@@ -327,6 +327,19 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     lessThan -- returns True if x is less than and not almostEquals y 
 
+.. function:: numToIntOrFloat(value)
+
+    Given a number, return an integer if it is very close to an integer, otherwise, return a float. 
+
+    >>> numToIntOrFloat(1.0)
+    1 
+    >>> numToIntOrFloat(1.00003)
+    1.00003 
+    >>> numToIntOrFloat(1.5)
+    1.5 
+    >>> numToIntOrFloat(1.0000000005)
+    1 
+
 .. function:: sortFilesRecent(fileList)
 
     Given two files, sort by most recent. Return only the file paths. 
@@ -460,7 +473,7 @@ defHash
 
 .. class:: defHash(hash=None, default=None, callDefault=False)
 
-    A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({"A": falsehash(), "B": falsehash()}) print(a["A"]["hi"]) # returns False there's probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element 
+    A replacement for dictionaries that behave a bit more like perl hashes. No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first in the definition and that default can be set to None (which it is) or to any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({"A": falsehash(), "B": falsehash()}) print(a["A"]["hi"]) # returns False there's probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element 
 
     inherits from: dict
 

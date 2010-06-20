@@ -240,7 +240,16 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dl class="attribute">
 <dt id="music21.stream.Stream.highestTime">
 <tt class="descname">highestTime</tt><a class="headerlink" href="#music21.stream.Stream.highestTime" title="Permalink to this definition">¶</a></dt>
-<dd>Returns the maximum of all Element offsets plus their Duration in quarter lengths. This value usually represents the last &#8220;release&#8221; in the Stream. The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately.</dd></dl>
+<dd><p>Returns the maximum of all Element offsets plus their Duration in quarter lengths. This value usually represents the last &#8220;release&#8221; in the Stream. Stream.duration is usually equal to the highestTime expressed as a Duration object, but it can be set separately for advanced operations. Example insert a dotted quarter at positions 0, 1, 2, 3, 4:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;A-&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">repeatInsert</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">highestTime</span> <span class="c"># 4 + 3</span>
+<span class="go">7.0</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.stream.Stream.isGapless">
@@ -292,7 +301,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dl class="attribute">
 <dt id="music21.stream.Stream.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.stream.Stream.mx" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create and return a musicxml score.</p>
+<dd><p>Create and return a musicxml Score object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">measure1</span> <span class="o">=</span> <span class="n">Measure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">measure1</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>
@@ -1447,7 +1456,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 <dl class="method">
 <dt id="music21.stream.Stream.replace">
 <tt class="descname">replace</tt><big>(</big><em>target</em>, <em>replacement</em>, <em>firstMatchOnly=False</em>, <em>allTargetSites=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.replace" title="Permalink to this definition">¶</a></dt>
-<dd>Given a <cite>target</cite> object, replace all references of that object with references to the supplied <cite>replacement</cite> object. If <cite>allTargetSites</cite> is True, all sites that have a reference for the relacement will be similarly changed. This is useful altering both a flat and nested representation.</dd></dl>
+<dd>Given a <cite>target</cite> object, replace all references of that object with references to the supplied <cite>replacement</cite> object. If <cite>allTargetSites</cite> is True (as it is by default), all sites that have a reference for the replacement will be similarly changed. This is useful altering both a flat and nested representation.</dd></dl>
 
 <dl class="method">
 <dt id="music21.stream.Stream.setupPickleScaffold">
@@ -1918,7 +1927,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 17, 2010.
+      Last updated on Jun 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

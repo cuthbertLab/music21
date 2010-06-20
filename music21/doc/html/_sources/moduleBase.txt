@@ -514,7 +514,7 @@ DefinedContexts
             >>> aContexts.getAttrByName('attr1') == 98
             True 
 
-        .. method:: getByClass(className, callerFirst=None, sortByCreationTime=False, memo=None)
+        .. method:: getByClass(className, serialReverseSearch=True, callerFirst=None, sortByCreationTime=False, memo=None)
 
             Return the most recently added reference based on className. Class name can be a string or the class name. This will recursively search the defined contexts of existing defined contexts. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position. 
 

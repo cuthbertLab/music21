@@ -15,47 +15,55 @@ music21.key
 
 .. function:: pitchToSharps(value, mode=None)
 
-    Given a pitch or :class:`music21.pitch.Pitch` object, return the number of sharps found in the major key. The `mode` parameter can be None, 'major', or 'minor'. 
+    Given a pitch or :class:`music21.pitch.Pitch` object, return the number of sharps found in the major key. The `mode` parameter can be None (=Major), 'major', or 'minor'. 
 
-    >>> pitchToSharps('c')
+    >>> from music21 import *
+    >>> key.pitchToSharps('c')
     0 
-    >>> pitchToSharps('c', 'minor')
+    >>> key.pitchToSharps('c', 'minor')
     -3 
-    >>> pitchToSharps('a', 'minor')
+    >>> key.pitchToSharps('a', 'minor')
     0 
-    >>> pitchToSharps('d')
+    >>> key.pitchToSharps('d')
     2 
-    >>> pitchToSharps('e-')
+    >>> key.pitchToSharps('e-')
     -3 
-    >>> pitchToSharps('a')
+    >>> key.pitchToSharps('a')
     3 
-    >>> pitchToSharps('e', 'minor')
+    >>> key.pitchToSharps('e', 'minor')
     1 
-    >>> pitchToSharps('f#', 'major')
+    >>> key.pitchToSharps('f#', 'major')
     6 
-    >>> pitchToSharps('g-', 'major')
+    >>> key.pitchToSharps('g-', 'major')
     -6 
-    >>> pitchToSharps('c#')
+    >>> key.pitchToSharps('c#')
     7 
-    >>> pitchToSharps('g#')
+    >>> key.pitchToSharps('g#')
     8 
 
 .. function:: sharpsToPitch(sharpCount)
 
     Given a number a positive/negative number of sharps, return a Pitch object set to the appropriate major key value. 
 
-    >>> sharpsToPitch(1)
+    >>> from music21 import *
+    >>> key.sharpsToPitch(1)
     G 
-    >>> sharpsToPitch(1)
+    >>> key.sharpsToPitch(1)
     G 
-    >>> sharpsToPitch(2)
+    >>> key.sharpsToPitch(2)
     D 
-    >>> sharpsToPitch(-2)
+    >>> key.sharpsToPitch(-2)
     B- 
-    >>> sharpsToPitch(-6)
+    >>> key.sharpsToPitch(-6)
     G- 
-    >>> sharpsToPitch(6)
+    Note that these are :class:`music21.pitch.Pitch` objects not just names: 
+    >>> k1 = key.sharpsToPitch(6)
+    >>> k1
     F# 
+    >>> k1.step
+    'F' 
+    >>> k1.accidental
+    <accidental sharp> 
 
 KeySignature
 ------------
@@ -65,7 +73,8 @@ KeySignature
 
     
 
-    >>> a = KeySignature(3)
+    >>> from music21 import *
+    >>> a = key.KeySignature(3)
     >>> a._strDescription()
     '3 sharps' 
 
@@ -100,27 +109,28 @@ KeySignature
 
         .. attribute:: alteredPitches
 
-            Return a list of pitches that are altered with this KeySignature. That is, all Pitch objects that will receive an accidental. 
+            Return a list of music21.pitch.Pitch objects that are altered by this KeySignature. That is, all Pitch objects that will receive an accidental. 
 
-            >>> a = KeySignature(3)
+            >>> from music21 import *
+            >>> a = key.KeySignature(3)
             >>> a.alteredPitches
             [F#, C#, G#] 
-            >>> a = KeySignature(1)
+            >>> a = key.KeySignature(1)
             >>> a.alteredPitches
             [F#] 
-            >>> a = KeySignature(9)
+            >>> a = key.KeySignature(9)
             >>> a.alteredPitches
             [F#, C#, G#, D#, A#, E#, B#, F##, C##] 
-            >>> a = KeySignature(-3)
+            >>> a = key.KeySignature(-3)
             >>> a.alteredPitches
             [B-, E-, A-] 
-            >>> a = KeySignature(-1)
+            >>> a = key.KeySignature(-1)
             >>> a.alteredPitches
             [B-] 
-            >>> a = KeySignature(-6)
+            >>> a = key.KeySignature(-6)
             >>> a.alteredPitches
             [B-, E-, A-, D-, G-, C-] 
-            >>> a = KeySignature(-8)
+            >>> a = key.KeySignature(-8)
             >>> a.alteredPitches
             [B-, E-, A-, D-, G-, C-, F-, B--] 
 
@@ -138,7 +148,8 @@ KeySignature
 
             Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`. 
 
-            >>> keyArray = [KeySignature(x) for x in range(-7,8)]
+            >>> from music21 import *
+            >>> keyArray = [key.KeySignature(x) for x in range(-7,8)]
             >>> keyArray[0].pitchAndMode
             (C-, None) 
             >>> keyArray[1].pitchAndMode
@@ -162,9 +173,61 @@ KeySignature
 
     **KeySignature** **methods**
 
+        .. method:: accidentalByStep(step)
+
+            given a step (C, D, E, F, etc.) return the accidental for that note in this key (using the natural minor for minor) or None if there is none. 
+
+            >>> from music21 import *
+            >>> g = key.KeySignature(1)
+            >>> g.accidentalByStep("F")
+            <accidental sharp> 
+            >>> g.accidentalByStep("G")
+            >>> f = KeySignature(-1)
+            >>> bbNote = note.Note("B-5")
+            >>> f.accidentalByStep(bbNote.step)
+            <accidental flat> 
+
+            
+            Fix a wrong note in F-major: 
+
+            
+            >>> wrongBNote = note.Note("B#4")
+            >>> if f.accidentalByStep(wrongBNote.step) != wrongBNote.accidental:
+            ...    wrongBNote.accidental = f.accidentalByStep(wrongBNote.step) 
+            >>> wrongBNote
+            <music21.note.Note B-> 
+
+            
+            Set all notes to the correct notes for a key using the note's Context: 
+
+            
+            >>> from music21 import *
+            >>> s1 = stream.Stream()
+            >>> s1.append(key.KeySignature(4))  # E-major or C-sharp-minor
+            >>> s1.append(note.HalfNote("C"))
+            >>> s1.append(note.HalfNote("E-"))
+            >>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
+            >>> s1.append(note.WholeNote("A"))
+            >>> s1.append(note.WholeNote("F#"))
+            >>> for n in s1.notes:
+            ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step) 
+            >>> s1.show('text')
+            {0.0} <music21.key.KeySignature of 4 sharps> 
+            {0.0} <music21.note.Note C#> 
+            {2.0} <music21.note.Note E> 
+            {4.0} <music21.key.KeySignature of 4 flats> 
+            {4.0} <music21.note.Note A-> 
+            {8.0} <music21.note.Note F> 
+
+            
+
+            
+
+            
+
         .. method:: transpose(value, inPlace=False)
 
-            Tranpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
+            Transpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied. 
 
             >>> a = KeySignature(2)
             >>> a.pitchAndMode

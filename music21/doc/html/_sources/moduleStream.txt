@@ -143,7 +143,14 @@ Stream
 
         .. attribute:: highestTime
 
-            Returns the maximum of all Element offsets plus their Duration in quarter lengths. This value usually represents the last "release" in the Stream. The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately. 
+            Returns the maximum of all Element offsets plus their Duration in quarter lengths. This value usually represents the last "release" in the Stream. Stream.duration is usually equal to the highestTime expressed as a Duration object, but it can be set separately for advanced operations. Example insert a dotted quarter at positions 0, 1, 2, 3, 4: 
+
+            >>> n = note.Note('A-')
+            >>> n.quarterLength = 3
+            >>> p1 = Stream()
+            >>> p1.repeatInsert(n, [0, 1, 2, 3, 4])
+            >>> p1.highestTime # 4 + 3
+            7.0 
 
         .. attribute:: isGapless
 
@@ -187,7 +194,7 @@ Stream
 
         .. attribute:: mx
 
-            Create and return a musicxml score. 
+            Create and return a musicxml Score object. 
 
             >>> n1 = note.Note()
             >>> measure1 = Measure()
@@ -1207,7 +1214,7 @@ Stream
 
         .. method:: replace(target, replacement, firstMatchOnly=False, allTargetSites=True)
 
-            Given a `target` object, replace all references of that object with references to the supplied `replacement` object. If `allTargetSites` is True, all sites that have a reference for the relacement will be similarly changed. This is useful altering both a flat and nested representation. 
+            Given a `target` object, replace all references of that object with references to the supplied `replacement` object. If `allTargetSites` is True (as it is by default), all sites that have a reference for the replacement will be similarly changed. This is useful altering both a flat and nested representation. 
 
         .. method:: setupPickleScaffold()
 

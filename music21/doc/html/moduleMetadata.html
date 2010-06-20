@@ -404,7 +404,18 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <dl class="attribute">
 <dt id="music21.metadata.Contributor.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.metadata.Contributor.mx" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd><p>Return a mxCreator object based on this object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">Metadata</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">composer</span> <span class="o">=</span> <span class="s">&#39;frank&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxCreator</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">_contributors</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">mx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxCreator</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;charData&#39;</span><span class="p">)</span>
+<span class="go">&#39;frank&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mxCreator</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">)</span>
+<span class="go">&#39;composer&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.metadata.Contributor.name">
@@ -505,19 +516,19 @@ Attributes inherited from <a title="music21.base.Music21Object" class="reference
 <dd>Get a list of all <a title="music21.metadata.Contributor" class="reference internal" href="#music21.metadata.Contributor"><tt class="xref docutils literal"><span class="pre">Contributor</span></tt></a> objects defined as composer of this work.</dd></dl>
 
 <dl class="attribute">
+<dt id="music21.metadata.Metadata.movementName">
+<tt class="descname">movementName</tt><a class="headerlink" href="#music21.metadata.Metadata.movementName" title="Permalink to this definition">¶</a></dt>
+<dd>Get or set the movement title.</dd></dl>
+
+<dl class="attribute">
 <dt id="music21.metadata.Metadata.movementNumber">
 <tt class="descname">movementNumber</tt><a class="headerlink" href="#music21.metadata.Metadata.movementNumber" title="Permalink to this definition">¶</a></dt>
 <dd>Get or set the movement number.</dd></dl>
 
 <dl class="attribute">
-<dt id="music21.metadata.Metadata.movementTitle">
-<tt class="descname">movementTitle</tt><a class="headerlink" href="#music21.metadata.Metadata.movementTitle" title="Permalink to this definition">¶</a></dt>
-<dd>Get or set the movement title.</dd></dl>
-
-<dl class="attribute">
 <dt id="music21.metadata.Metadata.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.metadata.Metadata.mx" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>Return a mxScore object, to be merged or used in final musicxml output</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.metadata.Metadata.number">
@@ -639,7 +650,7 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 17, 2010.
+      Last updated on Jun 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -679,7 +679,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 
 <dl class="method">
 <dt id="music21.base.DefinedContexts.getByClass">
-<tt class="descname">getByClass</tt><big>(</big><em>className</em>, <em>callerFirst=None</em>, <em>sortByCreationTime=False</em>, <em>memo=None</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getByClass" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">getByClass</tt><big>(</big><em>className</em>, <em>serialReverseSearch=True</em>, <em>callerFirst=None</em>, <em>sortByCreationTime=False</em>, <em>memo=None</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getByClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the most recently added reference based on className. Class name can be a string or the class name. This will recursively search the defined contexts of existing defined contexts. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">time</span>
@@ -1061,7 +1061,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 17, 2010.
+      Last updated on Jun 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

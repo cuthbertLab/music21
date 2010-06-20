@@ -348,7 +348,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.diatonicNoteNum">
 <tt class="descname">diatonicNoteNum</tt><a class="headerlink" href="#music21.pitch.Pitch.diatonicNoteNum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an integer that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc.</p>
+<dd><p>Returns (or takes) an integer that uniquely identifies the diatonic version of a note, that is ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">diatonicNoteNum</span>
 <span class="go">29</span>
@@ -360,6 +360,9 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <span class="go">&#39;double-flat&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">diatonicNoteNum</span>
 <span class="go">30</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lowc</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lowc</span><span class="o">.</span><span class="n">diatonicNoteNum</span>
+<span class="go">8</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="s">&quot;B&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">octave</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1</span>
@@ -368,6 +371,12 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">diatonicNoteNum</span>  <span class="c">#implicitOctave</span>
 <span class="go">29</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lowDSharp</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;C#7&quot;</span><span class="p">)</span> <span class="c"># !!!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lowDSharp</span><span class="o">.</span><span class="n">diatonicNoteNum</span> <span class="o">=</span> <span class="mf">9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lowDSharp</span><span class="o">.</span><span class="n">octave</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lowDSharp</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;D#&#39;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -688,7 +697,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 17, 2010.
+      Last updated on Jun 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

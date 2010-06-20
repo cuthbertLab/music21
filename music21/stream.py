@@ -906,9 +906,12 @@ class Stream(music21.Music21Object):
 
     def replace(self, target, replacement, firstMatchOnly=False,
                  allTargetSites=True):
-        '''Given a `target` object, replace all references of that object with references to the supplied `replacement` object.
+        '''Given a `target` object, replace all references of that object with 
+        references to the supplied `replacement` object.
 
-        If `allTargetSites` is True, all sites that have a reference for the relacement will be similarly changed. This is useful altering both a flat and nested representation.         
+        If `allTargetSites` is True (as it is by default), all sites that 
+        have a reference for the replacement will be similarly changed. 
+        This is useful altering both a flat and nested representation.         
         '''
         # get all indices in this Stream that match
         iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)

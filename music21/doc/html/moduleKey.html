@@ -96,28 +96,29 @@
 <dl class="function">
 <dt id="music21.key.pitchToSharps">
 <tt class="descclassname">music21.key.</tt><tt class="descname">pitchToSharps</tt><big>(</big><em>value</em>, <em>mode=None</em><big>)</big><a class="headerlink" href="#music21.key.pitchToSharps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a pitch or <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object, return the number of sharps found in the major key. The <cite>mode</cite> parameter can be None, &#8216;major&#8217;, or &#8216;minor&#8217;.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)</span>
+<dd><p>Given a pitch or <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object, return the number of sharps found in the major key. The <cite>mode</cite> parameter can be None (=Major), &#8216;major&#8217;, or &#8216;minor&#8217;.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)</span>
 <span class="go">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;minor&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;minor&#39;</span><span class="p">)</span>
 <span class="go">-3</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;minor&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;minor&#39;</span><span class="p">)</span>
 <span class="go">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
 <span class="go">2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;e-&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;e-&#39;</span><span class="p">)</span>
 <span class="go">-3</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
 <span class="go">3</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;minor&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;minor&#39;</span><span class="p">)</span>
 <span class="go">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;major&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;major&#39;</span><span class="p">)</span>
 <span class="go">6</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;g-&#39;</span><span class="p">,</span> <span class="s">&#39;major&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;g-&#39;</span><span class="p">,</span> <span class="s">&#39;major&#39;</span><span class="p">)</span>
 <span class="go">-6</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">)</span>
 <span class="go">7</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;g#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">pitchToSharps</span><span class="p">(</span><span class="s">&#39;g#&#39;</span><span class="p">)</span>
 <span class="go">8</span>
 </pre></div>
 </div>
@@ -127,18 +128,25 @@
 <dt id="music21.key.sharpsToPitch">
 <tt class="descclassname">music21.key.</tt><tt class="descname">sharpsToPitch</tt><big>(</big><em>sharpCount</em><big>)</big><a class="headerlink" href="#music21.key.sharpsToPitch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a number a positive/negative number of sharps, return a Pitch object set to the appropriate major key value.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
 <span class="go">G</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
 <span class="go">G</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="go">D</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="o">-</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="o">-</span><span class="mf">2</span><span class="p">)</span>
 <span class="go">B-</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="o">-</span><span class="mf">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span><span class="o">.</span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="o">-</span><span class="mf">6</span><span class="p">)</span>
 <span class="go">G-</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="mf">6</span><span class="p">)</span>
+<span class="go">Note that these are :class:`music21.pitch.Pitch` objects not just names:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">k1</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">sharpsToPitch</span><span class="p">(</span><span class="mf">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">k1</span>
 <span class="go">F#</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">k1</span><span class="o">.</span><span class="n">step</span>
+<span class="go">&#39;F&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">k1</span><span class="o">.</span><span class="n">accidental</span>
+<span class="go">&lt;accidental sharp&gt;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -149,7 +157,8 @@
 <dt id="music21.key.KeySignature">
 <em class="property">
 class </em><tt class="descclassname">music21.key.</tt><tt class="descname">KeySignature</tt><big>(</big><em>sharps=None</em><big>)</big><a class="headerlink" href="#music21.key.KeySignature" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">_strDescription</span><span class="p">()</span>
 <span class="go">&#39;3 sharps&#39;</span>
 </pre></div>
@@ -187,26 +196,27 @@ class </em><tt class="descclassname">music21.key.</tt><tt class="descname">KeySi
 <dl class="attribute">
 <dt id="music21.key.KeySignature.alteredPitches">
 <tt class="descname">alteredPitches</tt><a class="headerlink" href="#music21.key.KeySignature.alteredPitches" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of pitches that are altered with this KeySignature. That is, all Pitch objects that will receive an accidental.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<dd><p>Return a list of music21.pitch.Pitch objects that are altered by this KeySignature. That is, all Pitch objects that will receive an accidental.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
 <span class="go">[F#, C#, G#]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
 <span class="go">[F#]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="mf">9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">9</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
 <span class="go">[F#, C#, G#, D#, A#, E#, B#, F##, C##]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
 <span class="go">[B-, E-, A-]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
 <span class="go">[B-]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">6</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
 <span class="go">[B-, E-, A-, D-, G-, C-]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">8</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alteredPitches</span>
 <span class="go">[B-, E-, A-, D-, G-, C-, F-, B--]</span>
 </pre></div>
@@ -230,7 +240,8 @@ class </em><tt class="descclassname">music21.key.</tt><tt class="descname">KeySi
 <dt id="music21.key.KeySignature.pitchAndMode">
 <tt class="descname">pitchAndMode</tt><a class="headerlink" href="#music21.key.KeySignature.pitchAndMode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a a two value list containg a <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object that names this key and the value of <tt class="xref docutils literal"><span class="pre">mode</span></tt>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">keyArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">KeySignature</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mf">7</span><span class="p">,</span><span class="mf">8</span><span class="p">)]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">keyArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mf">7</span><span class="p">,</span><span class="mf">8</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">keyArray</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">pitchAndMode</span>
 <span class="go">(C-, None)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">keyArray</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">pitchAndMode</span>
@@ -258,9 +269,54 @@ class </em><tt class="descclassname">music21.key.</tt><tt class="descname">KeySi
 <p><strong>KeySignature</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
+<dt id="music21.key.KeySignature.accidentalByStep">
+<tt class="descname">accidentalByStep</tt><big>(</big><em>step</em><big>)</big><a class="headerlink" href="#music21.key.KeySignature.accidentalByStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a step (C, D, E, F, etc.) return the accidental for that note in this key (using the natural minor for minor) or None if there is none.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">accidentalByStep</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">)</span>
+<span class="go">&lt;accidental sharp&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">accidentalByStep</span><span class="p">(</span><span class="s">&quot;G&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bbNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;B-5&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">accidentalByStep</span><span class="p">(</span><span class="n">bbNote</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+<span class="go">&lt;accidental flat&gt;</span>
+</pre></div>
+</div>
+<p>Fix a wrong note in F-major:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">wrongBNote</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;B#4&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">accidentalByStep</span><span class="p">(</span><span class="n">wrongBNote</span><span class="o">.</span><span class="n">step</span><span class="p">)</span> <span class="o">!=</span> <span class="n">wrongBNote</span><span class="o">.</span><span class="n">accidental</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">wrongBNote</span><span class="o">.</span><span class="n">accidental</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">accidentalByStep</span><span class="p">(</span><span class="n">wrongBNote</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrongBNote</span>
+<span class="go">&lt;music21.note.Note B-&gt;</span>
+</pre></div>
+</div>
+<p>Set all notes to the correct notes for a key using the note&#8217;s Context:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">4</span><span class="p">))</span>  <span class="c"># E-major or C-sharp-minor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">HalfNote</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">HalfNote</span><span class="p">(</span><span class="s">&quot;E-&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="o">-</span><span class="mf">4</span><span class="p">))</span> <span class="c"># A-flat-major or F-minor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">WholeNote</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">WholeNote</span><span class="p">(</span><span class="s">&quot;F#&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">s1</span><span class="o">.</span><span class="n">notes</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">n</span><span class="o">.</span><span class="n">accidental</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">getContextByClass</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">)</span><span class="o">.</span><span class="n">accidentalByStep</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{0.0} &lt;music21.key.KeySignature of 4 sharps&gt;</span>
+<span class="go">{0.0} &lt;music21.note.Note C#&gt;</span>
+<span class="go">{2.0} &lt;music21.note.Note E&gt;</span>
+<span class="go">{4.0} &lt;music21.key.KeySignature of 4 flats&gt;</span>
+<span class="go">{4.0} &lt;music21.note.Note A-&gt;</span>
+<span class="go">{8.0} &lt;music21.note.Note F&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="music21.key.KeySignature.transpose">
 <tt class="descname">transpose</tt><big>(</big><em>value</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#music21.key.KeySignature.transpose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tranpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a <a title="music21.interval.Interval" class="reference external" href="moduleInterval.html#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">music21.interval.Interval</span></tt></a> object can be supplied.</p>
+<dd><p>Transpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a <a title="music21.interval.Interval" class="reference external" href="moduleInterval.html#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">music21.interval.Interval</span></tt></a> object can be supplied.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">KeySignature</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">pitchAndMode</span>
 <span class="go">(D, None)</span>
@@ -349,7 +405,7 @@ Properties inherited from <a title="music21.base.Music21Object" class="reference
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 17, 2010.
+      Last updated on Jun 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

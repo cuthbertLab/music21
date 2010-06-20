@@ -192,7 +192,7 @@
 <p>We can then iterate through the Part objects in the source Stream, get a flat representation of notes, and use the <a title="music21.stream.Stream.makeMeasures" class="reference external" href="moduleStream.html#music21.stream.Stream.makeMeasures"><tt class="xref docutils literal"><span class="pre">makeMeasures()</span></tt></a> method to create new Parts. The <a title="music21.stream.Stream.makeMeasures" class="reference external" href="moduleStream.html#music21.stream.Stream.makeMeasures"><tt class="xref docutils literal"><span class="pre">makeMeasures()</span></tt></a> method can take an optional Stream of TimeSignature objects that are used to configure the making of Measures.</p>
 <p>After Measure creation, Notes need to be split and extend with ties. the Stream <a title="music21.stream.Stream.makeTies" class="reference external" href="moduleStream.html#music21.stream.Stream.makeTies"><tt class="xref docutils literal"><span class="pre">makeTies()</span></tt></a> method can be used. These new Parts can be added to a new Stream and displayed.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sRebar</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">sSrc</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">sSrc</span><span class="o">.</span><span class="n">getElementsByClass</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">Part</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">newPart</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">getElementsNotOfClass</span><span class="p">(</span><span class="n">meter</span><span class="o">.</span><span class="n">TimeSignature</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">newPart</span> <span class="o">=</span> <span class="n">newPart</span><span class="o">.</span><span class="n">makeMeasures</span><span class="p">(</span><span class="n">tsStream</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">newPart</span><span class="o">.</span><span class="n">makeTies</span><span class="p">(</span><span class="n">inPlace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -586,7 +586,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 17, 2010.
+      Last updated on Jun 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

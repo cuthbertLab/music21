@@ -480,6 +480,22 @@
 <dd>lessThan &#8211; returns True if x is less than and not almostEquals y</dd></dl>
 
 <dl class="function">
+<dt id="music21.common.numToIntOrFloat">
+<tt class="descclassname">music21.common.</tt><tt class="descname">numToIntOrFloat</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.common.numToIntOrFloat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a number, return an integer if it is very close to an integer, otherwise, return a float.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">numToIntOrFloat</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">numToIntOrFloat</span><span class="p">(</span><span class="mf">1.00003</span><span class="p">)</span>
+<span class="go">1.00003</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">numToIntOrFloat</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="go">1.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">numToIntOrFloat</span><span class="p">(</span><span class="mf">1.0000000005</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="music21.common.sortFilesRecent">
 <tt class="descclassname">music21.common.</tt><tt class="descname">sortFilesRecent</tt><big>(</big><em>fileList</em><big>)</big><a class="headerlink" href="#music21.common.sortFilesRecent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given two files, sort by most recent. Return only the file paths.</p>
@@ -634,7 +650,7 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Ti
 <dt id="music21.common.defHash">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defHash</tt><big>(</big><em>hash=None</em>, <em>default=None</em>, <em>callDefault=False</em><big>)</big><a class="headerlink" href="#music21.common.defHash" title="Permalink to this definition">¶</a></dt>
-<dd><p>A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({&#8220;A&#8221;: falsehash(), &#8220;B&#8221;: falsehash()}) print(a[&#8220;A&#8221;][&#8220;hi&#8221;]) # returns False there&#8217;s probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element</p>
+<dd><p>A replacement for dictionaries that behave a bit more like perl hashes. No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first in the definition and that default can be set to None (which it is) or to any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({&#8220;A&#8221;: falsehash(), &#8220;B&#8221;: falsehash()}) print(a[&#8220;A&#8221;][&#8220;hi&#8221;]) # returns False there&#8217;s probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element</p>
 <p>inherits from: dict</p>
 <p><strong>defHash</strong> <strong>attributes</strong></p>
 <blockquote>
@@ -698,7 +714,7 @@ Methods inherited from list: <tt class="xref docutils literal"><span class="pre"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 17, 2010.
+      Last updated on Jun 20, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

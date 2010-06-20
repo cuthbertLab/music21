@@ -74,6 +74,7 @@ ConverterMusicXML
 
 .. class:: ConverterMusicXML(forceSource)
 
+    Converter for MusicXML 
 
     
 

@@ -371,7 +371,7 @@ music21.stream.Stream.augmentOrDiminish method moduleStream.html
 music21.stream.Stream.pitchAttributeCount method moduleStream.html
 music21.base.Music21Object.getSiteIds method moduleBase.html
 music21.stream.Measure.setLeftBarline method moduleStream.html
-music21.pitch.Pitch.updateAccidentalDisplay method modulePitch.html
+music21.metadata.Metadata.movementName attribute moduleMetadata.html
 music21.note.GeneralNote.beatDuration attribute moduleNote.html
 music21.clef.CBaritoneClef class moduleClef.html
 music21.base.Music21Object.removeLocationBySiteId method moduleBase.html
@@ -436,6 +436,7 @@ music21.note.GeneralNote.splitAtDurations method moduleNote.html
 music21.metadata.Metadata.mx attribute moduleMetadata.html
 music21.serial.RowSchoenbergOp50B class moduleSerial.html
 music21.key.KeySignature.classSortOrder attribute moduleKey.html
+music21.common.numToIntOrFloat function moduleCommon.html
 music21.interval.convertDiatonicNumberToStep function moduleInterval.html
 music21.interval.DiatonicInterval.reverse method moduleInterval.html
 music21.base.Music21Object.addContext method moduleBase.html
@@ -677,6 +678,7 @@ music21.environment.Preference class moduleEnvironment.html
 music21.duration.DurationUnit.link method moduleDuration.html
 music21.note.Note.freq440 attribute moduleNote.html
 music21.serial.RowSchoenbergOp48No3 class moduleSerial.html
+music21.key.KeySignature.accidentalByStep method moduleKey.html
 music21.duration.Duration.mx attribute moduleDuration.html
 music21.meter.TimeSignature.load method moduleMeter.html
 music21.metadata.Date.loadStr method moduleMetadata.html
@@ -865,7 +867,6 @@ music21.stream.Stream.remove method moduleStream.html
 music21.meter.TimeSignature.display attribute moduleMeter.html
 music21.note.GeneralNote class moduleNote.html
 music21.corpus.base.getBeethovenStringQuartets function moduleCorpusBase.html
-music21.metadata.Metadata.movementTitle attribute moduleMetadata.html
 music21.stream.Stream.repeatAppend method moduleStream.html
 music21.graph.PlotScatterPitchClassOffset class moduleGraph.html
 music21.note.Rest.isNote attribute moduleNote.html
@@ -932,6 +933,7 @@ music21.stream.Stream.makeRests method moduleStream.html
 music21.converter.ConverterHumdrum class moduleConverter.html
 music21.meter.TimeSignature.barDuration attribute moduleMeter.html
 music21.stream.Stream.measures attribute moduleStream.html
+music21.pitch.Pitch.updateAccidentalDisplay method modulePitch.html
 music21.duration.DurationUnit.updateQuarterLength method moduleDuration.html
 music21.stream.Stream.bestClef method moduleStream.html
 music21.note.QuarterNote class moduleNote.html

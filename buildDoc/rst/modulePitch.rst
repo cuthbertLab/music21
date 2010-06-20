@@ -229,7 +229,7 @@ Pitch
 
         .. attribute:: diatonicNoteNum
 
-            Returns an integer that uniquely identifies the note, ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc. 
+            Returns (or takes) an integer that uniquely identifies the diatonic version of a note, that is ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc. 
 
             >>> c = Pitch('c4')
             >>> c.diatonicNoteNum
@@ -242,6 +242,9 @@ Pitch
             'double-flat' 
             >>> d.diatonicNoteNum
             30 
+            >>> lowc = Pitch('c1')
+            >>> lowc.diatonicNoteNum
+            8 
             >>> b = Pitch()
             >>> b.step = "B"
             >>> b.octave = -1
@@ -250,6 +253,14 @@ Pitch
             >>> c = Pitch("C")
             >>> c.diatonicNoteNum  #implicitOctave
             29 
+            >>> lowDSharp = Pitch("C#7") # !!!
+            >>> lowDSharp.diatonicNoteNum = 9
+            >>> lowDSharp.octave
+            1 
+            >>> lowDSharp.name
+            'D#' 
+
+            
 
         .. attribute:: freq440
 
