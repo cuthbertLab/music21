@@ -820,8 +820,8 @@ class DefinedContexts(object):
     #---------------------------------------------------------------------------
     # for dealing with contexts or getting other information
 
-    def getByClass(self, className, callerFirst=None, sortByCreationTime=False, 
-                   memo=None):
+    def getByClass(self, className, serialReverseSearch=True, callerFirst=None,
+             sortByCreationTime=False, memo=None):
         '''Return the most recently added reference based on className. Class name can be a string or the class name.
 
         This will recursively search the defined contexts of existing defined contexts.
@@ -890,6 +890,7 @@ class DefinedContexts(object):
                 if id(obj) not in memo.keys():
                     if hasattr(obj, 'getContextByClass'):
                         post = obj.getContextByClass(className,
+                               serialReverseSearch=serialReverseSearch,
                                callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, 
                                memo=memo)
                         # after searching, store this obj in memo
@@ -1472,6 +1473,7 @@ class Music21Object(object):
             # if this is a stream, this will be the next level up, recursing
             # a reference to the callerFirst is continuall passed
             post = self._definedContexts.getByClass(className,
+                   serialReverseSearch=serialReverseSearch,
                    callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, memo=memo)
         return post
 

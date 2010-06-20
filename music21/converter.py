@@ -898,6 +898,7 @@ class Test(unittest.TestCase):
 
         # try to go the other way
         post = a.musicxml
+        #a.show()        
 
     def testConversionMXKey(self):
         from music21.musicxml import testPrimitive
@@ -933,6 +934,12 @@ _DOC_ORDER = [parse, parseFile, parseData, parseURL, Converter, ConverterMusicXM
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
     #music21.mainTest(Test, TestExternal)
+    import sys
 
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+
+    elif len(sys.argv) > 1:
+        a = Test()
+        a.testConversionMXArticulations()

@@ -5476,7 +5476,8 @@ class Score(Stream):
 
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
-
+        # add a metadata object
+        #self.insert(0, metadata.Metadata())
 
     def _getLily(self):
         '''
@@ -8139,7 +8140,7 @@ class Test(unittest.TestCase):
                 itemList.append(o)
                 itemList.append(copy.deepcopy(nAlter))
                 o += .25
-            environLocal.printDebug(['itemList', itemList])            
+            #environLocal.printDebug(['itemList', itemList])            
 
             sProc.insertAndShift(itemList)
             sProc.elements = sProc.sorted.elements
