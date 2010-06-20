@@ -217,6 +217,20 @@ class Text(object):
     def __str__(self):
         return str(self._data)
 
+    def _setLanguage(self, value):
+        self._language = value
+
+    def _getLanguage(self):
+        return self._language
+
+    language = property(_getLanguage, _setLanguage, 
+        doc = '''Set the language of the Text stored within.
+
+        >>> t = Text('my text')
+        >>> t.language = 'en'
+        >>> t.language  
+        'en'
+        ''')
 
 #-------------------------------------------------------------------------------
 class Date(object):
@@ -341,7 +355,7 @@ class Date(object):
         >>> d = Date()
         >>> d.loadStr('3030?/12~/?4')
         >>> str(d)
-        '3030?.12~.04?'
+        '3030?/12~/04?'
         '''
         # datetime.strftime("%Y.%m.%d")
         # cannot use this, as it does not support dates lower than 1900!
@@ -366,7 +380,7 @@ class Date(object):
                     sub = fmt % value
                 msg.append(sub)
 
-        return '.'.join(msg)
+        return '/'.join(msg)
 
 
     def loadStr(self, str):
@@ -374,27 +388,34 @@ class Date(object):
         
         Assume year/month/day/hour:minute:second
 
-        >>> d = Date()
+        >>> from music21 import *
+        >>> d = metadata.Date()
         >>> d.loadStr('3030?/12~/?4')
         >>> d.month, d.monthError
         (12, 'approximate')
         >>> d.year, d.yearError
         (3030, 'uncertain')
+        >>> d.month, d.monthError
+        (12, 'approximate')
         >>> d.day, d.dayError
         (4, 'uncertain')
+
+        >>> d = metadata.Date()
+        >>> d.loadStr('1834/12/4/4:50:32')
+        >>> d.minute, d.second
+        (50, 32)
+
         '''
         post = []
         postError = []
-        if '.' in str:
-            for chunk in str.split('.'):
-                value, error = self._stripError(chunk)
-                post.append(value) 
-                postError.append(error)
-        elif '/' in str:
-            for chunk in str.split('/'):
-                value, error = self._stripError(chunk)
-                post.append(value) 
-                postError.append(error)
+
+        str = str.replace(':', '/')
+        str = str.replace(' ', '')
+
+        for chunk in str.split('/'):
+            value, error = self._stripError(chunk)
+            post.append(value) 
+            postError.append(error)
 
         # as error is stripped, we can now convert to numbers
         post = [int(x) for x in post]
@@ -417,7 +438,7 @@ class Date(object):
         >>> a = Date()
         >>> a.loadDatetime(dt)
         >>> str(a)
-        '2005.02.01'
+        '2005/02/01'
         '''
         for attr in self.attrNames:
             if hasattr(dt, attr):
@@ -463,10 +484,13 @@ class Date(object):
 
         >>> a = Date(year=1843, month=3, day=3)
         >>> str(a)
-        '1843.03.03'
+        '1843/03/03'
         >>> a.datetime
         datetime.datetime(1843, 3, 3, 0, 0)
 
+        >>> a = Date(year=1843, month=3)
+        >>> str(a)
+        '1843/03/--'
         '''
         post = []
         # order here is order for datetime
@@ -499,11 +523,13 @@ class DateSingle(object):
         '''
         >>> dd = DateSingle('2009/12/31', 'approximate')
         >>> str(dd)
-        '2009.12.31'
+        '2009/12/31'
+        >>> dd.relevance
+        'approximate'
 
-        >>> dd = DateSingle('1805.3.12', 'uncertain')
+        >>> dd = DateSingle('1805/3/12', 'uncertain')
         >>> str(dd)
-        '1805.03.12'
+        '1805/03/12'
         '''
         self._data = None
         self._relevance = None # managed by property
@@ -521,8 +547,7 @@ class DateSingle(object):
         '''Assume a string is supplied as argument
         '''
         self._data = Date()
-        if common.isStr(data):
-            self._data.loadStr(data)
+        self._data.load(data)
 
     def _setRelevance(self, value):
         if value in ['certain', 'approximate', 'uncertain']:
@@ -539,6 +564,34 @@ class DateSingle(object):
     def __str__(self):
         return str(self._data)
 
+    def _getDatetime(self):
+        '''Get a datetime object.
+
+        >>> a = Date(year=1843, month=3, day=3)
+        >>> str(a)
+        '1843/03/03'
+        >>> a.datetime
+        datetime.datetime(1843, 3, 3, 0, 0)
+
+        >>> a = Date(year=1843, month=3)
+        >>> str(a)
+        '1843/03/--'
+        '''
+        # get from stored Date object
+        return self._data.datetime
+
+    datetime = property(_getDatetime, 
+        doc = '''Return a datetime object representation. 
+
+        >>> d = Date(year=1843, month=3, day=3)
+        >>> ds = DateSingle(d)
+        >>> ds.datetime
+        datetime.datetime(1843, 3, 3, 0, 0)
+        ''')
+
+
+
+
 
 class DateRelative(DateSingle):
     '''Store a relative date, sometime prior or sometime after
@@ -549,7 +602,7 @@ class DateRelative(DateSingle):
         '''
         >>> dd = DateRelative('2009/12/31', 'prior')
         >>> str(dd)
-        '2009.12.31'
+        '2009/12/31'
 
         >>> dd = DateRelative('2009/12/31', 'certain')
         Traceback (most recent call last):
@@ -577,7 +630,7 @@ class DateBetween(DateSingle):
         '''
         >>> dd = DateBetween(['2009/12/31', '2010/1/28'])
         >>> str(dd)
-        '2009.12.31 to 2010.01.28'
+        '2009/12/31 to 2010/01/28'
 
         >>> dd = DateBetween(['2009/12/31', '2010/1/28'], 'certain')
         Traceback (most recent call last):
@@ -592,8 +645,7 @@ class DateBetween(DateSingle):
         self._dataError = []
         for part in data:
             d = Date()
-            if common.isStr(part):
-                d.loadStr(part)
+            d.load(part)
             self._data.append(d) # a lost of Date objects
             # can look at Date and determine overall error
             self._dataError.append(None)
@@ -614,6 +666,7 @@ class DateBetween(DateSingle):
     relevance = property(DateSingle._getRelevance, _setRelevance)
 
 
+
 class DateSelection(DateSingle):
     '''Store a selection of dates, or a collection of dates that might all be possible
     '''
@@ -623,7 +676,7 @@ class DateSelection(DateSingle):
         '''
         >>> dd = DateSelection(['2009/12/31', '2010/1/28', '1894/1/28'], 'or')
         >>> str(dd)
-        '2009.12.31 or 2010.01.28 or 1894.01.28'
+        '2009/12/31 or 2010/01/28 or 1894/01/28'
 
         >>> dd = DateSelection(['2009/12/31', '2010/1/28'], 'certain')
         Traceback (most recent call last):
@@ -638,8 +691,7 @@ class DateSelection(DateSingle):
         self._dataError = []
         for part in data:
             d = Date()
-            if common.isStr(part):
-                d.loadStr(part)
+            d.load(part)
             self._data.append(d) # a lost of Date objects
             # can look at Date and determine overall error
             self._dataError.append(None)
@@ -695,11 +747,9 @@ class Contributor(object):
         # store birth and death of contributor, if known
         self._dateRange = [None, None]
         if 'birth' in keywords.keys():
-            self._dateRange[0] = Date()
-            self._dateRange[0].load(keywords['birth'])
+            self._dateRange[0] = DateSingle(keywords['birth'])
         if 'death' in keywords.keys():
-            self._dateRange[1] = Date()
-            self._dateRange[1].load(keywords['death'])
+            self._dateRange[1] = DateSingle(keywords['death'])
 
     def _getRole(self):
         return self._role
@@ -739,6 +789,9 @@ class Contributor(object):
         >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
         >>> td.name
         'Chopin, Fryderyk'
+        >>> td.names
+        ['Chopin, Fryderyk', 'Chopin, Frederick']
+
         ''')
 
     def _getNames(self):
@@ -948,11 +1001,11 @@ class Metadata(music21.Music21Object):
         >>> md = Metadata(title='Third Symphony')
         >>> md.title
         'Third Symphony'
-
+        
         >>> md = Metadata(popularTitle='Eroica')
         >>> md.title
         'Eroica'
-
+        
         >>> md = Metadata(title='Third Symphony', popularTitle='Eroica')
         >>> md.title
         'Third Symphony'
