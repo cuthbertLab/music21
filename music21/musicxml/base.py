@@ -1507,12 +1507,13 @@ class Rest(MusicXMLElementList):
     # temporary; this needs to be set based on clef
     # this could take a clef as an argument
     def setDefaults(self):
-        displayStep = DisplayStep()
-        displayStep.set('charData', 'B') # was D4
-        displayOctave = DisplayOctave()
-        displayOctave.set('charData', '4')
-        self.append(displayStep)
-        self.append(displayOctave)
+        pass
+#        displayStep = DisplayStep()
+#        displayStep.set('charData', 'B') # was D4
+#        displayOctave = DisplayOctave()
+#        displayOctave.set('charData', '4')
+#        self.append(displayStep)
+#        self.append(displayOctave)
 
 
 class DisplayStep(MusicXMLElement):

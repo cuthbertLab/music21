@@ -41,16 +41,16 @@ __all__ = ["analysis", "composition", "counterpoint", "corpus",
            
            "articulations", 
            'base', 
-           "chord", "chordTables", "clef","common", "converter", \
-           "defaults", "duration", "dynamics",\
-           "editorial","enharmonic", "environment", \
-           "graph", \
-           "interval", "instrument", "key", \
-           "metadata", "measure", "meter", \
-           "expressions", "note", \
-           "pitch", "ratios", \
+           "chord", "chordTables", "clef","common", "converter",
+           "defaults", "duration", "dynamics",
+           "editorial","enharmonic", "environment", 
+           "graph", 
+           "interval", "instrument", "key", 
+           "measure", "metadata", "meter", 
+           "expressions", "note", 
+           "pitch", "ratios", 
            "scale", "serial", "stream", 
-           "tempo", "text", "tinyNotation", \
+           "tempo", "text", "tinyNotation", 
            "voiceLeading"]
 
 # skipped purposely, "base", "node"

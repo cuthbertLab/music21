@@ -851,7 +851,10 @@ Advantage is coding time and fewer type errors while coding.
 '''
 
 class defHash(dict):
-    '''A replacement for dictionaries that behave a bit more like perl hashes.  No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first and that default can be set to None (which it is...) or any object.
+    '''A replacement for dictionaries that behave a bit more like perl hashes.  
+    No more KeyErrors. The difference between defHash and defaultdict is that the 
+    Dict values come first in the definition and that default can be set to 
+    None (which it is) or to any object.
     
     If you want a factory that makes hashes with a particular different default, use:
     

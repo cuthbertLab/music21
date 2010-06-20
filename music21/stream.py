@@ -28,6 +28,7 @@ from music21 import interval
 from music21 import key
 from music21 import lily as lilyModule
 from music21 import measure
+from music21 import metadata
 from music21 import meter
 from music21 import musicxml as musicxmlMod
 from music21 import note
@@ -472,9 +473,6 @@ class Stream(music21.Music21Object):
 
         return post
 
-
-
-
     def __deepcopy__(self, memo=None):
         '''This produces a new, independent object.
         '''
@@ -536,7 +534,7 @@ class Stream(music21.Music21Object):
         Used by both insert() and append()
         '''
         # using id() here b/c we do not want to get __eq__ comparisons
-        if id(element) == id(self): # cannot add this Stream into itself
+        if element is self: # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
 
         # temporarily removed
@@ -2831,9 +2829,14 @@ class Stream(music21.Music21Object):
 
 
     def extendDuration(self, objName, inPlace=True):
-        '''Given a Stream and an object class name, go through the Stream and find each instance of the desired object. The time between adjacent objects is then assigned to the duration of each object. The last duration of the last object is assigned to extend to the end of the Stream.
+        '''Given a Stream and an object class name, go through the Stream 
+        and find each instance of the desired object. The time between 
+        adjacent objects is then assigned to the duration of each object. 
+        The last duration of the last object is assigned to extend to the 
+        end of the Stream.
 
-        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+        If `inPlace` is True, this is done in-place; if `inPlace` is 
+        False, this returns a modified deep copy.
         
         >>> import music21.dynamics
         >>> stream1 = Stream()
@@ -3263,15 +3266,11 @@ class Stream(music21.Music21Object):
         ''')
 
     def _getHighestTime(self):
-        '''The largest offset plus duration.
-
-        >>> n = note.Note('A-')
+        '''returns the largest offset plus duration.
+      
+        >>> n = note.Note('C#')
         >>> n.quarterLength = 3
-        >>> p1 = Stream()
-        >>> p1.repeatInsert(n, [0, 1, 2, 3, 4])
-        >>> p1.highestTime # 4 + 3
-        7.0
-        
+
         >>> q = Stream()
         >>> for i in [20, 0, 10, 30, 40]:
         ...    p = Stream()
@@ -3319,9 +3318,22 @@ class Stream(music21.Music21Object):
 
     
     highestTime = property(_getHighestTime, doc='''
-        Returns the maximum of all Element offsets plus their Duration in quarter lengths. This value usually represents the last "release" in the Stream.
+        Returns the maximum of all Element offsets plus their Duration 
+        in quarter lengths. This value usually represents the last 
+        "release" in the Stream.
 
-        The duration of a Stream is usually equal to the highestTime expressed as a Duration object, but can be set separately.
+        Stream.duration is usually equal to the highestTime 
+        expressed as a Duration object, but it can be set separately 
+        for advanced operations.
+
+        Example insert a dotted quarter at positions 0, 1, 2, 3, 4:
+
+        >>> n = note.Note('A-')
+        >>> n.quarterLength = 3
+        >>> p1 = Stream()
+        >>> p1.repeatInsert(n, [0, 1, 2, 3, 4])
+        >>> p1.highestTime # 4 + 3
+        7.0
         ''')
 
     

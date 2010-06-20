@@ -1199,7 +1199,8 @@ class Pitch(music21.Music21Object):
     #---------------------------------------------------------------------------
     def _getDiatonicNoteNum(self):
         '''
-        Returns an integer that uniquely identifies the note, ignoring accidentals.
+        Returns (or takes) an integer that uniquely identifies the 
+        diatonic version of a note, that is ignoring accidentals.
         The number returned is the diatonic interval above C0 (the lowest C on
         a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc.
         Numbers can be negative for very low notes.        
@@ -1217,6 +1218,10 @@ class Pitch(music21.Music21Object):
         'double-flat'
         >>> d.diatonicNoteNum
         30
+        >>> lowc = Pitch('c1')
+        >>> lowc.diatonicNoteNum
+        8
+
         >>> b = Pitch()
         >>> b.step = "B"
         >>> b.octave = -1 
@@ -1225,6 +1230,14 @@ class Pitch(music21.Music21Object):
         >>> c = Pitch("C")
         >>> c.diatonicNoteNum  #implicitOctave
         29
+
+        >>> lowDSharp = Pitch("C#7") # !!!
+        >>> lowDSharp.diatonicNoteNum = 9
+        >>> lowDSharp.octave
+        1
+        >>> lowDSharp.name
+        'D#'
+
         '''
         if ['C','D','E','F','G','A','B'].count(self.step.upper()):
             noteNumber = ['C','D','E','F','G','A','B'].index(self.step.upper())
@@ -1232,9 +1245,17 @@ class Pitch(music21.Music21Object):
         else:
             raise PitchException("Could not find " + self.step + " in the index of notes") 
 
-    diatonicNoteNum = property(_getDiatonicNoteNum,
+    def _setDiatonicNoteNum(self, newNum):
+        octave = int((newNum-1)/7)
+        noteNameNum = newNum - 1 - (7*octave)
+        pitchList = ['C','D','E','F','G','A','B']
+        noteName = pitchList[noteNameNum]
+        self.octave = octave
+        self.step = noteName
+        return self
+
+    diatonicNoteNum = property(_getDiatonicNoteNum, _setDiatonicNoteNum,
         doc = _getDiatonicNoteNum.__doc__)
-        #Read-only property.\n"
 
                                     
     def transpose(self, value, inPlace=False):
