@@ -10,7 +10,10 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''Public interface for importing file formats into music21. 
+'''Public interface for importing various file formats into music21. 
+
+The most powerful and easy to use tool is the :func:`~music21.converter.parse` function. Simply provide a URL and, if the format is supported, a :class:`~music21.stream.Stream` will be returned. 
+
 '''
 
 

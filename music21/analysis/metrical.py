@@ -9,6 +9,12 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''Various tools and utilities for doing metrical or rhythmic analysis. 
+
+See the chapter :ref:`overviewMeters` for more information on defining metrical structures in music21.
+'''
+
+
 import music21.stream
 import music21.meter
 import unittest, doctest

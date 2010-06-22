@@ -72,6 +72,17 @@ Text
 
     
 
+    **Text** **properties**
+
+        .. attribute:: language
+
+            Set the language of the Text stored within. 
+
+            >>> t = Text('my text')
+            >>> t.language = 'en'
+            >>> t.language
+            'en' 
+
 
 Date
 ----
@@ -154,7 +165,7 @@ Date
             >>> a = Date()
             >>> a.loadDatetime(dt)
             >>> str(a)
-            '2005.02.01' 
+            '2005/02/01' 
 
         .. method:: loadOther(other)
 
@@ -170,14 +181,23 @@ Date
 
             Load a string date representation. Assume year/month/day/hour:minute:second 
 
-            >>> d = Date()
+            >>> from music21 import *
+            >>> d = metadata.Date()
             >>> d.loadStr('3030?/12~/?4')
             >>> d.month, d.monthError
             (12, 'approximate') 
             >>> d.year, d.yearError
             (3030, 'uncertain') 
+            >>> d.month, d.monthError
+            (12, 'approximate') 
             >>> d.day, d.dayError
             (4, 'uncertain') 
+            >>> d = metadata.Date()
+            >>> d.loadStr('1834/12/4/4:50:32')
+            >>> d.minute, d.second
+            (50, 32) 
+
+            
 
 
 DateSingle
@@ -193,10 +213,12 @@ DateSingle
 
     >>> dd = DateSingle('2009/12/31', 'approximate')
     >>> str(dd)
-    '2009.12.31' 
-    >>> dd = DateSingle('1805.3.12', 'uncertain')
+    '2009/12/31' 
+    >>> dd.relevance
+    'approximate' 
+    >>> dd = DateSingle('1805/3/12', 'uncertain')
     >>> str(dd)
-    '1805.03.12' 
+    '1805/03/12' 
 
     
 
@@ -205,6 +227,15 @@ DateSingle
         Attributes without Documentation: `isSingle`
 
     **DateSingle** **properties**
+
+        .. attribute:: datetime
+
+            Return a datetime object representation. 
+
+            >>> d = Date(year=1843, month=3, day=3)
+            >>> ds = DateSingle(d)
+            >>> ds.datetime
+            datetime.datetime(1843, 3, 3, 0, 0) 
 
         .. attribute:: relevance
 
@@ -222,7 +253,7 @@ DateRelative
 
     >>> dd = DateRelative('2009/12/31', 'prior')
     >>> str(dd)
-    '2009.12.31' 
+    '2009/12/31' 
     >>> dd = DateRelative('2009/12/31', 'certain')
     Traceback (most recent call last): 
     MetadataException: relevance value is not supported by this object: certain 
@@ -241,7 +272,7 @@ DateBetween
 
     >>> dd = DateBetween(['2009/12/31', '2010/1/28'])
     >>> str(dd)
-    '2009.12.31 to 2010.01.28' 
+    '2009/12/31 to 2010/01/28' 
     >>> dd = DateBetween(['2009/12/31', '2010/1/28'], 'certain')
     Traceback (most recent call last): 
     MetadataException: relevance value is not supported by this object: certain 
@@ -260,7 +291,7 @@ DateSelection
 
     >>> dd = DateSelection(['2009/12/31', '2010/1/28', '1894/1/28'], 'or')
     >>> str(dd)
-    '2009.12.31 or 2010.01.28 or 1894.01.28' 
+    '2009/12/31 or 2010/01/28 or 1894/01/28' 
     >>> dd = DateSelection(['2009/12/31', '2010/1/28'], 'certain')
     Traceback (most recent call last): 
     MetadataException: relevance value is not supported by this object: certain 
@@ -309,6 +340,10 @@ Contributor
             >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
             >>> td.name
             'Chopin, Fryderyk' 
+            >>> td.names
+            ['Chopin, Fryderyk', 'Chopin, Frederick'] 
+
+            
 
         .. attribute:: names
 

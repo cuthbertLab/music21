@@ -33,7 +33,7 @@ music21.graph.Graph.axis attribute moduleGraph.html
 music21.meter.TimeSignature.beatDivisionCountName attribute moduleMeter.html
 music21.environment.Environment.getDefaultRootTempDir method moduleEnvironment.html
 music21.graph.Graph.done method moduleGraph.html
-music21.serial.rowToMatrix function moduleSerial.html
+music21.metadata.Text.language attribute moduleMetadata.html
 music21.note.EighthNote class moduleNote.html
 music21.metadata.abbreviationToRole function moduleMetadata.html
 music21.meter.TimeSignature.beatLengthToQuarterLengthRatio attribute moduleMeter.html
@@ -63,6 +63,7 @@ music21.converter.Converter.stream attribute moduleConverter.html
 music21.editorial.NoteEditorial.lilyEnd method moduleEditorial.html
 music21.clef.Treble8vbClef class moduleClef.html
 music21.environment.Environment class moduleEnvironment.html
+music21.metadata.DateSingle.datetime attribute moduleMetadata.html
 music21.base.ElementWrapper class moduleBase.html
 music21.stream.Stream.attachIntervalsBetweenStreams method moduleStream.html
 music21.chord.Chord.pitches attribute moduleChord.html
@@ -366,6 +367,7 @@ music21.editorial.Comment.lily attribute moduleEditorial.html
 music21.meter.fractionSum function moduleMeter.html
 music21.chord.Chord.sortDiatonicAscending method moduleChord.html
 music21.note.Lyric class moduleNote.html
+music21.serial.rowToMatrix function moduleSerial.html
 music21.note.GeneralNote.lyric attribute moduleNote.html
 music21.stream.Stream.augmentOrDiminish method moduleStream.html
 music21.stream.Stream.pitchAttributeCount method moduleStream.html

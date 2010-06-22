@@ -8,6 +8,11 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''Various tools and utilities to find correlations between disparate objects in a Stream.
+
+See the chapter :ref:`overviewFormats` for more information and examples of converting formats into and out of music21.
+'''
+
 
 import unittest, doctest, random
 import sys

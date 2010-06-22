@@ -170,6 +170,21 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <span class="go">&#39;concerto in d&#39;</span>
 </pre></div>
 </div>
+<p><strong>Text</strong> <strong>properties</strong></p>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.metadata.Text.language">
+<tt class="descname">language</tt><a class="headerlink" href="#music21.metadata.Text.language" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the language of the Text stored within.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s">&#39;my text&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s">&#39;en&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">language</span>
+<span class="go">&#39;en&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</blockquote>
 </dd></dl>
 
 </div>
@@ -261,7 +276,7 @@ Attributes without Documentation: <cite>attrStrFormat</cite>, <cite>minuteError<
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">loadDatetime</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="go">&#39;2005.02.01&#39;</span>
+<span class="go">&#39;2005/02/01&#39;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -283,14 +298,21 @@ Attributes without Documentation: <cite>attrStrFormat</cite>, <cite>minuteError<
 <dt id="music21.metadata.Date.loadStr">
 <tt class="descname">loadStr</tt><big>(</big><em>str</em><big>)</big><a class="headerlink" href="#music21.metadata.Date.loadStr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a string date representation. Assume year/month/day/hour:minute:second</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Date</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">Date</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">loadStr</span><span class="p">(</span><span class="s">&#39;3030?/12~/?4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">monthError</span>
 <span class="go">(12, &#39;approximate&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">yearError</span>
 <span class="go">(3030, &#39;uncertain&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">monthError</span>
+<span class="go">(12, &#39;approximate&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">dayError</span>
 <span class="go">(4, &#39;uncertain&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">Date</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">loadStr</span><span class="p">(</span><span class="s">&#39;1834/12/4/4:50:32&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">second</span>
+<span class="go">(50, 32)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -308,10 +330,12 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <dd><p>Store a date, either as certain, approximate, or uncertain.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSingle</span><span class="p">(</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;approximate&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
-<span class="go">&#39;2009.12.31&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSingle</span><span class="p">(</span><span class="s">&#39;1805.3.12&#39;</span><span class="p">,</span> <span class="s">&#39;uncertain&#39;</span><span class="p">)</span>
+<span class="go">&#39;2009/12/31&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span><span class="o">.</span><span class="n">relevance</span>
+<span class="go">&#39;approximate&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSingle</span><span class="p">(</span><span class="s">&#39;1805/3/12&#39;</span><span class="p">,</span> <span class="s">&#39;uncertain&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
-<span class="go">&#39;1805.03.12&#39;</span>
+<span class="go">&#39;1805/03/12&#39;</span>
 </pre></div>
 </div>
 <p><strong>DateSingle</strong> <strong>attributes</strong></p>
@@ -319,6 +343,18 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 Attributes without Documentation: <cite>isSingle</cite></blockquote>
 <p><strong>DateSingle</strong> <strong>properties</strong></p>
 <blockquote>
+<dl class="attribute">
+<dt id="music21.metadata.DateSingle.datetime">
+<tt class="descname">datetime</tt><a class="headerlink" href="#music21.metadata.DateSingle.datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a datetime object representation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DateSingle</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">datetime</span>
+<span class="go">datetime.datetime(1843, 3, 3, 0, 0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.metadata.DateSingle.relevance">
 <tt class="descname">relevance</tt><a class="headerlink" href="#music21.metadata.DateSingle.relevance" title="Permalink to this definition">¶</a></dt>
@@ -337,7 +373,7 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <dd><p>Store a relative date, sometime prior or sometime after</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateRelative</span><span class="p">(</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;prior&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
-<span class="go">&#39;2009.12.31&#39;</span>
+<span class="go">&#39;2009/12/31&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateRelative</span><span class="p">(</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;certain&#39;</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="nc">MetadataException: relevance value is not supported by this object</span>: <span class="n-Identifier">certain</span>
@@ -356,7 +392,7 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <dd><p>Store a relative date, sometime between two dates</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateBetween</span><span class="p">([</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;2010/1/28&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
-<span class="go">&#39;2009.12.31 to 2010.01.28&#39;</span>
+<span class="go">&#39;2009/12/31 to 2010/01/28&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateBetween</span><span class="p">([</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;2010/1/28&#39;</span><span class="p">],</span> <span class="s">&#39;certain&#39;</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="nc">MetadataException: relevance value is not supported by this object</span>: <span class="n-Identifier">certain</span>
@@ -375,7 +411,7 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <dd><p>Store a selection of dates, or a collection of dates that might all be possible</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSelection</span><span class="p">([</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;2010/1/28&#39;</span><span class="p">,</span> <span class="s">&#39;1894/1/28&#39;</span><span class="p">],</span> <span class="s">&#39;or&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
-<span class="go">&#39;2009.12.31 or 2010.01.28 or 1894.01.28&#39;</span>
+<span class="go">&#39;2009/12/31 or 2010/01/28 or 1894/01/28&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSelection</span><span class="p">([</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;2010/1/28&#39;</span><span class="p">],</span> <span class="s">&#39;certain&#39;</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="nc">MetadataException: relevance value is not supported by this object</span>: <span class="n-Identifier">certain</span>
@@ -424,6 +460,8 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">td</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s">&#39;composer&#39;</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Chopin, Fryderyk&#39;</span><span class="p">,</span> <span class="s">&#39;Chopin, Frederick&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;Chopin, Fryderyk&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">names</span>
+<span class="go">[&#39;Chopin, Fryderyk&#39;, &#39;Chopin, Frederick&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -650,7 +688,7 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 20, 2010.
+      Last updated on Jun 22, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

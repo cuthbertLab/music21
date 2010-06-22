@@ -7,7 +7,9 @@ music21.converter
 
 .. module:: music21.converter
 
-Public interface for importing file formats into music21. 
+Public interface for importing various file formats into music21. The most powerful and easy to use tool is the :func:`~music21.converter.parse` function. Simply provide a URL and, if the format is supported, a :class:`~music21.stream.Stream` will be returned. 
+
+
 
 
 .. function:: parse(value, *args, **keywords)
