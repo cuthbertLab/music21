@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 '''Classes and functions for creating and manipulating notes, ties, and durations.
 
-The :class:`music21.pitch.Pitch` object is stored within, and used to configure, :class:`music21.note.Note` objects.
+The :class:`~music21.pitch.Pitch` object is stored within, and used to configure, :class:`~music21.note.Note` objects.
 '''
 
 import string, copy, math
@@ -169,7 +169,7 @@ class Lyric(object):
 
 #-------------------------------------------------------------------------------
 class GeneralNote(music21.Music21Object):
-    '''A GeneralNote object is the parent object for the :class:`music21.note.Note`, :class:`music21.note.Rest`, :class:`music21.note.Chord`, and related objects. 
+    '''A GeneralNote object is the parent object for the :class:`~music21.note.Note`, :class:`~music21.note.Rest`, :class:`~music21.note.Chord`, and related objects. 
     '''    
     isChord = False
 
@@ -789,8 +789,8 @@ class Note(NotRest):
     'isNote': 'Boolean read-only value describing if this object is a Note.',
     'isUnpitched': 'Boolean read-only value describing if this is Unpitched.',
     'isRest': 'Boolean read-only value describing if this is a Rest.',
-    'beams': 'A :class:`music21.note.Beams` object.',
-    'pitch': 'A :class:`music21.pitch.Pitch` object.',
+    'beams': 'A :class:`~music21.note.Beams` object.',
+    'pitch': 'A :class:`~music21.pitch.Pitch` object.',
     }
 
     # Accepts an argument for pitch
@@ -833,7 +833,7 @@ class Note(NotRest):
     def _getNameWithOctave(self): return self.pitch.nameWithOctave
 
     nameWithOctave = property(_getNameWithOctave, 
-        doc = '''Return or set the pitch name with octave from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.nameWithOctave`.
+        doc = '''Return or set the pitch name with octave from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.nameWithOctave`.
         ''')
 
 
@@ -870,7 +870,7 @@ class Note(NotRest):
         self._setAccidental(accidental)
 
     accidental = property(_getAccidental, _setAccidental,
-        doc = '''Return or set the :class:`music21.pitch.Accidental` object from the :class:`music21.pitch.Pitch` object.
+        doc = '''Return or set the :class:`~music21.pitch.Accidental` object from the :class:`~music21.pitch.Pitch` object.
         ''') 
 
 
@@ -878,28 +878,28 @@ class Note(NotRest):
     def _setStep(self, value): self.pitch.step = value
 
     step = property(_getStep, _setStep, 
-        doc = '''Return or set the pitch step from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.step`.
+        doc = '''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
     def _getFrequency(self): return self.pitch.frequency
     def _setFrequency(self, value): self.pitch.frequency = value
 
     frequency = property(_getFrequency, _setFrequency, 
-        doc = '''Return or set the frequency from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.frequency`.
+        doc = '''Return or set the frequency from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.frequency`.
         ''')
     
     def _getFreq440(self): return self.pitch.freq440
     def _setFreq440(self, value): self.pitch.freq440 = value
 
     freq440 = property(_getFreq440, _setFreq440, 
-        doc = '''Return or set the freq440 value from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.freq440`.
+        doc = '''Return or set the freq440 value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.freq440`.
         ''')
 
     def _getOctave(self): return self.pitch.octave
     def _setOctave(self, value): self.pitch.octave = value
 
     octave = property(_getOctave, _setOctave, 
-        doc = '''Return or set the octave value from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.octave`.''')
+        doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.octave`.''')
 
     # rewmoved: use property
 # this is only here backward compat; remove when possible
@@ -924,7 +924,7 @@ class Note(NotRest):
         self.pitch.midi = value
 
     midi = property(_getMidi, _setMidi, 
-        doc = '''Return or set the numerical MIDI pitch representation from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.midi`.
+        doc = '''Return or set the numerical MIDI pitch representation from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.midi`.
         ''')
 
 
@@ -997,7 +997,7 @@ class Note(NotRest):
         self.pitch.pitchClassString = value
 
     pitchClassString = property(_getPitchClassString, _setPitchClassString,
-        doc = '''Return or set the pitch class string from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.pitchClassString`.
+        doc = '''Return or set the pitch class string from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.pitchClassString`.
         ''')
 
 
@@ -1009,7 +1009,7 @@ class Note(NotRest):
         return self.pitch.diatonicNoteNum
 
     diatonicNoteNum = property(_getDiatonicNoteNum, 
-        doc = '''Return the diatonic note number from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.diatonicNoteNum`.
+        doc = '''Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.
         ''')
 
 

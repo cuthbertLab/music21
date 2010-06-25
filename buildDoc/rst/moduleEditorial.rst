@@ -7,6 +7,7 @@ music21.editorial
 
 .. module:: music21.editorial
 
+Editorial objects store comments and other meta-data associated with specific :class:`~music21.note.Note` objects or other music21 objects. 
 
 
 NoteEditorial

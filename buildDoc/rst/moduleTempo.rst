@@ -7,6 +7,7 @@ music21.tempo
 
 .. module:: music21.tempo
 
+This module defines objects for describing tempo and changes in tempo. 
 
 
 TempoMark

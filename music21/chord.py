@@ -10,7 +10,7 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
-This module defines the Chord object, a sub-class of :class:`music21.note.GeneralNote`.
+This module defines the Chord object, a sub-class of :class:`~music21.note.GeneralNote`.
 '''
  
 import copy

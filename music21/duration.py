@@ -9,7 +9,7 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''Classes and functions for creating and processing durations. :class:`music21.duration.Duration` objects, while a fundamental component of :class:`music21.note.Note` objects, are also used to describe the duration of other Music21Objects, such as :class:`music21.stream.Stream` and :class:`music21.meter.TimeSignature` objects.
+'''Classes and functions for creating and processing durations. :class:`~music21.duration.Duration` objects, while a fundamental component of :class:`~music21.note.Note` objects, are also used to describe the duration of other Music21Objects, such as :class:`~music21.stream.Stream` and :class:`~music21.meter.TimeSignature` objects.
 '''
 
 import unittest, doctest

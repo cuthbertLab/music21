@@ -5,13 +5,15 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''This module defines numerous subclasses of :class:`~music21.clef.Clef`, providing object representations for all commonly used clefs. Clef objects are often found within :class:`~music21.stream.Measure` objects.  
+'''
+
 import unittest
 
 import music21
-
 from music21 import common
 from music21 import musicxml
 from music21.lily import LilyString

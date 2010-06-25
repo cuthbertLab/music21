@@ -7,7 +7,7 @@ music21.note
 
 .. module:: music21.note
 
-Classes and functions for creating and manipulating notes, ties, and durations. Pitch-specific functions are in music21.pitch, but obviously are of great importance here too. 
+Classes and functions for creating and manipulating notes, ties, and durations. The :class:`~music21.pitch.Pitch` object is stored within, and used to configure, :class:`~music21.note.Note` objects. 
 
 
 .. function:: noteFromDiatonicNumber(number)
@@ -42,11 +42,11 @@ Note
 
         .. attribute:: beams
 
-            A :class:`music21.note.Beams` object. 
+            A :class:`~music21.note.Beams` object. 
 
         .. attribute:: pitch
 
-            A :class:`music21.pitch.Pitch` object. 
+            A :class:`~music21.pitch.Pitch` object. 
 
         Attributes inherited from :class:`~music21.note.NotRest`: :attr:`~music21.note.NotRest.stemDirection`
 
@@ -58,7 +58,7 @@ Note
 
         .. attribute:: nameWithOctave
 
-            Return or set the pitch name with octave from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.nameWithOctave`. 
+            Return or set the pitch name with octave from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.nameWithOctave`. 
 
         .. attribute:: pitchClass
 
@@ -66,19 +66,19 @@ Note
 
         .. attribute:: accidental
 
-            Return or set the :class:`music21.pitch.Accidental` object from the :class:`music21.pitch.Pitch` object. 
+            Return or set the :class:`~music21.pitch.Accidental` object from the :class:`~music21.pitch.Pitch` object. 
 
         .. attribute:: diatonicNoteNum
 
-            Return the diatonic note number from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.diatonicNoteNum`. 
+            Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.diatonicNoteNum`. 
 
         .. attribute:: freq440
 
-            Return or set the freq440 value from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.freq440`. 
+            Return or set the freq440 value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.freq440`. 
 
         .. attribute:: frequency
 
-            Return or set the frequency from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.frequency`. 
+            Return or set the frequency from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.frequency`. 
 
         .. attribute:: lily
 
@@ -86,7 +86,7 @@ Note
 
         .. attribute:: midi
 
-            Return or set the numerical MIDI pitch representation from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.midi`. 
+            Return or set the numerical MIDI pitch representation from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.midi`. 
 
         .. attribute:: mx
 
@@ -98,11 +98,11 @@ Note
 
         .. attribute:: octave
 
-            Return or set the octave value from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.octave`. 
+            Return or set the octave value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.octave`. 
 
         .. attribute:: pitchClassString
 
-            Return or set the pitch class string from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.pitchClassString`. 
+            Return or set the pitch class string from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.pitchClassString`. 
 
         .. attribute:: ps
 
@@ -110,7 +110,7 @@ Note
 
         .. attribute:: step
 
-            Return or set the pitch step from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.step`. 
+            Return or set the pitch step from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.step`. 
 
         Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
@@ -214,7 +214,7 @@ GeneralNote
 
 .. class:: GeneralNote(*arguments, **keywords)
 
-    A GeneralNote object is the parent object for the :class:`music21.note.Note`, :class:`music21.note.Rest`, :class:`music21.note.Chord`, and related objects. 
+    A GeneralNote object is the parent object for the :class:`~music21.note.Note`, :class:`~music21.note.Rest`, :class:`~music21.note.Chord`, and related objects. 
 
     inherits from: :class:`~music21.base.Music21Object`
 

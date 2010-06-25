@@ -8,7 +8,7 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''This module defines objects for representing key signatures, as well as key areas. The :class:`music21.key.KeySignature` is used in :class:`music21.stream.Measure` objects for defining notated key signatures. 
+'''This module defines objects for representing key signatures, as well as key areas. The :class:`~music21.key.KeySignature` is used in :class:`~music21.stream.Measure` objects for defining notated key signatures. 
 '''
 
 import doctest, unittest

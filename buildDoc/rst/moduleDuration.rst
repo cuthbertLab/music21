@@ -7,7 +7,7 @@ music21.duration
 
 .. module:: music21.duration
 
-Classes and functions for creating and processing durations. Durations, while a fundamental component of Note objects, are also used to describe the duration of other Music21Objects, such as Stream and TimeSignature objects. 
+Classes and functions for creating and processing durations. :class:`~music21.duration.Duration` objects, while a fundamental component of :class:`~music21.note.Note` objects, are also used to describe the duration of other Music21Objects, such as :class:`~music21.stream.Stream` and :class:`~music21.meter.TimeSignature` objects. 
 
 
 .. function:: convertQuarterLengthToType(qLen)

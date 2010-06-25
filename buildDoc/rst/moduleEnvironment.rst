@@ -7,7 +7,7 @@ music21.environment
 
 .. module:: music21.environment
 
-The environment module describes a flexible system for accessing and setting variables related to the user's music21 environment.  Such variables include the location of external applications such as Finale, whether music21 is allowed to access the on-line virtual corpus, etc. Complete documentation for using the module is found in :ref:`environment`. 
+The environment module describes an object for accessing and setting variables related to the user's music21 environment. Such variables include the location of external applications such as MusicXML readers (e.g. Finale), whether music21 is allowed to download files directly (via the virtual corpus), and other settings. Additional documentation for and examples of using this module are found in :ref:`environment`. 
 
 
 Environment

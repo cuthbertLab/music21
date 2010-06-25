@@ -7,6 +7,7 @@ music21.node
 
 .. module:: music21.node
 
+An object base-class for creating and editing specialized XML structures as object representations. 
 
 
 .. function:: fixed_writexml(writer, indent=, addindent=, newl=)

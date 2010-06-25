@@ -9,9 +9,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Classes for representing and processing articulations. Specific articulations are modeled as :class:`music21.articulation.Articulation` subclasses. 
+'''Classes for representing and processing articulations. Specific articulations are modeled as :class:`~music21.articulation.Articulation` subclasses. 
 
- A :class:`music21.note.Note` object has a :attr:`music21.note.Note.articulations` attribute. This list can be used to store one or more :class:`music21.articulation.Articulation` subclasses.
+ A :class:`~music21.note.Note` object has a :attr:`~music21.note.Note.articulations` attribute. This list can be used to store one or more :class:`music21.articulation.Articulation` subclasses.
 
 As much as possible, MusicXML names are used for Articulation classes, with xxx-yyy changed to XxxYyy 
 '''

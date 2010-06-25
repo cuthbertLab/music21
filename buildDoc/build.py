@@ -17,6 +17,7 @@ import types, inspect
 import music21
 
 from music21 import base
+from music21 import beam
 from music21 import clef
 from music21 import chord
 from music21 import common
@@ -61,6 +62,9 @@ MOCK_RE = re.compile('') # for testing against instance
 
 INDENT = ' '*4
 OMIT_STR = 'OMIT_FROM_DOCS'
+HIDE_LINE_STR = '#_DOCS_HIDE'
+SHOW_LINE_STR = '#_DOCS_SHOW'
+
 FORMATS = ['html', 'latex', 'pdf']
 
 # this is added to generated files
@@ -71,6 +75,7 @@ NO_DOC = 'No documentation.'
 
 MODULES = [
     base,
+    beam,
     clef, 
     common, 
     converter,
@@ -803,12 +808,20 @@ class RestructuredWriter(object):
         lines = doc.split('\n')
         sub = []
         for line in lines:
-            if OMIT_STR in line.strip(): # permit blocking doctest examples
+            line = line.strip()
+
+            if OMIT_STR in line: # permit blocking doctest examples
                 break # do not gather any more lines
-            
+            elif HIDE_LINE_STR in line: # do not show in docs
+                continue
+            elif SHOW_LINE_STR in line: # do not show in docs
+                line = line.replace(SHOW_LINE_STR, '')
+                # there may be two spaces after this removal; replace
+                line = line.replace('  ', ' ')
+
             match = False
             for stub in rstExclude:
-                if line.strip().startswith(stub):
+                if line.startswith(stub):
                     # do not strip
                     #environLocal.printDebug(['found rst in doc string:', line.strip()])
                     if stub == '.. image::':
@@ -819,7 +832,7 @@ class RestructuredWriter(object):
                     break
             # else, add a stripped line
             if not match:
-                sub.append(line.strip())
+                sub.append(line)
 
         # find double breaks in text
         post = []

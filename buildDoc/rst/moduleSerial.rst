@@ -7,6 +7,7 @@ music21.serial
 
 .. module:: music21.serial
 
+This module defines objects for defining and manipulating structures common to serial and/or twelve-tone music, including :class:`~music21.serial.ToneRow` subclasses. 
 
 
 .. function:: pcToToneRow(pcSet)

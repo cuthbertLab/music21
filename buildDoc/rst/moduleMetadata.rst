@@ -7,7 +7,7 @@ music21.metadata
 
 .. module:: music21.metadata
 
-Classes and functions for creating and processing score meta data, such as titles, movements, authors, publishers, and regions. 
+Classes and functions for creating and processing score metadata, such as titles, movements, authors, publishers, and regions. 
 
 
 .. function:: abbreviationToRole(value)

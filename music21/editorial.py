@@ -10,7 +10,7 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Editorial objects store comments and other meta-data associated with specific :class:`music21.note.Note` objects or other music21 objects. 
+'''Editorial objects store comments and other meta-data associated with specific :class:`~music21.note.Note` objects or other music21 objects. 
 '''
 
 

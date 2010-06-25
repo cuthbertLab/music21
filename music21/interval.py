@@ -10,7 +10,7 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''This module defines various types of interval objects. Fundamental classes are :class:`music21.interval.Interval`, :class:`music21.interval.DiatonicInterval`, and :class:`music21.interval.ChromaticInterval`.
+'''This module defines various types of interval objects. Fundamental classes are :class:`~music21.interval.Interval`, :class:`~music21.interval.DiatonicInterval`, and :class:`~music21.interval.ChromaticInterval`.
 
 Numerous utility functions are provided for processing and generating intervals.
 '''

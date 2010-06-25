@@ -10,7 +10,7 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Beam objects, added to :class:`music21.note.Note` and :class:`music21.chord.Chord` objects `beam` list, found on :attr:`music21.note.Note.beams` and :attr:`music21.chord.Chord.beams` attributes. 
+'''Beam objects, added to :class:`~music21.note.Note` and :class:`~music21.chord.Chord` objects `beam` list, found on :attr:`~music21.note.Note.beams` and :attr:`~music21.chord.Chord.beams` attributes. 
 
 '''
 

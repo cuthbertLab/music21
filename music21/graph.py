@@ -10,7 +10,7 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Object definitions for graphing and plotting :class:`music21.stream.Stream` objects. The :class:`music21.graph.Graph` object subclasses abstract fundamental graphing archetypes using the matplotlib library. The :class:`music21.graph.Plot` object subclasses provide reusable approaches to graphing data and structures in :class:`music21.stream.Stream` objects.
+'''Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. The :class:`~music21.graph.Graph` object subclasses abstract fundamental graphing archetypes using the matplotlib library. The :class:`~music21.graph.Plot` object subclasses provide reusable approaches to graphing data and structures in :class:`~music21.stream.Stream` objects.
 '''
 
 import unittest, doctest
@@ -445,17 +445,15 @@ class GraphHorizontalBar(Graph):
 
         Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.
 
-    .. image:: images/GraphHorizontalBarComposers.*
+    .. image:: images/GraphHorizontalBar.*
         :width: 600
 
-       
         >>> from music21 import *
-        >>> #----# a = graph.GraphHorizontalBar(doneAction='show')
-        >>> a = graph.GraphHorizontalBar(doneAction=None)  #--OMIT_DOCS--#
+        >>> #_DOCS_SHOW a = graph.GraphHorizontalBar(doneAction='show')
+        >>> a = graph.GraphHorizontalBar(doneAction=None)  #_DOCS_HIDE
         >>> data = [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
         >>> a.setData(data)
         >>> a.process()
-
 
         '''
         Graph.__init__(self, *args, **keywords)
@@ -2499,7 +2497,8 @@ class TestExternal(unittest.TestCase):
         # pair data with class name
         graphClasses = [
         (GraphHorizontalBar, 
-            [('a', [(15, 40)]), ('b', [(5,25), (20,40)]), ('c', [(0,60)])]),
+            [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
+        ),
         (GraphScatterWeighted, 
             [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]),
         (GraphScatter, 
@@ -2517,6 +2516,20 @@ class TestExternal(unittest.TestCase):
             fp = os.path.join(environLocal.getRootTempDir(), fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
+
+
+    def writeGraphColorGrid(self):
+        # this is temporary
+        import os
+        a = GraphColorGrid(doneAction=None)
+        data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
+        a.setData(data)
+        a.process()
+        fn = a.__class__.__name__ + '.png'
+        fp = os.path.join(environLocal.getRootTempDir(), fn)
+
+        a.write(fp)
+
 
 
     def writeAllPlots(self):
@@ -2738,4 +2751,7 @@ if __name__ == "__main__":
 
         #a.testPlotQuarterLength()
         #a.testPlotScatterPitchSpaceQuarterLength()
-        a.testPlotScatterPitchSpaceDynamicSymbol()
+        #a.testPlotScatterPitchSpaceDynamicSymbol()
+
+        #a.writeGraphColorGrid()
+        a.writeAllGraphs()

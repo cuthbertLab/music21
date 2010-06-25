@@ -7,6 +7,7 @@ music21.instrument
 
 .. module:: music21.instrument
 
+This module defines object models for instrument representations. Metadata for instrument realizations, including transpositions and default MIDI program numbers, are also included. 
 
 
 Instrument
