@@ -12,9 +12,7 @@
 
 import unittest, doctest
 
-
 import music21
-
 from music21 import meter
 from music21 import note
 from music21 import musicxml
@@ -22,7 +20,6 @@ musicxmlMod = musicxml # alias as to avoid name conflicts
 
 
 # TODO: it seems that this module might be better named bar
-# as it defines measure attributes and not Measures
 
 #-------------------------------------------------------------------------------
 class Barline(music21.Music21Object):

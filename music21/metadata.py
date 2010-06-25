@@ -8,7 +8,7 @@
 # Copyright:    (c) 2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''Classes and functions for creating and processing score meta data, such as titles, movements, authors, publishers, and regions.
+'''Classes and functions for creating and processing score metadata, such as titles, movements, authors, publishers, and regions.
 '''
 
 

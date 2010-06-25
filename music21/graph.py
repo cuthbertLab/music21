@@ -10,11 +10,13 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''Object definitions for graphing and plotting :class:`music21.stream.Stream` objects. The :class:`music21.graph.Graph` object subclasses abstract fundamental graphing archetypes using the matplotlib library. The :class:`music21.graph.Plot` object subclasses provide reusable approaches to graphing data and structures in :class:`music21.stream.Stream` objects.
+'''
+
 import unittest, doctest
 import random, math, sys
 
 import music21
-
 from music21 import note
 from music21 import dynamics
 from music21 import duration
@@ -27,7 +29,6 @@ from music21.analysis import correlate
 from music21 import environment
 _MOD = 'graph.py'
 environLocal = environment.Environment(_MOD)
-
 
 try:
     import matplotlib

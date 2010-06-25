@@ -10,13 +10,14 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''This module provides object representations of expression notation symbols.
+'''
+
 import doctest, unittest
 
 import music21
 import music21.interval
-
 from music21 import musicxml
-
 
 _MOD = 'expressions'
 

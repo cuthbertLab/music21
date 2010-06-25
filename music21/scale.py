@@ -1,6 +1,20 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         scale.py
+# Purpose:      music21 classes for representing scales
+#
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
+#
+# Copyright:    (c) 2009-2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
+'''Objects for defining scales. 
+'''
+
 import copy
 import unittest, doctest
-
 
 import music21
 from music21 import pitch

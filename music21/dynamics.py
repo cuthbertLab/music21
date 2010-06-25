@@ -10,8 +10,7 @@
 #-------------------------------------------------------------------------------
 
 '''
-Classes and functions for creating and manipulating dynamics.
-
+Classes and functions for creating and manipulating dynamic symbols. Rather than subclasses, the :class:`music21.dynamics.Dynamic` object is often specialized by parameters. 
 '''
 
 

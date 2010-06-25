@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:         test.py
+# Name:         text.py
 # Purpose:      music21 classes for text processing
 #
 # Authors:      Michael Scott Cuthbert
@@ -8,10 +8,12 @@
 # Copyright:    (c) 2009 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''Utility routines for processing text in scores and other musical objects. 
+'''
+
+
 import doctest, unittest
-
-import music21 ## needed to properly do isinstance checking
-
+import music21 # needed to properly do isinstance checking
 
 
 def assembleLyrics(streamIn):

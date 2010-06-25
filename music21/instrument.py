@@ -10,8 +10,10 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-import unittest, doctest
+'''This module defines object models for instrument representations. Metadata for instrument realizations, including transpositions and default MIDI program numbers, are also included. 
+'''
 
+import unittest, doctest
 
 import music21
 from music21 import musicxml

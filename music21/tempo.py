@@ -9,12 +9,16 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-_MOD = "tempo.py"
+'''This module defines objects for describing tempo and changes in tempo.
+'''
 
 import unittest, doctest
 
 import music21
 import music21.note
+
+_MOD = "tempo.py"
+
 
 class TempoMark(music21.Music21Object):
     '''

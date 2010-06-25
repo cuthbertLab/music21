@@ -8,6 +8,9 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''The :class:`music21.stream.Stream` and its subclasses, a subclass of the :class:`music21.base.Music21Object`, is the fundamental container of offset-positioned notation and musical elements in music21. Common Stream subclasses, such as the :class:`music21.stream.Measure` and :class:`music21.stream.Score` objects, are defined in this module. 
+'''
+
 
 import copy, types, random
 import doctest, unittest

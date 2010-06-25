@@ -7,7 +7,8 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-
+'''This module defines an object representation of MusicXML, used for converting to and from MusicXML and music21.
+'''
 
 import sys, os, copy
 import unittest, doctest

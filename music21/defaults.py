@@ -10,6 +10,10 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''Simple storage for data defaults used throughout music21.
+'''
+
+
 import unittest, doctest
 
 # note: this module should not import any higher level modules

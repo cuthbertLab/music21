@@ -9,9 +9,9 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''
-Classes and functions for creating and manipulating notes, ties, and durations.
-Pitch-specific functions are in music21.pitch, but obviously are of great importance here too.
+'''Classes and functions for creating and manipulating notes, ties, and durations.
+
+The :class:`music21.pitch.Pitch` object is stored within, and used to configure, :class:`music21.note.Note` objects.
 '''
 
 import string, copy, math

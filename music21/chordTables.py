@@ -9,10 +9,10 @@
 # License:       LGPL
 #-------------------------------------------------------------------------------
 
-'''This module stores numerous data lists used in deriving set-class values and other post-tonal chord representations. All features of this module are made available through :class:`music21.chord.Chord` objects. 
+'''This module stores numerous data lists used in deriving set-class values and other post-tonal chord representations. All features of this module are made available through :class:`music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
 
-import unittest, doctest
+import unittest, doctest 
 
 import music21
 from music21 import environment

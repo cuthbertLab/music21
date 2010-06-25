@@ -9,6 +9,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''This module defines the :class:`music21.meter.TimeSignature` object, as well as component objects for defining nested metrical structures, :class:`music21.meter.MeterTerminal` and :class:`music21.meter.MeterSequence` objects.
+'''
+
 import unittest, doctest
 import re, copy
 #import fractions # available in 2.6 and greater

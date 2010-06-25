@@ -6,16 +6,16 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''Editorial objects store comments and other meta-data associated with specific :class:`music21.note.Note` objects or other music21 objects. 
+'''
+
+
 import doctest, unittest
-
-
 import music21
-
-
 
 class EditorialException(Exception):
     pass

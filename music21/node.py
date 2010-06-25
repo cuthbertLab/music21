@@ -10,6 +10,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''An object base-class for creating and editing specialized XML structures as object representations. 
+'''
+
 import copy
 import xml.sax
 from xml.sax import saxutils

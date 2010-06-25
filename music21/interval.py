@@ -10,12 +10,10 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-"""Interval.py is a module for creating and manipulating interval objects.
-Included classes are Interval, DiatonicInterval, GenericInterval, and ChromaticInterval.
+'''This module defines various types of interval objects. Fundamental classes are :class:`music21.interval.Interval`, :class:`music21.interval.DiatonicInterval`, and :class:`music21.interval.ChromaticInterval`.
 
-There are also a number of useful lists included in the module.
-
-"""
+Numerous utility functions are provided for processing and generating intervals.
+'''
 
 import copy
 import math
