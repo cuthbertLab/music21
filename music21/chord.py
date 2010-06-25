@@ -9,8 +9,9 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-
-
+'''
+This module defines the Chord object, a sub-class of :class:`music21.note.GeneralNote`.
+'''
  
 import copy
 import unittest

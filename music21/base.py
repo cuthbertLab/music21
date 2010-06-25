@@ -11,15 +11,17 @@
 #-------------------------------------------------------------------------------
 
 '''
-Music21 base classes and important utilities.
+Music21 base classes for :class:`music21.stream.Stream` objects and elements contained within them. Additional objects for defining and manipulating elements are included.
 
-base -- the convention within music21 is that __init__ files contain:
+The namespace of this file, as all base.py files, is loaded into the package that contains this file via __init__.py. Everything in this file is this available after importing music21.
 
-   from base import *
-   
-so everything in this file can be accessed as music21.XXXX
-
+>>> import music21
+>>> music21.ElementWrapper
+<class 'music21.base.ElementWrapper'>
 '''
+
+# base -- the convention within music21 is that __init__ files contain:
+#    from base import *
 
 
 import copy

@@ -9,10 +9,11 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''
-music21.articulations -- Classes for dealing with articulations
+'''Classes for representing and processing articulations. Specific articulations are modeled as :class:`music21.articulation.Articulation` subclasses. 
 
-As much as possible, MusicXML names are used, with xxx-yyy changed to XxxYyy 
+ A :class:`music21.note.Note` object has a :attr:`music21.note.Note.articulations` attribute. This list can be used to store one or more :class:`music21.articulation.Articulation` subclasses.
+
+As much as possible, MusicXML names are used for Articulation classes, with xxx-yyy changed to XxxYyy 
 '''
 
 import doctest, unittest
@@ -31,6 +32,8 @@ class ClefException(Exception):
 
 #-------------------------------------------------------------------------------
 class Articulation(music21.Music21Object):
+    '''Base class for all Articulation sub-classes. 
+    '''
     def __init__(self):
         music21.Music21Object.__init__(self)
         self._mxName = None # specified in subclasses
