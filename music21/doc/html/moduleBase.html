@@ -90,7 +90,12 @@
             
   <div class="section" id="module-music21.base">
 <span id="modulebase"></span><h1>music21.base<a class="headerlink" href="#module-music21.base" title="Permalink to this headline">¶</a></h1>
-<p>Music21 base classes and important utilities. base &#8211; the convention within music21 is that __init__ files contain: from base import * so everything in this file can be accessed as music21.XXXX</p>
+<p>Music21 base classes for <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">music21.stream.Stream</span></tt></a> objects and elements contained within them. Additional objects for defining and manipulating elements are included. The namespace of this file, as all base.py files, is loaded into the package that contains this file via __init__.py. Everything in this file is this available after importing music21.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">music21</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">music21</span><span class="o">.</span><span class="n">ElementWrapper</span>
+<span class="go">&lt;class &#39;music21.base.ElementWrapper&#39;&gt;</span>
+</pre></div>
+</div>
 <div class="section" id="music21object">
 <h2>Music21Object<a class="headerlink" href="#music21object" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -1061,7 +1066,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 22, 2010.
+      Last updated on Jun 24, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -7,6 +7,7 @@ music21.chord
 
 .. module:: music21.chord
 
+This module defines the Chord object, a sub-class of :class:`music21.note.GeneralNote`. 
 
 
 Chord
