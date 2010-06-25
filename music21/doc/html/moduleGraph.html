@@ -127,7 +127,16 @@
 <dt id="music21.graph.PlotHistogramPitchSpace">
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotHistogramPitchSpace</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotHistogramPitchSpace" title="Permalink to this definition">¶</a></dt>
-<dd>A histogram of pitch space.</dd></dl>
+<dd><p>A histogram of pitch space.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotHistogramPitchSpace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
+<span class="go">&#39;histogram-pitch&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span> <span class="c"># with defaults and proper configuration, will open graph</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <img alt="_images/PlotHistogramPitchSpace.png" src="_images/PlotHistogramPitchSpace.png" />
 <table class="docutils field-list" frame="void" rules="none">
@@ -135,13 +144,6 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Plo
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">width:</th><td class="field-body"><p class="first">600</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotHistogramPitchSpace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">id</span>
-<span class="go">&#39;histogram-pitch&#39;</span>
-</pre></div>
-</div>
 <p>inherits from: <a title="music21.graph.PlotHistogram" class="reference internal" href="#music21.graph.PlotHistogram"><tt class="xref docutils literal"><span class="pre">PlotHistogram</span></tt></a>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">PlotStream</span></tt></a></p>
 <p><strong>PlotHistogramPitchSpace</strong> <strong>attributes</strong></p>
 <blockquote>
@@ -167,7 +169,16 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Plo
 <dt id="music21.graph.PlotHistogramPitchClass">
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotHistogramPitchClass</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotHistogramPitchClass" title="Permalink to this definition">¶</a></dt>
-<dd>A histogram of pitch class</dd></dl>
+<dd><p>A histogram of pitch class</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotHistogramPitchClass</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
+<span class="go">&#39;histogram-pitchClass&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span> <span class="c"># with defaults and proper configuration, will open graph</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <img alt="_images/PlotHistogramPitchClass.png" src="_images/PlotHistogramPitchClass.png" />
 <table class="docutils field-list" frame="void" rules="none">
@@ -175,13 +186,6 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Plo
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">width:</th><td class="field-body"><p class="first">600</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotHistogramPitchClass</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">id</span>
-<span class="go">&#39;histogram-pitchClass&#39;</span>
-</pre></div>
-</div>
 <p>inherits from: <a title="music21.graph.PlotHistogram" class="reference internal" href="#music21.graph.PlotHistogram"><tt class="xref docutils literal"><span class="pre">PlotHistogram</span></tt></a>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">PlotStream</span></tt></a></p>
 <p><strong>PlotHistogramPitchClass</strong> <strong>attributes</strong></p>
 <blockquote>
@@ -723,7 +727,7 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphHorizontalBar</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.GraphHorizontalBar" title="Permalink to this definition">¶</a></dt>
 <dd>Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.</dd></dl>
 
-<img alt="_images/GraphHorizontalBarComposers.png" src="_images/GraphHorizontalBarComposers.png" />
+<img alt="_images/GraphHorizontalBar.png" src="_images/GraphHorizontalBar.png" />
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

@@ -23,16 +23,17 @@ PlotHistogramPitchSpace
 
     A histogram of pitch space. 
 
-.. image:: images/PlotHistogramPitchSpace.* 
-:width: 600 
-
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHistogramPitchSpace(s)
+    >>> p.id
+    'histogram-pitch' 
+    >>> p.process() # with defaults and proper configuration, will open graph
     
 
-    >>> from music21 import corpus
-    >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> a = PlotHistogramPitchSpace(s)
-    >>> a.id
-    'histogram-pitch' 
+.. image:: images/PlotHistogramPitchSpace.* 
+    
+:width: 600 
 
     inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
@@ -58,14 +59,19 @@ PlotHistogramPitchClass
 
     A histogram of pitch class 
 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHistogramPitchClass(s)
+    >>> p.id
+    'histogram-pitchClass' 
+    >>> p.process() # with defaults and proper configuration, will open graph
+    
+
 .. image:: images/PlotHistogramPitchClass.* 
+    
 :width: 600 
 
-    >>> from music21 import corpus
-    >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> a = PlotHistogramPitchClass(s)
-    >>> a.id
-    'histogram-pitchClass' 
+    
 
     inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
@@ -524,7 +530,7 @@ GraphHorizontalBar
 
     Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values. 
 
-.. image:: images/GraphHorizontalBarComposers.* 
+.. image:: images/GraphHorizontalBar.* 
 :width: 600 
 
     >>> from music21 import *

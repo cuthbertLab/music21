@@ -1424,15 +1424,18 @@ class PlotHistogram(PlotStream):
 class PlotHistogramPitchSpace(PlotHistogram):
     '''A histogram of pitch space.
 
+    >>> from music21 import *
+
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHistogramPitchSpace(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW p = graph.PlotHistogramPitchSpace(s)
+    >>> p.id
+    'histogram-pitch'
+    >>> p.process() # with defaults and proper configuration, will open graph
+
     .. image:: images/PlotHistogramPitchSpace.*
         :width: 600
-
-
-    >>> from music21 import corpus
-    >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> a = PlotHistogramPitchSpace(s)
-    >>> a.id
-    'histogram-pitch'
     '''
     values = ['pitch']
     def __init__(self, streamObj, *args, **keywords):
@@ -1465,14 +1468,18 @@ class PlotHistogramPitchSpace(PlotHistogram):
 class PlotHistogramPitchClass(PlotHistogram):
     '''A histogram of pitch class
 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHistogramPitchClass(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW p = graph.PlotHistogramPitchClass(s)
+    >>> p.id
+    'histogram-pitchClass'
+    >>> p.process() # with defaults and proper configuration, will open graph
+
     .. image:: images/PlotHistogramPitchClass.*
         :width: 600
 
-    >>> from music21 import corpus
-    >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> a = PlotHistogramPitchClass(s)
-    >>> a.id
-    'histogram-pitchClass'
     '''
     values = ['pitchClass']
     def __init__(self, streamObj, *args, **keywords):
