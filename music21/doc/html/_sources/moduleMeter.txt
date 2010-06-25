@@ -7,6 +7,7 @@ music21.meter
 
 .. module:: music21.meter
 
+This module defines the :class:`~music21.meter.TimeSignature` object, as well as component objects for defining nested metrical structures, :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects. 
 
 
 .. function:: fractionSum(fList)

@@ -7,6 +7,7 @@ music21.expressions
 
 .. module:: music21.expressions
 
+This module provides object representations of expression notation symbols. 
 
 
 Fermata

@@ -7,6 +7,7 @@ music21.graph
 
 .. module:: music21.graph
 
+Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. The :class:`~music21.graph.Graph` object subclasses abstract fundamental graphing archetypes using the matplotlib library. The :class:`~music21.graph.Plot` object subclasses provide reusable approaches to graphing data and structures in :class:`~music21.stream.Stream` objects. 
 
 
 .. function:: plotStream(streamObj, *args, **keywords)

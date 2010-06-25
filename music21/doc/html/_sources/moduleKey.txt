@@ -7,6 +7,7 @@ music21.key
 
 .. module:: music21.key
 
+This module defines objects for representing key signatures, as well as key areas. The :class:`~music21.key.KeySignature` is used in :class:`~music21.stream.Measure` objects for defining notated key signatures. 
 
 
 .. function:: keyFromString(strKey)

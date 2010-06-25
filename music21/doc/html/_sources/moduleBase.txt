@@ -7,7 +7,7 @@ music21.base
 
 .. module:: music21.base
 
-Music21 base classes for :class:`music21.stream.Stream` objects and elements contained within them. Additional objects for defining and manipulating elements are included. The namespace of this file, as all base.py files, is loaded into the package that contains this file via __init__.py. Everything in this file is this available after importing music21. 
+Music21 base classes for :class:`~music21.stream.Stream` objects and elements contained within them. Additional objects for defining and manipulating elements are included. The namespace of this file, as all base.py files, is loaded into the package that contains this file via __init__.py. Everything in this file is thus available after importing music21. 
 
 >>> import music21
 >>> music21.ElementWrapper

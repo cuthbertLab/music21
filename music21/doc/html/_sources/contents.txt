@@ -42,6 +42,7 @@ Module Reference
    :maxdepth: 1
 
    moduleBase
+   moduleBeam
    moduleClef
    moduleCommon
    moduleConverter

@@ -97,7 +97,7 @@
             
   <div class="section" id="module-music21.note">
 <span id="modulenote"></span><h1>music21.note<a class="headerlink" href="#module-music21.note" title="Permalink to this headline">¶</a></h1>
-<p>Classes and functions for creating and manipulating notes, ties, and durations. Pitch-specific functions are in music21.pitch, but obviously are of great importance here too.</p>
+<p>Classes and functions for creating and manipulating notes, ties, and durations. The <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object is stored within, and used to configure, <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> objects.</p>
 <dl class="function">
 <dt id="music21.note.noteFromDiatonicNumber">
 <tt class="descclassname">music21.note.</tt><tt class="descname">noteFromDiatonicNumber</tt><big>(</big><em>number</em><big>)</big><a class="headerlink" href="#music21.note.noteFromDiatonicNumber" title="Permalink to this definition">¶</a></dt>
@@ -136,12 +136,12 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <dl class="attribute">
 <dt id="music21.note.Note.beams">
 <tt class="descname">beams</tt><a class="headerlink" href="#music21.note.Note.beams" title="Permalink to this definition">¶</a></dt>
-<dd>A <tt class="xref docutils literal"><span class="pre">music21.note.Beams</span></tt> object.</dd></dl>
+<dd>A <tt class="xref docutils literal"><span class="pre">Beams</span></tt> object.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.pitch">
 <tt class="descname">pitch</tt><a class="headerlink" href="#music21.note.Note.pitch" title="Permalink to this definition">¶</a></dt>
-<dd>A <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object.</dd></dl>
+<dd>A <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object.</dd></dl>
 
 <p>Attributes inherited from <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>: <tt class="xref docutils literal"><span class="pre">stemDirection</span></tt></p>
 <p>Attributes inherited from <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>: <a title="music21.note.GeneralNote.isChord" class="reference internal" href="#music21.note.GeneralNote.isChord"><tt class="xref docutils literal"><span class="pre">isChord</span></tt></a>, <a title="music21.note.GeneralNote.lyrics" class="reference internal" href="#music21.note.GeneralNote.lyrics"><tt class="xref docutils literal"><span class="pre">lyrics</span></tt></a>, <tt class="xref docutils literal"><span class="pre">notations</span></tt>, <a title="music21.note.GeneralNote.editorial" class="reference internal" href="#music21.note.GeneralNote.editorial"><tt class="xref docutils literal"><span class="pre">editorial</span></tt></a>, <a title="music21.note.GeneralNote.tie" class="reference internal" href="#music21.note.GeneralNote.tie"><tt class="xref docutils literal"><span class="pre">tie</span></tt></a>, <tt class="xref docutils literal"><span class="pre">articulations</span></tt></p>
@@ -152,7 +152,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <dl class="attribute">
 <dt id="music21.note.Note.nameWithOctave">
 <tt class="descname">nameWithOctave</tt><a class="headerlink" href="#music21.note.Note.nameWithOctave" title="Permalink to this definition">¶</a></dt>
-<dd>Return or set the pitch name with octave from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.nameWithOctave" class="reference external" href="modulePitch.html#music21.pitch.Pitch.nameWithOctave"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch.nameWithOctave</span></tt></a>.</dd></dl>
+<dd>Return or set the pitch name with octave from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.nameWithOctave" class="reference external" href="modulePitch.html#music21.pitch.Pitch.nameWithOctave"><tt class="xref docutils literal"><span class="pre">nameWithOctave</span></tt></a>.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.pitchClass">
@@ -162,22 +162,22 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <dl class="attribute">
 <dt id="music21.note.Note.accidental">
 <tt class="descname">accidental</tt><a class="headerlink" href="#music21.note.Note.accidental" title="Permalink to this definition">¶</a></dt>
-<dd>Return or set the <a title="music21.pitch.Accidental" class="reference external" href="modulePitch.html#music21.pitch.Accidental"><tt class="xref docutils literal"><span class="pre">music21.pitch.Accidental</span></tt></a> object from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object.</dd></dl>
+<dd>Return or set the <a title="music21.pitch.Accidental" class="reference external" href="modulePitch.html#music21.pitch.Accidental"><tt class="xref docutils literal"><span class="pre">Accidental</span></tt></a> object from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.diatonicNoteNum">
 <tt class="descname">diatonicNoteNum</tt><a class="headerlink" href="#music21.note.Note.diatonicNoteNum" title="Permalink to this definition">¶</a></dt>
-<dd>Return the diatonic note number from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.diatonicNoteNum" class="reference external" href="modulePitch.html#music21.pitch.Pitch.diatonicNoteNum"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch.diatonicNoteNum</span></tt></a>.</dd></dl>
+<dd>Return the diatonic note number from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.diatonicNoteNum" class="reference external" href="modulePitch.html#music21.pitch.Pitch.diatonicNoteNum"><tt class="xref docutils literal"><span class="pre">diatonicNoteNum</span></tt></a>.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.freq440">
 <tt class="descname">freq440</tt><a class="headerlink" href="#music21.note.Note.freq440" title="Permalink to this definition">¶</a></dt>
-<dd>Return or set the freq440 value from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.freq440" class="reference external" href="modulePitch.html#music21.pitch.Pitch.freq440"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch.freq440</span></tt></a>.</dd></dl>
+<dd>Return or set the freq440 value from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.freq440" class="reference external" href="modulePitch.html#music21.pitch.Pitch.freq440"><tt class="xref docutils literal"><span class="pre">freq440</span></tt></a>.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.frequency">
 <tt class="descname">frequency</tt><a class="headerlink" href="#music21.note.Note.frequency" title="Permalink to this definition">¶</a></dt>
-<dd>Return or set the frequency from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.frequency" class="reference external" href="modulePitch.html#music21.pitch.Pitch.frequency"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch.frequency</span></tt></a>.</dd></dl>
+<dd>Return or set the frequency from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.frequency" class="reference external" href="modulePitch.html#music21.pitch.Pitch.frequency"><tt class="xref docutils literal"><span class="pre">frequency</span></tt></a>.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.lily">
@@ -187,7 +187,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <dl class="attribute">
 <dt id="music21.note.Note.midi">
 <tt class="descname">midi</tt><a class="headerlink" href="#music21.note.Note.midi" title="Permalink to this definition">¶</a></dt>
-<dd>Return or set the numerical MIDI pitch representation from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.midi" class="reference external" href="modulePitch.html#music21.pitch.Pitch.midi"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch.midi</span></tt></a>.</dd></dl>
+<dd>Return or set the numerical MIDI pitch representation from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.midi" class="reference external" href="modulePitch.html#music21.pitch.Pitch.midi"><tt class="xref docutils literal"><span class="pre">midi</span></tt></a>.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.mx">
@@ -202,12 +202,12 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <dl class="attribute">
 <dt id="music21.note.Note.octave">
 <tt class="descname">octave</tt><a class="headerlink" href="#music21.note.Note.octave" title="Permalink to this definition">¶</a></dt>
-<dd>Return or set the octave value from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.octave" class="reference external" href="modulePitch.html#music21.pitch.Pitch.octave"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch.octave</span></tt></a>.</dd></dl>
+<dd>Return or set the octave value from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.octave" class="reference external" href="modulePitch.html#music21.pitch.Pitch.octave"><tt class="xref docutils literal"><span class="pre">octave</span></tt></a>.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.pitchClassString">
 <tt class="descname">pitchClassString</tt><a class="headerlink" href="#music21.note.Note.pitchClassString" title="Permalink to this definition">¶</a></dt>
-<dd>Return or set the pitch class string from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.pitchClassString" class="reference external" href="modulePitch.html#music21.pitch.Pitch.pitchClassString"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch.pitchClassString</span></tt></a>.</dd></dl>
+<dd>Return or set the pitch class string from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.pitchClassString" class="reference external" href="modulePitch.html#music21.pitch.Pitch.pitchClassString"><tt class="xref docutils literal"><span class="pre">pitchClassString</span></tt></a>.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.ps">
@@ -217,7 +217,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <dl class="attribute">
 <dt id="music21.note.Note.step">
 <tt class="descname">step</tt><a class="headerlink" href="#music21.note.Note.step" title="Permalink to this definition">¶</a></dt>
-<dd>Return or set the pitch step from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.step" class="reference external" href="modulePitch.html#music21.pitch.Pitch.step"><tt class="xref docutils literal"><span class="pre">music21.pitch.Pitch.step</span></tt></a>.</dd></dl>
+<dd>Return or set the pitch step from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.step" class="reference external" href="modulePitch.html#music21.pitch.Pitch.step"><tt class="xref docutils literal"><span class="pre">step</span></tt></a>.</dd></dl>
 
 <p>Properties inherited from <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>: <a title="music21.note.GeneralNote.quarterLength" class="reference internal" href="#music21.note.GeneralNote.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a>, <a title="music21.note.GeneralNote.beat" class="reference internal" href="#music21.note.GeneralNote.beat"><tt class="xref docutils literal"><span class="pre">beat</span></tt></a>, <a title="music21.note.GeneralNote.beatDuration" class="reference internal" href="#music21.note.GeneralNote.beatDuration"><tt class="xref docutils literal"><span class="pre">beatDuration</span></tt></a>, <a title="music21.note.GeneralNote.beatStr" class="reference internal" href="#music21.note.GeneralNote.beatStr"><tt class="xref docutils literal"><span class="pre">beatStr</span></tt></a>, <a title="music21.note.GeneralNote.color" class="reference internal" href="#music21.note.GeneralNote.color"><tt class="xref docutils literal"><span class="pre">color</span></tt></a>, <a title="music21.note.GeneralNote.lyric" class="reference internal" href="#music21.note.GeneralNote.lyric"><tt class="xref docutils literal"><span class="pre">lyric</span></tt></a>, <a title="music21.note.GeneralNote.musicxml" class="reference internal" href="#music21.note.GeneralNote.musicxml"><tt class="xref docutils literal"><span class="pre">musicxml</span></tt></a></p>
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
@@ -326,7 +326,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Eigh
 <dt id="music21.note.GeneralNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">GeneralNote</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.GeneralNote" title="Permalink to this definition">¶</a></dt>
-<dd><p>A GeneralNote object is the parent object for the <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">music21.note.Note</span></tt></a>, <a title="music21.note.Rest" class="reference internal" href="#music21.note.Rest"><tt class="xref docutils literal"><span class="pre">music21.note.Rest</span></tt></a>, <tt class="xref docutils literal"><span class="pre">music21.note.Chord</span></tt>, and related objects.</p>
+<dd><p>A GeneralNote object is the parent object for the <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.Rest" class="reference internal" href="#music21.note.Rest"><tt class="xref docutils literal"><span class="pre">Rest</span></tt></a>, <tt class="xref docutils literal"><span class="pre">Chord</span></tt>, and related objects.</p>
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>GeneralNote</strong> <strong>attributes</strong></p>
 <blockquote>
@@ -761,7 +761,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Whol
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 24, 2010.
+      Last updated on Jun 25, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
