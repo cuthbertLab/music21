@@ -614,7 +614,10 @@ class Stream(music21.Music21Object):
             item = offsetOrItemOrList
             offset = item.offset # should this be getOffsetBySite(None)?
 
-        if not common.isNum(offset):
+        #if not common.isNum(offset):
+        try: # using float conversion instead of isNum for performance
+            offset = float(offset)
+        except ValueError:
             raise StreamException("offset %s must be a number", offset)
 
         # if not a Music21Object, embed
@@ -2456,7 +2459,7 @@ class Stream(music21.Music21Object):
         oLow = returnObj.lowestOffset
         oHigh = returnObj.highestTime
 
-        environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
+        #environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
 
         if refStreamOrTimeRange == None: # use local
             oLowTarget = 0
@@ -2465,18 +2468,18 @@ class Stream(music21.Music21Object):
         elif isinstance(refStreamOrTimeRange, Stream):
             oLowTarget = refStreamOrTimeRange.lowestOffset
             oHighTarget = refStreamOrTimeRange.highestTime
-            environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
+            #environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
         # treat as a list
         elif common.isListLike(refStreamOrTimeRange):
             oLowTarget = min(refStreamOrTimeRange)
             oHighTarget = max(refStreamOrTimeRange)
-            environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
+            #environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
 
         qLen = oLow - oLowTarget
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
-            environLocal.printDebug(['makeRests(): add rests', r, r.duration])
+            #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
             returnObj.insert(oLowTarget, r)
     
@@ -2488,7 +2491,7 @@ class Stream(music21.Music21Object):
             returnObj.insert(oHigh, r)
     
         returnObj.elements = returnObj.sorted.elements
-        environLocal.printDebug(['makeRests(); dur of first object', returnObj[0].duration])
+        #environLocal.printDebug(['makeRests(); dur of first object', returnObj[0].duration])
 
         # do not need to sort, can concatenate without sorting
         # post = streamLead + returnObj 
@@ -7141,7 +7144,7 @@ class Test(unittest.TestCase):
 
             p.makeRests()
 
-            environLocal.printDebug(['first element', p[0], p[0].duration])
+            #environLocal.printDebug(['first element', p[0], p[0].duration])
             # by default, initial rest should be made
             sub = p.getElementsByClass(note.Rest)
             self.assertEqual(len(sub), 1)
