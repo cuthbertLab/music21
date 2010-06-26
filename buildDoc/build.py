@@ -807,8 +807,8 @@ class RestructuredWriter(object):
 
         lines = doc.split('\n')
         sub = []
-        for line in lines:
-            line = line.strip()
+        for lineSrc in lines:
+            line = lineSrc.strip()
 
             if OMIT_STR in line: # permit blocking doctest examples
                 break # do not gather any more lines
@@ -823,11 +823,16 @@ class RestructuredWriter(object):
             for stub in rstExclude:
                 if line.startswith(stub):
                     # do not strip
-                    #environLocal.printDebug(['found rst in doc string:', line.strip()])
+                    environLocal.printDebug(['found rst in doc string:', repr(lineSrc)])
                     if stub == '.. image::':
-                        sub.append('\n\n' + line) # do not strip
+                        lineSrc = lineSrc.rstrip()
+                        sub.append('\n\n' + lineSrc) # do not strip
+                    elif stub == ':width:': # immediate follows
+                        lineSrc = lineSrc.rstrip()
+                        sub.append(lineSrc) # do not strip
                     else:
-                        sub.append('\n' + line) # do not strip
+                        raise Exception('unexpected condition! %s' % sub)
+                        #sub.append('\n' + lineSrc) # do not strip
                     match = True
                     break
             # else, add a stripped line
@@ -864,6 +869,10 @@ class RestructuredWriter(object):
                 else:
                     space = '\n'
                     msg.append(space + indent + line)
+            elif line.strip().startswith(':width:'):
+                # these lines sometimes cause problems; never always add
+                # just one indent
+                msg.append('\n' + line)
             else: # continuing an existing line
                 if inExamples == False:
                     msg.append(line + ' ')

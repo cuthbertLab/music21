@@ -362,7 +362,7 @@ class Graph(object):
 class GraphColorGrid(Graph):
     ''' Grid of discrete colored "blocks" to visualize results of a windowed analysis routine.
     
-        Data is provided as a list of lists of colors, based on analysis-specific mapping of colors to results
+        Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
         
         
         >>> a = GraphColorGrid(doneAction=None)
@@ -445,15 +445,15 @@ class GraphHorizontalBar(Graph):
 
         Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.
 
-    .. image:: images/GraphHorizontalBar.*
-        :width: 600
-
         >>> from music21 import *
         >>> #_DOCS_SHOW a = graph.GraphHorizontalBar(doneAction='show')
         >>> a = graph.GraphHorizontalBar(doneAction=None)  #_DOCS_HIDE
         >>> data = [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
         >>> a.setData(data)
         >>> a.process()
+
+    .. image:: images/GraphHorizontalBar.*
+        :width: 600
 
         '''
         Graph.__init__(self, *args, **keywords)
@@ -945,7 +945,7 @@ class PlotStream(object):
         # by looking at keys or by looking at Notes
         offsetMap = self.streamObj.measureOffsetMap([stream.Measure, note.Note])
         if len(offsetMap.keys()) > 0:
-            return 'Measure Numbers'
+            return 'Measure Number'
         else:
             return 'Offset'
 
@@ -1425,7 +1425,6 @@ class PlotHistogramPitchSpace(PlotHistogram):
     '''A histogram of pitch space.
 
     >>> from music21 import *
-
     >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> p = graph.PlotHistogramPitchSpace(s, doneAction=None) #_DOCS_HIDE
@@ -1511,14 +1510,18 @@ class PlotHistogramPitchClass(PlotHistogram):
 class PlotHistogramQuarterLength(PlotHistogram):
     '''A histogram of pitch class
 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHistogramQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW p = graph.PlotHistogramQuarterLength(s)
+    >>> p.id
+    'histogram-quarterLength'
+    >>> p.process() # with defaults and proper configuration, will open graph
+
     .. image:: images/PlotHistogramQuarterLength.*
         :width: 600
 
-    >>> from music21 import corpus
-    >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> a = PlotHistogramQuarterLength(s)
-    >>> a.id
-    'histogram-quarterLength'
     '''
     values = ['quarterLength']
     def __init__(self, streamObj, *args, **keywords):
@@ -1615,14 +1618,14 @@ class PlotScatter(PlotStream):
 class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     '''A scatter plot of pitch space and quarter length
 
-    .. image:: images/PlotScatterPitchSpaceQuarterLength.*
-        :width: 600
-
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> a = PlotHistogramQuarterLength(s)
-    >>> a.id
+    >>> p = PlotHistogramQuarterLength(s)
+    >>> p.id
     'histogram-quarterLength'
+
+    .. image:: images/PlotScatterPitchSpaceQuarterLength.*
+        :width: 600
     '''
     values = ['pitch', 'quarterLength']
     def __init__(self, streamObj, *args, **keywords):
@@ -1876,8 +1879,18 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
 class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
     '''A graph of events, sorted by pitch space, over time
 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHorizontalBarPitchSpaceOffset(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW p = graph.PlotHorizontalBarPitchSpaceOffset(s)
+    >>> p.id
+    'horizontalBar-pitchoffset'
+    >>> p.process() # with defaults and proper configuration, will open graph
+
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
         :width: 600
+
     '''
 
 
@@ -1898,7 +1911,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
         self.graph.setTicks('x', xTicks)  
 
         if len(self.streamObj.measures) > 0 or len(self.streamObj.semiFlat.measures) > 0:
-            self.graph.setAxisLabel('x', 'Measure Numbers')
+            self.graph.setAxisLabel('x', 'Measure Number')
         else:
             self.graph.setAxisLabel('x', 'Offset')
         self.graph.setAxisLabel('y', 'Pitch')
@@ -2542,6 +2555,8 @@ class TestExternal(unittest.TestCase):
     def writeAllPlots(self):
         '''Write a graphic file for all graphs, naming them after the appropriate class. This is used to generate documentation samples.
         '''
+        # TODO: need to add strip() ties here; but need stripTies on Score
+
         import os
 
         plotClasses = [
@@ -2558,10 +2573,10 @@ class TestExternal(unittest.TestCase):
         ]
 
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        s = corpus.parseWork('bach/bwv57.8')
 
         for plotClassName in plotClasses:
-            obj = plotClassName(a, doneAction=None)
+            obj = plotClassName(s, doneAction=None)
             obj.process()
             fn = obj.__class__.__name__ + '.png'
             fp = os.path.join(environLocal.getRootTempDir(), fn)

@@ -5546,6 +5546,25 @@ class Score(Stream):
         return map
 
 
+    def stripTies(self, inPlace=False, matchByPitch=False):
+        '''Apply strip ties to each Part contained within this Score. 
+
+        Note that this presently does not retain Measures. 
+        '''
+        # TODO: this needs to be tested and re-worked to retain measures
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        for p in returnObj.getElementsByClass(Part):
+            # strip ties will use the appropriate flat presentation
+            # in place: already have a copy if nec
+            p.stripTies(inPlace=True, matchByPitch=matchByPitch) 
+
+        return returnObj
+        
+
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
     def runTest(self):
@@ -6622,6 +6641,40 @@ class Test(unittest.TestCase):
 
         c = b.stripTies() # gets flat, removes measures
         self.assertEqual(len(c.notes), 40)
+
+
+    def testStripTiesScore(self):
+        '''Test stripTies using the Score method
+        '''
+        # TODO: this is not yet fully implemented
+
+        from music21 import corpus
+        import music21
+        
+        s = corpus.parseWork('bach/bwv66.6')
+        self.assertEqual(len(s), 5)
+
+        parts = s.getElementsByClass(music21.stream.Part)
+        self.assertEqual(len(parts), 4)
+
+        self.assertEqual(len(parts[0].flat.notes), 37)
+        self.assertEqual(len(parts[1].flat.notes), 42)
+        self.assertEqual(len(parts[2].flat.notes), 45)
+        self.assertEqual(len(parts[3].flat.notes), 41)
+
+        # perform strip ties
+#         s = s.stripTies(inPlace=False)
+# 
+#         self.assertEqual(len(s), 5)
+#         parts = s.getElementsByClass(music21.stream.Part)
+#         self.assertEqual(len(parts), 4)
+# 
+#         self.assertEqual(len(parts[0].flat.notes), 37)
+#         self.assertEqual(len(parts[1].flat.notes), 42)
+#         self.assertEqual(len(parts[2].flat.notes), 45)
+#         self.assertEqual(len(parts[3].flat.notes), 41)
+# 
+#         s.stripTies()
 
 
     def testTwoStreamMethods(self):
@@ -8195,4 +8248,6 @@ if __name__ == "__main__":
         #a.testInsertAndShiftNoDuration()
         #a.testInsertAndShiftMultipleElements()
 
-        a.testMetadataOnStream()
+        #a.testMetadataOnStream()
+
+        a.testStripTiesScore()

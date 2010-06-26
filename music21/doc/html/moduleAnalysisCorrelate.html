@@ -94,19 +94,13 @@
 <dt id="music21.analysis.correlate.ActivityMatch">
 <em class="property">
 class </em><tt class="descclassname">music21.analysis.correlate.</tt><tt class="descname">ActivityMatch</tt><big>(</big><em>streamObj</em><big>)</big><a class="headerlink" href="#music21.analysis.correlate.ActivityMatch" title="Permalink to this definition">¶</a></dt>
-<dd>Given a Stream, find if one object is active while another is also active. Plotting routines to graph the output of dedicated methods in this class are available. <a title="music21.graph.PlotScatterPitchSpaceDynamicSymbol" class="reference external" href="moduleGraph.html#music21.graph.PlotScatterPitchSpaceDynamicSymbol"><tt class="xref docutils literal"><span class="pre">PlotScatterPitchSpaceDynamicSymbol</span></tt></a> and <a title="music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol" class="reference external" href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol"><tt class="xref docutils literal"><span class="pre">PlotScatterWeightedPitchSpaceDynamicSymbol</span></tt></a> employs the <tt class="xref docutils literal"><span class="pre">pitchToDynamic()</span></tt> method. Sample output is as follows:</dd></dl>
-
-<img alt="_images/PlotScatterWeightedPitchSpaceDynamicSymbol.png" src="_images/PlotScatterWeightedPitchSpaceDynamicSymbol.png" />
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">width:</th><td class="field-body"><p class="first">600</p>
+<dd><p>Given a Stream, find if one object is active while another is also active. Plotting routines to graph the output of dedicated methods in this class are available. <a title="music21.graph.PlotScatterPitchSpaceDynamicSymbol" class="reference external" href="moduleGraph.html#music21.graph.PlotScatterPitchSpaceDynamicSymbol"><tt class="xref docutils literal"><span class="pre">PlotScatterPitchSpaceDynamicSymbol</span></tt></a> and <a title="music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol" class="reference external" href="moduleGraph.html#music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol"><tt class="xref docutils literal"><span class="pre">PlotScatterWeightedPitchSpaceDynamicSymbol</span></tt></a> employs the <a title="music21.analysis.correlate.ActivityMatch.pitchToDynamic" class="reference internal" href="#music21.analysis.correlate.ActivityMatch.pitchToDynamic"><tt class="xref docutils literal"><span class="pre">pitchToDynamic()</span></tt></a> method. Sample output is as follows:</p>
+<img alt="_images/PlotScatterWeightedPitchSpaceDynamicSymbol.png" src="_images/PlotScatterWeightedPitchSpaceDynamicSymbol.png" style="width: 600px;" />
 <p><strong>ActivityMatch</strong> <strong>methods</strong></p>
-<blockquote class="last">
+<blockquote>
 <dl class="method">
-<dt id="music21.analysis.correlate.pitchToDynamic">
-<tt class="descclassname">music21.analysis.correlate.</tt><tt class="descname">pitchToDynamic</tt><big>(</big><em>dataPoints=True</em><big>)</big><a class="headerlink" href="#music21.analysis.correlate.pitchToDynamic" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.analysis.correlate.ActivityMatch.pitchToDynamic">
+<tt class="descname">pitchToDynamic</tt><big>(</big><em>dataPoints=True</em><big>)</big><a class="headerlink" href="#music21.analysis.correlate.ActivityMatch.pitchToDynamic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an analysis of pitch to dynamic symbol. If <cite>dataPoints</cite> is True, all data matches between source and destination are returned. If false, 3 point weighted coordinates are created for each unique match.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv8.6.xml&#39;</span><span class="p">)</span>
@@ -124,10 +118,8 @@ class </em><tt class="descclassname">music21.analysis.correlate.</tt><tt class="
 </dd></dl>
 
 </blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd></dl>
+
 </div>
 </div>
 
@@ -157,7 +149,7 @@ class </em><tt class="descclassname">music21.analysis.correlate.</tt><tt class="
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 25, 2010.
+      Last updated on Jun 26, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

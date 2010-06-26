@@ -698,8 +698,8 @@ Stream
 
             
 
-.. image:: images/getElementsByOffset.* 
-:width: 600 
+            .. image:: images/getElementsByOffset.* 
+                :width: 600
 
             
 

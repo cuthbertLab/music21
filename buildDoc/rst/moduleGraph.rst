@@ -31,9 +31,8 @@ PlotHistogramPitchSpace
     >>> p.process() # with defaults and proper configuration, will open graph
     
 
-.. image:: images/PlotHistogramPitchSpace.* 
-    
-:width: 600 
+    .. image:: images/PlotHistogramPitchSpace.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
@@ -67,9 +66,8 @@ PlotHistogramPitchClass
     >>> p.process() # with defaults and proper configuration, will open graph
     
 
-.. image:: images/PlotHistogramPitchClass.* 
-    
-:width: 600 
+    .. image:: images/PlotHistogramPitchClass.* 
+        :width: 600
 
     
 
@@ -97,14 +95,18 @@ PlotHistogramQuarterLength
 
     A histogram of pitch class 
 
-.. image:: images/PlotHistogramQuarterLength.* 
-:width: 600 
-
-    >>> from music21 import corpus
-    >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> a = PlotHistogramQuarterLength(s)
-    >>> a.id
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHistogramQuarterLength(s)
+    >>> p.id
     'histogram-quarterLength' 
+    >>> p.process() # with defaults and proper configuration, will open graph
+    
+
+    .. image:: images/PlotHistogramQuarterLength.* 
+        :width: 600
+
+    
 
     inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
@@ -130,14 +132,15 @@ PlotScatterPitchSpaceQuarterLength
 
     A scatter plot of pitch space and quarter length 
 
-.. image:: images/PlotScatterPitchSpaceQuarterLength.* 
-:width: 600 
-
     >>> from music21 import corpus
     >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> a = PlotHistogramQuarterLength(s)
-    >>> a.id
+    >>> p = PlotHistogramQuarterLength(s)
+    >>> p.id
     'histogram-quarterLength' 
+    
+
+    .. image:: images/PlotScatterPitchSpaceQuarterLength.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -163,8 +166,8 @@ PlotScatterPitchClassQuarterLength
 
     A scatter plot of pitch class and quarter length 
 
-.. image:: images/PlotScatterPitchClassQuarterLength.* 
-:width: 600 
+    .. image:: images/PlotScatterPitchClassQuarterLength.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -190,8 +193,8 @@ PlotScatterPitchClassOffset
 
     A scatter plot of pitch class and offset 
 
-.. image:: images/PlotScatterPitchClassOffset.* 
-:width: 600 
+    .. image:: images/PlotScatterPitchClassOffset.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -217,8 +220,18 @@ PlotHorizontalBarPitchSpaceOffset
 
     A graph of events, sorted by pitch space, over time 
 
-.. image:: images/PlotHorizontalBarPitchSpaceOffset.* 
-:width: 600 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHorizontalBarPitchSpaceOffset(s)
+    >>> p.id
+    'horizontalBar-pitchoffset' 
+    >>> p.process() # with defaults and proper configuration, will open graph
+    
+
+    .. image:: images/PlotHorizontalBarPitchSpaceOffset.* 
+        :width: 600
+
+    
 
     inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
@@ -244,8 +257,8 @@ PlotHorizontalBarPitchClassOffset
 
     A graph of events, sorted by pitch class, over time 
 
-.. image:: images/PlotHorizontalBarPitchClassOffset.* 
-:width: 600 
+    .. image:: images/PlotHorizontalBarPitchClassOffset.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
@@ -271,8 +284,8 @@ PlotScatterWeightedPitchSpaceQuarterLength
 
     A graph of event, sorted by pitch, over time 
 
-.. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.* 
-:width: 600 
+    .. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
@@ -298,8 +311,8 @@ PlotScatterWeightedPitchClassQuarterLength
 
     A graph of event, sorted by pitch class, over time. 
 
-.. image:: images/PlotScatterWeightedPitchClassQuarterLength.* 
-:width: 600 
+    .. image:: images/PlotScatterWeightedPitchClassQuarterLength.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
@@ -325,8 +338,8 @@ Plot3DBarsPitchSpaceQuarterLength
 
     A scatter plot of pitch and quarter length 
 
-.. image:: images/Plot3DBarsPitchSpaceQuarterLength.* 
-:width: 600 
+    .. image:: images/Plot3DBarsPitchSpaceQuarterLength.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.Plot3DBars`, :class:`~music21.graph.PlotStream`
 
@@ -422,8 +435,8 @@ Graph3DPolygonBars
 
     Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph. 
 
-.. image:: images/Graph3DPolygonBars.* 
-:width: 600 
+    .. image:: images/Graph3DPolygonBars.* 
+        :width: 600
 
     >>> a = Graph3DPolygonBars(doneAction=None)
     >>> data = {1:[], 2:[], 3:[]}
@@ -509,8 +522,8 @@ GraphHistogram
 
     Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value 
 
-.. image:: images/GraphHistogram.* 
-:width: 600 
+    .. image:: images/GraphHistogram.* 
+        :width: 600
 
     >>> a = GraphHistogram(doneAction=None)
     >>> data = [(x, random.choice(range(30))) for x in range(50)]
@@ -530,14 +543,15 @@ GraphHorizontalBar
 
     Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values. 
 
-.. image:: images/GraphHorizontalBar.* 
-:width: 600 
-
     >>> from music21 import *
     >>> a = graph.GraphHorizontalBar(doneAction='show')
     >>> data = [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
     >>> a.setData(data)
     >>> a.process()
+    
+
+    .. image:: images/GraphHorizontalBar.* 
+        :width: 600
 
     
 
@@ -552,8 +566,8 @@ GraphScatter
 
     Graph two parameters in a scatter plot. Data representation is a list of points of values. 
 
-.. image:: images/GraphScatter.* 
-:width: 600 
+    .. image:: images/GraphScatter.* 
+        :width: 600
 
     >>> a = GraphScatter(doneAction=None)
     >>> data = [(x, x*x) for x in range(50)]
@@ -572,8 +586,8 @@ GraphScatterWeighted
 
     A scatter plot where points are scaled in size to represent the number of values stored within. 
 
-.. image:: images/GraphScatterWeighted.* 
-:width: 600 
+    .. image:: images/GraphScatterWeighted.* 
+        :width: 600
 
     
 
@@ -763,8 +777,8 @@ PlotScatterPitchSpaceDynamicSymbol
 
     A graph of dynamics used by pitch space. 
 
-.. image:: images/PlotScatterPitchSpaceDynamicSymbol.* 
-:width: 600 
+    .. image:: images/PlotScatterPitchSpaceDynamicSymbol.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -813,8 +827,8 @@ PlotScatterWeightedPitchSpaceDynamicSymbol
 
     A graph of dynamics used by pitch space. 
 
-.. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.* 
-:width: 600 
+    .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.* 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
