@@ -2187,6 +2187,9 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.*
         :width: 600
     '''
+    # show false example using 
+    #    (Plot3DBarsPitchSpaceQuarterLength, testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),
+
     values = ['pitch', 'quarterLength']
     def __init__(self, streamObj, *args, **keywords):
         Plot3DBars.__init__(self, streamObj, *args, **keywords)
@@ -2556,27 +2559,41 @@ class TestExternal(unittest.TestCase):
         '''Write a graphic file for all graphs, naming them after the appropriate class. This is used to generate documentation samples.
         '''
         # TODO: need to add strip() ties here; but need stripTies on Score
-
         import os
+        from music21 import corpus, converter      
+        from music21.musicxml import testFiles 
 
         plotClasses = [
         # histograms
-        PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
+        (PlotHistogramPitchSpace, None, None), 
+        (PlotHistogramPitchClass, None, None), 
+        (PlotHistogramQuarterLength, None, None),
         # scatters
-        PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, PlotScatterPitchClassOffset,
+        (PlotScatterPitchSpaceQuarterLength, None, None), 
+        (PlotScatterPitchClassQuarterLength, None, None), 
+        (PlotScatterPitchClassOffset, None, None),
         # offset based horizontal
-        PlotHorizontalBarPitchSpaceOffset, PlotHorizontalBarPitchClassOffset,
+        (PlotHorizontalBarPitchSpaceOffset, None, None), 
+        (PlotHorizontalBarPitchClassOffset, None, None),
         # weighted scatter
-        PlotScatterWeightedPitchSpaceQuarterLength, PlotScatterWeightedPitchClassQuarterLength,
+        (PlotScatterWeightedPitchSpaceQuarterLength, None, None), (PlotScatterWeightedPitchClassQuarterLength, None, None),
         # 3d graphs
-        Plot3DBarsPitchSpaceQuarterLength,
+        (Plot3DBarsPitchSpaceQuarterLength, testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),
         ]
 
-        from music21 import corpus      
-        s = corpus.parseWork('bach/bwv57.8')
+        sDefault = corpus.parseWork('bach/bwv57.8')
 
-        for plotClassName in plotClasses:
-            obj = plotClassName(s, doneAction=None)
+        for plotClassName, work, titleStr in plotClasses:
+            if work == None:
+                s = sDefault
+            else: # expecting data
+                s = converter.parse(work)
+
+            if titleStr != None:
+                obj = plotClassName(s, doneAction=None, title=titleStr)
+            else:
+                obj = plotClassName(s, doneAction=None)
+
             obj.process()
             fn = obj.__class__.__name__ + '.png'
             fp = os.path.join(environLocal.getRootTempDir(), fn)
@@ -2776,4 +2793,5 @@ if __name__ == "__main__":
         #a.testPlotScatterPitchSpaceDynamicSymbol()
 
         #a.writeGraphColorGrid()
-        a.writeAllGraphs()
+        #a.writeAllGraphs()
+        a.writeAllPlots()
