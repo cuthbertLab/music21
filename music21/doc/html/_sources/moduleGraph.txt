@@ -224,7 +224,7 @@ PlotHorizontalBarPitchSpaceOffset
     >>> s = corpus.parseWork('bach/bwv57.8')
     >>> p = graph.PlotHorizontalBarPitchSpaceOffset(s)
     >>> p.id
-    'horizontalBar-pitchoffset' 
+    'horizontalBar-pitch-offset' 
     >>> p.process() # with defaults and proper configuration, will open graph
     
 
@@ -337,6 +337,15 @@ Plot3DBarsPitchSpaceQuarterLength
 .. class:: Plot3DBarsPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
     A scatter plot of pitch and quarter length 
+
+    >>> from music21 import *
+    >>> from music21.musicxml import testFiles
+    >>> s = converter.parse(testFiles.mozartTrioK581Excerpt)
+    >>> p = graph.Plot3DBarsPitchSpaceQuarterLength(s)
+    >>> p.id
+    '3dBars-pitch-quarterLength' 
+    >>> p.process() # with defaults and proper configuration, will open graph
+    
 
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.* 
         :width: 600
@@ -472,7 +481,7 @@ GraphColorGrid
 
 .. class:: GraphColorGrid(*args, **keywords)
 
-    Grid of discrete colored "blocks" to visualize results of a windowed analysis routine. Data is provided as a list of lists of colors, based on analysis-specific mapping of colors to results 
+    Grid of discrete colored "blocks" to visualize results of a windowed analysis routine. Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results. 
 
     
 

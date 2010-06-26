@@ -928,7 +928,7 @@ class PlotStream(object):
 
     #---------------------------------------------------------------------------
     def _getId(self):
-        return '%s-%s' % (self.format, ''.join(self.values))
+        return '%s-%s' % (self.format, '-'.join(self.values))
 
 
     id = property(_getId, doc='''
@@ -1512,8 +1512,8 @@ class PlotHistogramQuarterLength(PlotHistogram):
 
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> p = graph.PlotHistogramQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHistogramQuarterLength(s)
     >>> p.id
     'histogram-quarterLength'
@@ -1881,11 +1881,11 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> p = graph.PlotHorizontalBarPitchSpaceOffset(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHorizontalBarPitchSpaceOffset(s)
     >>> p.id
-    'horizontalBar-pitchoffset'
+    'horizontalBar-pitch-offset'
     >>> p.process() # with defaults and proper configuration, will open graph
 
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
@@ -2183,6 +2183,17 @@ class Plot3DBars(PlotStream):
 
 class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     '''A scatter plot of pitch and quarter length
+
+    >>> from music21 import *
+
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> p = graph.Plot3DBarsPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW from music21.musicxml import testFiles
+    >>> #_DOCS_SHOW s = converter.parse(testFiles.mozartTrioK581Excerpt)
+    >>> #_DOCS_SHOW p = graph.Plot3DBarsPitchSpaceQuarterLength(s) 
+    >>> p.id
+    '3dBars-pitch-quarterLength'
+    >>> p.process() # with defaults and proper configuration, will open graph
 
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.*
         :width: 600
