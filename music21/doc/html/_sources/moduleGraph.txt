@@ -132,11 +132,12 @@ PlotScatterPitchSpaceQuarterLength
 
     A scatter plot of pitch space and quarter length 
 
-    >>> from music21 import corpus
-    >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> p = PlotHistogramQuarterLength(s)
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotScatterPitchSpaceQuarterLength(s)
     >>> p.id
-    'histogram-quarterLength' 
+    'scatter-pitch-quarterLength' 
+    >>> p.process()
     
 
     .. image:: images/PlotScatterPitchSpaceQuarterLength.* 
@@ -166,6 +167,14 @@ PlotScatterPitchClassQuarterLength
 
     A scatter plot of pitch class and quarter length 
 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotScatterPitchClassQuarterLength(s)
+    >>> p.id
+    'scatter-pitchClass-quarterLength' 
+    >>> p.process()
+    
+
     .. image:: images/PlotScatterPitchClassQuarterLength.* 
         :width: 600
 
@@ -192,6 +201,14 @@ PlotScatterPitchClassOffset
 .. class:: PlotScatterPitchClassOffset(streamObj, *args, **keywords)
 
     A scatter plot of pitch class and offset 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotScatterPitchClassOffset(s)
+    >>> p.id
+    'scatter-pitchClass-offset' 
+    >>> p.process()
+    
 
     .. image:: images/PlotScatterPitchClassOffset.* 
         :width: 600
@@ -374,9 +391,8 @@ Graph
 
     An object representing a graph or plot, automating the creation and configuration of this graph in matplotlib. Graph objects do not manipulate Streams or other music21 data; they only manipulate raw data formatted for each Graph subclass. Numerous keyword arguments can be provided for configuration: alpha,  colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, colors, tickFontSize, titleFontSize, labelFontSize, fontFamily. The doneAction determines what happens after graph processing: either write a file ('write'), open an interactive GUI browser ('show') or None (do processing but do not write output. 
 
-    Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction 
+    A base-class for basic setup of graphs, abstracting functionality provided by matplotlib. Optional keyword arguments: alpha, colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, tickFontSize, titleFontSize, labelFontSize, fontFamily 
 
-    >>> a = Graph()
     >>> a = Graph(title='green')
 
     
@@ -441,21 +457,20 @@ Graph3DPolygonBars
 
 .. class:: Graph3DPolygonBars(*args, **keywords)
 
-
     Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph. 
 
-    .. image:: images/Graph3DPolygonBars.* 
-        :width: 600
-
-    >>> a = Graph3DPolygonBars(doneAction=None)
+    >>> from music21 import *
+    >>> g = graph.Graph3DPolygonBars()
     >>> data = {1:[], 2:[], 3:[]}
     >>> for i in range(len(data.keys())):
     ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)] 
     ...    data[data.keys()[i]] = q 
-    >>> a.setData(data)
-    >>> a.process()
-
+    >>> g.setData(data)
+    >>> g.process()
     
+
+    .. image:: images/Graph3DPolygonBars.* 
+        :width: 600
 
     
 
@@ -528,16 +543,18 @@ GraphHistogram
 
 .. class:: GraphHistogram(*args, **keywords)
 
-
     Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value 
+
+    >>> from music21 import *
+    >>> import random
+    >>> g = graph.GraphHistogram()
+    >>> data = [(x, random.choice(range(30))) for x in range(50)]
+    >>> g.setData(data)
+    >>> g.process()
+    
 
     .. image:: images/GraphHistogram.* 
         :width: 600
-
-    >>> a = GraphHistogram(doneAction=None)
-    >>> data = [(x, random.choice(range(30))) for x in range(50)]
-    >>> a.setData(data)
-    >>> a.process()
 
     
 
@@ -572,18 +589,17 @@ GraphScatter
 
 .. class:: GraphScatter(*args, **keywords)
 
-
     Graph two parameters in a scatter plot. Data representation is a list of points of values. 
+
+    >>> from music21 import *
+    >>> g = graph.GraphScatter()
+    >>> data = [(x, x*x) for x in range(50)]
+    >>> g.setData(data)
+    >>> g.process()
+    
 
     .. image:: images/GraphScatter.* 
         :width: 600
-
-    >>> a = GraphScatter(doneAction=None)
-    >>> data = [(x, x*x) for x in range(50)]
-    >>> a.setData(data)
-    >>> a.process()
-
-    
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -595,17 +611,17 @@ GraphScatterWeighted
 
     A scatter plot where points are scaled in size to represent the number of values stored within. 
 
+    >>> from music21 import *
+    >>> g = graph.GraphScatterWeighted()
+    >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]
+    >>> g.setData(data)
+    >>> g.process()
+    
+
     .. image:: images/GraphScatterWeighted.* 
         :width: 600
 
     
-
-    A scatter plot where points are scaled in size to represent the number of values stored within. 
-
-    >>> a = GraphScatterWeighted(doneAction=None)
-    >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5)]
-    >>> a.setData(data)
-    >>> a.process()
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -785,6 +801,14 @@ PlotScatterPitchSpaceDynamicSymbol
 .. class:: PlotScatterPitchSpaceDynamicSymbol(streamObj, *args, **keywords)
 
     A graph of dynamics used by pitch space. 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('schumann/opus41no1', 2)
+    >>> p = graph.PlotScatterPitchSpaceDynamicSymbol(s)
+    >>> p.id
+    'scatter-pitchClass-dynamicSymbol' 
+    >>> p.process()
+    
 
     .. image:: images/PlotScatterPitchSpaceDynamicSymbol.* 
         :width: 600

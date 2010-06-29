@@ -72,11 +72,10 @@ class Graph(object):
     '''
 
     def __init__(self, *args, **keywords):
-        '''Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters.
+        '''A base-class for basic setup of graphs, abstracting functionality provided by matplotlib.
 
-        Optional keyword arguments: title, doneAction
+        Optional keyword arguments: alpha, colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, tickFontSize, titleFontSize, labelFontSize, fontFamily
 
-        >>> a = Graph()
         >>> a = Graph(title='green')
         '''
         self.data = None
@@ -106,7 +105,6 @@ class Graph(object):
             self.colorGrid = keywords['colorGrid']
         else:
             self.colorGrid = '#666666'
-
 
         if 'title' in keywords:
             self.setTitle(keywords['title'])
@@ -362,13 +360,13 @@ class Graph(object):
 class GraphColorGrid(Graph):
     ''' Grid of discrete colored "blocks" to visualize results of a windowed analysis routine.
     
-        Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
-        
-        
-        >>> a = GraphColorGrid(doneAction=None)
-        >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
-        >>> a.setData(data)
-        >>> a.process()
+    Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
+    
+    
+    >>> a = GraphColorGrid(doneAction=None)
+    >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
+    >>> a.setData(data)
+    >>> a.process()
     '''
     def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
@@ -529,19 +527,19 @@ class GraphHorizontalBar(Graph):
 class GraphScatterWeighted(Graph):
     '''A scatter plot where points are scaled in size to represent the number of values stored within.
 
+    >>> from music21 import *
+    >>> #_DOCS_SHOW g = graph.GraphScatterWeighted()
+    >>> g = graph.GraphScatterWeighted(doneAction=None) #_DOCS_HIDE
+    >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]
+    >>> g.setData(data)
+    >>> g.process()
+
     .. image:: images/GraphScatterWeighted.*
         :width: 600
 
     '''
 
     def __init__(self, *args, **keywords):
-        '''A scatter plot where points are scaled in size to represent the number of values stored within.
-
-        >>> a = GraphScatterWeighted(doneAction=None)
-        >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5)]
-        >>> a.setData(data)
-        >>> a.process()
-        '''
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
@@ -637,18 +635,20 @@ class GraphScatterWeighted(Graph):
 
 
 class GraphScatter(Graph):
-    def __init__(self, *args, **keywords):
-        '''Graph two parameters in a scatter plot. Data representation is a list of points of values. 
+    '''Graph two parameters in a scatter plot. Data representation is a list of points of values. 
+
+    >>> from music21 import *
+    >>> #_DOCS_SHOW g = graph.GraphScatter()
+    >>> g = graph.GraphScatter(doneAction=None) #_DOCS_HIDE
+    >>> data = [(x, x*x) for x in range(50)]
+    >>> g.setData(data)
+    >>> g.process()
 
     .. image:: images/GraphScatter.*
         :width: 600
+    '''
 
-        >>> a = GraphScatter(doneAction=None)
-        >>> data = [(x, x*x) for x in range(50)]
-        >>> a.setData(data)
-        >>> a.process()
-
-        '''
+    def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
@@ -682,22 +682,27 @@ class GraphScatter(Graph):
         self.done()
 
 class GraphHistogram(Graph):
-    def __init__(self, *args, **keywords):
-        '''Graph the count of a single element.
+    '''Graph the count of a single element.
 
-        Data set is simply a list of x and y pairs, where there
-        is only one of each x value, and y value is the count or magnitude
-        of that value
+    Data set is simply a list of x and y pairs, where there
+    is only one of each x value, and y value is the count or magnitude
+    of that value
+
+    >>> from music21 import *
+    >>> import random
+    >>> #_DOCS_SHOW g = graph.GraphHistogram()
+    >>> g = graph.GraphHistogram(doneAction=None) #_DOCS_HIDE
+    >>> data = [(x, random.choice(range(30))) for x in range(50)]
+    >>> g.setData(data)
+    >>> g.process()
 
     .. image:: images/GraphHistogram.*
         :width: 600
 
-        >>> a = GraphHistogram(doneAction=None)
-        >>> data = [(x, random.choice(range(30))) for x in range(50)]
-        >>> a.setData(data)
-        >>> a.process()
+    '''
 
-        '''
+    def __init__(self, *args, **keywords):
+
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
@@ -788,26 +793,27 @@ class _Graph3DBars(Graph):
    
 
 class Graph3DPolygonBars(Graph):
-    def __init__(self, *args, **keywords):
-        '''Graph multiple parallel bar graphs in 3D.
+    '''Graph multiple parallel bar graphs in 3D.
 
-        This draws bars with polygons, a temporary alternative to using Graph3DBars, above.
+    This draws bars with polygons, a temporary alternative to using Graph3DBars, above.
 
-        Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph.
+    Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph.
+
+    >>> from music21 import *
+    >>> #_DOCS_SHOW g = graph.Graph3DPolygonBars()
+    >>> g = graph.Graph3DPolygonBars(doneAction=None) #_DOCS_HIDE
+    >>> data = {1:[], 2:[], 3:[]}
+    >>> for i in range(len(data.keys())):
+    ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
+    ...    data[data.keys()[i]] = q
+    >>> g.setData(data)
+    >>> g.process()
 
     .. image:: images/Graph3DPolygonBars.*
         :width: 600
 
-        >>> a = Graph3DPolygonBars(doneAction=None)
-        >>> data = {1:[], 2:[], 3:[]}
-        >>> for i in range(len(data.keys())):
-        ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
-        ...    data[data.keys()[i]] = q
-        >>> a.setData(data)
-        >>> a.process()
-
-
-        '''
+    '''
+    def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y', 'z']
         self._axisInit()
@@ -1426,8 +1432,8 @@ class PlotHistogramPitchSpace(PlotHistogram):
 
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> p = graph.PlotHistogramPitchSpace(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHistogramPitchSpace(s)
     >>> p.id
     'histogram-pitch'
@@ -1469,8 +1475,8 @@ class PlotHistogramPitchClass(PlotHistogram):
 
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> p = graph.PlotHistogramPitchClass(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHistogramPitchClass(s)
     >>> p.id
     'histogram-pitchClass'
@@ -1618,11 +1624,14 @@ class PlotScatter(PlotStream):
 class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     '''A scatter plot of pitch space and quarter length
 
-    >>> from music21 import corpus
-    >>> s = corpus.parseWork('bach/bwv324.xml')
-    >>> p = PlotHistogramQuarterLength(s)
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> p = graph.PlotScatterPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW p = graph.PlotScatterPitchSpaceQuarterLength(s)
     >>> p.id
-    'histogram-quarterLength'
+    'scatter-pitch-quarterLength'
+    >>> p.process()
 
     .. image:: images/PlotScatterPitchSpaceQuarterLength.*
         :width: 600
@@ -1659,6 +1668,15 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
 
 class PlotScatterPitchClassQuarterLength(PlotScatter):
     '''A scatter plot of pitch class and quarter length
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> p = graph.PlotScatterPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW p = graph.PlotScatterPitchClassQuarterLength(s)
+    >>> p.id
+    'scatter-pitchClass-quarterLength'
+    >>> p.process()
 
     .. image:: images/PlotScatterPitchClassQuarterLength.*
         :width: 600
@@ -1698,9 +1716,20 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
 class PlotScatterPitchClassOffset(PlotScatter):
     '''A scatter plot of pitch class and offset
 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> p = graph.PlotScatterPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW p = graph.PlotScatterPitchClassOffset(s)
+    >>> p.id
+    'scatter-pitchClass-offset'
+    >>> p.process()
+
     .. image:: images/PlotScatterPitchClassOffset.*
         :width: 600
     '''
+    # TODO: this graph is not returning correct measure numbers
+
     values = ['pitchClass', 'offset']
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
@@ -1738,6 +1767,15 @@ class PlotScatterPitchClassOffset(PlotScatter):
 
 class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
     '''A graph of dynamics used by pitch space.
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('schumann/opus41no1', 2) #_DOCS_HIDE
+    >>> p = graph.PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('schumann/opus41no1', 2)
+    >>> #_DOCS_SHOW p = graph.PlotScatterPitchSpaceDynamicSymbol(s)
+    >>> p.id
+    'scatter-pitchClass-dynamicSymbol'
+    >>> p.process()
 
     .. image:: images/PlotScatterPitchSpaceDynamicSymbol.*
         :width: 600
@@ -2198,8 +2236,6 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.*
         :width: 600
     '''
-    # show false example using 
-    #    (Plot3DBarsPitchSpaceQuarterLength, testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),
 
     values = ['pitch', 'quarterLength']
     def __init__(self, streamObj, *args, **keywords):

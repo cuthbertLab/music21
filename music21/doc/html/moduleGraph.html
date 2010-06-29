@@ -221,11 +221,12 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotScatterPitchSpaceQuarterLength</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotScatterPitchSpaceQuarterLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>A scatter plot of pitch space and quarter length</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">PlotHistogramQuarterLength</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotScatterPitchSpaceQuarterLength</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
-<span class="go">&#39;histogram-quarterLength&#39;</span>
+<span class="go">&#39;scatter-pitch-quarterLength&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/PlotScatterPitchSpaceQuarterLength.png" src="_images/PlotScatterPitchSpaceQuarterLength.png" style="width: 600px;" />
@@ -251,6 +252,14 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotScatterPitchClassQuarterLength</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotScatterPitchClassQuarterLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>A scatter plot of pitch class and quarter length</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotScatterPitchClassQuarterLength</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
+<span class="go">&#39;scatter-pitchClass-quarterLength&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
 <img alt="_images/PlotScatterPitchClassQuarterLength.png" src="_images/PlotScatterPitchClassQuarterLength.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.PlotScatter" class="reference internal" href="#music21.graph.PlotScatter"><tt class="xref docutils literal"><span class="pre">PlotScatter</span></tt></a>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">PlotStream</span></tt></a></p>
 <p><strong>PlotScatterPitchClassQuarterLength</strong> <strong>attributes</strong></p>
@@ -274,6 +283,14 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotScatterPitchClassOffset</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotScatterPitchClassOffset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A scatter plot of pitch class and offset</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotScatterPitchClassOffset</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
+<span class="go">&#39;scatter-pitchClass-offset&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
 <img alt="_images/PlotScatterPitchClassOffset.png" src="_images/PlotScatterPitchClassOffset.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.PlotScatter" class="reference internal" href="#music21.graph.PlotScatter"><tt class="xref docutils literal"><span class="pre">PlotScatter</span></tt></a>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">PlotStream</span></tt></a></p>
 <p><strong>PlotScatterPitchClassOffset</strong> <strong>attributes</strong></p>
@@ -429,9 +446,8 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.Graph" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object representing a graph or plot, automating the creation and configuration of this graph in matplotlib. Graph objects do not manipulate Streams or other music21 data; they only manipulate raw data formatted for each Graph subclass. Numerous keyword arguments can be provided for configuration: alpha,  colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, colors, tickFontSize, titleFontSize, labelFontSize, fontFamily. The doneAction determines what happens after graph processing: either write a file (&#8216;write&#8217;), open an interactive GUI browser (&#8216;show&#8217;) or None (do processing but do not write output.</p>
-<p>Setup a basic graph with a dictionary for two or more axis values. Set options for grid and other parameters. Optional keyword arguments: title, doneAction</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;green&#39;</span><span class="p">)</span>
+<p>A base-class for basic setup of graphs, abstracting functionality provided by matplotlib. Optional keyword arguments: alpha, colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, tickFontSize, titleFontSize, labelFontSize, fontFamily</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;green&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Graph</strong> <strong>attributes</strong></p>
@@ -511,16 +527,17 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph3DPolygonBars</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.Graph3DPolygonBars" title="Permalink to this definition">¶</a></dt>
 <dd><p>Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph.</p>
-<img alt="_images/Graph3DPolygonBars.png" src="_images/Graph3DPolygonBars.png" style="width: 600px;" />
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph3DPolygonBars</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">Graph3DPolygonBars</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="mf">1</span><span class="p">:[],</span> <span class="mf">2</span><span class="p">:[],</span> <span class="mf">3</span><span class="p">:[]}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
 <span class="gp">... </span>   <span class="n">q</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mf">1</span><span class="p">))))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">20</span><span class="p">)]</span>
 <span class="gp">... </span>   <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">q</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="_images/Graph3DPolygonBars.png" src="_images/Graph3DPolygonBars.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a></p>
 <p><strong>Graph3DPolygonBars</strong> <strong>attributes</strong></p>
 <blockquote>
@@ -597,13 +614,15 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphHistogram</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.GraphHistogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value</p>
-<img alt="_images/GraphHistogram.png" src="_images/GraphHistogram.png" style="width: 600px;" />
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">GraphHistogram</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">random</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">GraphHistogram</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">)))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">50</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="_images/GraphHistogram.png" src="_images/GraphHistogram.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a></p>
 </dd></dl>
 
@@ -634,13 +653,14 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphScatter</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.GraphScatter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Graph two parameters in a scatter plot. Data representation is a list of points of values.</p>
-<img alt="_images/GraphScatter.png" src="_images/GraphScatter.png" style="width: 600px;" />
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">GraphScatter</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">GraphScatter</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">50</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="_images/GraphScatter.png" src="_images/GraphScatter.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a></p>
 </dd></dl>
 
@@ -652,14 +672,14 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphScatterWeighted</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.GraphScatterWeighted" title="Permalink to this definition">¶</a></dt>
 <dd><p>A scatter plot where points are scaled in size to represent the number of values stored within.</p>
-<img alt="_images/GraphScatterWeighted.png" src="_images/GraphScatterWeighted.png" style="width: 600px;" />
-<p>A scatter plot where points are scaled in size to represent the number of values stored within.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">GraphScatterWeighted</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">23</span><span class="p">,</span> <span class="mf">15</span><span class="p">,</span> <span class="mf">234</span><span class="p">),</span> <span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="mf">23</span><span class="p">,</span> <span class="mf">12</span><span class="p">),</span> <span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="mf">23</span><span class="p">,</span> <span class="mf">5</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">GraphScatterWeighted</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">23</span><span class="p">,</span> <span class="mf">15</span><span class="p">,</span> <span class="mf">234</span><span class="p">),</span> <span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="mf">23</span><span class="p">,</span> <span class="mf">12</span><span class="p">),</span> <span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="mf">23</span><span class="p">,</span> <span class="mf">5</span><span class="p">),</span> <span class="p">(</span><span class="mf">15</span><span class="p">,</span> <span class="mf">18</span><span class="p">,</span> <span class="mf">120</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="_images/GraphScatterWeighted.png" src="_images/GraphScatterWeighted.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a></p>
 </dd></dl>
 
@@ -824,6 +844,14 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotScatterPitchSpaceDynamicSymbol</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotScatterPitchSpaceDynamicSymbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>A graph of dynamics used by pitch space.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;schumann/opus41no1&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotScatterPitchSpaceDynamicSymbol</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
+<span class="go">&#39;scatter-pitchClass-dynamicSymbol&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+</pre></div>
+</div>
 <img alt="_images/PlotScatterPitchSpaceDynamicSymbol.png" src="_images/PlotScatterPitchSpaceDynamicSymbol.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.PlotScatter" class="reference internal" href="#music21.graph.PlotScatter"><tt class="xref docutils literal"><span class="pre">PlotScatter</span></tt></a>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">PlotStream</span></tt></a></p>
 <p><strong>PlotScatterPitchSpaceDynamicSymbol</strong> <strong>attributes</strong></p>
@@ -1085,7 +1113,7 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 26, 2010.
+      Last updated on Jun 29, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
