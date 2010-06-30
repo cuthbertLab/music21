@@ -96,7 +96,17 @@
             
   <div class="section" id="module-music21.metadata">
 <span id="modulemetadata"></span><h1>music21.metadata<a class="headerlink" href="#module-music21.metadata" title="Permalink to this headline">¶</a></h1>
-<p>Classes and functions for creating and processing score metadata, such as titles, movements, authors, publishers, and regions.</p>
+<p>Classes and functions for creating and processing metadata associated with scores, works, and fragments, such as titles, movements, authors, publishers, and regions. The <a title="music21.metadata.Metadata" class="reference internal" href="#music21.metadata.Metadata"><tt class="xref docutils literal"><span class="pre">Metadata</span></tt></a> object is the main public interface to metadata components. A Metadata object can be added to a Stream and used to set common score attributes, such as title and composer. A Metadata object found at offset zero can be accessed through a Stream&#8217;s <a title="music21.stream.Stream.metadata" class="reference external" href="moduleStream.html#music21.stream.Stream.metadata"><tt class="xref docutils literal"><span class="pre">metadata</span></tt></a> property. The following example creates a <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> object, adds a <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> object, and configures and adds the <tt class="xref docutils literal"><span class="pre">title</span></tt> and <tt class="xref docutils literal"><span class="pre">composer</span></tt> properties of a Metadata object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">Metadata</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#39;title&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">composer</span> <span class="o">=</span> <span class="s">&#39;composer&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/moduleMetadata-01.png" src="_images/moduleMetadata-01.png" style="width: 600px;" />
 <dl class="function">
 <dt id="music21.metadata.abbreviationToRole">
 <tt class="descclassname">music21.metadata.</tt><tt class="descname">abbreviationToRole</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.abbreviationToRole" title="Permalink to this definition">¶</a></dt>
@@ -688,7 +698,7 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jun 29, 2010.
+      Last updated on Jun 30, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
