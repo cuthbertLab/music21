@@ -25,7 +25,7 @@ Notes, like all Muisc21Objects, have a Duration object that describes the time s
 
 To begin, lets create an instance of a Stream and an instance of a Note. We can set the :class:`~music21.pitch.Pitch` object to represent an E, and we can set the :class:`~music21.duration.Duration` object to represent a half-note (2 QLs).
 
->>> from music21 import note, stream
+>>> from music21 import *
 >>> s = stream.Stream()
 >>> n1 = note.Note()
 >>> n1.pitch.name = 'E4'
@@ -264,7 +264,7 @@ As shown in :ref:`quickStart`, a common arrangement of nested Streams is a :clas
 
 Such an arrangement of Stream objects is the common way musical scores are represented in music21. For example, importing a four-part chorale by J. S. Bach will provide a Score object with four Part Streams, each Part containing multiple Measure objects. Music21 comes with a :ref:`moduleCorpus.base` module that provides access to a large collection of scores, including all the Bach chorales. We can parse the score from the corpus with the :func:`~music21.corpus.base.parseWork` function. 
 
->>> from music21 import corpus
+>>> from music21 import *
 >>> sBach = corpus.parseWork('bach/bwv57.8')
 
 We can access and examine elements at each level of this Score by using standard Python syntax for lists within lists. Thus, we can see the length of each component: first the Score, then the Part at index zero, and then the object (a Measure) at index two, all from accessing the same name `sBach`.
@@ -279,7 +279,7 @@ We can access and examine elements at each level of this Score by using standard
 Note that more than just Measures might be stored in a Part (such as :class:`~music21.instrument.Instrument` objects), and more than just Notes might be stored in a Measure (such as :class:`~music21.meter.TimeSignature` and :class:`~music21.key.KeySignature` objects). We thus frequently need to filter Stream and Stream subclasses by the class we seek. To repeat the count and select specific classes, we can use the :meth:`~music21.stream.Stream.getElementsByClass` method. Notice how the counts deviate from the examples above.
 
 
->>> from music21 import stream, meter, key, note
+>>> from music21 import *
 >>> len(sBach.getElementsByClass(stream.Part))
 4
 >>> len(sBach[0].getElementsByClass(stream.Measure))

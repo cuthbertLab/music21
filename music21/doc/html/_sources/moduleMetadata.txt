@@ -7,7 +7,7 @@ music21.metadata
 
 .. module:: music21.metadata
 
-Classes and functions for creating and processing metadata associated with scores, works, and fragments, such as titles, movements, authors, publishers, and regions. The :class:`~music21.metadata.Metadata` object is the main public interface to metadata components. A Metadata object can be added to a Stream and used to set common score attributes, such as title and composer. A Metadata object found at offset zero can be accessed through a Stream's :attr:`~music21.stream.Stream.metadata` property. The following example creates a :class:`~music21.stream.Stream` object, adds a :class:`~music21.note.Note` object, and configures and adds the :attr:`~music21.stream.Metadata.title` and :attr:`~music21.stream.Metadata.composer` properties of a Metadata object. 
+Classes and functions for creating and processing metadata associated with scores, works, and fragments, such as titles, movements, authors, publishers, and regions. The :class:`~music21.metadata.Metadata` object is the main public interface to metadata components. A Metadata object can be added to a Stream and used to set common score attributes, such as title and composer. A Metadata object found at offset zero can be accessed through a Stream's :attr:`~music21.stream.Stream.metadata` property. The following example creates a :class:`~music21.stream.Stream` object, adds a :class:`~music21.note.Note` object, and configures and adds the :attr:`~music21.metadata.Metadata.title` and :attr:`~music21.metadata.Metadata.composer` properties of a Metadata object. 
 
 >>> from music21 import *
 >>> s = stream.Stream()

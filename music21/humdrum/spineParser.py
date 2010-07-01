@@ -19,7 +19,7 @@ import music21.dynamics
 
 from music21 import duration
 import music21.key
-import music21.measure
+#import music21.measure
 import music21.note
 import music21.expressions
 import music21.tempo

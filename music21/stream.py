@@ -20,6 +20,7 @@ from copy import deepcopy
 
 import music21 # needed to do fully-qualified isinstance name checking
 
+from music21 import bar
 from music21 import common
 from music21 import clef
 from music21 import chord
@@ -30,7 +31,7 @@ from music21 import instrument
 from music21 import interval
 from music21 import key
 from music21 import lily as lilyModule
-from music21 import measure
+#from music21 import measure
 from music21 import metadata
 from music21 import meter
 from music21 import musicxml as musicxmlMod
@@ -4873,25 +4874,9 @@ class Measure(Stream):
         self.measureNumber = 0 # 0 means undefined or pickup
         self.measureNumberSuffix = None # for measure 14a would be "a"
 
-        # inherits from prev measure or is default for group
-        # inherits from next measure or is default for group
-
-        # these need to be put on, and obtained from .elements
+        # barlines are stored on .elements by are accessed via attributes
         self.leftbarline = None  
         self.rightbarline = None 
-
-        # for display is overridden by next measure\'s leftbarline if that is not None and
-        # the two measures are on the same system
-
-        #self.internalbarlines = Stream()
-        # "measure expressions" that are attached to nowhere in particular
-        #self.timeIndependentDirections = Stream() 
-        # list of times at which Directions take place.
-        #self.timeDependentDirectionsTime = Stream() 
-        # should be sorted always.
-        # list of Directions that happen at a certain time, 
-        # keep indices together
-        #self.timeDependentDirections = Stream() 
 
 
     def addRepeat(self):
@@ -4903,12 +4888,16 @@ class Measure(Stream):
         pass
 
     def setRightBarline(self, blStyle = None):
-        self.rightbarline = measure.Barline(blStyle)
-        return self.rightbarline
+        '''Convenience method for creating and setting a Barline
+        '''
+        self.rightbarline = bar.Barline(blStyle)
+        #return self.rightbarline
     
     def setLeftBarline(self, blStyle = None):
-        self.leftbarline = measure.Barline(blStyle)
-        return self.leftbarline
+        '''Convenience method for creating and setting a Barline
+        '''
+        self.leftbarline = bar.Barline(blStyle)
+        #return self.leftbarline
     
     def measureNumberWithSuffix(self):
         if self.measureNumberSuffix:
@@ -5177,6 +5166,35 @@ class Measure(Stream):
         self.insert(0, keyObj)
 
     keySignature = property(_getKeySignature, _setKeySignature)   
+
+
+
+
+    def _getLeftBarline(self):
+        '''
+        >>> a = Measure()
+        '''
+        keyList = self.getElementsByClass(key.KeySignature)
+        # only return keySignatures with offset = 0.0
+        keyList = keyList.getElementsByOffset(0)
+        if len(keyList) == 0:
+            return None
+        else:
+            return keyList[0]    
+    
+    def _setLeftBarline(self, keyObj):
+        '''
+        >>> a = Measure()
+        '''
+        oldKey = self._getKeySignature()
+        if oldKey is not None:
+            #environLocal.printDebug(['removing key', oldKey])
+            junk = self.pop(self.index(oldKey))
+        self.insert(0, keyObj)
+
+    keySignature = property(_getKeySignature, _setKeySignature)   
+
+
 
     #---------------------------------------------------------------------------
     def _getMX(self):

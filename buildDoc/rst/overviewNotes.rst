@@ -16,7 +16,7 @@ Creating and Editing Pitches
 
 To create a Pitch object, simply call the class with a note name. A name (such as *B*) can be provided with optional symbols for sharp or flat (*#* or *-* respectively). An octave designation can optionally be provided (where middle C is C4).
 
->>> from music21 import pitch
+>>> from music21 import *
 >>> p1 = pitch.Pitch('b-4')
 
 There are numerous ways of expressing pitch. Many are available as properties from the Pitch object. The following example demonstrates many of these properties. 
@@ -70,7 +70,7 @@ Duration objects are ubiquitous in music21. Nearly all objects have, or can have
 
 To create Duration, call the class with an optional duration value, expressed either as a string (such as "quarter" or "half") or with a number (a value in Quarter Lengths). The following example creates a half note duration and a dotted quarter note duration.
 
->>> from music21 import Duration
+>>> from music21 import *
 >>> d1 = duration.Duration('half')
 >>> d2 = duration.Duration(1.5)
 
@@ -159,7 +159,7 @@ Note and Chord objects, as both subclasses of the :class:`~music21.note.GeneralN
 
 A Chord can be created with a list of Pitch objects or strings identical to those used for creating Pitches. Additional, pitch class integers can be provided. 
 
->>> from music21 import chord
+>>> from music21 import *
 >>> c1 = chord.Chord(['a#3', 'g4', 'f#5'])
 >>> c1.pitches
 [A#3, G4, F#5]

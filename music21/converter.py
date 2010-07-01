@@ -929,6 +929,13 @@ class Test(unittest.TestCase):
         self.assertEqual(a.metadata.title, 'Excerpt from Magnificat secundi toni')
 
 
+    def testConversionMXBarlines(self):
+        
+        from music21.musicxml import testPrimitive
+        a = parse(testPrimitive.barlines46a)
+        part = a[0]
+
+
 
 
 #-------------------------------------------------------------------------------

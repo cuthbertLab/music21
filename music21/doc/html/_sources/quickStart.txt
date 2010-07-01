@@ -37,7 +37,7 @@ installation is correctly configured by trying to import a music21 module.
 A module is a Python file that offers reusable resources. 
 These are all found inside the music21 package, so often we will 
 import a module (or all of them) from music21. To import the 
-:mod:`music21.corpus` module 
+:mod:`music21.corpus.base` module 
 from music21, enter the following command.
 
 >>> from music21 import corpus
@@ -65,9 +65,11 @@ Examining a Score
 
 Once music21 is installed, opening and examining a score and it elements is a good first step. Music21 comes with a corpus, a large collection freely distributable music stored in the MusicXML and humdrum formats. These files can be found in the music21/corpus directory. However, tools are provided for easy, direct access.
 
-To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus` module. (To see a complete listing of works in the corpus, see :ref:`referenceCorpus`) We imported this above, but lets do it again and use the `parseWork` method to get some some music parsed. This translates the file (a MusicXML or humdrum file) into music21 objects.
+To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus.base` module. (To see a complete listing of works in the corpus, see :ref:`referenceCorpus`.) We imported this module above, but here, lets import all music21 modules with the catch-all import statement `from music21 import *`. We will often use this import statement to quickly import all modules for easy access. 
 
->>> from music21 import corpus
+We will the use the :func:`~music21.corpus.base.parseWork` method to translate the file (a MusicXML or humdrum file) into music21 objects.
+
+>>> from music21 import *
 >>> sBach = corpus.parseWork('bach/bwv7.7')
 
 The score is returned as a music21 :class:`~music21.stream.Score`, which is a type (subclass) of a music21 :class:`~music21.stream.Stream`. 
@@ -180,7 +182,7 @@ We can create notes and measures from scratch using music21. Nearly every common
 
 If we wanted to re-create a few measures form a popular counterpoint text, we can create Notes and add them to Measures. We can then add Measures to Parts, and then Parts to Scores. At each step along, we can call the show() method to check our progress. In the first stage, we will create the bottom Part, and do this explicitly, one object at a time.
 
->>> from music21 import note, stream
+>>> from music21 import *
 >>> n1 = note.Note('e4')
 >>> n1.duration.type = 'whole'
 >>> n2 = note.Note('d4')

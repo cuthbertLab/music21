@@ -1312,7 +1312,7 @@ class Barline(MusicXMLElement):
         # attributes
         self._attr['location'] = None
         # elements
-        self.barStyle = None
+        self.barStyle = None # varieties include light-heavy
         self.endingObj = None
         self.repeatObj = None
 
@@ -1334,8 +1334,8 @@ class Ending(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'ending'
         # attributes
-        self._attr['type'] = None
-        self._attr['number'] = None
+        self._attr['type'] = None # can be start, stop, discontinue
+        self._attr['number'] = None # this is displayed indication
 
 
 class Repeat(MusicXMLElement):
@@ -1343,7 +1343,7 @@ class Repeat(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'repeat'
         # attributes
-        self._attr['direction'] = None
+        self._attr['direction'] = None # can be start or end
 
 
 class Note(MusicXMLElement):
