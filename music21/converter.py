@@ -930,12 +930,12 @@ class Test(unittest.TestCase):
 
 
     def testConversionMXBarlines(self):
-        
+        from music21 import bar
         from music21.musicxml import testPrimitive
         a = parse(testPrimitive.barlines46a)
         part = a[0]
-
-
+        barlineList = part.flat.getElementsByClass(bar.Barline)
+        self.assertEqual(len(barlineList), 11)
 
 
 #-------------------------------------------------------------------------------

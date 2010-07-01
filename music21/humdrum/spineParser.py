@@ -18,6 +18,8 @@ import music21.chord
 import music21.dynamics
 
 from music21 import duration
+from music21 import bar
+
 import music21.key
 #import music21.measure
 import music21.note
@@ -962,7 +964,11 @@ def hdStringToMeasure(contents):
     '''
     m1 = music21.stream.Measure()
     rematchMN = re.search("(\d+)([a-z]?)", contents)
-    m1.setRightBarline()
+
+    #m1.setrightBarline()
+    barline = bar.Barline()
+    m1.rightBarline = barline
+        
     
     if rematchMN:
         m1.measureNumber = int(rematchMN.group(1))
@@ -970,62 +976,62 @@ def hdStringToMeasure(contents):
             m1.measureNumberSuffix = rematchMN.group(2)
 
     if contents.count('-'):
-        m1.rightbarline.style = "none"
+        m1.rightBarline.style = "none"
     elif contents.count('\''):
-        m1.rightbarline.style = "short"
+        m1.rightBarline.style = "short"
     elif contents.count('`'):
-        m1.rightbarline.style = "tick"
+        m1.rightBarline.style = "tick"
     elif contents.count('||'):
-        m1.rightbarline.style = "light-light"
+        m1.rightBarline.style = "light-light"
         if contents.count(':') > 1:
-            m1.rightbarline.repeat_dots = "both"
+            m1.rightBarline.repeat_dots = "both"
         elif contents.count(':|'):
-            m1.rightbarline.repeat_dots = "left"
+            m1.rightBarline.repeat_dots = "left"
         elif contents.count('|:'):
-            m1.rightbarline.repeat_dots = "right"
+            m1.rightBarline.repeat_dots = "right"
     elif contents.count('!!'):
-        m1.rightbarline.style = "heavy-heavy"
+        m1.rightBarline.style = "heavy-heavy"
         if contents.count(':') > 1:
-            m1.rightbarline.repeat_dots = "both"
+            m1.rightBarline.repeat_dots = "both"
         elif contents.count(':!'):
-            m1.rightbarline.repeat_dots = "left"
+            m1.rightBarline.repeat_dots = "left"
         elif contents.count('!:'):
-            m1.rightbarline.repeat_dots = "right"
+            m1.rightBarline.repeat_dots = "right"
     elif contents.count('|!'):
-        m1.rightbarline.style = "light-heavy"
+        m1.rightBarline.style = "light-heavy"
         if contents.count(':') > 1:
-            m1.rightbarline.repeat_dots = "both"
+            m1.rightBarline.repeat_dots = "both"
         elif contents.count(':|'):
-            m1.rightbarline.repeat_dots = "left"
+            m1.rightBarline.repeat_dots = "left"
         elif contents.count('!:'):
-            m1.rightbarline.repeat_dots = "right"
+            m1.rightBarline.repeat_dots = "right"
     elif contents.count('!|'):
-        m1.rightbarline.style = "heavy-light"
+        m1.rightBarline.style = "heavy-light"
         if contents.count(':') > 1:
-            m1.rightbarline.repeat_dots = "both"
+            m1.rightBarline.repeat_dots = "both"
         elif contents.count(':!'):
-            m1.rightbarline.repeat_dots = "left"
+            m1.rightBarline.repeat_dots = "left"
         elif contents.count('|:'):
-            m1.rightbarline.repeat_dots = "right"
+            m1.rightBarline.repeat_dots = "right"
     elif contents.count('|'):
-        m1.rightbarline.style = "regular"
+        m1.rightBarline.style = "regular"
         if contents.count(':') > 1:
-            m1.rightbarline.repeat_dots = "both"
+            m1.rightBarline.repeat_dots = "both"
         elif contents.count(':|'):
-            m1.rightbarline.repeat_dots = "left"
+            m1.rightBarline.repeat_dots = "left"
         elif contents.count('|:'):
-            m1.rightbarline.repeat_dots = "right"
+            m1.rightBarline.repeat_dots = "right"
     elif contents.count('=='):
-        m1.rightbarline.style = "light-light"
+        m1.rightBarline.style = "light-light"
         if contents.count(':') > 1:
-            m1.rightbarline.repeat_dots = "both"
+            m1.rightBarline.repeat_dots = "both"
             ## cannot specify single repeat does without styles
         if contents == "==|":
             raise HumdrumException \
                 ("Cannot import a double bar visually rendered as a single bar")
     
     if contents.count(';'):
-        m1.rightbarline.pause = music21.expressions.Fermata()
+        m1.rightBarline.pause = music21.expressions.Fermata()
 
     return m1
 
@@ -1165,10 +1171,10 @@ class Test(unittest.TestCase):
         m1 = hdStringToMeasure("=29a;:|:")
         self.assertEqual(m1.measureNumber, 29)
         self.assertEqual(m1.measureNumberSuffix, "a")
-        self.assertEqual(m1.rightbarline.style, "regular")
-        self.assertEqual(m1.rightbarline.repeat_dots, "both")
-        assert m1.rightbarline.pause is not None
-        assert isinstance(m1.rightbarline.pause, music21.expressions.Fermata)
+        self.assertEqual(m1.rightBarline.style, "regular")
+        self.assertEqual(m1.rightBarline.repeat_dots, "both")
+        assert m1.rightBarline.pause is not None
+        assert isinstance(m1.rightBarline.pause, music21.expressions.Fermata)
 
     def testSpineMazurka(self):    
 #        hf1 = HumdrumFile("d:/web/eclipse/music21misc/mazurka06-2.krn")    

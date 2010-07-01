@@ -1310,7 +1310,7 @@ class Barline(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'barline'
         # attributes
-        self._attr['location'] = None
+        self._attr['location'] = None # right-left-middle
         # elements
         self.barStyle = None # varieties include light-heavy
         self.endingObj = None

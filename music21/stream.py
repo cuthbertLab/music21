@@ -2317,6 +2317,10 @@ class Stream(music21.Music21Object):
         # assume that flat/sorted options will be set before procesing
         offsetMap = [] # list of start, start+dur, element
         for e in srcObj:
+            # do not include barlines
+            if isinstance(e, bar.Barline):
+                continue
+            
             if hasattr(e, 'duration') and e.duration is not None:
                 dur = e.duration.quarterLength
             else:
@@ -4874,11 +4878,6 @@ class Measure(Stream):
         self.measureNumber = 0 # 0 means undefined or pickup
         self.measureNumberSuffix = None # for measure 14a would be "a"
 
-        # barlines are stored on .elements by are accessed via attributes
-        self.leftbarline = None  
-        self.rightbarline = None 
-
-
     def addRepeat(self):
         # TODO: write
         pass
@@ -4887,17 +4886,22 @@ class Measure(Stream):
         # TODO: write
         pass
 
-    def setRightBarline(self, blStyle = None):
-        '''Convenience method for creating and setting a Barline
-        '''
-        self.rightbarline = bar.Barline(blStyle)
-        #return self.rightbarline
+
+
+    # TODO: remove, replace with direct attribute access
+#     def setLeftBarline(self, blStyle = None):
+#         '''Convenience method for creating and setting a Barline
+#         '''
+#         barline = bar.Barline(blStyle)
+#         self.leftBarline = barline
+# 
+#     def setRightBarline(self, blStyle = None):
+#         '''Convenience method for creating and setting a Barline
+#         '''
+#         barline = bar.Barline(blStyle)
+#         self.rightBarline = bar.Barline(blStyle)
     
-    def setLeftBarline(self, blStyle = None):
-        '''Convenience method for creating and setting a Barline
-        '''
-        self.leftbarline = bar.Barline(blStyle)
-        #return self.leftbarline
+
     
     def measureNumberWithSuffix(self):
         if self.measureNumberSuffix:
@@ -5107,7 +5111,8 @@ class Measure(Stream):
         (2, 4)
         '''
         # there could be more than one
-        tsList = self.getElementsByClass(meter.TimeSignature)
+        tsList = self.getElementsByClass(music21.meter.TimeSignature)
+        #environLocal.printDebug(['matched Measure classes of type TimeSignature', tsList, len(tsList)])
         # only return timeSignatures at offset = 0.0
         tsList = tsList.getElementsByOffset(0)
         if len(tsList) == 0:
@@ -5127,7 +5132,7 @@ class Measure(Stream):
         '''
         oldTimeSignature = self._getTimeSignature()
         if oldTimeSignature is not None:
-            environLocal.printDebug(['removing ts', oldTimeSignature])
+            #environLocal.printDebug(['removing ts', oldTimeSignature])
             junk = self.pop(self.index(oldTimeSignature))
         self.insert(0, tsObj)
 
@@ -5174,25 +5179,67 @@ class Measure(Stream):
         '''
         >>> a = Measure()
         '''
-        keyList = self.getElementsByClass(key.KeySignature)
-        # only return keySignatures with offset = 0.0
-        keyList = keyList.getElementsByOffset(0)
-        if len(keyList) == 0:
+        barList = self.getElementsByClass(bar.Barline)
+        # only return Barlines with offset = 0.0
+        barList = barList.getElementsByOffset(0)
+        if len(barList) == 0:
             return None
         else:
-            return keyList[0]    
+            return barList[0]    
     
-    def _setLeftBarline(self, keyObj):
+    def _setLeftBarline(self, barlineObj):
         '''
         >>> a = Measure()
         '''
-        oldKey = self._getKeySignature()
-        if oldKey is not None:
-            #environLocal.printDebug(['removing key', oldKey])
-            junk = self.pop(self.index(oldKey))
-        self.insert(0, keyObj)
+        oldLeftBarline = self._getLeftBarline()
+        barlineObj.location = 'left'
 
-    keySignature = property(_getKeySignature, _setKeySignature)   
+        if oldLeftBarline is not None:
+            junk = self.pop(self.index(oldLeftBarline))
+        self.insert(0, barlineObj)
+
+    leftBarline = property(_getLeftBarline, _setLeftBarline, 
+        doc = '''Get or set the left barline, or the Barline object found at offset zero of the Measure.
+        ''')   
+
+
+
+    def _getRightBarline(self):
+        '''
+        >>> a = Measure()
+        '''
+        barList = self.getElementsByClass(bar.Barline)
+        try:
+            barQL = self.barDuration.quarterLength # access once
+        except StreamException: # if cannot get, use hightest time
+            barQL = self.highestTime
+
+        barList = barList.getElementsByOffset(barQL)
+        if len(barList) == 0:
+            return None
+        else:
+            return barList[0]    
+    
+    def _setRightBarline(self, barlineObj):
+        '''
+        >>> a = Measure()
+        '''
+        oldRightBarline = self._getRightBarline()
+        try:
+            barQL = self.barDuration.quarterLength # access once
+        except StreamException: # if cannot get, use hightest time
+            barQL = self.highestTime
+        barlineObj.location = 'right'
+
+        if oldRightBarline is not None:
+            junk = self.pop(self.index(oldRightBarline))
+        # insert at bar duration
+        
+        self.insert(barQL, barlineObj)
+
+    rightBarline = property(_getRightBarline, _setRightBarline, 
+        doc = '''Get or set the right barline, or the Barline object found at the offset equal to the bar duration. 
+        ''')   
 
 
 
@@ -5236,6 +5283,14 @@ class Measure(Stream):
         #mxAttributes.keyList = []
         mxMeasure.set('attributes', mxAttributes)
 
+        # see if we have a left barline
+        if self.leftBarline != None:
+            mxBarline = self.leftBarline.mx
+            # setting location outside of object based on that this attribute
+            # is the leftBarline
+            mxBarline.set('location', 'left')
+            mxMeasure.componentList.append(mxBarline)
+        
         #need to handle objects in order when creating musicxml 
         for obj in self.flat:
             if obj.isClass(note.GeneralNote):
@@ -5247,6 +5302,14 @@ class Measure(Stream):
             else:
                 pass
                 #environLocal.printDebug(['_getMX of Measure is not processing', obj])
+
+        # see if we have a right barline
+        if self.rightBarline != None:
+            mxBarline = self.rightBarline.mx
+            # setting location outside of object based on attribute
+            mxBarline.set('location', 'right')
+            mxMeasure.componentList.append(mxBarline)
+
         return mxMeasure
 
 
@@ -5302,7 +5365,26 @@ class Measure(Stream):
             else:
                 mxObjNext = None
 
-            if isinstance(mxObj, musicxmlMod.Note):
+            if isinstance(mxObj, musicxmlMod.Barline):
+                mxBarline = mxObj
+                barline = bar.Barline()
+                barline.mx = mxBarline # configure
+                if barline.location == 'left':
+                    self.leftBarline = barline
+                elif barline.location == 'right':
+                    # there may be problems importing a right barline
+                    # as we may not have  time signature
+                    # presently, the rightBarline property uses the the 
+                    # highestTime value
+                    #self.rightBarline = barline
+                    # this avoids doing a context search, but may have non
+                    # final offset
+                    self.insert(self.highestTime, barline)
+
+                else:
+                    environLocal.printDebug(['not handling barline that is neither left nor right', barline, barline.location])
+
+            elif isinstance(mxObj, musicxmlMod.Note):
                 mxNote = mxObj
                 if isinstance(mxObjNext, musicxmlMod.Note):
                     mxNoteNext = mxObjNext
@@ -7234,7 +7316,7 @@ class Test(unittest.TestCase):
 
 
     def testMakeMeasuresMeterStream(self):
-        '''Testing making measures of various sizes with a supplied single element meter stream. This illustrate an approach to partitioning elements by various sized windows. 
+        '''Testing making measures of various sizes with a supplied single element meter stream. This illustrates an approach to partitioning elements by various sized windows. 
         '''
         from music21 import meter, corpus
         sBach = corpus.parseWork('bach/bwv324.xml')
@@ -8242,8 +8324,46 @@ class Test(unittest.TestCase):
         post = s.musicxml
         #s.show()
 
-        
 
+    def testMeasureBarline(self):
+
+        from music21 import meter
+        
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('3/4')
+        self.assertEqual(len(m), 1)
+
+
+        b1 = bar.Barline('heavy')
+        # this adds to elements list
+        m.leftBarline = b1
+        self.assertEqual(len(m), 2)
+        self.assertEqual(m[1], b1) # this is on elements
+
+        b2 = bar.Barline('heavy')
+        self.assertEqual(m.barDuration.quarterLength, 3.0)
+        m.rightBarline = b2
+
+
+        # now have barline, ts, and barline
+        self.assertEqual(len(m), 3)
+        b3 = bar.Barline('double')
+        b4 = bar.Barline('heavy')
+
+        m.leftBarline = b3
+        # length should be the same, as we replaced
+        self.assertEqual(len(m), 3)
+        self.assertEqual(m.leftBarline, b3)
+
+        m.rightBarline = b4
+        self.assertEqual(len(m), 3)
+        self.assertEqual(m.rightBarline, b4)
+
+        p = Part()
+        p.append(copy.deepcopy(m))
+        p.append(copy.deepcopy(m))
+
+        #p.show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -8268,4 +8388,6 @@ if __name__ == "__main__":
 
         #a.testMetadataOnStream()
 
-        a.testStripTiesScore()
+        #a.testStripTiesScore()
+
+        a.testMeasureBarline()

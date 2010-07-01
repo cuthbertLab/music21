@@ -80,9 +80,11 @@ class Barline(music21.Music21Object):
     _pause = None  # can be music21.expressions.Fermata object
     
     def __init__(self, style = None):
+        music21.Music21Object.__init__(self)
+
         # this will raise an exception on error from property
         self.style = style
-            
+        self.location = None # can be left, right, middle, None
 
     def _getStyle(self):
         return self._style
@@ -108,6 +110,8 @@ class Barline(music21.Music21Object):
         '''
         mxBarline = musicxml.Barline()
         mxBarline.set('barStyle', self.style)
+        if self.location != None:
+            mxBarline.set('location', self.location)
         return mxBarline
 
     def _setMX(self, mxBarline):
@@ -122,6 +126,9 @@ class Barline(music21.Music21Object):
         'light-light'
         '''
         self.style = mxBarline.get('barStyle')
+        location = mxBarline.get('location')
+        if location != None:
+            self.location = location
 
     mx = property(_getMX, _setMX)    
 
