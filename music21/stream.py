@@ -5209,6 +5209,9 @@ class Measure(Stream):
         >>> a = Measure()
         '''
         barList = self.getElementsByClass(bar.Barline)
+        if len(barList) == 0: # do this before searching for barQL
+            return None
+
         try:
             barQL = self.barDuration.quarterLength # access once
         except StreamException: # if cannot get, use hightest time
