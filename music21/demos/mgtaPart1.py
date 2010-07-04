@@ -705,31 +705,81 @@ def ch2_basic_II(show=True, *arguments, **keywords):
 #-------------------------------------------------------------------------------
 # I Incomplete measures
 
+def ch2_writing_I_A(tsStr, barGroups):    
+    from music21 import meter, stream
+
+    ts = meter.TimeSignature(tsStr)
+
+    ex = stream.Stream()
+    ex.insert(0, ts)
+    for b in barGroups:
+        sum = 0
+        for ql in b:
+            if ql > 0: # quick encoding: negative values for rests
+                n = note.Note()
+            else:
+                n = note.Rest()
+            n.quarterLength = abs(ql)
+            sum += abs(ql)
+            ex.append(n)
+        if ts.barDuration.quarterLength - sum > 0:
+            nFill = note.Note()
+            # subtract bar dur from sum of existing notes
+            nFill.quarterLength = ts.barDuration.quarterLength - sum
+            ex.append(nFill)
+    ex.show('t')
+    return ex
 
 def ch2_writing_I_A_1(show=True, *arguments, **keywords):
     '''p. 14
     '''
-    pass
+    barGroups = ([.5], [.75, .25], [.5, .75], [.25, .25, .25, .25], [.5], [])
+    ex = ch2_writing_I_A('3/8', barGroups)
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
+
 
 def ch2_writing_I_A_2(show=True, *arguments, **keywords):
     '''p. 14
     '''
-    pass
+    barGroups = ([.75, .25, .25, .25, .25, .25, 1.5], [.25, .25, .5, -.5, .5], [2, .25, .25, .25, .25, .25, .25], [3])
+    ex = ch2_writing_I_A('4/4', barGroups)
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
 
 def ch2_writing_I_A_3(show=True, *arguments, **keywords):
     '''p. 14
     '''
-    pass
+    barGroups = ([2, 1.5, .5, .5, .5, .5], [-.5, .5, .5, .5, 1, 1, 1], [4, 1.5], [.5, .5, .5, .5, .5, 1, .5])
+    ex = ch2_writing_I_A('3/2', barGroups)
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
 
 def ch2_writing_I_A_4(show=True, *arguments, **keywords):
     '''p. 14
     '''
-    pass
+    barGroups = ([1.25, .25, .25, .25], [-.5, .5, -.5], [1.25], [.25, .25, .5, .75], [1])
+    ex = ch2_writing_I_A('2/4', barGroups)
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
 
 def ch2_writing_I_A_5(show=True, *arguments, **keywords):
     '''p. 14
     '''
-    pass
+    barGroups = ([2, 1, 1, 3], [.5, .5, .5, .5, 2], [3, 1, 1, 2], [2])
+    ex = ch2_writing_I_A('4/2', barGroups)
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
 
 
 
@@ -935,6 +985,8 @@ def ch2_writing_IV_A(show=True, *arguments, **keywords):
     '''p. 17
     '''
     pass
+
+
 
 def ch2_writing_IV_B(show=True, *arguments, **keywords):
     '''p. 18
@@ -1778,4 +1830,11 @@ if __name__ == "__main__":
         #ch2_writing_III_A_2(show=True)
         #ch2_writing_III_A_3(show=True)
 
-        ch2_writing_III_B_3(show=True)
+        #ch2_writing_III_B_3(show=True)
+
+
+        #ch2_writing_I_A_1(show=True)
+        #ch2_writing_I_A_2(show=True)
+        #ch2_writing_I_A_3(show=True)
+        #ch2_writing_I_A_4(show=True)
+        ch2_writing_I_A_5(show=True)
