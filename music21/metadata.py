@@ -56,7 +56,8 @@ APPROXIMATE = ['~', 'x']
 UNCERTAIN = ['?', 'z']
 
 def errorToSymbol(value):
-    '''
+    '''Convert an error string (appoximate, uncertain) into a symbol.
+
     >>> errorToSymbol('approximate')
     '~'
     >>> errorToSymbol('uncertain')
@@ -214,7 +215,7 @@ def workIdToAbbreviation(value):
 
 #-------------------------------------------------------------------------------
 class Text(object):
-    '''One unit of text data: a title, a name, or some other text data. Store the string and a language name or code.
+    '''One unit of text data: a title, a name, or some other text data. Store the string and a language name or code. This object can be used and/or subclassed for a variety for of text storage.
     '''
     def __init__(self, data='', language=None):
         '''
@@ -250,9 +251,14 @@ class Text(object):
 
 #-------------------------------------------------------------------------------
 class Date(object):
-    '''A single date value, specified by year, month, day, hour, minute, and second. 
+    '''A single date value, specified by year, month, day, hour, minute, and second. Note that this class has been created, instead of using Python's datetime, to provide greater flexibility for processing unconventional dates, ancient dates, dates with error, and date ranges. 
+
+    The :attr:`~music21.metadata.Date.datetime` property can be used to retrieve a datetime object when necessary.
 
     Additionally, each value can be specified as `uncertain` or `approximate`; if None, assumed to be certain.
+
+    Data objects are fundamental components of :class:`~music21.metadata.DateSingle` and related subclasses that represent single dates and date ranges. 
+
     '''
     def __init__(self, *args, **keywords):
         '''
@@ -531,8 +537,9 @@ class Date(object):
 
 #-------------------------------------------------------------------------------
 class DateSingle(object):
-    '''Store a date, either as certain, approximate, or uncertain.
+    '''Store a date, either as certain, approximate, or uncertain relevance.
 
+    The relevance attribute is limited within each DateSingle subclass depending on the design of the class. Alternative relevance types should be configured as other DateSingle subclasses. 
     '''
     isSingle = True
 
@@ -735,6 +742,8 @@ class DateSelection(DateSingle):
 class Contributor(object):
     '''A person that contributed to a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements.  
     '''
+    relevance = 'contributor'
+
     def __init__(self, *args, **keywords ):
         '''
         >>> td = Contributor(role='composer', name='Chopin, Fryderyk')
@@ -742,6 +751,8 @@ class Contributor(object):
         'composer'
         >>> td.name
         'Chopin, Fryderyk'
+        >>> td.relevance
+        'contributor'
 
         '''
         if 'role' in keywords.keys():
@@ -892,6 +903,25 @@ class Contributor(object):
         
 
 
+class Creator(Contributor):
+    '''A person that created a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements.  
+    '''
+
+    relevance = 'creator'
+
+    def __init__(self, *args, **keywords):
+        '''
+        >>> td = Creator(role='composer', name='Chopin, Fryderyk')
+        >>> td.role
+        'composer'
+        >>> td.name
+        'Chopin, Fryderyk'
+        >>> td.relevance
+        'creator'
+        '''
+        Contributor.__init__(self, *args, **keywords)
+
+
 #-------------------------------------------------------------------------------
 # as these have Date and Text fields, these need to be specialized objects
 
@@ -936,7 +966,6 @@ class Metadata(music21.Music21Object):
 
     In many cases, each Stream will have a single Metadata object at the zero offset position. 
     '''
-    # possibly rename Work?
 
     def __init__(self, *args, **keywords ):
         '''
@@ -946,6 +975,9 @@ class Metadata(music21.Music21Object):
         >>> md = Metadata(otl='Concerto in F') # can use abbreviations
         >>> md.title
         'Concerto in F'
+        >>> md.setWorkId('otl', 'Rhapsody in Blue')
+        >>> md.otl
+        'Rhapsody in Blue'
         '''
         music21.Music21Object.__init__(self)
 
@@ -998,6 +1030,35 @@ class Metadata(music21.Music21Object):
         elif isinstance(post, Date):
             return str(post)
 
+    #---------------------------------------------------------------------------
+    def setWorkId(self, idStr, value):
+        '''Directly set a workd id, given either as a full string name or as a three character abbreviation. 
+
+        >>> md = Metadata(title='Quartet')
+        >>> md.title
+        'Quartet'
+        >>> md.setWorkId('otl', 'Trio')
+        >>> md.title
+        'Trio'
+        >>> md.setWorkId('sdf', None)
+        Traceback (most recent call last):
+        MetadataException: no work id available with id: sdf
+
+        '''
+        idStr = idStr.lower()
+        match = False
+        for id in WORK_IDS:
+            abbr = workIdToAbbreviation(id)
+            if id.lower() == idStr:
+                self._workIds[id] = Text(value)
+                match = True
+                break
+            elif abbr.lower() == idStr:
+                self._workIds[id] = Text(value)
+                match = True
+                break
+        if not match:
+            raise MetadataException('no work id available with id: %s' % idStr)
 
     #---------------------------------------------------------------------------
     def _getTitle(self):
