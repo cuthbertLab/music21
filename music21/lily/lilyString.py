@@ -1,3 +1,44 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         lilyString.py
+# Purpose:      Processing of lilypond strings for output
+#
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
+#
+# Copyright:    (c) 2009-2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
+
+import os
+import sys
+import tempfile
+import re
+import time
+# import threading
+import unittest, doctest
+
+
+
+import music21
+from music21 import environment
+_MOD = 'lily.lilyString.py'
+environLocal = environment.Environment(_MOD)
+
+
+try: 
+    # optional imports for PIL 
+    from PIL import Image
+    from PIL import ImageOps    
+    noPIL = False
+except ImportError:
+    noPIL = True
+
+
+
+#-------------------------------------------------------------------------------
+
 TRANSPARENCY_START = r'''
  \override Rest #'transparent  = ##t
  \override Dots #'transparent  = ##t
@@ -7,30 +48,13 @@ TRANSPARENCY_STOP = r'''
  \revert Dots #'transparent
  '''
 
-import os
-import sys
-import tempfile
-import re
-import time
-import threading
-
-import music21
-
-import unittest, doctest
-
-try: 
-    ### required imports for PIL -- otherwise it doesnot like it, for some reason
-    from PIL import Image
-    from PIL import ImageOps    
-    noPIL = False
-except ImportError:
-    noPIL = True
 
 
-_MOD = 'lilyString.py' # module name for debugging reference
-
-
+#-------------------------------------------------------------------------------
 class LilyString(object):
+    '''Class for representing complete processing of a lily pond string.
+    '''
+
     LILYEXEC = 'lilypond'
     if sys.platform == "darwin":
         LILYEXEC = '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'
@@ -66,7 +90,6 @@ bookTitleMarkup=##f
 }
 
 '''
-
     noHeader = r'''
 scoreTitleMarkup=##f
 '''
@@ -151,20 +174,34 @@ scoreTitleMarkup=##f
     
     wrappedValue = property(_getWrappedValue)
     
-    def writeTemp(self):
-        (fd, tempName) = tempfile.mkstemp()
-        self.tempName = tempName
+    def writeTemp(self, ext=''):
+        fp = environLocal.getTempFile(ext)
+
+        #(fd, tempName) = tempfile.mkstemp()
+        self.tempName = fp
+
+        data = []
+        data.append(self.snippet)
+        data.append(self.headerInformation)
+        data.append(self.wrappedValue.encode('utf-8'))
+
         try:
-            ntf = open(tempName, "w")
-            print>>ntf, self.snippet
-            print>>ntf, self.headerInformation
-            print>>ntf, self.wrappedValue.encode('utf-8')
-            ntf.flush()
-            ntf.close()
+#             ntf = open(self.tempName, "w")
+#             print>>ntf, self.snippet
+#             print>>ntf, self.headerInformation
+#             print>>ntf, self.wrappedValue.encode('utf-8')
+#             ntf.flush()
+#             ntf.close()
+
+            f = open(self.tempName, 'w')
+            f.write(''.join(data))
+            f.close()
         except:
             raise
-        return tempName
+        return self.tempName
     
+
+
     def runThroughLily(self):
         filename = self.tempName
         format   = self.format
@@ -191,7 +228,7 @@ scoreTitleMarkup=##f
         return (fileform)
 
     def createPDF(self):
-        self.writeTemp()
+        self.writeTemp() # do not need extension here
         lilyFile = self.runThroughLily()
         return lilyFile
 
@@ -215,7 +252,7 @@ scoreTitleMarkup=##f
         '''        
         self.format = 'png'
         self.backend = 'eps'
-        self.writeTemp()
+        self.writeTemp() # do not need extension here
         lilyFile = self.runThroughLily()
         if noPIL is False:
             try:
@@ -223,6 +260,7 @@ scoreTitleMarkup=##f
                 lilyImage2 = ImageOps.expand(lilyImage, 10, "white")
                 if os.name == "nt":
                     format = "PNG"
+                # why are we changing format for darwin?
                 elif sys.platform == "darwin":
                     format = "JPEG"
                 else:
@@ -238,13 +276,16 @@ scoreTitleMarkup=##f
                 if base != lilyImage2.mode and lilyImage2.mode != "1":
                     file = lilyImage2.convert(base)._dump(format=format)
                 else:
-                    file = lilyImage2._dump(format=format)    
-                self.showImageDirect(file)
+                    file = lilyImage2._dump(format=format)
+                environLocal.launch(format, file)
+                #self.showImageDirect(file)
             except:
                 raise
-                self.showImageDirect(lilyFile)
+                # this will never execute after an extension
+                #self.showImageDirect(lilyFile)
         else:
-            self.showImageDirect(lilyFile)
+            environLocal.launch(self.format, lilyFile)
+            #self.showImageDirect(lilyFile)
         
         return lilyFile
         
@@ -273,6 +314,8 @@ scoreTitleMarkup=##f
             return False
         
     def playMIDIfile(self, file):
+        # TODO: this should not be called play, is it does not play the file
+        # but simply opens it. 
         if not os.path.exists(file):
             f2 = re.sub("\.midi",".mid", file)
             if os.path.exists(f2):
@@ -296,41 +339,47 @@ scoreTitleMarkup=##f
         headOut += " \" \n}\n";
         return headOut
 
-    def showImageDirect(self, imageFile, title = None, command = None):
-        '''borrowed from and modified from the excellent PIL image library, but needed
-        some changes to the NT handling'''
-        
-        if os.name == "nt":
-            format = "PNG"
-        elif sys.platform == "darwin":
-            format = "JPEG"
-            if not command:
-                command = "open -a /Applications/Preview.app"
-        else:
-            format = None
-            if not command:
-                command = "xv"
-                if title:
-                    command = command + " -name \"%s\"" % title
-        
-        if os.name == "nt":
-            command = "start %s" % (imageFile)
-            os.system(command)
-            if self.savePNG is False:
-                def quickDel():
-                    command = "del /f %s" % (imageFile)
-                    os.system(command)
-                t = threading.Timer(6.0, quickDel)
-                t.start()  ## give 6 seconds for viewer to open before deleting  
-        elif sys.platform == "darwin":
-            # on darwin open returns immediately resulting in the temp
-            # file removal while app is opening
-            command = "(%s %s; sleep 20; rm -f %s)&" % (command, imageFile, imageFile)
-            os.system(command)
-        else:
-            command = "(%s %s; rm -f %s)&" % (command, imageFile, imageFile)
-            os.system(command)
 
+# better here is to use and/or extend the environLocal.launch() method.
+
+#     def showImageDirect(self, imageFile, title = None, command = None):
+#         '''borrowed from and modified from the excellent PIL image library, but needed
+#         some changes to the NT handling'''
+#         
+#         if os.name == "nt":
+#             format = "PNG"
+#         elif sys.platform == "darwin":
+#             format = "JPEG"
+#             if not command:
+#                 command = "open -a /Applications/Preview.app"
+#         else:
+#             format = None
+#             if not command:
+#                 command = "xv"
+#                 if title:
+#                     command = command + " -name \"%s\"" % title
+#         
+#         if os.name == "nt":
+#             command = "start %s" % (imageFile)
+#             os.system(command)
+#             if self.savePNG is False:
+#                 def quickDel():
+#                     command = "del /f %s" % (imageFile)
+#                     os.system(command)
+#                 t = threading.Timer(6.0, quickDel)
+#                 t.start()  ## give 6 seconds for viewer to open before deleting  
+#         elif sys.platform == "darwin":
+#             # on darwin open returns immediately resulting in the temp
+#             # file removal while app is opening
+#             command = "(%s %s; sleep 20; rm -f %s)&" % (command, imageFile, imageFile)
+#             os.system(command)
+#         else:
+#             command = "(%s %s; rm -f %s)&" % (command, imageFile, imageFile)
+#             os.system(command)
+
+
+
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     pass
 
@@ -352,5 +401,8 @@ class TestExternal(unittest.TestCase):
         b.showPNG()    
         
 
+
+#-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
+    #music21.mainTest(Test, TestExternal)

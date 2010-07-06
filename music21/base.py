@@ -1808,8 +1808,17 @@ class Music21Object(object):
             if fp is None:
                 fp = environLocal.getTempFile(ext)
             dataStr = self.musicxml
+
+#         elif fmt == 'lily.pdf':
+#             return self.lily.showPDF()
+#         elif fmt == 'lily.png':
+#             return self.lily.showPNG()
+#         elif fmt == 'lily':
+#             return self.lily.showPNG()
+
         else:
             raise Music21ObjectException('cannot support writing in this format, %s yet' % format)
+
         f = open(fp, 'w')
         f.write(dataStr)
         f.close()
@@ -1854,12 +1863,14 @@ class Music21Object(object):
         # single line of text; most for debugging. returned, not printed
         elif format == 'textline': 
             return self._reprTextLine()
+
         elif fmt == 'lily.pdf':
             return self.lily.showPDF()
         elif fmt == 'lily.png':
             return self.lily.showPNG()
         elif fmt == 'lily':
             return self.lily.showPNG()
+
         else: # a format that writes a file
             environLocal.launch(format, self.write(format))
 

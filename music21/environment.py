@@ -125,6 +125,7 @@ class Environment(object):
         self.ref['musicxmlPath'] = None # path to a MusicXML reader: default, will find "Finale Reader"
         self.ref['midiPath'] = None # path to a midi reader
         self.ref['graphicsPath'] = None # path to a graphics viewer
+        self.ref['pdfPath'] = None # path to a pdf viewer
         self.ref['showFormat'] = 'musicxml' 
         self.ref['writeFormat'] = 'musicxml' 
         self.ref['autoDownload'] = 'ask' 
@@ -145,6 +146,7 @@ class Environment(object):
                 ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
                 ('musicxmlPath', '/Applications/Finale Reader/Finale Reader.app'),
                 ('graphicsPath', '/Applications/Preview.app'),
+                ('pdfPath', '/Applications/Preview.app'),
                 ]:
                 self.__setitem__(name, value) # use for key checking
 
@@ -297,7 +299,7 @@ class Environment(object):
                 self.ref[name] = value
 
     def write(self, fp=None):
-        '''Write an XML file. This must be manually called to store any changes made to the object and access preferences later. If `fp` is None, the default storage location will be used.
+        '''Write an XML preference file. This must be manually called to store any changes made to the object and access preferences later. If `fp` is None, the default storage location will be used.
         '''
         if fp == None:
             fp = self.getSettingsPath()
@@ -402,6 +404,8 @@ class Environment(object):
             fpApp = self.ref['lilypondPath']
         elif format in ['png', 'jpeg']:
             fpApp = self.ref['graphicsPath']   
+        elif format in ['pdf']:
+            fpApp = self.ref['pdfPath']   
         elif format == 'musicxml':
             fpApp = self.ref['musicxmlPath']   
 
