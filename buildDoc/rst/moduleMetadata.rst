@@ -46,7 +46,7 @@ Classes and functions for creating and processing metadata associated with score
 
 .. function:: errorToSymbol(value)
 
-    
+    Convert an error string (appoximate, uncertain) into a symbol. 
 
     >>> errorToSymbol('approximate')
     '~' 
@@ -76,7 +76,7 @@ Text
 
 .. class:: Text(data=, language=None)
 
-    One unit of text data: a title, a name, or some other text data. Store the string and a language name or code. 
+    One unit of text data: a title, a name, or some other text data. Store the string and a language name or code. This object can be used and/or subclassed for a variety for of text storage. 
 
     
 
@@ -103,7 +103,9 @@ Date
 
 .. class:: Date(*args, **keywords)
 
-    A single date value, specified by year, month, day, hour, minute, and second. Additionally, each value can be specified as `uncertain` or `approximate`; if None, assumed to be certain. 
+    A single date value, specified by year, month, day, hour, minute, and second. Note that this class has been created, instead of using Python's datetime, to provide greater flexibility for processing unconventional dates, ancient dates, dates with error, and date ranges. The :attr:`~music21.metadata.Date.datetime` property can be used to retrieve a datetime object when necessary. Additionally, each value can be specified as `uncertain` or `approximate`; if None, assumed to be certain. Data objects are fundamental components of :class:`~music21.metadata.DateSingle` and related subclasses that represent single dates and date ranges. 
+
+    
 
     
 
@@ -219,9 +221,7 @@ DateSingle
 
 .. class:: DateSingle(data=, relevance=certain)
 
-    Store a date, either as certain, approximate, or uncertain. 
-
-    
+    Store a date, either as certain, approximate, or uncertain relevance. The relevance attribute is limited within each DateSingle subclass depending on the design of the class. Alternative relevance types should be configured as other DateSingle subclasses. 
 
     
 
@@ -327,10 +327,16 @@ Contributor
     'composer' 
     >>> td.name
     'Chopin, Fryderyk' 
+    >>> td.relevance
+    'contributor' 
 
     
 
     
+
+    **Contributor** **attributes**
+
+        Attributes without Documentation: `relevance`
 
     **Contributor** **properties**
 
@@ -411,6 +417,11 @@ Metadata
     >>> md = Metadata(otl='Concerto in F') # can use abbreviations
     >>> md.title
     'Concerto in F' 
+    >>> md.setWorkId('otl', 'Rhapsody in Blue')
+    >>> md.otl
+    'Rhapsody in Blue' 
+    >>> md.title
+    'Rhapsody in Blue' 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -504,6 +515,22 @@ Metadata
 
             
 
+        .. method:: setWorkId(idStr, value)
+
+            Directly set a workd id, given either as a full string name or as a three character abbreviation. 
+
+            >>> md = Metadata(title='Quartet')
+            >>> md.title
+            'Quartet' 
+            >>> md.setWorkId('otl', 'Trio')
+            >>> md.title
+            'Trio' 
+            >>> md.setWorkId('sdf', None)
+            Traceback (most recent call last): 
+            MetadataException: no work id available with id: sdf 
+
+            
+
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocationBySite`, :meth:`~music21.base.Music21Object.removeLocationBySiteId`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
 
@@ -515,6 +542,26 @@ Copyright
     An object representation of copyright. 
 
     
+
+
+Creator
+-------
+
+.. class:: Creator(*args, **keywords)
+
+    A person that created a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements. 
+
+    
+
+    >>> td = Creator(role='composer', name='Chopin, Fryderyk')
+    >>> td.role
+    'composer' 
+    >>> td.name
+    'Chopin, Fryderyk' 
+    >>> td.relevance
+    'creator' 
+
+    inherits from: :class:`~music21.metadata.Contributor`
 
 
 Imprint

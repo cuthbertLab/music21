@@ -57,6 +57,7 @@
 <li><a class="reference external" href="#contributor">Contributor</a></li>
 <li><a class="reference external" href="#metadata">Metadata</a></li>
 <li><a class="reference external" href="#copyright">Copyright</a></li>
+<li><a class="reference external" href="#creator">Creator</a></li>
 <li><a class="reference external" href="#imprint">Imprint</a></li>
 </ul>
 </li>
@@ -136,7 +137,8 @@
 <dl class="function">
 <dt id="music21.metadata.errorToSymbol">
 <tt class="descclassname">music21.metadata.</tt><tt class="descname">errorToSymbol</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.errorToSymbol" title="Permalink to this definition">¶</a></dt>
-<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">errorToSymbol</span><span class="p">(</span><span class="s">&#39;approximate&#39;</span><span class="p">)</span>
+<dd><p>Convert an error string (appoximate, uncertain) into a symbol.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">errorToSymbol</span><span class="p">(</span><span class="s">&#39;approximate&#39;</span><span class="p">)</span>
 <span class="go">&#39;~&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">errorToSymbol</span><span class="p">(</span><span class="s">&#39;uncertain&#39;</span><span class="p">)</span>
 <span class="go">&#39;?&#39;</span>
@@ -174,7 +176,7 @@
 <dt id="music21.metadata.Text">
 <em class="property">
 class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Text</tt><big>(</big><em>data=</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#music21.metadata.Text" title="Permalink to this definition">¶</a></dt>
-<dd><p>One unit of text data: a title, a name, or some other text data. Store the string and a language name or code.</p>
+<dd><p>One unit of text data: a title, a name, or some other text data. Store the string and a language name or code. This object can be used and/or subclassed for a variety for of text storage.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">td</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s">&#39;concerto in d&#39;</span><span class="p">,</span> <span class="s">&#39;en&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">td</span><span class="p">)</span>
 <span class="go">&#39;concerto in d&#39;</span>
@@ -204,7 +206,7 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <dt id="music21.metadata.Date">
 <em class="property">
 class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Date</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.metadata.Date" title="Permalink to this definition">¶</a></dt>
-<dd><p>A single date value, specified by year, month, day, hour, minute, and second. Additionally, each value can be specified as <cite>uncertain</cite> or <cite>approximate</cite>; if None, assumed to be certain.</p>
+<dd><p>A single date value, specified by year, month, day, hour, minute, and second. Note that this class has been created, instead of using Python&#8217;s datetime, to provide greater flexibility for processing unconventional dates, ancient dates, dates with error, and date ranges. The <a title="music21.metadata.Date.datetime" class="reference internal" href="#music21.metadata.Date.datetime"><tt class="xref docutils literal"><span class="pre">datetime</span></tt></a> property can be used to retrieve a datetime object when necessary. Additionally, each value can be specified as <cite>uncertain</cite> or <cite>approximate</cite>; if None, assumed to be certain. Data objects are fundamental components of <a title="music21.metadata.DateSingle" class="reference internal" href="#music21.metadata.DateSingle"><tt class="xref docutils literal"><span class="pre">DateSingle</span></tt></a> and related subclasses that represent single dates and date ranges.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mf">1843</span><span class="p">,</span> <span class="n">yearError</span><span class="o">=</span><span class="s">&#39;approximate&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">year</span>
 <span class="go">1843</span>
@@ -337,7 +339,7 @@ Attributes without Documentation: <cite>attrStrFormat</cite>, <cite>minuteError<
 <dt id="music21.metadata.DateSingle">
 <em class="property">
 class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">DateSingle</tt><big>(</big><em>data=</em>, <em>relevance=certain</em><big>)</big><a class="headerlink" href="#music21.metadata.DateSingle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store a date, either as certain, approximate, or uncertain.</p>
+<dd><p>Store a date, either as certain, approximate, or uncertain relevance. The relevance attribute is limited within each DateSingle subclass depending on the design of the class. Alternative relevance types should be configured as other DateSingle subclasses.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">DateSingle</span><span class="p">(</span><span class="s">&#39;2009/12/31&#39;</span><span class="p">,</span> <span class="s">&#39;approximate&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
 <span class="go">&#39;2009/12/31&#39;</span>
@@ -443,8 +445,13 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <span class="go">&#39;composer&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;Chopin, Fryderyk&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">relevance</span>
+<span class="go">&#39;contributor&#39;</span>
 </pre></div>
 </div>
+<p><strong>Contributor</strong> <strong>attributes</strong></p>
+<blockquote>
+Attributes without Documentation: <cite>relevance</cite></blockquote>
 <p><strong>Contributor</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -539,6 +546,11 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
 <span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">otl</span><span class="o">=</span><span class="s">&#39;Concerto in F&#39;</span><span class="p">)</span> <span class="c"># can use abbreviations</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">title</span>
 <span class="go">&#39;Concerto in F&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">setWorkId</span><span class="p">(</span><span class="s">&#39;otl&#39;</span><span class="p">,</span> <span class="s">&#39;Rhapsody in Blue&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">otl</span>
+<span class="go">&#39;Rhapsody in Blue&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">title</span>
+<span class="go">&#39;Rhapsody in Blue&#39;</span>
 </pre></div>
 </div>
 <p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
@@ -647,6 +659,23 @@ Attributes inherited from <a title="music21.base.Music21Object" class="reference
 </div>
 </dd></dl>
 
+<dl class="method">
+<dt id="music21.metadata.Metadata.setWorkId">
+<tt class="descname">setWorkId</tt><big>(</big><em>idStr</em>, <em>value</em><big>)</big><a class="headerlink" href="#music21.metadata.Metadata.setWorkId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directly set a workd id, given either as a full string name or as a three character abbreviation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Quartet&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">title</span>
+<span class="go">&#39;Quartet&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">setWorkId</span><span class="p">(</span><span class="s">&#39;otl&#39;</span><span class="p">,</span> <span class="s">&#39;Trio&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">title</span>
+<span class="go">&#39;Trio&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">setWorkId</span><span class="p">(</span><span class="s">&#39;sdf&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">MetadataException: no work id available with id</span>: <span class="n-Identifier">sdf</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySite"><tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySiteId" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySiteId"><tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </blockquote>
 </dd></dl>
@@ -659,6 +688,26 @@ Attributes inherited from <a title="music21.base.Music21Object" class="reference
 <em class="property">
 class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Copyright</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.metadata.Copyright" title="Permalink to this definition">¶</a></dt>
 <dd>An object representation of copyright.</dd></dl>
+
+</div>
+<div class="section" id="creator">
+<h2>Creator<a class="headerlink" href="#creator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.metadata.Creator">
+<em class="property">
+class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">Creator</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.metadata.Creator" title="Permalink to this definition">¶</a></dt>
+<dd><p>A person that created a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are &#8220;creator&#8221; elements.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">td</span> <span class="o">=</span> <span class="n">Creator</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s">&#39;composer&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;Chopin, Fryderyk&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">role</span>
+<span class="go">&#39;composer&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;Chopin, Fryderyk&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">td</span><span class="o">.</span><span class="n">relevance</span>
+<span class="go">&#39;creator&#39;</span>
+</pre></div>
+</div>
+<p>inherits from: <a title="music21.metadata.Contributor" class="reference internal" href="#music21.metadata.Contributor"><tt class="xref docutils literal"><span class="pre">Contributor</span></tt></a></p>
+</dd></dl>
 
 </div>
 <div class="section" id="imprint">
@@ -698,7 +747,7 @@ class </em><tt class="descclassname">music21.metadata.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 01, 2010.
+      Last updated on Jul 06, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

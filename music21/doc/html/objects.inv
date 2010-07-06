@@ -338,6 +338,7 @@ music21.metadata.Copyright class moduleMetadata.html
 music21.stream.Measure.addTimeDependentDirection method moduleStream.html
 music21.serial.HistoricalTwelveToneRow.opus attribute moduleSerial.html
 music21.duration.Duration.clear method moduleDuration.html
+music21.stream.Measure.rightBarline attribute moduleStream.html
 music21.note.Note.ps attribute moduleNote.html
 music21.duration.GraceDuration class moduleDuration.html
 music21.serial.RowSchoenbergOp35No5 class moduleSerial.html
@@ -364,6 +365,7 @@ music21.duration.Duration.lily attribute moduleDuration.html
 music21.common.Iterator.next method moduleCommon.html
 music21.meter.MeterTerminal.subdivideByCount method moduleMeter.html
 music21.stream.Part class moduleStream.html
+music21.metadata.Creator class moduleMetadata.html
 music21.node.Node.tag attribute moduleNode.html
 music21.pitch.convertPitchClassToNumber function modulePitch.html
 music21.graph.GraphColorGrid.setMinWindow method moduleGraph.html
@@ -380,14 +382,12 @@ music21.note.GeneralNote.lyric attribute moduleNote.html
 music21.stream.Stream.augmentOrDiminish method moduleStream.html
 music21.stream.Stream.pitchAttributeCount method moduleStream.html
 music21.base.Music21Object.getSiteIds method moduleBase.html
-music21.stream.Measure.setLeftBarline method moduleStream.html
 music21.metadata.Metadata.movementName attribute moduleMetadata.html
 music21.note.GeneralNote.beatDuration attribute moduleNote.html
 music21.clef.CBaritoneClef class moduleClef.html
 music21.base.Music21Object.removeLocationBySiteId method moduleBase.html
 music21.serial.RowSchoenbergFragPianoPhantasia class moduleSerial.html
 music21.meter.TimeSignature.getAccent method moduleMeter.html
-music21.stream.Measure.setRightBarline method moduleStream.html
 music21.base.Music21Object.show method moduleBase.html
 music21.pitch.Pitch.musicxml attribute modulePitch.html
 music21.meter.MeterSequence.partitionByList method moduleMeter.html
@@ -750,6 +750,7 @@ music21.meter.MeterSequence.setLevelWeight method moduleMeter.html
 music21.base.Music21Object.addLocation method moduleBase.html
 music21.key.Key class moduleKey.html
 music21.base.Music21Object.unwrapWeakref method moduleBase.html
+music21.stream.Measure.leftBarline attribute moduleStream.html
 music21.editorial.Comment class moduleEditorial.html
 music21.base.Music21Object.hasContext method moduleBase.html
 music21.node.Node.getNewDoc method moduleNode.html
@@ -949,6 +950,7 @@ music21.converter.ConverterHumdrum class moduleConverter.html
 music21.meter.TimeSignature.barDuration attribute moduleMeter.html
 music21.stream.Stream.measures attribute moduleStream.html
 music21.pitch.Pitch.updateAccidentalDisplay method modulePitch.html
+music21.metadata.Metadata.setWorkId method moduleMetadata.html
 music21.duration.DurationUnit.updateQuarterLength method moduleDuration.html
 music21.stream.Stream.bestClef method moduleStream.html
 music21.note.QuarterNote class moduleNote.html

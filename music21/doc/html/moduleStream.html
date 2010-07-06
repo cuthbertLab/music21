@@ -1628,7 +1628,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <tt class="descname">measureNumberSuffix</tt><a class="headerlink" href="#music21.stream.Measure.measureNumberSuffix" title="Permalink to this definition">¶</a></dt>
 <dd>If a Measure number has a string annotation, such as &#8220;a&#8221; or similar, this string is stored here.</dd></dl>
 
-<p>Attributes without Documentation: <cite>isMeasure</cite>, <cite>leftbarline</cite>, <cite>rightbarline</cite>, <cite>filled</cite></p>
+<p>Attributes without Documentation: <cite>isMeasure</cite>, <cite>filled</cite></p>
 <p>Attributes inherited from <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>: <a title="music21.stream.Stream.flattenedRepresentationOf" class="reference internal" href="#music21.stream.Stream.flattenedRepresentationOf"><tt class="xref docutils literal"><span class="pre">flattenedRepresentationOf</span></tt></a>, <tt class="xref docutils literal"><span class="pre">classNames</span></tt>, <a title="music21.stream.Stream.isFlat" class="reference internal" href="#music21.stream.Stream.isFlat"><tt class="xref docutils literal"><span class="pre">isFlat</span></tt></a>, <a title="music21.stream.Stream.isSorted" class="reference internal" href="#music21.stream.Stream.isSorted"><tt class="xref docutils literal"><span class="pre">isSorted</span></tt></a></p>
 <p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
@@ -1662,6 +1662,11 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 </dd></dl>
 
 <dl class="attribute">
+<dt id="music21.stream.Measure.leftBarline">
+<tt class="descname">leftBarline</tt><a class="headerlink" href="#music21.stream.Measure.leftBarline" title="Permalink to this definition">¶</a></dt>
+<dd>Get or set the left barline, or the Barline object found at offset zero of the Measure.</dd></dl>
+
+<dl class="attribute">
 <dt id="music21.stream.Measure.musicxml">
 <tt class="descname">musicxml</tt><a class="headerlink" href="#music21.stream.Measure.musicxml" title="Permalink to this definition">¶</a></dt>
 <dd>Provide a complete MusicXML: representation.</dd></dl>
@@ -1682,6 +1687,11 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 </pre></div>
 </div>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="music21.stream.Measure.rightBarline">
+<tt class="descname">rightBarline</tt><a class="headerlink" href="#music21.stream.Measure.rightBarline" title="Permalink to this definition">¶</a></dt>
+<dd>Get or set the right barline, or the Barline object found at the offset equal to the bar duration.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.stream.Measure.timeSignature">
@@ -1742,16 +1752,6 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 <dl class="method">
 <dt id="music21.stream.Measure.measureNumberWithSuffix">
 <tt class="descname">measureNumberWithSuffix</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.stream.Measure.measureNumberWithSuffix" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
-
-<dl class="method">
-<dt id="music21.stream.Measure.setLeftBarline">
-<tt class="descname">setLeftBarline</tt><big>(</big><em>blStyle=None</em><big>)</big><a class="headerlink" href="#music21.stream.Measure.setLeftBarline" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
-
-<dl class="method">
-<dt id="music21.stream.Measure.setRightBarline">
-<tt class="descname">setRightBarline</tt><big>(</big><em>blStyle=None</em><big>)</big><a class="headerlink" href="#music21.stream.Measure.setRightBarline" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
 
 <dl class="method">
@@ -1928,7 +1928,7 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Vo
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 01, 2010.
+      Last updated on Jul 06, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

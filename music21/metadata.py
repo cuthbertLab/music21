@@ -978,6 +978,8 @@ class Metadata(music21.Music21Object):
         >>> md.setWorkId('otl', 'Rhapsody in Blue')
         >>> md.otl
         'Rhapsody in Blue'
+        >>> md.title
+        'Rhapsody in Blue'
         '''
         music21.Music21Object.__init__(self)
 

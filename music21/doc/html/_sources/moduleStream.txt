@@ -1360,7 +1360,7 @@ Measure
 
             If a Measure number has a string annotation, such as "a" or similar, this string is stored here. 
 
-        Attributes without Documentation: `isMeasure`, `leftbarline`, `rightbarline`, `filled`
+        Attributes without Documentation: `isMeasure`, `filled`
 
         Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
@@ -1390,6 +1390,10 @@ Measure
             >>> a.keySignature.sharps
             0 
 
+        .. attribute:: leftBarline
+
+            Get or set the left barline, or the Barline object found at offset zero of the Measure. 
+
         .. attribute:: musicxml
 
             Provide a complete MusicXML: representation. 
@@ -1407,6 +1411,10 @@ Measure
             >>> mxMeasure = b.mx
             >>> len(mxMeasure)
             1 
+
+        .. attribute:: rightBarline
+
+            Get or set the right barline, or the Barline object found at the offset equal to the bar duration. 
 
         .. attribute:: timeSignature
 
@@ -1458,14 +1466,6 @@ Measure
             Given a Measure with elements in it, get a TimeSignature that contains all elements. Note: this does not yet accommodate triplets. 
 
         .. method:: measureNumberWithSuffix()
-
-            No documentation. 
-
-        .. method:: setLeftBarline(blStyle=None)
-
-            No documentation. 
-
-        .. method:: setRightBarline(blStyle=None)
 
             No documentation. 
 
