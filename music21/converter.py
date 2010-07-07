@@ -937,6 +937,15 @@ class Test(unittest.TestCase):
         barlineList = part.flat.getElementsByClass(bar.Barline)
         self.assertEqual(len(barlineList), 11)
 
+    def testConversionMXLayout(self):
+        
+        from music21.musicxml import testPrimitive
+        a = parse(testPrimitive.systemLayoutTwoPart)
+        a.show()
+        #part = a[0]
+        #barlineList = part.flat.getElementsByClass(bar.Barline)
+        #self.assertEqual(len(barlineList), 11)
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -952,4 +961,4 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         a = Test()
-        a.testConversionMXArticulations()
+        a.testConversionMXLayout()

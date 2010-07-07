@@ -121,7 +121,7 @@ class Tag(object):
     def __init__(self, tag, cdFlag=False, className=None):
         self.tag = tag
         self.cdFlag = cdFlag # character data flag
-        self.status = 0
+        self.status = False
         self.charData = u''
         self.className = className
 
@@ -130,12 +130,12 @@ class Tag(object):
     def start(self):
         if self.status: # already open
             raise TagException('Tag (%s) is already started.' % self.tag)
-        self.status = 1
+        self.status = True
 
     def end(self):
         if not self.status:
             raise TagException('Tag (%s) is already ended.' % self.tag)
-        self.status = 0
+        self.status = False
         # when not doing audit checks, no need to count
         #self.count += 1 # increment on close
 
@@ -208,6 +208,15 @@ class TagLib(object):
 ('forward', False, Forward), 
 ('backup', False, Backup), 
 ('grace', False, Grace),  
+
+('print', False, Print),  
+('system-layout', False, SystemLayout),  
+('system-margins', False, SystemMargins),  
+('right-margin', True),  
+('left-margin', True),  
+('system-distance', True, SystemDistance),  
+
+
 ('time-modification', False, TimeModification), 
 ('actual-notes', True), 
 ('normal-notes', True), 
@@ -403,7 +412,7 @@ class TagLib(object):
         errors = []
         header = 'TagLib audit: '
         for key in self._t:
-            if self._t[key].status != 0:
+            if self._t[key].status: # if true
                 errors.append('tag <%s> left open' % key)
             if self._t[key].cdFlag:
                 sample = self._t[key].charData
@@ -1895,6 +1904,58 @@ class Tuplet(MusicXMLElement):
 
 
 
+# Layout elements in a print statement only apply to the current page, system, staff, or measure. Music that follows continues to take the default values from the layout included in the defaults element.
+
+class Print(MusicXMLElementList):
+    def __init__(self):
+        MusicXMLElementList.__init__(self)
+        self._tag = 'print'
+        # attributes
+        self._attr['new-system'] = None # yes /no
+        # elements
+        self.componentList = [] # contains: system-layout, measure-layout, numerous others
+
+class SystemLayout(MusicXMLElementList):
+    def __init__(self):
+        MusicXMLElementList.__init__(self)
+        self._tag = 'system-layout'
+        # elements
+        self.componentList = [] # contains: system margins
+
+class SystemMargins(MusicXMLElement):
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'system-margins'
+        # simple elements
+        self.leftMargin = None
+        self.rightMargin = None
+
+    def _getComponents(self):
+        c = []
+        c.append(('left-margin', self.leftMargin))
+        c.append(('right-margin', self.rightMargin))
+        return c
+
+# class LeftMargin(MusicXMLElement):
+#     def __init__(self):
+#         MusicXMLElement.__init__(self)
+#         self._tag = 'left-margin'
+#         self.charData = None # margin value in points or something
+# 
+# class RightMargin(MusicXMLElement):
+#     def __init__(self):
+#         MusicXMLElement.__init__(self)
+#         self._tag = 'right-margin'
+#         self.charData = None # margin value in points or something
+# 
+class SystemDistance(MusicXMLElement):
+    # this cannot be a simple element b/c it is mixed with SystemMargins
+    # 
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'system-distance'
+        self.charData = None # margin value in points or something
+
 
 #-------------------------------------------------------------------------------
 class Handler(xml.sax.ContentHandler):
@@ -3063,7 +3124,7 @@ class Test(unittest.TestCase):
 
 
 
-    def testPrimitiveXMLOut(self):
+    def testPrimitiveXMLOutA(self):
         beats = Beats(3)
         beatType = BeatType(8)
 
@@ -3462,6 +3523,47 @@ class Test(unittest.TestCase):
 </time>
 """
         self._compareXml(d, dExpected)
+
+
+
+
+    def testPrimitiveXMLOutB(self):
+
+        p = Print()
+        p.set('new-system', 'yes')
+
+        sl = SystemLayout()
+
+        sm = SystemMargins()
+        sm.set('leftMargin', 20)
+        sm.set('rightMargin', 30)
+
+        sd = SystemDistance()
+        sd.set('charData', 55)
+
+        sl.append(sm) 
+        # system distance contained in sys layout
+        sl.append(sd)
+
+        p.append(sl)
+
+        #print p.xmlStr()
+
+        pExpected = '''<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise
+  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+  'http://www.musicxml.org/dtds/partwise.dtd'>
+<print new-system="yes">
+  <system-layout>
+    <system-margins>
+      <left-margin>20</left-margin>
+      <right-margin>30</right-margin>
+    </system-margins>
+    <system-distance>55</system-distance>
+  </system-layout>
+</print>'''
+        self._compareXml(p, pExpected)
+
 
 
 
