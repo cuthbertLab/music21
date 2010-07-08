@@ -113,10 +113,10 @@ class SystemLayout(music21.Music21Object):
             mxSystemLayout.append(mxSystemMargins) 
 
         if self.distance != None:
-            mxSystemDistance = musicxml.SystemDistance()
-            mxSystemDistance.set('charData', self.distance)
+            #mxSystemDistance = musicxml.SystemDistance()
+            #mxSystemDistance.set('charData', self.distance)
             # only append if defined
-            mxSystemLayout.append(mxSystemDistance)
+            mxSystemLayout.systemDistance = self.distance
 
         mxPrint.append(mxSystemLayout)
 
@@ -130,13 +130,11 @@ class SystemLayout(music21.Music21Object):
         >>> mxPrint = musicxml.Print()
         >>> mxPrint.set('new-system', 'yes')
         >>> mxSystemLayout = musicxml.SystemLayout()
+        >>> mxSystemLayout.systemDistance = 55
         >>> mxSystemMargins = musicxml.SystemMargins()
         >>> mxSystemMargins.set('leftMargin', 20)
         >>> mxSystemMargins.set('rightMargin', 30)
-        >>> mxSystemDistance = musicxml.SystemDistance()
-        >>> mxSystemDistance.set('charData', 55)
         >>> mxSystemLayout.append(mxSystemMargins) 
-        >>> mxSystemLayout.append(mxSystemDistance)
         >>> mxPrint.append(mxSystemLayout)
 
         >>> sl = SystemLayout()
@@ -164,12 +162,9 @@ class SystemLayout(music21.Music21Object):
                 break # find first and break
 
         mxSystemMargins = None
-        mxSystemDistance = None
         for x in mxSystemLayout:
             if isinstance(x, musicxml.SystemMargins):
                 mxSystemMargins = x
-            if isinstance(x, musicxml.SystemDistance):
-                mxSystemDistance = x
 
         if mxSystemMargins != None:
             data = mxSystemMargins.get('leftMargin')
@@ -178,11 +173,9 @@ class SystemLayout(music21.Music21Object):
             data = mxSystemMargins.get('rightMargin')
             if data != None:
                 self.rightMargin = int(data)
-
-        if mxSystemDistance != None:
-            data = mxSystemDistance.get('charData')
-            if data != None:
-                self.distance = int(data)
+        
+        if mxSystemLayout != [] and mxSystemLayout.systemDistance != None:
+            self.distance = int(mxSystemLayout.systemDistance)
 
     mx = property(_getMX, _setMX)    
 

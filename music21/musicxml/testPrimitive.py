@@ -9160,7 +9160,7 @@ barlines46a = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
   <part id="P1">
     <measure number="1">
-      <attributes>
+        <attributes>
         <divisions>1</divisions>
         <key>
           <fifths>0</fifths>
@@ -9174,7 +9174,7 @@ barlines46a = """<?xml version="1.0" encoding="UTF-8"?>
           <sign>G</sign>
           <line>2</line>
         </clef>
-      </attributes>
+        </attributes>
       <note>
         <rest/>
         <duration>4</duration>

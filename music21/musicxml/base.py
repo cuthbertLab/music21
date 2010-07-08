@@ -234,7 +234,7 @@ class TagLib(object):
 ('system-margins', False, SystemMargins),  
 ('right-margin', True),  
 ('left-margin', True),  
-('system-distance', True, SystemDistance),  
+('system-distance', True),  
 
 ('time-modification', False, TimeModification), 
 ('actual-notes', True), 
@@ -1946,7 +1946,15 @@ class SystemLayout(MusicXMLElementList):
         MusicXMLElementList.__init__(self)
         self._tag = 'system-layout'
         # elements
+        self.systemDistance = None #
         self.componentList = [] # contains: system margins
+
+    def _getComponents(self):
+        c = [] 
+        c += self.componentList
+        # place after components
+        c.append(('system-distance', self.systemDistance))
+        return c
 
 class SystemMargins(MusicXMLElement):
     def __init__(self):
@@ -1961,14 +1969,6 @@ class SystemMargins(MusicXMLElement):
         c.append(('left-margin', self.leftMargin))
         c.append(('right-margin', self.rightMargin))
         return c
-
-class SystemDistance(MusicXMLElement):
-    # this cannot be a simple element b/c it is mixed with SystemMargins
-    # 
-    def __init__(self):
-        MusicXMLElement.__init__(self)
-        self._tag = 'system-distance'
-        self.charData = None # margin value in points or something
 
 
 #-------------------------------------------------------------------------------
@@ -2074,7 +2074,6 @@ class Handler(xml.sax.ContentHandler):
         self._printObj = None
         self._systemLayoutObj = None
         self._systemMarginsObj = None
-        self._systemDistanceObj = None
 
     def setDocumentLocator(self, locator):
         '''A locator object can be used to get line numbers from the XML document.'''
@@ -2257,10 +2256,6 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'system-margins':
             # has no attrs
             self._systemMarginsObj = SystemMargins() 
-
-        elif name == 'system-distance':
-            # has no attrs
-            self._systemDistanceObj = SystemDistance() 
 
 
         elif name == 'notehead': 
@@ -2621,12 +2616,9 @@ class Handler(xml.sax.ContentHandler):
             if self._systemMarginsObj != None: # in case found elsewhere
                 self._systemMarginsObj.rightMargin = self._currentTag.charData
 
-        elif name == 'system-distance':
+        elif name == 'system-distance': # simple element
             if self._systemLayoutObj != None: # in case found elsewhere
-                self._systemLayoutObj.componentList.append(
-                                    self._systemDistanceObj)
-                self._systemDistanceObj = None
-
+                self._systemLayoutObj.systemDistance = self._currentTag.charData
 
 
         elif name == 'notehead':
@@ -3375,12 +3367,9 @@ class Test(unittest.TestCase):
         sm.set('leftMargin', 20)
         sm.set('rightMargin', 30)
 
-        sd = SystemDistance()
-        sd.set('charData', 55)
-
         sl.append(sm) 
         # system distance contained in sys layout
-        sl.append(sd)
+        sl.systemDistance = 55
 
         p.append(sl)
 
