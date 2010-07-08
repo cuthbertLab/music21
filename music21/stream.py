@@ -5268,7 +5268,7 @@ class Measure(Stream):
 
         # print objects come before attributes
 
-        found = self.getElementsByClass(layout.SystemLayout):
+        found = self.getElementsByClass(layout.SystemLayout)
         if len(found) > 0:
             sl = found[0] # assume only one
             mxPrint = sl.mx
