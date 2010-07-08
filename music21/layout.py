@@ -34,19 +34,34 @@ class SystemLayout(music21.Music21Object):
 
     SystemLayout objects may be found on Measure or Part Streams.    
 
-    >>> sl = SystemLayout()
+    >>> sl = SystemLayout(leftmargin=234, rightmargin=124, distance=3)
+    >>> sl.distance
+    3
+    >>> sl.rightMargin
+    124
+    >>> sl.leftMargin
+    234
+
     '''
-    def __init__(self):
+    def __init__(self, *args, **keywords):
         music21.Music21Object.__init__(self)
         
         self.leftMargin = None
         self.rightMargin = None
 
         # this is probably the distance between adjacent systems
-        # musicxml also defines a top-system-distance tag
+        # musicxml also defines a top-system-distance tag; this may not be
+        # necessary to implements, as the top system is defined by context
         self.distance = None
 
 
+        for key in keywords.keys():
+            if key.lower() == 'leftmargin':
+                self.leftMargin = keywords[key]
+            if key.lower() == 'rightmargin':
+                self.rightMargin = keywords[key]
+            if key.lower() == 'distance':
+                self.distance = keywords[key]
 
 
 

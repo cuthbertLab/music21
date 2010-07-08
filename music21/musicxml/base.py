@@ -117,8 +117,19 @@ class DocumentException(Exception):
 
 #-------------------------------------------------------------------------------
 class Tag(object):
-    '''Object to store tags as encountered by SAX. Tags can be open or closed based on the status attribute. Tags can store character data collected between their defined tags. These are used only for finding and collecting tag attributes and elements. As we do not need character data for all tags, tags have an optional flag to select if the are to collect character data.'''
+    '''Object to store tags as encountered by SAX. Tags can be open or closed based on the status attribute. Tags can store character data collected between their defined tags. 
+
+    These objects are used only for finding and collecting tag attributes and elements. As we do not need character data for all tags, tags have an optional flag to select if the are to collect character data.
+    '''
     def __init__(self, tag, cdFlag=False, className=None):
+        '''
+        >>> t = Tag('note')
+        >>> t.start()
+        >>> t.start() # catch double starts
+        Traceback (most recent call last):
+        TagException: Tag (note) is already started.
+
+        '''
         self.tag = tag
         self.cdFlag = cdFlag # character data flag
         self.status = False
@@ -163,13 +174,24 @@ class Tag(object):
 
 class TagLib(object):
     '''
-    An object to store all MusicXML tags as Tag objects. Tag objects are used 
-    just to identify tags, store element contents and status in SAX parsing. 
-    With this design some tags can be used simply in SAX parsing as 
-    structural monitors, but not be instantiated as objects for content 
+    An object to store all MusicXML tags as :class:`~music21.musicxml.base.Tag` objects. Tag objects are used just to identify tags, store element contents and status in SAX parsing. 
+
+    With this design some tags (called simple elements) can be used simply in SAX parsing as structural monitors, but not be instantiated as objects for content 
     delivery.
     '''
     def __init__(self):
+        '''
+        >>> tl = TagLib()
+        >>> tl['voice'].tag
+        'voice'
+        >>> tl['voice'].status # open or closed
+        False
+        >>> tl.audit()
+        (True, 'TagLib audit: no errors found.')
+        >>> tl['note'].start()
+        >>> tl.audit()
+        (False, 'TagLib audit: 1 erorrs found:\\ntag <note> left open')
+        '''
         self._t = {}
 
         # store tag, charDataBool, className
@@ -419,10 +441,10 @@ class TagLib(object):
                 if sample != '':
                     errors.append('tag <%s> left element data: %s' % (key, sample))
         if len(errors) != 0:
-            ok = 0
+            ok = False
             return ok, header + ('%s erorrs found:\n' % len(errors)) + '\n'.join(errors)
         else:
-            ok = 1
+            ok = True
             return ok, header + 'no errors found.' 
 
 
@@ -435,7 +457,6 @@ class MusicXMLElement(node.Node):
 
     def __init__(self):
         '''
-    
         These tests are module specific and should be loaded as unittests, below
 
         >>> a = MusicXMLElement()
@@ -1936,18 +1957,6 @@ class SystemMargins(MusicXMLElement):
         c.append(('right-margin', self.rightMargin))
         return c
 
-# class LeftMargin(MusicXMLElement):
-#     def __init__(self):
-#         MusicXMLElement.__init__(self)
-#         self._tag = 'left-margin'
-#         self.charData = None # margin value in points or something
-# 
-# class RightMargin(MusicXMLElement):
-#     def __init__(self):
-#         MusicXMLElement.__init__(self)
-#         self._tag = 'right-margin'
-#         self.charData = None # margin value in points or something
-# 
 class SystemDistance(MusicXMLElement):
     # this cannot be a simple element b/c it is mixed with SystemMargins
     # 
@@ -2055,6 +2064,11 @@ class Handler(xml.sax.ContentHandler):
         self._graceObj = None
         self._wedgeObj = None
 
+        self._printObj = None
+        self._systemLayout = None
+        self._systemMargins = None
+        self._systemDistance = None
+
     def setDocumentLocator(self, locator):
         '''A locator object can be used to get line numbers from the XML document.'''
         self._locator = locator
@@ -2083,15 +2097,28 @@ class Handler(xml.sax.ContentHandler):
         # in all but a very few cases self.t[tag].charData = charData is 
         # sufficient for getting charData. however, in a few cases this
         # will not gather all data and cause very unexpected results
-        for tag in self.t.tagsCharData:
-            if self.t[tag].status:
-                self.t[tag].charData += charData
-                break
+
+        # the sax do cs explain why: The Parser will call this method to report each chunk of character data. SAX parsers may return all contiguous character data in a single chunk, or they may split it into several chunks
+
+
+        # the old approach: iterated over all tags to find which was open:
+#         for tag in self.t.tagsCharData:
+#             if self.t[tag].status:
+#                 self.t[tag].charData += charData
+#                 break
+
+        # the new approach simply uses the currentTag reference:
+        # this is much faster!
+
+        if self._currentTag.status:
+            self.t[self._currentTag.tag].charData += charData
+
 
 
     #---------------------------------------------------------------------------
     def startElement(self, name, attrs):
-        environLocal.printDebug([self._debugTagStr('start', name, attrs)], common.DEBUG_ALL)
+
+        # environLocal.printDebug([self._debugTagStr('start', name, attrs)], common.DEBUG_ALL)
 
         if name in self.t.tagsAll:
             self._currentTag = self.t[name]
@@ -3278,47 +3305,77 @@ class Test(unittest.TestCase):
 
 
 
-#         i = Lyric()
-#         i.set('number', 3)
-#         i.set('syllabic', 'single')
-#         i.set('text', 'Mai,')
-#         print i.toxml(None, None, 1)
-# 
-#         j = Beam()
-#         j.set('number', 1)
-#         j.charData = 'backward hook'
-#         print j.toxml(None, None, 1)
-# 
-#         j2 = Beam()
-#         j2.set('number', 2)
-#         j2.charData = 'begin'
-#         print j2.toxml(None, None, 1)
-# 
-# #these need to be updated with set method
-# 
-#         k = Slur()
-#         k.number = 1
-#         k.placement = 'below'
-#         k.type = 'start'
-#         print k.toxml(None, None, 1)
-# 
-#         l = Tie()
-#         l.type = 'stop'
-#         print l.toxml(None, None, 1)
-# 
-#         l2 = Tie()
-#         l2.type = 'start'
-#         print l2.toxml(None, None, 1)
-# 
-#         n = Notations()
-#         n.componentList.append(k)
-#         print n.toxml(None, None, 1)
-# 
-#         o = Tied()
-#         o.type = 'start'
-#         n.componentList.append(o)
-#         print n.toxml(None, None, 1)
-# 
+    def testPrimitiveXMLOutB(self):
+
+        p = Print()
+        p.set('new-system', 'yes')
+
+        sl = SystemLayout()
+
+        sm = SystemMargins()
+        sm.set('leftMargin', 20)
+        sm.set('rightMargin', 30)
+
+        sd = SystemDistance()
+        sd.set('charData', 55)
+
+        sl.append(sm) 
+        # system distance contained in sys layout
+        sl.append(sd)
+
+        p.append(sl)
+
+        #print p.xmlStr()
+
+        pExpected = '''<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise
+  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+  'http://www.musicxml.org/dtds/partwise.dtd'>
+<print new-system="yes">
+  <system-layout>
+    <system-margins>
+      <left-margin>20</left-margin>
+      <right-margin>30</right-margin>
+    </system-margins>
+    <system-distance>55</system-distance>
+  </system-layout>
+</print>'''
+        self._compareXml(p, pExpected)
+
+
+
+    def testPrimitiveXMLOutC(self):
+
+        i = Lyric()
+        i.set('number', 3)
+        i.set('syllabic', 'single')
+        i.set('text', 'Mai,')
+        iExpected = '''<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise
+  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+  'http://www.musicxml.org/dtds/partwise.dtd'>
+<lyric number="3">
+  <syllabic>single</syllabic>
+  <text>Mai,</text>
+</lyric>
+'''
+        self._compareXml(i, iExpected)
+
+
+        k = Slur()
+        k.set('number', 1)
+        k.set('placement', 'below')
+        k.set('type', 'start')
+        kExpected = '''<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise
+  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+  'http://www.musicxml.org/dtds/partwise.dtd'>
+<slur number="1" placement="below" type="start"/>
+'''
+        self._compareXml(k, kExpected)
+
+
+
 #         s = Notehead()
 #         s.filled = 'no'
 #         s.parentheses = 'yes'
@@ -3444,12 +3501,6 @@ class Test(unittest.TestCase):
 #         print kk
 #         print kk.toxml(None, None, 1)
 
-#         ll = Fermata()
-#         ll.type = 'inverted'
-#         print ll
-#         print ll.toxml(None, None, 1)
-
-
 
 
 
@@ -3523,46 +3574,6 @@ class Test(unittest.TestCase):
 </time>
 """
         self._compareXml(d, dExpected)
-
-
-
-
-    def testPrimitiveXMLOutB(self):
-
-        p = Print()
-        p.set('new-system', 'yes')
-
-        sl = SystemLayout()
-
-        sm = SystemMargins()
-        sm.set('leftMargin', 20)
-        sm.set('rightMargin', 30)
-
-        sd = SystemDistance()
-        sd.set('charData', 55)
-
-        sl.append(sm) 
-        # system distance contained in sys layout
-        sl.append(sd)
-
-        p.append(sl)
-
-        #print p.xmlStr()
-
-        pExpected = '''<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE score-partwise
-  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
-  'http://www.musicxml.org/dtds/partwise.dtd'>
-<print new-system="yes">
-  <system-layout>
-    <system-margins>
-      <left-margin>20</left-margin>
-      <right-margin>30</right-margin>
-    </system-margins>
-    <system-distance>55</system-distance>
-  </system-layout>
-</print>'''
-        self._compareXml(p, pExpected)
 
 
 

@@ -941,7 +941,8 @@ class Test(unittest.TestCase):
         
         from music21.musicxml import testPrimitive
         a = parse(testPrimitive.systemLayoutTwoPart)
-        a.show()
+        #a.show()
+
         #part = a[0]
         #barlineList = part.flat.getElementsByClass(bar.Barline)
         #self.assertEqual(len(barlineList), 11)

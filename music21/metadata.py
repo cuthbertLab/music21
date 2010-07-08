@@ -967,7 +967,7 @@ class Metadata(music21.Music21Object):
     In many cases, each Stream will have a single Metadata object at the zero offset position. 
     '''
 
-    def __init__(self, *args, **keywords ):
+    def __init__(self, *args, **keywords):
         '''
         >>> md = Metadata(title='Concerto in F')
         >>> md.title
