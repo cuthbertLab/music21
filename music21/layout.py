@@ -226,7 +226,7 @@ class Test(unittest.TestCase):
 
         sl = music21.layout.SystemLayout()
         sl.isNew = True
-        sl.leftMargin = 120
+        sl.leftMargin = 220
         s.measures[4].insert(0, sl)
 
         sl = music21.layout.SystemLayout()
