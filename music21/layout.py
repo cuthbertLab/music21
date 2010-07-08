@@ -29,7 +29,6 @@ from music21 import musicxml
 
 
 #-------------------------------------------------------------------------------
-
 class SystemLayout(music21.Music21Object):
     '''Parameters for configureing a system's layout.
 
@@ -203,52 +202,52 @@ class Test(unittest.TestCase):
         import music21
         from music21 import stream, note
         s = stream.Stream()
-
+        
         for i in range(1,11):
             m = stream.Measure()
             m.measureNumber = i
             n = note.Note()
             m.append(n)
             s.append(m)
-
-        # add a new system at m3
+        
         sl = music21.layout.SystemLayout()
         #sl.isNew = True # this should not be on first system
+        # as this causes all subsequent margins to be distorted
         sl.leftMargin = 300
         sl.rightMargin = 300
         s.measures[0].insert(0, sl)
-
+        
         sl = music21.layout.SystemLayout()
         sl.isNew = True
         sl.leftMargin = 200
         sl.rightMargin = 200
+        sl.distance = 40
         s.measures[2].insert(0, sl)
-
+        
         sl = music21.layout.SystemLayout()
         sl.isNew = True
         sl.leftMargin = 220
         s.measures[4].insert(0, sl)
-
+        
         sl = music21.layout.SystemLayout()
         sl.isNew = True
         sl.leftMargin = 60
         sl.rightMargin = 300
+        sl.distance = 200
         s.measures[6].insert(0, sl)
-
+        
         sl = music21.layout.SystemLayout()
         sl.isNew = True
         sl.leftMargin = 0
         sl.rightMargin = 0
         s.measures[8].insert(0, sl)
 
-
 #         systemLayoutList = s.flat.getElementsByClass(music21.layout.SystemLayout)
 #         self.assertEqual(len(systemLayoutList), 4)
 
-
-
         #s.show()
-
+    
+        mx = s.musicxml
 
 
 #-------------------------------------------------------------------------------
