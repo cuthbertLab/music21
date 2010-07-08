@@ -10,7 +10,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''This module defines objects for defining and manipulating structures common to serial and/or twelve-tone music, including :class:`~music21.serial.ToneRow` subclasses.
+'''This module defines objects for defining and manipulating structures 
+common to serial and/or twelve-tone music, 
+including :class:`~music21.serial.ToneRow` subclasses.
 '''
 
 

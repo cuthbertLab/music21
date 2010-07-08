@@ -10,7 +10,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''An object base-class for creating and editing specialized XML structures as object representations. 
+'''An object base-class for creating and editing specialized XML structures 
+as object representations.  Used by the musicxml converter, obviously, but
+also by environment.py.
 '''
 
 import copy
@@ -19,7 +21,7 @@ from xml.sax import saxutils
 import xml.dom.minidom
 
 
-# cannot import environment
+# cannot import environment because environment reads/writes XML
 import doctest, unittest
 import re
 from music21 import common
@@ -120,7 +122,7 @@ class Node(object):
         '''Define mappings from expected MusicXML names and specially named attributes in object.
         Return a list of zero or 1 name
         
-        Speialize in sublcasses as needed, calling this base class to get
+        Specialize in sublcasses as needed, calling this base class to get
         general defaults
 
         All options need to be lower case.
@@ -129,8 +131,9 @@ class Node(object):
         >>> a._convertNameCrossReference('characterData')
         'charData'
         '''
+        nl = name.lower()
         for attr, options in self._crossReference.items():
-            if name in options or name.lower() in options:
+            if name in options or nl in options:
                 return attr
         return '' # return an empty string if no match
 

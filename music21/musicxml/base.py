@@ -345,7 +345,7 @@ class TagLib(object):
             charDataBool = data[1]
             if len(data) > 2:
                 className = data[2]
-            else: # not all tags define a clas sname
+            else: # not all tags define a class name
                 className = None
 
             # error check for redundancy

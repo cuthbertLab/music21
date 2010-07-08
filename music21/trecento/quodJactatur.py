@@ -21,7 +21,7 @@ Polyphonic Music of the Fourteenth Century, vol. 24, and Quod Jactatur.
 Quod Jactatur has never been successfully transcribed.  Its canon,
 "Tenor quem contratenor triplumque fugant temporibus in quinque" and
 text "Quod Jactatur qui virtus opere non demonstratur / Ut aqua pissis 
-sepius scientia denegatur" together with the given clefs suggest a 
+sepius scientia dejugatur" (not "denegatur") together with the given clefs suggest a 
 resolution in fifths, five breves apart.  But none of the transcriptions
 have seemed successful.  Previous scholars seemed to neglect two important
 aspects of the composition.  First that important resting points happen 5
@@ -35,7 +35,8 @@ ordering can be seen by closely looking at the manuscript, Modena,
 Biblioteca Estense, Alpha.5.24, fol. 20v (old fol. 21v), edited recently
 by Anne Stone.  The clefs were originally written as C5 followed by
 C3 followed by C1, but the scribe erased the first two scribes and
-rewrote them in the correct order.
+rewrote them in the correct order.  (The C5 clef was also written as C4 first
+but changed to C5 later)
 
 Solving this canon seemed a great use of music21, since we could
 try out different solutions, moving notes over a measure or two, etc.
@@ -100,6 +101,7 @@ def invertStreamAroundNote(myStream, inversionNote = note.Note() ):
     for n in myStream.flat.notes:
         if n.isRest is False:
             n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
+#            n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
     return myStream
 
 def transposeStreamDiatonic(myStream, diatonicInterval = 1):
@@ -109,7 +111,7 @@ def transposeStreamDiatonic(myStream, diatonicInterval = 1):
                 n.pitch.diatonicNoteNum += diatonicInterval - 1                
             else:
                 n.pitch.diatonicNoteNum += diatonicInterval + 1
-        if n.pitch.accidental != n.getContextByClass(key.Key)
+#            n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
     return myStream    
 
 def bentWolfSolution():
@@ -152,17 +154,26 @@ def cuthZazSolution():
     qjTenor   = copy.deepcopy(qjPart)
     
     qjCtR = reverse(qjCt)
+#    qjCtR = qjCt
     
-    transposeStreamDiatonic(qjTenor, -5)
-    transposeStreamDiatonic(qjCtR, -9)
-    invertStreamAroundNote(qjCtR, note.Note("A2"))
+#    transposeStreamDiatonic(qjTenor, 1)
+    transposeStreamDiatonic(qjTriplum, 5)
+    transposeStreamDiatonic(qjCtR, -2)
+#    invertStreamAroundNote(qjCtR, qjCtR.flat.notes[0])
     
     qjTriplum = prependBlankMeasures(qjTriplum, 5)
-    qjCtR     = prependBlankMeasures(qjCtR, 5)
+    qjCtR     = prependBlankMeasures(qjCtR, 3)
     
     qjSolved.insert(0, qjTriplum)
     qjSolved.insert(0, qjCtR)
     qjSolved.insert(0, qjTenor)
+ 
+    for i in qjSolved.flat.notes:
+        if i.isRest is False:
+            if i.step == 'B':
+                i.accidental = pitch.Accidental('flat')
+            else:
+                i.accidental = None
     
     qjSolved.show('musicxml')
     print qjSolved.write('musicxml')
