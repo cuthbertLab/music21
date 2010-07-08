@@ -231,13 +231,13 @@ class TagLib(object):
 ('backup', False, Backup), 
 ('grace', False, Grace),  
 
+# this position is not based on measured tag usage
 ('print', False, Print),  
 ('system-layout', False, SystemLayout),  
 ('system-margins', False, SystemMargins),  
 ('right-margin', True),  
 ('left-margin', True),  
 ('system-distance', True, SystemDistance),  
-
 
 ('time-modification', False, TimeModification), 
 ('actual-notes', True), 
@@ -329,7 +329,7 @@ class TagLib(object):
         ]
 
         # order matters: keep order here
-        self.tagsCharData = []
+        self.tagsCharData = [] # note: this may no longer be needed
         self.tagsAll = [] 
 
         for data in _tags:
@@ -1978,7 +1978,9 @@ class Handler(xml.sax.ContentHandler):
 
         # this might be used in startElement() to speed up processing
         # this is not opperational yet
-        self._currentObj = None # store current mx object for processing
+        #self._currentObj = None # store current mx object for processing
+
+        # this is in use in characters()
         self._currentTag = None # store current tag object
 
         # all objects built in processing
@@ -2065,9 +2067,9 @@ class Handler(xml.sax.ContentHandler):
         self._wedgeObj = None
 
         self._printObj = None
-        self._systemLayout = None
-        self._systemMargins = None
-        self._systemDistance = None
+        self._systemLayoutObj = None
+        self._systemMarginsObj = None
+        self._systemDistanceObj = None
 
     def setDocumentLocator(self, locator):
         '''A locator object can be used to get line numbers from the XML document.'''
@@ -2124,6 +2126,8 @@ class Handler(xml.sax.ContentHandler):
             self._currentTag = self.t[name]
             self._currentTag.start() 
 
+            # idea is to do generic processing to single reference
+            # this is a problem for obj composition
             # presently, doing this breaks xml processing; not sure why
 #             if self.t[name].className != None:
 #                 self._currentObj = self.t[name].className()
@@ -2234,10 +2238,29 @@ class Handler(xml.sax.ContentHandler):
             self._graceObj.loadAttrs(attrs)
 
 
+        # the position in this group (print to sys distance) may not 
+        # be optimized
+        elif name == 'print':
+            #environLocal.printDebug(['found print tag'])
+            self._printObj = Print()
+            self._printObj.loadAttrs(attrs)
+
+        elif name == 'system-layout':
+            # has no attrs
+            self._systemLayoutObj = SystemLayout() 
+
+        elif name == 'system-margins':
+            # has no attrs
+            self._systemMarginsObj = SystemMargins() 
+
+        elif name == 'system-distance':
+            # has no attrs
+            self._systemDistanceObj = SystemDistance() 
+
+
         elif name == 'notehead': 
             self._noteheadObj = Notehead()
             self._noteheadObj.loadAttrs(attrs)
-
 
         elif name == 'technical': 
             self._technicalObj = Technical()
@@ -2374,13 +2397,16 @@ class Handler(xml.sax.ContentHandler):
 
 
 
+
+
     #---------------------------------------------------------------------------
     def endElement(self, name):
         environLocal.printDebug([self._debugTagStr('end', name)],  
                 common.DEBUG_ALL)
-    
-        if name in self.t.tagsAll:
-            self._currentObj = None # reset
+
+        # not in use yet
+#         if name in self.t.tagsAll:
+#             self._currentObj = None # reset
             #environLocal.printDebug([self._currentTag.tag])
 
         # place most commonly used tags first
@@ -2559,10 +2585,43 @@ class Handler(xml.sax.ContentHandler):
             self._measureObj.componentList.append(self._backupObj)
             self._backupObj = None
 
-
         elif name == 'grace':
             self._noteObj.graceObj = self._graceObj
             self._graceObj = None
+
+
+        # the position of print through sys-dist may not be optimized
+        elif name == 'print':
+            # print are stored in Measure, before attributes
+            if self._measureObj != None: # in case a print elsewhere
+                self._measureObj.componentList.append(self._printObj)
+                self._printObj = None
+
+        elif name == 'system-layout':
+            # has no attrs
+            if self._printObj != None: # in case found elsewhere
+                self._printObj.componentList.append(self._systemLayoutObj)
+                self._systemLayoutObj = None
+
+        elif name == 'system-margins':
+            if self._systemLayoutObj != None: # in case found elsewhere
+                self._systemLayoutObj.componentList.append(self._systemMarginsObj)
+                self._systemMarginsObj = None
+
+        elif name == 'left-margin': # simple element
+            if self._systemMarginsObj != None: # in case found elsewhere
+                self._systemMarginsObj.leftMargin = self._currentTag.charData
+
+        elif name == 'right-margin': # simple element
+            if self._systemMarginsObj != None: # in case found elsewhere
+                self._systemMarginsObj.rightMargin = self._currentTag.charData
+
+        elif name == 'system-distance':
+            if self._systemLayoutObj != None: # in case found elsewhere
+                self._systemLayoutObj.componentList.append(
+                                    self._systemDistanceObj)
+                self._systemDistanceObj = None
+
 
 
         elif name == 'notehead':
@@ -2724,14 +2783,10 @@ class Handler(xml.sax.ContentHandler):
                 self._midiInstrumentObj.midiProgram = self._currentTag.charData
 
 
-
-
         # formerly part of handler part
         elif name == 'part':
             self._parts.append(self._partObj) # outermost container
             self._partObj = None # clear to avoid mistakes
-
-
 
         elif name == 'key':
             self._attributesObj.keyList.append(self._keyObj)
@@ -2817,7 +2872,6 @@ class Handler(xml.sax.ContentHandler):
             #environLocal.printDebug(['got coc tag', self._clefObj])
 
 
-
         elif name == 'display-step':
             # chara data loaded in object
             self._restObj.componentList.append(self._displayStepObj)
@@ -2828,16 +2882,12 @@ class Handler(xml.sax.ContentHandler):
             self._displayOctaveObj = None
 
 
-
-
-
         elif name == 'staff': 
             if self._noteObj != None: # not a forward/backup tag
                 self._noteObj.staff = self._currentTag.charData
             else:
                 pass
                 #environLocal.printDebug([' cannot deal with this staff', self._currentTag.charData])
-
 
         elif name == 'barline': 
             self._measureObj.componentList.append(self._barlineObj)
@@ -2854,11 +2904,15 @@ class Handler(xml.sax.ContentHandler):
             self._barlineObj.repeatObj = self._repeatObj
             self._repeatObj = None
 
+
+
         # clear and end
         if name in self.t.tagsAll:
             self.t[name].clear() 
             self.t[name].end() 
 
+            # do not do this!
+            # self._currentTag = None
 
 
     #---------------------------------------------------------------------------

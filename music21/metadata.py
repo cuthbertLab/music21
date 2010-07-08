@@ -1272,7 +1272,7 @@ class Metadata(music21.Music21Object):
 
 
     def _setMX(self, mxScore):
-        '''Given an msScore, fill the necessary parameters of a Metadata.
+        '''Given an mxScore, fill the necessary parameters of a Metadata.
         '''
         self.movementNumber = mxScore.get('movementNumber')
         # xml calls this title not name
@@ -1292,7 +1292,7 @@ class Metadata(music21.Music21Object):
                 c.mx = mxCreator
                 self._contributors.append(c)
 
-        # not yet supported; an encoding is also fond in identification obj
+        # not yet supported; an encoding is also found in identification obj
         mxEncoding = mxScore.get('encodingObj')
 
     mx = property(_getMX, _setMX)    
