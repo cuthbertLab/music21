@@ -5267,7 +5267,7 @@ class Measure(Stream):
         mxMeasure.set('number', self.measureNumber)
 
         # print objects come before attributes
-
+        # note: this class match is a problem in cases where the object is created in the module itself, as in a test. 
         found = self.getElementsByClass(layout.SystemLayout)
         if len(found) > 0:
             sl = found[0] # assume only one
