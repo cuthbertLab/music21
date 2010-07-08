@@ -974,9 +974,15 @@ class Measure(MusicXMLElementList):
         self._crossReference['attributesObj'] = ['attributes']
 
     def _getComponents(self):
-        c = [] # have not checked order of this
+        c = [] 
         c.append(self.attributesObj)
-        c += self.componentList
+        #c += self.componentList
+        for part in self.componentList:
+            if isinstance(part, Print):
+                # place print elements first, ahead of attributes
+                c.insert(0, part)
+            else:
+                c.append(part)
         return c
 
     def setDefaults(self):

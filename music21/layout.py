@@ -93,13 +93,17 @@ class SystemLayout(music21.Music21Object):
         
         mxSystemLayout = musicxml.SystemLayout()
         mxSystemMargins = musicxml.SystemMargins()
+        match = False
         if self.leftMargin != None:
             mxSystemMargins.set('leftMargin', self.leftMargin)
+            match = True
         if self.rightMargin != None:
             mxSystemMargins.set('rightMargin', self.rightMargin)
+            match = True
 
         # stored on components list
-        mxSystemLayout.append(mxSystemMargins) 
+        if match:
+            mxSystemLayout.append(mxSystemMargins) 
 
         if self.distance != None:
             mxSystemDistance = musicxml.SystemDistance()
@@ -187,8 +191,20 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testPass(self):
-        pass
+    def testBasic(self):
+        from music21 import stream, note
+        s = stream.Stream()
+
+        for i in range(10):
+            m = stream.Measure()
+            s.append(m)
+
+        # add a new system at m3
+        sl = SystemLayout()
+        sl.isNew = True
+        s.measures[2].append(sl)
+
+        #s.show()
 
 
 
@@ -200,6 +216,7 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         a = Test()
-        #a.testNoteBeatPropertyCorpus()
+
+        a.testBasic()
 
 
