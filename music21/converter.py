@@ -943,7 +943,7 @@ class Test(unittest.TestCase):
         from music21 import stream, layout
 
         a = parse(testPrimitive.systemLayoutTwoPart)
-        #a.show()
+        a.show()
 
         part = a.getElementsByClass(stream.Part)[0]
         systemLayoutList = part.flat.getElementsByClass(layout.SystemLayout)

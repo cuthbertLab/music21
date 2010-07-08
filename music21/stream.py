@@ -5266,6 +5266,14 @@ class Measure(Stream):
         mxMeasure = musicxmlMod.Measure()
         mxMeasure.set('number', self.measureNumber)
 
+        # print objects come before attributes
+
+        found = self.getElementsByClass(layout.SystemLayout):
+        if len(found) > 0:
+            sl = found[0] # assume only one
+            mxPrint = sl.mx
+            mxMeasure.componentList.append(mxPrint)
+
         # get an empty mxAttributes object
         mxAttributes = musicxmlMod.Attributes()
         # best to only set dvisions here, as clef, time sig, meter are not
@@ -5303,7 +5311,7 @@ class Measure(Stream):
             elif obj.isClass(dynamics.Dynamic):
                 # returns an mxDirection object
                 mxMeasure.append(obj.mx)
-            else:
+            else: # other objects may have already been added
                 pass
                 #environLocal.printDebug(['_getMX of Measure is not processing', obj])
 
