@@ -940,12 +940,14 @@ class Test(unittest.TestCase):
     def testConversionMXLayout(self):
         
         from music21.musicxml import testPrimitive
+        from music21 import stream, layout
+
         a = parse(testPrimitive.systemLayoutTwoPart)
         #a.show()
 
-        #part = a[0]
-        #barlineList = part.flat.getElementsByClass(bar.Barline)
-        #self.assertEqual(len(barlineList), 11)
+        part = a.getElementsByClass(stream.Part)[0]
+        systemLayoutList = part.flat.getElementsByClass(layout.SystemLayout)
+        self.assertEqual(len(systemLayoutList), 6)
 
 
 #-------------------------------------------------------------------------------

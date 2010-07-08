@@ -169,7 +169,9 @@ class SystemLayout(music21.Music21Object):
                 self.rightMargin = int(data)
 
         if mxSystemDistance != None:
-            self.distance = int(mxSystemDistance.get('charData'))
+            data = mxSystemDistance.get('charData')
+            if data != None:
+                self.distance = int(data)
 
     mx = property(_getMX, _setMX)    
 

@@ -153,9 +153,6 @@ class Tag(object):
     def clear(self):
         self.charData = u''
 
-    def zeroCount(self):
-        self.count = 0
-
     def __eq__(self, other):
         if other == self.tag: return True
         else: return False
@@ -333,7 +330,9 @@ class TagLib(object):
         self.tagsAll = [] 
 
         for data in _tags:
-            if common.isStr(data): # if just a string w/o a class definition
+            # some cases have a string w/o a class definition
+            if isinstance(data, str):
+            # if common.isStr(data): 
                 if data in DYNAMIC_MARKS:
                     data = [data, False, DynamicMark]
                 elif data in ARTICULATION_MARKS:
@@ -350,8 +349,8 @@ class TagLib(object):
                 className = None
 
             # error check for redundancy
-            if tagName in self._t.keys():
-                raise TagLibException('duplicated tag %s' % tagName)
+            #if tagName in self._t.keys():
+            #    raise TagLibException('duplicated tag %s' % tagName)
 
             # store tag names in order
             self.tagsAll.append(tagName)
@@ -402,7 +401,7 @@ class TagLib(object):
     def statClear(self):
         tags = self._t.keys()
         for tag in tags:
-            self._t[tag].zeroCount()
+            self._t[tag].count = 0
 
     def _statMapActive(self):
         '''Display method for tag audit checks

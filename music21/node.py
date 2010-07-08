@@ -21,9 +21,16 @@ import xml.dom.minidom
 
 # cannot import environment
 import doctest, unittest
+import re
 from music21 import common
 
 _MOD = 'node.py'
+
+# these module-level dictionaries cache used xml name conversion
+# store converted names for reuse
+_cacheNameFromXml = {}
+_cacheNameToXml = {}
+RE_CAPS = re.compile('[A-Z]+')
 
 
 #-------------------------------------------------------------------------------
@@ -84,6 +91,7 @@ class Node(object):
         # specialize in subclassess
         self._crossReference = {'charData': ['characterdata', 'content']}
 
+
     def _getAttributes(self):
         '''Return a list of attribute names / value pairs
         >>> a = Node()
@@ -133,13 +141,19 @@ class Node(object):
         >>> a._convertNameFromXml('char-data')
         'charData'
         '''
+        try:
+            return _cacheNameFromXml[nameSrc]
+        except KeyError:
+            pass
+
         parts = nameSrc.split('-')
         nameDst = [parts[0]] # create a list for storage
         if len(parts) > 1:
             for stub in parts[1:]:
                 nameDst.append(stub[0].upper() + stub[1:])
         #print _MOD, 'new name', ''.join(nameDst)
-        return ''.join(nameDst)
+        _cacheNameFromXml[nameSrc] = ''.join(nameDst)
+        return _cacheNameFromXml[nameSrc]
 
     def _convertNameToXml(self, nameSrc):
         '''Given an a Python attribute name, try to convert it to a XML name.
@@ -149,13 +163,28 @@ class Node(object):
         >>> a._convertNameToXml('charData')
         'char-data'
         '''
-        nameDst = []
-        for char in nameSrc:
-            if char.isupper():
-                nameDst.append('-%s' % char.lower())
-            else:
-                nameDst.append(char)
-        return ''.join(nameDst)
+        try:
+            return _cacheNameToXml[nameSrc]
+        except KeyError:
+            pass
+
+        # this method is slightly faster than below
+        nameDst = nameSrc[:] # copy
+        caps = RE_CAPS.findall(nameSrc) # get a list of caps chars
+        caps = set(caps) # strip redundancies
+        if len(caps) > 0:
+            for char in caps:
+                nameDst = nameDst.replace(char, '-%s' % char.lower())
+
+#         nameDst = []
+#         for char in nameSrc:
+#             if char.isupper():
+#                 nameDst.append('-%s' % char.lower())
+#             else:
+#                 nameDst.append(char)
+
+        _cacheNameToXml[nameSrc] = nameDst
+        return _cacheNameToXml[nameSrc]
 
 
     #---------------------------------------------------------------------------

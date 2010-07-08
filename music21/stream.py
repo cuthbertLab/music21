@@ -30,6 +30,7 @@ from music21 import dynamics
 from music21 import instrument
 from music21 import interval
 from music21 import key
+from music21 import layout
 from music21 import lily as lilyModule
 #from music21 import measure
 from music21 import metadata
@@ -5358,6 +5359,7 @@ class Measure(Stream):
             self.keySignature = key.KeySignature()
             self.keySignature.mx = mxAttributes.keyList
 
+        # iterate through components found on components list
         # set to zero for each measure
         offsetMeasureNote = 0 # offset of note w/n measure        
         mxNoteList = [] # for chords
@@ -5368,7 +5370,16 @@ class Measure(Stream):
             else:
                 mxObjNext = None
 
-            if isinstance(mxObj, musicxmlMod.Barline):
+            if isinstance(mxObj, musicxmlMod.Print):
+                # mxPrint objects may be found in a Measure's componetns
+                # contain system layout information
+                mxPrint = mxObj
+                sl = layout.SystemLayout()
+                sl.mx = mxPrint
+                # store at zero position
+                self.insert(0, sl)
+
+            elif isinstance(mxObj, musicxmlMod.Barline):
                 mxBarline = mxObj
                 barline = bar.Barline()
                 barline.mx = mxBarline # configure
