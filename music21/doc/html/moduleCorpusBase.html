@@ -77,36 +77,43 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-music21.corpus.base">
-<span id="modulecorpus-base"></span><h1>music21.corpus.base<a class="headerlink" href="#module-music21.corpus.base" title="Permalink to this headline">¶</a></h1>
-<p>The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data. To see complete listing of works in the music21 corpus, visit  <a class="reference external" href="referenceCorpus.html#referencecorpus"><em>Corpus Reference Index</em></a>.</p>
+  <div class="section" id="music21-corpus-base">
+<span id="modulecorpus-base"></span><h1>music21.corpus.base<a class="headerlink" href="#music21-corpus-base" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="music21.corpus.base.parseWork">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">parseWork</tt><big>(</big><em>workName</em>, <em>movementNumber=None</em>, <em>extList=None</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.corpus.base.parseWork" title="Permalink to this definition">¶</a></dt>
-<dd><p>Search the corpus, then the virtual corpus, for a work. Return a parsed <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">music21.stream.Stream</span></tt></a>. If forceSource is True, the original file will always be loaded and pickled files, if available, will be ignored.</p>
+<dt id="parseWork">
+<tt class="descname">parseWork</tt><big>(</big><em>workName</em>, <em>movementNumber=None</em>, <em>extList=None</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#parseWork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search the corpus, then the virtual corpus, for a work. Return a parsed <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">music21.stream.Stream</span></tt></a>.</p>
+<blockquote>
+<p>If forceSource is True, the original file will always be loaded and pickled
+files, if available, will be ignored.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aStream</span> <span class="o">=</span> <span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;opus74no1/movement3&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+</blockquote>
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getWork">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getWork</tt><big>(</big><em>workName</em>, <em>movementNumber=None</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getWork" title="Permalink to this definition">¶</a></dt>
+<dt id="getWork">
+<tt class="descname">getWork</tt><big>(</big><em>workName</em>, <em>movementNumber=None</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#getWork" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search the corpus, then the virtual corpus, for a work. This method will return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised.</p>
+<blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">(</span><span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getWork</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;haydn&#39;</span><span class="p">,</span> <span class="s">&#39;opus74no2&#39;</span><span class="p">,</span> <span class="s">&#39;movement4.xml&#39;</span><span class="p">]))</span>
 <span class="go">True</span>
 </pre></div>
 </div>
+</blockquote>
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getBachChorales">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getBachChorales</tt><big>(</big><em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getBachChorales" title="Permalink to this definition">¶</a></dt>
+<dt id="getBachChorales">
+<tt class="descname">getBachChorales</tt><big>(</big><em>extList=None</em><big>)</big><a class="headerlink" href="#getBachChorales" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all Bach chorales.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getBachChorales</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">10</span>
@@ -122,8 +129,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getBeethovenStringQuartets">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getBeethovenStringQuartets</tt><big>(</big><em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getBeethovenStringQuartets" title="Permalink to this definition">¶</a></dt>
+<dt id="getBeethovenStringQuartets">
+<tt class="descname">getBeethovenStringQuartets</tt><big>(</big><em>extList=None</em><big>)</big><a class="headerlink" href="#getBeethovenStringQuartets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all Beethoven String Quartets.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getBeethovenStringQuartets</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">10</span>
@@ -139,8 +146,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getComposer">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getComposer</tt><big>(</big><em>composerName</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getComposer" title="Permalink to this definition">¶</a></dt>
+<dt id="getComposer">
+<tt class="descname">getComposer</tt><big>(</big><em>composerName</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#getComposer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all components of the corpus that match a composer&#8217;s name. An <cite>extList</cite>, if provided, defines which extensions are returned. An <cite>extList</cite> of None returns all extensions.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposer</span><span class="p">(</span><span class="s">&#39;beethoven&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">10</span>
@@ -159,10 +166,12 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getComposerDir">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getComposerDir</tt><big>(</big><em>composerName</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getComposerDir" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given the name of a composer, get the path to the top-level directory of that composer</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<dt id="getComposerDir">
+<tt class="descname">getComposerDir</tt><big>(</big><em>composerName</em><big>)</big><a class="headerlink" href="#getComposerDir" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Given the name of a composer, get the path to the top-level directory</dt>
+<dd><p class="first">of that composer</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getComposerDir</span><span class="p">(</span><span class="s">&#39;beethoven&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;corpus&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s">&#39;beethoven&#39;</span><span class="p">))</span>
 <span class="go">True</span>
@@ -177,25 +186,33 @@
 <span class="go">True</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getPaths">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getPaths</tt><big>(</big><em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getPaths" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get all paths in the corpus that match a known extension, or an extenion provided by an argument.</p>
+<dt id="getPaths">
+<tt class="descname">getPaths</tt><big>(</big><em>extList=None</em><big>)</big><a class="headerlink" href="#getPaths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Get all paths in the corpus that match a known extension, or an extenion</dt>
+<dd><p class="first">provided by an argument.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getPaths</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">30</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getPaths</span><span class="p">(</span><span class="s">&#39;krn&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">getPaths</span><span class="p">(</span><span class="s">&#39;krn&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">4</span>
 <span class="go">True</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getVirtualPaths">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getVirtualPaths</tt><big>(</big><em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getVirtualPaths" title="Permalink to this definition">¶</a></dt>
+<dt id="getVirtualPaths">
+<tt class="descname">getVirtualPaths</tt><big>(</big><em>extList=None</em><big>)</big><a class="headerlink" href="#getVirtualPaths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">getVirtualPaths</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mf">6</span>
 <span class="go">True</span>
@@ -204,20 +221,24 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getVirtualWorkList">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getVirtualWorkList</tt><big>(</big><em>workName</em>, <em>movementNumber=None</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getVirtualWorkList" title="Permalink to this definition">¶</a></dt>
+<dt id="getVirtualWorkList">
+<tt class="descname">getVirtualWorkList</tt><big>(</big><em>workName</em>, <em>movementNumber=None</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#getVirtualWorkList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a work name, search all virtual works and return a list of URLs for any matches.</p>
+<blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getVirtualWorkList</span><span class="p">(</span><span class="s">&#39;bach/bwv1007/prelude&#39;</span><span class="p">)</span>
 <span class="go">[&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">getVirtualWorkList</span><span class="p">(</span><span class="s">&#39;junk&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getVirtualWorkList</span><span class="p">(</span><span class="s">&#39;junk&#39;</span><span class="p">)</span>
 <span class="go">[]</span>
 </pre></div>
 </div>
+</blockquote>
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getWorkList">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getWorkList</tt><big>(</big><em>workName</em>, <em>movementNumber=None</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getWorkList" title="Permalink to this definition">¶</a></dt>
+<dt id="getWorkList">
+<tt class="descname">getWorkList</tt><big>(</big><em>workName</em>, <em>movementNumber=None</em>, <em>extList=None</em><big>)</big><a class="headerlink" href="#getWorkList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">getWorkList</span><span class="p">(</span><span class="s">&#39;beethoven/opus18no1&#39;</span><span class="p">))</span>
 <span class="go">8</span>
@@ -234,8 +255,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.corpus.base.getWorkReferences">
-<tt class="descclassname">music21.corpus.base.</tt><tt class="descname">getWorkReferences</tt><big>(</big><em>sort=True</em><big>)</big><a class="headerlink" href="#music21.corpus.base.getWorkReferences" title="Permalink to this definition">¶</a></dt>
+<dt id="getWorkReferences">
+<tt class="descname">getWorkReferences</tt><big>(</big><em>sort=True</em><big>)</big><a class="headerlink" href="#getWorkReferences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a lost of reference dictionaries, each each dictionary for a each composer. A &#8216;works&#8217; dictionary for each composer provides references to dictionaries for all associated works.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">post</span> <span class="o">=</span> <span class="n">getWorkReferences</span><span class="p">()</span>
 </pre></div>
@@ -270,7 +291,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 06, 2010.
+      Last updated on Jul 08, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

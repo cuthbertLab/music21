@@ -119,7 +119,23 @@
 <dl class="function">
 <dt id="music21.graph.plotStream">
 <tt class="descclassname">music21.graph.</tt><tt class="descname">plotStream</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.plotStream" title="Permalink to this definition">¶</a></dt>
-<dd>Given a stream and any keyword configuration arguments, create and display a plot. Note: plots requires matplotib to be installed. Plot method can be specified as a second argument or by keyword. Available plots include the following: pitchSpace (<a title="music21.graph.PlotHistogramPitchSpace" class="reference internal" href="#music21.graph.PlotHistogramPitchSpace"><tt class="xref docutils literal"><span class="pre">PlotHistogramPitchSpace</span></tt></a>) pitchClass (<a title="music21.graph.PlotHistogramPitchClass" class="reference internal" href="#music21.graph.PlotHistogramPitchClass"><tt class="xref docutils literal"><span class="pre">PlotHistogramPitchClass</span></tt></a>) quarterLength (<a title="music21.graph.PlotHistogramQuarterLength" class="reference internal" href="#music21.graph.PlotHistogramQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotHistogramQuarterLength</span></tt></a>) scatterPitchSpaceQuarterLength (<a title="music21.graph.PlotScatterPitchSpaceQuarterLength" class="reference internal" href="#music21.graph.PlotScatterPitchSpaceQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterPitchSpaceQuarterLength</span></tt></a>) scatterPitchClassQuarterLength (<a title="music21.graph.PlotScatterPitchClassQuarterLength" class="reference internal" href="#music21.graph.PlotScatterPitchClassQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterPitchClassQuarterLength</span></tt></a>) scatterPitchClassOffset (&#8216;<tt class="xref docutils literal"><span class="pre">PlotScatterPitchClassOffset</span></tt>) pitchClassOffset (<a title="music21.graph.PlotHorizontalBarPitchSpaceOffset" class="reference internal" href="#music21.graph.PlotHorizontalBarPitchSpaceOffset"><tt class="xref docutils literal"><span class="pre">PlotHorizontalBarPitchSpaceOffset</span></tt></a>) pitchSpaceOffset (<a title="music21.graph.PlotHorizontalBarPitchClassOffset" class="reference internal" href="#music21.graph.PlotHorizontalBarPitchClassOffset"><tt class="xref docutils literal"><span class="pre">PlotHorizontalBarPitchClassOffset</span></tt></a>) pitchSpaceQuarterLengthCount (<a title="music21.graph.PlotScatterWeightedPitchSpaceQuarterLength" class="reference internal" href="#music21.graph.PlotScatterWeightedPitchSpaceQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterWeightedPitchSpaceQuarterLength</span></tt></a>) pitchClassQuarterLengthCount (<a title="music21.graph.PlotScatterWeightedPitchClassQuarterLength" class="reference internal" href="#music21.graph.PlotScatterWeightedPitchClassQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterWeightedPitchClassQuarterLength</span></tt></a>) 3DPitchSpaceQuarterLengthCount (<a title="music21.graph.Plot3DBarsPitchSpaceQuarterLength" class="reference internal" href="#music21.graph.Plot3DBarsPitchSpaceQuarterLength"><tt class="xref docutils literal"><span class="pre">Plot3DBarsPitchSpaceQuarterLength</span></tt></a>)</dd></dl>
+<dd><p>Given a stream and any keyword configuration arguments, create and display a plot.</p>
+<blockquote>
+<p>Note: plots requires matplotib to be installed.</p>
+<p>Plot method can be specified as a second argument or by keyword. Available plots include the following:</p>
+<p>pitchSpace (<a title="music21.graph.PlotHistogramPitchSpace" class="reference internal" href="#music21.graph.PlotHistogramPitchSpace"><tt class="xref docutils literal"><span class="pre">PlotHistogramPitchSpace</span></tt></a>)
+pitchClass (<a title="music21.graph.PlotHistogramPitchClass" class="reference internal" href="#music21.graph.PlotHistogramPitchClass"><tt class="xref docutils literal"><span class="pre">PlotHistogramPitchClass</span></tt></a>)
+quarterLength (<a title="music21.graph.PlotHistogramQuarterLength" class="reference internal" href="#music21.graph.PlotHistogramQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotHistogramQuarterLength</span></tt></a>)</p>
+<p>scatterPitchSpaceQuarterLength (<a title="music21.graph.PlotScatterPitchSpaceQuarterLength" class="reference internal" href="#music21.graph.PlotScatterPitchSpaceQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterPitchSpaceQuarterLength</span></tt></a>)
+scatterPitchClassQuarterLength (<a title="music21.graph.PlotScatterPitchClassQuarterLength" class="reference internal" href="#music21.graph.PlotScatterPitchClassQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterPitchClassQuarterLength</span></tt></a>)
+scatterPitchClassOffset (&#8216;<tt class="xref docutils literal"><span class="pre">PlotScatterPitchClassOffset</span></tt>)</p>
+<p>pitchClassOffset (<a title="music21.graph.PlotHorizontalBarPitchSpaceOffset" class="reference internal" href="#music21.graph.PlotHorizontalBarPitchSpaceOffset"><tt class="xref docutils literal"><span class="pre">PlotHorizontalBarPitchSpaceOffset</span></tt></a>)
+pitchSpaceOffset (<a title="music21.graph.PlotHorizontalBarPitchClassOffset" class="reference internal" href="#music21.graph.PlotHorizontalBarPitchClassOffset"><tt class="xref docutils literal"><span class="pre">PlotHorizontalBarPitchClassOffset</span></tt></a>)</p>
+<p>pitchSpaceQuarterLengthCount (<a title="music21.graph.PlotScatterWeightedPitchSpaceQuarterLength" class="reference internal" href="#music21.graph.PlotScatterWeightedPitchSpaceQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterWeightedPitchSpaceQuarterLength</span></tt></a>)
+pitchClassQuarterLengthCount (<a title="music21.graph.PlotScatterWeightedPitchClassQuarterLength" class="reference internal" href="#music21.graph.PlotScatterWeightedPitchClassQuarterLength"><tt class="xref docutils literal"><span class="pre">PlotScatterWeightedPitchClassQuarterLength</span></tt></a>)</p>
+<p>3DPitchSpaceQuarterLengthCount (<a title="music21.graph.Plot3DBarsPitchSpaceQuarterLength" class="reference internal" href="#music21.graph.Plot3DBarsPitchSpaceQuarterLength"><tt class="xref docutils literal"><span class="pre">Plot3DBarsPitchSpaceQuarterLength</span></tt></a>)</p>
+</blockquote>
+</dd></dl>
 
 <div class="section" id="plothistogrampitchspace">
 <h2>PlotHistogramPitchSpace<a class="headerlink" href="#plothistogrampitchspace" title="Permalink to this headline">¶</a></h2>
@@ -129,8 +145,8 @@
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotHistogramPitchSpace</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotHistogramPitchSpace" title="Permalink to this definition">¶</a></dt>
 <dd><p>A histogram of pitch space.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotHistogramPitchSpace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW s = corpus.parseWork(&#39;bach/bwv57.8&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW p = graph.PlotHistogramPitchSpace(s)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
 <span class="go">&#39;histogram-pitch&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span> <span class="c"># with defaults and proper configuration, will open graph</span>
@@ -160,8 +176,8 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotHistogramPitchClass</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotHistogramPitchClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>A histogram of pitch class</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotHistogramPitchClass</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW s = corpus.parseWork(&#39;bach/bwv57.8&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW p = graph.PlotHistogramPitchClass(s)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
 <span class="go">&#39;histogram-pitchClass&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span> <span class="c"># with defaults and proper configuration, will open graph</span>
@@ -191,8 +207,8 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotHistogramQuarterLength</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotHistogramQuarterLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>A histogram of pitch class</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotHistogramQuarterLength</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW s = corpus.parseWork(&#39;bach/bwv57.8&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW p = graph.PlotHistogramQuarterLength(s)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
 <span class="go">&#39;histogram-quarterLength&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span> <span class="c"># with defaults and proper configuration, will open graph</span>
@@ -222,8 +238,8 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotScatterPitchSpaceQuarterLength</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotScatterPitchSpaceQuarterLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>A scatter plot of pitch space and quarter length</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotScatterPitchSpaceQuarterLength</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW s = corpus.parseWork(&#39;bach/bwv57.8&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW p = graph.PlotScatterPitchSpaceQuarterLength(s)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
 <span class="go">&#39;scatter-pitch-quarterLength&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
@@ -253,8 +269,8 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotScatterPitchClassQuarterLength</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotScatterPitchClassQuarterLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>A scatter plot of pitch class and quarter length</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotScatterPitchClassQuarterLength</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW s = corpus.parseWork(&#39;bach/bwv57.8&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW p = graph.PlotScatterPitchClassQuarterLength(s)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
 <span class="go">&#39;scatter-pitchClass-quarterLength&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
@@ -284,8 +300,8 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotScatterPitchClassOffset</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotScatterPitchClassOffset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A scatter plot of pitch class and offset</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotScatterPitchClassOffset</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW s = corpus.parseWork(&#39;bach/bwv57.8&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW p = graph.PlotScatterPitchClassOffset(s)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
 <span class="go">&#39;scatter-pitchClass-offset&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
@@ -315,8 +331,8 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotHorizontalBarPitchSpaceOffset</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotHorizontalBarPitchSpaceOffset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A graph of events, sorted by pitch space, over time</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv57.8&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotHorizontalBarPitchSpaceOffset</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW s = corpus.parseWork(&#39;bach/bwv57.8&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW p = graph.PlotHorizontalBarPitchSpaceOffset(s)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
 <span class="go">&#39;horizontalBar-pitch-offset&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span> <span class="c"># with defaults and proper configuration, will open graph</span>
@@ -414,15 +430,19 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Plot3DBarsPitchSpaceQuarterLength</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.Plot3DBarsPitchSpaceQuarterLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>A scatter plot of pitch and quarter length</p>
+<blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21.musicxml</span> <span class="kn">import</span> <span class="n">testFiles</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">converter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">testFiles</span><span class="o">.</span><span class="n">mozartTrioK581Excerpt</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">Plot3DBarsPitchSpaceQuarterLength</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW from music21.musicxml import testFiles</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW s = converter.parse(testFiles.mozartTrioK581Excerpt)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW p = graph.Plot3DBarsPitchSpaceQuarterLength(s)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
 <span class="go">&#39;3dBars-pitch-quarterLength&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span> <span class="c"># with defaults and proper configuration, will open graph</span>
 </pre></div>
 </div>
+</blockquote>
 <img alt="_images/Plot3DBarsPitchSpaceQuarterLength.png" src="_images/Plot3DBarsPitchSpaceQuarterLength.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.Plot3DBars" class="reference internal" href="#music21.graph.Plot3DBars"><tt class="xref docutils literal"><span class="pre">Plot3DBars</span></tt></a>, <a title="music21.graph.PlotStream" class="reference internal" href="#music21.graph.PlotStream"><tt class="xref docutils literal"><span class="pre">PlotStream</span></tt></a></p>
 <p><strong>Plot3DBarsPitchSpaceQuarterLength</strong> <strong>attributes</strong></p>
@@ -445,22 +465,46 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 <dt id="music21.graph.Graph">
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.Graph" title="Permalink to this definition">¶</a></dt>
-<dd><p>An object representing a graph or plot, automating the creation and configuration of this graph in matplotlib. Graph objects do not manipulate Streams or other music21 data; they only manipulate raw data formatted for each Graph subclass. Numerous keyword arguments can be provided for configuration: alpha,  colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, colors, tickFontSize, titleFontSize, labelFontSize, fontFamily. The doneAction determines what happens after graph processing: either write a file (&#8216;write&#8217;), open an interactive GUI browser (&#8216;show&#8217;) or None (do processing but do not write output.</p>
-<p>A base-class for basic setup of graphs, abstracting functionality provided by matplotlib. Optional keyword arguments: alpha, colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, tickFontSize, titleFontSize, labelFontSize, fontFamily</p>
+<dd><blockquote>
+<p>An object representing a graph or plot, automating the creation and configuration of this graph in matplotlib.</p>
+<blockquote>
+<p>Graph objects do not manipulate Streams or other music21 data; they only manipulate raw data formatted for each Graph subclass.</p>
+<p>Numerous keyword arguments can be provided for configuration: alpha,  colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, colors, tickFontSize, titleFontSize, labelFontSize, fontFamily.</p>
+<p>The doneAction determines what happens after graph processing: either write a file (&#8216;write&#8217;), open an interactive GUI browser (&#8216;show&#8217;) or None (do processing but do not write output.</p>
+</blockquote>
+<p>A base-class for basic setup of graphs, abstracting functionality provided by matplotlib.</p>
+<blockquote>
+<p>Optional keyword arguments: alpha, colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, tickFontSize, titleFontSize, labelFontSize, fontFamily</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;green&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+</blockquote>
 <p><strong>Graph</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
 <dt id="music21.graph.Graph.axis">
 <tt class="descname">axis</tt><a class="headerlink" href="#music21.graph.Graph.axis" title="Permalink to this definition">¶</a></dt>
-<dd>dict() -&gt; new empty dictionary. dict(mapping) -&gt; new dictionary initialized from a mapping object&#8217;s (key, value) pairs. dict(seq) -&gt; new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) -&gt; new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2)</dd></dl>
+<dd>dict() -&gt; new empty dictionary.</dd></dl>
 
-<p>Attributes without Documentation: <cite>fontFamily</cite>, <cite>doneAction</cite>, <cite>title</cite>, <cite>colorBackgroundFigure</cite>, <cite>colors</cite>, <cite>tickFontSize</cite>, <cite>colorGrid</cite>, <cite>figureSize</cite>, <cite>colorBackgroundData</cite>, <cite>axisKeys</cite>, <cite>grid</cite>, <cite>titleFontSize</cite>, <cite>alpha</cite>, <cite>labelFontSize</cite>, <cite>data</cite></p>
+</blockquote>
+</blockquote>
+<dl class="docutils">
+<dt>dict(mapping) -&gt; new dictionary initialized from a mapping object&#8217;s</dt>
+<dd>(key, value) pairs.</dd>
+<dt>dict(seq) -&gt; new dictionary initialized as if via:</dt>
+<dd><p class="first">d = {}
+for k, v in seq:</p>
+<blockquote class="last">
+d[k] = v</blockquote>
+</dd>
+<dt>dict(<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) -&gt; new dictionary initialized with the name=value pairs</dt>
+<dd><blockquote class="first">
+<p>in the keyword argument list.  For example:  dict(one=1, two=2)</p>
+<blockquote>
+Attributes without Documentation: <cite>fontFamily</cite>, <cite>doneAction</cite>, <cite>title</cite>, <cite>colorBackgroundFigure</cite>, <cite>colors</cite>, <cite>tickFontSize</cite>, <cite>colorGrid</cite>, <cite>figureSize</cite>, <cite>colorBackgroundData</cite>, <cite>axisKeys</cite>, <cite>grid</cite>, <cite>titleFontSize</cite>, <cite>alpha</cite>, <cite>labelFontSize</cite>, <cite>data</cite></blockquote>
 </blockquote>
 <p><strong>Graph</strong> <strong>methods</strong></p>
-<blockquote>
+<blockquote class="last">
 <dl class="method">
 <dt id="music21.graph.Graph.done">
 <tt class="descname">done</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.graph.Graph.done" title="Permalink to this definition">¶</a></dt>
@@ -517,6 +561,8 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <dd>Writes the graph to a file. If no file path is given, a temporary file is used.</dd></dl>
 
 </blockquote>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -526,9 +572,12 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <dt id="music21.graph.Graph3DPolygonBars">
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Graph3DPolygonBars</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.Graph3DPolygonBars" title="Permalink to this definition">¶</a></dt>
-<dd><p>Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph.</p>
+<dd><p>Graph multiple parallel bar graphs in 3D.</p>
+<blockquote>
+<p>This draws bars with polygons, a temporary alternative to using Graph3DBars, above.</p>
+<p>Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">Graph3DPolygonBars</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW g = graph.Graph3DPolygonBars()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="mf">1</span><span class="p">:[],</span> <span class="mf">2</span><span class="p">:[],</span> <span class="mf">3</span><span class="p">:[]}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
 <span class="gp">... </span>   <span class="n">q</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mf">1</span><span class="p">))))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">20</span><span class="p">)]</span>
@@ -537,6 +586,7 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
 </pre></div>
 </div>
+</blockquote>
 <img alt="_images/Graph3DPolygonBars.png" src="_images/Graph3DPolygonBars.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a></p>
 <p><strong>Graph3DPolygonBars</strong> <strong>attributes</strong></p>
@@ -562,13 +612,16 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <dt id="music21.graph.GraphColorGrid">
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphColorGrid</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.GraphColorGrid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Grid of discrete colored &#8220;blocks&#8221; to visualize results of a windowed analysis routine. Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.</p>
+<dd><blockquote>
+<p>Grid of discrete colored &#8220;blocks&#8221; to visualize results of a windowed analysis routine.</p>
+<p>Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">GraphColorGrid</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s">&#39;#525252&#39;</span><span class="p">,</span> <span class="s">&#39;#5f5f5f&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#858585&#39;</span><span class="p">,</span> <span class="s">&#39;#727272&#39;</span><span class="p">,</span> <span class="s">&#39;#6c6c6c&#39;</span><span class="p">,</span> <span class="s">&#39;#8c8c8c&#39;</span><span class="p">,</span> <span class="s">&#39;#8c8c8c&#39;</span><span class="p">,</span> <span class="s">&#39;#6c6c6c&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#6c6c6c&#39;</span><span class="p">,</span> <span class="s">&#39;#5f5f5f&#39;</span><span class="p">,</span> <span class="s">&#39;#525252&#39;</span><span class="p">,</span> <span class="s">&#39;#464646&#39;</span><span class="p">,</span> <span class="s">&#39;#3f3f3f&#39;</span><span class="p">,</span> <span class="s">&#39;#3f3f3f&#39;</span><span class="p">,</span> <span class="s">&#39;#4c4c4c&#39;</span><span class="p">,</span> <span class="s">&#39;#4c4c4c&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#4c4c4c&#39;</span><span class="p">,</span> <span class="s">&#39;#4c4c4c&#39;</span><span class="p">,</span> <span class="s">&#39;#525252&#39;</span><span class="p">,</span> <span class="s">&#39;#5f5f5f&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#858585&#39;</span><span class="p">,</span> <span class="s">&#39;#727272&#39;</span><span class="p">,</span> <span class="s">&#39;#6c6c6c&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#6c6c6c&#39;</span><span class="p">,</span> <span class="s">&#39;#5f5f5f&#39;</span><span class="p">,</span> <span class="s">&#39;#5f5f5f&#39;</span><span class="p">,</span> <span class="s">&#39;#858585&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#858585&#39;</span><span class="p">,</span> <span class="s">&#39;#929292&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#8c8c8c&#39;</span><span class="p">,</span> <span class="s">&#39;#8c8c8c&#39;</span><span class="p">,</span> <span class="s">&#39;#8c8c8c&#39;</span><span class="p">,</span> <span class="s">&#39;#858585&#39;</span><span class="p">,</span> <span class="s">&#39;#797979&#39;</span><span class="p">,</span> <span class="s">&#39;#858585&#39;</span><span class="p">,</span> <span class="s">&#39;#929292&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#8c8c8c&#39;</span><span class="p">,</span> <span class="s">&#39;#929292&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">,</span> <span class="s">&#39;#999999&#39;</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
 </pre></div>
 </div>
+</blockquote>
 <p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a></p>
 <p><strong>GraphColorGrid</strong> <strong>attributes</strong></p>
 <blockquote>
@@ -613,15 +666,20 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <dt id="music21.graph.GraphHistogram">
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphHistogram</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.GraphHistogram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value</p>
+<dd><p>Graph the count of a single element.</p>
+<blockquote>
+<p>Data set is simply a list of x and y pairs, where there
+is only one of each x value, and y value is the count or magnitude
+of that value</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">random</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">GraphHistogram</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW g = graph.GraphHistogram()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">30</span><span class="p">)))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">50</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
 </pre></div>
 </div>
+</blockquote>
 <img alt="_images/GraphHistogram.png" src="_images/GraphHistogram.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a></p>
 </dd></dl>
@@ -633,14 +691,17 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 <dt id="music21.graph.GraphHorizontalBar">
 <em class="property">
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphHorizontalBar</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.GraphHorizontalBar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.</p>
+<dd><p>Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap.</p>
+<blockquote>
+<p>Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">GraphHorizontalBar</span><span class="p">(</span><span class="n">doneAction</span><span class="o">=</span><span class="s">&#39;show&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW a = graph.GraphHorizontalBar(doneAction=&#39;show&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;Chopin&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mf">1810</span><span class="p">,</span> <span class="mf">1849</span><span class="o">-</span><span class="mf">1810</span><span class="p">)]),</span> <span class="p">(</span><span class="s">&#39;Schumanns&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mf">1810</span><span class="p">,</span> <span class="mf">1856</span><span class="o">-</span><span class="mf">1810</span><span class="p">),</span> <span class="p">(</span><span class="mf">1819</span><span class="p">,</span> <span class="mf">1896</span><span class="o">-</span><span class="mf">1819</span><span class="p">)]),</span> <span class="p">(</span><span class="s">&#39;Brahms&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mf">1833</span><span class="p">,</span> <span class="mf">1897</span><span class="o">-</span><span class="mf">1833</span><span class="p">)])]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
 </pre></div>
 </div>
+</blockquote>
 <img alt="_images/GraphHorizontalBar.png" src="_images/GraphHorizontalBar.png" style="width: 600px;" />
 <p>inherits from: <a title="music21.graph.Graph" class="reference internal" href="#music21.graph.Graph"><tt class="xref docutils literal"><span class="pre">Graph</span></tt></a></p>
 </dd></dl>
@@ -654,7 +715,7 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphScatter</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.GraphScatter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Graph two parameters in a scatter plot. Data representation is a list of points of values.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">GraphScatter</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW g = graph.GraphScatter()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">50</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
@@ -673,7 +734,7 @@ class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">Gra
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">GraphScatterWeighted</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.GraphScatterWeighted" title="Permalink to this definition">¶</a></dt>
 <dd><p>A scatter plot where points are scaled in size to represent the number of values stored within.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">GraphScatterWeighted</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW g = graph.GraphScatterWeighted()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">23</span><span class="p">,</span> <span class="mf">15</span><span class="p">,</span> <span class="mf">234</span><span class="p">),</span> <span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="mf">23</span><span class="p">,</span> <span class="mf">12</span><span class="p">),</span> <span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="mf">23</span><span class="p">,</span> <span class="mf">5</span><span class="p">),</span> <span class="p">(</span><span class="mf">15</span><span class="p">,</span> <span class="mf">18</span><span class="p">,</span> <span class="mf">120</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
@@ -845,8 +906,8 @@ Methods inherited from <a title="music21.graph.PlotStream" class="reference inte
 class </em><tt class="descclassname">music21.graph.</tt><tt class="descname">PlotScatterPitchSpaceDynamicSymbol</tt><big>(</big><em>streamObj</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.graph.PlotScatterPitchSpaceDynamicSymbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>A graph of dynamics used by pitch space.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;schumann/opus41no1&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">PlotScatterPitchSpaceDynamicSymbol</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW s = corpus.parseWork(&#39;schumann/opus41no1&#39;, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW p = graph.PlotScatterPitchSpaceDynamicSymbol(s)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">id</span>
 <span class="go">&#39;scatter-pitchClass-dynamicSymbol&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
@@ -951,12 +1012,15 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
 <dl class="method">
 <dt id="music21.graph.PlotStream.ticksDynamics">
 <tt class="descname">ticksDynamics</tt><big>(</big><em>minNameIndex=None</em>, <em>maxNameIndex=None</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksDynamics" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility method to get ticks in dynamic values.</p>
+<dd><blockquote>
+Utility method to get ticks in dynamic values.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksDynamics</span><span class="p">()</span>
 <span class="go">[[0, &#39;pppppp&#39;], [1, &#39;ppppp&#39;], [2, &#39;pppp&#39;], [3, &#39;ppp&#39;], [4, &#39;pp&#39;], [5, &#39;p&#39;], [6, &#39;mp&#39;], [7, &#39;mf&#39;], [8, &#39;f&#39;], [9, &#39;fp&#39;], [10, &#39;sf&#39;], [11, &#39;ff&#39;], [12, &#39;fff&#39;], [13, &#39;ffff&#39;], [14, &#39;fffff&#39;], [15, &#39;ffffff&#39;]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksDynamics</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksDynamics</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">6</span><span class="p">)</span>
 <span class="go">[[3, &#39;ppp&#39;], [4, &#39;pp&#39;], [5, &#39;p&#39;], [6, &#39;mp&#39;]]</span>
 </pre></div>
 </div>
@@ -965,21 +1029,28 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
 <dl class="method">
 <dt id="music21.graph.PlotStream.ticksOffset">
 <tt class="descname">ticksOffset</tt><big>(</big><em>offsetMin=None</em>, <em>offsetMax=None</em>, <em>offsetStepSize=None</em>, <em>displayMeasureNumberZero=False</em>, <em>remap=False</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksOffset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get offset ticks. If Measures are found, they will be used to create ticks. If not, <cite>offsetStepSize</cite> will be used to create offset ticks between min and max. The <cite>remap</cite> parameter is not yet used.</p>
+<dd><blockquote>
+Get offset ticks. If Measures are found, they will be used to create ticks. If not, <cite>offsetStepSize</cite> will be used to create offset ticks between min and max. The <cite>remap</cite> parameter is not yet used.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv281.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksOffset</span><span class="p">()</span> <span class="c"># on whole score</span>
 <span class="go">[[4.0, &#39;1&#39;], [8.0, &#39;2&#39;], [12.0, &#39;3&#39;], [16.0, &#39;4&#39;], [20.0, &#39;5&#39;], [24.0, &#39;6&#39;], [28.0, &#39;7&#39;], [32.0, &#39;8&#39;]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span> <span class="c"># on a Part</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span> <span class="c"># on a Part</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksOffset</span><span class="p">()</span> <span class="c"># on whole score</span>
 <span class="go">[[4.0, &#39;1&#39;], [8.0, &#39;2&#39;], [12.0, &#39;3&#39;], [16.0, &#39;4&#39;], [20.0, &#39;5&#39;], [24.0, &#39;6&#39;], [28.0, &#39;7&#39;], [32.0, &#39;8&#39;]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksOffset</span><span class="p">(</span><span class="mf">8</span><span class="p">,</span> <span class="mf">12</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
 <span class="go">[[8.0, &#39;2&#39;], [12.0, &#39;3&#39;]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="c"># on a Flat collection</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="c"># on a Flat collection</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksOffset</span><span class="p">(</span><span class="mf">8</span><span class="p">,</span> <span class="mf">12</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
 <span class="go">[[8.0, &#39;2&#39;], [12.0, &#39;3&#39;]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="c"># on a raw collection of notes with no measures</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="c"># on a raw collection of notes with no measures</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">repeatAppend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="c"># on a Part</span>
@@ -992,7 +1063,8 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
 <dl class="method">
 <dt id="music21.graph.PlotStream.ticksPitchClass">
 <tt class="descname">ticksPitchClass</tt><big>(</big><em>pcMin=0</em>, <em>pcMax=11</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksPitchClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility method to get ticks in pitch classes</p>
+<dd><blockquote>
+Utility method to get ticks in pitch classes</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
@@ -1005,19 +1077,24 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
 <dl class="method">
 <dt id="music21.graph.PlotStream.ticksPitchClassUsage">
 <tt class="descname">ticksPitchClassUsage</tt><big>(</big><em>pcMin=0</em>, <em>pcMax=11</em>, <em>showEnharmonic=True</em>, <em>blankLabelUnused=True</em>, <em>hideUnused=False</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksPitchClassUsage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get ticks and labels for pitch classes based on usage. That is, show the most commonly used enharmonic first.</p>
+<dd><blockquote>
+Get ticks and labels for pitch classes based on usage. That is, show the most commonly used enharmonic first.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchClassUsage</span><span class="p">(</span><span class="n">hideUnused</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">[[0, u&#39;C&#39;], [2, u&#39;D&#39;], [3, u&#39;D#&#39;], [4, u&#39;E&#39;], [6, u&#39;F#&#39;], [7, u&#39;G&#39;], [9, u&#39;A&#39;], [11, u&#39;B&#39;]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv281.xml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv281.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchClassUsage</span><span class="p">(</span><span class="n">showEnharmonic</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">hideUnused</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">[[0, u&#39;C&#39;], [2, u&#39;D&#39;], [3, u&#39;Eb&#39;], [4, u&#39;E&#39;], [5, u&#39;F&#39;], [7, u&#39;G&#39;], [9, u&#39;A&#39;], [10, u&#39;Bb&#39;], [11, u&#39;B&#39;]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchClassUsage</span><span class="p">(</span><span class="n">showEnharmonic</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blankLabelUnused</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="go">[[0, u&#39;C&#39;], [1, &#39;C#&#39;], [2, u&#39;D&#39;], [3, u&#39;Eb&#39;], [4, u&#39;E&#39;], [5, u&#39;F&#39;], [6, &#39;F#&#39;], [7, u&#39;G&#39;], [8, &#39;G#&#39;], [9, u&#39;A&#39;], [10, u&#39;Bb&#39;], [11, u&#39;B&#39;]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;schumann/opus41no1/movement2.xml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;schumann/opus41no1/movement2.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchClassUsage</span><span class="p">(</span><span class="n">showEnharmonic</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">[[0, u&#39;C&#39;], [1, u&#39;Db/C#&#39;], [2, u&#39;D&#39;], [3, u&#39;Eb/D#&#39;], [4, u&#39;E&#39;], [5, u&#39;F&#39;], [6, u&#39;F#&#39;], [7, u&#39;G&#39;], [8, u&#39;Ab/G#&#39;], [9, u&#39;A&#39;], [10, u&#39;Bb&#39;], [11, u&#39;B&#39;]]</span>
@@ -1028,7 +1105,8 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
 <dl class="method">
 <dt id="music21.graph.PlotStream.ticksPitchSpaceChromatic">
 <tt class="descname">ticksPitchSpaceChromatic</tt><big>(</big><em>pitchMin=36</em>, <em>pitchMax=100</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksPitchSpaceChromatic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility method to get ticks in pitch space values.</p>
+<dd><blockquote>
+Utility method to get ticks in pitch space values.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchSpaceChromatic</span><span class="p">(</span><span class="mf">60</span><span class="p">,</span><span class="mf">72</span><span class="p">)</span>
@@ -1040,7 +1118,8 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
 <dl class="method">
 <dt id="music21.graph.PlotStream.ticksPitchSpaceOctave">
 <tt class="descname">ticksPitchSpaceOctave</tt><big>(</big><em>pitchMin=36</em>, <em>pitchMax=100</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksPitchSpaceOctave" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility method to get ticks in pitch space only for every octave.</p>
+<dd><blockquote>
+Utility method to get ticks in pitch space only for every octave.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchSpaceOctave</span><span class="p">()</span>
@@ -1052,13 +1131,16 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
 <dl class="method">
 <dt id="music21.graph.PlotStream.ticksPitchSpaceUsage">
 <tt class="descname">ticksPitchSpaceUsage</tt><big>(</big><em>pcMin=36</em>, <em>pcMax=72</em>, <em>showEnharmonic=False</em>, <em>blankLabelUnused=True</em>, <em>hideUnused=False</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksPitchSpaceUsage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first.</p>
+<dd><blockquote>
+Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv324.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchSpaceUsage</span><span class="p">(</span><span class="n">hideUnused</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">[[64, u&#39;E4&#39;], [66, u&#39;F#4&#39;], [67, u&#39;G4&#39;], [69, u&#39;A4&#39;], [71, u&#39;B4&#39;], [72, u&#39;C5&#39;]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;schumann/opus41no1/movement2.xml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;schumann/opus41no1/movement2.xml&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ticksPitchSpaceUsage</span><span class="p">(</span><span class="n">showEnharmonic</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">hideUnused</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">[[36, u&#39;C2&#39;], [38, u&#39;D2&#39;], [40, u&#39;E2&#39;], [41, u&#39;F2&#39;], [43, u&#39;G2&#39;], [44, u&#39;Ab2&#39;], [45, u&#39;A2&#39;], [47, u&#39;B2&#39;], [48, u&#39;C3&#39;], [50, u&#39;D3&#39;], [51, u&#39;Eb3/D#3&#39;], [52, u&#39;E3&#39;], [53, u&#39;F3&#39;], [54, u&#39;F#3&#39;], [55, u&#39;G3&#39;], [56, u&#39;Ab3/G#3&#39;], [57, u&#39;A3&#39;], [58, u&#39;Bb3&#39;], [59, u&#39;B3&#39;], [60, u&#39;C4&#39;], [61, u&#39;Db4/C#4&#39;], [62, u&#39;D4&#39;], [63, u&#39;Eb4/D#4&#39;], [64, u&#39;E4&#39;], [65, u&#39;F4&#39;], [66, u&#39;F#4&#39;], [67, u&#39;G4&#39;], [68, u&#39;Ab4/G#4&#39;], [69, u&#39;A4&#39;], [70, u&#39;Bb4&#39;], [71, u&#39;B4&#39;], [72, u&#39;C5&#39;]]</span>
@@ -1069,7 +1151,8 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
 <dl class="method">
 <dt id="music21.graph.PlotStream.ticksQuarterLength">
 <tt class="descname">ticksQuarterLength</tt><big>(</big><em>min=0.25</em>, <em>max=4</em>, <em>remap=True</em><big>)</big><a class="headerlink" href="#music21.graph.PlotStream.ticksQuarterLength" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get ticks for quarterLength. If <cite>remap</cite> is True, the remapQuarterLength() function will be used to scale displayed quarter lengths by log base 2.</p>
+<dd><blockquote>
+Get ticks for quarterLength. If <cite>remap</cite> is True, the remapQuarterLength() function will be used to scale displayed quarter lengths by log base 2.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">stream</span><span class="p">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">PlotStream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 </pre></div>
@@ -1113,7 +1196,7 @@ Attributes without Documentation: <cite>format</cite>, <cite>values</cite></bloc
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 06, 2010.
+      Last updated on Jul 08, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

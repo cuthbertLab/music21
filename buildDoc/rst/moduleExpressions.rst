@@ -7,7 +7,9 @@ music21.expressions
 
 .. module:: music21.expressions
 
-This module provides object representations of expression notation symbols. 
+This module provides object representations of expression notation symbols.
+ 
+ 
 
 
 Fermata
@@ -28,12 +30,14 @@ Fermata
 
         .. attribute:: mx
 
-            Returns a musicxml.DynamicMark object 
-
-            >>> a = Fermata()
-            >>> mxFermata = a.mx
-            >>> mxFermata.get('type')
-            'upright' 
+            
+         Returns a musicxml.DynamicMark object
+         >>> a = Fermata()
+         >>> mxFermata = a.mx
+         >>> mxFermata.get('type')
+         'upright'
+         
+ 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -164,13 +168,15 @@ Trill
 
         .. attribute:: mx
 
-            Returns a musicxml.TrillMark object 
-
-            >>> a = Trill()
-            >>> a.placement = 'above'
-            >>> mxTrillMark = a.mx
-            >>> mxTrillMark.get('placement')
-            'above' 
+            
+         Returns a musicxml.TrillMark object
+         >>> a = Trill()
+         >>> a.placement = 'above'
+         >>> mxTrillMark = a.mx
+         >>> mxTrillMark.get('placement')
+         'above'
+         
+ 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 

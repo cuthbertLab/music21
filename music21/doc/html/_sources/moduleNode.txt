@@ -7,7 +7,11 @@ music21.node
 
 .. module:: music21.node
 
-An object base-class for creating and editing specialized XML structures as object representations. 
+An object base-class for creating and editing specialized XML structures 
+ as object representations.  Used by the musicxml converter, obviously, but
+ also by environment.py.
+ 
+ 
 
 
 .. function:: fixed_writexml(writer, indent=, addindent=, newl=)
@@ -20,9 +24,10 @@ Node
 
 
     
-
-    >>> a = Node()
-    >>> a.set('charData', 'test')
+         >>> a = Node()
+         >>> a.set('charData', 'test')
+         
+ 
 
     
 
@@ -34,48 +39,62 @@ Node
 
         .. attribute:: tag
 
-            No documentation. 
+            No documentation.
+ 
 
     **Node** **methods**
 
         .. method:: get(name)
 
-            No documentation. 
+            No documentation.
+ 
 
         .. method:: getNewDoc()
 
-            No documentation. 
+            No documentation.
+ 
 
         .. method:: loadAttrs(attrs)
 
             Given a SAX attrs object, load all atributes that are named within this object's _attr dictionary. 
+         
+ 
 
         .. method:: merge(other, favorSelf=True)
 
-            Given another similar or commonly used Node object, combine all attributes and return a new object. 
-
-            >>> a = Node()
-            >>> a.set('charData', 'green')
-            >>> b = Node()
-            >>> c = b.merge(a)
-            >>> c.get('charData')
-            'green' 
+            Given another similar or commonly used Node object, combine
+         all attributes and return a new object.
+ 
+         >>> a = Node()
+         >>> a.set('charData', 'green')
+         >>> b = Node()
+         >>> c = b.merge(a)
+         >>> c.get('charData')
+         'green'
+         
+ 
 
         .. method:: set(name, value)
 
-            No documentation. 
+            No documentation.
+ 
 
         .. method:: setDefaults()
 
-            provide defaults for all necessary attributes at this level 
+            provide defaults for all necessary attributes at this level
+         
+ 
 
         .. method:: toxml(doc=None, parent=None, stringOut=0)
 
-            Provides XML output as either a text string or as DOM node. This method can be called recursively to build up nodes on a DOM tree. This method will assume that if an self.charData attribute has been defined this is a text element for this node. Attributes, sub entities, and sub nodes are obtained via subclassed method calls. 
+            Provides XML output as either a text string or as DOM node. This method can be called recursively to build up nodes on a DOM tree. This method will assume that if an self.charData attribute has been defined this is a text element for this node. Attributes, sub entities, and sub nodes are obtained via subclassed method calls.
+         
+ 
 
         .. method:: xmlStr()
 
-            Shortcut method to provide quick xml out. 
+            Shortcut method to provide quick xml out.
+ 
 
 
 NodeList
@@ -83,7 +102,37 @@ NodeList
 
 .. class:: NodeList()
 
-    Nodes that is designed to function as a list. In general, this is an node this only used to contain other nodes. List operations permit easy access and manipuatlooi 
+    
+ To understand what a NodeList is, we need to first see that Nodes are simply 
+ xml-like containers. Though many xml-like containers store just character 
+ data, like::
+ 
+     <fifths>0</fifths>
+ 
+ Other xml-like containers are really more like lists, not storing character 
+ data but other xml-like containers in order, like::
+ 
+     <attributes>
+     <divisions>1</divisions>
+     <key>
+        <fifths>0</fifths>
+        <mode>major</mode>
+     </key>
+     <time symbol="common">
+        <beats>4</beats>
+        <beat-type>4</beat-type>
+     </time>
+     <clef>
+        <sign>G</sign>
+        <line>2</line>
+     </clef>
+     </attributes>
+ 
+ In these cases, its much easier to have an xml-like container that is list like. 
+ That way they can be iterated over or appended to.  Thus, NodeLists, which are
+ nodes that give us list-like functionality for the cases where we need them.
+ 
+ 
 
     inherits from: :class:`~music21.node.Node`
 
@@ -101,7 +150,8 @@ NodeList
 
         .. method:: append(item)
 
-            No documentation. 
+            No documentation.
+ 
 
         Methods inherited from :class:`~music21.node.Node`: :meth:`~music21.node.Node.get`, :meth:`~music21.node.Node.getNewDoc`, :meth:`~music21.node.Node.loadAttrs`, :meth:`~music21.node.Node.merge`, :meth:`~music21.node.Node.set`, :meth:`~music21.node.Node.setDefaults`, :meth:`~music21.node.Node.toxml`, :meth:`~music21.node.Node.xmlStr`
 

@@ -8,6 +8,8 @@ music21.instrument
 .. module:: music21.instrument
 
 This module defines object models for instrument representations. Metadata for instrument realizations, including transpositions and default MIDI program numbers, are also included. 
+ 
+ 
 
 
 Instrument
@@ -29,8 +31,8 @@ Instrument
         .. attribute:: mx
 
             
-
-            
+         
+ 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -38,11 +40,16 @@ Instrument
 
         .. method:: bestName()
 
-            Find a viable name, looking first at instrument, then part, then abbreviations. 
+            Find a viable name, looking first at instrument, then part, then 
+         abbreviations.
+         
+ 
 
         .. method:: partIdRandomize()
 
-            Force a unique id by using an MD5 
+            Force a unique id by using an MD5
+         
+ 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocationBySite`, :meth:`~music21.base.Music21Object.removeLocationBySiteId`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -74,22 +81,30 @@ StringInstrument
 
         .. attribute:: stringPitches
 
-            stringPitches is a property that stores a list of Pitches (or pitch names, such as "C4") that represent the pitch of the open strings from lowest to highest[#reentrant]_ 
-
-            >>> vln1 = Violin()
-            >>> vln1.stringPitches
-            [G3, D4, A4, E5] 
-            instrument.stringPitches are full pitch objects, not just names 
-            >>> [x.octave for x in vln1.stringPitches]
-            [3, 4, 4, 5] 
-            scordatura for Scelsi's *Anahit*. N.B. string to pitch conversion 
-            >>> vln1.stringPitches = ["G3","G4","B4","D4"]
-            >>> vln1.stringPitches
-            [G3, G4, B4, D4] 
-            ..[#reentrant] In some tuning methods such as reentrant tuning on the ukulele, 
-            lute, or five-string banjo the order might not strictly be from lowest to 
-            highest.  The same would hold true for certain violin scordatura pieces, such 
-            as some of Biber's *Mystery Sonatas* 
+            
+             stringPitches is a property that stores a list of Pitches (or pitch names, 
+             such as "C4") that represent the pitch of the open strings from lowest to
+             highest[#reentrant]_
+             
+             >>> vln1 = Violin()
+             >>> vln1.stringPitches
+             [G3, D4, A4, E5]
+             
+             instrument.stringPitches are full pitch objects, not just names
+             >>> [x.octave for x in vln1.stringPitches]
+             [3, 4, 4, 5]
+             
+             scordatura for Scelsi's *Anahit*. N.B. string to pitch conversion
+             >>> vln1.stringPitches = ["G3","G4","B4","D4"]
+             >>> vln1.stringPitches
+             [G3, G4, B4, D4]
+             
+             ..[#reentrant] In some tuning methods such as reentrant tuning on the ukulele,
+             lute, or five-string banjo the order might not strictly be from lowest to
+             highest.  The same would hold true for certain violin scordatura pieces, such
+             as some of Biber's *Mystery Sonatas*
+             
+ 
 
         Properties inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.mx`
 
@@ -114,7 +129,9 @@ Viola
 
         .. attribute:: lowestNote
 
-            An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
+            An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.
+     
+ 
 
         Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
@@ -147,7 +164,9 @@ Violin
 
         .. attribute:: lowestNote
 
-            An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
+            An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.
+     
+ 
 
         Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 
@@ -180,7 +199,9 @@ Violoncello
 
         .. attribute:: lowestNote
 
-            An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
+            An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.
+     
+ 
 
         Attributes inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.instrumentName`, :attr:`~music21.instrument.Instrument.midiChannel`, :attr:`~music21.instrument.Instrument.partId`, :attr:`~music21.instrument.Instrument.partName`, :attr:`~music21.instrument.Instrument.midiProgram`, :attr:`~music21.instrument.Instrument.instrumentAbbreviation`, :attr:`~music21.instrument.Instrument.transposition`, :attr:`~music21.instrument.Instrument.partAbbreviation`
 

@@ -122,12 +122,16 @@
 <dl class="function">
 <dt id="music21.common.almostEqual">
 <tt class="descclassname">music21.common.</tt><tt class="descname">almostEqual</tt><big>(</big><em>x</em>, <em>y=0.0</em>, <em>grain=1e-07</em><big>)</big><a class="headerlink" href="#music21.common.almostEqual" title="Permalink to this definition">¶</a></dt>
-<dd>The following four routines work for comparisons between floats that are normally inconsistent. almostEquals(x, y) &#8211; returns True if x and y are within 0.0000001 of each other</dd></dl>
+<dd><p>The following four routines work for comparisons between floats that are normally inconsistent.</p>
+<p>almostEquals(x, y) &#8211; returns True if x and y are within 0.0000001 of each other</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="music21.common.almostEquals">
 <tt class="descclassname">music21.common.</tt><tt class="descname">almostEquals</tt><big>(</big><em>x</em>, <em>y=0.0</em>, <em>grain=1e-07</em><big>)</big><a class="headerlink" href="#music21.common.almostEquals" title="Permalink to this definition">¶</a></dt>
-<dd>The following four routines work for comparisons between floats that are normally inconsistent. almostEquals(x, y) &#8211; returns True if x and y are within 0.0000001 of each other</dd></dl>
+<dd><p>The following four routines work for comparisons between floats that are normally inconsistent.</p>
+<p>almostEquals(x, y) &#8211; returns True if x and y are within 0.0000001 of each other</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="music21.common.basicallyEqual">
@@ -162,12 +166,23 @@
 <dl class="function">
 <dt id="music21.common.decimalToTuplet">
 <tt class="descclassname">music21.common.</tt><tt class="descname">decimalToTuplet</tt><big>(</big><em>decNum</em><big>)</big><a class="headerlink" href="#music21.common.decimalToTuplet" title="Permalink to this definition">¶</a></dt>
-<dd>For simple decimals (mostly &gt; 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator)</dd></dl>
+<dd><p>For simple decimals (mostly &gt; 1), a quick way to figure out the
+fraction in lowest terms that gives a valid tuplet.</p>
+<p>No it does not work really fast.  No it does not return tuplets with
+denominators over 100.  Too bad, math geeks.  This is real life.</p>
+<p>returns (numerator, denominator)</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="music21.common.dirPartitioned">
 <tt class="descclassname">music21.common.</tt><tt class="descname">dirPartitioned</tt><big>(</big><em>obj</em>, <em>skipLeading=</em><span class="optional">[</span>, <em>'__'</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#music21.common.dirPartitioned" title="Permalink to this definition">¶</a></dt>
-<dd>Given an objet, return three lists of names: methods, attributes, and properties. Note that if a name/attribute is dynamically created by a property it cannot be found until that attribute is created. TODO: this cannot properly partiton properties from methods</dd></dl>
+<dd><p>Given an objet, return three lists of names: methods, attributes, and properties.</p>
+<blockquote>
+<p>Note that if a name/attribute is dynamically created by a property it
+cannot be found until that attribute is created.</p>
+<p>TODO: this cannot properly partiton properties from methods</p>
+</blockquote>
+</dd></dl>
 
 <dl class="function">
 <dt id="music21.common.dotMultiplier">
@@ -186,8 +201,11 @@
 <dl class="function">
 <dt id="music21.common.findFormat">
 <tt class="descclassname">music21.common.</tt><tt class="descname">findFormat</tt><big>(</big><em>fmt</em><big>)</big><a class="headerlink" href="#music21.common.findFormat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a format defined either by a format name or an extension, return the format name as well as the output exensions. Note that .mxl and .mx are only considered MusicXML input formats.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;mx&#39;</span><span class="p">)</span>
+<dd><dl class="docutils">
+<dt>Given a format defined either by a format name or</dt>
+<dd><p class="first">an extension, return the format name as well as the output exensions.</p>
+<p>Note that .mxl and .mx are only considered MusicXML input formats.</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;mx&#39;</span><span class="p">)</span>
 <span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;.mxl&#39;</span><span class="p">)</span>
 <span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
@@ -207,43 +225,54 @@
 <span class="go">(&#39;textline&#39;, &#39;.txt&#39;)</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="music21.common.findFormatExtFile">
 <tt class="descclassname">music21.common.</tt><tt class="descname">findFormatExtFile</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.common.findFormatExtFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a file path (relative or absolute) find format and extension used (not the output extension)</p>
+<blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtFile</span><span class="p">(</span><span class="s">&#39;test.mx&#39;</span><span class="p">)</span>
 <span class="go">(&#39;musicxml&#39;, &#39;.mx&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtFile</span><span class="p">(</span><span class="s">&#39;long/file/path/test-2009.03.02.xml&#39;</span><span class="p">)</span>
 <span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtFile</span><span class="p">(</span><span class="s">&#39;long/file/path.intermediate.png/test-2009.03.xml&#39;</span><span class="p">)</span>
 <span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtFile</span><span class="p">(</span><span class="s">&#39;test.mus&#39;</span><span class="p">)</span>
-<span class="go">(&#39;finale&#39;, &#39;.mus&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtFile</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">)</span>
-<span class="go">(None, None)</span>
-<span class="go">Windows drive + pickle</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtFile</span><span class="p">(</span><span class="s">&#39;d:/long/file/path/test.p&#39;</span><span class="p">)</span>
-<span class="go">(&#39;pickle&#39;, &#39;.p&#39;)</span>
-<span class="go">On a windows networked filesystem</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtFile</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">long</span><span class="se">\f</span><span class="s">ile\path</span><span class="se">\t</span><span class="s">est.krn&#39;</span><span class="p">)</span>
-<span class="go">(&#39;humdrum&#39;, &#39;.krn&#39;)</span>
 </pre></div>
 </div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtFile</span><span class="p">(</span><span class="s">&#39;test.mus&#39;</span><span class="p">)</span>
+<span class="go">(&#39;finale&#39;, &#39;.mus&#39;)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtFile</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">(None, None)</span>
+</pre></div>
+</div>
+<p>Windows drive + pickle
+&gt;&gt;&gt; findFormatExtFile(&#8216;d:/long/file/path/test.p&#8217;)
+(&#8216;pickle&#8217;, &#8216;.p&#8217;)</p>
+<p>On a windows networked filesystem
+&gt;&gt;&gt; findFormatExtFile(&#8216;\longfilepathtest.krn&#8217;)
+(&#8216;humdrum&#8217;, &#8216;.krn&#8217;)</p>
+</blockquote>
 </dd></dl>
 
 <dl class="function">
 <dt id="music21.common.findFormatExtURL">
 <tt class="descclassname">music21.common.</tt><tt class="descname">findFormatExtURL</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#music21.common.findFormatExtURL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.</p>
+<blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">urlA</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=xml&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlB</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=kern&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlC</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlD</span> <span class="o">=</span> <span class="s">&#39;http://static.wikifonia.org/4918/musicxml.mxl&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlE</span> <span class="o">=</span> <span class="s">&#39;http://static.wikifonia.org/4306/musicxml.mxl&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlF</span> <span class="o">=</span> <span class="s">&#39;http://junk&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtURL</span><span class="p">(</span><span class="n">urlA</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtURL</span><span class="p">(</span><span class="n">urlA</span><span class="p">)</span>
 <span class="go">(&#39;musicxml&#39;, &#39;.xml&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatExtURL</span><span class="p">(</span><span class="n">urlB</span><span class="p">)</span>
 <span class="go">(&#39;humdrum&#39;, &#39;.krn&#39;)</span>
@@ -257,26 +286,29 @@
 <span class="go">(None, None)</span>
 </pre></div>
 </div>
+</blockquote>
 </dd></dl>
 
 <dl class="function">
 <dt id="music21.common.findFormatFile">
 <tt class="descclassname">music21.common.</tt><tt class="descname">findFormatFile</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.common.findFormatFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a file path (relative or absolute) return the format</p>
+<blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatFile</span><span class="p">(</span><span class="s">&#39;test.xml&#39;</span><span class="p">)</span>
 <span class="go">&#39;musicxml&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatFile</span><span class="p">(</span><span class="s">&#39;long/file/path/test-2009.03.02.xml&#39;</span><span class="p">)</span>
 <span class="go">&#39;musicxml&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatFile</span><span class="p">(</span><span class="s">&#39;long/file/path.intermediate.png/test-2009.03.xml&#39;</span><span class="p">)</span>
 <span class="go">&#39;musicxml&#39;</span>
-<span class="go">Windows drive + pickle</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatFile</span><span class="p">(</span><span class="s">&#39;d:/long/file/path/test.p&#39;</span><span class="p">)</span>
-<span class="go">&#39;pickle&#39;</span>
-<span class="go">On a windows networked filesystem</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormatFile</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">long</span><span class="se">\f</span><span class="s">ile\path</span><span class="se">\t</span><span class="s">est.krn&#39;</span><span class="p">)</span>
-<span class="go">&#39;humdrum&#39;</span>
 </pre></div>
 </div>
+<p>Windows drive + pickle
+&gt;&gt;&gt; findFormatFile(&#8216;d:/long/file/path/test.p&#8217;)
+&#8216;pickle&#8217;</p>
+<p>On a windows networked filesystem
+&gt;&gt;&gt; findFormatFile(&#8216;\longfilepathtest.krn&#8217;)
+&#8216;humdrum&#8217;</p>
+</blockquote>
 </dd></dl>
 
 <dl class="function">
@@ -304,23 +336,30 @@
 <dl class="function">
 <dt id="music21.common.formatStr">
 <tt class="descclassname">music21.common.</tt><tt class="descname">formatStr</tt><big>(</big><em>msg</em>, <em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.common.formatStr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Format one or more data elements into string suitable for printing straight to stderr or other outputs</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">formatStr</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">,</span> <span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<dd><dl class="docutils">
+<dt>Format one or more data elements into string suitable for printing</dt>
+<dd><p class="first">straight to stderr or other outputs</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">formatStr</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">,</span> <span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">a</span>
 <span class="go">test 1 2 3</span>
 <span class="go">&lt;BLANKLINE&gt;</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="music21.common.getMd5">
 <tt class="descclassname">music21.common.</tt><tt class="descname">getMd5</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#music21.common.getMd5" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a string from an md5 haslib</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getMd5</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">)</span>
+<dd><dl class="docutils">
+<dt>Return a string from an md5 haslib</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getMd5</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">)</span>
 <span class="go">&#39;098f6bcd4621d373cade4e832627b4f6&#39;</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -345,7 +384,13 @@
 <dl class="function">
 <dt id="music21.common.getPackageDir">
 <tt class="descclassname">music21.common.</tt><tt class="descname">getPackageDir</tt><big>(</big><em>fpMusic21=None</em>, <em>relative=True</em>, <em>remapSep=.</em>, <em>packageOnly=True</em><big>)</big><a class="headerlink" href="#music21.common.getPackageDir" title="Permalink to this definition">¶</a></dt>
-<dd>Manually get all directories in the music21 package, including the top level directory. This is used in setup.py. If <cite>relative</cite> is True, relative paths will be returned. If <cite>remapSep</cite> is set to anything other than None, the path separator will be replaced. If <cite>packageOnly</cite> is true, only directories with __init__.py files are colllected.</dd></dl>
+<dd><p>Manually get all directories in the music21 package, including the top level directory. This is used in setup.py.</p>
+<blockquote>
+<p>If <cite>relative</cite> is True, relative paths will be returned.</p>
+<p>If <cite>remapSep</cite> is set to anything other than None, the path separator will be replaced.</p>
+<p>If <cite>packageOnly</cite> is true, only directories with __init__.py files are colllected.</p>
+</blockquote>
+</dd></dl>
 
 <dl class="function">
 <dt id="music21.common.getPlatform">
@@ -382,7 +427,8 @@
 <dl class="function">
 <dt id="music21.common.isListLike">
 <tt class="descclassname">music21.common.</tt><tt class="descname">isListLike</tt><big>(</big><em>usrData</em><big>)</big><a class="headerlink" href="#music21.common.isListLike" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns True if is a List or a Set or a Tuple #TODO: add immutable sets and pre 2.6 set support</p>
+<dd><p>Returns True if is a List or a Set or a Tuple
+#TODO: add immutable sets and pre 2.6 set support</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">isListLike</span><span class="p">([])</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">isListLike</span><span class="p">(</span><span class="s">&#39;sharp&#39;</span><span class="p">)</span>
@@ -399,8 +445,10 @@
 <dl class="function">
 <dt id="music21.common.isNum">
 <tt class="descclassname">music21.common.</tt><tt class="descname">isNum</tt><big>(</big><em>usrData</em><big>)</big><a class="headerlink" href="#music21.common.isNum" title="Permalink to this definition">¶</a></dt>
-<dd><p>check if usrData is a number (float, int, long, Decimal), return boolean IMPROVE: when 2.6 is everywhere: add numbers class.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">isNum</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
+<dd><dl class="docutils">
+<dt>check if usrData is a number (float, int, long, Decimal), return boolean</dt>
+<dd><p class="first">IMPROVE: when 2.6 is everywhere: add numbers class.</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">isNum</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">isNum</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="go">True</span>
@@ -408,12 +456,16 @@
 <span class="go">False</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="music21.common.isPowerOfTwo">
 <tt class="descclassname">music21.common.</tt><tt class="descname">isPowerOfTwo</tt><big>(</big><em>n</em><big>)</big><a class="headerlink" href="#music21.common.isPowerOfTwo" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns True if argument is either a power of 2 or a reciprocal of a power of 2. Uses almostEquals so that a float whose reminder after taking a log is nearly zero is still True</p>
+<dd><p>returns True if argument is either a power of 2 or a reciprocal
+of a power of 2. Uses almostEquals so that a float whose reminder after
+taking a log is nearly zero is still True</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">isPowerOfTwo</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="go">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">isPowerOfTwo</span><span class="p">(</span><span class="mf">18</span><span class="p">)</span>
@@ -498,17 +550,25 @@
 <dl class="function">
 <dt id="music21.common.sortFilesRecent">
 <tt class="descclassname">music21.common.</tt><tt class="descname">sortFilesRecent</tt><big>(</big><em>fileList</em><big>)</big><a class="headerlink" href="#music21.common.sortFilesRecent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given two files, sort by most recent. Return only the file paths.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span>
+<dd><dl class="docutils">
+<dt>Given two files, sort by most recent. Return only the file</dt>
+<dd><p class="first">paths.</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">sortFilesRecent</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="music21.common.sortModules">
 <tt class="descclassname">music21.common.</tt><tt class="descname">sortModules</tt><big>(</big><em>moduleList</em><big>)</big><a class="headerlink" href="#music21.common.sortModules" title="Permalink to this definition">¶</a></dt>
-<dd>Sort a lost of imported module names such that most recently modified is first</dd></dl>
+<dd><dl class="docutils">
+<dt>Sort a lost of imported module names such that most recently modified is</dt>
+<dd>first</dd>
+</dl>
+</dd></dl>
 
 <dl class="function">
 <dt id="music21.common.spaceCamelCase">
@@ -533,11 +593,16 @@
 <dl class="function">
 <dt id="music21.common.stripAddresses">
 <tt class="descclassname">music21.common.</tt><tt class="descname">stripAddresses</tt><big>(</big><em>textString</em>, <em>replacement=ADDRESS</em><big>)</big><a class="headerlink" href="#music21.common.stripAddresses" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that changes all memory addresses in the given textString with (replacement).  This is useful for testing that a function gives an expected result even if the result contains references to memory locations.  So for instance:</p>
+<dd><p>Function that changes all memory addresses in the given
+textString with (replacement).  This is useful for testing
+that a function gives an expected result even if the result
+contains references to memory locations.  So for instance:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stripAddresses</span><span class="p">(</span><span class="s">&quot;{0.0} &lt;music21.clef.TrebleClef object at 0x02A87AD0&gt;&quot;</span><span class="p">)</span>
 <span class="go">&#39;{0.0} &lt;music21.clef.TrebleClef object at ADDRESS&gt;&#39;</span>
-<span class="go">while this is left alone:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">stripAddresses</span><span class="p">(</span><span class="s">&quot;{0.0} &lt;music21.humdrum.MiscTandam *&gt;I humdrum control&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>while this is left alone:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stripAddresses</span><span class="p">(</span><span class="s">&quot;{0.0} &lt;music21.humdrum.MiscTandam *&gt;I humdrum control&gt;&quot;</span><span class="p">)</span>
 <span class="go">&#39;{0.0} &lt;music21.humdrum.MiscTandam *&gt;I humdrum control&gt;&#39;</span>
 </pre></div>
 </div>
@@ -546,7 +611,8 @@
 <dl class="function">
 <dt id="music21.common.unwrapWeakref">
 <tt class="descclassname">music21.common.</tt><tt class="descname">unwrapWeakref</tt><big>(</big><em>referent</em><big>)</big><a class="headerlink" href="#music21.common.unwrapWeakref" title="Permalink to this definition">¶</a></dt>
-<dd><p>utility function that gets an object that might be an object itself or a weak reference to an object.</p>
+<dd><p>utility function that gets an object that might be an object itself
+or a weak reference to an object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a2</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -565,7 +631,8 @@
 <dl class="function">
 <dt id="music21.common.wrapWeakref">
 <tt class="descclassname">music21.common.</tt><tt class="descname">wrapWeakref</tt><big>(</big><em>referent</em><big>)</big><a class="headerlink" href="#music21.common.wrapWeakref" title="Permalink to this definition">¶</a></dt>
-<dd>utility function that wraps objects as weakrefs but does not wrap already wrapped objects</dd></dl>
+<dd>utility function that wraps objects as weakrefs but does not wrap
+already wrapped objects</dd></dl>
 
 <div class="section" id="scalar">
 <h2>Scalar<a class="headerlink" href="#scalar" title="Permalink to this headline">¶</a></h2>
@@ -604,7 +671,10 @@ Attributes without Documentation: <cite>valType</cite>, <cite>value</cite></bloc
 <dt id="music21.common.Iterator">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Iterator</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#music21.common.Iterator" title="Permalink to this definition">¶</a></dt>
-<dd><p>A simple Iterator object used to handle iteration of Streams and other list-like objects.</p>
+<dd><dl class="docutils">
+<dt>A simple Iterator object used to handle iteration of Streams and other</dt>
+<dd>list-like objects.</dd>
+</dl>
 <p><strong>Iterator</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
@@ -650,7 +720,24 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Ti
 <dt id="music21.common.defHash">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defHash</tt><big>(</big><em>hash=None</em>, <em>default=None</em>, <em>callDefault=False</em><big>)</big><a class="headerlink" href="#music21.common.defHash" title="Permalink to this definition">¶</a></dt>
-<dd><p>A replacement for dictionaries that behave a bit more like perl hashes. No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first in the definition and that default can be set to None (which it is) or to any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({&#8220;A&#8221;: falsehash(), &#8220;B&#8221;: falsehash()}) print(a[&#8220;A&#8221;][&#8220;hi&#8221;]) # returns False there&#8217;s probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element</p>
+<dd><dl class="docutils">
+<dt>A replacement for dictionaries that behave a bit more like perl hashes.</dt>
+<dd><p class="first">No more KeyErrors. The difference between defHash and defaultdict is that the
+Dict values come first in the definition and that default can be set to
+None (which it is) or to any object.</p>
+<p>If you want a factory that makes hashes with a particular different default, use:</p>
+<blockquote>
+falsehash = lambda h = None: defHash(h, default = False)
+a = falsehash({&#8220;A&#8221;: falsehash(), &#8220;B&#8221;: falsehash()})
+print(a[&#8220;A&#8221;][&#8220;hi&#8221;]) # returns False</blockquote>
+<p>there&#8217;s probably a way to use this to create a data structure
+of arbitrary dimensionality, though it escapes this author.</p>
+<p>if callDefault is True then the default is called:</p>
+<blockquote>
+defHash(default = list, callDefault = True)</blockquote>
+<p class="last">will create a new List for each element</p>
+</dd>
+</dl>
 <p>inherits from: dict</p>
 <p><strong>defHash</strong> <strong>attributes</strong></p>
 <blockquote>
@@ -714,7 +801,7 @@ Methods inherited from list: <tt class="xref docutils literal"><span class="pre"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 06, 2010.
+      Last updated on Jul 08, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

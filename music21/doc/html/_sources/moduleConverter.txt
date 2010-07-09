@@ -7,46 +7,64 @@ music21.converter
 
 .. module:: music21.converter
 
-Public interface for importing various file formats into music21. The most powerful and easy to use tool is the :func:`~music21.converter.parse` function. Simply provide a URL and, if the format is supported, a :class:`~music21.stream.Stream` will be returned. 
-
-
+Public interface for importing various file formats into music21. 
+ 
+ The most powerful and easy to use tool is the :func:`~music21.converter.parse` function. Simply provide a URL and, if the format is supported, a :class:`~music21.stream.Stream` will be returned. 
+ 
+ 
+ 
 
 
 .. function:: parse(value, *args, **keywords)
 
     Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
-
-    >>> s = parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
-    >>> s = parse("E8 f# g#' G f g# g G#", "2/4")
-
-    
+ 
+     >>> s = parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
+     >>> s = parse("E8 f# g#' G f g# g G#", "2/4")
+ 
+     
+ 
 
 .. function:: parseFile(fp, forceSource=False)
 
-    Given a file path, attempt to parse the file into a Stream. 
+    Given a file path, attempt to parse the file into a Stream.
+     
+ 
 
 .. function:: parseData(dataStr)
 
-    Given musical data represented within a Python string, attempt to parse the data into a Stream. 
+    Given musical data represented within a Python string, attempt to parse the data into a Stream.
+     
+ 
 
 .. function:: parseURL(url, forceSource=False)
 
     Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
+     
+ 
 
 .. function:: freeze(streamObj, fp=None)
 
-    Given a file path, attempt to parse the file into a Stream. 
+    Given a file path, attempt to parse the file into a Stream.
+     
+ 
 
 .. function:: unfreeze(fp)
 
-    Given a file path, attempt to parse the file into a Stream. 
+    Given a file path, attempt to parse the file into a Stream.
+     
+ 
 
 Converter
 ---------
 
 .. class:: Converter()
 
-    A class used for converting all supported data formats into music21 objects. Not a subclass, but a wrapper for different converter objects based on format. 
+    A class used for converting all supported data formats into music21 objects. 
+ 
+     Not a subclass, but a wrapper for different converter objects based on format.
+     
+ 
 
     
 
@@ -54,21 +72,30 @@ Converter
 
         .. attribute:: stream
 
-            No documentation. 
+            No documentation.
+ 
 
     **Converter** **methods**
 
         .. method:: parseData(dataStr)
 
-            Given raw data, determine format and parse into a music21 Stream. 
+            Given raw data, determine format and parse into a music21 Stream.
+         
+ 
 
         .. method:: parseFile(fp, forceSource=False)
 
-            Given a file path, parse and store a music21 Stream. 
+            Given a file path, parse and store a music21 Stream.
+         
+ 
 
         .. method:: parseURL(url)
 
-            Given a url, download and parse the file into a music21 Stream. Note that this checks the user Environment `autoDownlaad` setting before downloading. 
+            Given a url, download and parse the file into a music21 Stream.
+ 
+         Note that this checks the user Environment `autoDownlaad` setting before downloading. 
+         
+ 
 
 
 ConverterMusicXML
@@ -76,7 +103,9 @@ ConverterMusicXML
 
 .. class:: ConverterMusicXML(forceSource)
 
-    Converter for MusicXML 
+    Converter for MusicXML
+     
+ 
 
     
 
@@ -84,25 +113,35 @@ ConverterMusicXML
 
         .. attribute:: stream
 
-            No documentation. 
+            No documentation.
+ 
 
     **ConverterMusicXML** **methods**
 
         .. method:: getPartNames()
 
-            No documentation. 
+            No documentation.
+ 
 
         .. method:: load()
 
-            Load all parts from a MusicXML object representation. This determines the order parts are found in the stream 
+            Load all parts from a MusicXML object representation.
+         This determines the order parts are found in the stream
+         
+ 
 
         .. method:: parseData(xmlString)
 
-            Open MusicXML data from a string. 
+            Open MusicXML data from a string.
+ 
 
         .. method:: parseFile(fp)
 
-            Open from a file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source. 
+            Open from a file path; check to see if there is a pickled
+         version available and up to date; if so, open that, otherwise
+         open source.
+         
+ 
 
 
 ConverterHumdrum
@@ -110,7 +149,9 @@ ConverterHumdrum
 
 .. class:: ConverterHumdrum()
 
-    Simple class wrapper for parsing Humdrum data provided in a file or in a string. 
+    Simple class wrapper for parsing Humdrum data provided in a file or in a string.
+     
+ 
 
     
 
@@ -122,15 +163,18 @@ ConverterHumdrum
 
         .. method:: parseData(humdrumString)
 
-            Open Humdrum data from a string 
-
-            >>> humdata = '**kern\n*M2/4\n=1\n24r\n24g#\n24f#\n24e\n24c#\n24f\n24r\n24dn\n24e-\n24gn\n24e-\n24dn\n*-'
-            >>> c = ConverterHumdrum()
-            >>> s = c.parseData(humdata)
+            Open Humdrum data from a string
+ 
+         >>> humdata = '**kern\n*M2/4\n=1\n24r\n24g#\n24f#\n24e\n24c#\n24f\n24r\n24dn\n24e-\n24gn\n24e-\n24dn\n*-'
+         >>> c = ConverterHumdrum()
+         >>> s = c.parseData(humdata)
+         
+ 
 
         .. method:: parseFile(filepath)
 
-            Open Humdram data from a file path. 
+            Open Humdram data from a file path.
+ 
 
 
 ArchiveFilter
@@ -138,7 +182,9 @@ ArchiveFilter
 
 .. class:: ArchiveFilter(fp, format=zip)
 
-    Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive. 
+    Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive.
+     
+ 
 
     
 
@@ -147,10 +193,14 @@ ArchiveFilter
         .. method:: getData(name=None)
 
             Return data from the archive by name. If no name is given, a default may be available. 
+         
+ 
 
         .. method:: isArchive()
 
-            Return True or False if the filepath is an archive of the supplied format. 
+            Return True or False if the filepath is an archive of the supplied format.
+         
+ 
 
 
 ConverterTinyNotation
@@ -158,7 +208,9 @@ ConverterTinyNotation
 
 .. class:: ConverterTinyNotation()
 
-    Simple class wrapper for parsing TinyNotation data provided in a file or in a string. 
+    Simple class wrapper for parsing TinyNotation data provided in a file or in a string.
+     
+ 
 
     
 
@@ -170,15 +222,18 @@ ConverterTinyNotation
 
         .. method:: parseData(tnData)
 
-            Open TinyNotation data from a string or list 
-
-            >>> tnData = ["E4 r f# g=lastG trip{b-8 a g} c", "3/4"]
-            >>> c = ConverterTinyNotation()
-            >>> s = c.parseData(tnData)
+            Open TinyNotation data from a string or list
+ 
+         >>> tnData = ["E4 r f# g=lastG trip{b-8 a g} c", "3/4"]
+         >>> c = ConverterTinyNotation()
+         >>> s = c.parseData(tnData)
+         
+ 
 
         .. method:: parseFile(fp)
 
-            Open TinyNotation data from a file path. 
+            Open TinyNotation data from a file path.
+ 
 
 
 PickleFilter
@@ -186,9 +241,20 @@ PickleFilter
 
 .. class:: PickleFilter(fp, forceSource=False)
 
-    Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
+    Before opening a file path, this class can check if there is an up 
+     to date version pickled and stored in the scratch directory. 
+ 
+     If the user has not specified a scratch directory, a pickle path will 
+     not be created. 
+     
+ 
 
-    Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned. 
+    Provide a file path to check if there is pickled version.
+ 
+         If forceSource is True, pickled files, if available, will not be
+         returned.
+         
+ 
 
     
 
@@ -196,7 +262,11 @@ PickleFilter
 
         .. method:: status()
 
-            Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path. Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle. 
+            Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path.
+ 
+         Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle.
+         
+ 
 
 
 StreamFreezer
@@ -205,6 +275,8 @@ StreamFreezer
 .. class:: StreamFreezer(streamObj=None)
 
     This class is used to freeze a Stream, preparing it for pickling. 
+     
+ 
 
     
 
@@ -216,10 +288,14 @@ StreamFreezer
 
         .. method:: openPickle(fp)
 
-            For a supplied file path to a pickled stream, unpickle 
+            For a supplied file path to a pickled stream, unpickle
+         
+ 
 
         .. method:: writePickle(fp=None)
 
-            For a supplied Stream, write a pickled version. 
+            For a supplied Stream, write a pickled version.
+         
+ 
 
 

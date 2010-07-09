@@ -838,6 +838,7 @@ class RestructuredWriter(object):
             # else, add a stripped line
             if not match:
                 sub.append(line)
+#                sub.append(lineSrc + '\n')
 
         # find double breaks in text
         post = []

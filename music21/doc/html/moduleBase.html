@@ -88,27 +88,76 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-music21.base">
-<span id="modulebase"></span><h1>music21.base<a class="headerlink" href="#module-music21.base" title="Permalink to this headline">¶</a></h1>
-<p>Music21 base classes for <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> objects and elements contained within them. Additional objects for defining and manipulating elements are included. The namespace of this file, as all base.py files, is loaded into the package that contains this file via __init__.py. Everything in this file is thus available after importing music21.</p>
+  <div class="section" id="music21-base">
+<span id="modulebase"></span><h1>music21.base<a class="headerlink" href="#music21-base" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">music21</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">music21</span><span class="o">.</span><span class="n">ElementWrapper</span>
-<span class="go">&lt;class &#39;music21.base.ElementWrapper&#39;&gt;</span>
 </pre></div>
 </div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">music21</span><span class="o">.</span><span class="n">ElementWrapper</span>
+</pre></div>
+</div>
+<p>&lt;class &#8216;music21.base.ElementWrapper&#8217;&gt;</p>
 <div class="section" id="music21object">
 <h2>Music21Object<a class="headerlink" href="#music21object" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="music21.base.Music21Object">
+<dt id="Music21Object">
 <em class="property">
-class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Music21Object</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object" title="Permalink to this definition">¶</a></dt>
-<dd><p>Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
+class </em><tt class="descname">Music21Object</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#Music21Object" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<p>Base class for all music21 objects.</p>
+<p>All music21 objects encode 7 pieces of information:</p>
+<ol class="arabic">
+<li><p class="first">id        : unique identification string (optional)</p>
+</li>
+<li><dl class="first docutils">
+<dt>groups <span class="classifier-delimiter">:</span> <span class="classifier">a Groups object: which is a list of strings identifying</span></dt>
+<dd><p class="first last">internal subcollections
+(voices, parts, selections) to which this element belongs</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">duration  : Duration object representing the length of the object</p>
+</li>
+<li><dl class="first docutils">
+<dt>locations <span class="classifier-delimiter">:</span> <span class="classifier">a DefinedContexts object (see above) that specifies connections of</span></dt>
+<dd><p class="first last">this object to one location in another object</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">parent    : a reference or weakreference to a currently active Location</p>
+</li>
+<li><p class="first">offset    : a float or duration specifying the position of the object in parent</p>
+</li>
+<li><dl class="first docutils">
+<dt>contexts <span class="classifier-delimiter">:</span> <span class="classifier">a list of references or weakrefs for current contexts</span></dt>
+<dd><p class="first last">of the object (similar to locations but without an offset)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>priority <span class="classifier-delimiter">:</span> <span class="classifier">int representing the position of an object among all</span></dt>
+<dd><p class="first last">objects at the same offset.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<p>Each of these may be passed in as a named keyword to any music21 object.
+Some of these may be intercepted by the subclassing object (e.g., duration within Note)</p>
+</blockquote>
 <p><strong>Music21Object</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.base.Music21Object.classSortOrder">
-<tt class="descname">classSortOrder</tt><a class="headerlink" href="#music21.base.Music21Object.classSortOrder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Property which returns an number (int or otherwise) depending on the class of the Music21Object that represents a priority for an object based on its class alone &#8211; used as a tie for stream sorting in case two objects have the same offset and priority.  Lower numbers are sorted to the left of higher numbers.  For instance, Clef, KeySignature, TimeSignature all come (in that order) before Note. All undefined classes have classSortOrder of 20 &#8211; same as note.Note</p>
+<dt id="Music21Object.classSortOrder">
+<tt class="descname">classSortOrder</tt><a class="headerlink" href="#Music21Object.classSortOrder" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Property which returns an number (int or otherwise)</blockquote>
+<p>depending on the class of the Music21Object that
+represents a priority for an object based on its class alone &#8211;
+used as a tie for stream sorting in case two objects have the
+same offset and priority.  Lower numbers are sorted to the left
+of higher numbers.  For instance, Clef, KeySignature, TimeSignature
+all come (in that order) before Note.</p>
+<p>All undefined classes have classSortOrder of 20 &#8211; same as note.Note</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">TrebleClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span><span class="o">.</span><span class="n">classSortOrder</span>
@@ -116,49 +165,67 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ks</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ks</span><span class="o">.</span><span class="n">classSortOrder</span>
 <span class="go">1</span>
-<span class="go">New classes can define their own default classSortOrder</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">ExampleClass</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">classSortOrderDefault</span> <span class="o">=</span> <span class="mf">5</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ec1</span> <span class="o">=</span> <span class="n">ExampleClass</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ec1</span><span class="o">.</span><span class="n">classSortOrder</span>
-<span class="go">5</span>
 </pre></div>
 </div>
+<p>New classes can define their own default classSortOrder
+&gt;&gt;&gt; class ExampleClass(base.Music21Object):
+...     classSortOrderDefault = 5
+...
+&gt;&gt;&gt; ec1 = ExampleClass()
+&gt;&gt;&gt; ec1.classSortOrder
+5</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="music21.base.Music21Object.id">
-<tt class="descname">id</tt><a class="headerlink" href="#music21.base.Music21Object.id" title="Permalink to this definition">¶</a></dt>
+<dt id="Music21Object.id">
+<tt class="descname">id</tt><a class="headerlink" href="#Music21Object.id" title="Permalink to this definition">¶</a></dt>
 <dd>Unique identification string.</dd></dl>
 
 <dl class="attribute">
-<dt id="music21.base.Music21Object.groups">
-<tt class="descname">groups</tt><a class="headerlink" href="#music21.base.Music21Object.groups" title="Permalink to this definition">¶</a></dt>
+<dt id="Music21Object.groups">
+<tt class="descname">groups</tt><a class="headerlink" href="#Music21Object.groups" title="Permalink to this definition">¶</a></dt>
 <dd>An instance of a Group object.</dd></dl>
 
 </blockquote>
 <p><strong>Music21Object</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.base.Music21Object.duration">
-<tt class="descname">duration</tt><a class="headerlink" href="#music21.base.Music21Object.duration" title="Permalink to this definition">¶</a></dt>
+<dt id="Music21Object.duration">
+<tt class="descname">duration</tt><a class="headerlink" href="#Music21Object.duration" title="Permalink to this definition">¶</a></dt>
 <dd>Get and set the duration of this object as a Duration object.</dd></dl>
 
 <dl class="attribute">
-<dt id="music21.base.Music21Object.offset">
-<tt class="descname">offset</tt><a class="headerlink" href="#music21.base.Music21Object.offset" title="Permalink to this definition">¶</a></dt>
+<dt id="Music21Object.offset">
+<tt class="descname">offset</tt><a class="headerlink" href="#Music21Object.offset" title="Permalink to this definition">¶</a></dt>
 <dd>The offset property sets the position of this object from the start of its container (a Stream or Stream sub-class) in quarter lengths.</dd></dl>
 
 <dl class="attribute">
-<dt id="music21.base.Music21Object.parent">
-<tt class="descname">parent</tt><a class="headerlink" href="#music21.base.Music21Object.parent" title="Permalink to this definition">¶</a></dt>
+<dt id="Music21Object.parent">
+<tt class="descname">parent</tt><a class="headerlink" href="#Music21Object.parent" title="Permalink to this definition">¶</a></dt>
 <dd>A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object&#8217;s parent attribute is automatically set when an the object is attached to a Stream.</dd></dl>
 
 <dl class="attribute">
-<dt id="music21.base.Music21Object.priority">
-<tt class="descname">priority</tt><a class="headerlink" href="#music21.base.Music21Object.priority" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get and set the priority integer value. Priority specifies the order of processing from left (lowest number) to right (highest number) of objects at the same offset.  For instance, if you want a key change and a clef change to happen at the same time but the key change to appear first, then set: keySigElement.priority = 1; clefElement.priority = 2 this might be a slightly counterintuitive numbering of priority, but it does mean, for instance, if you had two elements at the same offset, an allegro tempo change and an andante tempo change, then the tempo change with the higher priority number would apply to the following notes (by being processed second). Default priority is 0; thus negative priorities are encouraged to have Elements that appear non-priority set elements. In case of tie, there are defined class sort orders defined in music21.base.CLASS_SORT_ORDER.  For instance, a key signature change appears before a time signature change before a note at the same offset.  This produces the familiar order of materials at the start of a musical score.</p>
+<dt id="Music21Object.priority">
+<tt class="descname">priority</tt><a class="headerlink" href="#Music21Object.priority" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Get and set the priority integer value.</blockquote>
+<p>Priority specifies the order of processing from left (lowest number)
+to right (highest number) of objects at the same offset.  For
+instance, if you want a key change and a clef change to happen at
+the same time but the key change to appear first, then set:
+keySigElement.priority = 1; clefElement.priority = 2 this might be
+a slightly counterintuitive numbering of priority, but it does
+mean, for instance, if you had two elements at the same offset,
+an allegro tempo change and an andante tempo change, then the
+tempo change with the higher priority number would apply to the
+following notes (by being processed second).</p>
+<p>Default priority is 0; thus negative priorities are encouraged
+to have Elements that appear non-priority set elements.</p>
+<p>In case of tie, there are defined class sort orders defined in
+music21.base.CLASS_SORT_ORDER.  For instance, a key signature
+change appears before a time signature change before a
+note at the same offset.  This produces the familiar order of
+materials at the start of a musical score.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mf">3</span>
@@ -173,14 +240,20 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <p><strong>Music21Object</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
-<dt id="music21.base.Music21Object.searchParentByAttr">
-<tt class="descname">searchParentByAttr</tt><big>(</big><em>attrName</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.searchParentByAttr" title="Permalink to this definition">¶</a></dt>
-<dd>If this element is contained within a Stream or other Music21 element, searchParentByAttr() permits searching attributes of higher-level objects. The first encountered match is returned, or None if no match. All parents are recursively searched upward.</dd></dl>
+<dt id="Music21Object.searchParentByAttr">
+<tt class="descname">searchParentByAttr</tt><big>(</big><em>attrName</em><big>)</big><a class="headerlink" href="#Music21Object.searchParentByAttr" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+If this element is contained within a Stream or other Music21 element,</blockquote>
+<p>searchParentByAttr() permits searching attributes of higher-level
+objects. The first encountered match is returned, or None if no match. All parents are recursively searched upward.</p>
+</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.getContextAttr">
-<tt class="descname">getContextAttr</tt><big>(</big><em>attr</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getContextAttr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given the name of an attribute, search Conctexts and return the best match.</p>
+<dt id="Music21Object.getContextAttr">
+<tt class="descname">getContextAttr</tt><big>(</big><em>attr</em><big>)</big><a class="headerlink" href="#Music21Object.getContextAttr" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Given the name of an attribute, search Conctexts and return</blockquote>
+<p>the best match.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
@@ -193,9 +266,11 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.setContextAttr">
-<tt class="descname">setContextAttr</tt><big>(</big><em>attrName</em>, <em>value</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.setContextAttr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given the name of an attribute, search Conctexts and return the best match.</p>
+<dt id="Music21Object.setContextAttr">
+<tt class="descname">setContextAttr</tt><big>(</big><em>attrName</em>, <em>value</em><big>)</big><a class="headerlink" href="#Music21Object.setContextAttr" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Given the name of an attribute, search Conctexts and return</blockquote>
+<p>the best match.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
@@ -211,9 +286,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.addContext">
-<tt class="descname">addContext</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.addContext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add an ojbect to the <a title="music21.base.DefinedContexts" class="reference internal" href="#music21.base.DefinedContexts"><tt class="xref docutils literal"><span class="pre">DefinedContexts</span></tt></a> object. For adding a location, use <a title="music21.base.Music21Object.addLocation" class="reference internal" href="#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>.</p>
+<dt id="Music21Object.addContext">
+<tt class="descname">addContext</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#Music21Object.addContext" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Add an ojbect to the <tt class="xref docutils literal"><span class="pre">DefinedContexts</span></tt> object. For adding a location, use <tt class="xref docutils literal"><span class="pre">addLocation()</span></tt>.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
@@ -226,9 +302,11 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.addLocation">
-<tt class="descname">addLocation</tt><big>(</big><em>site</em>, <em>offset</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.addLocation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a location to the <a title="music21.base.DefinedContexts" class="reference internal" href="#music21.base.DefinedContexts"><tt class="xref docutils literal"><span class="pre">DefinedContexts</span></tt></a> object. The supplied object is a reference to the object (the site) that contains an offset of this object. This is only for advanced location method and is not a complete or sufficient way to add an object to a Stream.</p>
+<dt id="Music21Object.addLocation">
+<tt class="descname">addLocation</tt><big>(</big><em>site</em>, <em>offset</em><big>)</big><a class="headerlink" href="#Music21Object.addLocation" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Add a location to the <tt class="xref docutils literal"><span class="pre">DefinedContexts</span></tt> object. The supplied object is a reference to the object (the site) that contains an offset of this object.</blockquote>
+<p>This is only for advanced location method and is not a complete or sufficient way to add an object to a Stream.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span><span class="p">,</span> <span class="n">stream</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
@@ -238,9 +316,13 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.addLocationAndParent">
-<tt class="descname">addLocationAndParent</tt><big>(</big><em>offset</em>, <em>parent</em>, <em>parentWeakRef=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.addLocationAndParent" title="Permalink to this definition">¶</a></dt>
-<dd><p>ADVANCED: a speedup tool that adds a new location element and a new parent.  Called by Stream.insert &#8211; this saves some dual processing.  Does not do safety checks that the siteId doesn&#8217;t already exist etc., because that is done earlier. This speeds up things like stream.getElementsById substantially. Testing script (N.B. manipulates Stream._elements directly &#8211; so not to be emulated)</p>
+<dt id="Music21Object.addLocationAndParent">
+<tt class="descname">addLocationAndParent</tt><big>(</big><em>offset</em>, <em>parent</em>, <em>parentWeakRef=None</em><big>)</big><a class="headerlink" href="#Music21Object.addLocationAndParent" title="Permalink to this definition">¶</a></dt>
+<dd><p>ADVANCED: a speedup tool that adds a new location element and a new parent.  Called
+by Stream.insert &#8211; this saves some dual processing.  Does not do safety checks that
+the siteId doesn&#8217;t already exist etc., because that is done earlier.</p>
+<p>This speeds up things like stream.getElementsById substantially.</p>
+<p>Testing script (N.B. manipulates Stream._elements directly &#8211; so not to be emulated)</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">stream</span> <span class="kn">import</span> <span class="n">Stream</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">st1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">o1</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
@@ -257,9 +339,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.freezeIds">
-<tt class="descname">freezeIds</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.freezeIds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporarily replace are stored keys with a different value.</p>
+<dt id="Music21Object.freezeIds">
+<tt class="descname">freezeIds</tt><big>(</big><big>)</big><a class="headerlink" href="#Music21Object.freezeIds" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Temporarily replace are stored keys with a different value.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aM21Obj</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bM21Obj</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aM21Obj</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
@@ -278,14 +361,28 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.getContextByClass">
-<tt class="descname">getContextByClass</tt><big>(</big><em>className</em>, <em>serialReverseSearch=True</em>, <em>callerFirst=None</em>, <em>sortByCreationTime=False</em>, <em>memo=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getContextByClass" title="Permalink to this definition">¶</a></dt>
-<dd>Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. The a reference to the caller is required to find the offset of the object of the caller. This is needed for serialReverseSearch. The caller may be a DefinedContexts reference from a lower-level object. If so, we can access the location of that lower-level object. However, if we need a flat representation, the caller needs to be the source Stream, not its DefinedContexts reference. The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search.</dd></dl>
+<dt id="Music21Object.getContextByClass">
+<tt class="descname">getContextByClass</tt><big>(</big><em>className</em>, <em>serialReverseSearch=True</em>, <em>callerFirst=None</em>, <em>sortByCreationTime=False</em>, <em>memo=None</em><big>)</big><a class="headerlink" href="#Music21Object.getContextByClass" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found.</blockquote>
+<p>The a reference to the caller is required to find the offset of the
+object of the caller. This is needed for serialReverseSearch.</p>
+<p>The caller may be a DefinedContexts reference from a lower-level object.
+If so, we can access the location of that lower-level object. However,
+if we need a flat representation, the caller needs to be the source
+Stream, not its DefinedContexts reference.</p>
+<p>The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search.</p>
+</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.getOffsetBySite">
-<tt class="descname">getOffsetBySite</tt><big>(</big><em>site</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getOffsetBySite" title="Permalink to this definition">¶</a></dt>
-<dd><p>If this class has been registered in a container such as a Stream, that container can be provided here, and the offset in that object can be returned. Note that this is different than the getOffsetByElement() method on Stream in that this can never access the flat representation of a Stream.</p>
+<dt id="Music21Object.getOffsetBySite">
+<tt class="descname">getOffsetBySite</tt><big>(</big><em>site</em><big>)</big><a class="headerlink" href="#Music21Object.getOffsetBySite" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+If this class has been registered in a container such as a Stream,</blockquote>
+<p>that container can be provided here, and the offset in that object
+can be returned.</p>
+<p>Note that this is different than the getOffsetByElement() method on
+Stream in that this can never access the flat representation of a Stream.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">getOffsetBySite</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
@@ -295,14 +392,15 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.getSiteIds">
-<tt class="descname">getSiteIds</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getSiteIds" title="Permalink to this definition">¶</a></dt>
+<dt id="Music21Object.getSiteIds">
+<tt class="descname">getSiteIds</tt><big>(</big><big>)</big><a class="headerlink" href="#Music21Object.getSiteIds" title="Permalink to this definition">¶</a></dt>
 <dd>Return a lost of all site Ids, or the id() value of the sites of this object.</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.getSites">
-<tt class="descname">getSites</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.getSites" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of all objects that store a location for this object. Will remove None, the default empty site placeholder.</p>
+<dt id="Music21Object.getSites">
+<tt class="descname">getSites</tt><big>(</big><big>)</big><a class="headerlink" href="#Music21Object.getSites" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Return a list of all objects that store a location for this object. Will remove None, the default empty site placeholder.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span><span class="p">,</span> <span class="n">stream</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
@@ -316,9 +414,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.hasContext">
-<tt class="descname">hasContext</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.hasContext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a Boolean if an object reference is stored in the object&#8217;s DefinedContexts object.</p>
+<dt id="Music21Object.hasContext">
+<tt class="descname">hasContext</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#Music21Object.hasContext" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Return a Boolean if an object reference is stored in the object&#8217;s DefinedContexts object.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="s">&#39;test&#39;</span>
@@ -335,9 +434,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.isClass">
-<tt class="descname">isClass</tt><big>(</big><em>className</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.isClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a boolean value depending on if the object is a particular class or not. In Music21Object, it just returns the result of <cite>isinstance</cite>. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.</p>
+<dt id="Music21Object.isClass">
+<tt class="descname">isClass</tt><big>(</big><em>className</em><big>)</big><a class="headerlink" href="#Music21Object.isClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a boolean value depending on if the object is a particular class or not.</p>
+<p>In Music21Object, it just returns the result of <cite>isinstance</cite>. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">isClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
@@ -352,14 +452,16 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.purgeLocations">
-<tt class="descname">purgeLocations</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.purgeLocations" title="Permalink to this definition">¶</a></dt>
+<dt id="Music21Object.purgeLocations">
+<tt class="descname">purgeLocations</tt><big>(</big><big>)</big><a class="headerlink" href="#Music21Object.purgeLocations" title="Permalink to this definition">¶</a></dt>
 <dd>Remove references to all locations in objects that no longer exist.</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.removeLocationBySite">
-<tt class="descname">removeLocationBySite</tt><big>(</big><em>site</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.removeLocationBySite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove a location in the <a title="music21.base.DefinedContexts" class="reference internal" href="#music21.base.DefinedContexts"><tt class="xref docutils literal"><span class="pre">DefinedContexts</span></tt></a> object. This is only for advanced location method and is not a complete or sufficient way to remove an object from a Stream.</p>
+<dt id="Music21Object.removeLocationBySite">
+<tt class="descname">removeLocationBySite</tt><big>(</big><em>site</em><big>)</big><a class="headerlink" href="#Music21Object.removeLocationBySite" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Remove a location in the <tt class="xref docutils literal"><span class="pre">DefinedContexts</span></tt> object.</blockquote>
+<p>This is only for advanced location method and is not a complete or sufficient way to remove an object from a Stream.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span><span class="p">,</span> <span class="n">stream</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
@@ -373,9 +475,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.removeLocationBySiteId">
-<tt class="descname">removeLocationBySiteId</tt><big>(</big><em>siteId</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.removeLocationBySiteId" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove a location in the <a title="music21.base.DefinedContexts" class="reference internal" href="#music21.base.DefinedContexts"><tt class="xref docutils literal"><span class="pre">DefinedContexts</span></tt></a> object by id.</p>
+<dt id="Music21Object.removeLocationBySiteId">
+<tt class="descname">removeLocationBySiteId</tt><big>(</big><em>siteId</em><big>)</big><a class="headerlink" href="#Music21Object.removeLocationBySiteId" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Remove a location in the <tt class="xref docutils literal"><span class="pre">DefinedContexts</span></tt> object by id.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span><span class="p">,</span> <span class="n">stream</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
@@ -389,9 +492,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.setOffsetBySite">
-<tt class="descname">setOffsetBySite</tt><big>(</big><em>site</em>, <em>value</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.setOffsetBySite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Direct access to the DefinedContexts setOffsetBySite() method. This should only be used for advanced processing of known site that already has been added.</p>
+<dt id="Music21Object.setOffsetBySite">
+<tt class="descname">setOffsetBySite</tt><big>(</big><em>site</em>, <em>value</em><big>)</big><a class="headerlink" href="#Music21Object.setOffsetBySite" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Direct access to the DefinedContexts setOffsetBySite() method. This should only be used for advanced processing of known site that already has been added.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
@@ -402,14 +506,23 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.show">
-<tt class="descname">show</tt><big>(</big><em>fmt=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.show" title="Permalink to this definition">¶</a></dt>
-<dd>Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user&#8217;s Environment Valid formats include (but are not limited to): xml (musicxml) text lily.png lily.pdf</dd></dl>
+<dt id="Music21Object.show">
+<tt class="descname">show</tt><big>(</big><em>fmt=None</em><big>)</big><a class="headerlink" href="#Music21Object.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user&#8217;s Environment</p>
+<dl class="docutils">
+<dt>Valid formats include (but are not limited to):</dt>
+<dd>xml (musicxml)
+text
+lily.png
+lily.pdf</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.unfreezeIds">
-<tt class="descname">unfreezeIds</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.unfreezeIds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Restore keys to be the id() of the object they contain</p>
+<dt id="Music21Object.unfreezeIds">
+<tt class="descname">unfreezeIds</tt><big>(</big><big>)</big><a class="headerlink" href="#Music21Object.unfreezeIds" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Restore keys to be the id() of the object they contain</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aM21Obj</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bM21Obj</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aM21Obj</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
@@ -432,9 +545,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.unwrapWeakref">
-<tt class="descname">unwrapWeakref</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.unwrapWeakref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Public interface to operation on DefinedContexts.</p>
+<dt id="Music21Object.unwrapWeakref">
+<tt class="descname">unwrapWeakref</tt><big>(</big><big>)</big><a class="headerlink" href="#Music21Object.unwrapWeakref" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Public interface to operation on DefinedContexts.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aM21Obj</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bM21Obj</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aM21Obj</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
@@ -447,9 +561,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.wrapWeakref">
-<tt class="descname">wrapWeakref</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.Music21Object.wrapWeakref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Public interface to operation on DefinedContexts.</p>
+<dt id="Music21Object.wrapWeakref">
+<tt class="descname">wrapWeakref</tt><big>(</big><big>)</big><a class="headerlink" href="#Music21Object.wrapWeakref" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Public interface to operation on DefinedContexts.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aM21Obj</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bM21Obj</span> <span class="o">=</span> <span class="n">Music21Object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aM21Obj</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">30</span>
@@ -463,9 +578,12 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.Music21Object.write">
-<tt class="descname">write</tt><big>(</big><em>fmt=None</em>, <em>fp=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.write" title="Permalink to this definition">¶</a></dt>
-<dd>Write a file. A None file path will result in temporary file</dd></dl>
+<dt id="Music21Object.write">
+<tt class="descname">write</tt><big>(</big><em>fmt=None</em>, <em>fp=None</em><big>)</big><a class="headerlink" href="#Music21Object.write" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Write a file.</blockquote>
+<p>A None file path will result in temporary file</p>
+</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -474,26 +592,33 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <div class="section" id="elementwrapper">
 <h2>ElementWrapper<a class="headerlink" href="#elementwrapper" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="music21.base.ElementWrapper">
+<dt id="ElementWrapper">
 <em class="property">
-class </em><tt class="descclassname">music21.base.</tt><tt class="descname">ElementWrapper</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>An element wraps any object that is not a <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>, so that that object can be positioned within a <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>. The object stored within ElementWrapper is available from the the <a title="music21.base.ElementWrapper.obj" class="reference internal" href="#music21.base.ElementWrapper.obj"><tt class="xref docutils literal"><span class="pre">obj</span></tt></a> attribute. Providing an object at initialization is mandatory.</p>
-<p>inherits from: <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
+class </em><tt class="descname">ElementWrapper</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#ElementWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<p>An element wraps any object that is not a <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>, so that that object can
+be positioned within a <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>.</p>
+<p>The object stored within ElementWrapper is available from the the <tt class="xref docutils literal"><span class="pre">obj</span></tt> attribute.</p>
+<p>Providing an object at initialization is mandatory.</p>
+</blockquote>
+<p>inherits from: <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></p>
 <p><strong>ElementWrapper</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.base.ElementWrapper.obj">
-<tt class="descname">obj</tt><a class="headerlink" href="#music21.base.ElementWrapper.obj" title="Permalink to this definition">¶</a></dt>
+<dt id="ElementWrapper.obj">
+<tt class="descname">obj</tt><a class="headerlink" href="#ElementWrapper.obj" title="Permalink to this definition">¶</a></dt>
 <dd>The object this wrapper wraps.</dd></dl>
 
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference internal" href="#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a></p>
+<p>Attributes inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></p>
 </blockquote>
 <p><strong>ElementWrapper</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.base.ElementWrapper.duration">
-<tt class="descname">duration</tt><a class="headerlink" href="#music21.base.ElementWrapper.duration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the duration of the ElementWrapper (if separately set), but normal returns the duration of the component object if available, otherwise returns None.</p>
+<dt id="ElementWrapper.duration">
+<tt class="descname">duration</tt><a class="headerlink" href="#ElementWrapper.duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the duration of the ElementWrapper (if separately set), but
+normal returns the duration of the component object if available, otherwise
+returns None.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;F#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2.0</span>
@@ -502,14 +627,16 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <span class="gp">&gt;&gt;&gt; </span><span class="n">el1</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">el1</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
 <span class="go">2.0</span>
-<span class="go">ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">KindaStupid</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ks1</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="n">KindaStupid</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ks1</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">duration</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="nc">AttributeError</span>: <span class="n-Identifier">&#39;KindaStupid&#39; object has no attribute &#39;duration&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">duration</span>
+</pre></div>
+</div>
+<p>ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY
+&gt;&gt;&gt; class KindaStupid(object):
+...     pass
+&gt;&gt;&gt; ks1 = ElementWrapper(KindaStupid())
+&gt;&gt;&gt; ks1.obj.duration
+Traceback (most recent call last):
+AttributeError: &#8216;KindaStupid&#8217; object has no attribute &#8216;duration&#8217;</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">duration</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ks1</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="s">&quot;whole&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ks1</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">quarterLength</span>
 <span class="go">4.0</span>
@@ -521,28 +648,29 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 </dd></dl>
 
 <dl class="attribute">
-<dt id="music21.base.ElementWrapper.id">
-<tt class="descname">id</tt><a class="headerlink" href="#music21.base.ElementWrapper.id" title="Permalink to this definition">¶</a></dt>
+<dt id="ElementWrapper.id">
+<tt class="descname">id</tt><a class="headerlink" href="#ElementWrapper.id" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
 
 <dl class="attribute">
-<dt id="music21.base.ElementWrapper.offset">
-<tt class="descname">offset</tt><a class="headerlink" href="#music21.base.ElementWrapper.offset" title="Permalink to this definition">¶</a></dt>
+<dt id="ElementWrapper.offset">
+<tt class="descname">offset</tt><a class="headerlink" href="#ElementWrapper.offset" title="Permalink to this definition">¶</a></dt>
 <dd>Get the offset for the set the parent object.</dd></dl>
 
-<p>Properties inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.parent" class="reference internal" href="#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference internal" href="#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
+<p>Properties inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">parent</span></tt>, <tt class="xref docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 <p><strong>ElementWrapper</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
-<dt id="music21.base.ElementWrapper.getId">
-<tt class="descname">getId</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.getId" title="Permalink to this definition">¶</a></dt>
+<dt id="ElementWrapper.getId">
+<tt class="descname">getId</tt><big>(</big><big>)</big><a class="headerlink" href="#ElementWrapper.getId" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.ElementWrapper.isClass">
-<tt class="descname">isClass</tt><big>(</big><em>className</em><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.isClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream</p>
+<dt id="ElementWrapper.isClass">
+<tt class="descname">isClass</tt><big>(</big><em>className</em><big>)</big><a class="headerlink" href="#ElementWrapper.isClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true if the object embedded is a particular class.</p>
+<p>Used by getElementsByClass in Stream</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
@@ -559,23 +687,32 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.ElementWrapper.isTwin">
-<tt class="descname">isTwin</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.isTwin" title="Permalink to this definition">¶</a></dt>
-<dd><p>a weaker form of equality.  a.isTwin(b) is true if a and b store either the same object OR objects that are equal and a.groups == b.groups and a.id == b.id (or both are none) and duration are equal. but does not require position, priority, or parent to be the same In other words, is essentially the same object in a different context</p>
+<dt id="ElementWrapper.isTwin">
+<tt class="descname">isTwin</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#ElementWrapper.isTwin" title="Permalink to this definition">¶</a></dt>
+<dd><p>a weaker form of equality.  a.isTwin(b) is true if
+a and b store either the same object OR objects that are equal
+and a.groups == b.groups
+and a.id == b.id (or both are none) and duration are equal.
+but does not require position, priority, or parent to be the same
+In other words, is essentially the same object in a different context</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">note</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span> <span class="o">=</span> <span class="n">ElementWrapper</span><span class="p">(</span><span class="n">obj</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;A-&quot;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&quot;aflat-Note&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;out-of-range&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">4.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mf">4</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bE</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aE</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">bE</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aE</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span> <span class="ow">is</span> <span class="n">bE</span>
 <span class="go">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span> <span class="o">==</span> <span class="n">bE</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span><span class="o">.</span><span class="n">isTwin</span><span class="p">(</span><span class="n">bE</span><span class="p">)</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bE</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">14.0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">bE</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mf">14.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bE</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aE</span> <span class="o">==</span> <span class="n">bE</span>
 <span class="go">False</span>
@@ -586,11 +723,11 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.ElementWrapper.setId">
-<tt class="descname">setId</tt><big>(</big><em>newId</em><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper.setId" title="Permalink to this definition">¶</a></dt>
+<dt id="ElementWrapper.setId">
+<tt class="descname">setId</tt><big>(</big><em>newId</em><big>)</big><a class="headerlink" href="#ElementWrapper.setId" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
 
-<p>Methods inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.addContext" class="reference internal" href="#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference internal" href="#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference internal" href="#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference internal" href="#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference internal" href="#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference internal" href="#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference internal" href="#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference internal" href="#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference internal" href="#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference internal" href="#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference internal" href="#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySite" class="reference internal" href="#music21.base.Music21Object.removeLocationBySite"><tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySiteId" class="reference internal" href="#music21.base.Music21Object.removeLocationBySiteId"><tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt></a>, <a title="music21.base.Music21Object.searchParentByAttr" class="reference internal" href="#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference internal" href="#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference internal" href="#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference internal" href="#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference internal" href="#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference internal" href="#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference internal" href="#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference internal" href="#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
+<p>Methods inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">addContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocation()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSites()</span></tt>, <tt class="xref docutils literal"><span class="pre">hasContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt>, <tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">show()</span></tt>, <tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">write()</span></tt></p>
 </blockquote>
 </dd></dl>
 
@@ -598,26 +735,37 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <div class="section" id="definedcontexts">
 <h2>DefinedContexts<a class="headerlink" href="#definedcontexts" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="music21.base.DefinedContexts">
+<dt id="DefinedContexts">
 <em class="property">
-class </em><tt class="descclassname">music21.base.</tt><tt class="descname">DefinedContexts</tt><a class="headerlink" href="#music21.base.DefinedContexts" title="Permalink to this definition">¶</a></dt>
-<dd><p>An object, stored within a Music21Object, that stores references to a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects</p>
+class </em><tt class="descname">DefinedContexts</tt><a class="headerlink" href="#DefinedContexts" title="Permalink to this definition">¶</a></dt>
+<dd><p>An object, stored within a Music21Object, that stores references to a collection of objects that may be contextually relevant.</p>
+<blockquote>
+<p>Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream.</p>
+<p>DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts).</p>
+<p>All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects</p>
+</blockquote>
 <p><strong>DefinedContexts</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
-<dt id="music21.base.DefinedContexts.add">
-<tt class="descname">add</tt><big>(</big><em>obj</em>, <em>offset=None</em>, <em>name=None</em>, <em>timeValue=None</em>, <em>idKey=None</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.add" title="Permalink to this definition">¶</a></dt>
-<dd>Add a reference to the DefinedContexts collection. if offset is None, it is interpreted as a context if offset is a value, it is intereted as location NOTE: offset follows obj here, unlike with add() in old DefinedContexts</dd></dl>
+<dt id="DefinedContexts.add">
+<tt class="descname">add</tt><big>(</big><em>obj</em>, <em>offset=None</em>, <em>name=None</em>, <em>timeValue=None</em>, <em>idKey=None</em><big>)</big><a class="headerlink" href="#DefinedContexts.add" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Add a reference to the DefinedContexts collection.</blockquote>
+<p>if offset is None, it is interpreted as a context
+if offset is a value, it is intereted as location</p>
+<p>NOTE: offset follows obj here, unlike with add() in old DefinedContexts</p>
+</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.clear">
-<tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.clear" title="Permalink to this definition">¶</a></dt>
+<dt id="DefinedContexts.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#DefinedContexts.clear" title="Permalink to this definition">¶</a></dt>
 <dd>Clear all stored data.</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.freezeIds">
-<tt class="descname">freezeIds</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.freezeIds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporarily replace are stored keys with a different value.</p>
+<dt id="DefinedContexts.freezeIds">
+<tt class="descname">freezeIds</tt><big>(</big><big>)</big><a class="headerlink" href="#DefinedContexts.freezeIds" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Temporarily replace are stored keys with a different value.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -634,9 +782,12 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.get">
-<tt class="descname">get</tt><big>(</big><em>locationsTrail=False</em>, <em>sortByCreationTime=False</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added. The <cite>locationsTrail</cite> option forces locations to come after all other defined contexts. The <cite>sortByCreationTime</cite> option will sort objects by creation time, where most-recently assigned objects are returned first.</p>
+<dt id="DefinedContexts.get">
+<tt class="descname">get</tt><big>(</big><em>locationsTrail=False</em>, <em>sortByCreationTime=False</em><big>)</big><a class="headerlink" href="#DefinedContexts.get" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added.</blockquote>
+<p>The <cite>locationsTrail</cite> option forces locations to come after all other defined contexts.</p>
+<p>The <cite>sortByCreationTime</cite> option will sort objects by creation time, where most-recently assigned objects are returned first.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">time</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
@@ -660,9 +811,11 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getAttrByName">
-<tt class="descname">getAttrByName</tt><big>(</big><em>attrName</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getAttrByName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute.</p>
+<dt id="DefinedContexts.getAttrByName">
+<tt class="descname">getAttrByName</tt><big>(</big><em>attrName</em><big>)</big><a class="headerlink" href="#DefinedContexts.getAttrByName" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Given an attribute name, search all objects and find the first</blockquote>
+<p>that matches this attribute name; then return a reference to this attribute.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="mf">234</span>
@@ -683,9 +836,18 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getByClass">
-<tt class="descname">getByClass</tt><big>(</big><em>className</em>, <em>serialReverseSearch=True</em>, <em>callerFirst=None</em>, <em>sortByCreationTime=False</em>, <em>memo=None</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getByClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the most recently added reference based on className. Class name can be a string or the class name. This will recursively search the defined contexts of existing defined contexts. Caller here can be the object that is hosting this DefinedContexts object (such as a Stream). This is necessary when, later on, we need a flat representation. If no caller is provided, the a reference to this DefinedContexts instances is based (from where locations can be looked up if necessary). callerFirst is simply used to pass a reference of the first caller; this is necessary if we are looking within a Stream for a flat offset position.</p>
+<dt id="DefinedContexts.getByClass">
+<tt class="descname">getByClass</tt><big>(</big><em>className</em>, <em>serialReverseSearch=True</em>, <em>callerFirst=None</em>, <em>sortByCreationTime=False</em>, <em>memo=None</em><big>)</big><a class="headerlink" href="#DefinedContexts.getByClass" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Return the most recently added reference based on className. Class name can be a string or the class name.</blockquote>
+<p>This will recursively search the defined contexts of existing defined contexts.</p>
+<p>Caller here can be the object that is hosting this DefinedContexts
+object (such as a Stream). This is necessary when, later on, we need
+a flat representation. If no caller is provided, the a reference to
+this DefinedContexts instances is based (from where locations can be
+looked up if necessary).</p>
+<p>callerFirst is simply used to pass a reference of the first caller; this
+is necessary if we are looking within a Stream for a flat offset position.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">time</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -704,14 +866,18 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getById">
-<tt class="descname">getById</tt><big>(</big><em>id</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getById" title="Permalink to this definition">¶</a></dt>
-<dd>Return the object specified by an id. Used for testing and debugging.</dd></dl>
+<dt id="DefinedContexts.getById">
+<tt class="descname">getById</tt><big>(</big><em>id</em><big>)</big><a class="headerlink" href="#DefinedContexts.getById" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Return the object specified by an id.</blockquote>
+<p>Used for testing and debugging.</p>
+</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getOffsetByObjectMatch">
-<tt class="descname">getOffsetByObjectMatch</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getOffsetByObjectMatch" title="Permalink to this definition">¶</a></dt>
-<dd><p>For a given object return the offset using a direct object match.</p>
+<dt id="DefinedContexts.getOffsetByObjectMatch">
+<tt class="descname">getOffsetByObjectMatch</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#DefinedContexts.getOffsetByObjectMatch" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+For a given object return the offset using a direct object match.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -728,9 +894,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getOffsetBySite">
-<tt class="descname">getOffsetBySite</tt><big>(</big><em>site</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getOffsetBySite" title="Permalink to this definition">¶</a></dt>
-<dd><p>For a given site return its offset. The None site is permitted.</p>
+<dt id="DefinedContexts.getOffsetBySite">
+<tt class="descname">getOffsetBySite</tt><big>(</big><em>site</em><big>)</big><a class="headerlink" href="#DefinedContexts.getOffsetBySite" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+For a given site return its offset. The None site is permitted.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -747,9 +914,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getOffsetBySiteId">
-<tt class="descname">getOffsetBySiteId</tt><big>(</big><em>siteId</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getOffsetBySiteId" title="Permalink to this definition">¶</a></dt>
-<dd><p>For a given site id, return its offset.</p>
+<dt id="DefinedContexts.getOffsetBySiteId">
+<tt class="descname">getOffsetBySiteId</tt><big>(</big><em>siteId</em><big>)</big><a class="headerlink" href="#DefinedContexts.getOffsetBySiteId" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+For a given site id, return its offset.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -766,9 +934,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getOffsets">
-<tt class="descname">getOffsets</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getOffsets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of all offsets.</p>
+<dt id="DefinedContexts.getOffsets">
+<tt class="descname">getOffsets</tt><big>(</big><big>)</big><a class="headerlink" href="#DefinedContexts.getOffsets" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Return a list of all offsets.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -786,9 +955,13 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getSiteByOffset">
-<tt class="descname">getSiteByOffset</tt><big>(</big><em>offset</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getSiteByOffset" title="Permalink to this definition">¶</a></dt>
-<dd><p>For a given offset return the parent # More than one parent may have the same offset; # this can return the last site added by sorting time No - now we use a dict, so there&#8217;s no guarantee that the one you want will be there &#8211; need orderedDicts!</p>
+<dt id="DefinedContexts.getSiteByOffset">
+<tt class="descname">getSiteByOffset</tt><big>(</big><em>offset</em><big>)</big><a class="headerlink" href="#DefinedContexts.getSiteByOffset" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+For a given offset return the parent</blockquote>
+<p># More than one parent may have the same offset;
+# this can return the last site added by sorting time</p>
+<p>No - now we use a dict, so there&#8217;s no guarantee that the one you want will be there &#8211; need orderedDicts!</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -803,14 +976,15 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getSiteIds">
-<tt class="descname">getSiteIds</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getSiteIds" title="Permalink to this definition">¶</a></dt>
+<dt id="DefinedContexts.getSiteIds">
+<tt class="descname">getSiteIds</tt><big>(</big><big>)</big><a class="headerlink" href="#DefinedContexts.getSiteIds" title="Permalink to this definition">¶</a></dt>
 <dd>Return a list of all site Ids.</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.getSites">
-<tt class="descname">getSites</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.getSites" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get all defined contexts that are locations; unwrap from weakrefs</p>
+<dt id="DefinedContexts.getSites">
+<tt class="descname">getSites</tt><big>(</big><big>)</big><a class="headerlink" href="#DefinedContexts.getSites" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Get all defined contexts that are locations; unwrap from weakrefs</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -826,14 +1000,15 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.hasSiteId">
-<tt class="descname">hasSiteId</tt><big>(</big><em>siteId</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.hasSiteId" title="Permalink to this definition">¶</a></dt>
+<dt id="DefinedContexts.hasSiteId">
+<tt class="descname">hasSiteId</tt><big>(</big><em>siteId</em><big>)</big><a class="headerlink" href="#DefinedContexts.hasSiteId" title="Permalink to this definition">¶</a></dt>
 <dd>Return True or False if this DefinedContexts object already has this site id defined as a location</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.isSite">
-<tt class="descname">isSite</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.isSite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given an object, determine if it is a site stored in this DefinedContexts. This will return False if the object is simply a context and not a location</p>
+<dt id="DefinedContexts.isSite">
+<tt class="descname">isSite</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#DefinedContexts.isSite" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Given an object, determine if it is a site stored in this DefinedContexts. This will return False if the object is simply a context and not a location</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -849,9 +1024,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.purgeLocations">
-<tt class="descname">purgeLocations</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.purgeLocations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clean all locations that refer to objects that no longer exist.</p>
+<dt id="DefinedContexts.purgeLocations">
+<tt class="descname">purgeLocations</tt><big>(</big><big>)</big><a class="headerlink" href="#DefinedContexts.purgeLocations" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Clean all locations that refer to objects that no longer exist.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -871,9 +1047,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.removeBySite">
-<tt class="descname">removeBySite</tt><big>(</big><em>site</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.removeBySite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove the object specified from DefinedContexts. Object provided can be a location site or a defined context.</p>
+<dt id="DefinedContexts.removeBySite">
+<tt class="descname">removeBySite</tt><big>(</big><em>site</em><big>)</big><a class="headerlink" href="#DefinedContexts.removeBySite" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Remove the object specified from DefinedContexts. Object provided can be a location site or a defined context.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -896,14 +1073,16 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.removeBySiteId">
-<tt class="descname">removeBySiteId</tt><big>(</big><em>idKey</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.removeBySiteId" title="Permalink to this definition">¶</a></dt>
+<dt id="DefinedContexts.removeBySiteId">
+<tt class="descname">removeBySiteId</tt><big>(</big><em>idKey</em><big>)</big><a class="headerlink" href="#DefinedContexts.removeBySiteId" title="Permalink to this definition">¶</a></dt>
 <dd>Remove a defined contexts entry by id key, which is id() of the object.</dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.setAttrByName">
-<tt class="descname">setAttrByName</tt><big>(</big><em>attrName</em>, <em>value</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.setAttrByName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given an attribute name, search all objects and find the first that matches this attribute name; then return a reference to this attribute.</p>
+<dt id="DefinedContexts.setAttrByName">
+<tt class="descname">setAttrByName</tt><big>(</big><em>attrName</em>, <em>value</em><big>)</big><a class="headerlink" href="#DefinedContexts.setAttrByName" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Given an attribute name, search all objects and find the first</blockquote>
+<p>that matches this attribute name; then return a reference to this attribute.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="n">attr1</span><span class="o">=</span><span class="mf">234</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -919,9 +1098,12 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.setOffsetBySite">
-<tt class="descname">setOffsetBySite</tt><big>(</big><em>site</em>, <em>value</em><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.setOffsetBySite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Changes the offset of the site specified.  Note that this can also be done with add, but the difference is that if the site is not in DefinedContexts, it will raise an exception.</p>
+<dt id="DefinedContexts.setOffsetBySite">
+<tt class="descname">setOffsetBySite</tt><big>(</big><em>site</em>, <em>value</em><big>)</big><a class="headerlink" href="#DefinedContexts.setOffsetBySite" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Changes the offset of the site specified.  Note that this can also be</blockquote>
+<p>done with add, but the difference is that if the site is not in
+DefinedContexts, it will raise an exception.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bSite</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -940,9 +1122,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.unfreezeIds">
-<tt class="descname">unfreezeIds</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.unfreezeIds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Restore keys to be the id() of the object they contain</p>
+<dt id="DefinedContexts.unfreezeIds">
+<tt class="descname">unfreezeIds</tt><big>(</big><big>)</big><a class="headerlink" href="#DefinedContexts.unfreezeIds" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Restore keys to be the id() of the object they contain</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -951,7 +1134,9 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">aObj</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bObj</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cObj</span><span class="p">,</span> <span class="mf">200</span><span class="p">)</span> <span class="c"># a location</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">oldKeys</span> <span class="o">=</span> <span class="n">aContexts</span><span class="o">.</span><span class="n">_definedContexts</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">oldKeys</span> <span class="o">=</span> <span class="n">aContexts</span><span class="o">.</span><span class="n">_definedContexts</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">oldLocations</span> <span class="o">=</span> <span class="n">aContexts</span><span class="o">.</span><span class="n">_locationKeys</span><span class="p">[:]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aContexts</span><span class="o">.</span><span class="n">freezeIds</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">newKeys</span> <span class="o">=</span> <span class="n">aContexts</span><span class="o">.</span><span class="n">_definedContexts</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
@@ -971,9 +1156,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.unwrapWeakref">
-<tt class="descname">unwrapWeakref</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.unwrapWeakref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Unwrap any and all weakrefs stored.</p>
+<dt id="DefinedContexts.unwrapWeakref">
+<tt class="descname">unwrapWeakref</tt><big>(</big><big>)</big><a class="headerlink" href="#DefinedContexts.unwrapWeakref" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Unwrap any and all weakrefs stored.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -994,9 +1180,10 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </dd></dl>
 
 <dl class="method">
-<dt id="music21.base.DefinedContexts.wrapWeakref">
-<tt class="descname">wrapWeakref</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.base.DefinedContexts.wrapWeakref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wrap any and all weakrefs stored.</p>
+<dt id="DefinedContexts.wrapWeakref">
+<tt class="descname">wrapWeakref</tt><big>(</big><big>)</big><a class="headerlink" href="#DefinedContexts.wrapWeakref" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Wrap any and all weakrefs stored.</blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="n">Music21Object</span><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bObj</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
@@ -1020,19 +1207,25 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 <div class="section" id="groups">
 <h2>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="music21.base.Groups">
+<dt id="Groups">
 <em class="property">
-class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Groups</tt><a class="headerlink" href="#music21.base.Groups" title="Permalink to this definition">¶</a></dt>
-<dd><p>A list of strings used to identify associations that an element might have. Enforces that all elements must be strings</p>
+class </em><tt class="descname">Groups</tt><a class="headerlink" href="#Groups" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>A list of strings used to identify associations that an element might</dt>
+<dd><p class="first">have. Enforces that all elements must be strings</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Groups</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
 <span class="go">&#39;hello&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="nc">GroupException</span>: <span class="n-Identifier">Only strings can be used as list names</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 <p>x.__init__(...) initializes x; see x.__class__.__doc__ for signature</p>
 <p>inherits from: list</p>
 </dd></dl>
@@ -1066,7 +1259,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 06, 2010.
+      Last updated on Jul 08, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

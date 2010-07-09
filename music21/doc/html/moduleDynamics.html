@@ -86,13 +86,14 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-music21.dynamics">
-<span id="moduledynamics"></span><h1>music21.dynamics<a class="headerlink" href="#module-music21.dynamics" title="Permalink to this headline">¶</a></h1>
-<p>Classes and functions for creating and manipulating dynamic symbols. Rather than subclasses, the <a title="music21.dynamics.Dynamic" class="reference internal" href="#music21.dynamics.Dynamic"><tt class="xref docutils literal"><span class="pre">Dynamic</span></tt></a> object is often specialized by parameters.</p>
+  <div class="section" id="music21-dynamics">
+<span id="moduledynamics"></span><h1>music21.dynamics<a class="headerlink" href="#music21-dynamics" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="music21.dynamics.dynamicStrFromDecimal">
-<tt class="descclassname">music21.dynamics.</tt><tt class="descname">dynamicStrFromDecimal</tt><big>(</big><em>n</em><big>)</big><a class="headerlink" href="#music21.dynamics.dynamicStrFromDecimal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a decimal from 0 to 1, return a string representing a dynamic with 0 being the softest (0.01 = &#8216;ppp&#8217;) and 1 being the loudest (0.9+ = &#8216;fff&#8217;) 0 returns &#8220;n&#8221; (niente), while ppp and fff are the loudest dynamics used.</p>
+<dt id="dynamicStrFromDecimal">
+<tt class="descname">dynamicStrFromDecimal</tt><big>(</big><em>n</em><big>)</big><a class="headerlink" href="#dynamicStrFromDecimal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a decimal from 0 to 1, return a string representing a dynamic
+with 0 being the softest (0.01 = &#8216;ppp&#8217;) and 1 being the loudest (0.9+ = &#8216;fff&#8217;)
+0 returns &#8220;n&#8221; (niente), while ppp and fff are the loudest dynamics used.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dynamics</span><span class="o">.</span><span class="n">dynamicStrFromDecimal</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
 <span class="go">&#39;p&#39;</span>
@@ -105,10 +106,11 @@
 <div class="section" id="dynamic">
 <h2>Dynamic<a class="headerlink" href="#dynamic" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="music21.dynamics.Dynamic">
+<dt id="Dynamic">
 <em class="property">
-class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">Dynamic</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#music21.dynamics.Dynamic" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descname">Dynamic</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#Dynamic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object representation of Dyanmics.</p>
+<blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pp1</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">Dynamic</span><span class="p">(</span><span class="s">&#39;pp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pp1</span><span class="o">.</span><span class="n">value</span>
@@ -117,20 +119,31 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <span class="go">&#39;pianissimo&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pp1</span><span class="o">.</span><span class="n">englishName</span>
 <span class="go">&#39;very soft&#39;</span>
-<span class="go">Dynamics can also be specified on a 0 to 1 scale with 1 being the</span>
-<span class="go">loudest (see dynamicStrFromDecimal() above)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pp2</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">Dynamic</span><span class="p">(</span><span class="mf">0.15</span><span class="p">)</span> <span class="c"># on 0 to 1 scale</span>
+</pre></div>
+</div>
+<p>Dynamics can also be specified on a 0 to 1 scale with 1 being the
+loudest (see dynamicStrFromDecimal() above)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pp2</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">Dynamic</span><span class="p">(</span><span class="mf">0.15</span><span class="p">)</span> <span class="c"># on 0 to 1 scale</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pp2</span><span class="o">.</span><span class="n">value</span>
 <span class="go">&#39;pp&#39;</span>
 </pre></div>
 </div>
-<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
+</blockquote>
+<p>inherits from: <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></p>
 <p><strong>Dynamic</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.dynamics.Dynamic.classSortOrder">
-<tt class="descname">classSortOrder</tt><a class="headerlink" href="#music21.dynamics.Dynamic.classSortOrder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Property which returns an number (int or otherwise) depending on the class of the Music21Object that represents a priority for an object based on its class alone &#8211; used as a tie for stream sorting in case two objects have the same offset and priority.  Lower numbers are sorted to the left of higher numbers.  For instance, Clef, KeySignature, TimeSignature all come (in that order) before Note. All undefined classes have classSortOrder of 20 &#8211; same as note.Note</p>
+<dt id="Dynamic.classSortOrder">
+<tt class="descname">classSortOrder</tt><a class="headerlink" href="#Dynamic.classSortOrder" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+Property which returns an number (int or otherwise)</blockquote>
+<p>depending on the class of the Music21Object that
+represents a priority for an object based on its class alone &#8211;
+used as a tie for stream sorting in case two objects have the
+same offset and priority.  Lower numbers are sorted to the left
+of higher numbers.  For instance, Clef, KeySignature, TimeSignature
+all come (in that order) before Note.</p>
+<p>All undefined classes have classSortOrder of 20 &#8211; same as note.Note</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">clef</span><span class="o">.</span><span class="n">TrebleClef</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span><span class="o">.</span><span class="n">classSortOrder</span>
@@ -138,30 +151,30 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ks</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">KeySignature</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ks</span><span class="o">.</span><span class="n">classSortOrder</span>
 <span class="go">1</span>
-<span class="go">New classes can define their own default classSortOrder</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">ExampleClass</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">Music21Object</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">classSortOrderDefault</span> <span class="o">=</span> <span class="mf">5</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ec1</span> <span class="o">=</span> <span class="n">ExampleClass</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ec1</span><span class="o">.</span><span class="n">classSortOrder</span>
-<span class="go">5</span>
 </pre></div>
 </div>
+<p>New classes can define their own default classSortOrder
+&gt;&gt;&gt; class ExampleClass(base.Music21Object):
+...     classSortOrderDefault = 5
+...
+&gt;&gt;&gt; ec1 = ExampleClass()
+&gt;&gt;&gt; ec1.classSortOrder
+5</p>
 </dd></dl>
 
 <p>Attributes without Documentation: <cite>posPlacement</cite>, <cite>value</cite>, <cite>posRelativeY</cite>, <cite>posDefaultX</cite>, <cite>posDefaultY</cite>, <cite>longName</cite>, <cite>posRelativeX</cite>, <cite>englishName</cite></p>
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
+<p>Attributes inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">id</span></tt>, <tt class="xref docutils literal"><span class="pre">groups</span></tt></p>
 </blockquote>
 <p><strong>Dynamic</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.dynamics.Dynamic.musicxml">
-<tt class="descname">musicxml</tt><a class="headerlink" href="#music21.dynamics.Dynamic.musicxml" title="Permalink to this definition">¶</a></dt>
+<dt id="Dynamic.musicxml">
+<tt class="descname">musicxml</tt><a class="headerlink" href="#Dynamic.musicxml" title="Permalink to this definition">¶</a></dt>
 <dd>Provide a complete MusicXML representation.</dd></dl>
 
 <dl class="attribute">
-<dt id="music21.dynamics.Dynamic.mx">
-<tt class="descname">mx</tt><a class="headerlink" href="#music21.dynamics.Dynamic.mx" title="Permalink to this definition">¶</a></dt>
+<dt id="Dynamic.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#Dynamic.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a musicxml.Direction object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">Dynamic</span><span class="p">(</span><span class="s">&#39;ppp&#39;</span><span class="p">)</span>
@@ -175,32 +188,32 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 </div>
 </dd></dl>
 
-<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
+<p>Properties inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">duration</span></tt>, <tt class="xref docutils literal"><span class="pre">offset</span></tt>, <tt class="xref docutils literal"><span class="pre">parent</span></tt>, <tt class="xref docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 <p><strong>Dynamic</strong> <strong>methods</strong></p>
 <blockquote>
-Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySite"><tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySiteId" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySiteId"><tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></blockquote>
+Methods inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">addContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocation()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSites()</span></tt>, <tt class="xref docutils literal"><span class="pre">hasContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">isClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt>, <tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">show()</span></tt>, <tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">write()</span></tt></blockquote>
 </dd></dl>
 
 </div>
 <div class="section" id="wedge">
 <h2>Wedge<a class="headerlink" href="#wedge" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="music21.dynamics.Wedge">
+<dt id="Wedge">
 <em class="property">
-class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">Wedge</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#music21.dynamics.Wedge" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descname">Wedge</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#Wedge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object model of crescendeo/decrescendo wedges.</p>
-<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
+<p>inherits from: <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></p>
 <p><strong>Wedge</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>posPlacement</cite>, <cite>spread</cite>, <cite>type</cite></p>
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
+<p>Attributes inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt>, <tt class="xref docutils literal"><span class="pre">id</span></tt>, <tt class="xref docutils literal"><span class="pre">groups</span></tt></p>
 </blockquote>
 <p><strong>Wedge</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="music21.dynamics.Wedge.mx">
-<tt class="descname">mx</tt><a class="headerlink" href="#music21.dynamics.Wedge.mx" title="Permalink to this definition">¶</a></dt>
+<dt id="Wedge.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#Wedge.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a musicxml.Direction object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">Wedge</span><span class="p">()</span>
@@ -213,11 +226,11 @@ class </em><tt class="descclassname">music21.dynamics.</tt><tt class="descname">
 </div>
 </dd></dl>
 
-<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
+<p>Properties inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">duration</span></tt>, <tt class="xref docutils literal"><span class="pre">offset</span></tt>, <tt class="xref docutils literal"><span class="pre">parent</span></tt>, <tt class="xref docutils literal"><span class="pre">priority</span></tt></p>
 </blockquote>
 <p><strong>Wedge</strong> <strong>methods</strong></p>
 <blockquote>
-Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySite"><tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySiteId" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySiteId"><tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></blockquote>
+Methods inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">addContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocation()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSites()</span></tt>, <tt class="xref docutils literal"><span class="pre">hasContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">isClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt>, <tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">show()</span></tt>, <tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">write()</span></tt></blockquote>
 </dd></dl>
 
 </div>
@@ -249,7 +262,7 @@ Methods inherited from <a title="music21.base.Music21Object" class="reference ex
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 06, 2010.
+      Last updated on Jul 08, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

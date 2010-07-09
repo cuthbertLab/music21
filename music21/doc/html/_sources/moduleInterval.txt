@@ -7,308 +7,364 @@ music21.interval
 
 .. module:: music21.interval
 
-This module defines various types of interval objects. Fundamental classes are :class:`~music21.interval.Interval`, :class:`~music21.interval.DiatonicInterval`, and :class:`~music21.interval.ChromaticInterval`. Numerous utility functions are provided for processing and generating intervals. 
+This module defines various types of interval objects. Fundamental classes are :class:`~music21.interval.Interval`, :class:`~music21.interval.DiatonicInterval`, and :class:`~music21.interval.ChromaticInterval`.
+ 
+ Numerous utility functions are provided for processing and generating intervals.
+ 
+ 
 
 
 .. function:: notesToChromatic(n1, n2)
 
-    Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.ChromaticInterval` object. 
-
-    >>> from music21 import note
-    >>> aNote = note.Note('c4')
-    >>> bNote = note.Note('g#5')
-    >>> notesToChromatic(aNote, bNote)
-    <music21.interval.ChromaticInterval 20> 
+    Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.ChromaticInterval` object.
+     
+     >>> from music21 import note
+     >>> aNote = note.Note('c4')
+     >>> bNote = note.Note('g#5')
+     >>> notesToChromatic(aNote, bNote)
+     <music21.interval.ChromaticInterval 20>
+     
+ 
 
 .. function:: intervalsToDiatonic(gInt, cInt)
 
-    Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a :class:`~music21.interval.DiatonicInterval`. 
-
-    >>> aInterval = GenericInterval('descending fifth')
-    >>> bInterval = ChromaticInterval(-7)
-    >>> cInterval = intervalsToDiatonic(aInterval, bInterval)
-    >>> cInterval
-    <music21.interval.DiatonicInterval P5> 
+    Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a :class:`~music21.interval.DiatonicInterval`.    
+ 
+     >>> aInterval = GenericInterval('descending fifth')
+     >>> bInterval = ChromaticInterval(-7)
+     >>> cInterval = intervalsToDiatonic(aInterval, bInterval)
+     >>> cInterval
+     <music21.interval.DiatonicInterval P5>
+     
+ 
 
 .. function:: notesToInterval(n1, n2=None)
 
-    Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments. 
-
-    >>> from music21 import note
-    >>> aNote = note.Note('c4')
-    >>> bNote = note.Note('g5')
-    >>> aInterval = notesToInterval(aNote, bNote)
-    >>> aInterval
-    <music21.interval.Interval P12> 
-    >>> bInterval = Interval(noteStart=aNote, noteEnd=bNote)
-    >>> aInterval.niceName == bInterval.niceName
-    True 
+    Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments.
+ 
+     >>> from music21 import note
+     >>> aNote = note.Note('c4')
+     >>> bNote = note.Note('g5')
+     >>> aInterval = notesToInterval(aNote, bNote)
+     >>> aInterval
+     <music21.interval.Interval P12>
+ 
+     >>> bInterval = Interval(noteStart=aNote, noteEnd=bNote)
+     >>> aInterval.niceName == bInterval.niceName
+     True
+     
+ 
 
 .. function:: convertDiatonicNumberToStep(dn)
 
     Convert a diatonic number to a step name and a octave integer. 
-
-    >>> convertDiatonicNumberToStep(15)
-    ('C', 2) 
-    >>> convertDiatonicNumberToStep(23)
-    ('D', 3) 
-    >>> convertDiatonicNumberToStep(0)
-    ('C', 0) 
-    >>> convertDiatonicNumberToStep(1)
-    ('C', 0) 
-    >>> convertDiatonicNumberToStep(2)
-    ('D', 0) 
-    >>> convertDiatonicNumberToStep(3)
-    ('E', 0) 
-    >>> convertDiatonicNumberToStep(4)
-    ('F', 0) 
-    >>> convertDiatonicNumberToStep(5)
-    ('G', 0) 
+ 
+     >>> convertDiatonicNumberToStep(15)
+     ('C', 2)
+     >>> convertDiatonicNumberToStep(23)
+     ('D', 3)
+     >>> convertDiatonicNumberToStep(0)
+     ('C', 0)
+     >>> convertDiatonicNumberToStep(1)
+     ('C', 0)
+     >>> convertDiatonicNumberToStep(2)
+     ('D', 0)
+     >>> convertDiatonicNumberToStep(3)
+     ('E', 0)
+     >>> convertDiatonicNumberToStep(4)
+     ('F', 0)
+     >>> convertDiatonicNumberToStep(5)
+     ('G', 0)
+     
+ 
 
 .. function:: convertGeneric(value)
 
-    Convert an interval specified in terms of its name (second, third) into an integer. If integers are passed, assume the are correct. 
-
-    >>> convertGeneric(3)
-    3 
-    >>> convertGeneric('third')
-    3 
-    >>> convertGeneric('3rd')
-    3 
-    >>> convertGeneric('octave')
-    8 
-    >>> convertGeneric('twelfth')
-    12 
-    >>> convertGeneric('descending twelfth')
-    -12 
-    >>> convertGeneric(12)
-    12 
-    >>> convertGeneric(-12)
-    -12 
+    Convert an interval specified in terms of its name (second, third) into an integer. If integers are passed, assume the are correct.
+ 
+     >>> convertGeneric(3)
+     3
+     >>> convertGeneric('third')
+     3
+     >>> convertGeneric('3rd')
+     3
+     >>> convertGeneric('octave')
+     8
+     >>> convertGeneric('twelfth')
+     12
+     >>> convertGeneric('descending twelfth')
+     -12
+     >>> convertGeneric(12)
+     12
+     >>> convertGeneric(-12)
+     -12
+     
+ 
 
 .. function:: convertSemitoneToSpecifierGeneric(count)
 
-    Given a number of semitones, return a default diatonic specifier. 
-
-    >>> convertSemitoneToSpecifierGeneric(0)
-    ('P', 1) 
-    >>> convertSemitoneToSpecifierGeneric(-2)
-    ('M', -2) 
-    >>> convertSemitoneToSpecifierGeneric(1)
-    ('m', 2) 
-    >>> convertSemitoneToSpecifierGeneric(7)
-    ('P', 5) 
-    >>> convertSemitoneToSpecifierGeneric(11)
-    ('M', 7) 
-    >>> convertSemitoneToSpecifierGeneric(12)
-    ('P', 8) 
-    >>> convertSemitoneToSpecifierGeneric(13)
-    ('m', 9) 
-    >>> convertSemitoneToSpecifierGeneric(-15)
-    ('m', -10) 
-    >>> convertSemitoneToSpecifierGeneric(24)
-    ('P', 15) 
+    Given a number of semitones, return a default diatonic specifier.
+ 
+     >>> convertSemitoneToSpecifierGeneric(0)
+     ('P', 1)
+     >>> convertSemitoneToSpecifierGeneric(-2)
+     ('M', -2)
+     >>> convertSemitoneToSpecifierGeneric(1)
+     ('m', 2)
+     >>> convertSemitoneToSpecifierGeneric(7)
+     ('P', 5)
+     >>> convertSemitoneToSpecifierGeneric(11)
+     ('M', 7)
+     >>> convertSemitoneToSpecifierGeneric(12)
+     ('P', 8)
+     >>> convertSemitoneToSpecifierGeneric(13)
+     ('m', 9)
+     >>> convertSemitoneToSpecifierGeneric(-15)
+     ('m', -10)
+     >>> convertSemitoneToSpecifierGeneric(24)
+     ('P', 15)
+     
+ 
 
 .. function:: convertSpecifier(specifier)
 
-    Given an integer or a string, return the integer for the appropriate specifier. This permits specifiers to specified in a flexible manner. 
-
-    >>> convertSpecifier(3)
-    (3, 'm') 
-    >>> convertSpecifier('p')
-    (1, 'P') 
-    >>> convertSpecifier('P')
-    (1, 'P') 
-    >>> convertSpecifier('M')
-    (2, 'M') 
-    >>> convertSpecifier('major')
-    (2, 'M') 
-    >>> convertSpecifier('m')
-    (3, 'm') 
-    >>> convertSpecifier('Augmented')
-    (4, 'A') 
-    >>> convertSpecifier('a')
-    (4, 'A') 
-    >>> convertSpecifier(None)
-    (None, None) 
+    Given an integer or a string, return the integer for the appropriate specifier. This permits specifiers to specified in a flexible manner.
+ 
+     >>> convertSpecifier(3)
+     (3, 'm')
+     >>> convertSpecifier('p')
+     (1, 'P')
+     >>> convertSpecifier('P')
+     (1, 'P')
+     >>> convertSpecifier('M')
+     (2, 'M')
+     >>> convertSpecifier('major')
+     (2, 'M')
+     >>> convertSpecifier('m')
+     (3, 'm')
+     >>> convertSpecifier('Augmented')
+     (4, 'A')
+     >>> convertSpecifier('a')
+     (4, 'A')
+     >>> convertSpecifier(None)
+     (None, None)
+     
+ 
 
 .. function:: convertStaffDistanceToInterval(staffDist)
 
-    Returns the interval number from the given staff distance. 
-
-    >>> convertStaffDistanceToInterval(3)
-    4 
-    >>> convertStaffDistanceToInterval(7)
-    8 
+    Returns the interval number from the given staff distance.
+ 
+     >>> convertStaffDistanceToInterval(3)
+     4
+     >>> convertStaffDistanceToInterval(7)
+     8
+     
+ 
 
 .. function:: getAbsoluteHigherNote(note1, note2)
 
-    Given two :class:`~music21.note.Note` objects, returns the higher note based on actual pitch. If both pitches are the same, returns the first note given. 
-
-    >>> from music21 import note
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d--3')
-    >>> getAbsoluteHigherNote(aNote, bNote)
-    <music21.note.Note C#> 
-
-    
+    Given two :class:`~music21.note.Note` objects, returns the higher note based on actual pitch.
+     If both pitches are the same, returns the first note given.
+ 
+     >>> from music21 import note
+     >>> aNote = note.Note('c#3')
+     >>> bNote = note.Note('d--3')
+     >>> getAbsoluteHigherNote(aNote, bNote)
+     <music21.note.Note C#>
+ 
+     
+ 
 
 .. function:: getAbsoluteLowerNote(note1, note2)
 
-    Given two :class:`~music21.note.Note` objects, returns the lower note based on actual pitch. If both pitches are the same, returns the first note given. 
-
-    >>> from music21 import note
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d--3')
-    >>> getAbsoluteLowerNote(aNote, bNote)
-    <music21.note.Note D--> 
+    Given two :class:`~music21.note.Note` objects, returns the lower note based on actual pitch.
+     If both pitches are the same, returns the first note given.
+ 
+     >>> from music21 import note
+     >>> aNote = note.Note('c#3')
+     >>> bNote = note.Note('d--3')
+     >>> getAbsoluteLowerNote(aNote, bNote)
+     <music21.note.Note D-->
+     
+ 
 
 .. function:: getWrittenHigherNote(note1, note2)
 
-    Given two :class:`~music21.note.Note` or :class:`~music21.pitch.Pitch` objects, this function returns the higher object based on diatonic note numbers. Returns the note higher in pitch if the diatonic number is the same, or the first note if pitch is also the same. 
-
-    >>> from music21 import pitch
-    >>> cis = pitch.Pitch("C#")
-    >>> deses = pitch.Pitch("D--")
-    >>> higher = getWrittenHigherNote(cis, deses)
-    >>> higher is deses
-    True 
-    >>> from music21 import note
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d-3')
-    >>> getWrittenHigherNote(aNote, bNote)
-    <music21.note.Note D-> 
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d--3')
-    >>> getWrittenHigherNote(aNote, bNote)
-    <music21.note.Note D--> 
+    Given two :class:`~music21.note.Note` or :class:`~music21.pitch.Pitch` objects, this function returns the higher object based on diatonic note
+     numbers. Returns the note higher in pitch if the diatonic number is
+     the same, or the first note if pitch is also the same.
+ 
+     >>> from music21 import pitch
+     >>> cis = pitch.Pitch("C#")
+     >>> deses = pitch.Pitch("D--")
+     >>> higher = getWrittenHigherNote(cis, deses)
+     >>> higher is deses
+     True
+ 
+     >>> from music21 import note
+     >>> aNote = note.Note('c#3')
+     >>> bNote = note.Note('d-3')
+     >>> getWrittenHigherNote(aNote, bNote)
+     <music21.note.Note D->
+ 
+     >>> aNote = note.Note('c#3')
+     >>> bNote = note.Note('d--3')
+     >>> getWrittenHigherNote(aNote, bNote)
+     <music21.note.Note D-->
+     
+ 
 
 .. function:: getWrittenLowerNote(note1, note2)
 
-    Given two :class:`~music21.note.Note` objects, returns the lower note based on diatonic note number. Returns the note lower in pitch if the diatonic number is the same, or the first note if pitch is also the same. 
-
-    >>> from music21 import note
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d--3')
-    >>> getWrittenLowerNote(aNote, bNote)
-    <music21.note.Note C#> 
-    >>> from music21 import note
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d-3')
-    >>> getWrittenLowerNote(aNote, bNote)
-    <music21.note.Note C#> 
+    Given two :class:`~music21.note.Note` objects, returns the lower note based on diatonic note
+     number. Returns the note lower in pitch if the diatonic number is
+     the same, or the first note if pitch is also the same.
+ 
+     >>> from music21 import note
+     >>> aNote = note.Note('c#3')
+     >>> bNote = note.Note('d--3')
+     >>> getWrittenLowerNote(aNote, bNote)
+     <music21.note.Note C#>
+ 
+     >>> from music21 import note
+     >>> aNote = note.Note('c#3')
+     >>> bNote = note.Note('d-3')
+     >>> getWrittenLowerNote(aNote, bNote)
+     <music21.note.Note C#>
+     
+ 
 
 .. function:: notesToGeneric(n1, n2)
 
-    Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.GenericInterval` object. 
-
-    >>> from music21 import note
-    >>> aNote = note.Note('c4')
-    >>> bNote = note.Note('g5')
-    >>> aInterval = notesToGeneric(aNote, bNote)
-    >>> aInterval
-    <music21.interval.GenericInterval 12> 
-
-    
+    Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.GenericInterval` object.
+     
+     >>> from music21 import note
+     >>> aNote = note.Note('c4')
+     >>> bNote = note.Note('g5')
+     >>> aInterval = notesToGeneric(aNote, bNote)
+     >>> aInterval
+     <music21.interval.GenericInterval 12>
+ 
+     
+ 
 
 .. function:: stringToInterval(string)
 
-    Given an interval string (such as "P5", "m3", "A2") return a :class:`~music21.interval.Interval` object. 
-
-    >>> aInterval = stringToInterval('P5')
-    >>> aInterval
-    <music21.interval.Interval P5> 
-    >>> aInterval = stringToInterval('m3')
-    >>> aInterval
-    <music21.interval.Interval m3> 
+    Given an interval string (such as "P5", "m3", "A2") return a :class:`~music21.interval.Interval` object.
+ 
+     >>> aInterval = stringToInterval('P5')
+     >>> aInterval
+     <music21.interval.Interval P5>
+     >>> aInterval = stringToInterval('m3')
+     >>> aInterval
+     <music21.interval.Interval m3>
+     
+ 
 
 .. function:: transposeNote(note1, intervalString)
 
     Given a :class:`~music21.note.Note` and a interval string (such as 'P5') or an Interval object, return a new Note object at the appropriate pitch level. 
-
-    >>> from music21 import note
-    >>> aNote = note.Note('c4')
-    >>> bNote = transposeNote(aNote, 'p5')
-    >>> bNote
-    <music21.note.Note G> 
-    >>> aNote = note.Note('f#4')
-    >>> bNote = transposeNote(aNote, 'm2')
-    >>> bNote
-    <music21.note.Note G> 
-
-    
+ 
+     >>> from music21 import note
+     >>> aNote = note.Note('c4')
+     >>> bNote = transposeNote(aNote, 'p5')
+     >>> bNote
+     <music21.note.Note G>
+ 
+     >>> aNote = note.Note('f#4')
+     >>> bNote = transposeNote(aNote, 'm2')
+     >>> bNote
+     <music21.note.Note G>
+ 
+     
+ 
 
 .. function:: transposePitch(pitch1, interval1)
 
     Given a :class:`~music21.pitch.Pitch` and a :class:`~music21.interval.Interval` object, return a new Pitch object at the appropriate pitch level. 
-
-    >>> from music21 import pitch
-    >>> aPitch = pitch.Pitch('C4')
-    >>> aInterval = Interval('P5')
-    >>> bPitch = transposePitch(aPitch, aInterval)
-    >>> bPitch
-    G4 
-    >>> bInterval = stringToInterval('P-5')
-    >>> cPitch = transposePitch(aPitch, bInterval)
-    >>> cPitch
-    F3 
+ 
+     >>> from music21 import pitch
+     >>> aPitch = pitch.Pitch('C4')
+     >>> aInterval = Interval('P5')
+     >>> bPitch = transposePitch(aPitch, aInterval)
+     >>> bPitch
+     G4
+     >>> bInterval = stringToInterval('P-5')
+     >>> cPitch = transposePitch(aPitch, bInterval)
+     >>> cPitch
+     F3
+     
+ 
 
 Interval
 --------
 
 .. class:: Interval(*arguments, **keywords)
 
-    An Interval class that encapsulates both a chromatic and diatonic intervals all in one model. The interval is specified either as named arguments, a :class:`~music21.interval.DiatonicInterval` and a :class:`~music21.interval.ChromaticInterval`, or two :class:`~music21.note.Note` objects, from which both a ChromaticInterval and DiatonicInterval are derived. 
-
-    >>> from music21 import note
-    >>> n1 = note.Note('c3')
-    >>> n2 = note.Note('c5')
-    >>> aInterval = Interval(noteStart=n1, noteEnd=n2)
-    >>> aInterval
-    <music21.interval.Interval P15> 
-
-    
-
-    >>> from music21 import note
-    >>> n1 = note.Note('c3')
-    >>> n2 = note.Note('g3')
-    >>> aInterval = Interval(noteStart=n1, noteEnd=n2)
-    >>> aInterval
-    <music21.interval.Interval P5> 
-    >>> aInterval = Interval(noteStart=n1, noteEnd=None)
-    Traceback (most recent call last): 
-    IntervalException: two or zero Note classes must be defined 
-    >>> aInterval = DiatonicInterval('major', 'third')
-    >>> bInterval = ChromaticInterval(4)
-    >>> cInterval = Interval(diatonic=aInterval, chromatic=bInterval)
-    >>> cInterval
-    <music21.interval.Interval M3> 
-    >>> cInterval = Interval(diatonic=aInterval, chromatic=None)
-    Traceback (most recent call last): 
-    IntervalException: either both or zero diatonic and chromatic classes must be defined 
-    >>> aInterval = Interval('m3')
-    >>> aInterval
-    <music21.interval.Interval m3> 
-    >>> aInterval = Interval('M3')
-    >>> aInterval
-    <music21.interval.Interval M3> 
-    >>> aInterval = Interval('p5')
-    >>> aInterval
-    <music21.interval.Interval P5> 
-    >>> aInterval = Interval('half')
-    >>> aInterval
-    <music21.interval.Interval m2> 
-    >>> aInterval = Interval('-h')
-    >>> aInterval
-    <music21.interval.Interval m-2> 
-    >>> aInterval = Interval(3)
-    >>> aInterval
-    <music21.interval.Interval m3> 
-    >>> aInterval = Interval(7)
-    >>> aInterval
-    <music21.interval.Interval P5> 
+    An Interval class that encapsulates both a chromatic and diatonic intervals all in one model. 
+ 
+      The interval is specified either as named arguments, a :class:`~music21.interval.DiatonicInterval` and a :class:`~music21.interval.ChromaticInterval`, or two :class:`~music21.note.Note` objects, from which both a ChromaticInterval and DiatonicInterval are derived. 
+ 
+     >>> from music21 import note
+     >>> n1 = note.Note('c3')
+     >>> n2 = note.Note('c5')
+     >>> aInterval = Interval(noteStart=n1, noteEnd=n2)
+     >>> aInterval
+     <music21.interval.Interval P15>
+     
+ 
 
     
+         >>> from music21 import note
+         >>> n1 = note.Note('c3')
+         >>> n2 = note.Note('g3')
+         >>> aInterval = Interval(noteStart=n1, noteEnd=n2)
+         >>> aInterval
+         <music21.interval.Interval P5>
+ 
+         >>> aInterval = Interval(noteStart=n1, noteEnd=None)
+         Traceback (most recent call last):
+         IntervalException: two or zero Note classes must be defined
+ 
+         >>> aInterval = DiatonicInterval('major', 'third')
+         >>> bInterval = ChromaticInterval(4)
+         >>> cInterval = Interval(diatonic=aInterval, chromatic=bInterval)
+         >>> cInterval
+         <music21.interval.Interval M3>
+ 
+         >>> cInterval = Interval(diatonic=aInterval, chromatic=None)
+         Traceback (most recent call last):
+         IntervalException: either both or zero diatonic and chromatic classes must be defined
+ 
+         >>> aInterval = Interval('m3')
+         >>> aInterval
+         <music21.interval.Interval m3>
+         >>> aInterval = Interval('M3')
+         >>> aInterval
+         <music21.interval.Interval M3>
+         >>> aInterval = Interval('p5')
+         >>> aInterval
+         <music21.interval.Interval P5>
+ 
+         >>> aInterval = Interval('half')
+         >>> aInterval
+         <music21.interval.Interval m2>
+ 
+         >>> aInterval = Interval('-h')
+         >>> aInterval
+         <music21.interval.Interval m-2>
+         
+         >>> aInterval = Interval(3)
+         >>> aInterval
+         <music21.interval.Interval m3>
+ 
+         >>> aInterval = Interval(7)
+         >>> aInterval
+         <music21.interval.Interval P5>
+ 
+         
+ 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -322,82 +378,95 @@ Interval
 
         .. attribute:: complement
 
-            Return a new Interval object that is the complement of this Interval. 
-
-            >>> aInterval = Interval('M3')
-            >>> bInterval = aInterval.complement
-            >>> bInterval
-            <music21.interval.Interval m6> 
+            Return a new Interval object that is the complement of this Interval.
+ 
+         >>> aInterval = Interval('M3')
+         >>> bInterval = aInterval.complement
+         >>> bInterval
+         <music21.interval.Interval m6>
+         
+ 
 
         .. attribute:: intervalClass
 
-            Return the interval class from the chromatic interval. 
-
-            >>> aInterval = Interval('M3')
-            >>> aInterval.intervalClass
-            4 
+            Return the interval class from the chromatic interval.
+ 
+         >>> aInterval = Interval('M3')
+         >>> aInterval.intervalClass
+         4
+         
+ 
 
         .. attribute:: noteEnd
 
-            Assuming this Interval has been defined, set the end note (_noteEnd) to a new value; this will adjust the value of the start note (_noteStart). 
-
-            >>> from music21 import note
-            >>> aInterval = Interval('M3')
-            >>> aInterval.noteEnd = note.Note('e4')
-            >>> aInterval.noteStart.nameWithOctave
-            'C4' 
-            >>> aInterval = Interval('m2')
-            >>> aInterval.noteEnd = note.Note('A#3')
-            >>> aInterval.noteStart.nameWithOctave
-            'G##3' 
-            >>> n1 = note.Note('g#3')
-            >>> n2 = note.Note('c3')
-            >>> aInterval = Interval(n1, n2)
-            >>> aInterval.directedName # downward augmented fifth
-            'A-5' 
-            >>> aInterval.noteEnd = note.Note('c4')
-            >>> aInterval.noteStart.nameWithOctave
-            'G#4' 
-            >>> aInterval = Interval('M3')
-            >>> aInterval.noteEnd = note.Note('A-3')
-            >>> aInterval.noteStart.nameWithOctave
-            'F-3' 
-
-            
+            Assuming this Interval has been defined, set the end note (_noteEnd) to a new value; this will adjust the value of the start note (_noteStart).
+ 
+         >>> from music21 import note
+         >>> aInterval = Interval('M3')
+         >>> aInterval.noteEnd = note.Note('e4')
+         >>> aInterval.noteStart.nameWithOctave
+         'C4'
+ 
+         >>> aInterval = Interval('m2')
+         >>> aInterval.noteEnd = note.Note('A#3')
+         >>> aInterval.noteStart.nameWithOctave
+         'G##3'
+ 
+         >>> n1 = note.Note('g#3')
+         >>> n2 = note.Note('c3')
+         >>> aInterval = Interval(n1, n2)
+         >>> aInterval.directedName # downward augmented fifth
+         'A-5'
+         >>> aInterval.noteEnd = note.Note('c4')
+         >>> aInterval.noteStart.nameWithOctave
+         'G#4'
+ 
+         >>> aInterval = Interval('M3')
+         >>> aInterval.noteEnd = note.Note('A-3')
+         >>> aInterval.noteStart.nameWithOctave
+         'F-3'
+ 
+          
+ 
 
         .. attribute:: noteStart
 
-            Assuming this Interval has been defined, set the start note (_noteStart) to a new value; this will adjust the value of the end note (_noteEnd). 
-
-            >>> from music21 import note
-            >>> aInterval = Interval('M3')
-            >>> aInterval.noteStart = note.Note('c4')
-            >>> aInterval.noteEnd.nameWithOctave
-            'E4' 
-            >>> n1 = note.Note('c3')
-            >>> n2 = note.Note('g#3')
-            >>> aInterval = Interval(n1, n2)
-            >>> aInterval.name
-            'A5' 
-            >>> aInterval.noteStart = note.Note('g4')
-            >>> aInterval.noteEnd.nameWithOctave
-            'D#5' 
-            >>> aInterval = Interval('-M3')
-            >>> aInterval.noteStart = note.Note('c4')
-            >>> aInterval.noteEnd.nameWithOctave
-            'A-3' 
-            >>> aInterval = Interval('M-2')
-            >>> aInterval.noteStart = note.Note('A#3')
-            >>> aInterval.noteEnd.nameWithOctave
-            'G#3' 
-            >>> aInterval = Interval('h')
-            >>> aInterval.directedName
-            'm2' 
-            >>> aInterval.noteStart = note.Note('F#3')
-            >>> aInterval.noteEnd.nameWithOctave
-            'G3' 
-
-            
+            Assuming this Interval has been defined, set the start note (_noteStart) to a new value; this will adjust the value of the end note (_noteEnd).
+         
+         >>> from music21 import note
+         >>> aInterval = Interval('M3')
+         >>> aInterval.noteStart = note.Note('c4')
+         >>> aInterval.noteEnd.nameWithOctave
+         'E4'
+ 
+         >>> n1 = note.Note('c3')
+         >>> n2 = note.Note('g#3')
+         >>> aInterval = Interval(n1, n2)
+         >>> aInterval.name
+         'A5'
+         >>> aInterval.noteStart = note.Note('g4')
+         >>> aInterval.noteEnd.nameWithOctave
+         'D#5'
+ 
+         >>> aInterval = Interval('-M3')
+         >>> aInterval.noteStart = note.Note('c4')
+         >>> aInterval.noteEnd.nameWithOctave
+         'A-3'
+ 
+         >>> aInterval = Interval('M-2')
+         >>> aInterval.noteStart = note.Note('A#3')
+         >>> aInterval.noteEnd.nameWithOctave
+         'G#3'
+ 
+         >>> aInterval = Interval('h')
+         >>> aInterval.directedName
+         'm2'
+         >>> aInterval.noteStart = note.Note('F#3')
+         >>> aInterval.noteEnd.nameWithOctave
+         'G3'
+ 
+         
+ 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -405,42 +474,48 @@ Interval
 
         .. method:: reinit()
 
-            Reinitialize the internal interval objects in case something has changed. Called during __init__ to assign attributes. 
+            Reinitialize the internal interval objects in case something has changed. Called during __init__ to assign attributes.
+         
+ 
 
         .. method:: reverse()
 
             Return an reversed version of this interval. If given Notes, these notes are reversed. 
-
-            >>> from music21 import note
-            >>> n1 = note.Note('c3')
-            >>> n2 = note.Note('g3')
-            >>> aInterval = Interval(noteStart=n1, noteEnd=n2)
-            >>> aInterval
-            <music21.interval.Interval P5> 
-            >>> bInterval = aInterval.reverse()
-            >>> bInterval
-            <music21.interval.Interval P-5> 
-            >>> bInterval.noteStart == aInterval.noteEnd
-            True 
-            >>> aInterval = Interval('m3')
-            >>> aInterval.reverse()
-            <music21.interval.Interval m-3> 
+ 
+         >>> from music21 import note
+         >>> n1 = note.Note('c3')
+         >>> n2 = note.Note('g3')
+         >>> aInterval = Interval(noteStart=n1, noteEnd=n2)
+         >>> aInterval
+         <music21.interval.Interval P5>
+         >>> bInterval = aInterval.reverse()
+         >>> bInterval
+         <music21.interval.Interval P-5>
+         >>> bInterval.noteStart == aInterval.noteEnd
+         True
+         
+         >>> aInterval = Interval('m3')
+         >>> aInterval.reverse()
+         <music21.interval.Interval m-3>
+         
+ 
 
         .. method:: transposePitch(p, reverse=False)
 
-            Given a Pitch, return a new, transposed Pitch, that is transformed according to this Interval. 
-
-            >>> from music21 import pitch
-            >>> p1 = pitch.Pitch('a#')
-            >>> i = Interval('m3')
-            >>> p2 = i.transposePitch(p1)
-            >>> p2
-            C#5 
-            >>> p2 = i.transposePitch(p1, reverse=True)
-            >>> p2
-            F##4 
-
-            
+            Given a Pitch, return a new, transposed Pitch, that is transformed according to this Interval.
+ 
+         >>> from music21 import pitch
+         >>> p1 = pitch.Pitch('a#')
+         >>> i = Interval('m3')
+         >>> p2 = i.transposePitch(p1)
+         >>> p2
+         C#5
+         >>> p2 = i.transposePitch(p1, reverse=True)
+         >>> p2
+         F##4
+ 
+         
+ 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocationBySite`, :meth:`~music21.base.Music21Object.removeLocationBySiteId`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -451,20 +526,22 @@ ChromaticInterval
 .. class:: ChromaticInterval(value)
 
     Chromatic interval class. Unlike a Diatonic interval, this Interval class treats interval spaces in half-steps. 
+ 
+     
+ 
 
     
-
-    
-
-    >>> aInterval = ChromaticInterval(-14)
-    >>> aInterval.semitones
-    -14 
-    >>> aInterval.undirected
-    14 
-    >>> aInterval.mod12
-    10 
-    >>> aInterval.intervalClass
-    2 
+         >>> aInterval = ChromaticInterval(-14)
+         >>> aInterval.semitones
+         -14
+         >>> aInterval.undirected
+         14
+         >>> aInterval.mod12
+         10
+         >>> aInterval.intervalClass
+         2
+         
+ 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -480,30 +557,38 @@ ChromaticInterval
 
         .. method:: getDiatonic()
 
-            Given a Chromatic interval, return a Diatonic interval object. While there is more than one Generic Interval for any given chromatic interval, this is needed to to permit easy chromatic specification of Interval objects. 
-
-            >>> aInterval = ChromaticInterval(5)
-            >>> aInterval.getDiatonic()
-            <music21.interval.DiatonicInterval P4> 
-            >>> aInterval = ChromaticInterval(7)
-            >>> aInterval.getDiatonic()
-            <music21.interval.DiatonicInterval P5> 
-            >>> aInterval = ChromaticInterval(11)
-            >>> aInterval.getDiatonic()
-            <music21.interval.DiatonicInterval M7> 
-
-            
+            Given a Chromatic interval, return a Diatonic interval object. 
+         
+         While there is more than one Generic Interval for any given chromatic interval, this is needed to to permit easy chromatic specification of Interval objects.
+ 
+         >>> aInterval = ChromaticInterval(5)
+         >>> aInterval.getDiatonic()
+         <music21.interval.DiatonicInterval P4>
+ 
+         >>> aInterval = ChromaticInterval(7)
+         >>> aInterval.getDiatonic()
+         <music21.interval.DiatonicInterval P5>
+ 
+         >>> aInterval = ChromaticInterval(11)
+         >>> aInterval.getDiatonic()
+         <music21.interval.DiatonicInterval M7>
+ 
+         
+ 
 
         .. method:: reverse()
 
-            Return an inverted interval, that is, reversing the direction. 
-
-            >>> aInterval = ChromaticInterval(-14)
-            >>> aInterval.reverse()
-            <music21.interval.ChromaticInterval 14> 
-            >>> aInterval = ChromaticInterval(3)
-            >>> aInterval.reverse()
-            <music21.interval.ChromaticInterval -3> 
+            Return an inverted interval, that is, reversing the direction.
+ 
+         >>> aInterval = ChromaticInterval(-14)
+         >>> aInterval.reverse()
+         <music21.interval.ChromaticInterval 14>
+ 
+         >>> aInterval = ChromaticInterval(3)
+         >>> aInterval.reverse()
+         <music21.interval.ChromaticInterval -3>
+         
+ 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocationBySite`, :meth:`~music21.base.Music21Object.removeLocationBySiteId`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -513,42 +598,52 @@ DiatonicInterval
 
 .. class:: DiatonicInterval(specifier, generic)
 
-    A class representing a diatonic interval. Two required arguments are a `specifier` (such as perfect, major, or minor) and a `generic`, an interval size (such as 2, 2nd, or second). A DiatonicInterval contains and encapsulates a :class:`~music21.interval.GenericInterval` 
+    A class representing a diatonic interval. Two required arguments are a `specifier` (such as perfect, major, or minor) and a `generic`, an interval size (such as 2, 2nd, or second). 
+ 
+     A DiatonicInterval contains and encapsulates a :class:`~music21.interval.GenericInterval`
+ 
+     
+ 
 
     
-
-    The `specifier` is an integer specifying a value in the `prefixSpecs` and `niceSpecNames` lists. The `generic` is an integer or GenericInterval instance. 
-
-    >>> aInterval = DiatonicInterval(1, 1)
-    >>> aInterval.simpleName
-    'P1' 
-    >>> aInterval = DiatonicInterval('p', 1)
-    >>> aInterval.simpleName
-    'P1' 
-    >>> aInterval = DiatonicInterval('major', 3)
-    >>> aInterval.simpleName
-    'M3' 
-    >>> aInterval.niceName
-    'Major Third' 
-    >>> aInterval.semiSimpleName
-    'M3' 
-    >>> aInterval.directedSimpleName
-    'M3' 
-    >>> aInterval.invertedOrderedSpecifier
-    'm' 
-    >>> aInterval.mod7
-    'M3' 
-    >>> aInterval = DiatonicInterval('major', 'third')
-    >>> aInterval.niceName
-    'Major Third' 
-    >>> aInterval = DiatonicInterval('perfect', 'octave')
-    >>> aInterval.niceName
-    'Perfect Octave' 
-    >>> aInterval = DiatonicInterval('minor', 10)
-    >>> aInterval.mod7
-    'm3' 
-
-    
+         The `specifier` is an integer specifying a value in the `prefixSpecs` and `niceSpecNames` lists. 
+ 
+         The `generic` is an integer or GenericInterval instance.
+ 
+         >>> aInterval = DiatonicInterval(1, 1)
+         >>> aInterval.simpleName
+         'P1'
+         >>> aInterval = DiatonicInterval('p', 1)
+         >>> aInterval.simpleName
+         'P1'
+         >>> aInterval = DiatonicInterval('major', 3)
+         >>> aInterval.simpleName
+         'M3'
+         >>> aInterval.niceName
+         'Major Third'
+         >>> aInterval.semiSimpleName
+         'M3'
+         >>> aInterval.directedSimpleName
+         'M3'
+         >>> aInterval.invertedOrderedSpecifier
+         'm'
+         >>> aInterval.mod7
+         'M3'
+ 
+         >>> aInterval = DiatonicInterval('major', 'third')
+         >>> aInterval.niceName
+         'Major Third'
+ 
+         >>> aInterval = DiatonicInterval('perfect', 'octave')
+         >>> aInterval.niceName
+         'Perfect Octave'
+ 
+         >>> aInterval = DiatonicInterval('minor', 10)
+         >>> aInterval.mod7
+         'm3'
+ 
+         
+ 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -564,36 +659,42 @@ DiatonicInterval
 
         .. method:: getChromatic()
 
-            Return a Chromatic interval based on the size of this Interval. 
-
-            >>> aInterval = DiatonicInterval('major', 'third')
-            >>> aInterval.niceName
-            'Major Third' 
-            >>> aInterval.getChromatic()
-            <music21.interval.ChromaticInterval 4> 
-            >>> aInterval = DiatonicInterval('augmented', -5)
-            >>> aInterval.niceName
-            'Augmented Fifth' 
-            >>> aInterval.getChromatic()
-            <music21.interval.ChromaticInterval -8> 
-            >>> aInterval = DiatonicInterval('minor', 'second')
-            >>> aInterval.niceName
-            'Minor Second' 
-            >>> aInterval.getChromatic()
-            <music21.interval.ChromaticInterval 1> 
-
-            
+            Return a Chromatic interval based on the size of this Interval.
+ 
+         >>> aInterval = DiatonicInterval('major', 'third')
+         >>> aInterval.niceName
+         'Major Third'
+         >>> aInterval.getChromatic()
+         <music21.interval.ChromaticInterval 4>
+ 
+         >>> aInterval = DiatonicInterval('augmented', -5)
+         >>> aInterval.niceName
+         'Augmented Fifth'
+         >>> aInterval.getChromatic()
+         <music21.interval.ChromaticInterval -8>
+ 
+         >>> aInterval = DiatonicInterval('minor', 'second')
+         >>> aInterval.niceName
+         'Minor Second'
+         >>> aInterval.getChromatic()
+         <music21.interval.ChromaticInterval 1>
+ 
+         
+ 
 
         .. method:: reverse()
 
-            Return a DiatonicInterval that is an inversion of this Interval. 
-
-            >>> aInterval = DiatonicInterval('major', 3)
-            >>> aInterval.reverse().directedName
-            'M-3' 
-            >>> aInterval = DiatonicInterval('augmented', 5)
-            >>> aInterval.reverse().directedName
-            'A-5' 
+            Return a DiatonicInterval that is an inversion of this Interval.
+ 
+         >>> aInterval = DiatonicInterval('major', 3)
+         >>> aInterval.reverse().directedName
+         'M-3'
+ 
+         >>> aInterval = DiatonicInterval('augmented', 5)
+         >>> aInterval.reverse().directedName
+         'A-5'
+         
+ 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocationBySite`, :meth:`~music21.base.Music21Object.removeLocationBySiteId`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -603,40 +704,53 @@ GenericInterval
 
 .. class:: GenericInterval(value)
 
-    A GenericInterval is an interval such as Third, Seventh, Octave, or Tenth. Constructor takes an integer or string specifying the interval and direction. The interval is not specified in half-steps, but in numeric values derived from interval names: a Third is 3; a Seventh is 7, etc. String values for interval names ('3rd' or 'third') are accepted. staffDistance: the number of lines or spaces apart; E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1 
+    
+     A GenericInterval is an interval such as Third, Seventh, Octave, or Tenth.
+     Constructor takes an integer or string specifying the interval and direction. 
+ 
+     The interval is not specified in half-steps, but in numeric values derived from interval names: a Third is 3; a Seventh is 7, etc. String values for interval names ('3rd' or 'third') are accepted.
+     
+     staffDistance: the number of lines or spaces apart;  
+         E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1
+     
+ 
 
     
-
-    >>> aInterval = GenericInterval(3)
-    >>> aInterval.direction
-    1 
-    >>> aInterval.perfectable
-    False 
-    >>> aInterval.staffDistance
-    2 
-    >>> aInterval = GenericInterval('Third')
-    >>> aInterval.staffDistance
-    2 
-    >>> aInterval = GenericInterval(-12)
-    >>> aInterval.perfectable
-    True 
-    >>> aInterval.staffDistance
-    -11 
-    >>> aInterval.mod7
-    4 
-    >>> bInterval = aInterval.complement()
-    >>> bInterval.staffDistance
-    3 
-    >>> aInterval = GenericInterval('descending twelfth')
-    >>> aInterval.perfectable
-    True 
-    >>> aInterval.staffDistance
-    -11 
-    >>> aInterval = GenericInterval(0)
-    Traceback (most recent call last): 
-    IntervalException: The Zeroth is not an interval 
-
-    
+         >>> aInterval = GenericInterval(3)
+         >>> aInterval.direction
+         1
+         >>> aInterval.perfectable
+         False
+         >>> aInterval.staffDistance
+         2
+ 
+         >>> aInterval = GenericInterval('Third')
+         >>> aInterval.staffDistance
+         2
+ 
+         >>> aInterval = GenericInterval(-12)
+         >>> aInterval.perfectable
+         True
+         >>> aInterval.staffDistance
+         -11
+         >>> aInterval.mod7
+         4
+         >>> bInterval = aInterval.complement()
+         >>> bInterval.staffDistance
+         3
+ 
+         >>> aInterval = GenericInterval('descending twelfth')
+         >>> aInterval.perfectable
+         True
+         >>> aInterval.staffDistance
+         -11
+ 
+         >>> aInterval = GenericInterval(0)
+         Traceback (most recent call last):
+         IntervalException: The Zeroth is not an interval
+ 
+         
+ 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -652,43 +766,53 @@ GenericInterval
 
         .. method:: complement()
 
-            Returns a new GenericInterval object where descending 3rds are 6ths, etc. 
-
-            >>> aInterval = GenericInterval('Third')
-            >>> aInterval.complement()
-            <music21.interval.GenericInterval 6> 
+            Returns a new GenericInterval object where descending 3rds are 6ths, etc.
+ 
+         >>> aInterval = GenericInterval('Third')
+         >>> aInterval.complement()
+         <music21.interval.GenericInterval 6>
+         
+ 
 
         .. method:: getDiatonic(specifier)
 
-            Given a specifier, return a :class:`~music21.interval.DiatonicInterval` object. Specifier should be provided as a string name, such as 'dd', 'M', or 'perfect'. 
-
-            >>> aInterval = GenericInterval('Third')
-            >>> aInterval.getDiatonic('major')
-            <music21.interval.DiatonicInterval M3> 
-            >>> aInterval.getDiatonic('minor')
-            <music21.interval.DiatonicInterval m3> 
-            >>> aInterval.getDiatonic('d')
-            <music21.interval.DiatonicInterval d3> 
-            >>> aInterval.getDiatonic('a')
-            <music21.interval.DiatonicInterval A3> 
-            >>> aInterval.getDiatonic(2)
-            <music21.interval.DiatonicInterval M3> 
-            >>> bInterval = GenericInterval('fifth')
-            >>> bInterval.getDiatonic('perfect')
-            <music21.interval.DiatonicInterval P5> 
+            Given a specifier, return a :class:`~music21.interval.DiatonicInterval` object. 
+ 
+         Specifier should be provided as a string name, such as 'dd', 'M', or 'perfect'.
+ 
+         >>> aInterval = GenericInterval('Third')
+         >>> aInterval.getDiatonic('major')
+         <music21.interval.DiatonicInterval M3>
+         >>> aInterval.getDiatonic('minor')
+         <music21.interval.DiatonicInterval m3>
+         >>> aInterval.getDiatonic('d')
+         <music21.interval.DiatonicInterval d3>
+         >>> aInterval.getDiatonic('a')
+         <music21.interval.DiatonicInterval A3>
+         >>> aInterval.getDiatonic(2)
+         <music21.interval.DiatonicInterval M3>
+ 
+         >>> bInterval = GenericInterval('fifth')
+         >>> bInterval.getDiatonic('perfect')
+         <music21.interval.DiatonicInterval P5>
+         
+ 
 
         .. method:: reverse()
 
             Returns a new GenericInterval object that is inverted. 
-
-            >>> aInterval = GenericInterval('Third')
-            >>> aInterval.reverse()
-            <music21.interval.GenericInterval -3> 
-            >>> aInterval = GenericInterval(-13)
-            >>> aInterval.direction
-            -1 
-            >>> aInterval.reverse()
-            <music21.interval.GenericInterval 13> 
+ 
+         >>> aInterval = GenericInterval('Third')
+         >>> aInterval.reverse()
+         <music21.interval.GenericInterval -3>
+ 
+         >>> aInterval = GenericInterval(-13)
+         >>> aInterval.direction
+         -1
+         >>> aInterval.reverse()
+         <music21.interval.GenericInterval 13>
+         
+ 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocationBySite`, :meth:`~music21.base.Music21Object.removeLocationBySiteId`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 

@@ -7,405 +7,537 @@ music21.common
 
 .. module:: music21.common
 
-Utility constants, dictionaries, functions, and objects used throughout music21. 
+Utility constants, dictionaries, functions, and objects used throughout music21.
+ 
+ 
 
 
 .. function:: fromRoman(num)
 
     
-
-    >>> fromRoman('ii')
-    2 
-    >>> fromRoman('vii')
-    7 
+     >>> fromRoman('ii')
+     2
+     >>> fromRoman('vii')
+     7
+     
+ 
 
 .. function:: toRoman(num)
 
     
-
-    >>> toRoman(2)
-    'II' 
-    >>> toRoman(7)
-    'VII' 
+     >>> toRoman(2)
+     'II'
+     >>> toRoman(7)
+     'VII'
+     
+ 
 
 .. function:: EuclidGCD(a, b)
 
-    use Euclid's algorithm to find the GCD of a and b 
+    use Euclid's algorithm to find the GCD of a and b
+ 
 
 .. function:: almostEqual(x, y=0.0, grain=1e-07)
 
-    The following four routines work for comparisons between floats that are normally inconsistent. almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other 
+    
+     The following four routines work for comparisons between floats that are normally inconsistent.
+     
+     almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other
+     
+ 
 
 .. function:: almostEquals(x, y=0.0, grain=1e-07)
 
-    The following four routines work for comparisons between floats that are normally inconsistent. almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other 
+    
+     The following four routines work for comparisons between floats that are normally inconsistent.
+     
+     almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other
+     
+ 
 
 .. function:: basicallyEqual(a, b)
 
-    returns true if a and b are equal except for whitespace differences 
-
-    >>> a = " hello there "
-    >>> b = "hello there"
-    >>> c = " bye there "
-    >>> basicallyEqual(a,b)
-    True 
-    >>> basicallyEqual(a,c)
-    False 
+    
+     returns true if a and b are equal except for whitespace differences
+ 
+     >>> a = " hello there "
+     >>> b = "hello there"
+     >>> c = " bye there "
+     >>> basicallyEqual(a,b)
+     True
+     >>> basicallyEqual(a,c)
+     False
+     
+ 
 
 .. function:: basicallyEquals(a, b)
 
-    returns true if a and b are equal except for whitespace differences 
-
-    >>> a = " hello there "
-    >>> b = "hello there"
-    >>> c = " bye there "
-    >>> basicallyEqual(a,b)
-    True 
-    >>> basicallyEqual(a,c)
-    False 
+    
+     returns true if a and b are equal except for whitespace differences
+ 
+     >>> a = " hello there "
+     >>> b = "hello there"
+     >>> c = " bye there "
+     >>> basicallyEqual(a,b)
+     True
+     >>> basicallyEqual(a,c)
+     False
+     
+ 
 
 .. function:: decimalToTuplet(decNum)
 
-    For simple decimals (mostly > 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator) 
+    
+     For simple decimals (mostly > 1), a quick way to figure out the
+     fraction in lowest terms that gives a valid tuplet.
+ 
+     No it does not work really fast.  No it does not return tuplets with
+     denominators over 100.  Too bad, math geeks.  This is real life.
+ 
+     returns (numerator, denominator)
+     
+ 
 
 .. function:: dirPartitioned(obj, skipLeading=['__'])
 
-    Given an objet, return three lists of names: methods, attributes, and properties. Note that if a name/attribute is dynamically created by a property it cannot be found until that attribute is created. TODO: this cannot properly partiton properties from methods 
+    Given an objet, return three lists of names: methods, attributes, and properties.
+ 
+     Note that if a name/attribute is dynamically created by a property it 
+     cannot be found until that attribute is created.
+ 
+     TODO: this cannot properly partiton properties from methods
+     
+ 
 
 .. function:: dotMultiplier(dots)
 
-    dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots 
-
-    >>> dotMultiplier(1)
-    1.5 
-    >>> dotMultiplier(2)
-    1.75 
-    >>> dotMultiplier(3)
-    1.875 
+    
+     dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots
+     
+     >>> dotMultiplier(1)
+     1.5
+     >>> dotMultiplier(2)
+     1.75
+     >>> dotMultiplier(3)
+     1.875
+     
+ 
 
 .. function:: findFormat(fmt)
 
-    Given a format defined either by a format name or an extension, return the format name as well as the output exensions. Note that .mxl and .mx are only considered MusicXML input formats. 
-
-    >>> findFormat('mx')
-    ('musicxml', '.xml') 
-    >>> findFormat('.mxl')
-    ('musicxml', '.xml') 
-    >>> findFormat('musicxml')
-    ('musicxml', '.xml') 
-    >>> findFormat('jpeg')
-    ('jpeg', '.jpg') 
-    >>> findFormat('lily')
-    ('lilypond', '.ly') 
-    >>> findFormat('jpeg')
-    ('jpeg', '.jpg') 
-    >>> findFormat('humdrum')
-    ('humdrum', '.krn') 
-    >>> findFormat('txt')
-    ('text', '.txt') 
-    >>> findFormat('textline')
-    ('textline', '.txt') 
+    Given a format defined either by a format name or 
+     an extension, return the format name as well as the output exensions.
+ 
+     Note that .mxl and .mx are only considered MusicXML input formats. 
+ 
+     >>> findFormat('mx')
+     ('musicxml', '.xml')
+     >>> findFormat('.mxl')
+     ('musicxml', '.xml')
+     >>> findFormat('musicxml')
+     ('musicxml', '.xml')
+     >>> findFormat('jpeg')
+     ('jpeg', '.jpg')
+     >>> findFormat('lily')
+     ('lilypond', '.ly')
+     >>> findFormat('jpeg')
+     ('jpeg', '.jpg')
+     >>> findFormat('humdrum')
+     ('humdrum', '.krn')
+     >>> findFormat('txt')
+     ('text', '.txt')
+     >>> findFormat('textline')
+     ('textline', '.txt')
+     
+ 
 
 .. function:: findFormatExtFile(fp)
 
-    Given a file path (relative or absolute) find format and extension used (not the output extension) 
-
-    >>> findFormatExtFile('test.mx')
-    ('musicxml', '.mx') 
-    >>> findFormatExtFile('long/file/path/test-2009.03.02.xml')
-    ('musicxml', '.xml') 
-    >>> findFormatExtFile('long/file/path.intermediate.png/test-2009.03.xml')
-    ('musicxml', '.xml') 
-    >>> findFormatExtFile('test.mus')
-    ('finale', '.mus') 
-    >>> findFormatExtFile('test')
-    (None, None) 
-    Windows drive + pickle 
-    >>> findFormatExtFile('d:/long/file/path/test.p')
-    ('pickle', '.p') 
-    On a windows networked filesystem 
-    >>> findFormatExtFile('\\long\file\path\test.krn')
-    ('humdrum', '.krn') 
+    Given a file path (relative or absolute) find format and extension used (not the output extension)
+ 
+     >>> findFormatExtFile('test.mx')
+     ('musicxml', '.mx')
+     >>> findFormatExtFile('long/file/path/test-2009.03.02.xml')
+     ('musicxml', '.xml')
+     >>> findFormatExtFile('long/file/path.intermediate.png/test-2009.03.xml')
+     ('musicxml', '.xml')
+ 
+     >>> findFormatExtFile('test.mus')
+     ('finale', '.mus')
+ 
+     >>> findFormatExtFile('test')
+     (None, None)
+     
+     Windows drive + pickle
+     >>> findFormatExtFile('d:/long/file/path/test.p')
+     ('pickle', '.p')
+     
+     On a windows networked filesystem
+     >>> findFormatExtFile('\\long\file\path\test.krn')
+     ('humdrum', '.krn')
+     
+ 
 
 .. function:: findFormatExtURL(url)
 
-    Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters. 
-
-    >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
-    >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
-    >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
-    >>> urlD = 'http://static.wikifonia.org/4918/musicxml.mxl'
-    >>> urlE = 'http://static.wikifonia.org/4306/musicxml.mxl'
-    >>> urlF = 'http://junk'
-    >>> findFormatExtURL(urlA)
-    ('musicxml', '.xml') 
-    >>> findFormatExtURL(urlB)
-    ('humdrum', '.krn') 
-    >>> findFormatExtURL(urlC)
-    ('musicxml', '.xml') 
-    >>> findFormatExtURL(urlD)
-    ('musicxml', '.mxl') 
-    >>> findFormatExtURL(urlE)
-    ('musicxml', '.mxl') 
-    >>> findFormatExtURL(urlF)
-    (None, None) 
+    Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.
+ 
+     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+     >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+     >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
+     >>> urlD = 'http://static.wikifonia.org/4918/musicxml.mxl'
+     >>> urlE = 'http://static.wikifonia.org/4306/musicxml.mxl'
+     >>> urlF = 'http://junk'
+ 
+     >>> findFormatExtURL(urlA)
+     ('musicxml', '.xml')
+     >>> findFormatExtURL(urlB)
+     ('humdrum', '.krn')
+     >>> findFormatExtURL(urlC)
+     ('musicxml', '.xml')
+     >>> findFormatExtURL(urlD)
+     ('musicxml', '.mxl')
+     >>> findFormatExtURL(urlE)
+     ('musicxml', '.mxl')
+     >>> findFormatExtURL(urlF)
+     (None, None)
+     
+ 
 
 .. function:: findFormatFile(fp)
 
-    Given a file path (relative or absolute) return the format 
-
-    >>> findFormatFile('test.xml')
-    'musicxml' 
-    >>> findFormatFile('long/file/path/test-2009.03.02.xml')
-    'musicxml' 
-    >>> findFormatFile('long/file/path.intermediate.png/test-2009.03.xml')
-    'musicxml' 
-    Windows drive + pickle 
-    >>> findFormatFile('d:/long/file/path/test.p')
-    'pickle' 
-    On a windows networked filesystem 
-    >>> findFormatFile('\\long\file\path\test.krn')
-    'humdrum' 
+    Given a file path (relative or absolute) return the format
+ 
+     >>> findFormatFile('test.xml')
+     'musicxml'
+     >>> findFormatFile('long/file/path/test-2009.03.02.xml')
+     'musicxml'
+     >>> findFormatFile('long/file/path.intermediate.png/test-2009.03.xml')
+     'musicxml'
+     
+     Windows drive + pickle
+     >>> findFormatFile('d:/long/file/path/test.p')
+     'pickle'
+     
+     On a windows networked filesystem
+     >>> findFormatFile('\\long\file\path\test.krn')
+     'humdrum'
+     
+ 
 
 .. function:: findInputExtension(fmt)
 
-    Given an input format, find and return all possible input extensions. 
-
-    >>> a = findInputExtension('musicxml')
-    >>> a
-    ['.xml', '.mxl', '.mx'] 
-    >>> a = findInputExtension('mx')
-    >>> a
-    ['.xml', '.mxl', '.mx'] 
-    >>> a = findInputExtension('humdrum')
-    >>> a
-    ['.krn'] 
+    Given an input format, find and return all possible input extensions.
+ 
+     >>> a = findInputExtension('musicxml')
+     >>> a
+     ['.xml', '.mxl', '.mx']
+     >>> a = findInputExtension('mx')
+     >>> a
+     ['.xml', '.mxl', '.mx']
+     >>> a = findInputExtension('humdrum')
+     >>> a
+     ['.krn']
+     
+ 
 
 .. function:: findSimpleFraction(working)
 
 
 .. function:: formatStr(msg, *arguments, **keywords)
 
-    Format one or more data elements into string suitable for printing straight to stderr or other outputs 
-
-    >>> a = formatStr('test', '1', 2, 3)
-    >>> print a
-    test 1 2 3 
-    <BLANKLINE> 
+    Format one or more data elements into string suitable for printing
+     straight to stderr or other outputs
+ 
+     >>> a = formatStr('test', '1', 2, 3)
+     >>> print a
+     test 1 2 3
+     <BLANKLINE>
+     
+ 
 
 .. function:: getMd5(value=None)
 
-    Return a string from an md5 haslib 
-
-    >>> getMd5('test')
-    '098f6bcd4621d373cade4e832627b4f6' 
+    Return a string from an md5 haslib
+     >>> getMd5('test')
+     '098f6bcd4621d373cade4e832627b4f6'
+     
+ 
 
 .. function:: getNumFromStr(usrStr)
 
-    Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters. 
-
-    >>> getNumFromStr('23a')
-    ('23', 'a') 
-    >>> getNumFromStr('23a954sdfwer')
-    ('23954', 'asdfwer') 
-    >>> getNumFromStr('')
-    ('', '') 
+    Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
+ 
+     >>> getNumFromStr('23a')
+     ('23', 'a')
+     >>> getNumFromStr('23a954sdfwer')
+     ('23954', 'asdfwer')
+     >>> getNumFromStr('')
+     ('', '')
+     
+ 
 
 .. function:: getPackageData()
 
     Return a list of package data in the format specified by setup.py. This creates a very inclusive list of all data types. 
+     
+ 
 
 .. function:: getPackageDir(fpMusic21=None, relative=True, remapSep=., packageOnly=True)
 
-    Manually get all directories in the music21 package, including the top level directory. This is used in setup.py. If `relative` is True, relative paths will be returned. If `remapSep` is set to anything other than None, the path separator will be replaced. If `packageOnly` is true, only directories with __init__.py files are colllected. 
+    Manually get all directories in the music21 package, including the top level directory. This is used in setup.py.
+     
+     If `relative` is True, relative paths will be returned. 
+ 
+     If `remapSep` is set to anything other than None, the path separator will be replaced. 
+ 
+     If `packageOnly` is true, only directories with __init__.py files are colllected. 
+     
+ 
 
 .. function:: getPlatform()
 
-    Return the name of the platform, where platforms are divided between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for (GNU/Linux and other variants). 
+    Return the name of the platform, where platforms are divided between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for (GNU/Linux and other variants).
+     
+ 
 
 .. function:: greaterThan(x, y=0.0)
 
-    greaterThan returns True if x is greater than and not almostEquals y 
+    
+     greaterThan returns True if x is greater than and not almostEquals y
+     
+ 
 
 .. function:: greaterThanOrEqual(x, y=0.0, grain=1e-07)
 
-    greaterThan returns True if x is greater than or almostEquals y 
+    
+     greaterThan returns True if x is greater than or almostEquals y
+     
+ 
 
 .. function:: isIterable(usrData)
 
-    Returns True if is the object can be iter'd over 
-
-    >>> isIterable([])
-    True 
-    >>> isIterable('sharp')
-    False 
-    >>> isIterable((None, None))
-    True 
-    >>> import music21.stream
-    >>> isIterable(music21.stream.Stream())
-    True 
+    
+     Returns True if is the object can be iter'd over
+ 
+     >>> isIterable([])
+     True
+     >>> isIterable('sharp')
+     False
+     >>> isIterable((None, None))
+     True
+     >>> import music21.stream
+     >>> isIterable(music21.stream.Stream())
+     True
+     
+ 
 
 .. function:: isListLike(usrData)
 
-    Returns True if is a List or a Set or a Tuple #TODO: add immutable sets and pre 2.6 set support 
-
-    >>> isListLike([])
-    True 
-    >>> isListLike('sharp')
-    False 
-    >>> isListLike((None, None))
-    True 
-    >>> import music21.stream
-    >>> isListLike(music21.stream.Stream())
-    False 
+    
+     Returns True if is a List or a Set or a Tuple
+     #TODO: add immutable sets and pre 2.6 set support
+ 
+     >>> isListLike([])
+     True
+     >>> isListLike('sharp')
+     False
+     >>> isListLike((None, None))
+     True
+     >>> import music21.stream
+     >>> isListLike(music21.stream.Stream())
+     False
+     
+ 
 
 .. function:: isNum(usrData)
 
-    check if usrData is a number (float, int, long, Decimal), return boolean IMPROVE: when 2.6 is everywhere: add numbers class. 
-
-    >>> isNum(3.0)
-    True 
-    >>> isNum(3)
-    True 
-    >>> isNum('three')
-    False 
+    check if usrData is a number (float, int, long, Decimal), return boolean
+     IMPROVE: when 2.6 is everywhere: add numbers class.
+ 
+     >>> isNum(3.0)
+     True
+     >>> isNum(3)
+     True
+     >>> isNum('three')
+     False
+     
+ 
 
 .. function:: isPowerOfTwo(n)
 
-    returns True if argument is either a power of 2 or a reciprocal of a power of 2. Uses almostEquals so that a float whose reminder after taking a log is nearly zero is still True 
-
-    >>> isPowerOfTwo(3)
-    False 
-    >>> isPowerOfTwo(18)
-    False 
-    >>> isPowerOfTwo(1024)
-    True 
-    >>> isPowerOfTwo(1024.01)
-    False 
-    >>> isPowerOfTwo(1024.00001)
-    True 
+     
+     returns True if argument is either a power of 2 or a reciprocal
+     of a power of 2. Uses almostEquals so that a float whose reminder after
+     taking a log is nearly zero is still True
+ 
+     >>> isPowerOfTwo(3)
+     False
+     >>> isPowerOfTwo(18)
+     False
+     >>> isPowerOfTwo(1024)
+     True
+     >>> isPowerOfTwo(1024.01)
+     False
+     >>> isPowerOfTwo(1024.00001)
+     True
+ 
+ 
 
 .. function:: isStr(usrData)
 
-    Check of usrData is some form of string, including unicode. 
-
-    >>> isStr(3)
-    False 
-    >>> isStr('sharp')
-    True 
-    >>> isStr(u'flat')
-    True 
+    Check of usrData is some form of string, including unicode.
+ 
+     >>> isStr(3)
+     False
+     >>> isStr('sharp')
+     True
+     >>> isStr(u'flat')
+     True
+     
+ 
 
 .. function:: isWeakref(referent)
 
-    Test if an object is a weakref 
-
-    >>> class Mock(object): pass
-    >>> a1 = Mock()
-    >>> a2 = Mock()
-    >>> isWeakref(a1)
-    False 
-    >>> isWeakref(3)
-    False 
-    >>> isWeakref(wrapWeakref(a1))
-    True 
+    Test if an object is a weakref
+ 
+     >>> class Mock(object): pass
+     >>> a1 = Mock()
+     >>> a2 = Mock()
+     >>> isWeakref(a1)
+     False
+     >>> isWeakref(3)
+     False
+     >>> isWeakref(wrapWeakref(a1))
+     True
+     
+ 
 
 .. function:: lcm(filter)
 
     
-
-    >>> lcm([3,4,5])
-    60 
-    >>> lcm([3,4])
-    12 
-    >>> lcm([1,2])
-    2 
-    >>> lcm([3,6])
-    6 
+     >>> lcm([3,4,5])
+     60
+     >>> lcm([3,4])
+     12
+     >>> lcm([1,2])
+     2
+     >>> lcm([3,6])
+     6
+     
+ 
 
 .. function:: lessThan(x, y=0.0)
 
-    lessThan -- returns True if x is less than and not almostEquals y 
+    
+     lessThan -- returns True if x is less than and not almostEquals y
+     
+ 
 
 .. function:: numToIntOrFloat(value)
 
-    Given a number, return an integer if it is very close to an integer, otherwise, return a float. 
-
-    >>> numToIntOrFloat(1.0)
-    1 
-    >>> numToIntOrFloat(1.00003)
-    1.00003 
-    >>> numToIntOrFloat(1.5)
-    1.5 
-    >>> numToIntOrFloat(1.0000000005)
-    1 
+    Given a number, return an integer if it is very close to an integer, otherwise, return a float.
+ 
+     >>> numToIntOrFloat(1.0)
+     1
+     >>> numToIntOrFloat(1.00003)
+     1.00003
+     >>> numToIntOrFloat(1.5)
+     1.5
+     >>> numToIntOrFloat(1.0000000005)
+     1
+     
+ 
 
 .. function:: sortFilesRecent(fileList)
 
-    Given two files, sort by most recent. Return only the file paths. 
-
-    >>> a = os.listdir(os.curdir)
-    >>> b = sortFilesRecent(a)
+    Given two files, sort by most recent. Return only the file
+     paths.
+ 
+     >>> a = os.listdir(os.curdir)
+     >>> b = sortFilesRecent(a)
+     
+ 
 
 .. function:: sortModules(moduleList)
 
-    Sort a lost of imported module names such that most recently modified is first 
+    Sort a lost of imported module names such that most recently modified is 
+     first
+ 
 
 .. function:: spaceCamelCase(usrStr, replaceUnderscore=True)
 
-    Given a camel-cased string, or a mixture of numbers and characters, create a space separated string. 
-
-    >>> spaceCamelCase('thisIsATest')
-    'this Is A Test' 
-    >>> spaceCamelCase('ThisIsATest')
-    'This Is A Test' 
-    >>> spaceCamelCase('movement3')
-    'movement 3' 
-    >>> spaceCamelCase('opus41no1')
-    'opus 41 no 1' 
-    >>> spaceCamelCase('opus23402no219235')
-    'opus 23402 no 219235' 
-    >>> spaceCamelCase('opus23402no219235').title()
-    'Opus 23402 No 219235' 
-
-    
+    Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
+ 
+     >>> spaceCamelCase('thisIsATest')
+     'this Is A Test'
+     >>> spaceCamelCase('ThisIsATest')
+     'This Is A Test'
+     >>> spaceCamelCase('movement3')
+     'movement 3'
+     >>> spaceCamelCase('opus41no1')
+     'opus 41 no 1'
+     >>> spaceCamelCase('opus23402no219235')
+     'opus 23402 no 219235'
+     >>> spaceCamelCase('opus23402no219235').title()
+     'Opus 23402 No 219235'
+ 
+     
+ 
 
 .. function:: stripAddresses(textString, replacement=ADDRESS)
 
-    Function that changes all memory addresses in the given textString with (replacement).  This is useful for testing that a function gives an expected result even if the result contains references to memory locations.  So for instance: 
-
-    >>> stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
-    '{0.0} <music21.clef.TrebleClef object at ADDRESS>' 
-    while this is left alone: 
-    >>> stripAddresses("{0.0} <music21.humdrum.MiscTandam *>I humdrum control>")
-    '{0.0} <music21.humdrum.MiscTandam *>I humdrum control>' 
+    
+     Function that changes all memory addresses in the given 
+     textString with (replacement).  This is useful for testing
+     that a function gives an expected result even if the result
+     contains references to memory locations.  So for instance:
+ 
+     >>> stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
+     '{0.0} <music21.clef.TrebleClef object at ADDRESS>'
+     
+     while this is left alone:
+ 
+     >>> stripAddresses("{0.0} <music21.humdrum.MiscTandam *>I humdrum control>")
+     '{0.0} <music21.humdrum.MiscTandam *>I humdrum control>'
+     
+ 
 
 .. function:: unwrapWeakref(referent)
 
-    utility function that gets an object that might be an object itself or a weak reference to an object. 
-
-    >>> class Mock(object): pass
-    >>> a1 = Mock()
-    >>> a2 = Mock()
-    >>> a2.strong = a1
-    >>> a2.weak = wrapWeakref(a1)
-    >>> unwrapWeakref(a2.strong) is a1
-    True 
-    >>> unwrapWeakref(a2.weak) is a1
-    True 
-    >>> unwrapWeakref(a2.strong) is unwrapWeakref(a2.weak)
-    True 
+    
+     utility function that gets an object that might be an object itself
+     or a weak reference to an object.
+     
+     >>> class Mock(object): pass
+     >>> a1 = Mock()
+     >>> a2 = Mock()
+     >>> a2.strong = a1
+     >>> a2.weak = wrapWeakref(a1)
+     >>> unwrapWeakref(a2.strong) is a1
+     True
+     >>> unwrapWeakref(a2.weak) is a1
+     True
+     >>> unwrapWeakref(a2.strong) is unwrapWeakref(a2.weak)
+     True
+     
+ 
 
 .. function:: wrapWeakref(referent)
 
-    utility function that wraps objects as weakrefs but does not wrap already wrapped objects 
+    
+     utility function that wraps objects as weakrefs but does not wrap
+     already wrapped objects
+     
+ 
 
 Scalar
 ------
 
 .. class:: Scalar(value=None)
 
-    for those of us who miss perl scalars.... 
+    for those of us who miss perl scalars....
+ 
 
     
 
@@ -417,15 +549,18 @@ Scalar
 
         .. method:: toFloat()
 
-            No documentation. 
+            No documentation.
+ 
 
         .. method:: toInt()
 
-            No documentation. 
+            No documentation.
+ 
 
         .. method:: toUnicode()
 
-            No documentation. 
+            No documentation.
+ 
 
 
 Iterator
@@ -433,7 +568,10 @@ Iterator
 
 .. class:: Iterator(data)
 
-    A simple Iterator object used to handle iteration of Streams and other list-like objects. 
+    A simple Iterator object used to handle iteration of Streams and other 
+     list-like objects. 
+     
+ 
 
     
 
@@ -441,7 +579,8 @@ Iterator
 
         .. method:: next()
 
-            No documentation. 
+            No documentation.
+ 
 
 
 Timer
@@ -449,7 +588,8 @@ Timer
 
 .. class:: Timer()
 
-    An object for timing. 
+    An object for timing.
+ 
 
     
 
@@ -457,15 +597,18 @@ Timer
 
         .. method:: clear()
 
-            No documentation. 
+            No documentation.
+ 
 
         .. method:: start()
 
-            Explicit start method; will clear previous values. Start always happens on initialization. 
+            Explicit start method; will clear previous values. Start always happens on initialization.
+ 
 
         .. method:: stop()
 
-            No documentation. 
+            No documentation.
+ 
 
 
 defHash
@@ -473,7 +616,27 @@ defHash
 
 .. class:: defHash(hash=None, default=None, callDefault=False)
 
-    A replacement for dictionaries that behave a bit more like perl hashes. No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first in the definition and that default can be set to None (which it is) or to any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({"A": falsehash(), "B": falsehash()}) print(a["A"]["hi"]) # returns False there's probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element 
+    A replacement for dictionaries that behave a bit more like perl hashes.  
+     No more KeyErrors. The difference between defHash and defaultdict is that the 
+     Dict values come first in the definition and that default can be set to 
+     None (which it is) or to any object.
+     
+     If you want a factory that makes hashes with a particular different default, use:
+     
+         falsehash = lambda h = None: defHash(h, default = False)
+         a = falsehash({"A": falsehash(), "B": falsehash()})
+         print(a["A"]["hi"]) # returns False
+     
+     there's probably a way to use this to create a data structure
+     of arbitrary dimensionality, though it escapes this author.
+ 
+     if callDefault is True then the default is called:
+     
+         defHash(default = list, callDefault = True)
+         
+     will create a new List for each element
+     
+ 
 
     inherits from: dict
 
@@ -487,7 +650,8 @@ defHash
 
         .. method:: get(key, *args)
 
-            No documentation. 
+            No documentation.
+ 
 
         Methods inherited from dict: :meth:`~__builtin__.dict.clear`, :meth:`~__builtin__.dict.copy`, :meth:`~__builtin__.dict.has_key`, :meth:`~__builtin__.dict.items`, :meth:`~__builtin__.dict.iteritems`, :meth:`~__builtin__.dict.iterkeys`, :meth:`~__builtin__.dict.itervalues`, :meth:`~__builtin__.dict.keys`, :meth:`~__builtin__.dict.pop`, :meth:`~__builtin__.dict.popitem`, :meth:`~__builtin__.dict.setdefault`, :meth:`~__builtin__.dict.update`, :meth:`~__builtin__.dict.values`
 
@@ -497,7 +661,9 @@ defList
 
 .. class:: defList(value=None, default=None, callDefault=False)
 
-    A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
+    A replacement for lists that behave a bit more like perl arrays. No more ListErrors.
+         
+ 
 
     inherits from: list
 

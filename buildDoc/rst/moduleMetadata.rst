@@ -7,82 +7,111 @@ music21.metadata
 
 .. module:: music21.metadata
 
-Classes and functions for creating and processing metadata associated with scores, works, and fragments, such as titles, movements, authors, publishers, and regions. The :class:`~music21.metadata.Metadata` object is the main public interface to metadata components. A Metadata object can be added to a Stream and used to set common score attributes, such as title and composer. A Metadata object found at offset zero can be accessed through a Stream's :attr:`~music21.stream.Stream.metadata` property. The following example creates a :class:`~music21.stream.Stream` object, adds a :class:`~music21.note.Note` object, and configures and adds the :attr:`~music21.metadata.Metadata.title` and :attr:`~music21.metadata.Metadata.composer` properties of a Metadata object. 
+Classes and functions for creating and processing metadata associated with scores, works, and fragments, such as titles, movements, authors, publishers, and regions.
+ 
+ The :class:`~music21.metadata.Metadata` object is the main public interface to metadata components. A Metadata object can be added to a Stream and used to set common score attributes, such as title and composer. A Metadata object found at offset zero can be accessed through a Stream's :attr:`~music21.stream.Stream.metadata` property. 
+ 
+ The following example creates a :class:`~music21.stream.Stream` object, adds a :class:`~music21.note.Note` object, and configures and adds the :attr:`~music21.metadata.Metadata.title` and :attr:`~music21.metadata.Metadata.composer` properties of a Metadata object. 
+ 
+ 
 
 >>> from music21 import *
 >>> s = stream.Stream()
+
 >>> s.append(note.Note())
+
 >>> s.insert(metadata.Metadata())
+
 >>> s.metadata.title = 'title'
+
 >>> s.metadata.composer = 'composer'
->>> s.show()
+
+>>> #_DOCS_SHOW s.show()
+
+
+ 
 
 
 .. image:: images/moduleMetadata-01.* 
     :width: 600
 
+ 
 
+ 
 
 
 .. function:: abbreviationToRole(value)
 
     Get ROLE_ABBREVIATIONS as string-like attributes, used for Contributors. 
-
-    >>> abbreviationToRole('com')
-    'composer' 
-    >>> abbreviationToRole('lib')
-    'librettist' 
-    >>> for id in ROLE_ABBREVIATIONS:
-    ...    post = abbreviationToRole(id) 
+ 
+     >>> abbreviationToRole('com')
+     'composer'
+     >>> abbreviationToRole('lib')
+     'librettist'
+     >>> for id in ROLE_ABBREVIATIONS: 
+     ...    post = abbreviationToRole(id)
+     
+ 
 
 .. function:: abbreviationToWorkId(value)
 
-    Get work id abbreviations. 
-
-    >>> abbreviationToWorkId('otl')
-    'title' 
-    >>> for id in WORK_ID_ABBREVIATIONS:
-    ...    post = abbreviationToWorkId(id) 
+    Get work id abbreviations.
+ 
+     >>> abbreviationToWorkId('otl')
+     'title'
+     >>> for id in WORK_ID_ABBREVIATIONS: 
+     ...    post = abbreviationToWorkId(id)
+     
+ 
 
 .. function:: errorToSymbol(value)
 
-    Convert an error string (appoximate, uncertain) into a symbol. 
-
-    >>> errorToSymbol('approximate')
-    '~' 
-    >>> errorToSymbol('uncertain')
-    '?' 
+    Convert an error string (appoximate, uncertain) into a symbol.
+ 
+     >>> errorToSymbol('approximate')
+     '~'
+     >>> errorToSymbol('uncertain')
+     '?'
+     
+ 
 
 .. function:: roleToAbbreviation(value)
 
-    Get a role id from a string representation. 
-
-    >>> roleToAbbreviation('composer')
-    'com' 
-    >>> for n in ROLES:
-    ...     post = roleToAbbreviation(n) 
+    Get a role id from a string representation.
+ 
+     >>> roleToAbbreviation('composer')
+     'com'
+     >>> for n in ROLES:
+     ...     post = roleToAbbreviation(n)
+     
+ 
 
 .. function:: workIdToAbbreviation(value)
 
-    Get a role id from a string representation. 
-
-    >>> workIdToAbbreviation('localeOfComposition')
-    'opc' 
-    >>> for n in WORK_IDS:
-    ...     post = workIdToAbbreviation(n) 
+    Get a role id from a string representation.
+ 
+     >>> workIdToAbbreviation('localeOfComposition')
+     'opc'
+     >>> for n in WORK_IDS:
+     ...     post = workIdToAbbreviation(n)
+     
+ 
 
 Text
 ----
 
 .. class:: Text(data=, language=None)
 
-    One unit of text data: a title, a name, or some other text data. Store the string and a language name or code. This object can be used and/or subclassed for a variety for of text storage. 
+    One unit of text data: a title, a name, or some other text data. Store the string and a language name or code. This object can be used and/or subclassed for a variety for of text storage.
+     
+ 
 
     
-
-    >>> td = Text('concerto in d', 'en')
-    >>> str(td)
-    'concerto in d' 
+         >>> td = Text('concerto in d', 'en')
+         >>> str(td)
+         'concerto in d'
+         
+ 
 
     
 
@@ -90,12 +119,14 @@ Text
 
         .. attribute:: language
 
-            Set the language of the Text stored within. 
-
-            >>> t = Text('my text')
-            >>> t.language = 'en'
-            >>> t.language
-            'en' 
+            Set the language of the Text stored within.
+ 
+         >>> t = Text('my text')
+         >>> t.language = 'en'
+         >>> t.language  
+         'en'
+         
+ 
 
 
 Date
@@ -103,22 +134,30 @@ Date
 
 .. class:: Date(*args, **keywords)
 
-    A single date value, specified by year, month, day, hour, minute, and second. Note that this class has been created, instead of using Python's datetime, to provide greater flexibility for processing unconventional dates, ancient dates, dates with error, and date ranges. The :attr:`~music21.metadata.Date.datetime` property can be used to retrieve a datetime object when necessary. Additionally, each value can be specified as `uncertain` or `approximate`; if None, assumed to be certain. Data objects are fundamental components of :class:`~music21.metadata.DateSingle` and related subclasses that represent single dates and date ranges. 
+    A single date value, specified by year, month, day, hour, minute, and second. Note that this class has been created, instead of using Python's datetime, to provide greater flexibility for processing unconventional dates, ancient dates, dates with error, and date ranges. 
+ 
+     The :attr:`~music21.metadata.Date.datetime` property can be used to retrieve a datetime object when necessary.
+ 
+     Additionally, each value can be specified as `uncertain` or `approximate`; if None, assumed to be certain.
+ 
+     Data objects are fundamental components of :class:`~music21.metadata.DateSingle` and related subclasses that represent single dates and date ranges. 
+ 
+     
+ 
 
     
-
-    
-
-    >>> a = Date(year=1843, yearError='approximate')
-    >>> a.year
-    1843 
-    >>> a.yearError
-    'approximate' 
-    >>> a = Date(year='1843?')
-    >>> a.yearError
-    'uncertain' 
-
-    
+         >>> a = Date(year=1843, yearError='approximate')
+         >>> a.year
+         1843
+         >>> a.yearError
+         'approximate'
+ 
+         >>> a = Date(year='1843?')
+         >>> a.yearError
+         'uncertain'
+ 
+         
+ 
 
     
 
@@ -131,89 +170,105 @@ Date
         .. attribute:: datetime
 
             Return a datetime object representation. 
-
-            >>> a = Date(year=1843, month=3, day=3)
-            >>> a.datetime
-            datetime.datetime(1843, 3, 3, 0, 0) 
+ 
+         >>> a = Date(year=1843, month=3, day=3)
+         >>> a.datetime
+         datetime.datetime(1843, 3, 3, 0, 0)
+         
+ 
 
         .. attribute:: hasError
 
             Return True if any data points have error defined. 
-
-            >>> a = Date(year=1843, month=3, day=3, dayError='approximate')
-            >>> a.hasError
-            True 
-            >>> b = Date(year=1843, month=3, day=3, minute=3)
-            >>> b.hasError
-            False 
+ 
+         >>> a = Date(year=1843, month=3, day=3, dayError='approximate')
+         >>> a.hasError
+         True
+         >>> b = Date(year=1843, month=3, day=3, minute=3)
+         >>> b.hasError
+         False
+         
+ 
 
         .. attribute:: hasTime
 
-            Return True if any time elements are defined. 
-
-            >>> a = Date(year=1843, month=3, day=3)
-            >>> a.hasTime
-            False 
-            >>> b = Date(year=1843, month=3, day=3, minute=3)
-            >>> b.hasTime
-            True 
+            Return True if any time elements are defined.
+ 
+         >>> a = Date(year=1843, month=3, day=3)
+         >>> a.hasTime
+         False
+         >>> b = Date(year=1843, month=3, day=3, minute=3)
+         >>> b.hasTime
+         True
+         
+ 
 
     **Date** **methods**
 
         .. method:: load(value)
 
-            Load values by string, datetime object, or Date object. 
-
-            >>> a = Date(year=1843, month=3, day=3)
-            >>> b = Date()
-            >>> b.load(a)
-            >>> b.year
-            1843 
+            Load values by string, datetime object, or Date object.
+ 
+         >>> a = Date(year=1843, month=3, day=3)
+         >>> b = Date()
+         >>> b.load(a)
+         >>> b.year
+         1843
+         
+ 
 
         .. method:: loadDatetime(dt)
 
-            Load time data from a datetime object. 
-
-            >>> import datetime
-            >>> dt = datetime.datetime(2005, 02, 01)
-            >>> dt
-            datetime.datetime(2005, 2, 1, 0, 0) 
-            >>> a = Date()
-            >>> a.loadDatetime(dt)
-            >>> str(a)
-            '2005/02/01' 
+            Load time data from a datetime object.
+ 
+         >>> import datetime
+         >>> dt = datetime.datetime(2005, 02, 01)
+         >>> dt
+         datetime.datetime(2005, 2, 1, 0, 0)
+         >>> a = Date()
+         >>> a.loadDatetime(dt)
+         >>> str(a)
+         '2005/02/01'
+         
+ 
 
         .. method:: loadOther(other)
 
-            Load values based on another Date object: 
-
-            >>> a = Date(year=1843, month=3, day=3)
-            >>> b = Date()
-            >>> b.loadOther(a)
-            >>> b.year
-            1843 
+            Load values based on another Date object:
+ 
+         >>> a = Date(year=1843, month=3, day=3)
+         >>> b = Date()
+         >>> b.loadOther(a)
+         >>> b.year
+         1843
+         
+ 
 
         .. method:: loadStr(str)
 
-            Load a string date representation. Assume year/month/day/hour:minute:second 
-
-            >>> from music21 import *
-            >>> d = metadata.Date()
-            >>> d.loadStr('3030?/12~/?4')
-            >>> d.month, d.monthError
-            (12, 'approximate') 
-            >>> d.year, d.yearError
-            (3030, 'uncertain') 
-            >>> d.month, d.monthError
-            (12, 'approximate') 
-            >>> d.day, d.dayError
-            (4, 'uncertain') 
-            >>> d = metadata.Date()
-            >>> d.loadStr('1834/12/4/4:50:32')
-            >>> d.minute, d.second
-            (50, 32) 
-
-            
+            Load a string date representation.
+         
+         Assume year/month/day/hour:minute:second
+ 
+         >>> from music21 import *
+         >>> d = metadata.Date()
+         >>> d.loadStr('3030?/12~/?4')
+         >>> d.month, d.monthError
+         (12, 'approximate')
+         >>> d.year, d.yearError
+         (3030, 'uncertain')
+         >>> d.month, d.monthError
+         (12, 'approximate')
+         >>> d.day, d.dayError
+         (4, 'uncertain')
+ 
+         >>> d = metadata.Date()
+         >>> d.loadStr('1834/12/4/4:50:32')
+         >>> d.minute, d.second
+         (50, 32)
+ 
+         
+ 
 
 
 DateSingle
@@ -221,18 +276,24 @@ DateSingle
 
 .. class:: DateSingle(data=, relevance=certain)
 
-    Store a date, either as certain, approximate, or uncertain relevance. The relevance attribute is limited within each DateSingle subclass depending on the design of the class. Alternative relevance types should be configured as other DateSingle subclasses. 
+    Store a date, either as certain, approximate, or uncertain relevance.
+ 
+     The relevance attribute is limited within each DateSingle subclass depending on the design of the class. Alternative relevance types should be configured as other DateSingle subclasses. 
+     
+ 
 
     
-
-    >>> dd = DateSingle('2009/12/31', 'approximate')
-    >>> str(dd)
-    '2009/12/31' 
-    >>> dd.relevance
-    'approximate' 
-    >>> dd = DateSingle('1805/3/12', 'uncertain')
-    >>> str(dd)
-    '1805/03/12' 
+         >>> dd = DateSingle('2009/12/31', 'approximate')
+         >>> str(dd)
+         '2009/12/31'
+         >>> dd.relevance
+         'approximate'
+ 
+         >>> dd = DateSingle('1805/3/12', 'uncertain')
+         >>> str(dd)
+         '1805/03/12'
+         
+ 
 
     
 
@@ -245,15 +306,18 @@ DateSingle
         .. attribute:: datetime
 
             Return a datetime object representation. 
-
-            >>> d = Date(year=1843, month=3, day=3)
-            >>> ds = DateSingle(d)
-            >>> ds.datetime
-            datetime.datetime(1843, 3, 3, 0, 0) 
+ 
+         >>> d = Date(year=1843, month=3, day=3)
+         >>> ds = DateSingle(d)
+         >>> ds.datetime
+         datetime.datetime(1843, 3, 3, 0, 0)
+         
+ 
 
         .. attribute:: relevance
 
-            No documentation. 
+            No documentation.
+ 
 
 
 DateRelative
@@ -261,16 +325,20 @@ DateRelative
 
 .. class:: DateRelative(data=, relevance=after)
 
-    Store a relative date, sometime prior or sometime after 
+    Store a relative date, sometime prior or sometime after
+     
+ 
 
     
-
-    >>> dd = DateRelative('2009/12/31', 'prior')
-    >>> str(dd)
-    '2009/12/31' 
-    >>> dd = DateRelative('2009/12/31', 'certain')
-    Traceback (most recent call last): 
-    MetadataException: relevance value is not supported by this object: certain 
+         >>> dd = DateRelative('2009/12/31', 'prior')
+         >>> str(dd)
+         '2009/12/31'
+ 
+         >>> dd = DateRelative('2009/12/31', 'certain')
+         Traceback (most recent call last):
+         MetadataException: relevance value is not supported by this object: certain
+         
+ 
 
     inherits from: :class:`~music21.metadata.DateSingle`
 
@@ -280,16 +348,20 @@ DateBetween
 
 .. class:: DateBetween(data=[], relevance=between)
 
-    Store a relative date, sometime between two dates 
+    Store a relative date, sometime between two dates
+     
+ 
 
     
-
-    >>> dd = DateBetween(['2009/12/31', '2010/1/28'])
-    >>> str(dd)
-    '2009/12/31 to 2010/01/28' 
-    >>> dd = DateBetween(['2009/12/31', '2010/1/28'], 'certain')
-    Traceback (most recent call last): 
-    MetadataException: relevance value is not supported by this object: certain 
+         >>> dd = DateBetween(['2009/12/31', '2010/1/28'])
+         >>> str(dd)
+         '2009/12/31 to 2010/01/28'
+ 
+         >>> dd = DateBetween(['2009/12/31', '2010/1/28'], 'certain')
+         Traceback (most recent call last):
+         MetadataException: relevance value is not supported by this object: certain
+         
+ 
 
     inherits from: :class:`~music21.metadata.DateSingle`
 
@@ -299,16 +371,20 @@ DateSelection
 
 .. class:: DateSelection(data=, relevance=or)
 
-    Store a selection of dates, or a collection of dates that might all be possible 
+    Store a selection of dates, or a collection of dates that might all be possible
+     
+ 
 
     
-
-    >>> dd = DateSelection(['2009/12/31', '2010/1/28', '1894/1/28'], 'or')
-    >>> str(dd)
-    '2009/12/31 or 2010/01/28 or 1894/01/28' 
-    >>> dd = DateSelection(['2009/12/31', '2010/1/28'], 'certain')
-    Traceback (most recent call last): 
-    MetadataException: relevance value is not supported by this object: certain 
+         >>> dd = DateSelection(['2009/12/31', '2010/1/28', '1894/1/28'], 'or')
+         >>> str(dd)
+         '2009/12/31 or 2010/01/28 or 1894/01/28'
+ 
+         >>> dd = DateSelection(['2009/12/31', '2010/1/28'], 'certain')
+         Traceback (most recent call last):
+         MetadataException: relevance value is not supported by this object: certain
+         
+ 
 
     inherits from: :class:`~music21.metadata.DateSingle`
 
@@ -318,19 +394,21 @@ Contributor
 
 .. class:: Contributor(*args, **keywords)
 
-    A person that contributed to a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements. 
+    A person that contributed to a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements.  
+     
+ 
 
     
-
-    >>> td = Contributor(role='composer', name='Chopin, Fryderyk')
-    >>> td.role
-    'composer' 
-    >>> td.name
-    'Chopin, Fryderyk' 
-    >>> td.relevance
-    'contributor' 
-
-    
+         >>> td = Contributor(role='composer', name='Chopin, Fryderyk')
+         >>> td.role
+         'composer'
+         >>> td.name
+         'Chopin, Fryderyk'
+         >>> td.relevance
+         'contributor'
+ 
+         
+ 
 
     
 
@@ -343,63 +421,72 @@ Contributor
         .. attribute:: mx
 
             Return a mxCreator object based on this object. 
-
-            >>> from music21 import *
-            >>> md = metadata.Metadata()
-            >>> md.composer = 'frank'
-            >>> mxCreator = md._contributors[0].mx
-            >>> mxCreator.get('charData')
-            'frank' 
-            >>> mxCreator.get('type')
-            'composer' 
+ 
+         >>> from music21 import *
+         >>> md = metadata.Metadata()
+         >>> md.composer = 'frank'
+         >>> mxCreator = md._contributors[0].mx
+         >>> mxCreator.get('charData')
+         'frank'
+         >>> mxCreator.get('type')
+         'composer'
+         
+ 
 
         .. attribute:: name
 
             Returns the text name, or the first of many names entered. 
-
-            >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
-            >>> td.name
-            'Chopin, Fryderyk' 
-            >>> td.names
-            ['Chopin, Fryderyk', 'Chopin, Frederick'] 
-
-            
+ 
+         >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
+         >>> td.name
+         'Chopin, Fryderyk'
+         >>> td.names
+         ['Chopin, Fryderyk', 'Chopin, Frederick']
+ 
+         
+ 
 
         .. attribute:: names
 
-            Returns all names in a list. 
-
-            >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
-            >>> td.names
-            ['Chopin, Fryderyk', 'Chopin, Frederick'] 
+            Returns all names in a list.
+ 
+         >>> td = Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
+         >>> td.names
+         ['Chopin, Fryderyk', 'Chopin, Frederick']
+         
+ 
 
         .. attribute:: role
 
-            The role is what part this Contributor plays in the work. Both full roll strings and roll abbreviations may be used. 
-
-            >>> td = Contributor()
-            >>> td.role = 'composer'
-            >>> td.role
-            'composer' 
-            >>> td.role = 'lor'
-            >>> td.role
-            'orchestrator' 
+            The role is what part this Contributor plays in the work. Both full roll strings and roll abbreviations may be used.
+ 
+         >>> td = Contributor()
+         >>> td.role = 'composer'
+         >>> td.role
+         'composer'
+         >>> td.role = 'lor'
+         >>> td.role
+         'orchestrator'
+         
+ 
 
     **Contributor** **methods**
 
         .. method:: age()
 
-            Calculate the age of the Contributor, returning a datetime.timedelta object. 
-
-            >>> a = Contributor(name='Beethoven, Ludwig van', role='composer', birth='1770/12/17', death='1827/3/26')
-            >>> a.role
-            'composer' 
-            >>> a.age()
-            datetime.timedelta(20552) 
-            >>> str(a.age())
-            '20552 days, 0:00:00' 
-            >>> a.age().days / 365
-            56 
+            Calculate the age of the Contributor, returning a datetime.timedelta object.
+ 
+         >>> a = Contributor(name='Beethoven, Ludwig van', role='composer', birth='1770/12/17', death='1827/3/26')
+         >>> a.role
+         'composer'
+         >>> a.age()
+         datetime.timedelta(20552)
+         >>> str(a.age())
+         '20552 days, 0:00:00'
+         >>> a.age().days / 365
+         56
+         
+ 
 
 
 Metadata
@@ -407,21 +494,28 @@ Metadata
 
 .. class:: Metadata(*args, **keywords)
 
-    Metadata represent data for a work or fragment, including title, composer, dates, and other relevant information. Metadata is a :class:`~music21.base.Music21Object` subclass, meaing that it can be positioned on a Stream by offset and have a :class:`~music21.duration.Duration`. In many cases, each Stream will have a single Metadata object at the zero offset position. 
+    Metadata represent data for a work or fragment, including title, composer, dates, and other relevant information.
+ 
+     Metadata is a :class:`~music21.base.Music21Object` subclass, meaing that it can be positioned on a Stream by offset and have a :class:`~music21.duration.Duration`.
+ 
+     In many cases, each Stream will have a single Metadata object at the zero offset position. 
+     
+ 
 
     
-
-    >>> md = Metadata(title='Concerto in F')
-    >>> md.title
-    'Concerto in F' 
-    >>> md = Metadata(otl='Concerto in F') # can use abbreviations
-    >>> md.title
-    'Concerto in F' 
-    >>> md.setWorkId('otl', 'Rhapsody in Blue')
-    >>> md.otl
-    'Rhapsody in Blue' 
-    >>> md.title
-    'Rhapsody in Blue' 
+         >>> md = Metadata(title='Concerto in F')
+         >>> md.title
+         'Concerto in F'
+         >>> md = Metadata(otl='Concerto in F') # can use abbreviations
+         >>> md.title
+         'Concerto in F'
+         >>> md.setWorkId('otl', 'Rhapsody in Blue')
+         >>> md.otl
+         'Rhapsody in Blue'
+         >>> md.title
+         'Rhapsody in Blue'
+         
+ 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -433,53 +527,73 @@ Metadata
 
         .. attribute:: composer
 
-            Get or set the composer of this work. More than one composer may be specified. The composer attribute does not live in Metadata, but creates a :class:`~music21.metadata.Contributor` object in the Metadata object. 
-
-            >>> md = Metadata(title='Third Symphony', popularTitle='Eroica', composer='Beethoven, Ludwig van')
-            >>> md.composer
-            'Beethoven, Ludwig van' 
+            Get or set the composer of this work. More than one composer may be specified.
+ 
+         The composer attribute does not live in Metadata, but creates a :class:`~music21.metadata.Contributor` object in the Metadata object.
+ 
+         >>> md = Metadata(title='Third Symphony', popularTitle='Eroica', composer='Beethoven, Ludwig van')
+         >>> md.composer
+         'Beethoven, Ludwig van'
+         
+ 
 
         .. attribute:: composers
 
-            Get a list of all :class:`~music21.metadata.Contributor` objects defined as composer of this work. 
+            Get a list of all :class:`~music21.metadata.Contributor` objects defined as composer of this work.
+         
+ 
 
         .. attribute:: movementName
 
             Get or set the movement title. 
+         
+ 
 
         .. attribute:: movementNumber
 
             Get or set the movement number. 
+         
+ 
 
         .. attribute:: mx
 
-            Return a mxScore object, to be merged or used in final musicxml output 
+            Return a mxScore object, to be merged or used in final musicxml output
+         
+ 
 
         .. attribute:: number
 
             Get or set the number of the work. 
+         
+ 
 
         .. attribute:: opusNumber
 
             Get or set the opus number. 
+         
+ 
 
         .. attribute:: title
 
             Get the title of the work, or the next matched title string available from related parameter fields. 
-
-            >>> md = Metadata(title='Third Symphony')
-            >>> md.title
-            'Third Symphony' 
-            >>> md = Metadata(popularTitle='Eroica')
-            >>> md.title
-            'Eroica' 
-            >>> md = Metadata(title='Third Symphony', popularTitle='Eroica')
-            >>> md.title
-            'Third Symphony' 
-            >>> md.popularTitle
-            'Eroica' 
-            >>> md.otp
-            'Eroica' 
+ 
+         >>> md = Metadata(title='Third Symphony')
+         >>> md.title
+         'Third Symphony'
+         
+         >>> md = Metadata(popularTitle='Eroica')
+         >>> md.title
+         'Eroica'
+         
+         >>> md = Metadata(title='Third Symphony', popularTitle='Eroica')
+         >>> md.title
+         'Third Symphony'
+         >>> md.popularTitle
+         'Eroica'
+         >>> md.otp
+         'Eroica'
+         
+ 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -487,49 +601,53 @@ Metadata
 
         .. method:: addContributor(c)
 
-            Assign a :class:`~music21.metadata.Contributor` object to this Metadata. 
-
-            >>> md = Metadata(title='Third Symphony')
-            >>> c = Contributor()
-            >>> c.name = 'Beethoven, Ludwig van'
-            >>> c.role = 'composer'
-            >>> md.addContributor(c)
-            >>> md.composer
-            'Beethoven, Ludwig van' 
-            >>> md.composer = 'frank'
-            >>> md.composers
-            ['Beethoven, Ludwig van', 'frank'] 
+            Assign a :class:`~music21.metadata.Contributor` object to this Metadata.
+ 
+         >>> md = Metadata(title='Third Symphony')
+         >>> c = Contributor()
+         >>> c.name = 'Beethoven, Ludwig van'
+         >>> c.role = 'composer'
+         >>> md.addContributor(c)
+         >>> md.composer
+         'Beethoven, Ludwig van'
+         >>> md.composer = 'frank'
+         >>> md.composers
+         ['Beethoven, Ludwig van', 'frank']
+         
+ 
 
         .. method:: getContributorsByRole(value)
 
             Return a :class:`~music21.metadata.Contributor` if defined for a provided role. 
-
-            >>> md = Metadata(title='Third Symphony')
-            >>> c = Contributor()
-            >>> c.name = 'Beethoven, Ludwig van'
-            >>> c.role = 'composer'
-            >>> md.addContributor(c)
-            >>> cList = md.getContributorsByRole('composer')
-            >>> cList[0].name
-            'Beethoven, Ludwig van' 
-
-            
+ 
+         >>> md = Metadata(title='Third Symphony')
+         >>> c = Contributor()
+         >>> c.name = 'Beethoven, Ludwig van'
+         >>> c.role = 'composer'
+         >>> md.addContributor(c)
+         >>> cList = md.getContributorsByRole('composer')
+         >>> cList[0].name
+         'Beethoven, Ludwig van'
+ 
+         
+ 
 
         .. method:: setWorkId(idStr, value)
 
             Directly set a workd id, given either as a full string name or as a three character abbreviation. 
-
-            >>> md = Metadata(title='Quartet')
-            >>> md.title
-            'Quartet' 
-            >>> md.setWorkId('otl', 'Trio')
-            >>> md.title
-            'Trio' 
-            >>> md.setWorkId('sdf', None)
-            Traceback (most recent call last): 
-            MetadataException: no work id available with id: sdf 
-
-            
+ 
+         >>> md = Metadata(title='Quartet')
+         >>> md.title
+         'Quartet'
+         >>> md.setWorkId('otl', 'Trio')
+         >>> md.title
+         'Trio'
+         >>> md.setWorkId('sdf', None)
+         Traceback (most recent call last):
+         MetadataException: no work id available with id: sdf
+ 
+         
+ 
 
         Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocationBySite`, :meth:`~music21.base.Music21Object.removeLocationBySiteId`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
 
@@ -539,7 +657,9 @@ Copyright
 
 .. class:: Copyright(*args, **keywords)
 
-    An object representation of copyright. 
+    An object representation of copyright.
+     
+ 
 
     
 
@@ -549,17 +669,20 @@ Creator
 
 .. class:: Creator(*args, **keywords)
 
-    A person that created a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements. 
+    A person that created a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements.  
+     
+ 
 
     
-
-    >>> td = Creator(role='composer', name='Chopin, Fryderyk')
-    >>> td.role
-    'composer' 
-    >>> td.name
-    'Chopin, Fryderyk' 
-    >>> td.relevance
-    'creator' 
+         >>> td = Creator(role='composer', name='Chopin, Fryderyk')
+         >>> td.role
+         'composer'
+         >>> td.name
+         'Chopin, Fryderyk'
+         >>> td.relevance
+         'creator'
+         
+ 
 
     inherits from: :class:`~music21.metadata.Contributor`
 
@@ -569,7 +692,9 @@ Imprint
 
 .. class:: Imprint(*args, **keywords)
 
-    An object representation of imprint, or publication. 
+    An object representation of imprint, or publication.
+     
+ 
 
     
 

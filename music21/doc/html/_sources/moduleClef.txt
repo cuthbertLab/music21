@@ -7,12 +7,17 @@ music21.clef
 
 .. module:: music21.clef
 
-This module defines numerous subclasses of :class:`~music21.clef.Clef`, providing object representations for all commonly used clefs. Clef objects are often found within :class:`~music21.stream.Measure` objects. 
+This module defines numerous subclasses of :class:`~music21.clef.Clef`, providing object representations for all commonly used clefs. Clef objects are often found within :class:`~music21.stream.Measure` objects.  
+ 
+ 
 
 
 .. function:: standardClefFromXN(xnStr)
 
-    Returns a Clef object given a string like "G2" or "F4" etc. 
+    
+     Returns a Clef object given a string like "G2" or "F4" etc.
+     
+ 
 
 Clef
 ----
@@ -26,22 +31,33 @@ Clef
 
         .. attribute:: classSortOrder
 
-            Property which returns an number (int or otherwise) depending on the class of the Music21Object that represents a priority for an object based on its class alone -- used as a tie for stream sorting in case two objects have the same offset and priority.  Lower numbers are sorted to the left of higher numbers.  For instance, Clef, KeySignature, TimeSignature all come (in that order) before Note. All undefined classes have classSortOrder of 20 -- same as note.Note 
-
-            >>> from music21 import *
-            >>> tc = clef.TrebleClef()
-            >>> tc.classSortOrder
-            0 
-            >>> ks = key.KeySignature(3)
-            >>> ks.classSortOrder
-            1 
-            New classes can define their own default classSortOrder 
-            >>> class ExampleClass(base.Music21Object):
-            ...     classSortOrderDefault = 5 
-            ... 
-            >>> ec1 = ExampleClass()
-            >>> ec1.classSortOrder
-            5 
+            Property which returns an number (int or otherwise)
+         depending on the class of the Music21Object that
+         represents a priority for an object based on its class alone --
+         used as a tie for stream sorting in case two objects have the
+         same offset and priority.  Lower numbers are sorted to the left
+         of higher numbers.  For instance, Clef, KeySignature, TimeSignature
+         all come (in that order) before Note.
+         
+         All undefined classes have classSortOrder of 20 -- same as note.Note
+         
+         >>> from music21 import *
+         >>> tc = clef.TrebleClef()
+         >>> tc.classSortOrder
+         0
+         >>> ks = key.KeySignature(3)
+         >>> ks.classSortOrder
+         1
+         
+         New classes can define their own default classSortOrder
+         >>> class ExampleClass(base.Music21Object):
+         ...     classSortOrderDefault = 5
+         ...
+         >>> ec1 = ExampleClass()
+         >>> ec1.classSortOrder
+         5
+         
+ 
 
         Attributes without Documentation: `octaveChange`, `sign`, `line`
 
@@ -51,21 +67,26 @@ Clef
 
         .. attribute:: mx
 
-            Given a music21 Clef object, return a MusicXML Clef object. This might be moved only into PitchClef. 
-
-            >>> from music21 import *
-            >>> b = clef.GClef()
-            >>> a = b.mx
-            >>> a.get('sign')
-            'G' 
-            >>> b = clef.Treble8vbClef()
-            >>> b.octaveChange
-            -1 
-            >>> a = b.mx
-            >>> a.get('sign')
-            'G' 
-            >>> a.get('clefOctaveChange')
-            -1 
+            Given a music21 Clef object, return a MusicXML Clef object.
+ 
+         This might be moved only into PitchClef.
+ 
+         >>> from music21 import *
+         >>> b = clef.GClef()
+         >>> a = b.mx
+         >>> a.get('sign')
+         'G'
+ 
+         >>> b = clef.Treble8vbClef()
+         >>> b.octaveChange
+         -1
+         >>> a = b.mx
+         >>> a.get('sign')
+         'G'
+         >>> a.get('clefOctaveChange')
+         -1
+         
+ 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -81,11 +102,12 @@ TrebleClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.TrebleClef()
-    >>> a.sign
-    'G' 
+         >>> from music21 import *
+         >>> a = clef.TrebleClef()
+         >>> a.sign
+         'G'
+         
+ 
 
     inherits from: :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -97,13 +119,13 @@ BassClef
 
 
     
-
-    
-
-    >>> from music21 import *
-    >>> a = clef.BassClef()
-    >>> a.sign
-    'F' 
+ 
+         >>> from music21 import *
+         >>> a = clef.BassClef()
+         >>> a.sign
+         'F'
+         
+ 
 
     inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -115,11 +137,12 @@ AltoClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.AltoClef()
-    >>> a.sign
-    'C' 
+         >>> from music21 import *
+         >>> a = clef.AltoClef()
+         >>> a.sign
+         'C'
+         
+ 
 
     inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -131,11 +154,12 @@ Bass8vaClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.Bass8vaClef()
-    >>> a.sign
-    'F' 
+         >>> from music21 import *
+         >>> a = clef.Bass8vaClef()
+         >>> a.sign
+         'F'
+         
+ 
 
     inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -147,13 +171,14 @@ Bass8vbClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.Bass8vbClef()
-    >>> a.sign
-    'F' 
-    >>> a.octaveChange
-    -1 
+         >>> from music21 import *
+         >>> a = clef.Bass8vbClef()
+         >>> a.sign
+         'F'
+         >>> a.octaveChange
+         -1
+         
+ 
 
     inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -165,13 +190,14 @@ CBaritoneClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.CBaritoneClef()
-    >>> a.sign
-    'C' 
-    >>> a.line
-    5 
+         >>> from music21 import *
+         >>> a = clef.CBaritoneClef()
+         >>> a.sign
+         'C'
+         >>> a.line
+         5
+         
+ 
 
     inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -183,11 +209,12 @@ CClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.CClef()
-    >>> a.sign
-    'C' 
+         >>> from music21 import *
+         >>> a = clef.CClef()
+         >>> a.sign
+         'C'
+         
+ 
 
     inherits from: :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -221,18 +248,19 @@ FBaritoneClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.FBaritoneClef()
-    >>> a.sign
-    'F' 
-    >>> a.line
-    3 
-    >>> b = clef.CBaritoneClef()
-    >>> a.lowestLine == b.lowestLine
-    True 
-    >>> a.sign == b.sign
-    False 
+         >>> from music21 import *
+         >>> a = clef.FBaritoneClef()
+         >>> a.sign
+         'F'
+         >>> a.line
+         3
+         >>> b = clef.CBaritoneClef()
+         >>> a.lowestLine == b.lowestLine
+         True
+         >>> a.sign == b.sign
+         False
+         
+ 
 
     inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -244,11 +272,12 @@ FClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.FClef()
-    >>> a.sign
-    'F' 
+         >>> from music21 import *
+         >>> a = clef.FClef()
+         >>> a.sign
+         'F'
+         
+ 
 
     inherits from: :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -282,11 +311,12 @@ FrenchViolinClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.FrenchViolinClef()
-    >>> a.sign
-    'G' 
+         >>> from music21 import *
+         >>> a = clef.FrenchViolinClef()
+         >>> a.sign
+         'G'
+         
+ 
 
     inherits from: :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -298,11 +328,12 @@ GClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.GClef()
-    >>> a.sign
-    'G' 
+         >>> from music21 import *
+         >>> a = clef.GClef()
+         >>> a.sign
+         'G'
+         
+ 
 
     inherits from: :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -336,11 +367,12 @@ GSopranoClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.GSopranoClef()
-    >>> a.sign
-    'G' 
+         >>> from music21 import *
+         >>> a = clef.GSopranoClef()
+         >>> a.sign
+         'G'
+         
+ 
 
     inherits from: :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -352,11 +384,12 @@ MezzoSopranoClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.MezzoSopranoClef()
-    >>> a.sign
-    'C' 
+         >>> from music21 import *
+         >>> a = clef.MezzoSopranoClef()
+         >>> a.sign
+         'C'
+         
+ 
 
     inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -399,7 +432,8 @@ PitchClef
 
         .. attribute:: lily
 
-            No documentation. 
+            No documentation.
+ 
 
         Properties inherited from :class:`~music21.clef.Clef`: :attr:`~music21.clef.Clef.mx`
 
@@ -417,11 +451,12 @@ SopranoClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.SopranoClef()
-    >>> a.sign
-    'C' 
+         >>> from music21 import *
+         >>> a = clef.SopranoClef()
+         >>> a.sign
+         'C'
+         
+ 
 
     inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -433,11 +468,12 @@ SubBassClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.SubBassClef()
-    >>> a.sign
-    'F' 
+         >>> from music21 import *
+         >>> a = clef.SubBassClef()
+         >>> a.sign
+         'F'
+         
+ 
 
     inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -458,15 +494,15 @@ TenorClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.TenorClef()
-    >>> a.sign
-    'C' 
-    >>> a.line
-    4 
-
-    
+         >>> from music21 import *
+         >>> a = clef.TenorClef()
+         >>> a.sign
+         'C'
+         >>> a.line
+         4
+         
+         
+ 
 
     inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -478,13 +514,14 @@ Treble8vaClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.Treble8vaClef()
-    >>> a.sign
-    'G' 
-    >>> a.octaveChange
-    1 
+         >>> from music21 import *
+         >>> a = clef.Treble8vaClef()
+         >>> a.sign
+         'G'
+         >>> a.octaveChange
+         1
+         
+ 
 
     inherits from: :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
@@ -496,13 +533,14 @@ Treble8vbClef
 
 
     
-
-    >>> from music21 import *
-    >>> a = clef.Treble8vbClef()
-    >>> a.sign
-    'G' 
-    >>> a.octaveChange
-    -1 
+         >>> from music21 import *
+         >>> a = clef.Treble8vbClef()
+         >>> a.sign
+         'G'
+         >>> a.octaveChange
+         -1
+         
+ 
 
     inherits from: :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 

@@ -7,26 +7,33 @@ music21.serial
 
 .. module:: music21.serial
 
-This module defines objects for defining and manipulating structures common to serial and/or twelve-tone music, including :class:`~music21.serial.ToneRow` subclasses. 
+This module defines objects for defining and manipulating structures 
+ common to serial and/or twelve-tone music, 
+ including :class:`~music21.serial.ToneRow` subclasses.
+ 
+ 
 
 
 .. function:: pcToToneRow(pcSet)
 
     A convenience function that, given a list of pitch classes represented as integers 
-
-    >>> a = pcToToneRow(range(12))
-    >>> matrixObj = a.matrix()
-    >>> print matrixObj
-    0  1  2  3  4  5  6  7  8  9  A  B 
-    B  0  1  2  3  4  5  6  7  8  9  A 
-    ... 
-    >>> import random
-    >>> a = pcToToneRow([4,5,0,6,7,2,'a',8,9,1,'b',3])
-    >>> matrixObj = a.matrix()
-    >>> print matrixObj
-    0  1  8  2  3  A  6  4  5  9  7  B 
-    B  0  7  1  2  9  5  3  4  8  6  A 
-    ... 
+ 
+     >>> a = pcToToneRow(range(12))
+     >>> matrixObj = a.matrix()
+     >>> print matrixObj
+       0  1  2  3  4  5  6  7  8  9  A  B
+       B  0  1  2  3  4  5  6  7  8  9  A
+     ...
+ 
+     >>> import random
+     >>> a = pcToToneRow([4,5,0,6,7,2,'a',8,9,1,'b',3])
+     >>> matrixObj = a.matrix()
+     >>> print matrixObj
+       0  1  8  2  3  A  6  4  5  9  7  B
+       B  0  7  1  2  9  5  3  4  8  6  A
+     ...
+     
+ 
 
 .. function:: rowToMatrix(p)
 
@@ -37,8 +44,9 @@ ToneRow
 .. class:: ToneRow()
 
     A Stream representation of a tone row, or an ordered sequence of pitches. 
-
-    
+ 
+     
+ 
 
     inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
@@ -48,7 +56,9 @@ TwelveToneRow
 
 .. class:: TwelveToneRow()
 
-    A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix. 
+    A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix.
+     
+ 
 
     inherits from: :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
@@ -56,7 +66,8 @@ TwelveToneRow
 
         .. attribute:: row
 
-            A list representing the pitch class values of the row. 
+            A list representing the pitch class values of the row.
+ 
 
         Attributes inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.isMeasure`, :attr:`~music21.stream.Stream.flattenedRepresentationOf`, :attr:`~music21.stream.Stream.classNames`, :attr:`~music21.stream.Stream.isFlat`, :attr:`~music21.stream.Stream.isSorted`
 
@@ -72,15 +83,18 @@ TwelveToneRow
 
         .. method:: matrix()
 
-            Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.  That object can just be printed (or displayed via .show()) 
-
-            >>> s37 = RowSchoenbergOp37().matrix()
-            >>> print s37
-            0  B  7  8  3  1  2  A  6  5  4  9 
-            1  0  8  9  4  2  3  B  7  6  5  A 
-            5  4  0  1  8  6  7  3  B  A  9  2 
-            4  3  B  0  7  5  6  2  A  9  8  1 
-            ... 
+            
+         Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.  That object can just be printed (or displayed via .show())
+         
+         >>> s37 = RowSchoenbergOp37().matrix()
+         >>> print s37
+           0  B  7  8  3  1  2  A  6  5  4  9
+           1  0  8  9  4  2  3  B  7  6  5  A
+           5  4  0  1  8  6  7  3  B  A  9  2
+           4  3  B  0  7  5  6  2  A  9  8  1
+         ...
+         
+ 
 
         Methods inherited from :class:`~music21.stream.Stream`: :meth:`~music21.stream.Stream.append`, :meth:`~music21.stream.Stream.insert`, :meth:`~music21.stream.Stream.insertAndShift`, :meth:`~music21.stream.Stream.transpose`, :meth:`~music21.stream.Stream.augmentOrDiminish`, :meth:`~music21.stream.Stream.scaleOffsets`, :meth:`~music21.stream.Stream.scaleDurations`, :meth:`~music21.stream.Stream.addGroupForElements`, :meth:`~music21.stream.Stream.allPlayingWhileSounding`, :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`~music21.stream.Stream.attributeCount`, :meth:`~music21.stream.Stream.bestClef`, :meth:`~music21.stream.Stream.extendDuration`, :meth:`~music21.stream.Stream.extractContext`, :meth:`~music21.stream.Stream.findConsecutiveNotes`, :meth:`~music21.stream.Stream.findGaps`, :meth:`~music21.stream.Stream.getClefs`, :meth:`~music21.stream.Stream.getElementAfterElement`, :meth:`~music21.stream.Stream.getElementAfterOffset`, :meth:`~music21.stream.Stream.getElementAtOrAfter`, :meth:`~music21.stream.Stream.getElementAtOrBefore`, :meth:`~music21.stream.Stream.getElementBeforeElement`, :meth:`~music21.stream.Stream.getElementBeforeOffset`, :meth:`~music21.stream.Stream.getElementById`, :meth:`~music21.stream.Stream.getElementsByClass`, :meth:`~music21.stream.Stream.getElementsByGroup`, :meth:`~music21.stream.Stream.getElementsByOffset`, :meth:`~music21.stream.Stream.getElementsNotOfClass`, :meth:`~music21.stream.Stream.getInstrument`, :meth:`~music21.stream.Stream.getKeySignatures`, :meth:`~music21.stream.Stream.getMeasure`, :meth:`~music21.stream.Stream.getMeasureRange`, :meth:`~music21.stream.Stream.getMeasures`, :meth:`~music21.stream.Stream.getOffsetByElement`, :meth:`~music21.stream.Stream.getOverlaps`, :meth:`~music21.stream.Stream.getSimultaneous`, :meth:`~music21.stream.Stream.getTimeSignatures`, :meth:`~music21.stream.Stream.groupCount`, :meth:`~music21.stream.Stream.groupElementsByOffset`, :meth:`~music21.stream.Stream.index`, :meth:`~music21.stream.Stream.indexList`, :meth:`~music21.stream.Stream.insertAtNativeOffset`, :meth:`~music21.stream.Stream.isClass`, :meth:`~music21.stream.Stream.isSequence`, :meth:`~music21.stream.Stream.makeAccidentals`, :meth:`~music21.stream.Stream.makeBeams`, :meth:`~music21.stream.Stream.makeMeasures`, :meth:`~music21.stream.Stream.makeNotation`, :meth:`~music21.stream.Stream.makeRests`, :meth:`~music21.stream.Stream.makeTies`, :meth:`~music21.stream.Stream.measureOffsetMap`, :meth:`~music21.stream.Stream.melodicIntervals`, :meth:`~music21.stream.Stream.pitchAttributeCount`, :meth:`~music21.stream.Stream.playingWhenAttacked`, :meth:`~music21.stream.Stream.plot`, :meth:`~music21.stream.Stream.pop`, :meth:`~music21.stream.Stream.remove`, :meth:`~music21.stream.Stream.repeatAppend`, :meth:`~music21.stream.Stream.repeatInsert`, :meth:`~music21.stream.Stream.replace`, :meth:`~music21.stream.Stream.setupPickleScaffold`, :meth:`~music21.stream.Stream.shiftElements`, :meth:`~music21.stream.Stream.simultaneousAttacks`, :meth:`~music21.stream.Stream.splitByClass`, :meth:`~music21.stream.Stream.stripTies`, :meth:`~music21.stream.Stream.teardownPickleScaffold`, :meth:`~music21.stream.Stream.transferOffsetToElements`, :meth:`~music21.stream.Stream.trimPlayingWhileSounding`
 
@@ -92,13 +106,17 @@ TwelveToneMatrix
 
 .. class:: TwelveToneMatrix(*arguments, **keywords)
 
-    An object representation of a 2-dimensional array of 12 pitches. Internal representation is as a :class:`~music21.stream.Stream`, which stores 12 Streams, each Stream a horizontal row of pitches in the matrix. This object is commonly used by calling the :meth:`~music21.stream.TwelveToneRow.matrix` method of :meth:`~music21.stream.TwelveToneRow` (or a subclass). 
+    An object representation of a 2-dimensional array of 12 pitches. Internal representation is as a :class:`~music21.stream.Stream`, which stores 12 Streams, each Stream a horizontal row of pitches in the matrix. 
+ 
+     This object is commonly used by calling the :meth:`~music21.stream.TwelveToneRow.matrix` method of :meth:`~music21.stream.TwelveToneRow` (or a subclass).
+ 
+     
+ 
 
     
-
-    
-
-    >>> aMatrix = TwelveToneMatrix()
+         >>> aMatrix = TwelveToneMatrix()
+         
+ 
 
     inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
@@ -109,6 +127,8 @@ HistoricalTwelveToneRow
 .. class:: HistoricalTwelveToneRow()
 
     A 12-tone row used in the historical literature. Added attributes to document the the historical context of the row. 
+     
+ 
 
     inherits from: :class:`~music21.serial.TwelveToneRow`, :class:`~music21.serial.ToneRow`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
@@ -116,15 +136,18 @@ HistoricalTwelveToneRow
 
         .. attribute:: composer
 
-            The composers name. 
+            The composers name.
+ 
 
         .. attribute:: opus
 
-            The opus of the work, or None. 
+            The opus of the work, or None.
+ 
 
         .. attribute:: title
 
-            The title of the work. 
+            The title of the work.
+ 
 
         Attributes inherited from :class:`~music21.serial.TwelveToneRow`: :attr:`~music21.serial.TwelveToneRow.row`
 
