@@ -13,7 +13,9 @@
 import unittest, doctest
 
 import music21
+
 from music21 import interval
+from music21 import common
 
 from music21.note import Note
 from music21.interval import Interval
@@ -106,25 +108,48 @@ class VoiceLeadingQuartet(music21.Music21Object):
             else:
                 return True
  
-    def antiParallelMotion(self):
+    def antiParallelMotion(self, simpleName = None):
         '''
         Returns true if the simple interval before is the same as the simple interval after
-        and the motion is contrary
+        and the motion is contrary.  if simpleName is specified as an Interval object or a
+        string then it only returns true if the simpleName of both intervals is the same
+        as simpleName (i.e., use to find antiParallel fifths) 
 
-        >>> n11 = Note("C4")
-        >>> n12 = Note("D3") # descending 7th
-        >>> n21 = Note("G4")
-        >>> n22 = Note("A4") # ascending 2nd
-        >>> vlq1 = VoiceLeadingQuartet(n11, n12, n21, n22)
+        >>> from music21 import *
+        >>> n11 = note.Note("C4")
+        >>> n12 = note.Note("D3") # descending 7th
+        >>> n21 = note.Note("G4")
+        >>> n22 = note.Note("A4") # ascending 2nd
+        >>> vlq1 = voiceLeading.VoiceLeadingQuartet(n11, n12, n21, n22)
         >>> vlq1.antiParallelMotion()
         True
-
+        >>> vlq1.antiParallelMotion('M2')
+        False
+        >>> vlq1.antiParallelMotion('P5')
+        True
+        
+        We can also use interval objects
+        >>> p5Obj = interval.Interval("P5")
+        >>> vlq1.antiParallelMotion(p5Obj)
+        True
         '''
         if not self.contraryMotion():
             return False
         else:
             if self.vIntervals[0].simpleName == self.vIntervals[1].simpleName:
-                return True
+                if simpleName is None:
+                    return True
+                else:
+                    if common.isStr(simpleName):
+                        if self.vIntervals[0].simpleName == simpleName:
+                            return True
+                        else:
+                            return False
+                    else: # assume Interval object
+                        if self.vIntervals[0].simpleName == simpleName.simpleName:
+                            return True
+                        else:
+                            return False
             else:
                 return False
 
