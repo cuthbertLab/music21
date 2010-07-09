@@ -2768,7 +2768,7 @@ class Stream(music21.Music21Object):
                 # that this may not be true
                 addAlteredPitches = ksStream[0].alteredPitches
         alteredPitches += addAlteredPitches
-        #environLocal.printDebug(['processing makeAccidentals() with alteredPitches:', alteredPitches])
+        environLocal.printDebug(['processing makeAccidentals() with alteredPitches:', alteredPitches])
 
         # need to move through notes in order
         # NOTE: this may or may have sub-streams that are not being examined

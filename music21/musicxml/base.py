@@ -1415,6 +1415,11 @@ class Note(MusicXMLElement):
         self.chord = False # boolean, default is false
         self.duration = None # number, in div per quarter
         self.voice = None # numbers
+
+        # note: to configre note size options, Type can have an attribute for
+        # cue or large, eg: <type size="cue">quarter</type>
+        # this will require a Type class
+
         self.type = None # string, representing long through 256th note
         self.stem = None # string
         self.staff = None # number, for parts w/ > 1 staff 

@@ -1974,7 +1974,6 @@ class TimeSignature(music21.Music21Object):
         if not isinstance(self.beat[0], MeterSequence):
             raise TimeSignatureException('cannot determine beat backgrond when each beat is not partitioned')
 
-
         # getting length here gives number of subdivisions
         for ms in self.beat:
             post.append(len(ms))

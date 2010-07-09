@@ -614,13 +614,15 @@ def ch2_basic_I_A_4(show=True, *arguments, **keywords):
 
 def ch2_basic_I_B(show=True, *arguments, **keywords):
     '''p. 12
-    Using the information given, complete the chart below.
+    Using the information given, complete the chart below. (Given meter type and one of meter, beat unit, beat division, full bar divisions, provide the other data)
     '''
+    # a brute force way to do this might have a function in meter.py that returns a number of candidates for a given meter type and some other parameter (bar duration). then, these values can be tested for match.
     pass
+    
 
 def ch2_basic_I_C(show=True, *arguments, **keywords):
     '''p. 13
-    Complete the chart below.
+    Complete the chart below. (For a given meter, provide meter type, beat unit, beat division, and beat subdivision.)
     '''
     from music21 import meter, stream
 
@@ -695,6 +697,8 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
 
 def ch2_basic_II(show=True, *arguments, **keywords):
     '''p. 13
+
+    Write the rhythms that use the same counting pattern as those in the same row. 
     '''
     pass
 
@@ -732,6 +736,8 @@ def ch2_writing_I_A(tsStr, barGroups):
 
 def ch2_writing_I_A_1(show=True, *arguments, **keywords):
     '''p. 14
+
+    Complete the rhythms below by adding one note value that completes any measure with too few beats.
     '''
     barGroups = ([.5], [.75, .25], [.5, .75], [.25, .25, .25, .25], [.5], [])
     ex = ch2_writing_I_A('3/8', barGroups)
@@ -785,6 +791,8 @@ def ch2_writing_I_A_5(show=True, *arguments, **keywords):
 
 def ch2_writing_I_B_1(show=True, *arguments, **keywords):
     '''p. 14
+
+    Complete the rhythms below by adding rests to complete any measure with too few beats. 
     '''
     pass
 
@@ -814,6 +822,8 @@ def ch2_writing_I_B_5(show=True, *arguments, **keywords):
 
 def ch2_writing_II_A(show=True, *arguments, **keywords):
     '''p. 15
+
+    Each of these pieces begins with an anacrusis. What note value (or note value plus rest) could the composer use to fill the last measure of the compositions correctly. 
     '''
     pass
 
@@ -941,7 +951,7 @@ def ch2_writing_III_B_1(show=True, *arguments, **keywords):
     Renotate the following rhythms without ties. 
     '''
     from music21 import tinyNotation
-    ex = tinyNotation.TinyNotationStream("c8~ c16 c16 c16 c16 c8~ c8 c c16 c~ c c c8 c4~ c8", "3/8")
+    ex = converter.parse("c8~ c16 c16 c16 c16 c8~ c8 c c16 c~ c c c8 c4~ c8", "3/8")
 
     ex = ch2_writing_III_B(ex)
     if show:
@@ -954,7 +964,7 @@ def ch2_writing_III_B_2(show=True, *arguments, **keywords):
     '''p. 17
     '''
     from music21 import tinyNotation
-    ex = tinyNotation.TinyNotationStream("c4~ c8 c16 c c8 c~ c c c2~ c4 c8 c8 c8~ c16 c c8~ c16 c c2", "4/4")
+    ex = converter.parse("c4~ c8 c16 c c8 c~ c c c2~ c4 c8 c8 c8~ c16 c c8~ c16 c c2", "4/4")
 
     ex = ch2_writing_III_B(ex)
     if show:
@@ -967,7 +977,7 @@ def ch2_writing_III_B_3(show=True, *arguments, **keywords):
     '''p. 17
     '''
     from music21 import tinyNotation
-    ex = tinyNotation.TinyNotationStream("c2~ c4 c c~ c8 c c4 c~ c c c2 c2 c2~ c4 c c1~ c2", "3/2")
+    ex = converter.parse("c2~ c4 c c~ c8 c c4 c~ c c c2 c2 c2~ c4 c c1~ c2", "3/2")
 
     ex = ch2_writing_III_B(ex)
     if show:
@@ -983,6 +993,8 @@ def ch2_writing_III_B_3(show=True, *arguments, **keywords):
 
 def ch2_writing_IV_A(show=True, *arguments, **keywords):
     '''p. 17
+
+    Rebeam each of the vocal lines to reflect the meter and beat unit instead. 
     '''
     pass
 
@@ -991,7 +1003,15 @@ def ch2_writing_IV_A(show=True, *arguments, **keywords):
 def ch2_writing_IV_B(show=True, *arguments, **keywords):
     '''p. 18
     '''
-    pass
+    ex = converter.parse("c8. c16 e8 g c'4. r8 a8. a16 c'8 a g4. e16 f g8 g8 e16 e g16 g a8 g8 e4 d8 e16 f e d8 d16 c4.", "2/4")
+    
+    ex = ex.makeMeasures() 
+    ex.makeBeams(inPlace=True)
+
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
 
 
 #-------------------------------------------------------------------------------
@@ -999,14 +1019,29 @@ def ch2_writing_IV_B(show=True, *arguments, **keywords):
 
 def ch2_writing_V_A(show=True, *arguments, **keywords):
     '''p. 18
+
+    Using the meter signature given, add bar lines to the following melodies. 
     '''
-    pass
+    from music21 import converter, key
+
+    # note: tiny is not encoding C#s for c'#4 properly (it seems)
+    ex = converter.parse("g#1 f#4 g#4 a1 g#2 f#1 g#4. en8 g#2 f#4 r4 f#4 d#8 B8 e2 r4 e4 a4. a8 a2 g#4 g# b4. e8 a2~ a4 a4 d'n4. d'8 d'n2 c'#4 c'# c'# c'#", "3/2")
+    
+    ex.insert(0, key.KeySignature(4))
+    # presently, this only works if makeAccidentals is called before make measures
+    ex.makeAccidentals(inPlace=True)
+    ex = ex.makeMeasures() 
+    ex.makeBeams(inPlace=True)
+
+    if show:
+        ex.show()
+    else:
+        post = ex.musicxml
 
 def ch2_writing_V_B(show=True, *arguments, **keywords):
     '''p. 18
     '''
     pass
-
 
 
 #-------------------------------------------------------------------------------
@@ -1837,4 +1872,8 @@ if __name__ == "__main__":
         #ch2_writing_I_A_2(show=True)
         #ch2_writing_I_A_3(show=True)
         #ch2_writing_I_A_4(show=True)
-        ch2_writing_I_A_5(show=True)
+        #ch2_writing_I_A_5(show=True)
+
+        #ch2_writing_IV_B(show=True)
+        ch2_writing_V_A(show=True)
+        
