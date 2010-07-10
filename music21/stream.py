@@ -2768,7 +2768,7 @@ class Stream(music21.Music21Object):
                 # that this may not be true
                 addAlteredPitches = ksStream[0].alteredPitches
         alteredPitches += addAlteredPitches
-        environLocal.printDebug(['processing makeAccidentals() with alteredPitches:', alteredPitches])
+        #environLocal.printDebug(['processing makeAccidentals() with alteredPitches:', alteredPitches])
 
         # need to move through notes in order
         # NOTE: this may or may have sub-streams that are not being examined
@@ -4864,6 +4864,7 @@ class Measure(Stream):
     'keyIsNew': 'Boolean describing if KeySignature is different than the previous Measure.',
     'measureNumber': 'A number representing the displayed or shown Measure number as presented in a written Score.',
     'measureNumberSuffix': 'If a Measure number has a string annotation, such as "a" or similar, this string is stored here.',
+    'layoutWidth': 'A suggestion for layout width, though most rendering systems do not support this designation. Use :class:`~music21.layout.SystemLayout` ojbects instead.',
     }
 
     def __init__(self, *args, **keywords):
@@ -4875,9 +4876,16 @@ class Measure(Stream):
         self.keyIsNew = False
 
         self.filled = False
+
         # NOTE: it seems that the default measure number should be zero.
         self.measureNumber = 0 # 0 means undefined or pickup
         self.measureNumberSuffix = None # for measure 14a would be "a"
+    
+        # we can request layout width, using the same units used
+        # in layout.py for systems; most musicxml readers do not support this
+        # on input
+        self.layoutWidth = None
+
 
     def addRepeat(self):
         # TODO: write
@@ -4886,22 +4894,6 @@ class Measure(Stream):
     def addTimeDependentDirection(self, time, direction):
         # TODO: write
         pass
-
-
-
-    # TODO: remove, replace with direct attribute access
-#     def setLeftBarline(self, blStyle = None):
-#         '''Convenience method for creating and setting a Barline
-#         '''
-#         barline = bar.Barline(blStyle)
-#         self.leftBarline = barline
-# 
-#     def setRightBarline(self, blStyle = None):
-#         '''Convenience method for creating and setting a Barline
-#         '''
-#         barline = bar.Barline(blStyle)
-#         self.rightBarline = bar.Barline(blStyle)
-    
 
     
     def measureNumberWithSuffix(self):
@@ -5266,6 +5258,9 @@ class Measure(Stream):
         mxMeasure = musicxmlMod.Measure()
         mxMeasure.set('number', self.measureNumber)
 
+        if self.layoutWidth != None:
+            mxMeasure.set('width', self.layoutWidth)
+
         # print objects come before attributes
         # note: this class match is a problem in cases where the object is created in the module itself, as in a test. 
         found = self.getElementsByClass(layout.SystemLayout)
@@ -5336,6 +5331,10 @@ class Measure(Stream):
         if mSuffix not in [None, '']:
             self.measureNumberSuffix = mSuffix
 
+        data = mxMeasure.get('width')
+        if data != None: # may need to do a format/unit conversion?
+            self.layoutWidth = data
+            
         junk = mxMeasure.get('implicit')
 #         environLocal.printDebug(['_setMX: working on measure:',
 #                                 self.measureNumber])
@@ -8387,6 +8386,29 @@ class Test(unittest.TestCase):
 
         #p.show()
 
+
+    def testMeasureLayout(self):
+        # test both system layout and measure width
+
+
+        # Note: Measure.layoutWidth is not currently read by musicxml
+        from music21 import note, layout
+    
+        s = Stream()
+        for i in range(1,10):
+            n = note.Note()
+            m = Measure()
+            m.append(n)
+            m.layoutWidth = i*100
+            if i % 2 == 0:
+                sl = layout.SystemLayout(isNew=True)
+                m.insert(0, sl)
+            s.append(m)
+
+        #s.show()
+        post = s.musicxml
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -8412,4 +8434,6 @@ if __name__ == "__main__":
 
         #a.testStripTiesScore()
 
-        a.testMeasureBarline()
+        #a.testMeasureBarline()
+
+        a.testMeasureLayout()
