@@ -471,11 +471,9 @@ class Stream(music21.Music21Object):
         '''
         post = self._elements.pop(index)
         self._elementsChanged()
-
         # remove self from locations here only if
         # there are no further locations
         post.removeLocationBySite(self)
-
         return post
 
     def __deepcopy__(self, memo=None):
@@ -2925,11 +2923,12 @@ class Stream(music21.Music21Object):
     
 
 
-    def stripTies(self, inPlace=False, matchByPitch=False):
+    def stripTies(self, inPlace=False, matchByPitch=False,
+         retainContainers=False):
         '''Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied 
         constituents. Lastly, remove the formerly-tied notes.
 
-        Presently, this only returns Note objects; Measures and other structures are stripped from the Stream. 
+        If `retainContainers` is False (by default), this method only returns Note objects; Measures and other structures are stripped from the Stream. Set `retainContainers` to True to remove ties from a :class:`~music21.part.Part` Stream that contains :class:`~music21.stream.Measure` Streams, and get back a multi-Measure structure.
 
         Presently, this only works if tied notes are sequentual; ultimately
         this will need to look at .to and .from attributes (if they exist)
@@ -2967,7 +2966,6 @@ class Stream(music21.Music21Object):
 
         for i in range(len(notes)):
             endMatch = None # can be True, False, or None
-
             n = notes[i]
             if i > 0: # get i and n for the previous value
                 iLast = i-1
@@ -2976,22 +2974,29 @@ class Stream(music21.Music21Object):
                 iLast = None
                 nLast = None
 
+            # see if we have a tie and it is started
             # a start typed tie may not be a true start tie
             if (hasattr(n, 'tie') and n.tie is not None and 
                 n.tie.type == 'start'):
-                # find a true start
+                # find a true start, add to known connected positions
                 if iLast is None or iLast not in posConnected:
                     posConnected = [i] # reset list with start
                 # find a continuation: the last note was a tie      
-                # start and this note is a tie start
+                # start and this note is a tie start (this may happen)
                 elif iLast in posConnected:
                     posConnected.append(i)
-                endMatch = False # a connection has been started
+                # a connection has been started or continued, so no endMatch
+                endMatch = False 
 
             # establish end condition
             if endMatch is None: # not yet set, not a start
+                # ties tell us when the are ended
                 if hasattr(n, 'tie') and n.tie is not None and n.tie.type == 'stop':
                     endMatch = True
+                # if we cannot find a stop tie, see if last note was connected
+                # and this and the last note are the same pitch; this assumes 
+                # that connected and same pitch value is tied; this is not
+                # frequently the case
                 elif matchByPitch:
                     # find out if the the last index is in position connected
                     # if the pitches are the same for each note
@@ -3004,36 +3009,61 @@ class Stream(music21.Music21Object):
             if endMatch:
                 posConnected.append(i) # add this last position
                 if len(posConnected) < 2:
+                    # an open tie, not connected to anything
                     # should be an error; presently, just skipping
                     #raise StreamException('cannot consolidate ties when only one tie is present', notes[posConnected[0]])
                     environLocal.printDebug(['cannot consolidate ties when only one tie is present', notes[posConnected[0]]])
                     posConnected = [] 
                     continue
 
-                # get sum of duratoins for all parts to add to first
+                # get sum of durations for all nots
+                # do not include first; will add to later; do not delete
                 durSum = 0
                 for q in posConnected[1:]: # all but the first
                     durSum += notes[q].quarterLength
                     posDelete.append(q) # store for deleting later
+                # dur sum should always be greater than zero
                 if durSum == 0:
                     raise StreamException('aggregated ties have a zero duration sum')
-                # add duration to lead
+                # change the duration of the first note to be self + sum
+                # of all others
                 qLen = notes[posConnected[0]].quarterLength
                 notes[posConnected[0]].quarterLength = qLen + durSum
 
-                # set tie to None
+                # set tie to None on first note
                 notes[posConnected[0]].tie = None
-
                 posConnected = [] # resset to empty
-                    
+
+        # all results have been processed                    
         # presently removing from notes, not resultObj, as index positions
         # in result object may not be the same
         posDelete.reverse() # start from highest and go down
-        for i in posDelete:
-            #environLocal.printDebug(['removing note', notes[i]])
-            junk = notes.pop(i)
 
-        return notes
+        if retainContainers:
+            for i in posDelete:
+                #environLocal.printDebug(['removing note', notes[i]])
+                if retainContainers:
+                    # get the obj ref
+                    nTarget = notes[i]
+                    # go through each container and find the note to delete
+                    # note: this assumes the container is Measure
+                    # TODO: this is where we need a recursive container Generator out
+                    for sub in reversed(returnObj.getElementsByClass(Measure)):
+                        try:
+                            i = sub.index(nTarget)
+                        except ValueError:
+                            continue
+                        junk = sub.pop(i)
+                        # get a new note
+                        # we should not continue searching Measures
+                        break 
+            return returnObj
+
+        else:
+            for i in posDelete:
+                # removing the note from notes
+                junk = notes.pop(i)
+            return notes
 
 
     #---------------------------------------------------------------------------
@@ -6739,7 +6769,7 @@ class Test(unittest.TestCase):
         ## TODO: Many more tests
         
 
-    def testStripTies(self):
+    def testStripTiesBuilt(self):
         s1 = Stream()
         n1 = note.Note()
         n1.quarterLength = 6
@@ -6754,8 +6784,6 @@ class Test(unittest.TestCase):
         sUntied = s1.stripTies()
         self.assertEqual(len(sUntied), 1)
         self.assertEqual(sUntied[0].quarterLength, 6)
-
-
 
         n = note.Note()        
         n.quarterLength = 3
@@ -6779,6 +6807,38 @@ class Test(unittest.TestCase):
         c = b.stripTies() # gets flat, removes measures
         self.assertEqual(len(c.notes), 40)
 
+
+    def testStripTiesImported(self):
+        from music21 import corpus, converter
+        from music21.musicxml import testPrimitive
+
+        a = converter.parse(testPrimitive.multiMeasureTies)
+
+        p1 = a.parts[0]
+        self.assertEqual(len(p1.flat.notes), 16)
+        p1.stripTies(inPlace=True, retainContainers=True)
+        self.assertEqual(len(p1.flat.notes), 6)
+
+        p2 = a.parts[1]
+        self.assertEqual(len(p2.flat.notes), 16)
+        p2Stripped = p2.stripTies(inPlace=False, retainContainers=True)
+        self.assertEqual(len(p2Stripped.flat.notes), 5)
+        # original part should not be changed
+        self.assertEqual(len(p2.flat.notes), 16)
+
+        p3 = a.parts[2]
+        self.assertEqual(len(p3.flat.notes), 16)
+        p3.stripTies(inPlace=True, retainContainers=True)
+        self.assertEqual(len(p3.flat.notes), 3)
+
+        p4 = a.parts[3]
+        self.assertEqual(len(p4.flat.notes), 16)
+        p4Notes = p4.stripTies(retainContainers=False)
+        # original should be unchanged
+        self.assertEqual(len(p4.flat.notes), 16)
+        # lesser notes
+        self.assertEqual(len(p4Notes), 10)
+    
 
     def testStripTiesScore(self):
         '''Test stripTies using the Score method
@@ -6812,6 +6872,10 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(parts[3].flat.notes), 41)
 # 
 #         s.stripTies()
+
+
+
+
 
 
     def testTwoStreamMethods(self):
@@ -8440,16 +8504,6 @@ if __name__ == "__main__":
         b = TestExternal()
 
 
-        #a.testAugmentOrDiminishHighestTimes()
-
-        #a.testInsertAndShiftBasic()
-        #a.testInsertAndShiftNoDuration()
-        #a.testInsertAndShiftMultipleElements()
-
-        #a.testMetadataOnStream()
-
-        #a.testStripTiesScore()
-
-        #a.testMeasureBarline()
-
-        a.testMeasureLayout()
+        a.testStripTiesBuilt()
+        a.testStripTiesImported()
+        a.testStripTiesScore()
