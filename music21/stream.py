@@ -1784,8 +1784,6 @@ class Stream(music21.Music21Object):
         else:   
             return None
 
-
-
     def getMeasures(self):
         '''Return all :class:`~music21.stream.Measure` objects in a Stream()
         '''
@@ -5633,6 +5631,24 @@ class Score(Stream):
         return ret
         
     lily = property(_getLily)
+
+
+    def _getParts(self):
+        '''        
+        '''
+        # note: _getParts is private; getMeasures, on Stream, shhould probably be similarly private
+        return self.getElementsByClass(Part)
+
+    parts = property(_getParts, 
+        doc='''Return all :class:`~music21.stream.Part` objects in a :class:`~music21.stream.Score`.
+
+        >>> from music21 import *
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> parts = s.parts     
+        >>> len(parts)
+        4
+        ''')
+
 
 
     def getMeasureRange(self, numberStart, numberEnd, 

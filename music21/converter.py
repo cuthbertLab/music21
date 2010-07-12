@@ -950,6 +950,31 @@ class Test(unittest.TestCase):
         self.assertEqual(len(systemLayoutList), 6)
 
 
+    def testConversionMXTies(self):
+        
+        from music21.musicxml import testPrimitive
+        from music21 import stream, layout
+
+        a = parse(testPrimitive.multiMeasureTies)
+        #a.show()
+
+        countTies = 0
+        countStartTies = 0
+        for p in a.parts:
+            post = p.getClefs()[0]
+            self.assertEqual(isinstance(post, clef.TenorClef), True)
+            for n in p.flat.notes:
+                if n.tie != None:
+                    countTies += 1
+                    if n.tie.type == 'start':
+                        countStartTies += 1
+
+        self.assertEqual(countTies, 57)
+        self.assertEqual(countStartTies, 40)
+
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, Converter, ConverterMusicXML, ConverterHumdrum]
@@ -964,4 +989,5 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         a = Test()
-        a.testConversionMXLayout()
+        #a.testConversionMXLayout()
+        a.testConversionMXTies()
