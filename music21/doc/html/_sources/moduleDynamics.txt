@@ -7,51 +7,39 @@ music21.dynamics
 
 .. module:: music21.dynamics
 
-
- Classes and functions for creating and manipulating dynamic symbols. Rather than subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters. 
- 
- 
+Classes and functions for creating and manipulating dynamic symbols. Rather than subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters. 
 
 
 .. function:: dynamicStrFromDecimal(n)
 
-    
-     Given a decimal from 0 to 1, return a string representing a dynamic
-     with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff')
-     0 returns "n" (niente), while ppp and fff are the loudest dynamics used.
-     
-     >>> from music21 import *
-     >>> dynamics.dynamicStrFromDecimal(0.25)
-     'p'
-     >>> dynamics.dynamicStrFromDecimal(1)
-     'fff'
-     
- 
+    Given a decimal from 0 to 1, return a string representing a dynamic with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff') 0 returns "n" (niente), while ppp and fff are the loudest dynamics used. 
+
+    >>> from music21 import *
+    >>> dynamics.dynamicStrFromDecimal(0.25)
+    'p' 
+    >>> dynamics.dynamicStrFromDecimal(1)
+    'fff' 
 
 Dynamic
 -------
 
 .. class:: Dynamic(value=None)
 
-    Object representation of Dyanmics.
-     
-     >>> from music21 import *
-     >>> pp1 = dynamics.Dynamic('pp')
-     >>> pp1.value
-     'pp'
-     >>> pp1.longName
-     'pianissimo'
-     >>> pp1.englishName
-     'very soft'
-     
-     Dynamics can also be specified on a 0 to 1 scale with 1 being the 
-     loudest (see dynamicStrFromDecimal() above)
-     
-     >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
-     >>> pp2.value
-     'pp'
-     
- 
+    Object representation of Dyanmics. 
+
+    >>> from music21 import *
+    >>> pp1 = dynamics.Dynamic('pp')
+    >>> pp1.value
+    'pp' 
+    >>> pp1.longName
+    'pianissimo' 
+    >>> pp1.englishName
+    'very soft' 
+    Dynamics can also be specified on a 0 to 1 scale with 1 being the 
+    loudest (see dynamicStrFromDecimal() above) 
+    >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
+    >>> pp2.value
+    'pp' 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -59,33 +47,22 @@ Dynamic
 
         .. attribute:: classSortOrder
 
-            Property which returns an number (int or otherwise)
-         depending on the class of the Music21Object that
-         represents a priority for an object based on its class alone --
-         used as a tie for stream sorting in case two objects have the
-         same offset and priority.  Lower numbers are sorted to the left
-         of higher numbers.  For instance, Clef, KeySignature, TimeSignature
-         all come (in that order) before Note.
-         
-         All undefined classes have classSortOrder of 20 -- same as note.Note
-         
-         >>> from music21 import *
-         >>> tc = clef.TrebleClef()
-         >>> tc.classSortOrder
-         0
-         >>> ks = key.KeySignature(3)
-         >>> ks.classSortOrder
-         1
-         
-         New classes can define their own default classSortOrder
-         >>> class ExampleClass(base.Music21Object):
-         ...     classSortOrderDefault = 5
-         ...
-         >>> ec1 = ExampleClass()
-         >>> ec1.classSortOrder
-         5
-         
- 
+            Property which returns an number (int or otherwise) depending on the class of the Music21Object that represents a priority for an object based on its class alone -- used as a tie for stream sorting in case two objects have the same offset and priority.  Lower numbers are sorted to the left of higher numbers.  For instance, Clef, KeySignature, TimeSignature all come (in that order) before Note. All undefined classes have classSortOrder of 20 -- same as note.Note 
+
+            >>> from music21 import *
+            >>> tc = clef.TrebleClef()
+            >>> tc.classSortOrder
+            0 
+            >>> ks = key.KeySignature(3)
+            >>> ks.classSortOrder
+            1 
+            New classes can define their own default classSortOrder 
+            >>> class ExampleClass(base.Music21Object):
+            ...     classSortOrderDefault = 5 
+            ... 
+            >>> ec1 = ExampleClass()
+            >>> ec1.classSortOrder
+            5 
 
         Attributes without Documentation: `posPlacement`, `value`, `posRelativeY`, `posDefaultX`, `posDefaultY`, `longName`, `posRelativeX`, `englishName`
 
@@ -95,25 +72,20 @@ Dynamic
 
         .. attribute:: musicxml
 
-            Provide a complete MusicXML representation.
-         
- 
+            Provide a complete MusicXML representation. 
 
         .. attribute:: mx
 
-            
-         returns a musicxml.Direction object
- 
-         >>> from music21 import *
-         >>> a = dynamics.Dynamic('ppp')
-         >>> a.posRelativeY = -10
-         >>> b = a.mx
-         >>> b[0][0][0].get('tag')
-         'ppp'
-         >>> b.get('placement')
-         'below'
-         
- 
+            returns a musicxml.Direction object 
+
+            >>> from music21 import *
+            >>> a = dynamics.Dynamic('ppp')
+            >>> a.posRelativeY = -10
+            >>> b = a.mx
+            >>> b[0][0][0].get('tag')
+            'ppp' 
+            >>> b.get('placement')
+            'below' 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -127,9 +99,7 @@ Wedge
 
 .. class:: Wedge(value=None)
 
-    Object model of crescendeo/decrescendo wedges.
-     
- 
+    Object model of crescendeo/decrescendo wedges. 
 
     inherits from: :class:`~music21.base.Music21Object`
 
@@ -143,18 +113,15 @@ Wedge
 
         .. attribute:: mx
 
-            
-         returns a musicxml.Direction object
- 
-         >>> from music21 import *
-         >>> a = dynamics.Wedge()
-         >>> a.type = 'crescendo'
-         >>> mxDirection = a.mx
-         >>> mxWedge = mxDirection.getWedge()
-         >>> mxWedge.get('type')
-         'crescendo'
-         
- 
+            returns a musicxml.Direction object 
+
+            >>> from music21 import *
+            >>> a = dynamics.Wedge()
+            >>> a.type = 'crescendo'
+            >>> mxDirection = a.mx
+            >>> mxWedge = mxDirection.getWedge()
+            >>> mxWedge.get('type')
+            'crescendo' 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 

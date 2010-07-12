@@ -384,8 +384,8 @@ class KeySignature(music21.Music21Object):
        
 
         Set all notes to the correct notes for a key using the note's Context:        
-
-     
+        
+        
         >>> from music21 import *
         >>> s1 = stream.Stream()
         >>> s1.append(key.KeySignature(4))  # E-major or C-sharp-minor
@@ -396,6 +396,12 @@ class KeySignature(music21.Music21Object):
         >>> s1.append(note.WholeNote("F#"))
         >>> for n in s1.notes:
         ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
+        >>> #_DOCS_SHOW s1.show()
+
+        .. image:: images/keyAccidentalByStep.*
+            :width: 400
+
+        OMIT_FROM_DOCS
         >>> s1.show('text')
         {0.0} <music21.key.KeySignature of 4 sharps>
         {0.0} <music21.note.Note C#>
@@ -404,7 +410,6 @@ class KeySignature(music21.Music21Object):
         {4.0} <music21.note.Note A->
         {8.0} <music21.note.Note F>
         
-
         
         '''
         for thisAlteration in self.alteredPitches:  # temp measure to fix dbl flats, etc.

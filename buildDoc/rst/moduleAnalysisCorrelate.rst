@@ -7,11 +7,7 @@ music21.analysis.correlate
 
 .. module:: music21.analysis.correlate
 
-Various tools and utilities to find correlations between disparate objects in a Stream.
- 
- See the chapter :ref:`overviewFormats` for more information and examples of converting formats into and out of music21.
- 
- 
+Various tools and utilities to find correlations between disparate objects in a Stream. See the chapter :ref:`overviewFormats` for more information and examples of converting formats into and out of music21. 
 
 
 ActivityMatch
@@ -19,18 +15,12 @@ ActivityMatch
 
 .. class:: ActivityMatch(streamObj)
 
-    Given a Stream, find if one object is active while another is also active.
- 
-     Plotting routines to graph the output of dedicated methods in this class are available. 
- 
-     :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol` and :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol` employs the :meth:`~music21.analysis.correlate.ActivityMatch.pitchToDynamic` method. Sample output is as follows:
- 
- 
+    Given a Stream, find if one object is active while another is also active. Plotting routines to graph the output of dedicated methods in this class are available. :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol` and :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol` employs the :meth:`~music21.analysis.correlate.ActivityMatch.pitchToDynamic` method. Sample output is as follows: 
 
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.* 
-        :width: 600    
-     
- 
+        :width: 600
+
+    
 
     
 
@@ -38,23 +28,18 @@ ActivityMatch
 
         .. method:: pitchToDynamic(dataPoints=True)
 
-            Create an analysis of pitch to dynamic symbol.
- 
-         If `dataPoints` is True, all data matches between source and destination are returned. If false, 3 point weighted coordinates are created for each unique match. 
- 
-         >>> from music21 import *
-         >>> s = corpus.parseWork('bach/bwv8.6.xml')
-         >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
-         >>> am.pitchToDynamic()
-         Traceback (most recent call last):
-         CorrelateException: cannot create correlation an object that is not found in the Stream: <class 'music21.dynamics.Dynamic'>
- 
-         >>> s = corpus.parseWork('schumann/opus41no1', 2)
-         >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
-         >>> data = am.pitchToDynamic()
-         >>> len(data)
-         401
-         
- 
+            Create an analysis of pitch to dynamic symbol. If `dataPoints` is True, all data matches between source and destination are returned. If false, 3 point weighted coordinates are created for each unique match. 
+
+            >>> from music21 import *
+            >>> s = corpus.parseWork('bach/bwv8.6.xml')
+            >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
+            >>> am.pitchToDynamic()
+            Traceback (most recent call last): 
+            CorrelateException: cannot create correlation an object that is not found in the Stream: <class 'music21.dynamics.Dynamic'> 
+            >>> s = corpus.parseWork('schumann/opus41no1', 2)
+            >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
+            >>> data = am.pitchToDynamic()
+            >>> len(data)
+            401 
 
 

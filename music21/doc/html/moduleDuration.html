@@ -114,10 +114,8 @@
 <dl class="function">
 <dt id="music21.duration.convertTypeToNumber">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">convertTypeToNumber</tt><big>(</big><em>dType</em><big>)</big><a class="headerlink" href="#music21.duration.convertTypeToNumber" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Convert a duration type string (<cite>dType</cite>) to a numerical scalar representation that shows</dt>
-<dd><p class="first">how many of that duration type fits within a whole note.</p>
-<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToNumber</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<dd><p>Convert a duration type string (<cite>dType</cite>) to a numerical scalar representation that shows how many of that duration type fits within a whole note.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToNumber</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
 <span class="go">4</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToNumber</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">)</span>
 <span class="go">2</span>
@@ -127,60 +125,49 @@
 <span class="go">0.125</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="music21.duration.convertTypeToQuarterLength">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">convertTypeToQuarterLength</tt><big>(</big><em>dType</em>, <em>dots=0</em>, <em>tuplets=</em><span class="optional">[</span><span class="optional">]</span>, <em>dotGroups=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#music21.duration.convertTypeToQuarterLength" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a rhythm type (<cite>dType</cite>), number of dots (<cite>dots</cite>), an optional list of
-Tuplet objects (<cite>tuplets</cite>), and a (very) optional list of Medieval dot groups (<cite>dotGroups</cite>),
-return the equivalent quarter length.</p>
+<dd><p>Given a rhythm type (<cite>dType</cite>), number of dots (<cite>dots</cite>), an optional list of Tuplet objects (<cite>tuplets</cite>), and a (very) optional list of Medieval dot groups (<cite>dotGroups</cite>), return the equivalent quarter length.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;whole&#39;</span><span class="p">)</span>
 <span class="go">4.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
 <span class="go">0.25</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
 <span class="go">1.75</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tup</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">(</span><span class="n">numberNotesActual</span> <span class="o">=</span> <span class="mf">5</span><span class="p">,</span> <span class="n">numberNotesNormal</span> <span class="o">=</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tup</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">(</span><span class="n">numberNotesActual</span> <span class="o">=</span> <span class="mf">5</span><span class="p">,</span> <span class="n">numberNotesNormal</span> <span class="o">=</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="p">[</span><span class="n">tup</span><span class="p">])</span>
 <span class="go">0.800000...</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tup</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">(</span><span class="n">numberNotesActual</span> <span class="o">=</span> <span class="mf">3</span><span class="p">,</span> <span class="n">numberNotesNormal</span> <span class="o">=</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tup</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">(</span><span class="n">numberNotesActual</span> <span class="o">=</span> <span class="mf">3</span><span class="p">,</span> <span class="n">numberNotesNormal</span> <span class="o">=</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="p">[</span><span class="n">tup</span><span class="p">])</span>
 <span class="go">1.333333...</span>
+<span class="go">Also can handle those rare medieval dot groups (such as dotted-dotted half notes that take a full measure of 9/8).</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertTypeToQuarterLength</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">,</span> <span class="n">dotGroups</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">])</span>
+<span class="go">4.5</span>
 </pre></div>
 </div>
-<p>Also can handle those rare medieval dot groups (such as dotted-dotted half notes that take a full measure of 9/8).
-&gt;&gt;&gt; convertTypeToQuarterLength(&#8216;half&#8217;, dotGroups = [1,1])
-4.5</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="music21.duration.dottedMatch">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">dottedMatch</tt><big>(</big><em>qLen</em>, <em>maxDots=4</em><big>)</big><a class="headerlink" href="#music21.duration.dottedMatch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a quarterLength, determine if there is a dotted (or non-dotted) type that exactly matches. Returns a pair of (numDots, type) or (False, False) if no exact matches are found.</p>
-<blockquote>
-<p>Returns a maximum of four dots by default.</p>
+<dd><p>Given a quarterLength, determine if there is a dotted (or non-dotted) type that exactly matches. Returns a pair of (numDots, type) or (False, False) if no exact matches are found. Returns a maximum of four dots by default.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
 <span class="go">(1, &#39;half&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">1.75</span><span class="p">)</span>
 <span class="go">(2, &#39;quarter&#39;)</span>
+<span class="go">This value is not equal to any dotted note length</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">1.6</span><span class="p">)</span>
+<span class="go">(False, False)</span>
+<span class="go">maxDots can be lowered for certain searches</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">1.875</span><span class="p">)</span>
+<span class="go">(3, &#39;quarter&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dottedMatch</span><span class="p">(</span><span class="mf">1.875</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="go">(False, False)</span>
 </pre></div>
 </div>
-<p>This value is not equal to any dotted note length
-&gt;&gt;&gt; dottedMatch(1.6)
-(False, False)</p>
-<p>maxDots can be lowered for certain searches
-&gt;&gt;&gt; dottedMatch(1.875)
-(3, &#8216;quarter&#8217;)
-&gt;&gt;&gt; dottedMatch(1.875, 2)
-(False, False)</p>
-</blockquote>
 </dd></dl>
 
 <dl class="function">
@@ -214,60 +201,44 @@ DurationException...</pre>
 <dl class="function">
 <dt id="music21.duration.partitionQuarterLength">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">partitionQuarterLength</tt><big>(</big><em>qLen</em>, <em>qLenDiv=4</em><big>)</big><a class="headerlink" href="#music21.duration.partitionQuarterLength" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a <cite>qLen</cite> (quarterLength) and a <cite>qLenDiv</cite>, that is, a base quarterLength to divide the <cite>qLen</cite> into
-(default = 4; i.e., into whole notes), returns a list of Durations that
-partition the given quarterLength so that there is no leftovers.</p>
-<p>This is a useful tool for partitioning a duration by Measures (i.e., take a long Duration and
-make it fit within several measures) or by beat groups.</p>
+<dd><p>Given a <cite>qLen</cite> (quarterLength) and a <cite>qLenDiv</cite>, that is, a base quarterLength to divide the <cite>qLen</cite> into (default = 4; i.e., into whole notes), returns a list of Durations that partition the given quarterLength so that there is no leftovers. This is a useful tool for partitioning a duration by Measures (i.e., take a long Duration and make it fit within several measures) or by beat groups.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Here is a Little demonstration function that will show how we can use partitionQuarterLength:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pql</span><span class="p">(</span><span class="n">qLen</span><span class="p">,</span> <span class="n">qLenDiv</span><span class="p">):</span>
 <span class="gp">... </span>   <span class="n">partitionList</span> <span class="o">=</span> <span class="n">partitionQuarterLength</span><span class="p">(</span><span class="n">qLen</span><span class="p">,</span> <span class="n">qLenDiv</span><span class="p">)</span>
 <span class="gp">... </span>   <span class="k">for</span> <span class="n">dur</span> <span class="ow">in</span> <span class="n">partitionList</span><span class="p">:</span>
 <span class="gp">... </span>       <span class="k">print</span><span class="p">(</span><span class="n">unitSpec</span><span class="p">(</span><span class="n">dur</span><span class="p">))</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c">#Divide 2.5 quarters worth of time into eighth notes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#Divide 2.5 quarters worth of time into eighth notes.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
 <span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
 <span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
 <span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
 <span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
 <span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c">#Dividing 5 qLen into 2.5 qLen bundles (i.e., 5/8 time)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#Dividing 5 qLen into 2.5 qLen bundles (i.e., 5/8 time)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
 <span class="go">(2.0, &#39;half&#39;, 0, None, None, None)</span>
 <span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
 <span class="go">(2.0, &#39;half&#39;, 0, None, None, None)</span>
 <span class="go">(0.5, &#39;eighth&#39;, 0, None, None, None)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c">#Dividing 5.25 qLen into dotted halves</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#Dividing 5.25 qLen into dotted halves</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">5.25</span><span class="p">,</span><span class="mf">3</span><span class="p">)</span>
 <span class="go">(3.0, &#39;half&#39;, 1, None, None, None)</span>
 <span class="go">(2.0, &#39;half&#39;, 0, None, None, None)</span>
 <span class="go">(0.25, &#39;16th&#39;, 0, None, None, None)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c">#Dividing 1.33333 qLen into triplet eighths:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#Dividing 1.33333 qLen into triplet eighths:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">4.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">)</span>
 <span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
 <span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
 <span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
 <span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c">#Dividing 1.5 into triplet eighths</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#Dividing 1.5 into triplet eighths</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span><span class="o">.</span><span class="mf">33333333333333</span><span class="p">)</span>
 <span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
 <span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
 <span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
 <span class="go">(0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
 <span class="go">(0.1666..., &#39;16th&#39;, 0, 3, 2, &#39;16th&#39;)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c">#There is no problem if the division unit is larger then the source duration, it</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#There is no problem if the division unit is larger then the source duration, it</span>
 <span class="go">just will not be totally filled.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pql</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="go">(1.5, &#39;quarter&#39;, 1, None, None, None)</span>
@@ -278,11 +249,7 @@ make it fit within several measures) or by beat groups.</p>
 <dl class="function">
 <dt id="music21.duration.quarterLengthToClosestType">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">quarterLengthToClosestType</tt><big>(</big><em>qLen</em><big>)</big><a class="headerlink" href="#music21.duration.quarterLengthToClosestType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a two-unit tuple consisting of</p>
-<ol class="arabic simple">
-<li>The type string (&#8220;quarter&#8221;) that is smaller than or equal to the quarterLength of provided.</li>
-<li>Boolean, True or False, whether the conversion was exact.</li>
-</ol>
+<dd><p>Returns a two-unit tuple consisting of 1. The type string (&#8220;quarter&#8221;) that is smaller than or equal to the quarterLength of provided. 2. Boolean, True or False, whether the conversion was exact.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToClosestType</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
 <span class="go">(&#39;eighth&#39;, True)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToClosestType</span><span class="p">(</span><span class="o">.</span><span class="mf">75</span><span class="p">)</span>
@@ -296,87 +263,56 @@ make it fit within several measures) or by beat groups.</p>
 <dl class="function">
 <dt id="music21.duration.quarterLengthToDurations">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">quarterLengthToDurations</tt><big>(</big><em>qLen</em><big>)</big><a class="headerlink" href="#music21.duration.quarterLengthToDurations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a List of new Duration Units given a quarter length.</p>
-<p>For many simple quarterLengths, the list will have only a single element.  However, for more complex durations, the list could contain several durations (presumably to be tied to each other).</p>
-<p>(All quarterLengths can, technically, be notated as a single unit given a complex enough tuplet, but we don&#8217;t like doing that).</p>
-<dl class="docutils">
-<dt>This is mainly a utility function. Much faster for many purposes is:</dt>
-<dd>d = Duration()
-d.quarterLength = 251.231312</dd>
-</dl>
-<p>and then let Duration automatically create Duration Components as necessary.</p>
-<p>These examples use unitSpec() to get a concise summary of the contents</p>
+<dd><p>Returns a List of new Duration Units given a quarter length. For many simple quarterLengths, the list will have only a single element.  However, for more complex durations, the list could contain several durations (presumably to be tied to each other). (All quarterLengths can, technically, be notated as a single unit given a complex enough tuplet, but we don&#8217;t like doing that). This is mainly a utility function. Much faster for many purposes is: d = Duration() d.quarterLength = 251.231312 and then let Duration automatically create Duration Components as necessary. These examples use unitSpec() to get a concise summary of the contents</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2</span><span class="p">))</span>
 <span class="go">[(2.0, &#39;half&#39;, 0, None, None, None)]</span>
-</pre></div>
-</div>
-<p>Dots are supported</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">3</span><span class="p">))</span>
+<span class="go">Dots are supported</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">3</span><span class="p">))</span>
 <span class="go">[(3.0, &#39;half&#39;, 1, None, None, None)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">6.0</span><span class="p">))</span>
 <span class="go">[(6.0, &#39;whole&#39;, 1, None, None, None)]</span>
-</pre></div>
-</div>
-<p>Double and triple dotted half note.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">3.5</span><span class="p">))</span>
+<span class="go">Double and triple dotted half note.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">3.5</span><span class="p">))</span>
 <span class="go">[(3.5, &#39;half&#39;, 2, None, None, None)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">3.75</span><span class="p">))</span>
 <span class="go">[(3.75, &#39;half&#39;, 3, None, None, None)]</span>
-</pre></div>
-</div>
-<p>A triplet quarter note, lasting .6666 qLen
-Or, a quarter that is 1/3 of a half.
-Or, a quarter that is 2/3 of a quarter.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">))</span>
+<span class="go">A triplet quarter note, lasting .6666 qLen</span>
+<span class="go">Or, a quarter that is 1/3 of a half.</span>
+<span class="go">Or, a quarter that is 2/3 of a quarter.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">))</span>
 <span class="go">[(0.666..., &#39;quarter&#39;, 0, 3, 2, &#39;quarter&#39;)]</span>
-</pre></div>
-</div>
-<p>A triplet eighth note, where 3 eights are in the place of 2.
-Or, an eighth that is 1/3 of a quarter
-Or, an eighth that is 2/3 of eighth</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">post</span> <span class="o">=</span> <span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="o">.</span><span class="mf">3333333</span><span class="p">))</span>
+<span class="go">A triplet eighth note, where 3 eights are in the place of 2.</span>
+<span class="go">Or, an eighth that is 1/3 of a quarter</span>
+<span class="go">Or, an eighth that is 2/3 of eighth</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">post</span> <span class="o">=</span> <span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="o">.</span><span class="mf">3333333</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">common</span><span class="o">.</span><span class="n">almostEquals</span><span class="p">(</span><span class="n">post</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">0</span><span class="p">],</span> <span class="o">.</span><span class="mf">3333333</span><span class="p">)</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">post</span><span class="p">[</span><span class="mf">0</span><span class="p">][</span><span class="mf">1</span><span class="p">:]</span>
 <span class="go">(&#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
-</pre></div>
-</div>
-<p>A half that is 1/3 of a whole, or a triplet half note.
-Or, a half that is 2/3 of a half</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">4.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">))</span>
+<span class="go">A half that is 1/3 of a whole, or a triplet half note.</span>
+<span class="go">Or, a half that is 2/3 of a half</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">4.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">))</span>
 <span class="go">[(1.33..., &#39;half&#39;, 0, 3, 2, &#39;half&#39;)]</span>
-</pre></div>
-</div>
-<p>A sixteenth that is 1/5 of a quarter
-Or, a sixteenth that is 4/5ths of a 16th</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">5.0</span><span class="p">))</span>
+<span class="go">A sixteenth that is 1/5 of a quarter</span>
+<span class="go">Or, a sixteenth that is 4/5ths of a 16th</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">5.0</span><span class="p">))</span>
 <span class="go">[(0.2..., &#39;16th&#39;, 0, 5, 4, &#39;16th&#39;)]</span>
-</pre></div>
-</div>
-<p>A 16th that is  1/7th of a quarter
-Or, a 16th that is 4/7 of a 16th</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">7.0</span><span class="p">))</span>
+<span class="go">A 16th that is  1/7th of a quarter</span>
+<span class="go">Or, a 16th that is 4/7 of a 16th</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">7.0</span><span class="p">))</span>
 <span class="go">[(0.142857..., &#39;16th&#39;, 0, 7, 4, &#39;16th&#39;)]</span>
-</pre></div>
-</div>
-<p>A 4/7ths of a whole note, or
-A quarter that is 4/7th of of a quarter</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">4.0</span><span class="o">/</span><span class="mf">7.0</span><span class="p">))</span>
+<span class="go">A 4/7ths of a whole note, or</span>
+<span class="go">A quarter that is 4/7th of of a quarter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">4.0</span><span class="o">/</span><span class="mf">7.0</span><span class="p">))</span>
 <span class="go">[(0.571428..., &#39;quarter&#39;, 0, 7, 4, &#39;quarter&#39;)]</span>
-</pre></div>
-</div>
-<p>If a duration is not containable in a single unit, this method
-will break off the largest type that fits within this type
-and recurse, adding as my units as necessary.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="go">If a duration is not containable in a single unit, this method</span>
+<span class="go">will break off the largest type that fits within this type</span>
+<span class="go">and recurse, adding as my units as necessary.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2.5</span><span class="p">))</span>
 <span class="go">[(2.0, &#39;half&#39;, 0, None, None, None), (0.5, &#39;eighth&#39;, 0, None, None, None)]</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2.3333333</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">2.3333333</span><span class="p">))</span>
 <span class="go">[(2.0, &#39;half&#39;, 0, None, None, None), (0.333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)]</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">6.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">quarterLengthToDurations</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mf">6.0</span><span class="p">))</span>
 <span class="go">[(0.1666..., &#39;16th&#39;, 0, 3, 2, &#39;16th&#39;)]</span>
 </pre></div>
 </div>
@@ -385,24 +321,15 @@ and recurse, adding as my units as necessary.</p>
 <dl class="function">
 <dt id="music21.duration.quarterLengthToTuplet">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">quarterLengthToTuplet</tt><big>(</big><em>qLen</em>, <em>maxToReturn=4</em><big>)</big><a class="headerlink" href="#music21.duration.quarterLengthToTuplet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of possible Tuplet objects for a given <cite>qLen</cite> (quarterLength). As there may be more than one possible solution, the <cite>maxToReturn</cite> integer specifies the maximum number of values returned.</p>
-<p>Searches for numerators specified in duration.defaultTupletNumerators (3, 5, 7, 11, 13). Does not return dotted tuplets, nor nested tuplets.</p>
-<p>Note that 4:3 tuplets won&#8217;t be found, but will be found as dotted notes
-by dottedMatch.</p>
+<dd><p>Returns a list of possible Tuplet objects for a given <cite>qLen</cite> (quarterLength). As there may be more than one possible solution, the <cite>maxToReturn</cite> integer specifies the maximum number of values returned. Searches for numerators specified in duration.defaultTupletNumerators (3, 5, 7, 11, 13). Does not return dotted tuplets, nor nested tuplets. Note that 4:3 tuplets won&#8217;t be found, but will be found as dotted notes by dottedMatch.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">33333333</span><span class="p">)</span>
 <span class="go">[&lt;music21.duration.Tuplet 3/2/eighth&gt;, &lt;music21.duration.Tuplet 3/1/quarter&gt;]</span>
-</pre></div>
-</div>
-<p>By specifying only 1 <cite>maxToReturn</cite>, the a single-length list containing the Tuplet with the smallest type will be returned.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">3333333</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="go">By specifying only 1 `maxToReturn`, the a single-length list containing the Tuplet with the smallest type will be returned.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">3333333</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
 <span class="go">[&lt;music21.duration.Tuplet 3/2/eighth&gt;]</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">20</span><span class="p">)</span>
 <span class="go">[&lt;music21.duration.Tuplet 5/4/16th&gt;, &lt;music21.duration.Tuplet 5/2/eighth&gt;, &lt;music21.duration.Tuplet 5/1/quarter&gt;]</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">3333333</span><span class="p">,</span> <span class="mf">1</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">quarterLengthToTuplet</span><span class="p">(</span><span class="o">.</span><span class="mf">3333333</span><span class="p">,</span> <span class="mf">1</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
 <span class="go">0.6666...</span>
 </pre></div>
@@ -429,28 +356,20 @@ by dottedMatch.</p>
 <dl class="function">
 <dt id="music21.duration.unitSpec">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">unitSpec</tt><big>(</big><em>durationObjectOrObjects</em><big>)</big><a class="headerlink" href="#music21.duration.unitSpec" title="Permalink to this definition">¶</a></dt>
-<dd><p>A simple data representation of most Duration objects. Processes a single Duration or a List of Durations, returning a single or list of unitSpecs.</p>
-<p>A unitSpec is a tuple of qLen, durType, dots, tupleNumerator, tupletDenominator, and tupletType (assuming top and bottom tuplets are the same).</p>
-<p>This function does not deal with nested tuplets, etc.</p>
+<dd><p>A simple data representation of most Duration objects. Processes a single Duration or a List of Durations, returning a single or list of unitSpecs. A unitSpec is a tuple of qLen, durType, dots, tupleNumerator, tupletDenominator, and tupletType (assuming top and bottom tuplets are the same). This function does not deal with nested tuplets, etc.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">aDur</span><span class="p">)</span>
 <span class="go">(3.0, &#39;half&#39;, 1, None, None, None)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1.125</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">bDur</span><span class="p">)</span>
 <span class="go">(1.125, &#39;complex&#39;, None, None, None, None)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">0.3333333</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">(</span><span class="n">cDur</span><span class="p">)</span>
 <span class="go">(0.33333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">([</span><span class="n">aDur</span><span class="p">,</span> <span class="n">bDur</span><span class="p">,</span> <span class="n">cDur</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unitSpec</span><span class="p">([</span><span class="n">aDur</span><span class="p">,</span> <span class="n">bDur</span><span class="p">,</span> <span class="n">cDur</span><span class="p">])</span>
 <span class="go">[(3.0, &#39;half&#39;, 1, None, None, None), (1.125, &#39;complex&#39;, None, None, None, None), (0.333333..., &#39;eighth&#39;, 0, 3, 2, &#39;eighth&#39;)]</span>
 </pre></div>
 </div>
@@ -459,10 +378,7 @@ by dottedMatch.</p>
 <dl class="function">
 <dt id="music21.duration.updateTupletType">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">updateTupletType</tt><big>(</big><em>durationList</em><big>)</big><a class="headerlink" href="#music21.duration.updateTupletType" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Given a list of Durations or DurationUnits (not yet working properly),</dt>
-<dd><p class="first">examine each Duration, and each component, and set Tuplet type to
-start or stop, as necessary.</p>
+<dd><p>Given a list of Durations or DurationUnits (not yet working properly), examine each Duration, and each component, and set Tuplet type to start or stop, as necessary.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">();</span> <span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">();</span> <span class="n">b</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">();</span> <span class="n">c</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
@@ -470,9 +386,7 @@ start or stop, as necessary.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">();</span> <span class="n">e</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">();</span> <span class="n">g</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333</span>
-</pre></div>
-</div>
-<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">None</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">updateTupletType</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#39;start&#39;</span>
@@ -487,8 +401,6 @@ start or stop, as necessary.</p>
 <span class="go">True</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <div class="section" id="duration">
@@ -497,17 +409,8 @@ start or stop, as necessary.</p>
 <dt id="music21.duration.Duration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">Duration</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.duration.Duration" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<p>Durations are one of the most important objects in music21. A Duration
-represents a span of musical time measurable in terms of quarter notes
-(or in advanced usage other units). For instance, &#8220;57 quarter notes&#8221;
-or &#8220;dotted half tied to quintuplet sixteenth note&#8221; or simply &#8220;quarter note.&#8221;</p>
-<p>A Duration object is made of one or more DurationUnit objects stored on the <cite>components</cite> list.</p>
-<p>Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Duration objects are not expressable as a single notation unit.</p>
-<p>Duration objects are not Music21Objects. Duration objects share many properties and attributes with DurationUnit objects, but Duration is not a subclass of DurationUnit.</p>
-<blockquote>
-First positional argument is assumed to be type string or a quarterLength.</blockquote>
-</blockquote>
+<dd><p>Durations are one of the most important objects in music21. A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units). For instance, &#8220;57 quarter notes&#8221; or &#8220;dotted half tied to quintuplet sixteenth note&#8221; or simply &#8220;quarter note.&#8221; A Duration object is made of one or more DurationUnit objects stored on the <cite>components</cite> list. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Duration objects are not expressable as a single notation unit. Duration objects are not Music21Objects. Duration objects share many properties and attributes with DurationUnit objects, but Duration is not a subclass of DurationUnit.</p>
+<p>First positional argument is assumed to be type string or a quarterLength.</p>
 <p>inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>Duration</strong> <strong>attributes</strong></p>
 <blockquote>
@@ -522,31 +425,25 @@ Attributes without Documentation: <cite>linkages</cite></blockquote>
 <dl class="attribute">
 <dt id="music21.duration.Duration.dots">
 <tt class="descname">dots</tt><a class="headerlink" href="#music21.duration.Duration.dots" title="Permalink to this definition">¶</a></dt>
-<dd>Returns the number of dots in the Duration
-if it is a simple Duration.  Otherwise raises error.</dd></dl>
+<dd>Returns the number of dots in the Duration if it is a simple Duration.  Otherwise raises error.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.duration.Duration.isComplex">
 <tt class="descname">isComplex</tt><a class="headerlink" href="#music21.duration.Duration.isComplex" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Property defining if this Duration has more than one DurationUnit object on the <cite>component</cite> list.</blockquote>
+<dd><p>Property defining if this Duration has more than one DurationUnit object on the <cite>component</cite> list.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1.375</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">isComplex</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aDur</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
 <span class="go">2</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1.6666666</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">isComplex</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">aDur</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
 <span class="go">2</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">25</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">isComplex</span>
 <span class="go">False</span>
@@ -559,9 +456,7 @@ Property defining if this Duration has more than one DurationUnit object on the 
 <dl class="attribute">
 <dt id="music21.duration.Duration.lily">
 <tt class="descname">lily</tt><a class="headerlink" href="#music21.duration.Duration.lily" title="Permalink to this definition">¶</a></dt>
-<dd>Simple lily duration: does not include tuplets
-These are taken care of in the lily processing in stream.Stream
-since lilypond requires tuplets to be in groups</dd></dl>
+<dd>Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.duration.Duration.musicxml">
@@ -571,8 +466,7 @@ since lilypond requires tuplets to be in groups</dd></dl>
 <dl class="attribute">
 <dt id="music21.duration.Duration.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.duration.Duration.mx" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of one or more musicxml.Note() objects with all rhythms
-and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.</p>
+<dd><p>Returns a list of one or more musicxml.Note() objects with all rhythms and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
@@ -580,9 +474,7 @@ and ties necessary. mxNote objects are incompletely specified, lacking full repr
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">musicxmlMod</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
 <span class="go">True</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="o">.</span><span class="mf">33333333</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1</span>
@@ -634,8 +526,7 @@ and ties necessary. mxNote objects are incompletely specified, lacking full repr
 <dl class="method">
 <dt id="music21.duration.Duration.augmentOrDiminish">
 <tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>retainComponents=False</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given a scalar greater than zero, return a scaled version of this duration.</blockquote>
+<dd><p>Given a scalar greater than zero, return a scaled version of this duration.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="c"># dotted quarter</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
@@ -645,9 +536,7 @@ Given a scalar greater than zero, return a scaled version of this duration.</blo
 <span class="go">&#39;half&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aDur</span><span class="o">.</span><span class="n">dots</span>
 <span class="go">1</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2.125</span> <span class="c"># requires components</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">bDur</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
 <span class="go">2</span>
@@ -656,9 +545,7 @@ Given a scalar greater than zero, return a scaled version of this duration.</blo
 <span class="go">4.25</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span><span class="o">.</span><span class="n">components</span>
 <span class="go">[&lt;music21.duration.DurationUnit 4.0&gt;, &lt;music21.duration.DurationUnit 0.25&gt;]</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dDur</span> <span class="o">=</span> <span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="n">retainComponents</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dDur</span> <span class="o">=</span> <span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="n">retainComponents</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dDur</span><span class="o">.</span><span class="n">components</span>
 <span class="go">[&lt;music21.duration.DurationUnit 4.0&gt;, &lt;music21.duration.DurationUnit 0.25&gt;]</span>
 </pre></div>
@@ -668,8 +555,7 @@ Given a scalar greater than zero, return a scaled version of this duration.</blo
 <dl class="method">
 <dt id="music21.duration.Duration.clear">
 <tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.Duration.clear" title="Permalink to this definition">¶</a></dt>
-<dd><p>Permit all componets to be removed.
-(It is not clear yet if this is needed)</p>
+<dd><p>Permit all componets to be removed. (It is not clear yet if this is needed)</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">4</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
@@ -686,19 +572,12 @@ Given a scalar greater than zero, return a scaled version of this duration.</blo
 <dl class="method">
 <dt id="music21.duration.Duration.componentIndexAtQtrPosition">
 <tt class="descname">componentIndexAtQtrPosition</tt><big>(</big><em>quarterPosition</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.componentIndexAtQtrPosition" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-returns the index number of the duration component sounding at</blockquote>
-<p>the given quarter position.</p>
-<p>Note that for 0 and the last value, the object is returned.</p>
+<dd><p>returns the index number of the duration component sounding at the given quarter position. Note that for 0 and the last value, the object is returned.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt>TODO: remove &#8220;for x in [1,1,1]&#8221; notation; it&#8217;s confusing (Perl-like)</dt>
-<dd>better is just to copy and paste three times.  Very easy to see what
-is happening.</dd>
-</dl>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">]:</span>
+<span class="go">TODO: remove &quot;for x in [1,1,1]&quot; notation; it&#39;s confusing (Perl-like)</span>
+<span class="go">better is just to copy and paste three times.  Very easy to see what</span>
+<span class="go">is happening.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">]:</span>
 <span class="gp">... </span>  <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="n">components</span>
@@ -711,23 +590,21 @@ is happening.</dd>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">componentIndexAtQtrPosition</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
 <span class="go">2</span>
+<span class="go">this is odd behavior:</span>
+<span class="go">e.g. given d1, d2, d3 as 3 quarter notes and</span>
+<span class="go">self.components = [d1, d2, d3]</span>
+<span class="go">then</span>
+<span class="go">self.componentIndexAtQtrPosition(1.5) == d2</span>
+<span class="go">self.componentIndexAtQtrPosition(2.0) == d3</span>
+<span class="go">self.componentIndexAtQtrPosition(2.5) == d3</span>
 </pre></div>
 </div>
-<p>this is odd behavior:
-e.g. given d1, d2, d3 as 3 quarter notes and
-self.components = [d1, d2, d3]
-then
-self.componentIndexAtQtrPosition(1.5) == d2
-self.componentIndexAtQtrPosition(2.0) == d3
-self.componentIndexAtQtrPosition(2.5) == d3</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="music21.duration.Duration.componentStartTime">
 <tt class="descname">componentStartTime</tt><big>(</big><em>componentIndex</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.componentStartTime" title="Permalink to this definition">¶</a></dt>
-<dd><p>For a valid component index value, this returns the quarter note offset
-at which that component would start.</p>
-<p>This does not handle fractional arguments.</p>
+<dd><p>For a valid component index value, this returns the quarter note offset at which that component would start. This does not handle fractional arguments.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">1</span><span class="p">]:</span>
 <span class="gp">... </span>   <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
@@ -747,11 +624,7 @@ at which that component would start.</p>
 <dl class="method">
 <dt id="music21.duration.Duration.consolidate">
 <tt class="descname">consolidate</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.Duration.consolidate" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given a Duration with multiple components, consolidate into a single</blockquote>
-<p>Duration. This can only be based on quarterLength; this is
-destructive: information is lost from coponents.</p>
-<p>This cannot be done for all Durations, as DurationUnits cannot express all durations</p>
+<dd><p>Given a Duration with multiple components, consolidate into a single Duration. This can only be based on quarterLength; this is destructive: information is lost from coponents. This cannot be done for all Durations, as DurationUnits cannot express all durations</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="s">&#39;quarter&#39;</span><span class="p">,</span> <span class="s">&#39;half&#39;</span><span class="p">,</span> <span class="s">&#39;quarter&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
@@ -763,26 +636,22 @@ destructive: information is lost from coponents.</p>
 <span class="go">4.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
 <span class="go">1</span>
+<span class="go">But it gains a type!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;whole&#39;</span>
 </pre></div>
 </div>
-<p>But it gains a type!
-&gt;&gt;&gt; a.type
-&#8216;whole&#8217;</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="music21.duration.Duration.expand">
 <tt class="descname">expand</tt><big>(</big><em>qLenDiv=4</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.expand" title="Permalink to this definition">¶</a></dt>
-<dd>Make a duration notatable by partitioning it into smaller
-units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength</dd></dl>
+<dd>Make a duration notatable by partitioning it into smaller units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength</dd></dl>
 
 <dl class="method">
 <dt id="music21.duration.Duration.fill">
 <tt class="descname">fill</tt><big>(</big><em>quarterLengthList=</em><span class="optional">[</span>, <em>'quarter'</em>, <em>'half'</em>, <em>'quarter'</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#music21.duration.Duration.fill" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Utility method for testing; a quick way to fill components. This will</blockquote>
-<p>remove any exisiting values.</p>
-</dd></dl>
+<dd>Utility method for testing; a quick way to fill components. This will remove any exisiting values.</dd></dl>
 
 <dl class="method">
 <dt id="music21.duration.Duration.show">
@@ -792,20 +661,14 @@ Utility method for testing; a quick way to fill components. This will</blockquot
 <dl class="method">
 <dt id="music21.duration.Duration.sliceComponentAtPosition">
 <tt class="descname">sliceComponentAtPosition</tt><big>(</big><em>quarterPosition</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.sliceComponentAtPosition" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given a quarter position within a component, divide that</blockquote>
-<p>component into two components.</p>
+<dd><p>Given a quarter position within a component, divide that component into two components.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span> <span class="c"># need to remove default</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDurationUnit</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDurationUnit</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDurationUnit</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">addDurationUnit</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
 <span class="go">3.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sliceComponentAtPosition</span><span class="p">(</span><span class="o">.</span><span class="mf">5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span>
@@ -830,9 +693,7 @@ Given a quarter position within a component, divide that</blockquote>
 <dl class="method">
 <dt id="music21.duration.Duration.write">
 <tt class="descname">write</tt><big>(</big><em>fmt=musicxml</em>, <em>fp=None</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>As in Music21Object.write: Writes a file in the given format (musicxml by default)</p>
-<p>A None file path will result in temporary file</p>
-</dd></dl>
+<dd>As in Music21Object.write: Writes a file in the given format (musicxml by default) A None file path will result in temporary file</dd></dl>
 
 <p>Methods inherited from <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a>: <a title="music21.duration.DurationCommon.aggregateTupletRatio" class="reference internal" href="#music21.duration.DurationCommon.aggregateTupletRatio"><tt class="xref docutils literal"><span class="pre">aggregateTupletRatio()</span></tt></a></p>
 </blockquote>
@@ -845,10 +706,7 @@ Given a quarter position within a component, divide that</blockquote>
 <dt id="music21.duration.Tuplet">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">Tuplet</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.duration.Tuplet" title="Permalink to this definition">¶</a></dt>
-<dd><p>A tuplet object is a representation of one or more ratios that modify duration values and are stored in Duration objects.</p>
-<blockquote>
-<p>Note that this is a duration modifier.  We should also have a tupletGroup
-object that groups note objects into larger groups.</p>
+<dd><p>A tuplet object is a representation of one or more ratios that modify duration values and are stored in Duration objects. Note that this is a duration modifier.  We should also have a tupletGroup object that groups note objects into larger groups.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">myTup</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">(</span><span class="n">numberNotesActual</span> <span class="o">=</span> <span class="mf">5</span><span class="p">,</span> <span class="n">numberNotesNormal</span> <span class="o">=</span> <span class="mf">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">myTup</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">())</span>
 <span class="go">0.8</span>
@@ -860,79 +718,39 @@ object that groups note objects into larger groups.</p>
 <span class="go">16th</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">myTup2</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">())</span>
 <span class="go">0.666...</span>
-</pre></div>
-</div>
-<p>Tuplets may be frozen, in which case they become immutable. Tuplets
-which are attached to Durations are automatically frozen</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">myTup</span><span class="o">.</span><span class="n">frozen</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="go">Tuplets may be frozen, in which case they become immutable. Tuplets</span>
+<span class="go">which are attached to Durations are automatically frozen</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myTup</span><span class="o">.</span><span class="n">frozen</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">myTup</span><span class="o">.</span><span class="n">tupletActual</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3</span><span class="p">,</span> <span class="mf">2</span><span class="p">]</span>
 <span class="gp">...</span>
 <span class="go">TupletException: A frozen tuplet (or one attached to a duration) is immutable</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">myHalf</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&quot;half&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myHalf</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&quot;half&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">myHalf</span><span class="o">.</span><span class="n">appendTuplet</span><span class="p">(</span><span class="n">myTup2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">myTup2</span><span class="o">.</span><span class="n">tupletActual</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5</span><span class="p">,</span> <span class="mf">4</span><span class="p">]</span>
 <span class="gp">...</span>
 <span class="go">TupletException: A frozen tuplet (or one attached to a duration) is immutable</span>
 </pre></div>
 </div>
-</blockquote>
 <p><strong>Tuplet</strong> <strong>attributes</strong></p>
-<blockquote>
 <blockquote>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.durationActual">
 <tt class="descname">durationActual</tt><a class="headerlink" href="#music21.duration.Tuplet.durationActual" title="Permalink to this definition">¶</a></dt>
-<dd>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie.</dd></dl>
+<dd>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length durations and &#8216;unexpressable&#8217; type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.)</dd></dl>
 
-</blockquote>
-<p>DurationUnits are not usually instantiated by users of music21,
-but are used within Duration objects to model the containment of numerous summed components.</p>
-<p>Like Durations, DurationUnits have the option of unlinking the quarterLength
-and its representation on the page. For instance, in 12/16, Brahms sometimes
-used a dotted half note to indicate the length of 11/16th of a note. (see Don
-Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can
-be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled
-by a single DurationUnit of unliked graphical/temporal representation.</p>
-<dl class="docutils">
-<dt>Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length</dt>
-<dd>durations and &#8216;unexpressable&#8217;</dd>
-</dl>
-<p>type for anything that cannot be expressed as a single notation unit, and thus
-needs a full Duration object (such as 2.5 quarterLengths.)</p>
-<blockquote>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.durationNormal">
 <tt class="descname">durationNormal</tt><a class="headerlink" href="#music21.duration.Tuplet.durationNormal" title="Permalink to this definition">¶</a></dt>
-<dd>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie.</dd></dl>
+<dd>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length durations and &#8216;unexpressable&#8217; type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.)</dd></dl>
 
-</blockquote>
-<p>DurationUnits are not usually instantiated by users of music21,
-but are used within Duration objects to model the containment of numerous summed components.</p>
-<p>Like Durations, DurationUnits have the option of unlinking the quarterLength
-and its representation on the page. For instance, in 12/16, Brahms sometimes
-used a dotted half note to indicate the length of 11/16th of a note. (see Don
-Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can
-be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled
-by a single DurationUnit of unliked graphical/temporal representation.</p>
-<dl class="docutils">
-<dt>Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length</dt>
-<dd>durations and &#8216;unexpressable&#8217;</dd>
-</dl>
-<p>type for anything that cannot be expressed as a single notation unit, and thus
-needs a full Duration object (such as 2.5 quarterLengths.)</p>
-<blockquote>
-Attributes without Documentation: <cite>frozen</cite>, <cite>tupletActualShow</cite>, <cite>placement</cite>, <cite>numberNotesActual</cite>, <cite>tupletId</cite>, <cite>nestedLevel</cite>, <cite>bracket</cite>, <cite>tupletNormalShow</cite>, <cite>type</cite>, <cite>numberNotesNormal</cite></blockquote>
+<p>Attributes without Documentation: <cite>frozen</cite>, <cite>tupletActualShow</cite>, <cite>placement</cite>, <cite>numberNotesActual</cite>, <cite>tupletId</cite>, <cite>nestedLevel</cite>, <cite>bracket</cite>, <cite>tupletNormalShow</cite>, <cite>type</cite>, <cite>numberNotesNormal</cite></p>
 </blockquote>
 <p><strong>Tuplet</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
 <dt id="music21.duration.Tuplet.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.duration.Tuplet.mx" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet.</blockquote>
-<p>mxTuplet needs to be on the Notes mxNotations field</p>
+<dd><p>From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet. mxTuplet needs to be on the Notes mxNotations field</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">bracket</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
@@ -956,8 +774,7 @@ From this object return both an mxTimeModification object and an mxTuplet object
 <dl class="method">
 <dt id="music21.duration.Tuplet.augmentOrDiminish">
 <tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given a scalar greater than zero, return a scaled version of this Duration.</blockquote>
+<dd><p>Given a scalar greater than zero, return a scaled version of this Duration.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">6</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
@@ -976,8 +793,7 @@ Given a scalar greater than zero, return a scaled version of this Duration.</blo
 <dl class="method">
 <dt id="music21.duration.Tuplet.setDurationType">
 <tt class="descname">setDurationType</tt><big>(</big><em>type</em><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.setDurationType" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Set the Duration for both actual and normal.</blockquote>
+<dd><p>Set the Duration for both actual and normal.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
 <span class="go">0.666...</span>
@@ -995,36 +811,30 @@ Set the Duration for both actual and normal.</blockquote>
 <dl class="method">
 <dt id="music21.duration.Tuplet.setRatio">
 <tt class="descname">setRatio</tt><big>(</big><em>actual</em>, <em>normal</em><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.setRatio" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Set the ratio of actual divisions to represented in normal divisions.</blockquote>
-<p>A triplet is 3 actual in the time of 2 normal.</p>
+<dd><p>Set the ratio of actual divisions to represented in normal divisions. A triplet is 3 actual in the time of 2 normal.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
 <span class="go">0.666...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">6</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
 <span class="go">0.333...</span>
+<span class="go">One way of expressing 6/4-ish triplets without numbers:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">setRatio</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">durationActual</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;quarter&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">durationNormal</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;half&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">()</span>
+<span class="go">0.666...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">totalTupletLength</span><span class="p">()</span>
+<span class="go">2.0</span>
 </pre></div>
 </div>
-<p>One way of expressing 6/4-ish triplets without numbers:
-&gt;&gt;&gt; a = Tuplet()
-&gt;&gt;&gt; a.setRatio(3,1)
-&gt;&gt;&gt; a.durationActual = DurationUnit(&#8216;quarter&#8217;)
-&gt;&gt;&gt; a.durationNormal = DurationUnit(&#8216;half&#8217;)
-&gt;&gt;&gt; a.tupletMultiplier()
-0.666...
-&gt;&gt;&gt; a.totalTupletLength()
-2.0</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="music21.duration.Tuplet.totalTupletLength">
 <tt class="descname">totalTupletLength</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.totalTupletLength" title="Permalink to this definition">¶</a></dt>
-<dd><p>The total length in quarters of the tuplet as defined, assuming that
-enough notes existed to fill all entire tuplet as defined.</p>
-<p>For instance, 3 quarters in the place of 2 quarters = 2.0
-5 half notes in the place of a 2 dotted half notes = 6.0
-(In the end it&#8217;s only the denominator that matters)</p>
+<dd><p>The total length in quarters of the tuplet as defined, assuming that enough notes existed to fill all entire tuplet as defined. For instance, 3 quarters in the place of 2 quarters = 2.0 5 half notes in the place of a 2 dotted half notes = 6.0 (In the end it&#8217;s only the denominator that matters)</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">totalTupletLength</span><span class="p">()</span>
 <span class="go">1.0</span>
@@ -1047,9 +857,7 @@ enough notes existed to fill all entire tuplet as defined.</p>
 <dl class="method">
 <dt id="music21.duration.Tuplet.tupletMultiplier">
 <tt class="descname">tupletMultiplier</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.Tuplet.tupletMultiplier" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Get a floating point value by which to scale the duration that</blockquote>
-<p>this Tuplet is associated with.</p>
+<dd><p>Get a floating point value by which to scale the duration that this Tuplet is associated with.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">myTuplet</span> <span class="o">=</span> <span class="n">Tuplet</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">myTuplet</span><span class="o">.</span><span class="n">tupletMultiplier</span><span class="p">(),</span> <span class="mf">3</span><span class="p">))</span>
 <span class="go">0.667</span>
@@ -1074,8 +882,7 @@ Get a floating point value by which to scale the duration that</blockquote>
 <dt id="music21.duration.AppogiaturaStartDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">AppogiaturaStartDuration</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.duration.AppogiaturaStartDuration" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-First positional argument is assumed to be type string or a quarterLength.</blockquote>
+<dd><p>First positional argument is assumed to be type string or a quarterLength.</p>
 <p>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 </dd></dl>
 
@@ -1086,8 +893,7 @@ First positional argument is assumed to be type string or a quarterLength.</bloc
 <dt id="music21.duration.AppogiaturaStopDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">AppogiaturaStopDuration</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.duration.AppogiaturaStopDuration" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-First positional argument is assumed to be type string or a quarterLength.</blockquote>
+<dd><p>First positional argument is assumed to be type string or a quarterLength.</p>
 <p>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 </dd></dl>
 
@@ -1105,11 +911,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 <dl class="method">
 <dt id="music21.duration.DurationCommon.aggregateTupletRatio">
 <tt class="descname">aggregateTupletRatio</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.DurationCommon.aggregateTupletRatio" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return the aggregate tuplet ratio. Say you have 3:2 under a 5:4.  This will give the equivalent</blockquote>
-<p>in non-nested tuplets. Returns a tuple representing the tuplet(!).  In the case of 3:2 under 5:4,
-it will return (15, 8).</p>
-<p>This tuple is needed for MusicXML time-modification among other places</p>
+<dd><p>Return the aggregate tuplet ratio. Say you have 3:2 under a 5:4.  This will give the equivalent in non-nested tuplets. Returns a tuple representing the tuplet(!).  In the case of 3:2 under 5:4, it will return (15, 8). This tuple is needed for MusicXML time-modification among other places</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">complexDur</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="s">&#39;eighth&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">complexDur</span><span class="o">.</span><span class="n">appendTuplet</span><span class="p">(</span><span class="n">Tuplet</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">complexDur</span><span class="o">.</span><span class="n">aggregateTupletRatio</span><span class="p">()</span>
@@ -1133,51 +935,27 @@ it will return (15, 8).</p>
 <dt id="music21.duration.DurationUnit">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">DurationUnit</tt><big>(</big><em>prototype=quarter</em><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit" title="Permalink to this definition">¶</a></dt>
-<dd><p>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie.</p>
-<blockquote>
-<p>DurationUnits are not usually instantiated by users of music21,
-but are used within Duration objects to model the containment of numerous summed components.</p>
-<p>Like Durations, DurationUnits have the option of unlinking the quarterLength
-and its representation on the page. For instance, in 12/16, Brahms sometimes
-used a dotted half note to indicate the length of 11/16th of a note. (see Don
-Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can
-be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled
-by a single DurationUnit of unliked graphical/temporal representation.</p>
-<dl class="docutils">
-<dt>Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length</dt>
-<dd>durations and &#8216;unexpressable&#8217;</dd>
-</dl>
-<p>type for anything that cannot be expressed as a single notation unit, and thus
-needs a full Duration object (such as 2.5 quarterLengths.)</p>
-</blockquote>
+<dd><p>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length durations and &#8216;unexpressable&#8217; type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.)</p>
 <p>inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>DurationUnit</strong> <strong>attributes</strong></p>
 <blockquote>
 Attributes without Documentation: <cite>linkStatus</cite></blockquote>
 <p><strong>DurationUnit</strong> <strong>properties</strong></p>
 <blockquote>
-<blockquote>
 <dl class="attribute">
 <dt id="music21.duration.DurationUnit.dots">
 <tt class="descname">dots</tt><a class="headerlink" href="#music21.duration.DurationUnit.dots" title="Permalink to this definition">¶</a></dt>
-<dd>_dots is a list (so we can do weird things like Crumb half-dots)
-Normally we only want the first element.
-So that&#8217;s what _getDots returns...</dd></dl>
+<dd>_dots is a list (so we can do weird things like Crumb half-dots) Normally we only want the first element. So that&#8217;s what _getDots returns...</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.duration.DurationUnit.lily">
 <tt class="descname">lily</tt><a class="headerlink" href="#music21.duration.DurationUnit.lily" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Simple lily duration: does not include tuplets;</blockquote>
-<p>these appear in the Stream object, because of
-how lily represents triplets</p>
-</dd></dl>
+<dd>Simple lily duration: does not include tuplets; these appear in the Stream object, because of how lily represents triplets</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.duration.DurationUnit.ordinal">
 <tt class="descname">ordinal</tt><a class="headerlink" href="#music21.duration.DurationUnit.ordinal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts type to an ordinal number where maxima = 1 and 1024th = 14;  whole = 4 and quarter = 6.
-Based on duration.ordinalTypeFromNum</p>
+<dd><p>Converts type to an ordinal number where maxima = 1 and 1024th = 14;  whole = 4 and quarter = 6. Based on duration.ordinalTypeFromNum</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;whole&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ordinal</span>
 <span class="go">4</span>
@@ -1194,9 +972,7 @@ Based on duration.ordinalTypeFromNum</p>
 <dl class="attribute">
 <dt id="music21.duration.DurationUnit.quarterLength">
 <tt class="descname">quarterLength</tt><a class="headerlink" href="#music21.duration.DurationUnit.quarterLength" title="Permalink to this definition">¶</a></dt>
-<dd>Property for getting or setting the quarterLength of a DurationUnit.</dd></dl>
-
-</blockquote>
+<dd><p>Property for getting or setting the quarterLength of a DurationUnit.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
@@ -1217,7 +993,8 @@ Based on duration.ordinalTypeFromNum</p>
 <span class="go">&#39;longa&#39;</span>
 </pre></div>
 </div>
-<blockquote>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.duration.DurationUnit.tuplets">
 <tt class="descname">tuplets</tt><a class="headerlink" href="#music21.duration.DurationUnit.tuplets" title="Permalink to this definition">¶</a></dt>
@@ -1226,9 +1003,7 @@ Based on duration.ordinalTypeFromNum</p>
 <dl class="attribute">
 <dt id="music21.duration.DurationUnit.type">
 <tt class="descname">type</tt><a class="headerlink" href="#music21.duration.DurationUnit.type" title="Permalink to this definition">¶</a></dt>
-<dd>Property for getting or setting the type of a DurationUnit.</dd></dl>
-
-</blockquote>
+<dd><p>Property for getting or setting the type of a DurationUnit.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span>
@@ -1243,6 +1018,8 @@ Based on duration.ordinalTypeFromNum</p>
 <span class="go">0.375</span>
 </pre></div>
 </div>
+</dd></dl>
+
 </blockquote>
 <p><strong>DurationUnit</strong> <strong>methods</strong></p>
 <blockquote>
@@ -1254,8 +1031,7 @@ Based on duration.ordinalTypeFromNum</p>
 <dl class="method">
 <dt id="music21.duration.DurationUnit.augmentOrDiminish">
 <tt class="descname">augmentOrDiminish</tt><big>(</big><em>scalar</em>, <em>inPlace=True</em><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.augmentOrDiminish" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given a scalar greater than one, return a scaled version of this duration.</blockquote>
+<dd><p>Given a scalar greater than one, return a scaled version of this duration.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">quarterLength</span>
@@ -1268,9 +1044,7 @@ Given a scalar greater than one, return a scaled version of this duration.</bloc
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="o">.</span><span class="mf">125</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">type</span>
 <span class="go">&#39;16th&#39;</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span> <span class="o">=</span> <span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">16</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span> <span class="o">=</span> <span class="n">bDur</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="mf">16</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cDur</span><span class="p">,</span> <span class="n">bDur</span>
 <span class="go">(&lt;music21.duration.DurationUnit 4.0&gt;, &lt;music21.duration.DurationUnit 0.25&gt;)</span>
 </pre></div>
@@ -1295,9 +1069,7 @@ Given a scalar greater than one, return a scaled version of this duration.</bloc
 <dl class="method">
 <dt id="music21.duration.DurationUnit.updateQuarterLength">
 <tt class="descname">updateQuarterLength</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit.updateQuarterLength" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates the quarterLength if linkStatus is True. Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set
-to True.</p>
-<p>To set quarterLength, use self.quarterLength.</p>
+<dd><p>Updates the quarterLength if linkStatus is True. Called by self._getQuarterLength if _quarterLengthNeedsUpdating is set to True. To set quarterLength, use self.quarterLength.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span> <span class="o">=</span> <span class="n">DurationUnit</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bDur</span><span class="o">.</span><span class="n">quarterLength</span>
 <span class="go">0.25</span>
@@ -1380,7 +1152,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 08, 2010.
+      Last updated on Jul 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

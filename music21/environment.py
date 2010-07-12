@@ -408,6 +408,8 @@ class Environment(object):
             fpApp = self.ref['pdfPath']   
         elif format == 'musicxml':
             fpApp = self.ref['musicxmlPath']   
+        else:
+            fpApp = None
 
         platform = common.getPlatform()
         if fpApp is None and platform != 'win':

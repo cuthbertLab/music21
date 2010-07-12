@@ -7,60 +7,7 @@ music21.tinyNotation
 
 .. module:: music21.tinyNotation
 
-tinyNotation -- a simple way of specifying single line melodies
- that uses a notation somewhat similar to Lilypond but with WAY fewer 
- options.  It was originally developed to notate trecento (medieval Italian)
- music, but it is pretty useful for a lot of short examples, so we have
- made it a generally supported music21 format
- 
- N.B.: TinyNotation is not meant to expand to cover every single case.  Instead
- it is meant to be subclassable to extend to the cases *your* project needs.
- See for instance the harmony examples in HarmonyStream and HarmonyNote
- or the Trecento specific examples in trecento/cadencebook.py
- 
- Here are the most important rules:
- 
- Note names are: a,b,c,d,e,f,g and r for rest
- 
- Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n.  
- If the accidental is above the staff (i.e., editorial), enclose it in 
- parentheses: (#), etc.  Make sure that flats in the key signatures are
- explicitly specified.  
- 
- Note octaves are specified as follows:
- 
-     CC to BB = from C below bass clef to second-line B in bass clef
- 
-     C to B = from bass clef C to B below middle C.
- 
-     c  to b = from middle C to the middle of treble clef
- 
-     c' to b' = from C in treble clef to B above treble clef
- 
- After the note name, a number may be placed indicating the note 
- length: 1 = whole note, 2 = half, 4 = quarter, 8 = eighth, 16 = sixteenth.  
- etc.  If the number is omitted then it is assumed to be the same 
- as the previous note.  I.e., c8 B c d  is a string of eighth notes.
- 
- After the number, a ~ can be placed to show a tie to the next note.  
- A "." indicates a dotted note.  (If you are entering
- data via Excel or other spreadsheet, be sure that "capitalize the 
- first letter of sentences" is turned off under "Tools->AutoCorrect,"
- otherwise the next letter will be capitalized, and the octave will
- be screwed up.
- 
- For triplets use this notation:  trip{c4 d8}  indicating that these 
- two notes both have "3s" over them.  For 4 in the place of 3, 
- use quad{c16 d e8}.  No other tuplets are supported.
- 
- Again, see the HarmonyStream (below) and trecento.cadencebook examples
- to see how to make TinyNotation useful for your own needs.
- 
- (Currently, final notes with fermatas (or any very long final note), 
- take 0 for the note length.  But expect this to disappear from the
- TinyNotation specification soon, as it's too Trecento specific.)
- 
- 
+tinyNotation -- a simple way of specifying single line melodies that uses a notation somewhat similar to Lilypond but with WAY fewer options.  It was originally developed to notate trecento (medieval Italian) music, but it is pretty useful for a lot of short examples, so we have made it a generally supported music21 format N.B.: TinyNotation is not meant to expand to cover every single case.  Instead it is meant to be subclassable to extend to the cases *your* project needs. See for instance the harmony examples in HarmonyStream and HarmonyNote or the Trecento specific examples in trecento/cadencebook.py Here are the most important rules: Note names are: a,b,c,d,e,f,g and r for rest Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n. If the accidental is above the staff (i.e., editorial), enclose it in parentheses: (#), etc.  Make sure that flats in the key signatures are explicitly specified. Note octaves are specified as follows: CC to BB = from C below bass clef to second-line B in bass clef C to B = from bass clef C to B below middle C. c  to b = from middle C to the middle of treble clef c' to b' = from C in treble clef to B above treble clef After the note name, a number may be placed indicating the note length: 1 = whole note, 2 = half, 4 = quarter, 8 = eighth, 16 = sixteenth. etc.  If the number is omitted then it is assumed to be the same as the previous note.  I.e., c8 B c d  is a string of eighth notes. After the number, a ~ can be placed to show a tie to the next note. A "." indicates a dotted note.  (If you are entering data via Excel or other spreadsheet, be sure that "capitalize the first letter of sentences" is turned off under "Tools->AutoCorrect," otherwise the next letter will be capitalized, and the octave will be screwed up. For triplets use this notation:  trip{c4 d8}  indicating that these two notes both have "3s" over them.  For 4 in the place of 3, use quad{c16 d e8}.  No other tuplets are supported. Again, see the HarmonyStream (below) and trecento.cadencebook examples to see how to make TinyNotation useful for your own needs. (Currently, final notes with fermatas (or any very long final note), take 0 for the note length.  But expect this to disappear from the TinyNotation specification soon, as it's too Trecento specific.) 
 
 
 TinyNotationNote
@@ -68,19 +15,18 @@ TinyNotationNote
 
 .. class:: TinyNotationNote(stringRep, storedDict={})
 
-     
-     >>> tcN = TinyNotationNote("AA-4.~=aflat_hel-")
-     >>> note1 = tcN.note
-     >>> note1.name
-     'A-'
-     >>> note1.octave
-     2
-     >>> note1.lyric
-     'hel-'
-     >>> note1.id
-     'aflat'
-     
- 
+    
+
+    >>> tcN = TinyNotationNote("AA-4.~=aflat_hel-")
+    >>> note1 = tcN.note
+    >>> note1.name
+    'A-' 
+    >>> note1.octave
+    2 
+    >>> note1.lyric
+    'hel-' 
+    >>> note1.id
+    'aflat' 
 
     
 
@@ -88,28 +34,15 @@ TinyNotationNote
 
         .. method:: customNotationMatch(m21NoteObject, stringRep, storedDict)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: customPitchMatch(stringRep, storedDict)
 
-            
-         method to create a note object in sub classes of tiny notation.  
-         Should return a Note-like object or None
-         
- 
+            method to create a note object in sub classes of tiny notation. Should return a Note-like object or None 
 
         .. method:: getDots(stringRep, noteObj)
 
-            
-         subclassable method to set the dots attributes of 
-         the duration object.
-         
-         It is subclassed in music21.trecento.cadencebook.TrecentoNote
-         where double dots are redefined as referring to multiply by
-         2.25 (according to a practice used by some Medieval musicologists).
-         
- 
+            subclassable method to set the dots attributes of the duration object. It is subclassed in music21.trecento.cadencebook.TrecentoNote where double dots are redefined as referring to multiply by 2.25 (according to a practice used by some Medieval musicologists). 
 
 
 TinyNotationStream
@@ -117,19 +50,15 @@ TinyNotationStream
 
 .. class:: TinyNotationStream(stringRep=, timeSignature=None)
 
-    A TinyNotationStream takes in a string representation similar to Lilypond format
-     but simplified somewhat and an optional time signature string (or TimeSignature object).
-     
-     example in 3/4:
-     >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c", "3/4")
-     >>> stream1.getElementById("lastG").step
-     'G'
-     >>> stream1.notes[1].isRest
-     True
-     >>> stream1.notes[0].octave
-     3    
-     
- 
+    A TinyNotationStream takes in a string representation similar to Lilypond format but simplified somewhat and an optional time signature string (or TimeSignature object). example in 3/4: 
+
+    >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c", "3/4")
+    >>> stream1.getElementById("lastG").step
+    'G' 
+    >>> stream1.notes[1].isRest
+    True 
+    >>> stream1.notes[0].octave
+    3 
 
     inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
@@ -151,10 +80,7 @@ TinyNotationStream
 
         .. method:: getNote(stringRep, storedDict={})
 
-            
-         called out so as to be subclassable
-         
- 
+            called out so as to be subclassable 
 
         Methods inherited from :class:`~music21.stream.Stream`: :meth:`~music21.stream.Stream.append`, :meth:`~music21.stream.Stream.insert`, :meth:`~music21.stream.Stream.insertAndShift`, :meth:`~music21.stream.Stream.transpose`, :meth:`~music21.stream.Stream.augmentOrDiminish`, :meth:`~music21.stream.Stream.scaleOffsets`, :meth:`~music21.stream.Stream.scaleDurations`, :meth:`~music21.stream.Stream.addGroupForElements`, :meth:`~music21.stream.Stream.allPlayingWhileSounding`, :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams`, :meth:`~music21.stream.Stream.attributeCount`, :meth:`~music21.stream.Stream.bestClef`, :meth:`~music21.stream.Stream.extendDuration`, :meth:`~music21.stream.Stream.extractContext`, :meth:`~music21.stream.Stream.findConsecutiveNotes`, :meth:`~music21.stream.Stream.findGaps`, :meth:`~music21.stream.Stream.getClefs`, :meth:`~music21.stream.Stream.getElementAfterElement`, :meth:`~music21.stream.Stream.getElementAfterOffset`, :meth:`~music21.stream.Stream.getElementAtOrAfter`, :meth:`~music21.stream.Stream.getElementAtOrBefore`, :meth:`~music21.stream.Stream.getElementBeforeElement`, :meth:`~music21.stream.Stream.getElementBeforeOffset`, :meth:`~music21.stream.Stream.getElementById`, :meth:`~music21.stream.Stream.getElementsByClass`, :meth:`~music21.stream.Stream.getElementsByGroup`, :meth:`~music21.stream.Stream.getElementsByOffset`, :meth:`~music21.stream.Stream.getElementsNotOfClass`, :meth:`~music21.stream.Stream.getInstrument`, :meth:`~music21.stream.Stream.getKeySignatures`, :meth:`~music21.stream.Stream.getMeasure`, :meth:`~music21.stream.Stream.getMeasureRange`, :meth:`~music21.stream.Stream.getMeasures`, :meth:`~music21.stream.Stream.getOffsetByElement`, :meth:`~music21.stream.Stream.getOverlaps`, :meth:`~music21.stream.Stream.getSimultaneous`, :meth:`~music21.stream.Stream.getTimeSignatures`, :meth:`~music21.stream.Stream.groupCount`, :meth:`~music21.stream.Stream.groupElementsByOffset`, :meth:`~music21.stream.Stream.index`, :meth:`~music21.stream.Stream.indexList`, :meth:`~music21.stream.Stream.insertAtNativeOffset`, :meth:`~music21.stream.Stream.isClass`, :meth:`~music21.stream.Stream.isSequence`, :meth:`~music21.stream.Stream.makeAccidentals`, :meth:`~music21.stream.Stream.makeBeams`, :meth:`~music21.stream.Stream.makeMeasures`, :meth:`~music21.stream.Stream.makeNotation`, :meth:`~music21.stream.Stream.makeRests`, :meth:`~music21.stream.Stream.makeTies`, :meth:`~music21.stream.Stream.measureOffsetMap`, :meth:`~music21.stream.Stream.melodicIntervals`, :meth:`~music21.stream.Stream.pitchAttributeCount`, :meth:`~music21.stream.Stream.playingWhenAttacked`, :meth:`~music21.stream.Stream.plot`, :meth:`~music21.stream.Stream.pop`, :meth:`~music21.stream.Stream.remove`, :meth:`~music21.stream.Stream.repeatAppend`, :meth:`~music21.stream.Stream.repeatInsert`, :meth:`~music21.stream.Stream.replace`, :meth:`~music21.stream.Stream.setupPickleScaffold`, :meth:`~music21.stream.Stream.shiftElements`, :meth:`~music21.stream.Stream.simultaneousAttacks`, :meth:`~music21.stream.Stream.splitByClass`, :meth:`~music21.stream.Stream.stripTies`, :meth:`~music21.stream.Stream.teardownPickleScaffold`, :meth:`~music21.stream.Stream.transferOffsetToElements`, :meth:`~music21.stream.Stream.trimPlayingWhileSounding`
 
@@ -166,30 +92,27 @@ HarmonyStream
 
 .. class:: HarmonyStream(stringRep=, timeSignature=None)
 
+    example of subclassing TinyNotationStream to include a possible harmonic representation of the note 
+
+    >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
+    >>> michelle += "G4*E-*_these c_are A-_words G_that "
+    >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
+    >>> hns = HarmonyStream(michelle, "4/4")
+    >>> ns = hns.notes
+    >>> ns[0].step
+    'C' 
+    >>> ns[0].editorial.misc['harmony']
+    'F' 
+    >>> ns[0].lyric
+    'Mi-' 
+    >>> ns[2].isRest
+    True 
+    >>> ns[5].name
+    'G' 
+    >>> ns[7].name
+    'A-' 
+
     
-     example of subclassing TinyNotationStream to include a possible harmonic representation of the note
- 
-     >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
-     >>> michelle += "G4*E-*_these c_are A-_words G_that "
-     >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
-     
-     >>> hns = HarmonyStream(michelle, "4/4")
-     >>> ns = hns.notes
-     >>> ns[0].step
-     'C'
-     >>> ns[0].editorial.misc['harmony']
-     'F'
-     >>> ns[0].lyric
-     'Mi-'
-     >>> ns[2].isRest
-     True
-     >>> ns[5].name
-     'G'
-     >>> ns[7].name
-     'A-'
- 
-     
- 
 
     inherits from: :class:`~music21.tinyNotation.TinyNotationStream`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
@@ -206,13 +129,7 @@ HarmonyNote
 
         .. method:: customNotationMatch(m21NoteObject, stringRep, storedDict)
 
-            
-         checks to see if a note has markup in the form *TEXT* and if
-         so, stores TEXT in the notes editorial.misc[] dictionary object
-         
-         See the demonstration in the docs for class HarmonyLine.
-         
- 
+            checks to see if a note has markup in the form *TEXT* and if so, stores TEXT in the notes editorial.misc[] dictionary object See the demonstration in the docs for class HarmonyLine. 
 
         Methods inherited from :class:`~music21.tinyNotation.TinyNotationNote`: :meth:`~music21.tinyNotation.TinyNotationNote.customPitchMatch`, :meth:`~music21.tinyNotation.TinyNotationNote.getDots`
 

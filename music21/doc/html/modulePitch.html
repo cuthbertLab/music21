@@ -86,24 +86,24 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="music21-pitch">
-<span id="modulepitch"></span><h1>music21.pitch<a class="headerlink" href="#music21-pitch" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-music21.pitch">
+<span id="modulepitch"></span><h1>music21.pitch<a class="headerlink" href="#module-music21.pitch" title="Permalink to this headline">¶</a></h1>
+<p>Classes and functions for creating and manipulating pitches, pitch-space, and accidentals. Used extensively by note.py</p>
 <dl class="function">
-<dt id="convertFqToPs">
-<tt class="descname">convertFqToPs</tt><big>(</big><em>fq</em><big>)</big><a class="headerlink" href="#convertFqToPs" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Utility conversion; does not process internals.</dt>
-<dd>Assumes A4 = 440 Hz
-&gt;&gt;&gt; convertFqToPs(440)
-69.0
-&gt;&gt;&gt; convertFqToPs(261.62556530059862)
-60.0</dd>
-</dl>
+<dt id="music21.pitch.convertFqToPs">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertFqToPs</tt><big>(</big><em>fq</em><big>)</big><a class="headerlink" href="#music21.pitch.convertFqToPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility conversion; does not process internals. Assumes A4 = 440 Hz</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertFqToPs</span><span class="p">(</span><span class="mf">440</span><span class="p">)</span>
+<span class="go">69.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertFqToPs</span><span class="p">(</span><span class="mf">261.62556530059862</span><span class="p">)</span>
+<span class="go">60.0</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
-<dt id="convertNameToPitchClass">
-<tt class="descname">convertNameToPitchClass</tt><big>(</big><em>pitchName</em><big>)</big><a class="headerlink" href="#convertNameToPitchClass" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.convertNameToPitchClass">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertNameToPitchClass</tt><big>(</big><em>pitchName</em><big>)</big><a class="headerlink" href="#music21.pitch.convertNameToPitchClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility conversion: from a pitch name to a pitch class integer between 0 and 11.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPitchClass</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
 <span class="go">0</span>
@@ -120,8 +120,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="convertNameToPs">
-<tt class="descname">convertNameToPs</tt><big>(</big><em>pitchName</em><big>)</big><a class="headerlink" href="#convertNameToPs" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.convertNameToPs">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertNameToPs</tt><big>(</big><em>pitchName</em><big>)</big><a class="headerlink" href="#music21.pitch.convertNameToPs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility conversion: from a pitch name to a pitch space number (floating point MIDI pitch values).</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertNameToPs</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
 <span class="go">60</span>
@@ -138,8 +138,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="convertPitchClassToNumber">
-<tt class="descname">convertPitchClassToNumber</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#convertPitchClassToNumber" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.convertPitchClassToNumber">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPitchClassToNumber</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPitchClassToNumber" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a pitch class or pitch class value, look for strings. If a string is found, replace it with the default pitch class representation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToNumber</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="go">3</span>
@@ -152,8 +152,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="convertPitchClassToStr">
-<tt class="descname">convertPitchClassToStr</tt><big>(</big><em>pc</em><big>)</big><a class="headerlink" href="#convertPitchClassToStr" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.convertPitchClassToStr">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPitchClassToStr</tt><big>(</big><em>pc</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPitchClassToStr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a pitch class number, return a string.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPitchClassToStr</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
 <span class="go">&#39;3&#39;</span>
@@ -164,43 +164,39 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="convertPsToFq">
-<tt class="descname">convertPsToFq</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#convertPsToFq" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility conversion; does not process internals.</p>
-<blockquote>
-Assumes A4 = 440 Hz
-&gt;&gt;&gt; convertPsToFq(69)
-440.0
-&gt;&gt;&gt; convertPsToFq(60)
-261.62556530059862
-&gt;&gt;&gt; convertPsToFq(2)
-9.1770239974189884
-&gt;&gt;&gt; convertPsToFq(135)
-19912.126958213179</blockquote>
+<dt id="music21.pitch.convertPsToFq">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToFq</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToFq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility conversion; does not process internals. Assumes A4 = 440 Hz</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">69</span><span class="p">)</span>
+<span class="go">440.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">60</span><span class="p">)</span>
+<span class="go">261.62556530059862</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">9.1770239974189884</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToFq</span><span class="p">(</span><span class="mf">135</span><span class="p">)</span>
+<span class="go">19912.126958213179</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
-<dt id="convertPsToOct">
-<tt class="descname">convertPsToOct</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#convertPsToOct" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Utility conversion; does not process internals.</dt>
-<dd>Assume C4 middle C, so 60 returns 4
-&gt;&gt;&gt; [convertPsToOct(59), convertPsToOct(60), convertPsToOct(61)]
-[3, 4, 4]
-&gt;&gt;&gt; [convertPsToOct(12), convertPsToOct(0), convertPsToOct(-12)]
-[0, -1, -2]
-&gt;&gt;&gt; convertPsToOct(135)
-10</dd>
-</dl>
+<dt id="music21.pitch.convertPsToOct">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToOct</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToOct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility conversion; does not process internals. Assume C4 middle C, so 60 returns 4</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">59</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">60</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">61</span><span class="p">)]</span>
+<span class="go">[3, 4, 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">12</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">0</span><span class="p">),</span> <span class="n">convertPsToOct</span><span class="p">(</span><span class="o">-</span><span class="mf">12</span><span class="p">)]</span>
+<span class="go">[0, -1, -2]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToOct</span><span class="p">(</span><span class="mf">135</span><span class="p">)</span>
+<span class="go">10</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
-<dt id="convertPsToStep">
-<tt class="descname">convertPsToStep</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#convertPsToStep" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Utility conversion; does not process internals.</dt>
-<dd><p class="first">Takes in a midiNote number (Assume C4 middle C, so 60 returns 4)
-Returns a tuple of Step name and either a natural or a sharp</p>
+<dt id="music21.pitch.convertPsToStep">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertPsToStep</tt><big>(</big><em>ps</em><big>)</big><a class="headerlink" href="#music21.pitch.convertPsToStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility conversion; does not process internals. Takes in a midiNote number (Assume C4 middle C, so 60 returns 4) Returns a tuple of Step name and either a natural or a sharp</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">60</span><span class="p">)</span>
 <span class="go">(&#39;C&#39;, &lt;accidental natural&gt;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">66</span><span class="p">)</span>
@@ -211,9 +207,7 @@ Returns a tuple of Step name and either a natural or a sharp</p>
 <span class="go">(&#39;G&#39;, &lt;accidental sharp&gt;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="o">-</span><span class="mf">2</span><span class="p">)</span>
 <span class="go">(&#39;A&#39;, &lt;accidental sharp&gt;)</span>
-</pre></div>
-</div>
-<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">60.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">60.5</span><span class="p">)</span>
 <span class="go">(&#39;C&#39;, &lt;accidental half-sharp&gt;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertPsToStep</span><span class="p">(</span><span class="mf">61.5</span><span class="p">)</span>
 <span class="go">(&#39;C&#39;, &lt;accidental one-and-a-half-sharp&gt;)</span>
@@ -225,16 +219,13 @@ Returns a tuple of Step name and either a natural or a sharp</p>
 <span class="go">(&#39;D&#39;, &lt;accidental sharp&gt;)</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="convertStepToPs">
-<tt class="descname">convertStepToPs</tt><big>(</big><em>step</em>, <em>oct</em>, <em>acc=None</em><big>)</big><a class="headerlink" href="#convertStepToPs" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Utility conversion; does not process internals.</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertStepToPs</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<dt id="music21.pitch.convertStepToPs">
+<tt class="descclassname">music21.pitch.</tt><tt class="descname">convertStepToPs</tt><big>(</big><em>step</em>, <em>oct</em>, <em>acc=None</em><big>)</big><a class="headerlink" href="#music21.pitch.convertStepToPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility conversion; does not process internals.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">convertStepToPs</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
 <span class="go">61</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convertStepToPs</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">2</span><span class="p">)</span>
 <span class="go">36</span>
@@ -242,21 +233,16 @@ Returns a tuple of Step name and either a natural or a sharp</p>
 <span class="go">62</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <div class="section" id="pitch">
 <h2>Pitch<a class="headerlink" href="#pitch" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="Pitch">
+<dt id="music21.pitch.Pitch">
 <em class="property">
-class </em><tt class="descname">Pitch</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#Pitch" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pitch</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.</p>
-<p>Create a Pitch.</p>
-<blockquote>
-<p>Optional parameter name should include a step and accidental character(s)</p>
-<p>it can also include a non-negative octave number.  (&#8220;C#4&#8221;, &#8220;B&#8211;3&#8221;, etc.)</p>
+<p>Create a Pitch. Optional parameter name should include a step and accidental character(s) it can also include a non-negative octave number.  (&#8220;C#4&#8221;, &#8220;B&#8211;3&#8221;, etc.)</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span>
 <span class="go">A#</span>
@@ -265,22 +251,18 @@ class </em><tt class="descname">Pitch</tt><big>(</big><em>name=None</em><big>)</
 <span class="go">D#</span>
 </pre></div>
 </div>
-</blockquote>
-<p>inherits from: <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></p>
+<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Pitch</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>defaultOctave</cite></p>
-<p>Attributes inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt>, <tt class="xref docutils literal"><span class="pre">id</span></tt>, <tt class="xref docutils literal"><span class="pre">groups</span></tt></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
 <p><strong>Pitch</strong> <strong>properties</strong></p>
 <blockquote>
-<blockquote>
 <dl class="attribute">
-<dt id="Pitch.name">
-<tt class="descname">name</tt><a class="headerlink" href="#Pitch.name" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Name presently returns pitch name and accidental without octave.</blockquote>
-<p>Perhaps better named getNameClass</p>
+<dt id="music21.pitch.Pitch.name">
+<tt class="descname">name</tt><a class="headerlink" href="#music21.pitch.Pitch.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name presently returns pitch name and accidental without octave. Perhaps better named getNameClass</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;G#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;G#&#39;</span>
@@ -289,13 +271,13 @@ Name presently returns pitch name and accidental without octave.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.nameWithOctave">
-<tt class="descname">nameWithOctave</tt><a class="headerlink" href="#Pitch.nameWithOctave" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Pitch.nameWithOctave">
+<tt class="descname">nameWithOctave</tt><a class="headerlink" href="#music21.pitch.Pitch.nameWithOctave" title="Permalink to this definition">¶</a></dt>
 <dd>The pitch name with an octave designation. If no octave as been set, no octave value is returned.</dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.step">
-<tt class="descname">step</tt><a class="headerlink" href="#Pitch.step" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Pitch.step">
+<tt class="descname">step</tt><a class="headerlink" href="#music21.pitch.Pitch.step" title="Permalink to this definition">¶</a></dt>
 <dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C#3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">_getStep</span><span class="p">()</span>
 <span class="go">&#39;C&#39;</span>
@@ -304,8 +286,8 @@ Name presently returns pitch name and accidental without octave.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.pitchClass">
-<tt class="descname">pitchClass</tt><a class="headerlink" href="#Pitch.pitchClass" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Pitch.pitchClass">
+<tt class="descname">pitchClass</tt><a class="headerlink" href="#music21.pitch.Pitch.pitchClass" title="Permalink to this definition">¶</a></dt>
 <dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">_getPitchClass</span><span class="p">()</span>
 <span class="go">9</span>
@@ -325,10 +307,9 @@ Name presently returns pitch name and accidental without octave.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.octave">
-<tt class="descname">octave</tt><a class="headerlink" href="#Pitch.octave" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns or sets the octave of the note.  Setting the octave
-updates the pitchSpace attribute.</p>
+<dt id="music21.pitch.Pitch.octave">
+<tt class="descname">octave</tt><a class="headerlink" href="#music21.pitch.Pitch.octave" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns or sets the octave of the note.  Setting the octave updates the pitchSpace attribute.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">octave</span> <span class="ow">is</span> <span class="bp">None</span>
 <span class="go">True</span>
@@ -350,13 +331,13 @@ updates the pitchSpace attribute.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.midi">
-<tt class="descname">midi</tt><a class="headerlink" href="#Pitch.midi" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Pitch.midi">
+<tt class="descname">midi</tt><a class="headerlink" href="#music21.pitch.Pitch.midi" title="Permalink to this definition">¶</a></dt>
 <dd>midi is ps (pitchSpace) as a rounded int; ps can accomodate floats</dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.accidental">
-<tt class="descname">accidental</tt><a class="headerlink" href="#Pitch.accidental" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Pitch.accidental">
+<tt class="descname">accidental</tt><a class="headerlink" href="#music21.pitch.Pitch.accidental" title="Permalink to this definition">¶</a></dt>
 <dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;D-2&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">alter</span>
 <span class="go">-1.0</span>
@@ -365,14 +346,9 @@ updates the pitchSpace attribute.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.diatonicNoteNum">
-<tt class="descname">diatonicNoteNum</tt><a class="headerlink" href="#Pitch.diatonicNoteNum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns (or takes) an integer that uniquely identifies the
-diatonic version of a note, that is ignoring accidentals.
-The number returned is the diatonic interval above C0 (the lowest C on
-a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc.
-Numbers can be negative for very low notes.</p>
-<p>C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc.</p>
+<dt id="music21.pitch.Pitch.diatonicNoteNum">
+<tt class="descname">diatonicNoteNum</tt><a class="headerlink" href="#music21.pitch.Pitch.diatonicNoteNum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns (or takes) an integer that uniquely identifies the diatonic version of a note, that is ignoring accidentals. The number returned is the diatonic interval above C0 (the lowest C on a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc. Numbers can be negative for very low notes. C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">diatonicNoteNum</span>
 <span class="go">29</span>
@@ -387,9 +363,7 @@ Numbers can be negative for very low notes.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lowc</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lowc</span><span class="o">.</span><span class="n">diatonicNoteNum</span>
 <span class="go">8</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="s">&quot;B&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">octave</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">diatonicNoteNum</span>
@@ -397,9 +371,7 @@ Numbers can be negative for very low notes.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">diatonicNoteNum</span>  <span class="c">#implicitOctave</span>
 <span class="go">29</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">lowDSharp</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;C#7&quot;</span><span class="p">)</span> <span class="c"># !!!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lowDSharp</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&quot;C#7&quot;</span><span class="p">)</span> <span class="c"># !!!</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lowDSharp</span><span class="o">.</span><span class="n">diatonicNoteNum</span> <span class="o">=</span> <span class="mf">9</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lowDSharp</span><span class="o">.</span><span class="n">octave</span>
 <span class="go">1</span>
@@ -410,8 +382,8 @@ Numbers can be negative for very low notes.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.freq440">
-<tt class="descname">freq440</tt><a class="headerlink" href="#Pitch.freq440" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Pitch.freq440">
+<tt class="descname">freq440</tt><a class="headerlink" href="#music21.pitch.Pitch.freq440" title="Permalink to this definition">¶</a></dt>
 <dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;A4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">freq440</span>
 <span class="go">440.0</span>
@@ -420,21 +392,14 @@ Numbers can be negative for very low notes.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.frequency">
-<tt class="descname">frequency</tt><a class="headerlink" href="#Pitch.frequency" title="Permalink to this definition">¶</a></dt>
-<dd>The frequency property gets or sets the frequency of
-the pitch in hertz.
-If the frequency has not been overridden, then
-it is computed based on A440Hz and equal temperament</dd></dl>
+<dt id="music21.pitch.Pitch.frequency">
+<tt class="descname">frequency</tt><a class="headerlink" href="#music21.pitch.Pitch.frequency" title="Permalink to this definition">¶</a></dt>
+<dd>The frequency property gets or sets the frequency of the pitch in hertz. If the frequency has not been overridden, then it is computed based on A440Hz and equal temperament</dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.german">
-<tt class="descname">german</tt><a class="headerlink" href="#Pitch.german" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</blockquote>
-<p>returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.)
-(Microtones raise an error).</p>
+<dt id="music21.pitch.Pitch.german">
+<tt class="descname">german</tt><a class="headerlink" href="#music21.pitch.Pitch.german" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.) (Microtones raise an error).</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;B-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
 <span class="go">B</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">german</span>
@@ -452,23 +417,21 @@ it is computed based on A440Hz and equal temperament</dd></dl>
 <span class="nc">PitchException</span>: <span class="n-Identifier">Es geht nicht &quot;german&quot; zu benutzen mit Microtoenen.  Schade!</span>
 </pre></div>
 </div>
-<blockquote>
-<dl class="attribute">
-<dt id="Pitch.implicitOctave">
-<tt class="descname">implicitOctave</tt><a class="headerlink" href="#Pitch.implicitOctave" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+</dd></dl>
 
-</blockquote>
-<p>returns the octave of the Pitch, or defaultOctave if octave was never set</p>
-<blockquote>
 <dl class="attribute">
-<dt id="Pitch.musicxml">
-<tt class="descname">musicxml</tt><a class="headerlink" href="#Pitch.musicxml" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Pitch.implicitOctave">
+<tt class="descname">implicitOctave</tt><a class="headerlink" href="#music21.pitch.Pitch.implicitOctave" title="Permalink to this definition">¶</a></dt>
+<dd>returns the octave of the Pitch, or defaultOctave if octave was never set</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.pitch.Pitch.musicxml">
+<tt class="descname">musicxml</tt><a class="headerlink" href="#music21.pitch.Pitch.musicxml" title="Permalink to this definition">¶</a></dt>
 <dd>Provide a complete MusicXML representation. Presently, this is based on</dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.mx">
-<tt class="descname">mx</tt><a class="headerlink" href="#Pitch.mx" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Pitch.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#music21.pitch.Pitch.mx" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a musicxml.Note() object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g#4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
@@ -479,10 +442,9 @@ it is computed based on A440Hz and equal temperament</dd></dl>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.pitchClassString">
-<tt class="descname">pitchClassString</tt><a class="headerlink" href="#Pitch.pitchClassString" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with <tt class="xref docutils literal"><span class="pre">pitchClass</span></tt>.</blockquote>
+<dt id="music21.pitch.Pitch.pitchClassString">
+<tt class="descname">pitchClassString</tt><a class="headerlink" href="#music21.pitch.Pitch.pitchClassString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with <a title="music21.pitch.Pitch.pitchClass" class="reference internal" href="#music21.pitch.Pitch.pitchClass"><tt class="xref docutils literal"><span class="pre">pitchClass</span></tt></a>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">pitchClassString</span> <span class="o">=</span> <span class="s">&#39;B&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">pitchClass</span>
@@ -494,10 +456,9 @@ Return a string representation of the pitch class, where integers greater than 1
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.ps">
-<tt class="descname">ps</tt><a class="headerlink" href="#Pitch.ps" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent).</blockquote>
+<dt id="music21.pitch.Pitch.ps">
+<tt class="descname">ps</tt><a class="headerlink" href="#music21.pitch.Pitch.ps" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent).</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">ps</span> <span class="o">=</span> <span class="mf">45</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
@@ -510,32 +471,27 @@ The ps property permits getting and setting a pitch space value, a floating poin
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Pitch.stepWithOctave">
-<tt class="descname">stepWithOctave</tt><a class="headerlink" href="#Pitch.stepWithOctave" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns the pitch step (F, G, etc) with octave designation. If no octave as been set, no octave value is returned.</blockquote>
+<dt id="music21.pitch.Pitch.stepWithOctave">
+<tt class="descname">stepWithOctave</tt><a class="headerlink" href="#music21.pitch.Pitch.stepWithOctave" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the pitch step (F, G, etc) with octave designation. If no octave as been set, no octave value is returned.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;G#4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">stepWithOctave</span>
 <span class="go">&#39;G4&#39;</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;A#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;A#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">stepWithOctave</span>
 <span class="go">&#39;A&#39;</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<p>Properties inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">duration</span></tt>, <tt class="xref docutils literal"><span class="pre">offset</span></tt>, <tt class="xref docutils literal"><span class="pre">parent</span></tt>, <tt class="xref docutils literal"><span class="pre">priority</span></tt></p>
-</blockquote>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
 <p><strong>Pitch</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
-<dt id="Pitch.inheritDisplay">
-<tt class="descname">inheritDisplay</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#Pitch.inheritDisplay" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Inherit display properties from another Pitch, including those found on the Accidental object.</blockquote>
+<dt id="music21.pitch.Pitch.inheritDisplay">
+<tt class="descname">inheritDisplay</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.inheritDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherit display properties from another Pitch, including those found on the Accidental object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayType</span> <span class="o">=</span> <span class="s">&#39;always&#39;</span>
@@ -548,10 +504,9 @@ Inherit display properties from another Pitch, including those found on the Acci
 </dd></dl>
 
 <dl class="method">
-<dt id="Pitch.transpose">
-<tt class="descname">transpose</tt><big>(</big><em>value</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#Pitch.transpose" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a <a title="music21.interval.Interval" class="reference external" href="moduleInterval.html#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">music21.interval.Interval</span></tt></a> object can be supplied.</blockquote>
+<dt id="music21.pitch.Pitch.transpose">
+<tt class="descname">transpose</tt><big>(</big><em>value</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.transpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a <a title="music21.interval.Interval" class="reference external" href="moduleInterval.html#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">music21.interval.Interval</span></tt></a> object can be supplied.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;g4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span> <span class="o">=</span> <span class="n">aPitch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s">&#39;m3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span>
@@ -560,9 +515,7 @@ Transpose the pitch by the user-provided value. If the value is an integer, the 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span> <span class="o">=</span> <span class="n">aPitch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">aInterval</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bPitch</span>
 <span class="go">C#4</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span>
 <span class="go">G4</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">aInterval</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">aPitch</span>
@@ -572,30 +525,20 @@ Transpose the pitch by the user-provided value. If the value is an integer, the 
 </dd></dl>
 
 <dl class="method">
-<dt id="Pitch.updateAccidentalDisplay">
-<tt class="descname">updateAccidentalDisplay</tt><big>(</big><em>pitchPast=</em><span class="optional">[</span><span class="optional">]</span>, <em>alteredPitches=</em><span class="optional">[</span><span class="optional">]</span>, <em>cautionaryPitchClass=True</em>, <em>cautionaryAll=False</em>, <em>overrideStatus=False</em>, <em>cautionaryNotImmediateRepeat=True</em><big>)</big><a class="headerlink" href="#Pitch.updateAccidentalDisplay" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given a list of Pitch objects in <cite>pitchPast</cite>, determine if this pitch&#8217;s Accidental object needs to be created or updated with a natural or other cautionary accidental.</blockquote>
-<p>Changes to this Pitch object&#8217;s Accidental object are made in-place.</p>
-<p>The <cite>alteredPitches</cite> list supplies pitches from a <a title="music21.key.KeySignature" class="reference external" href="moduleKey.html#music21.key.KeySignature"><tt class="xref docutils literal"><span class="pre">music21.key.KeySignature</span></tt></a> object using the <a title="music21.key.KeySignature.alteredPitches" class="reference external" href="moduleKey.html#music21.key.KeySignature.alteredPitches"><tt class="xref docutils literal"><span class="pre">alteredPitches</span></tt></a> property.</p>
-<p>If <cite>cautionaryPitchClass</cite> is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed.</p>
-<p>If <cite>overrideStatus</cite> is True, this method will ignore any current <cite>displayStatus</cite> stetting found on the Accidental. By default this does not happen. If <cite>displayStatus</cite> is set to None, the Accidental&#8217;s <cite>displayStatus</cite> is set.</p>
-<p>If <cite>cautionaryNotImmediateRepeat</cite> is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered.</p>
+<dt id="music21.pitch.Pitch.updateAccidentalDisplay">
+<tt class="descname">updateAccidentalDisplay</tt><big>(</big><em>pitchPast=</em><span class="optional">[</span><span class="optional">]</span>, <em>alteredPitches=</em><span class="optional">[</span><span class="optional">]</span>, <em>cautionaryPitchClass=True</em>, <em>cautionaryAll=False</em>, <em>overrideStatus=False</em>, <em>cautionaryNotImmediateRepeat=True</em><big>)</big><a class="headerlink" href="#music21.pitch.Pitch.updateAccidentalDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of Pitch objects in <cite>pitchPast</cite>, determine if this pitch&#8217;s Accidental object needs to be created or updated with a natural or other cautionary accidental. Changes to this Pitch object&#8217;s Accidental object are made in-place. The <cite>alteredPitches</cite> list supplies pitches from a <a title="music21.key.KeySignature" class="reference external" href="moduleKey.html#music21.key.KeySignature"><tt class="xref docutils literal"><span class="pre">music21.key.KeySignature</span></tt></a> object using the <a title="music21.key.KeySignature.alteredPitches" class="reference external" href="moduleKey.html#music21.key.KeySignature.alteredPitches"><tt class="xref docutils literal"><span class="pre">alteredPitches</span></tt></a> property. If <cite>cautionaryPitchClass</cite> is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. If <cite>overrideStatus</cite> is True, this method will ignore any current <cite>displayStatus</cite> stetting found on the Accidental. By default this does not happen. If <cite>displayStatus</cite> is set to None, the Accidental&#8217;s <cite>displayStatus</cite> is set. If <cite>cautionaryNotImmediateRepeat</cite> is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">,</span> <span class="n">cautionaryAll</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayStatus</span>
 <span class="go">(&lt;accidental natural&gt;, True)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">)</span> <span class="c"># should add a natural</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">accidental</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">accidental</span><span class="o">.</span><span class="n">displayStatus</span>
 <span class="go">(&lt;accidental natural&gt;, True)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a4&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">past</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;a3#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c#&#39;</span><span class="p">),</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c"># will not add a natural because match is pitchSpace</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">updateAccidentalDisplay</span><span class="p">(</span><span class="n">past</span><span class="p">,</span> <span class="n">cautionaryPitchClass</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -605,7 +548,7 @@ Given a list of Pitch objects in <cite>pitchPast</cite>, determine if this pitch
 </div>
 </dd></dl>
 
-<p>Methods inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">addContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocation()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSites()</span></tt>, <tt class="xref docutils literal"><span class="pre">hasContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">isClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt>, <tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">show()</span></tt>, <tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySite"><tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySiteId" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySiteId"><tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt></a>, <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </blockquote>
 </dd></dl>
 
@@ -613,83 +556,62 @@ Given a list of Pitch objects in <cite>pitchPast</cite>, determine if this pitch
 <div class="section" id="accidental">
 <h2>Accidental<a class="headerlink" href="#accidental" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="Accidental">
+<dt id="music21.pitch.Accidental">
 <em class="property">
-class </em><tt class="descname">Accidental</tt><big>(</big><em>specifier=natural</em><big>)</big><a class="headerlink" href="#Accidental" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Accidental</tt><big>(</big><em>specifier=natural</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accidental class.</p>
-<p>inherits from: <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></p>
+<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Accidental</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="Accidental.name">
-<tt class="descname">name</tt><a class="headerlink" href="#Accidental.name" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-A string name of the Accidental, such as &#8220;sharp&#8221; or</blockquote>
-<p>&#8220;double-flat&#8221;.</p>
-</dd></dl>
+<dt id="music21.pitch.Accidental.name">
+<tt class="descname">name</tt><a class="headerlink" href="#music21.pitch.Accidental.name" title="Permalink to this definition">¶</a></dt>
+<dd>A string name of the Accidental, such as &#8220;sharp&#8221; or &#8220;double-flat&#8221;.</dd></dl>
 
 <dl class="attribute">
-<dt id="Accidental.modifier">
-<tt class="descname">modifier</tt><a class="headerlink" href="#Accidental.modifier" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-A string symbol used to modify the pitch name, such as &#8220;#&#8221; or</blockquote>
-<p>&#8220;-&#8221; for sharp and flat, respectively.</p>
-</dd></dl>
+<dt id="music21.pitch.Accidental.modifier">
+<tt class="descname">modifier</tt><a class="headerlink" href="#music21.pitch.Accidental.modifier" title="Permalink to this definition">¶</a></dt>
+<dd>A string symbol used to modify the pitch name, such as &#8220;#&#8221; or &#8220;-&#8221; for sharp and flat, respectively.</dd></dl>
 
 <dl class="attribute">
-<dt id="Accidental.alter">
-<tt class="descname">alter</tt><a class="headerlink" href="#Accidental.alter" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-A signed decimal representing the number of half-steps shifted</blockquote>
-<p>by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.</p>
-</dd></dl>
+<dt id="music21.pitch.Accidental.alter">
+<tt class="descname">alter</tt><a class="headerlink" href="#music21.pitch.Accidental.alter" title="Permalink to this definition">¶</a></dt>
+<dd>A signed decimal representing the number of half-steps shifted by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.</dd></dl>
 
 <dl class="attribute">
-<dt id="Accidental.displaySize">
-<tt class="descname">displaySize</tt><a class="headerlink" href="#Accidental.displaySize" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Accidental.displaySize">
+<tt class="descname">displaySize</tt><a class="headerlink" href="#music21.pitch.Accidental.displaySize" title="Permalink to this definition">¶</a></dt>
 <dd>Size in display: &#8220;cue&#8221;, &#8220;large&#8221;, or a percentage.</dd></dl>
 
 <dl class="attribute">
-<dt id="Accidental.displayStyle">
-<tt class="descname">displayStyle</tt><a class="headerlink" href="#Accidental.displayStyle" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Accidental.displayStyle">
+<tt class="descname">displayStyle</tt><a class="headerlink" href="#music21.pitch.Accidental.displayStyle" title="Permalink to this definition">¶</a></dt>
 <dd>Style of display: &#8220;parentheses&#8221;, &#8220;bracket&#8221;, &#8220;both&#8221;.</dd></dl>
 
 <p>Attributes without Documentation: <cite>displayLocation</cite></p>
-<p>Attributes inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt>, <tt class="xref docutils literal"><span class="pre">id</span></tt></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a></p>
 </blockquote>
 <p><strong>Accidental</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="Accidental.displayStatus">
-<tt class="descname">displayStatus</tt><a class="headerlink" href="#Accidental.displayStatus" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given the displayType, should</blockquote>
-<p>this accidental be displayed?
-Can be True, False, or None if not defined. For contexts where
-the next program down the line cannot evaluate displayType</p>
-</dd></dl>
+<dt id="music21.pitch.Accidental.displayStatus">
+<tt class="descname">displayStatus</tt><a class="headerlink" href="#music21.pitch.Accidental.displayStatus" title="Permalink to this definition">¶</a></dt>
+<dd>Given the displayType, should this accidental be displayed? Can be True, False, or None if not defined. For contexts where the next program down the line cannot evaluate displayType</dd></dl>
 
 <dl class="attribute">
-<dt id="Accidental.displayType">
-<tt class="descname">displayType</tt><a class="headerlink" href="#Accidental.displayType" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Display if first in measure; other valid terms:</blockquote>
-<p>&#8220;always&#8221;, &#8220;never&#8221;, &#8220;unless-repeated&#8221; (show always unless
-the immediately preceding note is the same), &#8220;even-tied&#8221;
-(stronger than always: shows even if it is tied to the
-previous note)</p>
-</dd></dl>
+<dt id="music21.pitch.Accidental.displayType">
+<tt class="descname">displayType</tt><a class="headerlink" href="#music21.pitch.Accidental.displayType" title="Permalink to this definition">¶</a></dt>
+<dd>Display if first in measure; other valid terms: &#8220;always&#8221;, &#8220;never&#8221;, &#8220;unless-repeated&#8221; (show always unless the immediately preceding note is the same), &#8220;even-tied&#8221; (stronger than always: shows even if it is tied to the previous note)</dd></dl>
 
 <dl class="attribute">
-<dt id="Accidental.lily">
-<tt class="descname">lily</tt><a class="headerlink" href="#Accidental.lily" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.pitch.Accidental.lily">
+<tt class="descname">lily</tt><a class="headerlink" href="#music21.pitch.Accidental.lily" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
 
 <dl class="attribute">
-<dt id="Accidental.mx">
-<tt class="descname">mx</tt><a class="headerlink" href="#Accidental.mx" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-From music21 to MusicXML</blockquote>
+<dt id="music21.pitch.Accidental.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#music21.pitch.Accidental.mx" title="Permalink to this definition">¶</a></dt>
+<dd><p>From music21 to MusicXML</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;half-sharp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="o">.</span><span class="mf">5</span>
@@ -701,34 +623,27 @@ From music21 to MusicXML</blockquote>
 </div>
 </dd></dl>
 
-<p>Properties inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">duration</span></tt>, <tt class="xref docutils literal"><span class="pre">offset</span></tt>, <tt class="xref docutils literal"><span class="pre">parent</span></tt>, <tt class="xref docutils literal"><span class="pre">priority</span></tt></p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
 <p><strong>Accidental</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
-<dt id="Accidental.set">
-<tt class="descname">set</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#Accidental.set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Provide a value to the Accidental. Strings values, numbers, and Lilypond
-Abbreviations are all accepted.</p>
+<dt id="music21.pitch.Accidental.set">
+<tt class="descname">set</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a value to the Accidental. Strings values, numbers, and Lilypond Abbreviations are all accepted.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;sharp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span> <span class="o">==</span> <span class="mf">1</span>
 <span class="go">True</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">modifier</span> <span class="o">==</span> <span class="s">&quot;##&quot;</span>
 <span class="go">True</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">modifier</span> <span class="o">==</span> <span class="s">&quot;##&quot;</span>
 <span class="go">True</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;--&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;--&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">alter</span>
 <span class="go">-2.0</span>
 </pre></div>
@@ -736,12 +651,9 @@ Abbreviations are all accepted.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Accidental.inheritDisplay">
-<tt class="descname">inheritDisplay</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#Accidental.inheritDisplay" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given another Accidental object, inherit all the display properites</blockquote>
-<p>of that object.</p>
-<p>This is needed when transposing Pitches: we need to retain accidental display properties.</p>
+<dt id="music21.pitch.Accidental.inheritDisplay">
+<tt class="descname">inheritDisplay</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.pitch.Accidental.inheritDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given another Accidental object, inherit all the display properites of that object. This is needed when transposing Pitches: we need to retain accidental display properties.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;double-flat&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">displayType</span> <span class="o">=</span> <span class="s">&#39;always&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Accidental</span><span class="p">(</span><span class="s">&#39;sharp&#39;</span><span class="p">)</span>
@@ -752,7 +664,7 @@ Given another Accidental object, inherit all the display properites</blockquote>
 </div>
 </dd></dl>
 
-<p>Methods inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">addContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocation()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSites()</span></tt>, <tt class="xref docutils literal"><span class="pre">hasContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">isClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt>, <tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">show()</span></tt>, <tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySite"><tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySiteId" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySiteId"><tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt></a>, <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </blockquote>
 </dd></dl>
 
@@ -785,7 +697,7 @@ Given another Accidental object, inherit all the display properites</blockquote>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 08, 2010.
+      Last updated on Jul 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

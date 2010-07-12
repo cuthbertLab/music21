@@ -112,7 +112,7 @@ installation is correctly configured by trying to import a music21 module.
 A module is a Python file that offers reusable resources.
 These are all found inside the music21 package, so often we will
 import a module (or all of them) from music21. To import the
-<tt class="xref docutils literal"><span class="pre">music21.corpus.base</span></tt> module
+<a title="" class="reference external" href="moduleCorpusBase.html#module-music21.corpus.base"><tt class="xref docutils literal"><span class="pre">music21.corpus.base</span></tt></a> module
 from music21, enter the following command.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">corpus</span>
 <span class="go">&gt;&gt;&gt;</span>
@@ -134,8 +134,8 @@ the music21 group for help:</p>
 <div class="section" id="examining-a-score">
 <h2>Examining a Score<a class="headerlink" href="#examining-a-score" title="Permalink to this headline">¶</a></h2>
 <p>Once music21 is installed, opening and examining a score and it elements is a good first step. Music21 comes with a corpus, a large collection freely distributable music stored in the MusicXML and humdrum formats. These files can be found in the music21/corpus directory. However, tools are provided for easy, direct access.</p>
-<p>To import, or parse, a score stored in the corpus, use the <tt class="xref docutils literal"><span class="pre">music21.corpus.base</span></tt> module. (To see a complete listing of works in the corpus, see <a class="reference external" href="referenceCorpus.html#referencecorpus"><em>Corpus Reference Index</em></a>.) We imported this module above, but here, lets import all music21 modules with the catch-all import statement <cite>from music21 import *</cite>. We will often use this import statement to quickly import all modules for easy access.</p>
-<p>We will the use the <tt class="xref docutils literal"><span class="pre">parseWork()</span></tt> method to translate the file (a MusicXML or humdrum file) into music21 objects.</p>
+<p>To import, or parse, a score stored in the corpus, use the <a title="" class="reference external" href="moduleCorpusBase.html#module-music21.corpus.base"><tt class="xref docutils literal"><span class="pre">music21.corpus.base</span></tt></a> module. (To see a complete listing of works in the corpus, see <a class="reference external" href="referenceCorpus.html#referencecorpus"><em>Corpus Reference Index</em></a>.) We imported this module above, but here, lets import all music21 modules with the catch-all import statement <cite>from music21 import *</cite>. We will often use this import statement to quickly import all modules for easy access.</p>
+<p>We will the use the <a title="music21.corpus.base.parseWork" class="reference external" href="moduleCorpusBase.html#music21.corpus.base.parseWork"><tt class="xref docutils literal"><span class="pre">parseWork()</span></tt></a> method to translate the file (a MusicXML or humdrum file) into music21 objects.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sBach</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">parseWork</span><span class="p">(</span><span class="s">&#39;bach/bwv7.7&#39;</span><span class="p">)</span>
 </pre></div>
@@ -299,7 +299,7 @@ the components of a Stream in a text format, with the optional
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 08, 2010.
+      Last updated on Jul 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

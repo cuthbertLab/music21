@@ -93,9 +93,7 @@
             
   <div class="section" id="module-music21.converter">
 <span id="moduleconverter"></span><h1>music21.converter<a class="headerlink" href="#module-music21.converter" title="Permalink to this headline">¶</a></h1>
-<p>Public interface for importing various file formats into music21.</p>
-<blockquote>
-The most powerful and easy to use tool is the <a title="music21.converter.parse" class="reference internal" href="#music21.converter.parse"><tt class="xref docutils literal"><span class="pre">parse()</span></tt></a> function. Simply provide a URL and, if the format is supported, a <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> will be returned.</blockquote>
+<p>Public interface for importing various file formats into music21. The most powerful and easy to use tool is the <a title="music21.converter.parse" class="reference internal" href="#music21.converter.parse"><tt class="xref docutils literal"><span class="pre">parse()</span></tt></a> function. Simply provide a URL and, if the format is supported, a <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> will be returned.</p>
 <dl class="function">
 <dt id="music21.converter.parse">
 <tt class="descclassname">music21.converter.</tt><tt class="descname">parse</tt><big>(</big><em>value</em>, <em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.converter.parse" title="Permalink to this definition">¶</a></dt>
@@ -137,9 +135,7 @@ The most powerful and easy to use tool is the <a title="music21.converter.parse"
 <dt id="music21.converter.Converter">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">Converter</tt><a class="headerlink" href="#music21.converter.Converter" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class used for converting all supported data formats into music21 objects.</p>
-<blockquote>
-Not a subclass, but a wrapper for different converter objects based on format.</blockquote>
+<dd><p>A class used for converting all supported data formats into music21 objects. Not a subclass, but a wrapper for different converter objects based on format.</p>
 <p><strong>Converter</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -163,10 +159,7 @@ Not a subclass, but a wrapper for different converter objects based on format.</
 <dl class="method">
 <dt id="music21.converter.Converter.parseURL">
 <tt class="descname">parseURL</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#music21.converter.Converter.parseURL" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given a url, download and parse the file into a music21 Stream.</blockquote>
-<p>Note that this checks the user Environment <cite>autoDownlaad</cite> setting before downloading.</p>
-</dd></dl>
+<dd>Given a url, download and parse the file into a music21 Stream. Note that this checks the user Environment <cite>autoDownlaad</cite> setting before downloading.</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -197,10 +190,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dl class="method">
 <dt id="music21.converter.ConverterMusicXML.load">
 <tt class="descname">load</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.load" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Load all parts from a MusicXML object representation.</blockquote>
-<p>This determines the order parts are found in the stream</p>
-</dd></dl>
+<dd>Load all parts from a MusicXML object representation. This determines the order parts are found in the stream</dd></dl>
 
 <dl class="method">
 <dt id="music21.converter.ConverterMusicXML.parseData">
@@ -210,11 +200,7 @@ Load all parts from a MusicXML object representation.</blockquote>
 <dl class="method">
 <dt id="music21.converter.ConverterMusicXML.parseFile">
 <tt class="descname">parseFile</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMusicXML.parseFile" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Open from a file path; check to see if there is a pickled</blockquote>
-<p>version available and up to date; if so, open that, otherwise
-open source.</p>
-</dd></dl>
+<dd>Open from a file path; check to see if there is a pickled version available and up to date; if so, open that, otherwise open source.</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -235,8 +221,7 @@ Attributes without Documentation: <cite>stream</cite></blockquote>
 <dl class="method">
 <dt id="music21.converter.ConverterHumdrum.parseData">
 <tt class="descname">parseData</tt><big>(</big><em>humdrumString</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterHumdrum.parseData" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Open Humdrum data from a string</blockquote>
+<dd><p>Open Humdrum data from a string</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">humdata</span> <span class="o">=</span> <span class="s">&#39;**kern</span><span class="se">\n</span><span class="s">*M2/4</span><span class="se">\n</span><span class="s">=1</span><span class="se">\n</span><span class="s">24r</span><span class="se">\n</span><span class="s">24g#</span><span class="se">\n</span><span class="s">24f#</span><span class="se">\n</span><span class="s">24e</span><span class="se">\n</span><span class="s">24c#</span><span class="se">\n</span><span class="s">24f</span><span class="se">\n</span><span class="s">24r</span><span class="se">\n</span><span class="s">24dn</span><span class="se">\n</span><span class="s">24e-</span><span class="se">\n</span><span class="s">24gn</span><span class="se">\n</span><span class="s">24e-</span><span class="se">\n</span><span class="s">24dn</span><span class="se">\n</span><span class="s">*-&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">ConverterHumdrum</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">parseData</span><span class="p">(</span><span class="n">humdata</span><span class="p">)</span>
@@ -291,8 +276,7 @@ Attributes without Documentation: <cite>stream</cite></blockquote>
 <dl class="method">
 <dt id="music21.converter.ConverterTinyNotation.parseData">
 <tt class="descname">parseData</tt><big>(</big><em>tnData</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterTinyNotation.parseData" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Open TinyNotation data from a string or list</blockquote>
+<dd><p>Open TinyNotation data from a string or list</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tnData</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;E4 r f# g=lastG trip{b-8 a g} c&quot;</span><span class="p">,</span> <span class="s">&quot;3/4&quot;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">ConverterTinyNotation</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">parseData</span><span class="p">(</span><span class="n">tnData</span><span class="p">)</span>
@@ -315,26 +299,14 @@ Open TinyNotation data from a string or list</blockquote>
 <dt id="music21.converter.PickleFilter">
 <em class="property">
 class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">PickleFilter</tt><big>(</big><em>fp</em>, <em>forceSource=False</em><big>)</big><a class="headerlink" href="#music21.converter.PickleFilter" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Before opening a file path, this class can check if there is an up</dt>
-<dd><p class="first">to date version pickled and stored in the scratch directory.</p>
-<p class="last">If the user has not specified a scratch directory, a pickle path will
-not be created.</p>
-</dd>
-</dl>
-<p>Provide a file path to check if there is pickled version.</p>
-<blockquote>
-If forceSource is True, pickled files, if available, will not be
-returned.</blockquote>
+<dd><p>Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created.</p>
+<p>Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned.</p>
 <p><strong>PickleFilter</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
 <dt id="music21.converter.PickleFilter.status">
 <tt class="descname">status</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.converter.PickleFilter.status" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path.</blockquote>
-<p>Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle.</p>
-</dd></dl>
+<dd>Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path. Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle.</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -394,7 +366,7 @@ Attributes without Documentation: <cite>stream</cite></blockquote>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 08, 2010.
+      Last updated on Jul 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -87,14 +87,15 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="music21-environment">
-<span id="moduleenvironment"></span><h1>music21.environment<a class="headerlink" href="#music21-environment" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-music21.environment">
+<span id="moduleenvironment"></span><h1>music21.environment<a class="headerlink" href="#module-music21.environment" title="Permalink to this headline">¶</a></h1>
+<p>The environment module describes an object for accessing and setting variables related to the user&#8217;s music21 environment. Such variables include the location of external applications such as MusicXML readers (e.g. Finale), whether music21 is allowed to download files directly (via the virtual corpus), and other settings. Additional documentation for and examples of using this module are found in <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a>.</p>
 <div class="section" id="environment">
 <h2>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="Environment">
+<dt id="music21.environment.Environment">
 <em class="property">
-class </em><tt class="descname">Environment</tt><big>(</big><em>modName=None</em><big>)</big><a class="headerlink" href="#Environment" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.environment.</tt><tt class="descname">Environment</tt><big>(</big><em>modName=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Environment object stores user preferences as dictionary-like object.</p>
 <p>Create an instance of this object. A modName argument can be provided for use in printDebug() calls.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
@@ -104,83 +105,72 @@ class </em><tt class="descname">Environment</tt><big>(</big><em>modName=None</em
 <p><strong>Environment</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="Environment.modNameParent">
-<tt class="descname">modNameParent</tt><a class="headerlink" href="#Environment.modNameParent" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.modNameParent">
+<tt class="descname">modNameParent</tt><a class="headerlink" href="#music21.environment.Environment.modNameParent" title="Permalink to this definition">¶</a></dt>
 <dd>A string representation of the module that contains this Environment instance.</dd></dl>
 
 <dl class="attribute">
-<dt id="Environment.ref">
-<tt class="descname">ref</tt><a class="headerlink" href="#Environment.ref" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.ref">
+<tt class="descname">ref</tt><a class="headerlink" href="#music21.environment.Environment.ref" title="Permalink to this definition">¶</a></dt>
 <dd>The Python dictionary used to store all internal settings.</dd></dl>
 
 </blockquote>
 <p><strong>Environment</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
-<dt id="Environment.read">
-<tt class="descname">read</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#Environment.read" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.read">
+<tt class="descname">read</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.read" title="Permalink to this definition">¶</a></dt>
 <dd>Load an XML preference file if and only if the file is available and has been written in the past. This means that no preference file will ever be written unless manually done so. If no preference file exists, the method returns None.</dd></dl>
 
 <dl class="method">
-<dt id="Environment.write">
-<tt class="descname">write</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#Environment.write" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.write">
+<tt class="descname">write</tt><big>(</big><em>fp=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.write" title="Permalink to this definition">¶</a></dt>
 <dd>Write an XML preference file. This must be manually called to store any changes made to the object and access preferences later. If <cite>fp</cite> is None, the default storage location will be used.</dd></dl>
 
 <dl class="method">
-<dt id="Environment.getSettingsPath">
-<tt class="descname">getSettingsPath</tt><big>(</big><big>)</big><a class="headerlink" href="#Environment.getSettingsPath" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.getSettingsPath">
+<tt class="descname">getSettingsPath</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.getSettingsPath" title="Permalink to this definition">¶</a></dt>
 <dd>Return the path to the platform specific settings file.</dd></dl>
 
 <dl class="method">
-<dt id="Environment.getDefaultRootTempDir">
-<tt class="descname">getDefaultRootTempDir</tt><big>(</big><big>)</big><a class="headerlink" href="#Environment.getDefaultRootTempDir" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Use the Python tempfile.gettempdir() to get the system specified temporary directory, and try to add a new &#8216;music21&#8217; directory, and then return this directory.</blockquote>
-<p>This method is only called if the no scratch directory preference has been set.</p>
-<p>If not able to create a &#8216;music21&#8217; directory, the standard default is returned.</p>
-</dd></dl>
+<dt id="music21.environment.Environment.getDefaultRootTempDir">
+<tt class="descname">getDefaultRootTempDir</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.getDefaultRootTempDir" title="Permalink to this definition">¶</a></dt>
+<dd>Use the Python tempfile.gettempdir() to get the system specified temporary directory, and try to add a new &#8216;music21&#8217; directory, and then return this directory. This method is only called if the no scratch directory preference has been set. If not able to create a &#8216;music21&#8217; directory, the standard default is returned.</dd></dl>
 
 <dl class="method">
-<dt id="Environment.getRootTempDir">
-<tt class="descname">getRootTempDir</tt><big>(</big><big>)</big><a class="headerlink" href="#Environment.getRootTempDir" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.getRootTempDir">
+<tt class="descname">getRootTempDir</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.getRootTempDir" title="Permalink to this definition">¶</a></dt>
 <dd>Return a directory for writing temporary files. This does not create a new directory for each use, but either uses the user-set preference or gets the system-provided directory (with a music21 subdirectory, if possible).</dd></dl>
 
 <dl class="method">
-<dt id="Environment.getTempFile">
-<tt class="descname">getTempFile</tt><big>(</big><em>suffix=</em><big>)</big><a class="headerlink" href="#Environment.getTempFile" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.getTempFile">
+<tt class="descname">getTempFile</tt><big>(</big><em>suffix=</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.getTempFile" title="Permalink to this definition">¶</a></dt>
 <dd>Return a file path to a temporary file with the specified suffix</dd></dl>
 
 <dl class="method">
-<dt id="Environment.keys">
-<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#Environment.keys" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.keys" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
 
 <dl class="method">
-<dt id="Environment.launch">
-<tt class="descname">launch</tt><big>(</big><em>fmt</em>, <em>fp</em>, <em>options=</em><big>)</big><a class="headerlink" href="#Environment.launch" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.launch">
+<tt class="descname">launch</tt><big>(</big><em>fmt</em>, <em>fp</em>, <em>options=</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.launch" title="Permalink to this definition">¶</a></dt>
 <dd>Opens a file with an either default or user-specified applications.</dd></dl>
 
 <dl class="method">
-<dt id="Environment.loadDefaults">
-<tt class="descname">loadDefaults</tt><big>(</big><big>)</big><a class="headerlink" href="#Environment.loadDefaults" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.environment.Environment.loadDefaults">
+<tt class="descname">loadDefaults</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.loadDefaults" title="Permalink to this definition">¶</a></dt>
 <dd>Load defaults. All keys are derived from these defaults.</dd></dl>
 
 <dl class="method">
-<dt id="Environment.printDebug">
-<tt class="descname">printDebug</tt><big>(</big><em>msg</em>, <em>statusLevel=1</em><big>)</big><a class="headerlink" href="#Environment.printDebug" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Format one or more data elements into string, and print it</blockquote>
-<p>to stderr. The first arg can be a list of string; lists are
-concatenated with common.formatStr().</p>
-</dd></dl>
+<dt id="music21.environment.Environment.printDebug">
+<tt class="descname">printDebug</tt><big>(</big><em>msg</em>, <em>statusLevel=1</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.printDebug" title="Permalink to this definition">¶</a></dt>
+<dd>Format one or more data elements into string, and print it to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr().</dd></dl>
 
 <dl class="method">
-<dt id="Environment.warn">
-<tt class="descname">warn</tt><big>(</big><em>msg</em><big>)</big><a class="headerlink" href="#Environment.warn" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-To print a warning to the user, send a list of strings to this</blockquote>
-<p>method.</p>
-</dd></dl>
+<dt id="music21.environment.Environment.warn">
+<tt class="descname">warn</tt><big>(</big><em>msg</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.warn" title="Permalink to this definition">¶</a></dt>
+<dd>To print a warning to the user, send a list of strings to this method.</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -189,9 +179,9 @@ To print a warning to the user, send a list of strings to this</blockquote>
 <div class="section" id="preference">
 <h2>Preference<a class="headerlink" href="#preference" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="Preference">
+<dt id="music21.environment.Preference">
 <em class="property">
-class </em><tt class="descname">Preference</tt><a class="headerlink" href="#Preference" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.environment.</tt><tt class="descname">Preference</tt><a class="headerlink" href="#music21.environment.Preference" title="Permalink to this definition">¶</a></dt>
 <dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Preference</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -202,9 +192,9 @@ class </em><tt class="descname">Preference</tt><a class="headerlink" href="#Pref
 <div class="section" id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="Settings">
+<dt id="music21.environment.Settings">
 <em class="property">
-class </em><tt class="descname">Settings</tt><a class="headerlink" href="#Settings" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">music21.environment.</tt><tt class="descname">Settings</tt><a class="headerlink" href="#music21.environment.Settings" title="Permalink to this definition">¶</a></dt>
 <dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -240,7 +230,7 @@ class </em><tt class="descname">Settings</tt><a class="headerlink" href="#Settin
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 08, 2010.
+      Last updated on Jul 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

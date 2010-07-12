@@ -82,7 +82,20 @@ and what you'll get in your documentation is:
    >>> c1.step
    'C'
  
+Lines can be omitted on an individual basis by adding the expression 
+"#_DOCS_HIDE" somewhere on the line.  On the other hand, the text 
+"#_DOCS_SHOW" is removed from any line before it appears in the 
+documentation.  So you could use some of the same lines to test 
+code and also to give an example like so::
 
+   >>> d1 = music21.Note("D-")
+   >>> assert(d1.name == 'D-')  #_DOCS_HIDE
+   >>> #_DOCS_SHOW d1.show('lily')
+   
+in this case, the assertion code is omitted from the documentation 
+generated from the module, while the lilypond file is not generated
+during doctests.  Together with OMIT_FROM_DOCS, it's a great way to
+have your cake and eat it too.
 
 Ordering Module-Level Names
 -------------------------------------------------

@@ -88,30 +88,25 @@
             
   <div class="section" id="module-music21.beam">
 <span id="modulebeam"></span><h1>music21.beam<a class="headerlink" href="#module-music21.beam" title="Permalink to this headline">¶</a></h1>
-<p>Beam objects, added to <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> and <tt class="xref docutils literal"><span class="pre">Chord</span></tt> objects <cite>beam</cite> list, found on <a title="music21.note.Note.beams" class="reference external" href="moduleNote.html#music21.note.Note.beams"><tt class="xref docutils literal"><span class="pre">beams</span></tt></a> and <tt class="xref docutils literal"><span class="pre">beams</span></tt> attributes.</p>
+<p>Beam objects, added to <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> and <a title="music21.chord.Chord" class="reference external" href="moduleChord.html#music21.chord.Chord"><tt class="xref docutils literal"><span class="pre">Chord</span></tt></a> objects <cite>beam</cite> list, found on <a title="music21.note.Note.beams" class="reference external" href="moduleNote.html#music21.note.Note.beams"><tt class="xref docutils literal"><span class="pre">beams</span></tt></a> and <a title="music21.chord.Chord.beams" class="reference external" href="moduleChord.html#music21.chord.Chord.beams"><tt class="xref docutils literal"><span class="pre">beams</span></tt></a> attributes.</p>
 <div class="section" id="beam">
 <h2>Beam<a class="headerlink" href="#beam" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="music21.beam.Beam">
 <em class="property">
 class </em><tt class="descclassname">music21.beam.</tt><tt class="descname">Beam</tt><big>(</big><em>type=None</em>, <em>direction=None</em><big>)</big><a class="headerlink" href="#music21.beam.Beam" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<p>A Beam is an object representation of one single beam, that is, one horizontal
-line connecting two notes together (or less commonly a note to a rest).  Thus it
-takes two separate Beam objects to represent the beaming of a 16th note.</p>
-<p>The Beams object (note the plural) is the object that handles groups of Beam objects;
-it is defined later on.</p>
-<p>Here are two ways to define the start of a beam
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; b1 = music21.beam.Beam(type = &#8216;start&#8217;)
-&gt;&gt;&gt; b2 = music21.beam.Beam(&#8216;start&#8217;)</p>
-<p>Here is a partial beam (that is, one that does not
-connect to any other note, such as the second beam of
-a dotted eighth, sixteenth group)</p>
-<p>Two ways of doing the same thing
-&gt;&gt;&gt; b3 = music21.beam.Beam(type = &#8216;partial&#8217;, direction = &#8216;left&#8217;)
-&gt;&gt;&gt; b4 = music21.beam.Beam(&#8216;partial&#8217;, &#8216;left&#8217;)</p>
-</blockquote>
+<dd><p>A Beam is an object representation of one single beam, that is, one horizontal line connecting two notes together (or less commonly a note to a rest).  Thus it takes two separate Beam objects to represent the beaming of a 16th note. The Beams object (note the plural) is the object that handles groups of Beam objects; it is defined later on. Here are two ways to define the start of a beam</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b1</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">Beam</span><span class="p">(</span><span class="nb">type</span> <span class="o">=</span> <span class="s">&#39;start&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b2</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">Beam</span><span class="p">(</span><span class="s">&#39;start&#39;</span><span class="p">)</span>
+<span class="go">Here is a partial beam (that is, one that does not</span>
+<span class="go">connect to any other note, such as the second beam of</span>
+<span class="go">a dotted eighth, sixteenth group)</span>
+<span class="go">Two ways of doing the same thing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b3</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">Beam</span><span class="p">(</span><span class="nb">type</span> <span class="o">=</span> <span class="s">&#39;partial&#39;</span><span class="p">,</span> <span class="n">direction</span> <span class="o">=</span> <span class="s">&#39;left&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b4</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">Beam</span><span class="p">(</span><span class="s">&#39;partial&#39;</span><span class="p">,</span> <span class="s">&#39;left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p><strong>Beam</strong> <strong>attributes</strong></p>
 <blockquote>
 Attributes without Documentation: <cite>direction</cite>, <cite>type</cite>, <cite>number</cite>, <cite>independentAngle</cite></blockquote>
@@ -129,9 +124,7 @@ Attributes without Documentation: <cite>direction</cite>, <cite>type</cite>, <ci
 <span class="go">&#39;begin&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;number&#39;</span><span class="p">)</span>
 <span class="go">1</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&#39;partial&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&#39;partial&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s">&#39;left&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;charData&#39;</span><span class="p">)</span>
@@ -150,10 +143,7 @@ Attributes without Documentation: <cite>direction</cite>, <cite>type</cite>, <ci
 <dt id="music21.beam.Beams">
 <em class="property">
 class </em><tt class="descclassname">music21.beam.</tt><tt class="descname">Beams</tt><a class="headerlink" href="#music21.beam.Beams" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-The Beams object stores in it attribute beamsList (a list) all
-the Beam objects defined above.  Thus len(beam.Beams) tells you how many
-beams the note currently has on it.</blockquote>
+<dd><p>The Beams object stores in it attribute beamsList (a list) all the Beam objects defined above.  Thus len(beam.Beams) tells you how many beams the note currently has on it.</p>
 <p><strong>Beams</strong> <strong>attributes</strong></p>
 <blockquote>
 Attributes without Documentation: <cite>feathered</cite>, <cite>beamsList</cite></blockquote>
@@ -175,21 +165,13 @@ Attributes without Documentation: <cite>feathered</cite>, <cite>beamsList</cite>
 <dl class="method">
 <dt id="music21.beam.Beams.fill">
 <tt class="descname">fill</tt><big>(</big><em>level=None</em><big>)</big><a class="headerlink" href="#music21.beam.Beams.fill" title="Permalink to this definition">¶</a></dt>
-<dd><p>A quick way of setting the beams list for a particular duration,
-for instance, fill(&#8220;16th&#8221;) will clear the current list of beams in the
-Beams object and add two beams.  fill(2) will do the same (though note
-that that is an int, not a string).</p>
-<p>It does not do anything to the direction that the beams are going in.</p>
-<p>Both &#8220;eighth&#8221; and &#8220;8th&#8221; work.  Adding more than six beams (i.e. things like
-512th notes) raises an error.</p>
+<dd><p>A quick way of setting the beams list for a particular duration, for instance, fill(&#8220;16th&#8221;) will clear the current list of beams in the Beams object and add two beams.  fill(2) will do the same (though note that that is an int, not a string). It does not do anything to the direction that the beams are going in. Both &#8220;eighth&#8221; and &#8220;8th&#8221; work.  Adding more than six beams (i.e. things like 512th notes) raises an error.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">Beams</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 <span class="go">2</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s">&#39;32nd&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s">&#39;32nd&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 <span class="go">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">beamsList</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span>
@@ -201,8 +183,7 @@ that that is an int, not a string).</p>
 <dl class="method">
 <dt id="music21.beam.Beams.getByNumber">
 <tt class="descname">getByNumber</tt><big>(</big><em>number</em><big>)</big><a class="headerlink" href="#music21.beam.Beams.getByNumber" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Gets an internal beam object by number...</blockquote>
+<dd><p>Gets an internal beam object by number...</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Beams</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
@@ -216,9 +197,7 @@ Gets an internal beam object by number...</blockquote>
 <dl class="method">
 <dt id="music21.beam.Beams.getNumbers">
 <tt class="descname">getNumbers</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.beam.Beams.getNumbers" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns a list of all defined beam numbers; it should normally be</blockquote>
-<p>a set of consecutive integers, but it might not be.</p>
+<dd><p>Returns a list of all defined beam numbers; it should normally be a set of consecutive integers, but it might not be.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Beams</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s">&#39;32nd&#39;</span><span class="p">)</span>
@@ -231,8 +210,7 @@ Returns a list of all defined beam numbers; it should normally be</blockquote>
 <dl class="method">
 <dt id="music21.beam.Beams.getTypeByNumber">
 <tt class="descname">getTypeByNumber</tt><big>(</big><em>number</em><big>)</big><a class="headerlink" href="#music21.beam.Beams.getTypeByNumber" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Get beam type, with direction, by number</blockquote>
+<dd><p>Get beam type, with direction, by number</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Beams</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
@@ -249,8 +227,7 @@ Get beam type, with direction, by number</blockquote>
 <dl class="method">
 <dt id="music21.beam.Beams.getTypes">
 <tt class="descname">getTypes</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.beam.Beams.getTypes" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns a list of all beam types defined for the current beams</blockquote>
+<dd><p>Returns a list of all beam types defined for the current beams</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Beams</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
@@ -264,12 +241,7 @@ Returns a list of all beam types defined for the current beams</blockquote>
 <dl class="method">
 <dt id="music21.beam.Beams.setAll">
 <tt class="descname">setAll</tt><big>(</big><em>type</em>, <em>direction=None</em><big>)</big><a class="headerlink" href="#music21.beam.Beams.setAll" title="Permalink to this definition">¶</a></dt>
-<dd><p>setAll is a method of convenience that sets the type
-of each of the beam objects within the beamsList to the specified type.
-It also takes an optional &#8220;direction&#8221; attribute that sets the direction
-for each beam (otherwise the direction of each beam is set to None)
-Acceptable directions (start, stop, continue, etc.) are listed under
-Beam() above.</p>
+<dd><p>setAll is a method of convenience that sets the type of each of the beam objects within the beamsList to the specified type. It also takes an optional &#8220;direction&#8221; attribute that sets the direction for each beam (otherwise the direction of each beam is set to None) Acceptable directions (start, stop, continue, etc.) are listed under Beam() above.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">Beams</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
@@ -283,8 +255,7 @@ Beam() above.</p>
 <dl class="method">
 <dt id="music21.beam.Beams.setByNumber">
 <tt class="descname">setByNumber</tt><big>(</big><em>number</em>, <em>type</em>, <em>direction=None</em><big>)</big><a class="headerlink" href="#music21.beam.Beams.setByNumber" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Set an internal beam object by number, or rhythmic symbol level</blockquote>
+<dd><p>Set an internal beam object by number, or rhythmic symbol level</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Beams</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s">&#39;16th&#39;</span><span class="p">)</span>
@@ -336,7 +307,7 @@ Set an internal beam object by number, or rhythmic symbol level</blockquote>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 08, 2010.
+      Last updated on Jul 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

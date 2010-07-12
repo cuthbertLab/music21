@@ -7,14 +7,7 @@ music21.environment
 
 .. module:: music21.environment
 
-
- The environment module describes an object for accessing and setting
- variables related to the user's music21 environment. Such variables include
- the location of external applications such as MusicXML readers (e.g. Finale), whether music21 is allowed to download files directly (via the virtual corpus), and other settings.
- 
- Additional documentation for and examples of using this module are found in :ref:`environment`.
- 
- 
+The environment module describes an object for accessing and setting variables related to the user's music21 environment. Such variables include the location of external applications such as MusicXML readers (e.g. Finale), whether music21 is allowed to download files directly (via the virtual corpus), and other settings. Additional documentation for and examples of using this module are found in :ref:`environment`. 
 
 
 Environment
@@ -23,15 +16,11 @@ Environment
 .. class:: Environment(modName=None)
 
     The Environment object stores user preferences as dictionary-like object. 
-     
- 
 
     Create an instance of this object. A modName argument can be provided for use in printDebug() calls. 
- 
-         >>> a = Environment()
-         >>> post = a['writeFormat']
-         
- 
+
+    >>> a = Environment()
+    >>> post = a['writeFormat']
 
     
 
@@ -39,88 +28,57 @@ Environment
 
         .. attribute:: modNameParent
 
-            A string representation of the module that contains this Environment instance.
- 
+            A string representation of the module that contains this Environment instance. 
 
         .. attribute:: ref
 
-            The Python dictionary used to store all internal settings.
- 
+            The Python dictionary used to store all internal settings. 
 
     **Environment** **methods**
 
         .. method:: read(fp=None)
 
-            Load an XML preference file if and only if the file is available and has been written in the past. This means that no preference file will ever be written unless manually done so. If no preference file exists, the method returns None.
-         
- 
+            Load an XML preference file if and only if the file is available and has been written in the past. This means that no preference file will ever be written unless manually done so. If no preference file exists, the method returns None. 
 
         .. method:: write(fp=None)
 
-            Write an XML preference file. This must be manually called to store any changes made to the object and access preferences later. If `fp` is None, the default storage location will be used.
-         
- 
+            Write an XML preference file. This must be manually called to store any changes made to the object and access preferences later. If `fp` is None, the default storage location will be used. 
 
         .. method:: getSettingsPath()
 
-            Return the path to the platform specific settings file.
-         
- 
+            Return the path to the platform specific settings file. 
 
         .. method:: getDefaultRootTempDir()
 
-            Use the Python tempfile.gettempdir() to get the system specified temporary directory, and try to add a new 'music21' directory, and then return this directory.
- 
-         This method is only called if the no scratch directory preference has been set. 
- 
-         If not able to create a 'music21' directory, the standard default is returned.
-         
- 
+            Use the Python tempfile.gettempdir() to get the system specified temporary directory, and try to add a new 'music21' directory, and then return this directory. This method is only called if the no scratch directory preference has been set. If not able to create a 'music21' directory, the standard default is returned. 
 
         .. method:: getRootTempDir()
 
-            Return a directory for writing temporary files. This does not create a new directory for each use, but either uses the user-set preference or gets the system-provided directory (with a music21 subdirectory, if possible).
-         
- 
+            Return a directory for writing temporary files. This does not create a new directory for each use, but either uses the user-set preference or gets the system-provided directory (with a music21 subdirectory, if possible). 
 
         .. method:: getTempFile(suffix=)
 
-            Return a file path to a temporary file with the specified suffix
-         
- 
+            Return a file path to a temporary file with the specified suffix 
 
         .. method:: keys()
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: launch(fmt, fp, options=)
 
-            
-         Opens a file with an either default or user-specified applications.
-         
- 
+            Opens a file with an either default or user-specified applications. 
 
         .. method:: loadDefaults()
 
-            Load defaults. All keys are derived from these defaults.
-         
- 
+            Load defaults. All keys are derived from these defaults. 
 
         .. method:: printDebug(msg, statusLevel=1)
 
-            Format one or more data elements into string, and print it 
-         to stderr. The first arg can be a list of string; lists are 
-         concatenated with common.formatStr(). 
-         
- 
+            Format one or more data elements into string, and print it to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
         .. method:: warn(msg)
 
-            To print a warning to the user, send a list of strings to this
-         method. 
-         
- 
+            To print a warning to the user, send a list of strings to this method. 
 
 
 Preference
@@ -129,13 +87,12 @@ Preference
 .. class:: Preference()
 
     
-     
- 
 
     
-         >>> a = Preference()
-         
- 
+
+    
+
+    >>> a = Preference()
 
     inherits from: :class:`~music21.node.Node`
 
@@ -146,13 +103,12 @@ Settings
 .. class:: Settings()
 
     
-     
- 
 
     
-         >>> a = Settings()
-         
- 
+
+    
+
+    >>> a = Settings()
 
     inherits from: :class:`~music21.node.NodeList`, :class:`~music21.node.Node`
 

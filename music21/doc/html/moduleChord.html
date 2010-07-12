@@ -85,18 +85,16 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="music21-chord">
-<span id="modulechord"></span><h1>music21.chord<a class="headerlink" href="#music21-chord" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-music21.chord">
+<span id="modulechord"></span><h1>music21.chord<a class="headerlink" href="#module-music21.chord" title="Permalink to this headline">¶</a></h1>
+<p>This module defines the Chord object, a sub-class of <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>.</p>
 <div class="section" id="chord">
 <h2>Chord<a class="headerlink" href="#chord" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="Chord">
+<dt id="music21.chord.Chord">
 <em class="property">
-class </em><tt class="descname">Chord</tt><big>(</big><em>notes=</em><span class="optional">[</span><span class="optional">]</span>, <em>**keywords</em><big>)</big><a class="headerlink" href="#Chord" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for dealing with chords</p>
-<blockquote>
-<p>A Chord is like a Note object but has multiple pitches.</p>
-<p>Create chords by creating Notes or Pitches:</p>
+class </em><tt class="descclassname">music21.chord.</tt><tt class="descname">Chord</tt><big>(</big><em>notes=</em><span class="optional">[</span><span class="optional">]</span>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.chord.Chord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for dealing with chords A Chord is like a Note object but has multiple pitches. Create chords by creating Notes or Pitches:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">C</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;C&#39;</span>
@@ -104,54 +102,52 @@ class </em><tt class="descname">Chord</tt><big>(</big><em>notes=</em><span class
 <span class="gp">&gt;&gt;&gt; </span><span class="n">E</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;E&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;G&#39;</span>
+<span class="go">And then create a chord with notes:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="n">C</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">G</span><span class="p">])</span>
+<span class="go">Or, more simply, just pass strings of pitch names:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dmaj</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D&quot;</span><span class="p">,</span><span class="s">&quot;F#&quot;</span><span class="p">,</span><span class="s">&quot;A&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>And then create a chord with notes:
-&gt;&gt;&gt; cmaj = Chord([C, E, G])</p>
-<p>Or, more simply, just pass strings of pitch names:
-&gt;&gt;&gt; dmaj = Chord([&#8220;D&#8221;,&#8221;F#&#8221;,&#8221;A&#8221;])</p>
 <p>Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
 In addition, Chord is capable of determining what type of chord a particular chord is, whether
-it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in.</p>
-<p>NOTE: For now, the examples used in documentation give chords made from notes that are not
+it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in.
+NOTE: For now, the examples used in documentation give chords made from notes that are not
 defined. In the future, it may be possible to define a chord without first creating notes,
 but for now note that notes that appear in chords are simply shorthand instead of creating notes
 for use in examples</p>
-</blockquote>
-<p>inherits from: <a title="music21.note.NotRest" class="reference external" href="moduleNote.html#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></p>
+<p>inherits from: <a title="music21.note.NotRest" class="reference external" href="moduleNote.html#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Chord</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="Chord.isChord">
-<tt class="descname">isChord</tt><a class="headerlink" href="#Chord.isChord" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.isChord">
+<tt class="descname">isChord</tt><a class="headerlink" href="#music21.chord.Chord.isChord" title="Permalink to this definition">¶</a></dt>
 <dd>Boolean read-only value describing if this object is a Chord.</dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.isNote">
-<tt class="descname">isNote</tt><a class="headerlink" href="#Chord.isNote" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.isNote">
+<tt class="descname">isNote</tt><a class="headerlink" href="#music21.chord.Chord.isNote" title="Permalink to this definition">¶</a></dt>
 <dd>Boolean read-only value describing if this object is a Chord. Is False</dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.isRest">
-<tt class="descname">isRest</tt><a class="headerlink" href="#Chord.isRest" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.isRest">
+<tt class="descname">isRest</tt><a class="headerlink" href="#music21.chord.Chord.isRest" title="Permalink to this definition">¶</a></dt>
 <dd>Boolean read-only value describing if this is a Rest. Is False</dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.beams">
-<tt class="descname">beams</tt><a class="headerlink" href="#Chord.beams" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.beams">
+<tt class="descname">beams</tt><a class="headerlink" href="#music21.chord.Chord.beams" title="Permalink to this definition">¶</a></dt>
 <dd>A <a title="music21.beam.Beams" class="reference external" href="moduleBeam.html#music21.beam.Beams"><tt class="xref docutils literal"><span class="pre">music21.beam.Beams</span></tt></a> object.</dd></dl>
 
 <p>Attributes inherited from <a title="music21.note.NotRest" class="reference external" href="moduleNote.html#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>: <tt class="xref docutils literal"><span class="pre">stemDirection</span></tt></p>
 <p>Attributes inherited from <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>: <a title="music21.note.GeneralNote.lyrics" class="reference external" href="moduleNote.html#music21.note.GeneralNote.lyrics"><tt class="xref docutils literal"><span class="pre">lyrics</span></tt></a>, <tt class="xref docutils literal"><span class="pre">notations</span></tt>, <a title="music21.note.GeneralNote.editorial" class="reference external" href="moduleNote.html#music21.note.GeneralNote.editorial"><tt class="xref docutils literal"><span class="pre">editorial</span></tt></a>, <a title="music21.note.GeneralNote.tie" class="reference external" href="moduleNote.html#music21.note.GeneralNote.tie"><tt class="xref docutils literal"><span class="pre">tie</span></tt></a>, <tt class="xref docutils literal"><span class="pre">articulations</span></tt></p>
-<p>Attributes inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt>, <tt class="xref docutils literal"><span class="pre">id</span></tt>, <tt class="xref docutils literal"><span class="pre">groups</span></tt></p>
+<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a>, <a title="music21.base.Music21Object.groups" class="reference external" href="moduleBase.html#music21.base.Music21Object.groups"><tt class="xref docutils literal"><span class="pre">groups</span></tt></a></p>
 </blockquote>
 <p><strong>Chord</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
-<dt id="Chord.pitches">
-<tt class="descname">pitches</tt><a class="headerlink" href="#Chord.pitches" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a list of all Pitch objects in this Chord.</blockquote>
+<dt id="music21.chord.Chord.pitches">
+<tt class="descname">pitches</tt><a class="headerlink" href="#music21.chord.Chord.pitches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all Pitch objects in this Chord.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">pitches</span>
@@ -163,10 +159,9 @@ Return a list of all Pitch objects in this Chord.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.chordTablesAddress">
-<tt class="descname">chordTablesAddress</tt><a class="headerlink" href="#Chord.chordTablesAddress" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a triple tuple that represents that raw data location for information on the set class interpretation of this Chord. The data format is Forte set class cardinality, index number, and inversion status (where 0 is invariant, and -1 and 1 represent inverted or not, respectively).</blockquote>
+<dt id="music21.chord.Chord.chordTablesAddress">
+<tt class="descname">chordTablesAddress</tt><a class="headerlink" href="#music21.chord.Chord.chordTablesAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a triple tuple that represents that raw data location for information on the set class interpretation of this Chord. The data format is Forte set class cardinality, index number, and inversion status (where 0 is invariant, and -1 and 1 represent inverted or not, respectively).</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">chordTablesAddress</span>
@@ -176,10 +171,9 @@ Return a triple tuple that represents that raw data location for information on 
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.commonName">
-<tt class="descname">commonName</tt><a class="headerlink" href="#Chord.commonName" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a list of common names as strings that are associated with this Chord.</blockquote>
+<dt id="music21.chord.Chord.commonName">
+<tt class="descname">commonName</tt><a class="headerlink" href="#music21.chord.Chord.commonName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of common names as strings that are associated with this Chord.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">commonName</span>
@@ -189,10 +183,9 @@ Return a list of common names as strings that are associated with this Chord.</b
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.forteClass">
-<tt class="descname">forteClass</tt><a class="headerlink" href="#Chord.forteClass" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return the Forte set class name as a string. This assumes a Tn formation, where inversion distinctions are represented.</blockquote>
+<dt id="music21.chord.Chord.forteClass">
+<tt class="descname">forteClass</tt><a class="headerlink" href="#music21.chord.Chord.forteClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Forte set class name as a string. This assumes a Tn formation, where inversion distinctions are represented.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClass</span>
@@ -202,10 +195,9 @@ Return the Forte set class name as a string. This assumes a Tn formation, where 
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.forteClassNumber">
-<tt class="descname">forteClassNumber</tt><a class="headerlink" href="#Chord.forteClassNumber" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return the number of the Forte set class within the defined set group. That is, if the set is 3-11, this method returns 11.</blockquote>
+<dt id="music21.chord.Chord.forteClassNumber">
+<tt class="descname">forteClassNumber</tt><a class="headerlink" href="#music21.chord.Chord.forteClassNumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of the Forte set class within the defined set group. That is, if the set is 3-11, this method returns 11.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClassNumber</span>
@@ -215,10 +207,9 @@ Return the number of the Forte set class within the defined set group. That is, 
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.forteClassTn">
-<tt class="descname">forteClassTn</tt><a class="headerlink" href="#Chord.forteClassTn" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return the Forte Tn set class name, where inversion distinctions are represented.</blockquote>
+<dt id="music21.chord.Chord.forteClassTn">
+<tt class="descname">forteClassTn</tt><a class="headerlink" href="#music21.chord.Chord.forteClassTn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Forte Tn set class name, where inversion distinctions are represented.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClassTn</span>
@@ -228,10 +219,9 @@ Return the Forte Tn set class name, where inversion distinctions are represented
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.forteClassTnI">
-<tt class="descname">forteClassTnI</tt><a class="headerlink" href="#Chord.forteClassTnI" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return the Forte TnI class name, where inversion distinctions are not represented.</blockquote>
+<dt id="music21.chord.Chord.forteClassTnI">
+<tt class="descname">forteClassTnI</tt><a class="headerlink" href="#music21.chord.Chord.forteClassTnI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Forte TnI class name, where inversion distinctions are not represented.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">forteClassTnI</span>
@@ -241,10 +231,9 @@ Return the Forte TnI class name, where inversion distinctions are not represente
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.hasZRelation">
-<tt class="descname">hasZRelation</tt><a class="headerlink" href="#Chord.hasZRelation" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return True or False if the Chord has a Z-relation.</blockquote>
+<dt id="music21.chord.Chord.hasZRelation">
+<tt class="descname">hasZRelation</tt><a class="headerlink" href="#music21.chord.Chord.hasZRelation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True or False if the Chord has a Z-relation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">hasZRelation</span>
@@ -254,10 +243,9 @@ Return True or False if the Chord has a Z-relation.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.intervalVector">
-<tt class="descname">intervalVector</tt><a class="headerlink" href="#Chord.intervalVector" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return the interval vector for this Chord as a list of integers.</blockquote>
+<dt id="music21.chord.Chord.intervalVector">
+<tt class="descname">intervalVector</tt><a class="headerlink" href="#music21.chord.Chord.intervalVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the interval vector for this Chord as a list of integers.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">intervalVector</span>
@@ -267,10 +255,9 @@ Return the interval vector for this Chord as a list of integers.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.intervalVectorString">
-<tt class="descname">intervalVectorString</tt><a class="headerlink" href="#Chord.intervalVectorString" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return the interval vector as a string representation.</blockquote>
+<dt id="music21.chord.Chord.intervalVectorString">
+<tt class="descname">intervalVectorString</tt><a class="headerlink" href="#music21.chord.Chord.intervalVectorString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the interval vector as a string representation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">intervalVectorString</span>
@@ -280,10 +267,9 @@ Return the interval vector as a string representation.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.isPrimeFormInversion">
-<tt class="descname">isPrimeFormInversion</tt><a class="headerlink" href="#Chord.isPrimeFormInversion" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return True or False if the Chord represents a set class inversion.</blockquote>
+<dt id="music21.chord.Chord.isPrimeFormInversion">
+<tt class="descname">isPrimeFormInversion</tt><a class="headerlink" href="#music21.chord.Chord.isPrimeFormInversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True or False if the Chord represents a set class inversion.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">isPrimeFormInversion</span>
@@ -296,15 +282,14 @@ Return True or False if the Chord represents a set class inversion.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.lily">
-<tt class="descname">lily</tt><a class="headerlink" href="#Chord.lily" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.lily">
+<tt class="descname">lily</tt><a class="headerlink" href="#music21.chord.Chord.lily" title="Permalink to this definition">¶</a></dt>
 <dd>The name of the note as it would appear in Lilypond format.</dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.multisetCardinality">
-<tt class="descname">multisetCardinality</tt><a class="headerlink" href="#Chord.multisetCardinality" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return an integer representing the cardinality of the mutliset, or the number of pitch values.</blockquote>
+<dt id="music21.chord.Chord.multisetCardinality">
+<tt class="descname">multisetCardinality</tt><a class="headerlink" href="#music21.chord.Chord.multisetCardinality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an integer representing the cardinality of the mutliset, or the number of pitch values.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">multisetCardinality</span>
@@ -314,12 +299,9 @@ Return an integer representing the cardinality of the mutliset, or the number of
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.mx">
-<tt class="descname">mx</tt><a class="headerlink" href="#Chord.mx" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a List of mxNotes
-Attributes of notes are merged from different locations: first from the
-duration objects, then from the pitch objects. Finally, GeneralNote
-attributes are added</p>
+<dt id="music21.chord.Chord.mx">
+<tt class="descname">mx</tt><a class="headerlink" href="#music21.chord.Chord.mx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2</span>
@@ -343,10 +325,9 @@ attributes are added</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.normalForm">
-<tt class="descname">normalForm</tt><a class="headerlink" href="#Chord.normalForm" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return the normal form of the Chord represented as a list of integers.</blockquote>
+<dt id="music21.chord.Chord.normalForm">
+<tt class="descname">normalForm</tt><a class="headerlink" href="#music21.chord.Chord.normalForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the normal form of the Chord represented as a list of integers.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">normalForm</span>
@@ -356,10 +337,9 @@ Return the normal form of the Chord represented as a list of integers.</blockquo
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.normalFormString">
-<tt class="descname">normalFormString</tt><a class="headerlink" href="#Chord.normalFormString" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a string representation of the normal form of the Chord.</blockquote>
+<dt id="music21.chord.Chord.normalFormString">
+<tt class="descname">normalFormString</tt><a class="headerlink" href="#music21.chord.Chord.normalFormString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string representation of the normal form of the Chord.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">normalFormString</span>
@@ -369,10 +349,9 @@ Return a string representation of the normal form of the Chord.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.orderedPitchClasses">
-<tt class="descname">orderedPitchClasses</tt><a class="headerlink" href="#Chord.orderedPitchClasses" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return an list of pitch class integers, ordered form lowest to highest.</blockquote>
+<dt id="music21.chord.Chord.orderedPitchClasses">
+<tt class="descname">orderedPitchClasses</tt><a class="headerlink" href="#music21.chord.Chord.orderedPitchClasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an list of pitch class integers, ordered form lowest to highest.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">orderedPitchClasses</span>
@@ -382,10 +361,9 @@ Return an list of pitch class integers, ordered form lowest to highest.</blockqu
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.orderedPitchClassesString">
-<tt class="descname">orderedPitchClassesString</tt><a class="headerlink" href="#Chord.orderedPitchClassesString" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a string representation of the pitch class values.</blockquote>
+<dt id="music21.chord.Chord.orderedPitchClassesString">
+<tt class="descname">orderedPitchClassesString</tt><a class="headerlink" href="#music21.chord.Chord.orderedPitchClassesString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string representation of the pitch class values.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">orderedPitchClassesString</span>
@@ -395,10 +373,9 @@ Return a string representation of the pitch class values.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.pitchClassCardinality">
-<tt class="descname">pitchClassCardinality</tt><a class="headerlink" href="#Chord.pitchClassCardinality" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a the cardinality of pitch classes, or the number of unique pitch classes, in the Chord.</blockquote>
+<dt id="music21.chord.Chord.pitchClassCardinality">
+<tt class="descname">pitchClassCardinality</tt><a class="headerlink" href="#music21.chord.Chord.pitchClassCardinality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a the cardinality of pitch classes, or the number of unique pitch classes, in the Chord.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">pitchClassCardinality</span>
@@ -408,10 +385,9 @@ Return a the cardinality of pitch classes, or the number of unique pitch classes
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.pitchClasses">
-<tt class="descname">pitchClasses</tt><a class="headerlink" href="#Chord.pitchClasses" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a list of all pitch classes in the chord as integers.</blockquote>
+<dt id="music21.chord.Chord.pitchClasses">
+<tt class="descname">pitchClasses</tt><a class="headerlink" href="#music21.chord.Chord.pitchClasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all pitch classes in the chord as integers.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;D4&quot;</span><span class="p">,</span> <span class="s">&quot;A4&quot;</span><span class="p">,</span> <span class="s">&quot;F#5&quot;</span><span class="p">,</span> <span class="s">&quot;D6&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">pitchClasses</span>
@@ -421,10 +397,9 @@ Return a list of all pitch classes in the chord as integers.</blockquote>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.pitchedCommonName">
-<tt class="descname">pitchedCommonName</tt><a class="headerlink" href="#Chord.pitchedCommonName" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return the common name of this Chord preceded by its root, if a root is available.</blockquote>
+<dt id="music21.chord.Chord.pitchedCommonName">
+<tt class="descname">pitchedCommonName</tt><a class="headerlink" href="#music21.chord.Chord.pitchedCommonName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the common name of this Chord preceded by its root, if a root is available.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">pitchedCommonName</span>
@@ -434,10 +409,9 @@ Return the common name of this Chord preceded by its root, if a root is availabl
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.primeForm">
-<tt class="descname">primeForm</tt><a class="headerlink" href="#Chord.primeForm" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a representation of the Chord as a prime-form list of pitch class integers.</blockquote>
+<dt id="music21.chord.Chord.primeForm">
+<tt class="descname">primeForm</tt><a class="headerlink" href="#music21.chord.Chord.primeForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a representation of the Chord as a prime-form list of pitch class integers.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">primeForm</span>
@@ -447,10 +421,9 @@ Return a representation of the Chord as a prime-form list of pitch class integer
 </dd></dl>
 
 <dl class="attribute">
-<dt id="Chord.primeFormString">
-<tt class="descname">primeFormString</tt><a class="headerlink" href="#Chord.primeFormString" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Return a representation of the Chord as a prime-form set class string.</blockquote>
+<dt id="music21.chord.Chord.primeFormString">
+<tt class="descname">primeFormString</tt><a class="headerlink" href="#music21.chord.Chord.primeFormString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a representation of the Chord as a prime-form set class string.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">primeFormString</span>
@@ -460,15 +433,14 @@ Return a representation of the Chord as a prime-form set class string.</blockquo
 </dd></dl>
 
 <p>Properties inherited from <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>: <a title="music21.note.GeneralNote.beat" class="reference external" href="moduleNote.html#music21.note.GeneralNote.beat"><tt class="xref docutils literal"><span class="pre">beat</span></tt></a>, <a title="music21.note.GeneralNote.beatDuration" class="reference external" href="moduleNote.html#music21.note.GeneralNote.beatDuration"><tt class="xref docutils literal"><span class="pre">beatDuration</span></tt></a>, <a title="music21.note.GeneralNote.beatStr" class="reference external" href="moduleNote.html#music21.note.GeneralNote.beatStr"><tt class="xref docutils literal"><span class="pre">beatStr</span></tt></a>, <a title="music21.note.GeneralNote.color" class="reference external" href="moduleNote.html#music21.note.GeneralNote.color"><tt class="xref docutils literal"><span class="pre">color</span></tt></a>, <a title="music21.note.GeneralNote.lyric" class="reference external" href="moduleNote.html#music21.note.GeneralNote.lyric"><tt class="xref docutils literal"><span class="pre">lyric</span></tt></a>, <a title="music21.note.GeneralNote.musicxml" class="reference external" href="moduleNote.html#music21.note.GeneralNote.musicxml"><tt class="xref docutils literal"><span class="pre">musicxml</span></tt></a>, <a title="music21.note.GeneralNote.quarterLength" class="reference external" href="moduleNote.html#music21.note.GeneralNote.quarterLength"><tt class="xref docutils literal"><span class="pre">quarterLength</span></tt></a></p>
-<p>Properties inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">offset</span></tt>, <tt class="xref docutils literal"><span class="pre">parent</span></tt>, <tt class="xref docutils literal"><span class="pre">priority</span></tt></p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
 <p><strong>Chord</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
-<dt id="Chord.areZRelations">
-<tt class="descname">areZRelations</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#Chord.areZRelations" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Check of chord other is also a z relations</blockquote>
+<dt id="music21.chord.Chord.areZRelations">
+<tt class="descname">areZRelations</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.areZRelations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check of chord other is also a z relations</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;c#&quot;</span><span class="p">,</span> <span class="s">&quot;e&quot;</span><span class="p">,</span> <span class="s">&quot;f#&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;c#&quot;</span><span class="p">,</span> <span class="s">&quot;e-&quot;</span><span class="p">,</span> <span class="s">&quot;g&quot;</span><span class="p">])</span>
@@ -482,23 +454,20 @@ Check of chord other is also a z relations</blockquote>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.bass">
-<tt class="descname">bass</tt><big>(</big><em>newbass=0</em><big>)</big><a class="headerlink" href="#Chord.bass" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-returns the bass note or sets it to note.</blockquote>
-<p>Usually defined to the lowest note in the chord,
-but we want to be able to override this.  You might want an implied
-bass for instance...  v o9.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cmaj = chord.Chord([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; cmaj.bass() # returns C
-C</p>
+<dt id="music21.chord.Chord.bass">
+<tt class="descname">bass</tt><big>(</big><em>newbass=0</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.bass" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the bass note or sets it to note. Usually defined to the lowest note in the chord, but we want to be able to override this.  You might want an implied bass for instance...  v o9. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">bass</span><span class="p">()</span> <span class="c"># returns C</span>
+<span class="go">C</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.canBeDominantV">
-<tt class="descname">canBeDominantV</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.canBeDominantV" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.canBeDominantV">
+<tt class="descname">canBeDominantV</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.canBeDominantV" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if the chord is a Major Triad or a Dominant Seventh</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
@@ -509,8 +478,8 @@ C</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.canBeTonic">
-<tt class="descname">canBeTonic</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.canBeTonic" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.canBeTonic">
+<tt class="descname">canBeTonic</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.canBeTonic" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns True if the chord is a major or minor triad</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
@@ -524,8 +493,8 @@ C</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.closedPosition">
-<tt class="descname">closedPosition</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.closedPosition" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.closedPosition">
+<tt class="descname">closedPosition</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.closedPosition" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a new Chord object with the same pitch classes, but now in closed position</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">chord1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C#4&quot;</span><span class="p">,</span> <span class="s">&quot;G5&quot;</span><span class="p">,</span> <span class="s">&quot;E6&quot;</span><span class="p">])</span>
@@ -537,11 +506,9 @@ C</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.containsSeventh">
-<tt class="descname">containsSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.containsSeventh" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-returns True if the chord contains at least one of each of Third, Fifth, and Seventh.</blockquote>
-<p>raises an exception if the Root can&#8217;t be determined</p>
+<dt id="music21.chord.Chord.containsSeventh">
+<tt class="descname">containsSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.containsSeventh" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns True if the chord contains at least one of each of Third, Fifth, and Seventh. raises an exception if the Root can&#8217;t be determined</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
@@ -554,34 +521,29 @@ returns True if the chord contains at least one of each of Third, Fifth, and Sev
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.containsTriad">
-<tt class="descname">containsTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.containsTriad" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-returns True or False if there is no triad above the root.</blockquote>
-<p>&#8220;Contains vs. Is&#8221;: A dominant-seventh chord contains a triad.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cchord = chord.Chord([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; other = chord.Chord([&#8216;C&#8217;, &#8216;D&#8217;, &#8216;E&#8217;, &#8216;F&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; cchord.containsTriad() #returns True
-True
-&gt;&gt;&gt; other.containsTriad() #returns True
-True</p>
+<dt id="music21.chord.Chord.containsTriad">
+<tt class="descname">containsTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.containsTriad" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns True or False if there is no triad above the root. &#8220;Contains vs. Is&#8221;: A dominant-seventh chord contains a triad. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">containsTriad</span><span class="p">()</span> <span class="c">#returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">containsTriad</span><span class="p">()</span> <span class="c">#returns True</span>
+<span class="go">True</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.determineType">
-<tt class="descname">determineType</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.determineType" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-returns an abbreviation for the type of chord it is.</blockquote>
-<p>Add option to add inversion name to abbreviation?</p>
+<dt id="music21.chord.Chord.determineType">
+<tt class="descname">determineType</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.determineType" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns an abbreviation for the type of chord it is. Add option to add inversion name to abbreviation?</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">determineType</span><span class="p">()</span>
 <span class="go">&#39;Major Triad&#39;</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">determineType</span><span class="p">()</span>
 <span class="go">&#39;Dominant Seventh&#39;</span>
 </pre></div>
@@ -589,141 +551,112 @@ returns an abbreviation for the type of chord it is.</blockquote>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.duration">
-<tt class="descname">duration</tt><big>(</big><em>newDur=0</em><big>)</big><a class="headerlink" href="#Chord.duration" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Duration of the chord can be defined here OR it should return the duration</blockquote>
-<p>of the first note of the chord</p>
+<dt id="music21.chord.Chord.duration">
+<tt class="descname">duration</tt><big>(</big><em>newDur=0</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.duration" title="Permalink to this definition">¶</a></dt>
+<dd>Duration of the chord can be defined here OR it should return the duration of the first note of the chord</dd></dl>
+
+<dl class="method">
+<dt id="music21.chord.Chord.findBass">
+<tt class="descname">findBass</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.findBass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lowest note in the chord The only time findBass should be called is by bass() when it is figuring out what the bass note of the chord is. Generally call bass() instead example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C4&#39;</span><span class="p">,</span> <span class="s">&#39;E3&#39;</span><span class="p">,</span> <span class="s">&#39;G4&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">findBass</span><span class="p">()</span> <span class="c"># returns E3</span>
+<span class="go">E3</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.findBass">
-<tt class="descname">findBass</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.findBass" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns the lowest note in the chord</blockquote>
-<p>The only time findBass should be called is by bass() when it is figuring out what
-the bass note of the chord is.
-Generally call bass() instead</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cmaj = chord.Chord([&#8216;C4&#8217;, &#8216;E3&#8217;, &#8216;G4&#8217;])
-&gt;&gt;&gt; cmaj.findBass() # returns E3
-E3</p>
+<dt id="music21.chord.Chord.findRoot">
+<tt class="descname">findRoot</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.findRoot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks for the root by finding the note with the most 3rds above it Generally use root() instead, since if a chord doesn&#8217;t know its root, root() will run findRoot() automatically. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">findRoot</span><span class="p">()</span> <span class="c"># returns C</span>
+<span class="go">C</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.findRoot">
-<tt class="descname">findRoot</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.findRoot" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Looks for the root by finding the note with the most 3rds above it</blockquote>
-<p>Generally use root() instead, since if a chord doesn&#8217;t know its root, root() will
-run findRoot() automatically.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cmaj = chord.Chord([&#8216;E&#8217;, &#8216;G&#8217;, &#8216;C&#8217;])
-&gt;&gt;&gt; cmaj.findRoot() # returns C
-C</p>
+<dt id="music21.chord.Chord.hasAnyRepeatedScale">
+<tt class="descname">hasAnyRepeatedScale</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasAnyRepeatedScale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if for any scale degree there are two or more different notes (such as E and E-) in the chord. If there are no repeated scale degrees, return false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasAnyRepeatedScale</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">hasAnyRepeatedScale</span><span class="p">()</span> <span class="c"># returns false (chromatically identical notes of different scale degrees do not count.</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.hasAnyRepeatedScale">
-<tt class="descname">hasAnyRepeatedScale</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#Chord.hasAnyRepeatedScale" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if for any scale degree there are two or more different notes (such</blockquote>
-<p>as E and E-) in the chord. If there are no repeated scale degrees, return false.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cchord = chord.Chord ([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;E-&#8216;, &#8216;G&#8217;])
-&gt;&gt;&gt; other = chord.Chord ([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;F-&#8216;, &#8216;G&#8217;])
-&gt;&gt;&gt; cchord.hasAnyRepeatedScale()
-True
-&gt;&gt;&gt; other.hasAnyRepeatedScale() # returns false (chromatically identical notes of different scale degrees do not count.
-False</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="Chord.hasFifth">
-<tt class="descname">hasFifth</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#Chord.hasFifth" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.hasFifth">
+<tt class="descname">hasFifth</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasFifth" title="Permalink to this definition">¶</a></dt>
 <dd>Shortcut for hasScaleX(5)</dd></dl>
 
 <dl class="method">
-<dt id="Chord.hasRepeatedScaleX">
-<tt class="descname">hasRepeatedScaleX</tt><big>(</big><em>scaleDeg</em>, <em>testRoot=None</em><big>)</big><a class="headerlink" href="#Chord.hasRepeatedScaleX" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if scaleDeg above testRoot (or self.root()) has two</blockquote>
-<p>or more different notes (such as E and E-) in it.  Otherwise
-returns false.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cchord = chord.Chord ([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;E-&#8216;, &#8216;G&#8217;])
-&gt;&gt;&gt; cchord.hasRepeatedScaleX(3) # returns true
-True</p>
+<dt id="music21.chord.Chord.hasRepeatedScaleX">
+<tt class="descname">hasRepeatedScaleX</tt><big>(</big><em>scaleDeg</em>, <em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasRepeatedScaleX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if scaleDeg above testRoot (or self.root()) has two or more different notes (such as E and E-) in it.  Otherwise returns false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span> <span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasRepeatedScaleX</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span> <span class="c"># returns true</span>
+<span class="go">True</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.hasScaleX">
-<tt class="descname">hasScaleX</tt><big>(</big><em>scaleDegree</em>, <em>testRoot=None</em><big>)</big><a class="headerlink" href="#Chord.hasScaleX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Each of these returns the number of semitones above the root
-that the third, fifth, etc., of the chord lies, if there exists
-one.  Or False if it does not exist.</p>
-<p>You can optionally specify a note.Note object to try as the root.  It does
-not change the Chord.root object.  We use these methods to figure out
-what the root of the triad is.</p>
-<p>Currently there is a bug that in the case of a triply diminished
-third (e.g., &#8220;c&#8221; =&gt; &#8220;e&#8212;-&#8220;), this function will incorrectly claim
-no third exists.  Perhaps this be construed as a feature.</p>
-<p>In the case of chords such as C, E-, E, hasThird
-will return 3, not 4, nor a list object (3,4).  You probably do not
-want to be using tonal chord manipulation functions on chords such
-as these anyway.</p>
-<p>note.Note that in Chord, we&#8217;re using &#8220;Scale&#8221; to mean a diatonic scale step.
-It will not tell you if a chord has a specific scale degree in another
-scale system.  That functionality might be added to scale.py someday.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cchord = chord.Chord([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;E-&#8216;, &#8216;G&#8217;])
-&gt;&gt;&gt; cchord.hasScaleX(3) #
-4
-&gt;&gt;&gt; cchord.hasScaleX(5) # will return 7
-7
-&gt;&gt;&gt; cchord.hasScaleX(6) # will return False
-False</p>
+<dt id="music21.chord.Chord.hasScaleX">
+<tt class="descname">hasScaleX</tt><big>(</big><em>scaleDegree</em>, <em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasScaleX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Each of these returns the number of semitones above the root that the third, fifth, etc., of the chord lies, if there exists one.  Or False if it does not exist. You can optionally specify a note.Note object to try as the root.  It does not change the Chord.root object.  We use these methods to figure out what the root of the triad is. Currently there is a bug that in the case of a triply diminished third (e.g., &#8220;c&#8221; =&gt; &#8220;e&#8212;-&#8220;), this function will incorrectly claim no third exists.  Perhaps this be construed as a feature. In the case of chords such as C, E-, E, hasThird will return 3, not 4, nor a list object (3,4).  You probably do not want to be using tonal chord manipulation functions on chords such as these anyway. note.Note that in Chord, we&#8217;re using &#8220;Scale&#8221; to mean a diatonic scale step. It will not tell you if a chord has a specific scale degree in another scale system.  That functionality might be added to scale.py someday. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span> <span class="c">#</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span> <span class="c"># will return 7</span>
+<span class="go">7</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">6</span><span class="p">)</span> <span class="c"># will return False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.hasSeventh">
-<tt class="descname">hasSeventh</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#Chord.hasSeventh" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.hasSeventh">
+<tt class="descname">hasSeventh</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasSeventh" title="Permalink to this definition">¶</a></dt>
 <dd>Shortcut for hasScaleX(7)</dd></dl>
 
 <dl class="method">
-<dt id="Chord.hasSpecificX">
-<tt class="descname">hasSpecificX</tt><big>(</big><em>scaleDegree</em>, <em>testRoot=None</em><big>)</big><a class="headerlink" href="#Chord.hasSpecificX" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Exactly like hasScaleX, except it returns the interval itself instead of the number</blockquote>
-<p>of semitones.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cmaj = chord.Chord([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; cmaj.hasScaleX(3) #will return the interval between C and E
-4
-&gt;&gt;&gt; cmaj.hasScaleX(5) #will return the interval between C and G
-7
-&gt;&gt;&gt; cmaj.hasScaleX(6) #will return False
-False</p>
+<dt id="music21.chord.Chord.hasSpecificX">
+<tt class="descname">hasSpecificX</tt><big>(</big><em>scaleDegree</em>, <em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasSpecificX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exactly like hasScaleX, except it returns the interval itself instead of the number of semitones. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span> <span class="c">#will return the interval between C and E</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span> <span class="c">#will return the interval between C and G</span>
+<span class="go">7</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">hasScaleX</span><span class="p">(</span><span class="mf">6</span><span class="p">)</span> <span class="c">#will return False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.hasThird">
-<tt class="descname">hasThird</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#Chord.hasThird" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.hasThird">
+<tt class="descname">hasThird</tt><big>(</big><em>testRoot=None</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.hasThird" title="Permalink to this definition">¶</a></dt>
 <dd>Shortcut for hasScaleX(3)</dd></dl>
 
 <dl class="method">
-<dt id="Chord.inversion">
-<tt class="descname">inversion</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.inversion" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-returns an integer representing which standard inversion the chord is in. Chord</blockquote>
-<p>does not have to be complete, but determines the inversion by looking at the relationship
-of the bass note to the root.</p>
+<dt id="music21.chord.Chord.inversion">
+<tt class="descname">inversion</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.inversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns an integer representing which standard inversion the chord is in. Chord does not have to be complete, but determines the inversion by looking at the relationship of the bass note to the root.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">inversion</span><span class="p">()</span>
@@ -733,11 +666,9 @@ of the bass note to the root.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.inversionName">
-<tt class="descname">inversionName</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.inversionName" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns an integer representing the common abbreviation for the inversion the chord is in.</blockquote>
-<p>If chord is not in a common inversion, returns None.</p>
+<dt id="music21.chord.Chord.inversionName">
+<tt class="descname">inversionName</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.inversionName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an integer representing the common abbreviation for the inversion the chord is in. If chord is not in a common inversion, returns None.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;G3&#39;</span><span class="p">,</span> <span class="s">&#39;B3&#39;</span><span class="p">,</span> <span class="s">&#39;F3&#39;</span><span class="p">,</span> <span class="s">&#39;D3&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">inversionName</span><span class="p">()</span>
@@ -747,16 +678,9 @@ Returns an integer representing the common abbreviation for the inversion the ch
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.isAugmentedTriad">
-<tt class="descname">isAugmentedTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isAugmentedTriad" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if chord is an Augmented Triad, that is, if it contains only notes that are</blockquote>
-<p>either in unison with the root, a major third above the root, or an augmented fifth above the
-root. Additionally, must contain at least one of each third and fifth above the root.
-Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are
-usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab
-is 1st inversion).  However, B#-Fb-Ab does return false as expeccted).</p>
-<p>Returns false if is not an augmented triad.</p>
+<dt id="music21.chord.Chord.isAugmentedTriad">
+<tt class="descname">isAugmentedTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isAugmentedTriad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if chord is an Augmented Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or an augmented fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). Returns false if is not an augmented triad.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">music21.chord</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
@@ -764,15 +688,13 @@ is 1st inversion).  However, B#-Fb-Ab does return false as expeccted).</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G4&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
 <span class="go">False</span>
-</pre></div>
-</div>
-<p>Other spellings will give other roots!
-&gt;&gt;&gt; c = music21.chord.Chord([&#8220;C4&#8221;, &#8220;E4&#8221;, &#8220;A-4&#8221;])
-&gt;&gt;&gt; c.isAugmentedTriad()
-True
-&gt;&gt;&gt; c.root()
-A-4</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;F-4&quot;</span><span class="p">,</span> <span class="s">&quot;A-4&quot;</span><span class="p">])</span>
+<span class="go">Other spellings will give other roots!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;A-4&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">root</span><span class="p">()</span>
+<span class="go">A-4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;F-4&quot;</span><span class="p">,</span> <span class="s">&quot;A-4&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">isAugmentedTriad</span><span class="p">()</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;B#4&quot;</span><span class="p">,</span> <span class="s">&quot;F-4&quot;</span><span class="p">,</span> <span class="s">&quot;A-4&quot;</span><span class="p">])</span>
@@ -783,13 +705,9 @@ A-4</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.isDiminishedSeventh">
-<tt class="descname">isDiminishedSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isDiminishedSeventh" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are</blockquote>
-<p>either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh
-above the root. Additionally, must contain at least one of each third and fifth above the root.
-Chord must be spelled correctly. Otherwise returns false.</p>
+<dt id="music21.chord.Chord.isDiminishedSeventh">
+<tt class="descname">isDiminishedSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isDiminishedSeventh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g-&#39;</span><span class="p">,</span> <span class="s">&#39;b--&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isDiminishedSeventh</span><span class="p">()</span>
@@ -799,19 +717,13 @@ Chord must be spelled correctly. Otherwise returns false.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.isDiminishedTriad">
-<tt class="descname">isDiminishedTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isDiminishedTriad" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if chord is a Diminished Triad, that is, if it contains only notes that are</blockquote>
-<p>either in unison with the root, a minor third above the root, or a diminished fifth above the
-root. Additionally, must contain at least one of each third and fifth above the root.
-Chord must be spelled correctly. Otherwise returns false.</p>
+<dt id="music21.chord.Chord.isDiminishedTriad">
+<tt class="descname">isDiminishedTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isDiminishedTriad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if chord is a Diminished Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a diminished fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G-&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;F#&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isDiminishedTriad</span><span class="p">()</span> <span class="c">#returns True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isDiminishedTriad</span><span class="p">()</span> <span class="c">#returns True</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isDiminishedTriad</span><span class="p">()</span> <span class="c">#returns False</span>
 <span class="go">False</span>
@@ -820,13 +732,9 @@ Chord must be spelled correctly. Otherwise returns false.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.isDominantSeventh">
-<tt class="descname">isDominantSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isDominantSeventh" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if chord is a Dominant Seventh, that is, if it contains only notes that are</blockquote>
-<p>either in unison with the root, a major third above the root, a perfect fifth, or a major seventh
-above the root. Additionally, must contain at least one of each third and fifth above the root.
-Chord must be spelled correctly. Otherwise returns false.</p>
+<dt id="music21.chord.Chord.isDominantSeventh">
+<tt class="descname">isDominantSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isDominantSeventh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if chord is a Dominant Seventh, that is, if it contains only notes that are either in unison with the root, a major third above the root, a perfect fifth, or a major seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">isDominantSeventh</span><span class="p">()</span>
@@ -836,166 +744,130 @@ Chord must be spelled correctly. Otherwise returns false.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.isFalseDiminishedSeventh">
-<tt class="descname">isFalseDiminishedSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isFalseDiminishedSeventh" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are</blockquote>
-<p>either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh
-above the root. Additionally, must contain at least one of each third and fifth above the root.
-Chord MAY BE SPELLED INCORRECTLY. Otherwise returns false.</p>
-</dd></dl>
+<dt id="music21.chord.Chord.isFalseDiminishedSeventh">
+<tt class="descname">isFalseDiminishedSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isFalseDiminishedSeventh" title="Permalink to this definition">¶</a></dt>
+<dd>Returns True if chord is a Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a minor seventh above the root. Additionally, must contain at least one of each third and fifth above the root. Chord MAY BE SPELLED INCORRECTLY. Otherwise returns false.</dd></dl>
 
 <dl class="method">
-<dt id="Chord.isHalfDiminishedSeventh">
-<tt class="descname">isHalfDiminishedSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isHalfDiminishedSeventh" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if chord is a Half Diminished Seventh, that is, if it contains only notes that are</blockquote>
-<p>either in unison with the root, a minor third above the root, a diminished fifth, or a major seventh
-above the root. Additionally, must contain at least one of each third, fifth, and seventh above the root.
-Chord must be spelled correctly. Otherwise returns false.</p>
+<dt id="music21.chord.Chord.isHalfDiminishedSeventh">
+<tt class="descname">isHalfDiminishedSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isHalfDiminishedSeventh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if chord is a Half Diminished Seventh, that is, if it contains only notes that are either in unison with the root, a minor third above the root, a diminished fifth, or a major seventh above the root. Additionally, must contain at least one of each third, fifth, and seventh above the root. Chord must be spelled correctly. Otherwise returns false.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C4&#39;</span><span class="p">,</span><span class="s">&#39;E-4&#39;</span><span class="p">,</span><span class="s">&#39;G-4&#39;</span><span class="p">,</span><span class="s">&#39;B-4&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">isHalfDiminishedSeventh</span><span class="p">()</span>
 <span class="go">True</span>
+<span class="go">Incorrectly spelled chords are not considered half-diminished sevenths</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C4&#39;</span><span class="p">,</span><span class="s">&#39;E-4&#39;</span><span class="p">,</span><span class="s">&#39;G-4&#39;</span><span class="p">,</span><span class="s">&#39;A#4&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">isHalfDiminishedSeventh</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="go">Nor are incomplete chords</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c3</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C4&#39;</span><span class="p">,</span> <span class="s">&#39;G-4&#39;</span><span class="p">,</span><span class="s">&#39;B-4&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c3</span><span class="o">.</span><span class="n">isHalfDiminishedSeventh</span><span class="p">()</span>
+<span class="go">False</span>
 </pre></div>
 </div>
-<p>Incorrectly spelled chords are not considered half-diminished sevenths
-&gt;&gt;&gt; c2 = chord.Chord([&#8216;C4&#8217;,&#8217;E-4&#8217;,&#8217;G-4&#8217;,&#8217;A#4&#8217;])
-&gt;&gt;&gt; c2.isHalfDiminishedSeventh()
-False</p>
-<p>Nor are incomplete chords
-&gt;&gt;&gt; c3 = chord.Chord([&#8216;C4&#8217;, &#8216;G-4&#8217;,&#8217;B-4&#8217;])
-&gt;&gt;&gt; c3.isHalfDiminishedSeventh()
-False</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.isMajorTriad">
-<tt class="descname">isMajorTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isMajorTriad" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if chord is a Major Triad, that is, if it contains only notes that are</blockquote>
-<p>either in unison with the root, a major third above the root, or a perfect fifth above the
-root. Additionally, must contain at least one of each third and fifth above the root.
-Chord must be spelled correctly. Otherwise returns false.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cchord = chord.Chord([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; other = chord.Chord([&#8216;C&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; cchord.isMajorTriad() # returns True
-True
-&gt;&gt;&gt; other.isMajorTriad() # returns False
-False</p>
+<dt id="music21.chord.Chord.isMajorTriad">
+<tt class="descname">isMajorTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isMajorTriad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if chord is a Major Triad, that is, if it contains only notes that are either in unison with the root, a major third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isMajorTriad</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isMajorTriad</span><span class="p">()</span> <span class="c"># returns False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.isMinorTriad">
-<tt class="descname">isMinorTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isMinorTriad" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if chord is a Minor Triad, that is, if it contains only notes that are</blockquote>
-<p>either in unison with the root, a minor third above the root, or a perfect fifth above the
-root. Additionally, must contain at least one of each third and fifth above the root.
-Chord must be spelled correctly. Otherwise returns false.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cchord = chord.Chord([&#8216;C&#8217;, &#8216;E-&#8216;, &#8216;G&#8217;])
-&gt;&gt;&gt; other = chord.Chord([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; cchord.isMinorTriad() # returns True
-True
-&gt;&gt;&gt; other.isMinorTriad() # returns False
-False</p>
+<dt id="music21.chord.Chord.isMinorTriad">
+<tt class="descname">isMinorTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isMinorTriad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if chord is a Minor Triad, that is, if it contains only notes that are either in unison with the root, a minor third above the root, or a perfect fifth above the root. Additionally, must contain at least one of each third and fifth above the root. Chord must be spelled correctly. Otherwise returns false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E-&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isMinorTriad</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isMinorTriad</span><span class="p">()</span> <span class="c"># returns False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.isSeventh">
-<tt class="descname">isSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isSeventh" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns True if chord contains at least one of each of Third, Fifth, and Seventh,</blockquote>
-<p>and every note in the chord is a Third, Fifth, or Seventh, such that there are no
-repeated scale degrees (ex: E and E-). Else return false.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cchord = chord.Chord([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;G&#8217;, &#8216;B&#8217;])
-&gt;&gt;&gt; other = chord.Chord([&#8216;C&#8217;, &#8216;D&#8217;, &#8216;E&#8217;, &#8216;F&#8217;, &#8216;G&#8217;, &#8216;B&#8217;])
-&gt;&gt;&gt; cchord.isSeventh() # returns True
-True
-&gt;&gt;&gt; other.isSeventh() # returns False
-False</p>
+<dt id="music21.chord.Chord.isSeventh">
+<tt class="descname">isSeventh</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isSeventh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if chord contains at least one of each of Third, Fifth, and Seventh, and every note in the chord is a Third, Fifth, or Seventh, such that there are no repeated scale degrees (ex: E and E-). Else return false. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isSeventh</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isSeventh</span><span class="p">()</span> <span class="c"># returns False</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.isTriad">
-<tt class="descname">isTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.isTriad" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-returns True or False</blockquote>
-<p>&#8220;Contains vs. Is:&#8221; A dominant-seventh chord is NOT a triad.
-returns True if the chord contains at least one Third and one Fifth and all notes are
-equivalent to either of those notes. Only returns True if triad is spelled correctly.</p>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cchord = chord.Chord([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; other = chord.Chord([&#8216;C&#8217;, &#8216;D&#8217;, &#8216;E&#8217;, &#8216;F&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; cchord.isTriad() # returns True
-True
-&gt;&gt;&gt; other.isTriad()
-False</p>
+<dt id="music21.chord.Chord.isTriad">
+<tt class="descname">isTriad</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.isTriad" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns True or False &#8220;Contains vs. Is:&#8221; A dominant-seventh chord is NOT a triad. returns True if the chord contains at least one Third and one Fifth and all notes are equivalent to either of those notes. Only returns True if triad is spelled correctly. example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cchord</span><span class="o">.</span><span class="n">isTriad</span><span class="p">()</span> <span class="c"># returns True</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">isTriad</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.numNotes">
-<tt class="descname">numNotes</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.numNotes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="music21.chord.Chord.numNotes">
+<tt class="descname">numNotes</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.numNotes" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the number of notes in the chord</dd></dl>
 
-<p>Returns the number of notes in the chord</p>
 <dl class="method">
-<dt id="Chord.root">
-<tt class="descname">root</tt><big>(</big><em>newroot=False</em><big>)</big><a class="headerlink" href="#Chord.root" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.)</blockquote>
-<p>example:
-&gt;&gt;&gt; from music21 import *
-&gt;&gt;&gt; cmaj = chord.Chord([&#8216;C&#8217;, &#8216;E&#8217;, &#8216;G&#8217;])
-&gt;&gt;&gt; cmaj.root() # returns C
-C</p>
+<dt id="music21.chord.Chord.root">
+<tt class="descname">root</tt><big>(</big><em>newroot=False</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.) example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cmaj</span><span class="o">.</span><span class="n">root</span><span class="p">()</span> <span class="c"># returns C</span>
+<span class="go">C</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.seekChordTablesAddress">
-<tt class="descname">seekChordTablesAddress</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.seekChordTablesAddress" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Utility method to return the address to the chord table.</blockquote>
-<p>Table addresses are TN based three character codes:
-cardinaltiy, Forte index number, inversion</p>
-<p>Inversion is either 0 (for symmetrical) or -1/1</p>
-<p>NOTE: time consuming, and only should be run when necessary.</p>
+<dt id="music21.chord.Chord.seekChordTablesAddress">
+<tt class="descname">seekChordTablesAddress</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.seekChordTablesAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility method to return the address to the chord table. Table addresses are TN based three character codes: cardinaltiy, Forte index number, inversion Inversion is either 0 (for symmetrical) or -1/1 NOTE: time consuming, and only should be run when necessary.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c3&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">orderedPitchClasses</span>
 <span class="go">[0]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
 <span class="go">(1, 1, 0)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;d#&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;g#&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="s">&#39;d#&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;g#&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
 <span class="go">(11, 1, 0)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
 <span class="go">(3, 11, -1)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e-&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
 <span class="go">(3, 11, 1)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;d#&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;g#&#39;</span><span class="p">,</span> <span class="s">&#39;a#&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;d#&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;f#&#39;</span><span class="p">,</span> <span class="s">&#39;g#&#39;</span><span class="p">,</span> <span class="s">&#39;a#&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
 <span class="go">(7, 34, 0)</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;c#&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">seekChordTablesAddress</span><span class="p">()</span>
 <span class="go">(3, 1, 0)</span>
 </pre></div>
@@ -1003,31 +875,24 @@ cardinaltiy, Forte index number, inversion</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.semiClosedPosition">
-<tt class="descname">semiClosedPosition</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.semiClosedPosition" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO: Write</p>
-<p>moves everything within an octave EXCEPT if there&#8217;s already
-a pitch at that step, then it puts it up an octave.  It&#8217;s a
-very useful display standard for dense post-tonal chords.</p>
-</dd></dl>
+<dt id="music21.chord.Chord.semiClosedPosition">
+<tt class="descname">semiClosedPosition</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.semiClosedPosition" title="Permalink to this definition">¶</a></dt>
+<dd>TODO: Write moves everything within an octave EXCEPT if there&#8217;s already a pitch at that step, then it puts it up an octave.  It&#8217;s a very useful display standard for dense post-tonal chords.</dd></dl>
 
 <dl class="method">
-<dt id="Chord.sortAscending">
-<tt class="descname">sortAscending</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.sortAscending" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.sortAscending">
+<tt class="descname">sortAscending</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.sortAscending" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
 
 <dl class="method">
-<dt id="Chord.sortChromaticAscending">
-<tt class="descname">sortChromaticAscending</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.sortChromaticAscending" title="Permalink to this definition">¶</a></dt>
+<dt id="music21.chord.Chord.sortChromaticAscending">
+<tt class="descname">sortChromaticAscending</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.sortChromaticAscending" title="Permalink to this definition">¶</a></dt>
 <dd>Same as sortAscending but notes are sorted by midi number, so F## sorts above G-.</dd></dl>
 
 <dl class="method">
-<dt id="Chord.sortDiatonicAscending">
-<tt class="descname">sortDiatonicAscending</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.sortDiatonicAscending" title="Permalink to this definition">¶</a></dt>
-<dd><p>After talking with Daniel Jackson, let&#8217;s try to make the chord object as immutable
-as possible, so we return a new Chord object with the notes arranged from lowest to highest</p>
-<p>The notes are sorted by Scale degree and then by Offset (so F## sorts below G-).
-Notes that are the identical pitch retain their order</p>
+<dt id="music21.chord.Chord.sortDiatonicAscending">
+<tt class="descname">sortDiatonicAscending</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.sortDiatonicAscending" title="Permalink to this definition">¶</a></dt>
+<dd><p>After talking with Daniel Jackson, let&#8217;s try to make the chord object as immutable as possible, so we return a new Chord object with the notes arranged from lowest to highest The notes are sorted by Scale degree and then by Offset (so F## sorts below G-). Notes that are the identical pitch retain their order</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cMajUnsorted</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;E4&#39;</span><span class="p">,</span> <span class="s">&#39;C4&#39;</span><span class="p">,</span> <span class="s">&#39;G4&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cMajSorted</span> <span class="o">=</span> <span class="n">cMajUnsorted</span><span class="o">.</span><span class="n">sortDiatonicAscending</span><span class="p">()</span>
@@ -1038,17 +903,14 @@ Notes that are the identical pitch retain their order</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Chord.sortFrequencyAscending">
-<tt class="descname">sortFrequencyAscending</tt><big>(</big><big>)</big><a class="headerlink" href="#Chord.sortFrequencyAscending" title="Permalink to this definition">¶</a></dt>
-<dd>Same as above, but uses a note&#8217;s frequency to determine height; so that
-C# would be below D- in 1/4-comma meantone, equal in equal temperament,
-but below it in (most) just intonation types.</dd></dl>
+<dt id="music21.chord.Chord.sortFrequencyAscending">
+<tt class="descname">sortFrequencyAscending</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.chord.Chord.sortFrequencyAscending" title="Permalink to this definition">¶</a></dt>
+<dd>Same as above, but uses a note&#8217;s frequency to determine height; so that C# would be below D- in 1/4-comma meantone, equal in equal temperament, but below it in (most) just intonation types.</dd></dl>
 
 <dl class="method">
-<dt id="Chord.transpose">
-<tt class="descname">transpose</tt><big>(</big><em>value</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#Chord.transpose" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.</blockquote>
+<dt id="music21.chord.Chord.transpose">
+<tt class="descname">transpose</tt><big>(</big><em>value</em>, <em>inPlace=False</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.transpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;g4&#39;</span><span class="p">,</span> <span class="s">&#39;a3&#39;</span><span class="p">,</span> <span class="s">&#39;c#6&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s">&#39;m3&#39;</span><span class="p">)</span>
@@ -1058,9 +920,7 @@ Transpose the Note by the user-provided value. If the value is an integer, the t
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">aInterval</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span>
 <span class="go">&lt;music21.chord.Chord C#4 D#3 F##5&gt;</span>
-</pre></div>
-</div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">aInterval</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">aInterval</span><span class="p">,</span> <span class="n">inPlace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
 <span class="go">&lt;music21.chord.Chord C#4 D#3 F##5&gt;</span>
 </pre></div>
@@ -1069,7 +929,7 @@ Transpose the Note by the user-provided value. If the value is an integer, the t
 
 <p>Methods inherited from <a title="music21.note.NotRest" class="reference external" href="moduleNote.html#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>: <a title="music21.note.NotRest.splitNoteAtPoint" class="reference external" href="moduleNote.html#music21.note.NotRest.splitNoteAtPoint"><tt class="xref docutils literal"><span class="pre">splitNoteAtPoint()</span></tt></a></p>
 <p>Methods inherited from <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>: <a title="music21.note.GeneralNote.addLyric" class="reference external" href="moduleNote.html#music21.note.GeneralNote.addLyric"><tt class="xref docutils literal"><span class="pre">addLyric()</span></tt></a>, <a title="music21.note.GeneralNote.augmentOrDiminish" class="reference external" href="moduleNote.html#music21.note.GeneralNote.augmentOrDiminish"><tt class="xref docutils literal"><span class="pre">augmentOrDiminish()</span></tt></a>, <a title="music21.note.GeneralNote.compactNoteInfo" class="reference external" href="moduleNote.html#music21.note.GeneralNote.compactNoteInfo"><tt class="xref docutils literal"><span class="pre">compactNoteInfo()</span></tt></a>, <a title="music21.note.GeneralNote.splitAtDurations" class="reference external" href="moduleNote.html#music21.note.GeneralNote.splitAtDurations"><tt class="xref docutils literal"><span class="pre">splitAtDurations()</span></tt></a>, <a title="music21.note.GeneralNote.splitByQuarterLengths" class="reference external" href="moduleNote.html#music21.note.GeneralNote.splitByQuarterLengths"><tt class="xref docutils literal"><span class="pre">splitByQuarterLengths()</span></tt></a></p>
-<p>Methods inherited from <tt class="xref docutils literal"><span class="pre">Music21Object</span></tt>: <tt class="xref docutils literal"><span class="pre">addContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocation()</span></tt>, <tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt>, <tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">getSites()</span></tt>, <tt class="xref docutils literal"><span class="pre">hasContext()</span></tt>, <tt class="xref docutils literal"><span class="pre">isClass()</span></tt>, <tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt>, <tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt>, <tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt>, <tt class="xref docutils literal"><span class="pre">show()</span></tt>, <tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt>, <tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt>, <tt class="xref docutils literal"><span class="pre">write()</span></tt></p>
+<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySite"><tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySiteId" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySiteId"><tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt></a>, <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </blockquote>
 </dd></dl>
 
@@ -1102,7 +962,7 @@ Transpose the Note by the user-provided value. If the value is an integer, the t
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 08, 2010.
+      Last updated on Jul 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -154,6 +154,20 @@ write documentation/test-code like this:</p>
 <span class="go">&#39;C&#39;</span>
 </pre></div>
 </div>
+<p>Lines can be omitted on an individual basis by adding the expression
+&#8220;#_DOCS_HIDE&#8221; somewhere on the line.  On the other hand, the text
+&#8220;#_DOCS_SHOW&#8221; is removed from any line before it appears in the
+documentation.  So you could use some of the same lines to test
+code and also to give an example like so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;D-&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span><span class="p">(</span><span class="n">d1</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;D-&#39;</span><span class="p">)</span>  <span class="c">#_DOCS_HIDE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c">#_DOCS_SHOW d1.show(&#39;lily&#39;)</span>
+</pre></div>
+</div>
+<p>in this case, the assertion code is omitted from the documentation
+generated from the module, while the lilypond file is not generated
+during doctests.  Together with OMIT_FROM_DOCS, it&#8217;s a great way to
+have your cake and eat it too.</p>
 </div>
 <div class="section" id="ordering-module-level-names">
 <h2>Ordering Module-Level Names<a class="headerlink" href="#ordering-module-level-names" title="Permalink to this headline">¶</a></h2>
@@ -304,7 +318,7 @@ dictionary&#8217;s <cite>update()</cite> method.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 08, 2010.
+      Last updated on Jul 12, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

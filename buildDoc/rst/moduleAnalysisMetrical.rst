@@ -7,19 +7,10 @@ music21.analysis.metrical
 
 .. module:: music21.analysis.metrical
 
-Various tools and utilities for doing metrical or rhythmic analysis. 
- 
- See the chapter :ref:`overviewMeters` for more information on defining metrical structures in music21.
- 
- 
+Various tools and utilities for doing metrical or rhythmic analysis. See the chapter :ref:`overviewMeters` for more information on defining metrical structures in music21. 
 
 
 .. function:: labelBeatDepth(streamIn)
 
-    
-     Modify a Stream in place by annotating metrical analysis symbols.
- 
-     This assumes that the Stream is already partitioned into Measures.
-     
- 
+    Modify a Stream in place by annotating metrical analysis symbols. This assumes that the Stream is already partitioned into Measures. 
 

@@ -7,57 +7,32 @@ music21.graph
 
 .. module:: music21.graph
 
-Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. The :class:`~music21.graph.Graph` object subclasses abstract fundamental graphing archetypes using the matplotlib library. The :class:`~music21.graph.Plot` object subclasses provide reusable approaches to graphing data and structures in :class:`~music21.stream.Stream` objects.
- 
- 
+Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. The :class:`~music21.graph.Graph` object subclasses abstract fundamental graphing archetypes using the matplotlib library. The :class:`~music21.graph.Plot` object subclasses provide reusable approaches to graphing data and structures in :class:`~music21.stream.Stream` objects. 
 
 
 .. function:: plotStream(streamObj, *args, **keywords)
 
-    Given a stream and any keyword configuration arguments, create and display a plot.
- 
-     Note: plots requires matplotib to be installed.
- 
-     Plot method can be specified as a second argument or by keyword. Available plots include the following:
- 
-     pitchSpace (:class:`~music21.graph.PlotHistogramPitchSpace`)
-     pitchClass (:class:`~music21.graph.PlotHistogramPitchClass`)
-     quarterLength (:class:`~music21.graph.PlotHistogramQuarterLength`)
- 
-     scatterPitchSpaceQuarterLength (:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`)
-     scatterPitchClassQuarterLength (:class:`~music21.graph.PlotScatterPitchClassQuarterLength`)
-     scatterPitchClassOffset (':class:`~graph.PlotScatterPitchClassOffset`)
- 
-     pitchClassOffset (:class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`)
-     pitchSpaceOffset (:class:`~music21.graph.PlotHorizontalBarPitchClassOffset`)
- 
-     pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`)
-     pitchClassQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`)
- 
-     3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`)
- 
-     
- 
+    Given a stream and any keyword configuration arguments, create and display a plot. Note: plots requires matplotib to be installed. Plot method can be specified as a second argument or by keyword. Available plots include the following: pitchSpace (:class:`~music21.graph.PlotHistogramPitchSpace`) pitchClass (:class:`~music21.graph.PlotHistogramPitchClass`) quarterLength (:class:`~music21.graph.PlotHistogramQuarterLength`) scatterPitchSpaceQuarterLength (:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`) scatterPitchClassQuarterLength (:class:`~music21.graph.PlotScatterPitchClassQuarterLength`) scatterPitchClassOffset (':class:`~graph.PlotScatterPitchClassOffset`) pitchClassOffset (:class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`) pitchSpaceOffset (:class:`~music21.graph.PlotHorizontalBarPitchClassOffset`) pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`) pitchClassQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`) 3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`) 
+
+    
 
 PlotHistogramPitchSpace
 -----------------------
 
 .. class:: PlotHistogramPitchSpace(streamObj, *args, **keywords)
 
-    A histogram of pitch space.
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
-     >>> #_DOCS_SHOW p = graph.PlotHistogramPitchSpace(s)
-     >>> p.id
-     'histogram-pitch'
-     >>> p.process() # with defaults and proper configuration, will open graph
- 
- 
+    A histogram of pitch space. 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHistogramPitchSpace(s)
+    >>> p.id
+    'histogram-pitch' 
+    >>> p.process() # with defaults and proper configuration, will open graph
+    
 
     .. image:: images/PlotHistogramPitchSpace.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
@@ -81,21 +56,20 @@ PlotHistogramPitchClass
 
 .. class:: PlotHistogramPitchClass(streamObj, *args, **keywords)
 
-    A histogram of pitch class
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
-     >>> #_DOCS_SHOW p = graph.PlotHistogramPitchClass(s)
-     >>> p.id
-     'histogram-pitchClass'
-     >>> p.process() # with defaults and proper configuration, will open graph
- 
- 
+    A histogram of pitch class 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHistogramPitchClass(s)
+    >>> p.id
+    'histogram-pitchClass' 
+    >>> p.process() # with defaults and proper configuration, will open graph
+    
 
     .. image:: images/PlotHistogramPitchClass.* 
         :width: 600
-     
- 
+
+    
 
     inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
@@ -119,21 +93,20 @@ PlotHistogramQuarterLength
 
 .. class:: PlotHistogramQuarterLength(streamObj, *args, **keywords)
 
-    A histogram of pitch class
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
-     >>> #_DOCS_SHOW p = graph.PlotHistogramQuarterLength(s)
-     >>> p.id
-     'histogram-quarterLength'
-     >>> p.process() # with defaults and proper configuration, will open graph
- 
- 
+    A histogram of pitch class 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHistogramQuarterLength(s)
+    >>> p.id
+    'histogram-quarterLength' 
+    >>> p.process() # with defaults and proper configuration, will open graph
+    
 
     .. image:: images/PlotHistogramQuarterLength.* 
         :width: 600
-     
- 
+
+    
 
     inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
@@ -157,20 +130,18 @@ PlotScatterPitchSpaceQuarterLength
 
 .. class:: PlotScatterPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
-    A scatter plot of pitch space and quarter length
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
-     >>> #_DOCS_SHOW p = graph.PlotScatterPitchSpaceQuarterLength(s)
-     >>> p.id
-     'scatter-pitch-quarterLength'
-     >>> p.process()
- 
- 
+    A scatter plot of pitch space and quarter length 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotScatterPitchSpaceQuarterLength(s)
+    >>> p.id
+    'scatter-pitch-quarterLength' 
+    >>> p.process()
+    
 
     .. image:: images/PlotScatterPitchSpaceQuarterLength.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -194,20 +165,18 @@ PlotScatterPitchClassQuarterLength
 
 .. class:: PlotScatterPitchClassQuarterLength(streamObj, *args, **keywords)
 
-    A scatter plot of pitch class and quarter length
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
-     >>> #_DOCS_SHOW p = graph.PlotScatterPitchClassQuarterLength(s)
-     >>> p.id
-     'scatter-pitchClass-quarterLength'
-     >>> p.process()
- 
- 
+    A scatter plot of pitch class and quarter length 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotScatterPitchClassQuarterLength(s)
+    >>> p.id
+    'scatter-pitchClass-quarterLength' 
+    >>> p.process()
+    
 
     .. image:: images/PlotScatterPitchClassQuarterLength.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -231,20 +200,18 @@ PlotScatterPitchClassOffset
 
 .. class:: PlotScatterPitchClassOffset(streamObj, *args, **keywords)
 
-    A scatter plot of pitch class and offset
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
-     >>> #_DOCS_SHOW p = graph.PlotScatterPitchClassOffset(s)
-     >>> p.id
-     'scatter-pitchClass-offset'
-     >>> p.process()
- 
- 
+    A scatter plot of pitch class and offset 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotScatterPitchClassOffset(s)
+    >>> p.id
+    'scatter-pitchClass-offset' 
+    >>> p.process()
+    
 
     .. image:: images/PlotScatterPitchClassOffset.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -268,21 +235,20 @@ PlotHorizontalBarPitchSpaceOffset
 
 .. class:: PlotHorizontalBarPitchSpaceOffset(streamObj, *args, **keywords)
 
-    A graph of events, sorted by pitch space, over time
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
-     >>> #_DOCS_SHOW p = graph.PlotHorizontalBarPitchSpaceOffset(s)
-     >>> p.id
-     'horizontalBar-pitch-offset'
-     >>> p.process() # with defaults and proper configuration, will open graph
- 
- 
+    A graph of events, sorted by pitch space, over time 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv57.8')
+    >>> p = graph.PlotHorizontalBarPitchSpaceOffset(s)
+    >>> p.id
+    'horizontalBar-pitch-offset' 
+    >>> p.process() # with defaults and proper configuration, will open graph
+    
 
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.* 
         :width: 600
-     
- 
+
+    
 
     inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
@@ -306,13 +272,10 @@ PlotHorizontalBarPitchClassOffset
 
 .. class:: PlotHorizontalBarPitchClassOffset(streamObj, *args, **keywords)
 
-    A graph of events, sorted by pitch class, over time
- 
- 
+    A graph of events, sorted by pitch class, over time 
 
     .. image:: images/PlotHorizontalBarPitchClassOffset.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
@@ -336,13 +299,10 @@ PlotScatterWeightedPitchSpaceQuarterLength
 
 .. class:: PlotScatterWeightedPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
-    A graph of event, sorted by pitch, over time
- 
- 
+    A graph of event, sorted by pitch, over time 
 
     .. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
@@ -366,13 +326,10 @@ PlotScatterWeightedPitchClassQuarterLength
 
 .. class:: PlotScatterWeightedPitchClassQuarterLength(streamObj, *args, **keywords)
 
-    A graph of event, sorted by pitch class, over time.
- 
- 
+    A graph of event, sorted by pitch class, over time. 
 
     .. image:: images/PlotScatterWeightedPitchClassQuarterLength.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
@@ -396,22 +353,19 @@ Plot3DBarsPitchSpaceQuarterLength
 
 .. class:: Plot3DBarsPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
-    A scatter plot of pitch and quarter length
- 
-     >>> from music21 import *
- 
-     >>> #_DOCS_SHOW from music21.musicxml import testFiles
-     >>> #_DOCS_SHOW s = converter.parse(testFiles.mozartTrioK581Excerpt)
-     >>> #_DOCS_SHOW p = graph.Plot3DBarsPitchSpaceQuarterLength(s) 
-     >>> p.id
-     '3dBars-pitch-quarterLength'
-     >>> p.process() # with defaults and proper configuration, will open graph
- 
- 
+    A scatter plot of pitch and quarter length 
+
+    >>> from music21 import *
+    >>> from music21.musicxml import testFiles
+    >>> s = converter.parse(testFiles.mozartTrioK581Excerpt)
+    >>> p = graph.Plot3DBarsPitchSpaceQuarterLength(s)
+    >>> p.id
+    '3dBars-pitch-quarterLength' 
+    >>> p.process() # with defaults and proper configuration, will open graph
+    
 
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.Plot3DBars`, :class:`~music21.graph.PlotStream`
 
@@ -435,23 +389,11 @@ Graph
 
 .. class:: Graph(*args, **keywords)
 
-    An object representing a graph or plot, automating the creation and configuration of this graph in matplotlib.
- 
-     Graph objects do not manipulate Streams or other music21 data; they only manipulate raw data formatted for each Graph subclass.
- 
-     Numerous keyword arguments can be provided for configuration: alpha,  colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, colors, tickFontSize, titleFontSize, labelFontSize, fontFamily.
- 
-     The doneAction determines what happens after graph processing: either write a file ('write'), open an interactive GUI browser ('show') or None (do processing but do not write output.
-     
- 
+    An object representing a graph or plot, automating the creation and configuration of this graph in matplotlib. Graph objects do not manipulate Streams or other music21 data; they only manipulate raw data formatted for each Graph subclass. Numerous keyword arguments can be provided for configuration: alpha,  colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, colors, tickFontSize, titleFontSize, labelFontSize, fontFamily. The doneAction determines what happens after graph processing: either write a file ('write'), open an interactive GUI browser ('show') or None (do processing but do not write output. 
 
-    A base-class for basic setup of graphs, abstracting functionality provided by matplotlib.
- 
-         Optional keyword arguments: alpha, colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, tickFontSize, titleFontSize, labelFontSize, fontFamily
- 
-         >>> a = Graph(title='green')
-         
- 
+    A base-class for basic setup of graphs, abstracting functionality provided by matplotlib. Optional keyword arguments: alpha, colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, tickFontSize, titleFontSize, labelFontSize, fontFamily 
+
+    >>> a = Graph(title='green')
 
     
 
@@ -459,16 +401,7 @@ Graph
 
         .. attribute:: axis
 
-            dict() -> new empty dictionary.
- dict(mapping) -> new dictionary initialized from a mapping object's
-     (key, value) pairs.
- dict(seq) -> new dictionary initialized as if via:
-     d = {}
-     for k, v in seq:
-         d[k] = v
- dict(**kwargs) -> new dictionary initialized with the name=value pairs
-     in the keyword argument list.  For example:  dict(one=1, two=2)
- 
+            dict() -> new empty dictionary. dict(mapping) -> new dictionary initialized from a mapping object's (key, value) pairs. dict(seq) -> new dictionary initialized as if via: d = {} for k, v in seq: d[k] = v dict(**kwargs) -> new dictionary initialized with the name=value pairs in the keyword argument list.  For example:  dict(one=1, two=2) 
 
         Attributes without Documentation: `fontFamily`, `doneAction`, `title`, `colorBackgroundFigure`, `colors`, `tickFontSize`, `colorGrid`, `figureSize`, `colorBackgroundData`, `axisKeys`, `grid`, `titleFontSize`, `alpha`, `labelFontSize`, `data`
 
@@ -476,62 +409,47 @@ Graph
 
         .. method:: done(fp=None)
 
-            Implement the desired doneAction, after data processing
-         
- 
+            Implement the desired doneAction, after data processing 
 
         .. method:: process()
 
-            process data and prepare plot
- 
+            process data and prepare plot 
 
         .. method:: setAxisLabel(axisKey, label)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: setAxisRange(axisKey, valueRange, pad=False)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: setData(data)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: setDoneAction(action)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: setFigureSize(figSize)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: setTicks(axisKey, pairs)
 
-            paris are positions and labels
-         
- 
+            paris are positions and labels 
 
         .. method:: setTitle(title)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: show()
 
-            Calls the show() method of the matplotlib plot. For most matplotlib back ends, this will open a GUI window with the desired graph.
-         
- 
+            Calls the show() method of the matplotlib plot. For most matplotlib back ends, this will open a GUI window with the desired graph. 
 
         .. method:: write(fp=None)
 
             Writes the graph to a file. If no file path is given, a temporary file is used. 
-         
- 
 
 
 Graph3DPolygonBars
@@ -539,27 +457,22 @@ Graph3DPolygonBars
 
 .. class:: Graph3DPolygonBars(*args, **keywords)
 
-    Graph multiple parallel bar graphs in 3D.
- 
-     This draws bars with polygons, a temporary alternative to using Graph3DBars, above.
- 
-     Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph.
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW g = graph.Graph3DPolygonBars()
-     >>> data = {1:[], 2:[], 3:[]}
-     >>> for i in range(len(data.keys())):
-     ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
-     ...    data[data.keys()[i]] = q
-     >>> g.setData(data)
-     >>> g.process()
- 
- 
+    Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph. 
+
+    >>> from music21 import *
+    >>> g = graph.Graph3DPolygonBars()
+    >>> data = {1:[], 2:[], 3:[]}
+    >>> for i in range(len(data.keys())):
+    ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)] 
+    ...    data[data.keys()[i]] = q 
+    >>> g.setData(data)
+    >>> g.process()
+    
 
     .. image:: images/Graph3DPolygonBars.* 
         :width: 600
-     
- 
+
+    
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -573,8 +486,7 @@ Graph3DPolygonBars
 
         .. method:: process()
 
-            No documentation.
- 
+            No documentation. 
 
         Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
@@ -584,17 +496,14 @@ GraphColorGrid
 
 .. class:: GraphColorGrid(*args, **keywords)
 
-     Grid of discrete colored "blocks" to visualize results of a windowed analysis routine.
-     
-     Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
-     
-     
-     >>> a = GraphColorGrid(doneAction=None)
-     >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
-     >>> a.setData(data)
-     >>> a.process()
-     
- 
+    Grid of discrete colored "blocks" to visualize results of a windowed analysis routine. Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results. 
+
+    
+
+    >>> a = GraphColorGrid(doneAction=None)
+    >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
+    >>> a.setData(data)
+    >>> a.process()
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -608,28 +517,23 @@ GraphColorGrid
 
         .. method:: process()
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: setColors(colors)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: setMaxWindow(maxWindow)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: setMinWindow(minWindow)
 
-            No documentation.
- 
+            No documentation. 
 
         .. method:: setWindowStep(windowStep)
 
-            No documentation.
- 
+            No documentation. 
 
         Methods inherited from :class:`~music21.graph.Graph`: :meth:`~music21.graph.Graph.done`, :meth:`~music21.graph.Graph.setAxisLabel`, :meth:`~music21.graph.Graph.setAxisRange`, :meth:`~music21.graph.Graph.setData`, :meth:`~music21.graph.Graph.setDoneAction`, :meth:`~music21.graph.Graph.setFigureSize`, :meth:`~music21.graph.Graph.setTicks`, :meth:`~music21.graph.Graph.setTitle`, :meth:`~music21.graph.Graph.show`, :meth:`~music21.graph.Graph.write`
 
@@ -639,25 +543,20 @@ GraphHistogram
 
 .. class:: GraphHistogram(*args, **keywords)
 
-    Graph the count of a single element.
- 
-     Data set is simply a list of x and y pairs, where there
-     is only one of each x value, and y value is the count or magnitude
-     of that value
- 
-     >>> from music21 import *
-     >>> import random
-     >>> #_DOCS_SHOW g = graph.GraphHistogram()
-     >>> data = [(x, random.choice(range(30))) for x in range(50)]
-     >>> g.setData(data)
-     >>> g.process()
- 
- 
+    Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value 
+
+    >>> from music21 import *
+    >>> import random
+    >>> g = graph.GraphHistogram()
+    >>> data = [(x, random.choice(range(30))) for x in range(50)]
+    >>> g.setData(data)
+    >>> g.process()
+    
 
     .. image:: images/GraphHistogram.* 
         :width: 600
-     
- 
+
+    
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -668,22 +567,19 @@ GraphHorizontalBar
 .. class:: GraphHorizontalBar(*args, **keywords)
 
 
-    Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap.
- 
-         Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.
- 
-         >>> from music21 import *
-         >>> #_DOCS_SHOW a = graph.GraphHorizontalBar(doneAction='show')
-         >>> data = [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
-         >>> a.setData(data)
-         >>> a.process()
- 
- 
+    Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap. Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values. 
+
+    >>> from music21 import *
+    >>> a = graph.GraphHorizontalBar(doneAction='show')
+    >>> data = [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
+    >>> a.setData(data)
+    >>> a.process()
+    
 
     .. image:: images/GraphHorizontalBar.* 
         :width: 600
-         
- 
+
+    
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -694,18 +590,16 @@ GraphScatter
 .. class:: GraphScatter(*args, **keywords)
 
     Graph two parameters in a scatter plot. Data representation is a list of points of values. 
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW g = graph.GraphScatter()
-     >>> data = [(x, x*x) for x in range(50)]
-     >>> g.setData(data)
-     >>> g.process()
- 
- 
+
+    >>> from music21 import *
+    >>> g = graph.GraphScatter()
+    >>> data = [(x, x*x) for x in range(50)]
+    >>> g.setData(data)
+    >>> g.process()
+    
 
     .. image:: images/GraphScatter.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -715,20 +609,19 @@ GraphScatterWeighted
 
 .. class:: GraphScatterWeighted(*args, **keywords)
 
-    A scatter plot where points are scaled in size to represent the number of values stored within.
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW g = graph.GraphScatterWeighted()
-     >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]
-     >>> g.setData(data)
-     >>> g.process()
- 
- 
+    A scatter plot where points are scaled in size to represent the number of values stored within. 
+
+    >>> from music21 import *
+    >>> g = graph.GraphScatterWeighted()
+    >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]
+    >>> g.setData(data)
+    >>> g.process()
+    
 
     .. image:: images/GraphScatterWeighted.* 
         :width: 600
-     
- 
+
+    
 
     inherits from: :class:`~music21.graph.Graph`
 
@@ -738,9 +631,7 @@ Plot3DBars
 
 .. class:: Plot3DBars(streamObj, *args, **keywords)
 
-    Base class for Stream plotting classes.
-     
- 
+    Base class for Stream plotting classes. 
 
     inherits from: :class:`~music21.graph.PlotStream`
 
@@ -787,9 +678,7 @@ PlotColorGridKrumhanslSchmuckler
 
 .. class:: PlotColorGridKrumhanslSchmuckler(streamObj, *args, **keywords)
 
-    Subclass for plotting Krumhansl-Schmuckler analysis routine
-     
- 
+    Subclass for plotting Krumhansl-Schmuckler analysis routine 
 
     inherits from: :class:`~music21.graph.PlotColorGrid`, :class:`~music21.graph.PlotStream`
 
@@ -813,9 +702,7 @@ PlotColorGridSadoianAmbitus
 
 .. class:: PlotColorGridSadoianAmbitus(streamObj, *args, **keywords)
 
-    Subclass for plotting basic pitch span over a windowed analysis
-     
- 
+    Subclass for plotting basic pitch span over a windowed analysis 
 
     inherits from: :class:`~music21.graph.PlotColorGrid`, :class:`~music21.graph.PlotStream`
 
@@ -839,9 +726,7 @@ PlotHistogram
 
 .. class:: PlotHistogram(streamObj, *args, **keywords)
 
-    Base class for Stream plotting classes.
-     
- 
+    Base class for Stream plotting classes. 
 
     inherits from: :class:`~music21.graph.PlotStream`
 
@@ -865,10 +750,9 @@ PlotHorizontalBar
 
 .. class:: PlotHorizontalBar(streamObj, *args, **keywords)
 
-    A graph of events, sorted by pitch, over time
- 
-     
- 
+    A graph of events, sorted by pitch, over time 
+
+    
 
     inherits from: :class:`~music21.graph.PlotStream`
 
@@ -892,9 +776,7 @@ PlotScatter
 
 .. class:: PlotScatter(streamObj, *args, **keywords)
 
-    Base class for 2D Scatter plots.
-     
- 
+    Base class for 2D Scatter plots. 
 
     inherits from: :class:`~music21.graph.PlotStream`
 
@@ -918,20 +800,18 @@ PlotScatterPitchSpaceDynamicSymbol
 
 .. class:: PlotScatterPitchSpaceDynamicSymbol(streamObj, *args, **keywords)
 
-    A graph of dynamics used by pitch space.
- 
-     >>> from music21 import *
-     >>> #_DOCS_SHOW s = corpus.parseWork('schumann/opus41no1', 2)
-     >>> #_DOCS_SHOW p = graph.PlotScatterPitchSpaceDynamicSymbol(s)
-     >>> p.id
-     'scatter-pitchClass-dynamicSymbol'
-     >>> p.process()
- 
- 
+    A graph of dynamics used by pitch space. 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('schumann/opus41no1', 2)
+    >>> p = graph.PlotScatterPitchSpaceDynamicSymbol(s)
+    >>> p.id
+    'scatter-pitchClass-dynamicSymbol' 
+    >>> p.process()
+    
 
     .. image:: images/PlotScatterPitchSpaceDynamicSymbol.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
@@ -978,13 +858,10 @@ PlotScatterWeightedPitchSpaceDynamicSymbol
 
 .. class:: PlotScatterWeightedPitchSpaceDynamicSymbol(streamObj, *args, **keywords)
 
-    A graph of dynamics used by pitch space.
- 
- 
+    A graph of dynamics used by pitch space. 
 
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.* 
-        :width: 600    
- 
+        :width: 600
 
     inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
@@ -1008,13 +885,9 @@ PlotStream
 
 .. class:: PlotStream(streamObj, flatten=True, *args, **keywords)
 
-    Approaches to plotting and graphing a stream. A base class from which Stream plotting Classes inherit.
-     
- 
+    Approaches to plotting and graphing a stream. A base class from which Stream plotting Classes inherit. 
 
-    Provide a Stream as an arguement. If `flatten` is True, the Stream will automatically be flattened.
-         
- 
+    Provide a Stream as an arguement. If `flatten` is True, the Stream will automatically be flattened. 
 
     
 
@@ -1026,163 +899,130 @@ PlotStream
 
         .. attribute:: id
 
-            
-         Each PlotStream has a unique id that consists of its format and a string that defines the parameters that are graphed.
-         
- 
+            Each PlotStream has a unique id that consists of its format and a string that defines the parameters that are graphed. 
 
     **PlotStream** **methods**
 
         .. method:: process()
 
-            This will process all data, as well as call the done() method. What happens when the done() is called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph).
-         
- 
+            This will process all data, as well as call the done() method. What happens when the done() is called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph). 
 
         .. method:: remapQuarterLength(x)
 
-            Remap all quarter lengths.
-         
- 
+            Remap all quarter lengths. 
 
         .. method:: show()
 
-            Call internal Graphs show() method independently of doneAction set and run with process()
-         
- 
+            Call internal Graphs show() method independently of doneAction set and run with process() 
 
         .. method:: ticksDynamics(minNameIndex=None, maxNameIndex=None)
 
-            Utility method to get ticks in dynamic values.
- 
-         >>> from music21 import stream; s = stream.Stream()
-         >>> a = PlotStream(s)
-         >>> a.ticksDynamics()
-         [[0, 'pppppp'], [1, 'ppppp'], [2, 'pppp'], [3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp'], [7, 'mf'], [8, 'f'], [9, 'fp'], [10, 'sf'], [11, 'ff'], [12, 'fff'], [13, 'ffff'], [14, 'fffff'], [15, 'ffffff']]
- 
-         >>> a.ticksDynamics(3,6)
-         [[3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp']]
- 
-         
- 
+            Utility method to get ticks in dynamic values. 
+
+            >>> from music21 import stream; s = stream.Stream()
+            >>> a = PlotStream(s)
+            >>> a.ticksDynamics()
+            [[0, 'pppppp'], [1, 'ppppp'], [2, 'pppp'], [3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp'], [7, 'mf'], [8, 'f'], [9, 'fp'], [10, 'sf'], [11, 'ff'], [12, 'fff'], [13, 'ffff'], [14, 'fffff'], [15, 'ffffff']] 
+            >>> a.ticksDynamics(3,6)
+            [[3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp']] 
+
+            
 
         .. method:: ticksOffset(offsetMin=None, offsetMax=None, offsetStepSize=None, displayMeasureNumberZero=False, remap=False)
 
             Get offset ticks. If Measures are found, they will be used to create ticks. If not, `offsetStepSize` will be used to create offset ticks between min and max. The `remap` parameter is not yet used. 
- 
-         >>> from music21 import corpus, stream, note
-         >>> s = corpus.parseWork('bach/bwv281.xml')
-         >>> a = PlotStream(s)
-         >>> a.ticksOffset() # on whole score
-         [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']]
- 
-         >>> a = PlotStream(s[0]) # on a Part
-         >>> a.ticksOffset() # on whole score
-         [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']]
-         >>> a.ticksOffset(8, 12, 2)
-         [[8.0, '2'], [12.0, '3']]
- 
-         >>> a = PlotStream(s[0].flat) # on a Flat collection
-         >>> a.ticksOffset(8, 12, 2)
-         [[8.0, '2'], [12.0, '3']]
- 
-         >>> n = note.Note('a') # on a raw collection of notes with no measures
-         >>> s = stream.Stream()
-         >>> s.repeatAppend(n, 10)
-         >>> a = PlotStream(s) # on a Part
-         >>> a.ticksOffset() # on whole score
-         [[0, '0'], [10, '10']]
-         
- 
+
+            >>> from music21 import corpus, stream, note
+            >>> s = corpus.parseWork('bach/bwv281.xml')
+            >>> a = PlotStream(s)
+            >>> a.ticksOffset() # on whole score
+            [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']] 
+            >>> a = PlotStream(s[0]) # on a Part
+            >>> a.ticksOffset() # on whole score
+            [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']] 
+            >>> a.ticksOffset(8, 12, 2)
+            [[8.0, '2'], [12.0, '3']] 
+            >>> a = PlotStream(s[0].flat) # on a Flat collection
+            >>> a.ticksOffset(8, 12, 2)
+            [[8.0, '2'], [12.0, '3']] 
+            >>> n = note.Note('a') # on a raw collection of notes with no measures
+            >>> s = stream.Stream()
+            >>> s.repeatAppend(n, 10)
+            >>> a = PlotStream(s) # on a Part
+            >>> a.ticksOffset() # on whole score
+            [[0, '0'], [10, '10']] 
 
         .. method:: ticksPitchClass(pcMin=0, pcMax=11)
 
-            Utility method to get ticks in pitch classes
- 
-         >>> from music21 import corpus
-         >>> s = corpus.parseWork('bach/bwv324.xml')
-         >>> a = PlotStream(s)
-         >>> a.ticksPitchClass()
-         [[0, 'C'], [1, 'C#'], [2, 'D'], [3, 'D#'], [4, 'E'], [5, 'F'], [6, 'F#'], [7, 'G'], [8, 'G#'], [9, 'A'], [10, 'A#'], [11, 'B']]
-         
- 
+            Utility method to get ticks in pitch classes 
+
+            >>> from music21 import corpus
+            >>> s = corpus.parseWork('bach/bwv324.xml')
+            >>> a = PlotStream(s)
+            >>> a.ticksPitchClass()
+            [[0, 'C'], [1, 'C#'], [2, 'D'], [3, 'D#'], [4, 'E'], [5, 'F'], [6, 'F#'], [7, 'G'], [8, 'G#'], [9, 'A'], [10, 'A#'], [11, 'B']] 
 
         .. method:: ticksPitchClassUsage(pcMin=0, pcMax=11, showEnharmonic=True, blankLabelUnused=True, hideUnused=False)
 
-            Get ticks and labels for pitch classes based on usage. That is, show the most commonly used enharmonic first.
- 
-         >>> from music21 import corpus
-         >>> s = corpus.parseWork('bach/bwv324.xml')
-         >>> a = PlotStream(s)
-         >>> a.ticksPitchClassUsage(hideUnused=True)
-         [[0, u'C'], [2, u'D'], [3, u'D#'], [4, u'E'], [6, u'F#'], [7, u'G'], [9, u'A'], [11, u'B']]
- 
-         >>> s = corpus.parseWork('bach/bwv281.xml')
-         >>> a = PlotStream(s)
-         >>> a.ticksPitchClassUsage(showEnharmonic=True, hideUnused=True)
-         [[0, u'C'], [2, u'D'], [3, u'Eb'], [4, u'E'], [5, u'F'], [7, u'G'], [9, u'A'], [10, u'Bb'], [11, u'B']]
-         >>> a.ticksPitchClassUsage(showEnharmonic=True, blankLabelUnused=False)
-         [[0, u'C'], [1, 'C#'], [2, u'D'], [3, u'Eb'], [4, u'E'], [5, u'F'], [6, 'F#'], [7, u'G'], [8, 'G#'], [9, u'A'], [10, u'Bb'], [11, u'B']]
- 
-         >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
-         >>> a = PlotStream(s)
-         >>> a.ticksPitchClassUsage(showEnharmonic=True)
-         [[0, u'C'], [1, u'Db/C#'], [2, u'D'], [3, u'Eb/D#'], [4, u'E'], [5, u'F'], [6, u'F#'], [7, u'G'], [8, u'Ab/G#'], [9, u'A'], [10, u'Bb'], [11, u'B']]
- 
- 
+            Get ticks and labels for pitch classes based on usage. That is, show the most commonly used enharmonic first. 
+
+            >>> from music21 import corpus
+            >>> s = corpus.parseWork('bach/bwv324.xml')
+            >>> a = PlotStream(s)
+            >>> a.ticksPitchClassUsage(hideUnused=True)
+            [[0, u'C'], [2, u'D'], [3, u'D#'], [4, u'E'], [6, u'F#'], [7, u'G'], [9, u'A'], [11, u'B']] 
+            >>> s = corpus.parseWork('bach/bwv281.xml')
+            >>> a = PlotStream(s)
+            >>> a.ticksPitchClassUsage(showEnharmonic=True, hideUnused=True)
+            [[0, u'C'], [2, u'D'], [3, u'Eb'], [4, u'E'], [5, u'F'], [7, u'G'], [9, u'A'], [10, u'Bb'], [11, u'B']] 
+            >>> a.ticksPitchClassUsage(showEnharmonic=True, blankLabelUnused=False)
+            [[0, u'C'], [1, 'C#'], [2, u'D'], [3, u'Eb'], [4, u'E'], [5, u'F'], [6, 'F#'], [7, u'G'], [8, 'G#'], [9, u'A'], [10, u'Bb'], [11, u'B']] 
+            >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
+            >>> a = PlotStream(s)
+            >>> a.ticksPitchClassUsage(showEnharmonic=True)
+            [[0, u'C'], [1, u'Db/C#'], [2, u'D'], [3, u'Eb/D#'], [4, u'E'], [5, u'F'], [6, u'F#'], [7, u'G'], [8, u'Ab/G#'], [9, u'A'], [10, u'Bb'], [11, u'B']] 
 
         .. method:: ticksPitchSpaceChromatic(pitchMin=36, pitchMax=100)
 
-            Utility method to get ticks in pitch space values.
- 
-         >>> from music21 import stream; s = stream.Stream()
-         >>> a = PlotStream(s)
-         >>> a.ticksPitchSpaceChromatic(60,72)
-         [[60, 'C4'], [61, 'C#4'], [62, 'D4'], [63, 'D#4'], [64, 'E4'], [65, 'F4'], [66, 'F#4'], [67, 'G4'], [68, 'G#4'], [69, 'A4'], [70, 'A#4'], [71, 'B4'], [72, 'C5']]
-         
- 
+            Utility method to get ticks in pitch space values. 
+
+            >>> from music21 import stream; s = stream.Stream()
+            >>> a = PlotStream(s)
+            >>> a.ticksPitchSpaceChromatic(60,72)
+            [[60, 'C4'], [61, 'C#4'], [62, 'D4'], [63, 'D#4'], [64, 'E4'], [65, 'F4'], [66, 'F#4'], [67, 'G4'], [68, 'G#4'], [69, 'A4'], [70, 'A#4'], [71, 'B4'], [72, 'C5']] 
 
         .. method:: ticksPitchSpaceOctave(pitchMin=36, pitchMax=100)
 
-            Utility method to get ticks in pitch space only for every octave.
- 
-         >>> from music21 import stream; s = stream.Stream()
-         >>> a = PlotStream(s)
-         >>> a.ticksPitchSpaceOctave()
-         [[36, 'C2'], [48, 'C3'], [60, 'C4'], [72, 'C5'], [84, 'C6'], [96, 'C7']]
-         
- 
+            Utility method to get ticks in pitch space only for every octave. 
+
+            >>> from music21 import stream; s = stream.Stream()
+            >>> a = PlotStream(s)
+            >>> a.ticksPitchSpaceOctave()
+            [[36, 'C2'], [48, 'C3'], [60, 'C4'], [72, 'C5'], [84, 'C6'], [96, 'C7']] 
 
         .. method:: ticksPitchSpaceUsage(pcMin=36, pcMax=72, showEnharmonic=False, blankLabelUnused=True, hideUnused=False)
 
-            Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first.
- 
-         >>> from music21 import corpus
-         >>> s = corpus.parseWork('bach/bwv324.xml')
-         >>> a = PlotStream(s[0])
-         >>> a.ticksPitchSpaceUsage(hideUnused=True)
-         [[64, u'E4'], [66, u'F#4'], [67, u'G4'], [69, u'A4'], [71, u'B4'], [72, u'C5']]
- 
-         >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
-         >>> a = PlotStream(s)
-         >>> a.ticksPitchSpaceUsage(showEnharmonic=True, hideUnused=True)
-         [[36, u'C2'], [38, u'D2'], [40, u'E2'], [41, u'F2'], [43, u'G2'], [44, u'Ab2'], [45, u'A2'], [47, u'B2'], [48, u'C3'], [50, u'D3'], [51, u'Eb3/D#3'], [52, u'E3'], [53, u'F3'], [54, u'F#3'], [55, u'G3'], [56, u'Ab3/G#3'], [57, u'A3'], [58, u'Bb3'], [59, u'B3'], [60, u'C4'], [61, u'Db4/C#4'], [62, u'D4'], [63, u'Eb4/D#4'], [64, u'E4'], [65, u'F4'], [66, u'F#4'], [67, u'G4'], [68, u'Ab4/G#4'], [69, u'A4'], [70, u'Bb4'], [71, u'B4'], [72, u'C5']]
- 
- 
+            Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first. 
+
+            >>> from music21 import corpus
+            >>> s = corpus.parseWork('bach/bwv324.xml')
+            >>> a = PlotStream(s[0])
+            >>> a.ticksPitchSpaceUsage(hideUnused=True)
+            [[64, u'E4'], [66, u'F#4'], [67, u'G4'], [69, u'A4'], [71, u'B4'], [72, u'C5']] 
+            >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
+            >>> a = PlotStream(s)
+            >>> a.ticksPitchSpaceUsage(showEnharmonic=True, hideUnused=True)
+            [[36, u'C2'], [38, u'D2'], [40, u'E2'], [41, u'F2'], [43, u'G2'], [44, u'Ab2'], [45, u'A2'], [47, u'B2'], [48, u'C3'], [50, u'D3'], [51, u'Eb3/D#3'], [52, u'E3'], [53, u'F3'], [54, u'F#3'], [55, u'G3'], [56, u'Ab3/G#3'], [57, u'A3'], [58, u'Bb3'], [59, u'B3'], [60, u'C4'], [61, u'Db4/C#4'], [62, u'D4'], [63, u'Eb4/D#4'], [64, u'E4'], [65, u'F4'], [66, u'F#4'], [67, u'G4'], [68, u'Ab4/G#4'], [69, u'A4'], [70, u'Bb4'], [71, u'B4'], [72, u'C5']] 
 
         .. method:: ticksQuarterLength(min=0.25, max=4, remap=True)
 
             Get ticks for quarterLength. If `remap` is True, the remapQuarterLength() function will be used to scale displayed quarter lengths by log base 2. 
- 
-         >>> from music21 import stream; s = stream.Stream()
-         >>> a = PlotStream(s)
-         
- 
+
+            >>> from music21 import stream; s = stream.Stream()
+            >>> a = PlotStream(s)
 
         .. method:: write(fp=None)
 
-            Call internal Graphs write() method independently of doneAction set and run with process()
-         
- 
+            Call internal Graphs write() method independently of doneAction set and run with process() 
 
 
