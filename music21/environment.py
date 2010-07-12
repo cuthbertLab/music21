@@ -108,7 +108,7 @@ class Environment(object):
         self.ref = {}
         self.loadDefaults() # defines all valid keys in ref
         # read will only right over values if set in field
-        self.read()
+        self.read() # load a stored file if available
         # store the name of the module that is using this object
         # this is used for printing debug information
         self.modNameParent = modName
@@ -150,11 +150,28 @@ class Environment(object):
                 ]:
                 self.__setitem__(name, value) # use for key checking
 
+
+    def restoreDefaults(self):
+        '''Restore only defaults for all parameters. Useful for testing. 
+
+        >>> from music21 import *
+        >>> a = music21.environment.Environment()
+        >>> a['debug'] = 1
+        >>> a.restoreDefaults()
+        >>> a['debug']
+        0
+        '''
+        self.printDebug(['restoring Environment defaults'])
+        self.ref = {}
+        self.loadDefaults() # defines all valid keys in ref
+
+
     def __getitem__(self, key):
         '''Dictionary like getting. 
         '''
         # could read file here to update from disk
-        # could store last update tiem and look of file is more recent
+        # could store last update tim and look of file is more recent
+        # how, only doing read once is a bit more conservative
         #self.read()
         if key not in self.ref.keys():
             raise EnvironmentException('no preference: %s' % key)

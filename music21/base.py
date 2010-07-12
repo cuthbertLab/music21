@@ -51,6 +51,7 @@ VERSION = (0, 2, 4)  # increment any time picked versions will be obsolete.
 VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a2'
 WEAKREF_ACTIVE = True
 
+
 #-------------------------------------------------------------------------------
 class Music21Exception(Exception):
     pass

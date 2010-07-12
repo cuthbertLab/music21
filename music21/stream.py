@@ -6884,7 +6884,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[1].flat.notes), 42)
         self.assertEqual(len(s.parts[2].flat.notes), 45)
         self.assertEqual(len(s.parts[3].flat.notes), 41)
-        s.show()
+
         # perform strip ties in place
         s.stripTies(inPlace=True)
 

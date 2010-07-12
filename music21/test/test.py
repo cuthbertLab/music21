@@ -39,6 +39,7 @@ class ModuleGather(object):
         self.moduleSkip = [
             'test.py', 
             'testExternal.py', 
+            'testDefault.py', 
             'timePerformance.py',
             '__init__.py', 
             'timeGraphs.py',
@@ -73,7 +74,7 @@ class ModuleGather(object):
         fn = fn.replace('.py', '')
         return fn
      
-    def load(self):
+    def load(self, restoreEnvironmentDefaults=False):
         loadPass = []
         loadFail = []
         modules = []
@@ -99,6 +100,10 @@ class ModuleGather(object):
                 environLocal.printDebug(['failed import:', fp, '\n', 
                     '\tEXCEPTION:', str(excp).strip()])
                 continue
+
+            if restoreEnvironmentDefaults:
+                if hasattr(mod, 'environLocal'):
+                    mod.environLocal.restoreDefaults()
             modules.append(mod)
 
         return modules
@@ -107,7 +112,7 @@ class ModuleGather(object):
 
 
 
-def main(testGroup=['test']):
+def main(testGroup=['test'], restoreEnvironmentDefaults=False):
     '''Run all tests. Group can be test and external
 
     >>> print(None)
@@ -119,7 +124,7 @@ def main(testGroup=['test']):
         optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
 
     modGather = ModuleGather()
-    modules = modGather.load()
+    modules = modGather.load(restoreEnvironmentDefaults)
 
     environLocal.printDebug('looking for Test classes...\n')
 
