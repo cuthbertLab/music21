@@ -5714,11 +5714,10 @@ class Score(Stream):
 
 
     def stripTies(self, inPlace=False, matchByPitch=False):
-        '''Apply strip ties to each Part contained within this Score. 
+        '''Apply strip ties to each class:`~music21.part.Part` contained within this Score. 
 
-        Note that this presently does not retain Measures. 
+        This method will retain class:`~music21.part.Measure` objects and Parts.
         '''
-        # TODO: this needs to be tested and re-worked to retain measures
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
@@ -5727,8 +5726,8 @@ class Score(Stream):
         for p in returnObj.getElementsByClass(Part):
             # strip ties will use the appropriate flat presentation
             # in place: already have a copy if nec
-            p.stripTies(inPlace=True, matchByPitch=matchByPitch) 
-
+            p.stripTies(inPlace=True, matchByPitch=matchByPitch,
+                         retainContainers=True) 
         return returnObj
         
 
@@ -6843,38 +6842,56 @@ class Test(unittest.TestCase):
     def testStripTiesScore(self):
         '''Test stripTies using the Score method
         '''
-        # TODO: this is not yet fully implemented
 
-        from music21 import corpus
+        from music21 import corpus, converter
+        from music21.musicxml import testPrimitive
         import music21
-        
+
+        s = converter.parse(testPrimitive.multiMeasureTies)
+        self.assertEqual(len(s.parts), 4)
+
+        self.assertEqual(len(s.parts[0].flat.notes), 16)
+        self.assertEqual(len(s.parts[1].flat.notes), 16)
+        self.assertEqual(len(s.parts[2].flat.notes), 16)
+        self.assertEqual(len(s.parts[3].flat.notes), 16)
+
+        # first, in place false
+        sPost = s.stripTies(inPlace=False)
+
+        self.assertEqual(len(sPost.parts[0].flat.notes), 6)
+        self.assertEqual(len(sPost.parts[1].flat.notes), 5)
+        self.assertEqual(len(sPost.parts[2].flat.notes), 3)
+        self.assertEqual(len(sPost.parts[3].flat.notes), 10)
+
+        # make sure original is unchchanged
+        self.assertEqual(len(s.parts[0].flat.notes), 16)
+        self.assertEqual(len(s.parts[1].flat.notes), 16)
+        self.assertEqual(len(s.parts[2].flat.notes), 16)
+        self.assertEqual(len(s.parts[3].flat.notes), 16)
+
+        # second, in place true
+        sPost = s.stripTies(inPlace=True)
+        self.assertEqual(len(s.parts[0].flat.notes), 6)
+        self.assertEqual(len(s.parts[1].flat.notes), 5)
+        self.assertEqual(len(s.parts[2].flat.notes), 3)
+        self.assertEqual(len(s.parts[3].flat.notes), 10)
+
+        # just two ties here
         s = corpus.parseWork('bach/bwv66.6')
-        self.assertEqual(len(s), 5)
+        self.assertEqual(len(s.parts), 4)
 
-        parts = s.getElementsByClass(music21.stream.Part)
-        self.assertEqual(len(parts), 4)
+        self.assertEqual(len(s.parts[0].flat.notes), 37)
+        self.assertEqual(len(s.parts[1].flat.notes), 42)
+        self.assertEqual(len(s.parts[2].flat.notes), 45)
+        self.assertEqual(len(s.parts[3].flat.notes), 41)
+        s.show()
+        # perform strip ties in place
+        s.stripTies(inPlace=True)
 
-        self.assertEqual(len(parts[0].flat.notes), 37)
-        self.assertEqual(len(parts[1].flat.notes), 42)
-        self.assertEqual(len(parts[2].flat.notes), 45)
-        self.assertEqual(len(parts[3].flat.notes), 41)
-
-        # perform strip ties
-#         s = s.stripTies(inPlace=False)
-# 
-#         self.assertEqual(len(s), 5)
-#         parts = s.getElementsByClass(music21.stream.Part)
-#         self.assertEqual(len(parts), 4)
-# 
-#         self.assertEqual(len(parts[0].flat.notes), 37)
-#         self.assertEqual(len(parts[1].flat.notes), 42)
-#         self.assertEqual(len(parts[2].flat.notes), 45)
-#         self.assertEqual(len(parts[3].flat.notes), 41)
-# 
-#         s.stripTies()
-
-
-
+        self.assertEqual(len(s.parts[0].flat.notes), 36)
+        self.assertEqual(len(s.parts[1].flat.notes), 42)
+        self.assertEqual(len(s.parts[2].flat.notes), 44)
+        self.assertEqual(len(s.parts[3].flat.notes), 41)
 
 
 
