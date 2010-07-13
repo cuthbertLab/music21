@@ -1139,17 +1139,16 @@ class DurationUnit(DurationCommon):
         >>> cDur == bDur        
         True
         '''
-        if not isinstance(other, DurationCommon):
+        if other == None or not isinstance(other, DurationCommon):
             return False
 
-        if (self.type == other.type and 
-            self.dots == other.dots and 
-            self.tuplets == other.tuplets and 
-            #self.linkStatus == other.linkStatus and
-            self.quarterLength == other.quarterLength):
-            return True
-        else:
-            return False
+        if self.type == other.type:
+            if self.dots == other.dots:
+                if self.tuplets == other.tuplets:
+                #self.linkStatus == other.linkStatus and
+                    if self.quarterLength == other.quarterLength:
+                        return True
+        return False
 
     def __ne__(self, other):
         '''Test not equality.
@@ -1556,6 +1555,46 @@ class Duration(DurationCommon):
         '''Provide a representation.
         '''
         return '<music21.duration.Duration %s>' % self.quarterLength
+
+
+
+    def __eq__(self, other):
+        '''Test equality. Note: this may not work with Tuplets until we 
+        define equality tests for tuplets.
+
+        >>> aDur = Duration('quarter')
+        >>> bDur = Duration('16th') 
+        >>> cDur = Duration('16th') 
+        >>> aDur == bDur
+        False
+        >>> cDur == bDur        
+        True
+        '''
+        if other == None or not isinstance(other, DurationCommon):
+            return False
+
+        if self.isComplex == other.isComplex:
+            if self.type == other.type:
+                if self.dots == other.dots:
+                    if self.tuplets == other.tuplets:
+                    #self.linkStatus == other.linkStatus and
+                        if self.quarterLength == other.quarterLength:
+                            return True
+        return False
+
+    def __ne__(self, other):
+        '''Test not equality.
+
+        >>> aDur = Duration('quarter')
+        >>> bDur = Duration('16th') 
+        >>> cDur = Duration('16th') 
+        >>> aDur != bDur
+        True
+        >>> cDur != bDur        
+        False
+        '''
+        return not self.__eq__(other)
+
 
     def updateQuarterLength(self):
         '''Look to components and determine quarter length.

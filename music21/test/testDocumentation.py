@@ -15,6 +15,9 @@ import doctest, unittest
 
 import music21
 from music21 import corpus, stream, note, meter
+from music21 import environment
+_MOD = "test.testDocumentation.py"  
+environLocal = environment.Environment(_MOD)
 
 
 
@@ -68,7 +71,7 @@ class Test(unittest.TestCase):
         s.insert(4.5, n4)
 
 
-    def testOverviewMeter(self):
+    def testOverviewMeterA(self):
 
         sSrc = corpus.parseWork('bach/bwv13.6.xml')
         sPart = sSrc.getElementById('Bass')
@@ -137,22 +140,41 @@ class Test(unittest.TestCase):
             n.addLyric(n.beatStr)
         post = sPart.musicxml
 
-        sPart = sSrc.getElementById('Alto')
-        sMeasures = sPart.flat.notes.makeMeasures(meter.TimeSignature('6/8'))
-        sMeasures.makeTies(inPlace=True)
-        for n in sMeasures.flat.notes:
-            n.addLyric(n.beatStr)
-        post = sMeasures.musicxml
 
         # meter terminal objects
         mt = meter.MeterTerminal('3/4')
         self.assertEquals(mt.numerator, 3)
 
 
+    def testOverviewMeterB(self):
+
+        sSrc = corpus.parseWork('bach/bwv13.6.xml')
+
+        sPart = sSrc.getElementById('Alto')
+        ts = meter.TimeSignature('6/8')
+
+        sMeasures = sPart.flat.notes.makeMeasures(ts)
+        #sMeasures.show('t')
+
+        sMeasures.makeTies(inPlace=True)
+
+        # we have the same time signature value, but not the same object
+        self.assertEquals(sMeasures[0].timeSignature.numerator, ts.numerator)
+        self.assertEquals(sMeasures[0].timeSignature.denominator,
+                         ts.denominator)
+        # only have ts in first bar
+        self.assertEquals(sMeasures[1].timeSignature, None)
+
+        for n in sMeasures.flat.notes:
+            n.addLyric(n.beatStr)
+            #environLocal.printDebug(['offset/parent', n, n.offset, n.parent, beatStr, 'bestMeasure:', beatMeasure])
+
+        #sMeasures.show()
+        post = sMeasures.musicxml
+
 
 
     def testExamples(self):
-
 
         from music21 import stream, corpus
         src = corpus.parseWork('bach/bwv323.xml')
@@ -179,4 +201,6 @@ if __name__ == "__main__":
         a = Test()
 
 
-        a.testExamples()
+        #a.testExamples()
+
+        a.testOverviewMeterB()

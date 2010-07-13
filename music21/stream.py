@@ -393,6 +393,8 @@ class Stream(music21.Music21Object):
 
         No matches are found, an empty list is returned.
 
+        Matching is based exclusively on id() of objects.
+
         >>> s = Stream()
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('g#')
@@ -409,7 +411,7 @@ class Stream(music21.Music21Object):
         '''
         iMatch = []
         for i in range(len(self._elements)):
-            if self._elements[i] == obj:
+            if id(self._elements[i]) == id(obj):
                 iMatch.append(i)
             elif (hasattr(self._elements[i], "obj") and \
                      obj == self._elements[i].obj):
@@ -442,11 +444,17 @@ class Stream(music21.Music21Object):
         >>> s = Stream()
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('g#')
+        >>> # copies of an object are not the same as the object
+        >>> n3 = copy.deepcopy(n2)
         >>> s.insert(10, n1)
         >>> s.insert(5, n2)
         >>> s.remove(n1)
         >>> len(s)
         1
+        >>> s.insert(20, n3)
+        >>> s.remove(n3)
+        >>> [e for e in s] == [n2]
+        True
         '''
         iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
         match = []
@@ -1329,8 +1337,14 @@ class Stream(music21.Music21Object):
         110.0
         '''
         post = None
-        for element in self:
-            if element == obj:
+        for e in self._elements:
+            # must compare id(), not elements directly
+            # TODO: need to test with ElementWrapper
+            if isinstance(e, music21.ElementWrapper):
+                compareObj = e.obj
+            else:
+                compareObj = e
+            if id(compareObj) == id(obj):
                 post = obj.getOffsetBySite(self)
                 break
         return post
@@ -2317,7 +2331,6 @@ class Stream(music21.Music21Object):
             # do not include barlines
             if isinstance(e, bar.Barline):
                 continue
-            
             if hasattr(e, 'duration') and e.duration is not None:
                 dur = e.duration.quarterLength
             else:
@@ -2697,12 +2710,21 @@ class Stream(music21.Music21Object):
             noteStream = m.notes
             if len(noteStream) <= 1: 
                 continue # nothing to beam
+
             durList = []
             for n in noteStream:
                 durList.append(n.duration)
 
             #environLocal.printDebug(['beaming with ts', lastTimeSignature, 'measure', m, durList, noteStream[0], noteStream[1]])
 
+            # error check; call before sending to time signature, as, if this
+            # fails, it represents a problem that happens before time signature
+            # processing
+            if (sum([d.quarterLength for d in durList]) >
+                lastTimeSignature.barDuration.quarterLength):
+                raise StreamException('attempting makeBeams with a bar that contains durations that sum greater than bar duration (%s > %s)' % (sum([d.quarterLength for d in durList]), 
+                lastTimeSignature.barDuration.quarterLength))
+        
             # getBeams can take a list of Durations; however, this cannot
             # distinguish a Note from a Rest; thus, we can submit a flat 
             # stream of note or note-like entities; will return
@@ -2811,7 +2833,6 @@ class Stream(music21.Music21Object):
         >>> len(sMeasures.measures)
         4
         '''
-
         # only use inPlace arg on first usage
         measureStream = self.makeMeasures(meterStream=meterStream,
             refStreamOrTimeRange=refStreamOrTimeRange, inPlace=inPlace)
@@ -3069,7 +3090,11 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     def _getSorted(self):
         post = copy.copy(self.elements) ## already a copy
-        post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self), y.getOffsetBySite(self)) or cmp(x.priority, y.priority) or cmp(x.classSortOrder, y.classSortOrder))
+        post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self),
+            y.getOffsetBySite(self)) or 
+            cmp(x.priority, y.priority) or 
+            cmp(x.classSortOrder, y.classSortOrder)
+            )
         newStream = copy.copy(self)
         newStream.elements = post
         for e in post:
@@ -3080,11 +3105,11 @@ class Stream(music21.Music21Object):
         return newStream
     
     sorted = property(_getSorted, doc='''
-        returns a new Stream where all the elements are sorted according to offset time, then
+        Returns a new Stream where all the elements are sorted according to offset time, then
         priority, then classSortOrder (so that, for instance, a Clef at offset 0 appears before
         a Note at offset 0)
         
-        if this stream is not flat, then only the highest elements are sorted.  To sort all,
+        if this Stream is not flat, then only the highest elements are sorted.  To sort all,
         run myStream.flat.sorted
         
         For instance, here is an unsorted Stream
@@ -4338,8 +4363,7 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getDurSpan(self, flatStream):
-        '''Given elementsSorted, create a list of parallel
-        values that represent dur spans, or start and end times.
+        '''Given a flat stream, create a list of the start and end times (as a tuple pair) of all elements in the Stream.
 
         >>> a = Stream()
         >>> a.repeatInsert(note.HalfNote(), range(5))
@@ -4347,13 +4371,12 @@ class Stream(music21.Music21Object):
         [(0.0, 2.0), (1.0, 3.0), (2.0, 4.0), (3.0, 5.0), (4.0, 6.0)]
         '''
         post = []        
-        for i in range(len(flatStream)):
-            element = flatStream[i]
-            if element.duration is None:
-                durSpan = (element.offset, element.offset)
+        for e in flatStream:
+            if e.duration == None:
+                durSpan = (e.offset, e.offset)
             else:
-                dur = element.duration.quarterLength
-                durSpan = (element.offset, element.offset+dur)
+                dur = e.duration.quarterLength
+                durSpan = (e.offset, e.offset+dur)
             post.append(durSpan)
         # assume this is already sorted 
         # index found here will be the same as elementsSorted
@@ -4396,7 +4419,6 @@ class Stream(music21.Music21Object):
         return found
 
 
-
     def _findLayering(self, flatStream, includeDurationless=True,
                    includeEndBoundary=False):
         '''Find any elements in an elementsSorted list that have simultaneities 
@@ -4423,11 +4445,12 @@ class Stream(music21.Music21Object):
         for i in range(len(durSpanSorted)):
             src = durSpanSorted[i]
             # second entry is duration
-            if not includeDurationless and flatStream[i].duration is None: 
+            if not includeDurationless and flatStream[i].duration == None: 
                 continue
             # compare to all past and following durations
             for j in range(len(durSpanSorted)):
-                if j == i: continue # do not compare to self
+                if j == i: # index numbers
+                    continue # do not compare to self
                 dst = durSpanSorted[j]
                 # print src, dst, self._durSpanOverlap(src, dst, includeEndBoundary)
         
@@ -4470,7 +4493,10 @@ class Stream(music21.Music21Object):
                     # to store the src element below
                     store = True
                     for key in post.keys():
-                        if elementObj in post[key]:
+                        # this comparison needs to be based on object id, not
+                        # matching equality
+                        if id(elementObj) in [id(e) for e in post[key]]:
+                        # if elementObj in post[key]:
                             store = False
                             dstOffset = key
                             break
@@ -4485,7 +4511,8 @@ class Stream(music21.Music21Object):
                 # check if this object has been stored anywhere yet
                 store = True
                 for key in post.keys():
-                    if srcElementObj in post[key]:
+                    if id(srcElementObj) in [id(e) for e in post[key]]:
+                    #if srcElementObj in post[key]:
                         store = False
                         break
                 # dst offset may have been set when looking at indices
@@ -4502,9 +4529,7 @@ class Stream(music21.Music21Object):
 
 
     def findGaps(self):
-        '''
-        returns either (1) a Stream containing Elements (that wrap the None object)
-        whose offsets and durations are the length of gaps in the Stream
+        '''Returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream
         or (2) None if there are no gaps.
         
         N.B. there may be gaps in the flattened representation of the stream
@@ -4578,11 +4603,10 @@ class Stream(music21.Music21Object):
         Find any elements that overlap. Overlaping might include elements
         that have no duration but that are simultaneous. 
         Whether elements with None durations are included is determined by includeDurationless.
-        
-        CHRIS: What does this return? and how can someone use this?
-        
-        This example demonstrates end-joing overlaps: there are four quarter notes each
-        following each other. Whether or not these count as overlaps
+                
+        This method returns a dictionary, where keys are the start time of the first overlap and value are a list of all objects included in that overlap group. 
+
+        This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps
         is determined by the includeEndBoundary parameter. 
 
         >>> a = Stream()
@@ -4623,12 +4647,17 @@ class Stream(music21.Music21Object):
         >>> d = a.getOverlaps() 
         >>> len(d[0])
         7
+
+
         '''
         checkSimultaneity = False
         checkOverlap = True
         elementsSorted = self.flat.sorted
         simultaneityMap, overlapMap = self._findLayering(elementsSorted, 
                                 includeDurationless, includeEndBoundary)
+        #environLocal.printDebug(['simultaneityMap map', simultaneityMap])
+        #environLocal.printDebug(['overlapMap', overlapMap])
+
         return self._consolidateLayering(elementsSorted, overlapMap)
 
 
@@ -6183,7 +6212,7 @@ class Test(unittest.TestCase):
 
 
 
-    def testOverlaps(self):
+    def testOverlapsA(self):
         a = Stream()
         # here, the thir item overlaps with the first
         for offset, dur in [(0,12), (3,2), (11,3)]:
@@ -6231,6 +6260,51 @@ class Test(unittest.TestCase):
         post = a._consolidateLayering(a.flat, overlapMap)
 
 
+
+    def testOverlapsB(self):
+
+        a = Stream()
+        for x in range(4):
+            n = note.Note('G#')
+            n.duration = duration.Duration('quarter')
+            n.offset = x * 1
+            a.insert(n)
+        d = a.getOverlaps(True, False) 
+        # no overlaps
+        self.assertEqual(len(d), 0)
+
+        
+        # including coincident boundaries
+        d = a.getOverlaps(includeDurationless=True, includeEndBoundary=True) 
+        environLocal.printDebug(['testOverlapsB', d])
+        # return one dictionary that has a reference to each note that 
+        # is in the same overlap group
+        self.assertEqual(len(d), 1)
+        self.assertEqual(len(d[0]), 4)
+
+
+#         a = Stream()
+#         for x in [0,0,0,0,13,13,13]:
+#             n = note.Note('G#')
+#             n.duration = duration.Duration('half')
+#             n.offset = x
+#             a.insert(n)
+#         d = a.getOverlaps() 
+#         len(d[0])
+#         4
+#         len(d[13])
+#         3
+#         a = Stream()
+#         for x in [0,0,0,0,3,3,3]:
+#             n = note.Note('G#')
+#             n.duration = duration.Duration('whole')
+#             n.offset = x
+#             a.insert(n)
+# 
+#         # default is to not include coincident boundaries
+#         d = a.getOverlaps() 
+#         len(d[0])
+#         7
 
     def testStreamDuration(self):
         a = Stream()
@@ -8521,6 +8595,9 @@ if __name__ == "__main__":
         b = TestExternal()
 
 
-        a.testStripTiesBuilt()
-        a.testStripTiesImported()
-        a.testStripTiesScore()
+#         a.testStripTiesBuilt()
+#         a.testStripTiesImported()
+#         a.testStripTiesScore()
+
+        a.testOverlapsA()
+        a.testOverlapsB()

@@ -27,7 +27,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-class ClefException(Exception):
+class ArticulationException(Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -38,6 +38,55 @@ class Articulation(music21.Music21Object):
         music21.Music21Object.__init__(self)
         self._mxName = None # specified in subclasses
         self.placement = 'above'
+
+    def __eq__(self, other):
+        '''Equality. Based only on the class name, as not other attributes are independent of context and deployment.
+
+        >>> at1 = StrongAccent()
+        >>> at2 = StrongAccent()
+        >>> at3 = Accent()
+        >>> at4 = Staccatissimo()
+        >>> at5 = Staccato()
+        >>> at6 = Spiccato()
+        >>> at1 == at2
+        True
+        >>> at1 == at3
+        False
+        >>> at6 == at6
+        True
+        >>> [at1, at4, at3] == [at1, at4, at3]
+        True
+        >>> [at1, at2, at3] == [at2, at3, at1]
+        False
+        >>> set([at1, at2, at3]) == set([at2, at3, at1])
+        True 
+        >>> at6 == None
+        False
+        '''
+        # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
+        if other == None or not isinstance(other, Articulation):
+            return False
+        elif self.__class__ == other.__class__:
+            return True
+        return False
+
+    def __ne__(self, other):
+        '''Inequality. Needed for pitch comparisons.
+
+        >>> at1 = StrongAccent()
+        >>> at2 = StrongAccent()
+        >>> at3 = Accent()
+        >>> at4 = Staccatissimo()
+        >>> at5 = Staccato()
+        >>> at6 = Spiccato()
+        >>> at1 != at2
+        False
+        >>> at1 != at3
+        True
+        '''
+        return not self.__eq__(other)
+
+
 
     def _getMX(self):
         '''Return an mxArticulationMark

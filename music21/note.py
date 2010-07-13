@@ -110,6 +110,29 @@ class Tie(music21.Music21Object):
     mx = property(_getMX, _setMX)
 
 
+    def __eq__(self, other):
+        '''Equality. Based on attributes (such as pitch, accidental, duration, articulations, and ornaments) that are  not dependent on the wider context of a note (such as offset, beams, stem direction).
+
+        >>> t1 = Tie('start')
+        >>> t2 = Tie('start')
+        >>> t3 = Tie('end')
+        >>> t1 == t2
+        True
+        >>> t2 == t3, t3 == t1
+        (False, False)
+        >>> t2 == None
+        False
+        '''
+        if other == None or not isinstance(other, Tie):
+            return False
+        elif self.type == other.type:
+            return True
+        return False
+
+    def __ne__(self, other):
+        '''Inequality. Needed for pitch comparisons.
+        '''
+        return not self.__eq__(other)
 
 
 
@@ -336,19 +359,23 @@ class GeneralNote(music21.Music21Object):
 
         '''
         if self.parent != None and self.parent.isMeasure:
-            environLocal.printDebug(['found parent as Measure, using for offset'])
+            #environLocal.printDebug(['found parent as Measure, using for offset'])
             offsetLocal = self.getOffsetBySite(self.parent)
         else:
             # this method-level import seems unvoidable to be sure to get the 
             # right offset
             from music21 import stream
-            m = self.getContextByClass(stream.Measure)
+            # testing sortByCreationTime == true; this may be necessary
+            # as we often want the most recent measure
+            m = self.getContextByClass(stream.Measure, sortByCreationTime=True)
             if m != None:
                 #environLocal.printDebug(['using found Measure for offset access'])            
                 offsetLocal = self.getOffsetBySite(m)
             else: # hope that we get the right one
                 environLocal.printDebug(['using standard offset access'])
                 offsetLocal = self.offset
+
+        #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])
         return offsetLocal
 
     def _getBeat(self):
@@ -397,6 +424,7 @@ class GeneralNote(music21.Music21Object):
 
     def _getBeatStr(self):
         ts = self.getContextByClass(meter.TimeSignature)
+        #environLocal.printDebug(['_getBeatStr(): found ts:', ts])
         if ts == None:
             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
         return ts.getBeatProportionStr(self._getMeasureOffset())
@@ -821,6 +849,63 @@ class Note(NotRest):
 
     def __repr__(self):
         return "<music21.note.Note %s>" % self.name
+
+
+    def __eq__(self, other):
+        '''Equality. Based on attributes (such as pitch, accidental, duration, articulations, and ornaments) that are  not dependent on the wider context of a note (such as offset, beams, stem direction).
+
+        This presently does not look at lyrics in establishing equality.
+
+        >>> n1 = Note()
+        >>> n1.pitch.name = 'G#'
+        >>> n2 = Note()
+        >>> n2.pitch.name = 'A-'
+        >>> n3 = Note()
+        >>> n3.pitch.name = 'G#'
+        >>> n1 == n2
+        False
+        >>> n1 == n3
+        True
+        >>> n3.duration.quarterLength = 3
+        >>> n1 == n3
+        False
+
+        '''
+        if other == None or not isinstance(other, Note):
+            return False
+        # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
+        if self.pitch == other.pitch: 
+            # checks type, dots, tuplets, quarterlength, uses Pitch.__eq__
+            if self.duration == other.duration:
+                # articulations are a list of Articulation objects
+                # could convert to sets to compare unordered, but this would
+                # remove reduncies
+                if set(self.articulations) == set(other.articulations):
+                    # Tie objects if present compare only type
+                    if self.tie == other.tie:
+                        return True
+        return False
+
+    def __ne__(self, other):
+        '''Inequality. 
+
+        >>> n1 = Note()
+        >>> n1.pitch.name = 'G#'
+        >>> n2 = Note()
+        >>> n2.pitch.name = 'A-'
+        >>> n3 = Note()
+        >>> n3.pitch.name = 'G#'
+        >>> n1 != n2
+        True
+        >>> n1 != n3
+        False
+        >>> n3.duration.quarterLength = 3
+        >>> n1 != n3
+        True
+        '''
+        return not self.__eq__(other)
+
+
 
     #---------------------------------------------------------------------------
     # property access

@@ -927,7 +927,7 @@ def ch2_writing_III_B(src):
     # note that ending ties are not given with tiny notation
     group = []
     for n in s2.notes:
-        environLocal.printDebug([n, n.tie])
+        #environLocal.printDebug([n, n.tie])
         if n.tie != None or len(group) > 0:
             if n.tie != None and n.tie.type != 'stop':
                 group.append(n)
@@ -941,6 +941,8 @@ def ch2_writing_III_B(src):
                     else: # remove from source
                         s2.remove(group[i])
                 group = [] # reset
+
+    environLocal.printDebug(['post editing'])
 
     return ex
 
@@ -1875,5 +1877,6 @@ if __name__ == "__main__":
         #ch2_writing_I_A_5(show=True)
 
         #ch2_writing_IV_B(show=True)
-        ch2_writing_V_A(show=True)
+        #ch2_writing_V_A(show=True)
         
+        ch2_writing_III_B_1()
