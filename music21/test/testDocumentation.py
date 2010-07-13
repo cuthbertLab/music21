@@ -165,9 +165,14 @@ class Test(unittest.TestCase):
         # only have ts in first bar
         self.assertEquals(sMeasures[1].timeSignature, None)
 
+        beatStrList = []
         for n in sMeasures.flat.notes:
-            n.addLyric(n.beatStr)
+            bs = n.beatStr
+            n.addLyric(bs)
+            beatStrList.append(bs)
             #environLocal.printDebug(['offset/parent', n, n.offset, n.parent, beatStr, 'bestMeasure:', beatMeasure])
+
+        self.assertEquals(beatStrList, ['1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '2 2/3', '1', '1 1/3', '1 2/3', '2', '2 1/3', '1', '1 2/3', '1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1', '1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3', '1', '1 1/3', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1', '1 1/3', '1 2/3', '2 1/3', '2 2/3', '1', '1 2/3', '2', '2 1/3'])
 
         #sMeasures.show()
         post = sMeasures.musicxml
