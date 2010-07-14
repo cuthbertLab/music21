@@ -3750,8 +3750,9 @@ class Stream(music21.Music21Object):
         '''Returns the stream translated into Lilypond format.'''
         if self._overriddenLily is not None:
             return self._overriddenLily
-        elif self._cache["lily"] is not None:
-            return self._cache["lily"]
+        #elif self._cache["lily"] is not None:
+        #    return self._cache["lily"]
+        # TODO: RESTORE CACHE WHEN Changes bubble up 
         
         lilyout = u" { "
 #        if self.showTimeSignature is not False and self.timeSignature is not None:

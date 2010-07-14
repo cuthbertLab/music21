@@ -222,11 +222,7 @@ GeneralNote
 
         .. attribute:: editorial
 
-            EditorialComments that can be applied to notes 
-
-            >>> a = NoteEditorial()
-            >>> a.misc
-            {} 
+            a :class:`~music21.editorial.NoteEditorial` object that stores editorial information (comments, harmonic information, ficta) and certain display information (color, hidden-state). 
 
         .. attribute:: isChord
 

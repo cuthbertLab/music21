@@ -76,6 +76,17 @@ Environment
 
             Format one or more data elements into string, and print it to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr(). 
 
+        .. method:: restoreDefaults()
+
+            Restore only defaults for all parameters. Useful for testing. 
+
+            >>> from music21 import *
+            >>> a = music21.environment.Environment()
+            >>> a['debug'] = 1
+            >>> a.restoreDefaults()
+            >>> a['debug']
+            0 
+
         .. method:: warn(msg)
 
             To print a warning to the user, send a list of strings to this method. 

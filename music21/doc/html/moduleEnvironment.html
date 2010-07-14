@@ -168,6 +168,20 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dd>Format one or more data elements into string, and print it to stderr. The first arg can be a list of string; lists are concatenated with common.formatStr().</dd></dl>
 
 <dl class="method">
+<dt id="music21.environment.Environment.restoreDefaults">
+<tt class="descname">restoreDefaults</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.environment.Environment.restoreDefaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restore only defaults for all parameters. Useful for testing.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">music21</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">Environment</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="s">&#39;debug&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">restoreDefaults</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="s">&#39;debug&#39;</span><span class="p">]</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="music21.environment.Environment.warn">
 <tt class="descname">warn</tt><big>(</big><em>msg</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.warn" title="Permalink to this definition">¶</a></dt>
 <dd>To print a warning to the user, send a list of strings to this method.</dd></dl>
@@ -230,7 +244,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 12, 2010.
+      Last updated on Jul 14, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -15,51 +15,121 @@ NoteEditorial
 
 .. class:: NoteEditorial()
 
-    EditorialComments that can be applied to notes 
+    Editorial comments and special effects that can be applied to notes Standard ones are stored as attributes.  Non-standard/one-off effects are stored in the dict called "misc":: 
 
-    >>> a = NoteEditorial()
-    >>> a.misc
-    {} 
+    >>> from music21 import *
+    >>> a = editorial.NoteEditorial()
+    >>> a.color = "blue"  # a standard editorial effect
+    >>> a.misc['backgroundHighlight'] = 'yellow'  # non-standard.
 
-    inherits from: :class:`~music21.base.Music21Object`
+    
+    Every GeneralNote object already has a NoteEditorial object 
+    attached to it at object.editorial.  Normally you will just change that 
+    object instead. 
+    For instance, take the case where a scribe 
+    wrote F in the score, knowing that a good singer would automatically 
+    sing F-sharp instead.  We can store the editorial 
+    suggestion to sing F-sharp as a "musica ficta" accidental object:: 
+
+    
+    >>> fictaSharp = pitch.Accidental("Sharp")
+    >>> n = note.Note("F")
+    >>> n.editorial.ficta = fictaSharp
+    >>> n.show('lily.png') # only Lilypond currently supports musica ficta
+
+    
+    
+
+    .. image:: images/noteEditorialFictaSharp.* 
+        :width: 103
+
+    
+
+    
+
+    
+
+    
 
     **NoteEditorial** **attributes**
+
+        .. attribute:: comment
+
+            a reference to a :class:`~music21.editorial.Comment` object 
+
+        .. attribute:: ficta
+
+            a :class:`~music21.pitch.Accidental` object that specifies musica ficta for the note.  Will only be displayed in LilyPond and then only if there is no Accidental object on the note itself 
+
+        .. attribute:: melodicInterval
+
+            an :class:`~music21.interval.Interval` object that specifies the melodic interval to the next note in this part/voice/stream, etc. 
+
+        .. attribute:: color
+
+            the color of the note (x11 colors and extended x11colors are allowed), only displays properly in lilypond 
+
+        .. attribute:: melodicIntervalOverRests
+
+            same as melodicInterval but ignoring rests; MIGHT BE REMOVED SOON 
 
         .. attribute:: misc
 
             A dict to hold anything you might like to store. 
 
-        Attributes without Documentation: `comment`, `ficta`, `melodicInterval`, `color`, `melodicIntervalOverRests`, `harmonicInterval`, `melodicIntervals`, `melodicIntervalsOverRests`
+        .. attribute:: hidden
 
-        Attributes inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classSortOrder`, :attr:`~music21.base.Music21Object.id`
+            boolean value about whether to hide the note or not (only works in lilypond) 
 
-    **NoteEditorial** **properties**
+        .. attribute:: melodicIntervals
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+            a list for storing more than one melodic interval 
+
+        .. attribute:: harmonicIntervals
+
+            a list for when you want to store more than one harmonicInterval 
+
+        .. attribute:: harmonicInterval
+
+            an :class:`~music21.interval.Interval` object that specifies the harmonic interval between this note and a single other note (useful for storing information post analysis 
+
+        .. attribute:: melodicIntervalsOverRests
+
+            same thing but a list 
 
     **NoteEditorial** **methods**
 
         .. method:: colorLilyStart()
 
-            No documentation. 
+            returns \\color "theColorName" -- called out so it is more easily subclassed 
 
         .. method:: fictaLilyStart()
 
-            No documentation. 
+            returns \\ficta -- called out so it is more easily subclassed 
 
         .. method:: lilyAttached()
 
-            No documentation. 
+            returns any information that should be attached under the note, currently just returns self.comment.lily or "" 
 
         .. method:: lilyEnd()
 
-            No documentation. 
+            returns a string (not LilyString) of editorial lily instructions to come after the note.  Currently it is just info to turn off hidding of notes. 
 
         .. method:: lilyStart()
 
-            No documentation. 
+            A method that returns a string (not LilyString) containing the lilypond output that comes before the note. 
 
-        Methods inherited from :class:`~music21.base.Music21Object`: :meth:`~music21.base.Music21Object.searchParentByAttr`, :meth:`~music21.base.Music21Object.getContextAttr`, :meth:`~music21.base.Music21Object.setContextAttr`, :meth:`~music21.base.Music21Object.addContext`, :meth:`~music21.base.Music21Object.addLocation`, :meth:`~music21.base.Music21Object.addLocationAndParent`, :meth:`~music21.base.Music21Object.freezeIds`, :meth:`~music21.base.Music21Object.getContextByClass`, :meth:`~music21.base.Music21Object.getOffsetBySite`, :meth:`~music21.base.Music21Object.getSiteIds`, :meth:`~music21.base.Music21Object.getSites`, :meth:`~music21.base.Music21Object.hasContext`, :meth:`~music21.base.Music21Object.isClass`, :meth:`~music21.base.Music21Object.purgeLocations`, :meth:`~music21.base.Music21Object.removeLocationBySite`, :meth:`~music21.base.Music21Object.removeLocationBySiteId`, :meth:`~music21.base.Music21Object.setOffsetBySite`, :meth:`~music21.base.Music21Object.show`, :meth:`~music21.base.Music21Object.unfreezeIds`, :meth:`~music21.base.Music21Object.unwrapWeakref`, :meth:`~music21.base.Music21Object.wrapWeakref`, :meth:`~music21.base.Music21Object.write`
+            >>> from music21 import *
+            >>> n = note.Note()
+            >>> n.editorial.lilyStart()
+            '' 
+            >>> n.editorial.ficta = pitch.Accidental("Sharp")
+            >>> n.editorial.color = "blue"
+            >>> n.editorial.hidden = True
+            >>> n.editorial.lilyStart()
+            '\\ficta \\color "blue" \\hideNotes ' 
+
+            
 
 
 Comment
@@ -67,6 +137,16 @@ Comment
 
 .. class:: Comment
 
+    an object that adds text above or below a note: 
+
+    >>> from music21 import *
+    >>> n = note.Note()
+    >>> n.editorial.comment.text = "hello"
+    >>> n.editorial.comment.position = "above"
+    >>> n.editorial.comment.lily
+    '^"hello"' 
+
+    
 
     x.__init__(...) initializes x; see x.__class__.__doc__ for signature 
 

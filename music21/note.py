@@ -200,6 +200,7 @@ class GeneralNote(music21.Music21Object):
     _DOC_ORDER = ['duration', 'quarterLength', 'editorial']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
+    'editorial': 'a :class:`~music21.editorial.NoteEditorial` object that stores editorial information (comments, harmonic information, ficta) and certain display information (color, hidden-state).',
     'isChord': 'Boolean read-only value describing if this object is a Chord.',
     'lyrics': 'A list of Lyric objects.',
     'tie': 'A Tie object.'
@@ -1150,11 +1151,12 @@ class Note(NotRest):
         elif (self.editorial.ficta is not None):
             baseName += self.editorial.ficta.lily
         octaveModChars = ""
-        if (self.pitch.octave < 3):
-            correctedOctave = 3 - self.octave
+        spio = self.pitch.implicitOctave
+        if (spio < 3):
+            correctedOctave = 3 - spio
             octaveModChars = ',' * correctedOctave #  C2 = c,  C1 = c,,
         else:
-            correctedOctave = self.pitch.octave - 3
+            correctedOctave = spio - 3
             octaveModChars  = '\'' * correctedOctave # C4 = c', C5 = c''  etc.
         baseName += octaveModChars
         if (self.editorial.ficta is not None):

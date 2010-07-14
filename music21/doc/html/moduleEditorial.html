@@ -95,54 +95,124 @@
 <dt id="music21.editorial.NoteEditorial">
 <em class="property">
 class </em><tt class="descclassname">music21.editorial.</tt><tt class="descname">NoteEditorial</tt><a class="headerlink" href="#music21.editorial.NoteEditorial" title="Permalink to this definition">¶</a></dt>
-<dd><p>EditorialComments that can be applied to notes</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">NoteEditorial</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">misc</span>
-<span class="go">{}</span>
+<dd><p>Editorial comments and special effects that can be applied to notes Standard ones are stored as attributes.  Non-standard/one-off effects are stored in the dict called &#8220;misc&#8221;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">editorial</span><span class="o">.</span><span class="n">NoteEditorial</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="s">&quot;blue&quot;</span>  <span class="c"># a standard editorial effect</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">misc</span><span class="p">[</span><span class="s">&#39;backgroundHighlight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;yellow&#39;</span>  <span class="c"># non-standard.</span>
 </pre></div>
 </div>
-<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
+<p>Every GeneralNote object already has a NoteEditorial object
+attached to it at object.editorial.  Normally you will just change that
+object instead.
+For instance, take the case where a scribe
+wrote F in the score, knowing that a good singer would automatically
+sing F-sharp instead.  We can store the editorial
+suggestion to sing F-sharp as a &#8220;musica ficta&#8221; accidental object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fictaSharp</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Accidental</span><span class="p">(</span><span class="s">&quot;Sharp&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">ficta</span> <span class="o">=</span> <span class="n">fictaSharp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;lily.png&#39;</span><span class="p">)</span> <span class="c"># only Lilypond currently supports musica ficta</span>
+</pre></div>
+</div>
+<img alt="_images/noteEditorialFictaSharp.png" src="_images/noteEditorialFictaSharp.png" style="width: 103px;" />
 <p><strong>NoteEditorial</strong> <strong>attributes</strong></p>
 <blockquote>
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.comment">
+<tt class="descname">comment</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.comment" title="Permalink to this definition">¶</a></dt>
+<dd>a reference to a <a title="music21.editorial.Comment" class="reference internal" href="#music21.editorial.Comment"><tt class="xref docutils literal"><span class="pre">Comment</span></tt></a> object</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.ficta">
+<tt class="descname">ficta</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.ficta" title="Permalink to this definition">¶</a></dt>
+<dd>a <a title="music21.pitch.Accidental" class="reference external" href="modulePitch.html#music21.pitch.Accidental"><tt class="xref docutils literal"><span class="pre">Accidental</span></tt></a> object that specifies musica ficta for the note.  Will only be displayed in LilyPond and then only if there is no Accidental object on the note itself</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.melodicInterval">
+<tt class="descname">melodicInterval</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.melodicInterval" title="Permalink to this definition">¶</a></dt>
+<dd>an <a title="music21.interval.Interval" class="reference external" href="moduleInterval.html#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">Interval</span></tt></a> object that specifies the melodic interval to the next note in this part/voice/stream, etc.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.color">
+<tt class="descname">color</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.color" title="Permalink to this definition">¶</a></dt>
+<dd>the color of the note (x11 colors and extended x11colors are allowed), only displays properly in lilypond</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.melodicIntervalOverRests">
+<tt class="descname">melodicIntervalOverRests</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.melodicIntervalOverRests" title="Permalink to this definition">¶</a></dt>
+<dd>same as melodicInterval but ignoring rests; MIGHT BE REMOVED SOON</dd></dl>
+
 <dl class="attribute">
 <dt id="music21.editorial.NoteEditorial.misc">
 <tt class="descname">misc</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.misc" title="Permalink to this definition">¶</a></dt>
 <dd>A dict to hold anything you might like to store.</dd></dl>
 
-<p>Attributes without Documentation: <cite>comment</cite>, <cite>ficta</cite>, <cite>melodicInterval</cite>, <cite>color</cite>, <cite>melodicIntervalOverRests</cite>, <cite>harmonicInterval</cite>, <cite>melodicIntervals</cite>, <cite>melodicIntervalsOverRests</cite></p>
-<p>Attributes inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classSortOrder" class="reference external" href="moduleBase.html#music21.base.Music21Object.classSortOrder"><tt class="xref docutils literal"><span class="pre">classSortOrder</span></tt></a>, <a title="music21.base.Music21Object.id" class="reference external" href="moduleBase.html#music21.base.Music21Object.id"><tt class="xref docutils literal"><span class="pre">id</span></tt></a></p>
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.hidden">
+<tt class="descname">hidden</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.hidden" title="Permalink to this definition">¶</a></dt>
+<dd>boolean value about whether to hide the note or not (only works in lilypond)</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.melodicIntervals">
+<tt class="descname">melodicIntervals</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.melodicIntervals" title="Permalink to this definition">¶</a></dt>
+<dd>a list for storing more than one melodic interval</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.harmonicIntervals">
+<tt class="descname">harmonicIntervals</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.harmonicIntervals" title="Permalink to this definition">¶</a></dt>
+<dd>a list for when you want to store more than one harmonicInterval</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.harmonicInterval">
+<tt class="descname">harmonicInterval</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.harmonicInterval" title="Permalink to this definition">¶</a></dt>
+<dd>an <a title="music21.interval.Interval" class="reference external" href="moduleInterval.html#music21.interval.Interval"><tt class="xref docutils literal"><span class="pre">Interval</span></tt></a> object that specifies the harmonic interval between this note and a single other note (useful for storing information post analysis</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.editorial.NoteEditorial.melodicIntervalsOverRests">
+<tt class="descname">melodicIntervalsOverRests</tt><a class="headerlink" href="#music21.editorial.NoteEditorial.melodicIntervalsOverRests" title="Permalink to this definition">¶</a></dt>
+<dd>same thing but a list</dd></dl>
+
 </blockquote>
-<p><strong>NoteEditorial</strong> <strong>properties</strong></p>
-<blockquote>
-Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></blockquote>
 <p><strong>NoteEditorial</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
 <dt id="music21.editorial.NoteEditorial.colorLilyStart">
 <tt class="descname">colorLilyStart</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.colorLilyStart" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>returns \color &#8220;theColorName&#8221; &#8211; called out so it is more easily subclassed</dd></dl>
 
 <dl class="method">
 <dt id="music21.editorial.NoteEditorial.fictaLilyStart">
 <tt class="descname">fictaLilyStart</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.fictaLilyStart" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>returns \ficta &#8211; called out so it is more easily subclassed</dd></dl>
 
 <dl class="method">
 <dt id="music21.editorial.NoteEditorial.lilyAttached">
 <tt class="descname">lilyAttached</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.lilyAttached" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>returns any information that should be attached under the note, currently just returns self.comment.lily or &#8220;&#8221;</dd></dl>
 
 <dl class="method">
 <dt id="music21.editorial.NoteEditorial.lilyEnd">
 <tt class="descname">lilyEnd</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.lilyEnd" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>returns a string (not LilyString) of editorial lily instructions to come after the note.  Currently it is just info to turn off hidding of notes.</dd></dl>
 
 <dl class="method">
 <dt id="music21.editorial.NoteEditorial.lilyStart">
 <tt class="descname">lilyStart</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.editorial.NoteEditorial.lilyStart" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd><p>A method that returns a string (not LilyString) containing the lilypond output that comes before the note.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">lilyStart</span><span class="p">()</span>
+<span class="go">&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">ficta</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">Accidental</span><span class="p">(</span><span class="s">&quot;Sharp&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="s">&quot;blue&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">lilyStart</span><span class="p">()</span>
+<span class="go">&#39;\\ficta \\color &quot;blue&quot; \\hideNotes &#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
-<p>Methods inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.searchParentByAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.searchParentByAttr"><tt class="xref docutils literal"><span class="pre">searchParentByAttr()</span></tt></a>, <a title="music21.base.Music21Object.getContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextAttr"><tt class="xref docutils literal"><span class="pre">getContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.setContextAttr" class="reference external" href="moduleBase.html#music21.base.Music21Object.setContextAttr"><tt class="xref docutils literal"><span class="pre">setContextAttr()</span></tt></a>, <a title="music21.base.Music21Object.addContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.addContext"><tt class="xref docutils literal"><span class="pre">addContext()</span></tt></a>, <a title="music21.base.Music21Object.addLocation" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocation"><tt class="xref docutils literal"><span class="pre">addLocation()</span></tt></a>, <a title="music21.base.Music21Object.addLocationAndParent" class="reference external" href="moduleBase.html#music21.base.Music21Object.addLocationAndParent"><tt class="xref docutils literal"><span class="pre">addLocationAndParent()</span></tt></a>, <a title="music21.base.Music21Object.freezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.freezeIds"><tt class="xref docutils literal"><span class="pre">freezeIds()</span></tt></a>, <a title="music21.base.Music21Object.getContextByClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.getContextByClass"><tt class="xref docutils literal"><span class="pre">getContextByClass()</span></tt></a>, <a title="music21.base.Music21Object.getOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.getOffsetBySite"><tt class="xref docutils literal"><span class="pre">getOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.getSiteIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSiteIds"><tt class="xref docutils literal"><span class="pre">getSiteIds()</span></tt></a>, <a title="music21.base.Music21Object.getSites" class="reference external" href="moduleBase.html#music21.base.Music21Object.getSites"><tt class="xref docutils literal"><span class="pre">getSites()</span></tt></a>, <a title="music21.base.Music21Object.hasContext" class="reference external" href="moduleBase.html#music21.base.Music21Object.hasContext"><tt class="xref docutils literal"><span class="pre">hasContext()</span></tt></a>, <a title="music21.base.Music21Object.isClass" class="reference external" href="moduleBase.html#music21.base.Music21Object.isClass"><tt class="xref docutils literal"><span class="pre">isClass()</span></tt></a>, <a title="music21.base.Music21Object.purgeLocations" class="reference external" href="moduleBase.html#music21.base.Music21Object.purgeLocations"><tt class="xref docutils literal"><span class="pre">purgeLocations()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySite"><tt class="xref docutils literal"><span class="pre">removeLocationBySite()</span></tt></a>, <a title="music21.base.Music21Object.removeLocationBySiteId" class="reference external" href="moduleBase.html#music21.base.Music21Object.removeLocationBySiteId"><tt class="xref docutils literal"><span class="pre">removeLocationBySiteId()</span></tt></a>, <a title="music21.base.Music21Object.setOffsetBySite" class="reference external" href="moduleBase.html#music21.base.Music21Object.setOffsetBySite"><tt class="xref docutils literal"><span class="pre">setOffsetBySite()</span></tt></a>, <a title="music21.base.Music21Object.show" class="reference external" href="moduleBase.html#music21.base.Music21Object.show"><tt class="xref docutils literal"><span class="pre">show()</span></tt></a>, <a title="music21.base.Music21Object.unfreezeIds" class="reference external" href="moduleBase.html#music21.base.Music21Object.unfreezeIds"><tt class="xref docutils literal"><span class="pre">unfreezeIds()</span></tt></a>, <a title="music21.base.Music21Object.unwrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.unwrapWeakref"><tt class="xref docutils literal"><span class="pre">unwrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.wrapWeakref" class="reference external" href="moduleBase.html#music21.base.Music21Object.wrapWeakref"><tt class="xref docutils literal"><span class="pre">wrapWeakref()</span></tt></a>, <a title="music21.base.Music21Object.write" class="reference external" href="moduleBase.html#music21.base.Music21Object.write"><tt class="xref docutils literal"><span class="pre">write()</span></tt></a></p>
 </blockquote>
 </dd></dl>
 
@@ -153,7 +223,16 @@ Properties inherited from <a title="music21.base.Music21Object" class="reference
 <dt id="music21.editorial.Comment">
 <em class="property">
 class </em><tt class="descclassname">music21.editorial.</tt><tt class="descname">Comment</tt><a class="headerlink" href="#music21.editorial.Comment" title="Permalink to this definition">¶</a></dt>
-<dd><p>x.__init__(...) initializes x; see x.__class__.__doc__ for signature</p>
+<dd><p>an object that adds text above or below a note:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">comment</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">&quot;hello&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">comment</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="s">&quot;above&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">editorial</span><span class="o">.</span><span class="n">comment</span><span class="o">.</span><span class="n">lily</span>
+<span class="go">&#39;^&quot;hello&quot;&#39;</span>
+</pre></div>
+</div>
+<p>x.__init__(...) initializes x; see x.__class__.__doc__ for signature</p>
 <p><strong>Comment</strong> <strong>attributes</strong></p>
 <blockquote>
 Attributes without Documentation: <cite>position</cite>, <cite>text</cite></blockquote>
@@ -196,7 +275,7 @@ Attributes without Documentation: <cite>position</cite>, <cite>text</cite></bloc
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 12, 2010.
+      Last updated on Jul 14, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
