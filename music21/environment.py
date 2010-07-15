@@ -457,7 +457,7 @@ class Environment(object):
                 msg = [msg] # make into a list
             if msg[0] != self.modNameParent and self.modNameParent != None:
                 msg = [self.modNameParent + ':'] + msg
-    
+            # pass list to common.formatStr
             msg = common.formatStr(*msg)
             sys.stderr.write(msg)
     
