@@ -3292,6 +3292,46 @@ class Stream(music21.Music21Object):
         ''')
 
 
+    def _yieldDownwardContainers(self):
+        '''Yield all containers (Stream subclasses), including self, and going downward.
+        '''
+        yield self
+        # using indices so as to not to create an iterator and new locations/parents
+        for i in range(len(self._elements)):
+            # not using __getitem__, also to avoid new locations/parents
+            e = self._elements[i]
+            if hasattr(e, 'elements'):
+                # this returns a generator, so need to iterate over it
+                # to get results
+                for y in e._yieldDownwardContainers():
+                    yield y
+
+
+    def _yieldUpwardContainers(self):
+        '''Yield all containers (Stream subclasses), including self, and going upward.
+        '''
+        yield self
+        # may need to make sure that parent is correctly assigned
+        p = self.parent
+        # if a parent exists, its always a stream!
+        if p != None and hasattr(p, 'elements'):
+            # using indices so as to not to create an iterator and new locations/parents
+            # here we access the private _elements, again: no iterator
+            for i in range(len(p._elements)):
+                # not using __getitem__, also to avoid new locations/parents
+                e = p._elements[i]
+                environLocal.printDebug(['examining elements:', e])
+
+                # caller is contained in the parent; skip
+                if id(e) == id(self): 
+                    continue
+                # look to this elements parents
+                if e.parent != None and hasattr(e.parent, 'elements'):
+                    # this returns a generator, so need to iterate over it
+                    # to get results
+                    for y in e.parent._yieldUpwardContainers():
+                        yield y
+
     #---------------------------------------------------------------------------
     # duration and offset methods and properties
     
@@ -8581,6 +8621,58 @@ class Test(unittest.TestCase):
         post = s.musicxml
 
 
+    def testYieldContainers(self):
+        from music21 import stream
+        s1 = stream.Stream()
+        s1.id = '1-a'
+        s2 = stream.Stream()
+        s2.id = '2-a'
+        s3 = stream.Stream()
+        s3.id = '2-b'
+        s4 = stream.Stream()
+        s4.id = '3-a'
+        s5 = stream.Stream()
+        s5.id = '3-b'
+        s6 = stream.Stream()
+        s6.id = '3-c'
+        s7 = stream.Stream()
+        s7.id = '3-d'
+
+        #environLocal.printDebug(['s1, s2, s3, s4', s1, s2, s3, s4])
+
+        s2.append(s4)
+        s2.append(s5)
+        s3.append(s6)
+        s3.append(s7)
+        s1.append(s2)
+        s1.append(s3)
+
+        match = []
+        for x in s1._yieldDownwardContainers():
+            match.append(x.id)
+            if x.parent != None:
+                environLocal.printDebug([x, x.id, 'parent', x.parent,
+                                        x.parent.id])
+            else:
+                environLocal.printDebug([x, x.id, 'parent', x.parent])
+
+        # test downward
+        self.assertEqual(match, ['1-a', '2-a', '3-a', '3-b', '2-b', '3-c', '3-d'])
+
+        environLocal.printDebug(['trying upward:'])
+
+        match = []
+        for x in s7._yieldUpwardContainers():
+            match.append(x.id)
+            if x.parent != None:
+                environLocal.printDebug([x, x.id, 'parent', x.parent,
+                                        x.parent.id])
+            else:
+                environLocal.printDebug([x, x.id, 'parent', x.parent])
+
+        self.assertEqual(match, ['3-d', '2-b', '1-a'] )
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -8596,9 +8688,4 @@ if __name__ == "__main__":
         b = TestExternal()
 
 
-#         a.testStripTiesBuilt()
-#         a.testStripTiesImported()
-#         a.testStripTiesScore()
-
-        a.testOverlapsA()
-        a.testOverlapsB()
+        a.testYieldContainers()
