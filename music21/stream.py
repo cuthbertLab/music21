@@ -3361,7 +3361,10 @@ class Stream(music21.Music21Object):
                     # the caller; since it is a Stream, we yield
                     # caller is contained in the parent; if e is self, skip
                     if id(e) != id(self): 
-                        yield e
+                        if id(e) not in memo:
+                            yield e
+                            if skipDuplicates:
+                                memo.append(id(e))
 
     #---------------------------------------------------------------------------
     # duration and offset methods and properties
@@ -8711,16 +8714,14 @@ class Test(unittest.TestCase):
         match = []
         for x in s1._yieldElementsDownward():
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.parent])
-        # test downward
+            #environLocal.printDebug([x, x.id, 'parent', x.parent])
         self.assertEqual(match, ['1a', '2a', '3a', '3b', '3c', '2b', '3d', '3e', '2c', '3f'])
 
         environLocal.printDebug(['downward with elements:'])
         match = []
         for x in s1._yieldElementsDownward(excludeNonContainers=False):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.parent])
-        # test downward
+            #environLocal.printDebug([x, x.id, 'parent', x.parent])
         self.assertEqual(match, ['1a', 'n(1a)', '2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c', '2b', 'n2(2b)', '3d', '3e', '2c', '3f'])
 
 
@@ -8728,24 +8729,24 @@ class Test(unittest.TestCase):
         match = []
         for x in s2._yieldElementsDownward(excludeNonContainers=False):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.parent])
+            #environLocal.printDebug([x, x.id, 'parent', x.parent])
         # test downward
         self.assertEqual(match, ['2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c'])
-
 
         environLocal.printDebug(['upward, with skipDuplicates:'])
         match = []
         # must provide empty list for memo
-        for x in s7._yieldElementsUpward([]):
+        for x in s7._yieldElementsUpward([], skipDuplicates=True):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.parent])
-        self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '2b', '2c', '3b', '2b', '2c'] )
+            #environLocal.printDebug([x, x.id, 'parent', x.parent])
+        self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
+
 
         environLocal.printDebug(['upward from a single node, with skipDuplicates'])
         match = []
         for x in s10._yieldElementsUpward([]):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.parent])
+            #environLocal.printDebug([x, x.id, 'parent', x.parent])
 
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '2b'] )
 
@@ -8754,8 +8755,7 @@ class Test(unittest.TestCase):
         match = []
         for x in s10._yieldElementsUpward([], skipDuplicates=False):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.parent])
-
+            #environLocal.printDebug([x, x.id, 'parent', x.parent])
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
 
 
@@ -8766,7 +8766,7 @@ class Test(unittest.TestCase):
             skipDuplicates=True):
             match.append(x.id)
             environLocal.printDebug([x, x.id, 'parent', x.parent])
-        self.assertEqual(match, ['3d', 'n2(2b)', '2b', 'n(1a)', '1a', '2a', '2c', '2a', '2c', '3e'] )
+        self.assertEqual(match, ['3d', 'n2(2b)', '2b', 'n(1a)', '1a', '2a', '2c', '3e'] )
 
 
         environLocal.printDebug(['upward, with skipDuplicates, excludeNonContainers=False:'])
