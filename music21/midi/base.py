@@ -19,6 +19,9 @@ see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 import unittest, doctest
 import sys, os, string, types
 
+import StringIO # this module is not supported in python3
+# use io.StringIO  in python 3, avail in 2.6, not 2.5
+
 
 import music21
 from music21 import common
@@ -33,7 +36,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class EnumException(Exception): 
+class EnumerationException(Exception): 
     pass 
 
 class MidiException(Exception): 
@@ -125,13 +128,13 @@ class Enumeration(object):
             if type(x) == types.TupleType: 
                 x, i = x 
             if type(x) != types.StringType: 
-                raise EnumException("enum name is not a string: " + x)
+                raise EnumerationException("enum name is not a string: " + x)
             if type(i) != types.IntType: 
-                raise EnumException("enum value is not an integer: " + i)
+                raise EnumerationException("enum value is not an integer: " + i)
             if x in uniqueNames: 
-                raise EnumException("enum name is not unique: " + x)
+                raise EnumerationException("enum name is not unique: " + x)
             if i in uniqueValues: 
-                raise EnumException("enum value is not unique for " + x)
+                raise EnumerationException("enum value is not unique for " + x)
             uniqueNames.append(x) 
             uniqueValues.append(i) 
             lookup[x] = i 
@@ -198,26 +201,31 @@ metaEvents = Enumeration([("SEQUENCE_NUMBER", 0x00),
 
 
 
-def register_note(track_index, channel_index, pitch, velocity, 
-                  keyDownTime, keyUpTime): 
+# def register_note(track_index, channel_index, pitch, velocity, 
+#                   keyDownTime, keyUpTime): 
+# 
+#     """ 
+#     register_note() is a hook that can be overloaded from a script that 
+#     imports this module. Here is how you might do that, if you wanted to 
+#     store the notes as tuples in a list. Including the distinction 
+#     between track and channel offers more flexibility in assigning voices. 
+#     import midi 
+#     notelist = [ ] 
+#     def register_note(t, c, p, v, t1, t2): 
+#         notelist.append((t, c, p, v, t1, t2)) 
+#     midi.register_note = register_note 
+#     """ 
+#     pass 
 
-    """ 
-    register_note() is a hook that can be overloaded from a script that 
-    imports this module. Here is how you might do that, if you wanted to 
-    store the notes as tuples in a list. Including the distinction 
-    between track and channel offers more flexibility in assigning voices. 
-    import midi 
-    notelist = [ ] 
-    def register_note(t, c, p, v, t1, t2): 
-        notelist.append((t, c, p, v, t1, t2)) 
-    midi.register_note = register_note 
-    """ 
-    pass 
+
 
 class MidiChannel(object): 
-    """A channel (together with a track) provides the continuity connecting 
+    '''A channel (together with a track) provides the continuity connecting 
     a NOTE_ON event with its corresponding NOTE_OFF event. Together, those 
-    define the beginning and ending times for a Note.""" 
+    define the beginning and ending times for a Note.
+
+    >>> mc = MidiChannel(0, 0)
+    ''' 
     
     def __init__(self, track, index): 
         self.index = index 
@@ -233,22 +241,61 @@ class MidiChannel(object):
     def noteOff(self, pitch, time): 
         if pitch in self.pitches: 
             keyDownTime, velocity = self.pitches[pitch] 
-            register_note(self.track.index, self.index, pitch, velocity, 
-                          keyDownTime, time) 
+            #register_note(self.track.index, self.index, pitch, velocity, 
+            #              keyDownTime, time) 
             del self.pitches[pitch] 
 
 
 
 #-------------------------------------------------------------------------------
 class MidiEvent(object): 
+    '''A model of a MIDI event, including note-on, note-off, program change, controller change, any many others.
+
+    MidiEvent objects are paired (preceded) by DeltaTime objects in the list of events in a MidiTrack object.
+
+    The `track` argument must be a :class:`~music21.midi.base.MidiTrack` object.
+
+    The `type` attribute is a string representation of a Midi event from the channelVoiceMessages or metaEvents definitions. 
+
+    The `channel` attribute is an integer channel id, from 1 to 16. 
+
+    The `time` attribute is an integer duration of the event in clicks. This value can be zero. This value is not essential, as ultimate time positioning is determined by DeltaTime objects. 
+
+    The `pitch` attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127).
+
+    The `velocity` attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127).
+
+    The `data` attribute is used for storing other messages, such as SEQUENCE_TRACK_NAME string values. 
+
+    >>> mt = MidiTrack(1)
+    >>> me1 = MidiEvent(mt)
+    >>> me1.type = "NOTE_ON"
+    >>> me1.channel = 1
+    >>> me1.time = 200
+    >>> me1.pitch = 60
+    >>> me1.velocity = 120
+    >>> me1
+    <MidiEvent NOTE_ON, t=200, track=1, channel=1, pitch=60, velocity=120>
+
+    >>> me2 = MidiEvent(mt)
+    >>> me2.type = "SEQUENCE_TRACK_NAME"
+    >>> me2.time1 = 0
+    >>> me2.data = 'guitar'
+    >>> me2
+    <MidiEvent SEQUENCE_TRACK_NAME, t=None, track=1, channel=None, data='guitar'>
+    '''
     
     def __init__(self, track): 
         self.track = track 
+    
+        self.type = None 
         self.time = None 
-        self.channel = self.pitch = self.velocity = self.data = None 
+        self.channel = None
+        self.pitch = None
+        self.velocity = None
+        self.data = None 
     
     def __cmp__(self, other): 
-        # assert self.time != None and other.time != None 
         return cmp(self.time, other.time) 
     
     def __repr__(self): 
@@ -263,12 +310,13 @@ class MidiEvent(object):
         return r + ">" 
     
     def read(self, time, str): 
-        runningStatus = '' 
-        self.time = time 
-        # do we need to use running status? 
-        if not (ord(str[0]) & 0x80): 
-            str = runningStatus + str 
-        runningStatus = x = str[0] 
+#         runningStatus = '' 
+#         self.time = time 
+#         # do we need to use running status? 
+#         if not (ord(str[0]) & 0x80): 
+#             str = runningStatus + str 
+#         runningStatus = x = str[0] 
+        x = str[0] 
         x = ord(x) 
         y = x & 0xF0 
         z = ord(str[1]) 
@@ -282,13 +330,19 @@ class MidiEvent(object):
             else: 
                 self.pitch = z 
                 self.velocity = ord(str[2]) 
+
+                # each channel's object is accessed here
+                # using that channel, data for each event is sent
+                # note-offs are automatically paired
                 channel = self.track.channels[self.channel - 1] 
                 if (self.type == "NOTE_OFF" or 
                     (self.velocity == 0 and self.type == "NOTE_ON")): 
                     channel.noteOff(self.pitch, self.time) 
+
                 elif self.type == "NOTE_ON": 
                     channel.noteOn(self.pitch, self.time, self.velocity) 
                 return str[3:] 
+
         elif y == 0xB0 and channelModeMessages.has_value(z): 
             self.channel = (x & 0x0F) + 1 
             self.type = channelModeMessages.whatis(z) 
@@ -319,25 +373,31 @@ class MidiEvent(object):
     def write(self): 
         sysex_event_dict = {"F0_SYSEX_EVENT": 0xF0, 
                             "F7_SYSEX_EVENT": 0xF7} 
+
         if channelVoiceMessages.hasattr(self.type): 
             x = chr((self.channel - 1) + 
                     getattr(channelVoiceMessages, self.type)) 
+
+            # for writing note-on/note-off
             if (self.type != "PROGRAM_CHANGE" and 
                 self.type != "CHANNEL_KEY_PRESSURE"): 
                 data = chr(self.pitch) + chr(self.velocity) 
-            else: 
+            else:  # all other messages
                 data = chr(self.data) 
             return x + data 
+
         elif channelModeMessages.hasattr(self.type): 
             x = getattr(channelModeMessages, self.type) 
             x = (chr(0xB0 + (self.channel - 1)) + 
                  chr(x) + 
                  chr(self.data)) 
             return x 
+
         elif sysex_event_dict.has_key(self.type): 
             str = chr(sysex_event_dict[self.type]) 
             str = str + putVariableLengthNumber(len(self.data)) 
             return str + self.data 
+
         elif metaEvents.hasattr(self.type): 
             str = chr(0xFF) + chr(getattr(metaEvents, self.type)) 
             str = str + putVariableLengthNumber(len(self.data)) 
@@ -348,9 +408,27 @@ class MidiEvent(object):
 
 
 class DeltaTime(MidiEvent): 
+    '''Store the time change since the start or the last MidiEvent.
 
-    type = "DeltaTime" 
-    
+    Pairs of DeltaTime and MidiEvent objects are the basic presentation of temporal data.
+
+    The `track` argument must be a :class:`~music21.midi.base.MidiTrack` object.
+
+    Time values are in integers, representing ticks. 
+
+    The `channel` attribute, inherited from MidiEvent is not used.
+
+    >>> mt = MidiTrack(1)
+    >>> dt = DeltaTime(mt)
+    >>> dt.time = 380
+    >>> dt
+    <MidiEvent DeltaTime, t=380, track=1, channel=None>
+
+    '''
+    def __init__(self, track):
+        MidiEvent.__init__(self, track)
+        self.type = "DeltaTime" 
+
     def read(self, oldstr): 
         self.time, newstr = getVariableLengthNumber(oldstr) 
         return self.time, newstr 
@@ -359,45 +437,63 @@ class DeltaTime(MidiEvent):
         str = putVariableLengthNumber(self.time) 
         return str 
 
+
 class MidiTrack(object): 
+    '''A MIDI track.
+
+    An `index` is an integer identifier for this object.
+
+    >>> mt = MidiTrack(0)
     
+    '''
     def __init__(self, index): 
         self.index = index 
         self.events = [] 
+        self.length = 0 #the data length; only used on read()
+
+        # an object for each of 16 channels is created
         self.channels = [] 
-        self.length = 0
         for i in range(16): 
             self.channels.append(MidiChannel(self, i+1)) 
 
     def read(self, str): 
-        time = 0 
-        assert str[:4] == "MTrk" 
+        time = 0 # a running counter of ticks
+
+        if not str[:4] == "MTrk":
+            raise MidiException('badly formed midi string')
         length, str = getNumber(str[4:], 4) 
+
+        
         self.length = length 
         mystr = str[:length] 
         remainder = str[length:] 
+
         while mystr: 
+            # shave off the time stamp from the event
             delta_t = DeltaTime(self) 
             dt, mystr = delta_t.read(mystr) 
             time = time + dt 
             self.events.append(delta_t) 
+    
+            # set this MidiTrack as the track for this event
             e = MidiEvent(self) 
-
             # some midi events may raise errors; simply skip for now
             try:
                 mystr = e.read(time, mystr) 
             except MidiException:
-                environLocal.printDebug(['forced to skip event; delta_t:', delta_t])
+                #environLocal.printDebug(['forced to skip event; delta_t:', delta_t])
                 continue
             self.events.append(e) 
 
         return remainder 
     
     def write(self): 
+        # set time to the first event
         time = self.events[0].time 
         # build str using MidiEvents 
         str = "" 
         for e in self.events: 
+            # this writes both delta time and message events
             str = str + e.write() 
         return "MTrk" + putNumber(len(str), 4) + str 
     
@@ -410,6 +506,11 @@ class MidiTrack(object):
 
 
 class MidiFile(object):
+    '''
+    Low MIDI file writing, emulating methods from normal Python files. 
+
+    The `ticksPerQuarterNote` attribute must be set before writing. 1024 is a common value.
+    '''
     
     def __init__(self): 
         self.file = None 
@@ -423,14 +524,19 @@ class MidiFile(object):
 
         For writing to a MIDI file, `attrib` should be "wb".
         '''
-        # we do not need to read form stdin at this point
-#         if filename == None: 
-#             if attrib in ["r", "rb"]: 
-#                 self.file = sys.stdin 
-#             else: 
-#                 self.file = sys.stdout 
-#         else: 
+        if attrib not in ['rb', 'wb']:
+            raise MidiException('cannot read or write unless in binary mode, not:', attrib)
         self.file = open(filename, attrib) 
+
+    def openFileLike(self, fileLike):
+        '''Assign a file-like object, such as those provided by StringIO, as an open file object.
+
+        >>> fileLikeOpen = StringIO.StringIO()
+        >>> mf = MidiFile()
+        >>> mf.openFileLike(fileLikeOpen)
+        >>> mf.close()
+        '''
+        self.file = fileLike
     
     def __repr__(self): 
         r = "<MidiFile %d tracks\n" % len(self.tracks) 
@@ -445,23 +551,34 @@ class MidiFile(object):
         self.readstr(self.file.read()) 
     
     def readstr(self, str): 
-        assert str[:4] == "MThd" 
+        if not str[:4] == "MThd":
+            raise MidiException('badly formated midi string')
         length, str = getNumber(str[4:], 4) 
-        assert length == 6 
+        if not length == 6:
+            raise MidiException('badly formated midi string')
+
         format, str = getNumber(str, 2) 
         self.format = format 
-        assert format == 0 or format == 1   # dunno how to handle 2 
+
+        if not format in [0, 1]:
+            raise MidiException('cannot handle midi file format: %s' % format)
+
         numTracks, str = getNumber(str, 2) 
         division, str = getNumber(str, 2) 
+
+        # very few midi files seem to define ticksPerSecond
         if division & 0x8000: 
             framesPerSecond = -((division >> 8) | -128) 
             ticksPerFrame = division & 0xFF 
-            assert ticksPerFrame == 24 or ticksPerFrame == 25 or \
-                   ticksPerFrame == 29 or ticksPerFrame == 30 
-            if ticksPerFrame == 29: ticksPerFrame = 30  # drop frame 
+
+            if not ticksPerFrame in [24, 25, 29, 30]:
+                raise MidiException('cannot handle ticks per frame: %s' % ticksPerFrame)
+            if ticksPerFrame == 29: 
+                ticksPerFrame = 30  # drop frame 
             self.ticksPerSecond = ticksPerFrame * framesPerSecond 
         else: 
             self.ticksPerQuarterNote = division & 0x7FFF 
+
         for i in range(numTracks): 
             trk = MidiTrack(i) 
             str = trk.read(str) 
@@ -473,7 +590,8 @@ class MidiFile(object):
     def writestr(self): 
         division = self.ticksPerQuarterNote 
         # Don't handle ticksPerSecond yet, too confusing 
-        assert (division & 0x8000) == 0 
+        if (division & 0x8000) != 0:
+            raise MidiException('cannot write midi string')
         str = "MThd" + putNumber(6, 4) + putNumber(self.format, 2) 
         str = str + putNumber(len(self.tracks), 2) 
         str = str + putNumber(division, 2) 
@@ -502,6 +620,7 @@ class Test(unittest.TestCase):
         pass
 
     def testBasicImport(self):
+
         dir = common.getPackageDir(relative=False, remapSep=os.sep)
         for fp in dir:
             if fp.endswith('midi'):
@@ -521,6 +640,12 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
         #self.assertEqual(mf.writestr, None)
 
+        # try to write contents
+        fileLikeOpen = StringIO.StringIO()
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
+
 
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test02.mid')
@@ -533,6 +658,12 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mf.tracks), 5)
         self.assertEqual(mf.ticksPerQuarterNote, 1024)
         self.assertEqual(mf.ticksPerSecond, None)
+
+        # try to write contents
+        fileLikeOpen = StringIO.StringIO()
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
 
 
         # random files from the internet
@@ -547,6 +678,11 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerQuarterNote, 1024)
         self.assertEqual(mf.ticksPerSecond, None)
 
+        # try to write contents
+        fileLikeOpen = StringIO.StringIO()
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
 
         # random files from the internet
         fp = os.path.join(dirLib, 'test04.mid')
@@ -560,13 +696,120 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerQuarterNote,480)
         self.assertEqual(mf.ticksPerSecond, None)
 
+        # try to write contents
+        fileLikeOpen = StringIO.StringIO()
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
+
 #         mf = MidiFile()
 #         mf.open(fp)
 #         mf.read()
 #         mf.close()
 
 
+    def testInternalDataModel(self):
 
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('midi'):
+                break
+
+        dirLib = os.path.join(fp, 'testPrimitive')
+        # a simple file created in athenacl
+        fp = os.path.join(dirLib, 'test01.mid')
+        environLocal.printDebug([fp])
+        mf = MidiFile()
+        mf.open(fp)
+        mf.read()
+        mf.close()
+
+        track2 = mf.tracks[1]
+        # defines a channel object for each of 16 channels
+        self.assertEqual(len(track2.channels), 16)
+        # length seems to be the size of midi data in this track
+        self.assertEqual(track2.length, 255)
+
+        # a list of events
+        self.assertEqual(len(track2.events), 116)
+
+        i = 0
+        while i < len(track2.events)-1:
+            self.assertTrue(isinstance(track2.events[i], DeltaTime))
+            self.assertTrue(isinstance(track2.events[i+1], MidiEvent))
+
+            #environLocal.printDebug(['sample events: ', track2.events[i]])
+            #environLocal.printDebug(['sample events: ', track2.events[i+1]])
+            i += 2
+
+        # first object is delta time
+        # all objects are pairs of delta time, event
+
+
+    def testBasicExport(self):
+
+        mt = MidiTrack(1)
+        # duration, pitch, velocity
+        data = [[1024, 60, 90], [1024, 50, 70], [1024, 51, 120],[1024, 62, 80],
+                ]
+        t = 0
+        tLast = 0
+        for d, p, v in data:
+            dt = DeltaTime(mt)
+            dt.time = t - tLast
+            # add to track events
+            mt.events.append(dt)
+
+            me = MidiEvent(mt)
+            me.type = "NOTE_ON"
+            me.channel = 1
+            me.time = None #d
+            me.pitch = p
+            me.velocity = v
+            mt.events.append(me)
+
+
+            # add note off / velocity zero message
+            dt = DeltaTime(mt)
+            dt.time = d
+            # add to track events
+            mt.events.append(dt)
+
+            me = MidiEvent(mt)
+            me.type = "NOTE_ON"
+            me.channel = 1
+            me.time = None #d
+            me.pitch = p
+            me.velocity = 0
+            mt.events.append(me)
+
+            tLast = t + d # have delta to note off
+            t += d # next time
+
+        # add end of track
+        dt = DeltaTime(mt)
+        dt.time = 0
+        mt.events.append(dt)
+
+        me = MidiEvent(mt)
+        me.type = "END_OF_TRACK"
+        me.channel = 1
+        me.data = '' # must set data to empty string
+        mt.events.append(me)
+
+        for e in mt.events:
+            print e
+
+        mf = MidiFile()
+        mf.ticksPerQuarterNote = 1024 # cannot use: 10080
+        mf.tracks.append(mt)
+
+        
+        fileLikeOpen = StringIO.StringIO()
+        #mf.open('/src/music21/music21/midi/out.mid', 'wb')
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
 
 
 #-------------------------------------------------------------------------------
@@ -586,36 +829,3 @@ if __name__ == "__main__":
 
         #a.testNoteBeatPropertyCorpus()
 
-
-
-
-# 
-# def main(argv): 
-#     debugflag = 0 
-#     import getopt 
-#     infile = None 
-#     outfile = None 
-#     printflag = 0 
-#     optlist, args = getopt.getopt(argv[1:], "i:o:pd") 
-#     for (option, value) in optlist: 
-#         if option == '-i': 
-#             infile = value 
-#         elif option == '-o': 
-#             outfile = value 
-#         elif option == '-p': 
-#             printflag = 1 
-#         elif option == '-d': 
-#             debugflag = 1 
-#     m = MidiFile() 
-#     m.open(infile) 
-#     m.read() 
-#     m.close() 
-#     if printflag: 
-#         print(m) 
-#     else: 
-#         m.open(outfile, "wb") 
-#         m.write() 
-#         m.close() 
-# 
-# if __name__ == "__main__": 
-#     main(sys.argv) 

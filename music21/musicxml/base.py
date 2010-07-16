@@ -13,6 +13,8 @@
 import sys, os, copy
 import unittest, doctest
 import StringIO # this module is not supported in python3
+# use io.StringIO  in python 3
+
 try:
     import cPickle as pickleMod
 except ImportError:
