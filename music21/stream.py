@@ -32,10 +32,10 @@ from music21 import interval
 from music21 import key
 from music21 import layout
 from music21 import lily as lilyModule
-#from music21 import measure
 from music21 import metadata
 from music21 import meter
 from music21 import musicxml as musicxmlMod
+from music21 import midi as midiModule
 from music21 import note
 from music21 import metadata
 
@@ -3818,8 +3818,29 @@ class Stream(music21.Music21Object):
         # do not need to call elements changed, as called in sub methods
         return returnObj
 
-
     #---------------------------------------------------------------------------
+    def isMultiPart(self):
+        '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
+        '''
+        sTemplate = Stream()
+        multiPart = False
+        for obj in self:
+            # if obj is a Part, we have multi-parts
+            if isinstance(obj, Part):
+                multiPart = True
+                break # only need one
+            # if components are Measures, self is a part
+            elif isinstance(obj, Measure):
+                multiPart = False
+                break # only need one
+            # if components are streams of Notes or Measures, 
+            # than assume this is like a Part
+            elif isinstance(obj, sTemplate.classNames) and (
+                len(obj.measures) > 0 or len(obj.notes) > 0):
+                multiPart = True
+                break # only need one
+        return multiPart
+
     def _getLily(self):
         '''Returns the stream translated into Lilypond format.'''
         if self._overriddenLily is not None:
@@ -3872,6 +3893,144 @@ class Stream(music21.Music21Object):
 
 
 
+    #---------------------------------------------------------------------------
+
+    def _getMidiTracksPart(self, instObj=None):
+
+        if instObj is None:
+            # see if an instrument is defined in this or a parent stream
+            instObj = self.getInstrument()
+
+        # each part will become midi track
+        # each needs an id; can be adjusted later
+        mt = midiModule.MidiTrack(1)
+
+        dt = midiModule.DeltaTime(mt)
+        dt.time = 0
+        mt.events.append(dt)
+
+        me = midiModule.MidiEvent(mt)
+        me.type = "SEQUENCE_TRACK_NAME"
+        me.time = 0 # always at zero?
+        me.data = instObj.partName
+        mt.events.append(me)
+
+        # initial time is start of this Stream
+        #t = self.offset * defaults.ticksPerQuarter
+        # should shift at tracks level
+        t = 0 * defaults.ticksPerQuarter
+
+        # have to be sorted
+        for obj in self.flat.sorted:
+            tDurEvent = 0 # the found delta ticks in each event
+
+            if obj.isClass(note.GeneralNote):
+                if obj.isClass(note.Rest):
+                    t += (obj.offset * defaults.ticksPerQuarter)
+                    continue
+
+                sub = obj.midiEvents
+                # update times in these events
+                # all even numbered index values should be DeltaTime objs
+                # these are the only objects that need adjustment
+
+                # find difference since last event to this event
+                # cannot use getOffsetBySite(self), as need flat offset
+                tDif = t - (obj.offset * 
+                            defaults.ticksPerQuarter)
+
+                # a single note has 4 events; 
+                # the event events are delta times
+                if len(sub) == 4: 
+                    sub[0].time = int(round(tDif)) # set first delta 
+                    # get the duration in ticks
+                    tDurEvent = int(round(sub[2].time))
+
+                # must update all events with a ref to this MidiTrack
+                for e in sub:
+                    e.track = mt
+
+                t += tDurEvent
+                # add events to the list
+                mt.events += sub
+
+            elif obj.isClass(dynamics.Dynamic):
+                pass # configure dynamics
+            else: # other objects may have already been added
+                pass
+
+        dt = midiModule.DeltaTime(mt)
+        dt.time = 0
+        mt.events.append(dt)
+
+        me = midiModule.MidiEvent(mt)
+        me.type = "END_OF_TRACK"
+        me.channel = 1
+        me.data = '' # must set data to empty string
+        mt.events.append(me)
+
+        return mt
+        
+    def _setMidiTracksPart(self, eventList):
+        pass
+
+
+
+
+    def _getMidiTracks(self):
+
+        sTemplate = Stream()
+        # return a list of MidiTrack objects
+        midiTracks = []
+
+        # TODO: may need to shift all time values to accomodate 
+        # stream that do not start at same time
+        if self.isMultiPart():
+            for obj in self.getElementsByClass(sTemplate.classNames):
+                midiTracks.append(obj._getMidiTracksPart())
+        else: # just get this single stream
+            midiTracks.append(self._getMidiTracksPart())
+        return midiTracks
+
+    def _setMidiTracks(self, eventList):
+        pass
+
+    midiTracks = property(_getMidiTracks, _setMidiTracks, 
+        doc='''Get or set this Stream from a list of :class:`music21.midi.base.MidiTracks` objects.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> n = note.Note('g#3')
+        >>> n.quarterLength = .5
+        >>> s.repeatAppend(n, 6)
+        >>> len(s.midiTracks[0].events)
+        28
+        ''')
+
+
+    def _getMidiFile(self):
+        '''Provide a complete MusicXML representation. 
+        '''
+        # get a list of mid tracks objects
+        midiTracks = self._getMidiTracks()
+
+        # update track indices
+        # may need to update channel information
+        for i in range(len(midiTracks)):
+            midiTracks[i].index = i + 1
+
+        mf = midiModule.MidiFile()
+        mf.tracks = midiTracks
+        mf.ticksPerQuarterNote = defaults.ticksPerQuarter
+        return mf
+
+    midiFile = property(_getMidiFile,
+        doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.
+        ''')
+
+
+
+    #---------------------------------------------------------------------------
     def _getMXPart(self, instObj=None, meterStream=None, 
         refStreamOrTimeRange=None):
         '''If there are Measures within this stream, use them to create and
@@ -3884,10 +4043,6 @@ class Stream(music21.Music21Object):
         environLocal.printDebug(['calling Stream._getMXPart'])
         # note: meterStream may have TimeSignature objects from an unrelated
         # Stream.
-        #self.show('t')
-#         if len(self) > 2:
-#             environLocal.printDebug(['_getMXPart(): first two elements', self[0].offset, self[0].duration, self[1].offset, self[1].duration ])
-
         if instObj is None:
             # see if an instrument is defined in this or a parent stream
             instObj = self.getInstrument()
@@ -3939,7 +4094,6 @@ class Stream(music21.Music21Object):
 
         mxComponents = []
         instList = []
-        multiPart = False
         
         # search context probably should always be True here
         # to search container first, we need a non-flat version
@@ -3954,23 +4108,7 @@ class Stream(music21.Music21Object):
         # we need independent sub-stream elements to shift in presentation
         highestTime = 0
 
-        for obj in self:
-            # if obj is a Part, we have multi-parts
-            if isinstance(obj, Part):
-                multiPart = True
-                break # only need one
-            # if components are Measures, self is a part
-            elif isinstance(obj, Measure):
-                multiPart = False
-                break # only need one
-            # if components are streams of Notes or Measures, 
-            # than assume this is like a Part
-            elif isinstance(obj, sTemplate.classNames) and (
-                len(obj.measures) > 0 or len(obj.notes) > 0):
-                multiPart = True
-                break # only need one
-
-        if multiPart:
+        if self.isMultiPart():
             #environLocal.printDebug('Stream._getMX: interpreting multipart')
             # need to edit streams contained within streams
             # must repack into a new stream at each step
@@ -8781,6 +8919,20 @@ class Test(unittest.TestCase):
 
 
 
+    def testMidiEvents(self):
+        s = Stream()
+        n = note.Note('g#3')
+        n.quarterLength = .5
+        s.repeatAppend(n, 6)
+        post = s.midiTracks # get a lost 
+        self.assertEqual(len(post[0].events), 28)
+        # must be an even number
+        self.assertEqual(len(post[0].events) % 2, 0)
+        
+        post = s.midiFile
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -8796,4 +8948,5 @@ if __name__ == "__main__":
         b = TestExternal()
 
 
-        a.testYieldContainers()
+        #a.testYieldContainers()
+        a.testMidiEvents()

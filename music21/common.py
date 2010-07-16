@@ -31,6 +31,7 @@ fileExtensions = {
     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
+    'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
     'lilypond' : {'input': ['ly', 'lily', 'lily.png', 'lily.pdf'], 'output': 'ly'},
     'finale' : {'input': ['mus'], 'output': 'mus'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},
@@ -65,8 +66,8 @@ DEBUG_ALL = 255
 
 
 # used for checking preferences, and for setting environment variables
-VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline']
-VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline']
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi']
+VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 
@@ -94,6 +95,8 @@ def findFormat(fmt):
     ('text', '.txt')
     >>> findFormat('textline')
     ('textline', '.txt')
+    >>> findFormat('midi')
+    ('midi', '.mid')
     '''
     for key in fileExtensions.keys():
         if fmt.startswith('.'):

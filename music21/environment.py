@@ -147,6 +147,8 @@ class Environment(object):
                 ('musicxmlPath', '/Applications/Finale Reader/Finale Reader.app'),
                 ('graphicsPath', '/Applications/Preview.app'),
                 ('pdfPath', '/Applications/Preview.app'),
+                ('midiPath', '/Applications/QuickTime Player.app'),
+
                 ]:
                 self.__setitem__(name, value) # use for key checking
 
@@ -425,12 +427,14 @@ class Environment(object):
             fpApp = self.ref['pdfPath']   
         elif format == 'musicxml':
             fpApp = self.ref['musicxmlPath']   
+        elif format == 'midi':
+            fpApp = self.ref['midiPath']   
         else:
             fpApp = None
 
         platform = common.getPlatform()
         if fpApp is None and platform != 'win':
-            raise EnvironmentException("Cannot find an application for format %s, specify this in your environment", fmt)
+            raise EnvironmentException("Cannot find an application for format %s, specify this in your environment" % fmt)
         
         if platform == 'win' and fpApp is None:
             # no need to specify application here: windows starts the program based on the file extension

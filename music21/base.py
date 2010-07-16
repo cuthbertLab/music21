@@ -1803,18 +1803,29 @@ class Music21Object(object):
 
         if format is None:
             raise Music21ObjectException('bad format (%s) provided to write()' % fmt)
-        elif format == 'text':
-            if fp is None:
-                fp = environLocal.getTempFile(ext)
-            dataStr = self._reprText()
-        elif format == 'textline':
-            if fp is None:
-                fp = environLocal.getTempFile(ext)
-            dataStr = self._reprTextLine()
-        elif format == 'musicxml':
-            if fp is None:
-                fp = environLocal.getTempFile(ext)
-            dataStr = self.musicxml
+
+        if fp is None:
+            fp = environLocal.getTempFile(ext)
+
+        if format in ['text', 'textline', 'musicxml']:        
+            if format == 'text':
+                dataStr = self._reprText()
+            elif format == 'textline':
+                dataStr = self._reprTextLine()
+            elif format == 'musicxml':
+                dataStr = self.musicxml
+            f = open(fp, 'w')
+            f.write(dataStr)
+            f.close()
+            return fp
+
+        elif format == 'midi':
+            # returns a midi file object
+            mf = self.midiFile
+            mf.open(fp, 'wb') # write binary
+            mf.write()
+            mf.close()
+            return fp
 
 #         elif fmt == 'lily.pdf':
 #             return self.lily.showPDF()
@@ -1826,10 +1837,6 @@ class Music21Object(object):
         else:
             raise Music21ObjectException('cannot support writing in this format, %s yet' % format)
 
-        f = open(fp, 'w')
-        f.write(dataStr)
-        f.close()
-        return fp
 
 
     def _reprText(self):
@@ -1871,6 +1878,7 @@ class Music21Object(object):
         elif format == 'textline': 
             return self._reprTextLine()
 
+        # TODO: these need to be updated to write files
         elif fmt == 'lily.pdf':
             return self.lily.showPDF()
         elif fmt == 'lily.png':
@@ -1878,9 +1886,11 @@ class Music21Object(object):
         elif fmt == 'lily':
             return self.lily.showPNG()
 
-        else: # a format that writes a file
+        elif fmt in ['musicxml', 'midi']: # a format that writes a file
             environLocal.launch(format, self.write(format))
 
+        else:
+            raise Music21ObjectException('no such show format is supported:', fmt)
 
 
 #-------------------------------------------------------------------------------

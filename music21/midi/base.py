@@ -279,15 +279,14 @@ class MidiEvent(object):
 
     >>> me2 = MidiEvent(mt)
     >>> me2.type = "SEQUENCE_TRACK_NAME"
-    >>> me2.time1 = 0
+    >>> me2.time = 0
     >>> me2.data = 'guitar'
     >>> me2
-    <MidiEvent SEQUENCE_TRACK_NAME, t=None, track=1, channel=None, data='guitar'>
+    <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data='guitar'>
     '''
     
     def __init__(self, track): 
         self.track = track 
-    
         self.type = None 
         self.time = None 
         self.channel = None
@@ -299,10 +298,13 @@ class MidiEvent(object):
         return cmp(self.time, other.time) 
     
     def __repr__(self): 
+        if self.track == None:
+            trackIndex = None
+        else:
+            trackIndex = self.track.index
+
         r = ("<MidiEvent %s, t=%s, track=%s, channel=%s" % 
-             (self.type, 
-              repr(self.time), 
-              self.track.index, 
+             (self.type, repr(self.time), trackIndex, 
               repr(self.channel))) 
         for attrib in ["pitch", "data", "velocity"]: 
             if getattr(self, attrib) != None: 
@@ -394,14 +396,20 @@ class MidiEvent(object):
             return x 
 
         elif sysex_event_dict.has_key(self.type): 
-            str = chr(sysex_event_dict[self.type]) 
-            str = str + putVariableLengthNumber(len(self.data)) 
-            return str + self.data 
+            s = chr(sysex_event_dict[self.type]) 
+            s = s + putVariableLengthNumber(len(self.data)) 
+            return s + self.data 
 
         elif metaEvents.hasattr(self.type): 
-            str = chr(0xFF) + chr(getattr(metaEvents, self.type)) 
-            str = str + putVariableLengthNumber(len(self.data)) 
-            return str + self.data 
+            s = chr(0xFF) + chr(getattr(metaEvents, self.type)) 
+            s = s + putVariableLengthNumber(len(self.data)) 
+            try: # TODO: need to handle unicode
+                return s + self.data 
+            except UnicodeDecodeError:
+                environLocal.printDebug(['cannot decode data', self.data])
+                return s
+                #return s + str(self.data)
+
         else: 
             raise MidiException("unknown midi event type: %s" % self.type)
 
@@ -767,7 +775,6 @@ class Test(unittest.TestCase):
             me.pitch = p
             me.velocity = v
             mt.events.append(me)
-
 
             # add note off / velocity zero message
             dt = DeltaTime(mt)

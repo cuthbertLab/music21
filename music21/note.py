@@ -26,10 +26,8 @@ from music21 import instrument
 from music21 import interval
 from music21 import editorial
 from music21.lily import LilyString
-from music21 import musicxml
-musicxmlMod = musicxml # alias
-from music21 import midi
-midiMod = midi
+from music21 import musicxml as musicxmlMod
+from music21 import midi as midiModule
 from music21 import expressions
 from music21 import pitch
 from music21 import beam
@@ -164,7 +162,7 @@ class Lyric(object):
         >>> mxLyric.get('text')
         'hello'
         '''
-        mxLyric = musicxml.Lyric()
+        mxLyric = musicxmlMod.Lyric()
         mxLyric.set('text', self.text)
         mxLyric.set('number', self.number)
         mxLyric.set('syllabic', self.syllabic)
@@ -532,12 +530,12 @@ class GeneralNote(music21.Music21Object):
 
         mxNoteList = selfCopy._getMX() # can be rest, note, or chord
 
-        mxMeasure = musicxml.Measure()
+        mxMeasure = musicxmlMod.Measure()
         mxMeasure.setDefaults()
         for mxNote in mxNoteList:
             mxMeasure.append(mxNote)
 
-        mxPart = musicxml.Part()
+        mxPart = musicxmlMod.Part()
         mxPart.setDefaults()
         mxPart.append(mxMeasure)
 
@@ -556,12 +554,12 @@ class GeneralNote(music21.Music21Object):
         # must set this part to the same id
         mxPart.set('id', instObj.partId)
 
-        mxPartList = musicxml.PartList()
+        mxPartList = musicxmlMod.PartList()
         mxPartList.append(mxScorePart)
 
-        mxIdentification = musicxml.Identification()
+        mxIdentification = musicxmlMod.Identification()
         mxIdentification.setDefaults() # will create a composer
-        mxScore = musicxml.Score()
+        mxScore = musicxmlMod.Score()
         mxScore.setDefaults()
         mxScore.set('partList', mxPartList)
         mxScore.set('identification', mxIdentification)
@@ -1203,15 +1201,47 @@ class Note(NotRest):
 
 
     def _getMidiEvents(self):
-        pass
+        # midi track 
+        mt = None
 
-    def _setMidiEvents(self, valueList):
+        eventList = []
+        dt = midiModule.DeltaTime(mt)
+        dt.time = 0 # set to zero; will be shifted later as necessary
+        # add to track events
+        eventList.append(dt)
+
+        me = midiModule.MidiEvent(mt)
+        me.type = "NOTE_ON"
+        me.channel = 1
+        me.time = None # not required
+        me.pitch = self.midi
+        me.velocity = 90 # default, can change later
+        eventList.append(me)
+
+        # add note off / velocity zero message
+        dt = midiModule.DeltaTime(mt)
+        dt.time = self.duration.midi
+        # add to track events
+        eventList.append(dt)
+
+        me = midiModule.MidiEvent(mt)
+        me.type = "NOTE_ON"
+        me.channel = 1
+        me.time = None #d
+        me.pitch = self.midi
+        me.velocity = 0 # must be zero
+        eventList.append(me)
+        return eventList 
+
+    def _setMidiEvents(self, eventList):
         pass
 
     midiEvents = property(_getMidiEvents, _setMidiEvents, 
         doc='''Get or set this note as a list of :class:`music21.midi.base.MidiEvent` objects.
 
         >>> n = Note()
+        >>> n.midiEvents
+        [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=0>]
         ''')
 
     def _getMX(self):
@@ -1261,7 +1291,7 @@ class Note(NotRest):
 
         # if we have any articulations, they only go on the first of any 
         # component notes
-        mxArticulations = musicxml.Articulations()
+        mxArticulations = musicxmlMod.Articulations()
         for i in range(len(self.articulations)):
             obj = self.articulations[i] # returns mxArticulationMark
             mxArticulations.append(obj.mx) # append to mxArticulations
@@ -1424,7 +1454,7 @@ class Rest(GeneralNote):
         mxNoteList = []
         for mxNote in self.duration.mx: # returns a list of mxNote objs
             # merge method returns a new object
-            mxRest = musicxml.Rest()
+            mxRest = musicxmlMod.Rest()
             mxRest.setDefaults()
             mxNote.set('rest', mxRest)
             # get color from within .editorial using attribute
