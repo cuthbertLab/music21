@@ -4,6 +4,7 @@
 # Purpose:      music21 classes for dealing with midi data
 #
 # Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
 #
 # Copyright:    (c) 2010 The music21 Project
 # License:      LGPL
@@ -16,6 +17,25 @@ see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 
 import unittest, doctest
 import sys, string, types
+
+
+
+from music21 import environment
+_MOD = "midi.base.py"  
+environLocal = environment.Environment(_MOD)
+
+
+
+
+
+# runningStatus appears to want to be an attribute of a MidiTrack. But 
+# it doesn't seem to do any harm to implement it as a global. 
+
+runningStatus = None 
+
+
+
+#-------------------------------------------------------------------------------
 
 debugflag = 0 
 
@@ -145,10 +165,7 @@ metaEvents = Enumeration([("SEQUENCE_NUMBER", 0x00),
                           ("KEY_SIGNATURE", 0x59), 
                           ("SEQUENCER_SPECIFIC_META_EVENT", 0x7F)]) 
 
-# runningStatus appears to want to be an attribute of a MidiTrack. But 
-# it doesn't seem to do any harm to implement it as a global. 
 
-runningStatus = None 
 
 class MidiEvent(object): 
     
@@ -222,7 +239,7 @@ class MidiEvent(object):
             length, str = getVariableLengthNumber(str[2:]) 
             self.data = str[:length] 
             return str[length:] 
-        raise "Unknown midi event type" 
+        raise Exception("Unknown midi event type")
     
     def write(self): 
         sysex_event_dict = {"F0_SYSEX_EVENT": 0xF0, 
