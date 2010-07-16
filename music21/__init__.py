@@ -40,22 +40,22 @@ see trecento/xlrd/licenses.py for the complete disclaimer and conditions
 
 __all__ = ['base', 
 
-           "analysis", "composition", "counterpoint", "corpus", 
-           "demos", "doc", "humdrum", 
-           "lily", "musicxml", "test", "trecento", 
+           'analysis', 'composition', 'counterpoint', 'corpus', 
+           'demos', 'doc', 'humdrum', 
+           'lily', 'musicxml', 'test', 'trecento', 'midi',
            
-           "articulations", 'bar',
-           "chord", "chordTables", "clef","common", "converter",
-           "defaults", "duration", "dynamics",
-           "editorial","enharmonic", "environment", 
-           "graph", 
-           "interval", "instrument", "key", 
-           "metadata", "meter", 
-           "expressions", "note", 
-           "pitch", "ratios", 
-           "scale", "serial", "stream", 
-           "tempo", "text", "tinyNotation", 
-           "voiceLeading"]
+           'articulations', 'bar',
+           'chord', 'chordTables', 'clef','common', 'converter',
+           'defaults', 'duration', 'dynamics',
+           'editorial','enharmonic', 'environment', 
+           'graph', 
+           'interval', 'instrument', 'key', 
+           'metadata', 'meter', 
+           'expressions', 'note', 
+           'pitch', 'ratios', 
+           'scale', 'serial', 'stream', 
+           'tempo', 'text', 'tinyNotation', 
+           'voiceLeading']
 
 # skipped purposely, "base", "node"
 

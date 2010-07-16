@@ -1479,6 +1479,7 @@ def sendNoteInfo(music21noteObject):
             retstr += "Has a fermata on it\n"
     return retstr
 
+
 class TestExternal(unittest.TestCase):
     '''These are tests that open windows and rely on external software
     '''
