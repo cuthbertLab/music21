@@ -28,6 +28,8 @@ from music21 import editorial
 from music21.lily import LilyString
 from music21 import musicxml
 musicxmlMod = musicxml # alias
+from music21 import midi
+midiMod = midi
 from music21 import expressions
 from music21 import pitch
 from music21 import beam
@@ -987,11 +989,6 @@ class Note(NotRest):
     octave = property(_getOctave, _setOctave, 
         doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.octave`.''')
 
-    # rewmoved: use property
-# this is only here backward compat; remove when possible
-#     def midiNote(self):
-#         return self._getMidi()
-
     def _getMidi(self):
         '''
         Returns the note's midi number.  
@@ -1203,6 +1200,19 @@ class Note(NotRest):
         return LilyString(allNames)
 
     lily = property(_getLily)
+
+
+    def _getMidiEvents(self):
+        pass
+
+    def _setMidiEvents(self, valueList):
+        pass
+
+    midiEvents = property(_getMidiEvents, _setMidiEvents, 
+        doc='''Get or set this note as a list of :class:`music21.midi.base.MidiEvent` objects.
+
+        >>> n = Note()
+        ''')
 
     def _getMX(self):
         '''

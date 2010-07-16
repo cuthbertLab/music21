@@ -61,6 +61,7 @@ Module Reference
    moduleMeter
    moduleMetadata
    moduleAnalysisMetrical
+   moduleMidiBase
    moduleNote
    moduleNode
    modulePitch

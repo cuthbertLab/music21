@@ -1840,6 +1840,48 @@ class Duration(DurationCommon):
     lily = property(_getLily)
 
 
+    def _getMidi(self):
+        if self._quarterLengthNeedsUpdating:
+            self.updateQuarterLength()
+        return int(round(self.quarterLength * defaults.ticksPerQuarter))
+
+    def _setMidi(self, value, ticksPerQuarter=None):
+        if ticksPerQuarter == None:
+            ticksPerQuarter = defaults.ticksPerQuarter
+        # given a value in ticks
+        self._qtrLength = float(value) / ticksPerQuarter
+        self._componentsNeedUpdating = True
+        self._quarterLengthNeedsUpdating = False
+
+    def setMidi(self, value, ticksPerQuarter):
+        '''Set MIDI duration value with an arbitrary `ticksPerQuarter` value.
+
+        >>> d = Duration()
+        >>> d.setMidi(60, 120) 
+        >>> d.type
+        'eighth'
+        >>> d.quarterLength
+        0.5
+        >>> d.midi
+        512
+        '''
+        self._setMidi(value, ticksPerQuarter)
+
+    midi = property(_getMidi, _setMidi, 
+        doc='''Get or set a duration value in MIDI ticks. MIDI duration values are measured in ticks per quarter. The music21 default ticks per quarter setting is set in defaults.py.
+
+        >>> d = Duration()
+        >>> d.midi = 1024
+        >>> d.type
+        'quarter'
+        >>> d.type = '16th'
+        >>> d.midi
+        256
+        >>> d.quarterLength
+        0.25
+        ''')
+
+
     def _getMX(self):
         '''
         Returns a list of one or more musicxml.Note() objects with all rhythms

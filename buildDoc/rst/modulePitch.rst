@@ -217,7 +217,14 @@ Pitch
 
         .. attribute:: midi
 
-            midi is ps (pitchSpace) as a rounded int; ps can accomodate floats 
+            Get or set a pitch value in MIDI. MIDI pitch values are like ps values (pitchSpace) rounded to the nearest integer; the ps attribute will accomodate floats. 
+
+            >>> a = Pitch('C3')
+            >>> a.midi
+            48 
+            >>> a.midi =  23.5
+            >>> a.midi
+            24 
 
         .. attribute:: accidental
 

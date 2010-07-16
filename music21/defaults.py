@@ -81,7 +81,10 @@ long and the other half are 917.  But this has not been done yet.
 '''
 divisionsPerQuarter = 32*3*3*5*7 # 10080
 
-
+# ticks per quarter is used for midi
+# while a supposedly 16 bit unsigned value
+# midi.py gives an error with 10080
+ticksPerQuarter = 1024
 
 
 #-----------------------------------------------------------------||||||||||||--

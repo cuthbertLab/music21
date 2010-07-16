@@ -12,7 +12,7 @@
 '''
 Objects and tools for processing MIDI data. 
 
-This module incorporates Will Ware's public domain midi.py from 2001
+This module is based on Will Ware's public domain midi.py from 2001
 see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 '''
 

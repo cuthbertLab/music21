@@ -775,7 +775,16 @@ class Pitch(music21.Music21Object):
         self._pitchSpaceNeedsUpdating = True
 
     
-    midi = property(_getMidi, _setMidi, doc="midi is ps (pitchSpace) as a rounded int; ps can accomodate floats")
+    midi = property(_getMidi, _setMidi, 
+        doc='''Get or set a pitch value in MIDI. MIDI pitch values are like ps values (pitchSpace) rounded to the nearest integer; the ps attribute will accomodate floats.
+
+        >>> a = Pitch('C3')
+        >>> a.midi
+        48
+        >>> a.midi =  23.5
+        >>> a.midi
+        24
+        ''')
 
     def _getName(self):
         '''Name presently returns pitch name and accidental without octave.

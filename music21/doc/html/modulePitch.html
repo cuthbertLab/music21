@@ -333,7 +333,16 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Pit
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.midi">
 <tt class="descname">midi</tt><a class="headerlink" href="#music21.pitch.Pitch.midi" title="Permalink to this definition">¶</a></dt>
-<dd>midi is ps (pitchSpace) as a rounded int; ps can accomodate floats</dd></dl>
+<dd><p>Get or set a pitch value in MIDI. MIDI pitch values are like ps values (pitchSpace) rounded to the nearest integer; the ps attribute will accomodate floats.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="s">&#39;C3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">midi</span>
+<span class="go">48</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">midi</span> <span class="o">=</span>  <span class="mf">23.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">midi</span>
+<span class="go">24</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.pitch.Pitch.accidental">
@@ -697,7 +706,7 @@ class </em><tt class="descclassname">music21.pitch.</tt><tt class="descname">Acc
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 15, 2010.
+      Last updated on Jul 16, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

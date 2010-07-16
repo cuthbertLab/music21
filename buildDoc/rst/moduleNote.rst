@@ -88,6 +88,12 @@ Note
 
             Return or set the numerical MIDI pitch representation from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.midi`. 
 
+        .. attribute:: midiEvents
+
+            Get or set this note as a list of :class:`music21.midi.base.MidiEvent` objects. 
+
+            >>> n = Note()
+
         .. attribute:: mx
 
             Returns a List of mxNotes Attributes of notes are merged from different locations: first from the duration objects, then from the pitch objects. Finally, GeneralNote attributes are added 

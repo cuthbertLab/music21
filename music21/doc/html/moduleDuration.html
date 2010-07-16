@@ -459,6 +459,23 @@ Attributes without Documentation: <cite>linkages</cite></blockquote>
 <dd>Simple lily duration: does not include tuplets These are taken care of in the lily processing in stream.Stream since lilypond requires tuplets to be in groups</dd></dl>
 
 <dl class="attribute">
+<dt id="music21.duration.Duration.midi">
+<tt class="descname">midi</tt><a class="headerlink" href="#music21.duration.Duration.midi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get or set a duration value in MIDI ticks. MIDI duration values are measured in ticks per quarter. The music21 default ticks per quarter setting is set in defaults.py.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">midi</span> <span class="o">=</span> <span class="mf">1024</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;quarter&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&#39;16th&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">midi</span>
+<span class="go">256</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">0.25</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="music21.duration.Duration.musicxml">
 <tt class="descname">musicxml</tt><a class="headerlink" href="#music21.duration.Duration.musicxml" title="Permalink to this definition">¶</a></dt>
 <dd>Return a complete MusicXML string with defaults.</dd></dl>
@@ -652,6 +669,22 @@ Attributes without Documentation: <cite>linkages</cite></blockquote>
 <dt id="music21.duration.Duration.fill">
 <tt class="descname">fill</tt><big>(</big><em>quarterLengthList=</em><span class="optional">[</span>, <em>'quarter'</em>, <em>'half'</em>, <em>'quarter'</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#music21.duration.Duration.fill" title="Permalink to this definition">¶</a></dt>
 <dd>Utility method for testing; a quick way to fill components. This will remove any exisiting values.</dd></dl>
+
+<dl class="method">
+<dt id="music21.duration.Duration.setMidi">
+<tt class="descname">setMidi</tt><big>(</big><em>value</em>, <em>ticksPerQuarter</em><big>)</big><a class="headerlink" href="#music21.duration.Duration.setMidi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set MIDI duration value with an arbitrary <cite>ticksPerQuarter</cite> value.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">setMidi</span><span class="p">(</span><span class="mf">60</span><span class="p">,</span> <span class="mf">120</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;eighth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">midi</span>
+<span class="go">512</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="music21.duration.Duration.show">
@@ -1152,7 +1185,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 15, 2010.
+      Last updated on Jul 16, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

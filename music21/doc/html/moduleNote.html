@@ -22,7 +22,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="top" title="music21 v0.2.5a3 documentation" href="index.html" />
     <link rel="next" title="music21.node" href="moduleNode.html" />
-    <link rel="prev" title="music21.analysis.metrical" href="moduleAnalysisMetrical.html" /> 
+    <link rel="prev" title="music21.midi.base" href="moduleMidiBase.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +38,7 @@
           <a href="moduleNode.html" title="music21.node"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="moduleAnalysisMetrical.html" title="music21.analysis.metrical"
+          <a href="moduleMidiBase.html" title="music21.midi.base"
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.5a3 documentation</a> &raquo;</li> 
       </ul>
@@ -64,8 +64,8 @@
 </ul>
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="moduleAnalysisMetrical.html"
-                                  title="previous chapter">music21.analysis.metrical</a></p>
+            <p class="topless"><a href="moduleMidiBase.html"
+                                  title="previous chapter">music21.midi.base</a></p>
             <h4>Next topic</h4>
             <p class="topless"><a href="moduleNode.html"
                                   title="next chapter">music21.node</a></p>
@@ -188,6 +188,15 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <dt id="music21.note.Note.midi">
 <tt class="descname">midi</tt><a class="headerlink" href="#music21.note.Note.midi" title="Permalink to this definition">¶</a></dt>
 <dd>Return or set the numerical MIDI pitch representation from the <a title="music21.pitch.Pitch" class="reference external" href="modulePitch.html#music21.pitch.Pitch"><tt class="xref docutils literal"><span class="pre">Pitch</span></tt></a> object. See <a title="music21.pitch.Pitch.midi" class="reference external" href="modulePitch.html#music21.pitch.Pitch.midi"><tt class="xref docutils literal"><span class="pre">midi</span></tt></a>.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.note.Note.midiEvents">
+<tt class="descname">midiEvents</tt><a class="headerlink" href="#music21.note.Note.midiEvents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get or set this note as a list of <a title="music21.midi.base.MidiEvent" class="reference external" href="moduleMidiBase.html#music21.midi.base.MidiEvent"><tt class="xref docutils literal"><span class="pre">music21.midi.base.MidiEvent</span></tt></a> objects.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.Note.mx">
@@ -748,14 +757,14 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Whol
           <a href="moduleNode.html" title="music21.node"
              >next</a> |</li>
         <li class="right" >
-          <a href="moduleAnalysisMetrical.html" title="music21.analysis.metrical"
+          <a href="moduleMidiBase.html" title="music21.midi.base"
              >previous</a> |</li>
         <li><a href="contents.html">music21 v0.2.5a3 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 15, 2010.
+      Last updated on Jul 16, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

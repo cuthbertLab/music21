@@ -24,6 +24,8 @@ from music21 import common
 from music21 import converter
 
 from music21.corpus import base as corpus
+from music21.midi import base as midi
+
 
 from music21 import duration
 from music21 import dynamics
@@ -94,6 +96,7 @@ MODULES = [
     meter, 
     metadata,
     metrical,
+    midi,
     note, 
     node, 
     pitch, 
