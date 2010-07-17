@@ -3912,8 +3912,12 @@ class Stream(music21.Music21Object):
         #t = self.offset * defaults.ticksPerQuarter
         # should shift at tracks level
         t = 0 * defaults.ticksPerQuarter
-        # have to be sorted
-        for obj in self.flat.sorted:
+
+        # have to be sorted, have to strip ties
+        s = self.stripTies(inPlace=False, matchByPitch=False,
+                           retainContainers=False)
+        # probably already flat and sorted
+        for obj in s.flat.sorted:
             tDurEvent = 0 # the found delta ticks in each event
 
             if obj.isClass(note.GeneralNote):
@@ -3927,20 +3931,29 @@ class Stream(music21.Music21Object):
                 if obj.isRest:
                     # for a rest, need the duration of the rest, plus whatever
                     # difference between the offset and the last time value
-                    #t += (obj.quarterLength * defaults.ticksPerQuarter) + tDif
-                    #t += (obj.quarterLength * defaults.ticksPerQuarter) 
                     continue
 
+                # get a list of midi events
                 sub = obj.midiEvents
 
-                # a single note has 4 events; 
-                # the event events are delta times
-                if len(sub) == 4: 
+                # a note has 4 events: delta/note-on/delta/note-off
+                if obj.isNote:
                     sub[0].time = int(round(tDif)) # set first delta 
                     # get the duration in ticks; this is the delta to 
                     # to the note off message; already set when midi events are 
                     # obtained
                     tDurEvent = int(round(sub[2].time))
+
+                # a chord has delta/note-on/delta/note-off for each memeber
+                # of the chord. on the first delta is the offset, and only
+                # the first delta preceding the first note-off is the duration
+                if obj.isChord:
+                    # divide events between note-on and note-off
+                    sub[0].time = int(round(tDif)) # set first delta 
+                    # only the delta before the first note-off has the event dur
+                    # could also sum all durations before setting first
+                    # this is the second half of events
+                    tDurEvent = int(round(len(sub) / 2))
 
                 # to get new current time, need both the duration of the event
                 # as well as any difference found between the last event
@@ -9016,6 +9029,76 @@ class Test(unittest.TestCase):
 
 
 
+        #environLocal.printDebug(['w/ chords'])
+        s = Stream()
+        data = [('c2', 1), (None, 1), (['f3', 'a-4', 'c5'], 1), (None, .5), ('a#2', 1), (None, 2), (['d2', 'a4'], .5), (['d-2', 'a#3', 'g#6'], .5), (None, 1), (['f#3', 'a4', 'c#5'], 4)]
+        for p, d in data:
+            if p == None:
+                n = note.Rest()
+            elif isinstance(p, list):
+                n = chord.Chord(p)
+            else:
+                n = note.Note(p)
+            n.quarterLength = d
+            s.append(n)
+        #s.show('midi')
+        mf = s.midiFile
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), 
+        (0, 'NOTE_ON', 36), 
+        (1024, 'NOTE_OFF', 36), 
+        (1024, 'NOTE_ON', 53), (0, 'NOTE_ON', 68), (0, 'NOTE_ON', 72), 
+        (1024, 'NOTE_OFF', 53), (0, 'NOTE_OFF', 68), (0, 'NOTE_OFF', 72), 
+        (1530, 'NOTE_ON', 46), 
+        (1024, 'NOTE_OFF', 46), 
+        (2048, 'NOTE_ON', 38), (0, 'NOTE_ON', 69), 
+        (512, 'NOTE_OFF', 38), (0, 'NOTE_OFF', 69), 
+        (508, 'NOTE_ON', 37), (0, 'NOTE_ON', 58), (0, 'NOTE_ON', 92), 
+        (512, 'NOTE_OFF', 37), (0, 'NOTE_OFF', 58), (0, 'NOTE_OFF', 92), 
+        (1530, 'NOTE_ON', 54), (0, 'NOTE_ON', 69), (0, 'NOTE_ON', 73), 
+        (4096, 'NOTE_OFF', 54), (0, 'NOTE_OFF', 69), (0, 'NOTE_OFF', 73), 
+        (0, 'END_OF_TRACK', None)]
+        procCompare(mf, match)
+
+
+    def testMidiEventsImported(self):
+
+        from music21 import corpus
+
+        def procCompare(mf, match):
+            triples = []
+            for i in range(0, len(mf.tracks[0].events), 2):
+                d  = mf.tracks[0].events[i] # delta
+                e  = mf.tracks[0].events[i+1] # events
+                triples.append((d.time, e.type, e.pitch))
+            self.assertEqual(triples, match)
+        
+
+        s = corpus.parseWork('bach/bwv66.6')
+        part = s.parts[0].getMeasureRange(6,9) # last meausres
+        #part.show('musicxml')
+        #part.show('midi')
+
+        mf = part.midiFile
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), 
+        (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), 
+        (0, 'NOTE_ON', 71), (1024, 'NOTE_OFF', 71), 
+        (0, 'NOTE_ON', 73), (1024, 'NOTE_OFF', 73), 
+        (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), 
+        (0, 'NOTE_ON', 68), (1024, 'NOTE_OFF', 68), 
+        (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), 
+        (0, 'NOTE_ON', 68), (2048, 'NOTE_OFF', 68), 
+        (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), 
+        (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), 
+        (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), # tied note here
+        (0, 'NOTE_ON', 66), (512, 'NOTE_OFF', 66), 
+        (0, 'NOTE_ON', 65), (512, 'NOTE_OFF', 65), 
+        (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), 
+        (0, 'END_OF_TRACK', None)]
+        procCompare(mf, match)
+
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -9032,4 +9115,5 @@ if __name__ == "__main__":
 
 
         #a.testYieldContainers()
-        a.testMidiEventsBuilt()
+        #a.testMidiEventsBuilt()    
+        a.testMidiEventsImported()

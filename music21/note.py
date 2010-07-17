@@ -1262,8 +1262,6 @@ class Note(NotRest):
     midiFile = property(_getMidiFile,
         doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.
 
-        Provide a complete MIDI file representation. 
-
         >>> n = Note()
         >>> mf = n.midiFile
         ''')
