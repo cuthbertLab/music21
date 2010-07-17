@@ -236,9 +236,13 @@ class Chord(note.NotRest):
     def _getMidiEvents(self):
         mt = None # midi track 
         eventList = []
-        for pitchObj in self.pitches:
+
+        for i in range(len(self.pitches)):
+            pitchObj = self.pitches[i]
 
             dt = midiModule.DeltaTime(mt)
+            # for a chord, only the first delta time should have the offset
+            # here, all are zero
             dt.time = 0 # set to zero; will be shifted later as necessary
             # add to track events
             eventList.append(dt)
@@ -251,12 +255,17 @@ class Chord(note.NotRest):
             me.velocity = 90 # default, can change later
             eventList.append(me)
     
-        for pitchObj in self.pitches:
+        # must create each note on in chord before each note on
+        for i in range(len(self.pitches)):
+            pitchObj = self.pitches[i]
 
             # add note off / velocity zero message
             dt = midiModule.DeltaTime(mt)
-            dt.time = self.duration.midi
-            # add to track events
+            # for a chord, only the first delta time should have the dur
+            if i == 0:
+                dt.time = self.duration.midi
+            else:
+                dt.time = 0
             eventList.append(dt)
     
             me = midiModule.MidiEvent(mt)
