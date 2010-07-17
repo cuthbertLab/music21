@@ -1225,7 +1225,7 @@ class Note(NotRest):
         eventList.append(dt)
 
         me = midiModule.MidiEvent(mt)
-        me.type = "NOTE_ON"
+        me.type = "NOTE_OFF"
         me.channel = 1
         me.time = None #d
         me.pitch = self.midi
@@ -1237,12 +1237,37 @@ class Note(NotRest):
         pass
 
     midiEvents = property(_getMidiEvents, _setMidiEvents, 
-        doc='''Get or set this note as a list of :class:`music21.midi.base.MidiEvent` objects.
+        doc='''Get or set this chord as a list of :class:`music21.midi.base.MidiEvent` objects.
 
         >>> n = Note()
         >>> n.midiEvents
-        [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=0>]
+        [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
         ''')
+
+    def _getMidiFile(self):
+        # get a list of mid tracks objects
+        mt = midiModule.MidiTrack(1)
+        mt.events += midiModule.getStartEvents(mt)
+        mt.events += self._getMidiEvents()
+        mt.events += midiModule.getEndEvents(mt)
+
+        # set all events to have this track
+        mt.updateEvents()
+
+        mf = midiModule.MidiFile()
+        mf.tracks = [mt]
+        mf.ticksPerQuarterNote = defaults.ticksPerQuarter
+        return mf
+
+    midiFile = property(_getMidiFile,
+        doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.
+
+        Provide a complete MIDI file representation. 
+
+        >>> n = Note()
+        >>> mf = n.midiFile
+        ''')
+
 
     def _getMX(self):
         '''

@@ -2142,7 +2142,7 @@ class Stream(music21.Music21Object):
             self.append(deepcopy(element))
     
     def repeatInsert(self, item, offsets):
-        '''Given an object, create many DEEPcopies at the positions specified by 
+        '''Given an object, create a deep copy of each object at each positions specified by 
         the offset list:
 
         >>> a = Stream()
@@ -3896,6 +3896,8 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
 
     def _getMidiTracksPart(self, instObj=None):
+        # NOTE: this procedure requires that there are no overlaps between
+        # adjacent events. 
 
         if instObj is None:
             # see if an instrument is defined in this or a parent stream
@@ -3904,53 +3906,45 @@ class Stream(music21.Music21Object):
         # each part will become midi track
         # each needs an id; can be adjusted later
         mt = midiModule.MidiTrack(1)
-
-        dt = midiModule.DeltaTime(mt)
-        dt.time = 0
-        mt.events.append(dt)
-
-        me = midiModule.MidiEvent(mt)
-        me.type = "SEQUENCE_TRACK_NAME"
-        me.time = 0 # always at zero?
-        me.data = instObj.partName
-        mt.events.append(me)
+        mt.events += midiModule.getStartEvents(mt, instObj.partName)
 
         # initial time is start of this Stream
         #t = self.offset * defaults.ticksPerQuarter
         # should shift at tracks level
         t = 0 * defaults.ticksPerQuarter
-
         # have to be sorted
         for obj in self.flat.sorted:
             tDurEvent = 0 # the found delta ticks in each event
 
             if obj.isClass(note.GeneralNote):
-                if obj.isClass(note.Rest):
-                    t += (obj.offset * defaults.ticksPerQuarter)
+                # find difference since last event to this event
+                # cannot use getOffsetBySite(self), as need flat offset
+                # all values are in tpq; t stores abs time in tpq
+                tDif = (obj.offset * defaults.ticksPerQuarter) - t
+
+                #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
+
+                if obj.isRest:
+                    # for a rest, need the duration of the rest, plus whatever
+                    # difference between the offset and the last time value
+                    #t += (obj.quarterLength * defaults.ticksPerQuarter) + tDif
+                    #t += (obj.quarterLength * defaults.ticksPerQuarter) 
                     continue
 
                 sub = obj.midiEvents
-                # update times in these events
-                # all even numbered index values should be DeltaTime objs
-                # these are the only objects that need adjustment
-
-                # find difference since last event to this event
-                # cannot use getOffsetBySite(self), as need flat offset
-                tDif = t - (obj.offset * 
-                            defaults.ticksPerQuarter)
 
                 # a single note has 4 events; 
                 # the event events are delta times
                 if len(sub) == 4: 
                     sub[0].time = int(round(tDif)) # set first delta 
-                    # get the duration in ticks
+                    # get the duration in ticks; this is the delta to 
+                    # to the note off message; already set when midi events are 
+                    # obtained
                     tDurEvent = int(round(sub[2].time))
 
-                # must update all events with a ref to this MidiTrack
-                for e in sub:
-                    e.track = mt
-
-                t += tDurEvent
+                # to get new current time, need both the duration of the event
+                # as well as any difference found between the last event
+                t += tDif + tDurEvent
                 # add events to the list
                 mt.events += sub
 
@@ -3959,16 +3953,9 @@ class Stream(music21.Music21Object):
             else: # other objects may have already been added
                 pass
 
-        dt = midiModule.DeltaTime(mt)
-        dt.time = 0
-        mt.events.append(dt)
-
-        me = midiModule.MidiEvent(mt)
-        me.type = "END_OF_TRACK"
-        me.channel = 1
-        me.data = '' # must set data to empty string
-        mt.events.append(me)
-
+        # must update all events with a ref to this MidiTrack
+        mt.updateEvents()
+        mt.events += midiModule.getEndEvents(mt)
         return mt
         
     def _setMidiTracksPart(self, eventList):
@@ -3978,7 +3965,6 @@ class Stream(music21.Music21Object):
 
 
     def _getMidiTracks(self):
-
         sTemplate = Stream()
         # return a list of MidiTrack objects
         midiTracks = []
@@ -4009,7 +3995,7 @@ class Stream(music21.Music21Object):
 
 
     def _getMidiFile(self):
-        '''Provide a complete MusicXML representation. 
+        '''Provide a complete MIDI file representation. 
         '''
         # get a list of mid tracks objects
         midiTracks = self._getMidiTracks()
@@ -8919,7 +8905,17 @@ class Test(unittest.TestCase):
 
 
 
-    def testMidiEvents(self):
+    def testMidiEventsBuilt(self):
+
+        def procCompare(mf, match):
+            triples = []
+            for i in range(0, len(mf.tracks[0].events), 2):
+                d  = mf.tracks[0].events[i] # delta
+                e  = mf.tracks[0].events[i+1] # events
+                triples.append((d.time, e.type, e.pitch))
+            self.assertEqual(triples, match)
+        
+
         s = Stream()
         n = note.Note('g#3')
         n.quarterLength = .5
@@ -8928,8 +8924,95 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post[0].events), 28)
         # must be an even number
         self.assertEqual(len(post[0].events) % 2, 0)
+
+        mf = s.midiFile
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'END_OF_TRACK', None)]
+
+        procCompare(mf, match)
         
-        post = s.midiFile
+        s = Stream()
+        n = note.Note('g#3')
+        n.quarterLength = 1.5
+        s.repeatAppend(n, 3)
+
+        mf = s.midiFile
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'NOTE_ON', 56), (1536, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (1536, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (1536, 'NOTE_OFF', 56), (0, 'END_OF_TRACK', None)]
+        procCompare(mf, match)
+
+        # combinations of different pitches and durs
+        s = Stream()
+        data = [('c2', .25), ('c#3', .5), ('g#3', 1.5), ('a#2', 1), ('a4', 2)]
+        for p, d in data:
+            n = note.Note(p)
+            n.quarterLength = d
+            s.append(n)
+
+        mf = s.midiFile
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'NOTE_ON', 36), (256, 'NOTE_OFF', 36), (0, 'NOTE_ON', 49), (512, 'NOTE_OFF', 49), (0, 'NOTE_ON', 56), (1536, 'NOTE_OFF', 56), (0, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46), (0, 'NOTE_ON', 69), (2048, 'NOTE_OFF', 69), (0, 'END_OF_TRACK', None)] 
+        procCompare(mf, match)
+
+        # rests, basic
+        #environLocal.printDebug(['rests'])
+        s = Stream()
+        data = [('c2', 1), (None, .5), ('c#3', 1), (None, .5), ('a#2', 1), (None, .5), ('a4', 1)]
+        for p, d in data:
+            if p == None:
+                n = note.Rest()
+            else:
+                n = note.Note(p)
+            n.quarterLength = d
+            s.append(n)
+        #s.show('midi')
+        mf = s.midiFile
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), 
+        (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36), 
+        (512, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49), 
+        (512, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46), 
+        (512, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), 
+        (0, 'END_OF_TRACK', None)]
+        procCompare(mf, match)
+
+
+        #environLocal.printDebug(['rests, varied sizes'])
+        s = Stream()
+        data = [('c2', 1), (None, .25), ('c#3', 1), (None, 1.5), ('a#2', 1), (None, 2), ('a4', 1)]
+        for p, d in data:
+            if p == None:
+                n = note.Rest()
+            else:
+                n = note.Note(p)
+            n.quarterLength = d
+            s.append(n)
+        #s.show('midi')
+        mf = s.midiFile
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), 
+        (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36), 
+        (256, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49), 
+        (1536, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46), 
+        (2048, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), 
+        (0, 'END_OF_TRACK', None)]
+        procCompare(mf, match)
+
+        #environLocal.printDebug(['rests, multiple in a row'])
+        s = Stream()
+        data = [('c2', 1), (None, 1), (None, 1), ('c#3', 1), ('c#3', 1), (None, .5), (None, .5), (None, .5), (None, .5), ('a#2', 1), (None, 2), ('a4', 1)]
+        for p, d in data:
+            if p == None:
+                n = note.Rest()
+            else:
+                n = note.Note(p)
+            n.quarterLength = d
+            s.append(n)
+        #s.show('midi')
+        mf = s.midiFile
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), 
+        (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36), 
+        (2048, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49), 
+        (0, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49), 
+        (2048, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46), 
+        (2048, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), 
+        (0, 'END_OF_TRACK', None)]
+        procCompare(mf, match)
 
 
 
@@ -8949,4 +9032,4 @@ if __name__ == "__main__":
 
 
         #a.testYieldContainers()
-        a.testMidiEvents()
+        a.testMidiEventsBuilt()

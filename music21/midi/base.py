@@ -511,6 +511,14 @@ class MidiTrack(object):
             r = r + "    " + `e` + "\n" 
         return r + "  >" 
 
+    #---------------------------------------------------------------------------
+    def updateEvents(self):
+        '''We may attach events to this track before setting their `track` parameter. This method will move through all events and set their track to this track. 
+        '''
+        for e in self.events:
+            e.track = self
+
+
 
 
 class MidiFile(object):
@@ -607,6 +615,47 @@ class MidiFile(object):
             str = str + trk.write() 
         return str 
 
+
+#-------------------------------------------------------------------------------
+# utility functions for getting commonly used event
+
+
+def getStartEvents(mt=None, partName='', partProgram=0):
+    '''Provide a list of events found at the beginning of a track.
+
+    A MidiTrack reference can be provided via the `mt` parameter.
+    '''
+    events = []
+
+    dt = DeltaTime(mt)
+    dt.time = 0
+    events.append(dt)
+
+    me = MidiEvent(mt)
+    me.type = "SEQUENCE_TRACK_NAME"
+    me.time = 0 # always at zero?
+    me.data = partName
+    events.append(me)
+
+    return events
+
+
+def getEndEvents(mt=None, channelNumber=1):
+    '''Provide a list of events found at the end of a track.
+    '''
+    events = []
+
+    dt = DeltaTime(mt)
+    dt.time = 0
+    events.append(dt)
+
+    me = MidiEvent(mt)
+    me.type = "END_OF_TRACK"
+    me.channel = channelNumber
+    me.data = '' # must set data to empty string
+    events.append(me)
+
+    return events
 
 
 

@@ -22,7 +22,9 @@ from music21 import interval
 from music21.duration import Duration
 #from music21.note import Note
 from music21 import musicxml
+from music21 import midi as midiModule
 from music21 import note
+from music21 import defaults
 
 from music21.lily import LilyString
 #from music21.pitch import Pitch
@@ -227,10 +229,81 @@ class Chord(note.NotRest):
 #     def _getDuration(self):
 #         '''It is assumed that all notes ahve the same duration
 #         '''
-# 
 #     def _setDuration(self, value):
 # 
 #     property(_getDuration, _setDuration)
+
+    def _getMidiEvents(self):
+        mt = None # midi track 
+        eventList = []
+        for pitchObj in self.pitches:
+
+            dt = midiModule.DeltaTime(mt)
+            dt.time = 0 # set to zero; will be shifted later as necessary
+            # add to track events
+            eventList.append(dt)
+
+            me = midiModule.MidiEvent(mt)
+            me.type = "NOTE_ON"
+            me.channel = 1
+            me.time = None # not required
+            me.pitch = pitchObj.midi
+            me.velocity = 90 # default, can change later
+            eventList.append(me)
+    
+        for pitchObj in self.pitches:
+
+            # add note off / velocity zero message
+            dt = midiModule.DeltaTime(mt)
+            dt.time = self.duration.midi
+            # add to track events
+            eventList.append(dt)
+    
+            me = midiModule.MidiEvent(mt)
+            me.type = "NOTE_OFF"
+            me.channel = 1
+            me.time = None #d
+            me.pitch = pitchObj.midi
+            me.velocity = 0 # must be zero
+            eventList.append(me)
+        return eventList 
+
+    def _setMidiEvents(self, eventList):
+        pass
+
+    midiEvents = property(_getMidiEvents, _setMidiEvents, 
+        doc='''Get or set this Chord as a list of :class:`music21.midi.base.MidiEvent` objects.
+
+        >>> from music21 import *
+        >>> c = chord.Chord(['c3','g#4', 'b5'])
+        >>> c.midiEvents
+        [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=48, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=48, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=68, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=68, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=83, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=83, velocity=0>]
+        ''')
+
+    def _getMidiFile(self):
+        '''Provide a complete MIDI file representation. 
+        '''
+        # get a list of mid tracks objects
+        mt = midiModule.MidiTrack(1)
+        mt.events += midiModule.getStartEvents(mt)
+        mt.events += self._getMidiEvents()
+        mt.events += midiModule.getEndEvents(mt)
+
+        # set all events to have this track
+        mt.updateEvents()
+
+        mf = midiModule.MidiFile()
+        mf.tracks = [mt]
+        mf.ticksPerQuarterNote = defaults.ticksPerQuarter
+        return mf
+
+    midiFile = property(_getMidiFile,
+        doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.
+
+        >>> c = Chord(['c3','g#4', 'b5'])
+        >>> mf = c.midiFile
+        ''')
+
 
     def _getMX(self):
         '''
