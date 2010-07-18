@@ -3976,7 +3976,6 @@ class Stream(music21.Music21Object):
 
 
 
-
     def _getMidiTracks(self):
         sTemplate = Stream()
         # return a list of MidiTrack objects
@@ -4007,6 +4006,8 @@ class Stream(music21.Music21Object):
         ''')
 
 
+
+
     def _getMidiFile(self):
         '''Provide a complete MIDI file representation. 
         '''
@@ -4023,8 +4024,13 @@ class Stream(music21.Music21Object):
         mf.ticksPerQuarterNote = defaults.ticksPerQuarter
         return mf
 
-    midiFile = property(_getMidiFile,
-        doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.
+    def _setMidiFile(self, mf):
+        '''Given a :class:`music21.midi.base.MidiFile` object, configure a Stream
+        '''
+        environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
+
+    midiFile = property(_getMidiFile, _setMidiFile,
+        doc = '''Get or set a :class:`music21.midi.base.MidiFile` object.
         ''')
 
 

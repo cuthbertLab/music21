@@ -41,6 +41,7 @@ from music21 import instrument
 from music21 import key
 from music21 import meter
 from music21 import musicxml
+from music21 import midi
 from music21 import note
 from music21 import expressions
 from music21 import stream
@@ -254,6 +255,10 @@ class StreamFreezer(object):
 
 
 #-------------------------------------------------------------------------------
+# Converters are associated classes; they are not subclasses, but all most define a pareData() method, a parseFile() method, and a .stream attribute or property. 
+
+
+#-------------------------------------------------------------------------------
 class ConverterHumdrum(object):
     '''Simple class wrapper for parsing Humdrum data provided in a file or in a string.
     '''
@@ -301,7 +306,6 @@ class ConverterTinyNotation(object):
         else: # assume a 2 element sequence
             tnStr = tnData[0]
             tnTs = tnData[1]
-    
         self.stream = tinyNotation.TinyNotationStream(tnStr, tnTs)
 
     def parseFile(self, fp):
@@ -336,9 +340,6 @@ class ConverterMusicXML(object):
         self._stream.mx = self._mxScore
         t.stop()
         environLocal.printDebug(['music21 object creation time:', t])
-
-    #---------------------------------------------------------------------------
-    # properties
 
     def _getStream(self):
         return self._stream
@@ -428,6 +429,37 @@ class ConverterMusicXML(object):
 
 
 
+#-------------------------------------------------------------------------------
+class ConverterMidi(object):
+    '''Simple class wrapper for parsing MIDI.
+    '''
+
+    def __init__(self):
+        self._stream = stream.Score()
+
+    def parseData(self, strData):
+        '''Get MIDI data from a binary string representation.
+        '''
+        mf = midi.MidiFile()
+        # do not need to call open or close on MidiFile instance
+        mf.readstr(strData)
+        self._stream.midiFile = mf
+
+    def parseFile(self, fp):
+        '''Get MIDI data from a file path.'''
+
+        mf = midi.MidiFile()
+        mf.open(fp)
+        mf.read()
+        mf.close()
+        self._stream.midiFile = mf
+
+    def _getStream(self):
+        return self._stream
+
+    stream = property(_getStream)
+
+
 
 
 
@@ -448,6 +480,8 @@ class Converter(object):
         # this may change in the future
         if format in ['musicxml', 'pickle']: 
             self._converter = ConverterMusicXML(forceSource=forceSource)
+        elif format == 'midi':
+            self._converter = ConverterMidi()
         elif format == 'humdrum':
             self._converter = ConverterHumdrum()
         elif format == 'tinyNotation':
@@ -482,6 +516,8 @@ class Converter(object):
             dataStr = dataStr.lstrip()
             if dataStr.startswith('<?xml'):
                 format = 'musicxml'
+            elif dataStr.startswith('MThd'):
+                format = 'midi'
             elif dataStr.startswith('!!!') or dataStr.startswith('**'):
                 format = 'humdrum'
             else:
@@ -499,9 +535,7 @@ class Converter(object):
         autoDownload = environLocal['autoDownload']
         if autoDownload == 'allow':
             pass
-        elif autoDownload == 'deny':
-            raise ConverterException('automatic downloading of URLs is presently set to "%s"; configure your Environment "autoDownload" setting to "allow" to permit automatic downloading.' % autoDownload)
-        elif autoDownload == 'ask':
+        elif autoDownload in ['deny', 'ask']:
             raise ConverterException('automatic downloading of URLs is presently set to "%s"; configure your Environment "autoDownload" setting to "allow" to permit automatic downloading.' % autoDownload)
 
         #url = urllib.quote(url) may need?
@@ -533,6 +567,8 @@ class Converter(object):
     # properties
 
     def _getStream(self):
+        '''All converters have to have a stream property or attribute.
+        '''
         return self._converter.stream 
         # not _stream: please don't look in other objects' private variables; 
         #              humdrum worked differently.
@@ -586,6 +622,9 @@ def parse(value, *args, **keywords):
     if common.isListLike(value) or len(args) > 0: # tiny notation list
         if len(args) > 0: # add additional args to a lost
             value = [value] + list(args)
+        return parseData(value)
+     # a midi string, must come before os.path.exists test
+    elif value.startswith('MThd'):
         return parseData(value)
     elif os.path.exists(value):
         return parseFile(value, forceSource=forceSource)
@@ -974,6 +1013,35 @@ class Test(unittest.TestCase):
 
 
 
+    def testConversionMidiBasic(self):
+        import common
+
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('midi'):
+                break
+
+        dirLib = os.path.join(fp, 'testPrimitive')
+        # a simple file created in athenacl
+        fp = os.path.join(dirLib, 'test01.mid')
+
+        s = parseFile(fp)
+        s = parse(fp)
+
+        c = ConverterMidi()
+        c.parseFile(fp)
+
+        # try low level string data passing
+        f = open(fp, 'rb')
+        data = f.read()
+        f.close()
+        
+        c.parseData(data)
+
+        # try module-leve; function
+        parseData(data)
+        parse(data)
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -990,4 +1058,5 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         a = Test()
         #a.testConversionMXLayout()
-        a.testConversionMXTies()
+        #a.testConversionMXTies()
+        a.testConversionMidiBasic()
