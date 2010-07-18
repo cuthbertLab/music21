@@ -312,12 +312,8 @@ class MidiEvent(object):
         return r + ">" 
     
     def read(self, time, str): 
-#         runningStatus = '' 
-#         self.time = time 
-#         # do we need to use running status? 
-#         if not (ord(str[0]) & 0x80): 
-#             str = runningStatus + str 
-#         runningStatus = x = str[0] 
+        '''Read a MIDI event.
+        '''
         x = str[0] 
         x = ord(x) 
         y = x & 0xF0 
@@ -413,6 +409,94 @@ class MidiEvent(object):
         else: 
             raise MidiException("unknown midi event type: %s" % self.type)
 
+    #---------------------------------------------------------------------------
+    def isNoteOn(self):
+        '''Return a boolean if this is a note-on message and velocity is not zero.
+
+        >>> mt = MidiTrack(1)
+        >>> me1 = MidiEvent(mt)
+        >>> me1.type = "NOTE_ON"
+        >>> me1.velocity = 120
+        >>> me1.isNoteOn()
+        True
+        >>> me1.isNoteOff()
+        False
+        '''
+        if self.type == "NOTE_ON" and self.velocity != 0:
+            return True
+        return False
+
+    def isNoteOff(self):
+        '''Return a boolean if this is a note-off message, either as a note-off or as a note-on with zero velocity.
+
+        >>> mt = MidiTrack(1)
+        >>> me1 = MidiEvent(mt)
+        >>> me1.type = "NOTE_OFF"
+        >>> me1.isNoteOn()
+        False
+        >>> me1.isNoteOff()
+        True
+
+        >>> me2 = MidiEvent(mt)
+        >>> me2.type = "NOTE_ON"
+        >>> me2.velocity = 0
+        >>> me2.isNoteOn()
+        False
+        >>> me2.isNoteOff()
+        True
+        '''
+        if self.type == "NOTE_OFF":
+            return True
+        elif self.type == "NOTE_ON" and self.velocity == 0:
+            return True
+        return False
+
+    def isDeltaTime(self):
+        '''Return a boolean if this is a note-on message and velocity is not zero.
+
+        >>> mt = MidiTrack(1)
+        >>> dt = DeltaTime(mt)
+        >>> dt.isDeltaTime()
+        True
+        '''
+        if self.type == "DeltaTime":
+            return True
+        return False
+
+    def matchedNoteOff(self, other):
+        '''If this is a note-on, given another MIDI event, is this a matching note-off for this event, return True. Checks both pitch and channel.
+
+        >>> mt = MidiTrack(1)
+        >>> me1 = MidiEvent(mt)
+        >>> me1.type = "NOTE_ON"
+        >>> me1.velocity = 120
+        >>> me1.pitch = 60
+
+        >>> me2 = MidiEvent(mt)
+        >>> me2.type = "NOTE_ON"
+        >>> me2.velocity = 0
+        >>> me2.pitch = 60
+
+        >>> me1.matchedNoteOff(me2)
+        True
+
+        >>> me2.pitch = 61
+        >>> me1.matchedNoteOff(me2)
+        False
+
+        >>> me2.type = "NOTE_OFF"
+        >>> me1.matchedNoteOff(me2)
+        False
+
+        >>> me2.pitch = 60
+        >>> me1.matchedNoteOff(me2)
+        True
+
+        '''
+        if other.isNoteOff:
+            if self.pitch == other.pitch and self.channel == other.channel:
+                return True
+        return False
 
 
 class DeltaTime(MidiEvent): 
@@ -444,6 +528,9 @@ class DeltaTime(MidiEvent):
     def write(self): 
         str = putVariableLengthNumber(self.time) 
         return str 
+
+
+
 
 
 class MidiTrack(object): 
@@ -490,6 +577,8 @@ class MidiTrack(object):
                 mystr = e.read(time, mystr) 
             except MidiException:
                 #environLocal.printDebug(['forced to skip event; delta_t:', delta_t])
+                # remove the last delta_t added to events
+                junk = self.events.pop(len(self.events)-1)
                 continue
             self.events.append(e) 
 

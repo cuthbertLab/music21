@@ -3971,9 +3971,86 @@ class Stream(music21.Music21Object):
         mt.events += midiModule.getEndEvents(mt)
         return mt
         
+
     def _setMidiTracksPart(self, mt, ticksPerQuarterNote=None):
         environLocal.printDebug(['got midi track: events', len(mt.events)])
-        pass
+        # get an abs start time for each event, discard deltas
+        events = []
+        t = 0
+        # pair deltas with events, convert abs time
+        # get even numbers
+        # in some cases, the first event may not be a delta time, but
+        # a SEQUENCE_TRACK_NAME or something else. thus, need to get
+        # first delta time
+        i = 0
+        while i < len(mt.events):
+            #environLocal.printDebug(['index', i, mt.events[i]])
+            #environLocal.printDebug(['index', i+1, mt.events[i+1]])
+            
+            # need to find pairs of delta time and evens
+            # in some cases, there are delta times that are out of order, or
+            # packed in the beginning
+            if mt.events[i].isDeltaTime() and not mt.events[i+1].isDeltaTime():
+                td = mt.events[i]
+                e = mt.events[i+1]
+                t += td.time # increment time
+                events.append([t, e])
+                i += 2
+                continue
+            else:
+                # cannot pair delta time to the next event; skip by 1
+                environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
+                i += 1
+                continue
+
+        # need to pair note-on with note-off
+        notes = [] # store pairs of pairs
+        memo = [] # store already matched note off
+        for i in range(len(events)):
+            t, e = events[i]
+            # for each event, we need to search for a match in all future
+            # events
+            if e.isNoteOn():
+                for j in range(i+1, len(events)):
+                    if j in memo: 
+                        continue
+                    tSub, eSub = events[j]
+                    if e.matchedNoteOff(eSub):
+                        memo.append(j)
+                        notes.append([events[i], events[j]])
+                        break
+        # collect notes with similar start times into chords
+        chordGroups = []
+        chord = None
+        i = 0
+        while i < len(notes):
+            on, off = notes[i]
+            t, e = on
+            for j in range(i+1, len(notes)):
+                onSub, offSub = notes[j]
+                tSub, eSub = onSub
+                # can set a tolerance for chording; here at 1/16th
+                # of a quarter
+                if tSub - t <= ticksPerQuarterNote / 16:
+                    if chord == None: # start a new one
+                        chord = [notes[i]]
+                    chord.append(notes[j])
+                else: # no more matches
+                    if chord != None:
+                        chordGroups.append(chord)
+                        iSkip = len(chord)
+                    else:
+                        iSkip = 1
+                    chord = None
+            i += iSkip
+                        
+#         environLocal.printDebug(['got midi track: events'])
+#         for e in notes:
+#             print e
+# 
+#         environLocal.printDebug(['chord grups'])
+#         for c in chordGroups:
+#             print c
 
 
     def _getMidiTracks(self):
@@ -9134,5 +9211,5 @@ if __name__ == "__main__":
 
 
         #a.testYieldContainers()
-        #a.testMidiEventsBuilt()    
+        a.testMidiEventsBuilt()    
         a.testMidiEventsImported()

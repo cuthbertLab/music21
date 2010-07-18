@@ -1044,6 +1044,25 @@ class Test(unittest.TestCase):
         parse(data)
 
 
+    def testConversionMidiNotes(self):
+        import common
+
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('midi'):
+                break
+
+        dirLib = os.path.join(fp, 'testPrimitive')
+        # a simple file created in athenacl
+        #for fn in ['test01.mid', 'test02.mid', 'test03.mid', 'test04.mid']:
+        for fn in ['test05.mid']:
+
+            fp = os.path.join(dirLib, fn)
+    
+            s = parseFile(fp)
+    
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, Converter, ConverterMusicXML, ConverterHumdrum]
@@ -1060,4 +1079,4 @@ if __name__ == "__main__":
         a = Test()
         #a.testConversionMXLayout()
         #a.testConversionMXTies()
-        a.testConversionMidiBasic()
+        a.testConversionMidiNotes()
