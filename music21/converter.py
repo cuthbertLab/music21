@@ -435,6 +435,7 @@ class ConverterMidi(object):
     '''
 
     def __init__(self):
+        # always create a score instance
         self._stream = stream.Score()
 
     def parseData(self, strData):

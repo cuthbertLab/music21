@@ -3971,9 +3971,9 @@ class Stream(music21.Music21Object):
         mt.events += midiModule.getEndEvents(mt)
         return mt
         
-    def _setMidiTracksPart(self, eventList):
+    def _setMidiTracksPart(self, mt, ticksPerQuarterNote=None):
+        environLocal.printDebug(['got midi track: events', len(mt.events)])
         pass
-
 
 
     def _getMidiTracks(self):
@@ -3990,8 +3990,14 @@ class Stream(music21.Music21Object):
             midiTracks.append(self._getMidiTracksPart())
         return midiTracks
 
-    def _setMidiTracks(self, eventList):
-        pass
+    def _setMidiTracks(self, midiTracks, ticksPerQuarterNote=None):
+        # give a list of midi tracks
+        for mt in midiTracks:
+            streamPart = Part() # create a part instance for each part
+            streamPart._setMidiTracksPart(mt, 
+                ticksPerQuarterNote=ticksPerQuarterNote)
+            self.insert(0, streamPart)
+
 
     midiTracks = property(_getMidiTracks, _setMidiTracks, 
         doc='''Get or set this Stream from a list of :class:`music21.midi.base.MidiTracks` objects.
@@ -4029,6 +4035,13 @@ class Stream(music21.Music21Object):
         '''
         environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
 
+        if len(mf.tracks) == 0:
+            raise StreamException('no tracks are defined in this MIDI file.')
+        else:
+            # create a stream for each tracks   
+            # may need to check if tracks actually have event data
+            self._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
+
     midiFile = property(_getMidiFile, _setMidiFile,
         doc = '''Get or set a :class:`music21.midi.base.MidiFile` object.
         ''')
@@ -4045,7 +4058,7 @@ class Stream(music21.Music21Object):
         these events are positioned; this is necessary for handling
         cases where one part is shorter than another. 
         '''
-        environLocal.printDebug(['calling Stream._getMXPart'])
+        #environLocal.printDebug(['calling Stream._getMXPart'])
         # note: meterStream may have TimeSignature objects from an unrelated
         # Stream.
         if instObj is None:
