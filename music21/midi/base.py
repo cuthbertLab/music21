@@ -607,6 +607,13 @@ class MidiTrack(object):
         for e in self.events:
             e.track = self
 
+    def hasNotes(self):
+        '''Return True/False if this track has any note-on/note-off pairs defined. 
+        '''
+        for e in self.events:
+            if e.isNoteOn(): 
+                return True
+        return False
 
 
 
@@ -657,7 +664,7 @@ class MidiFile(object):
     
     def readstr(self, str): 
         if not str[:4] == "MThd":
-            raise MidiException('badly formated midi string')
+            raise MidiException('badly formated midi string, got: %s' % str[:20])
         length, str = getNumber(str[4:], 4) 
         if not length == 6:
             raise MidiException('badly formated midi string')

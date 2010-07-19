@@ -2440,7 +2440,8 @@ class Stream(music21.Music21Object):
         return post # returns a new stream populated w/ new measure streams
 
 
-    def makeRests(self, refStreamOrTimeRange=None, inPlace=True):
+    def makeRests(self, refStreamOrTimeRange=None, fillGaps=False,
+        inPlace=True):
         '''
         Given a Stream with an offset not equal to zero, 
         fill with one Rest preeceding this offset. 
@@ -2449,6 +2450,8 @@ class Stream(music21.Music21Object):
         Stream is used to get min and max offsets. If a list is provided, 
         the list assumed to provide minimum and maximum offsets. Rests will 
         be added to fill all time defined within refStream.
+
+        If `fillGaps` is True, this will create rests in any time regions that have no active elements.
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, 
         this returns a modified deepcopy.
@@ -2507,12 +2510,16 @@ class Stream(music21.Music21Object):
             r.duration.quarterLength = qLen
             # place at oHigh to reach to oHighTarget
             returnObj.insert(oHigh, r)
-    
-        returnObj.elements = returnObj.sorted.elements
-        #environLocal.printDebug(['makeRests(); dur of first object', returnObj[0].duration])
 
-        # do not need to sort, can concatenate without sorting
-        # post = streamLead + returnObj 
+        if fillGaps:
+            gapStream = self.findGaps()
+            if gapStream != None:
+                for e in gapStream:
+                    r = note.Rest()
+                    r.duration.quarterLength = e.duration.quarterLength
+                    returnObj.insert(e.offset, r)
+
+        returnObj.elements = returnObj.sorted.elements
         return returnObj
 
 
@@ -2850,11 +2857,12 @@ class Stream(music21.Music21Object):
                 m.makeAccidentals()
 
         measureStream.makeTies(meterStream, inPlace=True)
-        measureStream.makeBeams(inPlace=True)
-#         try:
-#             measureStream.makeBeams(inPlace=True)
-#         except StreamException:
-#             environLocal.printDebug('skipping makeBeams exception')
+        #measureStream.makeBeams(inPlace=True)
+        try:
+            measureStream.makeBeams(inPlace=True)
+        except StreamException:
+            environLocal.printDebug(['skipping makeBeams exception', 
+                                    StreamException])
 
         if len(measureStream) == 0:            
             raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
@@ -4101,18 +4109,14 @@ class Stream(music21.Music21Object):
 #        environLocal.printDebug(['got midi track: events'])
 #         for e in notes:
 #             print e
-#         environLocal.printDebug(['composite: ', len(composite)])
-#         for c in composite:
-#             print c
-#             print
-        # quantize to nearest 16th
-        if quantizePost:
-            self.quantize(.125, processOffsets=True, processDurations=True)
 
-#         if len(self) != 0:
-#             self.show('musicxml')
-#             for e in self:
-#                 print e.offset, e.duration, e.pitch
+        # quantize to nearest 16th
+        if quantizePost:    
+            # 0.0625
+            self.quantize(0.125, processOffsets=True, processDurations=True)
+
+        # always need to fill gaps, as rests are not found in any other way
+        self.makeRests(inPlace=True, fillGaps=True)
 
 
     def _getMidiTracks(self):
@@ -4132,9 +4136,13 @@ class Stream(music21.Music21Object):
     def _setMidiTracks(self, midiTracks, ticksPerQuarter=None):
         # give a list of midi tracks
         for mt in midiTracks:
-            streamPart = Part() # create a part instance for each part
-            streamPart._setMidiTracksPart(mt, ticksPerQuarter=ticksPerQuarter)
-            self.insert(0, streamPart)
+            # not all tracks have notes defined; only creates parts for those
+            # that do
+            if mt.hasNotes(): 
+                streamPart = Part() # create a part instance for each part
+                streamPart._setMidiTracksPart(mt,
+                    ticksPerQuarter=ticksPerQuarter)
+                self.insert(0, streamPart)
 
     midiTracks = property(_getMidiTracks, _setMidiTracks, 
         doc='''Get or set this Stream from a list of :class:`music21.midi.base.MidiTracks` objects.
@@ -4904,24 +4912,25 @@ class Stream(music21.Music21Object):
         N.B. there may be gaps in the flattened representation of the stream
         but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless
         '''
-        if self.cache["GapStream"]:
-            return self.cache["GapStream"]
+        if self._cache["GapStream"]:
+            return self._cache["GapStream"]
         
         sortedElements = self.sorted.elements
         gapStream = Stream()
         highestCurrentEndTime = 0
-        for thisElement in sortedElements:
-            if thisElement.offset > highestCurrentEndTime:
-                gapElement = music21.ElementWrapper(obj = None, offset = highestCurrentEndTime)
+        for e in sortedElements:
+            if e.offset > highestCurrentEndTime:
+                gapElement = music21.ElementWrapper(obj = None)
+
                 gapElement.duration = duration.Duration()
-                gapElement.duration.quarterLength = thisElement.offset - highestCurrentEndTime
-                gapStream.insert(gapElement)
-            highestCurrentEndTime = max(highestCurrentEndTime, thisElement.offset + thisElement.duration.quarterLength)
+                gapElement.duration.quarterLength = e.offset - highestCurrentEndTime
+                gapStream.insert(highestCurrentEndTime, gapElement)
+            highestCurrentEndTime = max(highestCurrentEndTime, e.offset + e.duration.quarterLength)
 
         if len(gapStream) == 0:
             return None
         else:
-            self.cache["GapStream"] = gapStream
+            self._cache["GapStream"] = gapStream
             return gapStream
 
     def _getIsGapless(self):
@@ -9254,6 +9263,20 @@ class Test(unittest.TestCase):
         procCompare(mf, match)
 
 
+    def testFindGaps(self):
+        from music21 import note
+        s = Stream()
+        n = note.Note()
+        s.repeatInsert(n, [0, 1.5, 2.5, 4, 8])
+        post = s.findGaps()
+        test = [(e.offset, e.offset+e.duration.quarterLength) for e in post]
+        match = [(1.0, 1.5), (3.5, 4.0), (5.0, 8.0)]
+        self.assertEqual(test, match)
+
+        self.assertEqual(len(s), 5)
+        s.makeRests(fillGaps=True)
+        self.assertEqual(len(s), 8)
+        self.assertEqual(len(s.getElementsByClass(note.Rest)), 3)
 
 
 #-------------------------------------------------------------------------------
@@ -9272,5 +9295,6 @@ if __name__ == "__main__":
 
 
         #a.testYieldContainers()
-        a.testMidiEventsBuilt()    
-        a.testMidiEventsImported()
+        #a.testMidiEventsBuilt()    
+        #a.testMidiEventsImported()
+        a.testFindGaps()

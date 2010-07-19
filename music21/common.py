@@ -343,7 +343,8 @@ def nearestMultiple(n, unit):
         elif n >= (matchHigh - half) and n <= matchHigh:
             return matchHigh                
         mult += 1
-
+        if mult >= 10:
+            raise Exception('could not find match; would be an infinite loop!')
 
 def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean

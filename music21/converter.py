@@ -1060,7 +1060,7 @@ class Test(unittest.TestCase):
             fp = os.path.join(dirLib, fn)
     
             s = parseFile(fp)
-    
+            #s.show()
 
 
 #-------------------------------------------------------------------------------
