@@ -313,6 +313,38 @@ def isPowerOfTwo(n):
     if (almostEquals(remainder, 0.0)): return True
     else: return False
 
+
+def nearestMultiple(n, unit):
+    '''Given a positive value, return the nearest multiple of the supplied `unit`.
+
+    >>> nearestMultiple(.25, .25)
+    0.25
+    >>> nearestMultiple(.35, .25)
+    0.25
+    >>> nearestMultiple(.4, .25)
+    0.5
+    >>> nearestMultiple(23404.001, .125)
+    23404.0
+    >>> nearestMultiple(23404.134, .125)
+    23404.125
+    >>> nearestMultiple(.001, .125)
+    0.0
+    '''
+    if n < 0:
+        raise Exception('cannot find nearest multiple for a value less than the unit: %s, %s' % (n, unit))
+
+    mult = math.floor(n / unit) # can start with the floor 
+    half = unit / 2.0
+    while True:
+        matchLow = unit * mult
+        matchHigh = unit * (mult + 1)
+        if n >= matchLow and n <= (matchLow + half):
+            return matchLow
+        elif n >= (matchHigh - half) and n <= matchHigh:
+            return matchHigh                
+        mult += 1
+
+
 def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
     IMPROVE: when 2.6 is everywhere: add numbers class.

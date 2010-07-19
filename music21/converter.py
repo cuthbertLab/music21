@@ -1055,7 +1055,7 @@ class Test(unittest.TestCase):
         dirLib = os.path.join(fp, 'testPrimitive')
         # a simple file created in athenacl
         #for fn in ['test01.mid', 'test02.mid', 'test03.mid', 'test04.mid']:
-        for fn in ['test05.mid']:
+        for fn in ['test01.mid']:
 
             fp = os.path.join(dirLib, fn)
     

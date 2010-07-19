@@ -1845,27 +1845,19 @@ class Duration(DurationCommon):
             self.updateQuarterLength()
         return int(round(self.quarterLength * defaults.ticksPerQuarter))
 
-    def _setMidi(self, value, ticksPerQuarter=None):
-        if ticksPerQuarter == None:
+    def _setMidi(self, value):
+        # its a pair of value, ticks per quarterLength
+        if isinstance(value, list) or isinstance(value, tuple): 
+            ticks = value[0]
+            ticksPerQuarter = value[1]
+        else:
+            ticks = value
             ticksPerQuarter = defaults.ticksPerQuarter
         # given a value in ticks
-        self._qtrLength = float(value) / ticksPerQuarter
+        self._qtrLength = float(ticks) / ticksPerQuarter
         self._componentsNeedUpdating = True
         self._quarterLengthNeedsUpdating = False
 
-    def setMidi(self, value, ticksPerQuarter):
-        '''Set MIDI duration value with an arbitrary `ticksPerQuarter` value.
-
-        >>> d = Duration()
-        >>> d.setMidi(60, 120) 
-        >>> d.type
-        'eighth'
-        >>> d.quarterLength
-        0.5
-        >>> d.midi
-        512
-        '''
-        self._setMidi(value, ticksPerQuarter)
 
     midi = property(_getMidi, _setMidi, 
         doc='''Get or set a duration value in MIDI ticks. MIDI duration values are measured in ticks per quarter. The music21 default ticks per quarter setting is set in defaults.py.

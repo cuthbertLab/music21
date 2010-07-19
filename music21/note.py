@@ -1233,8 +1233,17 @@ class Note(NotRest):
         eventList.append(me)
         return eventList 
 
-    def _setMidiEvents(self, eventList):
-        pass
+    def _setMidiEvents(self, eventList, ticksPerQuarter=None):
+        # event list can be provided to a note in a few different ways
+        # it may be a list of pairs, where pairs are abs start time in ticks
+        if len(eventList) == 2:
+            tOn, eOn = eventList[0]
+            tOff, eOff = eventList[1]
+
+            self.duration.midi = (tOff - tOn), ticksPerQuarter
+            self.pitch.midi = eOn.pitch
+        else:
+            raise NoteException('cannot handle MIDI event list in the form: %r', eventList)
 
     midiEvents = property(_getMidiEvents, _setMidiEvents, 
         doc='''Get or set this chord as a list of :class:`music21.midi.base.MidiEvent` objects.

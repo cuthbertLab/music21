@@ -277,8 +277,26 @@ class Chord(note.NotRest):
             eventList.append(me)
         return eventList 
 
-    def _setMidiEvents(self, eventList):
-        pass
+    def _setMidiEvents(self, eventList, ticksPerQuarter):
+        #environLocal.printDebug(['_setMidiEvents() got: ', eventList])
+        # events can be provided in a variety of forms
+        if isinstance(eventList, list) and isinstance(eventList[0], list):
+            pitches = []
+            # pairs of pairs
+            for onPair, offPair in eventList:
+                tOn, eOn = onPair
+                tOff, eOff = offPair
+
+                p = pitch.Pitch()
+                p.midi = eOn.pitch
+                pitches.append(p)
+                
+        self._setPitches(pitches)
+        # can simply use last-assigned pair of tOff, tOn
+        self.duration.midi = (tOff - tOn), ticksPerQuarter
+
+        #environLocal.printDebug(['_setMidiEvents() post: ', self])
+
 
     midiEvents = property(_getMidiEvents, _setMidiEvents, 
         doc='''Get or set this Chord as a list of :class:`music21.midi.base.MidiEvent` objects.
@@ -546,7 +564,7 @@ class Chord(note.NotRest):
         self._pitches = value
 
     pitches = property(_getPitches, _setPitches, 
-        doc = '''Return a list of all Pitch objects in this Chord.
+        doc = '''Get or set a list of all Pitch objects in this Chord.
 
         >>> from music21 import *
         >>> c = chord.Chord(["C4", "E4", "G#4"])

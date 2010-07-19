@@ -2343,7 +2343,7 @@ class Stream(music21.Music21Object):
             offsetMap.append([offset, offset + dur, e])
             #offsetMap.append([offset, offset + dur, copy.copy(e)])
     
-        #environLocal.printDebug(['makesMeasures(): offset map', offsetMap])    
+        #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
     
         #offsetMap.sort() not necessary; just get min and max
         oMin = min([start for start, end, e in offsetMap])
@@ -2851,6 +2851,10 @@ class Stream(music21.Music21Object):
 
         measureStream.makeTies(meterStream, inPlace=True)
         measureStream.makeBeams(inPlace=True)
+#         try:
+#             measureStream.makeBeams(inPlace=True)
+#         except StreamException:
+#             environLocal.printDebug('skipping makeBeams exception')
 
         if len(measureStream) == 0:            
             raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
@@ -3818,6 +3822,36 @@ class Stream(music21.Music21Object):
         # do not need to call elements changed, as called in sub methods
         return returnObj
 
+
+    def quantize(self, quarterLengthMin, processOffsets=True,
+                 processDurations=False):
+        '''Quantize time values in this Stream by snapping offsets and/or durations to the nearest multiple of a quarter length value given as `quarterLengthMin`. 
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.quarterLength = .49
+        >>> s = stream.Stream()
+        >>> s.repeatInsert(n, [0.1, .49, .9, 1.51])
+        >>> s.quantize(.25, processOffsets=True, processDurations=True)
+        >>> [e.offset for e in s]
+        [0.0, 0.5, 1.0, 1.5]
+        >>> [e.duration.quarterLength for e in s]
+        [0.5, 0.5, 0.5, 0.5]
+        '''
+        # this presently is not trying to avoid overlaps that
+        # result from quantization; this may be necessary
+        for e in self._elements:
+            if processOffsets:
+                o = e.getOffsetBySite(self)
+                oNew = common.nearestMultiple(o, quarterLengthMin)
+                e.setOffsetBySite(self, oNew)
+            if processDurations:
+                if e.duration != None:
+                    ql = e.duration.quarterLength
+                    qlNew = common.nearestMultiple(ql, quarterLengthMin)
+                    e.duration.quarterLength = qlNew
+
+
     #---------------------------------------------------------------------------
     def isMultiPart(self):
         '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
@@ -3972,8 +4006,8 @@ class Stream(music21.Music21Object):
         return mt
         
 
-    def _setMidiTracksPart(self, mt, ticksPerQuarterNote=None):
-        environLocal.printDebug(['got midi track: events', len(mt.events)])
+    def _setMidiTracksPart(self, mt, ticksPerQuarter=None, quantizePost=True):
+        environLocal.printDebug(['got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
         # get an abs start time for each event, discard deltas
         events = []
         t = 0
@@ -4019,38 +4053,66 @@ class Stream(music21.Music21Object):
                         memo.append(j)
                         notes.append([events[i], events[j]])
                         break
+
         # collect notes with similar start times into chords
-        chordGroups = []
-        chord = None
+        # create a composite list of both notes and chords
+        #composite = []
+        chordSub = None
         i = 0
         while i < len(notes):
+            # look at each note; get on time and event
             on, off = notes[i]
             t, e = on
+            # go through all following notes
             for j in range(i+1, len(notes)):
+                # look at each on time event
                 onSub, offSub = notes[j]
                 tSub, eSub = onSub
-                # can set a tolerance for chording; here at 1/16th
+                # can set a tolerance for chordSubing; here at 1/16th
                 # of a quarter
-                if tSub - t <= ticksPerQuarterNote / 16:
-                    if chord == None: # start a new one
-                        chord = [notes[i]]
-                    chord.append(notes[j])
-                else: # no more matches
-                    if chord != None:
-                        chordGroups.append(chord)
-                        iSkip = len(chord)
-                    else:
+                if tSub - t <= ticksPerQuarter / 16:
+                    if chordSub == None: # start a new one
+                        chordSub = [notes[i]]
+                    chordSub.append(notes[j])
+                    continue # keep looing
+                else: # no more matches; assuming chordSub tones are contiguous
+                    if chordSub != None:
+                        #composite.append(chordSub)
+                        # create a chord here
+                        c = chord.Chord()
+                        c._setMidiEvents(chordSub, ticksPerQuarter)
+                        o = notes[i][0][0] / float(ticksPerQuarter)
+                        self.insert(o, c)
+                        iSkip = len(chordSub)
+                        chordSub = None
+                    else: # just append the note
+                        #composite.append(notes[i])
+                        # create a note here
+                        n = note.Note()
+                        n._setMidiEvents(notes[i], ticksPerQuarter)
+                        # the time is the first value in the first pair
+                        # need to round, as floating point error is likely
+                        o = notes[i][0][0] / float(ticksPerQuarter)
+                        self.insert(o, n)
                         iSkip = 1
-                    chord = None
+                    break # exit secondary loop
             i += iSkip
                         
-#         environLocal.printDebug(['got midi track: events'])
+#        environLocal.printDebug(['got midi track: events'])
 #         for e in notes:
 #             print e
-# 
-#         environLocal.printDebug(['chord grups'])
-#         for c in chordGroups:
+#         environLocal.printDebug(['composite: ', len(composite)])
+#         for c in composite:
 #             print c
+#             print
+        # quantize to nearest 16th
+        if quantizePost:
+            self.quantize(.125, processOffsets=True, processDurations=True)
+
+#         if len(self) != 0:
+#             self.show('musicxml')
+#             for e in self:
+#                 print e.offset, e.duration, e.pitch
 
 
     def _getMidiTracks(self):
@@ -4059,7 +4121,7 @@ class Stream(music21.Music21Object):
         midiTracks = []
 
         # TODO: may need to shift all time values to accomodate 
-        # stream that do not start at same time
+        # Streams that do not start at same time
         if self.isMultiPart():
             for obj in self.getElementsByClass(sTemplate.classNames):
                 midiTracks.append(obj._getMidiTracksPart())
@@ -4067,14 +4129,12 @@ class Stream(music21.Music21Object):
             midiTracks.append(self._getMidiTracksPart())
         return midiTracks
 
-    def _setMidiTracks(self, midiTracks, ticksPerQuarterNote=None):
+    def _setMidiTracks(self, midiTracks, ticksPerQuarter=None):
         # give a list of midi tracks
         for mt in midiTracks:
             streamPart = Part() # create a part instance for each part
-            streamPart._setMidiTracksPart(mt, 
-                ticksPerQuarterNote=ticksPerQuarterNote)
+            streamPart._setMidiTracksPart(mt, ticksPerQuarter=ticksPerQuarter)
             self.insert(0, streamPart)
-
 
     midiTracks = property(_getMidiTracks, _setMidiTracks, 
         doc='''Get or set this Stream from a list of :class:`music21.midi.base.MidiTracks` objects.
@@ -4118,6 +4178,7 @@ class Stream(music21.Music21Object):
             # create a stream for each tracks   
             # may need to check if tracks actually have event data
             self._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
+
 
     midiFile = property(_getMidiFile, _setMidiFile,
         doc = '''Get or set a :class:`music21.midi.base.MidiFile` object.
