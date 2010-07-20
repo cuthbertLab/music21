@@ -3938,6 +3938,8 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
 
     def _getMidiTracksPart(self, instObj=None):
+        '''Returns a :class:`music21.midi.base.MidiTracks` object based on the content of this Stream.
+        '''
         # NOTE: this procedure requires that there are no overlaps between
         # adjacent events. 
 
@@ -4016,6 +4018,8 @@ class Stream(music21.Music21Object):
 
     def _setMidiTracksPart(self, mt, ticksPerQuarter=None, quantizePost=True):
         environLocal.printDebug(['got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
+        '''Given a MIDI track, configure a Stream.
+        '''
         # get an abs start time for each event, discard deltas
         events = []
         t = 0

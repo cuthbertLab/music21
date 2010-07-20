@@ -23,6 +23,7 @@ from music21.duration import Duration
 #from music21.note import Note
 from music21 import musicxml
 from music21 import midi as midiModule
+from music21.midi import translate as midiTranslate
 from music21 import note
 from music21 import defaults
 
@@ -234,66 +235,72 @@ class Chord(note.NotRest):
 #     property(_getDuration, _setDuration)
 
     def _getMidiEvents(self):
-        mt = None # midi track 
-        eventList = []
+        return midiTranslate.fromChordToMidiEvents(self)
 
-        for i in range(len(self.pitches)):
-            pitchObj = self.pitches[i]
-
-            dt = midiModule.DeltaTime(mt)
-            # for a chord, only the first delta time should have the offset
-            # here, all are zero
-            dt.time = 0 # set to zero; will be shifted later as necessary
-            # add to track events
-            eventList.append(dt)
-
-            me = midiModule.MidiEvent(mt)
-            me.type = "NOTE_ON"
-            me.channel = 1
-            me.time = None # not required
-            me.pitch = pitchObj.midi
-            me.velocity = 90 # default, can change later
-            eventList.append(me)
-    
-        # must create each note on in chord before each note on
-        for i in range(len(self.pitches)):
-            pitchObj = self.pitches[i]
-
-            # add note off / velocity zero message
-            dt = midiModule.DeltaTime(mt)
-            # for a chord, only the first delta time should have the dur
-            if i == 0:
-                dt.time = self.duration.midi
-            else:
-                dt.time = 0
-            eventList.append(dt)
-    
-            me = midiModule.MidiEvent(mt)
-            me.type = "NOTE_OFF"
-            me.channel = 1
-            me.time = None #d
-            me.pitch = pitchObj.midi
-            me.velocity = 0 # must be zero
-            eventList.append(me)
-        return eventList 
+#         mt = None # midi track 
+#         eventList = []
+# 
+#         for i in range(len(self.pitches)):
+#             pitchObj = self.pitches[i]
+# 
+#             dt = midiModule.DeltaTime(mt)
+#             # for a chord, only the first delta time should have the offset
+#             # here, all are zero
+#             dt.time = 0 # set to zero; will be shifted later as necessary
+#             # add to track events
+#             eventList.append(dt)
+# 
+#             me = midiModule.MidiEvent(mt)
+#             me.type = "NOTE_ON"
+#             me.channel = 1
+#             me.time = None # not required
+#             me.pitch = pitchObj.midi
+#             me.velocity = 90 # default, can change later
+#             eventList.append(me)
+#     
+#         # must create each note on in chord before each note on
+#         for i in range(len(self.pitches)):
+#             pitchObj = self.pitches[i]
+# 
+#             # add note off / velocity zero message
+#             dt = midiModule.DeltaTime(mt)
+#             # for a chord, only the first delta time should have the dur
+#             if i == 0:
+#                 dt.time = self.duration.midi
+#             else:
+#                 dt.time = 0
+#             eventList.append(dt)
+#     
+#             me = midiModule.MidiEvent(mt)
+#             me.type = "NOTE_OFF"
+#             me.channel = 1
+#             me.time = None #d
+#             me.pitch = pitchObj.midi
+#             me.velocity = 0 # must be zero
+#             eventList.append(me)
+#         return eventList 
 
     def _setMidiEvents(self, eventList, ticksPerQuarter):
+
+        midiTranslate.fromMidiEventsToChord(eventList, 
+            ticksPerQuarter, self)
+
         #environLocal.printDebug(['_setMidiEvents() got: ', eventList])
         # events can be provided in a variety of forms
-        if isinstance(eventList, list) and isinstance(eventList[0], list):
-            pitches = []
-            # pairs of pairs
-            for onPair, offPair in eventList:
-                tOn, eOn = onPair
-                tOff, eOff = offPair
-
-                p = pitch.Pitch()
-                p.midi = eOn.pitch
-                pitches.append(p)
-                
-        self._setPitches(pitches)
-        # can simply use last-assigned pair of tOff, tOn
-        self.duration.midi = (tOff - tOn), ticksPerQuarter
+#         if isinstance(eventList, list) and isinstance(eventList[0], list):
+#             pitches = []
+#             # pairs of pairs
+#             for onPair, offPair in eventList:
+#                 tOn, eOn = onPair
+#                 tOff, eOff = offPair
+# 
+#                 p = pitch.Pitch()
+#                 p.midi = eOn.pitch
+#                 pitches.append(p)
+#                 
+#         self._setPitches(pitches)
+#         # can simply use last-assigned pair of tOff, tOn
+#         self.duration.midi = (tOff - tOn), ticksPerQuarter
 
         #environLocal.printDebug(['_setMidiEvents() post: ', self])
 
@@ -310,19 +317,20 @@ class Chord(note.NotRest):
     def _getMidiFile(self):
         '''Provide a complete MIDI file representation. 
         '''
+        return midiTranslate.fromChordToMidiFile(self)
         # get a list of mid tracks objects
-        mt = midiModule.MidiTrack(1)
-        mt.events += midiModule.getStartEvents(mt)
-        mt.events += self._getMidiEvents()
-        mt.events += midiModule.getEndEvents(mt)
-
-        # set all events to have this track
-        mt.updateEvents()
-
-        mf = midiModule.MidiFile()
-        mf.tracks = [mt]
-        mf.ticksPerQuarterNote = defaults.ticksPerQuarter
-        return mf
+#         mt = midiModule.MidiTrack(1)
+#         mt.events += midiModule.getStartEvents(mt)
+#         mt.events += self._getMidiEvents()
+#         mt.events += midiModule.getEndEvents(mt)
+# 
+#         # set all events to have this track
+#         mt.updateEvents()
+# 
+#         mf = midiModule.MidiFile()
+#         mf.tracks = [mt]
+#         mf.ticksPerQuarterNote = defaults.ticksPerQuarter
+#         return mf
 
     midiFile = property(_getMidiFile,
         doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.
