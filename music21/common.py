@@ -796,6 +796,16 @@ def dirPartitioned(obj, skipLeading=['__']):
 
 #-------------------------------------------------------------------------------
 # tools for setup.py
+def getSourceFilePath():
+    '''Get the music21 directory that contains source files. This not the same as the outermost package development directory. 
+    '''
+    import music21
+    fpMusic21 = music21.__path__[0] # list, get first item
+    # use corpus as a test case
+    if 'corpus' not in os.listdir(fpMusic21):
+        raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
+    return fpMusic21
+
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
      packageOnly=True):

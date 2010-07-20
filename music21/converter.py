@@ -1047,20 +1047,21 @@ class Test(unittest.TestCase):
     def testConversionMidiNotes(self):
         import common
 
-        dir = common.getPackageDir(relative=False, remapSep=os.sep)
-        for fp in dir:
-            if fp.endswith('midi'):
-                break
-
-        dirLib = os.path.join(fp, 'testPrimitive')
+        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test01.mid')
         # a simple file created in athenacl
         #for fn in ['test01.mid', 'test02.mid', 'test03.mid', 'test04.mid']:
-        for fn in ['test01.mid']:
+        s = parseFile(fp)
+        #s.show()
+        self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 17)
 
-            fp = os.path.join(dirLib, fn)
-    
-            s = parseFile(fp)
-            #s.show()
+
+        # has chords and notes
+        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
+        s = parseFile(fp)
+        #s.show()
+        self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
+        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 3)
+
 
 
 #-------------------------------------------------------------------------------
@@ -1080,3 +1081,4 @@ if __name__ == "__main__":
         #a.testConversionMXLayout()
         #a.testConversionMXTies()
         a.testConversionMidiNotes()
+

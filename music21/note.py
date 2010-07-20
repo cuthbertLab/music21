@@ -1400,7 +1400,7 @@ class Note(NotRest):
 
 
 
-#--------------------------------------#
+#-------------------------------------------------------------------------------
 # convenience classes
 
 class EighthNote(Note):
@@ -1794,6 +1794,13 @@ class Test(unittest.TestCase):
                 self.assertEquals(match[i], found[i])
 
             #s.show()
+
+
+    def testNoteEquality(self):
+
+        n1 = Note('a#')
+        n2 = Note('g')
+        self.assertEqual(n1==n2, False)
 
 
 #-------------------------------------------------------------------------------
