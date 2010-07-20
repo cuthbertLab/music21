@@ -376,6 +376,25 @@ class Test(unittest.TestCase):
         self.assertEqual(a.bendAlter, None)
 
 
+    def testArticulationEquality(self):
+        a1 = Accent()
+        a2 = Accent()
+        a3 = StrongAccent()
+        a4 = StrongAccent()
+
+        self.assertEqual(a1, a2)
+        self.assertEqual(a3, a4)
+
+        # in order lists
+        self.assertEqual([a1, a3], [a2, a4])
+
+        self.assertEqual(set([a1, a3]), set([a1, a3]))
+        self.assertEqual(set([a1, a3]), set([a3, a1]))
+
+        # comparison of sets of different objects to not pass
+        self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

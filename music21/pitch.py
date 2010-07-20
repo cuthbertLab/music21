@@ -1931,6 +1931,8 @@ class Test(unittest.TestCase):
 
 
 
+# the updateAccidentalKeySignature() method was not implemented
+# as testd here
 
 #     def testUpdateAccidentalKeySignature(self):
 #         '''Test updating accidental display.
@@ -1978,7 +1980,6 @@ class Test(unittest.TestCase):
 #         proc(pList, ks.alteredPitches)        
 #         compare(pList, result)
 # 
-# 
 #         pList = [Pitch('b3'), Pitch('b-3'), Pitch('a3'), 
 #         Pitch('c#3'), Pitch('g#5'), Pitch('d-3')]
 #         result = [('natural', True), ('flat', False), ('natural', True), 
@@ -1988,6 +1989,30 @@ class Test(unittest.TestCase):
 #         proc(pList, ks.alteredPitches)        
 #         compare(pList, result)
 
+
+    def testPitchEquality(self):
+        '''Test updating accidental display.
+        '''
+        data = [('a', 'b', False), ('a', 'a', True), ('a#', 'a', False),
+                ('a#', 'b-', False), ('a#', 'a-', False), ('a##', 'a#', False),
+            ('a#4', 'a#4', True), ('a-3', 'a-4', False), ('a#3', 'a#4', False),
+            ]
+        for x, y, match in data:
+            p1 = Pitch(x)
+            p2 = Pitch(y)
+            self.assertEqual(p1==p2, match)
+
+        # specific case of changing octave
+        p1 = Pitch('a#')
+        p2 = Pitch('a#')
+        self.assertEqual(p1==p2, True)
+
+        p1.octave = 4
+        p2.octave = 3
+        self.assertEqual(p1==p2, False)
+        p1.octave = 4
+        p2.octave = 4
+        self.assertEqual(p1==p2, True)
 
 
 
@@ -2005,7 +2030,8 @@ if __name__ == "__main__":
         a = Test()
         b = TestExternal()
 
-        a.testUpdateAccidentalDisplayComplete()
+#         a.testUpdateAccidentalDisplayComplete()
+# 
+#         a.testUpdateAccidentalDisplaySeriesKeySignature()
 
-        a.testUpdateAccidentalDisplaySeriesKeySignature()
-
+        a.testPitchEquality()

@@ -1284,6 +1284,7 @@ class DurationUnit(DurationCommon):
             "not a valid quarter length (%s)" % value)
         if self.linkStatus is True:
             self._typeNeedsUpdating = True
+        # need to make sure its a float for comparisons
         self._qtrLength = value
 
     quarterLength = property(_getQuarterLength, _setQuarterLength,

@@ -879,12 +879,22 @@ class Note(NotRest):
             # checks type, dots, tuplets, quarterlength, uses Pitch.__eq__
             if self.duration == other.duration:
                 # articulations are a list of Articulation objects
-                # could convert to sets to compare unordered, but this would
-                # remove reduncies
-                if set(self.articulations) == set(other.articulations):
+                # converting to sets produces ordered cols that remove duplicate
+                # however, must then convert to list to match based on class ==
+                # not on class id()
+                if (sorted(list(set(self.articulations))) ==
+                    sorted(list(set(other.articulations)))):
                     # Tie objects if present compare only type
                     if self.tie == other.tie:
                         return True
+#                     else:
+#                         environLocal.printDebug('not matching note on tie')
+#                 else:
+#                     environLocal.printDebug('not matching note on articulations')
+#             else:
+#                 environLocal.printDebug('not matching note on duration')
+#         else:
+#             environLocal.printDebug('not matching note on pitch')
         return False
 
     def __ne__(self, other):
@@ -1797,11 +1807,79 @@ class Test(unittest.TestCase):
 
 
     def testNoteEquality(self):
+        from music21 import articulations
 
         n1 = Note('a#')
         n2 = Note('g')
-        self.assertEqual(n1==n2, False)
+        n3 = Note('a-')
+        n4 = Note('a#')
 
+        self.assertEqual(n1==n2, False)
+        self.assertEqual(n1==n3, False)
+        self.assertEqual(n1==n4, True)
+
+        # test durations with the same pitch
+        for x, y, match in [(1, 1, True), (1, .5, False), 
+                     (1, 2, False), (1, 1.5, False)]:
+            n1.quarterLength = x
+            n4.quarterLength = y
+            self.assertEqual(n1==n4, match) # sub1
+
+        # test durations with different pitch
+        for x, y, match in [(1, 1, False), (1, .5, False), 
+                     (1, 2, False), (1, 1.5, False)]:
+            n1.quarterLength = x
+            n2.quarterLength = y
+            self.assertEqual(n1==n2, match) # sub2
+
+        # same pitches different octaves
+        n1.quarterLength = 1.0
+        n4.quarterLength = 1.0
+        for x, y, match in [(4, 4, True), (3, 4, False), (2, 4, False)]:
+            n1.pitch.octave = x
+            n4.pitch.octave = y
+            self.assertEqual(n1==n4, match) # sub4
+
+        # with and without ties
+        n1.pitch.octave = 4
+        n4.pitch.octave = 4
+        t1 = Tie()
+        t2 = Tie()
+        for x, y, match in [(t1, None, False), (t1, t2, True)]:
+            n1.tie = x
+            n4.tie = y
+            self.assertEqual(n1==n4, match) # sub4
+
+        # with ties but different pitches
+        for n in [n1, n2, n3, n4]:
+            n.quarterLength = 1.0
+        t1 = Tie()
+        t2 = Tie()
+        for a, b, match in [(n1, n2, False), (n1, n3, False), 
+                            (n2, n3, False), (n1, n4, True)]:
+            a.tie = t1
+            b.tie = t2
+            self.assertEqual(a==b, match) # sub5
+
+        # articulation groups
+        a1 = [articulations.Accent()]
+        a2 = [articulations.Accent(), articulations.StrongAccent()]
+        a3 = [articulations.StrongAccent(), articulations.Accent()]
+        a4 = [articulations.StrongAccent(), articulations.Accent(), 
+             articulations.Tenuto()]
+        a5 = [articulations.Accent(), articulations.Tenuto(),
+             articulations.StrongAccent()]
+
+        for a, b, c, d, match in [(n1, n4, a1, a1, True), 
+                (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
+                # same pitch different orderings
+                (n1, n4, a2, a3, True), (n1, n4, a4, a5, True),
+                # different pitch same orderings
+               (n1, n2, a2, a3, False), (n1, n3, a4, a5, False),
+            ]:
+            a.articulations = c
+            b.articulations = d
+            self.assertEqual(a==b, match) # sub6
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1818,4 +1896,4 @@ if __name__ == "__main__":
 
 
 
-        a.testNoteBeatPropertyCorpus()
+        a.testNoteEquality()
