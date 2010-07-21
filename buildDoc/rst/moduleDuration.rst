@@ -519,19 +519,6 @@ Duration
 
             Utility method for testing; a quick way to fill components. This will remove any exisiting values. 
 
-        .. method:: setMidi(value, ticksPerQuarter)
-
-            Set MIDI duration value with an arbitrary `ticksPerQuarter` value. 
-
-            >>> d = Duration()
-            >>> d.setMidi(60, 120)
-            >>> d.type
-            'eighth' 
-            >>> d.quarterLength
-            0.5 
-            >>> d.midi
-            512 
-
         .. method:: show(format=musicxml)
 
             Same as Music21Object.show() 

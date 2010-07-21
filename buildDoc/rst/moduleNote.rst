@@ -90,9 +90,18 @@ Note
 
         .. attribute:: midiEvents
 
-            Get or set this note as a list of :class:`music21.midi.base.MidiEvent` objects. 
+            Get or set this chord as a list of :class:`music21.midi.base.MidiEvent` objects. 
 
             >>> n = Note()
+            >>> n.midiEvents
+            [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>] 
+
+        .. attribute:: midiFile
+
+            Return a complete :class:`music21.midi.base.MidiFile` object. 
+
+            >>> n = Note()
+            >>> mf = n.midiFile
 
         .. attribute:: mx
 
@@ -310,7 +319,7 @@ GeneralNote
 
         .. attribute:: color
 
-            No documentation. 
+            Return the Note color. 
 
         .. attribute:: lyric
 
@@ -318,7 +327,7 @@ GeneralNote
 
         .. attribute:: musicxml
 
-            This must call _getMX to get basic mxNote objects 
+            Return a complete musicxml representation. 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
@@ -364,6 +373,10 @@ GeneralNote
             >>> n.augmentOrDiminish(.25)
             >>> n.quarterLength
             0.5 
+            >>> n = note.Note('g#')
+            >>> n.augmentOrDiminish(-1)
+            Traceback (most recent call last): 
+            NoteException: scalar must be greater than zero 
 
         .. method:: compactNoteInfo()
 
@@ -533,7 +546,7 @@ Tie
 
         .. attribute:: mx
 
-            No documentation. 
+            Return a MusicXML object representation. 
 
         Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 

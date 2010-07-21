@@ -68,6 +68,11 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     For simple decimals (mostly > 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator) 
 
+    >>> decimalToTuplet(1.5)
+    (3, 2) 
+    >>> decimalToTuplet(1.25)
+    (5, 4) 
+
 .. function:: dirPartitioned(obj, skipLeading=['__'])
 
     Given an objet, return three lists of names: methods, attributes, and properties. Note that if a name/attribute is dynamically created by a property it cannot be found until that attribute is created. TODO: this cannot properly partiton properties from methods 
@@ -105,6 +110,8 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
     ('text', '.txt') 
     >>> findFormat('textline')
     ('textline', '.txt') 
+    >>> findFormat('midi')
+    ('midi', '.mid') 
 
 .. function:: findFormatExtFile(fp)
 
@@ -131,9 +138,9 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters. 
 
-    >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
-    >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
-    >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
+    >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+    >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+    >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
     >>> urlD = 'http://static.wikifonia.org/4918/musicxml.mxl'
     >>> urlE = 'http://static.wikifonia.org/4306/musicxml.mxl'
     >>> urlF = 'http://junk'
@@ -181,9 +188,6 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
     >>> a
     ['.krn'] 
 
-.. function:: findSimpleFraction(working)
-
-
 .. function:: formatStr(msg, *arguments, **keywords)
 
     Format one or more data elements into string suitable for printing straight to stderr or other outputs 
@@ -222,6 +226,10 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 .. function:: getPlatform()
 
     Return the name of the platform, where platforms are divided between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for (GNU/Linux and other variants). 
+
+.. function:: getSourceFilePath()
+
+    Get the music21 directory that contains source files. This not the same as the outermost package development directory. 
 
 .. function:: greaterThan(x, y=0.0)
 
@@ -327,6 +335,23 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
     lessThan -- returns True if x is less than and not almostEquals y 
 
+.. function:: nearestMultiple(n, unit)
+
+    Given a positive value, return the nearest multiple of the supplied `unit`. 
+
+    >>> nearestMultiple(.25, .25)
+    0.25 
+    >>> nearestMultiple(.35, .25)
+    0.25 
+    >>> nearestMultiple(.4, .25)
+    0.5 
+    >>> nearestMultiple(23404.001, .125)
+    23404.0 
+    >>> nearestMultiple(23404.134, .125)
+    23404.125 
+    >>> nearestMultiple(.001, .125)
+    0.0 
+
 .. function:: numToIntOrFloat(value)
 
     Given a number, return an integer if it is very close to an integer, otherwise, return a float. 
@@ -417,15 +442,15 @@ Scalar
 
         .. method:: toFloat()
 
-            No documentation. 
+            Return a float. 
 
         .. method:: toInt()
 
-            No documentation. 
+            Return an integer. 
 
         .. method:: toUnicode()
 
-            No documentation. 
+            Return unicode. 
 
 
 Iterator

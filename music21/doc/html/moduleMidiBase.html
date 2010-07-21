@@ -92,7 +92,12 @@
             
   <div class="section" id="module-music21.midi.base">
 <span id="modulemidi-base"></span><h1>music21.midi.base<a class="headerlink" href="#module-music21.midi.base" title="Permalink to this headline">¶</a></h1>
-<p>Objects and tools for processing MIDI data. This module is based on Will Ware&#8217;s public domain midi.py from 2001 see <a class="reference external" href="http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e">http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e</a></p>
+<p>Objects and tools for processing MIDI data. This module uses routines from Will Ware&#8217;s public domain midi.py from 2001 see <a class="reference external" href="http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e">http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e</a></p>
+<dl class="function">
+<dt id="music21.midi.base.getEndEvents">
+<tt class="descclassname">music21.midi.base.</tt><tt class="descname">getEndEvents</tt><big>(</big><em>mt=None</em>, <em>channelNumber=1</em><big>)</big><a class="headerlink" href="#music21.midi.base.getEndEvents" title="Permalink to this definition">¶</a></dt>
+<dd>Provide a list of events found at the end of a track.</dd></dl>
+
 <dl class="function">
 <dt id="music21.midi.base.getNumber">
 <tt class="descclassname">music21.midi.base.</tt><tt class="descname">getNumber</tt><big>(</big><em>str</em>, <em>length</em><big>)</big><a class="headerlink" href="#music21.midi.base.getNumber" title="Permalink to this definition">¶</a></dt>
@@ -106,6 +111,11 @@
 </pre></div>
 </div>
 </dd></dl>
+
+<dl class="function">
+<dt id="music21.midi.base.getStartEvents">
+<tt class="descclassname">music21.midi.base.</tt><tt class="descname">getStartEvents</tt><big>(</big><em>mt=None</em>, <em>partName=</em>, <em>partProgram=0</em><big>)</big><a class="headerlink" href="#music21.midi.base.getStartEvents" title="Permalink to this definition">¶</a></dt>
+<dd>Provide a list of events found at the beginning of a track. A MidiTrack reference can be provided via the <cite>mt</cite> parameter.</dd></dl>
 
 <dl class="function">
 <dt id="music21.midi.base.getVariableLengthNumber">
@@ -165,6 +175,7 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
 <tt class="descname">write</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.midi.base.DeltaTime.write" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
 
+<p>Methods inherited from <a title="music21.midi.base.MidiEvent" class="reference internal" href="#music21.midi.base.MidiEvent"><tt class="xref docutils literal"><span class="pre">MidiEvent</span></tt></a>: <a title="music21.midi.base.MidiEvent.isDeltaTime" class="reference internal" href="#music21.midi.base.MidiEvent.isDeltaTime"><tt class="xref docutils literal"><span class="pre">isDeltaTime()</span></tt></a>, <a title="music21.midi.base.MidiEvent.isNoteOff" class="reference internal" href="#music21.midi.base.MidiEvent.isNoteOff"><tt class="xref docutils literal"><span class="pre">isNoteOff()</span></tt></a>, <a title="music21.midi.base.MidiEvent.isNoteOn" class="reference internal" href="#music21.midi.base.MidiEvent.isNoteOn"><tt class="xref docutils literal"><span class="pre">isNoteOn()</span></tt></a>, <a title="music21.midi.base.MidiEvent.matchedNoteOff" class="reference internal" href="#music21.midi.base.MidiEvent.matchedNoteOff"><tt class="xref docutils literal"><span class="pre">matchedNoteOff()</span></tt></a></p>
 </blockquote>
 </dd></dl>
 
@@ -229,7 +240,7 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
 <dt id="music21.midi.base.MidiEvent">
 <em class="property">
 class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname">MidiEvent</tt><big>(</big><em>track</em><big>)</big><a class="headerlink" href="#music21.midi.base.MidiEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>A model of a MIDI event, including note-on, note-off, program change, controller change, any many others. MidiEvent objects are paired (preceded) by DeltaTime objects in the list of events in a MidiTrack object. The <cite>track</cite> argument must be a <a title="music21.midi.base.MidiTrack" class="reference internal" href="#music21.midi.base.MidiTrack"><tt class="xref docutils literal"><span class="pre">MidiTrack</span></tt></a> object. The <cite>type</cite> attribute is a string representation of a Midi event from the channelVoiceMessages or metaEvents definitions. The <cite>channel</cite> attribute is an integer channel id, from 1 to 16. The <cite>time</cite> attribute is an integer duration of the event in clicks. This value can be zero. This value is not essential, as ultimate time positioning is determined by DeltaTime objects. The <cite>pitch</cite> attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127). The <cite>velocity</cite> attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127). The <cite>data</cite> attribute is used for storing other messages, such as SEQUENCE_TRACK_NAME string values.</p>
+<dd><p>A model of a MIDI event, including note-on, note-off, program change, controller change, any many others. MidiEvent objects are paired (preceded) by DeltaTime objects in the list of events in a MidiTrack object. The <cite>track</cite> argument must be a <a title="music21.midi.base.MidiTrack" class="reference internal" href="#music21.midi.base.MidiTrack"><tt class="xref docutils literal"><span class="pre">MidiTrack</span></tt></a> object. The <cite>type</cite> attribute is a string representation of a Midi event from the channelVoiceMessages or metaEvents definitions. The <cite>channel</cite> attribute is an integer channel id, from 1 to 16. The <cite>time</cite> attribute is an integer duration of the event in ticks. This value can be zero. This value is not essential, as ultimate time positioning is determined by DeltaTime objects. The <cite>pitch</cite> attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127). The <cite>velocity</cite> attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127). The <cite>data</cite> attribute is used for storing other messages, such as SEQUENCE_TRACK_NAME string values.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span> <span class="o">=</span> <span class="n">MidiTrack</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span> <span class="o">=</span> <span class="n">MidiEvent</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;NOTE_ON&quot;</span>
@@ -241,18 +252,96 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
 <span class="go">&lt;MidiEvent NOTE_ON, t=200, track=1, channel=1, pitch=60, velocity=120&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span> <span class="o">=</span> <span class="n">MidiEvent</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;SEQUENCE_TRACK_NAME&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">time1</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="mf">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s">&#39;guitar&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span>
-<span class="go">&lt;MidiEvent SEQUENCE_TRACK_NAME, t=None, track=1, channel=None, data=&#39;guitar&#39;&gt;</span>
+<span class="go">&lt;MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=&#39;guitar&#39;&gt;</span>
 </pre></div>
 </div>
 <p><strong>MidiEvent</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
+<dt id="music21.midi.base.MidiEvent.isDeltaTime">
+<tt class="descname">isDeltaTime</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.midi.base.MidiEvent.isDeltaTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a boolean if this is a note-on message and velocity is not zero.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span> <span class="o">=</span> <span class="n">MidiTrack</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="n">DeltaTime</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span><span class="o">.</span><span class="n">isDeltaTime</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="music21.midi.base.MidiEvent.isNoteOff">
+<tt class="descname">isNoteOff</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.midi.base.MidiEvent.isNoteOff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a boolean if this is a note-off message, either as a note-off or as a note-on with zero velocity.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span> <span class="o">=</span> <span class="n">MidiTrack</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span> <span class="o">=</span> <span class="n">MidiEvent</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;NOTE_OFF&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">isNoteOn</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">isNoteOff</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span> <span class="o">=</span> <span class="n">MidiEvent</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;NOTE_ON&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">isNoteOn</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">isNoteOff</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="music21.midi.base.MidiEvent.isNoteOn">
+<tt class="descname">isNoteOn</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.midi.base.MidiEvent.isNoteOn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a boolean if this is a note-on message and velocity is not zero.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span> <span class="o">=</span> <span class="n">MidiTrack</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span> <span class="o">=</span> <span class="n">MidiEvent</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;NOTE_ON&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="mf">120</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">isNoteOn</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">isNoteOff</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="music21.midi.base.MidiEvent.matchedNoteOff">
+<tt class="descname">matchedNoteOff</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#music21.midi.base.MidiEvent.matchedNoteOff" title="Permalink to this definition">¶</a></dt>
+<dd><p>If this is a note-on, given another MIDI event, is this a matching note-off for this event, return True. Checks both pitch and channel.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span> <span class="o">=</span> <span class="n">MidiTrack</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span> <span class="o">=</span> <span class="n">MidiEvent</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;NOTE_ON&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="mf">120</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="mf">60</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span> <span class="o">=</span> <span class="n">MidiEvent</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;NOTE_ON&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="mf">60</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">matchedNoteOff</span><span class="p">(</span><span class="n">me2</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="mf">61</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">matchedNoteOff</span><span class="p">(</span><span class="n">me2</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&quot;NOTE_OFF&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">matchedNoteOff</span><span class="p">(</span><span class="n">me2</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me2</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="mf">60</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me1</span><span class="o">.</span><span class="n">matchedNoteOff</span><span class="p">(</span><span class="n">me2</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="music21.midi.base.MidiEvent.read">
 <tt class="descname">read</tt><big>(</big><em>time</em>, <em>str</em><big>)</big><a class="headerlink" href="#music21.midi.base.MidiEvent.read" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>Read a MIDI event.</dd></dl>
 
 <dl class="method">
 <dt id="music21.midi.base.MidiEvent.write">
@@ -334,9 +423,19 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
 <p><strong>MidiTrack</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
+<dt id="music21.midi.base.MidiTrack.hasNotes">
+<tt class="descname">hasNotes</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.midi.base.MidiTrack.hasNotes" title="Permalink to this definition">¶</a></dt>
+<dd>Return True/False if this track has any note-on/note-off pairs defined.</dd></dl>
+
+<dl class="method">
 <dt id="music21.midi.base.MidiTrack.read">
 <tt class="descname">read</tt><big>(</big><em>str</em><big>)</big><a class="headerlink" href="#music21.midi.base.MidiTrack.read" title="Permalink to this definition">¶</a></dt>
 <dd>No documentation.</dd></dl>
+
+<dl class="method">
+<dt id="music21.midi.base.MidiTrack.updateEvents">
+<tt class="descname">updateEvents</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.midi.base.MidiTrack.updateEvents" title="Permalink to this definition">¶</a></dt>
+<dd>We may attach events to this track before setting their <cite>track</cite> parameter. This method will move through all events and set their track to this track.</dd></dl>
 
 <dl class="method">
 <dt id="music21.midi.base.MidiTrack.write">
@@ -375,7 +474,7 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 16, 2010.
+      Last updated on Jul 21, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

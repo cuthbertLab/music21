@@ -52,6 +52,7 @@
 <li><a class="reference external" href="#convertermusicxml">ConverterMusicXML</a></li>
 <li><a class="reference external" href="#converterhumdrum">ConverterHumdrum</a></li>
 <li><a class="reference external" href="#archivefilter">ArchiveFilter</a></li>
+<li><a class="reference external" href="#convertermidi">ConverterMidi</a></li>
 <li><a class="reference external" href="#convertertinynotation">ConverterTinyNotation</a></li>
 <li><a class="reference external" href="#picklefilter">PickleFilter</a></li>
 <li><a class="reference external" href="#streamfreezer">StreamFreezer</a></li>
@@ -141,7 +142,7 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 <dl class="attribute">
 <dt id="music21.converter.Converter.stream">
 <tt class="descname">stream</tt><a class="headerlink" href="#music21.converter.Converter.stream" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>All converters have to have a stream property or attribute.</dd></dl>
 
 </blockquote>
 <p><strong>Converter</strong> <strong>methods</strong></p>
@@ -261,6 +262,37 @@ class </em><tt class="descclassname">music21.converter.</tt><tt class="descname"
 </dd></dl>
 
 </div>
+<div class="section" id="convertermidi">
+<h2>ConverterMidi<a class="headerlink" href="#convertermidi" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="music21.converter.ConverterMidi">
+<em class="property">
+class </em><tt class="descclassname">music21.converter.</tt><tt class="descname">ConverterMidi</tt><a class="headerlink" href="#music21.converter.ConverterMidi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple class wrapper for parsing MIDI.</p>
+<p><strong>ConverterMidi</strong> <strong>properties</strong></p>
+<blockquote>
+<dl class="attribute">
+<dt id="music21.converter.ConverterMidi.stream">
+<tt class="descname">stream</tt><a class="headerlink" href="#music21.converter.ConverterMidi.stream" title="Permalink to this definition">¶</a></dt>
+<dd>No documentation.</dd></dl>
+
+</blockquote>
+<p><strong>ConverterMidi</strong> <strong>methods</strong></p>
+<blockquote>
+<dl class="method">
+<dt id="music21.converter.ConverterMidi.parseData">
+<tt class="descname">parseData</tt><big>(</big><em>strData</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMidi.parseData" title="Permalink to this definition">¶</a></dt>
+<dd>Get MIDI data from a binary string representation.</dd></dl>
+
+<dl class="method">
+<dt id="music21.converter.ConverterMidi.parseFile">
+<tt class="descname">parseFile</tt><big>(</big><em>fp</em><big>)</big><a class="headerlink" href="#music21.converter.ConverterMidi.parseFile" title="Permalink to this definition">¶</a></dt>
+<dd>Get MIDI data from a file path.</dd></dl>
+
+</blockquote>
+</dd></dl>
+
+</div>
 <div class="section" id="convertertinynotation">
 <h2>ConverterTinyNotation<a class="headerlink" href="#convertertinynotation" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -366,7 +398,7 @@ Attributes without Documentation: <cite>stream</cite></blockquote>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 16, 2010.
+      Last updated on Jul 21, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

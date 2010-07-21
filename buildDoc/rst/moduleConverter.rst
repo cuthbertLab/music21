@@ -54,7 +54,7 @@ Converter
 
         .. attribute:: stream
 
-            No documentation. 
+            All converters have to have a stream property or attribute. 
 
     **Converter** **methods**
 
@@ -151,6 +151,32 @@ ArchiveFilter
         .. method:: isArchive()
 
             Return True or False if the filepath is an archive of the supplied format. 
+
+
+ConverterMidi
+-------------
+
+.. class:: ConverterMidi()
+
+    Simple class wrapper for parsing MIDI. 
+
+    
+
+    **ConverterMidi** **properties**
+
+        .. attribute:: stream
+
+            No documentation. 
+
+    **ConverterMidi** **methods**
+
+        .. method:: parseData(strData)
+
+            Get MIDI data from a binary string representation. 
+
+        .. method:: parseFile(fp)
+
+            Get MIDI data from a file path. 
 
 
 ConverterTinyNotation

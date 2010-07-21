@@ -147,7 +147,7 @@ for use in examples</p>
 <dl class="attribute">
 <dt id="music21.chord.Chord.pitches">
 <tt class="descname">pitches</tt><a class="headerlink" href="#music21.chord.Chord.pitches" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of all Pitch objects in this Chord.</p>
+<dd><p>Get or set a list of all Pitch objects in this Chord.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&quot;C4&quot;</span><span class="p">,</span> <span class="s">&quot;E4&quot;</span><span class="p">,</span> <span class="s">&quot;G#4&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">pitches</span>
@@ -178,6 +178,21 @@ for use in examples</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">commonName</span>
 <span class="go">[&#39;major triad&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.chord.Chord.duration">
+<tt class="descname">duration</tt><a class="headerlink" href="#music21.chord.Chord.duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get and set the duration of this Chord as a Duration object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">duration</span>
+<span class="go">&lt;music21.duration.Duration 1.0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">d</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -285,6 +300,28 @@ for use in examples</p>
 <dt id="music21.chord.Chord.lily">
 <tt class="descname">lily</tt><a class="headerlink" href="#music21.chord.Chord.lily" title="Permalink to this definition">¶</a></dt>
 <dd>The name of the note as it would appear in Lilypond format.</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.chord.Chord.midiEvents">
+<tt class="descname">midiEvents</tt><a class="headerlink" href="#music21.chord.Chord.midiEvents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get or set this Chord as a list of <a title="music21.midi.base.MidiEvent" class="reference external" href="moduleMidiBase.html#music21.midi.base.MidiEvent"><tt class="xref docutils literal"><span class="pre">music21.midi.base.MidiEvent</span></tt></a> objects.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chord</span><span class="o">.</span><span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c3&#39;</span><span class="p">,</span><span class="s">&#39;g#4&#39;</span><span class="p">,</span> <span class="s">&#39;b5&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">midiEvents</span>
+<span class="go">[&lt;MidiEvent DeltaTime, t=0, track=None, channel=None&gt;, &lt;MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=48, velocity=90&gt;, &lt;MidiEvent DeltaTime, t=0, track=None, channel=None&gt;, &lt;MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=68, velocity=90&gt;, &lt;MidiEvent DeltaTime, t=0, track=None, channel=None&gt;, &lt;MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=83, velocity=90&gt;, &lt;MidiEvent DeltaTime, t=1024, track=None, channel=None&gt;, &lt;MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=48, velocity=0&gt;, &lt;MidiEvent DeltaTime, t=0, track=None, channel=None&gt;, &lt;MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=68, velocity=0&gt;, &lt;MidiEvent DeltaTime, t=0, track=None, channel=None&gt;, &lt;MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=83, velocity=0&gt;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.chord.Chord.midiFile">
+<tt class="descname">midiFile</tt><a class="headerlink" href="#music21.chord.Chord.midiFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a complete <a title="music21.midi.base.MidiFile" class="reference external" href="moduleMidiBase.html#music21.midi.base.MidiFile"><tt class="xref docutils literal"><span class="pre">music21.midi.base.MidiFile</span></tt></a> object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Chord</span><span class="p">([</span><span class="s">&#39;c3&#39;</span><span class="p">,</span><span class="s">&#39;g#4&#39;</span><span class="p">,</span> <span class="s">&#39;b5&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mf</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">midiFile</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.chord.Chord.multisetCardinality">
@@ -549,11 +586,6 @@ for use in examples</p>
 </pre></div>
 </div>
 </dd></dl>
-
-<dl class="method">
-<dt id="music21.chord.Chord.duration">
-<tt class="descname">duration</tt><big>(</big><em>newDur=0</em><big>)</big><a class="headerlink" href="#music21.chord.Chord.duration" title="Permalink to this definition">¶</a></dt>
-<dd>Duration of the chord can be defined here OR it should return the duration of the first note of the chord</dd></dl>
 
 <dl class="method">
 <dt id="music21.chord.Chord.findBass">
@@ -962,7 +994,7 @@ for use in examples</p>
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 16, 2010.
+      Last updated on Jul 21, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

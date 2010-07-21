@@ -70,7 +70,7 @@ Chord
 
         .. attribute:: pitches
 
-            Return a list of all Pitch objects in this Chord. 
+            Get or set a list of all Pitch objects in this Chord. 
 
             >>> from music21 import *
             >>> c = chord.Chord(["C4", "E4", "G#4"])
@@ -96,6 +96,18 @@ Chord
             >>> c2 = chord.Chord(['c', 'e', 'g'])
             >>> c2.commonName
             ['major triad'] 
+
+        .. attribute:: duration
+
+            Get and set the duration of this Chord as a Duration object. 
+
+            >>> from music21 import *
+            >>> c = chord.Chord(['a', 'c', 'e'])
+            >>> c.duration
+            <music21.duration.Duration 1.0> 
+            >>> d = duration.Duration()
+            >>> d.quarterLength = 2
+            >>> c.duration = d
 
         .. attribute:: forteClass
 
@@ -175,6 +187,22 @@ Chord
         .. attribute:: lily
 
             The name of the note as it would appear in Lilypond format. 
+
+        .. attribute:: midiEvents
+
+            Get or set this Chord as a list of :class:`music21.midi.base.MidiEvent` objects. 
+
+            >>> from music21 import *
+            >>> c = chord.Chord(['c3','g#4', 'b5'])
+            >>> c.midiEvents
+            [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=48, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=68, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=83, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=48, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=68, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=83, velocity=0>] 
+
+        .. attribute:: midiFile
+
+            Return a complete :class:`music21.midi.base.MidiFile` object. 
+
+            >>> c = Chord(['c3','g#4', 'b5'])
+            >>> mf = c.midiFile
 
         .. attribute:: multisetCardinality
 
@@ -383,10 +411,6 @@ Chord
             >>> a = chord.Chord(['g', 'b', 'd', 'f'])
             >>> a.determineType()
             'Dominant Seventh' 
-
-        .. method:: duration(newDur=0)
-
-            Duration of the chord can be defined here OR it should return the duration of the first note of the chord 
 
         .. method:: findBass()
 

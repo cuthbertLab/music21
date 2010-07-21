@@ -192,8 +192,20 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 <dl class="attribute">
 <dt id="music21.note.Note.midiEvents">
 <tt class="descname">midiEvents</tt><a class="headerlink" href="#music21.note.Note.midiEvents" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get or set this note as a list of <a title="music21.midi.base.MidiEvent" class="reference external" href="moduleMidiBase.html#music21.midi.base.MidiEvent"><tt class="xref docutils literal"><span class="pre">music21.midi.base.MidiEvent</span></tt></a> objects.</p>
+<dd><p>Get or set this chord as a list of <a title="music21.midi.base.MidiEvent" class="reference external" href="moduleMidiBase.html#music21.midi.base.MidiEvent"><tt class="xref docutils literal"><span class="pre">music21.midi.base.MidiEvent</span></tt></a> objects.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">midiEvents</span>
+<span class="go">[&lt;MidiEvent DeltaTime, t=0, track=None, channel=None&gt;, &lt;MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90&gt;, &lt;MidiEvent DeltaTime, t=1024, track=None, channel=None&gt;, &lt;MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0&gt;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="music21.note.Note.midiFile">
+<tt class="descname">midiFile</tt><a class="headerlink" href="#music21.note.Note.midiFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a complete <a title="music21.midi.base.MidiFile" class="reference external" href="moduleMidiBase.html#music21.midi.base.MidiFile"><tt class="xref docutils literal"><span class="pre">music21.midi.base.MidiFile</span></tt></a> object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mf</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">midiFile</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -437,7 +449,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Gene
 <dl class="attribute">
 <dt id="music21.note.GeneralNote.color">
 <tt class="descname">color</tt><a class="headerlink" href="#music21.note.GeneralNote.color" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>Return the Note color.</dd></dl>
 
 <dl class="attribute">
 <dt id="music21.note.GeneralNote.lyric">
@@ -447,7 +459,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Gene
 <dl class="attribute">
 <dt id="music21.note.GeneralNote.musicxml">
 <tt class="descname">musicxml</tt><a class="headerlink" href="#music21.note.GeneralNote.musicxml" title="Permalink to this definition">¶</a></dt>
-<dd>This must call _getMX to get basic mxNote objects</dd></dl>
+<dd>Return a complete musicxml representation.</dd></dl>
 
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
@@ -496,6 +508,10 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Gene
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="o">.</span><span class="mf">25</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">quarterLength</span>
 <span class="go">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">(</span><span class="s">&#39;g#&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">augmentOrDiminish</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="nc">NoteException</span>: <span class="n-Identifier">scalar must be greater than zero</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -680,7 +696,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Tie<
 <dl class="attribute">
 <dt id="music21.note.Tie.mx">
 <tt class="descname">mx</tt><a class="headerlink" href="#music21.note.Tie.mx" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>Return a MusicXML object representation.</dd></dl>
 
 <p>Properties inherited from <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.duration" class="reference external" href="moduleBase.html#music21.base.Music21Object.duration"><tt class="xref docutils literal"><span class="pre">duration</span></tt></a>, <a title="music21.base.Music21Object.offset" class="reference external" href="moduleBase.html#music21.base.Music21Object.offset"><tt class="xref docutils literal"><span class="pre">offset</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference external" href="moduleBase.html#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference external" href="moduleBase.html#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
@@ -764,7 +780,7 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Whol
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 16, 2010.
+      Last updated on Jul 21, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

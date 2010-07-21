@@ -7,8 +7,12 @@ music21.midi.base
 
 .. module:: music21.midi.base
 
-Objects and tools for processing MIDI data. This module is based on Will Ware's public domain midi.py from 2001 see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e 
+Objects and tools for processing MIDI data. This module uses routines from Will Ware's public domain midi.py from 2001 see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e 
 
+
+.. function:: getEndEvents(mt=None, channelNumber=1)
+
+    Provide a list of events found at the end of a track. 
 
 .. function:: getNumber(str, length)
 
@@ -20,6 +24,10 @@ Objects and tools for processing MIDI data. This module is based on Will Ware's 
     (29797, 'st') 
     >>> getNumber('test', 4)
     (1952805748, '') 
+
+.. function:: getStartEvents(mt=None, partName=, partProgram=0)
+
+    Provide a list of events found at the beginning of a track. A MidiTrack reference can be provided via the `mt` parameter. 
 
 .. function:: getVariableLengthNumber(str)
 
@@ -73,6 +81,8 @@ DeltaTime
 
             No documentation. 
 
+        Methods inherited from :class:`~music21.midi.base.MidiEvent`: :meth:`~music21.midi.base.MidiEvent.isDeltaTime`, :meth:`~music21.midi.base.MidiEvent.isNoteOff`, :meth:`~music21.midi.base.MidiEvent.isNoteOn`, :meth:`~music21.midi.base.MidiEvent.matchedNoteOff`
+
 
 Enumeration
 -----------
@@ -125,7 +135,7 @@ MidiEvent
 
 .. class:: MidiEvent(track)
 
-    A model of a MIDI event, including note-on, note-off, program change, controller change, any many others. MidiEvent objects are paired (preceded) by DeltaTime objects in the list of events in a MidiTrack object. The `track` argument must be a :class:`~music21.midi.base.MidiTrack` object. The `type` attribute is a string representation of a Midi event from the channelVoiceMessages or metaEvents definitions. The `channel` attribute is an integer channel id, from 1 to 16. The `time` attribute is an integer duration of the event in clicks. This value can be zero. This value is not essential, as ultimate time positioning is determined by DeltaTime objects. The `pitch` attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127). The `velocity` attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127). The `data` attribute is used for storing other messages, such as SEQUENCE_TRACK_NAME string values. 
+    A model of a MIDI event, including note-on, note-off, program change, controller change, any many others. MidiEvent objects are paired (preceded) by DeltaTime objects in the list of events in a MidiTrack object. The `track` argument must be a :class:`~music21.midi.base.MidiTrack` object. The `type` attribute is a string representation of a Midi event from the channelVoiceMessages or metaEvents definitions. The `channel` attribute is an integer channel id, from 1 to 16. The `time` attribute is an integer duration of the event in ticks. This value can be zero. This value is not essential, as ultimate time positioning is determined by DeltaTime objects. The `pitch` attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127). The `velocity` attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127). The `data` attribute is used for storing other messages, such as SEQUENCE_TRACK_NAME string values. 
 
     >>> mt = MidiTrack(1)
     >>> me1 = MidiEvent(mt)
@@ -138,18 +148,86 @@ MidiEvent
     <MidiEvent NOTE_ON, t=200, track=1, channel=1, pitch=60, velocity=120> 
     >>> me2 = MidiEvent(mt)
     >>> me2.type = "SEQUENCE_TRACK_NAME"
-    >>> me2.time1 = 0
+    >>> me2.time = 0
     >>> me2.data = 'guitar'
     >>> me2
-    <MidiEvent SEQUENCE_TRACK_NAME, t=None, track=1, channel=None, data='guitar'> 
+    <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data='guitar'> 
 
     
 
     **MidiEvent** **methods**
 
+        .. method:: isDeltaTime()
+
+            Return a boolean if this is a note-on message and velocity is not zero. 
+
+            >>> mt = MidiTrack(1)
+            >>> dt = DeltaTime(mt)
+            >>> dt.isDeltaTime()
+            True 
+
+        .. method:: isNoteOff()
+
+            Return a boolean if this is a note-off message, either as a note-off or as a note-on with zero velocity. 
+
+            >>> mt = MidiTrack(1)
+            >>> me1 = MidiEvent(mt)
+            >>> me1.type = "NOTE_OFF"
+            >>> me1.isNoteOn()
+            False 
+            >>> me1.isNoteOff()
+            True 
+            >>> me2 = MidiEvent(mt)
+            >>> me2.type = "NOTE_ON"
+            >>> me2.velocity = 0
+            >>> me2.isNoteOn()
+            False 
+            >>> me2.isNoteOff()
+            True 
+
+        .. method:: isNoteOn()
+
+            Return a boolean if this is a note-on message and velocity is not zero. 
+
+            >>> mt = MidiTrack(1)
+            >>> me1 = MidiEvent(mt)
+            >>> me1.type = "NOTE_ON"
+            >>> me1.velocity = 120
+            >>> me1.isNoteOn()
+            True 
+            >>> me1.isNoteOff()
+            False 
+
+        .. method:: matchedNoteOff(other)
+
+            If this is a note-on, given another MIDI event, is this a matching note-off for this event, return True. Checks both pitch and channel. 
+
+            >>> mt = MidiTrack(1)
+            >>> me1 = MidiEvent(mt)
+            >>> me1.type = "NOTE_ON"
+            >>> me1.velocity = 120
+            >>> me1.pitch = 60
+            >>> me2 = MidiEvent(mt)
+            >>> me2.type = "NOTE_ON"
+            >>> me2.velocity = 0
+            >>> me2.pitch = 60
+            >>> me1.matchedNoteOff(me2)
+            True 
+            >>> me2.pitch = 61
+            >>> me1.matchedNoteOff(me2)
+            False 
+            >>> me2.type = "NOTE_OFF"
+            >>> me1.matchedNoteOff(me2)
+            False 
+            >>> me2.pitch = 60
+            >>> me1.matchedNoteOff(me2)
+            True 
+
+            
+
         .. method:: read(time, str)
 
-            No documentation. 
+            Read a MIDI event. 
 
         .. method:: write()
 
@@ -220,9 +298,17 @@ MidiTrack
 
     **MidiTrack** **methods**
 
+        .. method:: hasNotes()
+
+            Return True/False if this track has any note-on/note-off pairs defined. 
+
         .. method:: read(str)
 
             No documentation. 
+
+        .. method:: updateEvents()
+
+            We may attach events to this track before setting their `track` parameter. This method will move through all events and set their track to this track. 
 
         .. method:: write()
 

@@ -162,7 +162,14 @@
 <dl class="function">
 <dt id="music21.common.decimalToTuplet">
 <tt class="descclassname">music21.common.</tt><tt class="descname">decimalToTuplet</tt><big>(</big><em>decNum</em><big>)</big><a class="headerlink" href="#music21.common.decimalToTuplet" title="Permalink to this definition">¶</a></dt>
-<dd>For simple decimals (mostly &gt; 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator)</dd></dl>
+<dd><p>For simple decimals (mostly &gt; 1), a quick way to figure out the fraction in lowest terms that gives a valid tuplet. No it does not work really fast.  No it does not return tuplets with denominators over 100.  Too bad, math geeks.  This is real life. returns (numerator, denominator)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">decimalToTuplet</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="go">(3, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decimalToTuplet</span><span class="p">(</span><span class="mf">1.25</span><span class="p">)</span>
+<span class="go">(5, 4)</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="music21.common.dirPartitioned">
@@ -205,6 +212,8 @@
 <span class="go">(&#39;text&#39;, &#39;.txt&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;textline&#39;</span><span class="p">)</span>
 <span class="go">(&#39;textline&#39;, &#39;.txt&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">findFormat</span><span class="p">(</span><span class="s">&#39;midi&#39;</span><span class="p">)</span>
+<span class="go">(&#39;midi&#39;, &#39;.mid&#39;)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -237,9 +246,9 @@
 <dt id="music21.common.findFormatExtURL">
 <tt class="descclassname">music21.common.</tt><tt class="descname">findFormatExtURL</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#music21.common.findFormatExtURL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">urlA</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=xml&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">urlB</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=kern&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">urlC</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">urlA</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=xml&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlB</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&amp;file=d0576-06.krn&amp;f=kern&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlC</span> <span class="o">=</span> <span class="s">&#39;http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&amp;file=bwv1007-01.krn&amp;f=xml&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlD</span> <span class="o">=</span> <span class="s">&#39;http://static.wikifonia.org/4918/musicxml.mxl&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlE</span> <span class="o">=</span> <span class="s">&#39;http://static.wikifonia.org/4306/musicxml.mxl&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">urlF</span> <span class="o">=</span> <span class="s">&#39;http://junk&#39;</span>
@@ -297,11 +306,6 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="music21.common.findSimpleFraction">
-<tt class="descclassname">music21.common.</tt><tt class="descname">findSimpleFraction</tt><big>(</big><em>working</em><big>)</big><a class="headerlink" href="#music21.common.findSimpleFraction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
 <dt id="music21.common.formatStr">
 <tt class="descclassname">music21.common.</tt><tt class="descname">formatStr</tt><big>(</big><em>msg</em>, <em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.common.formatStr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format one or more data elements into string suitable for printing straight to stderr or other outputs</p>
@@ -351,6 +355,11 @@
 <dt id="music21.common.getPlatform">
 <tt class="descclassname">music21.common.</tt><tt class="descname">getPlatform</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.getPlatform" title="Permalink to this definition">¶</a></dt>
 <dd>Return the name of the platform, where platforms are divided between &#8216;win&#8217; (for Windows), &#8216;darwin&#8217; (for MacOS X), and &#8216;nix&#8217; for (GNU/Linux and other variants).</dd></dl>
+
+<dl class="function">
+<dt id="music21.common.getSourceFilePath">
+<tt class="descclassname">music21.common.</tt><tt class="descname">getSourceFilePath</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.getSourceFilePath" title="Permalink to this definition">¶</a></dt>
+<dd>Get the music21 directory that contains source files. This not the same as the outermost package development directory.</dd></dl>
 
 <dl class="function">
 <dt id="music21.common.greaterThan">
@@ -480,6 +489,26 @@
 <dd>lessThan &#8211; returns True if x is less than and not almostEquals y</dd></dl>
 
 <dl class="function">
+<dt id="music21.common.nearestMultiple">
+<tt class="descclassname">music21.common.</tt><tt class="descname">nearestMultiple</tt><big>(</big><em>n</em>, <em>unit</em><big>)</big><a class="headerlink" href="#music21.common.nearestMultiple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a positive value, return the nearest multiple of the supplied <cite>unit</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">25</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)</span>
+<span class="go">0.25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">35</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)</span>
+<span class="go">0.25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">4</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)</span>
+<span class="go">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="mf">23404.001</span><span class="p">,</span> <span class="o">.</span><span class="mf">125</span><span class="p">)</span>
+<span class="go">23404.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="mf">23404.134</span><span class="p">,</span> <span class="o">.</span><span class="mf">125</span><span class="p">)</span>
+<span class="go">23404.125</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">001</span><span class="p">,</span> <span class="o">.</span><span class="mf">125</span><span class="p">)</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="music21.common.numToIntOrFloat">
 <tt class="descclassname">music21.common.</tt><tt class="descname">numToIntOrFloat</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#music21.common.numToIntOrFloat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a number, return an integer if it is very close to an integer, otherwise, return a float.</p>
@@ -582,17 +611,17 @@ Attributes without Documentation: <cite>valType</cite>, <cite>value</cite></bloc
 <dl class="method">
 <dt id="music21.common.Scalar.toFloat">
 <tt class="descname">toFloat</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Scalar.toFloat" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>Return a float.</dd></dl>
 
 <dl class="method">
 <dt id="music21.common.Scalar.toInt">
 <tt class="descname">toInt</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Scalar.toInt" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>Return an integer.</dd></dl>
 
 <dl class="method">
 <dt id="music21.common.Scalar.toUnicode">
 <tt class="descname">toUnicode</tt><big>(</big><big>)</big><a class="headerlink" href="#music21.common.Scalar.toUnicode" title="Permalink to this definition">¶</a></dt>
-<dd>No documentation.</dd></dl>
+<dd>Return unicode.</dd></dl>
 
 </blockquote>
 </dd></dl>
@@ -714,7 +743,7 @@ Methods inherited from list: <tt class="xref docutils literal"><span class="pre"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 16, 2010.
+      Last updated on Jul 21, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
