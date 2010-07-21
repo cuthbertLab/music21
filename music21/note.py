@@ -14,8 +14,8 @@
 The :class:`~music21.pitch.Pitch` object is stored within, and used to configure, :class:`~music21.note.Note` objects.
 '''
 
-import string, copy, math
-import unittest, doctest
+import copy
+import unittest
 
 import music21
 from music21 import articulations
@@ -27,7 +27,7 @@ from music21 import interval
 from music21 import editorial
 from music21.lily import LilyString
 from music21 import musicxml as musicxmlMod
-from music21 import midi as midiModule
+#from music21 import midi as midiModule
 from music21.midi import translate as midiTranslate
 from music21 import expressions
 from music21 import pitch
@@ -75,6 +75,8 @@ class Tie(music21.Music21Object):
 
     # use weak-refs for .to and .from
     def _getMX(self):
+        '''Return a MusicXML object representation. 
+        '''
         mxTieList = []
         mxTie = musicxmlMod.Tie()
         mxTie.set('type', self.type) # start, stop
@@ -88,6 +90,8 @@ class Tie(music21.Music21Object):
         return mxTieList, mxTiedList
     
     def _setMX(self, mxNote):
+        '''Load a MusicXML object representation. 
+        '''
         mxTieList = mxNote.get('tieList')
         if len(mxTieList) > 0:
             # get all types and see what we have for this note
@@ -103,9 +107,10 @@ class Tie(music21.Music21Object):
             else:
                 environLocal.printDebug(['found unexpected arrangement of multiple tie types when importing from musicxml:', typesFound])    
 
-        mxNotations = mxNote.get('notations')
-        if mxNotations != None:
-            mxTiedList = mxNotations.getTieds()
+    # not sure this is necessary
+#         mxNotations = mxNote.get('notations')
+#         if mxNotations != None:
+#             mxTiedList = mxNotations.getTieds()
             # should be sufficient to only get mxTieList
 
     mx = property(_getMX, _setMX)
@@ -143,12 +148,13 @@ class LyricException(Exception):
 
 
 class Lyric(object):
+
     def __init__(self, text=None, number=1, syllabic=None):
         self.text = text
         if not common.isNum(number):
             raise LyricException('Number best be number')
         self.number = number
-        self.syllabic = None # can be begin, middle, or end
+        self.syllabic = syllabic # can be begin, middle, or end
 
 
     #---------------------------------------------------------------------------
@@ -220,6 +226,8 @@ class GeneralNote(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getColor(self):
+        '''Return the Note color. 
+        '''
         return self.editorial.color
 
     def _setColor(self, value): 
@@ -503,9 +511,14 @@ class GeneralNote(music21.Music21Object):
         >>> n.augmentOrDiminish(.25)
         >>> n.quarterLength
         0.5
+
+        >>> n = note.Note('g#')
+        >>> n.augmentOrDiminish(-1)
+        Traceback (most recent call last):
+        NoteException: scalar must be greater than zero
         '''
         if not scalar > 0:
-            raise DurationException('scalar must be greater than zero')
+            raise NoteException('scalar must be greater than zero')
 
         if inPlace:
             post = self
@@ -841,6 +854,7 @@ class Note(NotRest):
 #             components = keywords["components"]
 #         if "linkages" in keywords:
 #             linkages = keywords["linkages"]
+
         if "beams" in keywords:
             self.beams = keywords["beams"]
         else:
@@ -971,29 +985,41 @@ class Note(NotRest):
         ''') 
 
 
-    def _getStep(self): return self.pitch.step
-    def _setStep(self, value): self.pitch.step = value
+    def _getStep(self): 
+        return self.pitch.step
+
+    def _setStep(self, value): 
+        self.pitch.step = value
 
     step = property(_getStep, _setStep, 
         doc = '''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    def _getFrequency(self): return self.pitch.frequency
-    def _setFrequency(self, value): self.pitch.frequency = value
+    def _getFrequency(self): 
+        return self.pitch.frequency
+
+    def _setFrequency(self, value): 
+        self.pitch.frequency = value
 
     frequency = property(_getFrequency, _setFrequency, 
         doc = '''Return or set the frequency from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.frequency`.
         ''')
     
-    def _getFreq440(self): return self.pitch.freq440
-    def _setFreq440(self, value): self.pitch.freq440 = value
+    def _getFreq440(self): 
+        return self.pitch.freq440
+
+    def _setFreq440(self, value): 
+        self.pitch.freq440 = value
 
     freq440 = property(_getFreq440, _setFreq440, 
         doc = '''Return or set the freq440 value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.freq440`.
         ''')
 
-    def _getOctave(self): return self.pitch.octave
-    def _setOctave(self, value): self.pitch.octave = value
+    def _getOctave(self): 
+        return self.pitch.octave
+
+    def _setOctave(self, value): 
+        self.pitch.octave = value
 
     octave = property(_getOctave, _setOctave, 
         doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.octave`.''')
@@ -1629,6 +1655,7 @@ class Test(unittest.TestCase):
                     continue
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
+                self.assertNotEqual(id(a), id(b))
 
 
     def testComplex(self):
@@ -1723,7 +1750,6 @@ class Test(unittest.TestCase):
 
         from music21 import stream, meter, note
 
-
         data = [
     ['3/4', .5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5], 
             [1.0]*6, ],
@@ -1752,17 +1778,22 @@ class Test(unittest.TestCase):
 
         # one measure case
         for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
-            n = note.Note()
+            n = note.Note() # need fully qualified name
             n.quarterLength = nQL
             m = stream.Measure()
             m.timeSignature = meter.TimeSignature(tsStr)
             m.repeatAppend(n, nCount)
+            
+            self.assertEqual(len(m), nCount+1)
+
             # test matching beat proportion value
             post = [m.notes[i].beat for i in range(nCount)]
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeat[i], 4)
+
             # test getting beat duration
             post = [m.notes[i].beatDuration.quarterLength for i in range(nCount)]
+
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
 
@@ -1780,6 +1811,9 @@ class Test(unittest.TestCase):
             # m2 does not have time signature
             m2 = stream.Measure()
             m2.repeatAppend(n, nCount)
+            self.assertEqual(len(m2), nCount)
+            self.assertEqual(len(m2.notes), nCount)
+
             p.append(m2)
 
             # test matching beat proportion value
@@ -1904,4 +1938,5 @@ if __name__ == "__main__":
 
 
 
-        a.testNoteEquality()
+        #a.testNoteEquality()
+        a.testNoteBeatProperty()

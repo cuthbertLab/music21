@@ -10,13 +10,8 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-import sys
-from music21.test import test
 
-
-#-------------------------------------------------------------------------------
-
-# this requires pylint to be installed
+# this requires pylint to be installed and available from the command line
 
 
 import os, sys
@@ -69,14 +64,14 @@ def main(fnAccept=None):
     mg = test.ModuleGather()
 
     # only accept a few file names for now
-    if fnAccept == None:
+    if fnAccept in [None, []]:
         fnAccept = ['note.py']
-        #fnAccept = ['stream.py', 'note.py', 'chord.py']
 
+        #fnAccept = ['stream.py', 'note.py', 'chord.py']
 
     disable = ['C0301', 'C0302', 'C0103', 'C0324', 'W0621', 'W0511', 
                'W0404', 'R0201', 'R0904', 'E1101', 'R0914', 'R0903',
-               'R0911',]
+               'R0911', 'R0902', ]
 
     cmd = ['pylint -f colorized']
     for id in disable:
