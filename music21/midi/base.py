@@ -1,10 +1,10 @@
-#!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         midi.base.py
 # Purpose:      music21 classes for dealing with midi data
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               (Will Ware -- see docs)
 #
 # Copyright:    (c) 2010 The music21 Project
 # License:      LGPL
@@ -12,16 +12,17 @@
 '''
 Objects and tools for processing MIDI data. 
 
-This module is based on Will Ware's public domain midi.py from 2001
+This module uses routines from Will Ware's public domain midi.py from 2001
 see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 '''
 
 import unittest, doctest
 import sys, os, string, types
 
-import StringIO # this module is not supported in python3
-# use io.StringIO  in python 3, avail in 2.6, not 2.5
-
+try:
+    import StringIO # python 2 
+except:
+    from io import StringIO # python3 (also in python 2.6+)
 
 import music21
 from music21 import common
