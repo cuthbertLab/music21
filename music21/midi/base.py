@@ -259,7 +259,7 @@ class MidiEvent(object):
 
     The `channel` attribute is an integer channel id, from 1 to 16. 
 
-    The `time` attribute is an integer duration of the event in clicks. This value can be zero. This value is not essential, as ultimate time positioning is determined by DeltaTime objects. 
+    The `time` attribute is an integer duration of the event in ticks. This value can be zero. This value is not essential, as ultimate time positioning is determined by DeltaTime objects. 
 
     The `pitch` attribute is only defined for note-on and note-off messages. The attribute stores an integer representation (0-127).
 

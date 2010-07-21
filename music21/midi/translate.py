@@ -33,6 +33,31 @@ def fromMidiEventsToNote(eventList, ticksPerQuarter=None, input=None):
     '''Convert from a list of MIDI message to a music21 note
 
     The `input` parameter can be a Note or None; in the case of None, a Note object is created. 
+
+    >>> from music21 import *
+
+    >>> mt = midi.MidiTrack(1)
+    >>> dt1 = midi.DeltaTime(mt)
+    >>> dt1.time = 1024
+
+    >>> me1 = midi.MidiEvent(mt)
+    >>> me1.type = "NOTE_ON"
+    >>> me1.pitch = 45
+    >>> me1.velocity = 94
+
+    >>> dt2 = midi.DeltaTime(mt)
+    >>> dt2.time = 2048
+
+    >>> me1 = midi.MidiEvent(mt)
+    >>> me1.type = "NOTE_ON"
+    >>> me1.pitch = 45
+    >>> me1.velocity = 94
+
+    >>> n = fromMidiEventsToNote([dt1, me1, dt2, me1])
+    >>> n.pitch
+    A2
+    >>> n.duration.quarterLength
+    1.0
     '''
     if input == None:
         from music21 import note
@@ -40,14 +65,28 @@ def fromMidiEventsToNote(eventList, ticksPerQuarter=None, input=None):
     else:
         n = input
 
+    if ticksPerQuarter == None:
+        ticksPerQuarter = defaults.ticksPerQuarter
+
+    # pre sorted from a stream
     if len(eventList) == 2:
         tOn, eOn = eventList[0]
         tOff, eOff = eventList[1]
 
-        n.duration.midi = (tOff - tOn), ticksPerQuarter
-        n.pitch.midi = eOn.pitch
+    # a representation closer to stream
+    elif len(eventList) == 4:
+        # delta times are first and third
+        dur = eventList[2].time - eventList[0].time
+        # shift to start at zero; only care about duration here
+        tOn, eOn = 0, eventList[1]
+        tOff, eOff = dur, eventList[3]
     else:
         raise TranslateException('cannot handle MIDI event list in the form: %r', eventList)
+
+    n.duration.midi = (tOff - tOn), ticksPerQuarter
+    n.pitch.midi = eOn.pitch
+
+
     return n
 
 
@@ -199,6 +238,8 @@ def fromChordToMidiFile(input):
     mf.tracks = [mt]
     mf.ticksPerQuarterNote = defaults.ticksPerQuarter
     return mf
+
+
 
 
 
