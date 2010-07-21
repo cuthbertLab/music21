@@ -148,8 +148,8 @@ def findFormatFile(fp):
     >>> findFormatFile('\\\\long\\file\\path\\test.krn')
     'humdrum'
     '''
-    format, ext = findFormat(fp.split('.')[-1])
-    return format # may be None if no match
+    fmt, ext = findFormat(fp.split('.')[-1])
+    return fmt # may be None if no match
 
 
 def findFormatExtFile(fp):
@@ -242,9 +242,8 @@ def basicallyEqual(a, b):
     b = WHITESPACE.sub('', b)
     a = LINEFEED.sub('', a)
     b = LINEFEED.sub('', b)
-#    print a
-#    print b
-    if (a == b): return True
+    if (a == b): 
+        return True
     else: return False
 
 basicallyEquals = basicallyEqual
@@ -256,8 +255,10 @@ def almostEquals(x, y = 0.0, grain=1e-7):
     almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other
     '''
     
-    if abs(x - y) < grain: return True
-    else: return False
+    if abs(x - y) < grain: 
+        return True
+    else: 
+        return False
 
 almostEqual = almostEquals
 
@@ -265,23 +266,29 @@ def greaterThan(x, y = 0.0):
     '''
     greaterThan returns True if x is greater than and not almostEquals y
     '''
-    if x < y or almostEquals(x, y): return False
-    else: return True
+    if x < y or almostEquals(x, y): 
+        return False
+    else: 
+        return True
 
 def greaterThanOrEqual(x, y=0.0, grain=1e-7):
     '''
     greaterThan returns True if x is greater than or almostEquals y
     '''
-    if x > y or almostEquals(x, y, grain): return True
-    else: return False
+    if x > y or almostEquals(x, y, grain): 
+        return True
+    else: 
+        return False
 
 
 def lessThan(x, y = 0.0):
     '''
     lessThan -- returns True if x is less than and not almostEquals y
     '''
-    if x > y or almostEquals(x, y): return False
-    else: return True    
+    if x > y or almostEquals(x, y): 
+        return False
+    else: 
+        return True    
 
     
 def isPowerOfTwo(n):
@@ -310,8 +317,10 @@ def isPowerOfTwo(n):
         return False
     
     (remainder, throwAway) = math.modf(math.log(n, 2))
-    if (almostEquals(remainder, 0.0)): return True
-    else: return False
+    if (almostEquals(remainder, 0.0)): 
+        return True
+    else: 
+        return False
 
 
 def nearestMultiple(n, unit):
@@ -526,7 +535,8 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
             lastIsNum = False
 
     postStr = ''.join(post)
-    postStr = postStr.replace('_', ' ')
+    if replaceUnderscore:
+        postStr = postStr.replace('_', ' ')
     return postStr
 
 
@@ -568,9 +578,22 @@ def decimalToTuplet(decNum):
     denominators over 100.  Too bad, math geeks.  This is real life.
 
     returns (numerator, denominator)
+
+    >>> decimalToTuplet(1.5)
+    (3, 2)
+    >>> decimalToTuplet(1.25)
+    (5, 4)
     '''
 
-    (remainder, multiplier) = math.modf(decNum)
+    def findSimpleFraction(working):
+        'Utility function.'
+        for i in range(1,1000):
+            for j in range(i,2*i):
+                if almostEquals(working, (j+0.0)/i):
+                    return (int(j), int(i))
+        return (0,0)
+
+    remainder, multiplier = math.modf(decNum)
     working = decNum/multiplier
 
     (jy, iy) = findSimpleFraction(working)
@@ -584,12 +607,6 @@ def decimalToTuplet(decNum):
     iy = iy/gcd
     return (int(jy), int(iy))
 
-def findSimpleFraction(working):
-    for i in range(1,1000):
-        for j in range(i,2*i):
-            if almostEquals(working, (j+0.0)/i):
-                return (int(j), int(i))
-    return (0,0)
 
 def EuclidGCD(a, b):
     '''use Euclid\'s algorithm to find the GCD of a and b'''
@@ -727,7 +744,7 @@ def sortFilesRecent(fileList):
     sort.sort()
     sort.reverse()
     # just return 
-    return [y for x,y in sort] 
+    return [y for x, y in sort] 
 
 
 def getMd5(value=None):
@@ -936,12 +953,12 @@ class defHash(dict):
                 return dict.__getitem__(self, key)
 
     def get(self, key, *args):
-            if not args:
-                if self.callDefault is False:
-                    args = (self.default,)
-                else:
-                    args = (self.default(),)
-            return dict.get(self, key, *args)
+        if not args:
+            if self.callDefault is False:
+                args = (self.default,)
+            else:
+                args = (self.default(),)
+        return dict.get(self, key, *args)
 
 
 class defList(list):
@@ -978,6 +995,11 @@ class defList(list):
                     self.append(self.default())
             self.append(value)
 
+
+
+
+# this presently is not used anywhere in music21
+
 class Scalar(object):
     '''for those of us who miss perl scalars....'''
 
@@ -986,6 +1008,8 @@ class Scalar(object):
         self.valType = type(value)
     
     def toInt(self):
+        '''Return an integer.
+        '''
         valType = object.__getattribute__(self, "valType")
         value = object.__getattribute__(self, "value")
         if valType == int:
@@ -1000,6 +1024,8 @@ class Scalar(object):
             raise Exception("Could not force to Int " + valType)
 
     def toFloat(self):
+        '''Return a float.
+        '''
         valType = object.__getattribute__(self, "valType")
         value = object.__getattribute__(self, "value")
         if valType == float or valType == long:
@@ -1014,6 +1040,8 @@ class Scalar(object):
             raise Exception("Could not force to Int " + valType)
       
     def toUnicode(self):
+        '''Return unicode.
+        '''
         valType = object.__getattribute__(self, "valType")
         value = object.__getattribute__(self, "value")
         if valType == unicode:
@@ -1068,15 +1096,16 @@ class Scalar(object):
     def __sub__(self, newNum):
         valType = object.__getattribute__(self, "valType")
         value = object.__getattribute__(self, "value")
-        newType = type(newNum)
+        #newType = type(newNum)
+
         if valType == int or valType == float or valType == complex or valType == long:
             return Scalar(value - newNum)
         elif valType == str:
             raise Exception("Wouldnt it be cool to s/x// this?")
-            return Scalar(value + str(newNum))
+            #return Scalar(value + str(newNum))
         elif valType == unicode:
             raise Exception("Wouldnt it be cool to s/x// this?")
-            return Scalar(value + unicode(newNum))
+            #return Scalar(value + unicode(newNum))
         elif value is None:
             return Scalar(0 - newNum)
         else:
@@ -1272,10 +1301,9 @@ class TestMock(object):
             setattr(new, name, newValue)
         return new
 
-    def __copy__(self, memo):
+    def __copy__(self, memo=None):
         self.environLocal.printDebug(['copy called'])
         return copy.copy(self, memo)
-
 
     property1 = property(_get1, _set1)
 
@@ -1285,28 +1313,14 @@ class TestMock(object):
 
 
 class Test(unittest.TestCase):
+    '''Tests not requiring file output. 
+    '''
 
     def runTest(self):
         pass
 
     def setUp(self):
         pass
-
-    def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
-        '''
-        for part in sys.modules[self.__module__].__dict__.keys():
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            obj = getattr(sys.modules[self.__module__], part)
-            if callable(obj) and not isinstance(obj, types.FunctionType):
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
-
 
     def testToRoman(self):
         for src, dst in [(1, 'I'), (3, 'III'), (5, 'V')]:
@@ -1342,6 +1356,8 @@ class Test(unittest.TestCase):
 
 
     def testDeepcopy(self):
+        '''A simple test of deepcopying.
+        '''
         a = TestMock()
         b = TestMock()
         a.attr1 = b

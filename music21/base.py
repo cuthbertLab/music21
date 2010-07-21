@@ -2326,7 +2326,7 @@ class Test(unittest.TestCase):
     def testObjectsAndElements(self):
         from music21 import note, stream
         note1 = note.Note("B-")
-        note1.type = "whole"
+        note1.duration.type = "whole"
         stream1 = stream.Stream()
         stream1.append(note1)
         subStream = stream1.notes

@@ -568,10 +568,10 @@ class GeneralNote(music21.Music21Object):
         return mxScore.xmlStr()
 
 
-    def _setMusicXML(self, xmlString):
-        pass
 
-    musicxml = property(_getMusicXML, _setMusicXML)    
+    musicxml = property(_getMusicXML, 
+        doc = '''Return a complete musicxml representation.
+        ''')    
 
 
 

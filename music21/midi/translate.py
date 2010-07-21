@@ -97,7 +97,6 @@ def fromNoteToMidiFile(input):
 #-------------------------------------------------------------------------------
 # Chords
 
-
 def fromMidiEventsToChord(eventList, ticksPerQuarter=None, input=None):
 
     if input == None:

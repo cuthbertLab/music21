@@ -40,6 +40,7 @@ class ModuleGather(object):
             'test.py', 
             'testExternal.py', 
             'testDefault.py', 
+            'testLint.py', 
             'timePerformance.py',
             '__init__.py', 
             'timeGraphs.py',
