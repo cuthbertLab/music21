@@ -44,9 +44,6 @@ class ChordException(Exception):
     pass
 
 
-
-
-
 class Chord(note.NotRest):
     '''Class for dealing with chords
     
@@ -747,16 +744,52 @@ class Chord(note.NotRest):
                 raise ChordException("looping chord with no root: comprises all notes in the scale")
             roots = 0
 
-    def duration(self, newDur = 0):
-        '''Duration of the chord can be defined here OR it should return the duration
-        of the first note of the chord
+
+# this was an old method of assigning duration to a Chord. better now is to use
+# an overridden Duration property, as done below.
+
+#     def duration(self, newDur = 0):
+#         '''Duration of the chord can be defined here OR it should return the duration
+#         of the first note of the chord
+#         '''
+#         if (newDur):
+#             self._duration = newDur
+#         elif (self._duration is None and len(self.pitches) > 0):
+#             self._duration = self.pitches[0].duration
+#         return self._duration
+
+
+    def _getDuration(self):
         '''
-        if (newDur):
-            self._duration = newDur
-        elif (self._duration is None and len(self.pitches) > 0):
+        Gets the DurationObject of the object or None
+        '''
+        if self._duration is None and len(self.pitches > 0):
             self._duration = self.pitches[0].duration
-            
         return self._duration
+
+    def _setDuration(self, durationObj):
+        '''Set a Duration object.
+        '''
+        if hasattr(durationObj, "quarterLength"):
+            self._duration = durationObj
+        else:
+            # need to permit Duration object assignment here
+            raise Exception('this must be a Duration object, not %s' % durationObj)
+
+    duration = property(_getDuration, _setDuration, 
+        doc = '''Get and set the duration of this Chord as a Duration object.
+
+        >>> from music21 import *
+        >>> c = chord.Chord(['a', 'c', 'e'])
+        >>> c.duration
+        <music21.duration.Duration 1.0>
+        >>> d = duration.Duration()
+        >>> d.quarterLength = 2
+        >>> c.duration = d
+        ''')
+
+
+
 
     def hasThird(self, testRoot = None):
         '''Shortcut for hasScaleX(3)'''
@@ -983,8 +1016,8 @@ class Chord(note.NotRest):
         if (third is False or fifth is False or seventh is False):
             return False
 
-        #unused??
-        firstThird = self.hasSpecificX(3)
+        # unused variable
+        # firstThird = self.hasSpecificX(3)
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.diatonic.generic.mod7 != 1) and (thisInterval.diatonic.generic.mod7 != 3) and (thisInterval.diatonic.generic.mod7 != 5) and (thisInterval.diatonic.generic.mod7 != 7):
@@ -2105,10 +2138,8 @@ class Test(unittest.TestCase):
         chord15 = Chord([MiddleC, HighEFlat, LowGFlat, MiddleBFlat])
         
         assert chord15.isHalfDiminishedSeventh() == True
-        assert chord12.isHalfDiminishedSeventh() == False
-        
+        assert chord12.isHalfDiminishedSeventh() == False        
         assert chord15.bass().name == 'G-'
-        
         assert chord15.inversion() == 2
         assert chord15.inversionName() == 43
         

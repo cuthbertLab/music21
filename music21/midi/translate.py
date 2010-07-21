@@ -1,6 +1,19 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         midi.translate.py
+# Purpose:      Translate MIDI and music21 objects
+#
+# Authors:      Christopher Ariza
+#
+# Copyright:    (c) 2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
 
 
 
+import unittest
+
+import music21
 from music21 import midi as midiModule
 from music21 import defaults
 from music21 import pitch
@@ -186,4 +199,38 @@ def fromChordToMidiFile(input):
     mf.tracks = [mt]
     mf.ticksPerQuarterNote = defaults.ticksPerQuarter
     return mf
+
+
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+
+    def testNote(self):
+
+        from music21 import note
+        n = note.Note()
+        eventList = n.midiEvents
+        self.assertEqual(len(eventList), 4)
+
+        self.assertEqual(isinstance(eventList[0], midiModule.DeltaTime), True)
+        self.assertEqual(isinstance(eventList[2], midiModule.DeltaTime), True)
+
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        a = Test()
+        a.testPitchEquality()
 
