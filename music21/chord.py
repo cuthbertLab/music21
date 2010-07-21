@@ -232,7 +232,7 @@ class Chord(note.NotRest):
 #     property(_getDuration, _setDuration)
 
     def _getMidiEvents(self):
-        return midiTranslate.fromChordToMidiEvents(self)
+        return midiTranslate.chordToMidiEvents(self)
 
 #         mt = None # midi track 
 #         eventList = []
@@ -279,7 +279,7 @@ class Chord(note.NotRest):
 
     def _setMidiEvents(self, eventList, ticksPerQuarter):
 
-        midiTranslate.fromMidiEventsToChord(eventList, 
+        midiTranslate.midiEventsToChord(eventList, 
             ticksPerQuarter, self)
 
         #environLocal.printDebug(['_setMidiEvents() got: ', eventList])
@@ -314,7 +314,7 @@ class Chord(note.NotRest):
     def _getMidiFile(self):
         '''Provide a complete MIDI file representation. 
         '''
-        return midiTranslate.fromChordToMidiFile(self)
+        return midiTranslate.chordToMidiFile(self)
         # get a list of mid tracks objects
 #         mt = midiModule.MidiTrack(1)
 #         mt.events += midiModule.getStartEvents(mt)

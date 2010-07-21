@@ -1238,7 +1238,7 @@ class Note(NotRest):
 
 
     def _getMidiEvents(self):
-        return midiTranslate.fromNoteToMidiEvents(self)
+        return midiTranslate.noteToMidiEvents(self)
 
         # midi track 
 #         mt = None
@@ -1273,7 +1273,7 @@ class Note(NotRest):
 #         return eventList 
 
     def _setMidiEvents(self, eventList, ticksPerQuarter=None):
-        midiTranslate.fromMidiEventsToNote(eventList, 
+        midiTranslate.midiEventsToNote(eventList, 
             ticksPerQuarter, self)
 
         # event list can be provided to a note in a few different ways
@@ -1296,7 +1296,7 @@ class Note(NotRest):
         ''')
 
     def _getMidiFile(self):
-        return midiTranslate.fromNoteToMidiFile(self)
+        return midiTranslate.noteToMidiFile(self)
 
         # get a list of mid tracks objects
 #         mt = midiModule.MidiTrack(1)
