@@ -687,12 +687,20 @@ class Test(unittest.TestCase):
     def testNote(self):
 
         from music21 import note
-        n = note.Note()
-        eventList = n.midiEvents
+        n1 = note.Note('A4')
+        n1.quarterLength = 2.0
+        eventList = n1.midiEvents
         self.assertEqual(len(eventList), 4)
 
         self.assertEqual(isinstance(eventList[0], midiModule.DeltaTime), True)
         self.assertEqual(isinstance(eventList[2], midiModule.DeltaTime), True)
+
+
+        # translate eventList back to a note
+        n2 = midiEventsToNote(eventList)
+        self.assertEqual(n2.pitch.nameWithOctave, 'A4')
+        self.assertEqual(n2.quarterLength, 2.0)
+
 
 
 
