@@ -87,7 +87,7 @@ Dynamic
             >>> b.get('placement')
             'below' 
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Dynamic** **methods**
 
@@ -123,7 +123,7 @@ Wedge
             >>> mxWedge.get('type')
             'crescendo' 
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Wedge** **methods**
 

@@ -319,7 +319,7 @@ Chord
 
         Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`, :attr:`~music21.note.GeneralNote.quarterLength`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Chord** **methods**
 

@@ -491,19 +491,27 @@
 <dl class="function">
 <dt id="music21.common.nearestMultiple">
 <tt class="descclassname">music21.common.</tt><tt class="descname">nearestMultiple</tt><big>(</big><em>n</em>, <em>unit</em><big>)</big><a class="headerlink" href="#music21.common.nearestMultiple" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a positive value, return the nearest multiple of the supplied <cite>unit</cite>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">25</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)</span>
+<dd><p>Given a positive value <cite>n</cite>, return the nearest multiple of the supplied <cite>unit</cite> as well as the difference (error).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">25</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
 <span class="go">0.25</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">35</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">35</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
 <span class="go">0.25</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">4</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">4</span><span class="p">,</span> <span class="o">.</span><span class="mf">25</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
 <span class="go">0.5</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="mf">23404.001</span><span class="p">,</span> <span class="o">.</span><span class="mf">125</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="mf">23404.001</span><span class="p">,</span> <span class="o">.</span><span class="mf">125</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
 <span class="go">23404.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="mf">23404.134</span><span class="p">,</span> <span class="o">.</span><span class="mf">125</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="mf">23404.134</span><span class="p">,</span> <span class="o">.</span><span class="mf">125</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
 <span class="go">23404.125</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">001</span><span class="p">,</span> <span class="o">.</span><span class="mf">125</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">001</span><span class="p">,</span> <span class="o">.</span><span class="mf">125</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
 <span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">almostEquals</span><span class="p">(</span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">25</span><span class="p">,</span> <span class="p">(</span><span class="mf">1</span><span class="o">/</span><span class="mf">3.</span><span class="p">))[</span><span class="mf">0</span><span class="p">],</span> <span class="o">.</span><span class="mf">33333333</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">almostEquals</span><span class="p">(</span><span class="n">nearestMultiple</span><span class="p">(</span><span class="o">.</span><span class="mf">55</span><span class="p">,</span> <span class="p">(</span><span class="mf">1</span><span class="o">/</span><span class="mf">3.</span><span class="p">))[</span><span class="mf">0</span><span class="p">],</span> <span class="o">.</span><span class="mf">66666666</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">almostEquals</span><span class="p">(</span><span class="n">nearestMultiple</span><span class="p">(</span><span class="mf">234.69</span><span class="p">,</span> <span class="p">(</span><span class="mf">1</span><span class="o">/</span><span class="mf">3.</span><span class="p">))[</span><span class="mf">0</span><span class="p">],</span> <span class="mf">234.6666666</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">almostEquals</span><span class="p">(</span><span class="n">nearestMultiple</span><span class="p">(</span><span class="mf">18.123</span><span class="p">,</span> <span class="p">(</span><span class="mf">1</span><span class="o">/</span><span class="mf">6.</span><span class="p">))[</span><span class="mf">0</span><span class="p">],</span> <span class="mf">18.16666666</span><span class="p">)</span>
+<span class="go">True</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -743,7 +751,7 @@ Methods inherited from list: <tt class="xref docutils literal"><span class="pre"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 21, 2010.
+      Last updated on Jul 22, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

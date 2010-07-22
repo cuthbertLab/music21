@@ -129,7 +129,7 @@ Note
 
         Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Note** **methods**
 
@@ -206,7 +206,7 @@ Rest
 
         Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Rest** **methods**
 
@@ -329,7 +329,7 @@ GeneralNote
 
             Return a complete musicxml representation. 
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **GeneralNote** **methods**
 
@@ -472,7 +472,7 @@ NotRest
 
         Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **NotRest** **methods**
 
@@ -548,7 +548,7 @@ Tie
 
             Return a MusicXML object representation. 
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Tie** **methods**
 
@@ -584,7 +584,7 @@ Unpitched
 
         Properties inherited from :class:`~music21.note.GeneralNote`: :attr:`~music21.note.GeneralNote.quarterLength`, :attr:`~music21.note.GeneralNote.beat`, :attr:`~music21.note.GeneralNote.beatDuration`, :attr:`~music21.note.GeneralNote.beatStr`, :attr:`~music21.note.GeneralNote.color`, :attr:`~music21.note.GeneralNote.lyric`, :attr:`~music21.note.GeneralNote.musicxml`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Unpitched** **methods**
 

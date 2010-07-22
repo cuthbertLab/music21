@@ -337,20 +337,32 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 
 .. function:: nearestMultiple(n, unit)
 
-    Given a positive value, return the nearest multiple of the supplied `unit`. 
+    Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as the difference (error). 
 
-    >>> nearestMultiple(.25, .25)
+    >>> nearestMultiple(.25, .25)[0]
     0.25 
-    >>> nearestMultiple(.35, .25)
+    >>> nearestMultiple(.35, .25)[0]
     0.25 
-    >>> nearestMultiple(.4, .25)
+    >>> nearestMultiple(.4, .25)[0]
     0.5 
-    >>> nearestMultiple(23404.001, .125)
+    >>> nearestMultiple(23404.001, .125)[0]
     23404.0 
-    >>> nearestMultiple(23404.134, .125)
+    >>> nearestMultiple(23404.134, .125)[0]
     23404.125 
-    >>> nearestMultiple(.001, .125)
+    >>> nearestMultiple(.001, .125)[0]
     0.0 
+    >>> almostEquals(nearestMultiple(.25, (1/3.))[0], .33333333)
+    True 
+    >>> almostEquals(nearestMultiple(.55, (1/3.))[0], .66666666)
+    True 
+    >>> almostEquals(nearestMultiple(234.69, (1/3.))[0], 234.6666666)
+    True 
+    >>> almostEquals(nearestMultiple(18.123, (1/6.))[0], 18.16666666)
+    True 
+
+    
+
+    
 
 .. function:: numToIntOrFloat(value)
 

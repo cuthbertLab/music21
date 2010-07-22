@@ -32,7 +32,7 @@ Instrument
 
             
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Instrument** **methods**
 
@@ -93,7 +93,7 @@ StringInstrument
 
         Properties inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.mx`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **StringInstrument** **methods**
 
@@ -126,7 +126,7 @@ Viola
 
         Properties inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.mx`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Viola** **methods**
 
@@ -159,7 +159,7 @@ Violin
 
         Properties inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.mx`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Violin** **methods**
 
@@ -192,7 +192,7 @@ Violoncello
 
         Properties inherited from :class:`~music21.instrument.Instrument`: :attr:`~music21.instrument.Instrument.mx`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Violoncello** **methods**
 

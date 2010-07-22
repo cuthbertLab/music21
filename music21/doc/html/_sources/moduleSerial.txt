@@ -66,7 +66,7 @@ TwelveToneRow
 
         Properties inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.measures`, :attr:`~music21.stream.Stream.notes`, :attr:`~music21.stream.Stream.pitches`, :attr:`~music21.stream.Stream.duration`, :attr:`~music21.stream.Stream.elements`, :attr:`~music21.stream.Stream.flat`, :attr:`~music21.stream.Stream.highestOffset`, :attr:`~music21.stream.Stream.highestTime`, :attr:`~music21.stream.Stream.isGapless`, :attr:`~music21.stream.Stream.lily`, :attr:`~music21.stream.Stream.lowestOffset`, :attr:`~music21.stream.Stream.metadata`, :attr:`~music21.stream.Stream.midiFile`, :attr:`~music21.stream.Stream.midiTracks`, :attr:`~music21.stream.Stream.musicxml`, :attr:`~music21.stream.Stream.mx`, :attr:`~music21.stream.Stream.semiFlat`, :attr:`~music21.stream.Stream.sorted`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **TwelveToneRow** **methods**
 
@@ -136,7 +136,7 @@ HistoricalTwelveToneRow
 
         Properties inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.measures`, :attr:`~music21.stream.Stream.notes`, :attr:`~music21.stream.Stream.pitches`, :attr:`~music21.stream.Stream.duration`, :attr:`~music21.stream.Stream.elements`, :attr:`~music21.stream.Stream.flat`, :attr:`~music21.stream.Stream.highestOffset`, :attr:`~music21.stream.Stream.highestTime`, :attr:`~music21.stream.Stream.isGapless`, :attr:`~music21.stream.Stream.lily`, :attr:`~music21.stream.Stream.lowestOffset`, :attr:`~music21.stream.Stream.metadata`, :attr:`~music21.stream.Stream.midiFile`, :attr:`~music21.stream.Stream.midiTracks`, :attr:`~music21.stream.Stream.musicxml`, :attr:`~music21.stream.Stream.mx`, :attr:`~music21.stream.Stream.semiFlat`, :attr:`~music21.stream.Stream.sorted`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **HistoricalTwelveToneRow** **methods**
 

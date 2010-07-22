@@ -54,6 +54,33 @@ Music21Object
 
     **Music21Object** **properties**
 
+        .. attribute:: classes
+
+            returns a list containing the names (strings, not objects) of classes that this object belongs to -- starting with the object's class name and going up the mro() for the object.  Very similar to Perl's @ISA array: 
+
+            >>> from music21 import *
+            >>> q = note.QuarterNote()
+            >>> q.classes
+            ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object'] 
+
+            
+            Example: find GClefs that are not Treble clefs (or treble 8vb, etc.): 
+
+            
+            >>> s = stream.Stream()
+            >>> s.insert(10, clef.GClef())
+            >>> s.insert(20, clef.TrebleClef())
+            >>> s.insert(30, clef.FrenchViolinClef())
+            >>> s.insert(40, clef.Treble8vbClef())
+            >>> s.insert(50, clef.BassClef())
+            >>> s2 = stream.Stream()
+            >>> for t in s:
+            ...    if 'GClef' in t.classes and 'TrebleClef' not in t.classes: 
+            ...        s2.insert(t) 
+            >>> s2.show('text')
+            {10.0} <music21.clef.GClef object at 0x...> 
+            {30.0} <music21.clef.FrenchViolinClef object at 0x...> 
+
         .. attribute:: duration
 
             Get and set the duration of this object as a Duration object. 
@@ -213,9 +240,9 @@ Music21Object
 
         .. method:: isClass(className)
 
-            Returns a boolean value depending on if the object is a particular class or not. In Music21Object, it just returns the result of `isinstance`. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
+            DEPRECATED: DO NOT USE! Returns a boolean value depending on if the object is a particular class or not. In Music21Object, it just returns the result of `isinstance`. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not. 
 
-            >>> from music21 import note
+            >>> from music21 import *
             >>> n = note.Note()
             >>> n.isClass(note.Note)
             True 
@@ -381,7 +408,7 @@ ElementWrapper
 
             
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **ElementWrapper** **methods**
 

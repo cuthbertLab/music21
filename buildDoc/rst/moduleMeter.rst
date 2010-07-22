@@ -344,7 +344,7 @@ TimeSignature
             >>> ts.totalLength
             3.0 
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **TimeSignature** **methods**
 
@@ -1060,7 +1060,7 @@ NonPowerOfTwoTimeSignature
 
         Properties inherited from :class:`~music21.meter.TimeSignature`: :attr:`~music21.meter.TimeSignature.barDuration`, :attr:`~music21.meter.TimeSignature.beatCount`, :attr:`~music21.meter.TimeSignature.beatCountName`, :attr:`~music21.meter.TimeSignature.beatDivisionCount`, :attr:`~music21.meter.TimeSignature.beatDivisionCountName`, :attr:`~music21.meter.TimeSignature.beatDivisionDurations`, :attr:`~music21.meter.TimeSignature.beatDuration`, :attr:`~music21.meter.TimeSignature.beatLengthToQuarterLengthRatio`, :attr:`~music21.meter.TimeSignature.beatSubDivisionDurations`, :attr:`~music21.meter.TimeSignature.classification`, :attr:`~music21.meter.TimeSignature.denominator`, :attr:`~music21.meter.TimeSignature.lily`, :attr:`~music21.meter.TimeSignature.musicxml`, :attr:`~music21.meter.TimeSignature.mx`, :attr:`~music21.meter.TimeSignature.numerator`, :attr:`~music21.meter.TimeSignature.quarterLengthToBeatLengthRatio`, :attr:`~music21.meter.TimeSignature.totalLength`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.duration`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **NonPowerOfTwoTimeSignature** **methods**
 

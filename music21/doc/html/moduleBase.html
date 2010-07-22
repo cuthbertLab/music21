@@ -141,6 +141,34 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <p><strong>Music21Object</strong> <strong>properties</strong></p>
 <blockquote>
 <dl class="attribute">
+<dt id="music21.base.Music21Object.classes">
+<tt class="descname">classes</tt><a class="headerlink" href="#music21.base.Music21Object.classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list containing the names (strings, not objects) of classes that this object belongs to &#8211; starting with the object&#8217;s class name and going up the mro() for the object.  Very similar to Perl&#8217;s &#64;ISA array:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">QuarterNote</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">classes</span>
+<span class="go">[&#39;QuarterNote&#39;, &#39;Note&#39;, &#39;NotRest&#39;, &#39;GeneralNote&#39;, &#39;Music21Object&#39;, &#39;object&#39;]</span>
+</pre></div>
+</div>
+<p>Example: find GClefs that are not Treble clefs (or treble 8vb, etc.):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="n">clef</span><span class="o">.</span><span class="n">GClef</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="n">clef</span><span class="o">.</span><span class="n">TrebleClef</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">30</span><span class="p">,</span> <span class="n">clef</span><span class="o">.</span><span class="n">FrenchViolinClef</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">40</span><span class="p">,</span> <span class="n">clef</span><span class="o">.</span><span class="n">Treble8vbClef</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">50</span><span class="p">,</span> <span class="n">clef</span><span class="o">.</span><span class="n">BassClef</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="k">if</span> <span class="s">&#39;GClef&#39;</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">classes</span> <span class="ow">and</span> <span class="s">&#39;TrebleClef&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">classes</span><span class="p">:</span>
+<span class="gp">... </span>       <span class="n">s2</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s">&#39;text&#39;</span><span class="p">)</span>
+<span class="go">{10.0} &lt;music21.clef.GClef object at 0x...&gt;</span>
+<span class="go">{30.0} &lt;music21.clef.FrenchViolinClef object at 0x...&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="music21.base.Music21Object.duration">
 <tt class="descname">duration</tt><a class="headerlink" href="#music21.base.Music21Object.duration" title="Permalink to this definition">¶</a></dt>
 <dd>Get and set the duration of this object as a Duration object.</dd></dl>
@@ -337,8 +365,8 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 <dl class="method">
 <dt id="music21.base.Music21Object.isClass">
 <tt class="descname">isClass</tt><big>(</big><em>className</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.isClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a boolean value depending on if the object is a particular class or not. In Music21Object, it just returns the result of <cite>isinstance</cite>. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="n">note</span>
+<dd><p>DEPRECATED: DO NOT USE! Returns a boolean value depending on if the object is a particular class or not. In Music21Object, it just returns the result of <cite>isinstance</cite>. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">isClass</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">Note</span><span class="p">)</span>
 <span class="go">True</span>
@@ -530,7 +558,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 <tt class="descname">offset</tt><a class="headerlink" href="#music21.base.ElementWrapper.offset" title="Permalink to this definition">¶</a></dt>
 <dd>Get the offset for the set the parent object.</dd></dl>
 
-<p>Properties inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.parent" class="reference internal" href="#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference internal" href="#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
+<p>Properties inherited from <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>: <a title="music21.base.Music21Object.classes" class="reference internal" href="#music21.base.Music21Object.classes"><tt class="xref docutils literal"><span class="pre">classes</span></tt></a>, <a title="music21.base.Music21Object.parent" class="reference internal" href="#music21.base.Music21Object.parent"><tt class="xref docutils literal"><span class="pre">parent</span></tt></a>, <a title="music21.base.Music21Object.priority" class="reference internal" href="#music21.base.Music21Object.priority"><tt class="xref docutils literal"><span class="pre">priority</span></tt></a></p>
 </blockquote>
 <p><strong>ElementWrapper</strong> <strong>methods</strong></p>
 <blockquote>
@@ -1066,7 +1094,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 21, 2010.
+      Last updated on Jul 22, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

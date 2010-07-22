@@ -383,6 +383,7 @@ music21.common.getPackageData function moduleCommon.html
 music21.duration.DurationCommon.aggregateTupletRatio method moduleDuration.html
 music21.serial.RowSchoenbergOp27No1 class moduleSerial.html
 music21.stream.Stream.notes attribute moduleStream.html
+music21.base.Music21Object.classes attribute moduleBase.html
 music21.graph.PlotStream.ticksPitchClassUsage method moduleGraph.html
 music21.midi.base.MidiFile.read method moduleMidiBase.html
 music21.duration.Duration.lily attribute moduleDuration.html

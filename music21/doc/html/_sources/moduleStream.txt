@@ -244,7 +244,7 @@ Stream
             {1.0} <music21.note.Note D> 
             {0.0} <music21.note.Note C> 
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Stream** **methods**
 
@@ -549,7 +549,7 @@ Stream
 
             
 
-        .. method:: findGaps()
+        .. method:: findGaps(minimumQuarterLength=0.001)
 
             Returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream or (2) None if there are no gaps. N.B. there may be gaps in the flattened representation of the stream but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless 
 
@@ -1113,7 +1113,7 @@ Stream
 
         .. method:: makeTies(meterStream=None, inPlace=True, displayTiedAccidentals=False)
 
-            Given a stream containing measures, examine each element in the stream if the elements duration extends beyond the measures bound, create a tied  entity. If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy. 
+            Given a stream containing measures, examine each element in the stream if the elements duration extends beyond the measures boundary, create a tied entity. If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy. 
 
             >>> d = Stream()
             >>> n = note.Note()
@@ -1198,16 +1198,16 @@ Stream
             >>> len(a)
             9 
 
-        .. method:: quantize(quarterLengthMin, processOffsets=True, processDurations=False)
+        .. method:: quantize(quarterLengthDivisors=[4, 3], processOffsets=True, processDurations=False)
 
-            Quantize time values in this Stream by snapping offsets and/or durations to the nearest multiple of a quarter length value given as `quarterLengthMin`. 
+            Quantize time values in this Stream by snapping offsets and/or durations to the nearest multiple of a quarter length value given as one or more divisors of 1 quarter length. The quantized value found closest to a divisor multiple will be used. The `quarterLengthDivisors` provides a flexible way to provide quantization settings. For example, [2] will snap all events to eighth note grid. [4, 3] will snap events to sixteenth notes and eighth note triplets, whichever is closer. [4, 6] will snap events to sixteenth notes and sixteenth note triplets. 
 
             >>> from music21 import *
             >>> n = note.Note()
             >>> n.quarterLength = .49
             >>> s = stream.Stream()
             >>> s.repeatInsert(n, [0.1, .49, .9, 1.51])
-            >>> s.quantize(.25, processOffsets=True, processDurations=True)
+            >>> s.quantize([4], processOffsets=True, processDurations=True)
             >>> [e.offset for e in s]
             [0.0, 0.5, 1.0, 1.5] 
             >>> [e.duration.quarterLength for e in s]
@@ -1476,7 +1476,7 @@ Measure
 
         Properties inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.duration`, :attr:`~music21.stream.Stream.elements`, :attr:`~music21.stream.Stream.flat`, :attr:`~music21.stream.Stream.highestOffset`, :attr:`~music21.stream.Stream.highestTime`, :attr:`~music21.stream.Stream.isGapless`, :attr:`~music21.stream.Stream.lily`, :attr:`~music21.stream.Stream.lowestOffset`, :attr:`~music21.stream.Stream.measures`, :attr:`~music21.stream.Stream.metadata`, :attr:`~music21.stream.Stream.midiFile`, :attr:`~music21.stream.Stream.midiTracks`, :attr:`~music21.stream.Stream.notes`, :attr:`~music21.stream.Stream.pitches`, :attr:`~music21.stream.Stream.semiFlat`, :attr:`~music21.stream.Stream.sorted`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Measure** **methods**
 
@@ -1562,7 +1562,7 @@ Page
 
         Properties inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.measures`, :attr:`~music21.stream.Stream.notes`, :attr:`~music21.stream.Stream.pitches`, :attr:`~music21.stream.Stream.duration`, :attr:`~music21.stream.Stream.elements`, :attr:`~music21.stream.Stream.flat`, :attr:`~music21.stream.Stream.highestOffset`, :attr:`~music21.stream.Stream.highestTime`, :attr:`~music21.stream.Stream.isGapless`, :attr:`~music21.stream.Stream.lily`, :attr:`~music21.stream.Stream.lowestOffset`, :attr:`~music21.stream.Stream.metadata`, :attr:`~music21.stream.Stream.midiFile`, :attr:`~music21.stream.Stream.midiTracks`, :attr:`~music21.stream.Stream.musicxml`, :attr:`~music21.stream.Stream.mx`, :attr:`~music21.stream.Stream.semiFlat`, :attr:`~music21.stream.Stream.sorted`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Page** **methods**
 
@@ -1636,7 +1636,7 @@ Score
 
         Properties inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.measures`, :attr:`~music21.stream.Stream.notes`, :attr:`~music21.stream.Stream.pitches`, :attr:`~music21.stream.Stream.duration`, :attr:`~music21.stream.Stream.elements`, :attr:`~music21.stream.Stream.flat`, :attr:`~music21.stream.Stream.highestOffset`, :attr:`~music21.stream.Stream.highestTime`, :attr:`~music21.stream.Stream.isGapless`, :attr:`~music21.stream.Stream.lowestOffset`, :attr:`~music21.stream.Stream.metadata`, :attr:`~music21.stream.Stream.midiFile`, :attr:`~music21.stream.Stream.midiTracks`, :attr:`~music21.stream.Stream.musicxml`, :attr:`~music21.stream.Stream.mx`, :attr:`~music21.stream.Stream.semiFlat`, :attr:`~music21.stream.Stream.sorted`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Score** **methods**
 
@@ -1684,7 +1684,7 @@ Staff
 
         Properties inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.measures`, :attr:`~music21.stream.Stream.notes`, :attr:`~music21.stream.Stream.pitches`, :attr:`~music21.stream.Stream.duration`, :attr:`~music21.stream.Stream.elements`, :attr:`~music21.stream.Stream.flat`, :attr:`~music21.stream.Stream.highestOffset`, :attr:`~music21.stream.Stream.highestTime`, :attr:`~music21.stream.Stream.isGapless`, :attr:`~music21.stream.Stream.lily`, :attr:`~music21.stream.Stream.lowestOffset`, :attr:`~music21.stream.Stream.metadata`, :attr:`~music21.stream.Stream.midiFile`, :attr:`~music21.stream.Stream.midiTracks`, :attr:`~music21.stream.Stream.musicxml`, :attr:`~music21.stream.Stream.mx`, :attr:`~music21.stream.Stream.semiFlat`, :attr:`~music21.stream.Stream.sorted`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **Staff** **methods**
 
@@ -1720,7 +1720,7 @@ System
 
         Properties inherited from :class:`~music21.stream.Stream`: :attr:`~music21.stream.Stream.measures`, :attr:`~music21.stream.Stream.notes`, :attr:`~music21.stream.Stream.pitches`, :attr:`~music21.stream.Stream.duration`, :attr:`~music21.stream.Stream.elements`, :attr:`~music21.stream.Stream.flat`, :attr:`~music21.stream.Stream.highestOffset`, :attr:`~music21.stream.Stream.highestTime`, :attr:`~music21.stream.Stream.isGapless`, :attr:`~music21.stream.Stream.lily`, :attr:`~music21.stream.Stream.lowestOffset`, :attr:`~music21.stream.Stream.metadata`, :attr:`~music21.stream.Stream.midiFile`, :attr:`~music21.stream.Stream.midiTracks`, :attr:`~music21.stream.Stream.musicxml`, :attr:`~music21.stream.Stream.mx`, :attr:`~music21.stream.Stream.semiFlat`, :attr:`~music21.stream.Stream.sorted`
 
-        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
+        Properties inherited from :class:`~music21.base.Music21Object`: :attr:`~music21.base.Music21Object.classes`, :attr:`~music21.base.Music21Object.offset`, :attr:`~music21.base.Music21Object.parent`, :attr:`~music21.base.Music21Object.priority`
 
     **System** **methods**
 
