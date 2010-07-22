@@ -36,6 +36,7 @@ from music21 import metadata
 from music21 import meter
 from music21 import musicxml as musicxmlMod
 from music21 import midi as midiModule
+from music21.midi import translate as midiTranslate
 from music21 import note
 from music21 import metadata
 
@@ -3938,215 +3939,223 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
 
     def _getMidiTracksPart(self, instObj=None):
-        '''Returns a :class:`music21.midi.base.MidiTracks` object based on the content of this Stream.
+        '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
         '''
-        # NOTE: this procedure requires that there are no overlaps between
-        # adjacent events. 
+        return midiTranslate.streamToMidiTrack(self, instObj)
 
-        if instObj is None:
-            # see if an instrument is defined in this or a parent stream
-            instObj = self.getInstrument()
-
-        # each part will become midi track
-        # each needs an id; can be adjusted later
-        mt = midiModule.MidiTrack(1)
-        mt.events += midiModule.getStartEvents(mt, instObj.partName)
-
-        # initial time is start of this Stream
-        #t = self.offset * defaults.ticksPerQuarter
-        # should shift at tracks level
-        t = 0 * defaults.ticksPerQuarter
-
-        # have to be sorted, have to strip ties
-        s = self.stripTies(inPlace=False, matchByPitch=False,
-                           retainContainers=False)
-        # probably already flat and sorted
-        for obj in s.flat.sorted:
-            tDurEvent = 0 # the found delta ticks in each event
-
-            if obj.isClass(note.GeneralNote):
-                # find difference since last event to this event
-                # cannot use getOffsetBySite(self), as need flat offset
-                # all values are in tpq; t stores abs time in tpq
-                tDif = (obj.offset * defaults.ticksPerQuarter) - t
-
-                #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
-
-                if obj.isRest:
-                    # for a rest, need the duration of the rest, plus whatever
-                    # difference between the offset and the last time value
-                    continue
-
-                # get a list of midi events
-                sub = obj.midiEvents
-
-                # a note has 4 events: delta/note-on/delta/note-off
-                if obj.isNote:
-                    sub[0].time = int(round(tDif)) # set first delta 
-                    # get the duration in ticks; this is the delta to 
-                    # to the note off message; already set when midi events are 
-                    # obtained
-                    tDurEvent = int(round(sub[2].time))
-
-                # a chord has delta/note-on/delta/note-off for each memeber
-                # of the chord. on the first delta is the offset, and only
-                # the first delta preceding the first note-off is the duration
-                if obj.isChord:
-                    # divide events between note-on and note-off
-                    sub[0].time = int(round(tDif)) # set first delta 
-                    # only the delta before the first note-off has the event dur
-                    # could also sum all durations before setting first
-                    # this is the second half of events
-                    tDurEvent = int(round(len(sub) / 2))
-
-                # to get new current time, need both the duration of the event
-                # as well as any difference found between the last event
-                t += tDif + tDurEvent
-                # add events to the list
-                mt.events += sub
-
-            elif obj.isClass(dynamics.Dynamic):
-                pass # configure dynamics
-            else: # other objects may have already been added
-                pass
-
-        # must update all events with a ref to this MidiTrack
-        mt.updateEvents()
-        mt.events += midiModule.getEndEvents(mt)
-        return mt
-        
+#         if instObj is None:
+#             # see if an instrument is defined in this or a parent stream
+#             instObj = self.getInstrument()
+# 
+#         # each part will become midi track
+#         # each needs an id; can be adjusted later
+#         mt = midiModule.MidiTrack(1)
+#         mt.events += midiModule.getStartEvents(mt, instObj.partName)
+# 
+#         # initial time is start of this Stream
+#         #t = self.offset * defaults.ticksPerQuarter
+#         # should shift at tracks level
+#         t = 0 * defaults.ticksPerQuarter
+# 
+#         # have to be sorted, have to strip ties
+#         s = self.stripTies(inPlace=False, matchByPitch=False,
+#                            retainContainers=False)
+#         # probably already flat and sorted
+#         for obj in s.flat.sorted:
+#             tDurEvent = 0 # the found delta ticks in each event
+# 
+#             if obj.isClass(note.GeneralNote):
+#                 # find difference since last event to this event
+#                 # cannot use getOffsetBySite(self), as need flat offset
+#                 # all values are in tpq; t stores abs time in tpq
+#                 tDif = (obj.offset * defaults.ticksPerQuarter) - t
+# 
+#                 #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
+# 
+#                 if obj.isRest:
+#                     # for a rest, need the duration of the rest, plus whatever
+#                     # difference between the offset and the last time value
+#                     continue
+# 
+#                 # get a list of midi events
+#                 sub = obj.midiEvents
+# 
+#                 # a note has 4 events: delta/note-on/delta/note-off
+#                 if obj.isNote:
+#                     sub[0].time = int(round(tDif)) # set first delta 
+#                     # get the duration in ticks; this is the delta to 
+#                     # to the note off message; already set when midi events are 
+#                     # obtained
+#                     tDurEvent = int(round(sub[2].time))
+# 
+#                 # a chord has delta/note-on/delta/note-off for each memeber
+#                 # of the chord. on the first delta is the offset, and only
+#                 # the first delta preceding the first note-off is the duration
+#                 if obj.isChord:
+#                     # divide events between note-on and note-off
+#                     sub[0].time = int(round(tDif)) # set first delta 
+#                     # only the delta before the first note-off has the event dur
+#                     # could also sum all durations before setting first
+#                     # this is the second half of events
+#                     tDurEvent = int(round(len(sub) / 2))
+# 
+#                 # to get new current time, need both the duration of the event
+#                 # as well as any difference found between the last event
+#                 t += tDif + tDurEvent
+#                 # add events to the list
+#                 mt.events += sub
+# 
+#             elif obj.isClass(dynamics.Dynamic):
+#                 pass # configure dynamics
+#             else: # other objects may have already been added
+#                 pass
+# 
+#         # must update all events with a ref to this MidiTrack
+#         mt.updateEvents()
+#         mt.events += midiModule.getEndEvents(mt)
+#         return mt
+#         
 
     def _setMidiTracksPart(self, mt, ticksPerQuarter=None, quantizePost=True):
         environLocal.printDebug(['got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
         '''Given a MIDI track, configure a Stream.
         '''
+        # pass self as reference to configure this object
+        midiTranslate.midiTrackToStream(mt, ticksPerQuarter, quantizePost, self)
+
         # get an abs start time for each event, discard deltas
-        events = []
-        t = 0
-        # pair deltas with events, convert abs time
-        # get even numbers
-        # in some cases, the first event may not be a delta time, but
-        # a SEQUENCE_TRACK_NAME or something else. thus, need to get
-        # first delta time
-        i = 0
-        while i < len(mt.events):
-            #environLocal.printDebug(['index', i, mt.events[i]])
-            #environLocal.printDebug(['index', i+1, mt.events[i+1]])
-            
-            # need to find pairs of delta time and evens
-            # in some cases, there are delta times that are out of order, or
-            # packed in the beginning
-            if mt.events[i].isDeltaTime() and not mt.events[i+1].isDeltaTime():
-                td = mt.events[i]
-                e = mt.events[i+1]
-                t += td.time # increment time
-                events.append([t, e])
-                i += 2
-                continue
-            else:
-                # cannot pair delta time to the next event; skip by 1
-                environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
-                i += 1
-                continue
-
-        # need to pair note-on with note-off
-        notes = [] # store pairs of pairs
-        memo = [] # store already matched note off
-        for i in range(len(events)):
-            t, e = events[i]
-            # for each event, we need to search for a match in all future
-            # events
-            if e.isNoteOn():
-                for j in range(i+1, len(events)):
-                    if j in memo: 
-                        continue
-                    tSub, eSub = events[j]
-                    if e.matchedNoteOff(eSub):
-                        memo.append(j)
-                        notes.append([events[i], events[j]])
-                        break
-
-        # collect notes with similar start times into chords
-        # create a composite list of both notes and chords
-        #composite = []
-        chordSub = None
-        i = 0
-        while i < len(notes):
-            # look at each note; get on time and event
-            on, off = notes[i]
-            t, e = on
-            # go through all following notes
-            for j in range(i+1, len(notes)):
-                # look at each on time event
-                onSub, offSub = notes[j]
-                tSub, eSub = onSub
-                # can set a tolerance for chordSubing; here at 1/16th
-                # of a quarter
-                if tSub - t <= ticksPerQuarter / 16:
-                    if chordSub == None: # start a new one
-                        chordSub = [notes[i]]
-                    chordSub.append(notes[j])
-                    continue # keep looing
-                else: # no more matches; assuming chordSub tones are contiguous
-                    if chordSub != None:
-                        #composite.append(chordSub)
-                        # create a chord here
-                        c = chord.Chord()
-                        c._setMidiEvents(chordSub, ticksPerQuarter)
-                        o = notes[i][0][0] / float(ticksPerQuarter)
-                        self.insert(o, c)
-                        iSkip = len(chordSub)
-                        chordSub = None
-                    else: # just append the note
-                        #composite.append(notes[i])
-                        # create a note here
-                        n = note.Note()
-                        n._setMidiEvents(notes[i], ticksPerQuarter)
-                        # the time is the first value in the first pair
-                        # need to round, as floating point error is likely
-                        o = notes[i][0][0] / float(ticksPerQuarter)
-                        self.insert(o, n)
-                        iSkip = 1
-                    break # exit secondary loop
-            i += iSkip
-                        
-#        environLocal.printDebug(['got midi track: events'])
-#         for e in notes:
-#             print e
-
-        # quantize to nearest 16th
-        if quantizePost:    
-            # 0.0625
-            self.quantize(0.125, processOffsets=True, processDurations=True)
-
-        # always need to fill gaps, as rests are not found in any other way
-        self.makeRests(inPlace=True, fillGaps=True)
+#         events = []
+#         t = 0
+#         # pair deltas with events, convert abs time
+#         # get even numbers
+#         # in some cases, the first event may not be a delta time, but
+#         # a SEQUENCE_TRACK_NAME or something else. thus, need to get
+#         # first delta time
+#         i = 0
+#         while i < len(mt.events):
+#             #environLocal.printDebug(['index', i, mt.events[i]])
+#             #environLocal.printDebug(['index', i+1, mt.events[i+1]])
+#             
+#             # need to find pairs of delta time and evens
+#             # in some cases, there are delta times that are out of order, or
+#             # packed in the beginning
+#             if mt.events[i].isDeltaTime() and not mt.events[i+1].isDeltaTime():
+#                 td = mt.events[i]
+#                 e = mt.events[i+1]
+#                 t += td.time # increment time
+#                 events.append([t, e])
+#                 i += 2
+#                 continue
+#             else:
+#                 # cannot pair delta time to the next event; skip by 1
+#                 environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
+#                 i += 1
+#                 continue
+# 
+#         # need to pair note-on with note-off
+#         notes = [] # store pairs of pairs
+#         memo = [] # store already matched note off
+#         for i in range(len(events)):
+#             t, e = events[i]
+#             # for each event, we need to search for a match in all future
+#             # events
+#             if e.isNoteOn():
+#                 for j in range(i+1, len(events)):
+#                     if j in memo: 
+#                         continue
+#                     tSub, eSub = events[j]
+#                     if e.matchedNoteOff(eSub):
+#                         memo.append(j)
+#                         notes.append([events[i], events[j]])
+#                         break
+# 
+#         # collect notes with similar start times into chords
+#         # create a composite list of both notes and chords
+#         #composite = []
+#         chordSub = None
+#         i = 0
+#         while i < len(notes):
+#             # look at each note; get on time and event
+#             on, off = notes[i]
+#             t, e = on
+#             # go through all following notes
+#             for j in range(i+1, len(notes)):
+#                 # look at each on time event
+#                 onSub, offSub = notes[j]
+#                 tSub, eSub = onSub
+#                 # can set a tolerance for chordSubing; here at 1/16th
+#                 # of a quarter
+#                 if tSub - t <= ticksPerQuarter / 16:
+#                     if chordSub == None: # start a new one
+#                         chordSub = [notes[i]]
+#                     chordSub.append(notes[j])
+#                     continue # keep looing
+#                 else: # no more matches; assuming chordSub tones are contiguous
+#                     if chordSub != None:
+#                         #composite.append(chordSub)
+#                         # create a chord here
+#                         c = chord.Chord()
+#                         c._setMidiEvents(chordSub, ticksPerQuarter)
+#                         o = notes[i][0][0] / float(ticksPerQuarter)
+#                         self.insert(o, c)
+#                         iSkip = len(chordSub)
+#                         chordSub = None
+#                     else: # just append the note
+#                         #composite.append(notes[i])
+#                         # create a note here
+#                         n = note.Note()
+#                         n._setMidiEvents(notes[i], ticksPerQuarter)
+#                         # the time is the first value in the first pair
+#                         # need to round, as floating point error is likely
+#                         o = notes[i][0][0] / float(ticksPerQuarter)
+#                         self.insert(o, n)
+#                         iSkip = 1
+#                     break # exit secondary loop
+#             i += iSkip
+#                         
+# #        environLocal.printDebug(['got midi track: events'])
+# #         for e in notes:
+# #             print e
+# 
+#         # quantize to nearest 16th
+#         if quantizePost:    
+#             # 0.0625
+#             self.quantize(0.125, processOffsets=True, processDurations=True)
+# 
+#         # always need to fill gaps, as rests are not found in any other way
+#         self.makeRests(inPlace=True, fillGaps=True)
+# 
 
 
     def _getMidiTracks(self):
-        sTemplate = Stream()
-        # return a list of MidiTrack objects
-        midiTracks = []
+        return midiTranslate.streamsToMidiTracks(self)
 
-        # TODO: may need to shift all time values to accomodate 
-        # Streams that do not start at same time
-        if self.isMultiPart():
-            for obj in self.getElementsByClass(sTemplate.classNames):
-                midiTracks.append(obj._getMidiTracksPart())
-        else: # just get this single stream
-            midiTracks.append(self._getMidiTracksPart())
-        return midiTracks
+#         sTemplate = Stream()
+#         # return a list of MidiTrack objects
+#         midiTracks = []
+# 
+#         # TODO: may need to shift all time values to accomodate 
+#         # Streams that do not start at same time
+#         if self.isMultiPart():
+#             for obj in self.getElementsByClass(sTemplate.classNames):
+#                 midiTracks.append(obj._getMidiTracksPart())
+#         else: # just get this single stream
+#             midiTracks.append(self._getMidiTracksPart())
+#         return midiTracks
 
     def _setMidiTracks(self, midiTracks, ticksPerQuarter=None):
+        midiTranslate.midiTracksToStreams(midiTracks, 
+            ticksPerQuarter=ticksPerQuarter, input=self)
+
         # give a list of midi tracks
-        for mt in midiTracks:
-            # not all tracks have notes defined; only creates parts for those
-            # that do
-            if mt.hasNotes(): 
-                streamPart = Part() # create a part instance for each part
-                streamPart._setMidiTracksPart(mt,
-                    ticksPerQuarter=ticksPerQuarter)
-                self.insert(0, streamPart)
+#         for mt in midiTracks:
+#             # not all tracks have notes defined; only creates parts for those
+#             # that do
+#             if mt.hasNotes(): 
+#                 streamPart = Part() # create a part instance for each part
+#                 streamPart._setMidiTracksPart(mt,
+#                     ticksPerQuarter=ticksPerQuarter)
+#                 self.insert(0, streamPart)
 
     midiTracks = property(_getMidiTracks, _setMidiTracks, 
         doc='''Get or set this Stream from a list of :class:`music21.midi.base.MidiTracks` objects.
@@ -4166,30 +4175,34 @@ class Stream(music21.Music21Object):
     def _getMidiFile(self):
         '''Provide a complete MIDI file representation. 
         '''
+        return midiTranslate.streamToMidiFile(self)
+
         # get a list of mid tracks objects
-        midiTracks = self._getMidiTracks()
-
-        # update track indices
-        # may need to update channel information
-        for i in range(len(midiTracks)):
-            midiTracks[i].index = i + 1
-
-        mf = midiModule.MidiFile()
-        mf.tracks = midiTracks
-        mf.ticksPerQuarterNote = defaults.ticksPerQuarter
-        return mf
+#         midiTracks = self._getMidiTracks()
+# 
+#         # update track indices
+#         # may need to update channel information
+#         for i in range(len(midiTracks)):
+#             midiTracks[i].index = i + 1
+# 
+#         mf = midiModule.MidiFile()
+#         mf.tracks = midiTracks
+#         mf.ticksPerQuarterNote = defaults.ticksPerQuarter
+#         return mf
 
     def _setMidiFile(self, mf):
         '''Given a :class:`music21.midi.base.MidiFile` object, configure a Stream
         '''
-        environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
+        return midiTranslate.midiFileToStream(mf, input=self)
 
-        if len(mf.tracks) == 0:
-            raise StreamException('no tracks are defined in this MIDI file.')
-        else:
-            # create a stream for each tracks   
-            # may need to check if tracks actually have event data
-            self._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
+#         environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
+# 
+#         if len(mf.tracks) == 0:
+#             raise StreamException('no tracks are defined in this MIDI file.')
+#         else:
+#             # create a stream for each tracks   
+#             # may need to check if tracks actually have event data
+#             self._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
 
 
     midiFile = property(_getMidiFile, _setMidiFile,
