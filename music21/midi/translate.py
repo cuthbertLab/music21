@@ -467,7 +467,6 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
     from music21 import chord
     from music21 import note
 
-
     # get an abs start time for each event, discard deltas
     events = []
     t = 0
