@@ -1063,6 +1063,23 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 3)
 
 
+        # this sample has eight note triplets
+        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test06.mid')
+        s = parseFile(fp)
+        #s.show()
+        dList = [n.quarterLength for n in s.flat.notes[:30]]
+        match = [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.33333333333333331, 0.33333333333333331, 0.33333333333333331, 0.5, 0.5, 1.0]
+        self.assertEqual(dList, match)
+
+
+        # this sample has sixteenth note triplets
+        # TODO much work is still needed on getting timing right
+        # this produces numerous errors in makeMeasure partitioning
+        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test07.mid')
+        s = parseFile(fp)
+        #s.show()
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

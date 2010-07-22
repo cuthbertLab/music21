@@ -1897,6 +1897,7 @@ class Duration(DurationCommon):
         True
         '''
         post = [] # rename mxNoteList for consistencuy
+        #environLocal.printDebug(['in _getMX', self, self.quarterLength])
 
         for dur in self.components:
             mxDivisions = int(defaults.divisionsPerQuarter * 

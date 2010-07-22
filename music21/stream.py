@@ -2527,7 +2527,7 @@ class Stream(music21.Music21Object):
     def makeTies(self, meterStream=None, inPlace=True, 
         displayTiedAccidentals=False):
         '''Given a stream containing measures, examine each element in the stream 
-        if the elements duration extends beyond the measures bound, create a tied  entity.
+        if the elements duration extends beyond the measures boundary, create a tied entity.
     
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
                 
@@ -2579,7 +2579,7 @@ class Stream(music21.Music21Object):
             if m.timeSignature is not None:
                 lastTimeSignature = m.timeSignature
 
-            # get a next measure; we may not need it, but have it ready
+            # get next measure; we may not need it, but have it ready
             if mCount + 1 < len(measureStream):
                 mNext = measureStream[mCount+1]
                 mNextAdd = False # already present; do not append
@@ -2614,7 +2614,10 @@ class Stream(music21.Music21Object):
                     eoffset = e.getOffsetBySite(m)
                     eEnd = eoffset + e.duration.quarterLength
                     # assume end can be at boundary of end of measure
-                    if eEnd > mEnd:
+                    overshot = eEnd - mEnd
+                    # only process if overshot is greater than a minimum
+                    # 1/64 is 0.015625
+                    if overshot > .001:
                         if eoffset >= mEnd:
                             raise StreamException('element (%s) has offset %s within a measure that ends at offset %s' % (e, eoffset, mEnd))  
     
@@ -2669,6 +2672,8 @@ class Stream(music21.Music21Object):
                         if mNextAdd:
                             environLocal.printDebug(['makeTies() inserting mNext into returnObj', mNext])
                             returnObj.insert(mNext.offset, mNext)
+                    elif overshot > 0:
+                        environLocal.printDebug(['makeTies() found and skipping extremely small overshot into next measure', overshot])
             mCount += 1
 
         return returnObj
@@ -2728,10 +2733,13 @@ class Stream(music21.Music21Object):
             # error check; call before sending to time signature, as, if this
             # fails, it represents a problem that happens before time signature
             # processing
-            if (sum([d.quarterLength for d in durList]) >
-                lastTimeSignature.barDuration.quarterLength):
-                raise StreamException('attempting makeBeams with a bar that contains durations that sum greater than bar duration (%s > %s)' % (sum([d.quarterLength for d in durList]), 
-                lastTimeSignature.barDuration.quarterLength))
+
+            durSum = sum([d.quarterLength for d in durList])
+            barQL = lastTimeSignature.barDuration.quarterLength
+
+            if durSum > barQL:
+                environLocal.printDebug(['attempting makeBeams with a bar that contains durations that sum greater than bar duration (%s > %s)' % (durSum, barQL)])
+                continue
         
             # getBeams can take a list of Durations; however, this cannot
             # distinguish a Note from a Rest; thus, we can submit a flat 
@@ -2741,7 +2749,8 @@ class Stream(music21.Music21Object):
             for i in range(len(noteStream)):
                 # this may try to assign a beam to a Rest
                 noteStream[i].beams = beamsList[i]
-            # apply tuple types in place
+            # apply tuple types in place; this modifies the durations 
+            # in dur lost
             duration.updateTupletType(durList)
 
         return returnObj
@@ -3832,16 +3841,18 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
-    def quantize(self, quarterLengthMin, processOffsets=True,
-                 processDurations=False):
-        '''Quantize time values in this Stream by snapping offsets and/or durations to the nearest multiple of a quarter length value given as `quarterLengthMin`. 
+    def quantize(self, quarterLengthDivisors=[4, 3], 
+            processOffsets=True, processDurations=False):
+        '''Quantize time values in this Stream by snapping offsets and/or durations to the nearest multiple of a quarter length value given as one or more divisors of 1 quarter length. The quantized value found closest to a divisor multiple will be used.
+
+        The `quarterLengthDivisors` provides a flexible way to provide quantization settings. For example, [2] will snap all events to eighth note grid. [4, 3] will snap events to sixteenth notes and eighth note triplets, whichever is closer. [4, 6] will snap events to sixteenth notes and sixteenth note triplets. 
 
         >>> from music21 import *
         >>> n = note.Note()
         >>> n.quarterLength = .49
         >>> s = stream.Stream()
         >>> s.repeatInsert(n, [0.1, .49, .9, 1.51])
-        >>> s.quantize(.25, processOffsets=True, processDurations=True)
+        >>> s.quantize([4], processOffsets=True, processDurations=True)
         >>> [e.offset for e in s]
         [0.0, 0.5, 1.0, 1.5]
         >>> [e.duration.quarterLength for e in s]
@@ -3849,15 +3860,28 @@ class Stream(music21.Music21Object):
         '''
         # this presently is not trying to avoid overlaps that
         # result from quantization; this may be necessary
+
+        def bestMatch(target, divisors):
+            found = []
+            for div in divisors:
+                match, error = common.nearestMultiple(target, (1.0/div))
+                found.append((error, match)) # reverse for sorting
+            # get first, and leave out the error
+            return sorted(found)[0][1]
+
+        # if we have a min of .25 (sixteenth)
+        quarterLengthMin = quarterLengthDivisors[0]
         for e in self._elements:
             if processOffsets:
                 o = e.getOffsetBySite(self)
-                oNew = common.nearestMultiple(o, quarterLengthMin)
+                oNew = bestMatch(o, quarterLengthDivisors)
+                #oNew = common.nearestMultiple(o, quarterLengthMin)
                 e.setOffsetBySite(self, oNew)
             if processDurations:
                 if e.duration != None:
                     ql = e.duration.quarterLength
-                    qlNew = common.nearestMultiple(ql, quarterLengthMin)
+                    qlNew = bestMatch(ql, quarterLengthDivisors)
+                    #qlNew = common.nearestMultiple(ql, quarterLengthMin)
                     e.duration.quarterLength = qlNew
 
 
@@ -4922,7 +4946,7 @@ class Stream(music21.Music21Object):
 
 
 
-    def findGaps(self):
+    def findGaps(self, minimumQuarterLength=.001):
         '''Returns either (1) a Stream containing Elements (that wrap the None object) whose offsets and durations are the length of gaps in the Stream
         or (2) None if there are no gaps.
         
@@ -4938,9 +4962,12 @@ class Stream(music21.Music21Object):
         for e in sortedElements:
             if e.offset > highestCurrentEndTime:
                 gapElement = music21.ElementWrapper(obj = None)
-
+                gapQuarterLength = e.offset - highestCurrentEndTime
+                if gapQuarterLength <= minimumQuarterLength:
+                    environLocal.printDebug(['findGaps(): skipping very small gap:', gapQuarterLength])
+                    continue
                 gapElement.duration = duration.Duration()
-                gapElement.duration.quarterLength = e.offset - highestCurrentEndTime
+                gapElement.duration.quarterLength = gapQuarterLength
                 gapStream.insert(highestCurrentEndTime, gapElement)
             highestCurrentEndTime = max(highestCurrentEndTime, e.offset + e.duration.quarterLength)
 
@@ -9296,6 +9323,64 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.getElementsByClass(note.Rest)), 3)
 
 
+    def testQuantize(self):
+
+        def procCompare(srcOffset, srcDur, dstOffset, dstDur, divList):
+
+            from music21 import note
+            s = Stream()
+            for i in range(len(srcDur)):
+                n = note.Note()
+                n.quarterLength = srcDur[i]                
+                s.insert(srcOffset[i], n)
+
+            s.quantize(divList, processOffsets=True, processDurations=True)
+
+            targetOffset = [e.offset for e in s]
+            targetDur = [e.duration.quarterLength for e in s]
+   
+            self.assertEqual(targetOffset, dstOffset)
+            self.assertEqual(targetDur, dstDur)
+
+            #environLocal.printDebug(['quantization results:', targetOffset, targetDur])
+
+
+        procCompare([0.01, .24, .57, .78], [0.25, 0.25, 0.25, 0.25], 
+                    [0.0, .25, .5, .75], [0.25, 0.25, 0.25, 0.25], 
+                    [4]) # snap to .25
+
+        procCompare([0.01, .24, .52, .78], [0.25, 0.25, 0.25, 0.25], 
+                    [0.0, .25, .5, .75], [0.25, 0.25, 0.25, 0.25], 
+                    [8]) # snap to .125
+
+
+        procCompare([0.01, .345, .597, 1.02, 1.22], 
+                    [0.31, 0.32, 0.33, 0.25, 0.25], 
+
+                    [0.0, 1/3., 2/3., 1.0, 1.25], 
+                    [1/3., 1/3., 1/3., 0.25, 0.25], 
+
+                    [4, 3]) # snap to .125 and .3333
+
+
+        procCompare([0.01, .345, .687, 0.99, 1.28], 
+                    [0.31, 0.32, 0.33, 0.22, 0.21], 
+
+                    [0.0, 1/3., 2/3., 1.0, 1.25], 
+                    [1/3., 1/3., 1/3., 0.25, 0.25], 
+
+                    [8, 3]) # snap to .125 and .3333
+
+
+        procCompare([0.03, .335, .677, 1.02, 1.28], 
+                    [0.32, 0.35, 0.33, 0.22, 0.21], 
+
+                    [0.0, 1/3., 2/3., 1.0, 1.25], 
+                    [1/3., 1/3., 1/3., 0.25, 0.25], 
+
+                    [8, 6]) # snap to .125 and .1666666
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -9314,4 +9399,5 @@ if __name__ == "__main__":
         #a.testYieldContainers()
         #a.testMidiEventsBuilt()    
         #a.testMidiEventsImported()
-        a.testFindGaps()
+        #a.testFindGaps()
+        a.testQuantize()

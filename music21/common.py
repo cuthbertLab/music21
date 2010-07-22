@@ -324,36 +324,51 @@ def isPowerOfTwo(n):
 
 
 def nearestMultiple(n, unit):
-    '''Given a positive value, return the nearest multiple of the supplied `unit`.
+    '''Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as the difference (error).
 
-    >>> nearestMultiple(.25, .25)
+    >>> nearestMultiple(.25, .25)[0]
     0.25
-    >>> nearestMultiple(.35, .25)
+    >>> nearestMultiple(.35, .25)[0]
     0.25
-    >>> nearestMultiple(.4, .25)
+    >>> nearestMultiple(.4, .25)[0]
     0.5
-    >>> nearestMultiple(23404.001, .125)
+    >>> nearestMultiple(23404.001, .125)[0]
     23404.0
-    >>> nearestMultiple(23404.134, .125)
+    >>> nearestMultiple(23404.134, .125)[0]
     23404.125
-    >>> nearestMultiple(.001, .125)
+    >>> nearestMultiple(.001, .125)[0]
     0.0
+
+    >>> almostEquals(nearestMultiple(.25, (1/3.))[0], .33333333)
+    True
+    >>> almostEquals(nearestMultiple(.55, (1/3.))[0], .66666666)
+    True
+    >>> almostEquals(nearestMultiple(234.69, (1/3.))[0], 234.6666666)
+    True
+    >>> almostEquals(nearestMultiple(18.123, (1/6.))[0], 18.16666666)
+    True
+
+
     '''
     if n < 0:
         raise Exception('cannot find nearest multiple for a value less than the unit: %s, %s' % (n, unit))
 
-    mult = math.floor(n / unit) # can start with the floor 
-    half = unit / 2.0
-    while True:
-        matchLow = unit * mult
-        matchHigh = unit * (mult + 1)
-        if n >= matchLow and n <= (matchLow + half):
-            return matchLow
-        elif n >= (matchHigh - half) and n <= matchHigh:
-            return matchHigh                
-        mult += 1
-        if mult >= 10:
-            raise Exception('could not find match; would be an infinite loop!')
+    mult = math.floor(n / float(unit)) # can start with the floor 
+    halfUnit = unit / 2.0
+
+    matchLow = unit * mult
+    matchHigh = unit * (mult + 1)
+
+    #print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
+
+    if matchLow >= n >= matchHigh:
+        raise Exception('cannot place n between multiples: %s, %s', matchLow, matchHigh)
+
+    if n >= matchLow and n < (matchLow + halfUnit):
+        return matchLow, n - matchLow
+    elif n >= (matchHigh - halfUnit) and n <= matchHigh:
+        return matchHigh, matchHigh - n
+       
 
 def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean

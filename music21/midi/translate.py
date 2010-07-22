@@ -563,8 +563,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
 
     # quantize to nearest 16th
     if quantizePost:    
-        # 0.0625
-        s.quantize(0.125, processOffsets=True, processDurations=True)
+        s.quantize([8, 3], processOffsets=True, processDurations=True)
 
     # always need to fill gaps, as rests are not found in any other way
     s.makeRests(inPlace=True, fillGaps=True)
