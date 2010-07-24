@@ -7,7 +7,29 @@ music21.duration
 
 .. module:: music21.duration
 
-Classes and functions for creating and processing durations. :class:`~music21.duration.Duration` objects, while a fundamental component of :class:`~music21.note.Note` objects, are also used to describe the duration of other Music21Objects, such as :class:`~music21.stream.Stream` and :class:`~music21.meter.TimeSignature` objects. 
+The duration module contains :class:`~music21.duration.Duration` objects (among other objects and functions).  Duration objects are a fundamental component of :class:`~music21.note.Note` and all Music21Objects, such as :class:`~music21.meter.TimeSignature` objects. 
+
+Containers such as :class:`~music21.stream.Stream` and :class:`~music21.stream.Score` also have durations which are equal to the position of the ending of the last object in the Stream. 
+
+Music21 Durations are almost always measured in QuarterNotes, so an eighth note has a duration of 0.5.  Different Duration-like objects support objects such as grace notes which take no duration on the page, have a short (but real) duration when played, and have a duration-type representation when performed. Example usage: 
+
+>>> from music21 import *
+>>> d = duration.Duration()
+>>> d.quarterLength = 0.5
+>>> d.type
+'eighth' 
+>>> d.type = 'whole'
+>>> d.quarterLength
+4.0 
+>>> d.quarterLength = 0.166666666
+>>> d.type
+'16th' 
+>>> d.tuplets[0].numberNotesActual
+3 
+>>> d.tuplets[0].numberNotesNormal
+2 
+
+
 
 
 .. function:: convertQuarterLengthToType(qLen)

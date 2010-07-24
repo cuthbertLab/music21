@@ -66,7 +66,7 @@ class TestPerformance(unittest.TestCase):
             t.stop()
             dur = t()
             environLocal.printDebug(['timing tolerance for', known, 
-                'this run:', t, 'best runs:', 
+                'this run:', dur, 'best runs:', 
                 ['%s: %s' % (x, y) for x, y in best.items()]])
             self.assertEqual(True, dur <= max) # performance test
 

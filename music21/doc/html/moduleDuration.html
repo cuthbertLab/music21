@@ -95,7 +95,26 @@
             
   <div class="section" id="module-music21.duration">
 <span id="moduleduration"></span><h1>music21.duration<a class="headerlink" href="#module-music21.duration" title="Permalink to this headline">¶</a></h1>
-<p>Classes and functions for creating and processing durations. <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> objects, while a fundamental component of <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> objects, are also used to describe the duration of other Music21Objects, such as <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> and <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> objects.</p>
+<p>The duration module contains <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a> objects (among other objects and functions).  Duration objects are a fundamental component of <a title="music21.note.Note" class="reference external" href="moduleNote.html#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a> and all Music21Objects, such as <a title="music21.meter.TimeSignature" class="reference external" href="moduleMeter.html#music21.meter.TimeSignature"><tt class="xref docutils literal"><span class="pre">TimeSignature</span></tt></a> objects.</p>
+<p>Containers such as <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> and <a title="music21.stream.Score" class="reference external" href="moduleStream.html#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a> also have durations which are equal to the position of the ending of the last object in the Stream.</p>
+<p>Music21 Durations are almost always measured in QuarterNotes, so an eighth note has a duration of 0.5.  Different Duration-like objects support objects such as grace notes which take no duration on the page, have a short (but real) duration when played, and have a duration-type representation when performed. Example usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">music21</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">Duration</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;eighth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">&#39;whole&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">quarterLength</span> <span class="o">=</span> <span class="mf">0.166666666</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;16th&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">numberNotesActual</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">tuplets</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">numberNotesNormal</span>
+<span class="go">2</span>
+</pre></div>
+</div>
 <dl class="function">
 <dt id="music21.duration.convertQuarterLengthToType">
 <tt class="descclassname">music21.duration.</tt><tt class="descname">convertQuarterLengthToType</tt><big>(</big><em>qLen</em><big>)</big><a class="headerlink" href="#music21.duration.convertQuarterLengthToType" title="Permalink to this definition">¶</a></dt>
@@ -1169,7 +1188,7 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 22, 2010.
+      Last updated on Jul 23, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
