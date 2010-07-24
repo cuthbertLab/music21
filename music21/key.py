@@ -412,7 +412,7 @@ class KeySignature(music21.Music21Object):
         
         
         '''
-        for thisAlteration in self.alteredPitches:  # temp measure to fix dbl flats, etc.
+        for thisAlteration in reversed(self.alteredPitches):  # temp measure to fix dbl flats, etc.
             if thisAlteration.step.lower() == step.lower():
                 return thisAlteration.accidental
         
