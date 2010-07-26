@@ -338,6 +338,60 @@ def chordToMidiFile(input):
 
 
 #-------------------------------------------------------------------------------
+# Meta events
+
+def midiEventToTimeSignature(event):
+    '''Convert a single MIDI event into a music21 TimeSignature object.
+    '''
+    # http://www.sonicspot.com/guide/midifiles.html
+    # The time signature defined with 4 bytes, a numerator, a denominator, a metronome pulse and number of 32nd notes per MIDI quarter-note. The numerator is specified as a literal value, but the denominator is specified as (get ready) the value to which the power of 2 must be raised to equal the number of subdivisions per whole note. For example, a value of 0 means a whole note because 2 to the power of 0 is 1 (whole note), a value of 1 means a half-note because 2 to the power of 1 is 2 (half-note), and so on. 
+
+    #The metronome pulse specifies how often the metronome should click in terms of the number of clock signals per click, which come at a rate of 24 per quarter-note. For example, a value of 24 would mean to click once every quarter-note (beat) and a value of 48 would mean to click once every half-note (2 beats). And finally, the fourth byte specifies the number of 32nd notes per 24 MIDI clock signals. This value is usually 8 because there are usually 8 32nd notes in a quarter-note. At least one Time Signature Event should appear in the first track chunk (or all track chunks in a Type 2 file) before any non-zero delta time events. If one is not specified 4/4, 24, 8 should be assumed.
+    from music21 import meter
+
+    subStr = event.data # make a copy of the data to processDurations
+    post = []
+    # time signature is supposed to be 4 bytes
+    for i in range(4):
+        # get one number at a time
+        x, subStr = midiModule.getNumber(subStr, 1)
+        post.append(x)
+
+    n = post[0]
+    d = pow(2, post[1])
+    ts = meter.TimeSignature('%s/%s' % (n, d))
+    return ts
+
+
+
+def midiEventToKeySignature(event):
+    '''Convert a single MIDI event into a music21 TimeSignature object.
+    '''
+    # This meta event is used to specify the key (number of sharps or flats) and scale (major or minor) of a sequence. A positive value for the key specifies the number of sharps and a negative value specifies the number of flats. A value of 0 for the scale specifies a major key and a value of 1 specifies a minor key.
+    from music21 import key
+
+    subStr = event.data # make a copy of the data to processDurations
+    post = []
+    # time signature is supposed to be 4 bytes
+    for i in range(2):
+        # get one number at a time
+        x, subStr = midiModule.getNumber(subStr, 1)
+        post.append(x)
+
+    # fir value is number of sharp, or neg for number of flat
+    ks = key.KeySignature(post[0])
+
+    if post[1] == 0:
+        ks.mode = 'major'
+    if post[1] == 1:
+        ks.mode = 'minor'
+    return ks
+
+
+
+
+
+#-------------------------------------------------------------------------------
 # Streams
 
 
@@ -470,6 +524,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
     # get an abs start time for each event, discard deltas
     events = []
     t = 0
+
     # pair deltas with events, convert abs time
     # get even numbers
     # in some cases, the first event may not be a delta time, but
@@ -498,10 +553,13 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
 
     # need to pair note-on with note-off
     notes = [] # store pairs of pairs
+    metaEvents = [] # store pairs of abs time, m21 object
     memo = [] # store already matched note off
     for i in range(len(events)):
+        if i in memo:
+            continue
         t, e = events[i]
-        # for each event, we need to search for a match in all future
+        # for each note on event, we need to search for a match in all future
         # events
         if e.isNoteOn():
             for j in range(i+1, len(events)):
@@ -512,6 +570,29 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
                     memo.append(j)
                     notes.append([events[i], events[j]])
                     break
+        else:
+            if e.type == 'TIME_SIGNATURE':
+                # time signature should be 4 bytes
+                metaEvents.append([t, midiEventToTimeSignature(e)])
+
+            elif e.type == 'KEY_SIGNATURE':
+                metaEvents.append([t, midiEventToKeySignature(e)])
+                
+            elif e.type == 'SET_TEMPO':
+                pass
+               # environLocal.printDebug(['got midi message of type:', e.type, e.data, e])
+            elif e.type == 'INSTRUMENT_NAME':
+                pass
+                #environLocal.printDebug(['got midi message of type:', e.type, e.data, e])
+            elif e.type == 'PROGRAM_CHANGE':
+                pass
+                #environLocal.printDebug(['got midi message of type:', e.type, e.data, e])
+
+
+    # first create meta events
+    for t, obj in metaEvents:
+        environLocal.printDebug(['insert midi meta event:', t, obj])
+        s.insert(t / float(ticksPerQuarter), obj)
 
     # collect notes with similar start times into chords
     # create a composite list of both notes and chords
@@ -580,6 +661,9 @@ def streamsToMidiTracks(input):
     sTemplate = stream.Stream()
     # return a list of MidiTrack objects
     midiTracks = []
+
+    # TODO: may add a conductor track that contains
+    # time signature, tempo, and other meta data
 
     # TODO: may need to shift all time values to accomodate 
     # Streams that do not start at same time

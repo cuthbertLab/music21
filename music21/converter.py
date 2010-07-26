@@ -1045,7 +1045,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMidiNotes(self):
-        import common
+        import common, meter, key
 
         fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test01.mid')
         # a simple file created in athenacl
@@ -1059,26 +1059,46 @@ class Test(unittest.TestCase):
         fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
         s = parseFile(fp)
         #s.show()
+        environLocal.printDebug(['\nopening fp', fp])
+
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
         self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 3)
+
+        self.assertEqual(len(s.flat.getElementsByClass(meter.TimeSignature)), 0)
+        self.assertEqual(len(s.flat.getElementsByClass(key.KeySignature)), 0)
 
 
         # this sample has eight note triplets
         fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test06.mid')
         s = parseFile(fp)
         #s.show()
+
+        environLocal.printDebug(['\nopening fp', fp])
+
+        #s.show()
         dList = [n.quarterLength for n in s.flat.notes[:30]]
         match = [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.33333333333333331, 0.33333333333333331, 0.33333333333333331, 0.5, 0.5, 1.0]
         self.assertEqual(dList, match)
+
+
+        self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
+        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 1)
 
 
         # this sample has sixteenth note triplets
         # TODO much work is still needed on getting timing right
         # this produces numerous errors in makeMeasure partitioning
         fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test07.mid')
-        s = parseFile(fp)
-        #s.show()
+        #environLocal.printDebug(['\nopening fp', fp])
 
+        s = parseFile(fp)
+        #s.show('t')
+
+
+        self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
+        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 1)
+
+       
 
 
 #-------------------------------------------------------------------------------

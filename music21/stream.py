@@ -1190,7 +1190,14 @@ class Stream(music21.Music21Object):
         # use direct access to elements list
         for e in self._elements:
             for className in classFilterList:
-                if e.isClass(className):
+                # new method uses string matching of .classes attribute
+                # temporarily check to see if this is a string
+                if isinstance(className, str):
+                    if className in e.classes:
+                        found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
+                        break
+                # old method uses isClass matching
+                elif e.isClass(className):
                     found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
                     break
         # if this stream was sorted, the resultant stream is sorted
@@ -4960,16 +4967,21 @@ class Stream(music21.Music21Object):
         gapStream = Stream()
         highestCurrentEndTime = 0
         for e in sortedElements:
+
             if e.offset > highestCurrentEndTime:
                 gapElement = music21.ElementWrapper(obj = None)
                 gapQuarterLength = e.offset - highestCurrentEndTime
                 if gapQuarterLength <= minimumQuarterLength:
-                    environLocal.printDebug(['findGaps(): skipping very small gap:', gapQuarterLength])
+                    #environLocal.printDebug(['findGaps(): skipping very small gap:', gapQuarterLength])
                     continue
                 gapElement.duration = duration.Duration()
                 gapElement.duration.quarterLength = gapQuarterLength
                 gapStream.insert(highestCurrentEndTime, gapElement)
-            highestCurrentEndTime = max(highestCurrentEndTime, e.offset + e.duration.quarterLength)
+            if hasattr(e, 'duration') and e.duration != None:
+                eDur = e.duration.quarterLength
+            else:
+                eDur = 0.
+            highestCurrentEndTime = max(highestCurrentEndTime, e.offset + eDur)
 
         if len(gapStream) == 0:
             return None

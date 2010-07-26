@@ -1182,34 +1182,34 @@ class Music21Object(object):
     def _getClasses(self):
         return [x.__name__ for x in self.__class__.mro()] 
 
-    classes = property(_getClasses, doc='''
-    returns a list containing the names (strings, not objects) of classes that this 
-    object belongs to -- starting with the object's class name and going up the mro()
-    for the object.  Very similar to Perl's @ISA array:
+    classes = property(_getClasses, 
+        doc='''Returns a list containing the names (strings, not objects) of classes that this 
+        object belongs to -- starting with the object's class name and going up the mro()
+        for the object.  Very similar to Perl's @ISA array:
     
-    >>> from music21 import *
-    >>> q = note.QuarterNote()
-    >>> q.classes
-    ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
-    
-    
-    Example: find GClefs that are not Treble clefs (or treble 8vb, etc.):
-    
-    
-    >>> s = stream.Stream()
-    >>> s.insert(10, clef.GClef())
-    >>> s.insert(20, clef.TrebleClef())
-    >>> s.insert(30, clef.FrenchViolinClef())
-    >>> s.insert(40, clef.Treble8vbClef())
-    >>> s.insert(50, clef.BassClef())
-    >>> s2 = stream.Stream()
-    >>> for t in s:
-    ...    if 'GClef' in t.classes and 'TrebleClef' not in t.classes:
-    ...        s2.insert(t)
-    >>> s2.show('text')
-    {10.0} <music21.clef.GClef object at 0x...>
-    {30.0} <music21.clef.FrenchViolinClef object at 0x...>    
-    ''')
+        >>> from music21 import *
+        >>> q = note.QuarterNote()
+        >>> q.classes
+        ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
+        
+        
+        Example: find GClefs that are not Treble clefs (or treble 8vb, etc.):
+        
+        
+        >>> s = stream.Stream()
+        >>> s.insert(10, clef.GClef())
+        >>> s.insert(20, clef.TrebleClef())
+        >>> s.insert(30, clef.FrenchViolinClef())
+        >>> s.insert(40, clef.Treble8vbClef())
+        >>> s.insert(50, clef.BassClef())
+        >>> s2 = stream.Stream()
+        >>> for t in s:
+        ...    if 'GClef' in t.classes and 'TrebleClef' not in t.classes:
+        ...        s2.insert(t)
+        >>> s2.show('text')
+        {10.0} <music21.clef.GClef object at 0x...>
+        {30.0} <music21.clef.FrenchViolinClef object at 0x...>    
+        ''')
     
     #---------------------------------------------------------------------------
     # look at this object for an atttribute; if not here
