@@ -1095,8 +1095,8 @@ class Test(unittest.TestCase):
         #s.show('t')
 
 
-        self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
-        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 1)
+        self.assertEqual(len(s.flat.getElementsByClass('TimeSignature', strMatch=True)), 1)
+        self.assertEqual(len(s.flat.getElementsByClass('KeySignature', strMatch=True)), 1)
 
        
 

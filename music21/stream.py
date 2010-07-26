@@ -1153,7 +1153,7 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # getElementsByX(self): anything that returns a collection of Elements should return a Stream
 
-    def getElementsByClass(self, classFilterList):
+    def getElementsByClass(self, classFilterList, strMatch=False):
         '''Return a list of all Elements that match one or more classes in the `classFilterList`. A single class can be provided to the `classFilterList` parameter.
         
         >>> a = Stream()
@@ -1192,7 +1192,7 @@ class Stream(music21.Music21Object):
             for className in classFilterList:
                 # new method uses string matching of .classes attribute
                 # temporarily check to see if this is a string
-                if isinstance(className, str):
+                if strMatch:
                     if className in e.classes:
                         found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
                         break
