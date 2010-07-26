@@ -717,7 +717,12 @@ class Pitch(music21.Music21Object):
 
         ### this should eventually change to "stepEtcNeedsUpdating"
         ### but we'll see if it's a bottleneck
-        self.step, self.accidental = convertPsToStep(self._ps)
+        self.step, acc = convertPsToStep(self._ps)
+        # replace a natural with a None
+        if acc.name == 'natural':
+            self.accidental = None
+        else:
+            self.accidental = acc
         self.octave = convertPsToOct(self._ps)
 
     ps = property(_getPs, _setPs, 
@@ -771,7 +776,7 @@ class Pitch(music21.Music21Object):
             value = (12 * 9) + (value % 12) # highest oct plus modulus
         elif value < 0:
             value = 0 + (value % 12) # lowest oct plus modulus            
-        self.ps = value      
+        self._setPs(value)
         self._pitchSpaceNeedsUpdating = True
 
     
