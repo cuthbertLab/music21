@@ -55,6 +55,8 @@ class MidiException(Exception):
 def getNumber(str, length): 
     '''Return the value of a string byte from and 8-bit string.
 
+    This will sum a length greater than 1 if desired.
+
     >>> getNumber('test', 0)
     (0, 'test')
     >>> getNumber('test', 2)
@@ -84,6 +86,17 @@ def getVariableLengthNumber(str):
         if not (x & 0x80): 
             return sum, str[i:] 
 
+def getNumbersAsList(str):
+    '''Translate each char into a number, return in a list. Used for reading data messages where each byte encodes a different discrete value. 
+
+    >>> getNumbersAsList('\\x00\\x00\\x00\\x03')
+    [0, 0, 0, 3]
+    '''
+    post = []
+    for i in range(len(str)):
+        post.append(ord(str[i]))
+    return post
+
 def putNumber(num, length): 
     '''
     >>> putNumber(3, 4)
@@ -91,7 +104,7 @@ def putNumber(num, length):
     >>> putNumber(0, 1)
     '\\x00'
     '''
-    lst = [ ] 
+    lst = [] 
     for i in range(length): 
         n = 8 * (length - 1 - i) 
         lst.append(chr((num >> n) & 0xFF)) 
@@ -114,6 +127,17 @@ def putVariableLengthNumber(x):
     lst[-1] = chr(ord(lst[-1]) & 0x7f) 
     return string.join(lst, "") 
 
+
+def putNumbersAsList(numList):
+    '''Translate a list of numbers into a character byte strings. Used for encoding data messages where each byte encodes a different discrete value. 
+
+    >>> putNumbersAsList([0, 0, 0, 3])
+    '\\x00\\x00\\x00\\x03'
+    '''
+    post = []
+    for n in numList:
+        post.append(chr(n))
+    return ''.join(post)
 
 #-------------------------------------------------------------------------------
 class Enumeration(object): 

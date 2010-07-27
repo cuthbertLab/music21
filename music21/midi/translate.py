@@ -12,10 +12,12 @@
 
 
 import unittest
+import math
 
 import music21
 from music21 import midi as midiModule
 from music21 import defaults
+from music21 import common
 
 # modules that import this include stream.py, chord.py, note.py
 # thus, cannot import these here
@@ -340,8 +342,25 @@ def chordToMidiFile(input):
 #-------------------------------------------------------------------------------
 # Meta events
 
-def midiEventToTimeSignature(event):
+def midiEventsToTimeSignature(eventList):
     '''Convert a single MIDI event into a music21 TimeSignature object.
+
+    >>> from music21 import *
+    >>> mt = midi.MidiTrack(1)
+    >>> me1 = midi.MidiEvent(mt)
+    >>> me1.type = "TIME_SIGNATURE"
+    >>> me1.data = midi.putNumbersAsList([3, 1, 24, 8]) # 3/2 time
+    >>> ts = midiEventsToTimeSignature(me1)
+    >>> ts
+    <music21.meter.TimeSignature 3/2>
+
+    >>> me2 = midi.MidiEvent(mt)
+    >>> me2.type = "TIME_SIGNATURE"
+    >>> me2.data = midi.putNumbersAsList([3, 4]) # 3/16 time
+    >>> ts = midiEventsToTimeSignature(me2)
+    >>> ts
+    <music21.meter.TimeSignature 3/16>
+
     '''
     # http://www.sonicspot.com/guide/midifiles.html
     # The time signature defined with 4 bytes, a numerator, a denominator, a metronome pulse and number of 32nd notes per MIDI quarter-note. The numerator is specified as a literal value, but the denominator is specified as (get ready) the value to which the power of 2 must be raised to equal the number of subdivisions per whole note. For example, a value of 0 means a whole note because 2 to the power of 0 is 1 (whole note), a value of 1 means a half-note because 2 to the power of 1 is 2 (half-note), and so on. 
@@ -349,18 +368,54 @@ def midiEventToTimeSignature(event):
     #The metronome pulse specifies how often the metronome should click in terms of the number of clock signals per click, which come at a rate of 24 per quarter-note. For example, a value of 24 would mean to click once every quarter-note (beat) and a value of 48 would mean to click once every half-note (2 beats). And finally, the fourth byte specifies the number of 32nd notes per 24 MIDI clock signals. This value is usually 8 because there are usually 8 32nd notes in a quarter-note. At least one Time Signature Event should appear in the first track chunk (or all track chunks in a Type 2 file) before any non-zero delta time events. If one is not specified 4/4, 24, 8 should be assumed.
     from music21 import meter
 
-    subStr = event.data # make a copy of the data to processDurations
-    post = []
-    # time signature is supposed to be 4 bytes
-    for i in range(4):
-        # get one number at a time
-        x, subStr = midiModule.getNumber(subStr, 1)
-        post.append(x)
+    if not common.isListLike(eventList):
+        event = eventList
+    else: # get the second event; first is delta time
+        event = eventList[1]
+
+    # time signature is 4 byte encoding
+    post = midiModule.getNumbersAsList(event.data)
 
     n = post[0]
     d = pow(2, post[1])
     ts = meter.TimeSignature('%s/%s' % (n, d))
     return ts
+
+def timeSignatureToMidiEvents(ts):
+    '''Translate a m21 TiemSignature to a pair of events, including a DeltaTime.
+
+    >>> from music21 import *
+    >>> ts = meter.TimeSignature('5/4')
+    >>> eventList = timeSignatureToMidiEvents(ts)
+    >>> eventList[0]
+    <MidiEvent DeltaTime, t=0, track=None, channel=None>
+    >>> eventList[1]
+    <MidiEvent TIME_SIGNATURE, t=None, track=None, channel=1, data='\\x05\\x02\\x18\\x08'>
+    '''
+    mt = None # use a midi track set to None
+
+    eventList = []
+
+    dt = midiModule.DeltaTime(mt)
+    dt.time = 0 # set to zero; will be shifted later as necessary
+    # add to track events
+    eventList.append(dt)
+
+    n = ts.numerator
+    # need log base 2 to solve for exponent of 2
+    # 1 is 0, 2 is 1, 4 is 2, 16 is 4, etc
+    d = int(math.log(ts.denominator, 2))
+    metroClick = 24 # clock signals per click, clicks are 24 per quarter
+    subCount = 8 # number of 32 notes in a quarternote
+
+    me = midiModule.MidiEvent(mt)
+    me.type = "TIME_SIGNATURE"
+    me.channel = 1
+    me.time = None # not required
+    me.data = midiModule.putNumbersAsList([n, d, metroClick, subCount])
+    eventList.append(me)
+
+    return eventList 
 
 
 
@@ -395,7 +450,7 @@ def midiEventToKeySignature(event):
 # Streams
 
 
-def streamToMidiTrack(input, instObj=None):
+def streamToMidiTrack(input, instObj=None, translateTimeSignature=True):
 
     '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
 
@@ -429,26 +484,31 @@ def streamToMidiTrack(input, instObj=None):
     t = 0 * defaults.ticksPerQuarter
 
     # have to be sorted, have to strip ties
-    # do not need to retain containers, as Measures have no use here
+    # retain containers to get all elements: time signatures, dynamics, etc
     s = input.stripTies(inPlace=False, matchByPitch=False, 
-        retainContainers=False)
+        retainContainers=True)
+    s = s.flat
     # probably already flat and sorted
     for obj in s.flat.sorted:
         tDurEvent = 0 # the found delta ticks in each event
 
+
+        #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
+
         #if obj.isClass(note.GeneralNote):
-        if obj.isNote or obj.isRest or obj.isChord:
+        classes = obj.classes
+
+        if 'Note' in classes or 'Rest' in classes or 'Chord' in classes:
+        #if obj.isNote or obj.isRest or obj.isChord:
 
             # find difference since last event to this event
             # cannot use getOffsetBySite(self), as need flat offset
             # all values are in tpq; t stores abs time in tpq
             tDif = (obj.offset * defaults.ticksPerQuarter) - t
 
-            #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
-
-            if obj.isRest:
-                # for a rest, need the duration of the rest, plus whatever
-                # difference between the offset and the last time value
+            if 'Rest' in classes:
+                # for a rest, do not do anything: difference in offset will 
+                # account for the gap
                 continue
 
             # get a list of midi events
@@ -457,7 +517,7 @@ def streamToMidiTrack(input, instObj=None):
             sub = obj.midiEvents
 
             # a note has 4 events: delta/note-on/delta/note-off
-            if obj.isNote:
+            if 'Note' in classes:
                 sub[0].time = int(round(tDif)) # set first delta 
                 # get the duration in ticks; this is the delta to 
                 # to the note off message; already set when midi events are 
@@ -467,7 +527,7 @@ def streamToMidiTrack(input, instObj=None):
             # a chord has delta/note-on/delta/note-off for each memeber
             # of the chord. on the first delta is the offset, and only
             # the first delta preceding the first note-off is the duration
-            if obj.isChord:
+            if 'Chord' in classes:
                 # divide events between note-on and note-off
                 sub[0].time = int(round(tDif)) # set first delta 
                 # only the delta before the first note-off has the event dur
@@ -481,8 +541,21 @@ def streamToMidiTrack(input, instObj=None):
             # add events to the list
             mt.events += sub
 
-        elif obj.isClass(dynamics.Dynamic):
+        elif 'Dynamic' in classes:
             pass # configure dynamics
+
+        elif 'TimeSignature' in classes:
+            # find difference since last event to this event
+            # cannot use getOffsetBySite(self), as need flat offset
+            # all values are in tpq; t stores abs time in tpq
+            tDif = (obj.offset * defaults.ticksPerQuarter) - t
+            # return a pair of events
+            sub = timeSignatureToMidiEvents(obj)
+            # for a ts, this will usually be zero, but not always
+            sub[0].time = int(round(tDif)) # set first delta 
+            t += tDif
+            mt.events += sub
+
         else: # other objects may have already been added
             pass
 
@@ -573,20 +646,17 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
         else:
             if e.type == 'TIME_SIGNATURE':
                 # time signature should be 4 bytes
-                metaEvents.append([t, midiEventToTimeSignature(e)])
+                metaEvents.append([t, midiEventsToTimeSignature(e)])
 
             elif e.type == 'KEY_SIGNATURE':
                 metaEvents.append([t, midiEventToKeySignature(e)])
                 
             elif e.type == 'SET_TEMPO':
                 pass
-               # environLocal.printDebug(['got midi message of type:', e.type, e.data, e])
             elif e.type == 'INSTRUMENT_NAME':
                 pass
-                #environLocal.printDebug(['got midi message of type:', e.type, e.data, e])
             elif e.type == 'PROGRAM_CHANGE':
                 pass
-                #environLocal.printDebug(['got midi message of type:', e.type, e.data, e])
 
 
     # first create meta events
@@ -784,6 +854,30 @@ class Test(unittest.TestCase):
         self.assertEqual(n2.quarterLength, 2.0)
 
 
+    def testTimeSignature(self):
+        import copy
+        from music21 import note, stream, meter
+        environLocal.printDebug(['here!'])
+        n = note.Note()
+        n.quarterLength = .5
+        s = stream.Stream()
+        for i in range(20):
+            s.append(copy.deepcopy(n))
+
+        s.insert(0, meter.TimeSignature('3/4'))
+        s.insert(3, meter.TimeSignature('5/4'))
+        s.insert(8, meter.TimeSignature('2/4'))
+
+        mt = streamToMidiTrack(s)
+        self.assertEqual(len(mt.events), 90)
+
+        #s.show('midi')
+        
+        # get and compare just the time signatures
+        mtAlt = streamToMidiTrack(s.getElementsByClass('TimeSignature'))
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=5120, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+        self.assertEqual(str(mtAlt.events), match)
+
 
 
 if __name__ == "__main__":
@@ -793,5 +887,6 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         a = Test()
-        a.testPitchEquality()
+        #a.testPitchEquality()
 
+        a.testTimeSignature()
