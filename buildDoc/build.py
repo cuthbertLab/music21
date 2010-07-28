@@ -13,6 +13,7 @@
 import unittest, doctest
 import os, sys, webbrowser, re
 import types, inspect
+import codecs
 
 import music21
 
@@ -776,7 +777,7 @@ class RestructuredWriter(object):
         True
         '''
         msg = []
-        msg.append('inherits from:')
+        msg.append('Inherits from:')
         sub = []
         for i in range(len(mro)):
             if i == 0: continue # first is always the class itself
@@ -784,8 +785,10 @@ class RestructuredWriter(object):
             sub.append(self.formatParent(mro[i]))
         if len(sub) == 0:
             return ''
+
         msg.append(', '.join(sub))
-        return ' '.join(msg)
+        #msg.append(unichr(8594).join(sub))
+        return u' '.join(msg)
 
 
     def formatDocString(self, doc, indent='', modName=None):
@@ -1066,8 +1069,10 @@ class ClassDoc(RestructuredWriter):
         classNameStr = '%s' % self.name
         msg += self._heading(classNameStr, '-')
 
-        if not self._isAllInherited():
-            msg += [".. inheritance-diagram:: %s\n\n" % classNameStr]
+#         if not self._isAllInherited():
+#             msg += [".. inheritance-diagram:: %s\n\n" % classNameStr]
+
+        msg.append('%s\n\n' % (self.formatClassInheritance(self.mro)))
 
         # see if this class has __init__ documentation
         signature = self.partitionedClass.getSignature('__init__')
@@ -1086,7 +1091,8 @@ class ClassDoc(RestructuredWriter):
         # add init doc after main class doc
         if docInitCooked != None:
             msg.append('%s\n' % docInitCooked)
-        msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(self.mro)))
+
+#         msg.append('%s%s\n\n' % (INDENT, self.formatClassInheritance(self.mro)))
 
         # if all names are inherited (the are not newly defined) then skip
         # documentation of values
@@ -1350,6 +1356,10 @@ class Documentation(RestructuredWriter):
             a = ModuleDoc(module)
             #a.scanModule()
             f = open(os.path.join(self.dirRst, a.fileName), 'w')
+
+#             f.write(codecs.BOM_UTF8)
+#             f.write(a.getRestructured().encode( "utf-8" ) )
+
             f.write(a.getRestructured())
             f.close()
             self.chaptersModuleRef.append(a.fileRef)
@@ -1360,7 +1370,12 @@ class Documentation(RestructuredWriter):
         '''
         for obj in [CorpusDoc()]:
             f = open(os.path.join(self.dirRst, obj.fileName), 'w')
+
             f.write(obj.getRestructured())
+
+#             f.write(codecs.BOM_UTF8)
+#             f.write(obj.getRestructured().encode( "utf-8" ) )
+
             f.close()
             self.chaptersReference.append(obj.fileRef)
 

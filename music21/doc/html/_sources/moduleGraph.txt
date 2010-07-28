@@ -19,7 +19,7 @@ Object definitions for graphing and plotting :class:`~music21.stream.Stream` obj
 PlotHistogramPitchSpace
 -----------------------
 
-.. inheritance-diagram:: PlotHistogramPitchSpace
+Inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotHistogramPitchSpace(streamObj, *args, **keywords)
 
@@ -35,8 +35,6 @@ PlotHistogramPitchSpace
 
     .. image:: images/PlotHistogramPitchSpace.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
     **PlotHistogramPitchSpace** **attributes**
 
@@ -56,7 +54,7 @@ PlotHistogramPitchSpace
 PlotHistogramPitchClass
 -----------------------
 
-.. inheritance-diagram:: PlotHistogramPitchClass
+Inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotHistogramPitchClass(streamObj, *args, **keywords)
 
@@ -74,8 +72,6 @@ PlotHistogramPitchClass
         :width: 600
 
     
-
-    inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
     **PlotHistogramPitchClass** **attributes**
 
@@ -95,7 +91,7 @@ PlotHistogramPitchClass
 PlotHistogramQuarterLength
 --------------------------
 
-.. inheritance-diagram:: PlotHistogramQuarterLength
+Inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotHistogramQuarterLength(streamObj, *args, **keywords)
 
@@ -113,8 +109,6 @@ PlotHistogramQuarterLength
         :width: 600
 
     
-
-    inherits from: :class:`~music21.graph.PlotHistogram`, :class:`~music21.graph.PlotStream`
 
     **PlotHistogramQuarterLength** **attributes**
 
@@ -134,7 +128,7 @@ PlotHistogramQuarterLength
 PlotScatterPitchSpaceQuarterLength
 ----------------------------------
 
-.. inheritance-diagram:: PlotScatterPitchSpaceQuarterLength
+Inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotScatterPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
@@ -150,8 +144,6 @@ PlotScatterPitchSpaceQuarterLength
 
     .. image:: images/PlotScatterPitchSpaceQuarterLength.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
     **PlotScatterPitchSpaceQuarterLength** **attributes**
 
@@ -171,7 +163,7 @@ PlotScatterPitchSpaceQuarterLength
 PlotScatterPitchClassQuarterLength
 ----------------------------------
 
-.. inheritance-diagram:: PlotScatterPitchClassQuarterLength
+Inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotScatterPitchClassQuarterLength(streamObj, *args, **keywords)
 
@@ -187,8 +179,6 @@ PlotScatterPitchClassQuarterLength
 
     .. image:: images/PlotScatterPitchClassQuarterLength.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
     **PlotScatterPitchClassQuarterLength** **attributes**
 
@@ -208,7 +198,7 @@ PlotScatterPitchClassQuarterLength
 PlotScatterPitchClassOffset
 ---------------------------
 
-.. inheritance-diagram:: PlotScatterPitchClassOffset
+Inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotScatterPitchClassOffset(streamObj, *args, **keywords)
 
@@ -224,8 +214,6 @@ PlotScatterPitchClassOffset
 
     .. image:: images/PlotScatterPitchClassOffset.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
     **PlotScatterPitchClassOffset** **attributes**
 
@@ -245,7 +233,7 @@ PlotScatterPitchClassOffset
 PlotHorizontalBarPitchSpaceOffset
 ---------------------------------
 
-.. inheritance-diagram:: PlotHorizontalBarPitchSpaceOffset
+Inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotHorizontalBarPitchSpaceOffset(streamObj, *args, **keywords)
 
@@ -263,8 +251,6 @@ PlotHorizontalBarPitchSpaceOffset
         :width: 600
 
     
-
-    inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
     **PlotHorizontalBarPitchSpaceOffset** **attributes**
 
@@ -284,7 +270,7 @@ PlotHorizontalBarPitchSpaceOffset
 PlotHorizontalBarPitchClassOffset
 ---------------------------------
 
-.. inheritance-diagram:: PlotHorizontalBarPitchClassOffset
+Inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotHorizontalBarPitchClassOffset(streamObj, *args, **keywords)
 
@@ -292,8 +278,6 @@ PlotHorizontalBarPitchClassOffset
 
     .. image:: images/PlotHorizontalBarPitchClassOffset.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.PlotHorizontalBar`, :class:`~music21.graph.PlotStream`
 
     **PlotHorizontalBarPitchClassOffset** **attributes**
 
@@ -313,7 +297,7 @@ PlotHorizontalBarPitchClassOffset
 PlotScatterWeightedPitchSpaceQuarterLength
 ------------------------------------------
 
-.. inheritance-diagram:: PlotScatterWeightedPitchSpaceQuarterLength
+Inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotScatterWeightedPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
@@ -321,8 +305,6 @@ PlotScatterWeightedPitchSpaceQuarterLength
 
     .. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
     **PlotScatterWeightedPitchSpaceQuarterLength** **attributes**
 
@@ -342,7 +324,7 @@ PlotScatterWeightedPitchSpaceQuarterLength
 PlotScatterWeightedPitchClassQuarterLength
 ------------------------------------------
 
-.. inheritance-diagram:: PlotScatterWeightedPitchClassQuarterLength
+Inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotScatterWeightedPitchClassQuarterLength(streamObj, *args, **keywords)
 
@@ -350,8 +332,6 @@ PlotScatterWeightedPitchClassQuarterLength
 
     .. image:: images/PlotScatterWeightedPitchClassQuarterLength.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
     **PlotScatterWeightedPitchClassQuarterLength** **attributes**
 
@@ -371,7 +351,7 @@ PlotScatterWeightedPitchClassQuarterLength
 Plot3DBarsPitchSpaceQuarterLength
 ---------------------------------
 
-.. inheritance-diagram:: Plot3DBarsPitchSpaceQuarterLength
+Inherits from: :class:`~music21.graph.Plot3DBars`, :class:`~music21.graph.PlotStream`
 
 .. class:: Plot3DBarsPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
@@ -388,8 +368,6 @@ Plot3DBarsPitchSpaceQuarterLength
 
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.Plot3DBars`, :class:`~music21.graph.PlotStream`
 
     **Plot3DBarsPitchSpaceQuarterLength** **attributes**
 
@@ -409,7 +387,7 @@ Plot3DBarsPitchSpaceQuarterLength
 Graph
 -----
 
-.. inheritance-diagram:: Graph
+
 
 .. class:: Graph(*args, **keywords)
 
@@ -418,8 +396,6 @@ Graph
     A base-class for basic setup of graphs, abstracting functionality provided by matplotlib. Optional keyword arguments: alpha, colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, tickFontSize, titleFontSize, labelFontSize, fontFamily 
 
     >>> a = Graph(title='green')
-
-    
 
     **Graph** **attributes**
 
@@ -479,7 +455,7 @@ Graph
 Graph3DPolygonBars
 ------------------
 
-.. inheritance-diagram:: Graph3DPolygonBars
+Inherits from: :class:`~music21.graph.Graph`
 
 .. class:: Graph3DPolygonBars(*args, **keywords)
 
@@ -500,8 +476,6 @@ Graph3DPolygonBars
 
     
 
-    inherits from: :class:`~music21.graph.Graph`
-
     **Graph3DPolygonBars** **attributes**
 
         Attributes without Documentation: `barWidth`
@@ -520,7 +494,7 @@ Graph3DPolygonBars
 GraphColorGrid
 --------------
 
-.. inheritance-diagram:: GraphColorGrid
+Inherits from: :class:`~music21.graph.Graph`
 
 .. class:: GraphColorGrid(*args, **keywords)
 
@@ -532,8 +506,6 @@ GraphColorGrid
     >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
     >>> a.setData(data)
     >>> a.process()
-
-    inherits from: :class:`~music21.graph.Graph`
 
     **GraphColorGrid** **attributes**
 
@@ -569,6 +541,8 @@ GraphColorGrid
 GraphHistogram
 --------------
 
+Inherits from: :class:`~music21.graph.Graph`
+
 .. class:: GraphHistogram(*args, **keywords)
 
     Graph the count of a single element. Data set is simply a list of x and y pairs, where there is only one of each x value, and y value is the count or magnitude of that value 
@@ -586,11 +560,11 @@ GraphHistogram
 
     
 
-    inherits from: :class:`~music21.graph.Graph`
-
 
 GraphHorizontalBar
 ------------------
+
+Inherits from: :class:`~music21.graph.Graph`
 
 .. class:: GraphHorizontalBar(*args, **keywords)
 
@@ -609,11 +583,11 @@ GraphHorizontalBar
 
     
 
-    inherits from: :class:`~music21.graph.Graph`
-
 
 GraphScatter
 ------------
+
+Inherits from: :class:`~music21.graph.Graph`
 
 .. class:: GraphScatter(*args, **keywords)
 
@@ -629,11 +603,11 @@ GraphScatter
     .. image:: images/GraphScatter.* 
         :width: 600
 
-    inherits from: :class:`~music21.graph.Graph`
-
 
 GraphScatterWeighted
 --------------------
+
+Inherits from: :class:`~music21.graph.Graph`
 
 .. class:: GraphScatterWeighted(*args, **keywords)
 
@@ -651,19 +625,15 @@ GraphScatterWeighted
 
     
 
-    inherits from: :class:`~music21.graph.Graph`
-
 
 Plot3DBars
 ----------
 
-.. inheritance-diagram:: Plot3DBars
+Inherits from: :class:`~music21.graph.PlotStream`
 
 .. class:: Plot3DBars(streamObj, *args, **keywords)
 
     Base class for Stream plotting classes. 
-
-    inherits from: :class:`~music21.graph.PlotStream`
 
     **Plot3DBars** **attributes**
 
@@ -683,12 +653,10 @@ Plot3DBars
 PlotColorGrid
 -------------
 
-.. inheritance-diagram:: PlotColorGrid
+Inherits from: :class:`~music21.graph.PlotStream`
 
 .. class:: PlotColorGrid(streamObj, AnalysisProcessor, *args, **keywords)
 
-
-    inherits from: :class:`~music21.graph.PlotStream`
 
     **PlotColorGrid** **attributes**
 
@@ -708,13 +676,11 @@ PlotColorGrid
 PlotColorGridKrumhanslSchmuckler
 --------------------------------
 
-.. inheritance-diagram:: PlotColorGridKrumhanslSchmuckler
+Inherits from: :class:`~music21.graph.PlotColorGrid`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotColorGridKrumhanslSchmuckler(streamObj, *args, **keywords)
 
     Subclass for plotting Krumhansl-Schmuckler analysis routine 
-
-    inherits from: :class:`~music21.graph.PlotColorGrid`, :class:`~music21.graph.PlotStream`
 
     **PlotColorGridKrumhanslSchmuckler** **attributes**
 
@@ -734,13 +700,11 @@ PlotColorGridKrumhanslSchmuckler
 PlotColorGridSadoianAmbitus
 ---------------------------
 
-.. inheritance-diagram:: PlotColorGridSadoianAmbitus
+Inherits from: :class:`~music21.graph.PlotColorGrid`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotColorGridSadoianAmbitus(streamObj, *args, **keywords)
 
     Subclass for plotting basic pitch span over a windowed analysis 
-
-    inherits from: :class:`~music21.graph.PlotColorGrid`, :class:`~music21.graph.PlotStream`
 
     **PlotColorGridSadoianAmbitus** **attributes**
 
@@ -760,13 +724,11 @@ PlotColorGridSadoianAmbitus
 PlotHistogram
 -------------
 
-.. inheritance-diagram:: PlotHistogram
+Inherits from: :class:`~music21.graph.PlotStream`
 
 .. class:: PlotHistogram(streamObj, *args, **keywords)
 
     Base class for Stream plotting classes. 
-
-    inherits from: :class:`~music21.graph.PlotStream`
 
     **PlotHistogram** **attributes**
 
@@ -786,15 +748,13 @@ PlotHistogram
 PlotHorizontalBar
 -----------------
 
-.. inheritance-diagram:: PlotHorizontalBar
+Inherits from: :class:`~music21.graph.PlotStream`
 
 .. class:: PlotHorizontalBar(streamObj, *args, **keywords)
 
     A graph of events, sorted by pitch, over time 
 
     
-
-    inherits from: :class:`~music21.graph.PlotStream`
 
     **PlotHorizontalBar** **attributes**
 
@@ -814,13 +774,11 @@ PlotHorizontalBar
 PlotScatter
 -----------
 
-.. inheritance-diagram:: PlotScatter
+Inherits from: :class:`~music21.graph.PlotStream`
 
 .. class:: PlotScatter(streamObj, *args, **keywords)
 
     Base class for 2D Scatter plots. 
-
-    inherits from: :class:`~music21.graph.PlotStream`
 
     **PlotScatter** **attributes**
 
@@ -840,7 +798,7 @@ PlotScatter
 PlotScatterPitchSpaceDynamicSymbol
 ----------------------------------
 
-.. inheritance-diagram:: PlotScatterPitchSpaceDynamicSymbol
+Inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotScatterPitchSpaceDynamicSymbol(streamObj, *args, **keywords)
 
@@ -856,8 +814,6 @@ PlotScatterPitchSpaceDynamicSymbol
 
     .. image:: images/PlotScatterPitchSpaceDynamicSymbol.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.PlotScatter`, :class:`~music21.graph.PlotStream`
 
     **PlotScatterPitchSpaceDynamicSymbol** **attributes**
 
@@ -877,12 +833,10 @@ PlotScatterPitchSpaceDynamicSymbol
 PlotScatterWeighted
 -------------------
 
-.. inheritance-diagram:: PlotScatterWeighted
+Inherits from: :class:`~music21.graph.PlotStream`
 
 .. class:: PlotScatterWeighted(streamObj, *args, **keywords)
 
-
-    inherits from: :class:`~music21.graph.PlotStream`
 
     **PlotScatterWeighted** **attributes**
 
@@ -902,7 +856,7 @@ PlotScatterWeighted
 PlotScatterWeightedPitchSpaceDynamicSymbol
 ------------------------------------------
 
-.. inheritance-diagram:: PlotScatterWeightedPitchSpaceDynamicSymbol
+Inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
 .. class:: PlotScatterWeightedPitchSpaceDynamicSymbol(streamObj, *args, **keywords)
 
@@ -910,8 +864,6 @@ PlotScatterWeightedPitchSpaceDynamicSymbol
 
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.* 
         :width: 600
-
-    inherits from: :class:`~music21.graph.PlotScatterWeighted`, :class:`~music21.graph.PlotStream`
 
     **PlotScatterWeightedPitchSpaceDynamicSymbol** **attributes**
 
@@ -931,15 +883,13 @@ PlotScatterWeightedPitchSpaceDynamicSymbol
 PlotStream
 ----------
 
-.. inheritance-diagram:: PlotStream
+
 
 .. class:: PlotStream(streamObj, flatten=True, *args, **keywords)
 
     Approaches to plotting and graphing a stream. A base class from which Stream plotting Classes inherit. 
 
     Provide a Stream as an arguement. If `flatten` is True, the Stream will automatically be flattened. 
-
-    
 
     **PlotStream** **attributes**
 

@@ -17,12 +17,10 @@ This module defines numerous subclasses of :class:`~music21.clef.Clef`, providin
 Clef
 ----
 
-.. inheritance-diagram:: Clef
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Clef()
 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Clef** **attributes**
 
@@ -79,6 +77,8 @@ Clef
 TrebleClef
 ----------
 
+Inherits from: :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
+
 .. class:: TrebleClef()
 
 
@@ -89,11 +89,11 @@ TrebleClef
     >>> a.sign
     'G' 
 
-    inherits from: :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 BassClef
 --------
+
+Inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: BassClef()
 
@@ -107,11 +107,11 @@ BassClef
     >>> a.sign
     'F' 
 
-    inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 AltoClef
 --------
+
+Inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: AltoClef()
 
@@ -123,11 +123,11 @@ AltoClef
     >>> a.sign
     'C' 
 
-    inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 Bass8vaClef
 -----------
+
+Inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: Bass8vaClef()
 
@@ -139,11 +139,11 @@ Bass8vaClef
     >>> a.sign
     'F' 
 
-    inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 Bass8vbClef
 -----------
+
+Inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: Bass8vbClef()
 
@@ -157,11 +157,11 @@ Bass8vbClef
     >>> a.octaveChange
     -1 
 
-    inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 CBaritoneClef
 -------------
+
+Inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: CBaritoneClef()
 
@@ -175,13 +175,11 @@ CBaritoneClef
     >>> a.line
     5 
 
-    inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 CClef
 -----
 
-.. inheritance-diagram:: CClef
+Inherits from: :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: CClef()
 
@@ -192,8 +190,6 @@ CClef
     >>> a = clef.CClef()
     >>> a.sign
     'C' 
-
-    inherits from: :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
     **CClef** **attributes**
 
@@ -221,6 +217,8 @@ CClef
 FBaritoneClef
 -------------
 
+Inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
+
 .. class:: FBaritoneClef()
 
 
@@ -238,13 +236,11 @@ FBaritoneClef
     >>> a.sign == b.sign
     False 
 
-    inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 FClef
 -----
 
-.. inheritance-diagram:: FClef
+Inherits from: :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: FClef()
 
@@ -255,8 +251,6 @@ FClef
     >>> a = clef.FClef()
     >>> a.sign
     'F' 
-
-    inherits from: :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
     **FClef** **attributes**
 
@@ -284,6 +278,8 @@ FClef
 FrenchViolinClef
 ----------------
 
+Inherits from: :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
+
 .. class:: FrenchViolinClef()
 
 
@@ -294,13 +290,11 @@ FrenchViolinClef
     >>> a.sign
     'G' 
 
-    inherits from: :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 GClef
 -----
 
-.. inheritance-diagram:: GClef
+Inherits from: :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: GClef()
 
@@ -311,8 +305,6 @@ GClef
     >>> a = clef.GClef()
     >>> a.sign
     'G' 
-
-    inherits from: :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
     **GClef** **attributes**
 
@@ -340,6 +332,8 @@ GClef
 GSopranoClef
 ------------
 
+Inherits from: :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
+
 .. class:: GSopranoClef()
 
 
@@ -350,11 +344,11 @@ GSopranoClef
     >>> a.sign
     'G' 
 
-    inherits from: :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 MezzoSopranoClef
 ----------------
+
+Inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: MezzoSopranoClef()
 
@@ -366,36 +360,32 @@ MezzoSopranoClef
     >>> a.sign
     'C' 
 
-    inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 NoClef
 ------
 
+Inherits from: :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
+
 .. class:: NoClef()
 
-
-    inherits from: :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 
 PercussionClef
 --------------
 
+Inherits from: :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
+
 .. class:: PercussionClef()
 
-
-    inherits from: :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 
 PitchClef
 ---------
 
-.. inheritance-diagram:: PitchClef
+Inherits from: :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: PitchClef()
 
-
-    inherits from: :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
     **PitchClef** **attributes**
 
@@ -423,6 +413,8 @@ PitchClef
 SopranoClef
 -----------
 
+Inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
+
 .. class:: SopranoClef()
 
 
@@ -433,11 +425,11 @@ SopranoClef
     >>> a.sign
     'C' 
 
-    inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 SubBassClef
 -----------
+
+Inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: SubBassClef()
 
@@ -449,20 +441,20 @@ SubBassClef
     >>> a.sign
     'F' 
 
-    inherits from: :class:`~music21.clef.FClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 TabClef
 -------
 
+Inherits from: :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
+
 .. class:: TabClef()
 
-
-    inherits from: :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 
 TenorClef
 ---------
+
+Inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: TenorClef()
 
@@ -478,11 +470,11 @@ TenorClef
 
     
 
-    inherits from: :class:`~music21.clef.CClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 Treble8vaClef
 -------------
+
+Inherits from: :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: Treble8vaClef()
 
@@ -496,11 +488,11 @@ Treble8vaClef
     >>> a.octaveChange
     1 
 
-    inherits from: :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
-
 
 Treble8vbClef
 -------------
+
+Inherits from: :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 .. class:: Treble8vbClef()
 
@@ -513,7 +505,5 @@ Treble8vbClef
     'G' 
     >>> a.octaveChange
     -1 
-
-    inherits from: :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.GClef`, :class:`~music21.clef.PitchClef`, :class:`~music21.clef.Clef`, :class:`~music21.base.Music21Object`
 
 

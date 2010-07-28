@@ -256,7 +256,7 @@ This module defines various types of interval objects. Fundamental classes are :
 Interval
 --------
 
-.. inheritance-diagram:: Interval
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Interval(*arguments, **keywords)
 
@@ -311,8 +311,6 @@ Interval
     <music21.interval.Interval P5> 
 
     
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Interval** **attributes**
 
@@ -450,7 +448,7 @@ Interval
 ChromaticInterval
 -----------------
 
-.. inheritance-diagram:: ChromaticInterval
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: ChromaticInterval(value)
 
@@ -469,8 +467,6 @@ ChromaticInterval
     10 
     >>> aInterval.intervalClass
     2 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **ChromaticInterval** **attributes**
 
@@ -515,7 +511,7 @@ ChromaticInterval
 DiatonicInterval
 ----------------
 
-.. inheritance-diagram:: DiatonicInterval
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: DiatonicInterval(specifier, generic)
 
@@ -555,8 +551,6 @@ DiatonicInterval
     'm3' 
 
     
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **DiatonicInterval** **attributes**
 
@@ -607,7 +601,7 @@ DiatonicInterval
 GenericInterval
 ---------------
 
-.. inheritance-diagram:: GenericInterval
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: GenericInterval(value)
 
@@ -645,8 +639,6 @@ GenericInterval
     IntervalException: The Zeroth is not an interval 
 
     
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **GenericInterval** **attributes**
 

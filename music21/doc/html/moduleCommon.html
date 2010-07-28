@@ -606,19 +606,6 @@
 
 <div class="section" id="scalar">
 <h2>Scalar<a class="headerlink" href="#scalar" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-42d63e5a9ced7a12103e7e466b1ea211aa9ceb4f.png" alt="digraph inheritancec0636fc1e4 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.common.Scalar&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.common.Scalar&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritancec0636fc1e4" class="inheritance"/>
-<map id="inheritancec0636fc1e4" name="inheritancec0636fc1e4">
-<area shape="rect" id="node1" href="#music21.common.Scalar" title="music21.common.Scalar" alt="" coords="5,5,197,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.common.Scalar">
 <em class="property">
@@ -650,19 +637,6 @@ Attributes without Documentation: <cite>valType</cite>, <cite>value</cite></bloc
 </div>
 <div class="section" id="iterator">
 <h2>Iterator<a class="headerlink" href="#iterator" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-c6b9d24875b94a3fae574f3b9c5675bb52a8a118.png" alt="digraph inheritance7881926030 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.common.Iterator&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.common.Iterator&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance7881926030" class="inheritance"/>
-<map id="inheritance7881926030" name="inheritance7881926030">
-<area shape="rect" id="node1" href="#music21.common.Iterator" title="music21.common.Iterator" alt="" coords="5,5,197,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.common.Iterator">
 <em class="property">
@@ -681,19 +655,6 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">It
 </div>
 <div class="section" id="timer">
 <h2>Timer<a class="headerlink" href="#timer" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-6bddc371e49493e4402470232554f2cf4ab21df4.png" alt="digraph inheritance7be0b6e4b5 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.common.Timer&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.common.Timer&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance7be0b6e4b5" class="inheritance"/>
-<map id="inheritance7be0b6e4b5" name="inheritance7be0b6e4b5">
-<area shape="rect" id="node1" href="#music21.common.Timer" title="music21.common.Timer" alt="" coords="5,5,197,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.common.Timer">
 <em class="property">
@@ -722,25 +683,12 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">Ti
 </div>
 <div class="section" id="defhash">
 <h2>defHash<a class="headerlink" href="#defhash" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-846751e14542facc2c5c2995600ad5f72da15101.png" alt="digraph inheritance95a4ad2232 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.common.defHash&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.common.defHash&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance95a4ad2232" class="inheritance"/>
-<map id="inheritance95a4ad2232" name="inheritance95a4ad2232">
-<area shape="rect" id="node1" href="#music21.common.defHash" title="music21.common.defHash" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: dict</p>
 <dl class="class">
 <dt id="music21.common.defHash">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defHash</tt><big>(</big><em>hash=None</em>, <em>default=None</em>, <em>callDefault=False</em><big>)</big><a class="headerlink" href="#music21.common.defHash" title="Permalink to this definition">¶</a></dt>
 <dd><p>A replacement for dictionaries that behave a bit more like perl hashes. No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first in the definition and that default can be set to None (which it is) or to any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({&#8220;A&#8221;: falsehash(), &#8220;B&#8221;: falsehash()}) print(a[&#8220;A&#8221;][&#8220;hi&#8221;]) # returns False there&#8217;s probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element</p>
-<p>inherits from: dict</p>
 <p><strong>defHash</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>default</cite>, <cite>callDefault</cite></p>
@@ -760,25 +708,12 @@ class </em><tt class="descclassname">music21.common.</tt><tt class="descname">de
 </div>
 <div class="section" id="deflist">
 <h2>defList<a class="headerlink" href="#deflist" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-c0ec2449270d2c16c0ee8d5bb20b398bec84b8e4.png" alt="digraph inheritancebeeb4ac452 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.common.defList&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.common.defList&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritancebeeb4ac452" class="inheritance"/>
-<map id="inheritancebeeb4ac452" name="inheritancebeeb4ac452">
-<area shape="rect" id="node1" href="#music21.common.defList" title="music21.common.defList" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: list</p>
 <dl class="class">
 <dt id="music21.common.defList">
 <em class="property">
 class </em><tt class="descclassname">music21.common.</tt><tt class="descname">defList</tt><big>(</big><em>value=None</em>, <em>default=None</em>, <em>callDefault=False</em><big>)</big><a class="headerlink" href="#music21.common.defList" title="Permalink to this definition">¶</a></dt>
 <dd><p>A replacement for lists that behave a bit more like perl arrays. No more ListErrors.</p>
-<p>inherits from: list</p>
 <p><strong>defList</strong> <strong>attributes</strong></p>
 <blockquote>
 Attributes without Documentation: <cite>default</cite>, <cite>callDefault</cite></blockquote>

@@ -13,7 +13,7 @@ This module defines objects for describing tempo and changes in tempo.
 TempoMark
 ---------
 
-.. inheritance-diagram:: TempoMark
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: TempoMark(value=None)
 
@@ -22,8 +22,6 @@ TempoMark
     >>> tm = TempoMark("adagio")
     >>> tm.value
     'adagio' 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **TempoMark** **attributes**
 
@@ -62,7 +60,7 @@ TempoMark
 MetronomeMark
 -------------
 
-.. inheritance-diagram:: MetronomeMark
+Inherits from: :class:`~music21.tempo.TempoMark`, :class:`~music21.base.Music21Object`
 
 .. class:: MetronomeMark(number=60, referent=None)
 
@@ -71,8 +69,6 @@ MetronomeMark
     >>> a = MetronomeMark(40)
     >>> a.number
     40 
-
-    inherits from: :class:`~music21.tempo.TempoMark`, :class:`~music21.base.Music21Object`
 
     **MetronomeMark** **attributes**
 

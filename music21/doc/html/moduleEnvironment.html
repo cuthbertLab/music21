@@ -92,19 +92,6 @@
 <p>The environment module describes an object for accessing and setting variables related to the user&#8217;s music21 environment. Such variables include the location of external applications such as MusicXML readers (e.g. Finale), whether music21 is allowed to download files directly (via the virtual corpus), and other settings. Additional documentation for and examples of using this module are found in <a class="reference external" href="environment.html#environment"><em>Setting up and Configuring Environment</em></a>.</p>
 <div class="section" id="environment">
 <h2>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-0385d76e09e11f49eec2b6961bd0f34fb5057512.png" alt="digraph inheritancea0162a479c {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.environment.Environment&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.environment.Environment&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritancea0162a479c" class="inheritance"/>
-<map id="inheritancea0162a479c" name="inheritancea0162a479c">
-<area shape="rect" id="node1" href="#music21.environment.Environment" title="music21.environment.Environment" alt="" coords="5,5,213,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.environment.Environment">
 <em class="property">
@@ -167,7 +154,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 
 <dl class="method">
 <dt id="music21.environment.Environment.launch">
-<tt class="descname">launch</tt><big>(</big><em>fmt</em>, <em>fp</em>, <em>options=</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.launch" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">launch</tt><big>(</big><em>fmt</em>, <em>fp</em>, <em>options=</em>, <em>app=None</em><big>)</big><a class="headerlink" href="#music21.environment.Environment.launch" title="Permalink to this definition">¶</a></dt>
 <dd>Opens a file with an either default or user-specified applications.</dd></dl>
 
 <dl class="method">
@@ -205,6 +192,7 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 </div>
 <div class="section" id="preference">
 <h2>Preference<a class="headerlink" href="#preference" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">Node</span></tt></a></p>
 <dl class="class">
 <dt id="music21.environment.Preference">
 <em class="property">
@@ -212,12 +200,12 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Preference</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>inherits from: <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">Node</span></tt></a></p>
 </dd></dl>
 
 </div>
 <div class="section" id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.node.NodeList" class="reference external" href="moduleNode.html#music21.node.NodeList"><tt class="xref docutils literal"><span class="pre">NodeList</span></tt></a>, <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">Node</span></tt></a></p>
 <dl class="class">
 <dt id="music21.environment.Settings">
 <em class="property">
@@ -225,7 +213,6 @@ class </em><tt class="descclassname">music21.environment.</tt><tt class="descnam
 <dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>inherits from: <a title="music21.node.NodeList" class="reference external" href="moduleNode.html#music21.node.NodeList"><tt class="xref docutils literal"><span class="pre">NodeList</span></tt></a>, <a title="music21.node.Node" class="reference external" href="moduleNode.html#music21.node.Node"><tt class="xref docutils literal"><span class="pre">Node</span></tt></a></p>
 </dd></dl>
 
 </div>

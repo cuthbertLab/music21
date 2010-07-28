@@ -69,7 +69,7 @@ This module defines objects for representing key signatures, as well as key area
 KeySignature
 ------------
 
-.. inheritance-diagram:: KeySignature
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: KeySignature(sharps=None)
 
@@ -80,8 +80,6 @@ KeySignature
     >>> a = key.KeySignature(3)
     >>> a._strDescription()
     '3 sharps' 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **KeySignature** **attributes**
 
@@ -249,13 +247,11 @@ KeySignature
 Key
 ---
 
-.. inheritance-diagram:: Key
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Key(stream1=None)
 
     Note that a key is a sort of hypothetical/conceptual object. It probably has a scale (or scales) associated with it and a KeySignature, but not necessarily. 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Key** **attributes**
 

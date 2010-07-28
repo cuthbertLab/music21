@@ -90,28 +90,7 @@
 <p>This module defines the Chord object, a sub-class of <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>.</p>
 <div class="section" id="chord">
 <h2>Chord<a class="headerlink" href="#chord" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-d2e8fa9094b54f33580bbaba568588f3291c4d23.png" alt="digraph inheritance645c97135e {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.chord.Chord&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.chord.Chord&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.note.NotRest&quot; -&gt; &quot;music21.chord.Chord&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.note.NotRest&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleNote.html#music21.note.NotRest&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.note.GeneralNote&quot; -&gt; &quot;music21.note.NotRest&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.note.GeneralNote&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleNote.html#music21.note.GeneralNote&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.note.GeneralNote&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance645c97135e" class="inheritance"/>
-<map id="inheritance645c97135e" name="inheritance645c97135e">
-<area shape="rect" id="node1" href="#music21.chord.Chord" title="music21.chord.Chord" alt="" coords="5,133,197,157"/>
-<area shape="rect" id="node2" href="moduleNote.html#music21.note.NotRest" title="music21.note.NotRest" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node4" href="moduleNote.html#music21.note.GeneralNote" title="music21.note.GeneralNote" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node6" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.note.NotRest" class="reference external" href="moduleNote.html#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.chord.Chord">
 <em class="property">
@@ -137,7 +116,6 @@ NOTE: For now, the examples used in documentation give chords made from notes th
 defined. In the future, it may be possible to define a chord without first creating notes,
 but for now note that notes that appear in chords are simply shorthand instead of creating notes
 for use in examples</p>
-<p>inherits from: <a title="music21.note.NotRest" class="reference external" href="moduleNote.html#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference external" href="moduleNote.html#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Chord</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">

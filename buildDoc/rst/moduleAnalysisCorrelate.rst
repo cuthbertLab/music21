@@ -13,7 +13,7 @@ Various tools and utilities to find correlations between disparate objects in a 
 ActivityMatch
 -------------
 
-.. inheritance-diagram:: ActivityMatch
+
 
 .. class:: ActivityMatch(streamObj)
 
@@ -21,8 +21,6 @@ ActivityMatch
 
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.* 
         :width: 600
-
-    
 
     
 

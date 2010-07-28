@@ -424,29 +424,13 @@ DurationException...</pre>
 
 <div class="section" id="duration">
 <h2>Duration<a class="headerlink" href="#duration" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-3d71001999ebd0a7a3709e0caf879527aa583edc.png" alt="digraph inheritancee7ae60bd31 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.duration.Duration&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.duration.Duration&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.duration.DurationCommon&quot; -&gt; &quot;music21.duration.Duration&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.duration.DurationCommon&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.duration.DurationCommon&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritancee7ae60bd31" class="inheritance"/>
-<map id="inheritancee7ae60bd31" name="inheritancee7ae60bd31">
-<area shape="rect" id="node1" href="#music21.duration.Duration" title="music21.duration.Duration" alt="" coords="16,48,208,72"/>
-<area shape="rect" id="node2" href="#music21.duration.DurationCommon" title="music21.duration.DurationCommon" alt="" coords="5,5,219,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <dl class="class">
 <dt id="music21.duration.Duration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">Duration</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.duration.Duration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Durations are one of the most important objects in music21. A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units). For instance, &#8220;57 quarter notes&#8221; or &#8220;dotted half tied to quintuplet sixteenth note&#8221; or simply &#8220;quarter note.&#8221; A Duration object is made of one or more DurationUnit objects stored on the <cite>components</cite> list. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Duration objects are not expressable as a single notation unit. Duration objects are not Music21Objects. Duration objects share many properties and attributes with DurationUnit objects, but Duration is not a subclass of DurationUnit.</p>
 <p>First positional argument is assumed to be type string or a quarterLength.</p>
-<p>inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>Duration</strong> <strong>attributes</strong></p>
 <blockquote>
 Attributes without Documentation: <cite>linkages</cite></blockquote>
@@ -754,19 +738,6 @@ Attributes without Documentation: <cite>linkages</cite></blockquote>
 </div>
 <div class="section" id="tuplet">
 <h2>Tuplet<a class="headerlink" href="#tuplet" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-46c13cde35be4f72fa8c18627c521bc6af74ebce.png" alt="digraph inheritance2cb396f056 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.duration.Tuplet&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.duration.Tuplet&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance2cb396f056" class="inheritance"/>
-<map id="inheritance2cb396f056" name="inheritance2cb396f056">
-<area shape="rect" id="node1" href="#music21.duration.Tuplet" title="music21.duration.Tuplet" alt="" coords="5,5,197,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.duration.Tuplet">
 <em class="property">
@@ -943,41 +914,26 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 </div>
 <div class="section" id="appogiaturastartduration">
 <h2>AppogiaturaStartDuration<a class="headerlink" href="#appogiaturastartduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <dl class="class">
 <dt id="music21.duration.AppogiaturaStartDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">AppogiaturaStartDuration</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.duration.AppogiaturaStartDuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>First positional argument is assumed to be type string or a quarterLength.</p>
-<p>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
-</dd></dl>
+<dd>First positional argument is assumed to be type string or a quarterLength.</dd></dl>
 
 </div>
 <div class="section" id="appogiaturastopduration">
 <h2>AppogiaturaStopDuration<a class="headerlink" href="#appogiaturastopduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <dl class="class">
 <dt id="music21.duration.AppogiaturaStopDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">AppogiaturaStopDuration</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.duration.AppogiaturaStopDuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>First positional argument is assumed to be type string or a quarterLength.</p>
-<p>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
-</dd></dl>
+<dd>First positional argument is assumed to be type string or a quarterLength.</dd></dl>
 
 </div>
 <div class="section" id="durationcommon">
 <h2>DurationCommon<a class="headerlink" href="#durationcommon" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-336435d393be0166fd40d87b971e2aebf40ae953.png" alt="digraph inheritance0261f55c4a {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.duration.DurationCommon&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.duration.DurationCommon&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance0261f55c4a" class="inheritance"/>
-<map id="inheritance0261f55c4a" name="inheritance0261f55c4a">
-<area shape="rect" id="node1" href="#music21.duration.DurationCommon" title="music21.duration.DurationCommon" alt="" coords="5,5,219,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.duration.DurationCommon">
 <em class="property">
@@ -1009,28 +965,12 @@ class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">
 </div>
 <div class="section" id="durationunit">
 <h2>DurationUnit<a class="headerlink" href="#durationunit" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-00b2e51d3daa4adcecbf0213bf7c280b6962cd40.png" alt="digraph inheritance212d455efa {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.duration.DurationUnit&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.duration.DurationUnit&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.duration.DurationCommon&quot; -&gt; &quot;music21.duration.DurationUnit&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.duration.DurationCommon&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.duration.DurationCommon&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance212d455efa" class="inheritance"/>
-<map id="inheritance212d455efa" name="inheritance212d455efa">
-<area shape="rect" id="node1" href="#music21.duration.DurationUnit" title="music21.duration.DurationUnit" alt="" coords="16,48,208,72"/>
-<area shape="rect" id="node2" href="#music21.duration.DurationCommon" title="music21.duration.DurationCommon" alt="" coords="5,5,219,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <dl class="class">
 <dt id="music21.duration.DurationUnit">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">DurationUnit</tt><big>(</big><em>prototype=quarter</em><big>)</big><a class="headerlink" href="#music21.duration.DurationUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd&#8217;s Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms&#8217;s shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: &#8216;zero&#8217; type for zero-length durations and &#8216;unexpressable&#8217; type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.)</p>
-<p>inherits from: <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <p><strong>DurationUnit</strong> <strong>attributes</strong></p>
 <blockquote>
 Attributes without Documentation: <cite>linkStatus</cite></blockquote>
@@ -1193,29 +1133,32 @@ Attributes without Documentation: <cite>linkStatus</cite></blockquote>
 </div>
 <div class="section" id="graceduration">
 <h2>GraceDuration<a class="headerlink" href="#graceduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <dl class="class">
 <dt id="music21.duration.GraceDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">GraceDuration</tt><a class="headerlink" href="#music21.duration.GraceDuration" title="Permalink to this definition">¶</a></dt>
-<dd>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></dd></dl>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="longgraceduration">
 <h2>LongGraceDuration<a class="headerlink" href="#longgraceduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <dl class="class">
 <dt id="music21.duration.LongGraceDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">LongGraceDuration</tt><a class="headerlink" href="#music21.duration.LongGraceDuration" title="Permalink to this definition">¶</a></dt>
-<dd>inherits from: <a title="music21.duration.Duration" class="reference internal" href="#music21.duration.Duration"><tt class="xref docutils literal"><span class="pre">Duration</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></dd></dl>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="zeroduration">
 <h2>ZeroDuration<a class="headerlink" href="#zeroduration" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">DurationUnit</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></p>
 <dl class="class">
 <dt id="music21.duration.ZeroDuration">
 <em class="property">
 class </em><tt class="descclassname">music21.duration.</tt><tt class="descname">ZeroDuration</tt><a class="headerlink" href="#music21.duration.ZeroDuration" title="Permalink to this definition">¶</a></dt>
-<dd>inherits from: <a title="music21.duration.DurationUnit" class="reference internal" href="#music21.duration.DurationUnit"><tt class="xref docutils literal"><span class="pre">DurationUnit</span></tt></a>, <a title="music21.duration.DurationCommon" class="reference internal" href="#music21.duration.DurationCommon"><tt class="xref docutils literal"><span class="pre">DurationCommon</span></tt></a></dd></dl>
+<dd></dd></dl>
 
 </div>
 </div>

@@ -98,19 +98,6 @@
 </div>
 <div class="section" id="music21object">
 <h2>Music21Object<a class="headerlink" href="#music21object" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-a2b1c1b4a34f0d00e899b586d07ab1f89256ba99.png" alt="digraph inheritance493c39467e {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance493c39467e" class="inheritance"/>
-<map id="inheritance493c39467e" name="inheritance493c39467e">
-<area shape="rect" id="node1" href="#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.base.Music21Object">
 <em class="property">
@@ -444,7 +431,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 
 <dl class="method">
 <dt id="music21.base.Music21Object.show">
-<tt class="descname">show</tt><big>(</big><em>fmt=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.show" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">show</tt><big>(</big><em>fmt=None</em>, <em>app=None</em><big>)</big><a class="headerlink" href="#music21.base.Music21Object.show" title="Permalink to this definition">¶</a></dt>
 <dd>Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user&#8217;s Environment Valid formats include (but are not limited to): xml (musicxml) text lily.png lily.pdf</dd></dl>
 
 <dl class="method">
@@ -514,28 +501,12 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Musi
 </div>
 <div class="section" id="elementwrapper">
 <h2>ElementWrapper<a class="headerlink" href="#elementwrapper" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-31b49cabcd69ff3646579e1b686cb223b2b98985.png" alt="digraph inheritanceaa98665b06 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.base.ElementWrapper&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.base.ElementWrapper&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.base.ElementWrapper&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritanceaa98665b06" class="inheritance"/>
-<map id="inheritanceaa98665b06" name="inheritanceaa98665b06">
-<area shape="rect" id="node1" href="#music21.base.ElementWrapper" title="music21.base.ElementWrapper" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node2" href="#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.base.ElementWrapper">
 <em class="property">
 class </em><tt class="descclassname">music21.base.</tt><tt class="descname">ElementWrapper</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#music21.base.ElementWrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>An element wraps any object that is not a <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>, so that that object can be positioned within a <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>. The object stored within ElementWrapper is available from the the <a title="music21.base.ElementWrapper.obj" class="reference internal" href="#music21.base.ElementWrapper.obj"><tt class="xref docutils literal"><span class="pre">obj</span></tt></a> attribute. Providing an object at initialization is mandatory.</p>
-<p>inherits from: <a title="music21.base.Music21Object" class="reference internal" href="#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>ElementWrapper</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -654,19 +625,6 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Elem
 </div>
 <div class="section" id="definedcontexts">
 <h2>DefinedContexts<a class="headerlink" href="#definedcontexts" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-d43f265c4a095db720ea6aaf806c8b89c02ae5df.png" alt="digraph inheritancee547887928 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.base.DefinedContexts&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.base.DefinedContexts&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritancee547887928" class="inheritance"/>
-<map id="inheritancee547887928" name="inheritancee547887928">
-<area shape="rect" id="node1" href="#music21.base.DefinedContexts" title="music21.base.DefinedContexts" alt="" coords="5,5,197,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.base.DefinedContexts">
 <em class="property">
@@ -1089,6 +1047,7 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Defi
 </div>
 <div class="section" id="groups">
 <h2>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: list</p>
 <dl class="class">
 <dt id="music21.base.Groups">
 <em class="property">
@@ -1104,7 +1063,6 @@ class </em><tt class="descclassname">music21.base.</tt><tt class="descname">Grou
 </pre></div>
 </div>
 <p>x.__init__(...) initializes x; see x.__class__.__doc__ for signature</p>
-<p>inherits from: list</p>
 </dd></dl>
 
 </div>

@@ -13,7 +13,7 @@ The environment module describes an object for accessing and setting variables r
 Environment
 -----------
 
-.. inheritance-diagram:: Environment
+
 
 .. class:: Environment(modName=None)
 
@@ -23,8 +23,6 @@ Environment
 
     >>> a = Environment()
     >>> post = a['writeFormat']
-
-    
 
     **Environment** **attributes**
 
@@ -66,7 +64,7 @@ Environment
 
             No documentation. 
 
-        .. method:: launch(fmt, fp, options=)
+        .. method:: launch(fmt, fp, options=, app=None)
 
             Opens a file with an either default or user-specified applications. 
 
@@ -97,6 +95,8 @@ Environment
 Preference
 ----------
 
+Inherits from: :class:`~music21.node.Node`
+
 .. class:: Preference()
 
     
@@ -107,11 +107,11 @@ Preference
 
     >>> a = Preference()
 
-    inherits from: :class:`~music21.node.Node`
-
 
 Settings
 --------
+
+Inherits from: :class:`~music21.node.NodeList`, :class:`~music21.node.Node`
 
 .. class:: Settings()
 
@@ -122,7 +122,5 @@ Settings
     
 
     >>> a = Settings()
-
-    inherits from: :class:`~music21.node.NodeList`, :class:`~music21.node.Node`
 
 

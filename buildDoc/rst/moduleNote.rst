@@ -20,13 +20,11 @@ Classes and functions for creating and manipulating notes, ties, and durations. 
 Note
 ----
 
-.. inheritance-diagram:: Note
+Inherits from: :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
 .. class:: Note(*arguments, **keywords)
 
     Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
-
-    inherits from: :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
     **Note** **attributes**
 
@@ -168,13 +166,11 @@ Note
 Rest
 ----
 
-.. inheritance-diagram:: Rest
+Inherits from: :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
 .. class:: Rest(*arguments, **keywords)
 
     General rest class 
-
-    inherits from: :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
     **Rest** **attributes**
 
@@ -222,22 +218,20 @@ Rest
 EighthNote
 ----------
 
+Inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
+
 .. class:: EighthNote(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
 
 GeneralNote
 -----------
 
-.. inheritance-diagram:: GeneralNote
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: GeneralNote(*arguments, **keywords)
 
     A GeneralNote object is the parent object for the :class:`~music21.note.Note`, :class:`~music21.note.Rest`, :class:`~music21.note.Chord`, and related objects. 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **GeneralNote** **attributes**
 
@@ -425,21 +419,19 @@ GeneralNote
 HalfNote
 --------
 
+Inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
+
 .. class:: HalfNote(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
 
 Lyric
 -----
 
-.. inheritance-diagram:: Lyric
+
 
 .. class:: Lyric(text=None, number=1, syllabic=None)
 
-
-    
 
     **Lyric** **attributes**
 
@@ -462,13 +454,11 @@ Lyric
 NotRest
 -------
 
-.. inheritance-diagram:: NotRest
+Inherits from: :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
 .. class:: NotRest(*arguments, **keywords)
 
     Parent class for objects that are not rests; or, object that can be tied. 
-
-    inherits from: :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
     **NotRest** **attributes**
 
@@ -515,16 +505,16 @@ NotRest
 QuarterNote
 -----------
 
+Inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
+
 .. class:: QuarterNote(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
 
 Tie
 ---
 
-.. inheritance-diagram:: Tie
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Tie(tievalue=start)
 
@@ -545,8 +535,6 @@ Tie
     optional (to know what notes are next:) 
     .to = note()   # not implimented yet, b/c of garbage coll. 
     .from = note() 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Tie** **attributes**
 
@@ -570,13 +558,11 @@ Tie
 Unpitched
 ---------
 
-.. inheritance-diagram:: Unpitched
+Inherits from: :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
 .. class:: Unpitched(*arguments, **keywords)
 
     General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation 
-
-    inherits from: :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
     **Unpitched** **attributes**
 
@@ -610,9 +596,9 @@ Unpitched
 WholeNote
 ---------
 
+Inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
+
 .. class:: WholeNote(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.note.Note`, :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
 

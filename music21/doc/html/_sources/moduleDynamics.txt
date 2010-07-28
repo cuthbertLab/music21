@@ -23,7 +23,7 @@ Classes and functions for creating and manipulating dynamic symbols. Rather than
 Dynamic
 -------
 
-.. inheritance-diagram:: Dynamic
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Dynamic(value=None)
 
@@ -42,8 +42,6 @@ Dynamic
     >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
     >>> pp2.value
     'pp' 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Dynamic** **attributes**
 
@@ -99,13 +97,11 @@ Dynamic
 Wedge
 -----
 
-.. inheritance-diagram:: Wedge
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Wedge(value=None)
 
     Object model of crescendeo/decrescendo wedges. 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Wedge** **attributes**
 

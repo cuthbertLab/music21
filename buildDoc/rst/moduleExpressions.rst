@@ -13,12 +13,10 @@ This module provides object representations of expression notation symbols.
 Fermata
 -------
 
-.. inheritance-diagram:: Fermata
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Fermata(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Fermata** **attributes**
 
@@ -47,12 +45,10 @@ Fermata
 GeneralMordent
 --------------
 
-.. inheritance-diagram:: GeneralMordent
+Inherits from: :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 .. class:: GeneralMordent(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
     **GeneralMordent** **attributes**
 
@@ -74,66 +70,64 @@ GeneralMordent
 HalfStepInvertedMordent
 -----------------------
 
+Inherits from: :class:`~music21.expressions.InvertedMordent`, :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: HalfStepInvertedMordent()
 
-
-    inherits from: :class:`~music21.expressions.InvertedMordent`, :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 
 HalfStepMordent
 ---------------
 
+Inherits from: :class:`~music21.expressions.Mordent`, :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: HalfStepMordent()
 
-
-    inherits from: :class:`~music21.expressions.Mordent`, :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 
 HalfStepTrill
 -------------
 
+Inherits from: :class:`~music21.expressions.Trill`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: HalfStepTrill()
 
-
-    inherits from: :class:`~music21.expressions.Trill`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 
 InvertedMordent
 ---------------
 
+Inherits from: :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: InvertedMordent(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 
 InvertedTurn
 ------------
 
+Inherits from: :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: InvertedTurn(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 
 Mordent
 -------
 
+Inherits from: :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: Mordent(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 
 Ornament
 --------
 
-.. inheritance-diagram:: Ornament
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Ornament(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Ornament** **attributes**
 
@@ -153,12 +147,10 @@ Ornament
 Trill
 -----
 
-.. inheritance-diagram:: Trill
+Inherits from: :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 .. class:: Trill(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
     **Trill** **attributes**
 
@@ -190,36 +182,36 @@ Trill
 Turn
 ----
 
+Inherits from: :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: Turn(*arguments, **keywords)
 
-
-    inherits from: :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 
 WholeStepInvertedMordent
 ------------------------
 
+Inherits from: :class:`~music21.expressions.InvertedMordent`, :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: WholeStepInvertedMordent()
 
-
-    inherits from: :class:`~music21.expressions.InvertedMordent`, :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 
 WholeStepMordent
 ----------------
 
+Inherits from: :class:`~music21.expressions.Mordent`, :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: WholeStepMordent()
 
-
-    inherits from: :class:`~music21.expressions.Mordent`, :class:`~music21.expressions.GeneralMordent`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 
 WholeStepTrill
 --------------
 
+Inherits from: :class:`~music21.expressions.Trill`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
+
 .. class:: WholeStepTrill()
 
-
-    inherits from: :class:`~music21.expressions.Trill`, :class:`~music21.expressions.Ornament`, :class:`~music21.base.Music21Object`
 
 

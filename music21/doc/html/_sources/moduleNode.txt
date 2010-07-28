@@ -16,7 +16,7 @@ An object base-class for creating and editing specialized XML structures as obje
 Node
 ----
 
-.. inheritance-diagram:: Node
+
 
 .. class:: Node()
 
@@ -25,8 +25,6 @@ Node
 
     >>> a = Node()
     >>> a.set('charData', 'test')
-
-    
 
     **Node** **attributes**
 
@@ -83,13 +81,11 @@ Node
 NodeList
 --------
 
-.. inheritance-diagram:: NodeList
+Inherits from: :class:`~music21.node.Node`
 
 .. class:: NodeList()
 
     To understand what a NodeList is, we need to first see that Nodes are simply xml-like containers. Though many xml-like containers store just character data, like:: <fifths>0</fifths> Other xml-like containers are really more like lists, not storing character data but other xml-like containers in order, like:: <attributes> <divisions>1</divisions> <key> <fifths>0</fifths> <mode>major</mode> </key> <time symbol="common"> <beats>4</beats> <beat-type>4</beat-type> </time> <clef> <sign>G</sign> <line>2</line> </clef> </attributes> In these cases, its much easier to have an xml-like container that is list like. That way they can be iterated over or appended to.  Thus, NodeLists, which are nodes that give us list-like functionality for the cases where we need them. 
-
-    inherits from: :class:`~music21.node.Node`
 
     **NodeList** **attributes**
 

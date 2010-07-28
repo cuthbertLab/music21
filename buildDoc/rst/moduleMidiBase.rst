@@ -58,6 +58,10 @@ Objects and tools for processing MIDI data. This module uses routines from Will 
 
     >>> putNumbersAsList([0, 0, 0, 3])
     '\x00\x00\x00\x03' 
+    >>> putNumbersAsList([0, 0, 0, -3])
+    '\x00\x00\x00\xfd' 
+    >>> putNumbersAsList([0, 0, 0, -1])
+    '\x00\x00\x00\xff' 
 
 .. function:: putVariableLengthNumber(x)
 
@@ -71,7 +75,7 @@ Objects and tools for processing MIDI data. This module uses routines from Will 
 DeltaTime
 ---------
 
-.. inheritance-diagram:: DeltaTime
+Inherits from: :class:`~music21.midi.base.MidiEvent`
 
 .. class:: DeltaTime(track)
 
@@ -84,8 +88,6 @@ DeltaTime
     <MidiEvent DeltaTime, t=380, track=1, channel=None> 
 
     
-
-    inherits from: :class:`~music21.midi.base.MidiEvent`
 
     **DeltaTime** **methods**
 
@@ -103,13 +105,11 @@ DeltaTime
 Enumeration
 -----------
 
-.. inheritance-diagram:: Enumeration
+
 
 .. class:: Enumeration(enumList)
 
     Utility object for defining binary MIDI message constants. 
-
-    
 
     **Enumeration** **methods**
 
@@ -129,15 +129,13 @@ Enumeration
 MidiChannel
 -----------
 
-.. inheritance-diagram:: MidiChannel
+
 
 .. class:: MidiChannel(track, index)
 
     A channel (together with a track) provides the continuity connecting a NOTE_ON event with its corresponding NOTE_OFF event. Together, those define the beginning and ending times for a Note. 
 
     >>> mc = MidiChannel(0, 0)
-
-    
 
     **MidiChannel** **methods**
 
@@ -153,7 +151,7 @@ MidiChannel
 MidiEvent
 ---------
 
-.. inheritance-diagram:: MidiEvent
+
 
 .. class:: MidiEvent(track)
 
@@ -174,8 +172,6 @@ MidiEvent
     >>> me2.data = 'guitar'
     >>> me2
     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data='guitar'> 
-
-    
 
     **MidiEvent** **methods**
 
@@ -259,13 +255,11 @@ MidiEvent
 MidiFile
 --------
 
-.. inheritance-diagram:: MidiFile
+
 
 .. class:: MidiFile()
 
     Low MIDI file writing, emulating methods from normal Python files. The `ticksPerQuarterNote` attribute must be set before writing. 1024 is a common value. 
-
-    
 
     **MidiFile** **attributes**
 
@@ -310,15 +304,13 @@ MidiFile
 MidiTrack
 ---------
 
-.. inheritance-diagram:: MidiTrack
+
 
 .. class:: MidiTrack(index)
 
     A MIDI track. An `index` is an integer identifier for this object. 
 
     >>> mt = MidiTrack(0)
-
-    
 
     
 

@@ -17,13 +17,11 @@ Music21 base classes for :class:`~music21.stream.Stream` objects and elements co
 Music21Object
 -------------
 
-.. inheritance-diagram:: Music21Object
+
 
 .. class:: Music21Object(*arguments, **keywords)
 
     Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note) 
-
-    
 
     **Music21Object** **attributes**
 
@@ -296,7 +294,7 @@ Music21Object
             >>> a.addLocation(aSite, 20)
             >>> a.setOffsetBySite(aSite, 30)
 
-        .. method:: show(fmt=None)
+        .. method:: show(fmt=None, app=None)
 
             Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment Valid formats include (but are not limited to): xml (musicxml) text lily.png lily.pdf 
 
@@ -357,13 +355,11 @@ Music21Object
 ElementWrapper
 --------------
 
-.. inheritance-diagram:: ElementWrapper
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: ElementWrapper(obj)
 
     An element wraps any object that is not a :class:`~music21.base.Music21Object`, so that that object can be positioned within a :class:`~music21.stream.Stream`. The object stored within ElementWrapper is available from the the :attr:`~music21.base.ElementWrapper.obj` attribute. Providing an object at initialization is mandatory. 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **ElementWrapper** **attributes**
 
@@ -470,13 +466,11 @@ ElementWrapper
 DefinedContexts
 ---------------
 
-.. inheritance-diagram:: DefinedContexts
+
 
 .. class:: DefinedContexts()
 
     An object, stored within a Music21Object, that stores references to a collection of objects that may be contextually relevant. Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects 
-
-    
 
     
 
@@ -835,6 +829,8 @@ DefinedContexts
 Groups
 ------
 
+Inherits from: list
+
 .. class:: Groups
 
     A list of strings used to identify associations that an element might have. Enforces that all elements must be strings 
@@ -848,7 +844,5 @@ Groups
     GroupException: Only strings can be used as list names 
 
     x.__init__(...) initializes x; see x.__class__.__doc__ for signature 
-
-    inherits from: list
 
 

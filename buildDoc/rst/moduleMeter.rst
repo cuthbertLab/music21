@@ -103,12 +103,10 @@ This module defines the :class:`~music21.meter.TimeSignature` object, as well as
 TimeSignature
 -------------
 
-.. inheritance-diagram:: TimeSignature
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: TimeSignature(value=4/4, partitionRequest=None)
 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **TimeSignature** **attributes**
 
@@ -562,32 +560,30 @@ TimeSignature
 CompoundTimeSignature
 ---------------------
 
+Inherits from: :class:`~music21.meter.TimeSignature`, :class:`~music21.base.Music21Object`
+
 .. class:: CompoundTimeSignature(value=4/4, partitionRequest=None)
 
-
-    inherits from: :class:`~music21.meter.TimeSignature`, :class:`~music21.base.Music21Object`
 
 
 DurationDenominatorTimeSignature
 --------------------------------
 
+Inherits from: :class:`~music21.meter.TimeSignature`, :class:`~music21.base.Music21Object`
+
 .. class:: DurationDenominatorTimeSignature(value=4/4, partitionRequest=None)
 
     If you have played Hindemith you know these, 3/(dot-quarter) etc. 
-
-    inherits from: :class:`~music21.meter.TimeSignature`, :class:`~music21.base.Music21Object`
 
 
 MeterSequence
 -------------
 
-.. inheritance-diagram:: MeterSequence
+Inherits from: :class:`~music21.meter.MeterTerminal`
 
 .. class:: MeterSequence(value=None, partitionRequest=None)
 
     A meter sequence is a list of MeterTerminals, or other MeterSequences 
-
-    inherits from: :class:`~music21.meter.MeterTerminal`
 
     **MeterSequence** **attributes**
 
@@ -948,7 +944,7 @@ MeterSequence
 MeterTerminal
 -------------
 
-.. inheritance-diagram:: MeterTerminal
+
 
 .. class:: MeterTerminal(slashNotation=None, weight=1)
 
@@ -964,8 +960,6 @@ MeterTerminal
     >>> a = meter.MeterTerminal('5/2')
     >>> a.duration.quarterLength
     10.0 
-
-    
 
     
 
@@ -1051,12 +1045,10 @@ MeterTerminal
 NonPowerOfTwoTimeSignature
 --------------------------
 
-.. inheritance-diagram:: NonPowerOfTwoTimeSignature
+Inherits from: :class:`~music21.meter.TimeSignature`, :class:`~music21.base.Music21Object`
 
 .. class:: NonPowerOfTwoTimeSignature(value=4/4, partitionRequest=None)
 
-
-    inherits from: :class:`~music21.meter.TimeSignature`, :class:`~music21.base.Music21Object`
 
     **NonPowerOfTwoTimeSignature** **attributes**
 

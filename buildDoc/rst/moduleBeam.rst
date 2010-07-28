@@ -15,7 +15,7 @@ Beam objects, added to :class:`~music21.note.Note` and :class:`~music21.chord.Ch
 Beam
 ----
 
-.. inheritance-diagram:: Beam
+
 
 .. class:: Beam(type=None, direction=None)
 
@@ -30,8 +30,6 @@ Beam
     Two ways of doing the same thing 
     >>> b3 = music21.beam.Beam(type = 'partial', direction = 'left')
     >>> b4 = music21.beam.Beam('partial', 'left')
-
-    
 
     
 
@@ -66,13 +64,11 @@ Beam
 Beams
 -----
 
-.. inheritance-diagram:: Beams
+
 
 .. class:: Beams()
 
     The Beams object stores in it attribute beamsList (a list) all the Beam objects defined above.  Thus len(beam.Beams) tells you how many beams the note currently has on it. 
-
-    
 
     **Beams** **attributes**
 

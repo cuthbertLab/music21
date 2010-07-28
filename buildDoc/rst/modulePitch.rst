@@ -132,7 +132,7 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 Pitch
 -----
 
-.. inheritance-diagram:: Pitch
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Pitch(name=None)
 
@@ -146,8 +146,6 @@ Pitch
     >>> p2 = Pitch(3)
     >>> p2
     D# 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Pitch** **attributes**
 
@@ -421,13 +419,11 @@ Pitch
 Accidental
 ----------
 
-.. inheritance-diagram:: Accidental
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Accidental(specifier=natural)
 
     Accidental class. 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Accidental** **attributes**
 

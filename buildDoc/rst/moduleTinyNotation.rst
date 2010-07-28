@@ -13,7 +13,7 @@ tinyNotation -- a simple way of specifying single line melodies that uses a nota
 TinyNotationNote
 ----------------
 
-.. inheritance-diagram:: TinyNotationNote
+
 
 .. class:: TinyNotationNote(stringRep, storedDict={})
 
@@ -29,8 +29,6 @@ TinyNotationNote
     'hel-' 
     >>> note1.id
     'aflat' 
-
-    
 
     **TinyNotationNote** **methods**
 
@@ -50,7 +48,7 @@ TinyNotationNote
 TinyNotationStream
 ------------------
 
-.. inheritance-diagram:: TinyNotationStream
+Inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 .. class:: TinyNotationStream(stringRep=, timeSignature=None)
 
@@ -63,8 +61,6 @@ TinyNotationStream
     True 
     >>> stream1.notes[0].octave
     3 
-
-    inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
     **TinyNotationStream** **attributes**
 
@@ -94,6 +90,8 @@ TinyNotationStream
 HarmonyStream
 -------------
 
+Inherits from: :class:`~music21.tinyNotation.TinyNotationStream`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
 .. class:: HarmonyStream(stringRep=, timeSignature=None)
 
     example of subclassing TinyNotationStream to include a possible harmonic representation of the note 
@@ -118,18 +116,14 @@ HarmonyStream
 
     
 
-    inherits from: :class:`~music21.tinyNotation.TinyNotationStream`, :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
 
 HarmonyNote
 -----------
 
-.. inheritance-diagram:: HarmonyNote
+Inherits from: :class:`~music21.tinyNotation.TinyNotationNote`
 
 .. class:: HarmonyNote(stringRep, storedDict={})
 
-
-    inherits from: :class:`~music21.tinyNotation.TinyNotationNote`
 
     **HarmonyNote** **methods**
 

@@ -74,7 +74,7 @@ Classes and functions for creating and processing metadata associated with score
 Text
 ----
 
-.. inheritance-diagram:: Text
+
 
 .. class:: Text(data=, language=None)
 
@@ -85,8 +85,6 @@ Text
     >>> td = Text('concerto in d', 'en')
     >>> str(td)
     'concerto in d' 
-
-    
 
     **Text** **properties**
 
@@ -103,7 +101,7 @@ Text
 Date
 ----
 
-.. inheritance-diagram:: Date
+
 
 .. class:: Date(*args, **keywords)
 
@@ -121,8 +119,6 @@ Date
     >>> a = Date(year='1843?')
     >>> a.yearError
     'uncertain' 
-
-    
 
     
 
@@ -223,7 +219,7 @@ Date
 DateSingle
 ----------
 
-.. inheritance-diagram:: DateSingle
+
 
 .. class:: DateSingle(data=, relevance=certain)
 
@@ -239,8 +235,6 @@ DateSingle
     >>> dd = DateSingle('1805/3/12', 'uncertain')
     >>> str(dd)
     '1805/03/12' 
-
-    
 
     **DateSingle** **attributes**
 
@@ -265,6 +259,8 @@ DateSingle
 DateRelative
 ------------
 
+Inherits from: :class:`~music21.metadata.DateSingle`
+
 .. class:: DateRelative(data=, relevance=after)
 
     Store a relative date, sometime prior or sometime after 
@@ -278,11 +274,11 @@ DateRelative
     Traceback (most recent call last): 
     MetadataException: relevance value is not supported by this object: certain 
 
-    inherits from: :class:`~music21.metadata.DateSingle`
-
 
 DateBetween
 -----------
+
+Inherits from: :class:`~music21.metadata.DateSingle`
 
 .. class:: DateBetween(data=[], relevance=between)
 
@@ -297,11 +293,11 @@ DateBetween
     Traceback (most recent call last): 
     MetadataException: relevance value is not supported by this object: certain 
 
-    inherits from: :class:`~music21.metadata.DateSingle`
-
 
 DateSelection
 -------------
+
+Inherits from: :class:`~music21.metadata.DateSingle`
 
 .. class:: DateSelection(data=, relevance=or)
 
@@ -316,13 +312,11 @@ DateSelection
     Traceback (most recent call last): 
     MetadataException: relevance value is not supported by this object: certain 
 
-    inherits from: :class:`~music21.metadata.DateSingle`
-
 
 Contributor
 -----------
 
-.. inheritance-diagram:: Contributor
+
 
 .. class:: Contributor(*args, **keywords)
 
@@ -337,8 +331,6 @@ Contributor
     'Chopin, Fryderyk' 
     >>> td.relevance
     'contributor' 
-
-    
 
     
 
@@ -413,7 +405,7 @@ Contributor
 Metadata
 --------
 
-.. inheritance-diagram:: Metadata
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Metadata(*args, **keywords)
 
@@ -432,8 +424,6 @@ Metadata
     'Rhapsody in Blue' 
     >>> md.title
     'Rhapsody in Blue' 
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Metadata** **attributes**
 
@@ -547,15 +537,17 @@ Metadata
 Copyright
 ---------
 
+
+
 .. class:: Copyright(*args, **keywords)
 
     An object representation of copyright. 
 
-    
-
 
 Creator
 -------
+
+Inherits from: :class:`~music21.metadata.Contributor`
 
 .. class:: Creator(*args, **keywords)
 
@@ -571,16 +563,14 @@ Creator
     >>> td.relevance
     'creator' 
 
-    inherits from: :class:`~music21.metadata.Contributor`
-
 
 Imprint
 -------
 
+
+
 .. class:: Imprint(*args, **keywords)
 
     An object representation of imprint, or publication. 
-
-    
 
 

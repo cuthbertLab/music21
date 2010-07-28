@@ -93,19 +93,6 @@
 <p>tinyNotation &#8211; a simple way of specifying single line melodies that uses a notation somewhat similar to Lilypond but with WAY fewer options.  It was originally developed to notate trecento (medieval Italian) music, but it is pretty useful for a lot of short examples, so we have made it a generally supported music21 format N.B.: TinyNotation is not meant to expand to cover every single case.  Instead it is meant to be subclassable to extend to the cases <em>your</em> project needs. See for instance the harmony examples in HarmonyStream and HarmonyNote or the Trecento specific examples in trecento/cadencebook.py Here are the most important rules: Note names are: a,b,c,d,e,f,g and r for rest Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n. If the accidental is above the staff (i.e., editorial), enclose it in parentheses: (#), etc.  Make sure that flats in the key signatures are explicitly specified. Note octaves are specified as follows: CC to BB = from C below bass clef to second-line B in bass clef C to B = from bass clef C to B below middle C. c  to b = from middle C to the middle of treble clef c&#8217; to b&#8217; = from C in treble clef to B above treble clef After the note name, a number may be placed indicating the note length: 1 = whole note, 2 = half, 4 = quarter, 8 = eighth, 16 = sixteenth. etc.  If the number is omitted then it is assumed to be the same as the previous note.  I.e., c8 B c d  is a string of eighth notes. After the number, a ~ can be placed to show a tie to the next note. A &#8220;.&#8221; indicates a dotted note.  (If you are entering data via Excel or other spreadsheet, be sure that &#8220;capitalize the first letter of sentences&#8221; is turned off under &#8220;Tools-&gt;AutoCorrect,&#8221; otherwise the next letter will be capitalized, and the octave will be screwed up. For triplets use this notation:  trip{c4 d8}  indicating that these two notes both have &#8220;3s&#8221; over them.  For 4 in the place of 3, use quad{c16 d e8}.  No other tuplets are supported. Again, see the HarmonyStream (below) and trecento.cadencebook examples to see how to make TinyNotation useful for your own needs. (Currently, final notes with fermatas (or any very long final note), take 0 for the note length.  But expect this to disappear from the TinyNotation specification soon, as it&#8217;s too Trecento specific.)</p>
 <div class="section" id="tinynotationnote">
 <h2>TinyNotationNote<a class="headerlink" href="#tinynotationnote" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-28c545f91202da92dcee8b9bf2cad20465522b19.png" alt="digraph inheritancefc63affd9a {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.tinyNotation.TinyNotationNote&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.tinyNotation.TinyNotationNote&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritancefc63affd9a" class="inheritance"/>
-<map id="inheritancefc63affd9a" name="inheritancefc63affd9a">
-<area shape="rect" id="node1" href="#music21.tinyNotation.TinyNotationNote" title="music21.tinyNotation.TinyNotationNote" alt="" coords="5,5,235,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.tinyNotation.TinyNotationNote">
 <em class="property">
@@ -145,25 +132,7 @@ class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descna
 </div>
 <div class="section" id="tinynotationstream">
 <h2>TinyNotationStream<a class="headerlink" href="#tinynotationstream" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-df9f3b028bad7ee1bcfbe48d2832e3b5c27447bc.png" alt="digraph inheritance7bb72062fa {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.tinyNotation.TinyNotationStream&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.tinyNotation.TinyNotationStream&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.stream.Stream&quot; -&gt; &quot;music21.tinyNotation.TinyNotationStream&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.stream.Stream&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleStream.html#music21.stream.Stream&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.stream.Stream&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance7bb72062fa" class="inheritance"/>
-<map id="inheritance7bb72062fa" name="inheritance7bb72062fa">
-<area shape="rect" id="node1" href="#music21.tinyNotation.TinyNotationStream" title="music21.tinyNotation.TinyNotationStream" alt="" coords="5,91,251,115"/>
-<area shape="rect" id="node2" href="moduleStream.html#music21.stream.Stream" title="music21.stream.Stream" alt="" coords="32,48,224,72"/>
-<area shape="rect" id="node4" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="32,5,224,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.tinyNotation.TinyNotationStream">
 <em class="property">
@@ -178,7 +147,6 @@ class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descna
 <span class="go">3</span>
 </pre></div>
 </div>
-<p>inherits from: <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>TinyNotationStream</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>stringRep</cite></p>
@@ -205,6 +173,7 @@ class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descna
 </div>
 <div class="section" id="harmonystream">
 <h2>HarmonyStream<a class="headerlink" href="#harmonystream" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.tinyNotation.TinyNotationStream" class="reference internal" href="#music21.tinyNotation.TinyNotationStream"><tt class="xref docutils literal"><span class="pre">TinyNotationStream</span></tt></a>, <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.tinyNotation.HarmonyStream">
 <em class="property">
@@ -229,34 +198,17 @@ class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descna
 <span class="go">&#39;A-&#39;</span>
 </pre></div>
 </div>
-<p>inherits from: <a title="music21.tinyNotation.TinyNotationStream" class="reference internal" href="#music21.tinyNotation.TinyNotationStream"><tt class="xref docutils literal"><span class="pre">TinyNotationStream</span></tt></a>, <a title="music21.stream.Stream" class="reference external" href="moduleStream.html#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 </dd></dl>
 
 </div>
 <div class="section" id="harmonynote">
 <h2>HarmonyNote<a class="headerlink" href="#harmonynote" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-0fe717d1359801c6916156177f4492045696b571.png" alt="digraph inheritance0ef8849ba1 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.tinyNotation.HarmonyNote&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.tinyNotation.HarmonyNote&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.tinyNotation.TinyNotationNote&quot; -&gt; &quot;music21.tinyNotation.HarmonyNote&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.tinyNotation.TinyNotationNote&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.tinyNotation.TinyNotationNote&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance0ef8849ba1" class="inheritance"/>
-<map id="inheritance0ef8849ba1" name="inheritance0ef8849ba1">
-<area shape="rect" id="node1" href="#music21.tinyNotation.HarmonyNote" title="music21.tinyNotation.HarmonyNote" alt="" coords="15,48,225,72"/>
-<area shape="rect" id="node2" href="#music21.tinyNotation.TinyNotationNote" title="music21.tinyNotation.TinyNotationNote" alt="" coords="5,5,235,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.tinyNotation.TinyNotationNote" class="reference internal" href="#music21.tinyNotation.TinyNotationNote"><tt class="xref docutils literal"><span class="pre">TinyNotationNote</span></tt></a></p>
 <dl class="class">
 <dt id="music21.tinyNotation.HarmonyNote">
 <em class="property">
 class </em><tt class="descclassname">music21.tinyNotation.</tt><tt class="descname">HarmonyNote</tt><big>(</big><em>stringRep</em>, <em>storedDict={}</em><big>)</big><a class="headerlink" href="#music21.tinyNotation.HarmonyNote" title="Permalink to this definition">¶</a></dt>
-<dd><p>inherits from: <a title="music21.tinyNotation.TinyNotationNote" class="reference internal" href="#music21.tinyNotation.TinyNotationNote"><tt class="xref docutils literal"><span class="pre">TinyNotationNote</span></tt></a></p>
-<p><strong>HarmonyNote</strong> <strong>methods</strong></p>
+<dd><p><strong>HarmonyNote</strong> <strong>methods</strong></p>
 <blockquote>
 <dl class="method">
 <dt id="music21.tinyNotation.HarmonyNote.customNotationMatch">

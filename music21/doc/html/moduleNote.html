@@ -110,34 +110,12 @@
 
 <div class="section" id="note">
 <h2>Note<a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-3fce0e0db659c0805b70123a64c8b71b793791dc.png" alt="digraph inheritance3704f38351 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.note.Note&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.Note&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.note.NotRest&quot; -&gt; &quot;music21.note.Note&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.note.NotRest&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.NotRest&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.note.GeneralNote&quot; -&gt; &quot;music21.note.NotRest&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.note.GeneralNote&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.GeneralNote&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.note.GeneralNote&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance3704f38351" class="inheritance"/>
-<map id="inheritance3704f38351" name="inheritance3704f38351">
-<area shape="rect" id="node1" href="#music21.note.Note" title="music21.note.Note" alt="" coords="5,133,197,157"/>
-<area shape="rect" id="node2" href="#music21.note.NotRest" title="music21.note.NotRest" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node4" href="#music21.note.GeneralNote" title="music21.note.GeneralNote" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node6" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.Note">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.Note" title="Permalink to this definition">¶</a></dt>
 <dd><p>Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now.</p>
-<p>inherits from: <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Note</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -301,31 +279,12 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Note
 </div>
 <div class="section" id="rest">
 <h2>Rest<a class="headerlink" href="#rest" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-573153db451e02a3721a949d112667bdd66935e9.png" alt="digraph inheritance5c4cbfafc9 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.note.Rest&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.Rest&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.note.GeneralNote&quot; -&gt; &quot;music21.note.Rest&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.note.GeneralNote&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.GeneralNote&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.note.GeneralNote&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance5c4cbfafc9" class="inheritance"/>
-<map id="inheritance5c4cbfafc9" name="inheritance5c4cbfafc9">
-<area shape="rect" id="node1" href="#music21.note.Rest" title="music21.note.Rest" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node2" href="#music21.note.GeneralNote" title="music21.note.GeneralNote" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node4" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.Rest">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Rest</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.Rest" title="Permalink to this definition">¶</a></dt>
 <dd><p>General rest class</p>
-<p>inherits from: <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Rest</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -375,37 +334,22 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Rest
 </div>
 <div class="section" id="eighthnote">
 <h2>EighthNote<a class="headerlink" href="#eighthnote" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.EighthNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">EighthNote</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.EighthNote" title="Permalink to this definition">¶</a></dt>
-<dd>inherits from: <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></dd></dl>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="generalnote">
 <h2>GeneralNote<a class="headerlink" href="#generalnote" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-7ddb976d531103dfa32342a2d71729d048f06159.png" alt="digraph inheritance3021042099 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.note.GeneralNote&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.GeneralNote&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.note.GeneralNote&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance3021042099" class="inheritance"/>
-<map id="inheritance3021042099" name="inheritance3021042099">
-<area shape="rect" id="node1" href="#music21.note.GeneralNote" title="music21.note.GeneralNote" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node2" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.GeneralNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">GeneralNote</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.GeneralNote" title="Permalink to this definition">¶</a></dt>
 <dd><p>A GeneralNote object is the parent object for the <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.Rest" class="reference internal" href="#music21.note.Rest"><tt class="xref docutils literal"><span class="pre">Rest</span></tt></a>, <tt class="xref docutils literal"><span class="pre">Chord</span></tt>, and related objects.</p>
-<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>GeneralNote</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -622,28 +566,16 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Gene
 </div>
 <div class="section" id="halfnote">
 <h2>HalfNote<a class="headerlink" href="#halfnote" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.HalfNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">HalfNote</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.HalfNote" title="Permalink to this definition">¶</a></dt>
-<dd>inherits from: <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></dd></dl>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="lyric">
 <h2>Lyric<a class="headerlink" href="#lyric" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-f20a82d103f478e3e12498c72a45fba200b82f57.png" alt="digraph inheritance53447919a6 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.note.Lyric&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.Lyric&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance53447919a6" class="inheritance"/>
-<map id="inheritance53447919a6" name="inheritance53447919a6">
-<area shape="rect" id="node1" href="#music21.note.Lyric" title="music21.note.Lyric" alt="" coords="5,5,197,29"/>
-</map>
-</p>
 <dl class="class">
 <dt id="music21.note.Lyric">
 <em class="property">
@@ -673,31 +605,12 @@ Attributes without Documentation: <cite>text</cite>, <cite>number</cite>, <cite>
 </div>
 <div class="section" id="notrest">
 <h2>NotRest<a class="headerlink" href="#notrest" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-8fa99eb230d03fe0e122c3ea6aab5ab05d64d438.png" alt="digraph inheritance7f6f4d1194 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.note.NotRest&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.NotRest&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.note.GeneralNote&quot; -&gt; &quot;music21.note.NotRest&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.note.GeneralNote&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.GeneralNote&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.note.GeneralNote&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance7f6f4d1194" class="inheritance"/>
-<map id="inheritance7f6f4d1194" name="inheritance7f6f4d1194">
-<area shape="rect" id="node1" href="#music21.note.NotRest" title="music21.note.NotRest" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node2" href="#music21.note.GeneralNote" title="music21.note.GeneralNote" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node4" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.NotRest">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">NotRest</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.NotRest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parent class for objects that are not rests; or, object that can be tied.</p>
-<p>inherits from: <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>NotRest</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>stemDirection</cite></p>
@@ -743,31 +656,17 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">NotR
 </div>
 <div class="section" id="quarternote">
 <h2>QuarterNote<a class="headerlink" href="#quarternote" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.QuarterNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">QuarterNote</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.QuarterNote" title="Permalink to this definition">¶</a></dt>
-<dd>inherits from: <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></dd></dl>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="tie">
 <h2>Tie<a class="headerlink" href="#tie" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-1455ced35580f638e78568943f6c1e0b2207fc07.png" alt="digraph inheritance470731faea {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.note.Tie&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.Tie&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.note.Tie&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance470731faea" class="inheritance"/>
-<map id="inheritance470731faea" name="inheritance470731faea">
-<area shape="rect" id="node1" href="#music21.note.Tie" title="music21.note.Tie" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node2" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.Tie">
 <em class="property">
@@ -790,7 +689,6 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Tie<
 <span class="go">.from = note()</span>
 </pre></div>
 </div>
-<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Tie</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>type</cite></p>
@@ -813,31 +711,12 @@ Methods inherited from <a title="music21.base.Music21Object" class="reference ex
 </div>
 <div class="section" id="unpitched">
 <h2>Unpitched<a class="headerlink" href="#unpitched" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-34468db0719ddd738d60d697901e09f98b7f0434.png" alt="digraph inheritance76ac89b9a5 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.note.Unpitched&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.Unpitched&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.note.GeneralNote&quot; -&gt; &quot;music21.note.Unpitched&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.note.GeneralNote&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.note.GeneralNote&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.note.GeneralNote&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance76ac89b9a5" class="inheritance"/>
-<map id="inheritance76ac89b9a5" name="inheritance76ac89b9a5">
-<area shape="rect" id="node1" href="#music21.note.Unpitched" title="music21.note.Unpitched" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node2" href="#music21.note.GeneralNote" title="music21.note.GeneralNote" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node4" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.Unpitched">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Unpitched</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.Unpitched" title="Permalink to this definition">¶</a></dt>
 <dd><p>General class of unpitched objects which appear at different places on the staff.  Examples: percussion notation</p>
-<p>inherits from: <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Unpitched</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -869,11 +748,12 @@ class </em><tt class="descclassname">music21.note.</tt><tt class="descname">Unpi
 </div>
 <div class="section" id="wholenote">
 <h2>WholeNote<a class="headerlink" href="#wholenote" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.note.WholeNote">
 <em class="property">
 class </em><tt class="descclassname">music21.note.</tt><tt class="descname">WholeNote</tt><big>(</big><em>*arguments</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.note.WholeNote" title="Permalink to this definition">¶</a></dt>
-<dd>inherits from: <a title="music21.note.Note" class="reference internal" href="#music21.note.Note"><tt class="xref docutils literal"><span class="pre">Note</span></tt></a>, <a title="music21.note.NotRest" class="reference internal" href="#music21.note.NotRest"><tt class="xref docutils literal"><span class="pre">NotRest</span></tt></a>, <a title="music21.note.GeneralNote" class="reference internal" href="#music21.note.GeneralNote"><tt class="xref docutils literal"><span class="pre">GeneralNote</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></dd></dl>
+<dd></dd></dl>
 
 </div>
 </div>

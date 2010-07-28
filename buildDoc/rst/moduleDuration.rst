@@ -306,15 +306,13 @@ Music21 Durations are almost always measured in QuarterNotes, so an eighth note 
 Duration
 --------
 
-.. inheritance-diagram:: Duration
+Inherits from: :class:`~music21.duration.DurationCommon`
 
 .. class:: Duration(*arguments, **keywords)
 
     Durations are one of the most important objects in music21. A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units). For instance, "57 quarter notes" or "dotted half tied to quintuplet sixteenth note" or simply "quarter note." A Duration object is made of one or more DurationUnit objects stored on the `components` list. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Duration objects are not expressable as a single notation unit. Duration objects are not Music21Objects. Duration objects share many properties and attributes with DurationUnit objects, but Duration is not a subclass of DurationUnit. 
 
     First positional argument is assumed to be type string or a quarterLength. 
-
-    inherits from: :class:`~music21.duration.DurationCommon`
 
     **Duration** **attributes**
 
@@ -585,7 +583,7 @@ Duration
 Tuplet
 ------
 
-.. inheritance-diagram:: Tuplet
+
 
 .. class:: Tuplet(*arguments, **keywords)
 
@@ -615,8 +613,6 @@ Tuplet
     Traceback (most recent call last): 
     ... 
     TupletException: A frozen tuplet (or one attached to a duration) is immutable 
-
-    
 
     **Tuplet** **attributes**
 
@@ -740,37 +736,35 @@ Tuplet
 AppogiaturaStartDuration
 ------------------------
 
+Inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
+
 .. class:: AppogiaturaStartDuration(*arguments, **keywords)
 
 
     First positional argument is assumed to be type string or a quarterLength. 
 
-    inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
-
 
 AppogiaturaStopDuration
 -----------------------
+
+Inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
 
 .. class:: AppogiaturaStopDuration(*arguments, **keywords)
 
 
     First positional argument is assumed to be type string or a quarterLength. 
 
-    inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
-
 
 DurationCommon
 --------------
 
-.. inheritance-diagram:: DurationCommon
+
 
 .. class:: DurationCommon
 
     A base class for both Duration and DurationUnit objects. 
 
     x.__init__(...) initializes x; see x.__class__.__doc__ for signature 
-
-    
 
     **DurationCommon** **methods**
 
@@ -792,13 +786,11 @@ DurationCommon
 DurationUnit
 ------------
 
-.. inheritance-diagram:: DurationUnit
+Inherits from: :class:`~music21.duration.DurationCommon`
 
 .. class:: DurationUnit(prototype=quarter)
 
     A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. DurationUnits are not usually instantiated by users of music21, but are used within Duration objects to model the containment of numerous summed components. Like Durations, DurationUnits have the option of unlinking the quarterLength and its representation on the page. For instance, in 12/16, Brahms sometimes used a dotted half note to indicate the length of 11/16th of a note. (see Don Byrd's Extreme Notation webpage for more information). Since this duration can be expressed by a single graphical unit in Brahms's shorthand, it can be modeled by a single DurationUnit of unliked graphical/temporal representation. Additional types are needed beyond those in Duration: 'zero' type for zero-length durations and 'unexpressable' type for anything that cannot be expressed as a single notation unit, and thus needs a full Duration object (such as 2.5 quarterLengths.) 
-
-    inherits from: :class:`~music21.duration.DurationCommon`
 
     **DurationUnit** **attributes**
 
@@ -940,27 +932,27 @@ DurationUnit
 GraceDuration
 -------------
 
+Inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
+
 .. class:: GraceDuration()
 
-
-    inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
 
 
 LongGraceDuration
 -----------------
 
+Inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
+
 .. class:: LongGraceDuration()
 
-
-    inherits from: :class:`~music21.duration.Duration`, :class:`~music21.duration.DurationCommon`
 
 
 ZeroDuration
 ------------
 
+Inherits from: :class:`~music21.duration.DurationUnit`, :class:`~music21.duration.DurationCommon`
+
 .. class:: ZeroDuration()
 
-
-    inherits from: :class:`~music21.duration.DurationUnit`, :class:`~music21.duration.DurationCommon`
 
 

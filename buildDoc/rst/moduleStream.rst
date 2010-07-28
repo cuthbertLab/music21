@@ -13,7 +13,7 @@ The :class:`~music21.stream.Stream` and its subclasses, a subclass of the :class
 Stream
 ------
 
-.. inheritance-diagram:: Stream
+Inherits from: :class:`~music21.base.Music21Object`
 
 .. class:: Stream(givenElements=None)
 
@@ -24,8 +24,6 @@ Stream
     
 
     
-
-    inherits from: :class:`~music21.base.Music21Object`
 
     **Stream** **attributes**
 
@@ -799,12 +797,12 @@ Stream
             >>> len(found)
             25 
 
-        .. method:: getInstrument(searchParent=True)
+        .. method:: getInstrument(searchParent=True, returnDefault=True)
 
             Search this stream or parent streams for :class:`~music21.instrument.Instrument` objects, otherwise return a default 
 
             >>> a = Stream()
-            >>> b = a.getInstrument()
+            >>> b = a.getInstrument() # a default will be returned
 
         .. method:: getKeySignatures(searchParent=True, searchContext=True)
 
@@ -1379,13 +1377,11 @@ Stream
 Measure
 -------
 
-.. inheritance-diagram:: Measure
+Inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 .. class:: Measure(*args, **keywords)
 
     A representation of a Measure organized as a Stream. All properties of a Measure that are Music21 objects are found as part of the Stream's elements. 
-
-    inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
     **Measure** **attributes**
 
@@ -1542,7 +1538,7 @@ Measure
 Page
 ----
 
-.. inheritance-diagram:: Page
+Inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 .. class:: Page(givenElements=None)
 
@@ -1553,8 +1549,6 @@ Page
     
 
     
-
-    inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
     **Page** **attributes**
 
@@ -1580,6 +1574,8 @@ Page
 Part
 ----
 
+Inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
 .. class:: Part(givenElements=None)
 
     A Stream subclass for designating music that is considered a single part. May be enclosed in a staff (for instance, 2nd and 3rd trombone on a single staff), may enclose staves (piano treble and piano bass), or may not enclose or be enclosed by a staff (in which case, it assumes that this part fits on one staff and shares it with no other part 
@@ -1590,11 +1586,11 @@ Part
 
     
 
-    inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
 
 Performer
 ---------
+
+Inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 .. class:: Performer(givenElements=None)
 
@@ -1606,19 +1602,15 @@ Performer
 
     
 
-    inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
-
 
 Score
 -----
 
-.. inheritance-diagram:: Score
+Inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 .. class:: Score(*args, **keywords)
 
     A Stream subclass for handling multi-part music. Absolutely optional (the largest containing Stream in a piece could be a generic Stream, or a Part, or a Staff).  And Scores can be embedded in other Scores (in fact, our original thought was to call this class a Fragment because of this possibility of continuous embedding), but we figure that many people will like calling the largest container a Score and that this will become a standard. 
-
-    inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
     **Score** **attributes**
 
@@ -1668,7 +1660,7 @@ Score
 Staff
 -----
 
-.. inheritance-diagram:: Staff
+Inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 .. class:: Staff(givenElements=None)
 
@@ -1679,8 +1671,6 @@ Staff
     
 
     
-
-    inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
     **Staff** **attributes**
 
@@ -1706,7 +1696,7 @@ Staff
 System
 ------
 
-.. inheritance-diagram:: System
+Inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 .. class:: System(givenElements=None)
 
@@ -1717,8 +1707,6 @@ System
     
 
     
-
-    inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
     **System** **attributes**
 
@@ -1744,6 +1732,8 @@ System
 Voice
 -----
 
+Inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
+
 .. class:: Voice(givenElements=None)
 
     A Stream subclass for declaring that all the music in the stream belongs to a certain "voice" for analysis or display purposes. Note that both Finale's Layers and Voices as concepts are considered Voices here. 
@@ -1753,7 +1743,5 @@ Voice
     
 
     
-
-    inherits from: :class:`~music21.stream.Stream`, :class:`~music21.base.Music21Object`
 
 

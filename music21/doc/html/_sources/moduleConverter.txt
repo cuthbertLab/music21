@@ -44,13 +44,11 @@ Public interface for importing various file formats into music21. The most power
 Converter
 ---------
 
-.. inheritance-diagram:: Converter
+
 
 .. class:: Converter()
 
     A class used for converting all supported data formats into music21 objects. Not a subclass, but a wrapper for different converter objects based on format. 
-
-    
 
     **Converter** **properties**
 
@@ -76,13 +74,11 @@ Converter
 ConverterMusicXML
 -----------------
 
-.. inheritance-diagram:: ConverterMusicXML
+
 
 .. class:: ConverterMusicXML(forceSource)
 
     Converter for MusicXML 
-
-    
 
     **ConverterMusicXML** **properties**
 
@@ -112,13 +108,11 @@ ConverterMusicXML
 ConverterHumdrum
 ----------------
 
-.. inheritance-diagram:: ConverterHumdrum
+
 
 .. class:: ConverterHumdrum()
 
     Simple class wrapper for parsing Humdrum data provided in a file or in a string. 
-
-    
 
     **ConverterHumdrum** **attributes**
 
@@ -142,13 +136,11 @@ ConverterHumdrum
 ArchiveFilter
 -------------
 
-.. inheritance-diagram:: ArchiveFilter
+
 
 .. class:: ArchiveFilter(fp, format=zip)
 
     Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive. 
-
-    
 
     **ArchiveFilter** **methods**
 
@@ -164,13 +156,11 @@ ArchiveFilter
 ConverterMidi
 -------------
 
-.. inheritance-diagram:: ConverterMidi
+
 
 .. class:: ConverterMidi()
 
     Simple class wrapper for parsing MIDI. 
-
-    
 
     **ConverterMidi** **properties**
 
@@ -192,13 +182,11 @@ ConverterMidi
 ConverterTinyNotation
 ---------------------
 
-.. inheritance-diagram:: ConverterTinyNotation
+
 
 .. class:: ConverterTinyNotation()
 
     Simple class wrapper for parsing TinyNotation data provided in a file or in a string. 
-
-    
 
     **ConverterTinyNotation** **attributes**
 
@@ -222,15 +210,13 @@ ConverterTinyNotation
 PickleFilter
 ------------
 
-.. inheritance-diagram:: PickleFilter
+
 
 .. class:: PickleFilter(fp, forceSource=False)
 
     Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
 
     Provide a file path to check if there is pickled version. If forceSource is True, pickled files, if available, will not be returned. 
-
-    
 
     **PickleFilter** **methods**
 
@@ -242,13 +228,11 @@ PickleFilter
 StreamFreezer
 -------------
 
-.. inheritance-diagram:: StreamFreezer
+
 
 .. class:: StreamFreezer(streamObj=None)
 
     This class is used to freeze a Stream, preparing it for pickling. 
-
-    
 
     **StreamFreezer** **attributes**
 

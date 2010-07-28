@@ -13,7 +13,7 @@ This module defines the Chord object, a sub-class of :class:`~music21.note.Gener
 Chord
 -----
 
-.. inheritance-diagram:: Chord
+Inherits from: :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
 .. class:: Chord(notes=[], **keywords)
 
@@ -41,8 +41,6 @@ Chord
     for use in examples 
 
     
-
-    inherits from: :class:`~music21.note.NotRest`, :class:`~music21.note.GeneralNote`, :class:`~music21.base.Music21Object`
 
     **Chord** **attributes**
 

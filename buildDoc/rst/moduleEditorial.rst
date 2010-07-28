@@ -13,7 +13,7 @@ Editorial objects store comments and other meta-data associated with specific :c
 NoteEditorial
 -------------
 
-.. inheritance-diagram:: NoteEditorial
+
 
 .. class:: NoteEditorial()
 
@@ -44,8 +44,6 @@ NoteEditorial
 
     .. image:: images/noteEditorialFictaSharp.* 
         :width: 103
-
-    
 
     
 
@@ -137,7 +135,7 @@ NoteEditorial
 Comment
 -------
 
-.. inheritance-diagram:: Comment
+
 
 .. class:: Comment
 
@@ -153,8 +151,6 @@ Comment
     
 
     x.__init__(...) initializes x; see x.__class__.__doc__ for signature 
-
-    
 
     **Comment** **attributes**
 

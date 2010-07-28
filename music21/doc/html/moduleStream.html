@@ -98,28 +98,12 @@
 <p>The <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a> and its subclasses, a subclass of the <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a>, is the fundamental container of offset-positioned notation and musical elements in music21. Common Stream subclasses, such as the <a title="music21.stream.Measure" class="reference internal" href="#music21.stream.Measure"><tt class="xref docutils literal"><span class="pre">Measure</span></tt></a> and <a title="music21.stream.Score" class="reference internal" href="#music21.stream.Score"><tt class="xref docutils literal"><span class="pre">Score</span></tt></a> objects, are defined in this module.</p>
 <div class="section" id="stream">
 <h2>Stream<a class="headerlink" href="#stream" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-db57bcaceb77f77febcb4186b352a7059f4fc229.png" alt="digraph inheritanceb1f7f0a19b {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.stream.Stream&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Stream&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.stream.Stream&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritanceb1f7f0a19b" class="inheritance"/>
-<map id="inheritanceb1f7f0a19b" name="inheritanceb1f7f0a19b">
-<area shape="rect" id="node1" href="#music21.stream.Stream" title="music21.stream.Stream" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node2" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.stream.Stream">
 <em class="property">
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Stream</tt><big>(</big><em>givenElements=None</em><big>)</big><a class="headerlink" href="#music21.stream.Stream" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the fundamental container for Music21Objects; objects may be ordered and/or placed in time based on offsets from the start of this container&#8217;s offset. Like the base class, Music21Object, Streams have offsets, priority, id, and groups they also have an elements attribute which returns a list of elements; The Stream has a duration that is usually the release time of the chronologically last element in the Stream (that is, the highest onset plus duration of any element in the Stream). However, it can either explicitly set in which case we say that the duration is unlinked Streams may be embedded within other Streams.</p>
-<p>inherits from: <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Stream</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -979,10 +963,10 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 
 <dl class="method">
 <dt id="music21.stream.Stream.getInstrument">
-<tt class="descname">getInstrument</tt><big>(</big><em>searchParent=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getInstrument" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">getInstrument</tt><big>(</big><em>searchParent=True</em>, <em>returnDefault=True</em><big>)</big><a class="headerlink" href="#music21.stream.Stream.getInstrument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search this stream or parent streams for <a title="music21.instrument.Instrument" class="reference external" href="moduleInstrument.html#music21.instrument.Instrument"><tt class="xref docutils literal"><span class="pre">Instrument</span></tt></a> objects, otherwise return a default</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getInstrument</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">getInstrument</span><span class="p">()</span> <span class="c"># a default will be returned</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1660,31 +1644,12 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 </div>
 <div class="section" id="measure">
 <h2>Measure<a class="headerlink" href="#measure" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-883a018eb1b3e09efa1400549f15c8b9662e1fd9.png" alt="digraph inheritancee56babbcdb {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.stream.Measure&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Measure&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.stream.Stream&quot; -&gt; &quot;music21.stream.Measure&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.stream.Stream&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Stream&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.stream.Stream&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritancee56babbcdb" class="inheritance"/>
-<map id="inheritancee56babbcdb" name="inheritancee56babbcdb">
-<area shape="rect" id="node1" href="#music21.stream.Measure" title="music21.stream.Measure" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node2" href="#music21.stream.Stream" title="music21.stream.Stream" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node4" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.stream.Measure">
 <em class="property">
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Measure</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.stream.Measure" title="Permalink to this definition">¶</a></dt>
 <dd><p>A representation of a Measure organized as a Stream. All properties of a Measure that are Music21 objects are found as part of the Stream&#8217;s elements.</p>
-<p>inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Measure</strong> <strong>attributes</strong></p>
 <blockquote>
 <dl class="attribute">
@@ -1866,31 +1831,12 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Me
 </div>
 <div class="section" id="page">
 <h2>Page<a class="headerlink" href="#page" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-77ab9447977a2891bf2d8c609630f0aa0e575d0f.png" alt="digraph inheritance0199c772c2 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.stream.Page&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Page&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.stream.Stream&quot; -&gt; &quot;music21.stream.Page&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.stream.Stream&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Stream&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.stream.Stream&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance0199c772c2" class="inheritance"/>
-<map id="inheritance0199c772c2" name="inheritance0199c772c2">
-<area shape="rect" id="node1" href="#music21.stream.Page" title="music21.stream.Page" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node2" href="#music21.stream.Stream" title="music21.stream.Stream" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node4" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.stream.Page">
 <em class="property">
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Page</tt><big>(</big><em>givenElements=None</em><big>)</big><a class="headerlink" href="#music21.stream.Page" title="Permalink to this definition">¶</a></dt>
 <dd><p>Totally optional: designation that all the music in this Stream belongs on a single notated page</p>
-<p>inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Page</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>pageNumber</cite></p>
@@ -1912,53 +1858,32 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Pa
 </div>
 <div class="section" id="part">
 <h2>Part<a class="headerlink" href="#part" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.stream.Part">
 <em class="property">
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Part</tt><big>(</big><em>givenElements=None</em><big>)</big><a class="headerlink" href="#music21.stream.Part" title="Permalink to this definition">¶</a></dt>
-<dd><p>A Stream subclass for designating music that is considered a single part. May be enclosed in a staff (for instance, 2nd and 3rd trombone on a single staff), may enclose staves (piano treble and piano bass), or may not enclose or be enclosed by a staff (in which case, it assumes that this part fits on one staff and shares it with no other part</p>
-<p>inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
-</dd></dl>
+<dd>A Stream subclass for designating music that is considered a single part. May be enclosed in a staff (for instance, 2nd and 3rd trombone on a single staff), may enclose staves (piano treble and piano bass), or may not enclose or be enclosed by a staff (in which case, it assumes that this part fits on one staff and shares it with no other part</dd></dl>
 
 </div>
 <div class="section" id="performer">
 <h2>Performer<a class="headerlink" href="#performer" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.stream.Performer">
 <em class="property">
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Performer</tt><big>(</big><em>givenElements=None</em><big>)</big><a class="headerlink" href="#music21.stream.Performer" title="Permalink to this definition">¶</a></dt>
-<dd><p>A Stream subclass for designating music to be performed by a single Performer.  Should only be used when a single performer performs on multiple parts.  E.g. Bass Drum and Triangle on separate staves performed by one player. a Part + changes of Instrument is fine for designating most cases where a player changes instrument in a piece.  A part plus staves with individual instrument changes could also be a way of designating music that is performed by a single performer (see, for instance the Piano doubling Celesta part in Lukas Foss&#8217;s Time Cycle).  The Performer Stream-subclass could be useful for analyses of, for instance, how 5 percussionists chose to play a piece originally designated for 4 (or 6) percussionists in the score.</p>
-<p>inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
-</dd></dl>
+<dd>A Stream subclass for designating music to be performed by a single Performer.  Should only be used when a single performer performs on multiple parts.  E.g. Bass Drum and Triangle on separate staves performed by one player. a Part + changes of Instrument is fine for designating most cases where a player changes instrument in a piece.  A part plus staves with individual instrument changes could also be a way of designating music that is performed by a single performer (see, for instance the Piano doubling Celesta part in Lukas Foss&#8217;s Time Cycle).  The Performer Stream-subclass could be useful for analyses of, for instance, how 5 percussionists chose to play a piece originally designated for 4 (or 6) percussionists in the score.</dd></dl>
 
 </div>
 <div class="section" id="score">
 <h2>Score<a class="headerlink" href="#score" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-dd13c566fc864c550e6cc2774845acb59c899aa5.png" alt="digraph inheritancefb84047abd {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.stream.Score&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Score&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.stream.Stream&quot; -&gt; &quot;music21.stream.Score&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.stream.Stream&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Stream&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.stream.Stream&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritancefb84047abd" class="inheritance"/>
-<map id="inheritancefb84047abd" name="inheritancefb84047abd">
-<area shape="rect" id="node1" href="#music21.stream.Score" title="music21.stream.Score" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node2" href="#music21.stream.Stream" title="music21.stream.Stream" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node4" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.stream.Score">
 <em class="property">
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Score</tt><big>(</big><em>*args</em>, <em>**keywords</em><big>)</big><a class="headerlink" href="#music21.stream.Score" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Stream subclass for handling multi-part music. Absolutely optional (the largest containing Stream in a piece could be a generic Stream, or a Part, or a Staff).  And Scores can be embedded in other Scores (in fact, our original thought was to call this class a Fragment because of this possibility of continuous embedding), but we figure that many people will like calling the largest container a Score and that this will become a standard.</p>
-<p>inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Score</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes inherited from <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>: <tt class="xref docutils literal"><span class="pre">isMeasure</span></tt>, <a title="music21.stream.Stream.flattenedRepresentationOf" class="reference internal" href="#music21.stream.Stream.flattenedRepresentationOf"><tt class="xref docutils literal"><span class="pre">flattenedRepresentationOf</span></tt></a>, <tt class="xref docutils literal"><span class="pre">classNames</span></tt>, <a title="music21.stream.Stream.isFlat" class="reference internal" href="#music21.stream.Stream.isFlat"><tt class="xref docutils literal"><span class="pre">isFlat</span></tt></a>, <a title="music21.stream.Stream.isSorted" class="reference internal" href="#music21.stream.Stream.isSorted"><tt class="xref docutils literal"><span class="pre">isSorted</span></tt></a></p>
@@ -2012,31 +1937,12 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sc
 </div>
 <div class="section" id="staff">
 <h2>Staff<a class="headerlink" href="#staff" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-0176699b6cf6b3f7fe88a6cfaff09c51f8224157.png" alt="digraph inheritance1838874476 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.stream.Staff&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Staff&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.stream.Stream&quot; -&gt; &quot;music21.stream.Staff&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.stream.Stream&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Stream&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.stream.Stream&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance1838874476" class="inheritance"/>
-<map id="inheritance1838874476" name="inheritance1838874476">
-<area shape="rect" id="node1" href="#music21.stream.Staff" title="music21.stream.Staff" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node2" href="#music21.stream.Stream" title="music21.stream.Stream" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node4" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.stream.Staff">
 <em class="property">
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Staff</tt><big>(</big><em>givenElements=None</em><big>)</big><a class="headerlink" href="#music21.stream.Staff" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Stream subclass for designating music on a single staff</p>
-<p>inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>Staff</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>staffLines</cite></p>
@@ -2058,31 +1964,12 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">St
 </div>
 <div class="section" id="system">
 <h2>System<a class="headerlink" href="#system" title="Permalink to this headline">¶</a></h2>
-<p class="graphviz">
-<img src="_images/inheritance-a980316ac1ceb703e7934f302bc692fb5b38fab7.png" alt="digraph inheritance657674d4d9 {
-rankdir=TB;
-ranksep=0.2;
-fontsize=6;
-nodesep=0.2;
-size=&quot;8.0, 12.0&quot;;
-  &quot;music21.stream.System&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.System&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.stream.Stream&quot; -&gt; &quot;music21.stream.System&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.stream.Stream&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.stream.Stream&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-  &quot;music21.base.Music21Object&quot; -&gt; &quot;music21.stream.Stream&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
-  &quot;music21.base.Music21Object&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;moduleBase.html#music21.base.Music21Object&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
-}" usemap="#inheritance657674d4d9" class="inheritance"/>
-<map id="inheritance657674d4d9" name="inheritance657674d4d9">
-<area shape="rect" id="node1" href="#music21.stream.System" title="music21.stream.System" alt="" coords="5,91,197,115"/>
-<area shape="rect" id="node2" href="#music21.stream.Stream" title="music21.stream.Stream" alt="" coords="5,48,197,72"/>
-<area shape="rect" id="node4" href="moduleBase.html#music21.base.Music21Object" title="music21.base.Music21Object" alt="" coords="5,5,197,29"/>
-</map>
-</p>
+<p>Inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.stream.System">
 <em class="property">
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">System</tt><big>(</big><em>givenElements=None</em><big>)</big><a class="headerlink" href="#music21.stream.System" title="Permalink to this definition">¶</a></dt>
 <dd><p>Totally optional: designation that all the music in this Stream belongs in a single system.</p>
-<p>inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <p><strong>System</strong> <strong>attributes</strong></p>
 <blockquote>
 <p>Attributes without Documentation: <cite>systemNumber</cite>, <cite>systemNumbering</cite></p>
@@ -2104,13 +1991,12 @@ class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Sy
 </div>
 <div class="section" id="voice">
 <h2>Voice<a class="headerlink" href="#voice" title="Permalink to this headline">¶</a></h2>
+<p>Inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
 <dl class="class">
 <dt id="music21.stream.Voice">
 <em class="property">
 class </em><tt class="descclassname">music21.stream.</tt><tt class="descname">Voice</tt><big>(</big><em>givenElements=None</em><big>)</big><a class="headerlink" href="#music21.stream.Voice" title="Permalink to this definition">¶</a></dt>
-<dd><p>A Stream subclass for declaring that all the music in the stream belongs to a certain &#8220;voice&#8221; for analysis or display purposes. Note that both Finale&#8217;s Layers and Voices as concepts are considered Voices here.</p>
-<p>inherits from: <a title="music21.stream.Stream" class="reference internal" href="#music21.stream.Stream"><tt class="xref docutils literal"><span class="pre">Stream</span></tt></a>, <a title="music21.base.Music21Object" class="reference external" href="moduleBase.html#music21.base.Music21Object"><tt class="xref docutils literal"><span class="pre">Music21Object</span></tt></a></p>
-</dd></dl>
+<dd>A Stream subclass for declaring that all the music in the stream belongs to a certain &#8220;voice&#8221; for analysis or display purposes. Note that both Finale&#8217;s Layers and Voices as concepts are considered Voices here.</dd></dl>
 
 </div>
 </div>

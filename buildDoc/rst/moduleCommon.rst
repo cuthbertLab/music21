@@ -440,13 +440,11 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 Scalar
 ------
 
-.. inheritance-diagram:: Scalar
+
 
 .. class:: Scalar(value=None)
 
     for those of us who miss perl scalars.... 
-
-    
 
     **Scalar** **attributes**
 
@@ -470,13 +468,11 @@ Scalar
 Iterator
 --------
 
-.. inheritance-diagram:: Iterator
+
 
 .. class:: Iterator(data)
 
     A simple Iterator object used to handle iteration of Streams and other list-like objects. 
-
-    
 
     **Iterator** **methods**
 
@@ -488,13 +484,11 @@ Iterator
 Timer
 -----
 
-.. inheritance-diagram:: Timer
+
 
 .. class:: Timer()
 
     An object for timing. 
-
-    
 
     **Timer** **methods**
 
@@ -514,13 +508,11 @@ Timer
 defHash
 -------
 
-.. inheritance-diagram:: defHash
+Inherits from: dict
 
 .. class:: defHash(hash=None, default=None, callDefault=False)
 
     A replacement for dictionaries that behave a bit more like perl hashes. No more KeyErrors. The difference between defHash and defaultdict is that the Dict values come first in the definition and that default can be set to None (which it is) or to any object. If you want a factory that makes hashes with a particular different default, use: falsehash = lambda h = None: defHash(h, default = False) a = falsehash({"A": falsehash(), "B": falsehash()}) print(a["A"]["hi"]) # returns False there's probably a way to use this to create a data structure of arbitrary dimensionality, though it escapes this author. if callDefault is True then the default is called: defHash(default = list, callDefault = True) will create a new List for each element 
-
-    inherits from: dict
 
     **defHash** **attributes**
 
@@ -540,13 +532,11 @@ defHash
 defList
 -------
 
-.. inheritance-diagram:: defList
+Inherits from: list
 
 .. class:: defList(value=None, default=None, callDefault=False)
 
     A replacement for lists that behave a bit more like perl arrays. No more ListErrors. 
-
-    inherits from: list
 
     **defList** **attributes**
 
