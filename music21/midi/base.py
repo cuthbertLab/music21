@@ -133,9 +133,16 @@ def putNumbersAsList(numList):
 
     >>> putNumbersAsList([0, 0, 0, 3])
     '\\x00\\x00\\x00\\x03'
+    >>> putNumbersAsList([0, 0, 0, -3])
+    '\\x00\\x00\\x00\\xfd'
+    >>> putNumbersAsList([0, 0, 0, -1])
+    '\\x00\\x00\\x00\\xff'
     '''
     post = []
     for n in numList:
+        # assume if a number exceeds range count down from top?
+        if n < 0:
+            n = 256 + n # -1 will be 255
         post.append(chr(n))
     return ''.join(post)
 

@@ -91,6 +91,13 @@ class Instrument(music21.Music21Object):
         '''
         mxScorePart = musicxml.ScorePart()
 
+        if self.instrumentName != None:
+            pass
+        if self.midiProgram != None:
+            pass
+        if self.midiChannel != None:
+            pass
+
     def _setMX(self, mxScorePart):
         '''
         provide a score part object

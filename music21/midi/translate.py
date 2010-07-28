@@ -419,22 +419,49 @@ def timeSignatureToMidiEvents(ts):
 
 
 
-def midiEventToKeySignature(event):
+def midiEventsToKeySignature(eventList):
     '''Convert a single MIDI event into a music21 TimeSignature object.
+
+    >>> from music21 import *
+    >>> mt = midi.MidiTrack(1)
+    >>> me1 = midi.MidiEvent(mt)
+    >>> me1.type = "KEY_SIGNATURE"
+    >>> me1.data = midi.putNumbersAsList([2, 0]) # d major
+    >>> ks = midiEventsToKeySignature(me1)
+    >>> ks
+    <music21.key.KeySignature of 2 sharps>
+
+    >>> me2 = midi.MidiEvent(mt)
+    >>> me2.type = "KEY_SIGNATURE"
+    >>> me2.data = midi.putNumbersAsList([-2, 0]) # b- major
+    >>> me2.data
+    '\\xfe\\x00'
+    >>> midi.getNumbersAsList(me2.data)
+    [254, 0]
+    >>> ks = midiEventsToKeySignature(me2)
+    >>> ks
+    <music21.key.KeySignature of 2 flats>
+
     '''
     # This meta event is used to specify the key (number of sharps or flats) and scale (major or minor) of a sequence. A positive value for the key specifies the number of sharps and a negative value specifies the number of flats. A value of 0 for the scale specifies a major key and a value of 1 specifies a minor key.
     from music21 import key
 
-    subStr = event.data # make a copy of the data to processDurations
-    post = []
-    # time signature is supposed to be 4 bytes
-    for i in range(2):
-        # get one number at a time
-        x, subStr = midiModule.getNumber(subStr, 1)
-        post.append(x)
+    if not common.isListLike(eventList):
+        event = eventList
+    else: # get the second event; first is delta time
+        event = eventList[1]
+    post = midiModule.getNumbersAsList(event.data)
 
-    # fir value is number of sharp, or neg for number of flat
-    ks = key.KeySignature(post[0])
+    if post[0] > 12:
+        # flip around 256
+        sharpCount = post[0] - 256 # need negative values
+    else:
+        sharpCount = post[0]
+
+    environLocal.printDebug(['midiEventsToKeySignature', post, sharpCount])
+
+    # first value is number of sharp, or neg for number of flat
+    ks = key.KeySignature(sharpCount)
 
     if post[1] == 0:
         ks.mode = 'major'
@@ -442,6 +469,49 @@ def midiEventToKeySignature(event):
         ks.mode = 'minor'
     return ks
 
+def keySignatureToMidiEvents(ks):
+    '''Convert a single MIDI event into a music21 TimeSignature object.
+
+    >>> from music21 import key
+    >>> ks = key.KeySignature(2)
+    >>> ks
+    <music21.key.KeySignature of 2 sharps>
+    >>> eventList = keySignatureToMidiEvents(ks)
+    >>> eventList[1]
+    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\x02\\x00'>
+
+    >>> ks = key.KeySignature(-5)
+    >>> ks
+    <music21.key.KeySignature of 5 flats>
+    >>> eventList = keySignatureToMidiEvents(ks)
+    >>> eventList[1]
+    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\xfb\\x00'>
+    '''
+
+    mt = None # use a midi track set to None
+
+    eventList = []
+
+    dt = midiModule.DeltaTime(mt)
+    dt.time = 0 # set to zero; will be shifted later as necessary
+    # add to track events
+    eventList.append(dt)
+
+
+    sharpCount = ks.sharps
+    if ks.mode == 'minor':        
+        mode = 1
+    else: # major or None; must define one
+        mode = 0
+
+    me = midiModule.MidiEvent(mt)
+    me.type = "KEY_SIGNATURE"
+    me.channel = 1
+    me.time = None # not required
+    me.data = midiModule.putNumbersAsList([sharpCount, mode])
+    eventList.append(me)
+
+    return eventList 
 
 
 
@@ -558,6 +628,17 @@ def streamToMidiTrack(input, instObj=None, translateTimeSignature=True):
             t += tDif
             mt.events += sub
 
+        elif 'KeySignature' in classes:
+            tDif = (obj.offset * defaults.ticksPerQuarter) - t
+
+            environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
+
+            sub = keySignatureToMidiEvents(obj)
+            # for a ts, this will usually be zero, but not always
+            sub[0].time = int(round(tDif)) # set first delta 
+            t += tDif
+            mt.events += sub
+
         else: # other objects may have already been added
             pass
 
@@ -631,6 +712,8 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
     metaEvents = [] # store pairs of abs time, m21 object
     memo = [] # store already matched note off
     for i in range(len(events)):
+        #environLocal.printDebug(['paired events', events[i][0], events[i][1]])
+
         if i in memo:
             continue
         t, e = events[i]
@@ -651,7 +734,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
                 metaEvents.append([t, midiEventsToTimeSignature(e)])
 
             elif e.type == 'KEY_SIGNATURE':
-                metaEvents.append([t, midiEventToKeySignature(e)])
+                metaEvents.append([t, midiEventsToKeySignature(e)])
                 
             elif e.type == 'SET_TEMPO':
                 pass
@@ -859,7 +942,6 @@ class Test(unittest.TestCase):
     def testTimeSignature(self):
         import copy
         from music21 import note, stream, meter
-        environLocal.printDebug(['here!'])
         n = note.Note()
         n.quarterLength = .5
         s = stream.Stream()
@@ -881,6 +963,30 @@ class Test(unittest.TestCase):
         self.assertEqual(str(mtAlt.events), match)
 
 
+    def testKeySignature(self):
+        import copy
+        from music21 import note, stream, meter, key
+        n = note.Note()
+        n.quarterLength = .5
+        s = stream.Stream()
+        for i in range(20):
+            s.append(copy.deepcopy(n))
+
+        s.insert(0, meter.TimeSignature('3/4'))
+        s.insert(3, meter.TimeSignature('5/4'))
+        s.insert(8, meter.TimeSignature('2/4'))
+
+        s.insert(0, key.KeySignature(4))
+        s.insert(3, key.KeySignature(-5))
+        s.insert(8, key.KeySignature(6))
+
+        mt = streamToMidiTrack(s)
+        self.assertEqual(len(mt.events), 96)
+
+        #s.show('midi')
+        mtAlt = streamToMidiTrack(s.getElementsByClass('TimeSignature'))
+
+
 
 if __name__ == "__main__":
     import sys
@@ -891,4 +997,4 @@ if __name__ == "__main__":
         a = Test()
         #a.testPitchEquality()
 
-        a.testTimeSignature()
+        a.testKeySignature()

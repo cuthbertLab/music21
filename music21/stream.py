@@ -9304,21 +9304,7 @@ class Test(unittest.TestCase):
         #part.show('midi')
 
         mf = part.midiFile
-        match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'TIME_SIGNATURE', None),
-        (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), 
-        (0, 'NOTE_ON', 71), (1024, 'NOTE_OFF', 71), 
-        (0, 'NOTE_ON', 73), (1024, 'NOTE_OFF', 73), 
-        (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), 
-        (0, 'NOTE_ON', 68), (1024, 'NOTE_OFF', 68), 
-        (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), 
-        (0, 'NOTE_ON', 68), (2048, 'NOTE_OFF', 68), 
-        (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), 
-        (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), 
-        (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), # tied note here
-        (0, 'NOTE_ON', 66), (512, 'NOTE_OFF', 66), 
-        (0, 'NOTE_ON', 65), (512, 'NOTE_OFF', 65), 
-        (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), 
-        (0, 'END_OF_TRACK', None)]
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'KEY_SIGNATURE', None), (0, 'TIME_SIGNATURE', None), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 71), (1024, 'NOTE_OFF', 71), (0, 'NOTE_ON', 73), (1024, 'NOTE_OFF', 73), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 68), (1024, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 68), (2048, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (512, 'NOTE_OFF', 66), (0, 'NOTE_ON', 65), (512, 'NOTE_OFF', 65), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'END_OF_TRACK', None)] 
         procCompare(mf, match)
 
 

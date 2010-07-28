@@ -1090,15 +1090,27 @@ class Test(unittest.TestCase):
         # this produces numerous errors in makeMeasure partitioning
         fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test07.mid')
         #environLocal.printDebug(['\nopening fp', fp])
-
         s = parseFile(fp)
         #s.show('t')
-
-
         self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
         self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 1)
 
        
+
+
+        # this sample has dynamic changes in key signature
+        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test08.mid')
+        #environLocal.printDebug(['\nopening fp', fp])
+        s = parseFile(fp)
+        #s.show('t')
+        self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
+        found = s.flat.getElementsByClass('KeySignature')
+        self.assertEqual(len(found), 3)
+        # test the right keys
+        self.assertEqual(found[0].sharps, -3)
+        self.assertEqual(found[1].sharps, 3)
+        self.assertEqual(found[2].sharps, -1)
+
 
 
 #-------------------------------------------------------------------------------
