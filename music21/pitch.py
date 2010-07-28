@@ -584,56 +584,6 @@ class Accidental(music21.Music21Object):
 
 
 
-# def getEnharmonic(note1):
-#     '''Returns a new note that is the(/an) enharmonic equivalent of note1.
-# 
-#     N.B.: n1.name == getEnharmonic(getEnharmonic(n1)).name is not necessarily true.
-#     For instance: getEnharmonic(E##) => F#; getEnharmonic(F#) => G-
-#               or: getEnharmonic(A--) => G; getEnharmonic(G) => F##
-#     However, for all cases not involving double sharps or flats (and even many that do)
-#     getEnharmonic(getEnharmonic(n)) = n
-# 
-#     Enharmonics of the following are defined:
-#            C <-> B#, D <-> C##, E <-> F-; F <-> E#, G <-> F##, A <-> B--, B <-> C-
-# 
-#     However, areEnharmonics(A##, B) certainly returns true.
-# 
-#     Perhaps a getFirstNEnharmonics(n) needs to be defined which returns a list of the
-#     first n Enharmonics according to a particular algorithm, moving into triple sharps, etc.
-#     if need be.  Or getAllCommonEnharmonics(note) which returns all possible enharmonics that
-#     do not involve triple or more accidentals.
-# 
-#     '''
-#     # keep this in the pitch version
-# 
-#     pass
-# 
-# def flipEnharmonic(note1):
-#     '''like getEnharmonic, but alters the note that comes in'''
-#     pass
-# 
-# def getHigherEnharmonic(note1):
-#     '''returns the enharmonic note that is a dim-second above the current note'''
-#     pass
-# 
-# def getLowerEnharmonic(note1):
-#     '''returns the enharmonic note that is a dim-second below the current note'''
-#     pass
-# 
-# def areEnharmonics(note1, note2):
-#     # on Pitch, isEnharmonic(Pitch)
-#     pass
-# 
-# def getQuarterToneEnharmonic(note1):
-#     '''like getEnharmonic but handles quarterTones as well'''
-#     pass
-# 
-# def flipQuarterToneEnharmonic(note1):
-#     pass
-# 
-# def areQuarterToneEnharmonics(note1, note2):
-#     pass
-# 
 
 
 
@@ -1261,6 +1211,71 @@ class Pitch(music21.Music21Object):
         pass
 
     musicxml = property(_getMusicXML, _setMusicXML)
+
+
+
+    #---------------------------------------------------------------------------
+    def isEnharmonic(self, other):
+        '''Return True if other is an enharmonic equivalent of self. 
+
+        >>> from music21 import pitch
+        >>> p1 = pitch.Pitch('C#3')
+        >>> p2 = pitch.Pitch('D-3')
+        >>> p3 = pitch.Pitch('D#3')
+        >>> p1.isEnharmonic(p2)
+        True
+        >>> p2.isEnharmonic(p1)
+        True
+        >>> p3.isEnharmonic(p1)
+        False
+        '''
+        # if pitch space are equal, these are enharmoincs
+        if other.ps == self.ps:
+            return True
+        return False
+
+    def getHigherEnharmonic(self, inPlace=False):
+        '''Returns a Pitch enharmonic note that a dim-second above the current note'''
+        pass
+    
+    def getLowerEnharmonic(self, inPlace=False):
+        '''returns a Pitch enharmonic note that is a dim-second below the current note'''
+        pass
+
+    def getEnharmonic(self, inPlace=False):
+        '''Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
+    
+        N.B.: n1.name == getEnharmonic(getEnharmonic(n1)).name is not necessarily true.
+        For instance: getEnharmonic(E##) => F#; getEnharmonic(F#) => G-
+                  or: getEnharmonic(A--) => G; getEnharmonic(G) => F##
+        However, for all cases not involving double sharps or flats (and even many that do)
+        getEnharmonic(getEnharmonic(n)) = n
+    
+        Enharmonics of the following are defined:
+               C <-> B#, D <-> C##, E <-> F-; F <-> E#, G <-> F##, A <-> B--, B <-> C-
+    
+        However, areEnharmonics(A##, B) certainly returns true.
+    
+        OMIT_FROM_DOCS
+        Perhaps a getFirstNEnharmonics(n) needs to be defined which returns a list of the
+        first n Enharmonics according to a particular algorithm, moving into triple sharps, etc.
+        if need be.  Or getAllCommonEnharmonics(note) which returns all possible enharmonics that
+        do not involve triple or more accidentals.
+        '''
+        pass
+
+
+
+# not sure these are necessary
+# def getQuarterToneEnharmonic(note1):
+#     '''like getEnharmonic but handles quarterTones as well'''
+#     pass
+# 
+# def flipQuarterToneEnharmonic(note1):
+#     pass
+# 
+# def areQuarterToneEnharmonics(note1, note2):
+#     pass
 
 
 
