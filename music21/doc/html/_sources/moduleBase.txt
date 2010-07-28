@@ -17,6 +17,8 @@ Music21 base classes for :class:`~music21.stream.Stream` objects and elements co
 Music21Object
 -------------
 
+.. inheritance-diagram:: Music21Object
+
 .. class:: Music21Object(*arguments, **keywords)
 
     Base class for all music21 objects. All music21 objects encode 7 pieces of information: (1) id        : unique identification string (optional) (2) groups    : a Groups object: which is a list of strings identifying internal subcollections (voices, parts, selections) to which this element belongs (3) duration  : Duration object representing the length of the object (4) locations : a DefinedContexts object (see above) that specifies connections of this object to one location in another object (5) parent    : a reference or weakreference to a currently active Location (6) offset    : a float or duration specifying the position of the object in parent (7) contexts  : a list of references or weakrefs for current contexts of the object (similar to locations but without an offset) (8) priority  : int representing the position of an object among all objects at the same offset. Each of these may be passed in as a named keyword to any music21 object. Some of these may be intercepted by the subclassing object (e.g., duration within Note) 
@@ -56,7 +58,7 @@ Music21Object
 
         .. attribute:: classes
 
-            returns a list containing the names (strings, not objects) of classes that this object belongs to -- starting with the object's class name and going up the mro() for the object.  Very similar to Perl's @ISA array: 
+            Returns a list containing the names (strings, not objects) of classes that this object belongs to -- starting with the object's class name and going up the mro() for the object.  Very similar to Perl's @ISA array: 
 
             >>> from music21 import *
             >>> q = note.QuarterNote()
@@ -355,6 +357,8 @@ Music21Object
 ElementWrapper
 --------------
 
+.. inheritance-diagram:: ElementWrapper
+
 .. class:: ElementWrapper(obj)
 
     An element wraps any object that is not a :class:`~music21.base.Music21Object`, so that that object can be positioned within a :class:`~music21.stream.Stream`. The object stored within ElementWrapper is available from the the :attr:`~music21.base.ElementWrapper.obj` attribute. Providing an object at initialization is mandatory. 
@@ -465,6 +469,8 @@ ElementWrapper
 
 DefinedContexts
 ---------------
+
+.. inheritance-diagram:: DefinedContexts
 
 .. class:: DefinedContexts()
 

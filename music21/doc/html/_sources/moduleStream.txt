@@ -13,6 +13,8 @@ The :class:`~music21.stream.Stream` and its subclasses, a subclass of the :class
 Stream
 ------
 
+.. inheritance-diagram:: Stream
+
 .. class:: Stream(givenElements=None)
 
     This is the fundamental container for Music21Objects; objects may be ordered and/or placed in time based on offsets from the start of this container's offset. Like the base class, Music21Object, Streams have offsets, priority, id, and groups they also have an elements attribute which returns a list of elements; The Stream has a duration that is usually the release time of the chronologically last element in the Stream (that is, the highest onset plus duration of any element in the Stream). However, it can either explicitly set in which case we say that the duration is unlinked Streams may be embedded within other Streams. 
@@ -1377,6 +1379,8 @@ Stream
 Measure
 -------
 
+.. inheritance-diagram:: Measure
+
 .. class:: Measure(*args, **keywords)
 
     A representation of a Measure organized as a Stream. All properties of a Measure that are Music21 objects are found as part of the Stream's elements. 
@@ -1538,6 +1542,8 @@ Measure
 Page
 ----
 
+.. inheritance-diagram:: Page
+
 .. class:: Page(givenElements=None)
 
     Totally optional: designation that all the music in this Stream belongs on a single notated page 
@@ -1606,6 +1612,8 @@ Performer
 Score
 -----
 
+.. inheritance-diagram:: Score
+
 .. class:: Score(*args, **keywords)
 
     A Stream subclass for handling multi-part music. Absolutely optional (the largest containing Stream in a piece could be a generic Stream, or a Part, or a Staff).  And Scores can be embedded in other Scores (in fact, our original thought was to call this class a Fragment because of this possibility of continuous embedding), but we figure that many people will like calling the largest container a Score and that this will become a standard. 
@@ -1660,6 +1668,8 @@ Score
 Staff
 -----
 
+.. inheritance-diagram:: Staff
+
 .. class:: Staff(givenElements=None)
 
     A Stream subclass for designating music on a single staff 
@@ -1695,6 +1705,8 @@ Staff
 
 System
 ------
+
+.. inheritance-diagram:: System
 
 .. class:: System(givenElements=None)
 

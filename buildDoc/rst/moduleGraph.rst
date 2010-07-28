@@ -19,6 +19,8 @@ Object definitions for graphing and plotting :class:`~music21.stream.Stream` obj
 PlotHistogramPitchSpace
 -----------------------
 
+.. inheritance-diagram:: PlotHistogramPitchSpace
+
 .. class:: PlotHistogramPitchSpace(streamObj, *args, **keywords)
 
     A histogram of pitch space. 
@@ -53,6 +55,8 @@ PlotHistogramPitchSpace
 
 PlotHistogramPitchClass
 -----------------------
+
+.. inheritance-diagram:: PlotHistogramPitchClass
 
 .. class:: PlotHistogramPitchClass(streamObj, *args, **keywords)
 
@@ -91,6 +95,8 @@ PlotHistogramPitchClass
 PlotHistogramQuarterLength
 --------------------------
 
+.. inheritance-diagram:: PlotHistogramQuarterLength
+
 .. class:: PlotHistogramQuarterLength(streamObj, *args, **keywords)
 
     A histogram of pitch class 
@@ -128,6 +134,8 @@ PlotHistogramQuarterLength
 PlotScatterPitchSpaceQuarterLength
 ----------------------------------
 
+.. inheritance-diagram:: PlotScatterPitchSpaceQuarterLength
+
 .. class:: PlotScatterPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
     A scatter plot of pitch space and quarter length 
@@ -162,6 +170,8 @@ PlotScatterPitchSpaceQuarterLength
 
 PlotScatterPitchClassQuarterLength
 ----------------------------------
+
+.. inheritance-diagram:: PlotScatterPitchClassQuarterLength
 
 .. class:: PlotScatterPitchClassQuarterLength(streamObj, *args, **keywords)
 
@@ -198,6 +208,8 @@ PlotScatterPitchClassQuarterLength
 PlotScatterPitchClassOffset
 ---------------------------
 
+.. inheritance-diagram:: PlotScatterPitchClassOffset
+
 .. class:: PlotScatterPitchClassOffset(streamObj, *args, **keywords)
 
     A scatter plot of pitch class and offset 
@@ -232,6 +244,8 @@ PlotScatterPitchClassOffset
 
 PlotHorizontalBarPitchSpaceOffset
 ---------------------------------
+
+.. inheritance-diagram:: PlotHorizontalBarPitchSpaceOffset
 
 .. class:: PlotHorizontalBarPitchSpaceOffset(streamObj, *args, **keywords)
 
@@ -270,6 +284,8 @@ PlotHorizontalBarPitchSpaceOffset
 PlotHorizontalBarPitchClassOffset
 ---------------------------------
 
+.. inheritance-diagram:: PlotHorizontalBarPitchClassOffset
+
 .. class:: PlotHorizontalBarPitchClassOffset(streamObj, *args, **keywords)
 
     A graph of events, sorted by pitch class, over time 
@@ -296,6 +312,8 @@ PlotHorizontalBarPitchClassOffset
 
 PlotScatterWeightedPitchSpaceQuarterLength
 ------------------------------------------
+
+.. inheritance-diagram:: PlotScatterWeightedPitchSpaceQuarterLength
 
 .. class:: PlotScatterWeightedPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
@@ -324,6 +342,8 @@ PlotScatterWeightedPitchSpaceQuarterLength
 PlotScatterWeightedPitchClassQuarterLength
 ------------------------------------------
 
+.. inheritance-diagram:: PlotScatterWeightedPitchClassQuarterLength
+
 .. class:: PlotScatterWeightedPitchClassQuarterLength(streamObj, *args, **keywords)
 
     A graph of event, sorted by pitch class, over time. 
@@ -350,6 +370,8 @@ PlotScatterWeightedPitchClassQuarterLength
 
 Plot3DBarsPitchSpaceQuarterLength
 ---------------------------------
+
+.. inheritance-diagram:: Plot3DBarsPitchSpaceQuarterLength
 
 .. class:: Plot3DBarsPitchSpaceQuarterLength(streamObj, *args, **keywords)
 
@@ -386,6 +408,8 @@ Plot3DBarsPitchSpaceQuarterLength
 
 Graph
 -----
+
+.. inheritance-diagram:: Graph
 
 .. class:: Graph(*args, **keywords)
 
@@ -455,6 +479,8 @@ Graph
 Graph3DPolygonBars
 ------------------
 
+.. inheritance-diagram:: Graph3DPolygonBars
+
 .. class:: Graph3DPolygonBars(*args, **keywords)
 
     Graph multiple parallel bar graphs in 3D. This draws bars with polygons, a temporary alternative to using Graph3DBars, above. Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph. 
@@ -493,6 +519,8 @@ Graph3DPolygonBars
 
 GraphColorGrid
 --------------
+
+.. inheritance-diagram:: GraphColorGrid
 
 .. class:: GraphColorGrid(*args, **keywords)
 
@@ -629,6 +657,8 @@ GraphScatterWeighted
 Plot3DBars
 ----------
 
+.. inheritance-diagram:: Plot3DBars
+
 .. class:: Plot3DBars(streamObj, *args, **keywords)
 
     Base class for Stream plotting classes. 
@@ -653,6 +683,8 @@ Plot3DBars
 PlotColorGrid
 -------------
 
+.. inheritance-diagram:: PlotColorGrid
+
 .. class:: PlotColorGrid(streamObj, AnalysisProcessor, *args, **keywords)
 
 
@@ -675,6 +707,8 @@ PlotColorGrid
 
 PlotColorGridKrumhanslSchmuckler
 --------------------------------
+
+.. inheritance-diagram:: PlotColorGridKrumhanslSchmuckler
 
 .. class:: PlotColorGridKrumhanslSchmuckler(streamObj, *args, **keywords)
 
@@ -700,6 +734,8 @@ PlotColorGridKrumhanslSchmuckler
 PlotColorGridSadoianAmbitus
 ---------------------------
 
+.. inheritance-diagram:: PlotColorGridSadoianAmbitus
+
 .. class:: PlotColorGridSadoianAmbitus(streamObj, *args, **keywords)
 
     Subclass for plotting basic pitch span over a windowed analysis 
@@ -724,6 +760,8 @@ PlotColorGridSadoianAmbitus
 PlotHistogram
 -------------
 
+.. inheritance-diagram:: PlotHistogram
+
 .. class:: PlotHistogram(streamObj, *args, **keywords)
 
     Base class for Stream plotting classes. 
@@ -747,6 +785,8 @@ PlotHistogram
 
 PlotHorizontalBar
 -----------------
+
+.. inheritance-diagram:: PlotHorizontalBar
 
 .. class:: PlotHorizontalBar(streamObj, *args, **keywords)
 
@@ -774,6 +814,8 @@ PlotHorizontalBar
 PlotScatter
 -----------
 
+.. inheritance-diagram:: PlotScatter
+
 .. class:: PlotScatter(streamObj, *args, **keywords)
 
     Base class for 2D Scatter plots. 
@@ -797,6 +839,8 @@ PlotScatter
 
 PlotScatterPitchSpaceDynamicSymbol
 ----------------------------------
+
+.. inheritance-diagram:: PlotScatterPitchSpaceDynamicSymbol
 
 .. class:: PlotScatterPitchSpaceDynamicSymbol(streamObj, *args, **keywords)
 
@@ -833,6 +877,8 @@ PlotScatterPitchSpaceDynamicSymbol
 PlotScatterWeighted
 -------------------
 
+.. inheritance-diagram:: PlotScatterWeighted
+
 .. class:: PlotScatterWeighted(streamObj, *args, **keywords)
 
 
@@ -855,6 +901,8 @@ PlotScatterWeighted
 
 PlotScatterWeightedPitchSpaceDynamicSymbol
 ------------------------------------------
+
+.. inheritance-diagram:: PlotScatterWeightedPitchSpaceDynamicSymbol
 
 .. class:: PlotScatterWeightedPitchSpaceDynamicSymbol(streamObj, *args, **keywords)
 
@@ -882,6 +930,8 @@ PlotScatterWeightedPitchSpaceDynamicSymbol
 
 PlotStream
 ----------
+
+.. inheritance-diagram:: PlotStream
 
 .. class:: PlotStream(streamObj, flatten=True, *args, **keywords)
 

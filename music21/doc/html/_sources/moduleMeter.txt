@@ -103,6 +103,8 @@ This module defines the :class:`~music21.meter.TimeSignature` object, as well as
 TimeSignature
 -------------
 
+.. inheritance-diagram:: TimeSignature
+
 .. class:: TimeSignature(value=4/4, partitionRequest=None)
 
 
@@ -579,6 +581,8 @@ DurationDenominatorTimeSignature
 MeterSequence
 -------------
 
+.. inheritance-diagram:: MeterSequence
+
 .. class:: MeterSequence(value=None, partitionRequest=None)
 
     A meter sequence is a list of MeterTerminals, or other MeterSequences 
@@ -944,6 +948,8 @@ MeterSequence
 MeterTerminal
 -------------
 
+.. inheritance-diagram:: MeterTerminal
+
 .. class:: MeterTerminal(slashNotation=None, weight=1)
 
     A MeterTerminal is a nestable primitive of rhythmic division 
@@ -1044,6 +1050,8 @@ MeterTerminal
 
 NonPowerOfTwoTimeSignature
 --------------------------
+
+.. inheritance-diagram:: NonPowerOfTwoTimeSignature
 
 .. class:: NonPowerOfTwoTimeSignature(value=4/4, partitionRequest=None)
 

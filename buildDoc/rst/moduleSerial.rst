@@ -46,6 +46,8 @@ ToneRow
 TwelveToneRow
 -------------
 
+.. inheritance-diagram:: TwelveToneRow
+
 .. class:: TwelveToneRow()
 
     A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix. 
@@ -105,6 +107,8 @@ TwelveToneMatrix
 
 HistoricalTwelveToneRow
 -----------------------
+
+.. inheritance-diagram:: HistoricalTwelveToneRow
 
 .. class:: HistoricalTwelveToneRow()
 

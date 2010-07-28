@@ -17,6 +17,8 @@ This module defines numerous subclasses of :class:`~music21.clef.Clef`, providin
 Clef
 ----
 
+.. inheritance-diagram:: Clef
+
 .. class:: Clef()
 
 
@@ -179,6 +181,8 @@ CBaritoneClef
 CClef
 -----
 
+.. inheritance-diagram:: CClef
+
 .. class:: CClef()
 
 
@@ -240,6 +244,8 @@ FBaritoneClef
 FClef
 -----
 
+.. inheritance-diagram:: FClef
+
 .. class:: FClef()
 
 
@@ -293,6 +299,8 @@ FrenchViolinClef
 
 GClef
 -----
+
+.. inheritance-diagram:: GClef
 
 .. class:: GClef()
 
@@ -381,6 +389,8 @@ PercussionClef
 
 PitchClef
 ---------
+
+.. inheritance-diagram:: PitchClef
 
 .. class:: PitchClef()
 

@@ -1,6 +1,11 @@
 
 from music21.note import Note
 
+
+
+# this functionality is moving to Pitch
+
+
 def getEnharmonic(note1):
     '''Returns a new note that is the(/an) enharmonic equivalent of note1.
 
@@ -21,6 +26,8 @@ def getEnharmonic(note1):
     do not involve triple or more accidentals.
 
     '''
+    # keep this in the pitch version
+
     pass
 
 def flipEnharmonic(note1):
@@ -36,6 +43,7 @@ def getLowerEnharmonic(note1):
     pass
 
 def areEnharmonics(note1, note2):
+    # on Pitch, isEnharmonic(Pitch)
     pass
 
 def getQuarterToneEnharmonic(note1):

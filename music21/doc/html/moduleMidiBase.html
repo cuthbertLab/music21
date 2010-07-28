@@ -101,13 +101,23 @@
 <dl class="function">
 <dt id="music21.midi.base.getNumber">
 <tt class="descclassname">music21.midi.base.</tt><tt class="descname">getNumber</tt><big>(</big><em>str</em>, <em>length</em><big>)</big><a class="headerlink" href="#music21.midi.base.getNumber" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the value of a string byte from and 8-bit string.</p>
+<dd><p>Return the value of a string byte from and 8-bit string. This will sum a length greater than 1 if desired.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getNumber</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">,</span> <span class="mf">0</span><span class="p">)</span>
 <span class="go">(0, &#39;test&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">getNumber</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
 <span class="go">(29797, &#39;st&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">getNumber</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
 <span class="go">(1952805748, &#39;&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="music21.midi.base.getNumbersAsList">
+<tt class="descclassname">music21.midi.base.</tt><tt class="descname">getNumbersAsList</tt><big>(</big><em>str</em><big>)</big><a class="headerlink" href="#music21.midi.base.getNumbersAsList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate each char into a number, return in a list. Used for reading data messages where each byte encodes a different discrete value.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getNumbersAsList</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\x00\x00\x00\x03</span><span class="s">&#39;</span><span class="p">)</span>
+<span class="go">[0, 0, 0, 3]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -138,6 +148,16 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="music21.midi.base.putNumbersAsList">
+<tt class="descclassname">music21.midi.base.</tt><tt class="descname">putNumbersAsList</tt><big>(</big><em>numList</em><big>)</big><a class="headerlink" href="#music21.midi.base.putNumbersAsList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate a list of numbers into a character byte strings. Used for encoding data messages where each byte encodes a different discrete value.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">putNumbersAsList</span><span class="p">([</span><span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">3</span><span class="p">])</span>
+<span class="go">&#39;\x00\x00\x00\x03&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="music21.midi.base.putVariableLengthNumber">
 <tt class="descclassname">music21.midi.base.</tt><tt class="descname">putVariableLengthNumber</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#music21.midi.base.putVariableLengthNumber" title="Permalink to this definition">¶</a></dt>
 <dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">putVariableLengthNumber</span><span class="p">(</span><span class="mf">4</span><span class="p">)</span>
@@ -150,6 +170,22 @@
 
 <div class="section" id="deltatime">
 <h2>DeltaTime<a class="headerlink" href="#deltatime" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="_images/inheritance-ad3673553600ab6f44e3d75ebaeac1a759036e73.png" alt="digraph inheritance13c6082cad {
+rankdir=TB;
+ranksep=0.2;
+fontsize=6;
+nodesep=0.2;
+size=&quot;8.0, 12.0&quot;;
+  &quot;music21.midi.base.DeltaTime&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.midi.base.DeltaTime&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
+  &quot;music21.midi.base.MidiEvent&quot; -&gt; &quot;music21.midi.base.DeltaTime&quot; [arrowsize=0.7,style=&quot;setlinewidth(0.5)&quot;,arrowtail=empty,color=&quot;#666666&quot;,arrowhead=none,dir=back];
+  &quot;music21.midi.base.MidiEvent&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.midi.base.MidiEvent&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
+}" usemap="#inheritance13c6082cad" class="inheritance"/>
+<map id="inheritance13c6082cad" name="inheritance13c6082cad">
+<area shape="rect" id="node1" href="#music21.midi.base.DeltaTime" title="music21.midi.base.DeltaTime" alt="" coords="5,48,197,72"/>
+<area shape="rect" id="node2" href="#music21.midi.base.MidiEvent" title="music21.midi.base.MidiEvent" alt="" coords="5,5,197,29"/>
+</map>
+</p>
 <dl class="class">
 <dt id="music21.midi.base.DeltaTime">
 <em class="property">
@@ -182,6 +218,19 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
 </div>
 <div class="section" id="enumeration">
 <h2>Enumeration<a class="headerlink" href="#enumeration" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="_images/inheritance-7edf91cab486e8f92aad71d33c523bcb4c19a832.png" alt="digraph inheritance9eb9c8af14 {
+rankdir=TB;
+ranksep=0.2;
+fontsize=6;
+nodesep=0.2;
+size=&quot;8.0, 12.0&quot;;
+  &quot;music21.midi.base.Enumeration&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.midi.base.Enumeration&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
+}" usemap="#inheritance9eb9c8af14" class="inheritance"/>
+<map id="inheritance9eb9c8af14" name="inheritance9eb9c8af14">
+<area shape="rect" id="node1" href="#music21.midi.base.Enumeration" title="music21.midi.base.Enumeration" alt="" coords="5,5,200,29"/>
+</map>
+</p>
 <dl class="class">
 <dt id="music21.midi.base.Enumeration">
 <em class="property">
@@ -210,6 +259,19 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
 </div>
 <div class="section" id="midichannel">
 <h2>MidiChannel<a class="headerlink" href="#midichannel" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="_images/inheritance-b29d3c53f3ffa9d9ee1392072b1d8d82fd4073be.png" alt="digraph inheritance2aa1f55804 {
+rankdir=TB;
+ranksep=0.2;
+fontsize=6;
+nodesep=0.2;
+size=&quot;8.0, 12.0&quot;;
+  &quot;music21.midi.base.MidiChannel&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.midi.base.MidiChannel&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
+}" usemap="#inheritance2aa1f55804" class="inheritance"/>
+<map id="inheritance2aa1f55804" name="inheritance2aa1f55804">
+<area shape="rect" id="node1" href="#music21.midi.base.MidiChannel" title="music21.midi.base.MidiChannel" alt="" coords="5,5,197,29"/>
+</map>
+</p>
 <dl class="class">
 <dt id="music21.midi.base.MidiChannel">
 <em class="property">
@@ -236,6 +298,19 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
 </div>
 <div class="section" id="midievent">
 <h2>MidiEvent<a class="headerlink" href="#midievent" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="_images/inheritance-6c9a04eb41de7a29e449eec5a45a94250cf37d9e.png" alt="digraph inheritance31d4ebe353 {
+rankdir=TB;
+ranksep=0.2;
+fontsize=6;
+nodesep=0.2;
+size=&quot;8.0, 12.0&quot;;
+  &quot;music21.midi.base.MidiEvent&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.midi.base.MidiEvent&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
+}" usemap="#inheritance31d4ebe353" class="inheritance"/>
+<map id="inheritance31d4ebe353" name="inheritance31d4ebe353">
+<area shape="rect" id="node1" href="#music21.midi.base.MidiEvent" title="music21.midi.base.MidiEvent" alt="" coords="5,5,197,29"/>
+</map>
+</p>
 <dl class="class">
 <dt id="music21.midi.base.MidiEvent">
 <em class="property">
@@ -354,6 +429,19 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
 </div>
 <div class="section" id="midifile">
 <h2>MidiFile<a class="headerlink" href="#midifile" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="_images/inheritance-104d1f305c9e3fa0f769d942826db79b91c76002.png" alt="digraph inheritance6768f142d5 {
+rankdir=TB;
+ranksep=0.2;
+fontsize=6;
+nodesep=0.2;
+size=&quot;8.0, 12.0&quot;;
+  &quot;music21.midi.base.MidiFile&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.midi.base.MidiFile&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
+}" usemap="#inheritance6768f142d5" class="inheritance"/>
+<map id="inheritance6768f142d5" name="inheritance6768f142d5">
+<area shape="rect" id="node1" href="#music21.midi.base.MidiFile" title="music21.midi.base.MidiFile" alt="" coords="5,5,197,29"/>
+</map>
+</p>
 <dl class="class">
 <dt id="music21.midi.base.MidiFile">
 <em class="property">
@@ -412,6 +500,19 @@ Attributes without Documentation: <cite>ticksPerSecond</cite>, <cite>tracks</cit
 </div>
 <div class="section" id="miditrack">
 <h2>MidiTrack<a class="headerlink" href="#miditrack" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="_images/inheritance-14bbdb0a456162d89bb304bdd099f139a0d9f898.png" alt="digraph inheritance35c2cb96d6 {
+rankdir=TB;
+ranksep=0.2;
+fontsize=6;
+nodesep=0.2;
+size=&quot;8.0, 12.0&quot;;
+  &quot;music21.midi.base.MidiTrack&quot; [fontname=Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans,color=&quot;#666666&quot;,URL=&quot;#music21.midi.base.MidiTrack&quot;,style=&quot;filled&quot;,height=0.25,width=2,shape=box,fontsize=8,fillcolor=&quot;#605C7F&quot;,fontcolor=&quot;#ffffff&quot;];
+}" usemap="#inheritance35c2cb96d6" class="inheritance"/>
+<map id="inheritance35c2cb96d6" name="inheritance35c2cb96d6">
+<area shape="rect" id="node1" href="#music21.midi.base.MidiTrack" title="music21.midi.base.MidiTrack" alt="" coords="5,5,197,29"/>
+</map>
+</p>
 <dl class="class">
 <dt id="music21.midi.base.MidiTrack">
 <em class="property">
@@ -474,7 +575,7 @@ class </em><tt class="descclassname">music21.midi.base.</tt><tt class="descname"
     </div>
     <div class="footer">
       &copy; Copyright 2009-2010 The music21 Project.
-      Last updated on Jul 23, 2010.
+      Last updated on Jul 28, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

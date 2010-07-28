@@ -16,7 +16,7 @@ Objects and tools for processing MIDI data. This module uses routines from Will 
 
 .. function:: getNumber(str, length)
 
-    Return the value of a string byte from and 8-bit string. 
+    Return the value of a string byte from and 8-bit string. This will sum a length greater than 1 if desired. 
 
     >>> getNumber('test', 0)
     (0, 'test') 
@@ -24,6 +24,13 @@ Objects and tools for processing MIDI data. This module uses routines from Will 
     (29797, 'st') 
     >>> getNumber('test', 4)
     (1952805748, '') 
+
+.. function:: getNumbersAsList(str)
+
+    Translate each char into a number, return in a list. Used for reading data messages where each byte encodes a different discrete value. 
+
+    >>> getNumbersAsList('\x00\x00\x00\x03')
+    [0, 0, 0, 3] 
 
 .. function:: getStartEvents(mt=None, partName=, partProgram=0)
 
@@ -45,6 +52,13 @@ Objects and tools for processing MIDI data. This module uses routines from Will 
     >>> putNumber(0, 1)
     '\x00' 
 
+.. function:: putNumbersAsList(numList)
+
+    Translate a list of numbers into a character byte strings. Used for encoding data messages where each byte encodes a different discrete value. 
+
+    >>> putNumbersAsList([0, 0, 0, 3])
+    '\x00\x00\x00\x03' 
+
 .. function:: putVariableLengthNumber(x)
 
     
@@ -56,6 +70,8 @@ Objects and tools for processing MIDI data. This module uses routines from Will 
 
 DeltaTime
 ---------
+
+.. inheritance-diagram:: DeltaTime
 
 .. class:: DeltaTime(track)
 
@@ -87,6 +103,8 @@ DeltaTime
 Enumeration
 -----------
 
+.. inheritance-diagram:: Enumeration
+
 .. class:: Enumeration(enumList)
 
     Utility object for defining binary MIDI message constants. 
@@ -111,6 +129,8 @@ Enumeration
 MidiChannel
 -----------
 
+.. inheritance-diagram:: MidiChannel
+
 .. class:: MidiChannel(track, index)
 
     A channel (together with a track) provides the continuity connecting a NOTE_ON event with its corresponding NOTE_OFF event. Together, those define the beginning and ending times for a Note. 
@@ -132,6 +152,8 @@ MidiChannel
 
 MidiEvent
 ---------
+
+.. inheritance-diagram:: MidiEvent
 
 .. class:: MidiEvent(track)
 
@@ -237,6 +259,8 @@ MidiEvent
 MidiFile
 --------
 
+.. inheritance-diagram:: MidiFile
+
 .. class:: MidiFile()
 
     Low MIDI file writing, emulating methods from normal Python files. The `ticksPerQuarterNote` attribute must be set before writing. 1024 is a common value. 
@@ -285,6 +309,8 @@ MidiFile
 
 MidiTrack
 ---------
+
+.. inheritance-diagram:: MidiTrack
 
 .. class:: MidiTrack(index)
 

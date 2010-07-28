@@ -13,6 +13,8 @@ The environment module describes an object for accessing and setting variables r
 Environment
 -----------
 
+.. inheritance-diagram:: Environment
+
 .. class:: Environment(modName=None)
 
     The Environment object stores user preferences as dictionary-like object. 

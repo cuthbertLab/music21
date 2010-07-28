@@ -74,6 +74,8 @@ Classes and functions for creating and processing metadata associated with score
 Text
 ----
 
+.. inheritance-diagram:: Text
+
 .. class:: Text(data=, language=None)
 
     One unit of text data: a title, a name, or some other text data. Store the string and a language name or code. This object can be used and/or subclassed for a variety for of text storage. 
@@ -100,6 +102,8 @@ Text
 
 Date
 ----
+
+.. inheritance-diagram:: Date
 
 .. class:: Date(*args, **keywords)
 
@@ -219,6 +223,8 @@ Date
 DateSingle
 ----------
 
+.. inheritance-diagram:: DateSingle
+
 .. class:: DateSingle(data=, relevance=certain)
 
     Store a date, either as certain, approximate, or uncertain relevance. The relevance attribute is limited within each DateSingle subclass depending on the design of the class. Alternative relevance types should be configured as other DateSingle subclasses. 
@@ -316,6 +322,8 @@ DateSelection
 Contributor
 -----------
 
+.. inheritance-diagram:: Contributor
+
 .. class:: Contributor(*args, **keywords)
 
     A person that contributed to a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements. 
@@ -404,6 +412,8 @@ Contributor
 
 Metadata
 --------
+
+.. inheritance-diagram:: Metadata
 
 .. class:: Metadata(*args, **keywords)
 

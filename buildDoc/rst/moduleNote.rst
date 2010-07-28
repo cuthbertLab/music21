@@ -20,6 +20,8 @@ Classes and functions for creating and manipulating notes, ties, and durations. 
 Note
 ----
 
+.. inheritance-diagram:: Note
+
 .. class:: Note(*arguments, **keywords)
 
     Note class for notes (not rests or unpitched elements) that can be represented by one or more notational units A Note knows both its total duration and how to express itself as a set of tied notes of different lengths. For instance, a note of 2.5 quarters in length could be half tied to eighth or dotted quarter tied to quarter. A ComplexNote will eventually be smart enough that if given a duration in quarters it will try to figure out a way to express itself as best it can if it needs to be represented on page.  It does not know this now. 
@@ -166,6 +168,8 @@ Note
 Rest
 ----
 
+.. inheritance-diagram:: Rest
+
 .. class:: Rest(*arguments, **keywords)
 
     General rest class 
@@ -226,6 +230,8 @@ EighthNote
 
 GeneralNote
 -----------
+
+.. inheritance-diagram:: GeneralNote
 
 .. class:: GeneralNote(*arguments, **keywords)
 
@@ -428,6 +434,8 @@ HalfNote
 Lyric
 -----
 
+.. inheritance-diagram:: Lyric
+
 .. class:: Lyric(text=None, number=1, syllabic=None)
 
 
@@ -453,6 +461,8 @@ Lyric
 
 NotRest
 -------
+
+.. inheritance-diagram:: NotRest
 
 .. class:: NotRest(*arguments, **keywords)
 
@@ -514,6 +524,8 @@ QuarterNote
 Tie
 ---
 
+.. inheritance-diagram:: Tie
+
 .. class:: Tie(tievalue=start)
 
     Object added to notes that are tied to other notes. The `type` value is generally one of start or stop. 
@@ -557,6 +569,8 @@ Tie
 
 Unpitched
 ---------
+
+.. inheritance-diagram:: Unpitched
 
 .. class:: Unpitched(*arguments, **keywords)
 

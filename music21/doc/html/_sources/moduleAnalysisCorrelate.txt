@@ -13,6 +13,8 @@ Various tools and utilities to find correlations between disparate objects in a 
 ActivityMatch
 -------------
 
+.. inheritance-diagram:: ActivityMatch
+
 .. class:: ActivityMatch(streamObj)
 
     Given a Stream, find if one object is active while another is also active. Plotting routines to graph the output of dedicated methods in this class are available. :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol` and :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol` employs the :meth:`~music21.analysis.correlate.ActivityMatch.pitchToDynamic` method. Sample output is as follows: 

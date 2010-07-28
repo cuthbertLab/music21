@@ -13,6 +13,8 @@ This module provides object representations of expression notation symbols.
 Fermata
 -------
 
+.. inheritance-diagram:: Fermata
+
 .. class:: Fermata(*arguments, **keywords)
 
 
@@ -44,6 +46,8 @@ Fermata
 
 GeneralMordent
 --------------
+
+.. inheritance-diagram:: GeneralMordent
 
 .. class:: GeneralMordent(*arguments, **keywords)
 
@@ -124,6 +128,8 @@ Mordent
 Ornament
 --------
 
+.. inheritance-diagram:: Ornament
+
 .. class:: Ornament(*arguments, **keywords)
 
 
@@ -146,6 +152,8 @@ Ornament
 
 Trill
 -----
+
+.. inheritance-diagram:: Trill
 
 .. class:: Trill(*arguments, **keywords)
 

@@ -1695,6 +1695,8 @@ class Stream(music21.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: this probably needs to deepcopy the new first measure.
+
+        TODO: for any stream w/o measures call mekeMeasures
         '''
         
         # create a dictionary of measure number, list of Meaures
@@ -1810,6 +1812,7 @@ class Stream(music21.Music21Object):
         return self.getElementsByClass(Measure)
 
     measures = property(getMeasures)
+    # rename ._measureElements?
 
     def measureOffsetMap(self, classFilterList=None):
         '''If this Stream contains Measures, provide a dictionary where keys are offsets and values are a list of references to one or more Measures that start at that offset. The offset values is always in the frame of the calling Stream (self).

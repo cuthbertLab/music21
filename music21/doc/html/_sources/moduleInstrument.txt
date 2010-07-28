@@ -13,6 +13,8 @@ This module defines object models for instrument representations. Metadata for i
 Instrument
 ----------
 
+.. inheritance-diagram:: Instrument
+
 .. class:: Instrument()
 
 
@@ -58,6 +60,8 @@ Bassoon
 
 StringInstrument
 ----------------
+
+.. inheritance-diagram:: StringInstrument
 
 .. class:: StringInstrument()
 
@@ -105,6 +109,8 @@ StringInstrument
 Viola
 -----
 
+.. inheritance-diagram:: Viola
+
 .. class:: Viola()
 
 
@@ -138,6 +144,8 @@ Viola
 Violin
 ------
 
+.. inheritance-diagram:: Violin
+
 .. class:: Violin()
 
 
@@ -170,6 +178,8 @@ Violin
 
 Violoncello
 -----------
+
+.. inheritance-diagram:: Violoncello
 
 .. class:: Violoncello()
 

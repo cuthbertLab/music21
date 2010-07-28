@@ -13,6 +13,8 @@ tinyNotation -- a simple way of specifying single line melodies that uses a nota
 TinyNotationNote
 ----------------
 
+.. inheritance-diagram:: TinyNotationNote
+
 .. class:: TinyNotationNote(stringRep, storedDict={})
 
     
@@ -47,6 +49,8 @@ TinyNotationNote
 
 TinyNotationStream
 ------------------
+
+.. inheritance-diagram:: TinyNotationStream
 
 .. class:: TinyNotationStream(stringRep=, timeSignature=None)
 
@@ -119,6 +123,8 @@ HarmonyStream
 
 HarmonyNote
 -----------
+
+.. inheritance-diagram:: HarmonyNote
 
 .. class:: HarmonyNote(stringRep, storedDict={})
 

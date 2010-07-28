@@ -283,6 +283,7 @@ music21.common.Scalar.toFloat method moduleCommon.html
 music21.common.getNumFromStr function moduleCommon.html
 music21.interval.DiatonicInterval.getChromatic method moduleInterval.html
 music21.metadata.DateSelection class moduleMetadata.html
+music21.stream.Stream.plot method moduleStream.html
 music21.stream.Stream.midiFile attribute moduleStream.html
 music21.interval.ChromaticInterval class moduleInterval.html
 music21.note.Note.midiEvents attribute moduleNote.html
@@ -693,7 +694,7 @@ music21.graph.PlotStream.ticksPitchClass method moduleGraph.html
 music21.tinyNotation.TinyNotationNote.customPitchMatch method moduleTinyNotation.html
 music21.meter.NonPowerOfTwoTimeSignature class moduleMeter.html
 music21.meter.MeterSequence.depth attribute moduleMeter.html
-music21.stream.Stream.plot method moduleStream.html
+music21.midi.base.putNumbersAsList function moduleMidiBase.html
 music21.environment.Environment.write method moduleEnvironment.html
 music21.instrument.Violoncello.lowestNote attribute moduleInstrument.html
 music21.serial.RowWebernOp28 class moduleSerial.html
@@ -875,6 +876,7 @@ music21.serial.RowSchoenbergOp50C class moduleSerial.html
 music21.converter.ConverterMusicXML.getPartNames method moduleConverter.html
 music21.serial.RowBergLyricSuitePerm class moduleSerial.html
 music21.graph.Graph.process method moduleGraph.html
+music21.midi.base.getNumbersAsList function moduleMidiBase.html
 music21.chord.Chord.canBeDominantV method moduleChord.html
 music21.meter.MeterSequence.partition method moduleMeter.html
 music21.base.Music21Object.freezeIds method moduleBase.html

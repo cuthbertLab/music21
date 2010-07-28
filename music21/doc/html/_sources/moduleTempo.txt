@@ -13,6 +13,8 @@ This module defines objects for describing tempo and changes in tempo.
 TempoMark
 ---------
 
+.. inheritance-diagram:: TempoMark
+
 .. class:: TempoMark(value=None)
 
     
@@ -59,6 +61,8 @@ TempoMark
 
 MetronomeMark
 -------------
+
+.. inheritance-diagram:: MetronomeMark
 
 .. class:: MetronomeMark(number=60, referent=None)
 

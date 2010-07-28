@@ -132,6 +132,8 @@ Classes and functions for creating and manipulating pitches, pitch-space, and ac
 Pitch
 -----
 
+.. inheritance-diagram:: Pitch
+
 .. class:: Pitch(name=None)
 
     An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three. 
@@ -418,6 +420,8 @@ Pitch
 
 Accidental
 ----------
+
+.. inheritance-diagram:: Accidental
 
 .. class:: Accidental(specifier=natural)
 

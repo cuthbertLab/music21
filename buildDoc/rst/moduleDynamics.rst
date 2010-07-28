@@ -23,6 +23,8 @@ Classes and functions for creating and manipulating dynamic symbols. Rather than
 Dynamic
 -------
 
+.. inheritance-diagram:: Dynamic
+
 .. class:: Dynamic(value=None)
 
     Object representation of Dyanmics. 
@@ -96,6 +98,8 @@ Dynamic
 
 Wedge
 -----
+
+.. inheritance-diagram:: Wedge
 
 .. class:: Wedge(value=None)
 

@@ -16,6 +16,8 @@ An object base-class for creating and editing specialized XML structures as obje
 Node
 ----
 
+.. inheritance-diagram:: Node
+
 .. class:: Node()
 
 
@@ -80,6 +82,8 @@ Node
 
 NodeList
 --------
+
+.. inheritance-diagram:: NodeList
 
 .. class:: NodeList()
 

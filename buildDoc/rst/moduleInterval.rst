@@ -256,6 +256,8 @@ This module defines various types of interval objects. Fundamental classes are :
 Interval
 --------
 
+.. inheritance-diagram:: Interval
+
 .. class:: Interval(*arguments, **keywords)
 
     An Interval class that encapsulates both a chromatic and diatonic intervals all in one model. The interval is specified either as named arguments, a :class:`~music21.interval.DiatonicInterval` and a :class:`~music21.interval.ChromaticInterval`, or two :class:`~music21.note.Note` objects, from which both a ChromaticInterval and DiatonicInterval are derived. 
@@ -448,6 +450,8 @@ Interval
 ChromaticInterval
 -----------------
 
+.. inheritance-diagram:: ChromaticInterval
+
 .. class:: ChromaticInterval(value)
 
     Chromatic interval class. Unlike a Diatonic interval, this Interval class treats interval spaces in half-steps. 
@@ -510,6 +514,8 @@ ChromaticInterval
 
 DiatonicInterval
 ----------------
+
+.. inheritance-diagram:: DiatonicInterval
 
 .. class:: DiatonicInterval(specifier, generic)
 
@@ -600,6 +606,8 @@ DiatonicInterval
 
 GenericInterval
 ---------------
+
+.. inheritance-diagram:: GenericInterval
 
 .. class:: GenericInterval(value)
 

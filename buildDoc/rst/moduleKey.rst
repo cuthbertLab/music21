@@ -69,6 +69,8 @@ This module defines objects for representing key signatures, as well as key area
 KeySignature
 ------------
 
+.. inheritance-diagram:: KeySignature
+
 .. class:: KeySignature(sharps=None)
 
 
@@ -246,6 +248,8 @@ KeySignature
 
 Key
 ---
+
+.. inheritance-diagram:: Key
 
 .. class:: Key(stream1=None)
 

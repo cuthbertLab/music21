@@ -44,6 +44,8 @@ Public interface for importing various file formats into music21. The most power
 Converter
 ---------
 
+.. inheritance-diagram:: Converter
+
 .. class:: Converter()
 
     A class used for converting all supported data formats into music21 objects. Not a subclass, but a wrapper for different converter objects based on format. 
@@ -73,6 +75,8 @@ Converter
 
 ConverterMusicXML
 -----------------
+
+.. inheritance-diagram:: ConverterMusicXML
 
 .. class:: ConverterMusicXML(forceSource)
 
@@ -108,6 +112,8 @@ ConverterMusicXML
 ConverterHumdrum
 ----------------
 
+.. inheritance-diagram:: ConverterHumdrum
+
 .. class:: ConverterHumdrum()
 
     Simple class wrapper for parsing Humdrum data provided in a file or in a string. 
@@ -136,6 +142,8 @@ ConverterHumdrum
 ArchiveFilter
 -------------
 
+.. inheritance-diagram:: ArchiveFilter
+
 .. class:: ArchiveFilter(fp, format=zip)
 
     Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive. 
@@ -155,6 +163,8 @@ ArchiveFilter
 
 ConverterMidi
 -------------
+
+.. inheritance-diagram:: ConverterMidi
 
 .. class:: ConverterMidi()
 
@@ -181,6 +191,8 @@ ConverterMidi
 
 ConverterTinyNotation
 ---------------------
+
+.. inheritance-diagram:: ConverterTinyNotation
 
 .. class:: ConverterTinyNotation()
 
@@ -210,6 +222,8 @@ ConverterTinyNotation
 PickleFilter
 ------------
 
+.. inheritance-diagram:: PickleFilter
+
 .. class:: PickleFilter(fp, forceSource=False)
 
     Before opening a file path, this class can check if there is an up to date version pickled and stored in the scratch directory. If the user has not specified a scratch directory, a pickle path will not be created. 
@@ -227,6 +241,8 @@ PickleFilter
 
 StreamFreezer
 -------------
+
+.. inheritance-diagram:: StreamFreezer
 
 .. class:: StreamFreezer(streamObj=None)
 

@@ -13,6 +13,8 @@ This module defines the Chord object, a sub-class of :class:`~music21.note.Gener
 Chord
 -----
 
+.. inheritance-diagram:: Chord
+
 .. class:: Chord(notes=[], **keywords)
 
     Class for dealing with chords A Chord is like a Note object but has multiple pitches. Create chords by creating Notes or Pitches: 

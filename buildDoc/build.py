@@ -826,7 +826,7 @@ class RestructuredWriter(object):
             for stub in rstExclude:
                 if line.startswith(stub):
                     # do not strip
-                    environLocal.printDebug(['found rst in doc string:', repr(lineSrc)])
+                    #environLocal.printDebug(['found rst in doc string:', repr(lineSrc)])
                     if stub == '.. image::':
                         lineSrc = lineSrc.rstrip()
                         sub.append('\n\n' + lineSrc) # do not strip
@@ -1066,6 +1066,9 @@ class ClassDoc(RestructuredWriter):
         classNameStr = '%s' % self.name
         msg += self._heading(classNameStr, '-')
 
+        if not self._isAllInherited():
+            msg += [".. inheritance-diagram:: %s\n\n" % classNameStr]
+
         # see if this class has __init__ documentation
         signature = self.partitionedClass.getSignature('__init__')
         titleStr = '.. class:: %s%s\n\n' % (self.name, signature)
@@ -1088,7 +1091,7 @@ class ClassDoc(RestructuredWriter):
         # if all names are inherited (the are not newly defined) then skip
         # documentation of values
         if self._isAllInherited():
-            environLocal.printDebug([self.name, 'skipping detailed component documentation'])
+            #environLocal.printDebug([self.name, 'skipping detailed component documentation'])
             msg.append('\n'*1)
             return msg
 

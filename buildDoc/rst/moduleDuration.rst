@@ -306,6 +306,8 @@ Music21 Durations are almost always measured in QuarterNotes, so an eighth note 
 Duration
 --------
 
+.. inheritance-diagram:: Duration
+
 .. class:: Duration(*arguments, **keywords)
 
     Durations are one of the most important objects in music21. A Duration represents a span of musical time measurable in terms of quarter notes (or in advanced usage other units). For instance, "57 quarter notes" or "dotted half tied to quintuplet sixteenth note" or simply "quarter note." A Duration object is made of one or more DurationUnit objects stored on the `components` list. Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Duration objects are not expressable as a single notation unit. Duration objects are not Music21Objects. Duration objects share many properties and attributes with DurationUnit objects, but Duration is not a subclass of DurationUnit. 
@@ -583,6 +585,8 @@ Duration
 Tuplet
 ------
 
+.. inheritance-diagram:: Tuplet
+
 .. class:: Tuplet(*arguments, **keywords)
 
     A tuplet object is a representation of one or more ratios that modify duration values and are stored in Duration objects. Note that this is a duration modifier.  We should also have a tupletGroup object that groups note objects into larger groups. 
@@ -758,6 +762,8 @@ AppogiaturaStopDuration
 DurationCommon
 --------------
 
+.. inheritance-diagram:: DurationCommon
+
 .. class:: DurationCommon
 
     A base class for both Duration and DurationUnit objects. 
@@ -785,6 +791,8 @@ DurationCommon
 
 DurationUnit
 ------------
+
+.. inheritance-diagram:: DurationUnit
 
 .. class:: DurationUnit(prototype=quarter)
 

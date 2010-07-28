@@ -13,6 +13,8 @@ Editorial objects store comments and other meta-data associated with specific :c
 NoteEditorial
 -------------
 
+.. inheritance-diagram:: NoteEditorial
+
 .. class:: NoteEditorial()
 
     Editorial comments and special effects that can be applied to notes Standard ones are stored as attributes.  Non-standard/one-off effects are stored in the dict called "misc":: 
@@ -134,6 +136,8 @@ NoteEditorial
 
 Comment
 -------
+
+.. inheritance-diagram:: Comment
 
 .. class:: Comment
 

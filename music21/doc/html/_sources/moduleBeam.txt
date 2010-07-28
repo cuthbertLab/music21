@@ -15,6 +15,8 @@ Beam objects, added to :class:`~music21.note.Note` and :class:`~music21.chord.Ch
 Beam
 ----
 
+.. inheritance-diagram:: Beam
+
 .. class:: Beam(type=None, direction=None)
 
     A Beam is an object representation of one single beam, that is, one horizontal line connecting two notes together (or less commonly a note to a rest).  Thus it takes two separate Beam objects to represent the beaming of a 16th note. The Beams object (note the plural) is the object that handles groups of Beam objects; it is defined later on. Here are two ways to define the start of a beam 
@@ -63,6 +65,8 @@ Beam
 
 Beams
 -----
+
+.. inheritance-diagram:: Beams
 
 .. class:: Beams()
 

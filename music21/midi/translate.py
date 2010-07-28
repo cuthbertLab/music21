@@ -498,6 +498,7 @@ def streamToMidiTrack(input, instObj=None, translateTimeSignature=True):
         #if obj.isClass(note.GeneralNote):
         classes = obj.classes
 
+        # test: match to 'GeneralNote'
         if 'Note' in classes or 'Rest' in classes or 'Chord' in classes:
         #if obj.isNote or obj.isRest or obj.isChord:
 
@@ -506,6 +507,7 @@ def streamToMidiTrack(input, instObj=None, translateTimeSignature=True):
             # all values are in tpq; t stores abs time in tpq
             tDif = (obj.offset * defaults.ticksPerQuarter) - t
 
+            # includ 'Unpitched'
             if 'Rest' in classes:
                 # for a rest, do not do anything: difference in offset will 
                 # account for the gap
