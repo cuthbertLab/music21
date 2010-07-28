@@ -1235,12 +1235,40 @@ class Pitch(music21.Music21Object):
         return False
 
     def getHigherEnharmonic(self, inPlace=False):
-        '''Returns a Pitch enharmonic note that a dim-second above the current note'''
-        pass
+        '''Returns a Pitch enharmonic note that a dim-second above the current note
+
+        >>> from music21 import pitch
+        >>> p1 = pitch.Pitch('C#3')
+        >>> p2 = p1.getHigherEnharmonic()
+        >>> p2
+        D-3
+        '''
+        intervalObj = interval.Interval('d2')
+        if not inPlace:
+            return intervalObj.transposePitch(self)
+        else:
+            p = intervalObj.transposePitch(self)
+            self._setName(p.nameWithOctave)
+            self.accidental = p.accidental
+            return None
     
     def getLowerEnharmonic(self, inPlace=False):
-        '''returns a Pitch enharmonic note that is a dim-second below the current note'''
-        pass
+        '''returns a Pitch enharmonic note that is a dim-second below the current note
+        >>> from music21 import pitch
+        >>> p1 = pitch.Pitch('C-3')
+        >>> p2 = p1.getLowerEnharmonic()
+        >>> p2
+        B2
+        '''
+        intervalObj = interval.Interval('-d2')
+        if not inPlace:
+            return intervalObj.transposePitch(self)
+        else:
+            p = intervalObj.transposePitch(self)
+            self._setName(p.nameWithOctave)
+            self.accidental = p.accidental
+            return None
+
 
     def getEnharmonic(self, inPlace=False):
         '''Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
