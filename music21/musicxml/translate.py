@@ -92,11 +92,12 @@ def measureToMx(m):
             #environLocal.printDebug(['_getMX of Measure is not processing', obj])
 
     # see if we have a right barline
-    if m.rightBarline != None:
-        mxBarline = m.rightBarline.mx
-        # setting location outside of object based on attribute
-        mxBarline.set('location', 'right')
-        mxMeasure.componentList.append(mxBarline)
+    # presently turning barline output off b/c of performance concerns
+#     if m.rightBarline != None:
+#         mxBarline = m.rightBarline.mx
+#         # setting location outside of object based on attribute
+#         mxBarline.set('location', 'right')
+#         mxMeasure.componentList.append(mxBarline)
 
     return mxMeasure
 

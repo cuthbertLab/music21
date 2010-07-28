@@ -1013,6 +1013,22 @@ class Test(unittest.TestCase):
         self.assertEqual(countStartTies, 40)
 
 
+    def testConversionMXInstrument(self):
+        from music21 import corpus
+        s = corpus.parseWork('beethoven/opus18no1/movement3.xml')
+        #s.show()
+        is1 = s.parts[0].flat.getElementsByClass('Instrument')
+        self.assertEqual(len(is1), 1)
+        is2 = s.parts[1].flat.getElementsByClass('Instrument')
+        self.assertEqual(len(is2), 1)
+
+        is3 = s.parts[2].flat.getElementsByClass('Instrument')
+        self.assertEqual(len(is3), 1)
+
+        is4 = s.parts[3].flat.getElementsByClass('Instrument')
+        self.assertEqual(len(is4), 1)
+
+
 
     def testConversionMidiBasic(self):
         import common
@@ -1129,5 +1145,5 @@ if __name__ == "__main__":
         a = Test()
         #a.testConversionMXLayout()
         #a.testConversionMXTies()
-        a.testConversionMidiNotes()
+        a.testConversionMXInstrument()
 
