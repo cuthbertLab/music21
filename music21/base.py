@@ -1882,7 +1882,7 @@ class Music21Object(object):
         '''
         return self.__repr__()
 
-    def show(self, fmt=None):
+    def show(self, fmt=None, app=None):
         '''
         Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment 
 
@@ -1920,7 +1920,7 @@ class Music21Object(object):
             return self.lily.showPNG()
 
         elif fmt in ['musicxml', 'midi']: # a format that writes a file
-            environLocal.launch(format, self.write(format))
+            environLocal.launch(format, self.write(format), app=app)
 
         else:
             raise Music21ObjectException('no such show format is supported:', fmt)

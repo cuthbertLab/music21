@@ -404,7 +404,7 @@ class Environment(object):
         self.printDebug([_MOD, 'temporary file:', fp])
         return fp
 
-    def launch(self, fmt, fp, options=''):
+    def launch(self, fmt, fp, options='', app=None):
         '''
         Opens a file with an either default or user-specified applications.
         
@@ -431,6 +431,10 @@ class Environment(object):
             fpApp = self.ref['midiPath']   
         else:
             fpApp = None
+
+        # substitute provided app
+        if app != None:
+            fpApp = app 
 
         platform = common.getPlatform()
         if fpApp is None and platform != 'win':

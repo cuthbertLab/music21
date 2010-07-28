@@ -35,6 +35,7 @@ from music21 import lily as lilyModule
 from music21 import metadata
 from music21 import meter
 from music21 import musicxml as musicxmlMod
+from music21.musicxml import translate as musicxmlTranslate
 from music21 import midi as midiModule
 from music21.midi import translate as midiTranslate
 from music21 import note
@@ -1901,12 +1902,12 @@ class Stream(music21.Music21Object):
         return post
         
 
-    def getInstrument(self, searchParent=True):
+    def getInstrument(self, searchParent=True, returnDefault=True):
         '''Search this stream or parent streams for :class:`~music21.instrument.Instrument` objects, otherwise 
         return a default
 
         >>> a = Stream()
-        >>> b = a.getInstrument()
+        >>> b = a.getInstrument() # a default will be returned
         '''
         #environLocal.printDebug(['searching for instrument, called from:', 
         #                        self])
@@ -1914,7 +1915,7 @@ class Stream(music21.Music21Object):
         #for cases when there is more than one instrument
 
         instObj = None
-        post = self.getElementsByClass(instrument.Instrument)
+        post = self.getElementsByClass('Instrument')
         if len(post) > 0:
             #environLocal.printDebug(['found local instrument:', post[0]])
             instObj = post[0] # get first
@@ -1924,12 +1925,14 @@ class Stream(music21.Music21Object):
                     #environLocal.printDebug(['searching parent Stream', 
                     #    self, self.parent])
                     instObj = self.parent.getInstrument(
-                              searchParent=searchParent) 
+                              searchParent=searchParent, 
+                              returnDefault=False) 
 
         # if still not defined, get default
-        if instObj is None:
+        if returnDefault and instObj is None:
             instObj = instrument.Instrument()
-            instObj.partId = defaults.partId # give a default id
+            # now set with .mx call
+            #instObj.partId = defaults.partId # give a default id
             instObj.partName = defaults.partName # give a default id
         return instObj
 
@@ -3977,79 +3980,6 @@ class Stream(music21.Music21Object):
         '''
         return midiTranslate.streamToMidiTrack(self, instObj)
 
-#         if instObj is None:
-#             # see if an instrument is defined in this or a parent stream
-#             instObj = self.getInstrument()
-# 
-#         # each part will become midi track
-#         # each needs an id; can be adjusted later
-#         mt = midiModule.MidiTrack(1)
-#         mt.events += midiModule.getStartEvents(mt, instObj.partName)
-# 
-#         # initial time is start of this Stream
-#         #t = self.offset * defaults.ticksPerQuarter
-#         # should shift at tracks level
-#         t = 0 * defaults.ticksPerQuarter
-# 
-#         # have to be sorted, have to strip ties
-#         s = self.stripTies(inPlace=False, matchByPitch=False,
-#                            retainContainers=False)
-#         # probably already flat and sorted
-#         for obj in s.flat.sorted:
-#             tDurEvent = 0 # the found delta ticks in each event
-# 
-#             if obj.isClass(note.GeneralNote):
-#                 # find difference since last event to this event
-#                 # cannot use getOffsetBySite(self), as need flat offset
-#                 # all values are in tpq; t stores abs time in tpq
-#                 tDif = (obj.offset * defaults.ticksPerQuarter) - t
-# 
-#                 #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
-# 
-#                 if obj.isRest:
-#                     # for a rest, need the duration of the rest, plus whatever
-#                     # difference between the offset and the last time value
-#                     continue
-# 
-#                 # get a list of midi events
-#                 sub = obj.midiEvents
-# 
-#                 # a note has 4 events: delta/note-on/delta/note-off
-#                 if obj.isNote:
-#                     sub[0].time = int(round(tDif)) # set first delta 
-#                     # get the duration in ticks; this is the delta to 
-#                     # to the note off message; already set when midi events are 
-#                     # obtained
-#                     tDurEvent = int(round(sub[2].time))
-# 
-#                 # a chord has delta/note-on/delta/note-off for each memeber
-#                 # of the chord. on the first delta is the offset, and only
-#                 # the first delta preceding the first note-off is the duration
-#                 if obj.isChord:
-#                     # divide events between note-on and note-off
-#                     sub[0].time = int(round(tDif)) # set first delta 
-#                     # only the delta before the first note-off has the event dur
-#                     # could also sum all durations before setting first
-#                     # this is the second half of events
-#                     tDurEvent = int(round(len(sub) / 2))
-# 
-#                 # to get new current time, need both the duration of the event
-#                 # as well as any difference found between the last event
-#                 t += tDif + tDurEvent
-#                 # add events to the list
-#                 mt.events += sub
-# 
-#             elif obj.isClass(dynamics.Dynamic):
-#                 pass # configure dynamics
-#             else: # other objects may have already been added
-#                 pass
-# 
-#         # must update all events with a ref to this MidiTrack
-#         mt.updateEvents()
-#         mt.events += midiModule.getEndEvents(mt)
-#         return mt
-#         
-
     def _setMidiTracksPart(self, mt, ticksPerQuarter=None, quantizePost=True):
         environLocal.printDebug(['got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
         '''Given a MIDI track, configure a Stream.
@@ -4057,139 +3987,13 @@ class Stream(music21.Music21Object):
         # pass self as reference to configure this object
         midiTranslate.midiTrackToStream(mt, ticksPerQuarter, quantizePost, self)
 
-        # get an abs start time for each event, discard deltas
-#         events = []
-#         t = 0
-#         # pair deltas with events, convert abs time
-#         # get even numbers
-#         # in some cases, the first event may not be a delta time, but
-#         # a SEQUENCE_TRACK_NAME or something else. thus, need to get
-#         # first delta time
-#         i = 0
-#         while i < len(mt.events):
-#             #environLocal.printDebug(['index', i, mt.events[i]])
-#             #environLocal.printDebug(['index', i+1, mt.events[i+1]])
-#             
-#             # need to find pairs of delta time and evens
-#             # in some cases, there are delta times that are out of order, or
-#             # packed in the beginning
-#             if mt.events[i].isDeltaTime() and not mt.events[i+1].isDeltaTime():
-#                 td = mt.events[i]
-#                 e = mt.events[i+1]
-#                 t += td.time # increment time
-#                 events.append([t, e])
-#                 i += 2
-#                 continue
-#             else:
-#                 # cannot pair delta time to the next event; skip by 1
-#                 environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
-#                 i += 1
-#                 continue
-# 
-#         # need to pair note-on with note-off
-#         notes = [] # store pairs of pairs
-#         memo = [] # store already matched note off
-#         for i in range(len(events)):
-#             t, e = events[i]
-#             # for each event, we need to search for a match in all future
-#             # events
-#             if e.isNoteOn():
-#                 for j in range(i+1, len(events)):
-#                     if j in memo: 
-#                         continue
-#                     tSub, eSub = events[j]
-#                     if e.matchedNoteOff(eSub):
-#                         memo.append(j)
-#                         notes.append([events[i], events[j]])
-#                         break
-# 
-#         # collect notes with similar start times into chords
-#         # create a composite list of both notes and chords
-#         #composite = []
-#         chordSub = None
-#         i = 0
-#         while i < len(notes):
-#             # look at each note; get on time and event
-#             on, off = notes[i]
-#             t, e = on
-#             # go through all following notes
-#             for j in range(i+1, len(notes)):
-#                 # look at each on time event
-#                 onSub, offSub = notes[j]
-#                 tSub, eSub = onSub
-#                 # can set a tolerance for chordSubing; here at 1/16th
-#                 # of a quarter
-#                 if tSub - t <= ticksPerQuarter / 16:
-#                     if chordSub == None: # start a new one
-#                         chordSub = [notes[i]]
-#                     chordSub.append(notes[j])
-#                     continue # keep looing
-#                 else: # no more matches; assuming chordSub tones are contiguous
-#                     if chordSub != None:
-#                         #composite.append(chordSub)
-#                         # create a chord here
-#                         c = chord.Chord()
-#                         c._setMidiEvents(chordSub, ticksPerQuarter)
-#                         o = notes[i][0][0] / float(ticksPerQuarter)
-#                         self.insert(o, c)
-#                         iSkip = len(chordSub)
-#                         chordSub = None
-#                     else: # just append the note
-#                         #composite.append(notes[i])
-#                         # create a note here
-#                         n = note.Note()
-#                         n._setMidiEvents(notes[i], ticksPerQuarter)
-#                         # the time is the first value in the first pair
-#                         # need to round, as floating point error is likely
-#                         o = notes[i][0][0] / float(ticksPerQuarter)
-#                         self.insert(o, n)
-#                         iSkip = 1
-#                     break # exit secondary loop
-#             i += iSkip
-#                         
-# #        environLocal.printDebug(['got midi track: events'])
-# #         for e in notes:
-# #             print e
-# 
-#         # quantize to nearest 16th
-#         if quantizePost:    
-#             # 0.0625
-#             self.quantize(0.125, processOffsets=True, processDurations=True)
-# 
-#         # always need to fill gaps, as rests are not found in any other way
-#         self.makeRests(inPlace=True, fillGaps=True)
-# 
-
-
     def _getMidiTracks(self):
         return midiTranslate.streamsToMidiTracks(self)
 
-#         sTemplate = Stream()
-#         # return a list of MidiTrack objects
-#         midiTracks = []
-# 
-#         # TODO: may need to shift all time values to accomodate 
-#         # Streams that do not start at same time
-#         if self.isMultiPart():
-#             for obj in self.getElementsByClass(sTemplate.classNames):
-#                 midiTracks.append(obj._getMidiTracksPart())
-#         else: # just get this single stream
-#             midiTracks.append(self._getMidiTracksPart())
-#         return midiTracks
-
     def _setMidiTracks(self, midiTracks, ticksPerQuarter=None):
         midiTranslate.midiTracksToStreams(midiTracks, 
-            ticksPerQuarter=ticksPerQuarter, input=self)
+            ticksPerQuarter=ticksPerQuarter, inputM21=self)
 
-        # give a list of midi tracks
-#         for mt in midiTracks:
-#             # not all tracks have notes defined; only creates parts for those
-#             # that do
-#             if mt.hasNotes(): 
-#                 streamPart = Part() # create a part instance for each part
-#                 streamPart._setMidiTracksPart(mt,
-#                     ticksPerQuarter=ticksPerQuarter)
-#                 self.insert(0, streamPart)
 
     midiTracks = property(_getMidiTracks, _setMidiTracks, 
         doc='''Get or set this Stream from a list of :class:`music21.midi.base.MidiTracks` objects.
@@ -4211,33 +4015,10 @@ class Stream(music21.Music21Object):
         '''
         return midiTranslate.streamToMidiFile(self)
 
-        # get a list of mid tracks objects
-#         midiTracks = self._getMidiTracks()
-# 
-#         # update track indices
-#         # may need to update channel information
-#         for i in range(len(midiTracks)):
-#             midiTracks[i].index = i + 1
-# 
-#         mf = midiModule.MidiFile()
-#         mf.tracks = midiTracks
-#         mf.ticksPerQuarterNote = defaults.ticksPerQuarter
-#         return mf
-
     def _setMidiFile(self, mf):
         '''Given a :class:`music21.midi.base.MidiFile` object, configure a Stream
         '''
-        return midiTranslate.midiFileToStream(mf, input=self)
-
-#         environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
-# 
-#         if len(mf.tracks) == 0:
-#             raise StreamException('no tracks are defined in this MIDI file.')
-#         else:
-#             # create a stream for each tracks   
-#             # may need to check if tracks actually have event data
-#             self._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
-
+        return midiTranslate.midiFileToStream(mf, inputM21=self)
 
     midiFile = property(_getMidiFile, _setMidiFile,
         doc = '''Get or set a :class:`music21.midi.base.MidiFile` object.
@@ -4251,6 +4032,8 @@ class Stream(music21.Music21Object):
         '''If there are Measures within this stream, use them to create and
         return an MX Part and ScorePart. 
 
+        An `instObj` may be assigned from caller; this Instrument is pre-collected from this Stream in order to configure id and midi-channel values. 
+
         meterStream can be provided to provide a template within which
         these events are positioned; this is necessary for handling
         cases where one part is shorter than another. 
@@ -4261,14 +4044,25 @@ class Stream(music21.Music21Object):
         if instObj is None:
             # see if an instrument is defined in this or a parent stream
             instObj = self.getInstrument()
+        # must set a unique part id, if not already assigned
+        if instObj.partId == None:
+            instObj.partIdRandomize()
 
-        # instruments are defined here
-        mxScorePart = musicxmlMod.ScorePart()
-        mxScorePart.set('partName', instObj.partName)
-        mxScorePart.set('id', instObj.partId)
+        environLocal.printDebug(['calling Stream._getMXPart', repr(instObj), instObj.partId])
+
+
+#         mxScorePart = musicxmlMod.ScorePart()
+#         mxScorePart.set('partName', instObj.partName)
+#         mxScorePart.set('id', instObj.partId)
+
+        # instrument object returns a configured mxScorePart, that may
+        # also include midi or score instrument definitions
+        mxScorePart = instObj.mx
+
+        environLocal.printDebug(['calling Stream._getMXPart', 'mxScorePart', mxScorePart, mxScorePart.get('id')])
 
         mxPart = musicxmlMod.Part()
-        mxPart.setDefaults()
+        #mxPart.setDefaults()
         mxPart.set('id', instObj.partId) # need to set id
 
         # get a stream of measures
@@ -4370,11 +4164,13 @@ class Stream(music21.Music21Object):
                     raise StreamException('infinite stream encountered')
 
                 # only things that can be treated as parts are in finalStream
-                inst = obj.getInstrument()
+                # get a default instrument if not assigned
+                inst = obj.getInstrument(returnDefault=True)
                 instIdList = [x.partId for x in instList]
                 if inst.partId in instIdList: # must have unique ids 
                     inst.partIdRandomize() # set new random id
                 instList.append(inst)
+                # force this instrument into this part
                 mxComponents.append(obj._getMXPart(inst, meterStream,
                                 refStreamOrTimeRange))
 
@@ -5748,231 +5544,233 @@ class Measure(Stream):
         >>> len(mxMeasure) 
         1
         '''
+        return musicxmlTranslate.measureToMx(self)
 
-        mxMeasure = musicxmlMod.Measure()
-        mxMeasure.set('number', self.measureNumber)
-
-        if self.layoutWidth != None:
-            mxMeasure.set('width', self.layoutWidth)
-
-        # print objects come before attributes
-        # note: this class match is a problem in cases where the object is created in the module itself, as in a test. 
-        found = self.getElementsByClass(layout.SystemLayout)
-        if len(found) > 0:
-            sl = found[0] # assume only one
-            mxPrint = sl.mx
-            mxMeasure.componentList.append(mxPrint)
-
-        # get an empty mxAttributes object
-        mxAttributes = musicxmlMod.Attributes()
-        # best to only set dvisions here, as clef, time sig, meter are not
-        # required for each measure
-        mxAttributes.setDefaultDivisions() 
-
-        # may need to look here at the parent, and try to find
-        # the clef in the clef last defined in the parent
-        if self.clef is not None:
-            mxAttributes.clefList = [self.clef.mx]
-
-        if self.keySignature is not None: 
-            # key.mx returns a Key ojbect, needs to be in a list
-            mxAttributes.keyList = [self.keySignature.mx]
-        
-        if self.timeSignature is not None:
-            mxAttributes.timeList = self.timeSignature.mx 
-
-        #mxAttributes.keyList = []
-        mxMeasure.set('attributes', mxAttributes)
-
-        # see if we have a left barline
-        if self.leftBarline != None:
-            mxBarline = self.leftBarline.mx
-            # setting location outside of object based on that this attribute
-            # is the leftBarline
-            mxBarline.set('location', 'left')
-            mxMeasure.componentList.append(mxBarline)
-        
-        #need to handle objects in order when creating musicxml 
-        for obj in self.flat:
-            if obj.isClass(note.GeneralNote):
-                # .mx here returns a list of notes
-                mxMeasure.componentList += obj.mx
-            elif obj.isClass(dynamics.Dynamic):
-                # returns an mxDirection object
-                mxMeasure.append(obj.mx)
-            else: # other objects may have already been added
-                pass
-                #environLocal.printDebug(['_getMX of Measure is not processing', obj])
-
-        # see if we have a right barline
-        if self.rightBarline != None:
-            mxBarline = self.rightBarline.mx
-            # setting location outside of object based on attribute
-            mxBarline.set('location', 'right')
-            mxMeasure.componentList.append(mxBarline)
-
-        return mxMeasure
+#         mxMeasure = musicxmlMod.Measure()
+#         mxMeasure.set('number', self.measureNumber)
+# 
+#         if self.layoutWidth != None:
+#             mxMeasure.set('width', self.layoutWidth)
+# 
+#         # print objects come before attributes
+#         # note: this class match is a problem in cases where the object is created in the module itself, as in a test. 
+#         found = self.getElementsByClass(layout.SystemLayout)
+#         if len(found) > 0:
+#             sl = found[0] # assume only one
+#             mxPrint = sl.mx
+#             mxMeasure.componentList.append(mxPrint)
+# 
+#         # get an empty mxAttributes object
+#         mxAttributes = musicxmlMod.Attributes()
+#         # best to only set dvisions here, as clef, time sig, meter are not
+#         # required for each measure
+#         mxAttributes.setDefaultDivisions() 
+# 
+#         # may need to look here at the parent, and try to find
+#         # the clef in the clef last defined in the parent
+#         if self.clef is not None:
+#             mxAttributes.clefList = [self.clef.mx]
+# 
+#         if self.keySignature is not None: 
+#             # key.mx returns a Key ojbect, needs to be in a list
+#             mxAttributes.keyList = [self.keySignature.mx]
+#         
+#         if self.timeSignature is not None:
+#             mxAttributes.timeList = self.timeSignature.mx 
+# 
+#         #mxAttributes.keyList = []
+#         mxMeasure.set('attributes', mxAttributes)
+# 
+#         # see if we have a left barline
+#         if self.leftBarline != None:
+#             mxBarline = self.leftBarline.mx
+#             # setting location outside of object based on that this attribute
+#             # is the leftBarline
+#             mxBarline.set('location', 'left')
+#             mxMeasure.componentList.append(mxBarline)
+#         
+#         #need to handle objects in order when creating musicxml 
+#         for obj in self.flat:
+#             if obj.isClass(note.GeneralNote):
+#                 # .mx here returns a list of notes
+#                 mxMeasure.componentList += obj.mx
+#             elif obj.isClass(dynamics.Dynamic):
+#                 # returns an mxDirection object
+#                 mxMeasure.append(obj.mx)
+#             else: # other objects may have already been added
+#                 pass
+#                 #environLocal.printDebug(['_getMX of Measure is not processing', obj])
+# 
+#         # see if we have a right barline
+#         if self.rightBarline != None:
+#             mxBarline = self.rightBarline.mx
+#             # setting location outside of object based on attribute
+#             mxBarline.set('location', 'right')
+#             mxMeasure.componentList.append(mxBarline)
+# 
+#         return mxMeasure
 
 
     def _setMX(self, mxMeasure):
         '''Given an mxMeasure, create a music21 measure
         '''
+        return musicxmlTranslate.mxToMeasure(mxMeasure, inputM21=self)
         # measure number may be a string and not a number (always?)
-        mNum, mSuffix = common.getNumFromStr(mxMeasure.get('number'))
-        # assume that measure numbers are integers
-        if mNum not in [None, '']:
-            self.measureNumber = int(mNum)
-        if mSuffix not in [None, '']:
-            self.measureNumberSuffix = mSuffix
-
-        data = mxMeasure.get('width')
-        if data != None: # may need to do a format/unit conversion?
-            self.layoutWidth = data
-            
-        junk = mxMeasure.get('implicit')
-#         environLocal.printDebug(['_setMX: working on measure:',
-#                                 self.measureNumber])
-
-        mxAttributes = mxMeasure.get('attributes')
-        mxAttributesInternal = True
-        if mxAttributes is None:    
-            # need to keep track of where mxattributessrc is coming from
-            mxAttributesInternal = False
-            # not all measures have attributes definitions; this
-            # gets the last-encountered measure attributes
-            mxAttributes = mxMeasure.external['attributes']
-            if mxAttributes is None:
-                raise StreamException(
-                    'no mxAttribues available for this measure')
-
-        #environLocal.printDebug(['mxAttriutes clefList', mxAttributes.clefList, 
-        #                        mxAttributesInternal])
-
-        if mxAttributesInternal and len(mxAttributes.timeList) != 0:
-            self.timeSignature = meter.TimeSignature()
-            self.timeSignature.mx = mxAttributes.timeList
-
-        if mxAttributesInternal is True and len(mxAttributes.clefList) != 0:
-            self.clef = clef.Clef()
-            self.clef.mx = mxAttributes.clefList
-
-        if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
-            self.keySignature = key.KeySignature()
-            self.keySignature.mx = mxAttributes.keyList
-
-        # iterate through components found on components list
-        # set to zero for each measure
-        offsetMeasureNote = 0 # offset of note w/n measure        
-        mxNoteList = [] # for chords
-        for i in range(len(mxMeasure)):
-            mxObj = mxMeasure[i]
-            if i < len(mxMeasure)-1:
-                mxObjNext = mxMeasure[i+1]
-            else:
-                mxObjNext = None
-
-            if isinstance(mxObj, musicxmlMod.Print):
-                # mxPrint objects may be found in a Measure's componetns
-                # contain system layout information
-                mxPrint = mxObj
-                sl = layout.SystemLayout()
-                sl.mx = mxPrint
-                # store at zero position
-                self.insert(0, sl)
-
-            elif isinstance(mxObj, musicxmlMod.Barline):
-                mxBarline = mxObj
-                barline = bar.Barline()
-                barline.mx = mxBarline # configure
-                if barline.location == 'left':
-                    self.leftBarline = barline
-                elif barline.location == 'right':
-                    # there may be problems importing a right barline
-                    # as we may not have  time signature
-                    # presently, the rightBarline property uses the the 
-                    # highestTime value
-                    #self.rightBarline = barline
-                    # this avoids doing a context search, but may have non
-                    # final offset
-                    self.insert(self.highestTime, barline)
-
-                else:
-                    environLocal.printDebug(['not handling barline that is neither left nor right', barline, barline.location])
-
-            elif isinstance(mxObj, musicxmlMod.Note):
-                mxNote = mxObj
-                if isinstance(mxObjNext, musicxmlMod.Note):
-                    mxNoteNext = mxObjNext
-                else:
-                    mxNoteNext = None
-
-                if mxNote.get('print-object') == 'no':
-                    #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', self.measureNumber])
-                    continue
-
-                mxGrace = mxNote.get('grace')
-                if mxGrace is not None: # graces have a type but not a duration
-                    #TODO: add grace notes with duration equal to ZeroDuration
-                    #environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
-                    #self.measureNumber])
-                    continue
-
-                # the first note of a chord is not identified directly; only
-                # by looking at the next note can we tell if we have a chord
-                if mxNoteNext is not None and mxNoteNext.get('chord') is True:
-                    if mxNote.get('chord') is False:
-                        mxNote.set('chord', True) # set the first as a chord
-
-                if mxNote.get('rest') in [None, False]: # it is a note
-
-                    if mxNote.get('chord') is True:
-                        mxNoteList.append(mxNote)
-                        offsetIncrement = 0
-                    else:
-                        n = note.Note()
-                        n.mx = mxNote
-                        self.insert(offsetMeasureNote, n)
-                        offsetIncrement = n.quarterLength
-                    for mxLyric in mxNote.lyricList:
-                        lyricObj = note.Lyric()
-                        lyricObj.mx = mxLyric
-                        n.lyrics.append(lyricObj)
-                    if mxNote.get('notations') is not None:
-                        for mxObjSub in mxNote.get('notations'):
-                            # deal with ornaments, strill, etc
-                            pass
-                else: # its a rest
-                    n = note.Rest()
-                    n.mx = mxNote # assign mxNote to rest obj
-                    self.insert(offsetMeasureNote, n)            
-                    offsetIncrement = n.quarterLength
-
-                # if we we have notes in the note list and the next
-                # not either does not exist or is not a chord, we 
-                # have a complete chord
-                if len(mxNoteList) > 0 and (mxNoteNext is None 
-                    or mxNoteNext.get('chord') is False):
-                    c = chord.Chord()
-                    c.mx = mxNoteList
-                    mxNoteList = [] # clear for next chord
-                    self.insert(offsetMeasureNote, c)
-                    offsetIncrement = c.quarterLength
-
-                # do not need to increment for musicxml chords
-                offsetMeasureNote += offsetIncrement
-
-            # load dynamics into measure
-            elif isinstance(mxObj, musicxmlMod.Direction):
-#                 mxDynamicsFound, mxWedgeFound = self._getMxDynamics(mxObj)
-#                 for mxDirection in mxDynamicsFound:
-                if mxObj.getDynamicMark() is not None:
-                    d = dynamics.Dynamic()
-                    d.mx = mxObj
-                    self.insert(offsetMeasureNote, d)  
-                if mxObj.getWedge() is not None:
-                    w = dynamics.Wedge()
-                    w.mx = mxObj     
-                    self.insert(offsetMeasureNote, w)  
+#         mNum, mSuffix = common.getNumFromStr(mxMeasure.get('number'))
+#         # assume that measure numbers are integers
+#         if mNum not in [None, '']:
+#             self.measureNumber = int(mNum)
+#         if mSuffix not in [None, '']:
+#             self.measureNumberSuffix = mSuffix
+# 
+#         data = mxMeasure.get('width')
+#         if data != None: # may need to do a format/unit conversion?
+#             self.layoutWidth = data
+#             
+#         junk = mxMeasure.get('implicit')
+# #         environLocal.printDebug(['_setMX: working on measure:',
+# #                                 self.measureNumber])
+# 
+#         mxAttributes = mxMeasure.get('attributes')
+#         mxAttributesInternal = True
+#         if mxAttributes is None:    
+#             # need to keep track of where mxattributessrc is coming from
+#             mxAttributesInternal = False
+#             # not all measures have attributes definitions; this
+#             # gets the last-encountered measure attributes
+#             mxAttributes = mxMeasure.external['attributes']
+#             if mxAttributes is None:
+#                 raise StreamException(
+#                     'no mxAttribues available for this measure')
+# 
+#         #environLocal.printDebug(['mxAttriutes clefList', mxAttributes.clefList, 
+#         #                        mxAttributesInternal])
+# 
+#         if mxAttributesInternal and len(mxAttributes.timeList) != 0:
+#             self.timeSignature = meter.TimeSignature()
+#             self.timeSignature.mx = mxAttributes.timeList
+# 
+#         if mxAttributesInternal is True and len(mxAttributes.clefList) != 0:
+#             self.clef = clef.Clef()
+#             self.clef.mx = mxAttributes.clefList
+# 
+#         if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
+#             self.keySignature = key.KeySignature()
+#             self.keySignature.mx = mxAttributes.keyList
+# 
+#         # iterate through components found on components list
+#         # set to zero for each measure
+#         offsetMeasureNote = 0 # offset of note w/n measure        
+#         mxNoteList = [] # for chords
+#         for i in range(len(mxMeasure)):
+#             mxObj = mxMeasure[i]
+#             if i < len(mxMeasure)-1:
+#                 mxObjNext = mxMeasure[i+1]
+#             else:
+#                 mxObjNext = None
+# 
+#             if isinstance(mxObj, musicxmlMod.Print):
+#                 # mxPrint objects may be found in a Measure's componetns
+#                 # contain system layout information
+#                 mxPrint = mxObj
+#                 sl = layout.SystemLayout()
+#                 sl.mx = mxPrint
+#                 # store at zero position
+#                 self.insert(0, sl)
+# 
+#             elif isinstance(mxObj, musicxmlMod.Barline):
+#                 mxBarline = mxObj
+#                 barline = bar.Barline()
+#                 barline.mx = mxBarline # configure
+#                 if barline.location == 'left':
+#                     self.leftBarline = barline
+#                 elif barline.location == 'right':
+#                     # there may be problems importing a right barline
+#                     # as we may not have  time signature
+#                     # presently, the rightBarline property uses the the 
+#                     # highestTime value
+#                     #self.rightBarline = barline
+#                     # this avoids doing a context search, but may have non
+#                     # final offset
+#                     self.insert(self.highestTime, barline)
+# 
+#                 else:
+#                     environLocal.printDebug(['not handling barline that is neither left nor right', barline, barline.location])
+# 
+#             elif isinstance(mxObj, musicxmlMod.Note):
+#                 mxNote = mxObj
+#                 if isinstance(mxObjNext, musicxmlMod.Note):
+#                     mxNoteNext = mxObjNext
+#                 else:
+#                     mxNoteNext = None
+# 
+#                 if mxNote.get('print-object') == 'no':
+#                     #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', self.measureNumber])
+#                     continue
+# 
+#                 mxGrace = mxNote.get('grace')
+#                 if mxGrace is not None: # graces have a type but not a duration
+#                     #TODO: add grace notes with duration equal to ZeroDuration
+#                     #environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
+#                     #self.measureNumber])
+#                     continue
+# 
+#                 # the first note of a chord is not identified directly; only
+#                 # by looking at the next note can we tell if we have a chord
+#                 if mxNoteNext is not None and mxNoteNext.get('chord') is True:
+#                     if mxNote.get('chord') is False:
+#                         mxNote.set('chord', True) # set the first as a chord
+# 
+#                 if mxNote.get('rest') in [None, False]: # it is a note
+# 
+#                     if mxNote.get('chord') is True:
+#                         mxNoteList.append(mxNote)
+#                         offsetIncrement = 0
+#                     else:
+#                         n = note.Note()
+#                         n.mx = mxNote
+#                         self.insert(offsetMeasureNote, n)
+#                         offsetIncrement = n.quarterLength
+#                     for mxLyric in mxNote.lyricList:
+#                         lyricObj = note.Lyric()
+#                         lyricObj.mx = mxLyric
+#                         n.lyrics.append(lyricObj)
+#                     if mxNote.get('notations') is not None:
+#                         for mxObjSub in mxNote.get('notations'):
+#                             # deal with ornaments, strill, etc
+#                             pass
+#                 else: # its a rest
+#                     n = note.Rest()
+#                     n.mx = mxNote # assign mxNote to rest obj
+#                     self.insert(offsetMeasureNote, n)            
+#                     offsetIncrement = n.quarterLength
+# 
+#                 # if we we have notes in the note list and the next
+#                 # not either does not exist or is not a chord, we 
+#                 # have a complete chord
+#                 if len(mxNoteList) > 0 and (mxNoteNext is None 
+#                     or mxNoteNext.get('chord') is False):
+#                     c = chord.Chord()
+#                     c.mx = mxNoteList
+#                     mxNoteList = [] # clear for next chord
+#                     self.insert(offsetMeasureNote, c)
+#                     offsetIncrement = c.quarterLength
+# 
+#                 # do not need to increment for musicxml chords
+#                 offsetMeasureNote += offsetIncrement
+# 
+#             # load dynamics into measure
+#             elif isinstance(mxObj, musicxmlMod.Direction):
+# #                 mxDynamicsFound, mxWedgeFound = self._getMxDynamics(mxObj)
+# #                 for mxDirection in mxDynamicsFound:
+#                 if mxObj.getDynamicMark() is not None:
+#                     d = dynamics.Dynamic()
+#                     d.mx = mxObj
+#                     self.insert(offsetMeasureNote, d)  
+#                 if mxObj.getWedge() is not None:
+#                     w = dynamics.Wedge()
+#                     w.mx = mxObj     
+#                     self.insert(offsetMeasureNote, w)  
 
     mx = property(_getMX, _setMX)    
 
@@ -5981,41 +5779,36 @@ class Measure(Stream):
     def _getMusicXML(self):
         '''Provide a complete MusicXML: representation. 
         '''
+        return musicxmlTranslate.measureToMusicXML(self)
+#         mxMeasure = self._getMX()
+# 
+#         mxPart = musicxmlMod.Part()
+#         mxPart.setDefaults()
+#         mxPart.append(mxMeasure) # append measure here
+# 
+# 
+#         # see if an instrument is defined in this or a prent stream
+#         instObj = self.getInstrument()
+#         mxScorePart = musicxmlMod.ScorePart()
+#         mxScorePart.set('partName', instObj.partName)
+#         mxScorePart.set('id', instObj.partId)
+#         # must set this part to the same id
+#         mxPart.set('id', instObj.partId)
+# 
+#         mxPartList = musicxmlMod.PartList()
+#         mxPartList.append(mxScorePart)
+# 
+#         mxIdentification = musicxmlMod.Identification()
+#         mxIdentification.setDefaults() # will create a composer
+#         mxScore = musicxmlMod.Score()
+#         mxScore.setDefaults()
+#         mxScore.set('partList', mxPartList)
+#         mxScore.set('identification', mxIdentification)
+#         mxScore.append(mxPart)
+# 
+#         return mxScore.xmlStr()
 
-        mxMeasure = self._getMX()
-
-        mxPart = musicxmlMod.Part()
-        mxPart.setDefaults()
-        mxPart.append(mxMeasure) # append measure here
-
-
-        # see if an instrument is defined in this or a prent stream
-        instObj = self.getInstrument()
-        mxScorePart = musicxmlMod.ScorePart()
-        mxScorePart.set('partName', instObj.partName)
-        mxScorePart.set('id', instObj.partId)
-        # must set this part to the same id
-        mxPart.set('id', instObj.partId)
-
-        mxPartList = musicxmlMod.PartList()
-        mxPartList.append(mxScorePart)
-
-        mxIdentification = musicxmlMod.Identification()
-        mxIdentification.setDefaults() # will create a composer
-        mxScore = musicxmlMod.Score()
-        mxScore.setDefaults()
-        mxScore.set('partList', mxPartList)
-        mxScore.set('identification', mxIdentification)
-        mxScore.append(mxPart)
-
-        return mxScore.xmlStr()
-
-    def _setMusicXML(self, mxScore):
-        '''
-        '''
-        pass
-
-    musicxml = property(_getMusicXML, _setMusicXML)
+    musicxml = property(_getMusicXML)
 
 #-------------------------------------------------------------------------------
 class Voice(Stream):
@@ -9401,4 +9194,5 @@ if __name__ == "__main__":
         #a.testMidiEventsBuilt()    
         #a.testMidiEventsImported()
         #a.testFindGaps()
-        a.testQuantize()
+        #a.testQuantize()
+       

@@ -52,7 +52,6 @@ durationType = 'quarter'
 
 instrumentName = ''
 partName = ''
-partId = 'P1'
 
 keyFifths = 0
 keyMode = 'major'

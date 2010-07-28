@@ -877,7 +877,8 @@ class ScorePart(MusicXMLElement):
 
     def setDefaults(self):
         self.set('partName', defaults.partName)
-        self.set('id', defaults.partId)
+        # randomly generated in m21 object when needed
+        #self.set('id', defaults.partId)
 
 
 class ScoreInstrument(MusicXMLElement):
@@ -947,8 +948,10 @@ class Part(MusicXMLElementList):
         return self.componentList
 
     def setDefaults(self):
+        pass
         # might need to do this a different way
-        self.set('id', defaults.partId)
+        # randomly generated in m21 object when needed    
+        #self.set('id', defaults.partId)
 
 
 class Measure(MusicXMLElementList):

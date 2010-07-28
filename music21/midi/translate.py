@@ -38,10 +38,10 @@ class TranslateException(Exception):
 #-------------------------------------------------------------------------------
 # Notes
 
-def midiEventsToNote(eventList, ticksPerQuarter=None, input=None):
+def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     '''Convert from a list of MIDI message to a music21 note
 
-    The `input` parameter can be a Note or None; in the case of None, a Note object is created. 
+    The `inputM21` parameter can be a Note or None; in the case of None, a Note object is created. 
 
     >>> from music21 import *
 
@@ -68,11 +68,11 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, input=None):
     >>> n.duration.quarterLength
     1.0
     '''
-    if input == None:
+    if inputM21 == None:
         from music21 import note
         n = note.Note()
     else:
-        n = input
+        n = inputM21
 
     if ticksPerQuarter == None:
         ticksPerQuarter = defaults.ticksPerQuarter
@@ -98,7 +98,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, input=None):
     return n
 
 
-def noteToMidiEvents(input):
+def noteToMidiEvents(inputM21):
     '''Translate Note to four MIDI events.
 
     >>> from music21 import *
@@ -112,7 +112,7 @@ def noteToMidiEvents(input):
     [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=2560, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
     '''
 
-    n = input
+    n = inputM21
 
     mt = None # use a midi track set to None
     eventList = []
@@ -147,7 +147,7 @@ def noteToMidiEvents(input):
 
 
 
-def noteToMidiFile(input): 
+def noteToMidiFile(inputM21): 
     '''
     >>> from music21 import note
     >>> n1 = note.Note()
@@ -156,7 +156,7 @@ def noteToMidiFile(input):
     >>> mf.tracks[0].events
     [<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=6144, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=60, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]
     '''
-    n = input
+    n = inputM21
     mt = midiModule.MidiTrack(1)
     mt.events += midiModule.getStartEvents(mt)
     mt.events += noteToMidiEvents(n)
@@ -176,7 +176,7 @@ def noteToMidiFile(input):
 #-------------------------------------------------------------------------------
 # Chords
 
-def midiEventsToChord(eventList, ticksPerQuarter=None, input=None):
+def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     '''
 
     >>> from music21 import *
@@ -221,11 +221,11 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, input=None):
     >>> c.duration.quarterLength
     2.0
     '''
-    if input == None:
+    if inputM21 == None:
         from music21 import chord
         c = chord.Chord()
     else:
-        c = input
+        c = inputM21
 
     if ticksPerQuarter == None:
         ticksPerQuarter = defaults.ticksPerQuarter
@@ -266,7 +266,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, input=None):
 
 
 
-def chordToMidiEvents(input):
+def chordToMidiEvents(inputM21):
     '''
     >>> from music21 import *
     >>> c = chord.Chord(['c3','g#4', 'b5'])
@@ -277,7 +277,7 @@ def chordToMidiEvents(input):
     '''
     mt = None # midi track 
     eventList = []
-    c = input
+    c = inputM21
 
     for i in range(len(c.pitches)):
         pitchObj = c.pitches[i]
@@ -321,9 +321,9 @@ def chordToMidiEvents(input):
 
 
 
-def chordToMidiFile(input): 
+def chordToMidiFile(inputM21): 
     # this can be consolidated with noteToMidiFile
-    c = input
+    c = inputM21
 
     mt = midiModule.MidiTrack(1)
     mt.events += midiModule.getStartEvents(mt)
@@ -520,7 +520,7 @@ def keySignatureToMidiEvents(ks):
 # Streams
 
 
-def streamToMidiTrack(input, instObj=None, translateTimeSignature=True):
+def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
 
     '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
 
@@ -541,7 +541,7 @@ def streamToMidiTrack(input, instObj=None, translateTimeSignature=True):
 
     if instObj is None:
         # see if an instrument is defined in this or a parent stream
-        instObj = input.getInstrument()
+        instObj = inputM21.getInstrument()
 
     # each part will become midi track
     # each needs an id; can be adjusted later
@@ -555,7 +555,7 @@ def streamToMidiTrack(input, instObj=None, translateTimeSignature=True):
 
     # have to be sorted, have to strip ties
     # retain containers to get all elements: time signatures, dynamics, etc
-    s = input.stripTies(inPlace=False, matchByPitch=False, 
+    s = inputM21.stripTies(inPlace=False, matchByPitch=False, 
         retainContainers=True)
     s = s.flat
     # probably already flat and sorted
@@ -648,7 +648,7 @@ def streamToMidiTrack(input, instObj=None, translateTimeSignature=True):
     return mt
     
 
-def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
+def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, inputM21=None):
     '''
     >>> from music21 import *
     >>> import os
@@ -664,11 +664,11 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
     >>> len(s.notes)
     9
     '''
-    if input == None:
+    if inputM21 == None:
         from music21 import stream
         s = stream.Stream()
     else:
-        s = input
+        s = inputM21
 
     if ticksPerQuarter == None:
         ticksPerQuarter = defaults.ticksPerQuarter
@@ -807,11 +807,11 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, input=None):
 
 
 
-def streamsToMidiTracks(input):
+def streamsToMidiTracks(inputM21):
     '''Given a multipart stream, return a list of MIDI tracks. 
     '''
     from music21 import stream
-    s = input
+    s = inputM21
 
     sTemplate = stream.Stream()
     # return a list of MidiTrack objects
@@ -831,14 +831,14 @@ def streamsToMidiTracks(input):
 
 
 def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
-    input=None):
+    inputM21=None):
     '''Given a list of midiTracks, populate this Stream with sub-streams for each part. 
     '''
     from music21 import stream
-    if input == None:
+    if inputM21 == None:
         s = stream.Stream()
     else:
-        s = input
+        s = inputM21
 
     for mt in midiTracks:
         # not all tracks have notes defined; only creates parts for those
@@ -851,7 +851,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
     return s
 
 
-def streamToMidiFile(input):
+def streamToMidiFile(inputM21):
     '''
     >>> from music21 import *
     >>> s = stream.Stream()
@@ -864,7 +864,7 @@ def streamToMidiFile(input):
     >>> len(mf.tracks[0].events)
     20
     '''
-    s = input
+    s = inputM21
 
     midiTracks = s._getMidiTracks()
 
@@ -880,7 +880,7 @@ def streamToMidiFile(input):
 
 
 
-def midiFileToStream(mf, input=None):
+def midiFileToStream(mf, inputM21=None):
     '''
     >>> from music21 import *
     >>> import os
@@ -899,10 +899,10 @@ def midiFileToStream(mf, input=None):
     environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
 
     from music21 import stream
-    if input == None:
+    if inputM21 == None:
         s = stream.Stream()
     else:
-        s = input
+        s = inputM21
 
     if len(mf.tracks) == 0:
         raise StreamException('no tracks are defined in this MIDI file.')

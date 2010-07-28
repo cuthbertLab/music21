@@ -18,6 +18,7 @@ import unittest, doctest
 import music21
 from music21 import musicxml
 from music21 import common
+from music21 import defaults
 from music21 import pitch
 
 from music21 import environment
@@ -45,6 +46,7 @@ class Instrument(music21.Music21Object):
         self.partName = None
         self.partAbbreviation = None
 
+        self.instrumentId = None # apply to midi and instrument
         self.instrumentName = None
         self.instrumentAbbreviation = None
         self.midiProgram = None
@@ -64,15 +66,14 @@ class Instrument(music21.Music21Object):
         '''
         if self.partName != None:
             return self.partName
-        elif self.instrumentName != None:
-            return self.instrumentName
         elif self.partAbbreviation != None:
             return self.partAbbreviation
+        elif self.instrumentName != None:
+            return self.instrumentName
         elif self.instrumentAbbreviation != None:
             return self.instrumentAbbreviation
         else:
             return None
-
 
 
     def partIdRandomize(self):
@@ -83,20 +84,73 @@ class Instrument(music21.Music21Object):
         #                         self.partId, 'to', idNew])
         self.partId = idNew
          
-
+    def instrumentIdRandomize(self):
+        '''Force a unique id by using an MD5
+        '''
+        idNew = 'I%s' % common.getMd5()
+        #environLocal.printDebug(['incrementing instrument from', 
+        #                         self.partId, 'to', idNew])
+        self.instrumentId = idNew
+         
 
     #---------------------------------------------------------------------------
     def _getMX(self):
         '''
+        >>> from music21 import *
+        >>> i = instrument.Celesta()
+        >>> mxScorePart = i.mx
+        >>> len(mxScorePart.scoreInstrumentList)
+        1
+        >>> mxScorePart.scoreInstrumentList[0].instrumentName
+        'Celesta'
+        >>> mxScorePart.midiInstrumentList[0].midiProgram
+        9
         '''
         mxScorePart = musicxml.ScorePart()
 
-        if self.instrumentName != None:
-            pass
+        # get a random id if None set
+        if self.partId == None:
+            self.partIdRandomize()
+
+        if self.instrumentId == None:
+            self.instrumentIdRandomize()
+
+        # note: this is id, not partId!
+        mxScorePart.set('id', self.partId)
+
+        if self.partName != None:
+            mxScorePart.partName = self.partName
+        elif self.partName == None: # get default, as required
+            mxScorePart.partName = defaults.partName
+
+        if self.partAbbreviation != None:
+            mxScorePart.partAbbreviation = self.partAbbreviation
+
+        if self.instrumentName != None or self.instrumentAbbreviation != None:
+            mxScoreInstrument = musicxml.ScoreInstrument()
+            # set id to same as part for now
+            mxScoreInstrument.set('id', self.instrumentId)
+            # can set these to None
+            mxScoreInstrument.instrumentName = self.instrumentName
+            mxScoreInstrument.instrumentAbbreviation = self.instrumentAbbreviation
+            # add to mxScorePart
+            mxScorePart.scoreInstrumentList.append(mxScoreInstrument)
+
         if self.midiProgram != None:
-            pass
-        if self.midiChannel != None:
-            pass
+            mxMIDIInstrument = musicxml.MIDIInstrument()
+            mxMIDIInstrument.set('id', self.instrumentId)
+            # shift to start from 1
+            mxMIDIInstrument.midiProgram = self.midiProgram + 1 
+
+            if self.midiChannel == None:
+                # TODO: need to allocate channels from a higher level
+                self.midiChannel = 1 
+            mxMIDIInstrument.midiChannel = self.midiChannel
+            # add to mxScorePart
+            mxScorePart.midiInstrumentList.append(mxMIDIInstrument)
+
+        return mxScorePart
+        
 
     def _setMX(self, mxScorePart):
         '''
@@ -115,14 +169,63 @@ class Instrument(music21.Music21Object):
         if len(mxScorePart.midiInstrumentList) > 0:
             # for now, just get first midi instrument
             mxMIDIInstrument = mxScorePart.midiInstrumentList[0]
-            self.midiProgram = mxMIDIInstrument.get('midiProgram')
-            self.midiChannel = mxMIDIInstrument.get('midiChannel')
-
+            # musicxml counts from 1, not zero
+            self.midiProgram = int(mxMIDIInstrument.get('midiProgram')) - 1
+            self.midiChannel = int(mxMIDIInstrument.get('midiChannel'))
 
     mx = property(_getMX, _setMX)
 
 
+
+#-------------------------------------------------------------------------------
+class KeyboardInstrument(Instrument):
+
+    def __init__(self):
+        Instrument.__init__(self)
+
+
+class Piano(KeyboardInstrument):   
+    def __init__(self):
+        KeyboardInstrument.__init__(self)
+
+        self.instrumentName = 'Piano'
+        self.instrumentAbbreviation = 'Pno'
+        self.midiProgram = 0
+
+class Harpsichord(KeyboardInstrument):   
+    def __init__(self):
+        KeyboardInstrument.__init__(self)
+
+        self.instrumentName = 'Harpsichord'
+        self.instrumentAbbreviation = 'Hpschd'
+        self.midiProgram = 6
+
+
+class Clavichord(KeyboardInstrument):   
+    def __init__(self):
+        KeyboardInstrument.__init__(self)
+
+        self.instrumentName = 'Clavichord'
+        self.instrumentAbbreviation = 'Clv'
+        self.midiProgram = 7
+
+class Celesta(KeyboardInstrument):   
+    def __init__(self):
+        KeyboardInstrument.__init__(self)
+
+        self.instrumentName = 'Celesta'
+        self.instrumentAbbreviation = 'Clst'
+        self.midiProgram = 8
+
+
+
+
+#-------------------------------------------------------------------------------
+
 class StringInstrument(Instrument):
+
+    def __init__(self):
+        Instrument.__init__(self)
     
     def _getStringPitches(self):    
         if hasattr(self, "_cachedPitches") and self._cachedPitches is not None:
@@ -170,18 +273,43 @@ class StringInstrument(Instrument):
 class Violin(StringInstrument):   
     def __init__(self):
         StringInstrument.__init__(self)
+
+        self.instrumentName = 'Violin'
+        self.instrumentAbbreviation = 'Vln'
+        self.midiProgram = 40
+
         self.lowestNote = pitch.Pitch("G3")
         self._stringPitches = ["G3","D4","A4","E5"]
 
 class Viola(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
+
+        self.instrumentName = 'Viola'
+        self.instrumentAbbreviation = 'Vla'
+        self.midiProgram = 41
+
         self.lowestNote = pitch.Pitch("C3")
         
 
 class Violoncello(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
+
+        self.instrumentName = 'Violoncello'
+        self.instrumentAbbreviation = 'Vc'
+        self.midiProgram = 42
+
+        self.lowestNote = pitch.Pitch("C2")
+
+class Contrabass(StringInstrument):
+    def __init__(self):
+        StringInstrument.__init__(self)
+
+        self.instrumentName = 'Contrabass'
+        self.instrumentAbbreviation = 'Cb'
+        self.midiProgram = 43
+
         self.lowestNote = pitch.Pitch("C2")
 
 
@@ -197,7 +325,9 @@ class Bassoon(WoodwindInstrument):
     def __init__(self):
         WoodwindInstrument.__init__(self)
 
-
+        self.instrumentName = 'Bassoon'
+        self.instrumentAbbreviation = 'Bs'
+        self.midiProgram = 70
 
 
 
@@ -234,18 +364,16 @@ class Test(unittest.TestCase):
                 b = copy.deepcopy(obj)
 
 
-#     def testBruteMusicXML(self):
-#         from music21 import corpus
-# 
-#         post = []
-#         doc = musicxml.Document()
-#         doc.open(corpus.mozart[0])
-#         partList = doc.score.get('partList')
-#         for mxObj in partList:
-#             if isinstance(mxObj, music21.musicxml.ScorePart):
-#                 a = Instrument()    
-#                 a.mx = mxObj
-#                 post.append(a)
+    def testMusicXMLExport(self):
+        from music21 import stream, note, meter
+
+        s = stream.Stream()
+        i = Violin()
+        i.partName = 'test'
+        s.append(i)
+        s.repeatAppend(note.Note(), 10)
+        #s.show()
+
 
 
 
@@ -256,4 +384,10 @@ _DOC_ORDER = [Instrument]
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    import sys
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        a = Test()
+        a.testMusicXMLExport()
+
