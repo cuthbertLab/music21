@@ -1242,6 +1242,11 @@ class Pitch(music21.Music21Object):
         >>> p2 = p1.getHigherEnharmonic()
         >>> p2
         D-3
+
+        >>> p1 = pitch.Pitch('C#3')
+        >>> p1.getHigherEnharmonic(inPlace=True)
+        >>> p1
+        D-3
         '''
         intervalObj = interval.Interval('d2')
         if not inPlace:
@@ -1263,8 +1268,7 @@ class Pitch(music21.Music21Object):
         >>> p1 = pitch.Pitch('C#3')
         >>> p1.getLowerEnharmonic(inPlace=True)
         >>> p1
-        B2
-
+        B##2
         '''
         intervalObj = interval.Interval('-d2')
         if not inPlace:
