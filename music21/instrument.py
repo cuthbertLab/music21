@@ -93,6 +93,25 @@ class Instrument(music21.Music21Object):
         self.instrumentId = idNew
          
 
+    def midiChannelAutoAssign(self, usedChannels=[]):
+        '''Force a midi channel
+        '''
+        filter = []
+        for e in usedChannels:
+            if e != None:
+                filter.append(e)
+
+        if len(filter) == 0:
+            self.midiChannel = 0
+        else:
+            ch = max(filter)
+            ch += 1
+            if ch == 10:  # skip 10 /perc for now
+                ch += 1
+            ch = ch % 16 # wrap around if out
+            self.midiChannel = ch
+
+
     #---------------------------------------------------------------------------
     def _getMX(self):
         '''
@@ -144,8 +163,8 @@ class Instrument(music21.Music21Object):
 
             if self.midiChannel == None:
                 # TODO: need to allocate channels from a higher level
-                self.midiChannel = 1 
-            mxMIDIInstrument.midiChannel = self.midiChannel
+                self.midiChannelAutoAssign()
+            mxMIDIInstrument.midiChannel = self.midiChannel + 1
             # add to mxScorePart
             mxScorePart.midiInstrumentList.append(mxMIDIInstrument)
 
@@ -171,7 +190,7 @@ class Instrument(music21.Music21Object):
             mxMIDIInstrument = mxScorePart.midiInstrumentList[0]
             # musicxml counts from 1, not zero
             self.midiProgram = int(mxMIDIInstrument.get('midiProgram')) - 1
-            self.midiChannel = int(mxMIDIInstrument.get('midiChannel'))
+            self.midiChannel = int(mxMIDIInstrument.get('midiChannel')) - 1
 
     mx = property(_getMX, _setMX)
 
@@ -367,15 +386,24 @@ class Test(unittest.TestCase):
     def testMusicXMLExport(self):
         from music21 import stream, note, meter
 
-        s = stream.Stream()
-        i = Violin()
-        i.partName = 'test'
-        s.append(i)
-        s.repeatAppend(note.Note(), 10)
+        s1 = stream.Stream()
+        i1 = Violin()
+        i1.partName = 'test'
+        s1.append(i1)
+        s1.repeatAppend(note.Note(), 10)
         #s.show()
 
+        s2 = stream.Stream()
+        i2 = Piano()
+        i2.partName = 'test2'
+        s2.append(i2)
+        s2.repeatAppend(note.Note('g4'), 10)
 
+        s3 = stream.Score()
+        s3.insert(0, s1)
+        s3.insert(0, s2)
 
+        #s3.show()
 
 
 #-------------------------------------------------------------------------------

@@ -4158,6 +4158,7 @@ class Stream(music21.Music21Object):
 
             environLocal.printDebug(['Stream._getMX(): handling multi-part Stream of length:', len(partStream)])
             count = 0
+            midiChannelList = []
             for obj in partStream.getElementsByClass(sTemplate.classNames):
                 count += 1
                 if count > len(partStream):
@@ -4167,9 +4168,20 @@ class Stream(music21.Music21Object):
                 # get a default instrument if not assigned
                 inst = obj.getInstrument(returnDefault=True)
                 instIdList = [x.partId for x in instList]
+
                 if inst.partId in instIdList: # must have unique ids 
                     inst.partIdRandomize() # set new random id
+
+                if (inst.midiChannel == None or 
+                    inst.midiChannel in midiChannelList):
+                    inst.midiChannelAutoAssign(usedChannels=midiChannelList)
+                midiChannelList.append(inst.midiChannel)
+
+                environLocal.printDebug(['midiChannel list', midiChannelList])
+
+                # add to list for checking on next round
                 instList.append(inst)
+
                 # force this instrument into this part
                 mxComponents.append(obj._getMXPart(inst, meterStream,
                                 refStreamOrTimeRange))
