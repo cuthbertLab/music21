@@ -577,21 +577,21 @@ class Test(unittest.TestCase):
         # define ordered list of intervals
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         net = IntervalNetwork(edgeList)
-
+        
         # get this scale for any pitch at any step over any range
         # need a major scale with c# as the third degree
         match = net.realize('c#', 3)        
         self.assertEqual(str(match), '[A3, B3, C#, D4, E4, F#4, G#4, A4]')
-
+        
         # need a major scale with c# as the leading tone in a high octave
         match = net.realize('c#', 7, 'c8', 'c9')        
         self.assertEqual(str(match), '[C#8, D8, E8, F#8, G8, A8, B8]')
-
+        
         # for a given realization, we can find out the scale degree of any pithc
         self.assertEqual(net.getRelativeNodeId('c#', 7, 'd2'), 1)
         self.assertEqual(net.getRelativeNodeId('c#', 3, 'd2'), 4)
-    
-
+        
+        
         # we can create non-octave repeating scales too
         edgeList = ['P5', 'P5', 'P5']
         net = IntervalNetwork(edgeList)
@@ -599,32 +599,32 @@ class Test(unittest.TestCase):
         self.assertEqual(str(match), '[C4, G4, D5, A5]')
         match = net.realize('c4', 1, 'c4', 'c11')        
         self.assertEqual(str(match), '[C4, G4, D5, A5, E6, B6, F#7, C#8, G#8, D#9, A#9, E#10, B#10]')
-
+        
         # based on the original interval list, can get information on scale steps, even for non-octave repeating scales
         self.assertEqual(net.getRelativeNodeId('c4', 1, 'e#10'), 3)
-
-
+        
+        
         # we can also search for realized and possible matches in a network
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         net = IntervalNetwork(edgeList)
-
+        
         # if we know a realized version, we can test if pitches match in that version; returns matched, not found, and no match lists
         matched, noMatch = net.match('e-', 1, 'f')
         self.assertEqual(str(matched), '[F]')
-
+        
         # can search a list of pitches, isolating non-scale tones
         matched, noMatch = net.match('e-', 1, ['b-', 'd-', 'f'])
         self.assertEqual(str(matched), '[B-, F]')
         self.assertEqual(str(noMatch), '[D-]')
-
+        
         # finally, can search the unrealized network; all possible realizations
         # are tested, and the matched score is returned
         # the first top 4 results are returned by default
-
+        
         # in this case, the nearest major keys are G and D
         results = net.find(['g', 'a', 'b', 'd', 'f#'])
         self.assertEqual(str(results), '[(5, G), (5, D), (4, A), (4, C)]')
-
+        
         # with an f#, D is the most-matched first node pitch
         results = net.find(['g', 'a', 'b', 'c#', 'd', 'f#'])
         self.assertEqual(str(results), '[(6, D), (5, A), (5, G), (4, E)]')
@@ -635,48 +635,48 @@ class Test(unittest.TestCase):
         # can define a chord type as a sequence of intervals
         # to assure octave redundancy, must provide top-most interval to octave
         # this could be managed in specialized subclass
-
+        
         edgeList = ['M3', 'm3', 'P4']
         net = IntervalNetwork(edgeList)
-
+        
         # if g# is the root, or first node
         match = net.realize('g#', 1)        
         self.assertEqual(str(match), '[G#, B#4, D#5, G#5]')
-
+        
         # if g# is the fifth, or third node
         match = net.realize('g#', 3)        
         self.assertEqual(str(match), '[C#4, E#4, G#, C#5]')
-
+        
         # if g# is the third, or second node, across a wide range
         match = net.realize('g#', 2, 'c2', 'c5')        
         self.assertEqual(str(match), '[E2, G#2, B2, E3, G#3, B3, E4, G#, B4]')
-
+        
         # can match pitches to a realization of this chord
         # given a chord built form node 2 as g#, are e2 and b6 in this network
         matched, noMatch = net.match('g#', 2, ['e2', 'b6'])
         self.assertEqual(str(matched), '[E2, B6]')
-
+        
         # can find a first node (root) that match any provided pitches
         # this is independent of any realization
         results = net.find(['c', 'e', 'g'])
         self.assertEqual(str(results), '[(3, C), (1, A), (1, G#), (1, G)]')
-
+        
         # in this case, most likely an e triad
         results = net.find(['e', 'g#'])
         self.assertEqual(str(results), '[(2, E), (1, A), (1, G#), (1, C#)]')
-
-
+        
+        
         # we can do the same with larger or more complicated chords
         # again, we must provide the interval to the octave
         edgeList = ['M3', 'm3', 'M3', 'm3', 'm7']
         net = IntervalNetwork(edgeList)
         match = net.realize('c4', 1)        
         self.assertEqual(str(match), '[C4, E4, G4, B4, D5, C6]')
-
+        
         # if we want the same chord where c4 is the 5th node, or the ninth
         match = net.realize('c4', 5)        
         self.assertEqual(str(match), '[B-2, D3, F3, A3, C4, B-4]')
-
+        
         # we can of course provide any group of pitches and find the value
         # of the lowest node that provides the best fit
         results = net.find(['e', 'g#', 'b', 'd#'])
@@ -688,14 +688,14 @@ class Test(unittest.TestCase):
         # start with a major scale
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         netScale = IntervalNetwork(edgeList)
-
+        
         # take a half diminished seventh chord
         edgeList = ['m3', 'm3', 'M3', 'M2']
         netHarmony = IntervalNetwork(edgeList)
         match = netHarmony.realize('b4', 1)        
         self.assertEqual(str(match), '[B4, D5, F5, A5, B5]')
-
-
+        
+        
         # given a half dim seventh chord built on c#, what scale contains
         # these pitches?
         results = netScale.find(netHarmony.realize('c#', 1))
