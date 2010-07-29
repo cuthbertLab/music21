@@ -360,6 +360,8 @@ class GenericInterval(music21.Music21Object):
         2
 
         >>> aInterval = GenericInterval(-12)
+        >>> aInterval.niceName
+        'Twelfth'
         >>> aInterval.perfectable
         True
         >>> aInterval.staffDistance
@@ -379,6 +381,10 @@ class GenericInterval(music21.Music21Object):
         >>> aInterval = GenericInterval(0)
         Traceback (most recent call last):
         IntervalException: The Zeroth is not an interval
+
+        >>> aInterval = GenericInterval(24)
+        >>> aInterval.niceName
+        '24'
 
         '''
         music21.Music21Object.__init__(self)
@@ -440,8 +446,11 @@ class GenericInterval(music21.Music21Object):
             self.perfectable = True
         else:
             self.perfectable = False
-        
-        self.niceName = common.musicOrdinals[self.undirected]
+
+        if self.undirected < len(common.musicOrdinals):
+            self.niceName = common.musicOrdinals[self.undirected]
+        else:
+            self.niceName = str(self.undirected)
         self.simpleNiceName = common.musicOrdinals[self.simpleUndirected]
         self.semiSimpleNiceName = common.musicOrdinals[self.semiSimpleUndirected]
 

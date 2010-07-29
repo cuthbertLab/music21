@@ -412,6 +412,24 @@ class Accidental(music21.Music21Object):
              'three-quarters-flat', 'eseh', 'sesquiflat', -1.5]:
             self.name = 'one-and-a-half-flat'
             self.alter = -1.5
+            
+        elif name in ['triple-sharp', '###', 'isisis', 3]:
+            self.name = 'triple-sharp'
+            self.alter = 3.0
+            self.modifier = "###"
+        elif name in ['quadruple-sharp', '####', 'isisisis', 4]:
+            self.name = 'quadruple-sharp'
+            self.alter = 4.0
+            self.modifier = "####"
+        elif name in ['triple-flat', '---', 'eseses', -3]:
+            self.name = 'triple-flat'
+            self.alter = -3.0
+            self.modifier = '---'
+        elif name in ['quadruple-flat', '----', 'eseseses', -4]:
+            self.name = 'quadruple-flat'
+            self.alter = -4.0
+            self.modifier = '----'
+        
         else:
             raise AccidentalException('%s is not a supported accidental type' % name)
 
@@ -1218,7 +1236,7 @@ class Pitch(music21.Music21Object):
     def isEnharmonic(self, other):
         '''Return True if other is an enharmonic equivalent of self. 
 
-        >>> from music21 import pitch
+        >>> from music21 import *
         >>> p1 = pitch.Pitch('C#3')
         >>> p2 = pitch.Pitch('D-3')
         >>> p3 = pitch.Pitch('D#3')
@@ -1228,6 +1246,12 @@ class Pitch(music21.Music21Object):
         True
         >>> p3.isEnharmonic(p1)
         False
+        
+        OMIT_FROM_DOCS
+        >>> p4 = pitch.Pitch('B##3')
+        >>> p5 = pitch.Pitch('D-4')
+        >>> p4.isEnharmonic(p5)
+        True
         '''
         # if pitch space are equal, these are enharmoincs
         if other.ps == self.ps:
@@ -1237,7 +1261,7 @@ class Pitch(music21.Music21Object):
     def getHigherEnharmonic(self, inPlace=False):
         '''Returns a Pitch enharmonic note that a dim-second above the current note
 
-        >>> from music21 import pitch
+        >>> from music21 import *
         >>> p1 = pitch.Pitch('C#3')
         >>> p2 = p1.getHigherEnharmonic()
         >>> p2
@@ -1247,6 +1271,26 @@ class Pitch(music21.Music21Object):
         >>> p1.getHigherEnharmonic(inPlace=True)
         >>> p1
         D-3
+        
+        
+        
+        The method even works for certain CRAZY enharmonics
+        
+        
+        >>> p3 = pitch.Pitch('D--3')
+        >>> p4 = p3.getHigherEnharmonic()
+        >>> p4
+        E----3
+        
+        
+        But not for things that are just utterly insane:
+        
+        
+        >>> p4.getHigherEnharmonic()
+        Traceback (most recent call last):
+        AccidentalException: -5 is not a supported accidental type
+
+        
         '''
         intervalObj = interval.Interval('d2')
         if not inPlace:
@@ -1259,7 +1303,7 @@ class Pitch(music21.Music21Object):
     
     def getLowerEnharmonic(self, inPlace=False):
         '''returns a Pitch enharmonic note that is a dim-second below the current note
-        >>> from music21 import pitch
+        >>> from music21 import *
         >>> p1 = pitch.Pitch('C-3')
         >>> p2 = p1.getLowerEnharmonic()
         >>> p2
@@ -1279,6 +1323,50 @@ class Pitch(music21.Music21Object):
             self.accidental = p.accidental
             return None
 
+    def simplifyEnharmonic(self, inPlace=False):
+        '''
+        Returns a new Pitch (or sets the current one if inPlace is True)
+        that is either the same as the current pitch or has fewer
+        sharps or flats if possible.  For instance, E# returns F,
+        while A# remains A# (i.e., does not take into account that B- is
+        more common than A#).  Useful to call if you ever have an
+        algorithm that might take your piece far into the realm of
+        double or triple flats or sharps.
+        
+        TODO: should be called automatically after ChromaticInterval
+        transpositions.
+        
+        >>> from music21 import *
+        >>> p1 = pitch.Pitch("B#5")
+        >>> p1.simplifyEnharmonic().nameWithOctave
+        'C6'
+        
+        >>> p2 = pitch.Pitch("A#2")
+        >>> p2.simplifyEnharmonic(inPlace = True)
+        >>> p2
+        A#2
+        
+        >>> p3 = pitch.Pitch("E--3")
+        >>> p4 = p3.transpose(interval.Interval('-A5'))
+        >>> p4.simplifyEnharmonic()
+        F#2
+        '''
+        if abs(self.accidental.alter) < 2.0 and \
+            self.name not in ('E#', 'B#', 'C-', 'F-'):
+            if inPlace is True:
+                return None
+            else:
+                p = copy.deepcopy(self)
+                return p
+        else:
+            if inPlace is True:
+                self.ps = self.ps
+                return None
+            else:
+                p = Pitch()
+                p.ps = self.ps
+                return p
+
 
     def getEnharmonic(self, inPlace=False):
         '''Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
@@ -1292,7 +1380,7 @@ class Pitch(music21.Music21Object):
         Enharmonics of the following are defined:
                C <-> B#, D <-> C##, E <-> F-; F <-> E#, G <-> F##, A <-> B--, B <-> C-
     
-        However, areEnharmonics(A##, B) certainly returns true.
+        However, isEnharmonic() for A## and B certainly returns true.
     
         OMIT_FROM_DOCS
         Perhaps a getFirstNEnharmonics(n) needs to be defined which returns a list of the
