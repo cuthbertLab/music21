@@ -37,7 +37,7 @@ class IntervalNetwork:
     '''A graph of undefined Pitch nodes connected by a defined, ordered list of Interval objects as edges. 
     '''
 
-    def __init__(self):
+    def __init__(self, edgeList=None):
         self._edgesOrdered = []
         self._nodesOrdered = []
     
@@ -45,6 +45,9 @@ class IntervalNetwork:
         # as they are not positive ints
         self._start = 'start'
         self._end = 'end'
+
+        if edgeList != None: # auto initialize
+            self.setEdges(edgeList)
 
     def _updateNodes(self):
         low = self._start
@@ -259,6 +262,8 @@ class IntervalNetwork:
         else:
             nodeId = self._filterNodeId(nodeId)
             
+        if common.isStr(pitchObj):
+            pitchObj = pitch.Pitch(pitchObj)
 
         post = []
         post.append(pitchObj)
@@ -299,19 +304,227 @@ class IntervalNetwork:
 
 
 
-    def getRelativeNodeId(self, pitchObjReference, nodeIdReference, pitchTest):
+    def getRelativeNodeId(self, pitchReference, nodeId, pitchTest, 
+        permitEnharmonic=True):
         '''Given a reference pitch assigned to node id, determine the relative node id of pitchTest, even if displaced over multiple octaves
         
+        Need flags for pitch class and enharmonic comparison. 
+
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork(edgeList)
+        >>> net.realize(pitch.Pitch('e-2'))
+        [E-2, F2, G2, A-2, B-2, C3, D3, E-3]
+
+        >>> net.getRelativeNodeId('e-2', 1, 'd3')
+        7
+        >>> net.getRelativeNodeId('e3', 1, 'd5') == None
+        True
+        >>> net.getRelativeNodeId('e-3', 1, 'b-3')
+        5
+
+        >>> net.getRelativeNodeId('e-3', 1, 'e-5')
+        1
+        >>> net.getRelativeNodeId('e-2', 1, 'f3')
+        2
+        >>> net.getRelativeNodeId('e-3', 1, 'b6') == None
+        True
+
+        >>> net.getRelativeNodeId('e-3', 1, 'e-2')
+        1
+        >>> net.getRelativeNodeId('e-3', 1, 'd3')
+        7
+        >>> net.getRelativeNodeId('e-3', 1, 'e-3')
+        1
+        >>> net.getRelativeNodeId('e-3', 1, 'b-1')
+        5
+
+
+        >>> from music21 import *
+        >>> edgeList = ['p4', 'p4', 'p4']
+        >>> net = IntervalNetwork(edgeList)
+        >>> net.realize('f2')
+        [F2, B-2, E-3, A-3]
+        >>> net.realize('f2', 1, 'f2', 'f6')
+        [F2, B-2, E-3, A-3, D-4, G-4, C-5, F-5,   B--5, E--6]
+
+        >>> net.getRelativeNodeId('f2', 1, 'a-3') # could be 4 or 1
+        1
+        >>> net.getRelativeNodeId('f2', 1, 'd-4') # 2 is correct
+        2
+        >>> net.getRelativeNodeId('f2', 1, 'g-4') # 3 is correct
+        3
+        >>> net.getRelativeNodeId('f2', 1, 'c-5') # could be 4 or 1
+        1
+        >>> net.getRelativeNodeId('f2', 1, 'e--6') # could be 4 or 1
+        1
+
+
+        >>> net.realize('f6', 1, 'f2', 'f6')
+        [G#2, C#3, F#3, B3, E4, A4, D5, G5, C6, F6]
+
+        >>> net.getRelativeNodeId('f6', 1, 'd5') 
+        1
+        >>> net.getRelativeNodeId('f6', 1, 'g5') 
+        2
+        >>> net.getRelativeNodeId('f6', 1, 'a4') 
+        3
+        >>> net.getRelativeNodeId('f6', 1, 'e4') 
+        2
+        >>> net.getRelativeNodeId('f6', 1, 'b3') 
+        1
+
+
+
         '''
-        pass
+        if nodeId == None: # assume first
+            nodeId = self._getFirstNode()
+        else:
+            nodeId = self._filterNodeId(nodeId)
+
+        if common.isStr(pitchTest):
+            pitchTest = pitch.Pitch(pitchTest)
+
+        nodesRealized = self.realize(pitchReference, nodeId)
+
+        # check if in notesRealized
+        for i in range(len(nodesRealized)):
+            # comparison of attributes, not object
+            match = False
+            if permitEnharmonic:
+                if pitchTest.ps == nodesRealized[i].ps:
+                    match = True
+            else:
+                if pitchTest == nodesRealized[i]:
+                    match = True
+            if match:
+                return (i % len(self._edgesOrdered)) + 1 # first node is 1
+
+        # need to look upward
+        if pitchTest.ps > nodesRealized[-1].ps:
+            # from last to top
+            post = self._fitRange(nodesRealized, nodesRealized[-1], pitchTest)
+
+            # start shift to account for nodesRealized
+            i = 0
+            while True:
+                # add enharmonic comparison switch
+                if post[i].ps == pitchTest.ps:
+                    return (i % len(self._edgesOrdered)) + 1 # first node is 1
+                else:
+                    i += 1
+                if i >= len(post):
+                    return None
+
+        # need to look downward
+        elif pitchTest.ps < nodesRealized[0].ps:
+            post = self._fitRange(nodesRealized, pitchTest, nodesRealized[0])
+            # start shift to account for nodesRealized
+            i = len(post) - 1
+            count = 0 # first is zero position, boundary
+            while True:
+                #environLocal.printDebug([i, post, post[i]])
+
+                # add enharmonic comparison switch
+                if post[i].ps == pitchTest.ps:
+                    # remove the length of the post added in before
+                    # first node is 1
+                    return (count % len(self._edgesOrdered)) + 1 
+                else:
+                    i -= 1
+                    count -= 1
+                if i < 0:
+                    return None
+        return None
 
 
-    def match(self, pitchObjReference, nodeIdReference, pitchTest):
+
+
+
+
+    def match(self, pitchReference, nodeId, pitchTest):
         '''Given one or more pitches in pitchTest, determine number of pitch matches, pitch omissions, and non pitch tones. 
+
+        Need flags for pitch class and enharmonic comparison. 
+
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork(edgeList)
+        >>> net.realize('e-2')
+        [E-2, F2, G2, A-2, B-2, C3, D3, E-3]
+
+        >>> net.match('e-2', 1, 'c3')
+        ([C3], [], [])
+
+        >>> net.match('e-2', 1, 'd3')
+        ([D3], [], [])
+
+        >>> net.match('e-2', 1, 'd#3')
+        ([D#3], [E-3], [])
+
+        >>> net.match('e-2', 1, 'e3')
+        ([], [], [E3])
+
+        >>> pitchTest = [pitch.Pitch('b-2'), pitch.Pitch('b2'), pitch.Pitch('c3')]
+        >>> net.match('e-2', 1, pitchTest)
+        ([B-2, C3], [], [B2])
+
+        >>> pitchTest = ['b-2', 'b2', 'c3', 'e-3', 'e#3', 'f2', 'e--2']
+        >>> net.match('e-2', 1, pitchTest)
+        ([B-2, C3, E-3, E#3, F2, E--2], [D2, E-2, G2, A-2, D3, F3], [B2])
+
         '''
-        pass
+        if nodeId == None: # assume first
+            nodeId = self._getFirstNode()
+        else:
+            nodeId = self._filterNodeId(nodeId)
+
+        if not common.isListLike(pitchTest):
+            if common.isStr(pitchTest):
+                pitchTest = pitch.Pitch(pitchTest)
+            minPitch = pitchTest
+            maxPitch = pitchTest
+            pitchTest = [pitchTest]
+
+        else:
+            # could convert a list of string into pitch objects
+            temp = []
+            for p in pitchTest:
+                if common.isStr(p):
+                    temp.append(pitch.Pitch(p))
+            if len(temp) == len(pitchTest):
+                pitchTest = temp
+
+            sortList = [(pitchTest[i].ps, i) for i in range(len(pitchTest))]
+            sortList.sort()
+            minPitch = pitchTest[sortList[0][1]] # first index
+            maxPitch = pitchTest[sortList[-1][1]] # last index
 
 
+        nodesRealized = self.realize(pitchReference, nodeId, minPitch, maxPitch)
+
+        matched = []
+        notFound = []
+        noMatch = []
+
+        for target in pitchTest:
+            found = False
+            for p in nodesRealized:
+                # add enharmonic switch here
+                if target.ps == p.ps:
+                    matched.append(target)
+                    found = True
+                    break
+            if not found:
+                noMatch.append(target)
+
+        for p in nodesRealized:
+            if p not in matched:
+                notFound.append(p)
+            
+        return matched, notFound, noMatch
+                
+            
 
 
 #-------------------------------------------------------------------------------
