@@ -840,7 +840,7 @@ class Test(unittest.TestCase):
         notes = part.flat.notes
         beams = []
         for n in notes:
-            if n.isClass(note.Note):
+            if "Note" in n.classes:
                 beams += n.beams.beamsList
         self.assertEqual(len(beams), 152)
 

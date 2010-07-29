@@ -13,6 +13,9 @@
 '''This module defines various types of interval objects. Fundamental classes are :class:`~music21.interval.Interval`, :class:`~music21.interval.DiatonicInterval`, and :class:`~music21.interval.ChromaticInterval`.
 
 Numerous utility functions are provided for processing and generating intervals.
+
+*module authors: Michael Scott Cuthbert, Jackie Rogoff, Amy Hailes, and Christopher Ariza*
+
 '''
 
 import copy

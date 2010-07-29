@@ -209,8 +209,8 @@ class GeneralNote(music21.Music21Object):
     _DOC_ATTR = {
     'editorial': 'a :class:`~music21.editorial.NoteEditorial` object that stores editorial information (comments, harmonic information, ficta) and certain display information (color, hidden-state).',
     'isChord': 'Boolean read-only value describing if this object is a Chord.',
-    'lyrics': 'A list of Lyric objects.',
-    'tie': 'A Tie object.'
+    'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
+    'tie': 'either None or a :class:`~music21.note.Tie` object.'
     }    
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)

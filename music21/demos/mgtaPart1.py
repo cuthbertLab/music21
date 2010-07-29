@@ -88,8 +88,10 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
 def ch1_basic_I_C_1(show=True, *arguments, **keywords):
     '''
     p3.
-    start at a key marked with an ex, move finger according to pattern 
-    of half and whole steps; mark key at end with an asterisk
+    start at a note on the piano keyboard marked with an "X", 
+    move the performer's finger according to a pattern 
+    of half and whole steps and then mark the key at the end 
+    with an asterisk.
     '''
     from music21 import stream, interval
     nStart = note.Note('a4')
@@ -305,7 +307,9 @@ def ch1_basic_II_C_4(show=True, *arguments, **keywords):
 def ch1_writing_I_A_1(show=True, *arguments, **keywords):
     '''
     p. 5
-    Rewrite these melodies from music literature, placing the pitches one octave higher or lower as specified, by using ledger lines. Do not change to a new clef.
+    Rewrite these melodies from music literature, placing the pitches 
+    one octave higher or lower as specified, by using ledger lines. 
+    Do not change to a new clef.
 
     Rewrite one active higher 
     '''
@@ -614,7 +618,9 @@ def ch2_basic_I_A_4(show=True, *arguments, **keywords):
 
 def ch2_basic_I_B(show=True, *arguments, **keywords):
     '''p. 12
-    Using the information given, complete the chart below. (Given meter type and one of meter, beat unit, beat division, full bar divisions, provide the other data)
+    Using the information given, complete the chart below. 
+    (Given meter type and one of meter, beat unit, 
+    beat division, full bar divisions, provide the other data)
     '''
     # a brute force way to do this might have a function in meter.py that returns a number of candidates for a given meter type and some other parameter (bar duration). then, these values can be tested for match.
     pass

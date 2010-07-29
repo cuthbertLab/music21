@@ -52,8 +52,14 @@ class WindowedAnalysis(object):
         >>> post = wa._prepWindow()
         >>> len(post.measures)
         42
-        >>> len(post.measures[0])
-        6
+
+        >>> post.measures[0].show('text')
+        {0.0} <music21.meter.TimeSignature 1/4>
+        {0.0} <music21.clef.TrebleClef object at 0x...>
+        ...
+        {0.0} <music21.meter.TimeSignature 4/4>
+        ...
+        {0.0} <music21.note.Note B>   
         >>> len(post.measures[1])
         1
         '''
@@ -89,9 +95,12 @@ class WindowedAnalysis(object):
         
     def process(self, minWindow=1, maxWindow=1, windowStepSize=1,
         rawData=False):
-        ''' Main function call to start windowed analysis routine. Calls :meth:`~music21.WindowedAnalysis.GeneralNote._singleWindowAnalysis` for the number of different window sizes to be analyzed.
+        ''' Main function call to start windowed analysis routine. 
+        Calls :meth:`~music21.WindowedAnalysis.GeneralNote._singleWindowAnalysis` for 
+        the number of different window sizes to be analyzed.
 
-        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. The `windowStepSize` parameter determines the the increment between these window sizes, in quarter lengths. 
+        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. 
+        The `windowStepSize` parameter determines the the increment between these window sizes, in quarter lengths. 
 
         >>> from music21 import corpus
         >>> s = corpus.parseWork('bach/bwv324')
@@ -459,5 +468,5 @@ class Test(unittest.TestCase):
 if (__name__ == "__main__"):
     import doctest
     doctest.testmod()
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
     
