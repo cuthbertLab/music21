@@ -10,8 +10,15 @@ music21.base
 Music21 base classes for :class:`~music21.stream.Stream` objects and elements contained within them. Additional objects for defining and manipulating elements are included. The namespace of this file, as all base.py files, is loaded into the package that contains this file via __init__.py. Everything in this file is thus available after importing music21. 
 
 >>> import music21
->>> music21.ElementWrapper
-<class 'music21.base.ElementWrapper'> 
+>>> music21.Music21Object
+<class 'music21.base.Music21Object'> 
+Alternatively, after doing a complete import, these classes are available 
+under the module "base": 
+>>> from music21 import *
+>>> base.Music21Object
+<class 'music21.base.Music21Object'> 
+
+
 
 
 Music21Object
@@ -418,7 +425,7 @@ Inherits from: :class:`~music21.base.Music21Object`
 
         .. method:: isClass(className)
 
-            Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream 
+            DEPRICATED DON'T USE Returns true if the object embedded is a particular class. Used by getElementsByClass in Stream 
 
             >>> import note
             >>> a = ElementWrapper(None)

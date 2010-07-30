@@ -7,7 +7,9 @@ music21.interval
 
 .. module:: music21.interval
 
-This module defines various types of interval objects. Fundamental classes are :class:`~music21.interval.Interval`, :class:`~music21.interval.DiatonicInterval`, and :class:`~music21.interval.ChromaticInterval`. Numerous utility functions are provided for processing and generating intervals. 
+This module defines various types of interval objects. Fundamental classes are :class:`~music21.interval.Interval`, :class:`~music21.interval.DiatonicInterval`, and :class:`~music21.interval.ChromaticInterval`. Numerous utility functions are provided for processing and generating intervals. *module authors: Michael Scott Cuthbert, Jackie Rogoff, Amy Hailes, and Christopher Ariza* 
+
+
 
 
 .. function:: notesToChromatic(n1, n2)
@@ -620,6 +622,8 @@ Inherits from: :class:`~music21.base.Music21Object`
     >>> aInterval.staffDistance
     2 
     >>> aInterval = GenericInterval(-12)
+    >>> aInterval.niceName
+    'Twelfth' 
     >>> aInterval.perfectable
     True 
     >>> aInterval.staffDistance
@@ -637,6 +641,9 @@ Inherits from: :class:`~music21.base.Music21Object`
     >>> aInterval = GenericInterval(0)
     Traceback (most recent call last): 
     IntervalException: The Zeroth is not an interval 
+    >>> aInterval = GenericInterval(24)
+    >>> aInterval.niceName
+    '24' 
 
     
 

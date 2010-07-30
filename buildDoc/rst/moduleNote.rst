@@ -245,11 +245,11 @@ Inherits from: :class:`~music21.base.Music21Object`
 
         .. attribute:: lyrics
 
-            A list of Lyric objects. 
+            A list of :class:`~music21.note.Lyric` objects. 
 
         .. attribute:: tie
 
-            A Tie object. 
+            either None or a :class:`~music21.note.Tie` object. 
 
         Attributes without Documentation: `notations`, `articulations`
 

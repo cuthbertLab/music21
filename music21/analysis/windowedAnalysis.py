@@ -36,53 +36,82 @@ class WindowedAnalysisException(Exception):
 
 class WindowedAnalysis(object):
     def __init__(self, streamObj, analysisProcessor):
+        '''Create a WindowedAnalysis object.
+
+        The provided `analysisProcessor` must provide a `process()` method that, when given a windowed Stream (a Measure) returns two element tuple containing (a) a data value (implementation dependent) and (b) a color code. 
+        '''
         self.processor = analysisProcessor
         #environLocal.printDebug(self.processor)
         if 'Stream' not in streamObj.classes:
             raise WindowedAnalysisException, 'non-stream provided as argument'
-        self.streamObj = streamObj
 
-    def _prepWindow(self):
+        self._srcStream = streamObj
+        # store a windowed Stream, partitioned into bars of 1/4
+        self._windowedStream = self._getMinimumWindowStream() 
+
+    def _getMinimumWindowStream(self):
         ''' Take the loaded stream and restructure it into measures of 1 quarter note duration
 
         >>> from music21 import corpus
         >>> s = corpus.parseWork('bach/bwv324')
         >>> p = SadoianAmbitus()
         >>> # placing one part into analysis
-        >>> wa = WindowedAnalysis(s[0], p)
-        >>> post = wa._prepWindow()
+        >>> wa = WindowedAnalysis(s.parts[0], p)
+
+        >>> post = wa._getMinimumWindowStream()
         >>> len(post.measures)
         42
-
         >>> post.measures[0]
         <music21.stream.Measure 1 offset=0.0>
-
-        >>> len(post.measures[1])
+        >>> post.measures[0].timeSignature # set to 1/4 time signature
+        <music21.meter.TimeSignature 1/4>
+        >>> len(post.measures[1].notes) # one note in this measures 
         1
         '''
+        # create a stream that contains just a 1/4 time signature; this is 
+        # the minimum window size (and partitioning will be done by measure)
         meterStream = stream.Stream()
         meterStream.insert(0, meter.TimeSignature('1/4'))
         
-        # makeTies() splits the durations into proper measure boundaries for analysis
-        return self.streamObj.makeMeasures(meterStream).makeTies(inPlace=True)
+        # makeTies() splits the durations into proper measure boundaries for 
+        # analysis; this means that a duration that spans multiple 1/4 measures
+        # will be represented in each of those measures
+        return self._srcStream.makeMeasures(meterStream).makeTies(inPlace=True)
 
 
-    def _singleWindowAnalysis(self, windowSize, windowedStream):
-        ''' Handles calling single window analysis method for each window of a particular window size. 
+    def _analyze(self, windowSize):
+        ''' Calls, for a given window size, an analysis method across all windows in the source Stream. Windows above size 1 are always overlapped, so if a window of size 2 is used, windows 1-2, then 2-3, then 3-4 are compared. If a window of size 3 is used, windows 1-3, then 2-4, then 3-5 are compared. 
 
         Windows are assumed to be partitioned by :class:`music21.stream.Measure` objects.
+
+        Returns two lists for results, each equal in size to the length of minimum windows minus the window size plus one. If we have 20 1/4 windows, then the results lists will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc. 
+
+        >>> from music21 import corpus
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> p = SadoianAmbitus()
+        >>> wa = WindowedAnalysis(s, p)
+        >>> len(wa._windowedStream)
+        39
+        >>> a, b = wa._analyze(1)
+        >>> len(a), len(b)
+        (39, 39)
+
+        >>> a, b = wa._analyze(4)
+        >>> len(a), len(b)
+        (36, 36)
+
         '''
-        max = len(windowedStream.measures)
+        max = len(self._windowedStream.getElementsByClass('Measure'))
         data = [0] * (max - windowSize + 1)
         color = [0] * (max - windowSize + 1)               
         
         for i in range(max-windowSize + 1):
             # getting a range of Measures to be used as windows
-            # collect is set to [] so that clefs, timesignatures, and other
-            # objects are not gathered. 
+            # for getMeasureRange(), collect is set to [] so that clefs, timesignatures, and other objects are not gathered. 
+
             # a flat representation removes all Streams, returning only 
             # Notes, Chords, etc.
-            current = windowedStream.getMeasureRange(i, 
+            current = self._windowedStream.getMeasureRange(i, 
                       i+windowSize, collect=[]).flat
             # current is a Stream for analysis
             data[i], color[i] = self.processor.process(current)
@@ -93,7 +122,7 @@ class WindowedAnalysis(object):
     def process(self, minWindow=1, maxWindow=1, windowStepSize=1,
         rawData=False):
         ''' Main function call to start windowed analysis routine. 
-        Calls :meth:`~music21.WindowedAnalysis.GeneralNote._singleWindowAnalysis` for 
+        Calls :meth:`~music21.analysis.WindowedAnalysis._analyze` for 
         the number of different window sizes to be analyzed.
 
         The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. 
@@ -116,12 +145,10 @@ class WindowedAnalysis(object):
         '#FF8000'
         '''
         # names = [x.id for x in sStream]
-        
-        windowedStream = self._prepWindow()
-        
+                
         #max = len(sStream[0].measures)
         if maxWindow < 1:
-            max = len(windowedStream)
+            max = len(self._windowedStream)
         else:
             max = maxWindow
         
@@ -131,14 +158,15 @@ class WindowedAnalysis(object):
         # create empty arrays for storage
         solutionMatrix = [0] * solutionSize
         color = [0] * solutionSize
+
         for i in range(minWindow, max+1, windowStepSize):
             # where to add data in the solution vectors
-            pos = (i-minWindow)/windowStepSize
+            pos = (i-minWindow) / windowStepSize
 
             environLocal.printDebug(['processing window:', i, 
                                      'storing data:', pos])
 
-            soln, colorn = self._singleWindowAnalysis(i, windowedStream) 
+            soln, colorn = self._analyze(i) 
             if pos >= solutionSize:
                 environLocal.printDebug(['cannot fit data; position, solutionSize', pos, solutionSize])
             else:
@@ -152,24 +180,40 @@ class WindowedAnalysis(object):
 
 
 #------------------------------------------------------------------------------
+class DiscreteAnalysisException(Exception):
+    pass
 
 class DiscreteAnalysis(object):
-    ''' Parent class for single analytical methods
+    ''' Parent class for analytical methods.
+
+    Each analytical method returns a discrete numerical (or other) results as well as a color. Colors can be used in mapping output.
     '''
     def __init__(self):
         pass
+
+    def _rgbToHex(self, rgb):
+        '''Utility conversion method
+        '''
+        return '#%02x%02x%02x' % rgb    
     
     def possibleResults(self):
+        '''A list of pairs showing all discrete results and the assigned color.
+        '''
         pass
     
     def resultsToColor(self, result):
+        '''Given a numerical result, return the appropriate color. Must be able to handle None in the case that there is no result.
+        '''
         pass
     
     def process(self, subStream):
+        '''For a given Stream, apply the analysis to all components of this Stream.
+        '''
         pass
 
-#------------------------------------------------------------------------------
 
+
+#------------------------------------------------------------------------------
 class KrumhanslSchmuckler(DiscreteAnalysis):
     ''' Implementation of the Krumhansl-Schmuckler key determination algorithm
     '''
@@ -223,22 +267,23 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                  'A':'#9b009b',
                  'A#':'#9b009b'}
     
-    def _getWeights(self, isMajor): 
-        ''' Returns either the major or minor key profile as described by Sapp
+
+    def _getWeights(self, weightType='major'): 
+        ''' Returns either the a weight key profile as described by Sapp and others
             
         >>> a = KrumhanslSchmuckler()
-        >>> a._getWeights(True)
-        [6.3499999999999996, 2.3300000000000001, 3.48, 2.3300000000000001, 4.3799999999999999, 4.0899999999999999, 2.52, 5.1900000000000004, 2.3900000000000001, 3.6600000000000001, 2.29, 2.8799999999999999]
-        >>> a._getWeights(False)
-        [6.3300000000000001, 2.6800000000000002, 3.52, 5.3799999999999999, 2.6000000000000001, 3.5299999999999998, 2.54, 4.75, 3.98, 2.6899999999999999, 3.3399999999999999, 3.1699999999999999]
-            
+        >>> len(a._getWeights('major'))
+        12
+        >>> len(a._getWeights('minor'))
+        12            
         '''
-        
-        if isMajor:
+        weightType = weightType.lower()
+        if weightType == 'major':
             return [6.35, 2.33, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
-        else:
+        elif weightType == 'minor':
             return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]    
-
+        else:
+            raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
 
     def _getPitchClassDistribution(self, streamObj):
         '''Given a flat Stream, obtain a pitch class distribution. The value of each pitch class is scaled by its duration in quarter lengths.
@@ -274,16 +319,13 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         return pcDist
 
 
-    def _convoluteDistribution(self, pcDistribution, isMajor=True):
+    def _convoluteDistribution(self, pcDistribution, weightType='major'):
         ''' Takes in a pitch class distribution as a list and convolutes it
             over Sapp's given distribution for finding key, returning the result. 
         '''
         soln = [0] * 12
         
-        if isMajor:
-            toneWeights = self._getWeights(True)
-        else:
-            toneWeights = self._getWeights(False)
+        toneWeights = self._getWeights(weightType)
                 
         for i in range(len(soln)):
             for j in range(len(pcDistribution)):
@@ -306,7 +348,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         return likelyKeys
         
         
-    def _getDifference(self, keyResults, pcDistribution, isMajor=True):
+    def _getDifference(self, keyResults, pcDistribution, weightType):
         ''' Takes in a list of numerical probably key results and returns the
             difference of the top two keys
         '''
@@ -316,26 +358,29 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         bottomRight = [0]*12
         bottomLeft = [0]*12
             
-        if isMajor:
-            toneWeights = self._getWeights(True)
-        else:
-            toneWeights = self._getWeights(False)
-            
+        toneWeights = self._getWeights(weightType)
+
         profileAverage = float(sum(toneWeights))/len(toneWeights)
         histogramAverage = float(sum(pcDistribution))/len(pcDistribution) 
             
         for i in range(len(soln)):
             for j in range(len(toneWeights)):
-                top[i] = top[i] + ((toneWeights[(j - i) % 12]-profileAverage) * (pcDistribution[j]-histogramAverage))
-                bottomRight[i] = bottomRight[i] + ((toneWeights[(j-i)%12]-profileAverage)**2)
-                bottomLeft[i] = bottomLeft[i] + ((pcDistribution[j]-histogramAverage)**2)
+                top[i] = top[i] + ((
+                    toneWeights[(j - i) % 12]-profileAverage) * (
+                    pcDistribution[j]-histogramAverage))
+
+                bottomRight[i] = bottomRight[i] + ((
+                    toneWeights[(j-i)%12]-profileAverage)**2)
+
+                bottomLeft[i] = bottomLeft[i] + ((
+                    pcDistribution[j]-histogramAverage)**2)
+
                 if (bottomRight[i] == 0 or bottomLeft[i] == 0):
                     soln[i] = 0
                 else:
                     soln[i] = float(top[i]) / ((bottomRight[i]*bottomLeft[i])**.5)
-                
         return soln    
-        
+
     def possibleResults(self):
         ''' TODO: returns a list of possible results for the creation of a legend
         '''
@@ -370,14 +415,15 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
     
         pcDistribution = self._getPitchClassDistribution(sStream)
     
-        keyResultsMajor = self._convoluteDistribution(pcDistribution, True)
+        keyResultsMajor = self._convoluteDistribution(pcDistribution,'major')
         differenceMajor = self._getDifference(keyResultsMajor, 
-                         pcDistribution, True)
+                         pcDistribution, 'major')
         likelyKeysMajor = self._getLikelyKeys(keyResultsMajor, differenceMajor)
         
-        keyResultsMinor = self._convoluteDistribution(pcDistribution, False)   
+
+        keyResultsMinor = self._convoluteDistribution(pcDistribution,'minor')   
         differenceMinor = self._getDifference(keyResultsMinor, 
-                          pcDistribution, False)
+                          pcDistribution, 'minor')
         likelyKeysMinor = self._getLikelyKeys(keyResultsMinor, differenceMinor)
         
         #find the largest correlation value to use to select major or minor as the resulting key
@@ -392,7 +438,6 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 
 
 
-
 class SadoianAmbitus(DiscreteAnalysis):
     '''An basic analysis method for measuring register. 
     '''
@@ -401,41 +446,64 @@ class SadoianAmbitus(DiscreteAnalysis):
         self.pitchSpanColors = {}
         self._generateColors(130)
 
-
-    def _rgb_to_hex(self, rgb):
-        return '#%02x%02x%02x' % rgb    
-    
     def _generateColors(self, numColors):
-        
+        '''Provide uniformly distributed colors across the entire range.
+        '''
         for i in range(numColors):
             val = 0
             val = (255.0/numColors)*i
-            self.pitchSpanColors[i] = self._rgb_to_hex((val, val, val))
-            
+            self.pitchSpanColors[i] = self._rgbToHex((val, val, val))
     
-    def _getPitchSpan(self, work):
-        soln = 0
-        max = 0
-        min = 10000000000
+    def _getPitchSpan(self, subStream):
+        '''For a given subStream, return a value in half-steps of the range
+
+        >>> from music21 import *
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> p = SadoianAmbitus()
+        >>> p._getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
+        5.0
+        >>> p._getPitchSpan(s.parts[0].getElementsByClass('Measure')[6])
+        4.0
+
+        >>> s = stream.Stream()
+        >>> c = chord.Chord(['a2', 'b4', 'c8'])
+        >>> s.append(c)
+        >>> p._getPitchSpan(s)
+        63
+        '''
         
-        for n in work.notes:        
-            if not n.isRest:
-                if n.isChord:
-                    for m in n.pitches:
-                        if m.ps > max:
-                            max = m.ps
-                        elif m.ps < min:
-                            min = m.ps
-                else:
-                    if n.ps > max:
-                        max = n.ps
-                    elif n.ps < min:
-                        min = n.ps
-        
-        return (max - min)
+        if len(subStream.flat.notes) == 0:
+            # need to handle case of no pitches
+            return None
+
+        # find the min and max pitch space value for all pitches
+        psFound = []
+        for n in subStream.flat.notes:
+            pitches = []
+            if 'Chord' in n.classes:
+                pitches = n.pitches
+            elif 'Note' in n.classes:
+                pitches = [n.pitch]
+
+            psFound += [p.ps for p in pitches]
+        # use built-in functions
+        return abs(max(psFound) - min(psFound))
 
     
     def resultsToColor(self, result):
+        '''
+        >>> from music21 import *
+        >>> p = SadoianAmbitus()
+        >>> s = stream.Stream()
+        >>> c = chord.Chord(['a2', 'b4', 'c8'])
+        >>> s.append(c)
+        >>> p.resultsToColor(p._getPitchSpan(s))
+        '#7b7b7b'
+        '''    
+        # a result of None may be possible
+        if result == None:
+            return self._rgbToHex((0, 12, 0))
+
         return self.pitchSpanColors[result]
     
     
@@ -462,8 +530,9 @@ class Test(unittest.TestCase):
 
 #------------------------------------------------------------------------------
 
-if (__name__ == "__main__"):
-    import doctest
-    doctest.testmod()
-    music21.mainTest(Test)
-    
+if __name__ == "__main__":
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        a = Test()
+

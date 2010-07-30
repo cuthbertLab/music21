@@ -358,6 +358,61 @@ Inherits from: :class:`~music21.base.Music21Object`
 
     **Pitch** **methods**
 
+        .. method:: getEnharmonic(inPlace=False)
+
+            Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch. N.B.: n1.name == getEnharmonic(getEnharmonic(n1)).name is not necessarily true. For instance: getEnharmonic(E##) => F#; getEnharmonic(F#) => G- or: getEnharmonic(A--) => G; getEnharmonic(G) => F## However, for all cases not involving double sharps or flats (and even many that do) getEnharmonic(getEnharmonic(n)) = n Enharmonics of the following are defined: C <-> B#, D <-> C##, E <-> F-; F <-> E#, G <-> F##, A <-> B--, B <-> C- However, isEnharmonic() for A## and B certainly returns true. 
+
+        .. method:: getHigherEnharmonic(inPlace=False)
+
+            Returns a Pitch enharmonic note that a dim-second above the current note 
+
+            >>> from music21 import *
+            >>> p1 = pitch.Pitch('C#3')
+            >>> p2 = p1.getHigherEnharmonic()
+            >>> p2
+            D-3 
+            >>> p1 = pitch.Pitch('C#3')
+            >>> p1.getHigherEnharmonic(inPlace=True)
+            >>> p1
+            D-3 
+
+            
+
+            
+            The method even works for certain CRAZY enharmonics 
+
+            
+            >>> p3 = pitch.Pitch('D--3')
+            >>> p4 = p3.getHigherEnharmonic()
+            >>> p4
+            E----3 
+
+            
+            But not for things that are just utterly insane: 
+
+            
+            >>> p4.getHigherEnharmonic()
+            Traceback (most recent call last): 
+            AccidentalException: -5 is not a supported accidental type 
+
+            
+
+            
+
+        .. method:: getLowerEnharmonic(inPlace=False)
+
+            returns a Pitch enharmonic note that is a dim-second below the current note 
+
+            >>> from music21 import *
+            >>> p1 = pitch.Pitch('C-3')
+            >>> p2 = p1.getLowerEnharmonic()
+            >>> p2
+            B2 
+            >>> p1 = pitch.Pitch('C#3')
+            >>> p1.getLowerEnharmonic(inPlace=True)
+            >>> p1
+            B##2 
+
         .. method:: inheritDisplay(other)
 
             Inherit display properties from another Pitch, including those found on the Accidental object. 
@@ -371,6 +426,38 @@ Inherits from: :class:`~music21.base.Music21Object`
             'always' 
 
             
+
+        .. method:: isEnharmonic(other)
+
+            Return True if other is an enharmonic equivalent of self. 
+
+            >>> from music21 import *
+            >>> p1 = pitch.Pitch('C#3')
+            >>> p2 = pitch.Pitch('D-3')
+            >>> p3 = pitch.Pitch('D#3')
+            >>> p1.isEnharmonic(p2)
+            True 
+            >>> p2.isEnharmonic(p1)
+            True 
+            >>> p3.isEnharmonic(p1)
+            False 
+
+        .. method:: simplifyEnharmonic(inPlace=False)
+
+            Returns a new Pitch (or sets the current one if inPlace is True) that is either the same as the current pitch or has fewer sharps or flats if possible.  For instance, E# returns F, while A# remains A# (i.e., does not take into account that B- is more common than A#).  Useful to call if you ever have an algorithm that might take your piece far into the realm of double or triple flats or sharps. TODO: should be called automatically after ChromaticInterval transpositions. 
+
+            >>> from music21 import *
+            >>> p1 = pitch.Pitch("B#5")
+            >>> p1.simplifyEnharmonic().nameWithOctave
+            'C6' 
+            >>> p2 = pitch.Pitch("A#2")
+            >>> p2.simplifyEnharmonic(inPlace = True)
+            >>> p2
+            A#2 
+            >>> p3 = pitch.Pitch("E--3")
+            >>> p4 = p3.transpose(interval.Interval('-A5'))
+            >>> p4.simplifyEnharmonic()
+            F#2 
 
         .. method:: transpose(value, inPlace=False)
 
