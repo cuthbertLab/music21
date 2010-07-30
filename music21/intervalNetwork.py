@@ -38,9 +38,19 @@ class IntervalNetwork:
     '''
 
     def __init__(self, edgeList=None):
+        # edges are stored Interval objects, in order
         self._edgesOrdered = []
+        # nodes suggest Pitches, but Pitches are not stored
+        # instead, nodes are keys, pairs defining the two edges that connect
+        # to this node
         self._nodesOrdered = []
     
+        # attributes (weights, etc) for edges might be defined as dictionaries
+        # for each index position in the self._edgesOrdered list
+        self._edgeAttributes = {}
+        # attributes for nodes can be defined as dictionaries for each
+        # store node key (a pair between edges) 
+        self._nodeAttributes = {}
 
         # these are just symbols/place holders; values do not matter as long
         # as they are not positive ints

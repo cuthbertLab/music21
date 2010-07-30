@@ -5,6 +5,7 @@
 #               classes of analytical procedures
 #
 # Authors:      Jared Sadoian
+# Authors:      Christopher Ariza
 #
 # Copyright:    (c) 2010 The music21 Project
 # License:      LGPL
@@ -37,7 +38,7 @@ class WindowedAnalysis(object):
     def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
         #environLocal.printDebug(self.processor)
-        if not isinstance(streamObj, music21.stream.Stream):
+        if 'Stream' not in streamObj.classes:
             raise WindowedAnalysisException, 'non-stream provided as argument'
         self.streamObj = streamObj
 
@@ -53,13 +54,9 @@ class WindowedAnalysis(object):
         >>> len(post.measures)
         42
 
-        >>> post.measures[0].show('text')
-        {0.0} <music21.meter.TimeSignature 1/4>
-        {0.0} <music21.clef.TrebleClef object at 0x...>
-        ...
-        {0.0} <music21.meter.TimeSignature 4/4>
-        ...
-        {0.0} <music21.note.Note B>   
+        >>> post.measures[0]
+        <music21.stream.Measure 1 offset=0.0>
+
         >>> len(post.measures[1])
         1
         '''
