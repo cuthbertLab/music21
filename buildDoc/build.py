@@ -3,8 +3,8 @@
 # Name:         build.py
 # Purpose:      music21 documentation builder
 #
-# Authors:      Michael Scott Cuthbert
-#               Christopher Ariza
+# Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
 # Copyright:    (c) 2009-10 The music21 Project
 # License:      LGPL
