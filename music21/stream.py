@@ -1190,11 +1190,12 @@ class Stream(music21.Music21Object):
 
         # use direct access to elements list
         for e in self._elements:
+            eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
                 # new method uses string matching of .classes attribute
                 # temporarily check to see if this is a string
                 if isinstance(className, str):
-                    if className in e.classes:
+                    if className in eClasses:
                         found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
                         break
                 # old method uses isClass matching
@@ -1535,29 +1536,39 @@ class Stream(music21.Music21Object):
         '''
         candidates = []
         nearestTrailSpan = offset # start with max time
-        for element in self:
+        for e in self._elements:
+            eClasses = e.classes # store once, as this is property call
             if classList != None:
                 match = False
                 for cl in classList:
-                    if isinstance(element, cl):
-                        match = True
-                        break
+
+                    # new method uses string matching of .classes attribute
+                    # temporarily check to see if this is a string
+                    if isinstance(cl, str):
+                        if cl in eClasses:
+                            match = True
+                            break
+                    # old method uses isinstance matching
+                    else:
+                        if isinstance(e, cl):
+                            match = True
+                            break
                 if not match:
                     continue
-            span = offset - element.offset
-            #environLocal.printDebug(['element span check', span])
-            if span < 0: # the element is after this offset
+            span = offset - e.offset
+            #environLocal.printDebug(['e span check', span])
+            if span < 0: # the e is after this offset
                 continue
             elif span == 0: 
-                candidates.append((span, element))
+                candidates.append((span, e))
                 nearestTrailSpan = span
             else:
                 if span <= nearestTrailSpan: # this may be better than the best
-                    candidates.append((span, element))
+                    candidates.append((span, e))
                     nearestTrailSpan = span
                 else:
                     continue
-        #environLocal.printDebug(['getElementAtOrBefore(), element candidates', candidates])
+        #environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
         if len(candidates) > 0:
             candidates.sort()
             return candidates[0][1]
