@@ -424,6 +424,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         ('A#', 'major', 0.89772788962941652)
 
         '''
+        # always take a flat version here, otherwise likely to get nothing
         solution, color = self.process(sStream.flat)
         return solution
     
