@@ -26,8 +26,8 @@ from music21 import environment
 _MOD = 'windowedAnalysis.py'
 environLocal = environment.Environment(_MOD)
 
-#------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
 class WindowedAnalysisException(Exception):
     pass
 
@@ -50,7 +50,7 @@ class WindowedAnalysis(object):
         self._windowedStream = self._getMinimumWindowStream() 
 
     def _getMinimumWindowStream(self):
-        ''' Take the loaded stream and restructure it into measures of 1 quarter note duration
+        ''' Take the loaded stream and restructure it into measures of 1 quarter note duration.
 
         >>> from music21 import corpus
         >>> s = corpus.parseWork('bach/bwv324')
@@ -119,65 +119,69 @@ class WindowedAnalysis(object):
         return data, color
 
         
-    def process(self, minWindow=1, maxWindow=1, windowStepSize=1,
-        rawData=False):
-        ''' Main function call to start windowed analysis routine. 
+    def process(self, minWindow=1, maxWindow=1, windowStepSize=1):
+
+        ''' Main method for windowed analysis across one or more window size.
+
         Calls :meth:`~music21.analysis.WindowedAnalysis._analyze` for 
         the number of different window sizes to be analyzed.
 
-        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. 
-        The `windowStepSize` parameter determines the the increment between these window sizes, in quarter lengths. 
+        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. The `windowStepSize` parameter determines the the increment between these window sizes, in quarter lengths. 
+
+        If `minWindow` or `maxWindow` is None, the largest window size available will be set. 
 
         >>> from music21 import corpus
         >>> s = corpus.parseWork('bach/bwv324')
         >>> p = KrumhanslSchmuckler()
         >>> # placing one part into analysis
         >>> wa = WindowedAnalysis(s[0], p)
-        >>> x, y = wa.process(1, 1)
+        >>> x, y, z = wa.process(1, 1)
         >>> len(x) # we only have one series of windows
         1
-        >>> x[0], y[0] # we get out solution value and a color
-        >>> x, y = wa.process(1, 2)
+        >>> x[0][0], y[0][0] # for each window, we get a solution and a color
+        (('B', 'major', 0.6868258874056411), '#FF8000')
+
+        >>> x, y, z = wa.process(1, 2)
         >>> len(x) # we have two series of windows
         2
+
         >>> x[0][0] # the data returned is processor dependent; here we get
-        ('B', 'Major', 0.6868258874056411)
+        ('B', 'major', 0.6868258874056411)
         >>> y[0][0] # a color is returned for each matching data position
         '#FF8000'
         '''
         # names = [x.id for x in sStream]
                 
         #max = len(sStream[0].measures)
-        if maxWindow < 1:
+        if maxWindow == None:
             max = len(self._windowedStream)
         else:
             max = maxWindow
+
+        if minWindow == None:
+            min = len(self._windowedStream)
+        else:
+            min = minWindow
         
-        #array set to the size of the expected resulting set
-        solutionSize = (max-minWindow+1) / windowStepSize
+        # need to create storage for the output of each row, or the processing
+        # of all windows of a single size across the entire Stream
+        solutionMatrix = [] 
+        colorMatrix = [] 
+        # store meta data about each row as a dictionary
+        metaMatrix = [] 
 
-        # create empty arrays for storage
-        solutionMatrix = [0] * solutionSize
-        color = [0] * solutionSize
-
-        for i in range(minWindow, max+1, windowStepSize):
-            # where to add data in the solution vectors
-            pos = (i-minWindow) / windowStepSize
-
-            environLocal.printDebug(['processing window:', i, 
-                                     'storing data:', pos])
-
+        for i in range(min, max+1, windowStepSize):
+            environLocal.printDebug(['processing window:', i])
+            # each of these results are lists, where len is based on 
             soln, colorn = self._analyze(i) 
-            if pos >= solutionSize:
-                environLocal.printDebug(['cannot fit data; position, solutionSize', pos, solutionSize])
-            else:
-                solutionMatrix[pos] = soln
-                color[pos] = colorn
+            # store lists of results in a list of lists
+            solutionMatrix.append(soln)
+            colorMatrix.append(colorn)
+            meta = {'windowSize': i}
+            metaMatrix.append(meta)
         
-        return solutionMatrix, color
+        return solutionMatrix, colorMatrix, metaMatrix
 
-
-    
 
 
 #------------------------------------------------------------------------------
@@ -188,22 +192,25 @@ class DiscreteAnalysis(object):
     ''' Parent class for analytical methods.
 
     Each analytical method returns a discrete numerical (or other) results as well as a color. Colors can be used in mapping output.
+
+    Analytical methods may make use of a `referenceStream` to configure the processor on initialization. 
     '''
-    def __init__(self):
-        pass
+    def __init__(self, referenceStream=None):
+        # store a reference stream if needed
+        self._referenceStream = referenceStream
 
     def _rgbToHex(self, rgb):
         '''Utility conversion method
         '''
         return '#%02x%02x%02x' % rgb    
-    
+
     def possibleResults(self):
         '''A list of pairs showing all discrete results and the assigned color.
         '''
         pass
     
-    def resultsToColor(self, result):
-        '''Given a numerical result, return the appropriate color. Must be able to handle None in the case that there is no result.
+    def solutionToColor(self, result):
+        '''Given a analysis specific result, return the appropriate color. Must be able to handle None in the case that there is no result.
         '''
         pass
     
@@ -212,6 +219,11 @@ class DiscreteAnalysis(object):
         '''
         pass
 
+
+    def getSolution(self, subStream):
+        '''For a given Stream, apply the analysis and return the best solution.
+        '''
+        pass
 
 
 #------------------------------------------------------------------------------
@@ -225,7 +237,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         
         # note: these colors were manually selected to optimize distinguishing
         # characteristics. do not change without good reason
-        self.majorKeyColors = {'Eb':'#D60000',
+        self._majorKeyColors = {'Eb':'#D60000',
                  'E':'#FF0000',
                  'E#':'#FF2B00',
                  'B-':'#FF5600',
@@ -246,7 +258,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                  'A-':'#D600FF',
                  'A':'#FF00FF',
                  'A#':'#FF55FF'}
-        self.minorKeyColors = {'Eb':'#720000',
+        self._minorKeyColors = {'Eb':'#720000',
                  'E':'#9b0000',
                  'E#':'#9b0000',
                  'B-':'#9b0000',
@@ -387,25 +399,41 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         '''
         pass
     
-    def resultsToColor(self, key, modality):
-        ''' use the stored color information in the __init__ method to assign a color for a given result
+    def solutionToColor(self, solution):
+        '''For a given solution, return the color. Use the stored color information in the __init__ method to assign a color for a given result.
         '''
-        if modality == "Major":
-            return self.majorKeyColors[str(key)]
-        else:
-            return self.minorKeyColors[str(key)]
+        key = solution[0]
+        modality = solution[1]
+        if modality == "major":
+            return self._majorKeyColors[str(key)]
+        elif modality == "minor":
+            return self._minorKeyColors[str(key)]
         
     
-    def getResult(self, sStream):
+    def getSolution(self, sStream):
         ''' procedure to only return a text solution
+        >>> from music21 import *
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> p = KrumhanslSchmuckler()
+        >>> p.getSolution(s) # this seems correct
+        ('F#', 'minor', 0.81547089257624916)
+
+        >>> s = corpus.parseWork('bach/bwv57.8')
+        >>> p = KrumhanslSchmuckler()
+        >>> p.getSolution(s) # should be b- major
+        ('A#', 'major', 0.89772788962941652)
+
         '''
-        soln = self.process(sStream)
-        return soln[0]
+        solution, color = self.process(sStream.flat)
+        return solution
     
     
     def process(self, sStream):    
-        ''' Takes in a Stream and algorithmically detects
-            probable keys using convoluteDistribution() and getLikelyKeys()
+        ''' Takes in a Stream or sub-Stream and performs analysis on all contents of the Stream. A windowing system can be used to get partial results. 
+
+        Returns two values, a data list and a color string.
+
+        The data list contains a key (as a string), a mode (as a string), and a correlation value (degree of certainty)
         '''
     
         # this is the sample distribution used in the paper, for some testing purposes
@@ -429,12 +457,12 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         
         #find the largest correlation value to use to select major or minor as the resulting key
         if likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
-            likelyKey = (str(likelyKeysMajor[0][0]), "Major", likelyKeysMajor[0][1])
+            solution = (str(likelyKeysMajor[0][0]), "major", likelyKeysMajor[0][1])
         else:
-            likelyKey = (str(likelyKeysMinor[0][0]), "Minor", likelyKeysMinor[0][1])
+            solution = (str(likelyKeysMinor[0][0]), "minor", likelyKeysMinor[0][1])
             
-        color = self.resultsToColor(likelyKey[0], likelyKey[1])
-        return likelyKey, color        
+        color = self.solutionToColor(solution)
+        return solution, color        
     
 
 
@@ -442,18 +470,32 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 class SadoianAmbitus(DiscreteAnalysis):
     '''An basic analysis method for measuring register. 
     '''
-    def __init__(self):
-        DiscreteAnalysis.__init__(self)
+    def __init__(self, referenceStream=None):
+        DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         self.pitchSpanColors = {}
-        self._generateColors(130)
+        self._generateColors()
 
-    def _generateColors(self, numColors):
+    def _generateColors(self, numColors=None):
         '''Provide uniformly distributed colors across the entire range.
         '''
-        for i in range(numColors):
-            val = 0
-            val = (255.0/numColors)*i
+        if numColors == None:
+            if self._referenceStream != None:
+                # get total range for entire piece
+                min, max = self._getPitchRanges(self._referenceStream)
+            else:
+                min, max = 0, 130 # a large default
+        else: # create min max
+            min, max = 0, numColors
+
+        valueRange = max - min
+        step = 0
+        for i in range(min, max+1):
+            val = int(round((255.0 / valueRange) * step))
+            # store in dictionary the accepted values, not the step
             self.pitchSpanColors[i] = self._rgbToHex((val, val, val))
+            step += 1
+
+        #environLocal.printDebug([self.pitchSpanColors])
     
     def _getPitchSpan(self, subStream):
         '''For a given subStream, return a value in half-steps of the range
@@ -462,15 +504,15 @@ class SadoianAmbitus(DiscreteAnalysis):
         >>> s = corpus.parseWork('bach/bwv66.6')
         >>> p = SadoianAmbitus()
         >>> p._getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
-        5.0
+        (66, 71)
         >>> p._getPitchSpan(s.parts[0].getElementsByClass('Measure')[6])
-        4.0
+        (69, 73)
 
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
         >>> p._getPitchSpan(s)
-        63
+        (45, 108)
         '''
         
         if len(subStream.flat.notes) == 0:
@@ -488,31 +530,88 @@ class SadoianAmbitus(DiscreteAnalysis):
 
             psFound += [p.ps for p in pitches]
         # use built-in functions
-        return abs(max(psFound) - min(psFound))
+        return int(min(psFound)), int(max(psFound))
 
     
-    def resultsToColor(self, result):
+    def _getPitchRanges(self, subStream):
+        '''For a given subStream, return the smallest difference between any two pitches and the largest difference between any two pitches. This is used to get the smallest and larges ambitus possible in a given work. 
+
+        >>> from music21 import *
+        >>> p = SadoianAmbitus()
+        >>> s = stream.Stream()
+        >>> c = chord.Chord(['a2', 'b4', 'c8'])
+        >>> s.append(c)
+        >>> p._getPitchSpan(s)
+        (45, 108)
+        >>> p._getPitchRanges(s)
+        (26, 63)
+
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> p._getPitchRanges(s)
+        (0, 34)
+        '''
+        psFound = []
+        for n in subStream.flat.notes:
+            pitches = []
+            if 'Chord' in n.classes:
+                pitches = n.pitches
+            elif 'Note' in n.classes:
+                pitches = [n.pitch]
+            for p in pitches:
+                psFound.append(p.ps)
+        psFound.sort()
+        psRange = []
+        for i in range(len(psFound)-1):
+            p1 = psFound[i]
+            for j in range(i+1, len(psFound)):
+                p2 = psFound[j]
+                # p2 should always be equal or greater than p1
+                psRange.append(p2-p1)
+
+        return int(min(psRange)), int(max(psRange))
+
+
+    def solutionToColor(self, result):
         '''
         >>> from music21 import *
         >>> p = SadoianAmbitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
-        >>> p.resultsToColor(p._getPitchSpan(s))
-        '#7b7b7b'
+        >>> min, max = p._getPitchSpan(s)
+        >>> p.solutionToColor(max-min)
+        '#7c7c7c'
         '''    
         # a result of None may be possible
         if result == None:
-            return self._rgbToHex((0, 12, 0))
+            return self._rgbToHex((0, 128, 0))
 
         return self.pitchSpanColors[result]
     
     
     def process(self, sStream):
-        soln = self._getPitchSpan(sStream)
-        color = self.resultsToColor(soln)
+        post = self._getPitchSpan(sStream)
+        if post != None:
+            soln = post[1] - post[0] # max-min
+        else:
+            soln = None
+        color = self.solutionToColor(soln)
         
         return soln, color
+
+
+    def getSolution(self, sStream):
+        ''' procedure to only return a text solution
+        >>> from music21 import *
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> p = SadoianAmbitus()
+        >>> p.getSolution(s)
+        34
+
+        '''
+        solution, color = self.process(sStream)
+        return solution
+    
 
 
 #------------------------------------------------------------------------------

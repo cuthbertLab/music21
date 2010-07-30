@@ -209,7 +209,7 @@ class Graph(object):
         self.axis[axisKey]['label'] = label
 
     def _adjustAxisSpines(self, ax):
-        '''Remove the right and left spines from the diragmra
+        '''Remove the right and left spines from the diagram
         '''
         for loc, spine in ax.spines.iteritems():
             if loc in ['left','bottom']:
@@ -372,43 +372,13 @@ class GraphColorGrid(Graph):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
-        
-        
-        if 'minWindow' in keywords:
-            self.minWindow = keywords['minWindow']
-        else:
-            self.minWindow = 5
-        if 'maxWindow' in keywords:
-            self.maxWindow = keywords['maxWindow']
-        else:
-            # if maxWindow is negative it will revert to maximum number of quarterNote lengths
-            self.maxWindow = -1
-        if 'windowStep' in keywords:
-            self.windowStep = keywords['windowStep']
-        else:
-            self.windowStep = 3
-        
-        
-    def setColors(self, colors):
-        self.colors = colors
-    
-    def setMinWindow(self, minWindow):
-        self.minWindow = minWindow
-    
-    def setMaxWindow(self, maxWindow):
-        self.maxWindow = maxWindow
-        
-    def setWindowStep(self, windowStep):
-        self.windowStep = windowStep
-
+                
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
-        
-        axTop = self.fig.add_subplot(111)
-        plt.ylabel('Window Size: from 1 quarter note to entire work')
-        plt.xlabel('Progression of piece: from beginning to end')
-        #plt.legend(('E', 'B', 'F', 'C', 'G', 'D'), 'upper-left')
+
+        plotShift = .1        
+        axTop = self.fig.add_subplot(1, 1, 1+plotShift)
         
         for i in range(len(self.data)):
             positions = []
@@ -421,10 +391,14 @@ class GraphColorGrid(Graph):
                 subColors.append(self.data[i][j])
                 #correlations.append(float(self.data[i][j][2]))
                 heights.append(1)
-                
-            ax = self.fig.add_subplot(len(self.data), 1, len(self.data)-i)
+            
+            # add a new subplot for each row    
+            ax = self.fig.add_subplot(len(self.data), 1,
+                 len(self.data)-i+plotShift)
+
             ax.bar(positions, heights, 1, color=subColors)
             
+            # remove all ticks for subplots
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
             ax.set_yticklabels([""]*len(ax.get_yticklabels()))
@@ -432,6 +406,7 @@ class GraphColorGrid(Graph):
             ax.set_xlim([0,len(self.data[i])])
             
         self.setAxisRange('x', range(len(self.data)), 0)
+        # standard procedures
         self._adjustAxisSpines(axTop)
         self._applyFormatting(axTop)
         self.done()
@@ -1317,54 +1292,79 @@ class PlotStream(object):
 #-------------------------------------------------------------------------------
 # color grids    
 
-class PlotColorGrid(PlotStream):
-    format = ''
+class PlotColorGridWindowedAnalysis(PlotStream):
+    '''Base Plot for windowed analysis routines.
+
+    ''' 
+    format = 'colorGrid'
     
-    def __init__(self, streamObj, AnalysisProcessor, *args, **keywords):
+    def __init__(self, streamObj, processor=None, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
         
-        self.graph = GraphColorGrid(*args, **keywords)
+        if 'minWindow' in keywords:
+            self.minWindow = keywords['minWindow']
+        else:
+            self.minWindow = 10
+
+        if 'maxWindow' in keywords:
+            self.maxWindow = keywords['maxWindow']
+        else: # max window of None gets larges
+            self.maxWindow = None
+
+        if 'windowStep' in keywords:
+            self.windowStep = keywords['windowStep']
+        else:
+            self.windowStep = 1
         
-        data, yTicks = self._extractData(AnalysisProcessor)
+        # create a color grid
+        self.graph = GraphColorGrid(*args, **keywords)
+        data, yTicks = self._extractData(processor)
         
         self.graph.setData(data)
-        
         self.graph.setAxisLabel('y', 'Window Size')
-        self.graph.setAxisLabel('x', 'Time')
-        
+        self.graph.setAxisLabel('x', 'Proportional Time')
         self.graph.setTicks('y', yTicks)
+
         
-        
-    def _extractData(self, AnalysisProcessor, dataValueLegit=True):
-        b = AnalysisProcessor
-        a = windowedAnalysis.WindowedAnalysis(self.streamObj, b)
-        soln = a.process(self.graph.minWindow, self.graph.maxWindow, self.graph.windowStep)
-        
-        
+    def _extractData(self, processor, dataValueLegit=True):
+        '''Extract data actually calls the processing routine. 
+        '''
+        wa = windowedAnalysis.WindowedAnalysis(self.streamObj, processor)
+        solutionMatrix, colorMatrix, metaMatrix = wa.process(self.minWindow, 
+                                      self.maxWindow, self.windowStep)
+                
+        # get dictionaries of meta data for each row
+        pos = 0
         yTicks = []
-        for y in range(self.graph.minWindow, len(soln[1]), ((len(soln[1])-self.graph.minWindow)/10)+1):
-            yTicks.append([y, '%s' % y])
-        
-        # print yTicks
-        return soln[1], yTicks
+        for y in range(len(metaMatrix)):        
+            # pad three ticks for each needed
+            yTicks.append([pos, '']) # pad first
+            yTicks.append([pos+1, '%s' % metaMatrix[y]['windowSize']])
+            yTicks.append([pos+2, '']) # pad last
+            pos += 3
+
+        return colorMatrix, yTicks
     
     
-class PlotColorGridKrumhanslSchmuckler(PlotColorGrid):
+class PlotColorGridKrumhanslSchmuckler(PlotColorGridWindowedAnalysis):
     '''Subclass for plotting Krumhansl-Schmuckler analysis routine
     '''
     format = 'colorGrid'
     
     def __init__(self, streamObj, *args, **keywords):
-        PlotColorGrid.__init__(self, streamObj, windowedAnalysis.KrumhanslSchmuckler(), *args, **keywords)
+        PlotColorGridWindowedAnalysis.__init__(self, streamObj, 
+            windowedAnalysis.KrumhanslSchmuckler(), *args, **keywords)
     
     
-class PlotColorGridSadoianAmbitus(PlotColorGrid):
+class PlotColorGridSadoianAmbitus(PlotColorGridWindowedAnalysis):
     '''Subclass for plotting basic pitch span over a windowed analysis
     '''
     format = 'colorGrid'
     
     def __init__(self, streamObj, *args, **keywords):
-        PlotColorGrid.__init__(self, streamObj, windowedAnalysis.SadoianAmbitus(), *args, **keywords)
+        # provide the stream to both the window and processor in this case
+        PlotColorGridWindowedAnalysis.__init__(self, streamObj, 
+            windowedAnalysis.SadoianAmbitus(streamObj), *args, **keywords)
         
 
 #-------------------------------------------------------------------------------
@@ -2796,11 +2796,20 @@ class Test(unittest.TestCase):
         b.process()
 
         
-    def testPlotColorGridSadoianAmbitus(self):
+    def testPlotColorGridSadoianAmbitus(self, doneAction=None):
         from music21 import corpus
         a = corpus.parseWork('bach/bwv57.8')
-        b = PlotColorGridSadoianAmbitus(a, doneAction=None, title='Bach')
+        b = PlotColorGridSadoianAmbitus(a.parts[0], title='Bach Ambitus',
+            minWindow=1, maxWindow=8, windowStep=3,
+            doneAction=doneAction)
         b.process()
+
+
+        b = PlotColorGridKrumhanslSchmuckler(a.parts[0], title='Bach Key',
+            minWindow=1, maxWindow=8, windowStep=3, 
+            doneAction=doneAction)
+        b.process()
+
 
 
     def testAll(self):
@@ -2832,6 +2841,7 @@ if __name__ == "__main__":
         music21.mainTest(Test)
 
     elif len(sys.argv) > 1:
+        b = Test()
         a = TestExternal()
         #a.testPlotScatterWeightedPitchSpaceQuarterLength()
 
@@ -2841,4 +2851,6 @@ if __name__ == "__main__":
 
         #a.writeGraphColorGrid()
         #a.writeAllGraphs()
-        a.writeAllPlots()
+        #a.writeAllPlots()
+
+        b.testPlotColorGridSadoianAmbitus('write')
