@@ -136,6 +136,7 @@ class WindowedAnalysis(object):
         >>> x, y = wa.process(1, 1)
         >>> len(x) # we only have one series of windows
         1
+        >>> x[0], y[0] # we get out solution value and a color
         >>> x, y = wa.process(1, 2)
         >>> len(x) # we have two series of windows
         2
