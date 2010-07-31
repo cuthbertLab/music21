@@ -1,5 +1,5 @@
-__ALL__ = ['correlate', 'windowedAnalysis', 'metrical']
+__ALL__ = ['correlate', 'windowed', 'metrical', 'discrete']
 
 # this is necessary to get these names available with a 
 # from music21 import * import statement
-from music21.analysis import correlate, windowedAnalysis, metrical
+from music21.analysis import correlate, windowed, metrical, discrete

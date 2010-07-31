@@ -166,6 +166,8 @@ class Graph(object):
         self.title = title
 
     def setFigureSize(self, figSize):
+        '''Set the figure size as an x,y pair. Scales all graph components but not always all labels. 
+        '''
         self.figureSize = figSize
 
     def setDoneAction(self, action):
@@ -208,12 +210,13 @@ class Graph(object):
             raise GraphException('No such axis exists: %s' % axisKey)
         self.axis[axisKey]['label'] = label
 
-    def _adjustAxisSpines(self, ax):
+    def _adjustAxisSpines(self, ax, leftBottom=False):
         '''Remove the right and left spines from the diagram
         '''
         for loc, spine in ax.spines.iteritems():
             if loc in ['left','bottom']:
-                pass
+                if leftBottom:
+                    spine.set_color('none') # don't draw spine
                 # this pushes them outward in an interesting way
                 #spine.set_position(('outward',10)) # outward by 10 points
             elif loc in ['right','top']:
@@ -225,7 +228,10 @@ class Graph(object):
         for i, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
             if i % 2 == 1:   # odd indices
                 line.set_visible(False)
-       
+            else:
+                if leftBottom:
+                    line.set_visible(False)
+
     def _applyFormatting(self, ax):
         '''Apply formatting to the Axes container and Figure instance.  
         '''
@@ -364,7 +370,7 @@ class GraphColorGrid(Graph):
     
     
     >>> a = GraphColorGrid(doneAction=None)
-    >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
+    >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#00ff00', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#0000ff', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'],]
     >>> a.setData(data)
     >>> a.process()
     '''
@@ -372,12 +378,15 @@ class GraphColorGrid(Graph):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
+
+        if 'figureSize' not in keywords:
+            self.setFigureSize([8, 6])
                 
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
 
-        plotShift = .1        
+        plotShift = .05 # shift to make room for y axis label        
         axTop = self.fig.add_subplot(1, 1, 1+plotShift)
         
         for i in range(len(self.data)):
@@ -403,13 +412,104 @@ class GraphColorGrid(Graph):
                 line.set_visible(False)
             ax.set_yticklabels([""]*len(ax.get_yticklabels()))
             ax.set_xticklabels([""]*len(ax.get_xticklabels()))
+            # this is the shifting the visible bars; may not be necessary
             ax.set_xlim([0,len(self.data[i])])
             
         self.setAxisRange('x', range(len(self.data)), 0)
         # standard procedures
-        self._adjustAxisSpines(axTop)
+        self._adjustAxisSpines(axTop, leftBottom=True)
         self._applyFormatting(axTop)
         self.done()
+
+
+class GraphColorGridLegend(Graph):
+    ''' Grid of discrete colored "blocks" where each block can be labeled
+    
+    Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
+    
+    >>> a = GraphColorGrid(doneAction=None)
+    >>> data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')]),
+                ('b', [('t', '#858585'), ('u', '#00ff00'), ('v', '#6c6c6c')]), ('c', [('w', '#8c8c8c'), ('x', '#8c8c8c'), ('y', '#6c6c6c')])]
+
+    >>> a.setData(data)
+    >>> #a.process()
+    '''
+    def __init__(self, *args, **keywords):
+        Graph.__init__(self, *args, **keywords)
+        self.axisKeys = ['x', 'y']
+        self._axisInit()
+
+        if 'figureSize' not in keywords:
+            self.setFigureSize([5, 1.5])
+        if 'title' not in keywords:
+            self.setTitle('Legend')
+                
+    def process(self):
+        # figure size can be set w/ figsize=(5,10)
+        self.fig = plt.figure()
+
+        plotShift = 0        
+        axTop = self.fig.add_subplot(1, 1, 1+plotShift)
+        
+        for i in range(len(self.data)):
+            rowLabel = self.data[i][0]
+            rowData = self.data[i][1]
+
+            environLocal.printDebug(['rowLabel', rowLabel, i])
+
+            positions = []
+            heights = []
+            subColors = []
+            
+            for j in range(len(rowData)):
+                positions.append(.5+j)
+                subColors.append(rowData[j][1]) # second value is colors
+                heights.append(1)
+            
+            # add a new subplot for each row    
+            posTriple = (len(self.data), 1, len(self.data)-i+plotShift)
+            environLocal.printDebug(['posTriple', posTriple])
+            ax = self.fig.add_subplot(*posTriple)
+            # 1 here is width
+            ax.bar(positions, heights, 1, color=subColors)
+            
+            # remove all ticks for subplots
+            for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
+                line.set_visible(False)
+
+            # need one label for each left side; .5 is in the middle
+            ax.set_yticks([.5])
+            ax.set_yticklabels([rowLabel], fontsize=self.tickFontSize, 
+                family=self.fontFamily) # one label for one tick
+
+            # need a label for each bars
+            ax.set_xticks([x + 1 for x in range(len(rowData))])
+            # get labels from row data; first of pair
+            ax.set_xticklabels([x for x, y in rowData], 
+                fontsize=self.tickFontSize, family=self.fontFamily)
+            # this is the scaling to see all bars; not necessary
+            ax.set_xlim([.5, len(rowData)+.5])
+            
+        self.setAxisRange('x', range(len(self.data)), 0)
+
+        for j, line in enumerate(axTop.get_xticklines() + axTop.get_yticklines()):
+            line.set_visible(False)
+
+        # sets the space between subplots
+        # top and bottom here push diagram more toward center of frame
+        # may be useful in other graphs
+        self.fig.subplots_adjust(hspace=1.5, top=.7, bottom=.3)
+
+        self.setAxisLabel('y', '')
+        self.setAxisLabel('x', '')
+        self.setTicks('y', [])
+        self.setTicks('x', [])
+
+        # standard procedures
+        self._adjustAxisSpines(axTop, leftBottom=True)
+        self._applyFormatting(axTop)
+        self.done()
+
 
 
 class GraphHorizontalBar(Graph):
@@ -2818,6 +2918,27 @@ class Test(unittest.TestCase):
         plotStream(a.flat, doneAction=None)
 
 
+    
+    def testColorGridLegend(self, doneAction):
+
+#         data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')]), ('c', [('w', '#8c8c8c'), ('x', '#8c8c8c'), ('y', '#6c6c6c')]),]
+# 
+#         a = GraphColorGridLegend(doneAction=doneAction)
+#         a.setData(data)
+#         a.process()
+
+        from music21.analysis import windowedAnalysis
+        ks = windowedAnalysis.KrumhanslSchmuckler()
+        data = ks.possibleResults()
+        print data
+        a = GraphColorGridLegend(doneAction=doneAction)
+        a.setData(data)
+        a.process()
+
+#         a = GraphColorGrid(doneAction=doneAction)
+#         data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#00ff00', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#0000ff', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'],]
+#         a.setData(data)
+#         a.process()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -2853,4 +2974,6 @@ if __name__ == "__main__":
         #a.writeAllGraphs()
         #a.writeAllPlots()
 
-        b.testPlotColorGridSadoianAmbitus('write')
+        #b.testPlotColorGridSadoianAmbitus('write')
+
+        b.testColorGridLegend('write')
