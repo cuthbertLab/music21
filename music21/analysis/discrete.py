@@ -51,9 +51,10 @@ class DiscreteAnalysis(object):
     def _rgbToHex(self, rgb):
         '''Utility conversion method
         '''
+        rgb = int(round(rgb[0])), int(round(rgb[1])), int(round(rgb[2]))
         return '#%02x%02x%02x' % rgb    
 
-    def possibleResults(self):
+    def solutionLegend(self):
         '''A list of pairs showing all discrete results and the assigned color. Data should be organized to be passed to :class:`music21.graph.GraphColorGridLegend`.
         '''
         pass
@@ -81,8 +82,10 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
     '''
     _DOC_ALL_INHERITED = False
 
-    def __init__(self):
-        DiscreteAnalysis.__init__(self)
+    name = 'Krumhansl Schmuckler Key Analysis'
+
+    def __init__(self, referenceStream=None):
+        DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         
         # store color grid information to associate particular keys to colors
         
@@ -253,8 +256,14 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                     soln[i] = float(top[i]) / ((bottomRight[i]*bottomLeft[i])**.5)
         return soln    
 
-    def possibleResults(self):
-        ''' Returns a list of possible results for the creation of a legend.
+    def solutionLegend(self):
+        ''' Returns a list of lists of possible results for the creation of a legend.
+
+        >>> from music21 import *
+        >>> p = analysis.discrete.KrumhanslSchmuckler()
+        >>> p.solutionLegend()
+        [['Major', [('C-', '#55FF00'), ('C', '#00FF00'), ('C#', '#00AA55'), ('D-', '#5600FF'), ('D', '#8000FF'), ('D#', '#AB00FF'), ('E-', '#D60000'), ('E', '#FF0000'), ('E#', '#FF2B00'), ('F-', '#FFD600'), ('F', '#FFFF00'), ('F#', '#AAFF00'), ('G-', '#0055AA'), ('G', '#0000FF'), ('G#', '#2B00FF'), ('A-', '#D600FF'), ('A', '#FF00FF'), ('A#', '#FF55FF'), ('B-', '#FF5600'), ('B', '#FF8000'), ('B#', '#FFAB00')]], ['Minor', [('C-', '#009b00'), ('C', '#009b00'), ('C#', '#004600'), ('D-', '#00009b'), ('D', '#24009b'), ('D#', '#47009b'), ('E-', '#720000'), ('E', '#9b0000'), ('E#', '#9b0000'), ('F-', '#9b7200'), ('F', '#9b9b00'), ('F#', '#469b00'), ('G-', '#000046'), ('G', '#00009B'), ('G#', '#00009B'), ('A-', '#72009b'), ('A', '#9b009b'), ('A#', '#9b009b'), ('B-', '#9b0000'), ('B', '#9b2400'), ('B#', '#9b4700')]]]
+
         '''
         data = []
         for yLabel in ['Major', 'Minor']:
@@ -262,7 +271,6 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                 refDict = self._majorKeyColors
             elif yLabel == 'Minor':
                 refDict = self._minorKeyColors
-
             row = []
             row.append(yLabel)
             pairs = []
@@ -347,10 +355,13 @@ class SadoianAmbitus(DiscreteAnalysis):
     '''
     _DOC_ALL_INHERITED = False
 
+    name = 'Sadoian Ambitus Analysis'
+
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         self._pitchSpanColors = {}
         self._generateColors()
+
 
     def _generateColors(self, numColors=None):
         '''Provide uniformly distributed colors across the entire range.
@@ -369,7 +380,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         for i in range(min, max+1):
             val = int(round((255.0 / valueRange) * step))
             # store in dictionary the accepted values, not the step
-            self._pitchSpanColors[i] = self._rgbToHex((val, val, val))
+            self._pitchSpanColors[i] = self._rgbToHex(((val*.75), (val*.6), val))
             step += 1
 
         #environLocal.printDebug([self._pitchSpanColors])
@@ -448,6 +459,34 @@ class SadoianAmbitus(DiscreteAnalysis):
         return int(min(psRange)), int(max(psRange))
 
 
+    def solutionLegend(self):
+        '''Return legend data. 
+
+        >>> from music21 import *
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> p = analysis.discrete.SadoianAmbitus(s.parts[0]) #provide ref stream
+        >>> p.solutionLegend()
+        [['', [(0, '#000000'), (1, '#100d15'), (2, '#201a2b'), (3, '#302640'), (4, '#403355'), (5, '#50406a')]], ['', [(6, '#604d80'), (7, '#705995'), (8, '#8066aa'), (9, '#8f73bf'), (10, '#a080d5'), (11, '#b08cea'), (12, '#bf99ff')]]]
+
+        '''
+        data = []
+        keys = self._pitchSpanColors.keys()
+        keys.sort()
+
+        # split keys into two groups for two rows (optional)
+        for keyGroup in [range(0, len(keys)/2), 
+                        range(len(keys)/2, len(keys))]:
+            row = []
+            row.append('') # empty row label
+            pairs = []
+            for i in keyGroup:
+                pairs.append((i, self._pitchSpanColors[i]))
+            row.append(pairs)
+            data.append(row)
+
+        return data
+
+
     def solutionToColor(self, result):
         '''
         >>> from music21 import *
@@ -457,11 +496,11 @@ class SadoianAmbitus(DiscreteAnalysis):
         >>> s.append(c)
         >>> min, max = p._getPitchSpan(s)
         >>> p.solutionToColor(max-min)
-        '#7c7c7c'
+        '#5d4a7c'
         '''    
         # a result of None may be possible
         if result == None:
-            return self._rgbToHex((0, 128, 0))
+            return self._rgbToHex((255, 255, 255))
 
         return self._pitchSpanColors[result]
     
@@ -521,7 +560,8 @@ def analyzeStream(streamObj, *args, **keywords):
 
     for analysisClassName in analysisClasses:    
         # this is a very loose matching, as there are few classes now
-        if method.lower() in analysisClassName.__name__.lower():
+        if (method.lower() in analysisClassName.__name__.lower() or
+            method.lower() in analysisClassName.name):
             obj = analysisClassName()
             return obj.getSolution(streamObj)
     # if no match raise error

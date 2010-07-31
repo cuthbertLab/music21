@@ -14,7 +14,7 @@
 '''
 
 import unittest, doctest
-import random, math, sys
+import random, math, sys, os
 
 import music21
 from music21 import note
@@ -370,10 +370,15 @@ class GraphColorGrid(Graph):
     Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
     
     
-    >>> a = GraphColorGrid(doneAction=None)
-    >>> data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#00ff00', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#0000ff', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'],]
-    >>> a.setData(data)
-    >>> a.process()
+    >>> from music21 import *
+    >>> #_DOCS_SHOW g = graph.GraphColorGrid()
+    >>> g = graph.GraphColorGrid(doneAction=None) #_DOCS_HIDE
+    >>> data = [['#55FF00', '#9b0000', '#009b00'], ['#FFD600', '#FF5600'], ['#201a2b', '#8f73bf', '#a080d5', '#403355', '#999999']]
+    >>> g.setData(data)
+    >>> g.process()
+
+    .. image:: images/GraphColorGrid.*
+        :width: 600
     '''
     def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
@@ -389,10 +394,10 @@ class GraphColorGrid(Graph):
 
         plotShift = .05 # shift to make room for y axis label        
         axTop = self.fig.add_subplot(1, 1, 1+plotShift)
+        # do not need grid for outer container
         
         for i in range(len(self.data)):
             positions = []
-            #correlations = []
             heights = []
             subColors = []
             
@@ -417,6 +422,8 @@ class GraphColorGrid(Graph):
             ax.set_xlim([0,len(self.data[i])])
             
         self.setAxisRange('x', range(len(self.data)), 0)
+        # turn off grid
+        self.grid = False
         # standard procedures
         self._adjustAxisSpines(axTop, leftBottom=True)
         self._applyFormatting(axTop)
@@ -428,11 +435,18 @@ class GraphColorGridLegend(Graph):
     
     Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
     
-    >>> a = GraphColorGrid(doneAction=None)
-    >>> data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')])]
+    >>> from music21 import *
+    >>> #_DOCS_SHOW g = graph.GraphColorGridLegend()
+    >>> g = graph.GraphColorGridLegend(doneAction=None) #_DOCS_HIDE
+    >>> data = []
+    >>> data.append(('Major', [('C#', '#00AA55'), ('D-', '#5600FF'), ('G#', '#2B00FF')]))
+    >>> data.append(('Minor', [('C#', '#004600'), ('D-', '#00009b'), ('G#', '#00009B')]))
+    >>> g.setData(data)
+    >>> g.process()
 
-    >>> a.setData(data)
-    >>> #a.process()
+    .. image:: images/GraphColorGridLegend.*
+        :width: 600
+
     '''
 
 #     >>> data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')]),
@@ -471,7 +485,7 @@ class GraphColorGridLegend(Graph):
                 heights.append(1)
             
             # add a new subplot for each row    
-            posTriple = (len(self.data), 1, len(self.data)-i+plotShift)
+            posTriple = (len(self.data), 1, i+1+plotShift)
             environLocal.printDebug(['posTriple', posTriple])
             ax = self.fig.add_subplot(*posTriple)
             # 1 here is width
@@ -502,7 +516,8 @@ class GraphColorGridLegend(Graph):
         # sets the space between subplots
         # top and bottom here push diagram more toward center of frame
         # may be useful in other graphs
-        self.fig.subplots_adjust(hspace=1.5, top=.7, bottom=.3)
+        # , 
+        self.fig.subplots_adjust(hspace=1.5, top=.75, bottom=.2)
 
         self.setAxisLabel('y', '')
         self.setAxisLabel('x', '')
@@ -1406,10 +1421,13 @@ class PlotWindowedAnalysis(PlotStream):
     def __init__(self, streamObj, processor=None, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
         
+        # store process for getting title
+        self.processor = processor
+
         if 'minWindow' in keywords:
             self.minWindow = keywords['minWindow']
         else:
-            self.minWindow = 10
+            self.minWindow = 1
 
         if 'maxWindow' in keywords:
             self.maxWindow = keywords['maxWindow']
@@ -1419,7 +1437,7 @@ class PlotWindowedAnalysis(PlotStream):
         if 'windowStep' in keywords:
             self.windowStep = keywords['windowStep']
         else:
-            self.windowStep = 1
+            self.windowStep = 8
         
         # create a color grid
         self.graph = GraphColorGrid(*args, **keywords)
@@ -1450,17 +1468,78 @@ class PlotWindowedAnalysis(PlotStream):
 
         return colorMatrix, yTicks
     
+
+    def process(self):
+        '''Process method here overridden to provide legend.
+        '''
+        # call the process routine in the base graph
+        self.graph.process()
+        # create a new graph of the legend
+        self.graphLegend = GraphColorGridLegend(
+                           doneAction=self.graph.doneAction, 
+                           title=self.processor.name + ' Legend')
+        self.graphLegend.setData(self.processor.solutionLegend())
+        self.graphLegend.process()
+
+
+    def write(self, fp):
+        '''Process method here overridden to provide legend.
+        '''
+        dir, fn = os.path.split(fp)
+        fpLegend = os.path.join(dir, 'legend-' + fn)
+        # call the process routine in the base graph
+        self.graph.write(fp)
+        # create a new graph of the legend
+        self.graphLegend = GraphColorGridLegend(
+                           doneAction=self.graph.doneAction, 
+                           title=self.processor.name + ' Legend')
+        self.graphLegend.setData(self.processor.solutionLegend())
+        self.graphLegend.process()
+        self.graphLegend.write(fpLegend)
+
     
 class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
-    '''Subclass for plotting Krumhansl-Schmuckler analysis routine
+    '''Stream plotting of windowed version of Krumhansl-Schmuckler analysis routine.
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv66.6.xml') #_DOCS_HIDE
+    >>> p = graph.PlotWindowedKrumhanslSchmuckler(s.parts[0], doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv66.6')
+    >>> #_DOCS_SHOW p = graph.PlotWindowedKrumhanslSchmuckler(s.parts[0])
+    >>> p.id
+    'colorGrid-krumhanslSchmuckler'
+    >>> p.process() # with defaults and proper configuration, will open graph
+
+    .. image:: images/PlotWindowedKrumhanslSchmuckler.*
+        :width: 600
+
+    .. image:: images/legend-PlotWindowedKrumhanslSchmuckler.*
+
     '''
     values = ['krumhanslSchmuckler']
     def __init__(self, streamObj, *args, **keywords):
         PlotWindowedAnalysis.__init__(self, streamObj, 
-            discrete.KrumhanslSchmuckler(), *args, **keywords)
+            discrete.KrumhanslSchmuckler(streamObj), *args, **keywords)
     
+
+
 class PlotWindowedSadoianAmbitus(PlotWindowedAnalysis):
-    '''Subclass for plotting basic pitch span over a windowed analysis
+    '''Stream plotting of basic pitch span.
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv66.6.xml') #_DOCS_HIDE
+    >>> p = graph.PlotWindowedSadoianAmbitus(s.parts[0], doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv66.6')
+    >>> #_DOCS_SHOW p = graph.PlotWindowedSadoianAmbitus(s.parts[0])
+    >>> p.id
+    'colorGrid-ambitus'
+    >>> p.process() # with defaults and proper configuration, will open graph
+
+    .. image:: images/PlotWindowedSadoianAmbitus.*
+        :width: 600
+
+    .. image:: images/legend-PlotWindowedSadoianAmbitus.*
+
     '''
     values = ['ambitus']
     def __init__(self, streamObj, *args, **keywords):
@@ -1474,6 +1553,7 @@ class PlotWindowedSadoianAmbitus(PlotWindowedAnalysis):
 
 class PlotHistogram(PlotStream):
     '''Base class for Stream plotting classes.
+
     '''
     format = 'histogram'
     def __init__(self, streamObj, *args, **keywords):
@@ -2685,6 +2765,21 @@ class TestExternal(unittest.TestCase):
         (GraphHistogram, 
             [(x, random.choice(range(30))) for x in range(50)]),
         (Graph3DPolygonBars, data3DPolygonBars),
+        (GraphColorGridLegend, 
+        [('Major', [('C#', '#00AA55'), ('D-', '#5600FF'), ('G#', '#2B00FF')]),
+         ('Minor', [('C#', '#004600'), ('D-', '#00009b'), ('G#', '#00009B')]),]
+        ),
+        (GraphColorGrid, [['#55FF00', '#9b0000', '#009b00'], 
+                ['#FFD600', '#FF5600'], 
+                ['#201a2b', '#8f73bf', '#a080d5', '#403355', '#999999'],
+               ]
+        ),
+
+
+        ]
+
+        graphClasses = [
+        
         ]
 
         for graphClassName, data in graphClasses:
@@ -2739,9 +2834,17 @@ class TestExternal(unittest.TestCase):
 
         sDefault = corpus.parseWork('bach/bwv57.8')
 
+        plotClasses = [
+
+        (PlotWindowedKrumhanslSchmuckler, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
+        (PlotWindowedSadoianAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
+
+        ]
+
         for plotClassName, work, titleStr in plotClasses:
             if work == None:
                 s = sDefault
+
             else: # expecting data
                 s = converter.parse(work)
 
@@ -2908,11 +3011,11 @@ class Test(unittest.TestCase):
     def testPlotWindowedSadoianAmbitus(self, doneAction=None):
         from music21 import corpus
         a = corpus.parseWork('bach/bwv57.8')
-        b = PlotWindowedSadoianAmbitus(a.parts[0], title='Bach Ambitus',
+
+        b = PlotWindowedSadoianAmbitus(a.parts, title='Bach Ambitus',
             minWindow=1, maxWindow=8, windowStep=3,
             doneAction=doneAction)
         b.process()
-
 
         b = PlotWindowedKrumhanslSchmuckler(a.parts[0], title='Bach Key',
             minWindow=1, maxWindow=8, windowStep=3, 
@@ -2930,24 +3033,15 @@ class Test(unittest.TestCase):
     
     def testColorGridLegend(self, doneAction=None):
 
-#         data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')]), ('c', [('w', '#8c8c8c'), ('x', '#8c8c8c'), ('y', '#6c6c6c')]),]
-# 
-#         a = GraphColorGridLegend(doneAction=doneAction)
-#         a.setData(data)
-#         a.process()
-
         from music21.analysis import discrete
         ks = discrete.KrumhanslSchmuckler()
-        data = ks.possibleResults()
+        data = ks.solutionLegend()
         print data
         a = GraphColorGridLegend(doneAction=doneAction)
         a.setData(data)
         a.process()
 
-#         a = GraphColorGrid(doneAction=doneAction)
-#         data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#00ff00', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#0000ff', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'],]
-#         a.setData(data)
-#         a.process()
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -2985,4 +3079,7 @@ if __name__ == "__main__":
 
         #b.testPlotWindowedSadoianAmbitus('write')
 
-        b.testColorGridLegend('write')
+        #b.testColorGridLegend('write')
+        #b.testPlotWindowedSadoianAmbitus('write')
+
+        a.writeAllPlots()

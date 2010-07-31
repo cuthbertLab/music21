@@ -1107,7 +1107,12 @@ class Stream(music21.Music21Object):
 
 
     def analyze(self, *args, **keywords):
-        '''Given a method and keyword configuration arguments, create and display a plot.
+        '''Given a method and return an analysis specific data format.
+
+        Analysis methods can be specified as a second argument or by keyword. Available plots include the following:
+    
+        :class:`~music21.analysis.discrete.SadoianAmbitus`
+        :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')

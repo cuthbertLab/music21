@@ -124,7 +124,8 @@ class WindowedAnalysis(object):
         return data, color
 
         
-    def process(self, minWindow=1, maxWindow=1, windowStepSize=1):
+    def process(self, minWindow=1, maxWindow=1, windowStepSize=1, 
+                includeTotalWindow=True):
 
         ''' Main method for windowed analysis across one or more window size.
 
@@ -135,18 +136,20 @@ class WindowedAnalysis(object):
 
         If `minWindow` or `maxWindow` is None, the largest window size available will be set. 
 
+        If `includeTotalWindow` is True, the largest window size will always be added. 
+
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv324')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> # placing one part into analysis
         >>> wa = WindowedAnalysis(s[0], p)
-        >>> x, y, z = wa.process(1, 1)
+        >>> x, y, z = wa.process(1, 1, includeTotalWindow=False)
         >>> len(x) # we only have one series of windows
         1
         >>> x[0][0], y[0][0] # for each window, we get a solution and a color
         (('B', 'major', 0.6868258874056411), '#FF8000')
 
-        >>> x, y, z = wa.process(1, 2)
+        >>> x, y, z = wa.process(1, 2, includeTotalWindow=False)
         >>> len(x) # we have two series of windows
         2
 
@@ -175,7 +178,13 @@ class WindowedAnalysis(object):
         # store meta data about each row as a dictionary
         metaMatrix = [] 
 
-        for i in range(min, max+1, windowStepSize):
+        windowSizes = range(min, max+1, windowStepSize)
+        if includeTotalWindow:
+            totalWindow = len(self._windowedStream)
+            if totalWindow not in windowSizes:
+                windowSizes.append(totalWindow)
+
+        for i in windowSizes:
             environLocal.printDebug(['processing window:', i])
             # each of these results are lists, where len is based on 
             soln, colorn = self._analyze(i) 
