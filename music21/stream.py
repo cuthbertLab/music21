@@ -41,6 +41,7 @@ from music21.midi import translate as midiTranslate
 from music21 import note
 from music21 import metadata
 
+
 from music21 import environment
 _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
@@ -1103,6 +1104,22 @@ class Stream(music21.Music21Object):
         from music21 import graph
         # first ordered arg can be method type
         graph.plotStream(self, *args, **keywords)
+
+
+    def analyze(self, *args, **keywords):
+        '''Given a method and keyword configuration arguments, create and display a plot.
+
+        >>> from music21 import *
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s.analyze('ambitus')
+        34
+        >>> s.analyze('krumhansl')
+        ('F#', 'minor', 0.81547089257624916)
+        '''
+
+        from music21.analysis import discrete
+        # pass this stream to the analysis procedure
+        return discrete.analyzeStream(self, *args, **keywords)
 
 
     #---------------------------------------------------------------------------
@@ -9219,6 +9236,35 @@ class Test(unittest.TestCase):
                     [8, 6]) # snap to .125 and .1666666
 
 
+
+    def testAnalyze(self):
+        from music21 import stream, corpus
+        s = corpus.parseWork('bach/bwv66.6')
+
+        sub = [s.parts[0], s.parts[1], s.getMeasureRange(4,5), 
+                s.parts[2].getMeasureRange(4,5)]
+
+        matchAmbitus = [12, 15, 26, 10]
+
+        for i in range(len(sub)):
+            sTest = sub[i]
+            post = sTest.analyze('ambitus')
+            self.assertEqual(post, matchAmbitus[i])
+
+
+        # only match first two values
+        matchKrumhansl = [('F#', 'minor'), ('C#', 'minor'), 
+                          ('E', 'major') , ('E', 'major') ]
+
+        for i in range(len(sub)):
+            sTest = sub[i]
+            post = sTest.analyze('KrumhanslSchmuckler')
+            # returns three values; match 2
+            self.assertEqual(post[:2], matchKrumhansl[i])
+
+            
+            
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -9239,4 +9285,4 @@ if __name__ == "__main__":
         #a.testMidiEventsImported()
         #a.testFindGaps()
         #a.testQuantize()
-       
+        a.testAnalyze()

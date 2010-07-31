@@ -491,6 +491,43 @@ class SadoianAmbitus(DiscreteAnalysis):
 
 
 #------------------------------------------------------------------------------
+# public access function
+
+def analyzeStream(streamObj, *args, **keywords):
+    '''Public interface to discrete analysis methods to be applied to a Stream given as an argument. Methods return process-specific data format. See base-classes for details. 
+
+    Analysis methods can be specified as a second argument or by keyword. Available plots include the following:
+
+    :class:`~music21.analysis.discrete.SadoianAmbitus`
+    :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv66.6')
+    >>> analysis.discrete.analyzeStream(s, 'Krumhansl')
+    ('F#', 'minor', 0.81547089257624916)
+    >>> analysis.discrete.analyzeStream(s, 'ambitus')
+    34
+    '''
+    analysisClasses = [
+        SadoianAmbitus,
+        KrumhanslSchmuckler,
+    ]
+
+    if 'method' in keywords:
+        method = keywords['method']
+
+    if len(args) > 0:
+        method = args[0]
+
+    for analysisClassName in analysisClasses:    
+        # this is a very loose matching, as there are few classes now
+        if method.lower() in analysisClassName.__name__.lower():
+            obj = analysisClassName()
+            return obj.getSolution(streamObj)
+    # if no match raise error
+    raise DiscreteAnalysisException('no such analysis method: %s' % method)
+
+#------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
 
     def runTest(self):
@@ -501,6 +538,7 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
 
 
 #------------------------------------------------------------------------------

@@ -2444,8 +2444,8 @@ def plotStream(streamObj, *args, **keywords):
     if values == None or values == [None]:
         values = ['pitch']
 
-    environLocal.printDebug(['plotStream: stream', streamObj, 'format, values', format, values])
-
+    environLocal.printDebug(['plotStream: stream', streamObj, 
+                             'format, values', format, values])
 
     plotMake = []
     if format.lower() == 'all':
