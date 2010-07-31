@@ -1230,6 +1230,17 @@ class Pitch(music21.Music21Object):
 
     musicxml = property(_getMusicXML, _setMusicXML)
 
+    def lilyNoOctave(self):
+        '''
+        returns the lilypond representation of the pitch
+        (with accidentals) but without octave.
+        '''
+        
+        baseName = self.step.lower()
+        if (self.accidental):
+            baseName += self.accidental.lily
+        return baseName
+    
 
 
     #---------------------------------------------------------------------------

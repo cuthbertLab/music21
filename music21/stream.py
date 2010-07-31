@@ -3971,7 +3971,7 @@ class Stream(music21.Music21Object):
         
         lilyout += " } "
         lilyObj = lilyModule.LilyString(lilyout)
-        self._cache["lily"] = lilyObj
+#        self._cache["lily"] = lilyObj
         return lilyObj
 
     def _setLily(self, value):
@@ -3980,7 +3980,25 @@ class Stream(music21.Music21Object):
         self._overriddenLily = value
         self._cache["lily"] = None
 
-    lily = property(_getLily, _setLily)
+    lily = property(_getLily, _setLily, doc = r'''
+        returns or sets the lilypond output for the Stream.
+        Note that (for now at least), setting the Lilypond output for a Stream does not
+        change the stream itself.  It's just a way of overriding what is printed when .lily
+        is called.
+        
+        >>> from music21 import *
+        >>> s1 = stream.Stream()
+        >>> s1.append(clef.BassClef())
+        >>> s1.append(meter.TimeSignature("3/4"))
+        >>> k1 = key.KeySignature(5)
+        >>> k1.mode = 'minor'
+        >>> s1.append(k1)
+        >>> s1.append(note.Note("B-3"))   # quarter note
+        >>> s1.append(note.HalfNote("C#2"))
+        >>> s1.lily
+         { \clef "bass"  \time 3/4  \key gis \minor bes4 cis,2  } 
+    
+    ''')
 
 
 

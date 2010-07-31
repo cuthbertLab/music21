@@ -267,33 +267,36 @@ class KeySignature(music21.Music21Object):
         
 
     def _getPitchAndMode(self):
-        '''Returns a a two value list containg a :class:`music21.pitch.Pitch` object that names this key and the value of :attr:`~music21.key.KeySignature.mode`.
+        '''Returns a a two value list containing 
+        a :class:`music21.pitch.Pitch` object that 
+        names this key and the value of :attr:`~music21.key.KeySignature.mode`.
 
         >>> from music21 import *
        
-        >>> keyArray = [key.KeySignature(x) for x in range(-7,8)]
-        >>> keyArray[0].pitchAndMode
+        >>> key.KeySignature(-7).pitchAndMode
         (C-, None)
-        >>> keyArray[1].pitchAndMode
+        >>> key.KeySignature(-6).pitchAndMode
         (G-, None)
-        >>> keyArray[2].pitchAndMode
-        (D-, None)
-        >>> keyArray[3].pitchAndMode
-        (A-, None)
-        >>> keyArray[4].pitchAndMode
+        >>> key.KeySignature(-3).pitchAndMode
         (E-, None)
-        >>> keyArray[5].pitchAndMode
-        (B-, None)
-        >>> keyArray[6].pitchAndMode
-        (F, None)
-        >>> keyArray[7].pitchAndMode
+        >>> key.KeySignature(0).pitchAndMode
         (C, None)
-        >>> keyArray[8].pitchAndMode
+        >>> key.KeySignature(1).pitchAndMode
         (G, None)
+        >>> csharp = key.KeySignature(4)
+        >>> csharp.mode = "minor"
+        >>> csharp.pitchAndMode
+        (C#, 'minor')
+        >>> csharpPitch = csharp.pitchAndMode[0]
+        >>> csharpPitch.accidental
+        <accidental sharp>
         '''
         # this works but returns sharps
         # keyPc = (self.sharps * 7) % 12
-        pitchObj = sharpsToPitch(self.sharps)
+        if self.mode is not None and self.mode.lower() == 'minor':
+            pitchObj = sharpsToPitch(self.sharps + 3)
+        else:
+            pitchObj = sharpsToPitch(self.sharps)
         return pitchObj, self.mode
 
     pitchAndMode = property(_getPitchAndMode)
@@ -505,6 +508,28 @@ class KeySignature(music21.Music21Object):
 
     mx = property(_getMX, _setMX)
 
+    def _getLily(self):
+        (p, m) = self.pitchAndMode
+        if m is None:
+            m = "major"
+        pn = p.lilyNoOctave()
+        return r'\key ' + pn + ' \\' + m
+    
+    lily = property(_getLily, doc = r'''
+        returns the Lilypond representation of a KeySignature object
+        
+        >>> from music21 import *
+        >>> d = key.KeySignature(-1)
+        >>> d.mode = 'minor'
+        >>> print d.lily
+        \key d \minor
+        
+        Major is assumed:
+        
+        >>> fsharp = key.KeySignature(6)
+        >>> print fsharp.lily
+        \key fis \major
+    ''')
 
 
 

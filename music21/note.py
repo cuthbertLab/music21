@@ -1177,9 +1177,8 @@ class Note(NotRest):
         '''
         baseName = ""
         baseName += self.editorial.lilyStart()
-        baseName += self.step.lower()
-        if (self.pitch.accidental):
-            baseName += self.pitch.accidental.lily
+        if self.pitch is not None:
+            baseName += self.pitch.lilyNoOctave()
         elif (self.editorial.ficta is not None):
             baseName += self.editorial.ficta.lily
         octaveModChars = ""
