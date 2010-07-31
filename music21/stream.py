@@ -1091,6 +1091,9 @@ class Stream(music21.Music21Object):
 
         :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
 
+        :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
+        :class:`~music21.graph.PlotWindowedSadoianAmbitus`
+
         >>> a = Stream()
         >>> n = note.Note()
         >>> a.append(n)

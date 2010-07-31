@@ -79,6 +79,8 @@ class DiscreteAnalysis(object):
 class KrumhanslSchmuckler(DiscreteAnalysis):
     ''' Implementation of the Krumhansl-Schmuckler key determination algorithm
     '''
+    _DOC_ALL_INHERITED = False
+
     def __init__(self):
         DiscreteAnalysis.__init__(self)
         
@@ -343,9 +345,11 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 class SadoianAmbitus(DiscreteAnalysis):
     '''An basic analysis method for measuring register. 
     '''
+    _DOC_ALL_INHERITED = False
+
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
-        self.pitchSpanColors = {}
+        self._pitchSpanColors = {}
         self._generateColors()
 
     def _generateColors(self, numColors=None):
@@ -365,10 +369,10 @@ class SadoianAmbitus(DiscreteAnalysis):
         for i in range(min, max+1):
             val = int(round((255.0 / valueRange) * step))
             # store in dictionary the accepted values, not the step
-            self.pitchSpanColors[i] = self._rgbToHex((val, val, val))
+            self._pitchSpanColors[i] = self._rgbToHex((val, val, val))
             step += 1
 
-        #environLocal.printDebug([self.pitchSpanColors])
+        #environLocal.printDebug([self._pitchSpanColors])
     
     def _getPitchSpan(self, subStream):
         '''For a given subStream, return a value in half-steps of the range
@@ -459,7 +463,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         if result == None:
             return self._rgbToHex((0, 128, 0))
 
-        return self.pitchSpanColors[result]
+        return self._pitchSpanColors[result]
     
     
     def process(self, sStream):

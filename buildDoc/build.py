@@ -53,6 +53,8 @@ from music21.trecento import cadencebook as trecentoCadencebook
 
 from music21.analysis import correlate
 from music21.analysis import metrical
+from music21.analysis import discrete
+from music21.analysis import windowed
 
 
 #from music21 import environment #redundant
@@ -87,6 +89,7 @@ MODULES = [
     chord, 
     duration, 
     dynamics,
+    discrete,
     editorial,
     environment, 
     expressions,
@@ -105,6 +108,7 @@ MODULES = [
     serial,     
     tempo,     
     tinyNotation,
+    windowed,
 
 #   musicxml, 
 #   #  scale,
@@ -417,7 +421,6 @@ class PartitionedClass(PartitionedName):
         # create a combined data storage
         # this will match the order in names, and namesMroIndex
         self._data = self._dataClassify + self._dataLive
-
         self._sort()
 
     def _sort(self):
@@ -1016,6 +1019,13 @@ class ClassDoc(RestructuredWriter):
         '''Try to determine if a class is all inherited, that is: all the attributes and methods are from a subclass, and the docs will look identical.
         '''
         post = True
+
+        # some modules can define this attribute specifically
+        if hasattr(self.classNameEval, '_DOC_ALL_INHERITED'):
+            environLocal.printDebug(['found _DOC_ALL_INHERITED',
+                self.classNameEval._DOC_ALL_INHERITED])
+            return self.classNameEval._DOC_ALL_INHERITED
+
         for group in ['attributes', 'properties', 'methods']:    
             # in order for this to be all-inherited, it must have 
             # an inherited class that has all the same names just
@@ -1352,7 +1362,7 @@ class Documentation(RestructuredWriter):
         Add the file reference to the list of chaptersModuleRef.
         '''
         for module in self.modulesToBuild:
-            environLocal.printDebug(['writing rst documentation:', module])
+            #environLocal.printDebug(['writing rst documentation:', module])
             a = ModuleDoc(module)
             #a.scanModule()
             f = open(os.path.join(self.dirRst, a.fileName), 'w')

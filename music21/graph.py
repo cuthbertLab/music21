@@ -980,6 +980,8 @@ class Graph3DPolygonBars(Graph):
 class PlotStream(object):
     '''Approaches to plotting and graphing a stream. A base class from which Stream plotting Classes inherit.
     '''
+    # the following static parameters are used to for matching this
+    # plot based on user-requested string aguments
     # a string representation of the type of graph
     format = ''
     # store a list of parameters that are graphed
@@ -1401,7 +1403,6 @@ class PlotWindowedAnalysis(PlotStream):
 
     ''' 
     format = 'colorGrid'
-    
     def __init__(self, streamObj, processor=None, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
         
@@ -1453,18 +1454,15 @@ class PlotWindowedAnalysis(PlotStream):
 class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
     '''Subclass for plotting Krumhansl-Schmuckler analysis routine
     '''
-    format = 'colorGrid'
-    
+    values = ['krumhanslSchmuckler']
     def __init__(self, streamObj, *args, **keywords):
         PlotWindowedAnalysis.__init__(self, streamObj, 
             discrete.KrumhanslSchmuckler(), *args, **keywords)
     
-    
 class PlotWindowedSadoianAmbitus(PlotWindowedAnalysis):
     '''Subclass for plotting basic pitch span over a windowed analysis
     '''
-    format = 'colorGrid'
-    
+    values = ['ambitus']
     def __init__(self, streamObj, *args, **keywords):
         # provide the stream to both the window and processor in this case
         PlotWindowedAnalysis.__init__(self, streamObj, 
@@ -1478,7 +1476,6 @@ class PlotHistogram(PlotStream):
     '''Base class for Stream plotting classes.
     '''
     format = 'histogram'
-
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
@@ -2383,27 +2380,27 @@ def plotStream(streamObj, *args, **keywords):
 
     Plot method can be specified as a second argument or by keyword. Available plots include the following:
 
-    pitchSpace (:class:`~music21.graph.PlotHistogramPitchSpace`)
-    pitchClass (:class:`~music21.graph.PlotHistogramPitchClass`)
-    quarterLength (:class:`~music21.graph.PlotHistogramQuarterLength`)
+    :class:`~music21.graph.PlotHistogramPitchSpace`
+    :class:`~music21.graph.PlotHistogramPitchClass`
+    :class:`~music21.graph.PlotHistogramQuarterLength`
 
-    scatterPitchSpaceQuarterLength (:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`)
-    scatterPitchClassQuarterLength (:class:`~music21.graph.PlotScatterPitchClassQuarterLength`)
-    scatterPitchClassOffset (':class:`~graph.PlotScatterPitchClassOffset`)
+    :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
+    :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
+    :class:`~graph.PlotScatterPitchClassOffset`
 
-    pitchClassOffset (:class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`)
-    pitchSpaceOffset (:class:`~music21.graph.PlotHorizontalBarPitchClassOffset`)
+    :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
+    :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
 
-    pitchSpaceQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`)
-    pitchClassQuarterLengthCount (:class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`)
+    :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
+    :class:`~music21.graph.PlotScatterWeigthedPitchClassQuarterLength`
 
-    3DPitchSpaceQuarterLengthCount (:class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`)
+    :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
+
+    :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
+    :class:`~music21.graph.PlotWindowedSadoianAmbitus`
 
     '''
     plotClasses = [
-
-        # windowed
-        PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
 
         # histograms
         PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
@@ -2415,9 +2412,12 @@ def plotStream(streamObj, *args, **keywords):
         PlotScatterWeightedPitchSpaceQuarterLength, PlotScatterWeightedPitchClassQuarterLength,
         # 3d graphs
         Plot3DBarsPitchSpaceQuarterLength,
+        # windowed plots
+        PlotWindowedKrumhanslSchmuckler,
+        PlotWindowedSadoianAmbitus,
     ]
 
-
+    # can match by format
     if 'format' in keywords:
         format = keywords['format']
     else:
@@ -2452,10 +2452,11 @@ def plotStream(streamObj, *args, **keywords):
         plotMake = plotClasses
     else:
         for plotClassName in plotClasses:
+            # try to match by class name
             if plotClassName.__name__.lower() == format.lower():
                 plotMake.append(plotClassName)
 
-            # try direct match
+            # try direct match of format and values
             plotClassNameValues = [x.lower() for x in plotClassName.values]
             if plotClassName.format.lower() == format.lower():
                 match = 0

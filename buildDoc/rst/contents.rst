@@ -51,6 +51,7 @@ Module Reference
    moduleChord
    moduleDuration
    moduleDynamics
+   moduleAnalysisDiscrete
    moduleEditorial
    moduleEnvironment
    moduleExpressions
@@ -69,6 +70,7 @@ Module Reference
    moduleSerial
    moduleTempo
    moduleTinyNotation
+   moduleAnalysisWindowed
 
 
 Developer Reference
