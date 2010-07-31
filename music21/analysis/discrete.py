@@ -10,6 +10,27 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''Modular analysis procedures for use alone or applied with :class:`music21.analysis.windowed.WindowedAnalysis` class. 
+
+All procedures should inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`, or provide a similar interface. 
+
+The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) and :class:`music21.analysis.discrete.SadoianAmbitus` (for pitch range analysis) provide examples.
+'''
+
+import unittest
+import sys
+import music21
+
+from music21 import meter
+from music21.pitch import Pitch
+from music21 import stream 
+
+
+
+from music21 import environment
+_MOD = 'discrete.py'
+environLocal = environment.Environment(_MOD)
+
 
 
 #------------------------------------------------------------------------------
@@ -318,7 +339,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
     
 
 
-
+#------------------------------------------------------------------------------
 class SadoianAmbitus(DiscreteAnalysis):
     '''An basic analysis method for measuring register. 
     '''
@@ -463,3 +484,29 @@ class SadoianAmbitus(DiscreteAnalysis):
         '''
         solution, color = self.process(sStream)
         return solution
+
+
+#------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+    
+    
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+
+#------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        a = Test()
+
+
+
+

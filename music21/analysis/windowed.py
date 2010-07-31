@@ -10,6 +10,12 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''This module describes classes for performing windowed and overlapping windowed analysis. The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for systematic overlapping window analysis at the starting at the level of the quarter note and moving to the size of an entire :class:`music21.stream.Stream`.
+
+Modular analysis procedures inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`. The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) and :class:`music21.analysis.discrete.SadoianAmbitus` (for pitch range analysis) classes provide examples.
+'''
+
+
 import unittest, doctest, random
 import sys
 import math
@@ -51,9 +57,9 @@ class WindowedAnalysis(object):
     def _getMinimumWindowStream(self):
         ''' Take the loaded stream and restructure it into measures of 1 quarter note duration.
 
-        >>> from music21 import corpus
+        >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv324')
-        >>> p = SadoianAmbitus()
+        >>> p = analysis.discrete.SadoianAmbitus()
         >>> # placing one part into analysis
         >>> wa = WindowedAnalysis(s.parts[0], p)
 
@@ -85,9 +91,9 @@ class WindowedAnalysis(object):
 
         Returns two lists for results, each equal in size to the length of minimum windows minus the window size plus one. If we have 20 1/4 windows, then the results lists will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc. 
 
-        >>> from music21 import corpus
+        >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = SadoianAmbitus()
+        >>> p = analysis.discrete.SadoianAmbitus()
         >>> wa = WindowedAnalysis(s, p)
         >>> len(wa._windowedStream)
         39
@@ -129,9 +135,9 @@ class WindowedAnalysis(object):
 
         If `minWindow` or `maxWindow` is None, the largest window size available will be set. 
 
-        >>> from music21 import corpus
+        >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv324')
-        >>> p = KrumhanslSchmuckler()
+        >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> # placing one part into analysis
         >>> wa = WindowedAnalysis(s[0], p)
         >>> x, y, z = wa.process(1, 1)
@@ -185,20 +191,39 @@ class WindowedAnalysis(object):
 
 
 
-#------------------------------------------------------------------------------
 
+
+#------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
 
     def runTest(self):
         pass
-    
+
+
+
     
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
+    def testBasic(self):
+        from music21 import corpus
+        from music21.analysis import discrete
+        # get a procedure 
+        
+        s = corpus.parseWork('bach/bwv324')
 
+        for pClass in [discrete.KrumhanslSchmuckler, discrete.SadoianAmbitus]:
+            p = pClass()
+
+            # get windowing object, provide a stream for analysis as well as 
+            # the processor
+            wa = WindowedAnalysis(s, p)
+            # do smallest and larges
+            for i in range(1, 4) + [None]:
+                x, y, z = wa.process(i, i)
+    
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":

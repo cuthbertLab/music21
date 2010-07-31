@@ -23,7 +23,8 @@ from music21 import duration
 from music21 import pitch
 from music21 import common
 from music21 import chord
-from music21.analysis import windowedAnalysis
+from music21.analysis import windowed
+from music21.analysis import discrete
 from music21.analysis import correlate
 
 from music21 import environment
@@ -428,12 +429,15 @@ class GraphColorGridLegend(Graph):
     Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
     
     >>> a = GraphColorGrid(doneAction=None)
-    >>> data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')]),
-                ('b', [('t', '#858585'), ('u', '#00ff00'), ('v', '#6c6c6c')]), ('c', [('w', '#8c8c8c'), ('x', '#8c8c8c'), ('y', '#6c6c6c')])]
+    >>> data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')])]
 
     >>> a.setData(data)
     >>> #a.process()
     '''
+
+#     >>> data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')]),
+#                 ('b', [('t', '#858585'), ('u', '#00ff00'), ('v', '#6c6c6c')]), ('c', [('w', '#8c8c8c'), ('x', '#8c8c8c'), ('y', '#6c6c6c')])
+
     def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
@@ -1392,7 +1396,7 @@ class PlotStream(object):
 #-------------------------------------------------------------------------------
 # color grids    
 
-class PlotColorGridWindowedAnalysis(PlotStream):
+class PlotWindowedAnalysis(PlotStream):
     '''Base Plot for windowed analysis routines.
 
     ''' 
@@ -1429,7 +1433,7 @@ class PlotColorGridWindowedAnalysis(PlotStream):
     def _extractData(self, processor, dataValueLegit=True):
         '''Extract data actually calls the processing routine. 
         '''
-        wa = windowedAnalysis.WindowedAnalysis(self.streamObj, processor)
+        wa = windowed.WindowedAnalysis(self.streamObj, processor)
         solutionMatrix, colorMatrix, metaMatrix = wa.process(self.minWindow, 
                                       self.maxWindow, self.windowStep)
                 
@@ -1446,25 +1450,25 @@ class PlotColorGridWindowedAnalysis(PlotStream):
         return colorMatrix, yTicks
     
     
-class PlotColorGridKrumhanslSchmuckler(PlotColorGridWindowedAnalysis):
+class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
     '''Subclass for plotting Krumhansl-Schmuckler analysis routine
     '''
     format = 'colorGrid'
     
     def __init__(self, streamObj, *args, **keywords):
-        PlotColorGridWindowedAnalysis.__init__(self, streamObj, 
-            windowedAnalysis.KrumhanslSchmuckler(), *args, **keywords)
+        PlotWindowedAnalysis.__init__(self, streamObj, 
+            discrete.KrumhanslSchmuckler(), *args, **keywords)
     
     
-class PlotColorGridSadoianAmbitus(PlotColorGridWindowedAnalysis):
+class PlotWindowedSadoianAmbitus(PlotWindowedAnalysis):
     '''Subclass for plotting basic pitch span over a windowed analysis
     '''
     format = 'colorGrid'
     
     def __init__(self, streamObj, *args, **keywords):
         # provide the stream to both the window and processor in this case
-        PlotColorGridWindowedAnalysis.__init__(self, streamObj, 
-            windowedAnalysis.SadoianAmbitus(streamObj), *args, **keywords)
+        PlotWindowedAnalysis.__init__(self, streamObj, 
+            discrete.SadoianAmbitus(streamObj), *args, **keywords)
         
 
 #-------------------------------------------------------------------------------
@@ -2397,6 +2401,10 @@ def plotStream(streamObj, *args, **keywords):
 
     '''
     plotClasses = [
+
+        # windowed
+        PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
+
         # histograms
         PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
         # scatters
@@ -2896,16 +2904,16 @@ class Test(unittest.TestCase):
         b.process()
 
         
-    def testPlotColorGridSadoianAmbitus(self, doneAction=None):
+    def testPlotWindowedSadoianAmbitus(self, doneAction=None):
         from music21 import corpus
         a = corpus.parseWork('bach/bwv57.8')
-        b = PlotColorGridSadoianAmbitus(a.parts[0], title='Bach Ambitus',
+        b = PlotWindowedSadoianAmbitus(a.parts[0], title='Bach Ambitus',
             minWindow=1, maxWindow=8, windowStep=3,
             doneAction=doneAction)
         b.process()
 
 
-        b = PlotColorGridKrumhanslSchmuckler(a.parts[0], title='Bach Key',
+        b = PlotWindowedKrumhanslSchmuckler(a.parts[0], title='Bach Key',
             minWindow=1, maxWindow=8, windowStep=3, 
             doneAction=doneAction)
         b.process()
@@ -2919,7 +2927,7 @@ class Test(unittest.TestCase):
 
 
     
-    def testColorGridLegend(self, doneAction):
+    def testColorGridLegend(self, doneAction=None):
 
 #         data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')]), ('c', [('w', '#8c8c8c'), ('x', '#8c8c8c'), ('y', '#6c6c6c')]),]
 # 
@@ -2927,8 +2935,8 @@ class Test(unittest.TestCase):
 #         a.setData(data)
 #         a.process()
 
-        from music21.analysis import windowedAnalysis
-        ks = windowedAnalysis.KrumhanslSchmuckler()
+        from music21.analysis import discrete
+        ks = discrete.KrumhanslSchmuckler()
         data = ks.possibleResults()
         print data
         a = GraphColorGridLegend(doneAction=doneAction)
@@ -2974,6 +2982,6 @@ if __name__ == "__main__":
         #a.writeAllGraphs()
         #a.writeAllPlots()
 
-        #b.testPlotColorGridSadoianAmbitus('write')
+        #b.testPlotWindowedSadoianAmbitus('write')
 
         b.testColorGridLegend('write')
