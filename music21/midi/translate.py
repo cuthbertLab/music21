@@ -813,7 +813,6 @@ def streamsToMidiTracks(inputM21):
     from music21 import stream
     s = inputM21
 
-    sTemplate = stream.Stream()
     # return a list of MidiTrack objects
     midiTracks = []
 
@@ -823,7 +822,7 @@ def streamsToMidiTracks(inputM21):
     # TODO: may need to shift all time values to accomodate 
     # Streams that do not start at same time
     if s.isMultiPart():
-        for obj in s.getElementsByClass(sTemplate.classNames):
+        for obj in s.getElementsByClass('Stream'):
             midiTracks.append(obj._getMidiTracksPart())
     else: # just get this single stream
         midiTracks.append(s._getMidiTracksPart())

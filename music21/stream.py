@@ -121,7 +121,6 @@ class Stream(music21.Music21Object):
         
         '''
         music21.Music21Object.__init__(self)
-        self.classNames = (Stream, music21.stream.Stream)
 
         # self._elements stores ElementWrapper objects. These are not ordered.
         # this should have a public attribute/property self.elements
@@ -3938,7 +3937,6 @@ class Stream(music21.Music21Object):
     def isMultiPart(self):
         '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
         '''
-        sTemplate = Stream()
         multiPart = False
         for obj in self:
             # if obj is a Part, we have multi-parts
@@ -3951,7 +3949,7 @@ class Stream(music21.Music21Object):
                 break # only need one
             # if components are streams of Notes or Measures, 
             # than assume this is like a Part
-            elif isinstance(obj, sTemplate.classNames) and (
+            elif 'Stream' in obj.classes and (
                 len(obj.measures) > 0 or len(obj.notes) > 0):
                 multiPart = True
                 break # only need one
@@ -4151,10 +4149,6 @@ class Stream(music21.Music21Object):
         >>> mxScore = str1.mx
         '''
         #environLocal.printDebug('calling Stream._getMX')
-
-        # need to do class matching by both of these names
-        sTemplate = Stream()
-
         mxComponents = []
         instList = []
         
@@ -4183,7 +4177,7 @@ class Stream(music21.Music21Object):
             # TODO: now making a deepcopy, as we are going to edit internal objs
             partStream = copy.deepcopy(self)
 
-            for obj in partStream.getElementsByClass(sTemplate.classNames):
+            for obj in partStream.getElementsByClass('Stream'):
                 # may need to copy element here
                 # apply this streams offset to elements
                 obj.transferOffsetToElements() 
@@ -4207,13 +4201,13 @@ class Stream(music21.Music21Object):
 
             # would like to do something like this but cannot
             # replace object inside of the stream
-            for obj in partStream.getElementsByClass(sTemplate.classNames):
+            for obj in partStream.getElementsByClass('Stream'):
                 obj.makeRests(refStreamOrTimeRange, inPlace=True)
 
             environLocal.printDebug(['Stream._getMX(): handling multi-part Stream of length:', len(partStream)])
             count = 0
             midiChannelList = []
-            for obj in partStream.getElementsByClass(sTemplate.classNames):
+            for obj in partStream.getElementsByClass('Stream'):
                 count += 1
                 if count > len(partStream):
                     raise StreamException('infinite stream encountered')
@@ -8575,10 +8569,6 @@ class Test(unittest.TestCase):
     def testAugmentOrDiminishCorpus(self):
         '''Extact phrases from the corpus and use for testing 
         '''
-
-        # note: see sTemplate.classNames in _getMX to see why matching
-        # class is sometimes a problem
-
         from music21 import corpus
 
         # first method: iterating through notes
