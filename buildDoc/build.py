@@ -565,6 +565,17 @@ class PartitionedClass(PartitionedName):
 
 
     def getDoc(self, partName):
+        '''
+        >>> from music21 import pitch
+        >>> a = PartitionedClass(pitch.Pitch)
+        >>> a.getDoc('__init__')[:15]
+        'Create a Pitch.'
+
+        >>> from music21 import editorial
+        >>> b = PartitionedClass(editorial.Comment)
+        >>> b.getDoc('__init__')
+        'No documentation.'
+        '''
         element = self.getElement(partName)
 
         if hasattr(self.srcNameEval, '_DOC_ATTR'):
@@ -590,7 +601,11 @@ class PartitionedClass(PartitionedName):
             except AttributeError:
                 match = None
 
-        if match == None:
+        # the object object returns by default 
+        # x.__init__(...) initializes x; see x.__class__.__doc__ for signature
+        # this should be returned as Documentation
+
+        if match == None or match.startswith('x.__init__(...) initializes x'):
             return NO_DOC
         else:
             return match
@@ -617,11 +632,11 @@ class PartitionedClass(PartitionedName):
         True
 
         >>> a.getNames('method', mroIndex=0)
-        ['__init__', 'transpose']
+        ['__init__', 'getEnharmonic', 'getHigherEnharmonic', 'getLowerEnharmonic', 'inheritDisplay', 'isEnharmonic', 'lilyNoOctave', 'simplifyEnharmonic', 'transpose', 'updateAccidentalDisplay']
         >>> a.getNames('data', mroIndex=0)
         ['defaultOctave']
         >>> a.getNames('data', mroIndex=1)
-        ['id', 'groups']
+        ['classSortOrder', 'id', 'groups']
         >>> a.getNames('data', mroIndex=a.lastMroIndex())
         []
 
