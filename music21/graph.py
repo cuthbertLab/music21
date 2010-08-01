@@ -1439,9 +1439,15 @@ class PlotWindowedAnalysis(PlotStream):
         else:
             self.windowStep = 8
         
+        if 'compressLegend' in keywords:
+            self.compressLegend = keywords['compressLegend']
+        else:
+            self.compressLegend = False
+
         # create a color grid
         self.graph = GraphColorGrid(*args, **keywords)
-        data, yTicks = self._extractData(processor)
+        # uses self.processor
+        data, yTicks = self._extractData()
         
         self.graph.setData(data)
         self.graph.setAxisLabel('y', 'Window Size')
@@ -1449,10 +1455,10 @@ class PlotWindowedAnalysis(PlotStream):
         self.graph.setTicks('y', yTicks)
 
         
-    def _extractData(self, processor, dataValueLegit=True):
+    def _extractData(self):
         '''Extract data actually calls the processing routine. 
         '''
-        wa = windowed.WindowedAnalysis(self.streamObj, processor)
+        wa = windowed.WindowedAnalysis(self.streamObj, self.processor)
         solutionMatrix, colorMatrix, metaMatrix = wa.process(self.minWindow, 
                                       self.maxWindow, self.windowStep)
                 
@@ -1478,7 +1484,8 @@ class PlotWindowedAnalysis(PlotStream):
         self.graphLegend = GraphColorGridLegend(
                            doneAction=self.graph.doneAction, 
                            title=self.processor.name + ' Legend')
-        self.graphLegend.setData(self.processor.solutionLegend())
+        self.graphLegend.setData(self.processor.solutionLegend(
+            compress=self.compressLegend))
         self.graphLegend.process()
 
 
@@ -1493,7 +1500,10 @@ class PlotWindowedAnalysis(PlotStream):
         self.graphLegend = GraphColorGridLegend(
                            doneAction=self.graph.doneAction, 
                            title=self.processor.name + ' Legend')
-        self.graphLegend.setData(self.processor.solutionLegend())
+
+        self.graphLegend.setData(self.processor.solutionLegend(
+            compress=self.compressLegend))
+
         self.graphLegend.process()
         self.graphLegend.write(fpLegend)
 

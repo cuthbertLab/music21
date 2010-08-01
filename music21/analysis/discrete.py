@@ -47,7 +47,8 @@ class DiscreteAnalysis(object):
     def __init__(self, referenceStream=None):
         # store a reference stream if needed
         self._referenceStream = referenceStream
-        # store solutions encountered over a single run; this can be used
+
+        # store unique solutions encountered over a single run; this can be used
         # to configure the generation of a legend based only on the values 
         # that have been produced.
         # store pairs of sol, color
@@ -62,10 +63,10 @@ class DiscreteAnalysis(object):
     def clearSolutionsFound(self):
         self._solutionsFound = []
 
-    def solutionLegend(self, filterUnused=False):
+    def solutionLegend(self, compress=False):
         '''A list of pairs showing all discrete results and the assigned color. Data should be organized to be passed to :class:`music21.graph.GraphColorGridLegend`.
 
-        If filterUnused is True, the legend will only show values for solutions that have been encountered. 
+        If `compress` is True, the legend will only show values for solutions that have been encountered. 
         '''
         pass
     
@@ -266,7 +267,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                     soln[i] = float(top[i]) / ((bottomRight[i]*bottomLeft[i])**.5)
         return soln    
 
-    def solutionLegend(self):
+    def solutionLegend(self, compress=False):
         ''' Returns a list of lists of possible results for the creation of a legend.
 
         >>> from music21 import *
@@ -469,7 +470,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         return int(min(psRange)), int(max(psRange))
 
 
-    def solutionLegend(self):
+    def solutionLegend(self, compress=False):
         '''Return legend data. 
 
         >>> from music21 import *
