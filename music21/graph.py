@@ -395,24 +395,42 @@ class GraphColorGrid(Graph):
         plotShift = .05 # shift to make room for y axis label        
         axTop = self.fig.add_subplot(1, 1, 1+plotShift)
         # do not need grid for outer container
+
+
+        # these approaches do not work:
+        # adjust face color of axTop independently
+        # this sets the color of the main data presentation window
+        #axTop.axesPatch.set_facecolor('#000000')
+
+        # axTop.bar([.5], [1], 1, color=['#000000'], linewidth=.5, edgecolor='#111111')
         
-        for i in range(len(self.data)):
+        rowCount = len(self.data)
+
+        for i in range(rowCount):
             positions = []
             heights = []
             subColors = []
             
             for j in range(len(self.data[i])):
                 positions.append((1/2)+j)
+                # collect colors in a list to set all at once
                 subColors.append(self.data[i][j])
                 #correlations.append(float(self.data[i][j][2]))
                 heights.append(1)
             
             # add a new subplot for each row    
-            ax = self.fig.add_subplot(len(self.data), 1,
+            ax = self.fig.add_subplot(rowCount, 1,
                  len(self.data)-i+plotShift)
 
-            ax.bar(positions, heights, 1, color=subColors)
-            
+            # linewidth: .1 is the thinnest possible
+            ax.bar(positions, heights, 1, color=subColors, linewidth=.3, edgecolor='#000000', antialiased=False)
+
+            # remove spines from each bar plot; cause excessive thickness
+            for loc, spine in ax.spines.iteritems():
+                #spine.set_color('none') # don't draw spine
+                spine.set_linewidth(.3) 
+                spine.set_color('#000000') 
+
             # remove all ticks for subplots
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
@@ -421,7 +439,12 @@ class GraphColorGrid(Graph):
             # this is the shifting the visible bars; may not be necessary
             ax.set_xlim([0,len(self.data[i])])
             
-        self.setAxisRange('x', range(len(self.data)), 0)
+
+        # adjust space between the bars
+        # .1 is about the smallest that gives some space
+        self.fig.subplots_adjust(hspace=0,)
+
+        self.setAxisRange('x', range(rowCount), 0)
         # turn off grid
         self.grid = False
         # standard procedures
@@ -486,11 +509,17 @@ class GraphColorGridLegend(Graph):
             
             # add a new subplot for each row    
             posTriple = (len(self.data), 1, i+1+plotShift)
-            environLocal.printDebug(['posTriple', posTriple])
+            #environLocal.printDebug(['posTriple', posTriple])
             ax = self.fig.add_subplot(*posTriple)
             # 1 here is width
-            ax.bar(positions, heights, 1, color=subColors)
+            ax.bar(positions, heights, 1, color=subColors, linewidth=.3, edgecolor='#000000')
             
+            # remove spines from each bar plot; cause excessive thickness
+            for loc, spine in ax.spines.iteritems():
+                #spine.set_color('none') # don't draw spine
+                spine.set_linewidth(.3) 
+                spine.set_color('#000000') 
+
             # remove all ticks for subplots
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
@@ -1424,6 +1453,10 @@ class PlotWindowedAnalysis(PlotStream):
         # store process for getting title
         self.processor = processor
 
+        if 'title' not in keywords:
+            # pass to Graph instance
+            keywords['title'] = 'Windowed Analysis'
+
         if 'minWindow' in keywords:
             self.minWindow = keywords['minWindow']
         else:
@@ -1465,7 +1498,14 @@ class PlotWindowedAnalysis(PlotStream):
         # get dictionaries of meta data for each row
         pos = 0
         yTicks = []
-        for y in range(len(metaMatrix)):        
+
+        # if more than 12 bars, reduce the number of ticks
+        if len(metaMatrix) > 12:
+            tickRange = range(0, len(metaMatrix), int(len(metaMatrix) / 12))
+        else:
+            tickRange = range(len(metaMatrix))
+        environLocal.printDebug(['tickRange', tickRange])
+        for y in tickRange:        
             # pad three ticks for each needed
             yTicks.append([pos, '']) # pad first
             yTicks.append([pos+1, '%s' % metaMatrix[y]['windowSize']])
