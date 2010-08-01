@@ -47,6 +47,11 @@ class DiscreteAnalysis(object):
     def __init__(self, referenceStream=None):
         # store a reference stream if needed
         self._referenceStream = referenceStream
+        # store solutions encountered over a single run; this can be used
+        # to configure the generation of a legend based only on the values 
+        # that have been produced.
+        # store pairs of sol, color
+        self._solutionsFound = []
 
     def _rgbToHex(self, rgb):
         '''Utility conversion method
@@ -54,8 +59,13 @@ class DiscreteAnalysis(object):
         rgb = int(round(rgb[0])), int(round(rgb[1])), int(round(rgb[2]))
         return '#%02x%02x%02x' % rgb    
 
-    def solutionLegend(self):
+    def clearSolutionsFound(self):
+        self._solutionsFound = []
+
+    def solutionLegend(self, filterUnused=False):
         '''A list of pairs showing all discrete results and the assigned color. Data should be organized to be passed to :class:`music21.graph.GraphColorGridLegend`.
+
+        If filterUnused is True, the legend will only show values for solutions that have been encountered. 
         '''
         pass
     
