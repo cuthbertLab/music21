@@ -61,7 +61,18 @@ class DiscreteAnalysis(object):
         return '#%02x%02x%02x' % rgb    
 
     def clearSolutionsFound(self):
+        '''Clear all stored solutions 
+        '''
         self._solutionsFound = []
+
+    def getColorsUsed(self):
+        '''Based on solutions found so far with with this processor, return the colors that have been used.
+        '''
+        post = []
+        for solution, color in self._solutionsFound:
+            if color not in post:
+                post.append(color)
+        return post    
 
     def solutionLegend(self, compress=False):
         '''A list of pairs showing all discrete results and the assigned color. Data should be organized to be passed to :class:`music21.graph.GraphColorGridLegend`.
@@ -275,7 +286,14 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         >>> p.solutionLegend()
         [['Major', [('C-', '#55FF00'), ('C', '#00FF00'), ('C#', '#00AA55'), ('D-', '#5600FF'), ('D', '#8000FF'), ('D#', '#AB00FF'), ('E-', '#D60000'), ('E', '#FF0000'), ('E#', '#FF2B00'), ('F-', '#FFD600'), ('F', '#FFFF00'), ('F#', '#AAFF00'), ('G-', '#0055AA'), ('G', '#0000FF'), ('G#', '#2B00FF'), ('A-', '#D600FF'), ('A', '#FF00FF'), ('A#', '#FF55FF'), ('B-', '#FF5600'), ('B', '#FF8000'), ('B#', '#FFAB00')]], ['Minor', [('C-', '#009b00'), ('C', '#009b00'), ('C#', '#004600'), ('D-', '#00009b'), ('D', '#24009b'), ('D#', '#47009b'), ('E-', '#720000'), ('E', '#9b0000'), ('E#', '#9b0000'), ('F-', '#9b7200'), ('F', '#9b9b00'), ('F#', '#469b00'), ('G-', '#000046'), ('G', '#00009B'), ('G#', '#00009B'), ('A-', '#72009b'), ('A', '#9b009b'), ('A#', '#9b009b'), ('B-', '#9b0000'), ('B', '#9b2400'), ('B#', '#9b4700')]]]
 
+        >>> p.solutionLegend(compress=True) # empty if nothing processed
+        [['Major', [('C-', '#ffffff'), ('C', '#ffffff'), ('C#', '#ffffff'), ('D-', '#ffffff'), ('D', '#ffffff'), ('D#', '#ffffff'), ('E-', '#ffffff'), ('E', '#ffffff'), ('E#', '#ffffff'), ('F-', '#ffffff'), ('F', '#ffffff'), ('F#', '#ffffff'), ('G-', '#ffffff'), ('G', '#ffffff'), ('G#', '#ffffff'), ('A-', '#ffffff'), ('A', '#ffffff'), ('A#', '#ffffff'), ('B-', '#ffffff'), ('B', '#ffffff'), ('B#', '#ffffff')]], ['Minor', [('C-', '#ffffff'), ('C', '#ffffff'), ('C#', '#ffffff'), ('D-', '#ffffff'), ('D', '#ffffff'), ('D#', '#ffffff'), ('E-', '#ffffff'), ('E', '#ffffff'), ('E#', '#ffffff'), ('F-', '#ffffff'), ('F', '#ffffff'), ('F#', '#ffffff'), ('G-', '#ffffff'), ('G', '#ffffff'), ('G#', '#ffffff'), ('A-', '#ffffff'), ('A', '#ffffff'), ('A#', '#ffffff'), ('B-', '#ffffff'), ('B', '#ffffff'), ('B#', '#ffffff')]]]
+
         '''
+        if compress:
+            colorsUsed = self.getColorsUsed()
+            environLocal.printDebug(['colors used:', colorsUsed])
+
         data = []
         for yLabel in ['Major', 'Minor']:
             if yLabel == 'Major':
@@ -286,8 +304,12 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             row.append(yLabel)
             pairs = []
             for key in self._keySortOrder:
-                value = refDict[key]
-                pairs.append((key, value))
+                color = refDict[key]
+                if compress:
+                    if color not in colorsUsed:
+                        # set as white so as to maintain spacing
+                        color = '#ffffff' 
+                pairs.append((key, color))
             row.append(pairs)
             data.append(row)    
         return data
@@ -356,6 +378,9 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             solution = (str(likelyKeysMinor[0][0]), "minor", likelyKeysMinor[0][1])
             
         color = self.solutionToColor(solution)
+
+        # store solutions for compressed legend generation
+        self._solutionsFound.append((solution, color))
         return solution, color        
     
 
@@ -388,8 +413,10 @@ class SadoianAmbitus(DiscreteAnalysis):
 
         valueRange = max - min
         step = 0
+        antiBlack = 25
         for i in range(min, max+1):
-            val = int(round((255.0 / valueRange) * step))
+            # do not use all 255 to avoid going to black
+            val = int(round(((255.0 - antiBlack)/ valueRange) * step)) + antiBlack
             # store in dictionary the accepted values, not the step
             self._pitchSpanColors[i] = self._rgbToHex(((val*.75), (val*.6), val))
             step += 1
@@ -476,22 +503,55 @@ class SadoianAmbitus(DiscreteAnalysis):
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
         >>> p = analysis.discrete.SadoianAmbitus(s.parts[0]) #provide ref stream
-        >>> p.solutionLegend()
-        [['', [(0, '#000000'), (1, '#100d15'), (2, '#201a2b'), (3, '#302640'), (4, '#403355'), (5, '#50406a')]], ['', [(6, '#604d80'), (7, '#705995'), (8, '#8066aa'), (9, '#8f73bf'), (10, '#a080d5'), (11, '#b08cea'), (12, '#bf99ff')]]]
+        >>> len(p.solutionLegend())
+        2
+        >>> [len(x) for x in p.solutionLegend()]
+        [2, 2]
+
+        >>> [len(y) for y in [x for x in p.solutionLegend()]]
+        [2, 2]
+
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> p = SadoianAmbitus()
+        >>> p.solutionLegend(compress=True) # empty if nothing processed
+        [['', []], ['', []]]
+
+        >>> x = p.process(s.parts[0])
+        >>> [len(y) for y in [x for x in p.solutionLegend(compress=True)]]
+        [2, 2]
+
+        >>> x = p.process(s.parts[1])
+        >>> [len(y) for y in [x for x in p.solutionLegend(compress=True)]]
+        [2, 2]
 
         '''
+        if compress:
+            colorsUsed = self.getColorsUsed()
+
         data = []
-        keys = self._pitchSpanColors.keys()
+
+        colors = {} # a filtered dictionary
+        for i in range(len(self._pitchSpanColors.keys())):
+            if compress:
+                if self._pitchSpanColors[i] not in colorsUsed:
+                    continue
+            colors[i] = self._pitchSpanColors[i]  
+
+        # keys here are solutions, not colors
+        keys = colors.keys()
         keys.sort()
 
+        keysTopRow = keys[:(len(keys)/2)]
+        keysBottomRow = keys[(len(keys)/2):]
+
         # split keys into two groups for two rows (optional)
-        for keyGroup in [range(0, len(keys)/2), 
-                        range(len(keys)/2, len(keys))]:
+        for keyGroup in [keysTopRow, keysBottomRow]:
             row = []
             row.append('') # empty row label
             pairs = []
             for i in keyGroup:
-                pairs.append((i, self._pitchSpanColors[i]))
+                color = colors[i] # get form colors
+                pairs.append((i, color))
             row.append(pairs)
             data.append(row)
 
@@ -506,8 +566,8 @@ class SadoianAmbitus(DiscreteAnalysis):
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
         >>> min, max = p._getPitchSpan(s)
-        >>> p.solutionToColor(max-min)
-        '#5d4a7c'
+        >>> p.solutionToColor(max-min).startswith('#')
+        True
         '''    
         # a result of None may be possible
         if result == None:
@@ -519,12 +579,14 @@ class SadoianAmbitus(DiscreteAnalysis):
     def process(self, sStream):
         post = self._getPitchSpan(sStream)
         if post != None:
-            soln = post[1] - post[0] # max-min
+            solution = post[1] - post[0] # max-min
         else:
-            soln = None
-        color = self.solutionToColor(soln)
+            solution = None
+        color = self.solutionToColor(solution)
         
-        return soln, color
+        # store solutions for compressed legend generation
+        self._solutionsFound.append((solution, color))
+        return solution, color
 
 
     def getSolution(self, sStream):
