@@ -60,6 +60,33 @@ class DiscreteAnalysis(object):
         rgb = int(round(rgb[0])), int(round(rgb[1])), int(round(rgb[2]))
         return '#%02x%02x%02x' % rgb    
 
+    def _hexToRgb(self, value):
+        '''Utility conversion method    
+        >>> da = DiscreteAnalysis()
+        >>> da._hexToRgb('#ffffff')
+        [255, 255, 255]
+        >>> da._hexToRgb('#000000')
+        [0, 0, 0]
+        '''
+        value = value.lstrip('#')
+        lv = len(value)
+        return list(int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
+
+    def _rgbLimit(self, value):
+        '''Utility conversion method    
+        >>> da = DiscreteAnalysis()
+        >>> da._rgbLimit(300)
+        255
+        >>> da._rgbLimit(-30)
+        0
+        '''
+        if value < 0:
+            value = 0
+        elif value > 255:
+            value = 255
+        return value
+
+
     def clearSolutionsFound(self):
         '''Clear all stored solutions 
         '''
@@ -109,52 +136,6 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         
-        # store color grid information to associate particular keys to colors
-        
-        # note: these colors were manually selected to optimize distinguishing
-        # characteristics. do not change without good reason
-        self._majorKeyColors = {'E-':'#D60000',
-                 'E':'#FF0000',
-                 'E#':'#FF2B00',
-                 'B-':'#FF5600',
-                 'B':'#FF8000',
-                 'B#':'#FFAB00',
-                 'F-':'#FFD600', # was #FFFD600
-                 'F':'#FFFF00',
-                 'F#':'#AAFF00',
-                 'C-':'#55FF00',
-                 'C':'#00FF00',
-                 'C#':'#00AA55',
-                 'G-':'#0055AA',
-                 'G':'#0000FF',
-                 'G#':'#2B00FF',
-                 'D-':'#5600FF',
-                 'D':'#8000FF',
-                 'D#':'#AB00FF',
-                 'A-':'#D600FF',
-                 'A':'#FF00FF',
-                 'A#':'#FF55FF'}
-        self._minorKeyColors = {'E-':'#720000',
-                 'E':'#9b0000',
-                 'E#':'#9b0000',
-                 'B-':'#9b0000',
-                 'B':'#9b2400',
-                 'B#':'#9b4700',
-                 'F-':'#9b7200',
-                 'F':'#9b9b00',
-                 'F#':'#469b00',
-                 'C-':'#009b00',
-                 'C':'#009b00',
-                 'C#':'#004600',
-                 'G-':'#000046',
-                 'G':'#00009B',
-                 'G#':'#00009B',
-                 'D-':'#00009b',
-                 'D':'#24009b',
-                 'D#':'#47009b',
-                 'A-':'#72009b',
-                 'A':'#9b009b',
-                 'A#':'#9b009b'}
         # need a presentation order for legend; not alphabetical
         self._keySortOrder = ['C-', 'C', 'C#',
                               'D-', 'D', 'D#',
@@ -221,7 +202,6 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             over Sapp's given distribution for finding key, returning the result. 
         '''
         soln = [0] * 12
-        
         toneWeights = self._getWeights(weightType)
                 
         for i in range(len(soln)):
@@ -246,7 +226,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         
         
     def _getDifference(self, keyResults, pcDistribution, weightType):
-        ''' Takes in a list of numerical probably key results and returns the
+        ''' Takes in a list of numerical probable key results and returns the
             difference of the top two keys
         '''
             
@@ -283,11 +263,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 
         >>> from music21 import *
         >>> p = analysis.discrete.KrumhanslSchmuckler()
-        >>> p.solutionLegend()
-        [['Major', [('C-', '#55FF00'), ('C', '#00FF00'), ('C#', '#00AA55'), ('D-', '#5600FF'), ('D', '#8000FF'), ('D#', '#AB00FF'), ('E-', '#D60000'), ('E', '#FF0000'), ('E#', '#FF2B00'), ('F-', '#FFD600'), ('F', '#FFFF00'), ('F#', '#AAFF00'), ('G-', '#0055AA'), ('G', '#0000FF'), ('G#', '#2B00FF'), ('A-', '#D600FF'), ('A', '#FF00FF'), ('A#', '#FF55FF'), ('B-', '#FF5600'), ('B', '#FF8000'), ('B#', '#FFAB00')]], ['Minor', [('C-', '#009b00'), ('C', '#009b00'), ('C#', '#004600'), ('D-', '#00009b'), ('D', '#24009b'), ('D#', '#47009b'), ('E-', '#720000'), ('E', '#9b0000'), ('E#', '#9b0000'), ('F-', '#9b7200'), ('F', '#9b9b00'), ('F#', '#469b00'), ('G-', '#000046'), ('G', '#00009B'), ('G#', '#00009B'), ('A-', '#72009b'), ('A', '#9b009b'), ('A#', '#9b009b'), ('B-', '#9b0000'), ('B', '#9b2400'), ('B#', '#9b4700')]]]
-
-        >>> p.solutionLegend(compress=True) # empty if nothing processed
-        [['Major', [('C-', '#ffffff'), ('C', '#ffffff'), ('C#', '#ffffff'), ('D-', '#ffffff'), ('D', '#ffffff'), ('D#', '#ffffff'), ('E-', '#ffffff'), ('E', '#ffffff'), ('E#', '#ffffff'), ('F-', '#ffffff'), ('F', '#ffffff'), ('F#', '#ffffff'), ('G-', '#ffffff'), ('G', '#ffffff'), ('G#', '#ffffff'), ('A-', '#ffffff'), ('A', '#ffffff'), ('A#', '#ffffff'), ('B-', '#ffffff'), ('B', '#ffffff'), ('B#', '#ffffff')]], ['Minor', [('C-', '#ffffff'), ('C', '#ffffff'), ('C#', '#ffffff'), ('D-', '#ffffff'), ('D', '#ffffff'), ('D#', '#ffffff'), ('E-', '#ffffff'), ('E', '#ffffff'), ('E#', '#ffffff'), ('F-', '#ffffff'), ('F', '#ffffff'), ('F#', '#ffffff'), ('G-', '#ffffff'), ('G', '#ffffff'), ('G#', '#ffffff'), ('A-', '#ffffff'), ('A', '#ffffff'), ('A#', '#ffffff'), ('B-', '#ffffff'), ('B', '#ffffff'), ('B#', '#ffffff')]]]
+        >>> post = p.solutionLegend()
 
         '''
         if compress:
@@ -296,35 +272,133 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 
         data = []
         for yLabel in ['Major', 'Minor']:
-            if yLabel == 'Major':
-                refDict = self._majorKeyColors
-            elif yLabel == 'Minor':
-                refDict = self._minorKeyColors
             row = []
             row.append(yLabel)
             pairs = []
             for key in self._keySortOrder:
-                color = refDict[key]
+                color = self.solutionToColor([key, yLabel])
                 if compress:
                     if color not in colorsUsed:
                         # set as white so as to maintain spacing
                         color = '#ffffff' 
+                # replace all '-' with 'b' (or proper flat symbol)
+                key = key.replace('-', 'b')
+                # make minor keys in lower case
+                if yLabel == 'Minor':
+                    key = key.lower()
                 pairs.append((key, color))
             row.append(pairs)
             data.append(row)    
         return data
     
-    def solutionToColor(self, solution):
-        '''For a given solution, return the color. Use the stored color information in the __init__ method to assign a color for a given result.
+    def solutionToColorBright(self, solution):
+        '''For a given solution, return the color.
         '''
+
+        # store color grid information to associate particular keys to colors
+        # note: these colors were manually selected to optimize distinguishing
+        # characteristics. do not change without good reason
+        majorKeyColors = {'E-':'#D60000',
+                 'E':'#FF0000',
+                 'E#':'#FF2B00',
+                 'B-':'#FF5600',
+                 'B':'#FF8000',
+                 'B#':'#FFAB00',
+                 'F-':'#FFD600', # was #FFFD600
+                 'F':'#FFFF00',
+                 'F#':'#AAFF00',
+                 'C-':'#55FF00',
+                 'C':'#00FF00',
+                 'C#':'#00AA55',
+                 'G-':'#0055AA',
+                 'G':'#0000FF',
+                 'G#':'#2B00FF',
+                 'D-':'#5600FF',
+                 'D':'#8000FF',
+                 'D#':'#AB00FF',
+                 'A-':'#D600FF',
+                 'A':'#FF00FF',
+                 'A#':'#FF55FF'}
+        minorKeyColors = {'E-':'#720000',
+                 'E':'#9b0000',
+                 'E#':'#9b0000',
+                 'B-':'#9b0000',
+                 'B':'#9b2400',
+                 'B#':'#9b4700',
+                 'F-':'#9b7200',
+                 'F':'#9b9b00',
+                 'F#':'#469b00',
+                 'C-':'#009b00',
+                 'C':'#009b00',
+                 'C#':'#004600',
+                 'G-':'#000046',
+                 'G':'#00009B',
+                 'G#':'#00009B',
+                 'D-':'#00009b',
+                 'D':'#24009b',
+                 'D#':'#47009b',
+                 'A-':'#72009b',
+                 'A':'#9b009b',
+                 'A#':'#9b009b'}
+
+
         key = solution[0]
-        modality = solution[1]
+        modality = solution[1].lower()
         if modality == "major":
-            return self._majorKeyColors[str(key)]
+            return majorKeyColors[str(key)]
         elif modality == "minor":
-            return self._minorKeyColors[str(key)]
+            return minorKeyColors[str(key)]
         
     
+    def solutionToColor(self, solution):
+
+        key = solution[0]
+        modality = solution[1].lower()
+
+        # for each step, assign a color
+        # names taken from http://chaos2.org/misc/rgb.html
+        # idea is basically:
+        # red, orange, yellow, green, cyan, blue, purple, pink
+        stepLib = {'C': '#CD4F39', # tomato3
+                'D': '#DAA520', # goldenrod
+              #  'E': '#CDBE70', # LightGoldenrod1
+                'E': '#BCEE68', # DarkOliveGreen2
+                'F': '#96CDCD', # PaleTurquoise3
+                'G': '#6495ED', # cornflower blue
+                'A': '#8968CD', # MediumPurple3
+                'B': '#FF83FA', # orchid1
+
+                } 
+        # first char is always step
+        step = key[0]
+
+        rgbStep = self._hexToRgb(stepLib[step])
+
+
+        # make all the colors a but lighter
+        for i in range(len(rgbStep)):
+            rgbStep[i] = self._rgbLimit(rgbStep[i] + 30)
+
+
+        #make minor darker
+        if modality == 'minor':
+            for i in range(len(rgbStep)):
+                rgbStep[i] = self._rgbLimit(rgbStep[i] - 80)
+
+        if len(key) > 1:
+            if key[1] == '-':
+                # index and value shift
+                shiftLib = {0: 10, 1: 15, 2:-15}                   
+            elif key[1] == '#':                   
+                shiftLib = {0: -10, 1: -15, 2:15}      
+             
+            for i in shiftLib.keys():
+                rgbStep[i] = self._rgbLimit(rgbStep[i] + shiftLib[i])
+
+
+        return self._rgbToHex(rgbStep)
+
+
     def getSolution(self, sStream):
         ''' procedure to only return a text solution
         >>> from music21 import *

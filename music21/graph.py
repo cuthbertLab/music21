@@ -3135,7 +3135,7 @@ if __name__ == "__main__":
 
         #b.testPlotWindowedSadoianAmbitus('write')
 
-        #b.testColorGridLegend('write')
+        b.testColorGridLegend('write')
         #b.testPlotWindowedSadoianAmbitus('write')
 
-        a.writeAllPlots()
+        #a.writeAllPlots()
