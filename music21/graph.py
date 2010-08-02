@@ -423,6 +423,7 @@ class GraphColorGrid(Graph):
                  len(self.data)-i+plotShift)
 
             # linewidth: .1 is the thinnest possible
+            # antialiased = false, for small diagrams, provides tighter images
             ax.bar(positions, heights, 1, color=subColors, linewidth=.3, edgecolor='#000000', antialiased=False)
 
             # remove spines from each bar plot; cause excessive thickness
@@ -430,6 +431,7 @@ class GraphColorGrid(Graph):
                 #spine.set_color('none') # don't draw spine
                 spine.set_linewidth(.3) 
                 spine.set_color('#000000') 
+                spine.set_alpha(1) 
 
             # remove all ticks for subplots
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
@@ -439,6 +441,10 @@ class GraphColorGrid(Graph):
             # this is the shifting the visible bars; may not be necessary
             ax.set_xlim([0,len(self.data[i])])
             
+            # these do not seem to do anything
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
 
         # adjust space between the bars
         # .1 is about the smallest that gives some space
