@@ -78,11 +78,11 @@ class SystemLayout(music21.Music21Object):
         >>> slAlt = SystemLayout()
         >>> slAlt.mx = mxPrint # transfter
         >>> slAlt.leftMargin
-        234
+        234.0
         >>> slAlt.rightMargin
-        124
+        124.0
         >>> slAlt.distance
-        3
+        3.0
         >>> slAlt.isNew
         True
         '''
@@ -133,7 +133,7 @@ class SystemLayout(music21.Music21Object):
         >>> mxSystemLayout.systemDistance = 55
         >>> mxSystemMargins = musicxml.SystemMargins()
         >>> mxSystemMargins.set('leftMargin', 20)
-        >>> mxSystemMargins.set('rightMargin', 30)
+        >>> mxSystemMargins.set('rightMargin', 30.2)
         >>> mxSystemLayout.append(mxSystemMargins) 
         >>> mxPrint.append(mxSystemLayout)
 
@@ -142,11 +142,11 @@ class SystemLayout(music21.Music21Object):
         >>> sl.isNew
         True
         >>> sl.rightMargin
-        30
+        30.2
         >>> sl.leftMargin
-        20
+        20.0
         >>> sl.distance
-        55
+        55.0
         '''
         data = mxPrint.get('newSystem')
         if data == 'yes': # encoded as yes/no in musicxml
@@ -169,13 +169,14 @@ class SystemLayout(music21.Music21Object):
         if mxSystemMargins != None:
             data = mxSystemMargins.get('leftMargin')
             if data != None:
-                self.leftMargin = int(data)
+                # may be floating point values
+                self.leftMargin = float(data)
             data = mxSystemMargins.get('rightMargin')
             if data != None:
-                self.rightMargin = int(data)
+                self.rightMargin = float(data)
         
         if mxSystemLayout != [] and mxSystemLayout.systemDistance != None:
-            self.distance = int(mxSystemLayout.systemDistance)
+            self.distance = float(mxSystemLayout.systemDistance)
 
     mx = property(_getMX, _setMX)    
 
