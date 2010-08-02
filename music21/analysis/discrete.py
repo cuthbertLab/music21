@@ -104,12 +104,27 @@ class DiscreteAnalysis(object):
                 post.append(color)
         return post    
 
+    def getSolutionsUsed(self):
+        '''Based on solutions found so far with with this processor, return the solutions that have been used.
+        '''
+        post = []
+        for solution, color in self._solutionsFound:
+            if solution not in post:
+                post.append(solution)
+        return post   
+
     def solutionLegend(self, compress=False):
         '''A list of pairs showing all discrete results and the assigned color. Data should be organized to be passed to :class:`music21.graph.GraphColorGridLegend`.
 
         If `compress` is True, the legend will only show values for solutions that have been encountered. 
         '''
         pass
+
+
+    def solutionUnitString(self):
+        '''Return a string describing the solution values. Used in Legend formation. 
+        '''
+        return None
     
     def solutionToColor(self, result):
         '''Given a analysis specific result, return the appropriate color. Must be able to handle None in the case that there is no result.
@@ -141,15 +156,6 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         
-        # need a presentation order for legend; not alphabetical
-        self._keySortOrder = ['C-', 'C', 'C#',
-                              'D-', 'D', 'D#',
-                              'E-', 'E', 'E#',
-                              'F-', 'F', 'F#',
-                              'G-', 'G', 'G#',
-                              'A-', 'A', 'A#',
-                              'B-', 'B', 'B#',
-                            ]
 
     def _getWeights(self, weightType='major'): 
         ''' Returns either the a weight key profile as described by Sapp and others
@@ -271,16 +277,38 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         >>> post = p.solutionLegend()
 
         '''
+
+        # need a presentation order for legend; not alphabetical
+        _keySortOrder = ['C-', 'C', 'C#',
+                          'D-', 'D', 'D#',
+                          'E-', 'E', 'E#',
+                          'F-', 'F', 'F#',
+                          'G-', 'G', 'G#',
+                          'A-', 'A', 'A#',
+                          'B-', 'B', 'B#',
+                        ]
+
         if compress:
             colorsUsed = self.getColorsUsed()
+            solutionsUsed = self.getSolutionsUsed()
+
             environLocal.printDebug(['colors used:', colorsUsed])
+            keySortOrderFiltered = []
+            for key in _keySortOrder:
+                for sol in solutionsUsed: # three values
+                    if key == sol[0]: # first is key string
+                        keySortOrderFiltered.append(key)
+                        break
+        else:
+            keySortOrderFiltered = _keySortOrder
+        
 
         data = []
         for yLabel in ['Major', 'Minor']:
             row = []
             row.append(yLabel)
             pairs = []
-            for key in self._keySortOrder:
+            for key in keySortOrderFiltered:
                 color = self.solutionToColor([key, yLabel])
                 if compress:
                     if color not in colorsUsed:
@@ -296,6 +324,11 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             data.append(row)    
         return data
     
+    def solutionUnitString(self):
+        '''Return a string describing the solution values. Used in Legend formation. 
+        '''
+        return 'Keys'
+
     def solutionToColorBright(self, solution):
         '''For a given solution, return the color.
         '''
@@ -376,27 +409,23 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                 } 
         # first char is always step
         step = key[0]
-
         rgbStep = self._hexToRgb(stepLib[step])
-
-
-        # make all the colors a but lighter
+        # make all the colors a bit lighter
         for i in range(len(rgbStep)):
-            rgbStep[i] = self._rgbLimit(rgbStep[i] + 30)
-
+            rgbStep[i] = self._rgbLimit(rgbStep[i] + 50)
 
         #make minor darker
         if modality == 'minor':
             for i in range(len(rgbStep)):
-                rgbStep[i] = self._rgbLimit(rgbStep[i] - 80)
+                rgbStep[i] = self._rgbLimit(rgbStep[i] - 100)
 
         if len(key) > 1:
+            magnitude = 15
             if key[1] == '-':
-                # index and value shift
-                shiftLib = {0: 10, 1: 15, 2:-15}                   
+                # index and value shift for each of rgb values
+                shiftLib = {0: magnitude, 1: magnitude, 2: -magnitude}                   
             elif key[1] == '#':                   
-                shiftLib = {0: -10, 1: -15, 2:15}      
-             
+                shiftLib = {0: -magnitude, 1: -magnitude, 2: magnitude}                   
             for i in shiftLib.keys():
                 rgbStep[i] = self._rgbLimit(rgbStep[i] + shiftLib[i])
 
@@ -643,6 +672,11 @@ class SadoianAmbitus(DiscreteAnalysis):
 
         return data
 
+    def solutionUnitString(self):
+        '''Return a string describing the solution values. Used in Legend formation. 
+        '''
+        return 'Half-Steps'
+
 
     def solutionToColor(self, result):
         '''
@@ -704,7 +738,7 @@ class SadoianAmbitus(DiscreteAnalysis):
 def analyzeStream(streamObj, *args, **keywords):
     '''Public interface to discrete analysis methods to be applied to a Stream given as an argument. Methods return process-specific data format. See base-classes for details. 
 
-    Analysis methods can be specified as a second argument or by keyword. Available plots include the following:
+    Analysis methods can be specified as arguments or by use of a `method` keyword argument. If `method` is the class name, that class is returned. Otherwise, the :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers` list of all :class:`~music21.analysis.discrete.DiscreteAnalysis` subclass objects will be searched for matches. The first match that is found is returned. 
 
     :class:`~music21.analysis.discrete.SadoianAmbitus`
     :class:`~music21.analysis.discrete.KrumhanslSchmuckler`

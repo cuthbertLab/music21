@@ -141,8 +141,8 @@ class SystemLayout(music21.Music21Object):
         >>> sl.mx = mxPrint
         >>> sl.isNew
         True
-        >>> sl.rightMargin
-        30.2
+        >>> sl.rightMargin > 30.1 and sl.rightMargin <= 30.2
+        True
         >>> sl.leftMargin
         20.0
         >>> sl.distance

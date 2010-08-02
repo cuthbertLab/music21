@@ -1071,9 +1071,11 @@ class Stream(music21.Music21Object):
     def plot(self, *args, **keywords):
         '''Given a method and keyword configuration arguments, create and display a plot.
 
-        Note: plots requires matplotib to be installed.
-    
-        Plot method can be specified as a second argument or by the `method` keyword. Available plots include the following Plot classes:
+        Note: plot() requires matplotib to be installed.
+
+        For details on arguments, see :func:`~music21.graph.plotStream`.
+   
+        Available plots include the following Plot classes:
     
         :class:`~music21.graph.PlotHistogramPitchSpace`
         :class:`~music21.graph.PlotHistogramPitchClass`
@@ -1106,9 +1108,11 @@ class Stream(music21.Music21Object):
 
 
     def analyze(self, *args, **keywords):
-        '''Given a method and return an analysis specific data format.
+        '''Given an analysis method, return an analysis on this Stream.
 
-        Analysis methods can be specified as a second argument or by keyword. Available plots include the following:
+        For details on arguments, see :func:`~music21.analysis.discrete.analyzeStream`.
+
+        Available plots include the following:
     
         :class:`~music21.analysis.discrete.SadoianAmbitus`
         :class:`~music21.analysis.discrete.KrumhanslSchmuckler`

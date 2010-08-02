@@ -146,8 +146,11 @@ class WindowedAnalysis(object):
         >>> x, y, z = wa.process(1, 1, includeTotalWindow=False)
         >>> len(x) # we only have one series of windows
         1
-        >>> x[0][0], y[0][0] # for each window, we get a solution and a color
-        (('B', 'major', 0.6868258874056411), '#FF8000')
+
+        >>> y[0][0].startswith('#') # for each window, we get a solution and a color
+        True
+        >>> x[0][0][0] 
+        'B'
 
         >>> x, y, z = wa.process(1, 2, includeTotalWindow=False)
         >>> len(x) # we have two series of windows
@@ -155,8 +158,8 @@ class WindowedAnalysis(object):
 
         >>> x[0][0] # the data returned is processor dependent; here we get
         ('B', 'major', 0.6868258874056411)
-        >>> y[0][0] # a color is returned for each matching data position
-        '#FF8000'
+        >>> y[0][0].startswith('#') # a color is returned for each matching data position
+        True
         '''
         # names = [x.id for x in sStream]
                 

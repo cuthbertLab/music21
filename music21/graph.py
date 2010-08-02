@@ -386,16 +386,15 @@ class GraphColorGrid(Graph):
         self._axisInit()
 
         if 'figureSize' not in keywords:
-            self.setFigureSize([8, 6])
+            self.setFigureSize([9, 6])
                 
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
 
-        plotShift = .05 # shift to make room for y axis label        
+        plotShift = .08 # shift to make room for y axis label        
         axTop = self.fig.add_subplot(1, 1, 1+plotShift)
         # do not need grid for outer container
-
 
         # these approaches do not work:
         # adjust face color of axTop independently
@@ -448,7 +447,10 @@ class GraphColorGrid(Graph):
 
         # adjust space between the bars
         # .1 is about the smallest that gives some space
-        self.fig.subplots_adjust(hspace=0,)
+        if rowCount > 12:
+            self.fig.subplots_adjust(hspace=0)
+        else:
+            self.fig.subplots_adjust(hspace=.1)
 
         self.setAxisRange('x', range(rowCount), 0)
         # turn off grid
@@ -533,13 +535,16 @@ class GraphColorGridLegend(Graph):
             # need one label for each left side; .5 is in the middle
             ax.set_yticks([.5])
             ax.set_yticklabels([rowLabel], fontsize=self.tickFontSize, 
-                family=self.fontFamily) # one label for one tick
+                family=self.fontFamily, horizontalalignment='right', 
+                verticalalignment='center') # one label for one tick
 
             # need a label for each bars
             ax.set_xticks([x + 1 for x in range(len(rowData))])
             # get labels from row data; first of pair
+            # need to push y down as need bottom alignment for lower case
             ax.set_xticklabels([x for x, y in rowData], 
-                fontsize=self.tickFontSize, family=self.fontFamily)
+                fontsize=self.tickFontSize, family=self.fontFamily, horizontalalignment='center', verticalalignment='bottom', 
+                y=-.4)
             # this is the scaling to see all bars; not necessary
             ax.set_xlim([.5, len(rowData)+.5])
             
@@ -1282,8 +1287,11 @@ class PlotStream(object):
 
 
     def ticksOffset(self, offsetMin=None, offsetMax=None, offsetStepSize=None,
-                    displayMeasureNumberZero=False, remap=False):
+                    displayMeasureNumberZero=False, minMaxOnly=False, 
+                    remap=False):
         '''Get offset ticks. If Measures are found, they will be used to create ticks. If not, `offsetStepSize` will be used to create offset ticks between min and max. The `remap` parameter is not yet used. 
+
+        If `minMaxOnly` is True, only the first and last values will be provided.
 
         >>> from music21 import corpus, stream, note
         >>> s = corpus.parseWork('bach/bwv281.xml')
@@ -1329,7 +1337,6 @@ class PlotStream(object):
         ticks = [] # a lost of graphed value, string label pairs
         if len(offsetMap.keys()) > 0:
             #environLocal.printDebug(['using measures for offset ticks'])
-
             # store indices in offsetMap
             mNoToUse = []
             for key in sorted(offsetMap.keys()):
@@ -1342,16 +1349,23 @@ class PlotStream(object):
                     # measurers; this may not always be True
                     mNoToUse.append(key)
 
-            if len(mNoToUse) > 20:
-                # get about 10 ticks
-                mNoStepSize = int(len(mNoToUse) / 10.)
-            else:
-                mNoStepSize = 1
+            # just get the min and the max
+            if minMaxOnly:
+                for i in [0, len(mNoToUse)-1]:
+                    offset = mNoToUse[i]
+                    mNumber = offsetMap[offset][0].measureNumber
+                    ticks.append([offset, '%s' % mNumber])
 
-            for i in range(0, len(mNoToUse), mNoStepSize):
-                offset = mNoToUse[i]
-                mNumber = offsetMap[offset][0].measureNumber
-                ticks.append([offset, '%s' % mNumber])
+            else: # get all of them
+                if len(mNoToUse) > 20:
+                    # get about 10 ticks
+                    mNoStepSize = int(len(mNoToUse) / 10.)
+                else:
+                    mNoStepSize = 1    
+                for i in range(0, len(mNoToUse), mNoStepSize):
+                    offset = mNoToUse[i]
+                    mNumber = offsetMap[offset][0].measureNumber
+                    ticks.append([offset, '%s' % mNumber])
 
         else: # generate numeric ticks
             if offsetStepSize == None:
@@ -1481,7 +1495,7 @@ class PlotWindowedAnalysis(PlotStream):
         if 'compressLegend' in keywords:
             self.compressLegend = keywords['compressLegend']
         else:
-            self.compressLegend = False
+            self.compressLegend = True
 
         # create a color grid
         self.graph = GraphColorGrid(*args, **keywords)
@@ -1489,9 +1503,15 @@ class PlotWindowedAnalysis(PlotStream):
         data, yTicks = self._extractData()
         
         self.graph.setData(data)
-        self.graph.setAxisLabel('y', 'Window Size')
-        self.graph.setAxisLabel('x', 'Proportional Time')
+        self.graph.setAxisLabel('y', 'Window Size\n(Quarter Lengths)')
+        self.graph.setAxisLabel('x', 'Windows (%s Span)' %
+                                 self._axisLabelMeasureOrOffset())
         self.graph.setTicks('y', yTicks)
+
+        xTicks = self.ticksOffset(minMaxOnly=True)
+        # replace offset values with 0 and 1, as proportional here
+        xTicks = [(0, xTicks[0][1]), (1, xTicks[1][1])]
+        self.graph.setTicks('x', xTicks)
 
         
     def _extractData(self):
@@ -1520,6 +1540,14 @@ class PlotWindowedAnalysis(PlotStream):
 
         return colorMatrix, yTicks
     
+    def _getLegend(self):
+        title = (self.processor.name + 
+                ' (%s)' % self.processor.solutionUnitString())
+        graphLegend = GraphColorGridLegend(doneAction=self.graph.doneAction, 
+                           title=title)
+        graphLegend.setData(self.processor.solutionLegend(
+                           compress=self.compressLegend))
+        return graphLegend
 
     def process(self):
         '''Process method here overridden to provide legend.
@@ -1527,11 +1555,7 @@ class PlotWindowedAnalysis(PlotStream):
         # call the process routine in the base graph
         self.graph.process()
         # create a new graph of the legend
-        self.graphLegend = GraphColorGridLegend(
-                           doneAction=self.graph.doneAction, 
-                           title=self.processor.name + ' Legend')
-        self.graphLegend.setData(self.processor.solutionLegend(
-            compress=self.compressLegend))
+        self.graphLegend = self._getLegend()
         self.graphLegend.process()
 
 
@@ -1543,13 +1567,8 @@ class PlotWindowedAnalysis(PlotStream):
         # call the process routine in the base graph
         self.graph.write(fp)
         # create a new graph of the legend
-        self.graphLegend = GraphColorGridLegend(
-                           doneAction=self.graph.doneAction, 
-                           title=self.processor.name + ' Legend')
 
-        self.graphLegend.setData(self.processor.solutionLegend(
-            compress=self.compressLegend))
-
+        self.graphLegend = self._getLegend()
         self.graphLegend.process()
         self.graphLegend.write(fpLegend)
 
@@ -1562,8 +1581,6 @@ class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
     >>> p = graph.PlotWindowedKrumhanslSchmuckler(s.parts[0], doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv66.6')
     >>> #_DOCS_SHOW p = graph.PlotWindowedKrumhanslSchmuckler(s.parts[0])
-    >>> p.id
-    'colorGrid-krumhanslSchmuckler'
     >>> p.process() # with defaults and proper configuration, will open graph
 
     .. image:: images/PlotWindowedKrumhanslSchmuckler.*
@@ -1572,7 +1589,8 @@ class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
     .. image:: images/legend-PlotWindowedKrumhanslSchmuckler.*
 
     '''
-    values = ['krumhanslSchmuckler']
+    values = discrete.KrumhanslSchmuckler.identifiers
+
     def __init__(self, streamObj, *args, **keywords):
         PlotWindowedAnalysis.__init__(self, streamObj, 
             discrete.KrumhanslSchmuckler(streamObj), *args, **keywords)
@@ -1587,8 +1605,6 @@ class PlotWindowedSadoianAmbitus(PlotWindowedAnalysis):
     >>> p = graph.PlotWindowedSadoianAmbitus(s.parts[0], doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv66.6')
     >>> #_DOCS_SHOW p = graph.PlotWindowedSadoianAmbitus(s.parts[0])
-    >>> p.id
-    'colorGrid-ambitus'
     >>> p.process() # with defaults and proper configuration, will open graph
 
     .. image:: images/PlotWindowedSadoianAmbitus.*
@@ -1597,7 +1613,7 @@ class PlotWindowedSadoianAmbitus(PlotWindowedAnalysis):
     .. image:: images/legend-PlotWindowedSadoianAmbitus.*
 
     '''
-    values = ['ambitus']
+    values = discrete.SadoianAmbitus.identifiers
     def __init__(self, streamObj, *args, **keywords):
         # provide the stream to both the window and processor in this case
         PlotWindowedAnalysis.__init__(self, streamObj, 
@@ -2514,7 +2530,13 @@ def plotStream(streamObj, *args, **keywords):
 
     Note: plots requires matplotib to be installed.
 
-    Plot method can be specified as a second argument or by keyword. Available plots include the following:
+    Plot methods can be specified as additional arguments or by keyword. Two keyword arguments can be given: `format` and `values`. If positional arguments are given, the first is taken as `format` and the rest are collected as `values`. If `format` is the class name, that class is collected. Additionally, every :class:`~music21.graph.PlotStream` subclass defines one `format` string and a list of `values` strings. The `format` parameter defines the type of Graph (e.g. scatter, histogram, colorGrid). The `values` list defines what values are graphed (e.g. quarterLength, pitch, pitchClass). 
+
+    If a user provides a `format` and one or more `values` strings, a plot with the corresponding profile, if found, will be generated. If not, the first Plot to match any of the defined specifiers will be created. 
+
+    In the case of :class:`~music21.graph.PlotWindowedAnalysis` subclasses, the :class:`~music21.analysis.discrete.DiscreteAnalysis` subclass :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers` list is added to the Plot's `values` list. 
+
+    Available plots include the following:
 
     :class:`~music21.graph.PlotHistogramPitchSpace`
     :class:`~music21.graph.PlotHistogramPitchClass`
@@ -2537,7 +2559,6 @@ def plotStream(streamObj, *args, **keywords):
 
     '''
     plotClasses = [
-
         # histograms
         PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
         # scatters
@@ -2553,32 +2574,22 @@ def plotStream(streamObj, *args, **keywords):
         PlotWindowedSadoianAmbitus,
     ]
 
+    format = ''
+    values = []
+
     # can match by format
     if 'format' in keywords:
         format = keywords['format']
-    else:
-        format = None
     if 'values' in keywords:
         values = keywords['values'] # should be a list
-    else:
-        values = None
 
     if len(args) > 0:
         format = args[0]
     if len(args) > 1:
-        values = args[1] # get all remaining
+        values = args[1:] # get all remaining
 
     if not common.isListLike(values):
         values = [values]
-
-    #plotRequest = 'PlotHorizontalBarPitchSpaceOffset'
-    if format == None and values == None:
-        format = 'horizontalBar'
-        values = ['pitch', 'offset']
-    if format == None:
-        format = 'histogram'
-    if values == None or values == [None]:
-        values = ['pitch']
 
     environLocal.printDebug(['plotStream: stream', streamObj, 
                              'format, values', format, values])
@@ -2588,20 +2599,41 @@ def plotStream(streamObj, *args, **keywords):
         plotMake = plotClasses
     else:
         for plotClassName in plotClasses:
-            # try to match by class name
+            # try to match by complete class name
             if plotClassName.__name__.lower() == format.lower():
                 plotMake.append(plotClassName)
 
             # try direct match of format and values
             plotClassNameValues = [x.lower() for x in plotClassName.values]
-            if plotClassName.format.lower() == format.lower():
-                match = 0
+            plotClassNameFormat = plotClassName.format.lower()
+            if plotClassNameFormat == format.lower():
+                # see if a matching set of values is specified
+                # normally plots need to match all values 
+                match = []
                 for requestedValue in values:
                     if requestedValue == None: continue
                     if (requestedValue.lower() in plotClassNameValues):
-                        match += 1
-                if match == len(values):
+                        # do not allow the same value to be requested
+                        if requestedValue not in match:
+                            match.append(requestedValue)
+                if len(match) == len(values):
                     plotMake.append(plotClassName)
+
+        # if no matches, try something more drastic:
+        if len(plotMake) == 0:
+            for plotClassName in plotClasses:
+                # create a lost of all possible identifiers
+                plotClassIdentifiers = [plotClassName.format.lower()]
+                plotClassIdentifiers += [x.lower() for x in 
+                                        plotClassName.values]
+                # combine format and values args
+                for requestedValue in [format] + values:
+                    if requestedValue.lower() in plotClassIdentifiers:
+                        plotMake.append(plotClassName)
+                        break
+                if len(plotMake) > 0: # found a match
+                    break
+
 
     environLocal.printDebug(['plotClassName found', plotMake])
     for plotClassName in plotMake:
@@ -3064,17 +3096,25 @@ class Test(unittest.TestCase):
         b.process()
 
         
-    def testPlotWindowedSadoianAmbitus(self, doneAction=None):
+    def testPlotWindowed(self, doneAction=None):
         from music21 import corpus
-        a = corpus.parseWork('bach/bwv57.8')
+        if doneAction != None:
+            fp = random.choice(corpus.getBachChorales('.xml'))
+            dir, fn = os.path.split(fp)
+            a = corpus.parseWork(fp)
+            windowStep = random.choice([1,2,4,8,16,32])
+        else:
+            a = corpus.parseWork('bach/bwv66.6')
+            fn = 'bach/bwv66.6'
+            windowStep = 20 # set high to be fast
 
-        b = PlotWindowedSadoianAmbitus(a.parts, title='Bach Ambitus',
-            minWindow=1, maxWindow=8, windowStep=3,
-            doneAction=doneAction)
-        b.process()
+#         b = PlotWindowedSadoianAmbitus(a.parts, title='Bach Ambitus',
+#             minWindow=1, maxWindow=8, windowStep=3,
+#             doneAction=doneAction)
+#         b.process()
 
-        b = PlotWindowedKrumhanslSchmuckler(a.parts[0], title='Bach Key',
-            minWindow=1, maxWindow=8, windowStep=3, 
+        b = PlotWindowedKrumhanslSchmuckler(a, title=fn,
+            minWindow=1, windowStep=windowStep, 
             doneAction=doneAction)
         b.process()
 
@@ -3133,9 +3173,8 @@ if __name__ == "__main__":
         #a.writeAllGraphs()
         #a.writeAllPlots()
 
-        #b.testPlotWindowedSadoianAmbitus('write')
 
-        b.testColorGridLegend('write')
-        #b.testPlotWindowedSadoianAmbitus('write')
+        #b.testColorGridLegend('write')
+        b.testPlotWindowed('write')
 
         #a.writeAllPlots()
