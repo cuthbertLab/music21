@@ -9246,6 +9246,13 @@ class Test(unittest.TestCase):
             post = sTest.analyze('ambitus')
             self.assertEqual(post, matchAmbitus[i])
 
+        # match values for different analysis strings
+        for idStr in ['range', 'ambitus', 'span']:
+            for i in range(len(sub)):
+                sTest = sub[i]
+                post = sTest.analyze(idStr)
+                self.assertEqual(post, matchAmbitus[i])
+
 
         # only match first two values
         matchKrumhansl = [('F#', 'minor'), ('C#', 'minor'), 
@@ -9257,7 +9264,14 @@ class Test(unittest.TestCase):
             # returns three values; match 2
             self.assertEqual(post[:2], matchKrumhansl[i])
 
-            
+        # match values under different strings provided to analyze
+        for idStr in ['key', 'krumhansl', 'keyscape']:
+            for i in range(len(sub)):
+                sTest = sub[i]
+                post = sTest.analyze(idStr)
+                # returns three values; match 2
+                self.assertEqual(post[:2], matchKrumhansl[i])
+
             
 
 #-------------------------------------------------------------------------------

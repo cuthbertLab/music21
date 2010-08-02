@@ -44,6 +44,9 @@ class DiscreteAnalysis(object):
 
     Analytical methods may make use of a `referenceStream` to configure the processor on initialization. 
     '''
+    # define in subclass
+    name = ''
+    identifiers = []
     def __init__(self, referenceStream=None):
         # store a reference stream if needed
         self._referenceStream = referenceStream
@@ -114,7 +117,7 @@ class DiscreteAnalysis(object):
         pass
     
     def process(self, subStream):
-        '''For a given Stream, apply the analysis to all components of this Stream.
+        '''Given a Stream, apply the analysis to all components of this Stream. Expected return is a solution (method specific) and a color value.
         '''
         pass
 
@@ -132,6 +135,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
     _DOC_ALL_INHERITED = False
 
     name = 'Krumhansl Schmuckler Key Analysis'
+
+    identifiers = ['krumhansl', 'schmuckler', 'key', 'keyscape']
 
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
@@ -419,9 +424,9 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
     
     
     def process(self, sStream):    
-        ''' Takes in a Stream or sub-Stream and performs analysis on all contents of the Stream. A windowing system can be used to get partial results. 
+        ''' Takes in a Stream or sub-Stream and performs analysis on all contents of the Stream. The :class:`~music21.analysis.windowed.WindowedAnalysis` windowing system can be used to get numerous results by calling this method. 
 
-        Returns two values, a data list and a color string.
+        Returns two values, a solution data list and a color string.
 
         The data list contains a key (as a string), a mode (as a string), and a correlation value (degree of certainty)
         '''
@@ -466,8 +471,15 @@ class SadoianAmbitus(DiscreteAnalysis):
     _DOC_ALL_INHERITED = False
 
     name = 'Sadoian Ambitus Analysis'
+    # provide possible string matches for this processor
+    identifiers = ['ambitus', 'range', 'span']
 
     def __init__(self, referenceStream=None):
+        '''
+        >>> p = SadoianAmbitus()
+        >>> p.identifiers[0]
+        'ambitus'
+        '''
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         self._pitchSpanColors = {}
         self._generateColors()
@@ -651,6 +663,16 @@ class SadoianAmbitus(DiscreteAnalysis):
     
     
     def process(self, sStream):
+        '''Given a Stream, return a solution (in half steps) and a color string. 
+
+        >>> from music21 import *
+        >>> p = analysis.discrete.SadoianAmbitus()
+        >>> s = stream.Stream()
+        >>> c = chord.Chord(['a2', 'b4', 'c8'])
+        >>> s.append(c)
+        >>> p.process(s)
+        (63, '#665288')
+        '''
         post = self._getPitchSpan(sStream)
         if post != None:
             solution = post[1] - post[0] # max-min
@@ -693,6 +715,11 @@ def analyzeStream(streamObj, *args, **keywords):
     ('F#', 'minor', 0.81547089257624916)
     >>> analysis.discrete.analyzeStream(s, 'ambitus')
     34
+
+    >>> analysis.discrete.analyzeStream(s, 'key')[:2]
+    ('F#', 'minor')
+    >>> analysis.discrete.analyzeStream(s, 'range')
+    34
     '''
     analysisClasses = [
         SadoianAmbitus,
@@ -705,12 +732,29 @@ def analyzeStream(streamObj, *args, **keywords):
     if len(args) > 0:
         method = args[0]
 
+    match = None
     for analysisClassName in analysisClasses:    
         # this is a very loose matching, as there are few classes now
         if (method.lower() in analysisClassName.__name__.lower() or
             method.lower() in analysisClassName.name):
-            obj = analysisClassName()
-            return obj.getSolution(streamObj)
+            match = analysisClassName
+            #environLocal.printDebug(['matched analysis class name'])
+            break
+        else:
+            for idStr in analysisClassName.identifiers:
+                if method in idStr:
+                    match = analysisClassName
+                    #environLocal.printDebug(['matched idStr', idStr])
+
+                    break
+            if match != None:
+                break
+
+    if match != None:
+        obj = analysisClassName()
+        return obj.getSolution(streamObj)
+
+
     # if no match raise error
     raise DiscreteAnalysisException('no such analysis method: %s' % method)
 
