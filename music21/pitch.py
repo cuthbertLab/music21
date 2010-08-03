@@ -646,6 +646,10 @@ class Pitch(music21.Music21Object):
         self._octave = None
         self._pitchSpaceNeedsUpdating = True
 
+        # if True, accidental is not known; is determined algorithmically
+        # likely due to pitch data from midi or pitch space/class numbers
+        self.implicitAccidental = False
+
         # name combines step, octave, and accidental
         if name is not None and not common.isNum(name):       
             self._setName(name)
@@ -734,6 +738,15 @@ class Pitch(music21.Music21Object):
         return self._ps
     
     def _setPs(self, value):
+        '''
+        >>> from music21 import *
+        >>> p = pitch.Pitch()
+        >>> p.ps = 61
+        >>> p.implicitAccidental
+        True
+        '''
+        # set default enharmonics to minor key names
+
         self._ps = value
         self._pitchSpaceNeedsUpdating = False
 
@@ -746,6 +759,11 @@ class Pitch(music21.Music21Object):
         else:
             self.accidental = acc
         self.octave = convertPsToOct(self._ps)
+
+        # all ps settings must set implicit to True, as we do not know
+        # what accidental this is
+        self.implicitAccidental = True
+
 
     ps = property(_getPs, _setPs, 
         doc='''The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent).
@@ -782,6 +800,8 @@ class Pitch(music21.Music21Object):
         >>> a.midi = -10
         >>> a.midi
         2
+        >>> a.implicitAccidental
+        True
         '''
         if self._pitchSpaceNeedsUpdating:
             self._updatePitchSpace()
@@ -800,6 +820,10 @@ class Pitch(music21.Music21Object):
             value = 0 + (value % 12) # lowest oct plus modulus            
         self._setPs(value)
         self._pitchSpaceNeedsUpdating = True
+
+        # all midi settings must set implicit to True, as we do not know
+        # what accidental this is
+        self.implicitAccidental = True
 
     
     midi = property(_getMidi, _setMidi, 
@@ -831,6 +855,18 @@ class Pitch(music21.Music21Object):
         '''
         Set name, which may be provided with or without octave values. C4 or D-3
         are both accepted. 
+        
+        >>> from music21 import *
+        >>> p = pitch.Pitch()
+        >>> p.name = 'C#'
+        >>> p.implicitAccidental 
+        False
+        >>> p.ps = 61
+        >>> p.implicitAccidental 
+        True
+        >>> p.name = 'C#'
+        >>> p.implicitAccidental 
+        False
         '''
         usrStr = usrStr.strip().upper()
         # extract any numbers that may be octave designations
@@ -855,6 +891,10 @@ class Pitch(music21.Music21Object):
         if octFound != '': 
             octave = int(octFound)
             self.octave = octave
+
+        # when setting by name, we assume that the accidental intended
+        self.implicitAccidental = False
+
         self._pitchSpaceNeedsUpdating = True
     
     name = property(_getName, _setName)
@@ -944,6 +984,8 @@ class Pitch(music21.Music21Object):
         >>> a.pitchClass = 3
         >>> a
         D#3
+        >>> a.implicitAccidental
+        True
         >>> a.pitchClass = 'A'
         >>> a
         A#3
@@ -953,6 +995,9 @@ class Pitch(music21.Music21Object):
         # get step and accidental w/o octave
         self._step, self._accidental = convertPsToStep(value)  
         self._pitchSpaceNeedsUpdating = True
+
+        # do not know what accidental is
+        self.implicitAccidental = True
 
         #self.ps = convertStepToPs(self.step, self.implicitOctave, self.accidental)
       
@@ -1098,6 +1143,10 @@ class Pitch(music21.Music21Object):
         self.step, self.accidental = convertPsToStep(self.ps)  
         self.octave = convertPsToOct(self.ps)
       
+        # do not know what accidental is
+        self.implicitAccidental = True
+
+
     frequency = property(_getFrequency, _setFrequency, doc='''
         The frequency property gets or sets the frequency of
         the pitch in hertz.  

@@ -144,6 +144,9 @@ class DiscreteAnalysis(object):
 
 
 #------------------------------------------------------------------------------
+# alternative names
+# PitchClassKeyFinding
+
 class KrumhanslSchmuckler(DiscreteAnalysis):
     ''' Implementation of the Krumhansl-Schmuckler key determination algorithm
     '''
@@ -276,6 +279,9 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         >>> post = p.solutionLegend()
 
         '''
+
+        # in general go to Gb, F#: favor F# majorKeyColors
+        # favor eb minor
 
         # need a presentation order for legend; not alphabetical
         _keySortOrder = ['C-', 'C', 'C#',
