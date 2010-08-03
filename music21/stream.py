@@ -2808,6 +2808,43 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
+    def makeTupletBrackets(self, inPlace=True):
+        '''Given a Stream of mixed durations, the first and last tuplet of any group of tuplets must be designated as the start and end. 
+
+        We know we have the end of a tuplet when the sum of the quarter lengths is an integer or we reach the end of this Stream.
+        '''
+
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+        
+        open = False
+        sum = 0
+        lastTuplet = None
+
+        for e in returnObj._elements:
+            if hasattr(e, 'duration') and e.duration != None:
+                tContainer = e.duration.tuplets
+                environLocal.printDebug(['makeTupletBrackets', tContainer])
+                if len(tContainer) == 0:
+                    t = None
+                else:
+                    t = tContainer[0] # get first?
+                
+                if t == None:
+                    if open == True: # at the end of a tuplet span
+                        open = False
+                        lastTuplet.type = 'stop'
+                else:
+                    environLocal.printDebug(['makeTupletBrackets', 'existing typlet type', t.type])
+
+                    open = True
+                    t.type = 'start'
+                    lastTuplet = t
+
+        return returnObj
+
 
     def makeAccidentals(self, pitchPast=None, useKeySignature=True, 
         alteredPitches=None,         
@@ -9278,6 +9315,23 @@ class Test(unittest.TestCase):
 
             
 
+    def testMakeTupletBrackets(self):
+        
+
+#         def collectTupletTypes(s):
+
+        s = Stream()
+        qlList = [1, 1/3., 1/3., 1/3., 1, 1]
+        for ql in qlList:
+            n = note.Note()
+            n.quarterLength = ql
+            s.append(n)
+
+        s.makeTupletBrackets()
+        #s.show()
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -9298,4 +9352,5 @@ if __name__ == "__main__":
         #a.testMidiEventsImported()
         #a.testFindGaps()
         #a.testQuantize()
-        a.testAnalyze()
+       # a.testAnalyze()
+        a.testMakeTupletBrackets()

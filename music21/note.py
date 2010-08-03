@@ -537,6 +537,9 @@ class GeneralNote(music21.Music21Object):
     #---------------------------------------------------------------------------
     def _getMusicXML(self):
         '''This must call _getMX to get basic mxNote objects
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> post = n._getMusicXML()
         '''
         # make a copy, as we this process will change tuple types
         selfCopy = copy.deepcopy(self)
@@ -558,7 +561,10 @@ class GeneralNote(music21.Music21Object):
             instObj = self.parent.getInstrument()
         else:
             instObj = instrument.Instrument()
-            instObj.partId = defaults.partId # give a default id
+            # part id is now configured later in processing
+            #instObj.partId = defaults.partId # give a default id
+            instObj.instrumentIdRandomize()
+            instObj.partIdRandomize()
             instObj.partName = defaults.partName # give a default id
 
         mxScorePart = musicxmlMod.ScorePart()
@@ -1239,52 +1245,11 @@ class Note(NotRest):
     def _getMidiEvents(self):
         return midiTranslate.noteToMidiEvents(self)
 
-        # midi track 
-#         mt = None
-# 
-#         eventList = []
-#         dt = midiModule.DeltaTime(mt)
-#         dt.time = 0 # set to zero; will be shifted later as necessary
-#         # add to track events
-#         eventList.append(dt)
-# 
-#         me = midiModule.MidiEvent(mt)
-#         me.type = "NOTE_ON"
-#         me.channel = 1
-#         me.time = None # not required
-#         me.pitch = self.midi
-#         me.velocity = 90 # default, can change later
-#         eventList.append(me)
-# 
-#         # add note off / velocity zero message
-#         dt = midiModule.DeltaTime(mt)
-#         dt.time = self.duration.midi
-#         # add to track events
-#         eventList.append(dt)
-# 
-#         me = midiModule.MidiEvent(mt)
-#         me.type = "NOTE_OFF"
-#         me.channel = 1
-#         me.time = None #d
-#         me.pitch = self.midi
-#         me.velocity = 0 # must be zero
-#         eventList.append(me)
-#         return eventList 
 
     def _setMidiEvents(self, eventList, ticksPerQuarter=None):
         midiTranslate.midiEventsToNote(eventList, 
             ticksPerQuarter, self)
 
-        # event list can be provided to a note in a few different ways
-        # it may be a list of pairs, where pairs are abs start time in ticks
-#         if len(eventList) == 2:
-#             tOn, eOn = eventList[0]
-#             tOff, eOff = eventList[1]
-# 
-#             self.duration.midi = (tOff - tOn), ticksPerQuarter
-#             self.pitch.midi = eOn.pitch
-#         else:
-#             raise NoteException('cannot handle MIDI event list in the form: %r', eventList)
 
     midiEvents = property(_getMidiEvents, _setMidiEvents, 
         doc='''Get or set this chord as a list of :class:`music21.midi.base.MidiEvent` objects.
@@ -1297,19 +1262,6 @@ class Note(NotRest):
     def _getMidiFile(self):
         return midiTranslate.noteToMidiFile(self)
 
-        # get a list of mid tracks objects
-#         mt = midiModule.MidiTrack(1)
-#         mt.events += midiModule.getStartEvents(mt)
-#         mt.events += self._getMidiEvents()
-#         mt.events += midiModule.getEndEvents(mt)
-# 
-#         # set all events to have this track
-#         mt.updateEvents()
-# 
-#         mf = midiModule.MidiFile()
-#         mf.tracks = [mt]
-#         mf.ticksPerQuarterNote = defaults.ticksPerQuarter
-#         return mf
 
     midiFile = property(_getMidiFile,
         doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.

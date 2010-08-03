@@ -219,8 +219,11 @@ class TestExternal(unittest.TestCase):
         pass
 
 class TestMockProcesor(object):
-    pass
-
+    
+    def process(self, subStream):
+        '''Simply count the number of notes found
+        '''
+        return len(subStream.notes), None
     
 class Test(unittest.TestCase):
 
@@ -273,6 +276,36 @@ class Test(unittest.TestCase):
         self.assertEqual(len(wa2._windowedStream), 8)
 
 
+        # window size of 1 gets 2 solutions
+        a, b, c = wa1.process(1, 1, 1, includeTotalWindow=False)
+        self.assertEqual(len(a[0]), 2) 
+        self.assertEqual(a[0][0], 1)
+        self.assertEqual(a[0][1], 1)
+
+        # window size of 2 gets 1 solution
+        a, b, c = wa1.process(2, 2, 1, includeTotalWindow=False)
+        self.assertEqual(len(a[0]), 1)
+        # two items in this window
+        self.assertEqual(a[0][0], 2)
+
+
+        # window size of 1 gets 8 solutiions
+        a, b, c = wa2.process(1, 1, 1, includeTotalWindow=False)
+        self.assertEqual(len(a[0]), 8)
+        self.assertEqual(a[0][0], 1)
+        self.assertEqual(a[0][1], 1)
+
+        # window size of 2 gets 7 solutions
+        a, b, c = wa2.process(2, 2, 1, includeTotalWindow=False)
+        self.assertEqual(len(a[0]), 7)
+
+        # window size of 7 gets 2 solutions
+        a, b, c = wa2.process(7, 7, 1, includeTotalWindow=False)
+        self.assertEqual(len(a[0]), 2)
+
+        # window size of 8 gets 1 solutions
+        a, b, c = wa2.process(8, 8, 1, includeTotalWindow=False)
+        self.assertEqual(len(a[0]), 1)
 
 
 #------------------------------------------------------------------------------
@@ -283,3 +316,4 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         a = Test()
 
+        a.testWindowing()
