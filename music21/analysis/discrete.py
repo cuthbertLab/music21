@@ -194,8 +194,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         >>> a._getPitchClassDistribution(s)
         [3, 0, 1.5, 0, 1.5, 0, 2, 0, 0, 0, 1.5, 0]
         '''
+        # storage for 12 pitch classes
         pcDist = [0]*12
-        
         for n in streamObj.notes:        
             if not n.isRest:
                 length = n.quarterLength
@@ -204,7 +204,6 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                         pcDist[m] = pcDist[m] + (1 * length)
                 else:
                     pcDist[n.pitchClass] = pcDist[n.pitchClass] + (1 * length)
-        
         return pcDist
 
 
@@ -399,7 +398,6 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         # red, orange, yellow, green, cyan, blue, purple, pink
         stepLib = {'C': '#CD4F39', # tomato3
                 'D': '#DAA520', # goldenrod
-              #  'E': '#CDBE70', # LightGoldenrod1
                 'E': '#BCEE68', # DarkOliveGreen2
                 'F': '#96CDCD', # PaleTurquoise3
                 'G': '#6495ED', # cornflower blue
@@ -467,14 +465,15 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         #pcDistribution = [9,0,3,0,2,5,0,2,0,2,2,0]
     
         pcDistribution = self._getPitchClassDistribution(sStream)
+        environLocal.printDebug(['process(); pcDistribution', pcDistribution])
     
-        keyResultsMajor = self._convoluteDistribution(pcDistribution,'major')
+        keyResultsMajor = self._convoluteDistribution(pcDistribution, 'major')
         differenceMajor = self._getDifference(keyResultsMajor, 
-                         pcDistribution, 'major')
+                          pcDistribution, 'major')
         likelyKeysMajor = self._getLikelyKeys(keyResultsMajor, differenceMajor)
         
 
-        keyResultsMinor = self._convoluteDistribution(pcDistribution,'minor')   
+        keyResultsMinor = self._convoluteDistribution(pcDistribution, 'minor')   
         differenceMinor = self._getDifference(keyResultsMinor, 
                           pcDistribution, 'minor')
         likelyKeysMinor = self._getLikelyKeys(keyResultsMinor, differenceMinor)

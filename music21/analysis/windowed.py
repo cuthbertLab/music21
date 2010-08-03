@@ -106,7 +106,9 @@ class WindowedAnalysis(object):
         (36, 36)
 
         '''
-        max = len(self._windowedStream.getElementsByClass('Measure'))
+        # assuming that this is sorted
+        mStream = self._windowedStream #.getElementsByClass('Measure')
+        max = len(mStream)
         data = [0] * (max - windowSize + 1)
         color = [0] * (max - windowSize + 1)               
         
@@ -114,10 +116,18 @@ class WindowedAnalysis(object):
             # getting a range of Measures to be used as windows
             # for getMeasureRange(), collect is set to [] so that clefs, timesignatures, and other objects are not gathered. 
 
-            # a flat representation removes all Streams, returning only 
-            # Notes, Chords, etc.
-            current = self._windowedStream.getMeasureRange(i, 
-                      i+windowSize, collect=[]).flat
+            #environLocal.printDebug(['_analyzes(), i:', i, 'i+windowSize:', i+windowSize])
+            # a flat representation removes all Streams
+            current = stream.Stream()
+            for j in range(i, i+windowSize):
+                #environLocal.printDebug(['_analyzes(), j', j])
+                current.append(mStream[j])
+            current = current.flat.notes
+
+            # using getMeasureRange() is problematic
+#             current = self._windowedStream.getMeasureRange(i, 
+#                       i+windowSize, collect=[]).flat
+
             # current is a Stream for analysis
             data[i], color[i] = self.processor.process(current)
              
@@ -161,9 +171,6 @@ class WindowedAnalysis(object):
         >>> y[0][0].startswith('#') # a color is returned for each matching data position
         True
         '''
-        # names = [x.id for x in sStream]
-                
-        #max = len(sStream[0].measures)
         if maxWindow == None:
             max = len(self._windowedStream)
         else:
@@ -211,7 +218,8 @@ class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
 
-
+class TestMockProcesor(object):
+    pass
 
     
 class Test(unittest.TestCase):
@@ -236,6 +244,37 @@ class Test(unittest.TestCase):
             for i in range(1, 4) + [None]:
                 x, y, z = wa.process(i, i)
     
+
+    def testWindowing(self):
+        '''Test that windows are doing what they are supposed to do 
+        '''
+        p = TestMockProcesor()
+
+        from music21 import stream, note
+        s1 = stream.Stream()
+        s1.append(note.Note('c'))
+        s1.append(note.Note('c'))
+
+        s2 = stream.Stream()
+        s2.append(note.Note('c'))
+        s2.append(note.Note('d'))
+        s2.append(note.Note('e'))
+        s2.append(note.Note('f'))
+        s2.append(note.Note('g'))
+        s2.append(note.Note('a'))
+        s2.append(note.Note('b'))
+        s2.append(note.Note('c'))
+
+        wa1= WindowedAnalysis(s1, p)
+        wa2= WindowedAnalysis(s2, p)
+
+        # windows partitioned at quarter length
+        self.assertEqual(len(wa1._windowedStream), 2)
+        self.assertEqual(len(wa2._windowedStream), 8)
+
+
+
+
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":

@@ -1510,7 +1510,11 @@ class PlotWindowedAnalysis(PlotStream):
 
         xTicks = self.ticksOffset(minMaxOnly=True)
         # replace offset values with 0 and 1, as proportional here
-        xTicks = [(0, xTicks[0][1]), (1, xTicks[1][1])]
+        if len(xTicks) == 2:
+            xTicks = [(0, xTicks[0][1]), (1, xTicks[1][1])]
+        else:
+            environLocal.printDebug(['raw xTicks', xTicks])
+            xTicks = []
         self.graph.setTicks('x', xTicks)
 
         
