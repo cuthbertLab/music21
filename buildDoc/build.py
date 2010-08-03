@@ -1430,7 +1430,10 @@ class Documentation(RestructuredWriter):
 
         if common.getPlatform() in ['darwin', 'nix', 'win']:
             # -b selects the builder
-            import sphinx
+            try:
+                import sphinx
+            except ImportError:
+                raise BuildException("Building documentation requires the Sphinx toolkit.  Download it by typing 'easy_install -U Sphinx' at the command line or at http://sphinx.pocoo.org/")
             sphinxList = ['sphinx', '-E', '-b', format, '-d', self.dirBuildDoctrees,
                          self.dirRst, dirOut] 
             sphinx.main(sphinxList)
@@ -1439,8 +1442,8 @@ class Documentation(RestructuredWriter):
             webbrowser.open(pathLaunch)
 
 
-
-
+class BuildException(Exception):
+    pass
 
 
 

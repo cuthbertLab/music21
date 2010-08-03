@@ -48,8 +48,11 @@ STEPNAMES = ['C','D','E','F','G','A','B']
 #-------------------------------------------------------------------------------
 # utility functions
 def convertPitchClassToNumber(ps):
-    '''Given a pitch class or pitch class value, look for strings. If a string is found, replace it with the default pitch class representation.
+    '''Given a pitch class or pitch class value, 
+    look for strings. If a string is found, 
+    replace it with the default pitch class representation.
 
+    >>> from music21 import *
     >>> convertPitchClassToNumber(3)
     3
     >>> convertPitchClassToNumber('a')
@@ -1528,7 +1531,12 @@ class Pitch(music21.Music21Object):
 
                                     
     def transpose(self, value, inPlace=False):
-        '''Transpose the pitch by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied.
+        '''Transpose the pitch by the user-provided value. 
+        If the value is an integer, the transposition is 
+        treated in half steps. If the value is a string, 
+        any Interval string specification can be provided. 
+        Alternatively, a :class:`music21.interval.Interval` 
+        object can be supplied.
 
         >>> aPitch = Pitch('g4')
         >>> bPitch = aPitch.transpose('m3')
