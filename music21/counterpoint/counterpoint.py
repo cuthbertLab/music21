@@ -6,6 +6,8 @@ later other forms of counterpoint.
 
 Mostly coded by Jackie Rogoff -- some routines have been moved to
 by VoiceLeadingQuartet, and that module should be used for future work
+
+8/3/2010: this is a test by jrogoff to see if I can check things in
 '''
 
 import random
