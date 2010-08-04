@@ -54,14 +54,16 @@ def altDots(show=True):
     bass = bwv30_6.getElementById('Bass')
     excerpt = bass.getMeasureRange(1,10)
     music21.analysis.metrical.labelBeatDepth(excerpt)
-    excerpt.show()
+    if (show is True):
+        excerpt.show()
 
 
     bwv11_6 = corpus.parseWork('bach/bwv11.6.xml')
     alto = bwv11_6.getElementById('Alto')
     excerpt = alto.getMeasureRange(13,20)
     music21.analysis.metrical.labelBeatDepth(excerpt)
-    excerpt.show()
+    if (show is True):
+        excerpt.show()
 
     # 13-20
 
@@ -238,14 +240,89 @@ def messiaen(show = True):
 
 
 
-funcList = [messiaen, newDomSev, ] #pitchDensity, newDots, pitchDensity]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------
+funcList = [newDots, altDots ] #pitchDensity, newDots, pitchDensity]
+
+slow = [newDomSev, melodicChordExpression, pitchDensity]
+
+dependent = [messiaen ]
+
 
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-    def xtestBasic(self):
+    def testBasic(self):
         '''Test non-showing functions
 
         removed b/c taking a long time
@@ -265,7 +342,7 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(TestExternal)
+        music21.mainTest(Test)
     elif len(sys.argv) > 1:
         pass
         #newDots()
@@ -274,3 +351,12 @@ if __name__ == "__main__":
         #pitchQuarterLengthUsage()
         #messiaen()
         pitchQuarterLengthUsage3D()
+
+
+
+
+
+
+
+
+

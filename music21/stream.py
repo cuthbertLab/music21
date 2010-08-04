@@ -1399,9 +1399,20 @@ class Stream(music21.Music21Object):
         True
         >>> a.getElementById('green').id
         'green'
+        >>> a.getElementById('Green').id  # case does not matter
+        'green'
         '''
         for element in self.elements:
-            if element.id == id:
+            # case insensitive; this could be based on an option 
+            match = False
+            try:
+                if element.id.lower() == id.lower():
+                    match = True
+            except AttributeError: # not a string
+                if element.id == id:
+                    match = True
+
+            if match:
                 if classFilter is not None:
                     if element.isClass(classFilter):
                         return element
@@ -5661,6 +5672,7 @@ class Measure(Stream):
         '''Provide a complete MusicXML: representation. 
         '''
         return musicxmlTranslate.measureToMusicXML(self)
+
 
 
     musicxml = property(_getMusicXML)
