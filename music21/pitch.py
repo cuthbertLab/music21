@@ -1432,13 +1432,12 @@ class Pitch(music21.Music21Object):
         '''
         if abs(self.accidental.alter) < 2.0 and \
             self.name not in ('E#', 'B#', 'C-', 'F-'):
-            if inPlace is True:
+            if inPlace:
                 return None
             else:
-                p = copy.deepcopy(self)
-                return p
+                return copy.deepcopy(self)
         else:
-            if inPlace is True:
+            if inPlace:
                 self.ps = self.ps
                 return None
             else:
@@ -1466,10 +1465,46 @@ class Pitch(music21.Music21Object):
         first n Enharmonics according to a particular algorithm, moving into triple sharps, etc.
         if need be.  Or getAllCommonEnharmonics(note) which returns all possible enharmonics that
         do not involve triple or more accidentals.
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('d#')
+        >>> p.getEnharmonic()
+        E-4
+        >>> p = pitch.Pitch('e-8')
+        >>> p.getEnharmonic()
+        D#8
+        >>> pitch.Pitch('c-3').getEnharmonic()
+        B2
+        >>> pitch.Pitch('e#2').getEnharmonic()
+        F2
+        >>> pitch.Pitch('f#2').getEnharmonic()
+        G-2
+        >>> pitch.Pitch('c##5').getEnharmonic()
+        D5
+        >>> pitch.Pitch('g3').getEnharmonic() # presently does not alter
+        G3
+
         '''
-        pass
+        psRef = self.ps
+        if inPlace:
+            post = self
+        else:
+            post = copy.deepcopy(self)
 
+        if post.accidental != None:
+            if post.accidental.alter > 0:
+                # we have a sharp, need to get the equivalent flat
+                post.getHigherEnharmonic(inPlace=True)
+            elif post.accidental.alter < 0:
+                post.getLowerEnharmonic(inPlace=True)
+            else: # assume some direction, perhaps using a dictionary
+                post.getLowerEnharmonic(inPlace=True)
 
+        if inPlace:
+            return None
+        else:
+            return post
+        
 
 # not sure these are necessary
 # def getQuarterToneEnharmonic(note1):

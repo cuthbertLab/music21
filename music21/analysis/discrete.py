@@ -22,7 +22,7 @@ import sys
 import music21
 
 from music21 import meter
-from music21.pitch import Pitch
+from music21 import pitch
 from music21 import stream 
 
 
@@ -182,16 +182,32 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
-        
+
+        # store sharp/flat count on init if available
+        if referenceStream != None:
+            self.sharpFlatCount = self._getSharpFlatCount(referenceStream)
+        else:
+            self.sharpFlatCount = None
 
     def _getSharpFlatCount(self, subStream):
+        '''Determine count of sharps and flats in a Stream
+
+        >>> from music21 import *
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> p = KrumhanslSchmuckler()
+        >>> p._getSharpFlatCount(s.flat)
+        (87, 0)
+        '''
         # pitches gets a flat representation
         flatCount = 0
         sharpCount = 0
         for p in subStream.pitches:
             if p.accidental != None:
-                pass
-
+                if p.accidental.alter < 0:
+                    flatCount += -1
+                elif p.accidental.alter > 0:
+                    sharpCount += 1
+        return sharpCount, flatCount
 
     def _getWeights(self, weightType='major'): 
         ''' Returns either the a weight key profile as described by Sapp and others
@@ -232,6 +248,9 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         '''
         # storage for 12 pitch classes
         pcDist = [0]*12
+        if len(streamObj.notes) == 0:
+            return None
+
         for n in streamObj.notes:        
             if not n.isRest:
                 length = n.quarterLength
@@ -247,6 +266,10 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         ''' Takes in a pitch class distribution as a list and convolutes it
             over Sapp's given distribution for finding key, returning the result. 
         '''
+        # may get an empty distribution
+        if pcDistribution == None:
+            return None
+
         soln = [0] * 12
         toneWeights = self._getWeights(weightType)
         for i in range(len(soln)):
@@ -258,6 +281,10 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         ''' Takes in a list of probably key results in points and returns a
             list of keys in letters, sorted from most likely to least likely
         '''
+        # case of empty data
+        if keyResults == None:
+            return None
+
         likelyKeys = [0] * 12
         a = sorted(keyResults)
         a.reverse()
@@ -265,7 +292,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         #Return pairs, the pitch class and the correlation value, in order by point value
         for i in range(len(a)):
             # pitch objects created here
-            likelyKeys[i] = (Pitch(keyResults.index(a[i])), differences[keyResults.index(a[i])])
+            likelyKeys[i] = (pitch.Pitch(keyResults.index(a[i])),
+                             differences[keyResults.index(a[i])])
         return likelyKeys
         
         
@@ -273,7 +301,10 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         ''' Takes in a list of numerical probable key results and returns the
             difference of the top two keys
         '''
-            
+        # case of empty analysis
+        if keyResults == None:
+            return None
+ 
         soln = [0] * 12
         top = [0] * 12
         bottomRight = [0] * 12
@@ -314,11 +345,11 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         # need a presentation order for legend; not alphabetical
         _keySortOrder = ['C-', 'C', 'C#',
                           'D-', 'D', 'D#',
-                          'E-', 'E', 'E#',
-                          'F-', 'F', 'F#',
+                          'E-', 'E',
+                          'F', 'F#',
                           'G-', 'G', 'G#',
                           'A-', 'A', 'A#',
-                          'B-', 'B', 'B#',
+                          'B-', 'B',
                         ]
 
         if compress:
@@ -328,8 +359,10 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             environLocal.printDebug(['colors used:', colorsUsed])
             keySortOrderFiltered = []
             for key in _keySortOrder:
-                for sol in solutionsUsed: # three values
-                    if key == sol[0]: # first is key string
+                for sol in solutionsUsed: # three v alues
+                    if sol[0] == None: 
+                        continue
+                    if key == sol[0].name: # first is key string
                         keySortOrderFiltered.append(key)
                         break
         else:
@@ -338,21 +371,33 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 
         data = []
         for yLabel in ['Major', 'Minor']:
+            if yLabel == 'Major':
+                valid = self.keysValidMajor
+            elif yLabel == 'Minor':
+                valid = self.keysValidMinor
+
             row = []
             row.append(yLabel)
             pairs = []
-            for key in keySortOrderFiltered:
+            for key in [pitch.Pitch(p) for p in keySortOrderFiltered]:
                 color = self.solutionToColor([key, yLabel])
+                mask = False
                 if compress:
                     if color not in colorsUsed:
-                        # set as white so as to maintain spacing
-                        color = '#ffffff' 
-                # replace all '-' with 'b' (or proper flat symbol)
-                key = key.replace('-', 'b')
-                # make minor keys in lower case
-                if yLabel == 'Minor':
-                    key = key.lower()
-                pairs.append((key, color))
+                        mask = True
+                if key.name not in valid:
+                    mask = True
+                if mask:
+                    # set as white so as to maintain spacing
+                    color = '#ffffff' 
+                    keyStr = ''
+                else:
+                    # replace all '-' with 'b' (or proper flat symbol)
+                    keyStr = key.name.replace('-', 'b')
+                    # make minor keys in lower case
+                    if yLabel == 'Minor':
+                        keyStr = keyStr.lower()
+                pairs.append((keyStr, color))
             row.append(pairs)
             data.append(row)    
         return data
@@ -422,12 +467,17 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         
     
     def solutionToColor(self, solution):
-
+        
         key = solution[0]
+
+        # key may be None
+        if key == None:
+            return '#ffffff'
+
         modality = solution[1].lower()
 
         # for each step, assign a color
-        # names taken from http://chaos2.org/misc/rgb.html
+        # names taken from http://chaos2.org/misc/rgb.html    
         # idea is basically:
         # red, orange, yellow, green, cyan, blue, purple, pink
         stepLib = {'C': '#CD4F39', # tomato3
@@ -439,8 +489,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                 'B': '#FF83FA', # orchid1
 
                 } 
-        # first char is always step
-        step = key[0]
+        # value is pitch object; first char is always step
+        step = key.step # get C for C#
         rgbStep = self._hexToRgb(stepLib[step])
         # make all the colors a bit lighter
         for i in range(len(rgbStep)):
@@ -451,12 +501,12 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             for i in range(len(rgbStep)):
                 rgbStep[i] = self._rgbLimit(rgbStep[i] - 100)
 
-        if len(key) > 1:
+        if len(key.name) > 1:
             magnitude = 15
-            if key[1] == '-':
+            if key.name[1] == '-':
                 # index and value shift for each of rgb values
                 shiftLib = {0: magnitude, 1: magnitude, 2: -magnitude}                   
-            elif key[1] == '#':                   
+            elif key.name[1] == '#':                   
                 shiftLib = {0: -magnitude, 1: -magnitude, 2: magnitude}                   
             for i in shiftLib.keys():
                 rgbStep[i] = self._rgbLimit(rgbStep[i] + shiftLib[i])
@@ -465,26 +515,11 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         return self._rgbToHex(rgbStep)
 
 
-    def getSolution(self, sStream):
-        ''' procedure to only return a text solution
-        >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = KrumhanslSchmuckler()
-        >>> p.getSolution(s) # this seems correct
-        ('F#', 'minor', 0.81547089257624916)
 
-        >>> s = corpus.parseWork('bach/bwv57.8')
-        >>> p = KrumhanslSchmuckler()
-        >>> p.getSolution(s) 
-        ('B-', 'major', 0.89772788962941652)
-        '''
-        # always take a flat version here, otherwise likely to get nothing
-        solution, color = self.process(sStream.flat)
-        return solution
     
     def _likelyKeys(self, sStream):
         pcDistribution = self._getPitchClassDistribution(sStream)
-        environLocal.printDebug(['process(); pcDistribution', pcDistribution])
+        #environLocal.printDebug(['process(); pcDistribution', pcDistribution])
     
         keyResultsMajor = self._convoluteDistribution(pcDistribution, 'major')
         differenceMajor = self._getDifference(keyResultsMajor, 
@@ -500,8 +535,53 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         return likelyKeysMajor, likelyKeysMinor
 
 
-    def _bestKeyEnharmonic(self, pitchObj, sStream=None):
-        pass
+    def _bestKeyEnharmonic(self, pitchObj, mode, sStream=None):
+        '''
+        >>> from music21 import *
+        >>> p = analysis.discrete.KrumhanslSchmuckler()
+        >>> s = converter.parse('b-4 e- f g-', '4/4')
+        >>> p._bestKeyEnharmonic(pitch.Pitch('e#'), 'minor', s)
+        F4
+        >>> p._bestKeyEnharmonic(pitch.Pitch('f-'), 'major', s)
+        E4
+
+        '''
+        if pitchObj == None:
+            return None
+
+        # this does not yet seem necessary
+        # if not done at init with ref stream, do now
+#         if self.sharpFlatCount == None:
+#             sharpFlatCount = self._getSharpFlatCount(sStream)
+#         else:
+#             sharpFlatCount = self.sharpFlatCount
+# 
+#         if sharpFlatCount[0] > sharpFlatCount[1]:
+#             favor = 'sharp'
+#         elif sharpFlatCount[1] > sharpFlatCount[0]:
+#             favor = 'flat'
+#         else:
+#             favor = None
+
+        flipEnharmonic = False
+#         if pitchObj.accidental != None:
+#             # if we have a sharp key and we need to favor flat, get enharm
+#             if pitchObj.accidental.alter > 0 and favor == 'flat':
+#                 flipEnharmonic = True
+#             elif pitchObj.accidental.alter < 0 and favor == 'sharp':
+#                 flipEnharmonic = True
+
+#         if flipEnharmonic == False:
+        if mode == 'major':
+            if pitchObj.name not in self.keysValidMajor:
+                flipEnharmonic = True
+        elif mode == 'minor':
+            if pitchObj.name not in self.keysValidMinor:
+                flipEnharmonic = True
+
+        if flipEnharmonic:
+            pitchObj.getEnharmonic(inPlace=True)
+        return pitchObj
 
 
     def process(self, sStream):    
@@ -521,17 +601,46 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         likelyKeysMajor, likelyKeysMinor = self._likelyKeys(sStream)
 
         #find the largest correlation value to use to select major or minor as the resulting key
-        if likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
-            solution = (str(likelyKeysMajor[0][0]), "major", likelyKeysMajor[0][1])
+        if likelyKeysMajor == None or likelyKeysMinor == None:
+            mode = None
+            solution = (None, mode, 0)
+        elif likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
+            mode = 'major'
+            solution = (likelyKeysMajor[0][0], mode, likelyKeysMajor[0][1])
         else:
-            solution = (str(likelyKeysMinor[0][0]), "minor", likelyKeysMinor[0][1])
-            
+            mode = 'minor'
+            solution = (likelyKeysMinor[0][0], mode, likelyKeysMinor[0][1])
+
+        # first solution is pitch object
+        p = self._bestKeyEnharmonic(solution[0], mode, sStream)
+        solution = (p, mode, solution[2])
+
         color = self.solutionToColor(solution)
+
 
         # store solutions for compressed legend generation
         self._solutionsFound.append((solution, color))
         return solution, color        
     
+
+    def getSolution(self, sStream):
+        ''' procedure to only return a text solution
+        >>> from music21 import *
+        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> p = KrumhanslSchmuckler()
+        >>> p.getSolution(s) # this seems correct
+        (F#, 'minor', 0.81547089257624916)
+
+        >>> s = corpus.parseWork('bach/bwv57.8')
+        >>> p = KrumhanslSchmuckler(s)
+        >>> p.getSolution(s) 
+        (B-, 'major', 0.89772788962941652)
+        '''
+        # always take a flat version here, otherwise likely to get nothing
+        solution, color = self.process(sStream.flat)
+        return solution
+
+
 
 
 #------------------------------------------------------------------------------
@@ -789,12 +898,12 @@ def analyzeStream(streamObj, *args, **keywords):
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv66.6')
     >>> analysis.discrete.analyzeStream(s, 'Krumhansl')
-    ('F#', 'minor', 0.81547089257624916)
+    (F#, 'minor', 0.81547089257624916)
     >>> analysis.discrete.analyzeStream(s, 'ambitus')
     34
 
     >>> analysis.discrete.analyzeStream(s, 'key')[:2]
-    ('F#', 'minor')
+    (F#, 'minor')
     >>> analysis.discrete.analyzeStream(s, 'range')
     34
     '''

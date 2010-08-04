@@ -1122,7 +1122,7 @@ class Stream(music21.Music21Object):
         >>> s.analyze('ambitus')
         34
         >>> s.analyze('krumhansl')
-        ('F#', 'minor', 0.81547089257624916)
+        (F#, 'minor', 0.81547089257624916)
         '''
 
         from music21.analysis import discrete
@@ -9274,7 +9274,8 @@ class Test(unittest.TestCase):
 
 
     def testAnalyze(self):
-        from music21 import stream, corpus
+        from music21 import stream, corpus, pitch
+
         s = corpus.parseWork('bach/bwv66.6')
 
         sub = [s.parts[0], s.parts[1], s.getMeasureRange(4,5), 
@@ -9296,14 +9297,17 @@ class Test(unittest.TestCase):
 
 
         # only match first two values
-        matchKrumhansl = [('F#', 'minor'), ('C#', 'minor'), 
-                          ('E', 'major') , ('E', 'major') ]
+        matchKrumhansl = [(pitch.Pitch('F#'), 'minor'), 
+                          (pitch.Pitch('C#'), 'minor'), 
+                          (pitch.Pitch('E'), 'major') , 
+                          (pitch.Pitch('E'), 'major') ]
 
         for i in range(len(sub)):
             sTest = sub[i]
             post = sTest.analyze('KrumhanslSchmuckler')
             # returns three values; match 2
-            self.assertEqual(post[:2], matchKrumhansl[i])
+            self.assertEqual(post[:2][0].name, matchKrumhansl[i][0].name)
+            self.assertEqual(post[:2][1], matchKrumhansl[i][1])
 
         # match values under different strings provided to analyze
         for idStr in ['key', 'krumhansl', 'keyscape']:
@@ -9311,7 +9315,8 @@ class Test(unittest.TestCase):
                 sTest = sub[i]
                 post = sTest.analyze(idStr)
                 # returns three values; match 2
-                self.assertEqual(post[:2], matchKrumhansl[i])
+                self.assertEqual(post[:2][0].name, matchKrumhansl[i][0].name)
+                self.assertEqual(post[:2][1], matchKrumhansl[i][1])
 
             
 

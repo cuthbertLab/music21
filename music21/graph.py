@@ -1490,7 +1490,7 @@ class PlotWindowedAnalysis(PlotStream):
         if 'windowStep' in keywords:
             self.windowStep = keywords['windowStep']
         else:
-            self.windowStep = 8
+            self.windowStep = 'pow2'
 
         if 'windowType' in keywords:
             self.windowType = keywords['windowType']
@@ -3117,7 +3117,7 @@ class Test(unittest.TestCase):
             a = corpus.parseWork(fp)
             windowStep = '2'
             #windowStep = random.choice([1,2,4,8,16,32])
-            a.show()
+            #a.show()
         else:
             a = corpus.parseWork('bach/bwv66.6')
             fn = 'bach/bwv66.6'
@@ -3190,6 +3190,6 @@ if __name__ == "__main__":
 
 
         #b.testColorGridLegend('write')
-        #b.testPlotWindowed('write')
+        b.testPlotWindowed('write')
 
         #a.writeAllPlots()
