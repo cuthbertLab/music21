@@ -1014,6 +1014,16 @@ class Interval(music21.Music21Object):
             self.chromatic = ChromaticInterval(arguments[0])
             self.diatonic = self.chromatic.getDiatonic()
 
+        # permit pitches instead of Notes
+        # this requires importing note, which is a bit circular, but necessary
+        elif (len(arguments) == 2 and 'Pitch' in arguments[0].classes and 
+            'Pitch' in arguments[1].classes):
+            from music21 import note
+            self._noteStart = note.Note()
+            self._noteStart.pitch = arguments[0]
+            self._noteEnd = note.Note()
+            self._noteEnd.pitch = arguments[1]
+
         elif (len(arguments) == 2 and arguments[0].isNote == True and 
             arguments[1].isNote == True):
             self._noteStart = arguments[0]
@@ -1452,6 +1462,8 @@ def notesToInterval(n1, n2 = None):
                     note1 = n1, note2 = n2)
     return intObj
 
+
+
 def stringToInterval(string):
     '''Given an interval string (such as "P5", "m3", "A2") return a :class:`~music21.interval.Interval` object.
 
@@ -1671,6 +1683,12 @@ class Test(unittest.TestCase):
 
 
 
+    def testCreateIntervalFromPitch(self):     
+        from music21 import pitch  
+        p1 = pitch.Pitch('c')
+        p2 = pitch.Pitch('g')
+        i = Interval(p1, p2)
+        self.assertEqual(i.intervalClass, 5)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1679,4 +1697,12 @@ _DOC_ORDER = [notesToChromatic, intervalsToDiatonic, notesToInterval,
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    import sys
+
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        a = Test()
+
+
+        a.testCreateIntervalFromPitch()

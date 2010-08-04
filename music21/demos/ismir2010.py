@@ -315,10 +315,14 @@ def demoBasic():
     # We can show() a Stream in a variety of forms
     s1.show()
     s1.show('midi') # has errors!
-    s1.show('text')
+    s1.show('text') # too long here
 
     # Can get the number of Elements as a length, and iterate over Elements
     len(s1)
+
+    # Can grab polyphonic Measure range;
+
+
 
     # Can get sub-components through class or id filtering
     soprano = s1.getElementById('soprano')
@@ -330,6 +334,7 @@ def demoBasic():
     # A Part might contain numerous Measure Streams
     len(soprano.getElementsByClass('Measure'))
     mRange = soprano.getMeasureRange(15,17)
+    mRange.show('text') # here we can see this
     
     # Any stream can be flattened to remove all hierarchical levels
     # All notes of a part can be gathered into a single Stream
@@ -351,20 +356,65 @@ def demoBasic():
     sExtended.show()
 
 
-def demoCombineTransform():
-    pass
 
+def demoAnalysis():
+    # use Messian, ciconia, bach
+    fp = '/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml'
+    dpi = 300
+
+    pieceTitle = '"Mode de valeurs...", Part 2'
+
+    s = converter.parse(fp)
+
+    s.plot('histogram', 'pitchspace', dpi=dpi, title='Pitch Space Usage, %s' % pieceTitle)
+
+    s.plot('histogram', 'pitchclass', dpi=dpi, title='Pitch Class Usage, %s' % pieceTitle)
+
+
+    s.plot('scatter', values=['pitchclass', 'offset'], dpi=dpi, title='Pitch Class By Measure, %s' % pieceTitle)
+
+    s.plot('horizontalBar', values=['pitchclass', 'offset'], dpi=dpi, title='Pitch Space By Measure, %s' % pieceTitle)
+
+
+    s.plot('scatterweighted', values=['pitch', 'quarterlength'], dpi=dpi, title='Pitch and Duration, %s' % pieceTitle)
+
+
+
+    # s.getMeasuresRange(10,20)plot('PlotHorizontalBarPitchSpaceOffset')
+    # s.plot('PlotScatterWeightedPitchSpaceQuarterLength')
+
+
+def demoCombineTransform():
+    from music21 import corpus, interval
+
+    s1 = corpus.parseWork('bach/bwv103.6')
+    s2 = corpus.parseWork('bach/bwv18.5-lz')
+
+    keyPitch1 = s1.analyze('key')[0]
+    gap1 = interval.Interval(keyPitch1, pitch.Pitch('C'))
+
+    keyPitch2 = s2.analyze('key')[0]
+    gap2 = interval.Interval(keyPitch2, pitch.Pitch('C'))
+
+    sCompare = stream.Stream()
+    sCompare.insert(0, s1.parts['bass'])
+    sCompare.insert(0, s2.parts['bass'])
+
+    sCompare.show()
+
+    # attach interval name to lyric
+    # attach pitch class
 
 def demoSearch():
 
-    import os
+    import os, random
     from music21 import corpus, key
     
-    fpList = corpus.getBachChorales()
-    
+    fpList = corpus.getBachChorales('.xml')
+    random.shuffle(fpList)
     results = stream.Stream()
 
-    for fp in fpList[:20]:
+    for fp in fpList[:40]:
         fn = os.path.split(fp)[1]
         print fn
         s = converter.parse(fp)
@@ -375,8 +425,9 @@ def demoSearch():
             pLast = []
 
             for pStream in s.parts:
-                pFirst.append(pStream.flat.notes[0].pitch)
-                pLast.append(pStream.flat.notes[-1].pitch)
+                # clear accidental display status
+                pFirst.append(pStream.flat.getElementsByClass('Note')[0].pitch)
+                pLast.append(pStream.flat.getElementsByClass('Note')[-1].pitch)
 
             cFirst = chord.Chord(pFirst)
             cFirst.quarterLength = 2
@@ -387,10 +438,13 @@ def demoSearch():
             cLast = chord.Chord(pLast)
             cLast.quarterLength = 2
             cLast.transpose(12, inPlace=True)
-            if cLast.isMajorTriad:
-                cFirst.addLyric('M')
+            if cLast.isMajorTriad():
+                cLast.addLyric('M')
+            elif cLast.isMinorTriad():
+                cLast.addLyric('m')
+            else:
+                cLast.addLyric('?')
         
-
             m = stream.Measure()
             m.keySignature = s.flat.getElementsByClass('KeySignature')[0]
 
@@ -398,7 +452,7 @@ def demoSearch():
 
             m.append(cFirst)
             m.append(cLast)
-            results.append(m)
+            results.append(m.makeAccidentals(inPlace=True))
 
     results.show()
 
@@ -466,11 +520,12 @@ if __name__ == "__main__":
 
         #demoSearch()
 
-        demoBasic()
+        #demoBasic()
+        #demoCombineTransform()
 
+        #demoSearch()
 
-
-
+        demoAnalysis()
 
 
 

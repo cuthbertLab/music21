@@ -943,11 +943,18 @@ class Note(NotRest):
     # property access
 
 
-    def _getName(self): return self.pitch.name
-    def _setName(self, value): self.pitch.name = value
-    name = property(_getName, _setName)
+    def _getName(self): 
+        return self.pitch.name
+    
+    def _setName(self, value): 
+        self.pitch.name = value
 
-    def _getNameWithOctave(self): return self.pitch.nameWithOctave
+    name = property(_getName, _setName, 
+        doc = '''Return or set the pitch name from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.name`.
+        ''')
+
+    def _getNameWithOctave(self): 
+        return self.pitch.nameWithOctave
 
     nameWithOctave = property(_getNameWithOctave, 
         doc = '''Return or set the pitch name with octave from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.nameWithOctave`.

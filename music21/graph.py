@@ -59,7 +59,22 @@ class GraphException(Exception):
 class PlotStreamException(Exception):
     pass
 
+# temporary
+def _substituteAccidentalSymbols(label):
+    if not common.isStr(label):
+        return label
 
+    if '-' in label:
+        #label = label.replace('-', '&#x266d;')
+        #label = label.replace('-', 'b')
+        # this uses a tex-based italic
+        #label = label.replace('-', '$b$')
+        label = label.replace('-', r'$\flat$')
+#             if '#' in label:
+#                 label = label.replace('-', '&#x266f;')
+    if '#' in label:
+        label = label.replace('#', r'$\sharp$')
+    return label
 
 #-------------------------------------------------------------------------------
 class Graph(object):
@@ -299,8 +314,11 @@ class Graph(object):
                         values, labels = self.axis[axis]['ticks']
                         #environLocal.printDebug(['x tick labels, x tick values', labels, values])
                         ax.set_xticks(values)
+                        # using center alignment to account for odd spacing in 
+                        # accidentals
                         ax.set_xticklabels(labels, fontsize=self.tickFontSize,
-                            family=self.fontFamily)
+                            family=self.fontFamily, 
+                            horizontalalignment='center', verticalalignment='center', y=-.01)
 
                 elif axis == 'y':
                     # this is the old way ticks were set:
@@ -311,7 +329,8 @@ class Graph(object):
                         #environLocal.printDebug(['y tick labels, y tick values', labels, values])
                         ax.set_yticks(values)
                         ax.set_yticklabels(labels, fontsize=self.tickFontSize,
-                            family=self.fontFamily)
+                            family=self.fontFamily,
+                            horizontalalignment='right', verticalalignment='center')
             else: # apply some default formatting to default ticks
                 ax.set_xticklabels(ax.get_xticks(),
                     fontsize=self.tickFontSize, family=self.fontFamily) 
@@ -554,8 +573,9 @@ class GraphColorGridLegend(Graph):
             ax.set_xticks([x + 1 for x in range(len(rowData))])
             # get labels from row data; first of pair
             # need to push y down as need bottom alignment for lower case
-            ax.set_xticklabels([x for x, y in rowData], 
-                fontsize=self.tickFontSize, family=self.fontFamily, horizontalalignment='center', verticalalignment='bottom', 
+            ax.set_xticklabels(
+                [_substituteAccidentalSymbols(x) for x, y in rowData], 
+                fontsize=self.tickFontSize, family=self.fontFamily, horizontalalignment='center', verticalalignment='center', 
                 y=-.4)
             # this is the scaling to see all bars; not necessary
             ax.set_xlim([.5, len(rowData)+.5])
@@ -659,7 +679,7 @@ class GraphHorizontalBar(Graph):
             rangeStep = 1
         for x in range(int(math.floor(xMin)), 
                        int(round(math.ceil(xMax))), 
-                       rangeStep) + [int(round(xMax))]:
+                       rangeStep):
             xTicks.append([x, '%s' % x])
         self.setTicks('x', xTicks)  
 
@@ -857,7 +877,7 @@ class GraphHistogram(Graph):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         # added extra .1 in middle param to permit space on right 
-        ax = self.fig.add_subplot(1, 1.1, 1.1)
+        ax = self.fig.add_subplot(1, 1.1, 1.05)
 
         x = []
         y = []
@@ -1113,19 +1133,19 @@ class PlotStream(object):
 
 
     #---------------------------------------------------------------------------
+
+
+
     def _filterPitchLabel(self, ticks):
         '''Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
 
         '''
-        #TODO: this is not yet working!
-
+        environLocal.printDebug(['calling filterPitchLabel', ticks])
+        # this uses tex mathtext, which happens to define harp and flat
+        # http://matplotlib.sourceforge.net/users/mathtext.html
         post = []
         for value, label in ticks:
-            if '-' in label:
-                #label = label.replace('-', '&#x266d;')
-                label = label.replace('-', 'b')
-#             if '#' in label:
-#                 label = label.replace('-', '&#x266f;')
+            label = _substituteAccidentalSymbols(label)
             post.append([value, label])
             #post.append([value, unicode(label)])
         return post
@@ -1138,20 +1158,20 @@ class PlotStream(object):
         >>> from music21 import corpus
         >>> s = corpus.parseWork('bach/bwv324.xml')
         >>> a = PlotStream(s)
-        >>> a.ticksPitchClassUsage(hideUnused=True)
-        [[0, u'C'], [2, u'D'], [3, u'D#'], [4, u'E'], [6, u'F#'], [7, u'G'], [9, u'A'], [11, u'B']]
+        >>> [x for x, y in a.ticksPitchClassUsage(hideUnused=True)]
+        [0, 2, 3, 4, 6, 7, 9, 11]
 
         >>> s = corpus.parseWork('bach/bwv281.xml')
         >>> a = PlotStream(s)
-        >>> a.ticksPitchClassUsage(showEnharmonic=True, hideUnused=True)
-        [[0, u'C'], [2, u'D'], [3, u'Eb'], [4, u'E'], [5, u'F'], [7, u'G'], [9, u'A'], [10, u'Bb'], [11, u'B']]
-        >>> a.ticksPitchClassUsage(showEnharmonic=True, blankLabelUnused=False)
-        [[0, u'C'], [1, 'C#'], [2, u'D'], [3, u'Eb'], [4, u'E'], [5, u'F'], [6, 'F#'], [7, u'G'], [8, 'G#'], [9, u'A'], [10, u'Bb'], [11, u'B']]
+        >>> [x for x, y in a.ticksPitchClassUsage(showEnharmonic=True, hideUnused=True)]
+        [0, 2, 3, 4, 5, 7, 9, 10, 11]
+        >>> [x for x, y in a.ticksPitchClassUsage(showEnharmonic=True, blankLabelUnused=False)]
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
         >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
         >>> a = PlotStream(s)
-        >>> a.ticksPitchClassUsage(showEnharmonic=True)
-        [[0, u'C'], [1, u'Db/C#'], [2, u'D'], [3, u'Eb/D#'], [4, u'E'], [5, u'F'], [6, u'F#'], [7, u'G'], [8, u'Ab/G#'], [9, u'A'], [10, u'Bb'], [11, u'B']]
+        >>> [x for x, y in a.ticksPitchClassUsage(showEnharmonic=True)]
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
         OMIT_FROM_DOCS
         TODO: this ultimately needs to look at key signature/key to determine defaults for undefined notes.
@@ -1195,8 +1215,8 @@ class PlotStream(object):
         >>> from music21 import corpus
         >>> s = corpus.parseWork('bach/bwv324.xml')
         >>> a = PlotStream(s)
-        >>> a.ticksPitchClass()
-        [[0, 'C'], [1, 'C#'], [2, 'D'], [3, 'Eb'], [4, 'E'], [5, 'F'], [6, 'F#'], [7, 'G'], [8, 'G#'], [9, 'A'], [10, 'Bb'], [11, 'B']]
+        >>> [x for x,y in a.ticksPitchClass()]
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
         '''
         ticks = []
         for i in range(pcMin, pcMax+1):
@@ -1229,8 +1249,8 @@ class PlotStream(object):
 
         >>> from music21 import stream; s = stream.Stream()
         >>> a = PlotStream(s)
-        >>> a.ticksPitchSpaceChromatic(60,72)
-        [[60, 'C4'], [61, 'C#4'], [62, 'D4'], [63, 'Eb4'], [64, 'E4'], [65, 'F4'], [66, 'F#4'], [67, 'G4'], [68, 'G#4'], [69, 'A4'], [70, 'Bb4'], [71, 'B4'], [72, 'C5']]
+        >>> [x for x,y in a.ticksPitchSpaceChromatic(60,72)]
+        [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]
         '''
         ticks = []
         cVals = range(pitchMin, pitchMax+1)
@@ -1249,13 +1269,13 @@ class PlotStream(object):
         >>> from music21 import corpus
         >>> s = corpus.parseWork('bach/bwv324.xml')
         >>> a = PlotStream(s[0])
-        >>> a.ticksPitchSpaceUsage(hideUnused=True)
-        [[64, u'E4'], [66, u'F#4'], [67, u'G4'], [69, u'A4'], [71, u'B4'], [72, u'C5']]
+        >>> [x for x, y in a.ticksPitchSpaceUsage(hideUnused=True)]
+        [64, 66, 67, 69, 71, 72]
 
         >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
         >>> a = PlotStream(s)
-        >>> a.ticksPitchSpaceUsage(showEnharmonic=True, hideUnused=True)
-        [[36, u'C2'], [38, u'D2'], [40, u'E2'], [41, u'F2'], [43, u'G2'], [44, u'Ab2'], [45, u'A2'], [47, u'B2'], [48, u'C3'], [50, u'D3'], [51, u'Eb3/D#3'], [52, u'E3'], [53, u'F3'], [54, u'F#3'], [55, u'G3'], [56, u'Ab3/G#3'], [57, u'A3'], [58, u'Bb3'], [59, u'B3'], [60, u'C4'], [61, u'Db4/C#4'], [62, u'D4'], [63, u'Eb4/D#4'], [64, u'E4'], [65, u'F4'], [66, u'F#4'], [67, u'G4'], [68, u'Ab4/G#4'], [69, u'A4'], [70, u'Bb4'], [71, u'B4'], [72, u'C5']]
+        >>> [x for x, y in a.ticksPitchSpaceUsage(showEnharmonic=True, hideUnused=True)]
+        [36, 38, 40, 41, 43, 44, 45, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]
 
         OMIT_FROM_DOCS
         TODO: this needs to look at key signature/key to determine defaults
@@ -1351,8 +1371,9 @@ class PlotStream(object):
             #environLocal.printDebug(['using measures for offset ticks'])
             # store indices in offsetMap
             mNoToUse = []
-            for key in sorted(offsetMap.keys()):
-                if key >= offsetMin and key <= offsetMax:
+            sortedKeys = sorted(offsetMap.keys())
+            for key in sortedKeys:
+                if key > offsetMin and key < offsetMax:
                     if key == 0 and not displayMeasureNumberZero:
                         continue # skip
                     #if key == sorted(offsetMap.keys())[-1]:
@@ -1728,9 +1749,11 @@ class PlotHistogramPitchSpace(PlotHistogram):
         self.fxTick = lambda n: n.nameWithOctave
         # replace with self.ticksPitchSpaceUsage
 
-
         # will use self.fx and self.fxTick to extract data
         data, xTicks, yTicks = self._extractData()
+
+        # filter xTicks to remove - in flat lables
+        xTicks = self._filterPitchLabel(xTicks)
 
         self.graph = GraphHistogram(*args, **keywords)
         self.graph.setData(data)
@@ -1743,9 +1766,14 @@ class PlotHistogramPitchSpace(PlotHistogram):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([8,6])
+            self.graph.setFigureSize([9,6])
         if 'title' not in keywords:
             self.graph.setTitle('Pitch Histogram')
+
+        # make smaller
+        if 'tickFontSize' not in keywords:
+            self.graph.tickFontSize = 7
+
 
 
 class PlotHistogramPitchClass(PlotHistogram):
@@ -1769,11 +1797,14 @@ class PlotHistogramPitchClass(PlotHistogram):
         PlotHistogram.__init__(self, streamObj, *args, **keywords)
 
         self.fx = lambda n:n.pitchClass
-        self.fxTick = lambda n: n.nameWithOctave
+        self.fxTick = lambda n: n.name
         # replace with self.ticksPitchClassUsage
 
         # will use self.fx and self.fxTick to extract data
         data, xTicks, yTicks = self._extractData()
+
+        # filter xTicks to remove - in flat lables
+        xTicks = self._filterPitchLabel(xTicks)
 
         self.graph = GraphHistogram(*args, **keywords)
         self.graph.setData(data)
@@ -2006,8 +2037,6 @@ class PlotScatterPitchClassOffset(PlotScatter):
     .. image:: images/PlotScatterPitchClassOffset.*
         :width: 600
     '''
-    # TODO: this graph is not returning correct measure numbers
-
     values = ['pitchClass', 'offset']
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
@@ -2018,13 +2047,13 @@ class PlotScatterPitchClassOffset(PlotScatter):
         self.fx = lambda n:n.offset
         self.fxTicks = self.ticksOffset
 
-        if 'xLog' not in keywords:
-            xLog = True
-        else:
-            xLog = keywords['xLog']
+#         if 'xLog' not in keywords:
+#             xLog = False
+#         else:
+#             xLog = keywords['xLog']
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(xLog=xLog)
+        data, xTicks, yTicks = self._extractData()
 
         self.graph = GraphScatter(*args, **keywords)
         self.graph.setData(data)
@@ -2164,7 +2193,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
         :width: 600
     '''
 
-    values = ['pitchClass', 'offset']
+    values = ['pitchClass', 'offset', 'pianoroll']
     def __init__(self, streamObj, *args, **keywords):
         PlotHorizontalBar.__init__(self, streamObj, *args, **keywords)
 
@@ -2200,8 +2229,6 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
     >>> p = graph.PlotHorizontalBarPitchSpaceOffset(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHorizontalBarPitchSpaceOffset(s)
-    >>> p.id
-    'horizontalBar-pitch-offset'
     >>> p.process() # with defaults and proper configuration, will open graph
 
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
@@ -2210,7 +2237,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
     '''
 
 
-    values = ['pitch', 'offset']
+    values = ['pitch', 'offset', 'pianoroll']
     def __init__(self, streamObj, *args, **keywords):
         PlotHorizontalBar.__init__(self, streamObj, *args, **keywords)
        
@@ -2234,7 +2261,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([10,5])
+            self.graph.setFigureSize([10,6])
 
         if 'title' not in keywords:
             self.graph.setTitle('Note Quarter Length by Pitch')
@@ -2615,6 +2642,8 @@ def plotStream(streamObj, *args, **keywords):
 
     if not common.isListLike(values):
         values = [values]
+    # make sure we have a list
+    values = list(values)
 
     environLocal.printDebug(['plotStream: stream', streamObj, 
                              'format, values', format, values])
@@ -3160,7 +3189,7 @@ class Test(unittest.TestCase):
         ks = discrete.KrumhanslSchmuckler()
         data = ks.solutionLegend()
         print data
-        a = GraphColorGridLegend(doneAction=doneAction)
+        a = GraphColorGridLegend(doneAction=doneAction, dpi=300)
         a.setData(data)
         a.process()
 

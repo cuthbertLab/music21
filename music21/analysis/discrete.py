@@ -450,7 +450,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                     keyStr = ''
                 else:
                     # replace all '-' with 'b' (or proper flat symbol)
-                    keyStr = key.name.replace('-', 'b')
+                    #keyStr = key.name.replace('-', 'b')
+                    keyStr = key.name
                     # make minor keys in lower case
                     if yLabel == 'Minor':
                         keyStr = keyStr.lower()
