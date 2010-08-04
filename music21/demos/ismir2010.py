@@ -287,8 +287,12 @@ def messiaen(show = True):
 # 17 measures
 
 
-def demoBasic():
+def demoGettingWorks():
+    pass
 
+
+def demoBasic():
+    pass
 
 
 
