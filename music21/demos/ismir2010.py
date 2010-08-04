@@ -404,13 +404,22 @@ def demoGraphMozartChopin():
     dpi = 300
 
     mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt)
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(), dpi=dpi, title='Mozart Trio K. 581, Excerpt', colors=['#BCEE68'])
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(), dpi=dpi, title='Mozart Trio K. 581, Excerpt', colors=['#CD4F39'], alpha=.8)
     g.process()
     
     chopinStream = converter.parse(kernTest.mazurka6) 
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(chopinStream.stripTies(), dpi=dpi, title='Chopin Mazurka 6, Excerpt', colors=['#96CDCD']))
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(chopinStream.stripTies(), dpi=dpi, title='Chopin Mazurka 6, Excerpt', colors=['#6495ED'], alpha=.8)
     g.process()
 
+
+
+def demoBeethoven133()
+
+    sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
+    part = sStream[3].stripTies()
+
+    part.plot('scatter', values=['pitchclass', 'offset'],
+                 title='Beethoven, Opus 133, Cello')
 
 
 
