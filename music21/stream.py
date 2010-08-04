@@ -1787,6 +1787,11 @@ class Stream(music21.Music21Object):
         startOffset = None # set with the first measure
         startMeasure = None # store for adding other objects
         # get requested range
+
+        # if end not specified, get last
+        if numberEnd == None:
+            numberEnd = max([x for x,y in mapCooked])
+
         for i in range(numberStart, numberEnd+1):
             match = None
             for number, suffix in mapCooked.keys():

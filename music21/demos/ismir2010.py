@@ -376,12 +376,42 @@ def demoGraphMessiaen():
     s.plot('horizontalBar', values=['pitch', 'offset'], dpi=dpi, title='Pitch By Measure, %s' % pieceTitle)
 
 
-    s.plot('scatterweighted', values=['pitch', 'quarterlength'], dpi=dpi, title='Pitch and Duration, %s' % pieceTitle)
-
-
+    s.plot('scatterweighted', values=['pitch', 'quarterlength'], dpi=dpi, title='Pitch and Duration, %s' % pieceTitle, xLog=False)
 
     # s.getMeasuresRange(10,20)plot('PlotHorizontalBarPitchSpaceOffset')
     # s.plot('PlotScatterWeightedPitchSpaceQuarterLength')
+
+
+def demoGraphBach():
+
+    dpi = 300
+
+    # loping off first measure to avoid pickup
+    s1 = corpus.parseWork('bach/bwv103.6').getMeasureRange(1,None)
+    s2 = corpus.parseWork('bach/bwv18.5-lz').getMeasureRange(1,None)
+
+    s1.plot('key', dpi=dpi, title='Windowed Key Analysis, Bach, BWV 103.6', windowStep='pow2')
+    s2.plot('key', dpi=dpi, title='Windowed Key Analysis, Bach, BWV 18.5', windowStep='pow2')
+
+
+
+def demoGraphMozartChopin():
+
+    from music21 import converter
+    from music21.musicxml import testFiles as xmlTest
+    from music21.humdrum import testFiles as kernTest  
+
+    dpi = 300
+
+    mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt)
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(), dpi=dpi, title='Mozart Trio K. 581, Excerpt', colors=['#BCEE68'])
+    g.process()
+    
+    chopinStream = converter.parse(kernTest.mazurka6) 
+    g = graph.Plot3DBarsPitchSpaceQuarterLength(chopinStream.stripTies(), dpi=dpi, title='Chopin Mazurka 6, Excerpt', colors=['#96CDCD']))
+    g.process()
+
+
 
 
 def demoCombineTransform():
@@ -525,10 +555,10 @@ if __name__ == "__main__":
 
         #demoSearch()
 
-        demoGraphMessiaen()
+        #demoGraphMessiaen()
+
+        #demoGraphBach()
 
 
 
-
-
-
+        demoGraphMozartChopin()
