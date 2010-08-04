@@ -277,10 +277,11 @@ def messiaen(show = True):
 # ends on major I
 
 
-# >>> s = corpus.parseWork('bwv103')
+# >>> s = corpus.parseWork('bwv103.6')
 # 4/4, good beaming, has pickup
 # b minor, momves to D major, ends on major I
 # 16 measures
+# 4/4
 
 # >>> s = corpus.parseWork('bwv18.5-lz')
 # a minor, good amount of minor iv, ends on major 1
@@ -288,13 +289,70 @@ def messiaen(show = True):
 
 
 def demoGettingWorks():
-    pass
+    
+
+    # Can obtain works from an integrated corpus 
+    s1 = corpus.parseWork('bach/bwv103.6')
+    s2 = corpus.parseWork('bach/bwv18.5-lz')
+
+    # Can parse data stored in MusicXML files locally or online:
+    s = converter.parse('http://www.musicxml.org/xml/elite.xml')
+
+    # Can parse data stored in MIDI files locally or online:
+    s = converter.parse('http://www.jsbchorales.net/down/midi/010306b_.mid')
+
+
+    # Can parse data stored in Kern files locally or online:
+    s = converter.parse('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/371chorales&file=chor120.krn')
+
 
 
 def demoBasic():
+
+    # A score can be represented as a Stream of Parts and Metadata
+    s1 = corpus.parseWork('bach/bwv103.6')
+
+    # We can show() a Stream in a variety of forms
+    s1.show()
+    s1.show('midi') # has errors!
+    s1.show('text')
+
+    # Can get the number of Elements as a length, and iterate over Elements
+    len(s1)
+
+    # Can get sub-components through class or id filtering
+    soprano = s1.getElementById('soprano')
+
+    # Can employ the same show() method on any Stream or Stream subclass
+    soprano.show()
+    soprano.show('midi') # problem is here: offset is delayed
+
+    # A Part might contain numerous Measure Streams
+    len(soprano.getElementsByClass('Measure'))
+    mRange = soprano.getMeasureRange(15,17)
+    
+    # Any stream can be flattened to remove all hierarchical levels
+    # All notes of a part can be gathered into a single Stream
+    sNotes = soprano.flat.notes
+
+    # Can add notation elements or other objects by appending to a Stream
+    sNotes.insert(0, meter.TimeSignature('3/4'))
+
+    # Can create a new, transformed Stream by looking for Fermatas and extending them
+    sExtended = stream.Stream()
+    sExtended.insert(0, meter.TimeSignature('6/4'))
+    for n in sNotes.notes:
+        #if isinstance(n.notations[0], expressions.Fermata):
+        if len(n.notations) > 0:
+            n.duration.quarterLength = 4
+            sExtended.append(n)
+        else:
+            sExtended.append(n)
+    sExtended.show()
+
+
+def demoCombineTransform():
     pass
-
-
 
 
 def demoSearch():
@@ -406,7 +464,9 @@ if __name__ == "__main__":
         #pitchQuarterLengthUsage3D()
 
 
-        demoSearch()
+        #demoSearch()
+
+        demoBasic()
 
 
 
