@@ -277,8 +277,6 @@ def messiaen(show = True):
 # ends on major I
 
 
-
-
 # >>> s = corpus.parseWork('bwv103')
 # 4/4, good beaming, has pickup
 # b minor, momves to D major, ends on major I
@@ -289,11 +287,16 @@ def messiaen(show = True):
 # 17 measures
 
 
+def demoBasic():
+
+
+
+
 
 def demoSearch():
 
     import os
-    from music21 import corpus
+    from music21 import corpus, key
     
     fpList = corpus.getBachChorales()
     
@@ -301,8 +304,8 @@ def demoSearch():
 
     for fp in fpList[:20]:
         fn = os.path.split(fp)[1]
+        print fn
         s = converter.parse(fp)
-
         # get key, mode
         key, mode = s.analyze('key')[:2]
         if mode == 'minor':
@@ -322,10 +325,18 @@ def demoSearch():
             cLast = chord.Chord(pLast)
             cLast.quarterLength = 2
             cLast.transpose(12, inPlace=True)
+            if cLast.isMajorTriad:
+                cFirst.addLyric('M')
+        
 
-    
-            results.append(cFirst)
-            results.append(cLast)
+            m = stream.Measure()
+            m.keySignature = s.flat.getElementsByClass('KeySignature')[0]
+
+            print 'got', m.keySignature
+
+            m.append(cFirst)
+            m.append(cLast)
+            results.append(m)
 
     results.show()
 
