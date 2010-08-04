@@ -34,11 +34,11 @@ environLocal = environment.Environment(_MOD)
 
 STEPREF = {
            'C' : 0,
-           'D' : 2,
+           'D' : 2, #2
            'E' : 4,
            'F' : 5,
            'G' : 7,
-           'A' : 9,
+           'A' : 9, #9
            'B' : 11,
                }
 STEPNAMES = ['C','D','E','F','G','A','B']
@@ -147,7 +147,7 @@ def convertPsToStep(ps):
     >>> convertPsToStep(68)
     ('G', <accidental sharp>)
     >>> convertPsToStep(-2)
-    ('A', <accidental sharp>)
+    ('B', <accidental flat>)
 
     >>> convertPsToStep(60.5)
     ('C', <accidental half-sharp>)
@@ -158,7 +158,7 @@ def convertPsToStep(ps):
     >>> convertPsToStep(62.5)
     ('D', <accidental half-sharp>)
     >>> convertPsToStep(135)
-    ('D', <accidental sharp>)
+    ('E', <accidental flat>)
     '''
     # if this is a microtone it may have floating point vals
     pcReal = ps % 12 
@@ -169,15 +169,23 @@ def convertPsToStep(ps):
         micro = 0
 
     pc = int(pc)
+    # its a natural; nothing to do
     if pc in STEPREF.values():
         acc = Accidental(0+micro)
         pcName = pc 
-    elif pc-1 in STEPREF.values():
+    # if we take the pc down a half-step, do we get a stepref (natural) value
+    elif pc-1 in [0, 5, 7]: # c, f, g: can be sharped
+    #elif pc-1 in STEPREF.values():
+        # then we need an accidental to accommodate; here, a sharp
         acc = Accidental(1+micro)
         pcName = pc-1
-    elif pc+1 in STEPREF.values():
-        acc = Accidental(-1+micro)  # can't happen
+    # if we take the pc up a half-step, do we get a stepref (natural) value
+    elif pc+1 in [11, 4]: # b, e: can be flattened
+    #elif pc+1 in STEPREF.values():
+        # then we need an accidental to accommodate; here, a flat
+        acc = Accidental(-1+micro) 
         pcName = pc+1
+
     for key, value in STEPREF.items():
         if pcName == value:
             name = key
@@ -630,7 +638,7 @@ class Pitch(music21.Music21Object):
         A#
         >>> p2 = Pitch(3)
         >>> p2
-        D#
+        E-
         '''
         music21.Music21Object.__init__(self)
 
@@ -986,12 +994,12 @@ class Pitch(music21.Music21Object):
         >>> a = Pitch('a3')
         >>> a.pitchClass = 3
         >>> a
-        D#3
+        E-3
         >>> a.implicitAccidental
         True
         >>> a.pitchClass = 'A'
         >>> a
-        A#3
+        B-3
         '''
         # permit the submission of strings, like A an dB
         value = convertPitchClassToNumber(value)
@@ -1207,7 +1215,7 @@ class Pitch(music21.Music21Object):
 
     def _setMX(self, mxNote):
         '''
-        Given a MusicXML Note object, set this Ptich object to its values. 
+        Given a MusicXML Note object, set this Pitch object to its values. 
 
         >>> b = musicxml.Pitch()
         >>> b.set('octave', 3)
@@ -1226,8 +1234,16 @@ class Pitch(music21.Music21Object):
 
         self.step = mxPitch.get('step')
 
+        # sometimes we have an accidental defined but no alter value, due to 
+        # a natural; need to look at mxAccidental directly
+        mxAccidentalCharData = None
+        if mxAccidental != None:
+            mxAccidentalCharData = mxAccidental.get('charData')
+            #environLocal.printDebug(['found mxAccidental charData', mxAccidentalCharData])
+
         acc = mxPitch.get('alter')
-        if acc is not None: # None is used in musicxml but not in music21
+        # None is used in musicxml but not in music21
+        if acc != None or mxAccidentalCharData != None: 
             if mxAccidental is not None: # the source had wanted to show alter
                 accObj = Accidental()
                 accObj.mx = mxAccidental

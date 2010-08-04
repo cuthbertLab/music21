@@ -22,6 +22,7 @@ import math
 
 import music21
 
+from music21 import common
 from music21 import meter
 from music21.pitch import Pitch
 from music21 import stream 
@@ -49,7 +50,6 @@ class WindowedAnalysis(object):
         #environLocal.printDebug(self.processor)
         if 'Stream' not in streamObj.classes:
             raise WindowedAnalysisException, 'non-stream provided as argument'
-
         self._srcStream = streamObj
         # store a windowed Stream, partitioned into bars of 1/4
         self._windowedStream = self._getMinimumWindowStream() 
@@ -84,8 +84,11 @@ class WindowedAnalysis(object):
         return self._srcStream.makeMeasures(meterStream).makeTies(inPlace=True)
 
 
-    def _analyze(self, windowSize):
-        ''' Calls, for a given window size, an analysis method across all windows in the source Stream. Windows above size 1 are always overlapped, so if a window of size 2 is used, windows 1-2, then 2-3, then 3-4 are compared. If a window of size 3 is used, windows 1-3, then 2-4, then 3-5 are compared. 
+    def _analyze(self, windowSize, windowType='overlap'):
+        ''' Calls, for a given window size, an analysis method across all windows in the source Stream. 
+
+
+        If windowType is "overlap", windows above size 1 are always overlapped, so if a window of size 2 is used, windows 1-2, then 2-3, then 3-4 are compared. If a window of size 3 is used, windows 1-3, then 2-4, then 3-5 are compared. 
 
         Windows are assumed to be partitioned by :class:`music21.stream.Measure` objects.
 
@@ -106,36 +109,76 @@ class WindowedAnalysis(object):
         (36, 36)
 
         '''
+        maxWindowCount = len(self._windowedStream)
         # assuming that this is sorted
-        mStream = self._windowedStream #.getElementsByClass('Measure')
-        max = len(mStream)
-        data = [0] * (max - windowSize + 1)
-        color = [0] * (max - windowSize + 1)               
+
+        if windowType == 'overlap':
+            windowCount = maxWindowCount - windowSize + 1
+
+        if windowType == 'noOverlap':
+            windowCount = (maxWindowCount / windowSize) + 1
+
+        if windowType == 'adjacentAverage':
+            windowCount = maxWindowCount
+
+        data = [0] * windowCount
+        color = [0] * windowCount
+        # how many windows in this row
+        windowCountIndices = range(windowCount)
         
-        for i in range(max-windowSize + 1):
-            # getting a range of Measures to be used as windows
-            # for getMeasureRange(), collect is set to [] so that clefs, timesignatures, and other objects are not gathered. 
+        if windowType == 'overlap':
+            for i in windowCountIndices:
+                current = stream.Stream()
+                for j in range(i, i+windowSize):
+                    current.append(self._windowedStream[j])
+                data[i], color[i] = self.processor.process(current)
 
-            #environLocal.printDebug(['_analyzes(), i:', i, 'i+windowSize:', i+windowSize])
-            # a flat representation removes all Streams
-            current = stream.Stream()
-            for j in range(i, i+windowSize):
-                #environLocal.printDebug(['_analyzes(), j', j])
-                current.append(mStream[j])
-            current = current.flat.notes
+        elif windowType == 'noOverlap':
+            start = 0
+            end = start+windowSize
+            i = 0
+            while True:
+                if end >= len(self._windowedStream):
+                    end = len(self._windowedStream)
 
-            # using getMeasureRange() is problematic
-#             current = self._windowedStream.getMeasureRange(i, 
-#                       i+windowSize, collect=[]).flat
+                current = stream.Stream()
+                for j in range(start, end):
+                    current.append(self._windowedStream[j])
+                data[i], color[i] = self.processor.process(current)
 
-            # current is a Stream for analysis
-            data[i], color[i] = self.processor.process(current)
-             
+                start = end
+                end = start + windowSize
+                i += 1
+                if i >= windowCount:
+                    break
+       
+        elif windowType == 'adjacentAverage':
+            # first get overlapping windows
+            overlapped = []
+            for i in range(maxWindowCount - windowSize + 1):
+                current = stream.Stream()
+                # store indices of min windows that participate
+                participants = [] 
+                for j in range(i, i+windowSize):
+                    current.append(self._windowedStream[j])
+                    participants.append(j)
+                overlapped.append([current, participants])
+
+            # then distribute to each of maxWindowCount
+            for i in range(maxWindowCount):
+                # get all participants, combine into a single 
+                current = stream.Stream()
+                for dataStream, participants in overlapped:
+                    if i in participants:
+                        for m in dataStream:
+                            current.append(m)
+                data[i], color[i] = self.processor.process(current)
+
         return data, color
 
         
     def process(self, minWindow=1, maxWindow=1, windowStepSize=1, 
-                includeTotalWindow=True):
+                windowType='overlap', includeTotalWindow=True):
 
         ''' Main method for windowed analysis across one or more window size.
 
@@ -181,6 +224,16 @@ class WindowedAnalysis(object):
         else:
             min = minWindow
         
+        if windowType == None:
+            windowType = 'overlap'
+        elif windowType.lower() in ['overlap']:
+            windowType = 'overlap'
+        elif windowType.lower() in ['nooverlap', 'nonoverlapping']:
+            windowType = 'noOverlap'
+        elif windowType.lower() in ['adjacentaverage']:
+            windowType = 'adjacentAverage'
+
+
         # need to create storage for the output of each row, or the processing
         # of all windows of a single size across the entire Stream
         solutionMatrix = [] 
@@ -188,7 +241,18 @@ class WindowedAnalysis(object):
         # store meta data about each row as a dictionary
         metaMatrix = [] 
 
-        windowSizes = range(min, max+1, windowStepSize)
+        if common.isNum(windowStepSize):
+            windowSizes = range(min, max+1, windowStepSize)
+        else:
+            num, junk = common.getNumFromStr(windowStepSize)
+            windowSizes = []
+            x = min
+            while True:
+                windowSizes.append(x)
+                x = x * int(round(float(num)))
+                if x > (max * .75):
+                    break
+
         if includeTotalWindow:
             totalWindow = len(self._windowedStream)
             if totalWindow not in windowSizes:
@@ -197,7 +261,7 @@ class WindowedAnalysis(object):
         for i in windowSizes:
             environLocal.printDebug(['processing window:', i])
             # each of these results are lists, where len is based on 
-            soln, colorn = self._analyze(i) 
+            soln, colorn = self._analyze(i, windowType=windowType) 
             # store lists of results in a list of lists
             solutionMatrix.append(soln)
             colorMatrix.append(colorn)
@@ -223,7 +287,7 @@ class TestMockProcesor(object):
     def process(self, subStream):
         '''Simply count the number of notes found
         '''
-        return len(subStream.notes), None
+        return len(subStream.flat.notes), None
     
 class Test(unittest.TestCase):
 
@@ -308,6 +372,22 @@ class Test(unittest.TestCase):
         self.assertEqual(len(a[0]), 1)
 
 
+
+    def testVariableWindowing(self):
+        from music21.analysis import discrete
+        from music21 import corpus, graph
+        
+        p = discrete.KrumhanslSchmuckler()
+        s = corpus.parseWork('bach/bwv66.6')
+
+        wa = WindowedAnalysis(s, p)
+
+
+        plot = graph.PlotWindowedKrumhanslSchmuckler(s, doneAction=None,
+            windowStep=4, windowType='overlap')
+        plot.process()
+        #plot.write()
+
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
@@ -317,3 +397,6 @@ if __name__ == "__main__":
         a = Test()
 
         a.testWindowing()
+        #a.testVariableWindowing()
+
+

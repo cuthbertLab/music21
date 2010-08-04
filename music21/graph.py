@@ -1184,7 +1184,7 @@ class PlotStream(object):
         >>> s = corpus.parseWork('bach/bwv324.xml')
         >>> a = PlotStream(s)
         >>> a.ticksPitchClass()
-        [[0, 'C'], [1, 'C#'], [2, 'D'], [3, 'D#'], [4, 'E'], [5, 'F'], [6, 'F#'], [7, 'G'], [8, 'G#'], [9, 'A'], [10, 'A#'], [11, 'B']]
+        [[0, 'C'], [1, 'C#'], [2, 'D'], [3, 'Eb'], [4, 'E'], [5, 'F'], [6, 'F#'], [7, 'G'], [8, 'G#'], [9, 'A'], [10, 'Bb'], [11, 'B']]
         '''
         ticks = []
         for i in range(pcMin, pcMax+1):
@@ -1218,7 +1218,7 @@ class PlotStream(object):
         >>> from music21 import stream; s = stream.Stream()
         >>> a = PlotStream(s)
         >>> a.ticksPitchSpaceChromatic(60,72)
-        [[60, 'C4'], [61, 'C#4'], [62, 'D4'], [63, 'D#4'], [64, 'E4'], [65, 'F4'], [66, 'F#4'], [67, 'G4'], [68, 'G#4'], [69, 'A4'], [70, 'A#4'], [71, 'B4'], [72, 'C5']]
+        [[60, 'C4'], [61, 'C#4'], [62, 'D4'], [63, 'Eb4'], [64, 'E4'], [65, 'F4'], [66, 'F#4'], [67, 'G4'], [68, 'G#4'], [69, 'A4'], [70, 'Bb4'], [71, 'B4'], [72, 'C5']]
         '''
         ticks = []
         cVals = range(pitchMin, pitchMax+1)
@@ -1491,6 +1491,12 @@ class PlotWindowedAnalysis(PlotStream):
             self.windowStep = keywords['windowStep']
         else:
             self.windowStep = 8
+
+        if 'windowType' in keywords:
+            self.windowType = keywords['windowType']
+        else:
+            self.windowType = 'overlap'
+
         
         if 'compressLegend' in keywords:
             self.compressLegend = keywords['compressLegend']
@@ -1523,7 +1529,7 @@ class PlotWindowedAnalysis(PlotStream):
         '''
         wa = windowed.WindowedAnalysis(self.streamObj, self.processor)
         solutionMatrix, colorMatrix, metaMatrix = wa.process(self.minWindow, 
-                                      self.maxWindow, self.windowStep)
+            self.maxWindow, self.windowStep, windowType=self.windowType)
                 
         # get dictionaries of meta data for each row
         pos = 0
@@ -1563,9 +1569,12 @@ class PlotWindowedAnalysis(PlotStream):
         self.graphLegend.process()
 
 
-    def write(self, fp):
+    def write(self, fp=None):
         '''Process method here overridden to provide legend.
         '''
+        if fp == None:
+            fp = environLocal.getTempFile('.png')
+
         dir, fn = os.path.split(fp)
         fpLegend = os.path.join(dir, 'legend-' + fn)
         # call the process routine in the base graph
@@ -3106,7 +3115,9 @@ class Test(unittest.TestCase):
             fp = random.choice(corpus.getBachChorales('.xml'))
             dir, fn = os.path.split(fp)
             a = corpus.parseWork(fp)
-            windowStep = random.choice([1,2,4,8,16,32])
+            windowStep = '2'
+            #windowStep = random.choice([1,2,4,8,16,32])
+            a.show()
         else:
             a = corpus.parseWork('bach/bwv66.6')
             fn = 'bach/bwv66.6'
@@ -3179,6 +3190,6 @@ if __name__ == "__main__":
 
 
         #b.testColorGridLegend('write')
-        b.testPlotWindowed('write')
+        #b.testPlotWindowed('write')
 
         #a.writeAllPlots()

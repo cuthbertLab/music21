@@ -217,7 +217,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
 
     >>> c = midiEventsToChord([dt1, me1, dt2, me2, dt3, me3, dt4, me4])
     >>> c
-    <music21.chord.Chord A2 A#2>
+    <music21.chord.Chord A2 B-2>
     >>> c.duration.quarterLength
     2.0
     '''

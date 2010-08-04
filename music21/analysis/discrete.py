@@ -146,6 +146,8 @@ class DiscreteAnalysis(object):
 #------------------------------------------------------------------------------
 # alternative names
 # PitchClassKeyFinding
+# KeySearchByProbeTone
+# ProbeToneKeyFinding
 
 class KrumhanslSchmuckler(DiscreteAnalysis):
     ''' Implementation of the Krumhansl-Schmuckler key determination algorithm
@@ -156,9 +158,40 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 
     identifiers = ['krumhansl', 'schmuckler', 'key', 'keyscape']
 
+    # in general go to Gb, F#: favor F# majorKeyColors
+    # favor eb minor
+    # C- major cannot be determined if no enharmonics are present
+    # C# major can be determined w/o enharmonics
+    keysValidMajor = ['C', 'C#', 'C-',
+                      'D-', 'D',
+                      'E-', 'E',
+                      'F', 'F#',
+                      'G-', 'G',
+                      'A-', 'A',
+                      'B-', 'B',
+                    ]
+
+    keysValidMinor = ['C', 'C#',
+                      'D', 'D#',
+                      'E-', 'E',
+                      'F', 'F#',
+                      'G', 'G#',
+                      'A-', 'A', 'A#',
+                      'B-', 'B',
+                    ]
+
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         
+
+    def _getSharpFlatCount(self, subStream):
+        # pitches gets a flat representation
+        flatCount = 0
+        sharpCount = 0
+        for p in subStream.pitches:
+            if p.accidental != None:
+                pass
+
 
     def _getWeights(self, weightType='major'): 
         ''' Returns either the a weight key profile as described by Sapp and others
@@ -216,11 +249,9 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         '''
         soln = [0] * 12
         toneWeights = self._getWeights(weightType)
-                
         for i in range(len(soln)):
             for j in range(len(pcDistribution)):
                 soln[i] = soln[i] + (toneWeights[(j - i) % 12] * pcDistribution[j])
-            
         return soln  
     
     def _getLikelyKeys(self, keyResults, differences):
@@ -233,8 +264,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         
         #Return pairs, the pitch class and the correlation value, in order by point value
         for i in range(len(a)):
+            # pitch objects created here
             likelyKeys[i] = (Pitch(keyResults.index(a[i])), differences[keyResults.index(a[i])])
-        
         return likelyKeys
         
         
@@ -243,15 +274,15 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             difference of the top two keys
         '''
             
-        soln = [0]*12
-        top = [0]*12
-        bottomRight = [0]*12
-        bottomLeft = [0]*12
+        soln = [0] * 12
+        top = [0] * 12
+        bottomRight = [0] * 12
+        bottomLeft = [0] * 12
             
         toneWeights = self._getWeights(weightType)
 
-        profileAverage = float(sum(toneWeights))/len(toneWeights)
-        histogramAverage = float(sum(pcDistribution))/len(pcDistribution) 
+        profileAverage = float(sum(toneWeights)) / len(toneWeights)
+        histogramAverage = float(sum(pcDistribution)) / len(pcDistribution) 
             
         for i in range(len(soln)):
             for j in range(len(toneWeights)):
@@ -279,9 +310,6 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         >>> post = p.solutionLegend()
 
         '''
-
-        # in general go to Gb, F#: favor F# majorKeyColors
-        # favor eb minor
 
         # need a presentation order for legend; not alphabetical
         _keySortOrder = ['C-', 'C', 'C#',
@@ -334,63 +362,63 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         '''
         return 'Keys'
 
-    def solutionToColorBright(self, solution):
-        '''For a given solution, return the color.
-        '''
-
-        # store color grid information to associate particular keys to colors
-        # note: these colors were manually selected to optimize distinguishing
-        # characteristics. do not change without good reason
-        majorKeyColors = {'E-':'#D60000',
-                 'E':'#FF0000',
-                 'E#':'#FF2B00',
-                 'B-':'#FF5600',
-                 'B':'#FF8000',
-                 'B#':'#FFAB00',
-                 'F-':'#FFD600', # was #FFFD600
-                 'F':'#FFFF00',
-                 'F#':'#AAFF00',
-                 'C-':'#55FF00',
-                 'C':'#00FF00',
-                 'C#':'#00AA55',
-                 'G-':'#0055AA',
-                 'G':'#0000FF',
-                 'G#':'#2B00FF',
-                 'D-':'#5600FF',
-                 'D':'#8000FF',
-                 'D#':'#AB00FF',
-                 'A-':'#D600FF',
-                 'A':'#FF00FF',
-                 'A#':'#FF55FF'}
-        minorKeyColors = {'E-':'#720000',
-                 'E':'#9b0000',
-                 'E#':'#9b0000',
-                 'B-':'#9b0000',
-                 'B':'#9b2400',
-                 'B#':'#9b4700',
-                 'F-':'#9b7200',
-                 'F':'#9b9b00',
-                 'F#':'#469b00',
-                 'C-':'#009b00',
-                 'C':'#009b00',
-                 'C#':'#004600',
-                 'G-':'#000046',
-                 'G':'#00009B',
-                 'G#':'#00009B',
-                 'D-':'#00009b',
-                 'D':'#24009b',
-                 'D#':'#47009b',
-                 'A-':'#72009b',
-                 'A':'#9b009b',
-                 'A#':'#9b009b'}
-
-
-        key = solution[0]
-        modality = solution[1].lower()
-        if modality == "major":
-            return majorKeyColors[str(key)]
-        elif modality == "minor":
-            return minorKeyColors[str(key)]
+#     def solutionToColorBright(self, solution):
+#         '''For a given solution, return the color.
+#         '''
+# 
+#         # store color grid information to associate particular keys to colors
+#         # note: these colors were manually selected to optimize distinguishing
+#         # characteristics. do not change without good reason
+#         majorKeyColors = {'E-':'#D60000',
+#                  'E':'#FF0000',
+#                  'E#':'#FF2B00',
+#                  'B-':'#FF5600',
+#                  'B':'#FF8000',
+#                  'B#':'#FFAB00',
+#                  'F-':'#FFD600', # was #FFFD600
+#                  'F':'#FFFF00',
+#                  'F#':'#AAFF00',
+#                  'C-':'#55FF00',
+#                  'C':'#00FF00',
+#                  'C#':'#00AA55',
+#                  'G-':'#0055AA',
+#                  'G':'#0000FF',
+#                  'G#':'#2B00FF',
+#                  'D-':'#5600FF',
+#                  'D':'#8000FF',
+#                  'D#':'#AB00FF',
+#                  'A-':'#D600FF',
+#                  'A':'#FF00FF',
+#                  'A#':'#FF55FF'}
+#         minorKeyColors = {'E-':'#720000',
+#                  'E':'#9b0000',
+#                  'E#':'#9b0000',
+#                  'B-':'#9b0000',
+#                  'B':'#9b2400',
+#                  'B#':'#9b4700',
+#                  'F-':'#9b7200',
+#                  'F':'#9b9b00',
+#                  'F#':'#469b00',
+#                  'C-':'#009b00',
+#                  'C':'#009b00',
+#                  'C#':'#004600',
+#                  'G-':'#000046',
+#                  'G':'#00009B',
+#                  'G#':'#00009B',
+#                  'D-':'#00009b',
+#                  'D':'#24009b',
+#                  'D#':'#47009b',
+#                  'A-':'#72009b',
+#                  'A':'#9b009b',
+#                  'A#':'#9b009b'}
+# 
+# 
+#         key = solution[0]
+#         modality = solution[1].lower()
+#         if modality == "major":
+#             return majorKeyColors[str(key)]
+#         elif modality == "minor":
+#             return minorKeyColors[str(key)]
         
     
     def solutionToColor(self, solution):
@@ -447,29 +475,14 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 
         >>> s = corpus.parseWork('bach/bwv57.8')
         >>> p = KrumhanslSchmuckler()
-        >>> p.getSolution(s) # should be b- major
-        ('A#', 'major', 0.89772788962941652)
-
+        >>> p.getSolution(s) 
+        ('B-', 'major', 0.89772788962941652)
         '''
         # always take a flat version here, otherwise likely to get nothing
         solution, color = self.process(sStream.flat)
         return solution
     
-    
-    def process(self, sStream):    
-        ''' Takes in a Stream or sub-Stream and performs analysis on all contents of the Stream. The :class:`~music21.analysis.windowed.WindowedAnalysis` windowing system can be used to get numerous results by calling this method. 
-
-        Returns two values, a solution data list and a color string.
-
-        The data list contains a key (as a string), a mode (as a string), and a correlation value (degree of certainty)
-        '''
-    
-        # this is the sample distribution used in the paper, for some testing purposes
-        #pcDistribution = [7,0,5,0,7,16,0,16,0,15,6,0]
-        
-        # this is the distribution for the melody of "happy birthday"
-        #pcDistribution = [9,0,3,0,2,5,0,2,0,2,2,0]
-    
+    def _likelyKeys(self, sStream):
         pcDistribution = self._getPitchClassDistribution(sStream)
         environLocal.printDebug(['process(); pcDistribution', pcDistribution])
     
@@ -483,7 +496,30 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         differenceMinor = self._getDifference(keyResultsMinor, 
                           pcDistribution, 'minor')
         likelyKeysMinor = self._getLikelyKeys(keyResultsMinor, differenceMinor)
+
+        return likelyKeysMajor, likelyKeysMinor
+
+
+    def _bestKeyEnharmonic(self, pitchObj, sStream=None):
+        pass
+
+
+    def process(self, sStream):    
+        ''' Takes in a Stream or sub-Stream and performs analysis on all contents of the Stream. The :class:`~music21.analysis.windowed.WindowedAnalysis` windowing system can be used to get numerous results by calling this method. 
+
+        Returns two values, a solution data list and a color string.
+
+        The data list contains a key (as a string), a mode (as a string), and a correlation value (degree of certainty)
+        '''
+        sStream = sStream.flat.notes
+        # this is the sample distribution used in the paper, for some testing purposes
+        #pcDistribution = [7,0,5,0,7,16,0,16,0,15,6,0]
         
+        # this is the distribution for the melody of "happy birthday"
+        #pcDistribution = [9,0,3,0,2,5,0,2,0,2,2,0]
+    
+        likelyKeysMajor, likelyKeysMinor = self._likelyKeys(sStream)
+
         #find the largest correlation value to use to select major or minor as the resulting key
         if likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
             solution = (str(likelyKeysMajor[0][0]), "major", likelyKeysMajor[0][1])
@@ -712,6 +748,8 @@ class SadoianAmbitus(DiscreteAnalysis):
         >>> p.process(s)
         (63, '#665288')
         '''
+        sStream = sStream.flat.notes
+
         post = self._getPitchSpan(sStream)
         if post != None:
             solution = post[1] - post[0] # max-min
@@ -809,7 +847,54 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testKrumhansl(self):
+        from music21 import converter, stream
 
+        p = KrumhanslSchmuckler()
+        s1 = converter.parse('c4 d e f g a b c   c#4 d# e# f#', '4/4')
+        s2 = converter.parse('c#4 d# e# f#  f g a b- c d e f', '4/4')
+        s3 = converter.parse('c4 d e f g a b c   c#4 d# e# f#  c#4 d# e# f#  f g a b- c d e f', '4/4')
+
+        #self.assertEqual(p._getPitchClassDistribution(s1), [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+        p.process(s1)
+        likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1)
+        likelyKeysMajor1.sort()
+        likelyKeysMinor1.sort()
+        allResults1 =  likelyKeysMajor1 + likelyKeysMinor1
+        #print
+        post = []
+        post = sorted([(y, x) for x, y in allResults1])
+        #print post
+
+        p.process(s2)
+        likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2)
+        likelyKeysMajor2.sort()
+        likelyKeysMinor2.sort()
+        allResults2 =  likelyKeysMajor2 + likelyKeysMinor2
+        #print
+        post = []
+        post = sorted([(y, x) for x, y in allResults2])
+        #print post
+
+        likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3)
+        likelyKeysMajor3.sort()
+        likelyKeysMinor3.sort()
+        allResults3 =  likelyKeysMajor3 + likelyKeysMinor3
+        #print
+        post = []
+        post = sorted([(y, x) for x, y in allResults3])
+        #print post
+
+        avg = []
+        for i in range(len(allResults1)):
+            p, count1 = allResults1[i]
+            p, count2 = allResults2[i]
+            avg.append((p, (count1+count2)/2.0))
+        #print
+        post = []
+        post = sorted([(y, x) for x, y in avg])
+        #print post
 
 #------------------------------------------------------------------------------
 
@@ -819,6 +904,6 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         a = Test()
 
-
+        a.testKrumhansl()
 
 

@@ -2335,7 +2335,7 @@ class Test(unittest.TestCase):
         chord2 = chord1.closedPosition()
         self.assertEqual("<cis' e' g'>4", chord2.lily.value)
 
-    def testPostTonalChords(self):
+    def testPostTonalChordsA(self):
         c1 = Chord([0,1,3,6,8,9,12])
         self.assertEqual(c1.pitchClasses, [0, 1, 3, 6, 8, 9, 0])
         self.assertEqual(c1.multisetCardinality, 7)
@@ -2350,7 +2350,12 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.hasZRelation, True)
         self.assertEqual(c1.areZRelations(Chord([0,1,4,6,7,9])), True)
         self.assertEqual(c1.commonName[0], 'combinatorial RI (RI9)')
-        self.assertEqual(c1.pitchedCommonName, 'D#-combinatorial RI (RI9)')
+
+    def testPostTonalChordsB(self):
+        c1 = Chord([1, 4, 7, 10])
+        self.assertEqual(c1.commonName[0], 'diminished seventh chord')
+        self.assertEqual(c1.pitchedCommonName, 'C#-diminished seventh chord')
+
 
 
 
