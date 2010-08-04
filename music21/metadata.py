@@ -1237,7 +1237,8 @@ class Metadata(music21.Music21Object):
         # create and add work obj
         mxWork = musicxml.Work()
         match = False
-        if self.title != None:
+        if self.title not in [None, '']:
+            environLocal.printDebug(['_getMX, got title', self.title])
             match = True
             mxWork.set('workTitle', str(self.title))
             #mxWork.set('workNumber', None)
@@ -1246,13 +1247,13 @@ class Metadata(music21.Music21Object):
 
         # musicxml often defaults to show only movement title       
         # if no movement title is found, get the .title attr
-        if self.movementName != None:
+        if self.movementName not in [None, '']:
             mxScore.set('movementTitle', str(self.movementName))
         else: # it is none
             if self.title != None:
                 mxScore.set('movementTitle', str(self.title))
 
-        if self.movementNumber != None:
+        if self.movementNumber not in [None, '']:
             mxScore.set('movementNumber', str(self.movementNumber))
 
 
@@ -1281,6 +1282,7 @@ class Metadata(music21.Music21Object):
         mxWork = mxScore.get('workObj')
         if mxWork != None: # may be set to none
             self.title = mxWork.get('workTitle')
+            environLocal.printDebug(['_setMX, got title', self.title])
             self.number = mxWork.get('workNumber')
             self.opusNumber = mxWork.get('opus')
 

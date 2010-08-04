@@ -269,27 +269,65 @@ def messiaen(show = True):
 
 
 
+# minor mode bach chorales
+# >>> s = corpus.parseWork('bwv227.7')
+
+# this has bad beaming
+# move to relative major
+# ends on major I
 
 
 
 
+# >>> s = corpus.parseWork('bwv103')
+# 4/4, good beaming, has pickup
+# b minor, momves to D major, ends on major I
+# 16 measures
+
+# >>> s = corpus.parseWork('bwv18.5-lz')
+# a minor, good amount of minor iv, ends on major 1
+# 17 measures
 
 
 
+def demoSearch():
 
+    import os
+    from music21 import corpus
+    
+    fpList = corpus.getBachChorales()
+    
+    results = stream.Stream()
 
+    for fp in fpList[:20]:
+        fn = os.path.split(fp)[1]
+        s = converter.parse(fp)
 
+        # get key, mode
+        key, mode = s.analyze('key')[:2]
+        if mode == 'minor':
+            pFirst = []
+            pLast = []
 
+            for pStream in s.parts:
+                pFirst.append(pStream.flat.notes[0].pitch)
+                pLast.append(pStream.flat.notes[-1].pitch)
 
+            cFirst = chord.Chord(pFirst)
+            cFirst.quarterLength = 2
+            cFirst.transpose(12, inPlace=True)
+            cFirst.addLyric(fn)
+            cFirst.addLyric('%s %s' % (key, mode))
 
+            cLast = chord.Chord(pLast)
+            cLast.quarterLength = 2
+            cLast.transpose(12, inPlace=True)
 
+    
+            results.append(cFirst)
+            results.append(cLast)
 
-
-
-
-
-
-
+    results.show()
 
 
 
@@ -350,7 +388,11 @@ if __name__ == "__main__":
         #pitchDensity()
         #pitchQuarterLengthUsage()
         #messiaen()
-        pitchQuarterLengthUsage3D()
+        #pitchQuarterLengthUsage3D()
+
+
+        demoSearch()
+
 
 
 
