@@ -410,7 +410,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             colorsUsed = self.getColorsUsed()
             solutionsUsed = self.getSolutionsUsed()
 
-            environLocal.printDebug(['colors used:', colorsUsed])
+            #environLocal.printDebug(['colors used:', colorsUsed])
             keySortOrderFiltered = []
             for key in _keySortOrder:
                 for sol in solutionsUsed: # three v alues
@@ -434,7 +434,10 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             row.append(yLabel)
             pairs = []
             for key in [pitch.Pitch(p) for p in keySortOrderFiltered]:
-                color = self.solutionToColor([key, yLabel])
+                try:
+                    color = self.solutionToColor([key, yLabel])
+                except KeyError: # no such color defined; expected in a few 
+                    color = None # will be masked
                 mask = False
                 if compress:
                     if color not in colorsUsed:

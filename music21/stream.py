@@ -1046,7 +1046,7 @@ class Stream(music21.Music21Object):
                 element.teardownPickleScaffold()
             elif hasattr(element, "unwrapWeakref"): # recurse time:
             #elif isinstance(element, music21.Music21Object):
-                environLocal.printDebug(['processing music21 obj', element])
+                #environLocal.printDebug(['processing music21 obj', element])
                 element.wrapWeakref()
                 element.unfreezeIds()
 
@@ -1925,7 +1925,7 @@ class Stream(music21.Music21Object):
             # sort by time to search the most recent objects
             obj = self.getContextByClass(meter.TimeSignature, 
                   sortByCreationTime=sortByCreationTime)
-            environLocal.printDebug(['getTimeSignatures(): searching contexts: results', obj])
+            #environLocal.printDebug(['getTimeSignatures(): searching contexts: results', obj])
             if obj != None:
                 post.append(obj)
 
@@ -2345,7 +2345,7 @@ class Stream(music21.Music21Object):
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
         '''
-        environLocal.printDebug(['calling Stream.makeMeasures()'])
+        #environLocal.printDebug(['calling Stream.makeMeasures()'])
 
         # the srcObj shold not be modified or chagned
         # removed element copyig below and now making a deepcopy of entire stream
@@ -2610,7 +2610,7 @@ class Stream(music21.Music21Object):
         if len(measureStream) == 0:
             raise StreamException('cannot process a stream without measures')        
     
-        environLocal.printDebug(['makeTies() processing measureStream, length', measureStream, len(measureStream)])
+        #environLocal.printDebug(['makeTies() processing measureStream, length', measureStream, len(measureStream)])
 
         # may need to look in parent if no time signatures are found
         # presently searchContext is False to save time
@@ -3622,7 +3622,7 @@ class Stream(music21.Music21Object):
                     min = candidateOffset
             self._cache["LowestOffset"] = min
 
-            environLocal.printDebug(['_getLowestOffset: iterated elements', min])
+            #environLocal.printDebug(['_getLowestOffset: iterated elements', min])
 
         return self._cache["LowestOffset"]
 
@@ -4141,7 +4141,7 @@ class Stream(music21.Music21Object):
         if instObj.partId == None:
             instObj.partIdRandomize()
 
-        environLocal.printDebug(['calling Stream._getMXPart', repr(instObj), instObj.partId])
+        #environLocal.printDebug(['calling Stream._getMXPart', repr(instObj), instObj.partId])
 
 
 #         mxScorePart = musicxmlMod.ScorePart()
@@ -4152,7 +4152,7 @@ class Stream(music21.Music21Object):
         # also include midi or score instrument definitions
         mxScorePart = instObj.mx
 
-        environLocal.printDebug(['calling Stream._getMXPart', 'mxScorePart', mxScorePart, mxScorePart.get('id')])
+        #environLocal.printDebug(['calling Stream._getMXPart', 'mxScorePart', mxScorePart, mxScorePart.get('id')])
 
         mxPart = musicxmlMod.Part()
         #mxPart.setDefaults()
@@ -4276,7 +4276,7 @@ class Stream(music21.Music21Object):
                                 refStreamOrTimeRange))
 
         else: # assume this is the only part
-            environLocal.printDebug('Stream._getMX(): handling single-part Stream')
+            #environLocal.printDebug('Stream._getMX(): handling single-part Stream')
             # if no instrument is provided it will be obtained through self
             # when _getMxPart is called
             mxComponents.append(self._getMXPart(None, meterStream))
@@ -4372,7 +4372,7 @@ class Stream(music21.Music21Object):
         if firstBarDuration != None: 
             if streamPart.measures[0].barDurationProportion(
                 barDuration=firstBarDuration) < 1.0:
-                environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.measures[0]])
+                #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.measures[0]])
                 streamPart.measures[0].shiftElementsAsAnacrusis()
 
         streamPart.addGroupForElements(partId) # set group for components 
@@ -5439,8 +5439,8 @@ class Measure(Stream):
             # get 1 complement
             proportionShift = 1 - proportion
             shift = barDuration.quarterLength * proportionShift
-            environLocal.printDebug(['got anacrusis shift:', shift, 
-                                barDuration.quarterLength, proportion])
+            #environLocal.printDebug(['got anacrusis shift:', shift, 
+            #                    barDuration.quarterLength, proportion])
             # this will shift all elements
             self.shiftElements(shift, classFilterList=[note.GeneralNote])
         else:
@@ -5647,231 +5647,11 @@ class Measure(Stream):
         '''
         return musicxmlTranslate.measureToMx(self)
 
-#         mxMeasure = musicxmlMod.Measure()
-#         mxMeasure.set('number', self.measureNumber)
-# 
-#         if self.layoutWidth != None:
-#             mxMeasure.set('width', self.layoutWidth)
-# 
-#         # print objects come before attributes
-#         # note: this class match is a problem in cases where the object is created in the module itself, as in a test. 
-#         found = self.getElementsByClass(layout.SystemLayout)
-#         if len(found) > 0:
-#             sl = found[0] # assume only one
-#             mxPrint = sl.mx
-#             mxMeasure.componentList.append(mxPrint)
-# 
-#         # get an empty mxAttributes object
-#         mxAttributes = musicxmlMod.Attributes()
-#         # best to only set dvisions here, as clef, time sig, meter are not
-#         # required for each measure
-#         mxAttributes.setDefaultDivisions() 
-# 
-#         # may need to look here at the parent, and try to find
-#         # the clef in the clef last defined in the parent
-#         if self.clef is not None:
-#             mxAttributes.clefList = [self.clef.mx]
-# 
-#         if self.keySignature is not None: 
-#             # key.mx returns a Key ojbect, needs to be in a list
-#             mxAttributes.keyList = [self.keySignature.mx]
-#         
-#         if self.timeSignature is not None:
-#             mxAttributes.timeList = self.timeSignature.mx 
-# 
-#         #mxAttributes.keyList = []
-#         mxMeasure.set('attributes', mxAttributes)
-# 
-#         # see if we have a left barline
-#         if self.leftBarline != None:
-#             mxBarline = self.leftBarline.mx
-#             # setting location outside of object based on that this attribute
-#             # is the leftBarline
-#             mxBarline.set('location', 'left')
-#             mxMeasure.componentList.append(mxBarline)
-#         
-#         #need to handle objects in order when creating musicxml 
-#         for obj in self.flat:
-#             if obj.isClass(note.GeneralNote):
-#                 # .mx here returns a list of notes
-#                 mxMeasure.componentList += obj.mx
-#             elif obj.isClass(dynamics.Dynamic):
-#                 # returns an mxDirection object
-#                 mxMeasure.append(obj.mx)
-#             else: # other objects may have already been added
-#                 pass
-#                 #environLocal.printDebug(['_getMX of Measure is not processing', obj])
-# 
-#         # see if we have a right barline
-#         if self.rightBarline != None:
-#             mxBarline = self.rightBarline.mx
-#             # setting location outside of object based on attribute
-#             mxBarline.set('location', 'right')
-#             mxMeasure.componentList.append(mxBarline)
-# 
-#         return mxMeasure
-
 
     def _setMX(self, mxMeasure):
         '''Given an mxMeasure, create a music21 measure
         '''
         return musicxmlTranslate.mxToMeasure(mxMeasure, inputM21=self)
-        # measure number may be a string and not a number (always?)
-#         mNum, mSuffix = common.getNumFromStr(mxMeasure.get('number'))
-#         # assume that measure numbers are integers
-#         if mNum not in [None, '']:
-#             self.measureNumber = int(mNum)
-#         if mSuffix not in [None, '']:
-#             self.measureNumberSuffix = mSuffix
-# 
-#         data = mxMeasure.get('width')
-#         if data != None: # may need to do a format/unit conversion?
-#             self.layoutWidth = data
-#             
-#         junk = mxMeasure.get('implicit')
-# #         environLocal.printDebug(['_setMX: working on measure:',
-# #                                 self.measureNumber])
-# 
-#         mxAttributes = mxMeasure.get('attributes')
-#         mxAttributesInternal = True
-#         if mxAttributes is None:    
-#             # need to keep track of where mxattributessrc is coming from
-#             mxAttributesInternal = False
-#             # not all measures have attributes definitions; this
-#             # gets the last-encountered measure attributes
-#             mxAttributes = mxMeasure.external['attributes']
-#             if mxAttributes is None:
-#                 raise StreamException(
-#                     'no mxAttribues available for this measure')
-# 
-#         #environLocal.printDebug(['mxAttriutes clefList', mxAttributes.clefList, 
-#         #                        mxAttributesInternal])
-# 
-#         if mxAttributesInternal and len(mxAttributes.timeList) != 0:
-#             self.timeSignature = meter.TimeSignature()
-#             self.timeSignature.mx = mxAttributes.timeList
-# 
-#         if mxAttributesInternal is True and len(mxAttributes.clefList) != 0:
-#             self.clef = clef.Clef()
-#             self.clef.mx = mxAttributes.clefList
-# 
-#         if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
-#             self.keySignature = key.KeySignature()
-#             self.keySignature.mx = mxAttributes.keyList
-# 
-#         # iterate through components found on components list
-#         # set to zero for each measure
-#         offsetMeasureNote = 0 # offset of note w/n measure        
-#         mxNoteList = [] # for chords
-#         for i in range(len(mxMeasure)):
-#             mxObj = mxMeasure[i]
-#             if i < len(mxMeasure)-1:
-#                 mxObjNext = mxMeasure[i+1]
-#             else:
-#                 mxObjNext = None
-# 
-#             if isinstance(mxObj, musicxmlMod.Print):
-#                 # mxPrint objects may be found in a Measure's componetns
-#                 # contain system layout information
-#                 mxPrint = mxObj
-#                 sl = layout.SystemLayout()
-#                 sl.mx = mxPrint
-#                 # store at zero position
-#                 self.insert(0, sl)
-# 
-#             elif isinstance(mxObj, musicxmlMod.Barline):
-#                 mxBarline = mxObj
-#                 barline = bar.Barline()
-#                 barline.mx = mxBarline # configure
-#                 if barline.location == 'left':
-#                     self.leftBarline = barline
-#                 elif barline.location == 'right':
-#                     # there may be problems importing a right barline
-#                     # as we may not have  time signature
-#                     # presently, the rightBarline property uses the the 
-#                     # highestTime value
-#                     #self.rightBarline = barline
-#                     # this avoids doing a context search, but may have non
-#                     # final offset
-#                     self.insert(self.highestTime, barline)
-# 
-#                 else:
-#                     environLocal.printDebug(['not handling barline that is neither left nor right', barline, barline.location])
-# 
-#             elif isinstance(mxObj, musicxmlMod.Note):
-#                 mxNote = mxObj
-#                 if isinstance(mxObjNext, musicxmlMod.Note):
-#                     mxNoteNext = mxObjNext
-#                 else:
-#                     mxNoteNext = None
-# 
-#                 if mxNote.get('print-object') == 'no':
-#                     #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', self.measureNumber])
-#                     continue
-# 
-#                 mxGrace = mxNote.get('grace')
-#                 if mxGrace is not None: # graces have a type but not a duration
-#                     #TODO: add grace notes with duration equal to ZeroDuration
-#                     #environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
-#                     #self.measureNumber])
-#                     continue
-# 
-#                 # the first note of a chord is not identified directly; only
-#                 # by looking at the next note can we tell if we have a chord
-#                 if mxNoteNext is not None and mxNoteNext.get('chord') is True:
-#                     if mxNote.get('chord') is False:
-#                         mxNote.set('chord', True) # set the first as a chord
-# 
-#                 if mxNote.get('rest') in [None, False]: # it is a note
-# 
-#                     if mxNote.get('chord') is True:
-#                         mxNoteList.append(mxNote)
-#                         offsetIncrement = 0
-#                     else:
-#                         n = note.Note()
-#                         n.mx = mxNote
-#                         self.insert(offsetMeasureNote, n)
-#                         offsetIncrement = n.quarterLength
-#                     for mxLyric in mxNote.lyricList:
-#                         lyricObj = note.Lyric()
-#                         lyricObj.mx = mxLyric
-#                         n.lyrics.append(lyricObj)
-#                     if mxNote.get('notations') is not None:
-#                         for mxObjSub in mxNote.get('notations'):
-#                             # deal with ornaments, strill, etc
-#                             pass
-#                 else: # its a rest
-#                     n = note.Rest()
-#                     n.mx = mxNote # assign mxNote to rest obj
-#                     self.insert(offsetMeasureNote, n)            
-#                     offsetIncrement = n.quarterLength
-# 
-#                 # if we we have notes in the note list and the next
-#                 # not either does not exist or is not a chord, we 
-#                 # have a complete chord
-#                 if len(mxNoteList) > 0 and (mxNoteNext is None 
-#                     or mxNoteNext.get('chord') is False):
-#                     c = chord.Chord()
-#                     c.mx = mxNoteList
-#                     mxNoteList = [] # clear for next chord
-#                     self.insert(offsetMeasureNote, c)
-#                     offsetIncrement = c.quarterLength
-# 
-#                 # do not need to increment for musicxml chords
-#                 offsetMeasureNote += offsetIncrement
-# 
-#             # load dynamics into measure
-#             elif isinstance(mxObj, musicxmlMod.Direction):
-# #                 mxDynamicsFound, mxWedgeFound = self._getMxDynamics(mxObj)
-# #                 for mxDirection in mxDynamicsFound:
-#                 if mxObj.getDynamicMark() is not None:
-#                     d = dynamics.Dynamic()
-#                     d.mx = mxObj
-#                     self.insert(offsetMeasureNote, d)  
-#                 if mxObj.getWedge() is not None:
-#                     w = dynamics.Wedge()
-#                     w.mx = mxObj     
-#                     self.insert(offsetMeasureNote, w)  
 
     mx = property(_getMX, _setMX)    
 
@@ -5881,33 +5661,7 @@ class Measure(Stream):
         '''Provide a complete MusicXML: representation. 
         '''
         return musicxmlTranslate.measureToMusicXML(self)
-#         mxMeasure = self._getMX()
-# 
-#         mxPart = musicxmlMod.Part()
-#         mxPart.setDefaults()
-#         mxPart.append(mxMeasure) # append measure here
-# 
-# 
-#         # see if an instrument is defined in this or a prent stream
-#         instObj = self.getInstrument()
-#         mxScorePart = musicxmlMod.ScorePart()
-#         mxScorePart.set('partName', instObj.partName)
-#         mxScorePart.set('id', instObj.partId)
-#         # must set this part to the same id
-#         mxPart.set('id', instObj.partId)
-# 
-#         mxPartList = musicxmlMod.PartList()
-#         mxPartList.append(mxScorePart)
-# 
-#         mxIdentification = musicxmlMod.Identification()
-#         mxIdentification.setDefaults() # will create a composer
-#         mxScore = musicxmlMod.Score()
-#         mxScore.setDefaults()
-#         mxScore.set('partList', mxPartList)
-#         mxScore.set('identification', mxIdentification)
-#         mxScore.append(mxPart)
-# 
-#         return mxScore.xmlStr()
+
 
     musicxml = property(_getMusicXML)
 
@@ -7655,8 +7409,8 @@ class Test(unittest.TestCase):
         self.assertEqual(s1Flat.hasContext(s2), True)
 
         # this returns the proper dictionary entry
-        environLocal.printDebug(
-            ['s1Flat._definedContexts._definedContexts[id(s1)', s1Flat._definedContexts._definedContexts[id(s2)]])
+        #environLocal.printDebug(
+        #    ['s1Flat._definedContexts._definedContexts[id(s1)', s1Flat._definedContexts._definedContexts[id(s2)]])
         # we can extract out the same refernce
         s2Out = s1Flat._definedContexts.getById(id(s2))
 
@@ -7972,11 +7726,11 @@ class Test(unittest.TestCase):
 
         s2Flat = s2.flat
 
-        environLocal.printDebug(['s1', s1, id(s1)])    
-        environLocal.printDebug(['s2', s2, id(s2)])    
-        environLocal.printDebug(['s2flat', s2Flat, id(s2Flat)])
+        #environLocal.printDebug(['s1', s1, id(s1)])    
+        #environLocal.printDebug(['s2', s2, id(s2)])    
+        #environLocal.printDebug(['s2flat', s2Flat, id(s2Flat)])
 
-        environLocal.printDebug(['n1.siteIds', n1, n1.getSites(), n1.getSiteIds()])
+        #environLocal.printDebug(['n1.siteIds', n1, n1.getSites(), n1.getSiteIds()])
 
         # previously, one of these raised an error
         s3 = copy.deepcopy(s2Flat)
@@ -8961,7 +8715,7 @@ class Test(unittest.TestCase):
         s1.append(s3)
         s1.append(s4)
 
-        environLocal.printDebug(['downward:'])
+        #environLocal.printDebug(['downward:'])
 
         match = []
         for x in s1._yieldElementsDownward():
@@ -8969,7 +8723,7 @@ class Test(unittest.TestCase):
             #environLocal.printDebug([x, x.id, 'parent', x.parent])
         self.assertEqual(match, ['1a', '2a', '3a', '3b', '3c', '2b', '3d', '3e', '2c', '3f'])
 
-        environLocal.printDebug(['downward with elements:'])
+        #environLocal.printDebug(['downward with elements:'])
         match = []
         for x in s1._yieldElementsDownward(excludeNonContainers=False):
             match.append(x.id)
@@ -8977,7 +8731,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['1a', 'n(1a)', '2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c', '2b', 'n2(2b)', '3d', '3e', '2c', '3f'])
 
 
-        environLocal.printDebug(['downward from non-topmost element:'])
+        #environLocal.printDebug(['downward from non-topmost element:'])
         match = []
         for x in s2._yieldElementsDownward(excludeNonContainers=False):
             match.append(x.id)
@@ -8985,7 +8739,7 @@ class Test(unittest.TestCase):
         # test downward
         self.assertEqual(match, ['2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c'])
 
-        environLocal.printDebug(['upward, with skipDuplicates:'])
+        #environLocal.printDebug(['upward, with skipDuplicates:'])
         match = []
         # must provide empty list for memo
         for x in s7._yieldElementsUpward([], skipDuplicates=True):
@@ -8994,7 +8748,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
 
 
-        environLocal.printDebug(['upward from a single node, with skipDuplicates'])
+        #environLocal.printDebug(['upward from a single node, with skipDuplicates'])
         match = []
         for x in s10._yieldElementsUpward([]):
             match.append(x.id)
@@ -9003,7 +8757,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '2b'] )
 
 
-        environLocal.printDebug(['upward with skipDuplicates=False:'])
+        #environLocal.printDebug(['upward with skipDuplicates=False:'])
         match = []
         for x in s10._yieldElementsUpward([], skipDuplicates=False):
             match.append(x.id)
@@ -9011,7 +8765,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
 
 
-        environLocal.printDebug(['upward, with skipDuplicates, excludeNonContainers=False:'])
+        #environLocal.printDebug(['upward, with skipDuplicates, excludeNonContainers=False:'])
         match = []
         # must provide empty list for memo
         for x in s8._yieldElementsUpward([], excludeNonContainers=False, 
@@ -9021,7 +8775,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['3d', 'n2(2b)', '2b', 'n(1a)', '1a', '2a', '2c', '3e'] )
 
 
-        environLocal.printDebug(['upward, with skipDuplicates, excludeNonContainers=False:'])
+        #environLocal.printDebug(['upward, with skipDuplicates, excludeNonContainers=False:'])
         match = []
         # must provide empty list for memo
         for x in s4._yieldElementsUpward([], excludeNonContainers=False, 

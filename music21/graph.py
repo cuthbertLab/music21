@@ -3201,7 +3201,7 @@ if __name__ == "__main__":
         #a.writeAllPlots()
 
 
-        #b.testColorGridLegend('write')
-        b.testPlotWindowed('write')
+        b.testColorGridLegend('write')
+        #b.testPlotWindowed('write')
 
         #a.writeAllPlots()
