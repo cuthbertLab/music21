@@ -115,10 +115,10 @@ class WindowedAnalysis(object):
         if windowType == 'overlap':
             windowCount = maxWindowCount - windowSize + 1
 
-        if windowType == 'noOverlap':
+        elif windowType == 'noOverlap':
             windowCount = (maxWindowCount / windowSize) + 1
 
-        if windowType == 'adjacentAverage':
+        elif windowType == 'adjacentAverage':
             windowCount = maxWindowCount
 
         data = [0] * windowCount

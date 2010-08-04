@@ -188,6 +188,60 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             self.sharpFlatCount = self._getSharpFlatCount(referenceStream)
         else:
             self.sharpFlatCount = None
+        
+        self._majorKeyColors = {}
+        self._minorKeyColors = {}
+        self._fillColorDictionaries()
+    
+    def _fillColorDictionaries(self):
+        '''
+        >>> p = KrumhanslSchmuckler()
+        >>> len(p._majorKeyColors)
+        15
+        >>> p._majorKeyColors['C']
+        '#ff816b'
+        '''
+        # for each step, assign a color
+        # names taken from http://chaos2.org/misc/rgb.html    
+        # idea is basically:
+        # red, orange, yellow, green, cyan, blue, purple, pink
+        stepLib = {'C': '#CD4F39', # tomato3
+                'D': '#DAA520', # goldenrod
+                'E': '#BCEE68', # DarkOliveGreen2
+                'F': '#96CDCD', # PaleTurquoise3
+                'G': '#6495ED', # cornflower blue
+                'A': '#8968CD', # MediumPurple3
+                'B': '#FF83FA', # orchid1
+
+                } 
+        for dst, valid in [(self._majorKeyColors, self.keysValidMajor), 
+                           (self._minorKeyColors, self.keysValidMinor)]:
+            for key in valid:
+                # convert to pitch object
+                key = pitch.Pitch(key)
+                step = key.step # get C for C#
+                rgbStep = self._hexToRgb(stepLib[step])
+                # make all the colors a bit lighter
+                for i in range(len(rgbStep)):
+                    rgbStep[i] = self._rgbLimit(rgbStep[i] + 50)
+        
+                #make minor darker
+                if valid == self.keysValidMinor:
+                    for i in range(len(rgbStep)):
+                        rgbStep[i] = self._rgbLimit(rgbStep[i] - 100)
+        
+                if len(key.name) > 1:
+                    magnitude = 15
+                    if key.name[1] == '-':
+                        # index and value shift for each of rgb values
+                        shiftLib = {0: magnitude, 1: magnitude, 2: -magnitude}                   
+                    elif key.name[1] == '#':                   
+                        shiftLib = {0: -magnitude, 1: -magnitude, 2: magnitude}                   
+                    for i in shiftLib.keys():
+                        rgbStep[i] = self._rgbLimit(rgbStep[i] + shiftLib[i])
+                # add to dictionary
+                dst[key.name] = self._rgbToHex(rgbStep)
+
 
     def _getSharpFlatCount(self, subStream):
         '''Determine count of sharps and flats in a Stream
@@ -407,112 +461,17 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         '''
         return 'Keys'
 
-#     def solutionToColorBright(self, solution):
-#         '''For a given solution, return the color.
-#         '''
-# 
-#         # store color grid information to associate particular keys to colors
-#         # note: these colors were manually selected to optimize distinguishing
-#         # characteristics. do not change without good reason
-#         majorKeyColors = {'E-':'#D60000',
-#                  'E':'#FF0000',
-#                  'E#':'#FF2B00',
-#                  'B-':'#FF5600',
-#                  'B':'#FF8000',
-#                  'B#':'#FFAB00',
-#                  'F-':'#FFD600', # was #FFFD600
-#                  'F':'#FFFF00',
-#                  'F#':'#AAFF00',
-#                  'C-':'#55FF00',
-#                  'C':'#00FF00',
-#                  'C#':'#00AA55',
-#                  'G-':'#0055AA',
-#                  'G':'#0000FF',
-#                  'G#':'#2B00FF',
-#                  'D-':'#5600FF',
-#                  'D':'#8000FF',
-#                  'D#':'#AB00FF',
-#                  'A-':'#D600FF',
-#                  'A':'#FF00FF',
-#                  'A#':'#FF55FF'}
-#         minorKeyColors = {'E-':'#720000',
-#                  'E':'#9b0000',
-#                  'E#':'#9b0000',
-#                  'B-':'#9b0000',
-#                  'B':'#9b2400',
-#                  'B#':'#9b4700',
-#                  'F-':'#9b7200',
-#                  'F':'#9b9b00',
-#                  'F#':'#469b00',
-#                  'C-':'#009b00',
-#                  'C':'#009b00',
-#                  'C#':'#004600',
-#                  'G-':'#000046',
-#                  'G':'#00009B',
-#                  'G#':'#00009B',
-#                  'D-':'#00009b',
-#                  'D':'#24009b',
-#                  'D#':'#47009b',
-#                  'A-':'#72009b',
-#                  'A':'#9b009b',
-#                  'A#':'#9b009b'}
-# 
-# 
-#         key = solution[0]
-#         modality = solution[1].lower()
-#         if modality == "major":
-#             return majorKeyColors[str(key)]
-#         elif modality == "minor":
-#             return minorKeyColors[str(key)]
-        
     
     def solutionToColor(self, solution):
-        
         key = solution[0]
-
         # key may be None
         if key == None:
             return '#ffffff'
-
         modality = solution[1].lower()
-
-        # for each step, assign a color
-        # names taken from http://chaos2.org/misc/rgb.html    
-        # idea is basically:
-        # red, orange, yellow, green, cyan, blue, purple, pink
-        stepLib = {'C': '#CD4F39', # tomato3
-                'D': '#DAA520', # goldenrod
-                'E': '#BCEE68', # DarkOliveGreen2
-                'F': '#96CDCD', # PaleTurquoise3
-                'G': '#6495ED', # cornflower blue
-                'A': '#8968CD', # MediumPurple3
-                'B': '#FF83FA', # orchid1
-
-                } 
-        # value is pitch object; first char is always step
-        step = key.step # get C for C#
-        rgbStep = self._hexToRgb(stepLib[step])
-        # make all the colors a bit lighter
-        for i in range(len(rgbStep)):
-            rgbStep[i] = self._rgbLimit(rgbStep[i] + 50)
-
-        #make minor darker
-        if modality == 'minor':
-            for i in range(len(rgbStep)):
-                rgbStep[i] = self._rgbLimit(rgbStep[i] - 100)
-
-        if len(key.name) > 1:
-            magnitude = 15
-            if key.name[1] == '-':
-                # index and value shift for each of rgb values
-                shiftLib = {0: magnitude, 1: magnitude, 2: -magnitude}                   
-            elif key.name[1] == '#':                   
-                shiftLib = {0: -magnitude, 1: -magnitude, 2: magnitude}                   
-            for i in shiftLib.keys():
-                rgbStep[i] = self._rgbLimit(rgbStep[i] + shiftLib[i])
-
-
-        return self._rgbToHex(rgbStep)
+        if modality == 'major':
+            return self._majorKeyColors[key.name]
+        else:
+            return self._minorKeyColors[key.name]
 
 
 

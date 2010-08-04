@@ -1743,7 +1743,7 @@ class Stream(music21.Music21Object):
         # there may be more than one Measure with the same Measure number
         mapRaw = {}
         mNumbersUnique = [] # store just the numbers
-        for m in self.getMeasures():
+        for m in self.getElementsByClass('Measure'):
             # mId is a tuple of measure nmber and any suffix
             mId = (m.measureNumber, m.measureNumberSuffix)
             # store unique measure numbers for reference

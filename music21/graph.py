@@ -90,6 +90,12 @@ class Graph(object):
         else:
             self.alpha = .2
 
+        if 'dpi' in keywords:
+            self.dpi = keywords['dpi']
+        else:
+            self.dpi = None # do not set
+
+
         # set the color of the background data region
         if 'colorBackgroundData' in keywords:
             self.colorBackgroundData = keywords['colorBackgroundData']
@@ -358,8 +364,14 @@ class Graph(object):
         if fp == None:
             fp = environLocal.getTempFile('.png')
         #print _MOD, fp
-        self.fig.savefig(fp, facecolor=self.colorBackgroundFigure,      
+        if self.dpi != None:
+            self.fig.savefig(fp, facecolor=self.colorBackgroundFigure,      
+                             edgecolor=self.colorBackgroundFigure,
+                              dpi=self.dpi)
+        else:
+            self.fig.savefig(fp, facecolor=self.colorBackgroundFigure,      
                              edgecolor=self.colorBackgroundFigure)
+
         environLocal.launch('png', fp)
 
 
@@ -3115,7 +3127,7 @@ class Test(unittest.TestCase):
             fp = random.choice(corpus.getBachChorales('.xml'))
             dir, fn = os.path.split(fp)
             a = corpus.parseWork(fp)
-            windowStep = '2'
+            windowStep = 3 #'2'
             #windowStep = random.choice([1,2,4,8,16,32])
             #a.show()
         else:
@@ -3130,7 +3142,7 @@ class Test(unittest.TestCase):
 
         b = PlotWindowedKrumhanslSchmuckler(a, title=fn,
             minWindow=1, windowStep=windowStep, 
-            doneAction=doneAction)
+            doneAction=doneAction, dpi=300)
         b.process()
 
 
