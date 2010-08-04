@@ -357,24 +357,24 @@ def demoBasic():
 
 
 
-def demoAnalysis<essiaen():
-    # use Messian, ciconia, bach
+def demoGraphMessiaen():
+    # use Messiaen, ciconia, bach
     fp = '/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml'
     dpi = 300
 
-    pieceTitle = '"Mode de valeurs...", Part 2'
+    pieceTitle = 'Messiaen, Mode de valeurs..., Part 2'
 
     s = converter.parse(fp).stripTies()
 
-#     s.plot('histogram', 'pitchspace', dpi=dpi, title='Pitch Space Usage, %s' % pieceTitle)
-# 
-#     s.plot('histogram', 'pitchclass', dpi=dpi, title='Pitch Class Usage, %s' % pieceTitle)
-# 
-# 
-#     s.plot('scatter', values=['pitchclass', 'offset'], dpi=dpi, title='Pitch Class By Measure, %s' % pieceTitle)
-# 
-#     s.plot('horizontalBar', values=['pitchclass', 'offset'], dpi=dpi, title='Pitch Space By Measure, %s' % pieceTitle)
-# 
+    s.plot('histogram', 'pitchspace', dpi=dpi, title='Pitch Space Usage, %s' % pieceTitle)
+
+    s.plot('histogram', 'pitchclass', dpi=dpi, title='Pitch Class Usage, %s' % pieceTitle)
+
+
+    s.plot('scatter', values=['pitchclass', 'offset'], dpi=dpi, title='Pitch Class By Measure, %s' % pieceTitle)
+
+    s.plot('horizontalBar', values=['pitch', 'offset'], dpi=dpi, title='Pitch By Measure, %s' % pieceTitle)
+
 
     s.plot('scatterweighted', values=['pitch', 'quarterlength'], dpi=dpi, title='Pitch and Duration, %s' % pieceTitle)
 
@@ -525,7 +525,7 @@ if __name__ == "__main__":
 
         #demoSearch()
 
-        demoAnalysis()
+        demoGraphMessiaen()
 
 
 
