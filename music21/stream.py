@@ -9380,6 +9380,6 @@ if __name__ == "__main__":
        # a.testAnalyze()
 
         #a.testMakeTupletBracketsA()
-        #a.testMakeTupletBracketsB()
+        a.testMakeTupletBracketsB()
 
-        a.testMakeNotation()
+        #a.testMakeNotation()
