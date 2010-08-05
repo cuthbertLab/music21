@@ -24,6 +24,7 @@ import music21
 from music21 import meter
 from music21 import pitch
 from music21 import stream 
+from music21 import interval
 
 
 
@@ -835,16 +836,17 @@ class SadoianAmbitus(DiscreteAnalysis):
 
 
     def getSolution(self, sStream):
-        ''' procedure to only return a text solution
+        '''Procedure to only return an Inteval object.
+
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
         >>> p = SadoianAmbitus()
         >>> p.getSolution(s)
-        34
+        <music21.interval.Interval m21>
 
         '''
         solution, color = self.process(sStream)
-        return solution
+        return interval.Interval(solution)
 
 
 #------------------------------------------------------------------------------
@@ -863,12 +865,12 @@ def analyzeStream(streamObj, *args, **keywords):
     >>> analysis.discrete.analyzeStream(s, 'Krumhansl')
     (F#, 'minor', 0.81547089257624916)
     >>> analysis.discrete.analyzeStream(s, 'ambitus')
-    34
+    <music21.interval.Interval m21>
 
     >>> analysis.discrete.analyzeStream(s, 'key')[:2]
     (F#, 'minor')
     >>> analysis.discrete.analyzeStream(s, 'range')
-    34
+    <music21.interval.Interval m21>
     '''
     analysisClasses = [
         SadoianAmbitus,

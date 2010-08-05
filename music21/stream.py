@@ -1120,7 +1120,7 @@ class Stream(music21.Music21Object):
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
         >>> s.analyze('ambitus')
-        34
+        <music21.interval.Interval m21>
         >>> s.analyze('krumhansl')
         (F#, 'minor', 0.81547089257624916)
         '''
@@ -1868,7 +1868,6 @@ class Stream(music21.Music21Object):
         return self.getElementsByClass(Measure)
 
     measures = property(getMeasures)
-    # rename ._measureElements?
 
     def measureOffsetMap(self, classFilterList=None):
         '''If this Stream contains Measures, provide a dictionary where keys are offsets and values are a list of references to one or more Measures that start at that offset. The offset values is always in the frame of the calling Stream (self).
@@ -9128,19 +9127,22 @@ class Test(unittest.TestCase):
         sub = [s.parts[0], s.parts[1], s.getMeasureRange(4,5), 
                 s.parts[2].getMeasureRange(4,5)]
 
-        matchAmbitus = [12, 15, 26, 10]
+        matchAmbitus = [interval.Interval(12), 
+                        interval.Interval(15), 
+                        interval.Interval(26), 
+                        interval.Interval(10)]
 
         for i in range(len(sub)):
             sTest = sub[i]
             post = sTest.analyze('ambitus')
-            self.assertEqual(post, matchAmbitus[i])
+            self.assertEqual(str(post), str(matchAmbitus[i]))
 
         # match values for different analysis strings
         for idStr in ['range', 'ambitus', 'span']:
             for i in range(len(sub)):
                 sTest = sub[i]
                 post = sTest.analyze(idStr)
-                self.assertEqual(post, matchAmbitus[i])
+                self.assertEqual(str(post), str(matchAmbitus[i]))
 
 
         # only match first two values
