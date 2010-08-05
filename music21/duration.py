@@ -832,9 +832,9 @@ class Tuplet(object):
         else:
             self.durationNormal = DurationUnit("eighth") 
 
-        # type needs to be set at the start/stop of each group
-        # if set to None, will not be included
-        self.type = None # start/stop: for mxl bracket/group drawing 
+        # start/stop, or startStop: for mxl bracket/group drawing 
+        # startStop is not used in musicxml, but is encoded as two notations
+        self.type = None   
         self.bracket = True # true or false
         self.placement = "above" # above or below
         self.tupletActualShow = "number" # could be "number","type", or "none"
@@ -1020,21 +1020,36 @@ class Tuplet(object):
         mxTimeModification.set('normal-notes', self.numberNotesNormal)
         mxTimeModification.set('normal-type', self.durationNormal.type)
 
-        if self.type != None and self.type != "":
-            if self.type not in ["start", "stop"]:
-                raise TupletException("Cannot create music XML from a tuplet of type " + self.type)
-            mxTuplet = musicxmlMod.Tuplet()
-            # start/stop; needs to bet set by group
-            mxTuplet.set('type', self.type) 
-            # only provide other parameters if this tuplet is a start
-            if self.type == 'start':
-                mxTuplet.set('bracket', musicxmlMod.booleanToYesNo(
-                             self.bracket)) 
-                mxTuplet.set('placement', self.placement) 
-        else: # cannot provide an empty tuplet; return None
-            mxTuplet = None 
 
-        return mxTimeModification, mxTuplet
+        environLocal.printDebug(['_getMX(), fonud tuplet type:', self.type, 'bracket:', self.bracket, self])
+
+        # need to permit a tuplet type that is startStop, that
+        # create two mxTuplet objects, one for starting and one
+        # for stopping
+        # can have type 'start' with bracket 'no'
+        mxTupletList = []
+        if self.type not in [None, '']:
+            if self.type not in ['start', 'stop', 'startStop']:
+                raise TupletException("Cannot create music XML from a tuplet of type " + self.type)
+
+            if self.type == 'startStop': # need two mxObjects
+                localType = ['start', 'stop']
+            else:
+                localType = [self.type] # place in list
+
+            for type in localType:
+                mxTuplet = musicxmlMod.Tuplet()
+                # start/stop; needs to bet set by group
+                mxTuplet.set('type', type) 
+                # only provide other parameters if this tuplet is a start
+                if type == 'start':
+                    mxTuplet.set('bracket', musicxmlMod.booleanToYesNo(
+                                 self.bracket)) 
+                    mxTuplet.set('placement', self.placement) 
+                # append each
+                mxTupletList.append(mxTuplet)
+
+        return mxTimeModification, mxTupletList
 
     def _setMX(self, mxNote):
         '''Given an mxNote, based on mxTimeModification and mxTuplet objects, return a Tuplet object
@@ -1830,6 +1845,10 @@ class Duration(DurationCommon):
     dots = property(_getDots, _setDots)
 
     def _getTuplets(self):
+        '''
+        When there are more than one component, each component may have its 
+        own tuplet. 
+        '''
         if self._componentsNeedUpdating == True:
             self._updateComponents()
         if len(self.components) > 1:
@@ -1957,9 +1976,6 @@ class Duration(DurationCommon):
         # second pass for ties if more than one components
         # this assumes that all component are tied
 
-        # need to look for start and stop of tuplets
-        tupletStatus = None
-
         for i in range(len(self.components)):
             dur = self.components[i]
             mxNote = post[i]
@@ -1997,13 +2013,15 @@ class Duration(DurationCommon):
                 mxNote.set('tieList', mxTieList)
 
             if len(dur.tuplets) > 0:
-                mxTimeModification, mxTuplet = dur.tuplets[0].mx
+                # only getting first tuplet here
+                mxTimeModification, mxTupletList = dur.tuplets[0].mx
                 mxNote.set('timemodification', mxTimeModification)
-                if mxTuplet != None:
-                    mxNotations.append(mxTuplet)
+                if mxTupletList != []:
+                    mxNotations.componentList += mxTupletList
 
             # add notations to mxNote
             mxNote.set('notations', mxNotations)
+
         return post # a list of mxNotes
 
     def _setMX(self, mxNote):

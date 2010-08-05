@@ -2827,7 +2827,7 @@ class Stream(music21.Music21Object):
     def makeTupletBrackets(self, inPlace=True):
         '''Given a Stream of mixed durations, the first and last tuplet of any group of tuplets must be designated as the start and end. 
 
-        We know we have the end of a tuplet when the sum of the quarter lengths is an integer or we reach the end of this Stream.
+        Need to not only look at Notes, but components within Notes, as these might contain additional tuplets.
         '''
 
         if not inPlace: # make a copy
@@ -2836,28 +2836,74 @@ class Stream(music21.Music21Object):
             returnObj = self
         
         open = False
-        sum = 0
+        tupletCount = 0
         lastTuplet = None
 
-        for e in returnObj._elements:
-            if hasattr(e, 'duration') and e.duration != None:
-                tContainer = e.duration.tuplets
-                environLocal.printDebug(['makeTupletBrackets', tContainer])
+        # only want to look at notes
+        notes = returnObj.notes
+        durList = []
+        for e in notes:
+            for d in e.duration.components: 
+                durList.append(d)
+
+        eCount = len(durList)
+
+        #environLocal.printDebug(['calling makeTupletBrackets, lenght of notes:', eCount])
+
+        for i in range(eCount):
+            e = durList[i]
+            if e != None:
+                if e.tuplets == None:
+                    continue
+                tContainer = e.tuplets
+                #environLocal.printDebug(['makeTupletBrackets', tContainer])
                 if len(tContainer) == 0:
                     t = None
                 else:
                     t = tContainer[0] # get first?
                 
+                # end case: this Note does not have a tuplet
                 if t == None:
                     if open == True: # at the end of a tuplet span
                         open = False
-                        lastTuplet.type = 'stop'
-                else:
-                    environLocal.printDebug(['makeTupletBrackets', 'existing typlet type', t.type])
-
-                    open = True
-                    t.type = 'start'
+                        # now have a non-tuplet, but the tuplet span was only
+                        # one tuplet long; do not place a bracket
+                        if tupletCount == 1:        
+                            lastTuplet.type = 'startStop'
+                            lastTuplet.bracket = False
+                        else:
+                            lastTuplet.type = 'stop'
+                    tupletCount = 0
+                else: # have a tuplet
+                    tupletCount += 1
+                    # store this as the last tupelt
                     lastTuplet = t
+
+                    #environLocal.printDebug(['makeTupletBrackets', e, 'existing typlet type', t.type, 'bracket', t.bracket, 'tuplet count:', tupletCount])
+                        
+                    # already open bracket
+                    if open:
+                        # end case: this is the last element and its a tuplet
+                        # since this is an open bracket, we know we have more 
+                        # than one tuplet in this span
+                        if i == eCount - 1:
+                            t.type = 'stop'
+                        # if this the middle of a span, do nothing
+                        else:
+                            pass
+                    else: # need to open
+                        open = True
+                        # if this is the last event in this Stream
+                        # do not create bracket
+                        if i == eCount - 1:
+                            t.type = 'startStop'
+                            t.bracket = False
+                        # normal start of tuplet span
+                        else:
+                            t.type = 'start'
+            
+#                 if t != None:
+#                     environLocal.printDebug(['makeTupletBrackets', e, 'final type', t.type, 'bracket', t.bracket])
 
         return returnObj
 
@@ -2972,12 +3018,24 @@ class Stream(music21.Music21Object):
                 m.makeAccidentals()
 
         measureStream.makeTies(meterStream, inPlace=True)
+
+
         #measureStream.makeBeams(inPlace=True)
         try:
             measureStream.makeBeams(inPlace=True)
         except StreamException:
+            # this is a result of makeMeaures not getting everything 
+            # note to measure allocation right
             environLocal.printDebug(['skipping makeBeams exception', 
                                     StreamException])
+
+        # note: this needs to be after makeBeams, as placing this before
+        # makeBeams was causing the duration's tuplet to loose its type setting
+        # check for tuplet brackets one measure at a time       
+        # this means that they will never extend beyond one measure
+        for m in measureStream.getElementsByClass('Measure'):
+            m.makeTupletBrackets(inPlace=True)
+
 
         if len(measureStream) == 0:            
             raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
@@ -9109,10 +9167,61 @@ class Test(unittest.TestCase):
 
             
 
-    def testMakeTupletBrackets(self):
-        
+    def testMakeTupletBracketsA(self):
+        '''Creating brackets
+        '''
+        def collectType(s):
+            post = []
+            for e in s:
+                if len(e.duration.tuplets) > 0:
+                    post.append(e.duration.tuplets[0].type)
+                else:
+                    post.append(None)
+            return post
 
-#         def collectTupletTypes(s):
+        def collectBracket(s):
+            post = []
+            for e in s:
+                if len(e.duration.tuplets) > 0:
+                    post.append(e.duration.tuplets[0].bracket)
+                else:
+                    post.append(None)
+            return post
+
+        # case of incomplete, single tuplet ending the Stream
+        # remove bracket
+        s = Stream()
+        qlList = [1, 2, .5, 1/6.]
+        for ql in qlList:
+            n = note.Note()
+            n.quarterLength = ql
+            s.append(n)
+        s.makeTupletBrackets()
+        self.assertEqual(collectType(s), [None, None, None, 'startStop'])
+        self.assertEqual(collectBracket(s), [None, None, None, False])
+        #s.show()
+
+
+    def testMakeTupletBracketsB(self):
+        '''Creating brackets
+        '''
+        def collectType(s):
+            post = []
+            for e in s:
+                if len(e.duration.tuplets) > 0:
+                    post.append(e.duration.tuplets[0].type)
+                else:
+                    post.append(None)
+            return post
+
+        def collectBracket(s):
+            post = []
+            for e in s:
+                if len(e.duration.tuplets) > 0:
+                    post.append(e.duration.tuplets[0].bracket)
+                else:
+                    post.append(None)
+            return post
 
         s = Stream()
         qlList = [1, 1/3., 1/3., 1/3., 1, 1]
@@ -9120,9 +9229,131 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-
         s.makeTupletBrackets()
+        self.assertEqual(collectType(s), [None, 'start', None, 'stop', None, None])
         #s.show()
+
+
+        s = Stream()
+        qlList = [1, 1/6., 1/6., 1/6., 1/6., 1/6., 1/6., 1, 1]
+        for ql in qlList:
+            n = note.Note()
+            n.quarterLength = ql
+            s.append(n)
+        s.makeTupletBrackets()
+        # this is the correct type settings but this displays by dividing
+        # into two brackets
+        self.assertEqual(collectType(s), [None, 'start', None, None, None, None, 'stop', None, None] )
+        #s.show()
+
+        # case of tuplet ending the Stream
+        s = Stream()
+        qlList = [1, 2, .5, 1/6., 1/6., 1/6., ]
+        for ql in qlList:
+            n = note.Note()
+            n.quarterLength = ql
+            s.append(n)
+        s.makeTupletBrackets()
+        self.assertEqual(collectType(s), [None, None, None, 'start', None, 'stop'] )
+        #s.show()
+
+
+        # case of incomplete, single tuplets in the middle of a Strem
+        s = Stream()
+        qlList = [1, 1/3., 1, 1/3., 1, 1/3.]
+        for ql in qlList:
+            n = note.Note()
+            n.quarterLength = ql
+            s.append(n)
+        s.makeTupletBrackets()
+        self.assertEqual(collectType(s), [None, 'startStop', None,  'startStop', None,  'startStop'])
+        self.assertEqual(collectBracket(s), [None, False, None, False, None, False])
+        #s.show()
+
+        # diverse groups that sum to a whole
+        s = Stream()
+        qlList = [1, 1/3., 2/3., 2/3., 1/6., 1/6., 1]
+        for ql in qlList:
+            n = note.Note()
+            n.quarterLength = ql
+            s.append(n)
+        s.makeTupletBrackets()
+        self.assertEqual(collectType(s), [None, 'start', None, None, None, 'stop', None])
+        #s.show()
+
+
+        # diverse groups that sum to a whole
+        s = Stream()
+        qlList = [1, 1/3., 2/3., 1, 1/12., 1/3., 1/3., 1/12. ]
+        for ql in qlList:
+            n = note.Note()
+            n.quarterLength = ql
+            s.append(n)
+        s.makeTupletBrackets()
+        self.assertEqual(collectType(s), [None, 'start', 'stop', None, 'start', None, None, 'stop'] )
+        self.assertEqual(collectBracket(s), [None, True, True, None, True, True, True, True])
+        #s.show()
+
+
+        # quintuplets
+        s = Stream()
+        qlList = [1, 1/5., 1/5., 1/10., 1/10., 1/5., 1/5., 2. ]
+        for ql in qlList:
+            n = note.Note()
+            n.quarterLength = ql
+            s.append(n)
+        s.makeTupletBrackets()
+        self.assertEqual(collectType(s), [None, 'start', None, None, None, None, 'stop', None]  )
+        self.assertEqual(collectBracket(s), [None, True, True, True, True, True, True, None] )
+        #s.show()
+
+
+
+
+    def testMakeNotation(self):
+        '''This is a test of many make procedures
+        '''
+        def collectTupletType(s):
+            post = []
+            for e in s:
+                if len(e.duration.tuplets) > 0:
+                    post.append(e.duration.tuplets[0].type)
+                else:
+                    post.append(None)
+            return post
+
+        def collectTupletBracket(s):
+            post = []
+            for e in s:
+                if len(e.duration.tuplets) > 0:
+                    post.append(e.duration.tuplets[0].bracket)
+                else:
+                    post.append(None)
+            return post
+
+#         s = Stream()
+#         qlList = [1, 1/3., 1/3., 1/3., 1, 1, 1/3., 1/3., 1/3., 1, 1]
+#         for ql in qlList:
+#             n = note.Note()
+#             n.quarterLength = ql
+#             s.append(n)
+#         postMake = s.makeNotation()
+#         self.assertEqual(collectTupletType(postMake.flat.notes), [None, 'start', None, 'stop', None, None, 'start', None, 'stop', None, None])
+#         #s.show()
+
+
+        s = Stream()
+        qlList = [1/3.,]
+        for ql in qlList:
+            n = note.Note()
+            n.quarterLength = ql
+            s.append(n)
+        postMake = s.makeNotation()
+        self.assertEqual(collectTupletType(postMake.flat.notes), ['startStop'])
+        self.assertEqual(collectTupletBracket(postMake.flat.notes), [False])
+
+        #s.show()
+
 
 
 
@@ -9147,4 +9378,8 @@ if __name__ == "__main__":
         #a.testFindGaps()
         #a.testQuantize()
        # a.testAnalyze()
-        a.testMakeTupletBrackets()
+
+        #a.testMakeTupletBracketsA()
+        #a.testMakeTupletBracketsB()
+
+        a.testMakeNotation()
