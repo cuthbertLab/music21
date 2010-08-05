@@ -97,12 +97,12 @@ def showDots(show=True):
                 ts.beat[h][i][j] = \
                     ts.beat[h][i][j].subdivide(2)
     
-    for m in partBass.measures:
+    for m in partBass.getElementsByClass('Measure'):
         for n in m.notes:
             for i in range(ts.getBeatDepth(n.offset)):
                 n.addLyric('*')
     if show:
-        partBass.measures[0:7].show() 
+        partBass.getElementsByClass('Measure')[0:7].show() 
 
 
 
@@ -122,8 +122,8 @@ def findRaisedSevenths(show=True):
         found.insert(count, 
             part.flat.getElementsByClass(
             music21.clef.Clef)[0])
-        for i in range(len(part.measures)):
-            m = part.measures[i]
+        for i in range(len(part.getElementsByClass('Measure'))):
+            m = part.getElementsByClass('Measure')[i]
             for n in m.notes:
                 if n.name == 'C#': 
                     n.addLyric('%s, m. %s' % (          
@@ -149,7 +149,7 @@ def oldAccent(show=True):
     ts.accent.partition(['3/8', '3/8'])
     ts.setAccentWeight([1, .5])
     
-    for m in partBass.measures:
+    for m in partBass.getElementsByClass('Measure'):
         lastBeat = None
         for n in m.notes:
             beat, progress = ts.getBeatProgress(n.offset)

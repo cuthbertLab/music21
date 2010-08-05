@@ -105,7 +105,7 @@ class Stream(music21.Music21Object):
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['append', 'insert', 'insertAndShift', 
-        'measures', 'notes', 'pitches',
+        'notes', 'pitches',
         'transpose', 
         'augmentOrDiminish', 'scaleOffsets', 'scaleDurations']
     # documentation for all attributes (not properties or methods)
@@ -1862,12 +1862,12 @@ class Stream(music21.Music21Object):
         else:   
             return None
 
-    def getMeasures(self):
-        '''Return all :class:`~music21.stream.Measure` objects in a Stream()
-        '''
-        return self.getElementsByClass(Measure)
-
-    measures = property(getMeasures)
+#     def getMeasures(self):
+#         '''Return all :class:`~music21.stream.Measure` objects in a Stream()
+#         '''
+#         return self.getElementsByClass(Measure)
+# 
+#     measures = property(getMeasures)
 
     def measureOffsetMap(self, classFilterList=None):
         '''If this Stream contains Measures, provide a dictionary where keys are offsets and values are a list of references to one or more Measures that start at that offset. The offset values is always in the frame of the calling Stream (self).
@@ -1892,7 +1892,7 @@ class Stream(music21.Music21Object):
         # first, try to get measures
         # this works best of this is a Part or Score
         if Measure in classFilterList:
-            for m in self.getMeasures():
+            for m in self.getElementsByClass('Measure'):
                 offset = m.getOffsetBySite(self)
                 if offset not in map.keys():
                     map[offset] = []
@@ -2340,7 +2340,7 @@ class Stream(music21.Music21Object):
         >>> sSrc = Stream()
         >>> sSrc.repeatAppend(note.Rest(), 3)
         >>> sMeasures = sSrc.makeMeasures()
-        >>> len(sMeasures.measures)
+        >>> len(sMeasures.getElementsByClass('Measure'))
         1
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
@@ -2355,7 +2355,7 @@ class Stream(music21.Music21Object):
         >>> sSrc.repeatAppend(n, 10)
         >>> sSrc.repeatInsert(n, [x+.5 for x in range(10)])
         >>> sMeasures = sSrc.makeMeasures()
-        >>> len(sMeasures.measures)
+        >>> len(sMeasures.getElementsByClass('Measure'))
         3
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
@@ -2621,7 +2621,7 @@ class Stream(music21.Music21Object):
             raise StreamException('cannot process an empty stream')        
     
         # get measures from this stream
-        measureStream = returnObj.getMeasures()
+        measureStream = returnObj.getElementsByClass('Measure')
         if len(measureStream) == 0:
             raise StreamException('cannot process a stream without measures')        
     
@@ -2775,8 +2775,8 @@ class Stream(music21.Music21Object):
         if self.isClass(Measure):
             mColl = [] # store a list of measures for processing
             mColl.append(returnObj)
-        elif len(self.getMeasures()) > 0:
-            mColl = returnObj.getMeasures() # a stream of measures
+        elif len(self.getElementsByClass('Measure')) > 0:
+            mColl = returnObj.getElementsByClass('Measure') # a stream of measures
         else:
             raise StreamException('cannot process a stream that neither is a Measure nor has Measures')        
 
@@ -2997,7 +2997,7 @@ class Stream(music21.Music21Object):
         >>> n.quarterLength = 1.5
         >>> s.repeatAppend(n, 10)
         >>> sMeasures = s.makeNotation()
-        >>> len(sMeasures.measures)
+        >>> len(sMeasures.getElementsByClass('Measure'))
         4
         '''
         # only use inPlace arg on first usage
@@ -4064,7 +4064,7 @@ class Stream(music21.Music21Object):
             # if components are streams of Notes or Measures, 
             # than assume this is like a Part
             elif 'Stream' in obj.classes and (
-                len(obj.measures) > 0 or len(obj.notes) > 0):
+                len(obj.getElementsByClass('Measure')) > 0 or len(obj.notes) > 0):
                 multiPart = True
                 break # only need one
         return multiPart
@@ -4450,19 +4450,19 @@ class Stream(music21.Music21Object):
 #         # see if the first measure is a pickup
 #         # this may raise an exception if no time signature can be found
 #         try:
-#             firstBarDuration = streamPart.measures[0].barDuration
+#             firstBarDuration = streamPart.getElementsByClass('Measure')[0].barDuration
 #         # may not be able to get TimeSignature; if so pass
 #         except StreamException:
 #             firstBarDuration = None
-#             environLocal.printDebug(['cannot get bar duration for incompletely filled first bar, likely do to a missing TimeSignature', streamPart, streamPart.measures[0]])
+#             environLocal.printDebug(['cannot get bar duration for incompletely filled first bar, likely do to a missing TimeSignature', streamPart, streamPart.getElementsByClass('Measure')[0]])
 #             #streamPart.show('t')
 # 
 #         # cannot get bar duration proportion if cannot get a ts
 #         if firstBarDuration != None: 
-#             if streamPart.measures[0].barDurationProportion(
+#             if streamPart.getElementsByClass('Measure')[0].barDurationProportion(
 #                 barDuration=firstBarDuration) < 1.0:
-#                 #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.measures[0]])
-#                 streamPart.measures[0].shiftElementsAsAnacrusis()
+#                 #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.getElementsByClass('Measure')[0]])
+#                 streamPart.getElementsByClass('Measure')[0].shiftElementsAsAnacrusis()
 # 
 #         streamPart.addGroupForElements(partId) # set group for components 
 #         streamPart.groups.append(partId) # set group for stream itself
@@ -5872,7 +5872,6 @@ class Score(Stream):
     def _getParts(self):
         '''        
         '''
-        # note: _getParts is private; getMeasures, on Stream, shhould probably be similarly private
         return self.getElementsByClass(Part)
 
     parts = property(_getParts, 
@@ -6662,7 +6661,7 @@ class Test(unittest.TestCase):
 
         # this, if called, actively destroys the parent relationship!
         # on the measures (as new Elements are not created)
-        #m = b.getMeasures()[5]
+        #m = b.getElementsByClass('Measure')[5]
         #self.assertEqual(isinstance(m, Measure), True)
 
         # this false b/c, when getting the measures, parents are lost
@@ -7260,7 +7259,7 @@ class Test(unittest.TestCase):
         # we can get this information from Notes too!
         a = corpus.parseWork('bach/bwv324.xml')
         # get notes form one measure
-        mOffsetMap = a[0].measures[1].measureOffsetMap(note.Note)
+        mOffsetMap = a[0].getElementsByClass('Measure')[1].measureOffsetMap(note.Note)
         self.assertEqual(sorted(mOffsetMap.keys()), [4.0] )
 
         mOffsetMap = a[0].flat.measureOffsetMap(note.Note)
@@ -7451,7 +7450,7 @@ class Test(unittest.TestCase):
         # this all woroks fine
         sMeasures = s2.makeMeasures()
         self.assertEqual(len(sMeasures), 1)
-        self.assertEqual(len(sMeasures.measures), 1) # one measure
+        self.assertEqual(len(sMeasures.getElementsByClass('Measure')), 1) # one measure
         self.assertEqual(len(sMeasures[0]), 3) 
         # first is sig
         self.assertEqual(str(sMeasures[0][0]), '4/4') 

@@ -97,11 +97,11 @@ class Test(unittest.TestCase):
         post = sPart.musicxml
 
         # we get 3/4
-        self.assertEquals(sPart.measures[0].timeSignature.numerator, 3)
-        self.assertEquals(sPart.measures[1].timeSignature, None)
+        self.assertEquals(sPart.getElementsByClass('Measure')[0].timeSignature.numerator, 3)
+        self.assertEquals(sPart.getElementsByClass('Measure')[1].timeSignature, None)
 
-        sPart.measures[0].timeSignature = meter.TimeSignature('5/4')
-        self.assertEquals(sPart.measures[0].timeSignature.numerator, 5)
+        sPart.getElementsByClass('Measure')[0].timeSignature = meter.TimeSignature('5/4')
+        self.assertEquals(sPart.getElementsByClass('Measure')[0].timeSignature.numerator, 5)
         post = sPart.musicxml
 
         sNew = sPart.flat.notes

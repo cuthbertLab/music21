@@ -583,12 +583,12 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     
     # get the best time signature; make sure it agrees with the next
     # time signature, just to be sure
-    ts1 = ex.measures[0].bestTimeSignature()
-    ts2 = ex.measures[1].bestTimeSignature()
+    ts1 = ex.getElementsByClass('Measure')[0].bestTimeSignature()
+    ts2 = ex.getElementsByClass('Measure')[1].bestTimeSignature()
 
     # make sure these time signatures agree
     assert ts1.ratioEqual(ts2)
-    for m in ex.measures:
+    for m in ex.getElementsByClass('Measure'):
         m.insert(0, ts1)
     # append answers to first note
     ex.flat.notes[0].addLyric('Meter: %s' % ts1)

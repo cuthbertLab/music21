@@ -600,19 +600,19 @@ def mxToStreamPart(mxScore, partId, inputM21):
     # see if the first measure is a pickup
     # this may raise an exception if no time signature can be found
     try:
-        firstBarDuration = streamPart.measures[0].barDuration
+        firstBarDuration = streamPart.getElementsByClass('Measure')[0].barDuration
     # may not be able to get TimeSignature; if so pass
     except stream.StreamException:
         firstBarDuration = None
-        environLocal.printDebug(['cannot get bar duration for incompletely filled first bar, likely do to a missing TimeSignature', streamPart, streamPart.measures[0]])
+        environLocal.printDebug(['cannot get bar duration for incompletely filled first bar, likely do to a missing TimeSignature', streamPart, streamPart.getElementsByClass('Measure')[0]])
         #streamPart.show('t')
 
     # cannot get bar duration proportion if cannot get a ts
     if firstBarDuration != None: 
-        if streamPart.measures[0].barDurationProportion(
+        if streamPart.getElementsByClass('Measure')[0].barDurationProportion(
             barDuration=firstBarDuration) < 1.0:
-            #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.measures[0]])
-            streamPart.measures[0].shiftElementsAsAnacrusis()
+            #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.getElementsByClass('Measure')[0]])
+            streamPart.getElementsByClass('Measure')[0].shiftElementsAsAnacrusis()
 
     streamPart.addGroupForElements(partId) # set group for components 
     streamPart.groups.append(partId) # set group for stream itself

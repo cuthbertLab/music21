@@ -76,7 +76,7 @@ def newDomSev(show=True):
     # an empty container for later display
     display = stream.Stream() 
     
-    for thisMeasure in violin2.measures:
+    for thisMeasure in violin2.getElementsByClass('Measure'):
     
       # get a list of consecutive notes, skipping unisons, octaves,
          # and rests (and putting nothing in their places)
@@ -129,7 +129,7 @@ def melodicChordExpression(show=True):
     display = stream.Stream() 
     
     # iterate over all measures
-    for measure in violin2.measures:
+    for measure in violin2.getElementsByClass('Measure'):
         notes = measure.findConsecutiveNotes(
             skipUnisons=True, skipChords=True, 
             skipOctaves=True, skipRests=True, 

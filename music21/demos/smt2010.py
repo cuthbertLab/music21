@@ -30,7 +30,7 @@ def ex01(show=True, *arguments, **keywords):
     else:
         sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
 
-    v2Part = sStream[1].measures # get all measures from the second violin
+    v2Part = sStream[1].getElementsByClass('Measure') # get all measures from the second violin
     if show:
         v2Part[48].show() # render the 48th measure as notation
     
@@ -62,7 +62,7 @@ def ex02(show=True, *arguments, **keywords):
     else:
         sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
 
-    v2Part = sStream[1].measures # get all measures from the first violin
+    v2Part = sStream[1].getElementsByClass('Measure') # get all measures from the first violin
     
     # First, collect all non-redundant adjacent pitch classes, and store these pitch classes in a list. 
     pitches = []
@@ -135,7 +135,7 @@ def ex01Alt(show=True, *arguments, **keywords):
         sStream = keywords['op133']
     else:
         sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
-    v2Part = sStream[1].measures # get all measures from the second violin
+    v2Part = sStream[1].getElementsByClass('Measure') # get all measures from the second violin
 
     if show:
         v2Part[45].show() # render the 48th measure as notation
@@ -156,7 +156,7 @@ def findHighestNotes(show=True, *arguments, **keywords):
     for part in score.getElementsByClass(stream.Part):
         found.append(part.flat.getElementsByClass(music21.clef.Clef)[0])
         highestNoteNum = 0
-        for m in part.measures:
+        for m in part.getElementsByClass('Measure'):
             for n in m.notes:
                 if n.midi > highestNoteNum:
                     highestNoteNum = n.midi
@@ -185,7 +185,7 @@ def ex1_revised(show=True, *arguments, **keywords):
     violin2 = beethovenScore[1]      # most programming languages start counting from 0, 
     #  so part 0 = violin 1, part 1 = violin 2, etc.
     display = stream.Stream() # an empty container for filling with found notes
-    for thisMeasure in violin2.measures:
+    for thisMeasure in violin2.getElementsByClass('Measure'):
         notes = thisMeasure.findConsecutiveNotes(skipUnisons = True, 
                       skipChords = True,
                        skipOctaves = True, skipRests = True, noNone = True )

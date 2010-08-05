@@ -59,7 +59,7 @@ class Test(unittest.TestCase):
         #for part in partStream.partData:
         # a part stream could have an iterator that partitions itself
         # into measure-lenght part streams
-        for measure in partStream.measures():  # () ? 
+        for measure in partStream.getElementsByClass('Measure')():  # () ? 
             # measure is a partStream isolated for just the desired measure
             # assuming only one meter per measure
             meterObj = measure['meter']

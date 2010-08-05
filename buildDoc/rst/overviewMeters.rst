@@ -51,9 +51,9 @@ To examine the :class:`~music21.meter.TimeSignature` object active for this part
 
 Alternatively, we can look at the first Measure in the Stream, and examine the :attr:`~music21.stream.Measure.timeSignature` property. Notice that the second Measure does not have a TimeSignature. 
 
->>> sPart.measures[0].timeSignature
+>>> sPart.getElementsByClass('Measure')[0].timeSignature
 <music21.meter.TimeSignature 3/4>
->>> sPart.measures[1].timeSignature == None
+>>> sPart.getElementsByClass('Measure')[1].timeSignature == None
 True
 
 
@@ -63,7 +63,7 @@ Setting a Time Signature in a Measure
 
 We can create a new TimeSignature object by providing a string representation of the meter. In most cases, intuitive string-based time signature representations will give you the expected results. Assigning a new TimeSignature object, however, simple associated it with a Measure: it will not automatically rebar or reposition notes within bars. For example, the same part examined above can be modified. Here, the first Measure's :attr:`~music21.stream.Measure.timeSignature` property is set to a new object. Note that, when viewing the Part, the time signature is changed even though the position of the notes in Measures is not changed.
 
->>> sPart.measures[0].timeSignature = meter.TimeSignature('5/4')
+>>> sPart.getElementsByClass('Measure')[0].timeSignature = meter.TimeSignature('5/4')
 >>> sPart.show()
 
 
@@ -475,8 +475,8 @@ In the following example, all leading tones, or C#s, are collected into a new St
         found.insert(offsetQL, 
             part.flat.getElementsByClass(
             music21.clef.Clef)[0])
-        for i in range(len(part.measures)):
-            m = part.measures[i]
+        for i in range(len(part.getElementsByClass('Measure'))):
+            m = part.getElementsByClass('Measure')[i]
             for n in m.notes:
                 if n.name == 'C#': 
                     n.addLyric('%s, m. %s' %
@@ -524,12 +524,12 @@ The number of hierarchical levels, found with the :meth:`~music21.meter.TimeSign
                 ts.beat[h][i][j] = \
                     ts.beat[h][i][j].subdivide(2)
     
-    for m in partBass.measures:
+    for m in partBass.getElementsByClass('Measure'):
         for n in m.notes:
             for i in range(ts.getBeatDepth(n.offset)):
                 n.addLyric('*')
     
-    partBass.measures[0:7].show('musicxml') 
+    partBass.getElementsByClass('Measure')[0:7].show('musicxml') 
 
 
 .. image:: images/overviewMeters-07.*
@@ -568,7 +568,7 @@ The following example extracts the Bass line of a Bach chorale in 3/4 and, after
     ts.accent.partition(['3/8', '3/8'])
     ts.setAccentWeight([1, .5])
     
-    for m in partBass.measures:
+    for m in partBass.getElementsByClass('Measure'):
         lastBeat = None
         for n in m.notes:
             beat, progress = ts.getBeatProgress(n.offset)
@@ -583,7 +583,7 @@ The following example extracts the Bass line of a Bach chorale in 3/4 and, after
                 lastBeat = beat
             m = m.sorted
     
-    partBass.measures[0:8].show('musicxml')
+    partBass.getElementsByClass('Measure')[0:8].show('musicxml')
 
 
 .. image:: images/overviewMeters-05.*
