@@ -2032,6 +2032,12 @@ class Test(unittest.TestCase):
         self.assertEqual(a.accidental.displayStatus, True)
 
 
+        b = copy.deepcopy(a)
+        self.assertEqual(b.accidental.displayStatus, True)
+        self.assertEqual(b.accidental.name, 'natural')
+
+
+
 
     def testUpdateAccidentalDisplaySeries(self):
         '''Test updating accidental display.
@@ -2353,4 +2359,6 @@ if __name__ == "__main__":
 # 
 #         a.testUpdateAccidentalDisplaySeriesKeySignature()
 
-        a.testPitchEquality()
+        #a.testPitchEquality()  
+
+        a.testUpdateAccidentalDisplaySimple()

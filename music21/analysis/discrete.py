@@ -212,8 +212,8 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
                 'G': '#6495ED', # cornflower blue
                 'A': '#8968CD', # MediumPurple3
                 'B': '#FF83FA', # orchid1
-
                 } 
+
         for dst, valid in [(self._majorKeyColors, self.keysValidMajor), 
                            (self._minorKeyColors, self.keysValidMinor)]:
             for key in valid:

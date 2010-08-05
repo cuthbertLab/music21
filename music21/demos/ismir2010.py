@@ -24,6 +24,8 @@ from music21.meter import TimeSignature
 from music21.stream import Measure
 
 
+import os, random
+from music21 import corpus, key
 
 #-------------------------------------------------------------------------------
 def newDots(show=True):
@@ -313,47 +315,96 @@ def demoBasic():
     s1 = corpus.parseWork('bach/bwv103.6')
 
     # We can show() a Stream in a variety of forms
-    s1.show()
-    s1.show('midi') # has errors!
-    s1.show('text') # too long here
+    #s1.show()
+    #s1.show('midi') # has errors!
+    #s1.show('text') # too long here
 
     # Can get the number of Elements as a length, and iterate over Elements
     len(s1)
 
     # Can grab polyphonic Measure range;
 
-
-
     # Can get sub-components through class or id filtering
     soprano = s1.getElementById('soprano')
 
+
     # Can employ the same show() method on any Stream or Stream subclass
-    soprano.show()
-    soprano.show('midi') # problem is here: offset is delayed
+    #soprano.show()
+    #soprano.show('midi') # problem is here: offset is delayed
 
     # A Part might contain numerous Measure Streams
     len(soprano.getElementsByClass('Measure'))
-    mRange = soprano.getMeasureRange(15,17)
-    mRange.show('text') # here we can see this
+    mRange = soprano.getMeasureRange(14,16)
+    #mRange.show()
+   # mRange.sorted.show('text') # here we can see this
+
+
+
+    sNew = soprano.getMeasureRange(14,16).flat.notes.transpose('p-5')
+    sNew.makeAccidentals(overrideStatus=True)
+    ts1 = meter.TimeSignature('3/4')
+    ts2 = meter.TimeSignature('5/8')
+    sNew.insert(0, ts1)
+    sNew.insert(3, ts2)
+
+    #sNew.show()
     
+
+    sNew.augmentOrDiminish(2, inPlace=True)  
+    for n in sNew.notes:
+        if n.pitch.name == 'G' and n.quarterLength == 2:
+            n.addLyric('%s (2 QLs)' % n.name)
+    sNew.show()
+
     # Any stream can be flattened to remove all hierarchical levels
     # All notes of a part can be gathered into a single Stream
-    sNotes = soprano.flat.notes
+#     sNotes = soprano.flat.notes
+# 
+#     # Can add notation elements or other objects by appending to a Stream
+#     sNotes.insert(0, meter.TimeSignature('3/4'))
+# 
+#     # Can create a new, transformed Stream by looking for Fermatas and extending them
+#     sExtended = stream.Stream()
+#     sExtended.insert(0, meter.TimeSignature('6/4'))
+#     for n in sNotes.notes:
+#         #if isinstance(n.notations[0], expressions.Fermata):
+#         if len(n.notations) > 0:
+#             n.duration.quarterLength = 4
+#             sExtended.append(n)
+#         else:
+#             sExtended.append(n)
+#     #sExtended.show()
+# 
 
-    # Can add notation elements or other objects by appending to a Stream
-    sNotes.insert(0, meter.TimeSignature('3/4'))
 
-    # Can create a new, transformed Stream by looking for Fermatas and extending them
-    sExtended = stream.Stream()
-    sExtended.insert(0, meter.TimeSignature('6/4'))
-    for n in sNotes.notes:
-        #if isinstance(n.notations[0], expressions.Fermata):
-        if len(n.notations) > 0:
-            n.duration.quarterLength = 4
-            sExtended.append(n)
-        else:
-            sExtended.append(n)
-    sExtended.show()
+def beethovenSearch():
+
+    op133 = corpus.parseWork('beethoven/opus133.xml') 
+    violin2 = op133.getElementById('2nd Violin')
+    
+    # an empty container for later display
+    display = stream.Stream() 
+    
+    for m in violin2.getElementsByClass('Measure'):
+      notes = m.findConsecutiveNotes(
+        skipUnisons=True, skipOctaves=True, 
+        skipRests=True, noNone=True )
+     
+      pitches = stream.Stream(notes).pitches  
+      for i in range(len(pitches) - 3):
+        # makes every set of 4 notes into a whole-note chord
+        testChord = chord.Chord(pitches[i:i+4])       
+        testChord.duration.type = "whole" 
+        
+        if testChord.isDominantSeventh():
+          testChord.lyric = "m. " + str(m.measureNumber)
+          m.notes[0].lyric = chord.Chord(m.pitches).primeFormString
+               
+          chordMeasure = stream.Measure()
+          chordMeasure.append(testChord.closedPosition())
+          display.append(chordMeasure)
+          display.append(m)    
+    display.show()
 
 
 
@@ -413,13 +464,15 @@ def demoGraphMozartChopin():
 
 
 
-def demoBeethoven133()
+def demoBeethoven133():
+
+    dpi = 300
 
     sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
-    part = sStream[3].stripTies()
+    part = sStream['cello'].stripTies()
 
     part.plot('scatter', values=['pitchclass', 'offset'],
-                 title='Beethoven, Opus 133, Cello')
+                 title='Beethoven, Opus 133, Cello', dpi=dpi)
 
 
 
@@ -444,7 +497,7 @@ def demoCombineTransform():
     # attach interval name to lyric
     # attach pitch class
 
-def demoSearch():
+def demoBachSearch():
 
     import os, random
     from music21 import corpus, key
@@ -493,6 +546,35 @@ def demoSearch():
             m.append(cLast)
             results.append(m.makeAccidentals(inPlace=True))
 
+    results.show()
+
+
+def demoBachSearchBrief():    
+    fpList = corpus.getBachChorales('.xml')
+    results = stream.Stream()
+    for fp in fpList:
+      fn = os.path.split(fp)[1]
+      s = converter.parse(fp)
+      key, mode = s.analyze('key')[:2]
+      if mode == 'minor':
+        pLast = []
+        for pStream in s.parts:
+          # clear accidental display status
+          pLast.append(pStream.flat.pitches[-1])
+    
+        cLast = chord.Chord(pLast)
+        cLast.quarterLength = 4
+        cLast.transpose(12, inPlace=True)
+        if not cLast.isMinorTriad():
+          continue
+        cLast.addLyric(fn.replace('.xml', ''))
+        cLast.addLyric('%s %s' % (key, mode))
+
+        m = stream.Measure()
+        m.keySignature = s.flat.getElementsByClass('KeySignature')[0]
+        m.append(cLast)
+        results.append(m.makeAccidentals(inPlace=True))
+    
     results.show()
 
 
@@ -570,4 +652,11 @@ if __name__ == "__main__":
 
 
 
-        demoGraphMozartChopin()
+        #demoGraphMozartChopin()
+
+
+        #demoBeethoven133()
+
+        #beethovenSearch()
+
+        demoBachSearchBrief()

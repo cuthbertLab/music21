@@ -1052,6 +1052,7 @@ class Graph3DPolygonBars(Graph):
 
         poly = collections.PolyCollection(verts, facecolors=vertsColor)
         poly.set_alpha(self.alpha)
+
         ax.add_collection3d(poly, zs=zs, zdir='y')
         self._applyFormatting(ax)
         self.done()
@@ -1140,7 +1141,7 @@ class PlotStream(object):
         '''Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
 
         '''
-        environLocal.printDebug(['calling filterPitchLabel', ticks])
+        #environLocal.printDebug(['calling filterPitchLabel', ticks])
         # this uses tex mathtext, which happens to define harp and flat
         # http://matplotlib.sourceforge.net/users/mathtext.html
         post = []
@@ -1331,13 +1332,13 @@ class PlotStream(object):
         >>> a.ticksOffset() # on whole score
         [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']]
 
-        >>> a = PlotStream(s[0]) # on a Part
+        >>> a = PlotStream(s.parts[0].flat) # on a Part
         >>> a.ticksOffset() # on whole score
         [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']]
         >>> a.ticksOffset(8, 12, 2)
         [[8.0, '2'], [12.0, '3']]
 
-        >>> a = PlotStream(s[0].flat) # on a Flat collection
+        >>> a = PlotStream(s.parts[0].flat) # on a Flat collection
         >>> a.ticksOffset(8, 12, 2)
         [[8.0, '2'], [12.0, '3']]
 
@@ -1373,7 +1374,7 @@ class PlotStream(object):
             mNoToUse = []
             sortedKeys = sorted(offsetMap.keys())
             for key in sortedKeys:
-                if key > offsetMin and key < offsetMax:
+                if key >= offsetMin and key <= offsetMax:
                     if key == 0 and not displayMeasureNumberZero:
                         continue # skip
                     #if key == sorted(offsetMap.keys())[-1]:
@@ -2518,7 +2519,7 @@ class Plot3DBars(PlotStream):
                 maxCount = data[self.fy(noteObj)][indexToIncrement][1]
 
         # setting of ticks does not yet work in matplotlib
-        xTicks = []
+        xTicks = [(40, 'test')]
         yTicks = self.fyTicks(min(yValues), max(yValues))
         zTicks = []
         return data, xTicks, yTicks, zTicks
@@ -2560,7 +2561,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
         #self.graph.setTicks('x', xTicks)
         self.graph.setAxisLabel('y', 'MIDI Note Number')
         self.graph.setAxisLabel('x', 'Quarter Length')
-        #self.graph.setAxisLabel('z', 'Count')
+        self.graph.setAxisLabel('z', '')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
