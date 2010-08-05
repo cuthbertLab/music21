@@ -550,34 +550,30 @@ def demoBachSearch():
 
 
 def demoBachSearchBrief():    
-    fpList = corpus.getBachChorales('.xml')
+    choraleList = corpus.bachChorales
     results = stream.Stream()
-    for fp in fpList:
-      fn = os.path.split(fp)[1]
-      s = converter.parse(fp)
-      key, mode = s.analyze('key')[:2]
+    for filePath in choraleList:
+      fileName = os.path.split(filePath)[1]
+      pieceName = fileName.replace('.xml', '')
+      chorale = converter.parse(filePath)
+      print fileName
+      key, mode = chorale.analyze('key')[:2]
       if mode == 'minor':
-        pLast = []
-        for pStream in s.parts:
-          # clear accidental display status
-          pLast.append(pStream.flat.pitches[-1])
-    
-        cLast = chord.Chord(pLast)
-        cLast.quarterLength = 4
-        cLast.transpose(12, inPlace=True)
-        if not cLast.isMinorTriad():
+        lastChordPitches = []
+        for part in chorale.parts:
+          lastChordPitches.append(part.flat.pitches[-1])
+        lastChord = chord.Chord(lastChordPitches)
+        lastChord.duration.type = "whole"
+        lastChord.transpose("P8", inPlace=True)
+        if lastChord.isMinorTriad() is False and lastChord.isIncompleteMinorTriad() is False:
           continue
-        cLast.addLyric(fn.replace('.xml', ''))
-        cLast.addLyric('%s %s' % (key, mode))
-
+        lastChord.lyric = pieceName
         m = stream.Measure()
-        m.keySignature = s.flat.getElementsByClass('KeySignature')[0]
-        m.append(cLast)
+        m.keySignature = chorale.flat.getElementsByClass(
+          'KeySignature')[0]
+        m.append(lastChord)
         results.append(m.makeAccidentals(inPlace=True))
-    
     results.show()
-
-
 
 
 
@@ -628,7 +624,8 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
+        demoBachSearchBrief()
+#        music21.mainTest(Test)
     elif len(sys.argv) > 1:
         pass
         #newDots()

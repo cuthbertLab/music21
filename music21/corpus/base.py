@@ -522,11 +522,14 @@ bach = getComposer('bach')
 
 # additional libraries to define
 
-def getBachChorales(extList=None):
-    '''Return all Bach chorales.
+def getBachChorales(extList='xml'):
+    '''Return the file name of all Bach chorales.
+    
+    By default, only Bach Chorales in xml format are returned, because the quality of 
+    the encoding and our parsing of those is superior.
 
     >>> a = getBachChorales()
-    >>> len(a) > 10
+    >>> len(a) > 400
     True
     >>> a = getBachChorales('krn')
     >>> len(a) > 10

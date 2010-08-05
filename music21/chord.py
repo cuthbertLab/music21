@@ -1082,6 +1082,70 @@ class Chord(note.NotRest):
         
         return True
 
+    def isIncompleteMajorTriad(self):
+        '''
+        returns True if the chord is an incomplete Major triad, or, essentially,
+        a dyad of root and major third
+        
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['C4','E3'])
+        >>> c1.isMajorTriad()
+        False
+        >>> c1.isIncompleteMajorTriad()
+        True
+        >>> c2 = chord.Chord(['C4','E3', 'G5'])
+        >>> c2.isIncompleteMajorTriad()
+        False
+
+        OMIT_FROM_DOCS
+        >>> c3 = chord.Chord(['C4','E-3'])
+        >>> c3.isIncompleteMajorTriad()
+        False        
+        '''
+        third = self.hasSpecificX(3)
+        if (third is False):
+            return False
+ 
+        for thisPitch in self.pitches:
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
+            if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 4):
+                return False
+        
+        return True
+
+    def isIncompleteMinorTriad(self):
+        '''
+        returns True if the chord is an incomplete Minor triad, or, essentially,
+        a dyad of root and minor third
+        
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['C4','E-3'])
+        >>> c1.isMinorTriad()
+        False
+        >>> c1.isIncompleteMinorTriad()
+        True
+        >>> c2 = chord.Chord(['C4','E-3', 'G5'])
+        >>> c2.isIncompleteMinorTriad()
+        False
+
+        OMIT_FROM_DOCS
+        >>> c3 = chord.Chord(['C4','E3'])
+        >>> c3.isIncompleteMinorTriad()
+        False        
+        '''
+        third = self.hasSpecificX(3)
+        if (third is False):
+            return False
+ 
+        for thisPitch in self.pitches:
+            thisInterval = interval.notesToInterval(self.root(), thisPitch)
+            if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 3):
+                return False
+        
+        return True
+
+
+
     def isDiminishedTriad(self):
         '''Returns True if chord is a Diminished Triad, that is, if it contains only notes that are
         either in unison with the root, a minor third above the root, or a diminished fifth above the 
