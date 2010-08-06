@@ -2192,8 +2192,16 @@ class PlotHorizontalBar(PlotStream):
 class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
     '''A graph of events, sorted by pitch class, over time
 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> p = graph.PlotHorizontalBarPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW p = graph.PlotHorizontalBarPitchClassOffset(s)
+    >>> p.process() # with defaults and proper configuration, will open graph
+
     .. image:: images/PlotHorizontalBarPitchClassOffset.*
         :width: 600
+
     '''
 
     values = ['pitchClass', 'offset', 'pianoroll']
@@ -2236,9 +2244,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
         :width: 600
-
     '''
-
 
     values = ['pitch', 'offset', 'pianoroll']
     def __init__(self, streamObj, *args, **keywords):
@@ -2357,6 +2363,13 @@ class PlotScatterWeighted(PlotStream):
 class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
     '''A graph of event, sorted by pitch, over time
 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> p = graph.PlotScatterWeightedPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW p = graph.PlotScatterWeightedPitchSpaceQuarterLength(s)
+    >>> p.process() # with defaults and proper configuration, will open graph
+
     .. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.*
         :width: 600
     '''
@@ -2394,8 +2407,16 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
 class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
     '''A graph of event, sorted by pitch class, over time.
 
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> p = graph.PlotScatterWeightedPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW p = graph.PlotScatterWeightedPitchClassQuarterLength(s)
+    >>> p.process() # with defaults and proper configuration, will open graph
+
     .. image:: images/PlotScatterWeightedPitchClassQuarterLength.*
         :width: 600
+
     '''
 
     values = ['pitchClass', 'quarterLength']
@@ -2432,8 +2453,17 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
 class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
     '''A graph of dynamics used by pitch space.
 
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('schumann/opus41no1', 2) #_DOCS_HIDE
+    >>> p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('schumann/opus41no1', 2)
+    >>> #_DOCS_SHOW p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s)
+    >>> p.process() # with defaults and proper configuration, will open graph
+
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
+
     '''
 
     values = ['pitchClass', 'dynamicSymbol']
@@ -2534,7 +2564,6 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     '''A scatter plot of pitch and quarter length
 
     >>> from music21 import *
-
     >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.Plot3DBarsPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW from music21.musicxml import testFiles
@@ -2609,13 +2638,30 @@ def plotStream(streamObj, *args, **keywords):
     :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
 
     :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
-    :class:`~music21.graph.PlotScatterWeigthedPitchClassQuarterLength`
+    :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`
     :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
 
     :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
 
     :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
     :class:`~music21.graph.PlotWindowedSadoianAmbitus`
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s.plot('histogram', 'pitch')
+
+    .. image:: images/PlotHistogramPitchSpace.*
+        :width: 600
+
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s.plot('pianoroll')
+
+    .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
+        :width: 600
 
     '''
     plotClasses = [

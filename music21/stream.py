@@ -1083,23 +1083,41 @@ class Stream(music21.Music21Object):
     
         :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
         :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
-        :class:`~graph.PlotScatterPitchClassOffset`
+        :class:`~music21.graph.PlotScatterPitchClassOffset`
+        :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol`
     
         :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
         :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
     
         :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
-        :class:`~music21.graph.PlotScatterWeigthedPitchClassQuarterLength`
-
+        :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`
+        :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
+    
         :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
-
+    
         :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
         :class:`~music21.graph.PlotWindowedSadoianAmbitus`
 
-        >>> a = Stream()
-        >>> n = note.Note()
-        >>> a.append(n)
-        >>> a.plot('PlotHorizontalBarPitchSpaceOffset', doneAction=None)
+        >>> from music21 import *
+        >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+        >>> s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
+        >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+        >>> #_DOCS_SHOW s.plot('histogram', 'pitch')
+    
+
+        .. image:: images/PlotHistogramPitchSpace.*
+            :width: 600
+    
+
+        >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+        >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
+        >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+        >>> #_DOCS_SHOW s.plot('pianoroll')
+
+    
+        .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
+            :width: 600
+
         '''
         # import is here to avoid import of matplotlib problems
         from music21 import graph
@@ -1746,15 +1764,26 @@ class Stream(music21.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: this probably needs to deepcopy the new first measure.
-
-        TODO: for any stream w/o measures call mekeMeasures
         '''
         
         # create a dictionary of measure number, list of Meaures
         # there may be more than one Measure with the same Measure number
         mapRaw = {}
         mNumbersUnique = [] # store just the numbers
-        for m in self.getElementsByClass('Measure'):
+        mStream = self.getElementsByClass('Measure')
+
+
+        returnObj = Stream()
+        srcObj = self
+
+        # if we have no Measure defined, call makeNotation
+        # this will over return a deepcopy of all objects
+        if len(mStream) == 0:
+            mStream = self.makeNotation(inPlace=False)
+            # need to set srcObj to this new stream
+            srcObj = mStream
+
+        for m in mStream:
             # mId is a tuple of measure nmber and any suffix
             mId = (m.measureNumber, m.measureNumberSuffix)
             # store unique measure numbers for reference
@@ -1783,7 +1812,6 @@ class Stream(music21.Music21Object):
             mapCooked = mapRaw
         #environLocal.printDebug(['mapCooked', mapCooked])
 
-        post = Stream()
         startOffset = None # set with the first measure
         startMeasure = None # store for adding other objects
         # get requested range
@@ -1806,7 +1834,7 @@ class Stream(music21.Music21Object):
                 # this assumes measure are in offset order
                 # this may not always be the case
                 if startOffset == None: # only set on first
-                    startOffset = m.getOffsetBySite(self)
+                    startOffset = m.getOffsetBySite(srcObj)
                     # not sure if a deepcopy is necessary; this does not yet work
                     #startMeasure = copy.deepcopy(m)
                     startMeasure = m
@@ -1815,11 +1843,11 @@ class Stream(music21.Music21Object):
                     #found = startMeasure.getContextByClass(clef.Clef)
                     #environLocal.printDebug(['early clef search', found])
 
-                oldOffset = m.getOffsetBySite(self)
+                oldOffset = m.getOffsetBySite(srcObj)
                 # subtract the offset of the first measure
                 # this will be zero in the first usage
                 newOffset = oldOffset - startOffset
-                post.insert(newOffset, m)
+                returnObj.insert(newOffset, m)
 
                 #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
 
@@ -1836,7 +1864,7 @@ class Stream(music21.Music21Object):
             else:
                 environLocal.printDebug(['cannot find requested class in stream:', className])
 
-        return post
+        return returnObj
 
 
     def measure(self, measureNumber, 
@@ -9428,6 +9456,13 @@ class Test(unittest.TestCase):
         )
 
 
+    def testMeasuresAndMakeMeasures(self):
+        from music21 import converter
+        s = converter.parse('g8 e f g e f g a', '2/8')
+        sSub = s.measures(3,3)  
+        self.assertEqual(str(sSub.pitches), "[E4, F4]")
+        #sSub.show()
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -9456,4 +9491,6 @@ if __name__ == "__main__":
 
         #a.testMakeNotation()
 
-        a.testMakeTies()
+        #a.testMakeTies()
+
+        a.testMeasuresAndMakeMeasures()

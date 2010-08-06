@@ -987,6 +987,43 @@ class Test(unittest.TestCase):
 
 
 
+    def testAnacrusisTiming(self):
+
+        from music21 import corpus
+
+        s = corpus.parseWork('bach/bwv103.6')
+
+        # get just the soprano part
+        soprano = s.parts['soprano']
+        mts = streamToMidiTrack(soprano)
+
+        # first note-on is delayed due to anacrusis offset of first measure
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent KEY_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=512, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=66, velocity=0>]"""
+        
+        self.assertEqual(str(mts.events[:10]), match)
+
+        # first note-on is delayed due to anacrusis offset of first measure
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Alto'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent KEY_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=62, velocity=90>, <MidiEvent DeltaTime, t=1024, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=62, velocity=0>]"""
+
+        alto = s.parts['alto']
+        mta = streamToMidiTrack(alto)
+
+        self.assertEqual(str(mta.events[:10]), match)
+
+
+        # try streams to midi tracks
+        # get just the soprano part
+        soprano = s.parts['soprano']
+        mtList = streamsToMidiTracks(soprano)
+        self.assertEqual(len(mtList), 1)
+
+        # its the same as before
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent KEY_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=512, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=66, velocity=0>]"""
+
+        self.assertEqual(str(mtList[0].events[:10]), match)
+
+
+
 if __name__ == "__main__":
     import sys
 
@@ -996,4 +1033,6 @@ if __name__ == "__main__":
         a = Test()
         #a.testPitchEquality()
 
-        a.testKeySignature()
+        #a.testKeySignature()
+
+        a.testAnacrusisTiming()

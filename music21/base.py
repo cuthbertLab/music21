@@ -60,7 +60,7 @@ else:
 
 #-------------------------------------------------------------------------------
 VERSION = (0, 2, 5)  # increment any time picked versions will be obsolete.
-VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a3'
+VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a4'
 WEAKREF_ACTIVE = True
 
 

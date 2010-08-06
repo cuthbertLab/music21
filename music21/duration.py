@@ -2049,6 +2049,7 @@ class Duration(DurationCommon):
             "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
 
         mxDivisions = mxNote.external['divisions']
+        #environLocal.printDebug(['Duration._setMX', 'divisions', mxDivisions])
 
         if mxNote.duration != None: 
 
@@ -2061,6 +2062,8 @@ class Duration(DurationCommon):
     
             mxDotList = mxNote.get('dotList')
             qLen = float(mxNote.duration) / float(mxDivisions)
+
+            environLocal.printDebug(['Duration._setMX', 'raw qLen', qLen, type])
 
             mxNotations = mxNote.get('notations')
             mxTimeModification = mxNote.get('timemodification')

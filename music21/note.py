@@ -1499,7 +1499,11 @@ class Rest(GeneralNote):
     def _setMX(self, mxNote):
         '''Given an mxNote, fille the necessary parameters
         '''
-        self.duration.mx = mxNote
+        try:
+            self.duration.mx = mxNote
+        except duration.DurationException:
+            environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, self])
+            raise
 
     mx = property(_getMX, _setMX)    
 

@@ -17,6 +17,7 @@ see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 '''
 
 import unittest, doctest
+import unicodedata
 import sys, os, string, types
 
 try:
@@ -434,10 +435,9 @@ class MidiEvent(object):
             try: # TODO: need to handle unicode
                 return s + self.data 
             except UnicodeDecodeError:
-                environLocal.printDebug(['cannot decode data', self.data])
-                return s
-                #return s + str(self.data)
-
+                #environLocal.printDebug(['cannot decode data', self.data])
+                return s + unicodedata.normalize('NFKD', 
+                           self.data).encode('ascii','ignore')
         else: 
             raise MidiException("unknown midi event type: %s" % self.type)
 
