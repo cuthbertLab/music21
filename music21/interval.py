@@ -1112,8 +1112,8 @@ class Interval(music21.Music21Object):
         ''')
 
 
-    def transposePitch(self, p, reverse=False):
-        '''Given a Pitch, return a new, transposed Pitch, that is transformed according to this Interval.
+    def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True):
+        '''Given a Pitch, return a new, transposed Pitch, that is transformed according to this Interval. This is the main public interface to all transposition routines found on higher-level objects. 
 
         >>> from music21 import pitch
         >>> p1 = pitch.Pitch('a#')
@@ -1155,6 +1155,8 @@ class Interval(music21.Music21Object):
             pitch2.accidental = halfStepsToFix
             # inherit accidental display properties
             pitch2.inheritDisplay(pitch1)
+            pitch2.setAccidentalDisplay(None) # set accidental display to None
+
         return pitch2
 
 
@@ -1682,13 +1684,38 @@ class Test(unittest.TestCase):
         self.assertEqual(perfectFifth.complement.niceName, "Perfect Fourth")
 
 
-
     def testCreateIntervalFromPitch(self):     
         from music21 import pitch  
         p1 = pitch.Pitch('c')
         p2 = pitch.Pitch('g')
         i = Interval(p1, p2)
         self.assertEqual(i.intervalClass, 5)
+
+
+    def testTransposeImported(self):
+
+        def collectAccidentalDisplayStatus(s):
+            post = []
+            for e in s.flat.notes:
+                if e.pitch.accidental != None:
+                    post.append(e.pitch.accidental.displayStatus)
+                else: # mark as not having an accidental
+                    post.append('x')
+            return post
+
+        from music21 import corpus
+        s = corpus.parseWork('bach/bwv66.6')
+        # this has accidentals in measures 2 and 6
+        sSub = s[3].measures(2,6)
+        
+        self.assertEqual(collectAccidentalDisplayStatus(sSub), 
+                        ['x', False, 'x', 'x', True, False, 'x', False, False, False, False, False, False, 'x', 'x', 'x', False, False, False, 'x', 'x', 'x', 'x', True, False])
+
+        sTransposed = sSub.transpose('p5')
+        #sTransposed.show()
+
+        self.assertEqual(collectAccidentalDisplayStatus(sTransposed), 
+                        ['x', None, 'x', 'x', None, None, None, None, None, None, None, None, None, 'x', None, None, None, None, None, 'x', 'x', 'x', None, None, None])
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1702,7 +1729,8 @@ if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
-        a = Test()
+        t = Test()
 
+        #t.testCreateIntervalFromPitch()
 
-        a.testCreateIntervalFromPitch()
+        t.testTransposeImported()

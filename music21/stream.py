@@ -5903,8 +5903,8 @@ class Score(Stream):
 
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
-        >>> a.measure(3)
-        <music21.stream.Score object at 0x2a6ddf0>
+        >>> len(a.measure(3)[0]) # contains 1 measure
+        1
         '''
 
         post = Score()
@@ -9359,7 +9359,6 @@ class Test(unittest.TestCase):
 #         self.assertEqual(collectTupletType(postMake.flat.notes), [None, 'start', None, 'stop', None, None, 'start', None, 'stop', None, None])
 #         #s.show()
 
-
         s = Stream()
         qlList = [1/3.,]
         for ql in qlList:
@@ -9372,6 +9371,61 @@ class Test(unittest.TestCase):
 
         #s.show()
 
+
+
+    def testMakeTies(self):
+
+        from music21 import corpus, meter
+
+        def collectAccidentalDisplayStatus(s):
+            post = []
+            for e in s.flat.notes:
+                if e.pitch.accidental != None:
+                    post.append((e.pitch.name, e.pitch.accidental.displayStatus))
+                else: # mark as not having an accidental
+                    post.append('x')
+            return post
+
+
+        s = corpus.parseWork('bach/bwv66.6')
+        # this has accidentals in measures 2 and 6
+        sSub = s[3].measures(2,6)
+        #sSub.show()
+        # only notes that deviate from key signature are True
+        self.assertEqual(collectAccidentalDisplayStatus(sSub), ['x', (u'C#', False), 'x', 'x', (u'E#', True), (u'F#', False), 'x', (u'C#', False), (u'F#', False), (u'F#', False), (u'G#', False), (u'F#', False), (u'G#', False), 'x', 'x', 'x', (u'C#', False), (u'F#', False), (u'G#', False), 'x', 'x', 'x', 'x', (u'E#', True), (u'F#', False)] )
+
+        # this removes key signature
+        sSub = sSub.flat.notes
+        self.assertEqual(len(sSub), 25)
+
+        sSub.insert(0, meter.TimeSignature('3/8'))
+        sSub.augmentOrDiminish(2, inPlace=True)
+
+        # explicitly call make measures and make ties
+        mStream = sSub.makeMeasures()
+        mStream.makeTies(inPlace=True)
+
+        self.assertEqual(len(mStream.flat), 46)
+
+        #mStream.show()
+
+        # this as expected: the only True accidental display status is those
+        # that were in the orignal. in Finale display, however, sharps are 
+        # displayed when the should not be. 
+        self.assertEqual(collectAccidentalDisplayStatus(mStream), ['x', (u'C#', False), (u'C#', False), 'x', 'x', 'x', 'x', (u'E#', True), (u'E#', False), (u'F#', False), 'x', (u'C#', False), (u'C#', False), (u'F#', False), (u'F#', False), (u'F#', False), (u'F#', False), (u'G#', False), (u'G#', False), (u'F#', False), (u'G#', False), 'x', 'x', 'x', 'x', (u'C#', False), (u'C#', False), (u'F#', False), (u'F#', False), (u'G#', False), (u'G#', False), 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', (u'E#', True), (u'E#', False), (u'F#', False), (u'F#', False)]
+        )
+
+
+        # transposing should reset all transposed accidentals
+        mStream.transpose('p5', inPlace=True)
+
+        #mStream.show()
+
+        # after transposition all accidentals are reset
+        # note: last d# is not showing in Finale, but this seems to be a 
+        # finale error, as the musicxml is the same in all D# cases
+        self.assertEqual(collectAccidentalDisplayStatus(mStream), ['x', ('G#', None), ('G#', None), 'x', 'x', 'x', 'x', ('B#', None), ('B#', None), ('C#', None), ('F#', None), ('G#', None), ('G#', None), ('C#', None), ('C#', None), ('C#', None), ('C#', None), ('D#', None), ('D#', None), ('C#', None), ('D#', None), 'x', 'x', ('F#', None), ('F#', None), ('G#', None), ('G#', None), ('C#', None), ('C#', None), ('D#', None), ('D#', None), 'x', 'x', 'x', 'x', 'x', 'x', ('F#', None), ('F#', None), ('B#', None), ('B#', None), ('C#', None), ('C#', None)]
+        )
 
 
 
@@ -9398,6 +9452,8 @@ if __name__ == "__main__":
        # a.testAnalyze()
 
         #a.testMakeTupletBracketsA()
-        a.testMakeTupletBracketsB()
+        #a.testMakeTupletBracketsB()
 
         #a.testMakeNotation()
+
+        a.testMakeTies()

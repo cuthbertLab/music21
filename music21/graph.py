@@ -1470,10 +1470,10 @@ class PlotStream(object):
         >>> from music21 import stream; s = stream.Stream()
         >>> a = PlotStream(s)
         >>> a.ticksDynamics()
-        [[0, 'pppppp'], [1, 'ppppp'], [2, 'pppp'], [3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp'], [7, 'mf'], [8, 'f'], [9, 'fp'], [10, 'sf'], [11, 'ff'], [12, 'fff'], [13, 'ffff'], [14, 'fffff'], [15, 'ffffff']]
+        [[0, '$pppppp$'], [1, '$ppppp$'], [2, '$pppp$'], [3, '$ppp$'], [4, '$pp$'], [5, '$p$'], [6, '$mp$'], [7, '$mf$'], [8, '$f$'], [9, '$fp$'], [10, '$sf$'], [11, '$ff$'], [12, '$fff$'], [13, '$ffff$'], [14, '$fffff$'], [15, '$ffffff$']]
 
         >>> a.ticksDynamics(3,6)
-        [[3, 'ppp'], [4, 'pp'], [5, 'p'], [6, 'mp']]
+        [[3, '$ppp$'], [4, '$pp$'], [5, '$p$'], [6, '$mp$']]
 
         '''
         if minNameIndex == None:
@@ -1484,7 +1484,8 @@ class PlotStream(object):
 
         ticks = []
         for i in range(minNameIndex, maxNameIndex+1):
-            ticks.append([i, dynamics.shortNames[i]])
+            # place string in tex format for italic display
+            ticks.append([i, r'$%s$' % dynamics.shortNames[i]])
         return ticks
     
     
@@ -1771,7 +1772,7 @@ class PlotHistogramPitchSpace(PlotHistogram):
         if 'title' not in keywords:
             self.graph.setTitle('Pitch Histogram')
 
-        # make smaller
+        # make smaller for axis display
         if 'tickFontSize' not in keywords:
             self.graph.tickFontSize = 7
 
@@ -2081,15 +2082,13 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
     >>> p = graph.PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parseWork('schumann/opus41no1', 2)
     >>> #_DOCS_SHOW p = graph.PlotScatterPitchSpaceDynamicSymbol(s)
-    >>> p.id
-    'scatter-pitchClass-dynamicSymbol'
     >>> p.process()
 
     .. image:: images/PlotScatterPitchSpaceDynamicSymbol.*
         :width: 600
     '''
     # string name used to access this class
-    values = ['pitchClass', 'dynamicSymbol']
+    values = ['pitchClass', 'dynamics']
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
@@ -2117,11 +2116,14 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([10,6])
+            self.graph.setFigureSize([12,6])
         if 'title' not in keywords:
             self.graph.setTitle('Pitch Class by Quarter Length Scatter')
         if 'alpha' not in keywords:
             self.graph.alpha = .7
+        # make smaller for axis display
+        if 'tickFontSize' not in keywords:
+            self.graph.tickFontSize = 7
 
 
 
@@ -2464,11 +2466,14 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([8,8])
+            self.graph.setFigureSize([12,12])
         if 'title' not in keywords:
             self.graph.setTitle('Count of Pitch Class and Quarter Length')
         if 'alpha' not in keywords:
             self.graph.alpha = .8
+        # make smaller for axis display
+        if 'tickFontSize' not in keywords:
+            self.graph.tickFontSize = 7
 
 
 
@@ -2597,13 +2602,15 @@ def plotStream(streamObj, *args, **keywords):
 
     :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
     :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
-    :class:`~graph.PlotScatterPitchClassOffset`
+    :class:`~music21.graph.PlotScatterPitchClassOffset`
+    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol`
 
     :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
     :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
 
     :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
     :class:`~music21.graph.PlotScatterWeigthedPitchClassQuarterLength`
+    :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
 
     :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
 
@@ -2615,11 +2622,15 @@ def plotStream(streamObj, *args, **keywords):
         # histograms
         PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
         # scatters
-        PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, PlotScatterPitchClassOffset,
+        PlotScatterPitchSpaceQuarterLength, 
+        PlotScatterPitchClassQuarterLength, 
+        PlotScatterPitchClassOffset,
+        PlotScatterPitchSpaceDynamicSymbol,
         # offset based horizontal
         PlotHorizontalBarPitchSpaceOffset, PlotHorizontalBarPitchClassOffset,
         # weighted scatter
         PlotScatterWeightedPitchSpaceQuarterLength, PlotScatterWeightedPitchClassQuarterLength,
+        PlotScatterWeightedPitchSpaceDynamicSymbol,
         # 3d graphs
         Plot3DBarsPitchSpaceQuarterLength,
         # windowed plots
@@ -2961,11 +2972,16 @@ class TestExternal(unittest.TestCase):
         (PlotScatterPitchSpaceQuarterLength, None, None), 
         (PlotScatterPitchClassQuarterLength, None, None), 
         (PlotScatterPitchClassOffset, None, None),
+        (PlotScatterPitchSpaceDynamicSymbol, corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+
         # offset based horizontal
         (PlotHorizontalBarPitchSpaceOffset, None, None), 
         (PlotHorizontalBarPitchClassOffset, None, None),
         # weighted scatter
         (PlotScatterWeightedPitchSpaceQuarterLength, None, None), (PlotScatterWeightedPitchClassQuarterLength, None, None),
+        (PlotScatterWeightedPitchSpaceDynamicSymbol, corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+
+
         # 3d graphs
         (Plot3DBarsPitchSpaceQuarterLength, testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),
 
@@ -2973,6 +2989,8 @@ class TestExternal(unittest.TestCase):
         (PlotWindowedSadoianAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
 
         ]
+
+
 
         sDefault = corpus.parseWork('bach/bwv57.8')
 
@@ -3191,12 +3209,16 @@ class Test(unittest.TestCase):
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
+        # windowed
+        PlotWindowedKrumhanslSchmuckler, PlotWindowedSadoianAmbitus,
         # scatters
         PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, PlotScatterPitchClassOffset,
+        PlotScatterPitchSpaceDynamicSymbol,
         # offset based horizontal
         PlotHorizontalBarPitchSpaceOffset, PlotHorizontalBarPitchClassOffset,
         # weighted scatter
         PlotScatterWeightedPitchSpaceQuarterLength, PlotScatterWeightedPitchClassQuarterLength,
+        PlotScatterWeightedPitchSpaceDynamicSymbol,
         # 3d graphs
         Plot3DBarsPitchSpaceQuarterLength,
 ]
@@ -3220,10 +3242,8 @@ if __name__ == "__main__":
 
         #a.writeGraphColorGrid()
         #a.writeAllGraphs()
-        a.writeAllPlots()
+        #a.writeAllPlots()
 
 
         #b.testColorGridLegend('write')
         #b.testPlotWindowed('write')
-
-        #a.writeAllPlots()

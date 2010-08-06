@@ -1711,6 +1711,22 @@ class Pitch(music21.Music21Object):
 
 
 
+    def setAccidentalDisplay(self, value=None):
+        '''If this Pitch has an accidental, set its displayStatus, which can be True, False, or None. 
+
+        >>> a = Pitch('a')
+        >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
+        >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
+        >>> a.accidental, a.accidental.displayStatus
+        (<accidental natural>, True)
+        >>> a.setAccidentalDisplay(None)
+        >>> a.accidental, a.accidental.displayStatus
+        (<accidental natural>, None)
+        '''
+        if self.accidental != None:
+            self.accidental.displayStatus = value 
+
+
     def updateAccidentalDisplay(self, pitchPast=[], alteredPitches=[],
             cautionaryPitchClass=True, cautionaryAll=False, 
             overrideStatus=False, cautionaryNotImmediateRepeat=True):
@@ -1755,11 +1771,11 @@ class Pitch(music21.Music21Object):
             if self.accidental == None:
                 pass # no accidental defined; we may need to add one
             elif (self.accidental != None and 
-            self.accidental.displayStatus == None): # not set; need to set  
+                self.accidental.displayStatus == None): # not set; need to set  
                 # configure based on displayStatus alone, continue w/ normal
                 pass
             elif (self.accidental != None and 
-            self.accidental.displayStatus in [True, False]): 
+                self.accidental.displayStatus in [True, False]): 
                 return # exit: already set, do not override
 
         if len(pitchPast) == 0:
