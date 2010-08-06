@@ -607,6 +607,9 @@ class PartitionedClass(PartitionedName):
 
         if match == None or match.startswith('x.__init__(...) initializes x'):
             return NO_DOC
+        # default for a dictionary
+        elif match.startswith('dict() -> new empty dictionary'):
+            return NO_DOC
         else:
             return match
 

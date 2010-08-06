@@ -2044,6 +2044,10 @@ class Duration(DurationCommon):
         >>> c.quarterLength
         1.0
         '''
+        # this work
+        # from music21 import *; s = corpus.parseWork('schumann/opus41no1', 1) 
+        # has very problematic duration
+        
         if mxNote.external['measure'] == None:
             raise DurationException(
             "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
@@ -2056,7 +2060,7 @@ class Duration(DurationCommon):
             if mxNote.get('type') != None:
                 type = musicXMLTypeToType(mxNote.get('type'))
                 forceRaw = False
-            else: # some rests do not define type, and only define induration
+            else: # some rests do not define type, and only define duration
                 type = None # no type to get, must use raw
                 forceRaw = True
     
@@ -2080,11 +2084,19 @@ class Duration(DurationCommon):
 
             # two ways to create durations, raw and cooked
             durRaw = Duration() # raw just uses qLen
+            # the qLen set here may not be computable, but is not immediately
+            # computed until setting components
             durRaw.quarterLength = qLen
 
             if forceRaw:
                 #environLocal.printDebug(['forced to use raw duration', durRaw])
-                self.components = durRaw.components
+                try:
+                    self.components = durRaw.components
+                except DurationException:
+                    environLocal.warn(['Duration._setMX', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
+                    environLocal.printDebug(['Duration._setMX', 'raw qLen', qLen, type, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
+                    durRaw.quarterLength = 1.
+
             else: # a cooked version builds up from pieces
                 durUnit = DurationUnit()
                 durUnit.type = type
