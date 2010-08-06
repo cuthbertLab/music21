@@ -164,7 +164,7 @@ def oldAccent(show=True):
                 lastBeat = beat
             m = m.sorted
     if show:
-        partBass.getMeasureRange(1,8).show('musicxml')
+        partBass.measures(1,8).show('musicxml')
     else:
         post = partBass.musicxml
 

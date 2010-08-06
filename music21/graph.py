@@ -2786,7 +2786,7 @@ class TestExternal(unittest.TestCase):
         b.process()
 
         a = corpus.parseWork('bach/bwv57.8')
-        b = PlotHorizontalBarPitchClassOffset(a[0].getMeasureRange(3,6), title='Bach (soprano voice, mm 3-6)')
+        b = PlotHorizontalBarPitchClassOffset(a[0].measures(3,6), title='Bach (soprano voice, mm 3-6)')
         b.process()
 
 

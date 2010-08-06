@@ -21,10 +21,10 @@ In the following example, the :func:`~music21.corpus.base.parseWork` function is
 >>> [e.id for e in aScore]
 [u'Violin I.', u'Violin II.', u'Viola.', u'Violoncello.']
 
-We can view the fourth and fifth measures of the violin Part by obtaining the Part from the Stream with :meth:`~music21.stream.Stream.getElementById` method. Next, we can extract the desired measures with the :meth:`~music21.stream.Stream.getMeasureRange` method. Calling the :meth:`~music21.stream.Stream.show` method will, assuming correct setup of your environment, open a display of the extracted measures. (See :ref:`quickStart` for basic configuration information; see :ref:`environment` for complete information on configuring your :class:`~music21.environment.Environment`.)
+We can view the fourth and fifth measures of the violin Part by obtaining the Part from the Stream with :meth:`~music21.stream.Stream.getElementById` method. Next, we can extract the desired measures with the :meth:`~music21.stream.Stream.measures` method. Calling the :meth:`~music21.stream.Stream.show` method will, assuming correct setup of your environment, open a display of the extracted measures. (See :ref:`quickStart` for basic configuration information; see :ref:`environment` for complete information on configuring your :class:`~music21.environment.Environment`.)
 
 >>> vlnPart = aScore.getElementById('Violin I.')
->>> mRange = vlnPart.getMeasureRange(4,7)
+>>> mRange = vlnPart.measures(4,7)
 >>> mRange.show()
 
 .. image:: images/overviewPostTonal-01.*

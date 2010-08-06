@@ -8,7 +8,7 @@ The :class:`~music21.stream.Stream` object and its many subclasses offer the fun
 
 Commonly used subclasses of Streams include the :class:`~music21.stream.Score`, :class:`~music21.stream.Part`, and :class:`~music21.stream.Measure`. As should be clear, any time we want to collect and contain a group of music21 objects, we do so in a Stream. Streams can, of course, be used for less conventional organizational structures. We frequently will build and pass around temporary Streams, as doing so gives us access to a wide variety of tools for extracting, processing, and manipulating objects on the Stream. 
 
-A critical feature of music21's design is that one music21 object can be simultaneously stored (or, more accurately, referenced) in more than one Stream. For examples, we might have numerous :class:`~music21.stream.Measure` Streams contained in a :class:`~music21.stream.Part` Stream. If we extract a region of this Part (using the :meth:`~music21.stream.Stream.getMeasureRange` method), we get a new Stream containing the specified Measures. We have not actually created new Measures or their components; the output Stream simply has references to the same objects. Changes made to Measures in this output Stream will be simultaneously reflected in Measures in the source Part. 
+A critical feature of music21's design is that one music21 object can be simultaneously stored (or, more accurately, referenced) in more than one Stream. For examples, we might have numerous :class:`~music21.stream.Measure` Streams contained in a :class:`~music21.stream.Part` Stream. If we extract a region of this Part (using the :meth:`~music21.stream.Stream.measures` method), we get a new Stream containing the specified Measures. We have not actually created new Measures or their components; the output Stream simply has references to the same objects. Changes made to Measures in this output Stream will be simultaneously reflected in Measures in the source Part. 
 
 This overview will illustrate key features of music21's Stream. For complete documentation on Streams, see :ref:`moduleStream`.
 
@@ -287,13 +287,13 @@ Note that more than just Measures might be stored in a Part (such as :class:`~mu
 >>> len(sBach[0][1].getElementsByClass(note.Note))
 3
 
-The index position of a Measure may not be the same as the Measure number. For that reason, gathering Measures is best accomplished with either the :meth:`~music21.stream.Stream.getMeasureRange` method (returning a Stream of Parts or Measures) or the :meth:`~music21.stream.Stream.getMeasure` method (returning a single Measure). In the following examples a single Measure from each part is appended to a new Stream.
+The index position of a Measure may not be the same as the Measure number. For that reason, gathering Measures is best accomplished with either the :meth:`~music21.stream.Stream.measures` method (returning a Stream of Parts or Measures) or the :meth:`~music21.stream.Stream.measure` method (returning a single Measure). In the following examples a single Measure from each part is appended to a new Stream.
 
 >>> sNew = stream.Stream()
->>> sNew.append(sBach[0].getMeasure(3))
->>> sNew.append(sBach[1].getMeasure(5))
->>> sNew.append(sBach[2].getMeasure(7))
->>> sNew.append(sBach[3].getMeasure(9))
+>>> sNew.append(sBach[0].measure(3))
+>>> sNew.append(sBach[1].measure(5))
+>>> sNew.append(sBach[2].measure(7))
+>>> sNew.append(sBach[3].measure(9))
 >>> sNew.show()
 
 .. image:: images/overviewStreams-05.*
@@ -321,10 +321,10 @@ Element offsets are always relative to the Stream that contains them. For exampl
 .. NOTE: intentionally skipping a discussion of objects having offsets stored
 .. for multiple sites here; see below
 
->>> m = sBach[0].getMeasure(8)
+>>> m = sBach[0].measure(8)
 >>> m.getOffsetBySite(sBach[0])
 21.0
->>> n = sBach[0].getMeasure(8).notes[0]
+>>> n = sBach[0].measure(8).notes[0]
 >>> n
 <music21.note.Note B->
 >>> n.getOffsetBySite(m)

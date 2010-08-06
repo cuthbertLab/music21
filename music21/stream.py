@@ -1731,7 +1731,7 @@ class Stream(music21.Music21Object):
     # routines for obtaining specific types of elements from a Stream
     # _getNotes and _getPitches are found with the interval routines
 
-    def getMeasureRange(self, numberStart, numberEnd, 
+    def measures(self, numberStart, numberEnd, 
         collect=[clef.Clef, meter.TimeSignature, 
         instrument.Instrument, key.KeySignature]):
         '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
@@ -1740,7 +1740,7 @@ class Stream(music21.Music21Object):
 
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
-        >>> b = a[0].getMeasureRange(4,6)
+        >>> b = a[0].measures(4,6)
         >>> len(b)
         3
 
@@ -1839,35 +1839,29 @@ class Stream(music21.Music21Object):
         return post
 
 
-    def getMeasure(self, measureNumber, 
+    def measure(self, measureNumber, 
         collect=[clef.Clef, meter.TimeSignature, 
         instrument.Instrument, key.KeySignature]):
         '''Given a measure number, return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
 
-        This method is distinguished from :meth:`~music21.stream.Stream.getMeasureRange` in that this method returns a single Measure object, not a Stream containing one or more Measure objects.
+        This method is distinguished from :meth:`~music21.stream.Stream.measures` in that this method returns a single Measure object, not a Stream containing one or more Measure objects.
 
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
-        >>> a[0].getMeasure(3)
+        >>> a[0].measure(3)
         <music21.stream.Measure 3 offset=0.0>
         '''
         # we must be able to obtain a measure from this (not a flat) 
         # representation (e.g., this is a Stream or Part, not a Score)
-        if len(self.getElementsByClass(Measure)) >= 1:
-            s = self.getMeasureRange(measureNumber, measureNumber, collect=collect)
+        if len(self.getElementsByClass('Measure')) >= 1:
+            s = self.measures(measureNumber, measureNumber, collect=collect)
             if len(s) == 0:
                 return None
             else:
-                return s.getElementsByClass(Measure)[0]
+                return s.getElementsByClass('Measure')[0]
         else:   
             return None
 
-#     def getMeasures(self):
-#         '''Return all :class:`~music21.stream.Measure` objects in a Stream()
-#         '''
-#         return self.getElementsByClass(Measure)
-# 
-#     measures = property(getMeasures)
 
     def measureOffsetMap(self, classFilterList=None):
         '''If this Stream contains Measures, provide a dictionary where keys are offsets and values are a list of references to one or more Measures that start at that offset. The offset values is always in the frame of the calling Stream (self).
@@ -5886,17 +5880,40 @@ class Score(Stream):
 
 
 
-    def getMeasureRange(self, numberStart, numberEnd, 
+    def measures(self, numberStart, numberEnd, 
         collect=[clef.Clef, meter.TimeSignature, 
         instrument.Instrument, key.KeySignature]):
-        '''This method override the :meth:`~music21.stream.Stream.getMeasureRange` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
+        '''This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
         '''
         post = Score()
         # note that this will strip all objects that are not Parts
-        for p in self.getElementsByClass(Part):
+        for p in self.getElementsByClass('Part'):
             # insert all at zero
-            post.insert(0, p.getMeasureRange(numberStart, numberEnd,
+            post.insert(0, p.measures(numberStart, numberEnd,
                         collect))
+        return post
+
+
+    def measure(self, measureNumber, 
+        collect=[clef.Clef, meter.TimeSignature, 
+        instrument.Instrument, key.KeySignature]):
+        '''Given a measure number, return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
+
+        This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
+
+        >>> from music21 import corpus
+        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a.measure(3)
+        <music21.stream.Score object at 0x2a6ddf0>
+        '''
+
+        post = Score()
+        # note that this will strip all objects that are not Parts
+        for p in self.getElementsByClass('Part'):
+            # insert all at zero
+            mStream = p.measures(measureNumber, measureNumber, collect=collect)
+            if len(mStream) > 0:
+                post.insert(0, mStream)
         return post
 
 
@@ -7197,7 +7214,7 @@ class Test(unittest.TestCase):
     def testMeasureRange(self):
         from music21 import corpus
         a = corpus.parseWork('bach/bwv324.xml')
-        b = a[3].getMeasureRange(4,6)
+        b = a[3].measures(4,6)
         self.assertEqual(len(b), 3) 
         # first measure now has keu sig
         self.assertEqual(len(b[0].getElementsByClass(key.KeySignature)), 1) 
@@ -7216,13 +7233,13 @@ class Test(unittest.TestCase):
             m.repeatAppend(n, 4)
             c.append(m)
         #c.show()
-        d = c.getMeasureRange(2,3)
+        d = c.measures(2,3)
         self.assertEqual(len(d), 2) 
         #d.show()
 
         # try the score method
         a = corpus.parseWork('bach/bwv324.xml')
-        b = a.getMeasureRange(2,4)
+        b = a.measures(2,4)
         self.assertEqual(len(b[0].flat.getElementsByClass(clef.Clef)), 1) 
         self.assertEqual(len(b[1].flat.getElementsByClass(clef.Clef)), 1) 
         self.assertEqual(len(b[2].flat.getElementsByClass(clef.Clef)), 1) 
@@ -9034,7 +9051,7 @@ class Test(unittest.TestCase):
         
 
         s = corpus.parseWork('bach/bwv66.6')
-        part = s.parts[0].getMeasureRange(6,9) # last meausres
+        part = s.parts[0].measures(6,9) # last meausres
         #part.show('musicxml')
         #part.show('midi')
 
@@ -9123,8 +9140,8 @@ class Test(unittest.TestCase):
 
         s = corpus.parseWork('bach/bwv66.6')
 
-        sub = [s.parts[0], s.parts[1], s.getMeasureRange(4,5), 
-                s.parts[2].getMeasureRange(4,5)]
+        sub = [s.parts[0], s.parts[1], s.measures(4,5), 
+                s.parts[2].measures(4,5)]
 
         matchAmbitus = [interval.Interval(12), 
                         interval.Interval(15), 

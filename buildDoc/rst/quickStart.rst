@@ -144,9 +144,9 @@ Again, we can view the components of the Part with the 'text' option for the sho
 {4.0} <music21.stream.Measure 1 offset=4.0>
 ...
 
-Parts contain numerous components, including :class:`~music21.instrument.Instrument` objects. We can access the components of a Part by index, or directly access Measures from within a Part by using the :meth:`~music21.stream.Stream.getMeasureRange` method. In the following example, measures 2 through 4 are extracted from the Part as a new Stream (called select) and displayed with the show() method. 
+Parts contain numerous components, including :class:`~music21.instrument.Instrument` objects. We can access the components of a Part by index, or directly access Measures from within a Part by using the :meth:`~music21.stream.Stream.measures` method. In the following example, measures 2 through 4 are extracted from the Part as a new Stream (called select) and displayed with the show() method. 
 
->>> select = sBach[0].getMeasureRange(2,4)
+>>> select = sBach[0].measures(2,4)
 >>> select.show()
 
 .. image:: images/quickStart-03.*

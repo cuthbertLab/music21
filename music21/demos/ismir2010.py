@@ -46,7 +46,7 @@ def newDots(show=True):
     # display measure 0 (pickup) to measure 6 in the default viewer 
     # (here Finale Reader 2009)
     if (show is True):
-        bass.getMeasureRange(0,6).show()
+        bass.measures(0,6).show()
 
 
 def altDots(show=True):
@@ -54,7 +54,7 @@ def altDots(show=True):
     '''
     bwv30_6 = corpus.parseWork('bach/bwv30.6.xml')
     bass = bwv30_6.getElementById('Bass')
-    excerpt = bass.getMeasureRange(1,10)
+    excerpt = bass.measures(1,10)
     music21.analysis.metrical.labelBeatDepth(excerpt)
     if (show is True):
         excerpt.show()
@@ -62,7 +62,7 @@ def altDots(show=True):
 
     bwv11_6 = corpus.parseWork('bach/bwv11.6.xml')
     alto = bwv11_6.getElementById('Alto')
-    excerpt = alto.getMeasureRange(13,20)
+    excerpt = alto.measures(13,20)
     music21.analysis.metrical.labelBeatDepth(excerpt)
     if (show is True):
         excerpt.show()
@@ -334,13 +334,13 @@ def demoBasic():
 
     # A Part might contain numerous Measure Streams
     len(soprano.getElementsByClass('Measure'))
-    mRange = soprano.getMeasureRange(14,16)
+    mRange = soprano.measures(14,16)
     #mRange.show()
    # mRange.sorted.show('text') # here we can see this
 
 
 
-    sNew = soprano.getMeasureRange(14,16).flat.notes.transpose('p-5')
+    sNew = soprano.measures(14,16).flat.notes.transpose('p-5')
     sNew.makeAccidentals(overrideStatus=True)
     ts1 = meter.TimeSignature('3/4')
     ts2 = meter.TimeSignature('5/8')
@@ -438,8 +438,8 @@ def demoGraphBach():
     dpi = 300
 
     # loping off first measure to avoid pickup
-    s1 = corpus.parseWork('bach/bwv103.6').getMeasureRange(1,None)
-    s2 = corpus.parseWork('bach/bwv18.5-lz').getMeasureRange(1,None)
+    s1 = corpus.parseWork('bach/bwv103.6').measures(1,None)
+    s2 = corpus.parseWork('bach/bwv18.5-lz').measures(1,None)
 
     s1.plot('key', dpi=dpi, title='Windowed Key Analysis, Bach, BWV 103.6', windowStep='pow2')
     s2.plot('key', dpi=dpi, title='Windowed Key Analysis, Bach, BWV 18.5', windowStep='pow2')
