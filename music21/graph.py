@@ -2909,20 +2909,15 @@ class TestExternal(unittest.TestCase):
             [(x, random.choice(range(30))) for x in range(50)]),
         (Graph3DPolygonBars, data3DPolygonBars),
         (GraphColorGridLegend, 
-        [('Major', [('C#', '#00AA55'), ('D-', '#5600FF'), ('G#', '#2B00FF')]),
-         ('Minor', [('C#', '#004600'), ('D-', '#00009b'), ('G#', '#00009B')]),]
+        [('Major', [('C', '#00AA55'), ('D', '#5600FF'), ('G', '#2B00FF')]),
+         ('Minor', [('C', '#004600'), ('D', '#00009b'), ('G', '#00009B')]),]
         ),
-        (GraphColorGrid, [['#55FF00', '#9b0000', '#009b00'], 
+        (GraphColorGrid, [['#8968CD', '#96CDCD', '#CD4F39'], 
                 ['#FFD600', '#FF5600'], 
-                ['#201a2b', '#8f73bf', '#a080d5', '#403355', '#999999'],
+                ['#201a2b', '#8f73bf', '#a080d5', '#6495ED', '#FF83FA'],
                ]
         ),
 
-
-        ]
-
-        graphClasses = [
-        
         ]
 
         for graphClassName, data in graphClasses:
@@ -2973,16 +2968,13 @@ class TestExternal(unittest.TestCase):
         (PlotScatterWeightedPitchSpaceQuarterLength, None, None), (PlotScatterWeightedPitchClassQuarterLength, None, None),
         # 3d graphs
         (Plot3DBarsPitchSpaceQuarterLength, testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),
-        ]
-
-        sDefault = corpus.parseWork('bach/bwv57.8')
-
-        plotClasses = [
 
         (PlotWindowedKrumhanslSchmuckler, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
         (PlotWindowedSadoianAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
 
         ]
+
+        sDefault = corpus.parseWork('bach/bwv57.8')
 
         for plotClassName, work, titleStr in plotClasses:
             if work == None:
@@ -3228,10 +3220,10 @@ if __name__ == "__main__":
 
         #a.writeGraphColorGrid()
         #a.writeAllGraphs()
-        #a.writeAllPlots()
+        a.writeAllPlots()
 
 
-        b.testColorGridLegend('write')
+        #b.testColorGridLegend('write')
         #b.testPlotWindowed('write')
 
         #a.writeAllPlots()
