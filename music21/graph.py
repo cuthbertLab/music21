@@ -2655,6 +2655,7 @@ def plotStream(streamObj, *args, **keywords):
     .. image:: images/PlotHistogramPitchSpace.*
         :width: 600
 
+
     >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
     >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
