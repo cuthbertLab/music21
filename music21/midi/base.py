@@ -620,10 +620,11 @@ class MidiTrack(object):
         # set time to the first event
         time = self.events[0].time 
         # build str using MidiEvents 
-        str = "" 
+        str = ""
         for e in self.events: 
             # this writes both delta time and message events
-            str = str + e.write() 
+            ew = e.write()
+            str = str + ew 
         return "MTrk" + putNumber(len(str), 4) + str 
     
     def __repr__(self): 
@@ -729,7 +730,8 @@ class MidiFile(object):
             self.tracks.append(trk) 
     
     def write(self): 
-        self.file.write(self.writestr()) 
+        ws = self.writestr()
+        self.file.write(ws) 
     
     def writestr(self): 
         division = self.ticksPerQuarterNote 
