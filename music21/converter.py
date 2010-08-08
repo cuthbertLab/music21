@@ -422,6 +422,16 @@ class ConverterMusicXML(object):
             c.writePickle(fpPickle)
 
         self._mxScore = c.score
+
+        # movement titles can be stored in more than one place in musicxml
+        # manually insert file name as a title if no titles are defined
+        if self._mxScore.get('movementTitle') == None:
+            mxWork = self._mxScore.get('workObj')
+            if mxWork == None or mxWork.get('workTitle') == None: 
+                junk, fn = os.path.split(fp)
+                # set as movement title
+                self._mxScore.set('movementTitle', fn)
+
         if len(self._mxScore) == 0:
             raise ConverterException('score from file path (...%s) no parts defined' % fp[-10:])
         self.load()

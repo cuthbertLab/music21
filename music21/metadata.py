@@ -1277,7 +1277,9 @@ class Metadata(music21.Music21Object):
         '''
         self.movementNumber = mxScore.get('movementNumber')
         # xml calls this title not name
-        self.movementName = mxScore.get('movementTitle')
+        mxName = mxScore.get('movementTitle')
+        if mxName != None:
+            self.movementName = mxName
 
         mxWork = mxScore.get('workObj')
         if mxWork != None: # may be set to none
