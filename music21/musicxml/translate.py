@@ -410,6 +410,21 @@ def streamToMx(s):
     >>> mxScore = musicxml.translate.streamToMx(s1)
     >>> mxPartList = mxScore.get('partList')
     '''
+    if len(s) == 0:
+        # create an empty work
+        from music21 import stream, note, metadata
+        out = stream.Stream()
+        m = stream.Measure()
+        r = note.Rest()
+        r.duration.type = 'whole'
+        m.append(r)
+        out.append(m)
+        # return the processing of this Stream
+        md = metadata.Metadata(title='This Page Intentionally Left Blank')
+        out.insert(0, md)
+        # recursive call to this non-empty stream
+        return streamToMx(out)
+
     #environLocal.printDebug('calling Stream._getMX')
     mxComponents = []
     instList = []

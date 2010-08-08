@@ -536,55 +536,64 @@ class GeneralNote(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getMusicXML(self):
-        '''This must call _getMX to get basic mxNote objects
+        '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
+
         >>> from music21 import *
         >>> n = note.Note()
         >>> post = n._getMusicXML()
         '''
+        import stream
+
         # make a copy, as we this process will change tuple types
         selfCopy = copy.deepcopy(self)
         duration.updateTupletType(selfCopy.duration) # modifies in place
 
-        mxNoteList = selfCopy._getMX() # can be rest, note, or chord
+        out = stream.Stream()
+        out.append(selfCopy)
+        # call the musicxml property on Stream
+        return out.musicxml
+        
 
-        mxMeasure = musicxmlMod.Measure()
-        mxMeasure.setDefaults()
-        for mxNote in mxNoteList:
-            mxMeasure.append(mxNote)
-
-        mxPart = musicxmlMod.Part()
-        mxPart.setDefaults()
-        mxPart.append(mxMeasure)
-
-        # see if an instrument is defined in this or a parent stream
-        if hasattr(self.parent, 'getInstrument'):
-            instObj = self.parent.getInstrument()
-        else:
-            instObj = instrument.Instrument()
-            # part id is now configured later in processing
-            #instObj.partId = defaults.partId # give a default id
-            instObj.instrumentIdRandomize()
-            instObj.partIdRandomize()
-            instObj.partName = defaults.partName # give a default id
-
-        mxScorePart = musicxmlMod.ScorePart()
-        mxScorePart.set('partName', instObj.partName)
-        mxScorePart.set('id', instObj.partId)
-
-        # must set this part to the same id
-        mxPart.set('id', instObj.partId)
-
-        mxPartList = musicxmlMod.PartList()
-        mxPartList.append(mxScorePart)
-
-        mxIdentification = musicxmlMod.Identification()
-        mxIdentification.setDefaults() # will create a composer
-        mxScore = musicxmlMod.Score()
-        mxScore.setDefaults()
-        mxScore.set('partList', mxPartList)
-        mxScore.set('identification', mxIdentification)
-        mxScore.append(mxPart)
-        return mxScore.xmlStr()
+#         mxNoteList = selfCopy._getMX() # can be rest, note, or chord
+# 
+#         mxMeasure = musicxmlMod.Measure()
+#         mxMeasure.setDefaults()
+#         for mxNote in mxNoteList:
+#             mxMeasure.append(mxNote)
+# 
+#         mxPart = musicxmlMod.Part()
+#         mxPart.setDefaults()
+#         mxPart.append(mxMeasure)
+# 
+#         # see if an instrument is defined in this or a parent stream
+#         if hasattr(self.parent, 'getInstrument'):
+#             instObj = self.parent.getInstrument()
+#         else:
+#             instObj = instrument.Instrument()
+#             # part id is now configured later in processing
+#             #instObj.partId = defaults.partId # give a default id
+#             instObj.instrumentIdRandomize()
+#             instObj.partIdRandomize()
+#             instObj.partName = defaults.partName # give a default id
+# 
+#         mxScorePart = musicxmlMod.ScorePart()
+#         mxScorePart.set('partName', instObj.partName)
+#         mxScorePart.set('id', instObj.partId)
+# 
+#         # must set this part to the same id
+#         mxPart.set('id', instObj.partId)
+# 
+#         mxPartList = musicxmlMod.PartList()
+#         mxPartList.append(mxScorePart)
+# 
+#         mxIdentification = musicxmlMod.Identification()
+#         mxIdentification.setDefaults() # will create a composer
+#         mxScore = musicxmlMod.Score()
+#         mxScore.setDefaults()
+#         mxScore.set('partList', mxPartList)
+#         mxScore.set('identification', mxIdentification)
+#         mxScore.append(mxPart)
+#         return mxScore.xmlStr()
 
 
 
