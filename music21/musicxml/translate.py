@@ -681,7 +681,156 @@ def generalNoteToMusicXML(n):
     
 
 
+def noteToMxNotes(n):
 
+    '''
+    Returns a List of mxNotes
+    Attributes of notes are merged from different locations: first from the 
+    duration objects, then from the pitch objects. Finally, GeneralNote 
+    attributes are added
+    '''
+    mxNoteList = []
+    for mxNote in n.duration.mx: # returns a list of mxNote objs
+        # merge method returns a new object
+        mxNote = mxNote.merge(n.pitch.mx)
+        # get color from within .editorial using attribute
+        mxNote.set('color', n.color)
+        mxNoteList.append(mxNote)
+
+    # note: lyric only applied to first note
+    for lyricObj in n.lyrics:
+        mxNoteList[0].lyricList.append(lyricObj.mx)
+
+    # if this note, not a component duration, but this note has a tie, 
+    # need to add this to the last-encountered mxNote
+    if n.tie != None:
+        mxTieList, mxTiedList = n.tie.mx # get mxl objs from tie obj
+        # if starting a tie, add to last mxNote in mxNote list
+        if n.tie.type == 'start':
+            mxNoteList[-1].tieList += mxTieList
+            mxNoteList[-1].notationsObj.componentList += mxTiedList
+        # if ending a tie, set first mxNote to stop
+        # TODO: this may need to continue if there are components here
+        elif n.tie.type == 'stop':
+            mxNoteList[0].tieList += mxTieList
+            mxNoteList[0].notationsObj.componentList += mxTiedList
+
+    # need to apply beams to notes, but application needs to be
+    # reconfigured based on what is gotten from n.duration.mx
+
+    # likely, this means that many continue beams will need to be added
+
+    # this is setting the same beams for each part of this 
+    # note; this may not be correct, as we may be dividing the note into
+    # more than one part
+    for mxNote in mxNoteList:
+        if n.beams != None:
+            mxNote.beamList = n.beams.mx
+
+    # if we have any articulations, they only go on the first of any 
+    # component notes
+    mxArticulations = musicxmlMod.Articulations()
+    for i in range(len(n.articulations)):
+        obj = n.articulations[i] # returns mxArticulationMark
+        mxArticulations.append(obj.mx) # append to mxArticulations
+    if len(mxArticulations) > 0:
+        mxNoteList[0].notationsObj.componentList.append(mxArticulations)
+
+    # notations and articulations are mixed in musicxml
+    for i in range(len(n.notations)):
+        obj = n.notations[i] 
+        mxNoteList[0].notationsObj.componentList.append(obj.mx)
+
+    return mxNoteList
+
+
+
+def mxToNote(mxNote, inputM21):
+
+    from music21 import articulations
+    from music21 import expressions
+    from music21 import note
+
+    if inputM21 == None:
+        n = note.Measure()
+    else:
+        n = inputM21
+
+
+    # print object == 'no' and grace notes may have a type but not
+    # a duration. they may be filtered out at the level of Stream 
+    # processing
+    if mxNote.get('printObject') == 'no':
+        environLocal.printDebug(['got mxNote with printObject == no'])
+
+    mxGrace = mxNote.get('grace')
+    if mxGrace != None: # graces have a type but not a duration
+        environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration')])
+
+    n.pitch.mx = mxNote # required info will be taken from entire note
+    n.duration.mx = mxNote
+    n.beams.mx = mxNote.beamList
+
+    mxTieList = mxNote.get('tieList')
+    if len(mxTieList) > 0:
+        tieObj = note.Tie() # m21 tie object
+        tieObj.mx = mxNote # provide entire Note
+        # n.tie is defined in GeneralNote as None by default
+        n.tie = tieObj
+
+    mxNotations = mxNote.get('notations')
+    if mxNotations != None:
+        # get a list of mxArticulationMarks, not mxArticulations
+        mxArticulationMarkList = mxNotations.getArticulations()
+        for mxObj in mxArticulationMarkList:
+            articulationObj = articulations.Articulation()
+            articulationObj.mx = mxObj
+            n.articulations.append(articulationObj)
+
+        # get any fermatas, store on notations
+        mxFermataList = mxNotations.getFermatas()
+        for mxObj in mxFermataList:
+            fermataObj = expressions.Fermata()
+            fermataObj.mx = mxObj
+            # placing this as an articulation for now
+            n.notations.append(fermataObj)
+
+            #environLocal.printDebug(['_setMX(), n.mxFermataList', mxFermataList])
+
+
+
+
+
+def restToMxNotes(r):
+
+    mxNoteList = []
+    for mxNote in r.duration.mx: # returns a list of mxNote objs
+        # merge method returns a new object
+        mxRest = musicxmlMod.Rest()
+        mxRest.setDefaults()
+        mxNote.set('rest', mxRest)
+        # get color from within .editorial using attribute
+        mxNote.set('color', r.color)
+        mxNoteList.append(mxNote)
+    return mxNoteList
+
+
+
+
+def mxToRest(mxNote, inputM21=None):
+
+    from music21 import duration
+
+    if inputM21 == None:
+        r = note.Rest()
+    else:
+        r = inputM21
+
+    try:
+        r.duration.mx = mxNote
+    except duration.DurationException:
+        environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, r])
+        raise
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
