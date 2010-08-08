@@ -1932,7 +1932,8 @@ class Music21Object(object):
             return self.lily.showPNG()
 
         elif fmt in ['musicxml', 'midi']: # a format that writes a file
-            environLocal.launch(format, self.write(format), app=app)
+            returnedFilePath = self.write(format)
+            environLocal.launch(format, returnedFilePath, app=app)
 
         else:
             raise Music21ObjectException('no such show format is supported:', fmt)

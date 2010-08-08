@@ -6,6 +6,7 @@
 import pycallgraph
 import time
 
+from music21 import *
 import music21.stream
 import music21.humdrum
 from music21.humdrum import testFiles
@@ -33,8 +34,12 @@ def timeCapua():
 def timeCapua2():
     music21.trecento.capua.ruleFrequency()
 
+def timeISMIR():
+    s1 = corpus.parseWork('bach/bwv248')
+    s1.write()
+
 excludeList =  ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*',]
-excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
+#excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
 gf = pycallgraph.GlobbingFilter(exclude=excludeList)
 
@@ -42,7 +47,7 @@ print(time.ctime())
 
 pycallgraph.start_trace(filter_func = gf)
 
-timeCapua2()
+timeISMIR()
 
 pycallgraph.make_dot_graph('d:\\desktop\\test1.png')
 

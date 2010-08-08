@@ -1205,6 +1205,8 @@ class Note(NotRest):
         baseName += octaveModChars
         if (self.editorial.ficta is not None):
             baseName += "!"  # always display ficta
+        elif self.pitch is not None and self.pitch.accidental is not None:
+            baseName += self.pitch.accidental.lilyDisplayType()
         return baseName
 
 

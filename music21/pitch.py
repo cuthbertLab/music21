@@ -515,13 +515,6 @@ class Accidental(music21.Music21Object):
         if (self.name == "half-flat"): lilyRet = "eh"
         if (self.name == "one-and-a-half-flat"): lilyRet = "eseh"
         
-        if self.displayStatus == True or self.displayType == "always" \
-           or self.displayType == "even-tied":
-            lilyRet += "!"
-        
-        if self.displayStyle == "parentheses" or self.displayStyle == "both":
-            lilyRet += "?"
-            ## no brackets for now
         return lilyRet
         
     def _setLily(self, value):
@@ -543,6 +536,19 @@ class Accidental(music21.Music21Object):
 
     # property
     lily = property(_getLily, _setLily)
+
+    def lilyDisplayType(self):
+        lilyRet = ""
+        if self.displayStatus == True or self.displayType == "always" \
+           or self.displayType == "even-tied":
+            lilyRet += "!"
+        
+        if self.displayStyle == "parentheses" or self.displayStyle == "both":
+            lilyRet += "?"
+            ## no brackets for now
+
+        return lilyRet
+
 
     def _getMx(self):
         """From music21 to MusicXML
