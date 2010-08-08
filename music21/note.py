@@ -27,6 +27,7 @@ from music21 import interval
 from music21 import editorial
 from music21.lily import LilyString
 from music21 import musicxml as musicxmlMod
+from music21.musicxml import translate as musicxmlTranslate
 #from music21 import midi as midiModule
 from music21.midi import translate as midiTranslate
 from music21 import expressions
@@ -542,17 +543,8 @@ class GeneralNote(music21.Music21Object):
         >>> n = note.Note()
         >>> post = n._getMusicXML()
         '''
-        import stream
+        return musicxmlTranslate.generalNoteToMusicXML(self)
 
-        # make a copy, as we this process will change tuple types
-        selfCopy = copy.deepcopy(self)
-        duration.updateTupletType(selfCopy.duration) # modifies in place
-
-        out = stream.Stream()
-        out.append(selfCopy)
-        # call the musicxml property on Stream
-        return out.musicxml
-        
 
 #         mxNoteList = selfCopy._getMX() # can be rest, note, or chord
 # 

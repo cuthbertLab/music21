@@ -664,7 +664,21 @@ def mxToStream(mxScore, inputM21):
 
 
 #-------------------------------------------------------------------------------
+# Notes
 
+def generalNoteToMusicXML(n):
+
+    from music21 import stream, duration
+
+    # make a copy, as we this process will change tuple types
+    nCopy = copy.deepcopy(n)
+    duration.updateTupletType(nCopy.duration) # modifies in place
+
+    out = stream.Stream()
+    out.append(nCopy)
+    # call the musicxml property on Stream
+    return out.musicxml
+    
 
 
 
