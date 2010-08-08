@@ -1942,6 +1942,8 @@ class Stream(music21.Music21Object):
         >>> len(c) == 1
         True
         '''
+        # even if this is a Measure, the TimeSignatue in the Stream will be 
+        # found
         post = self.getElementsByClass(meter.TimeSignature)
 
         # search parent Streams through contexts    

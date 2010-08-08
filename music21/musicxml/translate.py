@@ -295,39 +295,59 @@ def mxToMeasure(mxMeasure, inputM21):
 def measureToMusicXML(m):
     '''Convert a music21 measure into a complete musicXML string representation
     '''
+    
+    from music21 import stream, duration
 
-    mxMeasure = m._getMX()
+    # search for time signatures, either defined locally or in context
+    found = m.getTimeSignatures(returnDefault=False)
+    if len(found) == 0:
+        ts = m.bestTimeSignature()
+    else:
+        ts = found[0]
 
-    mxPart = musicxmlMod.Part()
-    mxPart.setDefaults()
-    mxPart.append(mxMeasure) # append measure here
+    # might similarly look for key signature, instrument, and clef
+
+    mCopy = copy.deepcopy(m)    
+    mCopy.timeSignature = ts
+
+    out = stream.Stream()
+    out.append(mCopy)
+    # call the musicxml property on Stream
+    return out.musicxml
 
 
-    # see if an instrument is defined in this or a prent stream
-    instObj = m.getInstrument()
 
-    if instObj.partId == None:
-        instObj.instrumentIdRandomize()
-        instObj.partIdRandomize()
-
-    mxScorePart = musicxmlMod.ScorePart()
-    mxScorePart.set('partName', instObj.partName)
-    mxScorePart.set('id', instObj.partId)
-    # must set this part to the same id
-    mxPart.set('id', instObj.partId)
-
-    mxPartList = musicxmlMod.PartList()
-    mxPartList.append(mxScorePart)
-
-    mxIdentification = musicxmlMod.Identification()
-    mxIdentification.setDefaults() # will create a composer
-    mxScore = musicxmlMod.Score()
-    mxScore.setDefaults()
-    mxScore.set('partList', mxPartList)
-    mxScore.set('identification', mxIdentification)
-    mxScore.append(mxPart)
-
-    return mxScore.xmlStr()
+#     mxMeasure = m._getMX()
+# 
+#     mxPart = musicxmlMod.Part()
+#     mxPart.setDefaults()
+#     mxPart.append(mxMeasure) # append measure here
+# 
+#     # see if an instrument is defined in this or a prent stream
+#     instObj = m.getInstrument()
+# 
+#     if instObj.partId == None:
+#         instObj.instrumentIdRandomize()
+#         instObj.partIdRandomize()
+# 
+#     mxScorePart = musicxmlMod.ScorePart()
+#     mxScorePart.set('partName', instObj.partName)
+#     mxScorePart.set('id', instObj.partId)
+#     # must set this part to the same id
+#     mxPart.set('id', instObj.partId)
+# 
+#     mxPartList = musicxmlMod.PartList()
+#     mxPartList.append(mxScorePart)
+# 
+#     mxIdentification = musicxmlMod.Identification()
+#     mxIdentification.setDefaults() # will create a composer
+#     mxScore = musicxmlMod.Score()
+#     mxScore.setDefaults()
+#     mxScore.set('partList', mxPartList)
+#     mxScore.set('identification', mxIdentification)
+#     mxScore.append(mxPart)
+# 
+#     return mxScore.xmlStr()
 
 
 #-------------------------------------------------------------------------------
