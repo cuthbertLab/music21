@@ -101,6 +101,7 @@ class Stream(music21.Music21Object):
     Stream. -- see the ._getDuration() and ._setDuration() methods
     '''
 
+    # TODO: this and similar attributes are to replaced by checks to .classes
     isMeasure = False
 
     # define order to present names in documentation; use strings
@@ -111,6 +112,8 @@ class Stream(music21.Music21Object):
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'isSorted': 'Boolean describing whether the Stream is sorted or not.',
+    'autoSort': 'Boolean describing whether the Stream is automatically sorted by offset whenever necessary.',
+
     'isFlat': 'Boolean describing whether the Stream is flat.',
     'flattenedRepresentationOf': 'When this flat Stream is derived from another non-flat stream, a reference to the source Stream is stored here.',
     }
@@ -132,6 +135,7 @@ class Stream(music21.Music21Object):
         #self.obj = None
 
         self.isSorted = True
+        self.autoSort = True
         self.isFlat = True  ## does it have no embedded elements
 
         # seems that this should be named with a leading lower case?
@@ -282,6 +286,7 @@ class Stream(music21.Music21Object):
         self.isSorted = False
         self.isFlat = True
         for thisElement in self._elements:
+            # only need to find one case, and if so, no longer flat
             if isinstance(thisElement, Stream): 
                 self.isFlat = False
                 break
@@ -3285,20 +3290,53 @@ class Stream(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    def _getSorted(self):
-        post = copy.copy(self.elements) ## already a copy
-        post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self),
+
+    def sort(self):
+        '''Sort this Stream in place by offset, as well as by the standard class sort order.
+
+        >>> from music21 import *
+        >>> n1 = note.Note('a')
+        >>> n2 = note.Note('b')
+        >>> s = stream.Stream()
+        >>> s.insert(100, n2)
+        >>> s.insert(0, n1) # now a has a lower offset by higher index
+        >>> [n.name for n in s]
+        ['B', 'A']
+        >>> s.sort()
+        >>> [n.name for n in s]
+        ['A', 'B']
+        '''
+        self._elements.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self),
             y.getOffsetBySite(self)) or 
             cmp(x.priority, y.priority) or 
             cmp(x.classSortOrder, y.classSortOrder)
             )
+        self.isSorted = True
+
+
+    def _getSorted(self):
+        # get a shallow copy of elements list
+        post = copy.copy(self._elements) # already a copy
+#         post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self),
+#             y.getOffsetBySite(self)) or 
+#             cmp(x.priority, y.priority) or 
+#             cmp(x.classSortOrder, y.classSortOrder)
+#             )
+    
+        # get a shallow copy of the Stream itself
         newStream = copy.copy(self)
-        newStream.elements = post
+        # assign directly to _elements, as we do not need to call 
+        # _elementsChanged()
+        newStream._elements = post
         for e in post:
             e.addLocation(newStream, e.getOffsetBySite(self))
             # need to explicitly set parent
             e.parent = newStream 
-        newStream.isSorted = True
+#         newStream.isSorted = True
+
+        # now just sort this stream in place; this will update the 
+        # isSorted attribute
+        newStream.sort()
         return newStream
     
     sorted = property(_getSorted, doc='''
@@ -5207,6 +5245,7 @@ class Measure(Stream):
 
         Note: this does not yet accommodate triplets. 
         '''
+        #TODO: set limit at 11/4?
 
         minDurQL = 4 # smallest denominator; start with a whole note
 
@@ -9255,6 +9294,33 @@ class Test(unittest.TestCase):
         #sSub.show()
         
 
+
+    def testSortAndAutoSort(self):
+        from music21 import note
+        s = Stream()
+        s.autoSort = False
+
+        n1 = note.Note('a')
+        n2 = note.Note('b')
+
+        s.insert(100, n2) # add  'b' first
+        s.insert(0, n1) # now n1 has a higher index than n2
+
+        self.assertEqual([x.name for x in s], ['B', 'A'])
+        # try getting sorted
+        sSorted = s.sorted
+        # original unchanged
+        self.assertEqual([x.name for x in s], ['B', 'A'])
+        # new is chnaged
+        self.assertEqual([x.name for x in sSorted], ['A', 'B'])
+
+
+        # sort in place
+        s.sort()
+        self.assertEqual([x.name for x in s], ['A', 'B'])
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -9266,22 +9332,23 @@ if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
-        a = Test()
-        b = TestExternal()
+        t = Test()
+        te = TestExternal()
 
 
-        #a.testYieldContainers()
-        #a.testMidiEventsBuilt()    
-        #a.testMidiEventsImported()
-        #a.testFindGaps()
-        #a.testQuantize()
-       # a.testAnalyze()
+        #t.testYieldContainers()
+        #t.testMidiEventsBuilt()    
+        #t.testMidiEventsImported()
+        #t.testFindGaps()
+        #t.testQuantize()
+       # t.testAnalyze()
 
-        #a.testMakeTupletBracketsA()
-        #a.testMakeTupletBracketsB()
+        #t.testMakeTupletBracketsA()
+        #t.testMakeTupletBracketsB()
 
-        #a.testMakeNotation()
+        #t.testMakeNotation()
 
-        #a.testMakeTies()
+        #t.testMakeTies()
 
-        a.testMeasuresAndMakeMeasures()
+        #t.testMeasuresAndMakeMeasures()
+        t.testSortAndAutoSort()
