@@ -301,14 +301,19 @@ def measureToMusicXML(m):
     # search for time signatures, either defined locally or in context
     found = m.getTimeSignatures(returnDefault=False)
     if len(found) == 0:
-        ts = m.bestTimeSignature()
+        try:
+            ts = m.bestTimeSignature()
+        # may raise an exception if cannot find a rational match
+        except stream.StreamException:
+            ts = None # get the default
     else:
         ts = found[0]
 
     # might similarly look for key signature, instrument, and clef
 
     mCopy = copy.deepcopy(m)    
-    mCopy.timeSignature = ts
+    if ts != None:
+        mCopy.timeSignature = ts
 
     out = stream.Stream()
     out.append(mCopy)
