@@ -59,6 +59,8 @@ def convertPitchClassToNumber(ps):
     10
     >>> convertPitchClassToNumber('B')
     11
+    >>> convertPitchClassToNumber('3')
+    3
     '''
     if common.isNum(ps):
         return ps
@@ -123,6 +125,7 @@ def convertNameToPs(pitchName):
 
 def convertPsToOct(ps):
     '''Utility conversion; does not process internals.
+    Converts a midiNote number to an octave number.
     Assume C4 middle C, so 60 returns 4
     >>> [convertPsToOct(59), convertPsToOct(60), convertPsToOct(61)]
     [3, 4, 4]
@@ -194,6 +197,8 @@ def convertPsToStep(ps):
 
 def convertStepToPs(step, oct, acc=None):
     '''Utility conversion; does not process internals.
+    Takes in a note name string, octave number, and optional accidental (as integer).
+    Returns a midiNote number.
     >>> convertStepToPs('c', 4, 1)
     61
     >>> convertStepToPs('d', 2, -2)
@@ -214,6 +219,7 @@ def convertStepToPs(step, oct, acc=None):
 def convertPsToFq(ps):
     '''Utility conversion; does not process internals.
     
+    Converts a midiNote number to a frequency in Hz.
     Assumes A4 = 440 Hz
     >>> convertPsToFq(69)
     440.0
@@ -237,6 +243,7 @@ def convertPsToFq(ps):
 
 def convertFqToPs(fq):
     '''Utility conversion; does not process internals.
+    Converts a frequency in Hz into a midiNote number.
     Assumes A4 = 440 Hz
     >>> convertFqToPs(440)
     69.0
@@ -281,6 +288,7 @@ class Accidental(music21.Music21Object):
          by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.''',
     'displaySize': 'Size in display: "cue", "large", or a percentage.',
     'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
+    'displayLocation': 'Location of accidental: "normal", "above", "below".'
     }
 
     def __init__(self, specifier='natural'):
@@ -535,7 +543,8 @@ class Accidental(music21.Music21Object):
             self.displayStyle = "parentheses"
 
     # property
-    lily = property(_getLily, _setLily)
+    lily = property(_getLily, _setLily, doc =
+                    '''From music21 to Lilypond notation.''')
 
     def lilyDisplayType(self):
         lilyRet = ""
