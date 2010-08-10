@@ -12,13 +12,13 @@
 import copy
 from music21 import *
 
-def pitchedPhase():
+def pitchedPhase(show=False):
 
     sSrc = converter.parse("""E16 F# B c# d F# E c# B F# d c# 
                               E16 F# B c# d F# E c# B F# d c#""", '12/16')
     sPost = stream.Score()
-    sPost.append(stream.Part())
-    sPost.append(stream.Part())
+    sPost.insert(0, stream.Part())
+    sPost.insert(0, stream.Part())
 
     increment = 0.0625
 
@@ -31,13 +31,17 @@ def pitchedPhase():
         sPost.parts[1].append(sMod)
 
 
-    sPost.show('midi')
-    # midi for some reason shows a leading rest
-    sPost.show()
+    if show:
+        sPost.show('midi')
+        # midi for some reason shows a leading rest
+        sPost.show()
 
+    #post = sPost.musicxml
 
 
 if __name__ == '__main__':
 
-    pitchedPhase()
+    pitchedPhase(show=True)
+
+
 

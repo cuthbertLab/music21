@@ -1228,6 +1228,9 @@ class Stream(music21.Music21Object):
             if not isinstance(classFilterList, tuple):
                 classFilterList = [classFilterList]
 
+#         if not self.isSorted and self.autoSort:
+#             self.sort() # will set isSorted to True
+
         # use direct access to elements list
         for e in self._elements:
             eClasses = e.classes # store once, as this is property call
@@ -2378,7 +2381,7 @@ class Stream(music21.Music21Object):
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
         '''
-        #environLocal.printDebug(['calling Stream.makeMeasures()'])
+        environLocal.printDebug(['calling Stream.makeMeasures()'])
 
         # the srcObj shold not be modified or chagned
         # removed element copyig below and now making a deepcopy of entire stream
@@ -2387,7 +2390,7 @@ class Stream(music21.Music21Object):
         # should be contained
 
         # TODO: make inPlace an option
-        srcObj = copy.deepcopy(self.flat)
+        srcObj = copy.deepcopy(self.flat.sorted)
 
         # may need to look in parent if no time signatures are found
         if meterStream is None:
@@ -2436,8 +2439,9 @@ class Stream(music21.Music21Object):
         oMax = max([end for start, end, e in offsetMap])
     
         # this should not happen, but just in case
-        if not common.almostEquals(oMax, srcObj.highestTime):
-            raise StreamException('mismatch between oMax and highestTime (%s, %s)' % (oMax, srcObj.highestTime))
+        # not sure this is necessary
+#         if not common.almostEquals(oMax, srcObj.highestTime):
+#             raise StreamException('mismatch between oMax and highestTime (%s, %s)' % (oMax, srcObj.highestTime))
         #environLocal.printDebug(['oMin, oMax', oMin, oMax])
     
         # if a ref stream is provided, get highst time from there
@@ -3298,6 +3302,7 @@ class Stream(music21.Music21Object):
         >>> n1 = note.Note('a')
         >>> n2 = note.Note('b')
         >>> s = stream.Stream()
+        >>> s.autoSort = False
         >>> s.insert(100, n2)
         >>> s.insert(0, n1) # now a has a lower offset by higher index
         >>> [n.name for n in s]
@@ -3664,7 +3669,7 @@ class Stream(music21.Music21Object):
         >>> r.highestTime # 44 + 3
         47.0
         '''
-
+#         environLocal.printDebug(['_getHighestTime', 'isSorted', self.isSorted, self])
         if self._cache["HighestTime"] is not None:
             pass # return cache unaltered
         elif len(self._elements) == 0:
@@ -6749,6 +6754,7 @@ class Test(unittest.TestCase):
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
+        a.autoSort = False
         a.insert( 0, meter.TimeSignature("5/4")  )
         a.insert(10, meter.TimeSignature("2/4")  )
         a.insert( 3, meter.TimeSignature("3/16") )
@@ -9352,3 +9358,7 @@ if __name__ == "__main__":
 
         #t.testMeasuresAndMakeMeasures()
         t.testSortAndAutoSort()
+        t.testGetTimeSignatures()
+        t.testMetadataOnStream()
+
+        t.testGetInstrumentFromMxl()
