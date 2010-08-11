@@ -53,20 +53,21 @@ class Test(unittest.TestCase):
         pass
    
 
-    def testBasic(self):
+    def testBasic(self, cycles=4, show=False):
         # run a reduced version
-        pitchedPhase(4, show=False)
+        pitchedPhase(cycles=cycles, show=show)
 
 
 if __name__ == "__main__":
     import sys
+
 
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
 
     elif len(sys.argv) > 1:
         t = Test()
-        t.pitchedPhase(show=True)
+        t.testBasic(cycles=None, show=True)
 
 
 
