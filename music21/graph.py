@@ -1532,7 +1532,6 @@ class PlotWindowedAnalysis(PlotStream):
         else:
             self.windowType = 'overlap'
 
-        
         if 'compressLegend' in keywords:
             self.compressLegend = keywords['compressLegend']
         else:
@@ -1603,7 +1602,6 @@ class PlotWindowedAnalysis(PlotStream):
         self.graphLegend = self._getLegend()
         self.graphLegend.process()
 
-
     def write(self, fp=None):
         '''Process method here overridden to provide legend.
         '''
@@ -1643,7 +1641,6 @@ class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
         PlotWindowedAnalysis.__init__(self, streamObj, 
             discrete.KrumhanslSchmuckler(streamObj), *args, **keywords)
     
-
 
 class PlotWindowedSadoianAmbitus(PlotWindowedAnalysis):
     '''Stream plotting of basic pitch span.

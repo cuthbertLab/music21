@@ -10,9 +10,15 @@
 #-------------------------------------------------------------------------------
 
 import copy
+import unittest
+
+import music21
 from music21 import *
 
-def pitchedPhase(show=False):
+def pitchedPhase(cycles=None, show=False):
+    '''
+    >>> from music21.composition import phasing
+    '''
 
     sSrc = converter.parse("""E16 F# B c# d F# E c# B F# d c# 
                               E16 F# B c# d F# E c# B F# d c#""", '12/16')
@@ -21,8 +27,10 @@ def pitchedPhase(show=False):
     sPost.insert(0, stream.Part())
 
     increment = 0.0625
+    if cycles == None:
+        cycles = int(round(1/increment)) + 1
 
-    for i in range(int(round(1/increment)) + 1):
+    for i in range(cycles):
         sPost.parts[0].append(copy.deepcopy(sSrc))
         sMod = copy.deepcopy(sSrc)
         # increment last note
@@ -33,15 +41,33 @@ def pitchedPhase(show=False):
 
     if show:
         sPost.show('midi')
-        # midi for some reason shows a leading rest
         sPost.show()
+    else: # get musicxml
+        post = sPost.musicxml
 
-    #post = sPost.musicxml
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+   
+    def runTest(self):
+        pass
+   
+
+    def testBasic(self):
+        # run a reduced version
+        pitchedPhase(4, show=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    import sys
 
-    pitchedPhase(show=True)
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+
+    elif len(sys.argv) > 1:
+        t = Test()
+        t.pitchedPhase(show=True)
+
 
 
 
