@@ -10,17 +10,20 @@ by VoiceLeadingQuartet, and that module should be used for future work
 8/3/2010: this is a test by jrogoff to see if I can check things in
 '''
 
+import copy
 import random
 import unittest, doctest
 
 import music21
 from music21.note import Note
+from music21 import converter
 from music21 import duration
 from music21 import interval
+from music21 import meter
 from music21 import lily
 from music21 import scale
-#from music21 import twoStreams
 
+from music21 import stream
 from music21.stream import Stream
 from music21.voiceLeading import VoiceLeadingQuartet
 
@@ -109,8 +112,9 @@ class ModalCounterpoint(object):
         assigns a flag under note.editorial.misc under "Parallel Octave" for
         any note that has harmonic interval of an octave and is preceded by a
         harmonic interval of an octave.'''
-        twoStreams1 = TwoStreamComparer(stream1, stream2)
-        twoStreams1.intervalToOtherStreamWhenAttacked()
+        stream1.attachIntervalsBetweenStreams(stream2)
+        stream2.attachIntervalsBetweenStreams(stream1)
+
         numParallelOctaves = 0
         for note1 in stream1:
             note2 = stream1.noteFollowingNote(note1, False)
@@ -218,12 +222,12 @@ class ModalCounterpoint(object):
     def allValidHarmony(self, stream1, stream2):
         '''Given two simultaneous streams, returns True if all of the harmonies
         are legal and False if one or more is not.'''
-        twoStreams1 = TwoStreamComparer(stream1, stream2)
-        twoStreams1.intervalToOtherStreamWhenAttacked()
-        for note1 in stream1:
+        stream1.attachIntervalsBetweenStreams(stream2)
+        stream2.attachIntervalsBetweenStreams(stream1)
+        for note1 in stream1.notes:
             if note1.editorial.harmonicInterval.name not in self.legalHarmonicIntervals:
                 return False
-        for note2 in stream2:
+        for note2 in stream2.notes:
             if note2.editorial.harmonicInterval.name not in self.legalHarmonicIntervals:
                 return False
         if stream1.notes[-1].editorial.harmonicInterval.specificName != "Perfect":
@@ -234,10 +238,9 @@ class ModalCounterpoint(object):
     def countBadHarmonies(self, stream1, stream2):
         '''Given two simultaneous streams, counts the number of notes (in the
         first stream given) that create illegal harmonies when attacked.'''
-        twoStreams1 = TwoStreamComparer(stream1, stream2)
-        twoStreams1.intervalToOtherStreamWhenAttacked()
+        stream1.attachIntervalsBetweenStreams(stream2)
         numBadHarmonies = 0
-        for note1 in stream1:
+        for note1 in stream1.notes:
             if note1.editorial.harmonicInterval.name not in self.legalHarmonicIntervals:
                 numBadHarmonies += 1
         return numBadHarmonies
@@ -259,9 +262,10 @@ class ModalCounterpoint(object):
     def countBadSteps(self, stream1):
         '''Given a single stream, returns the number of illegal melodic intervals.'''
         numBadSteps = 0
-        for i in range(len(stream1.notes)-1):
-            note1 = stream1.notes[i]
-            note2 = stream1.noteFollowingNote(note1, False)
+        sn = stream1.notes
+        for i in range(len(sn)-1):
+            note1 = sn[i]
+            note2 = sn[i+1]
             if note2 is not None:
                 if not self.isValidStep(note1, note2):
                     numBadSteps += 1
@@ -288,8 +292,7 @@ class ModalCounterpoint(object):
         '''Given two consecutive streams and a limit, returns True if the
         number of consecutive harmonic thirds exceeds the limit and False
         otherwise.'''
-        twoStreams1 = TwoStreamComparer(stream1, stream2)
-        twoStreams1.intervalToOtherStreamWhenAttacked()
+        stream1.attachIntervalsBetweenStreams(stream2)
         intervalList = []
         for note1 in stream1.notes:
             intName = note1.editorial.harmonicInterval.name
@@ -316,8 +319,7 @@ class ModalCounterpoint(object):
         '''Given two consecutive streams and a limit, returns True if the
         number of consecutive harmonic sixths exceeds the limit and False
         otherwise.'''
-        twoStreams1 = TwoStreamComparer(stream1, stream2)
-        twoStreams1.intervalToOtherStreamWhenAttacked()
+        stream1.attachIntervalsBetweenStreams(stream2)
         intervalList = []
         for note1 in stream1.notes:
             intName = note1.editorial.harmonicInterval.name
@@ -344,28 +346,26 @@ class ModalCounterpoint(object):
         '''Given a stream of notes and a minor scale object, returns a new
         stream that raises all the leading tones of the original stream. Also
         raises the sixth if applicable to avoid augmented intervals.'''
-        notes2 = stream1.notes[:]
-        stream2 = Stream(notes2)
+        s1notes = stream1.notes
+        stream2 = stream.Part()
         sixth = minorScale.pitchFromScaleDegree(6).name
         seventh = minorScale.pitchFromScaleDegree(7).name
         tonic = minorScale.getTonic().name
-        for i in range(len(stream1.notes)-2):
-            note1 = stream1.notes[i]
-            note2 = stream1.notes[i+1]
-            note3 = stream1.notes[i+2]
-            if note1 is not None and note2 is not None and note3 is not None:
-                if note1.name == sixth and note2.name == seventh and note3.name == tonic:
-                    newNote1 = interval.transposeNote(note1, "A1")
-                    newNote2 = interval.transposeNote(note2, "A1")
-                    stream2.notes[i] = newNote1
-                    stream2.notes[i+1] = newNote2
-        for i in range(len(stream1.notes)-1):
-            note1 = stream1.notes[i]
-            note2 = stream1.notes[i+1]
-            if note1 is not None and note2 is not None:
-                if note1.name == seventh and note2.name == tonic:
-                    newNote = interval.transposeNote(note1, "A1")
-                    stream2.notes[i] = newNote
+
+        maxNote = len(s1notes)
+        for i in range(maxNote):
+            note1 = s1notes[i]
+            if (note1.name == sixth and i < maxNote - 2):
+                    note2 = s1notes[i+1]
+                    note3 = s1notes[i+2]
+                    if (note2.name == seventh and note3.name == tonic):
+                        note1 = note1.transpose("A1")
+            elif (note1.name == seventh and i < maxNote - 1):
+                note2 = s1notes[i+1]
+                if note2.name == tonic:
+                    note1 = note1.transpose("A1")
+            
+            stream2.append(copy.deepcopy(note1))
         return stream2
 
     def generateFirstSpecies(self, stream1, minorScale):
@@ -374,11 +374,14 @@ class ModalCounterpoint(object):
         counterpoint that follows the rules of 21M.301.'''
         # DOES NOT YET CHECK FOR TOO MANY THIRDS/SIXTHS IN A ROW,
         # DOES NOT YET RAISE LEADING TONES, AND DOES NOT CHECK FOR NOODLING.
-        stream2 = Stream([])
+        stream2 = stream.Part([])
         firstNote = stream1.notes[0]
-        choices = [interval.transposeNote(firstNote, "P1"),\
-                   interval.transposeNote(firstNote, "P5"),\
-                   interval.transposeNote(firstNote, "P8")]
+#        choices = [interval.transposeNote(firstNote, "P1"),\
+#                   interval.transposeNote(firstNote, "P5"),\
+#                   interval.transposeNote(firstNote, "P8")]
+        choices = [copy.deepcopy(firstNote),
+                   firstNote.transpose("P5"),
+                   firstNote.transpose("P8")]
         note1 = random.choice(choices)
         note1.duration = firstNote.duration
         stream2.append(note1)
@@ -458,9 +461,8 @@ class ModalCounterpoint(object):
             except: crossing = True
             goodNotes = minorScale.getConcreteMelodicMinorScale()
             goodNames = [note2.name for note2 in goodNotes]
-            if validHarmony and (not par5) and (not par8) and (not hid5) and\
+            if (note1.name in goodNames) and validHarmony and (not par5) and (not par8) and (not hid5) and\
                (not hid8) and (not par1) and (not crossing):
-                if note1.name in goodNames:
                     print "adding: ", note1.name, note1.octave
                     valid.append(note1)
         print
@@ -472,14 +474,14 @@ class Test(unittest.TestCase):
     def xtestCounterpoint(self):
         (n11,n12,n13,n14) = (Note(), Note(), Note(), Note())
         (n21,n22,n23,n24) = (Note(), Note(), Note(), Note())
-        n11.duration.type = "quarter"
-        n12.duration.type = "quarter"
-        n13.duration.type = "quarter"
-        n14.duration.type = "quarter"
-        n21.duration.type = "quarter"
-        n22.duration.type = "quarter"
-        n23.duration.type = "quarter"
-        n24.duration.type = "quarter"
+        n11.duration.type = "whole"
+        n12.duration.type = "whole"
+        n13.duration.type = "whole"
+        n14.duration.type = "whole"
+        n21.duration.type = "whole"
+        n22.duration.type = "whole"
+        n23.duration.type = "whole"
+        n24.duration.type = "whole"
         
         n11.step = "C"
         n12.step = "D"
@@ -561,10 +563,10 @@ class Test(unittest.TestCase):
         assert numBadMelody2 == 1
     
         (n31, n32, n33, n34) = (Note(), Note(), Note(), Note())
-        n31.duration.type = "quarter"
-        n32.duration.type = "quarter"
-        n33.duration.type = "quarter"
-        n34.duration.type = "quarter"
+        n31.duration.type = "whole"
+        n32.duration.type = "whole"
+        n33.duration.type = "whole"
+        n34.duration.type = "whole"
     
         n31.octave = 5
         n32.octave = 5
@@ -607,22 +609,22 @@ class Test(unittest.TestCase):
         assert consecutive3 == 0
     
         (n41, n42, n43, n44, n45, n46, n47) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
-        n41.duration.type = "quarter"
-        n42.duration.type = "quarter"
-        n43.duration.type = "quarter"
-        n44.duration.type = "quarter"
-        n45.duration.type = "quarter"
-        n46.duration.type = "quarter"
-        n47.duration.type = "quarter"
+        n41.duration.type = "whole"
+        n42.duration.type = "whole"
+        n43.duration.type = "whole"
+        n44.duration.type = "whole"
+        n45.duration.type = "whole"
+        n46.duration.type = "whole"
+        n47.duration.type = "whole"
     
         (n51, n52, n53, n54, n55, n56, n57) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
-        n51.duration.type = "quarter"
-        n52.duration.type = "quarter"
-        n53.duration.type = "quarter"
-        n54.duration.type = "quarter"
-        n55.duration.type = "quarter"
-        n56.duration.type = "quarter"
-        n57.duration.type = "quarter"
+        n51.duration.type = "whole"
+        n52.duration.type = "whole"
+        n53.duration.type = "whole"
+        n54.duration.type = "whole"
+        n55.duration.type = "whole"
+        n56.duration.type = "whole"
+        n57.duration.type = "whole"
     
         n51.step = "E"
         n52.step = "E"
@@ -641,13 +643,13 @@ class Test(unittest.TestCase):
         assert too32 == True
     
         (n61, n62, n63, n64, n65, n66, n67) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
-        n61.duration.type = "quarter"
-        n62.duration.type = "quarter"
-        n63.duration.type = "quarter"
-        n64.duration.type = "quarter"
-        n65.duration.type = "quarter"
-        n66.duration.type = "quarter"
-        n67.duration.type = "quarter"
+        n61.duration.type = "whole"
+        n62.duration.type = "whole"
+        n63.duration.type = "whole"
+        n64.duration.type = "whole"
+        n65.duration.type = "whole"
+        n66.duration.type = "whole"
+        n67.duration.type = "whole"
     
         n61.step = "E"
         n62.step = "E"
@@ -672,10 +674,10 @@ class Test(unittest.TestCase):
         assert too62 == True
     
         (n71, n72, n81, n82) = (Note(), Note(), Note(), Note())
-        n71.duration.type = "quarter"
-        n72.duration.type = "quarter"
-        n81.duration.type = "quarter"
-        n82.duration.type = "quarter"
+        n71.duration.type = "whole"
+        n72.duration.type = "whole"
+        n81.duration.type = "whole"
+        n82.duration.type = "whole"
         
         n71.octave = 5
         n72.step = "D"
@@ -688,10 +690,10 @@ class Test(unittest.TestCase):
         assert hiding2 == False
     
         (n73, n74, n75, n76) = (Note(), Note(), Note(), Note())
-        n73.duration.type = "quarter"
-        n74.duration.type = "quarter"
-        n75.duration.type = "quarter"
-        n76.duration.type = "quarter"
+        n73.duration.type = "whole"
+        n74.duration.type = "whole"
+        n75.duration.type = "whole"
+        n76.duration.type = "whole"
         
         n73.step = "D"
         n73.octave = 5
@@ -702,10 +704,10 @@ class Test(unittest.TestCase):
         n76.octave = 5
     
         (n83, n84, n85, n86) = (Note(), Note(), Note(), Note())
-        n83.duration.type = "quarter"
-        n84.duration.type = "quarter"
-        n85.duration.type = "quarter"
-        n86.duration.type = "quarter"
+        n83.duration.type = "whole"
+        n84.duration.type = "whole"
+        n85.duration.type = "whole"
+        n86.duration.type = "whole"
         
         n83.step = "G"
         n84.step = "F"
@@ -729,10 +731,10 @@ class Test(unittest.TestCase):
         (n91, n92, n93, n94, n95, n96) = (Note(), Note(), Note(), Note(), Note(), Note())
         (n01, n02, n03, n04, n05, n06) = (Note(), Note(), Note(), Note(), Note(), Note())
     
-        n91.duration.type = n92.duration.type = n93.duration.type = "quarter"
-        n94.duration.type = n95.duration.type = n96.duration.type = "quarter"
-        n01.duration.type = n02.duration.type = n03.duration.type = "quarter"
-        n04.duration.type = n05.duration.type = n06.duration.type = "quarter"
+        n91.duration.type = n92.duration.type = n93.duration.type = "whole"
+        n94.duration.type = n95.duration.type = n96.duration.type = "whole"
+        n01.duration.type = n02.duration.type = n03.duration.type = "whole"
+        n04.duration.type = n05.duration.type = n06.duration.type = "whole"
     
         n91.step = "A"
         n92.step = "D"
@@ -775,14 +777,14 @@ class Test(unittest.TestCase):
         assert hidden82 == False
     
         (n100, n101, n102, n103, n104, n105, n106, n107) = (Note(), Note(), Note(), Note(), Note(), Note(), Note(), Note())
-        n100.duration.type = "quarter"
-        n101.duration.type = "quarter"
-        n102.duration.type = "quarter"
-        n103.duration.type = "quarter"
-        n104.duration.type = "quarter"
-        n105.duration.type = "quarter"
-        n106.duration.type = "quarter"
-        n107.duration.type = "quarter"
+        n100.duration.type = "whole"
+        n101.duration.type = "whole"
+        n102.duration.type = "whole"
+        n103.duration.type = "whole"
+        n104.duration.type = "whole"
+        n105.duration.type = "whole"
+        n106.duration.type = "whole"
+        n107.duration.type = "whole"
     
         n100.name = "G"
         n101.name = "A"
@@ -809,63 +811,23 @@ class TestExternal(unittest.TestCase):
         '''
         
         n101 = Note()
-        n101.duration.type = "quarter"
+        n101.duration.type = "whole"
         n101.name = "A"
         aMinor = scale.ConcreteMinorScale(n101)
         n101b = Note()
-        n101b.duration.type = "quarter"
+        n101b.duration.type = "whole"
         n101b.name = "D"
         dMinor = scale.ConcreteMinorScale(n101b)
         
         counterpoint1 = ModalCounterpoint()
-        (n110, n111, n112, n113) = (Note(), Note(), Note(), Note())
-        (n114, n115, n116, n117, n118) = (Note(), Note(), Note(), Note(), Note())
-        (n119, n120, n121, n122, n123) = (Note(), Note(), Note(), Note(), Note())
-        (n124, n125, n126, n127, n128) = (Note(), Note(), Note(), Note(), Note())
-    
-        n110.duration.type = "quarter"
-        n111.duration.type = "quarter"
-        n112.duration.type = "quarter"
-        n113.duration.type = "quarter"
-        n114.duration.type = "quarter"
-        n115.duration.type = "quarter"
-        n116.duration.type = "quarter"
-        n117.duration.type = "quarter"
-        n118.duration.type = "quarter"
-    
-        n110.name = "A"
-        n110.octave = 3
-        n111.name = "C"
-        n111.octave = 4
-        n112.name = "B"
-        n112.octave = 3
-        n113.name = "C"
-        n113.octave = 4
-        n114.name = "D"
-        n115.name = "E"
-        n116.name = "C"
-        n116.octave = 4
-        n117.name = "B"
-        n117.octave = 3
-        n118.name = "A"
-        n118.octave = 3
-        n119.name = "F"
-        n120.name = "E"
-        n121.name = "D"
-        n122.name = "G"
-        n123.name = "F"
-        n124.name = "A"
-        n125.name = "G"
-        n126.name = "F"
-        n127.name = "E"
-        n128.name = "D"
-    
-        cantusFirmus1 = Stream([n110, n111, n112, n113, n114, n115, n116, n117, n118])
-        cantusFirmus2 = Stream([n110, n115, n114, n119, n120, n113, n121, n116, n117, n118])
-        cantusFirmus3 = Stream([n114, n119, n115, n121, n122, n123, n124, n125, n126, n127, n128])
+
+        cantusFirmus1 = "A1 c B c d e c B A"
+        cantusFirmus2 = "A1 e d f e c d c B A"
+        cantusFirmus3 = "d1 f e d g f a g f e d" 
         
-        choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3, cantusFirmus3, cantusFirmus3, cantusFirmus3]
-        cantusFirmus = random.choice(choices)
+        choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
+        chosenCantusFirmus = random.choice(choices)
+        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus, "4/4").notes)
     
         thisScale = aMinor
         if cantusFirmus is cantusFirmus3:
@@ -877,8 +839,6 @@ class TestExternal(unittest.TestCase):
         while (goodHarmony == False or goodMelody == False):
             try:
                 hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale)
-                print [note1.name + str(note1.octave) for note1 in hopeThisWorks.notes]
-    
                 hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
                 print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
         
@@ -896,27 +856,16 @@ class TestExternal(unittest.TestCase):
                 if not goodMelody: print "bad melody"
                 else: print "melody good"
             except ModalCounterpointException:
-                pass
+                pass        
+    
+        score = stream.Score()
+        score.insert(0, meter.TimeSignature('4/4'))
+        score.insert(0, hopeThisWorks2)
+        score.insert(0, cantusFirmus)
+#        score.show('text')
+#        score.show('musicxml')
+        score.show('midi')
+        score.show('lily.png')
         
-        d1 = duration.Duration()
-        d1.type = "whole"
-        for tN in hopeThisWorks2.notes:
-            tN.duration = d1
-        for tN in cantusFirmus.notes:
-            tN.duration = d1
-    
-        lilyOut = twoStreamLily(hopeThisWorks2, cantusFirmus)
-        lilyOut.showPNGandPlayMIDI()
-    
-def twoStreamLily(st1, st2):
-    lilyOut = lily.LilyString()
-    lilyOut += "<< \\time 4/4\n"
-    lilyOut += "  \\new Staff { " 
-    lilyOut += st1.lily + " } \n"    
-    lilyOut += "  \\new Staff { " 
-    lilyOut += st2.lily + " } \n"    
-    lilyOut += ">> \n"
-    return lilyOut
-    
 if (__name__ == "__main__"):
     music21.mainTest(TestExternal) #TestExternal

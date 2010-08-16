@@ -11,6 +11,7 @@
 
 import copy
 import unittest
+import random
 
 import music21
 from music21 import *
@@ -26,7 +27,8 @@ def pitchedPhase(cycles=None, show=False):
     sPost.insert(0, stream.Part())
     sPost.insert(0, stream.Part())
 
-    increment = 0.0625
+    durationToShift = duration.Duration('64th')
+    increment = durationToShift.quarterLength
     if cycles == None:
         cycles = int(round(1/increment)) + 1
 
@@ -35,7 +37,9 @@ def pitchedPhase(cycles=None, show=False):
         sMod = copy.deepcopy(sSrc)
         # increment last note
         sMod.notes[-1].quarterLength += increment
-        sMod.transpose(12, inPlace=True)
+        
+        randInterval = random.randint(-12,12)
+        sMod.transpose(randInterval, inPlace=True)
         sPost.parts[1].append(sMod)
 
 
@@ -60,6 +64,8 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import sys
+    t = Test()
+    t.testBasic(cycles=None, show=True)
 
 
     if len(sys.argv) == 1: # normal conditions

@@ -30,7 +30,7 @@ cents           interval.ChromaticInterval.cents    (tuning will eventually affe
 cleave          None                kern specific, not needed
 context         None                Not needed.  Use object.next and object.prev to get some context for many objects
 correl          None                Use numpy.corrcoef() or other, more sophisticated code
-deg             Key.degree(Note)    NOT YET WRITTEN -- for music21 v0.6b.  You will want to run key.keyFromStream() or key.keyFromStreams() first if key is unknown
+deg             Key.degree(Note)    stream.analyze('key')
 degree          Key.degree(Note)    Returns a scale.ScaleDegree object which will have various representations
 diss            analysis.kkdiss     NOT YET WRITTEN -- for music21 v2.0.
 ditto           None                Not needed.  Use copy.copy(object) or copy.deepcopy(object) to get another copy of an object
@@ -45,7 +45,7 @@ humdrum         None                Not needed.
 humsed          None                Not needed.
 humver          None                Not needed.
 infot           None                Use general purpose python information theory models
-iv              Chord.intervalVector  NOT YET WRITTEN (2008-10-18) (v0.6b)
+iv              Chord.intervalVector  chord.intervalVector
 kern            kern.write()        Outputting to kern not planned at this time.
 key             Key.keyFromStream() NOT YET WRITTEN (2008-10-18) (v0.6b)
 melac           analysis.thomassen.MelodicAccent    NOT YET WRITTEN -- lower priority (v2.0 or later)

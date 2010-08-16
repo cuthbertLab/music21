@@ -241,9 +241,13 @@ def messiaen(show = True):
         g.process()
 
 
+def schumann(show = True):
+    streamObject = corpus.parseWork('schumann/opus41no1', 3)
+    streamObject.plot('pitch')
 
-
-
+    from music21.humdrum import testFiles as tf
+    streamObject = converter.parse(tf.mazurka6)
+    streamObject.plot('pitch')
 
 
 

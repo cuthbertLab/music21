@@ -1126,14 +1126,14 @@ class Stream(music21.Music21Object):
 
         Available plots include the following:
     
-        :class:`~music21.analysis.discrete.SadoianAmbitus`
-        :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
+        ambitus -- runs :class:`~music21.analysis.discrete.SadoianAmbitus`
+        key -- :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
         >>> s.analyze('ambitus')
         <music21.interval.Interval m21>
-        >>> s.analyze('krumhansl')
+        >>> s.analyze('key')
         (F#, 'minor', 0.81547089257624916)
         '''
 
@@ -4592,19 +4592,24 @@ class Stream(music21.Music21Object):
         return returnList
     
     def melodicIntervals(self, *skipArgs, **skipKeywords):
-        '''Returns a Stream of :class:`~music21.interval.Interval` objects between Notes (and by default, Chords) that follow each other in a stream.
-        the offset of the Interval is the offset of the beginning of the interval (if two notes are adjacent, 
-        then it is equal to the offset of the second note)
+        '''Returns a Stream of :class:`~music21.interval.Interval` objects
+        between Notes (and by default, Chords) that follow each other in a stream.
+        the offset of the Interval is the offset of the beginning of the interval 
+        (if two notes are adjacent, then this offset is equal to the offset of 
+        the second note)
         
-        See Stream.findConsecutiveNotes for a discussion of what consecutive notes mean, and which keywords are allowed.
+        See Stream.findConsecutiveNotes for a discussion of what consecutive notes 
+        mean, and which keywords are allowed.
         
-        The interval between a Note and a Chord (or between two chords) is the interval between pitches[0]. For more complex interval calculations, run findConsecutiveNotes and then use notesToInterval.
+        The interval between a Note and a Chord (or between two chords) is the 
+        interval between pitches[0]. For more complex interval calculations, 
+        run findConsecutiveNotes and then use notesToInterval.
                 
-        Returns None of there are not at least two elements found by findConsecutiveNotes.
+        Returns None of there are not at least two elements found by 
+        findConsecutiveNotes.
 
         See Test.testMelodicIntervals() for usage details.
 
-        OMIT_FROM_DOCS
         '''
         returnList = self.findConsecutiveNotes(**skipKeywords)
         if len(returnList) < 2:
@@ -4635,7 +4640,8 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getDurSpan(self, flatStream):
-        '''Given a flat stream, create a list of the start and end times (as a tuple pair) of all elements in the Stream.
+        '''Given a flat stream, create a list of the start and end 
+        times (as a tuple pair) of all elements in the Stream.
 
         >>> a = Stream()
         >>> a.repeatInsert(note.HalfNote(), range(5))

@@ -211,12 +211,19 @@ def convertGeneric(value):
     12
     >>> convertGeneric(-12)
     -12
+    >>> convertGeneric(1)
+    1
+    >>> convertGeneric(None)
+    Traceback (most recent call last):
+    IntervalException: Cannot get a direction from None
+    >>> convertGeneric("1")
+    Traceback (most recent call last):
+    IntervalException: Cannot get a direction from 1
     '''
     post = None
     if common.isNum(value):
         post = value
         directionScalar = 1 # may still be negative
-
     elif common.isStr(value):
         # first, see if there is a direction term
         directionScalar = ASCENDING # assume ascending
@@ -260,8 +267,9 @@ def convertGeneric(value):
             post = 15
         elif value.lower() in ['16th', 'sixteenth']:
             post = 16
-    if post != None:
-        post = post * directionScalar
+    if post is None:
+        raise IntervalException("Cannot get a direction from " + str(value))
+    post = post * directionScalar
     return post
 
 
@@ -348,7 +356,7 @@ class GenericInterval(music21.Music21Object):
         E.g. C4 to C4 = 0;  C4 to D4 = 1;  C4 to B3 = -1
     '''
     
-    def __init__(self, value):
+    def __init__(self, value = "unison"):
         '''
         >>> aInterval = GenericInterval(3)
         >>> aInterval.direction
@@ -412,8 +420,10 @@ class GenericInterval(music21.Music21Object):
         else: 
             self.isSkip = False
 
-        if self.undirected == 2: self.isStep = True
-        else: self.isStep = False
+        if self.undirected == 2: 
+            self.isStep = True
+        else: 
+            self.isStep = False
         
         # unisons (even augmented) are neither steps nor skips.
         steps, octaves = math.modf(self.undirected/7.0)
@@ -542,7 +552,7 @@ class DiatonicInterval(music21.Music21Object):
     'directedNiceName': 'The name of the interval in full form with direction.',
     }
 
-    def __init__(self, specifier, generic):
+    def __init__(self, specifier = "P", generic = 1):
         '''
         The `specifier` is an integer specifying a value in the `prefixSpecs` and `niceSpecNames` lists. 
 
@@ -720,7 +730,7 @@ class ChromaticInterval(music21.Music21Object):
     '''Chromatic interval class. Unlike a Diatonic interval, this Interval class treats interval spaces in half-steps. 
 
     '''
-    def __init__(self, value):
+    def __init__(self, value = 0):
         '''
         >>> aInterval = ChromaticInterval(-14)
         >>> aInterval.semitones
@@ -1113,7 +1123,9 @@ class Interval(music21.Music21Object):
 
 
     def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True):
-        '''Given a Pitch, return a new, transposed Pitch, that is transformed according to this Interval. This is the main public interface to all transposition routines found on higher-level objects. 
+        '''Given a Pitch, return a new, transposed Pitch, that is transformed 
+        according to this Interval. This is the main public interface to all 
+        transposition routines found on higher-level objects. 
 
         >>> from music21 import pitch
         >>> p1 = pitch.Pitch('a#')
@@ -1422,6 +1434,8 @@ def transposeNote(note1, intervalString):
     >>> bNote = transposeNote(aNote, 'p5')
     >>> bNote
     <music21.note.Note G>
+    >>> bNote.pitch
+    G4
 
     >>> aNote = note.Note('f#4')
     >>> bNote = transposeNote(aNote, 'm2')
@@ -1430,7 +1444,7 @@ def transposeNote(note1, intervalString):
 
     '''
 
-    newPitch = transposePitch(note1, intervalString)
+    newPitch = transposePitch(note1.pitch, intervalString)
     newNote = copy.deepcopy(note1)
     newNote.pitch = newPitch
     return newNote
