@@ -1169,7 +1169,7 @@ class Interval(music21.Music21Object):
         if self.chromatic is not None:
             self.isChromaticStep = self.chromatic.isChromaticStep
 
-        if self.isDiatonicStep is not None and self.isChromaticStep is not None:
+        if self.chromatic is not None and self.diatonic is not None:
             self.isStep = self.isChromaticStep or self.isDiatonicStep
 
     def __repr__(self):
