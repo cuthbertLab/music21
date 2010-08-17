@@ -396,6 +396,16 @@ class GenericInterval(music21.Music21Object):
         >>> aInterval = GenericInterval(24)
         >>> aInterval.niceName
         '24'
+        >>> aInterval.isDiatonicStep
+        False
+        >>> aInterval.isStep
+        False
+
+        >>> aInterval = GenericInterval(2)
+        >>> aInterval.isDiatonicStep
+        True
+        >>> aInterval.isStep
+        True
 
         '''
         music21.Music21Object.__init__(self)
@@ -424,6 +434,8 @@ class GenericInterval(music21.Music21Object):
             self.isDiatonicStep = True
         else: 
             self.isDiatonicStep = False
+
+        self.isStep = self.isDiatonicStep
         
         # unisons (even augmented) are neither steps nor skips.
         steps, octaves = math.modf(self.undirected/7.0)
@@ -591,9 +603,13 @@ class DiatonicInterval(music21.Music21Object):
         'm3'
         >>> aInterval.isDiatonicStep
         False
+        >>> aInterval.isStep
+        False
 
         >>> aInterval = DiatonicInterval('major', 2)
         >>> aInterval.isDiatonicStep
+        True
+        >>> aInterval.isStep
         True
 
         '''
@@ -646,6 +662,7 @@ class DiatonicInterval(music21.Music21Object):
             self.prefectable = self.generic.perfectable
 
             self.isDiatonicStep = self.generic.isDiatonicStep
+            self.isStep = self.generic.isStep
 
             # for inversions 
             if self.prefectable: # inversions P <-> P; d <-> A; dd <-> AA; etc. 
@@ -751,9 +768,13 @@ class ChromaticInterval(music21.Music21Object):
         2
         >>> aInterval.isChromaticStep
         False
+        >>> aInterval.isStep
+        False
 
         >>> aInterval = ChromaticInterval(1)
         >>> aInterval.isChromaticStep
+        True
+        >>> aInterval.isStep
         True
         '''
         music21.Music21Object.__init__(self)
@@ -785,6 +806,8 @@ class ChromaticInterval(music21.Music21Object):
             self.isChromaticStep = True
         else:
             self.isChromaticStep = False
+
+        self.isStep = self.isChromaticStep
 
     def __repr__(self):
         return "<music21.interval.ChromaticInterval %s>" % self.directed
@@ -1016,6 +1039,8 @@ class Interval(music21.Music21Object):
         False
         >>> aInterval.isDiatonicStep
         False
+        >>> aInterval.isStep
+        False
 
         >>> aInterval = Interval('half')
         >>> aInterval
@@ -1023,6 +1048,8 @@ class Interval(music21.Music21Object):
         >>> aInterval.isChromaticStep
         True
         >>> aInterval.isDiatonicStep
+        True
+        >>> aInterval.isStep
         True
 
         >>> aInterval = Interval('-h')
@@ -1042,12 +1069,16 @@ class Interval(music21.Music21Object):
         False
         >>> aInterval.isDiatonicStep
         True
+        >>> aInterval.isStep
+        True
 
         >>> aInterval = Interval('dd3')
         >>> aInterval.isChromaticStep
         True
         >>> aInterval.isDiatonicStep
         False
+        >>> aInterval.isStep
+        True
 
         '''
         music21.Music21Object.__init__(self)
@@ -1115,7 +1146,7 @@ class Interval(music21.Music21Object):
         elif self.diatonic != None:
             self.direction = self.diatonic.generic.direction
             
-        if self.diatonic != None:
+        if self.diatonic is not None:
             self.specifier = self.diatonic.specifier
             self.diatonicType = self.diatonic.specifier
             self.specificName = self.diatonic.specificName
@@ -1133,8 +1164,13 @@ class Interval(music21.Music21Object):
             self.directedSimpleName = self.diatonic.directedSimpleName
             self.directedSimpleNiceName = self.diatonic.directedSimpleNiceName
 
-        self.isDiatonicStep = self.diatonic.isDiatonicStep
-        self.isChromaticStep = self.chromatic.isChromaticStep
+            self.isDiatonicStep = self.diatonic.isDiatonicStep
+
+        if self.chromatic is not None:
+            self.isChromaticStep = self.chromatic.isChromaticStep
+
+        if self.isDiatonicStep is not None and self.isChromaticStep is not None:
+            self.isStep = self.isChromaticStep or self.isDiatonicStep
 
     def __repr__(self):
         return "<music21.interval.Interval %s>" % self.directedName
