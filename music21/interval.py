@@ -421,9 +421,9 @@ class GenericInterval(music21.Music21Object):
             self.isSkip = False
 
         if self.undirected == 2: 
-            self.isStep = True
+            self.isDiatonicStep = True
         else: 
-            self.isStep = False
+            self.isDiatonicStep = False
         
         # unisons (even augmented) are neither steps nor skips.
         steps, octaves = math.modf(self.undirected/7.0)
@@ -589,6 +589,12 @@ class DiatonicInterval(music21.Music21Object):
         >>> aInterval = DiatonicInterval('minor', 10)
         >>> aInterval.mod7
         'm3'
+        >>> aInterval.isDiatonicStep
+        False
+
+        >>> aInterval = DiatonicInterval('major', 2)
+        >>> aInterval.isDiatonicStep
+        True
 
         '''
         music21.Music21Object.__init__(self)
@@ -638,6 +644,8 @@ class DiatonicInterval(music21.Music21Object):
 
             self.specificName = niceSpecNames[self.specifier]
             self.prefectable = self.generic.perfectable
+
+            self.isDiatonicStep = self.generic.isDiatonicStep
 
             # for inversions 
             if self.prefectable: # inversions P <-> P; d <-> A; dd <-> AA; etc. 
@@ -741,6 +749,12 @@ class ChromaticInterval(music21.Music21Object):
         10
         >>> aInterval.intervalClass
         2
+        >>> aInterval.isChromaticStep
+        False
+
+        >>> aInterval = ChromaticInterval(1)
+        >>> aInterval.isChromaticStep
+        True
         '''
         music21.Music21Object.__init__(self)
 
@@ -766,6 +780,11 @@ class ChromaticInterval(music21.Music21Object):
         self.intervalClass = self.mod12
         if (self.mod12 > 6):
             self.intervalClass = 12 - self.mod12
+
+        if self.undirected == 1:
+            self.isChromaticStep = True
+        else:
+            self.isChromaticStep = False
 
     def __repr__(self):
         return "<music21.interval.ChromaticInterval %s>" % self.directed
@@ -993,10 +1012,18 @@ class Interval(music21.Music21Object):
         >>> aInterval = Interval('p5')
         >>> aInterval
         <music21.interval.Interval P5>
+        >>> aInterval.isChromaticStep
+        False
+        >>> aInterval.isDiatonicStep
+        False
 
         >>> aInterval = Interval('half')
         >>> aInterval
         <music21.interval.Interval m2>
+        >>> aInterval.isChromaticStep
+        True
+        >>> aInterval.isDiatonicStep
+        True
 
         >>> aInterval = Interval('-h')
         >>> aInterval
@@ -1009,6 +1036,18 @@ class Interval(music21.Music21Object):
         >>> aInterval = Interval(7)
         >>> aInterval
         <music21.interval.Interval P5>
+
+        >>> aInterval = Interval('M2')
+        >>> aInterval.isChromaticStep
+        False
+        >>> aInterval.isDiatonicStep
+        True
+
+        >>> aInterval = Interval('dd3')
+        >>> aInterval.isChromaticStep
+        True
+        >>> aInterval.isDiatonicStep
+        False
 
         '''
         music21.Music21Object.__init__(self)
@@ -1093,6 +1132,9 @@ class Interval(music21.Music21Object):
             self.directedNiceName = self.diatonic.directedNiceName
             self.directedSimpleName = self.diatonic.directedSimpleName
             self.directedSimpleNiceName = self.diatonic.directedSimpleNiceName
+
+        self.isDiatonicStep = self.diatonic.isDiatonicStep
+        self.isChromaticStep = self.chromatic.isChromaticStep
 
     def __repr__(self):
         return "<music21.interval.Interval %s>" % self.directedName
@@ -1528,7 +1570,7 @@ class Test(unittest.TestCase):
         gInt1 = dInt1.generic
     
         ## TODO: rewrite all assertion code using self.assertEqual etc.
-        self.assertEqual(gInt1.isStep, False)
+        self.assertEqual(gInt1.isDiatonicStep, False)
         self.assertEqual(gInt1.isSkip, True)
         
         n1.accidental = Accidental("#")
