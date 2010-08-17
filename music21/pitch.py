@@ -756,7 +756,16 @@ class Pitch(music21.Music21Object):
             self._accidental = value
         self._pitchSpaceNeedsUpdating = True
     
-    accidental = property(_getAccidental, _setAccidental)
+    accidental = property(_getAccidental, _setAccidental,
+        doc='''Stores an optional accidental object contained within the
+        picth object.
+
+        >>> a = Pitch('E-')
+        >>> a.accidental.alter
+        -1.0
+        >>> a.accidental.modifier
+        '-'
+        ''')
 
     def _getPs(self):
         if self._pitchSpaceNeedsUpdating:
@@ -962,7 +971,14 @@ class Pitch(music21.Music21Object):
             raise PitchException("Cannot make a step out of %s" % usrStr)
         self._pitchSpaceNeedsUpdating = True
 
-    step = property(_getStep, _setStep)
+    step = property(_getStep, _setStep,
+        doc='''The diatonic name of the note; i.e. ignores accidental and
+        octave.
+
+        >>> a = Pitch('B-3')
+        >>> a.step
+        'B'
+        ''')
 
 
     def _getStepWithOctave(self):
@@ -1027,7 +1043,26 @@ class Pitch(music21.Music21Object):
 
         #self.ps = convertStepToPs(self.step, self.implicitOctave, self.accidental)
       
-    pitchClass = property(_getPitchClass, _setPitchClass)
+    pitchClass = property(_getPitchClass, _setPitchClass,
+        doc='''Returns the integer value for the pitch, 0-11, where C=0,
+        C#=1, D=2...B=11. Can be set using integers (0-11) or 'A' or 'B'
+        for 10 or 11.
+        
+        >>> a = Pitch('a3')
+        >>> a._getPitchClass()
+        9
+        >>> dis = Pitch('d3')
+        >>> dis.pitchClass
+        2
+        >>> dis.accidental = Accidental("#")
+        >>> dis.pitchClass
+        3
+        >>> dis.pitchClass = 11
+        >>> dis.pitchClass
+        11
+        >>> dis.name
+        'B'
+        ''')
 
 
     def _getPitchClassString(self):
