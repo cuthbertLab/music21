@@ -39,7 +39,7 @@ def labelBeatDepth(streamIn):
     >>> s.insert(0, ts)
     >>> n = note.Note()
     >>> s.repeatAppend(n, 4)
-    >>> analysis.metrical.labelBeatDepth(s)
+    >>> post = analysis.metrical.labelBeatDepth(s)
     >>> ts.beat
     <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
     '''
@@ -47,13 +47,12 @@ def labelBeatDepth(streamIn):
 #          music21.meter.TimeSignature)[0]
     
 
-    
     for m in streamIn.getElementsByClass(music21.stream.Measure):
 
         # this will search contexts
         ts = m.getTimeSignatures(sortByCreationTime=False)[0]
 
-        ts.beat.subdivideNestedHierarchy(3)
+        ts.beat.subdivideNestedHierarchy(depth=3)
 
 #         ts.beat.partition(1)
 #         environLocal.printDebug(['ts numerator', ts.numerator])
