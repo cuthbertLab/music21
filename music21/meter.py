@@ -990,6 +990,99 @@ class MeterSequence(MeterTerminal):
             raise MeterException('cannot process partition arguemtn %s' % value)
 
 
+    def subdividePartitions(self, divisions=2):
+        '''Subdivide all partitions a divisions value in place.
+
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence('2/4')
+        >>> ms.partition(2)
+        >>> ms
+        <MeterSequence {1/4+1/4}>
+        >>> ms.subdividePartitions(2)
+        >>> ms
+        <MeterSequence {{1/8+1/8}+{1/8+1/8}}>
+        >>> ms[0].subdividePartitions(2)
+        >>> ms
+        <MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{1/8+1/8}}>
+        >>> ms[1].subdividePartitions(2)
+        >>> ms
+        <MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
+        '''
+        for i in range(len(self)):
+            self[i] = self[i].subdivide(divisions)
+
+    def _subdivideNested(self, processObjList, divisions):
+        '''Recersive nested call routine. Return a reference to the newly created level.
+
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence('2/4')
+        >>> ms.partition(2)
+        >>> ms
+        <MeterSequence {1/4+1/4}>
+        >>> post = ms._subdivideNested([ms], 2)
+        >>> ms
+        <MeterSequence {{1/8+1/8}+{1/8+1/8}}>
+        >>> post = ms._subdivideNested(post, 2) # pass post here
+        >>> ms
+        <MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
+        '''
+        for obj in processObjList:
+            obj.subdividePartitions(divisions)
+        # gather references
+        post = []
+        for obj in processObjList:
+            for sub in obj:
+                post.append(sub)
+        return post
+
+    def subdivideNestedHierarchy(self, depth, divCount=None, divFirst=None):
+        '''Create nested structure down to a specified depth; the first division is set to one; the second division may be by 2 or 3; remaining divisions are always by 2.
+
+        This a destructive procedure that will remove any existing partition structures. 
+
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence('4/4')
+        >>> ms.subdivideNestedHierarchy(2)
+        >>> ms
+        <MeterSequence {{{1/4+1/4}+{1/4+1/4}}}>
+        >>> ms.subdivideNestedHierarchy(3)
+        >>> ms
+        <MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
+        >>> ms.subdivideNestedHierarchy(4)
+        >>> ms
+        <MeterSequence {{{{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}+{{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}}}>
+        >>> ms.subdivideNestedHierarchy(5)
+        >>> ms
+        <MeterSequence {{{{{{1/32+1/32}+{1/32+1/32}}+{{1/32+1/32}+{1/32+1/32}}}+{{{1/32+1/32}+{1/32+1/32}}+{{1/32+1/32}+{1/32+1/32}}}}+{{{{1/32+1/32}+{1/32+1/32}}+{{1/32+1/32}+{1/32+1/32}}}+{{{1/32+1/32}+{1/32+1/32}}+{{1/32+1/32}+{1/32+1/32}}}}}}>
+
+        '''
+        # as a hierarchical representation, first subdivision must be 1
+        self.partition(1)
+
+        # initial divisions are often based on numerator
+        if divCount == None: 
+            divCount = self.numerator
+        # use a fixed mapping for first divider; may be a good algo solution
+        if divFirst == None:
+            if divCount in [1, 2, 4, 8, 16, 32]:
+                divFirst = 2
+            elif divCount in [3, 6, 9, 12, 15]:
+                divFirst = 3
+            else: # set to numerator
+                divFirst = divCount
+
+        depthCount = 0
+        # this needs to be subdivided here by the LCM of the numerator
+        self.subdividePartitions(divFirst)
+        # self[h] = self[h].subdivide(divFirst)
+        depthCount += 1
+        # all other partitions are recursive; start first with list
+        post = [self]
+        while (depthCount <= depth):
+            post = self._subdivideNested(post, 2)
+            depthCount += 1
+
+
     #---------------------------------------------------------------------------
     def _getPartitionStr(self):
         count = len(self) 
@@ -1763,6 +1856,28 @@ class TimeSignature(music21.Music21Object):
             self.beam.partition([3] * (self.numerator / 3))
         else:
             pass # doing nothing will beam all together
+
+        #environLocal.printDebug('default beam partitions set to: %s' % self.beam)
+
+
+    def _setDefaultAccentWeights(self):
+        '''This sets default accent weights based on common hierarchical notions for meters; each beat is given a weight, as defined by the top level count of self.beat
+        '''
+        # provide a partition for each beat
+        self.accent.partition(len(self.beat)) 
+        beatRef = {1 : [1],
+                   2 : [1, .5],
+                   3 : [1, .5, .5],
+                   4 : [1, .25, .5, .25],
+                   5 : [1, .25, .25, .5, .25], # could be otherwise
+                   6 : [1, .25, .25, .5, .25, .25], # could be otherwise
+                   7 : [1, .25, .25, .5, .25, .5, .25], # could be otherwise
+                   8 : [1, .125, .25, .125, .5, .125, .25, .125],
+                  }
+
+
+
+
 
         #environLocal.printDebug('default beam partitions set to: %s' % self.beam)
 
@@ -2741,8 +2856,8 @@ class NonPowerOfTwoTimeSignature(TimeSignature):
 
 
 
-#-------------------------------------------------------------------------------class TestExternal(unittest.TestCase):
-    
+#-------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):    
     def runTest(self):
         pass
     
