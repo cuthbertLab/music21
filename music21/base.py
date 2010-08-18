@@ -1488,19 +1488,20 @@ class Music21Object(object):
                                     callerFirst)
 
                 # our caller might have been flattened after contexts were set
-                # this, this object may be in the caller's defined contexts, 
+                # thus, this object may be in the caller's defined contexts, 
                 # but this object knows nothing about a flat version of the 
                 # caller (it cannot get an offset of the caller, which we need
-                # to do the serial reverse search
+                # to do the serial reverse search)
                 if offsetOfCaller == None and hasattr(
                     callerFirst, 'flattenedRepresentationOf'):
                     #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from the callers flattenedRepresentationOf attribute', 'self', self, 'callerFirst', callerFirst])
-                    offsetOfCaller = self.getOffsetByElement(
-                        callerFirst.flattenedRepresentationOf)
-
-                # TODO: check semiflat for flattenedRepresentationOf?
-                # no reason to check a flat representaiton, b/c if the caller
-                # is a Stream, it will not be there.         
+                    if callerFirst.flattenedRepresentationOf != None:
+                        # TODO: check semiflat for flattenedRepresentationOf?
+                        flattened = callerFirst.flattenedRepresentationOf
+                    else:
+                        # need tests to show that this is necessary
+                        flattened = callerFirst.semiFlat
+                    offsetOfCaller = self.getOffsetByElement(flattened)
             
                 # last possibility: try to get offset of caller form a a 
                 # non-flat representation of self. this would only be necessary
