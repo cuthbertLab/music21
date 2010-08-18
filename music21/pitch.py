@@ -1479,6 +1479,10 @@ class Pitch(music21.Music21Object):
         >>> p4 = p3.transpose(interval.Interval('-A5'))
         >>> p4.simplifyEnharmonic()
         F#2
+
+        >>> pList = [pitch.Pitch("B"), pitch.Pitch("C#"), pitch.Pitch("G")]
+        >>> [p.simplifyEnharmonic() for p in pList]
+        [B, C#, G]
         '''
 
         if inPlace:
