@@ -1480,20 +1480,25 @@ class Pitch(music21.Music21Object):
         >>> p4.simplifyEnharmonic()
         F#2
         '''
-        if abs(self.accidental.alter) < 2.0 and \
-            self.name not in ('E#', 'B#', 'C-', 'F-'):
-            if inPlace:
-                return None
-            else:
-                return copy.deepcopy(self)
+
+        if inPlace:
+            returnObj = self
         else:
-            if inPlace:
-                self.ps = self.ps
-                return None
+            returnObj = copy.deepcopy(self)
+
+        if returnObj.accidental != None:
+            if abs(returnObj.accidental.alter) < 2.0 and \
+                returnObj.name not in ('E#', 'B#', 'C-', 'F-'):
+                pass
             else:
-                p = Pitch()
-                p.ps = self.ps
-                return p
+                # by reseting the pitch space value, we will get a simplyer
+                # enharmonic spelling
+                returnObj.ps = self.ps
+
+        if inPlace:
+            return None
+        else:
+            return returnObj
 
 
     def getEnharmonic(self, inPlace=False):
