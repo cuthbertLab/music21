@@ -763,7 +763,7 @@ class Chord(note.NotRest):
         '''
         Gets the DurationObject of the object or None
         '''
-        if self._duration is None and len(self.pitches > 0):
+        if self._duration is None and len(self.pitches) > 0:
             self._duration = self.pitches[0].duration
         return self._duration
 
