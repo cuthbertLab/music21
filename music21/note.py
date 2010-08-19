@@ -520,7 +520,6 @@ class GeneralNote(music21.Music21Object):
         0.5
         '''
         ts = self.getContextByClass(meter.TimeSignature)
-        allWeights = [mt.weight for mt in ts.accent]
         if ts == None:
             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
         return ts.getAccentWeight(self._getMeasureOffset())

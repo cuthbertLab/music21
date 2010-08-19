@@ -2708,6 +2708,11 @@ class TimeSignature(music21.Music21Object):
         >>> [ts1.getAccentWeight(x) for x in range(3)]
         [1.0, 0.5, 0.5]
         '''
+
+        # TODO: need to get minimum weight, and then return min 
+        # weight if we do not match a defined position 
+        #allWeights = [mt.weight for mt in ts.accent]
+
         msLevel = self.accent.getLevel(level)
         return msLevel[msLevel.positionToIndex(qLenPos)].weight
 
