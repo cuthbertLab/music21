@@ -6,8 +6,6 @@ later other forms of counterpoint.
 
 Mostly coded by Jackie Rogoff -- some routines have been moved to
 by VoiceLeadingQuartet, and that module should be used for future work
-
-8/3/2010: this is a test by jrogoff to see if I can check things in
 '''
 
 import copy
@@ -41,7 +39,29 @@ class ModalCounterpoint(object):
         '''Given two streams, returns the number of parallel fifths and also
         assigns a flag under note.editorial.misc under "Parallel Fifth" for
         any note that has harmonic interval of a fifth and is preceded by a
-        first harmonic interval of a fifth.'''
+        first harmonic interval of a fifth.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G3')
+        >>> n2 = note.Note('A3')
+        >>> n3 = note.Note('B3')
+        >>> n4 = note.Note('C4')
+        >>> m1 = note.Note('D4')
+        >>> m2 = note.Note('E4')
+        >>> m3 = note.Note('F#4')
+        >>> m4 = note.Note('G4')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.findParallelFifths(cp.stream1, cp.stream2)
+        3
+        >>> n1.editorial.harmonicInterval.name
+        'P5'
+        
+        '''
         
         srcStream.attachIntervalsBetweenStreams(cmpStream)
         numParallelFifths = 0
@@ -64,12 +84,33 @@ class ModalCounterpoint(object):
         where the two streams reach a fifth through parallel motion, but is
         not a parallel fifth.
 
-        NOTE: Order matters! (stream1, stream2) might
-        have no hidden fifths, while (stream2, stream1) does have them.'''
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G3')
+        >>> n2 = note.Note('A3')
+        >>> n3 = note.Note('B3')
+        >>> n4 = note.Note('C4')
+        >>> m1 = note.Note('C4')
+        >>> m2 = note.Note('E4')
+        >>> m3 = note.Note('D4')
+        >>> m4 = note.Note('G4')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.findHiddenFifths(cp.stream1, cp.stream2)
+        2
+        >>> n2.editorial.misc['Hidden Fifth']
+        True
+        >>> cp.findHiddenFifths(cp.stream2, cp.stream1)
+        2
+
+        '''
         numHiddenFifths = 0
         for i in range(len(stream1.notes)-1):
             note1 = stream1.notes[i]
-            note2 = stream1.noteFollowingNote(note1, False)
+            note2 = stream1.getElementAfterElement(note1, [Note])
             note3 = stream2.playingWhenAttacked(note1)
             note4 = stream2.playingWhenAttacked(note2)
             if note2 is not None and note3 is not None and note4 is not None:
@@ -80,9 +121,23 @@ class ModalCounterpoint(object):
         return numHiddenFifths
 
     def isParallelFifth(self, note11, note12, note21, note22):
-        '''Given four notes, assuming the first pair sounds at the same time and
-        the second pair sounds at the same time, returns True if the two
-        harmonic intervals are P5 and False otherwise.'''
+        '''Given four notes, assuming the first pair is one voice and
+        the second pair is another voice sounding at the same time,
+        returns True if the two harmonic intervals are P5 and False otherwise.
+        
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G3')
+        >>> n2 = note.Note('B-3')
+        >>> m1 = note.Note('D4')
+        >>> m2 = note.Note('F4')
+        >>> cp = ModalCounterpoint()
+        >>> cp.isParallelFifth(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
+        False
+        >>> cp.isParallelFifth(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
+        True
+
+        '''
         vlq = VoiceLeadingQuartet(note11, note12, note21, note22)
         return vlq.parallelFifth()
 #        interval1 = interval.notesToInterval(note11, note21)
@@ -91,19 +146,37 @@ class ModalCounterpoint(object):
 #        else: return False
 
     def isHiddenFifth(self, note11, note12, note21, note22):
-        '''Given four notes, assuming the first pair sounds at the same time and
-        the second pair sounds at the same time, returns True if there is a
-        hidden fifth and false otherwise.'''
+        '''Given four notes, assuming the first pair is one part and the
+        second is another part sounding at the same time, returns True if
+        there is a hidden fifth and false otherwise.
+        
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G3')
+        >>> n2 = note.Note('B-3')
+        >>> m1 = note.Note('E4')
+        >>> m2 = note.Note('F4')
+        >>> cp = ModalCounterpoint()
+        >>> cp.isHiddenFifth(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
+        False
+        >>> cp.isHiddenFifth(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
+        True
+
+        '''
         interval1 = interval.notesToInterval(note11, note21)
         interval2 = interval.notesToInterval(note12, note22)
         interval3 = interval.notesToInterval(note11, note12)
         interval4 = interval.notesToInterval(note21, note22)
         if interval3.direction > 0 and interval4.direction > 0:
-            if interval2.name == "P5" and not interval1.name == "P5": return True
-            else: return False
+            if interval2.name == "P5" and not interval1.name == "P5":
+                return True
+            else:
+                return False
         elif interval3.direction < 0 and interval4.direction < 0:
-            if interval2.name == "P5" and not interval1.name == "P5": return True
-            else: return False
+            if interval2.name == "P5" and not interval1.name == "P5":
+                return True
+            else:
+                return False
         elif interval3.direction == interval4.direction == 0: return False
         return False
 
@@ -111,20 +184,43 @@ class ModalCounterpoint(object):
         '''Given two streams, returns the number of parallel octaves and also
         assigns a flag under note.editorial.misc under "Parallel Octave" for
         any note that has harmonic interval of an octave and is preceded by a
-        harmonic interval of an octave.'''
+        harmonic interval of an octave.
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G3')
+        >>> n2 = note.Note('A3')
+        >>> n3 = note.Note('B3')
+        >>> n4 = note.Note('C4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('B4')
+        >>> m4 = note.Note('C5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.findParallelOctaves(cp.stream1, cp.stream2)
+        3
+        >>> n2.editorial.misc['Parallel Octave']
+        True
+        >>> cp.findParallelOctaves(cp.stream2, cp.stream1)
+        3
+
+        '''
         stream1.attachIntervalsBetweenStreams(stream2)
         stream2.attachIntervalsBetweenStreams(stream1)
 
         numParallelOctaves = 0
         for note1 in stream1:
-            note2 = stream1.noteFollowingNote(note1, False)
+            note2 = stream1.getElementAfterElement(note1, [Note])
             if note2 is not None:
                 if note1.editorial.harmonicInterval.name == "P8":
                     if note2.editorial.harmonicInterval.name == "P8":
                         numParallelOctaves += 1
                         note2.editorial.misc["Parallel Octave"] = True
         for note1 in stream2:
-            note2 = stream2.noteFollowingNote(note1, False)
+            note2 = stream2.getElementAfterElement(note1, [Note])
             if note2 is not None:
                 if note1.editorial.harmonicInterval.name == "P8":
                     if note2.editorial.harmonicInterval.name == "P8":
@@ -138,13 +234,34 @@ class ModalCounterpoint(object):
         hidden parallel octave. Note: a hidden octave here is defined as
         anything where the two streams reach an octave through parallel motion,
         but is not a parallel octave.
+        
 
-        NOTE: Order matters! (stream1, stream2) might
-        have no hidden octaves, while (stream2, stream1) does have them.'''
+        >>> from music21 import *
+        >>> n1 = note.Note('F3')
+        >>> n2 = note.Note('A3')
+        >>> n3 = note.Note('A3')
+        >>> n4 = note.Note('C4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('B4')
+        >>> m4 = note.Note('C5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.findHiddenOctaves(cp.stream1, cp.stream2)
+        2
+        >>> n2.editorial.misc['Hidden Octave']
+        True
+        >>> cp.findHiddenOctaves(cp.stream2, cp.stream1)
+        2
+
+        '''
         numHiddenOctaves = 0
         for i in range(len(stream1.notes)-1):
             note1 = stream1.notes[i]
-            note2 = stream1.noteFollowingNote(note1, False)
+            note2 = stream1.getElementAfterElement(note1, [Note])
             note3 = stream2.playingWhenAttacked(note1)
             note4 = stream2.playingWhenAttacked(note2)
             if note2 is not None and note3 is not None and note4 is not None:
@@ -154,74 +271,192 @@ class ModalCounterpoint(object):
                     note2.editorial.misc["Hidden Octave"] = True
         return numHiddenOctaves
 
-    def isHiddenOctave(self, note11, note12, note21, note22):
+    def isParallelOctave(self, note11, note12, note21, note22):
         '''Given four notes, assuming the first pair sounds at the same time and
-        the second pair sounds at the same time, returns True if there is a
-        hidden octave and false otherwise.'''
+        the second pair sounds at the same time, returns True if the two
+        harmonic intervals are P8 and False otherwise.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('A3')
+        >>> n2 = note.Note('B-3')
+        >>> m1 = note.Note('A4')
+        >>> m2 = note.Note('B-4')
+        >>> cp = ModalCounterpoint()
+        >>> cp.isParallelOctave(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
+        False
+        >>> cp.isParallelOctave(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
+        True
+
+        '''
+        interval1 = interval.notesToInterval(note11, note21)
+        interval2 = interval.notesToInterval(note12, note22)
+        if interval1.name == interval2.name == "P8":
+            return True
+        else:
+            return False
+
+    def isHiddenOctave(self, note11, note12, note21, note22):
+        '''Given four notes, assuming the first pair is from one part and
+        the second pair is from another part sounding at the same time,
+        returns True if there is a hidden octave and false otherwise.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('A3')
+        >>> n2 = note.Note('B-3')
+        >>> m1 = note.Note('F4')
+        >>> m2 = note.Note('B-4')
+        >>> cp = ModalCounterpoint()
+        >>> cp.isHiddenOctave(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
+        False
+        >>> cp.isHiddenOctave(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
+        True
+
+        '''
         interval1 = interval.notesToInterval(note11, note21)
         interval2 = interval.notesToInterval(note12, note22)
         interval3 = interval.notesToInterval(note11, note12)
         interval4 = interval.notesToInterval(note21, note22)
         if interval3.direction > 0 and interval4.direction > 0:
-            if interval2.name == "P8" and not interval1.name == "P8": return True
-            else: return False
+            if interval2.name == "P8" and not interval1.name == "P8":
+                return True
+            else:
+                return False
         if interval3.direction < 0 and interval4.direction < 0:
-            if interval2.name == "P8" and not interval1.name == "P8": return True
-            else: return False
+            if interval2.name == "P8" and not interval1.name == "P8":
+                return True
+            else:
+                return False
         if interval3.direction == 0 and interval4.direction == 0: return False
         return False
 
     def findParallelUnisons(self, stream1, stream2):
         '''Given two streams, returns the number of parallel unisons and also
         assigns a flag under note.editorial.misc under "Parallel Unison" for
-        any note that has harmonic interval of P1 and is preceded by a P1.'''
-        twoStreams1 = TwoStreamComparer(stream1, stream2)
-        twoStreams1.intervalToOtherStreamWhenAttacked()
+        any note that has harmonic interval of P1 and is preceded by a P1.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('A4')
+        >>> n3 = note.Note('B4')
+        >>> n4 = note.Note('C5')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('B4')
+        >>> m4 = note.Note('C5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.findParallelUnisons(cp.stream1, cp.stream2)
+        3
+        >>> n2.editorial.misc['Parallel Unison']
+        True
+        >>> cp.findParallelUnisons(cp.stream2, cp.stream1)
+        3
+
+        '''
+        
+        stream1.attachIntervalsBetweenStreams(stream2)
+        stream2.attachIntervalsBetweenStreams(stream1)
+        
         numParallelUnisons = 0
         for note1 in stream1:
-            note2 = stream1.noteFollowingNote(note1, False)
+            note2 = stream1.getElementAfterElement(note1, [Note])
             if note2 is not None:
                 if note1.editorial.harmonicInterval.name == "P1":
                     if note2.editorial.harmonicInterval.name == "P1":
                         numParallelUnisons += 1
                         note2.editorial.misc["Parallel Unison"] = True
         for note1 in stream2:
-            note2 = stream2.noteFollowingNote(note1, False)
+            note2 = stream2.getElementAfterElement(note1, [Note])
             if note2 is not None:
                 if note1.editorial.harmonicInterval.name == "P1":
                     if note2.editorial.harmonicInterval.name == "P1":
                         note2.editorial.misc["Parallel Unison"] = True
         return numParallelUnisons
 
-    def isParallelOctave(self, note11, note12, note21, note22):
-        '''Given four notes, assuming the first pair sounds at the same time and
-        the second pair sounds at the same time, returns True if the two
-        harmonic intervals are P8 and False otherwise.'''
-        interval1 = interval.notesToInterval(note11, note21)
-        interval2 = interval.notesToInterval(note12, note22)
-        if interval1.name == interval2.name == "P8": return True
-        else: return False
-
     def isParallelUnison(self, note11, note12, note21, note22):
         '''Given four notes, assuming the first pair sounds at the same time and
         the second pair sounds at the same time, returns True if the two
-        harmonic intervals are P8 and False otherwise.'''
+        harmonic intervals are P8 and False otherwise.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('A3')
+        >>> n2 = note.Note('B-3')
+        >>> m1 = note.Note('A3')
+        >>> m2 = note.Note('B-3')
+        >>> cp = ModalCounterpoint()
+        >>> cp.isParallelUnison(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
+        False
+        >>> cp.isParallelUnison(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
+        True
+
+        '''
         interval1 = interval.notesToInterval(note11, note21)
         interval2 = interval.notesToInterval(note12, note22)
-        if interval1.name == interval2.name == "P1": return True
-        else: return False
+        if interval1.name == interval2.name == "P1":
+            return True
+        else:
+            return False
 
 
     def isValidHarmony(self, note11, note21):
         '''Determines if the harmonic interval between two given notes is
-        "legal" according to 21M.301 rules of counterpoint.'''
+        "legal" according to 21M.301 rules of counterpoint. Legal harmonic
+        intervals include 'P1', 'P5', 'P8', 'm3', 'M3', 'm6', and 'M6'.
+
+
+        >>> from music21 import *
+        >>> c = note.Note('C4')
+        >>> d = note.Note('D4')
+        >>> e = note.Note('E4')
+        >>> cp = ModalCounterpoint()
+        >>> cp.isValidHarmony(c, d)
+        False
+        >>> cp.isValidHarmony(c, c)
+        True
+        >>> cp.isValidHarmony(c, e)
+        True
+
+        '''
         interval1 = interval.notesToInterval(note11, note21)
-        if interval1.diatonic.name in self.legalHarmonicIntervals: return True
-        else: return False
+        if interval1.diatonic.name in self.legalHarmonicIntervals:
+            return True
+        else:
+            return False
 
     def allValidHarmony(self, stream1, stream2):
         '''Given two simultaneous streams, returns True if all of the harmonies
-        are legal and False if one or more is not.'''
+        are legal and False if one or more is not. Legal harmonic intervals
+        include 'P1', 'P5', 'P8', 'm3', 'M3', 'm6', and 'M6'.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('A4')
+        >>> n3 = note.Note('B4')
+        >>> n4 = note.Note('C5')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('B4')
+        >>> m4 = note.Note('C5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.allValidHarmony(cp.stream1, cp.stream2)
+        True
+        >>> n1.name = 'F#4'
+        >>> cp.allValidHarmony(cp.stream1, cp.stream2)
+        False
+
+        '''
         stream1.attachIntervalsBetweenStreams(stream2)
         stream2.attachIntervalsBetweenStreams(stream1)
         for note1 in stream1.notes:
@@ -237,7 +472,30 @@ class ModalCounterpoint(object):
 
     def countBadHarmonies(self, stream1, stream2):
         '''Given two simultaneous streams, counts the number of notes (in the
-        first stream given) that create illegal harmonies when attacked.'''
+        first stream given) that create illegal harmonies when attacked.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('A4')
+        >>> n3 = note.Note('B4')
+        >>> n4 = note.Note('C5')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('B4')
+        >>> m4 = note.Note('C5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.countBadHarmonies(cp.stream1, cp.stream2)
+        0
+        >>> n1.name = 'F#4'
+        >>> cp.countBadHarmonies(cp.stream1, cp.stream2)
+        1
+
+        '''
         stream1.attachIntervalsBetweenStreams(stream2)
         numBadHarmonies = 0
         for note1 in stream1.notes:
@@ -247,20 +505,94 @@ class ModalCounterpoint(object):
 
     def isValidStep(self, note11, note12):
         '''Determines if the melodic interval between two given notes is "legal"
-        according to 21M.301 rules of counterpoint.'''
+        according to 21M.301 rules of counterpoint. Legal melodic intervals
+        include 'P4', 'P5', 'P8', 'm2', 'M2', 'm3', 'M3', and 'm6'.
+
+        SHOULD BE RENAMED isValidMelody?
+
+
+        >>> from music21 import *
+        >>> c = note.Note('C4')
+        >>> d = note.Note('D4')
+        >>> e = note.Note('E#4')
+        >>> cp = ModalCounterpoint()
+        >>> cp.isValidStep(c, d)
+        True
+        >>> cp.isValidStep(c, c)
+        False
+        >>> cp.isValidStep(c, e)
+        False
+
+        '''
         interval1 = interval.notesToInterval(note11, note12)
-        if interval1.diatonic.name in self.legalMelodicIntervals: return True
-        else: return False
+        if interval1.diatonic.name in self.legalMelodicIntervals:
+            return True
+        else:
+            return False
 
     def isValidMelody(self, stream1):
         '''Given a single stream, returns True if all melodic intervals are
-        legal and False otherwise.'''
+        legal and False otherwise. Legal melodic intervals include 'P4',
+        'P5', 'P8', 'm2', 'M2', 'm3', 'M3', and 'm6'.
+
+        SHOULD BE RENAMED allValidMelody?
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G-4')
+        >>> n2 = note.Note('A4')
+        >>> n3 = note.Note('B4')
+        >>> n4 = note.Note('B5')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('B4')
+        >>> m4 = note.Note('C5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.isValidMelody(cp.stream1)
+        False
+        >>> n1.name = 'F#4'
+        >>> cp.isValidMelody(cp.stream2)
+        True
+
+        '''
         numBadSteps = self.countBadSteps(stream1)
-        if numBadSteps == 0: return True
-        else: return False
+        if numBadSteps == 0:
+            return True
+        else:
+            return False
         
     def countBadSteps(self, stream1):
-        '''Given a single stream, returns the number of illegal melodic intervals.'''
+        '''Given a single stream, returns the number of illegal melodic
+        intervals.
+
+        SHOULD BE RENAMED countBadMelodies?
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G-4')
+        >>> n2 = note.Note('A4')
+        >>> n3 = note.Note('B4')
+        >>> n4 = note.Note('A5')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('B4')
+        >>> m4 = note.Note('C5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.countBadSteps(cp.stream1)
+        2
+        >>> n1.name = 'F#4'
+        >>> cp.countBadSteps(cp.stream2)
+        0
+    
+        '''
         numBadSteps = 0
         sn = stream1.notes
         for i in range(len(sn)-1):
@@ -291,23 +623,63 @@ class ModalCounterpoint(object):
     def tooManyThirds(self, stream1, stream2, limit = 3):
         '''Given two consecutive streams and a limit, returns True if the
         number of consecutive harmonic thirds exceeds the limit and False
-        otherwise.'''
+        otherwise.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('E4')
+        >>> n2 = note.Note('F4')
+        >>> n3 = note.Note('G4')
+        >>> n4 = note.Note('A4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('B4')
+        >>> m4 = note.Note('C5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.tooManyThirds(cp.stream1, cp.stream2)
+        True
+        >>> cp.tooManyThirds(cp.stream1, cp.stream2, 4)
+        False
+
+        '''
         stream1.attachIntervalsBetweenStreams(stream2)
-        intervalList = []
+        iList = []
         for note1 in stream1.notes:
-            intName = note1.editorial.harmonicInterval.name
-            intervalList.append(intName)
-        for i in range(len(intervalList)-limit):
-            newList = intervalList[i:]
-            consecutiveThirds = self.thirdCounter(newList, 0)
-            if consecutiveThirds > limit:
-                return True
+            iList.append(note1.editorial.harmonicInterval.name)
+        for i in range(len(iList)-limit): #no point checking if not enough notes left to SURPASS limit
+            if iList[i] == 'm3' or iList[i] == 'M3':
+                newList = iList[i:]
+                consecutiveThirds = self.thirdCounter(newList, 0)
+                if consecutiveThirds > limit:
+                    return True
         return False
 
     def thirdCounter(self, intervalList, numThirds):
         '''Recursive helper function for tooManyThirds that returns the number
         of consecutive thirds in a stream, given a corresponding list of
-        interval names.'''
+        interval names.
+
+
+        >>> cp = ModalCounterpoint()
+        >>> iList1 = ['m3', 'M3', 'm6']
+        >>> cp.thirdCounter(iList1, 0)
+        2
+        >>> cp.thirdCounter(iList1, 2)
+        4
+        >>> iList2 = ['m2', 'M3', 'P1']
+        >>> cp.thirdCounter(iList2, 0)
+        0
+        >>> iList3 = []
+        >>> cp.thirdCounter(iList3, 52)
+        52
+
+        '''
+        if len(intervalList) == 0:
+            return numThirds
         if intervalList[0] != "M3" and intervalList[0] != "m3":
             return numThirds
         else:
@@ -318,14 +690,36 @@ class ModalCounterpoint(object):
     def tooManySixths(self, stream1, stream2, limit = 3):
         '''Given two consecutive streams and a limit, returns True if the
         number of consecutive harmonic sixths exceeds the limit and False
-        otherwise.'''
+        otherwise.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('E4')
+        >>> n2 = note.Note('F4')
+        >>> n3 = note.Note('G4')
+        >>> n4 = note.Note('A4')
+        >>> m1 = note.Note('C5')
+        >>> m2 = note.Note('D5')
+        >>> m3 = note.Note('E5')
+        >>> m4 = note.Note('F5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.tooManySixths(cp.stream1, cp.stream2)
+        True
+        >>> cp.tooManySixths(cp.stream1, cp.stream2, 4)
+        False
+
+        '''
         stream1.attachIntervalsBetweenStreams(stream2)
-        intervalList = []
+        iList = []
         for note1 in stream1.notes:
             intName = note1.editorial.harmonicInterval.name
-            intervalList.append(intName)
-        for i in range(len(intervalList)-limit):
-            newList = intervalList[i:]
+            iList.append(intName)
+        for i in range(len(iList)-limit): #no point checking if not enough notes left to SURPASS limit
+            newList = iList[i:]
             consecutiveSixths = self.sixthCounter(newList, 0)
             if consecutiveSixths > limit:
                 return True
@@ -334,7 +728,25 @@ class ModalCounterpoint(object):
     def sixthCounter(self, intervalList, numSixths):
         '''Recursive helper function for tooManyThirds that returns the number
         of consecutive thirds in a stream, given a corresponding list of
-        interval names.'''
+        interval names.
+
+
+        >>> cp = ModalCounterpoint()
+        >>> iList1 = ['m6', 'M6', 'm3']
+        >>> cp.sixthCounter(iList1, 0)
+        2
+        >>> cp.sixthCounter(iList1, 2)
+        4
+        >>> iList2 = ['m2', 'M6', 'P1']
+        >>> cp.sixthCounter(iList2, 0)
+        0
+        >>> iList3 = []
+        >>> cp.sixthCounter(iList3, 52)
+        52
+
+        '''
+        if len(intervalList) == 0:
+            return numSixths
         if intervalList[0] != "M6" and intervalList[0] != "m6":
             return numSixths
         else:
@@ -467,6 +879,12 @@ class ModalCounterpoint(object):
                     valid.append(note1)
         print
         return valid
+
+##############################################################
+###
+###     TONS OF TESTING
+###
+##############################################################
 
 class Test(unittest.TestCase):
     pass
@@ -807,7 +1225,7 @@ class TestExternal(unittest.TestCase):
     def testGenerateFirstSpecies(self):
         '''
         A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
-        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2007.
+        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
         '''
         
         n101 = Note()
