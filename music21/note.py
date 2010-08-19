@@ -495,6 +495,51 @@ class GeneralNote(music21.Music21Object):
         ''')
 
 
+    def _getMetricalAccent(self):
+        '''Return a beat designation based on local Measure and TimeSignature
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.quarterLength = .25
+        >>> m = stream.Measure()
+        >>> m.isMeasure
+        True
+        >>> m.timeSignature = meter.TimeSignature('4/4')
+        >>> m.repeatAppend(n, 16)
+
+        >>> m.notes[0]._getMetricalAccent()
+        1.0
+        >>> m.notes[4]._getMetricalAccent()
+        0.25
+        >>> m.notes[8]._getMetricalAccent()
+        0.5
+        '''
+        ts = self.getContextByClass(meter.TimeSignature)
+        if ts == None:
+            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
+        return ts.getAccentWeight(self._getMeasureOffset())
+
+
+    metricalAccent = property(_getMetricalAccent,  
+        doc = '''Return the metrical accent of this Note in the most recently positioned Measure. Accent values are between zero and one, and are derived from the local TimeSignature's accent MeterSequence weights. 
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.quarterLength = .5
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('3/4')
+        >>> m.repeatAppend(n, 6)
+        >>> [m.notes[i].metricalAccent for i in range(6)]
+        [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]
+
+        >>> m.timeSignature = meter.TimeSignature('6/8')
+        >>> [m.notes[i].metricalAccent for i in range(6)]
+        [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
+
+        ''')
+
+
+
 
     def augmentOrDiminish(self, scalar, inPlace=True):
         '''Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy.

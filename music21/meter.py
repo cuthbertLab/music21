@@ -34,6 +34,13 @@ validDenominators = [1,2,4,8,16,32,64,128] # in order
 # also [pow(2,x) for x in range(8)]
 MIN_DENOMINATOR_TYPE = '128th'
 
+# possibly store a module-level dictionary of partitioned meter sequences used
+# for setting default accent weights; store as needed
+_meterSequenceAccentArchetypes = {}
+# store meter sequence division options, once created, in a module
+# level dictionary
+_meterSequenceDivisionOptions = {}
+
 def slashToFraction(value):
     '''
     >>> from music21 import *
@@ -387,6 +394,27 @@ class MeterTerminal(object):
         ms.partitionByList(numeratorList) # this will split weight
         return ms    
 
+    def subdivideByOther(self, other):
+        '''Return a MeterSequence
+        based on another MeterSequence
+
+        >>> from music21 import *
+        >>> a = meter.MeterSequence('1/4+1/4+1/4')
+        >>> a
+        <MeterSequence {1/4+1/4+1/4}>
+        >>> b = meter.MeterSequence('3/8+3/8')
+        >>> a.subdivideByOther(b)
+        <MeterSequence {{3/8+3/8}}>
+        '''
+        # elevate to meter sequence
+        ms = MeterSequence()
+        if other.duration.quarterLength != self.duration.quarterLength:
+            raise MeterException('cannot subdivide by other: %s' % other)
+        ms.load(other) # do not need to autoWeight here
+        #ms.partitionByOther(other) # this will split weight
+        return ms    
+
+
     def subdivide(self, value):
         '''Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence.
 
@@ -396,8 +424,12 @@ class MeterTerminal(object):
         '''
         if common.isListLike(value):
             return self.subdivideByList(value)
-        else:
+        elif isinstance(value, MeterSequence):
+            return self.subdivideByOther(value)
+        elif common.isNum(value):
             return self.subdivideByCount(value)
+        else:
+            raise MeterException('cannot process partition argument %s' % value)
 
 
 
@@ -676,11 +708,17 @@ class MeterSequence(MeterTerminal):
         >>> a._divisionOptionsAlgo(5,8)
         [['2/8', '3/8'], ['3/8', '2/8'], ['1/8', '1/8', '1/8', '1/8', '1/8'], ['5/8'], ['10/16'], ['20/32'], ['40/64'], ['80/128']]
 
+
+        >>> a._divisionOptionsAlgo(18,4)
+        [['3/4', '3/4', '3/4', '3/4', '3/4', '3/4'], ['1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4'], ['1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2'], ['18/4'], ['9/4', '9/4'], ['4/4', '4/4', '4/4', '4/4'], ['2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4'], ['9/2'], ['36/8'], ['72/16'], ['144/32'], ['288/64'], ['576/128']]
+
         '''
         opts = []
 
-        # compound meters; 6, 9, 12, 15
-        if n % 3 == 0 and n > 3 and d > 4:
+        # compound meters; 6, 9, 12, 15, 18
+        # 9/4, 9/2, 6/2 are all considered compound without d>4
+        #if n % 3 == 0 and n > 3 and d > 4:
+        if n % 3 == 0 and n > 3:
             nMod = n / 3
             seq = []
             for x in range(n/3):
@@ -824,11 +862,18 @@ class MeterSequence(MeterTerminal):
 
 
     def _getOptions(self):
+        # all-string python dictionaries are optimized; use string key
         n = int(self.numerator)
         d = int(self.denominator)
-        opts = []
-        opts += self._divisionOptionsAlgo(n, d)
-        opts += self._divisionOptionsPreset(n, d)
+        tsStr = '%s/%s' % (n, d)
+        try: 
+            return _meterSequenceDivisionOptions[tsStr]
+        except KeyError:
+            opts = []
+            opts += self._divisionOptionsAlgo(n, d)
+            opts += self._divisionOptionsPreset(n, d)
+            # store for access later
+            _meterSequenceDivisionOptions[tsStr] = opts
         return opts
 
 
@@ -980,7 +1025,9 @@ class MeterSequence(MeterTerminal):
 
 
     def subdividePartitionsEqual(self, divisions=None):
-        '''Subdivide all partitions by equally spaced divisions value in place.
+        '''Subdivide all partitions by equally-spaced divisions, given a divisions value. Manipulates this MeterSequence in place.
+
+        Divisions value may optionally be a MeterSequence, from which a top-level partitioning structure is derived.
 
         >>> from music21 import *
         >>> ms = meter.MeterSequence('2/4')
@@ -1005,13 +1052,15 @@ class MeterSequence(MeterTerminal):
             if divisions == None: # get dynamically
                 if self[i].numerator in [1, 2, 4, 8, 16]:
                     divisionsLocal = 2
-                elif self[i].numerator in [3, 6, 9, 12, 15]:
+                elif self[i].numerator in [3]:
                     divisionsLocal = 3
+                elif self[i].numerator in [6, 9, 12, 15, 18]:
+                    divisionsLocal = self[i].numerator / 3
                 else:
                     divisionsLocal = self[i].numerator
             else:
                 divisionsLocal = divisions
-#             environLocal.printDebug(['got divisions:', divisionsLocal, 'for numerator', self[i].numerator, 'denominator', self[i].denominator])
+            #environLocal.printDebug(['got divisions:', divisionsLocal, 'for numerator', self[i].numerator, 'denominator', self[i].denominator])
             self[i] = self[i].subdivide(divisionsLocal)
 
 
@@ -1032,17 +1081,20 @@ class MeterSequence(MeterTerminal):
         '''
         for obj in processObjList:
             obj.subdividePartitionsEqual(divisions)
-        # gather references
+        # gather references for recursive processing
         post = []
         for obj in processObjList:
             for sub in obj:
                 post.append(sub)
         return post
 
-    def subdivideNestedHierarchy(self, depth, divCount=None, divFirst=None):
+    def subdivideNestedHierarchy(self, depth, firstPartitionForm=None, 
+            normalizeDenominators=True):
         '''Create nested structure down to a specified depth; the first division is set to one; the second division may be by 2 or 3; remaining divisions are always by 2.
 
         This a destructive procedure that will remove any existing partition structures. 
+
+        `normalizeDenominators`, if True, will reduce all denominators to the same minimum level. 
 
         >>> from music21 import *
         >>> ms = meter.MeterSequence('4/4')
@@ -1063,32 +1115,73 @@ class MeterSequence(MeterTerminal):
         <MeterSequence {{{{{{1/32+1/32}+{1/32+1/32}}+{{1/32+1/32}+{1/32+1/32}}}+{{{1/32+1/32}+{1/32+1/32}}+{{1/32+1/32}+{1/32+1/32}}}}+{{{{1/32+1/32}+{1/32+1/32}}+{{1/32+1/32}+{1/32+1/32}}}+{{{1/32+1/32}+{1/32+1/32}}+{{1/32+1/32}+{1/32+1/32}}}}}}>
 
         '''
-        # as a hierarchical representation, first subdivision must be 1
+        # as a hierarchical representation, zeroth subdivision must be 1
         self.partition(1)
-
-        # initial divisions are often based on numerator
-        if divCount == None: 
-            divCount = self.numerator
-        # use a fixed mapping for first divider; may be a good algo solution
-        if divFirst == None:
-            if divCount in [1, 2, 4, 8, 16, 32]:
-                divFirst = 2
-            elif divCount in [3, 6, 9, 12, 15]:
-                divFirst = 3
-            else: # set to numerator
-                divFirst = divCount
-
         depthCount = 0
-        # this needs to be subdivided here by the LCM of the numerator
-        self.subdividePartitionsEqual(divFirst)
-        # self[h] = self[h].subdivide(divFirst)
-        depthCount += 1
+
+        # initial divisions are often based on numerator or are provided
+        # by looking at the number of top-level beat partitions
+        # thus, 6/8 will have 2, 18/4 should have 5
+
+        if isinstance(firstPartitionForm, MeterSequence):
+            # change self in place, as we cannot re-assign to self
+            #self = self.subdivideByOther(firstPartitionForm.getLevel(0))
+            self.load(firstPartitionForm.getLevel(0))
+            depthCount += 1
+        else: # can be just a number
+            if firstPartitionForm == None: 
+                firstPartitionForm = self.numerator
+            # use a fixed mapping for first divider; may be a good algo solution
+            if firstPartitionForm in [1, 2, 4, 8, 16, 32]:
+                divFirst = 2
+            elif firstPartitionForm in [3]:
+                divFirst = 3
+    #             elif firstPartitionForm in [6, 9, 12, 15, 18]:
+    #                 divFirst = firstPartitionForm / 3
+            # otherwise, set the first div to the number of beats; in 18/4
+            # this should be 6
+            else: # set to numerator
+                divFirst = firstPartitionForm
+
+            # use partitions equal, divide by number
+            self.subdividePartitionsEqual(divFirst)
+            # self[h] = self[h].subdivide(divFirst)
+            depthCount += 1
+
+#         environLocal.printDebug(['subdivideNestedHierarchy(): firstPartitionForm:', firstPartitionForm, ': self: ', self])
+
         # all other partitions are recursive; start first with list
         post = [self[0]]
         while (depthCount < depth):
             # setting divisions to None will get either 2/3 for all components
             post = self._subdivideNested(post, divisions=None)
             depthCount += 1
+
+            # need to detect cases of inequal denominators
+            if normalizeDenominators:
+                while True:
+                    d = []
+                    for ref in post:
+                        if ref.denominator not in d:
+                            d.append(ref.denominator)
+                    # if we have more than one denominator; we need to normalize
+                    #environLocal.printDebug(['subdivideNestedHierarchy():', 'd',  d, 'post', post, 'depthCount', depthCount])
+
+                    if len(d) > 1: 
+                        postNew = []
+                        for i in range(len(post)):
+                            # if this is a lower denominator (1/4 not 1/8), 
+                            # process again
+                            if post[i].denominator == min(d):
+                                postNew += self._subdivideNested([post[i]], 
+                                           divisions=None)
+                            else: # keep original if no problem
+                                postNew.append(post[i])
+                        post = postNew # reassing to original
+                    else:
+                        break
+
+        #environLocal.printDebug(['subdivideNestedHierarchy(): post nested processing:',  self])
 
 
     #---------------------------------------------------------------------------
@@ -1376,6 +1469,33 @@ class MeterSequence(MeterTerminal):
 
     depth = property(_getDepth)
 
+
+
+    def isUniformPartition(self, depth=0):
+        '''Return True if the top-level partitions have equal durations
+
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence('3/8+2/8+3/4')
+        >>> ms.isUniformPartition()
+        False
+        >>> ms = meter.MeterSequence('4/4')
+        >>> ms.isUniformPartition()
+        True
+        >>> ms = meter.MeterSequence('2/4+2/4')
+        >>> ms.isUniformPartition()
+        True
+        '''
+        n = []
+        d = []
+        for ms in self._getLevelList(depth):
+            if ms.numerator not in n:
+                n.append(ms.numerator)
+            if ms.denominator not in d:
+                d.append(ms.denominator)
+            # as soon as we have more than on entry, we do not have unform
+            if len(n) > 1 or len(d) > 1:
+                return False
+        return True
 
 
     #---------------------------------------------------------------------------
@@ -1827,11 +1947,13 @@ class TimeSignature(music21.Music21Object):
 
         # create subdivisions, and thus define compound/simple distinction
         if len(self.beat) > 1: # if partitioned
-            for i in range(len(self.beat)): # either 2 or 3
-                if self.beat[i].numerator == 3:
-                    self.beat[i] = self.beat[i].subdivide(3)
-                elif self.beat[i].numerator in [1, 2]:
-                    self.beat[i] = self.beat[i].subdivide(2)
+            self.beat.subdividePartitionsEqual()
+
+#             for i in range(len(self.beat)): # either 2 or 3
+#                 if self.beat[i].numerator == 3:
+#                     self.beat[i] = self.beat[i].subdivide(3)
+#                 elif self.beat[i].numerator in [1, 2]:
+#                     self.beat[i] = self.beat[i].subdivide(2)
 
                 # any lower level is divided by 2 
 #                 for j in range(len(self.beat[0][i])):
@@ -1888,35 +2010,53 @@ class TimeSignature(music21.Music21Object):
 
         '''
         # create a scratch MeterSequence for structure
-        ms = MeterSequence('%s/%s' % (self.numerator, self.denominator))
+        tsStr = '%s/%s' % (self.numerator, self.denominator)
+        if self.beat.isUniformPartition():
+            firstPartitionForm = len(self.beat)
+            cacheKey = (tsStr, firstPartitionForm, depth)
+        else: # derive from meter sequence
+            firstPartitionForm = self.beat
+            cacheKey = None # cannot cache based on beat form
 
-        # key operation here
-        # div count needs to be the number of top-level beat divisions
-        ms.subdivideNestedHierarchy(depth, divCount=len(self.beat))
+        #environLocal.printDebug(['_setDefaultAccentWeights(): firstPartitionForm set to', firstPartitionForm, 'self.beat: ', self.beat, tsStr])
+        try:
+            self.accent = copy.deepcopy(
+                          _meterSequenceAccentArchetypes[cacheKey])
+            #environLocal.printDebug(['using stored accent archetype:'])
+        except KeyError:
+            #environLocal.printDebug(['creating a new accent archetype'])
+            ms = MeterSequence(tsStr)    
+            # key operation here
+            # div count needs to be the number of top-level beat divisions
+            ms.subdivideNestedHierarchy(depth, 
+                firstPartitionForm=firstPartitionForm)
 
-        # provide a partition for each flat division
-        divCount = len(ms.flat)
-        divStep = self.barDuration.quarterLength / float(divCount)
+            # provide a partition for each flat division
+            accentCount = len(ms.flat)
+            #environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
+            divStep = self.barDuration.quarterLength / float(accentCount)
+            weightInts = [0] * accentCount # weights as integer/depth counts
+            for i in range(accentCount):
+                ql = i * divStep
+                weightInts[i] = ms.positionToDepth(ql, align='quantize')
+    
+            maxInt = max(weightInts)
+            weightValues = {} # reference dictionary
+            # minimum value, something like 1/16., to be multiplied by powers of 2
+            weightValueMin = 1.0 / pow(2, maxInt-1)
+            for x in range(maxInt):
+                # multiply base value (.125) by 1, 2, 4
+                # there is never a 0 integer weight, so add 1 to dictionary
+                weightValues[x+1] = weightValueMin * pow(2, x)
+    
+            # set weights on accent partitions
+            self.accent.partition([1] * accentCount) 
+            for i in range(accentCount):
+                # get values from weightValues dictionary
+                self.accent[i].weight = weightValues[weightInts[i]]
 
-        weightInts = [0] * divCount # weights as integer/depth counts
-        for i in range(divCount):
-            ql = i * divStep
-            weightInts[i] = ms.positionToDepth(ql, align='quantize')
-
-        maxInt = max(weightInts)
-        weightValues = {} # reference dictionary
-        # minimum value, something like 1/16., to be multiplied by powers of 2
-        weightValueMin = 1.0 / pow(2, maxInt-1)
-        for x in range(maxInt):
-            # multiply base value (.125) by 1, 2, 4
-            # there is never a 0 integer weight, so add 1 to dictionary
-            weightValues[x+1] = weightValueMin * pow(2, x)
-
-        # set weights on accent partitions
-        self.accent.partition([1] * divCount) 
-        for i in range(divCount):
-            # get values from weightValues dictionary
-            self.accent[i].weight = weightValues[weightInts[i]]
+            if cacheKey != None:
+                _meterSequenceAccentArchetypes[cacheKey] = copy.deepcopy(self.accent)
 
 
     def load(self, value, partitionRequest=None):
@@ -1941,7 +2081,13 @@ class TimeSignature(music21.Music21Object):
         if partitionRequest == None: # set default beam partitions
             self._setDefaultBeamPartitions()
             self._setDefaultBeatPartitions()
-            #self._setDefaultAccentWeights() # set partitions based on beat
+            # for some summed meters default accent weights are difficult
+            # to obtain
+            try:
+                self._setDefaultAccentWeights(3) # set partitions based on beat
+            except MeterException:
+                environLocal.printDebug(['cannot set default accents for:', self])
+                pass
 
     def loadRatio(self, numerator, denominator, partitionRequest=None):
         '''Convenience method
@@ -2562,6 +2708,8 @@ class TimeSignature(music21.Music21Object):
 
         >>> from music21 import *
         >>> ts1 = meter.TimeSignature('3/4')
+        >>> [ts1.getAccentWeight(x) for x in range(3)]
+        [1.0, 0.5, 0.5]
         '''
         msLevel = self.accent.getLevel(level)
         return msLevel[msLevel.positionToIndex(qLenPos)].weight
@@ -3165,11 +3313,11 @@ class Test(unittest.TestCase):
 
         ms = MeterSequence('6/8')
         ms.subdividePartitionsEqual(None)
-        self.assertEqual(str(ms), '{{1/4+1/4+1/4}}')
+        self.assertEqual(str(ms), '{{3/8+3/8}}')
 
         ms = MeterSequence('6/16')
         ms.subdividePartitionsEqual(None)
-        self.assertEqual(str(ms), '{{1/8+1/8+1/8}}')
+        self.assertEqual(str(ms), '{{3/16+3/16}}')
 
         ms = MeterSequence('3/8+3/8')
         ms.subdividePartitionsEqual(None)
@@ -3184,10 +3332,19 @@ class Test(unittest.TestCase):
         self.assertEqual(str(ms), '{{1/8+1/8+1/8+1/8+1/8}}')
 
 
-    def testSetDefaultAccentWeights(self):
+        ms = MeterSequence('3/8+3/4')
+        ms.subdividePartitionsEqual(None) # can partition by another 
+        self.assertEqual(str(ms), '{{1/8+1/8+1/8}+{1/4+1/4+1/4}}')
 
+
+
+
+    def testSetDefaultAccentWeights(self):
+        # these tests take the level to 3. in some cases, a level of 2
+        # is not sufficient to normalize all denominators
         pairs = [
         ('4/4', [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
+
         ('3/4', [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
 
         ('2/4', [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
@@ -3199,18 +3356,56 @@ class Test(unittest.TestCase):
         # all beats are even b/c this is unpartitioned
         ('5/4', [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125] ),
 
-        ('2/8+3/8', [1.0, 0.125, 0.25, 0.125, 
-                     0.5, 0.125, 0.25, 0.125, 0.25, 0.125]),
+        ('9/4', [1.0, 0.125, 0.25, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 0.25, 0.125]),
 
-        # TODO: this is a problem case
-        #('9/4', [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
+        ('18/4', [1.0, 0.125, 0.25, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 0.25, 0.125]),
+
+        ('11/8', [1.0, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125]),
+
+
+        ('2/8+3/8', [1.0, 0.125, 0.25, 0.125, 
+        0.5, 0.125, 0.25, 0.125, 0.25, 0.125] ),
+
+        ('3/8+2/8+3/4', 
+        [1.0, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625, 
+
+        0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625, 
+
+        0.5, 0.03125, 0.0625, 0.03125, 0.125, 0.03125, 0.0625, 0.03125, 
+        0.25, 0.03125, 0.0625, 0.03125, 0.125, 0.03125, 0.0625, 0.03125, 
+        0.25, 0.03125, 0.0625, 0.03125, 0.125, 0.03125, 0.0625, 0.03125
+        ] ), 
+
+
+        ('1/2+2/16', 
+        [1.0, 0.015625, 0.03125, 0.015625, 0.0625, 0.015625, 0.03125, 0.015625, 0.125, 0.015625, 0.03125, 0.015625, 0.0625, 0.015625, 0.03125, 0.015625, 0.25, 0.015625, 0.03125, 0.015625, 0.0625, 0.015625, 0.03125, 0.015625, 0.125, 0.015625, 0.03125, 0.015625, 0.0625, 0.015625, 0.03125, 0.015625, 
+        
+        0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625]  ),
 
 
                 ]
 
         for tsStr, match in pairs:
+            #environLocal.printDebug([tsStr])
             ts1 = TimeSignature(tsStr)
-            ts1._setDefaultAccentWeights(3)
+            ts1._setDefaultAccentWeights(3) # going to a lower level here
             self.assertEqual([mt.weight for mt in ts1.accent], match)
            
 
