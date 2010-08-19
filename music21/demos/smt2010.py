@@ -211,6 +211,46 @@ def ex1_revised(show=True, *arguments, **keywords):
     if show:
         display.write('musicxml')
     
+def findPotentialPassingTones(show = True):
+    g = corpus.parseWork('gloria')
+    gcn = g.parts['cantus'].measures(1,126).flat.notes
+
+    gcn[0].lyric = ""
+    gcn[-1].lyric = ""
+    for i in range(1, len(gcn) - 1):
+        prev = gcn[i-1]
+        cur  = gcn[i]
+        next = gcn[i+1]
+        
+        cur.lyric = ""
+        
+        if "Rest" in prev.classes or "Rest" in cur.classes \
+            or "Rest" in next.classes:
+            continue
+        
+        int1 = interval.notesToInterval(prev, cur)
+        if int1.isStep is False:
+            continue
+        
+        int2 = interval.notesToInterval(cur, next)
+        if int2.isStep is False:
+            continue
+            
+        cma = cur.metricalAccent 
+        if cma < 1 and \
+            cma <= prev.metricalAccent and \
+            cma <= next.metricalAccent: 
+
+            if int1.direction == int2.direction:
+                cur.lyric = 'pt' # neighbor tone
+            else:
+                cur.lyric = 'nt' # passing tone
+        
+    g.parts['cantus'].show()
+
+
+
+
 
 
 class Test(unittest.TestCase):
@@ -224,9 +264,9 @@ class Test(unittest.TestCase):
         # bethove examples are commented out for time
         #sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
         # ex03, ex01, ex02, ex04, ex01Alt, findHighestNotes,ex1_revised
-        for func in [findHighestNotes]:
+        for func in [findPotentialPassingTones]:
             #func(show=False, op133=sStream)
-            func(show=False)
+            func(show=True)
 
 if __name__ == "__main__":
     import music21
