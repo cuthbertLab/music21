@@ -151,7 +151,12 @@ class LyricException(Exception):
 class Lyric(object):
 
     def __init__(self, text=None, number=1, syllabic=None):
-        self.text = text
+        if not common.isStr(text):
+            # do not want to do this unless we are sure this is not a string
+            # possible might alter unicode or other string-like representations
+            self.text = str(text)         
+        else:
+            self.text = text
         if not common.isNum(number):
             raise LyricException('Number best be number')
         self.number = number
@@ -515,6 +520,7 @@ class GeneralNote(music21.Music21Object):
         0.5
         '''
         ts = self.getContextByClass(meter.TimeSignature)
+        allWeights = [mt.weight for mt in ts.accent]
         if ts == None:
             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
         return ts.getAccentWeight(self._getMeasureOffset())
@@ -1955,6 +1961,32 @@ class Test(unittest.TestCase):
             b.articulations = d
             self.assertEqual(a==b, match) # sub6
 
+
+
+    def testMetricalAccent(self):
+        from music21 import note, meter, stream
+        data = [
+('4/4', 8, .5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
+('3/4', 6, .5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25] ),
+('6/8', 6, .5, [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]  ),
+
+('12/32', 12, .125, [1.0, 0.125, 0.125, 0.25, 0.125, 0.125, 0.5, 0.125, 0.125, 0.25, 0.125, 0.125]  ),
+
+('5/8', 10, .25, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25]  ),
+
+                ]
+
+        for tsStr, nCount, dur, match in data:
+
+            m = stream.Measure()
+            m.timeSignature = meter.TimeSignature(tsStr)
+            n = note.Note()
+            n.quarterLength = dur   
+            m.repeatAppend(n, nCount)
+
+            self.assertEqual([n.metricalAccent for n in m.notes], match)
+            
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Note, Rest]
@@ -1965,10 +1997,12 @@ if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
-        a = Test()
-        b = TestExternal()
+        t = Test()
+        te = TestExternal()
 
 
 
-        #a.testNoteEquality()
-        a.testNoteBeatProperty()
+        #t.testNoteEquality()
+        #t.testNoteBeatProperty()
+
+        t.testMetricalAccent()

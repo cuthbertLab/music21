@@ -1122,7 +1122,6 @@ class MeterSequence(MeterTerminal):
         # initial divisions are often based on numerator or are provided
         # by looking at the number of top-level beat partitions
         # thus, 6/8 will have 2, 18/4 should have 5
-
         if isinstance(firstPartitionForm, MeterSequence):
             # change self in place, as we cannot re-assign to self
             #self = self.subdivideByOther(firstPartitionForm.getLevel(0))
@@ -1156,7 +1155,6 @@ class MeterSequence(MeterTerminal):
             # setting divisions to None will get either 2/3 for all components
             post = self._subdivideNested(post, divisions=None)
             depthCount += 1
-
             # need to detect cases of inequal denominators
             if normalizeDenominators:
                 while True:
@@ -1166,7 +1164,6 @@ class MeterSequence(MeterTerminal):
                             d.append(ref.denominator)
                     # if we have more than one denominator; we need to normalize
                     #environLocal.printDebug(['subdivideNestedHierarchy():', 'd',  d, 'post', post, 'depthCount', depthCount])
-
                     if len(d) > 1: 
                         postNew = []
                         for i in range(len(post)):

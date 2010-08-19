@@ -2508,7 +2508,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n.pitch.getContextAttr('measureNumber'), 34)
         n.pitch.setContextAttr('lyric',  
                                n.pitch.getContextAttr('measureNumber'))
-        self.assertEqual(n.lyric, 34)
+        # converted to a string now
+        self.assertEqual(n.lyric, '34')
 
 
         violin1 = corpus.parseWork("beethoven/opus18no1", 
