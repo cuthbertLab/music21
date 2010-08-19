@@ -124,7 +124,7 @@ def convertDiatonicNumberToStep(dn):
     >>> convertDiatonicNumberToStep(23)
     ('D', 3)
     >>> convertDiatonicNumberToStep(0)
-    ('C', 0)
+    ('B', -1)
     >>> convertDiatonicNumberToStep(1)
     ('C', 0)
     >>> convertDiatonicNumberToStep(2)
@@ -135,11 +135,23 @@ def convertDiatonicNumberToStep(dn):
     ('F', 0)
     >>> convertDiatonicNumberToStep(5)
     ('G', 0)
+    >>> convertDiatonicNumberToStep(-1)
+    ('A', -1)
+    >>> convertDiatonicNumberToStep(-2)
+    ('G', -1)
+    >>> convertDiatonicNumberToStep(-19)
+    ('D', -3)
     '''
-    remainder, octave = math.modf((dn-1)/7.0)
-    # what is .001 doing here?
-    return STEPNAMES[int((remainder*7)+.001)], int(octave)
-
+    if dn == 0:
+        return 'B', -1
+    elif dn > 0:
+        remainder, octave = math.modf((dn-1)/7.0)
+        # what is .001 doing here? -- A: prevents floating point errors
+        return STEPNAMES[int((remainder*7)+.001)], int(octave)
+    elif dn < 0:
+        remainder, octave = math.modf((dn-1)/7.0)
+#        return remainder, octave
+        return STEPNAMES[int((remainder*7)-.001)], int(octave - 1)
 
 def convertSpecifier(specifier):
     '''Given an integer or a string, return the integer for the appropriate specifier. This permits specifiers to specified in a flexible manner.
@@ -434,7 +446,7 @@ class GenericInterval(music21.Music21Object):
             self.isDiatonicStep = True
         else: 
             self.isDiatonicStep = False
-
+        
         self.isStep = self.isDiatonicStep
         
         # unisons (even augmented) are neither steps nor skips.
@@ -603,7 +615,7 @@ class DiatonicInterval(music21.Music21Object):
         'm3'
         >>> aInterval.isDiatonicStep
         False
-        >>> aInterval.isStep
+      >>> aInterval.isStep
         False
 
         >>> aInterval = DiatonicInterval('major', 2)
@@ -663,6 +675,7 @@ class DiatonicInterval(music21.Music21Object):
 
             self.isDiatonicStep = self.generic.isDiatonicStep
             self.isStep = self.generic.isStep
+            
 
             # for inversions 
             if self.prefectable: # inversions P <-> P; d <-> A; dd <-> AA; etc. 
@@ -1071,6 +1084,7 @@ class Interval(music21.Music21Object):
         True
         >>> aInterval.isStep
         True
+        
 
         >>> aInterval = Interval('dd3')
         >>> aInterval.isChromaticStep
@@ -1079,7 +1093,7 @@ class Interval(music21.Music21Object):
         False
         >>> aInterval.isStep
         True
-
+        
         '''
         music21.Music21Object.__init__(self)
         if len(arguments) == 1 and common.isStr(arguments[0]):
@@ -1165,7 +1179,7 @@ class Interval(music21.Music21Object):
             self.directedSimpleNiceName = self.diatonic.directedSimpleNiceName
 
             self.isDiatonicStep = self.diatonic.isDiatonicStep
-
+        
         if self.chromatic is not None:
             self.isChromaticStep = self.chromatic.isChromaticStep
 
@@ -1215,16 +1229,18 @@ class Interval(music21.Music21Object):
         >>> p2
         F##4
 
+        OMIT_FROM_DOCS
+        TODO: More tests here
+
         '''
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
-
+        oldDiatonicNum = pitch1.diatonicNoteNum
+        distanceToMove = self.diatonic.generic.staffDistance
         if not reverse:
-            newDiatonicNumber = (pitch1.diatonicNoteNum +
-                             self.diatonic.generic.staffDistance)
+            newDiatonicNumber = (oldDiatonicNum + distanceToMove)
         else:
-            newDiatonicNumber = (pitch1.diatonicNoteNum -
-                             self.diatonic.generic.staffDistance)
+            newDiatonicNumber = (oldDiatonicNum - distanceToMove)
 
         newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
         pitch2.step = newStep
@@ -1242,6 +1258,10 @@ class Interval(music21.Music21Object):
                           interval2.chromatic.semitones)
 
         if halfStepsToFix != 0:
+            while halfStepsToFix >= 12:
+                halfStepsToFix = halfStepsToFix - 12
+                pitch2.octave = pitch2.octave -1
+            
             pitch2.accidental = halfStepsToFix
             # inherit accidental display properties
             pitch2.inheritDisplay(pitch1)
