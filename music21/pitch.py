@@ -968,16 +968,28 @@ class Pitch(music21.Music21Object):
         if len(usrStr) == 1 and usrStr in STEPNAMES:
             self._step = usrStr
         else:
-            raise PitchException("Cannot make a step out of %s" % usrStr)
+            raise PitchException("Cannot make a step out of '%s'" % usrStr)
         self._pitchSpaceNeedsUpdating = True
 
     step = property(_getStep, _setStep,
-        doc='''The diatonic name of the note; i.e. ignores accidental and
-        octave.
+        doc='''The diatonic name of the note; i.e. does not give the 
+        accidental or octave.  Is case insensitive.
 
         >>> a = Pitch('B-3')
         >>> a.step
         'B'
+        
+        >>> a.step = "c"
+        >>> a.nameWithOctave
+        'C-3'
+        
+        
+        Giving an accidentals raises an exception
+        
+        >>> b = Pitch('E4')
+        >>> b.step = "E-"
+        Traceback (most recent call last):
+        PitchException: Cannot make a step out of 'E-'
         ''')
 
 
@@ -1589,37 +1601,50 @@ class Pitch(music21.Music21Object):
         
         C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc.
         
-        >>> c = Pitch('c4')
+        >>> from music21 import *
+        >>> c = pitch.Pitch('c4')
         >>> c.diatonicNoteNum
         29
-        >>> c = Pitch('c#4')
+        >>> c = pitch.Pitch('c#4')
         >>> c.diatonicNoteNum
         29
-        >>> d = Pitch('d--4')
+        >>> d = pitch.Pitch('d--4')
         >>> d.accidental.name
         'double-flat'
         >>> d.diatonicNoteNum
         30
-        >>> lowc = Pitch('c1')
+        >>> lowc = pitch.Pitch('c1')
         >>> lowc.diatonicNoteNum
         8
 
-        >>> b = Pitch()
+        >>> b = pitch.Pitch()
         >>> b.step = "B"
         >>> b.octave = -1 
         >>> b.diatonicNoteNum
         0
-        >>> c = Pitch("C")
+        >>> c = pitch.Pitch("C")
         >>> c.diatonicNoteNum  #implicitOctave
         29
 
-        >>> lowDSharp = Pitch("C#7") # !!!
-        >>> lowDSharp.diatonicNoteNum = 9
+        >>> lowDSharp = pitch.Pitch("C#7") # start high !!!
+        >>> lowDSharp.diatonicNoteNum = 9  # move low
         >>> lowDSharp.octave
         1
         >>> lowDSharp.name
         'D#'
 
+        OMIT_FROM_DOCS
+        
+        >>> lowlowA = pitch.Pitch("A")
+        >>> lowlowA.octave = -1
+        >>> lowlowA.diatonicNoteNum
+        -1
+        
+        >>> lowlowlowD = pitch.Pitch("D")
+        >>> lowlowlowD.octave = -3
+        >>> lowlowlowD.diatonicNoteNum
+        -19
+        
         '''
         if ['C','D','E','F','G','A','B'].count(self.step.upper()):
             noteNumber = ['C','D','E','F','G','A','B'].index(self.step.upper())
@@ -1662,6 +1687,14 @@ class Pitch(music21.Music21Object):
         >>> aPitch.transpose(aInterval, inPlace=True)
         >>> aPitch
         C#4
+        
+        OMIT_FROM_DOCS
+        
+        Test to make sure that extreme ranges work
+        >>> dPitch = Pitch('D2')
+        >>> lowC = dPitch.transpose('M-23')
+        >>> lowC
+        C-1
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
         if hasattr(value, 'diatonic'): # its an Interval class
@@ -1675,7 +1708,10 @@ class Pitch(music21.Music21Object):
             # can setName with nameWithOctave to recreate all essential
             # pitch attributes
             # NOTE: in some cases this may not return exactly the proper config
-            self._setName(p.nameWithOctave)
+            
+            # TODO -- DOES NOT WORK IF OCTAVE IS NEGATIVE.  A, -2 = A-flat 2!
+            self._setName(p.name)
+            self._setOctave(p.octave)
             # manually copy accidental object
             self.accidental = p.accidental
             return None

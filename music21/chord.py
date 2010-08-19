@@ -1093,6 +1093,11 @@ class Chord(note.NotRest):
         False
         >>> c1.isIncompleteMajorTriad()
         True
+        
+        
+        Note that complete major triads return False:
+        
+        
         >>> c2 = chord.Chord(['C4','E3', 'G5'])
         >>> c2.isIncompleteMajorTriad()
         False
