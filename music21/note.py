@@ -500,7 +500,7 @@ class GeneralNote(music21.Music21Object):
         ''')
 
 
-    def _getMetricalAccent(self):
+    def _getBeatStrength(self):
         '''Return an accent weight based on local Measure and TimeSignature. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
 
         >>> from music21 import *
@@ -512,11 +512,11 @@ class GeneralNote(music21.Music21Object):
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> m.repeatAppend(n, 16)
 
-        >>> m.notes[0]._getMetricalAccent()
+        >>> m.notes[0]._getBeatStrength()
         1.0
-        >>> m.notes[4]._getMetricalAccent()
+        >>> m.notes[4]._getBeatStrength()
         0.25
-        >>> m.notes[8]._getMetricalAccent()
+        >>> m.notes[8]._getBeatStrength()
         0.5
         '''
         ts = self.getContextByClass(meter.TimeSignature)
@@ -526,7 +526,7 @@ class GeneralNote(music21.Music21Object):
                forcePositionMatch=True)
 
 
-    metricalAccent = property(_getMetricalAccent,  
+    beatStrength = property(_getBeatStrength,  
         doc = '''Return the metrical accent of this Note in the most recently positioned Measure. Accent values are between zero and one, and are derived from the local TimeSignature's accent MeterSequence weights. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
 
         >>> from music21 import *
@@ -535,11 +535,11 @@ class GeneralNote(music21.Music21Object):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].metricalAccent for i in range(6)]
+        >>> [m.notes[i].beatStrength for i in range(6)]
         [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].metricalAccent for i in range(6)]
+        >>> [m.notes[i].beatStrength for i in range(6)]
         [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
 
         ''')
@@ -1990,7 +1990,7 @@ class Test(unittest.TestCase):
             n.quarterLength = dur   
             m.repeatAppend(n, nCount)
 
-            self.assertEqual([n.metricalAccent for n in m.notes], match)
+            self.assertEqual([n.beatStrength for n in m.notes], match)
             
 
 #-------------------------------------------------------------------------------

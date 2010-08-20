@@ -236,10 +236,10 @@ def findPotentialPassingTones(show = True):
         if int2.isStep is False:
             continue
             
-        cma = cur.metricalAccent 
+        cma = cur.beatStrength 
         if cma < 1 and \
-            cma <= prev.metricalAccent and \
-            cma <= next.metricalAccent: 
+            cma <= prev.beatStrength and \
+            cma <= next.beatStrength: 
 
             if int1.direction == int2.direction:
                 cur.lyric = 'pt' # neighbor tone
