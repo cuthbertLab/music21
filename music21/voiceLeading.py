@@ -5,6 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Jackie Rogoff
 #
 # Copyright:    (c) 2009 The music21 Project
 # License:      LGPL
@@ -50,7 +51,23 @@ class VoiceLeadingQuartet(music21.Music21Object):
         self.hIntervals.append(interval.notesToInterval(self.v2n1, self.v2n2))
     
     def noMotion(self):
-        '''Returns true if no voice moves at this "voice-leading" moment'''
+        '''Returns true if no voice moves at this "voice-leading" moment
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('G4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('G4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.noMotion()
+        True
+        >>> n2.octave = 5
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.noMotion()
+        False
+
+        '''
         for iV in self.hIntervals:
             if iV.name != "P1": 
                 return False
@@ -58,15 +75,34 @@ class VoiceLeadingQuartet(music21.Music21Object):
 
     def obliqueMotion(self):
         '''
-        Returns true if one voice remains the same and another moves.  I.e., isNoMotion 
-        must also be false
+        Returns true if one voice remains the same and another moves.  I.e.,
+        noMotion must be False if obliqueMotion is True.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('G4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('G4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.obliqueMotion()
+        False
+        >>> n2.octave = 5
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.obliqueMotion()
+        True
+        >>> m2.octave = 5
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.obliqueMotion()
+        False
+        
         '''
         if self.noMotion():
             return False
         else:
-            for iV in self.hIntervals:
-                if iV.name != "P1": 
-                    return False
+            iNames = [self.hIntervals[0].name, self.hIntervals[1].name]
+            if "P1" not in iNames: 
+                return False
             else:
                 return True
     
@@ -74,7 +110,31 @@ class VoiceLeadingQuartet(music21.Music21Object):
     def similarMotion(self):
         '''
         Returns true if the two voices both move in the same direction.
-        Parallel Motion will also return true, as it is a special case of similar motion
+        Parallel Motion will also return true, as it is a special case of
+        similar motion. If there is no motion, returns False.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('G4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('G4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.similarMotion()
+        False
+        >>> n2.octave = 5
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.similarMotion()
+        False
+        >>> m2.octave = 5
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.similarMotion()
+        True
+        >>> m2 = note.Note('A5')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.similarMotion()
+        True
+        
         '''
         
         if self.noMotion():
@@ -86,21 +146,74 @@ class VoiceLeadingQuartet(music21.Music21Object):
                 return False
  
     def parallelMotion(self):
-        '''returns True if both voices move with the same interval or an octave duplicate of the interval'''
+        '''returns True if both voices move with the same interval or an
+        octave duplicate of the interval
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('G4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('G4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.parallelMotion() #no motion, so oblique motion will give False
+        False
+        >>> n2.octave = 5
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.parallelMotion()
+        False
+        >>> m2.octave = 5
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.parallelMotion()
+        True
+        >>> m2 = note.Note('A5')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.parallelMotion()
+        False
+
+        '''
         if not self.similarMotion():
             return False
         else:
             if self.vIntervals[0].directedSimpleName == self.vIntervals[1].directedSimpleName:
                 return True
+            return False
     
     def contraryMotion(self):
         '''
         returns True if both voices move in opposite directions
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('G4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('G4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.contraryMotion() #no motion, so oblique motion will give False
+        False
+        >>> n2.octave = 5
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.contraryMotion()
+        False
+        >>> m2.octave = 5
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.contraryMotion()
+        False
+        >>> m2 = note.Note('A5')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.contraryMotion()
+        False
+        >>> m2 = note.Note('C4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.contraryMotion()
+        True
+        
         '''
         
         if self.noMotion():
             return False
-        elif self.parallelMotion():
+        elif self.obliqueMotion():
             return False
         else:
             if self.hIntervals[0].direction == self.hIntervals[1].direction:
@@ -110,10 +223,11 @@ class VoiceLeadingQuartet(music21.Music21Object):
  
     def antiParallelMotion(self, simpleName = None):
         '''
-        Returns true if the simple interval before is the same as the simple interval after
-        and the motion is contrary.  if simpleName is specified as an Interval object or a
-        string then it only returns true if the simpleName of both intervals is the same
-        as simpleName (i.e., use to find antiParallel fifths) 
+        Returns true if the simple interval before is the same as the simple
+        interval after and the motion is contrary. if simpleName is
+        specified as an Interval object or a string then it only returns
+        true if the simpleName of both intervals is the same as simpleName
+        (i.e., use to find antiParallel fifths) 
 
         >>> from music21 import *
         >>> n11 = note.Note("C4")
@@ -130,8 +244,20 @@ class VoiceLeadingQuartet(music21.Music21Object):
         
         We can also use interval objects
         >>> p5Obj = interval.Interval("P5")
+        >>> p8Obj = interval.Interval('P8')
         >>> vlq1.antiParallelMotion(p5Obj)
         True
+        >>> p8Obj = interval.Interval('P8')
+        >>> vlq1.antiParallelMotion(p8Obj)
+        False
+
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('G4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('G3')
+        >>> vl2 = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl2.antiParallelMotion()
+        False
         '''
         if not self.contraryMotion():
             return False
@@ -156,7 +282,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
  
     def parallelInterval(self, thisInterval):
         '''
-        Returns true if there is a parallel or antiParallel interval of this type
+        Returns true if there is a parallel or antiParallel interval of
+        this type (thisInterval should be an Interval object)
         
         >>> n11 = Note("C4")
         >>> n12a = Note("D4") # ascending 2nd
@@ -243,7 +370,27 @@ class VoiceLeadingQuartet(music21.Music21Object):
         '''
         n.b. -- this method finds ALL hidden intervals,
         not just those that are forbidden under traditional
-        common practice counterpoint rules
+        common practice counterpoint rules. Takes thisInterval,
+        an Interval object.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('G4')
+        >>> m1 = note.Note('B4')
+        >>> m2 = note.Note('D5')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.hiddenInterval(Interval('P5'))
+        True
+        >>> n1 = note.Note('E4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.hiddenInterval(Interval('P5'))
+        False
+        >>> m2.octave = 6
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.hiddenInterval(Interval('P5'))
+        False
+        
         '''
         
         if self.parallelMotion():
