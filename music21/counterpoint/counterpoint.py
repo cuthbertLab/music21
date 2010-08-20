@@ -845,12 +845,15 @@ class ModalCounterpoint(object):
             choices = self.generateValidNotes(prevFirmus, currFirmus, prevNote, afterLeap, minorScale)
             if len(choices) == 0:
                 raise ModalCounterpointException("Sorry, please try again")
+            #TODO: make deterministic with a flag
             newNote = random.choice(choices)
             newNote.duration = currFirmus.duration
             stream2.append(newNote)
-            int = interval.notesToInterval(prevNote, newNote)
-            if int.generic.undirected > 3: afterLeap = True
-            else: afterLeap = False
+            int1 = interval.notesToInterval(prevNote, newNote)
+            if int1.generic.undirected > 3:
+                afterLeap = True
+            else:
+                afterLeap = False
         return stream2
 
     def generateValidNotes(self, prevFirmus, currFirmus, prevNote, afterLeap, minorScale):
@@ -862,61 +865,87 @@ class ModalCounterpoint(object):
         print currFirmus.name
         valid = []
         bottomInt = interval.notesToInterval(prevFirmus, currFirmus)
-        if bottomInt.direction < 0: ascending = True
-        else: ascending = False
+
+        possibleNotes = []
 
         n1 = interval.transposeNote(prevNote, "m2")
         n2 = interval.transposeNote(prevNote, "M2")
         n3 = interval.transposeNote(prevNote, "m3")
         n4 = interval.transposeNote(prevNote, "M3")
-        n5 = interval.transposeNote(prevNote, "P4")
-        n6 = interval.transposeNote(prevNote, "P5")
-        if afterLeap: possible = [n1, n2, n3, n4]
-        else: possible = [n1, n2, n3, n4, n5, n6]
-        possible.extend(possible)
+        
+        if afterLeap:
+            goingUp = [n1, n2, n3, n4]
+        else:
+            n5 = interval.transposeNote(prevNote, "P4")
+            n6 = interval.transposeNote(prevNote, "P5")
+            goingUp = [n1, n2, n3, n4, n5, n6]
 
         n7 = interval.transposeNote(prevNote, "m-2")
         n8 = interval.transposeNote(prevNote, "M-2")
         n9 = interval.transposeNote(prevNote, "m-3")
         n10 = interval.transposeNote(prevNote, "M-3")
-        n11 = interval.transposeNote(prevNote, "P-4")
-        n12 = interval.transposeNote(prevNote, "P-5")
-        if afterLeap: possible.extend([n7, n8, n9, n10])
-        else: possible.extend([n7, n8, n9, n10, n11, n12])
-        print "possible: ", [note1.name for note1 in possible]
-        
-        for note1 in possible:
-            try: validHarmony = self.isValidHarmony(note1, currFirmus)
-            except: validHarmony = False
+        if afterLeap:
+            goingDown = [n7, n8, n9, n10]
+        else:
+            n11 = interval.transposeNote(prevNote, "P-4")
+            n12 = interval.transposeNote(prevNote, "P-5")
+            goingDown = [n7, n8, n9, n10, n11, n12]
 
-#            vlq = VoiceLeadingQuartet(prevNote, prevFirmus, note1, currFirmus)
-#            par5 = vlq.parallelFifth()
-#            par8 = vlq.parallelOctave()
-#            hid5 = vlq.hiddenFifth()
-#            hid8 = vlq.hiddenOctave()
-#            par1 = vlq.parallelUnison()
-            
-            try: par5 = self.isParallelFifth(prevNote, note1, prevFirmus, currFirmus)
-            except: par5 = True
-            try: par8 = self.isParallelOctave(prevNote, note1, prevFirmus, currFirmus)
-            except: par8 = True
-            try: hid5 = self.isHiddenFifth(prevNote, note1, prevFirmus, currFirmus)
-            except: hid5 = True
-            try: hid8 = self.isHiddenOctave(prevNote, note1, prevFirmus, currFirmus)
-            except: hid8 = True
-            try: par1 = self.isParallelUnison(prevNote, note1, prevFirmus, currFirmus)
-            except: par1 = True
-            try:
-                distance = interval.notesToInterval(currFirmus, note1)
-                if distance.direction < 0: crossing = True
-                else: crossing = False
-            except: crossing = True
-            goodNotes = minorScale.getConcreteMelodicMinorScale()
-            goodNames = [note2.name for note2 in goodNotes]
-            if (note1.name in goodNames) and validHarmony and (not par5) and (not par8) and (not hid5) and\
-               (not hid8) and (not par1) and (not crossing):
-                    print "adding: ", note1.name, note1.octave
-                    valid.append(note1)
+        possibleNotes.extend(goingUp)
+        possibleNotes.extend(goingDown)
+        #favor contrary motion
+        if bottomInt.direction < 0:
+            possibleNotes.extend(goingUp)
+        else:
+            possibleNotes.extend(goingDown)
+        print "possible: ", [note1.name for note1 in possibleNotes]
+
+        goodNotes = minorScale.getConcreteMelodicMinorScale()
+        goodNames = [note2.name for note2 in goodNotes]
+        
+        for note1 in possibleNotes:
+            if note1.name in goodNames:
+                if self.isValidHarmony(note1, currFirmus):
+                    if not self.isParallelUnison(prevNote, note1, prevFirmus, currFirmus):
+                        if not self.isParallelFifth(prevNote, note1, prevFirmus, currFirmus):
+                            if not self.isParallelOctave(prevNote, note1, prevFirmus, currFirmus):
+                                if not self.isHiddenFifth(prevNote, note1, prevFirmus, currFirmus):
+                                    if not self.isHiddenOctave(prevNote, note1, prevFirmus, currFirmus):
+                                        if interval.Interval(currFirmus, note1).direction >= 0:
+                                            print "adding: ", note1.name, note1.octave
+                                            valid.append(note1)
+                
+##            try: validHarmony = self.isValidHarmony(note1, currFirmus)
+##            except: validHarmony = False
+##
+###            vlq = VoiceLeadingQuartet(prevNote, prevFirmus, note1, currFirmus)
+###            par5 = vlq.parallelFifth()
+###            par8 = vlq.parallelOctave()
+###            hid5 = vlq.hiddenFifth()
+###            hid8 = vlq.hiddenOctave()
+###            par1 = vlq.parallelUnison()
+##            
+##            try: par5 = self.isParallelFifth(prevNote, note1, prevFirmus, currFirmus)
+##            except: par5 = True
+##            try: par8 = self.isParallelOctave(prevNote, note1, prevFirmus, currFirmus)
+##            except: par8 = True
+##            try: hid5 = self.isHiddenFifth(prevNote, note1, prevFirmus, currFirmus)
+##            except: hid5 = True
+##            try: hid8 = self.isHiddenOctave(prevNote, note1, prevFirmus, currFirmus)
+##            except: hid8 = True
+##            try: par1 = self.isParallelUnison(prevNote, note1, prevFirmus, currFirmus)
+##            except: par1 = True
+##            try:
+##                distance = interval.notesToInterval(currFirmus, note1)
+##                if distance.direction < 0: crossing = True
+##                else: crossing = False
+##            except: crossing = True
+##            goodNotes = minorScale.getConcreteMelodicMinorScale()
+##            goodNames = [note2.name for note2 in goodNotes]
+##            if (note1.name in goodNames) and validHarmony and (not par5) and (not par8) and (not hid5) and\
+##               (not hid8) and (not par1) and (not crossing):
+##                    print "adding: ", note1.name, note1.octave
+##                    valid.append(note1)
         print
         return valid
 
@@ -1262,69 +1291,75 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
     pass
    
-##    def testGenerateFirstSpecies(self):
-##        '''
-##        A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
-##        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
-##        '''
-##        
-##        n101 = Note()
-##        n101.duration.type = "whole"
-##        n101.name = "A"
-##        aMinor = scale.ConcreteMinorScale(n101)
-##        n101b = Note()
-##        n101b.duration.type = "whole"
-##        n101b.name = "D"
-##        dMinor = scale.ConcreteMinorScale(n101b)
-##        
-##        counterpoint1 = ModalCounterpoint()
-##
-##        cantusFirmus1 = "A1 c B c d e c B A"
-##        cantusFirmus2 = "A1 e d f e c d c B A"
-##        cantusFirmus3 = "d1 f e d g f a g f e d"
-##        #cantusFirmus4 = 
-##        
-##        choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
-##        chosenCantusFirmus = random.choice(choices)
-##        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus, "4/4").notes)
-##    
-##        thisScale = aMinor
-##        if cantusFirmus is cantusFirmus3:
-##            thisScale = dMinor
-##            
-##        goodHarmony = False
-##        goodMelody = False
-##    
-##        while (goodHarmony == False or goodMelody == False):
-##            try:
-##                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale)
-##                hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
-##                print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
-##        
-##                goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
-##                goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)        
-##    
-##                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
-##                if lastInterval.generic.undirected != 2:
-##                    goodMelody = False
-##                    print "rejected because lastInterval was not a second"
-##             
-##                print [note1.name + str(note1.octave) for note1 in cantusFirmus.notes]
-##                if not goodHarmony: print "bad harmony"
-##                else: print "harmony good"
-##                if not goodMelody: print "bad melody"
-##                else: print "melody good"
-##            except ModalCounterpointException:
-##                pass        
-##    
-##        score = stream.Score()
-##        score.insert(0, meter.TimeSignature('4/4'))
-##        score.insert(0, hopeThisWorks2)
-##        score.insert(0, cantusFirmus)
-###        score.show('text')
-###        score.show('musicxml')
-##        score.show('midi')
-##        score.show('lily.png')
+    def testGenerateFirstSpecies(self):
+        '''
+        A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
+        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
+        '''
+        
+        n101 = Note()
+        n101.duration.type = "whole"
+        n101.name = "A"
+        aMinor = scale.ConcreteMinorScale(n101)
+        n101b = Note()
+        n101b.duration.type = "whole"
+        n101b.name = "D"
+        dMinor = scale.ConcreteMinorScale(n101b)
+        
+        counterpoint1 = ModalCounterpoint()
+
+        cantusFirmus1 = "A1 c B c d e c B A"
+        cantusFirmus2 = "A1 e d f e c d c B A"
+        cantusFirmus3 = "d1 f e d g f a g f e d"
+        #cantusFirmus4 = 
+        
+        choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
+        chosenCantusFirmus = random.choice(choices)
+        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus, "4/4").notes)
+    
+        thisScale = aMinor
+        if cantusFirmus is cantusFirmus3:
+            thisScale = dMinor
+            
+        goodHarmony = False
+        goodMelody = False
+        thirdsGood = False
+        sixthsGood = False
+    
+        while (goodHarmony == False or goodMelody == False or thirdsGood == False or sixthsGood == False):
+            try:
+                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale)
+                hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
+                print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
+        
+                goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
+                goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)
+                thirdsGood = not counterpoint1.tooManyThirds(hopeThisWorks2, cantusFirmus)
+                sixthsGood = not counterpoint1.tooManySixths(hopeThisWorks2, cantusFirmus)
+    
+                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
+                if lastInterval.generic.undirected != 2:
+                    goodMelody = False
+                    print "rejected because lastInterval was not a second"
+             
+                print [note1.name + str(note1.octave) for note1 in cantusFirmus.notes]
+                if not goodHarmony: print "bad harmony"
+                else: print "harmony good"
+                if not goodMelody: print "bad melody"
+                else: print "melody good"
+                if not thirdsGood: print "too many thirds"
+                if not sixthsGood: print "too many sixths"
+            except ModalCounterpointException:
+                pass        
+    
+        score = stream.Score()
+        score.insert(0, meter.TimeSignature('4/4'))
+        score.insert(0, hopeThisWorks2)
+        score.insert(0, cantusFirmus)
+#        score.show('text')
+#        score.show('musicxml')
+        score.show('midi')
+        score.show('lily.png')
         
 if (__name__ == "__main__"):
     music21.mainTest(TestExternal) #TestExternal
