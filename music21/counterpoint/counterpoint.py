@@ -694,6 +694,7 @@ class ModalCounterpoint(object):
         interval names.
 
 
+        >>> from music21 import *
         >>> cp = ModalCounterpoint()
         >>> iList1 = ['m3', 'M3', 'm6']
         >>> cp.thirdCounter(iList1, 0)
@@ -761,6 +762,7 @@ class ModalCounterpoint(object):
         interval names.
 
 
+        >>> from music21 import *
         >>> cp = ModalCounterpoint()
         >>> iList1 = ['m6', 'M6', 'm3']
         >>> cp.sixthCounter(iList1, 0)
@@ -1252,68 +1254,69 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
     pass
    
-##    def testGenerateFirstSpecies(self):
-##        '''
-##        A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
-##        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
-##        '''
-##        
-##        n101 = Note()
-##        n101.duration.type = "whole"
-##        n101.name = "A"
-##        aMinor = scale.ConcreteMinorScale(n101)
-##        n101b = Note()
-##        n101b.duration.type = "whole"
-##        n101b.name = "D"
-##        dMinor = scale.ConcreteMinorScale(n101b)
-##        
-##        counterpoint1 = ModalCounterpoint()
-##
-##        cantusFirmus1 = "A1 c B c d e c B A"
-##        cantusFirmus2 = "A1 e d f e c d c B A"
-##        cantusFirmus3 = "d1 f e d g f a g f e d" 
-##        
-##        choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
-##        chosenCantusFirmus = random.choice(choices)
-##        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus, "4/4").notes)
-##    
-##        thisScale = aMinor
-##        if cantusFirmus is cantusFirmus3:
-##            thisScale = dMinor
-##            
-##        goodHarmony = False
-##        goodMelody = False
-##    
-##        while (goodHarmony == False or goodMelody == False):
-##            try:
-##                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale)
-##                hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
-##                print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
-##        
-##                goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
-##                goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)        
-##    
-##                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
-##                if lastInterval.generic.undirected != 2:
-##                    goodMelody = False
-##                    print "rejected because lastInterval was not a second"
-##             
-##                print [note1.name + str(note1.octave) for note1 in cantusFirmus.notes]
-##                if not goodHarmony: print "bad harmony"
-##                else: print "harmony good"
-##                if not goodMelody: print "bad melody"
-##                else: print "melody good"
-##            except ModalCounterpointException:
-##                pass        
-##    
-##        score = stream.Score()
-##        score.insert(0, meter.TimeSignature('4/4'))
-##        score.insert(0, hopeThisWorks2)
-##        score.insert(0, cantusFirmus)
-###        score.show('text')
-###        score.show('musicxml')
-##        score.show('midi')
-##        score.show('lily.png')
+    def testGenerateFirstSpecies(self):
+        '''
+        A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
+        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
+        '''
+        
+        n101 = Note()
+        n101.duration.type = "whole"
+        n101.name = "A"
+        aMinor = scale.ConcreteMinorScale(n101)
+        n101b = Note()
+        n101b.duration.type = "whole"
+        n101b.name = "D"
+        dMinor = scale.ConcreteMinorScale(n101b)
+        
+        counterpoint1 = ModalCounterpoint()
+
+        cantusFirmus1 = "A1 c B c d e c B A"
+        cantusFirmus2 = "A1 e d f e c d c B A"
+        cantusFirmus3 = "d1 f e d g f a g f e d"
+        #cantusFirmus4 = 
+        
+        choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
+        chosenCantusFirmus = random.choice(choices)
+        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus, "4/4").notes)
+    
+        thisScale = aMinor
+        if cantusFirmus is cantusFirmus3:
+            thisScale = dMinor
+            
+        goodHarmony = False
+        goodMelody = False
+    
+        while (goodHarmony == False or goodMelody == False):
+            try:
+                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale)
+                hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
+                print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
+        
+                goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
+                goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)        
+    
+                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
+                if lastInterval.generic.undirected != 2:
+                    goodMelody = False
+                    print "rejected because lastInterval was not a second"
+             
+                print [note1.name + str(note1.octave) for note1 in cantusFirmus.notes]
+                if not goodHarmony: print "bad harmony"
+                else: print "harmony good"
+                if not goodMelody: print "bad melody"
+                else: print "melody good"
+            except ModalCounterpointException:
+                pass        
+    
+        score = stream.Score()
+        score.insert(0, meter.TimeSignature('4/4'))
+        score.insert(0, hopeThisWorks2)
+        score.insert(0, cantusFirmus)
+#        score.show('text')
+#        score.show('musicxml')
+        score.show('midi')
+        score.show('lily.png')
         
 if (__name__ == "__main__"):
     music21.mainTest(TestExternal) #TestExternal
