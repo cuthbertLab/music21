@@ -117,7 +117,9 @@ def convertStaffDistanceToInterval(staffDist):
 
 
 def convertDiatonicNumberToStep(dn):
-    '''Convert a diatonic number to a step name and a octave integer. 
+    '''Convert a diatonic number to a step name (without accidental) and a octave integer. 
+    The lowest C on a Bosendorfer Imperial Grand is assigned 1 the D above it is 2,
+    E is 3, etc.  See pitch.diatonicNoteNum for more details
 
     >>> convertDiatonicNumberToStep(15)
     ('C', 2)
@@ -127,6 +129,18 @@ def convertDiatonicNumberToStep(dn):
     ('B', -1)
     >>> convertDiatonicNumberToStep(1)
     ('C', 0)
+
+
+    Extremely high and absurdly low numbers also produce "notes".
+    
+
+    >>> convertDiatonicNumberToStep(2100)
+    ('B', 299)
+    >>> convertDiatonicNumberToStep(-19)
+    ('D', -3)
+    
+    
+    OMIT_FROM_DOCS
     >>> convertDiatonicNumberToStep(2)
     ('D', 0)
     >>> convertDiatonicNumberToStep(3)
@@ -139,19 +153,26 @@ def convertDiatonicNumberToStep(dn):
     ('A', -1)
     >>> convertDiatonicNumberToStep(-2)
     ('G', -1)
-    >>> convertDiatonicNumberToStep(-19)
-    ('D', -3)
+    >>> convertDiatonicNumberToStep(-6)
+    ('C', -1)
+    >>> convertDiatonicNumberToStep(-7)
+    ('B', -2)
     '''
     if dn == 0:
         return 'B', -1
     elif dn > 0:
-        remainder, octave = math.modf((dn-1)/7.0)
+        octave = int((dn-1)/7.0)
+        stepnumber = (dn-1) - (octave * 7)
+        return STEPNAMES[stepnumber], octave
+
+#        remainder, octave = math.modf((dn-1)/7.0)
         # what is .001 doing here? -- A: prevents floating point errors
-        return STEPNAMES[int((remainder*7)+.001)], int(octave)
+#        return STEPNAMES[int((remainder*7)+.001)], int(octave)
     elif dn < 0:
-        remainder, octave = math.modf((dn-1)/7.0)
-#        return remainder, octave
-        return STEPNAMES[int((remainder*7)-.001)], int(octave - 1)
+        octave = int((dn)/7.0)
+        stepnumber = (dn-1) - (octave * 7)
+        return STEPNAMES[stepnumber], (octave - 1)
+
 
 def convertSpecifier(specifier):
     '''Given an integer or a string, return the integer for the appropriate specifier. This permits specifiers to specified in a flexible manner.

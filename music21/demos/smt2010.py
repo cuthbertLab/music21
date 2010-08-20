@@ -266,7 +266,7 @@ class Test(unittest.TestCase):
         # ex03, ex01, ex02, ex04, ex01Alt, findHighestNotes,ex1_revised
         for func in [findPotentialPassingTones]:
             #func(show=False, op133=sStream)
-            func(show=True)
+            func(show=False)
 
 if __name__ == "__main__":
     import music21

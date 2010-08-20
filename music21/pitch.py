@@ -310,9 +310,10 @@ class Accidental(music21.Music21Object):
     def __eq__(self, other):
         '''Equality. Needed for pitch comparisons.
 
-        >>> a = Accidental('double-flat')
-        >>> b = Accidental('double-flat')
-        >>> c = Accidental('double-sharp')
+        >>> from music21 import *
+        >>> a = pitch.Accidental('double-flat')
+        >>> b = pitch.Accidental('double-flat')
+        >>> c = pitch.Accidental('double-sharp')
         >>> a == b   
         True
         >>> a == c
@@ -337,10 +338,11 @@ class Accidental(music21.Music21Object):
 
 
     def __gt__(self, other):
-        '''Greater than.
+        '''Greater than.  Based on the accidentals' alter function.
 
-        >>> a = Accidental('sharp')
-        >>> b = Accidental('flat')
+        >>> from music21 import *
+        >>> a = pitch.Accidental('sharp')
+        >>> b = pitch.Accidental('flat')
         >>> a < b   
         False
         >>> a > b
@@ -356,8 +358,9 @@ class Accidental(music21.Music21Object):
     def __lt__(self, other):
         '''Less than
 
-        >>> a = Accidental('natural')
-        >>> b = Accidental('flat')
+        >>> from music21 import *
+        >>> a = pitch.Accidental('natural')
+        >>> b = pitch.Accidental('flat')
         >>> a > b   
         True
         >>> a < b
@@ -375,22 +378,23 @@ class Accidental(music21.Music21Object):
         Provide a value to the Accidental. Strings values, numbers, and Lilypond
         Abbreviations are all accepted.  
 
-        >>> a = Accidental()
+        >>> from music21 import *
+        >>> a = pitch.Accidental()
         >>> a.set('sharp')
         >>> a.alter == 1
         True
 
-        >>> a = Accidental()
+        >>> a = pitch.Accidental()
         >>> a.set(2)
         >>> a.modifier == "##"
         True
 
-        >>> a = Accidental()
+        >>> a = pitch.Accidental()
         >>> a.set(2.0)
         >>> a.modifier == "##"
         True
 
-        >>> a = Accidental('--')
+        >>> a = pitch.Accidental('--')
         >>> a.alter
         -2.0
         '''
@@ -498,9 +502,10 @@ class Accidental(music21.Music21Object):
 
         This is needed when transposing Pitches: we need to retain accidental display properties. 
 
-        >>> a = Accidental('double-flat')
+        >>> from music21 import *
+        >>> a = pitch.Accidental('double-flat')
         >>> a.displayType = 'always'
-        >>> b = Accidental('sharp')
+        >>> b = pitch.Accidental('sharp')
         >>> b.inheritDisplay(a)
         >>> b.displayType
         'always'
@@ -561,7 +566,9 @@ class Accidental(music21.Music21Object):
 
     def _getMx(self):
         """From music21 to MusicXML
-        >>> a = Accidental()
+
+        >>> from music21 import *
+        >>> a = pitch.Accidental()
         >>> a.set('half-sharp')
         >>> a.alter == .5
         True
@@ -594,11 +601,12 @@ class Accidental(music21.Music21Object):
     def _setMx(self, mxAccidental):
         """From MusicXML to Music21
         
+        >>> from music21 import *
         >>> a = musicxml.Accidental()
         >>> a.set('content', 'half-flat')
         >>> a.get('content')
         'half-flat'
-        >>> b = Accidental()
+        >>> b = pitch.Accidental()
         >>> b.mx = a
         >>> b.name
         'half-flat'
@@ -646,14 +654,21 @@ class Pitch(music21.Music21Object):
 
         Optional parameter name should include a step and accidental character(s)
 
-        it can also include a non-negative octave number.  ("C#4", "B--3", etc.)
+        it can also include an octave number ("C#4", "B--3", etc.) so long as it's 0 or higher.
 
-        >>> p1 = Pitch('a#')
+        >>> from music21 import *
+        >>> p1 = pitch.Pitch('a#')
         >>> p1
         A#
-        >>> p2 = Pitch(3)
+        >>> p2 = pitch.Pitch(3)
         >>> p2
         E-
+        
+        >>> p3 = pitch.Pitch("B--3")
+        >>> p3.accidental
+        <accidental double-flat>
+        >>> p3.octave
+        3
         '''
         music21.Music21Object.__init__(self)
 
@@ -1673,7 +1688,8 @@ class Pitch(music21.Music21Object):
         Alternatively, a :class:`music21.interval.Interval` 
         object can be supplied.
 
-        >>> aPitch = Pitch('g4')
+        >>> from music21 import *
+        >>> aPitch = pitch.Pitch('g4')
         >>> bPitch = aPitch.transpose('m3')
         >>> bPitch
         B-4
@@ -1691,10 +1707,10 @@ class Pitch(music21.Music21Object):
         OMIT_FROM_DOCS
         
         Test to make sure that extreme ranges work
-        >>> dPitch = Pitch('D2')
-        >>> lowC = dPitch.transpose('P-22')
+        >>> dPitch = pitch.Pitch('D2')
+        >>> lowC = dPitch.transpose('m-23')
         >>> lowC
-        D-1
+        C#-1
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
         if hasattr(value, 'diatonic'): # its an Interval class
@@ -2450,6 +2466,11 @@ class Test(unittest.TestCase):
         p2.octave = 4
         self.assertEqual(p1==p2, True)
 
+    def testLowNotes(self):
+        dPitch = Pitch('D2')
+        lowC = dPitch.transpose('M-23')
+        self.assertEqual(lowC.name, "C")
+        self.assertEqual(lowC.octave, -1)
 
 
 #-------------------------------------------------------------------------------
