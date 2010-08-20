@@ -1692,9 +1692,9 @@ class Pitch(music21.Music21Object):
         
         Test to make sure that extreme ranges work
         >>> dPitch = Pitch('D2')
-        >>> lowC = dPitch.transpose('M-23')
+        >>> lowC = dPitch.transpose('P-22')
         >>> lowC
-        C-1
+        D-1
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
         if hasattr(value, 'diatonic'): # its an Interval class
