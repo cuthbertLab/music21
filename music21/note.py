@@ -501,7 +501,7 @@ class GeneralNote(music21.Music21Object):
 
 
     def _getMetricalAccent(self):
-        '''Return a beat designation based on local Measure and TimeSignature
+        '''Return an accent weight based on local Measure and TimeSignature. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -522,11 +522,12 @@ class GeneralNote(music21.Music21Object):
         ts = self.getContextByClass(meter.TimeSignature)
         if ts == None:
             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
-        return ts.getAccentWeight(self._getMeasureOffset())
+        return ts.getAccentWeight(self._getMeasureOffset(),
+               forcePositionMatch=True)
 
 
     metricalAccent = property(_getMetricalAccent,  
-        doc = '''Return the metrical accent of this Note in the most recently positioned Measure. Accent values are between zero and one, and are derived from the local TimeSignature's accent MeterSequence weights. 
+        doc = '''Return the metrical accent of this Note in the most recently positioned Measure. Accent values are between zero and one, and are derived from the local TimeSignature's accent MeterSequence weights. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -1972,6 +1973,12 @@ class Test(unittest.TestCase):
 ('12/32', 12, .125, [1.0, 0.125, 0.125, 0.25, 0.125, 0.125, 0.5, 0.125, 0.125, 0.25, 0.125, 0.125]  ),
 
 ('5/8', 10, .25, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25]  ),
+
+# test notes that do not have defined accents
+('4/4', 16, .25, [1.0, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625, 0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625]),
+
+('4/4', 32, .125, [1.0, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625, 0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625, 0.5, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625, 0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625]),
+
 
                 ]
 

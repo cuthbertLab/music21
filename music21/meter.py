@@ -1703,6 +1703,8 @@ class MeterSequence(MeterTerminal):
                     match = i
                     break
             else:    
+                # note that this is >=, meaning that the first boundary
+                # is coincident
                 if (common.greaterThanOrEqual(qLenPos, start) and
                     common.lessThan(qLenPos, end)):
 #                if qLenPos >= start and qLenPos < end:
@@ -2700,8 +2702,10 @@ class TimeSignature(music21.Music21Object):
         for i in range(len(msLevel)):
             msLevel[i].weight = weightList[i % len(weightList)]
 
-    def getAccentWeight(self, qLenPos, level=0):
-        '''Given a qLenPos,  return an accent level. 
+    def getAccentWeight(self, qLenPos, level=0, forcePositionMatch=False):
+        '''Given a qLenPos,  return an accent level. In general, accents are assumed to define only a first-level weight. 
+
+        If `forcePositionMatch` is True, an accent will only returned if the provided qLenPos is a near exact match to the provided quarter length. Otherwise, half of the minimum quarter length will be provided.
 
         >>> from music21 import *
         >>> ts1 = meter.TimeSignature('3/4')
@@ -2709,11 +2713,18 @@ class TimeSignature(music21.Music21Object):
         [1.0, 0.5, 0.5]
         '''
 
-        # TODO: need to get minimum weight, and then return min 
-        # weight if we do not match a defined position 
-        #allWeights = [mt.weight for mt in ts.accent]
+        # might store this weight every time it is set, rather than
+        # getting it here
+        minWeight = min([mt.weight for mt in self.accent]) * .5
 
         msLevel = self.accent.getLevel(level)
+
+        if forcePositionMatch:
+            # only return values for qLen positions that are at the start
+            # of a span; for those that are not, we need to return a minWeight
+            localSpan = msLevel.positionToSpan(qLenPos)
+            if not common.almostEquals(qLenPos, localSpan[0]):
+                return minWeight
         return msLevel[msLevel.positionToIndex(qLenPos)].weight
 
     def getBeat(self, qLenPos):
