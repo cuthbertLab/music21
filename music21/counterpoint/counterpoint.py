@@ -60,6 +60,9 @@ class ModalCounterpoint(object):
         3
         >>> n1.editorial.harmonicInterval.name
         'P5'
+        >>> m4.octave = 5 #checking for 12ths as well
+        >>> cp.findParallelFifths(cp.stream1, cp.stream2)
+        3
         
         '''
         
@@ -70,8 +73,8 @@ class ModalCounterpoint(object):
         for note1 in srcStream:
             note2 = srcStream.getElementAfterElement(note1, [Note])
             if note2 is not None:
-                if note1.editorial.harmonicInterval.name == "P5" and \
-                   note2.editorial.harmonicInterval.name == "P5":
+                if note1.editorial.harmonicInterval.semiSimpleName == "P5" and \
+                   note2.editorial.harmonicInterval.semiSimpleName == "P5":
                         numParallelFifths += 1
                         note2.editorial.misc["Parallel Fifth"] = True
         return numParallelFifths
@@ -136,13 +139,17 @@ class ModalCounterpoint(object):
         False
         >>> cp.isParallelFifth(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
         True
+        >>> m1.octave = 5
+        >>> m2.octave = 5 #test parallel 12ths
+        >>> cp.isParallelFifth(n1, n2, m1, m2)
+        True
 
         '''
         vlq = VoiceLeadingQuartet(note11, note12, note21, note22)
         return vlq.parallelFifth()
 #        interval1 = interval.notesToInterval(note11, note21)
 #        interval2 = interval.notesToInterval(note12, note22)
-#        if interval1.name == interval2.name == "P5": return True
+#        if interval1.semiSimpleName == interval2.semiSimpleName == "P5": return True
 #        else: return False
 
     def isHiddenFifth(self, note11, note12, note21, note22):
@@ -161,6 +168,10 @@ class ModalCounterpoint(object):
         False
         >>> cp.isHiddenFifth(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
         True
+        >>> m1.octave = 5
+        >>> m2.octave = 5 # check for hidden 12ths
+        >>> cp.isHiddenFifth(n1, n2, m1, m2)
+        True
 
         '''
         interval1 = interval.notesToInterval(note11, note21)
@@ -168,12 +179,12 @@ class ModalCounterpoint(object):
         interval3 = interval.notesToInterval(note11, note12)
         interval4 = interval.notesToInterval(note21, note22)
         if interval3.direction > 0 and interval4.direction > 0:
-            if interval2.name == "P5" and not interval1.name == "P5":
+            if interval2.semiSimpleName == "P5" and not interval1.semiSimpleName == "P5":
                 return True
             else:
                 return False
         elif interval3.direction < 0 and interval4.direction < 0:
-            if interval2.name == "P5" and not interval1.name == "P5":
+            if interval2.semiSimpleName == "P5" and not interval1.semiSimpleName == "P5":
                 return True
             else:
                 return False
@@ -206,6 +217,10 @@ class ModalCounterpoint(object):
         True
         >>> cp.findParallelOctaves(cp.stream2, cp.stream1)
         3
+        >>> m3.octave = 5
+        >>> m4.octave = 6 #check for parallel 17ths
+        >>> cp.findParallelOctaves(cp.stream2, cp.stream1)
+        3
 
         '''
         stream1.attachIntervalsBetweenStreams(stream2)
@@ -215,15 +230,15 @@ class ModalCounterpoint(object):
         for note1 in stream1:
             note2 = stream1.getElementAfterElement(note1, [Note])
             if note2 is not None:
-                if note1.editorial.harmonicInterval.name == "P8":
-                    if note2.editorial.harmonicInterval.name == "P8":
+                if note1.editorial.harmonicInterval.semiSimpleName == "P8":
+                    if note2.editorial.harmonicInterval.semiSimpleName == "P8":
                         numParallelOctaves += 1
                         note2.editorial.misc["Parallel Octave"] = True
         for note1 in stream2:
             note2 = stream2.getElementAfterElement(note1, [Note])
             if note2 is not None:
-                if note1.editorial.harmonicInterval.name == "P8":
-                    if note2.editorial.harmonicInterval.name == "P8":
+                if note1.editorial.harmonicInterval.semiSimpleName == "P8":
+                    if note2.editorial.harmonicInterval.semiSimpleName == "P8":
                         note2.editorial.misc["Parallel Octave"] = True
         return numParallelOctaves
 
@@ -254,6 +269,9 @@ class ModalCounterpoint(object):
         2
         >>> n2.editorial.misc['Hidden Octave']
         True
+        >>> cp.findHiddenOctaves(cp.stream2, cp.stream1)
+        2
+        >>> m4.octave = 6
         >>> cp.findHiddenOctaves(cp.stream2, cp.stream1)
         2
 
@@ -287,11 +305,15 @@ class ModalCounterpoint(object):
         False
         >>> cp.isParallelOctave(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
         True
+        >>> m1.octave = 5
+        >>> m2.octave = 5
+        >>> cp.isParallelOctave(n1, n2, m1, m2)
+        True
 
         '''
         interval1 = interval.notesToInterval(note11, note21)
         interval2 = interval.notesToInterval(note12, note22)
-        if interval1.name == interval2.name == "P8":
+        if interval1.semiSimpleName == interval2.semiSimpleName == "P8":
             return True
         else:
             return False
@@ -312,6 +334,10 @@ class ModalCounterpoint(object):
         False
         >>> cp.isHiddenOctave(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
         True
+        >>> m1.octave = 5
+        >>> m2.octave = 5
+        >>> cp.isHiddenOctave(n1, n2, m1, m2)
+        True
 
         '''
         interval1 = interval.notesToInterval(note11, note21)
@@ -319,12 +345,12 @@ class ModalCounterpoint(object):
         interval3 = interval.notesToInterval(note11, note12)
         interval4 = interval.notesToInterval(note21, note22)
         if interval3.direction > 0 and interval4.direction > 0:
-            if interval2.name == "P8" and not interval1.name == "P8":
+            if interval2.semiSimpleName == "P8" and not interval1.semiSimpleName == "P8":
                 return True
             else:
                 return False
         if interval3.direction < 0 and interval4.direction < 0:
-            if interval2.name == "P8" and not interval1.name == "P8":
+            if interval2.semiSimpleName == "P8" and not interval1.semiSimpleName == "P8":
                 return True
             else:
                 return False
@@ -395,6 +421,10 @@ class ModalCounterpoint(object):
         False
         >>> cp.isParallelUnison(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
         True
+        >>> m1.octave = 4
+        >>> m2.octave = 4
+        >>> cp.isParallelUnison(n1, n2, m1, m2) #parallel octaves, not unison
+        False
 
         '''
         interval1 = interval.notesToInterval(note11, note21)
@@ -1222,68 +1252,68 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
     pass
    
-    def testGenerateFirstSpecies(self):
-        '''
-        A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
-        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
-        '''
-        
-        n101 = Note()
-        n101.duration.type = "whole"
-        n101.name = "A"
-        aMinor = scale.ConcreteMinorScale(n101)
-        n101b = Note()
-        n101b.duration.type = "whole"
-        n101b.name = "D"
-        dMinor = scale.ConcreteMinorScale(n101b)
-        
-        counterpoint1 = ModalCounterpoint()
-
-        cantusFirmus1 = "A1 c B c d e c B A"
-        cantusFirmus2 = "A1 e d f e c d c B A"
-        cantusFirmus3 = "d1 f e d g f a g f e d" 
-        
-        choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
-        chosenCantusFirmus = random.choice(choices)
-        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus, "4/4").notes)
-    
-        thisScale = aMinor
-        if cantusFirmus is cantusFirmus3:
-            thisScale = dMinor
-            
-        goodHarmony = False
-        goodMelody = False
-    
-        while (goodHarmony == False or goodMelody == False):
-            try:
-                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale)
-                hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
-                print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
-        
-                goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
-                goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)        
-    
-                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
-                if lastInterval.generic.undirected != 2:
-                    goodMelody = False
-                    print "rejected because lastInterval was not a second"
-             
-                print [note1.name + str(note1.octave) for note1 in cantusFirmus.notes]
-                if not goodHarmony: print "bad harmony"
-                else: print "harmony good"
-                if not goodMelody: print "bad melody"
-                else: print "melody good"
-            except ModalCounterpointException:
-                pass        
-    
-        score = stream.Score()
-        score.insert(0, meter.TimeSignature('4/4'))
-        score.insert(0, hopeThisWorks2)
-        score.insert(0, cantusFirmus)
-#        score.show('text')
-#        score.show('musicxml')
-        score.show('midi')
-        score.show('lily.png')
+##    def testGenerateFirstSpecies(self):
+##        '''
+##        A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
+##        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
+##        '''
+##        
+##        n101 = Note()
+##        n101.duration.type = "whole"
+##        n101.name = "A"
+##        aMinor = scale.ConcreteMinorScale(n101)
+##        n101b = Note()
+##        n101b.duration.type = "whole"
+##        n101b.name = "D"
+##        dMinor = scale.ConcreteMinorScale(n101b)
+##        
+##        counterpoint1 = ModalCounterpoint()
+##
+##        cantusFirmus1 = "A1 c B c d e c B A"
+##        cantusFirmus2 = "A1 e d f e c d c B A"
+##        cantusFirmus3 = "d1 f e d g f a g f e d" 
+##        
+##        choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
+##        chosenCantusFirmus = random.choice(choices)
+##        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus, "4/4").notes)
+##    
+##        thisScale = aMinor
+##        if cantusFirmus is cantusFirmus3:
+##            thisScale = dMinor
+##            
+##        goodHarmony = False
+##        goodMelody = False
+##    
+##        while (goodHarmony == False or goodMelody == False):
+##            try:
+##                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale)
+##                hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
+##                print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
+##        
+##                goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
+##                goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)        
+##    
+##                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
+##                if lastInterval.generic.undirected != 2:
+##                    goodMelody = False
+##                    print "rejected because lastInterval was not a second"
+##             
+##                print [note1.name + str(note1.octave) for note1 in cantusFirmus.notes]
+##                if not goodHarmony: print "bad harmony"
+##                else: print "harmony good"
+##                if not goodMelody: print "bad melody"
+##                else: print "melody good"
+##            except ModalCounterpointException:
+##                pass        
+##    
+##        score = stream.Score()
+##        score.insert(0, meter.TimeSignature('4/4'))
+##        score.insert(0, hopeThisWorks2)
+##        score.insert(0, cantusFirmus)
+###        score.show('text')
+###        score.show('musicxml')
+##        score.show('midi')
+##        score.show('lily.png')
         
 if (__name__ == "__main__"):
     music21.mainTest(TestExternal) #TestExternal
