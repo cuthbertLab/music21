@@ -1495,8 +1495,9 @@ class Music21Object(object):
                 if offsetOfCaller == None and hasattr(
                     callerFirst, 'flattenedRepresentationOf'):
                     #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from the callers flattenedRepresentationOf attribute', 'self', self, 'callerFirst', callerFirst])
+
+                    # Thanks Johannes Emerich [public@johannes.emerich.de] !
                     if callerFirst.flattenedRepresentationOf != None:
-                        # TODO: check semiflat for flattenedRepresentationOf?
                         flattened = callerFirst.flattenedRepresentationOf
                     else:
                         # need tests to show that this is necessary
