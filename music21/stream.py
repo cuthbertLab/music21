@@ -68,6 +68,8 @@ class StreamIterator():
         return self
 
     def next(self):
+        # calling .elements here will sort if autoSort = True
+        # thus, this does not need to sort or check autoSort status
         if self.index >= len(self.srcStream.elements):
             del self.srcStream
             raise StopIteration
@@ -218,12 +220,20 @@ class Stream(music21.Music21Object):
         True
         '''
 
+        # need to sort if not sorted, as this call may rely on index positions
+        if not self.isSorted and self.autoSort:
+            self.sort() # will set isSorted to True
+
         if common.isNum(key):
+            # TODO: using self._elements here will retain parent, as opposed   
+            # to using .elements
             e = self.elements[key]
             e.parent = self
             return e
     
         elif isinstance(key, slice): # get a slice of index values
+            # TODO: slice extraction needs testing; parent setting
+            # and locations adjustments seem to be problems
             # NOTE: this copy may return locations references that are 
             # not desirable
             #found = copy.copy(self) # return a stream of elements
@@ -294,6 +304,9 @@ class Stream(music21.Music21Object):
         self._cache = common.defHash()
 
     def _getElements(self):
+        # TODO: depreciate access to this method and the associated property
+        if not self.isSorted and self.autoSort:
+            self.sort() # will set isSorted to True
         return self._elements
    
     def _setElements(self, value):
@@ -376,8 +389,8 @@ class Stream(music21.Music21Object):
         >>> b = Stream()
         >>> b.repeatInsert(note.Note("G"), range(10))
         >>> c = a + b   
-        >>> c.pitches
-        [C, C, C, C, C, C, C, C, C, C, G, G, G, G, G, G, G, G, G, G]
+        >>> c.pitches # autoSort is True, thus a sorted version results
+        [C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G]
         >>> len(c.notes)
         20
         '''
@@ -416,6 +429,9 @@ class Stream(music21.Music21Object):
         [1]
 
         '''
+        if not self.isSorted and self.autoSort:
+            self.sort() # will set isSorted to True
+
         iMatch = []
         for i in range(len(self._elements)):
             if id(self._elements[i]) == id(obj):
@@ -1228,8 +1244,8 @@ class Stream(music21.Music21Object):
             if not isinstance(classFilterList, tuple):
                 classFilterList = [classFilterList]
 
-#         if not self.isSorted and self.autoSort:
-#             self.sort() # will set isSorted to True
+        if not self.isSorted and self.autoSort:
+            self.sort() # will set isSorted to True
 
         # use direct access to elements list
         for e in self._elements:
@@ -1239,7 +1255,8 @@ class Stream(music21.Music21Object):
                 # temporarily check to see if this is a string
                 if isinstance(className, str):
                     if className in eClasses:
-                        found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
+                        found.insert(e.getOffsetBySite(self), e,         
+                            ignoreSort=True)
                         break
                 # old method uses isClass matching
                 elif e.isClass(className):
@@ -1247,6 +1264,8 @@ class Stream(music21.Music21Object):
                     break
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
+        # passing on auto sort status may or may not be what is needed here
+        found.autoSort = self.autoSort
         return found
 
 
@@ -3356,6 +3375,7 @@ class Stream(music21.Music21Object):
         
         >>> from music21 import *
         >>> s = stream.Stream()
+        >>> s.autoSort = False # if true, sorting is automatic
         >>> s.insert(1, note.Note("D"))
         >>> s.insert(0, note.Note("C"))
         >>> s.show('text')
@@ -3376,6 +3396,7 @@ class Stream(music21.Music21Object):
         
         OMIT_FROM_DOCS
         >>> s = stream.Stream()
+        >>> s.autoSort = False
         >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
         >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
         >>> s.isSorted
@@ -3466,6 +3487,7 @@ class Stream(music21.Music21Object):
         returns a new Stream where no elements nest within other elements
         
         >>> s = Stream()
+        >>> s.autoSort = False
         >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
         >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
         >>> s.isSorted
@@ -6606,15 +6628,20 @@ class Test(unittest.TestCase):
     def testGetInstrumentFromMxl(self):
         '''Test getting an instrument from an mxl file
         '''
-        from music21 import corpus, converter
+        from music21 import corpus, converter, instrument
 
         # manuall set parent to associate 
         a = converter.parse(corpus.getWork(['haydn', 'opus74no2', 
                                             'movement4.xml']))
 
-        b = a[3][10:20]
-        # TODO: manually setting the parent is still necessary
-        b.parent = a[3] # manually set the parent
+#         b = a[3][10:20]
+#         # TODO: manually setting the parent is still necessary
+#         b.parent = a[3] # manually set the parent
+
+        b = a.parts[3]
+        # by calling the .part property, we create a new stream; thus, the
+        # parent of b is no longer a
+        self.assertEqual(b.parent, None)
         instObj = b.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
@@ -6770,9 +6797,11 @@ class Test(unittest.TestCase):
         offsets = [x.offset for x in a]
         self.assertEqual(offsets, [0.0, 10.0, 3.0, 20.0, 40.0])
 
+        # fill with notes
         a.repeatInsert(n, range(0,120,3))        
 
         b = a.getTimeSignatures(sortByCreationTime=False)
+
         self.assertEqual(len(b), 5)
         self.assertEqual(b[0].numerator, 5)
         self.assertEqual(b[4].numerator, 10)
@@ -6781,6 +6810,8 @@ class Test(unittest.TestCase):
 
         # none of the offsets are being copied 
         offsets = [x.offset for x in b]
+        # with autoSort is passed on from elements search
+        #self.assertEqual(offsets, [0.0, 3.0, 10.0, 20.0, 40.0])
         self.assertEqual(offsets, [0.0, 10.0, 3.0, 20.0, 40.0])
 
 
@@ -7513,11 +7544,12 @@ class Test(unittest.TestCase):
         # try making a deep copy of s3
 
         s3copy = copy.deepcopy(s3)
-        s1Measures = s3copy[0].makeMeasures()
+        #s1Measures = s3copy[0].makeMeasures()
+        s1Measures = s3copy.getElementsByClass('Stream')[0].makeMeasures()
         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
         #s1Measures.show() # these show the proper clefs
 
-        s2Measures = s3copy[1].makeMeasures()
+        s2Measures = s3copy.getElementsByClass('Stream')[1].makeMeasures()
         self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
         #s2Measures.show() # this shows the proper clef
 
@@ -9325,11 +9357,72 @@ class Test(unittest.TestCase):
         self.assertEqual([x.name for x in s], ['B', 'A'])
         # new is chnaged
         self.assertEqual([x.name for x in sSorted], ['A', 'B'])
-
-
         # sort in place
         s.sort()
         self.assertEqual([x.name for x in s], ['A', 'B'])
+
+
+        # test getElements sorting through .notes w/ autoSort
+        s = Stream()
+        s.autoSort = True
+        n1 = note.Note('a')
+        n2 = note.Note('b')
+        s.insert(100, n2) # add  'b' first
+        s.insert(0, n1) # now n1 (A) has a higher index than n2 (B)
+        # if we get .notes, we are getting elements by class, and thus getting 
+        # sorted version
+        self.assertEqual([x.name for x in s.notes], ['A', 'B'])
+
+        # test getElements sorting through .notes w/o autoSort
+        s = Stream()
+        s.autoSort = False
+        n1 = note.Note('a')
+        n2 = note.Note('b')
+        s.insert(100, n2) # add  'b' first
+        s.insert(0, n1) # now n1 (A) has a higher index than n2 (B)
+        self.assertEqual([x.name for x in s.notes], ['B', 'A'])
+
+
+        # test __getitem__ calls w/ autoSort
+        s = Stream()
+        s.autoSort = False
+        n1 = note.Note('a')
+        n2 = note.Note('b')
+        s.insert(100, n2) # add  'b' first
+        s.insert(0, n1) # now n1 (A) has a higher index than n2 (B)
+        self.assertEqual(s[0].name, 'B')
+        self.assertEqual(s[1].name, 'A')
+
+        # test __getitem__ calls w autoSort
+        s = Stream()
+        s.autoSort = True
+        n1 = note.Note('a')
+        n2 = note.Note('b')
+        s.insert(100, n2) # add  'b' first
+        s.insert(0, n1) # now n1 (A) has a higher index than n2 (B)
+        self.assertEqual(s[0].name, 'A')
+        self.assertEqual(s[1].name, 'B')
+
+
+        # test .elements calls w/ autoSort
+        s = Stream()
+        s.autoSort = False
+        n1 = note.Note('a')
+        n2 = note.Note('b')
+        s.insert(100, n2) # add  'b' first
+        s.insert(0, n1) # now n1 (A) has a higher index than n2 (B)
+        self.assertEqual(s.elements[0].name, 'B')
+        self.assertEqual(s.elements[1].name, 'A')
+
+        # test .elements calls w autoSort
+        s = Stream()
+        s.autoSort = True
+        n1 = note.Note('a')
+        n2 = note.Note('b')
+        s.insert(100, n2) # add  'b' first
+        s.insert(0, n1) # now n1 (A) has a higher index than n2 (B)
+        self.assertEqual(s.elements[0].name, 'A')
+        self.assertEqual(s.elements[1].name, 'B')
 
 
 
@@ -9363,8 +9456,12 @@ if __name__ == "__main__":
         #t.testMakeTies()
 
         #t.testMeasuresAndMakeMeasures()
-        t.testSortAndAutoSort()
-        t.testGetTimeSignatures()
-        t.testMetadataOnStream()
+        #t.testSortAndAutoSort()
+        #t.testGetTimeSignatures()
+        #t.testMetadataOnStream()
 
+        t.testContextNestedD()
         t.testGetInstrumentFromMxl()
+        t.testGetTimeSignatures()
+        t.testSortAndAutoSort()
+        

@@ -143,11 +143,13 @@ class Environment(object):
                 self.__setitem__(name, value) # use for key checking
         elif platform ==  'darwin':
             for name, value in [
-                ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
-                ('musicxmlPath', '/Applications/Finale Reader/Finale Reader.app'),
-                ('graphicsPath', '/Applications/Preview.app'),
-                ('pdfPath', '/Applications/Preview.app'),
-                ('midiPath', '/Applications/QuickTime Player.app'),
+            ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
+            # TODO: check default finale reader location
+            ('musicxmlPath', '/Applications/Finale Reader.app'),
+            #('musicxmlPath', '/Applications/Finale Reader/Finale Reader.app'),
+            ('graphicsPath', '/Applications/Preview.app'),
+            ('pdfPath', '/Applications/Preview.app'),
+            ('midiPath', '/Applications/QuickTime Player.app'),
 
                 ]:
                 self.__setitem__(name, value) # use for key checking
