@@ -758,7 +758,7 @@ class Stream(music21.Music21Object):
                 # increment highestTime by quarterlength
                 highestTime += element.duration.quarterLength
 
-        ## does not change sorted state
+        # does not change sorted state
         storeSorted = self.isSorted    
         self._elementsChanged()         
         self.isSorted = storeSorted
@@ -1436,6 +1436,7 @@ class Stream(music21.Music21Object):
         >>> a.getElementById('Green').id  # case does not matter
         'green'
         '''
+        # accessing .elements assures an autoSort check
         for element in self.elements:
             # case insensitive; this could be based on an option 
             match = False
@@ -1530,38 +1531,42 @@ class Stream(music21.Music21Object):
         found = Stream()
 
         #(offset, priority, dur, element). 
-        for element in self:
-            match = False
-            offset = element.offset
 
-            dur = element.duration
+        # accessing ._elements here will not create an Iterator
+        for e in self._elements:
+            match = False
+            # better to specify site of offset source
+            offset = e.getOffsetBySite(self)
+            #offset = e.offset
+
+            dur = e.duration
             if dur is None or mustFinishInSpan is False:
-                elementEnd = offset
+                eEnd = offset
             else:
-                elementEnd = offset + dur.quarterLength
+                eEnd = offset + dur.quarterLength
 
             if mustBeginInSpan is False and dur is not None:
-                elementStart = offset + dur.quarterLength
+                eStart = offset + dur.quarterLength
             else:
-                elementStart = offset
+                eStart = offset
 
             if includeEndBoundary is True and mustBeginInSpan is True and \
-                elementStart >= offsetStart and elementEnd <= offsetEnd:
+                eStart >= offsetStart and eEnd <= offsetEnd:
                     match = True
             elif includeEndBoundary is True and mustBeginInSpan is False and \
-                elementStart > offsetStart and elementEnd <= offsetEnd:
+                eStart > offsetStart and eEnd <= offsetEnd:
                     match = True
             elif includeEndBoundary is False and mustBeginInSpan is True and \
-                elementStart >= offsetStart and elementEnd < offsetEnd:
+                eStart >= offsetStart and eEnd < offsetEnd:
                     match = True
             elif includeEndBoundary is False and mustBeginInSpan is False and \
-                elementStart > offsetStart and elementEnd < offsetEnd:
+                eStart > offsetStart and eEnd < offsetEnd:
                     match = True
             else: # 
                 match = False
 
             if match is True:
-                found.insert(element)
+                found.insert(e)
         return found
 
 
@@ -1712,11 +1717,12 @@ class Stream(music21.Music21Object):
         True
         '''
         try:
+            # index() ultimately does an autoSort check, so no check here or 
+            # sorting is necessary
             elPos = self.index(element)
         except ValueError:
             raise StreamException("Could not find element in index")
 
-       
         if classList is None:
             if elPos == len(self._elements) - 1:
                 return None
@@ -1728,8 +1734,6 @@ class Stream(music21.Music21Object):
                     if isinstance(self._elements[i], cl): 
                         return self._elements[i]
             return None
-        
-        raise Exception("not yet implemented")
 
 
     def groupElementsByOffset(self, returnDict = False):
@@ -9423,6 +9427,35 @@ class Test(unittest.TestCase):
         s.insert(0, n1) # now n1 (A) has a higher index than n2 (B)
         self.assertEqual(s.elements[0].name, 'A')
         self.assertEqual(s.elements[1].name, 'B')
+
+
+        # test possible problematic casses of overlapping parts
+        # store start time, dur
+        pairs = [(20, 2), (15, 10), (22,1), (10, 2), (5, 25), (8, 10), (0, 2), (0, 30)]
+        
+        # with autoSort false
+        s = Stream()
+        s.autoSort = False
+        for o, d in pairs:
+            n = note.Note()
+            n.quarterLength = d
+            s.insert(o, n)
+        match = []
+        for n in s.notes:
+            match.append((n.offset, n.quarterLength))
+        self.assertEqual(pairs, match)
+        
+        # with autoSort True
+        s = Stream()
+        s.autoSort = True
+        for o, d in pairs:
+            n = note.Note()
+            n.quarterLength = d
+            s.insert(o, n)
+        match = []
+        for n in s.notes:
+            match.append((n.offset, n.quarterLength))
+        self.assertEqual([(0.0, 2), (0.0, 30), (5.0, 25), (8.0, 10), (10.0, 2), (15.0, 10), (20.0, 2), (22.0, 1.0)], match)
 
 
 

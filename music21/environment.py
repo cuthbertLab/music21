@@ -144,9 +144,8 @@ class Environment(object):
         elif platform ==  'darwin':
             for name, value in [
             ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
-            # TODO: check default finale reader location
+            # with 2011 version forward default finale reader location is now:
             ('musicxmlPath', '/Applications/Finale Reader.app'),
-            #('musicxmlPath', '/Applications/Finale Reader/Finale Reader.app'),
             ('graphicsPath', '/Applications/Preview.app'),
             ('pdfPath', '/Applications/Preview.app'),
             ('midiPath', '/Applications/QuickTime Player.app'),
