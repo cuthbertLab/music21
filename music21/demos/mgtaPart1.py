@@ -737,7 +737,7 @@ def ch2_writing_I_A(tsStr, barGroups):
             # subtract bar dur from sum of existing notes
             nFill.quarterLength = ts.barDuration.quarterLength - sum
             ex.append(nFill)
-    ex.show('t')
+    
     return ex
 
 def ch2_writing_I_A_1(show=True, *arguments, **keywords):
@@ -1859,7 +1859,7 @@ if __name__ == "__main__":
 
         #ch1_writing_I_B_1(show=True)
         #ch1_writing_I_B_2(show=True)
-        #ch1_writing_I_B_3(show=True)
+        ch1_writing_I_B_3(show=True)
         #ch1_basic_II_C_2(show=True)
         #ch1_writing_II_A(show=True)
 
@@ -1885,4 +1885,4 @@ if __name__ == "__main__":
         #ch2_writing_IV_B(show=True)
         #ch2_writing_V_A(show=True)
         
-        ch2_writing_III_B_1()
+        #ch2_writing_III_B_1()

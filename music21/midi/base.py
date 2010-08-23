@@ -983,8 +983,8 @@ class Test(unittest.TestCase):
         me.data = '' # must set data to empty string
         mt.events.append(me)
 
-        for e in mt.events:
-            print e
+#        for e in mt.events:
+#            print e
 
         mf = MidiFile()
         mf.ticksPerQuarterNote = 1024 # cannot use: 10080

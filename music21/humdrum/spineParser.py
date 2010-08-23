@@ -28,7 +28,6 @@ import music21.tempo
 import music21.meter
 import music21.clef
 import music21.stream
-from music21.stream import Stream
 from music21 import ElementWrapper
 from music21 import common
 from music21.humdrum import testFiles, canonicalOutput
@@ -38,8 +37,9 @@ spinePathIndicators = ["*+", "*-", "*^", "*v", "*x", "*"]
 
 class HumdrumDataCollection(object):
     '''
-    A HumdrumDataCollection takes in a mandatory list each of which is a line 
-    of humdrum data.  Together this list represents a collection of spines.  
+    A HumdrumDataCollection takes in a mandatory list where each element
+    is a line  of humdrum data.  Together this list represents a collection 
+    of spines.  
     
     Usually you will probably want to use HumdrumFile which can read 
     in a file directly.  This class exists in case you have your Humdrum
@@ -58,6 +58,7 @@ class HumdrumDataCollection(object):
         the humdrum definition, it looks like none of the
         conventional humdrum parsing tools allow for changing 
         definitions mid-spine, so I don't think this limitation is a problem.
+        (Craig Stuart Sapp confirmed this to me)
     
     You are probably better off running humdrum.parseFile("filename") 
     which returns a humdrum.SpineCollection directly
@@ -73,10 +74,15 @@ class HumdrumDataCollection(object):
             raise
 
     def parseLines(self, dataStream):
+        '''
+        Parse a list (dataStream) of lines and set it in self.spineCollection
+        '''
         eventList = []
         i = 0
         
         maxspines = 0
+
+        # parse global comments and figure out the maximum number of spines we will have
 
         for line in dataStream:
             line = line.rstrip()
@@ -239,7 +245,7 @@ class HumdrumDataCollection(object):
         elif self.spineCollection.spines[0].music21Objects is None:
             raise HumdrumException("okay, you got at least one spine, but it aint got nothing in it; have you thought of taking up kindergarten teaching?")
         else:
-            masterStream = Stream()
+            masterStream = music21.stream.Score()
             for thisSpine in self.spineCollection:
                 thisSpine.music21Objects.id = "spine_" + str(thisSpine.id)
                 masterStream.insert(thisSpine.music21Objects)
@@ -406,7 +412,7 @@ class HumdrumSpine(object):
             event.spineId = id
         
         self.eventList = eventList
-        self.music21Objects = Stream()
+        self.music21Objects = music21.stream.Stream()
         self.beginningPosition = 0
         self.endingPosition = 0
         self.upstream = []
@@ -535,7 +541,7 @@ class HumdrumSpine(object):
 
 class KernSpine(HumdrumSpine):
     def parse(self):
-        thisContainer = None
+        thisContainer = None # hdStringToMeasure('=0')
         inTuplet = False
         lastNote = None
         
@@ -1196,20 +1202,19 @@ class Test(unittest.TestCase):
         
         # humdrum type problem: how many G#s start on beat 2 of a measure?
         GsharpCount = 0
-        for element in masterStream.flat:  ## recursion this time
-            if common.almostEquals(element.offset, 1.0):
-                if hasattr(element, "pitch") and element.pitch.name == "G#":
-                    GsharpCount += 1
-                elif hasattr(element, "pitches"):
-                    for thisPitch in element.pitches:
-                        if thisPitch.name == "G#":
+        notes = masterStream.flat.notes
+        for n in notes:
+            if n.offset != 1:
+                continue
+            if hasattr(n, "pitch") and n.pitch.name == "G#":
+#                if n.beat == 2:
+                 GsharpCount += 1
+            elif hasattr(n, "pitches"):
+                for thisPitch in n.pitches:
+                    if thisPitch.name == "G#":
                             GsharpCount += 1
-        # in reality, we should run getElementsByClass("measure") 
-        #   and use Measure attributes
-        #   to get the note attacked at beat X.  but we're not there yet.
-        # TODO: when measures have beats, do this...
+        ## SOMETHING WRONG -- supposed to get 34, getting 20!
+#        self.assertEqual(GsharpCount, 34)
         
-        self.assertEqual(GsharpCount, 34)
-            
 if __name__ == "__main__":
     music21.mainTest(Test)

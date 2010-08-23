@@ -3243,7 +3243,7 @@ class Test(unittest.TestCase):
         from music21.analysis import discrete
         ks = discrete.KrumhanslSchmuckler()
         data = ks.solutionLegend()
-        print data
+        #print data
         a = GraphColorGridLegend(doneAction=doneAction, dpi=300)
         a.setData(data)
         a.process()

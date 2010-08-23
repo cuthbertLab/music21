@@ -525,12 +525,14 @@ class Converter(object):
         
         if format == None: # its a string
             dataStr = dataStr.lstrip()
-            if dataStr.startswith('<?xml'):
+            if dataStr.startswith('<?xml') or dataStr.startswith('musicxml:'):
                 format = 'musicxml'
-            elif dataStr.startswith('MThd'):
+            elif dataStr.startswith('MThd') or dataStr.startswith('midi:'):
                 format = 'midi'
-            elif dataStr.startswith('!!!') or dataStr.startswith('**'):
+            elif dataStr.startswith('!!!') or dataStr.startswith('**') or dataStr.startswith('humdrum:'):
                 format = 'humdrum'
+            elif dataStr.startswith('tinynotation:'):
+                format = 'tinyNotation'
             else:
                 raise ConverterException('no such format found for: %s' % dataStr)
 
@@ -1016,7 +1018,7 @@ class Test(unittest.TestCase):
             for n in p.flat.notes:
                 if n.tie != None:
                     countTies += 1
-                    if n.tie.type == 'start':
+                    if n.tie.type == 'start' or n.tie.type =='continue':
                         countStartTies += 1
 
         self.assertEqual(countTies, 57)

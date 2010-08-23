@@ -64,7 +64,7 @@ def bergEx01(show=True):
     if show:
         score.show()
    
-    ts = score.getElementsByClass(meter.TimeSignature)[0]
+    ts = score.flat.getElementsByClass(meter.TimeSignature)[0]
    
 # TODO: what is the best way to do this now that 
 # this raises a TupletException for being frozen?

@@ -80,13 +80,25 @@ class Tie(music21.Music21Object):
         '''
         mxTieList = []
         mxTie = musicxmlMod.Tie()
-        mxTie.set('type', self.type) # start, stop
+        if self.type == 'continue':
+            musicxmlTieType = 'stop'
+        else:
+            musicxmlTieType = self.type
+        mxTie.set('type', musicxmlTieType) # start, stop
         mxTieList.append(mxTie) # goes on mxNote.tieList
+        if self.type == 'continue':
+            mxTie = musicxmlMod.Tie()
+            mxTie.set('type', 'start')
+            mxTieList.append(mxTie) # goes on mxNote.tieList
 
         mxTiedList = []
         mxTied = musicxmlMod.Tied()
-        mxTied.set('type', self.type) 
+        mxTied.set('type', musicxmlTieType) # start, stop
         mxTiedList.append(mxTied) # goes on mxNote.notationsObj list
+        if self.type == 'continue':
+            mxTied = musicxmlMod.Tied()
+            mxTied.set('type', 'start')
+            mxTiedList.append(mxTied) 
 
         return mxTieList, mxTiedList
     
@@ -103,8 +115,8 @@ class Tie(music21.Music21Object):
             if len(typesFound) == 1:
                 self.type = typesFound[0]
             elif typesFound == ['stop', 'start']:
-                # take the second, the start value; do not need a stop
-                self.type = typesFound[1]
+                # CHRIS: this should be a 'continue' instead -- but then stripTies doesnt work
+                self.type = 'start'
             else:
                 environLocal.printDebug(['found unexpected arrangement of multiple tie types when importing from musicxml:', typesFound])    
 
@@ -120,9 +132,10 @@ class Tie(music21.Music21Object):
     def __eq__(self, other):
         '''Equality. Based on attributes (such as pitch, accidental, duration, articulations, and ornaments) that are  not dependent on the wider context of a note (such as offset, beams, stem direction).
 
-        >>> t1 = Tie('start')
-        >>> t2 = Tie('start')
-        >>> t3 = Tie('end')
+        >>> from music21 import *
+        >>> t1 = note.Tie('start')
+        >>> t2 = note.Tie('start')
+        >>> t3 = note.Tie('end')
         >>> t1 == t2
         True
         >>> t2 == t3, t3 == t1
@@ -557,7 +570,6 @@ class GeneralNote(music21.Music21Object):
         >>> n.quarterLength
         6
 
-        >>> from music21 import chord
         >>> c = chord.Chord(['g#','A#','d'])
         >>> n.quarterLength = 2
         >>> n.augmentOrDiminish(.25)
@@ -731,7 +743,8 @@ class GeneralNote(music21.Music21Object):
     def splitByQuarterLengths(self, quarterLengthList):
         '''Given a list of quarter lengths, return a list of Note objects, copied from this Note, that are partitioned and tied with the specified quarter length list durations.
 
-        >>> n = Note()
+        >>> from music21 import *
+        >>> n = note.Note()
         >>> n.quarterLength = 3
         >>> post = n.splitByQuarterLengths([1,1,1])
         >>> [n.quarterLength for n in post]
@@ -786,6 +799,103 @@ class GeneralNote(music21.Music21Object):
             if (isinstance(self.notations[0], music21.expressions.Fermata)):
                 ret += " has Fermata"
         return ret
+
+    #---------------------------------------------------------------------------
+    def _preDurationLily(self):
+        '''
+        Method to return all the lilypond information that appears before the 
+        duration number.
+        Is the same for simple and complex notes.
+        '''
+        baseName = ""
+        baseName += self.editorial.lilyStart()
+        if self.pitch is not None:
+            baseName += self.pitch.lilyNoOctave()
+        elif (self.editorial.ficta is not None):
+            baseName += self.editorial.ficta.lily
+        octaveModChars = ""
+        spio = self.pitch.implicitOctave
+        if (spio < 3):
+            correctedOctave = 3 - spio
+            octaveModChars = ',' * correctedOctave #  C2 = c,  C1 = c,,
+        else:
+            correctedOctave = spio - 3
+            octaveModChars  = '\'' * correctedOctave # C4 = c', C5 = c''  etc.
+        baseName += octaveModChars
+        if (self.editorial.ficta is not None):
+            baseName += "!"  # always display ficta
+        elif self.pitch is not None and self.pitch.accidental is not None:
+            baseName += self.pitch.accidental.lilyDisplayType()
+        return baseName
+
+    _lilyInternalTieCharacter = '~' # will be blank for rests
+
+    def _getLily(self):
+        '''
+        The name of the note as it would appear in Lilypond format.
+        '''
+        allNames = ""
+        baseName = self._preDurationLily()
+        if hasattr(self.duration, "components") and len(
+            self.duration.components) > 0:
+            for i in range(0, len(self.duration.components)):
+                thisDuration = self.duration.components[i]            
+                allNames += baseName
+                allNames += thisDuration.lily
+                allNames += self.editorial.lilyAttached()
+                if (i != len(self.duration.components) - 1):
+                    allNames += self._lilyInternalTieCharacter
+                    allNames += " "
+                if (i == 0): # first component
+                    if self.lyric is not None: # hack that uses markup...
+                        allNames += "_\markup { \"" + self.lyric + "\" } "
+        else:
+            allNames += baseName
+            allNames += self.duration.lily
+            allNames += self.editorial.lilyAttached()
+            if self.lyric is not None: # hack that uses markup...
+                allNames += "_\markup { \"" + self.lyric + "\" } "
+            
+        if (self.tie is not None):
+            if (self.tie.type != "stop"):
+                allNames += "~"
+        if (self.notations):
+            for thisNotation in self.notations:
+                if dir(thisNotation).count('lily') > 0:
+                    allNames += " " + thisNotation.lily
+
+        allNames += self.editorial.lilyEnd()
+        
+        return LilyString(allNames)
+
+    lily = property(_getLily, doc='''
+        read-only property that returns a LilyString of the lilypond representation of
+        a note (or via subclassing, rest or chord)
+        
+        >>> from music21 import *
+        >>> n1 = note.Note("C#5")
+        >>> n1.tie = note.Tie('start')
+        >>> n1.articulations = [articulations.Accent()]  ## DOES NOTHING RIGHT NOW
+        >>> n1.quarterLength = 1.25
+        >>> n1.lily
+        cis''4~ cis''16~
+
+        >>> r1 = note.Rest()
+        >>> r1.duration.type = "half"
+        >>> r1.lily
+        r2
+        
+        >>> r2 = note.Rest()
+        >>> r2.quarterLength = 1.25
+        >>> r2.lily
+        r4 r16
+        
+        >>> c1 = chord.Chord(["C#2", "E4", "D#5"])
+        >>> c1.quarterLength = 2.5   # BUG: 2.333333333 doesnt work yet
+        >>> c1.lily
+        <cis, e' dis''>2~ <cis, e' dis''>8
+        
+    ''')
 
 
 
@@ -930,11 +1040,12 @@ class Note(NotRest):
 
         This presently does not look at lyrics in establishing equality.
 
-        >>> n1 = Note()
+        >>> from music21 import *
+        >>> n1 = note.Note()
         >>> n1.pitch.name = 'G#'
-        >>> n2 = Note()
+        >>> n2 = note.Note()
         >>> n2.pitch.name = 'A-'
-        >>> n3 = Note()
+        >>> n3 = note.Note()
         >>> n3.pitch.name = 'G#'
         >>> n1 == n2
         False
@@ -973,11 +1084,12 @@ class Note(NotRest):
     def __ne__(self, other):
         '''Inequality. 
 
-        >>> n1 = Note()
+        >>> from music21 import *
+        >>> n1 = note.Note()
         >>> n1.pitch.name = 'G#'
-        >>> n2 = Note()
+        >>> n2 = note.Note()
         >>> n2.pitch.name = 'A-'
-        >>> n3 = Note()
+        >>> n3 = note.Note()
         >>> n3.pitch.name = 'G#'
         >>> n1 != n2
         True
@@ -1233,76 +1345,6 @@ class Note(NotRest):
         else:
             return None
 
-    #---------------------------------------------------------------------------
-    def _preDurationLily(self):
-        '''
-        Method to return all the lilypond information that appears before the 
-        duration number.
-        Is the same for simple and complex notes.
-        '''
-        baseName = ""
-        baseName += self.editorial.lilyStart()
-        if self.pitch is not None:
-            baseName += self.pitch.lilyNoOctave()
-        elif (self.editorial.ficta is not None):
-            baseName += self.editorial.ficta.lily
-        octaveModChars = ""
-        spio = self.pitch.implicitOctave
-        if (spio < 3):
-            correctedOctave = 3 - spio
-            octaveModChars = ',' * correctedOctave #  C2 = c,  C1 = c,,
-        else:
-            correctedOctave = spio - 3
-            octaveModChars  = '\'' * correctedOctave # C4 = c', C5 = c''  etc.
-        baseName += octaveModChars
-        if (self.editorial.ficta is not None):
-            baseName += "!"  # always display ficta
-        elif self.pitch is not None and self.pitch.accidental is not None:
-            baseName += self.pitch.accidental.lilyDisplayType()
-        return baseName
-
-
-    def _getLily(self):
-        '''
-        The name of the note as it would appear in Lilypond format.
-        '''
-        allNames = ""
-        baseName = self._preDurationLily()
-        if hasattr(self.duration, "components") and len(
-            self.duration.components) > 0:
-            for i in range(0, len(self.duration.components)):
-                thisDuration = self.duration.components[i]            
-                allNames += baseName
-                allNames += thisDuration.lily
-                allNames += self.editorial.lilyAttached()
-                if (i != len(self.duration.components) - 1):
-                    allNames += "~"
-                    allNames += " "
-                if (i == 0): # first component
-                    if self.lyric is not None: # hack that uses markup...
-                        allNames += "_\markup { \"" + self.lyric + "\" } "
-        else:
-            allNames += baseName
-            allNames += self.duration.lily
-            allNames += self.editorial.lilyAttached()
-            if self.lyric is not None: # hack that uses markup...
-                allNames += "_\markup { \"" + self.lyric + "\" } "
-            
-        if (self.tie is not None):
-            if (self.tie.type != "stop"):
-                allNames += "~"
-        if (self.notations):
-            for thisNotation in self.notations:
-                if dir(thisNotation).count('lily') > 0:
-                    allNames += " " + thisNotation.lily
-
-        allNames += self.editorial.lilyEnd()
-        
-        return LilyString(allNames)
-
-    lily = property(_getLily)
-
-
     def _getMidiEvents(self):
         return midiTranslate.noteToMidiEvents(self)
 
@@ -1315,7 +1357,8 @@ class Note(NotRest):
     midiEvents = property(_getMidiEvents, _setMidiEvents, 
         doc='''Get or set this chord as a list of :class:`music21.midi.base.MidiEvent` objects.
 
-        >>> n = Note()
+        >>> from music21 import *
+        >>> n = note.Note()
         >>> n.midiEvents
         [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
         ''')
@@ -1328,7 +1371,8 @@ class Note(NotRest):
     midiFile = property(_getMidiFile,
         doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.
 
-        >>> n = Note()
+        >>> from music21 import *
+        >>> n = note.Note()
         >>> mf = n.midiFile
         ''')
 
@@ -1408,7 +1452,7 @@ class Note(NotRest):
         >>> mxMeasure.append(mxNote)
         >>> mxNote.external['measure'] = mxMeasure # manually create ref
         >>> mxNote.external['divisions'] = mxMeasure.external['divisions']
-        >>> n = Note('c')
+        >>> n = note.Note('c')
         >>> n.mx = mxNote
         '''
         musicxmlTranslate.mxToNote(mxNote, self)
@@ -1531,24 +1575,10 @@ class Rest(GeneralNote):
     def __repr__(self):
         return "<music21.note.Rest %s>" % self.name
 
-    def _lilyName(self):
-        '''The name of the rest as it would appear in Lilypond format.
-        
-        >>> from music21 import *
-        >>> r1 = note.Rest()
-        >>> r1.duration.type = "half"
-        >>> r1.lily
-        'r2'
-        '''
-        baseName = ""
-        baseName += self.editorial.lilyStart()
-        baseName += "r"
-        baseName += self.duration.lily     
-        baseName += self.editorial.lilyAttached()
-        baseName += self.editorial.lilyEnd()
-        return baseName
-
-    lily = property(_lilyName)
+    def _preDurationLily(self):
+        return "r"
+    
+    _lilyInternalTieCharacter = ' ' # when separating components, dont tie them
 
 
     def _getMX(self):

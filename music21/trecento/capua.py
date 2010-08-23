@@ -868,7 +868,7 @@ def runPiece(pieceNum = 331, snipNum = 0):  # random default piece...
     pieceObj   = ballataObj.makeWork(pieceNum)
 #    pieceObj.snippets[0].lily.showPNG()
     applyCapua(pieceObj)
-    pieceObj.snippets[snipNum].lily.showPNG()
+#    pieceObj.snippets[snipNum].show('lily.png')
     srcStream    = pieceObj.snippets[snipNum].streams[0]
     cmpStream    = pieceObj.snippets[snipNum].streams[1]  ## ignore 3rd voice for now...
     srcStream.attachIntervalsBetweenStreams(cmpStream)
@@ -876,7 +876,7 @@ def runPiece(pieceNum = 331, snipNum = 0):  # random default piece...
     for note in srcStream.notes:
         if note.editorial.harmonicInterval is not None:
             print(note.name)
-            print(note.editorial.harmonicInterval.simpleName)
+            print(note.editorial.harmonicInterval.semiSimpleName)
             if "capua-ficta" in note.editorial.misc:
                 print note.editorial.misc['capua-ficta']
 
@@ -913,7 +913,7 @@ def showFourA():
             if capuaRuleFourA(thisStream) > 0:
                 showStream.append(thisStream)
 
-    showStream.lily.showPNG()
+    showStream.show('lily.png')
 
 
 class TestExternal(unittest.TestCase):
@@ -935,7 +935,7 @@ class TestExternal(unittest.TestCase):
             if note.editorial.harmonicInterval is not None:
                 note.lyric = note.editorial.harmonicInterval.simpleName
         
-        pieceObj.snippets[0].lily.showPNG()
+        pieceObj.snippets[0].show('lily.png')
 
     def testShowFourA(self):
         showFourA()

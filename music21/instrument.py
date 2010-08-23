@@ -38,6 +38,7 @@ class InstrumentException(Exception):
     pass
 
 class Instrument(music21.Music21Object):
+    classSortOrder = 1
 
     def __init__(self):
         music21.Music21Object.__init__(self)

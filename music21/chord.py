@@ -174,39 +174,6 @@ class Chord(note.NotRest):
         baseName += ">"
         return baseName
 
-    def _getLily(self):
-        '''
-        The name of the note as it would appear in Lilypond format.
-        '''
-        allNames = ""
-        baseName = self._preDurationLily()
-        if hasattr(self.duration, "components") and len(
-            self.duration.components) > 0:
-            for i in range(0, len(self.duration.components)):
-                thisDuration = self.duration.components[i]            
-                allNames += baseName
-                allNames += thisDuration.lily
-                allNames += self.editorial.lilyAttached()
-                if (i != len(self.duration.components) - 1):
-                    allNames += "~"
-                    allNames += " "
-        else:
-            allNames += baseName
-            allNames += self.duration.lily
-            
-        if (self.tie is not None):
-            if (self.tie.type != "stop"):
-                allNames += "~"
-        if (self.notations):
-            for thisNotation in self.notations:
-                if dir(thisNotation).count('lily') > 0:
-                    allNames += " " + thisNotation.lily
-
-        return LilyString(allNames)
-
-    lily = property(_getLily)
-
-
     #---------------------------------------------------------------------------
     def numNotes(self):
         '''
