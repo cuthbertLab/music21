@@ -99,7 +99,11 @@ def writeManifestTemplate(fpPackageDir):
 
 
 
-def runDisutils(bdistType):
+def runDisutils(bdistType=None):
+    '''The main distutils routine. 
+
+    When called without arguments, this performs a standard distutils installation. 
+    '''
     if bdistType == 'bdist_egg':
         print('using setuptools')
         from setuptools import setup
@@ -122,7 +126,11 @@ def runDisutils(bdistType):
     
         
 
-if sys.argv[1] in ['bdist', 'sdist', 'register', 'bdist_mpkg',
+#-------------------------------------------------------------------------------
+if len(sys.argv) == 1: # no args
+    print('welcome to music21\nto run setup.py for installation, enter, as an administrator (or with sudo): python setup.py install\n')
+
+elif sys.argv[1] in ['bdist', 'sdist', 'register', 'bdist_mpkg',
                         'bdist_rpm', 'bdist_deb', 'bdist_wininst',
                         'bdist_egg']:
     import music21
@@ -131,3 +139,11 @@ if sys.argv[1] in ['bdist', 'sdist', 'register', 'bdist_mpkg',
     print('fpPackageDir = %s' % fpPackageDir)
     writeManifestTemplate(fpPackageDir)
     runDisutils(sys.argv[1])
+
+elif sys.argv[1] in ['install']:
+    runDisutils('install')
+
+else:
+    print('cannot process provided arguments: %s\n' % sys.argv[1:])
+
+
