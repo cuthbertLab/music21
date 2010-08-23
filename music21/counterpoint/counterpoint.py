@@ -820,10 +820,15 @@ class ModalCounterpoint(object):
             stream2.append(copy.deepcopy(note1))
         return stream2
 
-    def generateFirstSpecies(self, stream1, minorScale):
+    def generateFirstSpecies(self, stream1, minorScale, choice = 'random'):
         '''Given a stream (the cantus firmus) and the stream's key in the
         form of a MinorScale object, generates a stream of first species
-        counterpoint that follows the rules of 21M.301.'''
+        counterpoint that follows the rules of 21M.301.
+
+        choice is a flag that can be set to deterministically choose notes
+        to add to the counterpoint. Right now, 'random', 'first', and 'last'
+        are supported. This will be expanded so that all solution sets can
+        be generated.'''
         # DOES NOT YET CHECK FOR TOO MANY THIRDS/SIXTHS IN A ROW,
         # DOES NOT YET RAISE LEADING TONES, AND DOES NOT CHECK FOR NOODLING.
         stream2 = stream.Part([])
@@ -834,7 +839,12 @@ class ModalCounterpoint(object):
         choices = [copy.deepcopy(firstNote),
                    firstNote.transpose("P5"),
                    firstNote.transpose("P8")]
-        note1 = random.choice(choices)
+        if choice == 'random':
+            note1 = random.choice(choices)
+        elif choice == 'first':
+            note1 = choices[0]
+        elif choice == 'last':
+            note1 = choices[-1]
         note1.duration = firstNote.duration
         stream2.append(note1)
         afterLeap = False
@@ -845,8 +855,14 @@ class ModalCounterpoint(object):
             choices = self.generateValidNotes(prevFirmus, currFirmus, prevNote, afterLeap, minorScale)
             if len(choices) == 0:
                 raise ModalCounterpointException("Sorry, please try again")
-            #TODO: make deterministic with a flag
-            newNote = random.choice(choices)
+            if choice == 'random':
+                newNote = random.choice(choices)
+            elif choice == 'first':
+                newNote = choices[0]
+            elif choice == 'last':
+                newNote = choices[-1]
+            else:
+                newNote = random.choice(choices) # if choice flag not recognized, go with random
             newNote.duration = currFirmus.duration
             stream2.append(newNote)
             int1 = interval.notesToInterval(prevNote, newNote)
@@ -900,7 +916,7 @@ class ModalCounterpoint(object):
             possibleNotes.extend(goingDown)
         print "possible: ", [note1.name for note1 in possibleNotes]
 
-        goodNotes = minorScale.getConcreteMelodicMinorScale()
+        goodNotes = minorScale.generateScaleList()
         goodNames = [note2.name for note2 in goodNotes]
         
         for note1 in possibleNotes:
@@ -1315,6 +1331,7 @@ class TestExternal(unittest.TestCase):
         
         choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
         chosenCantusFirmus = random.choice(choices)
+        print 'Using: ', chosenCantusFirmus
         cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus, "4/4").notes)
     
         thisScale = aMinor
@@ -1328,7 +1345,7 @@ class TestExternal(unittest.TestCase):
     
         while (goodHarmony == False or goodMelody == False or thirdsGood == False or sixthsGood == False):
             try:
-                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale)
+                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale, 'random')
                 hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
                 print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
         
