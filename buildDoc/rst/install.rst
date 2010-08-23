@@ -6,9 +6,7 @@ Installing Music21
 ======================================
 
 Music21 can be installed with a number of different methods. We give two 
-different options depending on if you're on PC (Windows) or Mac (OS X).  
-Unix users can use most of the Mac instructions, though Finale is not 
-available for Mac.
+different options depending on if you are a PC (Windows) or Mac (OS X) / Linux / Unix user. 
 
 
 Windows Install instructions
@@ -82,8 +80,8 @@ Components below.
 
 
 
-Mac OS X Install instructions
---------------------------------
+Mac OS X / Linux / Unix Install instructions
+----------------------------------------------
 
 1. Check your version of Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
