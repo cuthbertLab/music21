@@ -730,12 +730,11 @@ def noteToMxNotes(n):
     # need to add this to the last-encountered mxNote
     if n.tie != None:
         mxTieList, mxTiedList = n.tie.mx # get mxl objs from tie obj
-        # if starting a tie, add to last mxNote in mxNote list
-        if n.tie.type == 'start':
+        # if starting or continuing tie, add to last mxNote in mxNote list
+        if n.tie.type in ['start', 'continue']:
             mxNoteList[-1].tieList += mxTieList
             mxNoteList[-1].notationsObj.componentList += mxTiedList
         # if ending a tie, set first mxNote to stop
-        # TODO: this may need to continue if there are components here
         elif n.tie.type == 'stop':
             mxNoteList[0].tieList += mxTieList
             mxNoteList[0].notationsObj.componentList += mxTiedList

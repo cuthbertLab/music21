@@ -86,6 +86,7 @@ class Tie(music21.Music21Object):
             musicxmlTieType = self.type
         mxTie.set('type', musicxmlTieType) # start, stop
         mxTieList.append(mxTie) # goes on mxNote.tieList
+
         if self.type == 'continue':
             mxTie = musicxmlMod.Tie()
             mxTie.set('type', 'start')
@@ -99,7 +100,8 @@ class Tie(music21.Music21Object):
             mxTied = musicxmlMod.Tied()
             mxTied.set('type', 'start')
             mxTiedList.append(mxTied) 
-
+        
+        #environLocal.printDebug(['mxTieList', mxTieList])
         return mxTieList, mxTiedList
     
     def _setMX(self, mxNote):
@@ -115,8 +117,8 @@ class Tie(music21.Music21Object):
             if len(typesFound) == 1:
                 self.type = typesFound[0]
             elif typesFound == ['stop', 'start']:
-                # CHRIS: this should be a 'continue' instead -- but then stripTies doesnt work
-                self.type = 'start'
+                self.type = 'continue'
+                #self.type = 'start'
             else:
                 environLocal.printDebug(['found unexpected arrangement of multiple tie types when importing from musicxml:', typesFound])    
 
@@ -1379,67 +1381,6 @@ class Note(NotRest):
 
     def _getMX(self):
         return musicxmlTranslate.noteToMxNotes(self)
-        
-#         '''
-#         Returns a List of mxNotes
-#         Attributes of notes are merged from different locations: first from the 
-#         duration objects, then from the pitch objects. Finally, GeneralNote 
-#         attributes are added
-#         '''
-#         mxNoteList = []
-#         for mxNote in self.duration.mx: # returns a list of mxNote objs
-#             # merge method returns a new object
-#             mxNote = mxNote.merge(self.pitch.mx)
-#             # get color from within .editorial using attribute
-#             mxNote.set('color', self.color)
-#             mxNoteList.append(mxNote)
-# 
-#         # note: lyric only applied to first note
-#         for lyricObj in self.lyrics:
-#             mxNoteList[0].lyricList.append(lyricObj.mx)
-# 
-#         # if this note, not a component duration, but this note has a tie, 
-#         # need to add this to the last-encountered mxNote
-#         if self.tie != None:
-#             mxTieList, mxTiedList = self.tie.mx # get mxl objs from tie obj
-#             # if starting a tie, add to last mxNote in mxNote list
-#             if self.tie.type == 'start':
-#                 mxNoteList[-1].tieList += mxTieList
-#                 mxNoteList[-1].notationsObj.componentList += mxTiedList
-#             # if ending a tie, set first mxNote to stop
-#             # TODO: this may need to continue if there are components here
-#             elif self.tie.type == 'stop':
-#                 mxNoteList[0].tieList += mxTieList
-#                 mxNoteList[0].notationsObj.componentList += mxTiedList
-# 
-#         # need to apply beams to notes, but application needs to be
-#         # reconfigured based on what is gotten from self.duration.mx
-# 
-#         # likely, this means that many continue beams will need to be added
-# 
-#         # this is setting the same beams for each part of this 
-#         # note; this may not be correct, as we may be dividing the note into
-#         # more than one part
-#         for mxNote in mxNoteList:
-#             if self.beams != None:
-#                 mxNote.beamList = self.beams.mx
-# 
-#         # if we have any articulations, they only go on the first of any 
-#         # component notes
-#         mxArticulations = musicxmlMod.Articulations()
-#         for i in range(len(self.articulations)):
-#             obj = self.articulations[i] # returns mxArticulationMark
-#             mxArticulations.append(obj.mx) # append to mxArticulations
-#         if len(mxArticulations) > 0:
-#             mxNoteList[0].notationsObj.componentList.append(mxArticulations)
-# 
-#         # notations and articulations are mixed in musicxml
-#         for i in range(len(self.notations)):
-#             obj = self.notations[i] 
-#             mxNoteList[0].notationsObj.componentList.append(obj.mx)
-# 
-#         return mxNoteList
-
 
     def _setMX(self, mxNote):
         '''Given an mxNote, fill the necessary parameters of a Note
@@ -1457,59 +1398,6 @@ class Note(NotRest):
         '''
         musicxmlTranslate.mxToNote(mxNote, self)
 
-
-#         '''Given an mxNote, fill the necessary parameters of a Note
-# 
-#         >>> from music21 import *
-#         >>> mxNote = musicxml.Note()
-#         >>> mxNote.setDefaults()
-#         >>> mxMeasure = musicxml.Measure()
-#         >>> mxMeasure.setDefaults()
-#         >>> mxMeasure.append(mxNote)
-#         >>> mxNote.external['measure'] = mxMeasure # manually create ref
-#         >>> mxNote.external['divisions'] = mxMeasure.external['divisions']
-#         >>> n = Note('c')
-#         >>> n.mx = mxNote
-#         '''
-#         # print object == 'no' and grace notes may have a type but not
-#         # a duration. they may be filtered out at the level of Stream 
-#         # processing
-#         if mxNote.get('printObject') == 'no':
-#             environLocal.printDebug(['got mxNote with printObject == no'])
-# 
-#         mxGrace = mxNote.get('grace')
-#         if mxGrace != None: # graces have a type but not a duration
-#             environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration')])
-# 
-#         self.pitch.mx = mxNote # required info will be taken from entire note
-#         self.duration.mx = mxNote
-#         self.beams.mx = mxNote.beamList
-# 
-#         mxTieList = mxNote.get('tieList')
-#         if len(mxTieList) > 0:
-#             tieObj = Tie() # m21 tie object
-#             tieObj.mx = mxNote # provide entire Note
-#             # self.tie is defined in GeneralNote as None by default
-#             self.tie = tieObj
-# 
-#         mxNotations = mxNote.get('notations')
-#         if mxNotations != None:
-#             # get a list of mxArticulationMarks, not mxArticulations
-#             mxArticulationMarkList = mxNotations.getArticulations()
-#             for mxObj in mxArticulationMarkList:
-#                 articulationObj = articulations.Articulation()
-#                 articulationObj.mx = mxObj
-#                 self.articulations.append(articulationObj)
-# 
-#             # get any fermatas, store on notations
-#             mxFermataList = mxNotations.getFermatas()
-#             for mxObj in mxFermataList:
-#                 fermataObj = expressions.Fermata()
-#                 fermataObj.mx = mxObj
-#                 # placing this as an articulation for now
-#                 self.notations.append(fermataObj)
-# 
-#                 #environLocal.printDebug(['_setMX(), self.mxFermataList', mxFermataList])
 
     mx = property(_getMX, _setMX)    
 
@@ -2023,6 +1911,30 @@ class Test(unittest.TestCase):
             self.assertEqual([n.beatStrength for n in m.notes], match)
             
 
+
+
+    def testTieContinue(self):
+        from music21 import stream
+
+        n1 = Note()
+        n1.tie = Tie()
+        n1.tie.type = 'start'
+
+        n2 = Note()
+        n2.tie = Tie()
+        n2.tie.type = 'continue'
+
+        n3 = Note()
+        n3.tie = Tie()
+        n3.tie.type = 'stop'
+
+        s = stream.Stream()
+        s.append([n1, n2, n3])
+
+        # need to test that this gets us a continue tie, but hard to test
+        # post musicxml processing
+        #s.show()
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Note, Rest]
@@ -2036,9 +1948,10 @@ if __name__ == "__main__":
         t = Test()
         te = TestExternal()
 
-
+        
 
         #t.testNoteEquality()
         #t.testNoteBeatProperty()
 
-        t.testMetricalAccent()
+        #t.testMetricalAccent()
+        t.testTieContinue()

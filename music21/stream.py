@@ -3238,10 +3238,17 @@ class Stream(music21.Music21Object):
                 # a connection has been started or continued, so no endMatch
                 endMatch = False 
 
+            elif (hasattr(n, 'tie') and n.tie is not None and 
+                n.tie.type == 'continue'):
+                # a continue always implies a connection
+                posConnected.append(i)
+                endMatch = False 
+
             # establish end condition
-            if endMatch is None: # not yet set, not a start
+            if endMatch is None: # not yet set, not a start or continue
                 # ties tell us when the are ended
-                if hasattr(n, 'tie') and n.tie is not None and n.tie.type == 'stop':
+                if (hasattr(n, 'tie') and n.tie is not None 
+                    and n.tie.type == 'stop'):
                     endMatch = True
                 # if we cannot find a stop tie, see if last note was connected
                 # and this and the last note are the same pitch; this assumes 
@@ -9498,3 +9505,6 @@ if __name__ == "__main__":
         t.testGetTimeSignatures()
         t.testSortAndAutoSort()
         
+
+        t.testStripTiesBuilt()
+        t.testStripTiesImported()
