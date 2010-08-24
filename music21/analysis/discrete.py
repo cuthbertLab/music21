@@ -677,13 +677,17 @@ class SadoianAmbitus(DiscreteAnalysis):
         # find the min and max pitch space value for all pitches
         psFound = []
         for n in subStream.flat.notes:
+            #environLocal.printDebug([n])
             pitches = []
             if 'Chord' in n.classes:
                 pitches = n.pitches
             elif 'Note' in n.classes:
                 pitches = [n.pitch]
-
             psFound += [p.ps for p in pitches]
+
+        # in some cases no pitch space values are found due to all rests
+        if psFound == []:
+            return None
         # use built-in functions
         return int(min(psFound)), int(max(psFound))
 
