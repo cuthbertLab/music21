@@ -42,6 +42,7 @@ class Articulation(music21.Music21Object):
     def __eq__(self, other):
         '''Equality. Based only on the class name, as not other attributes are independent of context and deployment.
 
+        >>> from music21 import *
         >>> at1 = StrongAccent()
         >>> at2 = StrongAccent()
         >>> at3 = Accent()
@@ -73,6 +74,7 @@ class Articulation(music21.Music21Object):
     def __ne__(self, other):
         '''Inequality. Needed for pitch comparisons.
 
+        >>> from music21 import *
         >>> at1 = StrongAccent()
         >>> at2 = StrongAccent()
         >>> at3 = Accent()
@@ -91,6 +93,7 @@ class Articulation(music21.Music21Object):
     def _getMX(self):
         '''Return an mxArticulationMark
 
+        >>> from music21 import *
         >>> a = Accent()
         >>> mxArticulationMark = a.mx
         >>> mxArticulationMark
@@ -108,6 +111,7 @@ class Articulation(music21.Music21Object):
         '''Provided an mxArticulation object (not an mxArticulations object)
         to configure the object.
 
+        >>> from music21 import *
         >>> mxArticulationMark = musicxml.ArticulationMark('accent')
         >>> a = Articulation()
         >>> a.mx = mxArticulationMark
@@ -157,6 +161,7 @@ class TimbreArticulation(Articulation):
 class Accent(DynamicArticulation):
     def __init__(self):
         '''
+        >>> from music21 import *
         >>> a = Accent()
         '''
         DynamicArticulation.__init__(self)
@@ -165,6 +170,7 @@ class Accent(DynamicArticulation):
 class StrongAccent(Accent):
     def __init__(self):
         '''
+        >>> from music21 import *
         >>> a = StrongAccent()
         '''
         Accent.__init__(self)
@@ -173,6 +179,7 @@ class StrongAccent(Accent):
 class Staccato(LengthArticulation):
     def __init__(self):
         '''
+        >>> from music21 import *
         >>> a = Staccato()
         '''
         LengthArticulation.__init__(self)
@@ -181,6 +188,7 @@ class Staccato(LengthArticulation):
 class Staccatissimo(Staccato):
     def __init__(self):
         '''
+        >>> from music21 import *
         >>> a = Staccatissimo()
         '''
         Staccato.__init__(self)
@@ -189,6 +197,7 @@ class Staccatissimo(Staccato):
 class Spiccato(Staccato):
     def __init__(self):
         '''
+        >>> from music21 import *
         >>> a = Spiccato()
         '''
         Staccato.__init__(self)
@@ -197,6 +206,7 @@ class Spiccato(Staccato):
 class Tenuto(LengthArticulation):
     def __init__(self):
         '''
+        >>> from music21 import *
         >>> a = Tenuto()
         '''
         LengthArticulation.__init__(self)
@@ -205,6 +215,7 @@ class Tenuto(LengthArticulation):
 class DetachedLegato(LengthArticulation):
     def __init__(self):
         '''
+        >>> from music21 import *
         >>> a = DetachedLegato()
         '''
         LengthArticulation.__init__(self)
