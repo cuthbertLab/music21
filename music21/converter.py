@@ -399,14 +399,14 @@ class ConverterMusicXML(object):
                 try:
                     environLocal.printDebug(['pickled file version is not compatible', c.score.m21Version])
                 except AttributeError:
-                    ## some old pickles have no versions
+                    # some old pickles have no versions
                     pass
                 pickleError = True
                 writePickle = True
                 fpDst = fp # set to orignal file path
 
         if format == 'musicxml' or (formatSrc == 'musicxml' and pickleError):
-            environLocal.printDebug(['opening musicxml file', fpDst])
+            environLocal.printDebug(['opening musicxml file:', fpDst])
 
             # here, we can see if this is a mxl or similar archive
             arch = ArchiveFilter(fpDst)
@@ -415,13 +415,12 @@ class ConverterMusicXML(object):
             else: # its a file path
                 c.open(fpDst)
 
-        if writePickle:
-            if fpPickle == None: # if original file cannot be found
-                raise ConverterException('attempting to write pickle but no file path is given')
-            environLocal.printDebug(['writing pickled file', fpPickle])
-            c.writePickle(fpPickle)
-
+        # get mxScore object from .score attribute
         self._mxScore = c.score
+
+        # check that we have parts
+        if len(self._mxScore) == 0:
+            raise ConverterException('score from file path (...%s) no parts defined' % fp[-10:])
 
         # movement titles can be stored in more than one place in musicxml
         # manually insert file name as a title if no titles are defined
@@ -432,8 +431,13 @@ class ConverterMusicXML(object):
                 # set as movement title
                 self._mxScore.set('movementTitle', fn)
 
-        if len(self._mxScore) == 0:
-            raise ConverterException('score from file path (...%s) no parts defined' % fp[-10:])
+        # only write pickle if we have parts defined
+        if writePickle:
+            if fpPickle == None: # if original file cannot be found
+                raise ConverterException('attempting to write pickle but no file path is given')
+            environLocal.printDebug(['writing pickled file', fpPickle])
+            c.writePickle(fpPickle)
+
         self.load()
 
 
