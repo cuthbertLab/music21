@@ -275,12 +275,16 @@ class ConverterHumdrum(object):
         >>> s = c.parseData(humdata)
         '''
         self.data = humdrum.parseData(humdrumString)
+        #self.data.stream.makeNotation()
+        
         self.stream = self.data.stream
         return self.data
 
     def parseFile(self, filepath):
         '''Open Humdram data from a file path.'''
         self.data = humdrum.parseFile(filepath)
+        #self.data.stream.makeNotation()
+
         self.stream = self.data.stream
         return self.data
 
@@ -625,9 +629,23 @@ def parseURL(url, forceSource=False):
 def parse(value, *args, **keywords):
     '''Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
 
-    >>> s = parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
-    >>> s = parse("E8 f# g#' G f g# g G#", "2/4")
-
+    >>> from music21 import *
+    >>> s = converter.parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
+    >>> s.getElementsByClass(meter.TimeSignature)[0]
+    <music21.meter.TimeSignature 3/4>
+    
+    >>> s2 = converter.parse("E8 f# g#' G f g# g G#", "2/4")
+    >>> s2.show('text')
+    {0.0} <music21.meter.TimeSignature 2/4>
+    {0.0} <music21.note.Note E>
+    {0.5} <music21.note.Note F#>
+    {1.0} <music21.note.Note G#>
+    {1.5} <music21.note.Note G>
+    {2.0} <music21.note.Note F>
+    {2.5} <music21.note.Note G#>
+    {3.0} <music21.note.Note G>
+    {3.5} <music21.note.Note G#>
+    
     '''
 
     #environLocal.printDebug(['attempting to parse()', value])

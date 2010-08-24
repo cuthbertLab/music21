@@ -547,8 +547,23 @@ class KernSpine(HumdrumSpine):
         
         for event in self.eventList:
             eventC = str(event.contents)  # is str already; just for Eclipse
-            thisObject = None
-            if eventC.count(' '):
+            thisObject = None            
+            if eventC == ".":
+                pass
+            elif eventC.startswith('*'):
+                ## control processing
+                tempObject = kernTandamToControl(eventC)
+                if tempObject is not None:
+                    thisObject = tempObject
+            elif eventC.startswith('='):
+                ## barline/measure processing
+                if thisContainer is not None:
+                    self.music21Objects.append(thisContainer)
+                thisContainer = hdStringToMeasure(eventC)                
+            elif eventC.startswith('!'):
+                ## TODO: process comments
+                pass
+            elif eventC.count(' '):
                 ### multipleNotes
                 notesToProcess = eventC.split()
                 chordNotes = []
@@ -564,22 +579,7 @@ class KernSpine(HumdrumSpine):
                     inTuplet = False
                     lastNote.duration.tuplets[0].type = 'stop'
                 lastNote = thisObject
-            
-            elif eventC == ".":
-                pass
-            elif eventC.startswith('*'):
-                ## control processing
-                tempObject = kernTandamToControl(eventC)
-                if tempObject is not None:
-                    thisObject = tempObject
-            elif eventC.startswith('='):
-                ## barline/measure processing
-                if thisContainer is not None:
-                    self.music21Objects.append(thisContainer)
-                thisContainer = hdStringToMeasure(eventC)                
-            elif eventC.startswith('!'):
-                ## TODO: process comments
-                pass
+
             else:
                 thisObject = hdStringToNote(eventC)
                 if inTuplet is False and len(thisObject.duration.tuplets) > 0:
