@@ -38,6 +38,7 @@ class InstallRunner:
 
     def _findScratch(self):
         for fp in SCRATCH:
+            fp = os.path.expanduser(fp) # support ~
             if os.path.exists(fp) and os.path.isdir(fp):
                 return fp
         raise Exception('cannot find a valid scratch path')
@@ -85,8 +86,15 @@ class InstallRunner:
     def clean(self):
         pass
 
-    def run(self):
-        fpSource = self.download()
+    def run(self, fpDistribution=None):
+        '''Run the installer, test, and clean.
+
+        If  fpDistribution is not None, the specified distribution will be used.
+        '''
+        if fpDistribution == None:
+            fpSource = self.download()
+        else:
+            fpSource = fpDistribution
         # for now, just get the first py bin
         self.install(fpSource, PY_BIN[0])
         self.test(PY_BIN[0])
@@ -100,7 +108,6 @@ class InstallRunnerNix(InstallRunner):
     def __init__(self):
         InstallRunner.__init__(self)
         self._fpScratch = self._findScratch()
-
 
     def download(self):
         print('using download file path: %s' % self._fpScratch)
@@ -148,8 +155,13 @@ class InstallRunnerNix(InstallRunner):
 
 if __name__ == '__main__':
     
+    if len(sys.argv) > 0:
+        fpDist = sys.argv[1]
+    else:
+        fpDist = None
+
     ir = InstallRunnerNix()
-    ir.run()
+    ir.run(fpDist)
 
 
 
