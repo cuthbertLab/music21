@@ -34,6 +34,7 @@ class ModalCounterpoint(object):
         self.stream2 = stream2
         self.legalHarmonicIntervals = ['P1', 'P5', 'P8', 'm3', 'M3', 'm6', 'M6']
         self.legalMelodicIntervals = ['P4', 'P5', 'P8', 'm2', 'M2', 'm3', 'M3', 'm6']
+        self.legalMiddleHarmonicIntervals = ['P1', 'P4', 'P5', 'P8', 'm3', 'M3', 'm6', 'M6']
 
     def findParallelFifths(self, srcStream, cmpStream):
         '''Given two streams, returns the number of parallel fifths and also
@@ -463,7 +464,36 @@ class ModalCounterpoint(object):
 
         '''
         interval1 = interval.notesToInterval(note11, note21)
-        if interval1.diatonic.name in self.legalHarmonicIntervals:
+        if interval1.diatonic.semiSimpleName in self.legalHarmonicIntervals:
+            return True
+        else:
+            return False
+
+    def isValidMiddleHarmony(self, note11, note21):
+        '''Determines if the harmonic interval between two given notes is
+        "legal" according to 21M.301 rules of counterpoint. Legal harmonic
+        intervals include 'P1', 'P5', 'P8', 'm3', 'M3', 'm6', and 'M6'.
+        'P4' is now included because it is legal for middle harmonies.
+
+
+        >>> from music21 import *
+        >>> c = note.Note('C4')
+        >>> d = note.Note('D4')
+        >>> e = note.Note('E4')
+        >>> f = note.Note('F4')
+        >>> cp = ModalCounterpoint()
+        >>> cp.isValidMiddleHarmony(c, d)
+        False
+        >>> cp.isValidMiddleHarmony(c, c)
+        True
+        >>> cp.isValidMiddleHarmony(c, e)
+        True
+        >>> cp.isValidMiddleHarmony(c, f)
+        True
+
+        '''
+        interval1 = interval.notesToInterval(note11, note21)
+        if interval1.diatonic.semiSimpleName in self.legalMiddleHarmonicIntervals:
             return True
         else:
             return False
@@ -471,7 +501,8 @@ class ModalCounterpoint(object):
     def allValidHarmony(self, stream1, stream2):
         '''Given two simultaneous streams, returns True if all of the harmonies
         are legal and False if one or more is not. Legal harmonic intervals
-        include 'P1', 'P5', 'P8', 'm3', 'M3', 'm6', and 'M6'.
+        include 'P1', 'P5', 'P8', 'm3', 'M3', 'm6', and 'M6'. Also assumes that
+        final interval must be a perfect unison or octave.
 
 
         >>> from music21 import *
@@ -498,10 +529,54 @@ class ModalCounterpoint(object):
         stream1.attachIntervalsBetweenStreams(stream2)
         stream2.attachIntervalsBetweenStreams(stream1)
         for note1 in stream1.notes:
-            if note1.editorial.harmonicInterval.name not in self.legalHarmonicIntervals:
+            if note1.editorial.harmonicInterval.semiSimpleName not in self.legalHarmonicIntervals:
                 return False
         for note2 in stream2.notes:
-            if note2.editorial.harmonicInterval.name not in self.legalHarmonicIntervals:
+            if note2.editorial.harmonicInterval.semiSimpleName not in self.legalHarmonicIntervals:
+                return False
+        if stream1.notes[-1].editorial.harmonicInterval.specificName != "Perfect":
+            print(stream1.notes[-1].editorial.harmonicInterval.specificName + " ending, yuk!")
+            return False
+        elif stream1.notes[-1].editorial.harmonicInterval.generic == 5:
+            print "Ends on a fifth, yuk!"
+            return False
+        return True
+
+    def allValidHarmonyMiddleVoices(self, stream1, stream2):
+        '''Given two simultaneous streams, returns True if all of the harmonies
+        are legal and False if one or more is not. Legal harmonic intervals
+        include 'P1', 'P5', 'P8', 'm3', 'M3', 'm6', and 'M6'. As this is for
+        middle voices, the final interval is allowed to be a fifth.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('A4')
+        >>> n3 = note.Note('B4')
+        >>> n4 = note.Note('C5')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('B4')
+        >>> m4 = note.Note('C5')
+        >>> bass = stream.Stream()
+        >>> bass.append([n1, n2, n3, n4])
+        >>> sop = stream.Stream()
+        >>> sop.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp.allValidHarmony(cp.stream1, cp.stream2)
+        True
+        >>> n1.name = 'F#4'
+        >>> cp.allValidHarmony(cp.stream1, cp.stream2)
+        False
+
+        '''
+        stream1.attachIntervalsBetweenStreams(stream2)
+        stream2.attachIntervalsBetweenStreams(stream1)
+        for note1 in stream1.notes:
+            if note1.editorial.harmonicInterval.semiSimpleName not in self.legalHarmonicIntervals:
+                return False
+        for note2 in stream2.notes:
+            if note2.editorial.harmonicInterval.semiSimpleName not in self.legalHarmonicIntervals:
                 return False
         if stream1.notes[-1].editorial.harmonicInterval.specificName != "Perfect":
             print(stream1.notes[-1].editorial.harmonicInterval.specificName + " ending, yuk!")
@@ -537,7 +612,7 @@ class ModalCounterpoint(object):
         stream1.attachIntervalsBetweenStreams(stream2)
         numBadHarmonies = 0
         for note1 in stream1.notes:
-            if note1.editorial.harmonicInterval.name not in self.legalHarmonicIntervals:
+            if note1.editorial.harmonicInterval.semiSimpleName not in self.legalHarmonicIntervals:
                 numBadHarmonies += 1
         return numBadHarmonies
 
@@ -928,8 +1003,9 @@ class ModalCounterpoint(object):
                                 if not self.isHiddenFifth(prevNote, note1, prevFirmus, currFirmus):
                                     if not self.isHiddenOctave(prevNote, note1, prevFirmus, currFirmus):
                                         if interval.Interval(currFirmus, note1).direction >= 0:
-                                            print "adding: ", note1.name, note1.octave
-                                            valid.append(note1)
+                                            if interval.Interval(currFirmus, note1).generic.value <= 10:
+                                                print "adding: ", note1.name, note1.octave
+                                                valid.append(note1)
                 
 ##            try: validHarmony = self.isValidHarmony(note1, currFirmus)
 ##            except: validHarmony = False
@@ -962,6 +1038,206 @@ class ModalCounterpoint(object):
 ##               (not hid8) and (not par1) and (not crossing):
 ##                    print "adding: ", note1.name, note1.octave
 ##                    valid.append(note1)
+        print
+        return valid
+
+    def generateFirstSpeciesThreeVoices(self, bottom, minorScale, choice = 'random'):
+        '''Given a stream (the cantus firmus) and the stream's key in the
+        form of a MinorScale object, generates two streams of first species
+        counterpoint that follow the rules of 21M.301 and together with the
+        cantus firmus form valid three-part counterpoint.
+
+        choice is a flag that can be set to deterministically choose notes
+        to add to the counterpoint. Right now, 'random', 'first', and 'last'
+        are supported. This will be expanded so that all solution sets can
+        be generated.'''
+        
+        goodHarmony2 = False
+        goodMelody2 = False
+        thirdsGood2 = False
+        sixthsGood2 = False
+    
+        # get middle stream
+        while (goodHarmony2 == False or goodMelody2 == False or thirdsGood2 == False or sixthsGood2 == False):
+            try:
+                middle = self.generateFirstSpecies(bottom, minorScale, choice)
+                print [note1.name + str(note1.octave) for note1 in middle.notes]
+        
+                goodHarmony2 = self.allValidHarmony(middle, bottom)
+                goodMelody2 = self.isValidMelody(middle)
+                thirdsGood2 = not self.tooManyThirds(middle, bottom)
+                sixthsGood2 = not self.tooManySixths(middle, bottom)
+             
+                print [note1.name + str(note1.octave) for note1 in bottom.notes]
+                if not goodHarmony2: print "bad harmony"
+                else: print "harmony good"
+                if not goodMelody2: print "bad melody"
+                else: print "melody good"
+                if not thirdsGood2: print "too many thirds"
+                if not sixthsGood2: print "too many sixths"
+            except ModalCounterpointException:
+                pass
+
+        print "GENERATING THIRD VOICE NOW"
+        goodHarmony3 = False
+        goodMelody3 = False
+        thirdsGood3 = False
+        sixthsGood3 = False
+
+        # get top stream
+        while (goodHarmony3 == False or goodMelody3 == False or thirdsGood3 == False or sixthsGood3 == False):
+            try:
+                top = self.getValidThirdVoice(bottom, middle, minorScale, choice)
+                print [note1.name + str(note1.octave) for note1 in top.notes]
+
+                #goodHarmony3 = self.allValidHarmonyMiddleVoices(top, middle) and self.allValidHarmony(top, bottom)
+                #goodMelody3 = self.isValidMelody(top)
+                #thirdsGood3 = not self.tooManyThirds(top, middle) and not self.tooManyThirds(top, bottom)
+                #sixthsGood3 = not self.tooManySixths(top, middle) and not self.tooManySixths(top, bottom)
+
+                goodHarmony3 = goodMelody3 = thirdsGood3 = sixthsGood3 = True
+
+                lastInterval = interval.notesToInterval(top.notes[-2], top.notes[-1])
+                if lastInterval.generic.undirected != 2:
+                    goodMelody = False
+                    print "rejected because lastInterval was not a second"
+                
+                if not goodHarmony3: print 'bad harmony'
+                else: print 'harmony good'
+                if not goodMelody3: print 'bad melody'
+                else: print 'melody good'
+                if not thirdsGood3: print 'too many thirds'
+                if not sixthsGood3: print 'too many sixths'
+            except ModalCounterpointException:
+                pass
+
+                        
+        middle = self.raiseLeadingTone(middle, minorScale)
+        top = self.raiseLeadingTone(top, minorScale)
+        return (middle, top)
+
+    def getValidThirdVoice(self, bottom, middle, minorScale, choice):
+        '''
+        '''
+        top = stream.Part([])
+        firstNoteBottom = bottom.notes[0]
+        firstNoteMiddle = middle.notes[0]
+        firstBottomInterval = interval.Interval(firstNoteBottom, firstNoteMiddle)
+        if firstBottomInterval.name == 'P1':
+            choices = [firstNoteBottom.transpose('P5'),
+                       firstNoteBottom.transpose('P8'),]
+        elif firstBottomInterval.name == 'P5':
+            choices = [firstNoteBottom.transpose('P5'),
+                       firstNoteBottom.transpose('P8'),
+                       firstNoteBottom.transpose('P12')]
+        elif firstBottomInterval.name == 'P8':
+            choices = [firstNoteBottom.transpose('P8'),
+                       firstNoteBottom.transpose('P12'),
+                       firstNoteBottom.transpose('P15')]
+        if choice == 'random':
+            note1 = random.choice(choices)
+        elif choice == 'first':
+            note1 = choices[0]
+        elif choice == 'last':
+            note1 = choices[-1]
+        note1.duration = firstNoteMiddle.duration
+        top.append(note1)
+        afterLeap = False
+        for i in range(1, len(bottom.notes)):
+            prevBottom = bottom.notes[i-1]
+            currBottom = bottom.notes[i]
+            prevMiddle = middle.notes[i-1]
+            currMiddle = middle.notes[i]
+            prevTop = top.notes[i-1]
+            choices = self.generateValidThirdNotes(prevBottom, currBottom, prevMiddle,
+                                              currMiddle, prevTop, afterLeap, minorScale)
+            if len(choices) == 0:
+                raise ModalCounterpointException("Sorry, please try again")
+            if choice == 'random':
+                newNote = random.choice(choices)
+            elif choice == 'first':
+                newNote = choices[0]
+            elif choice == 'last':
+                newNote = choices[-1]
+            else:
+                newNote = random.choice(choices) # if choice flag not recognized, go with random
+            newNote.duration = currBottom.duration
+            top.append(newNote)
+            int1 = interval.notesToInterval(prevTop, newNote)
+            if int1.generic.undirected > 3:
+                afterLeap = True
+            else:
+                afterLeap = False
+        return top
+
+    def generateValidThirdNotes(self, prevBottom, currBottom, prevMiddle, currMiddle, prevTop,
+                                afterLeap, minorScale):
+        '''Helper function for getValidThirdVoice; gets a list of possible
+        next notes based on valid melodic intervals, then checks each one so
+        that parallel/hidden fifths/octaves, voice crossing, and invalid
+        harmonies are prevented between all three voices'''
+        print currBottom.name, str(currBottom.octave), ', ', currMiddle.name, str(currMiddle.octave)
+        valid = []
+        bottomInt = interval.notesToInterval(prevBottom, currBottom)
+        middleInt = interval.notesToInterval(prevMiddle, currMiddle)
+
+        possibleNotes = []
+
+        n1 = interval.transposeNote(prevTop, "m2")
+        n2 = interval.transposeNote(prevTop, "M2")
+        n3 = interval.transposeNote(prevTop, "m3")
+        n4 = interval.transposeNote(prevTop, "M3")
+        
+        if afterLeap:
+            goingUp = [n1, n2, n3, n4]
+        else:
+            n5 = interval.transposeNote(prevTop, "P4")
+            n6 = interval.transposeNote(prevTop, "P5")
+            goingUp = [n1, n2, n3, n4, n5, n6]
+
+        n7 = interval.transposeNote(prevTop, "m-2")
+        n8 = interval.transposeNote(prevTop, "M-2")
+        n9 = interval.transposeNote(prevTop, "m-3")
+        n10 = interval.transposeNote(prevTop, "M-3")
+        if afterLeap:
+            goingDown = [n7, n8, n9, n10]
+        else:
+            n11 = interval.transposeNote(prevTop, "P-4")
+            n12 = interval.transposeNote(prevTop, "P-5")
+            goingDown = [n7, n8, n9, n10, n11, n12]
+
+        possibleNotes.extend(goingUp)
+        possibleNotes.extend(goingDown)
+        # Does contrary motion make sense when there are more than 2 parts?
+##        #favor contrary motion
+##        if bottomInt.direction < 0:
+##            possibleNotes.extend(goingUp)
+##        else:
+##            possibleNotes.extend(goingDown)
+        print "possible: ", [note1.name for note1 in possibleNotes]
+
+        goodNotes = minorScale.generateScaleList()
+        goodNames = [note2.name for note2 in goodNotes]
+        
+        for note1 in possibleNotes:
+            if note1.name in goodNames:
+                if self.isValidHarmony(note1, currBottom) and self.isValidMiddleHarmony(note1, currMiddle):
+                    if not self.isParallelUnison(prevTop, note1, prevBottom, currBottom):
+                        if not self.isParallelUnison(prevTop, note1, prevMiddle, currMiddle):
+                            if not self.isParallelFifth(prevTop, note1, prevBottom, currBottom):
+                                if not self.isParallelFifth(prevTop, note1, prevMiddle, currMiddle):
+                                    if not self.isParallelOctave(prevTop, note1, prevBottom, currBottom):
+                                        if not self.isParallelOctave(prevTop, note1, prevMiddle, currMiddle):
+                                            if not self.isHiddenFifth(prevTop, note1, prevBottom, currBottom):
+                                                if not self.isHiddenFifth(prevTop, note1, prevMiddle, currMiddle):
+                                                    if not self.isHiddenOctave(prevTop, note1, prevBottom, currBottom):
+                                                        if not self.isHiddenOctave(prevTop, note1, prevMiddle, currMiddle):
+                                                            if interval.Interval(currBottom, note1).direction >= 0: # avoid voice crossing
+                                                                if interval.Interval(currMiddle, note1).direction >= 0:
+                                                                    if interval.Interval(currMiddle, note1).generic.value <= 10:
+                                                                        print "adding: ", note1.name, note1.octave
+                                                                        valid.append(note1)
+
         print
         return valid
 
@@ -1307,10 +1583,81 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
     pass
    
-    def testGenerateFirstSpecies(self):
+##    def testGenerateFirstSpecies(self):
+##        '''
+##        A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
+##        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
+##        '''
+##        
+##        n101 = Note()
+##        n101.duration.type = "whole"
+##        n101.name = "A"
+##        aMinor = scale.ConcreteMinorScale(n101)
+##        n101b = Note()
+##        n101b.duration.type = "whole"
+##        n101b.name = "D"
+##        dMinor = scale.ConcreteMinorScale(n101b)
+##        
+##        counterpoint1 = ModalCounterpoint()
+##
+##        cantusFirmus1 = "A1 c B c d e c B A"
+##        cantusFirmus2 = "A1 e d f e c d c B A"
+##        cantusFirmus3 = "d1 f e d g f a g f e d"
+##        #cantusFirmus4 = 
+##        
+##        choices = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
+##        chosenCantusFirmus = random.choice(choices)
+##        print 'Using: ', chosenCantusFirmus
+##        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus, "4/4").notes)
+##    
+##        thisScale = aMinor
+##        if cantusFirmus is cantusFirmus3:
+##            thisScale = dMinor
+##            
+##        goodHarmony = False
+##        goodMelody = False
+##        thirdsGood = False
+##        sixthsGood = False
+##    
+##        while (goodHarmony == False or goodMelody == False or thirdsGood == False or sixthsGood == False):
+##            try:
+##                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale, 'random')
+##                hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
+##                print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
+##        
+##                goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
+##                goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)
+##                thirdsGood = not counterpoint1.tooManyThirds(hopeThisWorks2, cantusFirmus)
+##                sixthsGood = not counterpoint1.tooManySixths(hopeThisWorks2, cantusFirmus)
+##    
+##                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
+##                if lastInterval.generic.undirected != 2:
+##                    goodMelody = False
+##                    print "rejected because lastInterval was not a second"
+##             
+##                print [note1.name + str(note1.octave) for note1 in cantusFirmus.notes]
+##                if not goodHarmony: print "bad harmony"
+##                else: print "harmony good"
+##                if not goodMelody: print "bad melody"
+##                else: print "melody good"
+##                if not thirdsGood: print "too many thirds"
+##                if not sixthsGood: print "too many sixths"
+##            except ModalCounterpointException:
+##                pass        
+##    
+##        score = stream.Score()
+##        score.insert(0, meter.TimeSignature('4/4'))
+##        score.insert(0, hopeThisWorks2)
+##        score.insert(0, cantusFirmus)
+###        score.show('text')
+###        score.show('musicxml')
+##        score.show('midi')
+##        score.show('lily.png')
+
+    def testGenerateFirstSpeciesThreeVoices(self):
         '''
-        A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
-        an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
+        A First Species, Three-Voice Counterpoint Generator by Jackie Rogoff (MIT 2010) written as continuation of 
+        a UROP (Undergraduate Research Opportunities Program) project at M.I.T. summer 2010.
         '''
         
         n101 = Note()
@@ -1338,45 +1685,19 @@ class TestExternal(unittest.TestCase):
         if cantusFirmus is cantusFirmus3:
             thisScale = dMinor
             
-        goodHarmony = False
-        goodMelody = False
-        thirdsGood = False
-        sixthsGood = False
-    
-        while (goodHarmony == False or goodMelody == False or thirdsGood == False or sixthsGood == False):
-            try:
-                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale, 'random')
-                hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
-                print [note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes]
-        
-                goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
-                goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)
-                thirdsGood = not counterpoint1.tooManyThirds(hopeThisWorks2, cantusFirmus)
-                sixthsGood = not counterpoint1.tooManySixths(hopeThisWorks2, cantusFirmus)
-    
-                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
-                if lastInterval.generic.undirected != 2:
-                    goodMelody = False
-                    print "rejected because lastInterval was not a second"
-             
-                print [note1.name + str(note1.octave) for note1 in cantusFirmus.notes]
-                if not goodHarmony: print "bad harmony"
-                else: print "harmony good"
-                if not goodMelody: print "bad melody"
-                else: print "melody good"
-                if not thirdsGood: print "too many thirds"
-                if not sixthsGood: print "too many sixths"
-            except ModalCounterpointException:
-                pass        
-    
+        (middleVoice, topVoice) = counterpoint1.generateFirstSpeciesThreeVoices(cantusFirmus, thisScale, 'random')
+            
         score = stream.Score()
         score.insert(0, meter.TimeSignature('4/4'))
-        score.insert(0, hopeThisWorks2)
+        score.insert(0, topVoice)
+        score.insert(0, middleVoice)
         score.insert(0, cantusFirmus)
 #        score.show('text')
 #        score.show('musicxml')
         score.show('midi')
         score.show('lily.png')
         
+
+    
 if (__name__ == "__main__"):
     music21.mainTest(TestExternal) #TestExternal
