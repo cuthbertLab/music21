@@ -648,7 +648,8 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
     return mt
     
 
-def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, inputM21=None):
+def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
+    inputM21=None):
     '''
     >>> from music21 import *
     >>> import os
@@ -691,7 +692,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, inputM21=None
         #environLocal.printDebug(['index', i, mt.events[i]])
         #environLocal.printDebug(['index', i+1, mt.events[i+1]])
         
-        # need to find pairs of delta time and evens
+        # need to find pairs of delta time and events
         # in some cases, there are delta times that are out of order, or
         # packed in the beginning
         if mt.events[i].isDeltaTime() and not mt.events[i+1].isDeltaTime():
@@ -706,6 +707,8 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, inputM21=None
             environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
             i += 1
             continue
+
+    #environLocal.printDebug(['raw event pairs', events])
 
     # need to pair note-on with note-off
     notes = [] # store pairs of pairs
@@ -741,6 +744,8 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, inputM21=None
             elif e.type == 'INSTRUMENT_NAME':
                 pass
             elif e.type == 'PROGRAM_CHANGE':
+                pass
+            elif e.type == 'MIDI_PORT':
                 pass
 
 
@@ -793,9 +798,9 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True, inputM21=None
                 break # exit secondary loop
         i += iSkip
                     
-#        environLocal.printDebug(['got midi track: events'])
-#         for e in notes:
-#             print e
+#     environLocal.printDebug(['got notes:'])
+#     for e in notes:
+#         print e
 
     # quantize to nearest 16th
     if quantizePost:    
@@ -842,11 +847,16 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
     for mt in midiTracks:
         # not all tracks have notes defined; only creates parts for those
         # that do
+        #environLocal.printDebug(['raw midi trakcs', mt])
+
         if mt.hasNotes(): 
             streamPart = stream.Part() # create a part instance for each part
             streamPart._setMidiTracksPart(mt,
                 ticksPerQuarter=ticksPerQuarter, quantizePost=quantizePost)
             s.insert(0, streamPart)
+        else:
+            environLocal.printDebug(['skipping midi track with no notes', mt])
+    
     return s
 
 

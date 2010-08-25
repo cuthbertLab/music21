@@ -1021,7 +1021,7 @@ class Tuplet(object):
         mxTimeModification.set('normal-type', self.durationNormal.type)
 
 
-        environLocal.printDebug(['_getMX(), fonud tuplet type:', self.type, 'bracket:', self.bracket, self])
+#         environLocal.printDebug(['_getMX(), found tuplet type:', self.type, 'bracket:', self.bracket, self])
 
         # need to permit a tuplet type that is startStop, that
         # create two mxTuplet objects, one for starting and one
