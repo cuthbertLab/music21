@@ -46,6 +46,9 @@ class InstallRunner:
     def download(self):
         pass
 
+    def copyToScratch(self, fp):
+        pass
+
     def _extractTar(self, fp):
         # remove tar
         fpExtracted = fp.replace('.tar.gz', '')
@@ -94,7 +97,7 @@ class InstallRunner:
         if fpDistribution == None:
             fpSource = self.download()
         else:
-            fpSource = fpDistribution
+            fpSource = self.copyToScratch(fpDistribution)
         # for now, just get the first py bin
         self.install(fpSource, PY_BIN[0])
         self.test(PY_BIN[0])
@@ -121,8 +124,16 @@ class InstallRunnerNix(InstallRunner):
         self._toClean.append(dst)
         return dst
 
+    def copyToScratch(self, fp):
+        junk, fn = os.path.split(fp)
+        dst = os.path.join(self._fpScratch, fn)
+        cmd = 'cp %s %s' % (fp, dst)
+        os.system(cmd)
+        return dst
+
     def install(self, fp, pyBin):
         # first, decompress
+        print('extracting: %s' % fp)
         fpExtracted = self._extractTar(fp)
         self._toClean.append(fpExtracted)
 
