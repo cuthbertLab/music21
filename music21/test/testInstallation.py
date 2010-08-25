@@ -25,6 +25,12 @@ FORCE_EXTRACT = False
 PY_BIN = ['python']
 
 
+# to run on a local svn check out, first build a source distribution
+# python setup.py sdist
+# then pass path to source distribution to test routine
+# python music21/test/testInstallation.py ~/music21/dist/music21-0.2.5a4.tar.gz
+
+
 #-------------------------------------------------------------------------------
 class InstallRunner:
     '''Base class for install runners. All methods in this class are cross platform. Platform specific code should be placed in subclasses.
@@ -129,6 +135,7 @@ class InstallRunnerNix(InstallRunner):
         dst = os.path.join(self._fpScratch, fn)
         cmd = 'cp %s %s' % (fp, dst)
         os.system(cmd)
+        self._toClean.append(dst)
         return dst
 
     def install(self, fp, pyBin):
