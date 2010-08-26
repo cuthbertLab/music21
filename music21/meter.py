@@ -600,6 +600,8 @@ class MeterSequence(MeterTerminal):
         self._partition = [] # a list of terminals or MeterSequences
         self._overriddenDuration = None
 
+        self._levelListCache = {}
+
         # this atribute is only used in MeterTermainals, and note 
         # in MeterSequences; a MeterSequences weight is based solely
         # on the sum of its components
@@ -674,6 +676,9 @@ class MeterSequence(MeterTerminal):
             self._partition[key] = value
         else:    
             raise MeterException('cannot insert %s into space of %s' % (value, self[key]))
+
+        # clear cache
+        self._levelListCache = {}
 
     #---------------------------------------------------------------------------
     # load common meter templates into this sequence
@@ -845,6 +850,8 @@ class MeterSequence(MeterTerminal):
         '''This will not sync with .numerator and .denominator if called alone
         '''
         self._partition = [] 
+        # clear cache
+        self._levelListCache = {}
 
     def _addTerminal(self, value):
         '''Add a an object to the partition list. This does not update numerator and denominator.
@@ -859,6 +866,9 @@ class MeterSequence(MeterTerminal):
         else:
             raise MeterException('cannot add %s to this sequence' % value)
         self._partition.append(mt)
+
+        # clear cache
+        self._levelListCache = {}
 
 
     def _getOptions(self):
@@ -914,6 +924,8 @@ class MeterSequence(MeterTerminal):
         else:
             raise MeterException('Cannot set partition by %s (%s/%s)' % (countRequest, self.numerator, self.denominator))
 
+        # clear cache
+        self._levelListCache = {}
 
     def partitionByList(self, numeratorList):
         '''Given a numerator list, partition MeterSequence inot a new list
@@ -973,6 +985,9 @@ class MeterSequence(MeterTerminal):
         else:
             raise MeterException('Cannot set partition by %s (%s/%s)' % (numeratorList, self.numerator, self.denominator))
 
+        # clear cache
+        self._levelListCache = {}
+
 
     def partitionByOther(self, other):
         '''Set partition to that found in another object
@@ -994,6 +1009,10 @@ class MeterSequence(MeterTerminal):
             self.weight = targetWeight
         else:
             raise MeterException('Cannot set partition for unequal MeterSequences')
+
+        # clear cache
+        self._levelListCache = {}
+
 
     def partition(self, value):
         ''' Partitioning creates and sets a number of MeterTerminals that make up this MeterSequence.
@@ -1063,6 +1082,8 @@ class MeterSequence(MeterTerminal):
             #environLocal.printDebug(['got divisions:', divisionsLocal, 'for numerator', self[i].numerator, 'denominator', self[i].denominator])
             self[i] = self[i].subdivide(divisionsLocal)
 
+        # clear cache
+        self._levelListCache = {}
 
     def _subdivideNested(self, processObjList, divisions):
         '''Recursive nested call routine. Return a reference to the newly created level.
@@ -1086,7 +1107,12 @@ class MeterSequence(MeterTerminal):
         for obj in processObjList:
             for sub in obj:
                 post.append(sub)
+
+        # clear cache
+        self._levelListCache = {}
+
         return post
+
 
     def subdivideNestedHierarchy(self, depth, firstPartitionForm=None, 
             normalizeDenominators=True):
@@ -1177,6 +1203,9 @@ class MeterSequence(MeterTerminal):
                         post = postNew # reassing to original
                     else:
                         break
+
+        # clear cache
+        self._levelListCache = {}
 
         #environLocal.printDebug(['subdivideNestedHierarchy(): post nested processing:',  self])
 
@@ -1295,6 +1324,9 @@ class MeterSequence(MeterTerminal):
 
         if partitionRequest != None:
             self.partition(partitionRequest)
+
+        # clear cache
+        self._levelListCache = {}
 
     
     def _updateRatio(self):
@@ -1517,6 +1549,13 @@ class MeterSequence(MeterTerminal):
         >>> meter.MeterSequence(b._getLevelList(3))
         <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         '''
+        
+        cacheKey = (levelCount, flat)
+        try: # check in cache 
+            return self._levelListCache[cacheKey]
+        except KeyError:
+            pass
+
         mtList = []
         for i in range(len(self)):
             #environLocal.printDebug(['_getLevelList weight', i, self[i].weight])
@@ -1537,6 +1576,10 @@ class MeterSequence(MeterTerminal):
                         mtList.append(mt)   
                     else: # its not a terminal, its a meter sequence
                         mtList.append(self[i])   
+
+        # store in cache
+        self._levelListCache[cacheKey] = mtList
+
         return mtList
 
 
@@ -1862,6 +1905,9 @@ class MeterSequence(MeterTerminal):
 
         return score
             
+
+
+
 
 #-------------------------------------------------------------------------------
 class TimeSignature(music21.Music21Object):
