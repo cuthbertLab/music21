@@ -150,7 +150,7 @@ def mxToMeasure(mxMeasure, inputM21):
 #         environLocal.printDebug(['_setMX: working on measure:',
 #                                 m.measureNumber])
 
-    mxAttributes = mxMeasure.get('attributes')
+    mxAttributes = mxMeasure.get('attributesObj')
     mxAttributesInternal = True
     if mxAttributes is None:    
         # need to keep track of where mxattributessrc is coming from
@@ -227,7 +227,7 @@ def mxToMeasure(mxMeasure, inputM21):
                 #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.measureNumber])
                 continue
 
-            mxGrace = mxNote.get('grace')
+            mxGrace = mxNote.get('graceObj')
             if mxGrace is not None: # graces have a type but not a duration
                 #TODO: add grace notes with duration equal to ZeroDuration
                 #environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
@@ -254,8 +254,8 @@ def mxToMeasure(mxMeasure, inputM21):
                     lyricObj = note.Lyric()
                     lyricObj.mx = mxLyric
                     n.lyrics.append(lyricObj)
-                if mxNote.get('notations') is not None:
-                    for mxObjSub in mxNote.get('notations'):
+                if mxNote.get('notationsObj') is not None:
+                    for mxObjSub in mxNote.get('notationsObj'):
                         # deal with ornaments, strill, etc
                         pass
             else: # its a rest
@@ -787,7 +787,7 @@ def mxToNote(mxNote, inputM21):
     if mxNote.get('printObject') == 'no':
         environLocal.printDebug(['got mxNote with printObject == no'])
 
-    mxGrace = mxNote.get('grace')
+    mxGrace = mxNote.get('graceObj')
     if mxGrace != None: # graces have a type but not a duration
         environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration')])
 
@@ -802,7 +802,7 @@ def mxToNote(mxNote, inputM21):
         # n.tie is defined in GeneralNote as None by default
         n.tie = tieObj
 
-    mxNotations = mxNote.get('notations')
+    mxNotations = mxNote.get('notationsObj')
     if mxNotations != None:
         # get a list of mxArticulationMarks, not mxArticulations
         mxArticulationMarkList = mxNotations.getArticulations()

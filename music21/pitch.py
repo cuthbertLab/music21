@@ -593,7 +593,7 @@ class Accidental(music21.Music21Object):
 #         if self.displayStatus == False:
 #             pass
             
-        mxAccidental.set('content', mxName)
+        mxAccidental.set('charData', mxName)
 
         return mxAccidental
 
@@ -611,7 +611,7 @@ class Accidental(music21.Music21Object):
         >>> b.name
         'half-flat'
         """
-        mxName = mxAccidental.get('content')
+        mxName = mxAccidental.get('charData')
         if mxName == "quarter-sharp": 
             name = "half-sharp"
         elif mxName == "three-quarters-sharp": 
@@ -1306,8 +1306,8 @@ class Pitch(music21.Music21Object):
         E-3
         '''
         # assume this is an object
-        mxPitch = mxNote.get('pitch')
-        mxAccidental = mxNote.get('accidental')
+        mxPitch = mxNote.get('pitchObj')
+        mxAccidental = mxNote.get('accidentalObj')
 
         self.step = mxPitch.get('step')
 

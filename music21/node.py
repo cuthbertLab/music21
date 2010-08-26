@@ -303,39 +303,56 @@ class Node(object):
     def set(self, name, value):
         if name in self._attr.keys():
             self._attr[name] = value
-        elif self._convertNameToXml(name) in self._attr.keys():
-            self._attr[self._convertNameToXml(name)] = value
-        else: # if a python name it will not be altered
-            match = False
-            candidates = []
-            candidates.append(self._convertNameFromXml(name))
-            candidates.append(self._convertNameCrossReference(name))
-            # only add if it exists already
-            # print _MOD, candidates
+            return
 
-            for candidate in candidates:
-                if hasattr(self, candidate):
-                    setattr(self, candidate, value)
-                    match = True
-            if not match:
-                raise NodeException('this object does not have a %s (or %s) attribute' % (name, candidates))
+        nameDst = self._convertNameToXml(name)
+        if nameDst in self._attr.keys():
+            self._attr[nameDst] = value
+            return
+
+        match = False
+        candidates = []
+        candidates.append(self._convertNameFromXml(name))
+        candidates.append(self._convertNameCrossReference(name))
+        # only add if it exists already
+        # print _MOD, candidates
+
+        for candidate in candidates:
+            if hasattr(self, candidate):
+                setattr(self, candidate, value)
+                match = True
+        if not match:
+            raise NodeException('this object does not have a %s (or %s) attribute' % (name, candidates))
         
     def get(self, name):
         if name in self._attr.keys():
             return self._attr[name]
-        elif self._convertNameToXml(name) in self._attr.keys():
-            return self._attr[self._convertNameToXml(name)]
-        else: # if a python name it will not be altered
-            match = False
-            candidates = []
-            candidates.append(self._convertNameFromXml(name))
-            candidates.append(self._convertNameCrossReference(name))
-            for candidate in candidates:
-                if hasattr(self, candidate):
-                    match = True
-                    return getattr(self, candidate)
-            if not match:
-                raise NodeException('this object does not have a %s (or %s) attribute' % (name, candidate))
+
+        # try direct access
+        try:
+            return getattr(self, name)
+        except AttributeError:
+            pass
+
+        # try conversions
+        nameDst = self._convertNameToXml(name)
+        #if nameDst in self._attr.keys():
+        try:
+            return self._attr[nameDst]
+        except KeyError:
+            pass
+
+        # if a python name it will not be altered
+        match = False
+        candidates = []
+        candidates.append(self._convertNameFromXml(name))
+        candidates.append(self._convertNameCrossReference(name))
+        for candidate in candidates:
+            if hasattr(self, candidate):
+                match = True
+                return getattr(self, candidate)
+        if not match:
+            raise NodeException('this object does not have a %s (or %s) attribute' % (name, candidate))
         
 
     def setDefaults(self):

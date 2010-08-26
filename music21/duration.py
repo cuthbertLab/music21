@@ -1057,7 +1057,7 @@ class Tuplet(object):
         if self.frozen == True:
             raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
 
-        mxTimeModification = mxNote.get('timemodification')
+        mxTimeModification = mxNote.get('timeModificationObj')
         #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
 
         self.numberNotesActual = int(mxTimeModification.get('actual-notes'))
@@ -1075,7 +1075,7 @@ class Tuplet(object):
         else: # set to type of duration
             self.setDurationType(musicXMLTypeToType(mxNote.get('type')))
 
-        mxNotations = mxNote.get('notations')
+        mxNotations = mxNote.get('notationsObj')
         #environLocal.printDebug(['got mxNotations', mxNotations])
 
         if mxNotations != None and len(mxNotations.getTuplets()) > 0:
@@ -2064,8 +2064,8 @@ class Duration(DurationCommon):
     
             mxDotList = mxNote.get('dotList')
             qLen = float(mxNote.duration) / float(mxDivisions)
-            mxNotations = mxNote.get('notations')
-            mxTimeModification = mxNote.get('timemodification')
+            mxNotations = mxNote.get('notationsObj')
+            mxTimeModification = mxNote.get('timeModificationObj')
 
             if mxTimeModification != None:
                 tup = Tuplet()

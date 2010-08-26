@@ -414,7 +414,7 @@ class Environment(object):
         OMIT_FROM_DOCS
 
         Optionally, can add additional command to erase files, if necessary 
-        Erase could be called from os or command-line arguemtns after opening
+        Erase could be called from os or command-line arguments after opening
         the file and then a short time delay.
 
         TODO: Move showImageDirectfrom lilyString.py ; add MIDI
