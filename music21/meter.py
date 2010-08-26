@@ -1579,7 +1579,6 @@ class MeterSequence(MeterTerminal):
 
         # store in cache
         self._levelListCache[cacheKey] = mtList
-
         return mtList
 
 
