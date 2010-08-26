@@ -1107,10 +1107,8 @@ class MeterSequence(MeterTerminal):
         for obj in processObjList:
             for sub in obj:
                 post.append(sub)
-
         # clear cache
         self._levelListCache = {}
-
         return post
 
 
@@ -1204,7 +1202,8 @@ class MeterSequence(MeterTerminal):
                     else:
                         break
 
-        # clear cache
+        # clear cache; done in self._subdivideNested and possibly not
+        # needed here
         self._levelListCache = {}
 
         #environLocal.printDebug(['subdivideNestedHierarchy(): post nested processing:',  self])
@@ -1404,7 +1403,7 @@ class MeterSequence(MeterTerminal):
     def _getFlatList(self):
         '''Retern a flat version of this MeterSequence as a list of MeterTerminals.
 
-        This retursn a list and not a new MeterSequence b/c MeterSequence objects are generally immutable and thus it does not make sense
+        This return a list and not a new MeterSequence b/c MeterSequence objects are generally immutable and thus it does not make sense
         to concatenate them.
 
         >>> from music21 import *
