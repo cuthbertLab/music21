@@ -40,30 +40,56 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-# define functions to Test
+class CallTest:
+    '''Base class for timed tests
+    '''
+    def __init__(self):
+        '''Perform setup routines for tests
+        '''
+        pass 
+
+    def testFocus(self):
+        '''Calls to be timed
+        '''
+        pass # run tests
 
 
-def timeHumdrum():
-    masterStream = music21.humdrum.parseData(humdrumTestFiles.mazurka6).stream
+#-------------------------------------------------------------------------------
+class TestTimeHumdrum(CallTest):
+    def testFocus(self):
+        masterStream = music21.humdrum.parseData(humdrumTestFiles.mazurka6).stream
 
-def timeMozart():
-    a = music21.converter.parse(music21.corpus.getWork('k155')[0])
-#    ls = music21.lily.LilyString("{" + a[0].lily + "}")
-#    ls.showPNG()
-#    a = music21.converter.parse(mxtf.ALL[1])
+class TestTimeMozart(CallTest):
+    def testFocus(self):
+        a = music21.converter.parse(music21.corpus.getWork('k155')[0])
+    #    ls = music21.lily.LilyString("{" + a[0].lily + "}")
+    #    ls.showPNG()
+    #    a = music21.converter.parse(mxtf.ALL[1])
 
-def timeCapua():
-    c1 = music21.trecento.capua.Test()
-    c1.testRunPiece()
+class TestTimeCapua1(CallTest):
+    def testFocus(self):
+        c1 = music21.trecento.capua.Test()
+        c1.testRunPiece()
 
-def timeCapua2():
-    music21.trecento.capua.ruleFrequency()
+class TestTimeCapua2(CallTest):
+    def testFocus(self):
+        music21.trecento.capua.ruleFrequency()
 
-def timeISMIR():
-    s1 = corpus.parseWork('bach/bwv248')
-    post = s1.musicxml
+class TestTimeIsmir(CallTest):
+    def testFocus(self):
+        s1 = corpus.parseWork('bach/bwv248')
+        post = s1.musicxml
 
 
+class TestMakeMeasures(CallTest):
+    def __init__(self):
+        self.s = music21.stream.Stream()
+        for i in range(10):
+            n = note.Note()
+            self.s.append(n)
+
+    def testFocus(self):
+        post = self.s.makeMeasures()
 
 #-------------------------------------------------------------------------------
 # handler
@@ -73,19 +99,22 @@ class CallGraph:
         self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
         #excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
-        # might set test function from a string
-        self.testFunction = timeISMIR
+        # set class  to test here
+        self.callTest = TestMakeMeasures
 
     def run(self):
         fp = environLocal.getTempFile('.png')
         gf = pycallgraph.GlobbingFilter(exclude=self.excludeList)
+        # create instnace; will call setup routines
+        ct = self.callTest()
 
         # start timer
+        print('starting test')
         t = common.Timer()
         t.start()
 
         pycallgraph.start_trace(filter_func = gf)
-        self.testFunction() # run routine
+        ct.testFocus() # run routine
 
         pycallgraph.stop_trace()
         pycallgraph.make_dot_graph(fp)
