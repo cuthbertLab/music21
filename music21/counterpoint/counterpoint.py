@@ -762,6 +762,21 @@ class ModalCounterpoint(object):
         >>> cp.tooManyThirds(cp.stream1, cp.stream2, 4)
         False
 
+
+
+        The third measure of Bach BWV 5.7 has four parallel thirds in a row between the soprano and alto in m. 5.
+
+        
+        >>> bachBWV57 = corpus.parseWork('bach/bwv5.7')
+        >>> sop = bachBWV57.parts['soprano'].measure(5)
+        >>> alto = bachBWV57.parts['alto'].measure(5)
+        >>> cp = ModalCounterpoint(sop, alto)
+        >>> cp.tooManyThirds(sop, alto, 3)
+        True
+        >>> cp.tooManyThirds(sop, alto, 4)
+        False
+
+
         '''
         stream1.attachIntervalsBetweenStreams(stream2)
         iList = []
@@ -829,6 +844,7 @@ class ModalCounterpoint(object):
         True
         >>> cp.tooManySixths(cp.stream1, cp.stream2, 4)
         False
+
 
         '''
         stream1.attachIntervalsBetweenStreams(stream2)
@@ -1759,4 +1775,4 @@ class TestExternal(unittest.TestCase):
 
     
 if (__name__ == "__main__"):
-    music21.mainTest(Test, TestExternal) #TestExternal
+    music21.mainTest(Test)  #, TestExternal) 

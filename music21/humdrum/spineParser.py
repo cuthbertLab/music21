@@ -1207,14 +1207,16 @@ class Test(unittest.TestCase):
             if n.offset != 1:
                 continue
             if hasattr(n, "pitch") and n.pitch.name == "G#":
-#                if n.beat == 2:
-                 GsharpCount += 1
+ #               if n.beat == 2:
+                  GsharpCount += 1
             elif hasattr(n, "pitches"):
-                for thisPitch in n.pitches:
-                    if thisPitch.name == "G#":
-                            GsharpCount += 1
-        ## SOMETHING WRONG -- supposed to get 34, getting 20!
-#        self.assertEqual(GsharpCount, 34)
+                if 'G#' in [p.name for p in n.pitches]:
+  #                  if n.beat == 2:
+                        GsharpCount += 1
+                           
+                
+                                   ## SOMETHING WRONG -- supposed to get 34, getting 20!
+        self.assertEqual(GsharpCount, 34)
         
 if __name__ == "__main__":
     music21.mainTest(Test)
