@@ -368,12 +368,12 @@ class DefinedContexts(object):
         # can have this perform differently based on domain
         if WEAKREF_ACTIVE:
             if obj is None: # leave None alone
-                objRef = obj
+                return obj
             else:
-                objRef = common.wrapWeakref(obj)
-        else: # a normal reference
-            objRef = obj
-        return objRef
+                return common.wrapWeakref(obj)
+        # a normal reference, return unaltered
+        return obj
+        
 
     def add(self, obj, offset=None, name=None, timeValue=None, idKey=None):
         '''Add a reference to the DefinedContexts collection. 

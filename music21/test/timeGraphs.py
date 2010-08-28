@@ -92,6 +92,17 @@ class TestMakeMeasures(CallTest):
         post = self.s.makeMeasures()
 
 
+class TestMakeTies(CallTest):
+    def __init__(self):
+        self.s = music21.stream.Stream()
+        for i in range(50):
+            n = note.Note()
+            n.quarterLength = 8
+            self.s.append(n)
+        self.s = self.s.makeMeasures()
+
+    def testFocus(self):
+        self.s.makeTies(inPlace=True)
 
 
 
@@ -104,7 +115,8 @@ class CallGraph:
         #excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # set class  to test here
-        self.callTest = TestMakeMeasures
+        self.callTest = TestMakeTies
+
 
     def run(self):
         fp = environLocal.getTempFile('.png')
