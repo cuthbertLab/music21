@@ -1310,6 +1310,37 @@ class Note(NotRest):
         ''')
 
 
+
+    def _getPitches(self):
+        return [self.pitch]
+
+    def _setPitches(self, value):
+        if common.isListLike(value):
+            if 'Pitch' in value[0].classes:
+                self.pitch = value[0]
+            else:
+                raise NoteException('must provide a list containing a Pitch, not: %s' % value)
+        else:
+            raise NoteException('cannot set pitches with provided object: %s' % value)
+
+    pitches = property(_getPitches, _setPitches, 
+        doc = '''Return the :class:`~music21.pitch.Pitch` object in a list. This property is designed to provide an interface analogous to that found on :class:`~music21.chord.Chord`.
+
+        >>> from music21 import *
+        >>> n = note.Note('g#')
+        >>> n.nameWithOctave
+        'G#'
+        >>> n.pitches
+        [G#]
+        >>> n.pitches = [pitch.Pitch('c2'), pitch.Pitch('g2')]
+        >>> n.nameWithOctave
+        'C2'
+        >>> n.pitches
+        [C2]
+        ''')
+
+
+
     def transpose(self, value, inPlace=False):
         '''Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
 
