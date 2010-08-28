@@ -1127,6 +1127,35 @@ class Note(NotRest):
         ''')
 
 
+    def _getPitchNames(self):
+        return [self.pitch.name]
+
+    def _setPitchNames(self, value):
+        if common.isListLike(value):
+            if 'Pitch' in value[0].classes:
+                self.pitch.name = value[0].name
+            else:
+                raise NoteException('must provide a list containing a Pitch, not: %s' % value)
+        else:
+            raise NoteException('cannot set pitch name with provided object: %s' % value)
+
+    pitchNames = property(_getPitchNames, _setPitchNames, 
+        doc = '''Return a list of Pitch names from  :attr:`~music21.pitch.Pitch.name`. This property is designed to provide an interface analogous to that found on :class:`~music21.chord.Chord`.
+
+        >>> from music21 import *
+        >>> n = note.Note('g#')
+        >>> n.name
+        'G#'
+        >>> n.pitchNames
+        ['G#']
+        >>> n.pitchNames = [pitch.Pitch('c2'), pitch.Pitch('g2')]
+        >>> n.name
+        'C'
+        >>> n.pitchNames
+        ['C']
+        ''')
+
+
     def _getAccidental(self): 
         return self.pitch.accidental
 

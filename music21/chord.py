@@ -31,7 +31,7 @@ from music21.lily import LilyString
 #from music21.pitch import Pitch
 from music21 import pitch
 from music21 import beam
-
+from music21 import common
 from music21 import chordTables
 
 from music21 import environment
@@ -201,73 +201,10 @@ class Chord(note.NotRest):
     def _getMidiEvents(self):
         return midiTranslate.chordToMidiEvents(self)
 
-#         mt = None # midi track 
-#         eventList = []
-# 
-#         for i in range(len(self.pitches)):
-#             pitchObj = self.pitches[i]
-# 
-#             dt = midiModule.DeltaTime(mt)
-#             # for a chord, only the first delta time should have the offset
-#             # here, all are zero
-#             dt.time = 0 # set to zero; will be shifted later as necessary
-#             # add to track events
-#             eventList.append(dt)
-# 
-#             me = midiModule.MidiEvent(mt)
-#             me.type = "NOTE_ON"
-#             me.channel = 1
-#             me.time = None # not required
-#             me.pitch = pitchObj.midi
-#             me.velocity = 90 # default, can change later
-#             eventList.append(me)
-#     
-#         # must create each note on in chord before each note on
-#         for i in range(len(self.pitches)):
-#             pitchObj = self.pitches[i]
-# 
-#             # add note off / velocity zero message
-#             dt = midiModule.DeltaTime(mt)
-#             # for a chord, only the first delta time should have the dur
-#             if i == 0:
-#                 dt.time = self.duration.midi
-#             else:
-#                 dt.time = 0
-#             eventList.append(dt)
-#     
-#             me = midiModule.MidiEvent(mt)
-#             me.type = "NOTE_OFF"
-#             me.channel = 1
-#             me.time = None #d
-#             me.pitch = pitchObj.midi
-#             me.velocity = 0 # must be zero
-#             eventList.append(me)
-#         return eventList 
-
     def _setMidiEvents(self, eventList, ticksPerQuarter):
 
         midiTranslate.midiEventsToChord(eventList, 
             ticksPerQuarter, self)
-
-        #environLocal.printDebug(['_setMidiEvents() got: ', eventList])
-        # events can be provided in a variety of forms
-#         if isinstance(eventList, list) and isinstance(eventList[0], list):
-#             pitches = []
-#             # pairs of pairs
-#             for onPair, offPair in eventList:
-#                 tOn, eOn = onPair
-#                 tOff, eOff = offPair
-# 
-#                 p = pitch.Pitch()
-#                 p.midi = eOn.pitch
-#                 pitches.append(p)
-#                 
-#         self._setPitches(pitches)
-#         # can simply use last-assigned pair of tOff, tOn
-#         self.duration.midi = (tOff - tOn), ticksPerQuarter
-
-        #environLocal.printDebug(['_setMidiEvents() post: ', self])
-
 
     midiEvents = property(_getMidiEvents, _setMidiEvents, 
         doc='''Get or set this Chord as a list of :class:`music21.midi.base.MidiEvent` objects.
@@ -545,6 +482,38 @@ class Chord(note.NotRest):
         >>> [p.midi for p in c.pitches]
         [60, 64, 68]
         ''')
+
+
+    def _getPitchNames(self):
+        return [p.name for p in self._pitches]
+
+    def _setPitchNames(self, value):
+        if common.isListLike(value):
+            if common.isStr(value[0]): # only checking first
+                self._pitches = [] # clear
+                for name in value:
+                    self._pitches.append(pitch.Pitch(name))
+            else:
+                raise NoteException('must provide a list containing a Pitch, not: %s' % value)
+        else:
+            raise NoteException('cannot set pitch name with provided object: %s' % value)
+
+        self._chordTablesAddressNeedsUpdating = True
+
+
+    pitchNames = property(_getPitchNames, _setPitchNames, 
+        doc = '''Return a list of Pitch names from each  :class:`~music21.pitch.Pitch` object's :attr:`~music21.pitch.Pitch.name` attribute.
+
+        >>> from music21 import *
+        >>> c = chord.Chord(['g#', 'd-'])
+        >>> c.pitchNames
+        ['G#', 'D-']
+        >>> c.pitchNames = ['c2', 'g2']
+        >>> c.pitchNames
+        ['C', 'G']
+        ''')
+
+
 
     def _getChordTablesAddress(self):
         '''
