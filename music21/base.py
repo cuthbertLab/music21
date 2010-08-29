@@ -200,8 +200,7 @@ class DefinedContexts(object):
         new = self.__class__()
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
-            new.add(dict['obj'], dict['offset'], dict['name'], 
-                    dict['time'], idKey)
+            new.add(dict['obj'], dict['offset'], dict['time'], idKey)
         return new
 
     #---------------------------------------------------------------------------
@@ -375,7 +374,7 @@ class DefinedContexts(object):
         return obj
         
 
-    def add(self, obj, offset=None, name=None, timeValue=None, idKey=None):
+    def add(self, obj, offset=None, timeValue=None, idKey=None):
         '''Add a reference to the DefinedContexts collection. 
         if offset is None, it is interpreted as a context
         if offset is a value, it is intereted as location
@@ -418,10 +417,11 @@ class DefinedContexts(object):
         dict['obj'] = objRef
         # offset can be None for contexts
         dict['offset'] = offset
-        if name == None:
-            dict['name'] = type(obj).__name__
-        else:
-            dict['name'] = name
+#         if name == None:
+#             dict['name'] = type(obj).__name__
+#         else:
+#             dict['name'] = name
+
         if timeValue == None:
             # NOTE: this may not give sub-second resolution on some platforms
             dict['time'] = defaultTimer()

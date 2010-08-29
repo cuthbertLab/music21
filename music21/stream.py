@@ -295,13 +295,17 @@ class Stream(music21.Music21Object):
         '''
         self.isSorted = False
         self.isFlat = True
-        for thisElement in self._elements:
+        for e in self._elements:
             # only need to find one case, and if so, no longer flat
-            if isinstance(thisElement, Stream): 
+            # fastest method here is isinstance()
+            if isinstance(e, Stream): 
+            #if hasattr(e, 'elements'):
                 self.isFlat = False
                 break
         # resetting the cache removes lowest and highest time storage
-        self._cache = common.defHash()
+        # a slight performance optimization: not creating unless needed
+        if len(self._cache) > 0:
+            self._cache = common.defHash()
 
     def _getElements(self):
         # TODO: depreciate access to this method and the associated property
@@ -584,7 +588,7 @@ class Stream(music21.Music21Object):
 #             raise StreamException('this element (%s, id %s) already has a location for this container (%s, id %s)' % (element, id(element), self, id(self)))
 
 
-    def insert(self, offsetOrItemOrList, itemOrNone = None, ignoreSort = False):
+    def insert(self, offsetOrItemOrList, itemOrNone=None, ignoreSort=False):
         '''
         Inserts an item(s) at the given offset(s). 
 
@@ -632,7 +636,8 @@ class Stream(music21.Music21Object):
         StreamException: ...
         
         '''
-        if itemOrNone is not None:
+        # normal approach: provide offset and item
+        if itemOrNone != None:
             offset = offsetOrItemOrList
             item = itemOrNone            
         elif itemOrNone is None and isinstance(offsetOrItemOrList, list):
@@ -644,6 +649,7 @@ class Stream(music21.Music21Object):
                 self.insert(offset, item, ignoreSort = ignoreSort)
                 i += 2
             return
+        # assume first arg is item, and that offset is local offset of object
         else:
             item = offsetOrItemOrList
             offset = item.offset # should this be getOffsetBySite(None)?
@@ -660,9 +666,9 @@ class Stream(music21.Music21Object):
         else:
             element = item
 
+        # checks of element is self; possibly performs additional checks
         self._addElementPreProcess(element)
 
-        offset = float(offset)
         element.addLocation(self, offset)
         # need to explicitly set the parent of the element
         element.parent = self 
@@ -674,8 +680,9 @@ class Stream(music21.Music21Object):
             else:
                 storeSorted = False
 
-        self._elements.append(element)  # could also do self.elements = self.elements + [element]
-        self._elementsChanged()         # maybe much slower?
+        # could also do self.elements = self.elements + [element]
+        self._elements.append(element)  
+        self._elementsChanged() 
 
         if ignoreSort is False:
             self.isSorted = storeSorted
@@ -1240,9 +1247,8 @@ class Stream(music21.Music21Object):
         found = Stream()
 
         # much faster in the most common case than calling common.isListLike
-        if not isinstance(classFilterList, list):
-            if not isinstance(classFilterList, tuple):
-                classFilterList = [classFilterList]
+        if not isinstance(classFilterList, (list, tuple)):
+            classFilterList = [classFilterList]
 
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
@@ -1257,11 +1263,11 @@ class Stream(music21.Music21Object):
                     if className in eClasses:
                         found.insert(e.getOffsetBySite(self), e,         
                             ignoreSort=True)
-                        break
+                        break # match first class and break to next e
                 # old method uses isClass matching
                 elif e.isClass(className):
                     found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
-                    break
+                    break # match first class and break to next e
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
         # passing on auto sort status may or may not be what is needed here

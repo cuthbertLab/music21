@@ -95,7 +95,7 @@ class TestMakeMeasures(CallTest):
 class TestMakeTies(CallTest):
     def __init__(self):
         self.s = music21.stream.Stream()
-        for i in range(50):
+        for i in range(100):
             n = note.Note()
             n.quarterLength = 8
             self.s.append(n)
@@ -103,6 +103,19 @@ class TestMakeTies(CallTest):
 
     def testFocus(self):
         self.s.makeTies(inPlace=True)
+
+
+class TestMakeBeams(CallTest):
+    def __init__(self):
+        self.s = music21.stream.Stream()
+        for i in range(100):
+            n = note.Note()
+            n.quarterLength = .25
+            self.s.append(n)
+        self.s = self.s.makeMeasures()
+
+    def testFocus(self):
+        self.s.makeBeams(inPlace=True)
 
 
 
@@ -115,7 +128,8 @@ class CallGraph:
         #excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # set class  to test here
-        self.callTest = TestMakeTies
+        #self.callTest = TestMakeTies
+        self.callTest = TestMakeBeams
 
 
     def run(self):

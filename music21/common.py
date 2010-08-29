@@ -967,6 +967,9 @@ class defHash(dict):
                 dict.__setitem__(self, key, self.default())
                 return dict.__getitem__(self, key)
 
+    def __len__(self):
+        return dict.__len__(self)
+
     def get(self, key, *args):
         if not args:
             if self.callDefault is False:
