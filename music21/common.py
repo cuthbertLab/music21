@@ -1162,12 +1162,17 @@ def wrapWeakref(referent):
     utility function that wraps objects as weakrefs but does not wrap
     already wrapped objects
     '''
-    if type(referent) is weakref.ref:
+    #if type(referent) is weakref.ref:
+    if isinstance(referent, weakref.ref):
         return referent
-    elif referent is None:
-        return None
-    else:
+
+    try:
         return weakref.ref(referent)
+    # if referent is None, will raise a TypeError
+    # will also raise a type error for string, ints, etc.
+    # slight performance bost rather than checking if None
+    except TypeError:
+        return None
 
 def unwrapWeakref(referent):
     '''

@@ -2130,6 +2130,7 @@ class Stream(music21.Music21Object):
         >>> len(c) == 1
         True
         '''
+        # TODO: parent searching is not yet implemented
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass(clef.Clef)
         #environLocal.printDebug(['getClefs(); count of local', len(post), post])       
@@ -2163,6 +2164,7 @@ class Stream(music21.Music21Object):
         >>> len(c) == 1
         True
         '''
+        # TODO: parent searching is not yet implemented
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass(key.KeySignature)
         if len(post) == 0 and searchContext:
@@ -2813,11 +2815,9 @@ class Stream(music21.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: inPlace=False does not work in many cases
-
         '''
 
         #environLocal.printDebug(['calling Stream.makeBeams()'])
-
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
@@ -2959,7 +2959,7 @@ class Stream(music21.Music21Object):
 
 
     def makeAccidentals(self, pitchPast=None, useKeySignature=True, 
-        alteredPitches=None,         
+        alteredPitches=None, searchKeySignatureByContext=False, 
         cautionaryPitchClass=True, cautionaryAll=False, inPlace=True, overrideStatus=False, cautionaryNotImmediateRepeat=True): 
         '''A method to set and provide accidentals given varous conditions and contexts.
 
@@ -2998,7 +2998,9 @@ class Stream(music21.Music21Object):
         if isinstance(useKeySignature, key.KeySignature):
             addAlteredPitches = useKeySignature.alteredPitches
         elif useKeySignature == True: # get from defined contexts
-            ksStream = self.getKeySignatures() # will search local, then parent
+            # will search local, then parent
+            ksStream = self.getKeySignatures(
+                searchContext=searchKeySignatureByContext) 
             if len(ksStream) > 0:
                 # assume we want the first found; in some cases it is possible
                 # that this may not be true
@@ -3060,12 +3062,17 @@ class Stream(music21.Music21Object):
         # for now, calling makeAccidentals once per measures       
         # pitches from last measure are passed
         # this needs to be called before makeTies
+        ksLast = None
         for i in range(len(measureStream)):
             m = measureStream[i]
+            if m.keySignature != None:
+                ksLast = m.keySignature
             if i > 0:
-                m.makeAccidentals(measureStream[i-1].pitches)
+                m.makeAccidentals(measureStream[i-1].pitches,
+                    useKeySignature=ksLast, searchKeySignatureByContext=False)
             else:
-                m.makeAccidentals()
+                m.makeAccidentals(useKeySignature=ksLast, 
+                    searchKeySignatureByContext=False)
 
         measureStream.makeTies(meterStream, inPlace=True)
 

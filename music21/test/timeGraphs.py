@@ -118,6 +118,31 @@ class TestMakeBeams(CallTest):
         self.s.makeBeams(inPlace=True)
 
 
+class TestMakeAccidentals(CallTest):
+    def __init__(self):
+        self.s = music21.stream.Stream()
+        for i in range(100):
+            n = note.Note()
+            n.quarterLength = .25
+            self.s.append(n)
+        self.s = self.s.makeMeasures()
+
+    def testFocus(self):
+        self.s.makeAccidentals(inPlace=True)
+
+
+class TestMusicXMLOutput(CallTest):
+    def __init__(self):
+        self.s = music21.stream.Stream()
+        for i in range(100):
+            n = note.Note()
+            n.quarterLength = 1.5
+            self.s.append(n)
+
+    def testFocus(self):
+        post = self.s.musicxml
+
+
 
 #-------------------------------------------------------------------------------
 # handler
@@ -129,7 +154,7 @@ class CallGraph:
 
         # set class  to test here
         #self.callTest = TestMakeTies
-        self.callTest = TestMakeBeams
+        self.callTest = TestMakeAccidentals
 
 
     def run(self):
