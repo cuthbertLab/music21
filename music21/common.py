@@ -72,6 +72,11 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 #-------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
 
+IMPORT_MSG_MATPLOTLIB = 'The matplotlib package is an optional additon to music21.\nFor information on installing matplotib, visit:\nhttp://matplotlib.sourceforge.net/users/installing.html'
+
+IMPORT_MSG_NUMPY = 'The numpy package is an optional additon to music21.\nFor information on installing numpy, visit:\nhttp://www.scipy.org/Download'
+
+IMPORT_MSG_PIL = 'The Python Imaging Library (PIL) is an optional additon to music21.\nFor information on installing PIL, visit:\nhttp://www.pythonware.com/products/pil'
 
 
 

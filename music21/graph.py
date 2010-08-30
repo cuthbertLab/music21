@@ -43,13 +43,15 @@ try:
 
     #from matplotlib.colors import colorConverter
     import matplotlib.pyplot as plt
-    import numpy
 
 except ImportError:
-    environLocal.warn('no matplotlib available')
+    environLocal.warn(common.IMPORT_MSG_MATPLOTLIB)
 
 
-
+try:
+    import numpy
+except ImportError:
+    environLocal.warn(common.IMPORT_MSG_NUMPY)
 
 
 #-------------------------------------------------------------------------------

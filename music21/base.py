@@ -58,9 +58,20 @@ else:
 
 # check external dependencies and display 
 
-# try:
-#     import matplotlib
+try:
+    import matplotlib
+except ImportError:
+    environLocal.warn(common.IMPORT_MSG_MATPLOTLIB)
 
+try:
+    import numpy
+except ImportError:
+    environLocal.warn(common.IMPORT_MSG_NUMPY)
+
+try:
+    import PIL
+except ImportError:
+    environLocal.warn(common.IMPORT_MSG_PIL)
 
 
 
