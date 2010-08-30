@@ -40,6 +40,100 @@ class TranslateException(Exception):
 
 
 #-------------------------------------------------------------------------------
+# Ties
+
+def tieToMx(t):
+    '''Convert an m21 Tie to a MusicXML Tie object. Return two component lists. 
+    '''
+    mxTieList = []
+    mxTie = musicxmlMod.Tie()
+    if t.type == 'continue':
+        musicxmlTieType = 'stop'
+    else:
+        musicxmlTieType = t.type
+    mxTie.set('type', musicxmlTieType) # start, stop
+    mxTieList.append(mxTie) # goes on mxNote.tieList
+
+    if t.type == 'continue':
+        mxTie = musicxmlMod.Tie()
+        mxTie.set('type', 'start')
+        mxTieList.append(mxTie) # goes on mxNote.tieList
+
+    mxTiedList = []
+    mxTied = musicxmlMod.Tied()
+    mxTied.set('type', musicxmlTieType) # start, stop
+    mxTiedList.append(mxTied) # goes on mxNote.notationsObj list
+    if t.type == 'continue':
+        mxTied = musicxmlMod.Tied()
+        mxTied.set('type', 'start')
+        mxTiedList.append(mxTied) 
+    
+    #environLocal.printDebug(['mxTieList', mxTieList])
+    return mxTieList, mxTiedList
+
+
+def mxToTie(mxNote, inputM21=None):
+    '''Based on properties in an mxNote, configure or create an m21 Tie object
+    '''
+    from music21 import note
+
+    if inputM21 == None:
+        from music21 import note
+        t = note.Tie()
+    else:
+        t = inputM21
+
+    mxTieList = mxNote.get('tieList')
+    if len(mxTieList) > 0:
+        # get all types and see what we have for this note
+        typesFound = []
+        for mxTie in mxTieList:
+            typesFound.append(mxTie.get('type'))
+        # trivial case: have only 1
+        if len(typesFound) == 1:
+            t.type = typesFound[0]
+        elif typesFound == ['stop', 'start']:
+            t.type = 'continue'
+            #self.type = 'start'
+        else:
+            environLocal.printDebug(['found unexpected arrangement of multiple tie types when importing from musicxml:', typesFound])    
+
+# from old note.py code
+    # not sure this is necessary
+#         mxNotations = mxNote.get('notations')
+#         if mxNotations != None:
+#             mxTiedList = mxNotations.getTieds()
+            # should be sufficient to only get mxTieList
+
+
+
+#-------------------------------------------------------------------------------
+# Lyrics
+
+def lyricToMx(l):
+
+    mxLyric = musicxmlMod.Lyric()
+    mxLyric.set('text', l.text)
+    mxLyric.set('number', l.number)
+    mxLyric.set('syllabic', l.syllabic)
+    return mxLyric
+
+
+def mxToLyric(mxLyric, inputM21=None):
+
+    if inputM21 == None:
+        from music21 import note
+        l = note.Lyric()
+    else:
+        l = inputM21
+
+    l.text = mxLyric.get('text')
+    l.number = mxLyric.get('number')
+    l.syllabic = mxLyric.get('syllabic')
+
+
+
+#-------------------------------------------------------------------------------
 # Measures
 
 

@@ -78,55 +78,54 @@ class Tie(music21.Music21Object):
     def _getMX(self):
         '''Return a MusicXML object representation. 
         '''
-        mxTieList = []
-        mxTie = musicxmlMod.Tie()
-        if self.type == 'continue':
-            musicxmlTieType = 'stop'
-        else:
-            musicxmlTieType = self.type
-        mxTie.set('type', musicxmlTieType) # start, stop
-        mxTieList.append(mxTie) # goes on mxNote.tieList
+        return musicxmlTranslate.tieToMx(self)
 
-        if self.type == 'continue':
-            mxTie = musicxmlMod.Tie()
-            mxTie.set('type', 'start')
-            mxTieList.append(mxTie) # goes on mxNote.tieList
-
-        mxTiedList = []
-        mxTied = musicxmlMod.Tied()
-        mxTied.set('type', musicxmlTieType) # start, stop
-        mxTiedList.append(mxTied) # goes on mxNote.notationsObj list
-        if self.type == 'continue':
-            mxTied = musicxmlMod.Tied()
-            mxTied.set('type', 'start')
-            mxTiedList.append(mxTied) 
-        
-        #environLocal.printDebug(['mxTieList', mxTieList])
-        return mxTieList, mxTiedList
+#         mxTieList = []
+#         mxTie = musicxmlMod.Tie()
+#         if self.type == 'continue':
+#             musicxmlTieType = 'stop'
+#         else:
+#             musicxmlTieType = self.type
+#         mxTie.set('type', musicxmlTieType) # start, stop
+#         mxTieList.append(mxTie) # goes on mxNote.tieList
+# 
+#         if self.type == 'continue':
+#             mxTie = musicxmlMod.Tie()
+#             mxTie.set('type', 'start')
+#             mxTieList.append(mxTie) # goes on mxNote.tieList
+# 
+#         mxTiedList = []
+#         mxTied = musicxmlMod.Tied()
+#         mxTied.set('type', musicxmlTieType) # start, stop
+#         mxTiedList.append(mxTied) # goes on mxNote.notationsObj list
+#         if self.type == 'continue':
+#             mxTied = musicxmlMod.Tied()
+#             mxTied.set('type', 'start')
+#             mxTiedList.append(mxTied) 
+#         
+#         #environLocal.printDebug(['mxTieList', mxTieList])
+#         return mxTieList, mxTiedList
     
     def _setMX(self, mxNote):
         '''Load a MusicXML object representation. 
         '''
-        mxTieList = mxNote.get('tieList')
-        if len(mxTieList) > 0:
-            # get all types and see what we have for this note
-            typesFound = []
-            for mxTie in mxTieList:
-                typesFound.append(mxTie.get('type'))
-            # trivial case: have only 1
-            if len(typesFound) == 1:
-                self.type = typesFound[0]
-            elif typesFound == ['stop', 'start']:
-                self.type = 'continue'
-                #self.type = 'start'
-            else:
-                environLocal.printDebug(['found unexpected arrangement of multiple tie types when importing from musicxml:', typesFound])    
+        musicxmlTranslate.mxToTie(mxNote, self)
 
-    # not sure this is necessary
-#         mxNotations = mxNote.get('notations')
-#         if mxNotations != None:
-#             mxTiedList = mxNotations.getTieds()
-            # should be sufficient to only get mxTieList
+#         mxTieList = mxNote.get('tieList')
+#         if len(mxTieList) > 0:
+#             # get all types and see what we have for this note
+#             typesFound = []
+#             for mxTie in mxTieList:
+#                 typesFound.append(mxTie.get('type'))
+#             # trivial case: have only 1
+#             if len(typesFound) == 1:
+#                 self.type = typesFound[0]
+#             elif typesFound == ['stop', 'start']:
+#                 self.type = 'continue'
+#                 #self.type = 'start'
+#             else:
+#                 environLocal.printDebug(['found unexpected arrangement of multiple tie types when importing from musicxml:', typesFound])    
+
 
     mx = property(_getMX, _setMX)
 
@@ -190,11 +189,13 @@ class Lyric(object):
         >>> mxLyric.get('text')
         'hello'
         '''
-        mxLyric = musicxmlMod.Lyric()
-        mxLyric.set('text', self.text)
-        mxLyric.set('number', self.number)
-        mxLyric.set('syllabic', self.syllabic)
-        return mxLyric
+        return musicxmlTranslate.lyricToMx(self)
+
+#         mxLyric = musicxmlMod.Lyric()
+#         mxLyric.set('text', self.text)
+#         mxLyric.set('number', self.number)
+#         mxLyric.set('syllabic', self.syllabic)
+#         return mxLyric
 
     def _setMX(self, mxLyric):
         '''Given an mxLyric, fill the necessary parameters
@@ -207,9 +208,11 @@ class Lyric(object):
         >>> a.text
         'hello'
         '''
-        self.text = mxLyric.get('text')
-        self.number = mxLyric.get('number')
-        self.syllabic = mxLyric.get('syllabic')
+        musicxmlTranslate.mxToLyric(mxLyric, self)
+
+#         self.text = mxLyric.get('text')
+#         self.number = mxLyric.get('number')
+#         self.syllabic = mxLyric.get('syllabic')
 
     mx = property(_getMX, _setMX)    
 
@@ -609,50 +612,6 @@ class GeneralNote(music21.Music21Object):
         >>> post = n._getMusicXML()
         '''
         return musicxmlTranslate.generalNoteToMusicXML(self)
-
-
-#         mxNoteList = selfCopy._getMX() # can be rest, note, or chord
-# 
-#         mxMeasure = musicxmlMod.Measure()
-#         mxMeasure.setDefaults()
-#         for mxNote in mxNoteList:
-#             mxMeasure.append(mxNote)
-# 
-#         mxPart = musicxmlMod.Part()
-#         mxPart.setDefaults()
-#         mxPart.append(mxMeasure)
-# 
-#         # see if an instrument is defined in this or a parent stream
-#         if hasattr(self.parent, 'getInstrument'):
-#             instObj = self.parent.getInstrument()
-#         else:
-#             instObj = instrument.Instrument()
-#             # part id is now configured later in processing
-#             #instObj.partId = defaults.partId # give a default id
-#             instObj.instrumentIdRandomize()
-#             instObj.partIdRandomize()
-#             instObj.partName = defaults.partName # give a default id
-# 
-#         mxScorePart = musicxmlMod.ScorePart()
-#         mxScorePart.set('partName', instObj.partName)
-#         mxScorePart.set('id', instObj.partId)
-# 
-#         # must set this part to the same id
-#         mxPart.set('id', instObj.partId)
-# 
-#         mxPartList = musicxmlMod.PartList()
-#         mxPartList.append(mxScorePart)
-# 
-#         mxIdentification = musicxmlMod.Identification()
-#         mxIdentification.setDefaults() # will create a composer
-#         mxScore = musicxmlMod.Score()
-#         mxScore.setDefaults()
-#         mxScore.set('partList', mxPartList)
-#         mxScore.set('identification', mxIdentification)
-#         mxScore.append(mxPart)
-#         return mxScore.xmlStr()
-
-
 
     musicxml = property(_getMusicXML, 
         doc = '''Return a complete musicxml representation.
@@ -1538,26 +1497,10 @@ class Rest(GeneralNote):
         '''
         return musicxmlTranslate.restToMxNotes(self)
 
-#         mxNoteList = []
-#         for mxNote in self.duration.mx: # returns a list of mxNote objs
-#             # merge method returns a new object
-#             mxRest = musicxmlMod.Rest()
-#             mxRest.setDefaults()
-#             mxNote.set('rest', mxRest)
-#             # get color from within .editorial using attribute
-#             mxNote.set('color', self.color)
-#             mxNoteList.append(mxNote)
-#         return mxNoteList
-
     def _setMX(self, mxNote):
         '''Given an mxNote, fille the necessary parameters
         '''
         musicxmlTranslate.mxToRest(mxNote, self)
-#         try:
-#             self.duration.mx = mxNote
-#         except duration.DurationException:
-#             environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, self])
-#             raise
 
     mx = property(_getMX, _setMX)    
 
