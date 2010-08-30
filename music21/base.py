@@ -56,6 +56,12 @@ else:
     defaultTimer = time.time
 
 
+# check external dependencies and display 
+
+# try:
+#     import matplotlib
+
+
 
 
 #-------------------------------------------------------------------------------

@@ -58,12 +58,10 @@ musicOrdinals[22] = "Triple-octave"
 WHITESPACE = re.compile('\s+')
 LINEFEED = re.compile('\n+')
 
-
 DEBUG_OFF = 0
 DEBUG_USER = 1
 DEBUG_DEVEL = 63
 DEBUG_ALL = 255
-
 
 # used for checking preferences, and for setting environment variables
 VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi']
@@ -71,6 +69,13 @@ VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 
+#-------------------------------------------------------------------------------
+# provide warning strings to users for use in conditional imports
+
+
+
+
+#-------------------------------------------------------------------------------
 def findFormat(fmt):
     '''Given a format defined either by a format name or 
     an extension, return the format name as well as the output exensions.
