@@ -68,6 +68,9 @@ class ABCObject(object):
 
     def stripComment(self, strSrc):
         '''
+        
+        removes ABC-style comments from a string:
+        
         >>> ao = ABCObject()
         >>> ao.stripComment('asdf')
         'asdf'
@@ -75,6 +78,8 @@ class ABCObject(object):
         'asdf'
         >>> ao.stripComment('asdf  %     234')
         'asdf  '
+        >>> ao.stripComment('[ceg]% this chord appears 50% more often than other chords do')
+        '[ceg]'
         '''
         if '%' in strSrc:
             post = rePreComment.match(strSrc).group()

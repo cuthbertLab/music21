@@ -270,6 +270,14 @@ class Test(unittest.TestCase):
             #func(show=False, op133=sStream)
             #func(show=False)
 
+def demoJesse():
+    luca = corpus.parseWork('luca/gloria')
+    for n in luca.measures(2, 20).flat.notes:
+        if n.isRest is False:
+            n.lyric = n.pitch.german
+    luca.show()
+
+
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)

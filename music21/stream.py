@@ -165,7 +165,8 @@ class Stream(music21.Music21Object):
         '''Get the total number of elements
         Does not recurse into objects
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.offset = x * 3
@@ -173,7 +174,7 @@ class Stream(music21.Music21Object):
         >>> len(a)
         4
 
-        >>> b = Stream()
+        >>> b = stream.Stream()
         >>> for x in range(4):
         ...     b.insert(deepcopy(a) ) # append streams
         >>> len(b)
@@ -201,7 +202,8 @@ class Stream(music21.Music21Object):
 
         ## maybe it should, but does not yet:    if a float is given, returns the element at that offset
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> a.repeatInsert(note.Rest(), range(6))
         >>> subslice = a[2:5]
         >>> len(subslice)
@@ -285,10 +287,11 @@ class Stream(music21.Music21Object):
         Call any time _elements is changed. Called by methods that add or change
         elements.
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> a.isFlat
         True
-        >>> a._elements.append(Stream())
+        >>> a._elements.append(stream.Stream())
         >>> a._elementsChanged()
         >>> a.isFlat
         False
@@ -315,12 +318,13 @@ class Stream(music21.Music21Object):
    
     def _setElements(self, value):
         '''
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note("C"), range(10))
-        >>> b = Stream()
+        >>> b = stream.Stream()
         >>> b.repeatInsert(note.Note("C"), range(10))
         >>> b.offset = 6
-        >>> c = Stream()
+        >>> c = stream.Stream()
         >>> c.repeatInsert(note.Note("C"), range(10))
         >>> c.offset = 12
         >>> b.insert(c)
@@ -344,12 +348,13 @@ class Stream(music21.Music21Object):
         '''Insert items at index positions. Index positions are based
         on position in self.elements. 
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note("C"), range(10))
-        >>> b = Stream()
+        >>> b = stream.Stream()
         >>> b.repeatInsert(note.Note("C"), range(10))
         >>> b.offset = 6
-        >>> c = Stream()
+        >>> c = stream.Stream()
         >>> c.repeatInsert(note.Note("C"), range(10))
         >>> c.offset = 12
         >>> b.insert(c)
@@ -373,7 +378,8 @@ class Stream(music21.Music21Object):
         '''Delete items at index positions. Index positions are based
         on position in self.elements. 
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note("C"), range(10))
         >>> del a[0]
         >>> len(a)
@@ -388,17 +394,31 @@ class Stream(music21.Music21Object):
 
         Presently, this does not manipulate the offsets of the incoming elements to actually be at the end of the Stream. This may be a problem that makes this method not so useful?
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Part()
         >>> a.repeatInsert(note.Note("C"), range(10))
-        >>> b = Stream()
+        >>> b = stream.Stream()
         >>> b.repeatInsert(note.Note("G"), range(10))
         >>> c = a + b   
         >>> c.pitches # autoSort is True, thus a sorted version results
         [C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G]
         >>> len(c.notes)
         20
+
+
+        The autoSort of the first stream becomes the autoSort of the
+        destination.  The class of the first becomes the class of the destination.
+        
+
+        >>> a.autoSort = False
+        >>> d = a + b
+        >>> d.pitches
+        [C, C, C, C, C, C, C, C, C, C, G, G, G, G, G, G, G, G, G, G]
+        >>> d.__class__.__name__
+        'Part'
         '''
-        s = Stream()
+        s = self.__class__()
+        s.autoSort = self.autoSort
         # may want to keep parent of source Stream?
         #s.elements = self._elements + other._elements
         # need to iterate over elements and re-assign to create new locations
@@ -419,7 +439,8 @@ class Stream(music21.Music21Object):
 
         Matching is based exclusively on id() of objects.
 
-        >>> s = Stream()
+        >>> from music21 import *
+        >>> s = stream.Stream()
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('g#')
 
@@ -450,7 +471,8 @@ class Stream(music21.Music21Object):
     def index(self, obj):
         '''Return the first matched index for the specified object.
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> fSharp = note.Note("F#")
         >>> a.repeatInsert(note.Note("A#"), range(10))
         >>> a.append(fSharp)
@@ -468,7 +490,8 @@ class Stream(music21.Music21Object):
 
         By default, only the first match is removed. This can be adjusted with the `firstMatchOnly` parameters. 
 
-        >>> s = Stream()
+        >>> from music21 import *
+        >>> s = stream.Stream()
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('g#')
         >>> # copies of an object are not the same as the object
@@ -498,7 +521,8 @@ class Stream(music21.Music21Object):
     def pop(self, index):
         '''Return and remove the object found at the user-specified index value. Index values are those found in `elements` and are not necessary offset order. 
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note("C"), range(10))
         >>> junk = a.pop(0)
         >>> len(a)
@@ -1220,7 +1244,8 @@ class Stream(music21.Music21Object):
     def getElementsByClass(self, classFilterList):
         '''Return a list of all Elements that match one or more classes in the `classFilterList`. A single class can be provided to the `classFilterList` parameter.
         
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Score()
         >>> a.repeatInsert(note.Rest(), range(10))
         >>> for x in range(4):
         ...     n = note.Note('G#')
@@ -1231,7 +1256,7 @@ class Stream(music21.Music21Object):
         4
         >>> found[0].pitch.accidental.name
         'sharp'
-        >>> b = Stream()
+        >>> b = stream.Stream()
         >>> b.repeatInsert(note.Rest(), range(15))
         >>> a.insert(b)
         >>> # here, it gets elements from within a stream
@@ -1242,9 +1267,10 @@ class Stream(music21.Music21Object):
         >>> found = a.flat.getElementsByClass(note.Rest)
         >>> len(found)
         25
+        >>> found.__class__.__name__
+        'Score'
         '''
-        # should probably be whatever class the caller is
-        found = Stream()
+        found = self.__class__()
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, (list, tuple)):
@@ -1301,7 +1327,10 @@ class Stream(music21.Music21Object):
         25
         '''
         # should probably be whatever class the caller is
-        found = Stream()
+        try: 
+            found = self.__class__()
+        except:
+            found = Stream()
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, list):
@@ -1353,7 +1382,7 @@ class Stream(music21.Music21Object):
         if not hasattr(groupFilterList, "__iter__"):
             groupFilterList = [groupFilterList]
 
-        returnStream = Stream()
+        returnStream = self.__class__()
         for myEl in self:
             for myGrp in groupFilterList:
                 if hasattr(myEl, "groups") and myGrp in myEl.groups:
@@ -1534,7 +1563,7 @@ class Stream(music21.Music21Object):
         if offsetEnd is None:
             offsetEnd = offsetStart
         
-        found = Stream()
+        found = self.__class__()
 
         #(offset, priority, dur, element). 
 
@@ -1799,7 +1828,7 @@ class Stream(music21.Music21Object):
         mStream = self.getElementsByClass('Measure')
 
 
-        returnObj = Stream()
+        returnObj = self.__class__()
         srcObj = self
 
         # if we have no Measure defined, call makeNotation
@@ -1986,7 +2015,7 @@ class Stream(music21.Music21Object):
         # search parent Streams through contexts    
         if len(post) == 0 and searchContext:
             # returns a single value
-            post = Stream()
+            post = self.__class__()
             # sort by time to search the most recent objects
             obj = self.getContextByClass(meter.TimeSignature, 
                   sortByCreationTime=sortByCreationTime)
@@ -2136,7 +2165,7 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['getClefs(); count of local', len(post), post])       
         if len(post) == 0 and searchContext:
             # returns a single value
-            post = Stream()
+            post = self.__class__()
             obj = self.getContextByClass(clef.Clef)
             #environLocal.printDebug(['getClefs(): searching contexts: results', obj])
             if obj != None:
@@ -2169,7 +2198,7 @@ class Stream(music21.Music21Object):
         post = self.getElementsByClass(key.KeySignature)
         if len(post) == 0 and searchContext:
             # returns a single value
-            post = Stream()
+            post = self.__class__()
             obj = self.getContextByClass(key.KeySignature)
             if obj != None:
                 post.append(obj)
@@ -2313,7 +2342,7 @@ class Stream(music21.Music21Object):
         
         '''
        
-        display = Stream()
+        display = self.__class__()
         found = None
         foundOffset = 0
         foundEnd = 0 
@@ -2363,8 +2392,8 @@ class Stream(music21.Music21Object):
         >>> len(c)
         31
         '''
-        a = Stream()
-        b = Stream()
+        a = self.__class__()
+        b = self.__class__()
         for element in self.getElementsByClass(objName):
             if fx(element):
                 a.insert(element)
@@ -2389,7 +2418,8 @@ class Stream(music21.Music21Object):
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
         
-        >>> sSrc = Stream()
+        >>> from music21 import *
+        >>> sSrc = stream.Stream()
         >>> sSrc.repeatAppend(note.Rest(), 3)
         >>> sMeasures = sSrc.makeMeasures()
         >>> len(sMeasures.getElementsByClass('Measure'))
@@ -2402,13 +2432,15 @@ class Stream(music21.Music21Object):
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 3/4>
             
-        >>> sSrc = Stream()
+        >>> sSrc = stream.Part()
         >>> n = note.Note()
         >>> sSrc.repeatAppend(n, 10)
         >>> sSrc.repeatInsert(n, [x+.5 for x in range(10)])
         >>> sMeasures = sSrc.makeMeasures()
         >>> len(sMeasures.getElementsByClass('Measure'))
         3
+        >>> sMeasures.__class__.__name__
+        'Part'
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
         '''
@@ -2488,7 +2520,7 @@ class Stream(music21.Music21Object):
     
         # create a stream of measures to contain the offsets range defined
         # create as many measures as needed to fit in oMax
-        post = Stream()
+        post = self.__class__()
         o = 0 # initial position of first measure is assumed to be zero
         measureCount = 0
         lastTimeSignature = None
@@ -2540,7 +2572,7 @@ class Stream(music21.Music21Object):
                     #environLocal.printDebug(['found measure match', i, mStart, mEnd, start, end, e])
                     break
             if not match:
-                raise StreamException('cannot place element with start/end %s/%s within any measures' % (start, end))
+                raise StreamException('cannot place element %s with start/end %s/%s within any measures' % (e, start, end))
             # find offset in the temporal context of this measure
             # i is the index of the measure that this element starts at
             # mStart, mEnd are correct
@@ -4863,7 +4895,7 @@ class Stream(music21.Music21Object):
             return self._cache["GapStream"]
         
         sortedElements = self.sorted.elements
-        gapStream = Stream()
+        gapStream = self.__class__()
         highestCurrentEndTime = 0
         for e in sortedElements:
 
@@ -4999,7 +5031,8 @@ class Stream(music21.Music21Object):
                         includeEndBoundary=False):
         '''A stream is a sequence if it has no overlaps.
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> for x in [0,0,0,0,3,3,3]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
@@ -5072,9 +5105,32 @@ class Stream(music21.Music21Object):
         return returnList
 
     def attachIntervalsBetweenStreams(self, cmpStream):
-        '''For each element in self, creates an interval object in the element's
+        '''For each element in self, creates an interval.Interval object in the element's
         editorial that is the interval between it and the element in cmpStream that
-        is sounding at the moment the element in srcStream is attacked.'''
+        is sounding at the moment the element in srcStream is attacked.
+        
+        remember if comparing two streams with measures, etc., to run:
+        
+            stream1.flat.attachIntervvalsBetweenStreams(stream2.flat)
+            
+        example usage:
+    
+        >>> from music21 import *
+        >>> s1 = converter.parse('C4 d8 e f# g A2', '5/4')
+        >>> s2 = converter.parse('g4 e8 d c4   a2', '5/4')
+        >>> s1.attachIntervalsBetweenStreams(s2)
+        >>> for n in s1.notes:
+        ...     if "Rest" in n.classes: continue  # safety check
+        ...     if n.editorial.harmonicInterval is None: continue # if other voice had a rest...
+        ...     print n.editorial.harmonicInterval.directedName
+        P12
+        M2
+        M-2
+        A-4
+        P-5
+        P8
+        
+        '''
     
         srcNotes = self.notes
         for thisNote in srcNotes:
