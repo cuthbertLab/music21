@@ -232,7 +232,17 @@ class ABCMetadataObject(ABCObject):
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
     def __init__(self, src):
-        ABCObject__init__(self, src)
+        ABCObject.__init__(self, src)
+        self.tag = None
+        self.data = None
+
+
+class ABCBarObject(ABCObject):
+
+    # given a logical unit, create an object
+    # may be a chord, notes, metadata, bars
+    def __init__(self, src):
+        ABCObject.__init__(self, src)
         self.tag = None
         self.data = None
 
@@ -242,14 +252,16 @@ class ABCNotationObject(ABCObject):
     # may be a chord, notes, bars
 
     def __init__(self, src):
-        ABCObject__init__(self, src)
+        ABCObject.__init__(self, src)
 
         self.inBar = None
         self.inBeam = None
         self.inSlur = None
         self.inGrace = None
 
-        self.isChord = None
+        # store chord string if connected 
+        self.chordSymbol = None 
+
         # provide default duration from handler
         self.durationDefault = None
         # store if a broken symbol applies 
@@ -257,13 +269,26 @@ class ABCNotationObject(ABCObject):
         # store where the broken symbol was found
         self.brokenSymbolPosition = None 
 
+class ABCChordObject(ABCNotationObject):
+
+    # given a logical unit, create an object
+    # may be a chord, notes, bars
+
+    def __init__(self, src):
+        ABCNotationObject.__init__(self, src)
+        # store a lost of component objects
+        self.noteObjects = []
+
+
+
 
 class ABCHandler(object):
 
     # divide elements of a character stream into objects and handle
     # store in a list, and pass global information to compontns
     def __init__(self):
-        self._objStream = []
+        # tokens are ABC objects in a linear stream
+        self._tokens = []
 
     def _getCharContext(self, strSrc, i):
         '''Find the local context of a string. Returns charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace.
@@ -356,7 +381,6 @@ class ABCHandler(object):
             if charThis == '%':
                 j = self._getNextLineBreak(strSrc, i)
                 environLocal.printDebug(['got comment:', repr(strSrc[i:j+1])])
-
                 i = j+1 # skip \n char
                 continue
 
@@ -368,9 +392,8 @@ class ABCHandler(object):
                 # collect until end of line; add one to get line break
                 j = self._getNextLineBreak(strSrc, i) + 1
                 collect = strSrc[i:j].strip()
-
-                environLocal.printDebug(['got metadata:', repr(''.join(collect))])
-
+                #environLocal.printDebug(['got metadata:', repr(''.join(collect))])
+                self._tokens.append(ABCMetadataObject(collect))
                 i = j
                 continue
             
@@ -391,7 +414,8 @@ class ABCHandler(object):
                         break
                 if matchBars:
                     collect = strSrc[i:j]
-                    environLocal.printDebug(['got bars:', repr(collect)])    
+                    #environLocal.printDebug(['got bars:', repr(collect)])  
+                    self._tokens.append(ABCBarObject(collect))
                     i = j
                     continue
                     
@@ -439,7 +463,9 @@ class ABCHandler(object):
                 else:
                     collect = strSrc[i:j]
 
-                environLocal.printDebug(['got chord:', repr(collect)])
+                #environLocal.printDebug(['got chord:', repr(collect)])
+                self._tokens.append(ABCChordObject(collect))
+
                 i = j
                 continue
 
@@ -476,9 +502,13 @@ class ABCHandler(object):
                     activeChordSymbol = '' # reset
                 else:
                     collect = strSrc[i:j]
-                environLocal.printDebug(['got note event:', repr(collect)])
+                #environLocal.printDebug(['got note event:', repr(collect)])
+                self._tokens.append(ABCNotationObject(collect))
                 i = j
                 continue
+
+            # look for white space: can be used to determine beam groups
+
             # no action: normal continuation of 1 char
             i += 1
 
