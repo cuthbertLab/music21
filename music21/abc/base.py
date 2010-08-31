@@ -193,7 +193,36 @@ environLocal = environment.Environment(_MOD)
 # ignored. The file English.abc contains plenty of examples.
 
 
+# store symbol and m21 naming/class eq
+ABC_BARS = [
+           ('|]', 'thin-thick double bar line'),
+           ('||', 'thin-thin double bar line'),
+           ('[|', 'thick-thin double bar line'),
+           (':|', 'left repeat'),
+           ('|:', 'right repeat'),
+           ('::', 'left-right repeat'),
+            # for comparison, single chars must go last
+           ('|', 'bar line'),
+           ]
 
+#  | bar line
+#  |] thin-thick double bar line
+#  || thin-thin double bar line
+#  [| thick-thin double bar line
+#  :| left repeat
+#  |: right repeat
+#  :: left-right repeat
+
+
+#-------------------------------------------------------------------------------
+class ABCObjectException(Exception):
+    pass
+
+class ABCHandlerException(Exception):
+    pass
+
+
+#-------------------------------------------------------------------------------
 class ABCObject(object):
     def __init__(self, src):
         self.src = src # store source character sequence
@@ -204,6 +233,8 @@ class ABCMetadataObject(ABCObject):
     # may be a chord, notes, metadata, bars
     def __init__(self, src):
         ABCObject__init__(self, src)
+        self.tag = None
+        self.data = None
 
 class ABCNotationObject(ABCObject):
 
@@ -234,43 +265,222 @@ class ABCHandler(object):
     def __init__(self):
         self._objStream = []
 
+    def _getCharContext(self, strSrc, i):
+        '''Find the local context of a string. Returns charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace.
 
-    def walk(self, str):
-        '''Walk the abc string, creating objects and backtracking along the way.
+
+        >>> ah = ABCHandler()
+        >>> ah._getCharContext('12345', 0)
+        (None, None, '1', '2', '2')
+        >>> ah._getCharContext('12345', 1)
+        ('1', '1', '2', '3', '3')
+        >>> ah._getCharContext('12345', 3)
+        ('3', '3', '4', '5', '5')
+        >>> ah._getCharContext('12345', 4)
+        ('4', '4', '5', None, None)
         '''
-            
-        for i in range(len(str)):
-            if i > 0:
-                charPrev = str[i-1]
-            else:      
-                charPrev = None
-
-            # get last char previous non-white; do not start with current
-            # -1 goes to index 0
-            charPrevNotSpace = None
-            for j in range(i-1, -1, -1):
-                if not str[j].isspace():
-                    charPrevNotSpace = str[j]
-                    break
-
-            charThis = str[i]
-
-            if i < len(str)-1:
-                charNext = str[i+1]
-            else:      
-                charNext = None
-
-            charNextNotSpace = None
-            for j in range(i, len(str)):
-                if not str[j].isspace():
-                    charNextNotSpace = str[j]
-                    break
+        lastIndex = len(strSrc) - 1
+        if i > lastIndex:
+            raise ABCHandlerException
+        # find local area of string
+        if i > 0:
+            charPrev = strSrc[i-1]
+        else:      
+            charPrev = None
+        # get last char previous non-white; do not start with current
+        # -1 goes to index 0
+        charPrevNotSpace = None
+        for j in range(i-1, -1, -1):
+            if not strSrc[j].isspace():
+                charPrevNotSpace = strSrc[j]
+                break
+        charThis = strSrc[i]
+        if i < len(strSrc)-1:
+            charNext = strSrc[i+1]
+        else:      
+            charNext = None
+        charNextNotSpace = None
+        # start at next index and look forward
+        for j in range(i+1, len(strSrc)):
+            if not strSrc[j].isspace():
+                charNextNotSpace = strSrc[j]
+                break
 
 #             environLocal.printDebug(['charPrevNotSpace', repr(charPrevNotSpace), 
 #                           'charPrevious', repr(charPrev), 
 #                           'charThis', repr(charThis), 
 #                           'charNext', repr(charNext), 
 #                           'charNextNotSpace', repr(charNextNotSpace)]) 
+
+        return charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace
+
+
+    def _getNextLineBreak(self, strSrc, i):
+        '''Return index of next line break.
+
+        >>> ah = ABCHandler()
+        >>> strSrc = 'de  we\\n wer bfg\\n'
+        >>> ah._getNextLineBreak(strSrc, 0)
+        6
+        >>> strSrc[0:6]
+        'de  we'
+        >>> # from last line break
+        >>> ah._getNextLineBreak(strSrc, 6)
+        15
+        >>> strSrc[ah._getNextLineBreak(strSrc, 0):]
+        '\\n wer bfg\\n'
+        '''
+        lastIndex = len(strSrc) - 1
+        j = i + 1 # start with next
+        while True:
+            if strSrc[j] == '\n' or j > lastIndex:
+                return j # will increment to next char on loop
+            j += 1
+
+    def tokenize(self, strSrc):
+        '''Walk the abc string, creating objects and backtracking along the way.
+        '''
+        i = 0
+        collect = []
+        lastIndex = len(strSrc) - 1
+
+        activeChordSymbol = '' # accumulate, then prepend
+        while True:    
+            if i > lastIndex:
+                break
+
+            q = self._getCharContext(strSrc, i)
+            charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace = q
+            
+            # comment lines, also encoding defs
+            if charThis == '%':
+                j = self._getNextLineBreak(strSrc, i)
+                environLocal.printDebug(['got comment:', repr(strSrc[i:j+1])])
+
+                i = j+1 # skip \n char
+                continue
+
+            # metadata: capatal alpha, with next char as:
+            # get metadata before others
+            # some meta data might have bar symbols, for example
+            if (charThis.isalpha() and charThis.isupper() 
+                and charNext != None and charNext == ':'):
+                # collect until end of line; add one to get line break
+                j = self._getNextLineBreak(strSrc, i) + 1
+                collect = strSrc[i:j].strip()
+
+                environLocal.printDebug(['got metadata:', repr(''.join(collect))])
+
+                i = j
+                continue
+            
+            # get bars: if not a space and not alpha newmeric
+            if (not charThis.isspace() and not charThis.isalnum()
+                and charThis not in ['~', '(']):
+                matchBars = False
+                for barIndex in range(len(ABC_BARS)):
+                    # first of bars tuple is symbol to match
+                    if charThis + charNext == ABC_BARS[barIndex][0]:
+                        j = i + 2
+                        matchBars = True 
+                        break
+                    # check for signle char bars
+                    elif charThis == ABC_BARS[barIndex][0]:
+                        j = i + 1
+                        matchBars = True 
+                        break
+                if matchBars:
+                    collect = strSrc[i:j]
+                    environLocal.printDebug(['got bars:', repr(collect)])    
+                    i = j
+                    continue
+                    
+            # get tuplet indicators: (2, (3
+            # TODO: extended tuplets look like this: (p:q:r or (3::
+            if (charThis == '(' and charNext != None and charNext.isdigit()):
+                j = i + 2 # always two characters
+                collect = strSrc[i:j]
+                environLocal.printDebug(['got tuplet start:', repr(collect)])
+                i = j
+                continue
+
+            # get bidirectionalRhythm modifiers: < or >, >>, up to <<<
+            if charThis in '<>':
+                j = i + 1
+                while (j < lastIndex and strSrc[j] in '<>'):
+                    j += 1
+                collect = strSrc[i:j]
+                environLocal.printDebug(['got bidrectional rhythm mod:', repr(collect)])
+                i = j
+                continue
+
+            # get chord symbols / guitar chords
+            if (charThis == '"'):
+                j = i + 1
+                while (j < lastIndex and strSrc[j] not in '"'):
+                    j += 1
+                j += 1 # need character that caused break
+                # there may be more than one chord symbol: need to accumulate
+                activeChordSymbol += strSrc[i:j]
+                #environLocal.printDebug(['got chord symbol:', repr(activeChordSymbol)])
+                i = j
+                continue
+
+            # get chords
+            if (charThis == '['):
+                j = i + 1
+                while (j < lastIndex and strSrc[j] not in ']'):
+                    j += 1
+                j += 1 # need character that caused break
+                # prepend chord symbol
+                if activeChordSymbol != '':
+                    collect = activeChordSymbol+strSrc[i:j]
+                    activeChordSymbol = '' # reset
+                else:
+                    collect = strSrc[i:j]
+
+                environLocal.printDebug(['got chord:', repr(collect)])
+                i = j
+                continue
+
+            # get the start of a note event: alpha, or 
+            # ~ tunr/ornament, accidentals ^, =, - as well as ^^
+            if (charThis.isalpha() or charThis in '~^=_.'):
+                # condition where we start with an alpha
+                foundAlpha = charThis.isalpha() and charThis not in ['u', 'v']
+                j = i + 1
+                while True:
+                    if j > lastIndex:
+                        break
+                    # ornaments may precede note names
+                    # accidentals (^=_) staccato (.), up/down bow (u, v)
+                    elif foundAlpha == False and strSrc[j] in '~=^_.uv':
+                        j += 1
+                        continue                    
+                    # only allow one alpha to be a continue condition
+                    elif (foundAlpha == False and strSrc[j].isalpha() 
+                        and strSrc[j] not in ['u', 'v']):
+                        foundAlpha = True
+                        j += 1
+                        continue                    
+                    # continue condition after alpha: 
+                    # , register modeifiaciton (, ') or number, rhythm
+                    elif strSrc[j].isdigit() or strSrc[j] in ',/\'':
+                        j += 1
+                        continue                    
+                    else: # space, all else: break
+                        break
+                # prepend chord symbol
+                if activeChordSymbol != '':
+                    collect = activeChordSymbol+strSrc[i:j]
+                    activeChordSymbol = '' # reset
+                else:
+                    collect = strSrc[i:j]
+                environLocal.printDebug(['got note event:', repr(collect)])
+                i = j
+                continue
+            # no action: normal continuation of 1 char
+            i += 1
 
     
 
@@ -308,7 +518,7 @@ class ABCFile(object):
     
     def readstr(self, str): 
         handler = ABCHandler()
-        handler.walk(str)
+        handler.tokenize(str)
     
 #     def write(self): 
 #         ws = self.writestr()
@@ -335,9 +545,17 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21.abc import testFiles
 
-        tf = testFiles.mysteryReel
-        af = ABCFile()
-        af.readstr(tf)
+        for tf in [testFiles.fyrareprisarn, 
+                   testFiles.mysteryReel, 
+                   testFiles.aleIsDear,
+                    testFiles.testPrimitive,
+                    testFiles.kitchGirl,
+                    testFiles.williamAndNancy,
+
+                ]:
+            af = ABCFile()
+            print
+            af.readstr(tf)
 
 
 if __name__ == "__main__":

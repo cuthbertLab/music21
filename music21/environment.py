@@ -204,7 +204,7 @@ class Environment(object):
 
     def __setitem__(self, key, value):
         '''Dictionary-like setting. Changes are made only to local dictionary.
-        Music call  write() to make permanent
+        Must call write() to make permanent
 
         >>> from music21 import *
         >>> a = music21.environment.Environment()
