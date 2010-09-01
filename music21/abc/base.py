@@ -47,8 +47,6 @@ reMetadataTag = re.compile('[A-Z]:')
 
 rePitchName = re.compile('[a-gA-Gz]')
 
-rePreComment = re.compile('.*%+') # zero or more %
-
 reChordSymbol = re.compile('"[^"]*"') # non greedy
 
 reChord = re.compile('[.*?]') # non greedy
@@ -68,7 +66,6 @@ class ABCObject(object):
 
     def stripComment(self, strSrc):
         '''
-        
         removes ABC-style comments from a string:
         
         >>> ao = ABCObject()
@@ -79,20 +76,22 @@ class ABCObject(object):
         >>> ao.stripComment('asdf  %     234')
         'asdf  '
         
-        
-        DOES NOT WORK YET:
-        
-        ]]] ao.stripComment('[ceg]% this chord appears 50% more often than other chords do')
+        >>> ao.stripComment('[ceg]% this chord appears 50% more often than other chords do')
         '[ceg]'
         '''
         if '%' in strSrc:
-            post = rePreComment.match(strSrc).group()
-            return post[:-1] # leave out delimiter
+            return strSrc.split('%')[0] #
         return strSrc
-        
+    
+    def preParse(self):
+        '''Called before context adjustments. 
+        '''
+        pass
 
     def parse(self): 
-        '''Read self.src and load attributes. Customize in subclasses.'''
+        '''Read self.src and load attributes. Customize in subclasses.
+        Called after context adjustments
+        '''
         pass
 
 
@@ -105,11 +104,105 @@ class ABCMetadata(ABCObject):
         self.tag = None
         self.data = None
 
-    def parse(self):
+    def preParse(self):
+        '''Called before context adjustments: need to have access to data
+        '''
         div = reMetadataTag.match(self.src).end()
         strSrc = self.stripComment(self.src) # remove any comments
         self.tag = strSrc[:div-1] # do not get colon, :
         self.data = strSrc[div:].strip() # remove leading/trailing
+
+    def parse(self):
+        pass
+
+    def isDefaultNoteLength(self):
+        if self.tag == 'L': 
+            return True
+        return False
+
+    def isMeter(self):
+        if self.tag == 'M': 
+            return True
+        return False
+
+    def getTimeSignature(self):
+        '''If there is a time signature representation available, get a numerator and denominator
+
+        >>> am = ABCMetadata('M:2/2')
+        >>> am.preParse()
+        >>> am.getTimeSignature()
+        (2, 2, 'normal')
+
+        >>> am = ABCMetadata('M:C|')
+        >>> am.preParse()
+        >>> am.getTimeSignature()
+        (2, 2, 'cut')
+        '''
+        if self.isMeter():
+            if self.data == 'C':
+                n, d = 4, 4
+                symbol = 'ccommon' # m21 compat
+            elif self.data == 'C|':
+                n, d = 2, 2
+                symbol = 'cut' # m21 compat
+            else:
+                n, d = self.data.split('/')
+                n = int(n.strip())
+                d = int(d.strip())
+                symbol = 'normal' # m21 compat
+        else:       
+            raise ABCObjectException('no time signature associated with this meta-data')
+
+        return n, d, symbol
+
+    def getDefaultQuarterLength(self):
+        '''If there is a quarter length representation available, return it as a floating point value
+
+        >>> am = ABCMetadata('L:1/2')
+        >>> am.preParse()
+        >>> am.getDefaultQuarterLength()
+        2.0
+
+        >>> am = ABCMetadata('L:1/8')
+        >>> am.preParse()
+        >>> am.getDefaultQuarterLength()
+        0.5
+
+        >>> am = ABCMetadata('M:C|')
+        >>> am.preParse()
+        >>> am.getDefaultQuarterLength()
+        0.5
+
+        >>> am = ABCMetadata('M:2/4')
+        >>> am.preParse()
+        >>> am.getDefaultQuarterLength()
+        0.25
+
+        >>> am = ABCMetadata('M:6/8')
+        >>> am.preParse()
+        >>> am.getDefaultQuarterLength()
+        0.5
+
+        '''
+        if self.isDefaultNoteLength():
+            # should be in L:1/4 form
+            n, d = self.data.split('/')
+            n = int(n.strip())
+            d = int(d.strip())
+            # 1/4 is 1, 1/8 is .5
+            return (float(n) / d) * 4
+            
+        elif self.isMeter():
+            # meter auto-set a default not length
+            n, d, symbol = self.getTimeSignature()
+            if float(n) / d < .75:
+                return .25 # less than 0.75 the default is a sixteenth note
+            else:
+                return .5 # otherwiseit is an eighth note
+
+        else:       
+            raise ABCObjectException('no quarter length associated with this meta-data')
+
 
 
 class ABCBar(ABCObject):
@@ -132,6 +225,19 @@ class ABCBrokenRhythmMarker(ABCObject):
     # may be a chord, notes, metadata, bars
     def __init__(self, src):
         ABCObject.__init__(self, src)
+        self.data = None
+
+    def preParse(self):
+        '''Called before context adjustments: need to have access to data
+
+        >>> abrm = ABCBrokenRhythmMarker('>>>')
+        >>> abrm.preParse()
+        >>> abrm.data
+        '>>>'
+        '''
+        self.data = self.src.strip()
+
+
 
 class ABCNote(ABCObject):
 
@@ -152,13 +258,11 @@ class ABCNote(ABCObject):
         
         # provide default duration from handler; may change during piece
         self.activeDefaultQuarterLength = None
-        # store if a broken symbol applies 
-        self.brokenSymbol = None
-        # store where the broken symbol was found
-        self.brokenSymbolPosition = None 
+        # store if a broken symbol applies; pair of symbol, position (left, right)
+        self.brokenRhythmMarker = None
 
         # pitch/ duration attributes for m21 conversion
-        self.pitchName = None # if None, as rest
+        self.pitchName = None # if None, a rest or chord
         self.quarterLength = None
 
     
@@ -240,13 +344,100 @@ class ABCNote(ABCObject):
         return '%s%s%s' % (name.upper(), accString, octave)
 
 
+    def _getQuarterLength(self, strSrc):
+        '''Called with parse(), after context processing, to calculate duration
+
+        >>> an = ABCNote()
+        >>> an.activeDefaultQuarterLength = .5
+        >>> an._getQuarterLength('e2')
+        1.0
+        >>> an._getQuarterLength('G')
+        0.5
+        >>> an._getQuarterLength('=c/2')
+        0.25
+        >>> an._getQuarterLength('A3/2')
+        0.75
+        >>> an._getQuarterLength('A/')
+        0.25
+
+        >>> an = ABCNote()
+        >>> an.activeDefaultQuarterLength = .5
+        >>> an.brokenRhythmMarker = ('>', 'left')
+        >>> an._getQuarterLength('A')
+        0.75
+        >>> an.brokenRhythmMarker = ('>', 'right')
+        >>> an._getQuarterLength('A')
+        0.25
+
+        >>> an.brokenRhythmMarker = ('<<<', 'left')
+        >>> an._getQuarterLength('A')
+        0.0625
+        >>> an.brokenRhythmMarker = ('<<<', 'right')
+        >>> an._getQuarterLength('A')
+        0.9375
+
+        '''
+        if self.activeDefaultQuarterLength == None:
+            raise ABCObjectException('cannot calculate quarter length without a default quarter length')
+
+        numStr = []
+        for c in strSrc:
+            if c.isdigit() or c in '/':
+                numStr.append(c)
+        numStr = ''.join(numStr)
+
+        # get default
+        if numStr == '':
+            ql = self.activeDefaultQuarterLength
+        # if only, shorthand for /2
+        elif numStr == '/':
+            ql = self.activeDefaultQuarterLength * .5
+        # if a half fraction
+        elif numStr.startswith('/'):
+            ql = self.activeDefaultQuarterLength / int(numStr.split('/')[1])
+        # assume we have a complete fraction
+        elif '/' in numStr:
+            n, d = numStr.split('/')
+            n = int(n.strip())
+            d = int(d.strip())
+            ql = self.activeDefaultQuarterLength * (float(n) / d)
+        # not a fraction; a multiplier
+        else: 
+            ql = self.activeDefaultQuarterLength * int(numStr)
+
+
+        if self.brokenRhythmMarker != None:
+            symbol, direction = self.brokenRhythmMarker
+            if symbol == '>':
+                modPair = (1.5, .5)
+            elif symbol == '<':
+                modPair = (.5, 1.5)
+            elif symbol == '>>':
+                modPair = (1.75, .25)
+            elif symbol == '<<':
+                modPair = (.25, 1.75)
+            elif symbol == '>>>':
+                modPair = (1.875, .125)
+            elif symbol == '<<<':
+                modPair = (.125, 1.875)
+            # apply based on direction
+            if direction == 'left':
+                ql *= modPair[0]
+            elif direction == 'right':
+                ql *= modPair[1]
+            
+        # need to look at tuplets lastly
+        return ql
+
+
     def parse(self):
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)        
         # get pitch name form remaining string
         # rests will have a pitch name of None
         self.pitchName = self._getPitchName(nonChordSymStr)
+        self.quarterLength = self._getQuarterLength(nonChordSymStr)
 
-        #environLocal.printDebug(['ABCNote:', 'pitch name:', self.pitchName])
+        # environLocal.printDebug(['ABCNote:', 'pitch name:', self.pitchName, 'ql:', self.quarterLength])
 
 
 class ABCChord(ABCNote):
@@ -256,7 +447,7 @@ class ABCChord(ABCNote):
 
     def __init__(self, src):
         ABCNote.__init__(self, src)
-        # store a lost of component objects
+        # store a list of component objects
         self.noteObjects = []
 
     def parse(self):
@@ -277,20 +468,29 @@ class ABCHandler(object):
         # tokens are ABC objects in a linear stream
         self._tokens = []
 
-    def _getCharContext(self, strSrc, i):
-        '''Find the local context of a string. Returns charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace.
+    def _getLinearContext(self, strSrc, i):
+        '''Find the local context of a string or list of ojbects. Returns charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace.
 
 
         >>> ah = ABCHandler()
-        >>> ah._getCharContext('12345', 0)
+        >>> ah._getLinearContext('12345', 0)
         (None, None, '1', '2', '2')
-        >>> ah._getCharContext('12345', 1)
+        >>> ah._getLinearContext('12345', 1)
         ('1', '1', '2', '3', '3')
-        >>> ah._getCharContext('12345', 3)
+        >>> ah._getLinearContext('12345', 3)
         ('3', '3', '4', '5', '5')
-        >>> ah._getCharContext('12345', 4)
+        >>> ah._getLinearContext('12345', 4)
         ('4', '4', '5', None, None)
-        '''
+
+        >>> ah._getLinearContext([32, None, 8, 11, 53], 4)
+        (11, 11, 53, None, None)
+        >>> ah._getLinearContext([32, None, 8, 11, 53], 2)
+        (32, None, 8, 11, 11)
+        >>> ah._getLinearContext([32, None, 8, 11, 53], 0)
+        (None, None, 32, None, 8)
+
+
+        '''            
         lastIndex = len(strSrc) - 1
         if i > lastIndex:
             raise ABCHandlerException
@@ -303,9 +503,17 @@ class ABCHandler(object):
         # -1 goes to index 0
         charPrevNotSpace = None
         for j in range(i-1, -1, -1):
-            if not strSrc[j].isspace():
-                charPrevNotSpace = strSrc[j]
-                break
+            # condition to break: find a something that is not None, or 
+            # a string that is not a space
+            if isinstance(strSrc[j], str):
+                if not strSrc[j].isspace():
+                    charPrevNotSpace = strSrc[j]
+                    break
+            else:
+                if strSrc[j] != None:
+                    charPrevNotSpace = strSrc[j]
+                    break
+
         charThis = strSrc[i]
         if i < len(strSrc)-1:
             charNext = strSrc[i+1]
@@ -314,9 +522,14 @@ class ABCHandler(object):
         charNextNotSpace = None
         # start at next index and look forward
         for j in range(i+1, len(strSrc)):
-            if not strSrc[j].isspace():
-                charNextNotSpace = strSrc[j]
-                break
+            if isinstance(strSrc[j], str):
+                if not strSrc[j].isspace():
+                    charNextNotSpace = strSrc[j]
+                    break
+            else:
+                if strSrc[j] != None:
+                    charNextNotSpace = strSrc[j]
+                    break
 
 #             environLocal.printDebug(['charPrevNotSpace', repr(charPrevNotSpace), 
 #                           'charPrevious', repr(charPrev), 
@@ -361,7 +574,7 @@ class ABCHandler(object):
             if i > lastIndex:
                 break
 
-            q = self._getCharContext(strSrc, i)
+            q = self._getLinearContext(strSrc, i)
             charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace = q
             
             # comment lines, also encoding defs
@@ -371,7 +584,7 @@ class ABCHandler(object):
                 i = j+1 # skip \n char
                 continue
 
-            # metadata: capatal alpha, with next char as:
+            # metadata: capatal alpha, with next char as ':'
             # get metadata before others
             # some meta data might have bar symbols, for example
             if (charThis.isalpha() and charThis.isupper() 
@@ -384,7 +597,7 @@ class ABCHandler(object):
                 i = j
                 continue
             
-            # get bars: if not a space and not alpha newmeric
+            # get bars: if not a space and not alphanemeric
             if (not charThis.isspace() and not charThis.isalnum()
                 and charThis not in ['~', '(']):
                 matchBars = False
@@ -504,8 +717,47 @@ class ABCHandler(object):
 
     
     def tokenProcess(self):
-        for o in self._tokens:
-            o.parse()
+        '''Process all token objects.
+        '''
+        # pre-parse : call on objects that need preliminary processing
+        # metadata, for example, is parsed
+        for t in self._tokens:
+            t.preParse()
+
+        # context: iterate through tokens, supplying contextual data as necessary to appropriate objects
+        lastDefaultQL = None
+        for i in range(len(self._tokens)):
+            # get context of tokens
+            q = self._getLinearContext(self._tokens, i)
+            tPrevNotSpace, tPrev, t, tNext, tNextNotSpace = q
+            
+            if isinstance(t, ABCMetadata):
+                if t.isMeter() or t.isDefaultNoteLength():
+                    lastDefaultQL = t.getDefaultQuarterLength()
+                continue
+
+            # broken rhythms need to be applied to previous and next notes
+            if isinstance(t, ABCBrokenRhythmMarker):
+                if (isinstance(tPrev, ABCNote) and 
+                isinstance(tNext, ABCNote)):
+                    #environLocal.printDebug(['tokenProcess: got broken rhythm marker', t.src])       
+                    tPrev.brokenRhythmMarker = (t.data, 'left')
+                    tNext.brokenRhythmMarker = (t.data, 'right')
+                else:
+                    raise ABCHandlerException('broken rhythm marker (%s) not positioned between two notes or chords' % t.src)
+
+            # ABCChord inherits ABCNote, thus getting note is enough
+            if isinstance(t, ABCNote):
+                if lastDefaultQL == None:
+                    raise ABCHandlerException('no active defailt not length provided for note processing. %s' % t.src)
+                t.activeDefaultQuarterLength = lastDefaultQL
+                continue
+
+
+
+        # parse : call methods to set attributes and parse string
+        for t in self._tokens:
+            t.parse()
             #print o.src
 
 
@@ -574,7 +826,7 @@ class Test(unittest.TestCase):
             (testFiles.fyrareprisarn, 236, 152, 0), 
             (testFiles.mysteryReel, 188, 153, 0), 
             (testFiles.aleIsDear, 291, 206, 32),
-            (testFiles.testPrimitive, 93, 75, 2),
+            (testFiles.testPrimitive, 94, 75, 2),
             (testFiles.kitchGirl, 125, 101, 2),
             (testFiles.williamAndNancy, 127, 93, 0),
                 ]:
@@ -607,8 +859,6 @@ class Test(unittest.TestCase):
         post = reMetadataTag.match(src).end()
         self.assertEqual(src[:post], 'Q:')
 
-        post = rePreComment.match(src).group()
-        self.assertEqual(post, 'Q: this is a test %')
 
         # chord symbol matches
         src = 'd|"G"e2d B2d|"C"gfe "D7"d2d|"G"e2d B2d|"A7""C"gfe "D7""D"d2c|'
@@ -636,7 +886,6 @@ class Test(unittest.TestCase):
             (testFiles.fyrareprisarn, 'Fyrareprisarn', '3/4', 'F'), 
             (testFiles.mysteryReel, 'Mystery Reel', 'C|', 'G'), 
             (testFiles.aleIsDear, 'Ale is Dear, the', '4/4', 'D', ),
-            (testFiles.testPrimitive, None, '9/8', 'G'),
             (testFiles.kitchGirl, 'Kitchen Girl', '4/4', 'D'),
             (testFiles.williamAndNancy, 'William and Nancy', '6/8', 'G'),
             ]:
@@ -660,13 +909,13 @@ class Test(unittest.TestCase):
     def testTokenProcess(self):
         from music21.abc import testFiles
 
-        for (tf, countTokens, noteTokens, chrodTokens) in [
-            (testFiles.fyrareprisarn, 236, 152, 0), 
-            (testFiles.mysteryReel, 188, 153, 0), 
-            (testFiles.aleIsDear, 291, 206, 32),
-            (testFiles.testPrimitive, 93, 75, 2),
-            (testFiles.kitchGirl, 125, 101, 2),
-            (testFiles.williamAndNancy, 127, 93, 0),
+        for tf in [
+            testFiles.fyrareprisarn,
+            testFiles.mysteryReel,
+            testFiles.aleIsDear, 
+            testFiles.testPrimitive,
+            testFiles.kitchGirl,
+            testFiles.williamAndNancy,
             ]:
 
             handler = ABCHandler()
