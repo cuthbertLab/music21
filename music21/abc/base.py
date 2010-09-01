@@ -316,6 +316,9 @@ class ABCNote(ABCObject):
         True
 
         '''
+        # TODO: pitches are key dependent: accidentals are not given
+        # if specified in key: must store key and adjust here
+
         name = rePitchName.findall(strSrc)[0]
         if name == 'z':
             return None # designates a rest
@@ -425,7 +428,7 @@ class ABCNote(ABCObject):
                 ql *= modPair[0]
             elif direction == 'right':
                 ql *= modPair[1]
-            
+
         # need to look at tuplets lastly
         return ql
 
@@ -788,11 +791,11 @@ class ABCFile(object):
         self.file.close() 
     
     def read(self): 
-        self.readstr(self.file.read()) 
+        return self.readstr(self.file.read()) 
     
     def readstr(self, str): 
         handler = ABCHandler()
-        return process(str)
+        return handler.process(str)
     
 #     def write(self): 
 #         ws = self.writestr()

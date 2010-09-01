@@ -950,6 +950,8 @@ def mxToRest(mxNote, inputM21=None):
         environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, r])
         raise
 
+
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     

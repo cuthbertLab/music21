@@ -55,9 +55,8 @@ except ImportError:
     _missingImport.append('numpy')
 
 if len(_missingImport) > 0:
-    environLocal.warn(common.IMPORT_OPTIONAL % ', '.join(_missingImport),
+    environLocal.warn(common.getMissingImportStr(_missingImport),
     header='music21:')
-
 
 
 #-------------------------------------------------------------------------------

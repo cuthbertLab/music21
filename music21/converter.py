@@ -32,6 +32,7 @@ except ImportError:
 
 
 import music21
+
 from music21 import chord
 from music21 import clef
 from music21 import common
@@ -47,6 +48,8 @@ from music21 import expressions
 from music21 import stream
 from music21 import tinyNotation
 
+from music21.abc import base as abcModule
+from music21.abc import translate as abcTranslate
 
 from music21 import environment
 _MOD = 'converter.py'
@@ -481,6 +484,41 @@ class ConverterMidi(object):
 
 
 
+#-------------------------------------------------------------------------------
+class ConverterABC(object):
+    '''Simple class wrapper for parsing ABC.
+    '''
+
+    def __init__(self):
+        # always create a score instance
+        self._stream = stream.Score()
+
+    def parseData(self, strData):
+        '''Get ABC data, as token list, from a string representation.
+        '''
+        af = abcModule.ABCFile()
+        # do not need to call open or close on MidiFile instance
+        abcTokenList = af.readstr(strData)
+        # set to stream
+        abcTranslate.abcToStream(abcTokenList, self._stream)
+
+    def parseFile(self, fp):
+        '''Get MIDI data from a file path.'''
+
+        af = abcModule.ABCFile()
+        af.open(fp)
+        abcTokenList = af.read()
+        af.close()
+        abcTranslate.abcToStream(abcTokenList, self._stream)
+
+    def _getStream(self):
+        return self._stream
+
+    stream = property(_getStream)
+
+
+
+
 
 
 
@@ -505,6 +543,8 @@ class Converter(object):
             self._converter = ConverterHumdrum()
         elif format == 'tinyNotation':
             self._converter = ConverterTinyNotation()
+        elif format == 'abc':
+            self._converter = ConverterABC()
         else:
             raise ConverterException('no such format: %s' % format)
 

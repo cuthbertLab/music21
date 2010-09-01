@@ -28,6 +28,7 @@ import inspect
 # define file extensions for various formats
 # keys are assumed to be formats
 fileExtensions = {
+    'abc' : {'input': ['abc'], 'output': 'abc'},
     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
@@ -72,8 +73,20 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 #-------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
 
-IMPORT_OPTIONAL = 'Missing optional packages %s; see http://web.mit.edu/music21/doc/extras.html'
+def getMissingImportStr(modNameList):
+    '''
+    >>> getMissingImportStr(['PIL'])
+    'Missing optional package PIL; see http://web.mit.edu/music21/doc/extras.html'
+    >>> getMissingImportStr(['PIL', 'numpy'])
+    'Missing optional packages PIL, numpy; see http://web.mit.edu/music21/doc/extras.html'
 
+    '''
+    if len(modNameList) == 0:
+        return None
+    elif len(modNameList) == 1:
+        return 'Missing optional package %s; see http://web.mit.edu/music21/doc/extras.html' % modNameList[0]
+    else:
+        return 'Missing optional packages %s; see http://web.mit.edu/music21/doc/extras.html' % ', '.join(modNameList)
 
 #-------------------------------------------------------------------------------
 def findFormat(fmt):
@@ -102,6 +115,8 @@ def findFormat(fmt):
     ('textline', '.txt')
     >>> findFormat('midi')
     ('midi', '.mid')
+    >>> findFormat('abc')
+    ('abc', '.abc')
     '''
     for key in fileExtensions.keys():
         if fmt.startswith('.'):
