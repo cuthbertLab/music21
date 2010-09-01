@@ -792,7 +792,7 @@ class ABCFile(object):
     
     def readstr(self, str): 
         handler = ABCHandler()
-        return.process(str)
+        return process(str)
     
 #     def write(self): 
 #         ws = self.writestr()
