@@ -1241,7 +1241,7 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # getElementsByX(self): anything that returns a collection of Elements should return a Stream
 
-    def getElementsByClass(self, classFilterList):
+    def getElementsByClass(self, classFilterList, returnStreamSubClass=True):
         '''Return a list of all Elements that match one or more classes in the `classFilterList`. A single class can be provided to the `classFilterList` parameter.
         
         >>> from music21 import *
@@ -1270,7 +1270,10 @@ class Stream(music21.Music21Object):
         >>> found.__class__.__name__
         'Score'
         '''
-        found = self.__class__()
+        if returnStreamSubClass:
+            found = self.__class__()
+        else:
+            found = Stream()
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, (list, tuple)):

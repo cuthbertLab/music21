@@ -24,6 +24,12 @@ import music21.note
 from music21 import stream
 from music21 import pitch
 
+from music21 import environment
+_MOD = 'serial.py'
+environLocal = environment.Environment(_MOD)
+
+
+
 #-------------------------------------------------------------------------------
 class SerialException(Exception):
     pass
@@ -75,6 +81,8 @@ class TwelveToneRow(ToneRow):
 
     def __init__(self):
         ToneRow.__init__(self)
+        environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
+
         if self.row != None:
             for pc in self.row:
                 self.append(pitch.Pitch(pc))
@@ -83,7 +91,15 @@ class TwelveToneRow(ToneRow):
         '''
         Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.  That object can just be printed (or displayed via .show())
         
+        >>> src = RowSchoenbergOp37()
+        >>> [p.name for p in src]
+        ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B']
+        >>> len(src)
+        12
         >>> s37 = RowSchoenbergOp37().matrix()
+        >>> [e for e in s37[0]]
+        [C, B, G, G#, E-, C#, D, B-, F#, F, E, A]
+
         >>> print s37
           0  B  7  8  3  1  2  A  6  5  4  9
           1  0  8  9  4  2  3  B  7  6  5  A
@@ -91,9 +107,10 @@ class TwelveToneRow(ToneRow):
           4  3  B  0  7  5  6  2  A  9  8  1
         ...
         '''        
-        
-        # TODO: FIX!
-        p = self.getElementsByClass(pitch.Pitch)
+        # note: do not want to return a TwelveToneRow() type, as this will
+        # add again the same pitches to the elements list twice. 
+        p = self.getElementsByClass(pitch.Pitch, returnStreamSubClass=False)
+
         i = [(12-x.pitchClass) % 12 for x in p]
         matrix = [[(x.pitchClass+t) % 12 for x in p] for t in i]
 
@@ -104,12 +121,15 @@ class TwelveToneRow(ToneRow):
             rowObject = copy.copy(self)
             rowObject.elements = []
             rowObject.id = 'row-' + str(i)
-            for thisPitch in row:
+            for p in row: # iterate over pitch class values
                 pObj = pitch.Pitch()
-                pObj.pitchClass = thisPitch
+                pObj.pitchClass = p
                 rowObject.append(pObj)
             matrixObj.insert(0, rowObject)
         
+
+        environLocal.printDebug(['calling matrix start: len row:', self.row, 'len self', len(self)])
+
         return matrixObj
         
 
@@ -575,10 +595,27 @@ class Test(unittest.TestCase):
 #                                    thisRow[6]).intervalClass == 6:
 #              # between element 1 and element 7 is there a TriTone?
 #              rowsWithTTRelations += 1
+
+
+    def testMatrix(self):
+
+        src = RowSchoenbergOp37()
+        self.assertEqual([p.name for p in src], 
+            ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B'])
+        s37 = RowSchoenbergOp37().matrix()
+        self.assertEqual([e.name for e in s37[0]], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 'F#', 'F', 'E', 'A'])
+
         
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [ToneRow, TwelveToneRow, TwelveToneMatrix]
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    import sys
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+
+    elif len(sys.argv) > 1:
+        t = Test()
+
+        t.testMatrix()
