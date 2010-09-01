@@ -530,13 +530,6 @@ class ABCHandler(object):
                 if strSrc[j] != None:
                     charNextNotSpace = strSrc[j]
                     break
-
-#             environLocal.printDebug(['charPrevNotSpace', repr(charPrevNotSpace), 
-#                           'charPrevious', repr(charPrev), 
-#                           'charThis', repr(charThis), 
-#                           'charNext', repr(charNext), 
-#                           'charNextNotSpace', repr(charNextNotSpace)]) 
-
         return charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace
 
 
@@ -753,13 +746,17 @@ class ABCHandler(object):
                 t.activeDefaultQuarterLength = lastDefaultQL
                 continue
 
-
-
         # parse : call methods to set attributes and parse string
         for t in self._tokens:
             t.parse()
             #print o.src
 
+    def process(self, strSrc):
+        self._tokens = []
+        self.tokenize(strSrc)
+        self.tokenProcess()
+        # return list of tokens
+        return self._tokens
 
 #-------------------------------------------------------------------------------
 class ABCFile(object):
@@ -795,7 +792,7 @@ class ABCFile(object):
     
     def readstr(self, str): 
         handler = ABCHandler()
-        handler.tokenize(str)
+        return.process(str)
     
 #     def write(self): 
 #         ws = self.writestr()
