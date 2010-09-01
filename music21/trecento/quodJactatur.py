@@ -303,6 +303,8 @@ def multipleSolve():
                             if writeLine == (-5, 0, False, False, 4, 10, False, False, 1, 5, False, False, -1.7722772277227723):
                                 pass
 
-multipleSolve()
-#bentWolfSolution()
-#cuthZazSolution()
+if __name__ == "__main__":
+    pass
+    #multipleSolve()
+    #bentWolfSolution()
+    #cuthZazSolution()

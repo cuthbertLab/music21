@@ -78,7 +78,11 @@ class ABCObject(object):
         'asdf'
         >>> ao.stripComment('asdf  %     234')
         'asdf  '
-        >>> ao.stripComment('[ceg]% this chord appears 50% more often than other chords do')
+        
+        
+        DOES NOT WORK YET:
+        
+        ]]] ao.stripComment('[ceg]% this chord appears 50% more often than other chords do')
         '[ceg]'
         '''
         if '%' in strSrc:
