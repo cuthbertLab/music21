@@ -151,7 +151,7 @@ class ABCNote(ABCObject):
         self.chordSymbols = [] 
         
         # provide default duration from handler; may change during piece
-        self.durationDefault = None
+        self.activeDefaultQuarterLength = None
         # store if a broken symbol applies 
         self.brokenSymbol = None
         # store where the broken symbol was found

@@ -31,6 +31,7 @@ from music21 import environment
 _MOD = 'graph.py'
 environLocal = environment.Environment(_MOD)
 
+_missingImport = []
 try:
     import matplotlib
     # backend can be configured from config file, matplotlibrc,
@@ -45,13 +46,18 @@ try:
     import matplotlib.pyplot as plt
 
 except ImportError:
-    environLocal.warn(common.IMPORT_MSG_MATPLOTLIB)
+    _missingImport.append('matplotlib')
 
 
 try:
     import numpy
 except ImportError:
-    environLocal.warn(common.IMPORT_MSG_NUMPY)
+    _missingImport.append('numpy')
+
+if len(_missingImport) > 0:
+    environLocal.warn(common.IMPORT_OPTIONAL % ', '.join(_missingImport),
+    header='music21:')
+
 
 
 #-------------------------------------------------------------------------------

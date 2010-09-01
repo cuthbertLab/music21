@@ -57,22 +57,25 @@ else:
 
 
 # check external dependencies and display 
-
+_missingImport = []
 try:
     import matplotlib
 except ImportError:
-    environLocal.warn(common.IMPORT_MSG_MATPLOTLIB)
+    _missingImport.append('matplotlib')
 
 try:
     import numpy
 except ImportError:
-    environLocal.warn(common.IMPORT_MSG_NUMPY)
+    _missingImport.append('numpy')
 
 try:
     import PIL
 except ImportError:
-    environLocal.warn(common.IMPORT_MSG_PIL)
+    _missingImport.append('PIL')
 
+if len(_missingImport) > 0:
+    environLocal.warn(common.IMPORT_OPTIONAL % ', '.join(_missingImport),
+    header='music21:')
 
 
 #-------------------------------------------------------------------------------

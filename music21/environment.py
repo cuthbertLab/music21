@@ -473,14 +473,17 @@ class Environment(object):
             sys.stderr.write(msg)
     
 
-    def warn(self, msg):
+    def warn(self, msg, header=None):
         '''To print a warning to the user, send a list of strings to this
         method. 
         '''
         if common.isStr(msg):
             msg = [msg] # make into a list
-        if msg[0] != self.modNameParent and self.modNameParent != None:
-            msg = [self.modNameParent + ': WARNING:'] + msg
+        if header == None:
+            if msg[0] != self.modNameParent and self.modNameParent != None:
+                msg = [self.modNameParent + ': WARNING:'] + msg
+        else:
+            msg = [header] + msg
         msg = common.formatStr(*msg)
         sys.stderr.write(msg)
     
