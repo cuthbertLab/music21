@@ -498,18 +498,18 @@ class ConverterABC(object):
         '''
         af = abcModule.ABCFile()
         # do not need to call open or close on MidiFile instance
-        abcTokenList = af.readstr(strData)
+        abcHandler = af.readstr(strData)
         # set to stream
-        abcTranslate.abcToStream(abcTokenList, self._stream)
+        abcTranslate.abcToStream(abcHandler, self._stream)
 
     def parseFile(self, fp):
         '''Get MIDI data from a file path.'''
 
         af = abcModule.ABCFile()
         af.open(fp)
-        abcTokenList = af.read()
+        abcHandler = af.read() # returns a handler instance
         af.close()
-        abcTranslate.abcToStream(abcTokenList, self._stream)
+        abcTranslate.abcToStream(abcHandler, self._stream)
 
     def _getStream(self):
         return self._stream

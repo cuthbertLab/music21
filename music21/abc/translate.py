@@ -20,54 +20,82 @@ environLocal = environment.Environment(_MOD)
 
 
 
-def abcToStream(abcTokenList, inputM21=None):
-    '''Given an mxScore, build into this stream
+def abcToStream(abcHandler, inputM21=None):
+    '''Given an abcHandler object, build into a multi part Stream with metadata
     '''
 
     from music21 import metadata
     from music21 import stream
     from music21 import note
     from music21 import meter
+    from music21 import chord
 
     if inputM21 == None:
         s = stream.Score()
     else:
         s = inputM21
 
+    # meta data can be first
     md = metadata.Metadata()
     s.insert(0, md)
 
-    p = stream.Part()
+    processTokens = []
+    tokenCollections = abcHandler.splitByVoice()
+    if len(tokenCollections) == 1:
+        processTokens.append(tokenCollections[0])
+    else:
+        # add meta data to each Part
+        for i in range(1, len(tokenCollections)):
+            processTokens.append(tokenCollections[0] + tokenCollections[i])
 
-    #ql = 0 # might not be zero if there is a pickup
-    for t in abcTokenList:
-        if isinstance(t, abcModule.ABCMetadata):
-            if t.isTitle():
-                environLocal.printDebug(['got title', t.data])
-                md.title = t.data
-            if t.isComposer():
-                md.composer = t.data
-            if t.isMeter():
-                n, d, symbol = t.getTimeSignature()
-                ts = meter.TimeSignature('%s/%s' % (n,d))
-                # should append at the right place
-                p.append(ts)
+    for abcTokenList in processTokens:
+        p = stream.Part()
+    
+        #ql = 0 # might not be zero if there is a pickup
+        for t in abcTokenList:
+            if isinstance(t, abcModule.ABCMetadata):
+                if t.isTitle():
+                    environLocal.printDebug(['got title', t.data])
+                    md.title = t.data
+                elif t.isComposer():
+                    md.composer = t.data
+                elif t.isMeter():
+                    n, d, symbol = t.getTimeSignature()
+                    ts = meter.TimeSignature('%s/%s' % (n,d))
+                    # should append at the right position
+                    p.append(ts)
 
-        # as ABCChord is subclass of ABCNote, handle first
-        elif isinstance(t, abcModule.ABCChord):
-            pass
-            #ql += t.quarterLength
+                elif t.isMeter():
+                    n, d, symbol = t.getTimeSignature()
+                    ts = meter.TimeSignature('%s/%s' % (n,d))
+                    # should append at the right position
+                    p.append(ts)
+    
+            # as ABCChord is subclass of ABCNote, handle first
+            elif isinstance(t, abcModule.ABCChord):
+                # may have more than notes?
+                pitchNameList = []
+                for tSub in t.subTokens:
+                    # notes are contained as subtokens are already parsed
+                    if isinstance(tSub, abcModule.ABCNote):
+                        pitchNameList.append(tSub.pitchName)
+                c = chord.Chord(pitchNameList)
+                c.quarterLength = t.quarterLength
+                p.append(c)
 
-        elif isinstance(t, abcModule.ABCNote):
-            n = note.Note(t.pitchName)
-            n.quarterLength = t.quarterLength
-            p.append(n)
-
-            #ql += t.quarterLength
-
-    # add metadata
-    s.insert(0, md)
-    s.insert(0, p)
+                #ql += t.quarterLength
+    
+            elif isinstance(t, abcModule.ABCNote):
+                if t.isRest:
+                    n = note.Rest()
+                else:
+                    n = note.Note(t.pitchName)
+                n.quarterLength = t.quarterLength
+                p.append(n)
+    
+                #ql += t.quarterLength
+    
+        s.insert(0, p)
 
     return s
 
@@ -92,14 +120,16 @@ class Test(unittest.TestCase):
 #             testFiles.testPrimitive,
 #            testFiles.fullRiggedShip,
 #            testFiles.kitchGirl,
-            testFiles.morrisonsJig,
+            #testFiles.morrisonsJig,
+#            testFiles.hectorTheHero,
+            testFiles.aleIsDear,
 #             testFiles.williamAndNancy,
             ]:
             af = abc.ABCFile()
-            abcTokenList = af.readstr(tf)
-
-            s = abcToStream(abcTokenList)
-            s.show('midi')
+            ah = af.readstr(tf) # return handler
+            s = abcToStream(ah)
+            #s.show()
+            #s.show('midi')
 
 
 
@@ -117,10 +147,62 @@ class Test(unittest.TestCase):
             ]:
 
             af = abc.ABCFile()
-            abcTokenList = af.readstr(tf)
-            s = abcToStream(abcTokenList)
+            ah = af.readstr(tf) # returns an ABCHandler object
+            s = abcToStream(ah)
 
             self.assertEqual(s.metadata.title, titleEncoded)
+
+
+    def testChords(self):
+
+        from music21 import abc
+        from music21.abc import testFiles
+
+
+        tf = testFiles.aleIsDear
+
+        af = abc.ABCFile()
+        s = abcToStream(af.readstr(tf))
+
+        self.assertEqual(len(s.parts), 2)
+        self.assertEqual(len(s.parts[0].notes), 111)
+        self.assertEqual(len(s.parts[1].notes), 127)
+
+        # chords are defined in second part here
+        self.assertEqual(len(s.parts[1].getElementsByClass('Chord')), 32)
+
+        # check pitches in chords
+        match = [p.nameWithOctave for p in s.parts[1].getElementsByClass(
+                'Chord')[4].pitches]
+        self.assertEqual(match, ['F4', 'D4', 'B3'])
+
+        match = [p.nameWithOctave for p in s.parts[1].getElementsByClass(
+                'Chord')[3].pitches]
+        self.assertEqual(match, ['E4', 'C4', 'A3'])
+
+        #s.show()
+        #s.show('midi')
+
+
+
+    def testMultiVoice(self):
+
+        from music21 import abc
+        from music21.abc import testFiles
+
+
+        tf = testFiles.testPrimitivePolyphonic
+
+        af = abc.ABCFile()
+        s = abcToStream(af.readstr(tf))
+
+        self.assertEqual(len(s.parts), 3)
+        self.assertEqual(len(s.parts[0].notes), 6)
+        self.assertEqual(len(s.parts[1].notes), 20)
+        self.assertEqual(len(s.parts[2].notes), 6)
+
+        #s.show()
+        #s.show('midi')
 
 
 
@@ -132,7 +214,7 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
-        t.testBasic()
+        t.testChords()
 
 
 
