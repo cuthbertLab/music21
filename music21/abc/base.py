@@ -125,6 +125,16 @@ class ABCMetadata(ABCObject):
             return True
         return False
 
+    def isTitle(self):
+        if self.tag == 'T': 
+            return True
+        return False
+
+    def isComposer(self):
+        if self.tag == 'C': 
+            return True
+        return False
+
     def getTimeSignature(self):
         '''If there is a time signature representation available, get a numerator and denominator
 
@@ -318,8 +328,11 @@ class ABCNote(ABCObject):
         '''
         # TODO: pitches are key dependent: accidentals are not given
         # if specified in key: must store key and adjust here
-
-        name = rePitchName.findall(strSrc)[0]
+        try:
+            name = rePitchName.findall(strSrc)[0]
+        except IndexError: # no matches
+            raise ABCHandlerException('cannot find any pitch information in: %s' % repr(strSrc))
+    
         if name == 'z':
             return None # designates a rest
         else:
@@ -408,7 +421,6 @@ class ABCNote(ABCObject):
         else: 
             ql = self.activeDefaultQuarterLength * int(numStr)
 
-
         if self.brokenRhythmMarker != None:
             symbol, direction = self.brokenRhythmMarker
             if symbol == '>':
@@ -477,20 +489,20 @@ class ABCHandler(object):
 
         >>> ah = ABCHandler()
         >>> ah._getLinearContext('12345', 0)
-        (None, None, '1', '2', '2')
+        (None, None, '1', '2', '2', '3')
         >>> ah._getLinearContext('12345', 1)
-        ('1', '1', '2', '3', '3')
+        ('1', '1', '2', '3', '3', '4')
         >>> ah._getLinearContext('12345', 3)
-        ('3', '3', '4', '5', '5')
+        ('3', '3', '4', '5', '5', None)
         >>> ah._getLinearContext('12345', 4)
-        ('4', '4', '5', None, None)
+        ('4', '4', '5', None, None, None)
 
         >>> ah._getLinearContext([32, None, 8, 11, 53], 4)
-        (11, 11, 53, None, None)
+        (11, 11, 53, None, None, None)
         >>> ah._getLinearContext([32, None, 8, 11, 53], 2)
-        (32, None, 8, 11, 11)
+        (32, None, 8, 11, 11, 53)
         >>> ah._getLinearContext([32, None, 8, 11, 53], 0)
-        (None, None, 32, None, 8)
+        (None, None, 32, None, 8, 8)
 
 
         '''            
@@ -499,41 +511,47 @@ class ABCHandler(object):
             raise ABCHandlerException
         # find local area of string
         if i > 0:
-            charPrev = strSrc[i-1]
+            cPrev = strSrc[i-1]
         else:      
-            charPrev = None
+            cPrev = None
         # get last char previous non-white; do not start with current
         # -1 goes to index 0
-        charPrevNotSpace = None
+        cPrevNotSpace = None
         for j in range(i-1, -1, -1):
             # condition to break: find a something that is not None, or 
             # a string that is not a space
             if isinstance(strSrc[j], str):
                 if not strSrc[j].isspace():
-                    charPrevNotSpace = strSrc[j]
+                    cPrevNotSpace = strSrc[j]
                     break
             else:
                 if strSrc[j] != None:
-                    charPrevNotSpace = strSrc[j]
+                    cPrevNotSpace = strSrc[j]
                     break
+        # set this characters
+        c = strSrc[i]
 
-        charThis = strSrc[i]
+        cNext = None
         if i < len(strSrc)-1:
-            charNext = strSrc[i+1]
-        else:      
-            charNext = None
-        charNextNotSpace = None
+            cNext = strSrc[i+1]            
+
+        # get 2 chars forward
+        cNextNext = None
+        if i < len(strSrc)-2:
+            cNextNext = strSrc[i+2]
+
+        cNextNotSpace = None
         # start at next index and look forward
         for j in range(i+1, len(strSrc)):
             if isinstance(strSrc[j], str):
                 if not strSrc[j].isspace():
-                    charNextNotSpace = strSrc[j]
+                    cNextNotSpace = strSrc[j]
                     break
             else:
                 if strSrc[j] != None:
-                    charNextNotSpace = strSrc[j]
+                    cNextNotSpace = strSrc[j]
                     break
-        return charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace
+        return cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext
 
 
     def _getNextLineBreak(self, strSrc, i):
@@ -571,10 +589,10 @@ class ABCHandler(object):
                 break
 
             q = self._getLinearContext(strSrc, i)
-            charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace = q
+            cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext = q
             
             # comment lines, also encoding defs
-            if charThis == '%':
+            if c == '%':
                 j = self._getNextLineBreak(strSrc, i)
                 environLocal.printDebug(['got comment:', repr(strSrc[i:j+1])])
                 i = j+1 # skip \n char
@@ -583,8 +601,12 @@ class ABCHandler(object):
             # metadata: capatal alpha, with next char as ':'
             # get metadata before others
             # some meta data might have bar symbols, for example
-            if (charThis.isalpha() and charThis.isupper() 
-                and charNext != None and charNext == ':'):
+            # need to not misinterpret repeat ends bars as meta
+            # e.g. dAG FED:|2 dAG FGA| this is incorrect, but can avoid by
+            # looking for a leading pipe
+            if (c.isalpha() and c.isupper() 
+                and cNext != None and cNext == ':' and 
+                cNextNext != None and cNextNext not in '|'):
                 # collect until end of line; add one to get line break
                 j = self._getNextLineBreak(strSrc, i) + 1
                 collect = strSrc[i:j].strip()
@@ -594,17 +616,17 @@ class ABCHandler(object):
                 continue
             
             # get bars: if not a space and not alphanemeric
-            if (not charThis.isspace() and not charThis.isalnum()
-                and charThis not in ['~', '(']):
+            if (not c.isspace() and not c.isalnum()
+                and c not in ['~', '(']):
                 matchBars = False
                 for barIndex in range(len(ABC_BARS)):
                     # first of bars tuple is symbol to match
-                    if charThis + charNext == ABC_BARS[barIndex][0]:
+                    if c + cNext == ABC_BARS[barIndex][0]:
                         j = i + 2
                         matchBars = True 
                         break
                     # check for signle char bars
-                    elif charThis == ABC_BARS[barIndex][0]:
+                    elif c == ABC_BARS[barIndex][0]:
                         j = i + 1
                         matchBars = True 
                         break
@@ -617,7 +639,7 @@ class ABCHandler(object):
                     
             # get tuplet indicators: (2, (3
             # TODO: extended tuplets look like this: (p:q:r or (3::
-            if (charThis == '(' and charNext != None and charNext.isdigit()):
+            if (c == '(' and cNext != None and cNext.isdigit()):
                 j = i + 2 # always two characters
                 collect = strSrc[i:j]
                 #environLocal.printDebug(['got tuplet start:', repr(collect)])
@@ -626,7 +648,7 @@ class ABCHandler(object):
                 continue
 
             # get broken rhythm modifiers: < or >, >>, up to <<<
-            if charThis in '<>':
+            if c in '<>':
                 j = i + 1
                 while (j < lastIndex and strSrc[j] in '<>'):
                     j += 1
@@ -638,7 +660,7 @@ class ABCHandler(object):
 
             # get chord symbols / guitar chords; collected and joined with
             # chord or notes
-            if (charThis == '"'):
+            if (c == '"'):
                 j = i + 1
                 while (j < lastIndex and strSrc[j] not in '"'):
                     j += 1
@@ -650,7 +672,7 @@ class ABCHandler(object):
                 continue
 
             # get chords
-            if (charThis == '['):
+            if (c == '['):
                 j = i + 1
                 while (j < lastIndex and strSrc[j] not in ']'):
                     j += 1
@@ -670,29 +692,34 @@ class ABCHandler(object):
 
             # get the start of a note event: alpha, or 
             # ~ tunr/ornament, accidentals ^, =, - as well as ^^
-            if (charThis.isalpha() or charThis in '~^=_.'):
-                # condition where we start with an alpha
-                foundAlpha = charThis.isalpha() and charThis not in ['u', 'v']
+            if (c.isalpha() or c in '~^=_.'):
+                # condition where we start with an alpha that is not an alpha
+                # that comes before a pitch indication
+                # H is fermata, L is accent, T is trill
+                foundPitchAlpha = c.isalpha() and c not in 'uvHLT'
                 j = i + 1
+
                 while True:
                     if j > lastIndex:
-                        break
+                        break    
+                    # if we have not found pitch alpha
                     # ornaments may precede note names
                     # accidentals (^=_) staccato (.), up/down bow (u, v)
-                    elif foundAlpha == False and strSrc[j] in '~=^_.uv':
+                    elif foundPitchAlpha == False and strSrc[j] in '~=^_.uvHLT':
                         j += 1
                         continue                    
-                    # only allow one alpha to be a continue condition
-                    elif (foundAlpha == False and strSrc[j].isalpha() 
-                        and strSrc[j] not in ['u', 'v']):
-                        foundAlpha = True
+                    # only allow one pitch alpha to be a continue condition
+                    elif (foundPitchAlpha == False and strSrc[j].isalpha() 
+                        and strSrc[j] not in 'uvHL'):
+                        foundPitchAlpha = True
                         j += 1
                         continue                    
-                    # continue condition after alpha: 
-                    # , register modeifiaciton (, ') or number, rhythm
+                    # continue conditions after alpha: 
+                    # , register modifiaciton (, ') or number, rhythm indication
+                    # number, /, 
                     elif strSrc[j].isdigit() or strSrc[j] in ',/\'':
                         j += 1
-                        continue                    
+                        continue    
                     else: # space, all else: break
                         break
                 # prepend chord symbol
@@ -718,6 +745,7 @@ class ABCHandler(object):
         # pre-parse : call on objects that need preliminary processing
         # metadata, for example, is parsed
         for t in self._tokens:
+            #environLocal.printDebug(['token:', t.src])
             t.preParse()
 
         # context: iterate through tokens, supplying contextual data as necessary to appropriate objects
@@ -725,7 +753,7 @@ class ABCHandler(object):
         for i in range(len(self._tokens)):
             # get context of tokens
             q = self._getLinearContext(self._tokens, i)
-            tPrevNotSpace, tPrev, t, tNext, tNextNotSpace = q
+            tPrevNotSpace, tPrev, t, tNext, tNextNotSpace, tNextNext = q
             
             if isinstance(t, ABCMetadata):
                 if t.isMeter() or t.isDefaultNoteLength():
@@ -829,6 +857,8 @@ class Test(unittest.TestCase):
             (testFiles.testPrimitive, 94, 75, 2),
             (testFiles.kitchGirl, 125, 101, 2),
             (testFiles.williamAndNancy, 127, 93, 0),
+            (testFiles.morrisonsJig, 176, 137, 0),
+
                 ]:
 
             handler = ABCHandler()
