@@ -371,6 +371,7 @@ class ABCNote(ABCToken):
         '''
         # TODO: pitches are key dependent: accidentals are not given
         # if specified in key: must store key and adjust here
+
         try:
             name = rePitchName.findall(strSrc)[0]
         except IndexError: # no matches

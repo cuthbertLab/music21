@@ -65,11 +65,8 @@ def abcToStream(abcHandler, inputM21=None):
                     # should append at the right position
                     p.append(ts)
 
-                elif t.isMeter():
-                    n, d, symbol = t.getTimeSignature()
-                    ts = meter.TimeSignature('%s/%s' % (n,d))
-                    # should append at the right position
-                    p.append(ts)
+                elif t.isKey():
+                    pass
     
             # as ABCChord is subclass of ABCNote, handle first
             elif isinstance(t, abcModule.ABCChord):
