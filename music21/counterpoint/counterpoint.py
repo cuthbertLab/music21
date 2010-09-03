@@ -518,7 +518,7 @@ class ModalCounterpoint(object):
         >>> from music21 import *
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('A4')
-        >>> n3 = note.Note('B4')
+        >>> n3 = note.Note('D4')
         >>> n4 = note.Note('C5')
         >>> m1 = note.Note('G4')
         >>> m2 = note.Note('A4')
@@ -528,7 +528,10 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = ModalCounterpoint(stream1 = sop, stream2 = bass)
+        >>> cp.allValidHarmony(cp.stream1, cp.stream2)
+        False
+        >>> n4.name = 'C4'
         >>> cp.allValidHarmony(cp.stream1, cp.stream2)
         True
         >>> n1.name = 'F#4'
@@ -554,7 +557,11 @@ class ModalCounterpoint(object):
         if abs(stream1.notes[-1].editorial.harmonicInterval.generic.value) == 5:
             environLocal.printDebug(["Ends on a fifth, yuk!"])
             return False
-        return True
+        if stream1.notes[-1].editorial.harmonicInterval.semiSimpleName == 'P8' and stream1.notes[-2].editorial.harmonicInterval.simpleName == 'M6':
+            return True
+        else:
+            environLocal.printDebug(['Not ending on M6 to P8'])
+        return False
 
     def allValidHarmonyMiddleVoices(self, stream1, stream2):
         '''Given two simultaneous streams, returns True if all of the harmonies
@@ -986,7 +993,48 @@ class ModalCounterpoint(object):
             stream2.append(copy.deepcopy(note1))
         return stream2
 
-    def generateFirstSpecies(self, stream1, minorScale, choice = 'random'):
+    def generateFirstSpecies(self, cantusFirmus, minorScale, choice = 'random'):
+        '''
+        Doc
+        '''
+        
+        goodHarmony = False
+        goodMelody = False
+        thirdsGood = False
+        sixthsGood = False
+    
+        while (goodHarmony == False or goodMelody == False or thirdsGood == False or sixthsGood == False):
+            environLocal.printDebug([''])
+            environLocal.printDebug(['-------------------------------------'])
+            environLocal.printDebug(['STARTING OVER NOW'])
+            try:
+                top = self.getValidSecondVoice(cantusFirmus, minorScale, 'random')
+                top = self.raiseLeadingTone(top, minorScale)
+                environLocal.printDebug([note1.name + str(note1.octave) for note1 in top.notes])
+        
+                goodHarmony = self.allValidHarmony(top, cantusFirmus)
+                goodMelody = self.isValidMelody(top)
+                thirdsGood = not self.tooManyThirds(top, cantusFirmus)
+                sixthsGood = not self.tooManySixths(top, cantusFirmus)
+    
+##                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
+##                if lastInterval.generic.undirected != 2:
+##                    goodMelody = False
+##                    environLocal.printDebug(["rejected because lastInterval was not a second"])
+             
+                environLocal.printDebug([note1.name + str(note1.octave) for note1 in cantusFirmus.notes])
+                if not goodHarmony: environLocal.printDebug(["bad harmony"])
+                else: environLocal.printDebug(["harmony good"])
+                if not goodMelody: environLocal.printDebug(["bad melody"])
+                else: environLocal.printDebug(["melody good"])
+                if not thirdsGood: environLocal.printDebug(["too many thirds"])
+                if not sixthsGood: environLocal.printDebug(["too many sixths"])
+            except ModalCounterpointException:
+                pass
+            
+        return top
+
+    def getValidSecondVoice(self, stream1, minorScale, choice = 'random'):
         '''Given a stream (the cantus firmus) and the stream's key in the
         form of a MinorScale object, generates a stream of first species
         counterpoint that follows the rules of 21M.301.
@@ -1036,28 +1084,11 @@ class ModalCounterpoint(object):
                 afterLeap = True
             else:
                 afterLeap = False
-        #generate last note that forms a perfect consonance
-##        prevFirmus = stream1.notes[-2]
-##        currFirmus = stream1.notes[-1]
-##        prevNote = stream2.notes[-1]
-##        choices = self.generateValidLastNotes(prevFirmus, currFirmus, prevNote, afterLeap, minorScale, True)
-##        if len(choices) == 0:
-##            raise ModalCounterpointException("Sorry, please try again")
-##        if choice == 'random':
-##            newNote = random.choice(choices)
-##        elif choice == 'first':
-##            newNote = choices[0]
-##        elif choice == 'last':
-##            newNote = choices[-1]
-##        else:
-##            newNote = random.choice(choices) # if choice flag not recognized, go with random
-##        newNote.duration = currFirmus.duration
-##        stream2.append(newNote)
         
         return stream2
 
     def generateValidNotes(self, prevFirmus, currFirmus, prevNote, afterLeap, minorScale):
-        '''Helper function for generateFirstSpecies; gets a list of possible
+        '''Helper function for getValidSecondVoice; gets a list of possible
         next notes based on valid melodic intervals, then checks each one so
         that parallel/hidden fifths/octaves, voice crossing, and invalid
         harmonies are prevented. Adds extra weight to notes that would create
@@ -1203,7 +1234,7 @@ class ModalCounterpoint(object):
         # get middle stream
         while (goodHarmony2 == False or goodMelody2 == False or thirdsGood2 == False or sixthsGood2 == False):
             try:
-                middle = self.generateFirstSpecies(bottom, minorScale, choice)
+                middle = self.getValidSecondVoice(bottom, minorScale, choice)
                 environLocal.printDebug([note1.name + str(note1.octave) for note1 in middle.notes])
         
                 goodHarmony2 = self.allValidHarmony(middle, bottom)
@@ -1726,16 +1757,36 @@ class Test(unittest.TestCase):
         assert names15 == ["G#", "A", "D", "F#", "G#", "A", "G", "F"]
 
 # ADD MORE CANTUS FIRMI HERE; MODIFY LIST CANTUSFIRMI
+
 cantusFirmus1 = {'notes': 'A1 c B c d e c B A', 'mode': 'A'}
 cantusFirmus2 = {'notes': 'A1 e d f e c d c B A', 'mode': 'A'}
 cantusFirmus3 = {'notes': 'd1 f e d g f a g f e d', 'mode': 'D'}
 
 cantusFirmi = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
 
-def getRandomCF():
-    return random.choice(cantusFirmi)
+def getRandomCF(mode = None):
+    '''
+    Function to obtain a dictionary representation of a cantus firmus. Cantus
+    firmi should be added to the list above in the format of a dictionary
+    with the keys 'notes' and 'mode'. Under 'notes' is a tiny notation string
+    to be parsed into music21 objects, while 'mode' accesses a string
+    representing the name of the related scale's tonic, which can be made
+    into a note and a scale object.
 
-getRandomCF()
+
+    >>> from music21 import *
+    >>> cf = getRandomCF()
+    >>> cf.keys()
+    ['notes', 'mode']
+    >>> isinstance(cf['notes'],str)
+    True
+    >>> isinstance(cf['mode'],str)
+    True
+    
+    '''
+    if mode is not None:
+        raise Exception('Cantus firmus selection by mode does not yet exist')
+    return random.choice(cantusFirmi)
 
 class TestExternal(unittest.TestCase):
     pass
@@ -1755,43 +1806,11 @@ class TestExternal(unittest.TestCase):
         baseNote = Note(cf['mode'])
         thisScale = scale.ConcreteMinorScale(baseNote)
             
-        goodHarmony = False
-        goodMelody = False
-        thirdsGood = False
-        sixthsGood = False
-    
-        while (goodHarmony == False or goodMelody == False or thirdsGood == False or sixthsGood == False):
-            environLocal.printDebug([''])
-            environLocal.printDebug(['-------------------------------------'])
-            environLocal.printDebug(['STARTING OVER NOW'])
-            try:
-                hopeThisWorks = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale, 'random')
-                hopeThisWorks2 = counterpoint1.raiseLeadingTone(hopeThisWorks, thisScale)
-                environLocal.printDebug([note1.name + str(note1.octave) for note1 in hopeThisWorks2.notes])
-        
-                goodHarmony = counterpoint1.allValidHarmony(hopeThisWorks2, cantusFirmus)
-                goodMelody = counterpoint1.isValidMelody(hopeThisWorks2)
-                thirdsGood = not counterpoint1.tooManyThirds(hopeThisWorks2, cantusFirmus)
-                sixthsGood = not counterpoint1.tooManySixths(hopeThisWorks2, cantusFirmus)
-    
-                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
-                if lastInterval.generic.undirected != 2:
-                    goodMelody = False
-                    environLocal.printDebug(["rejected because lastInterval was not a second"])
-             
-                environLocal.printDebug([note1.name + str(note1.octave) for note1 in cantusFirmus.notes])
-                if not goodHarmony: environLocal.printDebug(["bad harmony"])
-                else: environLocal.printDebug(["harmony good"])
-                if not goodMelody: environLocal.printDebug(["bad melody"])
-                else: environLocal.printDebug(["melody good"])
-                if not thirdsGood: environLocal.printDebug(["too many thirds"])
-                if not sixthsGood: environLocal.printDebug(["too many sixths"])
-            except ModalCounterpointException:
-                pass        
+        top = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale, 'random')
     
         score = stream.Score()
         score.insert(0, meter.TimeSignature('4/4'))
-        score.insert(0, hopeThisWorks2)
+        score.insert(0, top)
         score.insert(0, cantusFirmus)
 #        score.show('text')
 #        score.show('musicxml')
@@ -1803,6 +1822,8 @@ class TestExternal(unittest.TestCase):
         A First Species, Three-Voice Counterpoint Generator by Jackie Rogoff (MIT 2010) written as continuation of 
         a UROP (Undergraduate Research Opportunities Program) project at M.I.T. summer 2010.
         '''
+
+        counterpoint1 = ModalCounterpoint()
         
         cf = getRandomCF()
         environLocal.printDebug(['Using: ', cf['notes']])
