@@ -578,10 +578,10 @@ class ModalCounterpoint(object):
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
         >>> cp = ModalCounterpoint(stream1 = bass, stream2 = sop)
-        >>> cp.allValidHarmony(cp.stream1, cp.stream2)
+        >>> cp.allValidHarmonyMiddleVoices(cp.stream1, cp.stream2)
         True
         >>> n1.name = 'F#4'
-        >>> cp.allValidHarmony(cp.stream1, cp.stream2)
+        >>> cp.allValidHarmonyMiddleVoices(cp.stream1, cp.stream2)
         False
 
         '''
@@ -735,7 +735,27 @@ class ModalCounterpoint(object):
     def findAllBadFifths(self, stream1, stream2):
         '''Given two streams, returns the total parallel and hidden fifths,
         and also puts the appropriate tags in note.editorial.misc under
-        "Parallel Fifth" and "Hidden Fifth".'''
+        "Parallel Fifth" and "Hidden Fifth".
+
+        
+        >>> from music21 import *
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('D4')
+        >>> n3 = note.Note('E4')
+        >>> n4 = note.Note('F4')
+        >>> s1 = stream.Stream()
+        >>> s1.append([n1, n2, n3, n4])
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> m3 = note.Note('G4')
+        >>> m4 = note.Note('C5')
+        >>> s2 = stream.Stream()
+        >>> s2.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(s1, s2)
+        >>> cp.findAllBadFifths(cp.stream1, cp.stream2)
+        2
+
+        '''
         parallel = self.findParallelFifths(stream1, stream2)
         hidden = self.findHiddenFifths(stream1, stream2)
         return parallel + hidden
@@ -743,7 +763,27 @@ class ModalCounterpoint(object):
     def findAllBadOctaves(self, stream1, stream2):
         '''Given two streams, returns the total parallel and hidden octaves,
         and also puts the appropriate tags in note.editorial.misc under
-        "Parallel Octave" and "Hidden Octave".'''
+        "Parallel Octave" and "Hidden Octave".
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('D4')
+        >>> n3 = note.Note('E4')
+        >>> n4 = note.Note('F4')
+        >>> s1 = stream.Stream()
+        >>> s1.append([n1, n2, n3, n4])
+        >>> m1 = note.Note('C5')
+        >>> m2 = note.Note('D5')
+        >>> m3 = note.Note('C5')
+        >>> m4 = note.Note('F5')
+        >>> s2 = stream.Stream()
+        >>> s2.append([m1, m2, m3, m4])
+        >>> cp = ModalCounterpoint(s1, s2)
+        >>> cp.findAllBadOctaves(cp.stream1, cp.stream2)
+        2
+
+        '''
         parallel = self.findParallelOctaves(stream1, stream2)
         hidden = self.findHiddenOctaves(stream1, stream2)
         return parallel + hidden
@@ -860,7 +900,7 @@ class ModalCounterpoint(object):
         return False
 
 ##    def sixthCounter(self, intervalList, numSixths):
-##        '''Recursive helper function for tooManyThirds that returns the number
+##        '''Recursive helper function for tooManySixths that returns the number
 ##        of consecutive thirds in a stream, given a corresponding list of
 ##        interval names.
 ##
@@ -892,7 +932,38 @@ class ModalCounterpoint(object):
     def raiseLeadingTone(self, stream1, minorScale):
         '''Given a stream of notes and a minor scale object, returns a new
         stream that raises all the leading tones of the original stream. Also
-        raises the sixth if applicable to avoid augmented intervals.'''
+        raises the sixth if applicable to avoid augmented intervals.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('G4')
+        >>> n3 = note.Note('A4')
+        >>> n4 = note.Note('G4')
+        >>> n5 = note.Note('F4')
+        >>> n6 = note.Note('G4')
+        >>> n7 = note.Note('A4')
+        >>> n8 = note.Note('F4')
+        >>> n9 = note.Note('G4')
+        >>> s1 = stream.Stream()
+        >>> s2 = stream.Stream()
+        >>> s1.append([n1, n2, n3, n4, n5, n6, n7, n8, n9])
+        >>> s2.append([n1, n2, n3, n4, n5, n6, n7, n8, n9])
+        >>> cp = ModalCounterpoint(s1, s2)
+        >>> aMinor = scale.ConcreteMinorScale(n3)
+        >>> s2 = cp.raiseLeadingTone(s1, aMinor)
+        >>> s2.notes[1].name
+        'G#'
+        >>> s2.notes[3].name
+        'G'
+        >>> s2.notes[4].name
+        'F#'
+        >>> s2.notes[5].name
+        'G#'
+        >>> s2.notes[7].name
+        'F'
+
+        '''
         s1notes = stream1.notes
         stream2 = stream.Part()
         sixth = minorScale.pitchFromScaleDegree(6).name
@@ -1334,29 +1405,31 @@ class Test(unittest.TestCase):
         n23.duration.type = "whole"
         n24.duration.type = "whole"
         
-        n11.step = "C"
-        n12.step = "D"
-        n13.step = "E"
-        n14.step = "F"
+        n11.name = "C4"
+        n12.name = "D4"
+        n13.name = "F4"
+        n14.name = "F4"
     
-        n21.step = "G"
-        n22.step = "G"
-        n23.step = "B"
-        n24.step = "C"
-        n24.octave = 5
+        n21.name = "G4"
+        n22.name = "A4"
+        n23.name = "B4"
+        n24.name = "C5"
     
     
-        stream1 = Stream([n11, n12, n13, n14])
-        stream2 = Stream([n21, n22, n23, n24])
+        stream1 = Stream()
+        stream1.append([n11, n12, n13, n14])
+        stream2 = Stream()
+        stream2.append([n21, n22, n23, n24])
         stream3 = Stream([n11, n13, n14])
         stream4 = Stream([n21, n23, n24])
         stream5 = Stream([n11, n23, n24, n21])
     
         counterpoint1 = ModalCounterpoint(stream1, stream2)
     
-        #  CDEF
         #  GGBC
+        #  CDFF
         findPar5 = counterpoint1.findParallelFifths(stream1, stream2)
+        print findPar5
         
         assert findPar5 == 1
         assert n24.editorial.misc["Parallel Fifth"] == True
@@ -1652,37 +1725,35 @@ class Test(unittest.TestCase):
         names15 = [note1.name for note1 in stream15.notes]
         assert names15 == ["G#", "A", "D", "F#", "G#", "A", "G", "F"]
 
+# ADD MORE CANTUS FIRMI HERE; MODIFY LIST CANTUSFIRMI
+cantusFirmus1 = {'notes': 'A1 c B c d e c B A', 'mode': 'A'}
+cantusFirmus2 = {'notes': 'A1 e d f e c d c B A', 'mode': 'A'}
+cantusFirmus3 = {'notes': 'd1 f e d g f a g f e d', 'mode': 'D'}
+
+cantusFirmi = [cantusFirmus1, cantusFirmus2, cantusFirmus3]
+
+def getRandomCF():
+    return random.choice(cantusFirmi)
+
+getRandomCF()
+
 class TestExternal(unittest.TestCase):
     pass
    
-    def xtestGenerateFirstSpecies(self):
+    def testGenerateFirstSpecies(self):
         '''
         A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
         an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
         '''
         
-        n101 = Note()
-        n101.duration.type = "whole"
-        n101.name = "A"
-        aMinor = scale.ConcreteMinorScale(n101)
-        n101b = Note()
-        n101b.duration.type = "whole"
-        n101b.name = "D"
-        dMinor = scale.ConcreteMinorScale(n101b)
-        
         counterpoint1 = ModalCounterpoint()
 
-        cantusFirmus1 = "A1 c B c d e c B A"
-        cantusFirmus2 = "A1 e d f e c d c B A"
-        cantusFirmus3 = "d1 f e d g f a g f e d"
-        #cantusFirmus4 = 
-        
-        choices = [(cantusFirmus1, aMinor), (cantusFirmus2, aMinor), (cantusFirmus3, dMinor)]
-        chosenCantusFirmus = random.choice(choices)
-        environLocal.printDebug(['Using: ', chosenCantusFirmus[0]])
-        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus[0], "4/4").notes)
-    
-        thisScale = chosenCantusFirmus[1]
+        cf = getRandomCF()
+        environLocal.printDebug(['Using: ', cf['notes']])
+        cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notes)
+
+        baseNote = Note(cf['mode'])
+        thisScale = scale.ConcreteMinorScale(baseNote)
             
         goodHarmony = False
         goodMelody = False
@@ -1733,28 +1804,12 @@ class TestExternal(unittest.TestCase):
         a UROP (Undergraduate Research Opportunities Program) project at M.I.T. summer 2010.
         '''
         
-        n101 = Note()
-        n101.duration.type = "whole"
-        n101.name = "A"
-        aMinor = scale.ConcreteMinorScale(n101)
-        n101b = Note()
-        n101b.duration.type = "whole"
-        n101b.name = "D"
-        dMinor = scale.ConcreteMinorScale(n101b)
-        
-        counterpoint1 = ModalCounterpoint()
+        cf = getRandomCF()
+        environLocal.printDebug(['Using: ', cf['notes']])
+        cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notes)
 
-        cantusFirmus1 = "A1 c B c d e c B A"
-        cantusFirmus2 = "A1 e d f e c d c B A"
-        cantusFirmus3 = "d1 f e d g f a g f e d"
-        #cantusFirmus4 = 
-        
-        choices = [(cantusFirmus1, aMinor), (cantusFirmus2, aMinor), (cantusFirmus3, dMinor)]
-        chosenCantusFirmus = random.choice(choices)
-        environLocal.printDebug(['Using: ', chosenCantusFirmus[0]])
-        cantusFirmus = stream.Part(converter.parse(chosenCantusFirmus[0], "4/4").notes)
-    
-        thisScale = chosenCantusFirmus[1]
+        baseNote = Note(cf['mode'])
+        thisScale = scale.ConcreteMinorScale(baseNote)
             
         (middleVoice, topVoice) = counterpoint1.generateFirstSpeciesThreeVoices(cantusFirmus, thisScale, 'random')
             
