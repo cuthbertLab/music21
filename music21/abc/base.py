@@ -45,13 +45,20 @@ ABC_BARS = [
            ]
 
 #-------------------------------------------------------------------------------
-reMetadataTag = re.compile('[A-Z]:')
+# note inclusion of w: for lyrics
+reMetadataTag = re.compile('[A-Zw]:')
 
 rePitchName = re.compile('[a-gA-Gz]')
 
 reChordSymbol = re.compile('"[^"]*"') # non greedy
 
 reChord = re.compile('[.*?]') # non greedy
+
+# matching leading key indicators; see getKeySignature() for why h, p, etc 
+# are necessary
+reStandardKey = re.compile('[A-GH]{1}[#bP]{0,1}')
+
+
 
 #-------------------------------------------------------------------------------
 class ABCTokenException(Exception):
@@ -170,7 +177,7 @@ class ABCMetadata(ABCToken):
         if self.isMeter():
             if self.data == 'C':
                 n, d = 4, 4
-                symbol = 'ccommon' # m21 compat
+                symbol = 'common' # m21 compat
             elif self.data == 'C|':
                 n, d = 2, 2
                 symbol = 'cut' # m21 compat
@@ -188,9 +195,36 @@ class ABCMetadata(ABCToken):
     def getKeySignature(self):
         '''Extract key signature parameters, include indications for mode, and translate sharps count compatible with m21
         '''
-        pass
+        # placing this import in method for now; key.py may import this module
+        from music21 import key
 
+        if not self.isKey():
+            raise ABCTokenException('no key signature associated with this meta-data')
+        # first, get standard key indication
+        post = reStandardKey.findall(self.data)
+        if len(post) == 0:
+            standardKey = None
+        else: # get the first element in this list, like f#
+            standardKeyStr = post[0]
+            # replace b flat symbols w/ m21 '-' symbols
+            standardKeyStr.replace('b', '-')
 
+        # get everything after the first match
+        stringRemain = reStandardKey.split(src)
+        # check for mode strings
+        # only first three characters are parsed
+        modeCandidate = stringRemain.lower()
+        mode = None
+        for match, modeStr in [('mix', 'mixolydian'),
+                               ('dor', 'dorian'),
+                               ('phr', 'phrygian'),
+                               ('min', 'minor'),
+                              ]:
+            if match in modeCandidate:
+                mode = modeStr
+    
+        # with mode and standardKeyStr, create key signature object
+        # with key.pitchToSharps(standardKeyStr, mode)
 
     def getDefaultQuarterLength(self):
         '''If there is a quarter length representation available, return it as a floating point value
@@ -299,6 +333,10 @@ class ABCNote(ABCToken):
         self.inSlur = None
         self.inGrace = None
 
+        # set to True if a modification of key signautre
+        # set to False if an altered tone part of a Key
+        self.accidentalDisplayStatus = None
+
         # determined during parse() based on if pitch chars are present
         self.isRest = None
 
@@ -310,6 +348,9 @@ class ABCNote(ABCToken):
         # store if a broken symbol applies; pair of symbol, position (left, right)
         self.brokenRhythmMarker = None
 
+        # store key signature for pitch processing
+        self.activeKeySignature = None
+            
         # pitch/ duration attributes for m21 conversion
         self.pitchName = None # if None, a rest or chord
         self.quarterLength = None
@@ -371,7 +412,7 @@ class ABCNote(ABCToken):
         '''
         # TODO: pitches are key dependent: accidentals are not given
         # if specified in key: must store key and adjust here
-
+        # this conversion, or subset of it, might be better put in pitch.py
         try:
             name = rePitchName.findall(strSrc)[0]
         except IndexError: # no matches
@@ -420,6 +461,11 @@ class ABCNote(ABCToken):
         >>> an._getQuarterLength('A/')
         0.25
 
+        >>> an._getQuarterLength('A//')
+        0.125
+        >>> an._getQuarterLength('A///')
+        0.0625
+
         >>> an = ABCNote()
         >>> an.activeDefaultQuarterLength = .5
         >>> an.brokenRhythmMarker = ('>', 'left')
@@ -453,16 +499,26 @@ class ABCNote(ABCToken):
             if c.isdigit() or c in '/':
                 numStr.append(c)
         numStr = ''.join(numStr)
-
+        numStr = numStr.strip()
         # get default
         if numStr == '':
             ql = activeDefaultQuarterLength
         # if only, shorthand for /2
         elif numStr == '/':
             ql = activeDefaultQuarterLength * .5
+        elif numStr == '//':
+            ql = activeDefaultQuarterLength * .25
+        elif numStr == '///':
+            ql = activeDefaultQuarterLength * .125
         # if a half fraction
         elif numStr.startswith('/'):
             ql = activeDefaultQuarterLength / int(numStr.split('/')[1])
+        # uncommon usage: 3/ short for 3/2
+        elif numStr.endswith('/'):
+            n = int(numStr.split('/')[0].strip())
+            d = 2
+            ql = activeDefaultQuarterLength * (float(n) / d)
+
         # assume we have a complete fraction
         elif '/' in numStr:
             n, d = numStr.split('/')
@@ -683,12 +739,12 @@ class ABCHandler(object):
                 continue
 
             # metadata: capatal alpha, with next char as ':'
-            # get metadata before others
+            # or w: (lyric defs)
             # some meta data might have bar symbols, for example
-            # need to not misinterpret repeat ends bars as meta
+            # need to not misinterpret repeat bars as meta
             # e.g. dAG FED:|2 dAG FGA| this is incorrect, but can avoid by
             # looking for a leading pipe
-            if (c.isalpha() and c.isupper() 
+            if (((c.isalpha() and c.isupper()) or c in 'w')
                 and cNext != None and cNext == ':' and 
                 cNextNext != None and cNextNext not in '|'):
                 # collect until end of line; add one to get line break
@@ -904,6 +960,9 @@ class ABCHandler(object):
 
         '''
 
+        # TODO: this procedure should also be responsible for 
+        # breaking the passage into voice/lyric pairs
+
         if self._tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
 
@@ -1074,8 +1133,23 @@ class Test(unittest.TestCase):
         src = 'A3/2'
         self.assertEqual(rePitchName.findall(src)[0], 'A')
 
+        src = 'Edor'
+        post = reStandardKey.findall(src)
+        self.assertEqual(post, ['E'])
 
-        
+
+        src = 'nothing'
+        post = reStandardKey.findall(src)
+        self.assertEqual(post, [])
+
+        src = 'F#MIX'
+        post = reStandardKey.findall(src)
+        self.assertEqual(post, ['F#'])
+
+        # we can split to get the remaing chaaracters
+        post = reStandardKey.split(src)
+        self.assertEqual(post, ['', 'MIX'] )
+
 
     def testTokenProcessMetadata(self):
         from music21.abc import testFiles
@@ -1123,7 +1197,14 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    import sys
+
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        t = Test()
+
+        t.testRe()
 
 
 

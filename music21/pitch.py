@@ -252,6 +252,10 @@ def convertFqToPs(fq):
     '''
     return 12 * (math.log(fq / 440.0) / math.log(2)) + 69   
 
+
+
+
+
 #-------------------------------------------------------------------------------
 class AccidentalException(Exception):
     pass
@@ -288,6 +292,7 @@ class Accidental(music21.Music21Object):
          by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.''',
     'displaySize': 'Size in display: "cue", "large", or a percentage.',
     'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
+    'displayStatus': 'Whether this Accidental is to be displayed; can be None (for not set), True, or False.',
     'displayLocation': 'Location of accidental: "normal", "above", "below".'
     }
 

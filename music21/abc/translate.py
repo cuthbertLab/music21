@@ -119,8 +119,11 @@ class Test(unittest.TestCase):
 #            testFiles.kitchGirl,
             #testFiles.morrisonsJig,
 #            testFiles.hectorTheHero,
-            testFiles.aleIsDear,
+#            testFiles.aleIsDear,
 #             testFiles.williamAndNancy,
+#            testFiles.theAleWifesDaughter,
+#            testFiles.theBeggerBoy,
+            testFiles.theAleWifesDaughter,
             ]:
             af = abc.ABCFile()
             ah = af.readstr(tf) # return handler
@@ -202,6 +205,27 @@ class Test(unittest.TestCase):
         #s.show('midi')
 
 
+    def testLyrics(self):
+
+        from music21 import abc
+        from music21.abc import testFiles
+
+        tf = testFiles.sicutRosa
+
+        af = abc.ABCFile()
+        s = abcToStream(af.readstr(tf))
+
+        #s.show()
+
+#         self.assertEqual(len(s.parts), 3)
+#         self.assertEqual(len(s.parts[0].notes), 6)
+#         self.assertEqual(len(s.parts[1].notes), 20)
+#         self.assertEqual(len(s.parts[2].notes), 6)
+# 
+        #s.show()
+        #s.show('midi')
+
+
 
 if __name__ == "__main__":
     import sys
@@ -211,7 +235,7 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
-        t.testChords()
+        t.testBasic()
 
 
 

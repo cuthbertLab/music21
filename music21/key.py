@@ -95,6 +95,15 @@ def pitchToSharps(value, mode=None):
     7
     >>> key.pitchToSharps('g#')
     8
+
+    >>> key.pitchToSharps('e', 'dorian')
+    2
+    >>> key.pitchToSharps('d', 'dorian')
+    0
+
+    >>> key.pitchToSharps('g', 'mixolydian')
+    0
+
     '''
     if common.isStr(value):
         p = pitch.Pitch(value)
@@ -107,17 +116,35 @@ def pitchToSharps(value, mode=None):
         sharpSource.append(-i)
 
     minorShift = interval.Interval('-m3')
+    # this modal values were introduced to translate from ABC key values
+    # this value/mapping may need to be dynamically allocated based on other
+    # contexts (historical meaning of dorian, for example)
+    dorianShift = interval.Interval('M2')
+    mixolydianShift = interval.Interval('P5')
 
-    # NOTE: this may not be the fastest approach
+    # note: this may not be the fastest approach
     match = None
     for i in sharpSource:
         pCandidate = sharpsToPitch(i)
+        # create relative transpositions based on this pitch for major
+        pMinor = pCandidate.transpose(minorShift)
+        pDorian = pCandidate.transpose(dorianShift)
+        pMixolydian = pCandidate.transpose(mixolydianShift)
+
         if mode in [None, 'major']:
             if pCandidate.name == p.name:
                 match = i
                 break
-        else: # match minor pitch
-            pMinor = pCandidate.transpose(minorShift)
+        elif mode in ['dorian']:
+            if pDorian.name == p.name:
+                match = i
+                break
+        elif mode in ['mixolydian']:
+            if pMixolydian.name == p.name:
+                match = i
+                break
+        elif mode in ['minor']:
+        #else: # match minor pitch
             if pMinor.name == p.name:
                 match = i
                 break
