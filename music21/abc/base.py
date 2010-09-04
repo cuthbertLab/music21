@@ -66,6 +66,13 @@ class ABCHandlerException(Exception):
 
 #-------------------------------------------------------------------------------
 class ABCToken(object):
+    '''
+    ABC processing works with a multi-pass procedure. The first pass breaks the data stream into a list of ABCToken objects. ABCToken objects are specialized in subclasses. 
+
+    The multi-pass procedure is conducted by an ABCHandler object. The ABCHandler.tokenize() method breaks the data stream into ABCToken objects. The ABCHandler.tokenProcess() method first calls the preParse() method on each token, then does contextual adjustments to all tokens, then calls parse() on all tokens.
+
+
+    '''
     def __init__(self, src=''):
         self.src = src # store source character sequence
 
@@ -186,6 +193,15 @@ class ABCMetadata(ABCToken):
             symbol = 'normal' # m21 compat
 
         return n, d, symbol
+
+    def getTimeSignatureObject(self):
+        '''Return a music 21 time signature ojbect
+        '''
+        if not self.isMeter():
+            raise ABCTokenException('no time signature associated with this meta-data')
+        from music21 import meter
+        n, d, symbol = self.getTimeSignature()
+        return meter.TimeSignature('%s/%s' % (n,d))
 
 
     def getKeySignature(self):
@@ -336,11 +352,106 @@ class ABCBar(ABCToken):
 
 
 class ABCTuplet(ABCToken):
+    '''ABcTuplet tokens always precede the notes they describe.
+
+    
+    In ABCHandler.tokenProcess(), rhythms are adjusted. 
+
+    '''
     def __init__(self, src):
         ABCToken.__init__(self, src)
 
+        #self.qlRemain = None # how many ql are left of this tuplets activity
+        # how many notes are affected by this; this assumes equal duration
+        self.noteCount = None         
+
+        # actual is tuplet represented value; 3 in 3:2
+        self.numberNotesActual = None
+        #self.durationActual = None
+
+        # normal is underlying duration representation; 2 in 3:2
+        self.numberNotesNormal = None
+        #self.durationNormal = None
+
+        # store an m21 tuplet object
+        self.tupletObj = None
+
     def __repr__(self):
         return '<ABCTuplet %r>' % self.src
+
+    def updateRatio(self, keySignatureObj=None):
+        '''Cannot be called until local meter context is established
+
+        >>> at = ABCTuplet('(3')
+        >>> at.updateRatio()
+        >>> at.numberNotesActual, at.numberNotesNormal
+        (3, 2)
+
+        >>> at = ABCTuplet('(5')
+        >>> at.updateRatio()
+        >>> at.numberNotesActual, at.numberNotesNormal
+        (5, 2)
+
+        >>> from music21 import meter
+        >>> at = ABCTuplet('(5')
+        >>> at.updateRatio(meter.TimeSignature('6/8'))
+        >>> at.numberNotesActual, at.numberNotesNormal
+        (5, 3)
+        '''
+
+        if keySignatureObj == None:
+            from music21 import meter   
+            ts = meter.TimeSignature('4/4') # default
+        else:
+            ts = keySignatureObj
+
+        if ts.beatDivisionCount == 3: # if compound
+            normalSwitch = 3
+        else:
+            normalSwitch = 2
+
+        data = self.src.strip()
+        if data == '(2':
+            a, n = 2, 3 # actual, normal
+        elif data == '(3':
+            a, n = 3, 2 # actual, normal
+        elif data == '(4':
+            a, n = 4, 3 # actual, normal
+        elif data == '(5':
+            a, n = 5, normalSwitch # actual, normal
+        elif data == '(6':
+            a, n = 6, 2 # actual, normal
+        elif data == '(7':
+            a, n = 7, normalSwitch # actual, normal
+        elif data == '(8':
+            a, n = 8, 3 # actual, normal
+        elif data == '(9':
+            a, n = 9, normalSwitch # actual, normal
+        else:       
+            raise ABCTokenException('cannot handle tuplet of form: %s' % data)
+
+        self.numberNotesActual = a
+        self.numberNotesNormal = n
+
+
+    def updateNoteCount(self, durationActual=None, durationNormal=None):
+        '''Update the note count of notes that are affected by this tuplet.
+        '''
+        if self.numberNotesActual == None: 
+            raise ABCTokenException('must set numberNotesActual with updateRatio()')
+
+        # nee dto 
+        from music21 import duration
+        self.tupletObj = duration.Tuplet(
+            numberNotesActual=self.numberNotesActual, 
+            numberNotesNormal=self.numberNotesNormal, 
+            durationActual=durationActual,
+            durationNormal=durationNormal)
+
+        # copy value; this will be dynamically counted down
+        self.noteCount = self.numberNotesActual
+
+        #self.qlRemain = self._tupletObj.totalTupletLength()
 
 
 class ABCBrokenRhythmMarker(ABCToken):
@@ -367,12 +478,21 @@ class ABCBrokenRhythmMarker(ABCToken):
 
 
 class ABCNote(ABCToken):
+    '''
+    A model of an ABCNote.
 
+    General usage requires multi-pass processing. After being tokenized, each ABCNote needs a number of attributes updates. Attributes to be updated after tokenizing, and based on the linear sequence of tokens: `inBar`, `inBeam`, `inSlur`, `inGrace`, `activeDefaultQuarterLength`, `brokenRhythmMarker`, and `activeKeySignature`.  
+
+    The `chordSymbols` list stores one or more chord symbols (ABC calls these guitar chords) associated with this note. This attribute is updated when parse() is called. 
+    '''
     # given a logical unit, create an object
     # may be a chord, notes, bars
 
     def __init__(self, src=''):
         ABCToken.__init__(self, src)
+
+        # store chord string if connected to this note
+        self.chordSymbols = [] 
 
         # context attributes
         self.inBar = None
@@ -380,16 +500,6 @@ class ABCNote(ABCToken):
         self.inSlur = None
         self.inGrace = None
 
-        # set to True if a modification of key signautre
-        # set to False if an altered tone part of a Key
-        self.accidentalDisplayStatus = None
-
-        # determined during parse() based on if pitch chars are present
-        self.isRest = None
-
-        # store chord string if connected to this note
-        self.chordSymbols = [] 
-        
         # provide default duration from handler; may change during piece
         self.activeDefaultQuarterLength = None
         # store if a broken symbol applies; pair of symbol, position (left, right)
@@ -397,8 +507,17 @@ class ABCNote(ABCToken):
 
         # store key signature for pitch processing; this is an m21 object
         self.activeKeySignature = None
-            
+
+        # store a tuplet if active
+        self.activeTuplet = None
+
+        # set to True if a modification of key signautre
+        # set to False if an altered tone part of a Key
+        self.accidentalDisplayStatus = None
+        # determined during parse() based on if pitch chars are present
+        self.isRest = None            
         # pitch/ duration attributes for m21 conversion
+        # set with parse() based on all other contextual 
         self.pitchName = None # if None, a rest or chord
         self.quarterLength = None
 
@@ -429,8 +548,8 @@ class ABCNote(ABCToken):
             return [], strSrc        
 
 
-    def _getPitchName(self, strSrc):
-        '''Given a note or rest string without a chord symbol, return pitch or None if a rest. This value is paired with an accidental display status. Pitch alterations, and accidental display status, are adjusted if a key is declared in the Note. 
+    def _getPitchName(self, strSrc, forceKeySignature=None):
+        '''Given a note or rest string without a chord symbol, return a music21 pitch string or None (if a rest), and the accidental display status. This value is paired with an accidental display status. Pitch alterations, and accidental display status, are adjusted if a key is declared in the Note. 
 
         >>> from music21 import key
 
@@ -467,7 +586,12 @@ class ABCNote(ABCToken):
             name = rePitchName.findall(strSrc)[0]
         except IndexError: # no matches
             raise ABCHandlerException('cannot find any pitch information in: %s' % repr(strSrc))
-    
+
+        if forceKeySignature != None:
+            activeKeySignature = forceKeySignature
+        else: # may be None
+            activeKeySignature = self.activeKeySignature
+
         if name == 'z':
             return (None, None) # designates a rest
         else:
@@ -497,13 +621,13 @@ class ABCNote(ABCToken):
         if accString != '':
             accidentalDisplayStatus = True
         # if we do not have a key signature, and have accidentals, set to None
-        elif self.activeKeySignature == None:
+        elif activeKeySignature == None:
             accidentalDisplayStatus = None
         # pitches are key dependent: accidentals are not given
         # if we have a key and find a name, that does not have a n, must be
         # altered
         else:
-            alteredPitches = self.activeKeySignature.alteredPitches
+            alteredPitches = activeKeySignature.alteredPitches
             # just the steps, no accientals
             alteredPitchSteps = [p.step.lower() for p in alteredPitches]
             # includes #, -
@@ -625,14 +749,22 @@ class ABCNote(ABCToken):
                 ql *= modPair[1]
 
         # need to look at tuplets lastly
+        if self.activeTuplet != None: # this is an m21 tuplet object
+            # set the underlying duration type; probably this duration?
+            # or the activeDefaultQuarterLength
+            self.activeTuplet.setDurationType(activeDefaultQuarterLength)
+            # scale duration by active tuplet multipler
+            ql *= self.activeTuplet.tupletMultiplier()
         return ql
 
 
-    def parse(self, forceKey=None, forceDefaultQuarterLength=None):
+    def parse(self, forceKey=None, forceDefaultQuarterLength=None, 
+            forceKeySignature=None):
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)        
         # get pitch name form remaining string
         # rests will have a pitch name of None
-        a, b = self._getPitchName(nonChordSymStr)
+        a, b = self._getPitchName(nonChordSymStr,
+               forceKeySignature=forceKeySignature)
         self.pitchName, self.accidentalDisplayStatus = a, b
 
         if self.pitchName == None:
@@ -647,7 +779,12 @@ class ABCNote(ABCToken):
 
 
 class ABCChord(ABCNote):
+    '''
+    A representation of an ABC Chord, which contains within its delimiters individual notes. 
 
+    A subclass of ABCNote. 
+
+    '''
     # given a logical unit, create an object
     # may be a chord, notes, bars
 
@@ -667,7 +804,7 @@ class ABCChord(ABCNote):
         #environLocal.printDebug(['ABCChord:', nonChordSymStr, 'tokenStr', tokenStr])
 
         self.quarterLength = self._getQuarterLength(nonChordSymStr, 
-                            forceDefaultQuarterLength=forceDefaultQuarterLength)
+            forceDefaultQuarterLength=forceDefaultQuarterLength)
 
         # create a handler for processing internal chord notes
         ah = ABCHandler()
@@ -680,7 +817,9 @@ class ABCChord(ABCNote):
             #environLocal.printDebug(['ABCChord: subTokens', t])
             # parse any tokens individually, supply local data as necesssary
             if isinstance(t, ABCNote):
-                t.parse(forceDefaultQuarterLength=self.quarterLength)
+                t.parse(
+                    forceDefaultQuarterLength=self.activeDefaultQuarterLength,
+                    forceKeySignature=self.activeKeySignature)
 
             self.subTokens.append(t)
 
@@ -964,6 +1103,7 @@ class ABCHandler(object):
 
         # pre-parse : call on objects that need preliminary processing
         # metadata, for example, is parsed
+        lastTimeSignature = None
         for t in self._tokens:
             #environLocal.printDebug(['token:', t.src])
             t.preParse()
@@ -971,12 +1111,18 @@ class ABCHandler(object):
         # context: iterate through tokens, supplying contextual data as necessary to appropriate objects
         lastDefaultQL = None
         lastKeySignature = None
+        lastTimeSignatureObj = None # an m21 object
+        lastTupletToken = None # a token obj; keeps count of usage
+
         for i in range(len(self._tokens)):
             # get context of tokens
             q = self._getLinearContext(self._tokens, i)
             tPrevNotSpace, tPrev, t, tNext, tNextNotSpace, tNextNext = q
             
             if isinstance(t, ABCMetadata):
+                if t.isMeter():
+                    lastTimeSignatureObj = t.getTimeSignatureObject()
+                # restart matching conditions; match meter twice ok
                 if t.isMeter() or t.isDefaultNoteLength():
                     lastDefaultQL = t.getDefaultQuarterLength()
                 elif t.isKey():
@@ -992,17 +1138,37 @@ class ABCHandler(object):
                     tNext.brokenRhythmMarker = (t.data, 'right')
                 else:
                     raise ABCHandlerException('broken rhythm marker (%s) not positioned between two notes or chords' % t.src)
+
+            # need to update tuplets with currently active meter
+            if isinstance(t, ABCTuplet):
+                t.updateRatio(lastTimeSignatureObj)
+                # set number of notes that will be altered
+                # might need to do this with ql values, or look ahead to nxt 
+                # token
+                t.updateNoteCount() 
+                lastTupletToken = t
+
             # ABCChord inherits ABCNote, thus getting note is enough for both
             if isinstance(t, (ABCNote, ABCChord)):
                 if lastDefaultQL == None:
                     raise ABCHandlerException('no active default note length provided for note processing. tPrev: %s, t: %s, tNext: %s' % (tPrev, t, tNext))
                 t.activeDefaultQuarterLength = lastDefaultQL
                 t.activeKeySignature = lastKeySignature
-                continue
+                t.activeKeySignature = lastKeySignature
+
+                if lastTupletToken == None:
+                    pass
+                elif lastTupletToken.noteCount == 0:
+                    lastTupletToken = None # clear, no longer needed
+                else:
+                    lastTupletToken.noteCount -= 1 # decrement
+                    # add a reference to the note
+                    t.activeTuplet = lastTupletToken.tupletObj
 
         # parse : call methods to set attributes and parse string
         for t in self._tokens:
             t.parse()
+
             #print o.src
 
     def process(self, strSrc):

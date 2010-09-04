@@ -61,8 +61,7 @@ def abcToStream(abcHandler, inputM21=None):
                 elif t.isComposer():
                     md.composer = t.data
                 elif t.isMeter():
-                    n, d, symbol = t.getTimeSignature()
-                    ts = meter.TimeSignature('%s/%s' % (n,d))
+                    ts = t.getTimeSignatureObject()
                     # should append at the right position
                     p.append(ts)
                 elif t.isKey():
@@ -129,6 +128,9 @@ class Test(unittest.TestCase):
 #            testFiles.theAleWifesDaughter,
 #            testFiles.theBeggerBoy,
 #            testFiles.theAleWifesDaughter,
+
+#            testFiles.testPrimitiveTuplet,
+
             ]:
             af = abc.ABCFile()
             ah = af.readstr(tf) # return handler
@@ -176,14 +178,14 @@ class Test(unittest.TestCase):
         # chords are defined in second part here
         self.assertEqual(len(s.parts[1].getElementsByClass('Chord')), 32)
 
-        # check pitches in chords
+        # check pitches in chords; sharps are applied due to key signature
         match = [p.nameWithOctave for p in s.parts[1].getElementsByClass(
                 'Chord')[4].pitches]
-        self.assertEqual(match, ['F4', 'D4', 'B3'])
+        self.assertEqual(match, ['F#4', 'D4', 'B3'])
 
         match = [p.nameWithOctave for p in s.parts[1].getElementsByClass(
                 'Chord')[3].pitches]
-        self.assertEqual(match, ['E4', 'C4', 'A3'])
+        self.assertEqual(match, ['E4', 'C#4', 'A3'])
 
         #s.show()
         #s.show('midi')
@@ -194,7 +196,6 @@ class Test(unittest.TestCase):
 
         from music21 import abc
         from music21.abc import testFiles
-
 
         tf = testFiles.testPrimitivePolyphonic
 
@@ -210,16 +211,31 @@ class Test(unittest.TestCase):
         #s.show('midi')
 
 
+    def testTuplets(self):
+
+        from music21 import abc
+        from music21.abc import testFiles
+
+        tf = testFiles.testPrimitiveTuplet
+        af = abc.ABCFile()
+        s = abcToStream(af.readstr(tf))
+        match = []
+        # match strings for better comparison
+        for n in s.flat.notes:
+            match.append(str(n.quarterLength))
+        self.assertEqual(match, ['0.333333333333', '0.333333333333', '0.333333333333', '0.2', '0.2', '0.2', '0.2', '0.2', '0.166666666667', '0.166666666667', '0.166666666667', '0.166666666667', '0.166666666667', '0.166666666667', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.666666666667', '0.666666666667', '0.666666666667', '0.666666666667', '0.666666666667', '0.666666666667', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '2.0'])
+
+
     def testLyrics(self):
+        # TODO
 
         from music21 import abc
         from music21.abc import testFiles
 
         tf = testFiles.sicutRosa
-
         af = abc.ABCFile()
         s = abcToStream(af.readstr(tf))
-
+    
         #s.show()
 
 #         self.assertEqual(len(s.parts), 3)

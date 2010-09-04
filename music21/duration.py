@@ -738,8 +738,17 @@ class TupletException(Exception):
 class Tuplet(object):
     '''A tuplet object is a representation of one or more ratios that modify duration values and are stored in Duration objects.
 
-    Note that this is a duration modifier.  We should also have a tupletGroup
-    object that groups note objects into larger groups.
+    The primary representation uses two pairs of note numbers and durations. 
+
+    The first pair of note numbers and durations describes the representation within the tuplet, or the value presented by the context. This is called "actual." In a standard 8th note triplet this would be 3, eighth. Attributes are `numberNotesActual`, `durationActual`.
+
+    The second pair of note numbers and durations describes the space that would have been occupied in a normal context. This is called "normal." In a standard 8th note triplet this would be 2, eighth. Attributes are `numberNotesNormal`, `durationNormal`.
+
+    If duration values are not provided, the `durationActual` and `durationNormal` are assumed to be eighth.
+
+    If only one duration, either `durationActual` or `durationNormal`, is provided, both are set to the same value.
+
+    Note that this is a duration modifier, or a generator of ratios to scale quarterLength values in Duration objects.
 
     >>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
     >>> print(myTup.tupletMultiplier())
@@ -770,6 +779,9 @@ class Tuplet(object):
     TupletException: A frozen tuplet (or one attached to a duration) is immutable
     
     OMIT_FROM_DOCS
+    We should also have a tupletGroup
+
+    object that groups note objects into larger groups.
     # TODO: use __setattr__ to freeze all properties, and make a metaclass
     # exceptions: tuplet type, tuplet id: things that don't affect length
 
@@ -802,14 +814,14 @@ class Tuplet(object):
             self.nestedLevel = 1
 
         # actual is the count of notes that happen in this space
-        # this it not the real duration of notes that happen
+        # this is not the previous/expected duration of notes that happen
         if 'numberNotesActual' in keywords:
             self.numberNotesActual = keywords['numberNotesActual']
         else:
             self.numberNotesActual = 3.0
         
         # this previously stored a Duration, not a DurationUnit
-        if 'durationActual' in keywords:
+        if 'durationActual' in keywords and keywords['durationActual'] != None:
             if isinstance(keywords['durationActual'], basestring):
                 self.durationActual = DurationUnit(keywords['durationActual'])
             else:
@@ -817,14 +829,14 @@ class Tuplet(object):
         else:
             self.durationActual = DurationUnit("eighth") 
 
-        # normal is the space that would normally be occupied
+        # normal is the space that would normally be occupied by the tuplet span
         if 'numberNotesNormal' in keywords:
             self.numberNotesNormal = keywords['numberNotesNormal']
         else:
             self.numberNotesNormal = 2.0
         
         # this previously stored a Duration, not a DurationUnit
-        if 'durationNormal' in keywords:
+        if 'durationNormal' in keywords and keywords['durationNormal'] != None:
             if isinstance(keywords['durationNormal'], basestring):
                 self.durationNormal = DurationUnit(keywords['durationNormal'])
             else:
@@ -898,7 +910,7 @@ class Tuplet(object):
 
     def totalTupletLength(self):
         '''
-        The total length in quarters of the tuplet as defined, assuming that
+        The total duration in quarter length of the tuplet as defined, assuming that
         enough notes existed to fill all entire tuplet as defined.
 
         For instance, 3 quarters in the place of 2 quarters = 2.0
@@ -951,8 +963,10 @@ class Tuplet(object):
         self.numberNotesActual = actual
         self.numberNotesNormal = normal
 
-    def setDurationType(self, type):
+    def setDurationType(self, durType):
         '''Set the Duration for both actual and normal.
+
+        A type string or quarter length can be given.
 
         >>> a = Tuplet()
         >>> a.tupletMultiplier()
@@ -964,12 +978,24 @@ class Tuplet(object):
         0.6666...
         >>> a.totalTupletLength()
         4.0
+
+        >>> a.setDurationType(2)
+        >>> a.totalTupletLength()
+        4.0
+        >>> a.setDurationType(4)
+        >>> a.totalTupletLength()
+        8.0
+
+
         '''
         # these used to be Duration; now using DurationUnits
         if self.frozen == True:
             raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-        self.durationActual = DurationUnit(type) 
-        self.durationNormal = DurationUnit(type)        
+        if common.isNum(durType):
+            durType = convertQuarterLengthToType(durType)
+
+        self.durationActual = DurationUnit(durType) 
+        self.durationNormal = DurationUnit(durType)        
 
 
     def augmentOrDiminish(self, scalar, inPlace=True):
