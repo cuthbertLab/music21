@@ -28,6 +28,7 @@ def abcToStream(abcHandler, inputM21=None):
     from music21 import stream
     from music21 import note
     from music21 import meter
+    from music21 import key
     from music21 import chord
 
     if inputM21 == None:
@@ -64,9 +65,10 @@ def abcToStream(abcHandler, inputM21=None):
                     ts = meter.TimeSignature('%s/%s' % (n,d))
                     # should append at the right position
                     p.append(ts)
-
                 elif t.isKey():
-                    pass
+                    sharps, mode = t.getKeySignature()
+                    ks = key.KeySignature(sharps, mode)
+                    p.append(ks)
     
             # as ABCChord is subclass of ABCNote, handle first
             elif isinstance(t, abcModule.ABCChord):
@@ -87,6 +89,9 @@ def abcToStream(abcHandler, inputM21=None):
                     n = note.Rest()
                 else:
                     n = note.Note(t.pitchName)
+                    if n.accidental != None:
+                        n.accidental.displayStatus = t.accidentalDisplayStatus
+
                 n.quarterLength = t.quarterLength
                 p.append(n)
     
@@ -123,12 +128,12 @@ class Test(unittest.TestCase):
 #             testFiles.williamAndNancy,
 #            testFiles.theAleWifesDaughter,
 #            testFiles.theBeggerBoy,
-            testFiles.theAleWifesDaughter,
+#            testFiles.theAleWifesDaughter,
             ]:
             af = abc.ABCFile()
             ah = af.readstr(tf) # return handler
             s = abcToStream(ah)
-            #s.show()
+            s.show()
             #s.show('midi')
 
 

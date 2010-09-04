@@ -272,7 +272,7 @@ class Accidental(music21.Music21Object):
     '''
     # manager by properties
     _displayType = "normal" # always, never, unless-repeated, even-tied
-    _displayStatus = None
+    _displayStatus = None # None, True, False
 
     # not yet managed by properties: TODO
     displayStyle = "normal" # "parentheses", "bracket", "both"
@@ -292,7 +292,7 @@ class Accidental(music21.Music21Object):
          by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.''',
     'displaySize': 'Size in display: "cue", "large", or a percentage.',
     'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
-    'displayStatus': 'Whether this Accidental is to be displayed; can be None (for not set), True, or False.',
+    'displayStatus': 'Determines if this Accidental is to be displayed; can be None (for not set), True, or False.',
     'displayLocation': 'Location of accidental: "normal", "above", "below".'
     }
 

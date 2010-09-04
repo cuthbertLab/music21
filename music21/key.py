@@ -95,13 +95,17 @@ def pitchToSharps(value, mode=None):
     7
     >>> key.pitchToSharps('g#')
     8
-
     >>> key.pitchToSharps('e', 'dorian')
     2
     >>> key.pitchToSharps('d', 'dorian')
     0
-
     >>> key.pitchToSharps('g', 'mixolydian')
+    0
+    >>> key.pitchToSharps('e-', 'lydian')
+    -2
+    >>> key.pitchToSharps('a', 'phrygian')
+    -1
+    >>> key.pitchToSharps('e', 'phrygian')
     0
 
     '''
@@ -116,10 +120,13 @@ def pitchToSharps(value, mode=None):
         sharpSource.append(-i)
 
     minorShift = interval.Interval('-m3')
-    # this modal values were introduced to translate from ABC key values
+    # these modal values were introduced to translate from ABC key values that
+    # include mode specification
     # this value/mapping may need to be dynamically allocated based on other
-    # contexts (historical meaning of dorian, for example)
+    # contexts (historical meaning of dorian, for example) in the future
     dorianShift = interval.Interval('M2')
+    phrygianShift = interval.Interval('M3')
+    lydianShift = interval.Interval('P4')
     mixolydianShift = interval.Interval('P5')
 
     # note: this may not be the fastest approach
@@ -128,7 +135,10 @@ def pitchToSharps(value, mode=None):
         pCandidate = sharpsToPitch(i)
         # create relative transpositions based on this pitch for major
         pMinor = pCandidate.transpose(minorShift)
+
         pDorian = pCandidate.transpose(dorianShift)
+        pPhrygian = pCandidate.transpose(phrygianShift)
+        pLydian = pCandidate.transpose(lydianShift)
         pMixolydian = pCandidate.transpose(mixolydianShift)
 
         if mode in [None, 'major']:
@@ -137,6 +147,14 @@ def pitchToSharps(value, mode=None):
                 break
         elif mode in ['dorian']:
             if pDorian.name == p.name:
+                match = i
+                break
+        elif mode in ['phrygian']:
+            if pPhrygian.name == p.name:
+                match = i
+                break
+        elif mode in ['lydian']:
+            if pLydian.name == p.name:
                 match = i
                 break
         elif mode in ['mixolydian']:
@@ -256,7 +274,7 @@ class KeySignature(music21.Music21Object):
 
     classSortOrder = 2
     
-    def __init__(self, sharps = None):
+    def __init__(self, sharps=None, mode=None):
         '''
         >>> from music21 import *
 
@@ -268,7 +286,7 @@ class KeySignature(music21.Music21Object):
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
         self.sharps = sharps
         # optionally store mode, if known
-        self.mode = None
+        self.mode = mode
         # need to store a list of pitch objects, used for creating a 
         # non traditional key
         self._alteredPitches = None
@@ -330,6 +348,7 @@ class KeySignature(music21.Music21Object):
 
 
     def _getAlteredPitches(self):
+        # TODO: this result should probably be cached 
         post = []
         if self.sharps > 0:
             pKeep = pitch.Pitch('B')

@@ -54,10 +54,6 @@ reChordSymbol = re.compile('"[^"]*"') # non greedy
 
 reChord = re.compile('[.*?]') # non greedy
 
-# matching leading key indicators; see getKeySignature() for why h, p, etc 
-# are necessary
-reStandardKey = re.compile('[A-GH]{1}[#bP]{0,1}')
-
 
 
 #-------------------------------------------------------------------------------
@@ -174,57 +170,108 @@ class ABCMetadata(ABCToken):
         >>> am.getTimeSignature()
         (2, 2, 'cut')
         '''
-        if self.isMeter():
-            if self.data == 'C':
-                n, d = 4, 4
-                symbol = 'common' # m21 compat
-            elif self.data == 'C|':
-                n, d = 2, 2
-                symbol = 'cut' # m21 compat
-            else:
-                n, d = self.data.split('/')
-                n = int(n.strip())
-                d = int(d.strip())
-                symbol = 'normal' # m21 compat
-        else:       
+        if not self.isMeter():
             raise ABCTokenException('no time signature associated with this meta-data')
+
+        if self.data == 'C':
+            n, d = 4, 4
+            symbol = 'common' # m21 compat
+        elif self.data == 'C|':
+            n, d = 2, 2
+            symbol = 'cut' # m21 compat
+        else:
+            n, d = self.data.split('/')
+            n = int(n.strip())
+            d = int(d.strip())
+            symbol = 'normal' # m21 compat
 
         return n, d, symbol
 
 
     def getKeySignature(self):
-        '''Extract key signature parameters, include indications for mode, and translate sharps count compatible with m21
+        '''Extract key signature parameters, include indications for mode, and translate sharps count compatible with m21, returning the number of sharps and the mode.
+
+        >>> am = ABCMetadata('K:Eb Lydian')
+        >>> am.preParse()
+        >>> am.getKeySignature()
+        (-2, 'lydian')
+
+        >>> am = ABCMetadata('K:APhry')
+        >>> am.preParse()
+        >>> am.getKeySignature()
+        (-1, 'phrygian')
+
+        >>> am = ABCMetadata('K:G Mixolydian')
+        >>> am.preParse()
+        >>> am.getKeySignature()
+        (0, 'mixolydian')
+
+        >>> am = ABCMetadata('K: Edor')
+        >>> am.preParse()
+        >>> am.getKeySignature()
+        (2, 'dorian')
+
+        >>> am = ABCMetadata('K: F')
+        >>> am.preParse()
+        >>> am.getKeySignature()
+        (-1, None)
+
+        >>> am = ABCMetadata('K:G')
+        >>> am.preParse()
+        >>> am.getKeySignature()
+        (1, None)
+
+        >>> am = ABCMetadata('K:Hp')
+        >>> am.preParse()
+        >>> am.getKeySignature()
+        (2, None)
+
         '''
         # placing this import in method for now; key.py may import this module
         from music21 import key
 
         if not self.isKey():
             raise ABCTokenException('no key signature associated with this meta-data')
-        # first, get standard key indication
-        post = reStandardKey.findall(self.data)
-        if len(post) == 0:
-            standardKey = None
-        else: # get the first element in this list, like f#
-            standardKeyStr = post[0]
-            # replace b flat symbols w/ m21 '-' symbols
-            standardKeyStr.replace('b', '-')
 
-        # get everything after the first match
-        stringRemain = reStandardKey.split(src)
-        # check for mode strings
-        # only first three characters are parsed
-        modeCandidate = stringRemain.lower()
+        # abc uses b for flat in key spec only
+        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#', 
+                        'f', 'bb', 'eb', 'ab', 'db', 'gb', 'cb',
+                        # HP or Hp are used for highland pipes
+                        'hp']
+
+        # first, get standard key indication
+        for target in keyNameMatch:
+            if target == self.data[:len(target)].lower():
+                # keep case
+                standardKeyStr = self.data[:len(target)]
+                stringRemain = self.data[len(target):]
+        # replace a flat symbol if found; only the second char
+        if standardKeyStr == 'HP':
+            standardKeyStr = 'C' # no sharp or flats
+        elif standardKeyStr == 'Hp':
+            standardKeyStr = 'D' # use F#, C#, Gn
+        if len(standardKeyStr) > 1 and standardKeyStr[1] == 'b':
+            standardKeyStr = standardKeyStr[0] + '-'
+
         mode = None
-        for match, modeStr in [('mix', 'mixolydian'),
-                               ('dor', 'dorian'),
-                               ('phr', 'phrygian'),
-                               ('min', 'minor'),
-                              ]:
-            if match in modeCandidate:
-                mode = modeStr
+        if stringRemain != '':
+            # only first three characters are parsed
+            modeCandidate = stringRemain.lower()
+            for match, modeStr in [
+                                   ('dor', 'dorian'),
+                                   ('phr', 'phrygian'),
+                                   ('lyd', 'lydian'),
+                                   ('mix', 'mixolydian'),
+                                   ('min', 'minor'),
+                                  ]:
+                if match in modeCandidate:
+                    mode = modeStr
     
-        # with mode and standardKeyStr, create key signature object
-        # with key.pitchToSharps(standardKeyStr, mode)
+        # not yet implemented: checking for additional chromatic alternations
+        # e.g.: K:D =c would write the key signature as two sharps 
+        # (key of D) but then mark every  c  as  natural
+ 
+        return key.pitchToSharps(standardKeyStr, mode), mode
 
     def getDefaultQuarterLength(self):
         '''If there is a quarter length representation available, return it as a floating point value
@@ -348,7 +395,7 @@ class ABCNote(ABCToken):
         # store if a broken symbol applies; pair of symbol, position (left, right)
         self.brokenRhythmMarker = None
 
-        # store key signature for pitch processing
+        # store key signature for pitch processing; this is an m21 object
         self.activeKeySignature = None
             
         # pitch/ duration attributes for m21 conversion
@@ -383,43 +430,46 @@ class ABCNote(ABCToken):
 
 
     def _getPitchName(self, strSrc):
-        '''Given a note or rest string without a chord symbol, return pitch or None of a rest. 
+        '''Given a note or rest string without a chord symbol, return pitch or None if a rest. This value is paired with an accidental display status. Pitch alterations, and accidental display status, are adjusted if a key is declared in the Note. 
+
+        >>> from music21 import key
 
         >>> an = ABCNote()
         >>> an._getPitchName('e2')
-        'E5'
+        ('E5', None)
         >>> an._getPitchName('C')
-        'C4'
+        ('C4', None)
         >>> an._getPitchName('B,,')
-        'B2'
+        ('B2', None)
         >>> an._getPitchName('C,')
-        'C3'
+        ('C3', None)
         >>> an._getPitchName('c')
-        'C5'
+        ('C5', None)
         >>> an._getPitchName("c'")
-        'C6'
+        ('C6', None)
         >>> an._getPitchName("c''")
-        'C7'
+        ('C7', None)
         >>> an._getPitchName("^g")
-        'G#5'
+        ('G#5', True)
         >>> an._getPitchName("_g''")
-        'G-7'
+        ('G-7', True)
         >>> an._getPitchName("=c")
-        'Cn5'
-        >>> an._getPitchName("z4") == None
-        True
+        ('Cn5', True)
+        >>> an._getPitchName("z4") 
+        (None, None)
+
+        >>> an.activeKeySignature = key.KeySignature(3)
+        >>> an._getPitchName("c") # w/ key, change and set to false
+        ('C#5', False)
 
         '''
-        # TODO: pitches are key dependent: accidentals are not given
-        # if specified in key: must store key and adjust here
-        # this conversion, or subset of it, might be better put in pitch.py
         try:
             name = rePitchName.findall(strSrc)[0]
         except IndexError: # no matches
             raise ABCHandlerException('cannot find any pitch information in: %s' % repr(strSrc))
     
         if name == 'z':
-            return None # designates a rest
+            return (None, None) # designates a rest
         else:
             if name.islower():
                 octave = 5
@@ -442,7 +492,32 @@ class ABCNote(ABCToken):
         for x in range(naturalCount):
             accString += 'n' # m21 symbols
 
-        return '%s%s%s' % (name.upper(), accString, octave)
+        # if there is an explicit accidental, regardless of key, it should
+        # be shown: this works for naturals well
+        if accString != '':
+            accidentalDisplayStatus = True
+        # if we do not have a key signature, and have accidentals, set to None
+        elif self.activeKeySignature == None:
+            accidentalDisplayStatus = None
+        # pitches are key dependent: accidentals are not given
+        # if we have a key and find a name, that does not have a n, must be
+        # altered
+        else:
+            alteredPitches = self.activeKeySignature.alteredPitches
+            # just the steps, no accientals
+            alteredPitchSteps = [p.step.lower() for p in alteredPitches]
+            # includes #, -
+            alteredPitchNames = [p.name.lower() for p in alteredPitches]
+            #environLocal.printDebug(['alteredPitches', alteredPitches])
+
+            if name.lower() in alteredPitchSteps:
+                # get the corresponding index in the name
+                name = alteredPitchNames[alteredPitchSteps.index(name.lower())]
+            # set to false, as do not need to show w/ key sig
+            accidentalDisplayStatus = False
+
+        pStr = '%s%s%s' % (name.upper(), accString, octave)
+        return pStr, accidentalDisplayStatus
 
 
     def _getQuarterLength(self, strSrc, forceDefaultQuarterLength=None):
@@ -557,7 +632,9 @@ class ABCNote(ABCToken):
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)        
         # get pitch name form remaining string
         # rests will have a pitch name of None
-        self.pitchName = self._getPitchName(nonChordSymStr)
+        a, b = self._getPitchName(nonChordSymStr)
+        self.pitchName, self.accidentalDisplayStatus = a, b
+
         if self.pitchName == None:
             self.isRest = True
         else:
@@ -882,6 +959,9 @@ class ABCHandler(object):
     def tokenProcess(self):
         '''Process all token objects. First, call preParse(), then do cointext assignments, then call parse(). 
         '''
+        # need a key object to get altered pitches
+        from music21 import key
+
         # pre-parse : call on objects that need preliminary processing
         # metadata, for example, is parsed
         for t in self._tokens:
@@ -890,6 +970,7 @@ class ABCHandler(object):
 
         # context: iterate through tokens, supplying contextual data as necessary to appropriate objects
         lastDefaultQL = None
+        lastKeySignature = None
         for i in range(len(self._tokens)):
             # get context of tokens
             q = self._getLinearContext(self._tokens, i)
@@ -898,8 +979,10 @@ class ABCHandler(object):
             if isinstance(t, ABCMetadata):
                 if t.isMeter() or t.isDefaultNoteLength():
                     lastDefaultQL = t.getDefaultQuarterLength()
+                elif t.isKey():
+                    sharpCount, mode = t.getKeySignature()
+                    lastKeySignature = key.KeySignature(sharpCount, mode)
                 continue
-
             # broken rhythms need to be applied to previous and next notes
             if isinstance(t, ABCBrokenRhythmMarker):
                 if (isinstance(tPrev, ABCNote) and 
@@ -909,12 +992,12 @@ class ABCHandler(object):
                     tNext.brokenRhythmMarker = (t.data, 'right')
                 else:
                     raise ABCHandlerException('broken rhythm marker (%s) not positioned between two notes or chords' % t.src)
-
             # ABCChord inherits ABCNote, thus getting note is enough for both
             if isinstance(t, (ABCNote, ABCChord)):
                 if lastDefaultQL == None:
                     raise ABCHandlerException('no active default note length provided for note processing. tPrev: %s, t: %s, tNext: %s' % (tPrev, t, tNext))
                 t.activeDefaultQuarterLength = lastDefaultQL
+                t.activeKeySignature = lastKeySignature
                 continue
 
         # parse : call methods to set attributes and parse string
@@ -1133,22 +1216,6 @@ class Test(unittest.TestCase):
         src = 'A3/2'
         self.assertEqual(rePitchName.findall(src)[0], 'A')
 
-        src = 'Edor'
-        post = reStandardKey.findall(src)
-        self.assertEqual(post, ['E'])
-
-
-        src = 'nothing'
-        post = reStandardKey.findall(src)
-        self.assertEqual(post, [])
-
-        src = 'F#MIX'
-        post = reStandardKey.findall(src)
-        self.assertEqual(post, ['F#'])
-
-        # we can split to get the remaing chaaracters
-        post = reStandardKey.split(src)
-        self.assertEqual(post, ['', 'MIX'] )
 
 
     def testTokenProcessMetadata(self):
@@ -1196,6 +1263,30 @@ class Test(unittest.TestCase):
             handler.tokenProcess()
 
 
+    def testNoteParse(self):
+        from music21 import key
+
+        an = ABCNote()
+
+        # with a key signature, matching steps are assumed altered
+        an.activeKeySignature = key.KeySignature(3)
+        self.assertEqual(an._getPitchName("c"), ('C#5', False))
+
+        an.activeKeySignature = None
+        self.assertEqual(an._getPitchName("c"), ('C5', None))
+        self.assertEqual(an._getPitchName("^c"), ('C#5', True))
+
+
+        an.activeKeySignature = key.KeySignature(-3)
+        self.assertEqual(an._getPitchName("B"), ('B-4', False))
+
+        an.activeKeySignature = None
+        self.assertEqual(an._getPitchName("B"), ('B4', None))
+        self.assertEqual(an._getPitchName("_B"), ('B-4', True))
+
+
+
+
 if __name__ == "__main__":
     import sys
 
@@ -1204,7 +1295,7 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
 
-        t.testRe()
+        t.testNoteParse()
 
 
 
