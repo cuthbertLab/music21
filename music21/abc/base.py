@@ -813,6 +813,7 @@ class ABCChord(ABCNote):
         # may need to supply key?
         ah.tokenize(tokenStr)
 
+        chordDurationPost = None
         for t in ah.tokens:
             #environLocal.printDebug(['ABCChord: subTokens', t])
             # parse any tokens individually, supply local data as necesssary
@@ -820,8 +821,14 @@ class ABCChord(ABCNote):
                 t.parse(
                     forceDefaultQuarterLength=self.activeDefaultQuarterLength,
                     forceKeySignature=self.activeKeySignature)
+                # get the quarter length from the sub-tokens
+                # note: assuming these are the same
+                chordDurationPost = t.quarterLength
 
             self.subTokens.append(t)
+
+        if chordDurationPost != None:
+            self.quarterLength = chordDurationPost
 
 
 #-------------------------------------------------------------------------------
