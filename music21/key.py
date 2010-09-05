@@ -8,7 +8,9 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''This module defines objects for representing key signatures, as well as key areas. The :class:`~music21.key.KeySignature` is used in :class:`~music21.stream.Measure` objects for defining notated key signatures. 
+'''This module defines objects for representing key signatures as well as key 
+areas. The :class:`~music21.key.KeySignature` is used in 
+:class:`~music21.stream.Measure` objects for defining notated key signatures. 
 '''
 
 import doctest, unittest
@@ -24,7 +26,8 @@ from music21 import common
 
 #-------------------------------------------------------------------------------
 def sharpsToPitch(sharpCount):
-    '''Given a number a positive/negative number of sharps, return a Pitch object set to the appropriate major key value.
+    '''Given a number a positive/negative number of sharps, return a Pitch 
+    object set to the appropriate major key value.
 
     >>> from music21 import *
     >>> key.sharpsToPitch(1)
@@ -67,9 +70,18 @@ def sharpsToPitch(sharpCount):
 
 
 def pitchToSharps(value, mode=None):
-    '''Given a pitch or :class:`music21.pitch.Pitch` object, return the number of sharps found in the major key.
+    '''Given a pitch or :class:`music21.pitch.Pitch` object, 
+    return the number of sharps found in that mode.
 
-    The `mode` parameter can be None (=Major), 'major', or 'minor'.
+    The `mode` parameter can be 'major', 'minor', or most
+    of the common church/jazz modes ('dorian', 'mixolydian', etc.)
+    but not Locrian yet.
+    
+    If `mode` is omitted, the default mode is major.
+
+    (extra points to anyone who can find the earliest reference to
+    the Locrian mode in print.  David Cohen and I (MSC) have been
+    looking for this for years).
 
     >>> from music21 import *
 
@@ -471,7 +483,12 @@ class KeySignature(music21.Music21Object):
     #---------------------------------------------------------------------------
     # properties
     def transpose(self, value, inPlace=False):
-        '''Transpose the KeySignature by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided. Alternatively, a :class:`music21.interval.Interval` object can be supplied.
+        '''
+        Transpose the KeySignature by the user-provided value. 
+        If the value is an integer, the transposition is treated 
+        in half steps. If the value is a string, any Interval string 
+        specification can be provided. Alternatively, a 
+        :class:`music21.interval.Interval` object can be supplied.
 
         >>> a = KeySignature(2)
         >>> a.pitchAndMode
