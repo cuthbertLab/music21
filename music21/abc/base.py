@@ -67,10 +67,17 @@ class ABCHandlerException(Exception):
 #-------------------------------------------------------------------------------
 class ABCToken(object):
     '''
-    ABC processing works with a multi-pass procedure. The first pass breaks the data stream into a list of ABCToken objects. ABCToken objects are specialized in subclasses. 
+    ABC processing works with a multi-pass procedure. The first pass
+    breaks the data stream into a list of ABCToken objects. ABCToken
+    objects are specialized in subclasses. 
 
-    The multi-pass procedure is conducted by an ABCHandler object. The ABCHandler.tokenize() method breaks the data stream into ABCToken objects. The ABCHandler.tokenProcess() method first calls the preParse() method on each token, then does contextual adjustments to all tokens, then calls parse() on all tokens.
+    The multi-pass procedure is conducted by an ABCHandler object. 
+    The ABCHandler.tokenize() method breaks the data stream into 
+    ABCToken objects. The ABCHandler.tokenProcess() method first 
+    calls the preParse() method on each token, then does contextual 
+    adjustments to all tokens, then calls parse() on all tokens.
 
+    The ABC string itself is stored in self.src
 
     '''
     def __init__(self, src=''):
@@ -83,14 +90,14 @@ class ABCToken(object):
         '''
         removes ABC-style comments from a string:
         
-        >>> ao = ABCToken()
+        >>> from music21 import *
+        >>> ao = abc.ABCToken()
         >>> ao.stripComment('asdf')
         'asdf'
         >>> ao.stripComment('asdf%234')
         'asdf'
         >>> ao.stripComment('asdf  %     234')
-        'asdf  '
-        
+        'asdf  '        
         >>> ao.stripComment('[ceg]% this chord appears 50% more often than other chords do')
         '[ceg]'
         '''
@@ -99,13 +106,18 @@ class ABCToken(object):
         return strSrc
     
     def preParse(self):
-        '''Called before context adjustments. 
+        '''
+        Dummy method that is called before contextual adjustments. 
+        Designed to be subclassed or overridden.
         '''
         pass
 
     def parse(self): 
-        '''Read self.src and load attributes. Customize in subclasses.
-        Called after context adjustments
+        '''
+        Dummy method that is reads self.src and loads attributes. 
+        It is called after contextual adjustments.
+        
+        It is designed to be subclassed or overridden.
         '''
         pass
 
@@ -114,7 +126,7 @@ class ABCMetadata(ABCToken):
 
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
-    def __init__(self, src):
+    def __init__(self, src = ''):
         ABCToken.__init__(self, src)
         self.tag = None
         self.data = None
@@ -123,7 +135,18 @@ class ABCMetadata(ABCToken):
         return '<ABCMetadata %r>' % self.src
 
     def preParse(self):
-        '''Called before context adjustments: need to have access to data
+        '''
+        Called before contextual adjustments and needs 
+        to have access to data.  Divides a token into
+        .tag (a single capital letter or w) and .data representations.
+        
+        >>> from music21 import *
+        >>> x = abc.ABCMetadata('T:tagData')
+        >>> x.preParse()
+        >>> x.tag
+        'T'
+        >>> x.data
+        'tagData'
         '''
         div = reMetadataTag.match(self.src).end()
         strSrc = self.stripComment(self.src) # remove any comments
@@ -134,41 +157,64 @@ class ABCMetadata(ABCToken):
         pass
 
     def isDefaultNoteLength(self):
+        '''
+        returns True if the tag is "L", False otherwise.
+        '''
         if self.tag == 'L': 
             return True
         return False
 
     def isMeter(self):
+        '''
+        returns True if the tag is "M" for meter, False otherwise.
+        '''
+
         if self.tag == 'M': 
             return True
         return False
 
     def isTitle(self):
+        '''
+        returns True if the tag is "T" for title, False otherwise.
+        '''
         if self.tag == 'T': 
             return True
         return False
 
     def isComposer(self):
+        '''
+        returns True if the tag is "C" for composer, False otherwise.
+        '''
         if self.tag == 'C': 
             return True
         return False
 
     def isVoice(self):
+        '''
+        returns True if the tag is "V", False otherwise.
+        '''
         if self.tag == 'V': 
             return True
         return False
 
     def isKey(self):
+        '''
+        returns True if the tag is "K", False otherwise.
+        '''
         if self.tag == 'K': 
             return True
         return False
 
 
     def getTimeSignature(self):
-        '''If there is a time signature representation available, get a numerator and denominator
+        '''If there is a time signature representation available, 
+        get a numerator and denominator and an abbreviation symbol
 
-        >>> am = ABCMetadata('M:2/2')
+        >>> from music21 import *
+        >>> am = abc.ABCMetadata('M:2/2')
         >>> am.preParse()
+        >>> am.isMeter()
+        True
         >>> am.getTimeSignature()
         (2, 2, 'normal')
 
@@ -195,49 +241,61 @@ class ABCMetadata(ABCToken):
         return n, d, symbol
 
     def getTimeSignatureObject(self):
-        '''Return a music 21 time signature ojbect
+        '''
+        Return a music21 :class:`~music21.meter.TimeSignature` 
+        object for this metadata tag.
+        
+        >>> from music21 import *
+        >>> am = abc.ABCMetadata('M:2/2')
+        >>> am.preParse()
+        >>> ts = am.getTimeSignatureObject()
+        >>> ts
+        <music21.meter.TimeSignature 2/2>
         '''
         if not self.isMeter():
-            raise ABCTokenException('no time signature associated with this meta-data')
+            raise ABCTokenException('no time signature associated with this non-metrical meta-data')
         from music21 import meter
         n, d, symbol = self.getTimeSignature()
         return meter.TimeSignature('%s/%s' % (n,d))
 
 
     def getKeySignature(self):
-        '''Extract key signature parameters, include indications for mode, and translate sharps count compatible with m21, returning the number of sharps and the mode.
+        '''Extract key signature parameters, include indications for mode, 
+        and translate sharps count compatible with m21, 
+        returning the number of sharps and the mode.
 
-        >>> am = ABCMetadata('K:Eb Lydian')
+        >>> from music21 import *
+        >>> am = abc.ABCMetadata('K:Eb Lydian')
         >>> am.preParse()
         >>> am.getKeySignature()
         (-2, 'lydian')
 
-        >>> am = ABCMetadata('K:APhry')
+        >>> am = abc.ABCMetadata('K:APhry')
         >>> am.preParse()
         >>> am.getKeySignature()
         (-1, 'phrygian')
 
-        >>> am = ABCMetadata('K:G Mixolydian')
+        >>> am = abc.ABCMetadata('K:G Mixolydian')
         >>> am.preParse()
         >>> am.getKeySignature()
         (0, 'mixolydian')
 
-        >>> am = ABCMetadata('K: Edor')
+        >>> am = abc.ABCMetadata('K: Edor')
         >>> am.preParse()
         >>> am.getKeySignature()
         (2, 'dorian')
 
-        >>> am = ABCMetadata('K: F')
+        >>> am = abc.ABCMetadata('K: F')
         >>> am.preParse()
         >>> am.getKeySignature()
         (-1, None)
 
-        >>> am = ABCMetadata('K:G')
+        >>> am = abc.ABCMetadata('K:G')
         >>> am.preParse()
         >>> am.getKeySignature()
         (1, None)
 
-        >>> am = ABCMetadata('K:Hp')
+        >>> am = abc.ABCMetadata('K:Hp')
         >>> am.preParse()
         >>> am.getKeySignature()
         (2, None)
@@ -292,27 +350,28 @@ class ABCMetadata(ABCToken):
     def getDefaultQuarterLength(self):
         '''If there is a quarter length representation available, return it as a floating point value
 
-        >>> am = ABCMetadata('L:1/2')
+        >>> from music21 import *
+        >>> am = abc.ABCMetadata('L:1/2')
         >>> am.preParse()
         >>> am.getDefaultQuarterLength()
         2.0
 
-        >>> am = ABCMetadata('L:1/8')
+        >>> am = abc.ABCMetadata('L:1/8')
         >>> am.preParse()
         >>> am.getDefaultQuarterLength()
         0.5
 
-        >>> am = ABCMetadata('M:C|')
+        >>> am = abc.ABCMetadata('M:C|')
         >>> am.preParse()
         >>> am.getDefaultQuarterLength()
         0.5
 
-        >>> am = ABCMetadata('M:2/4')
+        >>> am = abc.ABCMetadata('M:2/4')
         >>> am.preParse()
         >>> am.getDefaultQuarterLength()
         0.25
 
-        >>> am = ABCMetadata('M:6/8')
+        >>> am = abc.ABCMetadata('M:6/8')
         >>> am.preParse()
         >>> am.getDefaultQuarterLength()
         0.5
@@ -352,9 +411,9 @@ class ABCBar(ABCToken):
 
 
 class ABCTuplet(ABCToken):
-    '''ABcTuplet tokens always precede the notes they describe.
+    '''
+    ABCTuplet tokens always precede the notes they describe.
 
-    
     In ABCHandler.tokenProcess(), rhythms are adjusted. 
 
     '''
@@ -382,18 +441,18 @@ class ABCTuplet(ABCToken):
     def updateRatio(self, keySignatureObj=None):
         '''Cannot be called until local meter context is established
 
-        >>> at = ABCTuplet('(3')
+        >>> from music21 import *
+        >>> at = abc.ABCTuplet('(3')
         >>> at.updateRatio()
         >>> at.numberNotesActual, at.numberNotesNormal
         (3, 2)
 
-        >>> at = ABCTuplet('(5')
+        >>> at = abc.ABCTuplet('(5')
         >>> at.updateRatio()
         >>> at.numberNotesActual, at.numberNotesNormal
         (5, 2)
 
-        >>> from music21 import meter
-        >>> at = ABCTuplet('(5')
+        >>> at = abc.ABCTuplet('(5')
         >>> at.updateRatio(meter.TimeSignature('6/8'))
         >>> at.numberNotesActual, at.numberNotesNormal
         (5, 3)
@@ -468,7 +527,8 @@ class ABCBrokenRhythmMarker(ABCToken):
     def preParse(self):
         '''Called before context adjustments: need to have access to data
 
-        >>> abrm = ABCBrokenRhythmMarker('>>>')
+        >>> from music21 import *
+        >>> abrm = abc.ABCBrokenRhythmMarker('>>>')
         >>> abrm.preParse()
         >>> abrm.data
         '>>>'
@@ -481,9 +541,16 @@ class ABCNote(ABCToken):
     '''
     A model of an ABCNote.
 
-    General usage requires multi-pass processing. After being tokenized, each ABCNote needs a number of attributes updates. Attributes to be updated after tokenizing, and based on the linear sequence of tokens: `inBar`, `inBeam`, `inSlur`, `inGrace`, `activeDefaultQuarterLength`, `brokenRhythmMarker`, and `activeKeySignature`.  
+    General usage requires multi-pass processing. After being tokenized, 
+    each ABCNote needs a number of attributes updates. Attributes to 
+    be updated after tokenizing, and based on the linear sequence of 
+    tokens: `inBar`, `inBeam`, `inSlur`, `inGrace`, 
+    `activeDefaultQuarterLength`, `brokenRhythmMarker`, and 
+    `activeKeySignature`.  
 
-    The `chordSymbols` list stores one or more chord symbols (ABC calls these guitar chords) associated with this note. This attribute is updated when parse() is called. 
+    The `chordSymbols` list stores one or more chord symbols (ABC calls 
+    these guitar chords) associated with this note. This attribute is 
+    updated when parse() is called. 
     '''
     # given a logical unit, create an object
     # may be a chord, notes, bars
@@ -527,9 +594,11 @@ class ABCNote(ABCToken):
 
     
     def _splitChordSymbols(self, strSrc):
-        '''Split chord symbols from other string characteristics. Return list of chord symbols and clean, remain chars
+        '''Split chord symbols from other string characteristics. 
+        Return list of chord symbols and clean, remain chars
 
-        >>> an = ABCNote()
+        >>> from music21 import *
+        >>> an = abc.ABCNote()
         >>> an._splitChordSymbols('"C"e2')
         (['"C"'], 'e2')
         >>> an._splitChordSymbols('b2')
@@ -549,11 +618,16 @@ class ABCNote(ABCToken):
 
 
     def _getPitchName(self, strSrc, forceKeySignature=None):
-        '''Given a note or rest string without a chord symbol, return a music21 pitch string or None (if a rest), and the accidental display status. This value is paired with an accidental display status. Pitch alterations, and accidental display status, are adjusted if a key is declared in the Note. 
+        '''Given a note or rest string without a chord symbol, 
+        return a music21 pitch string or None (if a rest), 
+        and the accidental display status. This value is paired 
+        with an accidental display status. Pitch alterations, and 
+        accidental display status, are adjusted if a key is 
+        declared in the Note. 
 
-        >>> from music21 import key
+        >>> from music21 import abc, key
 
-        >>> an = ABCNote()
+        >>> an = abc.ABCNote()
         >>> an._getPitchName('e2')
         ('E5', None)
         >>> an._getPitchName('C')
@@ -647,7 +721,8 @@ class ABCNote(ABCToken):
     def _getQuarterLength(self, strSrc, forceDefaultQuarterLength=None):
         '''Called with parse(), after context processing, to calculate duration
 
-        >>> an = ABCNote()
+        >>> from music21 import *
+        >>> an = abc.ABCNote()
         >>> an.activeDefaultQuarterLength = .5
         >>> an._getQuarterLength('e2')
         1.0
@@ -665,7 +740,7 @@ class ABCNote(ABCToken):
         >>> an._getQuarterLength('A///')
         0.0625
 
-        >>> an = ABCNote()
+        >>> an = abc.ABCNote()
         >>> an.activeDefaultQuarterLength = .5
         >>> an.brokenRhythmMarker = ('>', 'left')
         >>> an._getQuarterLength('A')
@@ -843,8 +918,8 @@ class ABCHandler(object):
     def _getLinearContext(self, strSrc, i):
         '''Find the local context of a string or list of ojbects. Returns charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace.
 
-
-        >>> ah = ABCHandler()
+        >>> from music21 import *
+        >>> ah = abc.ABCHandler()
         >>> ah._getLinearContext('12345', 0)
         (None, None, '1', '2', '2', '3')
         >>> ah._getLinearContext('12345', 1)
@@ -912,9 +987,10 @@ class ABCHandler(object):
 
 
     def _getNextLineBreak(self, strSrc, i):
-        '''Return index of next line break.
+        '''Return index of next line break after character i.
 
-        >>> ah = ABCHandler()
+        >>> from music21 import *
+        >>> ah = abc.ABCHandler()
         >>> strSrc = 'de  we\\n wer bfg\\n'
         >>> ah._getNextLineBreak(strSrc, 0)
         6
@@ -940,7 +1016,8 @@ class ABCHandler(object):
     def tokenize(self, strSrc):
         '''Walk the abc string, creating ABC objects along the way.
 
-        This may be called separately from process(), in the case that pre/post parse processing is not needed. 
+        This may be called separately from process(), in the case 
+        that pre/post parse processing is not needed. 
         '''
         i = 0
         collect = []
@@ -1200,8 +1277,9 @@ class ABCHandler(object):
     def splitByVoice(self):
         '''Given a processed token list, look for voices. If voices exist, split into parts: common metadata, then next voice, next voice, etc.
 
+        >>> from music21 import *
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||'
-        >>> ah = ABCHandler()
+        >>> ah = abc.ABCHandler()
         >>> junk = ah.process(abcStr)
         >>> tokenColls = ah.splitByVoice()
         >>> [t.src for t in tokenColls[0]] # common headers are first
@@ -1285,6 +1363,7 @@ class ABCFile(object):
         '''Open a file for reading
         '''
         self.file = open(filename, 'r') 
+        self.filename = filename
 
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by StringIO, as an open file object.

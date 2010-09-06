@@ -21,7 +21,10 @@ environLocal = environment.Environment(_MOD)
 
 
 def abcToStream(abcHandler, inputM21=None):
-    '''Given an abcHandler object, build into a multi part Stream with metadata
+    '''Given an abcHandler object, build into a multi-part :class:`~music21.stream.Score` with metadata
+    
+    if the optional parameter inputM21 is given a music21 Stream subclass, it will use that object
+    as the outermost object.  However, inner parts will always be made :class:`~music21.stream.Part` objects.
     '''
 
     from music21 import metadata

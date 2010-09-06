@@ -41,6 +41,7 @@ Module Reference
 .. toctree::
    :maxdepth: 1
 
+   moduleAbcBase
    moduleBase
    moduleBeam
    moduleClef
