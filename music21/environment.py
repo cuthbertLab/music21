@@ -90,7 +90,11 @@ class SettingsHandler(xml.sax.ContentHandler):
 
 #-------------------------------------------------------------------------------
 class Environment(object):
-    '''The Environment object stores user preferences as dictionary-like object. 
+    '''The Environment object stores user preferences as dictionary-like object. Additionally, the Environment object provides convenience methods to music21 modules for getting temporary files, launching files with external applications, and printing debug and warning messages.
+
+    Generally, each module creates a single, module-level instance of Environment, passing the module's name during creation. 
+
+    For more a user-level interface for creating and editing settings, see the  :class:`~music21.environment.UserSettings` object. 
     '''
 
     # define order to present names in documentation; use strings
@@ -254,6 +258,9 @@ class Environment(object):
         self.ref[key] = value
 
     def __repr__(self):
+        return '<Environment>'
+
+    def __str__(self):
         return repr(self.ref)
 
     def keys(self):
@@ -329,7 +336,6 @@ class Environment(object):
         # need to use __getitem__ here b/c need to covnert debug value
         # to an integer
         self.printDebug([_MOD, 'writing preference file', self.ref])
-
 
         dir, fn = os.path.split(fp)
         if fp == None or not os.path.exists(dir):
@@ -490,6 +496,90 @@ class Environment(object):
 
 
 #-------------------------------------------------------------------------------
+class UserSettings(object):
+    '''The UserSettings object provides a simple interface for configuring the user preferences in the :class:`~music21.environment.Environment` object.
+
+    First, create an instance of UserSettings:
+
+    >>> from music21 import *
+    >>> us = environment.UserSettings()
+
+
+    Second, view the available settings keys.
+
+
+    >>> us.keys()
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+
+
+    Third, after finding the desired setting, supply the new value as a Python dictionary key value pair. Setting this value updates the user's settings file. For example, to set the file path to the Application that will be used to open MusicXML files, use the 'musicxmlPath' key. 
+
+
+    >>> #_DOCS_SHOW us['musicxmlPath'] = '/Applications/Finale Reader.app'
+    >>> #_DOCS_SHOW us['musicxmlPath']
+    u'/Applications/Finale Reader.app'
+    '''
+
+    def __init__(self):
+        # store environment as a private attribute
+        self._environemnt = Environment()
+
+
+    def restoreDefaults(self):
+        '''Restore platform specific defaults. 
+        '''
+        # location specific, cannot test further
+        self._environemnt.restoreDefaults()
+        self._environemnt.write()
+
+    def __getitem__(self, key):
+        '''Dictionary like getting. 
+        '''
+        # location specific, cannot test further
+        return self._environemnt.__getitem__(key)
+
+
+    def __setitem__(self, key, value):
+        '''Dictionary-like setting. Changes are made and written to the user configuration file.
+        '''
+        # location specific, cannot test further
+        self._environemnt.__setitem__(key, value)
+        self._environemnt.write()
+
+
+    def __repr__(self):
+        '''Return a string representation. 
+
+        >>> from music21 import *
+        >>> us = environment.UserSettings()
+        >>> post = repr(us) # location specific, cannot test
+        '''
+        return self._environemnt.__repr__()
+
+    def __str__(self):
+        '''Return a string representation. 
+
+        >>> from music21 import *
+        >>> us = environment.UserSettings()
+        >>> post = repr(us) # location specific, cannot test
+        '''
+        return self._environemnt.__str__()
+
+    def keys(self):
+        '''Return the keys found in the user's :class:`~music21.environment.Environment` object. 
+        '''
+        return self._environemnt.ref.keys()
+
+    def getSettingsPath(self):
+        '''Return the path to the platform specific settings file.
+        '''
+        return self._environemnt.getSettingsPath()
+
+
+
+
+
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     '''Unit tests
     '''
@@ -530,7 +620,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Environment, Preference]
+_DOC_ORDER = [UserSettings, Environment, Preference]
 
 if __name__ == "__main__":
     music21.mainTest(Test)

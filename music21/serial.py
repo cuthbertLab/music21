@@ -81,7 +81,7 @@ class TwelveToneRow(ToneRow):
 
     def __init__(self):
         ToneRow.__init__(self)
-        environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
+        #environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
 
         if self.row != None:
             for pc in self.row:
