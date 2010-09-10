@@ -76,17 +76,17 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 def getMissingImportStr(modNameList):
     '''
     >>> getMissingImportStr(['PIL'])
-    'Missing optional package PIL; see http://web.mit.edu/music21/doc/extras.html'
+    'Missing optional package PIL; see http://mit.edu/music21/extras.html'
     >>> getMissingImportStr(['PIL', 'numpy'])
-    'Missing optional packages PIL, numpy; see http://web.mit.edu/music21/doc/extras.html'
+    'Missing optional packages PIL, numpy; see http://mit.edu/music21/extras.html'
 
     '''
     if len(modNameList) == 0:
         return None
     elif len(modNameList) == 1:
-        return 'Missing optional package %s; see http://web.mit.edu/music21/doc/extras.html' % modNameList[0]
+        return 'Missing optional package %s; see http://mit.edu/music21/extras.html' % modNameList[0]
     else:
-        return 'Missing optional packages %s; see http://web.mit.edu/music21/doc/extras.html' % ', '.join(modNameList)
+        return 'Missing optional packages %s; see http://mit.edu/music21/extras.html' % ', '.join(modNameList)
 
 #-------------------------------------------------------------------------------
 def findFormat(fmt):
