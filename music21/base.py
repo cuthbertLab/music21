@@ -1963,6 +1963,24 @@ class Music21Object(object):
 
     #---------------------------------------------------------------------------
     # temporal and beat based positioning
+    def _getMeasureNumberLocal(self):
+        '''If this object is contained in a Measure, return the measure number
+        '''
+        mNumber = None # default for not defined
+        if self.parent != None and self.parent.isMeasure:
+            mNumber = self.parent.measureNumber
+        else:
+            # testing sortByCreationTime == true; this may be necessary
+            # as we often want the most recent measure
+            m = self.getContextByClass('Measure', sortByCreationTime=True)
+            if m != None:
+                mNumber = m.measureNumber
+        return mNumber
+
+    measureNumberLocal = property(_getMeasureNumberLocal, 
+        doc = '''Return the measure number of a Measure that contains this object. 
+        ''')  
+
 
     def _getMeasureOffset(self):
         '''Try to obtain the nearest Measure that contains this object, and return the offset within that Measure.
@@ -2857,7 +2875,7 @@ class Test(unittest.TestCase):
 
 
     def testBeatAccess(self):
-        '''Test getting beta data from various Music21Objects.
+        '''Test getting beat data from various Music21Objects.
         '''
         from music21 import corpus
         s = corpus.parseWork('bach/bwv66.6.xml')
@@ -2918,6 +2936,37 @@ class Test(unittest.TestCase):
         self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None] )
 
 
+    def testMeaureNumberAccess(self):
+        '''Test getting measure numebr data from various Music21Objects.
+        '''
+
+        from music21 import corpus, stream, note
+        
+        s = corpus.parseWork('bach/bwv66.6.xml')
+        p1 = s.parts['Soprano']
+        for classStr in ['Clef', 'KeySignature', 'TimeSignature']:
+            self.assertEqual(p1.flat.getElementsByClass(
+                classStr)[0].measureNumberLocal, 0)
+        
+        match = []
+        for n in p1.flat.notes:
+            match.append(n.measureNumberLocal)
+        self.assertEqual(match, [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 9] )
+        
+        
+        # create a note and put it in different measures
+        m1 = stream.Measure()
+        m1.measureNumber = 3
+        m2 = stream.Measure()
+        m2.measureNumber = 74
+        n = note.Note()
+        self.assertEqual(n.measureNumberLocal, None) # not in a Meaure
+        m1.append(n)
+        self.assertEqual(n.measureNumberLocal, 3) 
+        m2.append(n)
+        self.assertEqual(n.measureNumberLocal, 74)
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper, DefinedContexts]
@@ -2970,4 +3019,5 @@ if __name__ == "__main__":
     else:
         t = Test()
         #t.testDefinedContextsClef()
-        t.testBeatAccess()
+        #t.testBeatAccess()
+        t.testMeaureNumberAccess()
