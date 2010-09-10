@@ -17,7 +17,6 @@ import codecs
 
 import music21
 
-from music21.abc import base as abc
 from music21 import base
 from music21 import beam
 from music21 import clef
@@ -27,6 +26,9 @@ from music21 import converter
 
 from music21.corpus import base as corpus
 from music21.midi import base as midi
+from music21.midi import translate as midiTranslate
+from music21.abc import base as abc
+from music21.abc import translate as abcTranslate
 
 
 from music21 import duration
@@ -81,6 +83,7 @@ NO_DOC = 'No documentation.'
 
 MODULES = [
     abc,
+    abcTranslate,
     base,
     beam,
     clef, 

@@ -68,8 +68,7 @@ def abcToStream(abcHandler, inputM21=None):
                     # should append at the right position
                     p.append(ts)
                 elif t.isKey():
-                    sharps, mode = t.getKeySignature()
-                    ks = key.KeySignature(sharps, mode)
+                    ks = t.getKeySignatureObject()
                     p.append(ks)
     
             # as ABCChord is subclass of ABCNote, handle first

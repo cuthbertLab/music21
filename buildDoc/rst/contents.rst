@@ -42,6 +42,7 @@ Module Reference
    :maxdepth: 1
 
    moduleAbcBase
+   moduleAbcTranslate
    moduleBase
    moduleBeam
    moduleClef

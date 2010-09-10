@@ -206,26 +206,25 @@ class ABCMetadata(ABCToken):
         return False
 
 
-    def getTimeSignature(self):
+    def _getTimeSignatureParameters(self):
         '''If there is a time signature representation available, 
-        get a numerator and denominator and an abbreviation symbol
+        get a numerator, denominator and an abbreviation symbol. To get a music21 :class:`~music21.meter.TimeSignature` object, use the :meth:`~music21.abc.base.ABCMetadata.getTimeSignatureObject` method.
 
         >>> from music21 import *
         >>> am = abc.ABCMetadata('M:2/2')
         >>> am.preParse()
         >>> am.isMeter()
         True
-        >>> am.getTimeSignature()
+        >>> am._getTimeSignatureParameters()
         (2, 2, 'normal')
 
         >>> am = ABCMetadata('M:C|')
         >>> am.preParse()
-        >>> am.getTimeSignature()
+        >>> am._getTimeSignatureParameters()
         (2, 2, 'cut')
         '''
         if not self.isMeter():
             raise ABCTokenException('no time signature associated with this meta-data')
-
         if self.data == 'C':
             n, d = 4, 4
             symbol = 'common' # m21 compat
@@ -237,7 +236,6 @@ class ABCMetadata(ABCToken):
             n = int(n.strip())
             d = int(d.strip())
             symbol = 'normal' # m21 compat
-
         return n, d, symbol
 
     def getTimeSignatureObject(self):
@@ -255,11 +253,11 @@ class ABCMetadata(ABCToken):
         if not self.isMeter():
             raise ABCTokenException('no time signature associated with this non-metrical meta-data')
         from music21 import meter
-        n, d, symbol = self.getTimeSignature()
+        n, d, symbol = self._getTimeSignatureParameters()
         return meter.TimeSignature('%s/%s' % (n,d))
 
 
-    def getKeySignature(self):
+    def _getKeySignatureParameters(self):
         '''Extract key signature parameters, include indications for mode, 
         and translate sharps count compatible with m21, 
         returning the number of sharps and the mode.
@@ -267,37 +265,37 @@ class ABCMetadata(ABCToken):
         >>> from music21 import *
         >>> am = abc.ABCMetadata('K:Eb Lydian')
         >>> am.preParse()
-        >>> am.getKeySignature()
+        >>> am._getKeySignatureParameters()
         (-2, 'lydian')
 
         >>> am = abc.ABCMetadata('K:APhry')
         >>> am.preParse()
-        >>> am.getKeySignature()
+        >>> am._getKeySignatureParameters()
         (-1, 'phrygian')
 
         >>> am = abc.ABCMetadata('K:G Mixolydian')
         >>> am.preParse()
-        >>> am.getKeySignature()
+        >>> am._getKeySignatureParameters()
         (0, 'mixolydian')
 
         >>> am = abc.ABCMetadata('K: Edor')
         >>> am.preParse()
-        >>> am.getKeySignature()
+        >>> am._getKeySignatureParameters()
         (2, 'dorian')
 
         >>> am = abc.ABCMetadata('K: F')
         >>> am.preParse()
-        >>> am.getKeySignature()
+        >>> am._getKeySignatureParameters()
         (-1, None)
 
         >>> am = abc.ABCMetadata('K:G')
         >>> am.preParse()
-        >>> am.getKeySignature()
+        >>> am._getKeySignatureParameters()
         (1, None)
 
         >>> am = abc.ABCMetadata('K:Hp')
         >>> am.preParse()
-        >>> am.getKeySignature()
+        >>> am._getKeySignatureParameters()
         (2, None)
 
         '''
@@ -347,6 +345,27 @@ class ABCMetadata(ABCToken):
  
         return key.pitchToSharps(standardKeyStr, mode), mode
 
+
+    def getKeySignatureObject(self):
+        '''
+        Return a music21 :class:`~music21.key.KeySignature` 
+        object for this metadata tag.
+        
+        >>> from music21 import *
+        >>> am = abc.ABCMetadata('K:G')
+        >>> am.preParse()
+        >>> ks = am.getKeySignatureObject()
+        >>> ks
+        <music21.key.KeySignature of 1 sharp>
+        '''
+        if not self.isKey():
+            raise ABCTokenException('no key signature associated with this meta-data')
+        from music21 import key
+        # return values of _getKeySignatureParameters are sharps, mode
+        # need to unpack list w/ *
+        return key.KeySignature(*self._getKeySignatureParameters())
+
+
     def getDefaultQuarterLength(self):
         '''If there is a quarter length representation available, return it as a floating point value
 
@@ -387,7 +406,7 @@ class ABCMetadata(ABCToken):
             
         elif self.isMeter():
             # meter auto-set a default not length
-            n, d, symbol = self.getTimeSignature()
+            n, d, symbol = self._getTimeSignatureParameters()
             if float(n) / d < .75:
                 return .25 # less than 0.75 the default is a sixteenth note
             else:
@@ -1210,7 +1229,7 @@ class ABCHandler(object):
                 if t.isMeter() or t.isDefaultNoteLength():
                     lastDefaultQL = t.getDefaultQuarterLength()
                 elif t.isKey():
-                    sharpCount, mode = t.getKeySignature()
+                    sharpCount, mode = t._getKeySignatureParameters()
                     lastKeySignature = key.KeySignature(sharpCount, mode)
                 continue
             # broken rhythms need to be applied to previous and next notes
