@@ -1495,11 +1495,11 @@ class Stream(music21.Music21Object):
                     return element
         return None
 
-    def getElementsByOffset(self, offsetStart, offsetEnd = None,
-                    includeEndBoundary = True, mustFinishInSpan = False, mustBeginInSpan = True):
+    def getElementsByOffset(self, offsetStart, offsetEnd=None,
+                    includeEndBoundary=True, mustFinishInSpan=False, mustBeginInSpan=True):
         '''Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values.
 
-        If `mustFinishInSpan` is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in.
+        If `mustFinishInSpan` is True then an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in.
 
         The `includeEndBoundary` option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do.
         
@@ -2379,26 +2379,57 @@ class Stream(music21.Music21Object):
 #     def getElementsByOffset(self, offsetStart, offsetEnd = None,
 #                     includeEndBoundary = True, mustFinishInSpan = False, mustBeginInSpan = True):
 
-    def chordify(self, offsetStepSize=1):
+    def chordify(self, minimumWindowSize=.25, inPlace=False):
         '''Gather any number of Note or note-like elements into a Chord.
 
-        The gathering of elements uses the same parameters as getElementsByOffset.
+        The gathering of elements uses the `minimumWindowSize`, in quarter lengths, to collect all elements that start within a specified window. After the first Chord is collected
 
+        The new Chord is given the maximum duration of all collected Notes.
 
         '''
         if not inPlace: # make a copy
             returnObj = self.__class__() # for output
         else:
             returnObj = self
-
         o = 0.0 # start at zero
+        oTerminate = self.highestOffset
         while True: 
-            oStart = 0.0
-            # end could/should be based on looking at the elements
-            oEnd = 0.0 + offsetStepSize 
+            oStart = o
+            # windowSize will be adjusted based on the longest duration 
+            # found
+            oEnd = oStart + minimumWindowSize 
             sub = self.getElementsByOffset(oStart, oEnd,
-                    includeEndBoundary=True, mustFinishInSpan=False, mustBeginInSpan=True)            
+                    includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
+            #print 'post getElements()', oStart, oEnd
+            #sub.show('t') 
+            subNotes = sub.notes # get once for speed         
             # make sub into a chord
+            ql = None 
+            if len(subNotes) > 0:
+                # get largest duration, use for duration of Chord, next span
+                ql = max([n.quarterLength for n in subNotes])
+                c = chord.Chord()
+                c.duration.quarterLength = ql
+                # these are references, not copies, for now
+                c.pitches = [n.pitch for n in subNotes]
+                if inPlace:
+                    # remove all the previous elements      
+                    for n in subNotes:
+                        returnObj.remove(n)
+                # insert chord at start location
+                returnObj.insert(o, c)
+            # set window size to max ql if found
+            if ql != None and ql >= minimumWindowSize:
+                # update start offset to what was old boundary
+                o += ql
+            else:
+                o += minimumWindowSize
+
+            if o > oTerminate:
+                break
+
+        return returnObj
+
 
     def splitByClass(self, objName, fx):
         '''Given a stream, get all objects specified by objName and then form
@@ -2724,7 +2755,8 @@ class Stream(music21.Music21Object):
         configure ".previous" and ".next" attributes
 
         '''
-        #environLocal.printDebug(['calling Stream.makeTies()'])
+        environLocal.printDebug(['calling Stream.makeTies()'])
+
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
@@ -2813,7 +2845,10 @@ class Stream(music21.Music21Object):
                         eRemain.duration.quarterLength = qLenRemain
 
                         # set ties
-                        if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
+                        if ('Note' in e.classes or 
+                            'Chord' in e.classes or 
+                            'Unpitched' in e.classes):
+                        #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
                             #environLocal.printDebug(['tieing in makeTies', e])
                             e.tie = note.Tie('start')
                             # we can set eRamain to be a stop on this iteration
@@ -9592,6 +9627,47 @@ class Test(unittest.TestCase):
         self.assertEqual([(0.0, 2), (0.0, 30), (5.0, 25), (8.0, 10), (10.0, 2), (15.0, 10), (20.0, 2), (22.0, 1.0)], match)
 
 
+    def testChordifyBuilt(self):
+
+        from music21 import stream
+
+        # test with equal durations
+        pitchCol = [('A2', 'C2'), 
+                    ('A#1', 'C-3', 'G5'), 
+                    ('D3', 'B-1', 'C4', 'D#2')]
+        # try with different duration assignments; should always get
+        # the same results
+        for durCol in [[1, 1, 1], [.5, 2, 3], [.25, .25, .5], [6, 6, 8]]: 
+            s = stream.Stream()
+            o = 0
+            for i in range(len(pitchCol)):
+                ql = durCol[i]
+                for pStr in pitchCol[i]:
+                    n = note.Note(pStr)
+                    n.quarterLength = ql
+                    s.insert(o, n)
+                o += ql
+            self.assertEqual(len(s), 9)
+            self.assertEqual(len(s.getElementsByClass('Chord')), 0)
+    
+            # do both in place and not in place, compare results
+            sMod = s.chordify(inPlace=False)
+            s.chordify(inPlace=True)
+            for sEval in [s, sMod]:
+                self.assertEqual(len(sEval.getElementsByClass('Chord')), 3)
+                # make sure we have all the original pitches
+                for i in range(len(pitchCol)):
+                    match = [p.nameWithOctave for p in
+                             sEval.getElementsByClass('Chord')[i].pitches]
+                    self.assertEqual(match, list(pitchCol[i]))
+
+
+#         print 'post chordify'
+#         s.show('t')
+#         sMod.show('t')
+
+        #s.show()
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -9627,11 +9703,13 @@ if __name__ == "__main__":
         #t.testGetTimeSignatures()
         #t.testMetadataOnStream()
 
-        t.testContextNestedD()
-        t.testGetInstrumentFromMxl()
-        t.testGetTimeSignatures()
-        t.testSortAndAutoSort()
-        
+#         t.testContextNestedD()
+#         t.testGetInstrumentFromMxl()
+#         t.testGetTimeSignatures()
+#         t.testSortAndAutoSort()
+#         
+# 
+#         t.testStripTiesBuilt()
+#         t.testStripTiesImported()
 
-        t.testStripTiesBuilt()
-        t.testStripTiesImported()
+        t.testChordifyBuilt()
