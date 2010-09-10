@@ -10,9 +10,9 @@
 '''
 Objects and resources for processing ABC data. 
 
-ABC conversion from a file or URL is available through the music21 converter module's :func:`~music21.converter.parse` function. 
+ABC conversion from a file or URL to a :class:`~music21.stream.Stream` is available through the music21 converter module's :func:`~music21.converter.parse` function. 
 
-
+Low level ABC conversion is facilitated by :func:`music21.abc.translate.abcToStream`.
 '''
 
 import music21
