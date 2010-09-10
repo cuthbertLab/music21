@@ -2376,16 +2376,22 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # transformations of self that return a new Stream
 
-#     def getElementsByOffset(self, offsetStart, offsetEnd = None,
-#                     includeEndBoundary = True, mustFinishInSpan = False, mustBeginInSpan = True):
-
-    def chordify(self, minimumWindowSize=.25, inPlace=False):
-        '''Gather any number of Note or note-like elements into a Chord.
-
-        The gathering of elements uses the `minimumWindowSize`, in quarter lengths, to collect all elements that start within a specified window. After the first Chord is collected
-
-        The new Chord is given the maximum duration of all collected Notes.
-
+    def chordify(self, minimumWindowSize=.25, includePostWindow=True,
+            gatherArticulations=True, gatherNotations=True, collect=[meter.TimeSignature, key.KeySignature], inPlace=False):
+        '''Gather simultaneous Notes into a Chords.
+        
+        The gathering of elements, starting from offset 0.0, uses the `minimumWindowSize`, in quarter lengths, to collect all Notes that start between 0.0 and the minimum window size (this permits overlaps within a minimum tolerance). 
+        
+        After collection, the maximum duration of collected elements is found; this duration is then used to set the new starting offset. A possible gap then results between the end of the window and offset specified by the maximum duration; these additional notes are gathered in a second pass if `includePostWindow` is True.
+        
+        The new start offset is shifted to the larger of either the minimum window or the maximum duration found in the collected group. The process is repeated until all offsets are covered.
+        
+        Each collection of Notes is formed into a Chord. The Chord is given the longest duration of all constituents, and is inserted at the start offset of the window from which it was gathered. 
+        
+        Chords can gather both articulations and notations from found Notes using `gatherArticulations` and `gatherNotations`.
+        
+        The resulting Stream, if not in-place, can also gather additional objects by placing class names in the `collect` list. By default, TimeSignature and KeySignature objects are collected. 
+        
         '''
         if not inPlace: # make a copy
             returnObj = self.__class__() # for output
@@ -2393,38 +2399,71 @@ class Stream(music21.Music21Object):
             returnObj = self
         o = 0.0 # start at zero
         oTerminate = self.highestOffset
+
+        # do not gather collect items (key signatures) when in place
+        if not inPlace:
+            for e in self.getElementsByClass(collect):
+                returnObj.insert(e.getOffsetBySite(self), e)
+
         while True: 
+            # get all notes within the start and the minwindow size
             oStart = o
-            # windowSize will be adjusted based on the longest duration 
-            # found
             oEnd = oStart + minimumWindowSize 
             sub = self.getElementsByOffset(oStart, oEnd,
                     includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
-            #print 'post getElements()', oStart, oEnd
-            #sub.show('t') 
             subNotes = sub.notes # get once for speed         
-            # make sub into a chord
-            ql = None 
+
+            qlMax = None 
+            # get the max duration found from within the window
             if len(subNotes) > 0:
                 # get largest duration, use for duration of Chord, next span
-                ql = max([n.quarterLength for n in subNotes])
+                qlMax = max([n.quarterLength for n in subNotes])
+
+            # if the max duration found in the window is greater than the min 
+            # window size, it is possible that there are notes that will not
+            # be gathered; those starting at the end of this window but before
+            # the max found duration (as that will become the start of the next
+            # window
+            # so: if ql > min window, gather notes between 
+            # oStart + minimumWindowSize and oStart + qlMax
+            if (includePostWindow and qlMax != None 
+                and qlMax > minimumWindowSize):
+                subAdd = self.getElementsByOffset(oStart+minimumWindowSize,
+                        oStart+qlMax,
+                        includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
+
+                # concatenate any additional notes found
+                subNotes += subAdd.notes
+
+            # make sub into a chord
+            if len(subNotes) > 0:
                 c = chord.Chord()
-                c.duration.quarterLength = ql
+                c.duration.quarterLength = qlMax
                 # these are references, not copies, for now
                 c.pitches = [n.pitch for n in subNotes]
+                if gatherArticulations:
+                    for n in subNotes:
+                        c.articulations += n.articulations
+                if gatherNotations:
+                    for n in subNotes:
+                        c.notations += n.notations
                 if inPlace:
                     # remove all the previous elements      
                     for n in subNotes:
                         returnObj.remove(n)
                 # insert chord at start location
                 returnObj.insert(o, c)
-            # set window size to max ql if found
-            if ql != None and ql >= minimumWindowSize:
+
+            # shift offset to qlMax or minimumWindowSize
+            if qlMax != None and qlMax >= minimumWindowSize:
                 # update start offset to what was old boundary
-                o += ql
+                # note: this assumes that the start of the longest duration
+                # was at oStart; it could have been between oStart and oEnd
+                o += qlMax
             else:
                 o += minimumWindowSize
 
+            # end While loop conditions
             if o > oTerminate:
                 break
 
@@ -9627,10 +9666,8 @@ class Test(unittest.TestCase):
         self.assertEqual([(0.0, 2), (0.0, 30), (5.0, 25), (8.0, 10), (10.0, 2), (15.0, 10), (20.0, 2), (22.0, 1.0)], match)
 
 
-    def testChordifyBuilt(self):
-
+    def testChordifyBuiltA(self):
         from music21 import stream
-
         # test with equal durations
         pitchCol = [('A2', 'C2'), 
                     ('A#1', 'C-3', 'G5'), 
@@ -9666,6 +9703,86 @@ class Test(unittest.TestCase):
 #         s.show('t')
         #sMod.show('t')
         #s.show()
+
+    def testChordifyBuiltB(self):
+        from music21 import stream
+
+        n1 = note.Note('c2')
+        n1.quarterLength = 2
+        n2 = note.Note('d3')
+        n2.quarterLength = .5
+
+        n3 = note.Note('e4')
+        n3.quarterLength = 2
+        n4 = note.Note('f5')
+        n4.quarterLength = .5
+
+        s = stream.Stream()
+        s.insert(0, n1)
+        s.insert(1, n2) # overlapping, starting after n1 but finishing before
+        s.insert(2, n3)
+        s.insert(3, n4) # overlapping, starting after n3 but finishing before
+
+        self.assertEqual([e.offset for e in s], [0.0, 1.0, 2.0, 3.0])
+        # this results in two chords; n2 and n4 are effectively shifted 
+        # to the start of n1 and n3
+        sMod = s.chordify(inPlace=False)
+        s.chordify(inPlace=True)   
+        for sEval in [s, sMod]:
+            self.assertEqual(len(sEval.getElementsByClass('Chord')), 2)
+            self.assertEqual([c.offset for c in sEval], [0.0, 2.0])
+
+
+        # do the same, but reverse the short/long duration relation
+        # because the default min window is .25, the first  and last 
+        # notes are not gathered into chords
+        # into a chord
+        n1 = note.Note('c2')
+        n1.quarterLength = .5
+        n2 = note.Note('d3')
+        n2.quarterLength = 1.5
+        n3 = note.Note('e4')
+        n3.quarterLength = .5
+        n4 = note.Note('f5')
+        n4.quarterLength = 1.5
+
+        s = stream.Stream()
+        s.insert(0, n1)
+        s.insert(1, n2) # overlapping, starting after n1 but finishing before
+        s.insert(2, n3)
+        s.insert(3, n4) # overlapping, starting after n3 but finishing before
+
+        # this results in two chords; n2 and n4 are effectively shifted 
+        # to the start of n1 and n3
+        sMod = s.chordify(inPlace=False)
+        s.chordify(inPlace=True)   
+        for sEval in [s, sMod]:
+            # have three chords, even though 1 only has more than 1 pitch
+            # might change this?
+            self.assertEqual(len(sEval.getElementsByClass('Chord')), 3)
+            self.assertEqual([c.offset for c in sEval], [0.0, 1.0, 3.0] )
+
+
+    def testChordifyImported(self):
+        from music21 import corpus
+        s = corpus.parseWork('bach/bwv66.6')
+        #s.show()
+        # using in place to get the stored flat version
+        sMod = s.flat.chordify(includePostWindow=False)
+        self.assertEqual(len(sMod.getElementsByClass('Chord')), 35)
+        self.assertEqual(
+            [len(c.pitches) for c in sMod.getElementsByClass('Chord')], 
+            [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4])
+
+        # when we include post-window, we get more tones, per chord
+        # but the same number of chords
+        sMod = s.flat.chordify(includePostWindow=True)
+        self.assertEqual(len(sMod.getElementsByClass('Chord')), 35)
+        self.assertEqual(
+            [len(c.pitches) for c in sMod.getElementsByClass('Chord')], 
+            [7, 4, 4, 4, 4, 7, 5, 4, 4, 4, 4, 5, 4, 4, 5, 5, 6, 4, 6, 5, 4, 4, 4, 4, 4, 4, 7, 6, 4, 7, 2, 6, 5, 5, 4] )
+
+        #sMod.show()
 
 
 #-------------------------------------------------------------------------------
@@ -9711,4 +9828,6 @@ if __name__ == "__main__":
 #         t.testStripTiesBuilt()
 #         t.testStripTiesImported()
 
-        t.testChordifyBuilt()
+        t.testChordifyBuiltA()
+        t.testChordifyBuiltB()
+        t.testChordifyImported()

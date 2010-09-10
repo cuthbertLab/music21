@@ -329,6 +329,11 @@ class Chord(note.NotRest):
         if mxArticulations != None:
             mxNoteList[0].notationsObj.componentList.append(mxArticulations)
 
+        # notations and articulations are mixed in musicxml
+        for i in range(len(self.notations)):
+            obj = self.notations[i] 
+            mxNoteList[0].notationsObj.componentList.append(obj.mx)
+
         return mxNoteList
 
     def _setMX(self, mxNoteList):
