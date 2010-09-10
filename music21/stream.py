@@ -1499,11 +1499,11 @@ class Stream(music21.Music21Object):
                     includeEndBoundary = True, mustFinishInSpan = False, mustBeginInSpan = True):
         '''Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values.
 
-        If mustFinishInSpan is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in.
+        If `mustFinishInSpan` is True than an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in.
 
-        The includeEndBoundary option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do.
+        The `includeEndBoundary` option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do.
         
-        Setting mustBeginInSpan to False is a good way of finding 
+        Setting `mustBeginInSpan` to False is a good way of finding 
         
 
             .. image:: images/getElementsByOffset.*
@@ -2375,6 +2375,30 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # transformations of self that return a new Stream
+
+#     def getElementsByOffset(self, offsetStart, offsetEnd = None,
+#                     includeEndBoundary = True, mustFinishInSpan = False, mustBeginInSpan = True):
+
+    def chordify(self, offsetStepSize=1):
+        '''Gather any number of Note or note-like elements into a Chord.
+
+        The gathering of elements uses the same parameters as getElementsByOffset.
+
+
+        '''
+        if not inPlace: # make a copy
+            returnObj = self.__class__() # for output
+        else:
+            returnObj = self
+
+        o = 0.0 # start at zero
+        while True: 
+            oStart = 0.0
+            # end could/should be based on looking at the elements
+            oEnd = 0.0 + offsetStepSize 
+            sub = self.getElementsByOffset(oStart, oEnd,
+                    includeEndBoundary=True, mustFinishInSpan=False, mustBeginInSpan=True)            
+            # make sub into a chord
 
     def splitByClass(self, objName, fx):
         '''Given a stream, get all objects specified by objName and then form
