@@ -8,7 +8,10 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
-Objects and tools for processing ABC data. 
+Objects and resources for processing ABC data. 
+
+ABC conversion from a file or URL is available through the music21 converter module's :func:`~music21.converter.parse` function. 
+
 
 '''
 
@@ -64,6 +67,8 @@ class ABCHandlerException(Exception):
     pass
 
 
+
+
 #-------------------------------------------------------------------------------
 class ABCToken(object):
     '''
@@ -73,11 +78,11 @@ class ABCToken(object):
 
     The multi-pass procedure is conducted by an ABCHandler object. 
     The ABCHandler.tokenize() method breaks the data stream into 
-    ABCToken objects. The ABCHandler.tokenProcess() method first 
-    calls the preParse() method on each token, then does contextual 
-    adjustments to all tokens, then calls parse() on all tokens.
+    ABCToken objects. The :meth:`~music21.abc.base.ABCHandler.tokenProcess` method first 
+    calls the :meth:`~music21.abc.base.ABCToken.preParse` method on each token, then does contextual 
+    adjustments to all tokens, then calls :meth:`~music21.abc.base.ABCToken.parse` on all tokens.
 
-    The ABC string itself is stored in self.src
+    The source ABC string itself is stored in self.src
 
     '''
     def __init__(self, src=''):
@@ -114,7 +119,7 @@ class ABCToken(object):
 
     def parse(self): 
         '''
-        Dummy method that is reads self.src and loads attributes. 
+        Dummy method that reads self.src and loads attributes. 
         It is called after contextual adjustments.
         
         It is designed to be subclassed or overridden.
@@ -222,10 +227,18 @@ class ABCMetadata(ABCToken):
         >>> am.preParse()
         >>> am._getTimeSignatureParameters()
         (2, 2, 'cut')
+
+        >>> am = ABCMetadata('M: none')
+        >>> am.preParse()
+        >>> am._getTimeSignatureParameters() == None
+        True
         '''
         if not self.isMeter():
             raise ABCTokenException('no time signature associated with this meta-data')
-        if self.data == 'C':
+
+        if self.data.lower() == 'none':
+            return None
+        elif self.data == 'C':
             n, d = 4, 4
             symbol = 'common' # m21 compat
         elif self.data == 'C|':
@@ -253,8 +266,12 @@ class ABCMetadata(ABCToken):
         if not self.isMeter():
             raise ABCTokenException('no time signature associated with this non-metrical meta-data')
         from music21 import meter
-        n, d, symbol = self._getTimeSignatureParameters()
-        return meter.TimeSignature('%s/%s' % (n,d))
+        parameters = self._getTimeSignatureParameters()
+        if parameters == None:
+            return None
+        else:
+            n, d, symbol = parameters
+            return meter.TimeSignature('%s/%s' % (n,d))
 
 
     def _getKeySignatureParameters(self):
@@ -406,7 +423,10 @@ class ABCMetadata(ABCToken):
             
         elif self.isMeter():
             # meter auto-set a default not length
-            n, d, symbol = self._getTimeSignatureParameters()
+            parameters = self._getTimeSignatureParameters()
+            if parameters == None:
+                return .5 # TODO: assume default, need to configure
+            n, d, symbol = parameters
             if float(n) / d < .75:
                 return .25 # less than 0.75 the default is a sixteenth note
             else:

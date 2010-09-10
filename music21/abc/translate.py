@@ -65,8 +65,9 @@ def abcToStream(abcHandler, inputM21=None):
                     md.composer = t.data
                 elif t.isMeter():
                     ts = t.getTimeSignatureObject()
+                    if ts != None: # can be None
                     # should append at the right position
-                    p.append(ts)
+                        p.append(ts)
                 elif t.isKey():
                     ks = t.getKeySignatureObject()
                     p.append(ks)
