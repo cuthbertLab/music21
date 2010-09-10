@@ -268,9 +268,12 @@ class Chord(note.NotRest):
         True
         '''
         mxNoteList = []
+        durPos = 0 # may have more than one dur
+        durPosLast = len(self.duration.mx) - 1
         for mxNoteBase in self.duration.mx: # returns a list of mxNote objs
             # merge method returns a new object
             chordPos = 0
+            mxNoteChordGroup = []
             for pitchObj in self.pitches:
                 mxNote = copy.deepcopy(mxNoteBase)
 
@@ -285,26 +288,34 @@ class Chord(note.NotRest):
                 if self.beams != None and chordPos == 0:
                     mxNote.beamList = self.beams.mx
 
-                mxNoteList.append(mxNote)
+                # if this note, not a component duration,
+                # need to add this to the last-encountered mxNote
+                if self.tie != None:
+                    # get mxl objs from tie obj
+                    mxTieList, mxTiedList = self.tie.mx 
+                    # if starting a tie, add to all mxNotes in the chord
+                    # but only add to the last duration in the dur group
+                    if (self.tie.type in ['start', 'continue'] and 
+                        durPos == durPosLast):
+                        mxNote.tieList += mxTieList
+                        mxNote.notationsObj.componentList += mxTiedList
+                    # if ending a tie, set first duration of dur group
+                    elif (self.tie.type == 'stop' and 
+                        durPos == 0):
+                        mxNote.tieList += mxTieList
+                        mxNote.notationsObj.componentList += mxTiedList
+
                 chordPos += 1
+                mxNoteChordGroup.append(mxNote)
+            
+
+            # add chord group to note list
+            mxNoteList += mxNoteChordGroup
+            durPos += 1
 
         # only applied to first note
         for lyricObj in self.lyrics:
             mxNoteList[0].lyricList.append(lyricObj.mx)
-
-        # if this note, not a component duration, but this note has a tie, 
-        # need to add this to the last-encountered mxNote
-        if self.tie != None:
-            mxTieList, mxTiedList = self.tie.mx # get mxl objs from tie obj
-            # if starting a tie, add to last mxNote in mxNote list
-            if self.tie.type == 'start':
-                mxNoteList[-1].tieList += mxTieList
-                mxNoteList[-1].notationsObj.componentList += mxTiedList
-            # if ending a tie, set first mxNote to stop
-            # TODO: this may need to continue if there are components here
-            elif self.tie.type == 'stop':
-                mxNoteList[0].tieList += mxTieList
-                mxNoteList[0].notationsObj.componentList += mxTiedList
 
         # if we have any articulations, they only go on the first of any 
         # component notes

@@ -9664,8 +9664,7 @@ class Test(unittest.TestCase):
 
 #         print 'post chordify'
 #         s.show('t')
-#         sMod.show('t')
-
+        #sMod.show('t')
         #s.show()
 
 
