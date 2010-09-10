@@ -3959,6 +3959,37 @@ class Stream(music21.Music21Object):
         'frank'
         ''')    
 
+    #---------------------------------------------------------------------------
+    # these methods override the behavior inherited from base.py
+
+    def _getMeasureOffset(self):
+        # this normally returns the offset of this object in its container
+        # for now, simply return the offset
+        return self.getOffsetBySite(self.parent)
+
+    def _getBeatCount(self):
+        # this normally returns the beat within a measure; here, it could
+        # be beats from the beginning?
+        return None
+
+    beatCount = property(_getBeatCount)  
+
+    def _getBeatStr(self):
+        return None
+
+    beatStr = property(_getBeatStr)
+  
+    def _getBeatDuration(self):
+        # this returns the duration of the active beat
+        return None
+
+    beatDuration = property(_getBeatDuration)
+  
+    def _getBeatStrength(self):
+        # this returns the accent weight of the active beat
+        return None
+
+    beatStrength = property(_getBeatStrength)
 
 
     #---------------------------------------------------------------------------

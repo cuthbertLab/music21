@@ -376,195 +376,196 @@ class GeneralNote(music21.Music21Object):
         ''')
 
 
-    def _getMeasureOffset(self):
-        '''Try to obtain the nearest Measure that contains this Note, and return the offset within that Measure.
+    #---------------------------------------------------------------------------
+#     def _getMeasureOffset(self):
+#         '''Try to obtain the nearest Measure that contains this Note, and return the offset within that Measure.
+# 
+#         >>> from music21 import *
+#         >>> n = note.Note()
+#         >>> n.quarterLength = 2
+#         >>> m = stream.Measure()
+#         >>> n._getMeasureOffset() # returns zero when not assigned
+#         0.0 
+#         >>> n.quarterLength = .5
+#         >>> m = stream.Measure()
+#         >>> m.repeatAppend(n, 4)
+#         >>> [n._getMeasureOffset() for n in m.notes]
+#         [0.0, 0.5, 1.0, 1.5]
+# 
+#         '''
+#         if self.parent != None and self.parent.isMeasure:
+#             #environLocal.printDebug(['found parent as Measure, using for offset'])
+#             offsetLocal = self.getOffsetBySite(self.parent)
+#         else:
+#             # this method-level import seems unvoidable to be sure to get the 
+#             # right offset
+#             from music21 import stream
+#             # testing sortByCreationTime == true; this may be necessary
+#             # as we often want the most recent measure
+#             m = self.getContextByClass(stream.Measure, sortByCreationTime=True)
+#             if m != None:
+#                 #environLocal.printDebug(['using found Measure for offset access'])            
+#                 offsetLocal = self.getOffsetBySite(m)
+#             else: # hope that we get the right one
+#                 environLocal.printDebug(['using standard offset access'])
+#                 offsetLocal = self.offset
+# 
+#         #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])
+#         return offsetLocal
+# 
+#     def _getBeat(self):
+#         '''Return a beat designation based on local Measure and TimeSignature
+# 
+#         >>> from music21 import *
+#         >>> n = note.Note()
+#         >>> n.quarterLength = 2
+#         >>> m = stream.Measure()
+#         >>> m.isMeasure
+#         True
+#         >>> m.timeSignature = meter.TimeSignature('4/4')
+#         >>> m.repeatAppend(n, 2)
+#         >>> m[1].parent # here we get the parent, but not in m.notes
+#         <music21.stream.Measure 0 offset=0.0>
+# 
+#         >>> m.notes[0]._getBeat()
+#         1.0
+#         >>> m.notes[1]._getBeat()
+#         3.0
+#         '''
+#         ts = self.getContextByClass(meter.TimeSignature)
+#         if ts == None:
+#             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
+#         return ts.getBeatProportion(self._getMeasureOffset())
+# 
+# 
+#     beat = property(_getBeat,  
+#         doc = '''Return the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a floating-point designation between 0 and 1 to show proportional progress through the beat.
+# 
+#         >>> from music21 import *
+#         >>> n = note.Note()
+#         >>> n.quarterLength = .5
+#         >>> m = stream.Measure()
+#         >>> m.timeSignature = meter.TimeSignature('3/4')
+#         >>> m.repeatAppend(n, 6)
+#         >>> [m.notes[i].beat for i in range(6)]
+#         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+# 
+#         >>> m.timeSignature = meter.TimeSignature('6/8')
+#         >>> [m.notes[i].beat for i in range(6)]
+#         [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
+# 
+#         ''')
+# 
+# 
+#     def _getBeatStr(self):
+#         ts = self.getContextByClass(meter.TimeSignature)
+#         #environLocal.printDebug(['_getBeatStr(): found ts:', ts])
+#         if ts == None:
+#             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
+#         return ts.getBeatProportionStr(self._getMeasureOffset())
+# 
+# 
+#     beatStr = property(_getBeatStr,  
+#         doc = '''Return a string representation of the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a fractional designation to show progress through the beat.
+# 
+#         >>> from music21 import *
+#         >>> n = note.Note()
+#         >>> n.quarterLength = .5
+#         >>> m = stream.Measure()
+#         >>> m.timeSignature = meter.TimeSignature('3/4')
+#         >>> m.repeatAppend(n, 6)
+#         >>> [m.notes[i].beatStr for i in range(6)]
+#         ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
+#         >>> m.timeSignature = meter.TimeSignature('6/8')
+#         >>> [m.notes[i].beatStr for i in range(6)]
+#         ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
+#         ''')
+# 
+# 
+#     def _getBeatDuration(self):
+#         '''Return a  designation based on local Measure and TimeSignature
+# 
+#         >>> from music21 import *
+#         >>> n = note.Note()
+#         >>> n.quarterLength = 2
+#         >>> m = stream.Measure()
+#         >>> m.timeSignature = meter.TimeSignature('4/4')
+#         >>> m.repeatAppend(n, 2)
+#         >>> m.notes[0]._getBeatDuration()
+#         <music21.duration.Duration 1.0>
+#         >>> m.notes[1]._getBeatDuration()
+#         <music21.duration.Duration 1.0>
+#         '''
+#         ts = self.getContextByClass(meter.TimeSignature)
+#         if ts == None:
+#             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')
+#         return ts.getBeatDuration(self._getMeasureOffset())
+# 
+#     beatDuration = property(_getBeatDuration,  
+#         doc = '''Return a :class:`~music21.duration.Duration` of the beat active for this Note as found in the most recently positioned Measure.
+# 
+#         >>> from music21 import *
+#         >>> n = note.Note()
+#         >>> n.quarterLength = .5
+#         >>> m = stream.Measure()
+#         >>> m.timeSignature = meter.TimeSignature('3/4')
+#         >>> m.repeatAppend(n, 6)
+#         >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
+#         [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+# 
+#         >>> m.timeSignature = meter.TimeSignature('6/8')
+#         >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
+#         [1.5, 1.5, 1.5, 1.5, 1.5, 1.5]
+#         ''')
+# 
+# 
+#     def _getBeatStrength(self):
+#         '''Return an accent weight based on local Measure and TimeSignature. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
+# 
+#         >>> from music21 import *
+#         >>> n = note.Note()
+#         >>> n.quarterLength = .25
+#         >>> m = stream.Measure()
+#         >>> m.isMeasure
+#         True
+#         >>> m.timeSignature = meter.TimeSignature('4/4')
+#         >>> m.repeatAppend(n, 16)
+# 
+#         >>> m.notes[0]._getBeatStrength()
+#         1.0
+#         >>> m.notes[4]._getBeatStrength()
+#         0.25
+#         >>> m.notes[8]._getBeatStrength()
+#         0.5
+#         '''
+#         ts = self.getContextByClass(meter.TimeSignature)
+#         if ts == None:
+#             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
+#         return ts.getAccentWeight(self._getMeasureOffset(),
+#                forcePositionMatch=True)
+# 
+# 
+#     beatStrength = property(_getBeatStrength,  
+#         doc = '''Return the metrical accent of this Note in the most recently positioned Measure. Accent values are between zero and one, and are derived from the local TimeSignature's accent MeterSequence weights. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
+# 
+#         >>> from music21 import *
+#         >>> n = note.Note()
+#         >>> n.quarterLength = .5
+#         >>> m = stream.Measure()
+#         >>> m.timeSignature = meter.TimeSignature('3/4')
+#         >>> m.repeatAppend(n, 6)
+#         >>> [m.notes[i].beatStrength for i in range(6)]
+#         [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]
+# 
+#         >>> m.timeSignature = meter.TimeSignature('6/8')
+#         >>> [m.notes[i].beatStrength for i in range(6)]
+#         [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
+# 
+#         ''')
 
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = 2
-        >>> m = stream.Measure()
-        >>> n._getMeasureOffset() # returns zero when not assigned
-        0.0 
-        >>> n.quarterLength = .5
-        >>> m = stream.Measure()
-        >>> m.repeatAppend(n, 4)
-        >>> [n._getMeasureOffset() for n in m.notes]
-        [0.0, 0.5, 1.0, 1.5]
-
-        '''
-        if self.parent != None and self.parent.isMeasure:
-            #environLocal.printDebug(['found parent as Measure, using for offset'])
-            offsetLocal = self.getOffsetBySite(self.parent)
-        else:
-            # this method-level import seems unvoidable to be sure to get the 
-            # right offset
-            from music21 import stream
-            # testing sortByCreationTime == true; this may be necessary
-            # as we often want the most recent measure
-            m = self.getContextByClass(stream.Measure, sortByCreationTime=True)
-            if m != None:
-                #environLocal.printDebug(['using found Measure for offset access'])            
-                offsetLocal = self.getOffsetBySite(m)
-            else: # hope that we get the right one
-                environLocal.printDebug(['using standard offset access'])
-                offsetLocal = self.offset
-
-        #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])
-        return offsetLocal
-
-    def _getBeat(self):
-        '''Return a beat designation based on local Measure and TimeSignature
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = 2
-        >>> m = stream.Measure()
-        >>> m.isMeasure
-        True
-        >>> m.timeSignature = meter.TimeSignature('4/4')
-        >>> m.repeatAppend(n, 2)
-        >>> m[1].parent # here we get the parent, but not in m.notes
-        <music21.stream.Measure 0 offset=0.0>
-
-        >>> m.notes[0]._getBeat()
-        1.0
-        >>> m.notes[1]._getBeat()
-        3.0
-        '''
-        ts = self.getContextByClass(meter.TimeSignature)
-        if ts == None:
-            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
-        return ts.getBeatProportion(self._getMeasureOffset())
 
 
-    beat = property(_getBeat,  
-        doc = '''Return the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a floating-point designation between 0 and 1 to show proportional progress through the beat.
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = .5
-        >>> m = stream.Measure()
-        >>> m.timeSignature = meter.TimeSignature('3/4')
-        >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beat for i in range(6)]
-        [1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
-
-        >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beat for i in range(6)]
-        [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
-
-        ''')
-
-
-    def _getBeatStr(self):
-        ts = self.getContextByClass(meter.TimeSignature)
-        #environLocal.printDebug(['_getBeatStr(): found ts:', ts])
-        if ts == None:
-            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
-        return ts.getBeatProportionStr(self._getMeasureOffset())
-
-
-    beatStr = property(_getBeatStr,  
-        doc = '''Return a string representation of the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a fractional designation to show progress through the beat.
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = .5
-        >>> m = stream.Measure()
-        >>> m.timeSignature = meter.TimeSignature('3/4')
-        >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatStr for i in range(6)]
-        ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
-        >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatStr for i in range(6)]
-        ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
-        ''')
-
-
-    def _getBeatDuration(self):
-        '''Return a  designation based on local Measure and TimeSignature
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = 2
-        >>> m = stream.Measure()
-        >>> m.timeSignature = meter.TimeSignature('4/4')
-        >>> m.repeatAppend(n, 2)
-        >>> m.notes[0]._getBeatDuration()
-        <music21.duration.Duration 1.0>
-        >>> m.notes[1]._getBeatDuration()
-        <music21.duration.Duration 1.0>
-        '''
-        ts = self.getContextByClass(meter.TimeSignature)
-        if ts == None:
-            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')
-        return ts.getBeatDuration(self._getMeasureOffset())
-
-    beatDuration = property(_getBeatDuration,  
-        doc = '''Return a :class:`~music21.duration.Duration` of the beat active for this Note as found in the most recently positioned Measure.
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = .5
-        >>> m = stream.Measure()
-        >>> m.timeSignature = meter.TimeSignature('3/4')
-        >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
-        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-
-        >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
-        [1.5, 1.5, 1.5, 1.5, 1.5, 1.5]
-        ''')
-
-
-    def _getBeatStrength(self):
-        '''Return an accent weight based on local Measure and TimeSignature. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = .25
-        >>> m = stream.Measure()
-        >>> m.isMeasure
-        True
-        >>> m.timeSignature = meter.TimeSignature('4/4')
-        >>> m.repeatAppend(n, 16)
-
-        >>> m.notes[0]._getBeatStrength()
-        1.0
-        >>> m.notes[4]._getBeatStrength()
-        0.25
-        >>> m.notes[8]._getBeatStrength()
-        0.5
-        '''
-        ts = self.getContextByClass(meter.TimeSignature)
-        if ts == None:
-            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
-        return ts.getAccentWeight(self._getMeasureOffset(),
-               forcePositionMatch=True)
-
-
-    beatStrength = property(_getBeatStrength,  
-        doc = '''Return the metrical accent of this Note in the most recently positioned Measure. Accent values are between zero and one, and are derived from the local TimeSignature's accent MeterSequence weights. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = .5
-        >>> m = stream.Measure()
-        >>> m.timeSignature = meter.TimeSignature('3/4')
-        >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatStrength for i in range(6)]
-        [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]
-
-        >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatStrength for i in range(6)]
-        [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
-
-        ''')
-
-
-
-
+    #---------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, inPlace=True):
         '''Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy.
 
@@ -1746,7 +1747,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(m), nCount+1)
 
             # test matching beat proportion value
-            post = [m.notes[i].beat for i in range(nCount)]
+            post = [m.notes[i].beatCount for i in range(nCount)]
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeat[i], 4)
 
@@ -1776,7 +1777,7 @@ class Test(unittest.TestCase):
             p.append(m2)
 
             # test matching beat proportion value
-            post = [m2.notes[i].beat for i in range(nCount)]
+            post = [m2.notes[i].beatCount for i in range(nCount)]
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeat[i], 4)
             # test getting beat duration
@@ -1798,8 +1799,8 @@ class Test(unittest.TestCase):
             # always use tenor line    
             found = []
             for n in s[2].flat.notes:
-                n.lyric = str(n.beat)
-                found.append(n.beat)
+                n.lyric = n.beatStr
+                found.append(n.beatCount)
             
             for i in range(len(match)):
                 self.assertEquals(match[i], found[i])
