@@ -38,6 +38,9 @@ _MOD = 'environment.py'
 class EnvironmentException(Exception):
     pass
 
+class UserSettingsException(Exception):
+    pass
+
 
 #-------------------------------------------------------------------------------
 class Settings(node.NodeList):
@@ -522,29 +525,29 @@ class UserSettings(object):
 
     def __init__(self):
         # store environment as a private attribute
-        self._environemnt = Environment()
+        self._environment = Environment()
 
 
     def restoreDefaults(self):
         '''Restore platform specific defaults. 
         '''
         # location specific, cannot test further
-        self._environemnt.restoreDefaults()
-        self._environemnt.write()
+        self._environment.restoreDefaults()
+        self._environment.write()
 
     def __getitem__(self, key):
         '''Dictionary like getting. 
         '''
         # location specific, cannot test further
-        return self._environemnt.__getitem__(key)
+        return self._environment.__getitem__(key)
 
 
     def __setitem__(self, key, value):
         '''Dictionary-like setting. Changes are made and written to the user configuration file.
         '''
         # location specific, cannot test further
-        self._environemnt.__setitem__(key, value)
-        self._environemnt.write()
+        self._environment.__setitem__(key, value)
+        self._environment.write()
 
 
     def __repr__(self):
@@ -554,7 +557,7 @@ class UserSettings(object):
         >>> us = environment.UserSettings()
         >>> post = repr(us) # location specific, cannot test
         '''
-        return self._environemnt.__repr__()
+        return self._environment.__repr__()
 
     def __str__(self):
         '''Return a string representation. 
@@ -563,19 +566,33 @@ class UserSettings(object):
         >>> us = environment.UserSettings()
         >>> post = repr(us) # location specific, cannot test
         '''
-        return self._environemnt.__str__()
+        return self._environment.__str__()
 
     def keys(self):
         '''Return the keys found in the user's :class:`~music21.environment.Environment` object. 
         '''
-        return self._environemnt.ref.keys()
+        return self._environment.ref.keys()
 
     def getSettingsPath(self):
         '''Return the path to the platform specific settings file.
         '''
-        return self._environemnt.getSettingsPath()
+        return self._environment.getSettingsPath()
 
+    def create(self):
+        '''If a environment configuration file does not exist, create one based on the default settings.
+        '''
+        if not os.path.exists(self._environment.getSettingsPath()):
+            self._environment.write()
+        else:
+            raise UserSettingsException('an environment configuration file already exists; simply set values to modify.')
 
+    def delete(self):
+        '''Permanently remove the user configuration file. 
+        '''
+        if os.path.exists(self._environment.getSettingsPath()):
+            os.remove(self._environment.getSettingsPath())
+        else:
+            raise UserSettingsException('an environment configuration file does not exist.')
 
 
 

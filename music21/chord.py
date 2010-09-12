@@ -300,15 +300,13 @@ class Chord(note.NotRest):
                         mxNote.tieList += mxTieList
                         mxNote.notationsObj.componentList += mxTiedList
                     # if ending a tie, set first duration of dur group
-                    elif (self.tie.type == 'stop' and 
-                        durPos == 0):
+                    elif (self.tie.type == 'stop' and durPos == 0):
                         mxNote.tieList += mxTieList
                         mxNote.notationsObj.componentList += mxTiedList
 
                 chordPos += 1
                 mxNoteChordGroup.append(mxNote)
             
-
             # add chord group to note list
             mxNoteList += mxNoteChordGroup
             durPos += 1
