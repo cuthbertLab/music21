@@ -59,8 +59,9 @@ def abcToStream(abcHandler, inputM21=None):
         for t in abcTokenList:
             if isinstance(t, abcModule.ABCMetadata):
                 if t.isTitle():
-                    environLocal.printDebug(['got title', t.data])
+                    environLocal.printDebug(['got raw abc title', t.data])
                     md.title = t.data
+                    environLocal.printDebug(['got metadata title', md.title])
                 elif t.isComposer():
                     md.composer = t.data
                 elif t.isMeter():

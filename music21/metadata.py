@@ -34,6 +34,7 @@ import datetime
 import music21
 from music21 import common
 from music21 import musicxml
+from music21 import text
 
 
 from music21 import environment
@@ -248,6 +249,19 @@ class Text(object):
         >>> t.language  
         'en'
         ''')
+
+    def getNormalizedArticle(self):
+        '''Return a string representation with normalized articles.
+
+        >>> from music21 import *
+        >>> td = metadata.Text('Ale is Dear, The', 'en')
+        >>> str(td)
+        'Ale is Dear, The'
+        >>> td.getNormalizedArticle()
+        'The Ale is Dear'
+        '''
+        return text.prependArticle(self.__str__(), self._language)
+
 
 #-------------------------------------------------------------------------------
 class Date(object):
@@ -1066,11 +1080,13 @@ class Metadata(music21.Music21Object):
     def _getTitle(self):
         searchId = ['title', 'popularTitle', 'alternativeTitle', 'movementName']
         post = None
+        match = None
         for key in searchId:
             post = self._workIds[key]
             if post != None: # get first matched
                 # get a string from this Text object
-                return str(self._workIds[key])
+                # get with normalized articles
+                return self._workIds[key].getNormalizedArticle()
 
     def _setTitle(self, value):
         self._workIds['title'] = Text(value)

@@ -84,7 +84,7 @@ EFE EFE|EFE c2d|efe dBG|A3A3:|
 # http://abcnotation.com/tunePage?a=www.scottishfiddlers.com/Sydney/Music/ABC/SSF_Dance/0182
 aleIsDear = """%  <A name="D1X180"></A>
 X: 180
-T:Ale is Dear, the
+T:Ale is Dear, The
 M: 4/4
 L: 1/8
 R:Reel
@@ -417,10 +417,6 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     music21.mainTest(Test)
-
-
-
-
 
 
 
