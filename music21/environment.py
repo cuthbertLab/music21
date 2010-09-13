@@ -131,7 +131,8 @@ class Environment(object):
         self.ref['lilypondVersion'] = None # version of lilypond
         self.ref['lilypondFormat'] = 'pdf' 
         self.ref['lilypondBackend'] = 'ps' 
-        self.ref['musicxmlPath'] = None # path to a MusicXML reader: default, will find "Finale Reader"
+        # path to a MusicXML reader: default, will find "Finale Reader"
+        self.ref['musicxmlPath'] = None 
         self.ref['midiPath'] = None # path to a midi reader
         self.ref['graphicsPath'] = None # path to a graphics viewer
         self.ref['pdfPath'] = None # path to a pdf viewer
@@ -139,6 +140,8 @@ class Environment(object):
         self.ref['writeFormat'] = 'musicxml' 
         self.ref['autoDownload'] = 'ask' 
         self.ref['debug'] = 0
+        # printing of missing import warnings
+        self.ref['warnings'] = 1 # default/non-zero is on
 
         platform = common.getPlatform()
 
@@ -512,7 +515,7 @@ class UserSettings(object):
 
 
     >>> us.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
 
 
     Third, after finding the desired setting, supply the new value as a Python dictionary key value pair. Setting this value updates the user's settings file. For example, to set the file path to the Application that will be used to open MusicXML files, use the 'musicxmlPath' key. 
