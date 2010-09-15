@@ -48,6 +48,7 @@ ABC_BARS = [
            ('::', 'left-right repeat'),
             # for comparison, single chars must go last
            ('|', 'bar line'),
+           (':', 'dotted bar line'),
            ]
 
 #-------------------------------------------------------------------------------
@@ -957,6 +958,7 @@ class ABCHandler(object):
         # tokens are ABC objects in a linear stream
         self._tokens = []
 
+
     def _getLinearContext(self, strSrc, i):
         '''Find the local context of a string or list of ojbects. Returns charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace.
 
@@ -1308,30 +1310,104 @@ class ABCHandler(object):
             raise ABCHandlerException('must process tokens before calling split')
         return self._tokens
 
-    tokens = property(_getTokens, 
-        doc = '''Get a the tokens from this Handler
+    def _setTokens(self, tokens):
+        '''Assign tokens to this Handler
+        '''
+        self._tokens = tokens
+
+
+    tokens = property(_getTokens, _setTokens,
+        doc = '''Get or set tokens for this Handler
         ''')
     
+    def __len__(self):
+        return len(self._tokens)
+
+    def __add__(self, other):
+        '''Return a new handler adding the tokens in both
+
+        >>> from music21 import *
+        >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n' 
+        >>> ah1 = abc.ABCHandler()
+        >>> junk = ah1.process(abcStr)
+        >>> len(ah1)
+        3
+
+        >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n' 
+        >>> ah2 = abc.ABCHandler()
+        >>> junk = ah2.process(abcStr)
+        >>> len(ah2)
+        3
+
+        >>> ah3 = ah1 + ah2
+        >>> len(ah3)
+        6
+        
+
+        '''
+        ah = self.__class__()
+        ah.tokens = self._tokens + other._tokens
+        return ah
+
 
     #---------------------------------------------------------------------------
     # utility methods for post processing
 
+
+
+    def splitByNumber(self):
+        '''Split tokens by tune numbers.
+        '''
+        pass
+
+    def definesMeasures(self):
+        '''Return True if this token structure defines Measures
+
+        >>> from music21 import *
+        >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||'
+        >>> ah = abc.ABCHandler()
+        >>> junk = ah.process(abcStr)
+        >>> True == ah.definesMeasures()
+        True
+
+        >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nB3 A3 G6 B3 A3 G6'
+        >>> ah = abc.ABCHandler()
+        >>> junk = ah.process(abcStr)
+        >>> False == ah.definesMeasures()
+        True
+
+        '''
+        if self._tokens == []:
+            raise ABCHandlerException('must process tokens before calling split')
+        count = 0
+        for i in range(len(self._tokens)):
+            t = self._tokens[i]
+            if isinstance(t, ABCBar):
+                count += 1
+                # forcing the inclusion of two measures to count
+                if count >= 2:
+                    return True
+        return False
+
+
     def splitByVoice(self):
         '''Given a processed token list, look for voices. If voices exist, split into parts: common metadata, then next voice, next voice, etc.
+
+        Each part is returned as a ABCHandler instance.
 
         >>> from music21 import *
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||'
         >>> ah = abc.ABCHandler()
         >>> junk = ah.process(abcStr)
         >>> tokenColls = ah.splitByVoice()
-        >>> [t.src for t in tokenColls[0]] # common headers are first
+        >>> [t.src for t in tokenColls[0].tokens] # common headers are first
         ['M:6/8', 'L:1/8', 'K:G']
         >>> # then each voice
-        >>> [t.src for t in tokenColls[1]] 
+        >>> [t.src for t in tokenColls[1].tokens] 
         ['V:1 name="Whistle" snm="wh"', 'B3', 'A3', '|', 'G6', '|', 'B3', 'A3', '|', 'G6', '||']
-        >>> [t.src for t in tokenColls[2]] 
+        >>> [t.src for t in tokenColls[2].tokens] 
         ['V:2 name="violin" snm="v"', 'B', 'd', 'B', 'A', 'c', 'A', '|', 'G', 'A', 'G', 'D3', '|', 'B', 'd', 'B', 'A', 'c', 'A', '|', 'G', 'A', 'G', 'D6', '||']
-        >>> [t.src for t in tokenColls[3]] 
+        >>> [t.src for t in tokenColls[3].tokens] 
         ['V:3 name="Bass" snm="b" clef=bass', 'D3', 'D3', '|', 'D6', '|', 'D3', 'D3', '|', 'D6', '||']
 
         '''
@@ -1358,24 +1434,113 @@ class ABCHandler(object):
         # no voices, or definition of one voice, or use of V: field for 
         # something else
         if voiceCount <= 1:
-            post.append(self._tokens)
+            ah = self.__class__()
+            ah.tokens = self._tokens
+            post.append(ah)
         # two or more voices
         else: 
             # metadata is everything before first v1. 
             # first v1 found at pos[0]
-            post.append(self._tokens[:pos[0]])
+            ah = self.__class__()
+            ah.tokens = self._tokens[:pos[0]]
+            post.append(ah)
             i = pos[0]
             # start range at second value in pos
             for x in range(1, len(pos)):
                 j = pos[x]
-                post.append(self._tokens[i:j])
+                ah = self.__class__()
+                ah.tokens = self._tokens[i:j]
+                post.append(ah)
                 i = j
             # get last span
-            post.append(self._tokens[i:])
+            ah = self.__class__()
+            ah.tokens = self._tokens[i:]
+            post.append(ah)
 
         return post
 
 
+
+    def splitByMeasure(self):
+        '''Divide a token list by Measures, also defining start and end bars. 
+
+        If a component does not have notes, leave as an empty bar. This is often done with leading metadata.
+        '''
+        if self._tokens == []:
+            raise ABCHandlerException('must process tokens before calling split')
+
+
+        barCount = 0
+        noteCount = 0
+        pos = []
+        for i in range(len(self._tokens)):
+            t = self._tokens[i]
+            if isinstance(t, (ABCNote, ABCChord)):
+                noteCount += 1
+                # do not continue
+            # either we get a bar, or we we have notes and no bar
+            if isinstance(t, ABCBar) or (barCount == 0 and noteCount > 0):
+                pos.append(i) # store position 
+                barCount += 1
+
+        # collect start and end pairs of split
+        pairs = []
+        pairs.append([0, pos[0]])
+        i = pos[0]
+        for x in range(1, len(pos)):
+            j = pos[x]
+            pairs.append([i, j])
+            i = j
+        # add last
+        pairs.append([i, len(self)])
+
+
+        post = []
+        for x, y in pairs:
+            ah = ABCHandlerBar()
+            ah.tokens = self._tokens[x:y]
+
+            if isinstance(self._tokens[x], ABCBar):
+                ah.leftBarToken = self._tokens[x]
+                ah.tokens = ah._tokens[1:] # remove first
+        
+            if y >= len(self):
+                if isinstance(self._tokens[y-1], ABCBar):
+                    ah.rightBarToken = self._tokens[y-1]
+            else:
+                if isinstance(self._tokens[y], ABCBar):
+                    ah.rightBarToken = self._tokens[y]
+
+            # after bar assign, if no bars known, reject
+            if len(ah) == 0:
+                continue 
+
+            post.append(ah)
+
+        return post
+
+
+    def hasNotes(self):
+        '''If tokens are processed, return True of ABCNote or ABCChord classes are defined
+
+        >>> from music21 import *
+        >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n' 
+        >>> ah1 = abc.ABCHandler()
+        >>> junk = ah1.process(abcStr)
+        >>> ah1.hasNotes()
+        False
+        >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nc1D2' 
+        >>> ah2 = abc.ABCHandler()
+        >>> junk = ah2.process(abcStr)
+        >>> ah2.hasNotes()
+        True
+        '''
+        if self._tokens == []:
+            raise ABCHandlerException('must process tokens before calling')
+        for t in self._tokens:
+            if isinstance(t, (ABCNote, ABCChord)):
+                return True
+        return False
 
     def getTitle(self):
         '''If tokens are processed, get the first title tag. Used for testing.
@@ -1388,6 +1553,20 @@ class ABCHandler(object):
                     return t.data
         return None
 
+
+
+
+class ABCHandlerBar(ABCHandler):
+    '''A Handler specialized for storing bars.
+    '''
+    # divide elements of a character stream into objects and handle
+    # store in a list, and pass global information to compontns
+    def __init__(self):
+        # tokens are ABC objects in a linear stream
+        ABCHandler.__init__(self)
+
+        self.leftBarToken = None
+        self.rightBarToken = None
 
 
 
@@ -1579,6 +1758,37 @@ class Test(unittest.TestCase):
         self.assertEqual(an._getPitchName("_B"), ('B-4', True))
 
 
+    def tessSplitByMeasure(self):
+
+        from music21.abc import testFiles
+        src = testFiles.hectorTheHero
+        
+        ah = ABCHandler()
+        ah.process(src)
+        ahm = ah.splitByMeasure()
+
+        for i, l, r in [(0, None, None), # meta data
+                        (1, None, '|:'),
+                        (2, '|:', '|'),
+                        (3, '|', '|'),
+                        (-2, '[1', ':|'),
+                        (-1, '[2', '|'), 
+                       ]:
+            #print i, l, r, ahm[i].tokens
+            if l == None:
+                self.assertEqual(ahm[i].leftBarToken, None)
+            else:
+                self.assertEqual(ahm[i].leftBarToken.src, l)
+
+            if r == None:
+                self.assertEqual(ahm[i].rightBarToken, None)
+            else:
+                self.assertEqual(ahm[i].rightBarToken.src, r)
+
+
+#         for ahSub in ah.splitByMeasure():
+#             environLocal.printDebug(['split by measure:', ahSub.tokens])
+#             environLocal.printDebug(['leftBar:', ahSub.leftBarToken, 'rightBar:', ahSub.rightBarToken, '\n'])
 
 
 if __name__ == "__main__":
@@ -1589,8 +1799,8 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
 
-        t.testNoteParse()
-
+        #t.testNoteParse()
+        t.tessSplitByMeasure()
 
 
 

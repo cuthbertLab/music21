@@ -43,20 +43,34 @@ def abcToStream(abcHandler, inputM21=None):
     md = metadata.Metadata()
     s.insert(0, md)
 
-    processTokens = []
+    partHandlers = []
     tokenCollections = abcHandler.splitByVoice()
     if len(tokenCollections) == 1:
-        processTokens.append(tokenCollections[0])
+        partHandlers.append(tokenCollections[0])
     else:
         # add meta data to each Part
         for i in range(1, len(tokenCollections)):
-            processTokens.append(tokenCollections[0] + tokenCollections[i])
+            # concatenate abc handler instances
+            partHandlers.append(tokenCollections[0] + tokenCollections[i])
 
-    for abcTokenList in processTokens:
+    # find if this token list defines measures
+    # this should probably operate at the level of tunes, not the entire
+    # token list
+
+    for partHandler in partHandlers:
         p = stream.Part()
-    
+        # TODO
+        useMeasures = False #partHandler.definesMeasures()
+
         #ql = 0 # might not be zero if there is a pickup
-        for t in abcTokenList:
+        for t in partHandler.tokens:
+            if useMeasures:
+                pass
+#                 if isinstance(t, abcModule.ABCBar):
+#                     environLocal.printDebug(['abc bar', t])
+            else:
+                dst = p # store destination of elements
+
             if isinstance(t, abcModule.ABCMetadata):
                 if t.isTitle():
                     environLocal.printDebug(['got raw abc title', t.data])
@@ -68,10 +82,16 @@ def abcToStream(abcHandler, inputM21=None):
                     ts = t.getTimeSignatureObject()
                     if ts != None: # can be None
                     # should append at the right position
-                        p.append(ts)
+                        if useMeasures: # assume at start of measures
+                            dst.timeSignature(ts)
+                        else:
+                            dst.append(ts)
                 elif t.isKey():
                     ks = t.getKeySignatureObject()
-                    p.append(ks)
+                    if useMeasures:  # assume at start of measures
+                        dst.keySignature = ks
+                    else:
+                        dst.append(ks)
     
             # as ABCChord is subclass of ABCNote, handle first
             elif isinstance(t, abcModule.ABCChord):
@@ -83,7 +103,7 @@ def abcToStream(abcHandler, inputM21=None):
                         pitchNameList.append(tSub.pitchName)
                 c = chord.Chord(pitchNameList)
                 c.quarterLength = t.quarterLength
-                p.append(c)
+                dst.append(c)
 
                 #ql += t.quarterLength
     
@@ -96,7 +116,7 @@ def abcToStream(abcHandler, inputM21=None):
                         n.accidental.displayStatus = t.accidentalDisplayStatus
 
                 n.quarterLength = t.quarterLength
-                p.append(n)
+                dst.append(n)
     
                 #ql += t.quarterLength
     
