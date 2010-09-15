@@ -1986,6 +1986,8 @@ class Music21Object(object):
     def _getMeasureOffset(self):
         '''Try to obtain the nearest Measure that contains this object, and return the offset within that Measure.
 
+        If a Measure is found, and that Measure has padding defined as `paddingLeft`, padding will be added to the native offset gathered from the object. 
+
         >>> from music21 import *
         >>> n = note.Note()
         >>> n.quarterLength = 2
@@ -1997,8 +1999,8 @@ class Music21Object(object):
         >>> m.repeatAppend(n, 4)
         >>> [n._getMeasureOffset() for n in m.notes]
         [0.0, 0.5, 1.0, 1.5]
-
         '''
+
         if self.parent != None and self.parent.isMeasure:
             #environLocal.printDebug(['found parent as Measure, using for offset'])
             offsetLocal = self.getOffsetBySite(self.parent)
@@ -2008,9 +2010,10 @@ class Music21Object(object):
             m = self.getContextByClass('Measure', sortByCreationTime=True)
             if m != None:
                 #environLocal.printDebug(['using found Measure for offset access'])            
-                offsetLocal = self.getOffsetBySite(m)
+                offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
+
             else: # hope that we get the right one
-                environLocal.printDebug(['using standard offset access'])
+                environLocal.printDebug(['_getMeasureOffset(): cannot find a Measre; using standard offset access'])
                 offsetLocal = self.offset
 
         #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])
@@ -2885,22 +2888,25 @@ class Test(unittest.TestCase):
         # this does not work; cannot get these values from Measures
         #self.assertEqual(p1.getElementsByClass('Measure')[3].beatCount, 3)
 
-        # clef/ks can get its beat
+        # clef/ks can get its beat; these objects are in a pickup, 
+        # and this give their bar offset relative to the bar
         for classStr in ['Clef', 'KeySignature']:
             self.assertEqual(p1.flat.getElementsByClass(
-                classStr)[0].beatCount, 1)
+                classStr)[0].beatCount, 4.0)
             self.assertEqual(p1.flat.getElementsByClass(
                 classStr)[0].beatDuration.quarterLength, 1.0)
             self.assertEqual(
-                p1.flat.getElementsByClass(classStr)[0].beatStrength, 1.0)
+                p1.flat.getElementsByClass(classStr)[0].beatStrength, 0.25)
 
         # ts can get beatStrength, beatDuration
         self.assertEqual(p1.flat.getElementsByClass(
             'TimeSignature')[0].beatDuration.quarterLength, 1.0)
         self.assertEqual(p1.flat.getElementsByClass(
-            'TimeSignature')[0].beatStrength, 1.0)
+            'TimeSignature')[0].beatStrength, 0.25)
         
-        # compare raw measure offsets
+        # compare offsets found with items positioned in Measures
+        # as the first bar is a pickup, the the measure offset here is returned
+        # with padding (resulting in 3) 
         post = []
         for n in p1.flat.notes:
             post.append(n._getMeasureOffset())
@@ -2915,10 +2921,11 @@ class Test(unittest.TestCase):
         # for stream and Stream subclass, overridden methods not yet
         # specialzied
         # _getMeasureOffset gets the offset within the parent
+        # this shows that measure offsets are accommodating pickup
         post = []
-        for n in p1.getElementsByClass('Measure'):
-            post.append(n._getMeasureOffset())
-        self.assertEqual(post, [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0])
+        for m in p1.getElementsByClass('Measure'):
+            post.append(m._getMeasureOffset())
+        self.assertEqual(post, [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0] )
 
         # all other methods define None
         post = []
@@ -2967,6 +2974,104 @@ class Test(unittest.TestCase):
         m2.append(n)
         self.assertEqual(n.measureNumberLocal, 74)
 
+
+
+    def testPickupMeauresBuilt(self):
+        import music21
+        from music21 import stream, meter, note
+    
+        s = stream.Score()
+    
+        m1 = stream.Measure()
+        m1.timeSignature = meter.TimeSignature('4/4')
+        n1 = note.Note('d2')
+        n1.quarterLength = 1.0
+        m1.append(n1)
+        # barDuration is baed only on TS
+        self.assertEqual(m1.barDuration.quarterLength, 4.0)
+        # duration shows the highest offset in the bar
+        self.assertEqual(m1.duration.quarterLength, 1.0)
+        # presently, the offset of the added note is zero
+        self.assertEqual(n1.getOffsetBySite(m1), 0.0)
+        # the _getMeasureOffset method is called by all methods that evaluate
+        # beat position; this takes padding into account
+        self.assertEqual(n1._getMeasureOffset(), 0.0)
+        self.assertEqual(n1.beatCount, 1.0)
+        
+        # the Measure.padAsAnacrusis() method looks at the barDuration and, 
+        # if the Measure is incomplete, assumes its an anacrusis and adds
+        # the appropriate padding
+        m1.padAsAnacrusis()
+        # app values are the same except _getMeasureOffset()
+        self.assertEqual(m1.barDuration.quarterLength, 4.0)
+        self.assertEqual(m1.duration.quarterLength, 1.0)
+        self.assertEqual(n1.getOffsetBySite(m1), 0.0)
+        # lowest offset inside of Measure still returns 0
+        self.assertEqual(m1.lowestOffset, 0.0)
+        # these values are now different
+        self.assertEqual(n1._getMeasureOffset(), 3.0)
+        self.assertEqual(n1.beatCount, 4.0)
+    
+        # appending this measure to the Score
+        s.append(m1)
+        # score duration is correct: 1
+        self.assertEqual(s.duration.quarterLength, 1.0)
+        # lowest offset is that of the first bar
+        self.assertEqual(s.lowestOffset, 0.0)
+        self.assertEqual(s.highestTime, 1.0)
+    
+    
+        m2 = stream.Measure()
+        n2 = note.Note('e2')
+        n2.quarterLength = 4.0
+        m2.append(n2)
+        # based on contents
+        self.assertEqual(m2.duration.quarterLength, 4.0)
+        # we cannot get a bar duration b/c we have not associated a ts
+        try:
+            m2.barDuration.quarterLength
+        except stream.StreamException:
+            pass
+    
+        # append to Score
+        s.append(m2)
+        # m2 can now find a time signature by looking to parent stream
+        self.assertEqual(m2.duration.quarterLength, 4.0)
+        # highest time of score takes into account new measure
+        self.assertEqual(s.highestTime, 5.0)
+        # offset are contiguous when accessed in a flat form
+        self.assertEqual([n.offset for n in s.flat.notes], [0.0, 1.0])        
+    
+    
+        m3 = stream.Measure()        
+        n3 = note.Note('f#2')
+        n3.quarterLength = 3.0
+        m3.append(n3)
+    
+        # add to stream
+        s.append(m3)
+        # m3 can now find a time signature by looking to parent stream
+        self.assertEqual(m2.duration.quarterLength, 4.0)
+        # highest time of score takes into account new measure
+        self.assertEqual(s.highestTime, 8.0)
+        # offset are contiguous when accessed in a flat form
+        self.assertEqual([n.offset for n in s.flat.notes], [0.0, 1.0, 5.0])        
+    
+    
+    def testPickupMeauresImported(self):
+        from music21 import corpus
+        s = corpus.parseWork('bach/bwv103.6')
+    
+        p = s.parts['soprano']
+        m1 = p.getElementsByClass('Measure')[0]
+    
+    
+        self.assertEqual([n.offset for n in m1.notes], [0.0, 0.5])
+        self.assertEqual(m1.paddingLeft, 3.0)
+        
+        #offsets for flat representation have proper spacing
+        self.assertEqual([n.offset for n in p.flat.notes], [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 12.5, 13.0, 15.0, 16.0, 16.5, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 28.5, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 34.75, 35.0, 35.5, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 47.0, 48.0, 48.5, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 60.5, 61.0, 63.0] )
+    
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -3021,4 +3126,7 @@ if __name__ == "__main__":
         t = Test()
         #t.testDefinedContextsClef()
         #t.testBeatAccess()
-        t.testMeaureNumberAccess()
+        #t.testMeaureNumberAccess()
+
+        t.testPickupMeauresBuilt()
+        t.testPickupMeauresImported()

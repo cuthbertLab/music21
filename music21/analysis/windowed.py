@@ -99,14 +99,14 @@ class WindowedAnalysis(object):
         >>> p = analysis.discrete.SadoianAmbitus()
         >>> wa = WindowedAnalysis(s, p)
         >>> len(wa._windowedStream)
-        39
+        36
         >>> a, b = wa._analyze(1)
         >>> len(a), len(b)
-        (39, 39)
+        (36, 36)
 
         >>> a, b = wa._analyze(4)
         >>> len(a), len(b)
-        (36, 36)
+        (33, 33)
 
         '''
         maxWindowCount = len(self._windowedStream)

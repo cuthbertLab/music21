@@ -878,7 +878,7 @@ def mxToStreamPart(mxScore, partId, inputM21):
     streamPart.insert(instrumentObj) # add instrument at zero offset
 
     # offset is in quarter note length
-    oMeasure = 0
+    oMeasure = 0.0
     lastTimeSignature = None
     for mxMeasure in mxPart:
         # create a music21 measure and then assign to mx attribute
@@ -900,28 +900,40 @@ def mxToStreamPart(mxScore, partId, inputM21):
         # offsets within measure; if the .highestTime value is greater
         # use this as the next offset
 
-        if m.highestTime > lastTimeSignature.barDuration.quarterLength:
+        if m.highestTime >= lastTimeSignature.barDuration.quarterLength:
             mOffsetShift = m.highestTime
         else: # use time signature
-            mOffsetShift = lastTimeSignature.barDuration.quarterLength 
+            # for the first measure, this may be a pickup
+            # must detect this when writing, as next measures offsets will be 
+            # incorrect
+            if oMeasure == 0.0:
+                # cannot get bar duration proportion if cannot get a ts
+                if m.barDurationProportion() < 1.0:
+                    m.padAsAnacrusis()
+                    environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
+                mOffsetShift = m.highestTime
+            # assume that, even if measure is incomplete, the next bar should
+            # start at the duration given by the time signature, not highestTime
+            else:
+                mOffsetShift = lastTimeSignature.barDuration.quarterLength 
         oMeasure += mOffsetShift
 
     # see if the first measure is a pickup
     # this may raise an exception if no time signature can be found
-    try:
-        firstBarDuration = streamPart.getElementsByClass('Measure')[0].barDuration
-    # may not be able to get TimeSignature; if so pass
-    except stream.StreamException:
-        firstBarDuration = None
-        environLocal.printDebug(['cannot get bar duration for incompletely filled first bar, likely do to a missing TimeSignature', streamPart, streamPart.getElementsByClass('Measure')[0]])
-        #streamPart.show('t')
-
-    # cannot get bar duration proportion if cannot get a ts
-    if firstBarDuration != None: 
-        if streamPart.getElementsByClass('Measure')[0].barDurationProportion(
-            barDuration=firstBarDuration) < 1.0:
-            #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.getElementsByClass('Measure')[0]])
-            streamPart.getElementsByClass('Measure')[0].shiftElementsAsAnacrusis()
+#     try:
+#         firstBarDuration = streamPart.getElementsByClass('Measure')[0].barDuration
+#     # may not be able to get TimeSignature; if so pass
+#     except stream.StreamException:
+#         firstBarDuration = None
+#         environLocal.printDebug(['cannot get bar duration for incompletely filled first bar, likely do to a missing TimeSignature', streamPart, streamPart.getElementsByClass('Measure')[0]])
+#         #streamPart.show('t')
+# 
+#     # cannot get bar duration proportion if cannot get a ts
+#     if firstBarDuration != None: 
+#         if streamPart.getElementsByClass('Measure')[0].barDurationProportion(
+#             barDuration=firstBarDuration) < 1.0:
+#             #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.getElementsByClass('Measure')[0]])
+#             streamPart.getElementsByClass('Measure')[0].padAsAnacrusis()
 
     streamPart.addGroupForElements(partId) # set group for components 
     streamPart.groups.append(partId) # set group for stream itself

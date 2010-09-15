@@ -1337,18 +1337,18 @@ class PlotStream(object):
         >>> from music21 import corpus, stream, note
         >>> s = corpus.parseWork('bach/bwv281.xml')
         >>> a = PlotStream(s)
-        >>> a.ticksOffset() # on whole score
-        [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']]
+        >>> a.ticksOffset() # on whole score, showing anacrusis spacing
+        [[1.0, '1'], [5.0, '2'], [9.0, '3'], [13.0, '4'], [17.0, '5'], [21.0, '6'], [25.0, '7'], [29.0, '8']]
 
         >>> a = PlotStream(s.parts[0].flat) # on a Part
-        >>> a.ticksOffset() # on whole score
-        [[4.0, '1'], [8.0, '2'], [12.0, '3'], [16.0, '4'], [20.0, '5'], [24.0, '6'], [28.0, '7'], [32.0, '8']]
+        >>> a.ticksOffset() # on whole score, showing anacrusis spacing
+        [[1.0, '1'], [5.0, '2'], [9.0, '3'], [13.0, '4'], [17.0, '5'], [21.0, '6'], [25.0, '7'], [29.0, '8']]
         >>> a.ticksOffset(8, 12, 2)
-        [[8.0, '2'], [12.0, '3']]
+        [[9.0, '3']]
 
         >>> a = PlotStream(s.parts[0].flat) # on a Flat collection
         >>> a.ticksOffset(8, 12, 2)
-        [[8.0, '2'], [12.0, '3']]
+        [[9.0, '3']]
 
         >>> n = note.Note('a') # on a raw collection of notes with no measures
         >>> s = stream.Stream()
@@ -1375,7 +1375,7 @@ class PlotStream(object):
         # see if this stream has any Measures, or has any references to
         # Measure obtained through contexts
         offsetMap = self.streamObj.measureOffsetMap([stream.Measure, note.Note])
-        ticks = [] # a lost of graphed value, string label pairs
+        ticks = [] # a list of graphed value, string label pairs
         if len(offsetMap.keys()) > 0:
             #environLocal.printDebug(['using measures for offset ticks'])
             # store indices in offsetMap
@@ -1383,13 +1383,14 @@ class PlotStream(object):
             sortedKeys = sorted(offsetMap.keys())
             for key in sortedKeys:
                 if key >= offsetMin and key <= offsetMax:
-                    if key == 0 and not displayMeasureNumberZero:
+                    if key == 0.0 and not displayMeasureNumberZero:
                         continue # skip
                     #if key == sorted(offsetMap.keys())[-1]:
                     #    continue # skip last
                     # assume we can get the first Measure in the lost if
                     # measurers; this may not always be True
                     mNoToUse.append(key)
+            #environLocal.printDebug(['ticksOffset():', 'mNotToUse', mNoToUse])
 
             # just get the min and the max
             if minMaxOnly:
@@ -1419,7 +1420,7 @@ class PlotStream(object):
             for i in range(oMin, oMax+1, offsetStepSize):
                 ticks.append([i, '%s' % i])
 
-        #environLocal.printDebug(['final ticks', ticks])
+        environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
         return ticks
 
     def remapQuarterLength(self, x):
@@ -1921,11 +1922,7 @@ class PlotScatter(PlotStream):
             x = self.fx(noteObj)
             if xLog:
                 x = self.remapQuarterLength(x)
-
             y = self.fy(noteObj)
-
-#             if not xValueLegit: # get index number, not actual value
-#                 x = xValues.index(x)
             data.append([x, y])
 
         xVals = [x for x,y in data]
@@ -2223,6 +2220,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
         self.graph.setData(data)
 
         # only need to add x ticks; y ticks added from data labels
+        environLocal.printDebug(['PlotHorizontalBarPitchClassOffset:', 'xTicks befor setting to self.graph', xTicks])
         self.graph.setTicks('x', xTicks)  
 
         self.graph.setAxisLabel('x', self._axisLabelMeasureOrOffset())

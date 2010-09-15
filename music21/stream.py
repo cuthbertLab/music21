@@ -116,40 +116,33 @@ class Stream(music21.Music21Object):
     'isSorted': 'Boolean describing whether the Stream is sorted or not.',
     'autoSort': 'Boolean describing whether the Stream is automatically sorted by offset whenever necessary.',
 
-    'isFlat': 'Boolean describing whether the Stream is flat.',
+    'isFlat': 'Boolean describing whether this Stream contains embedded sub-Streams or Stream subclasses (not flat).',
+
     'flattenedRepresentationOf': 'When this flat Stream is derived from another non-flat stream, a reference to the source Stream is stored here.',
     }
 
 
     def __init__(self, givenElements = None):
-        '''
-        
-        '''
         music21.Music21Object.__init__(self)
 
-        # self._elements stores ElementWrapper objects. These are not ordered.
-        # this should have a public attribute/property self.elements
-        self._elements = [] # givenElements
+        # self._elements stores ElementWrapper and Music21Object objects. 
+        self._elements = [] 
         self._unlinkedDuration = None
-
-        # the .obj attributes was held over from old ElementWrapper model
-        # no longer needed
-        #self.obj = None
 
         self.isSorted = True
         self.autoSort = True
-        self.isFlat = True  ## does it have no embedded elements
+        self.isFlat = True  # does it have no embedded Streams
 
         # seems that this should be named with a leading lower case?
-        # when derivin a flat stream, store a reference to the non-flat Stream          
+        # when deriving a flat stream, store a reference to the non-flat Stream          
         # from which this was taken
         self.flattenedRepresentationOf = None 
         
         self._cache = common.defHash()
 
         if givenElements is not None:
-            for thisEl in givenElements:
-                self.insert(thisEl)
+            for e in givenElements:
+                self.insert(e)
 
 
     #---------------------------------------------------------------------------
@@ -2794,7 +2787,7 @@ class Stream(music21.Music21Object):
         configure ".previous" and ".next" attributes
 
         '''
-        environLocal.printDebug(['calling Stream.makeTies()'])
+        #environLocal.printDebug(['calling Stream.makeTies()'])
 
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
@@ -5438,11 +5431,16 @@ class Measure(Stream):
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'timeSignatureIsNew': 'Boolean describing if the TimeSignature is different than the previous Measure.',
+
     'clefIsNew': 'Boolean describing if the Clef is different than the previous Measure.',
+
     'keyIsNew': 'Boolean describing if KeySignature is different than the previous Measure.',
+
     'measureNumber': 'A number representing the displayed or shown Measure number as presented in a written Score.',
+
     'measureNumberSuffix': 'If a Measure number has a string annotation, such as "a" or similar, this string is stored here.',
-    'layoutWidth': 'A suggestion for layout width, though most rendering systems do not support this designation. Use :class:`~music21.layout.SystemLayout` ojbects instead.',
+
+    'layoutWidth': 'A suggestion for layout width, though most rendering systems do not support this designation. Use :class:`~music21.layout.SystemLayout` objects instead.',
     }
 
     def __init__(self, *args, **keywords):
@@ -5455,7 +5453,14 @@ class Measure(Stream):
 
         self.filled = False
 
-        # NOTE: it seems that the default measure number should be zero.
+        # padding: defining a context for offsets contained within this Measure
+        # padding defines dead regions of offsets into the measure
+        # the paddingLeft is used by TimeSignature objects to determine beat
+        # position; paddingRight defines a QL from the end of the time signature
+        # to the last valid offset
+        self.paddingLeft = 0
+        self.paddingRight = 0
+
         self.measureNumber = 0 # 0 means undefined or pickup
         self.measureNumberSuffix = None # for measure 14a would be "a"
     
@@ -5484,6 +5489,76 @@ class Measure(Stream):
         return "<music21.stream.%s %s offset=%s>" % \
             (self.__class__.__name__, self.measureNumberWithSuffix(), self.offset)
         
+    #---------------------------------------------------------------------------
+    def barDurationProportion(self, barDuration=None):
+        '''Return a floating point value greater than 0 showing the proportion of the bar duration that is filled based on the highest time of all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
+
+        Bar duration refers to the duration of the Measure as suggested by the TimeSignature. This value cannot be determined without a Time Signature. 
+
+        An already-obtained Duration object can be supplied with the `barDuration` optional argument. 
+
+        >>> from music21 import *
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('3/4')
+        >>> n = note.Note()
+        >>> n.quarterLength = 1
+        >>> m.append(copy.deepcopy(n))
+        >>> m.barDurationProportion()
+        0.33333...
+        >>> m.append(copy.deepcopy(n))
+        >>> m.barDurationProportion()
+        0.66666...
+        >>> m.append(copy.deepcopy(n))
+        >>> m.barDurationProportion()
+        1.0
+        >>> m.append(copy.deepcopy(n))
+        >>> m.barDurationProportion()
+        1.33333...
+        '''
+        # passing a barDuration may save time in the lookup process
+        if barDuration == None:
+            barDuration = self.barDuration
+        return self.highestTime / barDuration.quarterLength
+
+    def padAsAnacrusis(self):
+        '''Given an incompletely filled Measure, adjust the paddingLeft value to to represent contained events as shifted to fill the left-most duration of the bar.
+
+        Calling this method will overwrite any previously set paddingLeft value, based on the current TimeSignature-derived `barDuration` attribute. 
+
+        >>> from music21 import *
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('3/4')
+        >>> n = note.Note()
+        >>> n.quarterLength = 1
+        >>> m.append(copy.deepcopy(n))
+        >>> m.padAsAnacrusis()
+        >>> m.paddingLeft
+        2.0
+        >>> m.timeSignature = meter.TimeSignature('5/4')
+        >>> m.padAsAnacrusis()
+        >>> m.paddingLeft
+        4.0
+        '''
+        # note: may need to set paddingLeft to 0 before examining
+
+        # bar duration is that suggested by time signature; it may
+        # may not be the same as Stream duration, which is based on contents
+        barDuration = self.barDuration
+        proportion = self.barDurationProportion(barDuration=barDuration)
+        if proportion < 1.:
+            # get 1 complement
+            proportionShift = 1 - proportion
+            self.paddingLeft = barDuration.quarterLength * proportionShift
+
+            #shift = barDuration.quarterLength * proportionShift
+            #environLocal.printDebug(['got anacrusis shift:', shift, 
+            #                    barDuration.quarterLength, proportion])
+            # this will shift all elements
+            #self.shiftElements(shift, classFilterList=[note.GeneralNote])
+        else:
+            environLocal.printDebug(['padAsAnacrusis() called; however, no anacrusis shift necessary:', barDuration.quarterLength, proportion])
+
+
     #---------------------------------------------------------------------------
     def bestTimeSignature(self):
         '''Given a Measure with elements in it, get a TimeSignature that contains all elements.
@@ -5573,67 +5648,45 @@ class Measure(Stream):
         doc = '''Return the bar duration, or the Duration specified by the TimeSignature. TimeSignature is found first within the Measure, or within a context based search.
         ''')
 
-    def barDurationProportion(self, barDuration=None):
-        '''Return a floating point value greater than 0 showing the proportion of the bar duration that is filled based on the highest time of all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
-
-        Bar duration refers to the duration of the Measure as suggested by the TimeSignature. This value cannot be determined without a Time Signature. 
-
-        An already-obtained Duration object can be supplied with the `barDuration` optional argument. 
-
-        >>> from music21 import *
-        >>> m = stream.Measure()
-        >>> m.timeSignature = meter.TimeSignature('3/4')
-        >>> n = note.Note()
-        >>> n.quarterLength = 1
-        >>> m.append(copy.deepcopy(n))
-        >>> m.barDurationProportion()
-        0.33333...
-        >>> m.append(copy.deepcopy(n))
-        >>> m.barDurationProportion()
-        0.66666...
-        >>> m.append(copy.deepcopy(n))
-        >>> m.barDurationProportion()
-        1.0
-        >>> m.append(copy.deepcopy(n))
-        >>> m.barDurationProportion()
-        1.33333...
-        '''
-        # passing a barDuration may save time in the lookup process
-        if barDuration == None:
-            barDuration = self.barDuration
-        return self.highestTime / barDuration.quarterLength
 
 
-    def shiftElementsAsAnacrusis(self):
-        '''
-        TODO: NEED Documentation for when to use this -- and needs test
-        that it's actually working.
-        
-        This method assumes that this is an incompletely filled Measure, 
-        and that all elements need to be shifted to the right so that the 
-        last element ends at the end of the part. 
 
-        >>> from music21 import *
-        >>> m = stream.Measure()
-        >>> m.timeSignature = meter.TimeSignature('3/4')
-        >>> n = note.Note()
-        >>> n.quarterLength = 1
-        >>> m.append(copy.deepcopy(n))
-        >>> m.shiftElementsAsAnacrusis()
-        '''
-        barDuration = self.barDuration
-        proportion = self.barDurationProportion(barDuration=barDuration)
-        if proportion < 1.:
-            # get 1 complement
-            proportionShift = 1 - proportion
-            shift = barDuration.quarterLength * proportionShift
-            #environLocal.printDebug(['got anacrusis shift:', shift, 
-            #                    barDuration.quarterLength, proportion])
-            # this will shift all elements
-            self.shiftElements(shift, classFilterList=[note.GeneralNote])
-        else:
-            environLocal.printDebug(['shiftElementsAsAnacrusis() called; however, no anacrusis shift necessary:', barDuration.quarterLength, proportion])
 
+# this method now padAsAnacrusis()
+# is now placed in Measure, and is not available on Stream
+
+#     def shiftElementsAsAnacrusis(self):
+#         '''
+#         TODO: NEED Documentation for when to use this -- and needs test
+#         that it's actually working.
+#         
+#         This method assumes that this is an incompletely filled Measure, 
+#         and that all elements need to be shifted to the right so that the 
+#         last element ends at the end of the part. 
+# 
+#         >>> from music21 import *
+#         >>> m = stream.Measure()
+#         >>> m.timeSignature = meter.TimeSignature('3/4')
+#         >>> n = note.Note()
+#         >>> n.quarterLength = 1
+#         >>> m.append(copy.deepcopy(n))
+#         >>> m.shiftElementsAsAnacrusis()
+#         '''
+#         # bar duration is that suggested by time signature; it may
+#         # may not be the same as Stream duration, based on contents
+#         barDuration = self.barDuration
+#         proportion = self.barDurationProportion(barDuration=barDuration)
+#         if proportion < 1.:
+#             # get 1 complement
+#             proportionShift = 1 - proportion
+#             shift = barDuration.quarterLength * proportionShift
+#             #environLocal.printDebug(['got anacrusis shift:', shift, 
+#             #                    barDuration.quarterLength, proportion])
+#             # this will shift all elements
+#             self.shiftElements(shift, classFilterList=[note.GeneralNote])
+#         else:
+#             environLocal.printDebug(['shiftElementsAsAnacrusis() called; however, no anacrusis shift necessary:', barDuration.quarterLength, proportion])
+# 
 
 
     #---------------------------------------------------------------------------
@@ -7411,12 +7464,13 @@ class Test(unittest.TestCase):
         self.assertEqual(len(alto.flat.notes), 73)
         
         # offset map for measures looking at the part's Measures
+        # note that pickup bar is taken into account
         post = alto.measureOffsetMap()
-        self.assertEqual(sorted(post.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0, 48.0, 52.0, 56.0, 60.0, 64.0])
+        self.assertEqual(sorted(post.keys()), [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0] )
         
         # looking at Measure and Notes: no problem
         post = alto.flat.measureOffsetMap([Measure, note.Note])
-        self.assertEqual(sorted(post.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0, 48.0, 52.0, 56.0, 60.0, 64.0])
+        self.assertEqual(sorted(post.keys()), [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0] )
         
         
         # after stripping ties, we have a stream with fewer notes
@@ -7441,7 +7495,7 @@ class Test(unittest.TestCase):
         # but, we can get an offset Measure map by looking at Notes
         post = altoPostTie.measureOffsetMap(note.Note)
         # nothing: no Measures:
-        self.assertEqual(sorted(post.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0, 48.0, 52.0, 56.0, 60.0, 64.0])
+        self.assertEqual(sorted(post.keys()), [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0])
 
         #from music21 import graph
         #graph.plotStream(altoPostTie, 'scatter', values=['pitchclass','offset'])
@@ -8630,12 +8684,13 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(m.barDurationProportion(), .333333, 4)
         self.assertAlmostEqual(m.barDuration.quarterLength, 3, 4)
 
-        m.shiftElementsAsAnacrusis()
-        self.assertEqual(m.notes[0].hasContext(m), True)
-        self.assertEqual(m.notes[0].offset, 2.0)
-        # now the duration is full
-        self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
-        self.assertAlmostEqual(m.highestOffset, 2.0, 4)
+# temporarily commented out
+#         m.shiftElementsAsAnacrusis()
+#         self.assertEqual(m.notes[0].hasContext(m), True)
+#         self.assertEqual(m.notes[0].offset, 2.0)
+#         # now the duration is full
+#         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
+#         self.assertAlmostEqual(m.highestOffset, 2.0, 4)
 
 
         m = stream.Measure()
@@ -8650,11 +8705,11 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(m.barDurationProportion(), .4, 4)
         self.assertEqual(m.barDuration.quarterLength, 5.0)
 
-        m.shiftElementsAsAnacrusis()
-        self.assertEqual(m.notes[0].offset, 3.0)
-        self.assertEqual(n1.offset, 3.0)
-        self.assertEqual(n2.offset, 3.5)
-        self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
+#         m.shiftElementsAsAnacrusis()
+#         self.assertEqual(m.notes[0].offset, 3.0)
+#         self.assertEqual(n1.offset, 3.0)
+#         self.assertEqual(n2.offset, 3.5)
+#         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
 
 
     def testInsertAndShiftBasic(self):
@@ -9828,6 +9883,8 @@ if __name__ == "__main__":
 #         t.testStripTiesBuilt()
 #         t.testStripTiesImported()
 
-        t.testChordifyBuiltA()
-        t.testChordifyBuiltB()
-        t.testChordifyImported()
+#         t.testChordifyBuiltA()
+#         t.testChordifyBuiltB()
+#         t.testChordifyImported()
+
+        t.testMeasureOffsetMapPostTie()

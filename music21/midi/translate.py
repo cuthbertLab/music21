@@ -559,7 +559,7 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
         retainContainers=True)
     s = s.flat
     # probably already flat and sorted
-    for obj in s.flat.sorted:
+    for obj in s.sorted:
         tDurEvent = 0 # the found delta ticks in each event
 
 
@@ -1007,13 +1007,14 @@ class Test(unittest.TestCase):
         soprano = s.parts['soprano']
         mts = streamToMidiTrack(soprano)
 
-        # first note-on is delayed due to anacrusis offset of first measure
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent KEY_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=512, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=66, velocity=0>]"""
-        
+        # first note-on is not delayed, even w anacrusis
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent KEY_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=512, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=66, velocity=0>]"""
+       
+
         self.assertEqual(str(mts.events[:10]), match)
 
-        # first note-on is delayed due to anacrusis offset of first measure
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Alto'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent KEY_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=62, velocity=90>, <MidiEvent DeltaTime, t=1024, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=62, velocity=0>]"""
+        # first note-on is not delayed, even w anacrusis
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Alto'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent KEY_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=62, velocity=90>, <MidiEvent DeltaTime, t=1024, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=62, velocity=0>]"""
 
         alto = s.parts['alto']
         mta = streamToMidiTrack(alto)
@@ -1028,7 +1029,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 1)
 
         # its the same as before
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent KEY_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=512, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=66, velocity=0>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent KEY_SIGNATURE, t=None, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent TIME_SIGNATURE, t=None, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=512, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=66, velocity=0>]"""
 
         self.assertEqual(str(mtList[0].events[:10]), match)
 

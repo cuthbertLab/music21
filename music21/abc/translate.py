@@ -151,7 +151,7 @@ class Test(unittest.TestCase):
         for (tf, titleEncoded, meterEncoded, keyEncoded) in [
             (testFiles.fyrareprisarn, 'Fyrareprisarn', '3/4', 'F'), 
             (testFiles.mysteryReel, 'Mystery Reel', 'C|', 'G'), 
-            (testFiles.aleIsDear, 'Ale is Dear, the', '4/4', 'D', ),
+            (testFiles.aleIsDear, 'The Ale is Dear', '4/4', 'D', ),
             (testFiles.kitchGirl, 'Kitchen Girl', '4/4', 'D'),
             (testFiles.williamAndNancy, 'William and Nancy', '6/8', 'G'),
             ]:
