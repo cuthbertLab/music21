@@ -2959,6 +2959,8 @@ class Stream(music21.Music21Object):
 
         lastTimeSignature = None
         for m in mColl:
+            # this means that the first of a stream of time signatures will
+            # be used
             if m.timeSignature is not None:
                 lastTimeSignature = m.timeSignature
             if lastTimeSignature is None:

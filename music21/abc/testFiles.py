@@ -357,7 +357,7 @@ K:G
 V:1 name="Whistle" snm="wh"
 B3 A3 | G6 | B3 A3 | G6 ||
 V:2 name="violin" snm="v"
-BdB AcA | GAG D3 | BdB AcA | GAG D6 ||
+BdB AcA | GAG D3 | BdB AcA | D6 ||
 V:3 name="Bass" snm="b" clef=bass
 D3 D3 | D6 | D3 D3 | D6 ||
 """

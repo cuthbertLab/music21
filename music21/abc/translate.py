@@ -59,66 +59,102 @@ def abcToStream(abcHandler, inputM21=None):
 
     for partHandler in partHandlers:
         p = stream.Part()
-        # TODO
-        useMeasures = False #partHandler.definesMeasures()
 
-        #ql = 0 # might not be zero if there is a pickup
-        for t in partHandler.tokens:
-            if useMeasures:
-                pass
-#                 if isinstance(t, abcModule.ABCBar):
-#                     environLocal.printDebug(['abc bar', t])
+        # first, split into a list of Measures; if there is only metadata and 
+        # one measure, that means that no measures are defined
+        barHandlers = partHandler.splitByMeasure()
+
+        # merge leading meta data; 
+        mergedHandlers = abcModule.mergeLeadingMetaData(barHandlers)
+
+        # if only one merged handler, do not create measures
+        if len(mergedHandlers) <= 1: 
+            useMeasures = False 
+        else:
+            useMeasures = True
+
+        # each unit in merged handlers defines possible a Measure (w/ or w/o metadata), trailing meta data, or a single collection of metadata and note data
+
+        barCount = 0
+        for mh in mergedHandlers:
+            # if use measures and the handler has notes; otherwise add to part
+            if useMeasures and mh.hasNotes():
+                dst = stream.Measure()
+                barCount += 1
+                # TODO: can add bar lines here, based on attributes of mh
+                # mh is an ABCBar handler
             else:
-                dst = p # store destination of elements
+                dst = p # store directly in a part instance
 
-            if isinstance(t, abcModule.ABCMetadata):
-                if t.isTitle():
-                    environLocal.printDebug(['got raw abc title', t.data])
-                    md.title = t.data
-                    environLocal.printDebug(['got metadata title', md.title])
-                elif t.isComposer():
-                    md.composer = t.data
-                elif t.isMeter():
-                    ts = t.getTimeSignatureObject()
-                    if ts != None: # can be None
-                    # should append at the right position
-                        if useMeasures: # assume at start of measures
-                            dst.timeSignature(ts)
+            #environLocal.printDebug([mh, 'dst', dst])
+            #ql = 0 # might not be zero if there is a pickup
+            for t in mh.tokens:    
+                if isinstance(t, abcModule.ABCMetadata):
+                    if t.isTitle():
+                        md.title = t.data
+                        environLocal.printDebug(['got metadata title', md.title])
+                    elif t.isComposer():
+                        md.composer = t.data
+                    elif t.isMeter():
+                        ts = t.getTimeSignatureObject()
+                        if ts != None: # can be None
+                        # should append at the right position
+                            if useMeasures: # assume at start of measures
+                                dst.timeSignature = ts
+                            else:
+                                dst.append(ts)
+                    elif t.isKey():
+                        ks = t.getKeySignatureObject()
+                        if useMeasures:  # assume at start of measures
+                            dst.keySignature = ks
                         else:
-                            dst.append(ts)
-                elif t.isKey():
-                    ks = t.getKeySignatureObject()
-                    if useMeasures:  # assume at start of measures
-                        dst.keySignature = ks
+                            dst.append(ks)
+        
+                # as ABCChord is subclass of ABCNote, handle first
+                elif isinstance(t, abcModule.ABCChord):
+                    # may have more than notes?
+                    pitchNameList = []
+                    for tSub in t.subTokens:
+                        # notes are contained as subtokens are already parsed
+                        if isinstance(tSub, abcModule.ABCNote):
+                            pitchNameList.append(tSub.pitchName)
+                    c = chord.Chord(pitchNameList)
+                    #TODO: need to adjust accidental display within 
+                    # the chord; need parallel approach to notes
+                    c.quarterLength = t.quarterLength
+                    dst.append(c)
+    
+                    #ql += t.quarterLength
+        
+                elif isinstance(t, abcModule.ABCNote):
+                    if t.isRest:
+                        n = note.Rest()
                     else:
-                        dst.append(ks)
+                        n = note.Note(t.pitchName)
+                        if n.accidental != None:
+                            n.accidental.displayStatus = t.accidentalDisplayStatus
     
-            # as ABCChord is subclass of ABCNote, handle first
-            elif isinstance(t, abcModule.ABCChord):
-                # may have more than notes?
-                pitchNameList = []
-                for tSub in t.subTokens:
-                    # notes are contained as subtokens are already parsed
-                    if isinstance(tSub, abcModule.ABCNote):
-                        pitchNameList.append(tSub.pitchName)
-                c = chord.Chord(pitchNameList)
-                c.quarterLength = t.quarterLength
-                dst.append(c)
+                    n.quarterLength = t.quarterLength
+                    dst.append(n)
 
-                #ql += t.quarterLength
-    
-            elif isinstance(t, abcModule.ABCNote):
-                if t.isRest:
-                    n = note.Rest()
-                else:
-                    n = note.Note(t.pitchName)
-                    if n.accidental != None:
-                        n.accidental.displayStatus = t.accidentalDisplayStatus
+            # append measure to part; in the case of trailing meta data
+            # dst may be part, even though useMeasures is True
+            if useMeasures and 'Measure' in dst.classes: 
+                # check for incomplete bars
+                if barCount == 1: # easy case
+                    # can only do this b/c ts is defined
+                    if dst.barDurationProportion() < 1.0:
+                        dst.padAsAnacrusis()
+                        environLocal.printDebug(['incompletely filled Measure found on abc import; interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
 
-                n.quarterLength = t.quarterLength
-                dst.append(n)
-    
-                #ql += t.quarterLength
+                # clefs are not typically defined; need to call bestClef
+                # can get clef from some voices definition
+                dst.clef = dst.bestClef()
+                p.append(dst)
+
+        if useMeasures:
+            # call make beams for now; later, import beams
+            p.makeBeams()
     
         s.insert(0, p)
 
@@ -153,6 +189,7 @@ class Test(unittest.TestCase):
 #            testFiles.theBeggerBoy,
 #            testFiles.theAleWifesDaughter,
 #            testFiles.testPrimitiveTuplet,
+#            testFiles.testPrimitivePolyphonic,
 
             ]:
             af = abc.ABCFile()
@@ -188,25 +225,23 @@ class Test(unittest.TestCase):
         from music21 import abc
         from music21.abc import testFiles
 
-
         tf = testFiles.aleIsDear
-
         af = abc.ABCFile()
         s = abcToStream(af.readstr(tf))
 
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].notes), 111)
-        self.assertEqual(len(s.parts[1].notes), 127)
+        self.assertEqual(len(s.parts[0].flat.notes), 111)
+        self.assertEqual(len(s.parts[1].flat.notes), 127)
 
         # chords are defined in second part here
-        self.assertEqual(len(s.parts[1].getElementsByClass('Chord')), 32)
+        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Chord')), 32)
 
         # check pitches in chords; sharps are applied due to key signature
-        match = [p.nameWithOctave for p in s.parts[1].getElementsByClass(
+        match = [p.nameWithOctave for p in s.parts[1].flat.getElementsByClass(
                 'Chord')[4].pitches]
         self.assertEqual(match, ['F#4', 'D4', 'B3'])
 
-        match = [p.nameWithOctave for p in s.parts[1].getElementsByClass(
+        match = [p.nameWithOctave for p in s.parts[1].flat.getElementsByClass(
                 'Chord')[3].pitches]
         self.assertEqual(match, ['E4', 'C#4', 'A3'])
 
@@ -226,9 +261,10 @@ class Test(unittest.TestCase):
         s = abcToStream(af.readstr(tf))
 
         self.assertEqual(len(s.parts), 3)
-        self.assertEqual(len(s.parts[0].notes), 6)
-        self.assertEqual(len(s.parts[1].notes), 20)
-        self.assertEqual(len(s.parts[2].notes), 6)
+        # must flatten b/c  there are measures
+        self.assertEqual(len(s.parts[0].flat.notes), 6)
+        self.assertEqual(len(s.parts[1].flat.notes), 17)
+        self.assertEqual(len(s.parts[2].flat.notes), 6)
 
         #s.show()
         #s.show('midi')
@@ -247,6 +283,46 @@ class Test(unittest.TestCase):
         for n in s.flat.notes:
             match.append(str(n.quarterLength))
         self.assertEqual(match, ['0.333333333333', '0.333333333333', '0.333333333333', '0.2', '0.2', '0.2', '0.2', '0.2', '0.166666666667', '0.166666666667', '0.166666666667', '0.166666666667', '0.166666666667', '0.166666666667', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.666666666667', '0.666666666667', '0.666666666667', '0.666666666667', '0.666666666667', '0.666666666667', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '2.0'])
+
+
+
+    def testAnacrusisPadding(self):
+        from music21 import abc
+        from music21.abc import testFiles
+
+        # 2 quarter pickup in 3/4
+        ah = abc.ABCHandler()
+        ah.process(testFiles.hectorTheHero)
+        s = abcToStream(ah)
+        m1 = s.parts[0].getElementsByClass('Measure')[0]
+
+        # ts is 3/4
+        self.assertEqual(m1.barDuration.quarterLength, 3.0)
+        # filled with two quarter notes
+        self.assertEqual(m1.duration.quarterLength, 2.0)
+        # notes are shown as being on beat 2 and 3
+        self.assertEqual(m1.notes[0]._getMeasureOffset(), 1.0)
+        self.assertEqual(m1.notes[0].beatCount, 2.0)
+        self.assertEqual(m1.notes[1]._getMeasureOffset(), 2.0)
+        self.assertEqual(m1.notes[1].beatCount, 3.0)
+
+
+        # two 16th pickup in 4/4
+        ah = abc.ABCHandler()
+        ah.process(testFiles.theAleWifesDaughter)
+        s = abcToStream(ah)
+        m1 = s.parts[0].getElementsByClass('Measure')[0]
+
+        # ts is 3/4
+        self.assertEqual(m1.barDuration.quarterLength, 4.0)
+        # filled with two 16th
+        self.assertEqual(m1.duration.quarterLength, 0.5)
+        # notes are shown as being on beat 2 and 3
+        self.assertEqual(m1.notes[0]._getMeasureOffset(), 3.5)
+        self.assertEqual(m1.notes[0].beatCount, 4.5)
+        self.assertEqual(m1.notes[1]._getMeasureOffset(), 3.75)
+        self.assertEqual(m1.notes[1].beatCount, 4.75)
+
 
 
     def testLyrics(self):
@@ -279,7 +355,7 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
-        t.testBasic()
+        #t.testBasic()
 
-
+        t.testAnacrusisPadding()
 

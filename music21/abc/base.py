@@ -1345,7 +1345,7 @@ class ABCHandler(object):
         
 
         '''
-        ah = self.__class__()
+        ah = self.__class__() # will get the same class type
         ah.tokens = self._tokens + other._tokens
         return ah
 
@@ -1430,33 +1430,33 @@ class ABCHandler(object):
                         pos.append(i) # store position 
                         voiceCount += 1
 
+
+
         post = []
         # no voices, or definition of one voice, or use of V: field for 
         # something else
         if voiceCount <= 1:
-            ah = self.__class__()
+            ah = self.__class__() # just making a copy
             ah.tokens = self._tokens
             post.append(ah)
         # two or more voices
         else: 
-            # metadata is everything before first v1. 
-            # first v1 found at pos[0]
-            ah = self.__class__()
-            ah.tokens = self._tokens[:pos[0]]
-            post.append(ah)
+            # collect start and end pairs of split
+            pairs = []
+            pairs.append([0, pos[0]])
             i = pos[0]
-            # start range at second value in pos
             for x in range(1, len(pos)):
                 j = pos[x]
-                ah = self.__class__()
-                ah.tokens = self._tokens[i:j]
-                post.append(ah)
+                pairs.append([i, j])
                 i = j
-            # get last span
-            ah = self.__class__()
-            ah.tokens = self._tokens[i:]
-            post.append(ah)
+            # add last
+            pairs.append([i, len(self)])
 
+            for x, y in pairs:
+                ah = self.__class__()
+                ah.tokens = self._tokens[x:y]
+                post.append(ah)
+    
         return post
 
 
@@ -1557,7 +1557,7 @@ class ABCHandler(object):
 
 
 class ABCHandlerBar(ABCHandler):
-    '''A Handler specialized for storing bars.
+    '''A Handler specialized for storing bars. All left and right bars are collected and assigned to attributes. 
     '''
     # divide elements of a character stream into objects and handle
     # store in a list, and pass global information to compontns
@@ -1569,6 +1569,43 @@ class ABCHandlerBar(ABCHandler):
         self.rightBarToken = None
 
 
+
+
+def mergeLeadingMetaData(barHandlers):
+    '''Given a list of ABCHandlerBar, ruturn a list of ABCHandlerBar objects, where leading metadata is merged, if possible, with the bar data preceding. This is often needed for processing
+    '''
+    mCount = 0
+    metadataPos = [] # store indices of handlers that are all metadata
+    for i in range(len(barHandlers)):
+        if barHandlers[i].hasNotes():
+            mCount += 1
+        else:
+            metadataPos.append(i)
+
+    # merge meta data into bars for processing
+    mergedHandlers = []
+    if mCount <= 1: # if only one true measure, do not create measures
+        ahb = ABCHandlerBar()
+        for h in barHandlers:
+            ahb += h # concatenate all
+        mergedHandlers.append(ahb)
+    else:
+        # when we have metadata, we need to pass its tokens with those
+        # of the measure that follows it; if we have trailing meta data, 
+        # we can pass but do not create a measure
+        i = 0
+        while i < len(barHandlers):
+            # if we find metadata and it is not the last valid index
+            # merge into a single handler
+            if i in metadataPos and i != len(barHandlers) -1:
+                mergedHandlers.append(barHandlers[i] +
+                                     barHandlers[i+1])
+                i += 2 
+            else:
+                mergedHandlers.append(barHandlers[i])
+                i += 1
+
+    return mergedHandlers
 
 #-------------------------------------------------------------------------------
 class ABCFile(object):
@@ -1758,13 +1795,12 @@ class Test(unittest.TestCase):
         self.assertEqual(an._getPitchName("_B"), ('B-4', True))
 
 
-    def tessSplitByMeasure(self):
+    def testSplitByMeasure(self):
 
         from music21.abc import testFiles
-        src = testFiles.hectorTheHero
         
         ah = ABCHandler()
-        ah.process(src)
+        ah.process(testFiles.hectorTheHero)
         ahm = ah.splitByMeasure()
 
         for i, l, r in [(0, None, None), # meta data
@@ -1791,6 +1827,99 @@ class Test(unittest.TestCase):
 #             environLocal.printDebug(['leftBar:', ahSub.leftBarToken, 'rightBar:', ahSub.rightBarToken, '\n'])
 
 
+        ah = ABCHandler()
+        ah.process(testFiles.theBeggerBoy)
+        ahm = ah.splitByMeasure()
+
+        for i, l, r in [(0, None, None), # meta data
+                        (1, None, '|'),
+                        (-1, '||', None), # trailing lyric meta data
+                       ]:
+            #print i, l, r, ahm[i].tokens
+            if l == None:
+                self.assertEqual(ahm[i].leftBarToken, None)
+            else:
+                self.assertEqual(ahm[i].leftBarToken.src, l)
+
+            if r == None:
+                self.assertEqual(ahm[i].rightBarToken, None)
+            else:
+                self.assertEqual(ahm[i].rightBarToken.src, r)
+
+        # test a simple string with no bars        
+        ah = ABCHandler()
+        ah.process('M:6/8\nL:1/8\nK:G\nc1D2')
+        ahm = ah.splitByMeasure()
+
+        for i, l, r in [(0, None, None), # meta data
+                        (-1, None, None), # note data, but no bars
+                       ]:
+            #print i, l, r, ahm[i].tokens
+            if l == None:
+                self.assertEqual(ahm[i].leftBarToken, None)
+            else:
+                self.assertEqual(ahm[i].leftBarToken.src, l)
+
+            if r == None:
+                self.assertEqual(ahm[i].rightBarToken, None)
+            else:
+                self.assertEqual(ahm[i].rightBarToken.src, r)
+
+
+    def testMergeLeadingMetaData(self):
+        from music21.abc import testFiles
+
+        # a case of leading and trailing meta data
+        ah = ABCHandler()
+        ah.process(testFiles.theBeggerBoy)
+        ahm = ah.splitByMeasure()
+
+        self.assertEqual(len(ahm), 14)
+
+        mergedHandlers = mergeLeadingMetaData(ahm)
+
+        # after merging, one less handler as leading meta data is mergerd
+        self.assertEqual(len(mergedHandlers), 13)
+        # the last handler is all trailing metadata
+        self.assertEqual(mergedHandlers[0].hasNotes(), True)
+        self.assertEqual(mergedHandlers[-1].hasNotes(), False)
+        self.assertEqual(mergedHandlers[-2].hasNotes(), True)
+        # these are all ABCHandlerBar instances with bars defined
+        self.assertEqual(mergedHandlers[-2].rightBarToken.src, '||')
+
+
+        # a case of only leading meta data
+        ah = ABCHandler()
+        ah.process(testFiles.theAleWifesDaughter)
+        ahm = ah.splitByMeasure()
+
+        self.assertEqual(len(ahm), 11)
+
+        mergedHandlers = mergeLeadingMetaData(ahm)
+        # after merging, one less handler as leading meta data is mergerd
+        self.assertEqual(len(mergedHandlers), 10)
+        # all handlers have notes
+        self.assertEqual(mergedHandlers[0].hasNotes(), True)
+        self.assertEqual(mergedHandlers[-1].hasNotes(), True)
+        self.assertEqual(mergedHandlers[-2].hasNotes(), True)
+        # these are all ABCHandlerBar instances with bars defined
+        self.assertEqual(mergedHandlers[-1].rightBarToken.src, '|]')
+
+
+        # test a simple string with no bars        
+        ah = ABCHandler()
+        ah.process('M:6/8\nL:1/8\nK:G\nc1D2')
+        ahm = ah.splitByMeasure()
+
+        # split by measure divides meta data
+        self.assertEqual(len(ahm), 2)
+        mergedHandlers = mergeLeadingMetaData(ahm)
+        # after merging, meta dat is merged back
+        self.assertEqual(len(mergedHandlers), 1)
+        # and it has notes
+        self.assertEqual(mergedHandlers[0].hasNotes(), True)
+
+
 if __name__ == "__main__":
     import sys
 
@@ -1800,8 +1929,8 @@ if __name__ == "__main__":
         t = Test()
 
         #t.testNoteParse()
-        t.tessSplitByMeasure()
-
+        t.testSplitByMeasure()
+        t.testMergeLeadingMetaData()
 
 
 
