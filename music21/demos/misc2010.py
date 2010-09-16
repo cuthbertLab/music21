@@ -34,7 +34,7 @@ def richardBreedGetWell():
                             thisMeasure = notes[i+j].getContextByClass(stream.Measure)
                             if thisMeasure is not None and thisMeasure is not lastMeasure:
                                 lastMeasure = thisMeasure
-                                measureNumber = thisMeasure.measureNumber
+                                measureNumber = thisMeasure.number
                                 thisMeasure.insert(0, thisMeasure.bestClef())
                                 display.append(thisMeasure)
                         notes[i].lyric = workName + " " + str(thisPart.id) + " " + str(measureNumber)

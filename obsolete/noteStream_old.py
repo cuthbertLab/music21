@@ -302,7 +302,7 @@ class NoteStream(object):
         else:
             currentMeasureObject = measure.Measure()
             currentMeasureObject.timeSignature = timeSignature
-            currentMeasureObject.measureNumber = currentMeasure
+            currentMeasureObject.number = currentMeasure
 
         returnMeasures = []
         returnMeasures.append(currentMeasureObject)
@@ -317,7 +317,7 @@ class NoteStream(object):
                 currentMeasure = thisNoteMeasure
                 currentMeasureObject = measure.Measure()
                 currentMeasureObject.timeSignature = timeSignature
-                currentMeasureObject.measureNumber = int(currentMeasure)
+                currentMeasureObject.number = int(currentMeasure)
                 returnMeasures.append(currentMeasureObject)
             currentMeasureObject.notes.append(thisNote)
             currentQtrPosition += thisNote.duration.quarterLength
@@ -474,7 +474,7 @@ if (__name__ == "__main__"):
     stream2.applyTimeSignature(ts1)
 #    measures = stream2.makeMeasures(ts1)
 #   for thisM in measures:
-#      print "New Measure, number " + str(thisM.measureNumber)
+#      print "New Measure, number " + str(thisM.number)
 #      if thisM.filled is True:
 #           print "Filled up"
 #        for thisN in thisM.notes:

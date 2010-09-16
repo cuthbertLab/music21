@@ -977,9 +977,9 @@ def hdStringToMeasure(contents):
         
     
     if rematchMN:
-        m1.measureNumber = int(rematchMN.group(1))
+        m1.number = int(rematchMN.group(1))
         if rematchMN.group(2):
-            m1.measureNumberSuffix = rematchMN.group(2)
+            m1.numberSuffix = rematchMN.group(2)
 
     if contents.count('-'):
         m1.rightBarline.style = "none"
@@ -1175,8 +1175,8 @@ class Test(unittest.TestCase):
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
         
         m1 = hdStringToMeasure("=29a;:|:")
-        self.assertEqual(m1.measureNumber, 29)
-        self.assertEqual(m1.measureNumberSuffix, "a")
+        self.assertEqual(m1.number, 29)
+        self.assertEqual(m1.numberSuffix, "a")
         self.assertEqual(m1.rightBarline.style, "regular")
         self.assertEqual(m1.rightBarline.repeat_dots, "both")
         assert m1.rightBarline.pause is not None

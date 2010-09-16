@@ -317,7 +317,7 @@ def measureToMx(m):
     '''
 
     mxMeasure = musicxmlMod.Measure()
-    mxMeasure.set('number', m.measureNumber)
+    mxMeasure.set('number', m.number)
 
     if m.layoutWidth != None:
         mxMeasure.set('width', m.layoutWidth)
@@ -407,9 +407,9 @@ def mxToMeasure(mxMeasure, inputM21):
     mNum, mSuffix = common.getNumFromStr(mxMeasure.get('number'))
     # assume that measure numbers are integers
     if mNum not in [None, '']:
-        m.measureNumber = int(mNum)
+        m.number = int(mNum)
     if mSuffix not in [None, '']:
-        m.measureNumberSuffix = mSuffix
+        m.numberSuffix = mSuffix
 
     data = mxMeasure.get('width')
     if data != None: # may need to do a format/unit conversion?
@@ -417,7 +417,7 @@ def mxToMeasure(mxMeasure, inputM21):
         
     junk = mxMeasure.get('implicit')
 #         environLocal.printDebug(['_setMX: working on measure:',
-#                                 m.measureNumber])
+#                                 m.number])
 
     mxAttributes = mxMeasure.get('attributesObj')
     mxAttributesInternal = True
@@ -493,14 +493,14 @@ def mxToMeasure(mxMeasure, inputM21):
                 mxNoteNext = None
 
             if mxNote.get('print-object') == 'no':
-                #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.measureNumber])
+                #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.number])
                 continue
 
             mxGrace = mxNote.get('graceObj')
             if mxGrace is not None: # graces have a type but not a duration
                 #TODO: add grace notes with duration equal to ZeroDuration
                 #environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
-                #m.measureNumber])
+                #m.number])
                 continue
 
             # the first note of a chord is not identified directly; only

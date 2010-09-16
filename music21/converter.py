@@ -866,8 +866,8 @@ class Test(unittest.TestCase):
         for part in a.getElementsByClass(stream.Part):
             self.assertEqual(len(part), 7) # seven measures
             measures = part.getElementsByClass(stream.Measure)
-            self.assertEqual(int(measures[0].measureNumber), 1)
-            self.assertEqual(int(measures[-1].measureNumber), 7)
+            self.assertEqual(int(measures[0].number), 1)
+            self.assertEqual(int(measures[-1].number), 7)
 
         # print a.recurseRepr()
 

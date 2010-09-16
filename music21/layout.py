@@ -199,7 +199,7 @@ class Test(unittest.TestCase):
         
         for i in range(1,11):
             m = stream.Measure()
-            m.measureNumber = i
+            m.number = i
             n = note.Note()
             m.append(n)
             s.append(m)

@@ -87,7 +87,7 @@ Counting and Searching
                 # We label the chord with the measure number
                 # and the first note of the measure with the Forte Prime form
                 
-                testChord.lyric = "m. " + str(thisMeasure.measureNumber)
+                testChord.lyric = "m. " + str(thisMeasure.number)
                 
                 primeForm = chord.Chord(thisMeasure.pitches).primeFormString
                 firstNote = thisMeasure.notes[0]

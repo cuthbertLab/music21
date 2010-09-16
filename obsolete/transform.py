@@ -210,7 +210,7 @@ def split(streamObj, objName, fx):
 #         # get active time signature
 #         ts = meterStream[meterCount % len(meterStream)]
 #         m.timeSignature = ts
-#         m.measureNumber = meterCount + 1
+#         m.number = meterCount + 1
 # 
 #         if ts.barDuration.quarterLength == 0: # will cause an infinite loop
 #             raise TransformException('time signature has no duration')    
@@ -295,7 +295,7 @@ def split(streamObj, objName, fx):
 #             else: # get the appropriately positioned meter
 #                 ts = meterStream[mCount % len(meterStream)]
 #             mNext.timeSignature = ts
-#             mNext.measureNumber = m.measureNumber + 1
+#             mNext.number = m.number + 1
 #             mNextAdd = True
 # 
 #         # seems like should be able to use m.duration.quarterLengths
@@ -439,7 +439,7 @@ def split(streamObj, objName, fx):
 #         else:
 #             currentMeasureObject = measure.Measure()
 #             currentMeasureObject.timeSignature = timeSignature
-#             currentMeasureObject.measureNumber = currentMeasure
+#             currentMeasureObject.number = currentMeasure
 # 
 #         returnMeasures = []
 #         returnMeasures.append(currentMeasureObject)
@@ -454,7 +454,7 @@ def split(streamObj, objName, fx):
 #                 currentMeasure = thisNoteMeasure
 #                 currentMeasureObject = measure.Measure()
 #                 currentMeasureObject.timeSignature = timeSignature
-#                 currentMeasureObject.measureNumber = int(currentMeasure)
+#                 currentMeasureObject.number = int(currentMeasure)
 #                 returnMeasures.append(currentMeasureObject)
 #             currentMeasureObject.notes.append(thisNote)
 #             currentQtrPosition += thisNote.duration.quarterLength

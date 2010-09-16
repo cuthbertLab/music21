@@ -81,12 +81,12 @@ def simple3():
                 thisNote.pitch = defaultPitch
             rhythmicStream.append(rhythmNote)
             
-        notes[0].lyric = str(thisMeasure.measureNumber)
+        notes[0].lyric = str(thisMeasure.number)
         if len(rhythmicHash[offsetString]) == 0: # if it is our first encounter with the rhythm, add the rhythm alone in blue
             for thisNote in rhythmicStream:
                 thisNote.color = "blue"
             rhythmicHash[offsetString].append(rhythmicStream)
-        thisMeasure.getNotes()[0].editorial.comment.text = str(thisMeasure.measureNumber)
+        thisMeasure.getNotes()[0].editorial.comment.text = str(thisMeasure.number)
         rhythmicHash[offsetString].append(thisMeasure)
 
     allLily = lily.LilyString()
@@ -354,7 +354,7 @@ def januaryThankYou():
                         measureNumber = 0
                         for site in notes[i]._definedContexts.getSites():
                             if isinstance(site, stream.Measure):
-                                measureNumber = site.measureNumber
+                                measureNumber = site.number
                                 display.append(site)
                         notes[i].lyric = workName + " " + str(thisPart.id) + " " + str(measureNumber)
                         m = stream.Measure()
@@ -441,7 +441,7 @@ def js_q1():
                     isCadence = True
             
             if isCadence is True and thisChord.inversion == 1:
-                thisChord.lyric.append(str.chorale.name + ": " + str(thisChord.context.measureNumber) + "/" + str(thisChord.context.beat))
+                thisChord.lyric.append(str.chorale.name + ": " + str(thisChord.context.number) + "/" + str(thisChord.context.beat))
                 returnStream.append(prev2Chord)
                 returnStream.append(prevChord)
                 returnStream.append(thisChord)

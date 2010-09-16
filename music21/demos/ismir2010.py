@@ -97,7 +97,7 @@ def newDomSev(show=True):
           # We label the chord with the measure number
           # and the first note of the measure with the Forte Prime form
         
-          testChord.lyric = "m. " + str(thisMeasure.measureNumber)
+          testChord.lyric = "m. " + str(thisMeasure.number)
           
           primeForm = chord.Chord(thisMeasure.pitches).primeFormString
           firstNote = thisMeasure.notes[0]
@@ -144,7 +144,7 @@ def melodicChordExpression(show=True):
             if testChord.isDominantSeventh():
                 # append the found pitches as chord
                 testChord.lyric = "m. " + str(
-                    measure.measureNumber)
+                    measure.number)
                 # store the chord in a measure
                 emptyMeasure = stream.Measure()
                 emptyMeasure.append(
@@ -401,7 +401,7 @@ def beethovenSearch():
         testChord.duration.type = "whole" 
         
         if testChord.isDominantSeventh():
-          testChord.lyric = "m. " + str(m.measureNumber)
+          testChord.lyric = "m. " + str(m.number)
           m.notes[0].lyric = chord.Chord(m.pitches).primeFormString
                
           chordMeasure = stream.Measure()

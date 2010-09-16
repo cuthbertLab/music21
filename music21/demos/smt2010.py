@@ -168,7 +168,7 @@ def findHighestNotes(show=True, *arguments, **keywords):
                     highestNote.duration.components[0].unlink()
                     highestNote.quarterLength = 4
                     highestNote.lyric = '%s: M. %s: beat %s' % (
-                        part.getInstrument().partName[0], m.measureNumber, ts.getBeat(n.offset))
+                        part.getInstrument().partName[0], m.number, ts.getBeat(n.offset))
         found.append(highestNote)
 
     if show:
@@ -195,7 +195,7 @@ def ex1_revised(show=True, *arguments, **keywords):
             testChord.duration.type = "whole"
             if testChord.isDominantSeventh() is True:
                 # since a chord was found in this measure, append the found pitches in closed position
-                testChord.lyric = "m. " + str(thisMeasure.measureNumber)
+                testChord.lyric = "m. " + str(thisMeasure.number)
                 emptyMeasure = stream.Measure()
                 emptyMeasure.append(testChord.closedPosition())
                 display.append(emptyMeasure)

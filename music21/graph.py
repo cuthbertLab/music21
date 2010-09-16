@@ -1396,7 +1396,7 @@ class PlotStream(object):
             if minMaxOnly:
                 for i in [0, len(mNoToUse)-1]:
                     offset = mNoToUse[i]
-                    mNumber = offsetMap[offset][0].measureNumber
+                    mNumber = offsetMap[offset][0].number
                     ticks.append([offset, '%s' % mNumber])
 
             else: # get all of them
@@ -1407,7 +1407,7 @@ class PlotStream(object):
                     mNoStepSize = 1    
                 for i in range(0, len(mNoToUse), mNoStepSize):
                     offset = mNoToUse[i]
-                    mNumber = offsetMap[offset][0].measureNumber
+                    mNumber = offsetMap[offset][0].number
                     ticks.append([offset, '%s' % mNumber])
 
         else: # generate numeric ticks

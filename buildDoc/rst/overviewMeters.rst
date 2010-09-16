@@ -481,7 +481,7 @@ In the following example, all leading tones, or C#s, are collected into a new St
                 if n.name == 'C#': 
                     n.addLyric('%s, m. %s' %
                         (part.id[0], 
-                        m.measureNumber))
+                        m.number))
                     n.addLyric('beat %s' % 
                         ts.getBeat(n.offset))
                     found.insert(offsetQL, n)

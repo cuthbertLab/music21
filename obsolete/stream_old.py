@@ -2478,10 +2478,10 @@ class NotationStream(StreamBundle):
                 raise StreamBundleException('not a MeasureUnit')
 
             mxMeasure = musicxmlMod.Measure()
-            if measureObj.measureNumber == None:
+            if measureObj.number == None:
                 mxMeasure.set('number', i)
             else:
-                mxMeasure.set('number', measureObj.measureNumber)
+                mxMeasure.set('number', measureObj.number)
             mxPart.append(mxMeasure)
         return mxPart
 
@@ -3290,10 +3290,10 @@ if __name__ == "__main__":
 #                 raise StreamBundleException('not a MeasureUnit')
 # 
 #             mxMeasure = musicxmlMod.Measure()
-#             if measureObj.measureNumber == None:
+#             if measureObj.number == None:
 #                 mxMeasure.set('number', i)
 #             else:
-#                 mxMeasure.set('number', measureObj.measureNumber)
+#                 mxMeasure.set('number', measureObj.number)
 #             mxPart.append(mxMeasure)
 #         return mxPart
 # 

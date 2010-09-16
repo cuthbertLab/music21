@@ -81,7 +81,7 @@ class Test(unittest.TestCase):
         sMeasures = sPart.flat.notes.makeMeasures(meter.TimeSignature('6/8'))
 
         # measure 2 is at index 1
-        self.assertEquals(sMeasures[1].measureNumber, 2)
+        self.assertEquals(sMeasures[1].number, 2)
 
         # getting a measure by context, we should 
         # get the most recent measure that was this note was in

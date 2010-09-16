@@ -1836,10 +1836,10 @@ class Stream(music21.Music21Object):
 
         for m in mStream:
             # mId is a tuple of measure nmber and any suffix
-            mId = (m.measureNumber, m.measureNumberSuffix)
+            mId = (m.number, m.numberSuffix)
             # store unique measure numbers for reference
-            if m.measureNumber not in mNumbersUnique:
-                mNumbersUnique.append(m.measureNumber)
+            if m.number not in mNumbersUnique:
+                mNumbersUnique.append(m.number)
             if mId not in mapRaw.keys():
                 mapRaw[mId] = [] # use a list
             # these will be in order by measure number
@@ -2616,7 +2616,7 @@ class Stream(music21.Music21Object):
         lastTimeSignature = None
         while True:    
             m = Measure()
-            m.measureNumber = measureCount + 1
+            m.number = measureCount + 1
             # get active time signature at this offset
             # make a copy and it to the meter
             thisTimeSignature = meterStream.getElementAtOrBefore(o)
@@ -2842,7 +2842,7 @@ class Stream(music21.Music21Object):
                 if not lastTimeSignature.ratioEqual(ts):
                     mNext.timeSignature = deepcopy(ts)
                 # increment measure number
-                mNext.measureNumber = m.measureNumber + 1
+                mNext.number = m.number + 1
                 mNextAdd = True # new measure, needs to be appended
     
             #environLocal.printDebug(['makeTies() dealing with measure', m, 'mNextAdd', mNextAdd])
@@ -5438,7 +5438,7 @@ class Measure(Stream):
 
     'keyIsNew': 'Boolean describing if KeySignature is different than the previous Measure.',
 
-    'measureNumber': 'A number representing the displayed or shown Measure number as presented in a written Score.',
+    'number': 'A number representing the displayed or shown Measure number as presented in a written Score.',
 
     'measureNumberSuffix': 'If a Measure number has a string annotation, such as "a" or similar, this string is stored here.',
 
@@ -5463,8 +5463,8 @@ class Measure(Stream):
         self.paddingLeft = 0
         self.paddingRight = 0
 
-        self.measureNumber = 0 # 0 means undefined or pickup
-        self.measureNumberSuffix = None # for measure 14a would be "a"
+        self.number = 0 # 0 means undefined or pickup
+        self.numberSuffix = None # for measure 14a would be "a"
     
         # we can request layout width, using the same units used
         # in layout.py for systems; most musicxml readers do not support this
@@ -5482,10 +5482,10 @@ class Measure(Stream):
 
     
     def measureNumberWithSuffix(self):
-        if self.measureNumberSuffix:
-            return str(self.measureNumber) + self.measureNumberSuffix
+        if self.numberSuffix:
+            return str(self.number) + self.numberSuffix
         else:
-            return str(self.measureNumber)
+            return str(self.number)
     
     def __repr__(self):
         return "<music21.stream.%s %s offset=%s>" % \
@@ -7482,11 +7482,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(altoPostTie.notes), 69)
         
         # we can still get measure numbers:
-        mNo = altoPostTie[3].getContextByClass(stream.Measure).measureNumber
+        mNo = altoPostTie[3].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 1)
-        mNo = altoPostTie[8].getContextByClass(stream.Measure).measureNumber
+        mNo = altoPostTie[8].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 2)
-        mNo = altoPostTie[15].getContextByClass(stream.Measure).measureNumber
+        mNo = altoPostTie[15].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 4)
         
         # can we get an offset Measure map by looking for measures

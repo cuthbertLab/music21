@@ -128,7 +128,7 @@ def findRaisedSevenths(show=True):
                 if n.name == 'C#': 
                     n.addLyric('%s, m. %s' % (          
         part.getInstrument().partName[0], 
-        m.measureNumber))
+        m.number))
                     n.addLyric('beat %s' %
         ts.getBeat(n.offset))
                     found.insert(count, n)

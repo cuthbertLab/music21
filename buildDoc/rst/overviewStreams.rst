@@ -302,7 +302,7 @@ The index position of a Measure may not be the same as the Measure number. For t
 
 .. TODO: Accessing Components of Parts and Measures
 .. have a section on getting attributes form Parts and Measures
-.. can show how to use .measureNumber, .timeSignature attributes of Measure
+.. can show how to use .number, .timeSignature attributes of Measure
 
 
 

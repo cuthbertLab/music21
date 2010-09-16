@@ -1969,13 +1969,13 @@ class Music21Object(object):
         '''
         mNumber = None # default for not defined
         if self.parent != None and self.parent.isMeasure:
-            mNumber = self.parent.measureNumber
+            mNumber = self.parent.number
         else:
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
             m = self.getContextByClass('Measure', sortByCreationTime=True)
             if m != None:
-                mNumber = m.measureNumber
+                mNumber = m.number
         return mNumber
 
     measureNumberLocal = property(_getMeasureNumberLocal, 
@@ -2729,15 +2729,15 @@ class Test(unittest.TestCase):
         from music21 import base, note, stream, corpus, clef
 
         m = stream.Measure()
-        m.measureNumber = 34
+        m.number = 34
         n = note.Note()
         m.append(n)
         
         n.pitch.addContext(m)
         n.pitch.addContext(n) 
-        self.assertEqual(n.pitch.getContextAttr('measureNumber'), 34)
+        self.assertEqual(n.pitch.getContextAttr('number'), 34)
         n.pitch.setContextAttr('lyric',  
-                               n.pitch.getContextAttr('measureNumber'))
+                               n.pitch.getContextAttr('number'))
         # converted to a string now
         self.assertEqual(n.lyric, '34')
 
@@ -2869,11 +2869,11 @@ class Test(unittest.TestCase):
         # TODO: this form does not yet work
         from music21 import base, note, stream, clef
         m = stream.Measure()
-        m.measureNumber = 34
+        m.number = 34
         n = note.Note()
         m.append(n)
         
-        #pitchMeasure = n.pitch.getContextAttr('measureNumber')
+        #pitchMeasure = n.pitch.getContextAttr('number')
         #n.pitch.setContextAttr('lyric', pitchMeasure)
         #self.assertEqual(n.lyric, 34)
 
@@ -2964,9 +2964,9 @@ class Test(unittest.TestCase):
         
         # create a note and put it in different measures
         m1 = stream.Measure()
-        m1.measureNumber = 3
+        m1.number = 3
         m2 = stream.Measure()
-        m2.measureNumber = 74
+        m2.number = 74
         n = note.Note()
         self.assertEqual(n.measureNumberLocal, None) # not in a Meaure
         m1.append(n)
