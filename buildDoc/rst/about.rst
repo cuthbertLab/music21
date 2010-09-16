@@ -70,12 +70,14 @@ Contributors
 Additionally, the following individuals have contributed materials or knowledge to this project.  
 They are all greatly appreciated.
 
-* Donald Byrd, researcher on University of Indiana who created a schema for computer-aided musicology 
+* `Donald Byrd`_, researcher on University of Indiana who created a schema for computer-aided musicology 
   (along with the source of all sorts of examples of how music notation is difficult).
+
+* `Ewa Dahlig-Turek`_ has kindly given permission to distribute the Essen folksong database with music21.
 
 * `Michael Good`_ and Recordare.com for creating MusicXML and many discussions about the project.
 
-* `Margaret Greentree`_ has given permission for distribution of her edited collection 
+* `Margaret Greentree`_ has kindly  given permission for distribution of her edited collection 
   of the Bach chorales in MusicXML format as part of the music21 corpus. 
   Her website contains all these chorales in additional formats.
 
@@ -83,13 +85,19 @@ They are all greatly appreciated.
 
 * `Craig Sapp`_ has always been generous in discussions about MIR.
 
-* `Bryen Travis`_ gave permission to use his collection of Bach MIDI data in music21.
+* `Seymour Schlien`_ has kindly given permission to distribute his ABC encodings of the Essen folksong database with music21.
 
+* `Bryen Travis`_ has kindly gave permission to use his collection of Bach MIDI data in music21.
+
+.. _Donald Byrd: http://www.informatics.indiana.edu/donbyrd/CMNExtremes.htm
 .. _Michael Good: http://www.recordare.com
 .. _Margaret Greentree: http://www.jsbchorales.net
 .. _Justin London: http://www.people.carleton.edu/~jlondon/2ndviennese.htm
 .. _Craig Sapp: https://ccrma.stanford.edu/~craig/
 .. _Bryen Travis: http://www.bachcentral.com/
+.. _Ewa Dahlig-Turek: http://www.esac-data.org
+.. _Seymour Schlien: http://ifdo.pugmarks.com/~seymour/runabc/esac/esacdatabase.html
+
 
 
 
@@ -147,13 +155,9 @@ itself in closed-source apps = illegal.
 The music21 Corpus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The music21 corpus contains works that to the best of our knowledge are freely
-distributable according to US copyright law. These works (along with the
-freely-available works linked to in the virtual corpus) may or may not be free
-works in your jurisdiction. If you believe this message to be in error
-regarding one or more works please contact Michael Cuthbert at the address
-provided on the contact page.
+The LGPL music21 software is distributed with a corpus of encoded compositions which are distributed with the permission of the encoders (and, where needed, the composers or arrangers) and where permitted under United States copyright law. Some encodings included in the corpus may not be used for commercial uses or have other restrictions: please see the licenses embedded in individual compositions or directories for more details.   
 
+To the best of our knowledge, the music (if not the encodings) in the corpus are either out of copyright in the United States and/or are licensed for non-commercial use. These works, along with any works linked to in the virtual corpus, may or may not be free in your jurisdiction. If you believe this message to be in error regarding one or more works please contact Michael Cuthbert at the address provided on the contact page.
 
 
 
