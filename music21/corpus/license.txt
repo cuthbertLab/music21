@@ -1,0 +1,14 @@
+#-------------------------------------------------------------------------------
+# Name:         corpus/license.txt
+# Purpose:      The music21 Project assumes no copyright or change in licensing
+#               for content distributed in the corpus.                
+#
+#-------------------------------------------------------------------------------
+
+
+
+The LGPL music21 software is distributed with a corpus of encoded compositions which are distributed with the permission of the encoders (and, where needed, the composers or arrangers) and where permitted under United States copyright law. Some encodings included in the corpus may not be used for commercial uses or have other restrictions: please see the licenses embedded in individual compositions or directories for more details.   
+
+To the best of our knowledge, the music (if not the encodings) in the corpus are either out of copyright in the United States and/or are licensed for non-commercial use. These works, along with any works linked to in the virtual corpus, may or may not be free in your jurisdiction. If you believe this message to be in error regarding one or more works please contact Michael Cuthbert at the address provided on the contact page.
+
+
