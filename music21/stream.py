@@ -5440,7 +5440,7 @@ class Measure(Stream):
 
     'number': 'A number representing the displayed or shown Measure number as presented in a written Score.',
 
-    'measureNumberSuffix': 'If a Measure number has a string annotation, such as "a" or similar, this string is stored here.',
+    'numberSuffix': 'If a Measure number has a string annotation, such as "a" or similar, this string is stored here.',
 
     'layoutWidth': 'A suggestion for layout width, though most rendering systems do not support this designation. Use :class:`~music21.layout.SystemLayout` objects instead.',
     }

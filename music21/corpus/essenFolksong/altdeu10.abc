@@ -1,0 +1,5003 @@
+
+X:1
+T: Das Hildebrandslied
+N: A0001
+O: Europa, Mitteleuropa, Deutschland
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | _B2B2c2c2 | d4d4
+z2d4d2 | d2e2=f2d2 | d4z2
+d2 | d2e2=f2d2 | _e4d4
+z2d2c2_B2 | d2_B2B4
+z2B2B2B2 | c2c2d4 | d4z2
+d2 | c2_B2B2B2 | A4G4
+z2d2d3c | _B4z2
+d2 | _e2d2d2_B2 | c4d4
+z2c2_BBG2 | G2E2F4 | G6
+
+X:2
+T: Herzog Ernst
+N: A0004A
+O: Europa, Mitteleuropa, Deutschland
+R: Romanze, Ballade, Lied
+M: none
+L: 1/4
+K: E
+A2A2A2 | A2B2=c2A2A4 | z2
+=c2c2c2 | B4A2B2A2A4
+A4B4A2=G2=F2E2E4 | z2
+A2A2A2 | A2B2=c2A2 | A4 | z2
+=c2c2c2 | B4A2B2A2A4
+A4B4 | A2=G2=F2E2E4 | z2
+E2E2E2 | =G2G2A2A2 | A4
+A2A2A2 | =G2=F2E2=C2 | z2
+=C2=G2G2 | =G2G2A2A2 | A4
+A2A2A2=G2 | =F2E2E4 | z2
+E2E2E2 | =G2G2E2=D2 | =C4 | z2
+=C2=G2G2 | A2B2=c4B2A4=G=FE4
+A2 | B4A2 | =G4=F2 | E4=C2 | =D4E8
+
+X:3
+T: Herzog Ernst
+N: A0004B
+O: Europa, Mitteleuropa, Deutschland
+R: Romanze, Ballade, Lied
+M: none
+L: 1/4
+K: A
+d2d2 | dd2d | =fdd2
+zde2e | =f2e | edd
+=f | e2d | =c2B | A2A2
+
+X:4
+T: Herzog Ernst
+N: A0004C
+O: Europa, Mitteleuropa, Deutschland
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/1
+K: E
+A | AEAA | AB=cc | BAz
+=c | =cccc | =d=cB
+A | =cBAA | EEz
+A | AEAA | AB=cc | BAz
+=c | =cccc | =d=cB
+A | =cBAA | EE
+B=d | =cBA=G | =GGE=C
+zGGG | =GGGA | =Gz
+AB | =cBA=G | AE2=F | E4
+
+X:5
+T: Der Graf von Rom oder der Graf im Pfluge
+N: A0007
+O: Europa, Mitteleuropa, Deutschland
+N: 16.Jh
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2G2B2G2 | d4d4z2
+d2 | e2d2=f2d2 | e4d4z2
+d2 | B2B2c2e2 | d4d4z2
+d2 | B2d2d2B2 | A4G4z2
+d2 | d3ed2d2 | B4A4z2
+A2 | G4G2G4A2 | B4A4z2
+D2 | G2G2A2A2 | BABcd4z2
+d2 | d2B2A2B2 | A4G4z2
+
+X:6
+T: Roland und Godelinde
+N: A0008
+O: Europa, Mitteleuropa, Flamen
+R: 310Romanze, Ballade, Lied
+M: 3/4
+L: 1/16
+K: A
+A3B | =c4A4E4 | A3BA4
+A3B | =c4A4E4 | A3BA4
+A3=c | B4=G4E4 | =G3AG4
+G3A | B4=G4F4 | E3FE2z2
+=C3D | E4E4=F4 | =G3AG4
+A3A | E4E4A4 | B3=cB4
+A3B | =c4A4E4 | A3BA4
+
+X:7
+T: Ritter Ulrich
+N: A0013A
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie nach Nicolai, Almanach II, No 21, S.210
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/8
+K: E
+E2 | E4A2A4=G2 | A4B2=c4
+B2 | A4A2=G2=F2E2 | A4=G=FE4
+AB | =c2B2A2=G4A2 | E4=D2=C4z2
+=G4=F2E2F2G2 | A2B2A2=G4A2 | =F6E4
+
+X:8
+T: Der Brautmoerder
+N: A0014
+O: Europa, Mitteleuropa, Deutschland
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: E
+B,B,B, | E3F=G2F2 | E4z
+BBB | A3AB2A2 | =G4z
+=ddd | =G3G=c2B2 | A4z
+=DDD | =GABAG2F2 | E4z
+
+X:9
+T: Halewyn
+N: A0015A
+O: Europa, Mitteleuropa, Deutschland
+R: Romanze, Ballade, Lied
+M: 3/4
+L: 1/4
+K: C
+CA,_B, | C2C | DC_B, | A,3
+C_B,A, | G,F,G, | A,_B,C | D3
+D_ED | C2D | CA,_B, | C3
+
+X:10
+T: Halewyn
+N: A0015B
+O: Europa, Mitteleuropa, Brabant
+N: Melodie  1836 mitgeteilt
+R: Romanze, Ballade, Lied
+M: 6/8
+L: 1/8
+K: C
+_B,A,B, | C3D3 | C2_B,A,2
+A, | _B,2A,G,2A, | _B,2CD3 | z2
+D_E2D | C3D3 | C2B,C3 | z3
+
+X:11
+T: Es taget in dem Osten
+N: A0016
+O: Europa, Mitteleuropa, Niederlande
+N: Melodie aus den Souterliedekens 1540
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: D
+G2 | D2D2=F2G2 | _B4A4
+d4 | =c4_B2G4A2 | =c3_BAGA4z2
+z2A2B2c2 | d4=c2
+d2 | _B4A4 | _B6A2 | G4z2
+A2 | D4E2=F4G2 | _B3AG=FG4
+
+X:12
+T: Es taget minnecliche
+N: A0017
+O: Europa, Mitteleuropa, Deutschland, Niederdeutschland
+N: Melodie: Strassburger Hs.(1421),121 Bl. 128b
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: G
+G2 | G4c2 | B4A2 | c2d2B2 | A4
+e2 | d4d2 | B4B2 | c2d2B2 | A4
+G2 | B4c2 | d4e2 | d2cBA2 | G4
+A2 | d4c2 | B4A2 | G4
+
+X:13
+T: Todtenamt
+N: A0018
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie: Hs. des 15.Jahrh. aus Karlsruhe
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: D
+D2 | D2D2D3G | A4=F3
+E | D2G2AG=FE | =F4z2
+E2 | G2A2G=FED | G4A2
+=FE | DCD2=FEDC | D4z2
+
+X:14
+T: Ritter und Herzogstochter
+N: A0019
+O: Europa, Mitteleuropa, Deutschland, Heidelberg
+N: Heidelberger Hs. 343 Bl. 103
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: A
+A | =c2cd2d | e2e2
+e2 | =g2g=f2d | e2d2z
+d | e2ee2=g | =f2e2
+e2 | d2=ce2c | B2A2z
+e | d2d=c2A | B=cd2
+d2 | d2dd2e | =f2e2
+e2 | d2=ce2c | B2A2z
+
+X:15
+T: Tageweis von der Koenigstochter und dem jungen Grafen
+N: A0020A
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie von 1545; vgl Kirchenlied "Hilf Gott, dass mir gelinge"
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/4
+K: A
+A4 | A4A2=G4E2 | =G4A4
+=c4 | =c4e2c4A2 | =G4A4
+A4 | A4A2=G4E2 | =G4A4
+=c4 | =c4e2c4A2 | =G4A4
+=c4 | =c4B2c4A2 | B3A=G4
+=c4 | =c4B2c4d2 | e4=c2BA
+=G4c4 | =c4e2c4A2 | =G4A4
+
+X:16
+T: Tageweis von der Koenigstochter und dem jungen Grafen
+N: A0020B
+O: Europa, Mitteleuropa, Deutschland
+N: Dieselbe Melodie etwas umgeformt. (1607 bei Praetorius)
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G4 | A2G2=F2D2 | =F4G4z2
+G2 | _B4B2c4B2 | A4G4
+G4 | A2G2=F2D2 | =F4G4z2
+G2 | _B4B2c4B2 | A4G4
+z2G2A2A2 | d2c2_B2A2
+B6AG | =F4z2
+G2 | _B2A2B2c2 | d4c2_B4AG | =F4z2
+G2 | _B4B2c4B2 | A4G4
+
+X:17
+T: Tageweis von der Koenigstochter und dem jungen Grafen
+N: A0020C
+O: Europa, Mitteleuropa, Deutschland
+N: Andere Melodie (1604)
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | A4A2B4B2 | c4c4z2
+c2 | c4A2B4c2 | A4G2F4
+F2 | A4A2B4B2 | c4c4z2
+c2 | c4A2B4c2 | A4G2F4
+c2 | c4B2A4G2 | F4G2A4
+c2 | d2c2c2A2 | c4B2AG | A4z4
+B4 | c4A2B4A2 | G4F4z2
+
+X:18
+T: Tageweis von der Koenigstochter und dem jungen Grafen
+N: A0020D
+O: Europa, Mitteleuropa, Deutschland
+N: Dieselbe Melodie wenig anders (1611)
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+F2 | AABB | c2c2z
+c | ccBA | G2F2
+F2 | AABB | c2c2z
+c | ccBA | G2F2
+A2 | AAGA | FGA2 | z2
+c2 | dccA | cB2A | G2F2 | z2
+C2 | FGAB | G2F2
+
+X:19
+T: Tanhaeuser
+N: A0021
+O: Europa, Mitteleuropa, Deutschland
+N: Die Melodie des alten, echten Volksliedes vom Tanhaeuser habe
+N: ich gluecklicherweise gefunden im 8. Quodlibet bei W. Schmeltzel
+N: 1544. Die vierte, fehlende Zeile habe ich musikalisch zu ergaen-
+N: zen versucht.
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/2
+K: F
+F2F2F2 | G2A2B2B2 | A2G2z2
+G2 | c2c2B2F2 | G2A2B2z2
+G2B2A3G | c2B2A4 | z2
+G2A2B2 | c2F2G4 | F8 | z2
+
+X:20
+T: Tanhuser
+N: A0022
+O: Europa, Mitteleuropa, Schweiz
+N: Aus der Schweiz nach  muendlicher Ueberlieferung 1830 durch
+N: Prof. Stalder aufgezeichnet.
+R: Romanze, Ballade, Lied
+M: 3/4
+L: 1/8
+K: C
+G, | CB,C2D2 | B,^F,G,3
+C | FGFEC2 | D2E2z
+C | EFG3C | DEF3
+C | ECD2C2 | B,2C2z
+
+X:21
+T: Der Bremberger
+N: A0023A
+O: Europa, Mitteleuropa, Deutschland
+N: Aeol mit phryg Schluss. Text, blos diese Strophe in den Grasliedlin
+N: 1535 No 13. Melodie von mir aus den drei vorhandenen Stimmen (Dis-
+N: kant, Alt, Bass) zu construieren versucht, da der Tenor mit der
+N: Hauptmelodie leider verloren gegangen ist.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2G3G | _B2B2d2d2 | d4c4 | _B4z4 | z6
+_B2 | _B2AG=F2B2 | A4G4 | =F4z4 | z6
+=F2 | =F4_E2D2 | =F4_B4 | G4=F4 | G4z2
+_B2 | c2_BAG2=F2 | _E8 | D8 | z2
+
+X:22
+T: Der Bremberger
+N: A0023B
+O: Europa, Mitteleuropa, Deutschland
+N: Neuere Melodie, noch 1850 am Niederrhein gehoert.
+R: Romanze, Ballade, Lied
+M: 6/8
+L: 1/16
+K: G
+d2 | _B4A2G4=F2 | G4A2_B4
+d2 | _B4A2G4=F2 | G4A2_B4
+Bc | d4d2d2_e2d2 | d6c4
+A_B | c4c2c2d2c2 | c6_B4
+BA | G4dc_B3cAB | G6z4
+
+X:23
+T: Zwei Wasser. (Schwimmersage)
+N: A0024A
+O: Europa, Mitteleuropa, Deutschland
+N: Mel. bei Joh. Ott, 1534 No. 37. Diskant. Conform bei Ott
+N: III. 1544 No. 15 und Pet. Schoeffer II No. 9.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: G
+G2 | G4_B2 | A4G2 | A3_Bc2 | d4
+d2 | c4A2 | _B2G4 | =F6 | z4
+=F2 | A4_B2 | c4_B2 | G3A_B2 | A4
+G2 | =F2D4 | G4F2 | G4
+
+X:24
+T: Zwei Wasser. (Schwimmersage)
+N: A0024B
+O: Europa, Mitteleuropa, Deutschland
+N: Mel. bei Schmeltzel, Quodlibet X. 1544
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: G
+G2 | G3A_B2 | A4G2 | A3_Bc2 | d4
+d2 | c3_BA2 | _B2G4 | =F6 | z4
+=F2 | G3A_B2 | c3_BA2 | G3A_B2 | A4
+G2 | =F2D4 | G3=FFE | G4
+
+X:25
+T: Zwei Wasser. (Schwimmersage)
+N: A0024C
+O: Europa, Mitteleuropa, Deutschland
+N: Mel. bei Rhaw, Bicinia II. 1545 No. 19.- Fuer Laute gesetzt und
+N: etwas verzerrt steht die Melodie schon in Hans Judenkunigs
+N: Lautenbuch, Wien 1523. Entzifferung s. Ambros, Gesch. d. Musik II,
+N: 282.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: G
+G2 | G3A_B2 | A4G2 | A3_Bc2 | d4
+d2 | c4A2 | _B2G4 | =F6 | z4
+=F2 | A4_B2 | c4_B2 | G3A_B2 | A4
+G2 | =F2D2F2 | G2A4 | G4
+
+X:26
+T: Schwimmersage
+N: A0025
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie und Text bei Forster II. 1540 No. 49
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: G
+G2 | G4_B2 | A4G2 | A3_Bc2 | c4
+B2 | c4A2 | _B2A4 | G6 | z4
+=F2 | A4_B2 | c4_B2 | G3A_B2 | A4
+G2 | =F2D4 | G4F2 | G4
+
+X:27
+T: Zwei Koenigskinder
+N: A0026A
+O: Europa, Mitteleuropa, Deutschland
+N: Svenska Folk - Visor, Stockholm 1814-16 No. 30
+R: Romanze, Ballade, Lied
+M: 3/4
+L: 1/4
+K: G
+G | A_BG | A_BG | A_Bc | d2
+c | _BAB | GA_B | A3- | Az
+d | d_ed | c_BA | _B3 | A2
+A | G2G | DEF | G3- | Gz
+
+X:28
+T: Zwei Koenigskinder
+N: A0026B
+O: Europa, Mitteleuropa, Deutschland
+N: Neusiedlers Lautenbuch 1536 I
+M: 3/4
+L: 1/8
+K: G
+G2 | G3A_B2 | A4G2 | A3_Bc2 | d4
+d2 | c3_BA2 | _B2G4 | =F6- | F2z2
+=F2 | A4_B2 | c4_B2 | G3A_B2 | A4
+G2 | =F2D4 | G4F2 | G6- | G2z2
+
+X:29
+T: Das Schloss in Oesterreich
+N: A0027A
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Forster 1540 II. No. 77
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: F
+F2F2G2 | A4B2c4A2 | F4z2
+F2A2B2 | c4F2F4ED | E2F2D4C4
+z2c2c2c2 | d3cd2c4B2 | A4z2
+d2 | c2G2A2F2 | E2F2G2A2GFG2 | F6
+
+X:30
+T: Das Schloss in Oesterreich
+N: A0027B
+O: Europa, Mitteleuropa, Deutschland
+N: Werlin 1646 S. 1754
+M: 3/2
+L: 1/4
+K: F
+F2F2G2 | A4B2 | c4A2 | F6
+F2A2B2 | c4G2 | F3ED2 | C6
+c2c2c2 | d4c2 | c4B2 | A6
+d2c2G2 | A4F2 | E2F2G2 | A3FG2 | F6
+
+X:31
+T: Das Schloss im Oberland (Falkenstein)
+N: A0028
+O: Europa, Mitteleuropa, Deutschland
+N: Die Melodie bei Joh. Ott 1544 No. 8. Sie ist nur eine
+N: Variante von: Es ligt ein schloss in Oesterreich.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: F
+F4 | F4G4A4B4 | c4c4F4
+G4 | A4d4c4F4 | F6EDE4F4 | D4C4z4
+c4 | c4c4c4B4 | B4A4G4
+d4 | c4G4A4F4 | E4F4G4A4G2F2G8 | F8z4
+
+X:32
+T: Herr von Falkenstein
+N: A0029
+O: Europa, Mitteleuropa, Deutschland
+N:  Die Melodie hat zuerst Kretzschmer, Volkslieder II. 1840
+N: No. 38 aus muendlicher Ueberlieferung mitgeteilt, und den Text aus dem
+N: Museum (Deutsches Museum 1785, Leipzig II, 381) uebersetzt.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+d2 | d2c_BAAd2 | d2c_BA3
+c | _B3AG2G2 | F4G2
+GG | A2_BBc2A2 | _B2c2d3
+c | _B2A2G2B2 | A4G2
+
+X:33
+T: Der gefangene Hans
+N: A0032
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie: Souterliedekens 1540 ad Ps. 69.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: E
+E2 | =G3GG2 | =G3GG2 | A4=G2 | A4
+A2 | =c4c2 | B2A2=G2 | =F4E=D | E4
+E2 | A2A2A2 | A4A2 | =G4E2 | =C4
+C2 | =G4E2 | =F4=G2 | A6 | =G4
+=c2 | B3A=G=F | E4
+
+X:34
+T: Peter Unverdorben
+N: A0033
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie und Text aus einer Handschrift des 15. Jahrh. des Klosters
+N: St. Georgen (Bibl. Karlsruhe). Mitgetheilt durch None, Anzeiger VI.
+N: Jahrg. Beil. 2 die Melodie.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: C
+D4 | G4A3GE4F4 | D4E2F2G4
+D4 | C4G4A2A2F2F2 | G2G2F4z4
+E4 | F6G2F4D2E2 | E2C2B,2C2E2F2DCB,2 | C8z4
+
+X:35
+T: Die Frau zur Weissenburg
+N: A0034
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie (Text von Boehme willkuerlich unterlegt): Souterliedekens
+N: 1540 ad Ps. 137.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: G
+G2 | G4G2 | A4A2 | _B4G2 | =F4
+F2 | _B4c2 | d4c2 | d3c_B2 | A4
+A2 | d2d2d2 | _B4c2 | _B2A2G2 | =F4
+F2 | G3A_B2 | c4_B2 | A6 | G4
+
+X:36
+T: Die Frau von Luxemburg
+N: A0035
+O: Europa, Mitteleuropa, Deutschland, Niederlande
+N: Melodie: Souterliedekens 1540 ad Ps. 137 (vgl. A0034), vereinfacht.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+G2G2G2 | A4A2_B2 | G4=F4 | z2
+=F2_B3c | d3cd2c_B | A2
+d2d2d2 | c2d4cA | =F6
+G2 | A2_B2c4 | c2_B2A3G | G8 | z2
+
+X:37
+T: Die drei Grafen
+N: A0036
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Schmeltzel, 1544, Quodlibet 7. Ab dritte Zeile von Boehme
+N: ergaenzt!
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2G2A2B2 | c4e2
+d2 | c2G2A2B2 | c4z2
+c2 | e2g2a2a2 | gfedc2
+d2 | e2d2c2B2 | A6
+
+X:38
+T: Vom jungen Grafen
+N: A0037
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie zuerst in Fr. Reichardts Musikal. Kunstmagazin 1782 S. 154.
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/4
+K: D
+A | D2E=F2G | A2AG2
+A | _B2AG=FG | A3-Az
+A | A_B=ccBA | A2GG2
+G | =FGAAGF | =F2EE2
+A | AG=FEDC | D3-Dz
+
+X:39
+T: Treue Liebe
+N: A0039
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie (von Boehme zum Text gesetzt): Souterliedekens 1544
+N: ad Ps. 66.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: F
+ |  |  | F2F2G2 | A4B2 | A2G4 | F4
+c2 | d4c2 | c4A2 | B4B2 | A4
+c2 | d4c2 | c4A2 | B2A2G2 | F4
+B2 | A4G2 | A4B2 | c2BAG2 | F6
+
+X:40
+T: Unter der Linde
+N: A0040
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie (von Boehme zum Text gesetzt): Souterliedekens 1544
+N: ad Ps. 63.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: D
+D2 | D4D2 | A2A2A2 | B2B2B2 | A4
+A2 | B4A2 | d4A2 | =c4B2 | A4
+=c2 | B3=cd2 | =c3BA2 | G2E2=F2 | D4
+A2 | A4=c2 | A2A2D2 | =F2E4 | D4
+
+X:41
+T: Zwei Gespielinnen
+N: A0041
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie (von Boehme zum Text gesetzt): Souterliedekens 1544
+N: ad Ps. 8, dem Text angepasst (was immer das heissen mag).
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: D
+D2D2D2 | A4A2=c4A2 | =F4z2
+A2A2A2 | _B2A2=F4G4 | =F4z2
+F2F2A2 | G=FGAG2F2E2D2 | =C4z2
+C2D2E2 | =F2D2A3GF2ED | E2D4
+
+X:42
+T: Der Todwunde
+N: A0042
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Schmeltzel 1544 Quodlibet No. 8.
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/2
+K: F
+F | A2AA2A | B2AG2G | A2AA2A | B2GF2
+
+X:43
+T: Die stolze (schoene) Muellerin
+N: A0043
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie mit geistlicher Parodie von Joh. v. Laufenberg c. 1420 aus der
+N: Strassb. Hs. No. 121 Bl. 54a. Von Boehme taktiert!
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: E
+B2 | =c2=d2d2e2 | =d2=cBA2
+B2 | =c2=d2B2dc | B3A=G3=FE2
+B2 | =c2=d2d2e2 | =d2=cBA2
+B2 | =c2=d2B2dc | B3A=G3=FE2
+G2 | =c2B2A2E2 | =D4=C2
+=G2 | A2B2=d3d | =c4B2
+=G2 | A2=G2=F2E2 | E6
+
+X:44
+T: Die schoene Muellerin
+N: A0044
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Joh. Ott III. 1544 No. 18.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+C2 | C2E2D2C2 | B,2B,2A,2
+B,2 | C2G,2A,2B,2 | C4z2
+C2 | C2E2D2C2 | B,2B,2A,2
+B,2 | C2G,2A,2B,2 | C3DE2
+C2 | D2C2B,2A,2 | G,4z2
+B,2 | C2B,2C2A,2 | G,4E,2
+B,2 | C2C2D2D2 | E4D2
+F2 | E2C2D2B,2 | C6
+
+X:45
+T: Frau Fischerin
+N: A0045
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie von Boehme aus drei Fragmenten zusammengesetzt: Schmeltzel
+N: 1544 Quodlibet 2 und 19.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: D
+ |  |  |  | d2d2d2 | =f3ed2 | e2=f4 | g4
+g2 | =f2e2d2 | c2d4 | e6
+d2d2d2 | =f3ed2 | e2=f4 | g4
+g2 | =f2e2d2 | c2d4 | e4
+d2 | d4d2 | _B4B2 | =c4_B2 | A4
+A2 | _B2B2=c2 | d3=c_B2 | A2d4 | =c4
+d2 | =c3_BA2 | _B2G4 | =F4
+d2 | d4d2 | _B4B2 | =c4_B2 | A4
+A2 | _B2B2=c2 | d3=c_B2 | A2d4 | =c4
+d2 | =c3_BA2 | _B2G4 | =F4
+_B2 | A3G=F2 | G2E4 | D6
+
+X:46
+T: Der Bettler
+N: A0046
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Forster V. 1556 No. 8.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | F4A4 | c4f4 | e4d4 | c4z2
+c2 | dcdef2f2 | e4d4 | c6B2 | A8 | z4
+F4 | A6G2 | A2B2c2c2 | F4z4
+A4A4 | B2G2A2F2 | E2F2G2B2 | A4G4 | F6
+
+X:47
+T: Der Koenigssohn
+N: A0049
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Forster V. 1556 No. 11.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | F2G2A2c2 | dBABG2G2 | F8
+z2F2c2c2 | d4c2c2- | c2=B2c4
+c4c2c2 | A3cB3A | G4z2
+c2 | B2G2A2F2 | A3Bc2B2 | BAGFG4 | F6
+
+X:48
+T: Schoen Elselein oder das Schwabentoechterlein
+N: A0051
+O: Europa, Mitteleuropa, Deutschland
+N: Fuenfte Zeile: Refrain. Melodie in: Reutterliedlin 1535 No. 2.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: D
+A2 | _B2B2=c2c2 | d2d2A2
+A2 | d2d2d2A2 | d4=c2
+A2 | _B2B2A2A2 | G2G2D2
+D2 | =F3GA2_B2 | =c3_BAGc2- | c2_BAG4 | =F8
+A3_B=c2c2 | G2=F2D2E2 | D6
+
+X:49
+T: Schwabentoechterlein
+N: A0052
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Joh. Ott 1544 No. 45.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+ |  |  | G4G2G2 | A4G4 | c4B4 | c4z2
+c2 | c4c4 | B3AG4 | A4A4 | d4z2
+d2 | c3BA2G2 | A4G4 | d2d2d3c | B4A2A2 | G8
+
+X:50
+T: Gretlein
+N: A0053A
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Forster III. 1549 No. 66.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+c2 | c4c4B2A2 | F4G2F4
+F2 | c4c4B2A2 | G3AB2A4
+G2 | F2F2E2C2 | D4E2F4
+A2 | G2G2F2E2 | D4C4z2
+c2 | c2c2B2A2 | G4F6
+
+X:51
+T: Gretlein
+N: A0053B
+O: Europa, Mitteleuropa, Deutschland
+N: Nach Boehme die vermutete volkstuemliche Form von A0053A.
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/8
+K: G
+G2 | d4d2c4B2 | G4A2G4
+G2 | d4d2c4B2 | A3Bc2B4
+A2 | G4G2F4D2 | E4F2G4
+B2 | A4A2G2F2E2 | D6
+d6 | d4d2c2B2A2 | G6-G2z2
+
+X:52
+T: Die schoene Magdalene
+N: A0054
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie: Schmeltzel 1544 Quodlibet No. 19, dritte und vierte Zeile
+N: von Boehme ergaenzt. (Vgl.A0065 und A0066, diese Angabe kann nicht
+N: stimmen!)
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: F
+F2 | c4c2c4c2 | d6d4
+f2 | e4d2c4B2 | A6-A4
+A2 | c4B2A4G2 | F6D4
+FF | G4B2A4G2 | F6-F4
+
+X:53
+T: Das wackere Maegdlein
+N: A0055
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie in Souterliedekens 1540 ad Ps. 3
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: G
+G2 | G2G2G2 | d4c2 | d4_B2 | A4
+d2 | d2d2c2 | _B4A2 | G4_B2 | A4z2
+G2F2G2 | D4
+A2 | _B4B2 | G4G2 | _B3cd2 | d4
+c2 | _B2d2c2 | _B2A4 | G4
+
+X:54
+T: Laemmerweide
+N: A0056A
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie in Souterliedekens 1540 ad Ps. 141.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: D
+D2D2D2 | A4B2=c2B4 | A4z2
+d2 | d4d2d2d2d2 | =c2A2=FGAB | =c4z2
+A2 | _B2A2G2F2 | D4=C4z2
+c2 | =c2c2B2c2 | d4A4z2
+d2 | =c2c2A2=F4E2 | =F3GA2A4GF | E4D2
+
+X:55
+T: Laemmerweide
+N: A0056B
+O: Europa, Mitteleuropa, Deutschland
+N: "Christ ist erstanden" Melodie in Koephls Gsgb. Strassb. 1537.
+N: Boehme will hiermit nachweisen, dass A0056A die bessere volketuemliche
+N: Lesart eines Volksliedes ist, das als geistliches Lied weltlichen
+N: Ursprung hat.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: D
+A4 | _B2A2B2d2 | =c2_B2A4
+z2A2d2d2 | =c2A2_B2G2 | =F4=c4
+z2A2c2_B2 | A2G2=F2D2 | =C4z2
+c2 | A2A2_B2=c2 | d4A4
+z2d2=c2_B2 | A2G2=FDE2 | D4
+
+X:56
+T: Laemmerweide
+N: A0056C
+O: Europa, Mitteleuropa, Deutschland
+N: "Herr Jesu Christe starcker Gott" Melodie: Wolfenbuettler Hs vom Jahr
+N: 1596 (Cod.Aug. 76.13. fol. Bl. 185), vgl. Kommentar zu A0056B!
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/2
+K: D
+A4 | _B2A2B2d2 | =c2_B2A2
+A2 | d2d2=c2A2 | _B2G2=F4 | =c4z2
+A2 | =c2_BA2G | =FED2 | =C4z2
+c2 | A2A2_B2=c2 | d4A4
+z2d2=c2_B2 | A2G2=FDE2 | D4
+
+X:57
+T: Die Maid vom Rosenthal
+N: A0057
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie: H. Finck 1536 No. 47.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: A
+A | A2A | A2B | =c2c | =c2
+c | AAA | =c2c | A3 | =G2
+G | =c2d | e2e | e2e | e2
+e | e2e | e2e | B3 | d2
+d | =c2A | B2A | A2G | A2
+
+X:58
+T: Malers Toechterlein
+N: A0058
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie aus den Reutterliedlein 1535 No. 12. Von Boehme in einen
+N: 3/2-Takt gesetzt.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: G
+G2 | G4A2 | B2c4 | B2A4 | G4
+G2 | d2A4 | d4^c2 | d6 | z4
+d2 | c4A2 | B4c2 | d6 | c4
+BA | G4G2 | A3Bc2 | d6
+d2c2BA | G2ABcd | e2d3B | c2A4 | G4
+
+X:59
+T: Die Waescherin
+N: A0059
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie aus: 68 Lieder. Nuernberg von Berg und Newber c.1542 No.30.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+ |  |  |  | G4G2G2 | d3cd2_B2 | A8
+z2c2c2c2 | d3cB2A2 | G4z2
+_B2 | c2A2_B2c2 | d2_B2A4 | z6
+_B2 | c3_BA2G2 | _B2c2d2B2 | AGA_Bc2
+d2 | _B3AGGG2 | c4A2
+A2 | _B2c2de=fe | d2c3_BAGB2A2 | G8
+
+X:60
+T: Winterrosen
+N: A0060
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie aus: Reutterliedlein 1535 No.10. Ganz gleichlautend bei J.Ott
+N: 1534 No.62 und Forster II. 1540 No.23.
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: F
+F2 | F2F2G2G2 | A2A2F2F2 | B3AG2A4G2 | FEF2G4 | z2
+G2B2B2 | A4A2G4G2 | F3GA3G | F2EDE2z2 | z2
+C2F2F2 | A4G2F2 | G4F2-F4
+
+X:61
+T: Am Brunnen
+N: A0063
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei J. Ott 1534 No.59.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+GGG | ddcc | d2z
+d | GA_Bc | A2A2 | z
+GGG | ddcc | d2z
+d | GA_Bc | A2A2 | z
+A=FG | A_BcA | G
+GAA | =FFG2 | D2z
+D | =FGA_B | cAG
+G | _Bcdc | A2c_B | G2_BA | F2G2 | z
+
+X:62
+T: Das Maedchen und die Hasel
+N: A0065
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie Zeile eins und zwei bei Schmeltzel 1544 Quodlibet 19 (vgl.
+N: A0054, diese Angabe kann nicht stimmen!), Zeile drei und vier
+N: von Boehme ergaenzt.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+FFF | ccff | e2z
+c | BAGF | cf2e | d2c2 | z
+ccc | AAdd | c2z
+c | dcAG | FB2A | G2F2 | z
+
+X:63
+T: Der verlorene Rosenkranz
+N: A0066A
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie zusammengefuegt aus zwei Fragmenten: Schmeltzel Quodlibet
+N: No. 19 (vgl A0054 und A0065, diese Angabe kann nicht stimmen!) und
+N: Forster II. No. 60.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: F
+F2 | F3FF2 | G3GA2 | B3BB2 | B4
+B2 | B3BB2 | A4B2 | c6 | A4
+c2 | f4f2 | e4d2 | c4c2 | A4
+A2 | c3BA2 | c4c2 | d6 | A4
+d2 | c2F2G2 | F4
+
+X:64
+T: Der verlorene Rosenkranz
+N: A0066B
+O: Europa, Mitteleuropa, Deutschland
+N: Juengere Melodie, zusammengesetzt von M. Franck aus 4 einzelnen
+N: Stellen im 7. Quodlibet des Fasciculus quodl. 1611.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: F
+F2 | A2A2B2B2 | c2c2c2
+c2 | B2A2B2c2 | B2G2F2
+c2 | A2A2G2G2 | FFF2C2
+A2 | A2F2A3B | c4B2A2 | G4F4 | z6
+
+X:65
+T: Ritter und Maid
+N: A0069A
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Fr. Nicolai, Almanach I, 1771 No. 2.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+d2 | d2c2d2_e2 | =f3gd3
+f | _e2d2c2_B2 | c4d2z
+c | c2ccd2c2 | _B3AG3
+A | _B2c2d2B2 | A4G2
+
+X:66
+T: Ritter und Maid
+N: A0069B
+O: Europa, Mitteleuropa, Deutschland
+N: Alte schlesische Melodie, aus: Graeters Ztschr. Idunna 1812 No. 12
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+G2 | d2d2d2_B2 | =f2f_ed2
+f2 | g2d2c2_B2 | c4d2
+=f2 | c2=f_ed2c2 | _B2A2G2
+A2 | _B2c2d2B2 | A4G2
+
+X:67
+T: Ritter und Maedchen
+N: A0070
+O: Europa, Mitteleuropa, Deutschland, Niederlande
+N: Melodie aus den Souterliedekens 1540 ad Ps.14.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: D
+z2D2D2D2 | =F4F4 | G2G2A4
+z2A2A2A2 | d3=c_B2A2 | _B4=c4
+z2c2c2c2 | AGA_B=c2A2 | G2G2=F4
+z2=c2d2d2 | =c2A2A4 | G2=F2 | E4D4
+
+X:68
+T: Der Schreiber im Garten
+N: A0071
+O: Europa, Mitteleuropa, Deutschland
+N: Jonisch, Anfang dorisch. Melodie aus dem 15. Jh., mitgeteilt in
+N: durch None im Anzeiger VI(1837) Beilage II No. 5.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+D2 | F2F2G2G2 | A2A2A2
+A2 | G2A2B2B2 | A2A2G2
+G2 | A2A2F2F2 | E2D2C4
+E2F2E2D2 | G2A2B2
+B2 | A2GFE2G2 | BAG2F2
+
+X:69
+T: Nachtfahrt
+N: A0073
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie aus Schmeltzels Quodlibet 8.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: D
+D | =FFGG | A3
+A | AAGG | =F2z
+F | =FFAA | EEG
+G | =FFEE | D3
+
+X:70
+T: Nachtfahrt
+N: A0074
+O: Europa, Mitteleuropa, Deutschland
+N:  Melodie aus Hainhofer, Lautenbuch II.Bl.7 (Mspt. von 1603. Bibl.
+N: zu Wolfenbuettel). Die Melodie ist von Boehme aus der Lautenschrift
+N: entziffert.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: D
+DE | =F3EF2 | G3=FG2 | A6- | A2z2
+A2 | G3A_B2 | A3_BG2 | =F6- | F4
+=FG | A4A2 | =c3_BA2 | G6 | E2A2
+G2 | =F3ED2 | C3DE2 | D6- | D4
+
+X:71
+T: Die plappernden Junggesellen
+N: A0075
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie in Francks Fasc. quodl. 1611 No. 4. Rhythmus von Boehme
+N: ueberarbeitet.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G4B4 | d6c2 | B4A4 | G4z2
+D2 | G4B4 | d6c2 | B4A4 | G4z2
+B2 | B2B2B2B2 | B4A2G2 | B2d2c2B2 | A4z2
+D2 | G2A2B2c2 | d3ed2c2 | B2B2A2A2 | G4z2
+
+X:72
+T: Der Rheinschiffer
+N: A0080
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie aus den Souterliedekens 1540 ad Ps. 130.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: F
+F2 | F3GA2 | B4
+A2 | F2A4 | G6 | z4
+F2 | F3GA2 | B4
+A2 | F2A4 | G6 | z2
+F2E2F2 | G4F2E2 | D4C4 | c6BA | G2
+c2B2B2 | A3GF2
+A2 | G4F4 | z4
+
+X:73
+T: Der Reuter
+N: A0081
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie aus M. Framck, Fascic. quodl. 1611 No. 2.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+d | d2d2ddd2 | e2d2c2z
+B | ddd2Bcdd | c2BAG2
+B2 | c2B2A2G2 | F4z3
+
+X:74
+T: Der Ackermann
+N: A0082A
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie bei Pet. Schoeffer II. 1537 No. 55. Von Boehme rhythmisch
+N: "wieder hergestellt".
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/8
+K: G
+G4G4G4 | d8e4 | =f4e8 | d8z4
+c4d4=f4 | d8d4 | _B4c8 | _B8z4
+B4d4=f4 | _e8d4 | c6_BAG4 | =F8z4
+d4d4d4 | d8c4 | _B8A4 | _B8z4
+B4d4=f4 | _e8c4 | d6c_BA4 | G8z4
+
+X:75
+T: Der schelmische Bauer
+N: A0082B
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 86.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: D
+D2 | D4D2 | A4A2 | =F4G2 | A4
+A2 | A4A2 | =c4A2 | =F4E2 | =F4z2 | z2
+=F2F2F2 | E2D2ED=F2 | =FED4C2 | D4z4 | z4
+D2 | A2A2A2 | =c2c2A2 | =F4E2 | =F4z2 | z2
+=F2F2F2 | E2D2ED=F2 | =FED4C2 | D4z4 | z4
+
+X:76
+T: Die Wise van Potteren
+N: A0084
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 149.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: A
+e2e2e2 | =f2e4d2e4 | d4z2
+e2e2e2 | =f2e4d2e4 | d4z2
+d2 | e2e2e2=f2 | =g2=fed4 | =c4z2
+e2 | =f2f2f2e2e2ee | d2d2d2A4
+A2 | =G4d4 | =c4=f2e2dcB2 | A6z6 | z2
+
+X:77
+T: Die niederlaendischen Grasmaedchen
+N: A0086
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II 1540 No. 11.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/8
+K: F
+f2 | f4f4e2f2 | g3fe2d4
+e2 | f4f4e2c2 | d3cA2d2c2
+A2 | F4F4c2c2 | d4e2f4
+e2 | d2c2B2A2G4 | F6z4
+
+X:78
+T: Der blaue Storch
+N: A0087
+O: Europa, Mitteleuropa, Deutschland
+N: Baseler Tenor. Hs. von 1560-70 fol. 68b.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: A
+e | e2e | e=ff | e2e | d2d
+a2=g2=fd | e2A | e2A | e2
+e | e2=f2=ge | d2dA2
+B | =c2c2BB | A2E | A2E | A2
+
+X:79
+T: Graserin und Ritter
+N: A0088
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie in Bicinia II, 83. Von Boehme rhythmisch vereinfacht.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: E
+B2 | =c2c2B2e2 | =d2d2=c4 | z2
+B2=c2=d2 | e2=d=cB2A2 | =G4z2
+G2 | =c2BA=G2c2 | =G4E2
+G2 | =c2BA=G2=F2 | E4=G2=c2 | B2A2=G3=F | E6
+
+X:80
+T: Des Markgrafen junge Braut
+N: A0089
+O: Europa, Mitteleuropa, Deutschland
+N: Forster V. No. 3.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | F2G2A2c2 | BBA2G2G2 | F4z2
+F2 | c2d2e2c2 | f4d4 | c4z4
+F4c2f2 | e3dc2d2 | c3BA4
+z2d2c3B | A2F2G2c2 | dBA2G2G2 | F6
+
+X:81
+T: Wassermanns Braut
+N: A0090
+O: Europa, Mitteleuropa, Deutschland
+N: Aus der Breslauer Gegend, bei Hoffmann, Schles. BL. No. 1.
+R: Romanze, Ballade, Lied
+M: 2/4
+L: 1/16
+K: F
+C2 | F2E2F2G2 | A3GF4
+A2G2A2B2 | c3BA2F2 | f4d2f2 | c4z2
+c2 | d2B2G2B2 | c2A2F2
+G2 | A2c2B2G2 | F4z2
+
+X:82
+T: Die verkaufte Muellerin
+N: A0093
+O: Europa, Mitteleuropa, Deutschland
+N: Aus Reichardts Musikal. Kunstmagazin I. Bd. Berlin 1782 S. 100.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2_B2AAd2 | c2_B2A2
+D2 | G2_B2AAd2 | c2_B2A3
+d | d2c2d2_BA | _B2G2z2
+
+X:83
+T: Die Kindsmoerderin
+N: A0094
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+N: Aus Schwaben. Aufgezeichnet vom Consistorialrath Horstig und zuerst
+N: mit Melodie mitgetheilt in Friedr. Reichardt, Berliner musikal.
+N: Zeitung II. Jahrg. Berlin 1806 S. 40 und Beilage 10.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: F
+F | _AFcc | c2_AA | G2GF | G2z
+G | G_ABc | _d2cB | _A2GG | F2z
+
+X:84
+T: Fuenf Soehne
+N: A0095
+O: Europa, Mitteleuropa, Deutschland
+N: Mitgetheilt aus Westfalen durch Freih. W. v. Haxthausen in None's
+N: Anz. 1838 Sp.34, aus einer Hs. des 16. Jahrh.
+R: Romanze, Ballade, Lied
+M: 3/4
+L: 1/8
+K: D
+A,2 | D2D2D2 | D2E2=F2 | G2E2E2 | E4
+A,2 | D4D2 | =F2E2DD | A4A2 | A4
+A2 | G2G2G2 | =F2F2ED | A6 | A,4
+A2 | A2G2A2 | A2G2A2 | =c2_B2A2 | G2A2G2 | =F4
+FF | =F2F2F2 | =F2E2D2 | A6 | D4
+
+X:85
+T: Die Stiefmutter
+N: A0096
+O: Europa, Mitteleuropa, Deutschland
+N: Aus Erk, Liederhalle, No. 2.
+R: Romanze, Ballade, Lied
+M: 3/4
+L: 1/8
+K: F
+C2 | F2F2GB | A2F2
+A2 | G3FEG | F2z2
+C2 | F2F2GB | A2F2
+A2 | G3FE2 | F4
+
+X:86
+T: Waechterlied
+N: A0101A
+O: Europa, Mitteleuropa, Deutschland
+N: Reutterliedlein 1535 No. 13.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+c2 | A4c2F4C2 | F2G2A4
+z2G2A2B2 | c4B2A2 | G4F4z2
+c2 | A4c2F4C2 | F2G2A4
+z2G2A2B2 | c4B2A2 | G4F4
+z2D2E2F2 | G4z2E2F2G2 | A4z4
+F4 | c4B2A4F2 | c4B2A4GF
+G3ABGc4BA | G4F8
+
+X:87
+T: Waechterlied
+N: A0101B
+O: Europa, Mitteleuropa, Deutschland
+N: J Walthers Wittenberger Gesangbuch 1551 No. 74
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+c2 | A2c2F2C2 | F2G2A4
+z2G2A2B2 | c4B2A2 | G2F4
+c2 | A2c2F2C2 | F2G2A4
+z2G2A2B2 | c4B2A2 | G4F4
+z2D2E2F2 | G4z2E2F2G2 | A4
+F4 | c4B2A4F2 | c4B2A4G
+F | G3ABGc4BA | G4F8
+
+X:88
+T: Der Waechter
+N: A0102
+O: Europa, Mitteleuropa, Deutschland
+N: Aus: 68 Lieder. Nuernberg J. Berg und Newber (1542) No. 55.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2A2_B2G2 | d2c_BA2A2 | G4z2
+G2 | d2e2=f2d2 | g2e2d4 | z4
+g4 | a2g2=f2d2 | =f2d2_B4
+z2f2f2d2 | g4d2d2 | c2_B2c2
+c2 | d4_B2G2 | =F4z4
+f4f2d2 | g4d2d2- | d2c_BA2A2 | G6
+
+X:89
+T: Haett ich den Schluessel zum Tage
+N: A0103
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens ad Ps. 47.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+C2 | C2C2B,2A,4G,2 | C4D2E3DEC | D4
+A4 | G4E2C4B,2 | A,2D4C4B,A, | G,4z2
+G,2C2D2 | E2E2D2E2 | A4G4 | F2E2D2
+C2 | B,2E4D4CB, | A,4G,4G4 | EFGFE2DC | D4C6
+
+X:90
+T: Tagelied
+N: A0105
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III 1549 No. 6.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+C4A,2B,2 | C4z2C2 | D2D2C4 | z2
+C2E2D2 | G4F2E2- | E2DCD4 | C8
+C4A,2B,2 | C4z2C2 | D2D2C4 | z2
+C2E2D2 | G4F2E2- | E2DCD4 | C8
+z4E4 | D2D2C4 | B,2C2A,4 | G,4z2G,2 | A,2B,2C4
+z2C2E2D2 | G4F2E2- | E2DCD4 | C8
+
+X:91
+T: Melodie eines Waechterliedes
+N: A0106
+O: Europa, Mitteleuropa, Deutschland
+N: Strassb. Hs. No. 121 Bl 45b (14. Jh.)
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: D
+D | G2A | B2B | d2
+=c | B2A | B2A | G2
+G | A2B | B2A | G2
+=F | E2E | G2E | D2
+E | =C2D | E2E | =F2E | D2
+D | G2=c | B2G | G2B | B2A | G2
+D | G2=c | B2G | G2B | B2A | G2
+=F | E2D2 | A2G=F | E2A2 | E3
+
+X:92
+T: Waechterlied
+N: A0107
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens ad Ps. 90.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: D
+D2 | =F2F2G2A2 | _B2A2=F2F2 | G4A4
+z2A2A2A2 | A4G2=F2E4 | D4z2
+A2 | A2A2G2=F2 | D4=C4
+z2C2D2E2 | =F2G4F2E4 | D6 | z4
+D2 | =F4G2 | A4A2 | _B4A2 | G3A_BA | G3=FED | =C4z2 | z4
+G2 | A2G2=F2 | D2E4 | =F3EDC | D4
+
+X:93
+T: Der Morgenstern ist aufgegangen
+N: A0108
+O: Europa, Mitteleuropa, Deutschland
+N: M. Praetorius, Mus. Sion. VI. 1609 No. 194.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: F
+c2 | c2A2F2G2 | ABc4A2 | B4A4
+z2c2c4 | A2G4F2 | B2G2c4 | A4z2
+A2 | AAABc2c2 | c2BAG4 | F2EDC4
+z2C2F2F2 | G2G2ABc2 | A2A2G2F2 | A4G4 | F8
+
+X:94
+T: Der Morgenstern
+N: A0109
+O: Europa, Mitteleuropa, Deutschland
+N: Frankf. Gsgb. von Gesius "O Christe Morgensterne" und bei M.
+N: Praetorius, Mus. Sion. VII. 1609 No. 69.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: F
+F | F2FF2D | C2GG2
+G | A2B2GG | F2
+A | B2BB2A | G3G2
+G | A2ccBA | G2
+G | A2B2GG | F2
+
+X:95
+T: Waechterlied
+N: A0111
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III. 1549 No. 13.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+C4A,2B,2 | C4z2C2 | D2D2C4 | z2
+C2E2F2 | G6F2 | E2G4FE | F2E2D4 | C8
+C4A,2B,2 | C4z2C2 | D2D2C4 | z2
+C2E2F2 | G6F2 | E2G4FE | F2E2D4 | C6
+G2 | E2D2C4 | z2C2D2D2 | A,4z2
+A,2 | G,2G,2D4 | C2C4B,A, | _B,A,G,F,G,4 | F,4z2
+C2 | A,2A,2D4 | C2C4B,A, | B,2B,2A,4 | z2
+G,2A,2B,2 | C4B,2A,2- | A,2G,F,G,2G,2 | F,4z2
+F2D2D2 | G4F2E2 | FFG3FE2- | E2EDCDC6
+
+X:96
+T: Tagelied
+N: A0112
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott 1534 No. 92.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: G
+G2 | _B4B4c4c4 | d8d4z2
+d2 | g4g4=f4d4 | =f3_ed2c2_B4z2
+B2 | =f6e2d4c4 | _B2A2G4=F4z2
+_e2 | d6c2_B4A4 | G4c4_B3AG2F2 | G4A4G6
+
+X:97
+T: Der Maibaum
+N: A0113
+O: Europa, Mitteleuropa, Deutschland
+N: "Herzlich thut mich erfreuen" Rhaw, Bicinia 1545 I, 91.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: F
+F2 | F2F2A2F2 | c4c2
+f2 | e2c2d2c2 | A4z2
+F2 | c2c2d2e2 | f4e2
+d2 | c3BA2G2 | F4z2
+A2 | c2d2c2A2 | B4A2
+G2 | A2B2c2A2 | G4z2
+d2 | c2B2A2G2 | F4G2
+d2 | c2A2B2G2 | F4z2
+
+X:98
+T: Maibaum und Abschied
+N: A0114
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 54.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: A
+A2 | A2A2A2B2 | =c3BA2=GF | =G4E4z2
+G2 | A2B4A4G2 | A4z2
+A2 | A2A2A2B2 | =c3BA2=GF | =G4E4z2
+G2 | A2B4A4G2 | A4z2
+B2 | B2B2B2A2 | d3=cB2A=G | A4=G4z2
+G2 | B4=G2d4=c2 | d3=cB2A=G | A4z2
+d2 | A2A2A2B2 | =c3BA2=GF | =G4E4z2
+G2 | A2B4A4G2 | A6
+
+X:99
+T: Waldvoegeleins Bitte
+N: A0115
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie aus Gerle, Tabulatur 1546.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | F2G2A2B2 | c3cc2
+c2 | d2c2c2B2 | c4z2
+c2 | c2c2d2B2 | c4B2
+A2 | G2A2c2c2- | c2BAG4 | F4z2
+c2 | c4B2 | A4G2 | F4F2 | G4z2
+F2 | F2G2A2B2 | c3dc2
+c2 | A3Bcdc2- | c2BAG4 | F6
+
+X:100
+T: Die Sonne ist verblichen
+N: A0116A
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III 1549 No. 42.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2d2=f2e2 | d4A2
+A2 | G4A2d2 | dc_BAB2B2 | G6
+G2 | G2d2=f2e2 | d4A2
+A2 | G4A2d2 | dc_BAB2B2 | G6
+c2 | c2c2c2_B2 | A4G4
+_B4 | A4=F2G2 | G=FEDE2E2 | D8
+z2G2G2A2 | _B2c2A4 | G4
+d4 | =f4e2d4c2
+d3c_BAB2- | B2AG=F2
+F2 | G2_B2A2c2 | d_BAGA2A2 | G6
+
+X:101
+T: Die Sonne ist verblichen
+N: A0116B
+O: Europa, Mitteleuropa, Deutschland
+N: M. Praetorius Mus. Sion. VIII. No. 229. "Wacht auf ihr Christen alle"
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+G2 | G4d2=f4e2d4 | A8
+G4A4 | _B6c2 | A4z2
+G2 | G4d2=f4e2d4 | A8
+_B2G4A2 | _B6c2 | A4z2
+c2 | c2c2c2_B2 | A4G4- | G4A2_B2- | B2G2=F2G2 | A4z2
+A2 | =F4F2G2- | G2A2_B4 | G8
+d4=f4 | e2d4c2 | _B6AG | F4
+G4 | _B3BB2c2 | A4G2
+
+X:102
+T: Die Sonne ist verblichen
+N: A0116C
+O: Europa, Mitteleuropa, Deutschland
+N: Praetorius Mus. Sion. VI. No. 195 "Fuer frewden wil ich singen"
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+ |  |  | z2G2G2G2 | d2=f4e2 | d2A4
+G2 | d4c2c2d2_B2 | A8
+z2G2G2G2 | d2=f4e2 | d2A4
+G2 | d4c2c2d2_B2 | A6
+_B2 | c2=f2f2d2 | c2_B4
+_e2 | d2c2_B2A2 | G4z2
+G2 | c2c2c2d2 | _e4c4
+z2d2d2d2 | d2c2_B2AG | F4G3A | _B2d4d2A4 | G8
+
+X:103
+T: Harter Entschluss
+N: A0117
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III. 1549 No. 61.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | F2A2G2F2 | E4F2
+G2 | A4A2B2G4 | F6
+F2 | F2A2G2F2 | E4F2
+G2 | A4A2B2G4 | F6
+F2 | A2G2A2B2 | c4F2
+B2 | A2A2A2GF | E4F2
+G2 | A2B2c2A2G4 | F6
+
+X:104
+T: Meins Herzens Schoene
+N: A0118
+O: Europa, Mitteleuropa, Deutschland
+N: Triller 1555 "Ein Gesang von Christo und seiner heiligen Gemeinde
+N: auf eine alte Tageweise"
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+ |  |  |  | z2F2F2F2 | A3GF2F2 | G4A4
+A4 | c4c2A4B2 | G4F4
+z2F2F2F2 | A3GF2F2 | G4A4
+A4 | c4c2A4B2 | G4F4
+A4 | A4A2G4G2 | F2EDG4 | G4z2
+C2 | F4F2F4F2 | G2G2F4z2
+F2 | G4G2G4G2 | A3Bcdc4BA | G2F2G4 | F8
+
+X:105
+T: Um Frauen willen
+N: A0121
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 36.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2G2A2B2 | c4c4z2
+d2 | e4e2d4d2 | c3decd4
+G2 | A2d2d2c4d2 | B3AG4z2
+d2 | c2A2B2c4_B2 | _B2AGA4z2
+G2 | A2d2d2c2c2d2 | c3BA4z2
+c2 | A2A2G2=F4G2 | A4z2
+G2 | G4B2c2A2A2 | GFGAB2A4
+B2 | c2d2e2d4
+d2 | d2B2c2d4c2 | c2BAG6
+
+X:106
+T: Parodie einer unbekannten Tageweise
+N: A0123
+O: Europa, Mitteleuropa, Deutschland
+N: Haym v. Themar. Augsburg 1590 No. 8. Mixol. mit dor. Schluss.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: D
+G2B2A2 | d2=cB^c2d2 | d2B2G4 | z2
+G2A2B2 | =c2A2d2d2 | =c2B2A2G3AG2 | D4z2
+B2 | A2B=cd2c2 | d2B2G4 | z2
+G2G2B2 | B2A2G2D2 | z2E2=F2G2 | _B2G2=F2z2
+E3DEFG2z2B2 | A4=F2G2 | A4=F3E | D8 | z2
+
+X:107
+T: Minnelied
+N: A0127
+O: Europa, Mitteleuropa, Deutschland
+N: Locheimer Liederbuch (Arnolds Ausgabe, Leipzig 1867 No. 39.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | F2F2A2A2 | d2d2c2
+c2 | A2G2F2
+F2 | F2F2A2A2 | d2d2c2
+c2 | A2G2F4
+E4F3F | A2A2G2
+G2 | D4C4
+A2G2A2B2 | c2d2c2
+B2 | A2F2E2F2 | A4G4 | F6
+
+X:108
+T: Liebeshoffnung
+N: A0128A
+O: Europa, Mitteleuropa, Deutschland
+N: Locheimer Liederbuch (Hs. c. 1450) No. 7.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+F | FAGF | E2D2
+C2 | FF2AG2 | F2z
+F | FAGF | E2D2
+C2 | FF2AG2 | F2z
+F | AABB | c2c2
+B2 | cF2A2G | F2z
+F | AABB | c2F2z
+G | AAGF | E2D2
+C2 | FF2AG2 | F3
+
+X:109
+T: Liebeshoffnung
+N: A0128B
+O: Europa, Mitteleuropa, Deutschland
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+F | FAGF | E2D2
+A2 | BG2AG2 | F3
+F | FAGF | E2D2
+A2 | BG2AG2 | F3
+F | AABB | c2G2
+c2 | A2AG2F | E2D2A2 | BG2AG2 | F3
+
+X:110
+T: Liebeshoffnung
+N: A0128C
+O: Europa, Mitteleuropa, Deutschland
+N: Boehm. Bruedergsgb. 1531 Bl. 9 "Gott sah zu seiner Zeit"
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+F2A2GF | E2D2
+C2 | FF2AG2 | F4
+F2A2GF | E2D2
+C2 | FF2AG2 | F3
+F | AABB | c2c2
+d2 | cB2AG2 | F2z
+F | AABB | c2F2
+AAGF | E2D2
+C2 | FF2AG2 | F4
+
+X:111
+T: Minnelied
+N: A0130
+O: Europa, Mitteleuropa, Deutschland
+N: Pet. Schoeffer 1513 No. 7.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: F
+f8e4d4 | c12B4 | A6G2F2G2E4 | D8z4
+d4 | c4d4e8 | z4e4f4d4 | c8z4
+c4 | d4e4A4A4 | c6B2A2B2G4 | F8z4
+F4 | G4A4D8 | z4A4B4c4 | A8z4
+A4 | d4d4c4f4 | e4d4A4A4 | c4c4d4
+f4 | e3dc2B2A2GFG4 | F8z8
+
+X:112
+T: Lieblich gesellet
+N: A0131
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder. Nuernberg gedr. von Berg und Newber (c. 1542) No. 29.
+N: Und Forster II. 1540 No. 14.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: F
+F | A2A | A2F | c2d | cd2 | c3- | c2
+d | c2B | AG2 | F2
+F | A2A | A2F | c2d | cd2 | c3- | c2
+d | c2B | AG2 | F2
+f | ffe | efd | c2f | egf | ed2 | c3- | c2
+d | c2B | AG2 | F2
+
+X:113
+T: Ach, herzigs Herz!
+N: A0132
+O: Europa, Mitteleuropa, Deutschland
+N: H. Finck 1536 No. 8 und Forster II. 1540 No. 7. Jon., Anfang aeol.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+A4 | c6d2 | e4e4 | A4z2
+f2 | e4d4 | c4A2c2 | dBA2G4 | F4z2
+c2 | d4c2f2- | f2e2d4 | c4z2
+f2 | f4f4 | e4z2d2 | c3AB4 | A4z2
+f2 | e2d2c2B2 | A4G4 | F8
+
+X:114
+T: Jungbrunnen
+N: A0133A
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott 1534 No. 44
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/2
+K: D
+=C2 | D2E2=F2D2 | =C4D3
+E | =F2G2E4 | D4z2
+=C2 | D2E2=F2D2 | =C4D3
+E | =F2G2E4 | D4z2
+D2 | A2A2A2G2 | G4A2
+G2 | =F2E2D2D2 | A,4z2
+A,2 | D2=C2D2E2 | =F4E2
+D2 | =F3ED2A2 | G4E4 | D6
+
+X:115
+T: Jungbrunnen
+N: A0133B
+O: Europa, Mitteleuropa, Deutschland
+N: Praetorius Mus. Sion. VII No. 74 (1609)
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+G | GA_BG | =F2G
+A | _BcA2 | G2z
+G | GA_BG | =F2G
+A | _BcA2 | G2z
+A | =FFGA | _B2c
+B | AG=FG | A2z
+A | GGAG | =F2G
+A | _BcBA | GFG
+
+X:116
+T: Es flog ein kleins Waldvoegelein
+N: A0134
+O: Europa, Mitteleuropa, Deutschland
+N: Memminger Tabulaturbuch (Hs. Anfang des 17. Jh.)
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: F
+F2 | F2c2A2F2 | E3FG2
+C2 | D2F2F2E2 | F4z2
+F2 | F2c2A2F2 | E3FG2
+C2 | D2F2F2E2 | F4z2
+A2 | F2c2cBA2 | G4G2
+B2 | A2G2A2F2 | G4z2
+c2 | B2A2G2F2 | E3FG2
+C2 | D2F2F2E2 | F4z2
+
+X:117
+T: Herzens Schluessel
+N: A0135A
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder. Nuernberg c. 1542 No. 21.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+F2FF | AAcc | A
+ccc | BAG2 | F4
+F2FF | AAcc | A
+ccc | BAG2 | F3
+c | cccB | A2G2 | z2
+A2 | B2Bc2A | G4 | z2
+c2 | dccA | F2cA2
+c | ccBAG2 | F4
+
+X:118
+T: Herzens Schluessel
+N: A0135B
+O: Europa, Mitteleuropa, Deutschland
+N: Forster IV. 1556 No. 15.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+F | FFAF | c2c2 | A2z
+c | c2cB- | BAG2 | F2
+F2 | FFAF | c2c2 | A2z
+c | c2cB- | BAG2 | F2z
+c | cccB | A2G
+G | A2BcAB | G2z
+c | cccA | F2cA2
+c | c2c2 | ABG2 | F3
+
+X:119
+T: Rosengarten
+N: A0136
+O: Europa, Mitteleuropa, Deutschland
+N: A0135B von Boehme in modernen Noten notiert.
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/4
+K: F
+C | F2FA2A | c2cA2
+c | c2cB2A | G3F2
+C | F2FA2A | c2cA2
+c | c2cB2A | G3F2
+c | d2cc2B | A3G2
+A | B2BcAB | G3-Gz
+c | d2cc2A | F2cA2
+c | c2cABG | F3-Fz
+
+X:120
+T: Wurzgaertelein
+N: A0141
+O: Europa, Mitteleuropa, Deutschland
+N: Forster V. 1556 No. 17.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F4 | F4F4 | G4G4 | A4A4 | A8 | z4
+A4 | c4c4 | A4G4 | A6GF | E8
+z2F2A2B2 | c4A4 | c3BA2G2 | A2GF | E4
+A4 | G4F4 | E4C4 | F3GA2GF | G6B2 | A3GF2E2 | F8
+
+X:121
+T: Sommerlied
+N: A0142
+O: Europa, Mitteleuropa, Deutschland
+N: G Rhaw, Bicinia. Viteb. 1545. Tom. I. No. 91. Von Boehme
+N: "rhythmisch gegliedert".
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: C
+C | CCEC | G2G2
+c2 | B2GA2G | E2z
+C | GABG | c2B2
+A2 | G2EF2D | C2z
+C | GGFE | F2E2
+C2 | E2AG2F | D2
+A2 | GGFE | C2D2
+A2 | G2EF2D | C3
+
+X:122
+T: Weltliches Mailied
+N: A0143
+O: Europa, Mitteleuropa, Deutschland
+N: Original unter "Wer sich des Maiens woelle"
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: Bb
+B2 | B2B2B2G2 | F4c3
+d | c3BA2G2 | F3GF2
+B2 | B2B2A2F2 | B4c2
+c2 | c2c2d2d2 | c3Bc2
+c2 | f2e2d2c2 | B4e2
+c2 | d2c2B2A2 | B4z2
+
+X:123
+T: Bunte Blumen
+N: A0144
+O: Europa, Mitteleuropa, Deutschland
+N: "Nicht unpassend waere die Weise vom "alten Mai"(s. geistl. Lieder)
+N: zu diesem Blumen und Mailust-Liede. Ich habe sie deshalb in modernen
+N: Noten und im Tanzrhythmus oben beigesetzt."
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/4
+K: A
+A | A2AA2G | E3B2
+c | B2AG2F | E3-E2
+A | A2AA2G | E3B2
+c | B2AG2F | E3-E2
+E | A2AG2E | A3B2
+B | B2Bc2c | B2AB2
+B | e2dc2B | A3d2
+B | c2BA2G | A3-A2
+
+X:124
+T: Roth Roeslein
+N: A0146
+O: Europa, Mitteleuropa, Deutschland
+N: Rhaw, Bicinia. 1545 Tom. I. No. 92.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+g | ggee | c2c2 | z2
+g | g2g | g2g | d3 | z2
+d | d2d | c2c | dc2 | B3
+c2dc- | cBA2 | G3
+
+X:125
+T: Jahreszeiten und Liebe
+N: A0151A
+O: Europa, Mitteleuropa, Deutschland
+N: Praetorius, Mus. Sion. VII. 1609 No. 239
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: G
+G2 | G4G2 | d4d2 | d3c_B2 | A4
+G2 | c4c2 | d4c2 | _B2A4 | G4
+G2 | A4A2 | A4c2 | _B4A2 | G4
+_B2 | A4G2 | F4G2 | A4A2 | d4c2 | _B2A4 | G4
+
+X:126
+T: Jahreszeiten und Liebe
+N: A0151B
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 110
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: A
+ |  |  | z2A2A2A2 | =c2c2B2B2 | A4z2
+A2 | d3=cB2c2- | c2B4A2 | B4z2
+B2 | B2B2d2d2 | d2=c4B2 | A=GAB=c2B2 | A2A2=G4
+z2G2A4 | B2=c3de2 | d3=cB2A2 | G4A4
+
+X:127
+T: Winterleid oder Mass in allen Dingen
+N: A0152
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 25.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+zGGG | _B2A2 | GFG2z
+c | _BAGG | A2_B2
+zAG=F | E2A2 | _Bcd2z
+d | ddc_B | A2G2
+
+X:128
+T: Winter
+N: A0154
+O: Europa, Mitteleuropa, Deutschland
+N: Aus Pater Werlins Liederhandschrift c. 1640 S. 1326.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: A
+A2A2A2 | =c3de2 | A2=c2d2 | e6
+A2A2A2 | =c3de2 | A2=c2d2 | e6
+=c2c2c2 | =c4e2 | =f4e2 | d4=c2 | B6 | A6
+
+X:129
+T: Reif und Schnee
+N: A0155
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie aus 4 Stellen zusammengesetzt, die 1611 in Melch. Francks
+N: Fasc. quodlib. No. 7 vorkommen.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: F
+F2 | A2A2B2B2 | c2c2F2F2 | c3cc2c2 | G4z2
+G2 | A2B2c2B2 | A2GFE2E2 | D2C2D2E2 | F6
+
+X:130
+T: Nachtigall
+N: A0157
+O: Europa, Mitteleuropa, Deutschland
+N: Forster I. 1539 No. 47.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | F2G2A2B2 | c4A2
+A2 | d4c2B2 | c4A2
+A2 | d2d2c2A2 | cBAGF2z2 | z2
+F2F2A2 | G2F2E2E2 | D4z2
+E2 | F3FF2E2 | D4C4 | z2
+F2F2F2 | F2E2F3E | D2
+C2F2A2 | G4z2
+F2 | F3ED2C2 | G2G2G2G2 | F6
+
+X:131
+T: Frau Nachtigall
+N: A0158A
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 6.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: D
+ |  |  | D2D2D2 | A4A2 | =c4c2 | =F4
+G2 | A2_B4 | A4G2 | A6 | A4z2
+A2=c2B2 | A2G2_B2 | A4A2 | D4
+A2 | =c4_BA | _B4A2 | G2E2=F2 | G2E4 | D6
+
+X:132
+T: Frau Nachtigall
+N: A0158B
+O: Europa, Mitteleuropa, Deutschland
+N: Werlin 1646 S. 1473.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: D
+D2D2D2 | A2A2=c3A | =F4z2
+F2 | A2_B2=c2d2 | _B4A4 | z2
+D2D2E2 | =F2G2A3A | D4z2
+A2 | =c2A2G3=F | E4D4 | z2
+
+X:133
+T: Guter Rath fuer Liebesleute
+N: A0163
+O: Europa, Mitteleuropa, Deutschland
+N: Oeglin 1512 No. 3.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: G
+G4G4G4 | d8g8 | =f4e4c8 | z4
+c4=f4d4 | e8d8 | g6=f2e4d4 | e8d8 | z4
+g4=f4e4 | =f8d4d4 | c4_B4A8 | z4
+G4_B4A4 | _B4=f4d6cB | c6_B2A4G4 | A8G8 | z4
+
+X:134
+T: Verschneiter Weg
+N: A0164
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder. Nuernberg bei Berg und Newber (c. 1542) No. 48.
+N: Grassliedlein 1535 No. 6.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: F
+F4 | F4G4A4B4 | c8c4
+c4 | G4A4B4c4 | A6G2F4
+G4 | G6G2G4A4 | B6B2B4
+A4 | G4F4F4E4 | F6EDC4
+G4 | G6G2G4A4 | B6B2B4
+A4 | G4F4F4E4 | F8z4
+
+X:135
+T: Kuckuk
+N: A0167
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II 1540 No. 29.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: F
+F4 | G4F4E4F4 | G8A8 | F8z4
+F4 | A4A4B4B4 | c8c8 | G6ABc4
+c4 | B4A4G4F4 | G8E8 | F6G2A4
+c4 | B4A4G4F4 | G8E8 | F8z4
+
+X:136
+T: Kuckuks Fall
+N: A0168
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott III 1544 No. 30
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: G
+G | G2G | G2A | _B2B | _B2
+B | _B2B | dc2 | _B3 | _B2
+B | _B2B | _B2B | A2G | =F2
+G | A2_B | c2_B | GA2 | G2
+
+X:137
+T: Alte Kuckukslieder (Kuckuks Ausflug)
+N: A0170A
+O: Europa, Mitteleuropa, Deutschland
+N: Aus Fragmenten in Schmeltzels neuntem Quodlibet (1544) von mir
+N: zusammengefuegt. Anders und ohne alle musikalische Ruecksicht
+N: von Uhland No. 14 zusammengesetzt.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+F | FccA | c2c
+B | AGAB | G2F
+F | AGAB | c2G
+G | AGAB | c2GA | F3
+
+X:138
+T: Alte Kuckukslieder (Kuckuks Verachtung)
+N: A0170B
+O: Europa, Mitteleuropa, Deutschland
+N: Aus Fragmenten in Schmeltzels neuntem Quodlibet (1544) von mir
+N: zusammengefuegt. Anders und ohne alle musikalische Ruecksicht
+N: von Uhland No. 14 zusammengesetzt.
+R: Romanze, Ballade, Lied
+M: 3/4
+L: 1/8
+K: F
+F2 | A4G2 | A4B2 | c4
+c2 | c3BA2 | B2A2G2 | F4
+A2 | B4B2 | A4F2 | G4G2 | F2F2
+F2 | B4B2 | A4F2 | G4G2 | F2F2
+
+X:139
+T: Alte Kuckukslieder (Kuckuks Noth)
+N: A0170C
+O: Europa, Mitteleuropa, Deutschland
+N: Aus Fragmenten in Schmeltzels neuntem Quodlibet (1544) von mir
+N: zusammengefuegt. Anders und ohne alle musikalische Ruecksicht
+N: von Uhland No. 14 zusammengesetzt.
+R: Romanze, Ballade, Lied
+M: 3/4
+L: 1/4
+K: F
+F | GGG | D2F | ED2 | C2z
+C | FCFG | A2GG | AAGG | A2G
+G | F2A2 | cAcA | cAcA | B2G2 | F3
+
+X:140
+T: Kaeuzlein
+N: A0172
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III 1549 No. 4
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | F2F2A2A2 | F4G2A4
+B2 | c4B2A2- | A2GFG2G2 | F4z2
+F2 | F4A2G4F2 | C3DE2F4
+F2 | A2c2B2AG | F2A2G2G2 | F6
+
+X:141
+T: Kaeuzlein
+N: A0173
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III 1549 No. 64.
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/8
+K: G
+G2 | G4G2B4B2 | G4A2B4
+c2 | d4c2B4A2 | G6-G4
+G2 | G4G2B4B2 | G4A2B4
+c2 | d4c2B4A2 | G6-G4
+G2 | G4B2A4A2 | D3EF2G4
+G2 | B2d2c2B4A2 | G6-G4
+
+X:142
+T: Lindenlaub
+N: A0174
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II 1540 No. 76.
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/2
+K: F
+F | F2FF2G | A3c3
+F2FF2E | D3C2
+c | c3A2A | c2cB2A | G3A2
+A | F2FB2B | GABc2
+c | c2BAG2 | F3-F2
+
+X:143
+T: Nun laube, Lindlein, laube
+N: A0175
+O: Europa, Mitteleuropa, Deutschland
+N: In Trillers Singbuch 1555 zu einem geistlichen Text.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+c2GA | cBA2 | G2z
+d | edcB | A2G2
+zA_BA | G_BG2 | =F2z
+A | cAGA | G4
+
+X:144
+T: Die Linde im Thal
+N: A0176
+O: Europa, Mitteleuropa, Deutschland
+N: Forster V 1556 No. 18.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+z2F2F2A2 | G2F2E2E2 | D4z2
+A2 | B2G4F4ED | E2F2D4 | C8
+c4c2c2 | c2A2F2A2 | G4F2ED | E2
+C2D2E2 | F2A2G2G2 | F8
+
+X:145
+T: Die Linde im Thal
+N: A0177
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder. Nuernberg bei Berg und Newber No. 25.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+G,2C2C2 | C2D2B,2A,2 | G,4z2
+C2 | B,2G,2A,2A,2 | G,4z2
+G,2 | C2C2G3F | E4D4 | CDEDC2B,A, | B,8 | z2
+G,2A,2B,2 | C3DE2D2 | C8 | z2
+
+X:146
+T: Espen - Zweiglein
+N: A0178A
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III 1549 No. 27
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: G
+z4G4G4G4 | c4A4B4c4 | d8z4
+G4c4d4 | e4d2c2B4c4 | d8c4
+c4 | B4c4d4e4 | e4d4c6BA | G8c8
+A6B2c4d4- | d4c4B4B4 | A4G4A8 | G8z8
+
+X:147
+T: Espen - Zweiglein
+N: A0178B
+O: Europa, Mitteleuropa, Deutschland
+N: Werlin Hs. 1646 S. 1446.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: F
+F2F2F2 | B2F2G2A2 | B4z2
+B2 | A2B2c2d2 | c4B4 | z2
+B2A2B2 | c2d2c2BA | G2G2F4 | z2
+c2B2A2 | G2F2G4 | F8 | z2
+
+X:148
+T:  Lass rauschen!
+N: A0179
+O: Europa, Mitteleuropa, Deutschland
+N: Schmeltzels Quodlibet 1544 No. 15.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: G
+G4 | G8d8 | e8d8 | c12c2B2 | A8z4
+A4 | c8c8 | c8B8 | A6B2c6Bc | d8z4
+d4 | G8A4A4 | B8c4c4 | A6G2F6E2 | D8z4
+D4 | A6B2c6Bc | d8z4
+e4 | d4d4B8 | c8A8 | G8z4
+G4 | G8d8 | =f8e8 | d8c4B4 | A8
+A4 | c4c4d4 | c8B8 | A4B4c4B2c2 | d4z4
+d4 | G8A8 | B8c8 | A12G4 | =F4E4D4
+D4 | A4B4c4B2c2 | d8e8 | d8c4B4 | c8A8 | B8
+e8 | d8c4B4 | c8A8 | G8z4
+
+X:149
+T: Sichelein - Rauschen
+N: A0180A
+O: Europa, Mitteleuropa, Deutschland
+N: Forster V 1556 No. 35.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G4 | G2B2A2G2 | d4d4z2
+G2 | d2d2c2B2AGd2 | A8 | z4
+d4 | c2B2A2G2 | c2BAd2
+B2A2B2 | G3AB2c2A4 | G4
+
+X:150
+T: Sichelein - Rauschen
+N: A0180B
+O: Europa, Mitteleuropa, Deutschland
+N: Werlin Hs. 1646 S. 1564.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: G
+G | G_BAG | d2d
+G | ddc_B | A2z
+d | c_BAG | d2_B
+G | A_BcA | G2z
+
+X:151
+T: Drei Fraeulein
+N: A0184
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott 1534 No. 41. Forster V 1556 No. 45.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2G2G2G2 | A4A4
+d4d2A2 | d2c4_B2 | A8 | z6
+d2 | d2d2d2d2 | c2A4
+_B2 | G4A2c2 | d_BAGA4 | G8
+d4=f2d2 | d_Bc2A4 | G6
+
+X:152
+T: Uebersetzung
+N: A0185
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie ist die von A0184
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+G2 | G2G2G2G2 | A4A2
+d2 | d2A2dc_B2 | A4z2
+d2 | d2d2d2d2 | c4A2
+_B2 | G2A2c_BAG | A4G2
+d2 | =f2d_Bc2A2 | G4z2
+
+X:153
+T: Uitwykelingslied (Uebersiedlungslied)
+N: A0186
+O: Europa, Mitteleuropa, Deutschland
+N: Willems Oude vlaemsche liederen (1848) No. 19.
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/8
+K: G
+D2 | G2F2G2d2c2d2 | _B4A2G4
+G2 | A2G2A2d2c2d2 | A6z4
+A2 | _B2A2G2G2A2B2 | c6d4
+c2 | _B2A2G2FED2d2 | _B2c2B2A2G2F2 | G6z4
+
+X:154
+T: Der Ritt durch den Wald
+N: A0189
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder (c. 1542) No. 18.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G4 | _B2B2c2c2 | d4G4
+d4 | c3de2=f4e2 | =f3ed2c_B | c8 | z4
+=f4 | =f2d2f2g2 | =f2e2d4
+f4 | _e2d2d2_B2 | c6
+d2 | d3c_B2AG | A8 | z4
+A4 | A2A2d2c2 | _B2AGA2A2 | _B4z2
+=f2 | =f2d2_e2g2 | =f2e2d4
+f4_e2d2 | d2_B2
+c4 | d6c_B | _B2AGA4 | G4
+
+X:155
+T: Lockung
+N: A0190
+O: Europa, Mitteleuropa, Deutschland
+N: Nach Forster II 1540 No. 73, dort rhythmisch entstellt, mit
+N: zweimaligem Taktwechsel. Alles deutet auf durchgaengigen Tripeltakt,
+N: den ich durch geringfuegige Aenderungen hergestellt habe.
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: F
+F2 | F4F2A4B2 | c4A2F4
+f2 | f4f2e4c2 | d6c4
+F2 | c4f2e2c2d2 | c4c2A4
+d2 | c3BA2G2F2E2 | D6C4
+C2 | F3GABc4BA | G6F4
+
+X:156
+T: Gerstebinden
+N: A0192
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott 1534 No. 34. Tons. von L. Senfl.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2G2G2G2 | A2A2A4
+e4=f3e | d4c4 | d8 | z2
+d2e4 | e2e4e2 | =f4e4
+d4c4 | A4B2c2 | d4z4
+d2d2c2B2 | G4z2G2 | A3Bc2d2- | d2e2d2c2- | c2B2A4 | G6
+
+X:157
+T: Goldringlein
+N: A0195
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott III 1544 No. 4 und Forster V. 1556 No. 6 und 9.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: F
+F2 | A4B2 | c4f2 | c2A2B2 | c6 | z4
+c2 | f4e2 | d2c2g2 | f2ecd2 | c4z2 | z4
+c2 | f4c2 | c2A2c2 | B2AFG2 | F6 | z4
+A2 | c4F2 | G2F2c2 | B2AFG2 | F4
+
+X:158
+T: Brauns Maegdelein
+N: A0196
+O: Europa, Mitteleuropa, Deutschland
+N: Forster V. 1556 No. 15.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+C2 | F2F2G2A2 | B3AG2
+c2 | A2F2G2E2 | F4z2
+C2 | F2F2G2A2 | B3AG2
+c2 | A2F2G2E2 | F4z2
+F2 | G2A2B2G2 | A2B2c2
+_e2 | d2c2c2B2 | c4z2
+c2 | c2c2ABcA | B2A2G2
+B2 | A2F2G2E2 | F6
+
+X:159
+T: Krauserlin, Mauserlin
+N: A0197A
+O: Europa, Mitteleuropa, Deutschland
+N: Gassenhawerlin 1535 No. 12. Tonsatz von Heinrich Finck.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G4G4 | A4B4 | c6c2 | c4z2
+c2 | c2c2A2A2 | d6c2 | B2c2A4 | G4z2
+G2 | G4G4 | A4B4 | c6c2 | c4z2
+c2 | c2c2A2A2 | d6c2 | B2c2A4 | G4z2
+B2 | c4c4 | B4e4 | d3cd4 | c4z2
+c2 | c2c2A2B2 | c2c2A2B2 | c2d2e2c2 | d6c2 | B2AGA4 | G6
+
+X:160
+T: Krauserlin, Mauserlin
+N: A0197B
+O: Europa, Mitteleuropa, Deutschland
+N: Baseler handschr. Tenor. (Mitte des 16. Jh. Fol. 22)
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G4G2G2 | A6B2 | c6c2 | c4z2
+c2 | c2c2B2c2 | d6c2 | B2AGA4 | G4z2
+G2 | G4G2G2 | A6B2 | c6c2 | c4z2
+c2 | c2c2B2c2 | d6c2 | B2AGA4 | G4z2
+G2 | c4c4 | B4c4 | d2c2d4 | c4z2
+c2 | B2c2A2c2 | d2c2A2G2 | c3de2A2 | d6c2 | B2c2A4 | G6
+
+X:161
+T: Murr nur nit!
+N: A0199
+O: Europa, Mitteleuropa, Deutschland
+N: Peter Schoeffer 1513 No. 4.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: C
+c2cc | GGAB | c2z
+cBA | d2Bc | A2G2
+c2cc | GGAB | c2z
+cBA | d2Bc | A2G
+E | FFEG | Ac2B | c2z
+c | BcA2 | G2
+c | c2c | c2c | A2A | GF2 | E2
+
+X:162
+T: Huete du dich!
+N: A0200
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder. Nuernberg bei Berg und Newber c. 1542 No. 33.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: F
+F2 | F3FA2 | G4A2 | B4A2 | G6 | A4G2 | F4
+F2 | A3AB2 | c4c2 | G4A2 | B4
+B2 | A4B2 | c4c2 | G4A2 | B6 | A4G2 | F6
+A4B2 | c4c2 | G4A2 | B4
+B2 | A2G4 | F4B2 | A2G4 | F4
+
+X:163
+T: Von einem stolzen Dirnelein
+N: A0201A
+O: Europa, Mitteleuropa, Deutschland
+N: J Werlin Hs. 1646 S. 234.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: F
+FFF | c2A | B2G | A3
+FFF | c2A | B2G | A2
+F | FFFF | F2G
+A | B2G | F2A | B2G | F2
+F | AABB | c2BA | G2F2
+
+X:164
+T: Von einem stolzen Dirnelein
+N: A0201B
+O: Europa, Mitteleuropa, Deutschland
+N: Fragment bei M. Franck, Fasc. Quodl. 1611  No. 3.
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/4
+K: F
+F | F2FccA | BGA2
+FFFccA | BGA
+A | FFAA | F2G
+
+X:165
+T: Mahnung der Liebe
+N: A0203
+O: Europa, Mitteleuropa, Deutschland
+N: Minnenbergs Christl. Reuterliedern 1582 No. 3.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: C
+ |  |  |  | C8D4D4 | C4F4D4E4 | F8z4
+F4 | D8E8 | F8G4E4- | E4D2C2D8 | C8z8
+C8D4D4 | C4F4D4E4 | F8z4
+F4 | D8E8 | F8G4E4- | E4D2C2D8 | C8z4
+F4 | D8E4F4- | F4C8D4- | D4C4_B,8 | A,8z4
+F,4 | C8D8 | E8F8 | G6F2E8 | D8z4
+F4 | E8D8 | C8z4D4 | D4C4_B,4B,4 | A,8z8
+F,2G,2A,2_B,2C4C4 | D4F4E4D4
+D2C2C6B,A,B,4 | C8z8
+
+X:166
+T: Stete Liebe
+N: A0204A
+O: Europa, Mitteleuropa, Deutschland
+N: J. Ott 1534 No. 67 und 68, J. Ott III 1544 No. 14. Tonsatz
+N: von Heinr. Isaak, vermuthlich auch von ihm die Melodie erfunden
+N: denn als Volksweise waere sie zu gekuenstelt.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/8
+K: G
+G4 | _B8c4 | d8=f4 | e4d8 | c8
+c4 | d8d4 | _B4G4d4 | c6_BAG4 | =F8
+F4 | _B8c4 | d4_B4d4 | c6_B2A4
+G4c4B4 | A2G2A8 | G8
+
+X:167
+T: Stuebelein
+N: A0204B
+O: Europa, Mitteleuropa, Deutschland
+N: Locheimer Liederbuch S. 45 (Druckausgabe S. 157).
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: F
+F4A2 | c4d2 | c2BAG2 | F6
+c6 | d4f2 | e4d2 | c2dcB2 | A6
+F2A2c2 | d4c2 | F2A2c2 | d4c2 | B2A2G2 | F6
+f6 | e4f2 | g2fed2 | c6
+d4f2 | c2BAG2 | F6 | c2fed2 | c6
+c4A2 | c4A2 | F4B2 | A4G2 | F6
+
+X:168
+T: Farben - Lied
+N: A0206
+O: Europa, Mitteleuropa, Deutschland
+N: M. Praetorius, Mus. Sion. VIII. 1610 No. 230 "Im Thon, Nach
+N: gruener Farb mein Herz verlangt"
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2F2F2 | c2c2d2e2 | f4
+c4 | B4c2A2G4 | F8 | z2
+F2F2F2 | c2c2d2e2 | f4
+c4 | B4c2A2G4 | F8 | z2
+c2c3B | A2F2A2B2 | c4
+f4 | g4e2f2d4 | c4z2
+c2 | c2d2e2c2 | f2d2c3
+c | d2f2e2d2 | c4A4 | G4
+F4 | A4c2A2G4 | F8 | z2
+
+X:169
+T: Dunkles Woelklein
+N: A0207
+O: Europa, Mitteleuropa, Deutschland
+N: P. Werlin 1646 S. 1504
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: G
+G | d2d | c2A | _B2c | A2
+d | d2d | c2A | _B2c | A2
+G | =F2E | D2d | =f3 | d3
+c_Bc | A2A | G2
+
+X:170
+T: Liebesklage
+N: A0208
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III. 1519 No. 17.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2_B2A2G2 | d4d4
+d4 | _B3cd2d2c2c2 | _B6
+G2 | G2_B2A2G2 | d4d4
+d4 | _B3cd2d2c2c2 | _B6
+B2 | _B2d2c2B2 | A4G4
+d4 | c4A4 | _B6A2G4 | =F4z4
+d4 | =f2f2e2d2d2c2 | d4_B4
+c2d2B2c2A4 | G6
+
+X:171
+T: Die hoechste Freud
+N: A0209
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 61.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+F | FGA2 | zAGF | B2zA | A2GFEF | G2F
+F | FGA2 | zAGF | B2zA | A2GFEF | G2F
+A | G2FEFGFD2 | C2z
+F | FGA2 | zAGF | B2zA | A2GFEF | G2F
+
+X:172
+T: Vor Zeiten und jetzt
+N: A0210
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder. Nuernberg bei Berg und Newber 1542 No. 42.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: A
+z2A2A2A2 | =G4A2=c2- | c2BAB2B2 | =G4
+=c2B2 | BAA4G2 | A6
+z2A2A2A2 | =G4A2=c2- | c2BAB2B2 | =G4
+=c2B2 | BAA4G2 | A4
+=c2 | B4A2 | =G4A2 | E2E2D2 | E4
+=c2 | B4A2 | =G4A2 | E2E2D2 | E4z2
+A2 | A2A2A2B2 | =c3BA2 | B3A=G4
+A4=c2B2 | BAA4G2 | A8
+
+X:173
+T: Elend hat mich umfangen
+N: A0211
+O: Europa, Mitteleuropa, Deutschland
+N: Dresdner Cod. M. 53
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/4
+K: A
+A4 | A8A4 | A8B4 | =c8B3A | =G8
+A4 | =c8B3A | A8G4 | A8
+A4 | A8A4 | A8B4 | =c8B3A | =G8
+A4 | =c8B3A | A8G4 | A8
+=c4 | B8A4 | =G8=F4 | E8E4 | E8
+=c4 | B8A4 | =G8=F4 | E8E4 | E8
+E4 | A8A4 | A8B4 | =c8B3A | =G8
+A4 | =c8B3A | A8G4 | A8
+
+X:174
+T: Das arme Maegdlein
+N: A0212A
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III 1549 No. 31.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2G2G2D2 | G3A_B2c2 | d_BAGA2A2 | G4z2
+G2 | A2A2d2A2 | _B4AGc2 | A4z2
+G2 | G2G2G2D2 | G3A_B2c2 | d_BAGA2A2 | G4z2
+G2 | A2A2d2A2 | _B4AGc2 | A4z2
+A2 | _B2A2d3c | _B2A2G2
+A2 | =F2G2A3G | =F2EDE4 | D4z2
+D2 | G2F2G4 | z2A2_B2A2 | G4z2
+d2 | d2d2A2d2 | c2_B2c2A2 | G4z2
+d2 | _B2A2G2D2 | G3A_B2c2 | d_BAGA4 | G6
+
+X:175
+T: Das arme Maegdlein
+N: A0212B
+O: Europa, Mitteleuropa, Deutschland
+N: Vereinfachung bei Werlin 1646.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: A
+A2 | A2A2A2E2 | AGAB=c2B2 | A4z2
+A2 | B2B2e2B2 | =c4B2
+A2 | A2A2A2E2 | AGAB=c2B2 | A4z2
+A2 | B2B2e2B2 | =c4B4
+z2B2c2B2 | e2d2=c2B2 | A4z2
+B2 | =G2E2B2A2 | =G2FEF4 | E4z2
+E2 | E2E2B2B2 | =G2F2E4
+z2e2e2e2 | B2e2d2=c2 | B4z2
+e2 | =c2B2d2c2 | B4A4
+
+X:176
+T: Nachreue
+N: A0213
+O: Europa, Mitteleuropa, Deutschland
+N: Rhaw, Bicinia 1541. Tom. I. No. 90.
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: F
+F2 | F4F2A4F2 | A4B2c4
+c2 | A4d2c4B2 | A2GFG2F4
+F2 | F4F2A4F2 | A4B2c4
+c2 | A4d2c4B2 | A2GFG2F4
+F2 | A4A2G3AB2 | c4B2c4
+c2 | c4c2d4d2 | c2BAB2A4
+A2 | A4F2G4c2 | d4d2c3B
+AG | F2B4A2G4 | F6-F4
+
+X:177
+T: Absage
+N: A0214
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III. 1552 No. 33.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2G2G2G2 | =F2F2D2
+D2 | _B3Bc2B2 | A4G2
+G2 | G2G2G2G2 | =F2F2D2
+D2 | _B3Bc2B2 | A4G2
+G2 | _B3cd2B2 | c4G4
+c3c_B2AG | =F3GA2
+_B2 | c2G2_B2A2 | G6
+
+X:178
+T: Untreue
+N: A0215A
+O: Europa, Mitteleuropa, Deutschland
+N: Gassenhawerlin 1535 No. 14
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: E
+A2 | A2A2=c2c2 | B4A2
+A2 | A4E2=G2=F4 | E6
+A2 | A2A2=c2c2 | B4A2
+A2 | A4E2=G2=F4 | E6
+=c2 | =c2c4B4c2 | =d6=cBA4 | =G4
+=c4 | B4=c2=d2- | d2=c4B2 | =c4z2
+c2 | =d4d4e4 | =d2=c4BA | B4A4
+B4 | =c4=G2A2- | A2=G2=F4 | E6
+
+X:179
+T: Untreue
+N: A0215B
+O: Europa, Mitteleuropa, Deutschland
+N: Vereinfacht bei Werlin 1646 S. 242.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: E
+A2 | A2A2=c2c2 | B4A2
+A2 | A2E2=G2F2 | E4z2
+A2 | A2A2=c2c2 | B4A2
+A2 | A2E2=G2F2 | E4z2
+=c2 | =c2B2c2=d2 | A4=G2
+=c2 | B2=c2=d2B2 | =c4z2
+c2 | =d2d2e2d2 | =c2BAB4 | A4z2
+B2 | =c2=G2A2F2 | E6
+
+X:180
+T: Klage ueber Untreue
+N: A0216
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder. Nuernberg bei Berg und Newber 1542 No. 57.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+ |  |  | F6ED | C2F4E2
+F3GA2F2 | G2A2B4 | A4z2
+A2 | A2G2A2B2 | c4B2A2- | A2GFG2G2 | F8 | z2
+A2A2G2 | F2E2D4 | C4z2
+C2 | F2F2G2A2 | B2A3GF2 | G2A2B4 | A4z2
+A2 | A2G2A2B2 | c4B2A2- | A2GFG4 | F8
+
+X:181
+T: Feinslieb von Flandern
+N: A0217
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie aus Fragmenten hergestellt, die bei M. Franck, Fasc.
+N: quodl. 1611 No. 4 vorkommen.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+d2 | d2B2c2d2 | e3dc2
+e2 | d2c2B2A2 | G4z2
+d2 | d2B2c2d2 | e3dc2
+e2 | d2c2B2A2 | G4z2
+B2 | c2c2A2B2 | cBAGA2
+A2 | BABcd2B2 | edcBA2A2 | G4z2
+
+X:182
+T: Venus, du und dein Kind
+N: A0219A
+O: Europa, Mitteleuropa, Deutschland
+N: Jac. Regnart, Kurtzweilige teutsche Liedlein. Wien 1574 No. 8.
+N: Nur der volksthuemlich gewordenen Melodie halber wurde dies
+N: Kunstlied hier aufgenommen.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: D
+=F2 | =F2A2A2G2 | A4z2
+A2 | A3G=F2F2 | E4z2
+E2 | =F2G2A2_B2 | G4A2
+E2 | =F2G2A2_B2 | G4A2
+A2 | =c3_BA2A2 | G4G2
+A2 | A3G=F2G2 | E4D2
+
+X:183
+T: Venus, du und dein Kind
+N: A0219B
+O: Europa, Mitteleuropa, Deutschland
+N: Als geistliches Lied
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: D
+D | DAA^G | A2z
+A | AG=FG | E2z
+E | =FGAA | A^GA
+E | =FGAA | G2A2 | z
+AA_B | =cAG2 | G
+GAG | =FGE2 | D3
+
+X:184
+T: Venus, du und dein Kind
+N: A0219C
+O: Europa, Mitteleuropa, Deutschland
+N: Als Choral. Zuerst bei H. Schein 1627.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: D
+D | DE=FG | A2z
+A | AG=FF | E2z
+E | =FGAA | G2A
+A | =FGAA | G2=F2
+AdA2 | AAG2
+GGAG | =FGE2 | D3
+
+X:185
+T: Liebeslied
+N: A0220A
+O: Europa, Mitteleuropa, Deutschland
+N: Hans Leo Hassler, Lustgarten neuer teutscher Gesaenge ...
+N: Nuernberg 1601.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: F
+A2d2 | cB2A | G2A2
+e2f2 | fe2e | d4
+A2d2 | cB2A | G2A2
+e2f2 | fe2e | d2z
+f | ecde | f3
+c | dcdB | A4
+f2e2 | gf2e | d2e2
+A2B2 | AG2G | A4
+
+X:186
+T: Liebeslied
+N: A0220B
+O: Europa, Mitteleuropa, Deutschland
+N: Dieselbe Melodie nach ihrem Rhythmus geordnet.
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/4
+K: F
+A2 | d2cB2A | G2A2
+e2 | f2fe2e | d4
+A2 | d2cB2A | G2A2
+e2 | f2fe2e | d2z
+f | ecde | f3
+c | dcdB | A2f2
+e2gf2e | d2e2
+A2 | B2AG2G | A4
+
+X:187
+T: Liebeslied
+N: A0220C
+O: Europa, Mitteleuropa, Deutschland
+N: Herm. Schein, in Scheins Gesangbuch 1627
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: E
+E2A2 | =G=F2E | =D2E2
+B2=c2 | =cB2B | A4
+E2A2 | =G=F2E | =D2E2
+B2=c2 | =cB2B | A2z
+=c | BAAB | =c2c
+=G | A=GA=F | E4
+E=cB2 | =d=c2B | A2B2
+E2=F2 | E=D2D | E4
+
+X:188
+T: Abfertigung
+N: A0221
+O: Europa, Mitteleuropa, Deutschland
+N: None, Anzeiger VI, 1837, Beil. II. No. 7. Original: Cod. von
+N: St. Blasien, 15. Jh.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: A
+AAA | B2BB | eed=c | B2z2
+=ccdd | e2dd | eed=c | B2z2
+BB=cc | BAB2 | BBEE | =GGAA | B2z
+B | dAB=c | ed=cc | BAA2
+
+X:189
+T: Nesselkranz
+N: A0222
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott III 1544 No. 24.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: G
+G | BBc | d2d | d2d | c2
+=f | eed | c2
+A | B2c | d2d | d2d | A2
+c | BA2 | G2
+
+X:190
+T: Zur Johannisfeier
+N: A0223
+O: Europa, Mitteleuropa, Deutschland
+N: Andere Lesart des vorigen Liedes, aus Volksmund: Schuster
+N: siebenbuergisch - saechs. VL S. 92.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+G2 | B3AB2c2 | d3cB2
+e2 | d2c2B2A2 | G3BA2
+e2 | d3cB2A2 | G4z2
+
+X:191
+T: Keinen Schreiber
+N: A0224
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott III 1544 No. 39
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: D
+d4d4d4 | d4d4A4A4 | A12
+A4 | e6d2=c4B4 | A8z8
+d6d2d4d4 | =c8A8
+c6_B2A4G4 | =F8z8
+F4F4G4G4 | A8D8 | z4
+d4=c4d4 | e8d6=cB | A8z4
+d4 | d4d4d4d4 | =c6_B2A8
+d4d4d4d4 | =c6_B2A4
+G4 | A4=F4E8 | D4G4A4=F4 | E8D8 | z4
+
+X:192
+T: Der Mutter und Tochter dasselbe gefaellt
+N: A0227
+O: Europa, Mitteleuropa, Deutschland
+N: Franck, Fasc. quodl. 1611 No. 6.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: C
+G | ECDG, | CED
+D | EGG^F | G2z
+D | EFGE | FDE
+G, | A,CCB, | C2z
+
+X:193
+T: Der Mutter Warnung
+N: A0228
+O: Europa, Mitteleuropa, Deutschland
+N: Werlins Hs. 1646 S. 2167.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: G
+G2 | _B4G2 | _B4c2 | d3e=f2 | _e4
+d2 | c4_B2 | A4G2 | F4
+G2 | _B4G2 | _B4c2 | d3e=f2 | _e4
+d2 | c4_B2 | A4G2 | F4
+A2 | _B3AB2 | c3_Bc2 | d3cd2 | _e4
+d2 | c4_B2 | _B4A2 | _B4
+d2 | d3e=f2 | d3e=f2 | d3c_B2 | A3_B
+c2 | _B3AG2 | F3GA2 | G4
+
+X:194
+T: Letzter Versuch
+N: A0232A
+O: Europa, Mitteleuropa, Deutschland
+N: J. Ott 1544 No. 7, Forster III. 1549 No. 60.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+c4c2c2 | c2c2B2c2 | A4F4
+A3Bc2d2- | d2c4B2 | A8
+c4c2c2 | c2c2B2c2 | A4F4
+A2Bcd2c2 | c2BAG2G2 | F8
+
+X:195
+T: Heirathslust
+N: A0232B
+O: Europa, Mitteleuropa, Deutschland
+N: M Franck, Fasc. quodl. 1611 No. 3
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+G2 | _B2B2c2c2 | d2d2d4
+_Bcd2Bcd2 | c2_B2A2
+d2 | d2A2_B2G2 | G2G2A4
+_B2A2G2G2 | G2F2G2
+
+X:196
+T: Brautwerbung
+N: A0233
+O: Europa, Mitteleuropa, Deutschland
+N: O. Siegf. Harnisch, Newe lustige Teutsche Liedlein. Helmstedt
+N: 1591 No. 12. Die Melodie hat Boehme vereinfacht.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: C
+c | cBAG | ccG
+G | AAGG | AAG2
+FFGF | EDC
+c | ccGG | AAG
+G | ccGG | AAG2
+FFGF | EDC
+c | ccB2 | AAG2
+AAGG | FFGF | EDC2
+cBAG | c2G
+G | AAGG | AAGG
+AADD | E3
+
+X:197
+T: Die alte Schwieger und die Schnur
+N: A0235
+O: Europa, Mitteleuropa, Deutschland
+N: Melch. Franck, Fasc. quodl. 1611 No. 3.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: F
+FFGG | AAF2
+GABc | A2G2
+DEF2 | DEF2
+GFEF | D2C2
+
+X:198
+T: Habenichts will freien
+N: A0236
+O: Europa, Mitteleuropa, Deutschland
+N: Reutterliedlein 1535 No. 6.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+G | GABc | d2A2
+c2 | cB2cA2 | G2z
+G | GABc | d2A2
+c2 | cB2cA2 | G2z
+A | AGEG | G=FD
+A | =FGAF | E2D2 | z3
+d | dcAc | cBG
+d | BcdB | A2G
+
+X:199
+T: Schlaefert dich noch?
+N: A0237
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II No. 66.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: D
+D2 | D4D2 | E4E2 | =F3ED2 | =C4
+C2 | =F,4F,2 | =C4C2 | D3E=F2 | E4z2
+A,3B,C2 | D4z2 | A,3B,C2 | D4
+
+X:200
+T: Brautlied
+N: A0239
+O: Europa, Mitteleuropa, Deutschland
+N: Beuttner 1602 II No. 89.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | _B2B2c2d2 | c2_B2A2
+e2 | =f2g2f2e2 | d2^c2d4z2
+d2 | g2=f2e2d2 | =f2e2d2
+d2 | d3dd2_B2 | G3A_B2
+B2 | A2G2G2G2 | F2G4
+
+X:201
+T: Nonnenklage
+N: A0242
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 82.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+g2 | g2g2=f2e2 | c4d2
+e2 | =f3ga2g3fG2 | =f4d2
+g2 | g2g2=f2e2 | c4d2
+e2 | =f3ga2g3fG2 | =f4d2
+d2 | d2d2e2e2 | =f4d2
+d2 | =f3ed2c3_BA2 | _B4z2
+=f2 | =f2f2f2f2 | g4d2
+d2 | =f3ga2g4f2 | g4d2
+d2=f2e2 | d2c4_B2A4 | G6
+
+X:202
+T: Herori matori!
+N: A0244
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II 1540 No. 32.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: F
+F | F2F | G2A | B2B | G2B | AGA | FF
+F | c2c | c2c | A2A | G2
+c | G2A | G2A | BAG | F2F | ABc | BG2 | F2
+
+X:203
+T: Rautenstraeuchlein oder Traum eines Ehemannes
+N: A0245
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II 1540 No. 21.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: F
+F4 | c8A8 | B8c8 | A8A4
+F4 | c8A8 | B8c4c8B2A2 | G8F4
+C4 | F4G4A4B4 | c6B2A4
+A4 | G4G4G4G4 | D8G8 | F6EDC4
+C4 | F4G4A4B4 | c6B2A4
+A4 | G4G4G4G4 | D8G8 | F8z4
+
+X:204
+T: Nach den Flitterwochen oder das boese Weib
+N: A0248
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II 1540 No. 69.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+ |  |  | F2F2F2 | A4B2c3BAG | F4z6
+c2 | c2d2c2c2 | BAGFG2G2 | F4z2
+f2 | e2f2d2g3fe2 | d4c4z2
+c2 | c2d2c2c2 | BAGFG2G2 | F4z2
+c2 | B2B2A2d2 | c2A2B2c4BA | G4F8
+
+X:205
+T: Missheirath
+N: A0250
+O: Europa, Mitteleuropa, Deutschland
+N: Ott III. 1544 No. 16 und 110.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2G2G2 | GA_Bcd4 | z2d2d2d2 | c3_BA2
+A2 | _B3AG2G2 | A4G4 | z2
+G2G2G2 | GA_Bcd4 | z2d2d2d2 | c3_BA2
+A2 | _B3AG2G2 | A4G4 | z2
+G2A2_B2 | c3_BA2G2 | =F4z2
+f2 | e2d2c2d2 | e4d4 | z2
+d2d2d2 | =f2e2d2d2 | c3_BA2
+d2 | c2_B2A2G2 | A4G4 | z2
+
+X:206
+T: Vogelhochzeit
+N: A0251
+O: Europa, Mitteleuropa, Deutschland
+N: Hainhofer Lautenbuch II Bl 131 (Hs. in fol 1604)
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: D
+G2 | d4d2 | d4G2 | d6 | d4
+G2 | A4B2 | =c4A2 | G3FGA | G4
+AB | =c4c2 | =c4B2 | =c4c2 | =c4
+B2 | A4=c2 | B4A2 | D3CDE | D4
+
+X:207
+T: Ich fahr dahin
+N: A0252
+O: Europa, Mitteleuropa, Deutschland
+N: Locheimer Liederbuch Ausgabe 1867 No. 8
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: F
+E | F2F | C2B | A2G | F2
+F | E2F | G2C | E2D | C2
+C | F2G | A2G | B2A | F2
+F | A2B | c2d | c2A | F2
+G | FEF | B2A | FAG | F2
+
+X:208
+T: Meiden
+N: A0253
+O: Europa, Mitteleuropa, Deutschland
+N: Locheimer Lbb. 1450 No. 26
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/2
+K: A
+A | A3e3 | =g2=fe2d | =c2B2
+B2 | A2E=G2=F | E3z2
+A | A3e3 | =g2=fe2d | =c2B2
+B2 | A2E=G2=F | E3z2
+E | A2B=c2d | B2z
+AB=c | d3=f3 | e3A2
+A | e2d=c2B | A2z
+B2A | =G3B3 | F3
+E3 | A2=cB2A | B4
+e2 | e2d=cAB | A4z
+
+X:209
+T: Abschied von Insbruck
+N: A0254A
+O: Europa, Mitteleuropa, Deutschland
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: F
+F4 | F2G2A4c4 | B4A4z2
+A2 | c3BG4A4 | F4E4z2
+F2 | G2F2E2F2 | G4z2
+G2 | F2G2A4c4 | B4A4z2
+A2 | c3BG4A4 | F4E4z2
+E2 | F2G2A4 | B3AGFG2 | AFF4E2 | F4
+
+X:210
+T: Vom christlichen Abschied aus dieser Welt
+N: A0254B
+O: Europa, Mitteleuropa, Deutschland
+N: 1555
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/4
+K: F
+F | F2GA2c | B2A2z
+A | c2cG2A | F2E2z
+F | GABA | G2z
+A | F2GA2c | B2A2z
+A | c2cG2A | F2E2z
+C | F2G2 | A2B2 | A2G2 | F3
+
+X:211
+T: Abendlied
+N: A0254C
+O: Europa, Mitteleuropa, Deutschland
+N: 1653
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+A | FGAc | B2A
+A | ccGA | F2E
+E | FGAA | G2z
+A | FGAc | B2A
+A | ccGA | F2E
+C | FGAB | AGF
+
+X:212
+T: Abschied
+N: A0257
+O: Europa, Mitteleuropa, Deutschland
+N: Gassenhawerlein 1535 No. 1.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+C2 | C2C2C2C2 | B,4G,4
+D4 | E4D2C4B,A, | B,2C2A,4 | G,6
+C2 | C2C2C2C2 | B,4G,4
+D4 | E4D2C4B,A, | B,2C2A,4 | G,6
+G2 | F2E2D2C2 | F6ED | E4D4z2
+D2 | G4F2E2 | FDD4C2 | D4z2
+G,2 | C2D2E2F2 | G4D4
+F4 | E4D2G4FE | F2E2D4 | C6
+
+X:213
+T: Abschied
+N: A0258
+O: Europa, Mitteleuropa, Deutschland
+N: Forster I 1539 No. 61.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+ |  |  | C4C4 | B,2C4D2 | B,4G,4
+D4E4 | D2C4B,A, | B,2C2A,4 | G,4z4
+C4C4 | B,2C4D2 | B,4G,4
+D4E4 | D2C4B,A, | B,2C2A,4 | G,4z2
+G2 | F2E2D4 | C2F4ED | E4D2
+D2 | G4F2E2 | FDD4C2 | D4z2
+G,2 | C2D2E2F2 | G4D4
+F4E4 | D2G4FE | FEDCD2D2 | C8
+
+X:214
+T: Sehnsucht
+N: A0259
+O: Europa, Mitteleuropa, Deutschland
+N: Locheimer Lbb. 1450 No. 17. Die Rhythmisierung ist von Boehme,
+N: sie folgt der "musikalischen Vernunft".
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/2
+K: D
+G | A2AAd2 | =c2A=FG2 | =F2z
+G | Ad2=cdB | A2z
+G | A_B=cc | d2A2
+d2 | =c2_BABG | =F2
+=c2 | _BAG=F | E2D2
+E=F | =c2AcG2 | =F2z
+F | AA=cc | d2A2
+G2 | AG2=FE2 | D3
+
+X:215
+T: Wanderlied
+N: A0260
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II 1540 No. 18.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | F2c2A2F2 | G4A2
+A2 | d4c2c2 | B2A2G4 | F4z2
+F2 | F2c2A2F2 | G4A2
+A2 | d4c2c2 | B2A2G4 | F4z2
+F2 | A2A2F2F2 | G4F2
+c2 | A4c2B4A2 | G4z2
+c2 | c2c2c2c4B2 | A2GFG4 | F4z4
+z2F2F2G2 | B2A2G4 | F6
+
+X:216
+T: Das Lied vom Scheiden
+N: A0262
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III 1549 No. 17
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+C4 | G2G2A2B2 | c4c4
+e4 | d4B2c3BAGA2A2 | G4z2
+G2 | c4c2B2B2AG | A4E4
+c4 | B2A3EG2F4 | E4z2
+E2E2E2 | G4F2E4DCD2D2 | C4z
+FC2 | G4A2B3cdB | c4G4
+c4 | B2A3EG2F4 | E8
+
+X:217
+T: Scheidelied
+N: A0263
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III 1549 No. 18.
+M: 4/2
+L: 1/4
+K: A
+ |  |  | e4e2e2 | e2d2e2=g2- | g2=f4ed | e2=c2z2
+e2 | e2e2e2d2- | d2=c3Bcd | e8
+e4e2e2 | e2d2e2=g2- | g2=f4ed | e2=c2z2
+e2 | e2e2e2d2- | d2=c3Bcd | e4z2
+e2 | =g3=fe2d2 | =c2A2=G4
+z2g2g2g2 | a2=f2=g2e2- | e2d=cBAB2 | A4z4
+z2A2e2=g2 | =f4e4 | A4z2
+e2 | =g2e4d2 | d=cBAB2B2 | A8
+
+X:218
+T: Mailust und Abschied
+N: A0264
+O: Europa, Mitteleuropa, Deutschland
+N: Forster III 1549 No. 18.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: A
+e2e2e2 | e2d2e2 | =g3=fed | e2=c2z2
+e2e2e2 | e4d2 | =c3Bcd | e4z2
+e2e2e2 | e2d2e2 | =g3fed | e2=c2z2
+e2e2e2 | e4d2 | =c3Bcd | e4z2
+e2e3d | =c4BA | =G4z2
+g2g2g2 | a2=f2=g2 | e4d=c | B2A2
+e2 | e4=c2 | d3=cBA | B4B2 | A6
+
+X:219
+T: Kein groesser Leiden als Scheiden
+N: A0266
+O: Europa, Mitteleuropa, Deutschland
+N: Hainhofers Lautenbuch I Hs. von 1603.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2G2G2 | F2_B2A2G2 | F2z
+FFDEF | G2G2E2F2 | G4z2
+A_B | c2_B2A2c2 | =F2A2_B2
+B2 | A2G2F2z
+F | FDEFG2G2 | E2F2G4 | z2
+
+X:220
+T: Abschied beim Wegzuge
+N: A0267
+O: Europa, Mitteleuropa, Deutschland
+N: M Franck Fasc. quodl. 1611 No. 6.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: D
+D2 | D3E=F2E2 | D4=C2
+A,2 | D2E2=F2ED | E4z2
+D2 | E2=F2G2E2 | =F4E2
+D2 | C2D2D2C2 | D4z2
+
+X:221
+T: Abschiedsstunde
+N: A0269A
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott 1534 No. 22 - 24.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: D
+=F4 | D2E2=F2G2 | A4A4
+A4 | G4E2=F2D4 | =C4z2
+=F2 | =F2A2G2F2 | E4D2
+=F2 | E2D2=C2D2_B,4 | A,4z2
+A,2A,2A,2 | D4D2=C3_B,A,G, | =F,4z2
+F2 | D2E2=F2G2 | A6
+G=F | E4G4 | =F2D4=C2D2_B,2 | A,8
+
+X:222
+T: Kranzsingen
+N: A0271A
+O: Europa, Mitteleuropa, Deutschland
+N: Klugs Gsgb 1535 No. 28
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/2
+K: F
+F | c2c2d2c2 | A2BGA2z
+F | c2c2c2AB | cBAGF2z
+F | F2G2A2A2 | F2G2A2z
+F | c2c2c2A2 | B2G2F3
+
+X:223
+T: Kranzsingen
+N: A0271B
+O: Europa, Mitteleuropa, Deutschland
+N: Geistl Ringeltentze 1550 No. 2
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/2
+K: F
+c | c2c2d2c2 | c2B2A2z
+A | A2c2c3B | A2G2F2z
+F | F2G2A3G | F2G2A3
+A | A2c2c2A2 | B2G2F3
+
+X:224
+T: Kranzsingen
+N: A0271C
+O: Europa, Mitteleuropa, Deutschland
+N: Trillers Singbuechlein 1555 "Aus frebden Landen komm ich her".
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/2
+K: F
+F | c2c2d2c2 | c3BA2z
+G | A2c2c2Ac | BAG2F2z
+C | F2G2A2G2 | c3BA2z
+c | c2c2c2A2 | B2G2F3
+
+X:225
+T: Kranzsingen
+N: A0271D
+O: Europa, Mitteleuropa, Deutschland
+N: M. Praetorius Mus. Sion. VI 1609 No. 27.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F | c2c2d2c2 | A2BGA2z
+F | c2c2c2AB | cAG2F2z
+C | F2G2A2A2 | F2G2A2z
+F | c2c2c2AB | cAG2F2z
+
+X:226
+T: Sommergewinn
+N: A0272
+O: Europa, Mitteleuropa, Deutschland
+N: Werlin Hs. 1646 S. 1502.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: C
+c | c2d | c2A | G2G | E2
+E | F2F | F2A | G2G | C2
+G | G2F | E2D | C2
+G | GAB | c2
+
+X:227
+T: Buchsbaum und Felbinger
+N: A0273A
+O: Europa, Mitteleuropa, Deutschland
+N: Finck 1536 No. 46
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: G
+G2 | G4G4A2B2 | c4c2c4
+c2 | c4c4B2A2 | B2A2G2A4
+A2 | =F4^F2E4E2 | D3E=F2G4
+G2 | c2B2A2G2 | A4G4
+
+X:228
+T: Buchsbaum und Felbinger
+N: A0273B
+O: Europa, Mitteleuropa, Deutschland
+N: Schmeltzel Quodl.XI 1544
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: G
+G2G2G2 | A4B4 | c4c2c4
+c2 | c4c4 | B3AB2A4G2 | A8 | z2
+A2=F2F2 | E4E2D2 | DCDE=F2F2 | G8 | z4
+B4 | c3BA2G2 | A4G4 | z2
+
+X:229
+T: Buchsbaum und Felbinger
+N: A0273C
+O: Europa, Mitteleuropa, Deutschland
+N: Werlin Hs. von 1646 S. 1502.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: G
+G | G2G | A2B | c2B | A2
+B | c2c | B2G | A2B | A2
+G | G2G | G2E | =F2G | A2
+B | c2B | A2G | A3 | G3
+
+X:230
+T: Alter Reihentanz um das erste Veilchen
+N: A0279
+O: Europa, Mitteleuropa, Deutschland
+N: Klieber Vier geistliche Reyenlieder  Nuernberg 1530.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | c4c2F2 | c4c2
+_e2 | d2c2B2A2 | BcdBc2
+A2 | A2A2B2B2 | c4A2
+A2 | B2B2c2c2 | A4F2
+F2 | B2B2G2G2 | F6
+
+X:231
+T: Alter Reihen um das erste Veilchen
+N: A0280A
+O: Europa, Mitteleuropa, Deutschland
+N: Babst Gsgb 1553 II No. 35.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+G | G2GG | A2A
+A | _BA=FA | _B2z
+G | A_BcA | _B2A
+A | GA_BA | =F2
+D2 | =FGAA | G3
+
+X:232
+T: Alter Reihen um das erste Veilchen
+N: A0280B
+O: Europa, Mitteleuropa, Deutschland
+N: Praetorius Mus. Sion. VIII 1610 No. 264
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: G
+G | G2GG | F2FF | G_BAG | F2z
+G | G2GG | F2FF | G_BAG | F2z
+_B | _BBBB | A2AA | GGFF | G3
+
+X:233
+T: Kranzsingen
+N: A0281
+O: Europa, Mitteleuropa, Deutschland
+N: J. Ott 1544 No. 3.
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/2
+K: F
+F | c2c2d2c2 | c2B2A2z
+B | c2c2c2B2 | A2G2F2z
+F | F2G2A3G | F2G2A2z
+c | c2c2c3B | A2G2F3
+
+X:234
+T: Abendreihen
+N: A0282A
+O: Europa, Mitteleuropa, Deutschland
+N: P. Schoeffer II: 65 Lieder 1537 No. 57.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+ |  |  |  | E4E2E2 | G4F2F2 | E4D2D2 | C4
+D4 | E4E4 | G4F2F2 | E4D2D2 | C4
+F4 | E3DC2B,2 | A,4G,4 | D4D4 | E4
+F4 | E3DC2B,2 | A,4G,4 | D4D4 | C8
+
+X:235
+T: Abendreihen
+N: A0282B
+O: Europa, Mitteleuropa, Deutschland
+N: Nik. Hermann: Historien von der Sindflut Leipzig 1563
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: F
+ |  |  | A2AA | c2B2 | AGFB | A2
+B2 | AGFE | D2C2 | G2G2 | A2
+B2 | AGFE | D2C2 | G2A2 | F4
+
+X:236
+T: Abendreihen
+N: A0283A
+O: Europa, Mitteleuropa, Deutschland
+N: Babst Gsgb 1545 II Bl. 37
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+G4 | B2A2 | B2c2 | d2ze | d2B2 | G4
+G4 | B2A2 | B2c2 | d2ze | d2B2 | G2
+d2 | B2A2 | G2D2 | ABcB | G4
+
+X:237
+T: Abendreihen
+N: A0283B
+O: Europa, Mitteleuropa, Deutschland
+N: Geistliche Ringeltentze 1550 No. 11.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: F
+F | A2B2 | c3B | A2G2 | F2z
+F | A2B2 | c3B | A2G2 | F2z
+B | A2G2 | D2C2 | G2A2 | F2z
+B | A2G2 | D2C2 | G2A2 | F2z
+
+X:238
+T: Ringeltanz
+N: A0284
+O: Europa, Mitteleuropa, Deutschland
+N: Geistliche Ringeltentze 1550 "Der 23. Psalm..."
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: G
+G2 | d4=f2 | e4d2 | c2A2B2 | G4
+G2 | d4=f2 | e4d2 | c2A2B2 | G4
+G2 | A3Bc2 | d4d2 | c4A2 | G4G2 | D3EF2 | G4
+G2 | A3Bc2 | d4d2 | c4A2 | G4G2 | D3EF2 | G4
+
+X:239
+T: Ringeltanz
+N: A0285
+O: Europa, Mitteleuropa, Deutschland
+N: Geistl Ringeltentze 1550 No. 12.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: F
+ |  | F2F | A2B | c2c | c2
+c | FFF | A2B | c3 | c2
+c | d2c | c2B | A2A | A2
+A | GGG | G2G | c2A | BG2 | F3
+
+X:240
+T: Ringeltanz
+N: A0286
+O: Europa, Mitteleuropa, Deutschland
+N: Geistliche Ringeltentze 1550 No. 1
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: F
+F2 | F4F2 | E3FG2 | F2D4 | C4F2 | F2D4 | C4
+C2 | G4G2 | A4G2 | F2E2D2 | E4z2
+C2D2E2 | F4z2 | C2D2E2 | F4
+
+X:241
+T: Ein Abendreihen vom Herrn Christo
+N: A0287
+O: Europa, Mitteleuropa, Deutschland
+N: Nik. Hermann Historien von der Sindflut 1563.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: F
+F | ccFF | ccF2
+c2dc | BAGG | F2z
+G | GGGF | EFG2 | z
+BAF | GGFF | F2z
+
+X:242
+T: Abendreihen mit Kranzsingen
+N: A0288
+O: Europa, Mitteleuropa, Deutschland
+N: Nic. Hermann: Evangelia auf alle Sonn - und Festtage. 1560.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | c2c2c2c2 | d2cBA2
+A2 | B2c2d2d2 | c4z2
+c2 | c2c2c2A2 | c2BAG2
+c2 | A2GFG2E2 | F4
+A4 | c2BAG2G2 | F4z2
+
+X:243
+T: Scherzlied
+N: A0289
+O: Europa, Mitteleuropa, Deutschland
+N: Schmeltzel Quodl. 9
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/2
+K: F
+F | c2cc2F | c2cc2
+c | B2cd2d | c3A2
+A | A2AA2A | c2cG2
+G | G2BA2G | F3F2
+
+X:244
+T: Susanna, willt du mit?
+N: A0290A
+O: Europa, Mitteleuropa, Deutschland
+N: Calvisius Harmonia Cantionum Ecclesiasticum 1597 No. 77
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+G2 | _BGBc | d3
+G | _BGBc | d3
+d | dddd | _BBA
+G | cccd | _BBA
+d | dc_BA | G3
+d | dc_BA | G2
+
+X:245
+T: Susanna, willt du mit?
+N: A0290B
+O: Europa, Mitteleuropa, Deutschland
+N: Praetorius Mus. Sion. VII 1609 No. 75
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: G
+G | _BABc | d2z
+G | _BABc | d2z
+d | dddd | c_BA
+G | dddd | c_BA
+B | AGGF | G3
+d | _BcAA | G3
+
+X:246
+T: Baenkelsaengerlied
+N: A0291
+O: Europa, Mitteleuropa, Deutschland
+N: Locheimer Liederbuch No. 42
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/2
+K: F
+F | F2FA2A | c3c2
+c | c2cd2d | c3A2
+F | F2FA2A | c3c2
+c | c2cd2d | c3e2
+e | f2fe2d | c3A2
+A | c2cd2d | c3B2
+B | A2AG2G | F3-F2
+
+X:247
+T: Springtanz der Ditmarsen
+N: A0292
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens ad Ps. 60.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: D
+D2 | D3CDCDE | =F4E2
+E2 | D2E2D2=C2 | B,4z2
+DD | A,2B,2=C2D2 | E2D=CB,2
+E2 | EDE=FA2G2 | =F2ED=C2
+D2 | E2D2CB,DC | D6
+
+X:248
+T: Unmoegliche Dinge
+N: A0293
+O: Europa, Mitteleuropa, Deutschland
+N: Rhaw, Bicinia I. 1545 No. 96
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+C2 | C2C2G2G2 | G2G2G2
+G2 | F2G2A2G2 | G2F2E2z2 | z2
+E2F2F2 | G2E2F2E2 | G2
+E2F2F2 | G4F2E4DC | D4C2
+
+X:249
+T: Lied zum langen Tanz der Ditmarsen
+N: A0294
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie wie A0293,nur im Tripeltakt.
+R: Romanze, Ballade, Lied
+M: 6/4
+L: 1/4
+K: C
+C | C2CG2G | G2GG2
+G | F2GA2G | G2FE2z
+F2EG2E | F2EG2
+E | F2FG2E | D3C2
+
+X:250
+T: Altes Tanzlied der Ostfriesen
+N: A0295
+O: Europa, Mitteleuropa, Deutschland
+N: Cadovius Mueller, Memoriale linguae Frisicae. 1691. Mitgeth.
+N: im Osterprogramm des K. Gymnasiums zu Aurich 1867 .
+R: Romanze, Ballade, Lied
+M: 3/4
+L: 1/8
+K: G
+d2 | d2d2d2 | d2e2f2 | g4f2 | e4
+d2 | d3cBA | G4
+d2 | d2d2d2 | d2e2f2 | g4f2 | e4
+d2 | d3cBA | G4z2
+A2A2A2 | A2B2c2 | d3cB2 | A4
+B2 | A3GF2 | G4B2 | A3GF2 | G4
+
+X:251
+T: Die Bauern von St. Poelten
+N: A0296
+O: Europa, Mitteleuropa, Deutschland
+N: Handschriftlich bei Werlin 1646. III. Bd. S. 1968.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/4
+K: A
+e2 | =c4A4e2d2 | =c3Bc2A4
+e2 | d4B4=c2d2 | e12
+e4d4=c2d2 | B8z2
+B2 | d4B4e2d2 | e3de2=c4
+d2 | e4=c4d2B2 | A12
+e4=c4d2B2 | A8z2
+
+X:252
+T: Das Kchuehorn
+N: A0297
+O: Europa, Mitteleuropa, Deutschland
+N: Spoerels Liederhandschr. 14. Jh. Cod. 2856 der Hofbibl. zu Wien
+N: fol 187
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: F
+FAc2 | fccA | c2
+FA | c2fc | cAFz
+fcAF | ABc2
+fccA | FAF2
+F2FA2A | c2cc2
+c | f2fc2c | c2cA2A | c3z3
+F2FA2A | c2cc2
+c | f2fc2c | c2cA2A | c3z2
+f | f2cc2A | c2cA2F
+A2AB2B | c3z2
+f | f2cc2A | c2cA2A
+F2FA2A | F3z3
+
+X:253
+T: Der Schaefer von der neuen Stadt
+N: A0298
+O: Europa, Mitteleuropa, Deutschland
+N: Schmeltzel Quodl. No. 8 (1544). Dritte Zeile von Boehme ergaenzt.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/1
+K: F
+F | F2F | c2c | d2d | c2
+F | c2f | eec | d3 | c2
+F | F2F | c2c | d2d | c2
+F | c2f | eec | d3 | c2
+d | cBG | AFd | cBG | AF
+C | FFA | c2A | G3 | F2
+
+X:254
+T: Tanzlied des 15. Jahrhunderts
+N: A0299
+O: Europa, Mitteleuropa, Deutschland
+N: Pet. Schoeffer 1513 No. 11.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/8
+K: F
+A4 | c6c2c4c4 | d6d2d4
+e4 | f6edc4e4 | d6cBA4
+A4 | c6c2c4c4 | d6d2d4
+e4 | f6edc4e4 | d6cBA4
+A4 | d4d4d4d4 | c4A4F4
+F4 | c4A4B4c4 | d8c4
+f4 | e6d2c4B4 | A8z4
+A4 | c4c4c4 | c8c4 | d8d4 | d8
+e4 | f4f4c4c4 | d6c2B4 | A8
+A4 | c4c4c4 | c8c4 | d8d4 | d8
+e4 | f4f4c4c4 | d6c2B4 | A8
+A4 | d8d4 | d8d4 | c8A4 | F8
+F4 | c4A4B2c2 | d4c4f4 | e6d2c2B2 | A8
+A4 | d8d4 | d8d4 | c8A4 | F8
+F4 | c4A4B2c2 | d4c4f4 | e6d2c2B2 | A8
+
+X:255
+T: Nachbildung eines alten Mai- und Tanzspielliedes aus der Schweiz
+N: A0300
+O: Europa, Mitteleuropa, Deutschland
+N: Baseler Tenor (1550) fol 44d
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: C
+G2 | G2G2A2B2 | c4G2
+d2 | B2c2A4 | G4z2
+G2 | G2G2A2B2 | c4G2
+d2 | B2c2A4 | G4z2
+c2 | d2e2d2c2 | e4d4 | c4z4 | z2
+G2A2G2 | E2G4FE | D2C2D4 | C4z2
+C2 | E3FG2A2 | B2c2A4 | G4z2
+G2 | A2B2c2G2 | c4d4 | c8
+
+X:256
+T: Tanzlied im Mai
+N: A0301
+O: Europa, Mitteleuropa, Deutschland
+N: Ott 1534 No. 96.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G4d2e2 | =f4e2
+d2 | g2d2d2c_B | A4G2
+G2 | G4d2e2 | =f4e2
+d2 | g2d2d2c_B | A4G2
+G2 | A2_B2c2c2 | _B2A2G2
+G2 | A2_B2c2c2 | _B2A2G4
+B4c2c2 | d4z2
+d2 | =f2f2e2e2 | d2d2A4
+=f2f2e2e2 | d2d2A4
+=f2ffe2ee | d2d2A2
+A2 | G2A2_B2c2 | d4d2
+d2 | c2c2A2A2 | G2G2A2A2 | G2G2A2A2 | G6
+
+X:257
+T: Volksmeldie des 14. Jahrhunderts
+N: A0302
+O: Europa, Mitteleuropa, Deutschland
+N: Musikal. Lehrcompendium des H. de Zeelandia (15.Jh). Mitgetheilt
+N: in W. Ambros, Gesch. d. Musik II, 277.
+R: Romanze, Ballade, Lied
+M: 3/4
+L: 1/8
+K: C
+C4D2 | E4C2 | F2E2D2 | CDC4
+GGEFED | CDC4 | c4BA | GAG4
+GAGFED | CDC2G2 | A2GFE2 | F2E2D2 | CDC4
+
+X:258
+T: Rumpel nit!
+N: A0303A
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder Nuernberg bei Berg und Newber 1542 No. 35
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/2
+K: G
+G2GG2G | d2dd3
+d2dc2d | _B2AG3
+B2Bc2A | =F2GA3
+G2GG2G | =F2ED2
+D | =F2GA2G | =F2GA2
+d | _B2AG2F | G6
+
+X:259
+T: Rumpel nit!
+N: A0303B
+O: Europa, Mitteleuropa, Deutschland
+N: Schmeltzel Quodl. 8.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/1
+K: F
+ |  | F2F | F2F | c2c | c2
+B | B2B | B2c | AG2 | F3
+
+X:260
+T: Tanz- und Scherzliedchen
+N: A0304A
+O: Europa, Mitteleuropa, Deutschland
+N: Werlins Hs. 1646. S. 1765
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: F
+F2F | G2A | B2B | A2A | G2G | F3
+F2F | G2A | B2B | A2A | G2G | F2
+A | A2B | c2c | GGB | A2G | A2A | GG
+F | G2A | B2A | G3 | F3
+
+X:261
+T: Henslein
+N: A0304B
+O: Europa, Mitteleuropa, Deutschland
+N: Schmeltzels Quodl. 1544 No. 9
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: F
+F2 | A4A2 | F4F2 | G4G2 | F4z2
+A4A2 | F4F2 | G4G2 | F4
+B2 | A3GF2 | G3FE2 | F2F2G2 | F4
+
+X:262
+T: Der lustige Bauer
+N: A0306
+O: Europa, Mitteleuropa, Deutschland
+N: 68 Lieder. Nuernberg 1542 bei Berg und Newber. No. 10.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+c3cc3c | c2c4d2 | c4F4
+c3cc3c | c2c4d2 | c4F4
+z4F4 | F4F2F2- | F2E2D2D2 | C8
+z4F4 | F4F2F2- | F2E2D2D2 | C8
+F4C2 | F4G2 | A6 | G6
+F4C2 | F4G2 | A4B2 | c4
+c2 | B4A2 | B4G2 | F6 | F6
+
+X:263
+T: Der Vorreihen
+N: A0307
+O: Europa, Mitteleuropa, Deutschland
+N: Harnisch, Newe lustige teudsche Liedlein mit drei Stimmen.
+N: Helmstedt 1591 No. 23.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/4
+K: F
+f2e2d2 | c4A2 | B2c2d2 | c4
+f2 | f3ed2 | c4d2 | e2f2e2 | f4z2
+d2c2c2 | A4z2 | d2c2c2 | A4B2 | G4
+A2 | F2fedc | =B2c2B2 | c4z2
+c2e2f2 | d4e2 | c2def2 | e6
+f3ed2 | c4d2 | G2F2G2 | A6
+c2e2f2 | d4e2 | c2def2 | e6
+f3ed2 | c4d2 | G2F2G2 | A6
+
+X:264
+T: Tanzlied
+N: A0308
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps 127. Ev. phrygisch aufzufassen.
+M: 4/2
+L: 1/4
+K: C
+E2G3A | B3Bc3B | A3
+AG3F | E4z4 | z2
+E2G3A | B3Bc3B | A3
+AG3F | E4z2
+E2 | E3EE3E | A4G3
+F | D4C4 | z2
+C2G3A | B3
+Bc3B | A3
+cB3A | G3FE3G | F4E4 | z2
+
+X:265
+T: Alte niederlaendische Tanzmelodie
+N: A0309A
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 132
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2 | G3GB3B | d3dB3
+B | d3dB3c | d4d2
+G2 | G3GB3B | d3dB3
+B | d3dB3c | d4d2
+d2 | d3dd3d | B3BA3
+A | B3AG3=F | E3=FG3A | B4A4 | G6
+
+X:266
+T: Albas Vertreibung
+N: A0309B
+O: Europa, Mitteleuropa, Deutschland
+N: Willems 1848 No. 36.
+R: Romanze, Ballade, Lied
+M: 6/8
+L: 1/8
+K: F
+F | F2FA2A | c2cA2
+A | c2cA2B | c3c2
+F | F2FA2A | c2cA2
+A | c2cA2B | c3c2
+c | c2cc2B | A2AG2
+G | A2FE2E | D2EF2G | A3G3 | F3z2
+
+X:267
+T: Tanzlied
+N: A0310A
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 133
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: A
+A2 | =G3GA3A | B4B3
+B | B3B=c3c | B4A2
+A2 | =G3GA3A | B4B3
+B | B3B=c3c | B4A4
+A4e4 | d3=cB3B | =c4B3
+B | A3AB3B | E4
+B4 | d3d=c3B | A6
+
+X:268
+T: Alter Sommerwendfest - Tanz
+N: A0310B
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 125
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+ |  |  |  | G3GG2G2 | _B3BB2
+B2 | G3GA2G2 | F4G4 | z2
+G2A3_B | c2c2_B3A | _B2
+B2=F2F2 | _B2B2A2A2 | _B3
+BA2G2 | A2G2F4 | G8
+
+X:269
+T: Alter Hochzeitstanz
+N: A0310C
+O: Europa, Mitteleuropa, Deutschland
+N: Souterliedekens 1540 ad Ps. 150
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/8
+K: G
+G4 | A4A2A2A2A2 | B4B4
+A4 | GFGAB2B2A2G2 | F4z4
+G4 | A6A2A2A2 | B4B4
+A4 | G2A2G4F4 | G4z2
+B2B2A2 | B4z2B2B2A2 | B4z2
+B2A2A2 | GFGBA2G2G2F2 | G8
+
+X:270
+T: Tandernack
+N: A0311A
+O: Europa, Mitteleuropa, Deutschland
+N: Ott 1534 No. 98
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: C
+ |  | E2E | E2F | EDD | C2
+C | E2E | A2A | GFF | E2
+E | G2G | A2A | E2E | C2
+C | D2D | E2D | CB,B, | A,3
+
+X:271
+T: Tandernack up dem Rhin
+N: A0311B
+O: Europa, Mitteleuropa, Deutschland
+N: Newsiedlers Lautenbuch 1536 II Bl. 02.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: C
+E2E2 | F2ED | EFD2 | C2
+A2 | G2AB | c2G2 | AF2D | C4
+
+X:272
+T: Gelamors
+N: A0312
+O: Europa, Mitteleuropa, Deutschland
+N: Locheimer Liederbuch Hs. S.44. Druck S. 155.
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/4
+K: G
+c12 | c6c2e4 | d12 | G2F2G2d2BGA2 | G12
+A4B2c6- | c6B6 | c4B2A2G4 | C4G2A2AGA=F | E12
+c12 | c6c2e4 | d12 | G2F2G2d2BGA2 | G12
+A4B2c6- | c6B6 | c4B2A2G4 | C4G2A2AGA=F | E12
+G6B6 | d12 | G6-G2=F4 | G2=F2G2d2BGA2 | G12
+G6B6 | d12 | G6-G2=F4 | G2=F2G2d2BGA2 | G12
+A6A2E4 | D6D2E4 | G6=F2E4 | D4A2G2AGA=F | E12
+c12 | G6G2c4 | G2E2C2B,C2ED2 | C12
+c6-c2e4 | d6-d2c4 | d2c2e2d2BGA2 | G12
+d6A6 | B2AG2=FE6 | A12
+E6E2G4 | A4d2e2cAB2 | A12
+e4d2c2B4 | A6A2B4 | E2D2E2A2GE=F2 | E12
+G2=F2A2G2ECD2 | C6C2D4 | E6-E2=F4
+G4c2d2BGA2 | G12
+
+X:273
+T: Der Botenbube
+N: A0314
+O: Europa, Mitteleuropa, Deutschland
+N: Hainhofer, Lautenbuch II. 1603. Bl. 28.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+G2G2G2D2 | GAG2F4
+A2_B2c2B2 | A2A2G4
+G2G2G2D2 | GAG2F4
+A2_B2c2B2 | A2A2G4
+A2A2A2G2 | A2_B2c4
+A2A2A2G2 | A2_B2c4
+d4c2B2 | A4G4 | =FGF2G2F2 | E4D2
+dD | _Bcd2c2B2 | A2A2G4
+
+X:274
+T: Der Schwanendreher
+N: A0315
+O: Europa, Mitteleuropa, Deutschland
+N: Hainhofer, Lautenbuch II. 1603. Bl. 13b Hs. in Wolfenbuettel.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: A
+BAGFE2F2 | G2G2F2F2
+G2A2B2B2 | c3BA2Bc
+d2B2c2c2 | B3EB4
+d4d2c2 | B2A=GF4
+d4d2c2 | B2A=GF2
+F2 | B4A4 | G3FE2
+B2 | c2B2c2d2 | e2dcB2
+A2 | G2F2G2A2 | B2AGF2
+B2 | c4B4 | G3FE2
+E2 | c4B4 | A3FA4
+
+X:275
+T: Deutscher dantz
+N: A0316
+O: Europa, Mitteleuropa, Deutschland
+N: Hainhofer, Lautenbuch II. 1603. Bl. 9b Hs. in Wolfenbuettel.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: A
+AB | c2B2c2d2 | e4c2
+e2 | d2c2B2e2 | c4z2
+AB | c2B2c2d2 | e4c2
+e2 | d2c2B2e2 | c4z2
+c2 | c2B2A2=G2 | F2EDE2
+BA | G2FEFEC^D | E4z2
+FG | A2A2B2B2 | c2e2dc
+BA | B2A2A2G2 | A4z2
+
+X:276
+T: Die Katze auf dem Dach
+N: A0317
+O: Europa, Mitteleuropa, Deutschland
+N: M. Franck, Fasc. quodl. 1615 No. 5.
+R: Romanze, Ballade, Lied
+M: 3/2
+L: 1/2
+K: G
+_B | _B2B | A2A | _B2B | A2
+A | _B2B | c2_B | AGF | G2
+
+X:277
+T: An den Most
+N: A0318
+O: Europa, Mitteleuropa, Deutschland
+N: Reutterliedlein (1535) No. 5.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: F
+c2 | A2F2c2d2 | c2B2A2
+G2 | c3BA2G2 | c2B2c2A2 | G4z4
+F4c2d2 | c2B2A2
+G2 | c3BA2G2 | c2B2c2A2
+d4c4 | A2F2G4 | F4z2
+
+X:278
+T: Weingruss
+N: A0319
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott 1534 No. 35
+R: Romanze, Ballade, Lied, Trinklied
+M: 3/1
+L: 1/2
+K: D
+A2 | A2A2BB | =c2cc2
+A | G2G2AB | =c3A3 | z4
+G2 | A2=c2BA | G2E=F2
+D | E2=F2GG | z4
+E2 | =F2G2AA | z4
+=c2 | B2A2G2 | =F2G4 | D4
+
+X:279
+T: Vom edlen Rebensaft
+N: A0320
+O: Europa, Mitteleuropa, Deutschland
+N: Scandello, d. Liedlein 1578 No. 3.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: A
+e2 | d2B2=c2A2 | B4A4 | z4
+=c4 | A2=F2=G2E2 | D4z2
+e2 | d2B2=c2A2 | B4A4 | z4
+=c4 | A2=F2=G2E2 | D4z2
+d2 | e2d2=c2A2 | B4=c4 | z2=c2A2A2 | =G2=F2E4
+z2A2A2A2 | =c3_BA2=F2 | =G4=F4
+z2=c2c2A2 | =c2d2c2B2 | A4z2
+
+X:280
+T: Beim Herumtrinken
+N: A0321
+O: Europa, Mitteleuropa, Deutschland
+N: Forster Lieder 4. Theil 1556
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/2
+K: G
+GGG | dd_ee | c2
+d_e | =fg_e2 | d2z
+d | gg_ee | =ffd2 | cAG2
+_Bcd2 | _Bcd2 | GA_Bc | A2G2
+_Bcd2 | _Bcd2 | GA_Bc | A2G2
+GA_Bc | A2G2 | z
+
+X:281
+T: Lasst uns fahrn nach Engelland zu!
+N: A0322
+O: Europa, Mitteleuropa, Deutschland
+N: Ammerbach Tablaturbuch 1571
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/4
+L: 1/8
+K: G
+d2d2d2 | d2d2_e2e2 | c4
+d2_e2 | =f2g2_e4 | d4z2
+d2 | g2g2_e2e2 | =f2f2d4 | c2A2G4
+_B2c2d4 | A2_B2c4
+G2A2B2c2 | A3AG4
+_B2c2d4 | A2_B2c4
+G2A2B2c2 | A3AG4
+G2A2_B2c2 | A3AG4 | z2
+
+X:282
+T: Trinkreime
+N: A0323
+O: Europa, Mitteleuropa, Deutschland
+N: Franck, Fasc. quodl. No. 1
+R: Romanze, Ballade, Lied, Trinklied
+M: 3/2
+L: 1/2
+K: F
+c | c2c | d2d | c2c | A2
+F | c2c | d2d | c2c | A2
+c | BAG | A2c | BAG | F2
+
+X:283
+T: Sauf - Messe
+N: A0327
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II No. 36
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: G
+G2 | G2G2A2B2 | c3cc4
+d2ddB2B2 | c2c2A2A2 | d2d2d4 | z2
+A2c2c2 | B2B2A2A2 | G4z2
+B2 | A2A2G4 | z2B2A2A2 | G4z4
+d2d2B2c2 | d4z4
+d2d2B2c2 | d4z4
+d2d2d2e2 | d4B4 | c2c2A2A2 | G4z4
+d2d2d2e2 | d4B4 | c2c2A2A2 | G4z4
+c3de4 | =f4d4 | c4d2=f2 | e8
+d4=f3f | e3dc2B2 | A2d3cB2 | A4G2
+
+X:284
+T: Trinklied
+N: A0328
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II (1540) No. 54.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: G
+G4G2G2 | G2G2A4 | =F4z4
+c4 | d4c4c4 | _B4A8 | G12 | z2
+G2G2G2 | G2G2A4 | =F4z4
+F4 | G4E4E4 | D8C4 | D2
+G2GGGG | A2A2=F4 | D4z4
+A4 | _B4A8 | G8F4 | G4z4
+_B4 | c4c2 | d2d2d2 | c2c2c2 | c8
+c4 | d8d4 | _B8c4 | _B4G8 | =F4E8 | D4z2
+F2 | G4F2F2 | G4A8 | _B8c4 | d4c8 | _B4A8 | G8z4
+
+X:285
+T: Der Rebner
+N: A0329
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II (1540) No. 54.
+R: Romanze, Ballade, Lied, Trinklied
+M: 3/2
+L: 1/2
+K: F
+FFF | A2A | c2c | AA
+d | c2c | AAd | c2c | AA
+A | AAA | A2A | B2A | GGG | F2E | F2
+A | AAA | A2A | B2A | GGG | F2E | F3
+
+X:286
+T: So trinken wir alle
+N: A0330
+O: Europa, Mitteleuropa, Deutschland
+N: H. Finck 1536 No. 45.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+F2 | A2A2B4 | c4A4
+B2B2c2BA | G4F4
+B2B2B2G2 | A2A2A2
+F2 | G2F2B2A2 | G4F4
+B2B2B2G2 | A2A2A2
+F2 | G2F2B2A2 | G4F2
+F2 | F4C2F2 | F4C2F2 | F4C2
+
+X:287
+T: Zecherlied
+N: A0331
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II (1540) No. 43
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: E
+=c2 | =c4B4 | A6=d2 | =d3B=c2A2 | =G4z2
+G2 | =c4B4 | A4E4 | =G2G2=F2F2 | E4z2
+E2 | E4E4 | =G6=F2 | E4=D4 | =C4z2
+E2 | =G2G2G4 | =G2G2G4 | A6A2 | A4z2
+B2 | =c2c2B4 | A4E4 | =G4=F4 | E6
+
+X:288
+T: Kannenlied
+N: A0332
+O: Europa, Mitteleuropa, Deutschland
+N: Finck 1536 No. 10; Forster II (1540) No. 63
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: D
+d2 | d3dd2d2 | A4A4
+e3d=c2B2 | A4z2
+A2 | A3B=c2d2 | =c4A4
+A3G=F2E2 | D4z2
+D2 | =F2F2GGG2 | A4z2
+B2 | =c2A2B2G2 | A4z2
+=c2 | =c2A2B2G2 | A4z2
+d2 | d2d2d2d2 | A4A3
+A | A2A2G2E2 | D4z2
+G2 | A2=F2G2E2 | D4z2
+
+X:289
+T: Abendlust
+N: A0334A
+O: Europa, Mitteleuropa, Deutschland
+N: Hainhofer Lautenbuch II S. 32b. (1603)
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: A
+E2 | A2A2B2AB | c2BAB2
+d2 | c2A2G2FG | A4z2
+E2 | A2A2B2AB | c2BAB2
+d2 | c2A2G2FG | A4z2
+A2 | d2c2B2AB | c2BAB2
+c2 | d2c2B2AB | c2BAB2z2
+c2A2A2G2 | A4z2
+
+X:290
+T: Abendlust
+N: A0334B
+O: Europa, Mitteleuropa, Deutschland
+N: Fragment bei M. Franck, 1611, Quodl. 2
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/4
+L: 1/4
+K: A
+ |  | eeBB | ccB
+B | eeBB | ccB
+e | ecBB | c2z2
+
+X:291
+T: Muscatellerlied
+N: A0335A
+O: Europa, Mitteleuropa, Deutschland
+N: Melodie von A0334 von Boehme in den Tripeltakt gesetzt.
+R: Romanze, Ballade, Lied, Trinklied
+M: 6/4
+L: 1/4
+K: F
+C | F2FG2G | A2AG2
+c | A2FG2E | F3F2
+C | F2FG2G | A2AG2
+c | A2FG2E | F3F2
+A | c2cG2G | A2AG2
+G | c2cG2G | A2AG2
+c | c2AG2B | A2GF2
+
+X:292
+T: Muscatellerlied
+N: A0335B
+O: Europa, Mitteleuropa, Deutschland
+N: Fragment bei Franck Fasc. quodl. (1611) No. 1.
+R: Romanze, Ballade, Lied, Trinklied
+M: 3/2
+L: 1/2
+K: F
+FFF | G2c | c2A | G2
+c | A2F | G2E | F3 | F2z
+
+X:293
+T: Alte Zecher - Melodie
+N: A0336
+O: Europa, Mitteleuropa, Deutschland
+N: Trillers Singbuch 1555.
+R: Romanze, Ballade, Lied, Trinklied
+M: 3/2
+L: 1/2
+K: D
+D | D2A | A2E | G=F2 | E2
+E | D2E | =FGE | D2
+D | D2A | A2E | G=F2 | E2
+E | D2E | =FGE | D2
+D | G2G | G2A | =cB2 | A2
+B | =c2G | A2E | G=F2 | E2
+E | G2G | D2E | =FD2 | =C2
+c | BA2 | d=cB | =cB2 | A2
+
+X:294
+T: Der Fuerstenberger
+N: A0337
+O: Europa, Mitteleuropa, Deutschland
+N: Ochsenkun, Tabulaturbuch 1558 Bl. 79.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/4
+L: 1/8
+K: A
+e2 | E2E2A2B2 | c3de2
+A2 | d2c2B2B2 | A4z2
+e2 | E2E2A2B2 | c3de2
+A2 | d2c2B2B2 | A4z2
+e2 | d2d2c3d | e4e2
+d2 | c2e2e2^d2 | e4z2
+e2 | c2c2A2A2 | e4c2
+d2 | B2A2A2G2 | A4z2
+e2 | c2c2A2A2 | e4c2
+d2 | B2A2A2G2 | A4z2
+
+X:295
+T: Der Weinkenner
+N: A0338
+O: Europa, Mitteleuropa, Deutschland
+N: Reutterliedlein 1535 No. 4
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/1
+L: 1/4
+K: F
+ |  |  |  |  | F8A4B4 | c4c4d4d4 | c8z4
+f4 | e4d4c4B4 | A4G2A4GFG4 | F8z8
+F8A4B4 | c4c4d4d4 | c8z4
+f4 | e4d4c4B4 | A4G2A4GFG4 | F8z4
+c4 | A4B4c4d4 | c2f4e2f8 | z4
+f4c4d4 | A6G2A2B2G4 | F8 | z4
+c4c4c4 | G4B4B4B4 | A8z4
+c4 | f4e2d4c2B4 | A8z4
+A4 | c4c4A4A4 | c4c4F8 | z4
+f4e4d4 | g4f2g4fed4 | c8
+
+X:296
+T: Trinklied
+N: A0340
+O: Europa, Mitteleuropa, Deutschland
+N: Scandello 1567 No. 20.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/2
+K: C
+G, | CCDD | E2C2
+G2 | AG2GGG | G2E2
+A2 | G2FED2 | C4
+G2E2A2 | GFGED2 | C4
+G2E2A2 | GFGED2 | C3
+
+X:297
+T: Trink aus!
+N: A0341
+O: Europa, Mitteleuropa, Deutschland
+N: Scandellus 1570 No. 18. Scheinbar eine populaere Melodie.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: F
+ |  |  |  | c4c2F2 | ccc2c2
+_e2 | d2c2B2A2 | G4F4
+c4c2F2 | ccc2c2
+_e2 | d2c2B2A2 | G4F4
+G2A2B2G2 | A2G2F2z
+F | G2A2B2G2 | A2G2F4 | z6
+c2 | c4A2c2 | c4A2c2 | c4c4
+
+X:298
+T: Der Zechbruder
+N: A0342
+O: Europa, Mitteleuropa, Deutschland
+N: Reutterliedlein 1535 No. 14.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: G
+d2 | d2d2d2d2 | A4z2
+A2 | d3c_B2A2 | G4z2
+d2 | c2A2_B2G2 | =F4z2
+D2 | G6F2 | G4z2
+d2 | c2A2_B2G2 | A4z2
+_B2 | _B6A2 | _B4z2
+B2 | c2_B2A2G2 | =F4z2
+D2 | G6F2 | G6
+d2 | c2A2_B2G2 | A2D2E2
+F2 | G6F2 | G6
+
+X:299
+T: Froehlich in Ehren
+N: A0343
+O: Europa, Mitteleuropa, Deutschland
+N: J. Werlin 1646 S. 3334.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/4
+L: 1/4
+K: G
+d | dded | c2c
+B | cBAA | B2z
+A | ABcd | e2e
+d | cBAA | G2z
+e | eedc | BAB
+d | eedc | BAB
+d | fed^c | d2z
+e | fed^c | d2z
+B | BABc | d2A
+B | BABc | d2A
+c | BcAA | G2z
+
+X:300
+T: Der Schlaftrunk
+N: A0344
+O: Europa, Mitteleuropa, Deutschland
+N: Freih. von Winnenbergs Reuterlieder. Strassburg 1582 No. 33.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/2
+K: F
+c2 | ccdc | B2Bd | cABG | F2
+c2 | ccdc | B2Bd | cABG | F2z
+B | BBG2 | GABB | G2z
+A | F2FF | GAG2 | F2z
+f | fed2 | c2A2 | BcdB | A3
+B | BBG2 | GABB | G2z
+A | F2FF | GAG2 | F2z
+f | fed2 | c2A2 | BcdB | A4
+c2cA | BAG2 | F2
+
+X:301
+T: Der trunkene Bruder
+N: A0345
+O: Europa, Mitteleuropa, Deutschland
+N: Reutterliedlein 1535 No. 17.
+R: Romanze, Ballade, Lied, Trinklied
+M: 4/2
+L: 1/4
+K: D
+D2 | DE=FGA2A2 | A4B2=c2- | c2BAB2B2 | A4z2
+d2 | d2d2=c4 | d2=f4ed | e4d2
+D2 | DE=FGA2A2 | A4B2=c2- | c2BAB2B2 | A4z2
+d2 | d2d2c4 | d2=f4ed | e4d4
+z2=f2e3d | =c2B2A2c2 | d2e3dd4c2 | d4z2
+A2 | A2A2A2A2 | B4A4 | z2A2A2A2 | =c4z2
+c2 | =c2c2G4 | z2G2G2G2 | B3=cd4 | A4z2
+=f2 | =f2f2e2d2 | e4d2
+
+X:302
+T: Martinslied
+N: A0348
+O: Europa, Mitteleuropa, Deutschland
+N: Lambacher Hs. (15. Jh.) fol. 170b.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: D
+d2d2 | A2B2 | =c2A2 | =F2
+G2 | A2G2 | =F2E2 | D2D2
+DDDE | =F2FG | AAGG | A3
+A | AAcc | d2e2
+=fedc | d3d | dd=cc | A2GG | =FFEE | D4
+
+X:303
+T: Martinslied des 14. Jahrhunderts
+N: A0349
+O: Europa, Mitteleuropa, Deutschland
+N: Lambacher Hs. (15. Jh.) fol 169.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/4
+K: E
+E2 | =FEFF | =D2E=F | E2=D2 | =FFAA | =GG=FF | E2
+e2 | =cBc=d | e2=de | =d=cBc | =dddd | =c2A2 | =c2A2 | =F2
+A=G | =FE=D2 | =FFF=G | AA=G=F | E2=D2
+=FFFF | =FFE2 | A=cA2 | =G2=F2 | E2
+
+X:304
+T: Martinsgans
+N: A0351
+O: Europa, Mitteleuropa, Deutschland
+N: Joh. Ott 1544 No. 13.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+f4 | e4f2d2 | c4z2c2 | A2B2c4 | z2
+c2d2d2 | c3BA2G2 | A2B2G4 | F4
+f4 | e4f2d2 | c4z2c2 | A2B2c4 | z2
+c2d2d2 | c3BA2G2 | A2B2G4 | F4z2
+F2 | A3Bc2F2 | A3Bc2c2 | d2e2f3e | d2c2d4 | c4z2
+c2 | c2c2A2F2 | c2d2B4 | A4z2A2 | d2d2c3B | A2B2G4 | F4
+
+X:305
+T: Martinsgans
+N: A0353
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II. 1540 No. 7.
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/4
+K: F
+F8A4B4 | c4c4d4d4 | c16
+c4c2c4BAG4 | F8c4c4 | d8c8
+F2F2A2B2 | c4c4 | c2c2d4 | c4z2
+c2 | c2c2c2c2 | c3BA4 | B2G2A4z2
+A2c3B | A2F2G4 | F8 | A2A2B4 | c4z2c2 | d2B2c4 | z2
+c2d2B2 | c4z2c2 | d2d2c4 | B2c3BA2 | G4F4 | z8
+F4 | F8F4 | A8B4 | c8c4
+c8c4 | d8f4 | e4d8 | c8 | d8 | e8 | f6
+F2 | c3BA2G2 | c3BA2G2 | c3BA2G2 | c4f4 | e2dcd4
+c2c2A2B2 | c4B2A2- | A2GFG4 | F8
+f3ed2c2 | f3ed2c2 | d4c4 | c2c4c2 | c4
+c4 | d4f4 | e4d4 | c4B2c2- | c2BAG2F2 | G4F4
+
+X:306
+T: Der weltliche Rosenkranz - Ton
+N: A0355
+O: Europa, Mitteleuropa, Deutschland
+N: Schmeltzel 1544 Quodl. 8.
+R: Romanze, Ballade, Lied
+M: 3/1
+L: 1/2
+K: F
+c2 | c4c2 | F4F2 | B4A2 | G4
+G2 | d4d2 | c4B2 | A3BcA | B2G4 | F4
+
+X:307
+T: Die Narrenkappe
+N: A0356
+O: Europa, Mitteleuropa, Deutschland
+N: Rhaw, Bicinia II 1545 No. 78.
+R: Romanze, Ballade, Lied
+M: 4/1
+L: 1/2
+K: C
+c2c2c2 | B2G2A2B2 | c4G4
+d3cB2A2 | G2F2G2E2 | D4C4 | z2
+c2c2c2 | B2G2A2B2 | c4G4
+d3cB2A2 | G2F2G2E2 | D4C4 | z2
+C2E2F2 | G2A2B2G2 | c3Bc3A | G8 | z2
+G2A2B2 | c4G4 | A2G2F4 | E8 | z2
+E2A2G2 | c2B2A2G2 | F2G2E4 | D8 | z2
+D2E2F2 | G3FE2D2 | E2F2D4 | C8 | z2
+
+X:308
+T: Der Narrentanz
+N: A0357
+O: Europa, Mitteleuropa, Deutschland
+N: Pet. Schoeffer II 1537  No. 38.
+R: Romanze, Ballade, Lied
+M: 6/2
+L: 1/2
+K: G
+G | G2G2AB | c2cc2
+c | A2A2Bc | d2dd2
+d | =f2f2ec | d2dA2
+B | cA2G2G | c2ed2c | B2c2A2 | G4z
+
+X:309
+T: Der Schlemmer
+N: A0358
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II. 1540. No. 57.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/2
+K: G
+G | _BBAG | d2c
+c | dc2_BA2 | G2z
+G | _BBAG | d2c
+c | dc2_BA2 | G2z
+_B | A2=FGE2 | D2z
+_B | A2Gc2_B | A2z
+G | _BBAG | d2c
+c | d2c_BA2 | G2z
+
+X:310
+T: Landsknecht als Schlemmer
+N: A0359
+O: Europa, Mitteleuropa, Deutschland
+N: Forster II. 1540 No. 17.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: G
+G2 | _B2B2c2c2 | d2d2d2=f2- | f2ede2e2 | d4z2
+_B2 | A2_B2A2A2 | G6g2 | g2=f2e2e2 | d4z2
+d2 | g4g4 | =f4d4 | =f4_e4 | d4z2
+=f2 | d2d2d2_B2 | d2d2d2G2 | c2_B2A2A2 | G4z2
+G2 | _B2B2c2c2 | d2d2d2=f2- | f2ede2e2 | d4z2
+_B2 | A2_B2A2A2 | G6g2 | g2=f2e2e2 | d4z2
+d2 | g4g4 | =f4d4 | =f4_e4 | d4z2
+=f2 | d2d2d2_B2 | d2d2d2G2 | c2_B2A2A2 | G4z4
+g4g2g2 | =f4_e4 | d2d2d4 | c2c2c4 | _B4B4
+=f2f2f4 | d4d2d2 | c2c2c4
+_B2B2B2B2 | c2_B2A2A2 | G4_B4
+c3cG2A2 | _B3cd3_e | =f6_e2 | d2c2_B2A2 | G6
+
+X:311
+T: Kloesterlein oder Abtweihe
+N: A0360
+O: Europa, Mitteleuropa, Deutschland
+N: J. Ott III Nuernberg 1544 No. 23.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: G
+d2 | d2d2d2d2 | d4d4z2
+d2 | d2d2=f2f2 | c4A4 | G4z2
+d2 | d2d2d2d2 | d2d2z2
+d2 | d2d2=f2f2 | c4A4 | G4z2
+G2 | A4A4 | c4c4 | d4d4 | d6c2 | _B4G4 | =F8
+A6_B2 | c4c2c2 | =f6
+e2 | d6c2 | _B2AGA2A2 | G8
+
+X:312
+T: Bohnenlied
+N: A0361
+O: Europa, Mitteleuropa, Deutschland
+N: Pet. Schoeffer II. 1537 No. 7.
+R: Romanze, Ballade, Lied
+M: 4/2
+L: 1/4
+K: F
+c4d2d2 | G2c2A2B2 | BAGFG2G2 | F8 | z2
+c2c2c2 | d3cB2G2 | B2c2d4 | c8
+c4d2d2 | A2c2A2B2 | BAGFG2G2 | F8 | z2
+c2c2c2 | d3cB2G2 | B2c2d4 | c8 | z2
+c2d2e2 | f3ed2c2 | d4z2
+f2 | c2d2e3d | c2B2A4 | G4z2
+c2 | d2B2c4 | z2c2d2B2 | c4z2
+F2 | c2A2F2c2 | d4c4
+
+X:313
+T: Bohnenlied
+N: A0362
+O: Europa, Mitteleuropa, Deutschland
+N: Pet. Schoeffer II. 1537 No. 6., hier giebt Boehme die vereinfachte
+N: Form nach Werlin 1646 S. 3135.
+R: Romanze, Ballade, Lied
+M: 4/4
+L: 1/8
+K: F
+c2d2d2 | G2c2A3F | G2G2F4 | z2
+c2c2c2 | d3c=B2c2 | =B4c4 | z2
+c2d2d2 | G2c2A3F | G2G2F4 | z2
+c2c2c2 | d3c=B2c2 | =B4c4 | z2
+c2d2e2 | f4z2e2 | d2^c2d4 | z2
+f2d2e2 | f3ed2c2 | B4A4 | z2
+c2d2=B2 | c4z2A2 | B2G2A4 | z2
+F2c2A2 | F2A2G4 | F8 | z2

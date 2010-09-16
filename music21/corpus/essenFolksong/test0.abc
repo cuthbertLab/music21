@@ -1,0 +1,367 @@
+
+X:1
+T: Ich hab die Nacht getrumet
+N: T0003A
+O: Irland
+N: bekannt
+R: Liebeslied
+M: 6/8
+L: 1/16
+K: E
+B,2 | E4F2=G3FE2 | B6F4
+A2 | =G3FE2D4E2 | F6z4
+B,2 | B4B2=G3FE2 | e6=c4
+A2 | =G3FE2F3ED2 | E6z4
+
+X:2
+T: CUCA 1
+N: T0008
+O: Amerika, Mittelamerika, Mexiko
+N: erste Fassung aus der Mex. Revolution. Die Zeilen 1 und 2 (REFRAIN)
+N: knnen wiederholt werden. - Text = beliebige Strophe.
+R: Corrido, gesungene Zeitung
+M: 3/4
+L: 1/8
+K: F
+CCC | F2ACCC | F2A4
+FFEEDD | C3
+CCC | E2GCCC | E2G4
+cdcBAG | F4z2
+CCFFAA | c2A4
+cdcBAc | B2G4
+CCEEGG | B2G4
+cdcBAG | A2F
+
+X:3
+T: CUCA 2
+N: T0008A
+O: Amerika, Mittelamerika, Mexiko
+N: zweite Fassung NACH der Mex. Revolution. Die Zeilen 1 und 2 (REFRAIN)
+N: knnen wiederholt werden.- Text = beliebige Strophe.
+R: Corrido, gesungene Zeitung
+M: 4/4
+L: 1/8
+K: F
+zCCC | Fz2AzCCC | Fz2Az4
+zF2FEEDD | C4
+zCCC | Ez2GzCCC | Ez2Gz4
+zc2dcBAG | A3Fz4
+zC2CFFAA | c3A4-A
+zc2dcBAc | B3G4-G
+zC2CEEGG | B3G4-G
+zc2dcBAG | A3F4-F
+
+X:4
+T: Chiu K'uang (Jiu guang: Weintrunkenheit)
+N: I0001
+O: China
+N: Die Notation sollte im Baáschlssel erfolgen. Transkription nach
+N: Liang Mingyue; ohne seinen besonderen Schluss. Zeile 6, 17 und 30
+N: werden wiederholt! ++++ Zur Lesbarkeit auf C transponiert.
+R: Kunstmusik
+M: 4/2
+L: 1/8
+K: C
+C2dGC2eGC2g2g4 | C2gGC2_aGC2c2c4
+C2cGC2aGC2g2g4 | C2eGC2c2c4
+A2A2e2dcC2c2c4
+A2A2e2dcC2c2c4
+C2deC2egC2g2g4 | C2gaC2acC2c2c4
+C2cGC2_aGC2g2g4 | C2eGC2c2c4
+A2A2e2dcC2c2c4
+C2deC2egC2g2g4 | C2gaC2acC2c2c4
+E2eAD2dGC2c2c4 | E2eAD2dGC2c2c2ed
+A,CC2E2E2DFG2G4 | A,CC2E2E2DFG2G4
+A2A2e2dcC2c2c4
+A2A2e2dcC2c2c4
+C2deC2egC2g2g4 | C2gaC2acC2c2c4
+C2dGC2eGC2g2g4 | C2gGC2_aGC2c2c4
+GcC2e2E2cfG2g4 | GcC2e2E2cfG2g4
+a2a2e2d2C2c2c4 | a2a2e2d2C2c2c4
+E2eAD2dGC2c2c4 | E2eAD2dGC2c2c4
+GcC2e2E2cfG2g4 | GcC2e2E2cfG2g4
+a2a2e2d2C2c2c4 | a2a2e2d2C2c2c4
+E2eAD2dGC2c2c4 | E2eAD2dGC2c2c4
+C2cGC2_aGC2g2g4 | C2eGC2c2c4
+A2A2e2dcC2c2c4
+A2A2e2dcC2c2c4
+C2deC2egC2g2g4 | C2gaC2acC2c2c4
+
+X:5
+T: Sakura
+N: I0001
+O: Asien, Ostasien, Japan
+N: ]
+R: Volkslied
+M: 4/4
+L: 1/8
+K: C
+A2A2B2z2 | A2A2B3z
+A2B2c2B2 | A2BAF3z
+E2C2E2F2 | E2ECB,3z
+A2B2c2B2 | A2BAF3z
+E2C2E2F2 | E2ECB,3z
+A2A2B2z2 | A2A2B4
+z2E2F4 | BAF2E4
+
+X:6
+T: Yang-Guan San Tie (Abschied der Freunde am Yang-Guan
+N: C0001
+O: China
+N: Transkription nach Reinhard. Muss noch verbessert werden!!!! +++++
+N: Die Notation sollte im Baáschlssel erfolgen.
+R: Kunstmusik fr Guqin
+M: 2/4
+L: 1/8
+K: A
+ | A,3B, | D2E2 | E4
+B,3D | F3E | D2E2 | E4
+A2Bd | A4 | F2AB | F2FE | D2EF | A,4
+D3B, | B,2B,2 | A,2B,2 | B,4
+B,3D | F3E | D2E2 | E4
+E3D | B,2D2 | D4
+B,2B2- | B4 | B,2B2- | B4
+B3A | B2AB | F4 | F4
+E3D | B,2D2 | D4 | D4
+F4- | F2D2 | E4
+F4- | F2D2 | E4
+F4 | D2E2
+B,4 | A,2B,2- | B,4 | B,4 | A,2B,2- | B,4
+B3d | e2d2 | f2e2 | e4
+a2bd | a4 | f2ab | f3e | D2E2 | e4
+F2d2 | efd2 | B2de | B3A | A,2AB | A,4
+d3e | f2a2 | af2e | D2E2 | e4
+E3D | B,2D2 | D4
+B,2B2- | B4 | B,2B2- | B4
+B3A | B2AB | F4 | F4
+A4 | B2d2 | B4 | A2D2 | BdB2 | A2F2 | F3E | D4 | D4
+F2F2 | F2E2 | E2E2
+D2D2 | B,2B,2 | D2D2 | E2E2 | F2F2 | A4
+F3E | E2E2 | F2E2 | FEFE | E4- | E4
+
+X:7
+T: Buffalo Dance
+N: C0003
+O: Amerika, USA, San Juan Pueblo
+N: s. Schaffrath 1978b und Teilcurriculum 1979
+R: Tanz
+M: none
+L: 1/8
+K: C
+CC | G2G2G2 | G2AFG2AF | AGFDGFDC | DCC4C2
+CC | G2G2G2 | G2AFG2AF | AGFDGFDC | DCC4C2
+D2EDD2ED | GFDCDCC4 | CCC4C2Cz
+
+X:8
+T: Lullaby
+N: C0004
+O: Amerika, USA
+N: s. Schaffrath Teilcurriculum 1979. Auch auf KA 00115? Die Phrasierung
+N: ist eintaktig, um die Formelhaftigkeit des Liedes zu kennzeichnen. Die
+N: Pausen wurden im Vgl. zur Transkription etwas verkrzt, um die Tne
+N: des Synthi besser ausklingen zu lassen.
+R: Wiegenlied
+M: 4/4
+L: 1/8
+K: Eb
+G4E4
+EB,3E3z
+GF3E4
+EB,3E3z
+EEFGE3z
+E2B,2E3z
+G2E2G3z
+EEG2E3z
+E2B,2E3z
+E2B,2E3z
+GF3E3z
+EB,3E3z
+G4E4
+EB,3E3z
+EEFGE3z
+E2B,2E3z
+G2E2G3z
+EEG2E3z
+E2B,2E3z
+E2B,2E3z
+GF3E3z
+EB,3E4
+
+X:9
+T: Krti
+N: C0005
+O: Asien, Sdasien, Indien
+N: Teiltrankskription!
+N: s. Schaffrath 1978b und Teilcurriculum 1979. Aufnahme vorhanden!
+R: Gesang, Gebet, Krti
+M: 4/4
+L: 1/16
+K: C
+z2C2C2C2G4G4G2 | G6G2F2_E2F2GFED
+E2C2C2C2G4G4G2 | G6G2F2_E2F2GFED
+E2C2C2C2G4G4G2 | G6G2F2_E2F2GFED
+E2E2F2G2GFEDE2C4
+G2A2_B2c6c2 | c16
+G2c2c2c4c2c4 | c6G2c2c2c2A2cA | G16
+
+X:10
+T: Ladrangan Bima Kurda
+N: C0000
+O: Asien, Sdostasien, Indonesion, Java
+N: Pelog Patet Barang.
+N: Entnommen aus Lehrerband "Musik hren-machen-verstehen"
+R: Nuclear Melody
+M: 4/4
+L: 1/8
+K: F
+A2A2A2E2 | A2A2A2E2 | AAEAABcB
+A2A2A2E2 | A2A2A2E2 | A2A2A2E2
+A2EA2BcB | A4A2E2
+A2A2A2E2 | A2A2A2E2 | A2EA2BcB
+A3AcABc | BcAcBcAc | BcAB2Bde | A2EA2BcB
+A3AcABc | BcAcBcAc | BcAB2Bde | A2EA2BcB
+A3AcABc | Bcefe2cB
+A3AcABc | Bcefe2cB
+ABFEEFAB | AcBABFAF
+EBABcBAF | E^DEDBAFB
+ABFEEFAB | AcBABFAF
+EBABcBAF | E^DEDBAFB
+A2A2A2E2 | A2A2A2E2 | A2A2A2E2
+A2EA2BcB | A8
+
+X:11
+T: Alamuhan
+N: C1154
+O: Asien, Ostasien, Xinjiang
+N: Wegen besserer Textverteilung in ESTAFF wurde die erste (wiederholte)
+N: Phrase noch einmal getrennt. Dasselbe gilt fr die letzte und vor-
+N: letzte. In die ersten beiden Zeilen gehren nun Wiederholungszeichen.
+N: Die Tonart wurde wegen der Textverteilung hochgesetzt. Hat jemand den
+N: original uigurischen Text?
+R: Qingge
+M: 4/4
+L: 1/16
+K: F
+CFFFEFG2A6f2
+edcBAFG2F4z4
+z2ccc3dfff2z4
+z2fff2d2ddc2z4
+z2fff2f2ded2c4
+z2ccA2A2GGA2z4
+CFFFc2B2A6f2
+edcBAFG2F4z4
+ccccccB2A6f2
+edagfde2f4z4
+
+X:12
+T: Taiyang chulai xiyangyang
+N: C0260
+O: China, Sichuan, Ostteil
+N: Die Gattungsbzeichnung gilt den Fuellwoertern, die den Klang des Gongs
+N: "Luo" imitieren.  Die Saengerin Lei Huilan ist Angehoerige der Zhuang
+N: Minderheit und studiert an der Guangzhouer Musikhochschule.
+N: aufgenommen am 5.5.87 +++ Komischer Grundton? +++
+N: +++ AUCH AUF KASSETTE 1 = 46 CUT 2 (A-Seite) +++ MEHRMALS ! +++
+N: Grundton liegt in der zweigestrichenen Oktave; Verzierung
+N: Als Tonbeispiel vorhanden; Signatur: 00151, Cut Nr.: 17
+N: Nach chinesischer Auffassung ist dies ein Zweizeiler (A-B).
+R: Shange, Luoer diao
+M: 2/4
+L: 1/8
+K: D
+efed | e2fz
+defe- | edBz
+ABdB | eeB2 | A2Bz
+dBed- | dBe2- | e4
+
+X:13
+T: Muwaschah Lamma Bada
+N: C0000
+O: Asien, Vorderer Orient, gypten(?), Spanien(?)
+N: Die ersten vier Zeilen werden wiederholt.
+R: Textgebundene Musik
+M: none
+L: 1/16
+K: G
+d2 | g4a_bcbbaaggfg4ab
+c4d2b3aaggfg4ag
+f4g2_e3dedefd4ed
+c4d2B3AAAGGFG4d2
+g4abcbbaaggfg4d2
+g4a2b4b2acb4g2
+d4c2cbbaagg=fg2abf2
+g4a2b4b2acb4ab
+c4d2b3aagg^fg4ag
+f4g2f=e_ededefd4ed
+c4d2B3AAGGFG4AB
+c4d2B3AAGGFG4z2
+
+X:14
+T: Mevlevi Ayini
+N: C0000
+O: Asien, Vorderer Orient, Trkei (?)
+N: Die Wiedergabe der Umschrift ist sehr unvollkommen!!!
+R: Improvisation beim Kaffeestampfen
+M: none
+L: 1/16
+K: G
+A4G2B2c2d4e4d2d2e2d2c2
+d2c2B2c4d4d4G2d2c2c2d2
+e2d2c2B2c2d4c4B2c4d2c2
+B2A2BcB2c2B2A2c2B2A2B4c4
+d4z2e4d4c4B2A2B2G4
+d6c2B2A4e2e2d2d6z2
+A4G2B2c2d4e4d2d2e2d2c2
+d2c2B2c4d4-d4G2d2c2c2d2
+e2d2c2B2c2d4c4B2c4d2c2
+B2A2BcB2c2B2A2c2B2A2B4c4
+d4z2e4d4c4B2A2B2G4
+d6c2B2A4e2e2d2d6z2
+A4G2B2c2d4e4d2d2e2d2c2
+d2c2B2c4d4-d4G2d2c2c2d2
+e2d2c2B2c2d4c4B2c4d2c2
+B2A2BcB2c2B2A2c2B2A2B4c4
+d4z2e4d4c4B2A2B2G4
+
+X:15
+T: Muaschah "Imla-li"
+N: C0000
+O: Asien, Vorderer Orient, Syrien (?)
+N: Die b werden hier oft als weiter erniedrigt angegeben.
+N: Die Zeilen 1 bis 10 werden wiederholt.
+R: Vokalform in der Kunstmusik
+M: none
+L: 1/32
+K: D
+D8=F4E2F2D2E2=CD2_B,2C2A,2C2A,2B,2G,4
+C4B,4C4D2E2D2E2F2G2F2E2D8B,2C2
+D6C2B,2C2D4G4-G2G2F2G2A2G2G2F2F2E2
+G2F2F2E2E2D2E2D2C2F2-^F2E4=F2G2F2E2D2D4
+A6G2A2G2-G2G2F2G2F2E2D2E2F8E4
+F2G2F4E4F2G2F2E2F2G2F2E2F2G2F4G4
+G2F2E2D2D4A2G2F2G2F2E2D2E2F12
+C8B,4C2D2C2B,2C4D2D2F4F2E2E2D2
+D2C2C2B,2B,2A,2A,4zG2-GG2F2E2A2G2G2F2F2E2
+G2F2F2E2E2D2E3DC2F2-^F2E4=F2G2F2E2D2D4
+D6G2F2G2A8G3AG2A2A8A4
+A8A4B3AG2c2-^c2B2=c2d2c2B2A2A4
+A8A4G8A2B2c2d2c2B2A2G2F2E2
+D4z2A2B2c2d8c2d2B2c2d8d4
+c4B4A3BA2G2c2-^c2A4A2G8A4
+F8F2E2F8A2G2F2G2A2G2G2F2F2E2
+G2F2F2E2E2D2E3D=C2F2-^F2E4=F2G2F2E2D2D4
+
+X:16
+T: Farewell to the Warriors
+N: C0000
+O: Amerika, USA
+N: Zum Vergleich mit der Komposition von Griffes. Grundton gendert.
+N: Die Tonbandangabe bezieht sich auf Griffes. Weitere Chippewa-
+R: NN
+M: 3/4
+L: 1/16
+K: D
+D3D | A6d2A3G | A8
+d2d2 | =c6d2 | A4G8
+=F2D2F6A2 | =F3DF8
+A6GAGF2D2 | G3=FD3=C | D8

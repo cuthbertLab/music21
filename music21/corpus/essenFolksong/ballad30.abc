@@ -1,0 +1,2493 @@
+
+X:1
+T: Ritter und Magd
+N: Q2055
+O: Mitteleuropa, Niederlande, West - Flandern
+N: Originalquelle, vgl. Q0055A. Niederlaendische Fassung der Ballade.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: none
+L: 1/4
+K: D
+D2E2=FF2D4 | A2B2dA4
+D2A2B=c4 | B2B2A2B2A2G2=FF4
+F2F2GA4A2 | D2E2=F2G4
+=C2D2E2F4 | D2E2DD4=C4D2
+
+X:2
+T: Ritter und Magd
+N: Q2055A
+O: Mitteleuropa, Niederlande, West - Flandern
+N: Vom Hg. metrisierte und korrigierte Fassung von Q0055 .
+N: Niederlaendische Fassung der Ballade.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 3/2
+L: 1/4
+K: D
+DE=F | D3AB=c | A2z
+DAB | =c3BBA | G2=F
+FFG | A2ADE=F | G2z
+=CDE | =F3DED | D=CD
+
+X:3
+T: Ritter und Magd
+N: Q2055B
+O: Mitteleuropa, Niederlande
+N: Chaotische Takteinteilung. Entsprechend der Originalquelle hier
+N: Taktwechsel kodiert. Niederlaendische Fassung der Ballade.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 3/4
+L: 1/16
+K: G
+A2B2B2d2 | B4c4d3e | d6
+B2c2c2d2 | e2e2e2e2d2e2 | d4B4 | z2
+d2e2d2e2 | d4d4d2c2B2 | c4
+d3c | B2A2B2d3c | A4G4 | z2
+d2e2f2g2 | d4d3ed2c2B2 | c4
+d3c | B2A2B2d3c | A4G4 | z2
+
+X:4
+T: Ritter und Magd
+N: Q0055C
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Nassau
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/8
+K: F
+C | FFAccd | ccAF2
+c | f2fedc | d3c2
+c | ddefed | c2BAA
+d | c2GB2B | B2cA2
+
+X:5
+T: Ritter und Magd
+N: Q0055D
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Wetterau
+N: Moeglicher Taktwechsel zum 2/4 angemerkt.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 3/4
+L: 1/8
+K: G
+DGA | B3ABc | d3
+Bcd | e2d2c2 | B2z
+GBd | A3cBd | G3
+ABc | d2B2A2 | G2z
+
+X:6
+T: Ritter und Magd
+N: Q0055E
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Oberhessen, Kr. Alsfeld,
+N: Moeglicher Taktwechsel zum 2/4 angemerkt.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 3/4
+L: 1/16
+K: G
+D2G2A2 | B6A2B2c2 | d6
+B2c2d2 | e4d4c4 | B4z2
+GAB2d2 | c6d2B2d2 | A4z2
+GAB2d2 | B6d2A4 | G4z2
+
+X:7
+T: Ritter und Magd
+N: Q0055F
+O: Mitteleuropa, Deutschland (DDR) , Sachsen - Anhalt,
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/4
+L: 1/16
+K: G
+D2 | G2D2B,2D2 | G3FG2
+B2 | A3FG2E2 | E2D2D2
+DD | E2E2E2GE | E2D2D2
+D2 | G3AB2G2 | A4G2
+
+X:8
+T: Ritter und Magd
+N: Q0055G
+O: Osteuropa, UdSSR, Russland, Kreis Leningrad, Kamenka
+N: Grundton in der eingestrichenen Oktave.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/4
+L: 1/8
+K: C
+G, | CG,E,G, | CCC
+E | DCB,A, | A,G,G,
+C | F,F,CF, | E,G,C
+C | B,DFB, | DCC
+
+X:9
+T: Ritter und Magd
+N: Q0055H
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Kr. Liegnitz,
+N: Anhaengsel an der zweiten Zeile.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/8
+K: Bb
+F | BAGFDF | BAGF2
+F | BBBcBc | B2dc2d | F2AB2
+
+X:10
+T: Ritter und Magd
+N: Q0055I
+O: Osteuropa, Ungarn, Nemetker Komitat Tolnau
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/2
+L: 1/8
+K: G
+G2 | B2G2G2B2 | A2AGF2
+E2 | G2E2G2E2 | D2G2D2
+DD | E2CCC2EE | D2DCB,2
+D2 | G2G2B2G2 | A4G2
+
+X:11
+T: Ritter und Magd
+N: Q0055J
+O: Osteuropa, Ungarn, Nemetker Komitat Tolnau
+N: Zweistimmig notiert. Oberstimme kodiert.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/4
+L: 1/8
+K: G
+B2 | d4d2d2B2A2 | G4B2B2B2
+d2 | A4B2c2d3c | c2B2z6
+d2 | d4g2g4g2 | g2a2g2f2d2
+c2 | B4d2g4B2 | e2d2z6
+d2 | d4g2b4a2 | a2g2z6
+
+X:12
+T: Ritter und Magd
+N: Q0055K
+O: Mitteleuropa, Deutschland (BRD) , nordwest - deutsch ?
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 4/4
+L: 1/8
+K: C
+CE | G2G2GAFD | C2E2E2
+E2 | D3EF2G2 | F2E2z2
+G2 | G3Ec3B | B2A2A2
+A2 | G3ce2d2 | d2c2z2
+
+X:13
+T: Ritter und Magd
+N: Q0055L
+O: Mitteleuropa, Deutschland (BRD) , Hessen - Nassau
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2G3A | B2B2B2
+GB | d2d2e2e2 | d3cB2
+GB | d2d2e3d | d2ced2
+dc | B2B2d2B2 | A4G2
+
+X:14
+T: Ritter und Magd
+N: Q1055M
+O: Osteuropa, Tschechoslowakei, Boehmen
+N: Melodievergleich zu Q0055B, D, und E; anderes Lied.
+R: geistlich
+M: 3/2
+L: 1/4
+K: G
+GGG | c3ABc | d2z
+ddd | g2efe2 | d2z
+ddd | e3dcB | A2z
+ddd | c2dBA2 | G3
+
+X:15
+T: Ritter und Magd
+N: Q1055N
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0055C, anderes Lied. Vereinfachte Fassung von
+N: Q0024D (Band 1, S. 271) .
+R: ???
+M: 6/4
+L: 1/8
+K: F
+F2F2G2 | A4B2c4A2 | F2
+f4f2f2f2 | e2c2d4 | c2z2
+F2c4f2 | e2c2d2c4c2 | A2
+d2c3B | A2F2G4 | F2
+
+X:16
+T: Ritter und Magd
+N: Q1055O
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0055C, anderes Lied.
+R: ???
+M: 6/4
+L: 1/4
+K: F
+FFG | ABcA | F2z
+fff | ecd2 | c2z
+Fcf | dcdd | c2z
+Adc | BAG2 | F2z
+
+X:17
+T: Ritter und Magd
+N: Q0055P
+O: Mitteleuropa, Deutschland (BRD) , Westfalen, Hillnhuetten
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: F
+C2F4G2 | A4B2c2dcBG | F4
+F2f2e2d2 | g2e2c2d6 | c4
+c2d4d2 | B4B2f2f2fd | c4
+A2d2B2G2 | c2A2F2G6 | F4
+
+X:18
+T: Ritter und Magd
+N: Q0055Q
+O: Mitteleuropa, Schweiz
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: F
+C2F4A2 | c3cc2d2f2d2 | c4
+c2f2e2d2 | c4B2A4B2 | c4
+c2d4d2 | d3ef2c2c2A2 | c4
+A2G2GGd2 | c2B2A2G3AG2 | F4
+c2d4d2 | d3ef2c2c2A2 | c4
+A2G2GGd2 | c2B2A2G3AG2 | F4
+
+X:19
+T: Ritter und Magd
+N: Q0055R
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Nassau
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: F
+C2 | F2F2A2c2c2c2 | A4AGF2z2
+F2 | f4f2f2d2B2 | d6c4
+B2 | A2c2c2f2d2d2 | d2c2c2c2z2
+A2 | G2d2d2d2c2B2 | B6A4
+
+X:20
+T: Ritter und Magd
+N: Q2055S
+O: Nordeuropa, Daenemark
+N: Daenische Fassung der Ballade. Dritte Zeile = Refrain auf
+N: sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 4/4
+L: 1/8
+K: A
+E | AGAFE2EE | AGAFE3
+E | AGABc2ec | B4Az2
+E | AGAFE3E | AGAFE3
+E | AGABc2ec | B4Az2
+
+X:21
+T: Ritter und Magd
+N: Q1055T
+O: Mitteleuropa, Deutschland
+N: Melodievariante zu Q0055F, anderes Lied.
+R: Ansinge- , Dreikoenigs - Lied, Brauchtum
+M: 4/4
+L: 1/8
+K: Bb
+F2 | BBF2B2d2 | dcc2B2
+d2 | d2c2c2B2 | A2G2F2
+F2 | B2F2Bdd2 | F2GAB2
+
+X:22
+T: Ritter und Magd
+N: Q0055U
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/4
+L: 1/16
+K: Bb
+F2 | BBF2DDF2 | B2A2B2
+d2 | c2A2BBG2 | G2F2F2
+F2 | G2G2G2G2 | F2F2F2
+F2 | B2B2ddB2 | F4B2
+
+X:23
+T: Ritter und Magd
+N: Q0055V
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 4/4
+L: 1/8
+K: Bb
+B2 | ddB2FFB2 | ccc2c2
+c2 | d2A2BBG2 | G2F2F2z2
+G2G2G2BG | F2F2F2
+F2 | B2B2dcB2 | F2F2B2
+
+X:24
+T: Ritter und Magd
+N: Q0055W
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: Bb
+B2 | d3BB2B2B2B2 | c4c2c4
+c2 | d2B2BBB2A2G2 | G4F2F4z2
+G4G4G4B2G2 | F4F4F4
+F4 | B2B2BBc2d2e2 | F4A2B4
+
+X:25
+T: Ritter und Magd
+N: Q0055X
+O: Mitteleuropa, Deutschland (BRD) , Westfalen
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 4/4
+L: 1/8
+K: D
+FG | A2AAA2Bc | d2cBA2
+Bc | d3BAGFG | A3FD2z2
+GABAGBdB | BAAAA2
+A2 | B2A2g2fe | d2c2d2
+
+X:26
+T: Ritter und Magd
+N: Q0055Y
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Grundton in der zweigestrichenen Oktave.
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/8
+K: C
+G, | C2B,C2D | E2FE2
+C | D2CD2E | D3C2
+G, | C2B,C2D | E2FE2
+C | D2CD2E | D3C2
+
+X:27
+T: Ritter und Magd
+N: Q0055Z
+O: Mitteleuropa, Deutschland (BRD) , Nord - Bayern, Franken
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: F
+FGA4A2 | F2F2G2A4A2 | F4
+G2A4A2 | B2A2G2G4A2 | F4
+FGA4AA | F4FGA4A2 | F4
+FGA4A2 | B3AG2G4A2 | F4
+
+X:28
+T: Ritter und Magd
+N: Q0055a
+O: Mitteleuropa, Deutschland (BRD) , Nord - Bayern, Franken
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: F
+FA | c3BA2f2e2d2 | d4c2c4
+AB | c4c2f2e2d2 | d4c2c4
+cc | f2c2A2c4AA | B2A2G2f4
+d2 | c4A2c2B2A2 | G4A2F4
+
+X:29
+T: Ritter und Magd
+N: Q0055b
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2GGG2 | A2F2D2z
+G | D2D2EEE2 | F2G2G2
+BB | B2BBc2AA | G2G2G2z
+G | D3DEEE2 | F2G2G2
+
+X:30
+T: Ritter und Magd
+N: Q0055c
+O: Osteuropa, Tschechoslowakei, Sudetenland
+N: Grundton in der zweigestrichenen Oktave.
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/4
+L: 1/16
+K: D
+A,2 | F3FFFEE | D3DD2A,2
+D3DG2F2 | F4E2
+A,2 | E2EEE2D2 | C3CC2
+B,2 | A,2A,2F2E2 | E4D2
+
+X:31
+T: Ritter und Magd
+N: Q0055d
+O: Mitteleuropa, Deutschland (DDR) , Sachsen - Anhalt
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2G2FE | E2D2D2
+D2 | D3GB3A | A2G2z2
+D2 | G2G2G2FE | E2D2D2
+D2 | D3GB3A | A2G2z2
+
+X:32
+T: Ritter und Magd
+N: Q0055e
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/8
+K: F
+C | F2FAFA | c2cA2
+G | AGAd2c | G3F2
+C | F2FF2A | F2FC2
+C | F2Ac2A | G3Fz
+
+X:33
+T: Ritter und Magd
+N: Q0055f
+O: Suedosteuropa, Jugoslawien, Slawonien
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: F
+C2 | C2F2F2F2G2A2 | A2G2G2G4
+C2 | F2A2c2c2B2A2 | G6F4
+cc | c4G2A4c2 | c2B2A2G4
+C2 | F2A2c2c2B2A2 | G6F4
+
+X:34
+T: Ritter und Magd
+N: Q0055g
+O: Osteuropa, UdSSR, Russland, Wolgagebiet
+N: 12/8 - Taktwechsel in 6/8 geaendert. Tempowechsel; Verzierung
+N: (Vorschlag) in der zweiten Zeile.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: G
+D2 | G3GB2A2B2c2 | d3ec2A6 | z6
+d4B2 | e2d2c2B2A2G2 | B6G4
+B2 | d3ed2c4d2 | B2c2B2A6 | z6
+d4B2 | c4B2A4G2 | B6G4
+
+X:35
+T: Ritter und Magd
+N: Q0055h
+O: Mitteleuropa, Deutschland (DDR) , Provinz Sachsen - Anhalt, Altmark
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 4/4
+L: 1/8
+K: F
+F2 | A2A2AGGG | FFAAc2
+A2 | c2c2ccff | A2G2B2
+G2 | F2F2AABB | c2A2F2
+
+X:36
+T: Ritter und Magd
+N: Q0055i
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Strehlen
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/4
+L: 1/16
+K: G
+D2 | D2G2G2G2 | G2B2d2
+d2 | e2ddc2A2 | G4F4 | G4z2
+
+X:37
+T: Ritter und Magd
+N: Q0055j
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Strehlen, Krummendorf
+N: Pausen am Ende der dritten und letzten Zeile eingefuegt.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/4
+L: 1/16
+K: G
+G2c2B2 | AAG2F2F2 | G4
+d4 | e2d2c2A2 | A4G2z2 | z2
+G2c2B2 | A2G2F2F2 | G4
+d4 | e2d2c2A2 | A4G2z2 | z2
+
+X:38
+T: Ritter und Magd
+N: Q0055k
+O: Mitteleuropa, Deutschland (BRD) , Hessen
+N: Vorder- und Nachsatz in verschiedenen Tonarten.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: G
+D2 | D2G2G2G2F2E2 | E2D2D2D4
+D2 | D2G2G2G2A2B2 | B6A4
+G2 | A2A2A2d2^c2B2 | A4A2F4
+A2 | A3GG2G2A2B2 | B6A2z2
+G2 | A2A2A2d2^c2B2 | A4A2F4
+A2 | A3GG2G2A2B2 | B6A2z2
+
+X:39
+T: Ritter und Magd
+N: Q0055l
+O: Mitteleuropa, Deutschland (BRD) , Nord - Bayern
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/8
+K: F
+c | A2cc2d | c2cf2
+c | d2efed | d3c2
+A | B2dc2B | A2fc2
+A | G2dc2A | G3F2
+
+X:40
+T: Ritter und Magd
+N: Q0055m
+O: Osteuropa, Ungarn (deutsch - ungarisch)
+N: Verselbstaendigter Vordersatz ?
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 6/8
+L: 1/16
+K: C
+G,2 | E4E2E2E2F2 | A3GG2G4
+E2 | A4G2F4D2 | F6E4
+G,2 | E4E2E4F2 | A4G2G4
+E2 | A4G2F4D2 | F6E4
+
+X:41
+T: Ritter und Magd
+N: Q0055n
+O: Osteuropa, UdSSR, Russland, Wolgagebiet
+N: Verselbstaendigter Vordersatz ?
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 3/4
+L: 1/16
+K: G
+D2G2A2 | B4A2G2FAA2 | A4G2
+E2D2D2 | d4c2A2d2c2 | B6
+
+X:42
+T: Ritter und Magd
+N: Q2055o
+O: Nordeuropa, Daenemark
+N: Daenische Fassung der Ballade.
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/4
+L: 1/16
+K: G
+G | B4G3A | B4d2B2 | B2A2A2G2 | F4z3
+G | A4F3G | A4B2G2 | E8 | D4z3
+G | G4z3D | D4z3B, | E4D3C | D4z3
+D | G3FG3A | B4d2B2 | A8 | G4z3
+
+X:43
+T: Ritter und Magd
+N: Q2055p
+O: Suedosteuropa, Jugoslawien, Kroatien
+N: Kroatische Fassung der Ballade.
+N: Dritte und vierte Zeile = Refrain, dritte Zeile auf sinnfreie Silben.
+R: Ballade, Betrug, Schwangerschaft, Tod, Selbstmord, Herr und Magd
+M: 2/4
+L: 1/16
+K: G
+ | G3DD2D2 | G2G2G2
+B2 | A3GF2E2 | E4D4
+D3ED2C2 | B,2B2B4
+c2F2E2F2 | G4G2z2
+
+X:44
+T: Wiedersehen an der Bahre
+N: Q0056
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Verzierung (Nachschlag) in der zweiten Zeile.
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 4/4
+L: 1/16
+K: G
+D3D | B6A2c2B2A2G2 | A6G2F4
+D3F | A4A2D2c4B3A | A4G4z4
+G2F2 | E4E4G4F2E2 | D3FF3Ad4c2
+A2 | G6B2d4c2A2 | A4G4z4
+
+X:45
+T: Wiedersehen an der Bahre
+N: Q0056A
+O: Mitteleuropa, Schweiz, Kt. Zuerich, Wehntal
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: F
+C2 | F3FF4G2G2 | A3AA6
+A2 | G2A2c4B2G2 | G4A4z2
+A2 | B2d2d4c2B2 | A2f2c4A2
+A2 | G2c2c4B2G2 | G4A4z2
+A2 | B2d2d4c2B2 | A2f2c4A2
+A2 | G2c2c4B2G2 | G4A4z2
+
+X:46
+T: Wiedersehen an der Bahre
+N: Q0056B
+O: Mitteleuropa, Deutschland (BRD) , Rheinprovinz, Hunsrueck
+N: Eingeklammerte Note am Zeilenanfang weggelassen.
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 3/4
+L: 1/8
+K: F
+FG | A2A2Bd | c2z
+cde | f2e2d2 | c2z
+cfe | d3cBd | c2z
+AFG | Acc2B2 | A2z
+cfe | d3cBd | c2z
+AFG | Acc2B2 | A2z2
+
+X:47
+T: Wiedersehen an der Bahre
+N: Q0056C
+O: Mitteleuropa, Deutschland (BRD) , Rheinland, Wuppertal, Beyenburg
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 3/4
+L: 1/8
+K: Eb
+E | EGB2AG | BFF2z
+F | FcB2F2 | A2G2z
+B | Bdf3A | GBe3
+e | dcB2F2 | A2G2z
+
+X:48
+T: Wiedersehen an der Bahre
+N: Q0056D
+O: Mitteleuropa, Schweiz, Aargau
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+D2 | D3BB4A2G2 | G2A2D4z2
+D2 | D3cc4B2A2 | A4G4z2
+GF | E3FG4F2E2 | D2G2B4z2
+B2 | A2B2d4c2A2 | A4B4z2
+GF | E3FG4F2E2 | D2G2B4z2
+B2 | A2B2d4c2A2 | A4G4z2
+
+X:49
+T: Wiedersehen an der Bahre
+N: Q0056E
+O: Mitteleuropa, Deutschland (BRD) , Baden
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 4/4
+L: 1/16
+K: G
+D4 | G4G4B4A2G2 | A4A4A4
+D2F2 | A6B2c4B2A2 | A8B4
+G4 | E2E2E2E2G4F2E2 | E4D2G2B4
+A2G2 | F3FA3Ad4c3F | A8G4
+G4 | E2E2E2E2G4F2E2 | E4D2G2B4
+A2G2 | F3FA3Ad4c3F | A8G4
+
+X:50
+T: Wiedersehen an der Bahre
+N: Q1056F
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Melodievergleich mit Q0056 , anderes Lied.
+R: historisches Lied, Napoleon
+M: 3/4
+L: 1/16
+K: G
+D2E2D2 | B6G2A2G2 | F4z2
+D2E2D2 | c4B2A2A4 | G4z2
+G2F2A2 | d4c2A2G2B2 | B2cBA2
+G2F2A2 | d4c2A2A4 | G4z2
+
+X:51
+T: Wiedersehen an der Bahre
+N: Q1056G
+O: Mitteleuropa, Deutschland / Frankreich, Elsass
+N: Eingeklammerte Note weggelassen. Melodievergleich mit Q0056,
+N: anderes Lied "Napoleonlied" .
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+D2E2F2 | G4F2E2G3G | D8
+D2E2F2 | G2G2F2E2G4 | D6
+G2F2A2 | d4c2d2B3B | B4A2
+G2F2A2 | d4c2A2A2c2 | B4z2
+G2F2A2 | d4c2d2B3B | B4A2
+G2F2A2 | d4c2A2A2c2 | B4z4
+
+X:52
+T: Wiedersehen an der Bahre
+N: Q0056H
+O: Mitteleuropa, Deutschland (BRD) , Wuerttemberg, Schwaebische Alb
+N: Eingeklammerte Note nicht mitgespielt.
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+ | D3GG4F2E2 | E3DD4z2
+D2 | D3GG4F2E2 | E4D4z2
+G2 | F2A2d4c2d2 | B2B2B4A2
+G2 | F2A2d4c3F | F4G4z4
+
+X:53
+T: Wiedersehen an der Bahre
+N: Q0056I
+O: Mitteleuropa, Deutschland (BRD) , Rheinpfalz, Hunsrueck
+N: Einzige vollstaendige Melodie aus einer etwas wirren Melodietafel.
+N: Eingeklammerte Noten nicht gespielt. Pause am Liedende korrigert.
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 3/4
+L: 1/8
+K: F
+FA | c3cde | f3
+cde | f2e2d2 | c3
+cfe | d3cBd | c3
+AFG | Acc2B2 | A2z
+cfe | d3cBd | c3
+AFG | Acc2B2 | A2z2
+
+X:54
+T: Wiedersehen an der Bahre
+N: Q0056J
+O: Mitteleuropa, Deutschland (BRD) , Rheinprovinz
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: F
+C2C2A2 | A4G2F2B2A2 | G4z2
+G2G2c2 | c4B4G2G2 | A4z2
+F2F2f2 | f4e3dd3c | c4z2
+A2G2F2 | c4B3GG4 | A4z2
+
+X:55
+T: Wiedersehen an der Bahre
+N: Q0056K
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Kurhessen
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 6/8
+L: 1/16
+K: F
+F2 | F4A2c4A2 | A4G2G4
+G2 | G4d2c4B2 | B6A4
+c2 | c4egg4B2 | A4cff4
+f2 | e4d2c4B2 | B6A4
+c2 | c4egg4B2 | A4cff4
+f2 | e4d2c4B2 | B6A4
+
+X:56
+T: Wiedersehen an der Bahre
+N: Q0056L
+O: Mitteleuropa, Deutschland (DDR) , Sachsen, Erzgebirge
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 4/4
+L: 1/8
+K: F
+F | F2A2c3A | B2B2G3
+G | G2d2c2B2 | B2A4z
+A | A2c2f3A | G2B2e3
+d | c2d2c3B | B2A4z
+A | A2c2f3A | G2B2e3
+d | c2B2A3G | G4F2z
+
+X:57
+T: Wiedersehen an der Bahre
+N: Q0056M
+O: Mitteleuropa, Oesterreich, Ostmark, Burgenland
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 2/4
+L: 1/16
+K: F
+c2 | d3cB2A2 | c2c2G2
+c2 | d3cB2A2 | c2G2z2
+c2 | f2e2g3f | e3df2
+ce | e3dc3B | B2A2z2
+c2 | f2e2g3f | e3df2
+ce | e3dc3B | B2A2z2
+
+X:58
+T: Wiedersehen an der Bahre
+N: Q0056N
+O: Osteuropa, Ungarn, Suedungarn, Komitat Tolnau
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 5/8
+L: 1/8
+K: F
+A | cAA2A | AGG2
+G | Gdd2G | BA2z
+c | Acf2A | GBd2
+f | edc2G | BA2z
+c | Acf2A | GBd2
+f | edc2G | BA2z
+
+X:59
+T: Wiedersehen an der Bahre
+N: Q0056O
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Oberschlesien,
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 4/4
+L: 1/8
+K: F
+FFA | c2c2B2c2 | A6
+F2 | B3df2ed | d2c4
+c2 | dcBA | AGG
+F | EGc3B | d2c4
+c2 | dcBA | AGG
+F | EGc3B | B2A2z
+
+X:60
+T: Wiedersehen an der Bahre
+N: Q0056P
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+R: Ballade, Abschied, Enttaeuschung, Tod, Selbstmord
+M: 6/4
+L: 1/4
+K: G
+GD2G | _B2AG2=F | G2
+=F_B2c | d2=fd_Bc | d2
+d=f2d | _edcd2c | _B2
+dd2c | c_BAG2=F | G2
+
+X:61
+T: Jungfer Doertchen
+N: Q0057
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Odenwald, Neunkirchen
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/8
+L: 1/8
+K: G
+GB2A | G2Bd2c | B2
+dcBA | edcB2A | B2
+dcBA | edcB2A | B2
+
+X:62
+T: Jungfer Doertchen
+N: Q0057A
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Niederlausitz,
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/8
+L: 1/16
+K: G
+GAB4A2 | G4d2g4dc | B4
+d2A4d2 | B4GAB4A2 | G4
+d2A4d2 | B4GAB4A2 | G4
+
+X:63
+T: Jungfer Doertchen
+N: Q0057B
+O: Suedosteuropa, Jugoslawien, Gottschee
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+D4G2B2 | d4d4e2e2 | d2
+edc2d2 | B2d2d4c2d2 | B4
+
+X:64
+T: Jungfer Doertchen
+N: Q0057C
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Odenwald
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+G2G2B2 | d6e2d3e | d4B2
+B2A2d2 | c4c2d2A3c | c4B2
+G2G2B2 | B6d2d3e | d4B2
+B2A2d2 | c6d2A3c | c4B2
+
+X:65
+T: Jungfer Doertchen
+N: Q0057D
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Nassau, Ellershausen
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/8
+L: 1/16
+K: G
+D2G4e2 | d3ed2c4d2 | B4
+D2G4e2 | d3ed2c4d2 | B4
+c2c3de2 | e2d2c2c3de2 | d4
+d2A3Ae2 | e3dc2d3edc | B4
+c2c3de2 | e2d2c2c3de2 | d4
+d2A3Ae2 | e3dc2d3edc | B4
+
+X:66
+T: Jungfer Doertchen
+N: Q0057E
+O: Suedosteuropa, Jugoslawien, Gottschee, Rieg
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/4
+L: 1/4
+K: G
+GB2B | d2BdcA | G2
+GcBA | G2GcBA | G2
+GB2B | d2BdcA | G2
+
+X:67
+T: Jungfer Doertchen
+N: Q0057F
+O: Suedosteuropa, Jugoslawien, Gottschee, Lichtenbach
+N: Dritte Zeile = Refrain.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/4
+L: 1/8
+K: G
+DFG2F2E2 | D4
+EFG2F2E2 | D4
+D2G2A2Bc | d4
+dcB4A2 | G4
+AcB4A2 | G2z2
+
+X:68
+T: Jungfer Doertchen
+N: Q0057G
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg
+N: Eigentlich Vierzeiler.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/8
+L: 1/16
+K: G
+D2B4A2 | G4Bdg4dc | B4
+d2A4B2 | c2c2A2B4A2 | G4
+d2A4B2 | c2c2A2B4A2 | G4
+
+X:69
+T: Jungfer Doertchen
+N: Q0057H
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/8
+L: 1/16
+K: G
+G2B3cB2 | G2B2d2g2e2d2 | B4
+d2A2A2B2 | c4d2B4A2 | G4
+d2A2A2B2 | c4d2B4A2 | G4
+
+X:70
+T: Jungfer Doertchen
+N: Q0057I
+O: Suedosteuropa, Jugoslawien, Gottschee
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 4/4
+L: 1/8
+K: G
+GBd2d2 | d2Bcd2c2 | B2
+e2d2d2 | B2AcB2A2 | G2
+
+X:71
+T: Jungfer Doertchen
+N: Q2057J
+O: Nordeuropa, Schweden
+N: Textverwandte Ballade aus Schweden. Modulation in die parallele
+N: Molltonart.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/4
+L: 1/8
+K: G
+GAB2B2A2 | G2G2B2d2d2c2 | B2z2
+B2d2d2d2 | d2c2B2B2A2B2 | G2z2
+GAB2B2A2 | G2G2B2d2d2c2 | B2z2
+A2B4D2 | E4F2G4F2 | E4
+
+X:72
+T: Jungfer Doertchen
+N: Q0057K
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: "Typische Unterstimme"
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 4/4
+L: 1/8
+K: G
+cA | B3AGDG2 | A2G2D2
+DF | A2c2BcBA | G2A2G2
+
+X:73
+T: Jungfer Doertchen
+N: Q1057L
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Melodievergleich zu Q0057 , anderes Lied. Verzierung (Schlussfloskel)
+N: Schlusspause ergaenzt.
+R: Hochzeits- , Brauchtums - Lied
+M: 4/4
+L: 1/8
+K: G
+Ac | B3AGFGB | A2G2F2
+FG | ABc2B2AB | G4F4 | G2z4
+
+X:74
+T: Jungfer Doertchen
+N: Q1057M
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Melodievergleich zu Q0057 , anderes Lied. "Typische Oberstimme"
+R: Marien - Lied, geistlich
+M: 4/4
+L: 1/8
+K: G
+B2d2c2 | BGBdc2B2 | A2
+ABcde2 | dedcB2A2 | B2
+
+X:75
+T: Jungfer Doertchen
+N: Q1057N
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Melodievergleich zu Q0057 , anderes Lied (Lied vom heiligen Kreuz) .
+N: Takt rhythmisch korrigiert: Pause ergaenzt.
+R: geistlich
+M: 2/4
+L: 1/8
+K: G
+d2 | dBdB | d2e2 | dcB2 | z3
+A | dedc | B2A2 | B2
+
+X:76
+T: Jungfer Doertchen
+N: Q0057O
+O: Osteuropa, UdSSR, Russland, Wolgakolonie
+N: Zweistimmig notiert, Oberstimme kodiert. Verzierungen (Vorschlaege)
+N: in der ersten und letzten Zeile.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 4/4
+L: 1/32
+K: G
+D4G8F8 | A8G4A4B8c2dcB2c2 | A8z4
+D4c8B6cA | d8c2B2c4B8GAF6 | G8z4
+D4G4A4G4A4 | A12G4B8c2dcB2c2 | A8z4
+G4F2G2A4c2B2c4 | A4B4G8B8GAF6 | G8z4
+
+X:77
+T: Jungfer Doertchen
+N: Q0057P
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: "Unterstimme"
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/2
+L: 1/8
+K: G
+D2G2D2 | G2G2B2G2c2c2 | B2
+cBA2B2 | G2G2B4A2A2 | G6
+
+X:78
+T: Jungfer Doertchen
+N: Q0057Q
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Kleine Melodievariante aus anderer Quelle abgedruckt.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/2
+L: 1/8
+K: G
+D2G2A2 | B3AB4c2c2 | B2
+c2A2B2 | G3AB4A2A2 | G6
+
+X:79
+T: Jungfer Doertchen
+N: Q0057R
+O: Mitteleuropa, Deutschland (BRD) , Rheinpfalz
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+D2G2B2 | B4d4d3e | d4B2
+B2A2B2 | c3cd4A2c2 | B4z2
+
+X:80
+T: Jungfer Doertchen
+N: Q0057S
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Nassau
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+G2G2B2 | d6d2e2d2 | B4z2
+d2g2e2 | d4B2B2c2d2 | B4z2
+B2B2B2 | A4d4e2ed | B4z2
+d2g2e2 | d4B2d2e2d2 | G4z2
+B2B2B2 | A4d4e2ed | B4z2
+d2g2e2 | d4B2d2e2d2 | G4z2
+
+X:81
+T: Jungfer Doertchen
+N: Q0057T
+O: Mitteleuropa, Deutschland (BRD) , Baden
+N: Zweistimmig notiert, Oberstimme kodiert.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/8
+L: 1/16
+K: G
+G2G4B2 | d4e2d4e2 | d2B2
+B2A4d2 | c2c2d2A4c2 | c2B2
+G2G4B2 | B2A2c2c4e2 | c2B2
+GAB4Bc | d4d2A4c2 | c2B2
+
+X:82
+T: Jungfer Doertchen
+N: Q0057U
+O: Mitteleuropa, Deutschland (BRD) , Rheinland
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/8
+L: 1/16
+K: G
+D2G4B2 | d4d2A4BA | G4
+A2B4e2 | d2d2d2c4d2 | B4
+G2G2B2e2 | e2d2B2B4d2 | d4
+B2A2A2A2 | e2d2B2d2d2dc | B4
+G2G2B2e2 | e2d2B2B4d2 | d4
+B2A2A2A2 | e2d2B2d2d2dc | B4
+
+X:83
+T: Jungfer Doertchen
+N: Q0057V
+O: Mitteleuropa, Deutschland (BRD) , Hessen
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 6/8
+L: 1/16
+K: G
+D2G4B2 | d3ed2c4d2 | B4
+D2G4B2 | d3ed2c4d2 | B4
+G2G3ee2 | e2d2c2B3dde | d4
+B2A3Bc2 | e3dc2d2d2c2 | B4
+G2G3ee2 | e2d2c2B3dde | d4
+B2A3Bc2 | e3dc2d2d2c2 | B4
+
+X:84
+T: Jungfer Doertchen
+N: Q0057W
+O: Mitteleuropa, Deutschland (BRD) , Hessen
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+D4B2A2 | G4e4e2d2 | d4z2
+d2eed2 | c4A4d2c2 | B4z2
+G2G2G2e2 | e4c2e2g2f2e2 | d4B2
+d2e2e2d2 | c4A2e2d2c2 | B4
+
+X:85
+T: Jungfer Doertchen
+N: Q0057X
+O: Osteuropa, UdSSR, Russland, Ukraine
+N: Verselbstaendigter Vordersatz ?
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+D2G2Ac | B6cBA2d2 | B3AB2
+A2B2c2 | d6edc2dc | B6
+
+X:86
+T: Jungfer Doertchen
+N: Q0057Y
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg
+N: Vierte und fuenfte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/4
+L: 1/16
+K: G
+D2 | G2G2B6G2 | G2=F2E6
+G2 | FFG2A4F4 | G2E2D4z4
+G4D4 | E2D2D3
+D | G2D2DD | E2D2
+D2 | GGA2B4G4 | c2A2G4
+
+X:87
+T: Jungfer Doertchen
+N: Q0057Z
+O: Mitteleuropa, Deutschland (DDR) , Sachsen, Altmark
+N: Dritte und vierte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 4/4
+L: 1/8
+K: G
+D2 | G2D2B2AG | FAABA2
+DF | A2AAd2cA | BGG2GA
+BG | E2EEG2
+FE | EDD2D2
+c2 | c2cAG2F2 | AGG2G2
+
+X:88
+T: Jungfer Doertchen
+N: Q0057a
+O: Mitteleuropa, Deutschland (DDR) , Sachsen, Altmark
+N: Dritte und vierte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 4/4
+L: 1/16
+K: G
+D4 | G4D4G2B2A2G2 | F4D4D4
+D2F2 | A4A4A2B2c2A2 | B4G4G4
+G4 | E3CC2C2C2
+E2G2E2 | E2D2D4D4
+c4 | B2d2G2B2d2c2A2F2 | A2G2G4G4
+
+X:89
+T: Jungfer Doertchen
+N: Q0057b
+O: Mitteleuropa, Deutschland (DDR) , Sachsen, Altmark
+N: Dritte und vierte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 4/4
+L: 1/16
+K: G
+D4 | G4G4B4A2G2 | G2F2F4F4
+D4 | A4A2A2d4c2A2 | c2B2B4B4
+G2F2 | E3EE2E2E4
+A2G2 | F3EF2G2A4
+c4 | B4c2c2d4A4 | c2B2B4B4
+
+X:90
+T: Jungfer Doertchen
+N: Q0057c
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Vom Hg. geaenderte Takteinteilung. Zweistimmig notiert, Oberstimme
+N: kodiert.
+R: Ballade, Todesahnung, Tod, Selbstmord
+M: 3/2
+L: 1/8
+K: G
+D2B2B2 | BAA2z2
+ABc2e2 | edd2z2
+B2d2gf | e2d2z2
+B2A2cB | A2G4
+
+X:91
+T: Der Scheintod
+N: Q2058
+O: Mitteleuropa, Niederlande
+N: Originalquelle in unmensurierten Choralnoten.
+N: Niederlaenische Fassung der Ballade.
+R: Ballade, Liebe, Enttaeuschung, Schein - Tod
+M: 3/2
+L: 1/8
+K: D
+D2D2D2 | =F4D4F2G2 | A4z2
+G2A2A2 | d3d=c2c2B2A2 | =c4z2
+c2c2c2 | A4=c4A2G2 | =F4
+=c4d3dc2A2 | G4=F2F2E4 | D4z2
+
+X:92
+T: Der Scheintod
+N: Q0058A
+O: Suedosteuropa, Jugoslawien, Gottschee
+R: Ballade, Liebe, Enttaeuschung, Schein - Tod, Selbstmord
+M: 3/2
+L: 1/8
+K: G
+D2G2G2 | BAG2G4A4 | B4z2
+G2d2d2 | edc2B4A4 | G4z2
+
+X:93
+T: Der Scheintod
+N: Q1058B
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Melodievergleich zu Q0058A, anderes Lied. Rhythmisch korrigiert:
+N: Notenwert im vorletzten Takt halbiert.
+R: Ballade, Maerchen
+M: 2/2
+L: 1/8
+K: F
+C2F2G2 | A2G2FFG2 | A4
+F2F2 | B2AGF2G2 | A2
+
+X:94
+T: Der Scheintod
+N: Q1058C
+O: Suedosteuropa, Rumaenien, Siebenbuergen
+N: Melodievergleich zu Q0058A, anderes Lied.
+R: Hochzeits- , Rocken - Lied, Brauchtum
+M: 3/4
+L: 1/8
+K: F
+CFG | A3CFG | A2z
+cBAGF | A2CCF2G2 | A2z
+
+X:95
+T: Der Scheintod
+N: Q1058D
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0058A, anderes Lied.
+R: Marien - Lied, geistlich
+M: 6/4
+L: 1/4
+K: F
+AF2G | A2cAFG | A2
+Ac2B | AGBAcG | F2
+
+X:96
+T: Der Scheintod
+N: Q2058E
+O: Mitteleuropa, Niederlande
+N: Kleinere Melodievarianten aus anderer Quelle abgedruckt.
+N: Taktart in "Taktwechsel" korrigiert. Niederlaendische Fassung.
+R: Ballade, Liebe, Enttaeuschung, Schein - Tod
+M: 3/2
+L: 1/8
+K: D
+D2D2D2 | =F4F4G2G2 | A4z2
+G2A2A2 | d3=cB2A2B4 | =c4z2
+c2c2d2 | AGAB=c2A2G2G2 | =F4z2
+=c2d4c2A2 | A4G2=F2E4 | D4z2
+
+X:97
+T: Der Scheintod
+N: Q3058F
+O: Mitteleuropa, Niederlande
+N: Melodievergleich zu Q0058  und Q0058G, anderes Lied.
+N: Taktart in "Taktwechsel" korrigiert.
+R: geistlich
+M: 3/2
+L: 1/8
+K: D
+D2=F2G2 | A6G=FG2G2 | A4z2
+A2=c2d2 | e4d2=c2B4 | A4z2
+A2A2A2 | =c6A2A2G2 | =F4
+=c4d6A2 | A4G2=F2E4 | D4z2
+
+X:98
+T: Der Scheintod
+N: Q0058G
+O: Mitteleuropa, Niederlande
+N: Tonangabe zu diesem Psalm steht auch bei einem Textnachweis der
+N: Ballade. Geistliche Kontrafaktur. Eingeklammerte Noten und Pausen
+N: kodiert.
+R: Ballade, Liebe, Enttaeuschung, Schein - Tod; geistlich
+M: none
+L: 1/8
+K: D
+D4 | =FEFGAG_B3AA4G2 | A4z4
+A4A2A2 | d4=c2A2_B4 | A4z2
+=c2c3_B | A3_B=c2A2BAG=F | E4z4
+A4A2A2 | G=FGA_B2A2GFEDE4 | D4z2
+A2DE=FGF2EDE4 | D8
+
+X:99
+T: Der Scheintod
+N: Q3058H
+O: Mitteleuropa, Frankreich
+N: Melodievergleich mit Q0058G, anderes Lied.
+R: Hochzeits - Lied
+M: 6/4
+L: 1/8
+K: D
+D4 | =F3GA2_B2A2G2 | A4z4
+A4 | d6=c2B2A2 | =c4A4
+c4 | A3_BA2=F2G2G2 | =F4z4
+A4 | G6=F2E2D2 | E4D4
+=F4 | E2A2=F2EDE4 | D8
+
+X:100
+T: Der Scheintod
+N: Q3058I
+O: Mitteleuropa, Frankreich
+N: Melodievergleich zu Q0058G, anderes Lied.
+R: Hochzeits - Lied
+M: 6/8
+L: 1/16
+K: D
+D2 | D6E2=F2G2 | A8z2
+A2 | d6d2=c2d2 | =c4_B2A2z2
+AB | =c6d2A2G2 | =F6-^F4
+G2 | A6G2D2G2 | =F4E2D4
+
+X:101
+T: Der Elsberger
+N: Q0059
+O: Suedosteuropa, Jugoslawien, Gottschee, Buehel
+N: Grundton in der zweigestrichenen Oktave; Schlusspause ergaenzt.
+R: Ballade, Betrug, Entfuehrung
+M: 2/4
+L: 1/8
+K: C
+G,2 | C2G2 | F2GF | EDCE2- | E2
+ED | C2ED | C2D2 | CB,C2 | z2
+
+X:102
+T: Der Elsberger
+N: Q0059A
+O: Suedosteuropa, Jugoslawien, Gottschee, Buehel
+N: Taktart und Rhythmus vom Hg. gegenueber der Quelle veraendert.
+R: Ballade, Betrug, Entfuehrung, Tod
+M: 3/4
+L: 1/16
+K: G
+D2G2d2 | c4d2c2B2A2G2 | B6
+BAG2BA | G4A4G2F2 | G4z2
+
+X:103
+T: Der Elsberger
+N: Q0059B
+O: Suedosteuropa, Jugoslawien, Gottschee, Morobitz
+R: Ballade, Betrug, Entfuehrung, Tod
+M: 2/4
+L: 1/16
+K: F
+C2 | A3AA3c | c3BG3
+G | B3BB3c | d3cA2
+
+X:104
+T: Der Elsberger
+N: Q1059C
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Melodievergleich zu Q0059, anderes Lied: "Tuerkischer Kaiser" .
+N: Taktart in "Taktwechsel" korrigiert.
+R: Ballade, Entfuehrung
+M: 4/2
+L: 1/4
+K: G
+D | B2d2c2d2 | BGF2
+F2 | G2BAG2A2 | FFG3
+
+X:105
+T: Der Elsberger
+N: Q1059D
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Melodievergleich zu Q0059, anderes Lied "Vom heiligen Kreuz" .
+R: geistlich, Brauchtum
+M: 3/2
+L: 1/8
+K: G
+G2G2F2 | G2c6BAF2 | A6
+c2BAGA | F3GA4F2F2 | G6
+
+X:106
+T: Der Elsberger
+N: Q1059E
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Melodievergleich zu Q0059, anderes Lied "Tuerkischer Kaiser" .
+R: Ballade, Entfuehrung
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2AGA2 | B3FA2A2 | G2
+D2B2d2 | c4d4 | B2G2A2A2 | G4z2
+
+X:107
+T: Der Elsberger
+N: Q1059F
+O: Mitteleuropa, Deutschland (BRD) , Hessen
+N: Melodievergleich zu Q0059B, anderes Lied.
+R: Brauchtum, Abholung der Kerb'   (???)
+M: none
+L: 1/16
+K: G
+B2 | B2B2B2BBd2c2 | A4z2
+A2 | A2AAc2B2 | G4
+
+X:108
+T: Der Elsberger
+N: Q1059G
+O: Suedosteuropa, Jugoslawien, Gottschee
+N: Melodievergleich zu Q0059B, anderes Lied
+R: Marien - Lied, Brauchtum, geistlich
+M: 6/4
+L: 1/4
+K: G
+BGAB | GABB2A | F2
+AFGA | FGAc2B | G2
+
+X:109
+T: Der junge Held
+N: Q0060
+O: Mitteleuropa, Deutschland
+R: Ballade, Verfuehrung, Standesunterschied
+M: 4/4
+L: 1/8
+K: G
+G2 | G2_B2A2A2 | D6
+A2 | _B2d2c2B2 | A6
+F2 | G3A_B2cB | AGFAG2
+G2 | G2_B2A2A2 | D6
+A2 | _B2d2c2B2 | A6
+F2 | G3A_B2cB | AGFAG2
+
+X:110
+T: Der junge Held
+N: Q0060A
+O: Mitteleuropa, Deutschland (BRD) , Rheinland, Bergisches Land,
+N: "Hei" am Ende der dritten und siebten Zeile.
+R: Ballade, Verfuehrung, Standesunterschied
+M: 6/8
+L: 1/16
+K: D
+D2 | D4A2A2B2=c2 | B4A2G4
+G2 | A4A2B4c2 | d4d2A4
+E2 | A4A2B4c2 | d6e4
+d2 | c4A2^G2A2B2 | A6z4
+A2 | d4d2A2B2c2 | d6A4
+A2 | _B4A2G4G2 | A6E4
+=FE | D4D2E2=F2G2 | A6_B4
+A2 | G2G2=F2E4F2 | D6z4
+
+X:111
+T: Der junge Held
+N: Q2060B
+O: Mitteleuropa, Niederlande
+N: Melodievergleich zu Q0060, Tonangabe ?? Vom Hg. mit dem Balladentext
+N: unterlegt.
+R: geistlich, Choral
+M: 4/4
+L: 1/4
+K: A
+A | A=GAB | =c3
+c | d=cBA | =G3
+B | =cedc | B2A
+E | A=GA=F | E3
+A | =cBcd | B3
+e | Bd=cd | B2A
+
+X:112
+T: Der junge Held
+N: Q2060C
+O: Mitteleuropa, Niederlande
+N: Niederlaendische Fassung der Ballade. In der Edition untextiert.
+N: Wiederholungen nicht gespielt (fehlender Text) .
+R: Ballade, Verfuehrung, Standesunterschied
+M: 6/4
+L: 1/8
+K: D
+D2 | D4E2=F4G2 | A4A2D4
+A2 | A4G2A4B2 | =c3Bc2G4
+G2 | =c3Bc2A3Bc2 | d6e3d
+=c2 | B3=cA2B3A^G2 | A6-A4
+=c2 | =c3Bc2A3Bc2 | d6A4
+d2 | =c4A2_B4G2 | A6=F4
+F2 | G4A2_B2A2G2 | A6G4
+=F2 | E4D2E4C2 | D6-D4
+
+X:113
+T: Der junge Held
+N: Q0060D
+O: Mitteleuropa, Deutschland (BRD) , Rheinland, Bergisches Land
+N: Tempowechsel beim Taktwechsel.
+R: Ballade, Verfuehrung, Standesunterschied
+M: 4/4
+L: 1/8
+K: D
+D2 | D2A2A2B=c | B3AG2
+GA | B3BB2d2 | =c3BA2z
+A | d3dc2A2 | d4A3
+A | G3GA3A | E4
+A2 | d4d2 | c2B2A2 | d6 | A4
+A2 | _B4A2 | G2=F2G2 | A6 | =F4
+E2 | D4E2 | =F4G2 | A6 | B4
+A2 | G2G2E2 | =F4E2 | D4z2
+
+X:114
+T: Der junge Held
+N: Q1060E
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Melodievergleich zu Q0060A, anderes Lied. Verzierung im letzten Takt.
+R: Tage - Lied
+M: none
+L: 1/8
+K: D
+D2 | D2D2D2A3B=c2 | B2A2G4
+G2 | A2AAd3ed2 | =cBA4
+AG | A2d2=c2B2A2 | =c2d2A4
+c2 | B2A2G4A2 | =F2E2D4
+D2 | D2D2A4G2 | A_BA3G=F2 | E4D4
+
+X:115
+T: Der junge Held
+N: Q1060F
+O: Mitteleuropa, Deutschland
+N: Melodievergleich mit Q0060A, anderes Lied.
+N: Pausen am Ende der 2. und 4. Zeile ergaenzt.
+R: ???
+M: 6/4
+L: 1/8
+K: D
+D2 | =F4G2A2=c4 | B2A4G4
+G2 | B4=c2d2e4 | d4=c2A2B4 | A4z6
+d2 | =c4A2G4_B2 | A4A2D4=F2 | E2D4=C4
+C2 | =F4G2A2=c3_B | A2G3=FD2E4 | D4z6
+
+X:116
+T: Der junge Held
+N: Q0060G
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+R: Ballade, Verfuehrung, Standesunterschied
+M: 4/4
+L: 1/8
+K: D
+D2 | A2A2=F2_B2 | A2G2=F2
+FF | _B2A2G2=FF | =FED2=C2
+C2 | =F2F2GFG2 | A4z2
+_B2 | A2D2=F2E2 | D4z2
+
+X:117
+T: Der junge Held
+N: Q0060H
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Kleinere Melodievarianten aus anderer Quelle abgedruckt.
+R: Ballade, Verfuehrung, Standesunterschied
+M: 4/4
+L: 1/8
+K: G
+=F2 | c2c2G2_B2 | A2G2=F2
+F2 | _B2A2G2=F2 | G2EDC2
+CC | =FFF2G2G2 | c4
+d4 | c2GA_B2A2 | G4z2
+
+X:118
+T: Der junge Held
+N: Q0060I
+O: Mitteleuropa, Luxemburg, Trotten
+R: Ballade, Verfuehrung, Standesunterschied
+M: 2/4
+L: 1/16
+K: F
+AA | ccc2G2B2 | A2G2F2
+AA | G2GGD2F2 | E2D2C2z
+C | FFF2G2G2 | A4
+B4 | cAA2cBG2 | F4z2
+
+X:119
+T: Totenamt
+N: Q2061
+O: Mitteleuropa, Niederlande
+N: Geistliche Kontrafaktur der Ballade.
+R: Ballade, Liebe, Eifersucht, Tod; geistlich
+M: none
+L: 1/8
+K: G
+G4 | D2D2=F2G2 | _B4A4z2
+d4 | c4_B2G4A2 | c3_BAGA4z2
+A2 | _B2c2d4c2d2 | _B4A4B3A | G4z4
+A4 | D4E2=F4G2 | _B3AG=FG4
+
+X:120
+T: Totenamt
+N: Q0061A
+O: Mitteleuropa, Deutschland (BRD) , Schwarzwald
+R: Ballade, Liebe, Eifersucht, Tod; "Purengesanck"
+M: none
+L: 1/8
+K: D
+D4 | D4D4D4D4D4 | G4A4=F4E2
+D4 | G4A2G4=F4 | E4
+=F2 | E4G2A2G2 | =F2E2D2
+G4 | A4=FED=CD4 | =FE2D=C4
+
+X:121
+T: Totenamt
+N: Q0061B
+O: Mitteleuropa, Deutschland
+N: Geistliche Kontrafaktur.
+R: Ballade, Liebe, Eifersucht, Tod; geistlich
+M: none
+L: 1/4
+K: G
+G | G2cB2A | c2d2B2A2
+e2 | d2dB2B | c2d2B2A2
+G2 | B2cd2e | d2c2BA2G2
+A | d2cB2A | G4
+
+X:122
+T: Totenamt
+N: Q1061C
+O: Osteuropa, Tschechoslowakei, Boehmen
+N: Melodievergleich zu Q0061, anderes Lied. Taktart in "FREI" geaendert.
+R: geistlich
+M: none
+L: 1/8
+K: G
+=F | G2G2=F2G2 | _B2B2A4
+G | A2d2d2c2 | c2_B2A4
+B | c2A2_B2G2 | _B2A2G4
+G | D2=F2G2A2 | _B2A2G8
+
+X:123
+T: Totenamt
+N: Q2061D
+O: Mitteleuropa, Niederlande
+N: Geistliche Kontrafaktur der Ballade. Original in Choralnotation.
+R: Ballade, Liebe, Eifersucht, Tod; geistlich
+M: 4/4
+L: 1/8
+K: G
+A2 | D2=F2G2G2 | _B4A2
+d2 | c2c2_B2G2A2 | c2_B2G2A2
+A2 | d2c2c2_B2 | G2G2_B2A2 | G4
+A2A2 | D2D2=F2F2G2 | _BAG=FG2
+
+X:124
+T: Totenamt
+N: Q1061E
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Melodievergleich zu Q0061, anderes Lied: "Kirchhofreiter" .
+R: Ballade, ???
+M: 4/4
+L: 1/8
+K: G
+D | D3GG2G2 | =F2GA_B2
+A2 | G2G2AAA2 | D2G2=F2z
+D | A3_BccAc | _BABAG2
+G2 | D2E2=F2G2 | _BAGFG2z
+
+X:125
+T: Totenamt
+N: Q2061F
+O: Mitteleuropa, Niederlande
+N: Geistliche Kontrafaktur der Ballade.
+R: Ballade, Liebe, Eifersucht, Tod, geistlich
+M: 6/4
+L: 1/8
+K: G
+G2 | G4G2A4A2 | G6G4
+_Bc | d4A2_B4AG | A4
+A2 | c4c2c4d_e | d6A4
+_B2 | A4G2=F4G2 | A4
+A2 | c4c2c4d_e | d2d2
+c2_B2 | A4G2
+
+X:126
+T: Der Spielmannssohn
+N: Q0062
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen, Rechicourt
+R: Ballade, Verfuehrung, Standesunterschied, Strafe, Gnade
+M: 6/4
+L: 1/16
+K: F
+ | c4A4G4F8F2G2 | A6A2B4c8
+F2c2 | c4c4c4f6g2f2e2 | d6f2c2d2c4z4
+c4 | f6e2f2e2d6c2B4 | B4c4d4c8
+F2A2 | A6c2c4c4B4A3B | G8F4F12
+
+X:127
+T: Der Spielmannssohn
+N: Q0062A
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen,
+N: Verzierung (Nachschlag) in der dritten Zeile.
+R: Ballade, Verfuehrung, Standesunterschied, Strafe, Gnade
+M: 6/4
+L: 1/8
+K: F
+C2 | F3EF2G4c2 | A3GA2F4
+F2 | G3AB2c3BA2 | F3GA2G4
+G2 | c3dc2cBA2G2 | F3CFAG3A
+F2 | G3AB2c3BA2 | G4c2F4
+
+X:128
+T: Der Spielmannssohn
+N: Q1062B
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0062, anderes Lied "Winterrosen" .
+R: Ballade
+M: none
+L: 1/8
+K: F
+F2 | F2F2G2G2 | A2A2F2
+F2 | B2A2G2A4G2 | FEF2G4z2
+G2 | B4B2A4A2 | G2G2F3G | A3GF2ED | E4
+C4 | F2F2A2G2F2 | G4F2
+
+X:129
+T: Der Spielmannssohn
+N: Q1062C
+O: Mitteleuropa, Deutschland (BRD) , Rheinland, Bergisches Land
+N: Verzierungen (Vorschlaege) ; Melodievergleich zu Q0062, anderes Lied.
+R: Fenstergang - Lied
+M: 6/8
+L: 1/16
+K: F
+CC | C2F2FFF2E2F2 | G3_AG2F4
+F2 | G4c2B2_A2G2 | F4_A2G4
+F2 | G4c2c2B2c2 | _A2G2F2_E4
+C2 | F4G2_A2G2F2 | _A2G2F2E6 | F4z6
+
+X:130
+T: Der Spielmannssohn
+N: Q1062D
+O: Mitteleuropa, Deutschland (BRD) , Westfalen
+N: Melodievergleich zu Q0062, anderes Lied "Der treue Knabe" .
+R: Tage - Lied
+M: 3/4
+L: 1/16
+K: F
+c2 | C3FF4E2F2 | G2GAF4z3
+F | F3cc3BA2F2 | G2FAG4z2
+F2 | G2A2B2c4C2C2 | F2E2F2A2G2z2
+C2 | B2A2G2A2F4 | C2C2F4z2
+
+X:131
+T: Der Spielmannssohn
+N: Q0062E
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Kleinere Melodievarianten aus anderer Quelle im gleichen System
+N: abgedruckt
+R: Ballade, Verfuehrung, Standesunterschied, Strafe, Gnade
+M: 6/8
+L: 1/16
+K: F
+C2 | F4F2G4c2 | A3GA2F4
+F2 | G3AB2c3BA2 | F3GA2G4
+G2 | c3dc2B2A2GG | F3CA2G4
+F2 | G2A2c2c3BA2 | G6F4
+
+X:132
+T: Der Spielmannssohn
+N: Q1062F
+O: Mitteleuropa
+N: Anderes Lied.
+R: geistlich, Messe
+M: none
+L: 1/4
+K: F
+FAcAGc2dc
+cdefedcdc
+fdefedcdc
+ABccBAGFGAFGFF
+
+X:133
+T: Der Spielmannssohn
+N: Q1062G
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Melodievergleich zu Q0062, anderes Lied "Maler der Blumen" .
+R: Legenden - Lied
+M: 6/8
+L: 1/16
+K: F
+F2 | A4G2A2A2G2 | A4B2c4
+c2 | d2d2c2d2f2fe | d6c4
+c2 | d3ddef2e2d2 | c2d2c2A4
+c2 | d3ddef2e2d2 | c2d2c2A4
+F2 | G3cc2c2B2A2 | G6F4
+
+X:134
+T: Der Spielmannssohn
+N: Q0062H
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Kleine Melodievarianten aus anderer Quelle im gleichen System
+N: abgedruckt.
+R: Ballade, Verfuehrung, Standesunterschied, Strafe, Gnade
+M: 6/8
+L: 1/16
+K: Bb
+F2 | B3BF2B4F2 | B3BB2B4
+F2 | c3cc2c2d2c2 | B6A4
+G2 | G4G2B2A2G2 | F4F2D4
+G2 | GGG2G2B2A2G2 | G6F4
+
+X:135
+T: Der Spielmannssohn
+N: Q0062I
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Anhaengsel in der dritten Zeile. In der Edition untextiert.
+R: Ballade, Verfuehrung, Standesunterschied, Strafe, Gnade
+M: 6/8
+L: 1/16
+K: Bb
+F2 | B2B2d2c2B2B2 | B2A2B2c4
+B2 | B2B2B2c2B2B2 | F6B4
+B2 | B2B2B2c2c2ff | f2f2e2f4ff | f2f2e2f4
+B2 | B2c2B2B2A2G2 | F6B4
+
+X:136
+T: Der Spielmannssohn
+N: Q0062J
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Ersten Notenwert der 2. bis 4. Zeile rhythmisch korrigiert.
+N: In der Edition untextiert.
+R: Ballade, Verfuehrung, Standesunterschied, Strafe, Gnade
+M: 6/8
+L: 1/16
+K: Bb
+f2 | e2d2c2B2B2B2 | c2c2c2F4
+F2 | B4B2c2c2c2 | f2f2f2c4
+F2 | B4B2c2c2c2 | f2f2f2c4
+F2 | B4B2c2c2c2 | f2f2f2c4
+f2 | e2d2c2A2B2B2 | c2c2c2F4
+F2 | B2BBB2A2B2c2 | f6c4
+
+X:137
+T: Der Spielmannssohn
+N: Q0062K
+O: Mitteleuropa, Schweiz
+N: Taktart in "FREI" korrigiert, unklar. Verzierung (Vorschlag).
+R: Ballade, Verfuehrung, Standesunterschied, Strafe, Gnade
+M: none
+L: 1/16
+K: D
+=C2 | A3AAA | _B2A2G4z2
+G2 | A2_B2=c2d2 | =c4A2
+G2 | A4d2=c3AA2 | A3GE2=F4
+G2 | A4_B2=c3GA2 | =F4D4z2
+
+X:138
+T: Des Grafen Toechterlein
+N: Q0063
+O: Mitteleuropa, Deutschland
+N: Taktart in "FREI" geaendert.
+R: Ballade, Liebe, Standesunterschied, Strafe, Gnade
+M: none
+L: 1/8
+K: F
+F2 | F4E2D4C2 | F4G2F4
+F2 | G4FGB4B2 | A4GFG4
+G2 | G4FGG4FG | A4G4 | F4
+A2 | G4FGE4DC | F4GAG4
+A2- | A2G2F2DCDEF2G2 | G4F4
+
+X:139
+T: Des Grafen Toechterlein
+N: Q3063A
+O: Mitteleuropa, Niederlande
+N: Melodievergleich zu Q0063, anderes Lied "Die drei Wege" .
+R: erzaehlendes Lied
+M: 3/8
+L: 1/16
+K: F
+FG | A2F2F2 | F2G2A2 | B3BA2 | G4
+GG | G2E2D2 | C2F2G2 | A3AG2 | F4
+
+X:140
+T: Des Grafen Toechterlein
+N: Q1063B
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Melodievergleich zu Q0063, anderes Lied "Graf Friedrich" .
+N: Aehnliche Fassung schon aus anderem Balladenband kodiert ???
+R: Ballade ???
+M: none
+L: 1/16
+K: F
+C4 | F2F2F4G6A2 | B2A2G4
+A2G2 | F4C4F2F2G2A2 | B2c2G4
+G6 | F2E2D2C3DC2C2 | F4G2G2A2F2G4
+B2B2 | A4G4F4C4F2G2 | A2A2G4F4
+
+X:141
+T: Des Grafen Toechterlein
+N: Q2063C
+O: Mitteleuropa, Niederlande
+N: Melodievarianten aus anderer Quelle abgedruckt. Niederlaendische
+N: Fassung der Ballade. Taktart in FREI geaendert.
+R: Ballade, Liebe, Standesunterschied, Strafe, Gnade
+M: none
+L: 1/8
+K: F
+F2 | F4E2D4C2 | F4G2F4
+F2 | G4FGB4B2 | A4GFG4
+G2 | G4FGG4FG | A8G8 | F4
+A2 | G4FGE4DC | F4GAB4
+A4 | F2E2DCDE | F2G2G4 | F4
+
+X:142
+T: Des Grafen Toechterlein
+N: Q1063D
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Melodievergleich zu Q0063, anderes Lied "Der Markgraf von Backenweil"
+N: Aehnliche Fassung schon aus anderem Balladenband kodiert ??
+N: Transkription einer Tonaufnahme.
+R: Ballade
+M: none
+L: 1/16
+K: F
+C4 | F4E4F8G2A2 | B4A4G8
+A4 | F4C4F4F4z4G4 | B4A4G8
+c6B2 | A4G4F4F4G4 | A8G8 | F8
+G8 | F4E4D4C6D2C2C2 | F4G4A3FG8
+c2B2 | A4G4F4F4G4 | A8G8 | F8z4
+
+X:143
+T: Des Grafen Toechterlein
+N: Q3063E
+O: Mitteleuropa, Niederlande
+N: Melodievergleich zu Q0063, anderes Lied.
+R: Ballade
+M: none
+L: 1/8
+K: F
+C2 | F4GAG4F2 | D4CDF4
+C2 | F4GAG4F2 | D4CDF4
+A4 | G2G2F2FE | D8C4
+A2 | A4AGF4C2 | F4G2A4
+A4 | F2E2D4E2F2 | G4F6
+
+X:144
+T: Des Grafen Toechterlein
+N: Q3063F
+O: Mitteleuropa, Niederlande
+N: Melodievergleich zu Q0063, anderes Lied "Die wise van Potteren" .
+N: Taktart in "FREI" geaendert. Unklar. Eingeklammerten Ton weggelassen.
+R: Ballade
+M: none
+L: 1/8
+K: F
+A2 | A2A2B2A4 | G2A4G4z2
+A2A4B2A4 | G2A4G4
+G2 | A2A2A2B2 | c2BAG4 | F4z2
+A2 | B2B2A2A2 | A2G4G2D4z2
+D2 | C4G4F4B2 | A4GFG4 | F4z2
+
+X:145
+T: Die Bernauerin
+N: Q0065
+O: Suedosteuropa, Rumaenien, Siebenbuergen
+N: Anhaengsel an der letzten Zeile.
+R: Ballade, historisch (1435) , Standesunterschied, Liebe, Mord
+M: 4/4
+L: 1/8
+K: D
+D2 | D4F2G2 | A4A2A2 | A2d2c2B2 | B4A2
+A2 | A2B2c2A2 | d4A2A2 | B2B2A2G2 | F4E2
+A2 | d4c2B2 | A4F2F2 | B4c4 | d2A2BAG2 | F4E4 | D4z2
+
+X:146
+T: Die Bernauerin
+N: Q3065A
+O: Mitteleuropa, Niederlande, flaemisch
+N: Melodievergleich zu Q0065, anderes Lied.
+R: ???
+M: 2/4
+L: 1/16
+K: C
+ | G2F2E2F2 | G6AB | d2c2B2A2 | A2G2G4
+E4E2E2 | G4G4 | A2GFE2ED | C4z4
+G2F2E2F2 | G6AB | d2c2B2A2 | A2G2G4
+E4E2E2 | G4G4 | A2GFE2ED | C4z4
+F2F2GFEF | E4z4
+A2A2BAGA | G4z4
+G4A2B2 | c2G2A2G2 | G2F2F2E2 | E4D2z2
+F2F2G2F2 | E4z4
+A2A2B2A2 | G4z4
+G2G2A2B2 | c2G2A2GF | E4D4 | C8
+G2G2A2B2 | c2G2A2GF | E4D4 | C8
+
+X:147
+T: Die Bernauerin
+N: Q0065B
+O: Mitteleuropa, Deutschland (BRD) , Bayern, Regensburg
+N: Anhaengsel an der letzten Zeile.
+R: Ballade, historisch (1435) , Standesunterschied, Liebe, Mord
+M: 4/4
+L: 1/8
+K: C
+G | GcBAGABc | d2cBc2z
+G | GcBAGABc | d2cBc2z
+G | Gcc2c2cc | Gdd2z2BB | Bcc2z3
+
+X:148
+T: Koenig von Mailand
+N: Q0067
+O: Osteuropa, UdSSR, Russland, Wolgakolonie, Saratow, Semenoska
+R: Ballade, Standesunterschied, Schwangerschaft, Moral, Hinrichtung,
+M: 3/4
+L: 1/16
+K: A
+E2 | A2B2c2d2e2d2 | c2B2A2B2
+c2c2 | BBB2F4G2A2 | B2B2E4
+E2E2 | AAB2e6d2 | c2B2A4z2
+
+X:149
+T: Koenig von Mailand
+N: Q1067A
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0067, anderes Lied. Pause am Ende der 2. Zeile
+N: eingefuegt.
+R: ???
+M: 6/4
+L: 1/8
+K: F
+C2 | F2F2G2F4-FA | A2AG3F6
+D2D2_E2D4F2- | F2G4G2FED2 | C6z4-z
+C | F2F2A2c6 | c2BAG2F2cAG2 | F6z4
+
+X:150
+T: Koenig von Mailand
+N: Q1067B
+O: Mitteleuropa, Deutschland (BRD) , Rheinland, Bergisches Land
+N: Melodievergleich zu Q0067, anderes Lied "Die dienende Schwester" .
+R: Ballade
+M: 2/4
+L: 1/8
+K: F
+G | c2GG | cBAG | F2GG | F2z
+A | G2GG | D2EE | F2ED | C2z
+C | F2F2 | G2cc | A2GA | F2z
+
+X:151
+T: Koenig von Mailand
+N: Q0041b
+O: Suedosteuropa, Rumaenien, Siebenbuergen
+N: Melodievergleich zu Q0067, anderes Lied "Maedchenmoerder" , deshalb
+N: in die Balladengruppe Q0041 eingeordnet.
+R: Ballade, Verfuehrung, Mord, Rache
+M: 4/4
+L: 1/8
+K: F
+C2 | G2G2AAGA | B2B2A2
+F2 | F2F2EED2 | GGGEC2
+C2 | F4G4 | c4A2GA | BBAAG2
+
+X:152
+T: Koenig von Mailand
+N: Q0041c
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Melodievergleich zu Q0067, anderes Lied "Maedchenmoerder" , deshalb
+N: in die Balladengruppe Q0041 eingeordnet. Schon kodiert ?
+R: Ballade, Verfuehrung, Mord, Rache
+M: none
+L: 1/8
+K: D
+A2A2G2=F3GA2 | A2AG=F4
+A2G2G2D3DG2 | =FED2=C4
+C2F2G2A3EG2 | =F2E2D4
+
+X:153
+T: Koenig von Mailand
+N: Q1067C
+O: Mitteleuropa, Oesterreich, Burgenland
+N: Melodievergleich zu Q0067, anderes Lied.
+R: Volks - Schauspiel - Lied
+M: none
+L: 1/8
+K: D
+=C2 | =F2G2A2A=c | G2G2=F4
+G2 | G2G2D2=F2G2F2 | E2G2=C4
+C2 | =F2G2A4G4 | =F2E2D4
+
+X:154
+T: Koenig von Mailand
+N: Q1067D
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0067, anderes Lied.
+R: ???
+M: none
+L: 1/8
+K: D
+D2 | =F2A2G2A4A2 | _BAA2G2BA=F2
+G2 | A2=FAGFD2A2GF | D2=F2D2=C2
+D2 | =F4G2A2F2D2 | A2GA=FDE2 | D4
+
+X:155
+T: Der grausame Bruder
+N: Q0068
+O: Mitteleuropa, Deutschland (DDR) , Sachsen, Kr. Wolmirstedt, Samswegen
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 6/8
+L: 1/16
+K: D
+D2 | F3FF2F2A2D2 | F3EE2E4
+F2 | F4F2A3GF2 | E2A2A2A4
+F2 | G3GG2B2A2G2 | F4F2A4
+F2 | E4E2G2F2E2 | E2D2D2D4
+F2 | G3GG2B2A2G2 | F4F2A4
+F2 | E4E2G2F2E2 | E2D2D2D4
+
+X:156
+T: Der grausame Bruder
+N: Q0068A
+O: Mitteleuropa, Deutschland / Frankreich, Elsass
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 2/4
+L: 1/8
+K: G
+D | G2_B2 | A2d2 | c_BA
+D | G2_B2 | A2d2 | c_BA
+B | cccd | _BAG
+D | G2A2 | _Bcd2 | _B2AG | G2z
+
+X:157
+T: Der grausame Bruder
+N: Q0068B
+O: Mitteleuropa, Deutschland (BRD) , Niedersachsen, Hannover, Gifhorn
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 6/8
+L: 1/16
+K: F
+C2 | C2F2F2F2G2A2 | A2G2F2G4
+CC | B4c2A3GFA | G3FE2F4
+A2 | B3cB2A3GFA | G3FE2F4
+A2 | B3cB2A3GFA | G3FE2F4
+
+X:158
+T: Der grausame Bruder
+N: Q2068C
+O: Nordeuropa, Schweden
+N: Schwedische Fassung der Ballade.
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 2/4
+L: 1/8
+K: G
+ | G2AA | _B2BA | _B2cc | d2Ac | _B2A2 | z3
+A | A2_Bc | d2Ac | _B2FF | G2
+A2 | _Bcd_e | d2FA | A2G2
+
+X:159
+T: Der grausame Bruder
+N: Q1068D
+O: Osteuropa, Polen, Bielitz
+N: Melodievergleich zu Q0068A, anderes Lied. Anhaengsel in der ersten
+N: Zeile.
+R: Dreikoenigs - Lied, Brauchtum
+M: 6/8
+L: 1/8
+K: G
+D | G2A_B2d | c2_BA2d | c2_BA2
+A | _B2cd2c | _B2AG2
+A | _B2cd2c | _B2AG2
+
+X:160
+T: Der grausame Bruder
+N: Q3068E
+O: Mitteleuropa, Niederlande
+N: Melodievergleich zu Q0068A, anderes Lied.
+R: geistlich
+M: none
+L: 1/16
+K: G
+G2 | G4_B4 | A4d4 | c_Bcdc2B2 | A4z2
+G2 | G4_B4 | A4d4 | c_Bcdc2B2 | A4z2
+d2 | d2d2=f4_e2 | d4c2 | d4
+_B4 | A2_B2c2 | d4G2 | _BABcB2A2 | G4
+
+X:161
+T: Der grausame Bruder
+N: Q1068F
+O: Osteuropa, Tschechoslowakei, Sudetenland, Deutsch - Proben, Gaidel
+N: Melodievergleich zu Q0068A, anderes Lied "Der Gluecksjaeger" .
+R: ???
+M: 2/4
+L: 1/16
+K: G
+D4 | G4B4 | A6d2 | c2B2A2
+G2 | G2B2A2G2 | F2E2D2
+DD | G2B2A2G2 | B4c2A2 | G4
+
+X:162
+T: Der grausame Bruder
+N: Q0068G
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 6/8
+L: 1/16
+K: G
+GA | B3AB2G2A2B2 | c3Bc2A4
+AB | c2A2d2B3AG2 | A3BA2G4
+AB | c2A2d2B3AG2 | A3BA2G4
+
+X:163
+T: Der grausame Bruder
+N: Q0068H
+O: Mitteleuropa, Deutschland (DDR) , Sachsen, Genthin
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 3/4
+L: 1/4
+K: G
+D | GGD | GAB | AFA | FD
+G | EFG | DDB, | EFG | Dz
+D | GGD | GAB | DDD | Gz
+
+X:164
+T: Der grausame Bruder
+N: Q0068I
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Neumark, Fuerstenfelde
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 3/4
+L: 1/8
+K: G
+D2 | G4A2 | B4d2 | B3GB2 | A2D2
+B2 | G2F2G2 | E2F2G2 | A3GF2 | E2z2
+FE | D3^CD2 | B,3CD2 | E3DC2 | B,2z2
+
+X:165
+T: Der grausame Bruder
+N: Q0068J
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen,
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 2/4
+L: 1/8
+K: G
+D | DGGG | A3B | BdcB | A2
+AB | c2cA | B2BA | G2F2 | E3
+E | A2BA | G2cA | B2A2 | G2z
+
+X:166
+T: Der grausame Bruder
+N: Q0068K
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen, Hambach
+N: Letzten Notenwert der dritten Zeile rhythmisch korrigiert.
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 3/8
+L: 1/16
+K: G
+GB | d4BG | B4Bd | B2G2D2 | E3
+DFA | G4Bd | d4A2 | G4
+GB | d4BG | B4Be | d4BG | A2z
+DFA | G4A2 | GGG2B2 | d4F2 | G4
+
+X:167
+T: Der grausame Bruder
+N: Q2068L
+O: Nordeuropa, Daenemark, Faeroer
+N: Daenische Fassung der Ballade.
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 4/4
+L: 1/8
+K: D
+=F2 | =FFF2=CCE2 | =F2G2F2
+A2 | =ccc2AA=F2 | =F2F2D2
+
+X:168
+T: Der grausame Bruder
+N: Q1068M
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0068L und J, anderes Lied.
+R: geistlich, Ruf
+M: 6/4
+L: 1/4
+K: D
+D | D2=C=F2F | GAG=F2
+D | D2=C=F2F | GAG=F2
+=c | =c2GA2E | =FGED2
+=c | =c2GA2E | =FGED2
+
+X:169
+T: Der grausame Bruder
+N: Q1068N
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Melodievergleich zu Q0068J, anderes Lied "Der Schuhknecht" .
+N: Schlusspause korrigiert.
+R: Ballade, ???
+M: 4/4
+L: 1/16
+K: F
+C4 | F3FF4G4A2B2 | B2c2B2A2G4z2
+GA | B4B2A2G6A2 | F3FF2D2D4z2
+G2 | G4G4F4B3B | A3AG2E2F4
+
+X:170
+T: Der grausame Bruder
+N: Q3068O
+O: Nordeuropa, Schweden
+N: Melodievergleich zu Q0068J, anderes Lied "Herr Ake" .
+R: ???
+M: 4/4
+L: 1/8
+K: D
+D | D2DDAAA_B | =c_BAG=F2GA | _B2A2z3
+=c | =cdc_BA2E=F | AG=FED2z
+=C | =F2A_BAGFE | E2D2z3
+
+X:171
+T: Der grausame Bruder
+N: Q2041d
+O: Osteuropa, Ungarn
+N: Melodievergleich zu Q0068J, anderes Lied "Maedchenmoerder" , deshalb
+N: in die Balladengruppe Q0041 eingeordnet.
+N: Verzierungen (Vorschlaege und Glissando) .
+R: Ballade, Verfuehrung, Mord, Rache
+M: 2/4
+L: 1/8
+K: D
+ | DDAA | =c_BAG
+A=FFG | =FEDA,
+DFA3E | G=FE2 | D2z2
+
+X:172
+T: Der grausame Bruder
+N: Q0068P
+O: Mitteleuropa, Deutschland (DDR) , Provinz Sachsen, Estedt
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 3/8
+L: 1/16
+K: C
+G2 | c2B2A2 | G3EC2 | D3EF2 | F2E2
+G2 | A2B2c2 | G2G2c2 | d2d2e2 | c4
+
+X:173
+T: Der grausame Bruder
+N: Q0068Q
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Korkwitz
+N: Eingeklammerte Note kodiert.
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 4/4
+L: 1/8
+K: G
+GA | B4A4 | G2G2A2A2 | B4z2
+GA | B4A4 | G2G2A2A2 | B4z2
+G2 | B2B2d2B2 | A2A2c2
+A2 | G2G2G2d2 | B4A4 | G4z2
+
+X:174
+T: Der grausame Bruder
+N: Q0068R
+O: Mitteleuropa, Deutschland (BRD) , Wuerttemberg
+N: Finaltoene zweistimmig. Oberen kodiert. Grundton in der
+N: zweigestrichenen Oktave.
+R: Ballade, Schwangerschaft, Moral, Mord
+M: none
+L: 1/16
+K: C
+G,4 | C4D4 | EDEF | GAG2F4 | E4
+G4 | A4G4 | F4E4D4D4 | E2F2G2F2 | E4
+G,4 | C4C4D4 | E4E2F2 | G4G2F2 | E4
+
+X:175
+T: Der grausame Bruder
+N: Q0068S
+O: Suedosteuropa, Jugoslawien, Batschka, Militic
+N: Eingeklammerte Noten kodiert.
+R: Ballade, Schwangerschaft, Moral, Mord
+M: 4/4
+L: 1/8
+K: C
+CE | G4G3A | G2E2D2z
+E | E2C2CCC2 | B,2D2G,2z
+C | C2E2G2GA | G2E2D2
+
+X:176
+T: Bai Raedder
+N: Q0071
+O: Mitteleuropa, Deutschland (BRD) , Nordsee, Foehr, Oevenum
+R: Ballade, Verleumdung, Moral, Mord
+M: 4/4
+L: 1/8
+K: A
+E2 | E2A2A2A2 | =f2e^de2
+=G2 | =c2c2dcd2 | e4z2
+E2 | A2=c2B2d2 | =c2B2A4
+cdcBA4 | =c2A2B2G2 | A4z2
+
+X:177
+T: Bai Raedder
+N: Q3071A
+O: Nordeuropa, Daenemark
+N: Melodievergleich zu Q0071, anderes Lied "Ribold og Guldborg" .
+N: Zweite und vierte Zeile: Refrain.
+R: Ballade, ???
+M: none
+L: 1/8
+K: D
+A, | D2DD | A2AA | _B2AG | G2
+=F2G | A2A2z3
+A | _B2AG | A2EE | =F2ED | C2
+DE | =F2ED | =FEDC | D2D2
+
+X:178
+T: Bai Raedder
+N: Q1071B
+O: Mitteleuropa, Deutschland (BRD) , Nordsee, Foehr
+N: Melodievergleich zu Q0071, anderes Lied. Anhaengsel an der dritten
+N: Zeile.
+R: Hochzeits - Lied, Tanz
+M: none
+L: 1/8
+K: A
+E2 | E2A2A2A2 | =ccBAB2
+BB | BBB2=c2c2 | d8
+B2B2=c2c2 | ddABA4 | =ccBcA4
+c2c2BGG2 | A8
+
+X:179
+T: Bai Raedder
+N: Q0071C
+O: Mitteleuropa, Deutschland (BRD) , Nordsee, Foehr
+N: Ohne Textunterlegung. Phraseneinteilung etwas unklar.
+R: Ballade, Verleumdung, Moral, Mord
+M: 4/4
+L: 1/4
+K: G
+D | GGGG | GED
+D | EEFC | G3
+D | GGGG | GED2 | GED2 | GED2
+EEFC | G3

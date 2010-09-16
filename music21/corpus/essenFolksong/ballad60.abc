@@ -1,0 +1,1540 @@
+
+X:1
+T: Sangeslohn
+N: Q0124
+O: Mitteleuropa, Niederlande
+N: Tonangabe zur Ballade "Sangeslohn" - moegliche Melodie (??) .
+R: geistlich
+M: 4/4
+L: 1/8
+K: D
+D2 | =F2G2A2d2 | =cBA3z
+A2 | =c3BB2A2G2 | G=F-^F3z
+=FD | E2=F2G3GD2 | D2=C3z
+=FD | E2=F2G2F2 | ED-D3z
+
+X:2
+T: Sangeslohn
+N: Q0124A
+O: Mitteleuropa, Deutschland
+N: Tonangabe zur Ballade "Sangeslohn" - moegliche Melodie (??) .
+R: geistlich
+M: none
+L: 1/2
+K: D
+D2=FGAd=cBA
+Ac2AF2AGGF
+GA2AD2FEDC
+EG2FE2DDC2D4
+
+X:3
+T: Sangeslohn
+N: Q0124B
+O: Mitteleuropa, Deutschland
+N: Tonangabe zur Ballade "Sangeslohn" - moegliche Melodie (??) .
+N: Taktart von "3er" in 6/4 geaendert. Dabei Notenwerte halbiert und
+N: zwei Notenwerte rhythmisch korrigiert.
+R: geistlich
+M: 6/4
+L: 1/8
+K: F
+F2 | F4F2F4D2 | C4G2G4
+G2 | A4B4G2G2 | F6-F4
+A2 | B4B2B4A2 | G6G4
+G2 | A4c2c3BA2 | G6-G4
+G2 | A4B4G2G2 | F6-F4
+
+X:4
+T: Sangeslohn
+N: Q0124C
+O: Mitteleuropa, Deutschland
+N: Tonangabe zur Ballade "Sangeslohn" - moegliche Melodie (??) .
+R: geistlich
+M: 3/2
+L: 1/2
+K: F
+ | FFF | F2D | C2G | G2
+G | B2B | AG2 | F3
+BBB | B2A | G3 | G2
+A | c2c | B2A | G2
+G | B2B | AG2 | F3
+
+X:5
+T: Die schoene Magdalena
+N: Q0125
+O: Mitteleuropa, Deutschland / UdSSR, Ostpreussen, Loschkeim, Spinnstube
+N: Beginn einer weiteren Melodievariante abgedruckt.
+N: Sechste Zeile = refrainartig, auf Wortwiederholungen.
+R: Ballade, verbotene Liebe, Flucht
+M: 6/8
+L: 1/16
+K: D
+A,2A,2 | D4D2E4E2 | F6E4
+A2 | A4A2B2A2^G2 | A6z2
+A,2A,2 | D4D2E4E2 | F6E4
+A2 | A4A2B2A2^G2 | A6z4
+A2 | d2A2A2A2F2D2 | E3FE2C2B,2
+A,2 | D4F2E4G2 | B6A2z2
+G2 | F2A2D2E2G2C2 | D6z2
+
+X:6
+T: Die schoene Magdalena
+N: Q0125A
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Schlusspause ergaenzt.
+N: Vierte Zeile = refrainartig, auf Wortwiederholungen.
+R: Ballade, verbotene Liebe, Flucht
+M: 6/8
+L: 1/16
+K: G
+D4 | G3A_BBA2G2FF | G3A_BGA4
+dd | d2d2d2d2_B2c2 | d6z4
+_Bc | d2d2ddc2c2dc | _Bcd2z6
+cB | A_Bc2z6BA | G3A_BGA4
+GA | _B2d2ccd2B2A2 | G4z4
+
+X:7
+T: Die schoene Magdalena
+N: Q0125B
+O: Mitteleuropa, Deutschland
+N: Moeglicherweise Ton, in dem die Ballade gesungen wurde. (??)
+N: Taktart entsprechend den Taktstrichen in 6/4 geaendert.
+R: geistlich
+M: 6/4
+L: 1/4
+K: F
+F | c2cc2c | d2fe2d | c3A2
+c | B2AF2F | A2Bc2B | G3A2
+c | B2AF2F | A2Bc2B | G3F2
+
+X:8
+T: Die schoene Magdalena
+N: Q0125C
+O: Mitteleuropa, Deutschland
+N: komponiert
+R: Ballade, verbotene Liebe, Flucht
+M: 2/4
+L: 1/16
+K: F
+FG | A2GAB2AB | c4c2
+Bc | d2cde2de | f6
+ed | c2c2c2dc | B4B2
+cB | A2BAG2AG | F6
+
+X:9
+T: Die schoene Magdalena
+N: Q0125D
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Kleinere Melodievarianten aus anderer Quelle abgedruckt.
+N: Vierte Zeile = refrainartig auf Wortwiederholungen.
+R: Ballade, verbotene Liebe, Flucht
+M: 6/8
+L: 1/16
+K: G
+D2 | G3A_B2A2G2F2 | G2A2_B2A4
+A2 | d3dd2c2B2c2 | d6z4
+_B2 | d2d2d2_e2d2c_B | A_Bc2
+BAG2B2BA | G3A_B2A4
+GG | d2d2c2d2_B2A2 | G6z4
+
+X:10
+T: Die schoene Magdalena
+N: Q0125E
+O: Mitteleuropa, Deutschland / UdSSR, Ostpreussen
+N: Schlusspause korrigiert.
+N: Vierte und sechste Zeile = refrainartig auf Wortwiederholungen.
+R: Ballade, verbotene Liebe, Flucht
+M: 6/8
+L: 1/16
+K: G
+D2 | G4G2B2A2G2 | d6d2z2
+d2 | d4d2e2d2^c2 | d6z4
+D2 | G4G2B2A2G2 | d6d2z2
+d2 | d4d2e2d2^c2 | d6z4
+d2 | g2d2d2d2B2G2 | A3A
+A2F3ED2 | G4B2A4c2 | e6d2z2
+c2 | B2d2G2A2c2F2 | G6z4
+
+X:11
+T: Die schoene Magdalena
+N: Q0125F
+O: Mitteleuropa, Deutschland / Polen, Pommern, Stettin und Kolberg
+N: Kleinere Melodievarianten aus anderer Quelle abgedruckt.
+N: Vierte und sechste Zeile = refrainartig auf Wortwiederholungen.
+R: Ballade, verbotene Liebe, Flucht
+M: 6/8
+L: 1/16
+K: G
+D2 | G4G2G2e2d2 | B2G2z6
+B2 | d4c2A2B2c2 | d4z6
+D2 | G4G2G2e2d2 | B2G2z6
+B2 | d4c2A2B2c2 | d4z6
+Bc | d2d2edc2c2dc | B2B2
+cBA2A2BA | G4B2D4
+D2 | G2B2e2d2c2A2 | G4z6
+Bc | d2d2edc2c2dc | B2B2
+cBA2A2BA | G4B2D4
+D2 | G2B2e2d2c2A2 | G4z6
+
+X:12
+T: Die schoene Magdalena
+N: Q0125G
+O: Osteuropa, UdSSR, Ukraine, Zaporoze, Viktoriafeld
+R: Ballade, verbotene Liebe, Flucht
+M: 6/8
+L: 1/16
+K: G
+DD | G4G2G2e2d2 | B2G4z4
+d2 | d2c2A2F2d2c2 | B6z4
+d2 | B2A2G2F2e2dc | B2d2
+cBA2c2BA | G4A2B4
+D2 | G2B2e2d2c2F2 | G6z4
+
+X:13
+T: Das mannstolle Maedchen
+N: Q0126
+O: Mitteleuropa, Deutschland
+N: Zaesuren vom Abdruck auf S. 92 uebernommen.
+R: Ballade, Werbung, Betrug
+M: none
+L: 1/8
+K: G
+G2 | G2A2B2c4 | B2A4G2
+G2 | d2A4d4c2 | d4z2
+d4 | c2A2B2c2 | d4c4
+BA | G4G2A3Bc2 | d4
+d2c2 | BAG4ABcde2d3B | c2A4G8
+
+X:14
+T: Das mannstolle Maedchen
+N: Q0126A
+O: Mitteleuropa, Luxemburg
+R: Ballade, Werbung, Betrug
+M: 2/4
+L: 1/8
+K: G
+D2 | G3F | G2AB | G2GF | G2
+c2 | B2AB | G2B2 | A4 | z2
+AB | c3B | ABcA | B3G | A2z2
+B2AG | FEDE | F2
+G2 | FEDE | F2
+
+X:15
+T: Das mannstolle Maedchen
+N: Q0126B
+O: Mitteleuropa, Deutschland
+N: Rekonstruktion der Balladenmelodie aus einem mehrstimmigen Satz von
+N: Orlando di Lasso.
+R: Ballade, Werbung, Betrug
+M: none
+L: 1/8
+K: G
+D2 | A2B2 | A2G2 | cBAA | G2z
+d | d2d2^c2d2 | B2c2A2z2
+G2 | BBAA | B2Az2
+B2 | BABG | A2z2
+GGB | d2d2^cd2c | d2z2
+dd | c2B2A2B2 | c2A2G4
+
+X:16
+T: Das mannstolle Maedchen
+N: Q0126C
+O: Mitteleuropa, Deutschland
+N: Rekonstruktion der Balladenmelodie aus einem mehrstimmigen Satz von
+N: Melchior Franck. Schlusspause ergaenzt.
+R: Ballade, Werbung, Betrug
+M: 2/4
+L: 1/8
+K: G
+A | AAdd | c2A
+c | BABB | A2z
+A | Bdd^c | d2
+Bd | cBAG | BAG2 | z3
+
+X:17
+T: Das mannstolle Maedchen
+N: Q0126D
+O: Mitteleuropa, Deutschland
+N: Rekonstruktion der Balladenmelodie aus einem mehrstimmigen Satz von
+N: Melchior Franck. Schlusspause ergaenzt und Notenwert am Ende
+N: der ersten Zeile rhythmisch korrigiert.
+R: Ballade, Werbung, Betrug
+M: 2/4
+L: 1/16
+K: D
+A2 | A3AB2c2 | d4c2
+A2 | B2d2d2c2 | d4
+F2A2 | G2F2E2D2 | F2E2D4 | z6
+
+X:18
+T: Das mannstolle Maedchen
+N: Q0126E
+O: Mitteleuropa, Deutschland
+N: Pausen am Ende der zweiten, sechsten und letzten Zeile eingefuegt.
+N: Anhaengesel an mehreren Zeilen.
+R: Ballade, Werbung, Betrug
+M: 2/4
+L: 1/16
+K: A
+E2 | A2B2=c2A2 | B2B2A2
+=c2 | B2A2=G2F2 | E4^D2E2FDE2 | E4z2
+E2 | A2B2=c2A2 | B2B2A2
+=c2 | B2A2=G2F2 | E4^D2E2FDE2 | E4
+A4 | B2=cBc2A2 | =G2F2E4
+=c4d4 | e4e2d=c | B2A2A2G2 | A6z2
+A2BA | A2G2A4 | A2E2E2=FG | A4z2
+
+X:19
+T: Das Maedchen und der Faehnrich
+N: Q0127
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Gramzow
+R: Ballade, verbotene Liebe, Flucht
+M: 4/4
+L: 1/8
+K: E
+=D2 | B3AB2=cB | A3=GA2
+BA | =G2G2GAB2 | A3=GF2
+EF | =GAGFE2FG | ABA=GF2
+=D2 | B2B2A=GFE | F4E2
+
+X:20
+T: Das Maedchen und der Faehnrich
+N: Q0127A
+O: Osteuropa, UdSSR, Ukraine
+N: Verzierungen (Vorschlaege) .  Grundton in der kleinen Oktave.
+R: Ballade, verbotene Liebe, Flucht
+M: none
+L: 1/8
+K: G
+D2 | G2A2B2c2 | d2B2G2
+G2 | e2e2g2ze | e2d2d2
+e2c2c2c2 | d2B2B2G2 | d2
+B2A2A2B2A2 | G2B2d6z2
+e2c2c2c2 | d2B2B2G2 | d2
+B2A2A2c2A2 | A2G2G6
+
+X:21
+T: Das Maedchen und der Faehnrich
+N: Q0127B
+O: Osteuropa, UdSSR, Ukraine
+R: Ballade, verbotene Liebe, Flucht
+M: 2/4
+L: 1/8
+K: B
+d | fffe | ddd
+c | BBgf | f2e
+c | eeed | ccc
+c | fedc | B2B
+
+X:22
+T: Das Maedchen und der Faehnrich
+N: Q0127C
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+R: Ballade, verbotene Liebe, Flucht
+M: 6/8
+L: 1/16
+K: G
+D2 | D2G2G2G4B2 | B4d2G4
+B2 | B2A2A2D2F2A2 | A6G4
+D2 | D2G2GGG2B2B2 | B4d2G4
+B2 | B2A2A2D2F2A2 | A6G4
+
+X:23
+T: Das Maedchen und der Faehnrich
+N: Q0127D
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Taktart entsprechend der Takteinteilung als 6/8 bezeichnet.
+R: Ballade, verbotene Liebe, Flucht
+M: 6/8
+L: 1/16
+K: G
+D2 | D2G2G2G4B2 | d4c2B4
+d2 | c4ccA2G2B2 | c4d2A4
+DD | D4G2F4B2 | d4d2B4
+d2 | d2c2c2A2B2c2 | c4d2B4
+
+X:24
+T: Das Maedchen und der Faehnrich
+N: Q0127E
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Neustadt - Eberswalde
+R: Ballade, verbotene Liebe, Flucht
+M: 4/4
+L: 1/8
+K: G
+_B2 | c_BAG=F2GA | _B2B2B2
+B2 | c2_B2G2cB | G4G2
+_B2 | c_BAG=F2GA | _B2B2B2
+B2 | c2_B2G2cB | G4G2
+_Bc | d2d2d2_ed | c2_B2c2
+Bc | ddddd2_ed | c2A2=F2
+_Bc | d2c2d2_ed | c2_B2c2
+_ed | c2cccc_ee | d2_B2=F2
+Bc | dc_BAG2AB | c2c2c2
+cc | d2d2G2c_B | A4G2
+
+X:25
+T: Das Maedchen und der Faehnrich
+N: Q0127F
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Birkenwerder
+R: Ballade, verbotene Liebe, Flucht
+M: 4/4
+L: 1/8
+K: G
+GA | _BcBAG2AB | cdc_BA2
+c2 | d2d2G2c2 | _B2A2G2
+G2 | d3cd2_e2 | c3_Bc2
+d2 | _B2A2B2d2 | c2_B2A2
+GA | _BcBAG2AB | cdc_BA2
+c2 | d2d2G2c2 | _B2A2G2
+
+X:26
+T: Das Maedchen und der Faehnrich
+N: Q0127G
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Charlottenburg
+N: Taktart entsprechend der Takteinteilung in 2/4 geaendert.
+R: Ballade, verbotene Liebe, Flucht
+M: 2/4
+L: 1/16
+K: G
+G2 | B2BAG2Bc | d2dcB2
+d2 | e2e2A2d2 | c4B2
+G2 | B2BAG2Bc | d2dcB2
+d2 | e2e2A2d2 | c4B2
+G2 | e3ce2ge | d3Bd2
+ed | c2cBc2d2 | c4B2
+
+X:27
+T: Das Maedchen und der Faehnrich
+N: Q0127H
+O: Osteuropa, UdSSR, Ukraine, Wolga
+N: Verzierung (Vorschlag) . Schlusspause ergaenzt.
+R: Ballade, verbotene Liebe, Flucht
+M: 4/4
+L: 1/8
+K: G
+B | d3Bd2ed | c3Bc2
+dB | AAG2A2d2 | c2B2A2
+AB | c2dBA2d2 | c2cBA2
+GB | ddd2GAB2 | A2B2G2
+AB | c2dBA2d2 | c2cBA2
+GB | ddd2GAB2 | A2B2G2z
+
+X:28
+T: Das Maedchen und der Faehnrich
+N: Q0127I
+O: Osteuropa, Polen, Mittelpolen, Kr. Nessau, Gross Rudzk
+R: Ballade, verbotene Liebe, Flucht
+M: 6/8
+L: 1/16
+K: G
+B2 | d4B2d4d2 | c4c2c4
+c2 | B4B2d3cB2 | A6G4
+B2 | c4B2A2A2G2 | c4B2A4
+d2 | e3dc2B4B2 | A6G4
+B2 | c4B2A2A2G2 | c4B2A4
+d2 | e3dc2B4B2 | A6G4
+
+X:29
+T: Das Maedchen und der Faehnrich
+N: Q0127J
+O: Mitteleuropa, Deutschland (DDR) , Sachsen, Grossenhain
+R: Ballade, verbotene Liebe, Flucht
+M: 2/4
+L: 1/16
+K: G
+GB | d2d2d2g2 | B2B2B2
+G2 | B3GB2d2 | c3BA2
+c2 | B2d2A2c2 | B2d2A2
+e2 | d2c2B2B2 | A4G2
+
+X:30
+T: Der verlorene Schuh
+N: Q0128
+O: Mitteleuropa, Deutschland
+N: Kontrafaktur, Ballade wurde vermutlich nach der Melodie des Schwankes
+N: "Pfaffenschandlied" gesungen.
+R: Ballade, Verfuehrung, verbotene Liebe, Ausrede; Schwank
+M: none
+L: 1/8
+K: G
+G2 | G2G2G2G2 | A2A2A2
+G2 | B2c2d2B2 | A4G4z2
+G2 | G2G2G2G2 | A2A2A2
+G2 | B2c2d2B2 | A4G4z2
+G2 | d2d2d2c2 | dcB2A4z2
+A2 | B2B2Bcd2 | B2c2G4z2
+G2A2G2 | d4z2
+e2 | d2c2dGA2 | G6
+
+X:31
+T: Das weinholende Maedchen
+N: Q0129
+O: Osteuropa, UdSSR, Wolga - Gebiet
+N: Vexierlied: Lied mit "Auslassung"
+R: Ballade, Werbung; Scherz -, Vexier - Lied
+M: 4/4
+L: 1/16
+K: F
+C2 | F4F4F3FF2G2 | A3AA2G2F4z2
+G2 | A4c4B2B2A2
+C2 | F4F4F3FF2G2 | A3AA2G2F4z2
+G2 | A4c4B2B2A2z2 | G4A2B2c2B2A2A2 | G6F2F4z2
+c2 | c3BA2B2c6c2 | d3ef2d2c4z2
+A2 | A3Bc2c2B2B2A2
+c2 | c3BA2B2c6c2 | d3ef2d2c4z2
+A2 | A3Bc2c2B2B2A2z2 | G4A2B2c4B2A2 | G6F2F4z2
+
+X:32
+T: Das weinholende Maedchen
+N: Q2129A
+O: Mitteleuropa, Deutschland (DDR) , Lausitz, Wittichenau; sorbisch
+N: Sorbische Fassung der Ballade.
+R: Ballade, Werbung
+M: 2/4
+L: 1/8
+K: G
+ | _B2dc | _B2=F2 | G2_BA | G2
+=F2 | G2_BA | G2
+=F2 | _B2c2 | d2c2 | _B3A | G4
+
+X:33
+T: Das weinholende Maedchen
+N: Q0129B
+O: Mitteleuropa, Deutschland (BRD) , Rheinland, Niederrhein
+N: Vermutlich keine originale Balladenmelodie sondern Unterlegung des
+N: Balladentextes mit einer anderen Balladenmelodie durch Zuccalmaglio.
+R: Ballade, Werbung
+M: 6/8
+L: 1/8
+K: G
+D | G2GA_Bc | d3A2
+A | d2ddc_B | A2z3
+d | =f_edcde | d3dc
+A | _BAGcBA | G3z2
+
+X:34
+T: Der Muskatbaum
+N: Q0130
+O: Mitteleuropa, Deutschland (BRD) , Rheinland, Niederrhein
+N: Zweizeilige Melodie, vermutlich mit Wiederholung auf die vierzeilige
+N: Textstrophe gesungen.
+R: Ballade, Werbung, Standesunterschied
+M: 4/4
+L: 1/8
+K: F
+C2 | F2F2G2G2 | A2AGF2
+G2 | AGABc2BA | B2A2G2
+
+X:35
+T: Der Muskatbaum
+N: Q0130A
+O: Mitteleuropa, Deutschland (BRD) , Rheinland, Niederrhein
+R: Ballade, Werbung, Standesunterschied
+M: 6/8
+L: 1/16
+K: D
+D2 | A4A2A4A2 | B4c2d4
+B2 | e4d2c2B2A2 | B6A2z2
+A2 | d4d2F4B2 | A3BAGF4
+D2 | E4FGA3GF2 | E6D4
+
+X:36
+T: Der Muskatbaum
+N: Q2130B
+O: Mitteleuropa, Deutschland (DDR) , Lausitz; sorbisch
+N: Sorbische Fassung der Ballade.
+R: Ballade, Werbung, Standesunterschied
+M: 3/4
+L: 1/8
+K: C
+G2 | c4c2 | B2A2G2 | A4B2 | c4
+B2 | A2B2c2 | d4B2 | c2B2A2 | G4
+G2 | c4G2 | A4FD | G2G2F2 | E4
+D2 | E4A2 | G4G2 | F2E2D2 | C4
+
+X:37
+T: Der Muskatbaum
+N: Q2130C
+O: Mitteleuropa, Deutschland (DDR) , Lausitz; sorbisch
+N: Sorbische Fassung der Ballade.
+R: Ballade, Werbung, Standesunterschied
+M: 3/4
+L: 1/4
+K: G
+D | G2B | G2D | E2F | G2
+D | G2B | A2D | GFE | D2
+
+X:38
+T: Der Muskatbaum
+N: Q2130D
+O: Mitteleuropa, Deutschland (DDR) , Lausitz; sorbisch
+N: Sorbische Fassung der Ballade. Verzierung (Vorschlag) im letzten
+N: Takt. Grundton unsicher.
+R: Ballade, Werbung, Standesunterschied
+M: 3/4
+L: 1/8
+K: A
+ | D2D2=G2 | A2E2D2 | E2E2G2 | A4
+=cB | A2=GFE2 | F2=G2A2 | E4z2
+
+X:39
+T: Der Werber und der Jude
+N: Q0131
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen, Kr. Saargemuend,
+R: Ballade, Braut - Werbung, Erpressung
+M: 4/4
+L: 1/8
+K: G
+D2 | G3AB2c2 | A3BG2
+D2 | G3AB2c2 | A2ABG2
+B2 | d2d2d2ee | d4A2
+A2 | d2c2B2A2 | G2E2D2
+D2 | G2A2B2c2 | A4G2
+
+X:40
+T: Der Werber und der Jude
+N: Q0131A
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen, Kr. Saargemuend,
+R: Ballade, Braut - Werbung, Erpressung
+M: 4/4
+L: 1/8
+K: G
+d2 | d2e2d2B2 | G2E2D2
+D2 | G2B2AAG2 | F2FFG2
+G2 | d2d2d2d2 | d4G2
+d2 | d2c2B2A2 | G2E2D2
+D2 | G2A2B2B2 | A4G2
+
+X:41
+T: Der Werber und der Jude
+N: Q0131B
+O: Osteuropa, UdSSR, Wolga - Gebiet, Rothammel
+N: Transkription einer Tonaufnahme. Verzierungen (Nachschlaege) .
+R: Ballade, Braut - Werbung, Erpressung
+M: none
+L: 1/8
+K: G
+D | DEFGAB | G2z
+D | DEFGAB | G2z2
+A2 | Bdcd | B2A2
+Bdcc | BBA
+B | GGFD | E2D2
+
+X:42
+T: Lieber ins Wasser
+N: Q0132
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen, Kr. Forbach,
+R: Ballade, Noetigung, Flucht
+M: 6/4
+L: 1/8
+K: E
+=D2 | E4=D2E4DD | =G2A2BAG4
+=D2 | =G2G2AA=c2B2A2 | =G2A2B2A4
+AG | A4=d2=c2B2A2 | =G4E2=F2E2
+E2 | =F2E2=D2=G2^F2G2A4F2 | E6E4
+A=G | A4=d2=c2B2A2 | =G4E2=F2E2
+E2 | =F2E2=D2=G2^F2G2A4F2 | E6E4
+
+X:43
+T: Lieber ins Wasser
+N: Q0132A
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen, Kr. Forbach,
+N: Schlusspause ergaenzt.
+R: Ballade, Noetigung, Flucht
+M: 6/4
+L: 1/16
+K: E
+E4=G4G4A4 | B4B4A4=G6A2B2A2 | A8
+E4=G4G4A4 | B4B4A4=G8E4 | =F4E4
+E4F8E4 | A8=G4A8G3=F | E12=D8z4 | z8
+
+X:44
+T: Der Nachtjaeger
+N: Q0133
+O: Mitteleuropa, Deutschland
+N: Schlusspause korrigiert. Grundton in der zweigestrichenen Oktave.
+N: Vorletzte Zeile = Refrain auf  sinnfreie Silben.
+R: Ballade, Jagd, Flucht, Vergewaltigung, Tod
+M: 6/8
+L: 1/16
+K: C
+G,2 | C4C2C3B,A,2 | G,4G,2G,4
+G2 | E6D6 | C6z4
+G,2 | C4C2C3B,A,2 | G,4G,2G,4
+G2 | E6D6 | C6z6
+G2E2E2G2 | F2D2D2
+G,2 | CDEFG2C2 | E4D4 | C6
+
+X:45
+T: Der Nachtjaeger
+N: Q0133A
+O: Mitteleuropa, Deutschland (DDR) , Sachsen - Anhalt
+N: Anhaengsel an der ersten Zeile. Dritte Zile = Refrain auf
+N: sinnfreie Silben. Eingeklammerte Toene kodiert.
+R: Ballade, Jagd, Flucht, Vergewaltigung, Tod
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2G2AA | B2A2G2g2 | ddddd2
+gd | dcccA2cA | G2BAG2
+cB | BAAAAAcA | GGBAG2BA | G2BAG2
+
+X:46
+T: Der Nachtjaeger
+N: Q0133B
+O: Mitteleuropa, Deutschland (DDR) , Pommern, Stralsund
+N: Anhaengsel an der ersten Zeile.  Dritte Zeile =  Refrain auf
+N: sinnfreie Silben.
+R: Ballade, Jagd, Flucht, Vergewaltigung, Tod
+M: 4/4
+L: 1/8
+K: G
+D2 | GFGABABc | d2cBA2zB | d2cBF2z
+A | ABAGFEFG | AGFED2z2
+d2B2B3B | c2A2A3
+A | GABcd2GA | B2A2G2
+
+X:47
+T: Der Nachtjaeger
+N: Q0133C
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Nassau
+N: Dritte Zeile = Refrain auf sinnfreie Silben. Schlusspause korrigiert.
+R: Ballade, Jagd, Flucht, Vergewaltigung, Tod
+M: 2/4
+L: 1/16
+K: G
+GB | d4d2c2 | B2A2B2c2 | d2d2e2dc | B4z2
+GB | d6d2 | e4d2c2 | B4A4 | G4z4
+A4A2A2 | A6d2 | BBBBBABc | B4z2
+GB | d6d2 | e4d2c2 | B4A4 | G4z2
+
+X:48
+T: Der Nachtjaeger
+N: Q0133D
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Grafschaft Glatz
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Jagd, Flucht, Vergewaltigung, Tod
+M: 4/4
+L: 1/8
+K: C
+G | G2EGc2BA | A2G2G2z
+G | FFFFA2GF | F2E2E2z
+G | GFEFEGcG | GFEGc2z
+c | cccce2dc | c2B2c2z
+
+X:49
+T: Der Nachtjaeger
+N: Q0133E
+O: Osteuropa, Tschechoslowakei, Boehmerwald, Muttersdorf
+N: Verzierungen (Glissandi) .
+R: Ballade, Jagd, Flucht, Vergewaltigung, Tod
+M: 4/4
+L: 1/16
+K: G
+d2 | d4B2g2g4f3e | e3dd2g2d4z2
+B2 | B3AA2e2e4d2A2 | c3BB2e2d4z2
+d2 | g3gg2b2a2b2c2a2 | f2d2e2f2g4z2
+
+X:50
+T: Der Nachtjaeger
+N: Q0133F
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+N: Anhaengsel an der vierten Zeile.
+R: Ballade, Jagd, Flucht, Vergewaltigung, Tod
+M: 2/4
+L: 1/16
+K: D
+A2 | A4d2B2 | A3BA2F2 | G4G2B2 | A4z2
+A2 | A4d2B2 | A3BA2F2 | G4G2B2 | A4z2
+F2 | F2E2F2A2 | G2F2E2
+D2 | F2E2F2A2 | G2F2E2D2 | A4A4 | F4z2
+
+X:51
+T: Der Nachtjaeger
+N: Q0133G
+O: Mitteleuropa, Deutschland / UdSSR, Ostpreussen
+R: Ballade, Jagd, Flucht, Vergewaltigung, Tod
+M: 4/4
+L: 1/8
+K: F
+F2 | A2F2AAc2 | c3AF2z2
+f4e2d2 | c4z2
+A2 | BAGBdcBG | F3Ac3z
+G4E4 | F3z3
+
+X:52
+T: Der Nachtjaeger
+N: Q0133H
+O: Mitteleuropa, Schweiz, Aargau
+R: Ballade, Jagd, Flucht, Vergewaltigung, Tod
+M: 4/4
+L: 1/16
+K: F
+F4 | A6G2F3AA2c2 | c2A2c2A2G4z2
+FG | A4A2c2B3BB2d2 | c4c2B2A4z2
+A2 | c4c4c2B2B2G2 | A4c4G4B4 | A8z4
+
+X:53
+T: Der Gluecksjaeger
+N: Q0134
+O: Mitteleuropa, Deutschland (BRD) , Westfalen, Muensterland
+N: Pause am Ende der zweiten Zeile weggelassen. Anhaengsel an der
+N: ersten Zeile. Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Jagd, Flucht, Verfuehrung
+M: 4/4
+L: 1/16
+K: G
+D2 | G4G2G2G4G2A2 | G4F2E2D4C2E2 | E6D2D4
+G4 | F2A2A2A2A4B2A2 | G4F2E2D4E2F2
+G4G4G4z2B2 | A3GF3GA4z2
+c2 | B2A2B2c2d4G2A2 | B4A4G4z2
+
+X:54
+T: Der Gluecksjaeger
+N: Q0134A
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Kapsdorf
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Jagd, Flucht, Verfuehrung
+M: 6/8
+L: 1/16
+K: G
+D2 | G4B2B2A2G2 | A4F2D4
+A2 | A4d2A2G2F2 | G2F2E2D4z2
+G4D2E2E2D2 | GGG2D2E2E2D
+D | D4G2B2A2G2 | A4A2G4
+
+X:55
+T: Der Gluecksjaeger
+N: Q0134B
+O: Mitteleuropa, Deutschland (BRD) , Baden, Freiburg i. Br., Hugstetten
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Jagd, Flucht, Verfuehrung
+M: 6/8
+L: 1/16
+K: G
+A2 | A3AA2A2G2F2 | G2E2D2z4
+A2 | A3AA2A2G2F2 | G2E2D2
+G2G2G2 | D2D2D2G2G2G2 | D2D2
+DBB2B2B2 | B2A2G2A2B2A2 | G6z4
+
+X:56
+T: Der Gluecksjaeger
+N: Q0134C
+O: Suedosteuropa, Rumaenien, Bukowina, Eichenau
+N: Grundton in der zweigestrichenen Oktave.
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Jagd, Flucht, Verfuehrung
+M: 3/8
+L: 1/16
+K: C
+G,2 | C4C2 | E3DC2 | D3CB,2 | D3CB,2
+D2D2DD | D4A,A, | A,3G,G,2 | A,3G,G,2
+C2B,2C2 | G,2A,2G,2 | C2B,2C2 | G,2A,2G,2
+C2C2CC | E3CC2 | D3ED2 | C4
+
+X:57
+T: Der Gluecksjaeger
+N: Q0134D
+O: Mitteleuropa, Deutschland (BRD) , Baden, Horben
+N: Dritte Zeile = Refrain auf sinnfreie Silben.
+R: Ballade, Jagd, Flucht, Verfuehrung
+M: 4/4
+L: 1/16
+K: C
+G2 | c4B2A2G4G2G2 | A4G2F2E4z2
+E2 | G4A2F2D3EF2D2 | E3FG2E2C4z2
+G2 | G2c2c2c2c3de2c2 | G2d2d2d2d3ef2
+g2 | e4d4c4z2
+
+X:58
+T: Gerstebinden
+N: Q0135
+O: Mitteleuropa, Deutschland
+N: Bass - Stimme in einem fuenfstimmigen Satz (cf.) von Ludwig Senfl.
+N: Satzbedingte ganztaktige Pausen Weggelassen, Schlussnote gekuerzt.
+N: Grundton in der grossen Oktave.
+R: Ballade, Beischlaf, Leiden
+M: 2/2
+L: 1/8
+K: G
+G2G2G2 | G2G2A2A2 | A4
+e4 | =f3ed4 | c4d4 | z6
+d2 | e4e2e2- | e2e2=f4 | e8
+d4c2A2 | B3cd4 | z4
+d4 | c2A2B3c | d4z4 | z4
+d2d2 | c2B2G4 | z6
+G2 | A3Bc2d2- | d2e2d2c2- | c2B2A4 | G4
+A2=F2- | F2G2d4 | G8
+
+X:59
+T: Gerstebinden
+N: Q0135A
+O: Mitteleuropa, Deutschland
+N: Tenor - Stimme aus einem vierstimmigen Quodlibetsatz von Wolfgang
+N: Schmeltzl. Notenwert rhythmisch korrigiert (in Takt 4) . Grundton
+N: in der kleinen Oktave.
+R: Ballade, Beischlaf, Leiden
+M: 4/2
+L: 1/4
+K: G
+G2 | G4G4- | G2G2A2A2 | A4
+e4 | =f3ed4 | c4d2
+d2 | d2d2d2d2 | G4z2
+
+X:60
+T: Gerstebinden
+N: Q1135B
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0135C, anderes Lied.
+R: Reigen - Lied
+M: 6/4
+L: 1/4
+K: G
+G | G2GG2G | A3A2
+A | _B2A=F2G | A3z2
+A | _B2cd2d | d2cA2
+c | _B2AG2G | =F2GA2
+A | _BA2G2=F | G3-G2
+
+X:61
+T: Gerstebinden
+N: Q0135C
+O: Mitteleuropa, Deutschland
+N: Tenor - Stimme in einem fuenfstimmigen Satz (cf.) von Ludwig Senfl.
+N: Grundton in der kleinen Oktave. Fuenfte Zeile = Refrain auf
+N: sinnfreie Silben.
+R: Ballade, Beischlaf, Leiden
+M: none
+L: 1/8
+K: G
+G2 | G2G2G2G2 | A2A2A4
+e4 | =f3ed4c4 | d4z2
+d2 | e4e2e4e2 | =f4e4
+d4c4A4 | B2c2d4
+d2d2c2B2 | G4z2
+G2 | A3B2cd4 | e2d2c4B2A4 | G8
+
+X:62
+T: Kornschneiden
+N: Q0136
+O: Mitteleuropa, Deutschland
+N: Taktart entsprechend den Taktstrichen als 3/4 bezeichnet.
+R: Ballade, Beischlaf, Schwangerschaft, Moral
+M: 3/4
+L: 1/4
+K: F
+F | F2C | F2G | A2A | G2
+F | F2C | F2G | A3 | G2
+F | G2A | B2c | A2A | G2
+G | F2F | CD_E | D3 | C2
+
+X:63
+T: Kornschneiden
+N: Q0136A
+O: Mitteleuropa, Niederlande
+N: Instrumentalstueck nach der Balladenmelodie.
+R: Ballade, Beischlaf, Schwangerschaft, Moral
+M: 3/4
+L: 1/4
+K: G
+D | G2D | G2A | BAB | A2
+D | G2F | G2A | B3 | A2
+D | G2D | G2A | BAB | A2
+D | G2F | G2A | B3 | A2
+A | B2c | d2d | cBc | B2
+B | ABA | EFG | F3 | E2
+
+X:64
+T: Kornschneiden
+N: Q0136B
+O: Westeuropa, England (?)
+N: Instrumentalstueck nach der Balladenmelodie.
+N: Taktart entsprechend der Takteinteilung festgelegt.
+R: Ballade, Beischlaf, Schwangerschaft, Moral
+M: 6/4
+L: 1/8
+K: G
+G4D2G4A2 | B3AB2A4
+F2 | G4D3DG2A2 | B6A6
+A4B2 | c4c2 | B4B2 | A4
+F2 | G4G2 | F4GF | E3D^C2D6
+GGFED=C | G4A2 | BGBcB2 | A4
+F2 | G4D2 | G4A2 | B3AB2 | A6
+A2FGAB | c4c2 | B3AB2 | FGA
+DEF | G4G2 | F4G2 | ^CDEDB,C | D6
+
+X:65
+T: Nachtigall als Warnerin
+N: Q0137
+O: Mitteleuropa, Deutschland / Polen, Pommern, Kr. Rummelsburg,
+R: Ballade, Allegorie; lyrisch (?)
+M: 3/4
+L: 1/4
+K: C
+G | E2E | G2G | c2c | G2
+G | A2c | B2d | d3 | c2
+G | e2e | edc | B2A | A2
+A | B2B | B2d | d3 | c2
+G | e2e | edc | B2A | A2
+A | B2B | B2d | d3 | c2
+
+X:66
+T: Nachtigall als Warnerin
+N: Q0137A
+O: Suedosteuropa, Rumaenien, Siebenbuergen, Muehlbach
+R: Ballade, Allegorie; lyrisch (?)
+M: none
+L: 1/16
+K: G
+D2 | G3GG6A2 | _B3AG6
+G2 | d2d2D2D2 | G4G4z2
+d2 | d3c_B6d2 | c3_BA4z2
+A2 | G3G_B6F2 | G4G4z2
+
+X:67
+T: Nachtigall als Warnerin
+N: Q0137B
+O: Osteuropa, Polen, Wolhynien, Kr. Kutno, Gem. Dobrzelin, Chocholow
+R: Ballade, Allegorie; lyrisch (?)
+M: 3/4
+L: 1/16
+K: G
+D2 | G6G2G2A2 | _B3AG6
+G2 | d3dD4D4 | G4G4z2
+d2 | d3c_B6d2 | c3_BA6
+A2 | G2A2_B4F4 | G4G4z2
+d2 | d3c_B6d2 | c3_BA6
+A2 | G2A2_B4F4 | G4G4z2
+
+X:68
+T: Nachtigall als Warnerin
+N: Q0137C
+O: Mitteleuropa, Deutschland / Polen, Westpreussen
+R: Ballade, Allegorie; lyrisch (?)
+M: 3/4
+L: 1/16
+K: C
+G4 | E6E2E4 | G8G4 | c8c4 | G8
+G4 | G8c3c | B8d4 | d12 | c8
+G4 | e8e4 | e4d4c4 | B8A4 | A8
+A4 | B8B4 | d8d4 | d12 | c8
+G4 | e8e4 | e4d4c4 | B8A4 | A8
+A4 | B8B4 | d8d4 | d12 | c8
+
+X:69
+T: Nachtigall als Warnerin
+N: Q0137D
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg
+R: Ballade, Allegorie; lyrisch (?)
+M: 6/4
+L: 1/8
+K: C
+G2 | E3EE2G4G2 | c4c2G4
+G2 | A4c2B4d2 | d6c4
+G2 | e4e2e2d2c2 | B4A2A4
+A2 | B4B2d4d2 | d6c4
+
+X:70
+T: Nachtigall als Warnerin
+N: Q0137E
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Nassau
+N: Zweistimmig notiert, Unterstimme kodiert.
+R: Ballade, Allegorie; lyrisch (?)
+M: 3/4
+L: 1/8
+K: C
+G2 | E3EE2 | G4G2 | c4c2 | G4
+c2 | A2A2c2 | B4d2 | d6 | c4
+G2 | e2d2c2 | e2d2c2 | B4A2 | A4
+A2 | B4B2 | B4d2 | d6 | c4
+
+X:71
+T: Nachtigall als Warnerin
+N: Q0137F
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Nassau
+R: Ballade, Allegorie; lyrisch (?)
+M: 4/4
+L: 1/8
+K: C
+G2 | G2GGG2G2 | c2c2G2
+G2 | A2c2B2d2 | d4c2
+G2 | e2e2e2e2 | g2g2f2
+d2 | g2g2g2f2 | f4e2
+
+X:72
+T: Nachtigall als Warnerin
+N: Q0137G
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Nassau
+R: Ballade, Allegorie; lyrisch (?)
+M: none
+L: 1/8
+K: C
+G2 | c3cc2 | G4G2 | A4A2 | G4
+G2 | G4c2 | B4d2 | d2c4
+G2 | e4e2 | e2d2c2 | g4f2 | f6
+G2 | g4g2 | g4f2 | f2e4
+
+X:73
+T: Nachtigall als Warnerin
+N: Q0137H
+O: Mitteleuropa, Deutschland (BRD) , Rheinland
+R: Ballade, Allegorie; lyrisch (?)
+M: 6/4
+L: 1/8
+K: C
+G2 | E3EE2G4G2 | c4c2G4
+G2 | A4AcB2B2d2 | d6c4
+G2 | e4e2e2d2c2 | B4A2A4
+A2 | B4B2d4d2 | d6c2z2
+
+X:74
+T: Nachtigall als Warnerin
+N: Q0137I
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+N: Gedruckte, "bereinigte" Fassung von Q0137J. Verzierung (Vorschlag) .
+R: Ballade, Allegorie; lyrisch (?)
+M: 3/4
+L: 1/8
+K: G
+ | GDG2G2 | FGA3
+A | BAG2A2 | cBA2z
+c | BdA3c | BdG3
+A | BGd2BG | A2G2z2
+
+X:75
+T: Nachtigall als Warnerin
+N: Q0137J
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+N: Unbereinigte Vorlage zu Q0137I. Taktart entsprechend den Taktstrichen
+N: festgelegt.
+R: Ballade, Allegorie; lyrisch (?)
+M: 3/4
+L: 1/16
+K: G
+ | G2D2G4G4 | F2G2A4z2
+G2 | B2A2G4A4 | c3BA4z2
+c2 | B2d2A6c2 | B2d2G6
+A2 | B2G2d2B2G4 | B3AG4z4
+
+X:76
+T: Nachtigall als Warnerin
+N: Q0137K
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+R: Ballade, Allegorie; lyrisch (?)
+M: 6/8
+L: 1/8
+K: G
+D | G2BBAG | A2ccB
+A | B2ddcB | BAz3
+B | d2BBcd | cBcA2
+A | B2BABA | AG4
+
+X:77
+T: Maedchen und Hasel
+N: Q0138
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Strehlen
+R: Ballade, verlorene Unschuld, Moral
+M: 3/4
+L: 1/16
+K: G
+D2 | G2F2G2G2A4 | F2E2F4z2
+D2 | G2F2G4B4 | B2A2A4z2
+G2 | A2G2A4d4 | c2B2A4z2
+AA | GGF2G4A4 | D2F2G4z2
+
+X:78
+T: Maedchen und Hasel
+N: Q0138A
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Uckermark, Gramzow
+R: Ballade, verlorene Unschuld, Moral
+M: 3/4
+L: 1/16
+K: G
+D2 | D2D2G4G2G2 | D2FGA6
+BA | G2G2G6AB | c2B2A4z2
+B2 | G2G2c6B2 | A2G2A6
+B2 | G2G2B2A2G2G2 | G2F2G4z2
+
+X:79
+T: Maedchen und Hasel
+N: Q0138B
+O: Mitteleuropa, Deutschland / UdSSR, Ostpreussen, Kr. Friedland,
+R: Ballade, verlorene Unschuld, Moral
+M: 3/4
+L: 1/16
+K: G
+D2 | D2G2G6E2 | G2F2D2D2z2
+D2 | D2F2A4E4 | E4D4z2
+D2 | D2c2c6A2 | c2B2G4z2
+B2 | B2AAE6A2 | A4G4z2
+D2 | D2c2c6A2 | c2B2G4z2
+B2 | B2AAE6A2 | A4G4z2
+
+X:80
+T: Maedchen und Hasel
+N: Q0138C
+O: Osteuropa, Tschechoslowakei, Deutsch - Proben, Sprachinsel
+R: Ballade, verlorene Unschuld, Moral
+M: 3/4
+L: 1/16
+K: E
+E2E2=G2 | B6^A2B2=c2 | A4z4
+=d2c2d2e2 | =d4B4
+B3B | =d6B2d3d | =G6
+A2B2B2 | =G6B2A2G2 | E4z2
+
+X:81
+T: Maedchen und Hasel
+N: Q0138D
+O: Mitteleuropa, Deutschland (BRD) , Rheinland, Kr. Koeln, Sinthern
+R: Ballade, verlorene Unschuld, Moral
+M: 3/4
+L: 1/16
+K: G
+G2 | G2B2B4A2G2 | F2A2A6
+A2 | A2d2d6B2 | B2A2A6
+AB | c2e2e3de4 | d2c2Bcded3
+B | A2B2c4d4 | c4B4z2
+
+X:82
+T: Maedchen und Hasel
+N: Q0138E
+O: Osteuropa, Ungarn, Kom. Tolnau, Nemetker
+R: Ballade, verlorene Unschuld, Moral
+M: 3/4
+L: 1/8
+K: G
+DD | G2G2FE | FFF2
+D2 | F3FED | E2D2
+
+X:83
+T: Maedchen und Hasel
+N: Q0138F
+O: Mitteleuropa, Deutschland
+N: geistliche Kontrafaktur; Tonangabe "Melodie vom Haselzweig" .
+R: Ballade, verlorene Unschuld, Moral; geistlich
+M: none
+L: 1/8
+K: G
+A2A2A2d2d2=f2g2f2
+d2c4g4g4d4f2g2e4d4z2
+c2d2f2e2d2d2B2A2
+G2B4G4B3ce4d2B2A4G8
+
+X:84
+T: Maedchen und Hasel
+N: Q0138G
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen
+R: Ballade, verlorene Unschuld, Moral
+M: 2/4
+L: 1/16
+K: G
+d2 | d2c2_BBd2 | c2d2G2
+_BB | _B2A2D2D2 | _B2c2d2
+d2 | d2c2d2_B2 | A4G2
+
+X:85
+T: Der schwatzhafte Junggeselle
+N: Q0139
+O: Osteuropa, UdSSR, Baltikum
+N: Schlusspause weggelassen.
+R: Ballade, Indiskretion, verweigerter Beischlaf; Studenten - Lied
+M: 4/4
+L: 1/16
+K: F
+C4 | F4E2D2C4B4 | B4A4d4c2
+C2 | F4E2D2C4B4 | B4A4d4c2
+c2 | A3cc2c2c4c2c2 | d2c2B2A2G6
+c2 | C2C2C2C2c4c2c2 | c2B2A2G2F4
+
+X:86
+T: Der schwatzhafte Junggeselle
+N: Q0139A
+O: Mitteleuropa, Deutschland (DDR) , Pommern, Kr. Ueckermuende,
+R: Ballade, Indiskretion, verweigerter Beischlaf; Spinnstuben - Lied (?)
+M: 4/4
+L: 1/8
+K: G
+D2 | G2FED2G2 | B,2DGG2
+D2 | G2FED2G2 | B,2DGG2z
+D | DBBBB2zd | dcecA2z
+F | FAAAA2zB | BABAG2
+
+X:87
+T: Der schwatzhafte Junggeselle
+N: Q0139B
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Niederschlesien, Wohlau
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 2/4
+L: 1/8
+K: G
+D2 | G2FE | D2GG | A2G2 | z2
+D2 | G2FE | D2G2 | A2G2 | z3
+G | GBBB | B2B
+B | ABcB | A2z2
+FAAA | A2B
+A | GABA | G2
+
+X:88
+T: Der schwatzhafte Junggeselle
+N: Q0139C
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen, Kr. Forbach,
+N: Taktwechsel entsprechend der Takteinteilung festgelegt.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 3/4
+L: 1/8
+K: Bb
+F2 | B2A2G2 | c2d2c2 | B2F2z2 | z4
+F2 | B4G2 | c4d2 | B2F2z2 | z4
+F2 | d2d2d2e2 | d4z2B2 | c2d2e2d2 | c4z2
+B2 | A2c2c2dd | c4B2c2 | d2e2d2c2 | B4z2
+
+X:89
+T: Der schwatzhafte Junggeselle
+N: Q0139D
+O: Mitteleuropa, Schweiz, Graubuenden, Bez. Heinzenberg, Portein
+N: Anhaengsel an der 1. und 2. Zeile.
+R: Ballade, Indiskretion, verweigerter Beischlaf; Studenten - Lied
+M: 2/4
+L: 1/16
+K: A
+e2 | c3cc3c | c2A2z4 | c2A2z2
+e2 | c2c2c2c2c2 | c2A2z4 | c2A2z2
+e2 | c3cc3c | c4z2e2 | f2e2d2c2 | B6
+A2 | G2B2d2e2 | g6f2 | e2e2d2d2 | c4z2
+e2 | c3cc3c | c4z2e2 | f2e2d2c2 | B6
+A2 | G2B2d2e2 | g6f2 | e2e2d2d2 | c4z2
+
+X:90
+T: Der schwatzhafte Junggeselle
+N: Q0139E
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Vogelsberg, Storndorf
+N: Letzten Notenwert der 2. Zeile rhythmisch korrigiert.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 2/4
+L: 1/16
+K: F
+C2 | F4E2D2 | C4A4 | G2E2F4- | F6
+C2 | F4E2D2 | C4A4 | G2E2F4- | F4
+F4 | F3GA2A2 | A4G2AA | B2B2c2A2 | G6
+G2 | G3GG3G | G2c2c2B2 | A2A2G2G2 | F4
+C4 | D2D2E2E2 | F6
+
+X:91
+T: Der schwatzhafte Junggeselle
+N: Q0139F
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Oberwesterwald,
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 4/4
+L: 1/16
+K: G
+D4 | G4F2E2D4G4 | A4G4z4
+D4 | G4F2E2D4G4 | A4G4z4
+B4 | B3BB3BB3Az2B2 | B3Bd3BA4z2
+G2 | F3AA2A2A3dc4 | B3BA3AG4
+
+X:92
+T: Der schwatzhafte Junggeselle
+N: Q0139G
+O: Osteuropa, UdSSR, Nord - Ukraine, Sprachinsel Belowjetsch
+N: Schlusspause und einen Taktstrich weggelassen.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 4/4
+L: 1/8
+K: F
+C | F2EDC2A2 | G2F2z3
+C | F2EDC2A2 | G2F2z3
+F | AAAAA2GA | B2AAG2z
+G | GGGGG2FG | AAGGA3
+
+X:93
+T: Der schwatzhafte Junggeselle
+N: Q0139H
+O: Osteuropa, UdSSR, Wolga - Gebiet, Neu - Galga
+N: Zweistimmig notiert, Oberstimme kodiert.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 4/4
+L: 1/16
+K: F
+C2 | F4E2D2C4B4 | A4c4F2z4
+C2 | F4E2D2C4B4 | A4c4F2z2
+F2G2 | A3AAAA2A4G2A2 | B2B2A2A2G6
+A2 | G4G2G2G4F2G2 | A2B2A2G2F4z2
+
+X:94
+T: Der schwatzhafte Junggeselle
+N: Q0139I
+O: Mitteleuropa, Oesterreich / Italien, Sued - Tirol, Bez. Sterzing,
+N: Anhaengsel an Zeile 1 und 2.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 2/4
+L: 1/8
+K: G
+D2 | G2FE | D2B2 | A2G2 | d2B2 | z2
+D2 | G2FE | D2B2 | A2G2 | d2B2 | z2
+d2 | BBBB | B3d | edcB | A3
+A | AAAA | d3c | BBAA | G2
+d2 | BBBB | B3d | edcB | A3
+A | AAAA | d3c | BBAA | G2
+
+X:95
+T: Der schwatzhafte Junggeselle
+N: Q0139J
+O: Osteuropa, Ungarn, Solymar
+N: Transkription mit Verzierungen, Betonungen, etc. 6 weitere
+N: Strophenvarianten abgedruckt. Nur erste Strophe kodiert.
+N: Perkussionston im zweiten Takt durch "richtigen" Ton ersetzt.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 2/4
+L: 1/16
+K: G
+D2 | G4F4E4 | D4B4 | c6d2 | B4z2
+D2 | G4F4E4 | D4G4 | c6d2 | B4z2
+B2 | B3cd2d2 | d6B2 | c2d2e2d2 | c4z2
+A2 | c3cc2c2 | c4B2A2 | B3cd2c2 | B4z2
+
+X:96
+T: Der schwatzhafte Junggeselle
+N: Q2139K
+O: Mitteleuropa, Niederlande, Provinz Noord - Brabant, Ospel
+N: Transkription einer Tonaufnahme. Ein Taktstrich in der 1. Zeile
+N: weggelassen. Niederlaendische Fassung der Ballade.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 4/4
+L: 1/16
+K: G
+D2 | G4F2E2A4B3A | G4D4z6
+D2 | G4F2E2A4B2A2 | G4D4z6
+B2 | B2B2B2B2B2G2z2B2 | BBd2c2B2A4z2
+A2 | A2A2A2A2B2A2G3B | A2A2E2F2G4z2
+
+X:97
+T: Der schwatzhafte Junggeselle
+N: Q2139L
+O: Mitteleuropa, Niederlande
+N: Schlusspause weggelassen. Niederlaendische Fassung der Ballade.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 6/8
+L: 1/16
+K: G
+G2 | G2D2B2B2G2d2 | d4dcB4
+d2 | d4e2e2d2e2 | d6z4
+d2 | d4g2g2f2g2 | d6B2z2
+d2 | d4c2c2B2c2 | B6z4
+B2 | B6A6 | B2c2d2g2f2e2 | d6c6 | B6z4
+d2 | g4fgd4e2 | d2g2
+f2e2d2c2 | B6A6 | G6-G4
+
+X:98
+T: Der schwatzhafte Junggeselle
+N: Q0139M
+O: Mitteleuropa, Deutschland
+N: Stimme aus einem Quodlibet von Melchior Franck.
+N: Taktstriche entsprechend der Vorzeichnung gesetzt. Schlusspause
+N: weggelassen.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 4/4
+L: 1/16
+K: G
+ | G4B4d6c2 | B4A4G4z2
+D2 | G4B4d6c2 | B4A4G4z2
+B2 | B2B2B2A2B4A2G2 | B2d2c2B2A4z2
+A2 | G2A2B2^c2d3dd2=c2 | B2B2A2A2G8
+
+X:99
+T: Der schwatzhafte Junggeselle
+N: Q0139N
+O: Mitteleuropa, Deutschland
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 4/4
+L: 1/8
+K: G
+D2 | G4B4 | d6c2 | B4A4 | G4z2
+D2 | G4B2B2 | d6c2 | B4A4 | G4z2
+G2 | B2B2B2B2 | B4A2G2 | B2d2c2B2 | A4z2
+D2 | G2A2B2c2 | d3ed2c2 | B2B2A2A2 | G4z2
+
+X:100
+T: Der schwatzhafte Junggeselle
+N: Q1139O
+O: Osteuropa, Ungarn, Kom. Tolnau, Kimling (Dunakoemloed)
+N: Melodievergleich zu Q0139M, anderes Lied.
+R: ???
+M: 4/4
+L: 1/8
+K: G
+D2 | G4A2A2 | _B2d2c2A2 | _B4A4 | G4z2
+D2 | G2G2A2A2 | _B2d2c2A2 | _B4A2A2 | G4z2
+A2 | d4d2d2 | d2c4A2 | G2A2_B2d2 | A4z2
+DD | G2G2A2A2 | _B2d2c2A2 | _B4A4 | G4z2
+
+X:101
+T: Der schwatzhafte Junggeselle
+N: Q2139P
+O: Mitteleuropa, Frankreich, Savoie
+N: Franzoesische Fassung der Ballade. Zweistimmig notiert, Unter- bzw.
+N: Mittelstimme kodiert. Notenwert in der letzten Zeile rhythmisch
+N: korrigiert.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 2/4
+L: 1/16
+K: G
+D2 | G3FG2A2 | B6A2 | d3cB2A2 | A4G2
+D2 | G3FG2A2 | B6A2 | d3cB2A2 | A4G2
+d2 | d4d2c2 | B6B2 | d2d2c2B2 | A4z2
+D2 | G3FG2A2 | B2B2c4 | B3cB3A | G6
+
+X:102
+T: Der schwatzhafte Junggeselle
+N: Q1139Q
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Grafschaft Glatz,
+N: Melodievergleich zu Q0139M, anderes Lied.
+R: Legenden - Lied, geistlich
+M: 4/4
+L: 1/8
+K: G
+D2 | G3AB2c2 | d2dcB2A2 | G4z2
+D2 | G3AB2c2 | A4d2dc | B4A4 | G4z2
+B2 | B2B2d2B2 | c4z2B2 | A2B2c2A2 | B4z2
+A2 | G3AB2c2 | A4d2dc | B4A4 | G4z2
+
+X:103
+T: Der schwatzhafte Junggeselle
+N: Q0139R
+O: Mitteleuropa, Deutschland (BRD) , Franken
+N: Zwei- und dreistimmig notiert, Oberstimme kodiert.
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: none
+L: 1/8
+K: G
+D | G2FE | D2GB | A2G2z2
+D | G2FE | D2GB | A2G2z2
+d2 | BBBBB3d | edcBA2
+G | FAAAd3c | BBBBG2
+
+X:104
+T: Der schwatzhafte Junggeselle
+N: Q0139S
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen, Fremersdorf
+R: Ballade, Indiskretion, verweigerter Beischlaf
+M: 3/8
+L: 1/16
+K: G
+D2 | G2F2E2 | A2B2A2 | G2D2
+D2 | G2F2G2 | A2B2A2 | G2D2
+B2 | G3BB2B2B6G2 | G2B2d2B2A6
+G2 | F3AA2AAA2d2d2c2 | B2B2A2A2G4z2
+
+X:105
+T: Der schwatzhafte Junggeselle
+N: Q1139T
+O: Osteuropa, Ungarn
+N: Melodievergleich zu Q0139 ff., anderes Lied.
+R: Legenden - Lied, geistlich
+M: 3/4
+L: 1/8
+K: G
+D2 | G2F2E2 | D4G2 | A3BAF | G4
+D2 | G2F2E2 | D4G2 | A3BAF | G4
+BB | B2B2B2 | B2A2d2 | c4B2 | A4
+G2 | F2A2A2 | A2G2A2 | B4AF | G4

@@ -1,0 +1,3017 @@
+
+X:1
+T: Der Vorwirt
+N: D0001
+O: Europa, Mitteleuropa, Lothringen, Altripp
+R: Ballade, Familienereignis
+M: none
+L: 1/8
+K: G
+DDDG2AG=F2GA_B
+AAGAGDD2D2E^FG2
+B2AccdcB2AAGGAG=F2
+DDDG2B2A2G2^FG4
+
+X:2
+T: Mach auf mein Schatz, mein goldne Pfort,
+N: D0002
+O: Europa, Mitteleuropa, Lothringen, Altripp
+N: Inzipit = Variante zum Lied
+R: Tage - Lied, Kiltlied
+M: 4/4
+L: 1/16
+K: G
+D2 | D2G2G2F2G6A2 | _B2A2G4A6
+G2 | =F4A2A2G4D2E2 | =F4E4D4z2
+d2 | d2c2d2dc_B6c2 | d2_e2d2c_BA6
+G2 | G2=F2G2A2_B2c2d2c2 | _B4A4G4z2
+
+X:3
+T: Liebesklage
+N: D0003
+O: Europa, Mitteleuropa, Lothringen, Altripp
+N: Taktwiederholung; Inzipit = Transposition zum Lied
+R: Liebes - Klage
+M: 4/4
+L: 1/8
+K: D
+A2 | A2A2G2A2 | =c2B2A2G2
+c2B2A2G2 | A2=F2E4
+A2A2D2EF | G2=FED2=C2
+F2G2A2G2 | =F2E2D2
+
+X:4
+T: Das Lied vom Zimmergesellen
+N: D0004
+O: Europa, Mitteleuropa, Lothringen, Altripp
+N: Laengenwerte in Zeile 263, 265 und 266 berichtigt; Sequenz,
+N: Wiederholungen; Inzipit = Variante zum Lied
+R: Ballade, Taten und Verbrechen
+M: 3/4
+L: 1/8
+K: D
+d2 | d2=c2d2 | A4A2 | G2G2G2 | =F4
+G2 | A2_B2=c2 | d2=c2d2 | A4
+=c2 | =c3dc2 | A3=cc2 | A3=cc2 | d4
+_BA | A3G=F2 | G3=FE2 | D4
+A=c | =c3dc2 | A3=cc2 | A3=cc2 | d4
+_BA | A3G=F2 | G3=FE2 | D4
+
+X:5
+T: Nun adje, jetzt muss ich fort
+N: D0005
+O: Europa, Mitteleuropa, Lothringen, Altripp
+N: Inzipit = entfernte Variante zum Lied  ??
+R: Soldaten - Lied
+M: 3/2
+L: 1/16
+K: G
+ |  | G4D4 | G6A2B8A4G2B2 | A8z8
+G4D4 | G6A2B8A4G2B2 | A8z4
+G2A2B4G4 | d6e2d4c2B2A4G4 | c6d2B4
+A2c2B4A4 | G6A2B4c2A2d4d3c | B8z8
+
+X:6
+T: Haescher des Herodes
+N: D0007
+O: Europa, Mitteleuropa, Lothringen, Morsbach ( Kr. Forbach )
+N: Inzipit = Variante zum Lied; Verzierung
+R: Legenden - Lied, Weihnachten
+M: none
+L: 1/8
+K: E
+=DF | =G2G2FE | =D2D2
+=GA | B2=G2AFG4
+B2 | A2A2BA=G2E2
+F2G2E2F2E4
+
+X:7
+T: Haescher des Herodes
+N: D0007A
+O: Europa, Mitteleuropa, Lothringen, Morsbach ( Kr. Forbach )
+N: Verzierung; Variante zu D0007
+R: Legenden - Lied, Weihnachten
+M: 3/4
+L: 1/8
+K: G
+=F2 | _B3AG2 | =F2F2
+_Bc | d4c2 | _B4
+d2 | c2c2dc | _B2G2
+A2 | _B2G2A2 | G4
+
+X:8
+T: Wenn Gott zwei Liebchen zusammen tut
+N: D0008
+O: Europa, Mitteleuropa, Lothringen, Morsbach ( Kr. Forbach )
+N: Zwei Strophenvarianten, 2. Strophe kodiert; Inzipit = Variante
+N: zum Lied
+R: Ballade, Maerchen, Zaubermaerchen
+M: none
+L: 1/8
+K: G
+D2G2A | _B4A4G4A4z2
+D2G2A | _B4A4G4A4z2
+GAB2c2 | d4_B2d2cB | A3A
+c2_B2A2 | G3DGA_B2A2 | G4z2
+
+X:9
+T: Graf Friedrich
+N: D0010
+O: Europa, Mitteleuropa, Lothringen, Morsbronn ( Kr. Forbach )
+N: Inzipit = entfernte Variante zum Lied ??
+R: Ballade, Familienereignisse
+M: none
+L: 1/16
+K: F
+C4F2F2F4G6A2B2A2G4
+A2G2F4C4F2F2G2A2B2c2G4
+G6F2E2D2C3DC2C2F4G2G2A2F2G4
+B2B2A4G4F4C4F2G2A2A2G4F4
+
+X:10
+T: Abgewiesener Knabe
+N: D0011
+O: Europa, Mitteleuropa, Lothringen, Weiler ( Kr. Forbach )
+N: in der zweiten Zeile rhythmisch korrigiert
+R: Kilt - Lied, abgewiesener Knabe
+M: 6/8
+L: 1/16
+K: F
+C2 | F2G2_A2G2A2B2 | G2F4z4
+cB | c2B2_A2F2B2A2 | G6z4
+_A2 | G2_A2B2c2B2c2 | F4_E2E6
+F3G_A2B3AG2 | _A2G2F4z2
+
+X:11
+T: Jungknab auf Botschaft
+N: D0012
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Achttonskala ( dorisch mit Alteration ?)
+N: Taktwiederholung; Inzipit entfernte Variante zum Lied
+R: Kilt - Lied
+M: 4/4
+L: 1/8
+K: E
+ |  | EEE | B4c2=d2 | c2B2A4- | A2
+A2B2B2 | e3fe2 | =d2c2B4
+BAB2e2 | =d2c2B2 | =d2e2B4
+d2c2B2 | A4B2 | =G2F2E2- | E3
+EEE | B4A2 | B2=c2B2=G2 | F2E2z
+
+X:12
+T: Ich seind so sehr betruebet,
+N: D0013
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Inzipit = Variante zum Lied
+R: Liebes - Klage
+M: 4/4
+L: 1/16
+K: G
+D4D4D4 | D4D3AG6_BA | G4z4z4
+_B2c2 | d4_e4d4 | c4d4c2_B2 | A8
+d8 | _e4d2c2c4A2c2 | _B4A4G4
+B4 | A4d4G2G2F2A2 | G8
+d8 | _e4d2c2c4A2c2 | _B4A4G4
+B4 | A4d4G2G2F2A2 | G8z8 | z4
+
+X:13
+T: Abgewiesene Freier ( Drei Gesellen )
+N: D0014
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Takt - und Zeilenwiederholung;Inzipit = entfernte Variante zum Lied
+R: Ballade, Werbung
+M: 2/4
+L: 1/8
+K: G
+D | G2DD | G2BA | G2D
+D | G2D2 | G2BA | G2D
+B | BBBB | B3B | ABcB | A3
+G | FAAA | Addc | BAAA | G3
+B | BBBB | B3B | ABcB | A3
+G | FAAA | Addc | BAAA | G3
+
+X:14
+T: Der Nachtjaeger
+N: D0015
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Inzipit = entfernte Variante ??
+R: Ballade, Zauber
+M: 2/4
+L: 1/16
+K: G
+D2 | G4F2E2 | D4D2D2 | c4c4 | B6
+B2 | B2A2c2A2 | G4G2B2 | A4A2F2 | G6
+GG | F2A2A2AA | G2B2d2c2 | B4A2A2 | G6
+
+X:15
+T: Der Nachtjaeger
+N: D0015A
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: In der ersten Zeile Tonlaenge korrigiert und "Taktstrich" zugefuegt
+N: Variante zu Lied D0015 ??
+R: Ballade, Zauber
+M: 2/4
+L: 1/16
+K: G
+=F2 | G2_B2A2G2 | =F4F2d2 | d2c2d4 | A6
+A2 | _B2B2c2cc | d3c_B2
+c2 | d2c2_B2A2 | G2_B2A4 | G4z2
+
+X:16
+T: Der Ring
+N: D0016
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Verzierungen; Inzipit = Transposition zum Lied
+R: Liebes - Lied
+M: 2/4
+L: 1/8
+K: E
+E | E=GFE | =D2D2 | =GBBA | B2z
+E | E=GFE | =D2D2 | =GBBA | B2
+=GA | BBB=c | B2A=G | A2
+A=c | B2EF | E2=D=C | =D2
+FA | =G2FF | E2z
+
+X:17
+T: Der himmlische Ackersmann
+N: D0018
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Inzipit = Variante zum Lied; Verzierungen
+R: geistliches Lied
+M: 3/4
+L: 1/8
+K: E
+=GE | E2E2E2 | B2B2A2 | B4A2 | =G4
+A2 | A4B2 | =c2B2A2 | =G2E2F2 | E4z2
+A6 | =G2F2E2 | =D4
+D2 | =G2G2A2 | B2B2A2 | =G2E2F2 | E4z2
+
+X:18
+T: Petrus und Pilatus
+N: D0019
+O: Europa, Mitteleuropa, Lothringen, Metz ( St. Vinzent )
+N: Inzipit = Variante zum Lied, Verzierung
+R: Kinder - Spiel
+M: 2/2
+L: 1/8
+K: G
+D2 | G2f2G2A2 | _B4=f4
+=B4c4 | d4z2
+d2 | _e2d2d2cc | d4_B2
+d2 | c2_B2A2G2 | A4D4
+G3GF4 | G4z2
+
+X:19
+T: Petrus und Pilatus
+N: D0019A
+O: Europa, Mitteleuropa, Lothringen, Metz ( St. Vinzent )
+N: Variante zu D0019
+R: Kinder - Spiel
+M: 2/4
+L: 1/16
+K: G
+D2 | G2f2G2A2 | _B4=f4
+B4c4 | d4z2
+d2 | _e2d2d2cc | d4_B2
+d2 | c2_B2A2G2 | A4D4- | D4
+G2G2 | F4G4 | G6
+
+X:20
+T: Hoert allesamt was ich ereklaer'
+N: D0020
+O: Europa, Mitteleuropa, Lothringen, Metz ( St. Vinzent )
+N: Caesuren nachtraeglich zugefuegt; Inzipit = Variante zum Lied
+R: Hochzeits - Lied
+M: none
+L: 1/8
+K: G
+D2D2G2G2B2AGFED3
+D | c3AB3BAGFED2
+D2 | c4B4A2z2
+GA | B2c2dcB2AGABc2
+A2B2c2dGA2GFE2D2z
+D | G3BA3BG2B2d2cA | B4A4G4
+
+X:21
+T: Das vierte Gebot ( Der Teufel als Freier )
+N: D0021
+O: Europa, Mitteleuropa, Lothringen, Metz ( St. Vinzent )
+N: Verzierung; Inzipit = Variante
+R: Zeitungs - Lied
+M: 4/4
+L: 1/8
+K: D
+F2 | F2E2 | D6DE | F2G2 | A6
+F2 | G2A2 | B4B2A2 | G4 | F6
+A2 | A2F2 | B6A2 | G2B2 | A6
+A2 | B2AA | A4G2G2 | G2ED | E6
+A2 | BBc2 | d4A4 | E4 | D4z2
+
+X:22
+T: Der Lindenschmied
+N: D0022
+O: Europa, Mitteleuropa, Lothringen, Metz ( St. Vinzent )
+R: historisches Lied
+M: 6/8
+L: 1/16
+K: G
+DD | G4G2=F4F2 | _B2d2c2B4
+G2 | A4_B2c2c2B2 | G2G2f2G4
+A2 | c2d2c2_B4A2 | G6=F4
+F2 | _B2d2c2d4dc | _B2c2d2c6
+d6c2B2A2 | G2D2G2_B2A2G2 | D6G4
+
+X:23
+T: Lazarus und der Prasser
+N: D0024
+O: Europa, Mitteleuropa, Lothringen, Gebenhausen
+N: Inzipit =  Variante
+R: Legenden - Lied
+M: 2/4
+L: 1/16
+K: F
+C2 | F3FF2G2 | A4c2B2 | A4G4 | F6
+F2 | G3GG2G2 | G4A2B2 | c4B2A2 | G4z2
+F2 | A4A2B2 | c6c2 | B2A2G2F2 | B4z2
+G2 | c4B2G2 | F2c2B2G2 | A4G2C2 | F4z2
+
+X:24
+T: Der eifersuechtige Knabe
+N: D0026
+O: Europa, Mitteleuropa, Lothringen, Gebenhausen
+N: Inzipit = entfernte Variante zum Lied
+R: Ballade, Liebe, Mord aus Eifersucht
+M: 6/8
+L: 1/16
+K: G
+d2 | B4B2A4A2 | G6D4
+G2 | G2G2A2B2G2A2 | B6-B4
+c2 | B2d2d2e2d2c2 | B6A6
+G6A6 | d3cB2c2B2A2 | G6-G4
+
+X:25
+T: Gemalte Rosen
+N: D0027
+O: Europa, Mitteleuropa, Lothringen, Gebenhausen
+N: Inzipit = Variante zum Lied
+R: Ballade, Liebe
+M: 2/2
+L: 1/8
+K: D
+A2 | d2A2A2A2 | B2A2A2
+A2 | B3GG2F2 | F4E4
+D4F4 | A6z2
+A4c4 | e6
+d2 | c2B2A2G2 | G4F2
+
+X:26
+T: Das faule Gretchen
+N: D0028
+O: Europa, Mitteleuropa, Lothringen, Gebenhausen
+N: Mehrere rhythmische Korrekturen zum 4/8 - Takt durchgefuehrt
+N: Verzierung; Inzipit = Variante
+R: Spott - Lied
+M: 4/8
+L: 1/16
+K: G
+D2 | G2B2A2F2 | G2E2D2
+D2 | E2G2F2A2 | G4z2
+D2 | G2B2A2F2 | G2E2D2
+D2 | E2G2F2A2 | G4
+d3c | B2B2B2B2 | B2d2d4 | B2d2d4
+d2c2c2e2 | e2d2B2
+AA | B2d2c2A2 | G4z2
+
+X:27
+T: Eleisonlied
+N: D0029
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Im Original mit der Bemerkung "ohne Taktakzente" ueberschrieben,
+N: aber mit Taktstrichen notiert; Inzipit = entfernte Variante
+R: Legenden - Lied
+M: 4/4
+L: 1/8
+K: F#
+EEEE | 4=A2F2 | =G2F2E2- | E4
+EE | 62 | =A22F4- | F3
+FFFFF | 4F2 | F2E2=D2- | D2
+E=G | F2CE | =D2C2 | 4
+
+X:28
+T: Eleisonlied
+N: D0029A
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Taktart veraendert ( siehe Lied D0029) ; Variante zu Lied D0029
+R: Legenden - Lied
+M: none
+L: 1/32
+K: G
+c4c4c4 | g12=f4d4 | _e4d4c8
+d4 | g8=f4g4d8z4
+d4d3dd3d | g8=f4_e8c4 | _B8
+c4d4_e4 | d8G4c4 | _B2A2G8
+
+X:29
+T: Ich stand mal auf hohem Berge,
+N: D0030
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Achttonskala (aeolisch mit fehlender Septime, in die Dominanttonart
+N: (Ionisch) modulierend ); Inzipit = Variante zum Lied
+R: Liebes - Klage
+M: 3/4
+L: 1/8
+K: G
+D2 | G3GG2 | A2B2^c2 | d3^cd2 | A2_B2
+AB | d3_ed2 | c3Bd2 | A2_B2z2
+d6 | ^c2d2A2 | _B2A2G2 | c4_e2 | d4
+d2 | G3A_B2 | c2_B2A2 | G4
+
+X:30
+T: Das Zauberross
+N: D0031
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Taktart in ' FREI ' korrigiert
+R: Ballade, magisch, mythisch
+M: none
+L: 1/8
+K: G
+DGA | B2B2AA | G2z
+GGB | d2d2eed
+cBA | G2d2cA | G3
+
+X:31
+T: Es fliegen zwei Tauben wohl ueber den Rhein,:
+N: D0032
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Achttonskala ( Ionisch, modulierend in die Dominanttonart )
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+D2 | G3AB2 | A2A2D2 | E2F2E2 | D4
+D2 | G2A2B2 | A2A2d2 | ^c3de2 | d4
+d2 | G2A2B2 | c2B2A2 | G2B2A2 | G4
+
+X:32
+T: Der verkleidete Markgrafensohn
+N: D0033
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Inzipit = Variante zum Lied
+R: Ballade
+M: 4/8
+L: 1/8
+K: G
+DDD | G2FE | FGA2- | A3
+A | BAGF | E2D
+A | AAB | AAd2 | cBA | G2A
+B | cA | BAG | F3 | G3
+
+X:33
+T: Sieben Straeuss
+N: D0034
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Inzipit = Variante zum Lied
+R: Ballade, vergebliche Werbung
+M: 3/4
+L: 1/8
+K: D
+A2A2G2 | =F3GA2 | AG=F2E2- | E6
+GGGGA2 | D3E=F2 | E2D2=C2- | C4
+=C2 | =F4G2 | A4G=F | E6 | D6
+
+X:34
+T: Es fliegen zwei Tauben wohl ueber den Rhein,
+N: D0035
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Inzipit = Variante zum Lied, beides Varianten zu Lied D0032
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+G2 | d2d2c2 | d2d2c2 | d2d2c2 | d6- | d2z2
+d2 | G3A_B2 | c2_B2A2 | G2G2F2 | G6- | G2z2
+D2 | G2G2A2 | G2G2D2 | =f2G2f2 | D6- | D2z2
+G2 | d2d2c2 | d2d2c2 | d2d2c2 | d6- | d2z2
+d2 | G3A_B2 | c2_B2A2 | G2G2F2 | G6- | G2z2
+
+X:35
+T: Es fliegen zwei Tauben wohl ueber den Rhein,:
+N: D0035A
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Variante zu D0035 und D0032
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: D
+D2 | G2G2A2 | G2G2D2 | =F2G2F2 | D4
+D2 | A2A2G2 | A2A2G2 | A2A2G2 | A4
+A2 | D3E=F2 | G2=F2E2 | D2D2C2 | D4
+
+X:36
+T: Der verkleidete Reiter
+N: D0036
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Notenwert in Zeile 261 korrigiert
+R: Ballade
+M: 6/8
+L: 1/8
+K: G
+G | G2GGAG | =F3G2
+A | _BAGcBA | G3-G2
+G | _B2=FB2c | d3dc
+c | dddGAG | =F3G2
+A | _BAGcBA | G3-G2
+
+X:37
+T: Wiedersehn
+N: D0039
+O: Europa, Mitteleuropa, Lothringen, Weiler
+N: Neuntonskala (beginnt in Moll, moduliert sofort nach Ionisch)
+R: Ballade, Liebe, Wiedervereinigung der Liebenden
+M: 3/4
+L: 1/8
+K: G
+D2 | G3A_B2 | A2_B2A2 | G2F2G2 | D4
+D2 | G4A2 | d3ed2 | c2B2A2- | A2z2
+BA | G2G2d^c | d2d2GG | G3FG2 | D4
+D2 | G2A2d2- | d4cB | A3BA2 | G4
+
+X:38
+T: Totenlied
+N: D0040
+O: Europa, Mitteleuropa, Lothringen, Rechicourt ( Kr. Saarburg )
+N: Verzierungen
+R: geistliches Lied, Tod, Totentanz
+M: 6/4
+L: 1/4
+K: G
+D | G2GA2A | B3zz
+A | A2Bc2d | B2AA2
+B | c2BBAG | A3zz
+B | B2AA2G | GABA2
+B | B2AA2G | GABA2
+B | d2AB2B | G3zz
+
+X:39
+T: Gottselige Strickerin
+N: D0041
+O: Europa, Mitteleuropa, Lothringen, Rechicourt ( Kr. Saarburg )
+N: Verzierungen; Inzipit = Variante zum Lied
+R: religioeses Erzaehl - Lied
+M: 3/8
+L: 1/16
+K: F
+F2 | F2F2F2 | F2F2F2 | G2G2A2 | B4B2 | F4
+F2 | B2B2c2 | d2d2dc | B2G2A2 | B6 | z4
+B2 | c2B2c2 | d2d2c2 | B6 | G6
+c4d2 | B3AF2 | G2A2A2 | F6 | z4
+F2 | B2B2c2 | d2d2c2 | B6 | G6
+c4d2 | B3AF2 | G2A2F2 | F4
+
+X:40
+T: Entfuehrte Graserin
+N: D0042
+O: Europa, Mitteleuropa, Lothringen, Rechicourt ( Kr. Saarburg )
+N: Verzierungen; Inzipit = Transposition zum Lied
+R: Ballade
+M: 2/4
+L: 1/16
+K: F
+F2 | F4F4 | c3cc2d2 | c4B2A2 | G8- | G4z2
+c2 | c2B2A2G2 | F4G4 | F2E2D4 | C8- | C4z2
+C2 | F4F4 | G4c4 | A4G4 | A8 | A4G4 | F8- | F4z2
+
+X:41
+T: Die himmlischen Freuden
+N: D0043
+O: Europa, Mitteleuropa, Lothringen, Halsdorf ( Kr. Diedenhofen )
+N: Achttonskala ( Ionisch in die Dominanttonart modulierend )
+N: Inzipit = Variante zum Lied
+R: geistliches Lied
+M: 3/4
+L: 1/16
+K: F
+F3F | A4A4B4 | c4c4c4 | A8B4 | c8
+c4 | d4c4B4 | A4G4F4 | E8F4 | G8
+F4 | A4c4=B4 | c4d4=B4 | c4d4=B4 | c4c4z4
+d8f4 | e6d2c4 | f4e4d4 | c12
+B12 | A4c4A4 | G4F4G4 | F8
+
+X:42
+T: Gruene Reben auf hohen Bergen,
+N: D0044
+O: Europa, Mitteleuropa, Lothringen, Halsdorf ( Kr. Diedenhofen )
+N: Inzipit = Variante zum Lied
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: G
+D3G | G2D2D2D2G2A2 | B2A2G4
+B3c | d4c2B2G2A2B2 | A4z4
+G4A2B2 | B3BB3dd2c2B2 | B2A2B2A4
+B3A | G4G3AG2F2E2 | D3AA4
+B3A | G2A2B2A2G3F | G4z4
+
+X:43
+T: Der Essigkrug
+N: D0045
+O: Europa, Mitteleuropa, Lothringen, Halsdorf ( Kr. Diedenhofen )
+N: Inzipit = Transposition zum Lied
+R: Scherzlied auf einen Hausstand
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B2B2F2F2 | G2G2F2z2
+B4G2A2 | B4z2
+F2 | D2E2F2e2 | d4B2
+d2 | c2c2B2A2 | B4z2
+FF | B4F2FF | G4F2
+F2 | B4G2A2 | B4z2
+F2 | B2B2c2e2 | d4B2
+d2 | c2c2B2A2 | B4z2
+
+X:44
+T: Der lustige Nagelschmied
+N: D0046
+O: Europa, Mitteleuropa, Lothringen, Halsdorf ( Kr. Diedenhofen )
+R: Staende - Lied
+M: 2/4
+L: 1/16
+K: G
+G2G2B2B2 | G2G2A4
+B2G2d2dd | B2A2G2z
+G | G2G2B2B2 | G2G2A4
+B2G2d2dd | B8
+
+X:45
+T: Wilmens Esel
+N: D0047
+O: Europa, Mitteleuropa, Lothringen, Breisdorf ( Kr. Diedenhofen )
+N: Heptatonik ( Ionisch, Schluss moduliert in parallele Molltonart)
+N: Inzipit = Variante zum Lied
+R: Ballade, Schwank
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B2B2B2c2 | d2c2B4
+c2B2c2d2 | e2ccd4d4
+f2e2d2c2 | d2ccB4
+c2c2c2d2 | B2B2B4
+c4c2B2 | d2c2B2A2 | G4z2
+
+X:46
+T: Nun adje, Schatz, und ich muss fort,
+N: D0049
+O: Europa, Mitteleuropa, Lothringen, Breisdorf ( Kr. Diedenhofen )
+R: Ballade
+M: 3/8
+L: 1/8
+K: G
+G | D2G | _B2A | G2F | G3- | G2
+G | _B2c | d2_e | d_Bc | d3- | d2
+d | =f2d | _edc | d2c | _B3- | B2
+d | d2c | c_BA | G2F | G3- | G2
+
+X:47
+T: Die Lumpenbauern
+N: D0050
+O: Europa, Mitteleuropa, Lothringen, Gebenhausen
+N: Die Tonrepetitionen in der ersten Zeile werden "psalmodierend"
+N: (Vortragsbezeichnung) vorgetragen, zweiter Teil metrisch gebunden
+R: Schwell - Lied, Scherz und Spott
+M: FREI4/4
+L: 1/16
+K: G
+C2GGGGGGGGGA2G3=FF2E2E2
+C2GGGGGGGGA2G3FF2E2E2
+C2GGGGGGGG
+GGGGA2G3FF2F2E4
+G4 | G2G2G4A4A4 | B6B2B4
+A4 | G2G2G4A2A2A4 | B6B2B4z4
+d8B4G4 | A4A4G4
+
+X:48
+T: Die heilige Katharina
+N: D0051
+O: Europa, Mitteleuropa, Lothringen, Gebenhausen
+N: Verzierung; Inzipit = Variante zum Lied
+R: Legenden - Lied
+M: 4/4
+L: 1/8
+K: A
+E2 | A3B=c2A2 | B2=g2z2
+=c2 | A2EEDE=FD | E2
+=c2d3e | =c2AAdcB2- | B2
+=cBA2A2 | G2B2A2
+
+X:49
+T: Der eifersuechtige Knabe
+N: D0052
+O: Europa, Mitteleuropa, Lothringen, Settingen
+R: Ballade, Liebe, Mord aus Eifersucht
+M: 3/4
+L: 1/8
+K: G
+D2 | D2G2G2 | G2A2B2 | B3AB2 | A4
+A2 | A2B2c2 | c2d2e2 | e4d2 | B4
+d2c2 | B3cB2 | A2G2d2 | d6- | d4
+e2 | d3cB2 | A2d2c2 | B6- | B4
+
+X:50
+T: Schloss in Oestreich
+N: D0054
+O: Europa, Mitteleuropa, Lothringen, Settingen
+N: Inzipit = Variante zum Lied
+R:  Ballade, Liebe, menschliche Grausamkeit
+M: 3/4
+L: 1/16
+K: C
+G2 | G2c2E6E2 | E2G2E6
+G2 | G2G2A6F2 | F4E4z2
+G2 | G2B2d6F2 | E2G2C4z4
+e4dcBAG2F2 | F4E4z2
+G2 | G2c2E6E2 | E2G2E6
+G2 | G2G2A6F2 | F4E4z2
+G2 | G2B2d6F2 | E2G2C4z4
+e4dcBAG2F2 | F4E4z2
+
+X:51
+T: Die irdische Pilgerfahrt
+N: D0055
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: Sonderzeichen in der Notation
+R: geistliches Lied
+M: 3/4
+L: 1/8
+K: G
+G2 | G4G2 | d6 | _e2=f2e2 | d4
+d2 | c3dc2 | _B2A2GA | _B2A2G2 | z4
+g2 | d2d2g2 | d2d2c2 | _B3dBA | G4
+G4 | _B2d2c2 | d3_edc | _B4A2G2- | G2z6
+
+X:52
+T: Falkenlied
+N: D0056
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: Inzipit = Variante zum Lied
+R: Legenden - Lied
+M: none
+L: 1/8
+K: G
+GGGGG2 | d3cdc_BAG2z2
+d2_eed2c2d2cBA2z2
+GG2G2 | d3cdc_BAG2z2
+B2ABc2A2d2BAG2
+
+X:53
+T: Dreikoenigslied
+N: D0057
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: Achttonskala (Ionisch mit Modulation in die Dominanttonart)
+N: Verzierungen; Inzipit = Variante zum Lied
+R:  Brauchtums - Lied, Dreikoenigs - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | GFE2F2G2 | A3BA2
+FD | G2G2c2B2 | A4z2
+D2 | GFE2F2G2 | A3BA2
+FD | G2G2c2B2 | A4z2
+FG | A3BAGFE | D3^CD2
+D2 | G3AG2F2 | E4D2
+D2 | GFE2F2G2 | A3BG2
+c2 | B2B2AGA2 | G4z2
+
+X:54
+T: 's Geigenbuebele
+N: D0058
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: haeufige Wiederholung eines rhythmischen Motivs; Verzierung;
+N: Inzipit = Variante zum Lied
+R: Ballade, magisch, mythisch
+M: 3/4
+L: 1/8
+K: G
+D2 | G3FG2 | A4d2 | B3AB2 | G4
+G2 | A3Bc2 | d3cB2 | G3AB2 | A4
+A2 | d3ed2 | dcB2A2 | G3DGB | A3B
+G2 | A3Bc2 | d3cB2 | A4d2 | G4
+
+X:55
+T: Drei Soldaten
+N: D0059
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: Verzierung; Inzipit = Variante zum Lied
+R: Ballade, Liebe, Freibitte fuer den Geliebten
+M: 4/4
+L: 1/8
+K: D
+D2 | D3EF2GG | A3BA2
+d2 | cBA2BcB2 | A4z2
+A2 | d2A2BcB2 | A3GF2
+B2 | B2A2AFAF | F2D2E2
+AB | A2EGF2E2 | D4z2
+
+X:56
+T: Die wiedergefundene Schwester
+N: D0060
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: Inzipit = Variante zum Lied
+R: Ballade, Familie, Wiederfinden von Familienangehoerigen
+M: 3/4
+L: 1/16
+K: F
+C4 | F4F4F2F2 | G4G4A2A2 | B12 | F4z4
+A2B2 | c6d2c4 | G4G4c4 | c4B4A4 | G4z4
+c3B | A4G4A4 | F4F4A4 | F4G4A4 | G4z4
+G4 | F4F4d4 | c6B2A2c2 | c2B2A4G4 | F4z4
+G4 | F4F4d4 | c6B2A2c2 | c2B2A4G4 | F4z4
+
+X:57
+T: Der arme Bauer
+N: D0061
+O: Europa, Mitteleuropa, Lothringen, Bettringen b. Holvingen
+N: Inzipit = Variante zum Lied
+R: Bauern - Klage
+M: 3/4
+L: 1/8
+K: G
+dd | d2dd_BG | A4
+d_e | d3d_BG | A2z
+ccc | c3cd_e | d2z
+c_BA | G2A2_BA | G3z
+
+X:58
+T: Arme Seele
+N: D0062
+O: Europa, Mitteleuropa, Lothringen, Woelflingen
+N: Inzipit = Variante zum Lied ( siehe folgendes Beispiel )
+R: geistliches Lied
+M: 3/8
+L: 1/16
+K: A
+D2 | A2A2A2 | =G2F2E2 | =c2B2A2 | B2z2
+=G2 | B2=c2dd | =c2B2A2 | =G2A2B2 | A2z2
+
+X:59
+T: Arme Seele
+N: D0062A
+O: Europa, Mitteleuropa, Lothringen, Woelflingen
+N: Variante zu D0062
+R: geistliches Lied
+M: 3/8
+L: 1/16
+K: G
+C2 | G2G2G2 | =F2E2D2 | _B2A2G2 | A2z2
+=F2 | A2_BBc2 | _B2A2G2 | F2G2A2 | G4z2
+
+X:60
+T: Schneider - Verschwoerung
+N: D0063
+O: Europa, Mitteleuropa, Lothringen, Woelflingen
+N: rezitativisch, Vortragsbezeichnung: lustig, schalkhaft
+N: Verzierung; Inzipt = Variante zum Lied
+R: Spott - Lied
+M: 3/4
+L: 1/16
+K: A
+D4 | D4A4A4 | A2AAA4B4 | A4=G4G4 | =G4G4
+G4 | =G8=c4 | =c4c4c4 | =c12 | =c8
+c3c | B6B2B4 | A4A4A4 | A8
+
+X:61
+T: Der Wolf ( Der Abendgang )
+N: D0064
+O: Europa, Mitteleuropa, Lothringen, Woelflingen
+R: Ballade, Tod eines Geliebten
+M: 4/4
+L: 1/16
+K: G
+D4 | G6A2B4B2d2 | A6BAG4
+D4 | G6A2B4B2d2 | A12
+B2A2 | G6A2B4c2e2 | d6e2d4
+d3c | B4B4A4A2F2 | G12
+D4 | G6A2B4c2e2 | d6e2d4
+d3c | B4B4A4A2F2 | G12
+
+X:62
+T: St. Odilien
+N: D0065
+O: Europa, Mitteleuropa, Lothringen, Woelflingen
+N: In Zeile 261 und 263 rhythmisch korrigiert
+N: Grundton in der kleinen Oktave
+R: Legenden - Lied
+M: 3/8
+L: 1/16
+K: G
+d2 | d4d2 | d2d2d2 | g2=f2g2 | d6- | d4
+=f2 | =f3ff2 | =f2g2f2 | _e2d2c2 | _B6- | B4
+d2 | c2d2_e2 | d4c2 | _B4A2 | G6- | G4
+
+X:63
+T: Als Sankt Justil blind geboren war,CNR[und ihr Vater ein Pfalzgraf war
+N: D0066
+O: Europa, Mitteleuropa, Lothringen, Hambach
+R: Legenden - Lied
+M: 3/8
+L: 1/16
+K: G
+d4A2 | A4d2 | =f4g2 | =f4e2 | d6
+d4d2 | c3cd2 | _B4A2 | G6- | G4
+G2 | _B4B2 | d2c2c2 | d6 | d2c2_B2 | A6 | G6
+
+X:64
+T: Schlangenkoechin
+N: D0067
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: Inzipit = Variante zum Lied
+R: Ballade
+M: 3/4
+L: 1/8
+K: F
+AB | c2A2cd | B2G2
+BB | A2F2A2 | G4
+C2 | F2F2G2 | A2A2
+B2 | c2B2e2 | F4
+
+X:65
+T: Schlangenkoechin
+N: D0067A
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: In der zweiten Zeile rhythmisch korrigiert; Variante zu D0067
+R: Ballade
+M: 3/4
+L: 1/8
+K: G
+Bc | d2B2d2 | cBA2
+cc | B2G2B2 | A4
+D2 | G2G2AA | B2B2
+Bc | d2B2A2 | G4
+
+X:66
+T: Gute Meinung
+N: D0068
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: Verzierungen; Inzipit = Variante zum Lied
+R: geistliches Lied
+M: 4/4
+L: 1/8
+K: Eb
+EFGAB2B2 | cdeccBB2
+BAcBB2EF | GAGFFEE2
+G3BBAA2 | GEBGGFF2
+G3BBAA2 | GEBGGFF2
+EFGAB2B2 | cdecB4
+BAcBB2EF | GAGFE2z2
+EFGAB2B2 | cdecB4
+BAcBB2EF | GAGFE2z2
+
+X:67
+T: Sieben Straeuss
+N: D0069
+O: Europa, Mitteleuropa, Lothringen, Hambach
+R: Ballade, abgewiesener Liebhaber
+M: none
+L: 1/8
+K: G
+G2G2B2d3ed2A2B2c2z2
+ddB2A2B2G2F2GBA2
+d3=fe2d2dcBGA4G2
+
+X:68
+T: Als Gott die Welt erschaffen hat
+N: D0070
+O: Europa, Mitteleuropa, Lothringen, Hambach
+N: Inzipit = Variante zum Lied
+R: geistliches Scherz - Lied
+M: 2/4
+L: 1/8
+K: D
+D | DEFG | AAA
+A | BcdB | BAz
+A | AGGE | DFF
+F | EFGE | D2z
+
+X:69
+T: Ja grueass di God, Frual vo da Au
+N: D0072
+O: Europa, Mitteleuropa, Deutschland, Niederbayern
+N: Pentatonik (Grundton ?) , Unterstimme in Terzparallelen (ergaenzt
+N: die Skala zur Heptatonik - Ionisch) ; Grundton in der
+N: zweigetrichenen Oktave; Inzipit = Transposition zum Lied
+R: historisches Lied, bayrische Erbfolgekriege
+M: 3/4
+L: 1/8
+K: C
+G,2 | E3EE2 | G3EEE | F2z2z2 | z2z2
+G,2 | F2F2G2 | A2G2F2 | E2z2z2 | z2z2
+G,2 | E3EE2 | G3EE2 | F2z2z2 | z2z2
+G,2 | F2F2G2 | A2G2F2 | E2z2
+E2 | F3FG2 | A2G2F2 | EEE2F2 | G2F2
+E2 | D3DD2 | F2E2D2 | E2z2
+E2 | D2E2F2 | G2G2F2 | E2z2
+
+X:70
+T: Ueba d' Alma, da gibts Kalma,
+N: D0073
+O: Europa, Mitteleuropa, Deutschland, Bayernalpe
+N: Unterstimme in Terzen und Sexten (ergaenzt die Skala zur Heptatonik
+N: Ionisch) ; Grundton in der zweigestrichenen Oktave
+N: Inzipit = Variante zum Lied
+R: Kilt - Lied
+M: 3/4
+L: 1/16
+K: D
+D3D | D2F,2A,4D3D | C4G,4
+C2C2 | C4D4E2E2 | F2d2A4
+G2G2 | F4A,4F4 | G6F2
+E2D2 | C4G,2A,2C2G,2 | F,8
+D3D | D2F,2A,4D3D | C4G,4
+C2C2 | C4D4E4 | F2d2A4
+G2G2 | F4A,4F4 | G6F2
+E2D2 | C4G,2A,2C2A,2 | F,8
+
+X:71
+T: Uebers Loaterl, da steig i net aufi,
+N: D0074
+O: Europa, Mitteleuropa, Deutschland, Bayernalpe
+N: Unterstimme vorwiegend in Terzen; Verzierung; Inzipit = Variante
+R: Kilt - Lied
+M: 3/4
+L: 1/16
+K: F
+A2A2 | A2c2f6A2 | c6B2A4 | c2G2B4z2
+B2 | B2c2e6B2 | d4c4B4 | A4z4z2
+A2 | A2c2f6A2 | c4B4A4 | c2G2B6
+B2 | B2c2e6B2 | d4c4B4 | A4z4z4
+G2GGG4C2z2 | A2f2c4f2c2 | e6d2B4 | A4z4z4
+G2GGG4C2z2 | A2f2c4f2c2 | e6d2B4 | A4z4
+c2c2 | d6c2A4 | c6B2G4 | e6d2B4 | d6c2A4
+d6c2A4 | c6B2G4 | e6d2c2B2 | A4z4
+
+X:72
+T: Bei da Lind'n bin i g'sessn,
+N: D0076
+O: Europa, Mitteleuropa, Oesterreich, Steiermark
+N: Inzipit = Transposition zum Lied
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: F
+C2A2 | A4G4C2B2 | B4A4
+C2A2 | A4G4C2B2 | B4A4
+A4 | B2d2d4c2B2 | B3Af2c2
+A2c2 | c4B4B4 | A4z4
+A4 | B2d2d4c2B2 | B3Af2c2
+A2c2 | e4B4B4 | A4z4
+
+X:73
+T: Andreas - Hofer - Lied
+N: D0077
+O: Europa, Mitteleuropa, Oesterreich, Steiermark
+N: Inzipit = Variante zum Lied
+R: historisches Lied
+M: 2/2
+L: 1/8
+K: C
+G4 | E2E2E2E2 | E4z2
+G2 | A3GF2E2 | E2D2z2
+G2 | E2E2E2E2 | E4z2
+G2 | A3GF2E2 | E2D2z2
+DE | G2DEF2DE | F4z2
+EF | G2EFG2EF | G4z2
+GF | E2E2c2A2 | G4z2
+GF | E2EFG2GF | E4
+
+X:74
+T: Mei Voda sei Haeusl is mit Haberstroh deckt,
+N: D0079
+O: Europa, Mitteleuropa, Deutschland, Niederbayern
+N: Viertonskala (Grundton fehlt - vermutlich mit Unterstimme gesungen)
+R: Ehestands - Lied
+M: 3/4
+L: 1/8
+K: G
+Bc | d2d2d2 | B2B2
+AB | d2d2d2 | c2z2
+AB | c2c3B | A2A2
+A2 | d2d2c2 | B2z2
+
+X:75
+T: Seckauer Jodler
+N: D0079A
+O: Europa, Mitteleuropa, Deutschland, Niederbayern
+N: Unterstimme notiert, ergaenzt die Skala zu Pentatonik; Inzipit =
+N: Transposition zum Lied; DVA - Signatur 79A; KEINE Variante zum
+N: vorhergehenden Lied !
+R: Jodler
+M: 3/4
+L: 1/16
+K: C
+G3E | G3ed2d2G3G | E2G2c4z3
+E | G3ed2d2G3G | E2G2c4z3
+E | G3ed2d2G3G | c3ge2e2
+c3c | G3ed2d2G3G | c3ge2e2
+c3c | G3ed2d2G3G | E3Gc3de3d | c8
+
+X:76
+T: Weil i's Deandl net wegbring;
+N: D0080
+O: Europa, Mitteleuropa, Deutschland, Bayerischer Wald
+N: Grundton in der kleinen Oktave
+R: Jodel - Lied
+M: 3/4
+L: 1/8
+K: G
+BB | d2g3a | g2d2
+B2 | cdf3d | c4z
+c | cdf3f | f3d
+c2 | Bdg3d | B4
+
+X:77
+T: Bu hoscht du hin das Zautle
+N: D0085
+O: Europa, Mitteleuropa, Deutschland, Gottschee
+N: Unterstimme in parallelen Terzen, ergaenzt die Skala zur Heptatonik
+N: (Ionisch) ; erste Zeile rhythmisch korrigiert (Pause)
+N: Inzipit = Variante zum Lied; DVA-Signatur 85a
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+C2 | c3cB2c2 | A4A2
+c2 | B3Bc2B2 | A4c2z2
+B3Bf2d2 | c3cc2f2
+e3dc2B2 | A4z2
+
+X:78
+T: Dem Kuhlips war die Kau gepfaend't
+N: D0087
+O: Europa, Mitteleuropa, Deutschland, Mittelhessen, Langsdorf
+N: Taktart in "FREI" korrigiert; Grundton in der kleinen Oktave
+R: Bauern - Klage
+M: none
+L: 1/8
+K: G
+d | gdBG | eee2z
+e | ddcA | BBz
+d | gdBG | eee2z
+e | ddcA | BBz
+
+X:79
+T: Mis Bueoeli
+N: D0089
+O: Europa, Mitteleuropa,Schweiz, Kt. Graubuenden, Chur
+N: Inzipit = Variante zum Lied
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: Eb
+B2 | G2A2B2c2e2c2 | B4A2F4
+B2 | G2A2B2c2e2c2 | B6z4
+G2 | F2G2F2E2F2G2 | F3GF2E4
+B2 | G2A2B2c2e2c2 | B6z4
+
+X:80
+T: Mis Bueoeli
+N: D0089A
+O: Europa, Mitteleuropa,Schweiz, Kt. Graubuenden, Chur
+N: Inzipit = Variante zum Lied
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: Eb
+B2 | G2A2B2c2e2c2 | B4A2F4
+B2 | G2A2B2c2e2c2 | B6z4
+G2 | F2G2F2E2F2G2 | F3GF2E4
+G2 | B2c2B2F2G2F2 | E6z4
+
+X:81
+T: Jodler
+N: D0090
+O: Europa, Mitteleuropa, Schweiz, Kt. Wallis, Brigersberg
+N: erste Zeile rhythmisch korrigiert
+N: Notentext vollstaendig ??  Sonderzeichen in der Notation
+R: Jodler
+M: 3/4
+L: 1/16
+K: G
+D2E2F2 | G4d4B4 | g6e2d2B2 | G4F4d4 | c6
+D2E2F2 | A2d2c2e2d2Fd | G4e4d4 | B12
+
+X:82
+T: Eischterliedji
+N: D0092
+O: Europa, Mitteleuropa,Schweiz, Kt. Wallis, Brigersberg
+R: Jodel - Lied
+M: 4/4
+L: 1/16
+K: G
+G3A | B4B4B3AB3c | d4d4z4
+e3d | d4c4e2d2c4 | B8z4
+G3A | B4B4B3AB3c | d4d4z4
+e3d | d4c4e2d2c4 | B8z4
+
+X:83
+T: Steh ich an mein Fensterlein,
+N: D0093
+O: Europa, Mitteleuropa, Deutschland, Baden, Freiburg i. Brsg.
+N: Inzipit = Variante zum Lied
+R: Liebesschmerz
+M: 3/4
+L: 1/8
+K: D
+FG | A3BAA | G2z2
+Ad | f3eed | A2z2
+dc | B3BBB | A2z2
+AA | G2c2 | d2z2
+dc | B3BBB | A2z2
+AA | G2c2 | d2z2
+
+X:84
+T: Schon wieder toent's vom Schacht zurueck
+N: D0094
+O: Europa, Mitteleuropa, Deutschland, Baden, Freiburg i. Brsg.
+N: erste, dritte und fuenfte Zeile rhythmisch korrigiert; Zweiter Teil
+N: des Liedes mehrstimmig; Inzipit = Variante zum Lied
+R: Arbeit, Staende - Lied, Bergmannslied
+M: 2/4
+L: 1/16
+K: G
+ |  |  | D4B,3C | D4D4 | E4F4 | G4z2
+G2 | F2A2G2E2 | E2D2z4
+D4B,3C | D4D4 | E4F4 | G4z2
+G2 | F2A2G2E2 | E2D2z4 | z4
+D4 | A6G2 | F2A2D4 | d6c2 | B4
+D4 | c6B2 | A2A2D4 | e6c2 | B8 | z4
+G4 | G6G2 | A4B4 | c8 | z4
+B2A2 | d8 | d4c4 | B8 | z4
+D4 | A6G2 | F2A2D4 | d6c2 | B4
+D4 | c6B2 | A2A2D4 | e6c2 | B8 | z4
+G4 | G6G2 | A4B4 | c8 | z4
+B2A2 | d8 | d4c4 | B8
+
+X:85
+T: Einst ein Jaeger wollte jagen
+N: D0096
+O: Europa, Mitteleuropa, Deutschland, Baden, Freiburg i. Brsg.
+N: Inzipit = Variante zum Lied
+R: Liebes - Lied, abgewiesener Liebhaber
+M: 6/4
+L: 1/8
+K: F
+C3D | C2F2F4C3D | C2A2A4
+B3A | G2C2G2C2G2A2 | F6z2
+C3D | C2F2F4C3D | C2A2A4
+B3A | G2C2G2C2G2A2 | F4z2
+C2F2A2 | B2d2d4c3B | A2C2A4
+B3A | G2C2G2C2G2A2 | F4z4
+
+X:86
+T: Gestern Abend in der stillen Ruh
+N: D0098
+O: Europa, Mitteleuropa, Deutschland, Baden, Freiburg i. Brsg.
+N: Inzipit = Variante zum Lied
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: C
+C2G2 | G2G2G2c2c2A2 | G4E4
+A3G | B6A2G3FF2E2 | F2G2E4
+G2G2 | F2A2D4B3B | c3AG2A2
+A3G | G2F2D4A3A | B2G2G4
+C2G2 | G2G2G2c2c2A2 | G4E2zAA2G2 | B4z2
+A2G2F2F2E2 | F2G2E4
+
+X:87
+T: Die Nachtpatrouille
+N: D0100
+O: Europa, Mitteleuropa, Deutschland, Baden, Freiburg i. Brsg.
+N: Pause in der vierten Zeile eingefuegt; Inzipit = Variante zum Lied
+R: Soldaten - Lied
+M: 4/4
+L: 1/8
+K: G
+D3C | B,2D2G2B2 | B4A4 | z4z4
+A6G2 | F2E2D2F2 | G4
+D3C | B,2D2G2B2 | B2A2A4 | z4z4
+A6G2 | F2E2D2F2 | G2A2B2z2 | z4
+G2Bd | d4B4 | d2c2B2c2 | B4
+G2Bd | d4B4 | d2c2B2c2 | B4
+
+X:88
+T: Echo - Jodel
+N: D0101
+O: Europa, Mitteleuropa, Schweiz, Bern
+N: vollstaendig ?
+R: Jodler
+M: 3/4
+L: 1/16
+K: G
+G6A2B4 | g8G3e | d12
+B6g2B4 | c4f6e2 | d12
+A6B2c4 | f8-f3e | d12
+c6a2c4 | B4d4g4 | b8-b2a2 | g12
+
+X:89
+T: D' Baarnertracht
+N: D0103
+O: Europa, Mitteleuropa, Schweiz, Bern
+N: Siebentonskala (Ionisch mit Auslassung und Modulation in
+N: die Dominanttonart) ; Inzipit = Variante zum Lied
+R: Jodel - Lied, Heimat - Lied, Liebes - Lied
+M: 4/4
+L: 1/16
+K: F
+A2G2 | F2F2F2C2F4G4 | A8z4
+A2G2 | F2F2F2C2F4G4 | A8z4
+F2G2 | A2A2c6A2B2A2 | G8C4
+F2G2 | A2A2c6A2B2A2 | G8C4
+A4 | c6A2d3cB2A2G2 | A8z4
+A4 | F4G4A4=B4 | c8C4
+F2A2 | c6d2c2B2 | A6G2F4 | G8A4 | F8
+F2A2 | c6d2c2B2 | A6G2F4 | G8A4 | F8z4
+
+X:90
+T: Des Morgens in der Fruehe
+N: D0120
+O: Europa, Mitteleuropa, Oesterreich, Salzburg
+N: Zeile 268 rhythmisch korrigiert; Inzipit = Variante zum Lied
+R: Alm - Lied, Jodel - Lied
+M: 3/4
+L: 1/16
+K: Bb
+ |  |  |  |  |  |  |  | F2 | F6D2E2G2 | F2d2B2z
+FF2A2c2 | f2g4f2e2F2d2 | B8z2
+F2 | F6D2E2G2 | F2d2B2z
+CC2E2G2 | c2d4c2B2F2A2 | F8z2
+F2 | E2c2B4A4 | B4F4C2D2 | E2c2G4A4 | B8z2
+B2 | E6G2cBAG | F2B2F4z2c2 | F3FG4A4 | B2c2d2c2
+B3A | G6A2cBAG | F2B2F4z2c2 | F3FG4A4 | B6
+D2F2B2 | d3dd2c2B2G2 | F3FF2D2F2B2 | A3AA2
+F2A2c2 | B3BB2A2B2c2 | d3dd2c2B2G2 | F3GF2z
+FF3B | A2F2f2e2g2f2e2A2 | B8z2
+
+X:91
+T: Hahnpfalzlied
+N: D0121
+O: Europa, Mitteleuropa, Deutschland, Bayern, Bad Kreuth
+N: Inzipit = Variante zum Lied
+R: Jaeger - Lied
+M: 3/4
+L: 1/8
+K: C
+C2 | D2F2B,2 | C2E2C2
+A2F2A2 | G2cEG2
+d2G2G2 | e3cE2
+G2D2G2 | C4
+
+X:92
+T: Bei der Lind'n bin i's gsessn
+N: D0124
+O: Europa, Mitteleuropa, Deutschland, Oberbayern, Woernsmuehl
+N: Zeilenwiederholung; zweistimmig ( parallele Terzen )
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+DB | B2A2Dc | c2B2
+DB | B2A2Dc | c2B2
+B2 | cee2de | cBgd
+dg | f2zcc2 | B4
+B2 | cee2de | cBgd
+dg | f2zcc2 | B4
+
+X:93
+T: 's Konzellerer Doerfl is scheibnkuglrund
+N: D0134
+O: Europa, Mitteleuropa, Deutschland, Bayer. Wald, Konzell
+N: zweistimmig (Sextparallelen und Terzen) ; Inzipit = Variante zum Lied
+R: Heimat - Lied
+M: 3/4
+L: 1/8
+K: A
+ |  | E2 | FddcB2 | AccBA2 | GBBcG2 | A2
+ABcE | FddcB2 | AccBA2 | GBBEcB | A2
+ABcE | FddcB2 | AccBA2 | GBBEcB | A2z2
+
+X:94
+T: Z' nachst bin i spat aussiganga
+N: D0136
+O: Europa, Mitteleuropa, Deutschland, Niederbayern, Weitmichel
+N: Inzipit = Variante zum Lied
+R: Kilt - Lied
+M: 3/4
+L: 1/8
+K: G
+D2 | G3GG2 | B2B2A2 | G2z2
+B,2 | B3BB2 | d2d2c2 | B2z2
+GG | e3eee | g2f2e2 | d3dd2 | g2
+d2B2 | c3cd2 | f3ed2 | B2z2
+GG | e3eee | g2f2e2 | d3dd2 | g2
+d2B2 | c3cd2 | f3ed2 | B2z2
+
+X:95
+T: Die Brombeerpflueckerin
+N: D0139
+O: Europa, Mitteleuropa, Deutschland, Bayer. Wald, Zwiesel
+N: Dreistimmig notiert ( hauptsaechlich in parallelen Terzen )
+R: Ballade, Verfuehrung
+M: 6/8
+L: 1/16
+K: G
+G2 | B4B2d3dBB | c4c2d6
+c4A2d4c2 | B4B2B4
+G2 | B4B2d3dB2 | c4d2f4
+ff | a4fff4c2 | b4g2d4
+B2 | c4d2f3dc2 | B6z4
+
+X:96
+T: Muellerstoechterlein
+N: D0141
+O: Europa, Mitteleuropa, Deutschland, Oberfranken
+N: Inzipit = Variante zum Lied
+R: Ballade
+M: 4/4
+L: 1/8
+K: F
+FG | AAAAAcBA | AGG2z2
+GA | B2BBBdcB | BAA2z2
+c2 | c2Acc2Ac | fedc2z2
+c | c2fcc2Ac | B2GBA2
+c2 | c2Acc2Ac | fedc2z2
+c | c2fcc2Ac | B2GBA2
+
+X:97
+T: Lied der Floesser vom Rotmain
+N: D0143
+O: Europa, Mitteleuropa, Deutschland, Oberfranken
+N: Wechselgesang solo - Gruppe; Sequenzen; In der fuenften Zeile
+N: rhythmisch korrigiert; Inzipit = Variante zum Lied
+R: Staende - Lied
+M: 4/8
+L: 1/16
+K: G
+ |  |  |  | G2G2G2G2 | G2E2D2D2 | G2E2D2D2
+G2A2B2B2 | A2A2G4
+G2A2B2B2 | A2A2G2
+D2 | G2G2G2G2 | G2E2D4 | G2E2D4
+G2A2B2B2 | A2A2G4
+G2A2B2B2 | A2A2G4 | z2
+GA | B3BB2AB | c2A2c2A2 | z2
+AB | c3cc2Bc | d2B2d2B2
+D4 | G2G2G2G2 | G2E2D4 | G2E2D4
+G2A2B2B2 | A2A2G4
+G2A2B2B2 | A2A2G4
+d4 | BBBcd4 | BBBcd4
+d2c2c2c2 | e2d2d2
+d2 | BBBcd4 | BBBcd4
+d2c2c2c2 | B4
+
+X:98
+T: Aber Montag, da ist a Knoedltag,
+N: D0144
+O: Europa, Mitteleuropa, Deutschland, Oberfranken
+N: zweistimmig notiert (parallele Terzen) ; Inzipit  = entfernte
+N: Variante zum Lied
+R: Scherz - Lied
+M: none
+L: 1/8
+K: G
+D2D2B4G6D2D2D2B2B2G6z2
+D2 | B2B2B2B2B2BBB2d4c4
+A2 | c2ccc2ccc2e2e2d4B4
+G2 | B2BBB2BBB2d4c4B6z2
+
+X:99
+T: Auf der letzten Reise litt ich etwas Not
+N: D0146
+O: Europa, Mitteleuropa, Deutschland, Wolga - Kolonie
+N: Inzipit = Transposition zum Lied
+R: Wander - Lied, Handwerksburschen - Lied
+M: 4/4
+L: 1/16
+K: A
+ | E3AA2A2c4A4 | d2c2B2A2B8
+E2F2G2A2B2c2d4 | e3dc2B2A8
+e2e2f2e2a4e2c2 | f2e2d2c2c2d2B4
+E3AA2A2c2c2A2c2 | e2e2e3fe6
+c2 | e2e2f2g2a2f2e2d2 | c2d2B4A8
+
+X:100
+T: Bin ich's Wandern muede, sehn ich mich nach Ruh'
+N: D0146A
+O: Europa, Mitteleuropa, Deutschland, Wolga - Kolonie
+N: Strophenvariante zu D00146; Inzipit = Transposition zum Lied
+R: Wander - Lied, Handwerksburschen - Lied
+M: 4/4
+L: 1/16
+K: A
+ | E3AA2A2c4A4 | d2c2B2A2B8
+E2F2G2A2B2c2d4 | e3dc2B2A8
+e2e2f2g2a2f2e2c2 | f2e2d2c2c2d2B4
+E3AA2A2c2c2A2zc | e2e2e3fe6
+c2 | e2e2f2g2a2f2e2d2 | c2d2B4A8
+
+X:101
+T: Die verwundete Dame
+N: D0147
+O: Europa, Mitteleuropa, Deutschland, Wolga - Kolonie
+R: Ballade
+M: 3/4
+L: 1/8
+K: G
+GBc | d2d2cd | A2z
+GFG | ABcAGA | Bcdc | B2AB | G2z
+
+X:102
+T: Der goldene Rosenkranz
+N: D0148
+O: Europa, Mitteleuropa, Deutschland, Wolga - Kolonie
+N: Inzipit = entfernte Varianta zum Lied ??
+R: geistliches Lied, Marien - Lied
+M: 3/4
+L: 1/8
+K: Eb
+E2 | G2B2G2 | F2E2F2 | E6- | E2z2
+FG | A2B2A2 | G2A2B2 | F6- | F2z2
+F2 | B2c2B2 | E4FG | A2B2G2 | F4
+Ac | B2A2G2 | F2G2F2 | E6- | E2z2
+
+X:103
+T: St. Martinslied
+N: D0152
+O: Europa, Mitteleuropa, Deutschland, Niederfranken
+N: haeufig wiederholte Taktformeln; Inzipit = Variante zum Lied
+R: Ansinge - Lied
+M: 4/4
+L: 1/8
+K: C
+G2G2A2A2 | G2G2E4
+G2G2A2A2 | G2G2E2
+A2 | G4E2A2 | G4E2E2 | GGG2E4
+G2G2A2A2 | G2G2E4
+G4A2A2 | G4E4
+G2G2A2A2 | G4E4
+G2G2G2EE | A2A2A4
+G2G2G2A2 | F2F2F4
+G4E4 | G4E4
+G2G2A2A2 | G4E4
+G2G2G2E2 | A2A2A4
+FFFFF2G2 | E2E2E4
+
+X:104
+T: Es war einmal ein kleiner Mann,
+N: D0156
+O: Europa, Mitteleuropa, Deutschland, Provinz Sachsen
+N: Inzipit = entfernte Variante ??
+R: Ehestands - Lied
+M: 2/4
+L: 1/8
+K: G
+D | GGGG | GDD2
+G2A2 | B2G
+G | BBBB | BGG2
+AAAF | G3
+
+X:105
+T: Ruschelputthennchen,
+N: D0158
+O: Europa, Mitteleuropa, Deutschland, Provinz Sachsen
+N: erste Zeile rhythmisch korrigert
+N: Inzipit = Variante zum Lied, Variante zu Lied D0159 ?
+R: Kinder - Lied
+M: 2/4
+L: 1/16
+K: C
+ |  |  |  | E3EE4 | D3CD2E2 | C3CC2C2 | G,6
+G,2 | E4E2E2 | D4E2D2 | C2C2C2C2 | G,6
+G,2 | C4E2G2 | G3GG2A2 | A4F2E2 | D6
+D2 | E2G2C4 | D2F2G,2G,2 | C4C4 | C8
+
+X:106
+T: Suse, Buebiken, suse,
+N: D0159
+O: Europa, Mitteleuropa, Deutschland, Provinz Sachsen
+N: Grundton ?? ; Inzipit = Variante zum Lied; Variante zu Lied D0158 ?
+R: Kinder - Lied
+M: 2/4
+L: 1/16
+K: F
+ |  |  |  | A2A2GGG2 | F4C2
+C2 | A2A2G2G2 | F4C2z2
+A2A2GAG2 | F4C2z2
+A2A2A2c2 | c2B2B4
+A2A2A2c2 | ccB2B4
+A2A2G2G2 | F4C2z2
+A2A2G2G2 | F4C2z2
+
+X:107
+T: Wie schoen ist das laendliche Leben,
+N: D0161
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: moduliertin die Dominanttonart; Pause in der zweiten Zeile rhythmisch
+N: korrigiert; Inzipit = entfernte Variante zum Lied
+R: Bauern - Lied
+M: 6/8
+L: 1/16
+K: Bb
+F2 | F2G2A2B2c2d2 | e6d4
+d2 | d3cc2e2A2A2 | B6z4
+F2 | F2G2A2B2c2d2 | e6d4
+d2 | d3cc2e2A2A2 | B6z4
+d2 | c2d2c2c2d2c2 | c4f2f2=e2
+d2 | c2d2c2B2AGF2 | A4c2e2d2
+c2 | B3BB2B2c2d2 | e6d4
+d2 | d3cc2e2A2A2 | B6z4
+
+X:108
+T: Der gepruegelte Ehemann
+N: D0163
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = Variante zum Lied
+R: Ehestands - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2A2B2c2 | d2d2d4
+e4g2e2 | d4z2
+d2 | d2c2c2c2 | c2B2B4
+A3Bc2A2 | B2c2d2
+d2 | d2c2c2c2 | c2B2B4
+A3Bc2F2 | G4z2
+
+X:109
+T: A Dirndel geht um Holz in Wald,
+N: D0164
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = Variante zum Lied
+R: Jaeger - Lied, Liebes - Lied
+M: 2/4
+L: 1/8
+K: G
+D | BBAG | ccA3
+D | ccBA | d2z
+B | ddcB | eeA2z
+d | f3edc | B2z
+
+X:110
+T: A Dirndel geht um Holz in Wald,
+N: D0164A
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = Variante zum Lied
+R: Jaeger - Lied, Liebes - Lied
+M: 6/8
+L: 1/8
+K: G
+D | B2BA2G | c2cA2
+D | c2cB2A | d2z3
+B | d2dc2B | e2eA2
+d | f2ed2c | B2z3
+
+X:111
+T: Fahr mir nit ueber mein Aeckerchen,
+N: D0165
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = Variante zum Lied
+R: Tanz - Lied
+M: 3/4
+L: 1/8
+K: G
+d3dd2 | e2d2c2 | B2B2B2
+d3dd2 | e2d2c2 | B4z2
+B3AB2 | c2B2A2 | d3dd2
+B3BB2 | c2B2A2 | G4z2
+
+X:112
+T: Schoenstes Schaetzchen ich steh draussen
+N: D0168
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = Variante zum Lied
+R: Tage - Lied, Kilt - Lied
+M: 4/4
+L: 1/8
+K: Eb
+ |  |  | E2B,2E2G2 | F2F2E2B,2
+G3FG2B2 | B2z2
+A2F2 | B2A2GGcB | B2G2z2
+B2 | B2cBA2B2 | G4z4
+
+X:113
+T: In einer glueckseligen Stund'
+N: D0169
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Grundton ? ; Inzipit = Variante zum Lied
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: D
+A,2 | F3ED2D2E2F2 | E4z2z4
+A2 | c3BA2G2E2A2 | F4z2z4
+D2 | D2F2A2d2c3B | B2A2z2z4
+A2 | c3BA2GGE2A2 | F4z2z4
+D2 | D2F2A2d2c3B | B2A2z2z4
+A2 | c3BA2GGE2A2 | F4z2z4
+
+X:114
+T: Hoer an, mein liebes Kind, was ich muss leiden,
+N: D0171
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Rhythmische Korrekturen (Pausen weggelassen) ; Inzipit = Variante
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: D
+DF | A2d2AA | F4z2
+B2A3E | G2F2
+DF | A2d2AA | F4z2
+B2A3E | G2F2
+EE | E2E3E | EFGBA2
+A2B2dB | BAA2
+DF | A2d2AA | AGF2z2
+B2A3E | G2F2
+EE | E2E3E | EFGBA2
+A2B2dB | BAA2
+DF | A2d2AA | AGF2z2
+B2A3E | G2F2
+
+X:115
+T: Die erloeste Sklavin
+N: D0172
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Grundton ??; Auftakt rhythmisch korrigiert; Verzierungen;
+N: Inzipit = Variante zum Lied
+R: Ballade, Liebe mit gluecklichem Ausgang
+M: 4/4
+L: 1/8
+K: F
+FAG | F3dc3B | B2A2z2
+AB | c3AdcBA | AGG2G2
+FA | c2c2cf2d | dcc2c2B
+A | B2B2BdcB | A2c2c2
+FA | c2c2cf2d | dcc2c2B
+A | B2B2BdcB | A2c2c2
+
+X:116
+T: Mir bluehet kein Fruehling, mit lachet keine Sonne,
+N: D0173
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = entfernte Variante zum Lied ?
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: D
+A2 | F4GFED | CEG2z2
+A2 | G3GA3E | GFF2z2
+D2 | DBB4A2 | A^G=G4
+G2 | F3AAGEC | D4z2
+
+X:117
+T: Jetzt fahr'n mer uebern See, vidrom,
+N: D0174
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Grundton ??; Inzipit = entfernte Variante zum Lied
+R: Bauern - Lied
+M: 2/4
+L: 1/8
+K: F
+C | AAAB | cccA | BBBc | A2z
+C | AAAB | cccA | BBBc | z2z
+c | dcBA | B2G2 | BBdd | cA2
+c | dcBA | B2Gc | cccB | A3
+
+X:118
+T: De Kerw
+N: D0175
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+R: Brauchtums - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G3GG2G2 | G2B2G4z2
+BB | A3GF2E2 | D4z2
+dd | d2d2c2A2 | G4z2
+B2 | d2d2c2A2 | d2d2B2
+G2 | A2A2B3A | G2B2d2
+B2 | d2d2c2A2 | d2d2B2
+G2 | A2A2B3A | G4z2
+
+X:119
+T: Gestern Abend in der stillen Ruh
+N: D0176
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: dritte und fuenfte Zeile rhythmisch korrigiert; Inzipit = Variante
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: F
+F2G2 | A4A4 | A2B2c2d2 | c4B2
+A2G2A2 | B3BB2d2c2B2 | B4A4
+F2G2 | A4A4 | A2B2c2d2c4 | B2
+A2G2A2 | B3BB2d2c2B2 | B4A4
+cccd | c6B2B4 | z2B2B2d2 | d3cc4
+cccd | c6B2B4 | z2B2B2d2 | d3cc4
+F2G2 | A4A4 | A2B2c2d2 | c2c2B2
+G2c3B | B4A4z4
+
+X:120
+T: Geh mer net iwer mei Aeckerche, Aeckerche,
+N: D0177
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = Transposition zum Lied
+R: Scherz - Lied
+M: 3/4
+L: 1/8
+K: F
+F3FF2 | A2G2F2 | c3cc2 | c3cc2
+F3FF2 | A2G2F2 | c4z2
+d3dd2 | d2c2B2 | A3cc2 | A3cc2
+e2d2c2 | B2A2G2 | c4z2
+d3dd2 | d2c2B2 | A3cc2 | A3cc2
+e2d2c2 | B2A2G2 | F4z2
+
+X:121
+T: Maria, die Mutter, wollt' wandern gehn,
+N: D0178
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+R: Legenden - Lied
+M: 2/4
+L: 1/8
+K: G
+B, | DD2B, | EEEF | DEDC | B,2z
+C | D3B, | E2EF | D2C2 | B,4
+DGGB | A2A2 | B2cB | A4
+B3A | G2GB | A2F2 | G2z
+
+X:122
+T: Ach schoenster Schatz, mein Augentrost,
+N: D0179
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = Variante zum Lied; Verzierung
+R: Liebes - Lied, Liebeslust
+M: 3/4
+L: 1/16
+K: G
+ |  |  | D2 | D2EFG4B4 | A2A2G2
+A2B2c2 | d3ed2B2c2d2 | B4z4z2
+D2 | G2B2d4e2d2 | c2B2d6
+e2 | B2A2B2d2c2B2 | A2G2A2
+D2G2B2 | d2e2d4c2d2 | B4z4z2
+
+X:123
+T: Ach schoenster Schatz, mein Augentrost,
+N: D0179A
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = Variante zum Lied; Variante zu DVA0179
+R: Liebes - Lied, Liebeslust
+M: 3/4
+L: 1/8
+K: G
+DGA | B2B2AA | G2z
+ABc | dedBcd | B2dz
+Bc | d2edcB | c2z
+dBA | BdcBAG | A2z
+DGB | dedBcd | B2z
+
+X:124
+T: Auf, auf ihr Jaeger all
+N: D0181
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Grundton in der zweigestrichenen Oktave; Inzipit = Transposition
+R: Jaeger - Lied
+M: 4/4
+L: 1/4
+K: C
+G, | CCDD | E2F2 | GEFD | CA,G,
+G, | CCDD | E2F2 | GEFD | C2z
+D | DDB,D | DDB,G, | E3G, | E3
+G, | FEDE | FEDC | B,G,ED | C2z
+D | DDB,D | DDB,G, | E3G, | E3
+G, | FEDE | FEDC | B,G,ED | C2z
+
+X:125
+T: Im Wald, im Wald, im Wald
+N: D0182
+O: Europa, Mitteleuropa, Deutschland, Untermainfranken, Spessart
+N: Inzipit = Variante zum Lied; Sequenzen
+R: Jaeger - Lied
+M: 6/8
+L: 1/16
+K: D
+A2 | A4A2A4f2 | d6-d4
+A2 | A4A2B4A2 | G6-G4
+f2 | e4f2e4f2 | e6-e4
+d2 | c4B2A4G2 | F6-F4
+AA | f2e2d2d2c2B2 | A2A2A2A2A2
+d2 | c2c2c2c2c2e2 | d2d2d2d2d2
+AA | f2e2d2d2c2B2 | A2A2A2A2A2
+dd | c2c2A2f2f2e2 | D6-D4
+
+X:126
+T: Die Mutter ist das groesste Glueck auf Erden,
+N: D0192
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Gleiwitz
+N: Sonderzeichen in der Notation; Inzipit = Variante zum Lied
+R: Mutter - Lied
+M: 4/4
+L: 1/16
+K: G
+ |  | d2d2c2 | B6d2g2f2e2B2 | d4c4z2
+c2c2B2 | A6d2d2d2e2d2 | B8z2
+g2g2g2 | e6f2a3gf2e2 | e4d4z2
+g2g2b2 | A4d4f3ed2c2 | B8z2
+
+X:127
+T: Jetzt muessen wir marschieren,
+N: D0194
+O: Europa, Mitteleuropa, Deutschland, Brandenburg, Berlin
+N: Inzipit = Transposition zum Lied, Sequenzen
+R: Soldaten - Lied
+M: 4/4
+L: 1/16
+K: A
+E4 | A4A4B4d4 | c8B8
+c4B2A2A4G4 | A4z4z4
+E4 | A4A4B4d4 | c8B8
+c4B2A2A4G4 | A4z4z4
+c2d2 | e4e4e3ed2c2 | d4z4z4
+B2c2 | d4d4d3dc2B2 | c4z4z4
+E4 | A4A4B4d4 | c8B8
+c4B2A2A4G4 | A4z4z4
+
+X:128
+T: Es droehnet der Marsch der Kolonne,
+N: D0195
+O: Europa, Mitteleuropa, Deutschland, Brandenburg, Berlin
+N: Inzipit = Transposition zum Lied
+R: Soldaten - Lied
+M: 4/4
+L: 1/16
+K: E
+B,4 | E4E3F=G4F3E | F4F8
+B4 | B4E4A6=G2 | F8z4
+B,4 | E4E3F=G4F3E | F4F8
+B4 | B4A2=G2A4G2F2 | =G8z4
+B4 | B4=G3GG4A2B2 | A4=D3DD4
+E2F2 | =G4E4E4F2G2 | F4B,4B,4
+E3F | =G4E4F4d4 | E8z4
+B4 | B4=G3GG4A2B2 | A4=D3DD4
+E2F2 | =G4E4E4F2G2 | F4B,4B,4
+E3F | =G4E4F4d4 | E8z4
+
+X:129
+T: Horch auf, Kamerad, die Trommel ruft,
+N: D0196
+O: Europa, Mitteleuropa, Deutschland, Brandenburg, Berlin
+R: nationalsozialistisches Lied, Soldaten - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2GGG2B2 | BAAFG2GG | c2ccc2c2 | B2G2z2
+D2 | G2GGG2B2 | BAAFG2GG | c2ccc2c2 | B2G2z2
+GG | e2e2e2ee | e2dcd3d | c2ccc2de | d2B2z2
+GG | e2e2e2ee | e2dcd3d | c2ccc2de | d2B2z2
+D2 | G2GGG2B2 | BAAFG2GG | c2cce2c2 | B2G2z2
+D2 | G2GGG2B2 | BAAFG2GG | c2ccc2c2 | B2G2z2
+
+X:130
+T: Siebenbuergen, Land des Segens
+N: D0197
+O: Europa, Suedosteuropa, Rumaenien, Siebenbuergen
+R: Heimat - Lied
+M: 3/4
+L: 1/16
+K: G
+B2G2 | d4d4A2B2 | G4D4
+G2A2 | B6cBA2G2 | A8
+D2D2 | G6B2d2e2 | d2c2B4
+d2e2 | c6A2d2c2 | B2c2d4
+G2A2 | B4B4B2B2 | B8
+GABc | d4d4A2B2 | G8
+
+X:131
+T: Haerzke, menj Haerzken, do faer iwerm Rech,
+N: D0198
+O: Europa, Suedosteuropa, Rumaenien, Siebenbuergen
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+ |  |  |  | d2B3c | B2A2z
+G | B2c2e2 | d4
+fg | a2g3e | g2d4
+c2A2c2 | B4
+fg | a2g3e | g2d4
+c2b2a2 | g6
+
+X:132
+T: Der Honef di wor gor klin, gor klin,
+N: D0200
+O: Europa, Suedosteuropa, Rumaenien, Siebenbuergen
+N: Inzipit = Transposition zum Lied
+R: Scherz - Lied
+M: 6/8
+L: 1/16
+K: D
+A2 | d2c2B2A4F2 | E4F2D4
+A2 | d2c2B2A4F2 | E4F2D4
+D2 | G3AB2A4D2 | G4B2A4
+A2 | d2c2B2A2B2A2 | G2F2E2D2z2
+
+X:133
+T: Der maechtigste Koenig im Luftrevier
+N: D0203
+O: Europa, Mitteleuropa, Deutschland, Hessen, Hof
+N: Inzipit = Variante zum Lied
+R: Wandervogel - Lied
+M: 4/4
+L: 1/16
+K: F
+ |  | C4 | F4F3FF4F2G2 | A4A3GF4
+A3A | G4C3cG4A3G | F8z4
+C4 | F4F3FF4F2G2 | A4A3GF4
+A4 | G4C3CG4A2G2 | F8z4
+A2B2 | c4A4A4F2A2 | c4A4A4
+F2A2 | c4A2F2c4A2F2 | c8z4
+C3C | A6E2G4F2D2 | C8z4
+C4 | D4G2F2E4A2G2 | F8z2
+F2F2A2 | c4-c6B2A2G2 | F4-F6
+A2G2F2 | G4-G6B2A2G2 | A4d4c4
+C4 | A6E2G4F2D2 | C8z4
+C4 | D4G2F2E4A2G2 | F12
+
+X:134
+T: O Himmel ich verspuer' ,
+N: D0215
+O: Europa, Mitteleuropa, Deutschland, Oberbayern
+N: zweistimmig notiert ( vorwiegend in Terzparallelen )
+N: Inzipit = Variante zum Lied, Variante zu D0077 ?
+R: Soldaten - Lied
+M: 4/4
+L: 1/8
+K: G
+dc | B3AB2c2 | B4z2
+d2 | g3dd2cB | B2A2z2
+dc | B3AB2c2 | B4z2
+d2 | g3dd2cB | B2A2z2
+d2 | e2d2e2f2 | g4z2
+d2 | e2dcB2A2 | G4z2
+
+X:135
+T: Dri lederne Struempf
+N: D0216
+O: Europa, Mitteleuropa, Deutschland, Bayern, Oberstdorf
+N: kleinere Varianten zur Strophe notiert; Tonart ??
+R: Tanz - Lied, Kinderlied
+M: 2/4
+L: 1/16
+K: G
+ |  |  |  | B4BBc2 | d4z2
+B2 | c3Bc2d2 | B4z2
+D2 | B3BB2c2 | d2d2d2
+B2 | c2B2c2d2 | B4z2
+D2 | B3BB2c2 | d2d2d2
+B2 | c2B2c2d2 | B4z4
+
+X:136
+T: Medche, waelt te'n Far nien?
+N: D0219
+O: Europa, Mitteleuropa, Deutschland, Siebenbuergen
+N: Variante in D0219A notiert, Inzipit = Variante zum Lied
+R: Ehestands - Lied
+M: 2/4
+L: 1/16
+K: F
+ |  |  | F2E2F2G2 | A4B4
+c4c3E | F4z2
+F2 | F2E2F2G2 | A2A2A4
+F2E2F2G2 | A2A2A4
+c4c3E | F4z4
+
+X:137
+T: Medsche waelt ta de Kanter nin ?
+N: D0219A
+O: Europa, Mitteleuropa, Deutschland, Siebenbuergen
+N: Variante zu D0219
+R: Ehestands - Lied
+M: 2/4
+L: 1/16
+K: F
+ |  |  | F2F2F2GG | A2G2F4
+G4C2C2 | F4z2
+c2 | c2c2=B2c2 | A2A2A4
+A2A2G2A2 | F2F2F4
+G4C2C2 | F4z4
+
+X:138
+T: Et sass e kli waelt Vijeltchen
+N: D0220
+O: Europa, Mitteleuropa, Deutschland, Siebenbuergen
+N: Variante zum folgenden D0220A, Inzipit = Variante zum Lied
+R: Liebes - Ballade
+M: 3/4
+L: 1/16
+K: G
+D2 | G3GG6A2 | _B3AG4z2
+G2 | d2d2D2D2 | G4G4z2
+d2 | d3c_B6d2 | c3_BA4z2
+A2 | G3G_B6F2 | G4G4z2
+
+X:139
+T: Et sass e kli waeld Voegelain
+N: D0220A
+O: Europa, Mitteleuropa, Deutschland, Siebenbuergen
+N: Variante zu D0220
+R: Liebes - Ballade
+M: 2/4
+L: 1/8
+K: G
+D | GGGA | _BBB
+B | c_BAG | A2A
+G | _BBBc | ddd
+G | GA_BF | G2z
+
+X:140
+T: Ick heff mol en Hamborger Veermaster sehn,
+N: D0224
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein, Kiel -
+N: Refrain zweistimmig notiert; Inzipit = Transposition zum Lied
+R: Staende - Lied, Seemannslied, Shanty
+M: 4/4
+L: 1/16
+K: C
+G4 | C4E3EG4c3c | A4G3GE4
+C3D | E4D4z4C3D | E4D4z4
+G4 | C4E3EG4c3c | A4G2G2E4
+C3D | E4D4E4D4 | C12z4
+C8E4G4 | c12B4 | A6B2c6A2 | G12
+c2c2 | A4A3AA6A2 | A4G4E4C2D2 | E6G2G4E4 | D4C4z8
+C8E4G4 | c12B4 | A6B2c6A2 | G12
+c2c2 | A4A3AA6A2 | A4G4E4C2D2 | E6G2G4E4 | D4C4z4
+
+X:141
+T: Magelhan (Rolling home)
+N: D0225
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein, Kiel -
+N: moduliert in die Dominanttonart; mehrstimmig notiert
+N: Inzipit = Variante zum Lied
+R: Staende - Lied, Seemannslied
+M: 3/4
+L: 1/16
+K: Bb
+F2D2E2 | F3FF2F2=E2F2 | G2F2-F2
+F2D2F2 | B4d4c2B2 | G6
+G2A2B2 | c6B2A2E2 | G2F2-F2
+F2F2B2 | A6F2G2A2 | B8
+D3E | F8D3F | B8
+A3B | c6B2A3G | F8
+A3B | c6B2A3E | G2F2-F2z2
+F2B2 | A6F2G3A | B6
+
+X:142
+T: So manchet leewe, lange Johr,
+N: D0226
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein, Kiel -
+N: moduliert in die Dominanttonart ?; mehrstimmig notiert
+N: Inzipit = Variante zum Lied
+R: Staende - Lied, Seemannslied
+M: 3/4
+L: 1/4
+K: C
+G | E2F | G2A | G2^F | F2G | e2d | A2B | c3- | cz
+G | E2F | G2A | B2c | B2B | B2^F | A2G | E3- | Ez
+E | F2G | A2f | f2e | e2e | e2B | d2c | A3- | Az
+c | d2c | B2A | A2G | c2G | G2F | B2A | G3- | Gz
+e | e2d | e2f | f2e | c2G | e2G | d2G | c3- | cz
+
+X:143
+T: Gefangen in maurischer Wueste,
+N: D0228
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein
+N: rhythmische Korrekturen in der ersten und vierten Zeile
+N: Inzipit = Variante zum Lied
+R: Soldaten - Lied
+M: 4/4
+L: 1/16
+K: Bb
+F4 | F4D2E2F4B2c2 | d8d4
+e2d2 | d4c2c2c4e2d2 | B12
+F2F2 | B4B2B2c4c2c2 | d4d4z4
+B2d2 | f6f2f4f2e2 | d12
+e3d | d2c2c4z2c2e2d2 | c2B2B6
+B2c2B2 | A6c2c2c2e2e2 | d8z2
+d2d2d2 | G6d2d6c2 | c4B6
+F2B2c2 | d6d2d2d2e2c2 | f8z2
+f2e2d2 | d2c2d2c2B2B2d3c | c8z4
+
+X:144
+T: La Paloma
+N: D0229
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein
+N: moduliert in die Dominanttonart; mit Klavierbegleitung;
+N: rhythmische Korrekturen in der zehnten Zeile und im Schlusstakt
+N: Inzipit = Variante zum Lied
+R: Staende - Lied, Seemannslied
+M: 2/4
+L: 1/16
+K: C
+ |  |  |  | G2 | G8 | GE2FG2A2 | Bc2AB2G2 | F8- | F4z2
+G2 | d8- | d2e2cdB2 | cB2AG2F2 | E8- | E4z2
+G2 | G8- | GE2FG2A2 | Bc2AB2G2 | F8- | F4z2
+G2 | d8- | de2cd2B2 | cB2AG2F2 | E8
+cc2cc2B2 | dd2cB2A2 | A2G6- | G8
+BB2BB2A2 | AG2GG2A2 | GFE6- | E8
+cc2cc2B2 | dd2cB2A2 | A2G6- | G8
+BB2BB2A2 | AG2GG2A2 | GFE6- | E2
+GGGA2^F | G8 | z2GGGG2A | B4
+d4- | de2cdB2c | AB2ce3d | DE2FA3G | E8 | z2
+GGGA2^F | G8 | z2GGGG2A | B4
+d4- | df2ede2c | dB2ce3d | DE2FA3G | c6
+
+X:145
+T: Ich will dir mein Schicksal erzaehlen,
+N: D0230
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein
+N: moduliert in die Dominanttonart; Inzipit = Variante zum Lied
+R: Staende - Lied, Dirne
+M: 4/4
+L: 1/8
+K: C
+ |  | G2 | C2EGA2G^F | A2G2z2
+G2 | C2EGA2Gc | B4z2
+GG | E2Gce2dc | c2A2z2
+dd | c2GcB2AB | c4z2
+GG | E2Gce2dc | cff2z2
+dd | c2GcB2AB | c4z2
+
+X:146
+T: Was schleicht dort im naechtlichen Walde
+N: D0233
+O: Europa, Mitteleuropa, Deutschland, Hohegeiss  Harz
+N: Inzipit = Variante zum Lied
+R: Jaeger - Lied, Wilderer
+M: 6/8
+L: 1/16
+K: C
+G2 | G2G2G2A2A2A2 | G2G4-G4
+G2 | c4c2d2d2c2 | B6-B4
+G2 | d4e2e3fc2 | B2B4-B4
+A2 | G4G2A2G2F2 | E6-E4
+c2 | d2c2A2d2c2A2 | A2G4-G4
+c2 | B4G2e2e2d2 | c6-c4
+
+X:147
+T: In dem schoenen Monat Mai,
+N: D0234
+O: Europa, Mitteleuropa, Deutschland, Hohegeiss  Harz
+N: Inzipit = Variante zum Lied
+R: Staende - Lied, Koehler
+M: 2/4
+L: 1/16
+K: G
+G2B2 | e2B2d2A2 | c4f2d2 | c2bag2BB | d4
+G2B2 | e2B2d2A2 | c4f2d2 | c2bag4 | d4b4
+g2B2gBBg | fAA2c2a2 | f2d2dcba | gBB2d4
+g2B2gBBg | fAA2A2c2 | f2d2dcba | g4
+
+X:148
+T: Johannistagslied
+N: D0235
+O: Europa, Mitteleuropa, Deutschland, Harz, St. Andreasberg
+N: moduliert in die Dominanttonart; Sonderzeichen in der Notation
+N: (Glissandi) ; metrisch freie Zeile 262 durch "laut gerufenen" Ton
+N: mit Fermate; Inzipit = Variante zum Lied
+N: Keine Variante zu den beiden folgenden Liedern !! (DVA-Signatur 235c)
+R: Ansinge - Lied
+M: 6/8
+L: 1/8
+K: G
+D | G2GGAB | BAAA2d | B2BAGA | G3z2
+D | G2GGAB | BAAA2d | B2BAGA | G3z2
+B | A2AA2A | AB^cd2
+B | A2AA2A | AB^cd3- | d2zz2
+D | G2BB2d | d3B2d | e2dc2F | A3G2
+D | G2BB2d | d3B2d | e2dc2F | A3G2
+
+X:149
+T: Gruenes Gras, gruenes Gras unter meinen Fuessen,
+N: D0235A
+O: Europa, Mitteleuropa, Deutschland, Harz, St. Andreasberg
+N: in der dritten Zeile rhythmisch korrigiert; Inzipit = Variante; Keine
+N: Variante zum folgenden und zum vorigen Lied !! (DVA - Signatur 235 d)
+R: Kinder - Lied, Tanzlied
+M: 2/4
+L: 1/16
+K: D
+ |  |  | A2G2F4 | A2G2F4 | A2A2B2A2 | A4G4
+G2G2E2F2 | G2G2E4 | G2G2A3G | G4F4
+A2G2F4 | A2G2F4 | A2A2B2A2 | A4G4
+G2G2E2F2 | G2G2E4 | G2G2A3G | G4F4
+F2G2A4 | F2G2A6A2 | d2B2A6
+A2 | B3AG6E2 | B3AF6
+A2 | A6G2E2G2 | B6A2F2
+D2 | D2E2F2G2 | A4A4 | B3BB2B2 | A6
+A2 | G3GG2G2 | F4F4 | A3AA2A2 | D4z4
+
+X:150
+T: Wo treff' ich meinen Schaefer an,
+N: D0235B
+O: Europa, Mitteleuropa, Deutschland, Harz, St. Andreasberg
+N: Keine Variante zu den beiden vorigen Liedern !! (DVA-Signatur 235e)
+R: Tanz - Lied
+M: 3/4
+L: 1/16
+K: G
+D2 | D2G2G4B4 | B3AA6
+B2 | c2e2d4B4 | A4G4z2
+D2 | D2G2G4B4 | B3AA6
+B2 | c2e2d4B4 | A4G4z4
+d3BB4A4 | d3cc4B4
+d3BB4A4 | d3cc4B2
+G2 | G2G2G4B4 | B4A4z2
+B2 | c2e2d4B4 | A4G4z2
+
+X:151
+T: In den schoenen Monat Mai, trueholda, duholda,
+N: D0236
+O: Europa, Mitteleuropa, Deutschland, Harz
+N: rhythmische Korrektur in der zweiten Zeile;
+N: Inzipit = Variante zum Lied; Variante zu D0234 ? (DVA-Signatur 236a)
+R: Staende - Lied, Koehler
+M: 2/4
+L: 1/16
+K: D
+ |  |  |  |  |  |  | D2D2F2F2 | A2A2F4
+c2A2A4 | d2F2A4
+D2D2F2F2 | A2A2F4
+c2A2Af3 | d3-d
+f3e | dF3d2F2d2 | cE3Ge3
+cE3c2E2c2 | dF3Af3 | d4z4
+
+X:152
+T: Schon wieder toent vom Schachte her
+N: D0238
+O: Europa, Mitteleuropa, Deutschland, Oberschlesien
+N: Inzipit = Transposition zum Lied
+R: Staende - Lied, Bergmann
+M: 6/8
+L: 1/8
+K: D
+A | A2FF2F | F2DD2D | G2BdcB | c3Az
+A | A2GB2G | G2FA2A | A2AABc | e2d2z
+d | e2cA2G | F2Adz
+d | e2cA2G | F2Adz
+d | B2BdcB | A3dz
+d | c3B2c | d2FB2
+A | A3g2c | d3dz
+
+X:153
+T: Wo e kleins Huettle steht, ist e kleins Guetle
+N: D0241
+O: Europa, Mitteleuropa, Deutschland, Wuerttemberg
+N: Inzipit = Transposition zum Lied
+R: Liebes - Lied, Liebeslust
+M: 3/8
+L: 1/16
+K: F
+C2F2F2 | E3DC2 | B2G2E2 | G2F2z2
+C2F2F2 | E3DC2 | B2G2E2 | F6
+G3AG2 | G3AG2 | G3AG2 | G3AG2
+F2E2D2 | C2B4 | c2c2cB | A4z2
+F2E2D2 | C2B4 | c2c2cB | A4z2
+
+X:154
+T: Uebers Bacherl bin i gschprunga,
+N: D0242
+O: Europa, Mitteleuropa, Deutschland, Bayern
+N: Inzipit = Transposition
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: D
+ | FG | A2A2FG | A2A2
+fd | c2c2BG | F2z2
+EF | GBB2AG | FAd2
+Ad | c2ccBG | F4
+EF | GBB2AG | FAd2
+Ad | c2ccBG | F4
+fd | dAA2FA | EAA2
+gc | cAA2GA | FAA2
+fd | dAA2FA | EAA2
+gc | cAAABc | d4
+
+X:155
+T: Ach Mutter, liebe Mutter,
+N: D0262
+O: Europa, Mitteleuropa, Deutschland, Rheinland, Koeln
+N: Inzipit = Variante zum Lied
+R: Liebes - Ballade
+M: 2/4
+L: 1/16
+K: G
+D2 | B3BB3A | A4G2
+D2 | c2c2cBdB | A4z2
+D2 | d3ed2c2 | B4dc
+BA | G2G2BAGA | G4
+A4 | B2B2dcA2 | G4z2
+
+X:156
+T: Was soll ich in der Fremde tun,
+N: D0264
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Muenster
+N: Inzipit = Transposition zum Lied
+R: Heimat - Lied
+M: 4/4
+L: 1/16
+K: F
+C4 | F6E2F4G4 | A6G2F4
+A2A2 | G4c4e6d2 | c8z4
+A2A2 | G6A2B4d4 | d4c4A4
+c2c2 | c4B4G4d3d | d4c4A4
+A2A2 | G6A2B4d4 | d4c4A4
+c2f2 | e6d2c4B4 | A8z4
+
+X:157
+T: Was wollen wir singen und heben an
+N: D0265
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Muenster
+N: Inzipit = Variante zum Lied (?); Variante zu D0018 ??
+R: geistliches Lied
+M: 3/4
+L: 1/8
+K: Ab
+E2 | A4B2 | c4d2 | c4B2 | A4
+c2 | B2c2B2 | G3GG2 | B2A2F2 | G4
+E2 | F2E2B,2 | E4
+E2 | A4B2 | c4d2 | c4B2 | A4
+
+X:158
+T: Lied der Siegerlaender Hammerschmiede
+N: D0266
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Muenster
+N: rhythmische Korrekturen in Zeile 261, 262 und 263 (Pause ergaenzt) ;
+N: 263 und 265; Tonrepetitionen ; Pause - Takt in Zeile 262 fuer
+N: szenisches Spiel vorgesehen; Refrain (ab Zeile 264) mehrstimmig
+N: Inzipit = Variante zum Lied (?)
+R: Trink - Lied, Zech - Lied
+M: 6/8
+L: 1/8
+K: G
+D | G2GGFE | D3B,2
+D | GGGGFE | D3B,2z
+B2B2BBB2 | BBedd2c2
+AAA2AAAA | AAedd2c2 | z8
+G2GGG2D2 | d2ddB2z2
+BBBBBB | BABd2c
+AAAAAA | AGAB3
+BBBBBB | BABd2c
+AAAAAA | AGAG2
+
+X:159
+T: Nikolaus, komm in unser Haus
+N: D0267
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Muenster
+R: Ansinge - Lied
+M: 4/4
+L: 1/8
+K: G
+ddd2dedc | B2B2B4
+c2c2cdcB | A2A2A4
+G2A2B2c2 | deded4
+g2d2dedc | B2A2d4
+g2d2dedc | B2A2G4
+
+X:160
+T: Die zwoelf heiligen Zahlen
+N: D0268
+O: Europa, Mitteleuropa, Deutschland, Eifel
+R: geistliches Lied, Curiosa geistlicher Lieder des Mittelalters
+M: 4/4
+L: 1/8
+K: G
+G3AB2B2 | A2A2G2z2
+B3cd2d2 | c2c2B2z2
+d3BdcB2 | A2BcB2z2
+B2BAB2B2 | B2BAB2z2
+A2B2A4 | A2B2A2
+GB | d2B2ABc2 | c4B2z2
+
+X:161
+T: In Hamburg steht ein Haus,
+N: D0269
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Muenster
+N: Inzipit = Variante zum Lied
+R: Tanz - Lied, Spiellied
+M: 2/4
+L: 1/16
+K: C
+G4 | c2G2E2C2 | G4
+e4 | d2c2B2A2 | G4
+A4 | G3FE2FF | G2G2G4
+G3FE2F2 | G2G2G2
+c2 | B2B2A2B2 | c4
+
+X:162
+T: Von der hohen Alm auf die Niederalm,
+N: D0285
+O: Europa, Mitteleuropa, Deutschland, Bayern
+N: Dreistimmig notiert; Inzipit = Variante zum Lied
+R: Hirten - Lied, Bauern - Lied, Kiltlied, Jodler
+M: 3/4
+L: 1/16
+K: D
+ |  |  | D3E | F2D2B4A3G | G2C2E4
+E2F2 | G2E2c4B4 | A2D2F4
+F2G2 | A2d2f4e3d | c2A2c4
+B2A2G2 | G2E2G2A2B2G2 | F8
+F2G2 | A2d2f4e3d | c2A2c4
+B2A2G2 | G2E2G2A2B2G2 | F8
+A3F | G2e2c2e2G3A | d2f2d2f2d3
+A | c2g2e2g2c3d | d2f2d2f2d3
+d | d2b2^a2b2e3d | d2f2d2f2d3
+d | c2g2e2g2c2e2 | D4z4
+
+X:163
+T: Die Sennerin hoasst Liesl,
+N: D0286
+O: Europa, Mitteleuropa, Deutschland, Bayern
+N: mehrstimmig notiert; Takt von 3/4 auf 6/8 korrigiert
+N: Inzipit = Variante zum Lied
+R: Hirten - Lied, Bauernlied, Jodler
+M: 4/4
+L: 1/16
+K: G
+ |  |  |  |  | D4 | G6D2B,4D4 | G4G4z4
+G4 | A6F2D4A4 | G8z4
+D4 | G6D2B,4D4 | G4G4z4
+G4 | A6F2D4A4 | G6
+G2F2G2 | A2A2D2A2G2A2 | B2B2G2
+G2F2G2 | A3FD2c2B2A2 | G6
+G2F2G2 | A3FD2c2B2A2 | G6
+D2D3D | D2G2G2G2G3G | G2B2B2
+G2G2B2 | d6c2B2A2 | G6
+D2D3D | D2G2G2G2G3G | G2B2B2
+G2G2B2 | d6c2B2A2 | G6z6
+
+X:164
+T: Und's Deandl is wunderschoe, i muass's aufrichti sagn,
+N: D0287
+O: Europa, Mitteleuropa, Deutschland, Bayern
+N: Zweistimmig notiert (Terzparallelen ); Inzipit = Variante zum Lied
+R: Scherz- und Spott - Lied, Jodler
+M: 3/4
+L: 1/32
+K: Eb
+e4e4e4 | B6B2G4z2G2G4G4 | A6A2D4
+d4d6d2 | c6c2F4D4E4D4 | B6B2G4
+e4e4e4 | B6B2G4z2G2A4B4 | c4e4e4
+e4d4c4 | c4B4d4c4B4A4 | G8z8z8
+G4B4e4B6A2G4e6G2 | F4A4d4c4F4d8
+F4A4d4c4F4d4A4 | G8B8e8
+E2E2E4G2G2G4B2B2B4 | g8a3gf2e2d2f6 | B16z8
+G4B4e4B6A2G4e6G2 | F4A4d4c4F4d8
+F4A4d4c4F4d4A4 | G8B8e8 | g8z4
+
+X:165
+T: Ob ich gleich ein Schaefer bin
+N: D0288
+O: Europa, Mitteleuropa, Deutschland, Unterfranken, Wuerzburg
+N: Inzipit = Variante zum Lied
+R: Hirten - Lied
+M: 3/4
+L: 1/16
+K: F
+ |  |  | F3G | A4A4G3G | F4z4
+F2A2 | c6A2G2G2 | F4z4
+c2c2 | d2c2B2A2B2B2 | B2d2c2B2A2G2 | A2G2
+F2F2F2A2 | G2G2F4
+F2A2 | c6A2G2G2 | F4z4
+
+X:166
+T: Pioniere sind stets munter,
+N: D0290
+O: Europa, Mitteleuropa, Deutschland,
+N: Inzipit = Variante zum Lied
+R: Soldaten - Lied
+M: 4/4
+L: 1/8
+K: D
+ |  |  |  |  |  | F3FFFEF | A2G2z4
+E3cccBc | d6z2
+F3FFFEF | A2G2z4
+E3cccBc | d6z2
+c3cccBc | d2A2z4
+c3cccBc | d2A2z2
+FG | A2d2c2B2 | A4
+B3B | AABc | d2
+FF | A2d2c2B2 | A4
+B3A | AABc | d4
+
+X:167
+T: Der Duwakwak, der Duwackelwak, der Duwak ist mein Leben,
+N: D0292
+O: Europa, Mitteleuropa, Deutschland, Wuerttemberg, Stuttgart
+N: letzte Pause rhythmisch korrigiert
+R: Trink - Lied, Zech - Lied
+M: 2/4
+L: 1/16
+K: G
+ |  |  |  | d4 | B2B2B2B2 | B2BBB2B2 | B2B2e2B2 | d4c2
+c2 | A2A2A2D2 | A2A2A2A2 | d2d2d2F2 | G4z4
+D2D2G2A2 | B3AG2G2z2B2e2e2 | d2c2F4z2
+D2F2A2 | d2d2d2d2z2c2B2A2 | B3AG4 | z2
+D2G2A2 | B3AG6e2e2B2 | d2c2F6
+D2F2A2 | d2d2d6d2c2F2 | G8z2
+D2G2A2 | B3AG6e2e2B2 | d2c2F6
+D2F2A2 | d2d2d6d2c2F2 | G8z4
+
+X:168
+T: A bissel sikkarisch, a bissl sakrisch,
+N: D0297
+O: Europa, Mitteleuropa, Oesterreich, Tirol
+N: Sonderzeichen in der Notation (Glissando)
+R: Jodel - Lied
+M: none
+L: 1/8
+K: G
+D2B2G2 | F2A2d3DcF | GGz
+GFE | DDz2CE | d3
+DBG | FAddz2fF | GGGGz2
+FE | DcE2FD | G3
+DBG | FAddz2fF | GGGGz2
+FE | DcE2FD | G3
+D6 | E6 | F6 | GdBGdG | AecAe2
+FdcFdG | GgdBG2
+GdBGdG | AecAe2
+f3edF | G6
+
+X:169
+T: Ihr lustige Brueder, stimmt das schoene Lied a,
+N: D0298
+O: Europa, Mitteleuropa, Deutschland, Baden, Alpirsbach
+N: Inzipit = Variante zum Lied
+R: Staende - Lied, Floesserlied
+M: 3/4
+L: 1/8
+K: D
+A,2 | D2D3E | F2F2
+DF | A2A2BA | A2z2
+AA | B2G3B | BAF2z
+F | A3EA2 | F2z2
+AA | B2G3B | BAF2z
+A | c2B2G2 | F2z2
+
+X:170
+T: Muede kehrt ein Wandersmann zurueck
+N: D1001
+O: Europa, Mitteleuropa, Deutschland, Hessen, Gross  Gerau, Klein Gerau
+N: DVA-Signatur A 487
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+ | B3AG2F2 | G2F2G2A2 | D3z
+D2F2 | A6G2 | F2A2e2d2 | B8- | B2z2
+G2A2 | B4d4 | c2B2A2G2 | E8- | E2z
+GF2E2 | D6G2 | F2A2e2d2 | B8
+
+X:171
+T: Muede kehrt ein Wandersmann zurueck
+N: D1002
+O: Europa, Mitteleuropa, Schweiz, Wimmis
+N: DVA-Signatur A 18 747
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+DG | B3AGFGA | D4z2
+DE | A3GFAed | B4z2
+DG | B3dcBAG | E4z2
+GE | D3GFAcB | G4z2
+
+X:172
+T: Muede kehrt ein Wanderer zurueck
+N: D1003
+O: Europa, Mitteleuropa, Deutschland, ???, Walensee, Oberterzen
+N: DVA-Signatur A 21 144
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+DD | B3AGFGA | D2z4
+FG | A3GFAed | B2z4
+DD | B3dcBAG | c2z3
+cce | d3GG2G2 | B2A2G2
+
+X:173
+T: Muede kehrt ein Wandersmann zurueck
+N: D1004
+O: Europa, Mitteleuropa, Schweiz, Kt. Aargau, Wohlen - Zufikon
+N: DVA-Signatur A 24 689
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+D2D2 | B6A2G3FG3A | D8z4
+F3G | A6G2F2A2e2d2 | B8z4
+G3A | B2d2d4c3BA2G2 | E8z4
+G3E | D4G4F2A2e2d2 | B8z4
+G3A | B2d2d4c3BA2G2 | c8z4
+c2A2 | d6c2D2c2B2A2 | G8z4
+
+X:174
+T: Muede kehrt ein Wandersmann zurueck
+N: D1005
+O: Europa, Mitteleuropa, Schweiz, Graubuenden, Tenna
+N: DVA-Signatur A 28 158
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+D3G | B6A2G2G2G2B2 | D8z4
+D2G2 | A6G2F2A2c2B2 | G8
+D2G2B2d2 | d8c2B2A2G2 | E8z4
+G2E2 | D2G2G4F2A2c2B2 | G8
+D2G2B2d2 | d8c2B2A2G2 | E8z4
+G2E2 | D2G2G4F2A2c2B2 | G8z4
+
+X:175
+T: Muede kehrt ein Wandersmann zurueck
+N: D1006
+O: Europa, Mitteleuropa, Deutschland, Wuettemberg, Nagold, Egenhausen
+N: Tonlaengen im vorletzten Takt korrigiert; DVA-Signatur A 36 810
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+DD | B3AGFGA | D4z2
+FG | A3GFAcB | G4z2
+GA | Bdd2cBAG | E4z
+GGE | D3GFAcB | G4z2
+GA | Bdd2cBAG | E4z
+GGE | D3GFAed | B4z2
+
+X:176
+T: Muede kehrt ein Wandersmann zurueck
+N: D1007
+O: Europa, Mitteleuropa, Deutschland, Wuerttemberg, Tiefenbach
+N: DVA-Signatur A 37 192
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+BA | G3GGGGc | c2z4
+DF | G3AGAed | B2z4
+GA | B3dcBAG | E2z3
+CB,A, | DEFAe2d2 | B2z4
+
+X:177
+T: Muede kehrt ein Wandersmann zurueck
+N: D1008
+O: Europa, Mitteleuropa, Deutschland, Hessen, Hanauer Kinzigtal,
+N: DVA-Signatur A 46 222
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+DG | B3AGFGB | D4z2
+DG | A3GFAed | B4z2
+GA | B2d2cBAG | E4z2
+GE | D3GFAed | B4z2
+GA | B2d2cBAG | E4z2
+GE | D3GFAed | B4z2
+
+X:178
+T: Muede kehrt ein Wandersmann zurueck
+N: D1009
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Hirschberg
+N: DVA-Signatur A 51 775
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+DB | B3AGFGA | D4z2
+DF | A3GFAcB | G4z2
+GA | B3dcBAG | c4z
+cBA | D3GFAcB | G4z2
+
+X:179
+T: Muede kehrt ein Wandersmann zurueck
+N: D1010
+O: Europa, Mitteleuropa, Deutschland, Rheinland Pfalz, Eifel, Kerpen
+N: DVA-Signatur A 52 662
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+DG | B3AGFGB | D4z2
+DF | A3GFAed | B4z2
+GA | B3dcBAG | E4z
+GFG | D3GFAed | B4z2
+GA | Bdd2cBAG | G2e2z
+edc | B3GFGcF | G4z2
+
+X:180
+T: Muede kehrt ein Wandersmann zurueck
+N: D1011
+O: Europa, Mitteleuropa, Deutschland, ???
+N: DVA-Signatur A 57 199
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+DD | B3AGFGB | D4z2
+FG | A3GFAed | B4z2
+GA | B3dcBAG | E4z2
+GE | D3GFAed | B4z2
+GA | B3dcBAG | E4z2
+GE | D3GFAed | B4z2
+
+X:181
+T: Muede kehrt ein Wandersmann zurueck
+N: D1012
+O: Europa, Mitteleuropa, Deutschland, Brandenburg, Bauzen
+N: DVA-Signatur A 59 141
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+D2D2 | B6A2G3FG2A2 | D8z4
+F2G2 | A6G2F2A2e2d2 | B8z4
+G2A2 | B2d2d8c2B2 | A2B2c4z2
+c2c2e2 | d6c2B2A2B2A2 | G12
+G2A2 | B2d2d8c2B2 | A2B2c4z2
+c2c2e2 | d6c2B2A2B2A2 | G12
+
+X:182
+T: Warum weinst du, schoene Gaertnersfrau
+N: D1013
+O: Europa, Mitteleuropa, Deutschland, Anhalt, Rauschenbach, Loedderitz
+N: DVA-Signatur A 59 974
+R: ???
+M: 4/4
+L: 1/8
+K: G
+DD | G2G2G2G2 | G2B2D4
+D2F2A3G | F2A2c2B2 | G4z2
+DD | G2B2B2d2 | c2B2A2G2 | E4
+G2E2 | D2G2F2E2 | F2G2B2A2 | G4z2
+
+X:183
+T: Muede kehrt ein Wanderer zurueck
+N: D1014
+O: Europa, Mitteleuropa, Deutschland, Rheinland, Duesseldorf, Ittar
+N: DVA-Signatur A 102 640
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+D2G2 | B6A2G2F2G2A2 | D12
+D2F2 | A6G2F2A2e3d | B12
+G2A2 | B6d2c2B2A2c2 | E8z2
+F2G2E2 | D6G2F2A2e3d | B8z4
+G2A2 | B6d2c2B2A2c2 | E8z2
+F2G2E2 | D6G2F2A2c3B | G8z4
+
+X:184
+T: Muede kehrt ein Wandersmann zurueck
+N: D1015
+O: Europa, Mitteleuropa, Deutschland, Rheinlamd Pfalz, Mosel, Mehring
+N: rhythmische Korrektur: in Takt 5 Punktierung ergaenzt
+N: DVA-Signatur A 151 821
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+DD | G3FGFGA | D4z
+DDF | A3GFAed | B4z2
+GB | d3dcBAG | e4z
+cBA | d3DDcBA | G2z4
+
+X:185
+T: Muede kehrt ein Wanderer zurueck
+N: D1016
+O: Europa, Mitteleuropa, Oesterreich, Tirol, Schwaz
+N: DVA-Signatur A 188 520
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+B3A | G6G2G2F2G2B2 | D8z2
+G2F2G2 | A6G2F2A2e3d | B8z2
+G2G2A2 | B6d2c2B2A2G2 | E8z2
+G2F2E2 | D6G2F3Ac3B | G8z2
+G2G2A2 | B6d2c2B2A2G2 | E8z2
+G2F2E2 | D6G2F3Ac3B | G8z4
+
+X:186
+T: Muede kehrt ein Wandersmann zurueck
+N: D1017
+O: Europa, Mitteleuropa, Deutschland, Unter - Franken, Bamberg Stadt,
+N: DVA-Signatur A 190 014
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+DD | B3AGFGB | D6
+DF | A3GFAed | B6
+GA | Bdd4cB | AGE4
+GF | EDGFGe2d | B6
+GA | Bdd4cB | AGE4
+GF | EDGFGe2d | B6
+
+X:187
+T: Muede ging ein Wanderer zurueck
+N: D1018
+O: Europa, Mitteleuropa, Ungarn, Kom. Tolnau, Dunakoemloed
+N: DVA-Signatur A 191 163
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+dd | G2G2FGAA | F4z2
+FG | A2A2FABB | G4z2
+GB | d2d2cBAG | E4z
+GGE | D2G2FAcB | G4z2
+
+X:188
+T: Muede kehrt ein Wanderer zurueck
+N: D1019
+O: Europa, Mitteleuropa, Deutschland, ???, Bielitz
+N: DVA-Signatur A 193 113
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+D3D | B6A2G3FG3A | D4z8
+F3G | A6G2F2A2e2d2 | B4z8
+D3D | B6B2d3dc3B | A4z8
+B3A | G6D2D2c2B2A2 | G4z8
+
+X:189
+T: Muede kehrt ein Wandersmann zurueck
+N: D1020
+O: Europa, Mitteleuropa, Deutschland, Unter - Franken, Bamberg Ebern,
+N: Takt in 2/4 korrigiert, in der 3. und 4. Zeile Pause ergaenzt
+N: DVA-Signatur A 196 840
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2G2 | B6A2 | G2F2G2GF | D4z4 | z4
+D2F2 | A6G2 | F2A2c2B2 | G4z4 | z4
+G2A2 | B6d2 | d4c2B2 | A4z4 | z2
+A2c2A2 | G6G2 | B2A2D2F2 | G4z4 | z4
+
+X:190
+T: Haensje klein geht allein
+N: D1021
+O: Europa, Mitteleuropa, Deutschland, Ottweiler, Welschbach
+N: DVA-Signatur A 126 662
+R: Kinder -, Scherz -, Neck - Lied
+M: 2/4
+L: 1/16
+K: D
+A2F2F4 | G2E2E4
+D2E2F2GG | A2A2A2z2
+A2FFF2zF | G2EEE2z2
+D2E2F2G2 | A2A2A2z2
+F2F2F2F2 | B2A2A2z2
+F2F2F2F2 | F2A2A2z2
+F2F2F2F2 | B2F2F2z2
+
+X:191
+T: Haenschen klein ging allein
+N: D1022
+O: Europa, Mitteleuropa, Deutschland, Baden, Freiburg /Br., Ebnet
+N: DVA-Signatur A 218 598
+R: Kinder - Lied
+M: 4/4
+L: 1/4
+K: G
+dBB2 | cAA2
+GABc | ddd2
+dBB2 | cAA2
+GBdd | G2z2
+AAAA | ABc2
+BBBB | Bcd2
+dBB2 | cAA2
+GBdd | G2z2
+AAAA | ABc2
+BBBB | Bcd2
+dBB2 | cAA2
+GBdd | G2z2
+
+X:192
+T: Haenschen klein geht allein
+N: D1023
+O: Europa, Mitteleuropa, Deutschland, Trier, Issel
+N: DVA-Signatur A 78 807
+R: Kinder - Lied
+M: 4/4
+L: 1/4
+K: F
+cAA2 | BGG2
+FGAB | ccc2
+cAA2 | BGG2
+FAcc | A2z2

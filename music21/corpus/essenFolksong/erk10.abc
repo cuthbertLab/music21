@@ -1,0 +1,9559 @@
+
+X:1
+T: ES FREIT EIN WILDER WASSERMANN
+N: E0001
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Hainau; Liegnitz
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2F2G2 | A2G2F4
+A2A2A2B2 | c3BA2
+F2 | f4fed2 | c4z2
+c2 | d2B2G2B2 | c2A2F2
+G2 | A2c2B2G2 | F4z2
+c2 | d2B2G2B2 | c2A2F2
+G2 | A2c2B2G2 | F4z2
+
+X:2
+T: ES FREIT EIN WILDER WASSERMANN
+N: E0001A
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Goldberg, Neukirch
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2F2A2 | c2A2F4
+A2c2c2c2 | f2c2A2
+A2 | c4dcBA | G4z2
+G2 | F2A2c2A2 | G2A2B2
+GG | F2A2cBG2 | F4z2
+
+X:3
+T: ES FREIT EIN WILDER WASSERMANN
+N: E0001B
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Niederlausitz
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2G2G2 | A2AGF4
+A2A2c2c2 | BBc2A2
+A2 | c2G2A2F2 | E2F2G2
+c2 | A2A2G2G2 | F4z2
+
+X:4
+T: VON GOLD LIESS ER EINE BRUECKE BAUN
+N: E0001C
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Joachimstal
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/16
+K: F
+C4 | F4F4A4c4 | f4e2d2c4
+f3f | d4B4G4c4 | A8z4
+A4 | c2B2B4G4G4 | A4A2B2c4
+A2G2 | F3FF3FA2G2F2G2 | F8z4
+
+X:5
+T: ES HATT EIN BAUR EIN TOECHTERLEIN
+N: E0001D
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Breslau
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: F
+C2 | F2E2F2G2 | A3GF2z2
+A2G2A2B2 | c3BA2
+F2 | f4d2f2 | c4z2
+c2 | d2B2G2d2 | c3AF2
+G2 | A2c2B2G2 | F4z2
+
+X:6
+T: ES FREIT EIN WILDER WASSERMANN
+N: E0001E
+O: Europa, Mitteleuropa, Deutschland, Uckermark, Granzow
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2AGAc | B2BAG4
+BABcd2e2 | c2dcB2
+Bc | d2A2B2GB | AGFED2
+EF | G3DB,2D2 | G4z2
+Bc | d2A2B2GB | AGFED2
+EF | G3DB,2D2 | G4z2
+
+X:7
+T: ES WAR EIN WILDER WASSERMANN
+N: E0001F
+O: Europa, Mitteleuropa, Deutschland, Hohen - Saten, Oderberg
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2A2Ac | B2BAG2
+AB | c2A2G2FA | E2D2z2
+D2 | G2B2d2G2 | F2A2c2
+d2 | B2B2c2F2 | G4z2
+
+X:8
+T: ES FREIT EIN WASSERMANN
+N: E0001G
+O: Europa, Mitteleuropa, Deutschland, Niederlausitz, Guben
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: A
+E2 | A3Bc2d2 | edcBA4
+cBcde2f2 | dcdec2
+cd | e2B2c2Ac | BAGFE2
+AB | c2Bcdc2B2 | A4z2
+
+X:9
+T: ES FREIT DER WILDE WASSERMANN
+N: E0001H
+O: Europa, Mitteleuropa, Deutschland, Pommern, Tantow, Rossow
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/8
+K: A
+E2 | A2A2BAB2 | c3BA2z2
+c3de2f2 | ecedc2
+c2 | e2B2dcBA | BAGFE2
+FG | A3EC2E2 | A4z2
+c2 | e2B2dcBA | BAGFE2
+FG | A3EC2E2 | A4z2
+
+X:10
+T: ES VERLIEBTE SICH EIN WILDER WASSERMANN
+N: E0001I
+O: Europa, Mitteleuropa, Deutschland, Magdeburg
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/8
+K: A
+EE | AAEEA2B2 | c2cBA2z2
+c3de2e2 | edd2c2
+Ac | eee2d2dB | AcA2E2
+E2 | FFF2E2G2 | A4z2
+
+X:11
+T: ES WOLLT EIN NICKELMANN FREIEN GEHN
+N: E0001
+O: Europa, Mitteleuropa, Deutschland, Magdeburg, Leitzkau
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2FEFG | ABAGF2
+AA | B2B2A2A2 | G4z2
+AB | c2G2GAGF | EFEDC2
+CC | F2F2G2d2 | c4
+B4 | A2A2AGG2 | F4z2
+
+X:12
+T: ES FREIT EINMAL EIN WASSERMANN
+N: E0002
+O: Europa, Mitteleuropa, Deutschland, Vormark, Wittstock
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/8
+K: D
+DF | A2AGFAd2 | B2BAG2
+GA | B2B2Bcde | c2A2A2
+A2 | d2d2defd | A2Bcd2
+
+X:13
+T: ES RITT EIN KOENIG WOHL UEBER DEN RHEIN
+N: E0002A
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Sage, Maerchen -, Zauber - Lied
+M: 3/4
+L: 1/8
+K: G
+DGA | _BBA2GGG | d3
+dcA | d2c2_Bc | A3
+AAA | d2ccd_B | A3
+_BGA | _BdcBAB | G2z
+
+X:14
+T: ES FREIT EIN HERR SO REICHE
+N: E0002B
+O: Europa, Mitteleuropa, Deutschland, Altmark
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/16
+K: G
+D2 | G4G2G2F2G2 | B2A2z2z4
+D2 | G4G2G2F2G2 | B2A2z2z4
+G2 | d4A2c2B2A2 | G4BAA4
+A2 | G4G2c2B2A2 | G2B2A2G4
+
+X:15
+T: CHRISTINCHEN GIENG INN GARTEN
+N: E0002C
+O: Europa, Mitteleuropa, Deutschland, Corvey
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/16
+K: Eb
+E2G2 | B6A2G4c4 | B3AG4z4
+E2G2 | B6A2G4c4 | B3AG4z4
+E2F2 | G4E4E4G4 | B4F2F2F4
+F4 | G4E4E4G4 | B4F2G2E4
+
+X:16
+T: CHRISTINCHEN GIENG IN GARTEN
+N: E0002D
+O: Europa, Mitteleuropa, Deutschland, Hildesheim
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/16
+K: F
+C2 | A4A2G2A2G2 | F2C2z6
+C2 | A4A2G2A2G2 | F2C2z6
+F2 | F4F2f4d2 | d3cc2A4
+A2 | A4G2c4B2 | B4A2A4
+
+X:17
+T: CHRISTINCHEN GIENG IN GARTEN
+N: E0002E
+O: Europa, Mitteleuropa, Deutschland, Hannover
+R: Sage, Maerchen -, Zauber - Lied; Kinder - Lied
+M: 4/4
+L: 1/4
+K: G
+D | GGDD | EDz
+D | GGDD | EDz
+D | DBBA | AGG
+B | AAdd | BAG
+
+X:18
+T: CHRISTINCHEN GIENG IN GARTEN
+N: E0002F
+O: Europa, Mitteleuropa, Deutschland, Nieder - Hessen
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/8
+K: Bb
+F | B2FB2c | AFz3
+F | B2FB2c | AFz3
+F | F2dd2c | B2DF2
+B | A2EE2G | G2FD2
+
+X:19
+T: ES WAR A MOL A MADEL
+N: E0003
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Sage, Maerchen -, Zauber - Lied, Ruebezahl; Gebirgs - Hirten - Lied
+M: 2/4
+L: 1/16
+K: C
+G,2 | C2B,2C2D2 | C2B,2B,2
+G,2 | C2B,2C2_E2 | D4z2
+D2 | _E2D2E2F2 | _E2D2D2
+B,2 | CD_E2DCB,2 | C4z2
+
+X:20
+T: WILL ICH IN MEIN GAERTCHEN GEHN
+N: E0004
+O: Europa, Mitteleuropa, Deutschland
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: G
+ | G2G2F2G2 | A2ABG2z2
+c3BA2d2 | B4G2z2
+d2edc2dc | B2cBA2z2
+B2c2d2ec | B2A2G2z2
+
+X:21
+T: GUETE MORGEN BUCKLIGE GRET
+N: E0004A
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c3dc2B2 | A2AAA2
+G2 | A3FF2A2 | A4G2
+G2 | A3GA2B2 | c2d2c2
+G2 | A3FA2G2 | G4F2z2
+
+X:22
+T: ES GEHT EIN BU BA BUTZEMANN
+N: E0005
+O: Europa, Mitteleuropa, Deutschland, Thueringen; Sachsen
+R: Sage, Maerchen -, Zauber - Lied, Kinder - Lied
+M: 2/4
+L: 1/16
+K: C
+G,2 | C4E4 | G4c4 | A3AA2
+A2 | G2F2E2D2 | C3EG2
+G,2 | C4E4 | G4c4 | A3AA2
+A2 | G2F2E2D2 | C4z2
+E2 | D2E2F2D2 | E2F2G2
+E2 | D2E2F2D2 | E2F2G2
+G,2 | C4E4 | G4c4 | A3AA2
+A2 | G2F2E2D2 | C4z2
+
+X:23
+T: TANZ TANZ BUTZEMANN
+N: E0005A
+O: Europa, Mitteleuropa, Deutschland, Erfurt
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: G
+ | G4B4 | d3ed2
+c2 | B2B2A2A2 | G4z4
+G2G2G2G2 | A2D2D2D2
+G2G2G2G2 | A2D2D2D2
+G4B4 | d3dd2
+c2 | B2B2A2A2 | G4z4
+
+X:24
+T: ES STAND EIN BAEUMLEIN IM TIEFEN THAL
+N: E0007
+O: Europa, Mitteleuropa, Deutschland
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: A
+E2 | E2A2A2c2 | c2B2B4
+ABcde2c2 | B4z2
+A2 | A2c2c2e2 | e2d2d2
+c2 | c2c2e2c2 | B2A2B4
+A3GA2c2 | B3AB2
+e2 | cBABc2B2 | A4z2
+
+X:25
+T: ICH GIENG MAL UEBER EINEN BUNGERT
+N: E0007A
+O: Europa, Mitteleuropa, Deutschland, Bonn, Kessenich
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: A
+E2 | A2E2A2B2 | c4d2c2 | B4z2
+E2 | A2E2A2B2 | c4d2c2 | B4z2
+B2 | e2d2c2B2 | A3BA2G2 | F2E2
+B4 | e2d2c2A2 | B4c2B2 | A4z2
+
+X:26
+T: DA DRUNTEN IM GARTEN
+N: E0009
+O: Europa, Mitteleuropa, Deutschland, Giessen
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/16
+K: G
+D2 | G2G2A2B2B2A2 | G6z4
+A2 | A4B2c4B2 | A6z4
+G2 | B2B2B2dccBA2 | A2A2d2BABAG2
+G2G2A2B2B2dc | B4A2G4
+
+X:27
+T: DA DRUNTEN IM GAERTELEIN
+N: E0009A
+O: Europa, Mitteleuropa, Deutschland, Wetzlar, Dutenhofen
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/16
+K: G
+D2 | G3AB2c2B2A2 | G6z4
+A2 | A4B2d2c2B2 | A6z4
+G2 | B4ded3ccB | A2A2d2B3ABA
+G2G3AB2B2e2 | d4cdB4
+
+X:28
+T: DORT DRUNTEN IM GARTEN DA IST EIN SCHOENES PARADIES
+N: E0009B
+O: Europa, Mitteleuropa, Deutschland, Hannover, Bantorf
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/16
+K: G
+D2 | G3GG2G2B2d2 | A6z4
+D2 | A4A2A2d2c2 | B6z4
+G2 | G2B2B2B4e2 | d6-d4
+cB | A4A2A2d2c2 | B6-B4
+GF | E4D2G4Be | d4F2G4
+
+X:29
+T: DA UNTEN IM GARTEN DA IST EIN SO SCHOEN PARADIES
+N: E0009C
+O: Europa, Mitteleuropa, Deutschland, Ober - Hessen
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/16
+K: G
+D2 | G3AB2G3AB2 | A6z4
+B2 | c4e2e4dc | B6z4
+G2 | G4e2e4d2 | c6z4
+A2 | A4d2d4B2 | B6z4
+D2 | E4F2G4e2 | e4d2c4d2 | B6z4
+
+X:30
+T: ES WOLLT EIN MAEGDLEIN SPAZIEREN GEHN
+N: E0011
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/8
+K: A
+E | A2A2A2B=c | A2GFE3
+E | B2B2B2e2 | BAGFE2
+E2 | A2B2=ceAc | =cBAGA2z
+
+X:31
+T: DER JAEGER LAENGS AM WEIHER GING
+N: E0013
+O: Europa, Mitteleuropa, Deutschland, Rheinland ?
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2G2G2 | G2FED4
+G4d2d2 | B4z2
+B2 | A2A2d2A2 | G2FED4
+G2GGG2GG | G2G2G2
+B2 | AGFGAGFE | D2D2D2
+c2 | B2B2A2A2 | d4
+e2c2 | B2B2A2A2 | G4z2
+
+X:32
+T: WILDY HOOREN
+N: E0017A
+O: Europa, Mitteleuropa, Niederlande
+R: Maerchen -, Zauber - Lied, Tannhaeuser - Sage
+M: 3/4
+L: 1/16
+K: D
+D2=F2G2 | A6G=FG2G2 | A6
+A2=c2d2 | e6d=cB4 | A6
+A2A2A2 | =c6A2A2G2 | =F6z2
+=c4 | d6A2A2G=F | E4D2
+
+X:33
+T: WELE GROSS WUNDER SCHAUEN WILL
+N: E0018
+O: Europa, Mitteleuropa, Schweiz, Entlibuch, Escholdsmatt
+R: Maerchen -, Zauber - Lied, Tannhaeuser - Sage
+M: 3/4
+L: 1/8
+K: C
+G, | CB,C2D2 | B,^F,G,3
+C | FGFEC2 | C2D2z
+C | EFG3C | DEF3
+D | ECD2C2 | B,2C2z
+
+X:34
+T: ES BLIES EIN JAEGER WOL IN SEIN HORN
+N: E0019
+O: Europa, Mitteleuropa, Deutschland
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/16
+K: Bb
+F2 | B4B2B3AG2 | F4F2F4
+f2 | d6c6 | B6z4
+F2 | B4B2B3AG2 | F4F2F4
+f2 | d6c6 | B6z6
+f2d2d2f2 | e2c2c2
+F2 | Bcdef2B2 | d4c4 | B4z2
+
+X:35
+T: ES BLIES EIN JAEGER WOL IN SEIN HORN
+N: E0019A
+O: Europa, Mitteleuropa, Deutschland, Berlin
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2G2d2 | B2d2G2d2 | B2d2G2z
+G | AAAAAGFG | AGFED2z2
+G2G2G3B | A2A2A2z
+A | BABcd2G2 | A2B2G2
+
+X:36
+T: ES BLIES EIN JAEGER WOL IN SEIN HORN
+N: E0019B
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2BABc | d2cBA2z
+B | d2cBA2z
+A | AAAAAGFG | AGFED2z2
+G2G2G3B | A2A2A2z
+A | BABcd2dc | B2A2G2
+
+X:37
+T: ES BLIES EIN JAEGER WOL IN SEIN HORN
+N: E0019C
+O: Europa, Mitteleuropa, Deutschland, Coethen
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/8
+K: F
+C2 | F2F2A2AB | c2cBA2
+f2 | c3BA2B2 | c4z2
+Ac | cBBAG2GB | A2G2F2
+C2 | F3GA2F2 | G3AB2
+c2 | AAAAG2G2 | F2f2c3
+B | AAAAG2G2 | F4z2
+
+X:38
+T: ES BLIES EIN JAEGER WOL IN SEIN JAEGERHORN
+N: E0019D
+O: Europa, Mitteleuropa, Deutschland, Bayern; Wuerttemberg; Thueringen
+R: Sage, Maerchen -, Zauber - Lied
+M: 2/4
+L: 1/16
+K: Eb
+EG | B3cB2A2 | G3FE2
+B2 | c2B2A2G2 | F4z2
+EG | B2B2B2e2 | c3Bc2
+A2 | G4F4 | E4z2
+DE | F2FGF2FG | F4z2
+F2 | G2B2G2e2 | B4z2
+EG | B2B2B2e2 | c3Bc2
+A2 | G4F4 | E4z2
+
+X:39
+T: ICH WEISS EIN JAEGER
+N: E0019E
+O: Europa, Mitteleuropa, Deutschland, Regensburg
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/16
+K: Bb
+F2 | B4d2d3cB2 | A4c2c6
+B3cd2d2c2B2 | c8z2
+B2 | d4f2f3ed2 | c4e2e6
+d3dd2d2c2B2 | A4c2c6
+B3cd2d2c2c2 | B8z2
+
+X:40
+T: ES WAR EIN JAEGER DER BLIES INS HORN
+N: E0019F
+O: Europa, Mitteleuropa, Deutschland, Siebengebirge
+R: Sage, Maerchen -, Zauber - Lied
+M: 6/8
+L: 1/8
+K: Bb
+F | B2BBBB | c2cc3
+Bcde2d | c2z3
+F | c2ccde | dcdB3
+BcdBcd | c2FF3
+dddc2c | B2z3
+
+X:41
+T: ES JUG EIN JAEGER WILD UND SCHWEIN
+N: E0019G
+O: Europa, Mitteleuropa, Deutschland, Frankfurt, Odenthal
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/16
+K: F
+FA | c4A4f4d4 | c4c2B2A8
+A4A4c4A4 | A4G4G8
+F2G2A4G2G2G4 | F4f4c8
+A2A2A4c4c2B2 | A8z6
+
+X:42
+T: ES STUND EIN HAEUSLEIN AN DEM RHEIN
+N: E0019H
+O: Europa, Mitteleuropa, Deutschland, Odenwald, Spachbruecken
+R: Sage, Maerchen -, Zauber - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2G2d2 | BAG2A2
+AB | c2c2c2d2 | B2B2B2
+d2 | A2A2A2dc | B4A4 | G4z2
+
+X:43
+T: HOORT TOE GY ARM' EN RYKE
+N: E0027
+O: Europa, Mitteleuropa, Niederlande; Frankreich, Flandern
+R: Helden - Sage, erzaehlendes Volks - Lied
+M: 6/8
+L: 1/8
+K: D
+D | D2AA2G | G2=FF2
+F | =F2FG2G | A4z
+D | D2AA2G | G2=FF2
+F | =F2FG2G | A4z
+A | =c2cA2A | G3=F2
+F | G2GA2A | G2=FE2
+E | E2EE2=F | G3G2
+G | A2AG2A | =F2ED2
+
+X:44
+T: WILHELM BIN ICH
+N: E0032
+O: Europa, Mitteleuropa, Deutschland
+R: Helden - Sage, erzaehlendes Volks - Lied
+M: 4/4
+L: 1/8
+K: C
+G,2 | C2C2D2D2 | E2D
+EF2E2 | D2D2C2
+G,2 | C2C2D2D2 | E2D
+EF2E2 | D2D2C4 | z2
+G2G2G2 | G2F2E2D
+E | F2E2D2C2 | D4z2
+G,2 | C2E2D2C2 | B,2A,
+G,A,2C2 | C2B,2C4 | z6
+
+X:45
+T: ES WOLLT EINMAL EIN EDLER HERR AUSREITEN
+N: E0033
+O: Europa, Mitteleuropa, Deutschland, Breslau
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 2/4
+L: 1/8
+K: F
+F | ccdd | cAcA | c2A
+F | ccdd | cAcA | c2A
+c | BBAF | ccAF | G2F
+
+X:46
+T: ER IST DER MORGENSTERNE
+N: E0035
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 6/4
+L: 1/8
+K: F
+F2 | F4F2F4D2 | C4G2G4
+G2 | A4B4G2G2 | F6-F4
+A2 | B4B2B4A2 | G6-G4
+G2 | A4c2c3BA2 | G6-G4
+G2 | A4B4G2G2 | F6-F4
+
+X:47
+T: STOLZ HEINRICH DER WOLLT FREIEN GEHN
+N: E0040
+O: Europa, Mitteleuropa, Deutschland, Niederrhein; Siebengebirge
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 2/4
+L: 1/16
+K: A
+E2 | A2=c2B2A2 | A2G2G2
+E2 | A2B2=c2c2 | B4z2
+A2 | =c2B2c2A2 | =c4e4
+A3Bc2A2 | G2F2E2
+B2 | =c2B2c2A2 | =c4e2
+c2 | B2A2G2B2 | A4z2
+
+X:48
+T: STOLZ SYBURG WOLLTE FREIEN GEHN
+N: E0040A
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 2/4
+L: 1/16
+K: A
+E2 | A3B=c2B2 | A2G2A2
+B2 | =c3de2d2 | =c4z2
+c2 | B3=cd2B2 | =c2e2e4
+A3cB2A2 | G2F2E2
+B2 | =c2c2B2B2 | =c3de2
+d2 | =c2A2B3B | A4z2
+
+X:49
+T: UND ALS ICH AUF GRUEN HEIDE KAM
+N: E0040B
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 4/4
+L: 1/8
+K: F
+_E | _E3_AA2F2 | F3_EE2z
+E | _A3AB3B | c6z
+_A | G3FG2_A2 | B4c4
+F3G_A2F2 | G2C2C2
+_A2 | G3FG2_A2 | B4c2z
+B | _A2F2G2E2 | F4z3
+
+X:50
+T: ES WAR EINMAL EIN RITTERSMANN
+N: E0041
+O: Europa, Mitteleuropa, Oesterreich, Steiermark
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 6/8
+L: 1/8
+K: Bb
+F | Bdddff | ecccz
+F | Fcccee | dBBB2
+F | BAGFED | F2ed2
+c | BAGFED | FGAB2
+
+X:51
+T: ALS SCHONDILG NOCH EIN KLEIN KIND WAR
+N: E0041A
+O: Europa, Mitteleuropa, Deutschland, Niederrhein
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 3/4
+L: 1/8
+K: E
+=D=GA | B3=cBA | =G3
+=DGA | B3=cBA | =G3
+FEF | =G2ABGF | E3
+FEF | =G2ABGF | E3
+
+X:52
+T: ES RITT EIN RAEUBER WOHL UEBER DEN RHEIN
+N: E0041B
+O: Europa, Mitteleuropa, Deutschland, Limburg, Nauheim
+R: erzaehlendes Volks - Lied, Raeuber - Sage
+M: 6/8
+L: 1/16
+K: G
+d2 | c4B2A2A2e2 | d2d2c2B4
+d2 | c2c2B2A2A2e2 | d4c2B4
+G2 | G2G2G2G2A2G2 | c4e2g2f2
+e2 | d2g2B2d2d2AB | c4d2B4
+
+X:53
+T: HEER HALWYN ZONG EEN LIEDEKYN
+N: E0041C
+O: Europa, Mitteleuropa, Niederlande, Flandern; Brabant
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 3/4
+L: 1/8
+K: F
+B2 | ABc2d2 | cBA3
+A | BAG2A2 | Bcd2z
+d | _edc2d2 | c=Bc2
+
+X:54
+T: ES RITT EIN RITTER WOL DURCH DAS RIED
+N: E0042
+O: Europa, Mitteleuropa, Deutschland, Heidelberg
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 3/2
+L: 1/8
+K: G
+G2 | G2A2B4A4 | B2cBA4z2
+BA | G2GFG4B4 | A2BAG4z2
+A2 | F2E2F2D2E2F2 | G4ABA4
+B2 | E4E2D2G2G2 | B6G4
+
+X:55
+T: SCHOEN HEINRICH DER WOLLTE SPAZIEREN GEHN
+N: E0042A
+O: Europa, Mitteleuropa, Deutschland, Oderbruch
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B2F2B2F2 | B2dBF2
+F2 | G2F2G2F2 | G2E2D2
+F2 | G2F2G2F2 | c2B2B2
+
+X:56
+T: SCHOEN ULRICH WOLLT SPAZIEREN GEHN
+N: E0042B
+O: Europa, Mitteleuropa, Deutschland, Trebbin
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 3/4
+L: 1/16
+K: G
+D2 | G3GG2B2d2G2 | B2AGF4z2
+A2 | c3cc2e2g2c2 | e2dcB4z2
+G2 | A3AA2B2c2F2 | A3GG4z2
+
+X:57
+T: CHOEN ULERICH UND HANSELEIN
+N: E0042C
+O: Europa, Mitteleuropa, Deutschland, Breslau
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 2/4
+L: 1/8
+K: G
+G | GBdB | ecd
+B | ddcA | GBA
+D | GGAd | B2AF | G2z
+
+X:58
+T: SCHOEN ULERICH UND HANSELEIN
+N: E0042D
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 4/4
+L: 1/8
+K: G
+GB | d2B2d2G2 | e2e2d2
+Bc | d2d2c2A2 | GFGAG2
+D2 | B4d4 | c2A2BAGF | G2z4
+
+X:59
+T: ES ZOG EIN REITER WOHL UEBER DEN RHEIN
+N: E0042E
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 6/8
+L: 1/8
+K: G
+D | G2GGAB | BAAA2
+A | FAAABc | c2BB2
+G | GGGGAB | c3A2d | B3G2
+G | A2AcAF | A3G2
+
+X:60
+T: ES RITTEN DREI REITER WOL UEBER DEN RHEIN
+N: E0042F
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt, Alsfeld
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 6/8
+L: 1/16
+K: G
+D2 | D3EF2G3AB2 | A2A2F2D4
+D2 | A2A2A2d2d2d2 | B4A2G4
+GB | d2d2d2e3ee2 | d4c2B4
+d2 | e4e2d2c2B2 | A6G4
+
+X:61
+T: ES ZOGEN DREI REITER WOL UEBER DEN RHEIN
+N: E0042G
+O: Europa, Mitteleuropa, Deutschland, Wetzlar, Atzbach
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 6/8
+L: 1/16
+K: G
+D2 | D3EF2G2A2B2 | A3GFED4
+DF | A3GA2d4d2 | B4AFG4
+GB | d3Bd2e3de2 | d4B2G4
+Bd | g3dB2d3cB2 | A6G4
+GB | d3Bd2e3de2 | d4B2G4
+Bd | g3dB2d3cB2 | A6G4
+
+X:62
+T: ET FRAD DE KENENK GENZT DEM REIN
+N: E0042H
+O: Europa, Mitteleuropa, Deutschland; Rumaenien, Siebenbuergen
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 4/4
+L: 1/8
+K: G
+BBB | E3B,E2F2 | E4z
+BBB | A2A2B2A2 | G4z
+ddd | G3Gc2B2 | A4z
+EDD | BDG2B3A | G4z
+ddd | G3Gc2B2 | A4z
+EDD | B,DG2B3A | G4z
+
+X:63
+T: ES RITT EIN LANDSKNAB UEBER FELD
+N: E0042I
+O: Europa, Mitteleuropa, Deutschland, Koenigsberg, Uderwangen
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 6/8
+L: 1/8
+K: F
+F | A2FA2B | c3c2
+f | c2AB2A | A3G2z | F2Ac2
+f | c2AB2A | G3F2
+
+X:64
+T: ALS DIE WUNDERSCHOENE ANNA
+N: E0042J
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 2/4
+L: 1/8
+K: Eb
+EG | BBBB | AG
+FG | BFFF | F2
+EG | BBBB | AG
+FG | BFFF | F2
+ec | BBAF | E2
+EE | c2cc | Bed
+c | BBAF | E2
+EG | B2DD | E2
+
+X:65
+T: ALS DIE WUNDERSCHOENE ANNA
+N: E0042K
+O: Europa, Mitteleuropa, Deutschland, Lahngegend; Westerwald; Wetterau
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 2/4
+L: 1/8
+K: Eb
+EG | BBBB | AG
+FE | GFFF | F2
+EG | BBBB | AG
+FE | GFFF | F2
+e2 | BBGF | E2
+GG | A2Ac | Be
+e2 | BBGF | E2
+GG | B2BA | G2
+
+X:66
+T: ALS DIE WUNDERSCHOENE ANNA
+N: E0042L
+O: Europa, Mitteleuropa, Deutschland, Harz, Clausthal, Altenau
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage
+M: 2/4
+L: 1/8
+K: Eb
+EF | GGGG | GG
+FE | FB,B,B, | B,z
+FG | AAAA | AA
+cB | AGGG | G2z
+c | BAGF | EEE
+E | c2c2 | B2z
+c | BAGF | EEE
+G | B2BA | G2
+
+X:67
+T: ANNA SASS AUF EINEM STEIN
+N: E0042M
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage, Kinder - Lied
+M: 2/4
+L: 1/8
+K: F
+c | dcBG | FAA2
+GBB2 | Acc
+c | dcBG | c2c2 | F2z
+
+X:68
+T: LIEB ANNA SASS AUF EINEM STEIN
+N: E0042N
+O: Europa, Mitteleuropa, Deutschland, Schleswig
+R: erzaehlendes Volks - Lied, Ritter -, Raeuber - Sage, Kinder - Lied
+M: 2/4
+L: 1/8
+K: C
+G, | CCB,A, | A,G,G,2
+A,F,F,2 | A,G,G,
+G, | CCB,A, | A,G,G,2
+A,2B,2 | C2z
+
+X:69
+T: ES TRIEB EIN SCHAEFER DIE LAEMMELEIN AUS
+N: E0043
+O: Europa, Mitteleuropa, Deutschland, Zerbst
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 4/4
+L: 1/16
+K: C
+G,4 | C4C4D2C2B,2A,2 | A,2G,2G,2G,2G,6
+C2 | G,2F,2E,2F,2G,2F,2E,2D,2 | E,4C,2C,2C,4
+E,2G,2 | G,2F,2D,2F,2E,4
+G,4 | C4C2C2D4D4 | B,3B,B,2B,2C4
+
+X:70
+T: ES TRIEB EIN SCHAEFER DEN BERG HINAN
+N: E0043A
+O: Europa, Mitteleuropa, Deutschland, Uckermark
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 6/8
+L: 1/16
+K: C
+G,2 | G,2C2C2C2B,2A,2 | A,2G,2G,2G,4
+G,2 | A,3A,A,2A,2G,2F,2 | F,2E,2E,2E,4
+G,2 | G,2E,2G,2C,4G,2 | G,2E,2G,2C,4
+G,2 | C3CC2E2D2D2 | B,3A,B,2C4
+
+X:71
+T: DER SCHAEFER UEBER DIE BRUECKE KAM
+N: E0043B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt, Alsfeld
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2B2B2 | d2d2B2
+d2 | edcBc2c2 | dcBAB2
+GA | B2B2d2c2 | B2A2G2
+B2 | AGBAG2B2 | d2D2G2
+GA | B2B2d2c2 | B2A2G2
+
+X:72
+T: ES WEIDET EIN SCHAEFER IM LANGEN HOLZ
+N: E0043C
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 4/4
+L: 1/8
+K: F
+F | FGABc2de | f2cAF2z2
+d3cdcBA | G3AG2
+AB | c2c2dcBA | G2GGG2
+cA | G2GGG2cA | G2GGG2z2
+c2def3B | A2G2F2z
+
+X:73
+T: ES SOLLT EIN SCHAEFER HUETEN GEHN
+N: E0043D
+O: Europa, Mitteleuropa, Deutschland, Siebengebirge
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 6/8
+L: 1/16
+K: E
+=D2 | =D2A2A2A2B2=c2 | B3AB2=G4z2
+A2B2=c2=d3ed2 | =c4B2A4
+AB | =c4c2c4B2 | =G4F2E4z2
+E4E2F4z2 | B4B2F4
+F2 | A2=G2F2G2F2E2 | F4B2E4
+
+X:74
+T: EIN SCHAEFER WOL UEBER DIE BRUECKE ZOG
+N: E0043E
+O: Europa, Mitteleuropa, Deutschland, Hessen - Nassau
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 6/8
+L: 1/16
+K: G
+D2 | G2D2G2B2G2B2 | d2e2d2B6
+d3dddA4e2 | d4dcB4
+B2 | B3BB2B2A2B2 | d2c2d2z6
+B3Bced4d2 | B3BB2B2A2B2 | d2c2d2B4
+
+X:75
+T: ET TRAEIP EN SCHAEPER SINE SCHAEPKES UT
+N: E0043F
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Iserlohn, Ergste
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 4/4
+L: 1/8
+K: A
+E2 | E2A2A2cc | cdcBA3
+c | B2G2A2F2 | GAGFE3
+E | A2c2e2d2 | cdcBA2
+
+X:76
+T: ES KAMEN DREI SCHWARZE RABEN
+N: E0045
+O: Europa, Mitteleuropa, Deutschland, Niederrhein
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/8
+L: 1/16
+K: F
+C2 | F3FF2 | A2F2A2 | c4B2 | A4
+c2 | d2f2d2 | c2A2FA | c4B2 | A4
+FA | c3AcA | G4
+FA | c3AcA | G4
+FA | c3dc2 | F2A2c2 | c2B2G2 | F4
+
+X:77
+T: ES LEUCHTEN DREI STERNE AM HIMMEL
+N: E0048
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 6/8
+L: 1/16
+K: F
+C2 | F3EF2G3FG2 | A3BAGF4
+AB | c3dc2F2A2G2 | A6z4
+EF | G4A2A3Bc2 | B6G4z2
+A6G2F2G2 | A3BAGF2z2
+
+X:78
+T: ES STEHEN DREI STERNE AM HIMMEL
+N: E0048A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 6/8
+L: 1/16
+K: G
+D2 | G2D2G2B2G2B2 | d3edcB2z2
+Bc | d3ed2d2c2c2 | B6z4
+Bc | d2B2d2e2d2c2 | B6A4z2
+B6c2d2e2 | d3edcB4
+c2 | d3ed2d2c2c2 | B6z4
+
+X:79
+T: ES KANN MICH NICHTS SCHOENRES ERFREUEN
+N: E0048B
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 6/8
+L: 1/16
+K: G
+D2 | G2D2G2B2G2B2 | d3edcB4
+Bc | d3ed2d2c2c2 | B4z2
+d6 | B2c2d2e2d2c2 | B6A4z2
+B6c2d2e2 | d3edcB4
+c2 | d3ed2d2c2c2 | B6z4
+
+X:80
+T: ES KANN MICH NICHTS SCHOENRES ERFREUEN
+N: E0048C
+O: Europa, Mitteleuropa, Deutschland, Thueringen; Franken; Sachsen
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 6/8
+L: 1/16
+K: G
+D2 | G2D2G2B2G2B2 | d6B4
+d2 | d3ed2c2A2d2 | B4z2
+d6 | B2c2d2B2c2d2 | e6c4z2
+e6g2f2e2 | d6B4
+d2 | d3ed2c2A2d2 | B4z6
+
+X:81
+T: IM AERGAEU SIND ZWEU LIEBI
+N: E0049
+O: Europa, Mitteleuropa, Schweiz
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 2/4
+L: 1/16
+K: G
+GA | B2B2B2AB | c2A2z2
+AB | c2c2c2Bc | d2B2z2
+ce | d2BBc2A2 | BABcB2
+ce | d2BBc2A2 | B6
+
+X:82
+T: IN DER EICHE DA WOHNET MEIN LIEBCHEN
+N: E0049A
+O: Europa, Mitteleuropa, Deutschland, Ost - Friesland
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: G
+GA | B2BBB2AB | c2A2z2
+AB | c2ccc2Bc | d2B2z2
+Bc | d2ddcBAG | e2e2e2
+ge | d2BBd2cc | B6
+
+X:83
+T: ES WOHNTEN ZWEI LIEBCHEN IN SCHWABEN
+N: E0049B
+O: Europa, Mitteleuropa, Deutschland, St. Wendel, Kirrweiler
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 2/4
+L: 1/16
+K: F
+C2 | F2FFF2EF | G2E2z2
+C2 | G2GGG2FG | A2F2z2
+FA | c2cAB2BG | A2f2d2
+dd | c2cABdcB | A4z2
+
+X:84
+T: ES WAREN ZWEI VERLIEBTE IN DEM MAILAND
+N: E0049C
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: G
+GA | B2B2B2AB | c2A2z2
+AB | c2c2cedc | d2B2z2
+GB | d2ddcBAG | e2e2e2
+ge | d2ddd2Ac | B4z2
+GB | d2ddcBAG | e2e2e2
+ge | d2ddd2Ac | B4z2
+
+X:85
+T: ES WARN EINMAL ZWEI BAUERNSOEHN
+N: E0050
+O: Europa, Mitteleuropa, Deutschland, Odenwald
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/8
+K: G
+G | BBG2B2 | AAF3
+A | GGE2A2 | FFD2z
+B | cBA2G2 | A2G2z
+
+X:86
+T: ES WARN EINMAL ZWEI BAUERNSOEHN
+N: E0050A
+O: Europa, Mitteleuropa, Deutschland, Baden
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/8
+K: G
+D | DGG2G2 | FGA3
+D | DFA2A2 | GAB2z
+G | BBc2B2 | AdB2z
+B | BBc2B2 | A2G2z
+
+X:87
+T: ES WARN EINMAL ZWEI BAUERNSOEHN
+N: E0050B
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Wittgenstein
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/16
+K: G
+D2 | G3GG6A2 | B3BB6
+B2 | A2B2c4F4 | A3GG4z2
+B2 | d6B2c2B2 | d4A4z2
+e2 | e2e2d2c2B4 | A4G4z2
+
+X:88
+T: ES WARN EINMAL ZWEI BAUERNSOEHN
+N: E0050C
+O: Europa, Mitteleuropa, Deutschland, Trier
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/8
+K: G
+D | DDG2B2 | AGA2z
+D | DDA2c2 | Bed2z
+c | Bcd2c2 | Bdd2z
+G | GGc2B2 | AFG2z
+
+X:89
+T: ES HATT EIN GASTWIRTH EINEN SOHN
+N: E0050D
+O: Europa, Mitteleuropa, Deutschland, Schlesien; Brandenburg
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/16
+K: Bb
+F2 | B2F2B4d4 | c2cBA6
+c2 | B2G2G4B4 | F2FED4z2
+F2 | B2B2d4B4 | c4B4z2
+
+X:90
+T: ES HATT EIN GASTWIRTH EINEN SOHN
+N: E0050E
+O: Europa, Mitteleuropa, Deutschland, Magdeburg
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/16
+K: G
+D2 | G2D2G4B4 | c2A2G6
+G2 | B2c2d4d4 | edcBA6
+G2 | F2ABc4B2G2 | A4G4z2
+
+X:91
+T: ES HATT EIN GASTWIRTH EINEN SOHN
+N: E0050F
+O: Europa, Mitteleuropa, Deutschland, Goettingen
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/16
+K: G
+D2 | G2F2G4B4 | A2G2A4z2
+D2 | A2G2A4c4 | B2A2B4z2
+d2 | B2dBG4B4 | A4G4z2
+
+X:92
+T: SUSANNA SPRANG ZUM THOR HINAUS
+N: E0051
+O: Europa, Mitteleuropa, Deutschland, Siebengebirge
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: Eb
+B,2 | E2G2B2cd | e2dcB2
+B2 | e4c4 | e4c4 | B2BAG2
+GA | B2B2c2GB | BAGFE2
+F2 | G4c4 | B4G2B2 | B2A2F2D2 | E4z2
+
+X:93
+T: SUSANNCHEN SPRANG ZUM THOR HINAUS
+N: E0051A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: A
+E2 | A3AA2A2 | c3BA2z2 | z4
+c4 | B4A4 | G4F4 | E3FE2
+D2 | C2E2C2E2 | c3BA2
+A2 | B4G4 | A4z2
+
+X:94
+T: ES GING EINST EIN VERLIEBTES PAAR
+N: E0052
+O: Europa, Mitteleuropa, Deutschland, Rheinland; Lahnkreis; Dillkreis
+R: erzaehlendes Volks - Lied, Sage, Mord, Verfuehrung
+M: 6/8
+L: 1/8
+K: G
+d | d2dg2g | B2Bd2
+d | A2Age^c | e3d2
+d | d2dg2g | B2Bd2
+A | BedcBA | A3G2
+
+X:95
+T: ES GIENG EINST EIN VERLIEBTES PAAR
+N: E0052A
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: erzaehlendes Volks - Lied, Sage, Mord, Verfuehrung
+M: 3/4
+L: 1/16
+K: G
+D2 | D2F2G6A2 | A2B2B6
+G2 | G2B2d3cB2A2 | A4G4z2
+d2 | e2c2c6e2 | d2B2B6
+d2 | e2d2c6B2 | B4A4z2
+D2 | D2G2G6A2 | A2B2B6
+G2 | G2B2d3cB2A2 | A4G4z2
+
+X:96
+T: ES WAR EIN REICHER KAUFMANNSSOHN
+N: E0053
+O: Europa, Mitteleuropa, Deutschland, Wetzlar, Philippstein
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 6/8
+L: 1/16
+K: G
+D2 | G4G2B2A2G2 | A4A2A4
+BA | G4B2d4B2 | B4A2z4
+B2 | c2e2e2e2d2c2 | B2d2d2d4
+B2 | A4A2d4A2 | A4G2z4
+
+X:97
+T: ES ZOG EIN HERR WOL IN DEN KRIEG
+N: E0055
+O: Europa, Mitteleuropa, Deutschland, Pommern, Fiddichow, Busendorf
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 2/4
+L: 1/16
+K: G
+D2 | G2B2B2GD | D2A2A2
+DD | G2G2FDAF | E4D2
+
+X:98
+T: JOSEPH LIEBER JOSEPH
+N: E0056
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: erzaehlendes Volks - Lied, Sage, Kinds - Mord
+M: 4/4
+L: 1/4
+K: F
+_A | _AFcc | c2_A
+A | GGGF | G2z
+G | G_ABc | d2c
+B | _A2GG | F2z
+
+X:99
+T: ACH JOSEPH LIEBER JOSEPH
+N: E0056A
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: erzaehlendes Volks - Lied, Sage, Kinds - Mord
+M: 3/4
+L: 1/8
+K: G
+D2 | GBd2BG | FAc2
+GB | d2d2cB | A4
+B2 | c2e2cA | B2d2
+BG | A2d2cA | B4
+B2 | c2e2cA | B2d2
+BG | A2d2cA | G4
+
+X:100
+T: MEIN LIEBE FRAU MUTTER
+N: E0056B
+O: Europa, Mitteleuropa, Oesterreich, Lilienfeld
+R: erzaehlendes Volks - Lied, Sage, Kinds - Mord
+M: 3/4
+L: 1/8
+K: Bb
+F2 | FBB3c | cdd3
+B | cde2d2 | c3z
+F2 | FBB3c | cdd3
+B | dcB2A2 | B4
+
+X:101
+T: ACH JOSEPH LIEBER JOSEPH
+N: E0056C
+O: Europa, Mitteleuropa, Deutschland, Dillenburg, Eibach
+R: erzaehlendes Volks - Lied, Sage, Kinds - Mord
+M: 3/4
+L: 1/8
+K: G
+G2 | G2D2Bc | B2G2
+Bc | d2c2B2 | A4
+AB | c2cedc | BdG2
+G2 | A2A2A2 | G4
+AB | c2cedc | BdG2
+G2 | A2A2A2 | G4
+
+X:102
+T: ACH JOSEPH LIEBER JOSEPH
+N: E0056D
+O: Europa, Mitteleuropa, Deutschland, Unter - Taunus, Niederreifenberg
+R: erzaehlendes Volks - Lied, Sage, Kinds - Mord
+M: 3/4
+L: 1/8
+K: G
+D2 | G2B2dB | BAA2
+e2 | d2c2B2 | A4
+AB | c2cedc | B2d2
+BB | A2d2c2 | B4
+AB | c2cedc | B2d2
+BB | A2d2c2 | B4
+
+X:103
+T: ACH HANNCHEN SCHOENSTES HANNCHEN
+N: E0056E
+O: Europa, Mitteleuropa, Deutschland, Limburg; Unter - Lahnkreis
+R: erzaehlendes Volks - Lied, Sage, Kinds - Mord
+M: 3/4
+L: 1/8
+K: G
+D2 | DBB2AG | FAA2
+AB | cee2dc | B2z2
+AB | cee2dc | Bdd2
+cB | Add2c2 | B4
+
+X:104
+T: ES RITTEN DREI REITER WOL UEBER DEN RHEIN
+N: E0057
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 2/4
+L: 1/8
+K: G
+D | G2FG | A2GA | B2cB | A2z
+d | c2Ac | B2GB | A2FD | GBd
+d | c2Ac | B2GB | A2FD | G2z
+
+X:105
+T: ES WOHNTE EINE WITWE
+N: E0057A
+O: Europa, Mitteleuropa, Deutschland, Magdeburg
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/8
+K: G
+G2 | d3cA2 | G2B2
+d2 | c2B2d2 | A2z2
+G2 | d2d2BG | e2e2
+c2 | B4A2 | G2z2
+
+X:106
+T: ES GIENG EIN MUELLER UEBER FELD
+N: E0058
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: G
+D2 | G2_B2A2d2 | c2_B2A2z
+D | G2_B2A2d2 | c2_B2A2z
+d | d2c2d2_BA | _B2G2z2
+
+X:107
+T: ES WOLLT EIN MUELLER FRUEH AUFSTEHN
+N: E0058A
+O: Europa, Mitteleuropa, Deutschland, Darmstadt, Dreieichenhain
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: G
+D2 | G3FG2A2 | B3AG2
+A2 | B3AB2c2 | d3cB2
+d2 | e2d2c2B2 | B4A2
+
+X:108
+T: ES WOLLT EIN MUELLER FRUEH AUFSTEHN
+N: E0058B
+O: Europa, Mitteleuropa, Deutschland, Altmark, Mieste
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: F
+C2 | F2F2G2cB | A3GF2
+FG | A2G2A2Bd | c3BA2
+FA | c2c2dcA2 | G4F2
+
+X:109
+T: ES WOLLT EIN MUELLER FRUEH AUFSTEHN
+N: E0058C
+O: Europa, Mitteleuropa, Deutschland, Hochwald, Bruchweiler; Schauren
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: D
+D2 | D2F2A2F2 | F3EE2
+E2 | E2B2A2G2 | G3FF2
+A2 | A2A2F2D2 | G2B2B2
+d2 | c2B2A2F2 | E4D2
+
+X:110
+T: ES LEIT EIN SCHLOSS IN OESTERREICH
+N: E0061
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/8
+K: F
+F2 | F4A2 | A4F2 | A4B2 | c4
+F2 | c4c2 | c4A2 | B4c2 | A4
+A2 | B4B2 | B4c2 | G4G2 | G4
+G2 | c4c2 | A2F2A2 | c4BA | G4
+G2 | A4G2 | F3EED | F4
+
+X:111
+T: ES LIEGT EIN SCHLOSS IN OESTERREICH
+N: E0061A
+O: Europa, Mitteleuropa, Deutschland, Sueddeutschland
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/8
+K: F
+ | F2F2G2 | A4B2 | c4A2 | F4z2
+F2A2B2 | c4F2 | F4ED | E2F2D2 | C4z2
+c2c2c2 | d3cd2 | c4B2 | A4
+d2 | c2G2A2F2 | E2F2
+G2A2 | A2GFG4 | F8
+
+X:112
+T: ES LIEGT EIN SCHLOSS IN OESTERREICH
+N: E0061B
+O: Europa, Mitteleuropa, Deutschland, Niederlausitz
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: G
+G2 | d2d2d2_B2 | =f2f2_ed
+f2 | g2d2c2_B2 | c2d4
+=f_e | c2=f_ed2c2 | _B2A2G2
+A2 | _B2c2d2cB | A_BG4
+
+X:113
+T: IDT LICHT SICH EIN SCHLOESSKEN
+N: E0061C
+O: Europa, Mitteleuropa, Deutschland, Niederdeutsch
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/2
+L: 1/4
+K: F
+A2 | A3AG2 | A3AB2 | c4c2 | A4
+c2 | c3cc2 | A3GF2 | G4-G2 | A2z2
+
+X:114
+T: ICH WEISS EIN EWIGES HIMMELREICH
+N: E0061D
+O: Europa, Mitteleuropa, Deutschland
+R: geistliches Volks - Lied
+M: 3/4
+L: 1/8
+K: F
+F2 | F4G2 | A4B2 | c4c2 | A4
+c2 | c4A2 | B4A2 | G6 | F4
+c2 | G4cB | A4G2 | F4E2 | D4
+C2 | F4AB | c3BA2 | G6 | F4
+
+X:115
+T: ES LIEGT EIN SCHLOSS IN OESTERREICH
+N: E0061E
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 6/4
+L: 1/4
+K: G
+D | G2BBAG | A2ccBA | B2ddcB | BAz3
+d | d2BB2d | dcBA2c | BdGAcF | AGz3
+
+X:116
+T: ES STEHT EIN SCHLOSS IN OESTERREICH
+N: E0061F
+O: Europa, Mitteleuropa, Deutschland, Pommern, Fiddichow, Brusenfelde
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/16
+K: D
+A,2 | D2F2A4G2C2 | E3GG4F2
+A,2 | D2F2A4D2F2 | F4E4z2
+A2 | F2A2d4c2B2 | B2A2F4z2
+d2 | A2F2G4C2E2 | E4D4z2
+
+X:117
+T: ES STEHT EIN SCHLOSS IN OESTERREICH
+N: E0061G
+O: Europa, Mitteleuropa, Deutschland, Pommern, Tantow, Rosow
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/8
+K: D
+D | DFA2GE | DFF2E
+D | DFA2GF | F2E2z
+A | AffcdF | Fee2z
+d | cBAGBC | E2D2z
+
+X:118
+T: ES LIEGT EIN SCHLOSS IN OESTERREICH
+N: E0061H
+O: Europa, Mitteleuropa, Deutschland, Rheinland; Mosel
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/16
+K: D
+D2 | D2FAA4G2E2 | D3FF4E2
+D2 | D2FAA4G2E2 | G2A2F4z2
+A2 | A2cee4c2A2 | B2c2d4
+d4 | B2B2A4F4 | G2A2F4z2
+
+X:119
+T: ES LIEGT EIN SCHLOSS IN OESTERREICH
+N: E0061I
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein, Westkueste
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 4/4
+L: 1/8
+K: Eb
+E2 | E2G2B2GE | D2G2F2z
+E | E2G2B2GE | G4F2z
+B | c2d2e2dc | B2B2e2d
+c | B2G2A3F | F4E2
+
+X:120
+T: COELN IST EINE SCHOENE STADT
+N: E0061J
+O: Europa, Mitteleuropa, Deutschland, Nassau, Kreis Wetzlar; Dillkreis
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 3/4
+L: 1/16
+K: G
+D2 | G2G2G4B4 | d2B2A6
+BA | G2F2G4B4 | B4A4z2
+c2 | B2e2d6d2 | d2dcB6
+B2 | A2d2c4B2d2 | A4G4z2
+
+X:121
+T: ES LIEGT EIN SCHLOESSCHEN IN OESTERREICH
+N: E0061K
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 2/4
+L: 1/16
+K: G
+D2G2B2 | G4F2G2 | A2B2G4 | z2
+G2B2d2 | d3cB2A2 | G4A4 | z2
+G2B2G2 | d3ed2B2 | A2G2c4 | z2
+B2A2G2 | d3ed2B2 | A2G2c4 | z2
+B2A2G2 | c4B4 | A4G4 | z2
+
+X:122
+T: IK SACH MINEN HER VAN VALKENSTEN
+N: E0062
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Bielefeld
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 4/4
+L: 1/8
+K: G
+d2 | d2c_BA2d2 | d2c_BA3
+c | _B2A2G2G2 | F4G2
+GG | A2_BBc2A2 | _B2c2d3
+c | _B2A2G2G2 | F4G2
+
+X:123
+T: ECK FACH MUINEN HEREN VAN FALKENSTEUN
+N: E0062A
+O: Europa, Mitteleuropa, Deutschland, Lippe - Detmold
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 6/8
+L: 1/8
+K: F
+F | cdcAGF | Bcdc2
+F | c2cfed | d3cz
+F | cdcAGF | Bcdc2
+F | c2cfed | d3c2c | G3F2
+
+X:124
+T: ES LIEGT EIN HAUS IM OBERLAND
+N: E0062B
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Ritter - Sage
+M: 4/4
+L: 1/16
+K: F
+F4 | F4G4A4B4 | c4c4F4
+G4 | A4d4c4F4- | F6EDE4F4 | D8C8 | z12
+c4 | c4c4d4c4 | c4B4A4
+d4 | c4G4A4F4 | E4F4
+G4A4 | A4G2F2G8 | F12
+
+X:125
+T: EEN KIND EN EEN KLEYNE KIND
+N: E0064
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Mord
+M: 2/4
+L: 1/8
+K: G
+D | G2GB | G2Bd | dcBA | G2
+Bd | dcBA | G2B2 | A2z
+A | A2B2 | c2BA | GABG | E2
+FG | A2d2 | cBAG | F2A2 | G2z
+
+X:126
+T: ES WARN EINMAL ZWEI JUNGE KNABN
+N: E0065
+O: Europa, Mitteleuropa, Deutschland, Frankfurt a.M.
+R: erzaehlendes Volks - Lied, Sage, Mord, Hinrichtung
+M: 4/4
+L: 1/8
+K: G
+D2 | D2G2G2A2 | F2E2D2z
+D | G2B2A2d2 | B4z2
+D2 | D2G2G2A2 | F2E2D2z
+D | G2B2A2d2 | B4z2
+GB | d2ddedcB | c2A2z2
+AB | c2ccdcBA | B2G2z2
+G2 | A2A2D2EF | G4z2
+
+X:127
+T: ES GIENG EIN REITER SPAZIEREN
+N: E0065
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Sage, Mord, Hinrichtung
+M: 6/8
+L: 1/16
+K: A
+E2 | A3ee2e2d2=f2 | e4=c2B4
+B2 | d3=cB2c2e2c2 | B6-B4
+B2 | =c3BA2c3BA2 | G4A2B4
+B2 | =c3BA2c3BA2 | G4A2B4
+G2 | A6e6 | =c4B2A4
+
+X:128
+T: ES STEHT EIN LIND IN JENEM THAL
+N: E0067
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 3/4
+L: 1/8
+K: D
+ | D2=F2G2 | A4_B2 | A4G2 | A4z2
+A2A2A2 | =c4_B2 | A2G2G2 | =F4
+A2 | G2A2_B2 | A4D2 | =F2E2D2 | =C4z2
+G2G2G2 | =FEFGA2 | G2=F2E2 | D6
+
+X:129
+T: ES STOT EIN LIND IM HIMMELREICH
+N: E0067A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 4/4
+L: 1/8
+K: C
+C2 | E2G2G2A2 | c2BGAGA2 | G4z2
+G2 | A2c2B3A | G3FE2
+G2 | G2E2D2C2 | C4z2
+C2 | E2G2G2A2 | c2BGAGA2 | G4z2
+G2 | A2c2B3A | G3FE2
+G2 | G2E2D2C2 | C4z2
+
+X:130
+T: WAS WIRST DU MIR MITBRINGEN
+N: E0068
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Breslau; Hainau
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2A2A2 | c4A2
+A2 | G2d2c2B2 | A4z2
+A2 | c2B2G2B2 | B4A2
+A2 | c2B2G2B2 | B4A2
+C2 | F2F2A2c2 | f6
+d2 | c2A2cBG2 | F4z2
+
+X:131
+T: ES WOLLT EIN MAEDCHEN INS KLOSTER GEHN
+N: E0068A
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2G2GA | B2B2A2
+B2 | c2B2A2G2 | A4z2
+d2 | d2d2d2ed | d2c2z2
+AB | c2c2c2dc | B2A2B2
+GA | B2dcB2A2 | G4z2
+
+X:132
+T:  ES GIENG EIN MATROSE WOL UEBER DEN GRUND
+N: E0069
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein, Achtrup
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 6/8
+L: 1/16
+K: F
+C2 | C2F2A2c2A2F2 | E3EG2B2G2
+E2 | F3FA2c2A2F2 | G6z4
+FB | d2B2d2f2e2d2 | c2F2A2c4
+d2 | c4G2B2A2G2 | A4d2c4
+c2 | d2B2d2f2e2d2 | c2F2A2c4
+d2 | c4G2B2A2G2 | F6z4
+
+X:133
+T: ES GIENG EIN MATROSE WOHL UEBER DEN RHEIN
+N: E0069A
+O: Europa, Mitteleuropa, Deutschland, Helgoland
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 6/8
+L: 1/8
+K: F
+C | FFAcAF | E2GBG
+E | FAccBA | G3z2
+c | cBdfed | cAfc2
+f | edcBAG | F3z2
+
+X:134
+T: ES WAREN ZWEI GESPIELEN
+N: E0070
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Breslau; Liegnitz
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 3/4
+L: 1/16
+K: F
+C2 | F2A2c4G4 | BA3G4z2
+c2 | c2e2f4d4 | fe3c4z2
+c2 | c2e2f4g4 | f2d2c4z2
+A2 | B2d2c4G4 | BA3F4z2
+c2 | c2e2f4g4 | f2d2c4z2
+A2 | B2d2c4G4 | BA3F4z2
+
+X:135
+T: HANI EN BLAUEN STORKEN GSEH
+N: E0071
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 4/4
+L: 1/8
+K: G
+D2 | G3DG2A2 | B2A2G2
+Bc | d3dd2B2 | A4z2
+GB | d2d2d2B2 | e4d2
+Bc | d2d2B2A2 | G4z2
+
+X:136
+T: ES WOLLT EIN MAEDCHEN GRASEN GEHN
+N: E0071A
+O: Europa, Mitteleuropa, Deutschland, Bayern
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2A2A2 | BAGAG2
+A2 | B2BBdcBc | d4z2
+GB | d2d2d2g2 | e4d2
+GB | dddddcc2 | B4z2
+GB | d2d2d2g2 | e4d2
+GB | dddddcc2 | B4z2
+
+X:137
+T: ES GIENG EIN MAEDCHEN GRASEN
+N: E0071B
+O: Europa, Mitteleuropa, Deutschland, Frankfurt a.M., Darmstadt
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: G
+D2 | G2B2B2d2 | G2B2B2
+d2 | d2c2c2B2 | B4A2
+GB | d2e2d2cA | G2B2B2
+BB | B2AAA2cc | e2d2d2
+GB | d2e2d2cA | G2B2B2
+B2 | A2A2d2dc | B6
+
+X:138
+T: ES GIENG EIN WACKRES MAEDCHEN
+N: E0071C
+O: Europa, Mitteleuropa, Deutschland, Marburg
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2B2d2 | G2B2B2
+d2 | d2c2c2B2 | B2A2z2
+d2 | d2e2c2A2 | G2B2B2
+B2 | B2A2A2Bc | e2d2d2
+d2 | d2e2c2A2 | G2B2B2
+B2 | d2d2e2d2 | B6
+
+X:139
+T: ES GIENG EIN MAEDCHEN GRASEN WOHL
+N: E0071D
+O: Europa, Mitteleuropa, Deutschland, Dillkreis
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 4/4
+L: 1/8
+K: G
+d2 | G2B2B2d2 | G2B2B2
+d2 | d3cc2B2 | d4A2
+AB | c2e2e2c2 | B2d2d2
+B2 | A2A2d2dc | B2d2d2
+dd | c2e2e2c2 | B2d2d2
+B2 | A2A2d2dc | B4z2
+
+X:140
+T: ES GIENG EIN MAEDCHEN GRAS SCHNEIDEN
+N: E0071E
+O: Europa, Mitteleuropa, Italien, Tirol, Meran,
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 6/8
+L: 1/8
+K: G
+D | G2GBBd | G2BB2
+d | d2dc2c | B3A2
+d | c2cedc | B2Bdc
+B | A2AcBA | G3B2
+d | c2cedc | B2Bdc
+B | A2AcBA | G3z2
+
+X:141
+T: ES WOLLT EIN MAEDEL GRASEN
+N: E0071F
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 3/4
+L: 1/8
+K: G
+G2 | FED2G2 | FED2
+G2 | FDE2A2 | G4
+D2 | GBd2de | dcA2
+Ac | cBBGFA | AGGF
+G2 | FDE2A2 | G4
+
+X:142
+T: ES SOLLT SICH EIN GOLDSCHMIED SCHMIEDEN
+N: E0071G
+O: Europa, Mitteleuropa, Deutschland, Bonn; Koblenz
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 6/8
+L: 1/16
+K: G
+D2 | G2G2G2B3AB2 | G4F2G4
+AB | c4c2B3cd2 | A6z4
+Bc | d2d2dcB3cd2 | d4c2A4
+A2 | B3cd2G4BA | G4z2
+A6 | B3cd2G4BA | G6z4
+
+X:143
+T: DORT OBEN AUF DEM BERGE
+N: E0071H
+O: Europa, Mitteleuropa, Deutschland, Boehmen
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: F
+C2 | F2G2A2B2 | c4A2
+f2 | e2d2cBAB | A4z2
+c2 | f2A2c2G2 | B2B2A2
+F2 | G2G2G2B2 | A2A2A2
+cf | c2A2B2AG | F4z2
+
+X:144
+T: A DIARNDL GEHT UM HOLZ IN WALD
+N: E0073
+O: Europa, Mitteleuropa, Oesterreich, Steiermark
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 3/4
+L: 1/16
+K: D
+A,2 | F3FF6F2 | d2c2B4z2
+D2 | C3BA4E4 | F2d2A4z2
+F2 | A3fd6F2 | d2c2B4z2
+D2 | C3BA4G2C2 | D4z8
+A,4C4E4 | A4g6c2 | d4F6B2 | A8z4
+c4G6B2 | A8z4 | d4F6B2 | A12
+A,4C4E4 | A4g6c2 | d4F6B2 | A8z4
+c4G6B2 | A4G4E4 | D12 | D4z6
+
+X:145
+T: ES GIENG A MAIDL NACH HOLZ
+N: E0073A
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: G
+D2 | B3BA2G2 | c3cF2
+F2 | c3cB2A2 | d4z2
+B2 | d3dc2B2 | e3eF2
+E2 | D2c2B2A2 | G4z2
+d2 | B2d2g3d | f3ee2
+e2 | d2D2B2A2 | G4z2
+
+X:146
+T: ES RITT EIN HERR UND AUCH SEIN KNECHT
+N: E0077
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Hainau
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: G
+D2 | G4d3c | B6
+c2 | B4A4 | G4z2
+G2 | B2B2d2B2 | A2c2B2
+G2 | B2B2d2B2 | A2c2B2
+D2 | G4d3c | B6
+c2 | B4A4 | G4z2
+
+X:147
+T: ACH SCHIFFMANN DU FEIN GUETIGER MANN
+N: E0078
+O: Europa, Mitteleuropa, Deutschland, Brandenburg, Wilsnack; Granzow
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: C
+EF | G2E2G2c2 | GFEDC2
+c2 | d2e2d3c | B2A2G2
+c2 | A2FFF2d2 | cBABG2
+c2 | E3FD3E | C4z2
+F2 | EGc2E3D | C4z2
+EF | G2E2G2c2 | GFEDC2
+c2 | d2e2d3c | B2A2G2
+c2 | A2FFF2d2 | cBABG2
+c2 | E3FD3E | C4z2
+F2 | EGc2E3D | C4z2
+EF | G2E2G2c2 | GFEDC2
+c2 | d2e2d3c | B2A2G2
+G2 | A2G2A2B2 | c2BAG3
+c | E3FD3E | C6
+F2 | EGc2E3D | C4z2
+
+X:148
+T: ACH SCHIFFMANN DU FEIN GUTER MANN
+N: E0078A
+O: Europa, Mitteleuropa, Deutschland, Halle
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/8
+K: F
+A | cAAA | AGG
+G | FAcd | dccA | cAA
+A | cAAA | AGG
+G | FAcd | dcc
+A | cAAA | AGG
+B | AFGA | F2z
+A | cAAA | AGG
+G | FAcd | dccA | cAA
+A | cAAA | AGG
+G | FAcd | dcc
+A | cAAA | AGG
+B | AFGA | F2z
+A | cAAA | AGG
+G | FAcd | dccA | cAA
+FFF | B2dddd | dcA
+fcc | AAAAAG | G2F2z
+
+X:149
+T: O SCHIPMANN O SCHIPMANN
+N: E0078B
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: F
+d4 | c2F2d4 | c2F2z2
+FA | c3dc2B2 | A3GF2
+F2 | E2C2E2C2 | F3FF2
+C2 | F3CF2F2 | F3Ac2
+B2 | A4G4 | F2z2
+d4 | c2F2d4 | c2F2z2
+FA | c2cdc2B2 | A2GGF2
+F2 | E2C2E2C2 | F4F2
+FA | c2cdc2BB | A3GF2
+F2 | E2C2E2C2 | F3FF2
+FA | c3dc2B2 | A3GF2
+F2 | E2C2E2C2 | F3FF2
+C2 | F3CF2A2 | F3Ac2
+B2 | A4G4 | F2z2
+d4 | c2F2d4 | c2F2
+
+X:150
+T: SCHIFFMANN LAT'T SCHIFFKEN SINKEN
+N: E0078C
+O: Europa, Mitteleuropa, Deutschland, Schoenebeck a.d. Elbe
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 4/4
+L: 1/8
+K: F
+FA | c2c2c2d2 | c3AF2
+A2 | G4A2A2 | F3ED2
+E2 | F2E2F2E2 | D4z2
+A2 | A2B2A2G2 | F2E2D2
+A2 | A2G2A2B2 | c3dc2A2 | c4A2
+
+X:151
+T: ICH FUHR EINSTMALS AUF STILLER SEE
+N: E0079
+O: Europa, Mitteleuropa, Deutschland, Odenwald
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 4/4
+L: 1/8
+K: F
+FAG | GF2dc3B | B2A2z2
+AB | c3AdcBA | AGG2G2
+FA | c2c2cf2d | dcc2c2B
+A | B2B2BdcB | A2c2c2
+FA | c2c2cf2d | dcc2c2B
+A | B2B2BdcB | A2c2c
+
+X:152
+T: EINSTMALS FUHR ICH AUF DER SEE
+N: E0079A
+O: Europa, Mitteleuropa, Deutschland, Jueterbog
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B2F2D2F2 | B2d2c3
+c | B2G2F2B2 | cBAGF2
+F2 | B2B2c2c2 | d2f2e4
+d2c2B2dc | B2A2B2
+
+X:153
+T: ES HAT E BUUR ES TOECHTERLI
+N: E0080
+O: Europa, Mitteleuropa, Schweiz
+R: erzaehlendes Volks - Lied, Sage, Liebe
+M: 2/4
+L: 1/8
+K: F
+C | FGAF | c2G2 | F2z
+c | cdec | f2d2 | c2z
+c | fedc | fdc
+C | FGAB | c2G2 | F2z
+
+X:154
+T: ES WAREN ZWEI KOENIGSKINDER
+N: E0084
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: G
+D2 | B2BBB2A2 | A3GG2
+D2 | c2cccBdB | A4z2
+D2 | d2dedccc | B4dc
+BA | G2GGBAA2 | G4
+A4 | B2BBdcA2 | G4z2
+
+X:155
+T: ES WAREN ZWEI KOENIGSKINDER
+N: E0084A
+O: Europa, Mitteleuropa, Deutschland, Bonn
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 6/8
+L: 1/16
+K: G
+D2 | G2G2A2_B2A2B2 | G3A_B2A4
+D2 | G2F2G2A2G2D2 | G8z2
+GA | _B2A2B2d2c2B2 | A3_Bc2B4
+B2 | G2F2G2A2G2F2 | G8z2
+
+X:156
+T: ES WAREN ZWEI KOENIGSKINDER
+N: E0084B
+O: Europa, Mitteleuropa, Deutschland, Niederrhein; Bergisches Land
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 6/8
+L: 1/16
+K: G
+_B2 | G2G2A2_B2A2B2 | G4_B2A4
+B2 | G2G2A2c2_B2A2 | G4F2G4
+GA | _B2B2B2c2c2c2 | d6c4
+d2 | _B2A2G2F2G2A2 | G8z2
+
+X:157
+T: ET WASSEN TWE KUENIGESKINNER
+N: E0084C
+O: Europa, Mitteleuropa, Deutschland, Muensterland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: F
+C2 | A2AAAGG2 | G3FF2
+C2 | B2BBBAcA | G4z2
+C2 | c2cccBBB | A3fcB
+AG | F2FFAGG2 | F4
+G3B | A2AAcBG2 | F4z2
+
+X:158
+T: ET WASSEN TWE KUENIGESKINNER
+N: E0084D
+O: Europa, Mitteleuropa, Deutschland, Paderborn
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: F
+C2 | CAAAAGG2 | GFF2z2
+C2 | CBBBBAcA | G4z2
+C2 | c2cccBBB | A3ccB
+AG | F2FFAGG2 | F4
+G3B | AfcAcBGA | F4z2
+
+X:159
+T: ES WAREN ZWEI KOENIGSKINDER
+N: E0084E
+O: Europa, Mitteleuropa, Deutschland, Lahn - Gegend, Kreis Limburg
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 6/8
+L: 1/16
+K: G
+D2 | B2G2G2G2A2B2 | B2A2z6
+A2 | A4A2d2d2c2 | B6z4
+GB | d2d2d2d2d2g2 | e8d2
+c2 | B2B2B2d4c2 | B6z4
+GB | d2d2d2d2d2g2 | e8d2
+c2 | B2B2B2d4c2 | B6z4
+
+X:160
+T: ES WAR EINMAL EINE KOENIGIN
+N: E0084F
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass, Bischweiler
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: G
+D2 | B3AG2F2 | A2E2z2
+A2 | A3AAGA2 | B4z2
+D2 | B3Bd3d | c2A2z2
+A2 | G3GB2A2 | G4z2
+
+X:161
+T: ICH STEH AUF EINEM HOHEN BERG
+N: E0089
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 6/8
+L: 1/8
+K: D
+A | D2E=F2G | A2AG2
+A | _B2AG=FG | A4z
+A | A_B=ccBA | A2GG2
+G | =FGAAGF | =F2EE2
+A | AG=FEDC | D4z
+
+X:162
+T: STUND ICH AUF HOHEN BERGEN
+N: E0089A
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 2/4
+L: 1/16
+K: D
+=FG | A3G=F2E2 | D2=FGA2
+A2 | _B2B2G2G2 | A4z2
+A2 | A3_B=c2A2 | G2=FGA2
+G2 | =F3GA2F2 | E2DE=F2
+A2 | d2=F2GAFE | D4
+A4 | d2=F2GAFE | D4z2
+
+X:163
+T: ICH STAND AUF HOHEM BERGE
+N: E0089B
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 2/4
+L: 1/16
+K: F
+FA | c3fc2B2 | A4G2
+G2 | A2A2B2d2 | c4z2
+c2 | f2f2edc2 | d4c4 | B4A2
+c2 | d2cBA2G2 | F4z2
+
+X:164
+T: ICH STAND AUF HOHEM BERGE
+N: E0089C
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 2/4
+L: 1/16
+K: F
+FA | c2cfcABG | A4G2
+G2 | A2AcB2Bd | c4z2
+c2 | f2f2edc2 | d4c4 | B4A2
+c2 | d2cBA2G2 | F4z2
+
+X:165
+T: ICH STAND AUF HOHEM BERGE
+N: E0089D
+O: Europa, Mitteleuropa, Deutschland, Norddeutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 2/4
+L: 1/16
+K: F
+FA | c3dc2B2 | A4G2
+G2 | A2f2e2d2 | c4z2
+c2 | f2f2edc2 | d4c4 | B4A2
+c2 | d2cBA2G2 | F4z2
+
+X:166
+T: ICH STAND AUF HOHEN BERGEN
+N: E0089E
+O: Europa, Mitteleuropa, Deutschland, Kreis Wetzlar; Neuwied
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 3/4
+L: 1/8
+K: F
+C2 | F2c2AF | G2B2
+cB | A2A2cA | G2z2
+GA | Bdd2cB | Acc2
+A2 | G2c2Bc | A2z2
+
+X:167
+T: ICH STAND AUF HOHEN BERGEN
+N: E0089F
+O: Europa, Mitteleuropa, Deutschland, Mosel, Veldenz; Gornhausen
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 6/8
+L: 1/16
+K: A
+E2 | C2E2A2C2E2c2 | c2B2z6
+E2 | E2G2B2d2c2B2 | A6z4
+Ac | e2e2e2e2d2c2 | d2B2z6
+E2 | E2G2B2d2c2B2 | A6z4
+
+X:168
+T: STAND ICH AUF HOHEM BERGE
+N: E0089G
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 2/4
+L: 1/16
+K: G
+D2 | B2G2d2B2 | B4A2
+A2 | B2G2d2B2 | A4z2
+Bc | d2d2d2de | d2B2G4
+c4e4 | d2B2G2
+d2 | d2c2A2F2 | G4z2
+
+X:169
+T: STAND ICH AUF HOHEM BERGE
+N: E0089H
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 2/4
+L: 1/16
+K: G
+D2 | B2G2d2B2 | B4A2
+A2 | B2G2d2B2 | A4z2
+Bc | d2d2d2de | d2B2G4
+c4e4 | d2B2G2
+B2 | d2B2A2AB | G4z2
+
+X:170
+T: ES REITEN DREI HERREN ZU MUENCHEN HINAUS
+N: E0092
+O: Europa, Mitteleuropa, Deutschland, Bayern, Regensburg
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: C
+G, | G,CB,A,G,A,B,C | D2CB,C2z
+G, | G,CB,A,G,A,B,C | D2CB,C2z
+G, | G,CC2C2C2 | G,DD2z2
+B,2 | B,CC2z3
+
+X:171
+T: ES WAR EINAML EIN FEINER KNAB
+N: E0093
+O: Europa, Mitteleuropa, Deutschland, Franken; Niederrhein; Odenwald
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: F
+C2F2A2 | c4A2c2d2c2 | B4A2
+c2c2A2 | A4G2A2cBG2 | G4F2
+
+X:172
+T: ES WAR EINMAL EIN FEINER KNAB
+N: E0093A
+O: Europa, Mitteleuropa, Deutschland, Bergisches Land
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: F
+FA | c2f2d2B2 | c2E2F2
+FA | d2c2c2AF | c2A2G2
+GA | B3cA2GF | f2d2c3
+c | e3ef2d2 | c2E2F2
+
+X:173
+T: ES WAR EINMAL EIN JUNGER KNAB
+N: E0093B
+O: Europa, Mitteleuropa, Italien, Tirol, Meran
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: F
+F2F2A2 | c6d2B2c2 | A4z2
+F2F2A2 | c6d2B2c2 | A4z2
+F2F2F2 | d4B2B2f2d2 | c6
+A2A2A2 | G4c2c2B2cB | A4z2
+
+X:174
+T: ES WAR EINMAL EIN BRAVER HUSAR
+N: E0093C
+O: Europa, Mitteleuropa, Deutschland, Oberlahnkreis; Kreis Wetzlar
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: Eb
+E2E2c2 | B4G2B2c2c2 | B4G2
+e2B2G2 | G4F2B2B3A | A4G2
+E2E2c2 | B4G2B2c2c2 | B4G2
+e2B2G2 | G4F2B2B3A | G4z2
+
+X:175
+T: ES WAR EINMAL EIN BRAVER HUSAR
+N: E0093D
+O: Europa, Mitteleuropa, Deutschland, Kreis Hofgeismar
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: G
+D2 | G3GG6A2 | B2B2B6
+B2 | A2e2d6A2 | A2c2B4z2
+G2 | G2e2e4d2c2 | B2ded6
+B2 | A2e2d6A2 | c2d2B4z2
+G2 | G2e2e4d2c2 | B2ded6
+B2 | A2e2d6A2 | c2d2B4z2
+
+X:176
+T: WACH AUF WACH AUF MEIN SCHATZ ALLEIN
+N: E0093E
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: F
+C2C2F2 | F4A4G2GA | F4z2
+C2F2A2 | c4A4G2^F2 | G4z2
+G2G2AB | c4C2C2F2A2 | A4G2
+C2B2A2 | G4F4C2E2 | F4z2
+
+X:177
+T: ZWEI LIEBTEN SICH AUS REINEM SINN
+N: E0093F
+O: Europa, Mitteleuropa, Deutschland, Kreis Wetzlar; Dillkreis
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: G
+D2G2A2 | B6B2A2G2 | d6
+D2D2F2 | A4e4d2c2 | B4z2
+d2d2d2 | c3BA2d2d2d2 | B3AG2
+B2B2B2 | A4e4d2c2 | B4z2
+
+X:178
+T: ZWEI LIEBTEN SICH AUS REINEM SINN
+N: E0093G
+O: Europa, Mitteleuropa, Deutschland, Oberlahnkreis; Westerwald
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: G
+D2E2F2 | G4B4A2GB | A4z2
+G2F2G2 | A4e4d2dc | B4z2
+d2d2d2 | c3BA2d2d2c2 | B3AG2
+G2F2G2 | A4e4d2dc | B4z2
+
+X:179
+T: ES WOLLT EIN MAEGDLEIN SEHR FRUEH AUFSTEHN
+N: E0096
+O: Europa, Mitteleuropa, Deutschland, Brandenburg; Sachsen; Odenwald
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: F
+C2F2G2 | A2G2F2c2dcBA | G4z2
+C2F2G2 | A2G2F2c2dcBA | G4z2
+cBA2c2 | c2BAB2BAG2B2 | B2AGA2
+cBA2G2 | F3GA2cBA2G2 | F4z2
+cBA2c2 | c2BAB2BAG2B2 | B2AGA2
+cBA2G2 | F3GA2cBA2G2 | F4z2
+
+X:180
+T: ES WOLLT EIN MAEGDLEIN SEHR FRUEH AUFSTEHN
+N: E0096A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: F
+C2F2A2 | G2AGF2AccBBA | G4z2
+cBA2c2 | cBBAB2BAG2B2 | BAAGA2
+cBA2G2 | F4z2
+cBA2c2 | cBBAB2BAG2B2 | BAAGA2
+cBA2G2 | F4z2
+
+X:181
+T: ICH WOLLT EINMAL RECHT FRUEH AUFSTEHN
+N: E0096B
+O: Europa, Mitteleuropa, Deutschland, Thueringen; Sachsen
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: F
+C2F2GB | A2G2F2c2dcBA | G4z2
+cBA2c2 | c2BAB2BAG2B2 | B2AGA2
+cBA2G2 | F4z2cBA2G2 | F4z2
+cBA2c2 | c2BAB2BAG2B2 | B2AGA2
+cBA2G2 | F4z2cBA2G2 | F4z2
+
+X:182
+T: ICH WOLLT EINMAL RECHT FRUEH AUFSTEHN
+N: E0096C
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Hainau; Fraustadt
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: G
+D2G2BA | G2D2B,2B2cBAG | A4z2
+D2G2BA | G2D2B,2B2cBAG | A4z2
+dcB2d2 | d2cBc2
+cBA2c2 | c2BAB2
+dcB2A2 | G3AB2
+dcB2A2 | G4z2
+
+X:183
+T: ES WOLLTE EIN MAEDCHEN IN DER FRUH AUFSTEHN
+N: E0096D
+O: Europa, Mitteleuropa, Deutschland, Odenwald; Bergstrasse
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/8
+K: F
+C2 | F2A2G2 | F2F2
+cd | c3BA2 | G4z2
+c2c2c2 | A3Bc2
+dcB2BA | G3AB2
+cBA2G2 | F4z2
+c2c2c2 | A3Bc2
+dcB2BA | G3AB2
+cBA2G2 | F4
+
+X:184
+T: ES WOLLTE EIN MAEDCHEN IN DER FRUEH AUFSTEHN
+N: E0096E
+O: Europa, Mitteleuropa, Deutschland, Taunus; Rheinland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/8
+K: F
+C2 | A2A2G2 | F2F2
+dd | c3BA2 | G4z2
+c2c2c2 | A3Bc2
+dcBAGF | G3AB2
+c2A2G2 | F4z2
+c2c2c2 | A3Bc2
+dcBAGF | G3AB2
+c2A2G2 | F4
+
+X:185
+T: ES WOLLTE EIN MAEDCHEN WOHL FRUEH AUFSTEHN
+N: E0096F
+O: Europa, Mitteleuropa, Deutschland, Lahngegend; Dillkreis
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/8
+K: G
+D2 | G2BAG2 | A3Bc
+e | d3cB2 | A4
+D2 | G2BAG2 | A3Bc
+e | d3cB2 | A4z2
+d2d2dc | B3cd2
+edc2B2 | A3Bc
+e | dcB2A2 | G4z2
+d2d2dc | B3cd2
+edc2B2 | A3Bc
+e | dcB2A2 | G4
+
+X:186
+T: ES WOLLT EIN JAEGER FRUEH AUFSTEHN
+N: E0096G
+O: Europa, Mitteleuropa, Deutschland, Uckermark
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: F
+C2F2A2 | c4f4dcB2 | A4z2
+c2c2c2 | c2BAB2
+GAB2B2 | B2AGA2
+A2cBG2 | F4z2
+
+X:187
+T: ES WAR EINE SCHOENE JUEDIN
+N: E0098
+O: Europa, Mitteleuropa, Deutschland, Oberrhein
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 4/4
+L: 1/8
+K: D
+D2 | D2FGA2EG | F2E2D2
+A2 | AdcBc2B2 | A4z2
+A2 | A2A2d2B2 | A4F2
+FG | A2A2d2B2 | A4F2
+BA | G3FG2A2 | F4z2
+A2 | A2A2d2B2 | A4F2
+FG | A2A2d2B2 | A4F2
+BA | G3FG2A2 | F4z2
+
+X:188
+T: ES WAR EINE STOLZE JUEDIN
+N: E0098A
+O: Europa, Mitteleuropa, Deutschland, Frankfurt; Bergstrasse; Baden
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 3/4
+L: 1/16
+K: D
+D2 | D2F2A4E4 | F2E2D4z2
+d2 | c2B2c4B4 | A8z2
+A2 | d2A2A2F2 | B4B2
+B2 | B2B2d2B2 | A4F4
+A4 | BAGFG4A4 | F8z2
+
+X:189
+T: ES WAR EINMAL EINE JUEDIN
+N: E0098B
+O: Europa, Mitteleuropa, Deutschland, Uckermark, Granzow
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 3/8
+L: 1/16
+K: F
+C2 | F4F2 | G3BAG | A2F2
+f2 | e3dc2 | d4=B2 | c4
+c2 | f2f2c2 | d3efd | c2A2
+c2 | f4cd | c3BGB | A2F2z2
+A2A2d2 | c2B2G2 | F4
+
+X:190
+T: ES WAR EINE STOLZE JUEDIN
+N: E0098C
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 3/4
+L: 1/8
+K: F
+C | FGA2B2 | c2c2z
+f | edc2=B2 | c4z
+c | fAc2de | f2c2z
+c | def2ed | c2A2z
+c | dBA2G2 | F4z
+
+X:191
+T: ES WAR EINE STOLZE JUEDIN
+N: E0098D
+O: Europa, Mitteleuropa, Deutschland, Hildburghausen
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 4/4
+L: 1/8
+K: F
+C2 | F2A2c2G2 | A2GFF2
+f2 | e3de2d2 | c4z2
+c2 | c2A2c2f2 | d4d2
+d2 | d2d2fed2 | c4A2
+c2 | c2A2B2c2 | A4z2
+
+X:192
+T: ES WAR EINE REICHE JUEDIN
+N: E0098E
+O: Europa, Mitteleuropa, Deutschland, Oberlahnkreis
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 6/8
+L: 1/16
+K: D
+D2 | F4A2E4G2 | FED2z6
+A2 | d3cB2c4B2 | A6z4
+F2 | A4A2d4dd | B6B4
+B2 | A2G2F2A2B2G2 | A4d2d4
+d2 | c2c2B2c4B2 | A6z4
+
+X:193
+T: ES WAR EINE REICHE JUEDIN
+N: E0098F
+O: Europa, Mitteleuropa, Deutschland, Kreis Limburg; Kreis Wetzlar
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid
+M: 6/8
+L: 1/8
+K: G
+D | B2AG2E | EDz3
+D | G2GB2G | A3z2
+D | B2Bd2d | c3E2
+E | D2GB2A | G3z2
+
+X:194
+T: MAN LEGT DEN BRANDENBURGER AUF EIN TISCH
+N: E0100
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: Bb
+G2G2G2 | B2d2d2c2 | B4z2
+B2 | B2AGF2B2 | A4G4 | F4z2
+F2 | F2EDF2B2 | G3FG2
+B2 | c2BAG2F2 | E4D2z2 | z2
+
+X:195
+T: SIE LEGTEN IHN AUF EINEN TISCH
+N: E0100B
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 6/8
+L: 1/16
+K: G
+d2 | _B4A2G4=F2 | G4A2_B4
+d2 | _B4A2G4=F2 | G4A2_B4
+Bc | d2d2d2d2_e2d2 | d6c4
+A_B | c4c2c2d2c2 | c6_B4
+BA | G4dc_B3cAB | G4z6
+
+X:196
+T: HANS SATTLE MIR DEN GAUL
+N: E0102
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod, Verrat
+M: 2/4
+L: 1/16
+K: C
+C4 | C2G,2A,2G,2 | C6
+E2 | D2C2B,2D2 | G,4z2
+C2 | C2G,2A,2E,F, | G,4E,2
+G,2 | C2G,2E,2D,2 | C,4
+
+X:197
+T: GRAF FRIEDRICH WOLLT AUSREITEN
+N: E0107
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: Bb
+F2 | B2F2GABG | F3ED2
+F2 | B2F2GABG | F3ED2
+B2 | c2A2F2F2 | e3cd2
+B2 | c2A2F2B2 | dccAB2
+B2 | c2A2F2F2 | e3cd2
+B2 | c2A2F2B2 | dccAB2
+
+X:198
+T: GRAF FRIEDRICH WOLLT AUSREITEN
+N: E0107A
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Hainau, Conradsdorf
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/8
+K: F
+C2 | FGA2A2 | G2F2z
+F | ABc2c2 | B2A
+AAA | c2BGGG | B2A
+FFG | A2c2GG | F4
+
+X:199
+T: ES THAET EIN KOENIG AUSREITEN
+N: E0107B
+O: Europa, Mitteleuropa, Deutschland, Altmark
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/8
+L: 1/8
+K: G
+D | G2G | GFG | AGz | z2
+D | G2G | GFG | AGz | z2
+B | d2A | cBA | GBB | A2
+A | DDF | D2F | AGF | G2
+
+X:200
+T: DIE GASSEN SEIN SO ENGE
+N: E0107C
+O: Europa, Mitteleuropa, Deutschland, Insel Ruegen
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 6/8
+L: 1/8
+K: G
+D | DGGFcA | FDz3
+D | DGGFcA | FDz3
+D | B2GB2G | c2BA2
+B | GFEDGG | AGFG2
+
+X:201
+T: WAS SIND DIE GASSEN SO ENGE
+N: E0107D
+O: Europa, Mitteleuropa, Deutschland, Kreis Wetzlar, Burgsolms
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 6/8
+L: 1/16
+K: C
+CE | G4G2G2F2D2 | G6E2z2
+CE | G4G2G2F2D2 | G6E2z2
+C2 | A4A2G2A2B2 | c2B2A2G4
+c2 | G2A2G2F2E2D2 | A2G2F2E4
+
+X:202
+T: MEISTER MUELLER THUT MAL SEHEN
+N: E0108
+O: Europa, Mitteleuropa, Deutschland, Odenwald; Thueringen; Franken
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: F
+FG | A2A2AcBA | A2G2z2
+GA | B2B2BdcB | B2A2z2
+AB | c2ABcfed | d2c2z
+ccd | c3dcBEG | G2F2z2
+AB | c2ABcfed | d2c2z
+ccd | c3dcBEG | G2F2z2
+
+X:203
+T: MEISTER MUELLER THUT MAL SEHEN
+N: E0108A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: F
+CC | F2F2FAcA | A2G2z2
+GA | B2B2BdcB | B2A2z2
+AB | c2ABcfed | d2c2z
+ccd | c3dcBEG | G2F2z2
+AB | c2ABcfed | d2c2z
+ccd | c3dcBEG | G2F2z2
+
+X:204
+T: MEISTER MUELLER THUT MAL SEHEN
+N: E0108B
+O: Europa, Mitteleuropa, Deutschland, Marburg
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: F
+FG | A2A2A2GA | B2G2z2
+GA | B2B2BdcB | c2A2z2
+FA | c3cccff | d4z
+fed | c2Acc2Bc | A4z2
+
+X:205
+T: DA DRUNTEN IN DEM TIEFEN THALE
+N: E0108C
+O: Europa, Mitteleuropa, Deutschland, Lahngegend; Taunus
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: Eb
+EF | G2G2GBAG | GFF2z2
+FG | A2A2AcBA | AGG2z2
+GA | B2GAB2cd | e2dcc2B2
+B2cde2dc | B2ABG2
+GA | B2GAB2cd | e2dcc2B2
+B2cde2dc | B2ABG2
+
+X:206
+T: ACH MUTTER GIEB MIR KEINEN MANN
+N: E0109
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: Eb
+E2 | E2F2G2B2- | BAG2F2F2 | E4z2
+E2 | B2c2d2B2 | e4c4 | B4z4 | z2
+B2B2e2 | d3cB2c2 | B3AG4 | z2
+c2B3A | G2E2F2B2- | BAG2F2F2 | E4z2
+
+X:207
+T: ES FREIT EINE JUNGE MARKGRAEFIN
+N: E0109A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: F
+FA | c2c2c2dc | cBB2z2
+cB | A2A2AGF2 | G3AG2
+AG | F2A2cAF2 | G4F2
+
+X:208
+T: ES HATT EIN BAUER EIN TOECHTERLEIN
+N: E0109B
+O: Europa, Mitteleuropa, Deutschland, Mittel - Franken
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/8
+L: 1/8
+K: F
+C | F2F | AFA | c2c | A2
+d | c2A | GAB | c2c | A2
+
+X:209
+T: ET QUAM SICK EN HEF[ERK1EN UT DANIA
+N: E0109C
+O: 0109C 08  F 3/4
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/8
+K: C
+G,2 | C2C2D2 | E2E2G2 | E2D2E2 | C4
+EF | G2G2A2 | G2G2B2 | c2A2B2 | c4
+G,2 | C2C2D2 | E2E2G2 | E2D2E2 | C4
+EF | G2G2A2 | G2G2B2 | c2A2B2 | c4
+EF | G2G2F2 | E2D2E2 | C2B,2C2 | D4
+EF | G2G2F2 | E2D2E2 | G,2A,2B,2 | C4
+
+X:210
+T: ES SPIELT EIN GRAF MIT EINER MAGD
+N: E0110
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: G
+d2 | d2c2d2_e2 | =f2g2d3
+f | _e2d2c2_B2 | c4d3
+c | c2c2d2c2 | _B2A2G2
+A2 | _B2c2d2B2 | A4G2
+
+X:211
+T: ES SPIELT EIN RITTER MIT EINER MAGD
+N: E0110B
+O: Europa, Mitteleuropa, Deutschland, Brandenburg; Schlesien; Sachsen
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B2F2D2F2 | B2B2B2
+d2 | c3AB2G2 | G2F2F2
+FF | G2G2G2GG | F2F2F2
+F2 | B2B2d2B2 | c4B2
+
+X:212
+T: ES SPIELTE EIN RITTER MIT EINER MAGD
+N: E0110C
+O: Europa, Mitteleuropa, Deutschland, Liegnitz
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 6/8
+L: 1/16
+K: Bb
+F2 | B2A2G2F2D2F2 | B2A2G2F4
+F2 | B4B2c3Bc2 | B4d2c4d2 | F4A2B4
+
+X:213
+T: ES SPIELT EIN GRAF MIT EINER MAGD
+N: E0110D
+O: Europa, Mitteleuropa, Deutschland, Wetterau
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/8
+K: G
+D | GAB3A | _Bcd3
+B | cde2d2 | c2_B2z
+G | BdA3c | _BdG3
+A | Bcd2B2 | A2G2z
+
+X:214
+T: ES SPIELT EIN HERR MIT SEINER MAGD
+N: E0110E
+O: Europa, Mitteleuropa, Deutschland; Oesterreich, Boehmen
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 2/4
+L: 1/16
+K: Bb
+Bc | d2B2B2d2 | c2A2A2
+c2 | G2A2cBAG | G4F2
+FF | G2E2E2GG | F2D2D2
+F2 | G2A2c2A2 | c4B2
+
+X:215
+T: ES SPIELTE EIN RITTER MIT EINER MADAM
+N: E0110F
+O: Europa, Mitteleuropa, Deutschland, Ober - Westerwald; Unter - Taunus
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 6/8
+L: 1/8
+K: Eb
+B, | EEGB2c | B2GE2
+B | e2edcB | c3B2
+B | cccedc | B2AGG
+c | B2FA2A | A2BG2
+
+X:216
+T: ES SPIELT EIN MARKGRAF MIT EINER SCHOENEN DAM
+N: E0110G
+O: Europa, Mitteleuropa, Deutschland, Magdeburg
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: F
+F2 | A2A2AGG2 | F2A2c2
+A2 | c2c2c2f2 | A2G2B2
+G2 | F2F2A2B2 | c2A2F2
+
+X:217
+T: ES RITT EIN REITER FRISCH WOHLGEMUTH
+N: E0110H
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 6/8
+L: 1/16
+K: F
+F2 | A3BA2F2A2c2 | f4d2c4
+A2 | G4A2B4c2 | A4G2F4
+A2 | G4A2B4c2 | A4G2F4
+
+X:218
+T: ES RITT EIN RITTER SEHR WOHLGEMUTH
+N: E0110I
+O: Europa, Mitteleuropa, Deutschland, Altmark
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 4/4
+L: 1/8
+K: G
+D2 | G2D2B2AG | FAABA2
+DF | A2AAd2cA | BGG2G2
+BG | E2EEG2FE | E2D2D2
+c2 | B2cAG2F2 | AGG2G2
+
+X:219
+T: IN DES GARTENS DUNKLER LAUBE
+N: E0112
+O: Europa, Mitteleuropa, Deutschland, Niederlausitz
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/8
+K: G
+GB | d2d2BG | GFF2
+Dc | c2c2dc | c2B2
+Gg | g2g2fe | edd2
+GB | dcedcF | A2G2
+
+X:220
+T: IN DES GARTENS DUNKLER LAUBE
+N: E0112A
+O: Europa, Mitteleuropa, Deutschland, Taunus, Niederreifenberg
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: Bb
+F2E2 | D2F2B4D2D2 | D2F2F4
+E2D2 | E2G2G4F3E | D4z4
+F2F2 | F2A2c2e2d2c2 | B2F2F4
+F2F2 | G4c4A3A | B4z4
+
+X:221
+T: IN DES GARTENS DUNKLER LAUBE
+N: E0112B
+O: Europa, Mitteleuropa, Deutschland, Lahn - Gebiet
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/8
+K: Bb
+FE | DFB2FE | DFB2
+BB | A3GFE | D4
+DD | Feeedc | cBB2
+BB | AGd2c2 | B4
+
+X:222
+T: IN DES GARTENS DUNKLER LAUBE
+N: E0112C
+O: Europa, Mitteleuropa, Deutschland, Wetterau
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/8
+K: Bb
+DE | FBB2DE | FBB2
+dd | c3FGF | D2z2
+FF | edcBAG | G2F2
+FA | Bdf2ec | B2z2
+FF | edcBAG | G2F2
+FA | Bdf2ec | B2z2
+
+X:223
+T: IN DES GARTENS DUNKLER LAUBE
+N: E0112D
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: erzaehlendes Volks - Lied, Sage, Liebe, Leid, Tod
+M: 3/4
+L: 1/16
+K: Bb
+F3G | F2B2B4D3D | D2F2F4
+E2D2 | E2G2B4A3c | B4z4
+F2F2 | e4c4f3e | d4B4
+F2F2 | G2c2c4A3c | B4z4
+
+X:224
+T: NUN SCHUERZ DICH GRETLEIN
+N: E0113
+O: Europa, Mitteleuropa, Deutschland, Sueddeutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 3/4
+L: 1/8
+K: F
+c2 | c4c2- | c2B2A2 | F4G2 | F4
+F2 | c4c2- | c2B2A2 | G3AB2 | A4
+G2 | F2F2E2C2 | D4E2 | F4
+A2 | G4F2 | E2D4 | C6- | C2z2
+c2 | c4B2 | A2G4 | F6- | F2z2
+
+X:225
+T: NUN SCHUERZ DICH GRETLEIN
+N: E0113A
+O: Europa, Mitteleuropa, Deutschland, Norddeutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 4/4
+L: 1/8
+K: G
+d2 | d2d2B2B2 | c4A2
+A2 | B2B2G3G | A4z2
+A2 | B2c2d2B2 | c4B2
+B2 | d2d2cde2 | d4B2
+d2 | e3dd2d2 | B6
+
+X:226
+T: SCHUERZ DICH GRETLE
+N: E0113B
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 4/4
+L: 1/4
+K: F
+ | ccAF | c2c
+A | GFFE | F2z2
+
+X:227
+T: AUF ERDEN ZU ALLER STUND
+N: E0114
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 4/4
+L: 1/8
+K: G
+D2 | G4F2G2 | A4G2
+A2 | B2d2c2B2 | A4z2
+GA | B2B2B2AB | c3dc2
+cB | A2A2A2Bc | d3ed2
+d2 | G6B2 | A6GA | B2B2dcA2 | G4z2
+
+X:228
+T: AUF ERDEN ALLEZEIT
+N: E0114A
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G4B2G2 | A4c2
+A2 | B2B2d2B2 | A4z2
+GA | B2B2B2AB | c3dc2
+cB | A2A2A2Bc | d3ed2
+G2 | G4F2A2 | A4G2
+B2 | B2B2c2A2 | G4z2
+
+X:229
+T: ICH STAND AUF HOHEM BERGE
+N: E0115
+O: Europa, Mitteleuropa, Deutschland, Lahnkreis; Dillkreis; Rheinland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 3/4
+L: 1/8
+K: G
+G2 | G2D2BB | B2G2
+d2 | e2d2cc | B4
+GG | e2eege | edd2
+dg | e2d2cc | B4
+
+X:230
+T: ICH STAND AUF HOHEM BERGE
+N: E0115A
+O: Europa, Mitteleuropa, Deutschland, Bergisches Land, Langenberg
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 3/4
+L: 1/8
+K: G
+D2 | G3ABB | BAA2
+BA | G3GBB | A4
+Bd | d2B2Bd | d2B2
+Bd | c3Add | B4
+
+X:231
+T: EIN MEIDLIN AN DEM BODEN LAG
+N: E0116
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 6/4
+L: 1/8
+K: G
+G2 | G4A2B4c2 | B4A2G4
+G2 | d4A2d4^c2 | d8z2
+d2 | c4A2B4c2 | d6c4
+BA | G4G2A3Bc2 | d6
+d2c2BA | G2ABcde2d3B | c2A4G4
+
+X:232
+T: BRAUNS MAEDCHEN AN DEM LADEN LAG
+N: E0116A
+O: Europa, Mitteleuropa, Luxemburg
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 4/4
+L: 1/8
+K: G
+D2 | G3FG2AB | G3FG2
+c2 | B2ABG2B2 | A4z2
+AB | c3BABcA | B3GA2z2
+B2AGFEDE | F2c2BAGA | B6
+
+X:233
+T: ES WOLLT EIN MAEGDLEIN WASSER HOLN
+N: E0117
+O: Europa, Mitteleuropa, Deutschland, Brandenburg; Schlesien; Sachsen
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 2/4
+L: 1/16
+K: C
+G,2 | C2G,2E,2G,2 | C3CC2
+E2 | D3CB,2A,2 | A,2G,2G,2z2
+E,2F,2G,2z2 | E,2F,2G,2
+G,2 | C2C2D2D2 | G,2A,B,C2
+
+X:234
+T: ES WOLLT  EIN MAEGDLEIN WASSER HOLN
+N: E0117A
+O: Europa, Mitteleuropa, Deutschland, Vogelsberg, Rabenau
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 2/4
+L: 1/16
+K: A
+E2 | A3EC2E2 | A3AA2
+c2 | B3cB2A2 | G2F2E2
+e2 | d3fB2d2 | c3eA2
+c2 | B3Bd2B2 | B2A2A2
+e2 | d3fB2d2 | c3eA2
+c2 | B3Bd2B2 | B2A2A2
+
+X:235
+T: ES WOLLT EIN MAEDCHEN WASSER HOLN
+N: E0117B
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 6/8
+L: 1/16
+K: F
+C2 | F4A2A2G2F2 | E4G2B4
+G2 | A4c2c3BA2 | A6G4
+FA | c4A2c4f2 | c4B2A4
+B2 | A4F2c3BA2 | G6F4
+
+X:236
+T: ES WAR EIN WACKER MAEGDLEIN
+N: E0118
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 3/4
+L: 1/8
+K: A
+A2 | A4A2 | e4d2 | e4=c2 | B4
+B2 | e4d2 | =c4B2 | A4=c2 | B4
+B2 | A2G2A2 | E4
+B2 | =c4c2 | A4B2 | =c3de2 | e4
+d2 | =c2e2d2 | =c2B4 | A6 | A2z2
+
+X:237
+T: ES HAETT EIN SCHWAB EIN TOECHTERLEIN
+N: E0119
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 4/4
+L: 1/8
+K: C
+G2 | _A2A2_B2B2 | c2c2G2z
+G | c3cc2G2 | c4_B2
+G2 | _A2A2G2G2 | F2F2C2z
+C | _E3FG2_A2 | _B2G2B2_AG | F4_E2z2
+G3_A_B2G2 | F2_E2C2D2 | C4z2
+
+X:238
+T: ES HATT EIN SCHWAB EIN TOECHTERLEIN
+N: E0119A
+O: Europa, Mitteleuropa, Deutschland, Torgau
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 6/8
+L: 1/8
+K: G
+D | G2GF2F | G2DD2
+D | E2FG2E | E2DD2
+D | D2cc2D | D2BB2
+G | F2GA2F | A2GG2
+D | D2cc2D | D2BB2
+G | F2GA2F | A2GG2
+
+X:239
+T: ES HATT EIN BAUR EIN TOECHTERLEIN
+N: E0119B
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 3/4
+L: 1/8
+K: F
+C | CFFAcA | AGG2z
+G | GAB2c2 | BAA2z
+F | FFd3c | Bdc2z
+B | AFcBA2 | G2F2z
+
+X:240
+T: ES WAR EIN REICHER SCHLAECHTERSMANN
+N: E0120
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 4/4
+L: 1/8
+K: A
+AB | =cdcBA2Bc | ded=cB2
+d2 | e2e2A2d2 | =c2B2A2
+A2 | e3de2=f2 | d3=cd2
+e2 | =c3BA2d2 | =c2B2A2
+A2 | e3de2=f2 | d3=cd2
+e2 | =c3BA2d2 | =c2B2A2
+
+X:241
+T: ES WOLLT EIN MAEDL WOL FRUEH AUFSTEHN
+N: E0121
+O: Europa, Mitteleuropa, Oesterreich
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2GABG | A2F2D2
+D2 | G2G2A2d2 | B4z2
+GA | B2G2B2G2 | c2B2A4
+F2A2D2c2 | B2A2G2
+D2 | B2B2A2A2 | G4z2
+
+X:242
+T: ES WOLLT EIN MAEDCHEN FRUEH AUFSTEHN
+N: E0121A
+O: Europa, Mitteleuropa, Deutschland, Pommern
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 2/4
+L: 1/16
+K: F
+C2 | F2AFC2C2 | D2FDC2
+C2 | D2D2B2E2 | F4G2
+G2 | A2A2B2E2 | F4z2
+C2 | A2F2A2c2 | B2A2G4
+G2F2G2B2 | A2G2F2
+G2 | A2A2B2E2 | F4z2
+
+X:243
+T: ES WOLLT EIN MAEDCHEN FRUEH AUFSTEHN
+N: E0121B
+O: Europa, Mitteleuropa, Deutschland, Schleswig
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2E2D2 | D2C2C2
+C2 | D2D2E2GG | F4z2
+C2 | C2F2A2c2 | c2B2G2z2
+CCE2GGB2 | B2A2F2
+A2 | A2G2D2E2 | F4z2
+
+X:244
+T: ES WOLLT EIN MAEGDLEIN FRUEH AUFSTEHN
+N: E0121C
+O: Europa, Mitteleuropa, Deutschland, Kleve; Bayern
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2F2A2 | G2FED2
+D2 | G2G2A2d2 | B4z2
+G2 | B3AB2Bd | c2B2A4
+A2A2A2d2 | B2A2G2
+A2 | B2B2A2A2 | G4z2
+
+X:245
+T: DOA SAU EN JONGE MOAD FREUG OPSTOAN
+N: E0122
+O: Europa, Mitteleuropa, Deutschland, Niederrhein, Niederkruechten
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 4/4
+L: 1/8
+K: D
+=C2 | =F2F2AGFG | A2AG=F2
+A_B | =c2A2=FEFG | A2AG=F2
+F2 | =F4G2 | A2=F2G2 | =F2E2F2 | D4
+=F2 | =F4G2 | A2=F2G2 | =F2E2F2 | D4
+
+X:246
+T: ES WOLLT EIN JUNGMAGD FRUEH AUFSTEHN
+N: E0122A
+O: Europa, Mitteleuropa, Deutschland, Niederrhein, Lobberich
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 4/4
+L: 1/8
+K: D
+=C2 | =F2F2AGFG | A2AG=F2
+A2 | _B2A2AG=FG | A2AG=F2
+=C2 | =F3GA2FA | G=FE2D2
+=C2 | =F3GA2FA | G=FE2D2
+
+X:247
+T: ES WOLLTE EIN MAEDCHEN DIE LAEMMLEIN HUETEN
+N: E0126
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 6/8
+L: 1/16
+K: F
+C2 | F2C2F2A2F2A2 | c2d2c2A2F2
+FA | c8G2B2 | A4z6
+C2 | F2C2F2A2F2A2 | c2d2c2A2F2
+FA | c8G2B2 | A4z6
+A2 | A2G2G2G2F2F2 | A2B2A2G4
+GA | B2B2B2B2c2d2 | d2c2c2A4
+cf | f2c2c2c2B2A2 | B8G2c2 | A4z6
+
+X:248
+T: ES HUETT SICH EIN MAEDEL DIE LAEMMELEIN
+N: E0126A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 6/8
+L: 1/16
+K: F
+C2 | F2F2F2A2F2A2 | c4c2A4c2 | B4G2A4
+C2 | F2F2F2A2F2A2 | c4c2A4c2 | B4G2A4
+A2 | B2B2B2G2G2G2 | c4c2A4
+A2 | B2B2B2G2G2G2 | c4c2A4
+c2 | f3cc2A2F2c2 | B4G2A4
+
+X:249
+T: ES WOLLT EIN MAEDCHEN DIE LAEMMELEIN HUETEN
+N: E0126B
+O: Europa, Mitteleuropa, Deutschland, Unter - Lahnkreis, Kreis Limburg
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, betrogene Liebe
+M: 6/8
+L: 1/8
+K: A
+A | e2ee2f | e2ec2
+e | d3e2d | c3z2
+A | e2ee2f | e2ec2
+e | d3e2d | c3z2
+A | fffagf | feee2
+e | dddfed | dccc2
+e | eeedde | c4z
+
+X:250
+T: WAR EINST EIN JUNG ZIMMERGESELL
+N: E0129
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe; Handwerk
+M: 6/8
+L: 1/16
+K: F
+C2 | F4F2A2G2F2 | G3GG2B2A2
+G2 | D4D2F2E2D2 | A8z2
+c2 | c4B2d2d2B2 | B2B2A2c4
+A2 | A2A2G2A4B2 | c8z2
+c2 | c4c2d2d2B2 | B4A2c4
+A2 | A4G2B4A2 | F8z2
+
+X:251
+T: WAR EINST EIN JUNG ZIMMERGESELL
+N: E0129A
+O: Europa, Mitteleuropa, Deutschland, Taunus, Wuerges
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe; Handwerk
+M: 6/8
+L: 1/16
+K: F
+C2 | F4F2A2G2F2 | G3GG2B2A2
+G2 | A3Bc2c2B2A2 | G6z4
+d2 | d4B2B2c2d2 | c4A2A4
+c2 | c2d2c2B2A2G2 | c6-c4
+d2 | d4B2B2c2d2 | c4A2A4
+c2 | c2d2c2B2A2G2 | F6z4
+
+X:252
+T: ES WAR EIN BRAVER JUNG FISCHERGESELL
+N: E0129B
+O: Europa, Mitteleuropa, Deutschland, Oderberg, Hohen - Saathen
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe; Handwerk
+M: 6/8
+L: 1/16
+K: A
+E2 | e4d2=c3dB2 | A3BA2=GFE2
+E2 | A4B2=c2e2dc | B6z4
+B2 | e3ed2d3=cB2 | =c4d2e4
+d2 | e3=fe2e3dB2 | A6z4
+
+X:253
+T: ES FUHR EIN ARMER BINDER
+N: E0130
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe; Handwerk
+M: 4/4
+L: 1/8
+K: G
+Bc | d2d2e2e2 | d3cB2
+d2 | c2B2A2A2 | G4z2
+G2 | A2A2B2B2 | c4A2
+d2 | G2G2F2G2 | A4
+B4 | c2d2B2A2 | G6
+
+X:254
+T: ES REISTE WOL EIN FASSBINDER
+N: E0130A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe; Handwerk
+M: 4/4
+L: 1/8
+K: G
+D2 | G2GGG2A2 | B2A2G2
+AB | c2c2B2AG | A2F2D2
+D2 | A2AAA2c2 | B2A2G2
+AB | c2c2B2AG | A2F2D2z
+D | G2DGB2GB | d4
+c4 | B2ABA2A2 | G4z2
+
+X:255
+T: ES GIENG EIN KNAB SPAZIEREN
+N: E0131
+O: Europa, Mitteleuropa, Deutschland, Siegen
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied; Vergewaltigung
+M: 2/4
+L: 1/16
+K: F
+C2 | F2A2c2d2 | c3BA2
+cd | c2B2G2c2 | A4z2
+cd | c2B2G2E2 | F3Ac2
+c2 | d2defed2 | c4
+B4 | A2F2G2AG | F4z2
+
+X:256
+T: ES GIENG EIN KNAB SPAZIEREN
+N: E0131A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Vergewaltigung
+M: 4/4
+L: 1/8
+K: Bb
+F2 | B2AGF2B2 | c4B2
+B2 | d3cB2d2 | c4z2
+Bc | d2d2d2ed | c3Bc2
+dc | B2B2cBAG | F4
+B4 | D2D2F2F2 | B4
+c3e | d2B2cBA2 | B4z2
+
+X:257
+T: ES GIENG EIN KNAB SPAZIEREN
+N: E0131B
+O: Europa, Mitteleuropa, Deutschland, Wuerttemberg
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Vergewaltigung
+M: 4/4
+L: 1/8
+K: G
+D2 | G2B2G2B2 | d2cBA2
+d2 | edcBA2A2 | B4z2
+AA | AAAAc2BA | B3cd2
+d2 | e2e2gfee | d4z2
+dc | B2B2d2dc | B4z2
+
+X:258
+T: ES MARSCHIERTEN DREI REGIMENTER
+N: E0132
+O: Europa, Mitteleuropa, Deutschland, Bergisches Land; Kleve
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Vergewaltigung
+M: 2/4
+L: 1/16
+K: G
+D2 | D2G2G2G2 | G4A2
+A2 | B4A2A2 | G4z2
+G2 | F2A2A2A2 | A4B2
+d2 | c4B2B2 | A4
+d4 | B2B2B2B2 | B2d2c2
+B2 | A3GF2G2 | A4z2
+GA | B4B4 | d3cB2
+A2 | B4A4 | G4z2
+
+X:259
+T: ALS WIR JUENGST IN REGENSBURG WAREN
+N: E0136
+O: Europa, Mitteleuropa, Deutschland, Bayern
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 2/4
+L: 1/8
+K: E
+ | B2BA | GBeG | B2AF | G2Ez
+B2BA | GBeG | B2AF | G2Ez
+E2GB | E2E2 | A2ce | B2z2
+A2A2 | G2GA | B4 | E2z2
+E2GB | E2GB | A2ce | B4
+d2cd | eGcB | B2AF | E2z2
+E2GB | E2GB | A2ce | B4
+d2cd | eGcB | B2AF | E2z2
+
+X:260
+T: EI DU FEIN LIEBER SCHIFFSMANN MEIN
+N: E0136A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 2/4
+L: 1/8
+K: E
+ | B2BA | GBeG | B2A2 | G2Ez
+B2BA | GBeG | B2A2 | G2Ez
+E2GB | E2GB | cAec | B2z2
+d2d2 | e2GA | B4 | G2z2
+E2GB | E2GB | A2ce | B4
+d2d2 | e2GA | B2gf | e2z2
+E2GB | E2GB | A2ce | B4
+d2d2 | e2GA | B2gf | e2z2
+
+X:261
+T: EI DU FEIN LIEBER SCHIFFSMANN MEIN
+N: E0136B
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 2/4
+L: 1/8
+K: E
+ | B2BA | GBeG | B2A2 | G2Ez
+B2BA | GBeG | B2A2 | G2Ez
+E2GB | E2GB | cAec | B2z2
+d2d2 | e2GA | B4 | G2z2
+E2GB | E2GB | A2ce | B4
+F2Ac | E2GB | B2gf | e2z2
+E2GB | E2GB | A2ce | B4
+F2Ac | E2GB | B2gf | e2z2
+
+X:262
+T: WAS WOLLN WIR ABER HEBEN AN
+N: E0137
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Schalk -, Schelmen - Lied, Liebe
+M: 6/4
+L: 1/4
+K: F
+F | F2GA2A | B2GA2
+A | B2cd2d | c3B2
+c | cccc2A | BdcA2
+A | G2ABAB | G3F2
+
+X:263
+T: ES GIENG A MOL A BETTELSMANN
+N: E0139
+O: Europa, Mitteleuropa, Deutschland, Kuhlaendchen
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann
+M: 2/4
+L: 1/16
+K: G
+D2 | G2B2A2c2 | B2BGA2
+D2 | G2B2d3B | ddBGA2
+A2 | B2d2c2B2 | d2cBA2
+A2 | c2BAc2BA | B2D2G2
+
+X:264
+T: EIN BETTELMANN KAM AUS HUNGERLAND HER
+N: E0139A
+O: Europa, Mitteleuropa, Deutschland, Uckermark
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann
+M: 6/8
+L: 1/16
+K: D
+A2 | d3cB2A4A2 | d3cB2A4z2
+d4B2A4A2 | A2B2A2A2F2F2 | F2E2E2D4z2
+A3ce3d | c3BA4
+F3GA3G | F3ED4
+
+X:265
+T: ES WAR EIN JUNGER MARKGRAFENSOHN
+N: E0140
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Scherz, Schwank, Liebe
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B2D2F2F2 | B2DDF2
+F2 | B2B2c2c2 | B2d2c2c2 | F4B2
+
+X:266
+T: ICH WEISS MIR EINEN ANGER BREIT
+N: E0143
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann
+M: 4/4
+L: 1/8
+K: F
+D2 | F2F2G2G2 | A2A2A2
+A2 | G2A2B2B2 | A2A2G2
+G2 | A2A2F2F2 | E2D2C2
+C2 | E2F2E2D2 | G2A2B2
+B2 | A2GFE2G2 | BAG2F2
+
+X:267
+T: ES WOHNT EIN MUELLER AN JENEM TEICH
+N: E0146
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B2B2B2B2 | B2G2F4
+e4d2d2 | c4z2
+c2 | f2c2c2B2 | A2G2F4
+B2BBB2BB | BBBBB2
+B2 | cBABcBAB | c2c2c2
+f2 | d2d2c2c2 | B3df2
+e2 | d2d2c2c2 | B4z2
+
+X:268
+T: ES WOHNT EIN MUELLER IN JENEM THAL
+N: E0146A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 6/8
+L: 1/8
+K: Bb
+F | B2BAAc | B2GF3
+e3d2f | c4z
+f | c2dc2B | A2GF3
+d2ddd2dd | d2ddd2
+f2 | ccccc2BB | A2G2F2
+F2 | B2B2c2c2 | f6
+e2 | d2d2c2c2 | B4z3
+
+X:269
+T: ES FUHR EIN MANN DEN RHEIN AUS
+N: E0148
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 4/4
+L: 1/8
+K: D
+D2 | A2A2B2B2 | A4A2
+G2 | F2D2E4 | D4z2
+D2 | A2A2B2c2 | d2Bcd2
+c2 | B2A2B4 | A4z2
+A2 | d3cB2A2 | d3cB2
+A2 | A2A2A2G2 | F4F2
+G2 | FEFDE4 | D3EF2
+G2 | F2D2E4 | D4z2
+
+X:270
+T: ES FUHR EIN BAUR INS HOLZ
+N: E0149
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann
+M: 4/4
+L: 1/4
+K: C
+C | CCA,A, | G,G,E,
+E, | G,G,F,F, | E,2z
+G, | CCDD | E2C
+F | ECCB, | C2A,B, | C2A,B, | C2z
+
+X:271
+T: ES FUHR EIN BAUER INS HOLZ
+N: E0149A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann
+M: 4/4
+L: 1/8
+K: C
+C2 | C3CB,3B, | A,3A,G,3
+G, | E,3F,G,2 | C,2z2
+C2 | C2B,2C2D2 | E4D2
+E2 | F2E2D2C2 | C4D2B,2 | C4D2B,2 | C4z2
+
+X:272
+T: ES FUHR EIN BAUER INS HOLZ
+N: E0149B
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann
+M: 6/8
+L: 1/16
+K: G
+D2 | G4G2F4F2 | E4E2D4
+D2 | G4G2A2G2A2 | B6z4
+G2 | B4A2B3cd2 | B4G2A4
+c2 | c4B2A4G2 | F3GA2A4
+B2 | d2B2d2c2A2c2 | B6z4
+
+X:273
+T: ES HAETT EIN BIEDERMANN EIN WEIB
+N: E0150
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann
+M: 6/4
+L: 1/8
+K: F
+A2 | A4A2A4A2 | A4A2A4
+A2 | A4A2A4F2 | G3AB2A3GF2 | G8z2
+G2 | G4G2G4A2 | B4B2A4
+A2 | G4F2F4E2 | F8z2
+F2 | D4D2E4E2 | F4F2F4
+F2 | D4D2E4E2 | F8z2
+
+X:274
+T: ES HATT EIN BAUER EIN SCHOENES WEIB
+N: E0150A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann
+M: 6/8
+L: 1/16
+K: G
+D2 | G4B2d3BG2 | F4A2c3A
+F2 | G4B2d3BG2 | A6z4
+D2 | G4B2d3BG2 | F4A2c3A
+F2 | G4B2d3BG2 | A6z4
+B2 | A3AA2A2G2A2 | B6z4
+B2 | A3AA2A2G2A2 | B6z4
+B2 | A3AA2A2G2A2 | G2B2d2
+G2B2d2 | e4c2c4e2 | d4B2B4
+G2 | A3Gc2D2E2F2 | G6z4
+B2 | A3AA2A2G2A2 | G2B2d2
+G2B2d2 | e4c2c4e2 | d4B2B4
+G2 | A3Gc2D2E2F2 | G6z4
+
+X:275
+T: ES HATT EIN BAUR SEIN WEIB VERLORN
+N: E0154
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann,
+M: 6/4
+L: 1/4
+K: F
+F | F2Fc2c | d2ef2
+f | c2cB2c | AG2F2
+
+X:276
+T: ES HATT EIN BAUR SEIN FRAU VERLOREN
+N: E0154A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank, betrogener Ehemann,
+M: 4/4
+L: 1/8
+K: G
+G2 | G2G2G2G2 | A2A2A2
+G2 | B2c2d2B2 | A4G2
+G2 | G2G2G2G2 | A2A2A2
+G2 | B2c2d2B2 | A4G2
+G2 | d2d2d2c2 | B2B2A2
+A2 | B2B2Bcd2 | B2c2A4 | z2
+G2A2G2 | c4z2
+e2 | d2c2dGA2 | G4z2
+
+X:277
+T: ICH WEISS EIN STOLZE MUELLERIN
+N: E0155
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank, Spott auf den Klerus
+M: 4/4
+L: 1/8
+K: C
+C2 | C2E2D2C2 | B,2B,2A,2
+B,2 | C2G,2A,2B,2 | C6
+C2 | C2E2D2C2 | B,2B,2A,2
+B,2 | C2G,2A,2B,2 | C3DE2
+C2 | D3CB,2A,2 | G,4z2
+B,2 | C2B,2C2A,2 | G,4E,2
+C2 | C2C2D2D2 | E4D2
+F2 | E2C2D2D2 | C6
+
+X:278
+T: ES WAR EINMAL EINE MUELLERIN
+N: E0156
+O: Europa, Mitteleuropa, Deutschland, Odenwald
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 4/4
+L: 1/8
+K: F
+C2 | F3GAGAB | c3dc2
+A2 | B3AB2c2 | A4z2
+FA | c2A2c2A2 | c3fd2
+c2 | B2A2G2A2 | B3dc2
+B2 | A3GA2B2 | c4
+d4 | c3AB2c2 | A4z2
+
+X:279
+T: ES WAR EINMAL EIN MUELLERIN
+N: E0156A
+O: Europa, Mitteleuropa, Deutschland, Taunus; Elsass
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 2/4
+L: 1/16
+K: F
+C2 | F3GA2B2 | c3dc2
+A2 | B3AB2c2 | A4z2
+FA | c2A2c2A2 | c2f2d2
+c2 | B2G2B2G2 | B2d2c2
+B2 | A3GA2B2 | c2f2e2
+d2 | c3AB2c2 | A4z2
+
+X:280
+T: ICH GING BEI EITLER NACHT
+N: E0157
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 3/4
+L: 1/8
+K: D
+DE | =F3EF2 | G3=FG2 | A6- | A2z2
+A2 | G3AG2 | A3_BG2 | =F6- | F2z2
+=FG | A4A2 | =c3_BA2 | G6 | E2A2
+G2 | =F3ED2 | C3DE2 | D6- | D2z2
+
+X:281
+T: ICH GING WOHL BEI DER NACHT
+N: E0157A
+O: Europa, Mitteleuropa, Deutschland, Gransee, Roennebeck
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 6/8
+L: 1/16
+K: A
+E2 | A4A2G4B2 | e4z6
+B2 | =c4d2e4c2 | B4d2d4
+B2 | =c4d2e4c2 | B4z6
+B2 | =c4B2c4d2 | e6B6
+=c4B2A4c2 | B4=G2E4
+E2 | =c4B2A4cc | B4=G2E4
+B2 | =c2B2A2B2A2G2 | A4z6
+
+X:282
+T: ICH GING MAL BEI DER NACHT
+N: E0157B
+O: Europa, Mitteleuropa, Deutschland, Ober - Lahnkreis, Dillkreis
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 2/4
+L: 1/16
+K: G
+D2 | G2F2E2D2 | B4
+d4 | c2B2A2G2 | A6
+A2 | A2A2A2d2 | A2FED2z2
+G2B2A2c2 | B3cd2
+dc | B2B2A2A2 | G4z2
+
+X:283
+T: ICH GING EINST BEI DER NACHT
+N: E0157C
+O: Europa, Mitteleuropa, Deutschland, Kreis Wetzlar
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 3/4
+L: 1/16
+K: G
+D2 | G2AcB4A4 | G4z6
+AB | c2e2d4c2d2 | B4z6
+d2 | B2d2d2ed | d2cBc2
+d2 | B4d2B2 | B2AGA2
+d2 | d2cBc2A2 | G4z6
+d2 | B2d2d2ed | d2cBc2
+d2 | B4d2B2 | B2AGA2
+d2 | d2cBc2A2 | G4z6
+
+X:284
+T: ES HAT EIN BAUER EIN TOECHTERLEIN
+N: E0158
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank, Studenten - Lied
+M: 6/4
+L: 1/4
+K: C
+C | C2CC2A, | B,2B,D2
+C | B,2A,G,2G, | G,2G,A,2
+A, | B,2B,C2C | C2CD2
+D | D2DD2D | E2ECED | C2B,C2
+
+X:285
+T: ICH KOMM DAHER OH ALLEN SPOTT
+N: E0159
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Scherz, Schwank
+M: 4/4
+L: 1/8
+K: F
+ | F4c3B | A2d2c2B2 | A4z2
+G2 | A3Bc2F2 | A4G4 | F4z2
+G2 | G3GG2A2 | B4A4 | G4z2
+G2 | G3FE2C2 | E4D4 | C4z2
+C2 | D2E2FGAB | c2A2G4 | F8
+
+X:286
+T: ES GINGEN DREI BAURN
+N: E0161
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 3/4
+L: 1/4
+K: F
+F | FFG | A2
+F | AAB | c2
+F | FFG | A2
+F | AAB | c2
+c | ccc | cB
+A | BAG | F2
+
+X:287
+T: ES WOLLT EIN VOGEL HOCHZEIT MACHEN
+N: E0163
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Bunzlau; Hainau
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 2/4
+L: 1/16
+K: G
+B2 | d2B2d2B2 | c2A2c4
+B2B2d2B2 | A2d2d2
+DD | G2G2G2BB | A2A2A2
+dc | BcB2ABA2 | G4z2
+
+X:288
+T: ES WOLLT EIN VOGEL HOCHZEIT MACHEN
+N: E0163A
+O: Europa, Mitteleuropa, Deutschland, Danzig
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 2/4
+L: 1/8
+K: G
+D | GABc | dddd
+ecge | eddz
+ccc2 | BBB2
+ABcA | AGG
+
+X:289
+T: ES WOLLT EIN VOEGLEIN HOCHZEIT MACHN
+N: E0163B
+O: Europa, Mitteleuropa, Deutschland, Charlottenburg
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 2/4
+L: 1/16
+K: C
+G,2 | C2C2E2D2 | D2C2C2
+G,2 | A,2B,2C2A,2 | A,2G,2G,2
+G,G, | C2C2C2CC | E2E2E2
+EE | D2D2D2B,2 | C4z2
+
+X:290
+T: DER SPERLING DER GIBT DER BRAUT DEN TRAURING
+N: E0163C
+O: Europa, Mitteleuropa, Deutschland, Danzig, Neuhof
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 2/4
+L: 1/8
+K: C
+G | G2AB | c2E
+A | GFED | E2C
+C | G2AB | c2E
+A | GEFD | CCC
+C | D2E^F | G2G
+G | dcBA | GFE
+C | GGAA | BBc
+A | GEFD | CCC
+
+X:291
+T: ES WOLLTEN DIE VOEGELCHEN HOCHZEIT MACHN
+N: E0163D
+O: Europa, Mitteleuropa, Deutschland, Berlin
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 6/8
+L: 1/16
+K: G
+D2 | G2G2G2G2A2B2 | B4A2A4
+d2 | B4B2A4A2 | G6G2z2
+D2 | G2G2G2G2A2B2 | B4A2A4
+d2 | B4B2A4A2 | G6G2z2
+D2 | G2G2z6B2 | B2A2z6
+A2 | B4c2d4G2 | A2G2z6
+GB | d3dd2d2c2BB | c3cc2c4
+dc | B2B2B2d3cB2 | B2A2A2A4
+d2 | B3BB2A2G2A2 | G4z6
+
+X:292
+T: EIN KAEFER AUF DEM ZAUNE SASS
+N: E0164
+O: Europa, Mitteleuropa, Deutschland, Mecklenburg
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen, Scherz
+M: 3/4
+L: 1/16
+K: G
+D2 | G3FG2B2B2G2 | F3ED8 | F4G4z2
+D2 | A3^GA4A4 | d3dd6
+G2 | F3GA4D4 | c3BB8 | F4G4z2
+
+X:293
+T: ES SASS EIN KAEFER AUF DEM BAEUMEL
+N: E0164A
+O: Europa, Mitteleuropa, Deutschland, Breslau
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen, Scherz
+M: 3/4
+L: 1/8
+K: G
+D2 | GFGFGF | G2D2F2 | G2z2
+G2 | d^cdcdc | d2A2
+B2 | cBc2BA | A2G2D2 | G2z2
+
+X:294
+T: BUHSKE DI REMMER
+N: E0166
+O: Europa, Mitteleuropa, Deutschland, Ost - Friesland
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 3/4
+L: 1/8
+K: G
+ | d2d2d2 | d2e2f2 | g4f2 | e4
+d2 | d3cBA | G4z2
+d2d2d2 | d2e2f2 | g4f2 | e4
+d2 | d3cBA | G4z2
+A2A2A2 | A2B2c2 | d3cB2 | A4
+B2 | A3GF2 | G4B2 | A3GF2 | G4z2
+
+X:295
+T: GESTERN ABEND GIENG ICH AUS
+N: E0167
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 2/4
+L: 1/8
+K: G
+ | DGGG | FAA2
+BBcA | AGG2
+dBBG | GEG2
+cBAG | FED2
+DGGG | FAA2
+BBcA | AGG2
+
+X:296
+T: ICH ARMER HAS IM WEITEN FELD
+N: E0169
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt; Baden
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 4/4
+L: 1/16
+K: F
+C2 | F4A4G6B2 | A3Bc2d2c6
+f2 | c2B2B2d2c4A4 | G4G4F4z2
+C2 | F2G2A6B2 | A4G4z2
+G2 | G2A2B6c2 | B4A4z2
+G2 | F6A2G6B2 | A3Bc2d2c6
+f2 | c2B2B2d2c4A4 | G4G4F4z2
+
+X:297
+T: ICH ARMES WALDHAESELEIN
+N: E0169A
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Neisse
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 2/4
+L: 1/16
+K: F
+C2 | F4A2A2 | G3Gc2
+B2 | A4G4 | F4z2
+C2 | F2F2A2A2 | G4c2
+B2 | A4G4 | F4z2
+F2 | A2A2G2cB | A4G2
+F2 | A2A2G2cB | A4G2
+C2 | F6A2 | G6
+B2 | A3Bc2d2 | c6
+cB | A2A2G2cB | A4G2
+cB | A4G4 | F4z2
+
+X:298
+T: ZWISCHEN BERG UND TIEFEM THAL
+N: E0170
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen, Scherz
+M: 3/4
+L: 1/16
+K: G
+ | D3DG4B4 | B3AA3GA4
+D2F2A4c4 | c4B4z4
+d3cB4d4 | d3cc3Bc4
+c3BA4c4 | c3BB3AB4
+G2B2d4B2G2 | A4G4z4
+d3cB4d4 | d3cc3Bc4
+c3BA4c4 | c3BB3AB4
+G2B2d4B2G2 | A4G4z4
+
+X:299
+T: ZWISCHEN BERG UND TIEFEM THAL
+N: E0170A
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen, Scherz
+M: 3/4
+L: 1/16
+K: G
+ | D3DG4B4 | B4A2G2A4
+D2F2A4c4 | c4B4z4
+d3cB4d4 | d4c2B2c4
+c3BA4c4 | c4B2A2B4
+G2B2d4B2G2 | A4G4z4
+d3cB4d4 | d4c2B2c4
+c3BA4c4 | c4B2A2B4
+G2B2d4B2G2 | A4G4z4
+
+X:300
+T: DIE EULE AUF DEM ZAUNE SASS
+N: E0171
+O: Europa, Mitteleuropa, Deutschland, Neisse, Walldorf
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 3/4
+L: 1/8
+K: F
+C | CCF2F2 | FGA2z
+G | FFF2G2 | A2G2z
+F | FAc2cB | AcG2z
+F | AcA2F2 | G2F2z
+
+X:301
+T: NAECHTEN ALS ICH SCHLAFEN GING
+N: E0173
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen, Liebe
+M: 3/4
+L: 1/8
+K: G
+D | GDG2G2 | FGA3
+A | BAG2A2 | cBA2z
+c | BdA3c | BdG3
+A | BGd2BG | A2G2z
+
+X:302
+T: ET SAS E KLI WAELTFIJELTCHEN
+N: E0173A
+O: Europa, Mitteleuropa, Deutschland; Rumaenien, Siebenbuergen, Muhlbach
+R: erzaehlendes Volks - Lied, Sage, Tier - Maerchen
+M: 3/4
+L: 1/16
+K: G
+D2 | G3GG4A4 | _B3AG6
+G2 | d2d2D2D2 | G4G4z2
+d2 | d3c_B6d2 | c3_BA4z2
+A2 | G3A_B6F2 | G4G4z2
+
+X:303
+T: ES WOLLT EIN MAEDL ZUM TANZE GEHN
+N: E0174
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen, Moral - Lied
+M: 3/4
+L: 1/8
+K: G
+D | DGG2G2 | FGA3
+A | GGG2A2 | B2A2z
+G | BAB2d2 | cBA2
+A2 | GGc2B2 | A2G2z
+
+X:304
+T: ES WOLLT EIN JUNGFER ZU TANZE GEHN
+N: E0174A
+O: Europa, Mitteleuropa, Deutschland, Altmark
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen, Moral - Lied
+M: 3/4
+L: 1/8
+K: G
+D | GGA2G2 | EED2z
+D | GAB2B2 | cBA2z
+B | ccc2e2 | dcB2z
+d | ABcBA2 | EAA2z
+B | ccc2e2 | dcB2z
+d | ABcBA2 | EAA2z
+
+X:305
+T: ES TRIEB EIN MAEDL DIE GAENSE AUS
+N: E0174B
+O: Europa, Mitteleuropa, Deutschland, Oderberg; Freienwalde
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen, Moral - Lied
+M: 2/4
+L: 1/8
+K: G
+D | GGFF | EED
+D | GGAA | B2c
+A | GGFA | A2G
+
+X:306
+T: ES WOLLT EIN MAEDCHEN SPAZIEREN GEHN
+N: E0174C
+O: Europa, Mitteleuropa, Deutschland, Uckermark, Granzow
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen, Moral - Lied
+M: 3/4
+L: 1/16
+K: G
+D2 | D2G2G4G4 | D2FGA6
+BA | G2G2G6AB | c2B2A4z2
+B2 | G2G2c6B2 | A2G2A6
+B2 | G2G2B3AG2G2 | F4G4z2
+
+X:307
+T: ES WOLLT EIN MAEDCHEN TANZEN GEHN
+N: E0174D
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen, Moral - Lied
+M: 3/4
+L: 1/16
+K: G
+D4 | G2B2B4A2G2 | F2A2D4z2
+D2 | G2B2d6B2 | B4A4
+D4 | G2B2B4A2G2 | F2A2D4z2
+D2 | G2B2d6B2 | B4A4
+A2B2 | c2e2e4d2c2 | Bcded6
+B2 | A2B2c6d2 | c4B4
+A2B2 | c2e2e4d2c2 | Bcded6
+B2 | A2B2c6d2 | c4B4
+
+X:308
+T: ES WOLLT EIN MAEDCHEN ZUM TANZE GEHN
+N: E0174E
+O: Europa, Mitteleuropa, Deutschland, Westerwald; Limburg
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen, Moral - Lied
+M: 3/4
+L: 1/16
+K: G
+D2 | E2D2B4A2G2 | B3AA4z2
+G2 | G2B2d6B2 | B4A4z2
+AB | c2e2e4d2c2 | B2d2G6
+B2 | A2e2d6c2 | c2d2B4z2
+AB | c2e2e4d2c2 | B2d2G6
+B2 | A2e2d6c2 | c2d2B4z2
+
+X:309
+T: O TANNENBAUM O TANNENBAUM
+N: E0175
+O: Europa, Mitteleuropa, Deutschland, Odenwald, Neunkirchen
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2A2cB | A2A2G2
+G2 | A2A2Bcd2 | c4z2
+c2 | d2e2f2c2 | f2d2c2
+cB | A2A2G2GE | F4z2
+c2 | d2e2f2c2 | f2d2c2
+cB | A2A2G2GE | F4z2
+
+X:310
+T: O TANNENBAUM O TANNENBAUM
+N: E0175A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2G2D2 | G2G2G2
+D2 | G2G2G2B2 | A4z2
+G2 | B2A2B2B2 | d2c2c2
+AA | dcB2AGA2 | G4z2
+G2 | B2A2B2B2 | d2c2c2
+AA | dcB2AGA2 | G4z2
+
+X:311
+T: EI DU EDLER TANNENBAUM
+N: E0175B
+O: Europa, Mitteleuropa, Deutschland, Kuhlaendchen
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen
+M: 3/4
+L: 1/8
+K: G
+ | GG_B2G2 | AAd2
+d2 | cc_B2G2 | =F4
+FG | GG_B2G2 | A2d2
+d2 | _BGBAGF | G6
+
+X:312
+T: O DANNEBOM O DANNEBOM
+N: E0175C
+O: Europa, Mitteleuropa, Deutschland, Paderborn
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen
+M: 4/4
+L: 1/8
+K: E
+B,2 | E2B2B2B2 | B2A2A2
+A2 | =G2G2B2AG | F4z2
+F2 | =G4B2G2 | A4=c2
+A2 | =G2G2F2F2 | E4z2
+
+X:313
+T: DORT BEIM SEE DA DRUNT
+N: E0177
+O: Europa, Mitteleuropa, Oesterreich, Steiermark
+R: erzaehlendes Volks - Lied, Sage, Pflanzen - Maerchen
+M: 3/4
+L: 1/8
+K: C
+ | G,4E2 | E,CG,4
+G,G,B,2G,F | E4
+E,C | B,F,B,2G,D | CE,C2
+G,C | B,FB,2FB, | CEG4
+A,3FA,F | EG,E2
+G,E | D4G,D | C4z2
+
+X:314
+T: ES KAM EIN ABENTEURER
+N: E0180
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 4/4
+L: 1/16
+K: G
+G4 | G4d4d4e2g2 | =f4e4d4z2
+e2 | =f4d4d4A2B2 | c4B4A4z2
+d2 | d4d2B2G4B4 | d2c2c2B2A6
+B2 | c4B2A2G4F2G2 | A6BAG4
+
+X:315
+T: ES RITT EIN RITTER WOL UEBER DEN RHEIN
+N: E0181
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 4/4
+L: 1/8
+K: G
+Bc | d2d2d2ed | dcc2c2
+dc | B2B2BAG2 | BAA2A2
+BA | G2B2dBG2 | BAA2G2
+
+X:316
+T: ES KAM EIN BETRUEBTER REITER DAHER
+N: E0181A
+O: Europa, Mitteleuropa, Deutschland, Sachsen
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 4/4
+L: 1/16
+K: G
+B2A2 | G4G2G2G2A2B2c2 | d4d3dd4
+e4 | d4c3cc4d2c2 | c3BB2B2B4
+d4 | B4A2A2A4G2A2 | B4B4B4
+d2d2 | B4A4A4G2A2 | B4B4B4
+
+X:317
+T: ES WAR EIN MARKGRAF AN DEM RHEIN
+N: E0182
+O: Europa, Mitteleuropa, Deutschland, Sueddeutschland
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 2/4
+L: 1/16
+K: G
+D2 | G4A4 | B2d2c2B2 | A4z2
+B2 | c2B2A2G2 | F2E2D2
+D2 | G4A4 | B3cd2c2 | B4A4 | G4z2
+
+X:318
+T: ES WOHNT EIN MARKGRAF AN DEM RHEIN
+N: E0182A
+O: Europa, Mitteleuropa, Deutschland, Sachsen; Schlesien; Brandenburg
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 2/4
+L: 1/8
+K: G
+D | G2D2 | G2d2 | BBB
+G | AAAF | GBG
+D | GGD2 | Gedc | B2A2 | G2z
+
+X:319
+T: ES WOHNT EIN MARKGRAF AN DEM RHEIN
+N: E0182B
+O: Europa, Mitteleuropa, Deutschland, Potsdam, Toeplitz
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 2/4
+L: 1/16
+K: G
+D2G2D2 | G4d4 | B2d2B2
+G2 | A3BA2c2 | B3cB2
+A2 | G4D4 | G2B2d2
+c2 | B4A4 | G4z4 | z2
+
+X:320
+T: ES WOHNT EIN PFALZGRAF AN DEM RHEIN
+N: E0182C
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 4/4
+L: 1/4
+K: G
+D | GGFA | GED
+D | EEEG | DDB,
+D | GBAA | d2c2 | B2z
+
+X:321
+T: ES WOHNT EIN PFALZGRAF AN DEM RHEIN
+N: E0182D
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 2/4
+L: 1/16
+K: D
+=F2 | =F2F2F2F2 | G2G2=C2
+E2 | E2E2E2G2 | =F2FED2
+F2 | =F2_B2A2G2 | =F2E2D2
+
+X:322
+T: ES WOHNT EIN KOENIG AN DEM RHEIN
+N: E0182E
+O: Europa, Mitteleuropa, Deutschland, Bergisches Land
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 2/4
+L: 1/16
+K: G
+GB | d4A4 | d2c2B2A2 | G4B2A2 | G4z2
+B2 | A4A2A2 | E4F2F2 | G4F2E2 | D4z2
+D2 | G4G2G2 | A4d2d2 | B4A2B2 | G4z2
+
+X:323
+T: ES WOHNT EIN KOENIG WEIT UEBERM RHEIN
+N: E0182F
+O: Europa, Mitteleuropa, Deutschland, Trier, Kluesserath
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 3/4
+L: 1/8
+K: D
+DDF | A2FABA | G2F
+ADD | D2CEGE | E2D
+
+X:324
+T: VALET ZUM THOR HINAUS
+N: E0183
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2G2A2 | B4A4 | G4z2
+G2 | F2G2A2B2 | c2B2d2B2 | A4z2
+A2 | B2A2B2c2 | d3ed2
+d2 | c2B2A2B2 | c3dc2
+c2 | B2A2G2dc | B4A4 | G4z2
+
+X:325
+T: ES RITT EIN HERR ZUM KUEHLEN WEIN
+N: E0185
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Breslau; Liegnitz
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 3/4
+L: 1/8
+K: Bb
+F | BAG2c2 | AGF2z
+F | Bcd2cA | BGF2z
+F | Bcd2cA | BGF2z
+
+X:326
+T: ES RITTEN DREI HERREN ZUM KUEHLEN WEIN
+N: E0185A
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Neisse, Waltorf
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 2/4
+L: 1/8
+K: Bb
+F | B2Bc | d2cB | dcB
+F | B2Bc | d2cB | dcB
+F | BBAB | c2BA | BGF
+F | BBAB | c2BA | BGF
+
+X:327
+T: ES RITT EIN HERR ZUM KUEHLEN WEIN
+N: E0185B
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Hainau
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 2/4
+L: 1/8
+K: G
+G | BGGG | AAA
+A | cAAG | FED
+D | GGAd | BAG
+
+X:328
+T: ES FUHR EIN FUHRKNECHT UEBERN RHEIN
+N: E0186
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte, Mord
+M: 2/4
+L: 1/8
+K: G
+D | G2_B2 | A2d2 | c_BA
+D | G2_B2 | A2d2 | c_BA
+B | cccd | _BAG
+D | G2A2 | _Bcd2 | _B2AG | G2z
+
+X:329
+T: ES FUHR EIN FUHRKNECHT UEBERN RHEIN
+N: E0186A
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte, Mord
+M: 2/4
+L: 1/8
+K: G
+D | G2_B2 | A2d2 | c_BA
+D | G2_B2 | A2d2 | c_BA
+A | cccd | _BAG
+D | G2_B2 | A2d2 | _BAG
+
+X:330
+T: ES FUHR EIN BAUER UEBER DEN RHEIN
+N: E0186B
+O: Europa, Mitteleuropa, Deutschland, Wuerttemberg
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte, Mord
+M: 4/4
+L: 1/8
+K: A
+E2 | A2B2cBcd | efedc2
+e2 | fedcB2B2 | cdecA2
+E2 | A2B2c2cd | e2edc2
+
+X:331
+T: ES FUHR EIN SCHIFFLEIN WOL UEBER DEN RHEIN
+N: E0186C
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte, Mord
+M: 6/8
+L: 1/16
+K: G
+GA | B3AB2G2A2B2 | c3Bc2A4
+AB | c2A2d2B3AG2 | A3BA2G4
+
+X:332
+T: ES GIENG EIN JUNG KUECHENJUNG
+N: E0186D
+O: Europa, Mitteleuropa, Deutschland, Magdeburg
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte, Mord
+M: 3/8
+L: 1/16
+K: C
+G,2 | C2B,2A,2 | G,3E,C,2 | D,3E,F,2 | F,2E,2
+G,2 | A,2B,2C2 | G,2G,2C2 | D2D2E2 | C4
+
+X:333
+T: ES WOLLTE EIN KUECHENJUNG
+N: E0186E
+O: Europa, Mitteleuropa, Deutschland, Magdeburg, Genthin
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte, Mord
+M: 3/8
+L: 1/8
+K: C
+G, | CCG, | CDE | DB,D | B,G,
+C | A,B,C | G,G,E, | A,B,C | G,2
+G, | CCG, | CDE | G,A,G, | C2
+
+X:334
+T: IK HEV SE NICH UP DE SCHOLEN GEBRACHT
+N: E0188
+O: Europa, Mitteleuropa, Deutschland, Ost - Friesland
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 3/4
+L: 1/8
+K: D
+A,2 | D2D2D2 | D2E2=F2 | G2E2E2 | E4
+A,2 | D4D2 | =F2E2DD | A4A2 | A4
+A2 | G4G2 | =F2F2ED | A6 | A,4
+A2 | A2G2A2 | A2G2A2 | =c2_B2A2 | G2A2G2 | =F4
+FF | =F2F2F2 | =F2E2D2 | A6 | D4
+
+X:335
+T: ACH MUTTER ES HUNGERT MICH
+N: E0189
+O: Europa, Mitteleuropa, Deutschland, Halle; Eisleben
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 4/4
+L: 1/8
+K: F
+F2 | AAA2ccA2 | A2G2G2z2
+A2A2c2A2 | A2G2G2z2
+F2d2d2d2 | d2c2c2z
+B | AAA2c2cB | A4z2
+
+X:336
+T: MUTTER ACH MUTTER ES HUNGERT MICH
+N: E0189A
+O: Europa, Mitteleuropa, Deutschland, Schoenbeck a.d. Elbe
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 3/4
+L: 1/8
+K: F
+ | F2A2c2 | f2e2d2 | d2c2c2 | A2z4
+c2B2B2 | G2z2G2 | d2c2c2 | A2z4
+A2c2B2A2 | G2z2
+A2c2B2A2 | G2F2E2
+C2 | D2D2E2E2 | F2G2A2
+A2 | A2B2c2dd | c4B4 | A8
+
+X:337
+T: KIND WO BIST DU HIN GEWESEN
+N: E0190
+O: Europa, Mitteleuropa, Deutschland, Bueckeburg
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 3/4
+L: 1/8
+K: F
+CC | F2F2GB | A2F2
+A2 | G3FEG | F2z2
+C2 | F2F2GG | A2F2
+A2 | G3FE2 | F2z2
+
+X:338
+T: KIND WO BIST DU DENN HENNE WEST
+N: E0190A
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 4/4
+L: 1/8
+K: F
+ | F2FGA2AB | c2d2c2
+FA | c2c2d2c2 | B4A2
+c2 | G2GGA2c2 | B4A2
+G2 | A2A2B2cd | d4c2z2
+G2GGA2d2 | c4B4 | A4
+d4 | c6A2 | c2c2B2B2 | A6z2
+
+X:339
+T: WO BIST DU DENN SO LANG GEWES'N
+N: E0190B
+O: Europa, Mitteleuropa, Deutschland, Wilsnack
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 4/4
+L: 1/8
+K: F
+C2 | F2F2c2c2 | A2cAF4
+G3FG2B2 | A2G2F2
+C2 | F2F2c2c2 | A2cAF4
+G3FG2B2 | A2G2F2
+C2 | F2F2c2c2 | A2cAF2
+F2 | G2G2E2C2 | F4z2
+F2 | G2ABc4 | A4z2
+c2 | d3cB2G2 | A4z2
+
+X:340
+T: SOLDAT KAM AUS DEM KRIEGE
+N: E0191
+O: Europa, Mitteleuropa, Deutschland, Oldenburg
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 6/8
+L: 1/8
+K: G
+D | G2GBAG | A2ddcA | B3z2
+D | G2GBAG | A2ddcA | B3z2
+B | B2GGAB | d2cc2
+c | c2AABc | e2dd2c | Bd
+BAcA | G3e3 | d2ddcA | G3z2
+
+X:341
+T: WENN GRUEN DIE EICHEN STEHEN
+N: E0191A
+O: Europa, Mitteleuropa, Deutschland, Wetterau; Lahnkreis; Dillkreis
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 4/4
+L: 1/8
+K: D
+A,F,A, | D3A,F,A,B,A, | A,G,G,2z
+DCD | E3DCB,A,G, | F,4z
+A,A,D | F3EDCB,A, | A,G,G,2z
+EDF, | B,3B,A,A,B,C | D4z
+A,A,D | F3EDCB,A, | A,G,G,2z
+EDF, | B,3B,A,A,B,C | D4z
+
+X:342
+T: ES FIEL EIN REIF IN FRUEHLINGSNACHT
+N: E0192
+O: Europa, Mitteleuropa, Deutschland, Nieder - Rhein ?
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 6/8
+L: 1/16
+K: G
+D2 | G4_B2A2G2=F2 | _B4c2d3c
+d2 | G4_B2A2G2=F2 | _B4c2d4
+d2 | d3c_B2c2A2d2 | G4G2F4
+=F2 | _B4c2d2c2B2 | A2_B2A2G4
+
+X:343
+T: ES WAR EIN MAEDCHEN VON FARBE SO BLEICH
+N: E0194
+O: Europa, Mitteleuropa, Deutschland, Siebengebirge
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 3/4
+L: 1/8
+K: D
+=FG | A4A2 | A2A2AG | =F2D2EF | G4
+A2 | =F2A2G2 | E2E2E=F | G2=F2E2 | D4
+
+X:344
+T: ES RITTEN ZWEI HERZLIEBCHEN
+N: E0194A
+O: Europa, Mitteleuropa, Deutschland, Mosel - Gegend
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 3/4
+L: 1/8
+K: G
+D2 | G3FGB | A2G2
+A2 | B3cB2 | A4
+GB | d2d2dc | B2A2
+GA | B2B2A2 | G4
+
+X:345
+T: ES GIENGEN ZWEI LIEBCHEN
+N: E0194B
+O: Europa, Mitteleuropa, Deutschland, Dillkreis
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 3/4
+L: 1/8
+K: G
+D2 | G3AB2 | A2G2
+A2 | B3cdB | A2z2
+GB | dcB2Ac | BAG2
+Ac | B2d2A2 | B4
+
+X:346
+T: ES WAR EINMAL EIN REITERSMANN
+N: E0195
+O: Europa, Mitteleuropa, Deutschland, Koenigsberg
+R: erzaehlendes Volks - Lied, Sage, Familien - Geschichte
+M: 4/4
+L: 1/8
+K: D
+A2 | D2D2D2Dd | d2d_BA2z
+G | =F3ED2EF | GAG=FE2z
+E | A2A2G2A2 | =F3ED2EF | GAG=FE2
+E2 | A2A2G2A2 | =F3ED2
+
+X:347
+T: ES GIENG EIN KNAB SPAZIEREN
+N: E0197
+O: Europa, Mitteleuropa, Deutschland, Mittel - Franken, Ziegelanger
+R: erzaehlendes Volks - Lied, Tod, Toten - Sage, Grabesstimme
+M: 4/4
+L: 1/8
+K: G
+GB | d2d2d2B2 | e2d2z2
+Bd | dcAccBGB | B2A2z2
+AB | c2c2c2BA | Bdd2z2
+Bd | dcAcB2A2 | G4z2
+
+X:348
+T: ES GIENG EIN KNABE SPAZIEREN
+N: E0197A
+O: Europa, Mitteleuropa, Deutschland, Baden, Merzhausen
+R: erzaehlendes Volks - Lied, Tod, Toten - Sage, Grabesstimme
+M: 6/4
+L: 1/8
+K: Eb
+EG | B3cB2G2F2E2 | c6B2z2
+GA | B3cB2A2F2B2 | G8z2
+EG | B3cB2G2F2E2 | c6B2z2
+GA | B3cB2A2F2B2 | G8z2
+GA | B3cB2A2F2B2 | G8z2
+
+X:349
+T: ES GIENG EIN KNAB SPAZIEREN
+N: E0197B
+O: Europa, Mitteleuropa, Italien, Tirol, Meran
+R: erzaehlendes Volks - Lied, Tod, Toten - Sage, Grabesstimme
+M: 2/4
+L: 1/16
+K: F
+FA | c2c2c2AF | d2c2z2
+Ac | B2B2A2cA | G4z2
+GA | B2B2B2AG | ABc2z2
+Bd | c2cBA2G2 | F4z2
+
+X:350
+T: ES GIENG EIN KNAB SPAZIEREN
+N: E0197C
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Tod, Toten - Sage, Grabesstimme
+M: 2/4
+L: 1/16
+K: C
+E2 | G2E2G2E2 | G2c2A4
+G4 | G2E2GFD2 | E4z2
+E2 | G2E2G2E2 | G2c2A4
+G4 | G2E2GFD2 | E4z2
+
+X:351
+T: ES WOLLT EIN HERR AUSREITEN
+N: E0199
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Kreis Neisse
+R: erzaehlendes Volks - Lied, Tod, Toten - Sage, Grabesstimme
+M: 6/8
+L: 1/16
+K: Eb
+B,2 | E4F2G4A2 | G4F2E4
+B,2 | E4F2G4A2 | G4F2E4
+E2 | A4G2G2F2E2 | F2F2E2D4
+E2 | G4GAG2F2E2 | G4F2E4
+
+X:352
+T: ES KAM VON EINER NEUSTADT HER
+N: E0200
+O: Europa, Mitteleuropa, Deutschland, Glogau, Liegnitz
+R: erzaehlendes Volks - Lied, Tod, Toten - Sage, Grabesstimme
+M: 3/4
+L: 1/8
+K: F
+C | FCFAc2 | BGF2z
+F | EFG2c2 | c=Bc2z
+A | Bcd3c | Bdc3
+B | AGFGBA | AGF2z
+
+X:353
+T: NUN ADE MEIN HERZLIEB SCHAETZELEIN
+N: E0201
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: erzaehlendes Volks - Lied, Tod, Toten - Sage, Grabesstimme
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2A2d2 | B3AG2
+GB | d2d2d2cB | A4z2
+d2 | B2B2B2de | d3cA2
+d2 | d2B2AGAB | G4z2
+
+X:354
+T: ES LAGEN ZWEI VERBORGEN
+N: E0201A
+O: Europa, Mitteleuropa, Deutschland, Ober - Lahnkreis; Limburg
+R: erzaehlendes Volks - Lied, Tod, Toten - Sage, Grabesstimme
+M: 4/4
+L: 1/8
+K: C
+G2 | E2E2EGA2 | G2F2D2
+GA | G2E2GAG2 | E4z2
+G2 | E2E2EGA2 | G2F2D2
+G2 | G2E2DED2 | C4z2
+
+X:355
+T: IETZ GANG I ANS BRUENNELE
+N: E0203
+O: Europa, Mitteleuropa, Deutschland, Schwaben, Remstal, Schorndorf
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 3/4
+L: 1/8
+K: G
+D2 | G3FGA | B3cB2
+A2G2A2 | G2z2
+G2 | B3ABc | d3ed2
+c2B2c2 | B4z2
+d6 | dcc2c2 | B2dBB2
+BAA2A2 | Bd3z2
+d6 | dcc2c2 | B2dBB2
+BAA2A2 | G4
+
+X:356
+T: JETZT GEH ICH ANS BRUENNELEIN
+N: E0203A
+O: Europa, Mitteleuropa, Deutschland, Dreieichenhain
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 3/4
+L: 1/8
+K: G
+D2 | G3ABc | d3ed2
+dccedc | B4
+D2 | G3ABc | d3ed2
+dccedc | B4
+Bd | dcc2e2 | d2B2B2
+dcA2d2 | B4
+Bd | dcc2e2 | d2B2B2
+dcA2d2 | B4
+
+X:357
+T: JETZT GEH ICH ANS BRUENNELEIN
+N: E0203B
+O: Europa, Mitteleuropa, Deutschland, Wetterau, Butzbach
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 3/4
+L: 1/8
+K: G
+D2 | D2B2A2 | G3FG2
+A2B2d2 | A4
+FG | A2A2ce | d2dcB2
+ccB2A2 | G4
+FG | A2A2ce | d2dcB2
+ccB2A2 | G4
+
+X:358
+T: ICH GIENG ZUM KUEHLEN WEIN
+N: E0203C
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 3/4
+L: 1/8
+K: G
+ | D2G2Ac | B3AG
+G | ABcBdB | A4z2
+GBd3c | BAdcB
+A | dcB2A2 | G4z2
+
+X:359
+T: ICH GIENG WOL IN DEN KRETSCHAM
+N: E0203D
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B2B2c2A2 | B4F2
+F2 | G2F2D2B,2 | F4z2
+B2 | d2d2d2e2 | f3gf2
+e2 | d4c4 | B4z2
+
+X:360
+T: ICH GING WOL IN DIE SCHENKE
+N: E0203E
+O: Europa, Mitteleuropa, Deutschland, Halle, Loebejuen
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 2/4
+L: 1/16
+K: G
+D2 | G3FG2B2 | d4B2
+d2 | d2c2A2F2 | G4z2
+G2 | e4e2e2 | e2d2d2
+B2 | d4c4 | B4z2
+
+X:361
+T: ICH GING WOL HIN
+N: E0203F
+O: Europa, Mitteleuropa, Deutschland, Frankfurt a.d. Oder, Seelow
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 3/4
+L: 1/16
+K: F
+C2 | F2F2A4c4 | B2d2c2B2A2
+C2 | F2G2A4c4 | G2G2F4z2
+C2 | F2G2A4c2A2 | G2C2G2C2z2
+C2 | F2G2A4c4 | G2GGF4z2
+
+X:362
+T: ES GRAST EIN MAEDEL HUEBSCH UND FEIN
+N: E0204
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Neisse, Korkwitz
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 2/4
+L: 1/8
+K: F
+F2 | F2c2 | A2GF | G2B2 | A2z
+F | cccA | dcd
+c | BABG | ccc
+B | A2d2 | c3
+A | cBGB | A2
+
+X:363
+T: ES GRAST EIN MAEGDLEIN HUEBSCH UND FEIN
+N: E0204A
+O: Europa, Mitteleuropa, Deutschland, Vormark, Perleberg, Klein Welle
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 2/4
+L: 1/16
+K: F
+FA | c4c2d2 | c6B2 | A4c2A2 | G6
+d2 | c2A2B2G2 | F2A2A2
+F2 | G2A2B2G2 | A6
+
+X:364
+T: ICH FORCHT MICH
+N: E0204B
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 2/4
+L: 1/16
+K: F
+F2 | A2A2A2A2 | c4c2B2 | A4G4 | F4z2
+F2 | ccccc2de | f2f2c2
+B2 | A2A2c2cB | A4G4 | F4z2
+
+X:365
+T: ICH SETZTE MICH NIEDER INS GRUENE GRAS
+N: E0205
+O: Europa, Mitteleuropa, Deutschland, Harz, Ilsenburg
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 3/4
+L: 1/8
+K: F
+C2 | F3AF2 | G3F
+G2 | A3cAF | G4
+C2 | F3AF2 | G3F
+G2 | A3cAF | G4
+GA | Bdd2cB | Acc2
+A2 | G2c2B2 | A4
+GA | Bdd2cB | Acc2
+A2 | G2c2B2 | A4
+
+X:366
+T: ICH LEGTE MICH NIEDER INS GRUNIGE GRAS
+N: E0205A
+O: Europa, Mitteleuropa, Deutschland, Hessen; Ober - Lahnkreis
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 3/4
+L: 1/8
+K: F
+F2 | EGG2ED | CAA2
+F2 | A3BcA | G4
+GA | Bff2dB | Acc2
+AF | E3GBG | F4
+
+X:367
+T: ICH LEGTE MICH NIEDER
+N: E0205B
+O: Europa, Mitteleuropa, Deutschland, Ober - Lahnkreis, Niedertiefenbach
+R: erzaehlendes Volks - Lied, Todes - Ahnung; betrogene Liebe
+M: 3/4
+L: 1/8
+K: G
+ | D2G2B2 | A2G2F2
+ABc2B2 | A4
+Bc | ded2c2 | B2A2G2
+ccB2A2 | G4
+Bc | ded2c2 | B2A2G2
+ccB2A2 | G6
+
+X:368
+T: ICH HAB DIE NACHT GETRAEUMET
+N: E0207
+O: Europa, Mitteleuropa, Deutschland
+R: erzaehlendes Volks - Lied, Todes - Ahnung
+M: 6/8
+L: 1/16
+K: E
+B,2 | E4F2=G3FE2 | B6A4
+A2 | =G3FE2D4E2 | F6z4
+E2 | B4B2=G3FE2 | e6=c4
+A2 | =G3FE2F3ED2 | E6z4
+
+X:369
+T: ES WARN EINMAL ZWEI MAEDCHEN
+N: E0209
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Geiz
+M: 2/4
+L: 1/16
+K: F
+F2 | c2c2c2d2 | c4A2d2 | c4A2
+A2 | c2c2cBB2 | A4z2
+A2 | c2c2cBB2 | A4z2
+A2 | c2A2c2A2 | c4d2
+c2 | B2G2B2G2 | B4c2
+A2 | c2c2cBB2 | A4z2
+A2 | c2c2cBB2 | A4z2
+
+X:370
+T: ES WAR EIN ARME MUTTER
+N: E0209A
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Geiz
+M: 6/8
+L: 1/8
+K: E
+=D | =G2=DG2A | BBz3
+B | =d2BB2A | B3z2
+B | =d2BB2A | B=Gz3
+A | B2F=G2F | E2z3
+
+X:371
+T: ZU FRANKFURTH  STAND EIN SCHIENES HAUS
+N: E0209B
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Geiz
+M: 2/4
+L: 1/16
+K: D
+DE | F2F2F2F2 | E2D2D2
+DE | F2F2A2F2 | E4D2
+DE | F2F2F2F2 | E2D2E2
+DE | F2F2F2F2 | E2D2E2
+DE | F2F2A2F2 | E4D2
+
+X:372
+T: WAS SOLL ICH DENN NUN SINGEN
+N: E0211
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Untreue
+M: 2/4
+L: 1/8
+K: F
+F | FAcA | AGG
+G | BBdB | B2A
+A | cAcA | c2fz
+dddd | c2A
+c | cBGc | A2z
+A | cAcA | c2fz
+dddd | c2A
+c | cBGc | A2z
+
+X:373
+T: EIN MAEDCHEN VON ACHTZEHN JAHREN
+N: E0211A
+O: Europa, Mitteleuropa, Deutschland, Nordsee, Budjadinger - Land
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Untreue
+M: 4/4
+L: 1/16
+K: F
+F2A2 | c4c3dc4B2G2 | F6A2G4
+G4 | A4f3fe4d3=B | c8z4
+c4 | f4f3fe4c4 | d8c4z4
+=B6d2c4z2A2 | c4F3AA2G2G2E2 | F8z4
+
+X:374
+T: EIN MAEKEN VON ACHTEIN JAHREN
+N: E0211B
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Paderborn
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Untreue
+M: 6/8
+L: 1/16
+K: E
+E2 | E3BB2B2A2=c2 | B4=G2F4
+G2 | E3F=G2A2B2G2 | F8z2
+EF | =G3FE2G2F2E2 | A4=c2B4
+A2 | =G3FE2F3GF2 | E8z2
+
+X:375
+T: ES WAR EINMAL EIN MAEDCHEN
+N: E0211C
+O: Europa, Mitteleuropa, Deutschland, Kreis Wetzlar, Burgsolms
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Untreue
+M: 4/4
+L: 1/16
+K: D
+D2F2 | A6B2A4G4 | F6E2D4
+d4 | c4c4B4B4 | A8z4
+A4 | d4d4c4c4 | B6AGF4
+A2G2 | F4F4E4E4 | D8z4
+A4 | d4d4c4c4 | B6AGF4
+A2G2 | F4F4E4E4 | D8z4
+
+X:376
+T: ES TRIEB EIN SCHAEFER OBEN REIN
+N: E0212
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Rabenmutter
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B3AB2c2 | d4c4 | B4z2
+c2 | d2c2d2e2 | f4e2d2 | d4
+f4 | e2d2c2B2 | d2c2B2A2 | B4d2B2 | c4
+f4 | e2d2c2B2 | d2c2B2A2 | B4z2
+
+X:377
+T: ES WOLLT EIN HIRTLEIN TRIEBEN AUS
+N: E0212A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Rabenmutter
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B3AB2c2 | d3cB2
+c2 | d3cd2e2 | f4d4 | c4z2
+f2 | e2d2c2B2 | d4c4 | B3cd2
+f2 | e2d2c2B2 | d4c4 | B4z2
+
+X:378
+T: ES HUETET EIN SCHAEFER
+N: E0212B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Oppenheim; Lerchheim
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Rabenmutter
+M: 6/8
+L: 1/8
+K: A
+E | EAAAcc | ceee2e | c4z
+E | EAAAcc | ceee2e | c4z
+c | c2ee2e | f2ec2e | c4z
+c | c2ee2e | f2ec2
+e | cAAB2E | A4z
+
+X:379
+T: ES HUETET EIN SCHAEFER AN JENEM HOLZ
+N: E0212C
+O: Europa, Mitteleuropa, Deutschland, Kassel, Witzenhausen, Alberode
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe, Rabenmutter
+M: 4/4
+L: 1/8
+K: G
+D2 | G2GGAcAA | B3AG2
+GA | B2BBc2ce | d3cB2
+d2 | c3BA2c2 | B4A4 | G4z2
+
+X:380
+T: ZU FRANKFURT VOR DEM THORE
+N: E0213
+O: Europa, Mitteleuropa, Deutschland, Kreis Limburg; Unter - Lahnkreis
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe
+M: 4/4
+L: 1/8
+K: G
+D2 | G2B2A2e2 | dcA2z2
+d2 | B3AG2B2 | A4z2
+GB | A2GBA2G2 | Ged2z2
+dc | BdBGA2BA | G4z2
+
+X:381
+T: IN DER STADT HAGENAU GENANNT
+N: E0215
+O: Europa, Mitteleuropa, Deutschland, Niederrhein; Elsass
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe
+M: 3/4
+L: 1/8
+K: G
+GBc | d3edc | B2z
+ABc | d3edc | B2z
+BdB | A3BcB | A2z
+ddd | d3BcA | G2z
+
+X:382
+T: WOL IN DER HAUPTSTADT DANZIG
+N: E0215A
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Hainau
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe
+M: 2/4
+L: 1/16
+K: D
+D2 | A2A2BAG2 | F4AG
+F2 | G2G2B2G2 | G4F2
+D2 | B2B2dcB2 | A4BA
+G2 | F2F2AGE2 | E4D2
+D2 | B2B2dcB2 | A4BA
+G2 | F2F2AGE2 | E4D2
+
+X:383
+T: ES STARBEN DREI GESCHWISTER
+N: E0218
+O: Europa, Mitteleuropa, Deutschland, Barmen
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe; Geiz
+M: 2/4
+L: 1/8
+K: F
+A2 | G2FE | FGA
+A | A2GF | G2
+FG | A2GA | B2A2 | G2GA | F2
+FG | A2GA | B2A2 | G2GA | F2
+FG | A2GA | B2A2 | G2GA | F2
+
+X:384
+T: ES WOHNT EIN MUELLER AN DEM RHEIN
+N: E0218
+O: Europa, Mitteleuropa, Deutschland, Unter - Taunus, Wuerges
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe
+M: 4/4
+L: 1/8
+K: Bb
+F2 | B3Fd2B2 | A2c2F3
+F | c2c2cBAG | G2FED2z
+F | B2B2d2B2 | F2A2B2
+
+X:385
+T: ES WAR EIN REICHER MUELLERSMANN
+N: E0218A
+O: Europa, Mitteleuropa, Deutschland, Trier, Kluesserath
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe
+M: 4/4
+L: 1/8
+K: Bb
+F2 | F2F2d3B | BAcAF2z
+F | BBABc2B2 | G2F2D2
+F2 | BBABd2c2 | F2F2B2
+
+X:386
+T: ES RITT EIN JAEGER WOHLGEMUTH
+N: E0219
+O: Europa, Mitteleuropa, Deutschland, Schlesien ?, Jaegerndorf
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe
+M: 2/4
+L: 1/16
+K: G
+D2 | G2A2B2c2 | d2e2d2
+B2 | A2e2d2cc | B2A2B2
+c2 | B4A4 | B4B2d2 | B4A4 | G4z2
+
+X:387
+T: HOERT IHR CHRISTEN MIT VERLANGEN
+N: E0220
+O: Europa, Mitteleuropa, Deutschland, Unter - Franken
+R: erzaehlendes Volks - Lied, Mahn -, Moral - Lied, Strafe, Faust - Sage
+M: 3/4
+L: 1/8
+K: G
+DD | G2G2BAG | FGA2
+FG | A2A2B^c | d4
+DD | G2G2BAG | FGA2
+GB | d2B2dcA | G4
+
+X:388
+T: ICH SING EIN LIED UND WEISS NIT WIE
+N: E0305
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Spott - Lied
+M: 3/4
+L: 1/4
+K: F
+ | FFF | c2A | B2G | A3
+FFF | c2A | B2G | A2
+F | FFFF | F2G
+A | B2G | F2A | B2G | F2
+F | AABB | c2BA | G2Fz
+
+X:389
+T: HERZU EIN NEUER PANTALON
+N: E0310
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Spott - Lied
+M: 4/4
+L: 1/8
+K: F
+c2 | c2c2d2d2 | c3BA2
+F2 | A2c2B2A2 | G4F2
+c2 | c2c2d2d2 | c3BA2
+F2 | A2c2B2A2 | G4F2
+f2 | f3ed2d2 | e3dc2
+c2 | d2e2f2e2 | d4c2
+c2 | A3GF2c2 | A3GF2
+c2 | d2c2B2A2 | G4F2
+
+X:390
+T: DER DEUTSCH-FRANZOS BEKLAGT SICH SEHR
+N: E0311
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Spott - Lied
+M: 4/4
+L: 1/4
+K: F
+A | GFGA | BAG
+A | GFEF | G2F
+A | GFGA | BAG
+A | GFEF | G2F
+F | GABA | GFG
+A | GFEF | G2F
+F | DEFF | GAF
+A | GFEF | G2F
+
+X:391
+T: HEU MARTIS ALEA
+N: E0314
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Dreissigjaehriger Krieg
+M: 2/2
+L: 1/8
+K: C
+C2 | C3CC2D2 | E4z2
+E2 | E3EE2D2 | E3ED2
+E2 | ^E2=E2D2C2 | D4z2
+D2 | D3ED2C2 | B,2C2D2
+D2 | D3ED2C2 | B,2C2D2
+G,2 | A,2C2C2B,2 | C6
+
+X:392
+T: DIE TROMMEL RUFT
+N: E0322
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Krieg (1706)
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B3FD3F | B3FD3
+F | B3AB3c | d4B4
+d3cd3e | f4e2
+d2 | c4c4 | c4z4
+c3dc3B | A3GF2
+A2 | c3Bc3d | e4c4
+d3cd3e | f3fB3
+c | d4c3c | B4z2
+
+X:393
+T: LILJE DU ALLERSCHOENSTE STADT
+N: E0323
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Festung Lille (1708)
+M: 4/4
+L: 1/8
+K: G
+ | G2D2B,2D2 | G2G2G2z2
+B2B2A2B2 | c2B2A2z2
+A2A2d2d2 | AGFEF2D2
+A2A2d2d2 | AGFEF2D2
+G2G2A2A2 | B2B2A2z2 | B2B2A2z2
+d3cB2B2 | A2A2G2z2
+
+X:394
+T: LILLE DU ALLERSCHOENSTE STADT
+N: E0323A
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Festung Lille (1708)
+M: 4/4
+L: 1/8
+K: Bb
+ | B3FD2F2 | B2B2B2z2
+d2d2c2z2 | e2d2c2z2
+c2c2c2f2 | cBAGA2F2
+c2c2c2f2 | cBAGA2F2
+B2B2c2c2 | d2d2c2z2 | d2d2c2z2
+f3ed2c2 | B2A2B2z2
+
+X:395
+T: PRINZ EUGEN DER EDLE RITTER
+N: E0324
+O: Europa, Mitteleuropa, Deutschland
+N: +++ nachtrglich 5/4! eingetragen ++++++
+R: historisches Lied, Prinz Eugen (1717)
+M: 5/4
+L: 1/8
+K: G
+DDG2G2GABB
+GAB2d2dccB
+AGABcBA3z
+dcB2d2edcB
+AGA2c2dcBA
+GGG2B2AAG2
+dcB2d2edcB
+AGA2c2dcBA
+GGG2B2AAG2
+
+X:396
+T: PRINZ EUGENIUS DER EDLE RITTER
+N: E0324A
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Prinz Eugen (1717)
+M: 3/4
+L: 1/16
+K: G
+D2D2 | G3GG2G2G2A2 | B4B4
+G2A2 | B4d4 | d2c2c2B2
+A2G2A2B2c2B2 | A8
+D2D2 | G3GG2G2G2A2 | B4B4
+G2A2 | B4d4 | d2c2c2B2
+A2G2A2B2c2B2 | A8
+d2c2 | B4d4 | e2d2c2B2
+A2G2 | A4c4 | d2c2B2A2
+G2G2 | G4B4A2A2 | G8
+d2c2 | B4d4 | e2d2c2B2
+A2G2 | A4c4 | d2c2B2A2
+G2G2 | G4B4A2A2 | G8
+
+X:397
+T: PRINZ EUGEN DER EDLE RITTER
+N: E0324B
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Prinz Eugen (1717)
+M: 3/4
+L: 1/8
+K: C
+G,G, | CCCCDD | E2E2
+CD | E2G2GF | F2E2
+DC | DEF2E2 | D4
+GF | E2G2AG | GFE2
+DC | D2F2GF | FED2
+CC | CDE2DD | C4
+
+X:398
+T: MARLBRUCK ZOG AUS ZUM KRIEGE
+N: E0325
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Krieg, Marlborough (1709)
+M: 6/8
+L: 1/8
+K: G
+B | B2BB2A | c3B
+cB | A2AAGA | B3G2
+G | B2BB2A | c3B2
+d | B2BAGA | B3z2
+d | d2Bc2e | d3z2
+d | d2Bc2e | d3z2
+
+X:399
+T: VIVAT JETZT GEHTS INS FELD
+N: E0326
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Krieg, Schlacht bei Lowositz (1756)
+M: 4/4
+L: 1/8
+K: C
+G2 | c2c2c2c2 | G4z2
+G2 | A2A2ABcA | G4z2
+G2 | GFFEF3F | EGGcc3
+G | AGFEGFED | C4z2
+
+X:400
+T: MARIA THERESIA ZEUCH NICHT IN DEN KRIEG
+N: E0327
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Siebenjaehriger Krieg (1756)
+M: 3/4
+L: 1/8
+K: C
+GAB | c3GG2 | G3EG2 | F2E2D2 | C2z2
+GAB | c3GG2 | G3EG2 | F2E2D2 | C2z2
+E2 | D2D2D2 | D3EF2 | G3FE2 | D2z4
+c3GG2 | G3EG2 | F2E2D2 | C2z2
+
+X:401
+T: ALS DIE PREUSSEN MARSCHIERTEN
+N: E0328
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Krieg, Prager Schlacht (1757)
+M: 4/4
+L: 1/16
+K: F
+F3A | c4A3FB4G3E | F8z2
+F2E2F2 | G4A4B4A4 | G8z4
+F3A | c4A3GF3F_E3E | D4F4B4z2
+B2 | d3dB3AG4F4 | E4G4c4z2
+C2 | F6A2G6B2 | A3Ff2d2c6
+c2 | f2c2d2B2c4E4 | F8z6
+C2 | F6A2G6B2 | A3Ff2d2c6
+c2 | f2c2d2B2c4E4 | F8z4
+
+X:402
+T: IM BOEHMERLAND BEI PRAG
+N: E0329
+O: Europa, Mitteleuropa, Deutschland, Neumark, Lippehne
+R: historisches Lied, Siebenjaehriger Krieg (1757)
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B3cdcdc | B4z2
+Bc | d2d2d2cd | e2dBc2
+AB | ccccccBc | d4z2
+Bc | d2ddd2e2 | f2edc2
+cd | e2ddc2AB | c2AGF2
+Bd | f3Bd2cA | B4z2
+
+X:403
+T: DU TAPFRER HELD
+N: E0331
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Siebenjaehriger Krieg (1757)
+M: 2/4
+L: 1/16
+K: G
+ | d4B2d2 | G4z2
+G2 | F3EF2G2 | A4z2
+A2 | d3df2e2 | d4z2
+G2 | F3EF2G2 | A4z2
+A2 | G3AB2c2 | d6
+e2 | d2dcB2c2 | B4A4 | G4z4
+
+X:404
+T: DER KOENIG VON PREUSSEN HAT LEUT
+N: E0332
+O: Europa, Mitteleuropa, Deutschland, Schweinfurt
+R: historisches Lied, Krieg, Breslau (1760)
+M: 2/4
+L: 1/16
+K: G
+d4 | B2A2G2A2G2F2 | G4z2
+A2 | B2d2c2B2 | A2G2F2E2 | D2E2D2C2 | B,8
+A3AA2A2A2B2 | c8z4
+B3BB2B2B2c2 | d8z4
+A4A3AA2A2 | B8z4
+d4A3AA2A2 | B8
+
+X:405
+T: KAISER JOSEPH
+N: E0334
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: historisches Lied, Bayrischer Erbfolgekrieg (1778)
+M: 4/4
+L: 1/8
+K: G
+ | G2GBG2GB | B2d2B4
+A3BdcBA | A4G2z2
+G2GBG2GB | B2d2B4
+A3BdcBA | A4G2z2
+A3GF2G2 | A3Bc4
+d2ded2cB | B4A2z2
+G2GBG2GB | B2d2B4
+A3BdcBA | A4G2z2
+
+X:406
+T: HIER STEHEN WIR AUF UNSERN KRUECKEN
+N: E0334
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: historisches Lied, Krieg, Invalieden; Tod Friedrich II (1786)
+M: 4/4
+L: 1/8
+K: Bb
+fdf | B4zbbc | b2g2z
+bag | f2dgfece | e2d2z
+fcd | eaa3ceg | g2f2z
+fcd | eaa3ceg | g2f2z
+bag | f3ed2c2 | fed2z
+bag | f3ed2c2 | B4z
+
+X:407
+T: HIER STEHEN WIRAUF UNSERN KRUECKEN
+N: E0334A
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: historisches Lied, Krieg, Invalieden; Tod Friedrich II (1786)
+M: 4/4
+L: 1/8
+K: Bb
+fdf | B4zbbb | a2f2z
+abg | f2dgfece | e2d2z
+dcd | fee2z2de | gff2z
+dcd | fee2z2de | gff2z
+bbb | g2fed2c2 | fedef
+bbb | g2fef2A2 | B4z
+
+X:408
+T: MARSCHIEREN WIR IN DAS TUF[ERK1ISCHE LAND
+N: E0335
+O: Europa, Mitteleuropa, Deutschland, Franken; Oesterreich
+R: historisches Lied, Krieg gegen die Tuerken (1789)
+M: 6/8
+L: 1/8
+K: A
+E | EAAA2B | AGFE2
+E | Eccc2c | c2ec2
+A | Accc2c | c2ec2
+c | BBBeed | c2BA2
+E | EAAA2B | AGFE2
+E | Eccedc | B3A2
+
+X:409
+T: ALS DIE GROSSE STADT BELGARAD
+N: E0336
+O: Europa, Mitteleuropa, Deutschland, Franken; Oesterreich
+R: historisches Lied, Krieg gegen die Tuerken (1789)
+M: 3/4
+L: 1/8
+K: G
+DD | G2BBAA | G2
+G2GA | B2d2cA | B4
+dB | A3GAA | Bcd2
+dB | A3GAA | Bcd2
+DD | G2B2AA | B4
+dc | B2d2AA | G4
+
+X:410
+T: JOSEPHUS DER ROEMISCHE KAISER
+N: E0337
+O: Europa, Mitteleuropa, Deutschland, Odenwald
+R: historisches Lied, Tod Kaiser Joseph II (1790)
+M: 6/8
+L: 1/8
+K: G
+D | DGGGAB | B3A2
+d | dBBcAA | B4z
+D | DGGGAB | B3A2
+d | dBBcAA | B4z
+G | G2BB2d | d2Bc2
+B | BAAABc | c2AB2
+D | DGGGAB | B3A2
+d | dBBcAA | A3Gz
+
+X:411
+T: JOSEPHUS DER ROEMISCHE KAISER
+N: E0337A
+O: Europa, Mitteleuropa, Deutschland, Odenwald
+R: historisches Lied, Tod Kaiser Joseph II (1790)
+M: 6/8
+L: 1/8
+K: G
+D | DGGGAB | B3A2
+d | BcBAGA | G3z2
+D | DGGGAB | B3A2
+d | BcBAGA | G3z2
+G | G2BB2d | d2Bc2
+B | BAAABc | c2AB2
+D | DGGGAB | B3A2
+d | BcBAGA | G3z2
+
+X:412
+T: ZUM DONNER ZUM DONNER
+N: E0338
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Krieg gegen Franzosen (1792)
+M: 3/4
+L: 1/8
+K: F
+F2 | A4F2 | A4F2 | A4B2 | c4
+A2 | G4G2 | c4B2 | A4G2 | F4
+F2 | A4F2 | A4F2 | A4B2 | c4
+A2 | G4G2 | c4B2 | A4G2 | F4
+F2 | G2G2A2 | B2B2G2 | A4f2 | c4
+A2 | G4A2 | B2B2G2 | A4f2 | c4
+FG | A2A2F2 | A2A2F2 | A2A2B2 | c4
+A2 | G4G2 | c4B2 | A4G2 | F4
+
+X:413
+T: AUF EINEM SCHOENEN GRUENEN RASEN
+N: E0341
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Krieg (1799)
+M: 3/4
+L: 1/8
+K: Eb
+EEE | E3EFG | G2F
+FFG | A3FBA | A2G2
+GA | B3GcA | F2z2
+B2 | G2B2B2 | e2c2
+c2 | A2c2c2 | e2d2
+c2 | c2B2B2 | e2B2
+B2 | A2G2G2 | G2A2
+B2 | c4d2d2 | e4c3
+A | G4F4 | E4z
+
+X:414
+T: DIE FRANZOSEN BRECHEN EIN
+N: E0342
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: historisches Lied, Krieg gegen Franzosen (1799)
+M: 3/4
+L: 1/8
+K: G
+D2 | G2GBAF | G4
+A2 | B2BdcA | B4
+GA | B2B2Bc | d3c
+B2 | BAAGAB | c3B
+A2 | B2dcBA | G4
+A2 | B2dcBA | G4
+
+X:415
+T: ACH PREUSSE WAS HAST DU GEFANGEN AN
+N: E0344
+O: Europa, Mitteleuropa, Deutschland, Bayern
+R: historisches Lied, Krieg v. Franzosen und Bayern gegen Preussen 1806
+M: 6/8
+L: 1/16
+K: G
+D2 | D3GG2G2F2E2 | E2D2D2D4
+c2 | B4B2A2G2A2 | G6z4
+D2 | D3GG2G2F2E2 | E2D2D2D4
+c2 | B4B2A2G2A2 | G6z4
+DG | G3GB2B4d2 | d3cc2c2c2
+c2 | A2A2d2d2c2c2 | c6B4
+D2 | D2G2G2G2F2E2 | E6D4
+c2 | B3BB2A2G2A2 | G6z4
+
+X:416
+T: AUF AUF IHR KRIEGER
+N: E0345
+O: Europa, Mitteleuropa, Oesterreich
+R: historisches Lied, Krieg (1809)
+M: 4/4
+L: 1/8
+K: Eb
+B2 | e3BBAGF | E2E2E2z
+G | FBdfe3=A | B4z2
+BA | G2G2G3B | BAAGA3
+G | GFF2F3A | AGGFG2
+B2 | e3BAGFE | B4
+d4 | e3cBAGF | E4z2
+
+X:417
+T: TYROLER LASST UNS STREITEN
+N: E0346
+O: Europa, Mitteleuropa, Oesterreich, Tirol
+R: historisches Lied, Krieg (1809)
+M: 6/8
+L: 1/16
+K: D
+D,F, | A,4A,2A,4A,2 | A,6F,4
+A,2 | G,2F,2G,2E,2F,2G,2 | A,6z4
+D,F, | A,4A,2A,4A,2 | A,4D2F4
+D2 | E4E2C3B,C2 | D6z4
+D,2 | E,4E,2D3B,^G,2 | A,4C2E,4
+E,2 | E,4E,2D3B,^G,2 | A,8z2
+G,2 | F,4F,2G,3F,G,2 | A,4D2F4
+D2 | E4E2C3B,C2 | D6z4
+D,2 | D,4F,2F,4A,2 | A,4D2F4
+D2 | E4E2C3B,C2 | D6z4
+
+X:418
+T: WILHELM KOMM AN MEINE SEITE
+N: E0347
+O: Europa, Mitteleuropa, Deutschland, Hochwald, Hellertshausen u.a.
+R: historisches Lied, Tod Koenigin Louise (1810)
+M: 4/4
+L: 1/16
+K: F
+F2A2 | c4c4c4d2c2 | A4F4z4
+G2A2 | B6B2A4c2A2 | G8z4
+F2A2 | c4c4f4e2d2 | c3dc4z4
+B2A2 | G4d4c4B2c2 | A8z4
+F2A2 | c4c4f4e2d2 | c3dc4z4
+B2A2 | G4d4c4B2c2 | A8z4
+
+X:419
+T: WILHELM KOMM AN MEINE SEITE
+N: E0347A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Westfalen
+R: historisches Lied, Tod Koenigin Louise (1810)
+M: 4/4
+L: 1/8
+K: C
+ | G,3G,G,G,G,G, | ECC2z2
+B,C | D3CB,2A,B, | C4z2
+E,F, | G,3EE2DC | CA,A,2z2
+CA, | G,3CB,2A,B, | C4z4
+
+X:420
+T: WILHELM KOMM AN MEINE SEITE
+N: E0347B
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: historisches Lied, Tod Koenigin Louise (1810)
+M: 4/4
+L: 1/16
+K: Eb
+G2F2 | E6E2E4D2E2 | G2F2F4z4
+B2G2 | F6F2F4B2A2 | G8z4
+E2F2 | G6E2G4F2E2 | C3cc8
+BAGF | E6G2B6D2 | E8z4
+E2F2 | G6E2G4F2E2 | C3cc8
+BAGF | E6G2B6D2 | E8z4
+
+X:421
+T: IST DENN DIESES WIRKLICH WAHR
+N: E0349
+O: Europa, Mitteleuropa, Deutschland, Schlesien; Posen; Schwaben
+R: historisches Lied, Napoleons russischer Feldzug (1812)
+M: 2/4
+L: 1/8
+K: G
+ | DGGG | FAD2
+DAAA | AdcA
+GBBB | Bdd2
+ABcF | A2G2
+
+X:422
+T: IST DENN DIESES WIRKLICH WAHR
+N: E0349A
+O: Europa, Mitteleuropa, Deutschland, Schlesien; Posen; Schwaben
+R: historisches Lied, Napoleons russischer Feldzug (1812)
+M: 2/4
+L: 1/8
+K: G
+ | DGGG | FAD2
+DAAA | ABB2
+GBBB | Bdd2
+ABcF | A2G2
+
+X:423
+T: KAISER DER NAPOLEON
+N: E0349B
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: historisches Lied, Napoleons russischer Feldzug (1812)
+M: 2/4
+L: 1/16
+K: G
+ | D2G2G2G2 | F2A2A4
+A2A2A2A2 | B2d2d4
+B3BB2B2 | d3cc4
+A2A2d3c | c4B4
+
+X:424
+T: NAPOLEON DU GROSSER SIEGER
+N: E0351
+O: Europa, Mitteleuropa, Deutschland, Wetterau
+R: historisches Lied, Napoleons russischer Feldzug (1812)
+M: 3/4
+L: 1/16
+K: G
+D2D2F2 | G4B4B2A2 | A2G2z2
+G2G2B2 | d4d4d2c2 | c2B2z6
+G2 | G2e2e2e2 | e2d2d4
+d2c2e2c2 | c2B2d2
+G2 | G2e2e2e2 | e2d2d4
+d2c2e2c2 | c2B2d4
+AAAAc4 | BBBBd4
+B2c2d3e | d2c2B2A2 | G4z4
+AAAAc4 | BBBBd4
+B2c2d3e | d2c2B2A2 | G4z2
+
+X:425
+T: WIR PREUSSEN ZIEHEN IN DAS FELD
+N: E0352
+O: Europa, Mitteleuropa, Deutschland, Pommern
+R: historisches Lied, preussisches Kriegs - Lied (1813)
+M: 4/4
+L: 1/8
+K: Bb
+F2 | B2F2F2B2 | G2E2E2
+c2 | A2F2G2A2 | B4z2
+F2 | B2F2F2B2 | G2E2E2
+c2 | A2F2G2A2 | B4z2
+Bc | d2d2edcB | c2F2F2
+FA | c2c2fedc | B2c2d
+FGA | B4dcBA | G4e
+eee | d2d2c2c2 | B4z3
+f | d2zfd2zf | gfede2z
+e | c2zec2ze | fedcd
+FFF | B4dcBA | G4e
+dcB | A2f2f2f2 | B4z2
+
+X:426
+T: MIT FROHEM MUTH UND HEITERM SINN
+N: E0352A
+O: Europa, Mitteleuropa, Deutschland
+R: historisches Lied, Krieg (1815)
+M: 4/4
+L: 1/8
+K: Bb
+B2 | F2F2F2B2 | G2G2G2
+c2 | A2F2G2A2 | B4z2
+B2 | F2F2F2B2 | G2G2G2
+c2 | A2F2G2A2 | B4z2
+B2 | c2c2c2A2 | B2d2d2
+B2 | c2c2c2A2 | B2d2d2
+F2 | B4dcBA | G4e2
+e2 | f2f2f2f2 | B4z2
+f2 | d2f2d2f2 | gfede2
+e2 | c2e2c2e2 | fedcd2
+F2 | B4dcBA | G4e2
+e2 | f2f2f2f2 | B4z2
+
+X:427
+T: ES KANN JA NICHT IMMER SO BLEIBEN
+N: E0353
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: historisches Lied, Krieg, Soldaten (1813 und 1870)
+M: 4/4
+L: 1/8
+K: F
+FG | A2AAAcBA | cGG2z2
+GA | B2BBd2cB | c4z2
+F2 | d2ddf2ed | dcc2z2
+cf | f2Acc2BG | F4z2
+F2 | d2ddf2ed | dcc2z2
+cf | f2Acc2BG | F4z2
+
+X:428
+T: ES KANN JA NICHT IMMER SO BLEIBEN
+N: E0353A
+O: Europa, Mitteleuropa, Deutschland, Wetterau
+R: historisches Lied, Krieg, Soldaten (1813 und 1870)
+M: 4/4
+L: 1/8
+K: F
+C2 | F2FFA2GF | cGG2z2
+GA | B2BBd2cB | c4z2
+F2 | d2ddf2ed | dcc2z2
+cf | f2Acc2BG | F4z2
+F2 | d2ddf2ed | dcc2z2
+cf | f2Acc2BG | F4z2
+
+X:429
+T: ES KANN JA NICHT IMMER SO BLEIBEN
+N: E0353B
+O: Europa, Mitteleuropa, Deutschland, Schleswig
+R: historisches Lied, Krieg, Soldaten (1813 und 1870)
+M: 4/4
+L: 1/16
+K: F
+C4 | A4A3GF4d3c | c2B2G4z4
+G2A2 | B4B2B2d4c2B2 | c8z4
+F4 | d4d2d2f4e2d2 | d2c2c4z4
+c2f2 | f4A2c2c4B2G2 | F8z4
+F4 | d4d2d2f4e2d2 | d2c2c4z4
+c2f2 | f4A2c2c4B2G2 | F8z4
+
+X:430
+T: ESKANN JA NICHT IMMER SO BLEIBEN
+N: E0353C
+O: Europa, Mitteleuropa, Deutschland, Hessen, Nassau
+R: historisches Lied, Krieg, Soldaten (1813 und 1870)
+M: 4/4
+L: 1/16
+K: F
+F2G2 | A4A2A2A2c2B2A2 | c2G2G4z4
+G2A2 | B4B2B2d4c2B2 | c8z4
+F4 | d4d2d2f4e2d2 | d2c2c4z4
+c2f2 | f2c2A2d2c4B3G | F8z4
+F4 | d4d2d2f4e2d2 | d2c2c4z4
+c2f2 | f2c2A2d2c4B3G | F8z4
+
+X:431
+T: ES KANN JA NICHT IMMER SO BLEIBEN
+N: E0353D
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt
+R: historisches Lied, Krieg, Soldaten (1813 und 1870)
+M: 4/4
+L: 1/8
+K: F
+FG | A2AAAcBA | cGG2z2
+GA | B2BBd2cB | c4z2
+F2 | d2ddf2ed | dcc2z2
+cf | e2eee2de | f4z2
+F2 | d2ddf2ed | dcc2z2
+cf | e2eee2de | f4z2
+
+X:432
+T: EINSTMALS SASS ICH VOR MEINER HUETTE
+N: E0355
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald; Nassau
+R: historisches Lied, Krieg, Schlacht bei Leipzig (1813)
+M: 6/8
+L: 1/8
+K: G
+DEF | G2BAGA | BAz
+AAA | d2cB2A | G2z
+DEF | G2BAGA | BAz
+AAA | d2cB2A | G2z
+BBB | dcAcBG | BAz
+BBB | dcAcBG | BAz
+DEF | G2BAGA | BAz
+edc | BAGAGF | d3
+edc | BAGd2d | G2z
+
+X:433
+T: IHR FRANZOSEN GEHT NACH HAUS
+N: E0356
+O: Europa, Mitteleuropa, Deutschland, Jena
+R: historisches Lied, Krieg gegen Frankreich (1813 und 1871)
+M: 2/4
+L: 1/8
+K: F
+ | C2A,C | FCA,F, | C3G, | B,2A,2
+C2A,C | FCA,F, | C3G, | B,2A,2
+F,A,A,A, | A,G,G,G,
+G,B,B,B, | B,A,A,A,
+A,CCC | =B,FF2
+CFAF | C2G2 | F2z2
+
+X:434
+T: IHR FRANZOSEN GEHT NACH HAUS
+N: E0356A
+O: Europa, Mitteleuropa, Deutschland, Ober - Hessen, Wiesenbreidenbach
+R: historisches Lied, Krieg gegen die Franzosen (1813 und 1871)
+M: 2/4
+L: 1/8
+K: F
+ | C2C2 | F2CA, | C2G,G, | B,2A,2
+C2C2 | F2CA, | C2G,G, | B,2A,2
+A,A,A,C | CG,G,G,
+B,B,B,D | CA,A,A,
+CCCF | FDD
+D | CFFA | G2E2 | F2z2
+
+X:435
+T: IHR FRANZOSEN GEHT NACH HAUS
+N: E0356B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Wetterau
+R: historisches Lied, Krieg gegen die Franzosen (1813 und 1871)
+M: 2/4
+L: 1/16
+K: D
+ | A,4A,4 | D2A,2F,2A,2 | A,6G,2 | G,4F,4
+A,4A,4 | D2A,2F,2A,2 | A,6G,2 | G,4F,4
+D,2F,2F,2A,2 | A,2E,2E,2E,2
+E,2G,2G,2B,2 | B,2A,2A,2A,2
+A,3A,A,2D2 | B,2B,2B,4
+C3CC2E2 | E2D2D4
+A,3A,A,2D2 | B,2B,2B,4
+C3CC2E2 | E2D2D4
+
+X:436
+T: AUF BRUEDER AUF ZUM STREIT
+N: E0357
+O: Europa, Mitteleuropa, Deutschland, Bayern, Franken
+R: historisches Lied, Krieg (1814)
+M: 4/4
+L: 1/8
+K: Bb
+F2 | B3AB2c2 | d4z2
+c2 | e2d2c2B2 | Affff2
+F2 | B3AB2c2 | d4z2
+c2 | e2d2c2Bd | c4z2
+AB | c2ccc2Bc | d2ddd2
+AB | c2c2c2d2 | ccccc2
+f2 | d2d2c2c2 | d4
+f4 | d2dBc2cA | B4z2
+
+X:437
+T: FRUEHMORGENS ALS DER TAG ANBRACH
+N: E0358
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Breslau
+R: historisches Lied, Krieg gegen Napoleon (1814)
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2A2A2 | B2BAG2
+A2 | B2B2c2c2 | d2dcB2
+d2 | e2d2c4 | B4z2
+B2 | d2d2e2d2 | dccBA2
+A2 | B2B2d2B2 | BAA2A2
+B2 | d2B2A4 | G4z2
+
+X:438
+T: DER GROSSE KAISER NAPOLEON
+N: E0358A
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: historisches Lied, Krieg gegen Napoleon (1815)
+M: 4/4
+L: 1/8
+K: G
+D2 | G2B2A2d2 | B3AG2
+GA | B2B2c2ce | d3cB2
+d2 | e2d2c4 | B4z2
+Bc | d2B2e3d | c2cBA2
+AB | c2A2d3c | B2BAG2
+G2 | A2e2d2c2 | B4z2
+
+X:439
+T: BEI WATERLOO WAR DIE GROSSE SCHLACHT
+N: E0358B
+O: Europa, Mitteleuropa, Deutschland, Lahngebiet, Unter - Taunus
+R: historisches Lied, Krieg gegen Napoleon (1815)
+M: 4/4
+L: 1/8
+K: F
+C2 | F2A2G2c2 | A2AGF2
+G2 | A2c2B2d2 | c2cBA2
+c2 | d3cB2c2 | A4z2
+FA | c2f2d3c | dcBAG2
+GA | B2BBBdcB | A2G2F2z
+G | A2c2G4 | F4z2
+FA | c2f2d3c | dcBAG2
+GA | B2BBBdcB | A2G2F2z
+G | A2c2G4 | F4z2
+
+X:440
+T: BEI WATERLOO STAND EINE EICHE
+N: E0358C
+O: Europa, Mitteleuropa, Deutschland, Hessen, Wetterau
+R: historisches Lied, Krieg gegen Napoleon (1815)
+M: 4/4
+L: 1/16
+K: F
+C4 | A6A2G2G2A2G2 | F4c4A2
+A2G2A2 | c6B2A3Ac3A | G8z4
+F2A2 | c6A2c3Ac3f | d4d4z2
+c2B2A2 | G6A2B3dc3B | B4A4z4
+F2A2 | c6A2c3Ac3f | d4d4z2
+c2B2A2 | G6A2B3dc3B | B4A4z4
+
+X:441
+T: BEI WATERLOO DA FIEL DER ERSTE SCHUSS
+N: E0359
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein
+R: historisches Lied, Krieg gegen Napoleon (1815)
+M: 4/4
+L: 1/8
+K: C
+G,2 | C2G,2E,2G,2 | C4
+A,4 | G,2FFEEDD | C4z2
+C2 | D2DDB,B,G,G, | C2G,2C2
+C2 | D2DDB,B,G,G, | C2G,2C2
+C2 | A,2A,A,A,CB,A, | G,3CC3
+E | EDFDC2B,2 | C4z2
+
+X:442
+T: UND ALS DER ERSTE SCHUSS
+N: E0359A
+O: Europa, Mitteleuropa, Deutschland, Berlin
+R: historisches Lied, Krieg gegen Napoleon (1815)
+M: 4/4
+L: 1/8
+K: C
+G,2 | C3G,E,2C,2 | G,4z2
+B,C | D2C2B,A,G,F, | E,4z2
+C2 | D2DDD2CD | E2D2C2
+C2 | D2DDD2CD | E2D2C2
+G,2 | C2CCEDCB, | A,4z2
+A,2 | G,2G,2G,2A,B, | C4z2
+
+X:443
+T: GEDENK MIT HOCHGEFUEHL AN JENE
+N: E0360
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: historisches Lied, Krieg gegen Napoleon (1815)
+M: 4/4
+L: 1/16
+K: C
+G,2 | C6C2G,4C2G,2 | A,2F,2C2A,2A,4G,4
+F,4G,2F,2E,4C4 | D4C2B,2C4z2
+G,2 | C6C2G,4C2G,2 | A,2F,2C2A,2A,4G,4
+F,4G,2F,2E,4C4 | D4C2B,2C4z2
+C2 | D6C2B,3A,G,3F, | F,4E,4z4
+G,2C2 | D6G,2E6D2 | C8z6
+G,2 | C6C2G,4C2G,2 | A,2F,2C2A,2A,4G,4
+F,4G,2F,2E,4C4 | D4B,3EE8
+C2B,2C2A,2G,4E4 | D6B,2C4z2
+
+X:444
+T: DIE DAENEN RUECKTEN EIN
+N: E0363
+O: Europa, Mitteleuropa, Deutschland, Unter - Westerwald, Woelferlingen
+R: historisches Lied, Schleswig Holsteinscher Krieg (1849)
+M: 3/4
+L: 1/8
+K: G
+D2 | B2B2AA | G4
+GB | d2d2c2 | B4
+GB | d2d2d2 | d3B
+B2 | c2c2c2 | c3B
+A2 | d2d2d2 | e4
+dd | e2c2d2 | B4
+GB | d2d2d2 | d3B
+B2 | c2c2c2 | c3B
+A2 | d2d2d2 | e4
+dd | e2c2d2 | B4
+
+X:445
+T: DIE FRANZOSEN ZOGEN EIN
+N: E0364
+O: Europa, Mitteleuropa, Deutschland, Frankreich, Elsass
+R: historisches Lied, Krieg, franzoesisches Soldaten - Lied (1855)
+M: 3/4
+L: 1/8
+K: G
+GA | B2B2A2 | G4
+GA | B2B2A2 | G4
+GB | d2d2d2 | d3c
+B2 | c2c2c2 | c3B
+A2 | B2B2A2 | G4
+GB | d2d2c2 | B4
+
+X:446
+T: IST ES DENN AUCH WIRKLICH WAHR
+N: E0368
+O: Europa, Mitteleuropa, Deutschland, Ober - Lahnkreis, Dillkreis
+R: historisches Lied, Deutsch - Franzoesischer Krieg (1870)
+M: 4/4
+L: 1/16
+K: F
+ | F4C4F4A4 | G2F2E2D2C8
+G4G4G4G4 | G4c4c4B4
+A4A4A4A4 | A2G2A2B2c8
+d6c2B4G4 | G8F4z4
+F4A3GF4A2A2 | G2A2B2A2G4z4
+G4B2A2G4A2B2 | c2d2c2B2A4z4
+A4A4A4A4 | A2G2A2B2c8
+d6c2B4G4 | G8F4z4
+
+X:447
+T: WAS IST MIT DIR GESCHEHEN
+N: E0369
+O: Europa, Mitteleuropa, Deutschland, Nassau, Dillkreis; Wetterau
+R: historisches Lied, Deutsch - Franzoesischer Krieg (1870)
+M: 4/4
+L: 1/8
+K: F
+C2 | F2F2A2c2 | f2c2A2
+F2 | d2d2e2e2 | f4z2
+C2 | F2F2A2c2 | f2c2A2
+F2 | d2d2e2e2 | f4z2
+A2 | G3Gf2f2 | e3ee2
+e2 | g2g2f2dd | c3dcB
+AG | F2F2A2c2 | f2c2A2
+F2 | d2d2e2e2 | f4z2
+
+X:448
+T: DER MAI TRITT EIN MIT FREUDEN
+N: E0381
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Jahreszeiten, Fruehling
+M: 3/4
+L: 1/8
+K: D
+A,2 | D3EFD | A,2F,2
+A,2 | B,3CDB, | A,4
+F,2 | G,2B,2A,G, | F,2A,2
+D2 | FED2C2 | D4
+DE | F2D2A2 | E3D
+C2 | D2B,2E2 | C2A,2z
+A, | B,3CDB, | A,2D2
+F2 | FED2C2 | D4
+
+X:449
+T: DER MAI WILL SICH MIT GUNSTEN
+N: E0382
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Jahreszeiten, Fruehling
+M: 4/4
+L: 1/8
+K: F
+F2 | F2G2A2B2 | c4A2
+A2 | d4c2B2 | c4A2
+A2 | d2d2c2A2 | cBAGF2z2 | z2
+F2F2A2 | G2F2E2E2 | D4z2
+E2 | F3FF2E2 | D4C4 | z2
+F2F2F2 | F2E2F3E | D2
+C2F2G2 | A4z2
+F2 | F3ED2C2 | G4G2G2 | G4F2
+
+X:450
+T: MIR GLIEBT IM GRUENEN MAIEN
+N: E0383
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Jahreszeiten, Fruehling
+M: 6/4
+L: 1/8
+K: G
+GA | _B4B2B2c2c2 | d6_B3c
+d2 | _e4d2d2c4 | _B6-=B4
+GA | _B4B2B2c2c2 | d6_B3c
+d2 | _e4d2d2c4 | _B6-=B4
+_Bc | d4d2d2c2_B2 | A3GA_BA3B
+c2 | _B4A2G4F2 | G6-G4
+
+X:451
+T: MEIN HERZ HAT SICH GESELLET
+N: E0388
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Jahreszeiten, Fruehling
+M: 6/4
+L: 1/4
+K: A
+A | A2AA2F | E3B2
+c | B2AG2F | E3-E2
+A | A2AA2F | E3B2
+c | B2AG2F | E3-E2
+E | A2AG2E | A3B2
+B | B2Bc2c | B2AB2
+c | e2dc2B | A3d2
+B | c2BA2G | A3-A2
+
+X:452
+T: DIE LIEBE MAIENZEIT
+N: E0392
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Jahreszeiten, Fruehling
+M: 4/4
+L: 1/8
+K: F
+c2 | c3AB2A2 | G4
+c4 | c3AB2A2 | G4z2
+G2 | G3GG2A2 | F4F2
+E2 | F3FG2A2 | B4A2
+A2 | B3BA2G2 | ^F4G2
+G2 | A2B2c2F2 | G4F2
+
+X:453
+T: DER WINTER IST VERGANGEN
+N: E0393
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Jahreszeiten, Fruehling
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2A2d2 | B4B2
+c2 | A2G2A2F2 | G4z2
+D2 | G2G2A2d2 | B4B2
+c2 | A2G2A2F2 | G4z2
+GA | B2B2B2AB | c4c2
+c2 | B2G2A2cB | A4z2
+C2 | G2G2A2d2 | B4B2
+c2 | A2G2A2F2 | G4z2
+
+X:454
+T: IM MAIEN IM MAIEN ISTS LIEBLICH
+N: E0394
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Jahreszeiten, Fruehling
+M: 6/8
+L: 1/16
+K: Eb
+A2 | A2e2G2G2B2E2 | G2GBAcB4
+B,2 | E2E2G2G2E2AG | F8z2
+B2 | B3AG2F2D2
+B2 | B3AG2F2D2
+B,2 | E4E2G4G2 | B6e4
+GA | B4EFG4F2 | E8z2
+
+X:455
+T: MIT LIEB BIN ICH UMFANGEN
+N: E0400
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: A
+E2 | ABcBAGFE | F4F2
+A2 | FGA2GABG | A4z2
+E2 | ABcBAGFE | F4F2
+A2 | FGA2GABG | A4z2
+c2 | B2e2d2c2 | B4B2
+e2 | d2c2B2A2 | G4z2
+E2 | AB=cBA=GFE | F4F2
+A2 | FGA2GABG | A4z2
+
+X:456
+T: DREI LAUB AUF EINER LINDEN
+N: E0404
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+F2 | F4F2 | F4G2 | A6 | c6
+F4F2 | F4E2 | D6 | C4
+c2 | c6 | A4
+A2 | d4c2 | B4A2 | G6 | A4
+A2 | F4F2 | B4B2 | G3AB2 | c4
+c2 | c4B2 | A2G4 | F6 | z4
+
+X:457
+T: ES STEHT EIN LIND IN JENEM THAL
+N: E0406
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2G2A2 | F2E2D2
+G2 | F2D2E2E2 | D4z2
+D2 | G2G2d3c | B4A4 | GABAG2FE | F2
+D2E2F2 | G3AB2A2 | G6
+D2 | G2G2d3c | B4A4 | GABAG2FE | F2
+D2E2F2 | G3AB2A2 | G6
+
+X:458
+T: NAER OOSTLAND WILLEN WIJ
+N: E0408
+O: Europa, Mitteleuropa, Deutschland; Niederlande
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: G
+D2 | G2F2G2d2^c2d2 | _B4A2G4
+G2 | A2G2A2d2^c2d2 | A6z4
+A2 | _B2A2G2G2A2B2 | c6d4
+c2 | _B2A2G2FED2
+d2 | _B2c2B2A2G2F2 | G6z4
+
+X:459
+T: NU UP JI RUTERS
+N: E0408A
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: G
+G2 | G4d2d4c2 | d4_B2A4
+A2 | c4c2c2_B2A2 | _B2B2A2G4
+G2 | G2_B2B2B2A2G2 | A6D4z2
+_B4B2B4B2 | A3cc2c4
+A2 | _B2d2d2d2c2B2 | A6G4
+
+X:460
+T: VOR MEINES HERZLIEBCHENS FENSTER
+N: E0409
+O: Europa, Mitteleuropa, Deutschland, Niederrhein
+R: Liebes - Lied, Abschied
+M: 6/8
+L: 1/16
+K: G
+D2 | G2G2G2A2G2A2 | B6A4
+Bc | d2c2B2A2G2A2 | B4z6
+B2 | d2c2B2A2G2A2 | G4E2D4D2 | B4G2A4
+Bc | d3cB2A2G2A2 | G8z2
+
+X:461
+T: NACHTIGALL KLEINS VOEGELEIN
+N: E0413
+O: Europa, Mitteleuropa, Deutschland, Bergisches Land, Homberg
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: C
+G,2A,B, | C4E4D2DE | C4z2
+D2F2E2 | D6C2B,2C2 | D4z4
+D2E2 | G2F4D2E2G2 | C4B,2
+A,2B,2C2 | D6F2E2D2 | C4z4
+D2E2 | G2F4D2E2G2 | C4B,2
+A,2B,2C2 | D6F2E2D2 | C4z4
+
+X:462
+T: FRAU NACHTIGALL KLEINS VOEGELEIN
+N: E0413A
+O: Europa, Mitteleuropa, Deutschland, Siebengebirge
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: F
+F2 | A2AGF6F2 | A2AGF2
+F2E2F2 | G4c2B2A2B2 | c4z2
+c2c2de | f4c2c2B2A2 | G6
+F2F2A2 | c4G4c2cB | A8z2
+
+X:463
+T: AUF DEM KIRCHHOF
+N: E0413B
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: A
+E=F | =G2G2A2A2 | =G2AB=c2z2
+E3=FG2BG | E2=C2z2
+E2 | E2E2F2G2 | A3B=c2
+cd | e2=cdecec | d6
+AB | =c2ccB2c2 | A6
+
+X:464
+T: VROU NACHTIGALL KLEINS VUEGELIN
+N: E0413C
+O: Europa, Mitteleuropa, Deutschland, Niederrhein, Niederkruechten
+N: modulierend, plagaler Schluss ?
+R: Liebes - Lied
+M: 4/4
+L: 1/4
+K: D
+A, | DEFG | FED
+A, | DEFG | FED
+F | D2CB, | B,2A,
+A, | DDEE | AEF
+F | ECB,
+
+X:465
+T: MIT LUST THAET ICH AUSREITEN
+N: E0418
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+G2 | G2G2G2G2 | A4A4
+d4d2A2 | d2c4_B2 | A4z2
+d2 | d2d2d2d2 | c2A4
+_B2 | G4A2c2- | c_BAGA4 | G4
+d4 | =f2d3_Bc2 | A2G4
+
+X:466
+T: DA DRUNTEN IN JENEM THALE
+N: E0419
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Abschied
+M: 6/8
+L: 1/16
+K: G
+D2 | G3FG2A2G2A2 | B4A2G4
+GA | B3cd2d2c2B2 | A6z4
+c2 | B2c2d2d2c2B2 | c3de2d4
+c2 | B2A2G2A2G2A2 | G6z4
+
+X:467
+T: DA DROBEN AUF JENEM BERGE
+N: E0419A
+O: Europa, Mitteleuropa, Deutschland, Hessen; Westfalen; Franken
+R: Liebes - Lied, Abschied
+M: 6/8
+L: 1/16
+K: G
+D2 | G3FG2A2G2A2 | B4A2G4
+A2 | B3cd2d2c2B2 | A8z2
+Bc | d2B2d2d2B2d2 | e3fe2d4
+c2 | B3cB2A2G2A2 | G8z2
+
+X:468
+T: DA DROBEN AUF JENEM BERGE
+N: E0419B
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Liebe
+M: 6/8
+L: 1/16
+K: G
+D2 | G3ABcd3edc | B4A2G4
+A2 | B3cd2d2c2B2 | A8z2
+Bc | d2B2d2d2B2d2 | e3fe2d4
+c2 | B3cB2A2G2A2 | G8z2
+
+X:469
+T: DA DROBEN AUF JENEM BERGE
+N: E0419C
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Liebes - Lied, Abschied
+M: 6/8
+L: 1/16
+K: G
+D2 | G3Bd2d3^cd2 | B6A4
+D2 | G3AB2B3AG2 | A8z2
+d2 | B3cd2B3cd2 | e4ged4
+c2 | B3cB2A2G2A2 | G8z2
+
+X:470
+T: DA DROBEN AUF JENEM BERGE
+N: E0419D
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: Liebes - Lied, Abschied
+M: 6/8
+L: 1/16
+K: E
+B,2 | E3DE2E3DE2 | D4C2B,4
+B,2 | E4E2F4F2 | G8z2
+GA | B3cB2B2c2B2 | B4A2A4
+A2 | G3AG2F2E2F2 | E8z2
+
+X:471
+T: SIST EBENE MOENSCH UF ERDE
+N: E0420
+O: Europa, Mitteleuropa, Schweiz, Kanton Bern
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: A
+E2 | A2AGA2B2 | =c2A2B4
+c2cAB4 | e4z2
+E2 | A2AGA2B2 | =c2A2B4
+c2cAB4 | e4z2
+e2 | B2BAG2A2 | B2B=cB2
+e2 | d=cBAG2AA | BAB=cB2
+AB | =c2ccd2d2 | e4d2
+d2 | =c2A2B2Bc | A6
+
+X:472
+T: ES IST EIN SCHNEE GEFALLEN
+N: E0424
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+F2 | F2G2A2B2 | c4c2
+c2 | G2A2B2c2 | A3GF2
+G2 | G3GG2A2 | B2B2B2
+A2 | G2F2F2E2 | F2EDC2
+G2 | G3GG2A2 | B2B2B2
+A2 | G2F2F2E2 | F6
+
+X:473
+T: ES HAT EINN SCHNEE GESCHNEIET
+N: E0424A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+D2 | GGB2G2 | d2d2
+de | dcBGA2 | G4
+G2 | dde2d2 | ccA2z
+F | AAc2A2 | BBG2
+de | dcBGA2 | G4
+
+X:474
+T: SIE GLEICHT WOL EINEM ROSENSTOCK
+N: E0426
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+G2 | G4D2 | G4c2 | B4A2 | G4
+D2 | G4A2 | B4c2 | B2A4 | G2FEF2 | G4
+G2 | G4D2 | G4c2 | B4A2 | G4
+D2 | G4A2 | B4c2 | B2A4 | G2FEF2 | G4
+G2 | B4B2 | A3Bc2 | d4c2 | d4
+B2 | B4B2 | A3Bc2 | d4c2 | d4
+B2 | B4B2 | B4A2 | G4F2 | G4z2
+G4A2 | B4c2 | B2A4 | G2FEF2 | G4
+
+X:475
+T: JUNGFRAEULEIN SOLL ICH MIT EUCH GAHN
+N: E0427
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 6/4
+L: 1/8
+K: F
+C2 | F4F2A4A2 | c4c2A4
+c2 | c4c2B4A2 | G6F4
+C2 | F4F2A4A2 | c4c2A4
+c2 | c4c2B4A2 | G6F4
+c2 | d4c2c4B2 | A6G4
+A2 | B4B2c3BA2 | G6G4
+c2 | d4c2c4A2 | F4c2A4
+c2 | c4c2A4A2 | G6F4
+
+X:476
+T: WENN ALLE BRUENNLEIN FLIESSEN
+N: E0429
+O: Europa, Mitteleuropa, Deutschland, Odenwald; Limburg, Nauheim
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | D2G2G2B2 | B2AGA2
+d2 | B2G2A2c2 | B4z2
+D2 | D2G2G2B2 | B2AGA2
+d2 | B2G2A2c2 | B4z2
+GA | B2d2d2e2 | d2cBc4
+B4d4 | B2AGA2
+d2 | B2B2A2c2 | B4z2
+
+X:477
+T: WENN ALLE BAECHLEIN FLIESSEN
+N: E0429A
+O: Europa, Mitteleuropa, Deutschland, Ober - Hessen
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2GFE2 | D2GBA2z2
+BBB2A4 | G4z2
+GA | B2ced2B2 | A2B2c2z2
+B4d2B2 | A2G2A4
+BBB2A4 | G4z2
+
+X:478
+T: WENN ALLE BAECHLEIN FLIESSEN
+N: E0429B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Dillkreis; Lahnkreis
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: G
+G2 | G2B2B2B2d2d2 | B6A4
+e2 | d2c2B2A6 | G6z4
+GB | d4d2d4e2 | d2c2c2e6
+B6d6 | d2A2A2A4
+e2 | d2c2B2A6 | G6z4
+
+X:479
+T: WENN ALL DIE BAECHLEIN FLIESSEN
+N: E0429C
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt, Brauerschwend
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | D2G2G2B2 | d2B2A2
+e2 | dcB2A4 | G4z2
+G2 | G2B2d2de | d2cBc4
+B4d2cB | d2A2A2
+e2 | dcB2A4 | G4z2
+
+X:480
+T: UND IN DEM SCHNEEGEBIRGE
+N: E0429D
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Breslau
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+F | FAc2c2 | d2c2z
+B | AGFAcA | G4z
+G | BBG2G2 | FAc2z
+f | cBA2G2 | F4z
+
+X:481
+T: ICH HAETT MIR FUERGENOMMEN
+N: E0430
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: C
+A,2 | A,2A,2C2C2 | B,4A,2
+A,2 | A,2E,2G,2F,2 | E,4z2
+A,2 | A,2A,2C2C2 | B,4A,2
+A,2 | A,2E,2G,2F,2 | E,4z2
+C2 | C2C2B,CD2 | A,4G,2
+C2 | B,2C2DCB,2 | C4z2
+C2 | D2D2E2D2 | C2B,A,B,4 | A,4z2
+B,2 | C2G,2A,2F,2 | E,6
+
+X:482
+T: ICH ARMES KAEUZLEIN KLEINE
+N: E0432
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 6/4
+L: 1/8
+K: F
+F2 | F4F2A4A2 | F6G4
+AB | c4B2A4G2 | F8z2
+F2 | F4A2G4G2 | C3DE2F4
+F2 | A2c2B2A4G2 | F8z2
+
+X:483
+T: DER WALDBEERSTRAUCH
+N: E0433
+O: Europa, Mitteleuropa, Deutschland, Niederrhein
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B2A2B2B2 | dcA2B2
+B2 | c2d2e2f2 | d4c2
+c2 | c3de2c2 | d2e2f4
+B2d2c4 | B2A2G2
+F2 | B2c2d3B | c4B2
+
+X:484
+T: MIR IST EIN ROTH GOLDFINGERLEIN
+N: E0434
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+F2 | A4B2 | c2f2d2 | A4B2 | c4
+c2 | f4e2 | d2c2g2 | f2ecd2 | c4
+c2 | f4c2 | c2A2c2 | B2AFG2 | F4
+A2 | c4AF | G2F2c2 | B2AFG2 | F4
+
+X:485
+T: EINEN RING TRAG ICH VON DIR
+N: E0435
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Liebes - Lied, Treue
+M: 4/4
+L: 1/8
+K: F
+ | c2c2A2F2 | G2AGF2z2
+c2c2f2A2 | c3BA2z2
+F2F2f2f2 | B2dcc2z2
+A2F2c2A2 | G2AGF2z2
+
+X:486
+T: GUT HENSEL UEBR DIE HEIDE REIT
+N: E0436
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Untreue
+M: 4/4
+L: 1/4
+K: F
+F | AABB | ccc
+c | BABc | BGA
+c | AAGG | FFD
+A | AFAB | c2BA | G2F
+
+X:487
+T: ICH WEISS MIR EIN MAIDLEIN
+N: E0445
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Spott
+M: 3/4
+L: 1/8
+K: G
+G2 | G3GG2 | A4B2 | c4B2 | A6
+B4A2 | G4
+G2 | B3Bc2 | d4d2 | A4B2 | c4
+c2 | B4c2 | d4d2 | A4B2 | c6
+B4A2 | G4z2
+B4c2 | d4d2 | A4B2 | c4
+c2 | B2A4 | G4c2 | B2A4 | G4
+
+X:488
+T: NU FALL DU REIF
+N: E0447
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Untreue
+M: 4/4
+L: 1/4
+K: A
+E | AABB | ccc
+B | ABcd | e3
+e | cccB | ABc
+c | BAAB | A3
+
+X:489
+T: FALL HEREIN FALL HEREIN DU KUEHLER TAU
+N: E0447A
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: A
+ | A2F2F4 | A2F2F4
+A4B3A | F4z2
+AB | A2=G2E2G2 | F4z2
+F2 | E2E2EAA2 | A2c2c2
+c2 | B2B2edB2 | A4z4
+
+X:490
+T: MEIN SCHATZ IST VIERZIG MEILEN VON HIER
+N: E0447B
+O: Europa, Mitteleuropa, Deutschland, Ober - Lahnkreis, Altenkirchen
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2B2B2AG | A2D2D2
+D2 | c2c2cedc | B4z2
+Ad | A2A2BAG2 | FED2D2
+Bd | cedcB2A2 | G4z2
+
+X:491
+T: ACH SCHOENSTES KAROLINCHEN
+N: E0447C
+O: Europa, Mitteleuropa, Deutschland, Lahngegend, Nassau
+R: Liebes - Lied
+M: 6/8
+L: 1/8
+K: G
+D | G2Bd2d | d3B2
+B | A2ed2c | B3z3
+G3e3 | d3-d2
+d | edccde | d2BB2
+d | dedd2c | B4z
+
+X:492
+T: MIR IST EIN SCHOENSBRAUN MEIDELEIN
+N: E0450
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+F2 | F2F2G2A2 | B3AG2
+B2 | A2F2G2G2 | F4z2
+F2 | F2F2G2A2 | B3AG2
+B2 | A2F2G2G2 | F4z2
+F2 | G2A2B2G2 | A2B2c2
+c2 | d2c2c2B2 | c4z2
+c2 | c2c2A2c2 | B3AG2
+B2 | A2F2G2G2 | F6
+
+X:493
+T: MIR IST EIN FEINES MEIDELEIN
+N: E0450A
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+G2 | G3GG2G2 | c3_BA2
+G2 | _B2A2G2F2 | G4z2
+G2 | G3GG2G2 | c3_BA2
+G2 | _B2A2G2F2 | G4z2
+G2 | A3_Bc2A2 | _B2c2d2
+e2 | =f3ed2^c2 | d4z2
+d2 | d2d2d2d2 | c3_BA2
+G2 | _B2A2G2F2 | G6
+
+X:494
+T: WOHL HEUTE NOCH UND MORGEN
+N: E0455
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: F
+B,2 | F2F2G2c2 | A4G2
+G2 | A2A2B2d2 | c6
+c2 | d2c2d2e2 | f2d2c2
+cB | A2A2G2G2 | F4z2
+c2 | d2c2d2e2 | f2d2c2
+cB | A2A2G2G2 | F4z2
+
+X:495
+T: LIEBLICH HAT SICH GESELLET
+N: E0456
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+F2 | A4A2 | A4F2 | c4d2 | c4
+d2 | c4B2 | A2G4 | F6- | F2z2
+F2 | A4A2 | A4F2 | c4d2 | c4
+d2 | c4B2 | A2G4 | F6- | F2z2
+f2 | f4f2 | e4e2 | f2d4 | c4
+f2 | e2g3f | e2d4 | c6- | c2z2
+d2 | c4B2 | A2G4 | F6- | F2z2
+
+X:496
+T: ES FLOG EIN KLEIN WALDVOEGELEIN
+N: E0459
+O: Europa, Mitteleuropa, Deutschland; Rumaenien, Siebenbuergen
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+G2 | B2A2B2c2 | d3cB2
+e2 | d2c2B2A2 | G3BA2
+e2 | d3cB2A2 | G4z2
+
+X:497
+T: WO FIND ICH DANN DEINS VATERS HAUS
+N: E0460
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2G2A2 | B2^c2d4
+e3d=c2B2 | A4B2z2
+d2c2B2A2 | B3BA2
+A2 | d2c2B2A2 | B3BA2
+B2 | c4z2e2 | d4z2
+d2 | d2B2A2G2 | A4A4 | B6
+
+X:498
+T: WIE KUMM ICH DENN DIE POORTS HERIN
+N: E0460A
+O: Europa, Mitteleuropa, Deutschland, Koeln ?
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: E
+B,2 | E2D2E2F2 | =G3FE2
+G2 | F2B,2^B,2D2 | E4z4
+E2B2B2B2 | A2=G2F2
+F2 | =G2E2E2E2 | F2B,2B,2
+B,2 | E2=G2F2E2 | D2B2B2
+A2 | =G2G2F2F2 | E4z2
+
+X:499
+T: ELEND HAT MICH UMFANGEN
+N: E0463
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Klage
+M: 6/4
+L: 1/16
+K: A
+A4 | A8A4A8B4 | =c8B3A=G8
+A4 | =c8B3AA8G4 | A12-A8
+A4 | A8A4A8B4 | =c8B3A=G8
+A4 | =c8B3AA8G4 | A12-A8
+=c4 | B8A4=G8=F4 | E8E4E8
+=c4 | B8A4=G8=F4 | E8E4E8
+E4 | A8A4A8B4 | =c8B3A=G8
+A4 | =c8B3AA8G4 | A12-A8
+
+X:500
+T: TRITT AUF DEN RIEGEL VON DER THUER
+N: E0469
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Kilt -, Fenster - Lied
+M: 4/4
+L: 1/8
+K: F
+F2 | F3GA2A2 | F4z2
+F2 | G2A2B2B2 | A4z2
+F2 | E2F2G2G2 | A4
+G2G2 | F2A2G4 | F4z2
+F2 | F3GA2A2 | F4z2
+F2 | G2A2B2B2 | A4z2
+F2 | E2F2G2G2 | A4
+G2G2 | F2A2G4 | F4z2
+F2 | F2E2F2D2 | C3DE2
+F2 | G2c2c2B2 | c4
+A4 | G2c2c2B2 | c2
+A2B2AG | A4z2A2 | A2A2A2
+F2 | G2A2B2A2 | cBAGA2
+F2 | E2F2G2G2 | A4G2
+G2 | F2A2G2G2 | F4
+C4 | F2A2G2G2 | F4z2
+
+X:501
+T: O WEH DER ZEIT DIE ICH VERZEHRT
+N: E0470
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Klage
+M: 3/4
+L: 1/8
+K: F
+F2 | F4G2 | A4F2 | A4B2 | c4
+c2 | A4d2 | c4B2 | A2GFG2 | F4
+F2 | F4G2 | A4F2 | A4B2 | c4
+c2 | A4d2 | c4B2 | A2GFG2 | F4
+F2 | A4A2 | G3AB2 | c4B2 | c4
+c2 | c4c2 | d4d2 | c2BAB2 | A4
+A2 | A4F2 | G4
+c2 | d4d2 | c3BAG | F2B4 | A2G4 | F4
+
+X:502
+T: ES IST NIT ALLES GOLDE
+N: E0472
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+F2 | F4F2 | F4F2 | C6 | C4
+C2 | D4D2 | E4E2 | F6- | F4
+F2 | F4F2 | F4F2 | C6 | C4
+C2 | D4D2 | E4E2 | F6- | F4z2
+A2A2A2 | A4B2 | c6 | A4
+A2 | c4c2 | B4B2 | A6- | A4
+A2 | d4d2 | d4d2 | c4c2 | A6
+c4c2 | B4B2 | A4A2 | A4z2
+A3GF2 | E4
+F2 | G3FE2 | D4E2 | F6- | F4
+
+X:503
+T: GUT GSELL UND DU MUSST WANDERN
+N: E0473
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+d2 | d2B2c2d2 | e2dec2
+e2 | d2B2c2A2 | BcBAG2
+B2 | A2F2G2E2 | FGFED2
+B2 | A2G2G2F2 | G6
+B2 | c2ABc2B2 | A3GA2
+B2 | c2A2A3^G | A6
+AG | FGFED2dc | BcBAG2
+B2 | A2G2G2F2 | G6
+
+X:504
+T: MEIN FEINSLIEB IST VON FLANDERN
+N: E0474
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Klage
+M: 4/4
+L: 1/8
+K: G
+G2 | G2G2A2B2 | c4c2
+BA | G2c2c2B2 | c4z2
+G2 | G2G2A2B2 | c4c2
+BA | G2c2c2B2 | c4z2
+d2 | e2dcB3c | d2
+d2d2d2 | A3Bc2
+d2 | B2G2G2F2 | G4z2
+
+X:505
+T: ACH SUESSER SCHATZ AUF DIESER ERD
+N: E0475
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+ | G2G2G2 | E3FG2 | A3GF2 | E6
+F3GA2 | G4F2 | E3DE2 | D6
+G2G2G2 | E3FG2 | A3GF2 | E6
+F3GA2 | G4F2 | E3DE2 | D6
+B2B2B2 | G3AB2 | A4G2 | F6
+d3cB2 | A4G2 | F3GA2 | G6
+
+X:506
+T: MEIN GMUETH IST MIR VERWIRRET
+N: E0476
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/4
+K: C
+ | E,2A,2 | G,F,2E, | D,2E,2
+B,2C2 | CB,2B, | A,4
+E,2A,2 | G,F,2E, | D,2E,2
+B,2C2 | CB,2B, | A,2z
+C | B,G,A,B, | C3
+G, | A,G,A,F, | E,4
+C2B,2 | DC2B, | A,2B,2
+E,2F,2 | E,D,2D, | E,4
+
+X:507
+T: DER GUTZGAUCH HAT SICH ZU TODE GEFALLN
+N: E0481
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/4
+K: C
+C | G2G | F2F | G2G | C2
+C | G2F | _B2A | G2F | G2
+G | c2c | A2A | _B2B | G2
+C | _E2F | G2F | _E2D | C2
+
+X:508
+T: S HAT SICH EIN KUCKUK ZU TOD GESCHRIEN
+N: E0482
+O: Europa, Mitteleuropa, Deutschland, Kuhlaendchen
+R: Liebes - Lied
+M: 2/4
+L: 1/8
+K: G
+D | GGBB | GGD
+D | GGBB | G2D
+d | ddBG | eed
+d | ccBB | A2G
+
+X:509
+T: EIN GUCKGUCK WOLLT AUSFLIEGEN
+N: E0483
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/4
+K: F
+F | FccA | c2c
+c | AGAB | G2F
+F | AGAB | c2G
+G | AGAB | c2GG | F2z
+
+X:510
+T: DER SAURE WINTER IST SO KALT
+N: E0485
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: A
+ | A2A2A2 | =c3de2 | A2=c2d2 | e6
+A2A2A2 | =c3de2 | A2=c2d2 | e6
+=c2c2c2 | =c4e2 | =f4e2
+d4=c2 | B6 | A6
+
+X:511
+T: DIE FISCH IM WASSER WOHNEN
+N: E0486
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: A
+AB | c2B2c2d2 | e4c2
+e2 | d2c2B2e2 | c4z2
+AB | c2B2c2d2 | e4c2
+e2 | d2c2B2e2 | c4z2
+c2 | c2B2A2G2 | F4E2
+BA | G2FEFEC^D | E4z2
+FG | A2A2B2B2 | c2e2dc
+BA | B2A2A2G2 | A4z2
+
+X:512
+T: BISTU DES GOLDSCHMIEDS TOECHTERLEIN
+N: E0487
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: A
+E2 | A2B2=c2A2 | G2B2A2
+=c2 | B2A2=G2F2 | E4^D4 | E6
+E2 | A2B2=c2A2 | G2B2A2
+=c2 | B2A2=G2F2 | E4^D4 | E6
+B2 | =c2B2c2A2 | =G2F2E4
+=c4d4 | e6d=c | B2A2G2
+A2 | B2A2A2G2 | A6
+A2 | E2E2F2G2 | A6
+
+X:513
+T: VIEL WOLLUST MIT SICH BRINGET
+N: E0491
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 6/4
+L: 1/8
+K: F
+c2 | c3BA2B3AG2 | A4F2A3G
+F2 | G4F2GFEDE2 | F6-F4
+c2 | c3BA2B3AG2 | A4F2A3G
+F2 | G4F2GFEDE2 | F6-F4
+GA | B4B2B4c2 | d4c2d3e
+f2 | e3dc2dc=BAB2 | c6-c4
+GA | B4B2B4c2 | d4c2d3e
+f2 | e3dc2dc=BAB2 | c6-c4
+
+X:514
+T: NACH GRUENER FARB MEIN HERZ VERLANGT
+N: E0502
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+F2F2F2 | c2c2d2e2 | f4z2
+c2 | B2c2A2G2 | F8 | z2
+F2F2F2 | c2c2d2e2 | f4z2
+c2 | B2c2A2G2 | F8 | z2
+c2c3B | A2F2A2B2 | c4z2
+f2 | g2e2f2d2 | c4z2
+c2 | c2d2e2c2 | f2d2c3
+c | d2f2e2d2 | c4A4 | G4z2
+F2 | A2c2A2G2 | F4z4 | z2
+
+X:515
+T: SCHOENSTES KIND ZU DEINEN FUESSEN
+N: E0504
+O: Europa, Mitteleuropa, Deutschland, Berlin
+R: Liebes - Lied, Liebeslust
+M: 3/4
+L: 1/8
+K: C
+ | GEcAGA | G2F2E2
+GcAF | E2D2 | C2z2
+GEcAGA | G2F2E2
+GcAF | E2D2 | C2z2
+DE | F2D2EF | G2E2
+DE | F2D2EF | G2E2z2
+GEcAGA | G2F2E2
+GcAF | E2D2 | C2z2
+
+X:516
+T: ALLERSCHOENSTER ENGEL
+N: E0505
+O: Europa, Mitteleuropa, Deutschland, Harz
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: C
+ | c2c2B2B2 | c2c2G4
+c2c2B2d2 | c4z4
+c2c2B2B2 | c2c2G4
+c2c2B2d2 | c4z2
+G2 | A2A2A2A2 | G2G2G2
+G2 | f4e4 | d6
+G2 | G4G2_B2 | A2c2F4
+A2A2A2c2 | _B2d2G2
+G2 | c3_Bc3B | c6
+E2 | F4G4 | C4z4
+
+X:517
+T: KEIN FEUER KEINE KOHLE KANN BRENNEN
+N: E0507
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+C2 | F2F2GG | A2A3
+B | c2dcBA | G4
+c2 | d2Bdfd | dcc2
+Ac | cBA2G2 | F3
+AGB | A3cBd | c2fz
+Ac | cBA2G2 | F4
+
+X:518
+T: EIN SCHAEFER TRAEGT SORGEN
+N: E0508
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Hainau; Sueddeutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/4
+K: Bb
+F | Bdd | df
+f | cee | df
+F | Bdd | df
+f | cee | dz
+d | cze | d2
+d | cfe | d2
+
+X:519
+T: DER SCHAEFER TRAEGT SORGEN
+N: E0508A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt, Messel
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+C2 | F2C2F2 | A2F2
+A2 | c2dcBA | A2G2
+B2 | B2d2fd | c2A2
+Ac | cBB2Bd | c4
+Ac | cBG2G2 | F4
+B2 | B2d2fd | c2A2
+Ac | cBB2Bd | c4
+Ac | cBG2G2 | F4
+
+X:520
+T: EIN SCHAEFER TRAEGT SORGEN
+N: E0508B
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Niederlausitz
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+cA | F2F2GB | A2F2
+c2 | d2c2B2 | B2A2
+FF | d2d2fd | c2A2
+c2 | c2B2GB | B2A2
+FF | d2d2fd | c2A2
+c2 | c2B2GA | G2F2
+
+X:521
+T: EIN SCHAEFER TRAEGT SORGEN
+N: E0508C
+O: Europa, Mitteleuropa, Deutschland, Ober - Lahnkreis; Dillkreis
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: Bb
+F2 | B3ABG | F2D2
+B2 | c2d2c2 | B4
+dd | c3deg | f2d2
+ff | g2f2e2 | d4
+dd | c3deg | f2d2
+ff | g2f2e2 | d4
+
+X:522
+T: SIND WIR GESCHIEDEN
+N: E0509
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 2/4
+L: 1/8
+K: G
+=F | _B2c2 | d2c
+d | _edc_B | c3
+=F | _B2c2 | d_e=f
+e | d_BcA | _B3
+c | c2c2 | AG=F
+d | d2d2 | _BAG
+G | _edc_B | A3
+c | _BGAF | G3
+
+X:523
+T: WO E KLEINS HUETTLE STEHT
+N: E0510
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: Liebes - Lied, Scherz
+M: 3/8
+L: 1/16
+K: G
+ | D2G2G2 | F3ED2
+c2A2F2 | A2G2z2
+D2G2G2 | F3ED2
+c2A2F2 | G4z2
+A3BA2 | A3BA2
+A3BA2 | A3BA2
+G2F2E2 | D2c4
+BAGFEF | G4z2
+
+X:524
+T: WANN ZU MEIM SCHAETZEL KOMMST
+N: E0510A
+O: Europa, Mitteleuropa, Deutschland, Bayern, Regensburg
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: G
+ | G3FG2 | AGFED2
+D3AA2 | ABG2z2
+G3FG2 | AGFED2
+D3AA2 | ABG2z2
+A3BA2 | A3BA2
+A3BA2 | A3BA2
+G2F2E2 | D2d4
+d2cBA2 | ABG2z2
+
+X:525
+T: WENN ZU MEIM SCHAETZEL KOMMST
+N: E0510B
+O: Europa, Mitteleuropa, Deutschland, Berlin
+R: Liebes - Lied; Studenten - Lied
+M: 3/8
+L: 1/16
+K: G
+ | B3AB2 | c2c2D2
+c3ce2 | d4B2
+B3AB2 | c2c2D2
+c3ce2 | d4B2
+A3BA2 | A3BA2
+A3BAB | c6 | B6 | A6
+B2B2B2 | B2d4
+d2cBcA | G2g2d2
+B2B2B2 | B2d4
+d2cBcA | G4z2
+B2B2B2 | B2d4
+d2cBcA | G2g2d2
+B2B2B2 | B2d4
+d2cBcA | G4z2
+
+X:526
+T: WENN DU BEI MEIN SCHAETZCHEN KOMMST
+N: E0510C
+O: Europa, Mitteleuropa, Deutschland, Westfalen ?
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: D
+ | d2cBA2G2 | F2G2A4
+d2cBA2G2 | F4E2z2
+d2cBA2G2 | F2G2A4
+F2D2E2C2 | D4D2z2
+D2F2D2F2 | D2F2A4
+C2E2C2E2 | C2E2G4
+D2F2D2F2 | D2F2A4
+F2D2E2C2 | D4D2z2
+
+X:527
+T: WENN ICH EIN KLEINS WALDVOEGLEIN WAER
+N: E0512
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Neisse, Waltorf
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: G
+ | d2dBGB | B2AGA2
+A2FDc2 | c2BAB2
+ddedc2 | B2A2z2
+ABc2A2 | Bed3B
+ABc2A2 | Bed3B
+B2A3G | G4z2
+
+X:528
+T: ACH WAS WIRD MEIN SCHAETZCHEN DENKEN
+N: E0514
+O: Europa, Mitteleuropa, Deutschland, Ober- Hessen; Westfalen; Rheinland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+ | G2BAG2D2 | B2dcB2B2
+A3GA2dc | B2A2G4
+G2BAG4 | B2dcB4
+A3GA2dc | B2A2G4
+
+X:529
+T: WAS WIRD WOHL MEIN SCHAETZLEIN DENKEN
+N: E0514A
+O: Europa, Mitteleuropa, Deutschland, Rheinpfalz
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+ | D4G4E4A4 | F4D4G4B4
+D4G4D4A4 | F4D4G4z4
+D4G4E4A4 | F4D4G4B4
+D4G4D4A4 | F4D4G4z4
+D4c3BA4z4 | D4B3AG4z4
+E4E4D4G2B2 | d4c4B4z4
+
+X:530
+T: ICH HAB EIN KLEINES HUETTCHEN
+N: E0516
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+CFG | A3BGA | F3
+AAB | c3dBc | A2z
+FFF | d3dfd | c2A
+ccc | B2Gccc | A2z
+FFF | d3dfd | c2A
+ccc | B2Gccc | A2z
+
+X:531
+T: ALS ICH AN EINEM SOMMERTAG
+N: E0517
+O: Europa, Mitteleuropa, Deutschland, Altmark
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | D2G2G2G2 | D2B2G4
+A4GFED | D2B2G2
+D2 | D2G2G2G2 | D2B2G4
+A4GFED | D2B2G2
+G2 | A2A2A2F2 | GFGAF2
+DF | A2A2A2G2 | F2E2D2z
+D | G2GAB2B2 | A2d2B2z
+D | GFGAB2d2 | A4d4 | G4z2
+
+X:532
+T: ALS ICH AN EINEM SOMMERTAG
+N: E0517A
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2B2B2B2 | B2d2d4
+c3Bc2d2 | B4z2
+D2 | G2B2B2B2 | B2d2d4
+c3Bc2d2 | B4z2
+c2 | c2e2e2e2 | e2d2d2
+d2 | d2c2c2c2 | c2B2B4
+G3cc4 | B3dd2z2
+c3Bc2d2 | B4d4
+A3cc4 | B3dd4
+c3Bc3A | G4z2
+
+X:533
+T: ALS ICH AN EINEM SOMMERTAG
+N: E0517B
+O: Europa, Mitteleuropa, Deutschland, Schleswig - Holstein; Nassau
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: C
+C,2E,2 | G,4G,4G,4C4 | G,4G,3F,E,4
+G,3G, | G,4F,3E,F,4G,3F, | E,8z4
+C,2E,2 | G,4G,4G,4C4 | G,4G,3F,E,4
+G,3G, | G,4F,3E,F,4G,3F, | E,8z4
+C,2E,2 | G,4G,4G,4C4 | G,4G,3F,E,4
+C,2C,2 | A,3A,A,3A,C3CB,3A, | A,3G,G,3G,C3C
+C3C | D4D3DB,4A,3B, | C4E4G,4
+C,2C,2 | A,3A,A,3A,C3CB,3A, | A,3G,G,3G,C3C
+C3C | D4D3DB,4A,3B, | C8z4
+
+X:534
+T: DENK ICH ALLEWEIL
+N: E0518
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: G
+GA | BBB2GA | BBB2
+d2 | d3cB2 | A4
+Ac | c2c2Ac | B2B2
+GB | A3GA2 | B2d2
+Ac | c2c2Ac | B2B2
+GB | A3GA2 | G4
+
+X:535
+T: SCHOENSTES SCHAETZCHEN
+N: E0518A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald; Wetterau
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: C
+CE | G2E2GA | GFD2
+GF | E3FE2 | D4
+G,2 | C2C2DF | E2E2
+FA | G2E2D2 | C4
+
+X:536
+T: SCHOENSTES SCHAETZCHEN
+N: E0518B
+O: Europa, Mitteleuropa, Deutschland, Rheinpfalz
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: G
+G3G | G4D4B3B | B4G4
+B2d2 | d4e2d2c2B2 | A4z4
+B2d2 | c2B2A4D2D2 | G2B2d4
+B2d2 | c2B2A4D2D2 | G2B2d4
+G4 | e4e4e4 | d6c2
+B2d2 | c4B4A4 | G8
+
+X:537
+T: GEH MEIN HANSEI
+N: E0519
+O: Europa, Mitteleuropa, Deutschland, Ober - Bayern
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: D
+ | A3FB3A | A3GC2C2
+A3GB3A | A3FD2A,2
+DEFGABcd | e3dB2
+EE | c3BAGBA | D2z6
+
+X:538
+T: ES IST FUERWAHR KEIN KREATUR
+N: E0520
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: C
+G,CC | C3EDC | B,2z
+G,CC | C3EDB, | C2z2
+E,G, | G,3G,A,G, | G,2E,2
+E,G, | G,3G,A,G, | G,2E,2
+CC | C3EDC | B,2z
+E,G,G, | C3EDB, | C2z
+
+X:539
+T: ES FLIEGT GAR MANCHES VOEGELEIN
+N: E0521
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G3FG2A2 | B3AG2
+B2 | c2B2A2G2 | A4z2
+D2 | G3FG2A2 | B3AG2
+B2 | c2B2A2G2 | A4z2
+A2 | A3BA2F2 | D2E2D2
+A2 | A3BA2F2 | D4z2
+D2 | G2G2A2A2 | B3cd2
+c2 | B2B2A2A2 | G4z2
+
+X:540
+T: GESTERN ABEND IN DER STILLEN RUH
+N: E0522
+O: Europa, Mitteleuropa, Deutschland, Schwaben, Kuestrin
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+ | B2GAB2G2 | B2d2c2B2 | B4A4
+A2FGA2F2 | A2c2B2A2 | A4G4
+d2Bcd2Bcd4 | A2B2c2BAB4
+G2g2f2e2 | d2Bcd4
+c2A2B2G2 | A2F2G4
+
+X:541
+T: GESTERN ABEND IN DER STILLEN RUH
+N: E0522A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt, Dreieichenhain
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: F
+F2G2 | A3AA2A2A4G2A2 | B8z4
+B2A2 | G3GG2G2G4F2G2 | A8z8
+c3BA2A2c4 | G2G2G2FGA4 | z4
+F2G2 | A3AA2A2c4B2A2 | G6
+A2c2B2G4 | F4z8
+
+X:542
+T: GESTERN ABEND IN DER STILLEN RUH
+N: E0522B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: F
+ | F2G2A2A2 | A2c2fcA2 | A4G4
+G2F2E2F2 | G2GAcBG2 | G4F4
+c2ABc2ABc4 | B2GAB2GAB3c
+A3AA2A2 | A2c2fcA2 | A4G2
+A2cBG2 | G4F4
+
+X:543
+T: GESTERN ABEND IN DER STILLEN RUH
+N: E0522C
+O: Europa, Mitteleuropa, Deutschland, Westerwald; Lahnkreis; Dillkreis
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: F
+ | F2A2F2A2 | F2ABc3A | A4G4
+G2G2G2G2 | G2d2c3d | c4A4
+c2A2A2A2A2c2 | B2G2G2G2G2
+C2 | F2A2F2A2 | F2Acc2A2 | A4G2
+d2c3d | c4A4
+
+X:544
+T: GESTERN ABEND IN DER STILLEN RUH
+N: E0522D
+O: Europa, Mitteleuropa, Deutschland, Rheinpfalz
+N: +++ Zeile 264 (+Auftakt 265) "gefhlsmáig" auf 4/4 getrimmt! ++++
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: A
+E2E2 | A6A2A2c2e2c2 | c3dB4z4
+B2c2 | d3dd2d2c2B2c3B | B3cA4z4
+A2B2 | c3Ac3Ac4d2c2 | B3GB3GB4
+B2d2 | c2A2A2ABc2
+A2B3G | B3cA4z4
+
+X:545
+T: GANZ VERGNUEGT UND EINSAM
+N: E0522E
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: F
+F2A2 | c2c2c2c2d3c | c4A4
+d3c | c2B2B2d2c2B2 | B4A4
+c2c2 | B2B2G4d2d2 | c2c2A4
+c2c2 | B2B2G4d2d2 | c2c2A4
+F2A2 | c2c2c2c2d3c | c4A4
+d3c | c2B2B2d2c2B2 | B4A4
+
+X:546
+T: GESTERN ABEND IN DER STILLEN RUH
+N: E0522F
+O: Europa, Mitteleuropa, Deutschland, Rheinland; Hessen
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: C
+G,G, | C2G,2C2G,2 | C2E2G,2
+EE | D3B,DCB,A, | G,2G,2G,2
+G,G, | F,2D2DCB,A, | G,2E2E2
+G,G, | F,2D2DCB,A, | G,2E2E2z2
+G,2G,2A,2B,2 | C2E2G,2
+EE | D3B,DCB,A, | G,2G,2G,2
+
+X:547
+T: UNTER MEINES VATERS SEINEM FENSTER
+N: E0523
+O: Europa, Mitteleuropa, Deutschland, Thueringen; Schlesien
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+FA | cAcAcA | cfA2
+dc | cBBGEG | G2F2
+AA | cBB2GG | dcc2
+AA | cBB2GG | dcc2
+AB | cAcAcA | cfA2
+dc | cBBGEG | G2F2
+
+X:548
+T: SCHEINT DER MOND SO SCHOEN
+N: E0524
+O: Europa, Mitteleuropa, Deutschland, Thueringen; Schwaben; Schlesien
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: G
+G3B | B3AA4F2c2 | c3BB4
+G2B2 | d3dd2d2d2d2 | d2g2B4
+B3d | d3cc2e2d2c2 | c4B4
+
+X:549
+T: MAEDELE RUCK AN MEINE GRUENE SEITE
+N: E0525
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: F
+FFA2 | c2c2c2c2=B2c2d2c2 | c2f2A2
+A2G2A2 | c3BB2B2A2B2 | d4c4
+c2c2 | B2B2G4d2d2 | c2c2A4
+c2c2 | B2B2G4d2d2 | c2c2A4
+FFA2 | c2c2c2c2=B2c2d2c2 | c2f2A2
+A2G2A2 | c3BB2A2B2G2 | G4F4
+
+X:550
+T: ICH WOLLT EIN BAEUMLEIN STEIGEN
+N: E0527
+O: Europa, Mitteleuropa, Deutschland, Harz; Hannover
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: A
+A2 | E2E2E2A2 | F4F2
+A2 | G2A2B2G2 | A4z2
+AB | c2c2c2dc | B2B2B2
+B2 | A2A2A2BA | G2GFE2
+E2 | A2A2B2B2 | c3de2
+d2 | c2c2B2B2 | A4z2
+
+X:551
+T: ICH WOLLT EIN BAEUMLEIN STEIGEN
+N: E0527A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt; Schwalbach
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: F
+C2 | F3GA2=B2 | c2c2c2
+c2 | d2e2f2d2 | c4z2
+c2 | c2=B2B2B2 | =B2A2A2
+A2 | G2G2A2G2 | F2A2c2
+c2 | c2=B2B2B2 | =B2A2A2
+A2 | G2G2A2G2 | F4z2
+
+X:552
+T: DES ABENDS WENN ICH SCHLAFEN GEH
+N: E0527B
+O: Europa, Mitteleuropa, Deutschland, Siebengebirge; Hessen, Darmstadt
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: F
+C2 | F3GA2B2 | c3dc2
+A2 | B2A2B2c2 | A4z2
+c2 | c3AB2G2 | A3BA2
+F2 | G3AB2G2 | A2d2c2
+c2 | c3AB2G2 | A3BA2
+F2 | G3AB2G2 | F4z2
+
+X:553
+T: DES ABENDS WENN ICH SCHLAFEN GEH
+N: E0527C
+O: Europa, Mitteleuropa, Deutschland, Lahnkreis; Dillkreis; Westerwald
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2D2D2G2 | E2E2E2
+c2 | d2d2c2F2 | G4z2
+GA | B2B2B2d2 | c2A2A2
+AB | c2c2c2e2 | d2B2B2
+G2 | E3FGFGE | D4G2
+B2 | d2c2A2F2 | G4z2
+
+X:554
+T: IN DEN GARTEN WOLLN WIR GEHN
+N: E0528
+O: Europa, Mitteleuropa, Deutschland, Sueddeutschland, Franken
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+ | G3AB2B2 | A2ABG2D2
+B3cd2d2 | c2cdB2G2
+d2d2e2e2 | c2ced4
+B2Bdc4 | A2AcB4
+G3Bd2d2 | dcc2B2z2
+
+X:555
+T: IN DEN GARTEN WOLLN WIR GEHN
+N: E0528A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Wetterau
+R: Liebes - Lied
+M: 6/8
+L: 1/8
+K: F
+ | F2AF2A | F2Ac2B
+E2GG2G | GcBB2A
+FAcc2A | B2df3
+d2fc2A | cBGF2z
+FAcc2A | B2df3
+d2fc2A | cBGF2z
+
+X:556
+T: HOERT IHR NICHT DEN JAEGER BLASEN
+N: E0528B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Nassau, Hennethal
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+ | G2A2A2A2 | ABcdcBG2
+E2G2G2G2 | G2cBBAA2
+CEGAB2G2 | FAcff4
+d2fdc2A2 | c2cBA4
+
+X:557
+T: NACHTIGALL ICH HOER DICH SINGEN
+N: E0529
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: F
+C2C2 | F4A4A2G2 | G2F2z2
+F2F2G2 | A4c4c2B2 | B2A2z8
+c2cAF4c4 | BcdBG4z4
+C2E2G4B4 | A2cAF2A2G2B2 | A2d2c4
+cBAG | F4A4AGFE | F4z4
+
+X:558
+T: NACHTIGALL ICH HOER DIR SINGEN
+N: E0529A
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: F
+ | C3CF4A4 | A2G2G2F2z2
+C2 | F3AA4c4 | c2B2B2A2z4
+A2cAF4c4 | BcdBG4z4
+C2E2G4B4 | A2cAF6E2
+F3AG3BA4
+B3dc4A4 | cBAGG4F2z2
+
+X:559
+T: KOMM ZU MIR IN GARTEN
+N: E0530
+O: Europa, Mitteleuropa, Deutschland, Franken ?
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+D2 | GAB2AG | AFD2
+d2 | dcB2AG | A4
+AB | c2c2BA | GFG2
+c2 | BAG2F2 | G4
+
+X:560
+T: WO IST DENN DAS MAEDCHEN
+N: E0530A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald, Alsbach
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: A
+E2 | A3GA2 | B3AB2 | c3dc2 | B4
+Bc | d3ed2 | c3BA2 | cBA2G2 | A4
+Bc | d3ed2 | c3BA2 | cBA2G2 | A4
+
+X:561
+T: WIE KOMMTS DASS DU SO TRAURIG BIST
+N: E0531
+O: Europa, Mitteleuropa, Schweiz
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: F
+FA | c3AB2G2 | AGABA2
+FA | c3AB2G2 | A4z2
+A2 | A3GG2B2 | B3AA2
+c2 | fcAFGBAG | F4z2
+
+X:562
+T: WIE KOMMTS DASS DU SO TRAURIG BIST
+N: E0531A
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: E
+EG | B3GA2F2 | GFGAG2
+EG | B3GA2F2 | G4z2
+EG | B3GA2F2 | GFGAG2
+EG | B3GA2F2 | G4z2
+Be | d3AA2c2 | BAGAB2
+c2 | B3GE2F2 | G4
+c4 | B3EG2F2 | E4z2
+Be | d3AA2c2 | BAGAB2
+c2 | B3GE2F2 | G4
+c4 | B3EG2F2 | E4z2
+
+X:563
+T: WENN ICH IN FREIHEIT LEBEN WILL
+N: E0531B
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+FA | c2f2cABG | F2A2A2
+FA | c2f2cABG | A4z2
+AA | A2A2G2cB | B3AA2
+c2 | fcAFc2E2 | F4z2
+
+X:564
+T: HAB ICH MEIN TAG KEIN GUT GETHAN
+N: E0532
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+=F2 | _B2d2c2A2 | _B2G2=F2
+F2 | _B2d2c2A2 | _B4z2
+=F2 | _B2d2c2A2 | _B2AG=F2
+G2 | A2D2E2F2 | G4z2
+
+X:565
+T: ICH GUNG ENMAL SPAZIERE
+N: E0533
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2F2G2A2 | B4G2D2 | A4z2
+D2 | G2F2G2A2 | B4G4
+A2AAA2dd | B4z2
+B2 | B2A2G2F2 | F4E2
+B,2 | E4z2D2 | G4z2D2 | B6
+
+X:566
+T: ICH GIENG EINMAL SPAZIERE
+N: E0533A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Hanau; Dillenburg
+R: Liebes - Lied
+M: 2/4
+L: 1/8
+K: G
+D | GGGD | G2GD | G2z
+d | dddd | e2e
+d | ccce | d2z
+B | BBBB | c2cd | B2z
+
+X:567
+T: ICH HAETT EMAL EN FREIER
+N: E0534
+O: Europa, Mitteleuropa, Deutschland, Hessen, Nassau
+R: Liebes - Lied
+M: 6/8
+L: 1/8
+K: G
+D | GGGBAG | A3z2
+A | AAAcBA | B2ed2c | B3z2
+
+X:568
+T: EI LIPPLE LOSS DER NO ROTHA
+N: E0535
+O: Europa, Mitteleuropa, Deutschland, Wuerttemberg
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: F
+C2 | F4F2E3FG2 | F6C4
+C2 | A4A2G3AB2 | A6z4
+C2 | F4F2E3FG2 | F6C4
+C2 | A4A2G3AB2 | A6z6
+c2B2A2d3cB2
+B2A2G2c3BA2 | C2D2E2F4
+
+X:569
+T: ICH HABE MEIN FEINSLIEBCHEN
+N: E0536
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+C | FAc2A2 | cBG2z
+F | EFG2B2 | dcA2z
+C | FFA2c2 | f4-f
+d | cBc2G2 | F4z
+
+X:570
+T: ICH HABE MEIN FEINSLIEBCHEN
+N: E0536A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+F | ccA2F2 | cBG2z
+G | BBG2d2 | cAF2z
+C | FFA2c2 | f4
+d2 | cAcBG2 | F4z
+
+X:571
+T: JETZT KOMMT DIE ZEIT
+N: E0537
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Hainau
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2B2AG | F3GA2
+D2 | G2G2c2B2 | A4z2
+AB | c2e2c2A2 | B2d2B2
+GB | A2c2A2F2 | G4z2
+
+X:572
+T: JETZT KOMMT DIE ZEIT
+N: E0537A
+O: Europa, Mitteleuropa, Deutschland, Brandenburg; Sachsen
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2B2dB | A3FD2
+D2 | G2G2B2Bd | A4z2
+AB | c2e2c2A2 | B2d2B2
+GB | A2c2A2F2 | G4z2
+
+X:573
+T: JETZT KOMMT DIE ZEIT
+N: E0537B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2D2B2AG | F3GA2
+dc | B2A2G2B2 | A4z2
+AB | c2e2c2A2 | B2d2B2
+GB | A2c2A2F2 | G4z2
+
+X:574
+T: ES LEUCHTET SCHON
+N: E0538
+O: Europa, Mitteleuropa, Deutschland, Uckermark, Gramzow
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: C
+EF | G2EGcd | e2G2
+AB | c3dcBA | G4
+EF | G2c2BA | G2EG
+cE | G3FDE | C4
+EF | G2c2BA | G2EG
+cE | G3FDE | C4
+
+X:575
+T: ES LEUCHTET SCHON WIEDER
+N: E0538A
+O: Europa, Mitteleuropa, Deutschland, Pommern, Fiddichow, Brusenfelde
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: C
+GA | G2E2cd | e2G2
+cd | c3BcA | A2G2
+cd | c3BcA | AGE2
+cG | GFD2AG | F2E2
+cd | c3BcA | AGE2
+cG | GFD2AG | F2E2
+
+X:576
+T: WILT DU MEI SEI
+N: E0539
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+fd | dcc2BG | GFF2
+AG | F2B2d2 | c2z2
+fd | dcc2BG | GFF2
+cA | GABGFE | F2z2
+
+X:577
+T: HERZIG LIEB SCHAETZELE
+N: E0540
+O: Europa, Mitteleuropa, Deutschland, Sueddeutschland
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: G
+ | G2GABc | d2ded2 | c2B2c2 | B4z2
+G2GABc | d2ded2 | c2B2c2 | B4z2
+d2ded2 | c2cdc2 | B2BcB2 | A2A2A2
+G2GABc | d2ded2 | c2B2c2 | B4z2
+
+X:578
+T: ICH HAB EIN SCHAETZLE IN DER NAEH
+N: E0541
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: A
+E2 | E2A2A2A2 | cBAGA2
+E2 | E2A2A2A2 | cBAGA2
+A2 | A2a2g2f2 | f4e2
+d2 | c4edcB | B4A2
+
+X:579
+T: MIT SANFTEM KUMMER UND SORGEN
+N: E0542
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: A
+E2 | C2E2A2C2E2A2 | c4e2B4
+E2 | E2G2B2B2c2d2 | c4e2c4
+EG | A4c2c4c2 | e4e2c2f2
+e2 | d4d2B2f2ed | c8z2
+EG | A4c2c4c2 | e4e2c2f2
+e2 | d4d2B2f2ed | c8z2
+
+X:580
+T: SCHOEN IST DIE JUGEND
+N: E0543
+O: Europa, Mitteleuropa, Deutschland, Hessen, Lahngegend; Odenwald
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: Bb
+F2D2E2 | F2d2d2c2B2G2 | F4D2
+F2G2F2 | F2c2c2e2d2c2 | B4z2
+F2G2F2 | c3cc2e2d2c2 | d3ff2
+B2B2B2 | G2e2d2c2d4c4 | B4z2
+F2G2F2 | c3cc2e2d2c2 | d3ff2
+B2B2B2 | G2e2d2c2d4c4 | B4z2
+
+X:581
+T: SCHOEN IST DIE JUGEND
+N: E0543A
+O: Europa, Mitteleuropa, Deutschland, Thueringen, Meiningen
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: E
+EEG | B2GBec | B2G
+BcB | A2FFBB | G2z
+EEG | B2GBec | B2G
+BcB | A2FFBB | G2z
+GGB | AAFAAc | B2G
+GGB | A2FFBB | G3
+
+X:582
+T: O HIMMEL WIE LANG SOLL ICH NOCH TRAGEN
+N: E0544
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: F
+C2 | F3EF2G2F2G2 | A4c2B6
+A3BA2G2F2G2 | F6z6
+A2F2c2G3FE2
+F2D2G2E3DC2
+F3EF2G3FG2 | A4c2B6
+A3BA2G3FG2 | F6z4
+
+X:583
+T: SCHOENSTES KIND AUF DIESER ERDE
+N: E0545
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald, Lindenfels
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+ | G6D2G4A4 | B3AB2c2B4A4
+B6A2B3cd2e2 | d4c2B2B4A4
+d6c2B4d4 | d6c2c4B4 | B2c2A4
+d6c2 | B2e2d2c2B4A4 | G8z8
+d6c2B4d4 | d6c2c4B4 | B2c2A4
+d6c2 | B2e2d2c2B4A4 | G8z8
+
+X:584
+T: SCHOENSTER SCHATZ AUF DIESER ERDE
+N: E0545A
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: Liebes - Lied, Treue
+M: 4/4
+L: 1/16
+K: G
+ | G4D4B4G2B2 | d4d4d2c2c4
+B6A2B4e4 | d4c2B2A8
+d6c2B4d4 | e3dc3BB2A2A4
+d6c2B4e4 | d3cB3AG4z4
+d6c2B4d4 | e3dc3BB2A2A4
+d6c2B4e4 | d3cB3AG4z4
+
+X:585
+T: DORT OBN AUF JENEM BERGE
+N: E0546
+O: Europa, Mitteleuropa, Deutschland, Pommern
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G3DB2AG | GFF2z2
+D2 | A2D2c2BA | B4z2
+B2 | d2B2d3D | D2c2c3
+A | c2A2c2D2 | D2B2B2
+cA | G2G2AGA2 | B6
+cA | G2GBd3D | G4z2
+
+X:586
+T: GESTERN BEI MONDENSCHEIN
+N: E0547
+O: Europa, Mitteleuropa, Deutschland; Oesterreich - Schlesien
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: Eb
+ | E2G2A2 | B3cB2
+A2G2F2 | G4E2
+E2G2A2 | B3cB2
+A2G2F2 | G4E2
+F2F2G2 | A3BA2
+G2G2A2 | B3cB2
+A2G2F2 | F4E2
+
+X:587
+T: ACH WIE ISTS MOEGLICH
+N: E0548
+O: Europa, Mitteleuropa, Deutschland, Hildburghausen
+R: Liebes - Lied, Treue
+M: 3/4
+L: 1/8
+K: F
+ | c2cdcB | B3AA2
+A2ABAG | G3FF2
+G2G2G2 | A3Bc2
+c2dcBA | A2G2z2
+c2c2c2 | d3efd
+c2cdcB | AGABA2
+F2A2c2 | cBGBA2
+c2dBGE | G2F2z2
+
+X:588
+T: ACH WIE ISTS MOEGLICH DANN
+N: E0548A
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: Bb
+ | d4B2G2 | G3FF4
+c4B2c2 | d2B2F4
+d4B2F2 | G2e2d4
+c4d2c2 | F4z4
+c4d2c2 | B2G2F4
+d4e2d2 | d2c2c4
+F4G2F2 | f2e2c4
+B4c2A2 | B4z4
+
+X:589
+T: ZWEI HERZEN IM LEBEN
+N: E0549
+O: Europa, Mitteleuropa, Deutschland, Schwaben,
+R: Liebes - Lied, Treue
+M: 3/8
+L: 1/16
+K: G
+GA | B2B2c2 | edd2
+B2 | dcc2A2 | cBB2
+GA | B2B2c2 | edd2
+B2 | dcc2A2 | cBB2
+Bd | dcc2A2 | cBB2
+Bd | dcc2Ac | cBB2
+GA | B2B2c2 | d4
+Bd | dcc2d2 | B4
+
+X:590
+T: ZU COBLENZ AUF DER BRUECKE
+N: E0550
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 6/8
+L: 1/8
+K: F
+C | A2AAGA | c3A2
+F | B2BBcd | c3z2
+A | c2Acfd | c3B2
+B | ABAGFG | F3z2
+
+X:591
+T: A SCHUESSLA UND A RAINDEL
+N: E0551
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Liebes - Lied, Versoehnung
+M: 2/4
+L: 1/16
+K: C
+C2 | C3G,G,2C2 | C3A,A,2
+D2 | B,2G,2A,2B,2 | C4z2
+C2 | C3G,G,2C2 | C3A,A,2
+D2 | B,2G,2A,2B,2 | C4z2
+C2 | B,2C2D2B,2 | C2D2E2
+C2 | B,2C2D2B,2 | C2D2E2
+C2 | G,2G,2G,2C2 | A,2A,2A,2
+D2 | B,2G,2A,2B,2 | C4z2
+
+X:592
+T: ICH HAB MIR EINEN GARTEN GEPFLANZT
+N: E0552
+O: Europa, Mitteleuropa, Deutschland, Bonn, Kessenich
+R: Liebes - Lied, Vertroestung
+M: 4/4
+L: 1/8
+K: A
+E2 | A2B2=c2B2 | A4=G2
+G2 | =cdeed2dB | =c4z2
+cd | e2e2=c2e2 | d2=c2B2
+Bc | d2d2B2e2 | =c2BcA2z2
+B3cd2eB | =c2B2A2
+
+X:593
+T: ACH SCHAETZCHEN WAS HAB ICH DIR ZU LEIDE GETHAN
+N: E0554
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt
+R: Liebes - Lied, Vertroestung
+M: 4/4
+L: 1/8
+K: F
+C2 | F2FFF2FG | A2A2A2
+FA | c3ABdcB | A4z2
+FA | c2ccc2dc | cBB2B2
+cB | A2AAAcBA | AGGGG2
+cB | A2A2G2G2 | F4z2
+
+X:594
+T: WENN ICH AN DEN LETZTEN ABEND GEDENNCK
+N: E0555
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald; Bergstrasse
+R: Liebes - Lied, Abschied
+M: 4/4
+L: 1/8
+K: D
+D,F, | A,2A,2A,2B,A, | A,G,G,F,G,2
+A,G, | F,2F,2A,2G,F, | E,4z2
+D,D, | B,2B,B,B,2DB, | B,A,A,A,D2
+DD | E2E2C2B,C | D4z2
+D,F, | A,A,A,A,A,2
+DC | B,B,B,B,B,2
+ED | C2A,2A,2B,C | D4z2
+D,F, | A,A,A,A,A,2
+DC | B,B,B,B,B,2
+ED | C2A,2A,2B,C | D4z2
+
+X:595
+T: I HA DAHEIM EN MAIDLI
+N: E0556
+O: Europa, Mitteleuropa, Schweiz
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: C
+G,2 | A,2G,2F,2D,2 | E,2G,2C2
+G,2 | G,2F2A,2B,2 | C4z2
+G,2 | A,2G,2F,2D,2 | E,2G,2C2
+G,2 | F2D2A,2B,2 | C4z2
+E2 | E3DD2E2 | D2C2C2
+D2 | C2B,2A,2B,2 | D2C2C2
+FE | ^C2D2D2ED | B,2C2C2
+EC | B,2G,2A,2B,2 | C4z2
+
+X:596
+T: DEN SONNTAG DEN MONTAG IN ALLER FRUEH
+N: E0557
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Abschied, Trennung
+M: 2/4
+L: 1/8
+K: F
+C | F2FG | A2A
+A | G2G2 | F2z
+G | AGAB | c2c
+c | B2B2 | A2z
+c | ccfc | B2d
+B | A2cA | G2z
+C | FGAB | cfd
+B | A2G2 | F2z
+
+X:597
+T: MEIN SCHATZ DER IST AUF DIE WANDERSCHAFT
+N: E0557A
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Trennung
+M: 4/4
+L: 1/8
+K: D
+DE | =F2D2D2DE | =F2D2D2
+E2 | =F2FFG2FG | A3_BA2
+=FG | A2A_B=c2A2 | _BAG=FE3
+E | =FEFGA2GE | D2C2D2
+
+X:598
+T: DAS LIEBEN BRINGT GROSS FREUD
+N: E0558
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G3AB2ce | d4z2
+GB | d2d2c2dc | B4z2
+GB | d2d2d2ed | dccBc2
+d2 | B2B2BdcB | AFFGA2
+GA | B4z2ce | d4z2
+GB | d2d2c2dc | B4z2
+
+X:599
+T: AUF TRAUERN FOLGT GROSS FREUD
+N: E0558A
+O: Europa, Mitteleuropa, Deutschland, Lahngegend; Taunus
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+D4 | G6A2B4c2e2 | d8z4
+B4 | d6c2e4d4 | B8z4
+d4 | B6d2d4e4 | d6c2c4
+d4 | B4B4d2c2B4 | B6A2A4
+d4 | B6cBA4d4 | B6cBA4
+e4 | d4f2e2d4c4 | B8z4
+
+X:600
+T: ACH SCHOENSTER SCHATZ VERZEIH ES MIR
+N: E0559
+O: Europa, Mitteleuropa, Deutschland, Frankfurt a.M.
+R: Liebes - Lied
+M: 6/8
+L: 1/8
+K: Eb
+B | B2GE2G | B2GE2
+E | A2cedc | c3B2
+G | A2ccBA | G2BBA
+G | F2BBAF | F3E2
+G | A2ccBA | G2BBA
+G | F2BBAF | F3E2
+
+X:601
+T: SCHOENSTER SCHATZ MEIN AUGENTROST
+N: E0560
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: G
+D2 | D2EFG4B4 | A2A2G2
+A2B2c2 | d3ed2B2c2d2 | B4z6
+D2 | G2B2d4e2d2 | c2B2c6
+d2 | B2A2B2d2c2B2 | A2G2A2
+D2G2B2 | d2e2d4c2d2 | B4z6
+
+X:602
+T: ACH SCHOENSTER SCHATZ MEIN AUGENTROST
+N: E0560A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+DGA | B2B2AA | G2z
+ABc | dedBcd | B2z
+dBc | d2edcB | c2z
+dBA | BdcBAG | A2z
+ABc | dedBcd | B2z
+
+X:603
+T: ICH GIENG EINSTMALS UMS HAUS
+N: E0560B
+O: Europa, Mitteleuropa, Deutschland, Lahngegend; Westfalen
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: C
+G2 | G2AGE6E2 | E2G2D6
+G2 | c2BAG4A2F2 | F2G2D4z2
+G2 | G3Bd2d2d2B2G2F2 | E2G2c3de4z2
+c2 | A4c2A2G4A2F2 | F4G4E4z2
+
+X:604
+T: O ENGEL ALLERSCHOENSTES KIND
+N: E0561
+O: Europa, Mitteleuropa, Deutschland, Hessen, Lahn - Kreis, Dill - Kreis
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: G
+D2 | D2G2G6B2 | B3AA4z2
+GA | B4d4c3B | B4A4z2
+G2 | G2e2d6e2 | d2B2c6
+d2 | B2A2B2c2d4 | c4B4z2
+
+X:605
+T: O ENGEL ALLERSCHOENSTES KIND
+N: E0561A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: Bb
+F4 | B2AGF4G4 | F2FED2
+F2B2c2 | d4d4d2c2 | B4z4
+F2GA | B2BAG4G2AB | c2cAF2
+F2B2c2 | d4d4d2c2 | B4z4
+
+X:606
+T: HOFFNUNG KOMM NUR BALD
+N: E0562
+O: Europa, Mitteleuropa, Deutschland, Coburg
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+F3G | A2A2G2G2 | F2z2
+A3B | c2c2B2B2 | A2z2
+c2c2 | d2dcB2Bd | c2z2
+A2A2 | B2BBG2G2 | F2z2
+c2c2 | d2dcB2Bd | c2z2
+A2A2 | B2BBG2G2 | F2z2
+
+X:607
+T: ICH GING DURCH EINEN GRASGRUENEN WALD
+N: E0563
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: G
+D2 | G4G2B2G2B2 | d3edcB4
+A2 | B2A2B2d3cB2 | A6G4
+G2 | A2A2B2c4A2 | B2B2c2d4
+B2 | A4B2c2B2A2 | B4c2d4
+A2 | B2A2B2d3cB2 | A6G4
+
+X:608
+T: MAEDCHEN WENN ICH DICH ERBLICKE
+N: E0566
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+ | F3Ac2c2 | B2G2FEDC
+FFFFA2c2 | G4z4
+B3Gd2cB | A2A2c2BA
+GGGGB2AG | F4z4
+
+X:609
+T: MAEDCHEN WENN ICH DICH ERBLICKE
+N: E0566A
+O: Europa, Mitteleuropa, Deutschland, Hessen; Westerwald
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+ | F2A2c2dc | B2G2F2C2
+FFAAc2BA | G4z4
+F2Bdf2ed | c2fcA2F2
+GFEGd2cB | A4z4
+
+X:610
+T: MAEDCHEN WENN ICH DICH ERBLICKE
+N: E0566B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+ | F2A2c2dc | B2G2F2C2
+FFAAc2BA | G4z4
+B2d2f2ed | dcc2fAA2
+GABcd2cB | A8
+
+X:611
+T: VON DIR GESCHIEDEN
+N: E0567
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Trost
+M: 4/4
+L: 1/8
+K: F
+CFA | c2c2zcfg | f2e2z
+BBA | Gee2zdcB | A4z
+Ffe | e2d2zdfd | c4z
+cBA | Gdd2zdcB | A4z
+Ffe | e2d2zdfd | c4z
+cBA | Gdd2zdcB | A4z
+
+X:612
+T: WAHRE FREUNDSCHAFT SOLL NICHT WANKEN
+N: E0568
+O: Europa, Mitteleuropa, Deutschland, Schlesien; Brandenburg; Hessen
+R: Liebes - Lied, Treue, Abschied
+M: 4/4
+L: 1/8
+K: F
+cA | F3FF3A | AGG2z2
+FA | c3cBABc | A4z2
+FF | d3df2ed | dcc2z2
+Ac | c2dcB3E | F4z2
+
+X:613
+T: WAHRE FREUNDSCHAFT SOLL NICHT WANKEN
+N: E0568A
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Liebes - Lied, Treue, Abschied
+M: 3/4
+L: 1/8
+K: F
+AG | F2F2AB | AGG2
+FD | C2FABc | A2z2
+FF | d3df2ed | dcc2z2
+Ac | c2dcB3E | F4z2
+
+X:614
+T: AUF DIESER WELT HAB ICH KEIN FREUD
+N: E0569
+O: Europa, Mitteleuropa, Deutschland, West -; Mitteldeutschland
+R: Liebes - Lied, Trennung
+M: 3/4
+L: 1/16
+K: Bb
+F4 | B2AGF4G4 | F2FED2
+F2B2c2 | d4d4c2c2 | B4z2
+B2B2B2 | G4E2c2c2c2 | A4F2
+F2B2c2 | d4d4c2c2 | B4z4
+
+X:615
+T: AUF DIESER WELT HAB ICH KEIN FREUD
+N: E0569A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Wetterau; Odenwald
+R: Liebes - Lied, Trennung
+M: 3/4
+L: 1/16
+K: Bb
+F4 | B2AGF4G4 | F2FED2
+F2B2c2 | d2f2f4e2f2 | d4z2
+B2A2B2 | c3cc2
+dcB2c2 | d3dd2
+F2B2d2 | f4f4e2f2 | d4z2
+B2A2B2 | c3cc2
+dcB2c2 | d3dd2
+F2B2d2 | f4f4e2f2 | d4z4
+
+X:616
+T: AUF DIESER WELT HAB ICH KEIN FREUD
+N: E0569B
+O: Europa, Mitteleuropa, Deutschland, Helgoland
+R: Liebes - Lied, Trennung
+M: 3/4
+L: 1/16
+K: Bb
+F4 | B3AB4c4 | d2f2e2
+d2c2B2 | c4e4d2c2 | B4z2
+fed2d2 | d3ef2edc2c2 | c3de2
+e2d2c2 | B4d4c2c2 | B4z2
+fed2d2 | d3ef2edc2c2 | c3de2
+e2d2c2 | B4d4c2c2 | B4z4
+
+X:617
+T: ZU DIR ZIEHTS MI HIN
+N: E0570
+O: Europa, Mitteleuropa, Deutschland, Bayern
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: A
+E2e2 | e4c2A2F2d2 | c8
+c2e2 | c4B4F2G2 | A4z4
+A2f2 | e4c2A2F2d2 | c8
+c2d2 | c4B4F2G2 | A8
+B3B | c2B2A2F2^D2B2 | B4
+G6E2 | B4A6F2 | B8
+A2f2 | e4c2A2F2d2 | c4z2
+c2c2d2 | c4B4F2G2 | A8
+B4 | d3ed3ed3e | c3^Bc4
+d2c2 | B2^A2B2d2c2B2 | A3Bc4
+e4 | d3ed3ed3e | c3^Bc4
+d2c2 | B2^A2B2d2c2B2 | A8
+
+X:618
+T: DA STEH I HIER OBEN
+N: E0571
+O: Europa, Mitteleuropa, Deutschland, Ober - Bayern
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+B | B2A3e | edB3
+c | BAE3F | G2D2z
+B | B2A3e | edB3
+c | BAE3F | G2D2z
+A | BAE3A | BAF3
+A | A2B2^c2 | d4
+cB | B2A3e | edB3
+c | BAE3F | G4
+cB | B2A3e | edB3
+c | BAE3F | G4z
+
+X:619
+T: HIER STEH ICH AM BERGE
+N: E0571A
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Herfurt; Hessen
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: D
+D2E2 | F4F6F2 | F2A2A4
+F2A2 | A4G4E2G2 | F4z4
+D2E2 | F4F6F2 | F2A2A4
+F2A2 | A4G4E2G2 | F4z4
+F4 | E2^G2B2d2d4 | c2B2A4
+E4 | E2^G2B2d2d4 | c6B2
+A4 | d4c4B3B | B4A4
+F2A2 | A4G4E2G2 | F2A2d4
+A4 | d4c4B3B | B4A4
+F2A2 | A4G4E2G2 | F8
+
+X:620
+T: HIER STEH ICH AM BERGE
+N: E0571B
+O: Europa, Mitteleuropa, Deutschland, Schwalbach
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: D
+F4 | E4A4B2d2 | d4c4
+A4 | E4A4B2d2 | d4c4
+F4 | E4A4B2d2 | d4c4
+A4 | E4A4B2d2 | d4c4
+A2d2 | d4c4B3B | B4A4
+E4 | E2^G2B2d2d4 | c6B2
+A4 | d4c4B3B | B4A4
+F2A2 | A4G4E2G2 | F2A2d4
+A4 | d4c4B3B | B4A4
+F2A2 | A4G4E2G2 | F8
+
+X:621
+T: ACH BLUEMLEIN BLAU VERDORRE NICHT
+N: E0572
+O: Europa, Mitteleuropa, Deutschland, Posen
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2d2d2 | _B3AG2
+G2 | A2A2d2d2 | c2_B2A2
+D2 | G2G2d2d2 | _B3AG2z2
+A2B2c4 | _B2c2d2
+D2 | G2G2c2_B2 | A4G2
+
+X:622
+T: ACH BLUEMLEIN BLAU VERDORRE NICHT
+N: E0572A
+O: Europa, Mitteleuropa, Deutschland, Niederlausitz, Luebbenau
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: F
+F | ABc3B | AGF2z
+f | fcd2c2 | B2A2z
+c | cAd3c | Bdc3
+B | AGcBA2 | G2F2z
+
+X:623
+T: ROSEL WENN DU MEINE WAERST
+N: E0573
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+ | d3dd2B2 | G2B2B4
+D2A2A4 | G2B2B4
+d3dd2B2 | G2B2B4
+D2A2A4 | G4z4
+
+X:624
+T: PETERSILJE DU SCHOENES KRAUT
+N: E0573A
+O: Europa, Mitteleuropa, Deutschland, Grafsch. Ruppin, Gransen
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: C
+ | G2c2cBcA | G2GEC2
+C2 | D2DFE2EG | GFD2C2z
+E | D3FE3G | GFD2C2z2
+
+X:625
+T: PETERSILJE DU SCHOENES KRAUT
+N: E0573B
+O: Europa, Mitteleuropa, Deutschland, Mark, Nauen, Vietzin
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+ | d3cB2B2 | A2A2G2
+G2 | A2A2B2d2 | dcB2A4
+A3Bc2A2 | B2e2d2
+d2 | c3BA2d2 | B2A2G4
+A3Bc2A2 | B2e2d2
+d2 | c3BA2d2 | B2A2G4
+
+X:626
+T: GRUENE PETERSILIE
+N: E0574
+O: Europa, Mitteleuropa, Deutschland, Uckermark
+R: Liebes - Lied
+M: 2/4
+L: 1/8
+K: F
+ | FGAB | c2cc | defd | d2c
+A | c2BB | G2GG | BAAA | F2z
+A | c2BB | G3G | F2EF | c3z
+B2B2 | G2GG | A2A2 | F2z2
+
+X:627
+T: ACH WAS THUT MIR MEIN HERZCHE SO WEH
+N: E0574A
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: F
+ | F3GA2cA | AGGGF2z
+G | AGAcdccc | cBB2A2z
+B | Accfd3
+c | cBBdc3
+B | AGABc2c
+c | B2c2A4
+
+X:628
+T: ALLEWEIL KA MER NET LUSTIG SEI
+N: E0575
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: G
+ | G3GG2 | B2A2G2 | d3DD2
+G3FG2 | B2A2G2 | d6
+c3de2 | e2d2c2 | B2Bcd2
+A2ABc2 | G3GG2 | F2E2F2 | G6- | G4z2
+
+X:629
+T: VOEGELE IM TANNENWALD
+N: E0576
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: F
+ | FGA2B2 | c2d2c2
+d2c2B2 | A2fff2
+FGA2B2 | c2d2c2
+d2c2B2 | A4z2
+A2ccc2 | c2B2B2
+B2A2A2 | A2GGG2
+FGA2B2 | c2d2c2
+d2c2B2 | A6
+
+X:630
+T: IK UND MYN LYSBET
+N: E0577
+O: Europa, Mitteleuropa, Deutschland, Ditmarsch
+R: Liebes - Lied
+M: 3/8
+L: 1/8
+K: D
+ | DFA | DFA | BBB | A2z
+BBB | A2A | GGG | FF
+F | EEE | D2z
+
+X:631
+T: DU DU LIEGST MIR IM HERZEN
+N: E0578
+O: Europa, Mitteleuropa, Deutschland, Norddeutschland
+R: Liebes - Lied
+M: 3/8
+L: 1/8
+K: F
+ | A3 | A3 | AGA | c2B
+G3 | G3 | GFG | A2z
+A3 | A3 | AGA | c2B
+GAB | dcE | F3 | z3
+d3c3 | e3f2z
+GABdcE | F3z3
+
+X:632
+T: GUTEN TAG HERR GAERTNERSMANN
+N: E0582
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Liebes - Lied
+M: 2/4
+L: 1/8
+K: G
+ | DBBA | AGG2
+DGFG | B2Az
+Aced | dcc2
+ABcF | A2Gz
+
+X:633
+T: WANN I HALD FRUA AFSTEH
+N: E0583
+O: Europa, Mitteleuropa, Oesterreich
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: G
+ | G4B2D2G2B2 | d4g2G2B4
+A4c2D2F4 | G4B2D2G4
+G4B2D2G2B2 | d4g2G2B4
+A2ccA2 | G2
+BBG2 | A2ccA2 | G2
+BBG2 | A2ccA2 | G4
+dd | g2dBcA | G4z2
+
+X:634
+T: MYS LIEB WE DU ZUR CHILCHE THUEST GA
+N: E0584
+O: Europa, Mitteleuropa, Schweiz, Bern
+R: Liebes - Lied
+M: 3/8
+L: 1/8
+K: A
+ | A3 | cde | dcB | AGF | E3
+A3 | Bcd | cde | B3
+A3 | cde | dcB | AGF | E3
+A3 | Bcd | cde | A3
+
+X:635
+T: IM SOMMER IST GUT WANDERN
+N: E0584A
+O: Europa, Mitteleuropa, Deutschland; Oesterreich, Boehmen
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: Bb
+F2 | B4c2d2c2B2 | c2d2e2d2z2
+e2 | d4c2B4d2 | cBA2G2F4
+B2 | c2B2c2c2B2c2 | c4g2f4
+d2 | e4d2c4B2 | F2G2A2B4
+d2 | e4d2c4B2 | dcB2A2B4
+
+X:636
+T: WAS HAB ICH DENN MEINEM FEINSLIEBCHEN GETHAN
+N: E0585
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald; Bergstrasse
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: Eb
+E2G2 | B4B2B2B2c2B2A2 | A2G2G2G2B4A2
+G2 | F4F2F2c4B2A2 | A2G2G2G2G4z2
+B2 | B2F2F2F2B4B2B2 | c4c4d4z2
+B2 | e4d2c2B3cB2A2 | G4F2F2E4
+
+X:637
+T: WENN DU WUESSTEST MEINE SCHMERZEN
+N: E0587
+O: Europa, Mitteleuropa, Deutschland, Hessen, Wetterau, Langsdorf
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: Eb
+ | E3GB2e2 | edc2B2e2
+c2c2B2B2 | A2B2G2z2
+E3GB2e2 | edc2B2e2
+c2c2B2B2 | A2B2G2z2
+e3cB2f2 | e3cd2B2
+e3cc2f2 | edecB2A2
+G3AB2e2 | edc2B2e2
+c2c2B2B2 | A2B2G2z2
+
+X:638
+T: LIEBES HERZCHEN ACH SCHOENSTES SCHAETZCHEN
+N: E0588
+O: Europa, Mitteleuropa, Deutschland, Unter - Taunus, Hennethal
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: Bb
+DE | FBBBcB | AGG2
+cB | AABBcc | cdd2
+DE | FBBBcB | AGG2
+cB | AABBcc | cdd2
+Bc | d2d2df | e2d2
+cB | A3GFE | E2D2
+DF | B2ddcd | f2e2
+ed | cccccc | cfd2
+
+X:639
+T: MEIN SCHAETZCHEN WILL WANDERN
+N: E0589
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: Liebes - Lied, Trennung
+M: 3/8
+L: 1/16
+K: F
+C2 | F3FF2 | A3GF2 | c4c2 | c4
+f2 | c4AA | B3AG2 | A3AA2 | A4
+FA | c4cc | c3cf2 | d3dd2 | d4
+d2 | c3dc2 | c2B2A2 | A3GG2 | G4
+FA | c2c2A2 | B2B2G2 | c2c2A2 | B2B2G2 | A3AA2 | A4
+
+X:640
+T: GUTEN ABE VRENELI
+N: E0590
+O: Europa, Mitteleuropa, Schweiz
+R: Liebes - Lied, Kilt - Lied
+M: 2/4
+L: 1/16
+K: A
+ | A3ce2c2 | c2B2B4
+B3df2d2 | d2c2c4
+A3ce2c2 | c2B2B4
+d2G2A2G2 | A4z4
+
+X:641
+T: ICH HABE MIR EINES ERWAEHLET
+N: E0591
+O: Europa, Mitteleuropa, Deutschland, Bergisches Land; Kleve
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: F
+C2 | F3EF2G2F2G2 | AGF2z6
+FA | c3cc2d2c2B2 | A6z4
+FA | c2c2dcB4cB | A2A2cAG4
+FG | A3Bc2d2c2B2 | A6z4
+FA | c2c2dcB4cB | A2A2cAG4
+FG | A3Bc2d2c2B2 | A6z4
+
+X:642
+T: ICH HABE MIR EINES ERWAEHLT
+N: E0591A
+O: Europa, Mitteleuropa, Deutschland, Kaiserslautern, Westrich
+R: Liebes - Lied
+M: 6/8
+L: 1/16
+K: F
+FG | A3BA2G2F2G2 | F6z4
+AB | c3dc2c2B2B2 | A6z4
+AB | c2c2d2B4
+GA | B2B2c2A4
+FG | A3BA2G2F2G2 | F6z4
+
+X:643
+T: ICH HAB MIR EINS ERWAEHLET
+N: E0591B
+O: Europa, Mitteleuropa, Deutschland, Thueringen; Sachsen
+R: Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G2F2A2G2 | c4B2
+Bc | d2d2cBcd | B4z2
+GB | BAAGF2
+Ac | cBBAG2
+GB | A2G2A2B2 | c6
+dc | B2B2AGAB | G4z2
+
+X:644
+T: O UELI MYN UELI
+N: E0592
+O: Europa, Mitteleuropa, Schweiz
+R: Liebes - Lied, Kilt - Lied
+M: 3/4
+L: 1/8
+K: Bb
+F2 | B3dcB | A2F2
+B2 | d2Bdfd | c4
+F2 | B3dcB | A2F2
+B2 | d2Bdfd | c4
+de | f2d2fd | e2c2
+de | f2d2fd | e2c2
+eg | f3dec | B4
+
+X:645
+T: ACH WENN DOCH MEIN SCHAETZCHEN EIN ROSENSTOCK WAER
+N: E0593
+O: Europa, Mitteleuropa, Deutschland, Hessen, Odenwald
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: A
+E2 | A3Bc2 | B3cd2 | e2e2d2 | c4
+ef | e2c2ef | cdB2
+E2 | A3Bc2 | B3cd2 | e2e2d2 | c4
+dd | e2c2B2 | A4
+
+X:646
+T: GUTE NACHT MEIN FEINES LIEB
+N: E0595
+O: Europa, Mitteleuropa, Deutschland
+R: Liebes - Lied, Abend, Staendchen
+M: 4/4
+L: 1/8
+K: G
+dc | B2dcB2d2 | edcBc2
+cB | A2A2d3c | B4z2
+dc | B2dcB2d2 | edcBc2
+cB | A2A2d3c | B4z2
+GB | d3BG2g2 | e3dc2
+cB | A3GF2e2 | d3cB2
+dc | B2dcB2d2 | edcBc2
+cB | A2e2d3c | B4z2
+
+X:647
+T: DER KUCKUK AUF DEM BIRNBAUM SASS
+N: E0596
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt, Offenthal
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: G
+D2 | G4B2 | G4B2 | d3ed2 | B4d2 | B4
+GB | d2d2ed | dcc2
+c2 | B3cdB | A4
+A2 | B2B2c2 | d2d2
+dc | B2B2A2 | G4
+
+X:648
+T: HEUT HAB ICH DIE MACHT ALLHIER
+N: E0597
+O: Europa, Mitteleuropa, Deutschland, Schwaben; Brandenburg, Oranienburg
+R: Liebes - Lied, Klage, Abschied
+M: 2/4
+L: 1/16
+K: Eb
+ | B4B3A | G3cB2
+A2 | GB3F4 | E4z4
+E3cc2c2 | c3BB2
+G2 | A4G4 | F4z2
+EF | G2G2B2G2 | F3GA2
+A2 | G2G2B2G2 | F4z2
+F2 | E3cc2c2 | B3eB2
+A2 | GB3F4 | E4z4
+
+X:649
+T: MEIN HERZLEIN THUT MIR GAR ZU WEH
+N: E0598
+O: Europa, Mitteleuropa, Deutschland, Gotha
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+G2 | _B4c4 | d6
+GA | _B4A4 | G4z2
+G2 | _B4c4 | d6
+GA | _B4A4 | G4z2
+A_B | c2c2c2cd | c4z2
+_Bc | d2d2c2_B2 | A4z2
+d2 | c2_B2A2G2 | G3FG2
+A2 | _B2c2d2F2 | G4z2
+
+X:650
+T: WENN ICH NACH WAPPUSHOF GEH
+N: E0600
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: D
+ | D2F2G2 | E2G2G2 | F6
+A2A2dA | A3GEG | F4z2
+A2AdA2 | G2GeG2
+F2DAF2 | EDEFE2
+D2F2F2 | A2G2GB | A6
+DFAdA2 | A3GEG | F4z2
+
+X:651
+T: WENN ICH ZUM THUEREL NAUS GEH
+N: E0600A
+O: Europa, Mitteleuropa, Deutschland, Schlesien, Neisse
+R: Liebes - Lied
+M: 3/8
+L: 1/8
+K: D
+ | FEF | GFG | A2
+A | AdF | AGE | F2z
+AdF | AGE
+GBE | GFD
+FEF | GFG | A2
+A | AdF | AGE | F2z
+
+X:652
+T: WIR SITZEN SO FROEHLICH
+N: E0602
+O: Europa, Mitteleuropa, Deutschland, Neustadt - Eberswalde, Coethen
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+G2 | G2D2B2 | B2G2
+d2 | d2edcB | B2A2
+G2 | G2D2B2 | B2G2
+d2 | d2edcB | B2A2
+dd | c2A2DD | G2B2
+dd | c2A2DD | G2B2
+GG | e2e2e2 | d3c
+Bd | d2c2Ac | c2B2
+GG | e2e2e2 | d3c
+Bd | d2c2Ac | A2G2
+
+X:653
+T: WIR WOLLEN VERGNUEGT UND EINSAM LEBEN
+N: E0602A
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: Liebes - Lied
+M: 3/8
+L: 1/16
+K: G
+G2 | G2D2B2 | B2G2
+d2 | d2c2B2 | B2A2
+AB | c2B2G2 | B2A2
+AB | c2B2G2 | B2A2
+GB | d4e2 | d3c
+B2 | e2d2F2 | G4
+
+X:654
+T: WIR WOLLEN VERGNUEGT UND EINSAM LEBEN
+N: E0602B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Wetterau; Taunus, Wuerges
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: G
+D2 | G2D2B2 | B2G2
+de | d2c2B2 | B2A2
+d2 | c2A2D2 | G2B2
+d2 | c2A2D2 | G2B2
+G2 | e2e2e2 | d3c
+Bd | c2B2A2 | G4
+
+X:655
+T: I WOASS A SCHOENI GLOCKN
+N: E0604
+O: Europa, Mitteleuropa, Deutschland, Ober - Bayern
+R: Liebes - Lied
+M: 3/4
+L: 1/8
+K: Bb
+FE | DEFGAB | Gcc3
+B | Agf2ec | BdF3
+E | DBFdBf | gfed
+cB | Agf2ec | B4
+
+X:656
+T: SCHAUTS AUSSI,WIES REGNT
+N: E0605
+O: Europa, Mitteleuropa, Deutschland, Bayern
+R: Liebes - Lied, Trost
+M: 3/4
+L: 1/8
+K: G
+GA | B3BB2 | c2z2
+AB | c3cc2 | d2z2
+GA | B3BB2 | c2A2
+AB | c3cc2 | B4
+G2 | d3cB2 | B2A2
+A2 | e2d2c2 | c2B2
+B2 | d3cB2 | B2A2
+A2 | e3dc2 | B4
+
+X:657
+T: UND SCHAU ICH HIN
+N: E0607
+O: Europa, Mitteleuropa, Deutschland, Schwaben
+R: Liebes - Lied,
+M: 2/4
+L: 1/16
+K: A
+A2 | G2A2B2A2 | G2A2B2
+A2 | A2=G2e2G2 | =G2F2d2
+A2 | G2A2B2A2 | G2A2B2
+A2 | A2=G2g3c | d4z4
+E4A4 | c6
+cd | c2B2B2Bc | B2A2A4
+E4A4 | c6
+cd | c2B2f3e | A4z2
+
+X:658
+T: ICH LIEBE DICH SO LANG ICH LEBEN WERDE
+N: E0608
+O: Europa, Mitteleuropa, Deutschland, Ober - Hessen; Nassau
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: A
+E2F2G2 | A6A2c2c2B2A2 | B2E2E4z2
+E2F2G2 | A6A2c2c2B2A2 | B8z2
+B2B3c | d6c2B2d2f2e2 | e2c2c4z2
+A2f2e2 | e3dd2E2c4B4 | A8z2
+
+X:659
+T: ICH UND MEIN ALLERLIEBSTER HANS
+N: E0609
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: A
+E2F2G2 | A4A4e2e2 | c4z2
+A2G2F2 | E4G2B2d2G2 | A4z2
+E2F2G2 | A4A4e2e2 | c4z2
+A2G2F2 | E4G2B2d2G2 | A4z4
+c3c | c4c2B2A2G2 | F4z2
+F2G2A2 | B2e2B2A2G2F2 | E4z2
+E2F2G2 | A2c2c2B2A2G2 | F4z2
+A2G2F2 | E4G2B2d2G2 | A4z2
+
+X:660
+T: MEI DIENDERL IS HARB AUF MI
+N: E0610
+O: Europa, Mitteleuropa, Oesterreich, Steiermark
+R: Liebes - Lied
+M: 3/4
+L: 1/16
+K: G
+D2A2 | B6A2B4 | c2F2F4z2
+c2 | c6B2c4 | d4z4
+d4 | d6^c2d4 | g4A4
+A2B2 | c2F2c2F2c2F2 | G4z4
+B4 | A4B4^c4 | d6^c2
+B4 | A4f6e2 | d8
+D2B2 | B6A2B4 | e4A4
+A2B2 | c2F2c2F2c2F2 | G4z4
+d4 | d6^c2d4 | g4A4
+A2B2 | c2F2c2F2c2F2 | G4z4
+D2B2 | B4A6B2 | c2e2F4
+A3B | c2e2^d2e2=d2c2 | B2g2G4
+B2c2 | e2d2c2B2A2G2 | a6
+g2f2e2 | e2F2e2F2e2F2 | G8
+
+X:661
+T: WENN ICH NOCH LEDIG WAER
+N: E0611
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: Liebes - Lied, Scherz - Lied
+M: 3/4
+L: 1/4
+K: G
+ | ddB | eed
+ccA | ddB
+ddB | eed
+cAd | B2z
+
+X:662
+T: SCHOENSTER ABENDSTERN
+N: E0613
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: A
+ | A4e4 | d3=cB4
+A3BcBcA | GABGE4
+d2d2d2d2 | e2d=cB4
+A3BcBcA | GABGE4
+A4e4 | =f2ede2
+d2 | =c2A2cBAG | A4z4
+
+X:663
+T: TRUTZ NIT SO
+N: E0614
+O: Europa, Mitteleuropa, Deutschland, Frankreich, Elsass
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c2c2c3B | A2A2A3G
+F2A2d3c | c2B2B4
+B2B2B3A | G2G2G3F
+E2G2c3B | B2A2A4

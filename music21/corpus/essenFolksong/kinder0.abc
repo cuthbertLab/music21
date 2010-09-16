@@ -1,0 +1,3119 @@
+
+X:1
+T: SCHLAF KINDLEIN SCHLAF
+N: K0001
+O: Europa, Mitteleuropa, Deutschland, Hessen ?
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/8
+K: F
+ | A2GG | F2z
+C | AAGG | F2z
+F | BBGG | ccA
+A | BBGG | ccA2
+B2GG | F2z2
+
+X:2
+T: SCHLAF KINDLEIN SCHLAF
+N: K0008
+O: Europa, Mitteleuropa, Deutschland, Taunus, Niederreifenberg
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4B2G2 | F4z2
+FA | c2c2B2G2 | F4z2
+AG | F2F2c2c2 | d2d2c4
+B2G2A2F2 | G2G2F4
+
+X:3
+T: SCHLOAP KINGEKEN SCHLOAP
+N: K0016
+O: Europa, Mitteleuropa, Deutschland, Oderbruch
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | A4GGG2 | F4z2
+CC | A2A2G2G2 | F4z4
+A2A2A2cc | c2B2B4
+GGG2G2B2 | A2G2F4
+A4GGG2 | F4z4
+
+X:4
+T: SCHLOAP KINNEKEN SCHLOAP
+N: K0017
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4AAG2 | F4z2
+F2 | c3BA2G2 | F4z2
+FF | A2G2A2c2 | B2A2G4
+A2G2A2c2 | B2A2G4
+c4AAG2 | F4z4
+
+X:5
+T: SCHLAF KINDCHEN WOHLE
+N: K0024
+O: Europa, Mitteleuropa, Deutschland, Untertaunus, Niederreifenberg
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4B2G2 | F4C4
+ccc2BBG2 | F4C4
+FFF2GGG2 | A2d2c4
+B2G2A2F2 | G2G2F4
+
+X:6
+T: SCHLAF MEIN KINDCHEN SIEBEN STUND
+N: K0025
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder -, Wiegen - Lied
+M: 6/8
+L: 1/16
+K: G
+ | B4B2d4B2 | A2B2A2G4z2
+e4e2d3cB2 | A2c2B2A4z2
+A4c2B2A2G2 | e4e2d3cB2
+A4e2d3cB2 | c3BA2A4G2
+
+X:7
+T: SCHLAF DU LIEBE KLEINE
+N: K0028
+O: Europa, Mitteleuropa, Deutschland, Elberfeld
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c2A2f2d2 | c4A2z2
+c2A2f2d2 | c4A2z2
+G2c2A2F2 | E2F2G4
+G2c2A2F2 | E2F2G4
+F2A2c3B | A2G2F4
+
+X:8
+T: SCHLAF KINDLEIN FESTE
+N: K0029
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/8
+K: F
+ | A2GG | F2C
+C | AAGG | F2C
+F | AAAc | BAG
+F | AAAc | BAG2
+A2GG | F2C2
+
+X:9
+T: SCHLAUF MAN WAWERL
+N: K0032
+O: Europa, Mitteleuropa, Deutschland, Boehmen
+R: Kinder -, Wiegen - Lied
+M: 4/4
+L: 1/8
+K: G
+ | d2d2B2G2 | c2c2A2z2
+e2e2d2c2 | d2d2B2z2
+d2d2B2G2 | c2c2A2z2
+e2e2d2c2 | d2d2B2z2
+B3AA2e2 | e3dG2
+d2 | d3cF2c2 | B6z2
+B3AA2e2 | e3dG2
+d2 | d3cF2c2 | B6z2
+
+X:10
+T: SCHLAF DU KLEINE SEELE
+N: K0037
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Kinder -, Wiegen - Lied
+M: 6/8
+L: 1/8
+K: G
+ | DGGGAB | B3A3
+DAAAdc | c3B2z
+DGGGAB | B3A3
+DAAAdc | c3B2z
+d2BBcd | c3A3
+c2AABc | B3G3
+DGGGAB | B3A3
+BdBAGA | G3z3
+BdBAcA | GGGG2z
+BdBAcA | G3z3
+
+X:11
+T: EIJENBEIJEN BISCH BISCH BISCH
+N: K0038
+O: Europa, Mitteleuropa, Deutschland, Weimar
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/8
+K: G
+ | ddBB | GGDz
+ddBB | GGDz
+GGAA | BBAA
+BGAD | GGGG
+
+X:12
+T: EIA WIWI WER SCHLAEFT HEUT NACHT BEI MIR
+N: K0040
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4A2G2 | F4z2
+C2 | c3BA2G2 | F4z4
+F2F2G2F2 | B2A2G2
+C2 | F2F2G2F2 | B2A2G4
+A4G2G2 | F4z4
+
+X:13
+T: STILLE STILLE KEIN GERAEUSCH GEMACHT
+N: K0046
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: D
+ | A4F2z2 | A4F2z2
+G3FG2A2 | F4z4
+E2E2G2G2 | F3GA4
+E2E2G2G2 | F3GA4
+A4F2z2 | A4F2z2
+G3FG2A2 | F4z4
+
+X:14
+T: EIA POPEIA WAS RASSELT IM STROH
+N: K0050
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder -, Wiegen - Lied
+M: 3/8
+L: 1/16
+K: G
+ | d3ed2 | B2A2B2 | G2F2G2 | D4z2
+d3ed2 | B2A2B2 | G2F2G2 | D4z2
+G3FG2 | A3GA2 | d2d2d2 | A4
+c2 | B3AGG | A4D2 | G4G2 | G6
+
+X:15
+T: SUSE LEWE SUSE WAT RUSCHELT INT STROH
+N: K0054A
+O: Europa, Mitteleuropa, Deutschland, Bielefeld
+R: Kinder -, Wiegen - Lied
+M: 3/4
+L: 1/8
+K: F
+ | c3dcB | A2A2A2 | G2F2G2 | F4
+A2 | c3dcB | A2A2A2 | G2F2G2 | F4z2
+G2G2G2 | A2A2A2 | B2B2A2 | G4
+FA | c3dcB | A2A2A2 | G2F2G2 | F4z2
+
+X:16
+T: SAUSE LIEBE NINNE WAS RASCHELT IM STROH
+N: K0055A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Kinder -, Wiegen -, Schlaf - Lied
+M: 3/4
+L: 1/8
+K: G
+ |  |  | d3cBA | G2G2
+GB | d2d2e2 | d4
+GB | d3cBA | G2G2
+GB | d2d2e2 | d4
+B2 | A3AA2 | A2B2
+c2 | d3cB2 | A4
+GB | d3cBA | G2G2
+G2 | A2B2A2 | G4z2
+
+X:17
+T: SAUSE KINGCHE SAUSE
+N: K0056
+O: Europa, Mitteleuropa, Deutschland, Darmstadt, Hopfgarten
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: G
+ | d3cB2A2 | G4D2z2
+d3cB2A2 | G4D2z2
+G2G2A2d2 | B2B2A4
+G2G2A2d2 | B2B2A4
+d3cB2A2 | G4D2z2
+
+X:18
+T: SUSE KINDKEN SUSE
+N: K0057
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: G
+ | B2B2A2A2 | G4D2z2
+B2B2A2A2 | G4D2z2
+B2B2B2B2 | c3cc2
+c2 | A2A2A2A2 | B3BB2z2
+B2B2A2A2 | G4D2z2
+
+X:19
+T: PRIPE NINNE SAUSE
+N: K0059
+O: Europa, Mitteleuropa, Deutschland, Oberlausitz
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | A2A2G2G2 | F4C2
+C2 | A2A2G2G2 | F4C2
+C2 | A2A2A2c2 | c2B2B2
+A2 | G2G2G2B2 | B2A2A2
+F2 | A2A2G2GG | F4C4
+A2A2G2G2 | F4C2z2
+
+X:20
+T: EIA BOBAIA SCHLAGS GICKELCHE TODT
+N: K0078
+O: Europa, Mitteleuropa, Deutschland, Frankfurt, Sachsenhausen
+R: Kinder -, Wiegen - Lied
+M: 3/8
+L: 1/8
+K: G
+ | GGG | ddd | eee | d2z
+ccc | BBB | AAd | G2z
+
+X:21
+T: NINA S FAHRET A BIERELE D RHIN NA
+N: K0083
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: Kinder -, Wiegen - Lied
+M: 6/8
+L: 1/16
+K: F
+ | c6G6 | F3FF2G3GG2 | A6G6
+c2c2c2G4G2 | A3GA2F6
+c2c2c2G4G2 | A3GA2F6
+F4G2A3AA2 | G2G2c2F4z2
+
+X:22
+T: AEIE BUBAEIE DIE BAEBLE SIN GUET
+N: K0089
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: Kinder -, Wiegen - Lied
+M: 3/8
+L: 1/16
+K: G
+ | d2dcBA | G2GABc | d2d2e2 | d6
+c2c2A2 | B3AG2 | A2A2F2 | G4z2
+d2d2B2 | c2c2A2 | B2G2G2 | A6
+d2d2B2 | c4A2 | B2B2G2 | A6
+d2dcBA | G2GABc | d2d2e2 | d6
+c2c2A2 | B3AG2 | A2A2F2 | G4z2
+
+X:23
+T: AEIE BUBAEIE SCHLOF LIAEWER AS DU
+N: K0090
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: Kinder -, Wiegen - Lied
+M: 3/8
+L: 1/8
+K: F
+ | cBc | GAB | AAG | c3
+cBG | FGA | AGG | F2z
+
+X:24
+T: ICH HAB MIR MEIN KINDEL FEIN SCHLAFEN GELEGT
+N: K0097A
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Kinder -, Wiegen - Lied
+M: 3/4
+L: 1/8
+K: G
+B2 | d2B2B2 | B3AA2 | c2A2A2 | B4
+B2 | d2G2G2 | B3AA2 | c2F2F2 | G4
+D2 | D2G2G2 | F2A2A2 | A3ce2 | d4
+B2 | A2A2BA | G2G2B2 | A3GF2 | G4
+
+X:25
+T: SCHLAF KINDCHEN SCHLAF DEIN VATER IST EIN SCHAF
+N: K0108
+O: Europa, Mitteleuropa, Deutschland, Hessen, Alsfeld
+R: Kinder -, Wiegen - Lied
+M: 4/4
+L: 1/8
+K: F
+ | A4G2G2 | F4z2
+GA | B2B2A2c2 | G4z2
+FA | c2c2f2d2 | d2c2c4
+A3GB2G2 | F2E2F4
+
+X:26
+T: SCHLAF MAIN KINDERL SCHLAF
+N: K0109
+O: Europa, Mitteleuropa, Oesterreich
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/8
+K: F
+ | ccBG | F2z
+A | ccBG | F2z
+F | GGGG | ccA
+F | GGGG | ccA2
+ccBG | F2z2
+
+X:27
+T: SCHLOAP KINDKEN PROFOSS
+N: K0110
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Ravensberg
+R: Kinder -, Wiegen - Lied
+M: 6/8
+L: 1/16
+K: F
+ | A6G2F2G2 | F6z4
+FA | c3dc2B2G2c2 | A6z4
+AA | B3AB2G2A2BB | c2B2c2A2G2
+A2 | B3AB2G2A2B2 | c2B2c2A4z2
+A6G2F2G2 | F6z6
+
+X:28
+T: HUSSE BUSSEE DAT ERSTE JAHR TWEE
+N: K0112
+O: Europa, Mitteleuropa, Deutschland, Norddeutschland, Holstein
+R: Kinder -, Wiegen - Lied
+M: 3/4
+L: 1/8
+K: G
+ | B2B2A2 | G2z2
+G2 | B2B2A2 | G2z2
+G2 | B2B2B2 | c2c2c2
+AAA2A2 | d2d2d2
+B2B2A2 | G4z2
+
+X:29
+T: ES KUMME SECHS BOLLACHA
+N: K0113
+O: Europa, Mitteleuropa, Deutschland, Maehren, Kuhlaendchen
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: G
+G2 | d2d2e2e2 | d4B2
+G2 | d2d2e2e2 | d4B2
+d2 | d3cA2B2 | c2d2B4
+d2c2A2B2 | c2d2B2
+d2 | d3cA2B2 | c2d2B4
+d2c2A2B2 | c2d2B2
+
+X:30
+T: HEIJO WOERN WIR DO
+N: K0115A
+O: Europa, Mitteleuropa, Deutschland, Ruhrgebiet
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4A4 | c2c2A4
+c2c2AAd2 | c4A4
+c2c2A2d2 | c4A4
+F2G2A2B2 | c2c2c4
+d2c2B2AA | G2GGF4
+F2G2AAB2 | G2G2F4
+
+X:31
+T: BUKO VON HALBERSTADT
+N: K0121A
+O: Europa, Mitteleuropa, Deutschland, Norddeutschland, Zerbst
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4A2d2 | c2cBA2z2
+c2c2A2d2 | c2cBA2
+C2 | F2F2G2G2 | A4G2
+C2 | F2F2G2G2 | A4G2
+G2 | F2F2G2G2 | A2A2G2
+B2 | A2FFG2CC | F2F2F2z2
+
+X:32
+T: MUTSCHEKUEHCHEN VON HALBERSTADT
+N: K0121B
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c3BA2G2 | F2F2C2z2
+c3BA2G2 | F2F2C2
+C2 | F2G2A2c2 | c2B2G2z2
+F2G2A2c2 | c2B2G2z2
+c3BA2F2 | B2d2c4
+B2G2A2F2 | G2E2F2z2
+
+X:33
+T: SCHLAF KINDCHEN ALSO WOHL
+N: K0122
+O: Europa, Mitteleuropa, Deutschland, Niederrhein
+R: Kinder -, Wiegen - Lied
+M: 2/4
+L: 1/16
+K: F
+ | A4G2G2 | F2F2C4
+A2A2G2G2 | F2F2C4
+F2A2A2c2 | c4B2
+A2 | G2G2G2B2 | B4A4
+F2A2A2c2 | c2B2B2
+A2 | G2G2G2B2 | AAG2F4
+
+X:34
+T: UFM BERGN DA GIEHT DAR WIND
+N: K0129
+O: Europa, Mitteleuropa, Deutschland, Oberschlesien
+R: Kinder -, Wiegen - Lied
+M: 6/8
+L: 1/16
+K: G
+dc | B3cB2A2B2A2 | G6z4
+dc | B3cB2A2B2A2 | G6z4
+B2 | A2B2^c2d2A2F2 | G2E2A2D4
+B2 | A2B2^c2d2A2F2 | G2E2A2D4
+c2 | B2A2A2A2G2G2 | F2E2F2G4
+c2 | B2A2A2A2G2G2 | F2E2F2G4
+D2 | G2G2G2_B2A2G2 | F2G2A2D4
+D2 | G2G2G2_B2A2G2 | F2G2A2D4z2
+B6G6 | B6G6
+
+X:35
+T: NUN SCHLAF MEIN LIEBES KINDELEIN
+N: K0130
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder -, Wiegen - Lied
+M: 4/4
+L: 1/4
+K: F
+F | FFAF | ccc
+c | dcAB | c2z
+c | cccA | ccA
+c | BAGG | F2
+A2 | cAGG | F4
+
+X:36
+T: KINNE WIPPCHEN ROTHE LIPPCHEN
+N: K0150
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Kinder -, Kose -, Scherz - Lied
+M: 3/8
+L: 1/16
+K: G
+DD | G2G2DD | G2G2
+DD | G2G2DD | G2G2z2
+d2B2G2 | D2D2
+
+X:37
+T: LIRUM LARUM LOEFFELSTIEL
+N: K0222
+O: Europa, Mitteleuropa, Deutschland, Thueringen, Stotternheim
+R: Kinder -, Kose -, Scherz - Lied
+M: 2/4
+L: 1/8
+K: G
+ | ddBG | eed2
+ccBB | AAG2
+ddBG | eed2
+ccBB | AAG2
+
+X:38
+T: BLAEH SCHAEFCHEN BLAEH
+N: K0259
+O: Europa, Mitteleuropa, Deutschland, Erfurt, Stotternheim
+R: Kinder -, Kose -, Scherz - Lied
+M: 2/4
+L: 1/8
+K: G
+ | d2BA | G2z
+d | dcBA | G2z
+G | BBBB | c2c
+c | AAAA | d2d
+d | dcBA | G2z2
+
+X:39
+T: BAEH LAEMMEL BAEH
+N: K0260
+O: Europa, Mitteleuropa, Deutschland, Breslau
+R: Kinder -, Kose -, Scherz - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4A2G2 | F4z2
+F2 | c2c2A2G2 | F4z2
+F2 | G2G2G2G2 | A3GF2
+F2 | G2G2G2G2 | A3GF2
+F2 | c2c2A2G2 | F4z4
+
+X:40
+T: DR HANS HAT HOSEN A
+N: K0298
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: Kinder -, Kose -, Scherz - Lied
+M: 2/4
+L: 1/16
+K: F
+ | F4G4 | A3GF2
+A2 | G4E4 | F4z4
+F2F2G2G2 | A3GF2
+A2 | G4E4 | F4z4
+c2B2G2G2 | c2A2F2F2
+c2B2G2G2 | c2A2F2F2
+F4G4 | A3GF2
+A2 | G4E4 | F4z4
+
+X:41
+T: UNSER HANS HAT HOSEN AN
+N: K0299
+O: Europa, Mitteleuropa, Deutschland, Boehmen
+R: Kinder -, Kose -, Scherz - Lied
+M: 2/4
+L: 1/16
+K: Bb
+ | G3DG2A2 | B3AG2
+d2 | d3DD3D | G4z4
+d4d3d | c4c4
+B4B3B | A4A4
+B3FB2c2 | d2f2B4
+c2e2A2A2 | B2g2f4
+B3FB2c2 | d2f2B4
+c3eA2A2 | B4z4
+
+X:42
+T: FIROWE D GLOCK ISCH DROWE
+N: K0312
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Ober - Elsass
+R: Kinder -, Kose -, Scherz - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4A2F2 | c2B2A2F2
+c2d2c2d2 | c2B2A2F2
+c4c2d2 | c4A4
+c2d2c2d2 | c4A4
+c4c2d2 | c4A4
+ddccBB | A4F4
+
+X:43
+T: BUM BAM BEIER DE KOESTER MAG KIEN EIER
+N: K0313
+O: Europa, Mitteleuropa, Deutschland, Oldenburg
+R: Kinder -, Schaukel -, Knierreiter -, Spiel - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4d4 | c4A2
+A2 | c2c2d2d2 | c4A2
+A2 | c2c2A4 | c2ccA4 | c2ccA4
+c2c2d2d2 | c2c2A4
+
+X:44
+T: S IST EIN MANN IN BRUNN GEFALLN
+N: K0338
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder -, Schaukel -, Kniereiter -, Spiel - Lied
+M: 2/4
+L: 1/8
+K: C
+ | CDEF | GGG2
+CDEF | GGG2
+CDEF | GGG2
+FFEC | D2Cz
+
+X:45
+T: SO FAHREN DIE DAMEN SO REITEN DIE HERREN
+N: K0352
+O: Europa, Mitteleuropa, Deutschland, Berlin
+R: Kinder -, Schaukel -, Knierreiter -, Spiel - Lied
+M: 3/4
+L: 1/8
+K: G
+D2 | G3AB2 | A2D2
+D2 | A3Bc2 | B2G2
+D2 | D2D2D2 | D2D2
+D2 | D2D2D2 | D2D2
+D2 | G2G2G2 | G2G2
+D2 | G2G2G2 | G2G2z2
+d2D2D2 | D2D2D2
+d2D2D2 | D2D2
+
+X:46
+T: HOTTE HOTTE REITERPFERD
+N: K0363
+O: Europa, Mitteleuropa, Deutschland, Erfurt, Stotternheim
+R: Kinder -, Schaukel -, Knierreiter -, Spiel - Lied
+M: 2/4
+L: 1/8
+K: G
+ | GGBB | ddBB
+GGBB | ddBz
+GABc | ddBz
+GABc | ddBz
+GABc | d2B2
+GABc | d2B2
+ddBG | eed2
+ccBB | AAGz
+d2BA | G2z2
+
+X:47
+T: ES TANZT EIN BI BA BUTZEMANN
+N: K0439
+O: Europa, Mitteleuropa, Deutschland, Thueringen; Hessen
+R: Kinder - Lied, Lehre, Strafe, Zucht - Reim
+M: 2/4
+L: 1/16
+K: G
+D2 | G4B4 | d4g4 | e3ee2
+e2 | d2c2B2A2 | G2B2d2
+D2 | G4B4 | d4g4 | e3ee2
+e2 | d2c2B2A2 | G4z2
+B2 | A2B2c2A2 | B2c2d2
+B2 | A2B2c2A2 | B2c2d2
+D2 | G4B4 | d4g4 | e3ee2
+e2 | d2c2B2A2 | G4z2
+
+X:48
+T: A B C DIE KATZE LIEF IN SCHNEE
+N: K0514
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder -, Spiel - Lied
+M: 2/4
+L: 1/16
+K: G
+ | G4B4 | d4z2
+d2 | d3cB2A2 | G4z4
+B2B2c2c2 | d4z4
+B2B2A2A2 | G4z4
+
+X:49
+T: HANS PHILIPPCHEN GEIG EINMAL
+N: K0556
+O: Europa, Mitteleuropa, Deutschland, Hessen; Schlesien
+R: Kinder -, Spiel - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c3cc2c2 | A2F2F4
+C3FF2A2 | A4G4
+B3BB2B2 | G2E2E4
+C3GG2A2 | G4F4
+
+X:50
+T: HAENSCHEN SASS IM SCHORNSTEIN
+N: K0578
+O: Europa, Mitteleuropa, Deutschland, Norddeutschland, Mecklenburg
+R: Kinder -, Spiel - Lied
+M: 2/4
+L: 1/16
+K: F
+ | F2G2A2B2 | c4c2
+c2 | d2B2f2d2 | c4z2
+c2 | B2B2B2B2 | A4A2
+A2 | A2G2G2A2 | F4z4
+F2G2A2B2 | c4c2
+c2 | d2B2f2d2 | c4z2
+c2 | B2B2B2B2 | A4A2
+A2 | A2G2G2A2 | F4z2
+C2 | F3AA2A2 | G3BB2
+B2 | A2F2c2A2 | G4z2
+C2 | F3AA2A2 | G3BB2
+B2 | A2F2G2E2 | F4z4
+
+X:51
+T: JAKOB HAT KEIN BROT IM HAUS
+N: K0600
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder -, Spiel - Lied
+M: 2/4
+L: 1/8
+K: G
+ | DGGG | FAG2
+DFAc | BdG2
+BBc2 | AAB2
+GGAA | FFG2
+
+X:52
+T: O DU KLEINER KLADRIAN
+N: K0641
+O: Europa, Mitteleuropa, Deutschland, Bergisches Land
+R: Kinder -, Tier - Lied
+M: 2/4
+L: 1/8
+K: G
+ | GGFD | GGD
+D | GGFA | G2Dz
+GGFD | AAA2
+GGFA | G2D
+D | GGDD | GGD2
+GGFD | AAA
+A | GGFA | G2Dz
+
+X:53
+T: WAS HABEN WIR GAENSE FUER KLEIDUNG AN
+N: K0646
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Kinder -, Tier - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2G2G2G2G2 | G2E2D4
+E4F4 | G4z2
+GA | B2B2B2B2 | c2c2c2
+cB | A2A2A2A2 | d2d2d4
+G4A4 | B4z2
+A2 | GFGAB2A2 | G4z2
+
+X:54
+T: MOHKUEHCHEN MOH WOVON BIST DU SO ROH
+N: K0653
+O: Europa, Mitteleuropa, Deutschland, Halle
+R: Kinder -, Tier - Lied
+M: 2/4
+L: 1/16
+K: F
+ | c4A2G2 | F4z2
+C2 | c2c2A2G2 | F4z2
+C2 | F2A2A2c2 | cBA2G2
+F2 | F2A2A2c2 | ccA2G2
+AG | F2F2G2G2 | F4z2
+c2 | c3BA2F2 | B2d2c2z
+A | A2G2AAF2 | G4F2z2
+
+X:55
+T: SEGG DOCH MUSEKAETTKEN
+N: K0669
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Engste
+R: Kinder -, Tier - Lied
+M: 3/4
+L: 1/8
+K: Bb
+ | d2d2dd | c2c2c2 | B2A2B2 | F4
+F2 | d2d2d2 | c2c2c2 | B2A2B2 | F4
+d2 | B2A2B2 | c4
+d2 | B2A2B2 | c4
+f2 | d2c2B2 | c2B2A2 | B4A2 | B4z2
+
+X:56
+T: RURU RINNEKEN
+N: K0690
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Kinder -, Tier - Lied
+M: 2/4
+L: 1/16
+K: F
+ | A4G4 | F2F2C2
+C2 | A2A2G2G2 | F2F2C2
+C2 | F2G2A2F2 | B4G2
+F2 | E2F2G2C2 | A4F2
+A2 | F4C2A2 | F2F2C2A2 | F4C2
+C2 | F2G2A2F2 | B2A2GGA2 | F4F2z2
+
+X:57
+T: STORCH STORCH STANE FLIEG UEBER HANE
+N: K0749
+O: Europa, Mitteleuropa, Deutschland, Odenwald, Alsbach
+R: Kinder -, Tier - Lied
+M: 2/4
+L: 1/8
+K: F
+ | ccdd | ccAz | ccdd | ccAz
+ccdd | ccAz | ccdd | ccAz
+ccdd | ccAz | ccdd | ccAz
+ccdd | ccAz | ccdd | ccAz
+c2B2 | A4
+
+X:58
+T: MAIKAEFER FLIEG
+N: K0798A
+O: Europa, Mitteleuropa, Deutschland, Thueringen; Vogtland
+R: Kinder -, Tier - Lied
+M: 2/4
+L: 1/16
+K: G
+ | d4B2A2 | G4z2
+D2 | G3AB2c2 | d4z2
+d2 | B2d2e2d2 | d2c2c4
+c2B2A2c2 | e2d2B4
+d4B2A2 | G4z4
+
+X:59
+T: MUHKUEHBCHEN FLIEGE
+N: K0823
+O: Europa, Mitteleuropa, Deutschland, Thueringen, Stotternheim
+R: Kinder -, Tier - Lied
+M: 2/4
+L: 1/16
+K: G
+ | d4B2G2 | d4B2
+G2 | d2d2B2G2 | d4B2
+GG | d2d2B2G2 | d2d2B4
+e2d2c2B2 | A2A2G4
+
+X:60
+T: LURE LURE LAEMPKEN
+N: K0845
+O: Europa, Mitteleuropa, Deutschland, Moers
+R: Kinder -, Tier - Lied
+M: 2/4
+L: 1/8
+K: G
+ | GGAA | B2Gz
+GGAA | B2Gz
+BBAG | B2B2
+AAAB | G2Gz
+
+X:61
+T: SCHNECKHAUS SCHNECKHAUS STECKE DEINE HOERNER AUS
+N: K0885
+O: Europa, Mitteleuropa, Deutschland, Thueringen, Stotternheim
+R: Kinder -, Tier - Lied
+M: 2/4
+L: 1/8
+K: G
+ | d2B2 | d2B2
+GABc | ddB2
+GABc | ddB2
+GABc | d2B2
+GABc | d2B2
+ddB2 | ddB2
+ddB2 | edcB | A2G2
+
+X:62
+T: SIPP SAPP SUNNNE
+N: K0925
+O: Europa, Mitteleuropa, Deutschland, Paderborn
+R: Kinder - Lied, Pflanzen
+M: 2/4
+L: 1/16
+K: G
+ | B4A4 | G4D2
+DD | B2B2A2A2 | G4D2
+D2 | B2B2A2A2 | G4D4
+D2D2D2D2 | B2B2A2A2 | G4D4
+
+X:63
+T: PIPKEN PIPKEN SAPE
+N: K0932
+O: Europa, Mitteleuropa, Deutschland, Elberfeld
+R: Kinder - Lied, Pflanzen
+M: 2/4
+L: 1/8
+K: G
+ | ddee | d2B
+c | ddee | d2B2
+ddde | dcBc
+ddde | dcBc
+ddde | dcB
+d | edcB | d2B
+e | d2Be | d2Bz
+
+X:64
+T: EHKHON MINNE KLOW
+N: K0946
+O: Europa, Mitteleuropa, Deutschland, Barmen, Elberfeld
+R: Kinder - Lied, Pflanzen
+M: 2/4
+L: 1/16
+K: G
+ | d4B2z2 | d2d2d2e2 | d4B2z2
+d2ddd2d2 | e2e2d2
+d2 | c2c2B2d2 | A4G2d2 | A2G2z4
+d2d2d2e2 | d4B2
+B2 | d2d2d2e2 | d4B2z2
+d2d2d2d2 | e2e2d4
+c2c2B2d2 | A2A2G4
+
+X:65
+T: TUARL HAUT GSAGT
+N: K0973
+O: Europa, Mitteleuropa, Deutschland, Boehmen
+R: Kinder - Lied, Pflanzen
+M: 3/4
+L: 1/8
+K: G
+ | B2B2B2 | B2B2B2
+ddc2B2 | A4z2
+c2B2A2 | G4z2
+B2B2B2 | B2B2B2
+ddc2B2 | A4z2
+c2B2A2 | G4z2
+
+X:66
+T: BLAUE BLAUE WOLKEN
+N: K1009
+O: Europa, Mitteleuropa, Deutschland, Bergisches Land
+R: Kinder -, Natur -, Regen - Lied
+M: 2/4
+L: 1/8
+K: G
+ | ddde | d2B
+G | ddde | d2Bz
+dddd | eee2
+dcBc | d2Bz
+
+X:67
+T: REGEN REGEN SCHUREN
+N: K1024
+O: Europa, Mitteleuropa, Deutschland, Ruhrgebiet, Kettwig
+R: Kinder -, Natur -, Regen - Lied
+M: 2/4
+L: 1/8
+K: G
+ | GGAA | B2G
+D | GGAA | B2G
+G | BBAG | B2B
+B | AAAB | G2G
+B | A2GB | A2Gz
+dGGG | GFG2
+
+X:68
+T: REGE REGE SCHURE
+N: K1026
+O: Europa, Mitteleuropa, Deutschland, Moers
+R: Kinder -, Natur -, Regen - Lied
+M: 2/4
+L: 1/16
+K: G
+ | G2G2A2A2 | B2G2z2
+D2 | G2G2A2A2 | B2G2z2
+D2 | B2B2AAA2 | B2B2B2
+B2 | A2A2A2A2 | B4B4
+A2A2A2B2 | G2G2G4
+
+X:69
+T: SCHENKT MIR MAL BAIRISCH EIN
+N: K1188
+O: Europa, Mitteleuropa, Deutschland, Ostpreussen; Vogtland
+R: Kinder -  Lied, Nachahmung des Posthorn - Signals
+M: 3/8
+L: 1/16
+K: C
+ | C2E2G2 | c3GE2
+G2G2G2 | c3GE2
+G2G2G2 | c4z2
+G2G2G2 | c4z2
+
+X:70
+T: ZEHN GAENS IM HABERSTROH
+N: K1220
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: Kinder - Lied, Tier - Maerchen
+M: 2/4
+L: 1/16
+K: F
+c4 | A2F2G2E2 | F4z2
+AB | c4A2AB | c4A2
+B2 | c2A2B2G2 | F4
+c4 | A2F2G2E2 | F4
+
+X:71
+T: WAS TRAEGT DIE GANS AUF IHREM SCHNABEL
+N: K1221
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Kinder - Lied, Tier - Maerchen
+M: 3/4
+L: 1/16
+K: G
+D2D3D | G4G4F3G | A4D4E3D | D8
+D4 | c4c2c2A3c | B4B4
+G3B | A4A4G2A2 | B4B4A3A | G4z2
+
+X:72
+T: WILL ICH IN MEIN GAERTCHEN GEHN
+N: K1237
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder - Lied, Luegen - Maerchen, Aberglaube
+M: 2/4
+L: 1/16
+K: G
+G2G2F2G2 | A2ABG2z2
+B2B2A2d2 | B4G2z2
+d2edc2dc | B2cBA2z2
+B2c2d2ec | B2A2G2z2
+
+X:73
+T: EIN SCHNEIDER FING NE MAUS
+N: K1239
+O: Europa, Mitteleuropa, Deutschland, Zwickau
+R: Kinder -, Spass - Lied, Neck - Maerchen
+M: 2/4
+L: 1/16
+K: F
+C2 | F3FF3F | F6
+G2 | A3AA3A | A6
+c2 | c3cc3c | d2c2B2A2 | G4c4 | c4z2
+
+X:74
+T: DROBEN AUF GRUENER WALDHEID
+N: K1261
+O: Europa, Mitteleuropa, Deutschland, Hessen, Darmstadt
+R: Kinder - Lied, Zaehl - Geschichte
+M: 6/8
+L: 1/16
+K: G
+ | G3FG2A2G2A2 | B6
+d6 | B2B2AA | A2A2
+AA | B2B2A2 | G4
+D2 | G3FG2A2G2A2 | B6z4
+GB | d4d2c4d2 | B4z8
+B2B2A2 | B2BBA2
+G3FG2A2G2A2 | B6
+d6 | B2B2AA | A2A2
+AA | B2B2A2 | G6
+
+X:75
+T: HEI WAS BIN I A LUSTIGER BUA
+N: K1263
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder - Lied, Zaehl - Geschichte
+M: 6/8
+L: 1/8
+K: C
+ | C2CG,G,G, | A,A,A,G,2
+G, | A,A,A,B,B,B, | C3G,3
+C2CG,G,G, | A,2A,G,3
+A,2A,B,B,B, | C2CG,2
+G, | G,A,B,C3
+
+X:76
+T: WIDE WIDE WENNE HEISST MEINE PUTHENNE
+N: K1266
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder - Lied, Zaehl - Geschichte
+M: 3/8
+L: 1/16
+K: D
+ | D3EFG | A2d2
+F2 | A2G2E2 | E2D2z2
+A2G2E2 | B2A2F2
+A2G2E2 | B2A2F2
+D3EFG | A2d2
+F2 | A2G2E2 | E2D2z2
+
+X:77
+T: WIR BITTEN DICH O JESULEIN
+N: K1589
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: Kinder - Lied, religioes, Gebet
+M: 4/4
+L: 1/16
+K: F
+F2G2 | A4A4A4c4 | B4A4G4
+c2B2 | A6GAB8 | A8z4
+c4 | f4e4d4c2e2 | d4d4c4
+f4 | c6B2A4G4 | A12
+
+X:78
+T: LIEBER FREUND ICH FRAGE DICH
+N: K1602
+O: Europa, Mitteleuropa, Deutschland, Boehmen
+R: Kinder - Lied, religioes, Gebet
+M: 4/4
+L: 1/8
+K: G
+ | G2G2G2A2 | GFE2D2z2
+G2G2G2A2 | GFE2D2z2
+E2E2F2F2 | G4z4
+G2B2B2d2 | d2c2A4
+G2B2B2d2 | d2c2A2
+c2 | B2G2F2A2 | A4G2z2
+
+X:79
+T: HERMANN FLA LAERM AN
+N: K1605
+O: Europa, Mitteleuropa, Deutschland, Westfalen ?
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 2/4
+L: 1/8
+K: C
+ | G2EA | G2E
+G | G2EA | G2E
+E | G2GA | G2E
+E | G2GA | G2E
+G | A2GG | G2Ez
+
+X:80
+T: DIE GULDNE SCHNUR GIEHT UM DAS HAUS
+N: K1612
+O: Europa, Mitteleuropa, Deutschland, Schweidnitz
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 2/4
+L: 1/16
+K: G
+G2 | d2d2d2e2 | d2B2G2
+G2 | d2d2d2e2 | d2B2G2
+B2 | d2d2d2e2 | d4B2
+B2 | d2d2d2e2 | d4B2
+G2 | d2d2d2e2 | d2B2G2
+G2 | d2d2d2e2 | d2B2G2
+B2 | ddd2dde2 | d2B2G2z2
+B4e2e2 | d4z2
+d2 | c2c2B2B2 | A2A2G2
+
+X:81
+T: RODEN RODEN EICHHON
+N: K1624
+O: Europa, Mitteleuropa, Deutschland, Koeln
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 2/4
+L: 1/16
+K: F
+ | G2G2F2A2 | G4F2z2
+G2G2F2AA | G4F2z2
+G2G2G4 | G2G2G4
+G2G2G2G2 | G4G2z2
+G4G4 | G2G2G4
+G2GGG2G2 | G2G2G4
+G4F2G2A2 | G4z4
+G4F2G2A2 | G4z2
+A2 | G2G2F2A2 | G2G2F2
+A2 | G2G2F2A2 | G4F2
+A2 | G4F2A2 | G4F2z2
+
+X:82
+T: NUN GEBT UNS AUCH EIN PEUST EI
+N: K1648
+O: Europa, Mitteleuropa, Deutschland, Koeln
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 2/4
+L: 1/8
+K: D
+A, | DEFG | A2Az
+d2cB | BAA
+A | dAGF | EFGz
+G2FE | FGAz
+BGEC | EDD
+
+X:83
+T: SINTE MARTENS VOGELTJE
+N: K1668
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 2/4
+L: 1/16
+K: G
+ | G2A2B2B2 | A2A2G2z2
+G2GAB2B2 | A2A2G2
+B2 | A4G2B2 | A4G2B2 | A4G2
+D2 | G2A2B2B2 | A2A2G2z2
+A4G2z2 | A2A2G2z2
+d2d2F2F2 | G2G2G4
+
+X:84
+T: SENTER KLOS DEN HEILGEN MANN
+N: K1678
+O: Europa, Mitteleuropa, Deutschland, Niederrhein, Moers
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 2/4
+L: 1/16
+K: G
+ | G2G2A2A2 | B2A2G2z2
+G2G2AAA2 | B2A2G2z2
+B2B2A2G2 | B2B2B2
+B2 | A2A2A2G2 | B4B2
+B2 | AAA2A2G2 | B4B2
+B2 | A2A2A2G2 | B4B2
+BB | A2A2A2B2 | G4G2z2
+
+X:85
+T: WIR KOMMEN DAHER IN DER HEILIGSTEN ZEIT
+N: K1695
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 3/8
+L: 1/16
+K: G
+GA | B2B2B2 | G2
+A2B2 | d2c2B2 | A4
+G2 | F3AA2 | A2B2
+c2 | B4A2 | G4z2
+
+X:86
+T: DREI KOENIG FUEHRET DIE GOETTLICHE HAND
+N: K1701
+O: Europa, Mitteleuropa, Deutschland, Franken
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 3/4
+L: 1/4
+K: G
+G | B2A | GAB | dcB | A2
+A | A2A | ABc | B2A | G2
+
+X:87
+T: HIER TRETEN WIR HER MIT UNSERM STERN
+N: K1703
+O: Europa, Mitteleuropa, Deutschland, Schleswig, Westkueste
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 3/4
+L: 1/8
+K: F
+C2 | F4E2 | F4F2 | F2A2G2 | F4
+GA | B3GcB | A3GF2 | G3FE2 | F4
+GA | B3GcB | A3GF2 | G3FE2 | F4
+
+X:88
+T: WIR KOMMEN DAHER OH ALLEN SPOTT
+N: K1704
+O: Europa, Mitteleuropa, Deutschland, Ober - Hessen
+R: Kinder -, Ansinge - Lied, Bettel - Reim
+M: 4/4
+L: 1/8
+K: Bb
+F2 | BBF2B2d2 | c2c2B2
+d2 | d2c2c2B2 | A2G2F2
+F2 | A2F2Bdd2 | F2GAB2
+
+X:89
+T: RINGLE RINGLE REIHE
+N: K2063
+O: Europa, Mitteleuropa, Deutschland, Darmstadt
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: F
+ | c2c2d2d2 | c4A2
+F2 | c2c2ddd2 | c4A2
+F2 | c2c2ded2 | c2c2A2
+F2 | c2c2d2d2 | c2c2c2z2
+
+X:90
+T: RUMME RUMME ROSENKRANZ
+N: K2065
+O: Europa, Mitteleuropa, Deutschland, Siegen
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | ccdd | ccA
+A | ccdd | c2A
+A | ccdd | c2A
+A | ccdd | ccA2
+ccdd | ccA2 | f4
+
+X:91
+T: ES SITZT NE FRAU IM RINGELEIN
+N: K2067
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: G
+D | GGBB | AAG
+G | BBdd | ccB
+B | dde2 | ccd
+B | BBc2 | AAB
+d | A2Gd | A2G
+
+X:92
+T: RINGEL RINGEL ROSENKRANZ
+N: K2068
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | ccdd | ccA2
+ccdd | ccA2
+ccdd | c2Az
+ccAA | ccAA
+ccdd | ccAA | z
+ccc | f4
+
+X:93
+T: RINGEL RINGEL ROSENKRANZ
+N: K2072
+O: Europa, Mitteleuropa, Deutschland, Darmstadt
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: F
+ | c2c2d2d2 | c2c2A4
+c2c2A4 | c2c2A4
+c2c2A4 | ccc2A4
+c2c2c2c2 | f4z4
+
+X:94
+T: KREIS KREIS KESSEL
+N: K2073
+O: Europa, Mitteleuropa, Deutschland, Weimar
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: F
+ | c4d4 | c4A2z2
+c2c2d2d2 | c4A2z2
+B2B2G2G2 | c2c2A4
+d3cB2A2 | G2G2F4
+
+X:95
+T: KREIS KREIS KESSEL
+N: K2074
+O: Europa, Mitteleuropa, Deutschland, Erfurt
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: G
+ | G2B2 | d2B2
+GABc | d2B2
+ddBG | eed2
+ccBB | AAG2
+
+X:96
+T: BAUER BAUE KESSEL
+N: K2075
+O: Europa, Mitteleuropa, Deutschland, Sachsen
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: G
+ | G2G2G2B2 | G4D4
+G2G2G2B2 | G4D4
+G2G2G2B2 | G2G2D4
+d3cB2A2 | G2G2G4
+
+X:97
+T: BAUER BAUE KESSEL
+N: K2075A
+O: Europa, Mitteleuropa, Deutschland, Schleswig
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: G
+ | G2G2G2B2 | G4D4
+G2G2G2B2 | G4D4
+G2G2E4 | G2G2E2E2
+G2G2A2A2 | G4E4
+G2G2G2B2 | G2G2D4
+d3cB2A2 | G2G2G4
+
+X:98
+T: RINGEL RINGEL ROSEN
+N: K2079
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel; +++ letzte Phrase korrigiert. ++++
+M: 2/4
+L: 1/8
+K: C
+ | GGAA | G2E2
+GGAA | G2E2
+GFEC | GFE2
+GGAA | GFEc
+c2c2 | c4
+
+X:99
+T: REIHE REIHE ROSE
+N: K2082
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Unter - Elsass
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: F
+ | c2d2c2d2 | c4A2z2
+c2d2c2d2 | c4A2
+A2 | c2c2AAA2 | c2c2A2
+A2 | cccAA2A2 | c2ccA4
+FFF2FFF2 | c2c2A4
+
+X:100
+T: RINGEL RINGEL ROSE
+N: K2083
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: Bb
+ | ddcc | B2F2
+ddcc | B2F2
+d2cc | B2F2
+ddcc | B2F2
+ccAA | ffdd
+eecc | f4
+
+X:101
+T: TANZE TANZE TELEMANN
+N: K2084
+O: Europa, Mitteleuropa, Deutschland, Wetterau, Bettenhausen
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: C
+ | G2G2A2A2 | G2F2E2
+C2 | G2G2A2A2 | G2F2E4
+G2G2A2A2 | G4E2
+C2 | G2G2AAA2 | G4E2ccc | c8
+
+X:102
+T: EIERKRANZ WAS GILT DIE SCHANZ
+N: K2087
+O: Europa, Mitteleuropa, Deutschland, Bacharach a.Rh., Oberdiebach
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 4/4
+L: 1/16
+K: G
+ | d4d4B8 | d4d4B4
+G4 | d4d4B4G4 | e8B4
+G4 | d2d2d4e4e2e2 | d8B4
+G4 | d8e8 | d8B8
+d4d4B4G4 | d4d4B4G4
+z4d3dd2g8
+
+X:103
+T: KLING KLING GLOECKCHEN
+N: K2093
+O: Europa, Mitteleuropa, Deutschland, Erfurt
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: G
+ | G4B4 | d4B2
+D2 | G2A2B2c2 | d4B4
+d2c2B2A2 | G4z2
+D2 | G2A2B2c2 | d4B4
+d2c2B2A2 | G4z4
+d4B4 | d2d2B4
+G2A2B2c2 | d2d2B4
+d2c2B2A2 | G4z2
+G2 | d2d2B2B2 | d2d2B4
+d2ddB2B2 | d2d2B4
+G2A2B2c2 | d2e2d4
+c2c2A2A2 | G2B2G4
+
+X:104
+T: WIR TRETEN AUF DIE KETTE
+N: K2096
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: F
+C2 | F2G2A2B2 | c4f4
+A2A2G2G2 | F4z2
+C2 | F2G2A2B2 | c4f4
+A2A2G2G2 | F4z4
+c2c2B2B2 | A2A2G4
+c2c2B2B2 | A4z4
+c2c2c2c2 | d2d2d4
+B2B2B2B2 | c2c2c2
+d2 | c3BA2d2 | c3BA2
+A2 | G2G2G2G2 | F4z4
+
+X:105
+T: SPRING SIE AUF DIE KETTE
+N: K2098
+O: Europa, Mitteleuropa, Deutschland, Oberlausitz
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | FGAB | c2c2
+d2f2 | c2z2
+d2f2 | c2z2
+BBBB | A2A2
+G2c2 | F2z2
+ccc2 | AAA2
+GGcc | AAA2
+ccc2 | AAA2
+GGcc | AGF2
+
+X:106
+T: ROHE ROHE SEIDE
+N: K2100
+O: Europa, Mitteleuropa, Deutschland, Provinz Sachsen
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: D
+ | A2A2B2B2 | A4F4
+A2A2B2B2 | A4F4
+A4F4 | A2A2F4
+A2A2B2B2 | A2A2F4
+A2A2B2B2 | A2A2F4
+A2A2B2B2 | A2A2F4
+A2A2B2B2 | A2A2F2FF
+A2A2B2B2 | A2A2F2FF
+A2A2B2B2 | A4F2z2
+A2A2F2D2 | B2B2A2A2
+G2G2F2F2 | E2A2D2D2
+
+X:107
+T: WIR TRATEN AUF DIE KETTE
+N: K2102
+O: Europa, Mitteleuropa, Deutschland, Rheinland, Laubenheim
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 4/4
+L: 1/8
+K: F
+F2 | F2A2c2d2 | c4A2z2
+c2B2A2G2 | F4z2
+F2 | F2A2c2d2 | c4A2z2
+c2B2A2G2 | F4z2
+c2 | c2B2A2z2 | c2B2A2z2
+c2c2d2d2 | c2B2A4
+c2c2c2A2 | f4z2
+cc | c2A2c2c2 | F4z2
+
+X:108
+T: DER KIRSCHBAUM HAT SEIN LAUB VERLORN
+N: K2119
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 4/4
+L: 1/8
+K: D
+D2 | A2A2B2B2 | A3GF2
+D2 | A2A2B2B2 | A4F2
+D2 | A2A2B2B2 | A3GF2
+D2 | A2A2B2B2 | A4F2
+
+X:109
+T: DER KIRSCHBAUM HAT SEIN LAUB VERLORN
+N: K2119A
+O: Europa, Mitteleuropa, Deutschland, Darmstadt
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 4/4
+L: 1/8
+K: D
+D2 | A2A2B2B2 | A3GF2
+D2 | A2A2B2B2 | A4F2
+D2 | A2A2B2B2 | A3GF2
+dd | A4F2dd | A4F2
+
+X:110
+T: HELL AUF DER WIESE FAENGT ES AN ZU SCHIESSEN
+N: K2120
+O: Europa, Mitteleuropa, Deutschland, Oberdiebach am Rhein
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: Eb
+ | B4c2c2 | B4G4
+B2B2c2c2 | B4G4
+B2B2B2E2 | B4B4
+B4B2E2 | B4B4
+B4B2B2 | B4B2B2
+B2B2c2c2 | B2B2G2
+GG | B2B2B2c2 | B2B2G2
+G2 | B2B2B2c2 | B2A2G4
+
+X:111
+T: DING DING THALERING
+N: K2137
+O: Europa, Mitteleuropa, Deutschland, Thueringen, Stotternheim
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: G
+ | d2B2 | ddB
+G | GABc | d2B2
+ddBB | ddB
+G | GABc | d2B2
+ddBB | d2B2
+ddBB | d2B2
+dcBA | G2z2
+
+X:112
+T: TING TANG TRALLALA WER IST IN MEINEM THORE
+N: K2138
+O: Europa, Mitteleuropa, Deutschland, Oberdiebach am Rhein
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: G
+ | d2e2 | dGG
+G | ddee | d2B
+G | ddGe | dBG2
+d2e2 | d4
+d2d2B4 | d2d2B4 | d2d2B4
+d2d2e2e2 | d2d2B4
+
+X:113
+T: WER EINE GANS GESTOHLEN HAT
+N: K2163
+O: Europa, Mitteleuropa, Deutschland, Berlin
+R: Kinder - Lied, Reigen,  Tanz - Spiel
+M: 2/4
+L: 1/8
+K: Bb
+F | BBBB | BGF
+F | G2A2 | B2z
+F | BBBB | BGF
+F | G2A2 | B2z
+f | dBcA | B2z
+
+X:114
+T: WER DIE GANS GESTOHLEN HAT
+N: K2163A
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: C
+ | C3DE2F2 | G3GG2
+G2 | A4A4 | G8
+F3FF2G2 | E2E2E3
+E | D4G4 | C8
+G4E2C2 | D2B,2C4
+G4E2C2 | D2B,2C4
+
+X:115
+T: ES KAM EIN REICHER VOGEL
+N: K2165
+O: Europa, Mitteleuropa, Deutschland, Oberdiebach am Rhein
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 3/4
+L: 1/16
+K: G
+d4 | d2d2B4d4 | A4d4z2
+d2 | d2d2B4d4 | c4B4z2
+c2 | c2c2A4c4 | c2B2A4z2
+d2 | d2d2B4e4 | d4z6
+d2 | d2d2B4d4 | c2B2A4z2
+d2 | d2d2B4d4 | c2B2A2
+c2B2d2 | c3BA4z2
+d2 | d2d2B4d4 | c2A2G4z4
+
+X:116
+T: DREIMAL UM DAS KAESTCHEN
+N: K2166
+O: Europa, Mitteleuropa, Deutschland, Oberdiebach am Rhein
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: G
+ | ddee | d2B
+G | dddd | g2z
+G | ddee | d2d2
+d2d2 | g2z
+G | ddAe | ddB
+G | dddG | d2d
+G | dddG | ddd
+G | dded | d2d2
+
+X:117
+T: GUTEN ABEND HERR SPIELMANN
+N: K2167
+O: Europa, Mitteleuropa, Deutschland, Oberdiebach am Rhein
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: G
+dd | d4B2d2 | d4B2
+Bd | c4A2c2 | B4z2
+dd | d4B2d2 | d4B2
+Bd | c4A2c2 | B4z2
+B2 | c4c2A2 | c4c2
+A2 | c4c2ce | A4e2
+B2 | c4c2A2 | d4d4
+d4e2f2 | g4z4
+d2ddd2d2 | g4z2
+
+X:118
+T: WIR FAHREN AUF DER GRUENEN SEE
+N: K2169A
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: C
+G2 | G2G2G2G2 | G2e2c4
+d3cB2A2 | A4G2
+G2 | G2G2G2G2 | G2e2c4
+d3cB2A2 | A4G4
+G2E2G2E2 | G2e2c2
+c2 | B4A2B2 | c4G2
+G2 | E2G2F2E2 | D4z2
+
+X:119
+T: DORT UNTEN IN DER GRUENEN SEE
+N: K2169B
+O: Europa, Mitteleuropa, Deutschland, Mainz
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 4/4
+L: 1/8
+K: F
+F2 | c2c2d2d2 | c2c2A2z2
+c2c2d2d2 | c4A2
+F2 | c2c2d2d2 | c2c2A2z2
+c2c2d2d2 | c4A2z2
+c2A2c2A2 | c2f2d2z
+d | c2Adc2AA | c2d2c2
+
+X:120
+T: WIR FAHREN AUF DIE SEE
+N: K2169C
+O: Europa, Mitteleuropa, Deutschland, Rheinland, Bacharach
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 4/4
+L: 1/4
+K: G
+ | BBBB | Bcd2
+ecBA | A2Gz
+BBBB | Bcd2
+ecBA | A2Gz
+d2B2 | d2B2 | c2e2 | d2z
+d | d2Bd | d2BB | c2e2 | d2z2
+
+X:121
+T: ES REGNET AUF DER BRUECKE
+N: K2170
+O: Europa, Mitteleuropa, Deutschland, Sachsen
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/8
+K: F
+C | FGAB | c2A
+A | B2c2 | A2z
+C | FGAB | c2A
+A | B2c2 | A2z
+c | BBGG | AAA
+c | BBGG | AAA2
+B2G2 | A2F2
+BBGG | A2F2
+FGAB | c2z
+d | cBAG | F2z
+
+X:122
+T: ES REGNET AUF DER BRUECKE
+N: K2172A
+O: Europa, Mitteleuropa, Deutschland, Niederrhein
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/8
+K: F
+C | FGAB | c2d
+B | A2G2 | F2z
+C | FGAB | c2d
+B | A2G2 | F2z2
+cccc | ddd2
+BBBB | ccc2
+AAAA | c2B
+B | A2G2 | F2z
+
+X:123
+T: ICH GING MAL UEBER NE BRUECKE
+N: K2174
+O: Europa, Mitteleuropa, Deutschland, Sachsen
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/8
+K: F
+C | FGAB | c2Az
+B2G2 | F2z
+C | FGAB | c2Az
+B2G2 | F2z2
+BBGG | AAF
+C | BBGG | AAF
+C | FGAB | c2z
+B | AAGG | F2z
+
+X:124
+T: WIR GINGN EINMAL NACH SCHWABEN
+N: K2181
+O: Europa, Mitteleuropa, Deutschland, Meerane
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/8
+K: F
+F | cccd | c2A
+A | cccd | ccA
+A | cccd | c2Az
+ccA2 | ccA2
+cccd | ccA
+
+X:125
+T: GEH IN DEN KREIS MEINE ROSA
+N: K2184A
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 3/4
+L: 1/8
+K: C
+G,G,G, | C4CD | C2B,
+G,G,G, | D4DE | D2C
+G,G,G, | E3DCB, | D3
+A,A,A, | D2C2B,2 | C2z
+
+X:126
+T: BLAUER BLAUER FINGERHUT
+N: K2186
+O: Europa, Mitteleuropa, Deutschland, Darmstadt
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/8
+K: C
+ | GGAA | GGE2
+GGAA | GGE2
+GGAA | G2E
+C | GGAA | G2E2
+GGAA | G2E2
+G2AA | G2E2
+GGAA | GGE2
+GGAA | G2Ez
+
+X:127
+T: BLAUER BLAUER FINGERHUT
+N: K2187
+O: Europa, Mitteleuropa, Deutschland, Oberdiebach am Rhein
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/8
+K: Eb
+ | BBcc | BBG2
+BBcc | BBG2
+eGGG | G2F2
+BBcc | BBG2
+BBcc | BBG2
+BBeB | B2G2
+BBeB | B2G2
+eGcB | BBG2
+eGGG | G2F2
+BBcc | BBG2
+eGGG | G2F2
+BBcc | BBG2
+eGcB | G2E2
+
+X:128
+T: ADAM GING UND WOLLTE SICH ERQUICKEN
+N: K2196
+O: Europa, Mitteleuropa, Deutschland, Dresden
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 3/4
+L: 1/16
+K: F
+F2A2 | c3dc2d2c2d2 | c4F4
+F2A2 | c3dc2d2c2d2 | c4F4
+F2A2 | c4d4c2d2 | c4F4
+F2F2 | G4G4c3B | A8
+F2A2 | c4c4d2c2 | A4F2
+F2F2A2 | c4c4d2c2 | A4F4
+F2A2 | c4A4f2d2 | c4A2
+c2d2c2 | B4G4c2c2 | A8
+
+X:129
+T: PETERSILJE SUPPENKRAUT
+N: K2200
+O: Europa, Mitteleuropa, Deutschland, Sachsen; Hessen
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/8
+K: G
+ | GGGB | GDD2
+EFGE | D2B,2
+GGGB | GDD2
+EFGE | D2D2
+cAA2 | BGG2
+AAFD | ddd2
+cAA2 | BGG2
+AAFD | G4
+
+X:130
+T: TRAUER TRAUER UEBER TRAUER
+N: K2208
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 3/4
+L: 1/16
+K: C
+C2E2 | G4E4c2A2 | G4E4
+E2G2 | F4D4G2G2 | E8
+C2E2 | G4E4c2A2 | G4E4
+E2G2 | F4D4G2GF | E8
+
+X:131
+T: HIER IST GRAS DORT IST GRAS
+N: K2209
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/8
+K: G
+ | ddB2 | ddB2
+edcB | B2A
+G | GABc | ddd
+B | edcA | A2Gz
+
+X:132
+T: WER STEHT DA DRAUSSEN VOR DER THUER
+N: K2216
+O: Europa, Mitteleuropa, Deutschland, Hessen, Wetterau
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 3/4
+L: 1/8
+K: C
+G, | G,G,G,2C2 | A,A,A,2z
+C | B,CD2G,2 | E2C2z2
+
+X:133
+T: DROBEN AUF DEM KIRCHHOF
+N: K2221
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/16
+K: C
+ | G2G2A2B2 | G4E2
+C2 | G2G2E2A2 | G4E2
+C2 | G2G2E2A2 | G2G2E2
+E2 | G2G2E2A2 | G4E2
+GG | G2F2E2GG | G2F2E2
+EE | F2F2G2G2 | E4z4
+
+X:134
+T: ALS ICH AUF DEN KIRCHHOF KAM
+N: K2222
+O: Europa, Mitteleuropa, Deutschland, Moseltal
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/16
+K: F
+C2 | F2G2A2B2 | c3dc2
+c2 | d2d2f2d2 | c4z2
+c2 | c3BB2B2 | B3AA2
+A2 | A2G2A2G2 | F2A2c2
+cc | c2B2B2BB | B2A2A2
+AA | A2G2A2G2 | F4z2
+
+X:135
+T: DORT OBEN AUF DEM BERGE
+N: K2223
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2F2F2 | F4C2
+C2 | A2A2A2A2 | A4z2
+F2 | c2c2c2c2 | c2A2F2
+F2 | G2G2C2C2 | F4z2
+cc | c2B2A2cc | c2B2A2
+AA | G2G2G2G2 | F4z2
+
+X:136
+T: AUF EINER HOHEN MAUER
+N: K2224
+O: Europa, Mitteleuropa, Deutschland, Berlin
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/16
+K: D
+A2 | A2A2B2B2 | A4F2
+F2 | G2G2E2G2 | F4z2
+A2 | A2A2B2B2 | A4F2
+F2 | G2G2E2G2 | D4z2
+F2 | A2A2B2B2 | A4z2
+A2 | A2A2B2B2 | A4z2
+FF | G2G2E2EE | F2F2D2
+DD | E2E2C2C2 | D4z2
+
+X:137
+T: WOLLN DIE WEISEN FRAUEN FRAGEN
+N: K2225
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/16
+K: C
+ | c2c2c2c2 | e2c2c2c2
+c2c2c2c2 | e2c2c2c2
+c2c2e4 | c2c2e4
+G3FE2D2 | D4C4
+
+X:138
+T: ROTHE KIRSCHEN ESS ICH GERN
+N: K2227
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/8
+K: C
+ | GGAA | GFEz
+GGAA | G2Ez
+GGAA | GFE2
+GGAA | GFEz
+GGAA | GFE2
+GGAA | GFEz
+GGA2 | GFE2
+GGAA | GFE2
+
+X:139
+T: MUSS WANDERN MUSS WANDERN
+N: K2228
+O: Europa, Mitteleuropa, Deutschland, Ostpreussen
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 2/4
+L: 1/16
+K: D
+A2 | A4F2A2 | A4F2
+A2 | d2c2B2A2 | A2G2F4
+D2D2D2DD | D2DDD4
+D2D2D2D2 | D4z4
+D2D2D2D2 | D4z4
+D2D2D2D2 | D4z4
+D2F2A2A2 | d2B2A4 | d2B2A2
+A2 | G2G2F2F2 | E2E2D2
+
+X:140
+T: ADAM HATTE SIEBEN SOEHNE
+N: K2237
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel, Pantomime
+M: 2/4
+L: 1/16
+K: C
+ | G2G2A2A2 | G2F2E2
+C2 | G2G2A2A2 | G4E2
+A2 | G2F2E2A2 | G2F2E2
+C2 | G2G2A2A2 | G2F2E4
+G2G2A2A2 | G2F2E4
+G2G2A2A2 | G2F2E4
+G2G2A2A2 | G2F2E4
+G2G2A2A2 | G2F2E2
+A2 | G2F2E2A2 | G2F2E2
+C2 | G2G2A2A2 | G4E2
+C2 | G2G2A2A2 | G2F2E2
+C2 | GGG2A2A2 | G4E4
+
+X:141
+T: ADAM HATTE SIEBEN SOEHNE
+N: K2238
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 2/4
+L: 1/8
+K: C
+ | CDEF | GGGG
+GFcA | G2E
+E | GFFF | FEE
+E | DDGG | C4
+
+X:142
+T: WOLLT IHR WISSEN
+N: K2239
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 3/4
+L: 1/16
+K: G
+G2B2 | d4d4e2d2 | B4G4
+G2G2 | c4A4F4 | G8
+G4 | d8e2d2 | B4G4
+G2G2G2 | c4A4F4 | G8
+
+X:143
+T: WOLLT IHR WISSEN
+N: K2239A
+O: Europa, Mitteleuropa, Deutschland, Dillkreis; Lahnkreis
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 3/4
+L: 1/16
+K: G
+G2B2 | d4d4e2d2 | d3cB4
+G2B2 | d4d4e2d2 | d3cB4
+G2G2 | B4A4D4 | G8
+G4 | d8e2d2 | d3cB4
+G2G2G2 | B4A4D4 | G8
+G4 | d8e2d2 | d3cB4
+G2G2G2 | B4A4D4 | G12
+
+X:144
+T: WOLLT IHR WISSEN
+N: K2239B
+O: Europa, Mitteleuropa, Deutschland, Vogtland
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 3/4
+L: 1/8
+K: G
+DD | G2G2DD | G2G2
+BB | c2c2AA | B2B2
+GG | A2A2F2 | d4
+BB | c2c2AA | B2B2
+GG | A2A2F2 | G4
+
+X:145
+T: SEHT IHR MEINE HERREN
+N: K2242
+O: Europa, Mitteleuropa, Deutschland, Westfalen, Hoerde
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 2/4
+L: 1/8
+K: D
+ | DEFG | A2A
+A | BBdB | A2z2
+GGGG | FFFF
+EEEE | DFAA
+dAAA | dAA
+A | DEFG | A2z
+G | FFEE | D2z2
+
+X:146
+T: VICTORIA VICTORIA
+N: K2244
+O: Europa, Mitteleuropa, Deutschland, Darmstadt
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 2/4
+L: 1/16
+K: C
+A2 | G2G2E2A2 | G2G2E2
+C2 | G2G2A2A2 | G2G2E2
+C2 | G2G2A2A2 | G4E2
+c2 | G4EEc2 | G4EEc2 | G4EE
+
+X:147
+T: IM SOMMER IM SOMMER DA IST DIE SCHOENSTE ZEIT
+N: K2248
+O: Europa, Mitteleuropa, Deutschland, Moseltal
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 2/4
+L: 1/8
+K: Bb
+F | B2Bc | d2d
+d | cBcd | B2z
+F | B2Bc | d2d
+d | cBcd | B2z
+c | c2Ac | c2d
+c | B2GG | A2z
+F | B2Bc | d2d
+d | cBcd | B2z
+
+X:148
+T: AUF DEM BERGE AUF DEM BERGE
+N: K2254
+O: Europa, Mitteleuropa, Deutschland, Bacharach am Rhein
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 3/4
+L: 1/8
+K: C
+GG | G2E2GG | G2E2
+G2 | F2D2F2 | E2z2
+GG | G2E2GG | G2E2
+G2 | F2D2F2 | E2z2
+GG | G2E2GG | G2E2
+G2 | F2D2F2 | E2z2
+GG | G2E2GG | G2E2
+G2 | F2D2F2 | E2z2
+
+X:149
+T: ALLE MEINE ENTCHEN
+N: K2254A
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 2/4
+L: 1/8
+K: C
+ | CDEF | G2G2
+AAAA | G2z2
+AAAA | G2z2
+FFFF | E2E2
+DDDD | C2z2
+
+X:150
+T: ALS ICH EINMAL REISTE
+N: K2255
+O: Europa, Mitteleuropa, Deutschland, Kassel, Kirchditmold
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 2/4
+L: 1/8
+K: G
+ | GGGG | GBB2
+BAAA | cBB2
+GGGG | GBB2
+BAAA | G2z2
+
+X:151
+T: ICH HAB EIN KLEINES MURMELTIER
+N: K2256
+O: Europa, Mitteleuropa, Deutschland, Brandenburg
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 2/4
+L: 1/8
+K: F
+F | cccd | cBA
+F | cccd | c2A
+F | cccd | cBA
+F | dcBA | G2F
+F | cccd | c2A
+F | cccd | cBA
+F | dcBA | G2F
+F | cccd | cBA
+F | dcBA | G2F
+
+X:152
+T: ICH KENN EIN KLEINES MURMELTIER
+N: K2257
+O: Europa, Mitteleuropa, Deutschland, Berlin
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 2/4
+L: 1/8
+K: C
+G | GGAA | GGE
+E | GGAG | G2E
+
+X:153
+T: ICH TRUG IN MEINEM SCHOSSE
+N: K2259
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 6/8
+L: 1/8
+K: G
+D | G2GGFG | A2FD2
+D | G2GGFG | A2FD2
+D | G2GGFG | A2FD2
+D | G2GGFG | A2FD3
+G2B2 | d3
+c | BBAA | G2z
+G | dddd | eee2
+cccc | ddd2
+G2B2 | d3
+c | BBAA | G2z
+
+X:154
+T: JETZ WOLL MER
+N: K2260
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Elsass
+R: Kinder - Lied, Reigen, Tanz, Nachahmungs - Spiel
+M: 3/4
+L: 1/4
+K: G
+ | GGG | GGG
+eee | d2z
+ccc | BBB
+ddd | G2z
+
+X:155
+T: LANGE LANGE LISE
+N: K2263
+O: Europa, Mitteleuropa, Deutschland, Schleswig
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: C
+ | GGAA | G2E2
+GGAA | G2E2
+GGGG | B2B
+A | GGFD | C2z2
+
+X:156
+T: IST DIE SCHWARZE KOECHIN DA
+N: K2267
+O: Europa, Mitteleuropa, Deutschland, Dresden
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: D
+ | AABB | AGF2
+A2B2 | A2z2
+AABB | AGFD
+AABB | AGFD
+A2B2 | A2z2
+
+X:157
+T: IST DIE SCHWARZE KOECHIN DA
+N: K2267A
+O: Europa, Mitteleuropa, Deutschland, Dresden
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: D
+ | AABB | AGF2
+A2B2 | A2z
+D | AGFD | AGF
+D | AABB | AGF2
+AzBz | Az3
+
+X:158
+T: ES KAM EIN MANN VON NINIVE
+N: K2268
+O: Europa, Mitteleuropa, Deutschland, Dresden
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2G2B2 | G2G2D2z2
+A3GF2E2 | D2B2G2
+D2 | G2G2G2B2 | G2G2D2z2
+A3GF2E2 | D2B2G2
+
+X:159
+T: ES KOMMEN DREI MAENNER VON NINIVE
+N: K2268A
+O: Europa, Mitteleuropa, Deutschland, Zwickau
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: D
+D2 | AAA2AAB2 | A2A2F2z2
+A3BA2B2 | A4F2
+D2 | AAA2AAB2 | A2A2F2z2
+A3BA2B2 | A4F2
+
+X:160
+T: ES KOMMEN DREI HERREN AUS NINIVE
+N: K2270A
+O: Europa, Mitteleuropa, Deutschland, Siegburg bei Bonn
+R: Kinder - Lied, Reigen, Tanz - Spiel, Brautwerbung
+M: 6/8
+L: 1/8
+K: G
+D | GGGFFF | G2DD2
+D | E2EF2F | G3G2
+D | GGGFFF | G2DD2
+D | E2EF2F | G3G2
+D | GFED | D2z
+D | GFED | D2z
+D | E2E2 | F2F2 | G4 | G2z
+
+X:161
+T: DO KOM ALL EIN KANOENNEKEN AN
+N: K2287
+O: Europa, Mitteleuropa, Deutschland, Westfalen
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: G
+D | GGGG | =FED2
+EEFF | G2z
+D | GGGG | =FED2
+EEFF | G2z
+
+X:162
+T: SCHLUPPT ALLE DURCH
+N: K2295
+O: Europa, Mitteleuropa, Deutschland, Darmstadt
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: D
+D | AAFD | AAF
+D | dcBA | A2F
+D | AAFD | AAF
+D | dcBA | A2F
+D | A2FD | A2F
+D | AAFD | AAF
+D | dcBA | A2F
+
+X:163
+T: ZIEHE DURCH DURCH DIE GOLDNE BRUECKE
+N: K2296
+O: Europa, Mitteleuropa, Deutschland, Westfalen; Brandenburg
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: D
+ | AAF2 | AAF2
+AABA | G2E
+E | GGEE | GGE
+E | GGAG | F2D
+A | A2FA | A2F
+A | AABA | GFE2
+
+X:164
+T: WIR WOLLN DIE MERSEBURGER BRUECKE BAUN
+N: K2303
+O: Europa, Mitteleuropa, Deutschland, Dresden; Leipzig
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 4/4
+L: 1/8
+K: G
+D2 | G2G2GGBB | G2G2D2
+D2 | G2G2GGBB | G2G2D2
+D2 | G4D2D2 | G4D2
+D2 | G2G2G2B2 | G4D2
+D2 | G2G2G2B2 | G4D2
+D2 | G2G2G2B2 | G4D2
+z2 | G2G2B2B2 | G4D2
+D2 | G2G2D2D2 | G2G2D2
+D2 | E2E2F2F2 | G4z2
+D2 | B2B2A2A2 | G4z2
+
+X:165
+T: DIE MEIERSCHE BRUECKE
+N: K2305
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 6/8
+L: 1/8
+K: D
+A | AAAFDB | A2AFD
+A | AAAFD
+B | A3F2B | A3F2
+D | A2AB2B | A3F2
+D | AAAB2B | A2GFD
+B | A2GF2B | A2GF2
+A | BBBAAG | FDz3
+
+X:166
+T: DIE MEIERSCHE BRUECKE
+N: K2305A
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 6/8
+L: 1/8
+K: D
+A | AAAFDB | A2AFD
+A | AAAFD
+B | A3F2B | A3F2
+D | A2AB2B | A3F2
+D | AAAB2B | A2GFD
+B | A2GF2B | A2GF2
+A | fdAAGE | DDz3
+
+X:167
+T: KRONE KRANE SCHWICKLE SCHWANE
+N: K2326
+O: Europa, Mitteleuropa, Deutschland, Barmen, Elberfeld
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | cBAB | cBAB
+cdcd | cBAB
+cccd | c2A
+B | cccd | c2A
+B | cccd | cBA
+d | cBAd | cBAz
+dcBA | GGF2
+
+X:168
+T: KRONE KRANE WICKLE SCHWANE
+N: K2333
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/16
+K: F
+ | c2c2A2d2 | c2c2A2A2
+c2c2d2d2 | c2c2A2F2
+c2c2d2d2 | c2c2A2
+F2 | c2c2d2d2 | c4A2z2
+c2c2d2d2 | c2c2A2F2
+c2c2d2d2 | c4A2z2
+c2c2d2d2 | c4A2z2
+f3cB2A2 | A4G4
+
+X:169
+T: MACHT AUF DAS THOR
+N: K2334
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: C
+A | GFEA | GFE
+B, | GGAA | G2E
+
+X:170
+T: MACHT AUF DAS THOR
+N: K2335
+O: Europa, Mitteleuropa, Deutschland, Rheinland, Laubenheim
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 4/4
+L: 1/8
+K: F
+FA | c2c2A2
+FA | c2c2A2
+f2 | e2d2c2B2 | A4F2
+
+X:171
+T: SAECKE FLICKEN
+N: K2336
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: C
+ | GFEB, | GFEB,
+GGAA | G2E2
+GFEB, | GFEB,
+GGAA | G2E2
+GGAA | GFEz
+GGAA | GFEz
+
+X:172
+T: DER SANDMANN KOMMT
+N: K2337
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 2/4
+L: 1/8
+K: G
+D | GGGD | BBB
+G | BBee | dBG
+G | AAdd | BAG
+
+X:173
+T: ALS DIE WUNDERSCHOENE ANNA
+N: K2349
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel, Sage, Ballade
+M: 2/4
+L: 1/8
+K: Eb
+B,E | GBBB | AGFE | BFFF | F2z
+e | BAGF | E2EE | c2cc | e2d
+c | BAGF | E2EG | B2B2 | E2
+
+X:174
+T: ES ZOG EIN MANN DURCH ASIENLAND
+N: K2352
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Reigen, Tanz - Spiel, Ballade
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2G2B2 | G3DD2B2 | G4z2
+B2 | B2B2B2B2 | B3AG2z2
+A2A2A2A2 | G2B2d2
+B2 | c2c2c2c2 | B3BB4
+A2A2A2A2 | G4z2
+
+X:175
+T: ES WOLLT EIN JAEGER FRUEH AUFSTEHN
+N: K2356
+O: Europa, Mitteleuropa, Deutschland, Oberdiebach am Rhein
+R: Kinder - Lied, Reigen, Tanz - Spiel, Ballade
+M: 3/4
+L: 1/16
+K: G
+d2 | d2d2B4d4 | c2B2A4z2
+c2 | c2B2A4e4 | d2d2G4z2
+d2 | d2d2B4d4 | c2B2A4z2
+d2 | d2d2d4d4 | c2B2A4z2
+d2 | d2d2B4d4 | c2B2A4z2
+c2 | c2B2A4e4 | d2dFG4z2
+d2 | d2d2B4d4 | c2B2A4z2
+c2 | c2B2A4e4 | d2dFG4z2
+
+X:176
+T: HAENSCHEN WILLST DU TANZEN
+N: K2358
+O: Europa, Mitteleuropa, Deutschland, Oberdiebach am Rhein
+R: Kinder - Lied, Reigen, Tanz - Spiel
+M: 4/4
+L: 1/4
+K: F
+ | ccAd | c2A
+F | cccc | f2z2
+ccAd | c2A
+F | cccc | f2z
+c | cFFd | ccA
+A | cccd | ccA
+F | cccc | F2z2
+
+X:177
+T: WIR WOLLN DAS HAESCHEN JAGEN
+N: K2364
+O: Europa, Mitteleuropa, Deutschland, Schlesien; Oldenburg
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/16
+K: G
+D2 | G3AB2c2 | d4d2
+e2 | d3cB2A2 | G4z2
+
+X:178
+T: HAENSCHEN KRIECHE DURCH DAS LOCH
+N: K2364A
+O: Europa, Mitteleuropa, Deutschland, Oberdiebach am Rhein
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/16
+K: G
+ | d2d2B2e2 | d2d2B2
+GG | d2d2e2e2 | d4B2z2
+d2d2B2e2 | d2d2B2
+G2 | d2d2e2e2 | d4B2z2
+
+X:179
+T: DER FUCHS GEHT RUM
+N: K2366
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/8
+K: F
+d | cBAd | cBA
+F | ccdd | c2A
+F | ccdd | ccA
+F | ccdd | c2Ad | c2A
+
+X:180
+T: EINS ZWEI DREI VIER FINKELSTEIN
+N: K2371
+O: Europa, Mitteleuropa, Deutschland, Siegerland
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | ccAA | ccA2
+ccdd | ccA2
+ccdd | ccA2
+c2d2 | c2z2
+
+X:181
+T: WIR WOLLN EINMAL SPAZIEREN GEHN
+N: K2372
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/8
+K: G
+D | GGGG | GED
+D | AAdd | B2G
+D | GGGG | GED
+D | AAdd | B2G
+G | AAFD | AAF
+G | AAFD | AAF
+D | G2B2 | d2z
+B | d2B2 | G2z
+
+X:182
+T: HAT EINS GESCHLAGEN KOMMT IMMER NOCH NICHT
+N: K2375A
+O: Europa, Mitteleuropa, Deutschland, Dresden
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 6/8
+L: 1/8
+K: G
+D | A2AGGD | AAAF2
+D | A2AGGD | AAAF2
+D | G2GGGG | d2z3
+D | G2GGGG | d2z3
+D | G2GGGG | G2z3
+
+X:183
+T: IHR TAEUBCHEN KOMMT ALLE ZU MIR
+N: K2401
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 6/8
+L: 1/8
+K: E
+=C | =GGGAAA | =GGFE2
+A | =G2FE2A | =G2FE2
+A | =G2FE2A | =G3E2
+A | =G2FE2A | =G3E2
+A | =G2FE2A | =G2FE2
+A | =G2FE2A | =G2FE2
+=C | =GGGAAA | =GGFE2
+
+X:184
+T: NIX IN DER GRUBE
+N: K2407
+O: Europa, Mitteleuropa, Deutschland, Thueringen, Schlesien
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/8
+K: C
+ | G2GA | G2E
+E | GGGA | G2Ez
+GGGA | G2E
+E | GGGA | G2Ez
+G2G2 | c4
+
+X:185
+T: HAESCHEN IN DER GRUBE
+N: K2409
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | FGAB | c2c2
+d2fd | c2z2
+cBBB | BAA2
+AGGG | GFF2
+FAc2 | cAF2
+
+X:186
+T: HAESCHEN IN DER GRUBE
+N: K2409A
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/8
+K: D
+ | AAFB | A2F2
+A2FB | A2z2
+AAFD | dBA2
+AAFD | dBA2 | z2
+AA | d2AA | d2z2
+
+X:187
+T: HAESCHEN IN DER GRUBE
+N: K2409B
+O: Europa, Mitteleuropa, Deutschland, Hessen, Nauheim
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/8
+K: G
+ | dBed | dccd | B2z2
+ABce | edd2
+dBed | dcc2
+ABcd | B2z2
+
+X:188
+T: RUPFE RUPFE GRAESCHEN
+N: K2427
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | ccdd | c2A
+A | BBGG | A2z
+A | ccdd | ccA
+A | BBGG | F2z2
+
+X:189
+T: WO WARST DU DEN GEWESEN
+N: K2444
+O: Europa, Mitteleuropa, Deutschland, Rheinland, Oberdiebach
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 3/4
+L: 1/8
+K: G
+D2 | GGG2B2 | d2B2
+c2 | B4A2 | G4
+BB | d2B2BB | c2A2
+A2 | B2G2G2 | e2d2
+BB | d2B2BB | c2A2
+A2 | B2F2F2 | G4
+
+X:190
+T: WO BIST DU DENN GEWESEN
+N: K2444A
+O: Europa, Mitteleuropa, Deutschland, Saarland
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 3/4
+L: 1/8
+K: G
+dd | d2B2BB | B2G2
+G2 | F2A2e2 | e2d2
+dd | d2B2BB | B2G2
+B2 | c2B2A2 | G2z2
+
+X:191
+T: KOMM WIR WOLLEN WANDERN
+N: K2445
+O: Europa, Mitteleuropa, Deutschland, Dresden
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | cccd | c2A
+F | cccd | c2A2
+cAcA | f2z
+d | cABG | F2z2
+
+X:192
+T: KOMM WIR WOLLEN WANDERN
+N: K2446
+O: Europa, Mitteleuropa, Deutschland
+N: Modulierender Schluss
+R: Kinder - Lied, Tanz -, Lauf - Spiel
+M: 2/4
+L: 1/16
+K: C
+ | G,2C2C2C2 | C2A,2G,4
+A,4B,4 | C4z2
+G,2 | C2C2C2C2 | C2_B,A,G,2z2
+A,2z2A,2z2 | A,2G,F,E,2z2
+A,2C2B,2A,^G, | A,8
+
+X:193
+T: TOENNEKEN TOENNEKEN OP DEN DRAG
+N: K2502
+O: Europa, Mitteleuropa, Deutschland, Niederrhein
+R: Kinder - Lied, Spiel
+M: 2/4
+L: 1/16
+K: G
+ | GGG2AAA2 | B2A2G4
+G2G2A2A2 | B4G2z2
+B2B2A2G2 | B2B2B4
+A2A2A2B2 | G2G2G4
+
+X:194
+T: BLINDE KUH SOLL DIRS GELINGEN
+N: K2511
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder - Lied, Such - Spiel
+M: 4/4
+L: 1/4
+K: G
+ | GGGB | GGDD
+GGGB | GGDD
+FDG2 | FDG2
+FFGG | AFG2
+
+X:195
+T: IM KELLER IM KELLER ISTS FINSTER
+N: K2512
+O: Europa, Mitteleuropa, Deutschland
+R: Kinder - Lied, Such - Spiel
+M: 2/4
+L: 1/16
+K: G
+D2 | GGG2GGB2 | G4D2
+D2 | GGG2GGB2 | G4D2
+D2 | G2G2GGB2 | G2G2D2
+D2 | G2GGGGB2 | G2G2D2z2 | d2z6
+
+X:196
+T: WELCHES IST DIE SCHOENSTE UNTER DIESEN ALL
+N: K2515
+O: Europa, Mitteleuropa, Deutschland, Starkenburg
+R: Kinder - Lied, Such - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | FAcf | c2A2
+cBGB | A2z2
+cBGB | A2z2
+cBGB | A2z2
+FAcf | c2A2
+cBGc | F2z2
+
+X:197
+T: GUTEN TAG HERR PAPPELJENER
+N: K2516
+O: Europa, Mitteleuropa, Deutschland, Darmstadt
+R: Kinder - Lied, Such - Spiel
+M: 2/4
+L: 1/16
+K: Eb
+EE | B2B2c2c2 | B4G2
+E2 | B2B2c2c2 | B4G2
+E2 | B2B2c2c2 | B4G2
+E2 | B2B2c2c2 | B2z4
+
+X:198
+T: ROMPEL TOMPEL TORIA
+N: K2522
+O: Europa, Mitteleuropa, Deutschland, Elberfeld
+R: Kinder - Lied, Rate - Spiel
+M: 2/4
+L: 1/16
+K: C
+ | C2C2B,2D2 | C2C2G,4
+C2C2B,2D2 | C4z4
+C2C2B,2G,2 | C2CCG,2G,2
+C2C2B,2G,2 | C2C2G,2G,2
+
+X:199
+T: DER ABT IST NICHT ZU HAUSE
+N: K2562
+O: Europa, Mitteleuropa, Deutschland, Dresden
+R: Kinder - Lied, Gesellschafts - Spiel
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2G2B2 | G4D2
+D2 | G2G2G2B2 | G4D2
+D2 | A2A2A2A2 | B2G2G2
+D2 | A2A2A2A2 | B2G2G4
+ddddd4
+
+X:200
+T: DER ABT IST NICHT ZU HAUSE
+N: K2562A
+O: Europa, Mitteleuropa, Deutschland, Thueringen
+R: Kinder - Lied, Gesellschafts - Spiel
+M: 2/4
+L: 1/8
+K: G
+D | GGGG | G2D
+D | BBBB | B2Gz
+ddde | dcc2
+BBBc | BAG2
+
+X:201
+T: SA SA SA DER ABT IST NICHT ZU HAUSE
+N: K2562B
+O: Europa, Mitteleuropa, Deutschland, Schlesien
+R: Kinder - Lied, Gesellschafts - Spiel
+M: 2/4
+L: 1/8
+K: G
+ | G2G2 | G2z
+B | ccAA | d2B2
+ccAA | ddBB
+ccAA | ddBB
+G2G2 | G2z2
+G2G2 | G2z2
+
+X:202
+T: ALLE DIE DAS RINGLEIN LIEBEN
+N: K2603
+O: Europa, Mitteleuropa, Deutschland, Berlin; Dessau
+R: Kinder - Lied, Pfaender - Spiel
+M: 2/4
+L: 1/16
+K: G
+ | d2d2d2c2 | B2B2B2G2
+A2A2B2B2 | dcBAG2z2
+d2d2d2B2 | B2B2B2G2
+A2A2B2B2 | dcBAG2z2
+
+X:203
+T: WER DIESEN RING NICHT FINDEN KANN
+N: K2603A
+O: Europa, Mitteleuropa, Deutschland, Nassau
+R: Kinder - Lied, Pfaender - Spiel
+M: 2/4
+L: 1/8
+K: G
+D | dddd | dBG
+B | AcFA | GBd
+B | AcFA | G2z
+G | AABB | ccB
+B | AABB | c2B2 | A2z
+D | dddd | dBG
+B | ABcF | AGG2
+
+X:204
+T: WER HAT DEN SCHLUESSEL ZUM GARTEN
+N: K2606
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Gesellschafts - Spiel
+M: 2/4
+L: 1/16
+K: C
+C2 | G2G2AAA2 | G4E2z2
+G2F2E2C2 | G2F2E2C2
+G2G2AAA2 | GGF2E2C2
+G2F2E2C2 | G2F2E4
+G2F2E4 | G2F2E4
+G2G2AAA2 | GGF2E4
+
+X:205
+T: DAS IST KURZ UND DAS IST LANG
+N: K2610
+O: Europa, Mitteleuropa, Deutschland, Rheinland
+R: Kinder - Lied, Pfaender - Spiel
+M: 2/4
+L: 1/8
+K: F
+ | FGAA | GGFz
+ABcc | BBAz
+ccdz | BBc2
+A3c | cBB2
+G3d | dcc2
+A3c | cBB2
+G2G2 | F2z2
+
+X:206
+T: HINTERM OFEN HINTERM OFEN
+N: K2617
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder -, Vexier - Lied, Gesellschafts - Spiel
+M: 2/4
+L: 1/16
+K: G
+ | G2FED2D2 | G2FED2D2
+E2E2F2F2 | G4G2z2
+G2B2B2d2 | d2c2A4
+A2c2c2e2 | e2d2B4
+G2FED2D2 | G2FED2D2
+E2E2F2F2 | G4G2z2
+
+X:207
+T: ES GEHT EIN GROSSER RUNDGESANG
+N: K2619
+O: Europa, Mitteleuropa, Deutschland, Kassel
+R: Kinder - Lied, Gesellschafts - Spiel
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2c2c2 | A3AF2
+F2 | G2G2C2C2 | F4z4
+G2G2G2G2 | A2c2c2
+G2 | G2G2G2G2 | A2c2c2
+C2 | F2F2c2c2 | A3GF2
+F2 | G2G2C2C2 | F4z2
+
+X:208
+T: UND ALS AN GRUENER SEITE
+N: K2620
+O: Europa, Mitteleuropa, Deutschland, Schleswig, Achtrup
+R: Kinder - Lied, Reigen, Gesellschafts - Spiel
+M: 2/4
+L: 1/8
+K: Bb
+F | BBBB | B2F
+F | dddd | d2B2
+f2f2 | fed
+d | cccc | B2F
+
+X:209
+T: HEILE HEILE SAEJE
+N: K3026
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Unter - Elsass
+R: Kinder - Lied, Heil - Spruch
+M: 2/4
+L: 1/8
+K: G
+ | dede | d2B2
+dede | d2B2
+dedd | g2z2
+dedc | B2z2
+
+X:210
+T: ICH UND MEIN JUNGES WEIB
+N: K3027
+O: Europa, Mitteleuropa, Deutschland, Rheinpfalz
+R: Kinder - Lied, Tanz
+M: 3/4
+L: 1/4
+K: G
+ | ddc | BBB
+Ged | d2c
+ccB | AAA
+Fdc | c2B
+
+X:211
+T: HANSELEMANN HAT STEFELE AN
+N: K3033
+O: Europa, Mitteleuropa, Deutschland; Frankreich, Unter - Elsass
+R: Kinder - Lied, Reiter - Spiel
+M: 4/4
+L: 1/8
+K: G
+ | B2BBB2G2 | F2FFF2
+D2 | D3FB2A2 | A4G2z2
+G2G2G2F2 | E2E2E2
+D2 | D3FB2A2 | A4G2z2
+
+X:212
+T: EINS ZWEI DREI VIER FUENF SECHS SIEBEN
+N: K3047
+O: Europa, Mitteleuropa, Deutschland, Saarland
+R: Kinder - Lied, Auszaehl - Reim
+M: 4/4
+L: 1/4
+K: G
+ | DGGG | GFAz
+DAAA | AGBz
+GBdz | eedz
+ccBB | AAGz
+
+X:213
+T: DEN LIEBSTEN BRUDER
+N: K3050
+O: Europa, Mitteleuropa, Deutschland, Saar - und Mosel - Gebiet
+R: Kinder - Lied; Trink - Lied
+M: 3/4
+L: 1/16
+K: G
+D2 | G3GG6A2 | B3BB6
+B2 | A2B2c4A4 | c4B4z2
+d2 | d2B2e6d2 | d3cc6
+c2 | c2A2d6c2 | c4B4z2
+d2 | d2B2e6d2 | d3cc6
+c2 | c2A2d6c2 | c4B4z2
