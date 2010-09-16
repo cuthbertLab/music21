@@ -447,11 +447,11 @@ class GeneralNote(music21.Music21Object):
 #         >>> m = stream.Measure()
 #         >>> m.timeSignature = meter.TimeSignature('3/4')
 #         >>> m.repeatAppend(n, 6)
-#         >>> [m.notes[i].beat for i in range(6)]
+#         >>> [m.notes[i].beatCount for i in range(6)]
 #         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
 # 
 #         >>> m.timeSignature = meter.TimeSignature('6/8')
-#         >>> [m.notes[i].beat for i in range(6)]
+#         >>> [m.notes[i].beatCount for i in range(6)]
 #         [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
 # 
 #         ''')
