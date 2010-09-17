@@ -150,7 +150,7 @@ def findHighestNotes(show=True, *arguments, **keywords):
     score = corpus.parseWork('bach/bwv366.xml')
     ts = score.flat.getElementsByClass(meter.TimeSignature)[0]
     # use default partitioning
-    #ts.beat.partition(3)
+    #ts.beatSequence.partition(3)
     
     found = stream.Stream()
     for part in score.getElementsByClass(stream.Part):

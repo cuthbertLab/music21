@@ -87,15 +87,15 @@ def showDots(show=True):
     ts = partBass.flat.getElementsByClass(
          meter.TimeSignature)[0]
     
-    ts.beat.partition(1)
-    for h in range(len(ts.beat)):
-        ts.beat[h] = ts.beat[h].subdivide(2)
-        for i in range(len(ts.beat[h])):
-            ts.beat[h][i] = \
-                ts.beat[h][i].subdivide(2)
-            for j in range(len(ts.beat[h][i])):
-                ts.beat[h][i][j] = \
-                    ts.beat[h][i][j].subdivide(2)
+    ts.beatSequence.partition(1)
+    for h in range(len(ts.beatSequence)):
+        ts.beatSequence[h] = ts.beatSequence[h].subdivide(2)
+        for i in range(len(ts.beatSequence[h])):
+            ts.beatSequence[h][i] = \
+                ts.beatSequence[h][i].subdivide(2)
+            for j in range(len(ts.beatSequence[h][i])):
+                ts.beatSequence[h][i][j] = \
+                    ts.beatSequence[h][i][j].subdivide(2)
     
     for m in partBass.getElementsByClass('Measure'):
         for n in m.notes:
@@ -114,7 +114,7 @@ def findRaisedSevenths(show=True):
     score = corpus.parseWork('bach/bwv366.xml')  
     ts = score.flat.getElementsByClass(
         meter.TimeSignature)[0]
-    #ts.beat.partition(3)
+    #ts.beatSequence.partition(3)
 
     found = stream.Stream()
     count = 0
@@ -145,8 +145,8 @@ def oldAccent(show=True):
     partBass = score.getElementById('Bass')
     
     ts = partBass.flat.getElementsByClass(meter.TimeSignature)[0]
-    ts.beat.partition(['3/8', '3/8'])
-    ts.accent.partition(['3/8', '3/8'])
+    ts.beatSequence.partition(['3/8', '3/8'])
+    ts.accentSequence.partition(['3/8', '3/8'])
     ts.setAccentWeight([1, .5])
     
     for m in partBass.getElementsByClass('Measure'):

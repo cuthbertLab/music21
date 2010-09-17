@@ -637,7 +637,7 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
         m.timeSignature = ts
         n = note.Note()
         n.lyric = str(ts)
-        n.duration = ts.beat.duration
+        n.duration = ts.beatSequence.duration
         m.append(n)
         return m
 
@@ -646,7 +646,7 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
         m.timeSignature = ts
         n = note.Note()
         n.lyric = ts.classification
-        n.duration = ts.beat.duration
+        n.duration = ts.beatSequence.duration
         m.append(n)
         return m
 

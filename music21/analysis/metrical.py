@@ -40,7 +40,7 @@ def labelBeatDepth(streamIn):
     >>> n = note.Note()
     >>> s.repeatAppend(n, 4)
     >>> post = analysis.metrical.labelBeatDepth(s)
-    >>> ts.beat
+    >>> ts.beatSequence
     <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
     '''
 #     ts = streamIn.flat.getElementsByClass(
@@ -52,7 +52,7 @@ def labelBeatDepth(streamIn):
         # this will search contexts
         ts = m.getTimeSignatures(sortByCreationTime=False)[0]
 
-        ts.beat.subdivideNestedHierarchy(depth=3)
+        ts.beatSequence.subdivideNestedHierarchy(depth=3)
 
         for n in m.notes:
             if n.tie != None:

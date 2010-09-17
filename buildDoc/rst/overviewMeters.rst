@@ -307,7 +307,7 @@ Finally, numerous methods provide ways to find and access the relevant nodes (th
 Advanced Time Signature Configuration
 ---------------------------------------------
 
-The music21 :class:`~music21.meter.TimeSignature` object contains four parallel MeterSequence objects, each assigned to the attributes :attr:`~music21.meter.TimeSignature.display`, :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.beam`, :attr:`~music21.meter.TimeSignature.accent`. The following displays a graphical realization of these four MeterSequence objects. 
+The music21 :class:`~music21.meter.TimeSignature` object contains four parallel MeterSequence objects, each assigned to the attributes :attr:`~music21.meter.TimeSignature.displaySequence`, :attr:`~music21.meter.TimeSignature.beatSequence`, :attr:`~music21.meter.TimeSignature.beamSequence`, :attr:`~music21.meter.TimeSignature.accentSequence`. The following displays a graphical realization of these four MeterSequence objects. 
 
 
 .. image:: images/overviewMeters-01.*
@@ -323,18 +323,18 @@ The TimeSignature provides a model of all common hierarchical structures contain
 Configuring Display
 -------------------------------------
 
-The TimeSignature :attr:`~music21.meter.TimeSignature.display` MeterSequence employs the highest-level partitions to configure the displayed time signature symbol. If more than one partition is given, those partitions will be interpreted as additive meter components. If partitions have a common denominator, a summed numerator (over a single denominator) can be displayed by setting the TimeSignature :attr:`~music21.meter.TimeSignature.summedNumerator` attribute to True. Lower-level subdivisions of the TimeSignature MeterSequence are not employed.
+The TimeSignature :attr:`~music21.meter.TimeSignature.displaySequence` MeterSequence employs the highest-level partitions to configure the displayed time signature symbol. If more than one partition is given, those partitions will be interpreted as additive meter components. If partitions have a common denominator, a summed numerator (over a single denominator) can be displayed by setting the TimeSignature :attr:`~music21.meter.TimeSignature.summedNumerator` attribute to True. Lower-level subdivisions of the TimeSignature MeterSequence are not employed.
 
-Note that a new MeterSequence instance can be assigned to the :attr:`~music21.meter.TimeSignature.display` attribute with a duration and/or partitioning completely independent from the :attr:`~music21.meter.TimeSignature.beat`, :attr:`~music21.meter.TimeSignature.beam`, and :attr:`~music21.meter.TimeSignature.accent` MeterSequences.
+Note that a new MeterSequence instance can be assigned to the :attr:`~music21.meter.TimeSignature.displaySequence` attribute with a duration and/or partitioning completely independent from the :attr:`~music21.meter.TimeSignature.beatSequence`, :attr:`~music21.meter.TimeSignature.beamSequence`, and :attr:`~music21.meter.TimeSignature.accentSequence` MeterSequences.
 
 The following example demonstrates setting the display MeterSequence for a TimeSignature::
 
 
     ts1 = meter.TimeSignature('5/8') # assumes two partitions
-    ts1.display.partition(['3/16','1/8','5/16'])
+    ts1.displaySequence.partition(['3/16','1/8','5/16'])
     
     ts2 = meter.TimeSignature('5/8') # assumes two partitions
-    ts2.display.partition(['2/8', '3/8'])
+    ts2.displaySequence.partition(['2/8', '3/8'])
     ts2.summedNumerator = True
         
     s = stream.Stream()
@@ -357,9 +357,9 @@ The following example demonstrates setting the display MeterSequence for a TimeS
 Configuring Beam
 -------------------------------------
 
-The TimeSignature :attr:`~music21.meter.TimeSignature.beam` MeterSequence employs the complete hierarchical structure to configure the single or multi-level beaming of a bar. The outer-most partitions can specify one or more top-level partitions. Lower-level partitions subdivide beam-groups, providing the appropriate beam-breaks when sufficiently small durations are employed. 
+The TimeSignature :attr:`~music21.meter.TimeSignature.beamSequence` MeterSequence employs the complete hierarchical structure to configure the single or multi-level beaming of a bar. The outer-most partitions can specify one or more top-level partitions. Lower-level partitions subdivide beam-groups, providing the appropriate beam-breaks when sufficiently small durations are employed. 
 
-The :attr:`~music21.meter.TimeSignature.beam` MeterSequence is generally used to create and configure :class:`~music21.note.Beams` objects stored in :class:`~music21.note.Note` objects. The TimeSignature :meth:`~music21.meter.TimeSignature.getBeams` method, given a list of :class:`~music21.duration.Duration` objects, returns a list of :class:`~music21.note.Beams` objects based on the TimeSignature  :attr:`~music21.meter.TimeSignature.beam` MeterSequence.
+The :attr:`~music21.meter.TimeSignature.beamSequence` MeterSequence is generally used to create and configure :class:`~music21.note.Beams` objects stored in :class:`~music21.note.Note` objects. The TimeSignature :meth:`~music21.meter.TimeSignature.getBeams` method, given a list of :class:`~music21.duration.Duration` objects, returns a list of :class:`~music21.note.Beams` objects based on the TimeSignature  :attr:`~music21.meter.TimeSignature.beamSequence` MeterSequence.
 
 Many users may find the Stream :meth:`~music21.stream.Stream.makeBeams` method the most convenient way to apply beams to a Measure or Stream of Note objects. This method returns a new Stream with created and configured Beams. 
 
@@ -367,23 +367,23 @@ The following example beams a bar of 3/4 in four different ways. The diversity a
 
 
     ts1 = meter.TimeSignature('3/4') 
-    ts1.beam.partition(1)
-    ts1.beam[0] = ts1.beam[0].subdivide(['3/8', '5/32', '4/32', '3/32'])
+    ts1.beamSequence.partition(1)
+    ts1.beamSequence[0] = ts1.beamSequence[0].subdivide(['3/8', '5/32', '4/32', '3/32'])
     
     ts2 = meter.TimeSignature('3/4') 
-    ts2.beam.partition(3)
+    ts2.beamSequence.partition(3)
     
     ts3 = meter.TimeSignature('3/4') 
-    ts3.beam.partition(3)
-    for i in range(len(ts3.beam)):
-        ts3.beam[i] = ts3.beam[i].subdivide(2)
+    ts3.beamSequence.partition(3)
+    for i in range(len(ts3.beamSequence)):
+        ts3.beamSequence[i] = ts3.beamSequence[i].subdivide(2)
     
     ts4 = meter.TimeSignature('3/4') 
-    ts4.beam.partition(['3/8', '3/8'])
-    for i in range(len(ts4.beam)):
-        ts4.beam[i] = ts4.beam[i].subdivide(['6/32', '6/32'])
-        for j in range(len(ts4.beam[i])):
-            ts4.beam[i][j] = ts4.beam[i][j].subdivide(2)
+    ts4.beamSequence.partition(['3/8', '3/8'])
+    for i in range(len(ts4.beamSequence)):
+        ts4.beamSequence[i] = ts4.beamSequence[i].subdivide(['6/32', '6/32'])
+        for j in range(len(ts4.beamSequence[i])):
+            ts4.beamSequence[i][j] = ts4.beamSequence[i][j].subdivide(2)
     
     s = stream.Stream()
     for ts in [ts1, ts2, ts3, ts4]:
@@ -411,14 +411,14 @@ The following is a fractional grid representation of the four beam partitions cr
 Configuring Beat
 -------------------------------------
 
-The TimeSignature :attr:`~music21.meter.TimeSignature.beat` MeterSequence employs the hierarchical structure to define the beats and beat divisions of a bar. The outer-most partitions can specify one ore more top level beats. Inner partitions can specify the beat division partitions. For most common meters, beats and beat divisions are pre-configured by default.
+The TimeSignature :attr:`~music21.meter.TimeSignature.beatSequence` MeterSequence employs the hierarchical structure to define the beats and beat divisions of a bar. The outer-most partitions can specify one ore more top level beats. Inner partitions can specify the beat division partitions. For most common meters, beats and beat divisions are pre-configured by default.
 
 In the following example, a simple and a compound meter is created, and the default beat partitions are examined. The :meth:`~music21.meter.MeterSequence.getLevel` method can be used to show the beat and background beat partitions. The timeSignature :attr:`~music21.meter.TimeSignature.beatDuration`,  :attr:`~music21.meter.TimeSignature.beatCount`, and :attr:`~music21.meter.TimeSignature.beatCountName` properties can be used to return commonly needed beat information. The TimeSignature :attr:`~music21.meter.TimeSignature.beatDivisionCount`, and :attr:`~music21.meter.TimeSignature.beatDivisionCountName` properties can be used to return commonly needed beat division information. These descriptors can be combined to return a string representation of the TimeSignature classification with :attr:`~music21.meter.TimeSignature.classification` property.
 
 >>> ts = meter.TimeSignature('3/4')
->>> ts.beat.getLevel(0)
+>>> ts.beatSequence.getLevel(0)
 <MeterSequence {1/4+1/4+1/4}>
->>> ts.beat.getLevel(1)
+>>> ts.beatSequence.getLevel(1)
 <MeterSequence {1/8+1/8+1/8+1/8+1/8+1/8}>
 >>> ts.beatDuration
 <music21.duration.Duration 1.0>
@@ -434,9 +434,9 @@ In the following example, a simple and a compound meter is created, and the defa
 'Simple Triple'
 
 >>> ts = meter.TimeSignature('12/16')
->>> ts.beat.getLevel(0)
+>>> ts.beatSequence.getLevel(0)
 <MeterSequence {3/16+3/16+3/16+3/16}>
->>> ts.beat.getLevel(1)
+>>> ts.beatSequence.getLevel(1)
 <MeterSequence {1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16}>
 >>> ts.beatDuration
 <music21.duration.Duration 0.75>
@@ -467,7 +467,7 @@ In the following example, all leading tones, or C#s, are collected into a new St
     score = corpus.parseWork('bach/bwv366.xml') 
     ts = score.flat.getElementsByClass(
         meter.TimeSignature)[0]
-    ts.beat.partition(3)
+    ts.beatSequence.partition(3)
     
     found = stream.Stream()
     offsetQL = 0
@@ -498,11 +498,11 @@ In the following example, all leading tones, or C#s, are collected into a new St
 Using Beat Depth to Provide Metrical Analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Another application of the :attr:`~music21.meter.TimeSignature.beat` MeterSequence is to define the hierarchical depth active for a given note found within the TimeSignature. 
+Another application of the :attr:`~music21.meter.TimeSignature.beatSequence` MeterSequence is to define the hierarchical depth active for a given note found within the TimeSignature. 
 
 The :meth:`~music21.meter.TimeSignature.getBeatDepth` method, when set with the optional parameter `aligh` to "quantize", shows the number of hierarchical levels that start at or before that point. This value is described by Lerdahl and Jackendoff as metrical analysis.
 
-In the following example, :attr:`~music21.meter.TimeSignature.beat` MeterSequence is partitioned first into one subdivision, and then each subsequent subdivision into two, down to four layers of partitioning. 
+In the following example, :attr:`~music21.meter.TimeSignature.beatSequence` MeterSequence is partitioned first into one subdivision, and then each subsequent subdivision into two, down to four layers of partitioning. 
 
 The number of hierarchical levels, found with the :meth:`~music21.meter.TimeSignature.getBeatDepth` method, is appended to each note with the :meth:`~music21.note.Note.addLyric` method::
 
@@ -514,15 +514,15 @@ The number of hierarchical levels, found with the :meth:`~music21.meter.TimeSign
     ts = partBass.flat.getElementsByClass(
          meter.TimeSignature)[0]
     
-    ts.beat.partition(1)
-    for h in range(len(ts.beat)):
-        ts.beat[h] = ts.beat[h].subdivide(2)
-        for i in range(len(ts.beat[h])):
-            ts.beat[h][i] = \
-                ts.beat[h][i].subdivide(2)
-            for j in range(len(ts.beat[h][i])):
-                ts.beat[h][i][j] = \
-                    ts.beat[h][i][j].subdivide(2)
+    ts.beatSequence.partition(1)
+    for h in range(len(ts.beatSequence)):
+        ts.beatSequence[h] = ts.beatSequence[h].subdivide(2)
+        for i in range(len(ts.beatSequence[h])):
+            ts.beatSequence[h][i] = \
+                ts.beatSequence[h][i].subdivide(2)
+            for j in range(len(ts.beatSequence[h][i])):
+                ts.beatSequence[h][i][j] = \
+                    ts.beatSequence[h][i][j].subdivide(2)
     
     for m in partBass.getElementsByClass('Measure'):
         for n in m.notes:
@@ -546,7 +546,7 @@ Alternatively, this type of annotation can be applied to a Stream using the :fun
 Configuring Accent
 -------------------------------------
 
-The TimeSignature :attr:`~music21.meter.TimeSignature.accent` MeterSequence defines one or more levels of hierarchical accent levels, where quantitative accent value is encoded in MeterTerminal or MeterSequence with a number assigned to the :attr:`~music21.meter.MeterTerminal.weight` attribute.
+The TimeSignature :attr:`~music21.meter.TimeSignature.accentSequence` MeterSequence defines one or more levels of hierarchical accent levels, where quantitative accent value is encoded in MeterTerminal or MeterSequence with a number assigned to the :attr:`~music21.meter.MeterTerminal.weight` attribute.
 
 
 
@@ -564,8 +564,8 @@ The following example extracts the Bass line of a Bach chorale in 3/4 and, after
     partBass = score.getElementById('Bass')
     
     ts = partBass.flat.getElementsByClass(meter.TimeSignature)[0]
-    ts.beat.partition(['3/8', '3/8'])
-    ts.accent.partition(['3/8', '3/8'])
+    ts.beatSequence.partition(['3/8', '3/8'])
+    ts.accentSequence.partition(['3/8', '3/8'])
     ts.setAccentWeight([1, .5])
     
     for m in partBass.getElementsByClass('Measure'):
