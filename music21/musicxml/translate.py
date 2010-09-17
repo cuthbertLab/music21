@@ -579,7 +579,8 @@ def measureToMusicXML(m):
         ts = found[0]
 
     # might similarly look for key signature, instrument, and clef
-
+    # must copy here b/c do not want to alter original, and need to set
+    # new objects in some cases (time signature, etc)
     mCopy = copy.deepcopy(m)    
     if ts != None:
         mCopy.timeSignature = ts
