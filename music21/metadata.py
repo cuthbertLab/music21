@@ -997,12 +997,16 @@ class Metadata(music21.Music21Object):
         '''
         music21.Music21Object.__init__(self)
 
-        # a lost of Contributor objects
+        # a list of Contributor objects
         # there can be more than one composer, or any other combination
         self._contributors = []
         self._date = None
 
-        # need a specific object for copyright and imprint
+        # store one or more URLs from which this work came; this could
+        # be local file paths or otherwise
+        self._urls = []
+
+        # TODO: need a specific object for copyright and imprint
         self._imprint = None
         self._copyright = None
 

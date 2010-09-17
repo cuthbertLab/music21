@@ -42,7 +42,7 @@ class ModuleGather(object):
             'testDefault.py', 
             'testInstallation.py', 
             'testLint.py', 
-            'timePerformance.py',
+            'testPerformance.py',
             '__init__.py', 
             'timeGraphs.py',
             'exceldiff.py', 

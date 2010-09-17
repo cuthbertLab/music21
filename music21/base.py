@@ -82,6 +82,8 @@ if len(_missingImport) > 0:
 #-------------------------------------------------------------------------------
 VERSION = (0, 2, 5)  # increment any time picked versions will be obsolete.
 VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a4'
+
+# define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
 
 
@@ -89,7 +91,8 @@ WEAKREF_ACTIVE = True
 class Music21Exception(Exception):
     pass
 
-class RelationsException(Exception):
+# should be renamed:
+class DefinedContextsException(Exception):
     pass
 
 class Music21ObjectException(Exception):
@@ -247,7 +250,8 @@ class DefinedContexts(object):
         False
         '''
         for idKey in self._definedContexts.keys():
-            if common.isWeakref(self._definedContexts[idKey]['obj']):
+            if WEAKREF_ACTIVE:
+            #if common.isWeakref(self._definedContexts[idKey]['obj']):
 
                 #environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
 
@@ -400,7 +404,8 @@ class DefinedContexts(object):
         if offset is None, it is interpreted as a context
         if offset is a value, it is intereted as location
 
-        NOTE: offset follows obj here, unlike with add() in old DefinedContexts
+        The `timeValue` argument is used to store the time at which an object is added to locations. This is not the same as `offset` 
+
         '''
         if offset == None: 
             domain = 'contexts'
@@ -438,13 +443,9 @@ class DefinedContexts(object):
         dict['obj'] = objRef
         # offset can be None for contexts
         dict['offset'] = offset
-#         if name == None:
-#             dict['name'] = type(obj).__name__
-#         else:
-#             dict['name'] = name
 
+        # NOTE: this may not give sub-second resolution on some platforms
         if timeValue == None:
-            # NOTE: this may not give sub-second resolution on some platforms
             dict['time'] = defaultTimer()
         else:
             dict['time'] = timeValue
@@ -486,7 +487,7 @@ class DefinedContexts(object):
         try:
             del self._definedContexts[siteId]
         except:    
-            raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
+            raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
         # also delete from location keys
         if siteId in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(siteId))
@@ -507,7 +508,8 @@ class DefinedContexts(object):
         '''
         dict = self._definedContexts[id]
         # need to check if these is weakref
-        if common.isWeakref(dict['obj']):
+        #if common.isWeakref(dict['obj']):
+        if WEAKREF_ACTIVE:
             return common.unwrapWeakref(dict['obj'])
         else:
             return dict['obj']
@@ -589,7 +591,8 @@ class DefinedContexts(object):
         for key in keys:
             dict = self._definedContexts[key]
             # need to check if these is weakref
-            if common.isWeakref(dict['obj']):
+            #if common.isWeakref(dict['obj']):
+            if WEAKREF_ACTIVE:
                 post.append(common.unwrapWeakref(dict['obj']))
             else:
                 post.append(dict['obj'])
@@ -617,7 +620,7 @@ class DefinedContexts(object):
             try:
                 s1 = self._definedContexts[idKey]['obj']
             except KeyError:
-                raise RelationsException('no such site: %s' % idKey)
+                raise DefinedContextsException('no such site: %s' % idKey)
             if s1 is None or WEAKREF_ACTIVE == False: # leave None alone
                 post.append(s1)
             else:
@@ -700,6 +703,37 @@ class DefinedContexts(object):
 #             self.removeBySiteId(idKey)
 
 
+    def _getOffsetBySiteId(self, idKey):
+        '''Main method for getting an offset from a location key.
+
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cSite = Mock()
+        >>> dSite = Mock()
+        >>> aLocations = DefinedContexts()
+        >>> aLocations.add(aSite, 0)
+        >>> aLocations.add(cSite) # a context
+        >>> aLocations.add(bSite, 234) # can add at same offset or another
+        >>> aLocations.add(dSite) # a context
+        >>> aLocations._getOffsetBySiteId(id(bSite))
+        234
+        '''
+        value = self._definedContexts[idKey]['offset']
+        # stored string are summed to be attributes of the stored object
+        if isinstance(value, str):
+            if value not in ['highestTime', 'lowestOffset', 'highestOffset']:
+                raise DefinedContextsException('attempted to set a bound offset with a string attribute that is not supported: %s' % value)
+
+            if WEAKREF_ACTIVE:
+                obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
+            else:
+                obj = self._definedContexts[idKey]['obj']
+            # offset value is an attribute string
+            return getattr(obj, value)
+        else:
+            return value
+
     def getOffsets(self):
         '''Return a list of all offsets.
 
@@ -717,11 +751,11 @@ class DefinedContexts(object):
         [0, 234]
         '''
         # here, already having location keys may be an advantage
-        return [self._definedContexts[x]['offset'] for x in self._locationKeys] 
+        return [self._getOffsetBySiteId(x) for x in self._locationKeys] 
 
 
     def getOffsetByObjectMatch(self, obj):
-        '''For a given object return the offset using a direct object match.
+        '''For a given object return the offset using a direct object match. The stored id value is not used; instead, the id() of both the stored object reference and the supplied objet is used. 
 
         >>> class Mock(Music21Object): pass
         >>> aSite = Mock()
@@ -737,12 +771,18 @@ class DefinedContexts(object):
         '''
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
-            if dict['obj'] == obj:
-                return dict['offset']
-        raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % obj)
+            # must unwrap references before comparison
+            #if common.isWeakref(dict['obj']):
+            if WEAKREF_ACTIVE:
+                compareObj = common.unwrapWeakref(dict['obj'])
+            else:
+                compareObj = dict['obj']
+            if id(compareObj) == id(obj):
+                return self._getOffsetBySiteId(idKey) #dict['offset']
+        raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % obj)
 
     def getOffsetBySite(self, site):
-        '''For a given site return its offset. The None site is permitted.
+        '''For a given site return its offset. The None site is permitted. The id() of the site is used to find the offset. 
 
         >>> class Mock(Music21Object): pass
         >>> aSite = Mock()
@@ -760,7 +800,9 @@ class DefinedContexts(object):
         if site is not None:
             siteId = id(site)
         try:
-            post = self._definedContexts[siteId]['offset']
+            # will raise a key error if not found
+            post = self._getOffsetBySiteId(siteId) 
+            #post = self._definedContexts[siteId]['offset']
         except KeyError: # the site id is not valid
             environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
 
@@ -770,8 +812,9 @@ class DefinedContexts(object):
             raise # re-raise Exception
 
         if post == None: # 
-            raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
-        return self._definedContexts[siteId]['offset']
+            raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
+        #self._definedContexts[siteId]['offset']
+        return post
 
 
     def getOffsetBySiteId(self, siteId):
@@ -789,10 +832,11 @@ class DefinedContexts(object):
         >>> aLocations.getOffsetBySiteId(id(bSite))
         121.5
         '''
-        post = self._definedContexts[siteId]['offset']
+        post = self._getOffsetBySiteId(siteId) 
+        #post = self._definedContexts[siteId]['offset']
         if post == None: # 
-            raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
-        return self._definedContexts[siteId]['offset']
+            raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
+        return post
 
 
     def setOffsetBySite(self, site, value):
@@ -812,7 +856,7 @@ class DefinedContexts(object):
         20
         >>> aLocations.setOffsetBySite(cSite, 30)        
         Traceback (most recent call last):
-        RelationsException: ...
+        DefinedContextsException: ...
         '''
         siteId = None
         if site is not None:
@@ -821,7 +865,7 @@ class DefinedContexts(object):
         try:
             self._definedContexts[siteId]['offset'] = value
         except KeyError:
-            raise RelationsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
+            raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
             
 
     def getSiteByOffset(self, offset):
@@ -851,8 +895,8 @@ class DefinedContexts(object):
         if WEAKREF_ACTIVE:
             if match is None:
                 return match
-            if not common.isWeakref(match):
-                raise RelationsException('site on coordinates is not a weak ref: %s' % match)
+            elif not common.isWeakref(match):
+                raise DefinedContextsException('site on coordinates is not a weak ref: %s' % match)
             return common.unwrapWeakref(match)
         else:
             return match
@@ -1374,7 +1418,7 @@ class Music21Object(object):
             return False
 
     def addLocation(self, site, offset):
-        '''Add a location to the :class:`~music21.base.DefinedContexts` object. The supplied object is a reference to the object (the site) that contains an offset of this object. 
+        '''Add a location to the :class:`~music21.base.DefinedContexts` object. The supplied object is a reference to the object (the site) that contains an offset of this object.  For example, if this Music21Object was Note, the site would be a Stream (or Stream subclass) and the offset would be a number for the offset. 
 
         This is only for advanced location method and is not a complete or sufficient way to add an object to a Stream. 
 
@@ -3073,6 +3117,110 @@ class Test(unittest.TestCase):
         self.assertEqual([n.offset for n in p.flat.notes], [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 12.5, 13.0, 15.0, 16.0, 16.5, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 28.5, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 34.75, 35.0, 35.5, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 47.0, 48.0, 48.5, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 60.5, 61.0, 63.0] )
     
 
+    def testBoundLocations(self):
+        '''Bound or relative locations; locations that are not based on a number but an attribute of the site.
+        '''
+        from music21 import stream, note, bar
+
+        s = stream.Stream()
+        n1 = note.Note()
+        n1.quarterLength = 20
+        s.append(n1)
+        self.assertEqual(s.highestTime, 20)
+
+        offset = None
+
+        # this would be in a note
+        dc = DefinedContexts()
+        # we would add, for that note, a location in object s
+        # if offset is None, it is a context, and has no offset
+        dc.add(s, None)
+        self.assertEqual(len(dc), 1)
+        self.assertEqual(len(dc._locationKeys), 0)
+        self.assertEqual(dc.getSites(), [])
+
+        dc = DefinedContexts()
+        # if we have an offset, we get a location
+        dc.add(s, 30)
+        self.assertEqual(len(dc), 1)
+        self.assertEqual(len(dc._locationKeys), 1)
+        self.assertEqual(dc.getSites(), [s])
+        self.assertEqual(dc.getOffsets(), [30])
+        self.assertEqual(dc.getOffsetBySite(s), 30)
+        self.assertEqual(dc.getOffsetByObjectMatch(s), 30)
+
+
+        dc = DefinedContexts()
+        # instead of adding the position of this dc in s, we add a lambda
+        # expression that take s as an argument
+        dc.add(s, 30)
+        self.assertEqual(len(dc), 1)
+        self.assertEqual(len(dc._locationKeys), 1)
+        self.assertEqual(dc.getSites(), [s])
+        self.assertEqual(dc.getOffsets(), [30])
+        self.assertEqual(dc.getOffsetBySite(s), 30)
+        self.assertEqual(dc.getOffsetByObjectMatch(s), 30)
+
+
+        # need to account for two cases; where a location is linked
+        # to another objects location.
+        # and where location is linked to a 
+
+        # could use lambda functions, but they may be hard to seralize
+        # instead, use a string for the attribute
+        
+        dc = DefinedContexts()
+        # instead of adding the position of this dc in s, we add a lambda
+        # expression that take s as an argument
+        dc.add(s, 'highestTime')
+        self.assertEqual(len(dc), 1)
+        self.assertEqual(len(dc._locationKeys), 1)
+        self.assertEqual(dc.getSites(), [s])
+        self.assertEqual(dc.getOffsetBySite(s), 20.0)
+        self.assertEqual(dc.getOffsets(), [20.0])
+        self.assertEqual(dc.getOffsetByObjectMatch(s), 20.0)
+
+        # change the stream and see that the location has changed
+        n2 = note.Note()
+        n2.quarterLength = 30
+        s.append(n2)
+        self.assertEqual(s.highestTime, 50)
+        self.assertEqual(dc.getOffsetBySite(s), 50.0)
+
+        # can add another location for the lowest offset
+        dc.add(s, 'lowestOffset')
+        # still only have one site
+        self.assertEqual(dc.getSites(), [s])
+        self.assertEqual(dc.getOffsetBySite(s), 0.0)
+
+        dc.add(s, 'highestOffset')
+        # still only have one site
+        self.assertEqual(dc.getSites(), [s])
+        self.assertEqual(dc.getOffsetBySite(s), 20.0)
+
+        # valid boundLocations are the following:
+        # highestOffset, lowestOffset, highestTime
+
+        # this works, but only b/c we are not actually appending
+        # the bar object. 
+
+        s = stream.Stream()
+        n1 = note.Note()
+        n1.quarterLength = 30
+        n2 = note.Note()
+        n2.quarterLength = 20
+
+        b1 = bar.Barline()
+        s.append(n1)
+        self.assertEqual(s.highestTime, 30.0)
+        b1.addLocation(s, 'highestTime')
+        self.assertEqual(b1.getOffsetBySite(s), 30.0)
+        
+        s.append(n2)
+        self.assertEqual(s.highestTime, 50.0)
+        self.assertEqual(b1.getOffsetBySite(s), 50.0)
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper, DefinedContexts]
@@ -3128,5 +3276,6 @@ if __name__ == "__main__":
         #t.testBeatAccess()
         #t.testMeaureNumberAccess()
 
-        t.testPickupMeauresBuilt()
-        t.testPickupMeauresImported()
+        #t.testPickupMeauresBuilt()
+        #t.testPickupMeauresImported()
+        t.testBoundLocations()

@@ -73,9 +73,7 @@ def styleToBarStyle(value):
 class Barline(music21.Music21Object):
 
     validStyles = barStyleDict.keys()
-    validRepeats = ['right', 'left', 'both']
 
-    _repeatDots = None
     _style = None
     _pause = None  # can be music21.expressions.Fermata object
     
@@ -138,11 +136,26 @@ class Barline(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class Repeat(music21.Music21Object):
-    '''The Repeat object defines a jump but not a change in barline style.  However
-    the Measure object\'s addRepeat both adds a Repeat object and changes the appropriate
-    Barline style.'''
-    pass
+class Repeat(Barline):
+    '''A Repeat barline
+
+    >>> from music21 import *
+    >>> r = bar.Repeat()
+    >>> r.repeatEnd == None
+    True
+    '''
+
+    _repeatDots = None # not sure what this is for; inherited from old modles
+
+    def __init__(self, style=None):
+        Barline.__init__(self)
+
+        # store if this is a start repeat, an end repeat, or both
+        # possible combine in a single parameter
+        self.repeatEnd = None #[True, False]
+        self.repeatStart = None #[True, False] 
+
+
 
 
 

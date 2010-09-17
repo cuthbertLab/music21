@@ -1477,7 +1477,6 @@ class Stream(music21.Music21Object):
             except AttributeError: # not a string
                 if element.id == id:
                     match = True
-
             if match:
                 if classFilter is not None:
                     if element.isClass(classFilter):
