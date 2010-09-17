@@ -141,13 +141,13 @@ Finding the Beat of a Note in a Measure
 
 If a Note is in a Measure, and that Measure or a preceding Measure has a TimeSignature, it is possible to find the beat, or the position of the Note in terms of the count of whole or fractional subdivisions of top-level beat partitions.
 
-The Note :attr:`~music21.note.GeneralNote.beat` property will return, if available, a numerical representation of the beat, with a floating point value corresponding to the proportional position through the beat. The Note :attr:`~music21.note.GeneralNote.beatStr` property returns a string representation, replacing floating point values with fractions when available. 
+The Note :attr:`~music21.note.GeneralNote.beatCount` property will return, if available, a numerical representation of the beat, with a floating point value corresponding to the proportional position through the beat. The Note :attr:`~music21.note.GeneralNote.beatStr` property returns a string representation, replacing floating point values with fractions when available. 
 
 >>> sSrc = corpus.parseWork('bach/bwv57.8.xml')
 >>> sPart = sSrc.getElementById('Soprano')
 >>> sPart.flat.notes[0]
 <music21.note.Note B->
->>> sPart.flat.notes[4].beat
+>>> sPart.flat.notes[4].beatCount
 2.5
 >>> sPart.flat.notes[4].beatStr
 '2 1/2'

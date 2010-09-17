@@ -441,7 +441,7 @@ def js_q1():
                     isCadence = True
             
             if isCadence is True and thisChord.inversion == 1:
-                thisChord.lyric.append(str.chorale.name + ": " + str(thisChord.context.number) + "/" + str(thisChord.context.beat))
+                thisChord.lyric.append(str.chorale.name + ": " + str(thisChord.context.number) + "/" + str(thisChord.context.beatCount))
                 returnStream.append(prev2Chord)
                 returnStream.append(prevChord)
                 returnStream.append(thisChord)
