@@ -141,13 +141,13 @@ Finding the Beat of a Note in a Measure
 
 If a Note is in a Measure, and that Measure or a preceding Measure has a TimeSignature, it is possible to find the beat, or the position of the Note in terms of the count of whole or fractional subdivisions of top-level beat partitions.
 
-The Note :attr:`~music21.note.GeneralNote.beatCount` property will return, if available, a numerical representation of the beat, with a floating point value corresponding to the proportional position through the beat. The Note :attr:`~music21.note.GeneralNote.beatStr` property returns a string representation, replacing floating point values with fractions when available. 
+The Note :attr:`~music21.note.GeneralNote.beat` property will return, if available, a numerical representation of the beat, with a floating point value corresponding to the proportional position through the beat. The Note :attr:`~music21.note.GeneralNote.beatStr` property returns a string representation, replacing floating point values with fractions when available. 
 
 >>> sSrc = corpus.parseWork('bach/bwv57.8.xml')
 >>> sPart = sSrc.getElementById('Soprano')
 >>> sPart.flat.notes[0]
 <music21.note.Note B->
->>> sPart.flat.notes[4].beatCount
+>>> sPart.flat.notes[4].beat
 2.5
 >>> sPart.flat.notes[4].beatStr
 '2 1/2'
@@ -413,7 +413,7 @@ Configuring Beat
 
 The TimeSignature :attr:`~music21.meter.TimeSignature.beatSequence` MeterSequence employs the hierarchical structure to define the beats and beat divisions of a bar. The outer-most partitions can specify one ore more top level beats. Inner partitions can specify the beat division partitions. For most common meters, beats and beat divisions are pre-configured by default.
 
-In the following example, a simple and a compound meter is created, and the default beat partitions are examined. The :meth:`~music21.meter.MeterSequence.getLevel` method can be used to show the beat and background beat partitions. The timeSignature :attr:`~music21.meter.TimeSignature.beatDuration`,  :attr:`~music21.meter.TimeSignature.beatCount`, and :attr:`~music21.meter.TimeSignature.beatCountName` properties can be used to return commonly needed beat information. The TimeSignature :attr:`~music21.meter.TimeSignature.beatDivisionCount`, and :attr:`~music21.meter.TimeSignature.beatDivisionCountName` properties can be used to return commonly needed beat division information. These descriptors can be combined to return a string representation of the TimeSignature classification with :attr:`~music21.meter.TimeSignature.classification` property.
+In the following example, a simple and a compound meter is created, and the default beat partitions are examined. The :meth:`~music21.meter.MeterSequence.getLevel` method can be used to show the beat and background beat partitions. The timeSignature :attr:`~music21.meter.TimeSignature.beatDuration`,  :attr:`~music21.meter.TimeSignature.beat`, and :attr:`~music21.meter.TimeSignature.beatCountName` properties can be used to return commonly needed beat information. The TimeSignature :attr:`~music21.meter.TimeSignature.beatDivisionCount`, and :attr:`~music21.meter.TimeSignature.beatDivisionCountName` properties can be used to return commonly needed beat division information. These descriptors can be combined to return a string representation of the TimeSignature classification with :attr:`~music21.meter.TimeSignature.classification` property.
 
 >>> ts = meter.TimeSignature('3/4')
 >>> ts.beatSequence.getLevel(0)
@@ -422,7 +422,7 @@ In the following example, a simple and a compound meter is created, and the defa
 <MeterSequence {1/8+1/8+1/8+1/8+1/8+1/8}>
 >>> ts.beatDuration
 <music21.duration.Duration 1.0>
->>> ts.beatCount
+>>> ts.beat
 3
 >>> ts.beatCountName
 'Triple'
@@ -440,7 +440,7 @@ In the following example, a simple and a compound meter is created, and the defa
 <MeterSequence {1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16}>
 >>> ts.beatDuration
 <music21.duration.Duration 0.75>
->>> ts.beatCount
+>>> ts.beat
 4
 >>> ts.beatCountName
 'Quadruple'

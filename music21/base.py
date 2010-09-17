@@ -2063,7 +2063,7 @@ class Music21Object(object):
         #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])
         return offsetLocal
 
-    def _getBeatCount(self):
+    def _getBeat(self):
         '''Return a beat designation based on local Measure and TimeSignature
 
         >>> from music21 import *
@@ -2077,9 +2077,9 @@ class Music21Object(object):
         >>> m[1].parent # here we get the parent, but not in m.notes
         <music21.stream.Measure 0 offset=0.0>
 
-        >>> m.notes[0]._getBeatCount()
+        >>> m.notes[0]._getBeat()
         1.0
-        >>> m.notes[1]._getBeatCount()
+        >>> m.notes[1]._getBeat()
         3.0
         '''
         ts = self.getContextByClass('TimeSignature')
@@ -2088,7 +2088,7 @@ class Music21Object(object):
         return ts.getBeatProportion(self._getMeasureOffset())
 
 
-    beatCount = property(_getBeatCount,  
+    beat = property(_getBeat,  
         doc = '''Return the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a floating-point designation between 0 and 1 to show proportional progress through the beat.
 
         >>> from music21 import *
@@ -2097,11 +2097,11 @@ class Music21Object(object):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatCount for i in range(6)]
+        >>> [m.notes[i].beat for i in range(6)]
         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatCount for i in range(6)]
+        >>> [m.notes[i].beat for i in range(6)]
         [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
 
         ''')
@@ -2930,13 +2930,13 @@ class Test(unittest.TestCase):
         p1 = s.parts['Soprano']
 
         # this does not work; cannot get these values from Measures
-        #self.assertEqual(p1.getElementsByClass('Measure')[3].beatCount, 3)
+        #self.assertEqual(p1.getElementsByClass('Measure')[3].beat, 3)
 
         # clef/ks can get its beat; these objects are in a pickup, 
         # and this give their bar offset relative to the bar
         for classStr in ['Clef', 'KeySignature']:
             self.assertEqual(p1.flat.getElementsByClass(
-                classStr)[0].beatCount, 4.0)
+                classStr)[0].beat, 4.0)
             self.assertEqual(p1.flat.getElementsByClass(
                 classStr)[0].beatDuration.quarterLength, 1.0)
             self.assertEqual(
@@ -2974,7 +2974,7 @@ class Test(unittest.TestCase):
         # all other methods define None
         post = []
         for n in p1.getElementsByClass('Measure'):
-            post.append(n.beatCount)
+            post.append(n.beat)
         self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None] )
 
         post = []
@@ -3040,7 +3040,7 @@ class Test(unittest.TestCase):
         # the _getMeasureOffset method is called by all methods that evaluate
         # beat position; this takes padding into account
         self.assertEqual(n1._getMeasureOffset(), 0.0)
-        self.assertEqual(n1.beatCount, 1.0)
+        self.assertEqual(n1.beat, 1.0)
         
         # the Measure.padAsAnacrusis() method looks at the barDuration and, 
         # if the Measure is incomplete, assumes its an anacrusis and adds
@@ -3054,7 +3054,7 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.lowestOffset, 0.0)
         # these values are now different
         self.assertEqual(n1._getMeasureOffset(), 3.0)
-        self.assertEqual(n1.beatCount, 4.0)
+        self.assertEqual(n1.beat, 4.0)
     
         # appending this measure to the Score
         s.append(m1)

@@ -447,11 +447,11 @@ class GeneralNote(music21.Music21Object):
 #         >>> m = stream.Measure()
 #         >>> m.timeSignature = meter.TimeSignature('3/4')
 #         >>> m.repeatAppend(n, 6)
-#         >>> [m.notes[i].beatCount for i in range(6)]
+#         >>> [m.notes[i].beat for i in range(6)]
 #         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
 # 
 #         >>> m.timeSignature = meter.TimeSignature('6/8')
-#         >>> [m.notes[i].beatCount for i in range(6)]
+#         >>> [m.notes[i].beat for i in range(6)]
 #         [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
 # 
 #         ''')
@@ -1747,7 +1747,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(m), nCount+1)
 
             # test matching beat proportion value
-            post = [m.notes[i].beatCount for i in range(nCount)]
+            post = [m.notes[i].beat for i in range(nCount)]
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeat[i], 4)
 
@@ -1777,7 +1777,7 @@ class Test(unittest.TestCase):
             p.append(m2)
 
             # test matching beat proportion value
-            post = [m2.notes[i].beatCount for i in range(nCount)]
+            post = [m2.notes[i].beat for i in range(nCount)]
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeat[i], 4)
             # test getting beat duration
@@ -1800,7 +1800,7 @@ class Test(unittest.TestCase):
             found = []
             for n in s[2].flat.notes:
                 n.lyric = n.beatStr
-                found.append(n.beatCount)
+                found.append(n.beat)
             
             for i in range(len(match)):
                 self.assertEquals(match[i], found[i])

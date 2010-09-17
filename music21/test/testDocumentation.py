@@ -133,7 +133,7 @@ class Test(unittest.TestCase):
         #sSrc = corpus.parseWork('bach/bwv57.8.xml')
         sPart = sSrc.getElementById('Soprano')
         self.assertEquals(sPart.flat.notes[0].name, 'B-')
-        self.assertEquals(sPart.flat.notes[4].beatCount, 2.5)
+        self.assertEquals(sPart.flat.notes[4].beat, 2.5)
         self.assertEquals(sPart.flat.notes[4].beatStr, '2 1/2')
 
         for n in sPart.flat.notes:

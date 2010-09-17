@@ -302,9 +302,9 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.duration.quarterLength, 2.0)
         # notes are shown as being on beat 2 and 3
         self.assertEqual(m1.notes[0]._getMeasureOffset(), 1.0)
-        self.assertEqual(m1.notes[0].beatCount, 2.0)
+        self.assertEqual(m1.notes[0].beat, 2.0)
         self.assertEqual(m1.notes[1]._getMeasureOffset(), 2.0)
-        self.assertEqual(m1.notes[1].beatCount, 3.0)
+        self.assertEqual(m1.notes[1].beat, 3.0)
 
 
         # two 16th pickup in 4/4
@@ -319,9 +319,9 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.duration.quarterLength, 0.5)
         # notes are shown as being on beat 2 and 3
         self.assertEqual(m1.notes[0]._getMeasureOffset(), 3.5)
-        self.assertEqual(m1.notes[0].beatCount, 4.5)
+        self.assertEqual(m1.notes[0].beat, 4.5)
         self.assertEqual(m1.notes[1]._getMeasureOffset(), 3.75)
-        self.assertEqual(m1.notes[1].beatCount, 4.75)
+        self.assertEqual(m1.notes[1].beat, 4.75)
 
 
 

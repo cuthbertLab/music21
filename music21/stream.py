@@ -4059,12 +4059,12 @@ class Stream(music21.Music21Object):
         # for now, simply return the offset
         return self.getOffsetBySite(self.parent)
 
-    def _getBeatCount(self):
+    def _getBeat(self):
         # this normally returns the beat within a measure; here, it could
         # be beats from the beginning?
         return None
 
-    beatCount = property(_getBeatCount)  
+    beat = property(_getBeat)  
 
     def _getBeatStr(self):
         return None
