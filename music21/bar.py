@@ -17,7 +17,7 @@ import unittest, doctest
 
 import music21
 from music21 import musicxml
-
+from music21 import node # for exception matching
 
 from music21 import environment
 _MOD = 'bar.py'
@@ -82,6 +82,8 @@ class Barline(music21.Music21Object):
 
         # this will raise an exception on error from property
         self.style = style
+
+        # this parameter does not seem to be needed in this object
         self.location = None # can be left, right, middle, None
 
     def _getStyle(self):
@@ -139,21 +141,93 @@ class Barline(music21.Music21Object):
 class Repeat(Barline):
     '''A Repeat barline
 
-    >>> from music21 import *
-    >>> r = bar.Repeat()
-    >>> r.repeatEnd == None
-    True
     '''
 
     _repeatDots = None # not sure what this is for; inherited from old modles
 
-    def __init__(self, style=None):
-        Barline.__init__(self)
+    def __init__(self, style=None, direction='start'):
+        Barline.__init__(self, style=style)
 
-        # store if this is a start repeat, an end repeat, or both
-        # possible combine in a single parameter
-        self.repeatEnd = None #[True, False]
-        self.repeatStart = None #[True, False] 
+        # must declare a direction
+        # start is forward, end is backward in musicxml
+        self.direction = direction # start, end, or both
+        self.times = None  # if an end, how many repeats
+
+
+    def _getMX(self):
+        '''
+        >>> b = Repeat('light-heavy')
+        >>> mxBarline = b.mx
+        >>> mxBarline.get('barStyle')
+        'light-heavy'
+        '''
+        mxBarline = musicxml.Barline()
+        mxBarline.set('barStyle', self.style)
+        if self.location != None:
+            mxBarline.set('location', self.location)
+
+        mxRepeat = musicxml.Repeat()
+        if self.direction == 'start':
+            mxRepeat.set('direction', 'forward')
+        elif self.direction == 'end':
+            mxRepeat.set('direction', 'backward')
+        else:
+            raise BarException('cannot handle direction format:', self.direction)
+
+        if self.times != None:
+            mxRepeat.set('times', self.times)
+
+        mxBarline.set('repeatObj', mxRepeat)
+
+        return mxBarline
+
+    def _setMX(self, mxBarline):
+        '''Given an mxBarline, fille the necessary parameters
+
+        >>> from music21 import musicxml
+        >>> mxRepeat = musicxml.Repeat()
+        >>> mxRepeat.set('direction', 'forward')
+        >>> mxRepeat.get('times') == None
+        True
+        >>> mxBarline = musicxml.Barline()
+        >>> mxBarline.set('barStyle', 'light-heavy')
+        >>> mxBarline.set('repeatObj', mxRepeat)
+        >>> b = Repeat()
+        >>> b.mx = mxBarline
+        >>> b.style
+        'light-heavy'
+        >>> b.direction
+        'start'
+        '''
+        self.style = mxBarline.get('barStyle')
+        location = mxBarline.get('location')
+        if location != None:
+            self.location = location
+
+        mxRepeat = mxBarline.get('repeatObj')
+        if mxRepeat == None:
+            raise BarException('attempting to create a Repeat from an MusicXML bar that does not define a repeat')
+
+        mxDirection = mxRepeat.get('direction')
+
+        # TODO: not sure why some repeat objects are not able to get
+        # the times attribute; all mxRepeat objects should have a times
+        try:
+            if mxRepeat.get('times') != None:
+                # make into a number
+                self.times = int(mxRepeat.get('times'))
+        except node.NodeException:
+            environLocal.printDebug(['Repeat object that, when trying to read musicxml input, fails to find a times attribute on mxReleat:', mxRepeat])
+
+        if mxDirection.lower() == 'forward':
+            self.direction = 'start'
+        elif mxDirection.lower() == 'backward':
+            self.direction = 'end'
+        else:
+            raise BarException('cannot handle mx direction format:', mxDirection)
+
+
+    mx = property(_getMX, _setMX)    
 
 
 

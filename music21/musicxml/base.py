@@ -1383,7 +1383,8 @@ class Repeat(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'repeat'
         # attributes
-        self._attr['direction'] = None # can be start or end
+        self._attr['direction'] = None # backward or forward
+        self._attr['times'] = None # can be start or end
 
 
 class Note(MusicXMLElement):

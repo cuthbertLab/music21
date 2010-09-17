@@ -352,9 +352,11 @@ def measureToMx(m):
     #mxAttributes.keyList = []
     mxMeasure.set('attributes', mxAttributes)
 
-    # see if we have a left barline
+    # see if we have barlines
     if m.leftBarline != None:
-        mxBarline = m.leftBarline.mx
+        environLocal.printDebug(['measureToMx(), m.leftBarline', m.leftBarline])
+
+        mxBarline = m.leftBarline.mx # this may be a repeat object
         # setting location outside of object based on that this attribute
         # is the leftBarline
         mxBarline.set('location', 'left')
@@ -374,13 +376,13 @@ def measureToMx(m):
             pass
             #environLocal.printDebug(['_getMX of Measure is not processing', obj])
 
-    # see if we have a right barline
-    # presently turning barline output off b/c of performance concerns
-#     if m.rightBarline != None:
-#         mxBarline = m.rightBarline.mx
-#         # setting location outside of object based on attribute
-#         mxBarline.set('location', 'right')
-#         mxMeasure.componentList.append(mxBarline)
+    # right barline must follow all notes
+    if m.rightBarline != None:
+        mxBarline = m.rightBarline.mx # this may be a repeat
+        # setting location outside of object based on that this attribute
+        # is the leftBarline
+        mxBarline.set('location', 'right')
+        mxMeasure.componentList.append(mxBarline)
 
     return mxMeasure
 
@@ -467,21 +469,23 @@ def mxToMeasure(mxMeasure, inputM21):
             m.insert(0, sl)
 
         elif isinstance(mxObj, musicxmlMod.Barline):
+            # repeat is a tag found in the barline object
+            #environLocal.printDebug(['found mx barline object', offsetMeasureNote, i, mxObj])
+
             mxBarline = mxObj
-            barline = bar.Barline()
+            if mxBarline.get('repeatObj') != None:
+                #environLocal.printDebug(['found mxBarline', mxBarline])
+                barline = bar.Repeat()
+            else:
+                barline = bar.Barline()
+
             barline.mx = mxBarline # configure
             if barline.location == 'left':
+                #environLocal.printDebug(['setting left barline', barline])
                 m.leftBarline = barline
             elif barline.location == 'right':
-                # there may be problems importing a right barline
-                # as we may not have  time signature
-                # presently, the rightBarline property uses the the 
-                # highestTime value
-                #m.rightBarline = barline
-                # this avoids doing a context search, but may have non
-                # final offset
-                m.insert(m.highestTime, barline)
-
+                #environLocal.printDebug(['setting right barline', barline])
+                m.rightBarline = barline
             else:
                 environLocal.printDebug(['not handling barline that is neither left nor right', barline, barline.location])
 

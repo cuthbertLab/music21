@@ -1202,6 +1202,32 @@ class Test(unittest.TestCase):
         self.assertEqual(found[2].sharps, -1)
 
 
+    def testConversMXRepeats(self):
+        from music21 import bar
+        from music21.musicxml import testPrimitive
+
+        mxString = testPrimitive.simpleRepeat45a
+        s = parse(mxString)
+
+        part = s.parts[0]
+        measures = part.getElementsByClass('Measure')
+        self.assertEqual(measures[0].leftBarline, None)
+        self.assertEqual(measures[0].rightBarline.style, 'light-heavy')
+
+        self.assertEqual(measures[1].leftBarline, None)
+        self.assertEqual(measures[1].rightBarline.style, 'light-heavy')
+
+
+
+
+        mxString = testPrimitive.repeatMultipleTimes45c
+        s = parse(mxString)
+
+        self.assertEqual(len(s.flat.getElementsByClass(bar.Barline)), 4)
+        part = s.parts[0]
+        measures = part.getElementsByClass('Measure')
+
+        #s.show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1216,8 +1242,8 @@ if __name__ == "__main__":
         music21.mainTest(Test)
 
     elif len(sys.argv) > 1:
-        a = Test()
-        #a.testConversionMXLayout()
-        #a.testConversionMXTies()
-        a.testConversionMXInstrument()
-
+        t = Test()
+        #t.testConversionMXLayout()
+        #t.testConversionMXTies()
+        #t.testConversionMXInstrument()
+        t.testConversMXRepeats()

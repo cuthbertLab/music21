@@ -1349,6 +1349,9 @@ class Stream(music21.Music21Object):
         >>> found.__class__.__name__
         'Score'
         '''
+        # TODO: could add `domain` parameter to allow searching only _elements, 
+        # or _elementsHighestTime, or both; possible performance hit
+
         if returnStreamSubClass:
             found = self.__class__()
         else:
@@ -3744,12 +3747,16 @@ class Stream(music21.Music21Object):
         sNew = copy.copy(self)
         #sNew = self.__class__()
 
+        # experimental: seems that storing .elements in here necessitates
+        # create a new, independent cache instance in the flat representation
+        sNew._cache = common.defHash()
+
         sNew._elements = []
+        sNew._elementsHighestTime = []
         sNew._elementsChanged()
 
         #environLocal.printDebug(['_getFlatOrSemiFlat(), sNew id', id(sNew)])
-        # Note: for e in self.elements creates a new Stream
-        for e in self.elements:
+        for e in self._elements:
             # check for stream instance instead
             # if this element is a stream
             if hasattr(e, "elements"): # recurse time:
@@ -3772,6 +3779,10 @@ class Stream(music21.Music21Object):
             else:
                 # insert into new stream at offset in old stream
                 sNew.insert(e.getOffsetBySite(self), e)
+
+        # highest time elements should never be Streams
+        for e in self._elementsHighestTime:
+            sNew.insertAtHighestTime(e)
 
         sNew.isFlat = True
         # here, we store the source stream from which thiss stream was derived
@@ -5912,9 +5923,14 @@ class Measure(Stream):
         '''
         >>> a = Measure()
         '''
-        barList = self.getElementsByClass(bar.Barline)
-        # only return Barlines with offset = 0.0
-        barList = barList.getElementsByOffset(0)
+        barList = []
+        # directly access _elements, as do not want to get any bars
+        # in _elementsHighestTime
+        for e in self._elements:
+            if 'Barline' in e.classes: # take the first
+                if e.getOffsetBySite(self) == 0.0:
+                    barList.append(e)
+                    break
         if len(barList) == 0:
             return None
         else:
@@ -5938,43 +5954,39 @@ class Measure(Stream):
 
 
     def _getRightBarline(self):
-        '''
-        >>> a = Measure()
-        '''
-        barList = self.getElementsByClass(bar.Barline)
+        # look on _elementsHighestTime
+        barList = []
+        for e in self._elementsHighestTime:
+            if 'Barline' in e.classes: # take the first
+                barList.append(e)
+                break
+        #barList = self.getElementsByClass(bar.Barline)
         if len(barList) == 0: # do this before searching for barQL
-            return None
-
-        try:
-            barQL = self.barDuration.quarterLength # access once
-        except StreamException: # if cannot get, use hightest time
-            barQL = self.highestTime
-
-        barList = barList.getElementsByOffset(barQL)
-        if len(barList) == 0:
             return None
         else:
             return barList[0]    
     
     def _setRightBarline(self, barlineObj):
-        '''
-        >>> a = Measure()
-        '''
         oldRightBarline = self._getRightBarline()
-        try:
-            barQL = self.barDuration.quarterLength # access once
-        except StreamException: # if cannot get, use hightest time
-            barQL = self.highestTime
+
         barlineObj.location = 'right'
 
         if oldRightBarline is not None:
             junk = self.pop(self.index(oldRightBarline))
-        # insert at bar duration
+        # insert into _elementsHighestTime
+        self.insertAtHighestTime(barlineObj)
         
-        self.insert(barQL, barlineObj)
+        #environLocal.printDebug(['post _setRightBarline', barlineObj, 'len of elements highest', len(self._elementsHighestTime)])
 
     rightBarline = property(_getRightBarline, _setRightBarline, 
         doc = '''Get or set the right barline, or the Barline object found at the offset equal to the bar duration. 
+
+        >>> from music21 import *
+        >>> b = bar.Barline('light-heavy')
+        >>> m = stream.Measure()
+        >>> m.rightBarline = b
+        >>> m.rightBarline.style
+        'light-heavy'
         ''')   
 
 
@@ -8987,41 +8999,50 @@ class Test(unittest.TestCase):
 
         from music21 import meter
         
-        m = Measure()
-        m.timeSignature = meter.TimeSignature('3/4')
-        self.assertEqual(len(m), 1)
-
+        m1 = Measure()
+        m1.timeSignature = meter.TimeSignature('3/4')
+        self.assertEqual(len(m1), 1)
 
         b1 = bar.Barline('heavy')
         # this adds to elements list
-        m.leftBarline = b1
-        self.assertEqual(len(m), 2)
-        self.assertEqual(m[1], b1) # this is on elements
+        m1.leftBarline = b1
+        self.assertEqual(len(m1), 2)
+        self.assertEqual(m1[1], b1) # this is on elements
+        self.assertEqual(m1.rightBarline, None) # this is on elements
 
         b2 = bar.Barline('heavy')
-        self.assertEqual(m.barDuration.quarterLength, 3.0)
-        m.rightBarline = b2
+        self.assertEqual(m1.barDuration.quarterLength, 3.0)
+        m1.rightBarline = b2
 
 
         # now have barline, ts, and barline
-        self.assertEqual(len(m), 3)
+        self.assertEqual(len(m1), 3)
         b3 = bar.Barline('double')
         b4 = bar.Barline('heavy')
 
-        m.leftBarline = b3
+        m1.leftBarline = b3
         # length should be the same, as we replaced
-        self.assertEqual(len(m), 3)
-        self.assertEqual(m.leftBarline, b3)
+        self.assertEqual(len(m1), 3)
+        self.assertEqual(m1.leftBarline, b3)
 
-        m.rightBarline = b4
-        self.assertEqual(len(m), 3)
-        self.assertEqual(m.rightBarline, b4)
+        m1.rightBarline = b4
+        self.assertEqual(len(m1), 3)
+        self.assertEqual(m1.rightBarline, b4)
 
         p = Part()
-        p.append(copy.deepcopy(m))
-        p.append(copy.deepcopy(m))
+        p.append(copy.deepcopy(m1))
+        p.append(copy.deepcopy(m1))
 
         #p.show()
+
+        # add right barline first, w/o a time signature
+        m2 = Measure()
+        self.assertEqual(len(m2), 0)
+        m2.rightBarline = b4
+        self.assertEqual(len(m2), 1)
+        self.assertEqual(m2.leftBarline, None) # this is on elements
+        self.assertEqual(m2.rightBarline, b4) # this is on elements
+
 
 
     def testMeasureLayout(self):
@@ -10185,3 +10206,5 @@ if __name__ == "__main__":
         t.testElementsHighestTimeA()
         t.testElementsHighestTimeB()
         t.testElementsHighestTimeC()
+
+        t.testMeasureBarline()
