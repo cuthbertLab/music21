@@ -298,6 +298,8 @@ class Stream(music21.Music21Object):
         '''
         self.isSorted = False
         self.isFlat = True
+        # do not need to look in _elementsHighestTime, as no Streams
+        # should be found there (they have a Duration)
         for e in self._elements:
             # only need to find one case, and if so, no longer flat
             # fastest method here is isinstance()
@@ -315,7 +317,15 @@ class Stream(music21.Music21Object):
         # and self._elementsHighestTime
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
-        return self._elements + self._elementsHighestTime
+
+        if self._cache["elements"] == None:
+            # this list concatenation may take time; thus, only do when
+            # _elementsChanged has been called
+            self._cache["elements"] =  self._elements + self._elementsHighestTime
+
+        return self._cache["elements"]
+
+        #return self._elements + self._elementsHighestTime
    
     def _setElements(self, value):
         '''
@@ -512,6 +522,10 @@ class Stream(music21.Music21Object):
         for i in iMatch:
             # remove from stream with pop with index
             match.append(self._elements.pop(i))
+
+        if len(iMatch) > 0:
+            self._elementsChanged()
+
         # after removing, need to remove self from locations reference 
         # and from parent reference, if set; this is taken care of with the 
         # Music21Object method
@@ -813,9 +827,7 @@ class Stream(music21.Music21Object):
         '''
         Inserts an item or items at the end of the Stream, stored in the special _elementsHighestTime
 
-        If `ignoreSort` is True then the inserting does not
-        change whether the Stream is sorted or not (much faster if you're going to be inserting dozens
-        of items that don't change the sort status)
+        As sorting is only by priority and class, cannot avoid setting isSorted to False. 
         
         '''
         if isinstance(itemOrList, list):
@@ -845,19 +857,10 @@ class Stream(music21.Music21Object):
         element.parent = self 
         # element.addLocationAndParent(offset, self)
 
-        if ignoreSort is False:
-            if self.isSorted is True:
-                storeSorted = True
-            else:
-                storeSorted = False
-
         # could also do self.elements = self.elements + [element]
         #self._elements.append(element)  
         self._elementsHighestTime.append(element)  
         self._elementsChanged() 
-
-        if ignoreSort is False:
-            self.isSorted = storeSorted
 
 
     #---------------------------------------------------------------------------
@@ -1069,6 +1072,9 @@ class Stream(music21.Music21Object):
             # remove this location from old; this will also adjust the parent
             # assignment if necessary
             target.removeLocationBySite(self)
+
+        # elements have changed
+        self._elementsChanged()
 
         if allTargetSites:
             for site in target.getSites():
@@ -3617,10 +3623,16 @@ class Stream(music21.Music21Object):
         '''
         self._elements.sort(
             cmp=lambda x,y: cmp(
-                x.getOffsetBySite(self),y.getOffsetBySite(self)
-            ) or cmp(x.priority, y.priority) or 
-            cmp(x.classSortOrder, y.classSortOrder)
+                x.getOffsetBySite(self), y.getOffsetBySite(self)
+                ) or cmp(x.priority, y.priority) or 
+                cmp(x.classSortOrder, y.classSortOrder)
             )
+        self._elementsHighestTime.sort(
+            cmp=lambda x,y: cmp(x.priority, y.priority) or 
+                cmp(x.classSortOrder, y.classSortOrder)
+            )
+        # as sorting changes order, elements have changed 
+        self._elementsChanged()
         self.isSorted = True
 
 
@@ -10081,13 +10093,46 @@ class Test(unittest.TestCase):
         s.shiftElements(5)
         self.assertEqual([e.offset for e in s], [5.0, 35.0, 55.0])
 
-
         # got all
         found1 = s.extractContext(n2, 30)
         self.assertEqual([e.offset for e in found1], [5.0, 35.0, 55.0])
         # just after, none before
         found1 = s.extractContext(n2, 0, 30)
         self.assertEqual([e.offset for e in found1], [35.0, 55.0])
+
+
+
+    def testElementsHighestTimeC(self): 
+
+        n1 = note.Note()
+        n1.quarterLength = 30
+        
+        n2 = note.Note()
+        n2.quarterLength = 20
+        
+        ts1 = meter.TimeSignature('6/8')
+        b1 = bar.Barline()
+        c1 = clef.Treble8vaClef()
+        
+        s = Stream()
+        s.append(n1)
+        self.assertEqual([e.offset for e in s], [0.0])
+        
+        s.insertAtHighestTime(b1)
+        s.insertAtHighestTime(c1)
+        s.insertAtHighestTime(ts1)
+        self.assertEqual([e.offset for e in s], [0.0, 30.0, 30.0, 30.0] )
+        
+        s.append(n2)
+        self.assertEqual([e.offset for e in s], [0.0, 30.0, 50.0, 50.0, 50.0] )
+        # sorting of objects is by class
+        self.assertEqual([e.classes[0] for e in s], ['Note', 'Note', 'Treble8vaClef', 'TimeSignature', 'Barline']  )
+        
+        b2 = bar.Barline()
+        s.insertAtHighestTime(b2)
+        self.assertEqual([e.classes[0] for e in s], ['Note', 'Note', 'Treble8vaClef', 'TimeSignature', 'Barline', 'Barline'] )
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -10139,3 +10184,4 @@ if __name__ == "__main__":
         #t.testMeasureOffsetMapPostTie()
         t.testElementsHighestTimeA()
         t.testElementsHighestTimeB()
+        t.testElementsHighestTimeC()
