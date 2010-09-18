@@ -150,7 +150,7 @@ class Repeat(Barline):
 
         # must declare a direction
         # start is forward, end is backward in musicxml
-        self.direction = direction # start, end, or both
+        self.direction = direction # start, end, or bidirectional
         self.times = None  # if an end, how many repeats
 
 
@@ -171,6 +171,8 @@ class Repeat(Barline):
             mxRepeat.set('direction', 'forward')
         elif self.direction == 'end':
             mxRepeat.set('direction', 'backward')
+        elif self.direction == 'bidirectional':
+            environLocal.printDebug(['skipping bi-directional repeat'])
         else:
             raise BarException('cannot handle direction format:', self.direction)
 

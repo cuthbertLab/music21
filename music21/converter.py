@@ -1217,9 +1217,6 @@ class Test(unittest.TestCase):
         self.assertEqual(measures[1].leftBarline, None)
         self.assertEqual(measures[1].rightBarline.style, 'light-heavy')
 
-
-
-
         mxString = testPrimitive.repeatMultipleTimes45c
         s = parse(mxString)
 

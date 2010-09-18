@@ -3747,7 +3747,7 @@ class Stream(music21.Music21Object):
         sNew = copy.copy(self)
         #sNew = self.__class__()
 
-        # experimental: seems that storing .elements in here necessitates
+        # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
         sNew._cache = common.defHash()
 

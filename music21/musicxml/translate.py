@@ -923,23 +923,6 @@ def mxToStreamPart(mxScore, partId, inputM21):
                 mOffsetShift = lastTimeSignature.barDuration.quarterLength 
         oMeasure += mOffsetShift
 
-    # see if the first measure is a pickup
-    # this may raise an exception if no time signature can be found
-#     try:
-#         firstBarDuration = streamPart.getElementsByClass('Measure')[0].barDuration
-#     # may not be able to get TimeSignature; if so pass
-#     except stream.StreamException:
-#         firstBarDuration = None
-#         environLocal.printDebug(['cannot get bar duration for incompletely filled first bar, likely do to a missing TimeSignature', streamPart, streamPart.getElementsByClass('Measure')[0]])
-#         #streamPart.show('t')
-# 
-#     # cannot get bar duration proportion if cannot get a ts
-#     if firstBarDuration != None: 
-#         if streamPart.getElementsByClass('Measure')[0].barDurationProportion(
-#             barDuration=firstBarDuration) < 1.0:
-#             #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis', streamPart, streamPart.getElementsByClass('Measure')[0]])
-#             streamPart.getElementsByClass('Measure')[0].padAsAnacrusis()
-
     streamPart.addGroupForElements(partId) # set group for components 
     streamPart.groups.append(partId) # set group for stream itself
 
@@ -950,7 +933,7 @@ def mxToStreamPart(mxScore, partId, inputM21):
 
 
 def mxToStream(mxScore, inputM21):
-    '''Given an mxScore, build into this stream
+    '''Given an mxScore, build into this stream.
     '''
 
     from music21 import metadata
@@ -982,6 +965,9 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
+        pass
+
+    def testBarRepeatConversion(self):
         pass
 
 

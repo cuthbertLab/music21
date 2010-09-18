@@ -20,6 +20,139 @@ environLocal = environment.Environment(_MOD)
 
 
 
+
+
+
+def abcToStreamPart(abcHandler, inputM21=None):
+    '''Handler conversion of a single Part of a multi-part score. Results are built into the provided inputM21 object or a newly created Stream.
+    '''
+    from music21 import metadata
+    from music21 import stream
+    from music21 import note
+    from music21 import meter
+    from music21 import key
+    from music21 import chord
+
+    if inputM21 == None:
+        s = stream.Score()
+    else:
+        s = inputM21
+
+    p = stream.Part()
+
+    # first, split into a list of Measures; if there is only metadata and 
+    # one measure, that means that no measures are defined
+    barHandlers = abcHandler.splitByMeasure()
+
+    # merge leading meta data with each bar that preceedes it
+    mergedHandlers = abcModule.mergeLeadingMetaData(barHandlers)
+
+    # if only one merged handler, do not create measures
+    if len(mergedHandlers) <= 1: 
+        useMeasures = False 
+    else:
+        useMeasures = True
+
+    # each unit in merged handlers defines possible a Measure (w/ or w/o metadata), trailing meta data, or a single collection of metadata and note data
+
+    barCount = 0
+    # merged handler are ABCHandlerBar objects, defining attributes for barlines
+    for mh in mergedHandlers:
+        # if use measures and the handler has notes; otherwise add to part
+        if useMeasures and mh.hasNotes():
+            dst = stream.Measure()
+
+            # bar tokens are already extracted form token list and are available
+            # as attributes on the handler object
+            # may return None for a regular barline
+            if mh.leftBarToken != None:
+                bLeft = mh.leftBarToken.getBarObject()
+                if bLeft != None:
+                    dst.leftBarline = bLeft
+            if mh.rightBarToken != None:
+                bRight = mh.rightBarToken.getBarObject()
+                if bRight != None:
+                    dst.rightBarline = bRight
+
+            barCount += 1
+
+        else:
+            dst = p # store directly in a part instance
+
+        #environLocal.printDebug([mh, 'dst', dst])
+        #ql = 0 # might not be zero if there is a pickup
+        for t in mh.tokens:    
+            if isinstance(t, abcModule.ABCMetadata):
+                if t.isMeter():
+                    ts = t.getTimeSignatureObject()
+                    if ts != None: # can be None
+                    # should append at the right position
+                        if useMeasures: # assume at start of measures
+                            dst.timeSignature = ts
+                        else:
+                            dst.append(ts)
+                elif t.isKey():
+                    ks = t.getKeySignatureObject()
+                    if useMeasures:  # assume at start of measures
+                        dst.keySignature = ks
+                    else:
+                        dst.append(ks)
+    
+            # as ABCChord is subclass of ABCNote, handle first
+            elif isinstance(t, abcModule.ABCChord):
+                # may have more than notes?
+                pitchNameList = []
+                accStatusList = [] # accidental display status list
+                for tSub in t.subTokens:
+                    # notes are contained as subtokens are already parsed
+                    if isinstance(tSub, abcModule.ABCNote):
+                        pitchNameList.append(tSub.pitchName)
+                        accStatusList.append(tSub.accidentalDisplayStatus)
+                c = chord.Chord(pitchNameList)
+                c.quarterLength = t.quarterLength
+                # adjust accidental display for each contained pitch
+                for pIndex in range(len(c.pitches)):
+                    if c.pitches[pIndex].accidental == None:
+                        continue
+                    c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
+                dst.append(c)
+
+                #ql += t.quarterLength
+    
+            elif isinstance(t, abcModule.ABCNote):
+                if t.isRest:
+                    n = note.Rest()
+                else:
+                    n = note.Note(t.pitchName)
+                    if n.accidental != None:
+                        n.accidental.displayStatus = t.accidentalDisplayStatus
+
+                n.quarterLength = t.quarterLength
+                dst.append(n)
+
+        # append measure to part; in the case of trailing meta data
+        # dst may be part, even though useMeasures is True
+        if useMeasures and 'Measure' in dst.classes: 
+            # check for incomplete bars
+            if barCount == 1: # easy case
+                # can only do this b/c ts is defined
+                if dst.barDurationProportion() < 1.0:
+                    dst.padAsAnacrusis()
+                    environLocal.printDebug(['incompletely filled Measure found on abc import; interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
+
+            # clefs are not typically defined; need to call bestClef
+            # can get clef from some voices definition
+            dst.clef = dst.bestClef()
+            p.append(dst)
+
+    if useMeasures:
+        # call make beams for now; later, import beams
+        p.makeBeams()
+
+    s.insert(0, p)
+    return s
+
+
 def abcToStream(abcHandler, inputM21=None):
     '''Given an abcHandler object, build into a multi-part :class:`~music21.stream.Score` with metadata
     
@@ -43,6 +176,23 @@ def abcToStream(abcHandler, inputM21=None):
     md = metadata.Metadata()
     s.insert(0, md)
 
+    # get title from large-scale metadata
+    match = []
+    for t in abcHandler.tokens:    
+        if isinstance(t, abcModule.ABCMetadata):
+            if t.isTitle():
+                md.title = t.data
+                match.append('title')
+                environLocal.printDebug(['got metadata title', md.title])
+            elif t.isComposer():
+                md.composer = t.data
+                match.append('composer')
+        # look for opportunity to break as soon as data is filled
+        if len(match) == 2:
+            match.sort()
+            if match == ['composer', 'title']:
+                break
+
     partHandlers = []
     tokenCollections = abcHandler.splitByVoice()
     if len(tokenCollections) == 1:
@@ -58,105 +208,7 @@ def abcToStream(abcHandler, inputM21=None):
     # token list
 
     for partHandler in partHandlers:
-        p = stream.Part()
-
-        # first, split into a list of Measures; if there is only metadata and 
-        # one measure, that means that no measures are defined
-        barHandlers = partHandler.splitByMeasure()
-
-        # merge leading meta data; 
-        mergedHandlers = abcModule.mergeLeadingMetaData(barHandlers)
-
-        # if only one merged handler, do not create measures
-        if len(mergedHandlers) <= 1: 
-            useMeasures = False 
-        else:
-            useMeasures = True
-
-        # each unit in merged handlers defines possible a Measure (w/ or w/o metadata), trailing meta data, or a single collection of metadata and note data
-
-        barCount = 0
-        for mh in mergedHandlers:
-            # if use measures and the handler has notes; otherwise add to part
-            if useMeasures and mh.hasNotes():
-                dst = stream.Measure()
-                barCount += 1
-                # TODO: can add bar lines here, based on attributes of mh
-                # mh is an ABCBar handler
-            else:
-                dst = p # store directly in a part instance
-
-            #environLocal.printDebug([mh, 'dst', dst])
-            #ql = 0 # might not be zero if there is a pickup
-            for t in mh.tokens:    
-                if isinstance(t, abcModule.ABCMetadata):
-                    if t.isTitle():
-                        md.title = t.data
-                        environLocal.printDebug(['got metadata title', md.title])
-                    elif t.isComposer():
-                        md.composer = t.data
-                    elif t.isMeter():
-                        ts = t.getTimeSignatureObject()
-                        if ts != None: # can be None
-                        # should append at the right position
-                            if useMeasures: # assume at start of measures
-                                dst.timeSignature = ts
-                            else:
-                                dst.append(ts)
-                    elif t.isKey():
-                        ks = t.getKeySignatureObject()
-                        if useMeasures:  # assume at start of measures
-                            dst.keySignature = ks
-                        else:
-                            dst.append(ks)
-        
-                # as ABCChord is subclass of ABCNote, handle first
-                elif isinstance(t, abcModule.ABCChord):
-                    # may have more than notes?
-                    pitchNameList = []
-                    for tSub in t.subTokens:
-                        # notes are contained as subtokens are already parsed
-                        if isinstance(tSub, abcModule.ABCNote):
-                            pitchNameList.append(tSub.pitchName)
-                    c = chord.Chord(pitchNameList)
-                    #TODO: need to adjust accidental display within 
-                    # the chord; need parallel approach to notes
-                    c.quarterLength = t.quarterLength
-                    dst.append(c)
-    
-                    #ql += t.quarterLength
-        
-                elif isinstance(t, abcModule.ABCNote):
-                    if t.isRest:
-                        n = note.Rest()
-                    else:
-                        n = note.Note(t.pitchName)
-                        if n.accidental != None:
-                            n.accidental.displayStatus = t.accidentalDisplayStatus
-    
-                    n.quarterLength = t.quarterLength
-                    dst.append(n)
-
-            # append measure to part; in the case of trailing meta data
-            # dst may be part, even though useMeasures is True
-            if useMeasures and 'Measure' in dst.classes: 
-                # check for incomplete bars
-                if barCount == 1: # easy case
-                    # can only do this b/c ts is defined
-                    if dst.barDurationProportion() < 1.0:
-                        dst.padAsAnacrusis()
-                        environLocal.printDebug(['incompletely filled Measure found on abc import; interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
-
-                # clefs are not typically defined; need to call bestClef
-                # can get clef from some voices definition
-                dst.clef = dst.bestClef()
-                p.append(dst)
-
-        if useMeasures:
-            # call make beams for now; later, import beams
-            p.makeBeams()
-    
-        s.insert(0, p)
+        abcToStreamPart(partHandler, s)
 
     return s
 
@@ -183,11 +235,12 @@ class Test(unittest.TestCase):
 #            testFiles.kitchGirl,
             #testFiles.morrisonsJig,
 #            testFiles.hectorTheHero,
-#            testFiles.aleIsDear,
 #             testFiles.williamAndNancy,
 #            testFiles.theAleWifesDaughter,
 #            testFiles.theBeggerBoy,
 #            testFiles.theAleWifesDaughter,
+#            testFiles.draughtOfAle,
+
 #            testFiles.testPrimitiveTuplet,
 #            testFiles.testPrimitivePolyphonic,
 

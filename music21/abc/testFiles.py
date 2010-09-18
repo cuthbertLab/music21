@@ -329,6 +329,23 @@ e|B>EE>E B>EG>e|B>EE>E B2G>B |A>FF>F A>FG>B|A>FF>F B2GF|
   d>fc>e d>fc>e|d>fc>e d>ec>d|e>fg>f e2e  |]
 """
 
+# http://abcnotation.com/tunePage?a=www.oldmusicproject.com/AA2ABC/0701-1200/Abc-0901-1000/0912-Draught/0000
+# has a secondary pickup bar mid-tune
+draughtOfAle = """X:0912
+T:"A Draught of Ale"    (jig)     0912
+C:after  Sg't. J. O'Neill
+B:O'Neill's Music Of Ireland (The 1850) Lyon & Healy, Chicago, 1903 edition
+Z:FROM O'NEILL'S TO NOTEWORTHY, FROM NOTEWORTHY TO ABC, MIDI AND .TXT BY VINCE BRENNAN June 2003 (HTTP://WWW.SOSYOURMOM.COM)
+I:abc2nwc
+M:6/8
+L:1/8
+K:G
+D|GBA G2A|Bdg Bdg|GBA G2B|AFD AFD|
+GBA G2A|Bdg Bdg|ecA dBG|cAF G2:|
+|:d|egf g2f|ege dBG|GFG dBG|BAA A2d|
+egf g2f|ege dBG|GFG dBG|cAF G2:|
+"""
+
 #-------------------------------------------------------------------------------
 # raw data for direct translation tests
 
@@ -380,6 +397,7 @@ ALL  = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
         williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies, 
         sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
 
+        draughtOfAle,
         testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
     ]
 

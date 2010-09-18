@@ -38,17 +38,17 @@ environLocal = environment.Environment(_MOD)
 
 # store symbol and m21 naming/class eq
 ABC_BARS = [
-           ('|]', 'thin-thick double bar line'),
-           ('||', 'thin-thin double bar line'),
-           ('[|', 'thick-thin double bar line'),
-           ('[1', 'first repeat'),
-           ('[2', 'second repeat'),
-           (':|', 'left repeat'),
-           ('|:', 'right repeat'),
-           ('::', 'left-right repeat'),
+           ('|]', 'light-heavy'),
+           ('||', 'light-light'),
+           ('[|', 'heavy-light'),
+           ('[1', 'regular-first'),
+           ('[2', 'regular-second'),
+           (':|', 'light-heavy-repeat-end'),
+           ('|:', 'heavy-light-repeat-start'),
+           ('::', 'heavy-heavy-repeat-bidirectional'),
             # for comparison, single chars must go last
-           ('|', 'bar line'),
-           (':', 'dotted bar line'),
+           ('|', 'regular'),
+           (':', 'dotted'),
            ]
 
 #-------------------------------------------------------------------------------
@@ -177,7 +177,6 @@ class ABCMetadata(ABCToken):
         '''
         returns True if the tag is "M" for meter, False otherwise.
         '''
-
         if self.tag == 'M': 
             return True
         return False
@@ -447,10 +446,95 @@ class ABCBar(ABCToken):
     # may be a chord, notes, metadata, bars
     def __init__(self, src):
         ABCToken.__init__(self, src)
-        self.barType = None
+        self.barType = None # repeat or barline
+        self.barStyle = None # regular, heavy-light, etc
+        self.repeatForm = None # end, start, bidrectional, first, second
 
     def __repr__(self):
         return '<ABCBar %r>' % self.src
+
+    def parse(self): 
+        '''        
+        Assign the bar-type based on the source string.
+
+        >>> from music21 import *
+
+        >>> ab = abc.ABCBar('|')
+        >>> ab.parse()
+        >>> ab.barType
+        'barline'
+        >>> ab.barStyle
+        'regular'
+
+        >>> ab = abc.ABCBar('||')
+        >>> ab.parse()
+        >>> ab.barType
+        'barline'
+        >>> ab.barStyle
+        'light-light'
+
+        >>> ab = abc.ABCBar('|:')
+        >>> ab.parse()
+        >>> ab.barType
+        'repeat'
+        >>> ab.barStyle
+        'heavy-light'
+        >>> ab.repeatForm
+        'start'
+        '''
+        for abcStr, barTypeString in ABC_BARS:
+            if abcStr == self.src.strip():
+                barTypeComponents = barTypeString.split('-')
+                if 'repeat' in barTypeComponents:
+                    self.barType = 'repeat'
+                else:
+                    self.barType = 'barline'
+
+                # case of regular, dotted
+                if len(barTypeComponents) == 1:
+                    self.barStyle = barTypeComponents[0]
+
+                # case of light-heavy, light-light, etc
+                elif len(barTypeComponents) >= 2:
+                    # must get out cases of the start-tags for repeat boundaries
+                    # not yet handling
+                    if 'first' in barTypeComponents:
+                        self.barStyle = 'regular'
+                        self.repeatForm = 'first' # not a repeat
+                    elif 'second' in barTypeComponents:
+                        self.barStyle = 'regular'
+                        self.repeatForm = 'second' # not a repeat
+                    else:
+                        self.barStyle = '%s-%s' % (barTypeComponents[0],
+                                               barTypeComponents[1])
+                # get extra repeat information; start, end, first, second
+                if len(barTypeComponents) > 2:
+                    self.repeatForm = barTypeComponents[3]
+
+    def isRepeat(self):
+        if self.barType == 'repeat':
+            return True
+        else:
+            return False
+
+    def getBarObject(self):
+        '''Return a music21 bar object
+
+        >>> from music21 import *
+        >>> ab = abc.ABCBar('|:')
+        >>> ab.parse()
+        >>> post = ab.getBarObject()
+        '''
+        from music21 import bar
+        if self.isRepeat():
+            post = bar.Repeat(self.barStyle, direction=self.repeatForm)
+                
+        elif self.barStyle == 'regular':
+            post = None # do not need an object for regular
+
+        else:
+            post = bar.Barline(self.barStyle)
+        return post
 
 
 class ABCTuplet(ABCToken):
@@ -876,8 +960,8 @@ class ABCNote(ABCToken):
         return ql
 
 
-    def parse(self, forceKey=None, forceDefaultQuarterLength=None, 
-            forceKeySignature=None):
+    def parse(self, forceDefaultQuarterLength=None, 
+                    forceKeySignature=None):
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)        
         # get pitch name form remaining string
         # rests will have a pitch name of None
@@ -915,7 +999,7 @@ class ABCChord(ABCNote):
         return '<ABCChord %r>' % self.src
 
 
-    def parse(self, forceKey=None, forceDefaultQuarterLength=None):
+    def parse(self, forceKeySignature=None, forceDefaultQuarterLength=None):
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src) 
 
         tokenStr = nonChordSymStr[1:-1] # remove outer brackets
@@ -923,6 +1007,11 @@ class ABCChord(ABCNote):
 
         self.quarterLength = self._getQuarterLength(nonChordSymStr, 
             forceDefaultQuarterLength=forceDefaultQuarterLength)
+
+        if forceKeySignature != None:
+            activeKeySignature = forceKeySignature
+        else: # may be None
+            activeKeySignature = self.activeKeySignature
 
         # create a handler for processing internal chord notes
         ah = ABCHandler()
@@ -932,13 +1021,14 @@ class ABCChord(ABCNote):
         ah.tokenize(tokenStr)
 
         chordDurationPost = None
+        # tokens contained here are each ABCNote instances
         for t in ah.tokens:
             #environLocal.printDebug(['ABCChord: subTokens', t])
             # parse any tokens individually, supply local data as necesssary
             if isinstance(t, ABCNote):
                 t.parse(
                     forceDefaultQuarterLength=self.activeDefaultQuarterLength,
-                    forceKeySignature=self.activeKeySignature)
+                    forceKeySignature=activeKeySignature)
                 # get the quarter length from the sub-tokens
                 # note: assuming these are the same
                 chordDurationPost = t.quarterLength
@@ -1282,7 +1372,6 @@ class ABCHandler(object):
                     raise ABCHandlerException('no active default note length provided for note processing. tPrev: %s, t: %s, tNext: %s' % (tPrev, t, tNext))
                 t.activeDefaultQuarterLength = lastDefaultQL
                 t.activeKeySignature = lastKeySignature
-                t.activeKeySignature = lastKeySignature
 
                 if lastTupletToken == None:
                     pass
@@ -1293,7 +1382,7 @@ class ABCHandler(object):
                     # add a reference to the note
                     t.activeTuplet = lastTupletToken.tupletObj
 
-        # parse : call methods to set attributes and parse string
+        # parse : call methods to set attributes and parse abc string
         for t in self._tokens:
             t.parse()
 
@@ -1305,6 +1394,9 @@ class ABCHandler(object):
         self.tokenProcess()
         # return list of tokens; stored internally
 
+    #---------------------------------------------------------------------------
+    # access tokens
+
     def _getTokens(self):
         if self._tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
@@ -1314,7 +1406,6 @@ class ABCHandler(object):
         '''Assign tokens to this Handler
         '''
         self._tokens = tokens
-
 
     tokens = property(_getTokens, _setTokens,
         doc = '''Get or set tokens for this Handler
@@ -1352,8 +1443,6 @@ class ABCHandler(object):
 
     #---------------------------------------------------------------------------
     # utility methods for post processing
-
-
 
     def splitByNumber(self):
         '''Split tokens by tune numbers.
@@ -1572,7 +1661,7 @@ class ABCHandlerBar(ABCHandler):
 
 
 def mergeLeadingMetaData(barHandlers):
-    '''Given a list of ABCHandlerBar, ruturn a list of ABCHandlerBar objects, where leading metadata is merged, if possible, with the bar data preceding. This is often needed for processing
+    '''Given a list of ABCHandlerBar, ruturn a list of ABCHandlerBar objects, where leading metadata is merged, if possible, with the bar data preceding. This is often needed for processing measures. 
     '''
     mCount = 0
     metadataPos = [] # store indices of handlers that are all metadata
