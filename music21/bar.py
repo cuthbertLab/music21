@@ -17,7 +17,6 @@ import unittest, doctest
 
 import music21
 from music21 import musicxml
-from music21 import node # for exception matching
 
 from music21 import environment
 _MOD = 'bar.py'
@@ -212,14 +211,11 @@ class Repeat(Barline):
 
         mxDirection = mxRepeat.get('direction')
 
-        # TODO: not sure why some repeat objects are not able to get
-        # the times attribute; all mxRepeat objects should have a times
-        try:
-            if mxRepeat.get('times') != None:
-                # make into a number
-                self.times = int(mxRepeat.get('times'))
-        except node.NodeException:
-            environLocal.printDebug(['Repeat object that, when trying to read musicxml input, fails to find a times attribute on mxReleat:', mxRepeat])
+        #environLocal.printDebug(['mxRepeat', mxRepeat, mxRepeat._attr])
+
+        if mxRepeat.get('times') != None:
+            # make into a number
+            self.times = int(mxRepeat.get('times'))
 
         if mxDirection.lower() == 'forward':
             self.direction = 'start'

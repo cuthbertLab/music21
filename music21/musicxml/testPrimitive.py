@@ -10783,7 +10783,7 @@ simpleRepeat45a = """<?xml version="1.0" encoding="UTF-8"?>
       </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>
-        <repeat direction="backward" times="5"/>
+        <repeat direction="backward" />
       </barline>
     </measure>
     <!--=======================================================-->

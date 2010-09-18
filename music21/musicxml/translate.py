@@ -54,6 +54,7 @@ def tieToMx(t):
     mxTie.set('type', musicxmlTieType) # start, stop
     mxTieList.append(mxTie) # goes on mxNote.tieList
 
+
     if t.type == 'continue':
         mxTie = musicxmlMod.Tie()
         mxTie.set('type', 'start')
@@ -354,8 +355,6 @@ def measureToMx(m):
 
     # see if we have barlines
     if m.leftBarline != None:
-        environLocal.printDebug(['measureToMx(), m.leftBarline', m.leftBarline])
-
         mxBarline = m.leftBarline.mx # this may be a repeat object
         # setting location outside of object based on that this attribute
         # is the leftBarline
@@ -405,6 +404,9 @@ def mxToMeasure(mxMeasure, inputM21):
         m = stream.Measure()
     else:
         m = inputM21
+
+    #print mxMeasure
+    #print
 
     mNum, mSuffix = common.getNumFromStr(mxMeasure.get('number'))
     # assume that measure numbers are integers
@@ -470,11 +472,10 @@ def mxToMeasure(mxMeasure, inputM21):
 
         elif isinstance(mxObj, musicxmlMod.Barline):
             # repeat is a tag found in the barline object
-            #environLocal.printDebug(['found mx barline object', offsetMeasureNote, i, mxObj])
-
             mxBarline = mxObj
-            if mxBarline.get('repeatObj') != None:
-                #environLocal.printDebug(['found mxBarline', mxBarline])
+            mxRepeatObj = mxBarline.get('repeatObj')
+
+            if mxRepeatObj != None:
                 barline = bar.Repeat()
             else:
                 barline = bar.Barline()
@@ -801,7 +802,7 @@ def streamToMx(s):
                 inst.midiChannelAutoAssign(usedChannels=midiChannelList)
             midiChannelList.append(inst.midiChannel)
 
-            environLocal.printDebug(['midiChannel list', midiChannelList])
+            #environLocal.printDebug(['midiChannel list', midiChannelList])
 
             # add to list for checking on next round
             instList.append(inst)
@@ -968,7 +969,20 @@ class Test(unittest.TestCase):
         pass
 
     def testBarRepeatConversion(self):
-        pass
+
+        from music21 import converter, corpus, bar
+        from music21.musicxml import testPrimitive
+        
+
+        #a = converter.parse(testPrimitive.simpleRepeat45a)
+        # this is a good example with repeats
+        s = corpus.parseWork('k80/movement3')
+        for p in s.parts:
+            post = p.flat.getElementsByClass('Repeat')
+            self.assertEqual(len(post), 6)
+
+        #a = corpus.parseWork('opus41no1/movement3')
+        #s.show()
 
 
 if __name__ == "__main__":
@@ -977,5 +991,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
-        a = Test()
+        t = Test()
+        t.testBarRepeatConversion()
 

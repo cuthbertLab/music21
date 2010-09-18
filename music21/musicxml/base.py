@@ -40,7 +40,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 2, 3) 
+VERSION_MINIMUM = (0, 2, 6) 
 
 
 #-------------------------------------------------------------------------------
@@ -1383,8 +1383,8 @@ class Repeat(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'repeat'
         # attributes
-        self._attr['direction'] = None # backward or forward
         self._attr['times'] = None # can be start or end
+        self._attr['direction'] = None # backward or forward
 
 
 class Note(MusicXMLElement):
@@ -3753,6 +3753,31 @@ class Test(unittest.TestCase):
         self._compareXml(mxScore2, mxScore1XMLStr)
 
 
+    def testBarlineRepeat(self):
+        from music21 import corpus
+        fp = corpus.getWork('opus18no1/movement3', extList=['.xml'])
+        d = Document()
+        d.open(fp)
+        self.assertEqual(d.score != None, True)
+
+        mxScore = d.score
+        mxParts = mxScore.componentList
+        p1 = mxParts[0]      
+        measures = p1.componentList  
+        for m in measures:
+            for c in m.componentList:
+                if isinstance(c, Barline):
+                    if c.repeatObj != None:
+                        self.assertEqual('times' in c.repeatObj._attr.keys(), True)
+                        self.assertEqual(c.repeatObj.get('direction'), 'backward')
+                        self.assertEqual(c.repeatObj.get('times'), None)
+                        #print c.repeatObj.direction
+
+
+        s = corpus.parseWork('opus18no1/movement3', extList=['.xml'])
+
+
+
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     # this is a temporary hack to get encoding working right
@@ -3766,11 +3791,17 @@ if __name__ == "__main__":
 
 
     elif len(sys.argv) == 2:
-        t = TestExternal()
-        if os.path.isdir(sys.argv[1]): 
-            t.testInputDirectory(sys.argv[1])
-        else: # assume it is a single file
-            t.testOpen(sys.argv[1])
+        #te = TestExternal()
+        t = Test()
+        t.testBarlineRepeat()
+
+#         if os.path.isdir(sys.argv[1]): 
+#             pass
+#             #te.testInputDirectory(sys.argv[1])
+#         else: # assume it is a single file
+#             #te.testOpen(sys.argv[1])
+
+
 
 
 
