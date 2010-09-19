@@ -39,6 +39,8 @@ from music21.corpus.beethoven import opus59no1
 from music21.corpus.beethoven import opus59no2
 from music21.corpus.beethoven import opus59no3
 
+from music21.corpus import essenFolksong
+
 from music21.corpus import ciconia
 
 from music21.corpus import haydn
@@ -69,6 +71,8 @@ MODULES = [
             opus59no3,
 
             ciconia,
+
+            essenFolksong,
 
             haydn,
             opus74no1,
