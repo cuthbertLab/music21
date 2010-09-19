@@ -1462,7 +1462,11 @@ class ABCHandler(object):
         >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> ah = abc.ABCHandler()
         >>> junk = ah.process(abcStr)
-
+        >>> len(ah)
+        14
+        >>> ahDict = ah.splitByReferenceNumber()
+        >>> len(ahDict[5].tokens)
+        14
         '''
         if self._tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
@@ -1485,7 +1489,8 @@ class ABCHandler(object):
 
         # collect start and end pairs of split
         pairs = []
-        pairs.append([0, pos[0]])
+        if pos[0] != 0: # if not first
+            pairs.append([0, pos[0]])
         i = pos[0]
         for x in range(1, len(pos)):
             j = pos[x]
@@ -1493,18 +1498,22 @@ class ABCHandler(object):
             i = j
         pairs.append([i, len(self)]) # add last
 
-        environLocal.printDebug(['pairs:', pairs])
+        #environLocal.printDebug(['pairs:', pairs, 'keys', keys])
+        if len(keys) != len(pairs):
+            raise ABCHandlerException('cannot match pairs to keys: %s, %s' % (pairs, keys))
         # case of one reference number: 
         if len(pairs) == 1: # one tune defined
             ah = ABCHandler()
             ah.tokens = self._tokens[pairs[0][0]:pairs[0][1]]
             return {keys[0]: ah}
 
-        post = []
-        for x, y in pairs:
+        post = {}
+        for i in range(len(pairs)):
+            x, y = pairs[i]
             ah = ABCHandler()
             ah.tokens = self._tokens[x:y]
-            post.append(ah)
+            post[keys[i]] = ah
+        return post
 
 
     def definesMeasures(self):
@@ -2065,6 +2074,52 @@ class Test(unittest.TestCase):
         self.assertEqual(mergedHandlers[0].hasNotes(), True)
 
 
+    def testSplitByReferenceNumber(self):
+        from music21.abc import testFiles
+
+        # a case of leading and trailing meta data
+        ah = ABCHandler()
+        ah.process(testFiles.theBeggerBoy)
+        ahs = ah.splitByReferenceNumber()
+        self.assertEqual(len(ahs), 1)
+        self.assertEqual(ahs.keys(), [5])
+        self.assertEqual(len(ahs[5]), 88) # tokens
+        self.assertEqual(ahs[5].tokens[0].src, 'X:5') # first is retained
+        self.assertEqual(ahs[5].getTitle(), 'The Begger Boy') # tokens
+
+
+        ah = ABCHandler()
+        ah.process(testFiles.testPrimitivePolyphonic) # has no reference num
+        self.assertEqual(len(ah), 47) # tokens
+
+        ahs = ah.splitByReferenceNumber()
+        self.assertEqual(len(ahs), 1)
+        self.assertEqual(ahs.keys(), [None])
+        self.assertEqual(ahs[None].tokens[0].src, 'M:6/8') # first is retained
+        self.assertEqual(len(ahs[None]), 47) # tokens
+
+
+        ah = ABCHandler()
+        ah.process(testFiles.valentineJigg) # has no reference num
+        self.assertEqual(len(ah), 244) # tital tokens
+
+        ahs = ah.splitByReferenceNumber()
+        self.assertEqual(len(ahs), 3)
+        self.assertEqual(ahs.keys(), [168, 166, 167])
+
+        self.assertEqual(ahs[168].tokens[0].src, 'X:168') # first is retained
+        self.assertEqual(ahs[168].getTitle(), '168  The Castle Gate   (HJ)')
+        self.assertEqual(len(ahs[168]), 89) # tokens
+
+        self.assertEqual(ahs[166].tokens[0].src, 'X:166') # first is retained
+        self.assertEqual(ahs[166].getTitle(), '166  Valentine Jigg   (Pe)')
+        self.assertEqual(len(ahs[166]), 67) # tokens
+
+        self.assertEqual(ahs[167].tokens[0].src, 'X:167') # first is retained
+        self.assertEqual(ahs[167].getTitle(), '167  The Dublin Jig     (HJ)')
+        self.assertEqual(len(ahs[167]), 88) # tokens
+
+
 if __name__ == "__main__":
     import sys
 
@@ -2074,8 +2129,8 @@ if __name__ == "__main__":
         t = Test()
 
         #t.testNoteParse()
-        t.testSplitByMeasure()
-        t.testMergeLeadingMetaData()
+        #t.testSplitByMeasure()
+        t.testSplitByReferenceNumber()
 
 
 

@@ -346,6 +346,44 @@ GBA G2A|Bdg Bdg|ecA dBG|cAF G2:|
 egf g2f|ege dBG|GFG dBG|cAF G2:|
 """
 
+# has three tunes
+# http://www.andyhornby.net/Music/slip%20jigs.abc
+valentineJigg = """
+X:166
+T:166  Valentine Jigg   (Pe)
+M: 9/8
+L: 1/8
+S: original in 6/8 major reconstruction -AH
+K:D
+A3 F2A c2d | efe d2c BAG|A3 F2A c2d| A2a g>fg a3 :|
+|: a2e c2e gag |e2c d2f efe |d3 G2B cdc |ABc dcB A3:|
+%%vskip 1.5cm
+
+X:167
+T:167  The Dublin Jig     (HJ)
+A:Wyresdale, Lancashire
+B:H.S.J. Jackson, 1823
+L:1/8
+M:9/8
+K:A
+f|ecA ABA agf | ecA FBA GFE |ecA Ace agf | ecA FBG A2  :|
+|:c|BGE EGB dcB | cAc ece aec |BGE EGB dcB | cde dcB A2  :|
+%%vskip 1.5cm
+
+X:168
+T:168  The Castle Gate   (HJ)
+A:Wyresdale, Lancashire
+B:H.S.J. Jackson, 1823
+L:1/8
+S: original in E
+M:9/8
+K:A
+E | Ace Ace Ace | Ace BcA GFE | Ace Ace Ace | cag fe^d e2 :|
+|:e | fga def Bcd | FGA BcA GFE | FAd GBe Ace | fdB BAG A2 :|
+%%vskip 1.5cm
+"""
+
+
 #-------------------------------------------------------------------------------
 # raw data for direct translation tests
 
@@ -398,6 +436,7 @@ ALL  = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
         sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
 
         draughtOfAle,
+        valentineJigg,
         testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
     ]
 
