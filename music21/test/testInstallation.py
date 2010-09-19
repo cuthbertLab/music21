@@ -15,20 +15,24 @@ import sys, os
 import tarfile
 import distutils.sysconfig
 
-# define on or more directories to try to use as a scratch directory for download
-
+# define on or more directories to try to use as a scratch directory for download; the first valid match will be used.
 SCRATCH = ['~/_download', '/_scratch']
+
+# set a download path if downloading source
 M21_SOURCE = 'http://music21.googlecode.com/files/music21-0.2.5a4.tar.gz'
+# if true, a new installer will always be downloaded. otherwise, if an appropriately named path exists on the local machine, downloading will be skipped
 FORCE_DOWNLOAD = False
+# if true, and an extracted installer is already present, use the extracted file rather than re-extracting
 FORCE_EXTRACT = False
 
+# can set the python to be used
 PY_BIN = ['python']
 
 
 # to run on a local svn check out, first build a source distribution
 # python setup.py sdist
 # then pass path to source distribution to test routine
-# python music21/test/testInstallation.py ~/music21/dist/music21-0.2.5a4.tar.gz
+# python music21/test/testInstallation.py ~/music21/dist/music21-0.2.6a4.tar.gz
 
 
 #-------------------------------------------------------------------------------
@@ -43,6 +47,8 @@ class InstallRunner:
 
 
     def _findScratch(self):
+        '''Find a scratch directory on this machine. This is not the music21 scratch directory, but a download or similar directory to store or copy installation packages that are being tested. Everything added into this directory will be deleted in cleaning. 
+        '''
         for fp in SCRATCH:
             fp = os.path.expanduser(fp) # support ~
             if os.path.exists(fp) and os.path.isdir(fp):
@@ -50,6 +56,8 @@ class InstallRunner:
         raise Exception('cannot find a valid scratch path')
 
     def download(self):
+        '''Optionally download the installation package from on-line. This is not usually run, as a local build (int0 dist) is always going to be more up to date. Instead, pass a file path to an installer package, use as an arg to run.
+        '''
         pass
 
     def copyToScratch(self, fp):
@@ -98,7 +106,9 @@ class InstallRunner:
     def run(self, fpDistribution=None):
         '''Run the installer, test, and clean.
 
-        If  fpDistribution is not None, the specified distribution will be used.
+        If `fpDistribution` is not None, the specified distribution will be used. Thus, a built distribution on a local machine can be pass by file path.
+
+        The run does three things: install the source, run all tests, and tehn remove the installation. 
         '''
         if fpDistribution == None:
             fpSource = self.download()
@@ -131,6 +141,10 @@ class InstallRunnerNix(InstallRunner):
         return dst
 
     def copyToScratch(self, fp):
+        '''Copy a file to a scratch directory.
+
+        This is used to store the downloaded or passed distribution file. 
+        '''
         junk, fn = os.path.split(fp)
         dst = os.path.join(self._fpScratch, fn)
         cmd = 'cp %s %s' % (fp, dst)
@@ -139,6 +153,8 @@ class InstallRunnerNix(InstallRunner):
         return dst
 
     def install(self, fp, pyBin):
+        '''Decompress, then install into site packages using setup.py install.
+        '''
         # first, decompress
         print('extracting: %s' % fp)
         fpExtracted = self._extractTar(fp)
@@ -157,11 +173,17 @@ class InstallRunnerNix(InstallRunner):
 
 
     def test(self, pyBin):
+        '''Run the main music21 test script.
+
+        This assumes that the only music21 files foudn in the search pat are those that are contained in site-packages. If there is another music21 installation that is also in a search path on this machine, it is possible that those files, not the ones just installed, are being tested.
+        '''
         testScript = os.path.join(self._getSitePackageDir(), 'test', 'test.py')
         cmd = '%s %s' % (pyBin, testScript)
         os.system(cmd)
 
     def clean(self):
+        '''Remove all files created in this installation. 
+        '''
         for fp in self._toClean:
             print('cleaning: %s' % fp)
             cmd = 'sudo rm -R %s' % fp
