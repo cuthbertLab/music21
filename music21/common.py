@@ -912,7 +912,8 @@ def getPackageData():
     '''Return a list of package data in the format specified by setup.py. This creates a very inclusive list of all data types. 
     '''
     # include these extensions for all directories, even if they are not normally there.
-    ext = ['txt', 'xml', 'krn', 'mxl', 'html', 'png', 'css', 'js', 'pdf']
+    ext = ['txt', 'xml', 'krn', 'mxl', 'html', 'png', 
+           'css', 'js', 'pdf', 'xls', 'mid']
 
     # need all dirs, not just packages, and relative to music21
     fpList = getPackageDir(fpMusic21=None, relative=True, remapSep=None,

@@ -87,7 +87,7 @@ def writeManifestTemplate(fpPackageDir):
     dst = os.path.join(fpPackageDir, 'MANIFEST.in')
     msg = []
     
-    msg.append('global-include *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png\n')
+    msg.append('global-include *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png *.xls *.mid\n')
     # order matters: remove dist and buildDoc directories after global include
     msg.append('prune dist\n')
     msg.append('prune buildDoc\n')
