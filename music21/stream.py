@@ -2500,6 +2500,9 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # transformations of self that return a new Stream
+    def sliceToMinimumDuration(self):
+        # assuming a flat stream with many parts, reduce all to the GCD.
+        pass
 
     def chordify(self, minimumWindowSize=.25, includePostWindow=True,
             gatherArticulations=True, gatherNotations=True, collect=[meter.TimeSignature, key.KeySignature], inPlace=False):
@@ -2518,6 +2521,13 @@ class Stream(music21.Music21Object):
         The resulting Stream, if not in-place, can also gather additional objects by placing class names in the `collect` list. By default, TimeSignature and KeySignature objects are collected. 
         
         '''
+        #TODO: add removeRedundantPitches as a default
+        # Chord.removeRedunantPitches and Chord.removeRedundantPitchClasses
+        # gather lyrics as an option
+        # remove redunancies for gathered items
+        # test with
+        # Schumann string quartet movement or the Luca Gloria 
+
         if not inPlace: # make a copy
             returnObj = self.__class__() # for output
         else:

@@ -166,48 +166,57 @@ class ABCMetadata(ABCToken):
         pass
 
     def isDefaultNoteLength(self):
-        '''
-        returns True if the tag is "L", False otherwise.
+        '''Returns True if the tag is "L", False otherwise.
         '''
         if self.tag == 'L': 
             return True
         return False
 
-    def isMeter(self):
+    def isReferenceNumber(self):
+        '''Returns True if the tag is "X", False otherwise.
+
+        >>> from music21 import *
+        >>> x = abc.ABCMetadata('X:5')
+        >>> x.preParse()
+        >>> x.tag
+        'X'
+        >>> x.isReferenceNumber()
+        True
         '''
-        returns True if the tag is "M" for meter, False otherwise.
+        if self.tag == 'X': 
+            return True
+        return False
+
+    def isMeter(self):
+        '''Returns True if the tag is "M" for meter, False otherwise.
         '''
         if self.tag == 'M': 
             return True
         return False
 
     def isTitle(self):
-        '''
-        returns True if the tag is "T" for title, False otherwise.
+        '''Returns True if the tag is "T" for title, False otherwise.
         '''
         if self.tag == 'T': 
             return True
         return False
 
     def isComposer(self):
-        '''
-        returns True if the tag is "C" for composer, False otherwise.
+        '''Returns True if the tag is "C" for composer, False otherwise.
         '''
         if self.tag == 'C': 
             return True
         return False
 
     def isVoice(self):
-        '''
-        returns True if the tag is "V", False otherwise.
+        '''Returns True if the tag is "V", False otherwise.
         '''
         if self.tag == 'V': 
             return True
         return False
 
     def isKey(self):
-        '''
-        returns True if the tag is "K", False otherwise.
+        '''Returns True if the tag is "K", False otherwise.
         '''
         if self.tag == 'K': 
             return True
@@ -1444,10 +1453,59 @@ class ABCHandler(object):
     #---------------------------------------------------------------------------
     # utility methods for post processing
 
-    def splitByNumber(self):
-        '''Split tokens by tune numbers.
+    def splitByReferenceNumber(self):
+        '''Split tokens by reference numbers.
+
+        Returns a dictionary of ABCHandler instances, where the reference number is used to access the music. If no reference numbers are defined, the tune is available under the dictionary entry None. 
+
+        >>> from music21 import *
+        >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
+        >>> ah = abc.ABCHandler()
+        >>> junk = ah.process(abcStr)
+
         '''
-        pass
+        if self._tokens == []:
+            raise ABCHandlerException('must process tokens before calling split')
+
+        pos = []
+        keys = []
+        for i in range(len(self._tokens)):
+            t = self._tokens[i]
+            if isinstance(t, ABCMetadata):
+                if t.isReferenceNumber():
+                    pos.append(i) # store position 
+                    # always a number? not sure
+                    keys.append(int(t.data))
+
+        # case of no definitions; return immediately
+        if len(pos) == 0: 
+            ah = ABCHandler()
+            ah.tokens = self._tokens
+            return {None: ah}
+
+        # collect start and end pairs of split
+        pairs = []
+        pairs.append([0, pos[0]])
+        i = pos[0]
+        for x in range(1, len(pos)):
+            j = pos[x]
+            pairs.append([i, j])
+            i = j
+        pairs.append([i, len(self)]) # add last
+
+        environLocal.printDebug(['pairs:', pairs])
+        # case of one reference number: 
+        if len(pairs) == 1: # one tune defined
+            ah = ABCHandler()
+            ah.tokens = self._tokens[pairs[0][0]:pairs[0][1]]
+            return {keys[0]: ah}
+
+        post = []
+        for x, y in pairs:
+            ah = ABCHandler()
+            ah.tokens = self._tokens[x:y]
+            post.append(ah)
+
 
     def definesMeasures(self):
         '''Return True if this token structure defines Measures
@@ -1519,8 +1577,6 @@ class ABCHandler(object):
                         pos.append(i) # store position 
                         voiceCount += 1
 
-
-
         post = []
         # no voices, or definition of one voice, or use of V: field for 
         # something else
@@ -1554,10 +1610,11 @@ class ABCHandler(object):
         '''Divide a token list by Measures, also defining start and end bars. 
 
         If a component does not have notes, leave as an empty bar. This is often done with leading metadata.
+
+        Returns a lost of ABCHandlerBar instances.
         '''
         if self._tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
-
 
         barCount = 0
         noteCount = 0
@@ -1582,7 +1639,6 @@ class ABCHandler(object):
             i = j
         # add last
         pairs.append([i, len(self)])
-
 
         post = []
         for x, y in pairs:

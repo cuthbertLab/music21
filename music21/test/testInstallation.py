@@ -29,7 +29,8 @@ FORCE_EXTRACT = False
 PY_BIN = ['python']
 
 
-# to run on a local svn check out, first build a source distribution
+# to run on a local svn check out, and assuming that checkout is in ~/music21, 
+# first build a source distribution
 # python setup.py sdist
 # then pass path to source distribution to test routine
 # python music21/test/testInstallation.py ~/music21/dist/music21-0.2.6a4.tar.gz
