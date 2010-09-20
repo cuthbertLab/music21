@@ -74,7 +74,7 @@ class StreamIterator():
             del self.srcStream
             raise StopIteration
         # here, the .elements property concatenates both ._elements and 
-        # ._elementsHighestTime; this may be a performance detriment
+        # ._endElements; this may be a performance detriment
         post = self.srcStream.elements[self.index]
         # here, the parent of extracted element is being set to Stream
         # that is the source of the iteration
@@ -130,9 +130,9 @@ class Stream(music21.Music21Object):
         # self._elements stores ElementWrapper and Music21Object objects. 
         self._elements = [] 
 
-        # self._elementsHighestTime stores ElementWrapper and Music21Object found at
+        # self._endElements stores ElementWrapper and Music21Object found at
         # the highestTime of this Stream. 
-        self._elementsHighestTime = [] 
+        self._endElements = [] 
 
         self._unlinkedDuration = None
 
@@ -182,7 +182,7 @@ class Stream(music21.Music21Object):
         >>> len(b.flat)
         16
         '''
-        return len(self._elements) + len(self._elementsHighestTime)
+        return len(self._elements) + len(self._endElements)
 
     def __iter__(self):
         '''
@@ -298,7 +298,7 @@ class Stream(music21.Music21Object):
         '''
         self.isSorted = False
         self.isFlat = True
-        # do not need to look in _elementsHighestTime, as no Streams
+        # do not need to look in _endElements, as no Streams
         # should be found there (they have a Duration)
         for e in self._elements:
             # only need to find one case, and if so, no longer flat
@@ -314,18 +314,18 @@ class Stream(music21.Music21Object):
 
     def _getElements(self):
         # this method is now important, in that it combines self._elements
-        # and self._elementsHighestTime
+        # and self._endElements
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
         if self._cache["elements"] == None:
             # this list concatenation may take time; thus, only do when
             # _elementsChanged has been called
-            self._cache["elements"] =  self._elements + self._elementsHighestTime
+            self._cache["elements"] =  self._elements + self._endElements
 
         return self._cache["elements"]
 
-        #return self._elements + self._elementsHighestTime
+        #return self._elements + self._endElements
    
     def _setElements(self, value):
         '''
@@ -547,8 +547,8 @@ class Stream(music21.Music21Object):
         # if less then base length, its in _elements
         if index < eLen:
             post = self._elements.pop(index)
-        else: # its in the _elementsHighestTime 
-            post = self._elementsHighestTime.pop(index - eLen)
+        else: # its in the _endElements 
+            post = self._endElements.pop(index - eLen)
 
         self._elementsChanged()
         # remove self from locations here only if
@@ -592,14 +592,14 @@ class Stream(music21.Music21Object):
                     new.insert(e.getOffsetBySite(old), newElement, 
                                ignoreSort=True)
 
-            elif name == '_elementsHighestTime':
+            elif name == '_endElements':
                 # must manually add elements to 
-                for e in self._elementsHighestTime: 
+                for e in self._endElements: 
                     # this will work for all with __deepcopy___
                     newElement = copy.deepcopy(e, memo)
                     # get the old offset from the parent Stream     
                     # user here to provide new offset
-                    new.insertAtHighestTime(newElement, ignoreSort=True)
+                    new.storeAtEnd(newElement, ignoreSort=True)
                 
             elif isinstance(part, Stream):
                 environLocal.printDebug(['found stream in dict keys', self,
@@ -823,9 +823,9 @@ class Stream(music21.Music21Object):
 
 
 
-    def insertAtHighestTime(self, itemOrList, ignoreSort=False):
+    def storeAtEnd(self, itemOrList, ignoreSort=False):
         '''
-        Inserts an item or items at the end of the Stream, stored in the special _elementsHighestTime
+        Inserts an item or items at the end of the Stream, stored in the special _endElements
 
         As sorting is only by priority and class, cannot avoid setting isSorted to False. 
         
@@ -834,7 +834,7 @@ class Stream(music21.Music21Object):
             i = 0
             for item in itemOrList:
                 # recursively calling insert() here
-                self.insertAtHighestTime(item, ignoreSort=ignoreSort)
+                self.storeAtEnd(item, ignoreSort=ignoreSort)
             return
         else:
             item = itemOrList
@@ -859,7 +859,7 @@ class Stream(music21.Music21Object):
 
         # could also do self.elements = self.elements + [element]
         #self._elements.append(element)  
-        self._elementsHighestTime.append(element)  
+        self._endElements.append(element)  
         self._elementsChanged() 
 
 
@@ -1062,7 +1062,7 @@ class Stream(music21.Music21Object):
                 # place the replacement at the old objects offset for this site
                 replacement.addLocation(self, target.getOffsetBySite(self))
             else:
-                self._elementsHighestTime[i - eLen] = replacement
+                self._endElements[i - eLen] = replacement
                 replacement.addLocation(self, 'highestTime')
 
             # NOTE: an alternative way to do this would be to look at all the 
@@ -1350,7 +1350,7 @@ class Stream(music21.Music21Object):
         'Score'
         '''
         # TODO: could add `domain` parameter to allow searching only _elements, 
-        # or _elementsHighestTime, or both; possible performance hit
+        # or _endElements, or both; possible performance hit
 
         if returnStreamSubClass:
             found = self.__class__()
@@ -1364,7 +1364,7 @@ class Stream(music21.Music21Object):
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
-        # need both _elements and _elementsHighestTime
+        # need both _elements and _endElements
         for e in self._elements:
             eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
@@ -1380,18 +1380,18 @@ class Stream(music21.Music21Object):
                     found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
                     break # match first class and break to next e
 
-        for e in self._elementsHighestTime:
+        for e in self._endElements:
             eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
                 # new method uses string matching of .classes attribute
                 # temporarily check to see if this is a string
                 if isinstance(className, str):
                     if className in eClasses:
-                        found.insertAtHighestTime(e, ignoreSort=True)
+                        found.storeAtEnd(e, ignoreSort=True)
                         break # match first class and break to next e
                 # old method uses isClass matching
                 elif e.isClass(className):
-                    found.insertAtHighestTime(e, ignoreSort=True)
+                    found.storeAtEnd(e, ignoreSort=True)
                     break # match first class and break to next e
 
         # if this stream was sorted, the resultant stream is sorted
@@ -1439,7 +1439,7 @@ class Stream(music21.Music21Object):
 
         # appendedAlready fixes bug where if an element matches two 
         # classes it was appendedTwice
-        # need both _elements and _elementsHighestTime
+        # need both _elements and _endElements
         for e in self._elements:
             for className in classFilterList:
                 if e.isClass(className):
@@ -1447,12 +1447,12 @@ class Stream(music21.Music21Object):
                 # only insert after all no match to all classes   
                 found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
 
-        for e in self._elementsHighestTime:
+        for e in self._endElements:
             for className in classFilterList:
                 if e.isClass(className):
                     break # if a match to any of the classes, break
                 # only insert after all no match to all classes   
-                found.insertAtHighestTime(e, ignoreSort=True)
+                found.storeAtEnd(e, ignoreSort=True)
 
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
@@ -1492,7 +1492,7 @@ class Stream(music21.Music21Object):
             groupFilterList = [groupFilterList]
 
         returnStream = self.__class__()
-        # need both _elements and _elementsHighestTime
+        # need both _elements and _endElements
         # must handle independently b/c inserting
         for e in self._elements:
             for g in groupFilterList:
@@ -1500,10 +1500,10 @@ class Stream(music21.Music21Object):
                     returnStream.insert(e.getOffsetBySite(self),
                                         e, ignoreSort = True)
 
-        for e in self._elementsHighestTime:
+        for e in self._endElements:
             for g in groupFilterList:
                 if hasattr(e, "groups") and g in e.groups:
-                    returnStream.insertAtHighestTime(e, ignoreSort=True)
+                    returnStream.storeAtEnd(e, ignoreSort=True)
 
 
                     #returnStream.append(myEl)
@@ -1530,7 +1530,7 @@ class Stream(music21.Music21Object):
         # this is similar to what getElementsByGroup does
 
         post = {}
-        # need both _elements and _elementsHighestTime
+        # need both _elements and _endElements
         for element in self.elements:
             for groupName in element.groups:
                 if groupName not in post.keys():
@@ -1564,7 +1564,7 @@ class Stream(music21.Music21Object):
         '''
         post = None
 
-        # need both _elements and _elementsHighestTime
+        # need both _elements and _endElements
         for e in self.elements:
             # must compare id(), not elements directly
             # TODO: need to test with ElementWrapper
@@ -1686,7 +1686,7 @@ class Stream(music21.Music21Object):
         found = self.__class__()
 
 
-        # need both _elements and _elementsHighestTime
+        # need both _elements and _endElements
         for e in self.elements:
             match = False
             # better to specify site of offset source
@@ -1768,7 +1768,7 @@ class Stream(music21.Music21Object):
         '''
         candidates = []
         nearestTrailSpan = offset # start with max time
-        # need both _elements and _elementsHighestTime
+        # need both _elements and _endElements
         for e in self.elements:
             eClasses = e.classes # store once, as this is property call
             if classList != None:
@@ -2337,7 +2337,7 @@ class Stream(music21.Music21Object):
     # offset manipulation
 
     def shiftElements(self, offset, classFilterList=None):
-        '''Add offset value to every offset of contained Elements. Elements that are stored on the _elementsHighestTime list will not be changed
+        '''Add offset value to every offset of contained Elements. Elements that are stored on the _endElements list will not be changed
 
         >>> a = Stream()
         >>> a.repeatInsert(note.Note("C"), range(0,10))
@@ -2348,7 +2348,7 @@ class Stream(music21.Music21Object):
         >>> a.lowestOffset
         20.0
         '''
-        # only want _elements, do not want _elementsHighestTime
+        # only want _elements, do not want _endElements
         for e in self._elements:
             match = False
             if classFilterList != None:
@@ -2484,16 +2484,16 @@ class Stream(music21.Music21Object):
         if found is None:
             raise StreamException("Could not find the element in the stream")
 
-        # handle _elements and _elementsHighestTime independently
+        # handle _elements and _endElements independently
         for e in self._elements:
             o = e.getOffsetBySite(self)
             if (o >= foundOffset - before and o < foundEnd + after):
                 display.insert(o, e)
 
-        for e in self._elementsHighestTime:
+        for e in self._endElements:
             o = e.getOffsetBySite(self)
             if (o >= foundOffset - before and o < foundEnd + after):
-                display.insertAtHighestTime(e)
+                display.storeAtEnd(e)
 
         return display
 
@@ -2635,11 +2635,11 @@ class Stream(music21.Music21Object):
             else:
                 b.insert(e)
 
-        for e in found._elementsHighestTime:
+        for e in found._endElements:
             if fx(e):
-                a.insertAtHighestTime(e)
+                a.storeAtEnd(e)
             else:
-                b.insertAtHighestTime(e)
+                b.storeAtEnd(e)
 
         return a, b
             
@@ -3640,7 +3640,7 @@ class Stream(music21.Music21Object):
                 ) or cmp(x.priority, y.priority) or 
                 cmp(x.classSortOrder, y.classSortOrder)
             )
-        self._elementsHighestTime.sort(
+        self._endElements.sort(
             cmp=lambda x,y: cmp(x.priority, y.priority) or 
                 cmp(x.classSortOrder, y.classSortOrder)
             )
@@ -3762,7 +3762,7 @@ class Stream(music21.Music21Object):
         sNew._cache = common.defHash()
 
         sNew._elements = []
-        sNew._elementsHighestTime = []
+        sNew._endElements = []
         sNew._elementsChanged()
 
         #environLocal.printDebug(['_getFlatOrSemiFlat(), sNew id', id(sNew)])
@@ -3791,8 +3791,8 @@ class Stream(music21.Music21Object):
                 sNew.insert(e.getOffsetBySite(self), e)
 
         # highest time elements should never be Streams
-        for e in self._elementsHighestTime:
-            sNew.insertAtHighestTime(e)
+        for e in self._endElements:
+            sNew.storeAtEnd(e)
 
         sNew.isFlat = True
         # here, we store the source stream from which thiss stream was derived
@@ -5935,7 +5935,7 @@ class Measure(Stream):
         '''
         barList = []
         # directly access _elements, as do not want to get any bars
-        # in _elementsHighestTime
+        # in _endElements
         for e in self._elements:
             if 'Barline' in e.classes: # take the first
                 if e.getOffsetBySite(self) == 0.0:
@@ -5964,9 +5964,9 @@ class Measure(Stream):
 
 
     def _getRightBarline(self):
-        # look on _elementsHighestTime
+        # look on _endElements
         barList = []
-        for e in self._elementsHighestTime:
+        for e in self._endElements:
             if 'Barline' in e.classes: # take the first
                 barList.append(e)
                 break
@@ -5983,10 +5983,10 @@ class Measure(Stream):
 
         if oldRightBarline is not None:
             junk = self.pop(self.index(oldRightBarline))
-        # insert into _elementsHighestTime
-        self.insertAtHighestTime(barlineObj)
+        # insert into _endElements
+        self.storeAtEnd(barlineObj)
         
-        #environLocal.printDebug(['post _setRightBarline', barlineObj, 'len of elements highest', len(self._elementsHighestTime)])
+        #environLocal.printDebug(['post _setRightBarline', barlineObj, 'len of elements highest', len(self._endElements)])
 
     rightBarline = property(_getRightBarline, _setRightBarline, 
         doc = '''Get or set the right barline, or the Barline object found at the offset equal to the bar duration. 
@@ -10036,7 +10036,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s[0].parent, s)
 
         # insert bar in highest time position
-        s.insertAtHighestTime(b1)
+        s.storeAtEnd(b1)
         self.assertEqual(len(s), 2)
         self.assertEqual(s[1], b1)
         self.assertEqual(s.index(b1), 1)
@@ -10123,7 +10123,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in s], [0.0, 30])
 
         # add back again.
-        s.insertAtHighestTime(b1)
+        s.storeAtEnd(b1)
         self.assertEqual([e.offset for e in s], [0.0, 30, 50.0])
 
         # try to remove intermediary elements
@@ -10150,7 +10150,7 @@ class Test(unittest.TestCase):
         s = Stream()
         s.append(n1)
         s.append(n2)
-        s.insertAtHighestTime(b1)
+        s.storeAtEnd(b1)
         self.assertEqual([e.offset for e in s], [0.0, 30.0, 50.0])
 
         # can shift elements, altering all, but only really shifting 
@@ -10183,9 +10183,9 @@ class Test(unittest.TestCase):
         s.append(n1)
         self.assertEqual([e.offset for e in s], [0.0])
         
-        s.insertAtHighestTime(b1)
-        s.insertAtHighestTime(c1)
-        s.insertAtHighestTime(ts1)
+        s.storeAtEnd(b1)
+        s.storeAtEnd(c1)
+        s.storeAtEnd(ts1)
         self.assertEqual([e.offset for e in s], [0.0, 30.0, 30.0, 30.0] )
         
         s.append(n2)
@@ -10194,7 +10194,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.classes[0] for e in s], ['Note', 'Note', 'Treble8vaClef', 'TimeSignature', 'Barline']  )
         
         b2 = bar.Barline()
-        s.insertAtHighestTime(b2)
+        s.storeAtEnd(b2)
         self.assertEqual([e.classes[0] for e in s], ['Note', 'Note', 'Treble8vaClef', 'TimeSignature', 'Barline', 'Barline'] )
 
 
