@@ -1499,13 +1499,10 @@ class Stream(music21.Music21Object):
                 if hasattr(e, "groups") and g in e.groups:
                     returnStream.insert(e.getOffsetBySite(self),
                                         e, ignoreSort = True)
-
         for e in self._endElements:
             for g in groupFilterList:
                 if hasattr(e, "groups") and g in e.groups:
                     returnStream.storeAtEnd(e, ignoreSort=True)
-
-
                     #returnStream.append(myEl)
         returnStream.isSorted = self.isSorted
         return returnStream
