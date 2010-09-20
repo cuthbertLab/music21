@@ -15,7 +15,7 @@ ABC conversion from a file or URL to a :class:`~music21.stream.Stream` is availa
 >>> #_DOCS_SHOW from music21 import *
 >>> #_DOCS_SHOW abcScore = converter.parse('/users/ariza/myScore.abc')
 
-Low level ABC conversion is facilitated by the objects in this module and :func:`music21.abc.translate.abcToStream`.
+Low level ABC conversion is facilitated by the objects in this module and :func:`music21.abc.translate.abcToStreamScore`.
 '''
 
 import music21
@@ -1453,6 +1453,36 @@ class ABCHandler(object):
     #---------------------------------------------------------------------------
     # utility methods for post processing
 
+    def definesReferenceNumbers(self):
+        '''Return True if this token structure defines more than 1 reference number.
+
+        >>> from music21 import *
+        >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
+        >>> ah = abc.ABCHandler()
+        >>> junk = ah.process(abcStr)
+        >>> ah.definesReferenceNumbers() # only one returns false
+        False 
+
+        >>> from music21 import *
+        >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||\\nX:6\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
+        >>> ah = abc.ABCHandler()
+        >>> junk = ah.process(abcStr)
+        >>> ah.definesReferenceNumbers() # only one returns false
+        True 
+        '''
+        if self._tokens == []:
+            raise ABCHandlerException('must process tokens before calling split') 
+        count = 0
+        for i in range(len(self._tokens)):
+            t = self._tokens[i]
+            if isinstance(t, ABCMetadata):
+                if t.isReferenceNumber():
+                    count += 1
+                    if count > 1:
+                        return True
+        return False 
+
+
     def splitByReferenceNumber(self):
         '''Split tokens by reference numbers.
 
@@ -1514,6 +1544,26 @@ class ABCHandler(object):
             ah.tokens = self._tokens[x:y]
             post[keys[i]] = ah
         return post
+
+    def getReferenceNumber(self):
+        '''If tokens are processed, get the first reference number defined.
+
+        >>> from music21 import *
+        >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
+        >>> ah = abc.ABCHandler()
+        >>> junk = ah.process(abcStr)
+        >>> ah.getReferenceNumber()
+        '5'
+        '''
+        if self._tokens == []:
+            raise ABCHandlerException('must process tokens before calling split')
+        for t in self._tokens:
+            if isinstance(t, ABCMetadata):
+                if t.isReferenceNumber():
+                    return t.data
+        return None
+
+
 
 
     def definesMeasures(self):
@@ -1795,6 +1845,8 @@ class ABCFile(object):
         return self.readstr(self.file.read()) 
     
     def readstr(self, str): 
+        '''Read a string and process all Tokens. Returns a ABCHandler instance.
+        '''
         handler = ABCHandler()
         # return the handler instanc
         handler.process(str)

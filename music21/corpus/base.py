@@ -136,12 +136,18 @@ def getPaths(extList=None):
     >>> a = getPaths('krn')
     >>> len(a) >= 4
     True
+
+    >>> a = getPaths('abc')
+    >>> len(a) >= 10
+    True
+
     '''
     if not common.isListLike(extList):
         extList = [extList]
 
     if extList == [None]:
-        extList = (common.findInputExtension('lily') +
+        extList = (common.findInputExtension('abc') +
+                   common.findInputExtension('lily') +
                    common.findInputExtension('musicxml') +
                    common.findInputExtension('humdrum'))
     #environLocal.printDebug(['getting paths with extensions:', extList])
@@ -182,7 +188,8 @@ def getVirtualPaths(extList=None):
         extList = [extList]
 
     if extList == [None]:
-        extList = (common.findInputExtension('lily') +
+        extList = (common.findInputExtension('abc') +
+                   common.findInputExtension('lily') +
                    common.findInputExtension('musicxml') +
                    common.findInputExtension('humdrum'))
     paths = []
@@ -198,7 +205,7 @@ def getVirtualPaths(extList=None):
 
 
 def getComposer(composerName, extList=None):
-    '''Return all components of the corpus that match a composer's name. An `extList`, if provided, defines which extensions are returned. An `extList` of None returns all extensions. 
+    '''Return all components of the corpus that match a composer's or a collection's name. An `extList`, if provided, defines which extensions are returned. An `extList` of None returns all extensions. 
 
     >>> a = getComposer('beethoven')
     >>> len(a) > 10
@@ -340,7 +347,7 @@ def getVirtualWorkList(workName, movementNumber=None, extList=None):
 #-------------------------------------------------------------------------------
 # high level utilities that mix corpus and virtual corpus
 def getWorkReferences(sort=True):
-    '''Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a lost of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works. 
+    '''Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a list of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works. 
 
     >>> post = getWorkReferences()
     '''
@@ -641,7 +648,17 @@ class Test(unittest.TestCase):
             environLocal.printDebug([keyObj])
 
 
+    def testEssenImport(self):
 
+        # can get a single file just by file name        
+        fp = getWork('altdeu10')
+        self.assertEqual(fp.endswith('essenFolksong/altdeu10.abc'), True)
+
+        fpCollection = getComposer('essenFolksong')
+        self.assertEqual(len(fpCollection), 31)
+
+        fpCollection = getComposer('essenFolksong', ['abc'])
+        self.assertEqual(len(fpCollection), 31)
 
 
 #-------------------------------------------------------------------------------
@@ -650,9 +667,12 @@ _DOC_ORDER = [parseWork, getWork]
 
 
 if __name__ == "__main__":
-    #qj = parseWork('ciconia/quod_jactatur')
-    music21.mainTest(Test)
+    import sys
 
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
 
-
+    elif len(sys.argv) > 1:
+        t = Test()
+        t.testEssenImport()
 

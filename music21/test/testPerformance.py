@@ -148,9 +148,11 @@ class Test(unittest.TestCase):
         post = x.musicxml
 
 
+    #---------------------------------------------------------------------------
     def testTimingTolerance(self):
-        '''Test the performance of loading various files
-        This may not produce errors as such, but is used to provide reference
+        '''Test the performance of methods defined above, comparing the resulting time to the time obtained in past runs. 
+
+        This should not produce errors as such, but is used to provide reference
         if overall performance has changed.
         '''
         # provide work and expected min/max in seconds

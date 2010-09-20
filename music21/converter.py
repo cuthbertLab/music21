@@ -500,7 +500,7 @@ class ConverterABC(object):
         # do not need to call open or close on MidiFile instance
         abcHandler = af.readstr(strData)
         # set to stream
-        abcTranslate.abcToStream(abcHandler, self._stream)
+        abcTranslate.abcToStreamScore(abcHandler, self._stream)
 
     def parseFile(self, fp):
         '''Get MIDI data from a file path.'''
@@ -509,7 +509,7 @@ class ConverterABC(object):
         af.open(fp)
         abcHandler = af.read() # returns a handler instance
         af.close()
-        abcTranslate.abcToStream(abcHandler, self._stream)
+        abcTranslate.abcToStreamScore(abcHandler, self._stream)
 
     def _getStream(self):
         return self._stream

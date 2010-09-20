@@ -466,7 +466,7 @@ class Test(unittest.TestCase):
         for tf in ALL:
             ah = af.readstr(tf)
             environLocal.printDebug([ah.getTitle()])
-            s = translate.abcToStream(ah)
+            s = translate.abcToStreamScore(ah)
             # run musicxml processing to look for internal errors
             out = s.musicxml
 

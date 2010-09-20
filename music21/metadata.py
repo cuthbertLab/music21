@@ -1153,7 +1153,7 @@ class Metadata(music21.Music21Object):
         self._workIds['number'] = Text(value)
 
     number = property(_getNumber, _setNumber, 
-        doc = '''Get or set the number of the work. 
+        doc = '''Get or set the number of the work.  
         ''')
 
 

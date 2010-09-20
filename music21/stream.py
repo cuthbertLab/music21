@@ -6107,6 +6107,7 @@ class Page(Stream):
     '''
     pageNumber = 0
     
+
 class Score(Stream):
     """A Stream subclass for handling multi-part music.
     
@@ -6163,8 +6164,6 @@ class Score(Stream):
         >>> len(parts)
         4
         ''')
-
-
 
     def measures(self, numberStart, numberEnd, 
         collect=[clef.Clef, meter.TimeSignature, 
@@ -6238,6 +6237,41 @@ class Score(Stream):
                          retainContainers=True) 
         return returnObj
         
+
+
+
+
+class Opus(Stream):
+    """A Stream subclass for handling multi-work music.
+    """
+    def __init__(self, *args, **keywords):
+        Stream.__init__(self, *args, **keywords)
+
+    def getScoreByNumber(self, opusMatch):
+        '''Get Score objects from this Stream by number
+        '''
+        for s in self.getElementsByClass('Score'):
+            if s.metadata.number == opusMatch:
+                return s
+            elif s.metadata.number == str(opusMatch):
+                return s
+            
+
+
+    def _getScores(self):
+        '''        
+        '''
+        return self.getElementsByClass(Score)
+
+    scores = property(_getScores, 
+        doc='''Return all :class:`~music21.stream.Score` objects in a :class:`~music21.stream.Opus`.
+
+        >>> from music21 import *
+        ''')
+
+
+
+
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

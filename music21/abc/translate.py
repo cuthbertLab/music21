@@ -24,7 +24,7 @@ environLocal = environment.Environment(_MOD)
 
 
 def abcToStreamPart(abcHandler, inputM21=None):
-    '''Handler conversion of a single Part of a multi-part score. Results are built into the provided inputM21 object or a newly created Stream.
+    '''Handler conversion of a single Part of a multi-part score. Results, as a Part, are built into the provided inputM21 object (a Score or similar Stream) or a newly created Stream.
     '''
     from music21 import metadata
     from music21 import stream
@@ -134,7 +134,9 @@ def abcToStreamPart(abcHandler, inputM21=None):
         # dst may be part, even though useMeasures is True
         if useMeasures and 'Measure' in dst.classes: 
             # check for incomplete bars
-            if barCount == 1: # easy case
+            # must have a time signature in this bar, or defined recently
+            # could use getTimeSignatures() on Stream
+            if barCount == 1 and dst.timeSignature != None: # easy case
                 # can only do this b/c ts is defined
                 if dst.barDurationProportion() < 1.0:
                     dst.padAsAnacrusis()
@@ -145,7 +147,8 @@ def abcToStreamPart(abcHandler, inputM21=None):
             dst.clef = dst.bestClef()
             p.append(dst)
 
-    if useMeasures:
+    if useMeasures and len(p.getTimeSignatures(searchContext=False, 
+            returnDefault=False)) > 0:
         # call make beams for now; later, import beams
         p.makeBeams()
 
@@ -153,8 +156,10 @@ def abcToStreamPart(abcHandler, inputM21=None):
     return s
 
 
-def abcToStream(abcHandler, inputM21=None):
-    '''Given an abcHandler object, build into a multi-part :class:`~music21.stream.Score` with metadata
+def abcToStreamScore(abcHandler, inputM21=None):
+    '''Given an abcHandler object, build into a multi-part :class:`~music21.stream.Score` with metadata.
+
+    This assumes that this ABCHandler defines a single work (with 1 or fewer reference numbers). 
     
     if the optional parameter inputM21 is given a music21 Stream subclass, it will use that object
     as the outermost object.  However, inner parts will always be made :class:`~music21.stream.Part` objects.
@@ -187,10 +192,15 @@ def abcToStream(abcHandler, inputM21=None):
             elif t.isComposer():
                 md.composer = t.data
                 match.append('composer')
+            elif t.isReferenceNumber():
+                md.number = int(t.data) # convert to int?
+                match.append('number')
+                environLocal.printDebug(['got work number', md.number])
+
         # look for opportunity to break as soon as data is filled
-        if len(match) == 2:
+        if len(match) == 3:
             match.sort()
-            if match == ['composer', 'title']:
+            if match == ['composer', 'number', 'title',]:
                 break
 
     partHandlers = []
@@ -206,14 +216,34 @@ def abcToStream(abcHandler, inputM21=None):
     # find if this token list defines measures
     # this should probably operate at the level of tunes, not the entire
     # token list
-
     for partHandler in partHandlers:
         abcToStreamPart(partHandler, s)
-
     return s
 
 
 
+
+def abcToStreamOpus(abcHandler, inputM21=None):
+    '''Convert a multi-work stream into one or more complete works packed into a an Opus Stream. 
+    '''
+    from music21 import stream
+
+    if inputM21 == None:
+        s = stream.Opus()
+    else:
+        s = inputM21
+
+    # returns a dictionary of numerical key
+    if abcHandler.definesReferenceNumbers():
+        abcDict = abcHandler.splitByReferenceNumber()
+        for key in sorted(abcDict.keys()):
+            # do not need to set work number, as that will be gathered
+            # with meta data in abcToStreamScore
+            s.append(abcToStreamScore(abcDict[key]))
+
+    else: # just return a single Single in opus object
+        s.append(abcToStreamScore(abcHandler))
+    return s
 
 
 #-------------------------------------------------------------------------------
@@ -246,8 +276,8 @@ class Test(unittest.TestCase):
 
             ]:
             af = abc.ABCFile()
-            ah = af.readstr(tf) # return handler
-            s = abcToStream(ah)
+            ah = af.readstr(tf) # return handler, processes tokens
+            s = abcToStreamScore(ah)
             s.show()
             #s.show('midi')
 
@@ -268,7 +298,7 @@ class Test(unittest.TestCase):
 
             af = abc.ABCFile()
             ah = af.readstr(tf) # returns an ABCHandler object
-            s = abcToStream(ah)
+            s = abcToStreamScore(ah)
 
             self.assertEqual(s.metadata.title, titleEncoded)
 
@@ -280,7 +310,7 @@ class Test(unittest.TestCase):
 
         tf = testFiles.aleIsDear
         af = abc.ABCFile()
-        s = abcToStream(af.readstr(tf))
+        s = abcToStreamScore(af.readstr(tf))
 
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].flat.notes), 111)
@@ -311,7 +341,7 @@ class Test(unittest.TestCase):
         tf = testFiles.testPrimitivePolyphonic
 
         af = abc.ABCFile()
-        s = abcToStream(af.readstr(tf))
+        s = abcToStreamScore(af.readstr(tf))
 
         self.assertEqual(len(s.parts), 3)
         # must flatten b/c  there are measures
@@ -330,7 +360,7 @@ class Test(unittest.TestCase):
 
         tf = testFiles.testPrimitiveTuplet
         af = abc.ABCFile()
-        s = abcToStream(af.readstr(tf))
+        s = abcToStreamScore(af.readstr(tf))
         match = []
         # match strings for better comparison
         for n in s.flat.notes:
@@ -346,7 +376,7 @@ class Test(unittest.TestCase):
         # 2 quarter pickup in 3/4
         ah = abc.ABCHandler()
         ah.process(testFiles.hectorTheHero)
-        s = abcToStream(ah)
+        s = abcToStreamScore(ah)
         m1 = s.parts[0].getElementsByClass('Measure')[0]
 
         # ts is 3/4
@@ -363,7 +393,7 @@ class Test(unittest.TestCase):
         # two 16th pickup in 4/4
         ah = abc.ABCHandler()
         ah.process(testFiles.theAleWifesDaughter)
-        s = abcToStream(ah)
+        s = abcToStreamScore(ah)
         m1 = s.parts[0].getElementsByClass('Measure')[0]
 
         # ts is 3/4
@@ -377,6 +407,22 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.notes[1].beat, 4.75)
 
 
+    def testOpusImport(self):
+        from music21 import corpus
+        from music21 import abc
+
+        # replace w/ ballad80, smaller or erk5
+        fp = corpus.getWork('ballad60')
+        self.assertEqual(fp.endswith('essenFolksong/ballad60.abc'), True)
+
+        af = abc.ABCFile()
+        af.open(fp) # return handler, processes tokens
+        ah = af.read()
+        af.close() 
+
+        op = abcToStreamOpus(ah)
+        #op.scores[3].show()
+        self.assertEqual(len(op), 105)
 
     def testLyrics(self):
         # TODO
@@ -386,10 +432,9 @@ class Test(unittest.TestCase):
 
         tf = testFiles.sicutRosa
         af = abc.ABCFile()
-        s = abcToStream(af.readstr(tf))
+        s = abcToStreamScore(af.readstr(tf))
     
         #s.show()
-
 #         self.assertEqual(len(s.parts), 3)
 #         self.assertEqual(len(s.parts[0].notes), 6)
 #         self.assertEqual(len(s.parts[1].notes), 20)
@@ -410,5 +455,6 @@ if __name__ == "__main__":
         t = Test()
         #t.testBasic()
 
-        t.testAnacrusisPadding()
+        #t.testAnacrusisPadding()
 
+        t.testOpusImport()
