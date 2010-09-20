@@ -113,10 +113,8 @@ class Test(unittest.TestCase):
         '''
         x = corpus.parseWork('beethoven/opus59no2/movement3', forceSource=True)
         #problem: doing each part is much faster than the whole score
-        post = x.parts[0].musicxml
-        post = x.parts[1].musicxml
-        post = x.parts[2].musicxml
-        post = x.parts[3].musicxml
+        for p in x.parts:
+            post = p.musicxml
 
     def runMusicxmlOutScoreBeethoven(self):
         '''Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3

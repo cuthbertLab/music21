@@ -143,6 +143,29 @@ class TestMusicXMLOutput(CallTest):
         post = self.s.musicxml
 
 
+class TestMusicXMLOutputParts(CallTest):
+    '''This tries to isolate a problem whereby part creation is much faster than score creation. 
+    '''
+    def __init__(self):
+        self.s = corpus.parseWork('beethoven/opus59no2/movement3', forceSource=True)
+
+    def testFocus(self):
+        for p in self.s.parts:
+            post = p.musicxml
+
+
+class TestMusicXMLOutputScore(CallTest):
+    '''This tries to isolate a problem whereby part creation is much faster than score creation. 
+    '''
+    def __init__(self):
+        self.s = corpus.parseWork('beethoven/opus59no2/movement3', forceSource=True)
+
+    def testFocus(self):
+        post = self.s.musicxml
+
+
+
+
 
 #-------------------------------------------------------------------------------
 # handler
@@ -154,10 +177,12 @@ class CallGraph:
 
         # set class  to test here
         #self.callTest = TestMakeTies
-        self.callTest = TestMakeAccidentals
-
+        #self.callTest = TestMakeAccidentals
+        self.callTest = TestMusicXMLOutputParts
 
     def run(self):
+        '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
+        '''
         fp = environLocal.getTempFile('.png')
         gf = pycallgraph.GlobbingFilter(exclude=self.excludeList)
         # create instnace; will call setup routines
