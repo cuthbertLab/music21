@@ -34,6 +34,7 @@ from music21 import expressions
 from music21 import pitch
 from music21 import beam
 from music21 import meter
+from music21 import tie
 
 
 
@@ -42,77 +43,6 @@ _MOD = "note.py"
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
-class Tie(object):
-    '''Object added to notes that are tied to other notes. The `type` value is generally one of start or stop.
-
-    >>> from music21 import *
-    >>> note1 = note.Note()
-    >>> note1.tie = Tie("start")
-    >>> note1.tieStyle = "normal" # or could be dotted or dashed
-    >>> note1.tie.type
-    'start'
-
-    Differences from MusicXML:
-       notes do not need to know if they are tied from a
-       previous note.  i.e., you can tie n1 to n2 just with
-       a tie start on n1.  However, if you want proper musicXML output
-       you need a tie stop on n2
-       one tie with "continue" implies tied from and tied to
-
-       optional (to know what notes are next:)
-          .to = note()   # not implimented yet, b/c of garbage coll.
-          .from = note()
-
-    OMIT_FROM_DOCS
-    (question: should notes be able to be tied to multiple notes
-    for the case where a single note is tied both voices of a
-    two-note-head unison?)
-    '''
-
-    def __init__(self, tievalue = 'start'):
-        #music21.Music21Object.__init__(self)
-        self.type = tievalue
-
-    # investigate using weak-refs for .to and .from
-
-    def _getMX(self):
-        '''Return a MusicXML object representation. 
-        '''
-        return musicxmlTranslate.tieToMx(self)
-
-    def _setMX(self, mxNote):
-        '''Load a MusicXML object representation. 
-        '''
-        musicxmlTranslate.mxToTie(mxNote, self)
-
-    mx = property(_getMX, _setMX)
-
-
-    def __eq__(self, other):
-        '''Equality. Based on attributes (such as pitch, accidental, duration, articulations, and ornaments) that are  not dependent on the wider context of a note (such as offset, beams, stem direction).
-
-        >>> from music21 import *
-        >>> t1 = note.Tie('start')
-        >>> t2 = note.Tie('start')
-        >>> t3 = note.Tie('end')
-        >>> t1 == t2
-        True
-        >>> t2 == t3, t3 == t1
-        (False, False)
-        >>> t2 == None
-        False
-        '''
-        if other == None or not isinstance(other, Tie):
-            return False
-        elif self.type == other.type:
-            return True
-        return False
-
-    def __ne__(self, other):
-        '''Inequality. Needed for pitch comparisons.
-        '''
-        return not self.__eq__(other)
 
 
 
@@ -623,11 +553,11 @@ class GeneralNote(music21.Music21Object):
                 tempNote = copy.deepcopy(self)
                 tempNote.duration = self.duration.components[i]
                 if i != (len(self.duration.components) - 1):
-                    tempNote.tie = Tie()
+                    tempNote.tie = tie.Tie()
                 else:
                     # last note just gets the tie of the original Note
                     if self.tie is None:
-                        self.tie = Tie("stop")
+                        self.tie = tie.Tie("stop")
                 returnNotes.append(tempNote)                
         return returnNotes
 
@@ -655,12 +585,12 @@ class GeneralNote(music21.Music21Object):
 
             # if not last
             if i == 0:
-                n.tie = Tie('start') # need a tie objects
+                n.tie = tie.Tie('start') # need a tie objects
             if i < (len(quarterLengthList) - 1):
-                n.tie = Tie('continue') # need a tie objects
+                n.tie = tie.Tie('continue') # need a tie objects
             else: # if last
                 # last note just gets the tie of the original Note
-                n.tie = Tie('stop')
+                n.tie = tie.Tie('stop')
             post.append(n)
 
         return post
@@ -768,7 +698,7 @@ class GeneralNote(music21.Music21Object):
         
         >>> from music21 import *
         >>> n1 = note.Note("C#5")
-        >>> n1.tie = note.Tie('start')
+        >>> n1.tie = tie.Tie('start')
         >>> n1.articulations = [articulations.Accent()]  ## DOES NOTHING RIGHT NOW
         >>> n1.quarterLength = 1.25
         >>> n1.lily
@@ -806,11 +736,6 @@ class NotRest(GeneralNote):
     
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
-
-#     def splitNoteAtPoint(self, quarterLength):
-#         (note1, note2) = GeneralNote.splitNoteAtPoint(self, quarterLength)
-#         note1.tie = Tie("start")  #rests arent tied
-#         return [note1, note2]
 
 
     #---------------------------------------------------------------------------
@@ -869,11 +794,11 @@ class NotRest(GeneralNote):
             'Unpitched' in e.classes):
         #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
             #environLocal.printDebug(['tieing in makeTies', e])
-            e.tie = note.Tie('start')
+            e.tie = tie.Tie('start')
             # we can set eRamain to be a stop on this iteration
             # if it needs to be tied to something on next
             # iteration, the tie object will be re-created
-            eRemain.tie = note.Tie('stop')
+            eRemain.tie = tie.Tie('stop')
     
         # hide accidentals on tied notes where previous note
         # had an accidental that was shown
@@ -889,7 +814,7 @@ class NotRest(GeneralNote):
 
         # this is all the functionality of PitchedOrUnpitched
 #         if hasattr(self, 'isRest') and not self.isRest:
-#             note1.tie = Tie("start")  #rests arent tied
+#             note1.tie = tie.Tie("start")  #rests arent tied
 
         return [e, eRemain]
 
@@ -1773,7 +1698,7 @@ class Test(unittest.TestCase):
 
 
     def testNoteEquality(self):
-        from music21 import articulations
+        from music21 import articulations, tie
 
         n1 = Note('a#')
         n2 = Note('g')
@@ -1809,8 +1734,8 @@ class Test(unittest.TestCase):
         # with and without ties
         n1.pitch.octave = 4
         n4.pitch.octave = 4
-        t1 = Tie()
-        t2 = Tie()
+        t1 = tie.Tie()
+        t2 = tie.Tie()
         for x, y, match in [(t1, None, False), (t1, t2, True)]:
             n1.tie = x
             n4.tie = y
@@ -1819,8 +1744,8 @@ class Test(unittest.TestCase):
         # with ties but different pitches
         for n in [n1, n2, n3, n4]:
             n.quarterLength = 1.0
-        t1 = Tie()
-        t2 = Tie()
+        t1 = tie.Tie()
+        t2 = tie.Tie()
         for a, b, match in [(n1, n2, False), (n1, n3, False), 
                             (n2, n3, False), (n1, n4, True)]:
             a.tie = t1
@@ -1885,15 +1810,15 @@ class Test(unittest.TestCase):
         from music21 import stream
 
         n1 = Note()
-        n1.tie = Tie()
+        n1.tie = tie.Tie()
         n1.tie.type = 'start'
 
         n2 = Note()
-        n2.tie = Tie()
+        n2.tie = tie.Tie()
         n2.tie.type = 'continue'
 
         n3 = Note()
-        n3.tie = Tie()
+        n3.tie = tie.Tie()
         n3.tie.type = 'stop'
 
         s = stream.Stream()

@@ -77,10 +77,11 @@ def mxToTie(mxNote, inputM21=None):
     '''Based on properties in an mxNote, configure or create an m21 Tie object
     '''
     from music21 import note
+    from music21 import tie
 
     if inputM21 == None:
         from music21 import note
-        t = note.Tie()
+        t = tie.Tie()
     else:
         t = inputM21
 
@@ -223,6 +224,7 @@ def mxToNote(mxNote, inputM21):
     from music21 import articulations
     from music21 import expressions
     from music21 import note
+    from music21 import tie
 
     if inputM21 == None:
         n = note.Measure()
@@ -246,7 +248,7 @@ def mxToNote(mxNote, inputM21):
 
     mxTieList = mxNote.get('tieList')
     if len(mxTieList) > 0:
-        tieObj = note.Tie() # m21 tie object
+        tieObj = tie.Tie() # m21 tie object
         tieObj.mx = mxNote # provide entire Note
         # n.tie is defined in GeneralNote as None by default
         n.tie = tieObj

@@ -75,6 +75,7 @@ import music21.duration
 
 from music21 import common
 from music21 import stream
+from music21 import tie
 from music21 import expressions
 from music21 import meter
 from music21 import pitch
@@ -208,7 +209,7 @@ class TinyNotationNote(object):
         if self.PRECTIE.match(stringRep):
             if self.debug is True: print("FOUND FRONT TIE")
             stringRep = self.PRECTIE.sub("", stringRep)
-            storedtie = music21.note.Tie("stop")
+            storedtie = music21.tie.Tie("stop")
 
         x = self.customPitchMatch(stringRep, storedDict)
         
@@ -253,7 +254,7 @@ class TinyNotationNote(object):
         ## get ties
         if self.TIE.search(stringRep):
             if self.debug is True: print("FOUND TIE")
-            noteObj.tie = music21.note.Tie("start")
+            noteObj.tie = music21.tie.Tie("start")
         
         ## use dict to set tuplets
         if (storedDict['inTrip'] == True or storedDict['inQuad'] == True) and usedLastDuration == False:

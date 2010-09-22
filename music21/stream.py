@@ -39,6 +39,7 @@ from music21.musicxml import translate as musicxmlTranslate
 from music21 import midi as midiModule
 from music21.midi import translate as midiTranslate
 from music21 import note
+from music21 import tie
 from music21 import metadata
 
 
@@ -3032,11 +3033,11 @@ class Stream(music21.Music21Object):
                             'Unpitched' in e.classes):
                         #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
                             #environLocal.printDebug(['tieing in makeTies', e])
-                            e.tie = note.Tie('start')
+                            e.tie = tie.Tie('start')
                             # we can set eRamain to be a stop on this iteration
                             # if it needs to be tied to something on next
                             # iteration, the tie object will be re-created
-                            eRemain.tie = note.Tie('stop')
+                            eRemain.tie = tie.Tie('stop')
     
                         # hide accidentals on tied notes where previous note
                         # had an accidental that was shown

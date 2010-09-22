@@ -54,7 +54,7 @@ __all__ = ['base',
            'expressions', 'note', 
            'pitch', 'ratios', 
            'scale', 'serial', 'stream', 
-           'tempo', 'text', 'tinyNotation', 
+           'tempo', 'text', 'tie', 'tinyNotation', 
            'voiceLeading']
 
 # skipped purposely, "base", "node"

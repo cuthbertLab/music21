@@ -1497,22 +1497,6 @@ class Note(MusicXMLElement):
                     new.pitchObj = other
 
 
-#     def addTie(self, tieType):
-#         '''Convenience for settting up ties. Can only be used when 
-#         not manually configure mxNotations
-#         '''
-#         if tieType not in ['start', 'stop']:
-#             raise MusicXMLException('bad tie type %s' % tieType)
-#         mxTie = Tie()
-#         mxTie.set('type', tieType) # start, stop
-#         self.tieList.append(mxTie)
-# 
-#         mxTied = Tied()
-#         mxTied.set('type', tieType) 
-#         self.notationsObj.append(mxTied)
-#         
-
-
 
 class Forward(MusicXMLElement):
     def __init__(self, type=None):

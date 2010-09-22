@@ -25,6 +25,7 @@ import music21.key
 import music21.note
 import music21.expressions
 import music21.tempo
+import music21.tie
 import music21.meter
 import music21.clef
 import music21.stream
@@ -848,11 +849,11 @@ def hdStringToNote(contents):
         for i in range(0, contents.count(')')):
             pass # slur end
     if contents.count('['):
-        thisObject.tie = music21.note.Tie("start")
+        thisObject.tie = music21.tie.Tie("start")
     elif contents.count(']'):
-        thisObject.tie = music21.note.Tie("stop")
+        thisObject.tie = music21.tie.Tie("stop")
     elif contents.count('_'):
-        thisObject.tie = music21.note.Tie("continue")
+        thisObject.tie = music21.tie.Tie("continue")
     
     ## 3.2.3 Ornaments    
     if contents.count('t'):
