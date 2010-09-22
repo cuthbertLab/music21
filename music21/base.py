@@ -45,6 +45,11 @@ import uuid
 
 from music21 import common
 from music21 import environment
+
+# needed for temporal manipulations; not music21 objects
+from music21 import tie
+from music21 import duration
+
 _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
 
@@ -2031,6 +2036,182 @@ class Music21Object(object):
 
         else:
             raise Music21ObjectException('no such show format is supported:', fmt)
+
+
+
+    #---------------------------------------------------------------------------
+    # duration manipulation, processing, and splitting
+
+
+    def splitAtQuarterLength(self, quarterLength, retainOrigin=True,
+            displayTiedAccidentals=False):
+        '''
+        Split an Element into two Elements based on Duration.
+
+        >>> from music21 import *
+        >>> a = note.NotRest()
+        >>> a.duration.type = 'whole'
+        >>> b, c = a.splitAtQuarterLength(3)
+        >>> b.duration.type
+        'half'
+        >>> b.duration.dots
+        1
+        >>> b.duration.quarterLength
+        3.0
+        >>> c.duration.type
+        'quarter'
+        >>> c.duration.dots
+        0
+        >>> c.duration.quarterLength
+        1.0
+        '''
+        # was note.splitNoteAtPoint
+
+        if self.duration == None:
+            raise Exception('cannot split an element that has a Duration of None')
+
+        if quarterLength > self.duration.quarterLength:
+            raise duration.DurationException(
+            "cannont split a duration (%s) at this quarter length (%s)" % (
+            self.duration.quarterLength, quarterLength))
+
+        if retainOrigin == True:
+            e = self
+        else:
+            e = copy.deepcopy(self)
+        eRemain = copy.deepcopy(self)
+
+        lenEnd = self.duration.quarterLength - quarterLength
+        lenStart = self.duration.quarterLength - lenEnd
+
+        d1 = duration.Duration()
+        d1.quarterLength = lenStart
+
+        d2 = duration.Duration()
+        d2.quarterLength = lenEnd
+
+        e.duration = d1
+        eRemain.duration = d2
+
+        # some higher-level classes need this functionality
+
+        # set ties
+        if ('Note' in e.classes or 
+            'Chord' in e.classes or 
+            'Unpitched' in e.classes):
+        #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
+            #environLocal.printDebug(['tieing in makeTies', e])
+            e.tie = tie.Tie('start')
+            # we can set eRamain to be a stop on this iteration
+            # if it needs to be tied to something on next
+            # iteration, the tie object will be re-created
+            eRemain.tie = tie.Tie('stop')
+    
+        # hide accidentals on tied notes where previous note
+        # had an accidental that was shown
+        if hasattr(e, 'accidental') and e.accidental != None:
+            if not displayTiedAccidentals: # if False
+                if (e.accidental.displayType not in     
+                    ['even-tied']):
+                    eRemain.accidental.displayStatus = False
+            else: # display tied accidentals
+                eRemain.accidental.displayType = 'even-tied'
+                eRemain.accidental.displayStatus = True
+
+        # this is all the functionality of PitchedOrUnpitched
+#         if hasattr(self, 'isRest') and not self.isRest:
+#             note1.tie = tie.Tie("start")  #rests arent tied
+
+        return [e, eRemain]
+
+
+    def splitAtDurations(self):
+        '''
+        Takes a Note and returns a list of Notes with only a single
+        duration.DurationUnit in each. Ties are added. 
+
+        >>> from music21 import *
+        >>> a = note.Note()
+        >>> a.duration.clear() # remove defaults
+        >>> a.duration.addDurationUnit(duration.Duration('half'))
+        >>> a.duration.quarterLength
+        2.0
+        >>> a.duration.addDurationUnit(duration.Duration('whole'))
+        >>> a.duration.quarterLength
+        6.0
+        >>> b = a.splitAtDurations()
+        >>> b[0].pitch == b[1].pitch
+        True
+        >>> b[0].duration.type
+        'half'
+        >>> b[1].duration.type
+        'whole'
+        '''
+        if self.duration == None:
+            raise Exception('cannot split an element that has a Duration of None')
+
+        returnNotes = []
+
+        if len(self.duration.components) == (len(self.duration.linkages) - 1):
+            for i in range(len(self.duration.components)):
+                tempNote = copy.deepcopy(self)
+                # note that this keeps durations 
+                tempNote.duration = self.duration.components[i]
+                if i != (len(self.duration.components) - 1):
+                    tempNote.tie = self.duration.linkages[i]                
+                    # last note just gets the tie of the original Note
+                returnNotes.append(tempNote)
+        else: 
+            for i in range(len(self.duration.components)):
+                tempNote = copy.deepcopy(self)
+                tempNote.duration = self.duration.components[i]
+                if i != (len(self.duration.components) - 1):
+                    tempNote.tie = tie.Tie()
+                else:
+                    # last note just gets the tie of the original Note
+                    if self.tie is None:
+                        self.tie = tie.Tie("stop")
+                returnNotes.append(tempNote)                
+        return returnNotes
+
+
+    def splitByQuarterLengths(self, quarterLengthList):
+        '''Given a list of quarter lengths, return a list of Note objects, copied from this Note, that are partitioned and tied with the specified quarter length list durations.
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.quarterLength = 3
+        >>> post = n.splitByQuarterLengths([1,1,1])
+        >>> [n.quarterLength for n in post]
+        [1, 1, 1]
+        '''
+        if self.duration == None:
+            raise Exception('cannot split an element that has a Duration of None')
+
+        if sum(quarterLengthList) != self.duration.quarterLength:
+            raise NoteException('cannot split by quarter length list that is not equal to the duratoin of the source.')
+        if len(quarterLengthList) <= 1:
+            raise NoteException('cannot split by this quarter length list: %s.' % quarterLengthList)
+
+        post = []
+        for i in range(len(quarterLengthList)):
+            ql = quarterLengthList[i]
+            n = copy.deepcopy(self)
+            n.quarterLength = ql
+
+            # if not last
+            if i == 0:
+                n.tie = tie.Tie('start') # need a tie objects
+            if i < (len(quarterLengthList) - 1):
+                n.tie = tie.Tie('continue') # need a tie objects
+            else: # if last
+                # last note just gets the tie of the original Note
+                n.tie = tie.Tie('stop')
+            post.append(n)
+
+        return post
+
+
 
 
     #---------------------------------------------------------------------------

@@ -137,6 +137,36 @@ class GeneralNote(music21.Music21Object):
         self.tie = None # store a Tie object
 
 
+    def compactNoteInfo(self):
+        '''A debugging info tool, returning information about a note
+        E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
+        '''
+        
+        ret = ""
+        if (self.isNote is True):
+            ret += self.name + " " + self.step + " " + str(self.octave)
+            if (self.accidental is not None):
+                ret += " " + self.accidental.name
+        elif (self.isRest is True):
+            ret += "rest"
+        else:
+            ret += "other note type"
+        if (self.tie is not None):
+            ret += " (Tie: " + self.tie.type + ")"
+        ret += " " + self.duration.type
+        ret += " " + str(self.duration.quarterLength)
+        if len(self.duration.tuplets) > 0:
+            ret += " & is a tuplet"
+            if self.duration.tuplets[0].type == "start":
+                ret += " (in fact STARTS the tuplet)"
+            elif self.duration.tuplets[0].type == "stop":
+                ret += " (in fact STOPS the tuplet)"
+        if len(self.notations) > 0:
+            if (isinstance(self.notations[0], music21.expressions.Fermata)):
+                ret += " has Fermata"
+        return ret
+
+
     #---------------------------------------------------------------------------
     def _getColor(self):
         '''Return the Note color. 
@@ -264,196 +294,6 @@ class GeneralNote(music21.Music21Object):
         2.0
         ''')
 
-
-    #---------------------------------------------------------------------------
-#     def _getMeasureOffset(self):
-#         '''Try to obtain the nearest Measure that contains this Note, and return the offset within that Measure.
-# 
-#         >>> from music21 import *
-#         >>> n = note.Note()
-#         >>> n.quarterLength = 2
-#         >>> m = stream.Measure()
-#         >>> n._getMeasureOffset() # returns zero when not assigned
-#         0.0 
-#         >>> n.quarterLength = .5
-#         >>> m = stream.Measure()
-#         >>> m.repeatAppend(n, 4)
-#         >>> [n._getMeasureOffset() for n in m.notes]
-#         [0.0, 0.5, 1.0, 1.5]
-# 
-#         '''
-#         if self.parent != None and self.parent.isMeasure:
-#             #environLocal.printDebug(['found parent as Measure, using for offset'])
-#             offsetLocal = self.getOffsetBySite(self.parent)
-#         else:
-#             # this method-level import seems unvoidable to be sure to get the 
-#             # right offset
-#             from music21 import stream
-#             # testing sortByCreationTime == true; this may be necessary
-#             # as we often want the most recent measure
-#             m = self.getContextByClass(stream.Measure, sortByCreationTime=True)
-#             if m != None:
-#                 #environLocal.printDebug(['using found Measure for offset access'])            
-#                 offsetLocal = self.getOffsetBySite(m)
-#             else: # hope that we get the right one
-#                 environLocal.printDebug(['using standard offset access'])
-#                 offsetLocal = self.offset
-# 
-#         #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])
-#         return offsetLocal
-# 
-#     def _getBeat(self):
-#         '''Return a beat designation based on local Measure and TimeSignature
-# 
-#         >>> from music21 import *
-#         >>> n = note.Note()
-#         >>> n.quarterLength = 2
-#         >>> m = stream.Measure()
-#         >>> m.isMeasure
-#         True
-#         >>> m.timeSignature = meter.TimeSignature('4/4')
-#         >>> m.repeatAppend(n, 2)
-#         >>> m[1].parent # here we get the parent, but not in m.notes
-#         <music21.stream.Measure 0 offset=0.0>
-# 
-#         >>> m.notes[0]._getBeat()
-#         1.0
-#         >>> m.notes[1]._getBeat()
-#         3.0
-#         '''
-#         ts = self.getContextByClass(meter.TimeSignature)
-#         if ts == None:
-#             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
-#         return ts.getBeatProportion(self._getMeasureOffset())
-# 
-# 
-#     beat = property(_getBeat,  
-#         doc = '''Return the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a floating-point designation between 0 and 1 to show proportional progress through the beat.
-# 
-#         >>> from music21 import *
-#         >>> n = note.Note()
-#         >>> n.quarterLength = .5
-#         >>> m = stream.Measure()
-#         >>> m.timeSignature = meter.TimeSignature('3/4')
-#         >>> m.repeatAppend(n, 6)
-#         >>> [m.notes[i].beat for i in range(6)]
-#         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
-# 
-#         >>> m.timeSignature = meter.TimeSignature('6/8')
-#         >>> [m.notes[i].beat for i in range(6)]
-#         [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
-# 
-#         ''')
-# 
-# 
-#     def _getBeatStr(self):
-#         ts = self.getContextByClass(meter.TimeSignature)
-#         #environLocal.printDebug(['_getBeatStr(): found ts:', ts])
-#         if ts == None:
-#             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
-#         return ts.getBeatProportionStr(self._getMeasureOffset())
-# 
-# 
-#     beatStr = property(_getBeatStr,  
-#         doc = '''Return a string representation of the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a fractional designation to show progress through the beat.
-# 
-#         >>> from music21 import *
-#         >>> n = note.Note()
-#         >>> n.quarterLength = .5
-#         >>> m = stream.Measure()
-#         >>> m.timeSignature = meter.TimeSignature('3/4')
-#         >>> m.repeatAppend(n, 6)
-#         >>> [m.notes[i].beatStr for i in range(6)]
-#         ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
-#         >>> m.timeSignature = meter.TimeSignature('6/8')
-#         >>> [m.notes[i].beatStr for i in range(6)]
-#         ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
-#         ''')
-# 
-# 
-#     def _getBeatDuration(self):
-#         '''Return a  designation based on local Measure and TimeSignature
-# 
-#         >>> from music21 import *
-#         >>> n = note.Note()
-#         >>> n.quarterLength = 2
-#         >>> m = stream.Measure()
-#         >>> m.timeSignature = meter.TimeSignature('4/4')
-#         >>> m.repeatAppend(n, 2)
-#         >>> m.notes[0]._getBeatDuration()
-#         <music21.duration.Duration 1.0>
-#         >>> m.notes[1]._getBeatDuration()
-#         <music21.duration.Duration 1.0>
-#         '''
-#         ts = self.getContextByClass(meter.TimeSignature)
-#         if ts == None:
-#             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')
-#         return ts.getBeatDuration(self._getMeasureOffset())
-# 
-#     beatDuration = property(_getBeatDuration,  
-#         doc = '''Return a :class:`~music21.duration.Duration` of the beat active for this Note as found in the most recently positioned Measure.
-# 
-#         >>> from music21 import *
-#         >>> n = note.Note()
-#         >>> n.quarterLength = .5
-#         >>> m = stream.Measure()
-#         >>> m.timeSignature = meter.TimeSignature('3/4')
-#         >>> m.repeatAppend(n, 6)
-#         >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
-#         [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-# 
-#         >>> m.timeSignature = meter.TimeSignature('6/8')
-#         >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
-#         [1.5, 1.5, 1.5, 1.5, 1.5, 1.5]
-#         ''')
-# 
-# 
-#     def _getBeatStrength(self):
-#         '''Return an accent weight based on local Measure and TimeSignature. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
-# 
-#         >>> from music21 import *
-#         >>> n = note.Note()
-#         >>> n.quarterLength = .25
-#         >>> m = stream.Measure()
-#         >>> m.isMeasure
-#         True
-#         >>> m.timeSignature = meter.TimeSignature('4/4')
-#         >>> m.repeatAppend(n, 16)
-# 
-#         >>> m.notes[0]._getBeatStrength()
-#         1.0
-#         >>> m.notes[4]._getBeatStrength()
-#         0.25
-#         >>> m.notes[8]._getBeatStrength()
-#         0.5
-#         '''
-#         ts = self.getContextByClass(meter.TimeSignature)
-#         if ts == None:
-#             raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
-#         return ts.getAccentWeight(self._getMeasureOffset(),
-#                forcePositionMatch=True)
-# 
-# 
-#     beatStrength = property(_getBeatStrength,  
-#         doc = '''Return the metrical accent of this Note in the most recently positioned Measure. Accent values are between zero and one, and are derived from the local TimeSignature's accent MeterSequence weights. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
-# 
-#         >>> from music21 import *
-#         >>> n = note.Note()
-#         >>> n.quarterLength = .5
-#         >>> m = stream.Measure()
-#         >>> m.timeSignature = meter.TimeSignature('3/4')
-#         >>> m.repeatAppend(n, 6)
-#         >>> [m.notes[i].beatStrength for i in range(6)]
-#         [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]
-# 
-#         >>> m.timeSignature = meter.TimeSignature('6/8')
-#         >>> [m.notes[i].beatStrength for i in range(6)]
-#         [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
-# 
-#         ''')
-
-
-
     #---------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, inPlace=True):
         '''Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy.
@@ -508,121 +348,6 @@ class GeneralNote(music21.Music21Object):
         ''')    
 
 
-
-
-
-    #---------------------------------------------------------------------------
-    # duration
-
-
-    def splitAtDurations(self):
-        '''
-        Takes a Note and returns a list of Notes with only a single
-        duration.DurationUnit in each. Ties are added. 
-
-        >>> from music21 import *
-        >>> a = note.Note()
-        >>> a.duration.clear() # remove defaults
-        >>> a.duration.addDurationUnit(duration.Duration('half'))
-        >>> a.duration.quarterLength
-        2.0
-        >>> a.duration.addDurationUnit(duration.Duration('whole'))
-        >>> a.duration.quarterLength
-        6.0
-        >>> b = a.splitAtDurations()
-        >>> b[0].pitch == b[1].pitch
-        True
-        >>> b[0].duration.type
-        'half'
-        >>> b[1].duration.type
-        'whole'
-        '''
-        returnNotes = []
-
-        if len(self.duration.components) == (len(self.duration.linkages) - 1):
-            for i in range(len(self.duration.components)):
-                tempNote = copy.deepcopy(self)
-                # note that this keeps durations 
-                tempNote.duration = self.duration.components[i]
-                if i != (len(self.duration.components) - 1):
-                    tempNote.tie = self.duration.linkages[i]                
-                    # last note just gets the tie of the original Note
-                returnNotes.append(tempNote)
-        else: 
-            for i in range(len(self.duration.components)):
-                tempNote = copy.deepcopy(self)
-                tempNote.duration = self.duration.components[i]
-                if i != (len(self.duration.components) - 1):
-                    tempNote.tie = tie.Tie()
-                else:
-                    # last note just gets the tie of the original Note
-                    if self.tie is None:
-                        self.tie = tie.Tie("stop")
-                returnNotes.append(tempNote)                
-        return returnNotes
-
-
-    def splitByQuarterLengths(self, quarterLengthList):
-        '''Given a list of quarter lengths, return a list of Note objects, copied from this Note, that are partitioned and tied with the specified quarter length list durations.
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = 3
-        >>> post = n.splitByQuarterLengths([1,1,1])
-        >>> [n.quarterLength for n in post]
-        [1, 1, 1]
-        '''
-        if sum(quarterLengthList) != self.duration.quarterLength:
-            raise NoteException('cannot split by quarter length list that is not equal to the duratoin of the source.')
-        if len(quarterLengthList) <= 1:
-            raise NoteException('cannot split by this quarter length list: %s.' % quarterLengthList)
-
-        post = []
-        for i in range(len(quarterLengthList)):
-            ql = quarterLengthList[i]
-            n = copy.deepcopy(self)
-            n.quarterLength = ql
-
-            # if not last
-            if i == 0:
-                n.tie = tie.Tie('start') # need a tie objects
-            if i < (len(quarterLengthList) - 1):
-                n.tie = tie.Tie('continue') # need a tie objects
-            else: # if last
-                # last note just gets the tie of the original Note
-                n.tie = tie.Tie('stop')
-            post.append(n)
-
-        return post
-
-    def compactNoteInfo(self):
-        '''A debugging info tool, returning information about a note
-        E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
-        '''
-        
-        ret = ""
-        if (self.isNote is True):
-            ret += self.name + " " + self.step + " " + str(self.octave)
-            if (self.accidental is not None):
-                ret += " " + self.accidental.name
-        elif (self.isRest is True):
-            ret += "rest"
-        else:
-            ret += "other note type"
-        if (self.tie is not None):
-            ret += " (Tie: " + self.tie.type + ")"
-        ret += " " + self.duration.type
-        ret += " " + str(self.duration.quarterLength)
-        if len(self.duration.tuplets) > 0:
-            ret += " & is a tuplet"
-            if self.duration.tuplets[0].type == "start":
-                ret += " (in fact STARTS the tuplet)"
-            elif self.duration.tuplets[0].type == "stop":
-                ret += " (in fact STOPS the tuplet)"
-        if len(self.notations) > 0:
-            if (isinstance(self.notations[0], music21.expressions.Fermata)):
-                ret += " has Fermata"
-        return ret
 
     #---------------------------------------------------------------------------
     def _preDurationLily(self):
@@ -736,88 +461,6 @@ class NotRest(GeneralNote):
     
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
-
-
-    #---------------------------------------------------------------------------
-    def splitNoteAtPoint(self, quarterLength, retainOrigin=True):
-        '''
-        Split an Element into two Elements based on Duration.
-
-        >>> from music21 import *
-        >>> a = note.NotRest()
-        >>> a.duration.type = 'whole'
-        >>> b, c = a.splitNoteAtPoint(3)
-        >>> b.duration.type
-        'half'
-        >>> b.duration.dots
-        1
-        >>> b.duration.quarterLength
-        3.0
-        >>> c.duration.type
-        'quarter'
-        >>> c.duration.dots
-        0
-        >>> c.duration.quarterLength
-        1.0
-        '''
-        if self.duration == None:
-            raise Exception('cannot split an element that has a Duration of None')
-
-        if quarterLength > self.duration.quarterLength:
-            raise duration.DurationException(
-            "cannont split a duration (%s) at this quarter length (%s)" % (
-            self.duration.quarterLength, quarterLength))
-
-        if retainOrigin == True:
-            e = self
-        else:
-            e = copy.deepcopy(self)
-        eRemain = copy.deepcopy(self)
-
-        lenEnd = self.duration.quarterLength - quarterLength
-        lenStart = self.duration.quarterLength - lenEnd
-
-        d1 = duration.Duration()
-        d1.quarterLength = lenStart
-
-        d2 = duration.Duration()
-        d2.quarterLength = lenEnd
-
-        e.duration = d1
-        eRemain.duration = d2
-
-        # some higher-level classes need this functionality
-
-        # set ties
-        if ('Note' in e.classes or 
-            'Chord' in e.classes or 
-            'Unpitched' in e.classes):
-        #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
-            #environLocal.printDebug(['tieing in makeTies', e])
-            e.tie = tie.Tie('start')
-            # we can set eRamain to be a stop on this iteration
-            # if it needs to be tied to something on next
-            # iteration, the tie object will be re-created
-            eRemain.tie = tie.Tie('stop')
-    
-        # hide accidentals on tied notes where previous note
-        # had an accidental that was shown
-        if hasattr(e, 'accidental') and e.accidental != None:
-            if not displayTiedAccidentals: # if False
-                if (e.accidental.displayType not in     
-                    ['even-tied']):
-                    eRemain.accidental.displayStatus = False
-            else: # display tied accidentals
-                eRemain.accidental.displayType = 'even-tied'
-                eRemain.accidental.displayStatus = True
-    
-
-        # this is all the functionality of PitchedOrUnpitched
-#         if hasattr(self, 'isRest') and not self.isRest:
-#             note1.tie = tie.Tie("start")  #rests arent tied
-
-        return [e, eRemain]
-
 
 
 #-------------------------------------------------------------------------------

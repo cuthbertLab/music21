@@ -3015,40 +3015,46 @@ class Stream(music21.Music21Object):
                         if eoffset >= mEnd:
                             raise StreamException('element (%s) has offset %s within a measure that ends at offset %s' % (e, eoffset, mEnd))  
     
+                        # using 
                         # note: cannot use GeneralNote.splitNoteAtPoint b/c
                         # we are not assuming that these are notes, only elements
-    
-                        qLenBegin = mEnd - eoffset
-                        #print 'e.offset, mEnd, qLenBegin', e.offset, mEnd, qLenBegin
-                        qLenRemain = e.duration.quarterLength - qLenBegin
-                        # modify existing duration rather than creating new
-                        e.duration.quarterLength = qLenBegin
-                        # create and place new element
-                        eRemain = deepcopy(e)
-                        eRemain.duration.quarterLength = qLenRemain
 
-                        # set ties
-                        if ('Note' in e.classes or 
-                            'Chord' in e.classes or 
-                            'Unpitched' in e.classes):
-                        #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
-                            #environLocal.printDebug(['tieing in makeTies', e])
-                            e.tie = tie.Tie('start')
-                            # we can set eRamain to be a stop on this iteration
-                            # if it needs to be tied to something on next
-                            # iteration, the tie object will be re-created
-                            eRemain.tie = tie.Tie('stop')
-    
-                        # hide accidentals on tied notes where previous note
-                        # had an accidental that was shown
-                        if hasattr(e, 'accidental') and e.accidental != None:
-                            if not displayTiedAccidentals: # if False
-                                if (e.accidental.displayType not in     
-                                    ['even-tied']):
-                                    eRemain.accidental.displayStatus = False
-                            else: # display tied accidentals
-                                eRemain.accidental.displayType = 'even-tied'
-                                eRemain.accidental.displayStatus = True
+                        qLenBegin = mEnd - eoffset    
+                        e, eRemain = e.splitAtQuarterLength(qLenBegin, 
+                            retainOrigin=True, 
+                            displayTiedAccidentals=displayTiedAccidentals)
+
+
+#                         #print 'e.offset, mEnd, qLenBegin', e.offset, mEnd, qLenBegin
+#                         qLenRemain = e.duration.quarterLength - qLenBegin
+#                         # modify existing duration rather than creating new
+#                         e.duration.quarterLength = qLenBegin
+#                         # create and place new element
+#                         eRemain = deepcopy(e)
+#                         eRemain.duration.quarterLength = qLenRemain
+# 
+#                         # set ties
+#                         if ('Note' in e.classes or 
+#                             'Chord' in e.classes or 
+#                             'Unpitched' in e.classes):
+#                         #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
+#                             #environLocal.printDebug(['tieing in makeTies', e])
+#                             e.tie = tie.Tie('start')
+#                             # we can set eRamain to be a stop on this iteration
+#                             # if it needs to be tied to something on next
+#                             # iteration, the tie object will be re-created
+#                             eRemain.tie = tie.Tie('stop')
+#     
+#                         # hide accidentals on tied notes where previous note
+#                         # had an accidental that was shown
+#                         if hasattr(e, 'accidental') and e.accidental != None:
+#                             if not displayTiedAccidentals: # if False
+#                                 if (e.accidental.displayType not in     
+#                                     ['even-tied']):
+#                                     eRemain.accidental.displayStatus = False
+#                             else: # display tied accidentals
+#                                 eRemain.accidental.displayType = 'even-tied'
+#                                 eRemain.accidental.displayStatus = True
 
 
                         # TODO: not sure this is the best way to make sure
@@ -3057,6 +3063,9 @@ class Stream(music21.Music21Object):
                         # setting is for the wrong location
                         eRemain.parent = mNext # manually set parent
                         eRemain.offset = 0
+
+                        # this use of elements is dangerous and needs special
+                        # handling
                         mNext.elements = [eRemain] + mNext.elements
 
                         # alternative approach (same slowness)
