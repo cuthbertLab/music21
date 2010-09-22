@@ -931,7 +931,7 @@ def hdStringToNote(contents):
             newTup.durationActual.type = thisObject.duration.type
             newTup.durationNormal.type = thisObject.duration.type
 
-            gcd = common.EuclidGCD(int(dT), basevalue)
+            gcd = common.euclidGCD(int(dT), basevalue)
             newTup.numberNotesActual = dT/gcd
             newTup.numberNotesNormal = float(basevalue)/gcd
             

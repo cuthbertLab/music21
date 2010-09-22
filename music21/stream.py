@@ -3024,38 +3024,7 @@ class Stream(music21.Music21Object):
                             retainOrigin=True, 
                             displayTiedAccidentals=displayTiedAccidentals)
 
-
 #                         #print 'e.offset, mEnd, qLenBegin', e.offset, mEnd, qLenBegin
-#                         qLenRemain = e.duration.quarterLength - qLenBegin
-#                         # modify existing duration rather than creating new
-#                         e.duration.quarterLength = qLenBegin
-#                         # create and place new element
-#                         eRemain = deepcopy(e)
-#                         eRemain.duration.quarterLength = qLenRemain
-# 
-#                         # set ties
-#                         if ('Note' in e.classes or 
-#                             'Chord' in e.classes or 
-#                             'Unpitched' in e.classes):
-#                         #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
-#                             #environLocal.printDebug(['tieing in makeTies', e])
-#                             e.tie = tie.Tie('start')
-#                             # we can set eRamain to be a stop on this iteration
-#                             # if it needs to be tied to something on next
-#                             # iteration, the tie object will be re-created
-#                             eRemain.tie = tie.Tie('stop')
-#     
-#                         # hide accidentals on tied notes where previous note
-#                         # had an accidental that was shown
-#                         if hasattr(e, 'accidental') and e.accidental != None:
-#                             if not displayTiedAccidentals: # if False
-#                                 if (e.accidental.displayType not in     
-#                                     ['even-tied']):
-#                                     eRemain.accidental.displayStatus = False
-#                             else: # display tied accidentals
-#                                 eRemain.accidental.displayType = 'even-tied'
-#                                 eRemain.accidental.displayStatus = True
-
 
                         # TODO: not sure this is the best way to make sure
                         # eRamin comes first 
@@ -4482,6 +4451,69 @@ class Stream(music21.Music21Object):
                     #qlNew = common.nearestMultiple(ql, quarterLengthMin)
                     e.duration.quarterLength = qlNew
 
+    #---------------------------------------------------------------------------
+    # slicing and recasting a note as many notes
+
+    def sliceByQuarterLengths(self, quarterLengthList, target=None,
+        inPlace=True):
+        '''Slice all durations of all part by the quarter length pattern provided in quarterLengthList.
+
+        If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
+        '''
+        if not inPlace: # make a copy
+            returnObj = self.__class__() # for output
+        else:
+            returnObj = self
+    
+        if not common.isListLike(quarterLengthList):
+            quarterLengthList = [quarterLengthList]
+
+        if target != None:
+            # get the element out of rutern obj, not elements
+            # store in a list
+            eToProcess = [returnObj.elements[self.index(target)]]
+        else:
+            eToProcess = returnObj.elements
+        
+        for e in eToProcess:
+            if not common.almostEquals(sum(quarterLengthList), e.quarterLength):
+                # try to map a list that is of sufficient duration
+                qlProcess = []
+                i = 0
+                while sum(qlProcess) < e.quarterLength:
+                    qlProcess.append(
+                        quarterLengthList[i%len(quarterLengthList)])
+                    i += 1
+            else:
+                qlProcess = quarterLengthList
+            environLocal.printDebug(['got qlProcess', 
+                qlProcess, 'for element', e])
+
+            post = e.splitByQuarterLengths(qlProcess)
+            # remove e from the source
+            oInsert = e.getOffsetBySite(returnObj)
+            returnObj.remove(e)
+            for eNew in post:
+                returnObj.insert(oInsert, eNew)
+                oInsert += eNew.quarterLength
+
+        return returnObj
+
+
+    def sliceByMinimum(self, target=None, inPlace=True):
+        '''Slice all duration of all part by the minimum duration that can be summed to each concurrent duration. 
+
+        If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
+        '''
+        pass
+
+
+    def sliceByBeat(self, target=None, inPlace=True):
+        '''Slice each duration by the beat.
+
+        If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
+        '''
+        pass
 
     #---------------------------------------------------------------------------
     def isMultiPart(self):
@@ -5517,7 +5549,7 @@ class Stream(music21.Music21Object):
 
     def allPlayingWhileSounding(self, el, elStream = None, 
                                 requireClass = False):
-        '''Returns a new Stream of elements in this stream that sound at the same time as "el", an element presumably in another Stream.
+        '''Returns a new Stream of elements in this stream that sound at the same time as `el`, an element presumably in another Stream.
         
         The offset of this new Stream is set to el's offset, while the offset of elements within the 
         Stream are adjusted relative to their position with respect to the start of el.  Thus, a note 
@@ -6250,6 +6282,27 @@ class Score(Stream):
                          retainContainers=True) 
         return returnObj
         
+
+    def sliceByQuarterLengths(self, quarterLengthList):
+        '''Slice all durations of all part by the quarter length pattern provided in quarterLengthList.
+
+        Overrides method defined on Stream.
+        '''
+        pass
+
+    def sliceByMinimum(self):
+        '''Slice all duration of all part by the minimum duration that can be summed to each concurrent duration. 
+
+        Overrides method defined on Stream.
+        '''
+        pass
+
+    def sliceByBeat(self):
+        '''Slice each duration by the beat.
+
+        Overrides method defined on Stream.
+        '''
+        pass
 
 
 
@@ -10232,6 +10285,32 @@ class Test(unittest.TestCase):
 
 
 
+
+    def testSliceByQuarterLengths(self):
+        from music21 import note
+        s = Stream()
+        n1 = note.Note()
+        n1.quarterLength = 1
+
+        n2 = note.Note()
+        n2.quarterLength = 2
+
+        n3 = note.Note()
+        n3.quarterLength = .5
+
+        n4 = note.Note()
+        n4.quarterLength = 1.5
+
+        for n in [n1,n2,n3,n4]:
+            s.append(n)
+    
+        # default will slice all
+        # TODO: .125 is not returning correct ties
+        for sliceQl, match in [(.25, 20), (.125, 40)]:
+            post = s.sliceByQuarterLengths(sliceQl, inPlace=True)
+            self.assertEqual(len(post), match)
+            #post.show()
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -10280,8 +10359,11 @@ if __name__ == "__main__":
 #         t.testChordifyImported()
 
         #t.testMeasureOffsetMapPostTie()
-        t.testElementsHighestTimeA()
-        t.testElementsHighestTimeB()
-        t.testElementsHighestTimeC()
+#         t.testElementsHighestTimeA()
+#         t.testElementsHighestTimeB()
+#         t.testElementsHighestTimeC()
+# 
+#         t.testMeasureBarline()
 
-        t.testMeasureBarline()
+
+        t.testSliceByQuarterLengths()

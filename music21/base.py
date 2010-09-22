@@ -2176,7 +2176,7 @@ class Music21Object(object):
 
 
     def splitByQuarterLengths(self, quarterLengthList):
-        '''Given a list of quarter lengths, return a list of Note objects, copied from this Note, that are partitioned and tied with the specified quarter length list durations.
+        '''Given a list of quarter lengths, return a list of Music21Objects objects, copied from this Music21Objects, that are partitioned and tied with the specified quarter length list durations.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -2186,32 +2186,35 @@ class Music21Object(object):
         [1, 1, 1]
         '''
         if self.duration == None:
-            raise Exception('cannot split an element that has a Duration of None')
+            raise Music21ObjectException('cannot split an element that has a Duration of None')
 
         if sum(quarterLengthList) != self.duration.quarterLength:
-            raise NoteException('cannot split by quarter length list that is not equal to the duratoin of the source.')
-        if len(quarterLengthList) <= 1:
-            raise NoteException('cannot split by this quarter length list: %s.' % quarterLengthList)
+            raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLength))
+        # if nothing to do
+        elif (len(quarterLengthList) == 1 and quarterLengthList[0] ==     
+            self.duration.quarterLength):
+            # return a copy of self in a list
+            return [copy.deepcopy(self)]
+        elif len(quarterLengthList) <= 1:
+            raise Music21ObjectException('cannot split by this quarter length list: %s.' % quarterLengthList)
 
         post = []
         for i in range(len(quarterLengthList)):
             ql = quarterLengthList[i]
-            n = copy.deepcopy(self)
-            n.quarterLength = ql
+            e = copy.deepcopy(self)
+            e.quarterLength = ql
 
             # if not last
             if i == 0:
-                n.tie = tie.Tie('start') # need a tie objects
-            if i < (len(quarterLengthList) - 1):
-                n.tie = tie.Tie('continue') # need a tie objects
+                e.tie = tie.Tie('start') # need a tie objects
+            elif i < (len(quarterLengthList) - 1):
+                e.tie = tie.Tie('continue') # need a tie objects
             else: # if last
                 # last note just gets the tie of the original Note
-                n.tie = tie.Tie('stop')
-            post.append(n)
+                e.tie = tie.Tie('stop')
+            post.append(e)
 
         return post
-
-
 
 
     #---------------------------------------------------------------------------
@@ -3460,7 +3463,8 @@ def mainTest(*testClasses):
     if ('noDocTest' in testClasses):
         s1 = unittest.TestSuite()
     else: 
-        s1 = doctest.DocTestSuite('__main__', optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
+        s1 = doctest.DocTestSuite('__main__', 
+        optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
 
     if ('verbose') in testClasses:
         verbosity = 2

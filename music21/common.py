@@ -637,24 +637,96 @@ def decimalToTuplet(decNum):
         raise Exception("No such luck")
 
     jy *= multiplier
-    gcd = EuclidGCD(int(jy), int(iy))
+    gcd = euclidGCD(int(jy), int(iy))
     jy = jy/gcd
     iy = iy/gcd
     return (int(jy), int(iy))
 
 
-def EuclidGCD(a, b):
-    '''use Euclid\'s algorithm to find the GCD of a and b'''
+def euclidGCD(a, b):
+    '''use Euclid\'s algorithm to find the GCD of a and b
+    >>> euclidGCD(2,4)
+    2
+    >>> euclidGCD(20,8)
+    4
+    '''
     if b == 0:
         return a
     else:
-        return EuclidGCD(b, a % b)
+        return euclidGCD(b, a % b)
     
+
+def approximateGCD(values, grain=1e-4):
+    '''Given a list of values, find the lowest common divisor of floating point values. 
+
+    >>> from music21 import *
+    >>> common.approximateGCD([2.5,10, .25])
+    0.25
+    >>> common.approximateGCD([2.5,10])
+    2.5
+    >>> common.approximateGCD([2,10])
+    2.0
+    >>> common.approximateGCD([1.5, 5, 2, 7])
+    0.5
+    >>> common.approximateGCD([2,5,10])
+    1.0
+    >>> common.approximateGCD([2,5,10,.25])
+    0.25
+    >>> str(common.approximateGCD([1/3.,2/3.]))
+    '0.333333333333'
+    >>> str(common.approximateGCD([5/3.,2/3.,4]))
+    '0.333333333333'
+    >>> str(common.approximateGCD([5/3.,2/3.,5]))
+    '0.333333333333'
+    >>> str(common.approximateGCD([5/3.,2/3.,5/6.,3/6.]))
+    '0.166666666667'
+    '''
+    # quick method: see if the smallest value is a common divisor of the rest
+    lowest = float(min(values))
+    count = 0
+    for x in values:
+        # lowest is already a float
+        junk, floatingValue = divmod(x / lowest, 1.0)
+        # if almost an even division
+        if almostEqual(floatingValue, 0.0, grain=grain):
+            count += 1
+    if count == len(values):
+        return lowest
+
+    # assume that one of these divisions will match
+    divisors = [1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]
+    divisions = [] # a list of lists, one for each entry
+    uniqueDivisions = []
+    for i in values:
+        coll = []
+        for d in divisors:
+            v = i / d
+            coll.append(v) # store all divisions
+            if v not in uniqueDivisions:
+                uniqueDivisions.append(v)
+        divisions.append(coll)
+    # find a unique divisor that is found in collected divisors
+    commonUniqueDivisions = []
+    for v in uniqueDivisions:
+        count = 0
+        for coll in divisions:
+            for x in coll:
+                # grain here is set low, mostly to catch triplets
+                if almostEquals(x, v, grain=grain):
+                    count += 1
+                    break # exit the iteration of coll; only 1 match possible
+        # store any division that is found in all values
+        if count == len(divisions):
+            commonUniqueDivisions.append(v)
+    if len(commonUniqueDivisions) == 0:
+        raise Exception('cannot find a common divisor')
+    return max(commonUniqueDivisions)
+
 
 def _lcm(a, b):
     """find lowest common multiple of a,b"""
     # // forcers integer style division (no remainder)
-    return abs(a*b) / EuclidGCD(a,b) 
+    return abs(a*b) / euclidGCD(a,b) 
 
 def lcm(filter):
     '''
@@ -1177,6 +1249,11 @@ class Scalar(object):
                     except AttributeError:
                         print("no more...")
                          
+
+
+
+
+
 #-------------------------------------------------------------------------------
 def wrapWeakref(referent):
     '''
