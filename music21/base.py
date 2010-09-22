@@ -862,7 +862,7 @@ class DefinedContexts(object):
         DefinedContextsException: ...
         '''
         siteId = None
-        if site is not None:
+        if site != None:
             siteId = id(site)
         # will raise an index error if the siteId does not exist
         try:
@@ -870,6 +870,17 @@ class DefinedContexts(object):
         except KeyError:
             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
             
+
+    def setOffsetBySiteId(self, siteId, value):
+        '''Set an offset by siteId. This assumes that the site is valid, is best used for advanced, performance critical usage only.
+
+        The `siteId` parameter can be None
+        '''
+        try:
+            self._definedContexts[siteId]['offset'] = value
+        except KeyError:
+            raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
+
 
     def getSiteByOffset(self, offset):
         '''For a given offset return the parent
@@ -1617,10 +1628,14 @@ class Music21Object(object):
     
     def _setParent(self, site):
         siteId = None
-        if site is not None: 
+        if site != None: 
             siteId = id(site)
+            # check that the parent is not already set to this object
+            # this avoids making another weakref
+            if self._currentParentId == siteId:
+                return
+
         if site is not None and not self._definedContexts.hasSiteId(siteId):
-#             siteId not in self._definedContexts.coordinates:
             self._definedContexts.add(site, self.offset, idKey=siteId) 
         
         if WEAKREF_ACTIVE:
@@ -1641,7 +1656,7 @@ class Music21Object(object):
 
     def addLocationAndParent(self, offset, parent, parentWeakRef = None):
         '''
-        ADVANCED: a speedup tool that adds a new location element and a new parent.  Called
+        This method is for advanced usage, generally as a speedup tool that adds a new location element and a new parent.  Called
         by Stream.insert -- this saves some dual processing.  Does not do safety checks that
         the siteId doesn't already exist etc., because that is done earlier.
         
@@ -1664,6 +1679,11 @@ class Music21Object(object):
         parentId = id(parent)
         self._definedContexts.add(parent, offset, idKey=parentId) 
         
+        # if the current parent is already set, nothing to do
+        # do not create a new weakref 
+        if self._currentParentId == parentId:
+            return 
+
         if WEAKREF_ACTIVE:
                 if parentWeakRef is None:
                     parentWeakRef = common.wrapWeakref(parent)
@@ -1706,26 +1726,28 @@ class Music21Object(object):
     def _setOffset(self, value):
         '''Set the offset for the parent object. 
         '''
-        if common.isNum(value):
-            # if a number assume it is a quarter length
-            # self._offset = duration.DurationUnit()
-            # MSC: We can change this when we decide that we want to return
-            #      something other than quarterLength
+        # assume that most times this is a number; in that case, the fastest
+        # thing to do is simply try to set the offset w/ float(value)
 
+        #if common.isNum(value):
+        try:
             offset = float(value)
-        elif hasattr(value, "quarterLength"):
+        except TypeError:
+            pass
+
+        if hasattr(value, "quarterLength"):
             # probably a Duration object, but could be something else -- in any case, we'll take it.
             offset = value.quarterLength
-        else:
-            raise Exception('We cannot set  %s as an offset' % value)
- 
-        self._definedContexts.setOffsetBySite(self.parent, offset)
-#        if self.parent is None:
-            # a None parent gets the offset at self
-#            self._definedContexts.setOffsetBySite(None, offset)
-            #self.disconnectedOffset = offset
-#        else:
-#            self._definedContexts.setOffsetBySite(self.parent, offset)
+
+# this no longer seems necessary; an exception will be raised elsewhere
+#         else:
+#             raise Exception('We cannot set  %s as an offset' % value)
+
+        # using _currentParentId offers a considerable speed boost, as we
+        # do not have to unwrap a weakref of self.parent to get the id()
+        # of parent
+        self._definedContexts.setOffsetBySiteId(self._currentParentId, offset) 
+
     
     offset = property(_getOffset, _setOffset, 
         doc = '''The offset property sets the position of this object from the start of its container (a Stream or Stream sub-class) in quarter lengths.
@@ -1904,6 +1926,8 @@ class Music21Object(object):
 
 
     #---------------------------------------------------------------------------
+    # display and writing
+
     def write(self, fmt=None, fp=None):
         '''Write a file.
         
@@ -2011,6 +2035,8 @@ class Music21Object(object):
 
     #---------------------------------------------------------------------------
     # temporal and beat based positioning
+
+
     def _getMeasureNumberLocal(self):
         '''If this object is contained in a Measure, return the measure number
         '''

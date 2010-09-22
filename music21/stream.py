@@ -2917,8 +2917,9 @@ class Stream(music21.Music21Object):
 
     def makeTies(self, meterStream=None, inPlace=True, 
         displayTiedAccidentals=False):
-        '''Given a stream containing measures, examine each element in the stream 
-        if the elements duration extends beyond the measures boundary, create a tied entity.
+        '''Given a stream containing measures, examine each element in the Stream. If the elements duration extends beyond the measures boundary, create a tied entity, placing the split Note in the next Measure.
+
+        Note that his method assumes that there is appropriate space in the next Measure: this will not shift Note, but instead allocate them evenly over barlines. Generall, makeMeasures is called prior to calling this method.
     
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
                 
@@ -3019,7 +3020,7 @@ class Stream(music21.Music21Object):
                         qLenBegin = mEnd - eoffset
                         #print 'e.offset, mEnd, qLenBegin', e.offset, mEnd, qLenBegin
                         qLenRemain = e.duration.quarterLength - qLenBegin
-                        # modify existing duration
+                        # modify existing duration rather than creating new
                         e.duration.quarterLength = qLenBegin
                         # create and place new element
                         eRemain = deepcopy(e)
@@ -6274,6 +6275,14 @@ class Opus(Stream):
         >>> from music21 import *
         ''')
 
+    def write(self, fmt=None, fp=None):
+        '''
+        Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment.
+
+        This method overrides the behavior specified in :class:`~music21.base.Music21Object`.
+        '''
+        for s in self.scores:
+            s.write(fmt=fmt, fp=fp)
 
     def show(self, fmt=None, app=None):
         '''
@@ -6281,9 +6290,10 @@ class Opus(Stream):
 
         This method overrides the behavior specified in :class:`~music21.base.Music21Object`.
         '''
-
         for s in self.scores:
             s.show(fmt=fmt, app=app)
+
+
 
 
 #-------------------------------------------------------------------------------

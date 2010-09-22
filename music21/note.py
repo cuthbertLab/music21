@@ -43,7 +43,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class Tie(music21.Music21Object):
+class Tie(object):
     '''Object added to notes that are tied to other notes. The `type` value is generally one of start or stop.
 
     >>> from music21 import *
@@ -70,62 +70,21 @@ class Tie(music21.Music21Object):
     two-note-head unison?)
     '''
 
-    def __init__(self, tievalue = "start"):
-        music21.Music21Object.__init__(self)
+    def __init__(self, tievalue = 'start'):
+        #music21.Music21Object.__init__(self)
         self.type = tievalue
 
-    # use weak-refs for .to and .from
+    # investigate using weak-refs for .to and .from
+
     def _getMX(self):
         '''Return a MusicXML object representation. 
         '''
         return musicxmlTranslate.tieToMx(self)
 
-#         mxTieList = []
-#         mxTie = musicxmlMod.Tie()
-#         if self.type == 'continue':
-#             musicxmlTieType = 'stop'
-#         else:
-#             musicxmlTieType = self.type
-#         mxTie.set('type', musicxmlTieType) # start, stop
-#         mxTieList.append(mxTie) # goes on mxNote.tieList
-# 
-#         if self.type == 'continue':
-#             mxTie = musicxmlMod.Tie()
-#             mxTie.set('type', 'start')
-#             mxTieList.append(mxTie) # goes on mxNote.tieList
-# 
-#         mxTiedList = []
-#         mxTied = musicxmlMod.Tied()
-#         mxTied.set('type', musicxmlTieType) # start, stop
-#         mxTiedList.append(mxTied) # goes on mxNote.notationsObj list
-#         if self.type == 'continue':
-#             mxTied = musicxmlMod.Tied()
-#             mxTied.set('type', 'start')
-#             mxTiedList.append(mxTied) 
-#         
-#         #environLocal.printDebug(['mxTieList', mxTieList])
-#         return mxTieList, mxTiedList
-    
     def _setMX(self, mxNote):
         '''Load a MusicXML object representation. 
         '''
         musicxmlTranslate.mxToTie(mxNote, self)
-
-#         mxTieList = mxNote.get('tieList')
-#         if len(mxTieList) > 0:
-#             # get all types and see what we have for this note
-#             typesFound = []
-#             for mxTie in mxTieList:
-#                 typesFound.append(mxTie.get('type'))
-#             # trivial case: have only 1
-#             if len(typesFound) == 1:
-#                 self.type = typesFound[0]
-#             elif typesFound == ['stop', 'start']:
-#                 self.type = 'continue'
-#                 #self.type = 'start'
-#             else:
-#                 environLocal.printDebug(['found unexpected arrangement of multiple tie types when importing from musicxml:', typesFound])    
-
 
     mx = property(_getMX, _setMX)
 
@@ -625,35 +584,6 @@ class GeneralNote(music21.Music21Object):
     #---------------------------------------------------------------------------
     # duration
 
-#     def appendDuration(self, durationObject):
-#         '''
-#         Sets the duration of the note to the supplied duration.Duration object
-# 
-#         >>> a = Note()
-#         >>> a.duration.clear() # remove default
-#         >>> a.appendDuration(duration.Duration('half'))
-#         >>> a.duration.quarterLength
-#         2.0
-#         >>> a.appendDuration(duration.Duration('whole'))
-#         >>> a.duration.quarterLength
-#         6.0
-# 
-#         '''
-#         # note: the lower level interface has changed here
-#         self.duration.addDurationUnit(durationObject)
-
-#     def clearDurations(self):
-#         '''
-#         clears all the durations stored in the note.
-#         After performing this, it's probably not wise to print the note until 
-#         at least one duration.Duration is added
-#         '''
-#         #self.componentDurations = []
-#         #self.durationLinkages = []
-#         #self.duration = ComplexDuration(components = self.componentDurations,
-#         #                                linkages = self.durationLinkages)
-#         self.duration = duration.Duration(components=[], linkages=[])
-
 
     def splitAtDurations(self):
         '''
@@ -724,11 +654,13 @@ class GeneralNote(music21.Music21Object):
             n.quarterLength = ql
 
             # if not last
-            if i != (len(quarterLengthList) - 1):
-                n.tie = Tie() # need a tie objects
+            if i == 0:
+                n.tie = Tie('start') # need a tie objects
+            if i < (len(quarterLengthList) - 1):
+                n.tie = Tie('continue') # need a tie objects
             else: # if last
                 # last note just gets the tie of the original Note
-                n.tie = Tie("stop")
+                n.tie = Tie('stop')
             post.append(n)
 
         return post
@@ -882,9 +814,9 @@ class NotRest(GeneralNote):
 
 
     #---------------------------------------------------------------------------
-    def splitNoteAtPoint(self, quarterLength):
+    def splitNoteAtPoint(self, quarterLength, retainOrigin=True):
         '''
-        Split a Note into two Notes. 
+        Split an Element into two Elements based on Duration.
 
         >>> from music21 import *
         >>> a = note.NotRest()
@@ -903,13 +835,19 @@ class NotRest(GeneralNote):
         >>> c.duration.quarterLength
         1.0
         '''
+        if self.duration == None:
+            raise Exception('cannot split an element that has a Duration of None')
+
         if quarterLength > self.duration.quarterLength:
             raise duration.DurationException(
             "cannont split a duration (%s) at this quarter length (%s)" % (
             self.duration.quarterLength, quarterLength))
 
-        note1 = copy.deepcopy(self)
-        note2 = copy.deepcopy(self)
+        if retainOrigin == True:
+            e = self
+        else:
+            e = copy.deepcopy(self)
+        eRemain = copy.deepcopy(self)
 
         lenEnd = self.duration.quarterLength - quarterLength
         lenStart = self.duration.quarterLength - lenEnd
@@ -920,14 +858,40 @@ class NotRest(GeneralNote):
         d2 = duration.Duration()
         d2.quarterLength = lenEnd
 
-        note1.duration = d1
-        note2.duration = d2
+        e.duration = d1
+        eRemain.duration = d2
+
+        # some higher-level classes need this functionality
+
+        # set ties
+        if ('Note' in e.classes or 
+            'Chord' in e.classes or 
+            'Unpitched' in e.classes):
+        #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
+            #environLocal.printDebug(['tieing in makeTies', e])
+            e.tie = note.Tie('start')
+            # we can set eRamain to be a stop on this iteration
+            # if it needs to be tied to something on next
+            # iteration, the tie object will be re-created
+            eRemain.tie = note.Tie('stop')
+    
+        # hide accidentals on tied notes where previous note
+        # had an accidental that was shown
+        if hasattr(e, 'accidental') and e.accidental != None:
+            if not displayTiedAccidentals: # if False
+                if (e.accidental.displayType not in     
+                    ['even-tied']):
+                    eRemain.accidental.displayStatus = False
+            else: # display tied accidentals
+                eRemain.accidental.displayType = 'even-tied'
+                eRemain.accidental.displayStatus = True
+    
 
         # this is all the functionality of PitchedOrUnpitched
-        if hasattr(self, 'isRest') and not self.isRest:
-            note1.tie = Tie("start")  #rests arent tied
+#         if hasattr(self, 'isRest') and not self.isRest:
+#             note1.tie = Tie("start")  #rests arent tied
 
-        return [note1, note2]
+        return [e, eRemain]
 
 
 
