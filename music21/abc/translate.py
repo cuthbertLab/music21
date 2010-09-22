@@ -223,8 +223,10 @@ def abcToStreamScore(abcHandler, inputM21=None):
 
 
 
-def abcToStreamOpus(abcHandler, inputM21=None):
+def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     '''Convert a multi-work stream into one or more complete works packed into a an Opus Stream. 
+
+    If a `number` argument is given, and a work is defined by that number, that work is returned. 
     '''
     from music21 import stream
 
@@ -233,15 +235,23 @@ def abcToStreamOpus(abcHandler, inputM21=None):
     else:
         s = inputM21
 
+    environLocal.printDebug(['abcToStreamOpus: got number', number])
+
+
     # returns a dictionary of numerical key
     if abcHandler.definesReferenceNumbers():
         abcDict = abcHandler.splitByReferenceNumber()
-        for key in sorted(abcDict.keys()):
-            # do not need to set work number, as that will be gathered
-            # with meta data in abcToStreamScore
-            s.append(abcToStreamScore(abcDict[key]))
+        if number != None and number in abcDict.keys():
+            s = stream.Score() # return a Stream
+            # get number from dictionary; set to new score
+            abcToStreamScore(abcDict[number], inputM21=s)
+        else: # build entire opus into an opus stream
+            for key in sorted(abcDict.keys()):
+                # do not need to set work number, as that will be gathered
+                # with meta data in abcToStreamScore
+                s.append(abcToStreamScore(abcDict[key]))
 
-    else: # just return a single Single in opus object
+    else: # just return single entry in opus object
         s.append(abcToStreamScore(abcHandler))
     return s
 
@@ -412,8 +422,8 @@ class Test(unittest.TestCase):
         from music21 import abc
 
         # replace w/ ballad80, smaller or erk5
-        fp = corpus.getWork('ballad60')
-        self.assertEqual(fp.endswith('essenFolksong/ballad60.abc'), True)
+        fp = corpus.getWork('teste')
+        self.assertEqual(fp.endswith('essenFolksong/teste.abc'), True)
 
         af = abc.ABCFile()
         af.open(fp) # return handler, processes tokens
@@ -422,7 +432,7 @@ class Test(unittest.TestCase):
 
         op = abcToStreamOpus(ah)
         #op.scores[3].show()
-        self.assertEqual(len(op), 105)
+        self.assertEqual(len(op), 8)
 
     def testLyrics(self):
         # TODO

@@ -436,7 +436,13 @@ class Node(object):
                 if type(content) == bool and content == True:
                     pass # no text node needed
                 else:
-                    sub.appendChild(doc.createTextNode(u"%s" % content))
+                    # was the topline; trying to use replace for errors
+                    #entry = u"%s" % content
+                    try:
+                        entry = unicode(content, errors='replace')
+                    except TypeError:
+                        entry = str(content)
+                    sub.appendChild(doc.createTextNode(entry))
                 node.appendChild(sub)
             elif isinstance(component, Node): # its a Node subclass
                 # parent is this node

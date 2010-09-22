@@ -79,6 +79,9 @@ if len(_missingImport) > 0:
         header='music21:')
 
 
+
+
+
 #-------------------------------------------------------------------------------
 VERSION = (0, 2, 6)  # increment any time picked versions will be obsolete.
 VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a4'
@@ -2787,7 +2790,7 @@ class Test(unittest.TestCase):
 
 
         violin1 = corpus.parseWork("beethoven/opus18no1", 
-                                3, 'xml').getElementById("Violin I")
+                                3, extList='xml').getElementById("Violin I")
         lastNote = violin1.flat.notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(lastNoteClef, clef.TrebleClef), True)

@@ -233,7 +233,11 @@ class Text(object):
             self._language = language
 
     def __str__(self):
-        return str(self._data)
+        #print type(self._data)
+        if isinstance(self._data, unicode):
+            return str(self._data.encode('utf-8'))
+        else:
+            return str(self._data)
 
     def _setLanguage(self, value):
         self._language = value

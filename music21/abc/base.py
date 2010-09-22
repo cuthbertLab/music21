@@ -20,7 +20,7 @@ Low level ABC conversion is facilitated by the objects in this module and :func:
 
 import music21
 import unittest
-import re
+import re, codecs
 
 try:
     import StringIO # python 2 
@@ -1824,7 +1824,10 @@ class ABCFile(object):
     def open(self, filename): 
         '''Open a file for reading
         '''
-        self.file = open(filename, 'r') 
+        #try:
+        self.file = codecs.open(filename, encoding='utf-8')
+        #exce[t
+        #self.file = open(filename, 'r') 
         self.filename = filename
 
     def openFileLike(self, fileLike):
@@ -1832,7 +1835,7 @@ class ABCFile(object):
 
         >>> fileLikeOpen = StringIO.StringIO()
         '''
-        self.file = fileLike
+        self.file = fileLike # already 'open'
     
     def __repr__(self): 
         r = "<ABCFile>" 

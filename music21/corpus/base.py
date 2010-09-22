@@ -491,11 +491,15 @@ def getWork(workName, movementNumber=None, extList=None):
         return post
 
 
-def parseWork(workName, movementNumber=None, extList=None, forceSource=False):
+def parseWork(workName, movementNumber=None, number=None, 
+    extList=None, forceSource=False):
     '''Search the corpus, then the virtual corpus, for a work. Return a parsed :class:`music21.stream.Stream`.
 
-    If forceSource is True, the original file will always be loaded and pickled
-    files, if available, will be ignored.
+    If `movementNumber` is defined, and a movement is included in the corpus, that movement will be returned. 
+
+    If `number` is defined, and the work is a collection with multiple components, that work number will be returned. 
+
+    If `forceSource` is True, the original file will always be loaded and pickled files, if available, will be ignored.
 
     >>> aStream = parseWork('opus74no1/movement3')
     '''
@@ -514,7 +518,7 @@ def parseWork(workName, movementNumber=None, extList=None, forceSource=False):
     else: # greater than zero:
         fp = post[0] # get first
       
-    return converter.parse(fp, forceSource=forceSource)
+    return converter.parse(fp, forceSource=forceSource, number=number)
 
 
 

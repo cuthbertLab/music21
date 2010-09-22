@@ -178,7 +178,8 @@ class CallGraph:
         # set class  to test here
         #self.callTest = TestMakeTies
         #self.callTest = TestMakeAccidentals
-        self.callTest = TestMusicXMLOutputParts
+        #self.callTest = TestMusicXMLOutputParts
+        self.callTest = TestMusicXMLOutputScore
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 

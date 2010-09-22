@@ -270,7 +270,7 @@ class ConverterHumdrum(object):
         self.stream = None
 
     #---------------------------------------------------------------------------
-    def parseData(self, humdrumString):
+    def parseData(self, humdrumString, number=None):
         '''Open Humdrum data from a string
 
         >>> humdata = '**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-'
@@ -283,7 +283,7 @@ class ConverterHumdrum(object):
         self.stream = self.data.stream
         return self.data
 
-    def parseFile(self, filepath):
+    def parseFile(self, filepath, number=None):
         '''Open Humdram data from a file path.'''
         self.data = humdrum.parseFile(filepath)
         #self.data.stream.makeNotation()
@@ -300,7 +300,7 @@ class ConverterTinyNotation(object):
         self.stream = None
 
     #---------------------------------------------------------------------------
-    def parseData(self, tnData):
+    def parseData(self, tnData, number=None):
         '''Open TinyNotation data from a string or list
 
         >>> tnData = ["E4 r f# g=lastG trip{b-8 a g} c", "3/4"]
@@ -315,7 +315,7 @@ class ConverterTinyNotation(object):
             tnTs = tnData[1]
         self.stream = tinyNotation.TinyNotationStream(tnStr, tnTs)
 
-    def parseFile(self, fp):
+    def parseFile(self, fp, number=None):
         '''Open TinyNotation data from a file path.'''
 
         f = open(fp)
@@ -355,7 +355,7 @@ class ConverterMusicXML(object):
 
 
     #---------------------------------------------------------------------------
-    def parseData(self, xmlString):
+    def parseData(self, xmlString, number=None):
         '''Open MusicXML data from a string.'''
         c = musicxml.Document()
         c.read(xmlString)
@@ -364,7 +364,7 @@ class ConverterMusicXML(object):
             raise ConverterException('score from xmlString (%s...) has no parts defined' % xmlString[:30])
         self.load()
 
-    def parseFile(self, fp):
+    def parseFile(self, fp, number=None):
         '''Open from a file path; check to see if there is a pickled
         version available and up to date; if so, open that, otherwise
         open source.
@@ -459,7 +459,7 @@ class ConverterMidi(object):
         # always create a score instance
         self._stream = stream.Score()
 
-    def parseData(self, strData):
+    def parseData(self, strData, number=None):
         '''Get MIDI data from a binary string representation.
         '''
         mf = midi.MidiFile()
@@ -467,7 +467,7 @@ class ConverterMidi(object):
         mf.readstr(strData)
         self._stream.midiFile = mf
 
-    def parseFile(self, fp):
+    def parseFile(self, fp, number=None):
         '''Get MIDI data from a file path.'''
 
         mf = midi.MidiFile()
@@ -493,23 +493,36 @@ class ConverterABC(object):
         # always create a score instance
         self._stream = stream.Score()
 
-    def parseData(self, strData):
-        '''Get ABC data, as token list, from a string representation.
+    def parseData(self, strData, number=None):
+        '''Get ABC data, as token list, from a string representation. If more than one work is defined in the ABC data, a  :class:`~music21.stream.Opus` object will be returned; otherwise, a :class:`~music21.stream.Score` is returned.
         '''
         af = abcModule.ABCFile()
         # do not need to call open or close on MidiFile instance
         abcHandler = af.readstr(strData)
         # set to stream
-        abcTranslate.abcToStreamScore(abcHandler, self._stream)
+        if abcHandler.definesReferenceNumbers():
+            # this creates an Opus object, not a Score object
+            self._stream = abcTranslate.abcToStreamOpus(abcHandler,
+                number=number)
+        else: # just one work
+            abcTranslate.abcToStreamScore(abcHandler, self._stream)
 
-    def parseFile(self, fp):
-        '''Get MIDI data from a file path.'''
+    def parseFile(self, fp, number=None):
+        '''Get MIDI data from a file path. If more than one work is defined in the ABC data, a  :class:`~music21.stream.Opus` object will be returned; otherwise, a :class:`~music21.stream.Score` is returned.
+        '''
+        environLocal.printDebug(['ConverterABC.parseFile: got number', number])
 
         af = abcModule.ABCFile()
         af.open(fp)
-        abcHandler = af.read() # returns a handler instance
+        abcHandler = af.read() # returns a handler instance of parse tokens
         af.close()
-        abcTranslate.abcToStreamScore(abcHandler, self._stream)
+        if abcHandler.definesReferenceNumbers():
+            # this creates a Score or Opus object, depending on if a number
+            # is given
+            self._stream = abcTranslate.abcToStreamOpus(abcHandler,
+                           number=number)
+        else: # just one work
+            abcTranslate.abcToStreamScore(abcHandler, self._stream)
 
     def _getStream(self):
         return self._stream
@@ -553,7 +566,7 @@ class Converter(object):
             raise ValueError
         return os.path.join(dir, 'm21-' + common.getMd5(url) + ext)
 
-    def parseFile(self, fp, forceSource=False):
+    def parseFile(self, fp, number=None, forceSource=False):
         '''Given a file path, parse and store a music21 Stream.
         '''
         #environLocal.printDebug(['attempting to parseFile', fp])
@@ -562,9 +575,9 @@ class Converter(object):
         # TODO: no extension matching for tinyNotation
         format = common.findFormatFile(fp) 
         self._setConverter(format, forceSource=forceSource)
-        self._converter.parseFile(fp)
+        self._converter.parseFile(fp, number=number)
 
-    def parseData(self, dataStr):
+    def parseData(self, dataStr, number=None):
         '''Given raw data, determine format and parse into a music21 Stream.
         '''
         format = None
@@ -581,14 +594,17 @@ class Converter(object):
                 format = 'humdrum'
             elif dataStr.startswith('tinynotation:'):
                 format = 'tinyNotation'
+            # assume must define a meter and a key
+            elif 'M:' in dataStr and 'K:' in dataStr:
+                format = 'abc'
             else:
                 raise ConverterException('no such format found for: %s' % dataStr)
 
         self._setConverter(format)
-        self._converter.parseData(dataStr)
+        self._converter.parseData(dataStr, number=number)
 
 
-    def parseURL(self, url):
+    def parseURL(self, url, number=None):
         '''Given a url, download and parse the file into a music21 Stream.
 
         Note that this checks the user Environment `autoDownlaad` setting before downloading. 
@@ -621,7 +637,7 @@ class Converter(object):
         # update format based on downloaded fp
         format = common.findFormatFile(fp) 
         self._setConverter(format, forceSource=False)
-        self._converter.parseFile(fp)
+        self._converter.parseFile(fp, number=number)
 
 
     #---------------------------------------------------------------------------
@@ -643,23 +659,23 @@ class Converter(object):
 # module level convenience methods
 
 
-def parseFile(fp, forceSource=False):
+def parseFile(fp, number=None, forceSource=False):
     '''Given a file path, attempt to parse the file into a Stream.
     '''
     v = Converter()
-    v.parseFile(fp, forceSource=forceSource)
+    v.parseFile(fp, number=number, forceSource=forceSource)
     return v.stream
 
-def parseData(dataStr):
+def parseData(dataStr, number=None):
     '''Given musical data represented within a Python string, attempt to parse the data into a Stream.
     '''
 #     if common.isListLike(dataStr):
 #         environLocal.printDebug(['parseData dataStr', dataStr])
     v = Converter()
-    v.parseData(dataStr)
+    v.parseData(dataStr, number=number)
     return v.stream
 
-def parseURL(url, forceSource=False):
+def parseURL(url, number=None, forceSource=False):
     '''Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
     '''
     v = Converter()
@@ -694,20 +710,26 @@ def parse(value, *args, **keywords):
     else:   
         forceSource = False
 
+    # see if a work number is defined; for multi-work collections
+    if 'number' in keywords.keys():
+        number = keywords['number']
+    else:   
+        number = None
+
     if common.isListLike(value) or len(args) > 0: # tiny notation list
         if len(args) > 0: # add additional args to a lost
             value = [value] + list(args)
-        return parseData(value)
+        return parseData(value, number=number)
      # a midi string, must come before os.path.exists test
     elif value.startswith('MThd'):
-        return parseData(value)
+        return parseData(value, number=number)
     elif os.path.exists(value):
-        return parseFile(value, forceSource=forceSource)
+        return parseFile(value, number=number, forceSource=forceSource)
     elif value.startswith('http://'): 
         # its a url; may need to broaden these criteria
-        return parseURL(value, forceSource=forceSource)
+        return parseURL(value, number=number, forceSource=forceSource)
     else:
-        return parseData(value)
+        return parseData(value, number=number)
 
 
 
@@ -1202,7 +1224,7 @@ class Test(unittest.TestCase):
         self.assertEqual(found[2].sharps, -1)
 
 
-    def testConversMXRepeats(self):
+    def testConversionMXRepeats(self):
         from music21 import bar
         from music21.musicxml import testPrimitive
 
@@ -1226,6 +1248,37 @@ class Test(unittest.TestCase):
 
         #s.show()
 
+
+
+    def testConversionABCOpus(self):
+        
+        from music21.abc import testFiles
+        from music21 import corpus
+        from music21 import stream
+
+        s = parse(testFiles.theAleWifesDaughter)
+        # get a Stream object, not an opus
+        self.assertEqual(isinstance(s, stream.Score), True)
+        self.assertEqual(isinstance(s, stream.Opus), False)
+        self.assertEqual(len(s.flat.notes), 66)
+
+        # a small essen collection
+        op = corpus.parseWork('essenFolksong/teste')
+        # get a Stream object, not an opus
+        #self.assertEqual(isinstance(op, stream.Score), True)
+        self.assertEqual(isinstance(op, stream.Opus), True)
+        self.assertEqual([len(s.flat.notes) for s in op], [33, 51, 59, 33, 29, 174, 67, 88])
+        #op.show()
+
+        # get one work from the opus
+        s = corpus.parseWork('essenFolksong/teste', number=6)
+        self.assertEqual(isinstance(s, stream.Score), True)
+        self.assertEqual(isinstance(s, stream.Opus), False)
+        self.assertEqual(s.metadata.title, 'Moli hua')
+
+        #s.show()
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, Converter, ConverterMusicXML, ConverterHumdrum]
@@ -1243,4 +1296,6 @@ if __name__ == "__main__":
         #t.testConversionMXLayout()
         #t.testConversionMXTies()
         #t.testConversionMXInstrument()
-        t.testConversMXRepeats()
+        #t.testConversionMXRepeats()
+
+        t.testConversionABCOpus()

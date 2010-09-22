@@ -4734,8 +4734,13 @@ class Stream(music21.Music21Object):
         '''
         see property `notes`, below
         '''
+        # in preliminary test, caching here shows no great performance benefit
+#         if self._cache["notes"] == None:
+#             # _elementsChanged has been called
+#             self._cache["notes"] =  self.getElementsByClass([note.GeneralNote, chord.Chord])
+#         return self._cache["notes"]
+
         return self.getElementsByClass([note.GeneralNote, chord.Chord])
-        # note: class names must be provided in one argument as a list
 
     notes = property(_getNotes, doc='''
         The notes property of a Stream returns a new Stream object
@@ -6241,6 +6246,9 @@ class Score(Stream):
 class Opus(Stream):
     """A Stream subclass for handling multi-work music.
     """
+
+    #TODO get by title, possibly w/ regex
+
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
 
@@ -6267,7 +6275,15 @@ class Opus(Stream):
         ''')
 
 
+    def show(self, fmt=None, app=None):
+        '''
+        Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment.
 
+        This method overrides the behavior specified in :class:`~music21.base.Music21Object`.
+        '''
+
+        for s in self.scores:
+            s.show(fmt=fmt, app=app)
 
 
 #-------------------------------------------------------------------------------
