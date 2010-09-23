@@ -3569,21 +3569,20 @@ class Stream(music21.Music21Object):
         if retainContainers:
             for i in posDelete:
                 #environLocal.printDebug(['removing note', notes[i]])
-                if retainContainers:
-                    # get the obj ref
-                    nTarget = notes[i]
-                    # go through each container and find the note to delete
-                    # note: this assumes the container is Measure
-                    # TODO: this is where we need a recursive container Generator out
-                    for sub in reversed(returnObj.getElementsByClass(Measure)):
-                        try:
-                            i = sub.index(nTarget)
-                        except ValueError:
-                            continue
-                        junk = sub.pop(i)
-                        # get a new note
-                        # we should not continue searching Measures
-                        break 
+                # get the obj ref
+                nTarget = notes[i]
+                # go through each container and find the note to delete
+                # note: this assumes the container is Measure
+                # TODO: this is where we need a recursive container Generator out
+                for sub in reversed(returnObj.getElementsByClass(Measure)):
+                    try:
+                        i = sub.index(nTarget)
+                    except ValueError:
+                        continue
+                    junk = sub.pop(i)
+                    # get a new note
+                    # we should not continue searching Measures
+                    break 
             return returnObj
 
         else:
@@ -4454,12 +4453,19 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # slicing and recasting a note as many notes
 
-    def sliceByQuarterLengths(self, quarterLengthList, target=None,
-        inPlace=True):
-        '''Slice all durations of all part by the quarter length pattern provided in quarterLengthList.
+    def sliceByQuarterLengths(self, quarterLengthList, target=None, 
+        addTies=True, inPlace=True):
+        '''Slice all :class:`~music21.duration.Duration` objects on all Notes of this Stream. Duration are sliced according to values provided in `quarterLengthList` list. If the sum of these values is less than the Duration, the values are accumulated in a loop to try to fill the Duration. If a match cannot be found, an Exception is raised. 
 
         If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
         '''
+        if self.hasMeasures():
+            # call on component measures
+            for m in self.getElementsByClass('Measure'):
+                m.sliceByQuarterLengths(quarterLengthList, 
+                    target=target, addTies=addTies, inPlace=inPlace)
+            return # exit
+
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
         else:
@@ -4469,11 +4475,11 @@ class Stream(music21.Music21Object):
             quarterLengthList = [quarterLengthList]
 
         if target != None:
-            # get the element out of rutern obj, not elements
-            # store in a list
+            # get the element out of rutern obj
+            # need to use self.index to get index value
             eToProcess = [returnObj.elements[self.index(target)]]
-        else:
-            eToProcess = returnObj.elements
+        else: # get elements list from Stream
+            eToProcess = returnObj.notes.elements 
         
         for e in eToProcess:
             if not common.almostEquals(sum(quarterLengthList), e.quarterLength,
@@ -4497,7 +4503,7 @@ class Stream(music21.Music21Object):
             if not common.almostEquals(sum(qlProcess), e.quarterLength):
                 raise StreamException('cannot map quarterLength list into element Duration: %s, %s' % (sum(qlProcess), e.quarterLength))
     
-            post = e.splitByQuarterLengths(qlProcess)
+            post = e.splitByQuarterLengths(qlProcess, addTies=addTies)
             # remove e from the source
             oInsert = e.getOffsetBySite(returnObj)
             returnObj.remove(e)
@@ -4524,6 +4530,18 @@ class Stream(music21.Music21Object):
         pass
 
     #---------------------------------------------------------------------------
+    def hasMeasures(self):
+        '''Return a boolean value showing if this Stream contains Measures
+        '''
+        hasMeasures = False
+        for obj in self:
+            # if obj is a Part, we have multi-parts
+            if 'Measure' in obj.classes:
+                hasMeasures = True
+                break # only need one
+        return hasMeasures
+
+
     def isMultiPart(self):
         '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
         '''
@@ -6119,6 +6137,8 @@ class Part(Stream):
         return lv2
     
     lily = property(_getLily)
+
+
 
 class Staff(Stream):
     '''
@@ -10294,7 +10314,7 @@ class Test(unittest.TestCase):
 
 
 
-    def testSliceByQuarterLengths(self):
+    def testSliceByQuarterLengthsBuilt(self):
         from music21 import note
         s = Stream()
         n1 = note.Note()
@@ -10328,6 +10348,67 @@ class Test(unittest.TestCase):
         self.assertEqual([n.tie.type for n in post.notes], ['start', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop'])
         #post.show()
 
+        # try to slice just a target
+        post = s.sliceByQuarterLengths(.125, target=n2, inPlace=False)
+        self.assertEqual([n.tie == None for n in post.notes], [True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True, True] )
+
+        #post.show()
+
+        # test case where we have an existing tied note in a multi Measure structure that we do not want to break
+        s = Stream()
+        n1 = note.Note()
+        n1.quarterLength = 8
+
+        n2 = note.Note()
+        n2.quarterLength = 8
+
+        n3 = note.Note()
+        n3.quarterLength = 8
+
+        s.append(n1)
+        s.append(n2)
+        s.append(n3)
+
+        self.assertEqual(s.highestTime, 24)
+        sMeasures = s.makeMeasures()
+        sMeasures.makeTies(inPlace=True)
+
+        self.assertEquals([n.tie.type for n in sMeasures.flat.notes], 
+            ['start', 'stop', 'start', 'stop', 'start', 'stop'] )
+
+        # this shows that the previous ties across the bar line are maintained
+        # even after slicing
+        sMeasures.sliceByQuarterLengths([.5], inPlace=True)
+        self.assertEquals([n.tie.type for n in sMeasures.flat.notes], 
+            ['start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop']  )
+
+        #sMeasures.show()
+
+
+    def testSliceByQuarterLengthsImported(self):
+
+        from music21 import corpus, converter
+
+        sSrc = corpus.parseWork('bwv66.6')
+
+        s = copy.deepcopy(sSrc)
+        for p in s.parts:
+            p.sliceByQuarterLengths(.5, inPlace=True, addTies=False)
+            p.makeBeams(inPlace=True)
+        self.assertEqual(len(s.parts[0].flat.notes), 72)
+        self.assertEqual(len(s.parts[1].flat.notes), 72)
+        self.assertEqual(len(s.parts[2].flat.notes), 72)
+        self.assertEqual(len(s.parts[3].flat.notes), 72)
+
+        s = copy.deepcopy(sSrc)
+        for p in s.parts:
+            p.sliceByQuarterLengths(.25, inPlace=True, addTies=False)
+            p.makeBeams(inPlace=True)
+        self.assertEqual(len(s.parts[0].flat.notes), 144)
+        self.assertEqual(len(s.parts[1].flat.notes), 144)
+        self.assertEqual(len(s.parts[2].flat.notes), 144)
+        self.assertEqual(len(s.parts[3].flat.notes), 144)
+            
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -10343,45 +10424,5 @@ if __name__ == "__main__":
         t = Test()
         te = TestExternal()
 
-
-        #t.testYieldContainers()
-        #t.testMidiEventsBuilt()    
-        #t.testMidiEventsImported()
-        #t.testFindGaps()
-        #t.testQuantize()
-       # t.testAnalyze()
-
-        #t.testMakeTupletBracketsA()
-        #t.testMakeTupletBracketsB()
-
-        #t.testMakeNotation()
-
-        #t.testMakeTies()
-
-        #t.testMeasuresAndMakeMeasures()
-        #t.testSortAndAutoSort()
-        #t.testGetTimeSignatures()
-        #t.testMetadataOnStream()
-
-#         t.testContextNestedD()
-#         t.testGetInstrumentFromMxl()
-#         t.testGetTimeSignatures()
-#         t.testSortAndAutoSort()
-#         
-# 
-#         t.testStripTiesBuilt()
-#         t.testStripTiesImported()
-
-#         t.testChordifyBuiltA()
-#         t.testChordifyBuiltB()
-#         t.testChordifyImported()
-
-        #t.testMeasureOffsetMapPostTie()
-#         t.testElementsHighestTimeA()
-#         t.testElementsHighestTimeB()
-#         t.testElementsHighestTimeC()
-# 
-#         t.testMeasureBarline()
-
-
-        t.testSliceByQuarterLengths()
+        t.testSliceByQuarterLengthsBuilt()
+        t.testSliceByQuarterLengthsImported()

@@ -2043,8 +2043,8 @@ class Music21Object(object):
     # duration manipulation, processing, and splitting
 
 
-    def splitAtQuarterLength(self, quarterLength, retainOrigin=True,
-            displayTiedAccidentals=False):
+    def splitAtQuarterLength(self, quarterLength, retainOrigin=True, 
+        addTies=True, displayTiedAccidentals=False):
         '''
         Split an Element into two Elements based on Duration.
 
@@ -2096,7 +2096,7 @@ class Music21Object(object):
         # some higher-level classes need this functionality
 
         # set ties
-        if ('Note' in e.classes or 
+        if addTies and ('Note' in e.classes or 
             'Chord' in e.classes or 
             'Unpitched' in e.classes):
         #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
@@ -2118,11 +2118,69 @@ class Music21Object(object):
                 eRemain.accidental.displayType = 'even-tied'
                 eRemain.accidental.displayStatus = True
 
-        # this is all the functionality of PitchedOrUnpitched
-#         if hasattr(self, 'isRest') and not self.isRest:
-#             note1.tie = tie.Tie("start")  #rests arent tied
-
         return [e, eRemain]
+
+    def splitByQuarterLengths(self, quarterLengthList, addTies=True):
+        '''Given a list of quarter lengths, return a list of Music21Objects objects, copied from this Music21Objects, that are partitioned and tied with the specified quarter length list durations.
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.quarterLength = 3
+        >>> post = n.splitByQuarterLengths([1,1,1])
+        >>> [n.quarterLength for n in post]
+        [1, 1, 1]
+        '''
+        if self.duration == None:
+            raise Music21ObjectException('cannot split an element that has a Duration of None')
+
+        if not common.almostEqual(sum(quarterLengthList),
+            self.duration.quarterLength, grain=1e-4):
+            raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLength))
+        # if nothing to do
+        elif (len(quarterLengthList) == 1 and quarterLengthList[0] ==     
+            self.duration.quarterLength):
+            # return a copy of self in a list
+            return [copy.deepcopy(self)]
+        elif len(quarterLengthList) <= 1:
+            raise Music21ObjectException('cannot split by this quarter length list: %s.' % quarterLengthList)
+
+        post = []
+        forceEndTieType = 'stop'
+        for i in range(len(quarterLengthList)):
+            ql = quarterLengthList[i]
+            e = copy.deepcopy(self)
+            e.quarterLength = ql
+
+            if addTies:
+                # if not last
+                if i == 0:
+                    # if the first elements has a Tie, then the status
+                    # of that Tie needs to be continued here and, at the 
+                    # end of all durations in this block.
+                    if e.tie != None:
+                        # the last tie of what was formally a start should
+                        # continue
+                        if e.tie.type == 'start':
+                            # keep start  if already set
+                            forceEndTieType = 'continue'
+                        # a stop was ending a previous tie; we know that
+                        # the first is now a continue
+                        elif e.tie.type == 'stop':
+                            forceEndTieType = 'stop'
+                            e.tie.type = 'continue' 
+                        elif e.tie.type == 'continue':
+                            forceEndTieType = 'continue'
+                            # keep continue if already set
+                    else:
+                        e.tie = tie.Tie('start') # need a tie objects
+                elif i < (len(quarterLengthList) - 1):
+                    e.tie = tie.Tie('continue') # need a tie objects
+                else: # if last
+                    # last note just gets the tie of the original Note
+                    e.tie = tie.Tie(forceEndTieType)
+            post.append(e)
+
+        return post
 
 
     def splitAtDurations(self):
@@ -2175,47 +2233,6 @@ class Music21Object(object):
         return returnNotes
 
 
-    def splitByQuarterLengths(self, quarterLengthList):
-        '''Given a list of quarter lengths, return a list of Music21Objects objects, copied from this Music21Objects, that are partitioned and tied with the specified quarter length list durations.
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.quarterLength = 3
-        >>> post = n.splitByQuarterLengths([1,1,1])
-        >>> [n.quarterLength for n in post]
-        [1, 1, 1]
-        '''
-        if self.duration == None:
-            raise Music21ObjectException('cannot split an element that has a Duration of None')
-
-        if not common.almostEqual(sum(quarterLengthList),
-            self.duration.quarterLength, grain=1e-4):
-            raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLength))
-        # if nothing to do
-        elif (len(quarterLengthList) == 1 and quarterLengthList[0] ==     
-            self.duration.quarterLength):
-            # return a copy of self in a list
-            return [copy.deepcopy(self)]
-        elif len(quarterLengthList) <= 1:
-            raise Music21ObjectException('cannot split by this quarter length list: %s.' % quarterLengthList)
-
-        post = []
-        for i in range(len(quarterLengthList)):
-            ql = quarterLengthList[i]
-            e = copy.deepcopy(self)
-            e.quarterLength = ql
-
-            # if not last
-            if i == 0:
-                e.tie = tie.Tie('start') # need a tie objects
-            elif i < (len(quarterLengthList) - 1):
-                e.tie = tie.Tie('continue') # need a tie objects
-            else: # if last
-                # last note just gets the tie of the original Note
-                e.tie = tie.Tie('stop')
-            post.append(e)
-
-        return post
 
 
     #---------------------------------------------------------------------------
