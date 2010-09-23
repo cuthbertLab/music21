@@ -2188,7 +2188,8 @@ class Music21Object(object):
         if self.duration == None:
             raise Music21ObjectException('cannot split an element that has a Duration of None')
 
-        if sum(quarterLengthList) != self.duration.quarterLength:
+        if not common.almostEqual(sum(quarterLengthList),
+            self.duration.quarterLength, grain=1e-4):
             raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLength))
         # if nothing to do
         elif (len(quarterLengthList) == 1 and quarterLengthList[0] ==     

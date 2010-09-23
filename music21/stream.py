@@ -4461,7 +4461,7 @@ class Stream(music21.Music21Object):
         If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
         '''
         if not inPlace: # make a copy
-            returnObj = self.__class__() # for output
+            returnObj = copy.deepcopy(self)
         else:
             returnObj = self
     
@@ -4476,19 +4476,27 @@ class Stream(music21.Music21Object):
             eToProcess = returnObj.elements
         
         for e in eToProcess:
-            if not common.almostEquals(sum(quarterLengthList), e.quarterLength):
+            if not common.almostEquals(sum(quarterLengthList), e.quarterLength,
+                grain=1e-4):
                 # try to map a list that is of sufficient duration
                 qlProcess = []
                 i = 0
-                while sum(qlProcess) < e.quarterLength:
+                while True:
                     qlProcess.append(
                         quarterLengthList[i%len(quarterLengthList)])
                     i += 1
+                    sumQL = sum(qlProcess)
+                    if (common.almostEquals(sumQL, e.quarterLength) or 
+                    sumQL >= e.quarterLength):
+                        break
             else:
                 qlProcess = quarterLengthList
-            environLocal.printDebug(['got qlProcess', 
-                qlProcess, 'for element', e])
 
+            #environLocal.printDebug(['got qlProcess', qlProcess, 'for element', e, e.quarterLength])
+
+            if not common.almostEquals(sum(qlProcess), e.quarterLength):
+                raise StreamException('cannot map quarterLength list into element Duration: %s, %s' % (sum(qlProcess), e.quarterLength))
+    
             post = e.splitByQuarterLengths(qlProcess)
             # remove e from the source
             oInsert = e.getOffsetBySite(returnObj)
@@ -10304,12 +10312,22 @@ class Test(unittest.TestCase):
         for n in [n1,n2,n3,n4]:
             s.append(n)
     
-        # default will slice all
-        # TODO: .125 is not returning correct ties
-        for sliceQl, match in [(.25, 20), (.125, 40)]:
-            post = s.sliceByQuarterLengths(sliceQl, inPlace=True)
-            self.assertEqual(len(post), match)
-            #post.show()
+        post = s.sliceByQuarterLengths(.125, inPlace=False)
+        self.assertEqual([n.tie.type for n in post.notes], ['start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop'] )
+
+        post = s.sliceByQuarterLengths(.25, inPlace=False)
+        self.assertEqual([n.tie.type for n in post.notes], ['start', 'continue', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'stop'] )
+
+        post = s.sliceByQuarterLengths(.5, inPlace=False)
+        self.assertEqual([n.tie == None for n in post.notes], [False, False, False, False, False, False, True, False, False, False] )
+
+        # cannot map .3333 into .5, so this raises an exception
+        self.assertRaises(StreamException, lambda: s.sliceByQuarterLengths(1/3., inPlace=False))
+
+        post = s.sliceByQuarterLengths(1/6., inPlace=False)
+        self.assertEqual([n.tie.type for n in post.notes], ['start', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop'])
+        #post.show()
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
