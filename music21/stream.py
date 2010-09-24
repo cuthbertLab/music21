@@ -2502,7 +2502,8 @@ class Stream(music21.Music21Object):
         # assuming a flat stream with many parts, reduce all to the GCD.
         pass
 
-    def chordify(self, minimumWindowSize=.25, includePostWindow=True,
+    def chordify(self, minimumWindowSize=.125, includePostWindow=True,
+            removeRedundantPitches=True,
             gatherArticulations=True, gatherNotations=True, collect=[meter.TimeSignature, key.KeySignature], inPlace=False):
         '''Gather simultaneous Notes into a Chords.
         
@@ -2522,8 +2523,6 @@ class Stream(music21.Music21Object):
         #TODO: add removeRedundantPitches as a default
         # Chord.removeRedunantPitches and Chord.removeRedundantPitchClasses
         # gather lyrics as an option
-        # remove redunancies for gathered items
-        # test with
         # Schumann string quartet movement or the Luca Gloria 
 
         if not inPlace: # make a copy
@@ -2568,7 +2567,7 @@ class Stream(music21.Music21Object):
                 # concatenate any additional notes found
                 subNotes += subAdd.notes
 
-            # make sub into a chord
+            # make subNotes into a chord
             if len(subNotes) > 0:
                 c = chord.Chord()
                 c.duration.quarterLength = qlMax
@@ -2584,6 +2583,10 @@ class Stream(music21.Music21Object):
                     # remove all the previous elements      
                     for n in subNotes:
                         returnObj.remove(n)
+
+                if removeRedundantPitches:
+                    c.removeRedundantPitches(inPlace=True)
+
                 # insert chord at start location
                 returnObj.insert(o, c)
 
@@ -10166,6 +10169,46 @@ class Test(unittest.TestCase):
             self.assertEqual([c.offset for c in sEval], [0.0, 1.0, 3.0] )
 
 
+    def testChordifyBuiltC(self):
+        # test removal of redundant pitches
+        from music21 import stream
+
+        n1 = note.Note('c2')
+        n1.quarterLength = .5
+        n2 = note.Note('c2')
+        n2.quarterLength = .5
+        n3 = note.Note('g2')
+        n3.quarterLength = .5
+
+        n4 = note.Note('e4')
+        n4.quarterLength = .5
+        n5 = note.Note('e4')
+        n5.quarterLength = .5
+        n6 = note.Note('f#4')
+        n6.quarterLength = .5
+
+        s1 = stream.Stream()
+        s1.insert(0, n1)
+        s1.insert(0, n2)
+        s1.insert(0, n3)
+        s1.insert(.5, n4)
+        s1.insert(.5, n5)
+        s1.insert(.5, n6)
+
+        sMod = s1.chordify(inPlace=False, removeRedundantPitches=True)
+        self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches], ['C2', 'G2'])
+
+        self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches], ['E4', 'F#4'])
+
+        # without redundant pitch gathering
+        sMod = s1.chordify(inPlace=False, removeRedundantPitches=False)
+        self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches], ['C2', 'C2', 'G2'])
+
+        self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches], ['E4', 'E4', 'F#4'] )
+            
+
+
+
     def testChordifyImported(self):
         from music21 import corpus
         s = corpus.parseWork('bach/bwv66.6')
@@ -10173,9 +10216,11 @@ class Test(unittest.TestCase):
         # using in place to get the stored flat version
         sMod = s.flat.chordify(includePostWindow=False)
         self.assertEqual(len(sMod.getElementsByClass('Chord')), 35)
+        #sMod.show()
         self.assertEqual(
             [len(c.pitches) for c in sMod.getElementsByClass('Chord')], 
-            [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4])
+            [3, 4, 4, 3, 4, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 4, 3, 4, 3, 4, 3, 4, 4, 4, 4, 3, 4, 4, 2, 4, 3, 4, 4])
+
 
         # when we include post-window, we get more tones, per chord
         # but the same number of chords
@@ -10183,8 +10228,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sMod.getElementsByClass('Chord')), 35)
         self.assertEqual(
             [len(c.pitches) for c in sMod.getElementsByClass('Chord')], 
-            [7, 4, 4, 4, 4, 7, 5, 4, 4, 4, 4, 5, 4, 4, 5, 5, 6, 4, 6, 5, 4, 4, 4, 4, 4, 4, 7, 6, 4, 7, 2, 6, 5, 5, 4] )
-
+            [6, 4, 4, 3, 4, 5, 5, 4, 4, 4, 4, 5, 4, 4, 5, 5, 5, 4, 5, 5, 3, 4, 3, 4, 4, 4, 7, 5, 4, 6, 2, 6, 4, 5, 4] )
         #sMod.show()
 
 
@@ -10552,8 +10596,12 @@ if __name__ == "__main__":
         t = Test()
         te = TestExternal()
 
-        t.testSliceByQuarterLengthsBuilt()
-        t.testSliceByQuarterLengthsImported()
-        t.testSliceByGreatestDivisorBuilt()
-        t.testSliceByGreatestDivisorImported()
+#         t.testSliceByQuarterLengthsBuilt()
+#         t.testSliceByQuarterLengthsImported()
+#         t.testSliceByGreatestDivisorBuilt()
+#         t.testSliceByGreatestDivisorImported()
 
+        t.testChordifyBuiltA()
+        t.testChordifyBuiltB()
+        t.testChordifyBuiltC()
+        t.testChordifyImported()

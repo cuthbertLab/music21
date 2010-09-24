@@ -10,8 +10,12 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+import unittest
 
-from musicxml import translate as musicxmlTranslate
+
+import music21
+from music21.musicxml import translate as musicxmlTranslate
+
 
 
 #-------------------------------------------------------------------------------
@@ -20,7 +24,7 @@ class Tie(object):
 
     >>> from music21 import *
     >>> note1 = note.Note()
-    >>> note1.tie = Tie("start")
+    >>> note1.tie = tie.Tie("start")
     >>> note1.tieStyle = "normal" # or could be dotted or dashed
     >>> note1.tie.type
     'start'
@@ -65,9 +69,9 @@ class Tie(object):
         '''Equality. Based on attributes (such as pitch, accidental, duration, articulations, and ornaments) that are  not dependent on the wider context of a note (such as offset, beams, stem direction).
 
         >>> from music21 import *
-        >>> t1 = note.Tie('start')
-        >>> t2 = note.Tie('start')
-        >>> t3 = note.Tie('end')
+        >>> t1 = tie.Tie('start')
+        >>> t2 = tie.Tie('start')
+        >>> t3 = tie.Tie('end')
         >>> t1 == t2
         True
         >>> t2 == t3, t3 == t1
@@ -88,3 +92,18 @@ class Tie(object):
 
 
 
+
+
+class Test(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+    
+    def testBasic(self):
+        pass
+    
+
+#-------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    music21.mainTest(Test)

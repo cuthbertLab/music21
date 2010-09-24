@@ -918,7 +918,7 @@ def mxToStreamPart(mxScore, partId, inputM21):
                 # cannot get bar duration proportion if cannot get a ts
                 if m.barDurationProportion() < 1.0:
                     m.padAsAnacrusis()
-                    environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
+                    #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
                 mOffsetShift = m.highestTime
             # assume that, even if measure is incomplete, the next bar should
             # start at the duration given by the time signature, not highestTime
