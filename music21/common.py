@@ -680,9 +680,11 @@ def approximateGCD(values, grain=1e-4):
     '0.333333333333'
     >>> str(common.approximateGCD([5/3.,2/3.,5/6.,3/6.]))
     '0.166666666667'
+
     '''
-    # quick method: see if the smallest value is a common divisor of the rest
     lowest = float(min(values))
+
+    # quick method: see if the smallest value is a common divisor of the rest
     count = 0
     for x in values:
         # lowest is already a float
