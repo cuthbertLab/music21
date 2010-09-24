@@ -4514,12 +4514,36 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
-    def sliceByMinimum(self, target=None, inPlace=True):
-        '''Slice all duration of all part by the minimum duration that can be summed to each concurrent duration. 
-
-        If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
+    def sliceByGreatestDivisor(self, addTies=True, inPlace=True):
+        '''Slice all :class:`~music21.duration.Duration` objects on all Notes of this Stream. Duration are sliced according to the approximate GCD found in all durations. 
         '''
-        pass
+        # when operating on a Stream, this should take all durations found and use the approximateGCD to get a min duration; then, call sliceByQuarterLengths
+        if self.hasMeasures():
+            # call on component measures
+            for m in self.getElementsByClass('Measure'):
+                m.sliceByGreatestDivisor(addTies=addTies, inPlace=inPlace)
+            return # exit
+
+        if not inPlace: # make a copy
+            returnObj = copy.deepcopy(self)
+        else:
+            returnObj = self
+    
+        uniqueQuarterLengths = []
+        for e in returnObj.notes:
+            if e.quarterLength not in uniqueQuarterLengths:
+                uniqueQuarterLengths.append(e.quarterLength)
+
+        #environLocal.printDebug(['unique quarter lengths', uniqueQuarterLengths])
+
+        # will raise an exception if no gcd can be found
+        divisor = common.approximateGCD(uniqueQuarterLengths)
+
+        # process in place b/c a copy, if necessary, has already been made                            
+        returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
+            target=None, addTies=addTies, inPlace=True)
+
+        return returnObj
 
 
     def sliceByBeat(self, target=None, inPlace=True):
@@ -6318,7 +6342,7 @@ class Score(Stream):
         '''
         pass
 
-    def sliceByMinimum(self):
+    def sliceByGreatestDivisor(self):
         '''Slice all duration of all part by the minimum duration that can be summed to each concurrent duration. 
 
         Overrides method defined on Stream.
@@ -10388,9 +10412,7 @@ class Test(unittest.TestCase):
     def testSliceByQuarterLengthsImported(self):
 
         from music21 import corpus, converter
-
         sSrc = corpus.parseWork('bwv66.6')
-
         s = copy.deepcopy(sSrc)
         for p in s.parts:
             p.sliceByQuarterLengths(.5, inPlace=True, addTies=False)
@@ -10410,6 +10432,62 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[3].flat.notes), 144)
             
 
+
+    def testSliceByGreatestDivisorBuilt(self):
+        from music21 import note
+
+        s = Stream()
+        n1 = note.Note()
+        n1.quarterLength = 1.75
+        n2 = note.Note()
+        n2.quarterLength = 2
+        n3 = note.Note()
+        n3.quarterLength = .5
+        n4 = note.Note()
+        n4.quarterLength = 1.5
+        for n in [n1,n2,n3,n4]:
+            s.append(n)
+        post = s.sliceByGreatestDivisor(inPlace=False)
+
+        self.assertEqual(len(post.flat.notes), 23)
+        self.assertEqual([n.tie.type for n in post.notes], ['start', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'stop'])
+
+
+        s = Stream()
+        n1 = note.Note()
+        n1.quarterLength = 2
+        n2 = note.Note()
+        n2.quarterLength = 1/3.
+        n3 = note.Note()
+        n3.quarterLength = .5
+        n4 = note.Note()
+        n4.quarterLength = 1.5
+        for n in [n1,n2,n3,n4]:
+            s.append(n)
+        post = s.sliceByGreatestDivisor(inPlace=False)
+
+        self.assertEqual(len(post.flat.notes), 26)
+        self.assertEqual([n.tie.type for n in post.notes], ['start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'stop', 'start', 'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'stop'] )
+
+
+    def testSliceByGreatestDivisorImported(self):
+
+        from music21 import corpus, converter
+        sSrc = corpus.parseWork('bwv66.6')
+        s = copy.deepcopy(sSrc)
+        for p in s.parts:
+            p.sliceByGreatestDivisor(inPlace=True, addTies=True)
+            p.makeBeams(inPlace=True)
+        #s.show()
+        # parts have different numbers of notes, as splitting is done on 
+        # a note per note basis
+        self.assertEqual(len(s.parts[0].flat.notes), 44)
+        self.assertEqual(len(s.parts[1].flat.notes), 59)
+        self.assertEqual(len(s.parts[2].flat.notes), 61)
+        self.assertEqual(len(s.parts[3].flat.notes), 53)
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -10424,5 +10502,8 @@ if __name__ == "__main__":
         t = Test()
         te = TestExternal()
 
-        t.testSliceByQuarterLengthsBuilt()
-        t.testSliceByQuarterLengthsImported()
+        #t.testSliceByQuarterLengthsBuilt()
+        #t.testSliceByQuarterLengthsImported()
+        t.testSliceByGreatestDivisorBuilt()
+        t.testSliceByGreatestDivisorImported()
+
