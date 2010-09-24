@@ -81,6 +81,9 @@ def abcToStreamPart(abcHandler, inputM21=None):
 
         #environLocal.printDebug([mh, 'dst', dst])
         #ql = 0 # might not be zero if there is a pickup
+        # in case need to transpose due to clef indication
+        postTransposition = 0
+        clefSet = False
         for t in mh.tokens:    
             if isinstance(t, abcModule.ABCMetadata):
                 if t.isMeter():
@@ -97,7 +100,17 @@ def abcToStreamPart(abcHandler, inputM21=None):
                         dst.keySignature = ks
                     else:
                         dst.append(ks)
-    
+                    # check for clef information sometimes stored in key
+                    clefObj, transposition = t.getClefObject()
+                    if clefObj != None: 
+                        clefSet = False
+                        environLocal.printDebug(['found clef in key token:', t, clefObj, transposition])
+                        if useMeasures:  # assume at start of measures
+                            dst.clef = clefObj
+                        else:
+                            dst.append(clefObj)
+                        postTransposition = transposition
+
             # as ABCChord is subclass of ABCNote, handle first
             elif isinstance(t, abcModule.ABCChord):
                 # may have more than notes?
@@ -130,6 +143,7 @@ def abcToStreamPart(abcHandler, inputM21=None):
                 n.quarterLength = t.quarterLength
                 dst.append(n)
 
+
         # append measure to part; in the case of trailing meta data
         # dst may be part, even though useMeasures is True
         if useMeasures and 'Measure' in dst.classes: 
@@ -141,16 +155,26 @@ def abcToStreamPart(abcHandler, inputM21=None):
                 if dst.barDurationProportion() < 1.0:
                     dst.padAsAnacrusis()
                     environLocal.printDebug(['incompletely filled Measure found on abc import; interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
-
-            # clefs are not typically defined; need to call bestClef
-            # can get clef from some voices definition
-            dst.clef = dst.bestClef()
             p.append(dst)
+
+
+    # clefs are not typically defined, but if so, are set to the first measure
+    # following the meta data, or in the open stream
+    if not clefSet:
+        if useMeasures:  # assume at start of measures
+            p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
+        else:
+            p.insert(0, p.bestClef())
+
+
+    if postTransposition != 0:
+        p.transpose(postTransposition, inPlace=True)
 
     if useMeasures and len(p.getTimeSignatures(searchContext=False, 
             returnDefault=False)) > 0:
         # call make beams for now; later, import beams
         p.makeBeams()
+
 
     s.insert(0, p)
     return s
@@ -182,26 +206,26 @@ def abcToStreamScore(abcHandler, inputM21=None):
     s.insert(0, md)
 
     # get title from large-scale metadata
-    match = []
+    titleCount = 0
     for t in abcHandler.tokens:    
         if isinstance(t, abcModule.ABCMetadata):
             if t.isTitle():
-                md.title = t.data
-                match.append('title')
-                environLocal.printDebug(['got metadata title', md.title])
+                if titleCount == 0: # first
+                    md.title = t.data
+                    environLocal.printDebug(['got metadata title', md.title])
+                    titleCount += 1
+                # all other titles go in alternative field
+                else:
+                    md.alternativeTitle = t.data
+                    environLocal.printDebug(['got alternative title', md.alternativeTitle])
+                    titleCount += 1
+
             elif t.isComposer():
                 md.composer = t.data
-                match.append('composer')
             elif t.isReferenceNumber():
                 md.number = int(t.data) # convert to int?
-                match.append('number')
                 environLocal.printDebug(['got work number', md.number])
 
-        # look for opportunity to break as soon as data is filled
-        if len(match) == 3:
-            match.sort()
-            if match == ['composer', 'number', 'title',]:
-                break
 
     partHandlers = []
     tokenCollections = abcHandler.splitByVoice()
@@ -455,6 +479,45 @@ class Test(unittest.TestCase):
 
 
 
+    def testMultiWorkImported(self):
+
+        from music21 import corpus
+        # defines multiple works, will return an opus
+        o = corpus.parseWork('desPrez/milleRegrets')
+        self.assertEqual(len(o), 4)
+        # each score in the opus is a Stream that contains a Part and metadata
+        p1 = o.getScoreByNumber(1).parts[0] 
+        self.assertEqual(p1.offset, 0.0)
+        self.assertEqual(len(p1.flat.notes), 89)
+
+        p2 = o.getScoreByNumber(2).parts[0] 
+        self.assertEqual(p2.offset, 0.0)
+        self.assertEqual(len(p2.flat.notes), 81)
+
+        p3 = o.getScoreByNumber(3).parts[0] 
+        self.assertEqual(p3.offset, 0.0)
+        self.assertEqual(len(p3.flat.notes), 83)
+
+        p4 = o.getScoreByNumber(4).parts[0] 
+        self.assertEqual(p4.offset, 0.0)
+        self.assertEqual(len(p4.flat.notes), 79)
+
+
+        sMerged = o.mergeScores()
+        self.assertEqual(sMerged.metadata.title, 'Mille regrets')
+        self.assertEqual(sMerged.metadata.composer, 'Josquin des Prez')
+        self.assertEqual(len(sMerged.parts), 4)
+
+
+        self.assertEqual(sMerged.parts[0].getElementsByClass('Clef')[0].sign, 'G')
+        self.assertEqual(sMerged.parts[1].getElementsByClass('Clef')[0].sign, 'G')
+        self.assertEqual(sMerged.parts[2].getElementsByClass('Clef')[0].sign, 'G')
+        self.assertEqual(sMerged.parts[2].getElementsByClass('Clef')[0].octaveChange, -1)
+        self.assertEqual(sMerged.parts[3].getElementsByClass('Clef')[0].sign, 'F')
+
+        #sMerged.show()
+
+
 if __name__ == "__main__":
     import sys
 
@@ -467,4 +530,6 @@ if __name__ == "__main__":
 
         #t.testAnacrusisPadding()
 
-        t.testOpusImport()
+        #t.testOpusImport()
+
+        t.testMultiWorkImported()

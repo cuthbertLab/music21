@@ -1772,7 +1772,6 @@ class Stream(music21.Music21Object):
             if classList != None:
                 match = False
                 for cl in classList:
-
                     # new method uses string matching of .classes attribute
                     # temporarily check to see if this is a string
                     if isinstance(cl, str):
@@ -1786,8 +1785,8 @@ class Stream(music21.Music21Object):
                             break
                 if not match:
                     continue
-            span = offset - e.offset
-            #environLocal.printDebug(['e span check', span])
+            span = offset - e.getOffsetBySite(self)
+            #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'e.getOffsetBySite(self)', e.getOffsetBySite(self), 'e', e])
             if span < 0: # the e is after this offset
                 continue
             elif span == 0: 
@@ -2710,6 +2709,8 @@ class Stream(music21.Music21Object):
             meterStream = Stream()
             meterStream.insert(0, ts)
 
+        #environLocal.printDebug(['makeMeasures(): meterStream', 'meterStream[0]', meterStream[0], 'meterStream[0].offset',  meterStream[0].offset, 'meterStream.elements[0].parent', meterStream.elements[0].parent])
+
         # get a clef for the entire stream; this will use bestClef
         # presently, this only gets the first clef
         # may need to store a clefStream and access changes in clefs
@@ -2764,19 +2765,25 @@ class Stream(music21.Music21Object):
         # create a stream of measures to contain the offsets range defined
         # create as many measures as needed to fit in oMax
         post = self.__class__()
-        o = 0 # initial position of first measure is assumed to be zero
+        o = 0.0 # initial position of first measure is assumed to be zero
         measureCount = 0
         lastTimeSignature = None
         while True:    
             m = Measure()
             m.number = measureCount + 1
+
+            #environLocal.printDebug(['handling measure', m, m.number, 'current offset value', o, meterStream._reprTextLine()])
+
             # get active time signature at this offset
             # make a copy and it to the meter
             thisTimeSignature = meterStream.getElementAtOrBefore(o)
+            if thisTimeSignature == None and lastTimeSignature == None:
+                raise StreamException('failed to find TimeSignature in meterStream; cannot process Measures')
+
             if thisTimeSignature != lastTimeSignature:
                 lastTimeSignature = meterStream.getElementAtOrBefore(o)
                 m.timeSignature = deepcopy(thisTimeSignature)
-                #environLocal.printDebug(['assigned time sig', m.timeSignature])
+                environLocal.printDebug(['assigned time sig', m.timeSignature])
 
             # only add a clef for the first measure when automatically 
             # creating Measures; this clef is from getClefs, called above
@@ -6235,7 +6242,8 @@ class Score(Stream):
 
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
-        # add a metadata object
+        # while a metadata object is often expected, adding here prob not       
+        # a good idea. 
         #self.insert(0, metadata.Metadata())
 
     def _getLily(self):
@@ -6416,7 +6424,15 @@ class Opus(Stream):
                 return s
             elif s.metadata.number == str(opusMatch):
                 return s
-            
+
+    def getScoreByTitle(self, titleMatch):
+        '''Get Score objects from this Stream by number
+        '''
+        for s in self.getElementsByClass('Score'):
+            if s.metadata.title == titleMatch:
+                return s
+            elif s.metadata.title == str(titleMatch):
+                return s            
 
 
     def _getScores(self):
@@ -6430,6 +6446,34 @@ class Opus(Stream):
         >>> from music21 import *
         ''')
 
+
+    def mergeScores(self):
+        '''Some Opus object represent numerous scores that are individual parts of the same work. This method will treat each contained Score as a Part, merging and returning a single Score with merged Metadata.
+
+        '''
+        sNew = Score()
+        mdNew = metadata.Metadata()
+
+        for s in self.scores:
+            p = s.parts[0] # assuming only one part
+            sNew.insert(0, p)
+    
+            md = s.metadata
+            # presently just getting the first of attributes encountered
+            if md != None:
+                #environLocal.printDebug(['subscore meta data', md, 'md.composer', md.composer, 'md.title', md.title])
+                if md.title != None and mdNew.title == None:
+                    mdNew.title = md.title
+                if md.composer != None and mdNew.composer == None:
+                    mdNew.composer = md.composer
+
+        sNew.insert(0, mdNew)
+
+        return sNew
+
+    
+
+    #---------------------------------------------------------------------------
     def write(self, fmt=None, fp=None):
         '''
         Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment.

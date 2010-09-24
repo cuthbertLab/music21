@@ -216,7 +216,7 @@ class ABCMetadata(ABCToken):
         return False
 
     def isKey(self):
-        '''Returns True if the tag is "K", False otherwise.
+        '''Returns True if the tag is "K", False otherwise. Note that in some cases a Key will encode clef information. 
         '''
         if self.tag == 'K': 
             return True
@@ -393,6 +393,37 @@ class ABCMetadata(ABCToken):
         # return values of _getKeySignatureParameters are sharps, mode
         # need to unpack list w/ *
         return key.KeySignature(*self._getKeySignatureParameters())
+
+
+
+    def getClefObject(self):
+        '''Extract any clef parameters stored in the key metadata token. Assume that a clef definition suggests a transposition. Return both the Clef and the transposition. 
+
+        >>> from music21 import *
+        >>> am = abc.ABCMetadata('K:Eb Lydian')
+        >>> am.preParse()
+        >>> am._getKeySignatureParameters()
+        (-2, 'lydian')
+
+        '''
+        if not self.isKey():
+            raise ABCTokenException('no key signature associated with this meta-data')
+
+        # placing this import in method for now; key.py may import this module
+        clefObj = None
+        t = None
+
+        from music21 import clef
+        if '-8va' in self.data.lower():
+            clefObj = clef.Treble8vbClef()
+            t = -12
+        elif 'bass' in self.data.lower():
+            clefObj = clef.BassClef() 
+            t = -24
+
+        # if not defined, returns None, None
+        return clefObj, t
+
 
 
     def getDefaultQuarterLength(self):

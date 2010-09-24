@@ -1119,6 +1119,27 @@ class Metadata(music21.Music21Object):
         'Eroica'
         ''')
 
+
+    def _getAlternativeTitle(self):
+        post = self._workIds['alternativeTitle']
+        if post == None:
+            return None
+        return str(self._workIds['alternativeTitle'])
+
+    def _setAlternativeTitle(self, value):
+        self._workIds['alternativeTitle'] = Text(value)
+
+    alternativeTitle = property(_getAlternativeTitle, _setAlternativeTitle, 
+        doc = '''Get or set the alternative title. 
+
+        >>> md = Metadata(popularTitle='Eroica')
+        >>> md.alternativeTitle = 'Cantus'
+        >>> md.alternativeTitle
+        'Cantus'
+
+        ''')
+
+
     def _getMovementNumber(self):
         post = self._workIds['movementNumber']
         if post == None:

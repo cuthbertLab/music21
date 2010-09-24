@@ -682,6 +682,9 @@ class Test(unittest.TestCase):
         fpCollection = getComposer('desPrez', ['abc'])
         self.assertEqual(len(fpCollection) >= 8, True)
 
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parseWork, getWork]
