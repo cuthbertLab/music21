@@ -2046,7 +2046,7 @@ class Music21Object(object):
     def splitAtQuarterLength(self, quarterLength, retainOrigin=True, 
         addTies=True, displayTiedAccidentals=False):
         '''
-        Split an Element into two Elements based on Duration.
+        Split an Element into two Elements at a provided QuarterLength into the Element.
 
         >>> from music21 import *
         >>> a = note.NotRest()
@@ -2094,13 +2094,14 @@ class Music21Object(object):
         eRemain.duration = d2
 
         # some higher-level classes need this functionality
-
         # set ties
         if addTies and ('Note' in e.classes or 
             'Chord' in e.classes or 
             'Unpitched' in e.classes):
         #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
             #environLocal.printDebug(['tieing in makeTies', e])
+
+            # TODO: probably better handling of existing ties
             e.tie = tie.Tie('start')
             # we can set eRamain to be a stop on this iteration
             # if it needs to be tied to something on next
@@ -2178,6 +2179,9 @@ class Music21Object(object):
                 else: # if last
                     # last note just gets the tie of the original Note
                     e.tie = tie.Tie(forceEndTieType)
+
+            # TODO: check and set accidentals
+
             post.append(e)
 
         return post

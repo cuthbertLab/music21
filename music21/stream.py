@@ -3476,6 +3476,15 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
+        # this did not work in initial testing
+#         if returnObj.isMultiPart():
+#             for p in returnObj.getElementsByClass('Part'):
+#                 # already handled in place
+#                 p.stripTies(inPlace=False, matchByPitch=matchByPitch,
+#                             retainContainers=retainContainers)
+#             return returnObj # exit
+
+
         # not sure if this must be sorted
         # but: tied notes must be in consecutive order
         #  returnObj = returnObj.sorted
@@ -4459,17 +4468,23 @@ class Stream(music21.Music21Object):
 
         If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
         '''
-        if self.hasMeasures():
-            # call on component measures
-            for m in self.getElementsByClass('Measure'):
-                m.sliceByQuarterLengths(quarterLengthList, 
-                    target=target, addTies=addTies, inPlace=inPlace)
-            return # exit
-
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
+
+        if returnObj.hasMeasures():
+            # call on component measures
+            for m in returnObj.getElementsByClass('Measure'):
+                m.sliceByQuarterLengths(quarterLengthList, 
+                    target=target, addTies=addTies, inPlace=True)
+            return returnObj # exit
+
+        if returnObj.isMultiPart():
+            for p in returnObj.getElementsByClass('Part'):
+                p.sliceByQuarterLengths(quarterLengthList, 
+                    target=target, addTies=addTies, inPlace=True)
+            return returnObj # exit
     
         if not common.isListLike(quarterLengthList):
             quarterLengthList = [quarterLengthList]
@@ -4518,16 +4533,17 @@ class Stream(music21.Music21Object):
         '''Slice all :class:`~music21.duration.Duration` objects on all Notes of this Stream. Duration are sliced according to the approximate GCD found in all durations. 
         '''
         # when operating on a Stream, this should take all durations found and use the approximateGCD to get a min duration; then, call sliceByQuarterLengths
-        if self.hasMeasures():
-            # call on component measures
-            for m in self.getElementsByClass('Measure'):
-                m.sliceByGreatestDivisor(addTies=addTies, inPlace=inPlace)
-            return # exit
 
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
+
+        if returnObj.hasMeasures():
+            # call on component measures
+            for m in returnObj.getElementsByClass('Measure'):
+                m.sliceByGreatestDivisor(addTies=addTies, inPlace=True)
+            return returnObj # exit
     
         uniqueQuarterLengths = []
         for e in returnObj.notes:
@@ -4547,11 +4563,9 @@ class Stream(music21.Music21Object):
 
 
     def sliceByBeat(self, target=None, inPlace=True):
-        '''Slice each duration by the beat.
-
-        If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
-        '''
         pass
+        # this is problematic, as it is not clear what to do with many 
+        # duration that are less than the beat?
 
     #---------------------------------------------------------------------------
     def hasMeasures(self):
@@ -6322,6 +6336,9 @@ class Score(Stream):
 
         This method will retain class:`~music21.part.Measure` objects and Parts.
         '''
+        # TODO: this functionality may be placed in the Stream method
+        # see sliceByQuarterLengths for examples
+
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
@@ -6335,26 +6352,46 @@ class Score(Stream):
         return returnObj
         
 
-    def sliceByQuarterLengths(self, quarterLengthList):
-        '''Slice all durations of all part by the quarter length pattern provided in quarterLengthList.
-
-        Overrides method defined on Stream.
-        '''
-        pass
-
-    def sliceByGreatestDivisor(self):
+    def sliceByGreatestDivisor(self, inPlace=True, addTies=True):
         '''Slice all duration of all part by the minimum duration that can be summed to each concurrent duration. 
 
         Overrides method defined on Stream.
         '''
-        pass
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
 
-    def sliceByBeat(self):
-        '''Slice each duration by the beat.
+        # find greatest divisor for each measure at a time
+        # if no measures this will be zero
+        mCount = len(returnObj.parts[0].getElementsByClass('Measure'))
 
-        Overrides method defined on Stream.
-        '''
-        pass
+        if mCount == 0:
+            mCount = 1 # treat as a single measure
+
+        for i in range(mCount): # may be zero
+            uniqueQuarterLengths = []
+            for p in returnObj.getElementsByClass('Part'):
+    
+                if p.hasMeasures():
+                    m = p.getElementsByClass('Measure')[i]
+                else:
+                    m = p # treat the entire part as one measure
+
+                # collect all unique quarter lengths
+                for e in m.notes:
+                    if e.quarterLength not in uniqueQuarterLengths:
+                        uniqueQuarterLengths.append(e.quarterLength)    
+
+            # after ql for all parts, find divisor
+            divisor = common.approximateGCD(uniqueQuarterLengths)
+
+            for p in returnObj.getElementsByClass('Part'):
+                # in place: already have a copy if nec
+                p.sliceByQuarterLengths(quarterLengthList=[divisor],
+                    target=None, addTies=addTies, inPlace=True)
+
+        return returnObj
 
 
 
@@ -10432,6 +10469,15 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[3].flat.notes), 144)
             
 
+        # test applying to a complete score; works fine
+        s = copy.deepcopy(sSrc)
+        s.sliceByQuarterLengths(.5, inPlace=True, addTies=False)
+        #s.show()
+        self.assertEqual(len(s.parts[0].flat.notes), 72)
+        self.assertEqual(len(s.parts[1].flat.notes), 72)
+        self.assertEqual(len(s.parts[2].flat.notes), 72)
+        self.assertEqual(len(s.parts[3].flat.notes), 72)
+
 
     def testSliceByGreatestDivisorBuilt(self):
         from music21 import note
@@ -10487,6 +10533,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[3].flat.notes), 53)
 
 
+        s = copy.deepcopy(sSrc)
+        s.sliceByGreatestDivisor(inPlace=True, addTies=True)
+        #s.flat.chordify().show()
+        #s.show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -10502,8 +10552,8 @@ if __name__ == "__main__":
         t = Test()
         te = TestExternal()
 
-        #t.testSliceByQuarterLengthsBuilt()
-        #t.testSliceByQuarterLengthsImported()
+        t.testSliceByQuarterLengthsBuilt()
+        t.testSliceByQuarterLengthsImported()
         t.testSliceByGreatestDivisorBuilt()
         t.testSliceByGreatestDivisorImported()
 
