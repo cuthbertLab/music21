@@ -1507,7 +1507,7 @@ class Chord(note.NotRest):
     def _getOrderedPitchClasses(self):
         '''Return a pitch class representation ordered by pitch class and removing redundancies.
 
-        This is a traditional pitch class set
+        This is a traditional pitch class set.
         '''
         pcGroup = []
         for p in self.pitches:
@@ -1913,6 +1913,81 @@ class Chord(note.NotRest):
         ''')    
 
 
+    #---------------------------------------------------------------------------
+    # remove routines
+
+    def _removePitchByRedundantAttribute(self, attribute, inPlace):
+        '''Common method for stripping pitches based on redundancy of one pitch attribute. The `attribute` is provided by a string. 
+        '''
+        if not inPlace: # make a copy
+            returnObj = copy.deepcopy(self)
+        else:
+            returnObj = self
+
+        unique = []
+        delete = []
+        for p in returnObj.pitches:
+            if getattr(p, attribute) not in unique:
+                unique.append(getattr(p, attribute)) 
+            else:
+                delete.append(p)
+
+        #environLocal.printDebug(['unique, delete', self, unique, delete])
+        for p in delete:
+            returnObj.pitches.remove(p)
+
+        if len(delete) > 0:
+            returnObj._chordTablesAddressNeedsUpdating = True
+
+        if not inPlace:
+            return returnObj
+
+
+
+    def removeRedundantPitches(self, inPlace=True):
+        '''Remove all but one instance of a pitch with more than one instance. 
+        
+        If `inPlace` is True, a copy is not made and None is returned; otherwise a copy is made and that copy is returned.
+
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
+        >>> c1.removeRedundantPitches()
+        >>> c1.pitches
+        [C2, G4, E3]
+        >>> c1.forteClass
+        '3-11B'
+
+        >>> c2 = chord.Chord(['c2', 'e3', 'g4', 'c5'])
+        >>> c2.removeRedundantPitches()
+        >>> c2.pitches
+        [C2, E3, G4, C5]
+        >>> c1.forteClass
+        '3-11B'
+
+        '''
+        return self._removePitchByRedundantAttribute('nameWithOctave',
+              inPlace=inPlace)
+
+
+    def removeRedundantPitchClasses(self, inPlace=True):
+        '''Remove all but one instance of a pitch class with more than one instance of that pitch class.
+
+        If `inPlace` is True, a copy is not made and None is returned; otherwise a copy is made and that copy is returned.
+
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
+        >>> c1.removeRedundantPitchClasses()
+        >>> c1.pitches
+        [C2, G4, E3]
+
+        >>> c2 = chord.Chord(['c2', 'e3', 'g4', 'c5', 'e3'])
+        >>> c2.removeRedundantPitchClasses()
+        >>> c2.pitches
+        [C2, G4, E3]
+
+        '''
+        return self._removePitchByRedundantAttribute('name',
+              inPlace=inPlace)
 
 
     #---------------------------------------------------------------------------
