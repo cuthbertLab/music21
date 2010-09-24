@@ -43,6 +43,8 @@ from music21.corpus import essenFolksong
 
 from music21.corpus import ciconia
 
+from music21.corpus import desPrez
+
 from music21.corpus import haydn
 from music21.corpus.haydn import opus74no1  
 from music21.corpus.haydn import opus74no2  
@@ -71,7 +73,7 @@ MODULES = [
             opus59no3,
 
             ciconia,
-
+            desPrez,
             essenFolksong,
 
             haydn,
@@ -105,6 +107,7 @@ COMPOSERS = [
     ('schumann', 'Robert Schumann'),
     ('luca', 'Luca'),
     ('bach', 'Johann Sebastian Bach'),
+    ('desPrez', 'Josquin des Prez'),
     ]
 
 # instantiate an instance of each virtual work object in a module
@@ -530,7 +533,9 @@ paths = getPaths()
 #-------------------------------------------------------------------------------
 # libraries
 
+
 beethoven = getComposer('beethoven')
+desPrez = getComposer('desPrez')
 mozart = getComposer('mozart')
 haydn = getComposer('haydn')
 bach = getComposer('bach')
@@ -665,6 +670,18 @@ class Test(unittest.TestCase):
         self.assertEqual(len(fpCollection), 31)
 
 
+    def testDesPrezImport(self):
+
+        # can get a single file just by file name        
+        fp = getWork('fortunaDunGranTempo')
+        self.assertEqual(fp.endswith('desPrez/fortunaDunGranTempo.abc'), True)
+
+        fpCollection = getComposer('desprez')
+        self.assertEqual(len(fpCollection) >= 8, True)
+
+        fpCollection = getComposer('desPrez', ['abc'])
+        self.assertEqual(len(fpCollection) >= 8, True)
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parseWork, getWork]
@@ -678,5 +695,6 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
-        t.testEssenImport()
+        #t.testEssenImport()
 
+        t.testDesPrezImport()
