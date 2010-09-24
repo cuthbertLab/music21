@@ -1598,7 +1598,7 @@ class ABCHandler(object):
 
 
     def definesMeasures(self):
-        '''Return True if this token structure defines Measures
+        '''Return True if this token structure defines Measures in a normal Measure form.
 
         >>> from music21 import *
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||'
@@ -1622,7 +1622,7 @@ class ABCHandler(object):
             if isinstance(t, ABCBar):
                 count += 1
                 # forcing the inclusion of two measures to count
-                if count >= 2:
+                if count >= 3:
                     return True
         return False
 
