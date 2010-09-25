@@ -73,6 +73,8 @@ They are all greatly appreciated.
 * `Donald Byrd`_, researcher on University of Indiana who created a schema for computer-aided musicology 
   (along with the source of all sorts of examples of how music notation is difficult).
 
+* `Laura E. Conrad`_ has kindly given permission to distribute her ABC editions of renaissance polyphony from Serpent Publications.
+
 * `Ewa Dahlig-Turek`_ has kindly given permission to distribute the Essen folksong database with music21.
 
 * `Michael Good`_ and Recordare.com for creating MusicXML and many discussions about the project.
@@ -90,6 +92,7 @@ They are all greatly appreciated.
 * `Bryen Travis`_ has kindly gave permission to use his collection of Bach MIDI data in music21.
 
 .. _Donald Byrd: http://www.informatics.indiana.edu/donbyrd/CMNExtremes.htm
+.. _Laura E. Conrad: http://www.serpentpublications.org/
 .. _Michael Good: http://www.recordare.com
 .. _Margaret Greentree: http://www.jsbchorales.net
 .. _Justin London: http://www.people.carleton.edu/~jlondon/2ndviennese.htm

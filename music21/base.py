@@ -2101,12 +2101,25 @@ class Music21Object(object):
         #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
             #environLocal.printDebug(['tieing in makeTies', e])
 
-            # TODO: probably better handling of existing ties
-            e.tie = tie.Tie('start')
-            # we can set eRamain to be a stop on this iteration
-            # if it needs to be tied to something on next
-            # iteration, the tie object will be re-created
-            eRemain.tie = tie.Tie('stop')
+            forceEndTieType = 'stop'
+            if e.tie != None:
+                # the last tie of what was formally a start should
+                # continue
+                if e.tie.type == 'start':
+                    # keep start  if already set
+                    forceEndTieType = 'continue'
+                # a stop was ending a previous tie; we know that
+                # the first is now a continue
+                elif e.tie.type == 'stop':
+                    forceEndTieType = 'stop'
+                    e.tie.type = 'continue' 
+                elif e.tie.type == 'continue':
+                    forceEndTieType = 'continue'
+                    # keep continue if already set
+            else:
+                e.tie = tie.Tie('start') # need a tie objects
+
+            eRemain.tie = tie.Tie(forceEndTieType)
     
         # hide accidentals on tied notes where previous note
         # had an accidental that was shown
@@ -2121,7 +2134,8 @@ class Music21Object(object):
 
         return [e, eRemain]
 
-    def splitByQuarterLengths(self, quarterLengthList, addTies=True):
+    def splitByQuarterLengths(self, quarterLengthList, addTies=True, 
+        displayTiedAccidentals=False):
         '''Given a list of quarter lengths, return a list of Music21Objects objects, copied from this Music21Objects, that are partitioned and tied with the specified quarter length list durations.
 
         >>> from music21 import *
@@ -2180,7 +2194,19 @@ class Music21Object(object):
                     # last note just gets the tie of the original Note
                     e.tie = tie.Tie(forceEndTieType)
 
-            # TODO: check and set accidentals
+            # hide accidentals on tied notes where previous note
+            # had an accidental that was shown
+            if i != 0:
+                # look at self for characteristics of origin
+                if hasattr(self, 'accidental') and self.accidental != None:
+                    if not displayTiedAccidentals: # if False
+                        # do not show accidentals unless display type in 'even-tied'
+                        if (self.accidental.displayType not in     
+                            ['even-tied']):
+                            e.accidental.displayStatus = False
+                    else: # display tied accidentals
+                        e.accidental.displayType = 'even-tied'
+                        e.accidental.displayStatus = True
 
             post.append(e)
 
@@ -2209,6 +2235,8 @@ class Music21Object(object):
         >>> b[1].duration.type
         'whole'
         '''
+        # Note: this method is not used used in any critical code and could possible be removed.
+
         if self.duration == None:
             raise Exception('cannot split an element that has a Duration of None')
 

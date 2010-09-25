@@ -2497,9 +2497,6 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # transformations of self that return a new Stream
-    def sliceToMinimumDuration(self):
-        # assuming a flat stream with many parts, reduce all to the GCD.
-        pass
 
     def chordify(self, minimumWindowSize=.125, includePostWindow=True,
             removeRedundantPitches=True,
@@ -2519,12 +2516,15 @@ class Stream(music21.Music21Object):
         The resulting Stream, if not in-place, can also gather additional objects by placing class names in the `collect` list. By default, TimeSignature and KeySignature objects are collected. 
         
         '''
-        #TODO: add removeRedundantPitches as a default
-        # Chord.removeRedunantPitches and Chord.removeRedundantPitchClasses
         # gather lyrics as an option
-        # Schumann string quartet movement or the Luca Gloria 
+
+        # define classes that are gathered; assume they have pitches
+        matchClasses = ['Note', 'Chord']
 
         if not inPlace: # make a copy
+            # since we do not return Scores, this probably should always be 
+            # a Stream
+            #returnObj = Stream()
             returnObj = self.__class__() # for output
         else:
             returnObj = self
@@ -2542,7 +2542,7 @@ class Stream(music21.Music21Object):
             oEnd = oStart + minimumWindowSize 
             sub = self.getElementsByOffset(oStart, oEnd,
                     includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
-            subNotes = sub.notes # get once for speed         
+            subNotes = sub.getElementsByClass(matchClasses) # get once for speed         
 
             qlMax = None 
             # get the max duration found from within the window
@@ -2564,7 +2564,7 @@ class Stream(music21.Music21Object):
                         includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
 
                 # concatenate any additional notes found
-                subNotes += subAdd.notes
+                subNotes += subAdd.getElementsByClass(matchClasses)
 
             # make subNotes into a chord
             if len(subNotes) > 0:
@@ -2601,6 +2601,10 @@ class Stream(music21.Music21Object):
             # end While loop conditions
             if o > oTerminate:
                 break
+
+        # already called
+#         if not inPlace:
+#             returnObj.insert(0, returnObj.bestClef())
 
         return returnObj
 
@@ -4473,7 +4477,7 @@ class Stream(music21.Music21Object):
     # slicing and recasting a note as many notes
 
     def sliceByQuarterLengths(self, quarterLengthList, target=None, 
-        addTies=True, inPlace=True):
+        addTies=True, inPlace=False):
         '''Slice all :class:`~music21.duration.Duration` objects on all Notes of this Stream. Duration are sliced according to values provided in `quarterLengthList` list. If the sum of these values is less than the Duration, the values are accumulated in a loop to try to fill the Duration. If a match cannot be found, an Exception is raised. 
 
         If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
@@ -4507,8 +4511,11 @@ class Stream(music21.Music21Object):
             eToProcess = returnObj.notes.elements 
         
         for e in eToProcess:
-            if not common.almostEquals(sum(quarterLengthList), e.quarterLength,
-                grain=1e-4):
+            # if qlList values are greater than the found duration, skip
+            if sum(quarterLengthList) > e.quarterLength:
+                continue
+            elif not common.almostEquals(sum(quarterLengthList),
+                e.quarterLength, grain=1e-4):
                 # try to map a list that is of sufficient duration
                 qlProcess = []
                 i = 0
@@ -4539,7 +4546,7 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
-    def sliceByGreatestDivisor(self, addTies=True, inPlace=True):
+    def sliceByGreatestDivisor(self, addTies=True, inPlace=False):
         '''Slice all :class:`~music21.duration.Duration` objects on all Notes of this Stream. Duration are sliced according to the approximate GCD found in all durations. 
         '''
         # when operating on a Stream, this should take all durations found and use the approximateGCD to get a min duration; then, call sliceByQuarterLengths
@@ -4573,9 +4580,23 @@ class Stream(music21.Music21Object):
 
 
     def sliceByBeat(self, target=None, inPlace=True):
-        pass
-        # this is problematic, as it is not clear what to do with many 
-        # duration that are less than the beat?
+        # TODO: implement
+
+        if not inPlace: # make a copy
+            returnObj = copy.deepcopy(self)
+        else:
+            returnObj = self
+
+        if target != None:
+            # get the element out of rutern obj
+            # need to use self.index to get index value
+            eToProcess = [returnObj.elements[self.index(target)]]
+        else: # get elements list from Stream
+            eToProcess = returnObj.notes.elements 
+        
+        for e in eToProcess:
+            pass
+
 
     #---------------------------------------------------------------------------
     def hasMeasures(self):
@@ -10534,6 +10555,49 @@ class Test(unittest.TestCase):
         #sMeasures.show()
 
 
+        s = Stream()
+        n1 = note.Note('c#')
+        n1.quarterLength = 1
+
+        n2 = note.Note('d-')
+        n2.quarterLength = 2
+
+        n3 = note.Note('f#')
+        n3.quarterLength = .5
+
+        n4 = note.Note('g#')
+        n4.quarterLength = 1.5
+
+        for n in [n1,n2,n3,n4]:
+            s.append(n)
+    
+        post = s.sliceByQuarterLengths(.125, inPlace=False)
+        #post.show()
+
+        self.assertEqual([n.tie == None for n in post.notes], [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False])
+
+
+        s = Stream()
+        n1 = note.Note()
+        n1.quarterLength = .25
+
+        n2 = note.Note()
+        n2.quarterLength = .5
+
+        n3 = note.Note()
+        n3.quarterLength = 1
+
+        n4 = note.Note()
+        n4.quarterLength = 1.5
+
+        for n in [n1,n2,n3,n4]:
+            s.append(n)
+    
+        post = s.sliceByQuarterLengths(.5, inPlace=False)
+        self.assertEqual([n.tie == None for n in post.notes], [True, True, False, False, False, False, False])
+
+
+
     def testSliceByQuarterLengthsImported(self):
 
         from music21 import corpus, converter
@@ -10626,6 +10690,9 @@ class Test(unittest.TestCase):
         #s.flat.chordify().show()
         #s.show()
 
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -10645,7 +10712,10 @@ if __name__ == "__main__":
 #         t.testSliceByGreatestDivisorBuilt()
 #         t.testSliceByGreatestDivisorImported()
 
-        t.testChordifyBuiltA()
-        t.testChordifyBuiltB()
-        t.testChordifyBuiltC()
-        t.testChordifyImported()
+#         t.testChordifyBuiltA()
+#         t.testChordifyBuiltB()
+#         t.testChordifyBuiltC()
+#         t.testChordifyImported()
+
+
+
