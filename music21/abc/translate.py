@@ -483,7 +483,7 @@ class Test(unittest.TestCase):
 
         from music21 import corpus
         # defines multiple works, will return an opus
-        o = corpus.parseWork('desPrez/milleRegrets')
+        o = corpus.parseWork('josquin/milleRegrets')
         self.assertEqual(len(o), 4)
         # each score in the opus is a Stream that contains a Part and metadata
         p1 = o.getScoreByNumber(1).parts[0] 

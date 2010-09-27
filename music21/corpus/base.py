@@ -43,7 +43,7 @@ from music21.corpus import essenFolksong
 
 from music21.corpus import ciconia
 
-from music21.corpus import desPrez
+from music21.corpus import josquin
 
 from music21.corpus import haydn
 from music21.corpus.haydn import opus74no1  
@@ -73,7 +73,7 @@ MODULES = [
             opus59no3,
 
             ciconia,
-            desPrez,
+            josquin,
             essenFolksong,
 
             haydn,
@@ -107,7 +107,7 @@ COMPOSERS = [
     ('schumann', 'Robert Schumann'),
     ('luca', 'Luca'),
     ('bach', 'Johann Sebastian Bach'),
-    ('desPrez', 'Josquin des Prez'),
+    ('josquin', 'Josquin des Prez'),
     ]
 
 # instantiate an instance of each virtual work object in a module
@@ -535,7 +535,7 @@ paths = getPaths()
 
 
 beethoven = getComposer('beethoven')
-desPrez = getComposer('desPrez')
+josquin = getComposer('josquin')
 mozart = getComposer('mozart')
 haydn = getComposer('haydn')
 bach = getComposer('bach')
@@ -674,12 +674,12 @@ class Test(unittest.TestCase):
 
         # can get a single file just by file name        
         fp = getWork('fortunaDunGranTempo')
-        self.assertEqual(fp.endswith('desPrez/fortunaDunGranTempo.abc'), True)
+        self.assertEqual(fp.endswith('josquin/fortunaDunGranTempo.abc'), True)
 
-        fpCollection = getComposer('desprez')
+        fpCollection = getComposer('josquin')
         self.assertEqual(len(fpCollection) >= 8, True)
 
-        fpCollection = getComposer('desPrez', ['abc'])
+        fpCollection = getComposer('josquin', ['abc'])
         self.assertEqual(len(fpCollection) >= 8, True)
 
 
