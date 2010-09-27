@@ -77,24 +77,40 @@ Parsing ABC files is exactly as parsing other data formats. Simply call the :fun
 >>> from music21 import *
 >>> o = converter.parse('/Volumes/xdisc/_scratch/oVenusBant.abc')
 
-Note that many ABC files define more than one complete musical work. If an ABC file defines more than one work, a :class:`~music21.stream.Opus` object is returned. Opus objects provide convenient ways to access multiple scores.
+Note that many ABC files define more than one complete musical work. If an ABC file defines more than one work, an :class:`~music21.stream.Opus` object is returned. Opus objects, a Stream subclass, provide convenience methods for accessing multiple Score objects.
 
-Reference work numbers (e.g., the "X:" metadata tag in ABC) are stored in an Opus, and are available with the :meth:`music21.stream.Opus.getNumbers` method. A :class:`~music21.stream.Score` object can be obtained from the Opus with the :meth:`music21.stream.Opus.getScoreByNumber` method.
+Reference work numbers (e.g., the "X:" metadata tag in ABC) are stored in :class:`~music21.metadata.Metadata` objects in each contained Score. Access to these numbers from the Opus is available with the :meth:`music21.stream.Opus.getNumbers` method. Additionally, the :class:`~music21.stream.Score` object can be directly obtained with the :meth:`~music21.stream.Opus.getScoreByNumber` method.
 
 >>> from music21 import *
 >>> o = corpus.parseWork('josquin/ovenusbant')
 >>> o.getNumbers()
 ['1', '2', '3']
 >>> s = o.getScoreByNumber(2)
+>>> s.metadata.title
+'O Venus bant'
 
-For example, given an ABC file that defines individual parts, each as a separate score, an Opus object is created. These parts can be combined into a single score with the :meth:`music21.stream.Opus.mergeScores` method. 
+Direct access to Score objects contained in an Opus by title is available with the :meth:`~music21.stream.Opus.getScoreByTitle` method.
+
+>>> from music21 import *
+>>> o = corpus.parseWork('essenFolksong/erk5')
+>>> s = o.getScoreByTitle('Vrienden, kommt alle gaere')
+
+In some cases an ABC file may define individual parts each as a separate score. When parsed, these parts can be combined from the Opus into a single Score with the :meth:`music21.stream.Opus.mergeScores` method. 
+
+>>> from music21 import *
+>>> o = corpus.parseWork('josquin/milleRegrets')
+>>> s = o.mergeScores()
+>>> s.metadata.title
+'Mille regrets'
+>>> len(s.parts)
+4
 
 
 
 Getting ABC Files
 -----------------------
 
-Large collections of ABC are found in numerous on-line repositories. The following links are just a few of the many resources available. 
+Large collections of ABC are available from numerous on-line repositories. The following links are just a few of the many resources available. 
 
 http://abcnotation.com/
 http://www.serpentpublications.org/

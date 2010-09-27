@@ -151,8 +151,9 @@ workIdDict = {
     'gco' : 'collectionDesignation',
     'txo' : 'textOriginalLanguage',
     'txl' : 'textLanguage',
+
     'ocy' : 'countryOfComposition',
-    'opc' : 'localeOfComposition',
+    'opc' : 'localeOfComposition', # origin in abc
     }
 # !!!OTL: Title. 
 # !!!OTP: Popular Title.
@@ -1195,6 +1196,24 @@ class Metadata(music21.Music21Object):
         doc = '''Get or set the opus number. 
         ''')
 
+
+
+    def _getLocalOfComposition(self):
+        post = self._workIds['localOfComposition']
+        if post == None:
+            return None
+        return str(self._workIds['localOfComposition'])
+
+    def _setLocalOfComposition(self, value):
+        self._workIds['localOfComposition'] = Text(value)
+
+    localOfComposition = property(_getLocalOfComposition, 
+                                 _setLocalOfComposition, 
+        doc = '''Get or set the local of composition, or origin, of the work. 
+        ''')
+
+
+
     #---------------------------------------------------------------------------
     # provide direct access to common Contributor roles
     def getContributorsByRole(self, value):
@@ -1300,7 +1319,6 @@ class Metadata(music21.Music21Object):
 
         if self.movementNumber not in [None, '']:
             mxScore.set('movementNumber', str(self.movementNumber))
-
 
         # create and add identification obj
         mxId = musicxml.Identification()

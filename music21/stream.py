@@ -6458,6 +6458,10 @@ class Opus(Stream):
         >>> o.getNumbers()
         ['1', '2', '3']
         >>> s = o.getScoreByNumber(2)
+        >>> s.metadata.title
+        'O Venus bant'
+        >>> s.metadata.alternativeTitle
+        'Tenor'
         '''
         for s in self.getElementsByClass('Score'):
             if s.metadata.number == opusMatch:
@@ -6495,6 +6499,13 @@ class Opus(Stream):
     def mergeScores(self):
         '''Some Opus object represent numerous scores that are individual parts of the same work. This method will treat each contained Score as a Part, merging and returning a single Score with merged Metadata.
 
+        >>> from music21 import *
+        >>> o = corpus.parseWork('josquin/milleRegrets')
+        >>> s = o.mergeScores()
+        >>> s.metadata.title
+        'Mille regrets'
+        >>> len(s.parts)
+        4
         '''
         sNew = Score()
         mdNew = metadata.Metadata()

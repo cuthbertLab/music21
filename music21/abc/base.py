@@ -208,6 +208,13 @@ class ABCMetadata(ABCToken):
             return True
         return False
 
+    def isOrigin(self):
+        '''Returns True if the tag is "O" for origin, False otherwise. This value is set in the Metadata `localOfComposition` of field. 
+        '''
+        if self.tag == 'O': 
+            return True
+        return False
+
     def isVoice(self):
         '''Returns True if the tag is "V", False otherwise.
         '''
@@ -556,6 +563,21 @@ class ABCBar(ABCToken):
             return True
         else:
             return False
+
+    def isRegular(self):
+        '''Return True if this is a regular, single, light bar line. 
+
+        >>> from music21 import *
+        >>> ab = abc.ABCBar('|')
+        >>> ab.parse()
+        >>> ab.isRegular()
+        True
+        '''
+        if self.barType != 'repeat' and self.barStyle == 'regular':
+            return True
+        else:
+            return False
+
 
     def getBarObject(self):
         '''Return a music21 bar object
@@ -1620,10 +1642,13 @@ class ABCHandler(object):
         for i in range(len(self._tokens)):
             t = self._tokens[i]
             if isinstance(t, ABCBar):
-                count += 1
-                # forcing the inclusion of two measures to count
-                if count >= 3:
-                    return True
+                # must define at least 2 regular barlines
+                # this leave out cases where only double bars are given
+                if t.isRegular():
+                    count += 1
+                    # forcing the inclusion of two measures to count
+                    if count >= 2:
+                        return True
         return False
 
 
@@ -1697,24 +1722,31 @@ class ABCHandler(object):
 
 
     def splitByMeasure(self):
-        '''Divide a token list by Measures, also defining start and end bars. 
+        '''Divide a token list by Measures, also defining start and end bars of each Measure. 
 
         If a component does not have notes, leave as an empty bar. This is often done with leading metadata.
 
-        Returns a lost of ABCHandlerBar instances.
+        Returns a list of ABCHandlerBar instances. The first usually defines only Metadata
         '''
         if self._tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
 
+        post = []
+#         if not self.definesMeasures():
+#             ah = self.__class__() # just making a copy
+#             ah.tokens = self._tokens
+#             post.append(ah)
+#             return post
+
+        pos = []
         barCount = 0
         noteCount = 0
-        pos = []
         for i in range(len(self._tokens)):
             t = self._tokens[i]
             if isinstance(t, (ABCNote, ABCChord)):
                 noteCount += 1
                 # do not continue
-            # either we get a bar, or we we have notes and no bar
+            # either we get a bar, or we we have notes and no bar yet
             if isinstance(t, ABCBar) or (barCount == 0 and noteCount > 0):
                 pos.append(i) # store position 
                 barCount += 1
@@ -1730,7 +1762,6 @@ class ABCHandler(object):
         # add last
         pairs.append([i, len(self)])
 
-        post = []
         for x, y in pairs:
             ah = ABCHandlerBar()
             ah.tokens = self._tokens[x:y]
@@ -2154,7 +2185,7 @@ class Test(unittest.TestCase):
         # split by measure divides meta data
         self.assertEqual(len(ahm), 2)
         mergedHandlers = mergeLeadingMetaData(ahm)
-        # after merging, meta dat is merged back
+        # after merging, meta data is merged back
         self.assertEqual(len(mergedHandlers), 1)
         # and it has notes
         self.assertEqual(mergedHandlers[0].hasNotes(), True)

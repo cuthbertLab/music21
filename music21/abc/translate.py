@@ -40,12 +40,16 @@ def abcToStreamPart(abcHandler, inputM21=None):
 
     p = stream.Part()
 
-    # first, split into a list of Measures; if there is only metadata and 
-    # one measure, that means that no measures are defined
-    barHandlers = abcHandler.splitByMeasure()
-
-    # merge leading meta data with each bar that preceedes it
-    mergedHandlers = abcModule.mergeLeadingMetaData(barHandlers)
+    # need to call on entire handlers, as looks for special criterial, 
+    # like that at least 2 regular bars are used, not just double bars    
+    if abcHandler.definesMeasures():
+        # first, split into a list of Measures; if there is only metadata and 
+        # one measure, that means that no measures are defined
+        barHandlers = abcHandler.splitByMeasure()
+        # merge leading meta data with each bar that preceedes it
+        mergedHandlers = abcModule.mergeLeadingMetaData(barHandlers)
+    else: # simply stick in a single list
+        mergedHandlers = [abcHandler] 
 
     # if only one merged handler, do not create measures
     if len(mergedHandlers) <= 1: 
@@ -212,19 +216,23 @@ def abcToStreamScore(abcHandler, inputM21=None):
             if t.isTitle():
                 if titleCount == 0: # first
                     md.title = t.data
-                    environLocal.printDebug(['got metadata title', md.title])
+                    #environLocal.printDebug(['got metadata title', md.title])
                     titleCount += 1
                 # all other titles go in alternative field
                 else:
                     md.alternativeTitle = t.data
-                    environLocal.printDebug(['got alternative title', md.alternativeTitle])
+                    #environLocal.printDebug(['got alternative title', md.alternativeTitle])
                     titleCount += 1
-
             elif t.isComposer():
                 md.composer = t.data
+
+            elif t.isOrigin():
+                md.localOfComposition = t.data
+                #environLocal.printDebug(['got local of composition', md.localOfComposition])
+
             elif t.isReferenceNumber():
                 md.number = int(t.data) # convert to int?
-                environLocal.printDebug(['got work number', md.number])
+                #environLocal.printDebug(['got work number', md.number])
 
 
     partHandlers = []
