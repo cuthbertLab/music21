@@ -6,7 +6,7 @@ What Is Music21?
 
 Music21 is a Python-based toolkit for computer-aided musicology. 
 
-Applications include computational musicology, music informations, musical example extraction and generation, music notation editing and scripting, and a wide variety of approaches to composition, both algorithmic and directly specified. 
+Applications of this toolkit include computational musicology, music informations, musical example extraction and generation, music notation editing and scripting, and a wide variety of approaches to composition, both algorithmic and directly specified. 
 
 Music21, while newly created from the ground up, leverages many approaches and traditions from previous software systems. See :ref:`about` for information on the authors and the background of this project.
 
@@ -33,9 +33,7 @@ Music21 can then import the MusicXML data. Additionally, there exist
 numerous on-line repositories of MusicXML data. See :ref:`overviewFormats` 
 for links.
 
-There are numerous additional symbolic music representations. Presently, 
-music21 supports Humdrum and its Kern format. MuseData, MIDI and additional 
-formats will be forthcoming.
+There are numerous additional symbolic music representations. In addition to MusicXML import and export, music21 presently supports import of Humdrum and its Kern format, MIDI, and ABC, as well as export of MIDI and Lilypond. MuseData and additional formats will be forthcoming.
 
 
 

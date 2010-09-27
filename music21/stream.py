@@ -6429,7 +6429,7 @@ class Score(Stream):
 
 
 class Opus(Stream):
-    """A Stream subclass for handling multi-work music.
+    """A Stream subclass for handling multi-work music encodings. Many ABC files, for example, define multiple works or parts within a single file. 
     """
 
     #TODO get by title, possibly w/ regex
@@ -6437,8 +6437,27 @@ class Opus(Stream):
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
 
+    def getNumbers(self):
+        '''Return a list of all numbers defined in this Opus.
+
+        >>> from music21 import *
+        >>> o = corpus.parseWork('josquin/ovenusbant')
+        >>> o.getNumbers()
+        ['1', '2', '3']
+        '''
+        post = []
+        for s in self.getElementsByClass('Score'):
+            post.append(s.metadata.number)
+        return post
+
     def getScoreByNumber(self, opusMatch):
         '''Get Score objects from this Stream by number
+
+        >>> from music21 import *
+        >>> o = corpus.parseWork('josquin/ovenusbant')
+        >>> o.getNumbers()
+        ['1', '2', '3']
+        >>> s = o.getScoreByNumber(2)
         '''
         for s in self.getElementsByClass('Score'):
             if s.metadata.number == opusMatch:
@@ -6448,6 +6467,11 @@ class Opus(Stream):
 
     def getScoreByTitle(self, titleMatch):
         '''Get Score objects from this Stream by number
+
+        >>> from music21 import *
+        >>> o = corpus.parseWork('essenFolksong/erk5')
+        >>> s = o.getScoreByTitle('Vrienden, kommt alle gaere')
+
         '''
         for s in self.getElementsByClass('Score'):
             if s.metadata.title == titleMatch:

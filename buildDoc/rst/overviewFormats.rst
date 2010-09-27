@@ -4,7 +4,7 @@
 Overview: Importing File and Data Formats
 ===================================================
 
-Music21 can import and export a variety of musical data formats. Many of these formats are distributed with music21 as part of the corpus module (see :ref:`moduleCorpus.base`). 
+Music21 can import and export a variety of musical data formats. Many examples of these formats are distributed with music21 as part of the corpus module (see :ref:`moduleCorpus.base`). 
 
 The converter module, as well as the module function :func:`music21.converter.parse` handle importing all supported formats. For complete documentation on file and data formats, see :ref:`moduleConverter`.
 
@@ -50,7 +50,7 @@ http://www.gutenberg.org
 Parsing Humdrum Files
 -----------------------
 
-Parsing Humdrum functions exactly as parsing other data formats. Simply call the :func:`music21.converter.parse` function on the desired file path or URL.
+Parsing Humdrum files is exactly as parsing other data formats. Simply call the :func:`music21.converter.parse` function on the desired file path or URL.
 
 >>> sLassus = converter.parse('/Volumes/xdisc/_scratch/matona.krn')
 
@@ -67,7 +67,45 @@ http://kern.humdrum.net/
 
 
 
+
+
+Parsing ABC Files
+-----------------------
+
+Parsing ABC files is exactly as parsing other data formats. Simply call the :func:`music21.converter.parse` function on the desired file path or URL.
+
+>>> from music21 import *
+>>> o = converter.parse('/Volumes/xdisc/_scratch/oVenusBant.abc')
+
+Note that many ABC files define more than one complete musical work. If an ABC file defines more than one work, a :class:`~music21.stream.Opus` object is returned. Opus objects provide convenient ways to access multiple scores.
+
+Reference work numbers (e.g., the "X:" metadata tag in ABC) are stored in an Opus, and are available with the :meth:`music21.stream.Opus.getNumbers` method. A :class:`~music21.stream.Score` object can be obtained from the Opus with the :meth:`music21.stream.Opus.getScoreByNumber` method.
+
+>>> from music21 import *
+>>> o = corpus.parseWork('josquin/ovenusbant')
+>>> o.getNumbers()
+['1', '2', '3']
+>>> s = o.getScoreByNumber(2)
+
+For example, given an ABC file that defines individual parts, each as a separate score, an Opus object is created. These parts can be combined into a single score with the :meth:`music21.stream.Opus.mergeScores` method. 
+
+
+
+Getting ABC Files
+-----------------------
+
+Large collections of ABC are found in numerous on-line repositories. The following links are just a few of the many resources available. 
+
+http://abcnotation.com/
+http://www.serpentpublications.org/
+
+
+
+
+
+
+
 Parsing MIDI Files
 -----------------------
 
-Presently, MIDI input and output is not yet supported. We hope to have this feature available soon. 
+MIDI input and output is handled in the same was other formats. Simply call the :func:`music21.converter.parse` function on the desired file path or URL.
