@@ -2498,7 +2498,7 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # transformations of self that return a new Stream
 
-    def chordify(self, minimumWindowSize=.125, includePostWindow=True,
+    def makeChords(self, minimumWindowSize=.125, includePostWindow=True,
             removeRedundantPitches=True,
             gatherArticulations=True, gatherNotations=True, collect=[meter.TimeSignature, key.KeySignature], inPlace=False):
         '''Gather simultaneous Notes into a Chords.
@@ -4597,7 +4597,7 @@ class Stream(music21.Music21Object):
         >>> n = note.Note()
         >>> n.quarterLength = 4
         >>> s.append(n)
-        >>> s.sliceAtOffsets([1, 2, 3], inPlace=True)
+        >>> post = s.sliceAtOffsets([1, 2, 3], inPlace=True)
         >>> [(e.offset, e.quarterLength) for e in s]
         [(0.0, 1.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0)]
         '''
@@ -4612,12 +4612,20 @@ class Stream(music21.Music21Object):
                 # offset values are not relative to measure; need to
                 # shift by each measure's offset
                 offsetListLocal = [o - m.getOffsetBySite(self) for o in offsetList]
-            
                 m.sliceAtOffsets(offsetList=offsetListLocal, 
                     addTies=addTies, inPlace=True, 
                     displayTiedAccidentals=displayTiedAccidentals)
             return returnObj # exit
     
+        if returnObj.isMultiPart():
+            for p in returnObj.getElementsByClass('Part'):
+                offsetListLocal = [o - p.getOffsetBySite(self) for o in offsetList]
+                p.sliceAtOffsets(offsetList=offsetListLocal, 
+                    addTies=addTies, inPlace=True, 
+                    displayTiedAccidentals=displayTiedAccidentals)
+            return returnObj # exit
+
+
         # list of start, start+dur, element, all in abs offset time
         offsetMap = self._getOffsetMap(returnObj)
         
@@ -4669,6 +4677,12 @@ class Stream(music21.Music21Object):
                     displayTiedAccidentals=displayTiedAccidentals)
             return returnObj # exit
 
+        if returnObj.isMultiPart():
+            for p in returnObj.getElementsByClass('Part'):
+                p.sliceByBeat(target=target, 
+                    addTies=addTies, inPlace=True, 
+                    displayTiedAccidentals=displayTiedAccidentals)
+            return returnObj # exit
 
         # this will return a default
         # using this method to work on Stream, not just Measures
@@ -6501,13 +6515,13 @@ class Score(Stream):
 
                 # collect all unique quarter lengths
                 for e in m.notes:
-                    environLocal.printDebug(['examining e', i, e, e.quarterLength])
+                    #environLocal.printDebug(['examining e', i, e, e.quarterLength])
                     if e.quarterLength not in uniqueQuarterLengths:
                         uniqueQuarterLengths.append(e.quarterLength)    
 
             # after ql for all parts, find divisor
             divisor = common.approximateGCD(uniqueQuarterLengths)
-            environLocal.printDebug(['Score.sliceByGreatestDivisor: got divisor from unique ql:', divisor, uniqueQuarterLengths])
+            #environLocal.printDebug(['Score.sliceByGreatestDivisor: got divisor from unique ql:', divisor, uniqueQuarterLengths])
 
             for p in returnObj.getElementsByClass('Part'):
                 # in place: already have a copy if nec
@@ -10340,7 +10354,7 @@ class Test(unittest.TestCase):
         self.assertEqual([(0.0, 2), (0.0, 30), (5.0, 25), (8.0, 10), (10.0, 2), (15.0, 10), (20.0, 2), (22.0, 1.0)], match)
 
 
-    def testChordifyBuiltA(self):
+    def testMakeChordsBuiltA(self):
         from music21 import stream
         # test with equal durations
         pitchCol = [('A2', 'C2'), 
@@ -10362,8 +10376,8 @@ class Test(unittest.TestCase):
             self.assertEqual(len(s.getElementsByClass('Chord')), 0)
     
             # do both in place and not in place, compare results
-            sMod = s.chordify(inPlace=False)
-            s.chordify(inPlace=True)
+            sMod = s.makeChords(inPlace=False)
+            s.makeChords(inPlace=True)
             for sEval in [s, sMod]:
                 self.assertEqual(len(sEval.getElementsByClass('Chord')), 3)
                 # make sure we have all the original pitches
@@ -10373,12 +10387,12 @@ class Test(unittest.TestCase):
                     self.assertEqual(match, list(pitchCol[i]))
 
 
-#         print 'post chordify'
+#         print 'post makeChords'
 #         s.show('t')
         #sMod.show('t')
         #s.show()
 
-    def testChordifyBuiltB(self):
+    def testMakeChordsBuiltB(self):
         from music21 import stream
 
         n1 = note.Note('c2')
@@ -10400,8 +10414,8 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in s], [0.0, 1.0, 2.0, 3.0])
         # this results in two chords; n2 and n4 are effectively shifted 
         # to the start of n1 and n3
-        sMod = s.chordify(inPlace=False)
-        s.chordify(inPlace=True)   
+        sMod = s.makeChords(inPlace=False)
+        s.makeChords(inPlace=True)   
         for sEval in [s, sMod]:
             self.assertEqual(len(sEval.getElementsByClass('Chord')), 2)
             self.assertEqual([c.offset for c in sEval], [0.0, 2.0])
@@ -10428,8 +10442,8 @@ class Test(unittest.TestCase):
 
         # this results in two chords; n2 and n4 are effectively shifted 
         # to the start of n1 and n3
-        sMod = s.chordify(inPlace=False)
-        s.chordify(inPlace=True)   
+        sMod = s.makeChords(inPlace=False)
+        s.makeChords(inPlace=True)   
         for sEval in [s, sMod]:
             # have three chords, even though 1 only has more than 1 pitch
             # might change this?
@@ -10437,7 +10451,7 @@ class Test(unittest.TestCase):
             self.assertEqual([c.offset for c in sEval], [0.0, 1.0, 3.0] )
 
 
-    def testChordifyBuiltC(self):
+    def testMakeChordsBuiltC(self):
         # test removal of redundant pitches
         from music21 import stream
 
@@ -10463,13 +10477,13 @@ class Test(unittest.TestCase):
         s1.insert(.5, n5)
         s1.insert(.5, n6)
 
-        sMod = s1.chordify(inPlace=False, removeRedundantPitches=True)
+        sMod = s1.makeChords(inPlace=False, removeRedundantPitches=True)
         self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches], ['C2', 'G2'])
 
         self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches], ['E4', 'F#4'])
 
         # without redundant pitch gathering
-        sMod = s1.chordify(inPlace=False, removeRedundantPitches=False)
+        sMod = s1.makeChords(inPlace=False, removeRedundantPitches=False)
         self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches], ['C2', 'C2', 'G2'])
 
         self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches], ['E4', 'E4', 'F#4'] )
@@ -10477,12 +10491,12 @@ class Test(unittest.TestCase):
 
 
 
-    def testChordifyImported(self):
+    def testMakeChordsImported(self):
         from music21 import corpus
         s = corpus.parseWork('bach/bwv66.6')
         #s.show()
         # using in place to get the stored flat version
-        sMod = s.flat.chordify(includePostWindow=False)
+        sMod = s.flat.makeChords(includePostWindow=False)
         self.assertEqual(len(sMod.getElementsByClass('Chord')), 35)
         #sMod.show()
         self.assertEqual(
@@ -10492,7 +10506,7 @@ class Test(unittest.TestCase):
 
         # when we include post-window, we get more tones, per chord
         # but the same number of chords
-        sMod = s.flat.chordify(includePostWindow=True)
+        sMod = s.flat.makeChords(includePostWindow=True)
         self.assertEqual(len(sMod.getElementsByClass('Chord')), 35)
         self.assertEqual(
             [len(c.pitches) for c in sMod.getElementsByClass('Chord')], 
@@ -10890,7 +10904,7 @@ class Test(unittest.TestCase):
 
         s = copy.deepcopy(sSrc)
         s.sliceByGreatestDivisor(inPlace=True, addTies=True)
-        #s.flat.chordify().show()
+        #s.flat.makeChords().show()
         #s.show()
 
 
@@ -10999,15 +11013,15 @@ if __name__ == "__main__":
         t = Test()
         te = TestExternal()
 
-#         t.testSliceByQuarterLengthsBuilt()
-#         t.testSliceByQuarterLengthsImported()
-#         t.testSliceByGreatestDivisorBuilt()
-#         t.testSliceByGreatestDivisorImported()
+        t.testSliceByQuarterLengthsBuilt()
+        t.testSliceByQuarterLengthsImported()
+        t.testSliceByGreatestDivisorBuilt()
+        t.testSliceByGreatestDivisorImported()
 
-#         t.testChordifyBuiltA()
-#         t.testChordifyBuiltB()
-#         t.testChordifyBuiltC()
-#         t.testChordifyImported()
+        t.testMakeChordsBuiltA()
+        t.testMakeChordsBuiltB()
+        t.testMakeChordsBuiltC()
+        t.testMakeChordsImported()
 
         t.testSliceAtOffsetsBuilt() 
         t.testSliceAtOffsetsImported()
