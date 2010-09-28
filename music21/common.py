@@ -749,7 +749,48 @@ def lcm(filter):
     return lcmVal
 
 
+def groupContiguousIntegers(src):
+    '''Given a list of integers, group contiguous values into sub lists
 
+    >>> groupContiguousIntegers([3, 5, 6])
+    [[3], [5, 6]]
+    >>> groupContiguousIntegers([3, 4, 6])
+    [[3, 4], [6]]
+    >>> groupContiguousIntegers([3, 4, 6, 7])
+    [[3, 4], [6, 7]]
+    >>> groupContiguousIntegers([3, 4, 6, 7, 20])
+    [[3, 4], [6, 7], [20]]
+    >>> groupContiguousIntegers([3, 4, 5, 6, 7])
+    [[3, 4, 5, 6, 7]]
+    >>> groupContiguousIntegers([3])
+    [[3]]
+    >>> groupContiguousIntegers([3, 200])
+    [[3], [200]]
+    '''
+    if len(src) <= 1:
+        return [src]
+    post = []
+    group = []
+    src.sort()
+    i = 0
+    while i < (len(src)-1):
+        e = src[i]
+        group.append(e)
+        eNext = src[i+1]
+        # if next is contiguous, add to grou
+        if eNext != e + 1:
+        # if not contiguous
+            post.append(group)
+            group = []
+        # second to last elements; handle separately 
+        if i == len(src)-2:
+            # need to handle next elements
+            group.append(eNext)
+            post.append(group)
+
+        i += 1
+
+    return post
 
 
 def fromRoman(num):
@@ -987,7 +1028,7 @@ def getPackageData():
     '''
     # include these extensions for all directories, even if they are not normally there.
     ext = ['txt', 'xml', 'krn', 'mxl', 'html', 'png', 
-           'css', 'js', 'pdf', 'xls', 'mid']
+           'css', 'js', 'pdf', 'xls', 'mid', 'abc']
 
     # need all dirs, not just packages, and relative to music21
     fpList = getPackageDir(fpMusic21=None, relative=True, remapSep=None,

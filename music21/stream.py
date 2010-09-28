@@ -3347,7 +3347,6 @@ class Stream(music21.Music21Object):
 
         measureStream.makeTies(meterStream, inPlace=True)
 
-
         #measureStream.makeBeams(inPlace=True)
         try:
             measureStream.makeBeams(inPlace=True)
@@ -4579,8 +4578,15 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
+    def sliceAtOffsets(self, quarterLengthList, addTies=True, inPlace=False):
+        '''Given a list of quarter lengths, slice and optionally tie all Durations at these points. 
+        '''
+        pass
+
+
     def sliceByBeat(self, target=None, inPlace=True):
         # TODO: implement
+        # this can call slice at Offsets, given the offsets for the beat
 
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -6396,7 +6402,9 @@ class Score(Stream):
 
         # find greatest divisor for each measure at a time
         # if no measures this will be zero
-        mCount = len(returnObj.parts[0].getElementsByClass('Measure'))
+        mStream = returnObj.parts[0].getElementsByClass('Measure')
+        mCount = len(mStream)
+
 
         if mCount == 0:
             mCount = 1 # treat as a single measure
@@ -6412,25 +6420,104 @@ class Score(Stream):
 
                 # collect all unique quarter lengths
                 for e in m.notes:
+                    environLocal.printDebug(['examining e', i, e, e.quarterLength])
                     if e.quarterLength not in uniqueQuarterLengths:
                         uniqueQuarterLengths.append(e.quarterLength)    
 
             # after ql for all parts, find divisor
             divisor = common.approximateGCD(uniqueQuarterLengths)
+            environLocal.printDebug(['Score.sliceByGreatestDivisor: got divisor from unique ql:', divisor, uniqueQuarterLengths])
 
             for p in returnObj.getElementsByClass('Part'):
                 # in place: already have a copy if nec
-                p.sliceByQuarterLengths(quarterLengthList=[divisor],
+                # must do on measure at a time
+                if p.hasMeasures():
+                    m = p.getElementsByClass('Measure')[i]
+                else:
+                    m = p # treat the entire part as one measure
+                m.sliceByQuarterLengths(quarterLengthList=[divisor],
                     target=None, addTies=addTies, inPlace=True)
 
         return returnObj
+
+    def sliceAtOffsets(self, quarterLengthList, addTies=True, inPlace=False):
+        '''Given a list of quarter lengths, slice and optionally tie all Durations at these points. 
+
+        Overrides method defined on Stream.
+        '''
+        pass
+
+
+# this was commented out as it is not immediately needed
+# could be useful later in a variety of contexts
+#     def mergeStaticNotes(self, attributesList=['pitch'], inPlace=False):
+#         '''Given a multipart work, look to see if the next verticality causes a change in one or more attributes, as specified by the `attributesList` parameter. If no change is found, merge the next durations with the previous. 
+# 
+#         Presently, this assumes that all parts have the same number of notes. This must thus be used in conjunction with sliceByGreatestDivisor() to properly match notes between different parts.
+#         '''
+# 
+#         if not inPlace: # make a copy
+#             returnObj = deepcopy(self)
+#         else:
+#             returnObj = self
+# 
+#         # if no measures this will be zero
+#         mStream = returnObj.parts[0].getElementsByClass('Measure')
+#         mCount = len(mStream)
+#         if mCount == 0:
+#             mCount = 1 # treat as a single measure
+# 
+#         # step through measures, or one whole part
+#         for i in range(mCount): # may be zero
+#             #for p in returnObj.getElementsByClass('Part'):
+#             # use the top-most part as the guide    
+#             p = returnObj.getElementsByClass('Part')[0]
+#             if p.hasMeasures():
+#                 mGuide = p.getElementsByClass('Measure')[i]
+#             else:
+#                 mGuide = p # treat the entire part as one measure
+# 
+#             mergePairTerminus = [] # store last of merge pair
+#             j = 0
+#             # only look at everything up to one before the last
+#             while j < len(mGuide.notes) - 1:
+#                 jNext = j + 1
+#                 # gather all attributes from this j for each part
+#                 # doing this by index
+#                 compare = []
+#                 compareNext = []
+# 
+#                 for pStream in returnObj.getElementsByClass('Part'):
+#                     #environLocal.printDebug(['handling part', pStream])
+#                     if pStream.hasMeasures():
+#                         m = pStream.getElementsByClass('Measure')[i]
+#                     else:
+#                         m = pStream # treat the entire part as one measure
+#                     for attr in attributesList:
+#                         compare.append(getattr(m.notes[j], attr))
+#                         compareNext.append(getattr(m.notes[jNext], attr))
+#                 environLocal.printDebug(['compare, compareNext', compare, compareNext])
+# 
+#                 if compare == compareNext:
+#                     if j not in mergePairTerminus:
+#                         mergePairTerminus.append(j)
+#                     mergePairTerminus.append(jNext)
+#                 j += 1
+#             environLocal.printDebug(['mergePairTerminus', mergePairTerminus])
+# 
+#             # collect objects to merged in continuous groups
+#             # store in a list of lists; do each part one at a time
+#             for pStream in returnObj.getElementsByClass('Part'):
+#                 mergeList = []
+#                 for q in mergePairTerminus:
+#                     pass
 
 
 
 
 class Opus(Stream):
-    """A Stream subclass for handling multi-work music encodings. Many ABC files, for example, define multiple works or parts within a single file. 
-    """
+    '''A Stream subclass for handling multi-work music encodings. Many ABC files, for example, define multiple works or parts within a single file. 
+    '''
 
     #TODO get by title, possibly w/ regex
 
@@ -10728,6 +10815,9 @@ class Test(unittest.TestCase):
 
 
 
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -10751,6 +10841,3 @@ if __name__ == "__main__":
 #         t.testChordifyBuiltB()
 #         t.testChordifyBuiltC()
 #         t.testChordifyImported()
-
-
-

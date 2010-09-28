@@ -33,7 +33,7 @@ PY_BIN = ['python']
 # first build a source distribution
 # python setup.py sdist
 # then pass path to source distribution to test routine
-# python music21/test/testInstallation.py ~/music21/dist/music21-0.2.6a4.tar.gz
+# python music21/test/testInstallation.py ~/music21/dist/music21-0.3.0a5.tar.gz
 
 
 #-------------------------------------------------------------------------------
