@@ -4588,19 +4588,44 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
-    def sliceAtOffsets(self, offsetList, addTies=True, inPlace=False, 
-        displayTiedAccidentals=False):
+    def sliceAtOffsets(self, offsetList, target=None, 
+        addTies=True, inPlace=False, displayTiedAccidentals=False):
         '''Given a list of quarter lengths, slice and optionally tie all Durations at these points. 
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> n = note.Note()
+        >>> n.quarterLength = 4
+        >>> s.append(n)
+        >>> s.sliceAtOffsets([1, 2, 3], inPlace=True)
+        >>> [(e.offset, e.quarterLength) for e in s]
+        [(0.0, 1.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0)]
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
 
+        if returnObj.hasMeasures():
+            # call on component measures
+            for m in returnObj.getElementsByClass('Measure'):
+                # offset values are not relative to measure; need to
+                # shift by each measure's offset
+                offsetListLocal = [o - m.getOffsetBySite(self) for o in offsetList]
+            
+                m.sliceAtOffsets(offsetList=offsetListLocal, 
+                    addTies=addTies, inPlace=True, 
+                    displayTiedAccidentals=displayTiedAccidentals)
+            return returnObj # exit
+    
         # list of start, start+dur, element, all in abs offset time
         offsetMap = self._getOffsetMap(returnObj)
         
         for oStart, oEnd, e in offsetMap:
+            # if target is defined, only modify that object
+            if target != None and id(e) != id(target):
+                continue
+
             cutPoints = []
             for o in offsetList:
                 if o > oStart and o < oEnd:
@@ -4616,7 +4641,7 @@ class Stream(music21.Music21Object):
                     # set the second part of the remainder to e, so that it
                     # will be processed with next cut point
                     eComplete, eNext = eNext.splitAtQuarterLength(oCut,
-                        retainOrigin=True, 
+                        retainOrigin=True, addTies=addTies,
                         displayTiedAccidentals=displayTiedAccidentals)                
                     # only need to insert eNext, as eComplete was modified
                     # in place due to retainOrigin option 
@@ -4625,31 +4650,40 @@ class Stream(music21.Music21Object):
                     oStartNext = o
         return returnObj
 
-#         self.getElementsByOffset(offsetStart, offsetEnd=None,
-#                     includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)
 
-
-
-
-    def sliceByBeat(self, target=None, inPlace=True):
-        # TODO: implement
-        # this can call slice at Offsets, given the offsets for the beat
+    def sliceByBeat(self, target=None, 
+        addTies=True, inPlace=False, displayTiedAccidentals=False):
+        '''Slice all elements in the Stream that have a Duration at the offsets determined to be the beat from the local TimeSignature. 
+        '''
 
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
 
-        if target != None:
-            # get the element out of rutern obj
-            # need to use self.index to get index value
-            eToProcess = [returnObj.elements[self.index(target)]]
-        else: # get elements list from Stream
-            eToProcess = returnObj.notes.elements 
-        
-        for e in eToProcess:
-            pass
+        if returnObj.hasMeasures():
+            # call on component measures
+            for m in returnObj.getElementsByClass('Measure'):
+                m.sliceByBeat(target=target, 
+                    addTies=addTies, inPlace=True, 
+                    displayTiedAccidentals=displayTiedAccidentals)
+            return returnObj # exit
 
+
+        # this will return a default
+        # using this method to work on Stream, not just Measures
+        tsStream = returnObj.getTimeSignatures(returnDefault=True)
+        
+        if len(tsStream) == 0:
+            raise StreamException('no time signature was found')        
+        elif len(tsStream) > 1:
+            raise StreamException('not yet implemented: slice by changing time signatures')
+
+        offsetList = tsStream[0].getBeatOffsets()
+        returnObj.sliceAtOffsets(offsetList, target=target, addTies=addTies, 
+            inPlace=True, displayTiedAccidentals=displayTiedAccidentals)
+
+        return returnObj
 
     #---------------------------------------------------------------------------
     def hasMeasures(self):
@@ -10903,6 +10937,54 @@ class Test(unittest.TestCase):
         post = sSrc.parts[0].flat.sliceAtOffsets([.25, 1.25, 3.25])
         self.assertEqual([e.offset for e in post], [0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.5, 1.0, 1.25, 2.0, 3.0, 3.25, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 35.0, 36.0] )
 
+        # will also work on measured part
+        post = sSrc.parts[0].sliceAtOffsets([.25, 1.25, 3.25, 35.125])
+        self.assertEqual([e.offset for e in 
+            post.getElementsByClass('Measure')[0].notes], [0.0, 0.25, 0.5])
+        self.assertEqual([e.offset for e in 
+            post.getElementsByClass('Measure')[1].notes], [0.0, 0.25, 1.0, 2.0, 2.25, 3.0])
+        # check for alteration in last measure
+        self.assertEqual([e.offset for e in 
+            post.getElementsByClass('Measure')[-1].notes], [0.0, 1.0, 1.5, 2.0, 2.125] )
+
+
+    def testSliceByBeatBuilt(self):
+
+        from music21 import stream, note, meter
+        s = stream.Stream()
+        ts1 = meter.TimeSignature('3/4')
+        s.insert(0, ts1)
+        for p, ql in [('d2',3)]:
+            n = note.Note(p)
+            n.quarterLength = ql
+            s.append(n)
+        # have time signature and one note
+        self.assertEqual([e.offset for e in s], [0.0, 0.0])
+
+        s1 = s.sliceByBeat()
+        self.assertEqual([(e.offset, e.quarterLength) for e in s1.notes], [(0.0, 1.0), (1.0, 1.0), (2.0, 1.0)] )
+
+        # replace old ts with a new 
+        s.remove(ts1)
+        ts2 = meter.TimeSignature('6/8')
+        s.insert(0, ts2)
+        s1 = s.sliceByBeat()
+        self.assertEqual([(e.offset, e.quarterLength) for e in s1.notes], [(0.0, 1.5), (1.5, 1.5)] )
+
+
+
+    def testSliceByBeatImported(self):
+
+        from music21 import corpus, converter
+        sSrc = corpus.parseWork('bwv66.6')
+        post = sSrc.parts[0].sliceByBeat()
+        self.assertEqual([e.offset for e in post.flat.notes],  [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 34.5, 35.0])
+
+        #post.show()
+
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -10929,3 +11011,6 @@ if __name__ == "__main__":
 
         t.testSliceAtOffsetsBuilt() 
         t.testSliceAtOffsetsImported()
+
+        t.testSliceByBeatBuilt()
+        t.testSliceByBeatImported()

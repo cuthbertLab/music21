@@ -2786,6 +2786,30 @@ class TimeSignature(music21.Music21Object):
         '''
         return self.beatSequence.positionToIndex(qLenPos) + 1
 
+    def getBeatOffsets(self):
+        '''Return offset positions in a list for the start of each beat, assuming this object is found at offset zero.
+
+        >>> from music21 import *
+        >>> a = TimeSignature('3/4')
+        >>> a.getBeatOffsets()
+        [0.0, 1.0, 2.0]
+        >>> a = TimeSignature('6/8')
+        >>> a.getBeatOffsets()
+        [0.0, 1.5]
+        '''
+        post = []
+        post.append(0.0)
+        if len(self.beatSequence) == 1:
+            return post    
+        else:       
+            endOffset = self.barDuration.quarterLength
+            o = 0.0
+            for ms in self.beatSequence:
+                o += ms.duration.quarterLength
+                if common.almostEquals(o, endOffset) or o >= endOffset:
+                    return post # do not add offset for end of bar
+                post.append(o)
+                
 
     def getBeatDuration(self, qLenPos):
         '''Give a quarter length position into this meter, return a :class:`~music21.duration.Duration` object active for the top-level beat. Unlike the :attr:`music21.meter.TimeSignature.beatDuration` parameter, this will work for asymmetrical meters.
