@@ -2648,6 +2648,32 @@ class Stream(music21.Music21Object):
         return a, b
             
 
+    def _getOffsetMap(self, srcObj=None):
+        '''Needed for makeMeasures and a few other places
+
+        The Stream soruce of elements is self by default, unless a `srcObj` is provided. 
+        '''
+        if srcObj == None:
+            srcObj = self
+            
+        # assume that flat/sorted options will be set before procesing
+        offsetMap = [] # list of start, start+dur, element
+        for e in srcObj:
+            # do not include barlines
+            if isinstance(e, bar.Barline):
+                continue
+            if hasattr(e, 'duration') and e.duration is not None:
+                dur = e.duration.quarterLength
+            else:
+                dur = 0 
+            # NOTE: rounding here may cause secondary problems
+            offset = round(e.getOffsetBySite(srcObj), 8)
+            # NOTE: used to make a copy.copy of elements here; 
+            # this is not necssary b/c making deepcopy of entire Stream
+            # changed on 4/16/2010
+            offsetMap.append([offset, offset + dur, e])
+            #offsetMap.append([offset, offset + dur, copy.copy(e)])
+        return offsetMap
 
     def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
         inPlace=False):
@@ -2726,25 +2752,9 @@ class Stream(music21.Music21Object):
     
         # for each element in stream, need to find max and min offset
         # assume that flat/sorted options will be set before procesing
-        offsetMap = [] # list of start, start+dur, element
-        for e in srcObj:
-            # do not include barlines
-            if isinstance(e, bar.Barline):
-                continue
-            if hasattr(e, 'duration') and e.duration is not None:
-                dur = e.duration.quarterLength
-            else:
-                dur = 0 
-            # NOTE: rounding here may cause secondary problems
-            offset = round(e.getOffsetBySite(srcObj), 8)
-            # NOTE: used to make a copy.copy of elements here; 
-            # this is not necssary b/c making deepcopy of entire Stream
-            # changed on 4/16/2010
-            offsetMap.append([offset, offset + dur, e])
-            #offsetMap.append([offset, offset + dur, copy.copy(e)])
-    
+        # list of start, start+dur, element
+        offsetMap = self._getOffsetMap(srcObj)
         #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
-    
         #offsetMap.sort() not necessary; just get min and max
         oMin = min([start for start, end, e in offsetMap])
         oMax = max([end for start, end, e in offsetMap])
@@ -2836,7 +2846,7 @@ class Stream(music21.Music21Object):
             # here, we have the correct measure from above
             #environLocal.printDebug(['measure placement', mStart, oNew, e])
 
-            # in the case of a Clef, and possible other measure attributes, 
+            # in the case of a Clef, and possibly other measure attributes, 
             # the element may have already been placed in this measure
             #environLocal.printDebug(['compare e, clef', e, m.clef])
             if m.clef == e:
@@ -4578,10 +4588,47 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
-    def sliceAtOffsets(self, quarterLengthList, addTies=True, inPlace=False):
+    def sliceAtOffsets(self, offsetList, addTies=True, inPlace=False, 
+        displayTiedAccidentals=False):
         '''Given a list of quarter lengths, slice and optionally tie all Durations at these points. 
         '''
-        pass
+        if not inPlace: # make a copy
+            returnObj = copy.deepcopy(self)
+        else:
+            returnObj = self
+
+        # list of start, start+dur, element, all in abs offset time
+        offsetMap = self._getOffsetMap(returnObj)
+        
+        for oStart, oEnd, e in offsetMap:
+            cutPoints = []
+            for o in offsetList:
+                if o > oStart and o < oEnd:
+                    cutPoints.append(o)
+            #environLocal.printDebug(['cutPoints', cutPoints, 'oStart', oStart, 'oEnd', oEnd])
+            if len(cutPoints) > 0:
+                # remove old 
+                #eProc = returnObj.remove(e)        
+                eNext = e
+                oStartNext = oStart
+                for o in cutPoints:
+                    oCut = o - oStartNext
+                    # set the second part of the remainder to e, so that it
+                    # will be processed with next cut point
+                    eComplete, eNext = eNext.splitAtQuarterLength(oCut,
+                        retainOrigin=True, 
+                        displayTiedAccidentals=displayTiedAccidentals)                
+                    # only need to insert eNext, as eComplete was modified
+                    # in place due to retainOrigin option 
+                    # insert at o, not oCut (duration into element)
+                    returnObj.insert(o, eNext)
+                    oStartNext = o
+        return returnObj
+
+#         self.getElementsByOffset(offsetStart, offsetEnd=None,
+#                     includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)
+
+
 
 
     def sliceByBeat(self, target=None, inPlace=True):
@@ -10813,10 +10860,48 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testSliceAtOffsetsBuilt(self):
+
+        from music21 import stream, note
+        s = stream.Stream()
+        for p, ql in [('d2',4)]:
+            n = note.Note(p)
+            n.quarterLength = ql
+            s.append(n)
+        self.assertEqual([e.offset for e in s], [0.0])
+
+        s1 = s.sliceAtOffsets([.5, 1, 1.5, 2, 2.5, 3, 3.5], inPlace=False)
+        self.assertEqual([(e.offset, e.quarterLength) for e in s1], [(0.0, 0.5), (0.5, 0.5), (1.0, 0.5), (1.5, 0.5), (2.0, 0.5), (2.5, 0.5), (3.0, 0.5), (3.5, 0.5)] )
+
+        s1 = s.sliceAtOffsets([.5], inPlace=False)
+        self.assertEqual([(e.offset, e.quarterLength) for e in s1], [(0.0, 0.5), (0.5, 3.5)])
 
 
 
+        s = stream.Stream()
+        for p, ql in [('a2',1.5), ('a2',1.5), ('a2',1.5)]:
+            n = note.Note(p)
+            n.quarterLength = ql
+            s.append(n)
+        self.assertEqual([e.offset for e in s], [0.0, 1.5, 3.0])
 
+        s1 = s.sliceAtOffsets([.5], inPlace=False)
+        self.assertEqual([e.offset for e in s1], [0.0, 0.5, 1.5, 3.0])
+        s1.sliceAtOffsets([1.0, 2.5], inPlace=True)
+        self.assertEqual([e.offset for e in s1], [0.0, 0.5, 1.0, 1.5, 2.5, 3.0])
+        s1.sliceAtOffsets([3.0, 2.0, 3.5, 4.0], inPlace=True)
+        self.assertEqual([e.offset for e in s1], [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0])
+
+        self.assertEqual([e.quarterLength for e in s1], [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
+
+
+    def testSliceAtOffsetsImported(self):
+
+        from music21 import corpus, converter
+        sSrc = corpus.parseWork('bwv66.6')
+
+        post = sSrc.parts[0].flat.sliceAtOffsets([.25, 1.25, 3.25])
+        self.assertEqual([e.offset for e in post], [0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.5, 1.0, 1.25, 2.0, 3.0, 3.25, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 35.0, 36.0] )
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -10841,3 +10926,6 @@ if __name__ == "__main__":
 #         t.testChordifyBuiltB()
 #         t.testChordifyBuiltC()
 #         t.testChordifyImported()
+
+        t.testSliceAtOffsetsBuilt() 
+        t.testSliceAtOffsetsImported()
