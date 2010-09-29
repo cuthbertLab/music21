@@ -233,9 +233,12 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
             if delay > 0:
                 qjPart = prependBlankMeasures(qjPart, delay)
             cachedParts[idString] = copy.deepcopy(qjPart)
-        qjSolved.insert(0, qjPart)
-
+        qjSolved.insert(0, qjPart.flat)
+    for tp in qjSolved.parts:
+        tp.makeMeasures(inPlace = True)
+    qjSolved.show('text')
     qjChords = qjSolved.chordify()
+    qjChords.show('text')
 
     consScore = 0
     totIntervals = 1
@@ -244,7 +247,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
 
     for n in qjChords.flat.notes:
         if not 'Chord' in n.classes: continue
-        if (startCounting is False or n.offset > 80) and n.pitchClassCardinality == 1:
+        if (startCounting is False or n.offset >= 70) and n.pitchClassCardinality == 1:
             continue
         else:
             startCounting = True
@@ -356,5 +359,5 @@ def multipleSolve():
 if __name__ == "__main__":
     pass
     #multipleSolve()
-    #bentWolfSolution()
-    cuthZazSolution()
+    bentWolfSolution()
+    #cuthZazSolution()
