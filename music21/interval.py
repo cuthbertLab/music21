@@ -951,30 +951,43 @@ def _stringToDiatonicChromatic(value):
 
 def notesToGeneric(n1, n2):
     '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.GenericInterval` object.
+    works equally well with :class:`~music21.pitch.Pitch` objects
     
-    >>> from music21 import note
+    >>> from music21 import *
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g5')
     >>> aInterval = notesToGeneric(aNote, bNote)
     >>> aInterval
     <music21.interval.GenericInterval 12>
 
+    >>> aPitch = pitch.Pitch('c#4')
+    >>> bPitch = pitch.Pitch('f-5')
+    >>> bInterval = notesToGeneric(aPitch, bPitch)
+    >>> bInterval
+    <music21.interval.GenericInterval 11>
+
     '''
-    # TODO: rename notesToGeneric
     staffDist = n2.diatonicNoteNum - n1.diatonicNoteNum
     genDist = convertStaffDistanceToInterval(staffDist)
     return GenericInterval(genDist)
 
 def notesToChromatic(n1, n2):
     '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.ChromaticInterval` object.
+    Works equally well with :class:`~music21.pitch.Pitch` objects.
     
-    >>> from music21 import note
+    >>> from music21 import *
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g#5')
     >>> notesToChromatic(aNote, bNote)
     <music21.interval.ChromaticInterval 20>
+
+    >>> aPitch = pitch.Pitch('c#4')
+    >>> bPitch = pitch.Pitch('f-5')
+    >>> bInterval = notesToChromatic(aPitch, bPitch)
+    >>> bInterval
+    <music21.interval.ChromaticInterval 15>
+
     '''
-    # TODO: rename notesToChromatic
     return ChromaticInterval(n2.midi - n1.midi)
 
 
@@ -1591,8 +1604,9 @@ def transposeNote(note1, intervalString):
 
 def notesToInterval(n1, n2 = None):  
     '''Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments.
+    Works equally well with :class:`~music21.pitch.Pitch` objects.
 
-    >>> from music21 import note
+    >>> from music21 import *
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g5')
     >>> aInterval = notesToInterval(aNote, bNote)
@@ -1602,14 +1616,25 @@ def notesToInterval(n1, n2 = None):
     >>> bInterval = Interval(noteStart=aNote, noteEnd=bNote)
     >>> aInterval.niceName == bInterval.niceName
     True
+
+    >>> aPitch = pitch.Pitch('c#4')
+    >>> bPitch = pitch.Pitch('f-5')
+    >>> cInterval = notesToInterval(aPitch, bPitch)
+    >>> cInterval
+    <music21.interval.Interval dd11>
+
     '''
     # TODO: possibly remove: not clear how this offers any better functionality
     # than just creating an Interval class?
 
     #note to self:  what's going on with the Note() representation in help?
     if n2 is None: 
-        n2 = music21.note.Note() 
-        # this is not done in the constructor because of looping problems with tinyNotationNote
+        # this is not done in the constructor originally because of looping problems with tinyNotationNote
+        # but also because we now support Pitches as well
+        if hasattr(n1, 'pitch'):
+            n2 = music21.note.Note()
+        else:
+            n2 = music21.pitch.Pitch() 
     gInt = notesToGeneric(n1, n2)
     cInt = notesToChromatic(n1, n2)
     dInt = intervalsToDiatonic(gInt, cInt)

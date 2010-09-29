@@ -1283,6 +1283,52 @@ class Chord(note.NotRest):
         
         return True
     
+    def isConsonant(self):
+        '''
+        returns True if the chord is
+             one PC
+             two PCs is a major or minor third or sixth or perfect fifth.
+             three PCs and is a major or minor triad not in second inversion.
+
+        These rules define all common-practice consonances (and earlier back to about 1300 all imperfect consonances)
+
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['C3', 'E4', 'G5'])
+        >>> c1.isConsonant()
+        True
+        >>> c2 = chord.Chord(['G3', 'E-4', 'C5'])
+        >>> c2.isConsonant()
+        False
+        >>> c3 = chord.Chord(['F2','A2','C3','E-3'])
+        >>> c3.isConsonant()
+        False
+        >>> c4 = chord.Chord(['C1','G1','C2','G2','C3','G3'])
+        >>> c4.isConsonant()
+        True
+        >>> c5 = chord.Chord(['G1','C2','G2','C3','G3'])
+        >>> c5.isConsonant()
+        False
+        >>> c6 = chord.Chord(['F#'])
+        >>> c6.isConsonant()
+        True
+
+        '''
+        c2 = self.removeRedundantPitchClasses(inPlace = False)
+        if c2.pitchClassCardinality == 1:
+            return True
+        elif c2.pitchClassCardinality == 2:
+            i = interval.notesToInterval(c2.pitches[0], c2.pitches[1])
+            if i.simpleName == 'P5' or i.simpleName == 'm3' or i.simpleName == 'M3' or i.simpleName == 'm6' or i.simpleName == 'M6':
+                return True
+            else:
+                return False
+        elif c2.pitchClassCardinality == 3:
+            if self.inversion() != 2 and (self.isMajorTriad() is True or self.isMinorTriad is True):
+                return True
+            else:
+                return False
+        else:
+            return False
     
     def determineType(self):
         '''returns an abbreviation for the type of chord it is.

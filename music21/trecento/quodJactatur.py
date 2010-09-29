@@ -57,7 +57,8 @@ def reverse(self, inPlace = False,
         sounds properly backwards.  Automatically sorts the stream as well.  If inPlace is True (no by default)
         the elements are reversed in the current stream.  if inPlace is False then a new stream is returned.
 
-        all elements of class classesToMove get moved to
+        all elements of class classesToMove get moved to their current end locations before being reversed.  
+        This puts the clefs, TimeSignatures, etc. in their proper locations.  DOES NOT YET WORK
         '''
         highestTime = self.highestTime
 
@@ -236,7 +237,8 @@ def cuthZazSolution():
     tenor = (1, 10, False, False)
     
     qjSolved, avgScore = prepareSolution(triplum, ct, tenor)
- #   qjSolved.show('musicxml')
+    qjSolvedChords = qjSolved.chordify()
+    qjSolvedChords.show('musicxml')
     print avgScore
     print cachedParts
  
@@ -307,4 +309,4 @@ if __name__ == "__main__":
     pass
     #multipleSolve()
     #bentWolfSolution()
-    #cuthZazSolution()
+    cuthZazSolution()
