@@ -2500,7 +2500,7 @@ class Stream(music21.Music21Object):
 
     def makeChords(self, minimumWindowSize=.125, includePostWindow=True,
             removeRedundantPitches=True,
-            gatherArticulations=True, gatherNotations=True, collect=[meter.TimeSignature, key.KeySignature], inPlace=False):
+            gatherArticulations=True, gatherNotations=True, inPlace=False):
         '''Gather simultaneous Notes into a Chords.
         
         The gathering of elements, starting from offset 0.0, uses the `minimumWindowSize`, in quarter lengths, to collect all Notes that start between 0.0 and the minimum window size (this permits overlaps within a minimum tolerance). 
@@ -2519,28 +2519,48 @@ class Stream(music21.Music21Object):
         # gather lyrics as an option
 
         # define classes that are gathered; assume they have pitches
-        matchClasses = ['Note', 'Chord']
+        matchClasses = ['Note', 'Chord', 'Rest']
 
         if not inPlace: # make a copy
             # since we do not return Scores, this probably should always be 
             # a Stream
             #returnObj = Stream()
-            returnObj = self.__class__() # for output
+            #returnObj = self.__class__() # for output
+            returnObj = copy.deepcopy(self)
         else:
             returnObj = self
-        o = 0.0 # start at zero
-        oTerminate = self.highestOffset
 
-        # do not gather collect items (key signatures) when in place
-        if not inPlace:
-            for e in self.getElementsByClass(collect):
-                returnObj.insert(e.getOffsetBySite(self), e)
+        if returnObj.hasMeasures():
+            # call on component measures
+            for m in returnObj.getElementsByClass('Measure'):
+                # offset values are not relative to measure; need to
+                # shift by each measure's offset
+                m.makeChords(minimumWindowSize=minimumWindowSize,
+                    includePostWindow=includePostWindow,
+                    removeRedundantPitches=removeRedundantPitches,
+                    gatherArticulations=gatherArticulations,
+                    gatherNotations=gatherNotations,
+                    inPlace=True)
+            return returnObj # exit
+    
+        if returnObj.isMultiPart():
+            for p in returnObj.getElementsByClass('Part'):
+                p.makeChords(minimumWindowSize=minimumWindowSize,
+                    includePostWindow=includePostWindow,
+                    removeRedundantPitches=removeRedundantPitches,
+                    gatherArticulations=gatherArticulations,
+                    gatherNotations=gatherNotations,
+                    inPlace=True)
+            return returnObj # exit
+
+        o = 0.0 # start at zero
+        oTerminate = returnObj.highestOffset
 
         while True: 
             # get all notes within the start and the minwindow size
             oStart = o
             oEnd = oStart + minimumWindowSize 
-            sub = self.getElementsByOffset(oStart, oEnd,
+            sub = returnObj.getElementsByOffset(oStart, oEnd,
                     includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
             subNotes = sub.getElementsByClass(matchClasses) # get once for speed         
 
@@ -2559,15 +2579,25 @@ class Stream(music21.Music21Object):
             # oStart + minimumWindowSize and oStart + qlMax
             if (includePostWindow and qlMax != None 
                 and qlMax > minimumWindowSize):
-                subAdd = self.getElementsByOffset(oStart+minimumWindowSize,
+                subAdd = returnObj.getElementsByOffset(oStart+minimumWindowSize,
                         oStart+qlMax,
                         includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
-
                 # concatenate any additional notes found
                 subNotes += subAdd.getElementsByClass(matchClasses)
 
+            subRest = []
+            for e in subNotes:
+                if 'Rest' in e.classes:
+                    subRest.append(e)
+            if len(subRest) > 0:
+                # remove from subNotes
+                for e in subRest:
+                    subNotes.remove(e)
+                
             # make subNotes into a chord
             if len(subNotes) > 0:
+                #environLocal.printDebug(['creating chord from subNotes', subNotes, 'inPlace', inPlace])
+
                 c = chord.Chord()
                 c.duration.quarterLength = qlMax
                 # these are references, not copies, for now
@@ -2578,16 +2608,27 @@ class Stream(music21.Music21Object):
                 if gatherNotations:
                     for n in subNotes:
                         c.notations += n.notations
-                if inPlace:
-                    # remove all the previous elements      
-                    for n in subNotes:
-                        returnObj.remove(n)
+                # always remove all the previous elements      
+                for n in subNotes:
+                    returnObj.remove(n)
+                for r in subRest:
+                    returnObj.remove(r)
 
                 if removeRedundantPitches:
                     c.removeRedundantPitches(inPlace=True)
-
                 # insert chord at start location
                 returnObj.insert(o, c)
+
+            # only add rests if no notes
+            elif len(subRest) > 0:
+                r = note.Rest()
+                r.quarterLength = qlMax
+                # remove old rests if in place
+                for rOld in subRest:
+                    returnObj.remove(rOld)
+                returnObj.insert(o, r)
+
+            #environLocal.printDebug(['len of returnObj', len(returnObj)])
 
             # shift offset to qlMax or minimumWindowSize
             if qlMax != None and qlMax >= minimumWindowSize:
@@ -2601,12 +2642,13 @@ class Stream(music21.Music21Object):
             # end While loop conditions
             if o > oTerminate:
                 break
-
-        # already called
-#         if not inPlace:
-#             returnObj.insert(0, returnObj.bestClef())
-
         return returnObj
+
+# not defined on Stream yet, as not clear what it should do
+#     def chordify(self):
+#         '''Split all duration in all parts, if multi-part, by all unique offsets. All simultaneous durations are then gathered into single chords. 
+#         '''
+#         pass
 
 
     def splitByClass(self, objName, fx):
@@ -2630,21 +2672,17 @@ class Stream(music21.Music21Object):
         '''
         a = self.__class__()
         b = self.__class__()
-    
         found = self.getElementsByClass(objName)
-
         for e in found._elements:
             if fx(e):
                 a.insert(e) # provide an offset here
             else:
                 b.insert(e)
-
         for e in found._endElements:
             if fx(e):
                 a.storeAtEnd(e)
             else:
                 b.storeAtEnd(e)
-
         return a, b
             
 
@@ -3811,7 +3849,7 @@ class Stream(music21.Music21Object):
 
     def _getFlat(self):
         '''
-        returns a new Stream where no elements nest within other elements
+        Returns a new Stream where no elements nest within other elements
         
         >>> s = Stream()
         >>> s.autoSort = False
@@ -6499,15 +6537,11 @@ class Score(Stream):
         # if no measures this will be zero
         mStream = returnObj.parts[0].getElementsByClass('Measure')
         mCount = len(mStream)
-
-
         if mCount == 0:
             mCount = 1 # treat as a single measure
-
-        for i in range(mCount): # may be zero
+        for i in range(mCount): # may be 1
             uniqueQuarterLengths = []
             for p in returnObj.getElementsByClass('Part'):
-    
                 if p.hasMeasures():
                     m = p.getElementsByClass('Measure')[i]
                 else:
@@ -6535,12 +6569,47 @@ class Score(Stream):
 
         return returnObj
 
-    def sliceAtOffsets(self, quarterLengthList, addTies=True, inPlace=False):
-        '''Given a list of quarter lengths, slice and optionally tie all Durations at these points. 
 
-        Overrides method defined on Stream.
+    def chordify(self, addTies=True, displayTiedAccidentals=False):
+        '''Split all Durations in all parts, if multi-part, by all unique offsets. All simultaneous durations are then gathered into single chords. 
         '''
-        pass
+        returnObj = deepcopy(self)
+
+        mStream = returnObj.parts[0].getElementsByClass('Measure')
+        mCount = len(mStream)
+        if mCount == 0:
+            mCount = 1 # treat as a single measure
+        for i in range(mCount): # may be 1
+            # first, collect all unique offsets for each measure
+            uniqueOffsets = []
+            for p in returnObj.getElementsByClass('Part'):
+                if p.hasMeasures():
+                    m = p.getElementsByClass('Measure')[i]
+                else:
+                    m = p # treat the entire part as one measure
+                for e in m.notes:
+                    # offset values here will be relative to the Measure
+                    o = e.getOffsetBySite(m)
+                    if o not in uniqueOffsets:
+                        uniqueOffsets.append(o)
+            #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
+
+            for p in returnObj.getElementsByClass('Part'):
+                # get one measure at a time
+                if p.hasMeasures():
+                    m = p.getElementsByClass('Measure')[i]
+                else:
+                    m = p # treat the entire part as one measure
+                # working with a copy, in place can be true
+                m.sliceAtOffsets(offsetList=uniqueOffsets, addTies=addTies, 
+                    inPlace=True,
+                    displayTiedAccidentals=displayTiedAccidentals )
+
+        # do in place as already a copy has been made
+        post = returnObj.flat.makeChords(includePostWindow=True, 
+            removeRedundantPitches=True,
+            gatherArticulations=True, gatherNotations=True, inPlace=True)
+        return post
 
 
 # this was commented out as it is not immediately needed
@@ -10996,8 +11065,16 @@ class Test(unittest.TestCase):
 
         #post.show()
 
+    def testChordifyImported(self):
+        from music21 import stream, corpus
+        s = corpus.parseWork('gloria')
+        #s.show()
+        post = s.measures(0,20).chordify()
 
+        self.assertEqual([e.offset for e in post.notes], [0.0, 3.0, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 21.5, 22.0, 22.5, 23.0, 23.5, 24.0, 24.5, 25.0, 25.5, 26.0, 26.5, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 40.5, 41.0, 42.0, 43.5, 45.0, 45.5, 46.0, 46.5, 47.0, 47.5, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 54.5, 55.0, 55.5, 56.0, 56.5, 57.0, 58.5, 59.5])
+        #post.show()
 
+        self.assertEqual(len(post.getElementsByClass('Chord')), 71)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -11013,18 +11090,22 @@ if __name__ == "__main__":
         t = Test()
         te = TestExternal()
 
-        t.testSliceByQuarterLengthsBuilt()
-        t.testSliceByQuarterLengthsImported()
-        t.testSliceByGreatestDivisorBuilt()
-        t.testSliceByGreatestDivisorImported()
+#         t.testSliceByQuarterLengthsBuilt()
+#         t.testSliceByQuarterLengthsImported()
+#         t.testSliceByGreatestDivisorBuilt()
+#         t.testSliceByGreatestDivisorImported()
+# 
+#         t.testMakeChordsBuiltA()
+#         t.testMakeChordsBuiltB()
+#         t.testMakeChordsBuiltC()
+#         t.testMakeChordsImported()
+# 
+#         t.testSliceAtOffsetsBuilt() 
+#         t.testSliceAtOffsetsImported()
+# 
+#         t.testSliceByBeatBuilt()
+#         t.testSliceByBeatImported()
 
-        t.testMakeChordsBuiltA()
         t.testMakeChordsBuiltB()
-        t.testMakeChordsBuiltC()
-        t.testMakeChordsImported()
 
-        t.testSliceAtOffsetsBuilt() 
-        t.testSliceAtOffsetsImported()
-
-        t.testSliceByBeatBuilt()
-        t.testSliceByBeatImported()
+        t.testChordifyImported()
