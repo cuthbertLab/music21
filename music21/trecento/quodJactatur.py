@@ -234,11 +234,11 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
                 qjPart = prependBlankMeasures(qjPart, delay)
             cachedParts[idString] = copy.deepcopy(qjPart)
         qjSolved.insert(0, qjPart.flat)
-    for tp in qjSolved.parts:
-        tp.makeMeasures(inPlace = True)
-    qjSolved.show('text')
+
+    #DOESN'T WORK -- am I doing something wrong?
+    #for tp in qjSolved.parts:
+    #    tp.makeMeasures(inPlace = True)
     qjChords = qjSolved.chordify()
-    qjChords.show('text')
 
     consScore = 0
     totIntervals = 1
@@ -284,9 +284,9 @@ def bentWolfSolution():
     
 def cuthZazSolution():
     getQJ()
-    triplum = (-4, 0, False, True)  # transpose, delay, invert, retro
-    ct = (-5, 5, False, False)
-    tenor = (1, 0, False, False)
+    triplum = (1, 0, False, False)  # transpose, delay, invert, retro
+    ct = (1, 1, False, False)
+    tenor = (1, 2, False, False)
     
     qjSolved, avgScore = prepareSolution(triplum, ct, tenor)
     qjSolved.show('musicxml')
@@ -359,5 +359,5 @@ def multipleSolve():
 if __name__ == "__main__":
     pass
     #multipleSolve()
-    bentWolfSolution()
-    #cuthZazSolution()
+    #bentWolfSolution()
+    cuthZazSolution()

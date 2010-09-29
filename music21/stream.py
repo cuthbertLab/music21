@@ -6594,6 +6594,8 @@ class Score(Stream):
                         uniqueOffsets.append(o)
             #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
 
+            uniqueOffsets = sorted(uniqueOffsets)
+
             for p in returnObj.getElementsByClass('Part'):
                 # get one measure at a time
                 if p.hasMeasures():
@@ -10987,7 +10989,7 @@ class Test(unittest.TestCase):
             s.append(n)
         self.assertEqual([e.offset for e in s], [0.0])
 
-        s1 = s.sliceAtOffsets([.5, 1, 1.5, 2, 2.5, 3, 3.5], inPlace=False)
+        s1 = s.sliceAtOffsets([0.5, 1, 1.5, 2, 2.5, 3, 3.5], inPlace=False)
         self.assertEqual([(e.offset, e.quarterLength) for e in s1], [(0.0, 0.5), (0.5, 0.5), (1.0, 0.5), (1.5, 0.5), (2.0, 0.5), (2.5, 0.5), (3.0, 0.5), (3.5, 0.5)] )
 
         s1 = s.sliceAtOffsets([.5], inPlace=False)
