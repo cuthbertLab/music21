@@ -1311,6 +1311,17 @@ class Chord(note.NotRest):
         >>> c6 = chord.Chord(['F#'])
         >>> c6.isConsonant()
         True
+        >>> c7 = chord.Chord(['C1','C#1','D-1'])
+        >>> c7.isConsonant()
+        False
+        
+        
+        Spelling does matter
+        
+        
+        >>> c8 = chord.Chord(['D-4','G#4'])
+        >>> c8.isConsonant()
+        False
 
         '''
         c2 = self.removeRedundantPitchClasses(inPlace = False)
@@ -1323,7 +1334,7 @@ class Chord(note.NotRest):
             else:
                 return False
         elif c2.pitchClassCardinality == 3:
-            if self.inversion() != 2 and (self.isMajorTriad() is True or self.isMinorTriad is True):
+            if (self.isMajorTriad() is True or self.isMinorTriad is True) and (self.inversion() != 2):
                 return True
             else:
                 return False

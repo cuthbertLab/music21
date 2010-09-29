@@ -148,7 +148,7 @@ def getQJ():
     cachedParts['1-0-False-False'] = copy.deepcopy(qjPart)
     return qjPart
 
-def prepareSolution(triplumTup, ctTup, tenorTup):
+def prepareSolutionOld(triplumTup, ctTup, tenorTup):
     qjSolved = stream.Score()
 
     for transpose, delay, invert, retro in [triplumTup, ctTup, tenorTup]:
@@ -215,6 +215,56 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
                 
     return (qjSolved, (consScore/(totIntervals + 0.0)))
 
+def prepareSolution(triplumTup, ctTup, tenorTup):
+    qjSolved = stream.Score()
+
+    for transpose, delay, invert, retro in [triplumTup, ctTup, tenorTup]:
+        idString = "%d-%d-%s-%s" % (transpose, delay, invert, retro)
+        if idString in cachedParts:
+            qjPart = copy.deepcopy(cachedParts[idString])
+        else:
+            qjPart = copy.deepcopy(cachedParts["1-0-False-False"])
+            if retro is True:
+                qjPart = reverse(qjPart, makeNotation = False)
+            if invert is True:
+                invertStreamAroundNote(qjPart, qjPart.flat.notes[0])
+            if transpose != 1:
+                transposeStreamDiatonic(qjPart, transpose)
+            if delay > 0:
+                qjPart = prependBlankMeasures(qjPart, delay)
+            cachedParts[idString] = copy.deepcopy(qjPart)
+        qjSolved.insert(0, qjPart)
+
+    qjChords = qjSolved.chordify()
+
+    consScore = 0
+    totIntervals = 1
+
+    startCounting = False
+
+    for n in qjChords.flat.notes:
+        if not 'Chord' in n.classes: continue
+        if (startCounting is False or n.offset > 80) and n.pitchClassCardinality == 1:
+            continue
+        else:
+            startCounting = True
+        if (n.offset/2.0) == int(n.offset/2.0): # downbeat
+            strength = 4
+        elif (n.offset) == int(n.offset): # strong beat
+            strength = 2
+        else:
+            strength = 0.5
+              
+        if n.isConsonant():
+            thisScore = strength
+        else:
+            thisScore = -2 * strength
+        
+        consScore += thisScore
+        totIntervals += 1
+        n.lyric = str(thisScore)
+                
+    return (qjChords, (consScore/(totIntervals + 0.0)))
     
     
 
@@ -224,7 +274,6 @@ def bentWolfSolution():
     ct = (1, 5, False, False)
     tenor = (-5, 0, False, False)
 
-    
     qjSolved, avgScore = prepareSolution(triplum, ct, tenor)
     qjSolved.show('musicxml')
     print avgScore
@@ -232,13 +281,12 @@ def bentWolfSolution():
     
 def cuthZazSolution():
     getQJ()
-    triplum = (-4, 0, False, False)  # transpose, delay, invert, retro
+    triplum = (-4, 0, False, True)  # transpose, delay, invert, retro
     ct = (-5, 5, False, False)
-    tenor = (1, 10, False, False)
+    tenor = (1, 0, False, False)
     
     qjSolved, avgScore = prepareSolution(triplum, ct, tenor)
-    qjSolvedChords = qjSolved.chordify()
-    qjSolvedChords.show('musicxml')
+    qjSolved.show('musicxml')
     print avgScore
     print cachedParts
  
