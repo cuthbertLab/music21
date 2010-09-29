@@ -11076,6 +11076,71 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(post.getElementsByClass('Chord')), 71)
 
+
+    def testChordifyRests(self):
+        # test that chordify does not choke on rests
+
+        from music21 import stream, note
+
+        p1 = stream.Part()
+        for p, ql in [(None, 2), ('d2',2), (None, 2), ('e3',2), ('f3', 2)]:
+            if p == None:
+                n = note.Rest()
+            else:
+                n = note.Note(p)
+            n.quarterLength = ql
+            p1.append(n)
+
+        p2 = stream.Part()
+        for p, ql in [(None, 2), ('d3',1), ('d#3',1), (None, 2), ('e5',2), (None, 2)]:
+            if p == None:
+                n = note.Rest()
+            else:
+                n = note.Note(p)
+            n.quarterLength = ql
+            p2.append(n)
+
+        self.assertEqual([e.offset for e in p1], [0.0, 2.0, 4.0, 6.0, 8.0])
+        self.assertEqual([e.offset for e in p2], [0.0, 2.0, 3.0, 4.0, 6.0, 8.0])
+
+        score = stream.Score()
+        score.insert(0, p1)
+        score.insert(0, p2)
+
+        # parts retain their characteristics, rests are retained in position
+        scoreChords = score.makeChords()
+        self.assertEqual(len(scoreChords.parts[0].flat), 5)
+        self.assertEqual(len(scoreChords.parts[0].flat.getElementsByClass(
+            'Chord')), 3)
+        self.assertEqual(len(scoreChords.parts[0].flat.getElementsByClass(
+            'Rest')), 2)
+
+        self.assertEqual(len(scoreChords.parts[1].flat), 6)
+        self.assertEqual(len(scoreChords.parts[1].flat.getElementsByClass(
+            'Chord')), 3)
+        self.assertEqual(len(scoreChords.parts[1].flat.getElementsByClass(
+            'Rest')), 3)
+
+        # calling this on a flattened version
+        scoreChords = score.flat.makeChords()
+        self.assertEqual(len(scoreChords.flat.getElementsByClass(
+            'Chord')), 3)
+        self.assertEqual(len(scoreChords.flat.getElementsByClass(
+            'Rest')), 2)
+
+        
+        scoreChordify = score.chordify()
+        self.assertEqual(len(scoreChordify.flat.getElementsByClass(
+            'Chord')), 4)
+        self.assertEqual(len(scoreChordify.flat.getElementsByClass(
+            'Rest')), 2)
+
+        self.assertEqual(str(scoreChordify.getElementsByClass(
+            'Chord')[0].pitches), '[D2, D3]')
+        self.assertEqual(str(scoreChordify.getElementsByClass(
+            'Chord')[1].pitches), '[D2, D#3]')
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -11106,6 +11171,8 @@ if __name__ == "__main__":
 #         t.testSliceByBeatBuilt()
 #         t.testSliceByBeatImported()
 
-        t.testMakeChordsBuiltB()
+        #t.testMakeChordsBuiltB()
 
-        t.testChordifyImported()
+        #t.testChordifyImported()
+
+        t.testChordifyRests()

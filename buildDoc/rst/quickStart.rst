@@ -100,32 +100,37 @@ the components of a Stream in a text format, with the optional
 'text' argument passed to the show method. Here is an excerpt of the output. 
 
 >>> sBach.show('text')
-{0.0} <music21.stream.Part object at 0x1b67cb0>
+{0.0} <music21.stream.Part object at 0x2a85d70>
     {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.meter.TimeSignature 4/4>
-        {0.0} <music21.clef.TrebleClef object at 0x18e9310>
+        {0.0} <music21.clef.TrebleClef object at 0x2ca7e50>
         {0.0} <music21.key.KeySignature of 2 sharps>
         {0.0} <music21.note.Note E>
         {0.5} <music21.note.Note F#>
-    {4.0} <music21.stream.Measure 1 offset=4.0>
+    {1.0} <music21.stream.Measure 1 offset=1.0>
 ...
 
 
-Once the score has been parsed, we can access its components in various ways. All Streams present their components in multiple ways. The components of a Score are usually :class:`~music21.stream.Part` objects, or specialized Streams that contain Measures. 
+Once the score has been parsed, we can access its components, as with all Streams, in multiple ways. A Score often, but not always, includes :class:`~music21.stream.Part` objects (specialized Streams that contain Measures) and a :class:`~music21.metadata.Metadata` object.
 
-The components of a Stream can be accessed as a list of elements accessed by index values. Index values in Python, as common in many programming languages, count from zero. Using the Python len() method, We can see that the Score as four components, index numbers 0 through 3. 
+The components of a Stream can be accessed as a list of elements accessed by index values. Index values in Python, as common in many programming languages, count from zero. Using the Python len() method, We can see that the Score as five components, index numbers 0 through 4. 
 
 >>> len(sBach)
-4
+5
 >>> sBach[0]
 <music21.stream.Part object at 0x1b67cb0>
 >>> sBach[1]
 <music21.stream.Part object at 0x19b40b0>
 
+Components of a Stream subclass, filtered by class type, are made available through property names. For example, all of the Part objects of this Score can be accessed with the :attr:`~music21.stream.Score.parts` property.
+
+>>> len(sBach.parts)
+5
+
 We can view one of these Parts by accessing the appropriate component and calling the show() method.
 
->>> sBach[0].show()
+>>> sBach.parts[0].show()
 
 .. image:: images/quickStart-02.*
     :width: 600
@@ -146,7 +151,7 @@ Again, we can view the components of the Part with the 'text' option for the sho
 
 Parts contain numerous components, including :class:`~music21.instrument.Instrument` objects. We can access the components of a Part by index, or directly access Measures from within a Part by using the :meth:`~music21.stream.Stream.measures` method. In the following example, measures 2 through 4 are extracted from the Part as a new Stream (called select) and displayed with the show() method. 
 
->>> select = sBach[0].measures(2,4)
+>>> select = sBach.parts[0].measures(2,4)
 >>> select.show()
 
 .. image:: images/quickStart-03.*
@@ -167,7 +172,7 @@ Examining a Score by Part Id
 
 Alternatively, we can access components of a Stream by `id`, or string identifiers. Streams can get components by `id` by using the :meth:`~music21.stream.Stream.getElementById` method. For example, we can first look at all `id` attributes of all Score elements, and then select one. 
 
->>> [part.id for part in sBach]
+>>> [part.id for part in sBach.parts]
 [u'Soprano', u'Alto', u'Tenor', u'Bass']
 >>> sBach.getElementById('Soprano')
 <music21.stream.Part object at 0x1b67cb0>

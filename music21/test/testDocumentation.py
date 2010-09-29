@@ -38,6 +38,88 @@ class Test(unittest.TestCase):
         pass
 
 
+    def testQuickStart(self):
+        from music21 import stream, corpus
+        sBach = corpus.parseWork('bach/bwv7.7')
+        # with metadata
+        self.assertEquals(len(sBach), 5)
+        self.assertEquals(len(sBach.parts), 4)
+
+        select = sBach.parts[0].measures(2,4)
+        self.assertEquals(len(select), 3)
+        self.assertEquals('Measure' in select[0].classes, True)
+        self.assertEquals([part.id for part in sBach.parts], [u'Soprano', u'Alto', u'Tenor', u'Bass'] )
+        self.assertEquals('Part' in sBach.getElementById('Soprano').classes, True)
+
+        mx = select.musicxml
+
+
+    def testOverviewNotes(self):
+        from music21 import duration, pitch, chord
+
+        p1 = pitch.Pitch('b-4')
+        self.assertEquals(p1.octave, 4)
+        self.assertEquals(p1.pitchClass, 10)
+        self.assertEquals(p1.name, 'B-')
+        self.assertEquals(p1.nameWithOctave, 'B-4')
+        self.assertEquals(p1.midi, 70)
+        p1.name = 'd#'
+        p1.octave = 3
+
+        self.assertEquals(p1.nameWithOctave, 'D#3')
+
+        self.assertEquals(str(p1.accidental), '<accidental sharp>')
+        self.assertEquals(p1.accidental.alter, 1.0)
+
+        p2 = p1.transpose('M7')
+        self.assertEquals(p2.nameWithOctave, 'C##4')
+
+
+        # creating and editing durations
+        d1 = duration.Duration('half')  
+        d2 = duration.Duration(1.5)
+        self.assertEquals(d1.quarterLength, 2.0)        
+        self.assertEquals(d2.dots, 1)
+        self.assertEquals(d2.type, 'quarter')
+        self.assertEquals(d2.quarterLength, 1.5)
+
+        d1.quarterLength = 2.25
+        self.assertEquals(d1.quarterLength, 2.25)
+        self.assertEquals(d1.type, 'complex')
+
+        mx = d1.musicxml
+
+
+        # creating and editing notes
+        n1 = note.Note('e-5')
+        self.assertEquals(n1.name, 'E-')
+        self.assertEquals(n1.pitchClass, 3)
+        self.assertEquals(n1.midi, 75)
+        self.assertEquals(n1.quarterLength, 1.0)
+
+        n1.addLyric(n1.name)
+        n1.addLyric(n1.pitchClass)
+        n1.addLyric('QL: %s' % n1.quarterLength)
+
+        n1.quarterLength = 6.25
+        mx = n1.musicxml
+
+
+        # creating and editing chords
+        c1 = chord.Chord(['a#3', 'g4', 'f#5'])
+        self.assertEquals(str(c1.pitches), '[A#3, G4, F#5]')        
+        c1.quarterLength = 1 + 1/3.0
+        self.assertEquals(str(c1.quarterLength), '1.33333333333')        
+        mx  = c1.musicxml
+
+        c2 = c1.transpose('m2')
+        self.assertEquals(str(c2.pitches), '[B3, A-4, G5]')        
+        mx  = c2.musicxml
+
+        c2.addLyric(c2.forteClass)
+        mx  = c2.musicxml
+
+
     def testOverviewStreams(self):
         s = stream.Stream()
         n1 = note.Note()

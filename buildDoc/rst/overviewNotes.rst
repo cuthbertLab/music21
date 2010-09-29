@@ -37,14 +37,14 @@ Some of these parameters are settable. By setting a parameter in the appropriate
 >>> p1.name = 'd#'
 >>> p1.octave = 3
 >>> p1
-D#2
+D#3
 
 Accidentals are represented with an :class:`~music21.pitch.Accidental` object on the :attr:`~music21.pitch.Pitch.accidental` attribute of Pitch.
 
 >>> p1.accidental
 <accidental sharp>
 >>> p1.accidental.alter
--1.0
+1.0
 
 Pitches, like many objects, can be transposed by an interval specified in any format permitted by the :class:`~music21.interval.Interval` object. Common string presentation are acceptable. The :meth:`~music21.pitch.Pitch.transpose` method returns a new Pitch object, leaving the original unchanged. 
 
@@ -68,7 +68,7 @@ Creating and Editing Durations
 
 Duration objects are ubiquitous in music21. Nearly all objects have, or can have, a Duration. A Duration can represent any time span, either quantized to common whole number ratios or otherwise. A Duration may represent a single notated entity (such as dotted quarter note) or tied aggregation of durations (such as a half note tied to a sixteenth note).
 
-To create Duration, call the class with an optional duration value, expressed either as a string (such as "quarter" or "half") or with a number (a value in Quarter Lengths). The following example creates a half note duration and a dotted quarter note duration.
+To create Duration, call the class with an optional duration value, expressed either as a string (such as "quarter" or "half") or with a number (a value in Quarter Lengths). The following example creates a half note duration and a dotted quarter note duration. 
 
 >>> from music21 import *
 >>> d1 = duration.Duration('half')
@@ -85,7 +85,7 @@ As with pitch, there are many ways of expressing duration. Many are available as
 >>> d2.quarterLength
 1.5
 
-Some of the Duration parameters are settable. In the following example the :attr:`~music21.duration.Duration.quarterLength` property is set to a new value. All corresponding parameters are updated when necessary.
+Some of the Duration parameters are settable. In the following example the :attr:`~music21.duration.Duration.quarterLength` property is set to a new value. All corresponding parameters are updated when necessary. While any floating point number can be used to set the quarter length, using the most accurate values for fractions is desirable. Note that in Python 2.x integer division results in integers; setting a `quarterLength` property to 1/3 will result in a 0, while 1/3.0 will result in a triplet (0.33333333333333331).
 
 >>> d1.quarterLength = 2.25
 >>> d1.type
@@ -128,7 +128,7 @@ Notes can store numerous lines of text as lyrics or other notations on the :attr
 >>> n1.addLyric(n1.pitchClass)
 >>> n1.addLyric('QL: %s' % n1.quarterLength)
 
-As should be clear, we can alway check our work with the :class:`~music21.base.Music21Object.show` method.
+As should be clear, we can always check our work with the :class:`~music21.base.Music21Object.show` method.
 
 >>> n1.show()
 
@@ -164,9 +164,9 @@ A Chord can be created with a list of Pitch objects or strings identical to thos
 >>> c1.pitches
 [A#3, G4, F#5]
 
-Like with a Note, Duration object properties can be configured from properties on Chord. For example, the Quarter Length of the Chord can be accessed from the :attr:`~music21.chord.Chord.quarterLength` property. The :class:`~music21.base.Music21Object.show` method can be used to display the results.
+Like with a Note, Duration object properties can be configured from properties on Chord. For example, the Quarter Length of the Chord can be accessed from the :attr:`~music21.chord.Chord.quarterLength` property. (Note that, to get expected results in Python 2.x, one of the values in division must be a floating point value.) The :class:`~music21.base.Music21Object.show` method can be used to display the results.
 
->>> c1.quarterLength = 1 + 1/3.
+>>> c1.quarterLength = 1 + 1/3.0
 >>> c1.show()
 
 .. image:: images/overviewNotes-05.*

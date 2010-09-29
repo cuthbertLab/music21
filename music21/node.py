@@ -441,7 +441,8 @@ class Node(object):
                     try:
                         entry = unicode(content, errors='replace')
                     except TypeError:
-                        entry = str(content)
+                        entry = u"%s" % content
+                        #entry = str(content)
                     sub.appendChild(doc.createTextNode(entry))
                 node.appendChild(sub)
             elif isinstance(component, Node): # its a Node subclass
