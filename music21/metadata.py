@@ -30,6 +30,7 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a :
 
 import unittest, doctest
 import datetime
+import json
 
 import music21
 from music21 import common
@@ -266,6 +267,46 @@ class Text(object):
         'The Ale is Dear'
         '''
         return text.prependArticle(self.__str__(), self._language)
+
+    #---------------------------------------------------------------------------
+    def _getJSON(self):
+        '''Return a JSON representation
+
+        >>> t = Text('my text')
+        >>> t.language = 'en'
+        >>> post = t.json # cannot show string as self changes in context
+        '''
+        src = {'self': str(self.__class__)}
+        # flat data attributes
+        for attr in ['_data', '_language']:
+            src[attr] = getattr(self, attr)
+        return json.dumps(src)
+
+
+    def _setJSON(self, jsonStr):
+        '''Set this object based on a JSON representation
+
+        >>> jsonStr = '{"_language": "en", "self": "<class \\'__main__.Text\\'>", "_data": "my text"}'
+        >>> d = json.loads(jsonStr)
+        >>> d
+        {u'_language': u'en', u'self': u"<class '__main__.Text'>", u'_data': u'my text'}
+        >>> t = Text()
+        >>> t.json = jsonStr
+        >>> str(t)
+        'my text'
+        >>> t.language
+        u'en'
+        '''
+        d = json.loads(jsonStr)
+        for attr in d.keys():
+            if attr == '__self__':
+                pass
+            else:
+                setattr(self, attr, d[attr])
+
+    json = property(_getJSON, _setJSON)    
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -877,6 +918,33 @@ class Contributor(object):
             return None
 
 
+    #---------------------------------------------------------------------------
+    def _getJSON(self):
+        '''Return a JSON representation
+        '''
+        src = {'self': str(self.__class__)}
+        # flat data attributes
+        for attr in ['role']:
+            src[attr] = getattr(self, attr)
+        # lists of objects
+        for attr in ['_names', '_dataRange']:
+            subList = []
+            for sub in getattr(self, attr):
+                subList.append(sub.json)
+            src[attr] = subList
+        return mxScore
+
+
+    def _setJSON(self, mxScore):
+        '''Set this object based on a JSON representation
+        '''
+        pass
+
+    json = property(_getJSON, _setJSON)    
+
+
+
+
     def _getMX(self):
         '''Return a mxCreator object based on this object. 
 
@@ -1290,7 +1358,6 @@ class Metadata(music21.Music21Object):
         >>> md.composer
         'Beethoven, Ludwig van'
         ''')
-
 
     #---------------------------------------------------------------------------
     def _getMX(self):
