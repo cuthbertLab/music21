@@ -1117,6 +1117,9 @@ class JSONSerializer(object):
         >>> post = t.json # cannot show string as self changes in context
         '''
         src = {'__self__': str(self.__class__)}
+        # always store the version used to create this datat
+        src['__version__'] = VERSION
+
         # flat data attributes
         flatData = {}
         for attr in self.getJSONDataNames():
@@ -1161,44 +1164,45 @@ class JSONSerializer(object):
             d = json.loads(jsonStr)
 
         for attr in d.keys():
-
             #environLocal.printDebug(['_setJSON: attr', attr, d[attr]])
 
             if attr == '__self__':
+                pass
+            elif attr == '__version__':
                 pass
             elif attr == '__flatData__':
                 #d[attr] is a dictionary of pairs
                 for key in d[attr].keys():
                     setattr(self, key, d[attr][key])
-
             elif attr == '__listData__':
                 # each key here is a name that contains a list of component 
                 # objects
                 for key in d[attr].keys():
                     #environLocal.printDebug(['_setJSON: key, value in d[attr]', key, d[attr][key]])
 
-                    dst = getattr(self, key)
-
+                    subList = []
                     # each part here should be a complete json dictionary
                     # definition
                     for part in d[attr][key]:
-                        environLocal.printDebug(['_setJSON: part in d', part, type(part)])
+                        #environLocal.printDebug(['_setJSON: part in d', part, type(part)])
                         dPart = json.loads(part)
-                        if dPart == None:
-                            dst.append(dPart)
+                        if dPart == None: # assign None directly
+                            subList.append(dPart)
                         else:
                             # need to instantiate an object here, call factory
                             # from base class
                             obj = self.getComponentFromJSON(dPart['__self__'])
                             # pass already-loaded dictionary here
                             obj.json = dPart
-                            dst.append(obj)
-                    #setattr(self, key, subList)
-
+                            subList.append(obj)
+                    setattr(self, key, subList)
             else:
                 raise JSONSerializerException('cannot handle json attr: %s'% attr)
 
-    json = property(_getJSON, _setJSON)    
+    json = property(_getJSON, _setJSON, 
+        doc = '''Get or set string JSON data for this object. This method is only available if an object has been customized and configured by overriding the following methods: :meth:`~music21.base.JSONSerializer.getJSONDataNames`, :meth:`~music21.base.JSONSerializer.getJSONListNames`, :meth:`~music21.base.JSONSerializer.getComponentFromJSON`.
+
+        ''')    
 
 
 

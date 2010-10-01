@@ -625,7 +625,7 @@ class Date(music21.JSONSerializer):
 
 
 #-------------------------------------------------------------------------------
-class DateSingle(object):
+class DateSingle(music21.JSONSerializer):
     '''Store a date, either as certain, approximate, or uncertain relevance.
 
     The relevance attribute is limited within each DateSingle subclass depending on the design of the class. Alternative relevance types should be configured as other DateSingle subclasses. 
@@ -644,14 +644,14 @@ class DateSingle(object):
         >>> str(dd)
         '1805/03/12'
         '''
-        self._data = None
+        self._data = [] # store a list of one or more Date objects
         self._relevance = None # managed by property
 
         # not yet implemented
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataError = None
+        self._dataError = [] # store a list of one or more strings
 
         self._prepareData(data)
         self.relevance = relevance # will use property
@@ -659,13 +659,17 @@ class DateSingle(object):
     def _prepareData(self, data):
         '''Assume a string is supplied as argument
         '''
-        self._data = Date()
-        self._data.load(data)
+        # here, using a list to store one object; this provides more 
+        # compatability  w/ other formats
+        self._data = [] # clear list
+        self._data.append(Date())
+        self._data[0].load(data)
 
     def _setRelevance(self, value):
         if value in ['certain', 'approximate', 'uncertain']:
             self._relevance = value
-            self._dataError = value # only here is dataError the same as relevance
+            self._dataError = []
+            self._dataError.append(value) # only here is dataError the same as relevance
         else:
             raise MetadataException('relevance value is not supported by this object: %s' % value)
 
@@ -675,7 +679,7 @@ class DateSingle(object):
     relevance = property(_getRelevance, _setRelevance)
 
     def __str__(self):
-        return str(self._data)
+        return str(self._data[0]) # always the first
 
     def _getDatetime(self):
         '''Get a datetime object.
@@ -691,7 +695,7 @@ class DateSingle(object):
         '1843/03/--'
         '''
         # get from stored Date object
-        return self._data.datetime
+        return self._data[0].datetime
 
     datetime = property(_getDatetime, 
         doc = '''Return a datetime object representation. 
@@ -701,6 +705,28 @@ class DateSingle(object):
         >>> ds.datetime
         datetime.datetime(1843, 3, 3, 0, 0)
         ''')
+
+
+    #---------------------------------------------------------------------------
+    # overridden methods for json processing 
+
+    def getJSONDataNames(self):
+        '''Define attributes of this object that can be serialized as single data attributes. 
+        '''
+        # _relevance is a single string, _dataError is a lost of strings
+        return ['_relevance',  '_dataError'] 
+
+    def getJSONListNames(self):
+        '''Define attributes of this object that can be serialized as single data attributes. 
+        '''
+        return ['_data']
+
+    def getComponentFromJSON(self, idStr):
+        if '.Date' in idStr:
+            return Date()
+        else:
+            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
+
 
 
 
@@ -759,7 +785,7 @@ class DateBetween(DateSingle):
         for part in data:
             d = Date()
             d.load(part)
-            self._data.append(d) # a lost of Date objects
+            self._data.append(d) # a list of Date objects
             # can look at Date and determine overall error
             self._dataError.append(None)
 
@@ -1516,7 +1542,7 @@ class Test(unittest.TestCase):
         t1.language = 'en'
         environLocal.printDebug([t1.json])
         jsonDict = json.loads(t1.json)
-        self.assertEqual(jsonDict.keys(), [u'__flatData__', u'__self__', u'__listData__'])
+        self.assertEqual(jsonDict.keys(), [u'__flatData__', u'__self__', u'__version__', u'__listData__'] )
         self.assertEqual(jsonDict['__flatData__'].keys(), [u'_language', u'_data'])
 
         tNew = metadata.Text()
@@ -1537,7 +1563,6 @@ class Test(unittest.TestCase):
 
 
         # test single date object
-
         d1 = metadata.Date(year=1843, yearError='approximate')
         d2 = metadata.Date(year='1843?')
         
@@ -1550,6 +1575,65 @@ class Test(unittest.TestCase):
         dNew.json = d2.json
         self.assertEqual(dNew.year, '1843')
         self.assertEqual(dNew.yearError, 'uncertain')
+
+        # test date single and other objects that store multiple Date objects
+
+        ds = metadata.DateSingle('2009/12/31', 'approximate')   
+        self.assertEqual(str(ds), '2009/12/31')
+        self.assertEqual(len(ds._data), 1)
+        dsNew = metadata.DateSingle()
+        self.assertEqual(len(dsNew._data), 1)
+        dsNew.json = ds.json
+
+        self.assertEqual(len(dsNew._data), 1)
+        self.assertEqual(dsNew._relevance, 'approximate')
+        self.assertEqual(dsNew._dataError, ['approximate'])
+        self.assertEqual(str(dsNew), '2009/12/31')
+
+
+        # test sublcasses of DateSingle
+        ds = metadata.DateRelative('2001/12/31', 'prior')   
+        self.assertEqual(str(ds), '2001/12/31')
+        self.assertEqual(ds.relevance, 'prior')
+        self.assertEqual(len(ds._data), 1)
+
+        dsNew = metadata.DateSingle()
+        dsNew.json = ds.json
+        self.assertEqual(len(dsNew._data), 1)
+        self.assertEqual(dsNew._relevance, 'prior')
+        self.assertEqual(dsNew._dataError, [])
+        self.assertEqual(str(dsNew), '2001/12/31')
+
+
+
+        db = metadata.DateBetween(['2009/12/31', '2010/1/28'])   
+        self.assertEqual(str(db), '2009/12/31 to 2010/01/28')
+        self.assertEqual(db.relevance, 'between')
+        self.assertEqual(db._dataError, [None, None])
+        self.assertEqual(len(db._data), 2)
+
+        dbNew = metadata.DateBetween()
+        dbNew.json = db.json
+        self.assertEqual(len(dbNew._data), 2)
+        self.assertEqual(dbNew._relevance, 'between')
+        self.assertEqual(dbNew._dataError, [None, None])
+        self.assertEqual(str(dbNew), '2009/12/31 to 2010/01/28')
+
+
+
+        ds = metadata.DateSelection(['2009/12/31', '2010/1/28', '1894/1/28'], 'or')   
+        self.assertEqual(str(ds), '2009/12/31 or 2010/01/28 or 1894/01/28')
+        self.assertEqual(ds.relevance, 'or')
+        self.assertEqual(ds._dataError, [None, None, None])
+        self.assertEqual(len(ds._data), 3)
+
+        dsNew = metadata.DateSelection()
+        dsNew.json = ds.json
+        self.assertEqual(len(dsNew._data), 3)
+        self.assertEqual(dsNew._relevance, 'or')
+        self.assertEqual(dsNew._dataError, [None, None, None])
+        self.assertEqual(str(dsNew), '2009/12/31 or 2010/01/28 or 1894/01/28')
+
 
 
 #-------------------------------------------------------------------------------
