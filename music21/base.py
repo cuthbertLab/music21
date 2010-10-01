@@ -42,6 +42,7 @@ import sys
 import types
 import inspect
 import uuid
+import json
 
 from music21 import common
 from music21 import environment
@@ -1073,9 +1074,136 @@ class DefinedContexts(object):
 
 
 
+#-------------------------------------------------------------------------------
+class JSONSerializerException(Exception):
+    pass
+
+
+class JSONSerializer(object):
+    '''Class that provides JSON output and input routines. Objects can inherit this class directly, or gain its functional through inheriting Music21Object. 
+    '''
+    # note that, since this inherits form object, other classes that inherit
+    # this class need to give object last
+    # e.g. class Text(music21.JSONSerializer, object):
+
+    def __init__(self):
+        pass
+
+    def getJSONDataNames(self):
+        '''Define attributes of this object that can be serialized as single data attributes. 
+        '''
+        environLocal.printDebug(['calling _getJSONDataNames'])
+        return []
+
+
+    def getJSONListNames(self):
+        '''Define attributes of this object that can be serialized as list of other objects, each object serializable. 
+        '''
+        return []
+
+    def getComponentFromJSON(self, idStr):
+        '''Given stored string during json serialization, return an object'
+
+        The subclass that overrides this method will have access to all modules necessary
+        '''
+        return None
+
+    def _getJSON(self):
+        '''Return a JSON representation
+
+        >>> from music21 import *
+        >>> t = metadata.Text('my text')
+        >>> t.language = 'en'
+        >>> post = t.json # cannot show string as self changes in context
+        '''
+        src = {'__self__': str(self.__class__)}
+        # flat data attributes
+        flatData = {}
+        for attr in self.getJSONDataNames():
+            #environLocal.printDebug(['_getJSON', attr])
+            flatData[attr] = getattr(self, attr)
+        src['__flatData__'] = flatData
+
+        listData = {}
+        for attr in self.getJSONListNames():
+            #environLocal.printDebug(['_setJSON: attr of list names', attr])
+            subList = []
+            for sub in getattr(self, attr):
+                # this sub object will return a complete json dictionary,
+                # including a definition of this object type stored in __self__
+                if sub == None:
+                    subList.append('null')
+                else:
+                    subList.append(sub.json)
+            listData[attr] = subList
+        src['__listData__'] = listData
+
+        return json.dumps(src)
+
+
+    def _setJSON(self, jsonStr):
+        '''Set this object based on a JSON representation
+
+        >>> from music21 import *
+        >>> t = metadata.Text('my text')
+        >>> t.language = 'en'
+        >>> tNew = metadata.Text()
+        >>> tNew.json = t.json
+        >>> str(t)
+        'my text'
+        >>> t.language
+        'en'
+        '''
+        #environLocal.printDebug(['_setJSON: srcStr', jsonStr])
+        if isinstance(jsonStr, dict):
+            d = jsonStr # do not loads  
+        else:
+            d = json.loads(jsonStr)
+
+        for attr in d.keys():
+
+            #environLocal.printDebug(['_setJSON: attr', attr, d[attr]])
+
+            if attr == '__self__':
+                pass
+            elif attr == '__flatData__':
+                #d[attr] is a dictionary of pairs
+                for key in d[attr].keys():
+                    setattr(self, key, d[attr][key])
+
+            elif attr == '__listData__':
+                # each key here is a name that contains a list of component 
+                # objects
+                for key in d[attr].keys():
+                    #environLocal.printDebug(['_setJSON: key, value in d[attr]', key, d[attr][key]])
+
+                    dst = getattr(self, key)
+
+                    # each part here should be a complete json dictionary
+                    # definition
+                    for part in d[attr][key]:
+                        environLocal.printDebug(['_setJSON: part in d', part, type(part)])
+                        dPart = json.loads(part)
+                        if dPart == None:
+                            dst.append(dPart)
+                        else:
+                            # need to instantiate an object here, call factory
+                            # from base class
+                            obj = self.getComponentFromJSON(dPart['__self__'])
+                            # pass already-loaded dictionary here
+                            obj.json = dPart
+                            dst.append(obj)
+                    #setattr(self, key, subList)
+
+            else:
+                raise JSONSerializerException('cannot handle json attr: %s'% attr)
+
+    json = property(_getJSON, _setJSON)    
+
+
 
 #-------------------------------------------------------------------------------
-class Music21Object(object):
+class Music21Object(JSONSerializer):
     '''
     Base class for all music21 objects.
     
@@ -1285,8 +1413,8 @@ class Music21Object(object):
     
         >>> from music21 import *
         >>> q = note.QuarterNote()
-        >>> q.classes
-        ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
+        >>> q.classes[:5]
+        ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object']
         
         
         Example: find GClefs that are not Treble clefs (or treble 8vb, etc.):

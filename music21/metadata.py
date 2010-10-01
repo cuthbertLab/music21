@@ -217,7 +217,7 @@ def workIdToAbbreviation(value):
 
 
 #-------------------------------------------------------------------------------
-class Text(object):
+class Text(music21.JSONSerializer):
     '''One unit of text data: a title, a name, or some other text data. Store the string and a language name or code. This object can be used and/or subclassed for a variety for of text storage.
     '''
     def __init__(self, data='', language=None):
@@ -269,48 +269,64 @@ class Text(object):
         return text.prependArticle(self.__str__(), self._language)
 
     #---------------------------------------------------------------------------
-    def _getJSON(self):
-        '''Return a JSON representation
 
-        >>> t = Text('my text')
-        >>> t.language = 'en'
-        >>> post = t.json # cannot show string as self changes in context
+    def getJSONDataNames(self):
+        '''Define attributes of this object that can be serialized as single data attributes. 
         '''
-        src = {'self': str(self.__class__)}
-        # flat data attributes
-        for attr in ['_data', '_language']:
-            src[attr] = getattr(self, attr)
-        return json.dumps(src)
+        return ['_data', '_language']
 
 
-    def _setJSON(self, jsonStr):
-        '''Set this object based on a JSON representation
-
-        >>> jsonStr = '{"_language": "en", "self": "<class \\'__main__.Text\\'>", "_data": "my text"}'
-        >>> d = json.loads(jsonStr)
-        >>> d
-        {u'_language': u'en', u'self': u"<class '__main__.Text'>", u'_data': u'my text'}
-        >>> t = Text()
-        >>> t.json = jsonStr
-        >>> str(t)
-        'my text'
-        >>> t.language
-        u'en'
+    def getJSONListNames(self):
+        '''Define attributes of this object that can be serialized as single data attributes. 
         '''
-        d = json.loads(jsonStr)
-        for attr in d.keys():
-            if attr == '__self__':
-                pass
-            else:
-                setattr(self, attr, d[attr])
+        return []
 
-    json = property(_getJSON, _setJSON)    
+
+
+
+
+#     def _getJSON(self):
+#         '''Return a JSON representation
+# 
+#         >>> t = Text('my text')
+#         >>> t.language = 'en'
+#         >>> post = t.json # cannot show string as self changes in context
+#         '''
+#         src = {'self': str(self.__class__)}
+#         # flat data attributes
+#         for attr in ['_data', '_language']:
+#             src[attr] = getattr(self, attr)
+#         return json.dumps(src)
+# 
+# 
+#     def _setJSON(self, jsonStr):
+#         '''Set this object based on a JSON representation
+# 
+#         >>> jsonStr = '{"_language": "en", "self": "<class \\'__main__.Text\\'>", "_data": "my text"}'
+#         >>> d = json.loads(jsonStr)
+#         >>> d
+#         {u'_language': u'en', u'self': u"<class '__main__.Text'>", u'_data': u'my text'}
+#         >>> t = Text()
+#         >>> t.json = jsonStr
+#         >>> str(t)
+#         'my text'
+#         >>> t.language
+#         u'en'
+#         '''
+#         d = json.loads(jsonStr)
+#         for attr in d.keys():
+#             if attr == '__self__':
+#                 pass
+#             else:
+#                 setattr(self, attr, d[attr])
+# 
+#     json = property(_getJSON, _setJSON)    
 
 
 
 
 #-------------------------------------------------------------------------------
-class Date(object):
+class Date(music21.JSONSerializer):
     '''A single date value, specified by year, month, day, hour, minute, and second. Note that this class has been created, instead of using Python's datetime, to provide greater flexibility for processing unconventional dates, ancient dates, dates with error, and date ranges. 
 
     The :attr:`~music21.metadata.Date.datetime` property can be used to retrieve a datetime object when necessary.
@@ -322,13 +338,14 @@ class Date(object):
     '''
     def __init__(self, *args, **keywords):
         '''
-        >>> a = Date(year=1843, yearError='approximate')
+        >>> from music21 import *
+        >>> a = metadata.Date(year=1843, yearError='approximate')
         >>> a.year
         1843
         >>> a.yearError
         'approximate'
 
-        >>> a = Date(year='1843?')
+        >>> a = metadata.Date(year='1843?')
         >>> a.yearError
         'uncertain'
 
@@ -595,6 +612,18 @@ class Date(object):
         ''')
 
 
+    #---------------------------------------------------------------------------
+    # overridden methods for json processing 
+
+    def getJSONDataNames(self):
+        '''Define attributes of this object that can be serialized as single data attributes. 
+        '''
+        return ['year', 'month', 'day', 'hour', 'minute', 'second',
+                'yearError', 'monthError', 'dayError', 'hourError', 'minuteError', 'secondError']
+
+
+
+
 #-------------------------------------------------------------------------------
 class DateSingle(object):
     '''Store a date, either as certain, approximate, or uncertain relevance.
@@ -799,7 +828,7 @@ class DateSelection(DateSingle):
 
 
 #-------------------------------------------------------------------------------
-class Contributor(object):
+class Contributor(music21.JSONSerializer):
     '''A person that contributed to a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements.  
     '''
     relevance = 'contributor'
@@ -816,6 +845,7 @@ class Contributor(object):
 
         '''
         if 'role' in keywords.keys():
+            # stored in self._role
             self.role = keywords['role'] # validated with property
         else:
             self.role = None
@@ -919,31 +949,28 @@ class Contributor(object):
 
 
     #---------------------------------------------------------------------------
-    def _getJSON(self):
-        '''Return a JSON representation
+    # overridden methods for json processing 
+
+    def getJSONDataNames(self):
+        '''Define attributes of this object that can be serialized as single data attributes. 
         '''
-        src = {'self': str(self.__class__)}
-        # flat data attributes
-        for attr in ['role']:
-            src[attr] = getattr(self, attr)
-        # lists of objects
-        for attr in ['_names', '_dataRange']:
-            subList = []
-            for sub in getattr(self, attr):
-                subList.append(sub.json)
-            src[attr] = subList
-        return mxScore
+        return ['_role']
 
-
-    def _setJSON(self, mxScore):
-        '''Set this object based on a JSON representation
+    def getJSONListNames(self):
+        '''Define attributes of this object that can be serialized as single data attributes. 
         '''
-        pass
+        return ['_names', '_dateRange']
 
-    json = property(_getJSON, _setJSON)    
+    def getComponentFromJSON(self, idStr):
+        if '.Text' in idStr:
+            return Text()
+        else:
+            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
 
 
 
+
+    #---------------------------------------------------------------------------
 
     def _getMX(self):
         '''Return a mxCreator object based on this object. 
@@ -1479,7 +1506,51 @@ class Test(unittest.TestCase):
         self.assertEqual(md.composer, 'Gilles Binchois')
 
 
-       
+    def testJSONSerialization(self):
+
+        from music21 import metadata
+        import json
+
+        # test creation and loading of data in a text
+        t1 = metadata.Text('my text')
+        t1.language = 'en'
+        environLocal.printDebug([t1.json])
+        jsonDict = json.loads(t1.json)
+        self.assertEqual(jsonDict.keys(), [u'__flatData__', u'__self__', u'__listData__'])
+        self.assertEqual(jsonDict['__flatData__'].keys(), [u'_language', u'_data'])
+
+        tNew = metadata.Text()
+        tNew.json = t1.json
+        self.assertEqual(tNew._data, 'my text')
+        self.assertEqual(tNew._language, 'en')
+
+
+        # test contributor
+        c1 = metadata.Contributor(role='composer', name='Gilles Binchois')
+        self.assertEqual(c1.role, 'composer')
+
+        jsonStr = c1.json
+        cNew = metadata.Contributor()
+        cNew.json = jsonStr
+        self.assertEqual(cNew.role, 'composer')
+        self.assertEqual(cNew.name, 'Gilles Binchois')
+
+
+        # test single date object
+
+        d1 = metadata.Date(year=1843, yearError='approximate')
+        d2 = metadata.Date(year='1843?')
+        
+        dNew = metadata.Date()
+        dNew.json = d1.json
+        self.assertEqual(dNew.year, 1843)
+        self.assertEqual(dNew.yearError, 'approximate')
+
+        dNew = metadata.Date()
+        dNew.json = d2.json
+        self.assertEqual(dNew.year, '1843')
+        self.assertEqual(dNew.yearError, 'uncertain')
+
 
 #-------------------------------------------------------------------------------
 _DOC_ORDER = [Text, Date, 
@@ -1494,5 +1565,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
-        a = Test()
-        a.testAugmentOrDiminish()
+        t = Test()
+        #t.testAugmentOrDiminish()
+        t.testJSONSerialization()
