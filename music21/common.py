@@ -426,8 +426,9 @@ def isStr(usrData):
     >>> isStr(u'flat')
     True
     """
-    if (isinstance(usrData, str) or 
-        isinstance(usrData, unicode)):
+    if isinstance(usrData, basestring):
+#     if (isinstance(usrData, str) or 
+#         isinstance(usrData, unicode)):
         return True
     else:
         return False                

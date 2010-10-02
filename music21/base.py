@@ -43,6 +43,7 @@ import types
 import inspect
 import uuid
 import json
+import codecs
 
 from music21 import common
 from music21 import environment
@@ -1107,10 +1108,7 @@ class JSONSerializer(object):
     #---------------------------------------------------------------------------
     # core methods for getting and setting
 
-
-
-
-    def _getJSONDict(self):
+    def _getJSONDict(self, includeVersion=False):
         '''Return a dictionary representation for JSON processing. All component objects are similarly encoded as dictionaries. This method is recursively called as needed to store dictionaries of component objects that are :class:`~music21.base.JSONSerializer` subclasses.
 
         >>> from music21 import *
@@ -1119,8 +1117,9 @@ class JSONSerializer(object):
         >>> post = t.json # cannot show string as self changes in context
         '''
         src = {'__class__': str(self.__class__)}
-        # always store the version used to create this datat
-        src['__version__'] = VERSION
+        # always store the version used to create this data
+        if includeVersion:
+            src['__version__'] = VERSION
 
         # flat data attributes
         flatData = {}
@@ -1158,7 +1157,9 @@ class JSONSerializer(object):
     def _getJSON(self):
         '''Return the dictionary returned by _getJSONDict() as a JSON string.
         '''
-        return json.dumps(self._getJSONDict())
+        # when called from json property, include version number;
+        # this should mean that only the outermost object has a version number
+        return json.dumps(self._getJSONDict(includeVersion=True))
 
 
     def _isComponent(self, target):
@@ -1234,7 +1235,7 @@ class JSONSerializer(object):
                                 # this could be flat data or a obj definition
                                 # in a dictionary
                                 attrValueSub = attrValue[subKey]
-                                # if a dictionary and defines a __class__ 
+                                # if a dictionary, and defines a __class__, 
                                 # create an object
                                 if self._isComponent(attrValueSub):
                                     subDict[subKey] = self._buildComponent(
@@ -1255,7 +1256,25 @@ class JSONSerializer(object):
 
 
     def jsonPrint(self):
-        print(json.dumps(self._getJSONDict(), sort_keys=True, indent=2))
+        print(json.dumps(self._getJSONDict(includeVersion=True), 
+            sort_keys=True, indent=2))
+
+
+    def jsonWrite(self, fp):
+        '''Given a file path, write JSON to a file for this object. Default file extension should be .json. File is opened and closed within this method call. 
+        '''
+        f = codecs.open(fp, mode='w', encoding='utf-8')
+        f.write(json.dumps(self._getJSONDict(includeVersion=True), 
+            sort_keys=True, indent=2))
+        f.close()
+
+    def jsonRead(self, fp):
+        '''Given a file path, read JSON from a file to this object. Default file extension should be .json. File is opened and closed within this method call. 
+        '''
+        f = open(fp)
+        self.json = f.read()
+        f.close()
+
 
 
 

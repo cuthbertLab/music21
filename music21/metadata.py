@@ -1683,6 +1683,10 @@ class Test(unittest.TestCase):
 
     def testJSONSerializationMetadata(self):
 
+        from music21 import musicxml
+        from music21.musicxml import testFiles
+
+
         md = Metadata(title='Concerto in F', date='2010', composer='Frank')
         #environLocal.printDebug([str(md.json)])
         self.assertEqual(md.composer, 'Frank')
@@ -1695,6 +1699,44 @@ class Test(unittest.TestCase):
         self.assertEqual(mdNew.composer, 'Frank')
 
         self.assertEqual(mdNew.title, 'Concerto in F')
+
+
+        # test getting meta data from an imported source
+
+        d = musicxml.Document()
+        d.read(testFiles.mozartTrioK581Excerpt)
+        mxScore = d.score # get the mx score directly
+        md = Metadata()
+        md.mx = mxScore
+
+        self.assertEqual(md.movementNumber, '3')
+        self.assertEqual(md.movementName, 'Menuetto (Excerpt from Second Trio)')
+        self.assertEqual(md.title, 'Quintet for Clarinet and Strings')
+        self.assertEqual(md.number, 'K. 581')
+        self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
+
+        # convert to json and see if data is still there
+        #md.jsonPrint()
+        jsonStr = md.json
+        mdNew = Metadata()
+        mdNew.json = jsonStr
+
+        self.assertEqual(mdNew.movementNumber, '3')
+        self.assertEqual(mdNew.movementName, 'Menuetto (Excerpt from Second Trio)')
+        self.assertEqual(mdNew.title, 'Quintet for Clarinet and Strings')
+        self.assertEqual(mdNew.number, 'K. 581')
+        self.assertEqual(mdNew.composer, 'Wolfgang Amadeus Mozart')
+
+
+        # temporary file writing test code; replace later
+#         mdNew.jsonWrite('/_scratch/test.json')
+#         mdFromFile = Metadata()
+#         mdFromFile.jsonRead('/_scratch/test.json')
+#         self.assertEqual(mdFromFile.movementNumber, '3')
+#         self.assertEqual(mdFromFile.movementName, 'Menuetto (Excerpt from Second Trio)')
+#         self.assertEqual(mdFromFile.title, 'Quintet for Clarinet and Strings')
+#         self.assertEqual(mdFromFile.number, 'K. 581')
+#         self.assertEqual(mdFromFile.composer, 'Wolfgang Amadeus Mozart')
 
 
 #-------------------------------------------------------------------------------
