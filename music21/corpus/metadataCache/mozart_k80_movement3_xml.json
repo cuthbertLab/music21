@@ -1,0 +1,70 @@
+{
+  "__attr__": {
+    "_contributors": [
+      {
+        "__attr__": {
+          "_dateRange": [
+            null, 
+            null
+          ], 
+          "_names": [
+            {
+              "__attr__": {
+                "_data": "W.A. Mozart", 
+                "_language": null
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          ], 
+          "_role": "composer", 
+          "relevance": "contributor"
+        }, 
+        "__class__": "<class 'music21.metadata.Contributor'>"
+      }
+    ], 
+    "_copyright": null, 
+    "_date": null, 
+    "_imprint": null, 
+    "_urls": [], 
+    "_workIds": {
+      "actNumber": null, 
+      "alternativeTitle": null, 
+      "associatedWork": null, 
+      "collectionDesignation": null, 
+      "commission": null, 
+      "countryOfComposition": null, 
+      "dedication": null, 
+      "groupTitle": null, 
+      "localeOfComposition": null, 
+      "movementName": {
+        "__attr__": {
+          "_data": "Quartet No.1 in G Major, K. 80, Mvmnt. 3", 
+          "_language": null
+        }, 
+        "__class__": "<class 'music21.metadata.Text'>"
+      }, 
+      "movementNumber": {
+        "__attr__": {
+          "_data": null, 
+          "_language": null
+        }, 
+        "__class__": "<class 'music21.metadata.Text'>"
+      }, 
+      "number": null, 
+      "opusNumber": null, 
+      "parentTitle": null, 
+      "popularTitle": null, 
+      "sceneNumber": null, 
+      "textLanguage": null, 
+      "textOriginalLanguage": null, 
+      "title": null, 
+      "volume": null
+    }
+  }, 
+  "__class__": "<class 'music21.metadata.Metadata'>", 
+  "__version__": [
+    0, 
+    3, 
+    0
+  ]
+}

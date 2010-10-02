@@ -437,7 +437,6 @@ def isStr(usrData):
 def isListLike(usrData):
     """
     Returns True if is a List or a Set or a Tuple
-    #TODO: add immutable sets and pre 2.6 set support
 
     >>> isListLike([])
     True
@@ -449,6 +448,7 @@ def isListLike(usrData):
     >>> isListLike(music21.stream.Stream())
     False
     """
+    #TODO: add immutable sets and pre 2.6 set support
     if (isinstance(usrData, list) or 
         isinstance(usrData, tuple) or
         isinstance(usrData, set)):
@@ -965,7 +965,7 @@ def dirPartitioned(obj, skipLeading=['__']):
 #-------------------------------------------------------------------------------
 # tools for setup.py
 def getSourceFilePath():
-    '''Get the music21 directory that contains source files. This not the same as the outermost package development directory. 
+    '''Get the music21 directory that contains source files. This is not the same as the outermost package development directory. 
     '''
     import music21
     fpMusic21 = music21.__path__[0] # list, get first item
@@ -973,6 +973,16 @@ def getSourceFilePath():
     if 'corpus' not in os.listdir(fpMusic21):
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
     return fpMusic21
+
+
+def getMetadataCacheFilePath():
+    '''Get the stored music21 directory that contains the corpus metadata cache. 
+
+    >>> from music21 import *
+    >>> common.getMetadataCacheFilePath().endswith('corpus/metadataCache')
+    True
+    '''
+    return os.path.join(getSourceFilePath(), 'corpus', 'metadataCache')
 
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
@@ -1029,7 +1039,7 @@ def getPackageData():
     '''
     # include these extensions for all directories, even if they are not normally there.
     ext = ['txt', 'xml', 'krn', 'mxl', 'html', 'png', 
-           'css', 'js', 'pdf', 'xls', 'mid', 'abc']
+           'css', 'js', 'pdf', 'xls', 'mid', 'abc', 'json']
 
     # need all dirs, not just packages, and relative to music21
     fpList = getPackageDir(fpMusic21=None, relative=True, remapSep=None,

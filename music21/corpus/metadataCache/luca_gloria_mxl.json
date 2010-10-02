@@ -1,0 +1,49 @@
+{
+  "__attr__": {
+    "_contributors": [], 
+    "_copyright": null, 
+    "_date": null, 
+    "_imprint": null, 
+    "_urls": [], 
+    "_workIds": {
+      "actNumber": null, 
+      "alternativeTitle": null, 
+      "associatedWork": null, 
+      "collectionDesignation": null, 
+      "commission": null, 
+      "countryOfComposition": null, 
+      "dedication": null, 
+      "groupTitle": null, 
+      "localeOfComposition": null, 
+      "movementName": {
+        "__attr__": {
+          "_data": "gloria.mxl", 
+          "_language": null
+        }, 
+        "__class__": "<class 'music21.metadata.Text'>"
+      }, 
+      "movementNumber": {
+        "__attr__": {
+          "_data": null, 
+          "_language": null
+        }, 
+        "__class__": "<class 'music21.metadata.Text'>"
+      }, 
+      "number": null, 
+      "opusNumber": null, 
+      "parentTitle": null, 
+      "popularTitle": null, 
+      "sceneNumber": null, 
+      "textLanguage": null, 
+      "textOriginalLanguage": null, 
+      "title": null, 
+      "volume": null
+    }
+  }, 
+  "__class__": "<class 'music21.metadata.Metadata'>", 
+  "__version__": [
+    0, 
+    3, 
+    0
+  ]
+}

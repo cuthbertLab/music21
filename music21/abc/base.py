@@ -252,6 +252,11 @@ class ABCMetadata(ABCToken):
         >>> am.preParse()
         >>> am._getTimeSignatureParameters() == None
         True
+
+        >>> am = ABCMetadata('M: FREI4/4')
+        >>> am.preParse()
+        >>> am._getTimeSignatureParameters()
+        (4, 4, 'normal')
         '''
         if not self.isMeter():
             raise ABCTokenException('no time signature associated with this meta-data')
@@ -266,8 +271,10 @@ class ABCMetadata(ABCToken):
             symbol = 'cut' # m21 compat
         else:
             n, d = self.data.split('/')
-            n = int(n.strip())
-            d = int(d.strip())
+            # using get number from string to handle odd cases such as
+            # FREI4/4
+            n = int(common.getNumFromStr(n.strip())[0])
+            d = int(common.getNumFromStr(d.strip())[0])
             symbol = 'normal' # m21 compat
         return n, d, symbol
 
@@ -348,12 +355,17 @@ class ABCMetadata(ABCToken):
                         # HP or Hp are used for highland pipes
                         'hp']
 
+        # if no match, provide defaults, 
+        # this is probably an error or badly formatted
+        standardKeyStr = 'C'
+        stringRemain = ''
         # first, get standard key indication
         for target in keyNameMatch:
             if target == self.data[:len(target)].lower():
                 # keep case
                 standardKeyStr = self.data[:len(target)]
                 stringRemain = self.data[len(target):]
+
         # replace a flat symbol if found; only the second char
         if standardKeyStr == 'HP':
             standardKeyStr = 'C' # no sharp or flats
@@ -468,7 +480,12 @@ class ABCMetadata(ABCToken):
             # should be in L:1/4 form
             n, d = self.data.split('/')
             n = int(n.strip())
-            d = int(d.strip())
+            # the notation L: 1/G is found in some essen files
+            # this is extremely uncommon and might be an error
+            if d in ['G']:
+                d = 4 # assume a default
+            else:
+                d = int(d.strip())
             # 1/4 is 1, 1/8 is .5
             return (float(n) / d) * 4
             
@@ -1202,7 +1219,7 @@ class ABCHandler(object):
         lastIndex = len(strSrc) - 1
         j = i + 1 # start with next
         while True:
-            if strSrc[j] == '\n' or j > lastIndex:
+            if j > lastIndex or strSrc[j] == '\n':
                 return j # will increment to next char on loop
             j += 1
 
@@ -1333,7 +1350,9 @@ class ABCHandler(object):
                 # condition where we start with an alpha that is not an alpha
                 # that comes before a pitch indication
                 # H is fermata, L is accent, T is trill
-                foundPitchAlpha = c.isalpha() and c not in 'uvHLT'
+                # not sure what S is, but josquin/laPlusDesPlus.abc
+                # uses it before pitches; might be a segno
+                foundPitchAlpha = c.isalpha() and c not in 'uvHLTS'
                 j = i + 1
 
                 while True:
@@ -1342,12 +1361,13 @@ class ABCHandler(object):
                     # if we have not found pitch alpha
                     # ornaments may precede note names
                     # accidentals (^=_) staccato (.), up/down bow (u, v)
-                    elif foundPitchAlpha == False and strSrc[j] in '~=^_.uvHLT':
+                    elif (foundPitchAlpha == False and 
+                        strSrc[j] in '~=^_.uvHLTS'):
                         j += 1
                         continue                    
                     # only allow one pitch alpha to be a continue condition
                     elif (foundPitchAlpha == False and strSrc[j].isalpha() 
-                        and strSrc[j] not in 'uvHL'):
+                        and strSrc[j] not in 'uvHLTS'):
                         foundPitchAlpha = True
                         j += 1
                         continue                    

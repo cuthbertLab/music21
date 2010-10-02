@@ -28,8 +28,11 @@ class VirtualWork(object):
     def __init__(self):
         self.composer = None
         self.title = None
+
         # provide a partial path in the corpus that represents this file
+        # this path must be unique for each work
         self.corpusPath = None
+
         # a list of URLs in order of best usage
         # these probably should all be the same format
         self.urlList = []

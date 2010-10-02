@@ -1099,9 +1099,9 @@ class JSONSerializer(object):
         return []
 
     def jsonComponentFactory(self, idStr):
-        '''Given stored string during json serialization, return an object'
+        '''Given a stored string during JSON serialization, return an object'
 
-        The subclass that overrides this method will have access to all modules necessary
+        The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
         '''
         return None
 
