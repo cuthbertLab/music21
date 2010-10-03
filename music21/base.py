@@ -1126,6 +1126,10 @@ class JSONSerializer(object):
         for attr in self.jsonAttributes():
             #environLocal.printDebug(['_getJSON', attr])
             attrValue = getattr(self, attr)
+            # do not store None values; assume initial/unset state
+            if attrValue is None:
+                continue
+
             # if, stored on this object, is an object w/ a json method
             if hasattr(attrValue, 'json'):
                 flatData[attr] = attrValue._getJSONDict()
@@ -1144,6 +1148,9 @@ class JSONSerializer(object):
                 flatData[attr] = {}
                 for key in attrValue.keys():
                     attrValueSub = attrValue[key]
+                    # skip None values for efficiency
+                    if attrValueSub is None:
+                        continue
                     # see if this object stores a json object or otherwise
                     if hasattr(attrValueSub, 'json'):
                         flatData[attr][key] = attrValueSub._getJSONDict()
@@ -1264,8 +1271,7 @@ class JSONSerializer(object):
         '''Given a file path, write JSON to a file for this object. Default file extension should be .json. File is opened and closed within this method call. 
         '''
         f = codecs.open(fp, mode='w', encoding='utf-8')
-        f.write(json.dumps(self._getJSONDict(includeVersion=True), 
-            sort_keys=True, indent=2))
+        f.write(json.dumps(self._getJSONDict(includeVersion=True)))
         f.close()
 
     def jsonRead(self, fp):

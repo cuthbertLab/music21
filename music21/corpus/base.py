@@ -314,8 +314,13 @@ def updateMetadataCache(overwrite=True):
 def getFilePathMetadataPairs():
     '''For all file paths in the corpus, pairs the file path with the one or more instantiated Metadata objects derived from JSON metadata cache.
     '''
-    post = []
 
+    t = common.Timer()
+    t.start()
+
+
+
+    post = []
     mdCachePaths = getMetadataCachePaths()
 
     for obj in VIRTUAL:
@@ -342,6 +347,7 @@ def getFilePathMetadataPairs():
                     group.append(md)
         post.append(group)
 
+    environLocal.printDebug(['metadata loading time:', t])
     return post
 
 
