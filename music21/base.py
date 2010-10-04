@@ -1249,7 +1249,11 @@ class JSONSerializer(object):
                                         attrValueSub)
                                 else:
                                     subDict[subKey] = attrValueSub
-                            setattr(self, key, subDict)
+                            #setattr(self, key, subDict)
+                            dst = getattr(self, key)
+                            # updating the dictionary preserves default 
+                            # values created at init
+                            dst.update(subDict) 
                     else: # assume a string
                         setattr(self, key, attrValue)
 

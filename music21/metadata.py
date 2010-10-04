@@ -1549,6 +1549,10 @@ class MetadataBundle(music21.JSONSerializer):
         # name is used to write storage file and acess this bundle from multiple # bundles
         self._name = name
 
+        # need to store local abs file path of each component
+        # this will need to be refreshed after loading
+        # keys are the same for self._storage
+        self._accessPaths = {}
 
     #---------------------------------------------------------------------------
     # overridden methods for json processing 
@@ -1658,26 +1662,25 @@ class MetadataBundle(music21.JSONSerializer):
 
 
 
-    def getFromPaths(self, pathList):
-        '''For file paths given, pair the file path with one or more instantiated Metadata objects derived from JSON metadata cache.
+    def updateAccessPaths(self, pathList):
+        '''For each stored Metatadata object, create an entry for a complete, local file path that returns this.
+
+        The `pathList` parameter is a list of all file paths on the users local system. 
         '''
     
-        t = common.Timer()
-        t.start()
-    
-        post = []
     
 #         for obj in VIRTUAL:
 #             if obj.corpusPath != None:
 #                 pass
-    
-        count = 0
+
+        # always clear first
+        self._accessPaths = {}
+
 
         # create a copy to manipulate
         keyOptions = self._storage.keys()
 
         for fp in pathList:
-            group = [fp]
     
             # this key may not be valid if it points to an Opus work that
             # has multiple numbers; thus, need to get a stub that can be 
@@ -1689,8 +1692,7 @@ class MetadataBundle(music21.JSONSerializer):
             match = False
             try:
                 md = self._storage[cp]
-                group.append(md)
-                #junk = keyOptions.remove(cp)
+                self._accessPaths[cp] = fp
                 match = True
             except KeyError:
                 pass
@@ -1699,10 +1701,31 @@ class MetadataBundle(music21.JSONSerializer):
                 # see if there is work id alternative
                 for candidate in keyOptions:
                     if candidate.startswith(cpStub):
-                        group.append(md)
-            post.append(group)
+                        self._accessPaths[candidate] = fp
     
-        environLocal.printDebug(['metadata grouping time:', t, 'md bundles found:', len(post)])
+        #environLocal.printDebug(['metadata grouping time:', t, 'md bundles found:', len(post)])
+        #return post
+
+    def getComposer(self, composerName, extList=None):
+        '''Get composer, permit regular expression matching. 
+
+        Return pairs of file paths and work numbers, or None
+        '''
+        post = []
+        for key in self._storage.keys():
+            md = self._storage[key]
+            c = md.composer
+            match = False
+            if c is not None and composerName.lower() in c.lower():
+                match = True
+            # name can be in path, which is the key here  
+            elif composerName.lower() in key:
+                match = True
+
+            if match:
+                if self._accessPaths[key] not in post:
+                    post.append((self._accessPaths[key], md.number))  
+
         return post
 
 
@@ -1917,8 +1940,20 @@ class Test(unittest.TestCase):
 #         self.assertEqual(mdFromFile.composer, 'Wolfgang Amadeus Mozart')
 
 
+    def testMetadataBundleRead(self):
+        from music21 import corpus, metadata
+    
+        mdb = metadata.MetadataBundle('core')
+        mdb.read()
+        mdb.updateAccessPaths(corpus.getPaths())
+    
+        post = mdb.getComposer('josquin')
+        self.assertEqual(len(post) > 6, True)
+    
+        post = mdb.getComposer('bach')
+        self.assertEqual(len(post) > 300, True)
 
-
+        #print post
 
 
 #-------------------------------------------------------------------------------
@@ -1940,4 +1975,4 @@ if __name__ == "__main__":
         #t.testJSONSerializationMetadata()
 
 
-        t.xtestMetadataBundle()
+        t.testMetadataBundleRead()

@@ -394,7 +394,6 @@ def getComposerDir(composerName):
     >>> a.endswith(os.path.join('corpus', os.sep, 'luca'))
     True
     '''
-    # TODO: have this also search COMPOSERS references for full names
     match = None
     for moduleName in MODULES:          
         if common.isListLike(moduleName):
