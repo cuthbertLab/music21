@@ -1659,7 +1659,7 @@ class MetadataBundle(music21.JSONSerializer):
 
 
     def getFromPaths(self, pathList):
-        '''For file paths given, pair the file path with the one or more instantiated Metadata objects derived from JSON metadata cache.
+        '''For file paths given, pair the file path with one or more instantiated Metadata objects derived from JSON metadata cache.
         '''
     
         t = common.Timer()
@@ -1920,20 +1920,6 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestMetadataBundle(self): 
-        from music21 import corpus
-
-        mdb = MetadataBundle('core')
-        paths = corpus.getPaths()
-        
-        mdb.addFromPaths(paths)
-
-        print mdb._storage
-        mdb.write() # will use a default file path
-
-        mdbNew = MetadataBundle('core')
-        mdbNew.read()
-        mdbNew.getFromPaths(corpus.getPaths())
 
 #-------------------------------------------------------------------------------
 _DOC_ORDER = [Text, Date, 
