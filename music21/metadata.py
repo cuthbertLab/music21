@@ -31,12 +31,13 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a :
 import unittest, doctest
 import datetime
 import json
+import os
+
 
 import music21
 from music21 import common
 from music21 import musicxml
 from music21 import text
-
 
 from music21 import environment
 _MOD = "metadata.py"
@@ -1529,6 +1530,183 @@ class Metadata(music21.Music21Object):
 
 
 
+
+
+#-------------------------------------------------------------------------------
+class MetadataBundle(music21.JSONSerializer):
+    '''An object that provides access to, searches within, and storage and loading of multiple Metadata objects.
+
+    Additionally, multiple MetadataBundles can be merged for additional processing
+    '''
+
+
+    def __init__(self, name='default'):
+
+        # all keys are strings, all value are Metadata
+        # there is apparently a performance boost for using all-string keys
+        self._storage = {}
+        
+        # name is used to write storage file and acess this bundle from multiple # bundles
+        self._name = name
+
+
+    #---------------------------------------------------------------------------
+    # overridden methods for json processing 
+
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+        '''
+        return ['_storage', '_name']
+
+    def jsonComponentFactory(self, idStr):
+        if '.Metadata' in idStr:
+            return Metadata()
+        else:
+            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
+
+    #---------------------------------------------------------------------------
+    def corpusPathToKey(self, fp, number=None):
+        '''Given a file path or corpus path, return the meta-data path
+    
+        >>> from music21 import *
+        >>> mb = MetadataBundle()
+        >>> mb.corpusPathToKey('bach/bwv1007/prelude').endswith('bach_bwv1007_prelude')
+        True
+        >>> mb.corpusPathToKey('/beethoven/opus59no1/movement1.xml').endswith('beethoven_opus59no1_movement1_xml')
+        True
+        '''
+        if 'corpus' in fp and 'music21' in fp:
+            cp = fp.split('corpus')[-1] # get fp after corpus
+        else:
+            cp = fp
+    
+        if cp.startswith(os.sep):
+            cp = cp[1:]
+    
+        cp = cp.replace('/', '_')
+        cp = cp.replace(os.sep, '_')
+        cp = cp.replace('.', '_')
+    
+        # append name to metadata path
+        if number == None:
+            return cp
+        else:
+            # append work number
+            return cp+'_%s' % number
+    
+    
+
+    def addFromPaths(self, pathList):
+        '''Parse and store metadata from numerous files speci
+        '''
+
+        # converter imports modules that import metadata
+        from music21 import converter
+
+        for fp in pathList:
+
+            environLocal.printDebug(['updateMetadataCache: examining:', fp])
+    
+            cp = self.corpusPathToKey(fp)
+        
+            post = converter.parse(fp, forceSource=True)
+            if 'Opus' in post.classes:
+                # need to get scores from each opus?
+                # problem here is that each sub-work has metadata, but there
+                # is only a single source file
+                for s in post.scores:
+                    md = s.metadata
+                    if md.number == None:
+                        environLocal.printDebug(['addFromPaths: got Opus that contains Streams that do not have work numbers:', fp])
+                    else:
+                        # update path to include work number
+                        cp = self.corpusPathToKey(fp, number=md.number)
+                        environLocal.printDebug(['addFromPaths: storing:', cp])
+                        self._storage[cp] = md
+            else:
+                md = post.metadata
+                if md is None:
+                    continue    
+                environLocal.printDebug(['updateMetadataCache: storing:', cp])
+                self._storage[cp] = md
+
+
+    def addFromVirtualWorks(self, pathList):
+        pass
+
+
+    def write(self):
+
+        fp = os.path.join(common.getMetadataCacheFilePath(), self._name + '.json')
+        environLocal.printDebug(['MetadataBundle: writing:', fp])
+        self.jsonWrite(fp)
+
+
+    def read(self, fp=None):
+        '''Load self from the file path suggested by the _name of this MetadataBundle
+        '''
+
+        t = common.Timer()
+        t.start()
+
+        if fp == None:
+            fp = os.path.join(common.getMetadataCacheFilePath(), self._name + '.json')
+        self.jsonRead(fp)
+
+        environLocal.printDebug(['MetadataBundle: loading time:', t, 'md items:', len(self._storage)])
+
+
+
+
+    def getFromPaths(self, pathList):
+        '''For file paths given, pair the file path with the one or more instantiated Metadata objects derived from JSON metadata cache.
+        '''
+    
+        t = common.Timer()
+        t.start()
+    
+        post = []
+    
+#         for obj in VIRTUAL:
+#             if obj.corpusPath != None:
+#                 pass
+    
+        count = 0
+
+        # create a copy to manipulate
+        keyOptions = self._storage.keys()
+
+        for fp in pathList:
+            group = [fp]
+    
+            # this key may not be valid if it points to an Opus work that
+            # has multiple numbers; thus, need to get a stub that can be 
+            # used for conversion
+            cp = self.corpusPathToKey(fp)
+            # a version of the path that may not have a work number
+            cpStub = '_'.join(cp.split('_')[:-1]) # get all but last underscore
+    
+            match = False
+            try:
+                md = self._storage[cp]
+                group.append(md)
+                #junk = keyOptions.remove(cp)
+                match = True
+            except KeyError:
+                pass
+
+            if not match:
+                # see if there is work id alternative
+                for candidate in keyOptions:
+                    if candidate.startswith(cpStub):
+                        group.append(md)
+            post.append(group)
+    
+        environLocal.printDebug(['metadata grouping time:', t, 'md bundles found:', len(post)])
+        return post
+
+
+
 #-------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
@@ -1739,6 +1917,24 @@ class Test(unittest.TestCase):
 #         self.assertEqual(mdFromFile.composer, 'Wolfgang Amadeus Mozart')
 
 
+
+
+
+    def xtestMetadataBundle(self): 
+        from music21 import corpus
+
+        mdb = MetadataBundle('core')
+        paths = corpus.getPaths()
+        
+        mdb.addFromPaths(paths)
+
+        print mdb._storage
+        mdb.write() # will use a default file path
+
+        mdbNew = MetadataBundle('core')
+        mdbNew.read()
+        mdbNew.getFromPaths(corpus.getPaths())
+
 #-------------------------------------------------------------------------------
 _DOC_ORDER = [Text, Date, 
             DateSingle, DateRelative, DateBetween, DateSelection, 
@@ -1754,5 +1950,8 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
         #t.testAugmentOrDiminish()
-        t.testJSONSerialization()
-        t.testJSONSerializationMetadata()
+        #t.testJSONSerialization()
+        #t.testJSONSerializationMetadata()
+
+
+        t.xtestMetadataBundle()

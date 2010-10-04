@@ -1267,11 +1267,15 @@ class JSONSerializer(object):
             sort_keys=True, indent=2))
 
 
-    def jsonWrite(self, fp):
+    def jsonWrite(self, fp, format=True):
         '''Given a file path, write JSON to a file for this object. Default file extension should be .json. File is opened and closed within this method call. 
         '''
         f = codecs.open(fp, mode='w', encoding='utf-8')
-        f.write(json.dumps(self._getJSONDict(includeVersion=True)))
+        if not format:
+            f.write(json.dumps(self._getJSONDict(includeVersion=True)))
+        else:
+            f.write(json.dumps(self._getJSONDict(includeVersion=True), 
+            sort_keys=True, indent=2))
         f.close()
 
     def jsonRead(self, fp):
