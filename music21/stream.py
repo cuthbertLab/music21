@@ -1023,15 +1023,16 @@ class Stream(music21.Music21Object):
 
         Used by getElementsByClass in Stream
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> a.isClass(note.Note)
         False
-        >>> a.isClass(Stream)
+        >>> a.isClass(stream.Stream)
         True
-        >>> b = Measure()
-        >>> b.isClass(Measure)
+        >>> b = stream.Measure()
+        >>> b.isClass(stream.Measure)
         True
-        >>> b.isClass(Stream)
+        >>> b.isClass(stream.Stream)
         True
         '''
         ## same as Music21Object.isClass, not ElementWrapper.isClass
@@ -6844,7 +6845,7 @@ class TestExternal(unittest.TestCase):
         
         for i in range(0,5):
             b.append(deepcopy(q))
-            b.elements[i].accidental = note.Accidental(i - 2)
+            b.elements[i].accidental = pitch.Accidental(i - 2)
         
         b.elements[0].duration.tuplets[0].type = "start"
         b.elements[-1].duration.tuplets[0].type = "stop"

@@ -342,11 +342,6 @@
     </measure>
     <!--=======================================================-->
     <measure number="9" width="226">
-      <print new-system="yes">
-        <system-layout>
-          <system-distance>114</system-distance>
-        </system-layout>
-      </print>
       <note default-x="79">
         <rest/>
         <duration>1</duration>
@@ -665,11 +660,6 @@
     </measure>
     <!--=======================================================-->
     <measure number="18" width="226">
-      <print new-system="yes">
-        <system-layout>
-          <system-distance>114</system-distance>
-        </system-layout>
-      </print>
       <note default-x="79">
         <pitch>
           <step>G</step>
@@ -955,11 +945,6 @@
     </measure>
     <!--=======================================================-->
     <measure number="27" width="226">
-      <print new-system="yes">
-        <system-layout>
-          <system-distance>114</system-distance>
-        </system-layout>
-      </print>
       <note default-x="79">
         <pitch>
           <step>D</step>

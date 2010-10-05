@@ -48,7 +48,7 @@ of music21's ability to manipulate diatonic Streams.
 
 def reverse(self, inPlace = False, 
                 classesToMove = (key.KeySignature, meter.TimeSignature, clef.Clef, metadata.Metadata, instrument.Instrument, layout.SystemLayout), 
-                makeNotation = True,
+                makeNotation = False,
                 ):
         '''
         synonym: retrograde()
@@ -84,14 +84,18 @@ def reverse(self, inPlace = False,
 #                if currentContexts[thisContext.__name__] is not curCon:
 #                    returnObj.insert(newOffset, curCon)
 #                    currentContexts[thisContext.__name__] = curCon
-                    
             returnObj.insert(newOffset, myEl)
- 
+
+            
         returnObj.insert(0, sf.getElementsByClass(layout.SystemLayout)[0])
         returnObj.insert(0, sf.getElementsByClass(clef.Clef)[0])
         returnObj.insert(0, sf.getElementsByClass(key.KeySignature)[0])
         returnObj.insert(0, sf.getElementsByClass(meter.TimeSignature)[0])
         returnObj.insert(0, sf.getElementsByClass(instrument.Instrument)[0])
+        for thisP in returnObj.flat.pitches:
+            if thisP.accidental is not None:
+                thisP.accidental.displayStatus = None
+ 
         if makeNotation is True:
             return returnObj.makeNotation()
         else:
@@ -111,6 +115,11 @@ def invertStreamAroundNote(myStream, inversionNote = note.Note() ):
     for n in myStream.flat.notes:
         if n.isRest is False:
             n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
+            if n.step != 'B':
+                n.pitch.accidental = None
+            else:
+                n.pitch.accidental = pitch.Accidental('flat')
+                n.pitch.accidental.displayStatus = None
 #            n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
     return myStream
 
@@ -247,7 +256,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
 
     for n in qjChords.flat.notes:
         if not 'Chord' in n.classes: continue
-        if (startCounting is False or n.offset >= 70) and n.pitchClassCardinality == 1:
+        if (startCounting is False or n.offset >= 70) and len(n.pitches) < 2:
             continue
         else:
             startCounting = True
@@ -267,7 +276,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
         totIntervals += 1
         n.lyric = str(thisScore)
                 
-    return (qjChords, (consScore/(totIntervals + 0.0)))
+    return (qjChords, (consScore/(totIntervals + 0.0)), qjSolved)
     
     
 
@@ -277,19 +286,17 @@ def bentWolfSolution():
     ct = (1, 5, False, False)
     tenor = (-5, 0, False, False)
 
-    qjSolved, avgScore = prepareSolution(triplum, ct, tenor)
-    qjSolved.show('musicxml')
+    qjChords, avgScore, fullScore = prepareSolution(triplum, ct, tenor)
+    fullScore.show('musicxml')
     print avgScore
     print cachedParts
     
-def cuthZazSolution():
+def possibleSolution():
     getQJ()
-    triplum = (1, 0, False, False)  # transpose, delay, invert, retro
-    ct = (1, 1, False, False)
-    tenor = (1, 2, False, False)
     
-    qjSolved, avgScore = prepareSolution(triplum, ct, tenor)
+    qjChords, avgScore, qjSolved = prepareSolution((1, 10, True, True), (-5, 0, False, False), (-5, 0, True, False))
     qjSolved.show('musicxml')
+    qjChords.show('musicxml')
     print avgScore
     print cachedParts
  
@@ -303,61 +310,63 @@ def multipleSolve():
     delayAmounts = [0, 5, 10]
 
     maxScore = -100
-    
-    for tripInvert in [False, True]:
-     for ctInvert in [False, True]:
-#      if tripInvert is True and ctInvert is False:
-#          continue  # is just the same as tripInvert == False and ctInvert == True
-      for tenInvert in [False, True]:
+    i = 0
+    for lowestTrans in range(len(transposeIntervals)):
+     for middleTrans in range(lowestTrans, len(transposeIntervals)):
+      for highestTrans in range(middleTrans, len(transposeIntervals)):
+       transLowest = transposeIntervals[lowestTrans]
+       transMiddle = transposeIntervals[middleTrans]
+       transHighest = transposeIntervals[highestTrans]
+       if transLowest != 1 and transMiddle != 1 and transHighest != 1:
+           continue
        
-       for tripRetro in [False, True]:
-        for ctRetro in [False, True]:
-#         if tripRetro is True and ctRetro is False:
-#             continue  # is just the same as tripRetro == False and ctRetro == True
-         for tenRetro in [False, True]:    
-          for tripDelay in delayAmounts:
-           for ctDelay in delayAmounts:
-#            if tripDelay > ctDelay:
-#                continue  # don't do the same thing twice   
-               
-            for tenDelay in delayAmounts:
-                for tripT in transposeIntervals:
-                    for ctT in transposeIntervals:
-                        for tenT in [1]: #transposeIntervals:
-                            if tripInvert is True and ctInvert is True and tenInvert is True:
-                                continue
-                            if tripRetro is True and ctRetro is True and tenRetro is True:
-                                continue
-                            if tripDelay != 0 and ctDelay != 0 and tenDelay != 0:
-                                continue
-                            if tripT != 1 and ctT != 1 and tenT != 1:
-                                continue  # no point in trying all four transposed the same
-                            if (tenDelay == tripDelay and tenRetro == tripRetro and tenInvert == tripInvert) or \
-                                (tenDelay == ctDelay and tenRetro == ctRetro and tenInvert == ctInvert) or \
-                                (ctDelay == tripDelay and ctRetro == tripRetro and ctInvert == tripInvert):
-                                continue  # it's all going to just be parallel motion between some pair of voices.
-                            
-
-#                            triplum = (5, 10, False, False)  # transpose, delay, invert, retro
-#                            ct = (1, 5, False, False)
-#                            tenor = (-5, 0, False, False)
-                            
-                            triplum = (tripT, tripDelay, tripInvert, tripRetro)
-                            ct = (ctT, ctDelay, ctInvert, ctRetro)
-                            tenor = (tenT, tenDelay, tenInvert, tenRetro)
-                            qjSolved, avgScore = prepareSolution(triplum, ct, tenor)
-                            #writeLine = (tripT, ctT, tenT, tripDelay, ctDelay, tenDelay, tripInvert, ctInvert, tenInvert, tripRetro, ctRetro, tenRetro, avgScore)
-                            writeLine = (tripT, tripDelay, tripInvert, tripRetro, ctT, ctDelay, ctInvert, ctRetro, tenT, tenDelay, tenInvert, tenRetro, avgScore)
-                            if avgScore > maxScore:
-                                maxScore = avgScore
-                                print "***** ",
-                            print writeLine
-                            csvFile.writerow(writeLine)
-                            if writeLine == (-5, 0, False, False, 4, 10, False, False, 1, 5, False, False, -1.7722772277227723):
-                                pass
+       for delayLowest in delayAmounts:
+        for delayMiddle in delayAmounts:
+         for delayHighest in delayAmounts:
+          if delayLowest != 0 and delayMiddle != 0 and delayHighest != 0:
+              continue
+          for lowestInvert in [False, True]:
+           for middleInvert in [False, True]:
+            for highestInvert in [False, True]:
+             if lowestInvert is True and middleInvert is True and highestInvert is True:
+                 continue  # very low probability
+             for lowestRetro in [False, True]:
+              for middleRetro in [False, True]:
+               for highestRetro in [False, True]:
+                if lowestRetro is True and middleRetro is True and highestRetro is True:
+                    continue
+                if ((delayLowest == delayMiddle and lowestInvert == middleInvert and lowestRetro == middleRetro) or
+                    (delayLowest == delayHighest and lowestInvert == highestInvert and lowestRetro == highestRetro) or
+                    (delayMiddle == delayHighest and middleInvert == highestInvert and middleRetro == highestRetro)):
+                        continue # no continuous parallel motion            
+                if (transLowest == transMiddle and delayLowest == delayMiddle and lowestRetro == False and middleRetro == True):
+                    continue # same as lowestRetro == True and middleRetro == False
+                if (transLowest == transMiddle and delayLowest == delayMiddle and lowestInvert == False and middleInvert == True):
+                    continue # same as lowestInvert == True and middleInvert == False
+                if (transLowest == 1 and transMiddle == 1):
+                    continue # if transHighest == 4 then it's the same as (-4, -4, 1) except for a few tritones
+                             # if transHighest == 5 then it's the same as (-5, -5, 1) except for a few tritones 
+                
+                
+                i += 1
+                triplum = (transHighest, delayHighest, highestInvert, highestRetro)
+                ct = (transMiddle, delayMiddle, middleInvert, middleRetro)
+                tenor = (transLowest, delayLowest, lowestInvert, lowestRetro)
+                qjSolved, avgScore, fullScore = prepareSolution(triplum, ct, tenor)
+                #writeLine = (tripT, ctT, tenT, tripDelay, ctDelay, tenDelay, tripInvert, ctInvert, tenInvert, tripRetro, ctRetro, tenRetro, avgScore)
+                writeLine = (transHighest, delayHighest, highestInvert, highestRetro, transMiddle, delayMiddle, middleInvert, middleRetro, transLowest, delayLowest, lowestInvert, lowestRetro, avgScore)
+                if avgScore > 0:
+                    print ""
+                    if avgScore > maxScore:
+                        maxScore = avgScore
+                        print "***** ",
+                    print writeLine
+                else:
+                    print str(i) + " ",
+                csvFile.writerow(writeLine)
 
 if __name__ == "__main__":
     pass
     #multipleSolve()
     #bentWolfSolution()
-    cuthZazSolution()
+    possibleSolution()

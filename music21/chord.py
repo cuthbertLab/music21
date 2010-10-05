@@ -1322,19 +1322,32 @@ class Chord(note.NotRest):
         >>> c8 = chord.Chord(['D-4','G#4'])
         >>> c8.isConsonant()
         False
-
+        >>> c9 = chord.Chord(['D3','A2','D2','D2','A4'])
+        >>> c9.isConsonant()
+        True
+        >>> c10 = chord.Chord(['D3','A2','D2','D2','A1'])
+        >>> c10.isConsonant()
+        False
+        
+        >>> c11 = chord.Chord(['F3','D4','A4'])
+        >>> c11.isConsonant()
+        True
+        
         '''
         c2 = self.removeRedundantPitchClasses(inPlace = False)
         if c2.pitchClassCardinality == 1:
             return True
         elif c2.pitchClassCardinality == 2:
-            i = interval.notesToInterval(c2.pitches[0], c2.pitches[1])
+            c3 = self.closedPosition()
+            c4 = c3.removeRedundantPitches(inPlace = False)
+            
+            i = interval.notesToInterval(c4.pitches[0], c4.pitches[1])
             if i.simpleName == 'P5' or i.simpleName == 'm3' or i.simpleName == 'M3' or i.simpleName == 'm6' or i.simpleName == 'M6':
                 return True
             else:
                 return False
         elif c2.pitchClassCardinality == 3:
-            if (self.isMajorTriad() is True or self.isMinorTriad is True) and (self.inversion() != 2):
+            if (self.isMajorTriad() is True or self.isMinorTriad() is True) and (self.inversion() != 2):
                 return True
             else:
                 return False
@@ -2027,9 +2040,10 @@ class Chord(note.NotRest):
 
 
     def removeRedundantPitchClasses(self, inPlace=True):
-        '''Remove all but one instance of a pitch class with more than one instance of that pitch class.
+        '''Remove all but the FIRST instance of a pitch class with more than one instance of that pitch class.
 
-        If `inPlace` is True, a copy is not made and None is returned; otherwise a copy is made and that copy is returned.
+        If `inPlace` is True, a copy is not made and None is returned; otherwise a copy is made and that 
+        copy is returned.
 
         >>> from music21 import *
         >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
@@ -2037,10 +2051,10 @@ class Chord(note.NotRest):
         >>> c1.pitches
         [C2, G4, E3]
 
-        >>> c2 = chord.Chord(['c2', 'e3', 'g4', 'c5', 'e3'])
+        >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3'])
         >>> c2.removeRedundantPitchClasses()
         >>> c2.pitches
-        [C2, G4, E3]
+        [C5, G4, E3]
 
         '''
         return self._removePitchByRedundantAttribute('name',
