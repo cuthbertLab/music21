@@ -1,16 +1,16 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         abc/__init__.py
-# Purpose:      Access to abc library
+# Name:         musedata/__init__.py
+# Purpose:      parses Walter Hewlett's MuseData format
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
 # Copyright:    (c) 2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-from music21.abc.base import *
-
+from music21.musedata.base import *
 
 __doc__ = base.__doc__
 
