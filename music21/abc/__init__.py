@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         musedata/__init__.py
-# Purpose:      parses Walter Hewlett's MuseData format
+# Name:         abc/__init__.py
+# Purpose:      parses ABC Notation
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -10,7 +10,8 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-from music21.musedata.base import *
+from music21.abc.base import *
+from music21.abc import base
 
 __doc__ = base.__doc__
 

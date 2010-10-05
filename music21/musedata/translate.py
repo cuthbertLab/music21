@@ -463,9 +463,9 @@ class Test(unittest.TestCase):
         from music21 import musedata
         from music21.musedata import testFiles
 
-        tf = testFiles.sicutRosa
-        af = musedata.MuseDataFile()
-        s = museDataToStreamScore(af.readstr(tf))
+#         tf = testFiles.sicutRosa
+#         af = musedata.MuseDataFile()
+#         s = museDataToStreamScore(af.readstr(tf))
     
         #s.show()
 #         self.assertEqual(len(s.parts), 3)
