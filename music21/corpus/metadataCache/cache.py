@@ -12,7 +12,7 @@
 
 from music21 import corpus, metadata
 
-def cacheCore(self): 
+def cacheCore(): 
     '''The core cache is all locally-stored corpus files. 
     '''
 
@@ -21,9 +21,6 @@ def cacheCore(self):
     mdb.addFromPaths(paths)
     #print mdb._storage
     mdb.write() # will use a default file path
-
-
-
 
 
 if __name__ == "__main__":
