@@ -1,22 +1,22 @@
 #-------------------------------------------------------------------------------
-# Name:         abc.base.py
-# Purpose:      music21 classes for dealing with abc data
+# Name:         musedata.base.py
+# Purpose:      music21 classes for dealing with MuseData
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
 # Copyright:    (c) 2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
-Objects and resources for processing ABC data. 
+Objects and resources for processing MuseData. 
 
-ABC conversion from a file or URL to a :class:`~music21.stream.Stream` is available through the music21 converter module's :func:`~music21.converter.parse` function. 
+MuseData conversion from a file or URL to a :class:`~music21.stream.Stream` is available through the music21 converter module's :func:`~music21.converter.parse` function. 
 
 >>> #_DOCS_SHOW from music21 import *
->>> #_DOCS_SHOW abcScore = converter.parse('/users/ariza/myScore.abc')
+>>> #_DOCS_SHOW abcScore = converter.parse('d:/data/musedata/myScore.stage2')
 
-
-Low level ABC conversion is facilitated by the objects in this module and :func:`music21.abc.translate.abcToStreamScore`.
+Low level MuseData conversion is facilitated by the objects in this module and :func:`music21.musedata.translate.museDataToStreamScore`.
 '''
 
 import music21
@@ -31,47 +31,59 @@ except:
 
 from music21 import common
 from music21 import environment
-_MOD = 'abc.base.py'
+_MOD = 'musedata.base.py'
 environLocal = environment.Environment(_MOD)
 
 # for implementation
-# see http://abcnotation.com/abc2mtex/abc.txt
+# see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
 
 # store symbol and m21 naming/class eq
-ABC_BARS = [
-           ('|]', 'light-heavy'),
-           ('||', 'light-light'),
-           ('[|', 'heavy-light'),
-           ('[1', 'regular-first'),
-           ('[2', 'regular-second'),
-           (':|', 'light-heavy-repeat-end'),
-           ('|:', 'heavy-light-repeat-start'),
-           ('::', 'heavy-heavy-repeat-bidirectional'),
-            # for comparison, single chars must go last
-           ('|', 'regular'),
-           (':', 'dotted'),
-           ]
+#ABC_BARS = [
+#           ('|]', 'light-heavy'),
+#           ('||', 'light-light'),
+#           ('[|', 'heavy-light'),
+#           ('[1', 'regular-first'),
+#           ('[2', 'regular-second'),
+#           (':|', 'light-heavy-repeat-end'),
+#           ('|:', 'heavy-light-repeat-start'),
+#           ('::', 'heavy-heavy-repeat-bidirectional'),
+#            # for comparison, single chars must go last
+#           ('|', 'regular'),
+#           (':', 'dotted'),
+#           ]
 
 #-------------------------------------------------------------------------------
 # note inclusion of w: for lyrics
-reMetadataTag = re.compile('[A-Zw]:')
+reMetadataTag = re.compile('[KQTCXSID][0-9]?:')
 
-rePitchName = re.compile('[a-gA-Gz]')
+rePitchName = re.compile('[A-Gr]')
 
-reChordSymbol = re.compile('"[^"]*"') # non greedy
+#reChordSymbol = re.compile('"[^"]*"') # non greedy
 
-reChord = re.compile('[.*?]') # non greedy
+#reChord = re.compile('[.*?]') # non greedy
 
 
 
 #-------------------------------------------------------------------------------
-class ABCTokenException(Exception):
+class MuseDataTokenException(Exception):
     pass
 
-class ABCHandlerException(Exception):
+class MuseDataHandlerException(Exception):
     pass
 
-
+class MuseDataFile(object):
+    '''
+    
+    '''
+    def __init__(self, data = ""):
+        self.data = data
+    
+    def __repr__(self):
+        return '<music21.musedata.MuseDataFile %d>' % self.id()
+    
+    def toStream(self):
+        return self.stream
+    
 
 
 #-------------------------------------------------------------------------------

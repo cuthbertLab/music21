@@ -1,444 +1,2737 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         testFiles.py
-# Purpose:      ABC test files
+# Purpose:      MuseData test files
 #
-# Authors:      Christopher Ariza
+# Authors:      most by Walter Hewlett; see examples
 #
-# License:      LGPL
+# License:      according to the files
 #-------------------------------------------------------------------------------
 
 import music21
 import unittest
 
-
-# abc standard
-# http://abcnotation.com/abc2mtex/abc.txt
+# musedata standard
+# http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
 
 from music21 import environment
-_MOD = 'abc.testFiles.py'
+_MOD = 'musedata.testFiles.py'
 environLocal = environment.Environment(_MOD)
 
 
 
-# http://abcnotation.com/tunePage?a=www.folkwiki.se/pub/cache/_Fyrareprisarn_0bf5b5/0001
-fyrareprisarn = """
-%%abc-charset utf-8
-
-X: 1
-T: Fyrareprisarn
-O: Jät, Småland
-S: efter August StrÃ¶mberg
-D: Svensson, Gustafsson mfl - BÃ¥lgetingen
-Z: Till abc av Jon Magnusson 100517 
-R: Hambo
-M: 3/4
-L: 1/8
-K: F
-c2 a>g f>e|d>c BA G>F|E>F GA B>c|d>c AB c>c|
-c>a a>g f>e|d>c BA G>F|E>F Gd c>E|F2 f4::
-{A}d>^c de f>g|e>f de =c>A|A>B AG FE|DE FG A>A|
-d>^c de fg|e>f de =c>A|A>B AG FE|D2 d4::
-c2 f2 c>c|B>d B4|G>c e2 c>e|f>>g a>f c2|
-c2 f2 c>c|B>d g4|G2 e>g c>>>e|f2 f4::
-f>f f4|e>e e3A|A>B AG FE|D>E FD E2|
-f>f f4|e>e e3A|A>B AG FE|D2 d4:|
-"""
-
-# http://abcnotation.com/tunePage?a=www.fiddletech.com/music/abcproj/0253
-mysteryReel = """
-X:254
-T:Mystery Reel
-R:reel
-Z:transcribed by Dave Marshall
-M:C|
-K:G
-|: egdB A3B | ~G3B A2Bd | e2dB A2BA |1 GEDE GABd :|2 GEDE GBdc |
-|: B~G3 GEDG | BGAB GEDG | A2GB A2GA |1 Bdef gedc :|2 Bdef gedB |
-|: ~G3E DEGB | dBGB A~E3 | GAGE DEGF | GBdB A2G2 :|
-| gede g2ag | egde ge (3eee | gede g2ag | egde ~g3a |
-gede g2ag | egde ge (3eee | ~g3e a2ba | ge (3eee b2ag |
-"""
-
-fullRiggedShip = """X: 1
-T:Full Rigged Ship
-M:6/8
-L:1/8
-Q:100
-C:Traditional
-S:From The Boys of the Lough
-R:Jig
-O:Boys Of The Lough
-A:Shetland
-D:Boys of the Lough "Wish You Were Here"
-K:G
-|:e2a aea|aea b2a|e2f~g3|eag fed|
-e2a aea|aea b2a|~g3 edB|A3A3:|!
-|:efe edB|A2Bc3|BAG BAG|BcdE3|
-efe edB|A2Bc2d|efe dBG|A3A3:|!
-|:EFE EFE|EFE c3|EFE E2D|E2=F GEC|
-EFE EFE|EFE c2d|efe dBG|A3A3:|
-"""
-
-# this is two parts, the V:2 designating second art
-# http://abcnotation.com/tunePage?a=www.scottishfiddlers.com/Sydney/Music/ABC/SSF_Dance/0182
-aleIsDear = """%  <A name="D1X180"></A>
-X: 180
-T:Ale is Dear, The
-M: 4/4
-L: 1/8
-R:Reel
-Q:1/4=211
-% Last note suggests Locrian mode tune
-K:D % 2 sharps
-% (c) SSF January 2006
-V:1
-f2 ef B2 fe| \
-fa ef cA ec| \
-f2 ef B2 fe| \
-fa ec B2 Bc|
-f2 ef B2 fe| \
-fa ef cA ec| \
-f2 ef B2 fe| \
-fa ec B2 Bc|
-B3/2B<Bc/2 d2 cB| \
-A3/2A<AB<AB/2 c<A| \
-B3/2B<Bc/2 d2 cB| \
-f<a e3/2c/2 B2 B2|
-B3/2B<Bc/2 d2 cB| \
-A3/2A<AB<AB/2 c<A| \
-d2 f3/2d/2 c2 e3/2c/2| \
-d<f e3/2c<BB<Bc/2|
-V:2
-% Chords
-B,,z [FDB,]z B,,z [FDB,]z| \
-B,,z [FDB,]z A,,z [ECA,]z| \
-B,,z [FDB,]z B,,z [FDB,]z| \
-B,,z [ECA,]z B,,z [FDB,]z|
-B,,z [FDB,]z B,,z [FDB,]z| \
-B,,z [FDB,]z A,,z [ECA,]z| \
-B,,z [FDB,]z B,,z [FDB,]z| \
-B,,z [ECA,]z B,,z [FDB,]z|
-B,,z [FDB,]z B,,z [FDB,]z| \
-A,,z [ECA,]z A,,z [ECA,]z| \
-B,,z [FDB,]z B,,z [FDB,]z| \
-B,,z [ECA,]z B,,z [FDB,]z|
-B,,z [FDB,]z B,,z [FDB,]z| \
-A,,z [ECA,]z A,,z [ECA,]z| \
-B,,z [FDB,]z A,,z [ECA,]z| \
-B,,z [ECA,]z B,,z [FDB,]
-
-"""
-
-# http://abcnotation.com/tunePage?a=abc.sourceforge.net/NMD/nmd/reelsh-l.txt/0056
-kitchGirl = """X: 57
-T:Kitchen Girl
-% Nottingham Music Database
-S:via PR
-M:4/4
-L:1/4
-K:D
-"A"[c2 a2 ]"G"[B2g2]|"A"e/2f/2e/2d/2 cc/2d/2|"A"e/2c/2e/2f/2 "G"g/2a/2b/2a/2|\
-"E"^ge ee/2=g/2|
-"A"a/2b/2a/2f/2 "G"g/2a/2g/2f/2|"A"e/2f/2e/2d/2 c/2d/2e/2f/2|\
-"G"gd "E"e/2f/2e/2d/2|"A"cA A2::
-"Am"=cc/2A/2 "G"B/2A/2G/2B/2|"Am"A/2B/2A/2G/2 E/2D/2E/2G/2|\
-"Am"A/2G/2A/2B/2 "C"=c/2B/2c/2d/2|"Em"ee/2g/2 e/2d/2B/2A/2|
-"Am"=cc/2A/2 "G"B/2A/2G/2B/2|"Am"A/2B/2A/2G/2 E/2D/2E/2G/2|\
-"Am"=c/2B/2A/2c/2 "G"B/2A/2G/2B/2|"Am"A3/2B/2 A2:|
-"""
-
-
-# http://abcnotation.com/tunePage?a=abc.sourceforge.net/NMD/nmd/morris.txt/0030
-williamAndNancy = """X: 31
-T:William and Nancy
-% Nottingham Music Database
-P:A(AABBB)2(AACCC)2
-S:Bledington
-M:6/8
-K:G
-P:A
-D|"G"G2G GBd|"C"e2e "G"dBG|"D7"A2d "G"BAG|"C"E2F "G"G2:|
-P:B
-d|"G"e2d B2d|"C"gfe "D7"d2d|"G"e2d B2d|"A7""C"gfe "D7""D"d2c|
-"G""Em"B2B Bcd|"C"e2e "G"dBG|"D7"A2d "G"BAG|"C"E2F "G"G2:|
-P:C
-"G"d3 "C"e3|"G"d3 "Em"B3|"G"d3 "C"g3/2f3/2|"C"e3 "G"d3|"D7"d3 "G"e3|"G"d3 B2d|\
-"A7""C"gfe "D7""D"d2c|
-"G""Em"B2B Bcd|"C"e2e "G"dBG|"D7"A2d "G"BAG|"C"E2F "G"G2:|
-"""
-
-# note key of e dorian
-# http://abcnotation.com/tunePage?a=www.banjolin.co.uk/banjolin12/music/tunes/abcs/morrisons/0000
-morrisonsJig = """X:297
-T:Morrison's
-O:Ireland
-F:http://www.banjolin.co.uk/tunes/abcs/morrisons.abc
-M:6/8
-L:1/8
-R:jig
-K:Edor
-|:E3 B3|E2B AFD|EBE B2c|dcB AFD|
-|EDE B3|E2B AFD|GBG FGA|1 dAG FED:|2 dAG FGA|
-|Bee fee|aee fed|Bee fee|fag fed|
-|Bee fee|aee fed|gfe d2A|BAG FGA|
-|Bee fee|aee fed|Bee fee|faf def|
-|g3 gfe|def gfg|edc d2A|BAG FED||
-"""
-
-
-#http://abcnotation.com/tunePage?a=www.alfwarnock.info/alfs/abc/alfwaltz/0048
-# example of ties; note altered pitches are not specified
-hectorTheHero = """X: 48
-T:Hector the Hero
-M:3/4
-L:1/8
-C:Scott Skinner
-K:A
-A2B2|:"A"c3 BA2|"D"f4ec|"A"e4-ef|e4AB|\
-"F#m"c4BA|"D"f4ec|"Bm"B4-Bc|"E"B4ce|
-"F#m"c3 BA2|"D"f4ec|"A"e4A2|"D"a4f2|\
-"A"e4Ac|"E"B4A2|"A"A6 -|[1 A2A2B2:|[2 A2c2e2||
-:"D"f4df|a4gf|"A"e4-ef|e4ce|\
-"F#m"f4ec|e4Ac|"Bm"B4-Bc|"E"B4ce|
-"D"f4df|a4gf|"A"e4dc|"D"a4d2|\
-"A"c4Ac|"E"B4A2|"A"A6 -|[1 A2c2e2:|[2 A2 z2|
-"""
-
-#http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/oneills/1001/F/09/0079
-# removed problematic meta declarations:
-#m: Tn2 = (3n/o/n/ m/n/
-#m: Tn3 = n (3o/n/o/ (3n/m/n/
-
-kingOfTheFairies = """X: 979
-T: King of the fairies
-C: anon.
-O: Ireland
-B: Francis O'Neill: "The Dance Music of Ireland" (1907) no. 979
-R: Long dance, set dance
-Z: Transcribed by Frank Nordberg - http://www.musicaviva.com
-F: http://www.musicaviva.com/abc/tunes/ireland/oneill-1001/oneill-1001-0979.abc
-M: 2/4
-L: 1/16
-K: Edor
-B,2|E^DE(F GF)GA|B2B2 TG3A|B2E2 E(FGE)|FGFE TD2B,2|E(^DEF) GFGA|B(AGB) d3
-c|B2E2 (GF)E^D|"^1)"E4E2:|
-d2|e2e2 Bde(f|ga)gf e2f2|e2B2 (BAB)c|d(edc) BcdB|e2B2 Bdef|g(agf) efed|Bd
-e(g fe)df|"^2)"e6(ef)|
-g3e f2d2|e(dBc) Td3e|dBA(F GA)B^c|dBA(F GF)ED|B,2E2 (EFG)A|B2e2 edef|e2B2
- BAG(F|TE4)E2|]
-W:
-W:
-W: 1) org. dotted 4th note.
-W: 2) org. not dotted.
-W:
-W:
-W: From Musica Viva - http://www.musicaviva.com
-W: the Internet center for free sheet music downloads.
-"""
-
-# http://abcnotation.com/tunePage?a=serpentpublications.org/music/bicinia/sicutrosa/allparts/0003
-sicutRosa = """X:1
-T:9v. Sicut rosa
-C:Orlando Lassusio
-O: Bicinia, sive Cantionis
-H: transcribed from the Musica Alamire facsimile of the original 
-H: printed in Antwerp by Petrum Phalesium, 1609
-%%gchordfont Helvetica 12 box
-%%MIDI nobarlines
-M:C|
-L:1/4
-K:G mixolydian treble8
-T:Tenor
-%%MIDI transpose -12
-%1
-G3 A B c d B e4 d2 B4 e3 d c2 B2 d4 d2 G  A B c d3 c B4 G4 d3 c
-w:Si- - - - - - - cut ro * -  - sa si- cut ro- - - - - - - sa in- -
-%2
-B A G4 F2 E4 "A"D2 A4 B2 c4 B2 d3 c B A G F E D C2 C2 G4 z2 G4 E2 G4 A2 c3 B A G
-w:- - - ter spi- nas il - lis ad- dit spe- - - - - - - -  ci- em, sic ve- nu- stat su- - - -
-%3
-_B2 A2 A4 D2 F2 E2 F2 G4 G3 A B2 A2 F2 c2 B2 c2 d2 c3 B d4 c B c A c4 B2 "B"c4 z2 G2 A2 B4 F2 c4
-w:- am vir- go Ma- ri- am pro- ge- - - ni- am Ma- ri- am pro- ge- - - - - - - - ni- am ger- mi- na- vit e-
-%4
-d2 e3 d/ c/ B c d A d3 c/ B/ c2 "C"d4-d4 z2 d2 e2 d3 B ^c2 d2 e2 c2 G A B c d2 G4 z2 G2
-w:nim flo- - - - - - - - - - - rem, * qui vi- ta- - -  lem dat o- do- - - - - rem qui 
-%5
-A2 G3 E ^F2 G2 A2 c4 B3 A/ G/ A4 HG4 |]
-w:vi- ta- - - lem dat o- do- - - - rem.
-"""
-
-# http://abcnotation.com/tunePage?a=www.campin.me.uk/Embro/Webrelease/Embro/17riot/abc/AleWife/0000
-theAleWifesDaughter = """X:1
-T:The Ale Wife's Daughter
-Z:Jack Campin: "Embro, Embro", transcription (c) 2001
-F:17riot/abc/AleWife.abc
-S:John Hamilton: A Collection of Twenty-Four Scots Songs (Chiefly Pastoral.), 1796
-B:NLS Glen.311
-M:C
-L:1/8
-Q:1/4=80
-N:Slow and Supplicative
-K:G Mixolydian
-(E/F/)|G<G GE  GA  c>B|A>A A>G Ac d3/ (c//d//)| e>g          d>e c>d e>d|cA A>G G3||
-(c/d/)|e<e e>c e>f g>e|d>d d>c de f3/ (e//f//)|(g/f/) (e/f/) ed  c>d e>d|cA A>G G3|]
-"""
-
-#http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/playford/playford.abc.txt/0009
-# a phyrigian; one flat
-theBeggerBoy = """
-X:5
-T:The Begger Boy
-R:Jig
-H:The tune name may derive from the song "The Begger Boy of the North"
-H:(c. 1630)
-N:This tune is in the rare Phrygian mode--suggested chords are given
-M:6/8
-L:1/8
-Q:90
-K:APhry
-AAAf2f|ec2d2c|AF2G2G|A2B cA2||
-AAAf2f|ec2d2c|Ac2ede|fA2G3|
-Acc e>dc|dfg/2f/2 efd|cAF G2G|A2B cA2||
-W:From ancient pedigree, by due descent
-W:I well can derive my generation
-W:Throughout all Christendome, and also Kent
-W:My calling is known both in terme and vacation
-W:My parents old taught me to be bold
-W:Ile never be daunted, whatever is spoken
-W:Where e're I come, my custome I hold
-W:And cry, Good your worship, bestow one token!
-W:--Roxburghe Ballads
-"""
-
-
-# http://abcnotation.com/tunePage?a=www.campin.me.uk/Embro/Webrelease/Embro/17riot/abc/SnaBas/0000
-# Eb lydian, written with two flats
-theBattleOfTheSnaBas = """X:1
-T:The Battle of the Sna' Ba's
-Z:Jack Campin: "Embro, Embro", transcription (c) 2001
-F:17riot/abc/SnaBas.abc
-S:NLS MH.v.549
-N:identical format, typeface and engraving style to The Lyre, but anonymous
-M:C|
-L:1/8
-Q:1/2=72
-K:Eb Lydian
-e|B>EE>E B>EG>e|B>EE>E B2G>B |A>FF>F A>FG>B|A>FF>F B2GF|
-  E>ee>f e>cB>G|F>ff>g f>ed>c|B>ee>f e>cB>e|
-  d>fc>e d>fc>e|d>fc>e d>ec>d|e>fg>f e2e  |]
-"""
-
-# http://abcnotation.com/tunePage?a=www.oldmusicproject.com/AA2ABC/0701-1200/Abc-0901-1000/0912-Draught/0000
-# has a secondary pickup bar mid-tune
-draughtOfAle = """X:0912
-T:"A Draught of Ale"    (jig)     0912
-C:after  Sg't. J. O'Neill
-B:O'Neill's Music Of Ireland (The 1850) Lyon & Healy, Chicago, 1903 edition
-Z:FROM O'NEILL'S TO NOTEWORTHY, FROM NOTEWORTHY TO ABC, MIDI AND .TXT BY VINCE BRENNAN June 2003 (HTTP://WWW.SOSYOURMOM.COM)
-I:abc2nwc
-M:6/8
-L:1/8
-K:G
-D|GBA G2A|Bdg Bdg|GBA G2B|AFD AFD|
-GBA G2A|Bdg Bdg|ecA dBG|cAF G2:|
-|:d|egf g2f|ege dBG|GFG dBG|BAA A2d|
-egf g2f|ege dBG|GFG dBG|cAF G2:|
-"""
-
-# has three tunes
-# http://www.andyhornby.net/Music/slip%20jigs.abc
-valentineJigg = """
-X:166
-T:166  Valentine Jigg   (Pe)
-M: 9/8
-L: 1/8
-S: original in 6/8 major reconstruction -AH
-K:D
-A3 F2A c2d | efe d2c BAG|A3 F2A c2d| A2a g>fg a3 :|
-|: a2e c2e gag |e2c d2f efe |d3 G2B cdc |ABc dcB A3:|
-%%vskip 1.5cm
-
-X:167
-T:167  The Dublin Jig     (HJ)
-A:Wyresdale, Lancashire
-B:H.S.J. Jackson, 1823
-L:1/8
-M:9/8
-K:A
-f|ecA ABA agf | ecA FBA GFE |ecA Ace agf | ecA FBG A2  :|
-|:c|BGE EGB dcB | cAc ece aec |BGE EGB dcB | cde dcB A2  :|
-%%vskip 1.5cm
-
-X:168
-T:168  The Castle Gate   (HJ)
-A:Wyresdale, Lancashire
-B:H.S.J. Jackson, 1823
-L:1/8
-S: original in E
-M:9/8
-K:A
-E | Ace Ace Ace | Ace BcA GFE | Ace Ace Ace | cag fe^d e2 :|
-|:e | fga def Bcd | FGA BcA GFE | FAd GBe Ace | fdB BAG A2 :|
-%%vskip 1.5cm
-"""
+# http://www.musedata.org/cgi-bin/mddata?composer=bach&edition=bg&genre=cant&work=0005&format=stage2&movement=03
+bach_cantata5_mvmt3 = r'''
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+PART = 01
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+(C) 1991, 2002 Center for Computer Assisted Research in the Humanities.
+ID: {bach/bg/cant/0005/stage2/03/01} [KHM:1658122244]
+TIMESTAMP: DEC/26/2001 [md5sum:6c630aa04ec9820c9bf44540e2d34d6c]
+03/06/91 S. Rasmussen
+WK#:5         MV#:3
+Bach Gesellschaft i
+Wo soll ich fliehen hin
+Aria
+Viola Solo
+1 75
+Group memberships: score
+score: part 1 of 3
+&
+conversion from old-format Stage2 to new-format Stage2
+S. Rasmussen    09/02/93
+&
+$ K:-3   Q:4   T:3/4   C:13
+Bf3    4        q     u
+measure 1       A
+S C0:S4
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+Ef4    1        s     u  [[
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+measure 2
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     d  [[     )
+C4     1        s     d  ==
+G3     1        s     d  ==
+C4     1        s     d  ]]
+Ef4    1        s     d  [[
+C4     1        s     d  ==
+G3     1        s     d  ==
+C4     1        s     d  ]]
+measure 3
+F4     1        s     d  [[     (
+Ef4    1        s     d  ==
+D4     1        s     d  ==     )
+C4     1        s     d  ]]
+Af4    1        s     d  [[     (
+G4     1        s     d  ==
+F4     1        s     d  ==     )
+Ef4    1        s     d  ]]
+D4     1        s     d  [[     .
+C5     1        s     d  ==     (
+Bf4    1        s     d  ==
+Af4    1        s     d  ]]     )
+measure 4
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+Ef4    1        s     u  [[
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+measure 5
+Ef4    1        s     d  [[     (
+D4     1        s     d  ==
+C4     1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     d  [[     )
+C5     1        s     d  ==
+Ef4    1        s     d  ==     (
+D4     1        s     d  ]]
+Ef4    1        s     d  [[     )
+C5     1        s     d  ==
+Ef4    1        s     d  ==     (
+D4     1        s     d  ]]
+measure 6
+Ef4    1        s     d  [[     )
+D4     1        s     d  ==
+C4     1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     d  [[     (
+C4     1        s     d  ==     )
+Ef4    1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+Ef4    1        s     d  [[     (
+A3     1        s n   d  ==     )
+Ef4    1        s     d  ==     (
+C4     1        s     d  ]]     )
+measure 7
+D4     1        s     d  [[     (
+Bf3    1        s     d  ==     )
+F4     1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+G4     1        s     d  [[     (
+Bf3    1        s     d  ==     )
+Ef4    1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+D4     1        s     u  [[     (
+Bf3    1        s     u  ==     )
+C4     1        s     u  ==     (
+A3     1        s n   u  ]]     )
+measure 8
+Bf3    4-       q     u        -
+Bf3    1        s     d  [[
+C4     1        s     d  ==     (
+D4     1        s     d  ==
+Ef4    1        s     d  ]]
+F4     1        s     d  [[
+G4     1        s     d  ==
+Af4    1        s     d  ==     +
+Bf4    1        s     d  ]]     )
+measure 9
+G3     1        s     d  [[     (
+E4     1        s n   d  ==     )
+Bf4    1        s     d  ==     (
+E4     1        s     d  ]]     )
+Bf4    1        s     d  [[     (
+E4     1        s     d  ==     )
+Bf4    1        s     d  ==     (
+E4     1        s     d  ]]     )
+G3     1        s     d  [[     (
+E4     1        s     d  ==     )
+Bf4    1        s     d  ==     (
+E4     1        s     d  ]]     )
+measure 10
+Af3    1        s     u  [[     .
+F4     1        s     u  ==     .
+Af3    1        s     u  ==     (
+G3     1        s     u  ]]
+Af3    1        s     u  [[     )
+F4     1        s     u  ==     .
+Af3    1        s     u  ==     (
+G3     1        s     u  ]]
+Af3    1        s     u  [[     )
+Bf3    1        s     u  ==
+C4     1        s     u  ==
+D4     1        s     u  ]]
+measure 11
+A3     1        s n   d  [[     (
+Ef4    1        s     d  ==     )
+C5     1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+C5     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+C5     1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+A3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+C5     1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+measure 12
+Bf3    1        s     u  [[     .
+D4     1        s     u  ==     .
+Bf3    1        s     u  ==     (
+A3     1        s n   u  ]]
+Bf3    1        s     u  [[     )
+D4     1        s     u  ==
+Bf3    1        s     u  ==     (
+P C33:u
+A3     1        s     u  ]]
+Bf3    1        s     d  [[     )
+C4     1        s     d  ==     .
+D4     1        s     d  ==     .
+Ef4    1        s     d  ]]     .
+measure 13
+Af3    1        s     d  [[     (+
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+D5     1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+Af3    1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+measure 14
+G3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s f   d  ==     (
+Ef4    1        s     d  ]]     )
+Df5    1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+G3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+measure 15
+Af3    1        s     d  [[     (
+Ef4    1        s     d  ==     )
+C5     1        s     d  ==     (
+Bf4    1        s     d  ]]
+Af4    1        s     d  [[
+G4     1        s     d  ==
+F4     1        s     d  ==
+Ef4    1        s     d  ]]     )
+Bf3    1        s     d  [[     .
+Ef4    1        s     d  ==     .
+F4     1        s     d  ==     .
+D4     1        s     d  ]]     .
+measure 16
+Ef4    1        s     d  [[     .
+C4     1        s     d  ==     (
+Bf3    1        s     d  ==
+Af3    1        s     d  ]]     )
+G3     1        s     d  [[     (
+Bf3    1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]     )
+Ef4    1        s     d  [[     (
+D4     1        s     d  ==
+C4     1        s     d  ==
+Bf3    1        s     d  ]]     )
+measure 17
+G4     1        s     d  [[     (p
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+Ef4    1        s     u  [[
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+measure 18
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+C4     1        s     u  ==
+G3     1        s     u  ==
+C4     1        s     u  ]]
+Ef4    1        s     u  [[
+C4     1        s     u  ==
+G3     1        s     u  ==
+C4     1        s     u  ]]
+measure 19
+F4     1        s     d  [[     (
+Ef4    1        s     d  ==
+D4     1        s     d  ==     )
+C4     1        s     d  ]]
+Af4    1        s     d  [[     (
+G4     1        s     d  ==
+F4     1        s     d  ==     )
+Ef4    1        s     d  ]]
+D4     1        s     d  [[
+C5     1        s     d  ==     (
+Bf4    1        s     d  ==
+Af4    1        s     d  ]]     )
+measure 20
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+Ef4    1        s     d  [[     (f
+D4     1        s     d  ==     )
+C4     1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+measure 21
+Af3    1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+D5     1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+Af3    1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+measure 22
+G3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s f   d  ==     (
+Ef4    1        s     d  ]]     )
+Df5    1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+G3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+measure 23
+Af3    1        s     d  [[     (
+Ef4    1        s     d  ==     )
+C5     1        s     d  ==     (
+Bf4    1        s     d  ]]
+Af4    1        s     d  [[
+G4     1        s     d  ==
+F4     1        s     d  ==
+Ef4    1        s     d  ]]     )
+Bf3    1        s     d  [[     .
+Ef4    1        s     d  ==     .
+F4     1        s     d  ==     .
+D4     1        s     d  ]]     .
+measure 24
+Ef4    1        s     d  [[
+C4     1        s     d  ==     (
+Bf3    1        s     d  ==
+Af3    1        s     d  ]]     )
+G3     1        s     d  [[     (
+Bf3    1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]     )
+Ef4    1        s     d  [[     (
+D4     1        s     d  ==
+C4     1        s     d  ==
+Bf3    1        s     d  ]]     )
+measure 25
+G4     1        s     d  [[     (p
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+Ef4    1        s     u  [[
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+measure 26
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+C4     1        s     u  ==
+G3     1        s     u  ==
+C4     1        s     u  ]]
+Ef4    1        s     u  [[
+C4     1        s     u  ==
+G3     1        s     u  ==
+C4     1        s     u  ]]
+measure 27
+F4     1        s     d  [[     (
+Ef4    1        s     d  ==
+D4     1        s     d  ==     )
+C4     1        s     d  ]]
+Af4    1        s     d  [[     (
+G4     1        s     d  ==
+F4     1        s     d  ==     )
+Ef4    1        s     d  ]]
+D4     1        s     d  [[     .
+C5     1        s     d  ==     (
+Bf4    1        s     d  ==
+Af4    1        s     d  ]]     )
+measure 28
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+F4     1        s     d  [[     (
+Ef4    1        s     d  ==
+D4     1        s     d  ==
+C4     1        s     d  ]]     )
+measure 29
+D4     2        e     d  [      (
+F4     2        e     d  ]      )
+F4     1        s     d  [[     (
+Ef4    1        s     d  ==
+D4     1        s     d  ==
+C4     1        s     d  ]]     )
+Bf4    4-       q     d        -
+measure 30
+Bf4    4        q     d
+Ef4    1        s     d  [[     (
+D4     1        s     d  ==
+C4     1        s     d  ==
+Bf3    1        s     d  ]]     )
+A4     4-       q n   d        -
+measure 31
+A4     4        q     d
+D4     1        s     u  [[     (
+C4     1        s     u  ==
+Bf3    1        s     u  ==
+A3     1        s n   u  ]]     )
+G4     4-       q     d        -
+measure 32
+G4     2        e     d  [
+A3     1        s n   d  =[     (
+Bf3    1        s     d  ]]
+C4     1        s     d  [[
+D4     1        s     d  ==
+Ef4    1        s     d  ==
+F4     1        s     d  ]]
+G4     1        s     d  [[
+A4     1        s n   d  ==
+Bf4    1        s     d  ==
+C5     1        s     d  ]]     )
+measure 33
+D5     1        s     d  [[     (
+C5     1        s     d  ==
+Bf4    1        s     d  ==
+A4     1        s n   d  ]]
+Bf4    1        s     d  [[     )
+F4     1        s     d  ==
+D4     1        s     d  ==
+F4     1        s     d  ]]
+Bf4    1        s     d  [[
+F4     1        s     d  ==
+D4     1        s     d  ==
+F4     1        s     d  ]]
+measure 34
+D5     1        s     d  [[     (
+C5     1        s     d  ==
+Bf4    1        s     d  ==
+A4     1        s n   d  ]]
+Bf4    1        s     d  [[     )
+G4     1        s     d  ==
+D4     1        s     d  ==
+G4     1        s     d  ]]
+Bf4    1        s     d  [[
+G4     1        s     d  ==
+D4     1        s     d  ==
+G4     1        s     d  ]]
+measure 35
+C5     1        s     d  [[     (
+Bf4    1        s     d  ==
+A4     1        s n   d  ==
+G4     1        s     d  ]]     )
+Ef5    1        s     d  [[     (
+D5     1        s     d  ==
+C5     1        s     d  ==
+Bf4    1        s     d  ]]
+A4     1        s     d  [[
+G4     1        s     d  ==
+F4     1        s     d  ==
+Ef4    1        s     d  ]]     )
+measure 36
+Bf4    2        e     d  [      (
+F4     2        e     d  =      )
+F4     2        e     d  =      (
+D4     2        e     d  =      )
+D4     2        e     d  =      (
+G4     2        e     d  ]      )
+measure 37
+G4     2        e     d  [      (
+Ef4    2        e     d  =      )
+Ef4    2        e     d  =      (
+C4     2        e     d  =      )
+C4     2        e     d  =      (
+F4     2        e     d  ]      )
+measure 38
+F4     1        s     d  [[     (
+Ef4    1        s     d  ==
+D4     1        s     d  ==
+C4     1        s     d  ]]
+D4     1        s     d  [[     )
+Bf3    1        s     d  ==
+Ef4    1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+F4     1        s     d  [[     (
+Bf3    1        s     d  ==     )
+G4     1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+measure 39
+Af4    1        s     d  [[     (+
+G4     1        s     d  ==
+F4     1        s     d  ==
+Ef4    1        s     d  ]]
+D4     1        s     d  [[     )
+G3     1        s     d  ==
+Af4    1        s     d  ==     (
+G3     1        s     d  ]]     )
+G4     1        s     d  [[     (
+G3     1        s     d  ==     )
+F4     1        s     d  ==     (
+G3     1        s     d  ]]     )
+measure 40
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]     )
+C5     1        s     d  [[     (
+Bf4    1        s     d  ==
+Af4    1        s     d  ==
+G4     1        s     d  ]]     )
+D5     1        s     d  [[     (
+C5     1        s     d  ==
+B4     1        s n   d  ==
+Af4    1        s     d  ]]     )+
+measure 41
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     d  [[     )
+C4     1        s     d  ==
+G3     1        s     d  ==
+C4     1        s     d  ]]
+Ef4    1        s     d  [[
+C4     1        s     d  ==
+G3     1        s     d  ==
+C4     1        s     d  ]]
+measure 42
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     d  [[     )
+C4     1        s     d  ==
+A3     1        s n   d  ==
+C4     1        s     d  ]]
+Ef4    1        s     d  [[
+C4     1        s     d  ==
+A3     1        s     d  ==
+C4     1        s     d  ]]
+measure 43
+D4     2        e     d
+rest   2        e
+rest   4        q
+F4     4        q     d         f
+measure 44
+D5     1        s     d  [[     (
+C5     1        s     d  ==
+Bf4    1        s     d  ==
+A4     1        s n   d  ]]
+Bf4    1        s     d  [[     )
+F4     1        s     d  ==
+D4     1        s     d  ==
+F4     1        s     d  ]]
+Af4    1        s f   d  [[
+F4     1        s     d  ==
+D4     1        s     d  ==
+F4     1        s     d  ]]
+measure 45
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     d  [[     )
+C5     1        s     d  ==
+Ef4    1        s     d  ==     (
+D4     1        s     d  ]]
+Ef4    1        s     d  [[     )
+C5     1        s     d  ==
+Ef4    1        s     d  ==     (
+D4     1        s     d  ]]
+measure 46
+Ef4    1        s     d  [[     )
+D4     1        s     d  ==
+C4     1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     d  [[     (
+C4     1        s     d  ==     )
+Ef4    1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+Ef4    1        s     d  [[     (
+A3     1        s n   d  ==     )
+Ef4    1        s     d  ==     (
+C4     1        s     d  ]]     )
+measure 47
+D4     1        s     d  [[     (
+Bf3    1        s     d  ==     )
+F4     1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+G4     1        s     d  [[     (
+Bf3    1        s     d  ==     )
+Ef4    1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+D4     1        s     u  [[     (
+Bf3    1        s     u  ==     )
+C4     1        s     u  ==     (
+A3     1        s n   u  ]]     )
+measure 48
+Bf3    4-       q     u        -
+Bf3    1        s     d  [[
+C4     1        s     d  ==     (p
+D4     1        s     d  ==
+Ef4    1        s     d  ]]
+F4     1        s     d  [[
+G4     1        s     d  ==
+Af4    1        s     d  ==
+Bf4    1        s     d  ]]     )
+measure 49
+G3     1        s     d  [[     (
+E4     1        s n   d  ==     )
+Bf4    1        s     d  ==     (
+E4     1        s     d  ]]     )
+Bf4    1        s     d  [[     (
+E4     1        s     d  ==     )
+Bf4    1        s     d  ==     (
+E4     1        s     d  ]]     )
+G3     1        s     d  [[     (
+E4     1        s     d  ==     )
+Bf4    1        s     d  ==     (
+E4     1        s     d  ]]     )
+measure 50
+Af3    1        s     u  [[
+F4     1        s     u  ==
+Af3    1        s     u  ==     (
+G3     1        s     u  ]]
+Af3    1        s     u  [[     )
+F4     1        s     u  ==
+Af3    1        s     u  ==     (
+G3     1        s     u  ]]
+Af3    1        s     u  [[     )
+Bf3    1        s     u  ==
+C4     1        s     u  ==
+D4     1        s     u  ]]
+measure 51
+A3     1        s n   d  [[     (
+Ef4    1        s     d  ==     )
+C5     1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+C5     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+C5     1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+A3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+C5     1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+measure 52
+Bf3    1        s     u  [[
+D4     1        s     u  ==
+Bf3    1        s     u  ==     (
+A3     1        s n   u  ]]
+Bf3    1        s     u  [[     )
+D4     1        s     u  ==
+Bf3    1        s     u  ==     (
+P C33:u
+A3     1        s     u  ]]
+Bf3    1        s     d  [[     )
+D4     1        s     d  ==     .
+Ef4    1        s     d  ==     .
+F4     1        s     d  ]]     .
+measure 53
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+Ef4    1        s     u  [[
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+measure 54
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+C4     1        s     u  ==
+G3     1        s     u  ==
+C4     1        s     u  ]]
+Ef4    1        s     u  [[
+C4     1        s     u  ==
+G3     1        s     u  ==
+C4     1        s     u  ]]
+measure 55
+F4     1        s     d  [[     (
+Ef4    1        s     d  ==
+D4     1        s     d  ==     )
+C4     1        s     d  ]]
+Af4    1        s     d  [[     (
+G4     1        s     d  ==
+F4     1        s     d  ==     )
+Ef4    1        s     d  ]]
+D4     1        s     d  [[     .
+C5     1        s     d  ==     (
+Bf4    1        s     d  ==
+Af4    1        s     d  ]]     )
+measure 56
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+Ef4    1        s     u  [[     )
+Bf3    1        s     u  ==
+G3     1        s     u  ==
+Bf3    1        s     u  ]]
+Ef4    1        s     d  [[     (
+D4     1        s     d  ==     )
+C4     1        s     d  ==     (
+Bf3    1        s     d  ]]     )
+measure 57
+Af3    1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+D5     1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+Af3    1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+measure 58
+G3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s f   d  ==     (
+Ef4    1        s     d  ]]     )
+Df5    1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+G3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+measure 59
+G3     1        s     d  [[     (
+E4     1        s n   d  ==     )
+Bf4    1        s     d  ==     (
+E4     1        s     d  ]]     )
+Bf4    1        s     d  [[     (
+E4     1        s     d  ==     )
+Bf4    1        s     d  ==     (
+E4     1        s     d  ]]     )
+G3     1        s     d  [[     (
+E4     1        s     d  ==     )
+Bf4    1        s     d  ==     (
+E4     1        s     d  ]]     )
+measure 60
+C4     1        s     d  [[
+Af4    1        s     d  ==
+C4     1        s     d  ==     (
+Bf3    1        s     d  ]]
+C4     1        s     d  [[     )
+C5     1        s     d  ==
+E4     1        s n   d  ==     (
+D4     1        s     d  ]]
+E4     1        s     d  [[     )
+Df5    1        s f   d  ==     (
+C5     1        s     d  ==
+Bf4    1        s     d  ]]     )
+measure 61
+C5     1        s     d  [[     (
+Bf4    1        s     d  ==
+Af4    1        s     d  ==
+G4     1        s     d  ]]
+Af4    1        s     d  [[     )
+F4     1        s     d  ==
+C4     1        s     d  ==
+F4     1        s     d  ]]
+Af4    1        s     d  [[
+F4     1        s     d  ==
+C4     1        s     d  ==
+F4     1        s     d  ]]
+measure 62
+C5     1        s     d  [[     (
+Bf4    1        s     d  ==
+Af4    1        s     d  ==
+G4     1        s     d  ]]
+Af4    1        s     d  [[     )
+F4     1        s     d  ==
+D4     1        s     d  ==
+F4     1        s     d  ]]
+Af4    1        s     d  [[
+F4     1        s     d  ==
+D4     1        s     d  ==
+F4     1        s     d  ]]
+measure 63
+Bf4    2        e     d
+rest   2        e
+rest   4        q
+rest   4        q
+measure 64
+rest   1        s
+Ef5    1        s     d  [[     (f
+D5     1        s     d  ==
+C5     1        s     d  ]]
+Bf4    1        s     d  [[
+Af4    1        s     d  ==
+G4     1        s     d  ==
+F4     1        s     d  ]]
+Ef4    1        s     d  [[
+D4     1        s     d  ==
+C4     1        s     d  ==
+Bf3    1        s     d  ]]     )
+measure 65
+Af3    1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+D5     1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+Af3    1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+measure 66
+G3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s f   d  ==     (
+Ef4    1        s     d  ]]     )
+Df5    1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+G3     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+Df5    1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+measure 67
+Af3    1        s     d  [[     (
+Ef4    1        s     d  ==     )
+C5     1        s     d  ==     (
+Bf4    1        s     d  ]]
+Af4    1        s     d  [[
+G4     1        s     d  ==
+F4     1        s     d  ==
+Ef4    1        s     d  ]]     )
+Bf3    1        s     d  [[     .
+Ef4    1        s     d  ==     .
+F4     1        s     d  ==     .
+D4     1        s     d  ]]     .
+measure 68
+Ef4    4        q     d         F
+S C8:F4
+rest   4        q
+rest   4        q
+measure 69
+rest   4        q
+Ef4    1        s     d  [[     (p
+D4     1        s     d  ==
+C4     1        s     d  ==
+B3     1        s n   d  ]]     )
+C4     4-       q     d        -
+measure 70
+C4     4        q     d
+Ef4    1        s     d  [[     (
+D4     1        s     d  ==
+C4     1        s     d  ==
+B3     1        s n   d  ]]     )
+C4     4-       q     d        -
+measure 71
+C4     4        q     d
+Af4    1        s     d  [[     (
+G4     1        s     d  ==
+F4     1        s     d  ==
+Ef4    1        s     d  ]]     )
+F4     4-       q     d        -
+measure 72
+F4     2        e     d  [      (
+G4     1        s     d  =[
+Af4    1        s     d  ]]     )
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]
+C4     1        s     u  [[
+B3     1        s n   u  ==
+A3     1        s n   u  ==
+G3     1        s     u  ]]     )
+measure 73
+Ef4    1        s     d  [[     (
+D4     1        s     d  ==
+C4     1        s     d  ==
+B3     1        s n   d  ]]     )
+C4     8-       h     d        -
+measure 74
+C4     1        s     u  [[
+Bf3    1        s     u  ==     (
+A3     1        s n   u  ==
+G3     1        s     u  ]]     )
+A3     8-       h     u        -
+measure 75
+A3     1        s     d  [[
+Ef4    1        s     d  ==     (
+D4     1        s     d  ==
+C4     1        s     d  ]]     )
+A4     1        s n   d  [[     (
+G4     1        s     d  ==
+F#4    1        s #   d  ==
+E4     1        s n   d  ]]     )
+C5     4-       q     d        -
+measure 76
+C5     1        s     d  [[     (
+Bf4    1        s     d  ==
+A4     1        s n   d  ==
+G4     1        s     d  ]]
+A4     1        s     d  [[
+G4     1        s     d  ==
+F#4    1        s #   d  ==
+Ef4    1        s     d  ]]
+D4     1        s     u  [[
+C4     1        s     u  ==
+Bf3    1        s     u  ==
+A3     1        s n   u  ]]     )
+measure 77
+G3     8        h     u
+Ef4    1        s     d  [[     (
+D4     1        s     d  ==
+C4     1        s     d  ==
+Bf3    1        s     d  ]]     )
+measure 78
+A3     8        h n   u
+F4     1        s     d  [[     (
+Ef4    1        s     d  ==
+D4     1        s     d  ==
+C4     1        s     d  ]]     )
+measure 79
+Bf3    8        h     u
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]     )
+measure 80
+C4    12-       h.    d        -(
+measure 81
+C4     1        s     d  [[
+F#4    1        s #   d  ==     )
+A4     1        s n   d  ==     (
+F#4    1        s     d  ]]     )
+A4     1        s     d  [[     (
+F#4    1        s     d  ==     )
+A4     1        s     d  ==     (
+F#4    1        s     d  ]]     )
+C4     1        s     d  [[     (
+F#4    1        s     d  ==     )
+A4     1        s     d  ==     (
+F#4    1        s     d  ]]     )
+measure 82
+C4     1        s     d  [[     (
+Ef4    1        s     d  ==     )+
+A4     1        s n   d  ==     (
+Ef4    1        s     d  ]]     )
+A4     1        s     d  [[     (
+Ef4    1        s     d  ==     )
+A4     1        s     d  ==     (
+Ef4    1        s     d  ]]     )
+C4     1        s     d  [[     (
+D4     1        s     d  ==     )
+A4     1        s     d  ==     (
+D4     1        s     d  ]]     )
+measure 83
+Bf3    2        e     u
+rest   2        e
+rest   4        q
+rest   4        q
+measure 84
+rest   2        e
+D5     1        s     d  [[     (f
+C5     1        s     d  ]]
+Bf4    1        s     d  [[
+A4     1        s n   d  ==
+G4     1        s     d  ==
+F4     1        s     d  ]]
+Ef4    1        s     d  [[
+D4     1        s     d  ==
+C4     1        s     d  ==
+Bf3    1        s     d  ]]     )
+measure 85
+A3     1        s n   d  [[     (
+G4     1        s     d  ==     )
+C5     1        s     d  ==     (
+G4     1        s     d  ]]     )
+C5     1        s     d  [[     (
+G4     1        s     d  ==     )
+C5     1        s     d  ==     (
+G4     1        s     d  ]]     )
+A3     1        s     d  [[     (
+G4     1        s     d  ==     )
+C5     1        s     d  ==     (
+G4     1        s     d  ]]     )
+measure 86
+A3     1        s n   d  [[     (
+F#4    1        s #   d  ==     )
+C5     1        s     d  ==     (
+F#4    1        s     d  ]]     )
+C5     1        s     d  [[     (
+F#4    1        s     d  ==     )
+C5     1        s     d  ==     (
+F#4    1        s     d  ]]     )
+A3     1        s     d  [[     (
+F#4    1        s     d  ==     )
+C5     1        s     d  ==     (
+F#4    1        s     d  ]]     )
+measure 87
+G3     1        s     d  [[     (
+D4     1        s     d  ==     )
+Bf4    1        s     d  ==     (
+A4     1        s n   d  ]]     )
+C5     1        s     d  [[     (
+Bf4    1        s     d  ==     )
+A4     1        s     d  ==     (
+G4     1        s     d  ]]     )
+D4     1        s     d  [[     .
+G4     1        s     d  ==     .
+A4     1        s     d  ==     .
+F#4    1        s #   d  ]]     .
+measure 88
+G4     1        s     d  [[
+C4     1        s     d  ==     (
+Bf3    1        s     d  ==
+A3     1        s n   d  ]]     )
+G3     1        s     u  [[     (p
+A3     1        s     u  ==
+Bf3    1        s     u  ==
+C4     1        s     u  ]]
+D4     1        s     d  [[
+F#4    1        s #   d  ==
+G4     1        s     d  ==
+A4     1        s n   d  ]]     )
+measure 89
+Bf4    1        s     d  [[     (
+A4     1        s     d  ==
+&
+Af4  in the BG edition (a possible error)
+&
+G4     1        s     d  ==
+F#4    1        s #   d  ]]
+G4     1        s     d  [[     )
+D4     1        s     d  ==
+Bf3    1        s     d  ==
+D4     1        s     d  ]]
+G4     1        s     d  [[
+D4     1        s     d  ==
+Bf3    1        s     d  ==
+D4     1        s     d  ]]
+measure 90
+Bf4    1        s     d  [[     (
+A4     1        s     d  ==
+&
+Af4  in the BG edition (a possible error)
+&
+G4     1        s     d  ==
+F#4    1        s #   d  ]]
+G4     1        s     d  [[     )
+D4     1        s     d  ==
+Bf3    1        s     d  ==
+D4     1        s     d  ]]
+G4     1        s     d  [[
+D4     1        s     d  ==
+Bf3    1        s     d  ==
+D4     1        s     d  ]]
+measure 91
+G4     1        s     d  [[     (
+F4     1        s     d  ==
+E4     1        s n   d  ==
+D4     1        s     d  ]]     )
+Bf4    1        s     d  [[     (
+Af4    1        s     d  ==     +
+G4     1        s     d  ==
+F4     1        s     d  ]]
+E4     1        s     d  [[
+D4     1        s     d  ==
+C4     1        s     d  ==
+Bf3    1        s     d  ]]     )
+measure 92
+Af3    4-       q     u        -
+Af3    1        s     d  [[
+C4     1        s     d  ==     (
+D4     1        s     d  ==
+E4     1        s n   d  ]]     )
+F4     1        s     d  [[     (
+E4     1        s     d  ==
+D4     1        s     d  ==     )
+C4     1        s     d  ]]
+measure 93
+Af4    1        s     d  [[     (
+G4     1        s     d  ==
+F4     1        s     d  ==
+E4     1        s n   d  ]]     )
+F4     8-       h     d        -
+measure 94
+F4     1        s     d  [[
+Ef4    1        s     d  ==     (+
+D4     1        s     d  ==
+C4     1        s     d  ]]     )
+D4     8-       h     d        -
+measure 95
+D4     1        s     u  [[
+C4     1        s     u  ==     (
+B3     1        s n   u  ==
+A3     1        s n   u  ]]     )
+G3     4        q     u
+rest   4        q
+measure 96
+rest   1        s
+Ef5    1        s     d  [[     (
+D5     1        s     d  ==
+C5     1        s     d  ]]     )
+D5     1        s     d  [[     (
+C5     1        s     d  ==
+B4     1        s n   d  ==
+Af4    1        s     d  ]]      +
+G4     1        s     d  [[
+F4     1        s     d  ==
+Ef4    1        s     d  ==
+D4     1        s     d  ]]     )
+measure 97
+C4     4-       q     d        -
+C4     1        s     u  [[
+Bf3    1        s     u  ==     (
+Af3    1        s     u  ==
+G3     1        s     u  ]]     )
+F4     4-       q     d        -
+measure 98
+F4     1        s     d  [[
+Bf4    1        s     d  ==     (
+Af4    1        s     d  ==
+G4     1        s     d  ]]     )
+Bf3    1        s     d  [[
+Af4    1        s     d  ==     (
+G4     1        s     d  ==
+F4     1        s     d  ]]     )
+Ef4    4-       q     d        -
+measure 99
+Ef4    1        s     d  [[
+Af4    1        s     d  ==     (
+G4     1        s     d  ==
+F4     1        s     d  ]]     )
+Af3    1        s     d  [[
+G4     1        s     d  ==     (
+F4     1        s     d  ==
+Ef4    1        s     d  ]]     )
+D4     4-       q     d        -
+measure 100
+D4     1        s     d  [[
+G4     1        s     d  ==     (
+F4     1        s     d  ==
+Ef4    1        s     d  ]]
+F4     1        s     d  [[
+Ef4    1        s     d  ==
+F4     1        s     d  ==
+G4     1        s     d  ]]     )
+Af4    4-       q     d        -
+measure 101
+Af4    1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+D5     1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+Af3    1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+measure 102
+G3     1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+D5     1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+G3     1        s     d  [[     (
+F4     1        s     d  ==     )
+D5     1        s     d  ==     (
+F4     1        s     d  ]]     )
+measure 103
+C5     2        e     d
+ Ef4            e     d
+ G3             e     d
+rest   2        e
+rest   4        q
+rest   4        q
+measure 104
+rest   4        q
+rest   1        s
+Ef5    1        s     d  [[     (f
+D5     1        s     d  ==
+C5     1        s     d  ]]
+Bf4    1        s     d  [[
+Af4    1        s     d  ==
+G4     1        s     d  ==
+F4     1        s     d  ]]     )
+*               B   39  Dal Segno
+mheavy2         A
+S C0:d
+/END
+/eof
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+PART = 02
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+(C) 1991, 2002 Center for Computer Assisted Research in the Humanities.
+ID: {bach/bg/cant/0005/stage2/03/02} [KHM:1658122244]
+TIMESTAMP: DEC/26/2001 [md5sum:bcce96553293672b44f5aeb074066fe8]
+03/06/91 S. Rasmussen
+WK#:5         MV#:3
+Bach Gesellschaft i
+Wo soll ich fliehen hin
+Aria
+TENORE
+1 75 T
+Group memberships: score
+score: part 2 of 3
+&
+conversion from old-format Stage2 to new-format Stage2
+S. Rasmussen    09/02/93
+&
+$ K:-3   Q:8   T:3/4   C:34
+rest   8        q
+measure 1       A
+S C0:S8
+rest  24
+measure 2
+rest  24
+measure 3
+rest  24
+measure 4
+rest  24
+measure 5
+rest  24
+measure 6
+rest  24
+measure 7
+rest  24
+measure 8
+rest  24
+measure 9
+rest  24
+measure 10
+rest  24
+measure 11
+rest  24
+measure 12
+rest  24
+measure 13
+rest  24
+measure 14
+rest  24
+measure 15
+rest  24
+measure 16
+rest   8        q
+rest   8        q
+Bf3    8        q     d                    Er-
+measure 17
+G4     2        s     d  [[                gie-
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  =]                -
+Ef4    4        e     d  ]                 -
+Bf3    4        e     d                    sse
+G3     4        e     u  [                 dich_
+Bf3    4        e     u  ]                 _
+measure 18
+G4     2        s     d  [[                reich-
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  =]                -
+Ef4    4        e     d  ]                 -
+C4     4        e     d                    lich
+G3     4        e     u  [                 du_
+C4     4        e     u  ]                 _
+measure 19
+F4    12        q.    d                    g\3ott-
+G4     4        e     d                    li-
+Af4    4        e     d  [                 che_
+D4     4        e     d  ]                 _
+measure 20
+Bf3    4        e     d  [                 Quel-
+Af4    4        e     d  ]                 -
+G4     8        q     d                    le.
+rest   8        q
+measure 21
+rest  24
+measure 22
+rest  24
+measure 23
+rest  24
+measure 24
+rest   8        q
+rest   8        q
+Bf3    8        q     d                    Er-
+measure 25
+G4     2        s     d  [[                gie-
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  =]                -
+Ef4    4        e     d  ]                 -
+Bf3    4        e     d                    sse
+G3     4        e     u  [                 dich_
+Bf3    4        e     u  ]                 _
+measure 26
+G4     2        s     d  [[                reich-
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  =]                -
+Ef4    4        e     d  ]                 -
+C4     4        e     d                    lich
+G3     4        e     u  [                 du_
+C4     4        e     u  ]                 _
+measure 27
+F4    12        q.    d                    g\3ott-
+G4     4        e     d                    li-
+Af4    4        e     d  [                 che_
+D4     4        e     d  ]                 _
+measure 28
+Bf3    4        e     d  [                 Quel-
+Af4    4        e     d  ]                 -
+G4     8        q     d                    le,
+F4     8        q     d                    ach
+measure 29
+F4     2        s     d  [[                wal-
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  ]]                -
+D4     2        s     d  [[                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ==                -
+Af3    2        s     d  ]]                -
+G4     2        s     d  [[                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ]]                -
+measure 30
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ]]                -
+C4     2        s     u  [[                -
+Bf3    2        s     u  ==                -
+A3     2        s n   u  ==                -
+G3     2        s     u  ]]                -
+F4     2        s     d  [[                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  ]]                -
+measure 31
+D4     2        s     d  [[                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ==                -
+A3     2        s     d  ]]                -
+&
+Af3 in the BG edition (an obvious error)
+&
+Bf3    2        s     u  [[                -
+A3     2        s n   u  ==                -
+G3     2        s     u  ==                -
+F3     2        s     u  ]]                -
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ]]                -
+measure 32
+A3     2        s n   d  [[                -
+Bf3    2        s     d  ==                -
+C4     2        s     d  ==                -
+A3     2        s     d  ]]                -
+F3     8        q     u                    le,
+C4     4        e     d  [                 ach_
+D4     2        s     d  =[                _
+Ef4    2        s     d  ]]                _
+measure 33
+D4     4        e     d  [                 wal-
+Ef4    2        s     d  =[                -
+F4     2        s     d  ]]                -
+F4     4        e     d  [                 le_
+Ef4    4        e     d  ]                 _
+D4     4        e     d  [                 mit_
+C4     4        e     d  ]                 _
+measure 34
+D4     4        e     d  [                 blu-
+Ef4    2        s     d  =[                -
+F4     2        s     d  ]]                -
+F4     4        e     d  [                 ti-
+Ef4    4        e     d  ]                 -
+D4     4        e     d  [                 gen_
+Ef4    2        s     d  =[                _
+F4     2        s     d  ]]                _
+measure 35
+G3     4        e     d  [                 Str\3o-
+G4     4-       e     d  ]     -           -
+G4     2        s     d  [[                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ]]                -
+F4     2        s     d  [[                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  ]]                -
+measure 36
+F4     2        s     d  [[                -
+G4     2        s     d  ==                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  ]]                -
+D4     2        s     d  [[                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ==                -
+A3     2        s n   d  ]]                -
+C4     2        s     u  [[                -
+Bf3    2        s     u  ==                -
+A3     2        s     u  ==                -
+G3     2        s     u  ]]                -
+measure 37
+Ef4    2        s     d  [[                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ]]                -
+C4     2        s     u  [[                -
+Bf3    2        s     u  ==                -
+A3     2        s n   u  ==                -
+G3     2        s     u  ]]                -
+Bf3    2        s     u  [[                -
+A3     2        s     u  ==                -
+G3     2        s     u  ==                -
+F3     2        s     u  ]]                -
+measure 38
+D4     4        e     d  [                 -
+C4     4        e     d  ]                 -
+Bf3    4        e     d  [                 men,_
+C4     4        e     d  ]                 _
+D4     4        e     d  [                 mit_
+Ef4    4        e     d  ]                 _
+measure 39
+F4     4        e     d  [                 blu-
+G4     2        s     d  =[                -
+Af4    2        s     d  ]]     +          -
+G4     4        e     d  [                 ti-
+F4     4        e     d  ]                 -
+Ef4    4        e     d  [                 gen_
+D4     4        e     d  ]                 _
+measure 40
+F4     4        e     d  [                 Str\3o-
+Ef4    4        e     d  ]                 -
+D4     4        e     d  [                 men,_
+C4     4        e     d  ]                 _
+G3     8        q     u                    ach
+measure 41
+Ef4    2        s     d  [[                wal-
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  =]                -
+C4     4        e     d  ]                 -
+G3     4        e     u                    le
+G4     4        e     d                    mit
+Ef4    4-       e     d        -           blu-
+measure 42
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  =]                -
+C4     4        e     d  ]                 -
+Ef4    4        e     d                    ti-
+G4     4        e     d  [                 gen_
+F4     4        e     d  ]                 _
+measure 43
+F4     4        e     d  [                 Str\3o-
+G4     2        s     d  =[                -
+F4     2        s     d  ]]                -
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  =]                -
+Ef4    4        e     d  ]                 -
+D4     2        s     d                    men
+C4     2        s     d                    auf
+measure 44
+Bf3    8        q     d                    mich.
+rest   8        q
+rest   8        q
+measure 45
+rest  24
+measure 46
+rest  24
+measure 47
+rest  24
+measure 48
+rest   8        q
+rest   8        q
+Bf3    8        q     d                    Er-
+measure 49
+Df4    2        s f   d  [[                gie-
+C4     2        s     d  ==                -
+Bf3    2        s     d  ==                -
+Af3    2        s     d  =]                -
+Bf3    4        e     d  ]                 -
+G3     4        e     u                    sse
+F4     4        e     d  [                 dich_
+E4     4        e n   d  ]                 _
+measure 50
+F4     8        q     d                    reich-
+F3     4        e     u  [                 lich_
+Af3    4        e     u  ]                 _
+C4     4        e     d  [                 du_
+Ef4    2        s     d  =[                _
+D4     2        s     d  ]]                _
+measure 51
+Ef4    2        s     d  [[                g\3ott-
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+D4     2        s     d  =]                -
+Ef4    4        e     d  ]                 -
+G4     4        e     d                    li-
+F4     8        q     d                    che
+measure 52
+F4     2        s     d  [[                Quel-
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  =]                -
+D4     4        e     d  ]                 -
+Bf3    4        e     d                    le,
+F4     6        e.    d  [                 er-
+G4     1        t     d  =[[               -
+Af4    1        t     d  ]]]               -
+measure 53
+G4     2        s     d  [[                gie-
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  =]                -
+Ef4    4        e     d  ]                 -
+Bf3    4        e     d                    sse
+G3     4        e     u  [                 dich_
+Bf3    4        e     u  ]                 _
+measure 54
+G4     2        s     d  [[                reich-
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  =]                -
+Ef4    4        e     d  ]                 -
+C4     4        e     d                    lich
+G3     4        e     u  [                 du_
+C4     4        e     u  ]                 _
+measure 55
+F4    12        q.    d                    g\3ott-
+G4     4        e     d                    li-
+Af4    4        e     d  [                 che_
+D4     4        e     d  ]                 _
+measure 56
+Bf3    4        e     d  [                 Quel-
+Af4    4        e     d  ]                 -
+G4     8        q     d                    le,
+Bf3    8        q     d                    ach
+measure 57
+F3     2        s     u  [[                wal-
+G3     2        s     u  =]                -
+Af3    4        e     u  ]                 -
+Af3    4        e     u  [                 le_
+G3     4        e     u  ]                 _
+Af3    4        e     u  [                 mit_
+F3     4        e     u  ]                 _
+measure 58
+G3     2        s     u  [[                blu-
+Af3    2        s     u  =]                -
+Bf3    4        e     u  ]                 -
+Bf3    4        e     u  [                 ti-
+Af3    4        e     u  ]                 -
+G3     4        e     u                    gen,
+Af3    4        e     u                    mit
+measure 59
+Bf3    2        s     d  [[                blu-
+C4     2        s     d  =]                -
+Df4    4        e f   d  ]                 -
+C4     4        e     d  [                 ti-
+Bf3    4        e     d  ]                 -
+Af3    4        e     u  [                 gen_
+G3     4        e     u  ]                 _
+measure 60
+Bf3    4        e     u  [                 Str\3o-
+Af3    4        e     u  ]                 -
+G3     4        e     u  [                 men,_
+F3     4        e     u  ]                 _
+C4     8        q     d                    ach
+measure 61
+Af4    2        s     d  [[                wal-
+G4     2        s     d  ==                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  =]                -
+F4     4        e     d  ]                 -
+C4     4        e     d                    le
+Af3    4        e     d  [                 mit_
+C4     4        e     d  ]                 _
+measure 62
+Af4    2        s     d  [[                blu-
+G4     2        s     d  ==                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  =]                -
+F4     4        e     d  ]                 -
+Af3    4        e     u                    ti-
+C4     4        e     d  [                 gen_
+Bf3    4        e     d  ]                 _
+measure 63
+Bf3    4        e     d  [                 Str\3o-
+C4     2        s     d  =[                -
+Bf3    2        s     d  ]]                -
+Af3    2        s     u  [[                -
+G3     2        s     u  ==                -
+F3     2        s     u  ==                -
+Ef3    2        s     u  =]                -
+Af3    4        e     u  ]                 -
+G3     2        s     u                    men
+F3     2        s     u                    auf
+measure 64
+Ef3    8        q     u                    mich.
+rest   8        q
+rest   8        q
+measure 65
+rest  24
+measure 66
+rest  24
+measure 67
+rest  24
+measure 68
+rest   8        q               F
+S C8:F8
+rest   8        q
+G3     8        q     u                    Es
+measure 69
+Ef4    2        s     d  [[                f\3uh-
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+B3     2        s n   d  =]                -
+C4     4        e     d  ]                 -
+G3     4        e     u                    let
+Ef3    4        e     u  [                 mein_
+G3     4        e     u  ]                 _
+measure 70
+Ef4    2        s     d  [[                Her-
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+B3     2        s n   d  =]                -
+C4     4        e     d  ]                 -
+G3     4        e     u                    ze
+Ef4    4        e     d  [                 die_
+D4     4        e     d  ]                 _
+measure 71
+D4     4        e     d  [                 tr\3ost-
+Af4    2        s     d  =[                -
+G4     2        s     d  ]]                -
+F4     2        s     d  [[                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  =]                -
+D4     4        e     d  ]                 -
+Ef4    2        s     d                    li-
+F4     2        s     d                    che
+measure 72
+B3     8        q n   d                    Stun-
+A3     4        e n   u  [                 de,_
+G3     4        e     u  ]                 _
+G4     8        q     d                    nun
+measure 73
+G4     8-       q     d        -           sin-
+G4     2        s     d  [[                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  =]                -
+Ef4    4        e     d  ]                 -
+F4     2        s     d                    ken
+D4     2        s     d                    die
+measure 74
+Ef4    8-       q     d        -           dr\3u-
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  =]                -
+C4     4        e     d  ]                 -
+D4     2        s     d                    cken-
+Bf3    2        s     d                    den
+measure 75
+C4     8-       q     d        -           La-
+C4     2        s     u  [[                -
+Bf3    2        s     u  ==                -
+A3     2        s n   u  ==                -
+G3     2        s     u  =]                -
+A3     4        e     u  ]                 -
+Bf3    2        s     d                    sten
+G3     2        s     u                    zu
+measure 76
+F#3    8        q #   u         t          Grun-
+S C33:uhn8s15t75
+E3     4        e n   u  [                 de,_
+D3     4        e     u  ]                 _
+A3     8        q n   u                    es
+measure 77
+C4     2        s     u  [[                w\3a-
+Bf3    2        s     u  ==                -
+A3     2        s n   u  ==                -
+G3     2        s     u  ]]                -
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ]]                -
+C4     2        s     u  [[                -
+Bf3    2        s     u  ==                -
+A3     2        s     u  ==                -
+G3     2        s     u  ]]                -
+measure 78
+D4     2        s     d  [[                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ==                -
+A3     2        s n   d  ]]                -
+F4     2        s     d  [[                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  ]]                -
+D4     2        s     d  [[                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ==                -
+A3     2        s     d  ]]                -
+measure 79
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ]]                -
+G4     2        s     d  [[                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ]]                -
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ]]                -
+measure 80
+F4     2        s     d  [[                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  ]]                -
+A4     2        s n   d  [[                -
+G4     2        s     d  ==                -
+F#4    2        s #   d  ==                -
+E4     2        s     d  ]]                -
+F#4    2        s n   d  [[                -
+E4     2        s     d  ==                -
+&
+Ef4  \
+F4     in the BG edition (a probable error)
+Ef4  /
+&
+D4     2        s     d  ==                -
+C4     2        s     d  ]]                -
+measure 81
+D4    12        q.    d                    -
+Ef4    4        e     d                    schet
+D4     8        q     d                    die
+measure 82
+F#3    4        e #   u  [                 s\3und-
+A3     4        e     u  =                 -
+&
+Af3  in the BG edition (a probable error)
+&
+C4     4        e     u  ]                 -
+Ef4    4        e     d                    li-
+D4     8        q     d                    chen
+measure 83
+D4     4        e     d  [                 Fle-
+Ef4    2        s     d  =[                -
+D4     2        s     d  ]]                -
+C4     2        s     d  [[                -
+Bf3    2        s     d  ==                -
+A3     2        s n   d  ==                -
+G3     2        s     d  =]                -
+C4     4        e     d  ]                 -
+Bf3    2        s     d                    cken
+A3     2        s     u                    von
+measure 84
+gA3    6        e n   u         (
+S C1:ft50
+G3     8        q     u         )          sich.
+rest   8        q
+rest   8        q
+measure 85
+rest  24
+measure 86
+rest  24
+measure 87
+rest  24
+measure 88
+rest   8        q
+rest   8        q
+D4     8        q     d                    Es
+measure 89
+D4     2        s     d  [[                f\3uh-
+C4     2        s     d  ==                -
+Bf3    2        s     d  ==                -
+A3     2        s n   d  =]                -
+Bf3    4        e     d  ]                 -
+G3     4        e     u                    let
+D4     8        q     d                    mein
+measure 90
+D4     2        s     d  [[                Her-
+C4     2        s     d  ==                -
+Bf3    2        s     d  ==                -
+A3     2        s n   d  =]                -
+Bf3    4        e     d  ]                 -
+G3     4        e     u                    ze
+D4     4        e     d  [                 die_
+E4     2        s n   d  =[                _
+F4     2        s     d  ]]                _
+measure 91
+E4     2        s n   d  [[                tr\3ost-
+F4     2        s     d  =]                -
+G4     4-       e     d  ]     -           -
+G4     2        s     d  [[                -
+F4     2        s     d  ==                -
+E4     2        s     d  ==                -
+D4     2        s     d  =]                -
+C4     4        e     d  ]                 -
+D4     2        s     d                    li-
+E4     2        s     d                    che
+measure 92
+F4     4        e     d  [                 Stun-
+G4     2        s     d  =[                -
+Af4    2        s     d  ]]                -
+Af4    8        q     d                    de,
+C4     8        q     d                    nun
+measure 93
+C4     8-       q     d        -           sin-
+C4     2        s     u  [[                -
+Bf3    2        s     u  ==                -
+Af3    2        s     u  ==                -
+G3     2        s     u  =]                -
+Af3    4        e     u  ]                 -
+Bf3    2        s     d                    ken
+G3     2        s     u                    die
+measure 94
+Af3    4        e     d  [                 dr\3u-
+Af4    4-       e     d  ]     -           -
+Af4    2        s     d  [[                -
+F4     2        s     d  ==                -
+G4     2        s     d  ==                -
+Ef4    2        s     d  =]                -
+F4     4        e     d  ]                 -
+G4     2        s     d                    cken-
+Ef4    2        s     d                    den
+measure 95
+F4     8-       q     d        -           La-
+F4     2        s     d  [[                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  =]                -
+D4     4        e     d  ]                 -
+Ef4    2        s     d                    sten
+C4     2        s     d                    zu
+measure 96
+B3     8        q n   d                    Grun-
+A3     4        e n   u  [                 de,_
+G3     4        e     u  ]                 _
+D4     8        q     d                    es
+measure 97
+F4     2        s     d  [[                w\3a-
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  ]]                -
+Af4    2        s     d  [[                -
+G4     2        s     d  ==                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  ]]                -
+F4     2        s     d  [[                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  ]]                -
+measure 98
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ]]                -
+G4     2        s     d  [[                -
+F4     2        s     d  ==                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ]]                -
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ]]                -
+measure 99
+Df4    2        s f   d  [[                -
+C4     2        s     d  ==                -
+Bf3    2        s     d  ==                -
+Af3    2        s     d  ]]                -
+F4     2        s     d  [[                -
+Ef4    2        s     d  ==                -
+D4     2        s n   d  ==                -
+C4     2        s     d  ]]                -
+D4     2        s     d  [[                -
+C4     2        s     d  ==                -
+B3     2        s n   d  ==                -
+A3     2        s n   d  ]]                -
+measure 100
+C4     2        s     u  [[                -
+B3     2        s n   u  ==                -
+A3     2        s n   u  ==                -
+G3     2        s     u  ]]                -
+D4     2        s     d  [[                -
+C4     2        s     d  ==                -
+B3     2        s     d  ==                -
+A3     2        s     d  ]]                -
+Ef4    2        s     d  [[                -
+D4     2        s     d  ==                -
+C4     2        s     d  ==                -
+B3     2        s     d  ]]                -
+measure 101
+F4    12        q.    d                    -
+G4     4        e     d                    schet
+F4     8        q     d                    die
+measure 102
+B3     4        e n   d  [                 s\3und-
+D4     4        e     d  =                 -
+F4     4        e     d  ]                 -
+Af4    4        e     d                    li-
+G4     8        q     d                    chen
+measure 103
+G4     4        e     d  [                 Fle-
+Af4    2        s     d  =[                -
+G4     2        s     d  ]]                -
+F4     2        s     d  [[                -
+Ef4    2        s     d  ==                -
+D4     2        s     d  ==                -
+C4     2        s     d  =]                -
+F4     4        e     d  ]                 -
+Ef4    2        s     d                    cken
+D4     2        s     d                    von
+measure 104
+C4     8        q     d                    sich.
+rest   8        q
+rest   8        q
+*               B   39  Dal Segno
+mheavy2         A
+S C0:d
+/END
+/eof
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+PART = 03
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+(C) 1991, 2002 Center for Computer Assisted Research in the Humanities.
+ID: {bach/bg/cant/0005/stage2/03/03} [KHM:1658122244]
+TIMESTAMP: DEC/26/2001 [md5sum:d3a30662b48731ae35e243eb82937a72]
+03/06/91 S. Rasmussen
+WK#:5         MV#:3
+Bach Gesellschaft i
+Wo soll ich fliehen hin
+Aria
+Continuo
+1 75
+Group memberships: score
+score: part 3 of 3
+&
+conversion from old-format Stage2 to new-format Stage2
+S. Rasmussen    09/02/93
+&
+$ K:-3   Q:4   T:3/4   C:22
+rest   4        q
+measure 1       A
+S C0:S4
+Ef2    2        e     u  [
+Ef3    2        e     u  =
+Ef3    2        e     u  =      (
+D3     2        e     u  =      )
+D3     2        e     u  =      (
+C3     2        e     u  ]      )
+measure 2
+C2     2        e     u  [
+C3     2        e     u  =
+C3     2        e     u  =      (
+Bf2    2        e     u  =      )
+Bf2    2        e     u  =      (
+Af2    2        e     u  ]      )
+measure 3
+Af2    2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 4
+Ef2    2        e     u  [
+Ef3    2        e     u  =
+Ef3    2        e     u  =      (
+D3     2        e     u  =      )
+D3     2        e     u  =      (
+C3     2        e     u  ]      )
+measure 5
+C3     2        e     d  [
+C4     2        e     d  =
+C4     2        e     d  =      (
+Bf3    2        e     d  =      )
+Bf3    2        e     d  =      (
+A3     2        e n   d  ]      )
+measure 6
+A2     2        e n   d  [
+A3     2        e n   d  =
+A3     2        e     d  =      (
+G3     2        e     d  =      )
+G3     2        e     d  =      (
+F3     2        e     d  ]      )
+measure 7
+Bf3    2        e     d
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+F3     2        e     d
+rest   2        e
+measure 8
+Bf2    2        e     d  [
+Bf3    2        e     d  =
+Bf3    2        e     d  =      (
+Af3    2        e     d  =      )+
+Af3    2        e     d  =      (
+G3     2        e     d  ]      )
+measure 9
+G3     2        e     d
+rest   2        e
+C4     2        e     d
+rest   2        e
+C3     2        e     u
+rest   2        e
+measure 10
+F3     2        e     d  [      (
+Af3    2        e     d  =      )
+Af3    2        e     d  =      (
+C4     2        e     d  =      )
+C4     2        e     d  =      (
+F3     2        e     d  ]      )
+measure 11
+F3     2        e     d
+rest   2        e
+A3     2        e n   d
+rest   2        e
+F3     2        e     d
+rest   2        e
+measure 12
+Bf3    2        e     d  [      (
+F3     2        e     d  =      )
+F3     2        e     d  =      (
+D3     2        e     d  =      )
+D3     2        e     d  =      (
+Bf2    2        e     d  ]      )
+measure 13
+Bf2    2        e     u
+rest   2        e
+Bf3    2        e     d
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 14
+Ef3    2        e     d
+rest   2        e
+G2     2        e     u
+rest   2        e
+Ef2    2        e     u
+rest   2        e
+measure 15
+Af2    2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 16
+Ef2    2        e     u  [
+Ef3    2        e     u  =
+Ef3    2        e     u  =      (
+Bf2    2        e     u  =      )
+G2     2        e     u  =      (
+Ef2    2        e     u  ]      )
+measure 17
+Ef2    2        e     u  [      p
+Ef3    2        e     u  =
+Ef3    2        e     u  =      (
+D3     2        e     u  =      )
+D3     2        e     u  =      (
+C3     2        e     u  ]      )
+measure 18
+C2     2        e     u  [
+C3     2        e     u  =
+C3     2        e     u  =      (
+Bf2    2        e     u  =      )
+Bf2    2        e     u  =      (
+Af2    2        e     u  ]      )
+measure 19
+Af2    2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 20
+Ef2    2        e     d  [
+Ef3    2        e     d  =
+Ef3    2        e     d  =      (
+G3     2        e     d  =      )
+G3     2        e     d  =      (
+Bf3    2        e     d  ]      )
+measure 21
+Bf3    2        e     d         f
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+Bf3    2        e     d
+rest   2        e
+measure 22
+Ef3    2        e     d
+rest   2        e
+G2     2        e     u
+rest   2        e
+Ef2    2        e     u
+rest   2        e
+measure 23
+Af2    2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 24
+Ef2    2        e     u  [
+Ef3    2        e     u  =
+Ef3    2        e     u  =      (
+Bf2    2        e     u  =      )
+G2     2        e     u  =      (
+Ef2    2        e     u  ]      )
+measure 25
+Ef2    2        e     u  [      p
+Ef3    2        e     u  =
+Ef3    2        e     u  =      (
+D3     2        e     u  =      )
+D3     2        e     u  =      (
+C3     2        e     u  ]      )
+measure 26
+C2     2        e     u  [
+C3     2        e     u  =
+C3     2        e     u  =      (
+Bf2    2        e     u  =      )
+Bf2    2        e     u  =      (
+Af2    2        e     u  ]      )
+measure 27
+Af2    2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 28
+Ef2    2        e     u  [
+Ef3    2        e     u  =
+Ef3    2        e     u  =      (
+C3     2        e     u  =      )
+A2     2        e n   u  =      (
+F2     2        e     u  ]      )
+measure 29
+Bf2    2        e     u
+rest   2        e
+Bf3    2        e     d
+rest   2        e
+Ef3    1        s     u  [[     (
+D3     1        s     u  ==
+C3     1        s     u  ==
+Bf2    1        s     u  ]]     )
+measure 30
+C3     2        e     u
+rest   2        e
+C4     2        e     d
+rest   2        e
+D3     1        s     u  [[     (
+C3     1        s     u  ==
+Bf2    1        s     u  ==
+A2     1        s n   u  ]]     )
+measure 31
+Bf2    2        e     u
+rest   2        e
+Bf3    2        e     d
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+measure 32
+F3     2        e     d  [      (
+Ef3    2        e     d  =      )
+Ef3    2        e     d  =      (
+D3     2        e     d  =      )
+D3     2        e     d  =      (
+C3     2        e     d  ]      )
+measure 33
+Bf2    2        e     u
+rest   2        e
+D3     2        e     d
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 34
+G2     2        e     u
+rest   2        e
+G3     2        e     d
+rest   2        e
+F3     2        e     d
+rest   2        e
+measure 35
+Ef3    2        e     d
+rest   2        e
+C3     2        e     u
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+measure 36
+D3     2        e     d
+rest   2        e
+F3     2        e     d
+rest   2        e
+G3     2        e     d
+rest   2        e
+measure 37
+C3     2        e     u
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+F3     2        e     d
+rest   2        e
+measure 38
+Bf2    2        e     u
+rest   2        e
+Bf3    2        e     d
+rest   2        e
+Af3    2        e     d         +
+rest   2        e
+measure 39
+G3     2        e     d
+rest   2        e
+B3     2        e n   d
+rest   2        e
+G3     2        e     d
+rest   2        e
+measure 40
+C3     2        e     u
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+B2     2        e n   u
+rest   2        e
+measure 41
+C3     2        e     u
+rest   2        e
+C4     2        e     d
+rest   2        e
+Bf3    2        e     d
+rest   2        e
+measure 42
+A3     2        e n   d
+rest   2        e
+F3     2        e     d
+rest   2        e
+A3     2        e     d
+rest   2        e
+measure 43
+Bf3    2        e     d
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+F3     2        e     d
+rest   2        e
+measure 44
+Bf2    2        e     u         f
+rest   2        e
+D3     2        e     d
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 45
+Ef3    2        e     d  [
+C4     2        e     d  =
+C4     2        e     d  =      (
+Bf3    2        e     d  =      )
+Bf3    2        e     d  =      (
+A3     2        e n   d  ]      )
+measure 46
+A3     2        e n   d  [      (
+G3     2        e     d  =      )
+G3     2        e     d  =      (
+F3     2        e     d  =      )
+F3     2        e     d  =      (
+A3     2        e     d  ]      )
+measure 47
+Bf3    2        e     d
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+F3     2        e     d
+rest   2        e
+measure 48
+Bf2    2        e     d  [
+Bf3    2        e     d  =      p
+Bf3    2        e     d  =      (
+Af3    2        e     d  =      )+
+Af3    2        e     d  =      (
+G3     2        e     d  ]      )
+measure 49
+G3     2        e     d
+rest   2        e
+C4     2        e     d
+rest   2        e
+C3     2        e     u
+rest   2        e
+measure 50
+F2     2        e     u  [      (
+Af2    2        e     u  =      )
+Af2    2        e     u  =      (
+C3     2        e     u  =      )
+C3     2        e     u  =      (
+F3     2        e     u  ]      )
+measure 51
+F3     2        e     d
+rest   2        e
+A3     2        e n   d
+rest   2        e
+F3     2        e     d
+rest   2        e
+measure 52
+Bf3    2        e     u  [
+Bf2    2        e     u  =
+Bf2    2        e     u  =      (
+Af2    2        e     u  =      )
+G2     2        e     u  =      (
+F2     2        e     u  ]      )
+measure 53
+Ef2    2        e     u  [
+Ef3    2        e     u  =
+Ef3    2        e     u  =      (
+D3     2        e     u  =      )
+D3     2        e     u  =      (
+C3     2        e     u  ]      )
+measure 54
+C2     2        e     u  [
+C3     2        e     u  =
+C3     2        e     u  =      (
+Bf2    2        e     u  =      )
+Bf2    2        e     u  =      (
+Af2    2        e     u  ]      )
+measure 55
+Af2    2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 56
+Ef2    2        e     d  [
+Ef3    2        e     d  =
+Ef3    2        e     d  =      (
+G3     2        e     d  =      )
+G3     2        e     d  =      (
+Bf3    2        e     d  ]      )
+measure 57
+Bf3    2        e     d
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+Bf3    2        e     d
+rest   2        e
+measure 58
+Ef3    2        e     d
+rest   2        e
+G3     2        e     d
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+measure 59
+E3     2        e n   d
+rest   2        e
+G3     2        e     d
+rest   2        e
+C3     2        e     u
+rest   2        e
+measure 60
+F2     2        e     u
+rest   2        e
+Af2    2        e     u
+rest   2        e
+C3     2        e     u
+rest   2        e
+measure 61
+F2     2        e     u
+rest   2        e
+F3     2        e     d
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+measure 62
+D3     2        e     d
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+D3     2        e     d
+rest   2        e
+measure 63
+Ef3    2        e     d
+rest   2        e
+Af2    2        e     u
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 64
+Ef2    2        e     u  [      (f
+G2     2        e     u  =      )
+G2     2        e     u  =      (
+Af2    2        e     u  =      )
+Af2    2        e     u  =      (
+Bf2    2        e     u  ]      )
+measure 65
+Bf2    2        e     u
+rest   2        e
+Bf3    2        e     d
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 66
+Ef3    2        e     d
+rest   2        e
+G2     2        e     u
+rest   2        e
+Ef2    2        e     u
+rest   2        e
+measure 67
+Af2    2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 68
+Ef2    4        q     u         F
+S C8:F4
+rest   4        q
+rest   4        q
+measure 69
+C3     2        e     d  [      p
+C4     2        e     d  =
+C4     2        e     d  =      (
+Bf3    2        e     d  =      )
+Bf3    2        e     d  =      (
+Af3    2        e     d  ]      )
+measure 70
+Af2    2        e     d  [
+Af3    2        e     d  =
+Af3    2        e     d  =      (
+G3     2        e     d  =      )
+G3     2        e     d  =      (
+F3     2        e     d  ]      )
+measure 71
+F3     2        e     d
+rest   2        e
+D3     2        e     d
+rest   2        e
+F3     2        e     d
+rest   2        e
+measure 72
+G2     2        e     u  [      (
+A2     2        e n   u  =      )
+A2     2        e     u  =      (
+B2     2        e n   u  =      )
+B2     2        e     u  =      (
+C3     2        e     u  ]      )
+measure 73
+C3     2        e     d  [
+C4     2        e     d  =
+C4     2        e     d  =      (
+Bf3    2        e     d  =      )
+Bf3    2        e     d  =      (
+A3     2        e n   d  ]      )
+measure 74
+A2     2        e n   d  [
+A3     2        e n   d  =
+A3     2        e     d  =      (
+G3     2        e     d  =      )
+G3     2        e     d  =      (
+F#3    2        e #   d  ]      )
+measure 75
+F#3    2        e #   d  [      (
+G3     2        e     d  =      )
+G3     2        e     d  =      (
+Ef3    2        e     d  =      )
+Ef3    2        e     d  =      (
+D3     2        e     d  ]      )
+measure 76
+D3     2        e     d  [      (
+E3     2        e n   d  =      )
+E3     2        e     d  =      (
+F#3    2        e #   d  =      )
+F#3    2        e     d  =      (
+G3     2        e     d  ]      )
+measure 77
+G2     2        e     u
+rest   2        e
+C3     2        e     u
+rest   2        e
+A2     2        e n   u
+rest   2        e
+measure 78
+F2     2        e     u
+rest   2        e
+D3     2        e     d
+rest   2        e
+Bf2    2        e     u
+rest   2        e
+measure 79
+G2     2        e     u
+rest   2        e
+Ef3    2        e     d
+rest   2        e
+C3     2        e     u
+rest   2        e
+measure 80
+A2     2        e n   u
+rest   2        e
+C3     2        e     u
+rest   2        e
+A2     2        e     u
+rest   2        e
+measure 81
+F#2    2        e #   u  [      (
+C3     2        e     u  =      )
+C3     2        e     u  =      (
+A2     2        e n   u  =      )
+A2     2        e     u  =      (
+F#2    2        e     u  ]      )
+measure 82
+D2     2        e     u
+rest   2        e
+F#2    2        e #   u
+rest   2        e
+D2     2        e     u
+rest   2        e
+measure 83
+G2     2        e     u
+rest   2        e
+C3     2        e     u
+rest   2        e
+D3     2        e     d
+rest   2        e
+measure 84
+G2     2        e     u         f
+rest   2        e
+G3     2        e     d
+rest   2        e
+G2     2        e     u
+rest   2        e
+measure 85
+A2     2        e n   u  [      (
+Bf2    2        e     u  =      )
+Bf2    2        e     u  =      (
+C3     2        e     u  =      )
+C3     2        e     u  =      (
+D3     2        e     u  ]      )
+measure 86
+D3     2        e     d  [      (
+E3     2        e n   d  =      )
+E3     2        e     d  =      (
+F#3    2        e #   d  =      )
+F#3    2        e     d  =      (
+G3     2        e     d  ]      )
+measure 87
+G3     2        e     d  [      (
+Ef3    2        e     d  =      )
+Ef3    2        e     d  =      (
+C3     2        e     d  =      )
+D3     2        e     d  =
+D2     2        e     d  ]
+measure 88
+G2     2        e     u  [      (
+Bf2    2        e     u  =      )
+Bf2    2        e     u  =      (p
+D3     2        e     u  =      )
+D3     2        e     u  =      (
+F#3    2        e #   u  ]      )
+measure 89
+G3     2        e     u  [
+G2     2        e     u  =
+G2     2        e     u  =      (
+F2     2        e     u  =      )
+F2     2        e     u  =      (
+Ef2    2        e     u  ]      )
+measure 90
+Ef2    2        e     u  [
+Ef3    2        e     u  =
+Ef3    2        e     u  =      (
+D3     2        e     u  =      )
+D3     2        e     u  =      (
+C3     2        e     u  ]      )
+measure 91
+C3     2        e     u
+rest   2        e
+C4     2        e     d
+rest   2        e
+C3     2        e     u
+rest   2        e
+measure 92
+F3     2        e     u  [      (
+C3     2        e     u  =      )
+C3     2        e     u  =      (
+Af2    2        e     u  =      )
+Af2    2        e     u  =      (
+F2     2        e     u  ]      )
+measure 93
+F2     2        e     d  [
+F3     2        e     d  =
+F3     2        e     d  =      (
+Ef3    2        e     d  =      )
+Ef3    2        e     d  =      (
+D3     2        e     d  ]      )
+measure 94
+D2     2        e     u  [
+D3     2        e     u  =
+D3     2        e     u  =      (
+C3     2        e     u  =      )
+C3     2        e     u  =      (
+B2     2        e n   u  ]      )
+measure 95
+B2     2        e n   u  [      (
+C3     2        e     u  =      )
+C3     2        e     u  =      (
+Af2    2        e     u  =      )+
+Af2    2        e     u  =      (
+G2     2        e     u  ]      )
+measure 96
+G2     2        e     u  [      (
+A2     2        e n   u  =      )
+A2     2        e     u  =      (
+B2     2        e n   u  =      )
+B2     2        e     u  =      (
+C3     2        e     u  ]      )
+measure 97
+C3     2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+Af2    2        e     u
+rest   2        e
+measure 98
+Bf2    2        e     u
+rest   2        e
+Ef2    2        e     u
+rest   2        e
+G2     2        e     u
+rest   2        e
+measure 99
+Af2    2        e     u
+rest   2        e
+D2     2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+measure 100
+G2     2        e     d  [
+G3     2        e     d  =
+Af3    2        e     d  =      (
+G3     2        e     d  =      )
+F3     2        e     d  =      (
+Ef3    2        e     d  ]      )
+measure 101
+D3     2        e     d  [      (
+F3     2        e     d  =      )
+F3     2        e     d  =      (
+D3     2        e     d  =      )
+D3     2        e     d  =      (
+B2     2        e n   d  ]      )
+measure 102
+G2     2        e     u
+rest   2        e
+B2     2        e n   u
+rest   2        e
+G2     2        e     u
+rest   2        e
+measure 103
+Ef2    2        e     u
+rest   2        e
+F2     2        e     u
+rest   2        e
+G2     2        e     u
+rest   2        e
+measure 104
+C2     2        e     u  [
+C3     2        e     u  =      f
+C3     2        e     u  =      (
+D3     2        e     u  =      )
+D3     2        e     u  =      (
+Ef3    2        e     u  ]      )
+*               B   39  Dal Segno
+mheavy2         A
+S C0:d
+/END
+/eof
+'''
 
 
 #-------------------------------------------------------------------------------
 # raw data for direct translation tests
 
-testPrimitive = """
-M:4/4
-ed|cecA B2ed|cAcA E2ed|cecA B2ed|c2A2 A2:|
-K:G
-
-AB|cdec BcdB|ABAF GFE2|cdec BcdB|c2A2 A2:|
-
-% comment line 
-
-E2E EFE|E2E EFG|\
-M:9/8
-A2G F2E D2|]
-
-"C"[CEGc] "Gm7"[.=G,^c']
-
-(3.a.b.c  % stacato
-vAuBvA  % up down bow
-"""
-
-testPrimitivePolyphonic = """M:6/8
-L:1/8
-K:G
-V:1 name="Whistle" snm="wh"
-B3 A3 | G6 | B3 A3 | G6 ||
-V:2 name="violin" snm="v"
-BdB AcA | GAG D3 | BdB AcA | D6 ||
-V:3 name="Bass" snm="b" clef=bass
-D3 D3 | D6 | D3 D3 | D6 ||
-"""
-
-testPrimitiveTuplet = """M:4/4
-K:E
-T:Test Tuplet Primitve
-(3.c=c^c (5ccc=cc (6ccccc=f (7Bcc^^c=cc^f 
-
-(3.c2=c2^c2 (3.c2=c2^c2 
-
-(6c/c/c/c/c/=f/ (6B/c/c/^^c/c/^f/ z4
-
-"""
-# (9Bc^C ^c=cc =Cc=f
-
 #-------------------------------------------------------------------------------
 
-ALL  = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl, 
-        williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies, 
-        sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
-
-        draughtOfAle,
-        valentineJigg,
-        testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
-    ]
+ALL  = [bach_cantata5_mvmt3]
 
 
 
@@ -457,19 +2750,18 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testBasic(self):
-        from music21 import abc
-        from music21.abc import translate
+    def xtestBasic(self):
+        from music21 import musedata
+        from music21.musedata import translate
 
-        af = abc.ABCFile()
+        af = musedata.MuseDataFile()
 
         for tf in ALL:
             ah = af.readstr(tf)
             environLocal.printDebug([ah.getTitle()])
-            s = translate.abcToStreamScore(ah)
+            s = translate.museDataToStreamScore(ah)
             # run musicxml processing to look for internal errors
             out = s.musicxml
-
 
 if __name__ == "__main__":
     music21.mainTest(Test)
