@@ -652,21 +652,23 @@ class SadoianAmbitus(DiscreteAnalysis):
 
         #environLocal.printDebug([self._pitchSpanColors])
     
-    def _getPitchSpan(self, subStream):
-        '''For a given subStream, return a value in half-steps of the range
+    def getPitchSpan(self, subStream):
+        '''For a given subStream, return the minimum and maximum pitch space value found. 
+
+        This public method may be used by other classes. 
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
         >>> p = SadoianAmbitus()
-        >>> p._getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
+        >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
         (66, 71)
-        >>> p._getPitchSpan(s.parts[0].getElementsByClass('Measure')[6])
+        >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[6])
         (69, 73)
 
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
-        >>> p._getPitchSpan(s)
+        >>> p.getPitchSpan(s)
         (45, 108)
         '''
         
@@ -693,14 +695,14 @@ class SadoianAmbitus(DiscreteAnalysis):
 
     
     def _getPitchRanges(self, subStream):
-        '''For a given subStream, return the smallest difference between any two pitches and the largest difference between any two pitches. This is used to get the smallest and larges ambitus possible in a given work. 
+        '''For a given subStream, return the smallest difference between any two pitches and the largest difference between any two pitches. This is used to get the smallest and largest ambitus possible in a given work. 
 
         >>> from music21 import *
         >>> p = SadoianAmbitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
-        >>> p._getPitchSpan(s)
+        >>> p.getPitchSpan(s)
         (45, 108)
         >>> p._getPitchRanges(s)
         (26, 63)
@@ -803,7 +805,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
-        >>> min, max = p._getPitchSpan(s)
+        >>> min, max = p.getPitchSpan(s)
         >>> p.solutionToColor(max-min).startswith('#')
         True
         '''    
@@ -827,7 +829,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         '''
         sStream = sStream.flat.notes
 
-        post = self._getPitchSpan(sStream)
+        post = self.getPitchSpan(sStream)
         if post != None:
             solution = post[1] - post[0] # max-min
         else:

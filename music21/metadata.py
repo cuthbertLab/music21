@@ -40,6 +40,7 @@ from music21 import common
 from music21 import musicxml
 from music21 import text
 
+
 from music21 import environment
 _MOD = "metadata.py"
 environLocal = environment.Environment(_MOD)
@@ -1337,6 +1338,83 @@ class Metadata(music21.Music21Object):
         ''')
 
 
+    #---------------------------------------------------------------------------
+    # searching and matching
+    def search(self, query, field=None):
+        '''Search one or all fields with a query, given either as a string or a regular expression match.
+
+        >>> from music21 import *
+        >>> md = Metadata()
+        >>> md.composer = 'Beethoven, Ludwig van'
+        >>> md.title = 'Third Symphony'
+
+        >>> md.search('beethoven', 'composer')
+        (True, 'composer')
+        >>> md.search('beethoven', 'compose')
+        (True, 'composer')
+        >>> md.search('frank', 'composer')
+        (False, None)
+        >>> md.search('frank')
+        (False, None)
+
+        >>> md.search('third')
+        (True, 'title')
+        >>> md.search('third', 'composer')
+        (False, None)
+        >>> md.search('third', 'title')
+        (True, 'title')
+
+        '''
+
+        fieldsToCompare = ['date', 'title', 'alternativeTitle', 'movementNumber', 'movementName', 'number', 'opusNumber', 'composer', 'localeOfComposition']
+
+        valueFieldPairs = []
+
+        if field != None:
+            match = False
+            try:
+                value = getattr(self, field)
+                valueFieldPairs.append((value, field))
+                match = True
+            except AttributeError:
+                pass
+
+            if not match:
+                for f in fieldsToCompare:
+                    environLocal.printDebug(['comparing fields:', f, field])
+                    # look for partial match in all fields
+                    if field.lower() in f.lower():
+                        value = getattr(self, f)
+                        valueFieldPairs.append((value, f))
+                        match = True
+                        break
+            # if cannot find a match for any field, return 
+            if not match:
+                return False, None
+
+        else: # get all fields
+            for f in fieldsToCompare:
+                value = getattr(self, f)
+                valueFieldPairs.append((value, f))
+
+        # for now, make all queries strings
+        # ultimately, can look for regular expressions by checking for
+        # .search
+        if hasattr(query, 'search'):
+            pass
+        else:
+            query = str(query)
+            for v, f in valueFieldPairs:
+                if common.isStr(v):
+                    if query.lower() in v.lower():
+                        return True, f
+                elif query == v: 
+                    return True, f
+                
+        return False, None
+            
+
+
 
     #---------------------------------------------------------------------------
     # provide direct access to common Contributor roles
@@ -1561,7 +1639,34 @@ class RichMetadata(Metadata):
         self.pitchHighest = None
         self.pitchLowest = None
 
+    #---------------------------------------------------------------------------
+    # overridden methods for json processing 
 
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+        '''
+        # add new names to base-class names
+        return ['keySignatureFirst', 'timeSignatureFirst'] + Metadata.jsonAttributes(self)
+
+    def jsonComponentFactory(self, idStr):
+        from music21 import meter
+        from music21 import key
+
+        try:
+            obj = Metadata.jsonComponentFactory(self, idStr)
+            return obj
+        except MetadataException:
+            pass
+
+        if '.TimeSignature' in idStr:
+            return meter.TimeSignature()
+        elif '.KeySignature' in idStr:
+            return key.KeySignature()
+        else:
+            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
+
+
+    #---------------------------------------------------------------------------
     def merge(self, other, favorSelf=True):
         '''Given another Metadata object, combine
         all attributes and return a new object.
@@ -1595,8 +1700,48 @@ class RichMetadata(Metadata):
     def update(self, streamObj):
         '''Given a Stream object, update attributes with stored objects. 
         '''
-        pass
+        # must be a method-level import
+        from music21.analysis import discrete
 
+        # clear all old values
+        self.keySignatureFirst = None
+        #self.keySignatures = []
+        self.timeSignatureFirst = None
+        #self.timeSignatures = []
+        self.tempoFirst = None
+        #self.tempos = []
+
+        self.ambitus = None
+        self.pitchHighest = None
+        self.pitchLowest = None
+
+
+        # get flat sorted stream
+        flat = streamObj.flat.sorted
+
+        tsStream = flat.getElementsByClass('TimeSignature')
+        self.timeSignatureFirst = tsStream[0]
+        
+        # this presently does not work properly b/c ts comparisons are not
+        # built-in; need to add __eq__ methods to MeterTerminal
+#         for ts in tsStream:
+#             if ts not in self.timeSignatures:
+#                 self.timeSignatures.append(ts)
+
+        ksStream = flat.getElementsByClass('KeySignature')
+        self.keySignatureFirst = ksStream[0]
+#         for ks in ksStream:
+#             if ks not in self.keySignatures:
+#                 self.keySignatures.append(ts)
+
+        
+#         analysisObj = discrete.SadoianAmbitus(streamObj)    
+#         psRange = analysisObj.getPitchSpan(streamObj)
+#         if psRange != None: # may be none if no pitches are stored
+#             # presently, these are numbers; convert to pitches later
+#             self.pitchLowest, self.pitchHighest = psRange
+# 
+#         self.ambitus = analysisObj.getSolution(streamObj)
 
 #-------------------------------------------------------------------------------
 class MetadataBundle(music21.JSONSerializer):
@@ -2006,20 +2151,49 @@ class Test(unittest.TestCase):
 #         self.assertEqual(mdFromFile.composer, 'Wolfgang Amadeus Mozart')
 
 
-    def xtestMetadataBundleRead(self):
-        from music21 import corpus, metadata
-    
-        mdb = metadata.MetadataBundle('core')
-        mdb.read()
-        mdb.updateAccessPaths(corpus.getPaths())
-    
-        post = mdb.getComposer('josquin')
-        self.assertEqual(len(post) > 6, True)
-    
-        post = mdb.getComposer('bach')
-        self.assertEqual(len(post) > 300, True)
+    def testLoadRichMetadata(self):
 
-        #print post
+        from music21 import corpus
+
+        s = corpus.parseWork('jactatur')
+        self.assertEqual(s.metadata.composer, 'Johannes Ciconia')
+
+        rmd = RichMetadata()
+        rmd.merge(s.metadata)
+
+        self.assertEqual(rmd.composer, 'Johannes Ciconia')
+        # update rmd with stream
+        rmd.update(s)
+
+        self.assertEqual(str(rmd.keySignatureFirst), '<music21.key.KeySignature of 1 flat>')
+
+        self.assertEqual(str(rmd.timeSignatureFirst), '2/4')
+
+        #rmd.jsonPrint()
+        rmdNew = RichMetadata()
+        rmdNew.json = rmd.json
+        self.assertEqual(rmdNew.composer, 'Johannes Ciconia')
+
+        self.assertEqual(str(rmdNew.timeSignatureFirst), '2/4')
+        self.assertEqual(str(rmdNew.keySignatureFirst), '<music21.key.KeySignature of 1 flat>')
+
+#         self.assertEqual(rmd.pitchLowest, 55)
+#         self.assertEqual(rmd.pitchHighest, 65)
+#         self.assertEqual(str(rmd.ambitus), '<music21.interval.Interval m7>')
+
+
+        s = corpus.parseWork('bwv66.6')
+        rmd = RichMetadata()
+        rmd.merge(s.metadata)
+
+        rmd.update(s)
+        self.assertEqual(str(rmd.keySignatureFirst), '<music21.key.KeySignature of 3 sharps>')
+        self.assertEqual(str(rmd.timeSignatureFirst), '4/4')
+
+        rmdNew.json = rmd.json
+        self.assertEqual(str(rmdNew.timeSignatureFirst), '4/4')
+        self.assertEqual(str(rmdNew.keySignatureFirst), '<music21.key.KeySignature of 3 sharps>')
+
 
 
 #-------------------------------------------------------------------------------
@@ -2041,4 +2215,4 @@ if __name__ == "__main__":
         #t.testJSONSerializationMetadata()
 
 
-        t.testMetadataBundleRead()
+        t.testLoadRichMetadata()

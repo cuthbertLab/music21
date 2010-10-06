@@ -6718,10 +6718,14 @@ class Opus(Stream):
         'Tenor'
         '''
         for s in self.getElementsByClass('Score'):
-            if s.metadata.number == opusMatch:
+            match, field = s.metadata.search(opusMatch, 'number')
+            if match:
                 return s
-            elif s.metadata.number == str(opusMatch):
-                return s
+
+#             if s.metadata.number == opusMatch:
+#                 return s
+#             elif s.metadata.number == str(opusMatch):
+#                 return s
 
     def getScoreByTitle(self, titleMatch):
         '''Get Score objects from this Stream by number
@@ -6732,10 +6736,15 @@ class Opus(Stream):
 
         '''
         for s in self.getElementsByClass('Score'):
-            if s.metadata.title == titleMatch:
+            match, field = s.metadata.search(titleMatch, 'title')
+            if match:
                 return s
-            elif s.metadata.title == str(titleMatch):
-                return s            
+
+#         for s in self.getElementsByClass('Score'):
+#             if s.metadata.title == titleMatch:
+#                 return s
+#             elif s.metadata.title == str(titleMatch):
+#                 return s            
 
 
     def _getScores(self):
