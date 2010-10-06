@@ -654,6 +654,25 @@ class Test(unittest.TestCase):
 
 
 
+    def testJSONStorage(self):
+        ks = KeySignature(3)
+        # cannot test to json str as __class__ is different based on context 
+        #self.assertEqual(ks.json, '{"__attr__": {"sharps": 3}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.KeySignature\'>"}')
+
+        jsonStr = ks.json
+    
+        ksNew = KeySignature()
+        ksNew.json = jsonStr
+
+        self.assertEqual(ksNew._strDescription(), '3 sharps')
+        
+
+#         jsString = ts.json
+#         ts = TimeSignature()
+#         ts.json = jsString
+#         self.assertEqual(ts.stringNotation, '3/4')
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

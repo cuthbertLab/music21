@@ -3534,7 +3534,8 @@ class Test(unittest.TestCase):
 
     def testJSONStorage(self):
         ts = TimeSignature('3/4')
-        self.assertEqual(ts.json, '{"__attr__": {"stringNotation": "3/4"}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.TimeSignature\'>"}')
+        # cannot test to json str as __class__ is different based on context 
+        #self.assertEqual(ts.json, '{"__attr__": {"stringNotation": "3/4"}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.TimeSignature\'>"}')
 
         jsString = ts.json
         ts = TimeSignature()
