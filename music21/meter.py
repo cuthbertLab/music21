@@ -2142,6 +2142,27 @@ class TimeSignature(music21.Music21Object):
     #---------------------------------------------------------------------------
     # properties
 
+
+    def _setStringNotation(self, value):
+        self.load(value)
+
+    def _getStringNotation(self):
+        return str(self)
+ 
+    stringNotation = property(_getStringNotation, _setStringNotation, 
+        doc = '''Get or set the TimeSignature by a simple string value.
+
+        >>> from music21 import *
+        >>> ts = TimeSignature('6/8')
+        >>> ts.stringNotation
+        '6/8'
+        >>> ts.stringNotation = '4/2'
+        >>> ts.stringNotation
+        '4/2'
+        ''')
+
+
+
     # temp for backward compat
     def _getTotalLength(self):
         return self.beamSequence.duration.quarterLength
@@ -3091,6 +3112,26 @@ class TimeSignature(music21.Music21Object):
     musicxml = property(_getMusicXML, _setMusicXML)
 
 
+    #---------------------------------------------------------------------------
+    # override these methods for json functionality
+
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+        '''
+        # only string notation is stored, meaning that any non-default
+        # internal representations will not be saved
+        # a new default will be created when restored
+        return ['stringNotation']
+
+    def jsonComponentFactory(self, idStr):
+        '''Given a stored string during JSON serialization, return an object'
+
+        The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
+        '''
+        return None
+
+
+
 
 
 
@@ -3490,6 +3531,16 @@ class Test(unittest.TestCase):
             self.assertEqual([mt.weight for mt in ts1.accentSequence], match)
            
 
+
+    def testJSONStorage(self):
+        ts = TimeSignature('3/4')
+        self.assertEqual(ts.json, '{"__attr__": {"stringNotation": "3/4"}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.TimeSignature\'>"}')
+
+        jsString = ts.json
+        ts = TimeSignature()
+        ts.json = jsString
+        self.assertEqual(ts.stringNotation, '3/4')
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [TimeSignature, CompoundTimeSignature]
@@ -3508,3 +3559,5 @@ if __name__ == "__main__":
 #         t.testBeatProportionFromTimeSignature()
         t.testSubdividePartitionsEqual()
         t.testSetDefaultAccentWeights()
+        t.testJSONStorage()
+

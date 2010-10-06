@@ -595,6 +595,30 @@ class KeySignature(music21.Music21Object):
     ''')
 
 
+    #---------------------------------------------------------------------------
+    # override these methods for json functionality
+
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+        '''
+        # only string notation is stored, meaning that any non-default
+        # internal representations will not be saved
+        # a new default will be created when restored
+        return ['sharps', 'mode', '_alteredPitches']
+
+
+    def jsonComponentFactory(self, idStr):
+        '''Given a stored string during JSON serialization, return an object'
+
+        The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
+        '''
+        return None
+
+
+
+
+
+
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
