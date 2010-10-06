@@ -1339,84 +1339,6 @@ class Metadata(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    # searching and matching
-    def search(self, query, field=None):
-        '''Search one or all fields with a query, given either as a string or a regular expression match.
-
-        >>> from music21 import *
-        >>> md = Metadata()
-        >>> md.composer = 'Beethoven, Ludwig van'
-        >>> md.title = 'Third Symphony'
-
-        >>> md.search('beethoven', 'composer')
-        (True, 'composer')
-        >>> md.search('beethoven', 'compose')
-        (True, 'composer')
-        >>> md.search('frank', 'composer')
-        (False, None)
-        >>> md.search('frank')
-        (False, None)
-
-        >>> md.search('third')
-        (True, 'title')
-        >>> md.search('third', 'composer')
-        (False, None)
-        >>> md.search('third', 'title')
-        (True, 'title')
-
-        '''
-
-        fieldsToCompare = ['date', 'title', 'alternativeTitle', 'movementNumber', 'movementName', 'number', 'opusNumber', 'composer', 'localeOfComposition']
-
-        valueFieldPairs = []
-
-        if field != None:
-            match = False
-            try:
-                value = getattr(self, field)
-                valueFieldPairs.append((value, field))
-                match = True
-            except AttributeError:
-                pass
-
-            if not match:
-                for f in fieldsToCompare:
-                    environLocal.printDebug(['comparing fields:', f, field])
-                    # look for partial match in all fields
-                    if field.lower() in f.lower():
-                        value = getattr(self, f)
-                        valueFieldPairs.append((value, f))
-                        match = True
-                        break
-            # if cannot find a match for any field, return 
-            if not match:
-                return False, None
-
-        else: # get all fields
-            for f in fieldsToCompare:
-                value = getattr(self, f)
-                valueFieldPairs.append((value, f))
-
-        # for now, make all queries strings
-        # ultimately, can look for regular expressions by checking for
-        # .search
-        if hasattr(query, 'search'):
-            pass
-        else:
-            query = str(query)
-            for v, f in valueFieldPairs:
-                if common.isStr(v):
-                    if query.lower() in v.lower():
-                        return True, f
-                elif query == v: 
-                    return True, f
-                
-        return False, None
-            
-
-
-
-    #---------------------------------------------------------------------------
     # provide direct access to common Contributor roles
     def getContributorsByRole(self, value):
         '''Return a :class:`~music21.metadata.Contributor` if defined for a provided role. 
@@ -1493,6 +1415,83 @@ class Metadata(music21.Music21Object):
         'Beethoven, Ludwig van'
         ''')
 
+
+
+    #---------------------------------------------------------------------------
+    # searching and matching
+    def search(self, query, field=None):
+        '''Search one or all fields with a query, given either as a string or a regular expression match.
+
+        >>> from music21 import *
+        >>> md = Metadata()
+        >>> md.composer = 'Beethoven, Ludwig van'
+        >>> md.title = 'Third Symphony'
+
+        >>> md.search('beethoven', 'composer')
+        (True, 'composer')
+        >>> md.search('beethoven', 'compose')
+        (True, 'composer')
+        >>> md.search('frank', 'composer')
+        (False, None)
+        >>> md.search('frank')
+        (False, None)
+
+        >>> md.search('third')
+        (True, 'title')
+        >>> md.search('third', 'composer')
+        (False, None)
+        >>> md.search('third', 'title')
+        (True, 'title')
+
+        '''
+
+        fieldsToCompare = ['date', 'title', 'alternativeTitle', 'movementNumber', 'movementName', 'number', 'opusNumber', 'composer', 'localeOfComposition']
+
+        valueFieldPairs = []
+
+        if field != None:
+            match = False
+            try:
+                value = getattr(self, field)
+                valueFieldPairs.append((value, field))
+                match = True
+            except AttributeError:
+                pass
+
+            if not match:
+                for f in fieldsToCompare:
+                    environLocal.printDebug(['comparing fields:', f, field])
+                    # look for partial match in all fields
+                    if field.lower() in f.lower():
+                        value = getattr(self, f)
+                        valueFieldPairs.append((value, f))
+                        match = True
+                        break
+            # if cannot find a match for any field, return 
+            if not match:
+                return False, None
+
+        else: # get all fields
+            for f in fieldsToCompare:
+                value = getattr(self, f)
+                valueFieldPairs.append((value, f))
+
+        # for now, make all queries strings
+        # ultimately, can look for regular expressions by checking for
+        # .search
+        if hasattr(query, 'search'):
+            pass
+        else:
+            query = str(query)
+            for v, f in valueFieldPairs:
+                if common.isStr(v):
+                    if query.lower() in v.lower():
+                        return True, f
+                elif query == v: 
+                    return True, f
+                
+        return False, None
+            
 
 
     #---------------------------------------------------------------------------
@@ -1667,7 +1666,7 @@ class RichMetadata(Metadata):
 
 
     #---------------------------------------------------------------------------
-    def merge(self, other, favorSelf=True):
+    def merge(self, other, favorSelf=False):
         '''Given another Metadata object, combine
         all attributes and return a new object.
 
@@ -1679,27 +1678,29 @@ class RichMetadata(Metadata):
         >>> rmd.title
         'Concerto in F'
         '''
-        localNames = dir(self)
-        for name in dir(other): 
-            if name.startswith('__'):
+        # specifically name attributes to copy, as do not want to get all
+        # Metadata is a m21 object
+        localNames = ['_contributors', '_date', '_urls', '_imprint',
+                      '_copyright', '_workIds']
+
+        environLocal.printDebug(['RichMetadata: calling merge()'])
+        for name in localNames: 
+            localValue = getattr(self, name)
+            # if not set, and favoring self, then only then set
+            # this will not work on dictionaries
+            if localValue != None and favorSelf:
                 continue
-            if name in localNames:
-                try:
-                    localValue = getattr(self, name)
-                except music21.Music21ObjectException:
-                    continue
-                # if not set, and favoring self, then only then set
-                if localValue != None and favorSelf:
-                    continue
-                else:
-                    otherValue = getattr(other, name)
-                    if otherValue is not None:
-                        setattr(self, name, otherValue)
+            else:
+                otherValue = getattr(other, name)
+                if otherValue is not None:
+                    setattr(self, name, otherValue)
 
 
     def update(self, streamObj):
         '''Given a Stream object, update attributes with stored objects. 
         '''
+        environLocal.printDebug(['RichMetadata: calling update()'])
+
         # must be a method-level import
         from music21.analysis import discrete
 
@@ -1720,7 +1721,8 @@ class RichMetadata(Metadata):
         flat = streamObj.flat.sorted
 
         tsStream = flat.getElementsByClass('TimeSignature')
-        self.timeSignatureFirst = tsStream[0]
+        if len(tsStream) > 0:
+            self.timeSignatureFirst = tsStream[0]
         
         # this presently does not work properly b/c ts comparisons are not
         # built-in; need to add __eq__ methods to MeterTerminal
@@ -1729,7 +1731,8 @@ class RichMetadata(Metadata):
 #                 self.timeSignatures.append(ts)
 
         ksStream = flat.getElementsByClass('KeySignature')
-        self.keySignatureFirst = ksStream[0]
+        if len(ksStream) > 0:
+            self.keySignatureFirst = ksStream[0]
 #         for ks in ksStream:
 #             if ks not in self.keySignatures:
 #                 self.keySignatures.append(ts)
@@ -1742,6 +1745,7 @@ class RichMetadata(Metadata):
 #             self.pitchLowest, self.pitchHighest = psRange
 # 
 #         self.ambitus = analysisObj.getSolution(streamObj)
+
 
 #-------------------------------------------------------------------------------
 class MetadataBundle(music21.JSONSerializer):
@@ -1819,11 +1823,8 @@ class MetadataBundle(music21.JSONSerializer):
         from music21 import converter
 
         for fp in pathList:
-
             environLocal.printDebug(['updateMetadataCache: examining:', fp])
-    
             cp = self.corpusPathToKey(fp)
-        
             post = converter.parse(fp, forceSource=True)
             if 'Opus' in post.classes:
                 # need to get scores from each opus?
@@ -1831,19 +1832,26 @@ class MetadataBundle(music21.JSONSerializer):
                 # is only a single source file
                 for s in post.scores:
                     md = s.metadata
+                    # updgrade md to rmd
+                    rmd = RichMetadata()
+                    rmd.merge(md)
+                    rmd.update(s) # update based on Stream
                     if md.number == None:
                         environLocal.printDebug(['addFromPaths: got Opus that contains Streams that do not have work numbers:', fp])
                     else:
                         # update path to include work number
                         cp = self.corpusPathToKey(fp, number=md.number)
                         environLocal.printDebug(['addFromPaths: storing:', cp])
-                        self._storage[cp] = md
+                        self._storage[cp] = rmd
             else:
                 md = post.metadata
                 if md is None:
                     continue    
+                rmd = RichMetadata()
+                rmd.merge(md)
+                rmd.update(post) # update based on Stream
                 environLocal.printDebug(['updateMetadataCache: storing:', cp])
-                self._storage[cp] = md
+                self._storage[cp] = rmd
 
 
     def addFromVirtualWorks(self, pathList):
@@ -1851,7 +1859,8 @@ class MetadataBundle(music21.JSONSerializer):
 
 
     def write(self):
-
+        '''Write the JSON storage of all Metadata or RichMetadata contained in this object. 
+        '''
         fp = os.path.join(common.getMetadataCacheFilePath(), self._name + '.json')
         environLocal.printDebug(['MetadataBundle: writing:', fp])
         self.jsonWrite(fp)
@@ -1863,7 +1872,6 @@ class MetadataBundle(music21.JSONSerializer):
 
         t = common.Timer()
         t.start()
-
         if fp == None:
             fp = os.path.join(common.getMetadataCacheFilePath(), self._name + '.json')
         self.jsonRead(fp)
@@ -2095,7 +2103,7 @@ class Test(unittest.TestCase):
 
     def testJSONSerializationMetadata(self):
 
-        from music21 import musicxml
+        from music21 import musicxml, corpus
         from music21.musicxml import testFiles
 
 
@@ -2139,16 +2147,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mdNew.number, 'K. 581')
         self.assertEqual(mdNew.composer, 'Wolfgang Amadeus Mozart')
 
-
-        # temporary file writing test code; replace later
-#         mdNew.jsonWrite('/_scratch/test.json')
-#         mdFromFile = Metadata()
-#         mdFromFile.jsonRead('/_scratch/test.json')
-#         self.assertEqual(mdFromFile.movementNumber, '3')
-#         self.assertEqual(mdFromFile.movementName, 'Menuetto (Excerpt from Second Trio)')
-#         self.assertEqual(mdFromFile.title, 'Quintet for Clarinet and Strings')
-#         self.assertEqual(mdFromFile.number, 'K. 581')
-#         self.assertEqual(mdFromFile.composer, 'Wolfgang Amadeus Mozart')
 
 
     def testLoadRichMetadata(self):
@@ -2195,6 +2193,21 @@ class Test(unittest.TestCase):
         self.assertEqual(str(rmdNew.keySignatureFirst), '<music21.key.KeySignature of 3 sharps>')
 
 
+        # test that work id values are copied
+        o = corpus.parseWork('essenFolksong/teste')
+        self.assertEqual(len(o), 8)
+
+        s = o.getScoreByNumber(4)
+        self.assertEqual(s.metadata.localeOfComposition, 'Asien, Ostasien, China, Sichuan')
+
+        rmd = RichMetadata()
+        rmd.merge(s.metadata)
+        rmd.update(s)
+
+        self.assertEqual(rmd.localeOfComposition, 'Asien, Ostasien, China, Sichuan')
+
+
+
 
 #-------------------------------------------------------------------------------
 _DOC_ORDER = [Text, Date, 
@@ -2215,4 +2228,4 @@ if __name__ == "__main__":
         #t.testJSONSerializationMetadata()
 
 
-        t.testLoadRichMetadata()
+        t.testJSONSerializationMetadata()
