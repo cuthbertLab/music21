@@ -235,7 +235,7 @@ def museDataToStreamScore(museDataHandler, inputM21=None):
                 md.composer = t.data
 
             elif t.isOrigin():
-                md.localOfComposition = t.data
+                md.localeOfComposition = t.data
                 #environLocal.printDebug(['got local of composition', md.localOfComposition])
 
             elif t.isReferenceNumber():

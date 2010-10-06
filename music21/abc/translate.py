@@ -233,7 +233,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
                 md.composer = t.data
 
             elif t.isOrigin():
-                md.localOfComposition = t.data
+                md.localeOfComposition = t.data
                 #environLocal.printDebug(['got local of composition', md.localOfComposition])
 
             elif t.isReferenceNumber():
@@ -532,6 +532,20 @@ class Test(unittest.TestCase):
         #sMerged.show()
 
 
+    def testLocaleOfCompositionImport(self):
+
+        from music21 import corpus
+        # defines multiple works, will return an opus
+        o = corpus.parseWork('essenFolksong/teste')
+        self.assertEqual(len(o), 8)
+
+        s = o.getScoreByNumber(4)
+        self.assertEqual(s.metadata.localeOfComposition, 'Asien, Ostasien, China, Sichuan')
+
+        s = o.getScoreByNumber(7)
+        self.assertEqual(s.metadata.localeOfComposition, 'Amerika, Mittelamerika, Mexiko')
+
+
 if __name__ == "__main__":
     import sys
 
@@ -547,3 +561,4 @@ if __name__ == "__main__":
         #t.testOpusImport()
 
         t.testMultiWorkImported()
+        t.testLocaleOfCompositionImport()
