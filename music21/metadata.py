@@ -32,6 +32,7 @@ import unittest, doctest
 import datetime
 import json
 import os
+import inspect
 
 
 import music21
@@ -1321,18 +1322,18 @@ class Metadata(music21.Music21Object):
 
 
 
-    def _getLocalOfComposition(self):
-        post = self._workIds['localOfComposition']
+    def _getLocaleOfComposition(self):
+        post = self._workIds['localeOfComposition']
         if post == None:
             return None
-        return str(self._workIds['localOfComposition'])
+        return str(self._workIds['localeOfComposition'])
 
-    def _setLocalOfComposition(self, value):
-        self._workIds['localOfComposition'] = Text(value)
+    def _setLocaleOfComposition(self, value):
+        self._workIds['localeOfComposition'] = Text(value)
 
-    localOfComposition = property(_getLocalOfComposition, 
-                                 _setLocalOfComposition, 
-        doc = '''Get or set the local of composition, or origin, of the work. 
+    localeOfComposition = property(_getLocaleOfComposition, 
+                                 _setLocaleOfComposition, 
+        doc = '''Get or set the locale of composition, or origin, of the work. 
         ''')
 
 
@@ -1527,9 +1528,74 @@ class Metadata(music21.Music21Object):
 #         ''')
 # 
 
+#-------------------------------------------------------------------------------
+class RichMetadata(Metadata):
+    '''RichMetadata adds to Metadata information about the contents of the Score it is attached to. TimeSignature, KeySignature and related analytical is stored. RichMetadata are generally only created in the process of creating stored JSON metadata. 
+
+    '''
+
+    def __init__(self, *args, **keywords):
+        '''
+        >>> md = RichMetadata(title='Concerto in F')
+        >>> md.title
+        'Concerto in F'
+        >>> md = RichMetadata(otl='Concerto in F') # can use abbreviations
+        >>> md.title
+        'Concerto in F'
+        >>> md.setWorkId('otl', 'Rhapsody in Blue')
+        >>> md.otl
+        'Rhapsody in Blue'
+        >>> md.title
+        'Rhapsody in Blue'
+        '''
+        Metadata.__init__(self, *args, **keywords)
+
+        self.keySignatureFirst = None
+        self.keySignatures = []
+        self.timeSignatureFirst = None
+        self.timeSignatures = []
+        self.tempoFirst = None
+        self.tempos = []
+
+        self.ambitus = None
+        self.pitchHighest = None
+        self.pitchLowest = None
 
 
+    def merge(self, other, favorSelf=True):
+        '''Given another Metadata object, combine
+        all attributes and return a new object.
 
+        >>> md = Metadata(title='Concerto in F')
+        >>> md.title
+        'Concerto in F'
+        >>> rmd = RichMetadata()
+        >>> rmd.merge(md)
+        >>> rmd.title
+        'Concerto in F'
+        '''
+        localNames = dir(self)
+        for name in dir(other): 
+            if name.startswith('__'):
+                continue
+            if name in localNames:
+                try:
+                    localValue = getattr(self, name)
+                except music21.Music21ObjectException:
+                    continue
+                # if not set, and favoring self, then only then set
+                if localValue != None and favorSelf:
+                    continue
+                else:
+                    otherValue = getattr(other, name)
+                    if otherValue is not None:
+                        setattr(self, name, otherValue)
+
+
+    def update(self, streamObj):
+        '''Given a Stream object, update attributes with stored objects. 
+        '''
+        pass
 
 
 #-------------------------------------------------------------------------------
@@ -1940,7 +2006,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(mdFromFile.composer, 'Wolfgang Amadeus Mozart')
 
 
-    def testMetadataBundleRead(self):
+    def xtestMetadataBundleRead(self):
         from music21 import corpus, metadata
     
         mdb = metadata.MetadataBundle('core')

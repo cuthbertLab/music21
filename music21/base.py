@@ -2566,7 +2566,7 @@ class Music21Object(JSONSerializer):
         '''
         ts = self.getContextByClass('TimeSignature')
         if ts == None:
-            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
+            raise Music21ObjectException('this Note does not have a TimeSignature in DefinedContexts')                    
         return ts.getBeatProportion(self._getMeasureOffset())
 
 
@@ -2593,7 +2593,7 @@ class Music21Object(JSONSerializer):
         ts = self.getContextByClass('TimeSignature')
         #environLocal.printDebug(['_getBeatStr(): found ts:', ts])
         if ts == None:
-            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
+            raise Music21ObjectException('this Note does not have a TimeSignature in DefinedContexts')                    
         return ts.getBeatProportionStr(self._getMeasureOffset())
 
 
@@ -2630,7 +2630,7 @@ class Music21Object(JSONSerializer):
         '''
         ts = self.getContextByClass('TimeSignature')
         if ts == None:
-            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')
+            raise Music21ObjectException('this Note does not have a TimeSignature in DefinedContexts')
         return ts.getBeatDuration(self._getMeasureOffset())
 
     beatDuration = property(_getBeatDuration,  
@@ -2672,7 +2672,7 @@ class Music21Object(JSONSerializer):
         '''
         ts = self.getContextByClass('TimeSignature')
         if ts == None:
-            raise NoteException('this Note does not have a TimeSignature in DefinedContexts')                    
+            raise Music21ObjectException('this Note does not have a TimeSignature in DefinedContexts')                    
         return ts.getAccentWeight(self._getMeasureOffset(),
                forcePositionMatch=True)
 
