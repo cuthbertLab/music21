@@ -400,13 +400,13 @@ class DefinedContexts(object):
         '''Prepare an object for storage. May be stored as a standard refernce or as a weak reference.
         '''
         # can have this perform differently based on domain
-        if WEAKREF_ACTIVE:
-            if obj is None: # leave None alone
-                return obj
-            else:
-                return common.wrapWeakref(obj)
+        if obj is None: # leave None alone
+            return obj
+        elif WEAKREF_ACTIVE:
+            return common.wrapWeakref(obj)
         # a normal reference, return unaltered
-        return obj
+        else:
+            return obj
         
 
     def add(self, obj, offset=None, timeValue=None, idKey=None):
@@ -417,31 +417,29 @@ class DefinedContexts(object):
         The `timeValue` argument is used to store the time at which an object is added to locations. This is not the same as `offset` 
 
         '''
-        if offset == None: 
-            domain = 'contexts'
-        else: 
-            domain = 'locations'
+        # NOTE: this is a performance critical method
+
+        isLocation = False # 'contexts'
+        if offset is not None: 
+            isLocation = True # 'locations'
 
         # note: if we want both context and locations to exists
         # for the same object, may need to append character code to id
-        if idKey == None and obj != None:
-            idKey = id(obj)
 
+        if idKey is None and obj != None:
+            idKey = id(obj)
         # a None object will have a key of None
-        elif idKey == None and obj == None:
-            idKey = None
+        # do not need to set this as is default
 
         #environLocal.printDebug(['adding obj', obj, idKey])
-        objRef = self._prepareObject(obj, domain)
-        add = False
-        update = False
-        if idKey not in self._definedContexts.keys():
-            add = True
-        else:
-            update = True
+        objRef = self._prepareObject(obj, isLocation)
 
-        if domain == 'locations': # the dictionary may already be a context
-            if add: # already know that it is new
+        updateNotAdd = False
+        if idKey in self._definedContexts.keys():
+            updateNotAdd = True
+
+        if isLocation: # the dictionary may already be a context
+            if not updateNotAdd: # already know that it is new (not an update)
                 self._locationKeys.append(idKey)
             # this may be a context that is now a location
             elif idKey not in self._locationKeys: 
@@ -451,8 +449,7 @@ class DefinedContexts(object):
 
         dict = {}
         dict['obj'] = objRef
-        # offset can be None for contexts
-        dict['offset'] = offset
+        dict['offset'] = offset # offset can be None for contexts
 
         # NOTE: this may not give sub-second resolution on some platforms
         if timeValue == None:
@@ -460,10 +457,10 @@ class DefinedContexts(object):
         else:
             dict['time'] = timeValue
 
-        if add:
-            self._definedContexts[idKey] = dict
-        if update: # add new/missing information to dictionary
+        if updateNotAdd: # add new/missing information to dictionary
             self._definedContexts[idKey].update(dict)
+        else: # add:
+            self._definedContexts[idKey] = dict
 
     def removeBySite(self, site):
         '''Remove the object specified from DefinedContexts. Object provided can be a location site or a defined context. 

@@ -120,10 +120,18 @@ for name in dir(virtual): # look over virtual module
             VIRTUAL.append(obj)
 
 
+# a list of metadataCache's can reside in this module-level storage; this 
+# data is loaded on demand. 
+_metadataBundleCore = None
+
+
+
 
 #-------------------------------------------------------------------------------
 class CorpusException(Exception):
     pass
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -210,145 +218,23 @@ def getLocalPaths(extList=None):
     '''
     Access files in additional directories supplied by the user and defined in environement settings. 
     '''
-    pass
+    return []
+
 
 
 #-------------------------------------------------------------------------------
-# this functionality is moved to MetadataBundle
-
-# def corpusPathToMetadataCachePath(fp, number=None):
-#     '''Given a file path or corpus path, return the meta-data path
-# 
-#     >>> from music21 import *
-#     >>> corpus.corpusPathToMetadataCachePath('bach/bwv1007/prelude').endswith('bach_bwv1007_prelude.json')
-#     True
-#     >>> corpus.corpusPathToMetadataCachePath('/beethoven/opus59no1/movement1.xml').endswith('beethoven_opus59no1_movement1_xml.json')
-#     True
-#     '''
-#     if 'corpus' in fp:
-#         cp = fp.split('corpus')[-1] # get fp after corpus
-#     else:
-#         cp = fp
-# 
-#     if cp.startswith(os.sep):
-#         cp = cp[1:]
-# 
-#     cp = cp.replace('/', '_')
-#     cp = cp.replace(os.sep, '_')
-#     cp = cp.replace('.', '_')
-# 
-#     # append name to metadata path
-#     if number == None:
-#         return os.path.join(common.getMetadataCacheFilePath(), cp+'.json')
-#     else:
-#         # append work number to meatdata
-#         return os.path.join(common.getMetadataCacheFilePath(), cp+'_%s.json' % number)
+def _updateMetadataBundle(domain=['core']):
+    if 'core' in domain:
+        _metadataBundleCore = metadata.MetadataBundle('core')
+        _metadataBundleCore.read()
+        # must update access paths for the files found on this system
+        _metadataBundleCore.updateAccessPaths(getPaths())
+    if 'virtual' in domain:
+        pass
+    if 'local' in domain:
+        pass
 
 
-# def getMetadataCachePaths():
-#     '''Get all known metadata cache paths
-#     ''' 
-#     post = []
-#     stub = common.getMetadataCacheFilePath()
-#     for fn in os.listdir(stub):
-#         if fn.endswith('.json'):
-#             post.append(os.path.join(stub, fn))
-#     return post
-
-# def updateMetadataCache(overwrite=True):
-#     '''Open and parse every file; access Metadata objects and write JSON file. This is a time consuming process. 
-# 
-#     >>> from music21 import *
-#     '''
-# 
-#     # for file name, use the corpusPath; this is not a complete file path, but 
-#     # a file path stub, like 'bach/bwv773'
-# 
-#     # for VirtualWork objects, this is self.corpusPath
-#     # for normal corpus files, this is a chopped version of the file path
-#     # this does, however, include the file extension    
-#     # as we may have more than one file for the same work w/ diff extensions
-#     # this is appropriate
-#     
-#     corpusPaths = []
-# 
-#     for obj in VIRTUAL:
-#         if obj.corpusPath != None:
-#             pass
-# 
-#     # get all paths
-#     for fp in getPaths():
-# 
-#         environLocal.printDebug(['updateMetadataCache: examining:', fp])
-# 
-#         cp = corpusPathToMetadataCachePath(fp)
-# 
-#         # skip if overwrite is False and this path exists
-#         if not overwrite and os.path.exists(cp):
-#             continue
-# 
-#         post = converter.parse(fp, forceSource=True)
-#         if 'Opus' in post.classes:
-#             # need to get scores from each opus?
-#             # problem here is that each sub-work has metadata, but there
-#             # is only a single source file
-#             for s in post.scores:
-#                 md = s.metadata
-#                 if md.number == None:
-#                     environLocal.printDebug(['updateMetadataCache: got Opus that contains Streams that do not have work numbers:', fp])
-#                 else:
-#                     # update path to include work number
-#                     cp = corpusPathToMetadataCachePath(fp, number=md.number)
-#                     if not overwrite and os.path.exists(cp):
-#                         continue
-#                     environLocal.printDebug(['updateMetadataCache: writing:', cp])
-#                     md.jsonWrite(cp)
-#         else:
-#             md = post.metadata
-#             if md is None:
-#                 continue
-# 
-#             environLocal.printDebug(['updateMetadataCache: writing:', cp])
-#             md.jsonWrite(cp)
-
-
-# def getFilePathMetadataPairs():
-#     '''For all file paths in the corpus, pairs the file path with the one or more instantiated Metadata objects derived from JSON metadata cache.
-#     '''
-# 
-#     t = common.Timer()
-#     t.start()
-# 
-#     post = []
-#     mdCachePaths = getMetadataCachePaths()
-# 
-#     for obj in VIRTUAL:
-#         if obj.corpusPath != None:
-#             pass
-# 
-#     count = 0
-#     for fp in getPaths():
-#         group = [fp]
-# 
-#         cp = corpusPathToMetadataCachePath(fp)
-#         # a version of the path that may not have a work number
-#         cpStub = '_'.join(cp.split('_')[:-1]) # get all but last underscore
-# 
-#         if os.path.exists(cp):
-#             md = metadata.Metadata()
-#             md.jsonRead(cp)
-#             group.append(md)
-# 
-#         else: # see if there is work id alternative
-#             for candidate in mdCachePaths:
-#                 if candidate.startswith(cpStub):
-#                     md = metadata.Metadata()
-#                     md.jsonRead(candidate)
-#                     group.append(md)
-#         post.append(group)
-# 
-#     environLocal.printDebug(['metadata loading time:', t, 'md files:', len(mdCachePaths)])
-#     return post
 
 
 #-------------------------------------------------------------------------------

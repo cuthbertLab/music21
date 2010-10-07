@@ -1765,7 +1765,7 @@ class MetadataBundle(music21.JSONSerializer):
         self._name = name
 
         # need to store local abs file path of each component
-        # this will need to be refreshed after loading
+        # this will need to be refreshed after loading json data
         # keys are the same for self._storage
         self._accessPaths = {}
 
@@ -1780,6 +1780,8 @@ class MetadataBundle(music21.JSONSerializer):
     def jsonComponentFactory(self, idStr):
         if '.Metadata' in idStr:
             return Metadata()
+        elif '.RichMetadata' in idStr:
+            return RichMetadata()
         else:
             raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
 

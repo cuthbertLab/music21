@@ -68,6 +68,8 @@ def sharpsToPitch(sharpCount):
     return pitchInit
 
 
+# store a cache of already-found values
+_pitchToSharpsCache = {}
 
 def pitchToSharps(value, mode=None):
     '''Given a pitch or :class:`music21.pitch.Pitch` object, 

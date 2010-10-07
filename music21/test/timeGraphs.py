@@ -164,6 +164,26 @@ class TestMusicXMLOutputScore(CallTest):
         post = self.s.musicxml
 
 
+class TestABCImport(CallTest):
+
+
+    def __init__(self):
+        pass
+
+    def testFocus(self):
+        self.s = corpus.parseWork('josquin/adieuMesAmours.abc', forceSource=True)
+
+
+class TestMetadataBundle(CallTest):
+
+    def __init__(self):
+        pass
+
+    def testFocus(self):
+        # this opens and instantiates the metad
+        from music21.corpus import base
+        base._updateMetadataBundle()
+
 
 
 
@@ -179,7 +199,8 @@ class CallGraph:
         #self.callTest = TestMakeTies
         #self.callTest = TestMakeAccidentals
         #self.callTest = TestMusicXMLOutputParts
-        self.callTest = TestMusicXMLOutputScore
+        #self.callTest = TestABCImport
+        self.callTest = TestMetadataBundle
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
