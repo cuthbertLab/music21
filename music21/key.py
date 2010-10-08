@@ -24,6 +24,13 @@ from music21 import musicxml
 from music21 import common
 
 
+from music21 import environment
+_MOD = "key.py"
+environLocal = environment.Environment(_MOD)
+
+
+
+
 #-------------------------------------------------------------------------------
 def sharpsToPitch(sharpCount):
     '''Given a number a positive/negative number of sharps, return a Pitch 
@@ -117,16 +124,24 @@ def pitchToSharps(value, mode=None):
     0
     >>> key.pitchToSharps('e-', 'lydian')
     -2
+    >>> key.pitchToSharps('e-', 'lydian')
+    -2
     >>> key.pitchToSharps('a', 'phrygian')
     -1
     >>> key.pitchToSharps('e', 'phrygian')
     0
 
     '''
+
     if common.isStr(value):
         p = pitch.Pitch(value)
     else:
         p = value
+
+    if (p.name, mode) in _pitchToSharpsCache.keys():            
+        return _pitchToSharpsCache[(p.name, mode)]
+
+
     # start at C and continue in both directions
     sharpSource = [0]
     for i in range(1,13):
@@ -180,6 +195,8 @@ def pitchToSharps(value, mode=None):
             if pMinor.name == p.name:
                 match = i
                 break
+
+    _pitchToSharpsCache[(p.name, mode)] = match
     return match
 
 
@@ -298,14 +315,23 @@ class KeySignature(music21.Music21Object):
         '''
         music21.Music21Object.__init__(self)
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
-        self.sharps = sharps
+        self._sharps = sharps
         # optionally store mode, if known
-        self.mode = mode
+        self._mode = mode
         # need to store a list of pitch objects, used for creating a 
         # non traditional key
         self._alteredPitches = None
 
+        # cache altered pitches
+        self._alteredPitchesCached = []
+
     #---------------------------------------------------------------------------
+    def _attributesChanged(self):
+        '''Clear the altered pitches cache
+        '''
+        self._alteredPitchesCached = []
+
+
     def _strDescription(self):
         ns = self.sharps
         if ns == None:
@@ -362,7 +388,10 @@ class KeySignature(music21.Music21Object):
 
 
     def _getAlteredPitches(self):
-        # TODO: this result should probably be cached 
+        if self._alteredPitchesCached: # if list not empty
+            #environLocal.printDebug(['using cached altered pitches'])
+            return self._alteredPitchesCached
+
         post = []
         if self.sharps > 0:
             pKeep = pitch.Pitch('B')
@@ -379,6 +408,9 @@ class KeySignature(music21.Music21Object):
                 p = copy.deepcopy(pKeep)
                 p.octave = None
                 post.append(p)
+
+        # assign list to altered pitches; list will be empty if not set
+        self._alteredPitchesCached = post
         return post
 
 
@@ -526,6 +558,8 @@ class KeySignature(music21.Music21Object):
         p2 = p1.transpose(intervalObj)
         
         post.sharps = pitchToSharps(p2, mode)
+        post._attributesChanged()
+
         # mode is already set
         if not inPlace:
             return post
@@ -535,6 +569,35 @@ class KeySignature(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # properties
+
+
+    def _getSharps(self):
+        return self._sharps
+
+    def _setSharps(self, value):
+        if value != self._sharps:
+            self._sharps = value
+            self._attributesChanged()
+
+    sharps = property(_getSharps, _setSharps, 
+        doc = '''Get or set the number of sharps.
+        ''')
+
+
+    def _getMode(self):
+        return self._mode
+
+    def _setMode(self, value):
+        if value != self._mode:
+            self._mode = value
+            self._attributesChanged()
+
+    mode = property(_getMode, _setMode,
+        doc = '''Get or set the mode.
+        ''')
+
+
+
 
     def _getMX(self):
         '''Returns a musicxml.KeySignature object

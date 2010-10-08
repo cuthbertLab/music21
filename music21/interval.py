@@ -1285,12 +1285,14 @@ class Interval(music21.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: More tests here
-
         '''
+        # NOTE: this is a performance critical method
+
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
         oldDiatonicNum = pitch1.diatonicNoteNum
         distanceToMove = self.diatonic.generic.staffDistance
+
         if not reverse:
             newDiatonicNumber = (oldDiatonicNum + distanceToMove)
         else:
@@ -1314,7 +1316,7 @@ class Interval(music21.Music21Object):
         if halfStepsToFix != 0:
             while halfStepsToFix >= 12:
                 halfStepsToFix = halfStepsToFix - 12
-                pitch2.octave = pitch2.octave -1
+                pitch2.octave = pitch2.octave - 1
             
             pitch2.accidental = halfStepsToFix
             # inherit accidental display properties
