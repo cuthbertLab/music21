@@ -95,6 +95,13 @@ MODULES = [
             bach,
     ]
 
+
+# a list of metadataCache's can reside in this module-level storage; this 
+# data is loaded on demand. 
+_METADATA_BUNDLES = {'core':None, 'virtual':None, 'local':None}
+
+
+
 # store all composers in the corpus (not virtual) 
 # as two element tuples of path name, full name
 COMPOSERS = [
@@ -118,11 +125,6 @@ for name in dir(virtual): # look over virtual module
         obj = className()
         if isinstance(obj, virtual.VirtualWork) and obj.corpusPath != None:
             VIRTUAL.append(obj)
-
-
-# a list of metadataCache's can reside in this module-level storage; this 
-# data is loaded on demand. 
-_metadataBundleCore = None
 
 
 
@@ -225,15 +227,27 @@ def getLocalPaths(extList=None):
 #-------------------------------------------------------------------------------
 def _updateMetadataBundle(domain=['core']):
     if 'core' in domain:
-        _metadataBundleCore = metadata.MetadataBundle('core')
-        _metadataBundleCore.read()
-        # must update access paths for the files found on this system
-        _metadataBundleCore.updateAccessPaths(getPaths())
+        if _METADATA_BUNDLES['core'] == None:
+            _METADATA_BUNDLES['core'] = metadata.MetadataBundle('core')
+            _METADATA_BUNDLES['core'].read()
+            # must update access paths for the files found on this system
+            _METADATA_BUNDLES['core'].updateAccessPaths(getPaths())
     if 'virtual' in domain:
         pass
     if 'local' in domain:
         pass
 
+
+def search(query, field=None, domain=['core'], extList=None):
+    '''Search all stored metadata and return a list of file paths; to return a list of parsed Streams, use searchParse(). 
+
+    This method uses stored metadata and thus, on first usage, will incur a performance penalty during metadata loading.
+    '''
+    post = []
+    _updateMetadataBundle(domain)
+    if 'core' in domain:
+        post += _METADATA_BUNDLES['core'].search(query, field, extList)
+    return post
 
 
 
@@ -627,10 +641,6 @@ def getBeethovenStringQuartets(extList=None):
     '''
 
     candidates = []
-
-    # TODO: this is a problem: getWork sometimes returns a list, 
-    # sometimes a single value. this should always return a list
-
     candidates += getWorkList(['beethoven', 'opus18no1'], extList=extList)
     candidates += getWorkList(['beethoven', 'opus18no3'], extList=extList)
     candidates += getWorkList(['beethoven', 'opus18no4'], extList=extList)
@@ -717,6 +727,22 @@ class Test(unittest.TestCase):
         self.assertEqual(len(fpCollection) >= 8, True)
 
 
+    def testSearch(self):
+
+        from music21 import corpus, key
+
+        post = corpus.search('china', 'locale')
+        self.assertEqual(len(post) > 1200, True)
+
+        post = corpus.search('bach')
+        self.assertEqual(len(post) > 120, True)
+
+        post = corpus.search('3/8', 'timeSignature')
+        self.assertEqual(len(post) > 360, True)
+
+        ks = key.KeySignature(-4, 'major')
+        post = corpus.search(str(ks), 'keySignature')
+        self.assertEqual(len(post) >= 1, True)
 
 
 #-------------------------------------------------------------------------------
@@ -734,4 +760,6 @@ if __name__ == "__main__":
         t = Test()
         #t.testEssenImport()
 
-        t.testDesPrezImport()
+        #t.testDesPrezImport()
+
+        t.testSearch()

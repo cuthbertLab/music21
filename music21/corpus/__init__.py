@@ -11,6 +11,6 @@
 #-------------------------------------------------------------------------------
 
 from music21.corpus import base
-from base import *
+from music21.corpus.base import *
 
 __doc__ = base.__doc__

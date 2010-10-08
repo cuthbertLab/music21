@@ -133,7 +133,7 @@ def roleToAbbreviation(value):
     raise MetadataException('no such role: %s' % value)
 
 
-workIdDict = {
+workIdAbbreviationDict = {
     'otl' : 'title',
     'otp' : 'popularTitle',
     'ota' : 'alternativeTitle',
@@ -159,6 +159,13 @@ workIdDict = {
     'ocy' : 'countryOfComposition',
     'opc' : 'localeOfComposition', # origin in abc
     }
+
+# store a reference dictionary for quick lookup, with full attr names
+# as keys
+workIdLookupDict = {}
+for key, value in workIdAbbreviationDict.items(): 
+    workIdLookupDict[value.lower()] = key
+
 # !!!OTL: Title. 
 # !!!OTP: Popular Title.
 # !!!OTA: Alternative title.
@@ -180,8 +187,8 @@ workIdDict = {
 # !!!OCY: Country of composition. 
 # !!!OPC: City, town or village of composition. 
 
-WORK_ID_ABBREVIATIONS = workIdDict.keys()
-WORK_IDS = workIdDict.values()
+WORK_ID_ABBREVIATIONS = workIdAbbreviationDict.keys()
+WORK_IDS = workIdAbbreviationDict.values()
 
 def abbreviationToWorkId(value):
     '''Get work id abbreviations.
@@ -192,8 +199,8 @@ def abbreviationToWorkId(value):
     ...    post = abbreviationToWorkId(id)
     '''
     value = value.lower()
-    if value in workIdDict.keys():
-        return workIdDict[value]
+    if value in workIdAbbreviationDict.keys():
+        return workIdAbbreviationDict[value]
     else:
         raise MetadataException('no such work id: %s' % value)
 
@@ -205,9 +212,16 @@ def workIdToAbbreviation(value):
     >>> for n in WORK_IDS:
     ...     post = workIdToAbbreviation(n)
     '''
-    # note: probably not the fastest way to do this
+    # NOTE: this is a performance critical function
+    try:
+        # try direct access, where keys are already lower case
+        return workIdLookupDict[value] 
+    except KeyError:
+        pass
+
+    # slow approach
     for id in WORK_ID_ABBREVIATIONS:
-        if value.lower() == workIdDict[id].lower():
+        if value.lower() == workIdAbbreviationDict[id].lower():
             return id
     raise MetadataException('no such role: %s' % value)
 
@@ -1115,8 +1129,8 @@ class Metadata(music21.Music21Object):
         # a dictionary of Text elements, where keys are work id strings
         # all are loaded with None by default
         self._workIds = {}
-        for id in WORK_IDS:
-            abbr = workIdToAbbreviation(id)
+        for abbr, id in workIdAbbreviationDict.items():
+            #abbr = workIdToAbbreviation(id)
             if id in keywords.keys():
                 self._workIds[id] = Text(keywords[id])
             elif abbr in keywords.keys():
@@ -1130,13 +1144,20 @@ class Metadata(music21.Music21Object):
         for attr in ['composer', 'date']:
             if attr in keywords.keys():
                 setattr(self, attr, keywords[attr])
+        
+        # used for the search() methods to determine what attributes
+        # are made available by default; add more as properties/import 
+        # exists
+        self._searchAttributes = ['date', 'title', 'alternativeTitle', 'movementNumber', 'movementName', 'number', 'opusNumber', 'composer', 'localeOfComposition']
+
 
     def __getattr__(self, name):
         '''Utility attribute access for attributes that do not yet have property definitions. 
         '''
         match = None
-        for id in WORK_IDS:
-            abbr = workIdToAbbreviation(id)
+        for abbr, id in workIdAbbreviationDict.items():
+        #for id in WORK_IDS:
+            #abbr = workIdToAbbreviation(id)
             if name == id:
                 match = id 
                 break
@@ -1146,11 +1167,13 @@ class Metadata(music21.Music21Object):
         if match == None:
             raise AttributeError('object has no attribute: %s' % name)
         post = self._workIds[match]
-        # if a Text object, return a string representation
-        if isinstance(post, Text):
-            return str(post)
-        elif isinstance(post, Date):
-            return str(post)
+        # always return string representation for now
+        return str(post)
+
+#         if isinstance(post, Text):
+#             return str(post)
+#         elif isinstance(post, Date):
+#             return str(post)
 
     #---------------------------------------------------------------------------
     # property access to things that are not stored in the work ids
@@ -1197,13 +1220,14 @@ class Metadata(music21.Music21Object):
         '''
         idStr = idStr.lower()
         match = False
-        for id in WORK_IDS:
-            abbr = workIdToAbbreviation(id)
+        for abbr, id in workIdAbbreviationDict.items():
+        #for id in WORK_IDS:
+            #abbr = workIdToAbbreviation(id)
             if id.lower() == idStr:
                 self._workIds[id] = Text(value)
                 match = True
                 break
-            elif abbr.lower() == idStr:
+            elif abbr == idStr:
                 self._workIds[id] = Text(value)
                 match = True
                 break
@@ -1444,9 +1468,6 @@ class Metadata(music21.Music21Object):
         (True, 'title')
 
         '''
-
-        fieldsToCompare = ['date', 'title', 'alternativeTitle', 'movementNumber', 'movementName', 'number', 'opusNumber', 'composer', 'localeOfComposition']
-
         valueFieldPairs = []
 
         if field != None:
@@ -1459,8 +1480,8 @@ class Metadata(music21.Music21Object):
                 pass
 
             if not match:
-                for f in fieldsToCompare:
-                    environLocal.printDebug(['comparing fields:', f, field])
+                for f in self._searchAttributes:
+                    #environLocal.printDebug(['comparing fields:', f, field])
                     # look for partial match in all fields
                     if field.lower() in f.lower():
                         value = getattr(self, f)
@@ -1472,7 +1493,7 @@ class Metadata(music21.Music21Object):
                 return False, None
 
         else: # get all fields
-            for f in fieldsToCompare:
+            for f in self._searchAttributes:
                 value = getattr(self, f)
                 valueFieldPairs.append((value, f))
 
@@ -1624,6 +1645,8 @@ class RichMetadata(Metadata):
         'Rhapsody in Blue'
         >>> md.title
         'Rhapsody in Blue'
+        >>> 'keySignatureFirst' in md._searchAttributes
+        True
         '''
         Metadata.__init__(self, *args, **keywords)
 
@@ -1637,6 +1660,11 @@ class RichMetadata(Metadata):
         self.ambitus = None
         self.pitchHighest = None
         self.pitchLowest = None
+
+        # append to existing search attributes from Metdata
+        self._searchAttributes += ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest'] 
+
+
 
     #---------------------------------------------------------------------------
     # overridden methods for json processing 
@@ -1759,8 +1787,6 @@ class MetadataBundle(music21.JSONSerializer):
 
     Additionally, multiple MetadataBundles can be merged for additional processing
     '''
-
-
     def __init__(self, name='default'):
 
         # all keys are strings, all value are Metadata
@@ -1824,12 +1850,16 @@ class MetadataBundle(music21.JSONSerializer):
     
 
     def addFromPaths(self, pathList):
-        '''Parse and store metadata from numerous files speci
-        '''
+        '''Parse and store metadata from numerous files spec
 
+        >>> from music21 import *
+        >>> mb = MetadataBundle()
+        >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
+        >>> len(mb._storage)
+        1
+        '''
         # converter imports modules that import metadata
         from music21 import converter
-
         for fp in pathList:
             environLocal.printDebug(['updateMetadataCache: examining:', fp])
             cp = self.corpusPathToKey(fp)
@@ -1887,12 +1917,19 @@ class MetadataBundle(music21.JSONSerializer):
         environLocal.printDebug(['MetadataBundle: loading time:', t, 'md items:', len(self._storage)])
 
 
-
-
     def updateAccessPaths(self, pathList):
         '''For each stored Metatadata object, create an entry for a complete, local file path that returns this.
 
         The `pathList` parameter is a list of all file paths on the users local system. 
+
+        >>> from music21 import *
+        >>> mb = MetadataBundle()
+        >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
+        >>> len(mb._accessPaths)
+        0
+        >>> mb.updateAccessPaths(corpus.getWorkList('bwv66.6'))
+        >>> len(mb._accessPaths)
+        1
         '''
         # always clear first
         self._accessPaths = {}
@@ -1925,26 +1962,44 @@ class MetadataBundle(music21.JSONSerializer):
         #environLocal.printDebug(['metadata grouping time:', t, 'md bundles found:', len(post)])
         #return post
 
-    def getComposer(self, composerName, extList=None):
-        '''Get composer, permit regular expression matching. 
+    def search(self, query, field=None, extList=None):
+        '''Perform search, on all stored metadata, permit regular expression matching. 
 
         Return pairs of file paths and work numbers, or None
+
+        >>> from music21 import *
+        >>> mb = MetadataBundle()
+        >>> mb.addFromPaths(corpus.getWorkList('ciconia'))
+        >>> mb.updateAccessPaths(corpus.getWorkList('ciconia'))
+        >>> post = mb.search('cicon', 'composer')
+        >>> len(post[0])
+        2
+        >>> post = mb.search('cicon', 'composer', extList=['.krn'])
+        >>> len(post) # no files in this format
+        0
+        >>> post = mb.search('cicon', 'composer', extList=['.xml'])
+        >>> len(post) # no files in this format
+        1
         '''
         post = []
         for key in self._storage.keys():
             md = self._storage[key]
-            c = md.composer
-            match = False
-            if c is not None and composerName.lower() in c.lower():
-                match = True
-            # name can be in path, which is the key here  
-            elif composerName.lower() in key:
-                match = True
-
+            match, fieldPost = md.search(query, field)
             if match:
-                if self._accessPaths[key] not in post:
-                    post.append((self._accessPaths[key], md.number))  
+                # returns a pair of file path, work number
+                result = (self._accessPaths[key], md.number)
+                include = False
 
+                if extList != None:
+                    for ext in extList:
+                        if result[0].endswith(ext):
+                            include = True
+                            break
+                else:
+                    include = True
+
+                if include and result not in post:
+                    post.append(result)  
         return post
 
 
