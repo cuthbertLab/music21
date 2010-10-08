@@ -1300,6 +1300,7 @@ class MeterSequence(MeterTerminal):
                 self._addTerminal(MeterTerminal(slashNotation)) 
             self._updateRatio()
             self.weight = targetWeight # may be None
+
         elif isinstance(value, MeterTerminal):
             # if we have a singel MeterTerminal and autoWeight is active
             # set this terminal to the old weight
@@ -1941,6 +1942,7 @@ class TimeSignature(music21.Music21Object):
     def __repr__(self):
         return "<music21.meter.TimeSignature %s>" % self.__str__()
 
+
     def ratioEqual(self, other):
         '''A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio. 
         '''
@@ -1992,15 +1994,6 @@ class TimeSignature(music21.Music21Object):
         if len(self.beatSequence) > 1: # if partitioned
             self.beatSequence.subdividePartitionsEqual()
 
-#             for i in range(len(self.beatSequence)): # either 2 or 3
-#                 if self.beatSequence[i].numerator == 3:
-#                     self.beatSequence[i] = self.beatSequence[i].subdivide(3)
-#                 elif self.beatSequence[i].numerator in [1, 2]:
-#                     self.beatSequence[i] = self.beatSequence[i].subdivide(2)
-
-                # any lower level is divided by 2 
-#                 for j in range(len(self.beatSequence[0][i])):
-#                     self.beatSequence[0][i][j] = self.beatSequence[0][i][j].subdivide(2)
                     
 
     def _setDefaultBeamPartitions(self):
@@ -2143,23 +2136,23 @@ class TimeSignature(music21.Music21Object):
     # properties
 
 
-    def _setStringNotation(self, value):
-        self.load(value)
-
-    def _getStringNotation(self):
-        return str(self)
- 
-    stringNotation = property(_getStringNotation, _setStringNotation, 
-        doc = '''Get or set the TimeSignature by a simple string value.
-
-        >>> from music21 import *
-        >>> ts = TimeSignature('6/8')
-        >>> ts.stringNotation
-        '6/8'
-        >>> ts.stringNotation = '4/2'
-        >>> ts.stringNotation
-        '4/2'
-        ''')
+#     def _setStringNotation(self, value):
+#         self.load(value)
+# 
+#     def _getStringNotation(self):
+#         return str(self)
+#  
+#     stringNotation = property(_getStringNotation, _setStringNotation, 
+#         doc = '''Get or set the TimeSignature by a simple string value. This permits loading a time signature by a string parameter. 
+# 
+#         >>> from music21 import *
+#         >>> ts = TimeSignature('6/8')
+#         >>> ts.stringNotation
+#         '6/8'
+#         >>> ts.stringNotation = '4/2'
+#         >>> ts.stringNotation
+#         '4/2'
+#         ''')
 
 
 
@@ -3115,20 +3108,20 @@ class TimeSignature(music21.Music21Object):
     #---------------------------------------------------------------------------
     # override these methods for json functionality
 
-    def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
-        '''
-        # only string notation is stored, meaning that any non-default
-        # internal representations will not be saved
-        # a new default will be created when restored
-        return ['stringNotation']
-
-    def jsonComponentFactory(self, idStr):
-        '''Given a stored string during JSON serialization, return an object'
-
-        The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
-        '''
-        return None
+#     def jsonAttributes(self):
+#         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+#         '''
+#         # only string notation is stored, meaning that any non-default
+#         # internal representations will not be saved
+#         # a new default will be created when restored
+#         return ['stringNotation']
+# 
+#     def jsonComponentFactory(self, idStr):
+#         '''Given a stored string during JSON serialization, return an object'
+# 
+#         The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
+#         '''
+#         return None
 
 
 
@@ -3532,15 +3525,15 @@ class Test(unittest.TestCase):
            
 
 
-    def testJSONStorage(self):
-        ts = TimeSignature('3/4')
-        # cannot test to json str as __class__ is different based on context 
-        #self.assertEqual(ts.json, '{"__attr__": {"stringNotation": "3/4"}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.TimeSignature\'>"}')
-
-        jsString = ts.json
-        ts = TimeSignature()
-        ts.json = jsString
-        self.assertEqual(ts.stringNotation, '3/4')
+#     def testJSONStorage(self):
+#         ts = TimeSignature('3/4')
+#         # cannot test to json str as __class__ is different based on context 
+#         #self.assertEqual(ts.json, '{"__attr__": {"stringNotation": "3/4"}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.TimeSignature\'>"}')
+# 
+#         jsString = ts.json
+#         ts = TimeSignature()
+#         ts.json = jsString
+#         self.assertEqual(ts.stringNotation, '3/4')
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

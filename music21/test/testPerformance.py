@@ -162,6 +162,7 @@ class Test(unittest.TestCase):
 
             (self.runStreamIterationByIterator, 
                 {'2010.09.20': 2.2524, 
+                 '2010.10.07': 1.8214, 
                 }),
 
             (self.runStreamIterationByElements, 
@@ -190,6 +191,7 @@ class Test(unittest.TestCase):
 
             (self.runMusicxmlOutScoreBeethoven, 
                 {'2010.09.20': 33.273, 
+                 '2010.10.07': 11.9290, 
                 }),
 
 
@@ -214,6 +216,7 @@ class Test(unittest.TestCase):
 
             (self.runMusicxmlOutLuca, 
                 {'2010.09.20': 8.372, 
+                 '2010.10.07': 4.5613, 
                 }),
 
 

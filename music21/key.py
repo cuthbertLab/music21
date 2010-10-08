@@ -349,6 +349,11 @@ class KeySignature(music21.Music21Object):
         
     def __repr__(self):
         return "<music21.key.KeySignature of %s>" % self._strDescription()
+
+    def __str__(self):
+        # string representation needs to be complete, as is used
+        # for metadata comparisons
+        return "sharps %s, mode %s" % (self.sharps, self.mode)
         
 
     def _getPitchAndMode(self):
@@ -662,22 +667,23 @@ class KeySignature(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # override these methods for json functionality
+    # not presently in use
 
-    def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
-        '''
-        # only string notation is stored, meaning that any non-default
-        # internal representations will not be saved
-        # a new default will be created when restored
-        return ['sharps', 'mode', '_alteredPitches']
-
-
-    def jsonComponentFactory(self, idStr):
-        '''Given a stored string during JSON serialization, return an object'
-
-        The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
-        '''
-        return None
+#     def jsonAttributes(self):
+#         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+#         '''
+#         # only string notation is stored, meaning that any non-default
+#         # internal representations will not be saved
+#         # a new default will be created when restored
+#         return ['sharps', 'mode', '_alteredPitches']
+# 
+# 
+#     def jsonComponentFactory(self, idStr):
+#         '''Given a stored string during JSON serialization, return an object'
+# 
+#         The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
+#         '''
+#         return None
 
 
 
@@ -719,18 +725,18 @@ class Test(unittest.TestCase):
 
 
 
-    def testJSONStorage(self):
-        ks = KeySignature(3)
-        # cannot test to json str as __class__ is different based on context 
-        #self.assertEqual(ks.json, '{"__attr__": {"sharps": 3}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.KeySignature\'>"}')
-
-        jsonStr = ks.json
-    
-        ksNew = KeySignature()
-        ksNew.json = jsonStr
-
-        self.assertEqual(ksNew._strDescription(), '3 sharps')
-        
+#     def testJSONStorage(self):
+#         ks = KeySignature(3)
+#         # cannot test to json str as __class__ is different based on context 
+#         #self.assertEqual(ks.json, '{"__attr__": {"sharps": 3}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.KeySignature\'>"}')
+# 
+#         jsonStr = ks.json
+#     
+#         ksNew = KeySignature()
+#         ksNew.json = jsonStr
+# 
+#         self.assertEqual(ksNew._strDescription(), '3 sharps')
+#         
 
 #         jsString = ts.json
 #         ts = TimeSignature()

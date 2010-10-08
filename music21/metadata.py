@@ -1645,7 +1645,7 @@ class RichMetadata(Metadata):
         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
         '''
         # add new names to base-class names
-        return ['keySignatureFirst', 'timeSignatureFirst'] + Metadata.jsonAttributes(self)
+        return ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest'] + Metadata.jsonAttributes(self)
 
     def jsonComponentFactory(self, idStr):
         from music21 import meter
@@ -1722,7 +1722,9 @@ class RichMetadata(Metadata):
 
         tsStream = flat.getElementsByClass('TimeSignature')
         if len(tsStream) > 0:
-            self.timeSignatureFirst = tsStream[0]
+            # just store the string representation  
+            # re-instantiating TimeSignature objects is expensive
+            self.timeSignatureFirst = str(tsStream[0])
         
         # this presently does not work properly b/c ts comparisons are not
         # built-in; need to add __eq__ methods to MeterTerminal
@@ -1732,19 +1734,23 @@ class RichMetadata(Metadata):
 
         ksStream = flat.getElementsByClass('KeySignature')
         if len(ksStream) > 0:
-            self.keySignatureFirst = ksStream[0]
+            self.keySignatureFirst = str(ksStream[0])
 #         for ks in ksStream:
 #             if ks not in self.keySignatures:
 #                 self.keySignatures.append(ts)
 
         
-#         analysisObj = discrete.SadoianAmbitus(streamObj)    
-#         psRange = analysisObj.getPitchSpan(streamObj)
-#         if psRange != None: # may be none if no pitches are stored
-#             # presently, these are numbers; convert to pitches later
-#             self.pitchLowest, self.pitchHighest = psRange
+        analysisObj = discrete.SadoianAmbitus(streamObj)    
+        psRange = analysisObj.getPitchSpan(streamObj)
+        if psRange != None: # may be none if no pitches are stored
+            # presently, these are numbers; convert to pitches later
+            self.pitchLowest = str(psRange[0]) 
+            self.pitchHighest = str(psRange[1])
 # 
 #         self.ambitus = analysisObj.getSolution(streamObj)
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -1888,16 +1894,8 @@ class MetadataBundle(music21.JSONSerializer):
 
         The `pathList` parameter is a list of all file paths on the users local system. 
         '''
-    
-    
-#         for obj in VIRTUAL:
-#             if obj.corpusPath != None:
-#                 pass
-
         # always clear first
         self._accessPaths = {}
-
-
         # create a copy to manipulate
         keyOptions = self._storage.keys()
 
@@ -2165,7 +2163,7 @@ class Test(unittest.TestCase):
         # update rmd with stream
         rmd.update(s)
 
-        self.assertEqual(str(rmd.keySignatureFirst), '<music21.key.KeySignature of 1 flat>')
+        self.assertEqual(rmd.keySignatureFirst, 'sharps -1, mode major')
 
         self.assertEqual(str(rmd.timeSignatureFirst), '2/4')
 
@@ -2175,7 +2173,7 @@ class Test(unittest.TestCase):
         self.assertEqual(rmdNew.composer, 'Johannes Ciconia')
 
         self.assertEqual(str(rmdNew.timeSignatureFirst), '2/4')
-        self.assertEqual(str(rmdNew.keySignatureFirst), '<music21.key.KeySignature of 1 flat>')
+        self.assertEqual(str(rmdNew.keySignatureFirst), 'sharps -1, mode major')
 
 #         self.assertEqual(rmd.pitchLowest, 55)
 #         self.assertEqual(rmd.pitchHighest, 65)
@@ -2187,12 +2185,12 @@ class Test(unittest.TestCase):
         rmd.merge(s.metadata)
 
         rmd.update(s)
-        self.assertEqual(str(rmd.keySignatureFirst), '<music21.key.KeySignature of 3 sharps>')
+        self.assertEqual(str(rmd.keySignatureFirst), 'sharps 3, mode minor')
         self.assertEqual(str(rmd.timeSignatureFirst), '4/4')
 
         rmdNew.json = rmd.json
         self.assertEqual(str(rmdNew.timeSignatureFirst), '4/4')
-        self.assertEqual(str(rmdNew.keySignatureFirst), '<music21.key.KeySignature of 3 sharps>')
+        self.assertEqual(str(rmdNew.keySignatureFirst), 'sharps 3, mode minor')
 
 
         # test that work id values are copied
