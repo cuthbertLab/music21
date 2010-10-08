@@ -148,6 +148,17 @@ class Test(unittest.TestCase):
 
 
 
+    def runCreateTimeSignatures(self):
+        '''Creating 500 TimeSignature objects
+        '''
+        from music21 import meter
+        tsStr = ['4/4', '4/4', '4/4', '3/4', '3/4', '2/4', '2/4', '2/2', '2/2', '3/8', '6/8', '9/8', '5/4', '12/8']
+
+        for i in range(100):
+            ts = meter.TimeSignature(tsStr[i%len(tsStr)])
+
+
+
 
 
     #---------------------------------------------------------------------------
@@ -218,6 +229,13 @@ class Test(unittest.TestCase):
                 {'2010.09.20': 8.372, 
                  '2010.10.07': 4.5613, 
                 }),
+
+
+            (self.runCreateTimeSignatures, 
+                {
+                 '2010.10.07': 0.665923118591, 
+                }),
+
 
 
             ]:

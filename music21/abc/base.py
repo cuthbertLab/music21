@@ -1130,31 +1130,32 @@ class ABCHandler(object):
 
 
     def _getLinearContext(self, strSrc, i):
-        '''Find the local context of a string or list of ojbects. Returns charPrevNotSpace, charPrev, charThis, charNext, charNextNotSpace.
+        '''Find the local context of a string or list of ojbects. Returns charPrev, charThis, charNext, charNextNext.
 
         >>> from music21 import *
         >>> ah = abc.ABCHandler()
         >>> ah._getLinearContext('12345', 0)
-        (None, None, '1', '2', '2', '3')
+        (None, '1', '2', '3')
         >>> ah._getLinearContext('12345', 1)
-        ('1', '1', '2', '3', '3', '4')
+        ('1', '2', '3', '4')
         >>> ah._getLinearContext('12345', 3)
-        ('3', '3', '4', '5', '5', None)
+        ('3', '4', '5', None)
         >>> ah._getLinearContext('12345', 4)
-        ('4', '4', '5', None, None, None)
+        ('4', '5', None, None)
 
         >>> ah._getLinearContext([32, None, 8, 11, 53], 4)
-        (11, 11, 53, None, None, None)
+        (11, 53, None, None)
         >>> ah._getLinearContext([32, None, 8, 11, 53], 2)
-        (32, None, 8, 11, 11, 53)
+        (None, 8, 11, 53)
         >>> ah._getLinearContext([32, None, 8, 11, 53], 0)
-        (None, None, 32, None, 8, 8)
-
-
+        (None, 32, None, 8)
         '''            
+        # NOte: this is performance critical method
+
         lastIndex = len(strSrc) - 1
         if i > lastIndex:
-            raise ABCHandlerException
+            raise ABCHandlerException('bad index value: %s' % i)
+
         # find local area of string
         if i > 0:
             cPrev = strSrc[i-1]
@@ -1162,18 +1163,18 @@ class ABCHandler(object):
             cPrev = None
         # get last char previous non-white; do not start with current
         # -1 goes to index 0
-        cPrevNotSpace = None
-        for j in range(i-1, -1, -1):
-            # condition to break: find a something that is not None, or 
-            # a string that is not a space
-            if isinstance(strSrc[j], str):
-                if not strSrc[j].isspace():
-                    cPrevNotSpace = strSrc[j]
-                    break
-            else:
-                if strSrc[j] != None:
-                    cPrevNotSpace = strSrc[j]
-                    break
+#         cPrevNotSpace = None
+#         for j in range(i-1, -1, -1):
+#             # condition to break: find a something that is not None, or 
+#             # a string that is not a space
+#             if isinstance(strSrc[j], str):
+#                 if not strSrc[j].isspace():
+#                     cPrevNotSpace = strSrc[j]
+#                     break
+#             else:
+#                 if strSrc[j] != None:
+#                     cPrevNotSpace = strSrc[j]
+#                     break
         # set this characters
         c = strSrc[i]
 
@@ -1186,18 +1187,19 @@ class ABCHandler(object):
         if i < len(strSrc)-2:
             cNextNext = strSrc[i+2]
 
-        cNextNotSpace = None
-        # start at next index and look forward
-        for j in range(i+1, len(strSrc)):
-            if isinstance(strSrc[j], str):
-                if not strSrc[j].isspace():
-                    cNextNotSpace = strSrc[j]
-                    break
-            else:
-                if strSrc[j] != None:
-                    cNextNotSpace = strSrc[j]
-                    break
-        return cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext
+#         cNextNotSpace = None
+#         # start at next index and look forward
+#         for j in range(i+1, len(strSrc)):
+#             if isinstance(strSrc[j], str):
+#                 if not strSrc[j].isspace():
+#                     cNextNotSpace = strSrc[j]
+#                     break
+#             else:
+#                 if strSrc[j] != None:
+#                     cNextNotSpace = strSrc[j]
+#                     break
+        return cPrev, c, cNext, cNextNext
+        #return cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext
 
 
     def _getNextLineBreak(self, strSrc, i):
@@ -1243,7 +1245,8 @@ class ABCHandler(object):
                 break
 
             q = self._getLinearContext(strSrc, i)
-            cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext = q
+            cPrev, c, cNext, cNextNext = q
+            #cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext = q
             
             # comment lines, also encoding defs
             if c == '%':
@@ -1418,7 +1421,8 @@ class ABCHandler(object):
         for i in range(len(self._tokens)):
             # get context of tokens
             q = self._getLinearContext(self._tokens, i)
-            tPrevNotSpace, tPrev, t, tNext, tNextNotSpace, tNextNext = q
+            tPrev, t, tNext, tNextNext = q
+            #tPrevNotSpace, tPrev, t, tNext, tNextNotSpace, tNextNext = q
             
             if isinstance(t, ABCMetadata):
                 if t.isMeter():

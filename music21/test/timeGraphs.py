@@ -173,7 +173,7 @@ class TestABCImport(CallTest):
         pass
 
     def testFocus(self):
-        self.s = corpus.parseWork('josquin/adieuMesAmours.abc', forceSource=True)
+        self.s = corpus.parseWork('essenFolksong/erk20.abc', forceSource=True)
 
 
 class TestMetadataBundle(CallTest):
@@ -206,8 +206,8 @@ class CallGraph:
         #self.callTest = TestMusicXMLOutputParts
         #self.callTest = TestMusicXMLOutputScore
 
-        #self.callTest = TestABCImport
-        self.callTest = TestMetadataBundle
+        self.callTest = TestABCImport
+        #self.callTest = TestMetadataBundle
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 

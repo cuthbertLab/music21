@@ -127,15 +127,12 @@ class GeneralNote(music21.Music21Object):
     }    
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)
-
         self.duration = duration.Duration(**keywords)
         self.lyrics = [] # a list of lyric objects
-
         self.notations = []
         self.articulations = []
         self.editorial = editorial.NoteEditorial()
         self.tie = None # store a Tie object
-
 
     def compactNoteInfo(self):
         '''A debugging info tool, returning information about a note
@@ -506,7 +503,8 @@ class Note(NotRest):
             if isinstance(arguments[0], pitch.Pitch):
                 self.pitch = arguments[0]
             else:
-                self.pitch = pitch.Pitch(arguments[0]) # assume first arg is pitch
+                # assume first arg is pitch
+                self.pitch = pitch.Pitch(arguments[0]) 
         else:
             self.pitch = pitch.Pitch('C4')
 

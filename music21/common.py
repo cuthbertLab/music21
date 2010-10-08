@@ -1105,6 +1105,8 @@ class defHash(dict):
         self.callDefault = callDefault
     
     def __getitem__(self, key):
+        # NOTE: this is perforamnce critical method and should be as fast as 
+        # possible
         try:
             return dict.__getitem__(self, key)
         except KeyError:
@@ -1315,16 +1317,18 @@ def wrapWeakref(referent):
     already wrapped objects
     '''
     #if type(referent) is weakref.ref:
-    if isinstance(referent, weakref.ref):
-        return referent
+#     if isinstance(referent, weakref.ref):
+#         return referent
 
     try:
         return weakref.ref(referent)
     # if referent is None, will raise a TypeError
+    # if referent is a weakref, will also raise a TypeError
     # will also raise a type error for string, ints, etc.
     # slight performance bost rather than checking if None
     except TypeError:
-        return None
+        return referent
+        #return None
 
 def unwrapWeakref(referent):
     '''
