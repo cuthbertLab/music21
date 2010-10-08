@@ -34,9 +34,14 @@ validDenominators = [1,2,4,8,16,32,64,128] # in order
 # also [pow(2,x) for x in range(8)]
 MIN_DENOMINATOR_TYPE = '128th'
 
-# possibly store a module-level dictionary of partitioned meter sequences used
+# store a module-level dictionary of partitioned meter sequences used
 # for setting default accent weights; store as needed
 _meterSequenceAccentArchetypes = {}
+
+# performance tests showed that caching this additional structures did not
+# show immediate performance benefits
+#_meterSequenceBeatArchetypes = {}
+#_meterSequenceBeamArchetypes = {}
 # store meter sequence division options, once created, in a module
 # level dictionary
 _meterSequenceDivisionOptions = {}
@@ -290,13 +295,33 @@ class MeterTerminal(object):
         self._overriddenDuration = None
 
         if slashNotation != None:
-            self.numerator, self.denominator = slashToFraction(slashNotation)
+            # assign directly to values, not properties, to avoid
+            # calling _ratioChanged more than necessary
+            self._numerator, self._denominator = slashToFraction(slashNotation)
         self._ratioChanged() # sets self._duration
 
         # this will call _setWeight property for data checking
         # explicitly calling base class method to avoid problems
         # in the derived class MeterSequence
         MeterTerminal._setWeight(self, weight)
+
+
+    def __deepcopy__(self, memo=None):
+        '''Helper method to copy.py's deepcopy function. Call it from there.
+
+        Defining a custom __deepcopy__ here is a performance boost, particularly in not copying _duration, directly assigning _weight, and other benefits.
+
+        >>> from copy import deepcopy
+        '''
+        # call class to get a new, empty instance
+        new = self.__class__()
+        #for name in dir(self):
+        new._numerator = self._numerator
+        new._denominator = self._denominator    
+        new._ratioChanged() # faster than copying dur
+        #new._duration = copy.deepcopy(self._duration, memo)
+        new._weight = self._weight # these are numbers
+        return new
 
     def __str__(self):
         return str(int(self.numerator)) + "/" + str(int(self.denominator))
@@ -497,6 +522,8 @@ class MeterTerminal(object):
     def _ratioChanged(self):
         '''If ratio has been changed, call this to update duration 
         '''
+        # NOTE: this is a performance critical method and should only be
+        # called when necessary
         if self.numerator == None or self.denominator == None:
             self._duration = None
         else:
@@ -505,7 +532,7 @@ class MeterTerminal(object):
                 self._duration.quarterLength = ((4.0 * 
                             self.numerator)/self.denominator)
             except duration.DurationException:
-                environLocal.printDebug(['DuratioinException encountered', 
+                environLocal.printDebug(['DurationException encountered', 
                     'numerator/denominator', self.numerator, self.denominator])
                 self._duration = None
 
@@ -599,7 +626,6 @@ class MeterSequence(MeterTerminal):
         self._denominator = None # lowest common multiple 
         self._partition = [] # a list of terminals or MeterSequences
         self._overriddenDuration = None
-
         self._levelListCache = {}
 
         # this atribute is only used in MeterTermainals, and note 
@@ -615,6 +641,28 @@ class MeterSequence(MeterTerminal):
 
         if value != None:
             self.load(value, partitionRequest)
+
+    def __deepcopy__(self, memo=None):
+        '''Helper method to copy.py's deepcopy function. Call it from there.
+
+        Defining a custom __deepcopy__ here is a performance boost, particularly in not copying _duration and other benefits. Notably, self._levelListCache is not copied, with may not be needed in the copy and may be large. 
+
+        >>> from copy import deepcopy
+        '''
+        # call class to get a new, empty instance
+        new = self.__class__()
+        #for name in dir(self):
+        new._numerator = self._numerator
+        new._denominator = self._denominator    
+        new._partition = copy.deepcopy(self._partition, memo)
+        new._ratioChanged() # faster than copying dur
+        #new._duration = copy.deepcopy(self._duration, memo)
+
+        new._overriddenDuration = self._overriddenDuration   
+        new.summedNumerator = self.summedNumerator 
+        new.parenthesis = self.parenthesis 
+
+        return new
 
     def __str__(self):
         msg = []
@@ -859,14 +907,20 @@ class MeterSequence(MeterTerminal):
         targetWeight is the expected total Weight for this MeterSequence. This
         would be self.weight, but offten partitions are cleared before _addTerminal is called. 
         '''
-        if common.isStr(value):
-            mt = MeterTerminal(value)
-        elif isinstance(value, MeterTerminal): # may be a MeterSequence
-            mt = value
-        else:
-            raise MeterException('cannot add %s to this sequence' % value)
-        self._partition.append(mt)
+        # NOTE: this is a performance critical method
 
+        if isinstance(value, MeterTerminal): # may be a MeterSequence
+            mt = value
+        else: # assume it is a string
+            mt = MeterTerminal(value)
+
+#         if common.isStr(value):
+#             mt = MeterTerminal(value)
+#         elif isinstance(value, MeterTerminal): # may be a MeterSequence
+#             mt = value
+#         else:
+#             raise MeterException('cannot add %s to this sequence' % value)
+        self._partition.append(mt)
         # clear cache
         self._levelListCache = {}
 
@@ -877,6 +931,7 @@ class MeterSequence(MeterTerminal):
         d = int(self.denominator)
         tsStr = '%s/%s' % (n, d)
         try: 
+            # return a stored, cached value
             return _meterSequenceDivisionOptions[tsStr]
         except KeyError:
             opts = []
@@ -1282,6 +1337,7 @@ class MeterSequence(MeterTerminal):
         '{5/8+4/4}'
 
         '''
+        # NOTE: this is a performance critical method
         if autoWeight:
             if targetWeight != None:
                 targetWeight = targetWeight
@@ -1291,9 +1347,9 @@ class MeterSequence(MeterTerminal):
             targetWeight = None
 
         #environLocal.printDebug(['calling load in MeterSequence, got targetWeight', targetWeight])
+        self._clearPartition()
 
         if common.isStr(value):
-            self._clearPartition()
             ratioList, self.summedNumerator = slashMixedToFraction(value)
             for n,d in ratioList:
                 slashNotation = '%s/%s' % (n,d)
@@ -1306,14 +1362,12 @@ class MeterSequence(MeterTerminal):
             # set this terminal to the old weight
             if targetWeight != None:
                 value.weight = targetWeight
-            self._clearPartition()
             self._addTerminal(value) 
             self._updateRatio()
             # do not need to set weight, as based on terminal
             #environLocal.printDebug(['created MeterSequence from MeterTerminal; old weight, new weight', value.weight, self.weight])
     
         elif common.isListLike(value): # a list of Terminals or Sequenc es
-            self._clearPartition()
             for obj in value:
                 #environLocal.printDebug('creating MeterSequence with %s' % obj)
                 self._addTerminal(obj) 
@@ -1339,8 +1393,9 @@ class MeterSequence(MeterTerminal):
         fList = [(mt.numerator, mt.denominator) for mt in self._partition]
         # clear first to avoid partial updating
         # can only set to private attributes
-        self._numerator, self._denominator = None, 1            
+        #self._numerator, self._denominator = None, 1            
         self._numerator, self._denominator = fractionSum(fList)
+        # must call ratio changed directly as not using properties
         self._ratioChanged()
 
 
@@ -1364,7 +1419,7 @@ class MeterSequence(MeterTerminal):
         0.5
         '''
         sum = 0
-        for obj in self:
+        for obj in self._partition:
             sum += obj.weight # may be a MeterTerminal or MeterSequence
         return sum
 
@@ -1379,9 +1434,10 @@ class MeterSequence(MeterTerminal):
         else:
             if not common.isNum(value):
                 raise MeterException('weight values must be numbers')
-            totalRatio = self.numerator / float(self.denominator)
-            for mt in self:
-                partRatio = mt.numerator / float(mt.denominator)
+            totalRatio = self._numerator / float(self._denominator)
+            for mt in self._partition:
+            #for mt in self:
+                partRatio = mt._numerator / float(mt._denominator)
                 mt.weight = value * (partRatio/totalRatio)
                 #mt.weight = (partRatio/totalRatio) #* totalRatio
                 #environLocal.printDebug(['setting weight based on part, total, weight', partRatio, totalRatio, mt.weight])
@@ -1432,7 +1488,7 @@ class MeterSequence(MeterTerminal):
 
         '''
         mtList = []
-        for obj in self:
+        for obj in self._partition:
             if not isinstance(obj, MeterSequence):
                 mtList.append(obj)
             else: # its a meter sequence
@@ -1549,7 +1605,6 @@ class MeterSequence(MeterTerminal):
         >>> meter.MeterSequence(b._getLevelList(3))
         <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         '''
-        
         cacheKey = (levelCount, flat)
         try: # check in cache 
             return self._levelListCache[cacheKey]
@@ -1557,26 +1612,26 @@ class MeterSequence(MeterTerminal):
             pass
 
         mtList = []
-        for i in range(len(self)):
+        for i in range(len(self._partition)):
             #environLocal.printDebug(['_getLevelList weight', i, self[i].weight])
-            if not isinstance(self[i], MeterSequence):
+            if not isinstance(self._partition[i], MeterSequence):
                 mt = self[i] # a meter terminal
                 mtList.append(mt)   
             else: # its a sequence
                 if levelCount > 0: # retain this sequence but get lower level
                     # reduce level by 1 when recursing; do not
                     # change levelCount here
-                    mtList += self[i]._getLevelList(levelCount-1, flat)
+                    mtList += self._partition[i]._getLevelList(
+                                levelCount-1, flat)
                 else: # level count is at zero
                     if flat: # make sequence into a terminal
                         mt = MeterTerminal('%s/%s' % (
-                                  self[i].numerator, self[i].denominator))
+                                  self._partition[i]._numerator, self._partition[i]._denominator))
                         # set weight to that of the sequence
-                        mt.weight = self[i].weight
+                        mt.weight = self._partition[i].weight
                         mtList.append(mt)   
                     else: # its not a terminal, its a meter sequence
-                        mtList.append(self[i])   
-
+                        mtList.append(self._partition[i])   
         # store in cache
         self._levelListCache[cacheKey] = mtList
         return mtList
@@ -1963,8 +2018,18 @@ class TimeSignature(music21.Music21Object):
         >>> len(ts.beatSequence) # first, not zeroth, level stores beat
         3
         '''
+#         tsStr = '%s/%s' % (self.numerator, self.denominator)
+#         firstPartitionForm = len(self.displaySequence)
+#         cacheKey = None #(tsStr, firstPartitionForm)
+# 
+#         try:
+#             self.beatSequence = copy.deepcopy(
+#                                 _meterSequenceBeatArchetypes[cacheKey])
+#             #environLocal.printDebug(['using stored accent archetype:'])
+#         except KeyError:
 
-        # if a non-compound meter has been given
+        # if a non-compound meter has been given, as in 
+        # not 3+1/4; just 5/4
         if len(self.displaySequence) == 1:
             # create toplevel partitions
             if self.numerator in [2, 6]: # duple meters
@@ -1975,30 +2040,40 @@ class TimeSignature(music21.Music21Object):
                 self.beatSequence.partition([3,3,3])
             elif self.numerator in [4, 12]: # quadruple meters
                 self.beatSequence.partition(4)
-            elif self.numerator in [5]: # quintuple meters
-                self.beatSequence.partition(5)
             elif self.numerator in [15]: # quintuple meters
                 self.beatSequence.partition([3,3,3,3,3])
             # skip 6 numerators; covered above
             elif self.numerator in [18]: # sextuple meters
                 self.beatSequence.partition([3,3,3,3,3,3])
-            else: # case of odd meters
+            else: # case of odd meters: 5, 7
                 self.beatSequence.partition(self.numerator)
 
         # if a compound meter has been given
         else: # partition by display
             self.beatSequence.partition(self.displaySequence)
 
-
         # create subdivisions, and thus define compound/simple distinction
         if len(self.beatSequence) > 1: # if partitioned
             self.beatSequence.subdividePartitionsEqual()
 
-                    
+#             if cacheKey != None:
+#                 _meterSequenceBeatArchetypes[cacheKey] = copy.deepcopy(self.beatSequence)
 
+
+                    
     def _setDefaultBeamPartitions(self):
         '''This sets default beam partitions when partitionRequest is None.
         '''
+#         tsStr = '%s/%s' % (self.numerator, self.denominator)
+#         firstPartitionForm = len(self.displaySequence)
+#         cacheKey = None #(tsStr, firstPartitionForm)
+# 
+#         try:
+#             self.beamSequence = copy.deepcopy(
+#                                 _meterSequenceBeamArchetypes[cacheKey])
+#             #environLocal.printDebug(['using stored beam archetype:'])
+#         except KeyError:
+
         # more general, based only on numerator
         if self.numerator in [2, 3, 4]:
             self.beamSequence.partition(self.numerator)
@@ -2024,6 +2099,8 @@ class TimeSignature(music21.Music21Object):
             pass # doing nothing will beam all together
 
         #environLocal.printDebug('default beam partitions set to: %s' % self.beamSequence)
+#         if cacheKey != None:
+#             _meterSequenceBeamArchetypes[cacheKey] = copy.deepcopy(self.beamSequence)
 
 
     def _setDefaultAccentWeights(self, depth=3):
@@ -2045,6 +2122,8 @@ class TimeSignature(music21.Music21Object):
         [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]
 
         '''
+        # NOTE: this is a performance critical method
+
         # create a scratch MeterSequence for structure
         tsStr = '%s/%s' % (self.numerator, self.denominator)
         if self.beatSequence.isUniformPartition():
@@ -2294,7 +2373,7 @@ class TimeSignature(music21.Music21Object):
         post = []
         if len(self.beatSequence) == 1:
             raise TimeSignatureException('cannot determine beat unit for an unpartitioned beat')
-        for ms in self.beatSequence:
+        for ms in self.beatSequence._partition:
             post.append(ms.duration.quarterLength)
         if len(set(post)) == 1:
             return self.beatSequence[0].duration # all are the same
@@ -2330,7 +2409,7 @@ class TimeSignature(music21.Music21Object):
             raise TimeSignatureException('cannot determine beat backgrond when each beat is not partitioned')
 
         # getting length here gives number of subdivisions
-        for ms in self.beatSequence:
+        for ms in self.beatSequence._partition:
             post.append(len(ms))
 
         # convert this to a set; if length is 1, then all beats are uniform
@@ -2394,12 +2473,12 @@ class TimeSignature(music21.Music21Object):
         post = []
         if len(self.beatSequence) == 1:
             raise TimeSignatureException('cannot determine beat division for an unpartitioned beat')
-        for mt in self.beatSequence:
+        for mt in self.beatSequence._partition:
             for subMt in mt:
                 post.append(subMt.duration.quarterLength)
         if len(set(post)) == 1: # all the same 
             out = [] # could be a Stream, but stream.py imports meter.py
-            for subMt in self.beatSequence[0]:
+            for subMt in self.beatSequence[0]._partition:
                 out.append(subMt.duration)
             return out
         else:
@@ -2773,7 +2852,7 @@ class TimeSignature(music21.Music21Object):
 
         # might store this weight every time it is set, rather than
         # getting it here
-        minWeight = min([mt.weight for mt in self.accentSequence]) * .5
+        minWeight = min([mt.weight for mt in self.accentSequence._partition]) * .5
 
         msLevel = self.accentSequence.getLevel(level)
 
@@ -2818,7 +2897,7 @@ class TimeSignature(music21.Music21Object):
         else:       
             endOffset = self.barDuration.quarterLength
             o = 0.0
-            for ms in self.beatSequence:
+            for ms in self.beatSequence._partition:
                 o += ms.duration.quarterLength
                 if common.almostEquals(o, endOffset) or o >= endOffset:
                     return post # do not add offset for end of bar
@@ -3006,7 +3085,7 @@ class TimeSignature(music21.Music21Object):
         mxTime = musicxml.Time()
         
         # always get a flat version to display any subivisions created
-        fList = [(mt.numerator, mt.denominator) for mt in self.displaySequence.flat]
+        fList = [(mt.numerator, mt.denominator) for mt in self.displaySequence.flat._partition]
         if self.summedNumerator:
             # this will try to reduce any common denominators into 
             # a common group

@@ -154,7 +154,7 @@ class Test(unittest.TestCase):
         from music21 import meter
         tsStr = ['4/4', '4/4', '4/4', '3/4', '3/4', '2/4', '2/4', '2/2', '2/2', '3/8', '6/8', '9/8', '5/4', '12/8']
 
-        for i in range(100):
+        for i in range(500):
             ts = meter.TimeSignature(tsStr[i%len(tsStr)])
 
 
@@ -170,6 +170,14 @@ class Test(unittest.TestCase):
         '''
         # provide work and expected min/max in seconds
         for testMethod, best in [
+
+            (self.runCreateTimeSignatures, 
+                {
+                 '2010.10.07': 2.88308691978, 
+                 '2010.10.08': 1.51130700111, 
+
+                }),
+
 
             (self.runStreamIterationByIterator, 
                 {'2010.09.20': 2.2524, 
@@ -231,10 +239,6 @@ class Test(unittest.TestCase):
                 }),
 
 
-            (self.runCreateTimeSignatures, 
-                {
-                 '2010.10.07': 0.665923118591, 
-                }),
 
 
 

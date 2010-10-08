@@ -1406,7 +1406,7 @@ class Music21Object(JSONSerializer):
 
     def __deepcopy__(self, memo=None):
         '''
-        Helper method to copy.py's deepcopy function.  Call it from there
+        Helper method to copy.py's deepcopy function.  Call it from there.
 
         memo=None is the default as specified in copy.py
 
