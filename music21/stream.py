@@ -6656,7 +6656,7 @@ class Opus(Stream):
         return post
 
     def getScoreByNumber(self, opusMatch):
-        '''Get Score objects from this Stream by number
+        '''Get Score objects from this Stream by number. Performs title search using the :meth:`~music21.metadata.Metadata.search` method, and returns the first result. 
 
         >>> from music21 import *
         >>> o = corpus.parseWork('josquin/ovenusbant')
@@ -6679,24 +6679,19 @@ class Opus(Stream):
 #                 return s
 
     def getScoreByTitle(self, titleMatch):
-        '''Get Score objects from this Stream by number
+        '''Get Score objects from this Stream by a title. Performs title search using the :meth:`~music21.metadata.Metadata.search` method, and returns the first result. 
 
         >>> from music21 import *
         >>> o = corpus.parseWork('essenFolksong/erk5')
         >>> s = o.getScoreByTitle('Vrienden, kommt alle gaere')
-
+        >>> s = o.getScoreByTitle('(.*)kommt(.*)') # regular expression
+        >>> s.metadata.title
+        'Vrienden, kommt alle gaere'
         '''
         for s in self.getElementsByClass('Score'):
             match, field = s.metadata.search(titleMatch, 'title')
             if match:
                 return s
-
-#         for s in self.getElementsByClass('Score'):
-#             if s.metadata.title == titleMatch:
-#                 return s
-#             elif s.metadata.title == str(titleMatch):
-#                 return s            
-
 
     def _getScores(self):
         '''        
@@ -11104,6 +11099,24 @@ class Test(unittest.TestCase):
             'Chord')[1].pitches), '[D2, D#3]')
 
 
+
+    def testOpusSearch(self):
+        from music21 import corpus
+        import re
+        o = corpus.parseWork('essenFolksong/erk5')
+        s = o.getScoreByTitle('blauen')
+        self.assertEqual(s.metadata.title, 'Ich sach mir einen blauen Storchen')
+        
+        s = o.getScoreByTitle('pfal.gr.f')
+        self.assertEqual(s.metadata.title, 'Es fuhr sich ein Pfalzgraf')
+        
+        s = o.getScoreByTitle(re.compile('Pfal(.*)'))
+        self.assertEqual(s.metadata.title, 'Es fuhr sich ein Pfalzgraf')
+
+
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -11138,4 +11151,6 @@ if __name__ == "__main__":
 
         #t.testChordifyImported()
 
-        t.testChordifyRests()
+        #t.testChordifyRests()
+
+        t.testOpusSearch()

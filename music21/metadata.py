@@ -33,7 +33,7 @@ import datetime
 import json
 import os
 import inspect
-
+import re
 
 import music21
 from music21 import common
@@ -1467,6 +1467,11 @@ class Metadata(music21.Music21Object):
         >>> md.search('third', 'title')
         (True, 'title')
 
+        >>> md.search('third|fourth')
+        (True, 'title')
+        >>> md.search('thove(.*)')
+        (True, 'composer')
+
         '''
         valueFieldPairs = []
 
@@ -1500,8 +1505,21 @@ class Metadata(music21.Music21Object):
         # for now, make all queries strings
         # ultimately, can look for regular expressions by checking for
         # .search
+        useRegex = False
         if hasattr(query, 'search'):
-            pass
+            useRegex = True
+            reQuery = query # already compiled
+        # look for regex characters
+        elif common.isStr(query) and ('*' in query or '.' in query or '|' in query or '+' in query or '?' in query or '{' in query or '}' in query):
+            useRegex = True
+            reQuery = re.compile(query, flags=re.I) 
+
+        if useRegex:
+            for v, f in valueFieldPairs:
+                # re.I makes case insensitive
+                match = reQuery.search(str(v))
+                if match is not None:
+                    return True, f
         else:
             query = str(query)
             for v, f in valueFieldPairs:
@@ -1629,7 +1647,6 @@ class Metadata(music21.Music21Object):
 #-------------------------------------------------------------------------------
 class RichMetadata(Metadata):
     '''RichMetadata adds to Metadata information about the contents of the Score it is attached to. TimeSignature, KeySignature and related analytical is stored. RichMetadata are generally only created in the process of creating stored JSON metadata. 
-
     '''
 
     def __init__(self, *args, **keywords):
@@ -2263,6 +2280,14 @@ class Test(unittest.TestCase):
 
 
 
+    def testMetadataSearch(self):
+        from music21 import corpus
+        s = corpus.parseWork('ciconia')
+        print s.metadata.title
+        self.assertEqual(s.metadata.search('quod', 'title'), (True, 'title'))
+        self.assertEqual(s.metadata.search('qu.d', 'title'), (True, 'title'))
+        self.assertEqual(s.metadata.search(re.compile('(.*)canon(.*)')), (True, 'title'))
+
 
 #-------------------------------------------------------------------------------
 _DOC_ORDER = [Text, Date, 
@@ -2283,4 +2308,4 @@ if __name__ == "__main__":
         #t.testJSONSerializationMetadata()
 
 
-        t.testJSONSerializationMetadata()
+        t.testMetadataSearch()

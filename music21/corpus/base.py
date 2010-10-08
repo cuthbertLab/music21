@@ -241,6 +241,8 @@ def _updateMetadataBundle(domain=['core']):
 def search(query, field=None, domain=['core'], extList=None):
     '''Search all stored metadata and return a list of file paths; to return a list of parsed Streams, use searchParse(). 
 
+    The `domain` parameter can be used to specify one of three corpora: core (included with music21), virtual (defined in music21 but hosted online), and local (hosted on the user's system). 
+
     This method uses stored metadata and thus, on first usage, will incur a performance penalty during metadata loading.
     '''
     post = []
@@ -733,16 +735,44 @@ class Test(unittest.TestCase):
 
         post = corpus.search('china', 'locale')
         self.assertEqual(len(post) > 1200, True)
+        
+        post = corpus.search('Sichuan', 'locale')
+        self.assertEqual(len(post), 47)
+        
+        post = corpus.search('Taiwan', 'locale')
+        self.assertEqual(len(post), 27)
+        self.assertEqual(post[0][0][-8:], 'han2.abc') # file
+        self.assertEqual(post[0][1], '209') # work number
+        
+        post = corpus.search('Sichuan|Taiwan', 'locale')
+        self.assertEqual(len(post), 74)
+
 
         post = corpus.search('bach')
         self.assertEqual(len(post) > 120, True)
 
+        post = corpus.search('haydn', 'composer')
+        self.assertEqual(len(post), 0)
+        post = corpus.search('haydn|beethoven', 'composer')
+        self.assertEqual(len(post) >= 16, True)
+
+
+        post = corpus.search('canon')
+        self.assertEqual(len(post) >= 1, True)
+
         post = corpus.search('3/8', 'timeSignature')
         self.assertEqual(len(post) > 360, True)
 
-        ks = key.KeySignature(-4, 'major')
+        post = corpus.search('3/.', 'timeSignature')
+        self.assertEqual(len(post) >= 2200 , True)
+
+
+        ks = key.KeySignature(3, 'major')
         post = corpus.search(str(ks), 'keySignature')
-        self.assertEqual(len(post) >= 1, True)
+        self.assertEqual(len(post) >= 32, True)
+
+        post = corpus.search('sharps (.*), mode phry(.*)', 'keySignature')
+        self.assertEqual(len(post) >= 9, True)
 
 
 #-------------------------------------------------------------------------------
