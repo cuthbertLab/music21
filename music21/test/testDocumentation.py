@@ -39,7 +39,7 @@ class Test(unittest.TestCase):
 
 
     def testQuickStart(self):
-        from music21 import stream, corpus
+        from music21 import stream, corpus, note
         sBach = corpus.parseWork('bach/bwv7.7')
         # with metadata
         self.assertEquals(len(sBach), 5)
@@ -52,6 +52,50 @@ class Test(unittest.TestCase):
         self.assertEquals('Part' in sBach.getElementById('Soprano').classes, True)
 
         mx = select.musicxml
+
+
+        # Creating Notes, Measures, Parts, and Scores
+        n1 = note.Note('e4')
+        n1.duration.type = 'whole'
+        n2 = note.Note('d4')
+        n2.duration.type = 'whole'
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m1.append(n1)
+        m2.append(n2)
+        partLower = stream.Part()
+        partLower.append(m1)
+        partLower.append(m2)
+
+        self.assertEquals(len(partLower.getElementsByClass('Measure')), 2)
+        self.assertEquals(len(partLower.flat), 2)
+        mx = partLower.musicxml
+
+        data1 = [('g4', 'quarter'), ('a4', 'quarter'), ('b4', 'quarter'), ('c#5', 'quarter')]
+        data2 = [('d5', 'whole')]
+        data = [data1, data2]
+        partUpper = stream.Part()
+        for mData in data:
+            m = stream.Measure()
+            for pitchName, durType in mData:
+                n = note.Note(pitchName)
+                n.duration.type = durType
+                m.append(n)
+            partUpper.append(m)
+
+        self.assertEquals(len(partUpper.getElementsByClass('Measure')), 2)
+        self.assertEquals(len(partUpper.flat), 5)
+        mx = partLower.musicxml
+
+        sCadence = stream.Score()
+        sCadence.insert(0, partUpper)
+        sCadence.insert(0, partLower)
+
+        self.assertEquals(len(sCadence.getElementsByClass('Part')), 2)
+        self.assertEquals(len(sCadence.flat.notes), 7)
+
+        #sCadence.show()
+
 
 
     def testOverviewNotes(self):

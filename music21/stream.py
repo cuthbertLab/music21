@@ -4915,55 +4915,6 @@ class Stream(music21.Music21Object):
         return musicxmlTranslate.streamPartToMx(self, instObj=instObj,
             meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange)
 
-#         if instObj is None:
-#             # see if an instrument is defined in this or a parent stream
-#             instObj = self.getInstrument()
-#         # must set a unique part id, if not already assigned
-#         if instObj.partId == None:
-#             instObj.partIdRandomize()
-# 
-#         #environLocal.printDebug(['calling Stream._getMXPart', repr(instObj), instObj.partId])
-# 
-#         # instrument object returns a configured mxScorePart, that may
-#         # also include midi or score instrument definitions
-#         mxScorePart = instObj.mx
-# 
-#         #environLocal.printDebug(['calling Stream._getMXPart', 'mxScorePart', mxScorePart, mxScorePart.get('id')])
-# 
-#         mxPart = musicxmlMod.Part()
-#         #mxPart.setDefaults()
-#         mxPart.set('id', instObj.partId) # need to set id
-# 
-#         # get a stream of measures
-#         # if flat is used here, the Measure is not obtained
-#         # may need to be semi flat?
-#         measureStream = self.getElementsByClass(Measure)
-#         if len(measureStream) == 0:
-#             # try to add measures if none defined
-#             # returns a new stream w/ new Measures but the same objects
-#             measureStream = self.makeNotation(meterStream=meterStream,
-#                             refStreamOrTimeRange=refStreamOrTimeRange)
-#             #environLocal.printDebug(['Stream._getMXPart: post makeNotation, length', len(measureStream)])
-#         else: # there are measures
-#             # check that first measure has any atributes in outer Stream
-#             # this is for non-standard Stream formations (some kern imports)
-#             # that place key/clef information in the containing stream
-#             if measureStream[0].clef == None:
-#                 outerClefs = self.getElementsByClass('Clef')
-#                 if len(outerClefs) > 0:
-#                     measureStream[0].clef = outerClefs[0]
-#             if measureStream[0].keySignature == None:
-#                 outerKeySignatures = self.getElementsByClass('KeySignature')
-#                 if len(outerKeySignatures) > 0:
-#                     measureStream[0].keySignature = outerKeySignatures[0]
-# 
-#         # for each measure, call .mx to get the musicxml representation
-#         for obj in measureStream:
-#             mxPart.append(obj.mx)
-# 
-#         # mxScorePart contains mxInstrument
-#         return mxScorePart, mxPart
-
 
     def _getMX(self):
         '''Create and return a musicxml Score object. 

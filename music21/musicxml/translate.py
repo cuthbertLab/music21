@@ -569,7 +569,9 @@ def mxToMeasure(mxMeasure, inputM21):
 
 
 def measureToMusicXML(m):
-    '''Translate a music21 Measure into a complete musicXML string representation
+    '''Translate a music21 Measure into a complete musicXML string representation.
+
+    Note: this method is called for complete musicxml representation of a Measure, not in in Part or Stream production. 
     '''
     
     from music21 import stream, duration
@@ -643,9 +645,7 @@ def streamPartToMx(s, instObj=None, meterStream=None,
 
     An `instObj` may be assigned from caller; this Instrument is pre-collected from this Stream in order to configure id and midi-channel values. 
 
-    meterStream can be provided to provide a template within which
-    these events are positioned; this is necessary for handling
-    cases where one part is shorter than another. 
+    The `meterStream`, if provides a template of meters. 
     '''
     #environLocal.printDebug(['calling Stream._getMXPart'])
     # note: meterStream may have TimeSignature objects from an unrelated
@@ -738,7 +738,7 @@ def streamToMx(s):
     meterStream = s.getTimeSignatures(searchContext=False,
                     sortByCreationTime=False, returnDefault=False) 
     if len(meterStream) == 0:
-        meterStream = s.flat.getTimeSignatures(searchContext=True,
+        meterStream = s.flat.getTimeSignatures(searchContext=False,
                     sortByCreationTime=True, returnDefault=True) 
 
     # we need independent sub-stream elements to shift in presentation
@@ -761,11 +761,16 @@ def streamToMx(s):
             # apply this streams offset to elements
             obj.transferOffsetToElements() 
 
-            ts = obj.getTimeSignatures(sortByCreationTime=True, 
-                 searchContext=True)
-            # the longest meterStream is the meterStream for all parts
-            if len(ts) > meterStream:
-                meterStream = ts
+# its not clear that this gathering, at the level of each part
+# is necessary, given how this is done for the entire score, or the 
+# flat score. 
+
+#             ts = obj.getTimeSignatures(sortByCreationTime=True, 
+#                  searchContext=False)
+#             # the longest meterStream is the meterStream for all parts
+#             if len(ts) > meterStream:
+#                 meterStream = ts
+
             ht = obj.highestTime
             if ht > highestTime:
                 highestTime = ht
@@ -810,6 +815,9 @@ def streamToMx(s):
             instList.append(inst)
 
             # force this instrument into this part
+            # meterStream is only used here if there are no measures
+            # defined in this part
+            # this method calls streamPartToMx()
             mxComponents.append(obj._getMXPart(inst, meterStream,
                             refStreamOrTimeRange))
 
