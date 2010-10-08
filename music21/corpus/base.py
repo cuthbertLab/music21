@@ -404,6 +404,8 @@ def getWorkReferences(sort=True):
     >>> post = getWorkReferences()
     '''
     # from music21 import corpus; corpus.getWorkReferences()
+    # TODO: update this to use metadata
+
     post = []
     for dirComposer, composer in COMPOSERS:
         ref = {}
