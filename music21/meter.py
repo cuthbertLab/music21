@@ -472,8 +472,8 @@ class MeterTerminal(object):
         >>> a.weight
         0.5
         '''
-        if not common.isNum(value):
-            raise MeterException('weight values must be numbers')
+#         if not common.isNum(value):
+#             raise MeterException('weight values must be numbers')
         self._weight = value
     
     weight = property(_getWeight, _setWeight)

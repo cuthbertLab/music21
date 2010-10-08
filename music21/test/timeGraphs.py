@@ -201,6 +201,18 @@ class TestCreateTimeSignature(CallTest):
 
 
 
+class TestCreateDurations(CallTest):
+
+    def __init__(self):
+        from music21.test import testPerformance
+        self.t = test.testPerformance.Test()
+
+    def testFocus(self):
+        # create 500 time signatures
+        self.t.runCreateDurations()
+
+
+
 
 
 
@@ -224,7 +236,10 @@ class CallGraph:
 
         #self.callTest = TestABCImport
         #self.callTest = TestMetadataBundle
-        self.callTest = TestCreateTimeSignature
+        #self.callTest = TestCreateTimeSignature
+
+        self.callTest = TestCreateDurations
+
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 

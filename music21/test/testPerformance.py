@@ -158,6 +158,17 @@ class Test(unittest.TestCase):
             ts = meter.TimeSignature(tsStr[i%len(tsStr)])
 
 
+    def runCreateDurations(self):
+        '''Creating 10000 Duration objects
+        '''
+        from music21 import duration
+        qlList = [4, 2, 1, .5, 1/3., .25, .125]
+
+        for i in range(10000):
+            ql = qlList[i%len(qlList)]
+            d = duration.Duration()
+            d.quarterLength = ql
+            post = d.quarterLength
 
 
 
@@ -171,10 +182,17 @@ class Test(unittest.TestCase):
         # provide work and expected min/max in seconds
         for testMethod, best in [
 
+
+            (self.runCreateDurations, 
+                {
+                 '2010.10.07': 0.201117992401, 
+
+                }),
+
             (self.runCreateTimeSignatures, 
                 {
                  '2010.10.07': 2.88308691978, 
-                 '2010.10.08': 1.51130700111, 
+                 '2010.10.08': 1.40892004967 , 
 
                 }),
 
