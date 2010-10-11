@@ -36,29 +36,156 @@ environLocal = environment.Environment(_MOD)
 
 # for implementation
 # see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
+# http://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
 
-
-#-------------------------------------------------------------------------------
-# note inclusion of w: for lyrics
-reMetadataTag = re.compile('[KQTCXSID][0-9]?:')
-
-rePitchName = re.compile('[A-Gr]')
-
-#reChordSymbol = re.compile('"[^"]*"') # non greedy
-
-#reChord = re.compile('[.*?]') # non greedy
 
 
 
 #-------------------------------------------------------------------------------
-class MuseDataTokenException(Exception):
-    pass
-
-class MuseDataHandlerException(Exception):
+class MuseDataException(Exception):
     pass
 
 
 
+#-------------------------------------------------------------------------------
+class MuseDataRecord(object):
+    '''Object for extracting data from a Note or other related record
+    '''
+    def __init__(self, src='', parent=None):
+        #environLocal.printDebug(['creating MuseDataRecord'])
+        self.src = src # src here is one line of text
+        self.parent = parent
+    
+
+    def isRest(self):
+        if len(sekf.src) > 0 and self.src[0] == 'r':
+            return True
+        return False
+
+    def isNote(self):
+        if len(self.src) > 0 and self.src[0] in 'ABCDEFG':
+            return True
+        return False
+
+    def isCueOrGrace(self):
+        if len(self.src) > 0 and self.src[0] in 'cg':
+            return True
+        return False
+
+    def _getPitchParameters(self):
+        '''
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('Ef4    1        s     d  ==')
+        >>> mdr.isNote()
+        True
+        >>> mdr._getPitchParameters()
+        'E-4'
+
+        >>> mdr = music21.musedata.MuseDataRecord('F#4    1        s #   d  ==')
+        >>> mdr.isNote()
+        True
+        >>> mdr._getPitchParameters()
+        'F#4'
+        '''
+        if self.isNote():
+            data = self.src[0:3]
+        elif self.isCueOrGrace():
+            data = self.src[1:4]
+        else:
+            raise MuseDataException('cannot get pitch parameters from this kind of record')
+
+        pStr = [data[0]] # first element will be A...G
+        if '#' in data:
+            pStr.append('#')
+        elif '##' in data:
+            pStr.append('##')
+        elif 'f' in data:
+            pStr.append('-')
+        elif 'ff' in data:
+            pStr.append('--')
+        
+        # probably a faster way to do this
+        numbers, junk = common.getNumFromStr(data)
+
+        pStr.append(numbers)
+        return ''.join(pStr)
+    
+
+#-------------------------------------------------------------------------------
+class MuseDataRecordIterator(object):
+    '''Create MuseDataRecord objects on demand, in order
+    '''
+    def __init__(self, src, parent):
+        self.src = src # the lost of all record lines
+        self.index = 0
+        self.parent = parent
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.index >= len(self.src):
+            raise StopIteration
+        # add one b/c end is inclusive
+        mdr = MuseDataRecord(self.src[self.index])
+        self.index += 1
+        return mdr
+
+
+#-------------------------------------------------------------------------------
+class MuseDataMeasure(object):
+    '''A MuseDataMeasure is an abstraction of the data contained within a measure definitions. 
+
+    This needs to be an object to gracefully handle the following cases. Some Measures do not have any notes, for example, and the end of encoding where a final bar line is defined. Some measures do not have numbers or barlin definitions, such as pickup notes. Some measures define barline characteristics. Backup and forward presumably only is contained within a measure.
+    '''
+    def __init__(self, src=[], parent=None):
+        #environLocal.printDebug(['creating MuseDataMeasure'])
+        self.src = src # a list of character lines for this measure
+        # store reference to parent Part
+        self.parent = parent
+
+    def __repr__(self):
+        return '<music21.musedata.MuseDataPart size=%s>' % (len(self.src))
+
+
+    def hasNotes(self):
+        '''Return True of if this Measure return Notes
+        '''
+        for line in self.src:
+            if len(line) > 0 and line[0] in 'ABCDEFGrgc':
+                return True
+        return False
+
+    def __iter__(self):
+        '''
+        Iterating over this part returns MuseDataMeasure objects
+        '''
+        return MuseDataRecordIterator(self.src, self)
+
+
+
+
+#-------------------------------------------------------------------------------
+class MuseDataMeasureIterator(object):
+    '''Create MuseDataMeasure objects on demand, in order
+    '''
+    def __init__(self, src, boundaries, parent):
+        self.src = src # the lost of all record lines
+        self.boundaries = boundaries # pairs of all boundaries
+        self.index = 0
+        self.parent = parent
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.index >= len(self.boundaries):
+            raise StopIteration
+        start, end = self.boundaries[self.index]
+        # add one b/c end is inclusive
+        mdm = MuseDataMeasure(self.src[start:end+1], self.parent)
+        self.index += 1
+        return mdm
 
 
 #-------------------------------------------------------------------------------
@@ -67,8 +194,12 @@ class MuseDataPart(object):
     '''
     
     def __init__(self, src=[]):
-        environLocal.printDebug(['creating MuseDataPart'])
+        #environLocal.printDebug(['creating MuseDataPart'])
         self.src = src # a list of character lines for this part
+
+        # a list of start, end indicies for each defined measure
+        self._measureBoundaries = []
+        self._divisionsPerQuarter = None # store
     
     def __repr__(self):
         return '<music21.musedata.MuseDataPart>'
@@ -433,6 +564,85 @@ class MuseDataPart(object):
         # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
         return int(self._getDigitsFollowingTag(line, 'Q:'))
 
+    #---------------------------------------------------------------------------
+    # dealing with measures and notes
+    def _getMeasureBoundaryIndices(self, src=None):
+        '''
+        >>> from music21 import *
+        >>> mdp = music21.musedata.MuseDataPart()
+        >>> mdp._getMeasureBoundaryIndices(['$', 'A', 'B', 'm', 'C', 'm', 'D'])
+        [(1, 2), (3, 4), (5, 6)]
+        >>> mdp._getMeasureBoundaryIndices(['$', 'm', 'B', 'C', 'm', 'D', 'E', 'm', 'F', 'D'])
+        [(1, 3), (4, 6), (7, 9)]
+        >>> mdp._getMeasureBoundaryIndices(['$', 'B', 'C', 'm', 'D', 'E'])
+        [(1, 2), (3, 5)]
+        '''
+        if src == None:
+            src = self.src
+        boundaries = []
+        mIndices = []
+        firstPostAttributesIndex = None
+        lastIndex = len(src) - 1
+
+        # first, get index positions
+        mAttributeRecordCount = 0 # store number of $ found
+        # all comment lines have already been stripped from the representaiton        
+        for i in range(len(src)):
+            line = src[i]
+            
+            if line.startswith('$'):
+                mAttributeRecordCount += 1
+                continue
+
+            if mAttributeRecordCount > 0 and firstPostAttributesIndex == None:
+                firstPostAttributesIndex = i    
+                # do not continue, as this may also be a measure start
+
+            if line.startswith('m'):
+                mIndices.append(i)
+
+        # second, match pairs
+        # if start of music is start of measure
+        startIterIndex = None  
+        if mIndices[0] == firstPostAttributesIndex:
+            if len(mIndices) == 1:
+                boundaries.append((mIndices[0], lastIndex))
+                startIterIndex = None
+            else:
+                boundaries.append((mIndices[0], mIndices[1]-1))
+                startIterIndex = 1
+        # if there is a pickup measure
+        else:
+            boundaries.append((firstPostAttributesIndex, mIndices[0]-1))
+            startIterIndex = 0
+        
+        if startIterIndex != None:
+            for i in range(startIterIndex, len(mIndices)):
+                # if the last
+                if i == len(mIndices) - 1:
+                    boundaries.append((mIndices[i], lastIndex))
+                else:
+                    boundaries.append((mIndices[i], mIndices[i+1]-1))
+
+        return boundaries    
+
+
+
+    def update(self):
+        '''After setting the source string, this method must be called to configure the _measureNumberToLine method and set additional attributes. 
+        '''
+        self._divisionsPerQuarter = self._getDivisionsPerQuarterNote()
+        self._measureBoundaries = self._getMeasureBoundaryIndices()
+
+
+    def __iter__(self):
+        '''
+        Iterating over this part returns MuseDataMeasure objects
+        '''
+        return MuseDataMeasureIterator(self.src, self._measureBoundaries, self)
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -484,9 +694,12 @@ class MuseDataFile(object):
 
             if commentToggle:
                 continue # skip block comment lines 
-
+            elif len(line) > 0 and line[0] == '@':
+                continue
             elif line.startswith('/END'):
                 mdp = MuseDataPart(lines)
+                # update sets measure boundaries, divisions
+                mdp.update()
                 self.parts.append(mdp)
                 lines = [] # clear storage
             # mostly redundant; seems to follow /END
@@ -583,6 +796,7 @@ class Test(unittest.TestCase):
         self.assertEquals(mdpObjs[0]._getDivisionsPerQuarterNote(), 4)
 
 
+
     def testLoadFromFile(self):
         import os
         from music21.musedata import testFiles
@@ -650,6 +864,33 @@ class Test(unittest.TestCase):
         self.assertEquals(mdpObjs[0]._getKeyParameters(), 0)
         self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
         self.assertEquals(mdpObjs[0]._getDivisionsPerQuarterNote(), 6)
+
+
+    def testIterateMeasuresFromString(self):
+
+        from music21.musedata import testFiles
+
+        mdw = MuseDataWork()
+        mdw.addString(testFiles.bach_cantata5_mvmt3)
+
+
+        mdpObjs = mdw.getParts()
+
+        # can iterate over measures, creating them as iterating
+        for m in mdpObjs[0]:
+            self.assertEquals(isinstance(m, MuseDataMeasure), True)
+
+            # iterate over measures to get notes
+            for n in m:
+                self.assertEquals(isinstance(n, MuseDataRecord), True)
+
+        # cannot access them as in a list, however
+        #self.assertEquals(mdpObjs[0][0], True)
+
+        
+
+
+
 
 
 if __name__ == "__main__":
