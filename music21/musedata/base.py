@@ -57,78 +57,492 @@ class MuseDataTokenException(Exception):
 class MuseDataHandlerException(Exception):
     pass
 
-class MuseDataFile(object):
-    '''
-    
-    '''
-    def __init__(self, data = ""):
-        self.data = data
-    
-    def __repr__(self):
-        return '<music21.musedata.MuseDataFile %d>' % self.id()
-    
-    def toStream(self):
-        return self.stream
-    
+
 
 
 
 #-------------------------------------------------------------------------------
-# class ABCFile(object):
-#     '''
-#     ABC File access
-# 
-#     '''
-#     
-#     def __init__(self): 
-#         pass
-# 
-#     def open(self, filename): 
-#         '''Open a file for reading
-#         '''
-#         #try:
-#         self.file = codecs.open(filename, encoding='utf-8')
-#         #exce[t
-#         #self.file = open(filename, 'r') 
-#         self.filename = filename
-# 
-#     def openFileLike(self, fileLike):
-#         '''Assign a file-like object, such as those provided by StringIO, as an open file object.
-# 
-#         >>> fileLikeOpen = StringIO.StringIO()
-#         '''
-#         self.file = fileLike # already 'open'
-#     
-#     def __repr__(self): 
-#         r = "<ABCFile>" 
-#         return r 
-#     
-#     def close(self): 
-#         self.file.close() 
-#     
-#     def read(self): 
-#         return self.readstr(self.file.read()) 
-#     
-#     def readstr(self, str): 
-#         '''Read a string and process all Tokens. Returns a ABCHandler instance.
-#         '''
-#         handler = ABCHandler()
-#         # return the handler instanc
-#         handler.process(str)
-#         return handler
-#     
-# #     def write(self): 
-# #         ws = self.writestr()
-# #         self.file.write(ws) 
-# #     
-# #     def writestr(self): 
-# #         pass
-# 
-# 
+class MuseDataPart(object):
+    '''A MuseData part is defined by collection of lines 
+    '''
+    
+    def __init__(self, src=[]):
+        environLocal.printDebug(['creating MuseDataPart'])
+        self.src = src # a list of character lines for this part
+    
+    def __repr__(self):
+        return '<music21.musedata.MuseDataPart>'
+    
+
+    def _getDigitsFollowingTag(self, line, tag):
+        '''
+        >>> from music21 import *
+        >>> mdp = music21.musedata.MuseDataPart()
+        >>> mdp._getDigitsFollowingTag('junk WK#:2345', 'WK#:')
+        '2345'
+        >>> mdp._getDigitsFollowingTag('junk WK#: 2345 junk', 'WK#:')
+        '2345'
+        >>> mdp._getDigitsFollowingTag('$ K:-3   Q:4   T:3/4   C:22', 'Q:')
+        '4'
+        >>> mdp._getDigitsFollowingTag('$ K:-3   Q:4   T:3/4   C:22', 'T:')
+        '3/4'
+        >>> mdp._getDigitsFollowingTag('$ K:-3   Q:4', 'T:')
+        ''
+        '''
+        post = []
+        if tag in line:
+            i = line.find(tag) + len(tag)
+            while i < len(line):
+                if line[i].isdigit():
+                    post.append(line[i])
+                elif line[i].isspace():
+                    pass
+                elif line[i] in '-/': # chars to permit
+                    post.append(line[i])
+                else: # anything other than space ends gather
+                    break
+                i += 1
+        return ''.join(post)
+
+
+    def _getAlphasFollowingTag(self, line, tag):
+        '''
+        >>> from music21 import *
+        >>> mdp = music21.musedata.MuseDataPart()
+        >>> mdp._getAlphasFollowingTag('Group memberships: sound, score', 'Group memberships:')
+        'sound,score'
+        '''
+        line = line.lower()
+        tag = tag.lower()
+        post = []
+        if tag in line:
+            i = line.find(tag) + len(tag)
+            while i < len(line):
+                if line[i].isalpha():
+                    post.append(line[i])
+                elif line[i].isspace():
+                    pass
+                elif line[i] in ',': # chars to permit
+                    post.append(line[i])
+                else: # anything other than space ends gather
+                    break
+                i += 1
+        return ''.join(post)
+
+
+    def getWorkNumber(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = musedata.MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getWorkNumber()
+        '5'
+        '''
+        return self._getDigitsFollowingTag(self.src[4], 'WK#:')
+
+    def getMovementNumber(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = musedata.MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getMovementNumber()
+        '3'
+        '''
+        return self._getDigitsFollowingTag(self.src[4], 'MV#:')
+            
+
+    def getSource(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = musedata.MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getSource()
+        'Bach Gesellschaft i'
+        '''
+        return self.src[5]
+
+
+    def getWorkTitle(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getWorkTitle()
+        'Wo soll ich fliehen hin'
+        '''
+        return self.src[6]
+
+
+    def getMovementTitle(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getMovementTitle()
+        'Aria'
+        '''
+        return self.src[7]
+
+
+    def getPartName(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getPartName()
+        'Viola Solo'
+        >>> mdw.getParts()[1].getPartName()
+        'TENORE'
+        '''
+        return self.src[8]
 
 
 
+    def getGroupMemberships(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getGroupMemberships()
+        ['score']
+        '''
+        raw = self._getAlphasFollowingTag(self.src[10], 'group memberships:')
+        post = []
+        for entry in raw.split(','):
+            if entry.strip() != '':
+                post.append(entry.strip())
+        return post
 
+    def getGroupMembershipsTotal(self, membership='score'):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getGroupMembershipsTotal()
+        3
+        '''
+        i = 11 # start with index 11, move to line tt starts with $
+        raw = None
+        while not self.src[i].startswith('$'):
+            line = self.src[i]
+            if line.startswith(membership):
+                raw = self._getDigitsFollowingTag(line, 'of')
+                break
+            i += 1
+        if raw == None:
+            return None
+        else:
+            return int(raw)
+
+
+    def getGroupMembershipNumber(self, membership='score'):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getGroupMembershipNumber()
+        1
+        >>> mdw.getParts()[1].getGroupMembershipNumber()
+        2
+        >>> mdw.getParts()[2].getGroupMembershipNumber()
+        3
+        '''
+        i = 11 # start with index 11, move to line tt starts with $
+        raw = None
+        while not self.src[i].startswith('$'):
+            line = self.src[i]
+            if line.startswith(membership):
+                raw = self._getDigitsFollowingTag(line, 'part')
+                break
+            i += 1
+        if raw == None:
+            return None
+        else:
+            return int(raw)
+
+    def _getAttributesRecord(self):
+        '''The attributes record is not in a fixed position, but is the first line that starts with a $.
+
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0]._getAttributesRecord()
+        '$ K:-3   Q:4   T:3/4   C:13'
+        >>> mdw.getParts()[1]._getAttributesRecord()
+        '$ K:-3   Q:8   T:3/4   C:34'
+        >>> mdw.getParts()[2]._getAttributesRecord()
+        '$ K:-3   Q:4   T:3/4   C:22'
+        '''
+        i = 11 # start with index 11, move to line tt starts with $
+        while not self.src[i].startswith('$'):
+            i += 1
+        return self.src[i]
+
+
+    def _getKeyParameters(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0]._getKeyParameters()
+        -3
+        >>> mdw.getParts()[1]._getKeyParameters()
+        -3
+        '''
+        line = self._getAttributesRecord()
+        # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
+        return int(self._getDigitsFollowingTag(line, 'K:'))
+
+
+    def _getTimeSignatureParameters(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0]._getTimeSignatureParameters()
+        '3/4'
+        >>> mdw.getParts()[1]._getTimeSignatureParameters()
+        '3/4'
+        '''
+        line = self._getAttributesRecord()
+        # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
+        return self._getDigitsFollowingTag(line, 'T:')
+
+
+    def _getNumberOfStaves(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0]._getNumberOfStaves()
+        1
+        '''
+        line = self._getAttributesRecord()
+        # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
+        raw = self._getDigitsFollowingTag(line, 'S:')
+        if raw == '':
+            return 1 # default
+        else:
+            return int(raw)
+
+
+    def _getClefParameters(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0]._getClefParameters()
+        ['13']
+        >>> mdw.getParts()[1]._getClefParameters()
+        ['34']
+        '''
+        # clef may be givne as C: or Cn:, where n is the number for 
+        # a staff, if multiple staves are included in this parts
+
+        line = self._getAttributesRecord()
+        # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
+        # keep as string, as these are two-char codes
+        post = []
+        raw = self._getDigitsFollowingTag(line, 'C:')
+        if raw != '':
+            post.append(raw)
+        if raw == '':
+            # find max number of staffs
+            for i in range(1, self._getNumberOfStaves() + 1): 
+                raw = self._getDigitsFollowingTag(line, 'C%s:' % i)
+                if raw != '':
+                    post.append(raw)
+        return post
+
+    def getClefObject(self, voice=1):
+        '''Return a music21 clef object based on a two character clef definition.
+
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getClefObject().sign
+        'C'
+        '''
+        # there may be more than one clef definition
+        charPair = self._getClefParameters()[voice-1]
+        from music21 import clef
+
+        if charPair == '05':
+            return clef.FrenchViolinClef()
+        elif charPair == '04': # line 4 is 2nd from bottom
+            return clef.TrebleClef()
+
+        elif charPair == '34': # 3 here is G 8vb
+            return clef.Treble8vbClef()
+        elif charPair == '64': # 6 here is G 8va
+            return clef.Treble8vaClef()
+        elif charPair == '03': 
+            return clef.GSopranoClef()
+
+
+        elif charPair == '11':
+            return clef.CBaritoneClef()
+        elif charPair == '12':
+            return clef.TenorClef()
+        elif charPair == '13':
+            return clef.AltoClef()
+        elif charPair == '14':
+            return clef.MezzoSopranoClef()
+        elif charPair == '15': # 5 is lowest line
+            return clef.SopranoClef()
+
+
+        elif charPair == '22':
+            return clef.BassClef()
+        elif charPair == '23': # middle line:
+            return clef.FBaritoneClef()
+
+        elif charPair == '52': # 5 is transposed down f-clef
+            return clef.Bass8vbClef()
+        elif charPair == '82': # 8 is transposed up f-clef
+            return clef.Bass8vaClef()
+
+
+    def _getDivisionsPerQuarterNote(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0]._getDivisionsPerQuarterNote()
+        4
+        >>> mdw.getParts()[1]._getDivisionsPerQuarterNote()
+        8
+        '''
+        line = self._getAttributesRecord()
+        # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
+        return int(self._getDigitsFollowingTag(line, 'Q:'))
+
+
+
+#-------------------------------------------------------------------------------
+class MuseDataFile(object):
+    '''A MuseData file may describe one or more Part; a Score might need multiple files for definition. 
+    
+    '''
+    
+    def __init__(self):
+        self.parts = [] # a lost of MuseDataPart objects
+
+        self.filename = None
+        self.file = None   
+
+    def __repr__(self):
+        return '<music21.musedata.MuseDataFile>'
+    
+
+    def open(self, fp):
+        #self.file = codecs.open(filename, encoding='utf-8')
+        self.file = open(fp, 'r') 
+        self.filename = fp
+
+    def read(self): 
+        # call readstr with source string from file
+        return self.readstr(self.file.read()) 
+
+    def close(self):
+        self.file.close()
+
+    def readstr(self, str): 
+        '''Read a string, dividing it into individual parts.
+        '''
+        # need to split the string into individual parts, as more than 
+        # one part might be defined
+        commentToggle = False
+
+        lines = []
+        for line in str.split('\n'):
+            # each part, or the entire file, will end with /END
+
+            if line.startswith('&'): 
+                if commentToggle:
+                    commentToggle = False
+                    continue
+                else:
+                    commentToggle = True
+                    continue
+
+            if commentToggle:
+                continue # skip block comment lines 
+
+            elif line.startswith('/END'):
+                mdp = MuseDataPart(lines)
+                self.parts.append(mdp)
+                lines = [] # clear storage
+            # mostly redundant; seems to follow /END
+            elif line.startswith('/eof'):
+                pass
+            else: # gather all else
+                lines.append(line)
+
+
+
+#-------------------------------------------------------------------------------
+class MuseDataWork(object):
+    '''A work might consist of one ore more files. 
+    '''
+
+    def __init__(self):
+        self.files = [] # a list of one or more MuseDataFile objects
+
+
+    def addFile(self, fp):
+        '''Open and read this file path as 
+        '''
+        mdf = MuseDataFile()
+        mdf.open(fp)
+        mdf.read()  # process string and break into parts
+        mdf.close()
+        self.files.append(mdf)
+
+
+    def addString(self, str):
+        '''Add a string representation acting like a part file
+
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+
+        '''
+        mdf = MuseDataFile()
+        mdf.readstr(str) # process string and break into parts
+        self.files.append(mdf)
+
+
+    #---------------------------------------------------------------------------
+    def getParts(self):
+        '''Get all parts contained in all files associated with this work as lists of strings
+        '''
+        # TODO: may need to sort parts by group membership values and 
+        # numbers
+        post = []
+        for mdf in self.files:
+            for mdp in mdf.parts:
+                post.append(mdp)
+        return post
+                
+            
 
 
 
@@ -139,6 +553,103 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+
+    def testLoadFromString(self):
+        import os
+        from music21.musedata import testFiles
+
+        mdw = MuseDataWork()
+        mdw.addString(testFiles.bach_cantata5_mvmt3)
+
+        mdpObjs = mdw.getParts()
+        self.assertEquals(len(mdpObjs), 3)
+        # first line of src strings
+        self.assertEquals(mdpObjs[0].src[1], 'ID: {bach/bg/cant/0005/stage2/03/01} [KHM:1658122244]')
+
+        self.assertEquals(mdpObjs[1].src[1], 'ID: {bach/bg/cant/0005/stage2/03/02} [KHM:1658122244]')
+
+        self.assertEquals(mdpObjs[2].src[1], 'ID: {bach/bg/cant/0005/stage2/03/03} [KHM:1658122244]')
+
+        for i in range(3):
+            self.assertEquals(mdpObjs[i].getWorkNumber(), '5')
+            self.assertEquals(mdpObjs[i].getMovementNumber(), '3')
+            self.assertEquals(mdpObjs[i].getSource(), 'Bach Gesellschaft i')
+            self.assertEquals(mdpObjs[i].getWorkTitle(), 'Wo soll ich fliehen hin')
+            self.assertEquals(mdpObjs[i].getMovementTitle(), 'Aria')
+
+
+        self.assertEquals(mdpObjs[0]._getKeyParameters(), -3)
+        self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
+        self.assertEquals(mdpObjs[0]._getDivisionsPerQuarterNote(), 4)
+
+
+    def testLoadFromFile(self):
+        import os
+        from music21.musedata import testFiles
+
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('musedata'):
+                break
+
+        mdw = MuseDataWork()
+
+        dirLib = os.path.join(fp, 'testPrimitive')
+        for fn in ['test-1b.md', 'test-1c.md', 'test-1d.md', 
+                   'test-1e.md', 'test-1f.md']:
+            fp = os.path.join(dirLib, fn)
+            environLocal.printDebug([fp])
+
+            mdw.addFile(fp)
+
+        mdpObjs = mdw.getParts()
+        self.assertEquals(len(mdpObjs), 5)
+        # first line of src strings
+        self.assertEquals(mdpObjs[0].src[4], 'WK#:581       MV#:3c')
+        self.assertEquals(mdpObjs[0].src[12], 'score: part 1 of 5')
+
+        self.assertEquals(mdpObjs[1].src[4], 'WK#:581       MV#:3c')
+        self.assertEquals(mdpObjs[1].src[12], 'score: part 2 of 5')
+
+        self.assertEquals(mdpObjs[2].src[4], 'WK#:581       MV#:3c')
+        self.assertEquals(mdpObjs[2].src[12], 'score: part 3 of 5')
+
+        self.assertEquals(mdpObjs[3].src[4], 'WK#:581       MV#:3c')
+        self.assertEquals(mdpObjs[3].src[12], 'score: part 4 of 5')
+
+        self.assertEquals(mdpObjs[4].src[4], 'WK#:581       MV#:3c')
+        self.assertEquals(mdpObjs[4].src[12], 'score: part 5 of 5')
+
+
+        # all files have the same metadata
+        for i in range(4):
+            self.assertEquals(mdpObjs[i].getWorkNumber(), '581')
+            self.assertEquals(mdpObjs[i].getMovementNumber(), '3')
+            self.assertEquals(mdpObjs[i].getSource().startswith('Breitkopf'), True)
+            self.assertEquals(mdpObjs[i].getWorkTitle(), 'Clarinet Quintet')
+            self.assertEquals(mdpObjs[i].getMovementTitle(), 'Trio II')
+
+            self.assertEquals(mdpObjs[i].getGroupMemberships(), ['sound', 'score'])
+
+            self.assertEquals(mdpObjs[i].getGroupMembershipsTotal('score'), 5)
+            self.assertEquals(mdpObjs[i].getGroupMembershipsTotal('sound'), 5)
+
+        self.assertEquals(mdpObjs[0].getGroupMembershipNumber('score'), 1)
+        self.assertEquals(mdpObjs[0].getGroupMembershipNumber('sound'), 1)
+        self.assertEquals(mdpObjs[1].getGroupMembershipNumber('score'), 2)
+        self.assertEquals(mdpObjs[1].getGroupMembershipNumber('sound'), 2)
+        self.assertEquals(mdpObjs[2].getGroupMembershipNumber('score'), 3)
+        self.assertEquals(mdpObjs[2].getGroupMembershipNumber('sound'), 3)
+
+        self.assertEquals(mdpObjs[3].getGroupMembershipNumber('score'), 4)
+        self.assertEquals(mdpObjs[3].getGroupMembershipNumber('sound'), 4)
+        self.assertEquals(mdpObjs[4].getGroupMembershipNumber('score'), 5)
+        self.assertEquals(mdpObjs[4].getGroupMembershipNumber('sound'), 5)
+
+
+        self.assertEquals(mdpObjs[0]._getKeyParameters(), 0)
+        self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
+        self.assertEquals(mdpObjs[0]._getDivisionsPerQuarterNote(), 6)
 
 
 if __name__ == "__main__":

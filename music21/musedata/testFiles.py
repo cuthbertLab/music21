@@ -21,8 +21,7 @@ environLocal = environment.Environment(_MOD)
 
 
 # http://www.musedata.org/cgi-bin/mddata?composer=bach&edition=bg&genre=cant&work=0005&format=stage2&movement=03
-bach_cantata5_mvmt3 = r'''
-&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+bach_cantata5_mvmt3 = r'''&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 PART = 01
 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 (C) 1991, 2002 Center for Computer Assisted Research in the Humanities.

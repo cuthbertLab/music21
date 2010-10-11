@@ -1161,20 +1161,6 @@ class ABCHandler(object):
             cPrev = strSrc[i-1]
         else:      
             cPrev = None
-        # get last char previous non-white; do not start with current
-        # -1 goes to index 0
-#         cPrevNotSpace = None
-#         for j in range(i-1, -1, -1):
-#             # condition to break: find a something that is not None, or 
-#             # a string that is not a space
-#             if isinstance(strSrc[j], str):
-#                 if not strSrc[j].isspace():
-#                     cPrevNotSpace = strSrc[j]
-#                     break
-#             else:
-#                 if strSrc[j] != None:
-#                     cPrevNotSpace = strSrc[j]
-#                     break
         # set this characters
         c = strSrc[i]
 
@@ -1187,17 +1173,6 @@ class ABCHandler(object):
         if i < len(strSrc)-2:
             cNextNext = strSrc[i+2]
 
-#         cNextNotSpace = None
-#         # start at next index and look forward
-#         for j in range(i+1, len(strSrc)):
-#             if isinstance(strSrc[j], str):
-#                 if not strSrc[j].isspace():
-#                     cNextNotSpace = strSrc[j]
-#                     break
-#             else:
-#                 if strSrc[j] != None:
-#                     cNextNotSpace = strSrc[j]
-#                     break
         return cPrev, c, cNext, cNextNext
         #return cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext
 

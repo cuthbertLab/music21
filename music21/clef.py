@@ -37,6 +37,7 @@ class Clef(music21.Music21Object):
     def __init__(self):
         music21.Music21Object.__init__(self)
         self.sign = None
+        # line counts start from the bottom up, the reverse of musedata
         self.line = None
         self.octaveChange = 0 # set to zero as default
 
