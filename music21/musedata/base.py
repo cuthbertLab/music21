@@ -58,12 +58,48 @@ class MuseDataRecord(object):
     
 
     def isRest(self):
-        if len(sekf.src) > 0 and self.src[0] == 'r':
+        '''Return a boolean if this record is tied. 
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('D4     1        s     d  ]]')
+        >>> mdr.isRest()
+        False
+        >>> mdr = music21.musedata.MuseDataRecord('measure 1       A')
+        >>> mdr.isRest()
+        False
+
+        '''
+        if len(self.src) > 0 and self.src[0] == 'r':
             return True
         return False
 
+    def isTied(self):
+        '''Return a boolean if this record is tied. 
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('D4     8-       h     d        -')
+        >>> mdr.isTied()
+        True
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('C4     1        s     u  [[')
+        >>> mdr.isTied()
+        False
+        '''
+        if len(self.src) > 0 and self.src[8] == '-':
+            return True
+        return False
+
+
     def isNote(self):
         if len(self.src) > 0 and self.src[0] in 'ABCDEFG':
+            return True
+        return False
+
+    def isChord(self):
+        '''Chords are specified as additional note records following a main chord tone. The blank space defines this as chord tone. 
+        '''
+        if len(self.src) > 0 and self.src[0] == ' ':
             return True
         return False
 
@@ -89,7 +125,7 @@ class MuseDataRecord(object):
         '''
         if self.isNote():
             data = self.src[0:3]
-        elif self.isCueOrGrace():
+        elif self.isCueOrGrace() or self.isChord():
             data = self.src[1:4]
         else:
             raise MuseDataException('cannot get pitch parameters from this kind of record')
@@ -111,6 +147,116 @@ class MuseDataRecord(object):
         return ''.join(pStr)
     
 
+    def _getAccidentalObject(self):
+        '''Return a music21 Accidental object for the representation.
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('Ef4    1        s     d  ==')
+        >>> mdr._getAccidentalObject()
+        >>> mdr = music21.musedata.MuseDataRecord('F#4    1        s #   d  ==')
+        >>> mdr._getAccidentalObject()
+        <accidental sharp>
+        >>> mdr._getAccidentalObject().displayStatus == True
+        True
+        '''
+        from music21 import pitch
+
+        data = self.src[18]
+        acc = None
+        if data == '#':
+            acc = pitch.Accidental('sharp')
+        elif data == 'n':
+            acc = pitch.Accidental('natural')
+        elif data == 'f':
+            acc = pitch.Accidental('flat')
+        elif data == 'x':
+            acc = pitch.Accidental('double-sharp')
+        elif data == 'X':
+            # this is sharp sharp, cannot distinguish
+            acc = pitch.Accidental('double-sharp')
+        elif data == '&':
+            acc = pitch.Accidental('double-flat')
+        elif data == 'S':
+            # natural sharp; cannot yet do
+            acc = pitch.Accidental('sharp')
+        elif data == 'F':
+            # natural flat; cannot yet do
+            acc = pitch.Accidental('flat')
+        # if no match or ' ', return None
+
+        if acc != None:
+            # not sure what the expectation is here: could be 'normal'
+            # 'unless-repeated'
+            acc.displayType = 'always'
+            acc.displayStatus = True
+        return acc
+
+
+    def getPitchObject(self):
+        '''Get the Pitch object defined by this record. This may be a note, chord, or grace pitch.
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('Ef4    1        s     d  ==')
+        >>> p = mdr.getPitchObject()
+        >>> p.nameWithOctave
+        'E4'
+        >>> mdr = music21.musedata.MuseDataRecord('F#4    1        s #   d  ==')
+        >>> p = mdr.getPitchObject()
+        >>> p.nameWithOctave
+        'F#4'
+        >>> p.accidental.displayStatus
+        True
+        '''
+        from music21 import pitch
+        p = pitch.Pitch(self._getPitchParameters())
+        # bypass using property, as that sets pitch space value as needing
+        # update, and pitch space value should be correct
+        p._accidental = self._getAccidentalObject()
+        return p
+
+
+    def getQuarterLength(self, divisionsPerQuarterNote=None):
+        '''
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('Ef4    1        s     d  ==')
+        >>> mdr.getQuarterLength(4)
+        0.25
+
+        >>> mdr = music21.musedata.MuseDataRecord('Ef4    6        s     d  ==')
+        >>> mdr.getQuarterLength(4)
+        1.5
+        '''
+
+        divisions = int(self.src[5:8])
+        # the parent is the measure, and the parent of that is the part
+        if self.parent != None:
+            dpq = self.parent.parent.getDivisionsPerQuarterNote()
+        elif divisionsPerQuarterNote != None:
+            dpq = divisionsPerQuarterNote
+        else:
+            raise MuseDataException('cannot access parent container of this record to obtain divisions per quarter')
+
+        return divisions / float(dpq)
+
+
+    def getDots(self):
+        if len(self.src) > 0:
+            if self.src[17] == '.':
+                return 1
+            if self.src[17] == ':':
+                return 2
+        return 0
+
+    def getType(self):
+        # TODO: column 17 self.src[16] defines the graphic note type
+        # this may or may not align with derived quarter length
+        if len(self.src) == 0:
+            return None
+
+        data = self.src[16]
+            
+        
+
 #-------------------------------------------------------------------------------
 class MuseDataRecordIterator(object):
     '''Create MuseDataRecord objects on demand, in order
@@ -127,7 +273,7 @@ class MuseDataRecordIterator(object):
         if self.index >= len(self.src):
             raise StopIteration
         # add one b/c end is inclusive
-        mdr = MuseDataRecord(self.src[self.index])
+        mdr = MuseDataRecord(self.src[self.index], self.parent)
         self.index += 1
         return mdr
 
@@ -162,7 +308,10 @@ class MuseDataMeasure(object):
         '''
         return MuseDataRecordIterator(self.src, self)
 
-
+    def getRecords(self):
+        '''Return a lost of all records stored in this measure as MuseDataRecord.
+        '''
+        return [mdr for mdr in self]
 
 
 #-------------------------------------------------------------------------------
@@ -192,7 +341,6 @@ class MuseDataMeasureIterator(object):
 class MuseDataPart(object):
     '''A MuseData part is defined by collection of lines 
     '''
-    
     def __init__(self, src=[]):
         #environLocal.printDebug(['creating MuseDataPart'])
         self.src = src # a list of character lines for this part
@@ -200,7 +348,11 @@ class MuseDataPart(object):
         # a list of start, end indicies for each defined measure
         self._measureBoundaries = []
         self._divisionsPerQuarter = None # store
-    
+
+        # set to None until called the first time, then return stored value
+        self._divisionsPerQuarterNote = None
+
+
     def __repr__(self):
         return '<music21.musedata.MuseDataPart>'
     
@@ -435,6 +587,17 @@ class MuseDataPart(object):
         # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
         return int(self._getDigitsFollowingTag(line, 'K:'))
 
+    def getKeySignature(self):
+        '''
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getKeySignature()
+        <music21.key.KeySignature of 3 flats>
+        '''
+        from music21 import key
+        return key.KeySignature(self._getKeyParameters())
 
     def _getTimeSignatureParameters(self):
         '''
@@ -451,6 +614,17 @@ class MuseDataPart(object):
         # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
         return self._getDigitsFollowingTag(line, 'T:')
 
+    def getTimeSignatureObject(self):
+        '''     
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = MuseDataWork()
+        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.getParts()[0].getTimeSignatureObject()
+        <music21.meter.TimeSignature 3/4>
+        '''
+        from music21 import meter
+        return meter.TimeSignature(self._getTimeSignatureParameters())
 
     def _getNumberOfStaves(self):
         '''
@@ -549,20 +723,28 @@ class MuseDataPart(object):
             return clef.Bass8vaClef()
 
 
-    def _getDivisionsPerQuarterNote(self):
+    def getDivisionsPerQuarterNote(self):
         '''
         >>> from music21 import *
         >>> from music21.musedata import testFiles
         >>> mdw = MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
-        >>> mdw.getParts()[0]._getDivisionsPerQuarterNote()
+        >>> mdw.getParts()[0].getDivisionsPerQuarterNote()
         4
-        >>> mdw.getParts()[1]._getDivisionsPerQuarterNote()
+        >>> mdw.getParts()[0].getDivisionsPerQuarterNote()
+        4
+        >>> mdw.getParts()[1].getDivisionsPerQuarterNote()
         8
         '''
-        line = self._getAttributesRecord()
-        # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
-        return int(self._getDigitsFollowingTag(line, 'Q:'))
+        if self._divisionsPerQuarterNote == None:
+            # set once the first time this is called
+            line = self._getAttributesRecord()
+            # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
+            self._divisionsPerQuarterNote = int(
+                self._getDigitsFollowingTag(line, 'Q:'))
+
+        return self._divisionsPerQuarterNote
+
 
     #---------------------------------------------------------------------------
     # dealing with measures and notes
@@ -631,7 +813,7 @@ class MuseDataPart(object):
     def update(self):
         '''After setting the source string, this method must be called to configure the _measureNumberToLine method and set additional attributes. 
         '''
-        self._divisionsPerQuarter = self._getDivisionsPerQuarterNote()
+        self._divisionsPerQuarter = self.getDivisionsPerQuarterNote()
         self._measureBoundaries = self._getMeasureBoundaryIndices()
 
 
@@ -642,15 +824,23 @@ class MuseDataPart(object):
         return MuseDataMeasureIterator(self.src, self._measureBoundaries, self)
 
 
+    def getMeasures(self):
+        '''Return a list of all measures stored in this part as MuseDataMeasure objects.
+        '''
+        return [mdm for mdm in self]
+
+
+
+
 
 
 
 #-------------------------------------------------------------------------------
 class MuseDataFile(object):
-    '''A MuseData file may describe one or more Part; a Score might need multiple files for definition. 
-    
+    '''A MuseDataFile file may describe one or more MuseDataPart; a Score might need multiple files for complete definition. A MuseDataFile object can be created from a string.
+
+    When read, one or more MuseDataPart objects are created and stored on self.parts. 
     '''
-    
     def __init__(self):
         self.parts = [] # a lost of MuseDataPart objects
 
@@ -722,12 +912,14 @@ class MuseDataWork(object):
     def addFile(self, fp):
         '''Open and read this file path as 
         '''
-        mdf = MuseDataFile()
-        mdf.open(fp)
-        mdf.read()  # process string and break into parts
-        mdf.close()
-        self.files.append(mdf)
-
+        if not common.isListLike(fp):
+            fpList = [fp]
+        for fp in fpList:
+            mdf = MuseDataFile()
+            mdf.open(fp)
+            mdf.read()  # process string and break into parts
+            mdf.close()
+            self.files.append(mdf)
 
     def addString(self, str):
         '''Add a string representation acting like a part file
@@ -738,14 +930,19 @@ class MuseDataWork(object):
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
 
         '''
-        mdf = MuseDataFile()
-        mdf.readstr(str) # process string and break into parts
-        self.files.append(mdf)
+        if not common.isListLike(str):
+            strList = [str]
+        for str in strList:
+            mdf = MuseDataFile()
+            mdf.readstr(str) # process string and break into parts
+            self.files.append(mdf)
+
+    
 
 
     #---------------------------------------------------------------------------
     def getParts(self):
-        '''Get all parts contained in all files associated with this work as lists of strings
+        '''Get all parts contained in all files associated with this work. A list of MuseDataPart objects that were created in a MuseDataFile.
         '''
         # TODO: may need to sort parts by group membership values and 
         # numbers
@@ -793,7 +990,7 @@ class Test(unittest.TestCase):
 
         self.assertEquals(mdpObjs[0]._getKeyParameters(), -3)
         self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
-        self.assertEquals(mdpObjs[0]._getDivisionsPerQuarterNote(), 4)
+        self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
 
 
 
@@ -863,7 +1060,7 @@ class Test(unittest.TestCase):
 
         self.assertEquals(mdpObjs[0]._getKeyParameters(), 0)
         self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
-        self.assertEquals(mdpObjs[0]._getDivisionsPerQuarterNote(), 6)
+        self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 6)
 
 
     def testIterateMeasuresFromString(self):
@@ -887,9 +1084,16 @@ class Test(unittest.TestCase):
         # cannot access them as in a list, however
         #self.assertEquals(mdpObjs[0][0], True)
 
-        
+        # try using stored objects
+        measures = mdpObjs[0].getMeasures()
+        self.assertEquals(isinstance(measures[0], MuseDataMeasure), True)
+        self.assertEquals(len(measures), 106)
 
+        records = measures[4].getRecords()
+        self.assertEquals(isinstance(records[0], MuseDataRecord), True)
+        self.assertEquals(len(records), 13)
 
+       
 
 
 

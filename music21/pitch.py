@@ -772,7 +772,7 @@ class Pitch(music21.Music21Object):
         '''
         if (isinstance(value, basestring) or common.isNum(value)):
             self._accidental = Accidental(value)
-        else:
+        else: # assume an accidental object
             self._accidental = value
         self._pitchSpaceNeedsUpdating = True
     

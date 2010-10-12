@@ -132,6 +132,9 @@ class GeneralNote(music21.Music21Object):
         self.notations = []
         self.articulations = []
         self.editorial = editorial.NoteEditorial()
+
+        # note: Chord inherits this object, and thus has one Tie object
+        # chords may need Tie objects for each pitch
         self.tie = None # store a Tie object
 
     def compactNoteInfo(self):

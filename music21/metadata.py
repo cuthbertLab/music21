@@ -1606,7 +1606,10 @@ class Metadata(music21.Music21Object):
     def _setMX(self, mxScore):
         '''Given an mxScore, fill the necessary parameters of a Metadata.
         '''
-        self.movementNumber = mxScore.get('movementNumber')
+        mxMovementNumber = mxScore.get('movementNumber')
+        if mxMovementNumber != None:
+            self.movementNumber = mxMovementNumber
+
         # xml calls this title not name
         mxName = mxScore.get('movementTitle')
         if mxName != None:
