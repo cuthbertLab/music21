@@ -233,6 +233,9 @@ def findFormatExtURL(url):
         ext = '.xml'
     elif '=kern' in url:
         ext = '.krn'
+    # specific tag used on musedata.org
+    elif 'format=stage2' in url or 'format=stage1' in url:
+        ext = '.md'
     else: # check for file that ends in all known input extensions
         for key in fileExtensions.keys():
             for extSample in fileExtensions[key]['input']:

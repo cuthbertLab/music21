@@ -76,11 +76,13 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     # create and store objects
     mdmObjs = museDataPart.getMeasures()
 
-    environLocal.printDebug(['first measure parent', mdmObjs[0].parent])
+    #environLocal.printDebug(['first measure parent', mdmObjs[0].parent])
 
 
     barCount = 0
     for mdm in mdmObjs:
+        #environLocal.printDebug(['processing:', mdm.src])
+
         m = stream.Measure()
         if barCount == 0: # only for first
             # the parent of the measure is the part

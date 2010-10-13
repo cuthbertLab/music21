@@ -685,18 +685,20 @@ class MuseDataPart(object):
         '''
         # there may be more than one clef definition
         charPair = self._getClefParameters()[voice-1]
+        # convert to int and back to string to strip zeros
+        charPair = str(int(charPair))
         from music21 import clef
 
-        if charPair == '05':
+        if charPair == '5':
             return clef.FrenchViolinClef()
-        elif charPair == '04': # line 4 is 2nd from bottom
+        elif charPair == '4': # line 4 is 2nd from bottom
             return clef.TrebleClef()
 
         elif charPair == '34': # 3 here is G 8vb
             return clef.Treble8vbClef()
         elif charPair == '64': # 6 here is G 8va
             return clef.Treble8vaClef()
-        elif charPair == '03': 
+        elif charPair == '3': 
             return clef.GSopranoClef()
 
 
@@ -721,7 +723,8 @@ class MuseDataPart(object):
             return clef.Bass8vbClef()
         elif charPair == '82': # 8 is transposed up f-clef
             return clef.Bass8vaClef()
-
+        else:
+            raise MuseDataException('cannot determine clef from:', charPair)
 
     def getDivisionsPerQuarterNote(self):
         '''

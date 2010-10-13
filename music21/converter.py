@@ -51,6 +51,9 @@ from music21 import tinyNotation
 from music21.abc import base as abcModule
 from music21.abc import translate as abcTranslate
 
+from music21.musedata import base as musedataModule
+from music21.musedata import translate as musedataTranslate
+
 from music21 import environment
 _MOD = 'converter.py'
 environLocal = environment.Environment(_MOD)
@@ -532,6 +535,58 @@ class ConverterABC(object):
 
 
 
+#-------------------------------------------------------------------------------
+class ConverterMuseData(object):
+    '''Simple class wrapper for parsing ABC.
+    '''
+
+    def __init__(self):
+        # always create a score instance
+        self._stream = stream.Score()
+
+    def parseData(self, strData, number=None):
+        '''Get musedata from a string representation. 
+
+        '''
+        if common.isStr(strData):
+            strDataList = [strData]
+        else:
+            strDataList = strData
+
+        mdw = musedataModule.MuseDataWork()
+
+        for strData in strDataList:
+            mdw.addString(strData)
+
+        musedataTranslate.museDataWorkToStreamScore(mdw, self._stream)
+
+
+    def parseFile(self, fp, number=None):
+        '''
+        '''
+        if not common.isListLike(fp):
+            fpList = [fp]
+        else:
+            fpList = fp
+
+        mdw = musedataModule.MuseDataWork()
+
+        for fp in fpList:
+            mdw.addFile(fp)
+
+        musedataTranslate.museDataWorkToStreamScore(mdw, self._stream)
+
+
+
+    def _getStream(self):
+        return self._stream
+
+    stream = property(_getStream)
+
+
+
+
+
 
 
 
@@ -558,6 +613,8 @@ class Converter(object):
             self._converter = ConverterTinyNotation()
         elif format == 'abc':
             self._converter = ConverterABC()
+        elif format == 'musedata':
+            self._converter = ConverterMuseData()
         else:
             raise ConverterException('no such format: %s' % format)
 
@@ -595,6 +652,8 @@ class Converter(object):
             elif dataStr.startswith('tinynotation:'):
                 format = 'tinyNotation'
             # assume must define a meter and a key
+            elif 'WK#:' in dataStr and 'measure' in dataStr:
+                format = 'musedata'
             elif 'M:' in dataStr and 'K:' in dataStr:
                 format = 'abc'
             else:
@@ -1279,6 +1338,24 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testConversionMusedata(self):
+        
+        from music21.musedata import testFiles
+        from music21 import corpus
+        from music21 import stream
+
+        cmd = ConverterMuseData()
+        cmd.parseData(testFiles.bach_cantata5_mvmt3)
+        s = cmd.stream
+        #s.show()
+
+        # test data id
+        s = parse(testFiles.bach_cantata5_mvmt3)
+        self.assertEqual(s.metadata.title, 'Wo soll ich fliehen hin')
+        self.assertEqual(len(s.parts), 3)
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, Converter, ConverterMusicXML, ConverterHumdrum]
@@ -1299,3 +1376,4 @@ if __name__ == "__main__":
         #t.testConversionMXRepeats()
 
         t.testConversionABCOpus()
+        t.testConversionMusedata()
