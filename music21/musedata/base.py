@@ -199,7 +199,7 @@ class MuseDataRecord(object):
         >>> mdr = music21.musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> p = mdr.getPitchObject()
         >>> p.nameWithOctave
-        'E4'
+        'E-4'
         >>> mdr = music21.musedata.MuseDataRecord('F#4    1        s #   d  ==')
         >>> p = mdr.getPitchObject()
         >>> p.nameWithOctave
@@ -211,7 +211,15 @@ class MuseDataRecord(object):
         p = pitch.Pitch(self._getPitchParameters())
         # bypass using property, as that sets pitch space value as needing
         # update, and pitch space value should be correct
-        p._accidental = self._getAccidentalObject()
+        acc = self._getAccidentalObject()
+        # only set if not None, as otherwise default accidental will already
+        # be created
+        if p.accidental is not None:
+            # set display to hidden, as explicit display accidentals are given 
+            # with an acc parameter
+            p.accidental.displayStatus = False
+        if acc is not None:
+            p._accidental = self._getAccidentalObject()
         return p
 
 
