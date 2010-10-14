@@ -33,7 +33,8 @@ fileExtensions = {
     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
     'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
-    'musedata' : {'input': ['md', 'musedata'], 'output': 'md'},
+    # note that all .zip files will be assumed to be musedata
+    'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
     'lilypond' : {'input': ['ly', 'lily', 'lily.png', 'lily.pdf', 'lilypond.png', 'lilypong.pdf'], 'output': 'ly'},
     'finale' : {'input': ['mus'], 'output': 'mus'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},
@@ -118,6 +119,10 @@ def findFormat(fmt):
     ('midi', '.mid')
     >>> findFormat('abc')
     ('abc', '.abc')
+    >>> findFormat('md')
+    ('musedata', '.md')
+    >>> findFormat('zip')
+    ('musedata', '.md')
     '''
     for key in fileExtensions.keys():
         if fmt.startswith('.'):

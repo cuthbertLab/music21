@@ -50,7 +50,6 @@ from music21 import tinyNotation
 
 from music21.abc import base as abcModule
 from music21.abc import translate as abcTranslate
-
 from music21.musedata import base as musedataModule
 from music21.musedata import translate as musedataTranslate
 
@@ -77,18 +76,19 @@ class ConverterFileException(Exception):
 class ArchiveFilter(object):
     '''Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive.
     '''
-
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
 
-    def __init__(self, fp, format='zip'):
+    def __init__(self, fp, archiveType='zip'):
+        '''Only archive type supported now is zip. 
+        '''
         self.fp = fp
-        self.format = format
+        self.archiveType = archiveType
 
     def isArchive(self):
-        '''Return True or False if the filepath is an archive of the supplied format.
+        '''Return True or False if the filepath is an archive of the supplied archiveType.
         '''
-        if self.format == 'zip':
+        if self.archiveType == 'zip':
             if self.fp.endswith('mxl'):
                 # try to open it, as some mxl files are not zips
                 try:
@@ -96,17 +96,29 @@ class ArchiveFilter(object):
                 except zipfile.BadZipfile:
                     return False
                 return True
-            if self.fp.endswith('zip'):
+            elif self.fp.endswith('zip'):
                 return True
         else:
-            raise ArchiveFilterException('no support for format: %s' % self.format)
+            raise ArchiveFilterException('no support for archiveType: %s' % self.archiveType)
         return False
 
 
-    def getData(self, name=None, format='musicxml'):
+    def getNames(self):
+        '''Return a list of all names contained in this archive. 
+        '''
+        post = []
+        if self.archiveType == 'zip':
+            f = zipfile.ZipFile(self.fp, 'r')
+            for subFp in f.namelist():
+                post.append(subFp)
+            f.close()
+        return post
+
+
+    def getData(self, name=None, format='musicxml' ):
         '''Return data from the archive by name. If no name is given, a default may be available. 
         '''
-        if self.format == 'zip':
+        if self.archiveType == 'zip':
             f = zipfile.ZipFile(self.fp, 'r')
             if name == None and format == 'musicxml': # try to auto-harvest
                 # will return data as a string
@@ -124,12 +136,9 @@ class ArchiveFilter(object):
 
             elif name == None and format == 'musedata': 
                 pass
-
-        # here, we might look specifically at the META-INF data structure
-        elif self.foramt == 'mxl':
-            pass
+            f.close()
         else:
-            raise ArchiveFilterException('no support for format: %s' % self.format)
+            raise ArchiveFilterException('no support for extension: %s' % self.archiveType)
 
 #-------------------------------------------------------------------------------
 class PickleFilter(object):
@@ -1364,6 +1373,32 @@ class Test(unittest.TestCase):
 
 
 
+    def testMixedArchiveHandling(self):
+        '''Test getting data out of musedata or musicxml zip files.
+        '''
+        fp = os.path.join(common.getSourceFilePath(), 'musicxml', 'testMxl.mxl')
+        af = ArchiveFilter(fp)
+        # for now, only support zip
+        self.assertEqual(af.archiveType, 'zip')
+        self.assertEqual(af.isArchive(), True)
+        # if this is a musicxml file, there will only be single file; we
+        # can cal get datat to get this 
+        post = af.getData()
+        self.assertEqual(post[:38], '<?xml version="1.0" encoding="UTF-8"?>')
+        self.assertEqual(af.getNames(), ['musicXML.xml', 'META-INF/', 'META-INF/container.xml'])
+
+        # test from a file that ends in zip
+        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        af = ArchiveFilter(fp)
+        # for now, only support zip
+        self.assertEqual(af.archiveType, 'zip')
+        self.assertEqual(af.isArchive(), True)
+        self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
+
+        # use a MuseDataDirectory object to figure out what files to use
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, Converter, ConverterMusicXML, ConverterHumdrum]
@@ -1383,5 +1418,7 @@ if __name__ == "__main__":
         #t.testConversionMXInstrument()
         #t.testConversionMXRepeats()
 
-        t.testConversionABCOpus()
-        t.testConversionMusedata()
+        #t.testConversionABCOpus()
+        #t.testConversionMusedata()
+
+        t.testMixedArchiveHandling()

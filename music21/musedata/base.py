@@ -948,8 +948,6 @@ class MuseDataWork(object):
             mdf.readstr(str) # process string and break into parts
             self.files.append(mdf)
 
-    
-
 
     #---------------------------------------------------------------------------
     def getParts(self):
@@ -964,6 +962,24 @@ class MuseDataWork(object):
         return post
                 
             
+
+
+
+#-------------------------------------------------------------------------------
+class MuseDataDirectory(object):
+    '''This class manages finding musedata files stored in a directory, comparing file names and examining sub directories to determine which files are parts.
+
+    Once found, a MuseDataWork, or a list of paths, can be returned
+
+    A directory, or a list of file path stubs, such as that obtained within a zip file, can both be provided
+    '''
+    def __init__(self, dirOrList):
+        self.paths = []
+
+        if common.isListLike(dirOrList):
+            self.paths = dirOrList  
+        elif os.isdir(dirOrList):
+            self.paths = []
 
 
 
