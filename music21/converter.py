@@ -103,12 +103,12 @@ class ArchiveFilter(object):
         return False
 
 
-    def getData(self, name=None):
+    def getData(self, name=None, format='musicxml'):
         '''Return data from the archive by name. If no name is given, a default may be available. 
         '''
         if self.format == 'zip':
             f = zipfile.ZipFile(self.fp, 'r')
-            if name == None: # try to auto-harvest
+            if name == None and format == 'musicxml': # try to auto-harvest
                 # will return data as a string
                 # note that we need to read the META-INF/container.xml file
                 # and get the rootfile full-path
@@ -121,14 +121,17 @@ class ArchiveFilter(object):
                         continue
                     if subFp.endswith('.xml'):
                         return f.read(subFp)
+
+            elif name == None and format == 'musedata': 
+                pass
+
         # here, we might look specifically at the META-INF data structure
         elif self.foramt == 'mxl':
             pass
         else:
             raise ArchiveFilterException('no support for format: %s' % self.format)
 
-
-
+#-------------------------------------------------------------------------------
 class PickleFilter(object):
     '''Before opening a file path, this class can check if there is an up 
     to date version pickled and stored in the scratch directory. 
@@ -629,8 +632,13 @@ class Converter(object):
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):
             raise ConverterFileException('no such file eists: %s' % fp)
-        # TODO: no extension matching for tinyNotation
-        format = common.findFormatFile(fp) 
+
+        # if the file path is to a directory, assume it is a collection of 
+        # musedata parts
+        if os.path.isdir(fp):
+            format = 'musedata'
+        else:
+            format = common.findFormatFile(fp) 
         self._setConverter(format, forceSource=forceSource)
         self._converter.parseFile(fp, number=number)
 
