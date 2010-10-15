@@ -982,6 +982,19 @@ class MuseDataDirectory(object):
             self.paths = []
 
 
+    def isMusedataFile(self, fp):
+        # look for file extension; not often used
+        # cannot open file and look, as names from a zip archive are note
+        # directly openable
+        if fp.endswith('.md'):
+            return True
+        # directories from a zip will end in '/', or os.sep
+        elif (fp.endswith('.py') or fp.endswith('/') or 
+            fp.endswith(os.sep)  or fp.startswith('.')):
+            return False
+        return True
+        
+
 
 
 #-------------------------------------------------------------------------------
@@ -1025,16 +1038,14 @@ class Test(unittest.TestCase):
         import os
         from music21.musedata import testFiles
 
-        dir = common.getPackageDir(relative=False, remapSep=os.sep)
-        for fp in dir:
-            if fp.endswith('musedata'):
-                break
+
+        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive')
+
 
         mdw = MuseDataWork()
 
-        dirLib = os.path.join(fp, 'testPrimitive')
-        for fn in ['test-1b.md', 'test-1c.md', 'test-1d.md', 
-                   'test-1e.md', 'test-1f.md']:
+        dirLib = os.path.join(fp, 'test01')
+        for fn in ['01.md', '02.md', '03.md', '04.md', '05.md']:
             fp = os.path.join(dirLib, fn)
             environLocal.printDebug([fp])
 

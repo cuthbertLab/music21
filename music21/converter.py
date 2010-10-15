@@ -135,6 +135,9 @@ class ArchiveFilter(object):
                         return f.read(subFp)
 
             elif name == None and format == 'musedata': 
+                # this might concatenate all parts into a single string
+                # or, return a list of strings
+                # alternative, a different method might return one at a time
                 pass
             f.close()
         else:
