@@ -86,7 +86,9 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         m = stream.Measure()
         if barCount == 0: # only for first
             # the parent of the measure is the part
-            m.clef = mdm.parent.getClefObject()
+            c = mdm.parent.getClefObject()
+            if c != None:
+                m.clef = mdm.parent.getClefObject()
             m.timeSignature = mdm.parent.getTimeSignatureObject()
             m.keySignature = mdm.parent.getKeySignature()
 
@@ -199,6 +201,7 @@ class Test(unittest.TestCase):
         mdw.addString(testFiles.bach_cantata5_mvmt3)
         
         s = museDataWorkToStreamScore(mdw)
+        #post = s.musicxml
         
         #s.show()
         self.assertEqual(len(s.parts), 3)
@@ -210,6 +213,19 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.notes), 1062)
         self.assertEqual(len(s.parts[1].flat.notes), 596)
         self.assertEqual(len(s.parts[2].flat.notes), 626)
+
+
+        # try stage 1
+        mdw = musedata.MuseDataWork()
+        mdw.addString(testFiles.bachContrapunctus1_part1)
+        mdw.addString(testFiles.bachContrapunctus1_part2)
+
+        s = museDataWorkToStreamScore(mdw)
+        self.assertEqual(len(s.parts[0].flat.notes), 291)
+        self.assertEqual(len(s.parts[1].flat.notes), 293)
+
+        post = s.musicxml
+      
 
 
 

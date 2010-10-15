@@ -89,7 +89,8 @@ class ArchiveManager(object):
         '''Return True or False if the filepath is an archive of the supplied archiveType.
         '''
         if self.archiveType == 'zip':
-            if self.fp.endswith('mxl'):
+            # some .md files can be zipped
+            if self.fp.endswith('mxl') or self.fp.endswith('md'):
                 # try to open it, as some mxl files are not zips
                 try:
                     f = zipfile.ZipFile(self.fp, 'r')
@@ -601,13 +602,15 @@ class ConverterMuseData(object):
         '''
         mdw = musedataModule.MuseDataWork()
 
+        af = ArchiveManager(fp)
+
+        #environLocal.printDebug(['ConverterMuseData: parseFile', fp, af.isArchive()])
         # for dealing with one or more files
-        if fp.endswith('.zip'):
-            environLocal.printDebug(['ConverterMuseData', fp])
-            af = ArchiveManager(fp)
+        if fp.endswith('.zip') or af.isArchive():
+            #environLocal.printDebug(['ConverterMuseData: found archive', fp])
             # get data will return all data from the zip as a single string
             for partStr in af.getData(format='musedata'):
-                environLocal.printDebug(['partStr'])
+                #environLocal.printDebug(['partStr', partStr])
                 mdw.addString(partStr)            
         else:
             if os.path.isdir(fp):
@@ -1409,6 +1412,12 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts), 3)
 
 
+        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        s = parse(fp)
+        self.assertEqual(len(s.parts), 4)
+        #s.show()
+
+
 
     def testMixedArchiveHandling(self):
         '''Test getting data out of musedata or musicxml zip files.
@@ -1474,6 +1483,6 @@ if __name__ == "__main__":
         #t.testConversionMXRepeats()
 
         #t.testConversionABCOpus()
-        #t.testConversionMusedata()
+        t.testConversionMusedata()
 
         t.testMixedArchiveHandling()
