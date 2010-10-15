@@ -59,7 +59,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class ArchiveFilterException(Exception):
+class ArchiveManagerException(Exception):
     pass
 
 class PickleFilterException(Exception):
@@ -73,7 +73,7 @@ class ConverterFileException(Exception):
 
 
 #-------------------------------------------------------------------------------
-class ArchiveFilter(object):
+class ArchiveManager(object):
     '''Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive.
     '''
     # for info on mxl files, see
@@ -99,7 +99,7 @@ class ArchiveFilter(object):
             elif self.fp.endswith('zip'):
                 return True
         else:
-            raise ArchiveFilterException('no support for archiveType: %s' % self.archiveType)
+            raise ArchiveManagerException('no support for archiveType: %s' % self.archiveType)
         return False
 
 
@@ -117,6 +117,8 @@ class ArchiveFilter(object):
 
     def getData(self, name=None, format='musicxml' ):
         '''Return data from the archive by name. If no name is given, a default may be available. 
+
+        For 'musedata' format this will be a list of strings. For 'musicxml' this will be a single string. 
         '''
         if self.archiveType == 'zip':
             f = zipfile.ZipFile(self.fp, 'r')
@@ -132,16 +134,34 @@ class ArchiveFilter(object):
                     if 'META-INF' in subFp: 
                         continue
                     if subFp.endswith('.xml'):
-                        return f.read(subFp)
+                        post = f.read(subFp)
+                        break
 
             elif name == None and format == 'musedata': 
                 # this might concatenate all parts into a single string
                 # or, return a list of strings
                 # alternative, a different method might return one at a time
-                pass
+                mdd = musedataModule.MuseDataDirectory(f.namelist())
+                environLocal.printDebug(['mdd object, namelist', mdd, f.namelist])
+
+                post = []
+                for subFp in mdd.getPaths():
+                    component = f.open(subFp, 'rU')
+                    post.append(''.join(component.readlines()))    
+                    
+                    # note: the following methods do not properly employ
+                    # universal new lines; this is a python problem:
+                    # http://bugs.python.org/issue6759
+                    #post.append(component.read())    
+                    #post.append(f.read(subFp, 'U'))    
+                    #msg.append('\n/END\n')
+    
             f.close()
         else:
-            raise ArchiveFilterException('no support for extension: %s' % self.archiveType)
+            raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
+
+        return post
+
 
 #-------------------------------------------------------------------------------
 class PickleFilter(object):
@@ -434,7 +454,7 @@ class ConverterMusicXML(object):
             environLocal.printDebug(['opening musicxml file:', fpDst])
 
             # here, we can see if this is a mxl or similar archive
-            arch = ArchiveFilter(fpDst)
+            arch = ArchiveManager(fpDst)
             if arch.isArchive():
                 c.read(arch.getData())
             else: # its a file path
@@ -579,15 +599,29 @@ class ConverterMuseData(object):
     def parseFile(self, fp, number=None):
         '''
         '''
-        if not common.isListLike(fp):
-            fpList = [fp]
-        else:
-            fpList = fp
-
         mdw = musedataModule.MuseDataWork()
 
-        for fp in fpList:
-            mdw.addFile(fp)
+        # for dealing with one or more files
+        if fp.endswith('.zip'):
+            environLocal.printDebug(['ConverterMuseData', fp])
+            af = ArchiveManager(fp)
+            # get data will return all data from the zip as a single string
+            for partStr in af.getData(format='musedata'):
+                environLocal.printDebug(['partStr'])
+                mdw.addString(partStr)            
+        else:
+            if os.path.isdir(fp):
+                mdd = musedataModule.MuseDataDirectory(fp)
+                fpList = mdd.getPaths()
+            elif not common.isListLike(fp):
+                fpList = [fp]            
+            else:
+                fpList = fp
+
+            for fp in fpList:
+                mdw.addFile(fp)
+
+        environLocal.printDebug(['ConverterMuseData: mdw file count', len(mdw.files)])
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self._stream)
 
@@ -1380,7 +1414,7 @@ class Test(unittest.TestCase):
         '''Test getting data out of musedata or musicxml zip files.
         '''
         fp = os.path.join(common.getSourceFilePath(), 'musicxml', 'testMxl.mxl')
-        af = ArchiveFilter(fp)
+        af = ArchiveManager(fp)
         # for now, only support zip
         self.assertEqual(af.archiveType, 'zip')
         self.assertEqual(af.isArchive(), True)
@@ -1391,16 +1425,34 @@ class Test(unittest.TestCase):
         self.assertEqual(af.getNames(), ['musicXML.xml', 'META-INF/', 'META-INF/container.xml'])
 
         # test from a file that ends in zip
+        # note: this is a stage1 file!
         fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
-        af = ArchiveFilter(fp)
+        af = ArchiveManager(fp)
         # for now, only support zip
         self.assertEqual(af.archiveType, 'zip')
         self.assertEqual(af.isArchive(), True)
         self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
 
-        # use a MuseDataDirectory object to figure out what files to use
+        # returns a list of strings
+        self.assertEqual(af.getData(format='musedata')[0][:30], '378\n1080  1\nBach Gesells\nchaft')
 
 
+        #mdw = musedataModule.MuseDataWork()
+        # can add a list of strings from getData
+        #mdw.addString(af.getData(format='musedata'))
+        #self.assertEqual(len(mdw.files), 4)
+# 
+#         mdpList = mdw.getParts()
+#         self.assertEqual(len(mdpList), 4)
+
+        # try to load parse the zip file
+        #s = parse(fp)
+
+        # test loading a directory
+        fp = os.path.join(common.getSourceFilePath(), 'musedata',
+                'testPrimitive', 'test01')
+        cmd = ConverterMuseData()
+        cmd.parseFile(fp)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

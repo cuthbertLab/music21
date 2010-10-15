@@ -22,6 +22,7 @@ Low level MuseData conversion is facilitated by the objects in this module and :
 import music21
 import unittest
 import re, codecs
+import os
 
 try:
     import StringIO # python 2 
@@ -882,9 +883,12 @@ class MuseDataFile(object):
         commentToggle = False
 
         lines = []
-        for line in str.split('\n'):
-            # each part, or the entire file, will end with /END
+        srcLines = str.split('\n')
+        lastLineIndex = len(srcLines) - 1
+        for i, line in enumerate(srcLines):
+            #environLocal.printDebug(['reading line', i, line])
 
+            # each part, or the entire file, will end with /END
             if line.startswith('&'): 
                 if commentToggle:
                     commentToggle = False
@@ -897,13 +901,16 @@ class MuseDataFile(object):
                 continue # skip block comment lines 
             elif len(line) > 0 and line[0] == '@':
                 continue
-            elif line.startswith('/END'):
+            # some files do not use the back slash, and just have END
+            elif line.startswith('/END') or line.startswith('END'):
+                environLocal.printDebug(['found last line', i, repr(line), 'length of lines', len(lines)])
+                
                 mdp = MuseDataPart(lines)
                 # update sets measure boundaries, divisions
                 mdp.update()
                 self.parts.append(mdp)
                 lines = [] # clear storage
-            # mostly redundant; seems to follow /END
+            # mostly redundant; seems to follow /END; do not include
             elif line.startswith('/eof'):
                 pass
             else: # gather all else
@@ -925,6 +932,9 @@ class MuseDataWork(object):
         '''
         if not common.isListLike(fp):
             fpList = [fp]
+        else:
+            fpList = fp
+
         for fp in fpList:
             mdf = MuseDataFile()
             mdf.open(fp)
@@ -943,6 +953,8 @@ class MuseDataWork(object):
         '''
         if not common.isListLike(str):
             strList = [str]
+        else:
+            strList = str
         for str in strList:
             mdf = MuseDataFile()
             mdf.readstr(str) # process string and break into parts
@@ -975,12 +987,46 @@ class MuseDataDirectory(object):
     '''
     def __init__(self, dirOrList):
         self.paths = []
+        self.groups = {} # use fp as key; store 'number'
 
+        self._perpareGroups(dirOrList)
+
+    def _perpareGroups(self, dirOrList):
         if common.isListLike(dirOrList):
-            self.paths = dirOrList  
-        elif os.isdir(dirOrList):
-            self.paths = []
+            # assume a flat list from a zip file
+            sep = '/' # sep is always backslash
+            for fp in dirOrList:
+                if self.isMusedataFile(fp):
+                    self.paths.append(fp)
+        elif os.path.isdir(dirOrList):
+            sep = os.sep # sep os.sep
+            # first, get the contents of the dir and see if it has md files
+            for fn in os.listdir(dirOrList):
+                numStr, nonNumStr = common.getNumFromStr(fn)
+                if numStr == '' and not self.isMusedataFile(fn):
+                    continue
+                else:
+                    self.paths.append(os.path.join(dirOrList, fn))
 
+            #rawPaths = []
+#             for dirpath, dirnames, filenames in os.walk(dirOrList):
+#                 stub, dirName = os.path.split(dirpath)
+#                 if dirName.startswith('.'): 
+#                     continue
+#                 for fn in filenames:
+#                     if self.isMusedataFile(fn):
+#                         rawPaths.append(os.path.join(dirpath, fn))
+            #stub, base = os.split(dirOrList)
+            # see if top level is directory
+            #environLocal.printDebug(['here', rawPaths])
+
+        else:
+            raise MuseDataException('cannot get files from the following entity', dirOrList)
+
+        # after gathering paths, may need to sort/get by groups
+        self.paths.sort()
+
+        environLocal.printDebug(['self.paths', self.paths])
 
     def isMusedataFile(self, fp):
         # look for file extension; not often used
@@ -990,10 +1036,17 @@ class MuseDataDirectory(object):
             return True
         # directories from a zip will end in '/', or os.sep
         elif (fp.endswith('.py') or fp.endswith('/') or 
-            fp.endswith(os.sep)  or fp.startswith('.')):
+            fp.endswith(os.sep)  or fp.startswith('.') or
+            fp.endswith('.svn-base')):
             return False
         return True
         
+    def getPaths(self, group=None):
+        '''Return sorted paths for a group, or None
+        '''
+        environLocal.printDebug(['getPaths() called with self.paths', self.paths])
+
+        return self.paths
 
 
 
@@ -1133,6 +1186,23 @@ class Test(unittest.TestCase):
 
        
 
+    def testMuseDataDirectory(self):
+
+        from music21 import converter
+
+        #fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+    
+
+        fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
+
+        mdd = MuseDataDirectory(fpDir)
+
+        # from archive: note: this is a stage 1 file 
+        fpArchive = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        af = converter.ArchiveManager(fpArchive)
+        mdd = MuseDataDirectory(af.getNames())
+
+
 
 
 if __name__ == "__main__":
@@ -1145,7 +1215,7 @@ if __name__ == "__main__":
 
         #t.testNoteParse()
 
-
+        t.testMuseDataDirectory()
 
 
 
