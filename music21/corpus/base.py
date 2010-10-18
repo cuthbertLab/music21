@@ -44,6 +44,9 @@ from music21.corpus import essenFolksong
 from music21.corpus import ciconia
 from music21.corpus import josquin
 
+from music21.corpus import handel
+from music21.corpus.handel import hwv56  
+
 from music21.corpus import haydn
 from music21.corpus.haydn import opus74no1  
 from music21.corpus.haydn import opus74no2  
@@ -74,6 +77,9 @@ MODULES = [
             ciconia,
             josquin,
             essenFolksong,
+
+            handel,
+            hwv56,
 
             haydn,
             opus74no1,
@@ -108,6 +114,7 @@ COMPOSERS = [
     ('beethoven', 'Ludwig van Beethoven'),
     ('ciconia', 'Johannes Ciconia'),
     ('haydn', 'Joseph Haydn'),
+    ('handel', 'George Frideric Handel'),
     ('mozart', 'Wolfgang Amadeus Mozart'),
     ('schoenberg', 'Arnold Schoenberg'),
     ('schumann', 'Robert Schumann'),
@@ -127,13 +134,9 @@ for name in dir(virtual): # look over virtual module
             VIRTUAL.append(obj)
 
 
-
-
 #-------------------------------------------------------------------------------
 class CorpusException(Exception):
     pass
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -161,6 +164,7 @@ def getPaths(extList=None):
         extList = (common.findInputExtension('abc') +
                    common.findInputExtension('lily') +
                    common.findInputExtension('musicxml') +
+                   common.findInputExtension('musedata') +
                    common.findInputExtension('humdrum'))
     #environLocal.printDebug(['getting paths with extensions:', extList])
     paths = []    
@@ -590,6 +594,7 @@ beethoven = getComposer('beethoven')
 josquin = getComposer('josquin')
 mozart = getComposer('mozart')
 haydn = getComposer('haydn')
+handel = getComposer('handel')
 bach = getComposer('bach')
 
 # additional libraries to define
@@ -729,6 +734,16 @@ class Test(unittest.TestCase):
 
         fpCollection = getComposer('josquin', ['abc'])
         self.assertEqual(len(fpCollection) >= 8, True)
+
+
+    def testHandelImport(self):
+
+        # can get a single file just by file name        
+        fp = getWork('hwv56/movement1-01')# 
+        fpCollection = getComposer('handel')
+        self.assertEqual(len(fpCollection) >= 1, True)
+        fpCollection = getComposer('handel', ['md'])
+        self.assertEqual(len(fpCollection) >= 1, True)
 
 
     def testSearch(self):
