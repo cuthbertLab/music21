@@ -29,9 +29,8 @@ class BarException(Exception):
     pass
 
 
-# store alternative names for styles
-# derived from musicxml    
-
+# store alternative names for styles; use this dictionary for translation
+# reference
 barStyleDict = {
     'regular': [], 
     'dotted': [], 
@@ -48,7 +47,7 @@ barStyleDict = {
 
 
 def styleToBarStyle(value):
-    '''Convert a bar style into a standard form
+    '''Convert a bar style into a standard form.
 
     >>> styleToBarStyle('regular')
     'regular'

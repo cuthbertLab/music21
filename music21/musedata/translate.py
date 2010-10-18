@@ -80,10 +80,26 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
 
     barCount = 0
-    for mdm in mdmObjs:
+    for mIndex, mdm in enumerate(mdmObjs):
         #environLocal.printDebug(['processing:', mdm.src])
+        if not mdm.hasNotes():
+            continue
 
-        m = stream.Measure()
+        #m = stream.Measure()
+        # get a measure object with a left configured bar line
+        if mIndex <= len(mdmObjs) - 2:
+            mdmNext = mdmObjs[mIndex+1]
+        else:
+            mdmNext = None
+
+        m = mdm.getMeasureObject()
+
+        # conditions for a final measure definition defining the last bar
+        if mdmNext != None and not mdmNext.hasNotes():
+            environLocal.printDebug(['got mdmNext not none and not has notes'])
+            # get bar from next measure definition
+            m.rightBarline = mdmNext.getBarObject()
+
         if barCount == 0: # only for first
             # the parent of the measure is the part
             c = mdm.parent.getClefObject()
@@ -203,7 +219,7 @@ class Test(unittest.TestCase):
         s = museDataWorkToStreamScore(mdw)
         #post = s.musicxml
         
-        #s.show()
+        s.show()
         self.assertEqual(len(s.parts), 3)
 
         self.assertEqual(s.parts[0].id, 'Viola Solo')

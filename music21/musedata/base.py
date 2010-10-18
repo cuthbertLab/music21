@@ -334,6 +334,77 @@ class MuseDataMeasure(object):
         return '<music21.musedata.MuseDataPart size=%s>' % (len(self.src))
 
 
+    def getBarObject(self):
+        '''Return a configured music21 bar object. This can be used with the current Measure or applied to a previous Measure.
+        '''
+        # get bar objects
+        from music21 import bar
+
+        data = self.src[0].strip() # get first line
+        # not all measure first-lines begin w/ measures, such as pickups
+        if data[0] != 'm': # a normal data record
+            data = 'measure'
+
+        dataBar = data[1:7]
+        #environLocal.printDebug(['getBarObject: dataBar', dataBar])
+        if dataBar == 'easure': # regular
+            blStyle = 'regular'
+        elif dataBar == 'dotted': 
+            blStyle = 'dotted'
+        elif dataBar == 'double': 
+            blStyle = 'light-light'
+        elif dataBar == 'heavy1': 
+            blStyle = 'heavy'
+        elif dataBar == 'heavy2': 
+            blStyle = 'light-heavy'
+        elif dataBar == 'heavy3': 
+            blStyle = 'heavy-light'
+        elif dataBar == 'heavy4': 
+            blStyle = 'heavy-heavy'
+        else:
+            raise MuseDataException('cannot process bar data definition: %s', dataBar)
+
+        bl = bar.Barline(blStyle)
+
+        # numerous flags might be stored at the end of line
+        # some flags include A for segno, ~ for wavy line continuation
+        if len(data) > 16 and data[16:].strip() != '':
+            dataFlag = data[16:].strip()
+            if ':|' in dataFlag:
+                repeatForm = None # can be first, second
+                bl = bar.Repeat(blStyle, direction='end')
+            elif '|:' in dataFlag:   
+                repeatForm = None # can be first, second
+                bl = bar.Repeat(blStyle, direction='start')       
+        return bl
+
+
+    def getMeasureObject(self):
+        '''Return a configured music21 object.
+        '''
+        from music21 import stream
+
+        data = self.src[0].strip() # get first line
+        # not all measure first-lines begin w/ measures, such as pickups
+        if data[0] != 'm': # a normal data record
+            data = 'measure'
+
+        # see if there is a measure number
+        mNumber = ''
+        if len(data) > 11 and data[8:12].strip() != '':
+            mNumber = data[8:12].strip()
+
+        m = stream.Measure()
+        # assume that this definition refers to this bar; this is not 
+        # always the case
+        m.leftBarline = self.getBarObject()
+        #m.rightBarline = None
+
+        if mNumber != '':
+            m.number = mNumber
+
+        return m
+
     def hasNotes(self):
         '''Return True of if this Measure return Notes
         '''

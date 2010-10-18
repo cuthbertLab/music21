@@ -83,7 +83,6 @@ def abcToStreamPart(abcHandler, inputM21=None):
                 bRight = mh.rightBarToken.getBarObject()
                 if bRight != None:
                     dst.rightBarline = bRight
-
             barCount += 1
 
         else:
