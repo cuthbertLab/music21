@@ -166,7 +166,11 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         p.append(m)
         barCount += 1
 
-    # for now, make beams rather than importing
+    if museDataPart.stage == 1:
+        # cannot yet get stage 1 clef data
+        p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
+    # for now, make beams rather than importing; this will be needed from
+    # stage 2
     p.makeBeams()
 
     s.insert(0, p)

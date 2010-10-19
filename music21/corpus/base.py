@@ -64,7 +64,9 @@ from music21.corpus import schumann
 from music21.corpus.schumann import opus41no1
 
 from music21.corpus import luca
+
 from music21.corpus import bach
+from music21.corpus.bach import bwv1080
 
 
 MODULES = [
@@ -98,7 +100,9 @@ MODULES = [
             opus41no1,
 
             luca,
+
             bach,
+            bwv1080,
     ]
 
 
@@ -140,9 +144,11 @@ class CorpusException(Exception):
 
 
 #-------------------------------------------------------------------------------
-def getPaths(extList=None):    
+def getPaths(extList=None, expandExtensions=True):    
     '''Get all paths in the corpus that match a known extension, or an extenion
     provided by an argument.
+
+    If `expandExtensions` is True, a format for an extension, and related extensions, will replaced by all known input extensions. This is convenient when an input format might match for multiple extensions.
 
     >>> a = getPaths()
     >>> len(a) > 30
@@ -166,6 +172,12 @@ def getPaths(extList=None):
                    common.findInputExtension('musicxml') +
                    common.findInputExtension('musedata') +
                    common.findInputExtension('humdrum'))
+    elif expandExtensions:
+        extMod = []
+        for e in extList:
+            extMod += common.findInputExtension(e)
+        extList = extMod
+        
     #environLocal.printDebug(['getting paths with extensions:', extList])
     paths = []    
     for moduleName in MODULES:
@@ -207,6 +219,7 @@ def getVirtualPaths(extList=None):
         extList = (common.findInputExtension('abc') +
                    common.findInputExtension('lily') +
                    common.findInputExtension('musicxml') +
+                   common.findInputExtension('musedata') +
                    common.findInputExtension('humdrum'))
     paths = []
     for obj in VIRTUAL:
@@ -349,6 +362,9 @@ def getWorkList(workName, movementNumber=None, extList=None):
     >>> len(getWorkList('handel/hwv56', (1,1), '.md'))
     1
 
+    >>> len(getWorkList('bach/bwv1080', 1, '.md'))
+    1
+
     '''
     if not common.isListLike(extList):
         extList = [extList]
@@ -370,23 +386,62 @@ def getWorkList(workName, movementNumber=None, extList=None):
         elif workSlashes.lower() in path.lower():
             post.append(path)
 
+    #environLocal.printDebug(['post', post])
 
     postMvt = []
     if movementNumber is not None and len(post) > 0:
         # store one ore more possible mappings of movement number
-        movementStrList = ['movement%s' % str(movementNumber)]
+        movementStrList = []
+
         # see if this is a pair
         if common.isListLike(movementNumber):
             movementStrList.append(''.join([str(x) for x in movementNumber]))
+            movementStrList.append('-'.join([str(x) for x in movementNumber]))
+            movementStrList.append('movement' + '-'.join([str(x) for x in movementNumber]))
+            movementStrList.append('movement' + '-0'.join([str(x) for x in movementNumber]))
+        else:
+            movementStrList += ['0%s' % str(movementNumber), 
+                           '%s' % str(movementNumber), 
+                           'movement%s' % str(movementNumber)]
+
+        #environLocal.printDebug(['movementStrList', movementStrList])
 
         for fp in post:
-            for movementStr in movementStrList:
-                if movementStr.lower() in fp.lower():
-                    postMvt.append(fp)
+            dir, fn = os.path.split(fp)
+            if '.' in fn:
+                fnNoExt = fn.split('.')[0]
+            else:
+                fnNoExt = None
+            
+            searchPartialMatch = True
+            if fnNoExt != None:
+                # look for direct matches first
+                for movementStr in movementStrList:
+                    #if movementStr.lower() in fp.lower():
+                    #environLocal.printDebug(['fnNoExt comparing', movementStr, fnNoExt])
+                    if fnNoExt.lower() == movementStr.lower():
+                        #environLocal.printDebug(['matched fnNoExt', fp])
+                        postMvt.append(fp)     
+                        searchPartialMatch = False           
+
+            # if we have one direct match, all other matches must 
+            # be direct. this will match multiple files with different 
+            # file extensions
+            if len(postMvt) > 0:
+                continue
+
+            if searchPartialMatch:
+                #environLocal.printDebug(['searching partial match'])
+                for movementStr in movementStrList:
+                    #if movementStr.lower() in fp.lower():
+                    if fn.startswith(movementStr.lower()):
+                        postMvt.append(fp)
         if len(postMvt) == 0:
             pass # return an empty list
     else:
         postMvt = post
+
+    #environLocal.printDebug(['postMvt', postMvt])
 
     postMvt.sort() # sort here, a shorter list
     if len(postMvt) == 0:
@@ -806,6 +861,27 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post) >= 9, True)
 
 
+
+    def testGetWorkList(self):
+        self.assertEqual(len(getPaths('.md')) >= 38, True)
+
+        self.assertEqual(len(getWorkList('bach/bwv1080', 1, '.zip')), 1)
+
+        self.assertEqual(len(getWorkList('handel/hwv56', (1,1), '.md')), 1)
+
+        self.assertEqual(len(getWorkList('handel/hwv56', '1-01', '.md')), 1)
+
+
+        self.assertEqual(len(getWorkList('bach/bwv1080')), 21)
+
+        self.assertEqual(len(getWorkList('bach/bwv1080', 1)), 1)
+
+
+        # there are two versions of this file        
+        self.assertEqual(len(getWorkList('beethoven/opus18no1', 1)), 2)
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parseWork, getWork]
@@ -823,4 +899,6 @@ if __name__ == "__main__":
 
         #t.testDesPrezImport()
 
-        t.testSearch()
+        #t.testSearch()
+
+        t.testGetWorkList()

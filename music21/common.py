@@ -143,6 +143,8 @@ def findInputExtension(fmt):
     >>> a = findInputExtension('humdrum')
     >>> a
     ['.krn']
+    >>> findInputExtension('musedata')
+    ['.md', '.musedata', '.zip']
     '''
     fmt = findFormat(fmt)[0]
     if fmt == None:
