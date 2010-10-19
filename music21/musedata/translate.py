@@ -30,6 +30,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
+
 def _musedataRecordListToNoteOrChord(records):
     '''Given a list of MuseDataRecord objects, return a configured
     Note or Chord
@@ -44,13 +45,21 @@ def _musedataRecordListToNoteOrChord(records):
         # directly assign pitch object; will already have accidental
         post.pitch = records[0].getPitchObject()
     else:
-        environLocal.printDebug(['attempting chord creation: records', len(records)])
+        #environLocal.printDebug(['attempting chord creation: records', len(records)])
         # can supply a lost of Pitch objects at creation
         post = chord.Chord([r.getPitchObject() for r in records])
 
     # if a chord, we are assume that all durations are the same
     post.quarterLength = records[0].getQuarterLength()
 
+    # see if there are nay lyrics; not sure what to do if lyrics are defined
+    # for multiple chord tones
+    lyricList = records[0].getLyrics()
+    if lyricList is not None:
+        # cyclicalling addLyric will auto increment lyric number assinged
+        for lyric in lyricList:
+            post.addLyric(lyric)
+ 
     # presently this sets a single tie for a chord; may be different cases
     if records[0].isTied():
         post.tie = tie.Tie() # can be start, end, continue
@@ -96,7 +105,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
         # conditions for a final measure definition defining the last bar
         if mdmNext != None and not mdmNext.hasNotes():
-            environLocal.printDebug(['got mdmNext not none and not has notes'])
+            #environLocal.printDebug(['got mdmNext not none and not has notes'])
             # get bar from next measure definition
             m.rightBarline = mdmNext.getBarObject()
 
@@ -252,6 +261,25 @@ class Test(unittest.TestCase):
 
 
 
+    def testGetLyrics(self):
+        
+        from music21 import musedata
+        from music21 import corpus
+
+        s = corpus.parseWork('hwv56', '1-08')
+        self.assertEqual(len(s.parts), 2)
+        self.assertEqual(s.parts[0].id, 'Contr\'alto')
+        self.assertEqual(s.parts[1].id, 'Bassi')
+
+        self.assertEqual(len(s.parts[0].flat.notes), 34)
+        self.assertEqual(len(s.parts[1].flat.notes), 9)
+
+        self.assertEqual(s.parts[0].flat.notes[2].lyric, 'Be-')
+        self.assertEqual(s.parts[0].flat.notes[3].lyric, 'hold,')
+
+        #s.show()
+
+
 if __name__ == "__main__":
     import sys
 
@@ -260,3 +288,4 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
+        t.testGetLyrics()

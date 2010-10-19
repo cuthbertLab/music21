@@ -343,6 +343,12 @@ def getWorkList(workName, movementNumber=None, extList=None):
     1
     >>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
     0
+
+    >>> len(getWorkList('handel/hwv56', '1-01', '.md'))
+    1
+    >>> len(getWorkList('handel/hwv56', (1,1), '.md'))
+    1
+
     '''
     if not common.isListLike(extList):
         extList = [extList]
@@ -353,19 +359,26 @@ def getWorkList(workName, movementNumber=None, extList=None):
     # permit workName to be a list of paths/branches
     if common.isListLike(workName):
         workName = os.path.sep.join(workName)
+
     # replace with os-dependent separators 
     workSlashes = workName.replace('/', os.path.sep)
 
+    # find all matches for the work name
     for path in paths:
         if workName.lower() in path.lower():
             post.append(path)
         elif workSlashes.lower() in path.lower():
             post.append(path)
 
-    post.sort()
+
     postMvt = []
     if movementNumber is not None and len(post) > 0:
-        movementStrList = ['movement%s' % movementNumber]
+        # store one ore more possible mappings of movement number
+        movementStrList = ['movement%s' % str(movementNumber)]
+        # see if this is a pair
+        if common.isListLike(movementNumber):
+            movementStrList.append(''.join([str(x) for x in movementNumber]))
+
         for fp in post:
             for movementStr in movementStrList:
                 if movementStr.lower() in fp.lower():
@@ -375,6 +388,7 @@ def getWorkList(workName, movementNumber=None, extList=None):
     else:
         postMvt = post
 
+    postMvt.sort() # sort here, a shorter list
     if len(postMvt) == 0:
         return []
     else:

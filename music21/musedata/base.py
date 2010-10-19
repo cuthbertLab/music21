@@ -289,6 +289,31 @@ class MuseDataRecord(object):
             data = self.src[16]
             
         
+    def getLyrics(self):
+        '''Return lyrics as a list.
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('D4     2        e     u                    con-')
+        >>> mdr.stage = 2
+        >>> mdr.getLyrics()
+        ['con-']
+        '''
+        data = None
+        if self.stage == 1:
+            return None
+        else:   
+            #print self.src, len(self.src)
+            if len(self.src) < 44:
+                return None
+            raw = self.src[43:]
+            # | used to delimit multiple versus
+            data = [x.strip() for x in raw.split('|')]
+        return data
+
+            
+            
+            
+        
 
 #-------------------------------------------------------------------------------
 class MuseDataRecordIterator(object):
@@ -657,7 +682,7 @@ class MuseDataPart(object):
         if self.stage == 1:
             return None
         else:
-            return self.src[8]
+            return self.src[8].strip()
 
 
     def getGroupMemberships(self):
@@ -838,10 +863,20 @@ class MuseDataPart(object):
         '''
         line = self._getAttributesRecord()        
         if self.stage == 1:
-            return '%s/%s' % (line.split(' ')[4], line.split(' ')[5])
+            n = int(line.split(' ')[4])
+            d = int(line.split(' ')[5])
         else:
             # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
-            return self._getDigitsFollowingTag(line, 'T:')
+            n, d =  self._getDigitsFollowingTag(line, 'T:').split('/')
+            n, d = int(n), int(d)
+        # usage of 1/1 is common and seems to need replacement to 4/4, or 
+        # common time
+        if n == 1 and d == 1:
+            return '4/4'
+        else:
+            return '%s/%s' % (n, d)
+
+
 
     def getTimeSignatureObject(self):
         '''     
@@ -1165,7 +1200,7 @@ class MuseDataFile(object):
                 continue
             # stage 1 files use END, stage 2 uses /END
             elif line.startswith('/END') or line.startswith('END'):
-                environLocal.printDebug(['found last line', i, repr(line), 'length of lines', len(lines)])
+                #environLocal.printDebug(['found last line', i, repr(line), 'length of lines', len(lines)])
                 
                 mdp = MuseDataPart(lines)
                 # update sets measure boundaries, divisions
@@ -1483,6 +1518,24 @@ class Test(unittest.TestCase):
         self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
 
 
+    def testGetLyrics(self):
+
+        from music21 import musedata
+        mdr = musedata.MuseDataRecord('D4     2        e     u                    con-')
+        mdr.stage = 2
+        self.assertEquals(mdr.getLyrics(), ['con-'])
+
+        mdr = musedata.MuseDataRecord('F#4    2        e     u                    a')
+        mdr.stage = 2
+        self.assertEquals(mdr.getLyrics(), ['a'])
+
+
+        mdr = musedata.MuseDataRecord('F#4    2        e     u                    a | b')
+        mdr.stage = 2
+        self.assertEquals(mdr.getLyrics(), ['a', 'b'])
+
+
+
 
 if __name__ == "__main__":
     import sys
@@ -1494,8 +1547,8 @@ if __name__ == "__main__":
 
         #t.testNoteParse()
 
-        t.testMuseDataDirectory()
+        #t.testMuseDataDirectory()
 
-        t.testStage1Basic()
+        #t.testStage1Basic()
 
-
+        t.testGetLyrics()
