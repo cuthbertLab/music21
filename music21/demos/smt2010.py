@@ -172,8 +172,9 @@ def findHighestNotes(show=True, *arguments, **keywords):
         found.append(highestNote)
 
     if show:
-        print (ound.write('musicxml'))
-
+        print (found.write('musicxml'))
+    else:
+        mx = found.musicxml
 
 
 def ex1_revised(show=True, *arguments, **keywords):
@@ -249,10 +250,65 @@ def findPotentialPassingTones(show = True):
         g.parts['cantus'].show()
 
 
+def demoJesse(show=True):
+    luca = corpus.parseWork('luca/gloria')
+    for n in luca.measures(2, 20).flat.notes:
+        if n.isRest is False:
+            n.lyric = n.pitch.german
+    if show:   
+        luca.show()
+    else:
+        mx = luca.musicxml
+
+#-------------------------------------------------------------------------------
+# new examples
+
+
+def corpusSearch():
+
+    from music21 import corpus
+    from music21.analysis import discrete
+
+    parsedStream = {}
+
+    sa = discrete.SadoianAmbitus()
+
+    # Shanbei: region in northwestern china
+    # qitai: on the silk road
+    print
+    post = corpus.search('qitai', 'locale')
+    for fp, n in post:
+        print fp, n
+        if fp not in parsedStream.keys():
+            s = converter.parse(fp)
+            parsedStream[fp] = s
+        else:   
+            s = parsedStream[fp]
+
+        if n != None: # get from opus
+            s = s.getScoreByNumber(n)
+        
+        print sa.getPitchRanges(s)
+
+    print
+    post = corpus.search('hequ', 'locale')
+    for fp, n in post:
+        print fp, n
+        s = converter.parse(fp, number=n)
+        print sa.getPitchRanges(s)
+
+    print
+    post = corpus.search('suzhou', 'locale')
+    for fp, n in post:
+        print fp, n
+        s = converter.parse(fp, number=n)
+        print sa.getPitchRanges(s)
 
 
 
 
+
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -265,21 +321,23 @@ class Test(unittest.TestCase):
         # findPassingTones too
         #sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
         # ex03, ex01, ex02, ex04, ex01Alt, findHighestNotes,ex1_revised
-        for func in [findPotentialPassingTones]:
+        #for func in [findPotentialPassingTones]:
+        for func in [findHighestNotes, demoJesse]:
+
             pass
             #func(show=False, op133=sStream)
-            #func(show=False)
+            func(show=False)
 
-def demoJesse():
-    luca = corpus.parseWork('luca/gloria')
-    for n in luca.measures(2, 20).flat.notes:
-        if n.isRest is False:
-            n.lyric = n.pitch.german
-    luca.show()
 
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    import sys
 
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+
+    elif len(sys.argv) > 1:
+        t = Test()
+        corpusSearch()
 

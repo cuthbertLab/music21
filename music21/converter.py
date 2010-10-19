@@ -57,7 +57,6 @@ from music21 import environment
 _MOD = 'converter.py'
 environLocal = environment.Environment(_MOD)
 
-
 #-------------------------------------------------------------------------------
 class ArchiveManagerException(Exception):
     pass
@@ -678,6 +677,7 @@ class Converter(object):
     def parseFile(self, fp, number=None, forceSource=False):
         '''Given a file path, parse and store a music21 Stream.
         '''
+
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):
             raise ConverterFileException('no such file eists: %s' % fp)
@@ -691,7 +691,7 @@ class Converter(object):
         self._setConverter(format, forceSource=forceSource)
         self._converter.parseFile(fp, number=number)
 
-    def parseData(self, dataStr, number=None):
+    def parseData(self, dataStr, number=None, forceSource=False):
         '''Given raw data, determine format and parse into a music21 Stream.
         '''
         format = None

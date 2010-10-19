@@ -634,7 +634,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         if numColors == None:
             if self._referenceStream != None:
                 # get total range for entire piece
-                min, max = self._getPitchRanges(self._referenceStream)
+                min, max = self.getPitchRanges(self._referenceStream)
             else:
                 min, max = 0, 130 # a large default
         else: # create min max
@@ -694,7 +694,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         return int(min(psFound)), int(max(psFound))
 
     
-    def _getPitchRanges(self, subStream):
+    def getPitchRanges(self, subStream):
         '''For a given subStream, return the smallest difference between any two pitches and the largest difference between any two pitches. This is used to get the smallest and largest ambitus possible in a given work. 
 
         >>> from music21 import *
@@ -704,11 +704,11 @@ class SadoianAmbitus(DiscreteAnalysis):
         >>> s.append(c)
         >>> p.getPitchSpan(s)
         (45, 108)
-        >>> p._getPitchRanges(s)
+        >>> p.getPitchRanges(s)
         (26, 63)
 
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p._getPitchRanges(s)
+        >>> p.getPitchRanges(s)
         (0, 34)
         '''
         psFound = []

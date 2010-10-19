@@ -219,7 +219,7 @@ class Test(unittest.TestCase):
         s = museDataWorkToStreamScore(mdw)
         #post = s.musicxml
         
-        s.show()
+        #s.show()
         self.assertEqual(len(s.parts), 3)
 
         self.assertEqual(s.parts[0].id, 'Viola Solo')
