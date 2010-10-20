@@ -77,14 +77,15 @@ def _musedataBeamToBeams(beamSymbol):
     return beamsObj
 
 
-def _musedataRecordListToNoteOrChord(records):
+def _musedataRecordListToNoteOrChord(records, previousElement=None):
     '''Given a list of MuseDataRecord objects, return a configured
-    Note or Chord
+    Note or Chord.
+
+    Optionally pass a previous element, which may be music21 Note, Chord, or Rest; this is used to determine tie status
     '''
     from music21 import note
     from music21 import chord
     from music21 import tie
-
 
     if len(records) == 1:
         post = note.Note()
@@ -113,7 +114,17 @@ def _musedataRecordListToNoteOrChord(records):
  
     # presently this sets a single tie for a chord; may be different cases
     if records[0].isTied():
-        post.tie = tie.Tie() # can be start, end, continue
+        post.tie = tie.Tie('start') # can be start or continue;
+        if previousElement != None and previousElement.tie != None:
+            # if previous is a start or a continue; this has to be a continue
+            # as musedata does not mark the end of a tie
+            if previousElement.tie.type in ['start', 'continue']:
+                post.tie = tie.Tie('continue') 
+    else: # if no tie indication in the musedata record
+        if previousElement != None and previousElement.tie != None:
+            if previousElement.tie.type in ['start', 'continue']:
+                post.tie = tie.Tie('stop') # can be start, end, continue
+
     return post
 
 
@@ -140,6 +151,9 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
 
     barCount = 0
+    # get each measure
+    # store last Note/Chord/Rest for tie comparisons; span measures
+    eLast = None
     for mIndex, mdm in enumerate(mdmObjs):
         #environLocal.printDebug(['processing:', mdm.src])
         if not mdm.hasNotes():
@@ -173,7 +187,8 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         # store pairs of pitches and durations for chording after a
         # new note has been found
         pendingRecords = [] 
-        
+
+        # get notes in each record        
         for i in range(len(mdrObjs)):
             mdr = mdrObjs[i]
             #environLocal.printDebug(['processing:', mdr.src])
@@ -182,12 +197,16 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 #environLocal.printDebug(['got mdr rest, parent:', mdr.parent])
                 # check for pending records first
                 if pendingRecords != []:
-                    m.append(_musedataRecordListToNoteOrChord(pendingRecords))
+                    e = _musedataRecordListToNoteOrChord(pendingRecords,
+                        eLast)
+                    m.append(e)
+                    eLast = e
                     pendingRecords = []
                 # create rest after clearing pending records
                 r = note.Rest()
                 r.quarterLength = mdr.getQuarterLength()
                 m.append(r)
+                eLast = r
                 continue
             # a note is note as chord, but may have chord tones
             # attached to it that follow
@@ -200,14 +219,19 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 # note found that is not a chord; if first not a chord
                 # need to append immediately
                 if pendingRecords != []:
-                    m.append(_musedataRecordListToNoteOrChord(pendingRecords))
+                    # this could be a Chord or Note
+                    e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
+                    m.append(e)
+                    eLast = e
                     pendingRecords = []
                 # need to append this record for the current note
                 pendingRecords.append(mdr)
 
         # check for any remaining single notes (if last) or chords
         if pendingRecords != []:
-            m.append(_musedataRecordListToNoteOrChord(pendingRecords))
+            e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
+            m.append(e)
+            eLast = e
 
         if barCount == 0 and m.timeSignature != None: # easy case
             # can only do this b/c ts is defined

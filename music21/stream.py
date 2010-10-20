@@ -2544,7 +2544,7 @@ class Stream(music21.Music21Object):
                     inPlace=True)
             return returnObj # exit
     
-        if returnObj.isMultiPart():
+        if returnObj.hasPartLikeStreams():
             for p in returnObj.getElementsByClass('Part'):
                 p.makeChords(minimumWindowSize=minimumWindowSize,
                     includePostWindow=includePostWindow,
@@ -3533,13 +3533,14 @@ class Stream(music21.Music21Object):
         1
         >>> 
         '''
+        #environLocal.printDebug(['calling stripTies'])
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
             returnObj = self
 
         # this did not work in initial testing
-#         if returnObj.isMultiPart():
+#         if returnObj.hasPartLikeStreams():
 #             for p in returnObj.getElementsByClass('Part'):
 #                 # already handled in place
 #                 p.stripTies(inPlace=False, matchByPitch=matchByPitch,
@@ -4542,7 +4543,7 @@ class Stream(music21.Music21Object):
                     target=target, addTies=addTies, inPlace=True)
             return returnObj # exit
 
-        if returnObj.isMultiPart():
+        if returnObj.hasPartLikeStreams():
             for p in returnObj.getElementsByClass('Part'):
                 p.sliceByQuarterLengths(quarterLengthList, 
                     target=target, addTies=addTies, inPlace=True)
@@ -4656,7 +4657,7 @@ class Stream(music21.Music21Object):
                     displayTiedAccidentals=displayTiedAccidentals)
             return returnObj # exit
     
-        if returnObj.isMultiPart():
+        if returnObj.hasPartLikeStreams():
             for p in returnObj.getElementsByClass('Part'):
                 offsetListLocal = [o - p.getOffsetBySite(self) for o in offsetList]
                 p.sliceAtOffsets(offsetList=offsetListLocal, 
@@ -4716,7 +4717,7 @@ class Stream(music21.Music21Object):
                     displayTiedAccidentals=displayTiedAccidentals)
             return returnObj # exit
 
-        if returnObj.isMultiPart():
+        if returnObj.hasPartLikeStreams():
             for p in returnObj.getElementsByClass('Part'):
                 p.sliceByBeat(target=target, 
                     addTies=addTies, inPlace=True, 
@@ -4751,7 +4752,7 @@ class Stream(music21.Music21Object):
         return hasMeasures
 
 
-    def isMultiPart(self):
+    def hasPartLikeStreams(self):
         '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
         '''
         multiPart = False
@@ -4771,6 +4772,8 @@ class Stream(music21.Music21Object):
                 multiPart = True
                 break # only need one
         return multiPart
+
+
 
     def _getLily(self):
         '''Returns the stream translated into Lilypond format.'''
@@ -5139,8 +5142,10 @@ class Stream(music21.Music21Object):
                     returnList.append(None)
                     lastWasNone = True
             if hasattr(el, "pitch"):
-                if (skipUnisons is False or isinstance(lastPitch, list) or lastPitch is None or 
-                    el.pitch.pitchClass != lastPitch.pitchClass or (skipOctaves is False and el.pitch.ps != lastPitch.ps)):
+                if (skipUnisons is False or isinstance(lastPitch, list) or
+                    lastPitch is None or 
+                    el.pitch.pitchClass != lastPitch.pitchClass or 
+                    (skipOctaves is False and el.pitch.ps != lastPitch.ps)):
                     if getOverlaps is True or el.offset >= lastEnd:
                         if el.offset >= lastEnd:  # is not an overlap...
                             lastStart = el.offset
@@ -5152,7 +5157,6 @@ class Stream(music21.Music21Object):
                             lastPitch = el.pitch
                         else:  # do not update anything for overlaps
                             pass 
-
                         returnList.append(el)
 
             elif hasattr(el, "pitches"):
@@ -5174,10 +5178,8 @@ class Stream(music21.Music21Object):
                                     lastEnd = lastStart + el.duration.quarterLength
                                 else:
                                     lastEnd = lastStart
-            
                                 lastPitch = el.pitches
                                 lastWasNone = False 
-
                             else:  # do not update anything for overlaps
                                 pass 
                             returnList.append(el)
@@ -5234,9 +5236,12 @@ class Stream(music21.Music21Object):
                 elif hasattr(secondNote, "pitches") and len(secondNote.pitches) > 0:
                     secondPitch = secondNote.pitches[0]
                 if firstPitch is not None and secondPitch is not None:
-                    returnInterval = interval.notesToInterval(firstPitch, secondPitch)
-                    returnInterval.offset = firstNote.offset + firstNote.duration.quarterLength
-                    returnInterval.duration = duration.Duration(secondNote.offset - returnInterval.offset)
+                    returnInterval = interval.notesToInterval(firstPitch, 
+                                     secondPitch)
+                    returnInterval.offset = (firstNote.offset + 
+                                     firstNote.duration.quarterLength)
+                    returnInterval.duration = duration.Duration(
+                        secondNote.offset - returnInterval.offset)
                     returnStream.insert(returnInterval)
 
         return returnStream

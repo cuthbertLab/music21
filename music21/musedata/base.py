@@ -64,7 +64,7 @@ class MuseDataRecord(object):
             self.stage = None
 
     def isRest(self):
-        '''Return a boolean if this record is tied. 
+        '''Return a boolean if this record is a rest. 
 
         >>> from music21 import *
         >>> mdr = music21.musedata.MuseDataRecord('D4     1        s     d  ]]')

@@ -271,9 +271,9 @@ def corpusSearch():
 
     parsedStream = {}
 
-    sa = discrete.Ambitus()
+    mid = discrete.MelodicIntervalDiversity()
 
-    def getStream(fp, n):
+    def getScore(fp, n):
         if fp not in parsedStream.keys():
             s = converter.parse(fp)
             parsedStream[fp] = s
@@ -288,24 +288,46 @@ def corpusSearch():
     post = corpus.search('qitai', 'locale')
     for fp, n in post:
         print fp, n
-        s = getStream(fp, n)        
-        print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+        s = getScore(fp, n)        
+       # print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+        intervals = mid.getUniqueMelodicIntervals(s)
+        print len(intervals), intervals
 
     print
     post = corpus.search('hequ', 'locale')
     for fp, n in post:
         print fp, n
-        s = getStream(fp, n)        
-        print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+        s = getScore(fp, n)        
+        #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+        intervals = mid.getUniqueMelodicIntervals(s)
+        print len(intervals), intervals
 
     print
     post = corpus.search('suzhou', 'locale')
     for fp, n in post:
         print fp, n
-        s = getStream(fp, n)        
-        print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+        s = getScore(fp, n)        
+        #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+        intervals = mid.getUniqueMelodicIntervals(s)
+        print len(intervals), intervals
+
+
+    print
+    post = corpus.search('lothringen', 'locale')
+    for fp, n in post:
+        print fp, n
+        s = getScore(fp, n)        
+        #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+        intervals = mid.getUniqueMelodicIntervals(s)
+        print len(intervals), intervals
+
+
+
 
     #s.show()
+
+
+
 
 
 

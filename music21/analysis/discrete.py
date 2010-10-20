@@ -873,16 +873,71 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
 
 
-    def process(self, sStream):
+    def solutionToColor(self, solution):
+        # TODO: map diversity to color span
+        return '#ffffff'
 
-        pass
+    def getUniqueMelodicIntervals(self, sStream, ignoreDirection=True, 
+        ignoreUnison=True):
+        '''
+        Find all unique melodic intervals in this Stream. 
 
+        If `found` is provided, this list will be used to store Intervals, and Intervals not found in `found` will be gathered.
+        '''
+        # note that Stream.findConsecutiveNotes() and Stream.melodicIntervals()
+        # offer similar approaches, but return Streams and manage offsets and durations, components not needed here
+    
+        found=[]
+
+        # if this has parts, need to move through each at a time
+        if sStream.hasPartLikeStreams():
+            procList = [s for s in sStream.getElementsByClass('Stream')]
+        else: # assume a single list of notes
+            procList = [sStream]
+
+        for p in procList:
+            # get only Notes for now, skipping rests and chords
+            noteStream = p.stripTies(inPlace=False).getElementsByClass('Note')
+            #noteStream.show()
+
+            for i, n in enumerate(noteStream):
+    
+                if i <= len(noteStream) - 2:
+                    nNext = noteStream[i+1]
+                else:
+                    nNext = None
+
+                if nNext is not None:
+                    #environLocal.printDebug(['creating interval from notes:', n, nNext, i])
+                    i = interval.notesToInterval(n, nNext)
+                    if ignoreUnison: # will apply to enharmonic eq unisons
+                        if i.chromatic.semitones == 0:
+                            continue
+                    if ignoreDirection:
+                        if i.chromatic.semitones < 0:
+                            i = i.reverse()
+                    if i not in found:
+                        found.append(i)
+
+        def compare(x, y):
+            return abs(x.chromatic.semitones) - abs(y.chromatic.semitones)
+
+        found.sort(cmp=compare)
+        return found
+
+    def process(self, sStream, ignoreDirection=True):
+        '''
+        Find how many unique intervals are used in this Stream
+        '''
+        uniqueIntervals = getUniqueMelodicIntervals(sStream, ignoreDirection)
+        return len(uniqueIntervals), self.solutionToColor(len(uniqueIntervals))
 
 
     def getSolution(self, sStream):
-
-
-        pass
+        '''Solution is the number of unique intervals.
+        '''
+        solution, color = self.process(sStream.flat)
+        return solution
 
 
 #------------------------------------------------------------------------------
@@ -1006,14 +1061,48 @@ class Test(unittest.TestCase):
         post = sorted([(y, x) for x, y in avg])
         #print post
 
+
+    def testIntervalDiversity(self):
+        from music21 import note, stream, corpus
+        
+        s = stream.Stream()
+        s.append(note.Note('g#3'))
+        s.append(note.Note('a3'))
+        s.append(note.Note('g4'))
+
+        id = MelodicIntervalDiversity()
+        self.assertEqual(str(id.getUniqueMelodicIntervals(s)), '[<music21.interval.Interval m2>, <music21.interval.Interval m7>]')
+
+
+        s = stream.Stream()
+        s.append(note.Note('c3'))
+        s.append(note.Note('d3'))
+        s.append(note.Note('c3'))
+        s.append(note.Note('d3'))
+
+        id = MelodicIntervalDiversity()
+        self.assertEqual(str(id.getUniqueMelodicIntervals(s)), '[<music21.interval.Interval M2>]')
+
+        self.assertEqual(str(id.getUniqueMelodicIntervals(s, ignoreDirection=False)), '[<music21.interval.Interval M2>, <music21.interval.Interval M-2>]')
+
+        id = MelodicIntervalDiversity()
+        s = corpus.parseWork('hwv56', '1-08')
+        #s.show()
+
+        self.assertEqual(str(id.getUniqueMelodicIntervals(s.parts[1])), '[<music21.interval.Interval M2>, <music21.interval.Interval m3>, <music21.interval.Interval P4>, <music21.interval.Interval P5>]')
+
+        self.assertEqual(str(id.getUniqueMelodicIntervals(s)), '[<music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval m3>, <music21.interval.Interval M3>, <music21.interval.Interval P4>, <music21.interval.Interval P5>]')
+        
+
+
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
-        a = Test()
+        t = Test()
 
-        a.testKrumhansl()
+        #t.testKrumhansl()
 
-
+        t.testIntervalDiversity()

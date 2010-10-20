@@ -826,7 +826,7 @@ def streamsToMidiTracks(inputM21):
 
     # TODO: may need to shift all time values to accomodate 
     # Streams that do not start at same time
-    if s.isMultiPart():
+    if s.hasPartLikeStreams():
         for obj in s.getElementsByClass('Stream'):
             midiTracks.append(obj._getMidiTracksPart())
     else: # just get this single stream

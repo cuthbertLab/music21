@@ -744,7 +744,7 @@ def streamToMx(s):
     # we need independent sub-stream elements to shift in presentation
     highestTime = 0
 
-    if s.isMultiPart():
+    if s.hasPartLikeStreams():
         #environLocal.printDebug('Stream._getMX: interpreting multipart')
         # need to edit streams contained within streams
         # must repack into a new stream at each step

@@ -163,7 +163,7 @@ def abcToStreamPart(abcHandler, inputM21=None):
                 # can only do this b/c ts is defined
                 if dst.barDurationProportion() < 1.0:
                     dst.padAsAnacrusis()
-                    environLocal.printDebug(['incompletely filled Measure found on abc import; interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
+                    #environLocal.printDebug(['incompletely filled Measure found on abc import; interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
             p.append(dst)
 
 

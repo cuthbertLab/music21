@@ -20,7 +20,7 @@ from music21.musicxml import translate as musicxmlTranslate
 
 #-------------------------------------------------------------------------------
 class Tie(object):
-    '''Object added to notes that are tied to other notes. The `type` value is generally one of start or stop.
+    '''Object added to notes that are tied to other notes. The `type` value is one of start, stop, or continue.
 
     >>> from music21 import *
     >>> note1 = note.Note()
