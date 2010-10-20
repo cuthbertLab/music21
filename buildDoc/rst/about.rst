@@ -83,6 +83,8 @@ They are all greatly appreciated.
   of the Bach chorales in MusicXML format as part of the music21 corpus. 
   Her website contains all these chorales in additional formats.
 
+* `Walter B. Hewlitt`_ and The Center for Computer Assisted Research in the Humanities (CCARH) have kindly given permission for distribution of musedata encoded files.
+
 * `Justin London`_ compiled and maintained the list of Second-Viennese row forms now available in serial.py.
 
 * `Craig Sapp`_ has always been generous in discussions about MIR.
@@ -96,6 +98,7 @@ They are all greatly appreciated.
 .. _Michael Good: http://www.recordare.com
 .. _Margaret Greentree: http://www.jsbchorales.net
 .. _Justin London: http://www.people.carleton.edu/~jlondon/2ndviennese.htm
+.. _Walter B. Hewlitt: http://www.ccarh.org
 .. _Craig Sapp: https://ccrma.stanford.edu/~craig/
 .. _Bryen Travis: http://www.bachcentral.com/
 .. _Ewa Dahlig-Turek: http://www.esac-data.org

@@ -855,6 +855,39 @@ class SadoianAmbitus(DiscreteAnalysis):
         return interval.Interval(solution)
 
 
+
+
+#------------------------------------------------------------------------------
+class MelodicIntervalDiversity(DiscreteAnalysis):
+    '''An analysis method to determine the diversity of intervals used in a Stream.
+    '''
+    _DOC_ALL_INHERITED = False
+
+    name = 'Interval Diversity'
+    # provide possible string matches for this processor
+    identifiers = ['ambitus', 'range', 'span']
+
+    def __init__(self, referenceStream=None):
+        '''
+        >>> p = SadoianAmbitus()
+        >>> p.identifiers[0]
+        'ambitus'
+        '''
+        DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
+
+
+    def process(self, sStream):
+
+        pass
+
+
+
+    def getSolution(self, sStream):
+
+
+        pass
+
+
 #------------------------------------------------------------------------------
 # public access function
 

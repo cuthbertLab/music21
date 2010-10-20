@@ -532,11 +532,33 @@ class GenericInterval(music21.Music21Object):
         else:
             self.mod7 = self.simpleDirected
 
-    def __int__(self):
-        return self.directed
 
     def __repr__(self):
         return "<music21.interval.GenericInterval %s>" % self.directed
+
+    def __eq__(self, other):
+        '''
+        >>> a = GenericInterval('Third')
+        >>> b = GenericInterval(-3)
+        >>> c = GenericInterval(3)
+        >>> d = GenericInterval(6)
+        >>> a == b
+        False
+        >>> a == a == c
+        True
+        >>> b == c
+        False
+        >>> a != d
+        True
+        >>> a in [b, c, d]
+        True
+        '''
+        if self.value == other.value and self.directed == other.directed:
+            return True
+        else:
+            return False
+
+
 
     def complement(self):
         '''Returns a new GenericInterval object where descending 3rds are 6ths, etc.
@@ -613,7 +635,7 @@ class DiatonicInterval(music21.Music21Object):
 
     def __init__(self, specifier = "P", generic = 1):
         '''
-        The `specifier` is an integer specifying a value in the `prefixSpecs` and `niceSpecNames` lists. 
+        The `specifier` is an integer or string specifying a value in the `prefixSpecs` and `niceSpecNames` lists. 
 
         The `generic` is an integer or GenericInterval instance.
 
@@ -738,6 +760,26 @@ class DiatonicInterval(music21.Music21Object):
     def __repr__(self):
         return "<music21.interval.DiatonicInterval %s>" % self.name
 
+    def __eq__(self, other):
+        '''
+        >>> a = DiatonicInterval('major', 3)
+        >>> b = DiatonicInterval('minor', 3)
+        >>> c = DiatonicInterval('major', 3)
+        >>> d = DiatonicInterval('diminished', 4)
+        >>> a == b
+        False
+        >>> a == c
+        True
+        >>> a == d
+        False
+        '''
+        if other == None:
+            return False
+        if self.generic == other.generic and self.specifier == other.specifier:
+            return True
+        else:
+            return False
+
 
     def reverse(self):
         '''Return a DiatonicInterval that is an inversion of this Interval.
@@ -859,6 +901,27 @@ class ChromaticInterval(music21.Music21Object):
 
     def __repr__(self):
         return "<music21.interval.ChromaticInterval %s>" % self.directed
+
+    def __eq__(self, other):
+        '''
+        >>> a = ChromaticInterval(-14)
+        >>> b = ChromaticInterval(14)
+        >>> c = ChromaticInterval(-14)
+        >>> d = ChromaticInterval(7)
+        >>> a == b
+        False
+        >>> a == c
+        True
+        >>> a == d
+        False
+        '''
+        if other == None:
+            return False
+        if self.semitones == other.semitones:
+            return True
+        else:
+            return False
+
 
     def reverse(self):
         '''Return an inverted interval, that is, reversing the direction.
@@ -1241,6 +1304,29 @@ class Interval(music21.Music21Object):
 
     def __repr__(self):
         return "<music21.interval.Interval %s>" % self.directedName
+
+    def __eq__(self, other):
+        '''
+        >>> a = Interval('a4')
+        >>> b = Interval('d5')
+        >>> c = Interval('m3')
+        >>> d = Interval('d5')
+        >>> a == b
+        False
+        >>> b == d
+        True
+        >>> a == c
+        False
+        >>> b in [a, c, d]
+        True
+        '''
+        if other == None:
+            return False
+        if (self.diatonic == other.diatonic and 
+            self.chromatic == other.chromatic):
+            return True
+        else:
+            return False
 
     def _getComplement(self):
         return Interval(self.diatonic.mod7inversion)
