@@ -273,37 +273,39 @@ def corpusSearch():
 
     sa = discrete.SadoianAmbitus()
 
-    # Shanbei: region in northwestern china
-    # qitai: on the silk road
-    print
-    post = corpus.search('qitai', 'locale')
-    for fp, n in post:
-        print fp, n
+    def getStream(fp, n):
         if fp not in parsedStream.keys():
             s = converter.parse(fp)
             parsedStream[fp] = s
         else:   
             s = parsedStream[fp]
-
         if n != None: # get from opus
             s = s.getScoreByNumber(n)
-        
-        print sa.getPitchRanges(s)
+        return s
+
+    # Shanbei: region in northwestern china
+    # qitai: on the silk road
+    post = corpus.search('qitai', 'locale')
+    for fp, n in post:
+        print fp, n
+        s = getStream(fp, n)        
+        print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
 
     print
     post = corpus.search('hequ', 'locale')
     for fp, n in post:
         print fp, n
-        s = converter.parse(fp, number=n)
-        print sa.getPitchRanges(s)
+        s = getStream(fp, n)        
+        print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
 
     print
     post = corpus.search('suzhou', 'locale')
     for fp, n in post:
         print fp, n
-        s = converter.parse(fp, number=n)
-        print sa.getPitchRanges(s)
+        s = getStream(fp, n)        
+        print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
 
+    #s.show()
 
 
 

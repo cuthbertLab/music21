@@ -30,6 +30,52 @@ environLocal = environment.Environment(_MOD)
 
 
 
+#-------------------------------------------------------------------------------
+class MuseDataTranslateException(Exception):
+    pass
+
+
+def _musedataBeamToBeams(beamSymbol):
+    '''Given a musedata beam symbol, converter to a music21 Beams object representation. 
+
+    >>> from music21.musedata import translate
+    >>> translate._musedataBeamToBeams('[[')
+    <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
+    >>> translate._musedataBeamToBeams('===')
+    <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>/<music21.beam.Beam 3/continue>>
+
+    >>> translate._musedataBeamToBeams(r']/') # must escape backslash
+    <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>
+
+    '''
+    from music21 import beam
+
+    beamsObj = beam.Beams()
+
+    # assume that we are starting with 8th, even if given as a space
+    for char in beamSymbol:
+        direction = None
+        if char == '[':
+            type='start'
+        elif char == ']':
+            type='stop'
+        elif char == '=':
+            type='continue'
+        elif char == '/': # forward is right
+            type='partial'
+            direction='right'
+        elif char == '\\' or char == r'\\': # backward is left
+            type='partial'
+            direction='left'
+        else:
+            raise MuseDataTranslateException('cannot interpreter beams char:' % char)
+
+        # will automatically increment number        
+        # note that this does not permit defining 16th and not defining 8th
+        beamsObj.append(type, direction)
+
+    return beamsObj
+
 
 def _musedataRecordListToNoteOrChord(records):
     '''Given a list of MuseDataRecord objects, return a configured
@@ -59,6 +105,11 @@ def _musedataRecordListToNoteOrChord(records):
         # cyclicalling addLyric will auto increment lyric number assinged
         for lyric in lyricList:
             post.addLyric(lyric)
+
+    # see if there are any beams; again, get from first record only
+    beamsChars = records[0].getBeams()
+    if beamsChars is not None:
+        post.beams = _musedataBeamToBeams(beamsChars)
  
     # presently this sets a single tie for a chord; may be different cases
     if records[0].isTied():
@@ -169,10 +220,9 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     if museDataPart.stage == 1:
         # cannot yet get stage 1 clef data
         p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
-    # for now, make beams rather than importing; this will be needed from
-    # stage 2
-    p.makeBeams()
-
+        p.makeBeams()
+    # assume that beams and clefs are defined in all stage 2
+   
     s.insert(0, p)
     return s
 
@@ -284,6 +334,55 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testGetBeams(self):
+        from music21 import corpus
+
+        # try single character conversion
+        post = _musedataBeamToBeams('=')
+        self.assertEqual(str(post), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+
+        post = _musedataBeamToBeams(']\\')
+        self.assertEqual(str(post), '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>')
+
+        post = _musedataBeamToBeams(']/')
+        self.assertEqual(str(post), '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>')
+
+
+        s = corpus.parseWork('hwv56', '1-18')
+        self.assertEqual(len(s.parts), 5)
+        # the fourth part is vocal, and has no beams defined
+        self.assertEqual(str(s.parts[3].getElementsByClass(
+            'Measure')[3].notes[0].beams), '<music21.beam.Beams >')
+        self.assertEqual(str(s.parts[3].getElementsByClass(
+            'Measure')[3].notes[0].lyric), 'sud-')
+
+        # the bottom part has 8ths beamed two to a bar
+        self.assertEqual(str(s.parts[4].getElementsByClass(
+            'Measure')[3].notes[0].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>>')
+        self.assertEqual(str(s.parts[4].getElementsByClass(
+            'Measure')[3].notes[1].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+        self.assertEqual(str(s.parts[4].getElementsByClass(
+            'Measure')[3].notes[2].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+        self.assertEqual(str(s.parts[4].getElementsByClass(
+            'Measure')[3].notes[3].beams), '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
+
+        #s.show()
+        # test that stage1 files continue to have makeBeams called
+        s = corpus.parseWork('bwv1080', '16')
+        # measure two has 9/16 beamed in three beats of 16ths
+        self.assertEqual(len(s.parts), 2)
+
+        #s.parts[0].getElementsByClass('Measure')[1].show()
+
+        self.assertEqual(str(s.parts[0].getElementsByClass(
+            'Measure')[1].notes[0].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
+        self.assertEqual(str(s.parts[0].getElementsByClass(
+            'Measure')[1].notes[1].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>')
+        self.assertEqual(str(s.parts[0].getElementsByClass(
+            'Measure')[1].notes[2].beams), '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
+
+
+
 if __name__ == "__main__":
     import sys
 
@@ -292,4 +391,5 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
-        t.testGetLyrics()
+        #t.testGetLyrics()
+        t.testGetBeams()

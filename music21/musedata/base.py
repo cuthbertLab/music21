@@ -310,8 +310,30 @@ class MuseDataRecord(object):
             data = [x.strip() for x in raw.split('|')]
         return data
 
-            
-            
+
+    def getBeams(self):
+        '''Return complete span of characters defining beams.
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('E2     1        s     u  =')
+        >>> mdr.getBeams()
+        '='
+        >>> mdr = music21.musedata.MuseDataRecord('E2     1        s     u  ]\')
+        >>> mdr.getBeams()
+        ']\'
+        >>> mdr = music21.musedata.MuseDataRecord('E2     4        q     u')
+        >>> mdr.getBeams() == None
+        True
+
+        '''
+        if self.stage == 1:
+            return None
+        else:   
+            data = self.src[25:31] # def as cols 26 to 31 inclusive
+            if data == '':
+                return None
+            # on trim trailing white space, not leading
+            return data.rstrip()
             
         
 

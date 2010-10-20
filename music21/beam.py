@@ -157,6 +157,8 @@ class Beams(object):
 
 
     def append(self, type=None, direction=None):
+        '''Append a new Beam object to this Beams, automatically creating the Beam object and incrementing the number count. 
+        '''
         obj = Beam(type, direction)
         obj.number = len(self.beamsList) + 1
         self.beamsList.append(obj)
