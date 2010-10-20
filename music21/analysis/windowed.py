@@ -12,7 +12,7 @@
 
 '''This module describes classes for performing windowed and overlapping windowed analysis. The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for systematic overlapping window analysis at the starting at the level of the quarter note and moving to the size of an entire :class:`music21.stream.Stream`.
 
-Modular analysis procedures inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`. The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) and :class:`music21.analysis.discrete.SadoianAmbitus` (for pitch range analysis) classes provide examples.
+Modular analysis procedures inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`. The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
 '''
 
 
@@ -59,7 +59,7 @@ class WindowedAnalysis(object):
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv324')
-        >>> p = analysis.discrete.SadoianAmbitus()
+        >>> p = analysis.discrete.Ambitus()
         >>> # placing one part into analysis
         >>> wa = WindowedAnalysis(s.parts[0], p)
 
@@ -96,7 +96,7 @@ class WindowedAnalysis(object):
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = analysis.discrete.SadoianAmbitus()
+        >>> p = analysis.discrete.Ambitus()
         >>> wa = WindowedAnalysis(s, p)
         >>> len(wa._windowedStream)
         36
@@ -301,7 +301,7 @@ class Test(unittest.TestCase):
         
         s = corpus.parseWork('bach/bwv324')
 
-        for pClass in [discrete.KrumhanslSchmuckler, discrete.SadoianAmbitus]:
+        for pClass in [discrete.KrumhanslSchmuckler, discrete.Ambitus]:
             p = pClass()
 
             # get windowing object, provide a stream for analysis as well as 

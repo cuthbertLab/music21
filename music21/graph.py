@@ -1651,27 +1651,27 @@ class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
             discrete.KrumhanslSchmuckler(streamObj), *args, **keywords)
     
 
-class PlotWindowedSadoianAmbitus(PlotWindowedAnalysis):
+class PlotWindowedAmbitus(PlotWindowedAnalysis):
     '''Stream plotting of basic pitch span.
 
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv66.6.xml') #_DOCS_HIDE
-    >>> p = graph.PlotWindowedSadoianAmbitus(s.parts[0], doneAction=None) #_DOCS_HIDE
+    >>> p = graph.PlotWindowedAmbitus(s.parts[0], doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv66.6')
-    >>> #_DOCS_SHOW p = graph.PlotWindowedSadoianAmbitus(s.parts[0])
+    >>> #_DOCS_SHOW p = graph.PlotWindowedAmbitus(s.parts[0])
     >>> p.process() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotWindowedSadoianAmbitus.*
+    .. image:: images/PlotWindowedAmbitus.*
         :width: 600
 
-    .. image:: images/legend-PlotWindowedSadoianAmbitus.*
+    .. image:: images/legend-PlotWindowedAmbitus.*
 
     '''
-    values = discrete.SadoianAmbitus.identifiers
+    values = discrete.Ambitus.identifiers
     def __init__(self, streamObj, *args, **keywords):
         # provide the stream to both the window and processor in this case
         PlotWindowedAnalysis.__init__(self, streamObj, 
-            discrete.SadoianAmbitus(streamObj), *args, **keywords)
+            discrete.Ambitus(streamObj), *args, **keywords)
         
 
 #-------------------------------------------------------------------------------
@@ -2647,7 +2647,7 @@ def plotStream(streamObj, *args, **keywords):
     :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
 
     :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
-    :class:`~music21.graph.PlotWindowedSadoianAmbitus`
+    :class:`~music21.graph.PlotWindowedAmbitus`
 
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
@@ -2685,7 +2685,7 @@ def plotStream(streamObj, *args, **keywords):
         Plot3DBarsPitchSpaceQuarterLength,
         # windowed plots
         PlotWindowedKrumhanslSchmuckler,
-        PlotWindowedSadoianAmbitus,
+        PlotWindowedAmbitus,
     ]
 
     format = ''
@@ -3036,7 +3036,7 @@ class TestExternal(unittest.TestCase):
         (Plot3DBarsPitchSpaceQuarterLength, testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),
 
         (PlotWindowedKrumhanslSchmuckler, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
-        (PlotWindowedSadoianAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
+        (PlotWindowedAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
 
         ]
 
@@ -3225,7 +3225,7 @@ class Test(unittest.TestCase):
             fn = 'bach/bwv66.6'
             windowStep = 20 # set high to be fast
 
-#         b = PlotWindowedSadoianAmbitus(a.parts, title='Bach Ambitus',
+#         b = PlotWindowedAmbitus(a.parts, title='Bach Ambitus',
 #             minWindow=1, maxWindow=8, windowStep=3,
 #             doneAction=doneAction)
 #         b.process()
@@ -3260,7 +3260,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = [PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
         # windowed
-        PlotWindowedKrumhanslSchmuckler, PlotWindowedSadoianAmbitus,
+        PlotWindowedKrumhanslSchmuckler, PlotWindowedAmbitus,
         # scatters
         PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, PlotScatterPitchClassOffset,
         PlotScatterPitchSpaceDynamicSymbol,

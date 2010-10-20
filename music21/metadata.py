@@ -1788,7 +1788,7 @@ class RichMetadata(Metadata):
 #                 self.keySignatures.append(ts)
 
         
-        analysisObj = discrete.SadoianAmbitus(streamObj)    
+        analysisObj = discrete.Ambitus(streamObj)    
         psRange = analysisObj.getPitchSpan(streamObj)
         if psRange != None: # may be none if no pitches are stored
             # presently, these are numbers; convert to pitches later

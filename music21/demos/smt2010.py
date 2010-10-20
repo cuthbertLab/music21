@@ -271,7 +271,7 @@ def corpusSearch():
 
     parsedStream = {}
 
-    sa = discrete.SadoianAmbitus()
+    sa = discrete.Ambitus()
 
     def getStream(fp, n):
         if fp not in parsedStream.keys():

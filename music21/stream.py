@@ -1229,7 +1229,7 @@ class Stream(music21.Music21Object):
         :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
     
         :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
-        :class:`~music21.graph.PlotWindowedSadoianAmbitus`
+        :class:`~music21.graph.PlotWindowedAmbitus`
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
@@ -1254,7 +1254,7 @@ class Stream(music21.Music21Object):
 
         Available plots include the following:
     
-        ambitus -- runs :class:`~music21.analysis.discrete.SadoianAmbitus`
+        ambitus -- runs :class:`~music21.analysis.discrete.Ambitus`
         key -- :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
 
         >>> from music21 import *

@@ -14,7 +14,7 @@
 
 All procedures should inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`, or provide a similar interface. 
 
-The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) and :class:`music21.analysis.discrete.SadoianAmbitus` (for pitch range analysis) provide examples.
+The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
 '''
 
 import unittest
@@ -608,7 +608,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
 
 
 #------------------------------------------------------------------------------
-class SadoianAmbitus(DiscreteAnalysis):
+class Ambitus(DiscreteAnalysis):
     '''An basic analysis method for measuring register. 
     '''
     _DOC_ALL_INHERITED = False
@@ -619,7 +619,7 @@ class SadoianAmbitus(DiscreteAnalysis):
 
     def __init__(self, referenceStream=None):
         '''
-        >>> p = SadoianAmbitus()
+        >>> p = Ambitus()
         >>> p.identifiers[0]
         'ambitus'
         '''
@@ -659,7 +659,7 @@ class SadoianAmbitus(DiscreteAnalysis):
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = SadoianAmbitus()
+        >>> p = Ambitus()
         >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
         (66, 71)
         >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[6])
@@ -698,7 +698,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         '''For a given subStream, return the smallest difference between any two pitches and the largest difference between any two pitches. This is used to get the smallest and largest ambitus possible in a given work. 
 
         >>> from music21 import *
-        >>> p = SadoianAmbitus()
+        >>> p = Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
@@ -737,7 +737,7 @@ class SadoianAmbitus(DiscreteAnalysis):
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = analysis.discrete.SadoianAmbitus(s.parts[0]) #provide ref stream
+        >>> p = analysis.discrete.Ambitus(s.parts[0]) #provide ref stream
         >>> len(p.solutionLegend())
         2
         >>> [len(x) for x in p.solutionLegend()]
@@ -747,7 +747,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         [2, 2]
 
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = SadoianAmbitus()
+        >>> p = Ambitus()
         >>> p.solutionLegend(compress=True) # empty if nothing processed
         [['', []], ['', []]]
 
@@ -801,7 +801,7 @@ class SadoianAmbitus(DiscreteAnalysis):
     def solutionToColor(self, result):
         '''
         >>> from music21 import *
-        >>> p = SadoianAmbitus()
+        >>> p = Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
@@ -820,7 +820,7 @@ class SadoianAmbitus(DiscreteAnalysis):
         '''Given a Stream, return a solution (in half steps) and a color string. 
 
         >>> from music21 import *
-        >>> p = analysis.discrete.SadoianAmbitus()
+        >>> p = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
@@ -846,7 +846,7 @@ class SadoianAmbitus(DiscreteAnalysis):
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = SadoianAmbitus()
+        >>> p = Ambitus()
         >>> p.getSolution(s)
         <music21.interval.Interval m21>
 
@@ -869,9 +869,6 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 
     def __init__(self, referenceStream=None):
         '''
-        >>> p = SadoianAmbitus()
-        >>> p.identifiers[0]
-        'ambitus'
         '''
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
 
@@ -896,7 +893,7 @@ def analyzeStream(streamObj, *args, **keywords):
 
     Analysis methods can be specified as arguments or by use of a `method` keyword argument. If `method` is the class name, that class is returned. Otherwise, the :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers` list of all :class:`~music21.analysis.discrete.DiscreteAnalysis` subclass objects will be searched for matches. The first match that is found is returned. 
 
-    :class:`~music21.analysis.discrete.SadoianAmbitus`
+    :class:`~music21.analysis.discrete.Ambitus`
     :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
 
     >>> from music21 import *
@@ -912,7 +909,7 @@ def analyzeStream(streamObj, *args, **keywords):
     <music21.interval.Interval m21>
     '''
     analysisClasses = [
-        SadoianAmbitus,
+        Ambitus,
         KrumhanslSchmuckler,
     ]
 
