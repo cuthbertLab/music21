@@ -14,10 +14,10 @@
 import unittest, doctest
 from music21 import *
 
+from music21 import environment
+_MOD = 'demo/smt2010.py'
+environLocal = environment.Environment(_MOD)
 
-
-# TODO: possibly use more than one example, or more than one encoding
-# TODO: remove extraneous print statements in examples?
 
 
 def ex01(show=True, *arguments, **keywords):
@@ -264,7 +264,7 @@ def demoJesse(show=True):
 # new examples
 
 
-def corpusSearch():
+def corpusMelodicIntervalSearch():
 
     from music21 import corpus
     from music21.analysis import discrete
@@ -286,41 +286,61 @@ def corpusSearch():
     # Shanbei: region in northwestern china
     # qitai: on the silk road
     post = corpus.search('qitai', 'locale')
-    for fp, n in post:
-        print fp, n
-        s = getScore(fp, n)        
-       # print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-        intervals = mid.getUniqueMelodicIntervals(s)
-        print len(intervals), intervals
+    environLocal.printDebug(['qitai search count:', len(post)])
+#     for fp, n in post:
+#         print fp, n
+#         s = getScore(fp, n)        
+#        # print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+#         intervals = mid.countMelodicIntervals(s)
+#         print len(intervals), intervals
 
-    print
     post = corpus.search('hequ', 'locale')
+    environLocal.printDebug(['hequ search count:', len(post)])
+
     for fp, n in post:
         print fp, n
         s = getScore(fp, n)        
         #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-        intervals = mid.getUniqueMelodicIntervals(s)
+        intervals = mid.countMelodicIntervals(s)
         print len(intervals), intervals
 
-    print
+#     print
     post = corpus.search('suzhou', 'locale')
+    environLocal.printDebug(['suzhou search count:', len(post)])
+
+#     for fp, n in post:
+#         print fp, n
+#         s = getScore(fp, n)        
+#         #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+#         intervals = mid.countMelodicIntervals(s)
+#         print len(intervals), intervals
+
+    # 104 tunes from the netherlands
+    post = corpus.search('niederlande', 'locale')
+
+    # can try Irland; there are many from Luxemburg
+    # there are  few tunes form Mexiko
+
+
+    environLocal.printDebug(['niederlande search count:', len(post)])
+
     for fp, n in post:
         print fp, n
         s = getScore(fp, n)        
         #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-        intervals = mid.getUniqueMelodicIntervals(s)
+        intervals = mid.countMelodicIntervals(s)
         print len(intervals), intervals
 
 
-    print
-    post = corpus.search('lothringen', 'locale')
+    post = corpus.search('mexiko', 'locale')
+    environLocal.printDebug(['mexiko search count:', len(post)])
+
     for fp, n in post:
         print fp, n
         s = getScore(fp, n)        
         #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-        intervals = mid.getUniqueMelodicIntervals(s)
+        intervals = mid.countMelodicIntervals(s)
         print len(intervals), intervals
-
 
 
 
@@ -393,5 +413,5 @@ if __name__ == "__main__":
         t = Test()
 
         #corpusSearch()
-
-        chordifyAnalysis()
+        corpusMelodicIntervalSearch()
+        #chordifyAnalysis()

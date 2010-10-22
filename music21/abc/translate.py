@@ -179,11 +179,11 @@ def abcToStreamPart(abcHandler, inputM21=None):
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)
 
-    if useMeasures and len(p.getTimeSignatures(searchContext=False, 
+    if useMeasures and len(p.flat.getTimeSignatures(searchContext=False, 
             returnDefault=False)) > 0:
         # call make beams for now; later, import beams
+        environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         p.makeBeams()
-
 
     s.insert(0, p)
     return s

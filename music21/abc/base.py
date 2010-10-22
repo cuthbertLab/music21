@@ -76,6 +76,9 @@ class ABCHandlerException(Exception):
     pass
 
 
+class ABCFileException(Exception):
+    pass
+
 
 
 #-------------------------------------------------------------------------------
@@ -1915,17 +1918,52 @@ class ABCFile(object):
     def close(self): 
         self.file.close() 
     
-    def read(self): 
-        return self.readstr(self.file.read()) 
+    def read(self, number=None): 
+        '''Read a file. Note that this calls readstring, which processes all tokens. 
+
+        If `number` is given, a work number will be extracted if possible. 
+        '''
+        return self.readstr(self.file.read(), number) 
+
+
+    def extractReferenceNumber(self, strSrc, number):
+        '''Extract a single reference number from many defined in a file. This permits loading a single work from a collection/opus without parsing the entire file. 
+        '''
+        collect = []
+        gather = False
+        for line in strSrc.split('\n'):
+            # must be a single line definition
+            if line.strip().startswith('X:') and line.replace(' ', '') == 'X:%s' % number:
+                gather = True
+            # if already gathering and find another ref number definition
+            # stop gathering
+            elif gather == True and line.strip().startswith('X:'):
+                break
+            if gather == True:
+                collect.append(line)
+
+        if collect == []:
+            raise ABCFileException('cannot find requested reference number in source file: %s' % number)
+
+        post = '\n'.join(collect)
+        return post
+
     
-    def readstr(self, str): 
+    def readstr(self, strSrc, number=None): 
         '''Read a string and process all Tokens. Returns a ABCHandler instance.
         '''
+        if number is not None:
+            # will raise exception if cannot be found
+            strSrc = self.extractReferenceNumber(strSrc, number)
+
         handler = ABCHandler()
         # return the handler instanc
-        handler.process(str)
+        handler.process(strSrc)
         return handler
     
+
+
+
 #     def write(self): 
 #         ws = self.writestr()
 #         self.file.write(ws) 
@@ -2246,6 +2284,32 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ahs[167]), 88) # tokens
 
 
+    def testExtractReferenceNumber(self):
+        from music21 import corpus
+        fp = corpus.getWork('essenFolksong/test0')
+
+        af = ABCFile()
+        af.open(fp)
+        ah = af.read(5) # returns a parsed handler
+        af.close()
+        self.assertEqual(len(ah), 74)
+
+
+        af = ABCFile()
+        af.open(fp)
+        ah = af.read(7) # returns a parsed handler
+        af.close()
+        self.assertEqual(len(ah), 84)
+
+        fp = corpus.getWork('essenFolksong/han1')
+        af = ABCFile()
+        af.open(fp)
+        ah = af.read(339) # returns a parsed handler
+        af.close()
+        self.assertEqual(len(ah), 101)
+
+
+
 if __name__ == "__main__":
     import sys
 
@@ -2256,9 +2320,9 @@ if __name__ == "__main__":
 
         #t.testNoteParse()
         #t.testSplitByMeasure()
-        t.testSplitByReferenceNumber()
+        #t.testSplitByReferenceNumber()
 
-
+        t.testExtractReferenceNumber()
 
 
 

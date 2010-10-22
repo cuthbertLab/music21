@@ -877,17 +877,18 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         # TODO: map diversity to color span
         return '#ffffff'
 
-    def getUniqueMelodicIntervals(self, sStream, ignoreDirection=True, 
+    def countMelodicIntervals(self, sStream, found=None, ignoreDirection=True, 
         ignoreUnison=True):
         '''
         Find all unique melodic intervals in this Stream. 
 
-        If `found` is provided, this list will be used to store Intervals, and Intervals not found in `found` will be gathered.
+        If `found` is provided as a dictionary, this dictionary will be used to store Intervals, and counts of Intervals already found will be incremented.
         '''
         # note that Stream.findConsecutiveNotes() and Stream.melodicIntervals()
         # offer similar approaches, but return Streams and manage offsets and durations, components not needed here
     
-        found=[]
+        if found == None:
+            found = {}
 
         # if this has parts, need to move through each at a time
         if sStream.hasPartLikeStreams():
@@ -916,20 +917,24 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
                     if ignoreDirection:
                         if i.chromatic.semitones < 0:
                             i = i.reverse()
-                    if i not in found:
-                        found.append(i)
+                    # must use directed name for cases where ignoreDirection
+                    # is false
+                    if i.directedName not in found.keys():
+                        found[i.directedName] = [i, 1]
+                    else:
+                        found[i.directedName][1] += 1 # increment counter
+                        
+#         def compare(x, y):
+#             return abs(x.chromatic.semitones) - abs(y.chromatic.semitones)
+#         found.sort(cmp=compare)
 
-        def compare(x, y):
-            return abs(x.chromatic.semitones) - abs(y.chromatic.semitones)
-
-        found.sort(cmp=compare)
         return found
 
     def process(self, sStream, ignoreDirection=True):
         '''
         Find how many unique intervals are used in this Stream
         '''
-        uniqueIntervals = getUniqueMelodicIntervals(sStream, ignoreDirection)
+        uniqueIntervals = countMelodicIntervals(sStream, ignoreDirection)
         return len(uniqueIntervals), self.solutionToColor(len(uniqueIntervals))
 
 
@@ -1071,7 +1076,7 @@ class Test(unittest.TestCase):
         s.append(note.Note('g4'))
 
         id = MelodicIntervalDiversity()
-        self.assertEqual(str(id.getUniqueMelodicIntervals(s)), '[<music21.interval.Interval m2>, <music21.interval.Interval m7>]')
+        self.assertEqual(str(id.countMelodicIntervals(s)), "{'m7': [<music21.interval.Interval m7>, 1], 'm2': [<music21.interval.Interval m2>, 1]}")
 
 
         s = stream.Stream()
@@ -1081,17 +1086,17 @@ class Test(unittest.TestCase):
         s.append(note.Note('d3'))
 
         id = MelodicIntervalDiversity()
-        self.assertEqual(str(id.getUniqueMelodicIntervals(s)), '[<music21.interval.Interval M2>]')
+        self.assertEqual(str(id.countMelodicIntervals(s)), "{'M2': [<music21.interval.Interval M2>, 3]}")
 
-        self.assertEqual(str(id.getUniqueMelodicIntervals(s, ignoreDirection=False)), '[<music21.interval.Interval M2>, <music21.interval.Interval M-2>]')
+        self.assertEqual(str(id.countMelodicIntervals(s, ignoreDirection=False)), """{'M-2': [<music21.interval.Interval M-2>, 1], 'M2': [<music21.interval.Interval M2>, 2]}""")
 
         id = MelodicIntervalDiversity()
         s = corpus.parseWork('hwv56', '1-08')
         #s.show()
 
-        self.assertEqual(str(id.getUniqueMelodicIntervals(s.parts[1])), '[<music21.interval.Interval M2>, <music21.interval.Interval m3>, <music21.interval.Interval P4>, <music21.interval.Interval P5>]')
+        self.assertEqual(str(id.countMelodicIntervals(s.parts[1])), "{'P5': [<music21.interval.Interval P5>, 1], 'P4': [<music21.interval.Interval P4>, 1], 'm3': [<music21.interval.Interval m3>, 1], 'M2': [<music21.interval.Interval M2>, 2]}")
 
-        self.assertEqual(str(id.getUniqueMelodicIntervals(s)), '[<music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval m3>, <music21.interval.Interval M3>, <music21.interval.Interval P4>, <music21.interval.Interval P5>]')
+        self.assertEqual(str(id.countMelodicIntervals(s)), "{'M3': [<music21.interval.Interval M3>, 1], 'P4': [<music21.interval.Interval P4>, 5], 'P5': [<music21.interval.Interval P5>, 2], 'M2': [<music21.interval.Interval M2>, 8], 'm3': [<music21.interval.Interval m3>, 3], 'm2': [<music21.interval.Interval m2>, 1]}")
         
 
 

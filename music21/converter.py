@@ -535,8 +535,8 @@ class ConverterABC(object):
         '''Get ABC data, as token list, from a string representation. If more than one work is defined in the ABC data, a  :class:`~music21.stream.Opus` object will be returned; otherwise, a :class:`~music21.stream.Score` is returned.
         '''
         af = abcModule.ABCFile()
-        # do not need to call open or close on MidiFile instance
-        abcHandler = af.readstr(strData)
+        # do not need to call open or close 
+        abcHandler = af.readstr(strData, number=number)
         # set to stream
         if abcHandler.definesReferenceNumbers():
             # this creates an Opus object, not a Score object
@@ -547,19 +547,26 @@ class ConverterABC(object):
 
     def parseFile(self, fp, number=None):
         '''Get MIDI data from a file path. If more than one work is defined in the ABC data, a  :class:`~music21.stream.Opus` object will be returned; otherwise, a :class:`~music21.stream.Score` is returned.
+
+        If `number` is provided, and this ABC file defines multiple works with a X: tag, just the specified work will be returned. 
         '''
         environLocal.printDebug(['ConverterABC.parseFile: got number', number])
 
         af = abcModule.ABCFile()
         af.open(fp)
-        abcHandler = af.read() # returns a handler instance of parse tokens
+        # returns a handler instance of parse tokens
+        abcHandler = af.read(number=number) 
         af.close()
+
+        # only create opus if multiple ref numbers
+        # are defined; if a number is given an opus will no be created
         if abcHandler.definesReferenceNumbers():
             # this creates a Score or Opus object, depending on if a number
             # is given
             self._stream = abcTranslate.abcToStreamOpus(abcHandler,
                            number=number)
-        else: # just one work
+        # just get a single work
+        else: 
             abcTranslate.abcToStreamScore(abcHandler, self._stream)
 
     def _getStream(self):
@@ -1395,6 +1402,18 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testConversionABCWorkFromOpus(self):
+        # test giving a work number at loading
+        from music21 import corpus
+        s = corpus.parseWork('essenFolksong/han1', number=6)
+        self.assertEqual(isinstance(s, stream.Score), True)
+        self.assertEqual(s.metadata.title, 'Yi gan hongqi kongzhong piao')
+        # make sure that beams are being made
+        self.assertEqual(str(s.parts[0].flat.notes[4].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
+        #s.show()
+
+
+
     def testConversionMusedata(self):
         
         from music21.musedata import testFiles
@@ -1483,6 +1502,8 @@ if __name__ == "__main__":
         #t.testConversionMXRepeats()
 
         #t.testConversionABCOpus()
-        t.testConversionMusedata()
+        #t.testConversionMusedata()
 
-        t.testMixedArchiveHandling()
+        #t.testMixedArchiveHandling()
+
+        t.testConversionABCWorkFromOpus()
