@@ -988,7 +988,8 @@ def getMetadataCacheFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache. 
 
     >>> from music21 import *
-    >>> common.getMetadataCacheFilePath().endswith('corpus/metadataCache')
+    >>> fp = common.getMetadataCacheFilePath()
+    >>> fp.endswith('corpus/metadataCache') or fp.endswith(r'corpus\metadataCache')
     True
     '''
     return os.path.join(getSourceFilePath(), 'corpus', 'metadataCache')

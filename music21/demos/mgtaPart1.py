@@ -478,7 +478,8 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
     n = copy.deepcopy(nStart)
 
     while True:
-        n.quarterLength = random.choice([.25, .5, 1])
+#        n.quarterLength = random.choice([.25, .5, 1])
+        n.duration.type = random.choice(['16th', 'eighth', 'quarter'])
         s.append(n)
         # if we have written more than fifteen notes 
         # and the last notes matches the first pitch class, then end.
@@ -1851,17 +1852,19 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
+    ch2_writing_III_A_1(show = True)
     if len(sys.argv) == 1:
-        music21.mainTest(Test)
+        pass
+        #music21.mainTest(Test)
     else:
+        pass
         #b = TestExternal()
         #b.testBasic()
 
         #ch1_writing_I_B_1(show=True)
         #ch1_writing_I_B_2(show=True)
-        ch1_writing_I_B_3(show=True)
+        #ch1_writing_I_B_3(show=True)
         #ch1_basic_II_C_2(show=True)
-        #ch1_writing_II_A(show=True)
 
         #ch5_writing_IV_A(show=True)
 

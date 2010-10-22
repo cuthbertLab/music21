@@ -51,8 +51,8 @@ directionTerms = {DESCENDING:"Descending",
 # specifiers are derived from these two lists; 
 # perhaps better represented with a dictionary
 # perhaps the first entry, below, should be None, like in prefixSpecs?
-niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished', 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented', 'Triply-Diminished']
-prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd']
+niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished', 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented', 'Triply-Diminished', "Quadruply-Augmented", "Quadruply-Diminished"]
+prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd']
 
 # constants provide the common numerical representation of an interval. 
 # this is not the number of half tone shift. 
@@ -66,28 +66,30 @@ DBLAUG     = 6
 DBLDIM     = 7
 TRPAUG     = 8
 TRPDIM     = 9
+QUADAUG    = 10
+QUADDIM    = 11
 
 # ordered list of perfect specifiers
-orderedPerfSpecs = ['ddd', 'dd', 'd', 'P', 'A', 'AA', 'AAA']
-perfSpecifiers = [TRPDIM, DBLDIM, DIMINISHED, PERFECT, 
-                  AUGMENTED, DBLAUG, TRPAUG]
-perfOffset = 3 # that is, Perfect is third on the list.s
+orderedPerfSpecs = ['dddd', 'ddd', 'dd', 'd', 'P', 'A', 'AA', 'AAA', 'AAAA']
+perfSpecifiers = [QUADDIM, TRPDIM, DBLDIM, DIMINISHED, PERFECT, 
+                  AUGMENTED, DBLAUG, TRPAUG, QUADAUG]
+perfOffset = 4 # that is, Perfect is third on the list.s
 
 # ordered list of imperfect specifiers
-orderedImperfSpecs = ['ddd', 'dd', 'd', 'm', 'M', 'A', 'AA', 'AAA']
+orderedImperfSpecs = ['dddd', 'ddd', 'dd', 'd', 'm', 'M', 'A', 'AA', 'AAA', 'AAAA']
 # why is this not called imperfSpecifiers?
-specifiers = [TRPDIM, DBLDIM, DIMINISHED, MINOR, MAJOR, 
-              AUGMENTED, DBLAUG, TRPAUG]
-majOffset  = 4 # index of Major
+specifiers = [QUADDIM, TRPDIM, DBLDIM, DIMINISHED, MINOR, MAJOR, 
+              AUGMENTED, DBLAUG, TRPAUG, QUADAUG]
+majOffset  = 5 # index of Major
 
 # the following dictionaries provide half step shifts given key values
 # either as integers (generic) or as strings (adjust perfect/imprefect)
 #assuming Perfect or Major
 semitonesGeneric = {1:0, 2:2, 3:4, 4:5, 5:7, 6:9, 7:11} 
-semitonesAdjustPerfect = {"P":0, "A":1, "AA":2, "AAA":3, 
-                          "d":-1, "dd":-2, "ddd":-3} #offset from Perfect
-semitonesAdjustImperf = {"M":0, "m":-1, "A":1, "AA":2, "AAA":3, 
-                         "d":-2, "dd":-3, "ddd":-4} #offset from Major
+semitonesAdjustPerfect = {"P":0, "A":1, "AA":2, "AAA":3, 'AAAA': 4,
+                          "d":-1, "dd":-2, "ddd":-3, 'dddd': -4} #offset from Perfect
+semitonesAdjustImperf = {"M":0, "m":-1, "A":1, "AA":2, "AAA":3, "AAAA": 4, 
+                         "d":-2, "dd":-3, "ddd":-4, 'dddd': -5} #offset from Major
 
 
 #-------------------------------------------------------------------------------
@@ -1065,8 +1067,14 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     (2, 'M')
     '''
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
+    
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
-    theseSemis  = cInt.undirected
+    if gInt.direction != cInt.direction and gInt.direction != OBLIQUE and cInt.direction != OBLIQUE:
+        ## intervals like d2 and dd2 etc. (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
+        theseSemis = -1 * cInt.undirected
+    else:
+        ## all normal intervals
+        theseSemis  = cInt.undirected
     if gInt.perfectable:
         specifier = perfSpecifiers[perfOffset + theseSemis - normalSemis]
     else:
@@ -1710,6 +1718,27 @@ def notesToInterval(n1, n2 = None):
     >>> cInterval = notesToInterval(aPitch, bPitch)
     >>> cInterval
     <music21.interval.Interval dd11>
+
+    >>> cPitch = pitch.Pitch('e#4')
+    >>> dPitch = pitch.Pitch('f-4')
+    >>> dInterval = notesToInterval(cPitch, dPitch)
+    >>> dInterval
+    <music21.interval.Interval dd2>
+
+    >>> ePitch = pitch.Pitch('e##4')
+    >>> fPitch = pitch.Pitch('f--4')
+    >>> dInterval = notesToInterval(ePitch, fPitch)
+    >>> dInterval
+    <music21.interval.Interval dddd2>
+
+    >>> gPitch = pitch.Pitch('c--4')
+    >>> hPitch = pitch.Pitch('c##4')
+    >>> iInterval = notesToInterval(gPitch, hPitch)
+    >>> iInterval
+    <music21.interval.Interval AAAA1>
+
+    >>> notesToInterval(pitch.Pitch('e##4'), pitch.Pitch('f--5'))
+    <music21.interval.Interval dddd9>
 
     '''
     # TODO: possibly remove: not clear how this offers any better functionality
