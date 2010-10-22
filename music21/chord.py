@@ -1507,17 +1507,16 @@ class Chord(note.NotRest):
 
         >>> c2 = chord.Chord(["C#4", "G5", "E6"])
         >>> str(c2.closedPosition(6).pitches)
-        '[G5, C#6, E6]'
+        '[C#6, E6, G6]'
         '''
-        environLocal.printDebug(['calling closedPosition()', inPlace])
+        #environLocal.printDebug(['calling closedPosition()', inPlace])
         if inPlace:
             returnObj = self
         else:
             returnObj = copy.deepcopy(self)
         #tempChordNotes = returnObj.pitches
 
-        pBass = returnObj.bass()
-
+        pBass = returnObj.bass() # returns a reference, not a copy
         if forceOctave is not None:
             if pBass.octave > forceOctave:      
                 dif = -1
@@ -1527,7 +1526,9 @@ class Chord(note.NotRest):
                 dif = None
             if dif != None:
                 while pBass.octave != forceOctave:
-                    pBass.octave += dif
+                    # shift octave of all pitches
+                    for p in returnObj.pitches:
+                        p.octave += dif
 
         # can change these pitches in place
         for p in returnObj.pitches:
@@ -2096,13 +2097,14 @@ class Chord(note.NotRest):
 
         
     def sortDiatonicAscending(self, inPlace=False):
-        '''
-        After talking with Daniel Jackson, let's try to make the chord object as immutable
-        as possible, so we return a new Chord object with the notes arranged from lowest to highest
-        
+        '''        
         The notes are sorted by Scale degree and then by Offset (so F## sorts below G-).  
         Notes that are the identical pitch retain their order
         
+        After talking with Daniel Jackson, let's try to make the chord object as immutable
+        as possible, so we return a new Chord object with the notes arranged from lowest to highest
+
+
         >>> from music21 import *
         >>> cMajUnsorted = chord.Chord(['E4', 'C4', 'G4'])
         >>> cMajSorted = cMajUnsorted.sortDiatonicAscending()
@@ -2120,11 +2122,7 @@ class Chord(note.NotRest):
         else:
             returnObj = copy.deepcopy(self)
 
-        #tempChordNotes = returnObj.pitches
-
-        returnObj.pitches.sort(cmp=lambda x,y: cmp(x.diatonicNoteNum, y.diatonicNoteNum) or \
-                            cmp(x.ps, y.ps))
-        #returnObj.pitches = tempChordNotes
+        returnObj.pitches.sort(cmp=lambda x,y: cmp(x.diatonicNoteNum, y.diatonicNoteNum) or cmp(x.ps, y.ps))
 
         return returnObj
 

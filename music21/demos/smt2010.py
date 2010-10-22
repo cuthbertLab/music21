@@ -333,42 +333,28 @@ def corpusSearch():
 def chordifyAnalysis():
     from music21 import stream, interval
 
-    #s = corpus.parseWork('bwv1080', '16')
-
     o = corpus.parseWork('josquin/milleRegrets')
-    sMerged = o.mergeScores()
+    sSrc = o.mergeScores()
+    #sSrc = corpus.parseWork('bwv1080', 1)
 
-    sExcerpt = sMerged.measures(0,20)
+    sExcerpt = sSrc.measures(0,20)
 
     display = stream.Score()
-    display.metadata = sMerged.metadata
+    display.metadata = sSrc.metadata
     for p in sExcerpt.parts:
         display.insert(0, p)
 
     reduction = sExcerpt.chordify()
     for c in reduction.flat.getElementsByClass('Chord'):
-        #c.closedPosition(forceOctave=4, inPlace=True)
-
-        # order of pitches post-chordify is from top to bottom
-
-        #intervalString = [p.nameWithOctave for p in c.pitches]
-        #c.addLyric('/'.join(intervalString))
-        print c.pitches
+        c.sortAscending()
+        for j, p in enumerate(c.pitches):
+            if j < len(c.pitches) - 1: # if not last, which is lowest
+                i = interval.Interval(c.pitches[-1], p)
+                c.addLyric(i.name)
         c.closedPosition(forceOctave=4, inPlace=True)
-        #c.closedPosition(inPlace=True)
-        print c.pitches
-
-
-#         for j, p in enumerate(c.pitches):
-#             if j < len(c.pitches) - 1: # if not last, which is lowest
-#                 i = interval.Interval(c.pitches[-1], p)
-#                 c.addLyric(i.name)
-
-        #c.pitches = [pitch.Pitch('b4')] # replace
-
+        c.removeRedundantPitches(inPlace=True)
 
     display.insert(0, reduction)
-
     display.show()
 
 
