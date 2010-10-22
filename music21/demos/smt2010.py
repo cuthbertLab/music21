@@ -265,84 +265,64 @@ def demoJesse(show=True):
 
 
 def corpusMelodicIntervalSearch():
-
     from music21 import corpus
     from music21.analysis import discrete
 
-    parsedStream = {}
-
     mid = discrete.MelodicIntervalDiversity()
+    groupEast = corpus.search('shanxi', 'locale')
+    groupWest = corpus.search('niederlande', 'locale') 
 
-    def getScore(fp, n):
-        if fp not in parsedStream.keys():
-            s = converter.parse(fp)
-            parsedStream[fp] = s
-        else:   
-            s = parsedStream[fp]
-        if n != None: # get from opus
-            s = s.getScoreByNumber(n)
-        return s
+    msg = []
+    for name, group in [('shanxi', groupEast), ('niederlande', groupWest)]:
+        intervalDict = {}
+        workCount = 0
+        intervalCount = 0
+        seventhCount = 0
+        for fp, n in group:
+            workCount += 1
+            s = converter.parse(fp, number=n)
+            intervalDict = mid.countMelodicIntervals(s, found=intervalDict)
+        
+        for key in sorted(intervalDict.keys()):
+            intervalCount += intervalDict[key][1] # second value is count
+            if key in ['m7', 'M7']:
+                seventhCount += intervalDict[key][1] 
 
-    # Shanbei: region in northwestern china
-    # qitai: on the silk road
-    post = corpus.search('qitai', 'locale')
-    environLocal.printDebug(['qitai search count:', len(post)])
-#     for fp, n in post:
-#         print fp, n
-#         s = getScore(fp, n)        
-#        # print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-#         intervals = mid.countMelodicIntervals(s)
-#         print len(intervals), intervals
+        pcentSevenths = round(((seventhCount / float(intervalCount)) * 100), 4)
+        msg.append('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (name, pcentSevenths, intervalCount, workCount))
+    
+#         for key in sorted(intervalDict.keys()):
+#             print intervalDict[key]
 
-    post = corpus.search('hequ', 'locale')
-    environLocal.printDebug(['hequ search count:', len(post)])
+    for sub in msg: 
+        print sub
 
-    for fp, n in post:
-        print fp, n
-        s = getScore(fp, n)        
-        #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-        intervals = mid.countMelodicIntervals(s)
-        print len(intervals), intervals
 
-#     print
-    post = corpus.search('suzhou', 'locale')
-    environLocal.printDebug(['suzhou search count:', len(post)])
+    #groupEast = corpus.search('qitai', 'locale') + corpus.search('hequ', 'locale') + corpus.search('suzhou', 'locale') + corpus.search('ziyang', 'locale')
 
+
+# 
+#     environLocal.printDebug(['niederlande search count:', len(post)])
+# 
 #     for fp, n in post:
 #         print fp, n
 #         s = getScore(fp, n)        
 #         #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
 #         intervals = mid.countMelodicIntervals(s)
 #         print len(intervals), intervals
-
-    # 104 tunes from the netherlands
-    post = corpus.search('niederlande', 'locale')
-
-    # can try Irland; there are many from Luxemburg
-    # there are  few tunes form Mexiko
-
-
-    environLocal.printDebug(['niederlande search count:', len(post)])
-
-    for fp, n in post:
-        print fp, n
-        s = getScore(fp, n)        
-        #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-        intervals = mid.countMelodicIntervals(s)
-        print len(intervals), intervals
-
-
-    post = corpus.search('mexiko', 'locale')
-    environLocal.printDebug(['mexiko search count:', len(post)])
-
-    for fp, n in post:
-        print fp, n
-        s = getScore(fp, n)        
-        #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-        intervals = mid.countMelodicIntervals(s)
-        print len(intervals), intervals
-
-
+# 
+# 
+#     post = corpus.search('mexiko', 'locale')
+#     environLocal.printDebug(['mexiko search count:', len(post)])
+# 
+#     for fp, n in post:
+#         print fp, n
+#         s = getScore(fp, n)        
+#         #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
+#         intervals = mid.countMelodicIntervals(s)
+#         print len(intervals), intervals
+# 
+# 
 
     #s.show()
 
