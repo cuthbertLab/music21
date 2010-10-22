@@ -27,19 +27,24 @@ def cacheCore():
     t.start()
 
     # the core cache is based on local files stored in music21
-    mdb = metadata.MetadataBundle('core')
-    paths = corpus.getPaths()
+    # virtual is on-line
+    for name, getPaths in [('virtual', corpus.getVirtualPaths), 
+                           ('core', corpus.getPaths), 
+                      ]:
 
-    environLocal.printDebug(['cacheCore: starting process of paths:', 
-                            len(paths)])
+        mdb = metadata.MetadataBundle(name)
+        paths = getPaths()
+    
+        environLocal.printDebug(['cacheCore: starting processing of paths:', 
+                                len(paths)])
+    
+        #mdb.addFromPaths(paths[-3:])
+        mdb.addFromPaths(paths) # all paths
+        #print mdb._storage
+        mdb.write() # will use a default file path and  name
 
-    #mdb.addFromPaths(paths[-3:])
-    mdb.addFromPaths(paths) # all paths
-    #print mdb._storage
-    mdb.write() # will use a default file path and core name
 
-
-    environLocal.printDebug(['cacheCore: writing time:', t, 'md items:', len(mdb._storage)])
+    environLocal.printDebug(['cache: writing time:', t, 'md items:', len(mdb._storage)])
 
 
 

@@ -110,7 +110,11 @@ MODULES = [
 # data is loaded on demand. 
 _METADATA_BUNDLES = {'core':None, 'virtual':None, 'local':None}
 
-
+_ALL_EXTENSIONS = (common.findInputExtension('abc') +
+                   common.findInputExtension('lily') +
+                   common.findInputExtension('musicxml') +
+                   common.findInputExtension('musedata') +
+                   common.findInputExtension('humdrum'))
 
 # store all composers in the corpus (not virtual) 
 # as two element tuples of path name, full name
@@ -167,11 +171,7 @@ def getPaths(extList=None, expandExtensions=True):
         extList = [extList]
 
     if extList == [None]:
-        extList = (common.findInputExtension('abc') +
-                   common.findInputExtension('lily') +
-                   common.findInputExtension('musicxml') +
-                   common.findInputExtension('musedata') +
-                   common.findInputExtension('humdrum'))
+        extList = _ALL_EXTENSIONS
     elif expandExtensions:
         extMod = []
         for e in extList:
@@ -216,11 +216,7 @@ def getVirtualPaths(extList=None):
         extList = [extList]
 
     if extList == [None]:
-        extList = (common.findInputExtension('abc') +
-                   common.findInputExtension('lily') +
-                   common.findInputExtension('musicxml') +
-                   common.findInputExtension('musedata') +
-                   common.findInputExtension('humdrum'))
+        extList = _ALL_EXTENSIONS
     paths = []
     for obj in VIRTUAL:
         if obj.corpusPath != None:

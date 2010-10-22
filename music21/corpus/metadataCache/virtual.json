@@ -1,0 +1,70 @@
+{
+  "__attr__": {
+    "_name": "virtual", 
+    "_storage": {
+      "http:__web_mit_edu_sadoian_Public_corpus_schubert576-6_xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-416a563fb85e0f39605959a901af8503.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 3, mode major", 
+          "pitchHighest": "81", 
+          "pitchLowest": "37", 
+          "timeSignatureFirst": "2/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
+      "http:__web_mit_edu_sadoian_Public_corpus_schubert576-6a_xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-48f24e5f0ad04454b4b8876a208c307a.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 3, mode major", 
+          "pitchHighest": "69", 
+          "pitchLowest": "37", 
+          "timeSignatureFirst": "2/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
+      "http:__web_mit_edu_sadoian_Public_corpus_schubert576-6b_xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-80b35bd98e567cd528f82c4a03dbbe7d.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 3, mode major", 
+          "pitchHighest": "81", 
+          "pitchLowest": "44", 
+          "timeSignatureFirst": "2/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }
+    }
+  }, 
+  "__class__": "<class 'music21.metadata.MetadataBundle'>", 
+  "__version__": [
+    0, 
+    3, 
+    0
+  ]
+}
