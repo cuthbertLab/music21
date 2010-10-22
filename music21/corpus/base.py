@@ -779,8 +779,8 @@ class Test(unittest.TestCase):
 
         # can get a single file just by file name        
         fp = getWork('altdeu10')
-        self.assertEqual(fp.endswith('essenFolksong/altdeu10.abc'), True)
-
+        self.assertTrue(fp.endswith('essenFolksong/altdeu10.abc') or fp.endswith(r'essenFolksong\altdeu10.abc'))
+                        
         fpCollection = getComposer('essenFolksong')
         self.assertEqual(len(fpCollection), 31)
 
@@ -792,6 +792,7 @@ class Test(unittest.TestCase):
 
         # can get a single file just by file name        
         fp = getWork('fortunaDunGranTempo')
+        fp = re.sub(r'\\', '/', fp)
         self.assertEqual(fp.endswith('josquin/fortunaDunGranTempo.abc'), True)
 
         fpCollection = getComposer('josquin')
