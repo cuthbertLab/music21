@@ -127,6 +127,7 @@ class GeneralNote(music21.Music21Object):
     }    
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)
+
         self.duration = duration.Duration(**keywords)
         self.lyrics = [] # a list of lyric objects
         self.notations = []
@@ -505,18 +506,10 @@ class Note(NotRest):
         if len(arguments) > 0:
             if isinstance(arguments[0], pitch.Pitch):
                 self.pitch = arguments[0]
-            else:
-                # assume first arg is pitch
+            else: # assume first arg is pitch
                 self.pitch = pitch.Pitch(arguments[0]) 
-        else:
+        else: # supply a default pitch
             self.pitch = pitch.Pitch('C4')
-
-#         components = []
-#         linkages = []
-#         if "components" in keywords:
-#             components = keywords["components"]
-#         if "linkages" in keywords:
-#             linkages = keywords["linkages"]
 
         if "beams" in keywords:
             self.beams = keywords["beams"]

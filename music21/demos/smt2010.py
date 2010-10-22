@@ -330,6 +330,48 @@ def corpusSearch():
 
 
 
+def chordifyAnalysis():
+    from music21 import stream, interval
+
+    #s = corpus.parseWork('bwv1080', '16')
+
+    o = corpus.parseWork('josquin/milleRegrets')
+    sMerged = o.mergeScores()
+
+    sExcerpt = sMerged.measures(0,20)
+
+    display = stream.Score()
+    display.metadata = sMerged.metadata
+    for p in sExcerpt.parts:
+        display.insert(0, p)
+
+    reduction = sExcerpt.chordify()
+    for c in reduction.flat.getElementsByClass('Chord'):
+        #c.closedPosition(forceOctave=4, inPlace=True)
+
+        # order of pitches post-chordify is from top to bottom
+
+        #intervalString = [p.nameWithOctave for p in c.pitches]
+        #c.addLyric('/'.join(intervalString))
+        print c.pitches
+        c.closedPosition(forceOctave=4, inPlace=True)
+        #c.closedPosition(inPlace=True)
+        print c.pitches
+
+
+#         for j, p in enumerate(c.pitches):
+#             if j < len(c.pitches) - 1: # if not last, which is lowest
+#                 i = interval.Interval(c.pitches[-1], p)
+#                 c.addLyric(i.name)
+
+        #c.pitches = [pitch.Pitch('b4')] # replace
+
+
+    display.insert(0, reduction)
+
+    display.show()
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -363,5 +405,7 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
-        corpusSearch()
 
+        #corpusSearch()
+
+        chordifyAnalysis()

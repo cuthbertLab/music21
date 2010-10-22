@@ -43,7 +43,7 @@ STEPREF = {
                }
 STEPNAMES = ['C','D','E','F','G','A','B']
 
-
+TWELFTH_ROOT_OF_TWO = 2.0 ** (1.0/12)
 
 #-------------------------------------------------------------------------------
 # utility functions
@@ -684,7 +684,7 @@ class Pitch(music21.Music21Object):
         # keep an accidental object based on self._alter
         
         self._overridden_freq440 = None
-        self._twelfth_root_of_two = 2.0 ** (1.0/12)
+        self._twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
         self._accidental = None
 
         # should this remain an attribute or only refer to value in defaults
@@ -697,10 +697,11 @@ class Pitch(music21.Music21Object):
         self.implicitAccidental = False
 
         # name combines step, octave, and accidental
-        if name is not None and not common.isNum(name):       
-            self._setName(name)
-        elif name is not None and common.isNum(name):
-            self._setPitchClass(name)
+        if name is not None:
+            if not common.isNum(name):       
+                self._setName(name)
+            else: # is a number
+                self._setPitchClass(name)
 
     def __repr__(self):
         return self.nameWithOctave

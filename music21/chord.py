@@ -1490,24 +1490,54 @@ class Chord(note.NotRest):
         else:
             raise ChordException("Not a triad")
  
-    def closedPosition(self):
-        '''
-        returns a new Chord object with the same pitch classes, but now in closed position
+    def closedPosition(self, forceOctave=None, inPlace=False):
+        '''Returns a new Chord object with the same pitch classes, but now in closed position.
+
+        If `forcedOctave` is provided, the bass of the chord will be shifted to that provided octave.
 
         >>> from music21 import *
         >>> chord1 = chord.Chord(["C#4", "G5", "E6"])
         >>> chord2 = chord1.closedPosition()
         >>> print(chord2.lily.value)
         <cis' e' g'>4
+
+        >>> c2 = chord.Chord(["C#4", "G5", "E6"])
+        >>> str(c2.closedPosition(2).pitches)
+        '[C#2, E2, G2]'
+
+        >>> c2 = chord.Chord(["C#4", "G5", "E6"])
+        >>> str(c2.closedPosition(6).pitches)
+        '[G5, C#6, E6]'
         '''
-        newChord = copy.deepcopy(self)
-        tempChordNotes = newChord.pitches
-        chordBassPS = self.bass().ps
-        for thisPitch in tempChordNotes:
-            while thisPitch.ps > chordBassPS + 12:
-                thisPitch.octave = thisPitch.octave - 1      
-        newChord.pitches = tempChordNotes
-        return newChord.sortAscending() # creates a second new chord object!
+        environLocal.printDebug(['calling closedPosition()', inPlace])
+        if inPlace:
+            returnObj = self
+        else:
+            returnObj = copy.deepcopy(self)
+        #tempChordNotes = returnObj.pitches
+
+        pBass = returnObj.bass()
+
+        if forceOctave is not None:
+            if pBass.octave > forceOctave:      
+                dif = -1
+            elif pBass.octave < forceOctave:      
+                dif = 1
+            else: # equal
+                dif = None
+            if dif != None:
+                while pBass.octave != forceOctave:
+                    pBass.octave += dif
+
+        # can change these pitches in place
+        for p in returnObj.pitches:
+            # bring each pitch down octaves until pitch space is 
+            # within an octave
+            while p.ps > pBass.ps + 12:
+                p.octave -= 1      
+
+        # if not inPlace, creates a second new chord object!
+        return returnObj.sortAscending(inPlace=True) 
 
     def semiClosedPosition(self):
         '''
@@ -2064,11 +2094,8 @@ class Chord(note.NotRest):
     #---------------------------------------------------------------------------
     # sort routines
 
-    def sortAscending(self):
-        # TODO Check context
-        return self.sortDiatonicAscending()
         
-    def sortDiatonicAscending(self):
+    def sortDiatonicAscending(self, inPlace=False):
         '''
         After talking with Daniel Jackson, let's try to make the chord object as immutable
         as possible, so we return a new Chord object with the notes arranged from lowest to highest
@@ -2081,14 +2108,29 @@ class Chord(note.NotRest):
         >>> cMajSorted = cMajUnsorted.sortDiatonicAscending()
         >>> cMajSorted.pitches[0].name
         'C'
+
+        >>> c2 = chord.Chord(['E4', 'C4', 'G4'])
+        >>> junk = c2.sortDiatonicAscending(inPlace=True)
+        >>> c2
+        <music21.chord.Chord C4 E4 G4>
         '''
 
-        newChord = copy.deepcopy(self)
-        tempChordNotes = newChord.pitches
-        tempChordNotes.sort(cmp=lambda x,y: cmp(x.diatonicNoteNum, y.diatonicNoteNum) or \
+        if inPlace:
+            returnObj = self
+        else:
+            returnObj = copy.deepcopy(self)
+
+        #tempChordNotes = returnObj.pitches
+
+        returnObj.pitches.sort(cmp=lambda x,y: cmp(x.diatonicNoteNum, y.diatonicNoteNum) or \
                             cmp(x.ps, y.ps))
-        newChord.pitches = tempChordNotes
-        return newChord
+        #returnObj.pitches = tempChordNotes
+
+        return returnObj
+
+    def sortAscending(self, inPlace=False):
+        # TODO Check context
+        return self.sortDiatonicAscending(inPlace=inPlace)
 
     
     def sortChromaticAscending(self):

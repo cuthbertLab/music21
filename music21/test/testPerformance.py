@@ -172,6 +172,15 @@ class Test(unittest.TestCase):
 
 
 
+    def runParseABC(self):
+        '''Creating loading a large multiwork abc file
+        '''
+        from music21 import corpus
+
+        s = corpus.parseWork('essenFolksong/han1')
+
+
+
     #---------------------------------------------------------------------------
     def testTimingTolerance(self):
         '''Test the performance of methods defined above, comparing the resulting time to the time obtained in past runs. 
@@ -181,6 +190,12 @@ class Test(unittest.TestCase):
         '''
         # provide work and expected min/max in seconds
         for testMethod, best in [
+
+            (self.runParseABC, 
+                {
+                 '2010.10.20': 38.6760668755, 
+                 '2010.10.21': 35.4297668934,
+                }),
 
 
             (self.runCreateDurations, 

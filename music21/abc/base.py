@@ -52,6 +52,10 @@ ABC_BARS = [
            (':', 'dotted'),
            ]
 
+# store a mapping of ABC representation to pitch values
+_pitchTranslationCache = {}
+
+
 #-------------------------------------------------------------------------------
 # note inclusion of w: for lyrics
 reMetadataTag = re.compile('[A-Zw]:')
@@ -868,33 +872,34 @@ class ABCNote(ABCToken):
         except IndexError: # no matches
             raise ABCHandlerException('cannot find any pitch information in: %s' % repr(strSrc))
 
+        if name == 'z':
+            return (None, None) # designates a rest
+
         if forceKeySignature != None:
             activeKeySignature = forceKeySignature
         else: # may be None
             activeKeySignature = self.activeKeySignature
 
-        if name == 'z':
-            return (None, None) # designates a rest
-        else:
-            if name.islower():
-                octave = 5
-            else:
-                octave = 4
-        # look in source string for register modification
-        octModUp = strSrc.count("'")
-        octModDown = strSrc.count(",")
-        octave -= octModDown
-        octave += octModUp
+        try: # returns pStr, accidentalDisplayStatus
+            return _pitchTranslationCache[(strSrc, str(activeKeySignature))] 
+        except KeyError:
+            pass
 
-        sharpCount = strSrc.count("^")
-        flatCount = strSrc.count("_")
-        naturalCount = strSrc.count("=")
+        if name.islower():
+            octave = 5
+        else:
+            octave = 4
+        # look in source string for register modification
+        octave -= strSrc.count(",")
+        octave += strSrc.count("'")
+
+        # get an accidental string
         accString = ''
-        for x in range(flatCount):
+        for x in range(strSrc.count("_")):
             accString += '-' # m21 symbols
-        for x in range(sharpCount):
+        for x in range(strSrc.count("^")):
             accString += '#' # m21 symbols
-        for x in range(naturalCount):
+        for x in range(strSrc.count("=")):
             accString += 'n' # m21 symbols
 
         # if there is an explicit accidental, regardless of key, it should
@@ -921,7 +926,11 @@ class ABCNote(ABCToken):
             # set to false, as do not need to show w/ key sig
             accidentalDisplayStatus = False
 
+        # making upper here, but this is not relevant
         pStr = '%s%s%s' % (name.upper(), accString, octave)
+
+        # store in global cache
+        _pitchTranslationCache[(strSrc, str(activeKeySignature))] = pStr, accidentalDisplayStatus
         return pStr, accidentalDisplayStatus
 
 

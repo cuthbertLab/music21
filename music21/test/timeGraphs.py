@@ -214,6 +214,16 @@ class TestCreateDurations(CallTest):
 
 
 
+class TestParseABC(CallTest):
+
+    def __init__(self):
+        from music21.test import testPerformance
+        self.t = test.testPerformance.Test()
+
+    def testFocus(self):
+        # create 500 time signatures
+        self.t.runParseABC()
+
 
 
 
@@ -238,7 +248,7 @@ class CallGraph:
         #self.callTest = TestMetadataBundle
         #self.callTest = TestCreateTimeSignature
 
-        self.callTest = TestCreateDurations
+        self.callTest = TestParseABC
 
 
     def run(self):
