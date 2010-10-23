@@ -2,6 +2,180 @@
   "__attr__": {
     "_name": "virtual", 
     "_storage": {
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_bach_cello&file=bwv1007-01_krn&f=xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-73c69954b59e5b98278400657b88503a.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 1, mode None", 
+          "pitchHighest": "67", 
+          "pitchLowest": "36", 
+          "timeSignatureFirst": "4/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_pachelbel&file=canon_krn&f=xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-caa4768738c4d8813ce3f78b682572b8.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 2, mode None", 
+          "pitchHighest": "86", 
+          "pitchLowest": "38", 
+          "timeSignatureFirst": "4/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_schubert_piano_d0576&file=d0576-06_krn&f=xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-43f075dbbe4328402234e85dc71d6332.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 3, mode None", 
+          "pitchHighest": "81", 
+          "pitchLowest": "37", 
+          "timeSignatureFirst": "2/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=osu_classical_bach_inventions&file=inven01_krn&f=xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-355cf399875d46b3ea75a6086d9e1caf.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 0, mode None", 
+          "pitchHighest": "84", 
+          "pitchLowest": "36", 
+          "timeSignatureFirst": "4/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=osu_classical_bach_inventions&file=inven02_krn&f=xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-75a4d45be4c266a1f7d9d6491e33ca5a.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps -3, mode None", 
+          "pitchHighest": "84", 
+          "pitchLowest": "36", 
+          "timeSignatureFirst": "4/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
+      "http:__static_wikifonia_org_1164_musicxml_mxl": {
+        "__attr__": {
+          "_contributors": [
+            {
+              "__attr__": {
+                "_dateRange": [
+                  null, 
+                  null
+                ], 
+                "_names": [
+                  {
+                    "__attr__": {
+                      "_data": "John Coltrane"
+                    }, 
+                    "__class__": "<class 'music21.metadata.Text'>"
+                  }
+                ], 
+                "_role": "composer", 
+                "relevance": "contributor"
+              }, 
+              "__class__": "<class 'music21.metadata.Contributor'>"
+            }, 
+            {
+              "__attr__": {
+                "_dateRange": [
+                  null, 
+                  null
+                ], 
+                "_names": [
+                  {
+                    "__attr__": {
+                      "_data": ""
+                    }, 
+                    "__class__": "<class 'music21.metadata.Text'>"
+                  }
+                ], 
+                "relevance": "contributor"
+              }, 
+              "__class__": "<class 'music21.metadata.Contributor'>"
+            }
+          ], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "Giant Steps"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }, 
+            "movementNumber": {
+              "__attr__": {
+                "_data": ""
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }, 
+            "number": {
+              "__attr__": {
+                "_data": ""
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }, 
+            "opusNumber": {
+              "__attr__": {}, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }, 
+            "title": {
+              "__attr__": {
+                "_data": ""
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 0, mode major", 
+          "pitchHighest": "82", 
+          "pitchLowest": "63", 
+          "timeSignatureFirst": "4/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
       "http:__web_mit_edu_sadoian_Public_corpus_schubert576-6_xml": {
         "__attr__": {
           "_contributors": [], 

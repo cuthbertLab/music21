@@ -2440,7 +2440,7 @@ class Stream(music21.Music21Object):
 
 
     def extractContext(self, searchElement, before = 4.0, after = 4.0, 
-                       maxBefore = None, maxAfter = None):
+                       maxBefore = None, maxAfter = None, forceOutputClass=None):
         '''Extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4), and returns a new Stream.
                 
         >>> from music21 import note
@@ -2461,8 +2461,11 @@ class Stream(music21.Music21Object):
         note: this probably should be renamed, as we use Context in a specail way. Perhaps better is extractNeighbors?
         
         '''
-       
-        display = self.__class__()
+        if forceOutputClass == None:
+            display = self.__class__()
+        else:
+            display = forceOutputClass()
+
         found = None
         foundOffset = 0
         foundEnd = 0 

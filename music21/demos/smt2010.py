@@ -289,7 +289,6 @@ def corpusMelodicIntervalSearch():
 
         pcentSevenths = round(((seventhCount / float(intervalCount)) * 100), 4)
         msg.append('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (name, pcentSevenths, intervalCount, workCount))
-    
 #         for key in sorted(intervalDict.keys()):
 #             print intervalDict[key]
 
@@ -297,37 +296,51 @@ def corpusMelodicIntervalSearch():
         print sub
 
 
-    #groupEast = corpus.search('qitai', 'locale') + corpus.search('hequ', 'locale') + corpus.search('suzhou', 'locale') + corpus.search('ziyang', 'locale')
+def corpusFindMelodicSevenths():
+    # find and display melodic sevenths
+    import os
+    from music21 import corpus
+    from music21.analysis import discrete
 
+    mid = discrete.MelodicIntervalDiversity()
+    groupEast = corpus.search('shanxi', 'locale')
+    groupWest = corpus.search('niederlande', 'locale') 
 
-# 
-#     environLocal.printDebug(['niederlande search count:', len(post)])
-# 
-#     for fp, n in post:
-#         print fp, n
-#         s = getScore(fp, n)        
-#         #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-#         intervals = mid.countMelodicIntervals(s)
-#         print len(intervals), intervals
-# 
-# 
-#     post = corpus.search('mexiko', 'locale')
-#     environLocal.printDebug(['mexiko search count:', len(post)])
-# 
-#     for fp, n in post:
-#         print fp, n
-#         s = getScore(fp, n)        
-#         #print sa.getPitchRanges(s), s.flat.getElementsByClass('KeySignature')[0]
-#         intervals = mid.countMelodicIntervals(s)
-#         print len(intervals), intervals
-# 
-# 
+    found = []
+    for name, group in [('shanxi', groupEast), ('niederlande', groupWest)]:
+        for fp, n in group:
+            s = converter.parse(fp, number=n)
+            intervalDict = mid.countMelodicIntervals(s)
+        
+            for key in sorted(intervalDict.keys()):
+                if key in ['m7', 'M7']:
+                    found.append([fp, n, s])
+                   
+    results = stream.Stream()
+    for fp, num, s in found: 
+        environLocal.printDebug(['working with found', fp, num])
+        # this assumes these are all monophonic
+        noteStream = s.flat.getElementsByClass('Note')
+        for i, n in enumerate(noteStream):
+            if i <= len(noteStream) - 2:
+                nNext = noteStream[i+1]
+            else:
+                nNext = None
 
-    #s.show()
+            if nNext is not None:
+                #environLocal.printDebug(['creating interval from notes:', n, nNext, i])
+                i = interval.notesToInterval(n, nNext)
+                environLocal.printDebug(['got interval', i.name])
+                if i.name in ['m7', 'M7']:
+                    #n.addLyric(s.metadata.title)
+                    junk, fn = os.path.split(fp)
+                    n.addLyric('%s: %s' % (fn, num))
 
-
-
-
+                    m = noteStream.extractContext(n, 1, 2, forceOutputClass=stream.Measure)
+                    m.makeAccidentals()
+                    m.timeSignature = m.bestTimeSignature()
+                    results.append(m)
+    results.show()
 
 def chordifyAnalysis():
     from music21 import stream, interval
@@ -350,6 +363,32 @@ def chordifyAnalysis():
             if j < len(c.pitches) - 1: # if not last, which is lowest
                 i = interval.Interval(c.pitches[-1], p)
                 c.addLyric(i.name)
+        c.closedPosition(forceOctave=4, inPlace=True)
+        c.removeRedundantPitches(inPlace=True)
+
+    display.insert(0, reduction)
+    display.show()
+
+
+def chordifyAnalysisHandel():
+    from music21 import stream, interval
+
+    sSrc = corpus.parseWork('hwv56', '3-03')
+
+    sExcerpt = sSrc #.measures(0,20)
+
+    display = stream.Score()
+    display.metadata = sSrc.metadata
+    for p in sExcerpt.parts:
+        display.insert(0, p)
+
+    reduction = sExcerpt.chordify()
+    for c in reduction.flat.getElementsByClass('Chord'):
+        c.sortAscending()
+        for j, p in enumerate(c.pitches):
+            if j < len(c.pitches) - 1: # if not last, which is lowest
+                i = interval.Interval(c.pitches[-1], p)
+                c.addLyric(i.semiSimpleName)
         c.closedPosition(forceOctave=4, inPlace=True)
         c.removeRedundantPitches(inPlace=True)
 
@@ -392,5 +431,7 @@ if __name__ == "__main__":
         t = Test()
 
         #corpusSearch()
-        corpusMelodicIntervalSearch()
+        #corpusMelodicIntervalSearch()
         #chordifyAnalysis()
+        #chordifyAnalysisHandel()
+        corpusFindMelodicSevenths()
