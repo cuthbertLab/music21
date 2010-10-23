@@ -460,7 +460,7 @@ class Test(unittest.TestCase):
 
         # replace w/ ballad80, smaller or erk5
         fp = corpus.getWork('teste')
-        self.assertEqual(fp.endswith('essenFolksong/teste.abc'), True)
+        self.assertTrue(fp.endswith('essenFolksong/teste.abc') or fp.endswith(r'essenFolksong\teste.abc'))
 
         af = abc.ABCFile()
         af.open(fp) # return handler, processes tokens

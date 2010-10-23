@@ -1554,7 +1554,7 @@ class Stream(music21.Music21Object):
 
         >>> s2.flat.getOffsetBySite(n1) # this will not work
         Traceback (most recent call last):
-        KeyError: ...
+        DefinedContextsException: ...
 
         >>> s2.flat.getOffsetByElement(n1)
         20.0
