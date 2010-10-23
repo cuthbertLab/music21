@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         icmc2010.py
-# Purpose:      icmc2010.py
+# Name:         smt2010.py
+# Purpose:      Demonstrations for the SMT 2010 poster session
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -14,7 +14,6 @@
 import unittest, doctest
 from music21 import *
 
-from music21 import environment
 _MOD = 'demo/smt2010.py'
 environLocal = environment.Environment(_MOD)
 

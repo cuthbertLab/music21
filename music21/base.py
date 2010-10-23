@@ -718,6 +718,7 @@ class DefinedContexts(object):
         >>> bSite = Mock()
         >>> cSite = Mock()
         >>> dSite = Mock()
+        >>> eSite = Mock()
         >>> aLocations = DefinedContexts()
         >>> aLocations.add(aSite, 0)
         >>> aLocations.add(cSite) # a context
@@ -726,7 +727,10 @@ class DefinedContexts(object):
         >>> aLocations._getOffsetBySiteId(id(bSite))
         234
         '''
-        value = self._definedContexts[idKey]['offset']
+        try:
+            value = self._definedContexts[idKey]['offset']
+        except KeyError:
+            raise DefinedContextsException("Could not find the object with id %d in the Site marked with idKey %d" % (id(self), idKey))
         # stored string are summed to be attributes of the stored object
         if isinstance(value, str):
             if value not in ['highestTime', 'lowestOffset', 'highestOffset']:
@@ -810,7 +814,7 @@ class DefinedContexts(object):
             # will raise a key error if not found
             post = self._getOffsetBySiteId(siteId) 
             #post = self._definedContexts[siteId]['offset']
-        except KeyError: # the site id is not valid
+        except DefinedContextsException: # the site id is not valid
             environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
 
 #             self.purgeLocations()
@@ -1567,10 +1571,22 @@ class Music21Object(JSONSerializer):
         Note that this is different than the getOffsetByElement() method on 
         Stream in that this can never access the flat representation of a Stream.
 
-        >>> a = Music21Object()
+        >>> from music21 import *
+        >>> a = base.Music21Object()
         >>> a.offset = 30
         >>> a.getOffsetBySite(None)
         30.0
+        
+        >>> s1 = stream.Stream()
+        >>> s1.insert(20.5, a)
+        >>> a.getOffsetBySite(s1)
+        20.5
+        >>> s2 = stream.Stream()
+        >>> a.getOffsetBySite(s2)
+        Traceback (most recent call last):
+        ...
+        DefinedContextsException: Could not find the object with id ...
+        
         '''
         return self._definedContexts.getOffsetBySite(site)
 

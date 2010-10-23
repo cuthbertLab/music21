@@ -489,7 +489,7 @@ class PartitionedClass(PartitionedName):
     def _fillDataLive(self):
         post = []
         # we cannot get this data if the object cannot be instantiated
-        if self.srcObj == None: 
+        if self.srcObj is None: 
             return post
         # dir(self.srcObj) will get all names
         # want only writable attributes: 
