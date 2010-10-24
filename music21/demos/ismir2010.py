@@ -229,8 +229,8 @@ def pitchQuarterLengthUsage3D(show=True):
 
 
 def messiaen(show = True):
-    messiaen = converter.parse('d:/docs/research/music21/ismir-2010/messiaen_valeurs_part2.xml')
-    #messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
+    #messiaen = #converter.parse('d:/docs/research/music21/ismir-2010/messiaen_valeurs_part2.xml')
+    messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
 
     #messiaen.show()
     notes = messiaen.flat.stripTies()
@@ -435,6 +435,22 @@ def demoGraphMessiaen():
 
     # s.getMeasuresRange(10,20)plot('PlotHorizontalBarPitchSpaceOffset')
     # s.plot('PlotScatterWeightedPitchSpaceQuarterLength')
+
+
+def demoGraphMessiaenBrief():
+    # use Messiaen, ciconia, bach
+    fp = '/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml'
+    dpi = 300
+
+    #pieceTitle = 'Messiaen, Mode de valeurs..., Part 2'
+
+    s = converter.parse(fp).stripTies()
+
+
+    #s.plot('scatter', values=['pitchclass', 'offset'], dpi=dpi)
+
+    s.plot('scatterweighted', title='', values=['pitch', 'quarterlength'], dpi=dpi, xLog=False)
+
 
 
 def demoGraphBach():
@@ -659,4 +675,7 @@ if __name__ == "__main__":
 
         #beethovenSearch()
 
-        demoBachSearchBrief()
+        #demoBachSearchBrief()
+
+        demoGraphMessiaenBrief()
+

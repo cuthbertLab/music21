@@ -373,29 +373,41 @@ def chordifyAnalysis():
 def chordifyAnalysisHandel():
     from music21 import stream, interval
 
-    sSrc = corpus.parseWork('hwv56', '3-03')
-
-    sExcerpt = sSrc #.measures(0,20)
-
+    sExcerpt = corpus.parseWork('hwv56', '3-03')
+    sExcerpt = sExcerpt.measures(0,10)
     display = stream.Score()
-    display.metadata = sSrc.metadata
-    for p in sExcerpt.parts:
-        display.insert(0, p)
-
+    for p in sExcerpt.parts: display.insert(0, p)
     reduction = sExcerpt.chordify()
     for c in reduction.flat.getElementsByClass('Chord'):
+        c.removeRedundantPitches(inPlace=True)
         c.sortAscending()
         for j, p in enumerate(c.pitches):
             if j < len(c.pitches) - 1: # if not last, which is lowest
                 i = interval.Interval(c.pitches[-1], p)
                 c.addLyric(i.semiSimpleName)
         c.closedPosition(forceOctave=4, inPlace=True)
-        c.removeRedundantPitches(inPlace=True)
-
     display.insert(0, reduction)
     display.show()
 
 
+
+def chordifyAnalysisBrief():
+    from music21 import stream, interval
+
+    # 7. Contrapunctus VII, a 4 per Augmentationem et Diminutionem: Uses augmented (doubling all note lengths) and diminished versions of the main subject and its inversion.
+
+    #sSrc = corpus.parseWork('josquin/milleRegrets').mergeScores()
+    sSrc = corpus.parseWork('bwv1080', 8)
+    sExcerpt = sSrc #.measures(60,61)
+    display = stream.Score()
+    for p in sExcerpt.parts: display.insert(0, p)
+    reduction = sExcerpt.chordify()
+    for c in reduction.flat.getElementsByClass('Chord'):
+        c.annotateIntervals()
+        c.closedPosition(forceOctave=4, inPlace=True)
+        c.removeRedundantPitches(inPlace=True)
+    display.insert(0, reduction)
+    display.show()
 
 
 #-------------------------------------------------------------------------------
@@ -434,4 +446,9 @@ if __name__ == "__main__":
         #corpusMelodicIntervalSearch()
         #chordifyAnalysis()
         #chordifyAnalysisHandel()
-        corpusFindMelodicSevenths()
+        #corpusFindMelodicSevenths()
+
+        #ex04()
+
+        #chordifyAnalysisHandel()
+        chordifyAnalysisBrief()

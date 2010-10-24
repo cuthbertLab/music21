@@ -1551,6 +1551,26 @@ class Chord(note.NotRest):
         raise ChordException('not yet implemented')
 
     #---------------------------------------------------------------------------
+    # annotations
+
+    def annotateIntervals(self):
+        # make a copy of self for reducing pitches, but attach to self
+        c = copy.deepcopy(self)
+
+        # this could be an option
+        c.removeRedundantPitches(inPlace=True)
+        c.sortAscending()
+        #environLocal.printDebug(['annotateIntervals()', c.pitches])
+        for j, p in enumerate(c.pitches):
+            if j < len(c.pitches) - 1: # if not last, which is lowest
+                i = interval.Interval(c.pitches[-1], p)
+                notation = i.semiSimpleName
+                # remove perfect
+                notation = notation.replace('P', '')
+                self.addLyric(notation)
+
+
+    #---------------------------------------------------------------------------
     # new methods for forte/pitch class data
 
     def _formatVectorString(self, vectorList):
