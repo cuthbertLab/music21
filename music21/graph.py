@@ -349,7 +349,8 @@ class Graph(object):
             ax.set_title(self.title, fontsize=self.titleFontSize, family=self.fontFamily)
 
         if self.grid:
-            ax.grid(True, color=self.colorGrid)
+            if self.colorGrid is not None: # None is another way to hide grid
+                ax.grid(True, color=self.colorGrid)
 
 
         # right and top must be larger

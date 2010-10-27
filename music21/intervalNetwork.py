@@ -92,7 +92,7 @@ class IntervalNetwork:
         return self._nodesOrdered[0]
     
     firstNode = property(_getFirstNode, 
-        doc='''Return the last Node.
+        doc='''Return the coordinates of the first Node. Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the strings 'start' or 'end.' As 
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
@@ -105,7 +105,7 @@ class IntervalNetwork:
         return self._nodesOrdered[-1]
     
     lastNode = property(_getLastNode, 
-        doc='''Return the last Node.
+        doc='''Return the coordinates of the last Node. Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
@@ -117,7 +117,10 @@ class IntervalNetwork:
 
     #---------------------------------------------------------------------------
     def _filterNodeId(self, id):
-        '''
+        '''Given a node id, return the edge coordinates.
+
+        Node 1 is the first node, even though the edge coordinates are 'start' and 0.
+
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
         >>> net.setEdges(edgeList)
@@ -197,7 +200,6 @@ class IntervalNetwork:
             # do nothing
             return nodesRealized
 
-
         # first, extend upward, starting with the topmost interval   
         post = []
         if maxPitch.ps > localMax.ps:
@@ -253,10 +255,10 @@ class IntervalNetwork:
         >>> net.realize(pitch.Pitch('G3'))
         [G3, A3, B3, C4, D4, E4, F#4, G4]
 
-        >>> net.realize(pitch.Pitch('G3'), 5) # fifth (scale) degree
+        >>> net.realize(pitch.Pitch('G3'), 5) # G3 is the fifth (scale) degree
         [C3, D3, E3, F3, G3, A3, B3, C4]
 
-        >>> net.realize(pitch.Pitch('G3'), 7) # seventh (scale) degree
+        >>> net.realize(pitch.Pitch('G3'), 7) # G3 is the seventh (scale) degree
         [A-2, B-2, C3, D-3, E-3, F3, G3, A-3]
 
         >>> net.realize(pitch.Pitch('G3'), 1) # seventh (scale) degree
@@ -325,7 +327,7 @@ class IntervalNetwork:
         >>> net.realize(pitch.Pitch('e-2'))
         [E-2, F2, G2, A-2, B-2, C3, D3, E-3]
 
-        >>> net.getRelativeNodeId('e-2', 1, 'd3')
+        >>> net.getRelativeNodeId('e-2', 1, 'd3') # if e- is tonic, what is d3
         7
         >>> net.getRelativeNodeId('e3', 1, 'd5') == None
         True
@@ -350,7 +352,7 @@ class IntervalNetwork:
 
 
         >>> from music21 import *
-        >>> edgeList = ['p4', 'p4', 'p4']
+        >>> edgeList = ['p4', 'p4', 'p4'] # a non octave-repeating scale
         >>> net = IntervalNetwork(edgeList)
         >>> net.realize('f2')
         [F2, B-2, E-3, A-3]
@@ -481,7 +483,7 @@ class IntervalNetwork:
         >>> net.realize('e-2')
         [E-2, F2, G2, A-2, B-2, C3, D3, E-3]
 
-        >>> net.match('e-2', 1, 'c3')
+        >>> net.match('e-2', 1, 'c3') # if e- is tonic, is 'c3' in the scale?
         ([C3], [])
 
         >>> net.match('e-2', 1, 'd3')
@@ -545,6 +547,7 @@ class IntervalNetwork:
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork(edgeList)
+        >>> # a network built on G or D as 
         >>> net.find(['g', 'a', 'b', 'd', 'f#'])
         [(5, G), (5, D), (4, A), (4, C)]
 
@@ -556,7 +559,7 @@ class IntervalNetwork:
         nodeId = self._getFirstNode()
         sortList = []
 
-        # for now, searchin 12 pitches; this may be more than necessary
+        # for now, searching 12 pitches; this may be more than necessary
         for p in [pitch.Pitch('c'), pitch.Pitch('c#'),
                   pitch.Pitch('d'), pitch.Pitch('d#'),
                   pitch.Pitch('e'), pitch.Pitch('f'),
@@ -597,8 +600,10 @@ class Test(unittest.TestCase):
         match = net.realize('c#', 7, 'c8', 'c9')        
         self.assertEqual(str(match), '[C#8, D8, E8, F#8, G8, A8, B8]')
         
-        # for a given realization, we can find out the scale degree of any pithc
+        # for a given realization, we can find out the scale degree of any pitch
+        # if c# is the leading tone, what is d? 1
         self.assertEqual(net.getRelativeNodeId('c#', 7, 'd2'), 1)
+        # if c# is the mediant, what is d? 4
         self.assertEqual(net.getRelativeNodeId('c#', 3, 'd2'), 4)
         
         
@@ -619,10 +624,12 @@ class Test(unittest.TestCase):
         net = IntervalNetwork(edgeList)
         
         # if we know a realized version, we can test if pitches match in that version; returns matched, not found, and no match lists
+        # f i s found in a scale where e- is the tonic
         matched, noMatch = net.match('e-', 1, 'f')
         self.assertEqual(str(matched), '[F]')
         
         # can search a list of pitches, isolating non-scale tones
+        # if e- is the tonic, which pitches are part of the scale
         matched, noMatch = net.match('e-', 1, ['b-', 'd-', 'f'])
         self.assertEqual(str(matched), '[B-, F]')
         self.assertEqual(str(noMatch), '[D-]')
@@ -654,6 +661,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(match), '[G#, B#4, D#5, G#5]')
         
         # if g# is the fifth, or third node
+        # a specialzied subclass can handle this mapping
         match = net.realize('g#', 3)        
         self.assertEqual(str(match), '[C#4, E#4, G#, C#5]')
         
@@ -724,3 +732,9 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         a = Test()
 
+
+
+
+# melodic/harmonic minor
+# abstracted in scale class
+# non uni-directional scale

@@ -1553,21 +1553,28 @@ class Chord(note.NotRest):
     #---------------------------------------------------------------------------
     # annotations
 
-    def annotateIntervals(self):
+    def annotateIntervals(self, stripSpecifiers=True, sortPitches=False):
         # make a copy of self for reducing pitches, but attach to self
         c = copy.deepcopy(self)
 
         # this could be an option
         c.removeRedundantPitches(inPlace=True)
-        c.sortAscending()
+        if sortPitches:
+            c.sortAscending()
         #environLocal.printDebug(['annotateIntervals()', c.pitches])
-        for j, p in enumerate(c.pitches):
-            if j < len(c.pitches) - 1: # if not last, which is lowest
-                i = interval.Interval(c.pitches[-1], p)
-                notation = i.semiSimpleName
-                # remove perfect
-                notation = notation.replace('P', '')
-                self.addLyric(notation)
+        for j in range(len(c.pitches)-1, 0, -1): # only go to zero 
+            if j == 0: 
+                continue # first is lowest
+            p = c.pitches[j]
+            i = interval.Interval(c.pitches[0], p)
+            notation = i.semiSimpleName
+            # remove perfect
+            if stripSpecifiers:
+                notation = notation.lower().replace('p', '')
+                notation = notation.replace('m', '')
+                notation = notation.replace('d', '')
+                notation = notation.replace('a', '')
+            self.addLyric(notation)
 
 
     #---------------------------------------------------------------------------

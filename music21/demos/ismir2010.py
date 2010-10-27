@@ -440,7 +440,7 @@ def demoGraphMessiaen():
 def demoGraphMessiaenBrief():
     # use Messiaen, ciconia, bach
     fp = '/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml'
-    dpi = 300
+    dpi = 600
 
     #pieceTitle = 'Messiaen, Mode de valeurs..., Part 2'
 
@@ -449,7 +449,7 @@ def demoGraphMessiaenBrief():
 
     #s.plot('scatter', values=['pitchclass', 'offset'], dpi=dpi)
 
-    s.plot('scatterweighted', title='', values=['pitch', 'quarterlength'], dpi=dpi, xLog=False)
+    s.plot('scatterweighted', title='', colorGrid=None, values=['pitch', 'quarterlength'], dpi=dpi, xLog=False)
 
 
 
@@ -678,4 +678,5 @@ if __name__ == "__main__":
         #demoBachSearchBrief()
 
         demoGraphMessiaenBrief()
+
 

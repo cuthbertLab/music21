@@ -264,6 +264,7 @@ def demoJesse(show=True):
 
 
 def corpusMelodicIntervalSearch():
+    # this version compares china to netherlands
     from music21 import corpus
     from music21.analysis import discrete
 
@@ -292,6 +293,34 @@ def corpusMelodicIntervalSearch():
 #         for key in sorted(intervalDict.keys()):
 #             print intervalDict[key]
 
+    for sub in msg: 
+        print sub
+
+
+
+       # ('anhui', corpus.search('anhui', 'locale')), # gets 3.5
+       # ('Qinghai', corpus.search('Qinghai', 'locale')), # gets 2.5
+       # ('Zhejiang', corpus.search('Zhejiang', 'locale')), # ; coastal
+        # shanxi get 3.2
+        # fujian gets 0.8
+def corpusMelodicIntervalSearchBrief(show=False):
+    # try for the most concise representation
+    from music21 import corpus, analysis
+    mid = analysis.discrete.MelodicIntervalDiversity()
+    msg = []
+    for region in ['shanxi', 'fujian']:
+        intervalDict = {}
+        intervalCount = 0
+        seventhCount = 0
+        for fp, n in corpus.search(region, 'locale'):
+            s = converter.parse(fp, number=n)
+            intervalDict = mid.countMelodicIntervals(s, found=intervalDict)
+        for key in intervalDict.keys():
+            intervalCount += intervalDict[key][1] # second value is count
+            if key in ['m7', 'M7']:
+                seventhCount += intervalDict[key][1] 
+        pcentSevenths = round((seventhCount / float(intervalCount) * 100), 4)
+        msg.append('locale: %s: found %s percent melodic sevenths, out of %s intervals' % (region, pcentSevenths, intervalCount))
     for sub in msg: 
         print sub
 
@@ -358,14 +387,9 @@ def chordifyAnalysis():
 
     reduction = sExcerpt.chordify()
     for c in reduction.flat.getElementsByClass('Chord'):
-        c.sortAscending()
-        for j, p in enumerate(c.pitches):
-            if j < len(c.pitches) - 1: # if not last, which is lowest
-                i = interval.Interval(c.pitches[-1], p)
-                c.addLyric(i.name)
+        c.annotateIntervals()
         c.closedPosition(forceOctave=4, inPlace=True)
         c.removeRedundantPitches(inPlace=True)
-
     display.insert(0, reduction)
     display.show()
 
@@ -379,33 +403,33 @@ def chordifyAnalysisHandel():
     for p in sExcerpt.parts: display.insert(0, p)
     reduction = sExcerpt.chordify()
     for c in reduction.flat.getElementsByClass('Chord'):
-        c.removeRedundantPitches(inPlace=True)
-        c.sortAscending()
-        for j, p in enumerate(c.pitches):
-            if j < len(c.pitches) - 1: # if not last, which is lowest
-                i = interval.Interval(c.pitches[-1], p)
-                c.addLyric(i.semiSimpleName)
+        c.annotateIntervals()
         c.closedPosition(forceOctave=4, inPlace=True)
+        c.removeRedundantPitches(inPlace=True)
     display.insert(0, reduction)
     display.show()
 
 
 
 def chordifyAnalysisBrief():
-    from music21 import stream, interval
-
-    # 7. Contrapunctus VII, a 4 per Augmentationem et Diminutionem: Uses augmented (doubling all note lengths) and diminished versions of the main subject and its inversion.
-
     #sSrc = corpus.parseWork('josquin/milleRegrets').mergeScores()
-    sSrc = corpus.parseWork('bwv1080', 8)
-    sExcerpt = sSrc #.measures(60,61)
+
+    from music21 import stream, interval
+    #sExcerpt = corpus.parseWork('bwv1080', 8).measures(10,12)
+
+    # 128, 134
+    #o = corpus.parseWork('josquin/milleRegrets')
+    # remove number
+    o = corpus.parseWork('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
+    sExcerpt = o.mergeScores().measures(128, 134)
+
     display = stream.Score()
     for p in sExcerpt.parts: display.insert(0, p)
     reduction = sExcerpt.chordify()
     for c in reduction.flat.getElementsByClass('Chord'):
-        c.annotateIntervals()
         c.closedPosition(forceOctave=4, inPlace=True)
         c.removeRedundantPitches(inPlace=True)
+        c.annotateIntervals()
     display.insert(0, reduction)
     display.show()
 
@@ -424,9 +448,8 @@ class Test(unittest.TestCase):
         #sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
         # ex03, ex01, ex02, ex04, ex01Alt, findHighestNotes,ex1_revised
         #for func in [findPotentialPassingTones]:
-        for func in [findHighestNotes, demoJesse]:
+        for func in [findHighestNotes, demoJesse, corpusMelodicIntervalSearchBrief]:
 
-            pass
             #func(show=False, op133=sStream)
             func(show=False)
 
@@ -451,4 +474,6 @@ if __name__ == "__main__":
         #ex04()
 
         #chordifyAnalysisHandel()
+        #chordifyAnalysisBrief()
+        #corpusMelodicIntervalSearchBrief()
         chordifyAnalysisBrief()
