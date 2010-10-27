@@ -16,7 +16,12 @@ _MOD = 'demo/nemcog.py'
 environLocal = environment.Environment(_MOD)
 
 def timing(show = True):
-    pass
+    thusSaith = corpus.parseWork('handel/hwv56', '1-05')
+    #thusSaith.show()
+
+    chordSaith = thusSaith.chordify()
+    if show is True:
+        chordSaith.show()
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -25,7 +30,7 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
-        '''Test non-showing functions
+        '''nemcog: Test non-showing functions
         '''
         # beethoven examples are commented out for time
         # findPassingTones too
@@ -36,7 +41,7 @@ class Test(unittest.TestCase):
 
             pass
             #func(show=False, op133=sStream)
-            func(show=True)
+            #func(show=False)
 
 
 if __name__ == "__main__":

@@ -175,7 +175,7 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
-        '''Test non-showing functions
+        '''icmc2010: Test non-showing functions
         '''
         for func in [bergEx01, showDots, findRaisedSevenths, oldAccent]:
             func(show=False)

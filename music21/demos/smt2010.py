@@ -417,7 +417,7 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
-        '''Test non-showing functions
+        '''smt2010: Test non-showing functions
         '''
         # beethoven examples are commented out for time
         # findPassingTones too

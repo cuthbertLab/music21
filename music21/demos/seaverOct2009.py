@@ -516,7 +516,7 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
-        '''Test non-showing functions
+        '''seaverOct2009: Test non-showing functions
         '''
         for func in tests:
             func(show=False)

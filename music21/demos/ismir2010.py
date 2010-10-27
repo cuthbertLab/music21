@@ -625,7 +625,7 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
-        '''Test non-showing functions
+        '''ismir2010: Test non-showing functions
 
         removed b/c taking a long time
         '''
