@@ -14,7 +14,6 @@ from music21 import pitch
 from music21 import note
 from music21 import interval
 
-#COMMIT TEST
 
 #Key => Base40 pitch number
 #Value => Music21 Pitch name
@@ -145,7 +144,7 @@ def base40DeltaToInterval(delta):
     given the delta (difference) between them. The interval provided
     is without direction.
 
-    Returns None if the interval is not handled by Base40.
+    Raises a Base40 Exception if the interval is not handled by Base40.
     Base40 can only handle major, minor, perfect, augmented,
     and diminished intervals. Although not for certain, it seems
     that the engineers that designed this system assumed that
@@ -196,7 +195,7 @@ def base40ToPitch(base40Num):
     Converts a Base40 pitch number into a music21 Pitch.
     The Base40 number is octave specific.
 
-    Returns None if the Base40 pitch number given doesn't
+    Raises a Base40 Exception if the Base40 pitch number given doesn't
     have an associated pitch name. There is one unassigned number
     each time the interval between two letters is a whole step.
     
@@ -207,7 +206,7 @@ def base40ToPitch(base40Num):
     B##1
     >>> base40ToPitch(23)
     Traceback (most recent call last):
-    Base40Exception: Pitch name not assigned to this Base40 number: 23
+    Base40Exception: Pitch name not assigned to this Base40 number 23
     >>> base40ToPitch(186)
     G5
     '''
@@ -219,8 +218,7 @@ def base40ToPitch(base40Num):
         p.name = pitchName
         return p
 
-    #raise ValueError('Pitch name not assigned to this Base40 number.')
-    raise Base40Exception('Pitch name not assigned to this Base40 number: ' \
+    raise Base40Exception('Pitch name not assigned to this Base40 number ' \
           + str(base40Num))
 
 
@@ -229,7 +227,7 @@ def pitchToBase40(pitchToConvert):
     Converts a pitch string or a music21 Pitch into a Base40
     pitch number. The Base40 number is octave specific.
     
-    Returns None if the pitch to convert is outside the set
+    Raises a Base40 Exception if the pitch to convert is outside the set
     of pitches that Base40 can handle; for example, half flats
     and half sharps or triple flats and triple sharps.
 
@@ -240,7 +238,7 @@ def pitchToBase40(pitchToConvert):
     142
     >>> pitchToBase40('F###4')
     Traceback (most recent call last):
-    Base40Exception: Base40 cannot handle this pitch: F###4
+    Base40Exception: Base40 cannot handle this pitch F###4
     '''
     if type(pitchToConvert) == str:
             pitchToConvert = pitch.Pitch(pitchToConvert)
@@ -250,7 +248,7 @@ def pitchToBase40(pitchToConvert):
         return base40Num
 
     #raise ValueError('Base40 cannot handle this pitch.')
-    raise Base40Exception('Base40 cannot handle this pitch: ' + \
+    raise Base40Exception('Base40 cannot handle this pitch ' + \
           pitchToConvert.nameWithOctave)
 
 
@@ -260,7 +258,7 @@ def base40Interval(base40NumA, base40NumB):
     numbers, using their delta (difference) as defined
     in Base40. The interval provided is without direction.
     
-    Returns None if the delta doesn't correspond
+    Raises a Base40 Exception if the delta doesn't correspond
     to an interval in Base40, or if either base40 pitch
     number doesn't correspond to a pitch name.
 
@@ -274,22 +272,22 @@ def base40Interval(base40NumA, base40NumB):
     >>> base40Interval(1,3)
     Traceback (most recent call last):
     Base40Exception: Interval not handled by Base40 2
-    >>> base40ActualInterval(2,6)
+    >>> base40Interval(2,6)
     Traceback (most recent call last):
-    Base40Exception: Pitch name not assigned to this Base40 number: 6
+    Base40Exception: Pitch name not assigned to this Base40 number 6 Interval does not exist
     '''
     pitchA = base40Equivalent[(base40NumA-1)%40 + 1]
     pitchB = base40Equivalent[(base40NumB-1)%40 + 1]
 
     if pitchA == None and pitchB == None:
-        raise Base40Exception('Pitch name not assigned to these Base40 numbers: ' \
+        raise Base40Exception('Pitch name not assigned to these Base40 numbers ' \
               + str(base40NumA) + ' and ' + str(base40NumA) + ' Interval does not exist')
         return None
     elif pitchA == None:
-        raise Base40Exception('Pitch name not assigned to this Base40 number: ' \
+        raise Base40Exception('Pitch name not assigned to this Base40 number ' \
               + str(base40NumA) + ' Interval does not exist')
     elif pitchB == None:
-        raise Base40Exception('Pitch name not assigned to this Base40 number: ' \
+        raise Base40Exception('Pitch name not assigned to this Base40 number ' \
               + str(base40NumB) + ' Interval does not exist')
  
     delta = abs(base40NumB - base40NumA)
@@ -301,7 +299,7 @@ def base40ActualInterval(base40NumA, base40NumB):
     Calculates a music21 Interval between two Base40 pitch
     numbers, as calculated using the music21.interval module.
 
-    Returns None if (a) Either or both of the Base40 pitch
+    Raises a Base40 Exception if (a) Either of the Base40 pitch
     numbers does not correspond to a pitch name or (b) If
     an unusual interval is encountered that can't be handled
     by music21.
@@ -317,17 +315,15 @@ def base40ActualInterval(base40NumA, base40NumB):
     <music21.interval.Interval AA1>
     >>> base40ActualInterval(2,6)
     Traceback (most recent call last):
-    Base40Exception: Pitch name not assigned to this Base40 number: 6
+    Base40Exception: Pitch name not assigned to this Base40 number 6
 
     OMIT_FROM_DOCS
     >>> base40ActualInterval(12,6)
     Traceback (most recent call last):
-    Base40Exception: Pitch name not assigned to this Base40 number: 12
+    Base40Exception: Pitch name not assigned to this Base40 number 12
     '''
     pitchA = base40ToPitch(base40NumA)
     pitchB = base40ToPitch(base40NumB)
-    if pitchA == None or pitchB == None:
-        raise Base40Exception('Interval does not exist')
 
     noteA = note.Note()
     noteA.pitch = pitchA
@@ -337,7 +333,7 @@ def base40ActualInterval(base40NumA, base40NumB):
     try:
         return interval.notesToInterval(noteA,noteB)
     except IndexError:
-        raise Base40Exception('Unusual interval: Limitation of music21.interval')
+        raise Base40Exception('Unusual interval- Limitation of music21.interval')
     
 class Base40Exception(music21.Music21Exception):
     pass
@@ -348,5 +344,6 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
+    #base40Interval(2,6)    
     music21.mainTest(Test)
