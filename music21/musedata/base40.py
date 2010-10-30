@@ -345,5 +345,4 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    #base40Interval(2,6)    
     music21.mainTest(Test)
