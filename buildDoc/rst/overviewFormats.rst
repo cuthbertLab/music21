@@ -112,10 +112,38 @@ Getting ABC Files
 
 Large collections of ABC are available from numerous on-line repositories. The following links are just a few of the many resources available. 
 
-http://abcnotation.com/
-http://www.serpentpublications.org/
+http://abcnotation.com
+
+http://www.serpentpublications.org
 
 
+
+
+
+
+
+
+Parsing Musedata Files
+------------------------
+
+Both stage 1 and stage 2 Musedata file formats are supported by Music21. Multi-part Musedata (stage 2) files, zipped archives, and directories containing individual files for each part (stage 1 or stage 2) can be imported with the :func:`music21.converter.parse` function on the desired file path or URL.
+
+>>> from music21 import *
+>>> s = converter.parse('http://www.musedata.org/cgi-bin/mddata?composer=corelli&edition=chry&genre=trio&work=op1n08&format=stage2&movement=01')
+
+If a directory or zipped archive is passed to the :func:`music21.converter.parse` function, the contained files will be treated as a collection of Musedata parts.
+
+>>> corpus.getWork('bach/bwv1080/16')
+'/Users/ariza/_x/src/music21/music21/corpus/bach/bwv1080/16.zip'
+>>> s = corpus.parseWork('bach/bwv1080/16')
+
+
+Getting Musedata Files
+------------------------
+
+Large collections of Musedata files are available from musedata.org, sponsored by the Center for Computer Assisted Research in the Humanities at Stanford University.
+
+http://www.musedata.org/
 
 
 
