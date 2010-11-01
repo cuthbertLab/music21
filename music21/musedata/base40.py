@@ -141,8 +141,7 @@ base40IntervalTable = \
 def base40DeltaToInterval(delta):
     '''
     Returns a music21 Interval between two Base40 pitch numbers
-    given the delta (difference) between them. The interval provided
-    is without direction.
+    given the delta (difference) between them.
 
     Raises a Base40 Exception if the interval is not handled by Base40.
     Base40 can only handle major, minor, perfect, augmented,
@@ -161,35 +160,37 @@ def base40DeltaToInterval(delta):
     <music21.interval.Interval m3>
     >>> base40DeltaToInterval(23)
     <music21.interval.Interval P5>
+    >>> base40DeltaToInterval(-23)
+    <music21.interval.Interval P-5>
     >>> base40DeltaToInterval(52)
     <music21.interval.Interval M10>
-    >>> base40DeltaToInterval(37)
+    >>> base40DeltaToInterval(-52)
+    <music21.interval.Interval M-10>    
+    >>> base40DeltaToInterval(77)
     Traceback (most recent call last):
     Base40Exception: Interval not handled by Base40 37
     '''
-    #Simple intervals
-    if delta <= 40:
-        try:
-            return base40IntervalTable[delta]
-        except KeyError:
-            raise Base40Exception('Interval not handled by Base40 ' + str(delta))
-
-    #Compound intervals
-    simpleDelta = delta % 40
-
+    
+    direction = 1
+    if delta < 0:
+       direction = -1
+       
+    simpleDelta = abs(delta) % 40
+    
     try:
         simpleInterval = base40IntervalTable[simpleDelta]
     except KeyError:
         raise Base40Exception('Interval not handled by Base40 ' + str(simpleDelta))
 
-    numOctaves = delta / 40
-
+    numOctaves = abs(delta) / 40
+    
     sgi = simpleInterval.generic #Simple generic interval
-    cgi = interval.GenericInterval(sgi.value + 7 * numOctaves) #Compound generic interval
+    cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves)) #Compound generic interval
     sdi = simpleInterval.diatonic #Simple diatonic interval
-    cdi = interval.DiatonicInterval(sdi.specifier,cgi.value) #Compound diatonic interval
+    
+    newInterval = interval.convertSpecifier(sdi.specifier)[1] + str(cgi.value)
 
-    return interval.Interval(cdi.name)
+    return interval.Interval(newInterval)
     
 
 def base40ToPitch(base40Num):
@@ -268,7 +269,7 @@ def base40Interval(base40NumA, base40NumB):
     >>> base40Interval(163,191)
     <music21.interval.Interval m6>
     >>> base40Interval(186,174)      #Descending M3
-    <music21.interval.Interval M3> 
+    <music21.interval.Interval M-3> 
     >>> base40Interval(1,5)          #INCORRECT!
     <music21.interval.Interval d2> 
     >>> base40Interval(1,3)
@@ -292,7 +293,7 @@ def base40Interval(base40NumA, base40NumB):
         raise Base40Exception('Pitch name not assigned to this Base40 number ' \
               + str(base40NumB) + ' Interval does not exist')
  
-    delta = abs(base40NumB - base40NumA)
+    delta = base40NumB - base40NumA
     return base40DeltaToInterval(delta)
 
 
