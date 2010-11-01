@@ -29,7 +29,7 @@ def cacheCore():
     # the core cache is based on local files stored in music21
     # virtual is on-line
     for name, getPaths in [('virtual', corpus.getVirtualPaths), 
-                     #      ('core', corpus.getPaths), 
+                          ('core', corpus.getPaths), 
                       ]:
 
         mdb = metadata.MetadataBundle(name)

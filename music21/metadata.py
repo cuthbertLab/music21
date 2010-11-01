@@ -1870,7 +1870,7 @@ class MetadataBundle(music21.JSONSerializer):
     
 
     def addFromPaths(self, pathList):
-        '''Parse and store metadata from numerous files spec
+        '''Parse and store metadata from numerous files
 
         >>> from music21 import *
         >>> mb = MetadataBundle()
@@ -1934,7 +1934,7 @@ class MetadataBundle(music21.JSONSerializer):
             fp = os.path.join(common.getMetadataCacheFilePath(), self._name + '.json')
         self.jsonRead(fp)
 
-        environLocal.printDebug(['MetadataBundle: loading time:', t, 'md items:', len(self._storage)])
+        environLocal.printDebug(['MetadataBundle: loading time:', self._name, t, 'md items:', len(self._storage)])
 
 
     def updateAccessPaths(self, pathList):

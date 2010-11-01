@@ -238,20 +238,32 @@ def getLocalPaths(extList=None):
 
 
 #-------------------------------------------------------------------------------
-def _updateMetadataBundle(domain=['core']):
-    if 'core' in domain:
-        if _METADATA_BUNDLES['core'] == None:
-            _METADATA_BUNDLES['core'] = metadata.MetadataBundle('core')
-            _METADATA_BUNDLES['core'].read()
+def _updateMetadataBundle():
+
+    for d, f in (('core', getPaths), ('virtual', getVirtualPaths)):
+        if _METADATA_BUNDLES[d] == None:
+            _METADATA_BUNDLES[d] = metadata.MetadataBundle(d)
+            _METADATA_BUNDLES[d].read()
             # must update access paths for the files found on this system
-            _METADATA_BUNDLES['core'].updateAccessPaths(getPaths())
-    if 'virtual' in domain:
-        pass
-    if 'local' in domain:
-        pass
+            _METADATA_BUNDLES[d].updateAccessPaths(f())
+
+#     if 'core' in domain:
+#         if _METADATA_BUNDLES['core'] == None:
+#             _METADATA_BUNDLES['core'] = metadata.MetadataBundle('core')
+#             _METADATA_BUNDLES['core'].read()
+#             # must update access paths for the files found on this system
+#             _METADATA_BUNDLES['core'].updateAccessPaths(getPaths())
+#     if 'virtual' in domain:
+#         if _METADATA_BUNDLES['virtual'] == None:
+#             _METADATA_BUNDLES['virtual'] = metadata.MetadataBundle('virtual')
+#             _METADATA_BUNDLES['virtual'].read()
+#             # must update access paths for the files found on this system
+#             _METADATA_BUNDLES['virtual'].updateAccessPaths(getVirtualPaths())
+#     if 'local' in domain:
+#         pass
 
 
-def search(query, field=None, domain=['core'], extList=None):
+def search(query, field=None, domain=['core', 'virtual'], extList=None):
     '''Search all stored metadata and return a list of file paths; to return a list of parsed Streams, use searchParse(). 
 
     The `domain` parameter can be used to specify one of three corpora: core (included with music21), virtual (defined in music21 but hosted online), and local (hosted on the user's system). 
@@ -259,9 +271,11 @@ def search(query, field=None, domain=['core'], extList=None):
     This method uses stored metadata and thus, on first usage, will incur a performance penalty during metadata loading.
     '''
     post = []
-    _updateMetadataBundle(domain)
+    _updateMetadataBundle()
     if 'core' in domain:
         post += _METADATA_BUNDLES['core'].search(query, field, extList)
+    if 'virtual' in domain:
+        post += _METADATA_BUNDLES['virtual'].search(query, field, extList)
     return post
 
 
@@ -857,6 +871,12 @@ class Test(unittest.TestCase):
         post = corpus.search('sharps (.*), mode phry(.*)', 'keySignature')
         self.assertEqual(len(post) >= 9, True)
 
+        # searching virtual entries
+        post = corpus.search('coltrane', 'composer')
+        self.assertEqual(len(post) > 0, True)
+        # returns items in pairs: url and work number
+        self.assertEqual(post[0][0], 'http://static.wikifonia.org/1164/musicxml.mxl')
+
 
 
     def testGetWorkList(self):
@@ -896,6 +916,6 @@ if __name__ == "__main__":
 
         #t.testDesPrezImport()
 
-        #t.testSearch()
+        t.testSearch()
 
-        t.testGetWorkList()
+        #t.testGetWorkList()

@@ -941,11 +941,11 @@ class CorpusDoc(RestructuredWriter):
         msg = []
 
         msg.append('.. _%s:\n\n' % self.fileRef)
-        msg += self._heading('Corpus Reference Index' , '=')
+        msg += self._heading('List of Works Found in the music21 Corpus' , '=')
         msg.append(WARN_EDIT)
 
 
-        msg += self._para('''The following listing shows all files available in the music21 corpus and available through the virtual corpus. To load a work from the corpus, provide the file path stub provided. For example::
+        msg += self._para('''The following list shows all files available in the music21 corpus and available through the virtual corpus. To load a work from the corpus, provide the file path stub provided. For example::
 
         >>> from music21 import corpus
         >>> s = corpus.parseWork('bach/bwv108.6.xml')
