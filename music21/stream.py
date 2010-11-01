@@ -3385,6 +3385,7 @@ class Stream(music21.Music21Object):
         # for now, calling makeAccidentals once per measures       
         # pitches from last measure are passed
         # this needs to be called before makeTies
+        # note that this functionality is also placed in Part
         ksLast = None
         for i in range(len(measureStream)):
             m = measureStream[i]
@@ -6298,6 +6299,26 @@ class Part(Stream):
     assumes that this part fits on one staff and shares it with no other
     part
     '''
+
+    def makeAccidentals(self):
+        '''
+        This overridden method of Stream.makeAccidentals provides the management of passing pitches from a past Measure to each new measure for processing. 
+        '''
+        # process make accidentals for each measure
+        measureStream = self.getElementsByClass('Measure')
+        for i in range(len(measureStream)):
+            m = measureStream[i]
+            if m.keySignature != None:
+                ksLast = m.keySignature
+            # if beyond the first measure, use the pitches from the last
+            # measure for context
+            if i > 0:
+                m.makeAccidentals(measureStream[i-1].pitches,
+                    useKeySignature=ksLast, searchKeySignatureByContext=False)
+            else:
+                m.makeAccidentals(useKeySignature=ksLast, 
+                    searchKeySignatureByContext=False)
+
 
     def _getLily(self):
         lv = Stream._getLily(self)

@@ -245,6 +245,8 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         # cannot yet get stage 1 clef data
         p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
         p.makeBeams()
+        # will call overridden method on Part
+        p.makeAccidentals()
     # assume that beams and clefs are defined in all stage 2
    
     s.insert(0, p)
@@ -407,6 +409,25 @@ class Test(unittest.TestCase):
 
 
 
+    def testAccidentals(self):
+        from music21 import corpus
+        s = corpus.parseWork('bwv1080', '16')
+        self.assertEqual(len(s.parts[0].getKeySignatures()), 1)
+        self.assertEqual(str(s.parts[0].getKeySignatures()[0]), 'sharps -1, mode None')
+
+        notes = s.parts[0].flat.notes
+        self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
+        self.assertEqual(notes[2].accidental.displayStatus, True)
+
+        # from key signature
+        self.assertEqual(str(notes[16].accidental), '<accidental flat>')
+        self.assertEqual(notes[16].accidental.displayStatus, False)
+
+
+        #s.show()
+
+
+
 if __name__ == "__main__":
     import sys
 
@@ -416,4 +437,5 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
         #t.testGetLyrics()
-        t.testGetBeams()
+        #t.testGetBeams()
+        t.testAccidentals()
