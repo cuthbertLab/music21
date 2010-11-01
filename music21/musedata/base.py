@@ -1069,11 +1069,9 @@ class MuseDataPart(object):
         >>> mdw = MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.addFile(fp2)
-
+        >>> mdw.getParts()[0].getTranspositionIntervalObject()
+        <music21.interval.Interval m-3>
         '''
-#         >>> mdw.getParts()[0].getTranspositionIntervalObject()
-#         -11
-
         # transposition intervals are given in base40; must convert to intervals
         args = self._getTranspositionParameters()
         if args is None:

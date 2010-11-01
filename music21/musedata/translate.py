@@ -241,6 +241,16 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         p.append(m)
         barCount += 1
 
+    # for now, make all imports a c-score on import; 
+    tInterval = museDataPart.getTranspositionIntervalObject()
+    #environLocal.printDebug(['got transposition interval', p.id, tInterval])
+    if tInterval is not None:
+        p.flat.transpose(tInterval, 
+                        classFilterList=['Note', 'Chord', 'KeySignature'],
+                        inPlace=True)
+        # need to call make accidentals to correct new issues
+        p.makeAccidentals()
+
     if museDataPart.stage == 1:
         # cannot yet get stage 1 clef data
         p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
@@ -432,6 +442,18 @@ class Test(unittest.TestCase):
 
 
 
+    def testTransposingInstruments(self):
+        import os
+        from music21 import converter, common
+        fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
+        s = converter.parse(fpDir)
+        p = s.parts['Clarinet in A']
+        self.assertEqual(str(p.getElementsByClass('Measure')[0].keySignature), 'sharps 3, mode None')
+        self.assertEqual(str(p.flat.notes[0]), '<music21.note.Note A>')
+
+        #s.show()
+
+
 if __name__ == "__main__":
     import sys
 
@@ -442,4 +464,5 @@ if __name__ == "__main__":
         t = Test()
         #t.testGetLyrics()
         #t.testGetBeams()
-        t.testAccidentals()
+        #t.testAccidentals()
+        t.testTransposingInstruments()

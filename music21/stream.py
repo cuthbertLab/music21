@@ -4307,8 +4307,9 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # transformations
 
-    def transpose(self, value, inPlace=False):
-        '''Transpose all Pitches, Notes, and Chords in the 
+    def transpose(self, value, inPlace=False, 
+        classFilterList=['Note', 'Chord']):
+        '''Transpose all specified classes in the 
         Stream by the 
         user-provided value. If the value is an integer, the 
         transposition is treated in half steps. If the value is 
@@ -4344,9 +4345,13 @@ class Stream(music21.Music21Object):
             post = copy.deepcopy(self)
         else:
             post = self
-        for p in post.pitches: # includes chords
-            # do inplace transpositions on the deepcopy
-            p.transpose(value, inPlace=True)            
+#         for p in post.pitches: # includes chords
+#             # do inplace transpositions on the deepcopy
+#             p.transpose(value, inPlace=True)            
+
+        for e in post.getElementsByClass(classFilterList=classFilterList): 
+            e.transpose(value, inPlace=True)            
+
 
         if not inPlace:
             return post
@@ -10275,7 +10280,7 @@ class Test(unittest.TestCase):
 
 
         # transposing should reset all transposed accidentals
-        mStream.transpose('p5', inPlace=True)
+        mStream.flat.transpose('p5', inPlace=True)
 
         #mStream.show()
 

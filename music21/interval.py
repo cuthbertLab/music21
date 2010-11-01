@@ -2006,7 +2006,7 @@ class Test(unittest.TestCase):
         self.assertEqual(collectAccidentalDisplayStatus(sSub), 
                         ['x', False, 'x', 'x', True, False, 'x', False, False, False, False, False, False, 'x', 'x', 'x', False, False, False, 'x', 'x', 'x', 'x', True, False])
 
-        sTransposed = sSub.transpose('p5')
+        sTransposed = sSub.flat.transpose('p5')
         #sTransposed.show()
 
         self.assertEqual(collectAccidentalDisplayStatus(sTransposed), 
