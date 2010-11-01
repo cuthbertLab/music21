@@ -423,6 +423,10 @@ class Test(unittest.TestCase):
         self.assertEqual(str(notes[16].accidental), '<accidental flat>')
         self.assertEqual(notes[16].accidental.displayStatus, False)
 
+        # cautionary from within measure
+        notes = s.parts[1].measure(13).flat.notes
+        self.assertEqual(str(notes[8].accidental), '<accidental natural>')
+        self.assertEqual(notes[8].accidental.displayStatus, True)
 
         #s.show()
 

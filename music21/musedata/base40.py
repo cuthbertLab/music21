@@ -157,6 +157,8 @@ def base40DeltaToInterval(delta):
     >>> from music21 import *
     >>> base40DeltaToInterval(4)
     <music21.interval.Interval d2>
+    >>> base40DeltaToInterval(11)
+    <music21.interval.Interval m3>
     >>> base40DeltaToInterval(23)
     <music21.interval.Interval P5>
     >>> base40DeltaToInterval(52)

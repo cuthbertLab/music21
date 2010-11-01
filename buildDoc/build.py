@@ -29,7 +29,11 @@ from music21.midi import base as midi
 from music21.midi import translate as midiTranslate
 from music21.abc import base as abc
 from music21.abc import translate as abcTranslate
-
+from music21.musedata import base as musedata
+from music21.musedata import translate as musedataTranslate
+from music21.musedata import base40
+from music21.musicxml import base as musicxml
+from music21.musicxml import translate as musicxmlTranslate
 
 from music21 import duration
 from music21 import dynamics
@@ -42,7 +46,6 @@ from music21 import instrument
 from music21 import interval
 from music21 import metadata
 from music21 import meter
-from music21 import musicxml
 from music21 import note
 from music21 import node
 from music21 import pitch
@@ -105,7 +108,14 @@ MODULES = [
     meter, 
     metadata,
     metrical,
+
+    musedata,
+    musedataTranslate,
+    base40,
+
     midi,
+    midiTranslate,
+
     note, 
     node, 
     pitch, 
@@ -116,6 +126,7 @@ MODULES = [
     windowed,
 
 #   musicxml, 
+#   musicxmlTranslate,
 #   #  scale,
 
 # trecento

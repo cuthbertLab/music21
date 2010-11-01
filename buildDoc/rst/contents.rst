@@ -64,7 +64,11 @@ Module Reference
    moduleMeter
    moduleMetadata
    moduleAnalysisMetrical
+   moduleMusedataBase
+   moduleMusedataTranslate
+   moduleMusedataBase40
    moduleMidiBase
+   moduleMidiTranslate
    moduleNote
    moduleNode
    modulePitch

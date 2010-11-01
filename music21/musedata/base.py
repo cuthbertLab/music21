@@ -29,7 +29,7 @@ try:
 except:
     from io import StringIO # python3 (also in python 2.6+)
 
-
+from music21.musedata import base40
 from music21 import common
 from music21 import environment
 _MOD = 'musedata.base.py'
@@ -1033,6 +1033,53 @@ class MuseDataPart(object):
                 return clef.Bass8vaClef()
             else:
                 raise MuseDataException('cannot determine clef from:', charPair)
+
+
+    def _getTranspositionParameters(self):
+        '''
+        Get the transposition, if defined, from the Metadata header. 
+
+        >>> from music21 import *
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
+        >>> fp2 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '02.md')
+        >>> mdw = MuseDataWork()
+        >>> mdw.addFile(fp1)
+        >>> mdw.addFile(fp2)
+        >>> mdw.getParts()[0]._getTranspositionParameters()
+        -11
+        >>> mdw.getParts()[1]._getTranspositionParameters() == None
+        True
+        '''
+        line = self._getAttributesRecord()
+        if self.stage == 1:
+            return None # not sure if or if, how, this is defined
+        else:
+            raw = self._getDigitsFollowingTag(line, 'X:')
+            if raw == '':
+                return None
+            else:
+                return int(raw)
+
+    def getTranspositionIntervalObject(self):
+        '''If this part defines a transposition, return a corresponding Interval object. 
+
+        >>> from music21 import *
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
+        >>> fp2 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '02.md')
+        >>> mdw = MuseDataWork()
+        >>> mdw.addFile(fp1)
+        >>> mdw.addFile(fp2)
+
+        '''
+#         >>> mdw.getParts()[0].getTranspositionIntervalObject()
+#         -11
+
+        # transposition intervals are given in base40; must convert to intervals
+        args = self._getTranspositionParameters()
+        if args is None:
+            return None
+        else:
+            return base40.base40DeltaToInterval(args)
 
     def getDivisionsPerQuarterNote(self):
         '''
