@@ -640,13 +640,17 @@ class Stream(music21.Music21Object):
 #             raise StreamException('this element (%s, id %s) already has a location for this container (%s, id %s)' % (element, id(element), self, id(self)))
 
 
-    def insert(self, offsetOrItemOrList, itemOrNone=None, ignoreSort=False):
+    def insert(self, offsetOrItemOrList, itemOrNone=None, 
+                     ignoreSort=False, setParent=True):
         '''
         Inserts an item(s) at the given offset(s). 
 
         If `ignoreSort` is True then the inserting does not
         change whether the Stream is sorted or not (much faster if you're going to be inserting dozens
         of items that don't change the sort status)
+
+        The `setParent` parameter should nearly always be True; only for 
+        advanced Stream manipulation. 
         
         Has three forms: in the two argument form, inserts an element at the given offset:
         
@@ -723,8 +727,8 @@ class Stream(music21.Music21Object):
 
         element.addLocation(self, offset)
         # need to explicitly set the parent of the element
-        element.parent = self 
-        # element.addLocationAndParent(offset, self)
+        if setParent:
+            element.parent = self 
 
         if ignoreSort is False:
             if self.isSorted is True and self.highestTime <= offset:
@@ -3816,25 +3820,22 @@ class Stream(music21.Music21Object):
 
         
     def _getFlatOrSemiFlat(self, retainContainers):
-
+        '''The `retainContainers` option, if True, returns a semiFlat version: containers are not discarded in flattening.
+        '''
         # if already flat, could just return a shallow copy?
 #         if self.isFlat == True:
 #             return self
-
-
 #         environLocal.printDebug(['_getFlatOrSemiFlat: break1: self', self, 'self.parent', self.parent])       
-
 
         # this copy will have a shared locations object
         # not that copy.copy() in some cases seems to not cause secondary
-        # problems
+        # problems that self.__class__() does
         sNew = copy.copy(self)
         #sNew = self.__class__()
 
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
         sNew._cache = common.defHash()
-
         sNew._elements = []
         sNew._endElements = []
         sNew._elementsChanged()
@@ -3842,23 +3843,24 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['_getFlatOrSemiFlat(), sNew id', id(sNew)])
         for e in self._elements:
             # check for stream instance instead
-            # if this element is a stream
+            # if this element is a Stream
             if hasattr(e, "elements"): # recurse time:
                 recurseStreamOffset = e.getOffsetBySite(self)
                 if retainContainers is True: # semiFlat
-                    sNew.insert(recurseStreamOffset, e)
+                    # this will change the parent of e to be sNew, previously
+                    # this was the parent was the caller; thus, the parent here
+                    # should not be set
+                    sNew.insert(recurseStreamOffset, e, setParent=False)
                     recurseStream = e.semiFlat
                 else:
                     recurseStream = e.flat
                 
                 #environLocal.printDebug("recurseStreamOffset: " + str(e.id) + " " + str(recurseStreamOffset))
-                
+                # recurse Stream is the flat or semiFlat contents of a Stream
+                # contained within the caller
                 for subEl in recurseStream:
-                    # TODO: this should not access the private attribute 
                     oldOffset = subEl.getOffsetBySite(recurseStream)
-                    newOffset = oldOffset + recurseStreamOffset
-                    #environLocal.printDebug(["newOffset: ", subEl.id, newOffset])
-                    sNew.insert(newOffset, subEl)
+                    sNew.insert(oldOffset + recurseStreamOffset, subEl)
             # if element not a stream
             else:
                 # insert into new stream at offset in old stream
@@ -11222,26 +11224,34 @@ class Test(unittest.TestCase):
 
         s1 = Stream()
         s2 = Stream()
-
         s2.append(s1)
-
+        
         self.assertEqual(s1.parent, s2)
-
         junk = s1.semiFlat
         self.assertEqual(s1.parent, s2)
-
         junk = s1.flat
         self.assertEqual(s1.parent, s2)
+        
+        # this works fine
+        junk = s2.flat
+        self.assertEqual(s1.parent, s2)
+        
+        # this was the key problem: getting the semiFlat of the parent   
+        # looses the parent of the sub-stream; this is fixed by the inserting
+        # of the sub-Stream with setParent False
+        junk = s2.semiFlat
+        self.assertEqual(s1.parent, s2)
 
-        # TODO: these fail
+        # these test prove that getting a semiFlat stream does not change the
+        # parent
         junk = s1._definedContexts.getByClass(meter.TimeSignature)
-        #self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.parent, s2)
 
         junk = s1._definedContexts.getByClass(clef.Clef)
-        #self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.parent, s2)
 
-#         junk = s1.getContextByClass('Clef')
-#         self.assertEqual(s1.parent, s2)
+        junk = s1.getContextByClass('Clef')
+        self.assertEqual(s1.parent, s2)
 
 
 
