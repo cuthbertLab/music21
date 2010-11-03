@@ -2893,7 +2893,7 @@ class Stream(music21.Music21Object):
             # add voices if necessary (voiceCount > 0)
             for voiceIndex in range(voiceCount):
                 v = Voice()
-                v.id = voiceIndex
+                v.id = voiceIndex # id is voice index, starting at 0
                 m.insert(0, v)
 
             # avoid an infinite loop
@@ -2909,7 +2909,8 @@ class Stream(music21.Music21Object):
         
         # populate measures with elements
         for start, end, e, voiceIndex in offsetMap:
-            # iterate through all measures 
+            # iterate through all measures, finding a measure that 
+            # can contain this element
             match = False
             lastTimeSignature = None
             for i in range(len(post)):
@@ -2928,6 +2929,7 @@ class Stream(music21.Music21Object):
                     break
             if not match:
                 raise StreamException('cannot place element %s with start/end %s/%s within any measures' % (e, start, end))
+
             # find offset in the temporal context of this measure
             # i is the index of the measure that this element starts at
             # mStart, mEnd are correct
@@ -2941,7 +2943,10 @@ class Stream(music21.Music21Object):
             if m.clef == e:
                 continue
 
-            m.insert(oNew, e)
+            if voiceIndex = None:
+                m.insert(oNew, e)
+            else: # insert into voice specified by the voice index
+                m.voices[voiceIndex].insert(oNew, e)
 
         return post # returns a new stream populated w/ new measure streams
 
