@@ -11255,7 +11255,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in oMeasures[0].voices[0]], [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5])
         self.assertEqual([e.offset for e in oMeasures[0].voices[1]], [0.0, 1.0, 2.0, 3.0])
 
-        s.show()
+        #s.show()
 
 
     
