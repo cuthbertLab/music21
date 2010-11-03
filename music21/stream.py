@@ -2282,14 +2282,17 @@ class Stream(music21.Music21Object):
         # TODO: parent searching is not yet implemented
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass(clef.Clef)
-        #environLocal.printDebug(['getClefs(); count of local', len(post), post])       
+        environLocal.printDebug(['getClefs(); count of local', len(post), post])       
         if len(post) == 0 and searchContext:
             # returns a single value
             post = self.__class__()
+            environLocal.printDebug(['getClefs(): break1: self.parent', self.parent])       
             obj = self.getContextByClass(clef.Clef)
             #environLocal.printDebug(['getClefs(): searching contexts: results', obj])
+            environLocal.printDebug(['getClefs(): break2: self.parent', self.parent])       
             if obj != None:
                 post.append(obj)
+
 
         # get a default and/or place default at zero if nothing at zero
         if len(post) == 0 or post[0].offset > 0: 
@@ -2758,16 +2761,20 @@ class Stream(music21.Music21Object):
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
         '''
-        environLocal.printDebug(['calling Stream.makeMeasures()'])
+        #environLocal.printDebug(['calling Stream.makeMeasures()'])
 
         # the srcObj shold not be modified or chagned
-        # removed element copyig below and now making a deepcopy of entire stream
+        # removed element copying below and now making a deepcopy of entire stream
         # must take a flat representation, as we need to be able to 
         # position components, and sub-streams might hide elements that
         # should be contained
 
         # TODO: make inPlace an option
+
+        #srcObj = copy.deepcopy(self)
         srcObj = copy.deepcopy(self.flat.sorted)
+
+        environLocal.printDebug(['makeMeasures(): srcObj.parent', srcObj.parent, 'self.parent', self.parent])
 
         # may need to look in parent if no time signatures are found
         if meterStream is None:
@@ -2781,13 +2788,22 @@ class Stream(music21.Music21Object):
             meterStream = Stream()
             meterStream.insert(0, ts)
 
+#         if srcObj.hasVoices():
+#             environLocal.printDebug(['make measures found voices'])
+#             # need to call this method recursively 
+#             srcObj = srcObj.flat.sorted
+#         else:
+#             environLocal.printDebug(['make measures found no voices'])
+#             # take flat and sorted version
+#             srcObj = srcObj.flat.sorted
+
         #environLocal.printDebug(['makeMeasures(): meterStream', 'meterStream[0]', meterStream[0], 'meterStream[0].offset',  meterStream[0].offset, 'meterStream.elements[0].parent', meterStream.elements[0].parent])
 
         # get a clef for the entire stream; this will use bestClef
         # presently, this only gets the first clef
         # may need to store a clefStream and access changes in clefs
         # as is done with meterStream
-        clefStream = srcObj.getClefs()
+        clefStream = srcObj.getClefs(searchParent=True, searchContext=True)
         clefObj = clefStream[0]
 
         #environLocal.printDebug(['makeMeasures(): first clef found after copying and flattening', clefObj])
@@ -2795,7 +2811,7 @@ class Stream(music21.Music21Object):
         # for each element in stream, need to find max and min offset
         # assume that flat/sorted options will be set before procesing
         # list of start, start+dur, element
-        offsetMap = self._getOffsetMap(srcObj)
+        offsetMap = srcObj._getOffsetMap()
         #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
         #offsetMap.sort() not necessary; just get min and max
         oMin = min([start for start, end, e in offsetMap])
@@ -3805,7 +3821,13 @@ class Stream(music21.Music21Object):
 #         if self.isFlat == True:
 #             return self
 
+
+#         environLocal.printDebug(['_getFlatOrSemiFlat: break1: self', self, 'self.parent', self.parent])       
+
+
         # this copy will have a shared locations object
+        # not that copy.copy() in some cases seems to not cause secondary
+        # problems
         sNew = copy.copy(self)
         #sNew = self.__class__()
 
@@ -3841,15 +3863,18 @@ class Stream(music21.Music21Object):
             else:
                 # insert into new stream at offset in old stream
                 sNew.insert(e.getOffsetBySite(self), e)
-
+    
         # highest time elements should never be Streams
         for e in self._endElements:
             sNew.storeAtEnd(e)
 
         sNew.isFlat = True
-        # here, we store the source stream from which thiss stream was derived
+        # here, we store the source stream from which this stream was derived
         # TODO: this should probably be a weakref
         sNew.flattenedRepresentationOf = self #common.wrapWeakref(self)
+
+#         environLocal.printDebug(['_getFlatOrSemiFlat: break2: self', self, 'self.parent', self.parent])       
+
         return sNew
     
 
@@ -3914,11 +3939,8 @@ class Stream(music21.Music21Object):
 
 
     def _getSemiFlat(self):
-    # does not yet work (nor same for flat above in part because .copy() does not eliminate the cache...
-    #        if not self._cache['semiflat']:
-    #            self._cache['semiflat'] = self._getFlatOrSemiFlat(retainContainers = True)
-    #        return self._cache['semiflat']
         return self._getFlatOrSemiFlat(retainContainers = True)
+
 
     semiFlat = property(_getSemiFlat, doc='''
         Returns a flat-like Stream representation. Stream sub-classed containers, such as Measure or Part, are retained in the output Stream, but positioned at their relative offset. 
@@ -4752,13 +4774,25 @@ class Stream(music21.Music21Object):
     def hasMeasures(self):
         '''Return a boolean value showing if this Stream contains Measures
         '''
-        hasMeasures = False
+        post = False
         for obj in self:
             # if obj is a Part, we have multi-parts
             if 'Measure' in obj.classes:
-                hasMeasures = True
+                post = True
                 break # only need one
-        return hasMeasures
+        return post
+
+
+    def hasVoices(self):
+        '''Return a boolean value showing if this Stream contains Voices
+        '''
+        post = False
+        for obj in self:
+            # if obj is a Part, we have multi-parts
+            if 'Voice' in obj.classes:
+                post = True
+                break # only need one
+        return post
 
 
     def hasPartLikeStreams(self):
@@ -4774,6 +4808,10 @@ class Stream(music21.Music21Object):
             elif isinstance(obj, Measure):
                 multiPart = False
                 break # only need one
+            # if voices are present not multipart
+            elif isinstance(obj, Voice):
+                multiPart = False
+                break
             # if components are streams of Notes or Measures, 
             # than assume this is like a Part
             elif 'Stream' in obj.classes and (
@@ -5828,6 +5866,20 @@ class Stream(music21.Music21Object):
         
         return otherElements
 
+#-------------------------------------------------------------------------------
+class Voice(Stream):
+    '''
+    A Stream subclass for declaring that all the music in the
+    stream belongs to a certain "voice" for analysis or display
+    purposes.
+    
+    Note that both Finale's Layers and Voices as concepts are
+    considered Voices here.
+    '''
+    pass
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -6282,17 +6334,9 @@ class Measure(Stream):
 
     musicxml = property(_getMusicXML)
 
-#-------------------------------------------------------------------------------
-class Voice(Stream):
-    '''
-    A Stream subclass for declaring that all the music in the
-    stream belongs to a certain "voice" for analysis or display
-    purposes.
-    
-    Note that both Finale's Layers and Voices as concepts are
-    considered Voices here.
-    '''
-    pass
+
+
+
 
 class Part(Stream):
     '''A Stream subclass for designating music that is
@@ -8445,13 +8489,18 @@ class Test(unittest.TestCase):
         s3.insert(0, s1)
         s3.insert(0, s2)
         
+        self.assertEqual(s1.parent, s3)
+
         s3.insert(0, clef.AltoClef())
         # both output parts have alto clefs
         #s3.show()
 
         # get clef form higher level stream; only option
+        self.assertEqual(s1.parent, s3)
         post = s1.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
+        # TODO: isolated parent mangling problem here
+        #self.assertEqual(s1.parent, s3)
 
         post = s2.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
@@ -8484,7 +8533,7 @@ class Test(unittest.TestCase):
         post = s1FlatCopy.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-
+        environLocal.printDebug(['s1.parent', s1.parent])
         s1Measures = s1.makeMeasures()
         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
 
@@ -11148,6 +11197,51 @@ class Test(unittest.TestCase):
         self.assertEqual(s.metadata.title, 'Es fuhr sich ein Pfalzgraf')
 
 
+    def testVoicesBasic(self):
+
+        v1 = Voice()
+        n1 = note.Note('c4')
+        n1.quarterLength = .5
+        v1.repeatAppend(n1, 8)
+
+        v2 = Voice()
+        n2 = note.Note('c4')
+        n2.quarterLength = 1
+        v2.repeatAppend(n2, 4)
+        
+        s = Stream()
+        s.insert(0, v1)
+        s.insert(0, v2)
+
+        #s.show()
+
+
+    
+    def testParentMangling(self):
+        import clef, meter
+
+        s1 = Stream()
+        s2 = Stream()
+
+        s2.append(s1)
+
+        self.assertEqual(s1.parent, s2)
+
+        junk = s1.semiFlat
+        self.assertEqual(s1.parent, s2)
+
+        junk = s1.flat
+        self.assertEqual(s1.parent, s2)
+
+        # TODO: these fail
+        junk = s1._definedContexts.getByClass(meter.TimeSignature)
+        #self.assertEqual(s1.parent, s2)
+
+        junk = s1._definedContexts.getByClass(clef.Clef)
+        #self.assertEqual(s1.parent, s2)
+
+#         junk = s1.getContextByClass('Clef')
+#         self.assertEqual(s1.parent, s2)
 
 
 
@@ -11187,4 +11281,10 @@ if __name__ == "__main__":
 
         #t.testChordifyRests()
 
-        t.testOpusSearch()
+        #t.testOpusSearch()
+
+        #t.testVoicesBasic()
+
+        #t.testContextNestedD()
+
+        t.testParentMangling()

@@ -968,7 +968,7 @@ class DefinedContexts(object):
         if memo == None:
             memo = {} # intialize
 
-        #environLocal.printDebug(['call getByClass() from:', self, 'callerFirst:', callerFirst])
+#         environLocal.printDebug(['call getByClass() from:', self, 'callerFirst:', callerFirst, 'callerFirst.parent', callerFirst.parent])
         post = None
 
         count = 0
@@ -976,7 +976,7 @@ class DefinedContexts(object):
         # need to sort: look at most-recently added objs are first
         for obj in self.get(locationsTrail=True,  
                             sortByCreationTime=sortByCreationTime):
-            #environLocal.printDebug(['searching defined context', obj])
+#             environLocal.printDebug(['searching defined context', obj, 'obj.parent', obj.parent])
             count += 1
 
             #environLocal.printDebug(['memo', memo])
@@ -1013,7 +1013,7 @@ class DefinedContexts(object):
                     #environLocal.printDebug['skipping searching of object already searched:', obj]
             else: # post is not None
                 break
-        #environLocal.printDebug(['getByClass(): defined contexts searched:', count])
+#         environLocal.printDebug(['getByClass(): defined contexts searched:', count, 'callerFirst.parent', callerFirst.parent])
         return post
 
     def getAttrByName(self, attrName):
@@ -1771,6 +1771,14 @@ class Music21Object(JSONSerializer):
         # thus, to do serial reverse search we need to 
         # look at parent flat and track back to first encountered class match
 
+
+#         environLocal.printDebug(['self', self, 'getContextByClass(): self.parent', self.parent, 'callerFirst', callerFirst])       
+# 
+#         if callerFirst is not None:
+#             environLocal.printDebug(['break1', 'callerFirst', callerFirst, 'callerFirst.parent', callerFirst.parent])       
+
+        storedParent = self.parent
+
         if callerFirst == None: # this is the first caller
             callerFirst = self
         if memo == None:
@@ -1796,12 +1804,27 @@ class Music21Object(JSONSerializer):
                 # most error tolerant: returns None
                 offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
 
+#                 if callerFirst is not None:
+#                     environLocal.printDebug(['break2', 'callerFirst', callerFirst, 'callerFirst.parent', callerFirst.parent])       
+
                 # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
                 # is the caller. 
                 if offsetOfCaller == None:
+
+#                     if callerFirst is not None:
+#                         environLocal.printDebug(['break2.1', 'callerFirst', callerFirst, 'callerFirst.parent', callerFirst.parent])       
+
                     #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a semi-flat representation', 'self', self, self.id, 'callerFirst', callerFirst, callerFirst.id])
                     offsetOfCaller = self.semiFlat.getOffsetByElement(
                                     callerFirst)
+
+#                     if callerFirst is not None:
+#                         environLocal.printDebug(['break2.5', 'callerFirst', callerFirst, 'callerFirst.parent', callerFirst.parent])       
+# 
+#                 # callerFirst loses its parent here
+#                 if callerFirst is not None:
+#                     environLocal.printDebug(['break3', 'callerFirst', callerFirst, 'callerFirst.parent', callerFirst.parent])       
+
 
                 # our caller might have been flattened after contexts were set
                 # thus, this object may be in the caller's defined contexts, 
@@ -1839,6 +1862,8 @@ class Music21Object(JSONSerializer):
 
                 #environLocal.printDebug([self, 'results of serialReverseSearch:', post, '; searching for:', className, '; starting from offset', offsetOfCaller])
 
+#         environLocal.printDebug(['self', self, 'getContextByClass(): post reverse serial: self.parent', self.parent])       
+
         if post == None: # still no match
             # this will call this method on all defined contexts, including
             # locations
@@ -1847,6 +1872,9 @@ class Music21Object(JSONSerializer):
             post = self._definedContexts.getByClass(className,
                    serialReverseSearch=serialReverseSearch,
                    callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, memo=memo)
+
+#         environLocal.printDebug(['self', self, 'getContextByClass(): post getByClass(): self.parent', self.parent, 'storedParent', storedParent])       
+
         return post
 
 
