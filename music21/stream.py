@@ -2943,7 +2943,7 @@ class Stream(music21.Music21Object):
             if m.clef == e:
                 continue
 
-            if voiceIndex = None:
+            if voiceIndex == None:
                 m.insert(oNew, e)
             else: # insert into voice specified by the voice index
                 m.voices[voiceIndex].insert(oNew, e)
@@ -11249,7 +11249,13 @@ class Test(unittest.TestCase):
         # test allocating streams and assigning indices
         oMap = s._getOffsetMap() 
         self.assertEqual(str(oMap), '[(0.0, 0.5, <music21.note.Note C>, 0), (0.5, 1.0, <music21.note.Note C>, 0), (1.0, 1.5, <music21.note.Note C>, 0), (1.5, 2.0, <music21.note.Note C>, 0), (2.0, 2.5, <music21.note.Note C>, 0), (2.5, 3.0, <music21.note.Note C>, 0), (3.0, 3.5, <music21.note.Note C>, 0), (3.5, 4.0, <music21.note.Note C>, 0), (0.0, 1.0, <music21.note.Note C>, 1), (1.0, 2.0, <music21.note.Note C>, 1), (2.0, 3.0, <music21.note.Note C>, 1), (3.0, 4.0, <music21.note.Note C>, 1)]')
-        #s.show()
+
+        oMeasures = s.makeMeasures()
+        self.assertEqual(len(oMeasures[0].voices), 2)
+        self.assertEqual([e.offset for e in oMeasures[0].voices[0]], [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5])
+        self.assertEqual([e.offset for e in oMeasures[0].voices[1]], [0.0, 1.0, 2.0, 3.0])
+
+        s.show()
 
 
     
