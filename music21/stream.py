@@ -2119,6 +2119,24 @@ class Stream(music21.Music21Object):
                     map[offset].append(m)
         return map
 
+
+    def _getVoices(self):
+        '''        
+        '''
+        return self.getElementsByClass(Voice)
+
+    voices = property(_getVoices, 
+        doc='''Return all :class:`~music21.stream.Voices` objects in a :class:`~music21.stream.Stream` or Stream subclass.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.insert(0, stream.Voice()) 
+        >>> s.insert(0, stream.Voice()) 
+        >>> len(s.voices)
+        2
+        ''')
+
+
     def getTimeSignatures(self, searchContext=True, returnDefault=True,
         sortByCreationTime=True):
         '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
@@ -2269,7 +2287,8 @@ class Stream(music21.Music21Object):
                 return clef.BassClef()
 
 
-    def getClefs(self, searchParent=True, searchContext=True):
+    def getClefs(self, searchParent=True, searchContext=True, 
+        returnDefault=True):
         '''Collect all :class:`~music21.clef.Clef` objects in this Stream in a new Stream. Optionally search the parent stream and/or contexts. 
 
         If no Clef objects are defined, get a default using :meth:`~music21.stream.Stream.bestClef`
@@ -2286,20 +2305,21 @@ class Stream(music21.Music21Object):
         # TODO: parent searching is not yet implemented
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass(clef.Clef)
-        environLocal.printDebug(['getClefs(); count of local', len(post), post])       
+
+        #environLocal.printDebug(['getClefs(); count of local', len(post), post])       
+        if len(post) == 0 and searchParent and self.parent != None:
+            environLocal.printDebug(['getClefs(): search parent'])       
+            post = self.parent.getElementsByClass(clef.Clef)
+
         if len(post) == 0 and searchContext:
-            # returns a single value
-            post = self.__class__()
-            environLocal.printDebug(['getClefs(): break1: self.parent', self.parent])       
+            # returns a single element match
+            #post = self.__class__()
             obj = self.getContextByClass(clef.Clef)
-            #environLocal.printDebug(['getClefs(): searching contexts: results', obj])
-            environLocal.printDebug(['getClefs(): break2: self.parent', self.parent])       
             if obj != None:
                 post.append(obj)
 
-
         # get a default and/or place default at zero if nothing at zero
-        if len(post) == 0 or post[0].offset > 0: 
+        if returnDefault and (len(post) == 0 or post[0].offset > 0): 
             #environLocal.printDebug(['getClefs(): using bestClef()'])
             post.insert(0, self.bestClef())
         return post
@@ -2707,21 +2727,29 @@ class Stream(music21.Music21Object):
             
         # assume that flat/sorted options will be set before procesing
         offsetMap = [] # list of start, start+dur, element
-        for e in srcObj:
-            # do not include barlines
-            if isinstance(e, bar.Barline):
-                continue
-            if hasattr(e, 'duration') and e.duration is not None:
-                dur = e.duration.quarterLength
-            else:
-                dur = 0 
-            # NOTE: rounding here may cause secondary problems
-            offset = round(e.getOffsetBySite(srcObj), 8)
-            # NOTE: used to make a copy.copy of elements here; 
-            # this is not necssary b/c making deepcopy of entire Stream
-            # changed on 4/16/2010
-            offsetMap.append([offset, offset + dur, e])
-            #offsetMap.append([offset, offset + dur, copy.copy(e)])
+
+        if srcObj.hasVoices():
+            groups = []
+            for i, v in enumerate(srcObj.voices):
+                groups.append((v.flat, i))
+        else: # create a single collection
+            groups = [(srcObj, None)]
+
+        for group, voiceIndex in groups:
+            for e in group:
+                # do not include barlines
+                if isinstance(e, bar.Barline):
+                    continue
+                if hasattr(e, 'duration') and e.duration is not None:
+                    dur = e.duration.quarterLength
+                else:
+                    dur = 0 
+                # NOTE: rounding here may cause secondary problems
+                offset = round(e.getOffsetBySite(group), 8)
+                # NOTE: used to make a copy.copy of elements here; 
+                # this is not necssary b/c making deepcopy of entire Stream
+                offsetMap.append((offset, offset + dur, e, voiceIndex))
+                #offsetMap.append([offset, offset + dur, copy.copy(e)])
         return offsetMap
 
     def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
@@ -2775,15 +2803,21 @@ class Stream(music21.Music21Object):
 
         # TODO: make inPlace an option
 
-        #srcObj = copy.deepcopy(self)
-        srcObj = copy.deepcopy(self.flat.sorted)
-
-        environLocal.printDebug(['makeMeasures(): srcObj.parent', srcObj.parent, 'self.parent', self.parent])
+        if self.hasVoices():
+            environLocal.printDebug(['make measures found voices'])
+            # cannot make flat here, as this would destroy stream partitions
+            srcObj = copy.deepcopy(self.sorted)
+            voiceCount = len(srcObj.voices)
+        else:
+            environLocal.printDebug(['make measures found no voices'])
+            # take flat and sorted version
+            srcObj = copy.deepcopy(self.flat.sorted)
+            voiceCount = 0
 
         # may need to look in parent if no time signatures are found
         if meterStream is None:
             # get from this Stream, or search the contexts
-            meterStream = srcObj.getTimeSignatures(returnDefault=True, 
+            meterStream = srcObj.flat.getTimeSignatures(returnDefault=True, 
                           searchContext=False,
                           sortByCreationTime=False)
         # if meterStream is a TimeSignature, use it
@@ -2792,14 +2826,8 @@ class Stream(music21.Music21Object):
             meterStream = Stream()
             meterStream.insert(0, ts)
 
-#         if srcObj.hasVoices():
-#             environLocal.printDebug(['make measures found voices'])
-#             # need to call this method recursively 
-#             srcObj = srcObj.flat.sorted
-#         else:
-#             environLocal.printDebug(['make measures found no voices'])
-#             # take flat and sorted version
-#             srcObj = srcObj.flat.sorted
+        environLocal.printDebug(['Stream.makeMeasures(): srcObj.parent', srcObj.parent])
+
 
         #environLocal.printDebug(['makeMeasures(): meterStream', 'meterStream[0]', meterStream[0], 'meterStream[0].offset',  meterStream[0].offset, 'meterStream.elements[0].parent', meterStream.elements[0].parent])
 
@@ -2807,7 +2835,8 @@ class Stream(music21.Music21Object):
         # presently, this only gets the first clef
         # may need to store a clefStream and access changes in clefs
         # as is done with meterStream
-        clefStream = srcObj.getClefs(searchParent=True, searchContext=True)
+        clefStream = srcObj.getClefs(searchParent=True, searchContext=True,
+                        returnDefault=True)
         clefObj = clefStream[0]
 
         #environLocal.printDebug(['makeMeasures(): first clef found after copying and flattening', clefObj])
@@ -2818,15 +2847,9 @@ class Stream(music21.Music21Object):
         offsetMap = srcObj._getOffsetMap()
         #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
         #offsetMap.sort() not necessary; just get min and max
-        oMin = min([start for start, end, e in offsetMap])
-        oMax = max([end for start, end, e in offsetMap])
-    
-        # this should not happen, but just in case
-        # not sure this is necessary
-#         if not common.almostEquals(oMax, srcObj.highestTime):
-#             raise StreamException('mismatch between oMax and highestTime (%s, %s)' % (oMax, srcObj.highestTime))
-        #environLocal.printDebug(['oMin, oMax', oMin, oMax])
-    
+        oMin = min([start for start, end, e, voiceIndex in offsetMap])
+        oMax = max([end for start, end, e, voiceIndex in offsetMap])
+        
         # if a ref stream is provided, get highst time from there
         # only if it is greater thant the highest time yet encountered
 
@@ -2867,6 +2890,12 @@ class Stream(music21.Music21Object):
                 m.clef = clefObj
                 #environLocal.printDebug(['assigned clef to measure', measureCount, m.clef])    
 
+            # add voices if necessary (voiceCount > 0)
+            for voiceIndex in range(voiceCount):
+                v = Voice()
+                v.id = voiceIndex
+                m.insert(0, v)
+
             # avoid an infinite loop
             if thisTimeSignature.barDuration.quarterLength == 0:
                 raise StreamException('time signature has no duration')    
@@ -2879,7 +2908,7 @@ class Stream(music21.Music21Object):
                 measureCount += 1
         
         # populate measures with elements
-        for start, end, e in offsetMap:
+        for start, end, e, voiceIndex in offsetMap:
             # iterate through all measures 
             match = False
             lastTimeSignature = None
@@ -2903,11 +2932,9 @@ class Stream(music21.Music21Object):
             # i is the index of the measure that this element starts at
             # mStart, mEnd are correct
             oNew = start - mStart # remove measure offset from element offset
+
             # insert element at this offset in the measure
             # not copying elements here!
-            # here, we have the correct measure from above
-            #environLocal.printDebug(['measure placement', mStart, oNew, e])
-
             # in the case of a Clef, and possibly other measure attributes, 
             # the element may have already been placed in this measure
             #environLocal.printDebug(['compare e, clef', e, m.clef])
@@ -3729,7 +3756,6 @@ class Stream(music21.Music21Object):
 #             cmp(x.priority, y.priority) or 
 #             cmp(x.classSortOrder, y.classSortOrder)
 #             )
-    
         # get a shallow copy of the Stream itself
         newStream = copy.copy(self)
         # assign directly to _elements, as we do not need to call 
@@ -4702,7 +4728,7 @@ class Stream(music21.Music21Object):
         # list of start, start+dur, element, all in abs offset time
         offsetMap = self._getOffsetMap(returnObj)
         
-        for oStart, oEnd, e in offsetMap:
+        for oStart, oEnd, e, voiceCount in offsetMap:
             # if target is defined, only modify that object
             if target != None and id(e) != id(target):
                 continue
@@ -11215,6 +11241,9 @@ class Test(unittest.TestCase):
         s.insert(0, v1)
         s.insert(0, v2)
 
+        # test allocating streams and assigning indices
+        oMap = s._getOffsetMap() 
+        self.assertEqual(str(oMap), '[(0.0, 0.5, <music21.note.Note C>, 0), (0.5, 1.0, <music21.note.Note C>, 0), (1.0, 1.5, <music21.note.Note C>, 0), (1.5, 2.0, <music21.note.Note C>, 0), (2.0, 2.5, <music21.note.Note C>, 0), (2.5, 3.0, <music21.note.Note C>, 0), (3.0, 3.5, <music21.note.Note C>, 0), (3.5, 4.0, <music21.note.Note C>, 0), (0.0, 1.0, <music21.note.Note C>, 1), (1.0, 2.0, <music21.note.Note C>, 1), (2.0, 3.0, <music21.note.Note C>, 1), (3.0, 4.0, <music21.note.Note C>, 1)]')
         #s.show()
 
 
@@ -11293,8 +11322,8 @@ if __name__ == "__main__":
 
         #t.testOpusSearch()
 
-        #t.testVoicesBasic()
+        t.testVoicesBasic()
 
-        #t.testContextNestedD()
+        t.testContextNestedD()
 
-        t.testParentMangling()
+        #t.testParentMangling()
