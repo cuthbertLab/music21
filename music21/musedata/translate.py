@@ -79,7 +79,7 @@ def _musedataBeamToBeams(beamSymbol):
 
 def _musedataRecordListToNoteOrChord(records, previousElement=None):
     '''Given a list of MuseDataRecord objects, return a configured
-    Note or Chord.
+    :class:`~music21.note.Note` or :class:`~music21.chord.Chord`.
 
     Optionally pass a previous element, which may be music21 Note, Chord, or Rest; this is used to determine tie status
     '''
@@ -124,12 +124,20 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
         if previousElement != None and previousElement.tie != None:
             if previousElement.tie.type in ['start', 'continue']:
                 post.tie = tie.Tie('stop') # can be start, end, continue
-
     return post
 
 
+
+def _processPending(hasVoices, pendingRecords, eLast, m, vActive):
+    e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
+    if hasVoices:
+        vActive.append(e)
+    else:
+        m.append(e)
+    return e
+
 def musedataPartToStreamPart(museDataPart, inputM21=None):
-    '''
+    '''Translate a musedata part to a :class:`~music21.stream.Part`.
     '''
     from music21 import stream
     from music21 import meter
@@ -149,7 +157,6 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
     #environLocal.printDebug(['first measure parent', mdmObjs[0].parent])
 
-
     barCount = 0
     # get each measure
     # store last Note/Chord/Rest for tie comparisons; span measures
@@ -158,6 +165,13 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         #environLocal.printDebug(['processing:', mdm.src])
         if not mdm.hasNotes():
             continue
+
+        if mdm.hasVoices():
+            hasVoices = True
+            vActive = stream.Voice()
+        else:
+            hasVoices = False
+            vActive = None
 
         #m = stream.Measure()
         # get a measure object with a left configured bar line
@@ -193,19 +207,38 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             mdr = mdrObjs[i]
             #environLocal.printDebug(['processing:', mdr.src])
 
+            if mdr.isBack():
+                # the current use of back assumes tt back assumes tt we always
+                # return to the start of the measure; this may not be the case
+                if pendingRecords != []:
+                    eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
+                    pendingRecords = []
+
+                # every time we encounter a back, we need to store
+                # our existing voice and create a new one
+                m.insert(0, vActive)
+                vActive = stream.Voice()
+
             if mdr.isRest():
                 #environLocal.printDebug(['got mdr rest, parent:', mdr.parent])
                 # check for pending records first
                 if pendingRecords != []:
-                    e = _musedataRecordListToNoteOrChord(pendingRecords,
-                        eLast)
-                    m.append(e)
-                    eLast = e
+                    eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
+#                     e = _musedataRecordListToNoteOrChord(pendingRecords,
+#                         eLast)
+#                     if hasVoices:
+#                         vActive.append(e)
+#                     else:
+#                         m.append(e)
+#                     eLast = e
                     pendingRecords = []
                 # create rest after clearing pending records
                 r = note.Rest()
                 r.quarterLength = mdr.getQuarterLength()
-                m.append(r)
+                if hasVoices:
+                    vActive.append(r)
+                else:
+                    m.append(r)
                 eLast = r
                 continue
             # a note is note as chord, but may have chord tones
@@ -220,18 +253,30 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 # need to append immediately
                 if pendingRecords != []:
                     # this could be a Chord or Note
-                    e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
-                    m.append(e)
-                    eLast = e
+                    eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
+#                     e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
+#                     if hasVoices:
+#                         vActive.append(e)
+#                     else:
+#                         m.append(e)
+#                     eLast = e
                     pendingRecords = []
                 # need to append this record for the current note
                 pendingRecords.append(mdr)
 
         # check for any remaining single notes (if last) or chords
         if pendingRecords != []:
-            e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
-            m.append(e)
-            eLast = e
+#             e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
+#             if hasVoices:
+#                 vActive.append(e)
+#             else:
+#                 m.append(e)
+#             eLast = e
+            eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
+
+        # may be bending elements in a voice to append to a measure
+        if vActive is not None and len(vActive) > 0:
+            m.insert(0, vActive)
 
         if barCount == 0 and m.timeSignature != None: # easy case
             # can only do this b/c ts is defined
@@ -454,6 +499,34 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testBackBasic(self):
+        
+
+        import os
+        from music21 import converter, common
+        fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test02')
+        s = converter.parse(fpDir)
+        # note: this is a multi-staff work, but presently gets encoded
+        # as multiple voices
+        measures = s.parts[0].measures(1,5)
+        self.assertEqual(len(measures[0].flat.notes), 6)
+        self.assertEqual(len(measures[1].flat.notes), 12)
+        self.assertEqual(len(measures[2].flat.notes), 5)
+        self.assertEqual(len(measures[3].flat.notes), 8)
+        self.assertEqual(len(measures[4].flat.notes), 7)
+
+        #s.show()
+
+
+        # alternative test
+        # note: this encoding has many parts in a single staff
+        # not sure how to translate
+        fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test03')
+        s = converter.parse(fpDir)
+        #s.show()
+
+
+
 if __name__ == "__main__":
     import sys
 
@@ -465,4 +538,5 @@ if __name__ == "__main__":
         #t.testGetLyrics()
         #t.testGetBeams()
         #t.testAccidentals()
-        t.testTransposingInstruments()
+        #t.testTransposingInstruments()
+        t.testBackBasic()

@@ -9,8 +9,8 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-
-
+'''Low-level conversion routines between MusicXML and music21.
+'''
 
 
 import unittest
@@ -43,7 +43,8 @@ class TranslateException(Exception):
 # Ties
 
 def tieToMx(t):
-    '''Convert an m21 Tie to lists of MusicXML Tie or Tied objects. Return two component lists. 
+    '''Translate a music21 :class:`~music21.tie.Tie` object to MusicXML :class:`~music21.musicxml.Tie` and :class:`~music21.musicxml.Tied` objects as two component lists.
+
     '''
     mxTieList = []
     mxTie = musicxmlMod.Tie()
@@ -74,7 +75,7 @@ def tieToMx(t):
 
 
 def mxToTie(mxNote, inputM21=None):
-    '''Based on properties in an mxNote, configure or create an m21 Tie object
+    '''Translate a MusicXML :class:`~music21.musicxml.Note` to a music21 :class:`~music21.tie.Tie` object.
     '''
     from music21 import note
     from music21 import tie
@@ -113,7 +114,8 @@ def mxToTie(mxNote, inputM21=None):
 # Lyrics
 
 def lyricToMx(l):
-
+    '''Translate a music21 :class:`~music21.note.Lyric` object to a MusicXML :class:`~music21.musicxml.Lyric` object. 
+    '''
     mxLyric = musicxmlMod.Lyric()
     mxLyric.set('text', l.text)
     mxLyric.set('number', l.number)
@@ -122,7 +124,8 @@ def lyricToMx(l):
 
 
 def mxToLyric(mxLyric, inputM21=None):
-
+    '''Translate a MusicXML :class:`~music21.musicxml.Lyric` object to a music21 :class:`~music21.note.Lyric` object. 
+    '''
     if inputM21 == None:
         from music21 import note
         l = note.Lyric()
@@ -134,6 +137,211 @@ def mxToLyric(mxLyric, inputM21=None):
     l.syllabic = mxLyric.get('syllabic')
 
 
+#-------------------------------------------------------------------------------
+# Durations
+
+def mxToDuration(mxNote, inputM21):
+    '''Translate a MusicXML :class:`~music21.musicxml.Note` object to a music21 :class:`~music21.duration.Duration` object. 
+
+    >>> from music21 import *
+    >>> a = musicxml.Note()
+    >>> a.setDefaults()
+    >>> m = musicxml.Measure()
+    >>> m.setDefaults()
+    >>> a.external['measure'] = m # assign measure for divisions ref
+    >>> a.external['divisions'] = m.external['divisions']
+    >>> c = duration.Duration()
+    >>> musicxml.translate.mxToDuration(a, c)
+    <music21.duration.Duration 1.0>
+    >>> c.quarterLength
+    1.0
+
+    '''
+    from music21 import duration
+
+    if inputM21 == None:
+        d = duration.Duration
+    else:
+        d = inputM21
+
+    if mxNote.external['measure'] == None:
+        raise DurationException(
+        "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
+
+    mxDivisions = mxNote.external['divisions']
+    if mxNote.duration != None: 
+        if mxNote.get('type') != None:
+            type = duration.musicXMLTypeToType(mxNote.get('type'))
+            forceRaw = False
+        else: # some rests do not define type, and only define duration
+            type = None # no type to get, must use raw
+            forceRaw = True
+
+        mxDotList = mxNote.get('dotList')
+        # divide mxNote duration count by divisions to get qL
+        qLen = float(mxNote.duration) / float(mxDivisions)
+        mxNotations = mxNote.get('notationsObj')
+        mxTimeModification = mxNote.get('timeModificationObj')
+
+        if mxTimeModification != None:
+            tup = duration.Tuplet()
+            tup.mx = mxNote # get all necessary config from mxNote
+
+            #environLocal.printDebug(['created Tuplet', tup])
+            # need to see if there is more than one component
+            #self.components[0]._tuplets.append(tup)
+        else:
+            tup = None
+
+        # two ways to create durations, raw and cooked
+        durRaw = duration.Duration() # raw just uses qLen
+        # the qLen set here may not be computable, but is not immediately
+        # computed until setting components
+        durRaw.quarterLength = qLen
+
+        if forceRaw:
+            #environLocal.printDebug(['forced to use raw duration', durRaw])
+            try:
+                d.components = durRaw.components
+            except DurationException:
+                environLocal.warn(['Duration._setMX', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
+                environLocal.printDebug(['Duration._setMX', 'raw qLen', qLen, type, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
+                durRaw.quarterLength = 1.
+
+        else: # a cooked version builds up from pieces
+            durUnit = duration.DurationUnit()
+            durUnit.type = type
+            durUnit.dots = len(mxDotList)
+            if not tup == None:
+                durUnit.appendTuplet(tup)
+            durCooked = duration.Duration(components=[durUnit])
+
+            #environLocal.printDebug(['got durRaw, durCooked:', durRaw, durCooked])
+            if durUnit.quarterLength != durCooked.quarterLength:
+                environLocal.printDebug(['error in stored MusicXML representaiton and duration value', durRaw, durCooked])
+            # old way just used qLen
+            #self.quarterLength = qLen
+            d.components = durCooked.components
+    return d
+
+
+def durationToMx(d):
+    '''Translate a music21 :class:`~music21.duration.Duration` object to a list of one or more MusicXML :class:`~music21.musicxml.Note` objects. 
+
+    All rhythms and ties necessary in the MusicXML Notes are configured. The returned mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.
+
+    >>> from music21 import *
+    >>> a = duration.Duration()
+    >>> a.quarterLength = 3
+    >>> b = musicxml.translate.durationToMx(a)
+    >>> len(b) == 1
+    True
+    >>> isinstance(b[0], musicxmlMod.Note)
+    True
+
+    >>> a = duration.Duration()
+    >>> a.quarterLength = .33333333
+    >>> b = musicxml.translate.durationToMx(a)
+    >>> len(b) == 1
+    True
+    >>> isinstance(b[0], musicxmlMod.Note)
+    True
+    '''
+    from music21 import duration
+
+    post = [] # rename mxNoteList for consistencuy
+    #environLocal.printDebug(['in _getMX', d, d.quarterLength])
+
+    for dur in d.components:
+        mxDivisions = int(defaults.divisionsPerQuarter * 
+                          dur.quarterLength)
+        mxType = duration.typeToMusicXMLType(dur.type)
+        # check if name is not in collection of MusicXML names, which does 
+        # not have maxima, etc.
+        mxDotList = []
+        # only presently looking at first dot group
+        # also assuming that these are integer values
+        # need to handle fractional dots differently
+        for x in range(int(dur.dots)):
+            # only need to create object
+            mxDotList.append(musicxmlMod.Dot())
+
+        mxNote = musicxmlMod.Note()
+        mxNote.set('duration', mxDivisions)
+        mxNote.set('type', mxType)
+        mxNote.set('dotList', mxDotList)
+        post.append(mxNote)
+
+    # second pass for ties if more than one components
+    # this assumes that all component are tied
+
+    for i in range(len(d.components)):
+        dur = d.components[i]
+        mxNote = post[i]
+
+        # contains Tuplet, Dynamcs, Articulations
+        mxNotations = musicxmlMod.Notations()
+
+        # only need ties if more than one component
+        mxTieList = []
+        if len(d.components) > 1:
+            if i == 0:
+                mxTie = musicxmlMod.Tie()
+                mxTie.set('type', 'start') # start, stop
+                mxTieList.append(mxTie)
+                mxTied = musicxmlMod.Tied()
+                mxTied.set('type', 'start') 
+                mxNotations.append(mxTied)
+            elif i == len(d.components) - 1: #end 
+                mxTie = musicxmlMod.Tie()
+                mxTie.set('type', 'stop') # start, stop
+                mxTieList.append(mxTie)
+                mxTied = musicxmlMod.Tied()
+                mxTied.set('type', 'stop') 
+                mxNotations.append(mxTied)
+            else: # continuation
+                for type in ['stop', 'start']:
+                    mxTie = musicxmlMod.Tie()
+                    mxTie.set('type', type) # start, stop
+                    mxTieList.append(mxTie)
+                    mxTied = musicxmlMod.Tied()
+                    mxTied.set('type', type) 
+                    mxNotations.append(mxTied)
+
+        if len(d.components) > 1:
+            mxNote.set('tieList', mxTieList)
+
+        if len(dur.tuplets) > 0:
+            # only getting first tuplet here
+            mxTimeModification, mxTupletList = dur.tuplets[0].mx
+            mxNote.set('timemodification', mxTimeModification)
+            if mxTupletList != []:
+                mxNotations.componentList += mxTupletList
+
+        # add notations to mxNote
+        mxNote.set('notations', mxNotations)
+
+    return post # a list of mxNotes
+
+
+def durationToMusicXML(d):
+    '''Translate a music21 :class:`~music21.duration.Duration` into a complete MusicXML representation. 
+    '''
+    from music21 import duration, note
+
+    # todo: this is not yet implemented in music21 note objects; to do
+    #mxNotehead = musicxmlMod.Notehead()
+    #mxNotehead.set('charData', defaults.noteheadUnpitched)
+
+    # make a copy, as we this process will change tuple types
+    dCopy = copy.deepcopy(d)
+    # this update is done in note output
+    #updateTupletType(dCopy.components) # modifies in place
+
+    n = note.Note()
+    n.duration = dCopy
+    # call the musicxml property on Stream
+    return generalNoteToMusicXML(n)
 
 
 
@@ -142,6 +350,15 @@ def mxToLyric(mxLyric, inputM21=None):
 # Notes
 
 def generalNoteToMusicXML(n):
+    '''Translate a music21 :class:`~music21.note.Note` into a complete MusicXML representation. 
+
+    >>> from music21 import *
+    >>> n = note.Note('c3')
+    >>> n.quarterLength = 3
+    >>> post = musicxml.translate.generalNoteToMusicXML(n)
+    >>> post[-100:].replace('\\n', '')
+    '/type>        <dot/>        <notations/>      </note>    </measure>  </part></score-partwise>'
+    '''
 
     from music21 import stream, duration
 
@@ -157,12 +374,12 @@ def generalNoteToMusicXML(n):
 
 
 def noteToMxNotes(n):
-
-    '''Translate a music21 Note into a List of mxNotes
-    Attributes of notes are merged from different locations: first from the 
-    duration objects, then from the pitch objects. Finally, GeneralNote 
-    attributes are added
+    '''Translate a music21 :class:`~music21.note.Note` into a list of :class:`~music21.musicxml.Note` objects.
     '''
+    #Attributes of notes are merged from different locations: first from the 
+    #duration objects, then from the pitch objects. Finally, GeneralNote 
+    #attributes are added.
+
     mxNoteList = []
     for mxNote in n.duration.mx: # returns a list of mxNote objs
         # merge method returns a new object
@@ -219,7 +436,8 @@ def noteToMxNotes(n):
 
 
 def mxToNote(mxNote, inputM21):
-    '''Translate an mxNote into a music21 Note.
+    '''Translate a MusicXML :class:`~music21.musicxml.Note` to a :class:`~music21.note.Note`.
+
     '''
     from music21 import articulations
     from music21 import expressions
@@ -230,7 +448,6 @@ def mxToNote(mxNote, inputM21):
         n = note.Measure()
     else:
         n = inputM21
-
 
     # print object == 'no' and grace notes may have a type but not
     # a duration. they may be filtered out at the level of Stream 
@@ -274,10 +491,9 @@ def mxToNote(mxNote, inputM21):
 
 
 
-
-
 def restToMxNotes(r):
-
+    '''Translate a :class:`~music21.note.Rest` to a MusicXML :class:`~music21.musicxml.Note` object configured with a :class:`~music21.musicxml.Rest`.
+    '''
     mxNoteList = []
     for mxNote in r.duration.mx: # returns a list of mxNote objs
         # merge method returns a new object
@@ -293,8 +509,11 @@ def restToMxNotes(r):
 
 
 def mxToRest(mxNote, inputM21=None):
+    '''Translate a MusicXML :class:`~music21.musicxml.Note` object to a :class:`~music21.note.Rest`.
 
-    from music21 import duration
+    If an `inputM21` object reference is provided, this object will be configured; otherwise, a new :class:`~music21.note.Rest` object is created and returned.
+    '''
+    from music21 import note
 
     if inputM21 == None:
         r = note.Rest()
@@ -306,8 +525,7 @@ def mxToRest(mxNote, inputM21=None):
     except duration.DurationException:
         environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, r])
         raise
-
-
+    return r
 
 
 
@@ -316,7 +534,7 @@ def mxToRest(mxNote, inputM21=None):
 
 
 def measureToMx(m):
-    '''Given a measure, translate to musicxml objects
+    '''Translate a :class:`~music21.stream.Measure` to a MusicXML :class:`~music21.musicxml.Measure` object.
     '''
 
     mxMeasure = musicxmlMod.Measure()
@@ -337,22 +555,18 @@ def measureToMx(m):
     mxAttributes = musicxmlMod.Attributes()
     # best to only set dvisions here, as clef, time sig, meter are not
     # required for each measure
-    mxAttributes.setDefaultDivisions() 
+    mxAttributes.setDefaultDivisions()
 
     # may need to look here at the parent, and try to find
     # the clef in the clef last defined in the parent
     # often m.clef will be None b/c a clef has already been defined
     if m.clef is not None:
         mxAttributes.clefList = [m.clef.mx]
-
     if m.keySignature is not None: 
         # key.mx returns a Key ojbect, needs to be in a list
         mxAttributes.keyList = [m.keySignature.mx]
-    
     if m.timeSignature is not None:
         mxAttributes.timeList = m.timeSignature.mx 
-
-    #mxAttributes.keyList = []
     mxMeasure.set('attributes', mxAttributes)
 
     # see if we have barlines
@@ -363,19 +577,46 @@ def measureToMx(m):
         mxBarline.set('location', 'left')
         mxMeasure.componentList.append(mxBarline)
     
-    #need to handle objects in order when creating musicxml 
-    for obj in m.flat:
-        classes = obj.classes # store result of property call oince
-        if 'GeneralNote' in classes:
-            # .mx here returns a list of notes
-            mxMeasure.componentList += obj.mx
-        elif 'Dynamic' in classes:
-        #elif obj.isClass(dynamics.Dynamic):
-            # returns an mxDirection object
-            mxMeasure.append(obj.mx)
-        else: # other objects may have already been added
-            pass
-            #environLocal.printDebug(['_getMX of Measure is not processing', obj])
+    # need to handle objects in order when creating musicxml 
+    # we thus assume that objects are sorted here
+
+    if m.hasVoices():
+        # store divisions for use in calculating backup of voices 
+        divisions = mxAttributes.divisions
+        for v in m.voices:
+            # iterate over each object in this voice
+            offsetMeasureNote = 0 # offset of notes w/n measure  
+            for obj in v.flat:
+                classes = obj.classes # store result of property call oince
+                if 'GeneralNote' in classes:
+                    # increment offset before getting mx, as this way a single
+                    # chord provides only one value
+                    offsetMeasureNote += obj.quarterLength
+                    # .mx here returns a list of notes
+                    objList = obj.mx
+                    # need to set voice for each contained mx object
+                    for sub in objList:
+                        sub.voice = v.id # the voice id is the voice number
+                    mxMeasure.componentList += objList
+            # create backup object configured to duration of accumulated
+            # notes
+            mxBackup = musicxmlMod.Backup()
+            mxBackup.duration = int(divisions * offsetMeasureNote)
+            mxMeasure.componentList.append(mxBackup)
+
+    else: # no voices
+        for obj in m.flat:
+            classes = obj.classes # store result of property call oince
+            if 'GeneralNote' in classes:
+                # .mx here returns a list of notes
+                mxMeasure.componentList += obj.mx
+            elif 'Dynamic' in classes:
+            #elif obj.isClass(dynamics.Dynamic):
+                # returns an mxDirection object
+                mxMeasure.append(obj.mx)
+            else: # other objects may have already been added
+                pass
+                #environLocal.printDebug(['_getMX of Measure is not processing', obj])
 
     # right barline must follow all notes
     if m.rightBarline != None:
@@ -389,9 +630,11 @@ def measureToMx(m):
 
 
 def mxToMeasure(mxMeasure, inputM21):
-    '''Translate an mxMeasure into a music21 Measure.
-    Can optionally provide an inputM21 object reference to configure that object; else, an object is created. 
+    '''Translate an mxMeasure (a MusicXML :class:`~music21.musicxml.Measure` object) into a music21 :class:`~music21.stream.Measure`.
+
+    If an `inputM21` object reference is provided, this object will be configured and returned; otherwise, a new :class:`~music21.stream.Measure` object is created.  
     '''
+    from music21 import stream
     from music21 import chord
     from music21 import dynamics
     from music21 import key
@@ -402,13 +645,9 @@ def mxToMeasure(mxMeasure, inputM21):
     from music21 import meter
 
     if inputM21 == None:
-        from music21 import stream
         m = stream.Measure()
     else:
         m = inputM21
-
-    #print mxMeasure
-    #print
 
     mNum, mSuffix = common.getNumFromStr(mxMeasure.get('number'))
     # assume that measure numbers are integers
@@ -422,13 +661,14 @@ def mxToMeasure(mxMeasure, inputM21):
         m.layoutWidth = data
         
     junk = mxMeasure.get('implicit')
-#         environLocal.printDebug(['_setMX: working on measure:',
-#                                 m.number])
 
     mxAttributes = mxMeasure.get('attributesObj')
     mxAttributesInternal = True
+    # if we do not have defined mxAttributes, must get from stored attributes
     if mxAttributes is None:    
-        # need to keep track of where mxattributessrc is coming from
+        # need to keep track of where mxattributes src is coming from
+        # if attributes are defined in this measure, mxAttributesInternal 
+        # is true
         mxAttributesInternal = False
         # not all measures have attributes definitions; this
         # gets the last-encountered measure attributes
@@ -443,27 +683,58 @@ def mxToMeasure(mxMeasure, inputM21):
     if mxAttributesInternal and len(mxAttributes.timeList) != 0:
         m.timeSignature = meter.TimeSignature()
         m.timeSignature.mx = mxAttributes.timeList
-
     if mxAttributesInternal is True and len(mxAttributes.clefList) != 0:
         m.clef = clef.Clef()
         m.clef.mx = mxAttributes.clefList
-
     if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
         m.keySignature = key.KeySignature()
         m.keySignature.mx = mxAttributes.keyList
 
+
+    if mxAttributes.divisions is not None:
+        divisions = mxAttributes.divisions
+    else:
+        divisions = mxMeasure.external['divisions']
+
+    #environLocal.printDebug(['mxToMeasure(): divisions', divisions, mxMeasure.getVoiceCount()])
+
+    if mxMeasure.getVoiceCount() > 1:
+        useVoices = True
+        # count from zero
+        for id in mxMeasure.getVoiceIndices():
+            v = stream.Voice()
+            v.id = id
+            m.insert(0, v)
+    else:
+        useVoices = False
+
     # iterate through components found on components list
     # set to zero for each measure
     offsetMeasureNote = 0 # offset of note w/n measure        
-    mxNoteList = [] # for chords
+    mxNoteList = [] # for accumulating notes in chords
     for i in range(len(mxMeasure)):
+
+        # try to get the next object for chord comparisons
         mxObj = mxMeasure[i]
         if i < len(mxMeasure)-1:
             mxObjNext = mxMeasure[i+1]
         else:
             mxObjNext = None
 
-        if isinstance(mxObj, musicxmlMod.Print):
+        # NOTE: tests have shown that using isinstance() here is much faster
+        # than checking the .tag attribute.
+
+        # check for backup and forward first
+        if isinstance(mxObj, musicxmlMod.Backup):
+            # resolve as quarterLength, subtract from measure offset
+            offsetMeasureNote -= float(mxObj.duration) / float(divisions)
+            continue
+        elif isinstance(mxObj, musicxmlMod.Forward):
+            # resolve as quarterLength, add to measure offset
+            offsetMeasureNote += float(mxObj.duration) / float(divisions)
+            continue
+
+        elif isinstance(mxObj, musicxmlMod.Print):
             # mxPrint objects may be found in a Measure's componetns
             # contain system layout information
             mxPrint = mxObj
@@ -517,15 +788,19 @@ def mxToMeasure(mxMeasure, inputM21):
                     mxNote.set('chord', True) # set the first as a chord
 
             if mxNote.get('rest') in [None, False]: # it is a note
-
+                # if a chord, do not increment until chord is complete
                 if mxNote.get('chord') is True:
                     mxNoteList.append(mxNote)
                     offsetIncrement = 0
                 else:
                     n = note.Note()
                     n.mx = mxNote
-                    m.insert(offsetMeasureNote, n)
+                    if useVoices:
+                        m.voices[mxNote.voice].insert(offsetMeasureNote, n)
+                    else:
+                        m.insert(offsetMeasureNote, n)
                     offsetIncrement = n.quarterLength
+
                 for mxLyric in mxNote.lyricList:
                     lyricObj = note.Lyric()
                     lyricObj.mx = mxLyric
@@ -537,24 +812,33 @@ def mxToMeasure(mxMeasure, inputM21):
             else: # its a rest
                 n = note.Rest()
                 n.mx = mxNote # assign mxNote to rest obj
-                m.insert(offsetMeasureNote, n)            
+                #m.insert(offsetMeasureNote, n)
+                if useVoices:
+                    m.voices[mxNote.voice].insert(offsetMeasureNote, n)
+                else:
+                    m.insert(offsetMeasureNote, n)
                 offsetIncrement = n.quarterLength
 
             # if we we have notes in the note list and the next
-            # not either does not exist or is not a chord, we 
+            # note either does not exist or is not a chord, we 
             # have a complete chord
             if len(mxNoteList) > 0 and (mxNoteNext is None 
                 or mxNoteNext.get('chord') is False):
                 c = chord.Chord()
                 c.mx = mxNoteList
                 mxNoteList = [] # clear for next chord
-                m.insert(offsetMeasureNote, c)
+                #m.insert(offsetMeasureNote, c)
+                if useVoices:
+                    m.voices[mxNote.voice].insert(offsetMeasureNote, c)
+                else:
+                    m.insert(offsetMeasureNote, c)
+
                 offsetIncrement = c.quarterLength
 
-            # do not need to increment for musicxml chords
+            # only increment Chords after completion
             offsetMeasureNote += offsetIncrement
 
-        # load dynamics into measure
+        # load dynamics into Measure, not into Voice
         elif isinstance(mxObj, musicxmlMod.Direction):
 #                 mxDynamicsFound, mxWedgeFound = m._getMxDynamics(mxObj)
 #                 for mxDirection in mxDynamicsFound:
@@ -569,9 +853,16 @@ def mxToMeasure(mxMeasure, inputM21):
 
 
 def measureToMusicXML(m):
-    '''Translate a music21 Measure into a complete musicXML string representation.
+    '''Translate a music21 Measure into a complete MusicXML string representation.
 
-    Note: this method is called for complete musicxml representation of a Measure, not in in Part or Stream production. 
+    Note: this method is called for complete MusicXML representation of a Measure, not for partial solutions in Part or Stream production. 
+
+    >>> from music21 import *
+    >>> m = stream.Measure()
+    >>> m.repeatAppend(note.Note('g3'), 4)
+    >>> post = musicxml.translate.measureToMusicXML(m)
+    >>> post[-100:].replace('\\n', '')
+    ' <type>quarter</type>        <notations/>      </note>    </measure>  </part></score-partwise>'
     '''
     
     from music21 import stream, duration
@@ -600,38 +891,6 @@ def measureToMusicXML(m):
     return out.musicxml
 
 
-
-#     mxMeasure = m._getMX()
-# 
-#     mxPart = musicxmlMod.Part()
-#     mxPart.setDefaults()
-#     mxPart.append(mxMeasure) # append measure here
-# 
-#     # see if an instrument is defined in this or a prent stream
-#     instObj = m.getInstrument()
-# 
-#     if instObj.partId == None:
-#         instObj.instrumentIdRandomize()
-#         instObj.partIdRandomize()
-# 
-#     mxScorePart = musicxmlMod.ScorePart()
-#     mxScorePart.set('partName', instObj.partName)
-#     mxScorePart.set('id', instObj.partId)
-#     # must set this part to the same id
-#     mxPart.set('id', instObj.partId)
-# 
-#     mxPartList = musicxmlMod.PartList()
-#     mxPartList.append(mxScorePart)
-# 
-#     mxIdentification = musicxmlMod.Identification()
-#     mxIdentification.setDefaults() # will create a composer
-#     mxScore = musicxmlMod.Score()
-#     mxScore.setDefaults()
-#     mxScore.set('partList', mxPartList)
-#     mxScore.set('identification', mxIdentification)
-#     mxScore.append(mxPart)
-# 
-#     return mxScore.xmlStr()
 
 
 #-------------------------------------------------------------------------------
@@ -944,7 +1203,7 @@ def mxToStreamPart(mxScore, partId, inputM21):
 
 
 def mxToStream(mxScore, inputM21):
-    '''Given an mxScore, build into this stream.
+    '''Translate an mxScore into a music21 Stream object.
     '''
 
     from music21 import metadata
@@ -994,6 +1253,26 @@ class Test(unittest.TestCase):
         #a = corpus.parseWork('opus41no1/movement3')
         #s.show()
 
+    def testVoices(self):
+
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.voiceDouble)
+        m1 = s.parts[0].getElementsByClass('Measure')[0]
+        self.assertEqual(m1.hasVoices(), True)
+
+        self.assertEqual([v.id for v in m1.voices], [u'1', u'2'])
+
+        self.assertEqual([e.offset for e in m1.voices[0]], [0.0, 1.0, 2.0, 3.0])
+        self.assertEqual([e.offset for e in m1.voices['1']], [0.0, 1.0, 2.0, 3.0])
+
+        self.assertEqual([e.offset for e in m1.voices[1]], [0.0, 2.0, 2.5, 3.0, 3.5])
+        self.assertEqual([e.offset for e in m1.voices['2']], [0.0, 2.0, 2.5, 3.0, 3.5])
+        post = s.musicxml
+        #s.show()
+
+
 
 if __name__ == "__main__":
     import sys
@@ -1002,5 +1281,5 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         t = Test()
-        t.testBarRepeatConversion()
+        t.testVoices()
 

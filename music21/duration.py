@@ -57,7 +57,9 @@ import copy
 from music21 import defaults
 from music21 import common
 from music21 import musicxml as musicxmlMod
+from music21.musicxml import translate as musicxmlTranslate
 
+from music21.midi import translate as midiTranslate
 
 from music21 import environment
 _MOD = "duration.py"  
@@ -1922,9 +1924,11 @@ class Duration(DurationCommon):
 
 
     def _getMidi(self):
-        if self._quarterLengthNeedsUpdating:
-            self.updateQuarterLength()
-        return int(round(self.quarterLength * defaults.ticksPerQuarter))
+        return midiTranslate.durationToMidi(self)
+
+#         if self._quarterLengthNeedsUpdating:
+#             self.updateQuarterLength()
+#         return int(round(self.quarterLength * defaults.ticksPerQuarter))
 
     def _setMidi(self, value):
         # its a pair of value, ticks per quarterLength
@@ -1934,10 +1938,13 @@ class Duration(DurationCommon):
         else:
             ticks = value
             ticksPerQuarter = defaults.ticksPerQuarter
+
+        return midiTranslate.midiToDuration(ticks, ticksPerQuarter, inputM21=self)
+
         # given a value in ticks
-        self._qtrLength = float(ticks) / ticksPerQuarter
-        self._componentsNeedUpdating = True
-        self._quarterLengthNeedsUpdating = False
+#         self._qtrLength = float(ticks) / ticksPerQuarter
+#         self._componentsNeedUpdating = True
+#         self._quarterLengthNeedsUpdating = False
 
 
     midi = property(_getMidi, _setMidi, 
@@ -1976,79 +1983,81 @@ class Duration(DurationCommon):
         >>> isinstance(b[0], musicxmlMod.Note)
         True
         '''
-        post = [] # rename mxNoteList for consistencuy
-        #environLocal.printDebug(['in _getMX', self, self.quarterLength])
+        return musicxmlTranslate.durationToMx(self)
 
-        for dur in self.components:
-            mxDivisions = int(defaults.divisionsPerQuarter * 
-                              dur.quarterLength)
-            mxType = typeToMusicXMLType(dur.type)
-            # check if name is not in collection of MusicXML names, which does 
-            # not have maxima, etc.
-            mxDotList = []
-            # only presently looking at first dot group
-            # also assuming that these are integer values
-            # need to handle fractional dots differently
-            for x in range(int(dur.dots)):
-                # only need to create object
-                mxDotList.append(musicxmlMod.Dot())
-
-            mxNote = musicxmlMod.Note()
-            mxNote.set('duration', mxDivisions)
-            mxNote.set('type', mxType)
-            mxNote.set('dotList', mxDotList)
-            post.append(mxNote)
-
-        # second pass for ties if more than one components
-        # this assumes that all component are tied
-
-        for i in range(len(self.components)):
-            dur = self.components[i]
-            mxNote = post[i]
-
-            # contains Tuplet, Dynamcs, Articulations
-            mxNotations = musicxmlMod.Notations()
-
-            # only need ties if more than one component
-            mxTieList = []
-            if len(self.components) > 1:
-                if i == 0:
-                    mxTie = musicxmlMod.Tie()
-                    mxTie.set('type', 'start') # start, stop
-                    mxTieList.append(mxTie)
-                    mxTied = musicxmlMod.Tied()
-                    mxTied.set('type', 'start') 
-                    mxNotations.append(mxTied)
-                elif i == len(self.components) - 1: #end 
-                    mxTie = musicxmlMod.Tie()
-                    mxTie.set('type', 'stop') # start, stop
-                    mxTieList.append(mxTie)
-                    mxTied = musicxmlMod.Tied()
-                    mxTied.set('type', 'stop') 
-                    mxNotations.append(mxTied)
-                else: # continuation
-                    for type in ['stop', 'start']:
-                        mxTie = musicxmlMod.Tie()
-                        mxTie.set('type', type) # start, stop
-                        mxTieList.append(mxTie)
-                        mxTied = musicxmlMod.Tied()
-                        mxTied.set('type', type) 
-                        mxNotations.append(mxTied)
-
-            if len(self.components) > 1:
-                mxNote.set('tieList', mxTieList)
-
-            if len(dur.tuplets) > 0:
-                # only getting first tuplet here
-                mxTimeModification, mxTupletList = dur.tuplets[0].mx
-                mxNote.set('timemodification', mxTimeModification)
-                if mxTupletList != []:
-                    mxNotations.componentList += mxTupletList
-
-            # add notations to mxNote
-            mxNote.set('notations', mxNotations)
-
-        return post # a list of mxNotes
+#         post = [] # rename mxNoteList for consistencuy
+#         #environLocal.printDebug(['in _getMX', self, self.quarterLength])
+# 
+#         for dur in self.components:
+#             mxDivisions = int(defaults.divisionsPerQuarter * 
+#                               dur.quarterLength)
+#             mxType = typeToMusicXMLType(dur.type)
+#             # check if name is not in collection of MusicXML names, which does 
+#             # not have maxima, etc.
+#             mxDotList = []
+#             # only presently looking at first dot group
+#             # also assuming that these are integer values
+#             # need to handle fractional dots differently
+#             for x in range(int(dur.dots)):
+#                 # only need to create object
+#                 mxDotList.append(musicxmlMod.Dot())
+# 
+#             mxNote = musicxmlMod.Note()
+#             mxNote.set('duration', mxDivisions)
+#             mxNote.set('type', mxType)
+#             mxNote.set('dotList', mxDotList)
+#             post.append(mxNote)
+# 
+#         # second pass for ties if more than one components
+#         # this assumes that all component are tied
+# 
+#         for i in range(len(self.components)):
+#             dur = self.components[i]
+#             mxNote = post[i]
+# 
+#             # contains Tuplet, Dynamcs, Articulations
+#             mxNotations = musicxmlMod.Notations()
+# 
+#             # only need ties if more than one component
+#             mxTieList = []
+#             if len(self.components) > 1:
+#                 if i == 0:
+#                     mxTie = musicxmlMod.Tie()
+#                     mxTie.set('type', 'start') # start, stop
+#                     mxTieList.append(mxTie)
+#                     mxTied = musicxmlMod.Tied()
+#                     mxTied.set('type', 'start') 
+#                     mxNotations.append(mxTied)
+#                 elif i == len(self.components) - 1: #end 
+#                     mxTie = musicxmlMod.Tie()
+#                     mxTie.set('type', 'stop') # start, stop
+#                     mxTieList.append(mxTie)
+#                     mxTied = musicxmlMod.Tied()
+#                     mxTied.set('type', 'stop') 
+#                     mxNotations.append(mxTied)
+#                 else: # continuation
+#                     for type in ['stop', 'start']:
+#                         mxTie = musicxmlMod.Tie()
+#                         mxTie.set('type', type) # start, stop
+#                         mxTieList.append(mxTie)
+#                         mxTied = musicxmlMod.Tied()
+#                         mxTied.set('type', type) 
+#                         mxNotations.append(mxTied)
+# 
+#             if len(self.components) > 1:
+#                 mxNote.set('tieList', mxTieList)
+# 
+#             if len(dur.tuplets) > 0:
+#                 # only getting first tuplet here
+#                 mxTimeModification, mxTupletList = dur.tuplets[0].mx
+#                 mxNote.set('timemodification', mxTimeModification)
+#                 if mxTupletList != []:
+#                     mxNotations.componentList += mxTupletList
+# 
+#             # add notations to mxNote
+#             mxNote.set('notations', mxNotations)
+# 
+#         return post # a list of mxNotes
 
     def _setMX(self, mxNote):
         '''
@@ -2069,69 +2078,69 @@ class Duration(DurationCommon):
         >>> c.mx = a
         >>> c.quarterLength
         1.0
-        '''
-        # this work
-        # from music21 import *; s = corpus.parseWork('schumann/opus41no1', 1) 
-        # has very problematic duration
-        
-        if mxNote.external['measure'] == None:
-            raise DurationException(
-            "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
+        '''   
+        musicxmlTranslate.mxToDuration(mxNote, self)
 
-        mxDivisions = mxNote.external['divisions']
-        if mxNote.duration != None: 
-
-            if mxNote.get('type') != None:
-                type = musicXMLTypeToType(mxNote.get('type'))
-                forceRaw = False
-            else: # some rests do not define type, and only define duration
-                type = None # no type to get, must use raw
-                forceRaw = True
-    
-            mxDotList = mxNote.get('dotList')
-            qLen = float(mxNote.duration) / float(mxDivisions)
-            mxNotations = mxNote.get('notationsObj')
-            mxTimeModification = mxNote.get('timeModificationObj')
-
-            if mxTimeModification != None:
-                tup = Tuplet()
-                tup.mx = mxNote # get all necessary config from mxNote
-
-                #environLocal.printDebug(['created Tuplet', tup])
-                # need to see if there is more than one component
-                #self.components[0]._tuplets.append(tup)
-            else:
-                tup = None
-
-            # two ways to create durations, raw and cooked
-            durRaw = Duration() # raw just uses qLen
-            # the qLen set here may not be computable, but is not immediately
-            # computed until setting components
-            durRaw.quarterLength = qLen
-
-            if forceRaw:
-                #environLocal.printDebug(['forced to use raw duration', durRaw])
-                try:
-                    self.components = durRaw.components
-                except DurationException:
-                    environLocal.warn(['Duration._setMX', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
-                    environLocal.printDebug(['Duration._setMX', 'raw qLen', qLen, type, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
-                    durRaw.quarterLength = 1.
-
-            else: # a cooked version builds up from pieces
-                durUnit = DurationUnit()
-                durUnit.type = type
-                durUnit.dots = len(mxDotList)
-                if not tup == None:
-                    durUnit.appendTuplet(tup)
-                durCooked = Duration(components=[durUnit])
-    
-                #environLocal.printDebug(['got durRaw, durCooked:', durRaw, durCooked])
-                if durUnit.quarterLength != durCooked.quarterLength:
-                    environLocal.printDebug(['error in stored MusicXML representaiton and duration value', durRaw, durCooked])
-                # old way just used qLen
-                #self.quarterLength = qLen
-                self.components = durCooked.components
+     
+#         if mxNote.external['measure'] == None:
+#             raise DurationException(
+#             "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
+# 
+#         mxDivisions = mxNote.external['divisions']
+#         if mxNote.duration != None: 
+# 
+#             if mxNote.get('type') != None:
+#                 type = musicXMLTypeToType(mxNote.get('type'))
+#                 forceRaw = False
+#             else: # some rests do not define type, and only define duration
+#                 type = None # no type to get, must use raw
+#                 forceRaw = True
+#     
+#             mxDotList = mxNote.get('dotList')
+#             # divide mxNote duration count by divisions to get qL
+#             qLen = float(mxNote.duration) / float(mxDivisions)
+#             mxNotations = mxNote.get('notationsObj')
+#             mxTimeModification = mxNote.get('timeModificationObj')
+# 
+#             if mxTimeModification != None:
+#                 tup = Tuplet()
+#                 tup.mx = mxNote # get all necessary config from mxNote
+# 
+#                 #environLocal.printDebug(['created Tuplet', tup])
+#                 # need to see if there is more than one component
+#                 #self.components[0]._tuplets.append(tup)
+#             else:
+#                 tup = None
+# 
+#             # two ways to create durations, raw and cooked
+#             durRaw = Duration() # raw just uses qLen
+#             # the qLen set here may not be computable, but is not immediately
+#             # computed until setting components
+#             durRaw.quarterLength = qLen
+# 
+#             if forceRaw:
+#                 #environLocal.printDebug(['forced to use raw duration', durRaw])
+#                 try:
+#                     self.components = durRaw.components
+#                 except DurationException:
+#                     environLocal.warn(['Duration._setMX', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
+#                     environLocal.printDebug(['Duration._setMX', 'raw qLen', qLen, type, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
+#                     durRaw.quarterLength = 1.
+# 
+#             else: # a cooked version builds up from pieces
+#                 durUnit = DurationUnit()
+#                 durUnit.type = type
+#                 durUnit.dots = len(mxDotList)
+#                 if not tup == None:
+#                     durUnit.appendTuplet(tup)
+#                 durCooked = Duration(components=[durUnit])
+#     
+#                 #environLocal.printDebug(['got durRaw, durCooked:', durRaw, durCooked])
+#                 if durUnit.quarterLength != durCooked.quarterLength:
+#                     environLocal.printDebug(['error in stored MusicXML representaiton and duration value', durRaw, durCooked])
+#                 # old way just used qLen
+#                 #self.quarterLength = qLen
+#                 self.components = durCooked.components
 
 
     mx = property(_getMX, _setMX)
@@ -2140,43 +2149,45 @@ class Duration(DurationCommon):
     def _getMusicXML(self):
         '''Return a complete MusicXML string with defaults.
         '''
+        return musicxmlTranslate.durationToMusicXML(self)
+
         # as this is a rhythm alone, can set a different note head default
-        mxNotehead = musicxmlMod.Notehead()
-        mxNotehead.set('charData', defaults.noteheadUnpitched)
-
-        # make a copy, as we this process will change tuple types
-        selfCopy = copy.deepcopy(self)
-        updateTupletType(selfCopy.components) # modifies in place
-
-        mxNoteList = selfCopy.mx # getting durations here as mxNotes
-        for i in range(len(mxNoteList)):
-            mxNoteDefault = musicxmlMod.Note()
-            mxNoteDefault.setDefaults()    
-            mxNoteDefault.set('notehead', mxNotehead)
-            mxNoteList[i] = mxNoteList[i].merge(mxNoteDefault, favorSelf=True)
-
-        mxMeasure = musicxmlMod.Measure()
-        mxMeasure.setDefaults()
-        for mxNote in mxNoteList:
-            mxMeasure.append(mxNote)
-        mxPart = musicxmlMod.Part()
-        mxPart.setDefaults()
-        mxPart.append(mxMeasure)
-
-        mxScorePart = musicxmlMod.ScorePart()
-        mxScorePart.setDefaults()
-        mxPartList = musicxmlMod.PartList()
-        mxPartList.append(mxScorePart)
-
-        mxIdentification = musicxmlMod.Identification()
-        mxIdentification.setDefaults() # will create a composer
-
-        mxScore = musicxmlMod.Score()
-        mxScore.setDefaults()
-        mxScore.set('partList', mxPartList)
-        mxScore.set('identification', mxIdentification)
-        mxScore.append(mxPart)
-        return mxScore.xmlStr()
+#         mxNotehead = musicxmlMod.Notehead()
+#         mxNotehead.set('charData', defaults.noteheadUnpitched)
+# 
+#         # make a copy, as we this process will change tuple types
+#         selfCopy = copy.deepcopy(self)
+#         updateTupletType(selfCopy.components) # modifies in place
+# 
+#         mxNoteList = selfCopy.mx # getting durations here as mxNotes
+#         for i in range(len(mxNoteList)):
+#             mxNoteDefault = musicxmlMod.Note()
+#             mxNoteDefault.setDefaults()    
+#             mxNoteDefault.set('notehead', mxNotehead)
+#             mxNoteList[i] = mxNoteList[i].merge(mxNoteDefault, favorSelf=True)
+# 
+#         mxMeasure = musicxmlMod.Measure()
+#         mxMeasure.setDefaults()
+#         for mxNote in mxNoteList:
+#             mxMeasure.append(mxNote)
+#         mxPart = musicxmlMod.Part()
+#         mxPart.setDefaults()
+#         mxPart.append(mxMeasure)
+# 
+#         mxScorePart = musicxmlMod.ScorePart()
+#         mxScorePart.setDefaults()
+#         mxPartList = musicxmlMod.PartList()
+#         mxPartList.append(mxScorePart)
+# 
+#         mxIdentification = musicxmlMod.Identification()
+#         mxIdentification.setDefaults() # will create a composer
+# 
+#         mxScore = musicxmlMod.Score()
+#         mxScore.setDefaults()
+#         mxScore.set('partList', mxPartList)
+#         mxScore.set('identification', mxIdentification)
+#         mxScore.append(mxPart)
+#         return mxScore.xmlStr()
 
     musicxml = property(_getMusicXML)
 
@@ -2184,7 +2195,7 @@ class Duration(DurationCommon):
         '''
         As in Music21Object.write: Writes a file in the given format (musicxml by default)
         
-        A None file path will result in temporary file
+        A None file path will result in temporary file.
         '''
         format, ext = common.findFormat(fmt)
         if format == None:
@@ -2202,7 +2213,7 @@ class Duration(DurationCommon):
 
     def show(self, format='musicxml'):
         '''
-        Same as Music21Object.show()
+        Same as Music21Object.show().
         '''
         environLocal.launch(format, self.write(format))
 

@@ -303,6 +303,7 @@ def corpusMelodicIntervalSearch():
        # ('Zhejiang', corpus.search('Zhejiang', 'locale')), # ; coastal
         # shanxi get 3.2
         # fujian gets 0.8
+
 def corpusMelodicIntervalSearchBrief(show=False):
     # try for the most concise representation
     from music21 import corpus, analysis
@@ -310,17 +311,23 @@ def corpusMelodicIntervalSearchBrief(show=False):
     msg = []
     for region in ['shanxi', 'fujian']:
         intervalDict = {}
+        workCount = 0
         intervalCount = 0
         seventhCount = 0
         for fp, n in corpus.search(region, 'locale'):
+            workCount += 1
             s = converter.parse(fp, number=n)
             intervalDict = mid.countMelodicIntervals(s, found=intervalDict)
         for key in intervalDict.keys():
             intervalCount += intervalDict[key][1] # second value is count
             if key in ['m7', 'M7']:
-                seventhCount += intervalDict[key][1] 
+                seventhCount += intervalDict[key][1]
+
+
         pcentSevenths = round((seventhCount / float(intervalCount) * 100), 4)
-        msg.append('locale: %s: found %s percent melodic sevenths, out of %s intervals' % (region, pcentSevenths, intervalCount))
+
+        msg.append('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (region, pcentSevenths, intervalCount, workCount))
+
     for sub in msg: 
         print sub
 

@@ -2088,11 +2088,13 @@ class Stream(music21.Music21Object):
         if not common.isListLike(classFilterList):
             classFilterList = [classFilterList]
 
+        environLocal.printDebug(['calling measure offsetMap()'])
+
         #environLocal.printDebug([classFilterList])
         map = {}
         # first, try to get measures
         # this works best of this is a Part or Score
-        if Measure in classFilterList:
+        if Measure in classFilterList or 'Measure' in classFilterList:
             for m in self.getElementsByClass('Measure'):
                 offset = m.getOffsetBySite(self)
                 if offset not in map.keys():
@@ -2102,10 +2104,12 @@ class Stream(music21.Music21Object):
 
         # try other classes
         for className in classFilterList:
-            if className == Measure: # do not redo
+            if className in [Measure or 'Measure']: # do not redo
                 continue
             for e in self.getElementsByClass(className):
-                #environLocal.printDebug([e])
+                environLocal.printDebug(['calling measure offsetMap(); e:', e])
+                # NOTE: if this is done on Notes, this can take an extremely
+                # long time to prorcess
                 m = e.getContextByClass(Measure)
                 if m == None: 
                     continue
@@ -2287,7 +2291,7 @@ class Stream(music21.Music21Object):
                 return clef.BassClef()
 
 
-    def getClefs(self, searchParent=True, searchContext=True, 
+    def getClefs(self, searchParent=False, searchContext=True, 
         returnDefault=True):
         '''Collect all :class:`~music21.clef.Clef` objects in this Stream in a new Stream. Optionally search the parent stream and/or contexts. 
 
@@ -2804,12 +2808,12 @@ class Stream(music21.Music21Object):
         # TODO: make inPlace an option
 
         if self.hasVoices():
-            environLocal.printDebug(['make measures found voices'])
+            #environLocal.printDebug(['make measures found voices'])
             # cannot make flat here, as this would destroy stream partitions
             srcObj = copy.deepcopy(self.sorted)
             voiceCount = len(srcObj.voices)
         else:
-            environLocal.printDebug(['make measures found no voices'])
+            #environLocal.printDebug(['make measures found no voices'])
             # take flat and sorted version
             srcObj = copy.deepcopy(self.flat.sorted)
             voiceCount = 0
@@ -3205,6 +3209,7 @@ class Stream(music21.Music21Object):
             raise StreamException('cannot process a stream that neither is a Measure nor has Measures')        
 
         lastTimeSignature = None
+        
         for m in mColl:
             # this means that the first of a stream of time signatures will
             # be used
@@ -3212,39 +3217,47 @@ class Stream(music21.Music21Object):
                 lastTimeSignature = m.timeSignature
             if lastTimeSignature is None:
                 raise StreamException('cannot proces beams in a Measure without a time signature')
+
+            noteGroups = []
+            if m.hasVoices():
+                for v in m.voices:
+                    noteGroups.append(v.notes)
+            else:
+                noteGroups.append(m.notes)
+
+            for noteStream in noteGroups:
+
+                if len(noteStream) <= 1: 
+                    continue # nothing to beam
     
-            noteStream = m.notes
-            if len(noteStream) <= 1: 
-                continue # nothing to beam
-
-            durList = []
-            for n in noteStream:
-                durList.append(n.duration)
-
-            #environLocal.printDebug(['beaming with ts', lastTimeSignature, 'measure', m, durList, noteStream[0], noteStream[1]])
-
-            # error check; call before sending to time signature, as, if this
-            # fails, it represents a problem that happens before time signature
-            # processing
-
-            durSum = sum([d.quarterLength for d in durList])
-            barQL = lastTimeSignature.barDuration.quarterLength
-
-            if durSum > barQL:
-                environLocal.printDebug(['attempting makeBeams with a bar that contains durations that sum greater than bar duration (%s > %s)' % (durSum, barQL)])
-                continue
-        
-            # getBeams can take a list of Durations; however, this cannot
-            # distinguish a Note from a Rest; thus, we can submit a flat 
-            # stream of note or note-like entities; will return
-            # the saem lost of beam objects
-            beamsList = lastTimeSignature.getBeams(noteStream)
-            for i in range(len(noteStream)):
-                # this may try to assign a beam to a Rest
-                noteStream[i].beams = beamsList[i]
-            # apply tuple types in place; this modifies the durations 
-            # in dur lost
-            duration.updateTupletType(durList)
+                durList = []
+                for n in noteStream:
+                    durList.append(n.duration)
+    
+                #environLocal.printDebug(['beaming with ts', lastTimeSignature, 'measure', m, durList, noteStream[0], noteStream[1]])
+    
+                # error check; call before sending to time signature, as, if this
+                # fails, it represents a problem that happens before time signature
+                # processing
+    
+                durSum = sum([d.quarterLength for d in durList])
+                barQL = lastTimeSignature.barDuration.quarterLength
+    
+                if durSum > barQL:
+                    environLocal.printDebug(['attempting makeBeams with a bar that contains durations that sum greater than bar duration (%s > %s)' % (durSum, barQL)])
+                    continue
+            
+                # getBeams can take a list of Durations; however, this cannot
+                # distinguish a Note from a Rest; thus, we can submit a flat 
+                # stream of note or note-like entities; will return
+                # the saem lost of beam objects
+                beamsList = lastTimeSignature.getBeams(noteStream)
+                for i in range(len(noteStream)):
+                    # this may try to assign a beam to a Rest
+                    noteStream[i].beams = beamsList[i]
+                # apply tuple types in place; this modifies the durations 
+                # in dur lost
+                duration.updateTupletType(durList)
 
         return returnObj
 
@@ -3878,6 +3891,8 @@ class Stream(music21.Music21Object):
             if hasattr(e, "elements"): # recurse time:
                 recurseStreamOffset = e.getOffsetBySite(self)
                 if retainContainers is True: # semiFlat
+                    #environLocal.printDebug(['_getFlatOrSemiFlat(), retaining containers, storing element:', e])
+
                     # this will change the parent of e to be sNew, previously
                     # this was the parent was the caller; thus, the parent here
                     # should not be set
@@ -5180,7 +5195,9 @@ class Stream(music21.Music21Object):
                 post[key] += 1
         return post
 
-    #------------ interval routines --------------------------------------------
+
+    #---------------------------------------------------------------------------
+    # interval routines
     
     def findConsecutiveNotes(self, skipRests = False, skipChords = False, 
         skipUnisons = False, skipOctaves = False,
@@ -5216,64 +5233,82 @@ class Stream(music21.Music21Object):
         if skipOctaves is True:
             skipUnisons = True  # implied
             
-        for el in sortedSelf.elements:
-            if lastWasNone is False and skipGaps is False and el.offset > lastEnd:
-                if not noNone:
-                    returnList.append(None)
-                    lastWasNone = True
-            if hasattr(el, "pitch"):
-                if (skipUnisons is False or isinstance(lastPitch, list) or
-                    lastPitch is None or 
-                    el.pitch.pitchClass != lastPitch.pitchClass or 
-                    (skipOctaves is False and el.pitch.ps != lastPitch.ps)):
-                    if getOverlaps is True or el.offset >= lastEnd:
-                        if el.offset >= lastEnd:  # is not an overlap...
-                            lastStart = el.offset
-                            if hasattr(el, "duration"):
-                                lastEnd = lastStart + el.duration.quarterLength
-                            else:
-                                lastEnd = lastStart
-                            lastWasNone = False
-                            lastPitch = el.pitch
-                        else:  # do not update anything for overlaps
-                            pass 
-                        returnList.append(el)
 
-            elif hasattr(el, "pitches"):
-                if skipChords is True:
-                    if lastWasNone is False:
-                        if not noNone:
-                            returnList.append(None)
-                            lastWasNone = True
-                            lastPitch = None
-                else:
-                    if (skipUnisons is True and isinstance(lastPitch, list) and
-                        el.pitches[0].ps == lastPitch[0].ps):
-                        pass
-                    else:
-                        if getOverlaps is True or el.offset >= lastEnd:
-                            if el.offset >= lastEnd:  # is not an overlap...
-                                lastStart = el.offset
-                                if hasattr(el, "duration"):
-                                    lastEnd = lastStart + el.duration.quarterLength
+        # need to look for voices in self and deal with each one at a time
+        if self.hasVoices:
+            vGroups = []
+            for v in self.voices:
+                vGroups.append(v.flat)
+            else:
+                vGroups.append(sortedSelf)
+
+        for v in vGroups:
+            for e in v._elements:
+                if (lastWasNone is False and skipGaps is False and 
+                    e.offset > lastEnd):
+                    if not noNone:
+                        returnList.append(None)
+                        lastWasNone = True
+                if hasattr(e, "pitch"):
+                    if (skipUnisons is False or isinstance(lastPitch, list) or
+                        lastPitch is None or 
+                        e.pitch.pitchClass != lastPitch.pitchClass or 
+                        (skipOctaves is False and e.pitch.ps != lastPitch.ps)):
+                        if getOverlaps is True or e.offset >= lastEnd:
+                            if e.offset >= lastEnd:  # is not an overlap...
+                                lastStart = e.offset
+                                if hasattr(e, "duration"):
+                                    lastEnd = lastStart + e.duration.quarterLength
                                 else:
                                     lastEnd = lastStart
-                                lastPitch = el.pitches
-                                lastWasNone = False 
+                                lastWasNone = False
+                                lastPitch = e.pitch
                             else:  # do not update anything for overlaps
                                 pass 
-                            returnList.append(el)
-
-            elif skipRests is False and isinstance(el, note.Rest) and lastWasNone is False:
-                if noNone is False:
-                    returnList.append(None)
-                    lastWasNone = True
-                    lastPitch = None
-            elif skipRests is True and isinstance(el, note.Rest):
-                lastEnd = el.offset + el.duration.quarterLength
+                            returnList.append(e)
+                # if we have a chord
+                elif hasattr(e, "pitches"):
+                    if skipChords is True:
+                        if lastWasNone is False:
+                            if not noNone:
+                                returnList.append(None)
+                                lastWasNone = True
+                                lastPitch = None
+                    # if we have a chord
+                    else:
+                        #environLocal.printDebug(['e.pitches', e, e.pitches])
+                        #environLocal.printDebug(['lastPitch', lastPitch])
+   
+                        if (skipUnisons is True and isinstance(lastPitch, list) and
+                            e.pitches[0].ps == lastPitch[0].ps):
+                            pass
+                        else:
+                            if getOverlaps is True or e.offset >= lastEnd:
+                                if e.offset >= lastEnd:  # is not an overlap...
+                                    lastStart = e.offset
+                                    if hasattr(e, "duration"):
+                                        lastEnd = lastStart + e.duration.quarterLength
+                                    else:
+                                        lastEnd = lastStart
+                                    # this is the case where the last pitch is a 
+                                    # a list
+                                    lastPitch = e.pitches
+                                    lastWasNone = False 
+                                else:  # do not update anything for overlaps
+                                    pass 
+                                returnList.append(e)
+    
+                elif (skipRests is False and isinstance(e, note.Rest) and
+                    lastWasNone is False):
+                    if noNone is False:
+                        returnList.append(None)
+                        lastWasNone = True
+                        lastPitch = None
+                elif skipRests is True and isinstance(e, note.Rest):
+                    lastEnd = e.offset + e.duration.quarterLength
         
         if lastWasNone is True:
-            returnList.pop()
+            returnList.pop() # removes the last-added element
         return returnList
     
     def melodicIntervals(self, *skipArgs, **skipKeywords):
@@ -6415,8 +6450,9 @@ class Staff(Stream):
     '''
     A Stream subclass for designating music on a single staff
     '''
-    
+    # NOTE: not yet implemented
     staffLines = 5
+
 
 class Performer(Stream):
     '''
@@ -6434,6 +6470,7 @@ class Performer(Stream):
     how 5 percussionists chose to play a piece originally designated for 4
     (or 6) percussionists in the score.
     '''
+    # NOTE: not yet implemented
     pass
 
 
@@ -6675,6 +6712,65 @@ class Score(Stream):
             removeRedundantPitches=True,
             gatherArticulations=True, gatherNotations=True, inPlace=True)
         return post
+
+
+
+    def implode(self, voicesPerPart=2):
+        '''Given a multi-part :class:`~music21.stream.Score`, return a new Score that combines parts into voices. 
+        '''
+        s = Score()
+        s.metadata = self.metadata
+        pCount = 0
+        # iterate through each part
+        for pIndex, p in enumerate(self.parts):
+            if pCount % voicesPerPart == 0:
+                environLocal.printDebug(['creating new part', p, pIndex])
+                pActive = Part()
+
+            # only check for measures once per part
+            if pActive.hasMeasures():
+                hasMeasures = True
+            else:
+                hasMeasures = False
+
+            for mIndex, m in enumerate(p.getElementsByClass('Measure')):
+                environLocal.printDebug(['pindex, p', pIndex, p, 'mIndex, m', mIndex, m, 'hasMeasures', hasMeasures])
+                # only create measures if non already exist
+                if not hasMeasures:
+                    environLocal.printDebug(['creating measure'])
+                    mActive = Measure()
+                    # some attributes may be none
+                    # note: not copying here; and first part read will provide
+                    # attributes; possible other parts may have other attributes
+                    mActive.number = m.number
+                    if m.timeSignature is not None:
+                        mActive.timeSignature = m.timeSignature 
+                    if m.keySignature is not None:
+                        mActive.keySignature = m.keySignature 
+                    if m.clef is not None:
+                        mActive.clef = m.clef
+                else:
+                    mActive = pActive.getElementsByClass('Measure')[mIndex]
+
+                # transfer elements into a voice                
+                v = Voice()
+                v.id = pIndex % voicesPerPart
+                # for now, just take notes, including rests
+                for e in m.notes: #m.getElementsByClass():
+                    v.insert(e.getOffsetBySite(m), e)
+                # insert voice in new  measure
+                environLocal.printDebug(['inserting voice', v, v.id, 'into measure', mActive])
+                mActive.insert(0, v)
+                mActive.show('t')
+                # only insert measure if new part does not already have measures
+                if not hasMeasures:
+                    pActive.insert(m.getOffsetBySite(p), mActive)
+
+            pCount += 1
+            if pCount % voicesPerPart == 0:
+                s.insert(0, pActive)
+        
+        return s
 
 
 # this was commented out as it is not immediately needed
@@ -8198,17 +8294,21 @@ class Test(unittest.TestCase):
             [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]  )
 
         for key, value in mOffsetMap.items():
-            # each key contains 4 measures
+            # each key contains 4 measures, one for each part
             self.assertEqual(len(value), 4)
 
         # we can get this information from Notes too!
         a = corpus.parseWork('bach/bwv324.xml')
-        # get notes form one measure
+        # get notes from one measure
         mOffsetMap = a[0].getElementsByClass('Measure')[1].measureOffsetMap(note.Note)
         self.assertEqual(sorted(mOffsetMap.keys()), [4.0] )
 
         mOffsetMap = a[0].flat.measureOffsetMap(note.Note)
         self.assertEqual(sorted(mOffsetMap.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]   )
+
+        self.assertEqual(str(mOffsetMap[0.0]), '[<music21.stream.Measure 1 offset=0.0>]')
+
+        self.assertEqual(str(mOffsetMap[4.0]), '[<music21.stream.Measure 2 offset=4.0>]')
 
         # this should work but does not yet
         # it seems that the flat score does not work as the flat part
@@ -11229,35 +11329,6 @@ class Test(unittest.TestCase):
         s = o.getScoreByTitle(re.compile('Pfal(.*)'))
         self.assertEqual(s.metadata.title, 'Es fuhr sich ein Pfalzgraf')
 
-
-    def testVoicesBasic(self):
-
-        v1 = Voice()
-        n1 = note.Note('c4')
-        n1.quarterLength = .5
-        v1.repeatAppend(n1, 8)
-
-        v2 = Voice()
-        n2 = note.Note('c4')
-        n2.quarterLength = 1
-        v2.repeatAppend(n2, 4)
-        
-        s = Stream()
-        s.insert(0, v1)
-        s.insert(0, v2)
-
-        # test allocating streams and assigning indices
-        oMap = s._getOffsetMap() 
-        self.assertEqual(str(oMap), '[(0.0, 0.5, <music21.note.Note C>, 0), (0.5, 1.0, <music21.note.Note C>, 0), (1.0, 1.5, <music21.note.Note C>, 0), (1.5, 2.0, <music21.note.Note C>, 0), (2.0, 2.5, <music21.note.Note C>, 0), (2.5, 3.0, <music21.note.Note C>, 0), (3.0, 3.5, <music21.note.Note C>, 0), (3.5, 4.0, <music21.note.Note C>, 0), (0.0, 1.0, <music21.note.Note C>, 1), (1.0, 2.0, <music21.note.Note C>, 1), (2.0, 3.0, <music21.note.Note C>, 1), (3.0, 4.0, <music21.note.Note C>, 1)]')
-
-        oMeasures = s.makeMeasures()
-        self.assertEqual(len(oMeasures[0].voices), 2)
-        self.assertEqual([e.offset for e in oMeasures[0].voices[0]], [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5])
-        self.assertEqual([e.offset for e in oMeasures[0].voices[1]], [0.0, 1.0, 2.0, 3.0])
-
-        #s.show()
-
-
     
     def testParentMangling(self):
         import clef, meter
@@ -11292,6 +11363,95 @@ class Test(unittest.TestCase):
 
         junk = s1.getContextByClass('Clef')
         self.assertEqual(s1.parent, s2)
+
+
+    def testVoicesBasic(self):
+
+        v1 = Voice()
+        n1 = note.Note('c5')
+        n1.quarterLength = .5
+        v1.repeatAppend(n1, 8)
+
+        v2 = Voice()
+        n2 = note.Note('c4')
+        n2.quarterLength = 1
+        v2.repeatAppend(n2, 4)
+        
+        s = Stream()
+        s.insert(0, v1)
+        s.insert(0, v2)
+
+        # test allocating streams and assigning indices
+        oMap = s._getOffsetMap() 
+        self.assertEqual(str(oMap), '[(0.0, 0.5, <music21.note.Note C>, 0), (0.5, 1.0, <music21.note.Note C>, 0), (1.0, 1.5, <music21.note.Note C>, 0), (1.5, 2.0, <music21.note.Note C>, 0), (2.0, 2.5, <music21.note.Note C>, 0), (2.5, 3.0, <music21.note.Note C>, 0), (3.0, 3.5, <music21.note.Note C>, 0), (3.5, 4.0, <music21.note.Note C>, 0), (0.0, 1.0, <music21.note.Note C>, 1), (1.0, 2.0, <music21.note.Note C>, 1), (2.0, 3.0, <music21.note.Note C>, 1), (3.0, 4.0, <music21.note.Note C>, 1)]')
+
+        oMeasures = s.makeMeasures()
+        self.assertEqual(len(oMeasures[0].voices), 2)
+        self.assertEqual([e.offset for e in oMeasures[0].voices[0]], [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5])
+        self.assertEqual([e.offset for e in oMeasures[0].voices[1]], [0.0, 1.0, 2.0, 3.0])
+
+        post = s.musicxml
+
+
+        # try version longer than 1 measure, more than 2 voices
+        v1 = Voice()
+        n1 = note.Note('c5')
+        n1.quarterLength = .5
+        v1.repeatAppend(n1, 32)
+
+        v2 = Voice()
+        n2 = note.Note('c4')
+        n2.quarterLength = 1
+        v2.repeatAppend(n2, 16)
+
+        v3 = Voice()
+        n3 = note.Note('c3')
+        n3.quarterLength = .25
+        v3.repeatAppend(n3, 64)
+
+        v4 = Voice()
+        n4 = note.Note('c2')
+        n4.quarterLength = 4
+        v4.repeatAppend(n4, 4)
+        
+        s = Stream()
+        s.insert(0, v1)
+        s.insert(0, v2)
+        s.insert(0, v3)
+        s.insert(0, v4)
+
+        oMeasures = s.makeMeasures()
+
+        # each measures has the same number of voices
+        for i in range(3):
+            self.assertEqual(len(oMeasures[i].voices), 4)
+        # each measures has the same total number of voices
+        for i in range(3):
+            self.assertEqual(len(oMeasures[i].flat.notes), 29)
+        # each measures has the same number of notes for each voices
+        for i in range(3):
+            self.assertEqual(len(oMeasures[i].voices[0].notes), 8)
+            self.assertEqual(len(oMeasures[i].voices[1].notes), 4)
+            self.assertEqual(len(oMeasures[i].voices[2].notes), 16)
+            self.assertEqual(len(oMeasures[i].voices[3].notes), 1)
+
+
+
+        post = s.musicxml
+        #s.show()
+
+
+        # todo: use makeTies
+
+
+    def testImplode(self):
+        from music21 import corpus
+        s = corpus.parseWork('bwv66.6')
+        #s.show()
+        s1 = s.implode(2)
+        #s1.show()
+        #s1.show('t')
+
 
 
 
@@ -11333,8 +11493,11 @@ if __name__ == "__main__":
 
         #t.testOpusSearch()
 
-        t.testVoicesBasic()
+        #t.testVoicesBasic()
 
-        t.testContextNestedD()
+        #t.testContextNestedD()
 
         #t.testParentMangling()
+
+        #t.testMeasureOffsetMap()
+        t.testImplode()

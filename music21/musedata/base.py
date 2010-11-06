@@ -50,7 +50,7 @@ class MuseDataException(Exception):
 
 #-------------------------------------------------------------------------------
 class MuseDataRecord(object):
-    '''Object for extracting data from a Note or other related record
+    '''Object for extracting data from a Note or other related record, or a single line of musedata data. 
     '''
     def __init__(self, src='', parent=None):
         #environLocal.printDebug(['creating MuseDataRecord'])
@@ -119,6 +119,19 @@ class MuseDataRecord(object):
         if len(self.src) > 0 and self.src[0] in 'cg':
             return True
         return False
+
+
+    def isBack(self):
+        '''
+        >>> mdr = music21.musedata.MuseDataRecord('back   4')
+        >>> mdr.isBack()
+        True
+        '''
+        if len(self.src) > 0 and self.src[0:4] == 'back':
+            return True
+        return False
+
+
 
     def _getPitchParameters(self):
         '''
@@ -250,6 +263,10 @@ class MuseDataRecord(object):
         >>> mdr = music21.musedata.MuseDataRecord('Ef4    6        s     d  ==')
         >>> mdr.getQuarterLength(4)
         1.5
+
+        >>> mdr = music21.musedata.MuseDataRecord('back   4')
+        >>> mdr.getQuarterLength(4)
+        1.0
         '''
         if self.stage == 1:
             divisions = int(self.src[5:7])
@@ -427,7 +444,7 @@ class MuseDataMeasure(object):
 
 
     def getMeasureObject(self):
-        '''Return a configured music21 object.
+        '''Return a configured music21 :class:`~music21.stream.Measure`.
         '''
         from music21 import stream
 
@@ -459,6 +476,17 @@ class MuseDataMeasure(object):
             if len(line) > 0 and line[0] in 'ABCDEFGrgc':
                 return True
         return False
+
+    def hasVoices(self):
+        '''Return True of if this Measure defines one or more 'back' indication.
+
+        Note: this does not instantiate MuseDataRecord instances.
+        '''
+        for line in self.src:
+            if len(line) > 0 and line.startswith('back'):
+                return True
+        return False
+
 
     def __iter__(self):
         '''

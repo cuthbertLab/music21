@@ -182,7 +182,7 @@ def abcToStreamPart(abcHandler, inputM21=None):
     if useMeasures and len(p.flat.getTimeSignatures(searchContext=False, 
             returnDefault=False)) > 0:
         # call make beams for now; later, import beams
-        environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
+        #environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         p.makeBeams()
 
     s.insert(0, p)

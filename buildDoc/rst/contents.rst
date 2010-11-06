@@ -64,6 +64,7 @@ Module Reference
    moduleMeter
    moduleMetadata
    moduleAnalysisMetrical
+   moduleMusicxmlTranslate
    moduleMusedataBase
    moduleMusedataTranslate
    moduleMusedataBase40

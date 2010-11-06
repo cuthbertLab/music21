@@ -227,6 +227,55 @@ class TestParseABC(CallTest):
 
 
 
+class TestMusicXMLObjectTypeChecking(CallTest):
+
+    def __init__(self):
+        from music21 import musicxml
+        self.objs = []
+        self.count = 100000
+        # all objects that would be found in a Measure
+        for x in range(self.count):
+            self.objs.append(musicxml.Note())
+        for x in range(self.count):
+            self.objs.append(musicxml.Backup())
+        for x in range(self.count):
+            self.objs.append(musicxml.Forward())
+
+    def testFocus(self):
+        # note: this shows that using isinstance() is much faster than 
+        # checking the tag attribute
+
+        from music21 import musicxml
+        # create 500 time signatures
+        n = []
+        b = []
+        f = []
+#         for obj in self.objs:
+#             if isinstance(obj, musicxml.Note):
+#                 n.append(obj)
+#             elif isinstance(obj, musicxml.Backup):
+#                 b.append(obj)
+#             elif isinstance(obj, musicxml.Forward):
+#                 f.append(obj)
+
+        for obj in self.objs:
+            if obj.tag == 'note':
+                n.append(obj)
+            elif obj.tag == 'backup':
+                b.append(obj)
+            elif obj.tag == 'forward':
+                f.append(obj)
+
+
+        assert(len(n) == self.count)
+        assert(len(b) == self.count)
+        assert(len(f) == self.count)
+
+
+
+
+
+
 
 
 
@@ -248,8 +297,8 @@ class CallGraph:
         #self.callTest = TestMetadataBundle
         #self.callTest = TestCreateTimeSignature
 
-        self.callTest = TestParseABC
-
+        #self.callTest = TestParseABC
+        self.callTest = TestMusicXMLObjectTypeChecking
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 

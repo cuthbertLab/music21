@@ -34,6 +34,29 @@ class TranslateException(Exception):
     pass
 
 
+#-------------------------------------------------------------------------------
+# Durations
+
+def durationToMidi(d):
+    if d._quarterLengthNeedsUpdating:
+        d.updateQuarterLength()
+    return int(round(d.quarterLength * defaults.ticksPerQuarter))
+
+def midiToDuration(ticks, ticksPerQuarter=None, inputM21=None):
+    if inputM21 == None:
+        from music21 import duration
+        d = duration.Duration
+    else:
+        d = inputM21
+
+    if ticksPerQuarter == None:
+        ticksPerQuarter = defaults.ticksPerQuarter
+    # given a value in ticks
+    d._qtrLength = float(ticks) / ticksPerQuarter
+    d._componentsNeedUpdating = True
+    d._quarterLengthNeedsUpdating = False
+    return d
+
 
 #-------------------------------------------------------------------------------
 # Notes

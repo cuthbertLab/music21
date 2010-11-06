@@ -305,8 +305,10 @@ class Test(unittest.TestCase):
 
 
 
-    def testExamples(self):
+    def testExamplesA(self):
 
+
+        # mensural cannon
         from music21 import stream, corpus
         src = corpus.parseWork('bach/bwv323.xml')
         ex = src.getElementById('Soprano').flat.notes[:20]
@@ -318,9 +320,242 @@ class Test(unittest.TestCase):
             s.insert(0, part)
         post = s.musicxml
         #s.show()
+        # all parts have the same number of notes
+        for i in range(3):
+            self.assertEqual(len(s.parts[i].flat.notes), 20) 
+
+        self.assertEqual(len(s.parts[0].measures(1,4).flat.notes), 9) 
+        self.assertEqual(len(s.parts[1].measures(1,4).flat.notes), 6) 
+        self.assertEqual(len(s.parts[2].measures(1,4).flat.notes), 19) 
+        self.assertEqual(len(s.parts[3].measures(1,4).flat.notes), 10) 
         
+
+
+        # counting and searching musical elements
+        s = corpus.parseWork("bach/bwv30.6")                
+        total = 0
+        for p in s.pitches:
+            if p.name == 'G#':
+                total += 1
         
+        self.assertEqual(total, 28) # returns 28
+
+
+
+        # finding adjacent chords from a specific root
+        from music21 import corpus, stream, note
         
+        # Parse a work from the corpus
+        s = corpus.parseWork('bwv66.6')        
+        # Reduce the work to a series of simultaneities, then extract only
+        # the resultant Chords
+        chords = s.chordify().getElementsByClass('Chord')
+        # Create a Stream for display
+        display = stream.Stream()
+        # Iterate through the chords by index and a Chord
+        for i, c1 in enumerate(chords):
+            # Get the next Chord, or a Rest
+            if i < len(chords) - 1:
+                c2 = chords[i+1]
+            else:
+                c2 = note.Rest()
+            
+            # If the root of the Chord is A, collect and display this Chord
+            # and the next Chord
+            if c1.findRoot().name == 'A':
+                m = stream.Measure()
+                m.append(c1)
+                m.append(c2)
+                display.append(m)
+        
+        self.assertEqual(len(display.flat.getElementsByClass('Chord')), 14)
+        for m in display.getElementsByClass('Measure'):
+            # get just the first chord
+            c  = display.flat.getElementsByClass('Chord')[0]
+            self.assertEqual(c.findRoot().name, 'A')
+        #display.show()
+
+
+
+    def testExamplesB(self):
+
+        from music21 import corpus, chord, stream
+
+        # First, we parse the score and get just the Violin part
+        op133 = corpus.parseWork('beethoven/opus133.xml') 
+        violin2 = op133.getElementById('2nd Violin')        
+        # An empty container is created for later display
+        display = stream.Stream() 
+        # We iterate over each measure
+        for m in violin2.getElementsByClass('Measure'):
+        
+            # We get a list of consecutive notes, skipping unisons, octaves,
+            # and rests 
+            notes = m.findConsecutiveNotes(skipUnisons=True, 
+                    skipOctaves=True, skipRests=True, noNone=True )
+            # From this collection of Notes we gather all Pitches
+            pitches = stream.Stream(notes).pitches
+
+            # Taking four Pitches at a time, we create Chords            
+            for i in range(len(pitches) - 3):
+                c = chord.Chord(pitches[i:i+4])           
+                c.duration.type = "whole"                 
+                # We test to see if this Chord is a Dominant seventh
+                if c.isDominantSeventh():
+                    # We label the Chord and the first Note of the Measure
+                    c.lyric = "m. " + str(m.number)
+                    primeForm = chord.Chord(m.pitches).primeFormString
+                    firstNote = m.notes[0]
+                    firstNote.lyric = primeForm
+                    # The chord (in closed position) and the Measures are 
+                    # appended for display 
+                    mChord = stream.Measure()
+                    mChord.append(c.closedPosition())
+                    display.append(mChord)
+                    display.append(m)
+            
+        #display.show()
+
+        # 2 chords found
+        self.assertEqual(len(display.flat.getElementsByClass('Chord')), 2)
+
+        c1 = display.getElementsByClass('Measure'
+                )[0].getElementsByClass('Chord')[0]
+        c2 = display.getElementsByClass('Measure'
+                )[2].getElementsByClass('Chord')[0]
+
+        self.assertEqual(c1.isDominantSeventh(), True)
+        self.assertEqual(c2.isDominantSeventh(), True)
+
+#             # get just the first chord
+#             c  = display.flat.getElementsByClass('Chord')[0]
+#             self.assertEqual(c.findRoot().name, 'A')
+
+
+
+    def testExamplesC(self):
+
+        from music21 import corpus, analysis, converter
+        # Get an analysis tool
+        mid = analysis.discrete.MelodicIntervalDiversity()
+        results = []
+        # Iterate over two regions
+        for region in ['shanxi', 'fujian']:
+            # Create storage units
+            intervalDict = {}
+            workCount = 0
+            intervalCount = 0
+            seventhCount = 0
+            # Perform a location search on the corpus and iterate over 
+            # resulting file name and work number
+            for fp, n in corpus.search(region, 'locale'):
+                workCount += 1
+                # Parse the work and create a dictionary of intervals
+                s = converter.parse(fp, number=n)
+                intervalDict = mid.countMelodicIntervals(s, found=intervalDict)
+            # Iterate through all intervals, and count totals and sevenths
+            for label in intervalDict.keys():
+                intervalCount += intervalDict[label][1] 
+                if label in ['m7', 'M7']:
+                    seventhCount += intervalDict[label][1]
+            # Calculate a percentage and store results
+            pcentSevenths = round((seventhCount / float(intervalCount) * 100), 
+                            4)
+            results.append((region, pcentSevenths, intervalCount, workCount))
+    
+        # Print results
+        for region, pcentSevenths, intervalCount, workCount in results: 
+            print('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (region, pcentSevenths, intervalCount, workCount))
+
+        region, pcentSevenths, intervalCount, workCount = results[0]
+        self.assertEqual(region, 'shanxi')
+        self.assertEqual(pcentSevenths, 3.1994)
+        self.assertEqual(intervalCount, 4282)
+        self.assertEqual(workCount, 77)
+
+        region, pcentSevenths, intervalCount, workCount = results[1]
+        self.assertEqual(region, 'fujian')
+        self.assertEqual(pcentSevenths, 0.7654)
+        self.assertEqual(intervalCount, 2613)
+        self.assertEqual(workCount, 53)
+
+
+
+    def testExamplesD(self):
+        from music21 import corpus
+        # Parse an Opus, a collection of Scores
+        o = corpus.parseWork('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
+        # Create a Score from a Measure range
+        sExcerpt = o.mergeScores().measures(128, 134)
+        # Create a reduction of Chords
+        reduction = sExcerpt.chordify()
+        # Iterate over the Chords and prepare presentation
+        for c in reduction.flat.getElementsByClass('Chord'):
+            c.closedPosition(forceOctave=4, inPlace=True)
+            c.removeRedundantPitches(inPlace=True)
+            c.annotateIntervals()
+        # Add the reduction and display the results
+        sExcerpt.insert(0, reduction)
+        #sExcerpt.show()
+
+        self.assertEqual(len(sExcerpt.flat.getElementsByClass('Chord')), 14)
+
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[0]), '<music21.chord.Chord E4 G4 B4 E5>')
+
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[1]), '<music21.chord.Chord E4 G4 E5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[2]), '<music21.chord.Chord D4 F4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[3]), '<music21.chord.Chord D4 F4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[4]), '<music21.chord.Chord D4 F4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[5]), '<music21.chord.Chord A4 C5 E5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[6]), '<music21.chord.Chord A4 C5>')
+
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[7]), '<music21.chord.Chord G4 A4 B4 C5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[8]), '<music21.chord.Chord F4 A4 D5>')
+
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[9]), '<music21.chord.Chord F4 G4 A4 D5>')
+
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[10]), '<music21.chord.Chord F4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[11]), '<music21.chord.Chord E4 G4 B4 E5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[12]), '<music21.chord.Chord E4 B4 E5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[13]), '<music21.chord.Chord E4 B4 E5>')
+
+
+    def testExamplesE(self):
+        # 100:150 finds 2
+        # 150:200 finds 1
+        # 200:250 finds 2
+        # 250:300 finds 1
+        # 300:350 finds 3
+
+        from music21 import corpus, converter, chord
+        # Create storage for the results
+        results = stream.Stream()
+        # Get file paths to all Chorales
+        for fp in corpus.bachChorales[310:330]:
+            # Parse, and then analyze the key
+            chorale = converter.parse(fp)
+            key, mode = chorale.analyze('key')[:2]
+            # Select minor-mode chorales
+            if mode == 'minor':
+                # Gather last pitches from all parts into a Chord
+                lastChordPitches = []
+                for part in chorale.parts:
+                    lastChordPitches.append(part.flat.pitches[-1])
+                cLast = chord.Chord(lastChordPitches)
+                cLast.duration.type = "whole"
+                cLast.transpose("P8", inPlace=True)
+                # If a minor triad, append to results with annotations
+                if cLast.isMinorTriad() or cLast.isIncompleteMinorTriad():
+                    cLast.lyric = chorale.metadata.title
+                    m = stream.Measure()
+                    m.keySignature = chorale.flat.getElementsByClass(
+                      'KeySignature')[0]
+                    m.append(cLast)
+                    results.append(m.makeAccidentals(inPlace=True))
+        #results.show()
+        self.assertEqual(len(results.flat.getElementsByClass('Chord')), 2)
+        self.assertEqual(str(results.flat.getElementsByClass('Chord')[0]), '<music21.chord.Chord A5 C5 E4 A3>')
+        self.assertEqual(str(results.flat.getElementsByClass('Chord')[1]), '<music21.chord.Chord A5 C5 A4 A3>')
 
 
 if __name__ == "__main__":
@@ -329,9 +564,14 @@ if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
-        a = Test()
+        t = Test()
 
 
-        #a.testExamples()
+        #t.testExamplesA()
 
-        a.testOverviewMeterB()
+        #t.testOverviewMeterB()
+        #t.testExamplesB()
+        #t.testExamplesC()
+
+        #t.testExamplesD()
+        t.testExamplesE()

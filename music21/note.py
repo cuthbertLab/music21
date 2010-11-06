@@ -458,6 +458,7 @@ class NotRest(GeneralNote):
     
     # unspecified means that there may be a stem, but its orienation
     # has not been declared. 
+    # TODO: import from MusicXML
     stemDirection = "unspecified"
     
     def __init__(self, *arguments, **keywords):

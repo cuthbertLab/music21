@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
-# Name:         base.py / musicxml.py
-# Purpose:      Convert MusicXML to and from music21
+# Name:         musicxml/base.py
+# Purpose:      MusicXML objects for conversion to and from music21
 #
 # Authors:      Christopher Ariza
 #
@@ -40,7 +40,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 2, 6) 
+VERSION_MINIMUM = (0, 3, 1) 
 
 
 #-------------------------------------------------------------------------------
@@ -978,6 +978,9 @@ class Measure(MusicXMLElementList):
         self._attributesObjList = []
         self._crossReference['attributesObj'] = ['attributes']
 
+        # store unique voice index numbers
+        self._voiceIndices = []
+
     def _getComponents(self):
         c = [] 
         c.append(self.attributesObj)
@@ -999,11 +1002,14 @@ class Measure(MusicXMLElementList):
 
 
     def update(self):
-        '''This method looks at all note, forward, and backup objects and updates note start times'''
+        '''This method looks at all note, forward, and backup objects and updates divisons and attributes references
+        '''
         updateAttributes = False
         if len(self._attributesObjList) > 1:
             updateAttributes = True
             attrConsolidate = Attributes()
+            # consolidate is necessary for some MusicXML files that define 
+            # each attribute component in its own attribute container
             for attrObj in self._attributesObjList:
                 #environLocal.printDebug(['found multiple Attributes', attrObj])
                 attrConsolidate = attrConsolidate.merge(attrObj)
@@ -1012,44 +1018,61 @@ class Measure(MusicXMLElementList):
             self.external['attributes'] = self.attributesObj
             self.external['divisions'] = self.attributesObj.divisions
 
-        counter = 0
+        #counter = 0
         noteThis = None
         noteNext = None
         for pos in range(len(self.componentList)):
+            #environLocal.printDebug(['Measure.update()', counter])
             obj = self.componentList[pos]
-            if obj.tag == 'forward':
-                counter += int(obj.duration)
-                continue
-            elif obj.tag == 'backup':
-                counter -= int(obj.duration)
-                continue
-            elif obj.tag == 'note':
+
+# this mechanism was used for storing note 
+# locations within a measure; this is no longer necessary
+#             if obj.tag == 'forward':
+#                 counter += int(obj.duration)
+#                 continue
+#             elif obj.tag == 'backup':
+#                 counter -= int(obj.duration)
+#                 continue
+            if obj.tag in ['note']:
+                if obj.voice is not None:
+                    if obj.voice not in self._voiceIndices:
+                        self._voiceIndices.append(obj.voice)
+
                 # may need to assign new, merged attributes obj to components
                 if updateAttributes:
                     obj.external['attributes'] = self.attributesObj     
                     if self.attributesObj.divisions != None:
                         obj.external['divisions'] = self.attributesObj.divisions     
 
-                noteThis = obj
-                # get a reference to the next note
-                if pos+1 == len(self.componentList):
-                    noteNext = None
-                else:
-                    for posSub in range(pos+1, len(self.componentList)):
-                        if self.componentList[posSub].tag == 'note':
-                            noteNext = self.componentList[posSub]
-                            break
-                obj.external['start'] = counter
-                # only increment if next note is not a chord
-                if noteNext != None and not noteNext.chord:
-                    if obj.duration == None: # a grace note
-                        pass
-                    else:
-                        counter = counter + int(obj.duration)
-            else: # direction elements are found here
-                pass
+#                 noteThis = obj
+#                 # get a reference to the next note
+#                 if pos+1 == len(self.componentList):
+#                     noteNext = None
+#                 else:
+#                     for posSub in range(pos+1, len(self.componentList)):
+#                         if self.componentList[posSub].tag == 'note':
+#                             noteNext = self.componentList[posSub]
+#                             break
+#                 obj.external['start'] = counter
+#                 # only increment if next note is not a chord
+#                 if noteNext != None and not noteNext.chord:
+#                     if obj.duration == None: # a grace note
+#                         pass
+#                     else:
+#                         counter = counter + int(obj.duration)
+
+        self._voiceIndices.sort()
 
 
+    def getVoiceCount(self):
+        '''Return the number of voices defined in this Measure; this must be called after update(). 
+        '''
+        return len(self._voiceIndices)
+
+    def getVoiceIndices(self):
+        '''Return a list of unique sorted voice ids. 
+        '''
+        return self._voiceIndices
 
 
 class Attributes(MusicXMLElement):
@@ -1391,18 +1414,10 @@ class Note(MusicXMLElement):
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'note'
-        # note objects need a special attribute for start count
-        # this value represents the start time as specified by MusicXML
-        # backup and forward tags, and is in division units per Measure
-        # this value can only be relative to measure, as each measure
-        # can have a different divisions (music xml stats that forward/backward
-        # should not cross measure boundaries
-        # this can also be used to determine if note is part of a chord
-        self.external['start'] = None
         # notes can optionally store a reference to the mesure object that 
         # contains them. 
         self.external['measure'] = None
-        # nots can optional store a reference to the last encounted attributes
+        # notes can optional store a reference to the last encounted attributes
         # from whatever previous meassure had an attributes object
         # this is needed to get divisions from arbitrary notes
         self.external['attributes'] = None
@@ -1519,6 +1534,7 @@ class Backup(MusicXMLElement):
         # attributes
         # elements
         self.duration = None
+
 
     def _getComponents(self):
         c = []
@@ -3007,17 +3023,18 @@ class Document(object):
         print()
         print(self.score.toxml(None, None, 1))
 
-    def reprPolyphony(self):
-        # create an event list by measure
-        for part in self.score.componentList:
-            print('+'*20 + ' ' + 'part-id', part.get('id'))
-            for measure in part.componentList:
-                print(' '*10 + '+'*10 + ' ' + 'measure-no', measure.get('number'))
-                for note in measure.componentList:
-                    # skip forward and backward objects
-                    if note.tag != 'note': continue
-                    startStr = str(note.external['start']).ljust(5)
-                    print(' '*20 + ' ' + 'note', startStr, note)
+# no longer needed 
+#     def reprPolyphony(self):
+#         # create an event list by measure
+#         for part in self.score.componentList:
+#             print('+'*20 + ' ' + 'part-id', part.get('id'))
+#             for measure in part.componentList:
+#                 print(' '*10 + '+'*10 + ' ' + 'measure-no', measure.get('number'))
+#                 for note in measure.componentList:
+#                     # skip forward and backward objects
+#                     if note.tag != 'note': continue
+#                     #startStr = str(note.external['start']).ljust(5)
+#                     print(' '*20 + ' ' + 'note', startStr, note)
 
     #---------------------------------------------------------------------------
     def write(self, fp):
@@ -3100,15 +3117,7 @@ class TestExternal(unittest.TestCase):
 #                 print '='*20, fp
 #                 self.testCompareFile(fp)
 
-    def testPolyphonyFile(self, fp=None):
 
-        from music21 import corpus
-        if fp == None: # get shuman
-            fp = corpus.getWork('opus41no1', 2)
-
-        c = Document()
-        c.open(fp, audit=True)
-        c.reprPolyphony()
 
 # need new path
 #    def testMarkings(self):

@@ -1094,6 +1094,10 @@ class PlotStream(object):
         self.flatten = flatten
         self.graph = None  # store instance of graph class here
 
+        # store axis label type for time-based plots
+        # either measure or offset
+        self._axisLabelUsesMeasures = None
+
     def process(self):
         '''This will process all data, as well as call the done() method. What happens when the done() is called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph).
         '''
@@ -1123,12 +1127,11 @@ class PlotStream(object):
     def _axisLabelMeasureOrOffset(self):
         '''Return an axis label for measure or offset, depending on if measures are available.
         '''
-        from music21 import stream
-
-        # generate an offset map to see if we can find measure numbers, either
-        # by looking at keys or by looking at Notes
-        offsetMap = self.streamObj.measureOffsetMap([stream.Measure, note.Note])
-        if len(offsetMap.keys()) > 0:
+        # look for this attribute; only want to do ticksOffset procedure once
+        if self._axisLabelUsesMeasures is None:
+            raise GraphException('call ticksOffset() first')
+        # this parameter is set in 
+        if self._axisLabelUsesMeasures:
             return 'Measure Number'
         else:
             return 'Offset'
@@ -1375,7 +1378,30 @@ class PlotStream(object):
    
         # see if this stream has any Measures, or has any references to
         # Measure obtained through contexts
-        offsetMap = self.streamObj.measureOffsetMap([stream.Measure, note.Note])
+        # look at measures first, as this will always be faster
+        environLocal.printDebug(['ticksOffset: about to call measure offset', self.streamObj])
+
+        if self.streamObj.hasPartLikeStreams():
+            # if we have part-like sub streams; we can assume that all parts
+            # have parallel measures start times here for simplicity
+            # take the top part 
+            environLocal.printDebug(['found partLikeStreams', self.streamObj.parts[0]])
+
+            offsetMap = self.streamObj.parts[0].measureOffsetMap(
+                        ['Measure'])
+        elif self.streamObj.hasMeasures():
+            offsetMap = self.streamObj.measureOffsetMap([stream.Measure])
+        else:
+            offsetMap = self.streamObj.measureOffsetMap([note.Note])
+
+        if len(offsetMap.keys()) > 0:
+            self._axisLabelUsesMeasures = True
+        else:
+            self._axisLabelUsesMeasures = False
+
+        environLocal.printDebug(['ticksOffset: got offset map keys', offsetMap.keys(), self._axisLabelUsesMeasures])
+
+
         ticks = [] # a list of graphed value, string label pairs
         if len(offsetMap.keys()) > 0:
             #environLocal.printDebug(['using measures for offset ticks'])
@@ -1551,6 +1577,7 @@ class PlotWindowedAnalysis(PlotStream):
         self.graph = GraphColorGrid(*args, **keywords)
         # uses self.processor
         data, yTicks = self._extractData()
+        xTicks = self.ticksOffset(minMaxOnly=True)
         
         self.graph.setData(data)
         self.graph.setAxisLabel('y', 'Window Size\n(Quarter Lengths)')
@@ -1558,7 +1585,6 @@ class PlotWindowedAnalysis(PlotStream):
                                  self._axisLabelMeasureOrOffset())
         self.graph.setTicks('y', yTicks)
 
-        xTicks = self.ticksOffset(minMaxOnly=True)
         # replace offset values with 0 and 1, as proportional here
         if len(xTicks) == 2:
             xTicks = [(0, xTicks[0][1]), (1, xTicks[1][1])]
@@ -2221,7 +2247,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
         self.graph.setData(data)
 
         # only need to add x ticks; y ticks added from data labels
-        environLocal.printDebug(['PlotHorizontalBarPitchClassOffset:', 'xTicks befor setting to self.graph', xTicks])
+        #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset:', 'xTicks before setting to self.graph', xTicks])
         self.graph.setTicks('x', xTicks)  
 
         self.graph.setAxisLabel('x', self._axisLabelMeasureOrOffset())
@@ -3255,6 +3281,13 @@ class Test(unittest.TestCase):
         a.setData(data)
         a.process()
 
+    def testPianoRollFromOpus(self):
+        from music21 import corpus
+        o = corpus.parseWork('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
+        s = o.mergeScores()
+
+        b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)
+        b.process()
 
 
 #-------------------------------------------------------------------------------
@@ -3283,18 +3316,19 @@ if __name__ == "__main__":
         music21.mainTest(Test)
 
     elif len(sys.argv) > 1:
-        b = Test()
-        a = TestExternal()
+        t = Test()
+        te = TestExternal()
         #a.testPlotScatterWeightedPitchSpaceQuarterLength()
 
-        #a.testPlotQuarterLength()
-        #a.testPlotScatterPitchSpaceQuarterLength()
-        #a.testPlotScatterPitchSpaceDynamicSymbol()
+        #t.testPlotQuarterLength()
+        #t.testPlotScatterPitchSpaceQuarterLength()
+        #t.testPlotScatterPitchSpaceDynamicSymbol()
 
-        #a.writeGraphColorGrid()
-        #a.writeAllGraphs()
-        #a.writeAllPlots()
+        #t.writeGraphColorGrid()
+        #t.writeAllGraphs()
+        #t.writeAllPlots()
 
+        #te.testColorGridLegend('write')
+        #te.testPlotWindowed('write')
 
-        #b.testColorGridLegend('write')
-        #b.testPlotWindowed('write')
+        t.testPianoRollFromOpus()

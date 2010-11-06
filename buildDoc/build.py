@@ -109,6 +109,8 @@ MODULES = [
     metadata,
     metrical,
 
+    musicxmlTranslate,
+
     musedata,
     musedataTranslate,
     base40,
