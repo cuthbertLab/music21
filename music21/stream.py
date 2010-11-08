@@ -4878,7 +4878,7 @@ class Stream(music21.Music21Object):
         #    return self._cache["lily"]
         # TODO: RESTORE CACHE WHEN Changes bubble up 
         
-        lilyout = u" { "
+        lilyout = u"\n  { "
 #        if self.showTimeSignature is not False and self.timeSignature is not None:
 #            lilyout += self.timeSignature.lily
     
@@ -6439,7 +6439,7 @@ class Part(Stream):
 
     def _getLily(self):
         lv = Stream._getLily(self)
-        lv2 = lilyModule.LilyString(" \\new Staff " + lv.value)
+        lv2 = lilyModule.LilyString("\t\n \\new Staff " + lv.value)
         return lv2
     
     lily = property(_getLily)
@@ -6520,7 +6520,7 @@ class Score(Stream):
                     else:
                         # TODO: write out debug code here
                         pass
-                ret += " >> "
+                ret += " >>\n"
             else:
                 if hasattr(thisOffsetPosition[0], "lily"):
                     ret += thisOffsetPosition[0].lily
@@ -7541,7 +7541,7 @@ class Test(unittest.TestCase):
         a.insert(bestC)
         a.insert(ts)
         a.insert(b)
-        self.assertEqual(a.lily.value, u' { \\clef "treble"  \\time 3/4   { c\'\'4 c\'\'4 c\'\'4 c\'\'4  }   } ')
+        self.assertEqual(a.lily.value, u'\n  { \\clef "treble"  \\time 3/4  \n  { c\'\'4 c\'\'4 c\'\'4 c\'\'4  }   } ')
 
     def testLilySemiComplex(self):
         from music21 import pitch
@@ -7577,7 +7577,7 @@ class Test(unittest.TestCase):
         a.insert(bestC)
         a.insert(ts)
         a.insert(b)
-        self.assertEqual(a.lily.value,  u' { \\clef "bass"  \\time 3/8   { \\times 3/5 {ceses,8 ces,8 c,8_"a real C" cis,8 cisis,8}  }   } ')
+        self.assertEqual(a.lily.value,  u'\n  { \\clef "bass"  \\time 3/8  \n  { \\times 3/5 {ceses,8 ces,8 c,8_"a real C" cis,8 cisis,8}  }   } ')
 
     def testScoreLily(self):
         c = note.Note("C4")
@@ -7593,7 +7593,7 @@ class Test(unittest.TestCase):
         score1.insert(ts)
         score1.insert(s1)
         score1.insert(s2)
-        self.assertEqual(u" << \\time 2/4  \\new Staff  { c'4 d'4  }  \\new Staff  { d'4 c'4  }  >> ", score1.lily.value)
+        self.assertEqual(u" << \\time 2/4 \t\n \\new Staff \n  { c'4 d'4  } \t\n \\new Staff \n  { d'4 c'4  }  >>\n", score1.lily.value)
 
 
 
@@ -11500,4 +11500,22 @@ if __name__ == "__main__":
         #t.testParentMangling()
 
         #t.testMeasureOffsetMap()
-        t.testImplode()
+        #t.testImplode()
+
+
+        t.testLilySimple()
+
+        t.testLilySemiComplex()
+
+        t.testScoreLily()
+
+
+
+
+
+
+
+
+
+
+

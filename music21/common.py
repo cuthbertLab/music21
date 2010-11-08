@@ -122,6 +122,8 @@ def findFormat(fmt):
     >>> findFormat('md')
     ('musedata', '.md')
     '''
+    # make lower case, as some lilypond processing used upper case
+    fmt = fmt.lower().strip()
     for key in fileExtensions.keys():
         if fmt.startswith('.'):
             fmt = fmt[1:] # strip .

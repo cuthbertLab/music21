@@ -174,6 +174,16 @@ scoreTitleMarkup=##f
     
     wrappedValue = property(_getWrappedValue)
     
+
+    def renderTemplate(self):
+        '''Return configured string data. 
+        '''
+        data = []
+        data.append(self.snippet)
+        data.append(self.headerInformation)
+        data.append(self.wrappedValue.encode('utf-8'))
+        return "\n".join(data)
+
     def writeTemp(self, ext=''):
         fp = environLocal.getTempFile(ext)
 
@@ -186,13 +196,6 @@ scoreTitleMarkup=##f
         data.append(self.wrappedValue.encode('utf-8'))
 
         try:
-#             ntf = open(self.tempName, "w")
-#             print>>ntf, self.snippet
-#             print>>ntf, self.headerInformation
-#             print>>ntf, self.wrappedValue.encode('utf-8')
-#             ntf.flush()
-#             ntf.close()
-
             f = open(self.tempName, 'w')
             f.write(''.join(data))
             f.close()
@@ -222,7 +225,7 @@ scoreTitleMarkup=##f
         if not os.path.exists(fileform):
             fileend = os.path.basename(fileform)
             if not os.path.exists(fileend):
-                raise Exception("I can't find " + fileend)
+                raise Exception("cannot find " + fileend)
             else:
                 fileform = fileend
         return (fileform)
@@ -235,14 +238,14 @@ scoreTitleMarkup=##f
     def showPDF(self):
         lF = self.createPDF()
         if not os.path.exists(lF):
-            raise Exception("Something went wrong with PDF Creation")
+            raise Exception('Something went wrong with PDF Creation')
         else:
-            if os.name == "nt":
-                command = "start /wait %s && del /f %s" % (lF, lF)
-            elif sys.platform == "darwin":
-                command = "open %s" % lF
+            if os.name == 'nt':
+                command = 'start /wait %s && del /f %s' % (lF, lF)
+            elif sys.platform == 'darwin':
+                command = 'open %s' % lF
             else:
-                command = ""
+                command = ''
             os.system(command)
         
     def showPNG(self):
@@ -257,14 +260,14 @@ scoreTitleMarkup=##f
         if noPIL is False:
             try:
                 lilyImage = Image.open(lilyFile)
-                lilyImage2 = ImageOps.expand(lilyImage, 10, "white")
-                if os.name == "nt":
-                    format = "PNG"
+                lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')
+                if os.name == 'nt':
+                    format = 'png'
                 # why are we changing format for darwin?
-                elif sys.platform == "darwin":
-                    format = "JPEG"
-                else:
-                    format = None
+                elif sys.platform == 'darwin':
+                    format = 'jpeg'
+                else: # default for all other platforms
+                    format = 'png'
                 
                 if lilyImage2.mode == "I;16":
                 # @PIL88 @PIL101
@@ -406,3 +409,9 @@ class TestExternal(unittest.TestCase):
 if __name__ == "__main__":
     music21.mainTest(Test)
     #music21.mainTest(Test, TestExternal)
+
+
+
+
+
+

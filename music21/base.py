@@ -2183,13 +2183,16 @@ class Music21Object(JSONSerializer):
         if fp is None:
             fp = environLocal.getTempFile(ext)
 
-        if format in ['text', 'textline', 'musicxml']:        
+        if format in ['text', 'textline', 'musicxml', 'lilypond']:        
             if format == 'text':
                 dataStr = self._reprText()
             elif format == 'textline':
                 dataStr = self._reprTextLine()
             elif format == 'musicxml':
                 dataStr = self.musicxml
+            elif format == 'lilypond':
+                dataStr = self.lily.renderTemplate()
+
             f = open(fp, 'w')
             f.write(dataStr)
             f.close()
@@ -2255,9 +2258,12 @@ class Music21Object(JSONSerializer):
             return self._reprTextLine()
 
         # TODO: these need to be updated to write files
+
         elif fmt == 'lily.pdf':
-            return self.lily.showPDF()
+            #return self.lily.showPDF()
+            environLocal.launch('pdf', self.lily.createPDF(), app=app)
         elif fmt == 'lily.png':
+            # TODO check that these use environLocal 
             return self.lily.showPNG()
         elif fmt == 'lily':
             return self.lily.showPNG()
@@ -3775,3 +3781,8 @@ if __name__ == "__main__":
         #t.testPickupMeauresBuilt()
         #t.testPickupMeauresImported()
         t.testBoundLocations()
+
+
+
+
+

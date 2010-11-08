@@ -1555,10 +1555,11 @@ class DurationUnit(DurationCommon):
         '''
         if self._typeNeedsUpdating:
             self.updateType()
-
         number_type = convertTypeToNumber(self.type)
         dots = "." * int(self.dots)
-        return (str(number_type) + dots)
+        if number_type < 1:
+           number_type = int(number_type * 16)
+        return str(number_type) + dots
 
     lily = property(_getLily)
 
@@ -2816,3 +2817,11 @@ if __name__ == "__main__":
 
         a = Test()
         a.testAugmentOrDiminish()
+
+
+
+
+
+
+
+
