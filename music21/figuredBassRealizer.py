@@ -1,3 +1,13 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         figuredBassRealizer.py
+# Purpose:      music21 class which will find all valid solutions of a given figured bass
+# Authors:      Jose Cabal-Ugaz
+#
+# Copyright:    (c) 2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 import music21
 import unittest
 import random
@@ -231,16 +241,13 @@ def findNextPitches(fbScale, prevPitches, nextBass, nextNotation='-', octaveLimi
     pitchList = fbScale.getPitchesAboveBassPitchFromNotation(nextBass, nextNotation, octaveLimit)
     bassPair = (prevBass, nextBass)
     tenorList = possiblePitches([bassPair], prevTenor, pitchList)
-    tenorList = sortPitchListByDistanceToPitch(prevTenor, tenorList)
     
     for nextTenor in tenorList:
         tenorPair = (prevTenor, nextTenor)
         altoList = possiblePitches([bassPair, tenorPair], prevAlto, pitchList)
-        altoList = sortPitchListByDistanceToPitch(prevAlto, altoList)
         for nextAlto in altoList:
             altoPair = (prevAlto, nextAlto)
             sopranoList = possiblePitches([bassPair, tenorPair, altoPair], prevSoprano, pitchList)
-            sopranoList = sortPitchListByDistanceToPitch(prevSoprano, sopranoList)
             for nextSoprano in sopranoList:
                 nextPitches = [nextSoprano, nextAlto, nextTenor, nextBass]
                 possibilities.append(nextPitches)
@@ -266,9 +273,10 @@ def possiblePitches(voicePairs, pitchB1, pitchList):
     []
     >>> voicePairC2 = (pitch.Pitch('C4'), pitch.Pitch('B3'))
     >>> possiblePitches([voicePairA, voicePairB, voicePairC2], pitch.Pitch('E4'), pitchList) #voice crossing (E4->F3, E4->B3)
-    [D4, F4, B4]
+    [F4, D4, B4]
     '''
     possibilities = []
+    pitchList = sortPitchListByDistanceToPitch(pitchB1, pitchList)
     for pitchB2 in pitchList:
         isGood = True
         for (pitchA1, pitchA2) in voicePairs:
