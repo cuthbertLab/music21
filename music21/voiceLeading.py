@@ -408,6 +408,22 @@ class VoiceLeadingQuartet(music21.Music21Object):
     
     def hiddenOctave(self):
         return self.hiddenInterval(self.octave)
+    
+    def voiceCrossing(self):
+        '''
+        >>> from music21 import *
+        >>> v1n1 = pitch.Pitch('C3')
+        >>> v1n2 = pitch.Pitch('F3')
+        >>> v2n1 = pitch.Pitch('E3')
+        >>> v2n2 = pitch.Pitch('G3')
+        >>> vlq = VoiceLeadingQuartet(v1n1, v1n2, v2n1, v2n2)
+        >>> vlq.voiceCrossing()
+        True
+        '''
+        isCrossing = False
+        if (self.v1n2.ps >= self.v2n1.ps) or (self.v1n1.ps >= self.v2n2.ps):
+            isCrossing = True
+        return isCrossing
 
 class VoiceLeadingException(Exception):
     pass
