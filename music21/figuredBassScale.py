@@ -111,7 +111,7 @@ class FiguredBassScale:
         a list of applicable pitch names. If there is no notation,
         that need not be explicitly indicated.
         
-        >>> from music21 import pitch
+        >>> from music21 import *
         >>> fbScale = FiguredBassScale('C')
         >>> fbScale.getPitchNamesFromNotation(pitch.Pitch('D3'), '6')
         ['D', 'F', 'B']
@@ -156,7 +156,7 @@ class FiguredBassScale:
         Given a pitch, returns a corresponding scale degree if it's
         present in the scale. Otherwise, raises an exception.
         
-        >>> from music21 import pitch
+        >>> from music21 import *
         >>> fbScale = FiguredBassScale('A', 'minor')
         >>> fbScale.getScaleDegree(pitch.Pitch('G'))
         7
@@ -179,7 +179,7 @@ class FiguredBassScale:
         pitches above it, inclusive of the bass pitch, that correspond to 
         the associated pitch names.
         
-        >>> from music21 import pitch
+        >>> from music21 import *
         >>> fbScale = FiguredBassScale('C')
         >>> fbScale.getPitchesAboveBassPitchFromNotation('C3')
         [C3, C4, C5, C6, C7, E3, E4, E5, E6, E7, G3, G4, G5, G6, G7]
@@ -210,7 +210,7 @@ class FiguredBassScale:
         Given a pitch, returns True if present in scale and
         False otherwise.
         
-        >>> from music21 import pitch
+        >>> from music21 import *
         >>> fbScale = FiguredBassScale('G')
         >>> fbScale.isInScale('F')
         False
@@ -238,7 +238,7 @@ class FiguredBassScale:
         
         This method, however, could be made public.
         
-        >>> from music21 import pitch
+        >>> from music21 import *
         >>> fbScale = FiguredBassScale('F')
         >>> fbScale._FiguredBassScale__getPitchNamesOnPitchInScale('B-', 1, 3) #Dammit python, that method was private!
         ['B-', 'D', 'G']
