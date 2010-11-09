@@ -7,6 +7,7 @@ from music21 import pitch
 from music21 import voiceLeading
 from music21 import note
 from music21 import stream
+from music21 import meter
 
 
 def realizeFiguredBass(figuredBassList, scaleValue, scaleMode = 'major'):
@@ -58,6 +59,7 @@ def realizeFiguredBass(figuredBassList, scaleValue, scaleMode = 'major'):
     #printChordProgression(allChordProgressions[0])
         
     score = stream.Score()
+    score.insert(0, meter.TimeSignature('6/4'))
     score.insert(0, sopranoLine)
     score.insert(0, altoLine)
     score.insert(0, tenorLine)
@@ -199,9 +201,7 @@ def findNextPitches(fbScale, prevPitches, nextBass, nextNotation='-', octaveLimi
     voice crossings, and leaps of greater than an octave with respect to the 
     previous pitches.
     
-    >>> from music21 import pitch
-    >>> from music21 import figuredBassRealizer
-    >>> from music21 import figuredBassScale
+    >>> from music21 import *
     >>> fbScale = figuredBassScale.FiguredBassScale('C')
     >>> prevSoprano = pitch.Pitch('E4')
     >>> prevAlto = pitch.Pitch('C4')
@@ -210,7 +210,7 @@ def findNextPitches(fbScale, prevPitches, nextBass, nextNotation='-', octaveLimi
     >>> prevPitches = [prevSoprano, prevAlto, prevTenor, prevBass]
     >>> nextBass = pitch.Pitch('D3')
     >>> nextNotation = '6'
-    >>> figuredBassRealizer.findNextPitches(fbScale, prevPitches, nextBass, nextNotation)[0:3]
+    >>> findNextPitches(fbScale, prevPitches, nextBass, nextNotation)[0:3]
     [[F4, B3, F3, D3], [D4, B3, F3, D3], [B4, B3, F3, D3]]
     >>> len(findNextPitches(fbScale, prevPitches, nextBass, nextNotation))
     12
@@ -255,18 +255,17 @@ def possiblePitches(voicePairs, pitchB1, pitchList):
     can actually move to, given voicing rules set about in the
     method isAbsoluteRuleBreaker. 
     
-    >>> from music21 import pitch
-    >>> from music21 import figuredBassRealizer
+    >>> from music21 import *
     >>> voicePairA = (pitch.Pitch('C3'), pitch.Pitch('D3'))
     >>> voicePairB = (pitch.Pitch('G3'), pitch.Pitch('B3'))
     >>> pitchList = [pitch.Pitch('F3'), pitch.Pitch('B3'), pitch.Pitch('D4'), pitch.Pitch('F4'), pitch.Pitch('B4')]
-    >>> figuredBassRealizer.possiblePitches([voicePairA, voicePairB], pitch.Pitch('C4'), pitchList) #voice crossing (C4->F3), parallel octaves (C4->D4)
+    >>> possiblePitches([voicePairA, voicePairB], pitch.Pitch('C4'), pitchList) #voice crossing (C4->F3), parallel octaves (C4->D4)
     [B3, F4, B4]
     >>> voicePairC1 = (pitch.Pitch('C4'), pitch.Pitch('F4'))
-    >>> figuredBassRealizer.possiblePitches([voicePairA, voicePairB, voicePairC1], pitch.Pitch('E4'), pitchList) #voice crossing (C4->F4, F4 higher than E4)
+    >>> possiblePitches([voicePairA, voicePairB, voicePairC1], pitch.Pitch('E4'), pitchList) #voice crossing (C4->F4, F4 higher than E4)
     []
     >>> voicePairC2 = (pitch.Pitch('C4'), pitch.Pitch('B3'))
-    >>> figuredBassRealizer.possiblePitches([voicePairA, voicePairB, voicePairC2], pitch.Pitch('E4'), pitchList) #voice crossing (E4->F3, E4->B3)
+    >>> possiblePitches([voicePairA, voicePairB, voicePairC2], pitch.Pitch('E4'), pitchList) #voice crossing (E4->F3, E4->B3)
     [D4, F4, B4]
     '''
     possibilities = []
@@ -289,37 +288,35 @@ def isAbsoluteRuleBreaker(vlq, verbose=False):
     been broken, although we can choose to relax the rules.
     
     Default voicing rules: 
-    (a) No parallel (or antiparallel) fifths between two voices, 
-    (b) No parallel (or antiparallel) octaves between two voices,
-    (c) No voice crossings,
+    (a) No parallel (or antiparallel) fifths between the two voices, 
+    (b) No parallel (or antiparallel) octaves between the two voices,
+    (c) No voice crossings, as determined by frequency crossing (NOT written crossing)
     (d) No leaps of greater than an octave in either voice, as determined by absolute distance (NOT written distance)
     
-    >>> from music21 import voiceLeading
-    >>> from music21 import pitch
-    >>> from music21 import figuredBassRealizer
+    >>> from music21 import *
     >>> vlqA = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('D3'), pitch.Pitch('G3'), pitch.Pitch('A3'))
-    >>> figuredBassRealizer.isAbsoluteRuleBreaker(vlqA, True) #Parallel fifths = C->D, G->A
+    >>> isAbsoluteRuleBreaker(vlqA, True) #Parallel fifths = C->D, G->A
     Parallel fifths!
     True
     >>> vlqB = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('B3'), pitch.Pitch('G3'), pitch.Pitch('D3')) 
-    >>> figuredBassRealizer.isAbsoluteRuleBreaker(vlqB, True) #Voice crossing = C->A, higher than the G above C
+    >>> isAbsoluteRuleBreaker(vlqB, True) #Voice crossing = C->A, higher than the G above C
     Voice crossing!
     True
     >>> vlqC = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('D3'), pitch.Pitch('F3'), pitch.Pitch('G3')) 
-    >>> figuredBassRealizer.isAbsoluteRuleBreaker(vlqC, True) #Parallel fourths
+    >>> isAbsoluteRuleBreaker(vlqC, True) #Parallel fourths
     False
     
     OMIT_FROM_DOCS
     >>> vlqD = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('D3'), pitch.Pitch('C4'), pitch.Pitch('D4'))
-    >>> figuredBassRealizer.isAbsoluteRuleBreaker(vlqD, True) #Parallel octaves = C3->D3, C4->D4
+    >>> isAbsoluteRuleBreaker(vlqD, True) #Parallel octaves = C3->D3, C4->D4
     Parallel octaves!
     True
     >>> vlqE = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('G4'), pitch.Pitch('E5'), pitch.Pitch('D5'))
-    >>> figuredBassRealizer.isAbsoluteRuleBreaker(vlqE, True)
+    >>> isAbsoluteRuleBreaker(vlqE, True)
     Greater than octave leap in bottom voice!
     True
     >>> vlqF = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('D3'), pitch.Pitch('E5'), pitch.Pitch('G6'))
-    >>> figuredBassRealizer.isAbsoluteRuleBreaker(vlqF, True)
+    >>> isAbsoluteRuleBreaker(vlqF, True)
     Greater than octave leap in top voice!
     True
     '''
@@ -414,7 +411,7 @@ def sortPitchListByDistanceToPitch(pitchZero, pitchList):
     actual distance (not written distance) as determined by their pitch space
     number. Ties are broken alphabetically, then numerically.
     
-    >>> from music21 import pitch
+    >>> from music21 import *
     >>> pitchZero = pitch.Pitch('C5')
     >>> pitchList = [pitch.Pitch('C6'), pitch.Pitch('G4'), pitch.Pitch('C4'), pitch.Pitch('C3'), pitch.Pitch('E5')]
     >>> sortPitchListByDistanceToPitch(pitchZero, pitchList)
@@ -454,8 +451,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    #fbScale = figuredBassScale.FiguredBassScale('C')
     figuredBassList = [(note.Note('C3'), '-'), (note.Note('F3'), '6'), (note.Note('G3'), '6/4'), \
                        (note.Note('F3'), '4/2'), (note.Note('E3'), '6')]
-    realizeFiguredBass(figuredBassList, 'C', 'major') 
+    #realizeFiguredBass(figuredBassList, 'C', 'major') 
     music21.mainTest(Test)
