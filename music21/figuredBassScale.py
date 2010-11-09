@@ -1,3 +1,13 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         figuredBassScale.py
+# Purpose:      music21 class for conveniently representing the scale of a figured bass
+# Authors:      Jose Cabal-Ugaz
+#
+# Copyright:    (c) 2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 import music21
 import unittest
 
