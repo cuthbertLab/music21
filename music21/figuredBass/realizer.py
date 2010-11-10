@@ -12,7 +12,6 @@ import music21
 import unittest
 import random
 
-from music21 import figuredBassScale
 from music21 import pitch
 from music21 import voiceLeading
 from music21 import note
@@ -26,7 +25,7 @@ def realizeFiguredBass(figuredBassList, scaleValue, scaleMode = 'major'):
     tenorLine = stream.Part()
     bassLine = stream.Part()
     
-    fbScale = figuredBassScale.FiguredBassScale(scaleValue, scaleMode)
+    fbScale = realizerScale.FiguredBassScale(scaleValue, scaleMode)
     (firstBassNote, firstNotation) = figuredBassList.pop(0)
         
     startPossibilities = getStartingPitches(fbScale, firstBassNote.pitch, firstNotation)
@@ -212,7 +211,7 @@ def findNextPitches(fbScale, prevPitches, nextBass, nextNotation='-', octaveLimi
     previous pitches.
     
     >>> from music21 import *
-    >>> fbScale = figuredBassScale.FiguredBassScale('C')
+    >>> fbScale = realizerScale.FiguredBassScale('C')
     >>> prevSoprano = pitch.Pitch('E4')
     >>> prevAlto = pitch.Pitch('C4')
     >>> prevTenor = pitch.Pitch('G3')
