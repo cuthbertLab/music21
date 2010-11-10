@@ -2041,7 +2041,7 @@ class Stream(music21.Music21Object):
             if found != None:
                 startMeasure.insert(0, found)
             else:
-                environLocal.printDebug(['cannot find requested class in stream:', className])
+                environLocal.printDebug(['measures(): cannot find requested class in stream:', className])
 
         return returnObj
 
@@ -6734,10 +6734,10 @@ class Score(Stream):
                 hasMeasures = False
 
             for mIndex, m in enumerate(p.getElementsByClass('Measure')):
-                environLocal.printDebug(['pindex, p', pIndex, p, 'mIndex, m', mIndex, m, 'hasMeasures', hasMeasures])
+                #environLocal.printDebug(['pindex, p', pIndex, p, 'mIndex, m', mIndex, m, 'hasMeasures', hasMeasures])
                 # only create measures if non already exist
                 if not hasMeasures:
-                    environLocal.printDebug(['creating measure'])
+                    #environLocal.printDebug(['creating measure'])
                     mActive = Measure()
                     # some attributes may be none
                     # note: not copying here; and first part read will provide
@@ -6759,9 +6759,9 @@ class Score(Stream):
                 for e in m.notes: #m.getElementsByClass():
                     v.insert(e.getOffsetBySite(m), e)
                 # insert voice in new  measure
-                environLocal.printDebug(['inserting voice', v, v.id, 'into measure', mActive])
+                #environLocal.printDebug(['inserting voice', v, v.id, 'into measure', mActive])
                 mActive.insert(0, v)
-                mActive.show('t')
+                #mActive.show('t')
                 # only insert measure if new part does not already have measures
                 if not hasMeasures:
                     pActive.insert(m.getOffsetBySite(p), mActive)
@@ -11446,13 +11446,17 @@ class Test(unittest.TestCase):
 
     def testImplode(self):
         from music21 import corpus
-        s = corpus.parseWork('bwv66.6')
+        s0 = corpus.parseWork('bwv66.6')
         #s.show()
-        s1 = s.implode(2)
+        s1 = s0.implode(2)
         #s1.show()
         #s1.show('t')
-
-
+        self.assertEqual(len(s1.parts), 2)
+        for p in s1.parts:
+            # need to look in measures to get at voices
+            self.assertEqual(len(p.getElementsByClass('Measure')[0].voices), 2)
+            self.assertEqual(len(p.measure(2).voices), 2)
+            self.assertEqual(len(p.measures(1,3)[2].voices), 2)
 
 
 #-------------------------------------------------------------------------------
@@ -11500,14 +11504,9 @@ if __name__ == "__main__":
         #t.testParentMangling()
 
         #t.testMeasureOffsetMap()
-        #t.testImplode()
+        t.testImplode()
 
 
-        t.testLilySimple()
-
-        t.testLilySemiComplex()
-
-        t.testScoreLily()
 
 
 
