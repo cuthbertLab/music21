@@ -41,7 +41,7 @@ see trecento/xlrd/licenses.py for the complete disclaimer and conditions
 __all__ = ['base', 
 
            'abc','analysis', 'composition', 'counterpoint', 'corpus', 
-           'demos', 'doc', 'humdrum', 
+           'demos', 'doc', 'figuredBass', 'humdrum', 
            'lily', 'musicxml', 'test', 'trecento', 'midi',
            
            'articulations', 'bar',
