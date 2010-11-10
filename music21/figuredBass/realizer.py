@@ -12,6 +12,8 @@ import music21
 import unittest
 import random
 
+from music21.figuredBass import realizerScale
+
 from music21 import pitch
 from music21 import voiceLeading
 from music21 import note
