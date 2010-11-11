@@ -194,7 +194,6 @@ class FiguredBassScale:
 
         return self._scale[scaleDegree - 1]
     
-    
     def getScaleDegree(self, pitchValue):
         '''
         Given a pitch, returns a corresponding scale degree if it's
@@ -246,7 +245,6 @@ class FiguredBassScale:
                 pitchesAboveNote.append(givenPitch)
         
         return pitchesAboveNote
-
 
     def isInScale(self, pitchValue):
         '''
