@@ -486,7 +486,7 @@ class Test(unittest.TestCase):
         # Parse an Opus, a collection of Scores
         o = corpus.parseWork('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         # Create a Score from a Measure range
-        sExcerpt = o.mergeScores().measures(128, 134)
+        sExcerpt = o.mergeScores().measures(127, 133)
         # Create a reduction of Chords
         reduction = sExcerpt.chordify()
         # Iterate over the Chords and prepare presentation
@@ -498,26 +498,24 @@ class Test(unittest.TestCase):
         sExcerpt.insert(0, reduction)
         #sExcerpt.show()
 
-        self.assertEqual(len(sExcerpt.flat.getElementsByClass('Chord')), 14)
+        self.assertEqual(len(sExcerpt.flat.getElementsByClass('Chord')), 13)
 
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[0]), '<music21.chord.Chord E4 G4 B4 E5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[1]), '<music21.chord.Chord E4 G4 B4 E5>')
 
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[1]), '<music21.chord.Chord E4 G4 E5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[2]), '<music21.chord.Chord D4 F4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[2]), '<music21.chord.Chord E4 G4 E5>')
         self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[3]), '<music21.chord.Chord D4 F4 A4 D5>')
         self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[4]), '<music21.chord.Chord D4 F4 A4 D5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[5]), '<music21.chord.Chord A4 C5 E5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[6]), '<music21.chord.Chord A4 C5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[5]), '<music21.chord.Chord D4 F4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[6]), '<music21.chord.Chord A4 C5 E5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[7]), '<music21.chord.Chord A4 C5>')
 
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[7]), '<music21.chord.Chord G4 A4 B4 C5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[8]), '<music21.chord.Chord F4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[8]), '<music21.chord.Chord G4 A4 B4 C5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[9]), '<music21.chord.Chord F4 A4 D5>')
 
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[9]), '<music21.chord.Chord F4 G4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[10]), '<music21.chord.Chord F4 G4 A4 D5>')
 
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[10]), '<music21.chord.Chord F4 A4 D5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[11]), '<music21.chord.Chord E4 G4 B4 E5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[12]), '<music21.chord.Chord E4 B4 E5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[13]), '<music21.chord.Chord E4 B4 E5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[11]), '<music21.chord.Chord F4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[12]), '<music21.chord.Chord E4 G4 B4 E5>')
 
 
     def testExamplesE(self):
@@ -573,5 +571,5 @@ if __name__ == "__main__":
         #t.testExamplesB()
         #t.testExamplesC()
 
-        #t.testExamplesD()
-        t.testExamplesE()
+        t.testExamplesD()
+        #t.testExamplesE()

@@ -18,7 +18,7 @@ This example, after parsing a polyphonic work stored as an Opus and creating a S
     # Parse an Opus, a collection of Scores
     o = corpus.parseWork('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
     # Create a Score from a Measure range
-    sExcerpt = o.mergeScores().measures(128, 134)
+    sExcerpt = o.mergeScores().measures(127, 134)
     # Create a reduction of Chords
     reduction = sExcerpt.chordify()
     # Iterate over the Chords and prepare presentation
