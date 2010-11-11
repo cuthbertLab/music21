@@ -273,13 +273,13 @@ class FiguredBassScale:
         which comprise that chord.
         
         >>> fbScale = FiguredBassScale('C')
-        >>> fbScale._FiguredBassScale_pitchNameRetrievalFromStandardNotation('G3', '7,5,3')
+        >>> fbScale._pitchNameRetrievalFromStandardNotation('G3', '7,5,3')
         ['G', 'B', 'D', 'F']
-        >>> fbScale._FiguredBassScale_pitchNameRetrievalFromStandardNotation('B3', '6,5,3')
+        >>> fbScale._pitchNameRetrievalFromStandardNotation('B3', '6,5,3')
         ['B', 'D', 'F', 'G']
-        >>> fbScale._FiguredBassScale_pitchNameRetrievalFromStandardNotation('F3', '6-,3-') #N6 Chord
+        >>> fbScale._pitchNameRetrievalFromStandardNotation('F3', '6-,3-') #N6 Chord
         ['F', 'A-', 'D-']
-        >>> fbScale._FiguredBassScale_pitchNameRetrievalFromStandardNotation('C#3', '    7-,5, 3    ')
+        >>> fbScale._pitchNameRetrievalFromStandardNotation('C#3', '    7-,5, 3    ') #Leading and trailing whitespace removed 
         ['C#', 'E', 'G', 'B-']
         '''
         bassPitch = convertToPitch(bassPitch)
@@ -306,11 +306,11 @@ class FiguredBassScale:
         
         >>> from music21 import *
         >>> fbScale = FiguredBassScale('C')
-        >>> fbScale._FiguredBassScale_getPseudoScaleDegree('C#')
+        >>> fbScale._getPseudoScaleDegree('C#')
         1
-        >>> fbScale._FiguredBassScale_getPseudoScaleDegree('E-')
+        >>> fbScale._getPseudoScaleDegree('E-')
         3
-        >>> fbScale._FiguredBassScale_getPseudoScaleDegree('G#')
+        >>> fbScale._getPseudoScaleDegree('G#')
         5
         '''
         bassPitchCopy = copy.deepcopy(bassPitch)
