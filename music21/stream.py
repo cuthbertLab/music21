@@ -2121,7 +2121,9 @@ class Stream(music21.Music21Object):
                 #environLocal.printDebug(['calling measure offsetMap(); e:', e])
                 # NOTE: if this is done on Notes, this can take an extremely
                 # long time to process
-                m = e.getContextByClass(Measure, sortByCreationTime=False,
+                # -1 here is a reverse sort, where oldest objects are returned
+                # first
+                m = e.getContextByClass(Measure, sortByCreationTime=-1,
                     prioritizeParent=False)
                 if m is None: 
                     continue
@@ -3165,11 +3167,12 @@ class Stream(music21.Music21Object):
                         # NOTE: must set parent here b/c otherwise offset
                         # setting is for the wrong location
                         eRemain.parent = mNext # manually set parent
-                        eRemain.offset = 0
+                        #eRemain.offset = 0
 
                         # this use of elements is dangerous and needs special
                         # handling
-                        mNext.elements = [eRemain] + mNext.elements
+                        #mNext.elements = [eRemain] + mNext.elements
+                        mNext.insert(0, eRemain)
 
                         # alternative approach (same slowness)
                         #mNext.insert(0, eRemain)
@@ -8359,21 +8362,21 @@ class Test(unittest.TestCase):
         # instead of storing a time value for locations, use an index 
         # count
 
-#         m1 = a[0].getElementsByClass('Measure')[1]
-#         mOffsetMap = m1.measureOffsetMap(note.Note)
-#         # offset here is that of measure that originally contained this note
-#         environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
-#         self.assertEqual(sorted(mOffsetMap.keys()), [4.0] )
-# 
-#         m2 = a[0].getElementsByClass('Measure')[2]
-#         mOffsetMap = m2.measureOffsetMap(note.Note)
-#         # offset here is that of measure that originally contained this note
-#         self.assertEqual(sorted(mOffsetMap.keys()), [8.0] )
+        m1 = a[0].getElementsByClass('Measure')[1]
+        mOffsetMap = m1.measureOffsetMap(note.Note)
+        # offset here is that of measure that originally contained this note
+        environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
+        self.assertEqual(sorted(mOffsetMap.keys()), [4.0] )
+
+        m2 = a[0].getElementsByClass('Measure')[2]
+        mOffsetMap = m2.measureOffsetMap(note.Note)
+        # offset here is that of measure that originally contained this note
+        self.assertEqual(sorted(mOffsetMap.keys()), [8.0] )
 
 
         # this should work but does not yet
         # it seems that the flat score does not work as the flat part
-#         mOffsetMap = a.flat.measureOffsetMap(note.Note)
+#         mOffsetMap = a.flat.measureOffsetMap('Note')
 #         self.assertEqual(sorted(mOffsetMap.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]  )
 
 

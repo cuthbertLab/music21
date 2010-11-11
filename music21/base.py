@@ -55,13 +55,6 @@ from music21 import duration
 _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
 
-# get the right timer for windows
-import time
-if common.getPlatform() == "win":
-    defaultTimer = time.clock
-else:
-    defaultTimer = time.time
-
 
 # check external dependencies and display 
 _missingImport = []
@@ -197,6 +190,9 @@ class DefinedContexts(object):
         # store idKeys in lists for easy access
         # the same key may be both in locationKeys and contextKeys
         self._locationKeys = []
+        # store an index of numbers for tagging the time of defined contexts; 
+        # this is used to be able to descern the order of context as added
+        self._timeIndex = 0
 
     def __len__(self):
         '''Return the total number of references.
@@ -229,12 +225,13 @@ class DefinedContexts(object):
 
         OMIT_FROM_DOCS
         the not copying object references here may be a problem
-        seems to be a prblem in copying Streams before pickling
+        seems to be a problem in copying Streams before pickling
         '''
         new = self.__class__()
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
-            new.add(dict['obj'], dict['offset'], dict['time'], idKey)
+            new.add(dict['obj'], offset=dict['offset'], timeValue=dict['time'],
+                    idKey=idKey)
         return new
 
     #---------------------------------------------------------------------------
@@ -452,8 +449,9 @@ class DefinedContexts(object):
         dict['offset'] = offset # offset can be None for contexts
 
         # NOTE: this may not give sub-second resolution on some platforms
-        if timeValue == None:
-            dict['time'] = defaultTimer()
+        if timeValue is None:
+            dict['time'] = self._timeIndex
+            self._timeIndex += 1 # increment for next usage
         else:
             dict['time'] = timeValue
 
@@ -522,8 +520,8 @@ class DefinedContexts(object):
             return dict['obj']
 
 
-    def _keysByTime(self):
-        '''Get keys sorted by creation time, where most recent are always first.
+    def _keysByTime(self, newFirst=True):
+        '''Get keys sorted by creation time, where most recent are first if `newFirst` is True. else, most recent are last.
 
         >>> from music21 import *
         >>> import time
@@ -533,9 +531,7 @@ class DefinedContexts(object):
         >>> cObj = Mock()
         >>> aContexts = DefinedContexts()
         >>> aContexts.add(cObj, 345)
-        >>> #time.sleep(.05)
         >>> aContexts.add(aObj)
-        >>> #time.sleep(.05)
         >>> aContexts.add(bObj)
         >>> k = aContexts._keysByTime()
         >>> aContexts._definedContexts[k[0]]['time'] > aContexts._definedContexts[k[1]]['time'] > aContexts._definedContexts[k[2]]['time']
@@ -545,7 +541,8 @@ class DefinedContexts(object):
         for key in self._definedContexts.keys():
             post.append((self._definedContexts[key]['time'], key))
         post.sort()
-        post.reverse()
+        if newFirst:
+            post.reverse()
         return [k for t, k in post]
 
 
@@ -578,8 +575,10 @@ class DefinedContexts(object):
         >>> aContexts.get(sortByCreationTime=True) == [bObj, aObj, cObj]
         True
         '''
-        if sortByCreationTime:
-            keyRepository = self._keysByTime()
+        if sortByCreationTime in [True, 1]:
+            keyRepository = self._keysByTime(newFirst=True)
+        elif sortByCreationTime in [-1]:
+            keyRepository = self._keysByTime(newFirst=False)
         else:
             keyRepository = self._definedContexts.keys()
 
@@ -751,6 +750,7 @@ class DefinedContexts(object):
                 obj = self._definedContexts[idKey]['obj']
             # offset value is an attribute string
             return getattr(obj, value)
+        # if value is not a string, it is a proper offset
         else:
             return value
 
@@ -816,6 +816,7 @@ class DefinedContexts(object):
         >>> aLocations.getOffsetBySite(bSite)
         121.5
         '''
+        # NOTE: this is a performance critical operation
         siteId = None
         if site is not None:
             siteId = id(site)
@@ -831,7 +832,7 @@ class DefinedContexts(object):
 
             raise # re-raise Exception
 
-        if post == None: # 
+        if post is None: # 
             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
         #self._definedContexts[siteId]['offset']
         return post
@@ -1799,64 +1800,61 @@ class Music21Object(JSONSerializer):
             # if this is a Stream and we have a caller
             # callerFirst must also be not None; this is assured if caller      
             # is not None
-            if hasattr(self, "elements") and callerFirst != None: 
+            if hasattr(self, "elements") and callerFirst is not None: 
                 # find the offset of the callerFirst
                 # if this is a Stream, we need to find the offset relative
-                # to this Stream; it may only be available within a flat
+                # to this Stream; it may only be available within a semiFlat
                 # representaiton
 
-                # alternative method may not work in all cases
-                # and raises an exception on error
-                #offsetOfCaller = callerFirst.getOffsetBySite(self.flat)
+                semiFlat = self.semiFlat
 
-                # most error tolerant: returns None
-                offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
+                # UPDATE: searching both flat and semiflat was redundant
+                # now, just searching semiflat
+#                 offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
+#                 # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
+#                 # is the caller. 
 
-                # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
-                # is the caller. 
-                if offsetOfCaller == None:
 
-                    #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a semi-flat representation', 'self', self, self.id, 'callerFirst', callerFirst, callerFirst.id])
-                    offsetOfCaller = self.semiFlat.getOffsetByElement(
-                                    callerFirst)
+                #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a semi-flat representation', 'self', self, self.id, 'callerFirst', callerFirst, callerFirst.id])
+                offsetOfCaller = semiFlat.getOffsetByElement(callerFirst)
 
                 # our caller might have been flattened after contexts were set
                 # thus, this object may be in the caller's defined contexts, 
                 # but this object knows nothing about a flat version of the 
                 # caller (it cannot get an offset of the caller, which we need
                 # to do the serial reverse search)
-                if offsetOfCaller == None and hasattr(
+                if offsetOfCaller is None and hasattr(
                     callerFirst, 'flattenedRepresentationOf'):
                     #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from the callers flattenedRepresentationOf attribute', 'self', self, 'callerFirst', callerFirst])
 
                     # Thanks Johannes Emerich [public@johannes.emerich.de] !
                     if callerFirst.flattenedRepresentationOf != None:
                         flattened = callerFirst.flattenedRepresentationOf
-                    else:
-                        # need tests to show that this is necessary
-                        flattened = callerFirst.semiFlat
-                    offsetOfCaller = self.getOffsetByElement(flattened)
+                        offsetOfCaller = self.getOffsetByElement(flattened)
+
+#                     else: # need tests to show that this is necessary
+#                         flattened = callerFirst.semiFlat
             
-                # last possibility: try to get offset of caller form a a 
+                # UPDATE: this was commented out and shown to not be necessary
+                # probably due to improvement in semiFlat
+                # last possibility: try to get offset of caller from a 
                 # non-flat representation of self. this would only be necessary
                 # if the semiflat operation is not not flattening 
                 # the right things
-                if offsetOfCaller == None:
-                    #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a non-flat representation', 'self', self, 'callerFirst', callerFirst])
-                    offsetOfCaller = self.getOffsetByElement(callerFirst)
+#                 if offsetOfCaller == None:
+#                     #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a non-flat representation', 'self', self, 'callerFirst', callerFirst])
+#                     offsetOfCaller = self.getOffsetByElement(callerFirst)
 
 
-                # in some cases it might be necessary and/or faster 
-                # to search the 
-                # offsetOfCaller = caller.flat.getOffsetBySite(self)
-                # offsetOfCaller = caller.getOffsetBySite(self)
+                # if the offset has been found, get element at  or before
+                # this offset
                 if offsetOfCaller != None:
-                    post = self.flat.getElementAtOrBefore(offsetOfCaller, 
+                    post = semiFlat.getElementAtOrBefore(offsetOfCaller, 
                                [className])
 
                 #environLocal.printDebug([self, 'results of serialReverseSearch:', post, '; searching for:', className, '; starting from offset', offsetOfCaller])
 
-        if post == None: # still no match
+        if post is None: # still no match
             # this will call this method on all defined contexts, including
             # locations (one of which must be the parent)
             # if this is a stream, this will be the next level up, recursing
@@ -2569,12 +2567,13 @@ class Music21Object(JSONSerializer):
         '''
 
         if self.parent != None and self.parent.isMeasure:
-            #environLocal.printDebug(['found parent as Measure, using for offset'])
+            environLocal.printDebug(['found parent as Measure, using for offset'])
             offsetLocal = self.getOffsetBySite(self.parent)
         else:
+            #environLocal.printDebug(['did not find parent as Measure, doing context search', 'self.parent', self.parent])
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
-            m = self.getContextByClass('Measure', sortByCreationTime=True)
+            m = self.getContextByClass('Measure', sortByCreationTime=True, prioritizeParent=False)
             if m != None:
                 #environLocal.printDebug(['using found Measure for offset access'])            
                 offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
