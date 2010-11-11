@@ -1935,14 +1935,14 @@ class Stream(music21.Music21Object):
 
         Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.  
 
+        While all elements in the source are made available in the extracted region, new Measure objects are created and returned. 
+
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
         >>> b = a[0].measures(4,6)
         >>> len(b)
         3
 
-        OMIT_FROM_DOCS
-        TODO: this probably needs to deepcopy the new first measure.
         '''
         
         # create a dictionary of measure number, list of Meaures
@@ -1950,7 +1950,6 @@ class Stream(music21.Music21Object):
         mapRaw = {}
         mNumbersUnique = [] # store just the numbers
         mStream = self.getElementsByClass('Measure')
-
 
         returnObj = self.__class__()
         srcObj = self
@@ -1984,7 +1983,7 @@ class Stream(music21.Music21Object):
             i = 1
             for number, suffix in mapRaw.keys():
                 for m in mapRaw[(number, suffix)]:
-                    # expecting a lost of measures
+                    # expecting a list of measures
                     mapCooked[(i, None)] = [m]
                     i += 1
         else:
@@ -1994,6 +1993,7 @@ class Stream(music21.Music21Object):
         startOffset = None # set with the first measure
         startMeasure = None # store for adding other objects
         # get requested range
+        startMeasureNew = None
 
         # if end not specified, get last
         if numberEnd == None:
@@ -2014,32 +2014,43 @@ class Stream(music21.Music21Object):
                 # this may not always be the case
                 if startOffset == None: # only set on first
                     startOffset = m.getOffsetBySite(srcObj)
-                    # not sure if a deepcopy is necessary; this does not yet work
-                    #startMeasure = copy.deepcopy(m)
                     startMeasure = m
 
-                    # this works here, but not after appending!
-                    #found = startMeasure.getContextByClass(clef.Clef)
-                    #environLocal.printDebug(['early clef search', found])
+                # create a new Measure container, but populate it 
+                # with the same elements
+                mNew = Measure()
+                mNew.mergeAttributes(m)
+                # will only set on first time through
+                if startMeasureNew is None:
+                    startMeasureNew = mNew
+
+                # transfer elements to the new measure
+                for e in m._elements:
+                    mNew.insert(e)
+                for e in m._endElements:
+                    mNew.storeAtEnd(e)
 
                 oldOffset = m.getOffsetBySite(srcObj)
                 # subtract the offset of the first measure
                 # this will be zero in the first usage
                 newOffset = oldOffset - startOffset
-                returnObj.insert(newOffset, m)
+                returnObj.insert(newOffset, mNew)
 
                 #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
 
         # manipulate startMeasure to add desired context objects
         for className in collect:
             # first, see if it is in this Measure
+            # startMeasure here is the original measure
             found = startMeasure.getElementsByClass(className)
             if len(found) > 0:
                 continue # already have one on this measure
 
             found = startMeasure.getContextByClass(className)
             if found != None:
-                startMeasure.insert(0, found)
+                # only insert into measure new
+                # TODO: may want to deepcopy inserted object here
+                startMeasureNew.insert(0, found)
             else:
                 environLocal.printDebug(['measures(): cannot find requested class in stream:', className])
 
@@ -2088,7 +2099,7 @@ class Stream(music21.Music21Object):
         if not common.isListLike(classFilterList):
             classFilterList = [classFilterList]
 
-        environLocal.printDebug(['calling measure offsetMap()'])
+        #environLocal.printDebug(['calling measure offsetMap()'])
 
         #environLocal.printDebug([classFilterList])
         map = {}
@@ -2107,7 +2118,7 @@ class Stream(music21.Music21Object):
             if className in [Measure or 'Measure']: # do not redo
                 continue
             for e in self.getElementsByClass(className):
-                environLocal.printDebug(['calling measure offsetMap(); e:', e])
+                #environLocal.printDebug(['calling measure offsetMap(); e:', e])
                 # NOTE: if this is done on Notes, this can take an extremely
                 # long time to prorcess
                 m = e.getContextByClass(Measure)
@@ -6024,6 +6035,22 @@ class Measure(Stream):
             (self.__class__.__name__, self.measureNumberWithSuffix(), self.offset)
         
     #---------------------------------------------------------------------------
+    def mergeAttributes(self, other):
+        '''Given another Measure, configure all non-element attributes of this Measure with the attributes of the other Measure. No elements will be changed or copied.
+
+        This method is necessary because Measures, unlike some Streams, have attributes independent of any stored elements.
+        '''
+        self.timeSignatureIsNew = other.timeSignatureIsNew
+        self.clefIsNew = other.clefIsNew
+        self.keyIsNew = other.keyIsNew
+        self.filled = other.filled
+        self.paddingLeft = other.paddingLeft
+        self.paddingRight = other.paddingRight
+        self.number = other.number
+        self.numberSuffix = other.numberSuffix
+        self.layoutWidth = other.layoutWidth
+
+    #---------------------------------------------------------------------------
     def barDurationProportion(self, barDuration=None):
         '''Return a floating point value greater than 0 showing the proportion of the bar duration that is filled based on the highest time of all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
 
@@ -8240,6 +8267,7 @@ class Test(unittest.TestCase):
         a = corpus.parseWork('bach/bwv324.xml')
         b = a[3].measures(4,6)
         self.assertEqual(len(b), 3) 
+        #b.show('t')
         # first measure now has keu sig
         self.assertEqual(len(b[0].getElementsByClass(key.KeySignature)), 1) 
         # first measure now has meter
@@ -8248,6 +8276,23 @@ class Test(unittest.TestCase):
         self.assertEqual(len(b[0].getElementsByClass(clef.Clef)), 1) 
 
         #b.show()       
+        # get first part
+        p1 = a.parts[0]
+        # get measure by class; this will not manipulate the measure
+        mExRaw = p1.getElementsByClass('Measure')[5]
+        self.assertEqual(str([n for n in mExRaw.notes]), '[<music21.note.Note B>, <music21.note.Note D>]')
+        self.assertEqual(len(mExRaw.flat), 3)
+
+        # get measure by using method; this will add elements
+        mEx = p1.measure(6)
+        self.assertEqual(str([n for n in mEx.notes]), '[<music21.note.Note B>, <music21.note.Note D>]')
+        self.assertEqual(len(mEx.flat), 7)
+        
+        # make sure source has not chnaged
+        mExRaw = p1.getElementsByClass('Measure')[5]
+        self.assertEqual(str([n for n in mExRaw.notes]), '[<music21.note.Note B>, <music21.note.Note D>]')
+        self.assertEqual(len(mExRaw.flat), 3)
+
 
         # test measures with no measure numbesr
         c = Stream()
@@ -11452,11 +11497,58 @@ class Test(unittest.TestCase):
         #s1.show()
         #s1.show('t')
         self.assertEqual(len(s1.parts), 2)
+
+        p1 = s1.parts[0]
+        self.assertEqual(len(p1.flat.getElementsByClass('Clef')), 1)
+        #p1.show('t')
+
+        # look at individual measure; check counts; these should not
+        # change after measure extraction
+        m1Raw = p1.getElementsByClass('Measure')[1]
+        environLocal.printDebug(['m1Raw', m1Raw])
+        self.assertEqual(len(m1Raw.flat), 8)
+
+        #m1Raw.show('t')
+        m2Raw = p1.getElementsByClass('Measure')[2]
+        environLocal.printDebug(['m2Raw', m2Raw])
+        self.assertEqual(len(m2Raw.flat), 9)
+
+        # get a measure from this part
+        m1 = p1.measure(2)
+        self.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
+
+        # look at individual measure; check counts; these should not
+        # change after measure extraction
+        m1Raw = p1.getElementsByClass('Measure')[1]
+        environLocal.printDebug(['m1Raw', m1Raw])
+        self.assertEqual(len(m1Raw.flat), 8)
+
+        #m1Raw.show('t')
+        m2Raw = p1.getElementsByClass('Measure')[2]
+        environLocal.printDebug(['m2Raw', m2Raw])
+        self.assertEqual(len(m2Raw.flat), 9)
+
+        #m2Raw.show('t')
+
+        self.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
+        ex1 = p1.measures(1,3)
+        self.assertEqual(len(ex1.flat.getElementsByClass('Clef')), 1)
+
+        #ex1.show()
+
         for p in s1.parts:
             # need to look in measures to get at voices
             self.assertEqual(len(p.getElementsByClass('Measure')[0].voices), 2)
             self.assertEqual(len(p.measure(2).voices), 2)
             self.assertEqual(len(p.measures(1,3)[2].voices), 2)
+
+        #s1.show()
+        #p1.show()
+
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -11504,6 +11596,7 @@ if __name__ == "__main__":
         #t.testParentMangling()
 
         #t.testMeasureOffsetMap()
+        t.testMeasureRange()
         t.testImplode()
 
 

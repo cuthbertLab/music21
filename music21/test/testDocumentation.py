@@ -571,5 +571,5 @@ if __name__ == "__main__":
         #t.testExamplesB()
         #t.testExamplesC()
 
-        t.testExamplesD()
+        #t.testExamplesD()
         #t.testExamplesE()
