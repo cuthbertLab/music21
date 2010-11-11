@@ -21,13 +21,13 @@ from music21.musedata import base40
 
 
 inversionTable = {'': '5,3',
-                   '5': '5,3',
-                   '6': '6,3',
-                   '6,4': '6,4',
-                   '7': '7,5,3',
-                   '6,5': '6,5,3',
-                   '4,3': '6,4,3',
-                   '4,2': '6,4,2'}
+                  '5': '5,3',
+                  '6': '6,3',
+                  '6,4': '6,4',
+                  '7': '7,5,3',
+                  '6,5': '6,5,3',
+                  '4,3': '6,4,3',
+                  '4,2': '6,4,2'}
 
 
 class FiguredBassScale:    
@@ -35,12 +35,12 @@ class FiguredBassScale:
         '''
         Constructs a FiguredBassScale object, with a scaleValue (key) and a scaleMode (major is default).
         '''
-        self.__scaleValue = convertToPitch(scaleValue) #If scale value provided as string, convert to pitch
-        self.__scaleMode = scaleMode
-        self.__keySig = key.KeySignature(key.pitchToSharps(self.__scaleValue,self.__scaleMode))
-        self.__scale = self.__constructScale()
+        self._scaleValue = convertToPitch(scaleValue) #If scale value provided as string, convert to pitch
+        self._scaleMode = scaleMode
+        self._keySig = key.KeySignature(key.pitchToSharps(self._scaleValue,self._scaleMode))
+        self._scale = self._constructScale()
         
-    def __constructScale(self):
+    def _constructScale(self):
         '''
         Builds the list of pitch names found in the scale.
         '''
@@ -48,11 +48,11 @@ class FiguredBassScale:
                     note.Note('D'), note.Note('E'), note.Note('F'),
                     note.Note('G')]
         for i in range(len(noteList)):
-            if (self.__keySig.accidentalByStep(noteList[i].step)
+            if (self._keySig.accidentalByStep(noteList[i].step)
                     != noteList[i].accidental):
                 noteList[i].accidental = \
-                    self.__keySig.accidentalByStep(noteList[i].step)        
-        indexStart = noteList.index(note.Note(self.__scaleValue.name))
+                    self._keySig.accidentalByStep(noteList[i].step)        
+        indexStart = noteList.index(note.Note(self._scaleValue.name))
         newNoteList = [] #List of notes in correct order
         for i in range(indexStart,indexStart+8):
             newNoteList.append(noteList[i%7].name)
@@ -69,7 +69,7 @@ class FiguredBassScale:
         >>> fbScale2.getScaleValue()
         F
         '''
-        return self.__scaleValue
+        return self._scaleValue
 
     def getScaleMode(self):
         '''
@@ -88,7 +88,7 @@ class FiguredBassScale:
         >>> fbScale4.getScaleMode()
         'dorian'
         '''
-        return self.__scaleMode
+        return self._scaleMode
     
     def getScale(self):
         '''
@@ -101,7 +101,7 @@ class FiguredBassScale:
         >>> fbScale2.getScale()
         ['F', 'G', 'A', 'B-', 'C', 'D', 'E', 'F']
         '''
-        return self.__scale
+        return self._scale
     
     def getPitchNamesFromNotation(self, bassPitch, notationString = ''):
         '''
@@ -128,14 +128,14 @@ class FiguredBassScale:
         '''
         try:
             notationToUse = inversionTable[notationString]
-            return self.__pitchNameRetrievalFromStandardNotation(bassPitch, notationToUse)
+            return self._pitchNameRetrievalFromStandardNotation(bassPitch, notationToUse)
         except KeyError:
             notationList = parseNotationString(notationString)
             pitchNameList = None
             if len(notationList) == 1:
                 (intervalAboveBass, accidentalString) = notationList[0]
                 if intervalAboveBass == 3 and accidentalString != None: #Root position chord, raise 3rd above bass
-                    pitchNameList = self.__getPitchNamesOnPitchInScale(bassPitch, 0, 3)
+                    pitchNameList = self._getPitchNamesOnPitchInScale(bassPitch, 0, 3)
                     pitchNameList[1] = modifyPitchNameWithAccidentalString(pitchNameList[1], accidentalString)
                     return pitchNameList
             
@@ -172,7 +172,7 @@ class FiguredBassScale:
                 except KeyError:
                     pass
             
-            pitchNameList = self.__pitchNameRetrievalFromStandardNotation(bassPitch, notationToUse)
+            pitchNameList = self._pitchNameRetrievalFromStandardNotation(bassPitch, notationToUse)
             return pitchNameList
 
     def getPitchNameOnScaleDegree(self, scaleDegree):
@@ -192,7 +192,7 @@ class FiguredBassScale:
         if scaleDegree <= 0 or scaleDegree > 7:
             raise FiguredBassScaleException("Scale degree out of bounds-> " + str(scaleDegree))
 
-        return self.__scale[scaleDegree - 1]
+        return self._scale[scaleDegree - 1]
     
     
     def getScaleDegree(self, pitchValue):
@@ -212,7 +212,7 @@ class FiguredBassScale:
         '''
         pitchValue = convertToPitch(pitchValue)
         if self.isInScale(pitchValue.name):
-            return self.__scale.index(pitchValue.name) + 1
+            return self._scale.index(pitchValue.name) + 1
         raise FiguredBassScaleException("Pitch not in scale of " + str(self.getScaleValue()) \
                              + " " + str(self.getScaleMode()) + "-> " + str(pitchValue.name))
    
@@ -262,24 +262,24 @@ class FiguredBassScale:
         '''
         pitchValue = convertToPitch(pitchValue)
         inScale = False
-        if pitchValue.name in self.__scale:
+        if pitchValue.name in self._scale:
             inScale = True
         return inScale
    
     #A few private methods which are accessed by the public methods above
-    def __pitchNameRetrievalFromStandardNotation(self, bassPitch, notationString):
+    def _pitchNameRetrievalFromStandardNotation(self, bassPitch, notationString):
         '''
         Given a bass pitch and a *full* figured bass notation, return the pitch names
         which comprise that chord.
         
         >>> fbScale = FiguredBassScale('C')
-        >>> fbScale._FiguredBassScale__pitchNameRetrievalFromStandardNotation('G3', '7,5,3')
+        >>> fbScale._FiguredBassScale_pitchNameRetrievalFromStandardNotation('G3', '7,5,3')
         ['G', 'B', 'D', 'F']
-        >>> fbScale._FiguredBassScale__pitchNameRetrievalFromStandardNotation('B3', '6,5,3')
+        >>> fbScale._FiguredBassScale_pitchNameRetrievalFromStandardNotation('B3', '6,5,3')
         ['B', 'D', 'F', 'G']
-        >>> fbScale._FiguredBassScale__pitchNameRetrievalFromStandardNotation('F3', '6-,3-') #N6 Chord
+        >>> fbScale._FiguredBassScale_pitchNameRetrievalFromStandardNotation('F3', '6-,3-') #N6 Chord
         ['F', 'A-', 'D-']
-        >>> fbScale._FiguredBassScale__pitchNameRetrievalFromStandardNotation('C#3', '    7-,5, 3    ')
+        >>> fbScale._FiguredBassScale_pitchNameRetrievalFromStandardNotation('C#3', '    7-,5, 3    ')
         ['C#', 'E', 'G', 'B-']
         '''
         bassPitch = convertToPitch(bassPitch)
@@ -288,38 +288,38 @@ class FiguredBassScale:
         try:
             bassSD = self.getScaleDegree(bassPitch)
         except FiguredBassScaleException:
-            bassSD = self.__getPseudoScaleDegree(bassPitch)
+            bassSD = self._getPseudoScaleDegree(bassPitch)
         pitchNameList.append(bassPitch.name)
         for (intervalAboveBass, accidentalString) in notationList:
             bassIndex = bassSD - 1
             pitchIndex = (bassIndex + intervalAboveBass - 1) % 7
-            pitchName = self.__scale[pitchIndex]
+            pitchName = self._scale[pitchIndex]
             if (accidentalString != None):
                 pitchName = modifyPitchNameWithAccidentalString(pitchName, accidentalString)
             pitchNameList.insert(1, pitchName)
         return pitchNameList
 
-    def __getPseudoScaleDegree(self, bassPitch):
+    def _getPseudoScaleDegree(self, bassPitch):
         '''
         Given a bass pitch which is not in the scale, returns what the scale degree
         would be if it were.
         
         >>> from music21 import *
         >>> fbScale = FiguredBassScale('C')
-        >>> fbScale._FiguredBassScale__getPseudoScaleDegree('C#')
+        >>> fbScale._FiguredBassScale_getPseudoScaleDegree('C#')
         1
-        >>> fbScale._FiguredBassScale__getPseudoScaleDegree('E-')
+        >>> fbScale._FiguredBassScale_getPseudoScaleDegree('E-')
         3
-        >>> fbScale._FiguredBassScale__getPseudoScaleDegree('G#')
+        >>> fbScale._FiguredBassScale_getPseudoScaleDegree('G#')
         5
         '''
         bassPitchCopy = copy.deepcopy(bassPitch)
         bassPitchCopy = convertToPitch(bassPitchCopy)
         bassNote = note.Note(bassPitchCopy)
-        if (self.__keySig.accidentalByStep(bassNote.step)
+        if (self._keySig.accidentalByStep(bassNote.step)
                     != bassNote.accidental):
                 bassNote.accidental = \
-                    self.__keySig.accidentalByStep(bassNote.step)
+                    self._keySig.accidentalByStep(bassNote.step)
         return self.getScaleDegree(bassNote.pitch)
 
 
