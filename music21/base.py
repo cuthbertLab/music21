@@ -549,12 +549,15 @@ class DefinedContexts(object):
         return [k for t, k in post]
 
 
-    def get(self, locationsTrail=False, sortByCreationTime=False):
+    def get(self, locationsTrail=False, sortByCreationTime=False,
+            priorityTarget=None):
         '''Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added.
 
         The `locationsTrail` option forces locations to come after all other defined contexts.
 
         The `sortByCreationTime` option will sort objects by creation time, where most-recently assigned objects are returned first. 
+
+        If `priorityTarget` is defined, this object will be placed first in the list of objects.
 
         >>> from music21 import *
         >>> import time
@@ -603,6 +606,12 @@ class DefinedContexts(object):
                 post.append(common.unwrapWeakref(dict['obj']))
             else:
                 post.append(dict['obj'])
+
+        if priorityTarget is not None:
+            if priorityTarget in post:
+                #environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
+                # extract object and make first
+                post.insert(0, post.pop(post.index(priorityTarget)))
         return post
 
     #---------------------------------------------------------------------------
@@ -928,19 +937,16 @@ class DefinedContexts(object):
     # for dealing with contexts or getting other information
 
     def getByClass(self, className, serialReverseSearch=True, callerFirst=None,
-             sortByCreationTime=False, memo=None):
+             sortByCreationTime=False, prioritizeParent=False, 
+             priorityTarget=None, memo=None):
         '''Return the most recently added reference based on className. Class name can be a string or the class name.
 
         This will recursively search the defined contexts of existing defined contexts.
 
-        Caller here can be the object that is hosting this DefinedContexts
-        object (such as a Stream). This is necessary when, later on, we need
-        a flat representation. If no caller is provided, the a reference to
-        this DefinedContexts instances is based (from where locations can be 
-        looked up if necessary).
-
-        callerFirst is simply used to pass a reference of the first caller; this
+        The `callerFirst` parameters is simply used to pass a reference of the first caller; this
         is necessary if we are looking within a Stream for a flat offset position.
+
+        If `priorityTarget` is specified, this location will be searched first. The `prioritizeParent` is based to to any recursively called getContextByClass() calls. 
 
         >>> class Mock(Music21Object): pass
         >>> import time
@@ -973,10 +979,10 @@ class DefinedContexts(object):
         count = 0
         # search any defined contexts first
         # need to sort: look at most-recently added objs are first
-        for obj in self.get(locationsTrail=True,  
-                            sortByCreationTime=sortByCreationTime):
-            count += 1
-
+        objs = self.get(locationsTrail=True,  
+                        sortByCreationTime=sortByCreationTime,
+                        priorityTarget=priorityTarget)
+        for obj in objs:
             #environLocal.printDebug(['memo', memo])
             if obj is None: 
                 continue # in case the reference is dead
@@ -987,20 +993,27 @@ class DefinedContexts(object):
             elif isinstance(obj, className):
                     post = obj       
                     break
+        if post != None:
+            return post
+
+        for obj in objs:
+            if obj is None: 
+                continue # in case the reference is dead
             # if after trying to match name, look in the defined contexts' 
             # defined contexts [sic!]
-            # note that this does not complete searching at the first level
-            # before recursing: might want to change this
-            if post == None: # no match yet
+            if post is None: # no match yet
                 # access public method to recurse
                 if id(obj) not in memo.keys():
+                    # if the object is a Musci21Object
                     if hasattr(obj, 'getContextByClass'):
+                        # store this object as having been searched
+                        memo[id(obj)] = obj
                         post = obj.getContextByClass(className,
                                serialReverseSearch=serialReverseSearch,
-                               callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, 
+                               callerFirst=callerFirst, 
+                               sortByCreationTime=sortByCreationTime, 
+                               prioritizeParent=prioritizeParent,
                                memo=memo)
-                        # after searching, store this obj in memo
-                        memo[id(obj)] = obj
                         if post != None:
                             break
                     else: # this is not a music21 object
@@ -1749,7 +1762,7 @@ class Music21Object(JSONSerializer):
 
 
     def getContextByClass(self, className, serialReverseSearch=True,
-                          callerFirst=None, sortByCreationTime=False, memo=None):
+                          callerFirst=None, sortByCreationTime=False, prioritizeParent=True, memo=None):
         '''Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. 
 
         The a reference to the caller is required to find the offset of the 
@@ -1760,18 +1773,23 @@ class Music21Object(JSONSerializer):
         if we need a flat representation, the caller needs to be the source 
         Stream, not its DefinedContexts reference.
 
-        The callerFirst is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
+        The `callerFirst` is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
+
+        The `prioritizeParent` parameter searches the objects parent before any other object. 
         '''
-        #environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.parent, 'callerFirst:', callerFirst])
+        #environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.parent, 'callerFirst:', callerFirst, 'prioritizeParent', prioritizeParent])
     
         # this method will be called recursively on all object levels, ascending
         # thus, to do serial reverse search we need to 
         # look at parent flat and track back to first encountered class match
-        storedParent = self.parent
+        if prioritizeParent:
+            priorityTarget = self.parent
+        else:
+            priorityTarget = None
 
-        if callerFirst == None: # this is the first caller
+        if callerFirst is None: # this is the first caller
             callerFirst = self
-        if memo == None:
+        if memo is None:
             memo = {} # intialize
 
         post = None
@@ -1840,12 +1858,16 @@ class Music21Object(JSONSerializer):
 
         if post == None: # still no match
             # this will call this method on all defined contexts, including
-            # locations
+            # locations (one of which must be the parent)
             # if this is a stream, this will be the next level up, recursing
             # a reference to the callerFirst is continuall passed
             post = self._definedContexts.getByClass(className,
                    serialReverseSearch=serialReverseSearch,
-                   callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, memo=memo)
+                   callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, 
+                   # make the priorityTarget the parent, meaning we search
+                   # this object first
+                   prioritizeParent=prioritizeParent, 
+                   priorityTarget=priorityTarget, memo=memo)
 
         return post
 
@@ -2558,7 +2580,7 @@ class Music21Object(JSONSerializer):
                 offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
 
             else: # hope that we get the right one
-                environLocal.printDebug(['_getMeasureOffset(): cannot find a Measre; using standard offset access'])
+                environLocal.printDebug(['_getMeasureOffset(): cannot find a Measure; using standard offset access'])
                 offsetLocal = self.offset
 
         #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])

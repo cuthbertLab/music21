@@ -272,6 +272,26 @@ class TestMusicXMLObjectTypeChecking(CallTest):
         assert(len(f) == self.count)
 
 
+class TestGetContextByClass(CallTest):
+
+    def __init__(self):
+
+        from music21 import corpus, clef, meter, key
+        self.s = corpus.parseWork('bwv66.6')
+
+
+    def testFocus(self):
+        from music21 import corpus, clef, meter, key
+        for p in self.s.parts:
+            for m in p.getElementsByClass('Measure'):
+                post = m.getContextByClass(clef.Clef)
+                post = m.getContextByClass(meter.TimeSignature)
+                post = m.getContextByClass(key.KeySignature)
+                for n in m.notes:
+                    post = n.getContextByClass(clef.Clef)
+                    post = n.getContextByClass(meter.TimeSignature)
+                    post = n.getContextByClass(key.KeySignature)
+            
 
 
 
@@ -298,7 +318,8 @@ class CallGraph:
         #self.callTest = TestCreateTimeSignature
 
         #self.callTest = TestParseABC
-        self.callTest = TestMusicXMLObjectTypeChecking
+        #self.callTest = TestMusicXMLObjectTypeChecking
+        self.callTest = TestGetContextByClass
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
