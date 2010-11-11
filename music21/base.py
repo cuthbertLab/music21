@@ -1799,7 +1799,8 @@ class Music21Object(JSONSerializer):
         if serialReverseSearch:
 
             # if this is a Stream and we have a caller, see if we 
-            # can get the offset from within this Stream            
+            # can get the offset from within this Stream       
+            # first, see if this element is even in this Stream     
             getOffsetOfCaller = False
             if hasattr(self, "elements") and callerFirst is not None: 
                 # find the offset of the callerFirst
@@ -1807,6 +1808,8 @@ class Music21Object(JSONSerializer):
                 # to this Stream; it may only be available within a semiFlat
                 # representaiton
 
+                # this semiFlat name will be used in the getOffsetOfCaller 
+                # branch below
                 semiFlat = self.semiFlat
                 # see if this element is in this Stream; 
                 if semiFlat.hasElement(callerFirst): 
@@ -1819,9 +1822,6 @@ class Music21Object(JSONSerializer):
                                 getOffsetOfCaller = True
 
             if getOffsetOfCaller:
-                # UPDATE: searching both flat and semiflat was redundant
-                # now, just searching semiflat
-                #offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
                 # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
                 # is the caller. 
 
@@ -1841,20 +1841,6 @@ class Music21Object(JSONSerializer):
                     if callerFirst.flattenedRepresentationOf != None:
                         unFlat = callerFirst.flattenedRepresentationOf
                         offsetOfCaller = semiFlat.getOffsetByElement(unFlat)
-
-                    #else: # need tests to show that this is necessary
-                        #flattened = callerFirst.semiFlat
-            
-                # UPDATE: this was commented out and shown to not be necessary
-                # probably due to improvement in semiFlat
-                # last possibility: try to get offset of caller from a 
-                # non-flat representation of self. this would only be necessary
-                # if the semiflat operation is not not flattening 
-                # the right things
-                #if offsetOfCaller == None:
-                    #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a non-flat representation', 'self', self, 'callerFirst', callerFirst])
-                    #offsetOfCaller = self.getOffsetByElement(callerFirst)
-
 
                 # if the offset has been found, get element at  or before
                 # this offset
