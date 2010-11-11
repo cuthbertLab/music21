@@ -218,7 +218,7 @@ class Test(unittest.TestCase):
             (self.runGetElementsByContext, 
                 {
                  '2010.11.10': 7.3888170, 
-                 '2010.11.11': 7.0868251, 
+                 '2010.11.11': 3.96121883392, 
                 }),
 
 # 

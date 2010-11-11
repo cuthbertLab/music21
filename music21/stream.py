@@ -442,6 +442,18 @@ class Stream(music21.Music21Object):
         return s
 
 
+    def hasElement(self, obj):
+        '''Return True if this element is contained in this Stream.
+        '''
+        for e in self._elements:
+            if id(e) == id(obj): 
+                return True
+        for e in self._endElements:
+            if id(e) == id(obj): 
+                return True
+        return False
+
+
     def indexList(self, obj, firstMatchOnly=False):
         '''Return a list of one or more index values where the supplied object is found on this Stream's `elements` list. 
 

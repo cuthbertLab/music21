@@ -1797,9 +1797,10 @@ class Music21Object(JSONSerializer):
         # first, if this obj is a Stream, we see if the class exists at or
         # before where the offsetOfCaller
         if serialReverseSearch:
-            # if this is a Stream and we have a caller
-            # callerFirst must also be not None; this is assured if caller      
-            # is not None
+
+            # if this is a Stream and we have a caller, see if we 
+            # can get the offset from within this Stream            
+            getOffsetOfCaller = False
             if hasattr(self, "elements") and callerFirst is not None: 
                 # find the offset of the callerFirst
                 # if this is a Stream, we need to find the offset relative
@@ -1807,13 +1808,22 @@ class Music21Object(JSONSerializer):
                 # representaiton
 
                 semiFlat = self.semiFlat
+                # see if this element is in this Stream; 
+                if semiFlat.hasElement(callerFirst): 
+                    getOffsetOfCaller = True
+                else:
+                    if hasattr(callerFirst, 'flattenedRepresentationOf'):
+                        if callerFirst.flattenedRepresentationOf is not None:
+                            if semiFlat.hasElement(
+                            callerFirst.flattenedRepresentationOf):
+                                getOffsetOfCaller = True
 
+            if getOffsetOfCaller:
                 # UPDATE: searching both flat and semiflat was redundant
                 # now, just searching semiflat
-#                 offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
-#                 # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
-#                 # is the caller. 
-
+                #offsetOfCaller = self.flat.getOffsetByElement(callerFirst)
+                # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
+                # is the caller. 
 
                 #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a semi-flat representation', 'self', self, self.id, 'callerFirst', callerFirst, callerFirst.id])
                 offsetOfCaller = semiFlat.getOffsetByElement(callerFirst)
@@ -1829,11 +1839,11 @@ class Music21Object(JSONSerializer):
 
                     # Thanks Johannes Emerich [public@johannes.emerich.de] !
                     if callerFirst.flattenedRepresentationOf != None:
-                        flattened = callerFirst.flattenedRepresentationOf
-                        offsetOfCaller = self.getOffsetByElement(flattened)
+                        unFlat = callerFirst.flattenedRepresentationOf
+                        offsetOfCaller = semiFlat.getOffsetByElement(unFlat)
 
-#                     else: # need tests to show that this is necessary
-#                         flattened = callerFirst.semiFlat
+                    #else: # need tests to show that this is necessary
+                        #flattened = callerFirst.semiFlat
             
                 # UPDATE: this was commented out and shown to not be necessary
                 # probably due to improvement in semiFlat
@@ -1841,9 +1851,9 @@ class Music21Object(JSONSerializer):
                 # non-flat representation of self. this would only be necessary
                 # if the semiflat operation is not not flattening 
                 # the right things
-#                 if offsetOfCaller == None:
-#                     #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a non-flat representation', 'self', self, 'callerFirst', callerFirst])
-#                     offsetOfCaller = self.getOffsetByElement(callerFirst)
+                #if offsetOfCaller == None:
+                    #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a non-flat representation', 'self', self, 'callerFirst', callerFirst])
+                    #offsetOfCaller = self.getOffsetByElement(callerFirst)
 
 
                 # if the offset has been found, get element at  or before
