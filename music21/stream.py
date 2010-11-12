@@ -461,7 +461,7 @@ class Stream(music21.Music21Object):
                 return True
         return False
 
-    def mergeElements(self, other, classFilter=[]):
+    def mergeElements(self, other, classFilterList=[]):
         '''Given another Stream, store references of each element in the other Stream in this Stream. This does not make copies of any elements, but simply stores all of them in this Stream.
 
         Optionally, provide a list of classes to exclude with the `classFilter` list. 
@@ -486,19 +486,19 @@ class Stream(music21.Music21Object):
         for e in other._elements:
             #self.insert(other.offset, e)
             match = False
-            for c in classFilter:
+            for c in classFilterList:
                 if c in e.classes:
                     match = True
                     break
-            if len(classFilter) == 0 or match:
+            if len(classFilterList) == 0 or match:
                 self.insert(e.getOffsetBySite(other), e)
         for e in other._endElements:
             match = False
-            for c in classFilter:
+            for c in classFilterList:
                 if c in e.classes:
                     match = True
                     break
-            if len(classFilter) == 0 or match:
+            if len(classFilterList) == 0 or match:
                 self.storeAtEnd(e)
         #self._elementsChanged()
 
@@ -1341,7 +1341,7 @@ class Stream(music21.Music21Object):
     def addGroupForElements(self, group, classFilter=None):
         '''
         Add the group to the groups attribute of all elements.
-        if classFilter is set then only those elements whose objects
+        if `classFilter` is set then only those elements whose objects
         belong to a certain class (or for Streams which are themselves of
         a certain class) are set.
          
@@ -6021,7 +6021,16 @@ class Stream(music21.Music21Object):
         '''
         s = Score()
         #s.metadata = self.metadata
-        
+
+        # if this is a Score, call this recursively on each Part, then
+        # add all parts to one Score
+        if self.hasPartLikeStreams():
+            for p in self.parts:
+                sSub = p.explode()
+                for pSub in sSub:
+                    s.insert(0, pSub)
+            return s
+
         # need to find maximum voice count
         partCount = 0
         #partId = []
@@ -6049,7 +6058,7 @@ class Stream(music21.Music21Object):
                     mActive.mergeAttributes(m)
                     # merge everything except Voices; this will get
                     # clefs
-                    mActive.mergeElements(m, classFilter=['Bar', 'TimeSignature', 'Clef', 'KeySignature'])
+                    mActive.mergeElements(m, classFilterList=['Bar', 'TimeSignature', 'Clef', 'KeySignature'])
                     for vIndex, v in enumerate(m.voices):
                         # make an independent copy
                         mNew = copy.deepcopy(mActive)
@@ -6877,8 +6886,6 @@ class Score(Stream):
             gatherArticulations=True, gatherNotations=True, inPlace=True)
         return post
 
-
-
     def implode(self, voiceAllocation=2, permitOneVoicePerPart=False):
         '''Given a multi-part :class:`~music21.stream.Score`, return a new Score that combines parts into voices. 
 
@@ -6945,7 +6952,7 @@ class Score(Stream):
                         # note: not copying here; and first part read will provide
                         # attributes; possible other parts may have other attributes
                         mActive.mergeAttributes(m)
-                        mActive.mergeElements(m, classFilter=['Bar', 'TimeSignature', 'Clef', 'KeySignature'])
+                        mActive.mergeElements(m, classFilterList=['Bar', 'TimeSignature', 'Clef', 'KeySignature'])
 
 #                         if m.timeSignature is not None:
 #                             mActive.timeSignature = m.timeSignature 
@@ -11820,22 +11827,66 @@ class Test(unittest.TestCase):
         #s.show()
         s1 = s0.implode(2) # produce two parts each with two voices
 
-        s1.parts[0].explode()
+        s2 = s1.parts[0].explode()
+        # now a two part score
+        self.assertEqual(len(s2.parts), 2)
+        # makes sure we have what we started with
+        self.assertEqual(len(s2.parts[0].flat.notes), len(s0.parts[0].flat.notes))
 
 
-        s2 = Stream()
+        s1 = s0.implode(4) # create one staff with all parts
+        self.assertEqual(s1.classes[0], 'Score') # we get a Score back
+        # we have a Score with one part and measures, each with 4 voices
+        self.assertEqual(len(s1.parts[0].getElementsByClass(
+            'Measure')[0].voices), 4)
+        # need to access part
+        s2 = s1.explode() # return to four parts in a score; 
+        # make sure we have what we started with
+        self.assertEqual(len(s2.parts[0].flat.notes),
+                         len(s0.parts[0].flat.notes))
+        self.assertEqual(str([n for n in s2.parts[0].flat.notes]),
+                         str([n for n in s0.parts[0].flat.notes]))
+
+        self.assertEqual(len(s2.parts[1].flat.notes),
+                         len(s0.parts[1].flat.notes))
+        self.assertEqual(str([n for n in s2.parts[1].flat.notes]),
+                         str([n for n in s0.parts[1].flat.notes]))
+
+        self.assertEqual(len(s2.parts[2].flat.notes),
+                         len(s0.parts[2].flat.notes))
+        self.assertEqual(str([n for n in s2.parts[2].flat.notes]),
+                         str([n for n in s0.parts[2].flat.notes]))
+
+        self.assertEqual(len(s2.parts[3].flat.notes),
+                         len(s0.parts[3].flat.notes))
+        self.assertEqual(str([n for n in s2.parts[3].flat.notes]),
+                         str([n for n in s0.parts[3].flat.notes]))
+
+        # try on a built Stream that has no Measures
+        # build a stream
+        s0 = Stream()
         v1 = Voice()
         v1.repeatAppend(note.Note('c3'), 4)
         v2 = Voice()
-        v2.repeatAppend(note.Note('g3'), 4)
+        v2.repeatAppend(note.Note('g4'), 4)
         v3 = Voice()
-        v3.repeatAppend(note.Note('b3'), 4)
-        s2.insert(0, v1)
-        s2.insert(0, v2)
-        s2.insert(0, v3)
+        v3.repeatAppend(note.Note('b5'), 4)
+        s0.insert(0, v1)
+        s0.insert(0, v2)
+        s0.insert(0, v3)
         #s2.show()
-        s2.explode()
+        s1 = s0.explode()
+        self.assertEqual(len(s1.parts), 3)
+        self.assertEqual(len(s1.parts[0].flat), len(v1.flat))
+        self.assertEqual([e for e in s1.parts[0].flat], [e for e in v1.flat])
 
+        self.assertEqual(len(s1.parts[1].flat), len(v2.flat))
+        self.assertEqual([e for e in s1.parts[1].flat], [e for e in v2.flat])
+
+        self.assertEqual(len(s1.parts[2].flat), len(v3.flat))
+        self.assertEqual([e for e in s1.parts[2].flat], [e for e in v3.flat])
+
+        #s1.show()
 
     def testMergeElements(self):
         from music21 import stream
@@ -11853,10 +11904,10 @@ class Test(unittest.TestCase):
         self.assertEqual(id(s1[0]) == id(s2[0]), True)
         self.assertEqual(id(s1[1]) == id(s2[1]), True)
 
-        s3.mergeElements(s1, classFilter=['Rest'])
+        s3.mergeElements(s1, classFilterList=['Rest'])
         self.assertEqual(len(s3), 0)
 
-        s3.mergeElements(s1, classFilter=['GeneralNote'])
+        s3.mergeElements(s1, classFilterList=['GeneralNote'])
         self.assertEqual(len(s3), 2)
 
 
@@ -11881,11 +11932,10 @@ if __name__ == "__main__":
 
         #t.testMeasureOffsetMap()
 
-        t.testImplodeA()
-        t.testImplodeB()
+        #t.testImplodeA()
+        #t.testImplodeB()
         t.testExplodeA()
 
 
 
-        t.testMergeElements()
 
