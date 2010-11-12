@@ -6758,61 +6758,93 @@ class Score(Stream):
 
 
 
-    def implode(self, voicesPerPart=2):
+    def implode(self, voiceAllocation=2, permitOneVoicePerPart=False):
         '''Given a multi-part :class:`~music21.stream.Score`, return a new Score that combines parts into voices. 
+
+        The `voiceAllocation` parameter can be an integer: if so, this many parts will each be grouped into one part as voices
+
+        The `permitOneVoicePerPart` parameter, if True, will encode a single voice inside a single Part, rather than leaving a single part alone. 
         '''
+        bundle = []
+        if common.isNum(voiceAllocation):
+            voicesPerPart = voiceAllocation
+            for pIndex, p in enumerate(self.parts):
+                if pIndex % voicesPerPart == 0:
+                    sub = []
+                    sub.append(p)
+                else:
+                    sub.append(p)
+                if pIndex % voicesPerPart == voicesPerPart - 1:
+                    bundle.append(sub)
+                    sub = []
+            if sub != []: # get last
+                bundle.append(sub)
+        # else, assume it is a list of groupings
+        elif common.isListLike(voiceAllocation):
+            for group in voiceAllocation:
+                sub = []                    
+                for id in group:
+                    sub.append(self.parts[id])
+                bundle.append(sub)
+        else:
+            raise StreamException('incorrect voiceAllocation format: %s' % voiceAllocation)
+
+        environLocal.printDebug(['implide() bundle:', bundle]) 
+
         s = Score()
         s.metadata = self.metadata
-        pCount = 0
-        # iterate through each part
-        for pIndex, p in enumerate(self.parts):
-            if pCount % voicesPerPart == 0:
-                environLocal.printDebug(['creating new part', p, pIndex])
-                pActive = Part()
 
-            # only check for measures once per part
-            if pActive.hasMeasures():
-                hasMeasures = True
-            else:
-                hasMeasures = False
+        for sub in bundle: # each sub contains parts
+            if len(sub) == 1 and not permitOneVoicePerPart:
+                # probably need to create a new part and measure
+                s.insert(0, sub[0])
+                continue
 
-            for mIndex, m in enumerate(p.getElementsByClass('Measure')):
-                #environLocal.printDebug(['pindex, p', pIndex, p, 'mIndex, m', mIndex, m, 'hasMeasures', hasMeasures])
-                # only create measures if non already exist
-                if not hasMeasures:
-                    #environLocal.printDebug(['creating measure'])
-                    mActive = Measure()
-                    # some attributes may be none
-                    # note: not copying here; and first part read will provide
-                    # attributes; possible other parts may have other attributes
-                    mActive.number = m.number
-                    if m.timeSignature is not None:
-                        mActive.timeSignature = m.timeSignature 
-                    if m.keySignature is not None:
-                        mActive.keySignature = m.keySignature 
-                    if m.clef is not None:
-                        mActive.clef = m.clef
+            pActive = Part()
+            # iterate through each part
+            for pIndex, p in enumerate(sub):
+                # only check for measures once per part
+                if pActive.hasMeasures():
+                    hasMeasures = True
                 else:
-                    mActive = pActive.getElementsByClass('Measure')[mIndex]
+                    hasMeasures = False
+    
+                for mIndex, m in enumerate(p.getElementsByClass('Measure')):
+                    #environLocal.printDebug(['pindex, p', pIndex, p, 'mIndex, m', mIndex, m, 'hasMeasures', hasMeasures])
+                    # only create measures if non already exist
+                    if not hasMeasures:
+                        #environLocal.printDebug(['creating measure'])
+                        mActive = Measure()
+                        # some attributes may be none
+                        # note: not copying here; and first part read will provide
+                        # attributes; possible other parts may have other attributes
+                        mActive.mergeAttributes(m)
+                        if m.timeSignature is not None:
+                            mActive.timeSignature = m.timeSignature 
+                        if m.keySignature is not None:
+                            mActive.keySignature = m.keySignature 
+                        if m.clef is not None:
+                            mActive.clef = m.clef
+                    else:
+                        mActive = pActive.getElementsByClass('Measure')[mIndex]
+    
+                    # transfer elements into a voice                
+                    v = Voice()
+                    v.id = pIndex
+                    # for now, just take notes, including rests
+                    for e in m.notes: #m.getElementsByClass():
+                        v.insert(e.getOffsetBySite(m), e)
+                    # insert voice in new  measure
+                    #environLocal.printDebug(['inserting voice', v, v.id, 'into measure', mActive])
+                    mActive.insert(0, v)
+                    #mActive.show('t')
+                    # only insert measure if new part does not already have measures
+                    if not hasMeasures:
+                        pActive.insert(m.getOffsetBySite(p), mActive)
 
-                # transfer elements into a voice                
-                v = Voice()
-                v.id = pIndex % voicesPerPart
-                # for now, just take notes, including rests
-                for e in m.notes: #m.getElementsByClass():
-                    v.insert(e.getOffsetBySite(m), e)
-                # insert voice in new  measure
-                #environLocal.printDebug(['inserting voice', v, v.id, 'into measure', mActive])
-                mActive.insert(0, v)
-                #mActive.show('t')
-                # only insert measure if new part does not already have measures
-                if not hasMeasures:
-                    pActive.insert(m.getOffsetBySite(p), mActive)
-
-            pCount += 1
-            if pCount % voicesPerPart == 0:
-                s.insert(0, pActive)
-        
+            s.insert(0, pActive)
+            pActive = None
+            
         return s
 
 
@@ -11441,6 +11473,22 @@ class Test(unittest.TestCase):
         self.assertEqual(s1.parent, s2)
 
 
+
+    def testGetElementsByContextStream(self):
+        from music21 import corpus, meter, key, clef
+
+        s = corpus.parseWork('bwv66.6')
+        for p in s.parts:
+            for m in p.getElementsByClass('Measure'):
+                post = m.getContextByClass(clef.Clef)
+                self.assertEqual(isinstance(post, clef.Clef), True)
+                post = m.getContextByClass(meter.TimeSignature)
+                self.assertEqual(isinstance(post, meter.TimeSignature), True)
+                post = m.getContextByClass(key.KeySignature)
+                self.assertEqual(isinstance(post, key.KeySignature), True)
+
+
+
     def testVoicesBasic(self):
 
         v1 = Voice()
@@ -11517,10 +11565,7 @@ class Test(unittest.TestCase):
         #s.show()
 
 
-        # todo: use makeTies
-
-
-    def testImplode(self):
+    def testImplodeA(self):
         from music21 import corpus
         s0 = corpus.parseWork('bwv66.6')
         #s.show()
@@ -11578,19 +11623,57 @@ class Test(unittest.TestCase):
 
 
 
+    def testImplodeB(self):
+        from music21 import corpus
+        # this work has five parts: results in e parts
+        s0 = corpus.parseWork('hwv56', '1-18')
+        s1 = s0.implode(2, permitOneVoicePerPart=True)
+        self.assertEqual(len(s1.parts), 3)
+        self.assertEqual(len(s1.parts[0].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s1.parts[1].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s1.parts[2].getElementsByClass(
+            'Measure')[0].voices), 1)
 
-    def testGetElementsByContextStream(self):
-        from music21 import corpus, meter, key, clef
+        #s1.show()
 
-        s = corpus.parseWork('bwv66.6')
-        for p in s.parts:
-            for m in p.getElementsByClass('Measure'):
-                post = m.getContextByClass(clef.Clef)
-                self.assertEqual(isinstance(post, clef.Clef), True)
-                post = m.getContextByClass(meter.TimeSignature)
-                self.assertEqual(isinstance(post, meter.TimeSignature), True)
-                post = m.getContextByClass(key.KeySignature)
-                self.assertEqual(isinstance(post, key.KeySignature), True)
+        s0 = corpus.parseWork('hwv56', '1-05')
+        # can use index values
+        s2 = s0.implode(([0,1], [2,4], [3]), permitOneVoicePerPart=True)   
+        self.assertEqual(len(s2.parts), 3)
+        self.assertEqual(len(s2.parts[0].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s2.parts[1].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s2.parts[2].getElementsByClass(
+            'Measure')[0].voices), 1)
+
+        s2 = s0.implode((['Violino I','Violino II'], ['Viola','Bassi'], ['Basso']), permitOneVoicePerPart=True)
+        self.assertEqual(len(s2.parts), 3)
+        self.assertEqual(len(s2.parts[0].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s2.parts[1].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s2.parts[2].getElementsByClass(
+            'Measure')[0].voices), 1)
+
+
+        # this will keep the voice part unaltered
+        s2 = s0.implode((['Violino I','Violino II'], ['Viola','Bassi'], ['Basso']), permitOneVoicePerPart=False)
+        self.assertEqual(len(s2.parts), 3)
+        self.assertEqual(len(s2.parts[0].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s2.parts[1].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(s2.parts[2].getElementsByClass(
+            'Measure')[0].hasVoices(), False)
+
+        #s2.show()
+
+
+
+
 
 
 
@@ -11612,7 +11695,10 @@ if __name__ == "__main__":
 
         #t.testGetElementsByContextStream()
 
-        t.testMeasureOffsetMap()
+        #t.testMeasureOffsetMap()
+
+        t.testImplodeA()
+        t.testImplodeB()
 
 
 
