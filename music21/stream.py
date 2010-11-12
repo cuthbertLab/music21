@@ -6782,9 +6782,14 @@ class Score(Stream):
         # else, assume it is a list of groupings
         elif common.isListLike(voiceAllocation):
             for group in voiceAllocation:
-                sub = []                    
-                for id in group:
-                    sub.append(self.parts[id])
+                sub = []
+                # if a single entry
+                if not common.isListLike(group):
+                    # group is a single index
+                    sub.append(self.parts[group])
+                else:
+                    for id in group:
+                        sub.append(self.parts[id])
                 bundle.append(sub)
         else:
             raise StreamException('incorrect voiceAllocation format: %s' % voiceAllocation)
@@ -11640,7 +11645,7 @@ class Test(unittest.TestCase):
 
         s0 = corpus.parseWork('hwv56', '1-05')
         # can use index values
-        s2 = s0.implode(([0,1], [2,4], [3]), permitOneVoicePerPart=True)   
+        s2 = s0.implode(([0,1], [2,4], 3), permitOneVoicePerPart=True)   
         self.assertEqual(len(s2.parts), 3)
         self.assertEqual(len(s2.parts[0].getElementsByClass(
             'Measure')[0].voices), 2)
@@ -11660,7 +11665,7 @@ class Test(unittest.TestCase):
 
 
         # this will keep the voice part unaltered
-        s2 = s0.implode((['Violino I','Violino II'], ['Viola','Bassi'], ['Basso']), permitOneVoicePerPart=False)
+        s2 = s0.implode((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'), permitOneVoicePerPart=False)
         self.assertEqual(len(s2.parts), 3)
         self.assertEqual(len(s2.parts[0].getElementsByClass(
             'Measure')[0].voices), 2)
