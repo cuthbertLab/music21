@@ -11674,8 +11674,11 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.parts[2].getElementsByClass(
             'Measure')[0].hasVoices(), False)
 
-        #s2.show()
 
+        # mm 16-19 are a good examples
+        s1 = corpus.parseWork('hwv56', '1-05').measures(16, 19)
+        s2 = s1.implode((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'))
+        s2.show()
 
 
 
