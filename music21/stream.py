@@ -3655,6 +3655,8 @@ class Stream(music21.Music21Object):
         '''Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied 
         constituents. Lastly, remove the formerly-tied notes.
 
+        This method can be used on Stream and Stream subclasses. When used on a Score, Parts and Measures are retained. 
+
         If `retainContainers` is False (by default), this method only returns Note objects; Measures and other structures are stripped from the Stream. Set `retainContainers` to True to remove ties from a :class:`~music21.part.Part` Stream that contains :class:`~music21.stream.Measure` Streams, and get back a multi-Measure structure.
 
         Presently, this only works if tied notes are sequentual; ultimately
@@ -3684,14 +3686,13 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
-        # this did not work in initial testing
-#         if returnObj.hasPartLikeStreams():
-#             for p in returnObj.getElementsByClass('Part'):
-#                 # already handled in place
-#                 p.stripTies(inPlace=False, matchByPitch=matchByPitch,
-#                             retainContainers=retainContainers)
-#             return returnObj # exit
-
+        if returnObj.hasPartLikeStreams():
+            for p in returnObj.getElementsByClass('Part'):
+                # already copied if necessary; edit in place
+                # when handling a score, retain containers should be true
+                p.stripTies(inPlace=True, matchByPitch=matchByPitch,
+                            retainContainers=True)
+            return returnObj # exit
 
         # not sure if this must be sorted
         # but: tied notes must be in consecutive order
@@ -6774,26 +6775,24 @@ class Score(Stream):
                         map[key].append(m)
         return map
 
-
-    def stripTies(self, inPlace=False, matchByPitch=False):
-        '''Apply strip ties to each class:`~music21.part.Part` contained within this Score. 
-
-        This method will retain class:`~music21.part.Measure` objects and Parts.
-        '''
-        # TODO: this functionality may be placed in the Stream method
-        # see sliceByQuarterLengths for examples
-
-        if not inPlace: # make a copy
-            returnObj = deepcopy(self)
-        else:
-            returnObj = self
-
-        for p in returnObj.getElementsByClass(Part):
-            # strip ties will use the appropriate flat presentation
-            # in place: already have a copy if nec
-            p.stripTies(inPlace=True, matchByPitch=matchByPitch,
-                         retainContainers=True) 
-        return returnObj
+# functionality moved to Stream.stripTies()
+#     def stripTies(self, inPlace=False, matchByPitch=False):
+#         '''Apply strip ties to each class:`~music21.part.Part` contained within this Score. 
+# 
+#         This method will retain class:`~music21.part.Measure` objects and Parts.
+#         '''
+# 
+#         if not inPlace: # make a copy
+#             returnObj = deepcopy(self)
+#         else:
+#             returnObj = self
+# 
+#         for p in returnObj.getElementsByClass(Part):
+#             # strip ties will use the appropriate flat presentation
+#             # in place: already have a copy if nec
+#             p.stripTies(inPlace=True, matchByPitch=matchByPitch,
+#                          retainContainers=True) 
+#         return returnObj
         
 
     def sliceByGreatestDivisor(self, inPlace=True, addTies=True):
@@ -11934,8 +11933,10 @@ if __name__ == "__main__":
 
         #t.testImplodeA()
         #t.testImplodeB()
-        t.testExplodeA()
+        #t.testExplodeA()
 
 
-
+        t.testStripTiesBuilt()
+        t.testStripTiesImported()
+        t.testStripTiesScore()
 
