@@ -443,7 +443,15 @@ class Stream(music21.Music21Object):
 
 
     def hasElement(self, obj):
-        '''Return True if this element is contained in this Stream.
+        '''Return True if an element, provided as an argument, is contained in this Stream.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('g#')
+        >>> s.append(n1)
+        >>> s.hasElement(n1)
+        True
         '''
         for e in self._elements:
             if id(e) == id(obj): 
@@ -453,6 +461,46 @@ class Stream(music21.Music21Object):
                 return True
         return False
 
+    def mergeElements(self, other, classFilter=[]):
+        '''Given another Stream, store references of each element in the other Stream in this Stream. This does not make copies of any elements, but simply stores all of them in this Stream.
+
+        Optionally, provide a list of classes to exclude with the `classFilter` list. 
+
+        This method provides functionality like a shallow copy, but manages locations properly, only copies elements, and permits filtering by class type. 
+
+        >>> from music21 import *
+        >>> s1 = stream.Stream()
+        >>> s2 = stream.Stream()
+        >>> n1 = note.Note('f#')
+        >>> n2 = note.Note('g')
+        >>> s1.append(n1)
+        >>> s1.append(n2)
+        >>> s2.mergeElements(s1)
+        >>> len(s2)
+        2
+        >>> s1[0] is s2[0]
+        True
+        >>> s1[1] is s2[1]
+        True
+        '''
+        for e in other._elements:
+            #self.insert(other.offset, e)
+            match = False
+            for c in classFilter:
+                if c in e.classes:
+                    match = True
+                    break
+            if len(classFilter) == 0 or match:
+                self.insert(e.getOffsetBySite(other), e)
+        for e in other._endElements:
+            match = False
+            for c in classFilter:
+                if c in e.classes:
+                    match = True
+                    break
+            if len(classFilter) == 0 or match:
+                self.storeAtEnd(e)
+        #self._elementsChanged()
 
     def indexList(self, obj, firstMatchOnly=False):
         '''Return a list of one or more index values where the supplied object is found on this Stream's `elements` list. 
@@ -2516,7 +2564,7 @@ class Stream(music21.Music21Object):
         OMIT_FROM_DOCS
         TODO: maxBefore -- maximum number of elements to return before; etc.
 
-        note: this probably should be renamed, as we use Context in a specail way. Perhaps better is extractNeighbors?
+        NOTE: RENAME: this probably should be renamed, as we use Context in a specail way. Perhaps better is extractNeighbors?
         
         '''
         if forceOutputClass == None:
@@ -5962,6 +6010,73 @@ class Stream(music21.Music21Object):
         
         return otherElements
 
+
+    #---------------------------------------------------------------------------
+    # voice processing routines
+
+    def explode(self):
+        '''If this Stream defines one or more voices, extract each into a Part, returning a Score.
+
+        If this Stream has no voice, return the Stream as a Part with in a Score. 
+        '''
+        s = Score()
+        #s.metadata = self.metadata
+        
+        # need to find maximum voice count
+        partCount = 0
+        #partId = []
+        if self.hasMeasures():
+            for m in self.getElementsByClass('Measure'):
+                vCount = len(m.voices)
+                if vCount > partCount:
+                    partCount = vCount
+        elif self.hasVoices():
+            partCount = len(self.voices)
+        else: # if no measure or voices, get one part
+            partCount = 1 
+
+        environLocal.printDebug(['explode(): got partCount', partCount])
+
+        # create parts, naming ids by voice id?
+        for sub in range(partCount):
+            p = Part()
+            s.insert(0, p)
+
+        if self.hasMeasures():
+            for m in self.getElementsByClass('Measure'):
+                if m.hasVoices():
+                    mActive = Measure()
+                    mActive.mergeAttributes(m)
+                    # merge everything except Voices; this will get
+                    # clefs
+                    mActive.mergeElements(m, classFilter=['Bar', 'TimeSignature', 'Clef', 'KeySignature'])
+                    for vIndex, v in enumerate(m.voices):
+                        # make an independent copy
+                        mNew = copy.deepcopy(mActive)
+                        # merge all elements from the voice
+                        mNew.mergeElements(v)
+                        # insert in the appropriate part
+                        s[vIndex].insert(m.getOffsetBySite(self), mNew)
+                # if a measure does not have voices, simply populate
+                # with elements and append
+                else:
+                    mNew = Measure()
+                    mNew.mergeAttributes(m)
+                    # get all elements
+                    mNew.mergeElements(m)
+                    # always place in top-part
+                    s[0].insert(m.getOffsetBySite(self), mNew)
+        # if no measures but voices, contents of each voice go into the part
+        elif self.hasVoices():
+            for vIndex, v in enumerate(self.voices):
+                s[vIndex].mergeElements(v)
+        # if just a Stream of elements, add to a part
+        else: 
+            s[0].mergeElements(self)
+
+        return s
+
+
 #-------------------------------------------------------------------------------
 class Voice(Stream):
     '''
@@ -6830,12 +6945,14 @@ class Score(Stream):
                         # note: not copying here; and first part read will provide
                         # attributes; possible other parts may have other attributes
                         mActive.mergeAttributes(m)
-                        if m.timeSignature is not None:
-                            mActive.timeSignature = m.timeSignature 
-                        if m.keySignature is not None:
-                            mActive.keySignature = m.keySignature 
-                        if m.clef is not None:
-                            mActive.clef = m.clef
+                        mActive.mergeElements(m, classFilter=['Bar', 'TimeSignature', 'Clef', 'KeySignature'])
+
+#                         if m.timeSignature is not None:
+#                             mActive.timeSignature = m.timeSignature 
+#                         if m.keySignature is not None:
+#                             mActive.keySignature = m.keySignature 
+#                         if m.clef is not None:
+#                             mActive.clef = m.clef
                     else:
                         mActive = pActive.getElementsByClass('Measure')[mIndex]
     
@@ -11684,6 +11801,7 @@ class Test(unittest.TestCase):
         # mm 16-19 are a good examples
         s1 = corpus.parseWork('hwv56', '1-05').measures(16, 19)
         s2 = s1.implode((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'))
+        #s2.show()
 
         self.assertEqual(len(s2.parts), 3)
         self.assertEqual(len(s2.parts[0].getElementsByClass(
@@ -11695,6 +11813,51 @@ class Test(unittest.TestCase):
 
 
 
+    def testExplodeA(self):
+        
+        from music21 import corpus
+        s0 = corpus.parseWork('bwv66.6')
+        #s.show()
+        s1 = s0.implode(2) # produce two parts each with two voices
+
+        s1.parts[0].explode()
+
+
+        s2 = Stream()
+        v1 = Voice()
+        v1.repeatAppend(note.Note('c3'), 4)
+        v2 = Voice()
+        v2.repeatAppend(note.Note('g3'), 4)
+        v3 = Voice()
+        v3.repeatAppend(note.Note('b3'), 4)
+        s2.insert(0, v1)
+        s2.insert(0, v2)
+        s2.insert(0, v3)
+        #s2.show()
+        s2.explode()
+
+
+    def testMergeElements(self):
+        from music21 import stream
+        s1 = stream.Stream()
+        s2 = stream.Stream()
+        s3 = stream.Stream()
+
+        n1 = note.Note('f#')
+        n2 = note.Note('g')
+        s1.append(n1)
+        s1.append(n2)
+
+        s2.mergeElements(s1)
+        self.assertEqual(len(s2), 2)
+        self.assertEqual(id(s1[0]) == id(s2[0]), True)
+        self.assertEqual(id(s1[1]) == id(s2[1]), True)
+
+        s3.mergeElements(s1, classFilter=['Rest'])
+        self.assertEqual(len(s3), 0)
+
+        s3.mergeElements(s1, classFilter=['GeneralNote'])
+        self.assertEqual(len(s3), 2)
 
 
 
@@ -11720,9 +11883,9 @@ if __name__ == "__main__":
 
         t.testImplodeA()
         t.testImplodeB()
+        t.testExplodeA()
 
 
 
-
-
+        t.testMergeElements()
 
