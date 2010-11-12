@@ -1964,6 +1964,7 @@ class Stream(music21.Music21Object):
         mStream = self.getElementsByClass('Measure')
 
         returnObj = self.__class__()
+        returnObj.mergeAttributes(self) # get id and groups
         srcObj = self
 
         # if we have no Measure defined, call makeNotation
@@ -6056,6 +6057,9 @@ class Measure(Stream):
 
         This method is necessary because Measures, unlike some Streams, have attributes independent of any stored elements.
         '''
+        # calling bass class sets id, groups
+        music21.Music21Object.mergeAttributes(self, other)
+
         self.timeSignatureIsNew = other.timeSignatureIsNew
         self.clefIsNew = other.clefIsNew
         self.keyIsNew = other.keyIsNew
@@ -6596,6 +6600,7 @@ class Score(Stream):
         '''This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
         '''
         post = Score()
+        post.mergeAttributes(self)
         # note that this will strip all objects that are not Parts
         for p in self.getElementsByClass('Part'):
             # insert all at zero
@@ -6618,6 +6623,7 @@ class Score(Stream):
         '''
 
         post = Score()
+        post.mergeAttributes(self)
         # note that this will strip all objects that are not Parts
         for p in self.getElementsByClass('Part'):
             # insert all at zero
@@ -6794,7 +6800,7 @@ class Score(Stream):
         else:
             raise StreamException('incorrect voiceAllocation format: %s' % voiceAllocation)
 
-        environLocal.printDebug(['implide() bundle:', bundle]) 
+        environLocal.printDebug(['implode() bundle:', bundle]) 
 
         s = Score()
         s.metadata = self.metadata
@@ -11678,7 +11684,14 @@ class Test(unittest.TestCase):
         # mm 16-19 are a good examples
         s1 = corpus.parseWork('hwv56', '1-05').measures(16, 19)
         s2 = s1.implode((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'))
-        s2.show()
+
+        self.assertEqual(len(s2.parts), 3)
+        self.assertEqual(len(s2.parts[0].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s2.parts[1].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(s2.parts[2].getElementsByClass(
+            'Measure')[0].hasVoices(), False)
 
 
 

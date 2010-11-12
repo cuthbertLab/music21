@@ -1418,6 +1418,13 @@ class Music21Object(JSONSerializer):
 #             self._definedContexts = []
     
 
+    def mergeAttributes(self, other):
+        '''Merge all elementary, static attributes. Namely, `id` and `groups` attributes from another music21 object. Can be useful for copy-like operations.
+        '''
+        self.id = other.id
+        self.groups = copy.deepcopy(other.groups)
+
+
 
     def __deepcopy__(self, memo=None):
         '''
