@@ -11740,23 +11740,24 @@ class Test(unittest.TestCase):
     def testVoicesB(self):
 
         # make sure strip ties works
-        v1 = Voice()
+        from music21 import stream
+
+        v1 = stream.Voice()
         n1 = note.Note('c5')
         n1.quarterLength = .5
         v1.repeatAppend(n1, 27)
 
-        v2 = Voice()
+        v2 = stream.Voice()
         n2 = note.Note('c4')
         n2.quarterLength = 3
         v2.repeatAppend(n2, 6)
 
-        v3 = Voice()
+        v3 = stream.Voice()
         n3 = note.Note('c3')
         n3.quarterLength = 8
         v3.repeatAppend(n3, 4)
-
         
-        s = Stream()
+        s = stream.Stream()
         s.insert(0, v1)
         s.insert(0, v2)
         s.insert(0, v3)
@@ -11773,17 +11774,18 @@ class Test(unittest.TestCase):
 
 
     def testVoicesC(self):
-        v1 = Voice()
+        from music21 import stream
+        v1 = stream.Voice()
         n1 = note.Note('c5')
         n1.quarterLength = .25
         v1.repeatInsert(n1, [2, 4.5, 7.25, 11.75])
 
-        v2 = Voice()
+        v2 = stream.Voice()
         n2 = note.Note('c4')
         n2.quarterLength = .25
         v2.repeatInsert(n2, [.25, 3.75, 5.5, 13.75])
 
-        s = Stream()
+        s = stream.Stream()
         s.insert(0, v1)
         s.insert(0, v2)
 
