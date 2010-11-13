@@ -3059,7 +3059,6 @@ class Stream(music21.Music21Object):
         0.0
 
         OMIT_FROM_DOCS
-        TODO: rename fillRests() or something else.
         TODO: if inPlace == True, this should return None
         '''
         if not inPlace: # make a copy
@@ -3067,8 +3066,6 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
-        oLow = returnObj.lowestOffset
-        oHigh = returnObj.highestTime
 
         #environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
 
@@ -3086,30 +3083,42 @@ class Stream(music21.Music21Object):
             oHighTarget = max(refStreamOrTimeRange)
             #environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
 
-        qLen = oLow - oLowTarget
-        if qLen > 0:
-            r = note.Rest()
-            r.duration.quarterLength = qLen
-            #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
-            # place at oLowTarget to reach to oLow
-            returnObj.insert(oLowTarget, r)
+        if returnObj.hasVoices():
+            bundle = returnObj.voices
+        else:
+            bundle = [returnObj]
+
+        for v in bundle:
+            oLow = v.lowestOffset
+            oHigh = v.highestTime
+            qLen = oLow - oLowTarget
+            if qLen > 0:
+                r = note.Rest()
+                r.duration.quarterLength = qLen
+                #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
+                # place at oLowTarget to reach to oLow
+                v.insert(oLowTarget, r)
+        
+            qLen = oHighTarget - oHigh
+            if qLen > 0:
+                r = note.Rest()
+                r.duration.quarterLength = qLen
+                # place at oHigh to reach to oHighTarget
+                v.insert(oHigh, r)
     
-        qLen = oHighTarget - oHigh
-        if qLen > 0:
-            r = note.Rest()
-            r.duration.quarterLength = qLen
-            # place at oHigh to reach to oHighTarget
-            returnObj.insert(oHigh, r)
+            if fillGaps:
+                gapStream = v.findGaps()
+                if gapStream != None:
+                    for e in gapStream:
+                        r = note.Rest()
+                        r.duration.quarterLength = e.duration.quarterLength
+                        v.insert(e.offset, r)
+            v.isSorted = False
 
-        if fillGaps:
-            gapStream = self.findGaps()
-            if gapStream != None:
-                for e in gapStream:
-                    r = note.Rest()
-                    r.duration.quarterLength = e.duration.quarterLength
-                    returnObj.insert(e.offset, r)
-
-        returnObj.elements = returnObj.sorted.elements
+        # with auto sort no longer necessary. 
+        
+        #returnObj.elements = returnObj.sorted.elements
+        self.isSorted = False
         return returnObj
 
 
@@ -3192,61 +3201,72 @@ class Stream(music21.Music21Object):
                 # increment measure number
                 mNext.number = m.number + 1
                 mNextAdd = True # new measure, needs to be appended
+
+            if mNext.hasVoices():
+                mNextHasVoices = True
+            else:
+                mNextHasVoices = False
     
             #environLocal.printDebug(['makeTies() dealing with measure', m, 'mNextAdd', mNextAdd])
             # for each measure, go through each element and see if its
             # duraton fits in the bar that contains it
             mStart, mEnd = 0, lastTimeSignature.barDuration.quarterLength
-            for e in m:
-                #environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
-
-                if hasattr(e, 'duration') and e.duration is not None:
-                    # check to see if duration is within Measure
-                    eoffset = e.getOffsetBySite(m)
-                    eEnd = eoffset + e.duration.quarterLength
-                    # assume end can be at boundary of end of measure
-                    overshot = eEnd - mEnd
-                    # only process if overshot is greater than a minimum
-                    # 1/64 is 0.015625
-                    if overshot > .001:
-                        if eoffset >= mEnd:
-                            raise StreamException('element (%s) has offset %s within a measure that ends at offset %s' % (e, eoffset, mEnd))  
+            if m.hasVoices():
+                bundle = m.voices
+                mHasVoices = True
+            else:
+                bundle = [m]
+                mHasVoices = False
+            # bundle components may be voices, or just a measure
+            for v in bundle:
+                for e in v:
+                    #environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
     
-                        # using 
-                        # note: cannot use GeneralNote.splitNoteAtPoint b/c
-                        # we are not assuming that these are notes, only elements
+                    if hasattr(e, 'duration') and e.duration is not None:
+                        # check to see if duration is within Measure
+                        eOffset = e.getOffsetBySite(v)
+                        eEnd = eOffset + e.duration.quarterLength
+                        # assume end can be at boundary of end of measure
+                        overshot = eEnd - mEnd
+                        # only process if overshot is greater than a minimum
+                        # 1/64 is 0.015625
+                        if overshot > .001:
+                            if eOffset >= mEnd:
+                                raise StreamException('element (%s) has offset %s within a measure that ends at offset %s' % (e, eOffset, mEnd))  
+        
+                            qLenBegin = mEnd - eOffset    
+                            e, eRemain = e.splitAtQuarterLength(qLenBegin, 
+                                retainOrigin=True, 
+                                displayTiedAccidentals=displayTiedAccidentals)
+        
+                            # manage bridging voices
+                            if mNextHasVoices:
+                                if mHasVoices: # try to match voice id
+                                    dst = mNext.voices[v.id]
+                                # src does not have voice, but dst does
+                                else: # place in top-most voice
+                                    dst = mNext.voices[0]
+                            else:
+                                # mNext has no voices but this one does    
+                                if mHasVoices:
+                                    # internalize all components in a voice
+                                    mNext.internalize(container=Voice)
+                                    # place in first voice
+                                    dst = mNext.voices[0]
+                                else: # no voices in either
+                                    dst = mNext
 
-                        qLenBegin = mEnd - eoffset    
-                        e, eRemain = e.splitAtQuarterLength(qLenBegin, 
-                            retainOrigin=True, 
-                            displayTiedAccidentals=displayTiedAccidentals)
-
-#                         #print 'e.offset, mEnd, qLenBegin', e.offset, mEnd, qLenBegin
-
-                        # TODO: not sure this is the best way to make sure
-                        # eRamin comes first 
-                        # NOTE: must set parent here b/c otherwise offset
-                        # setting is for the wrong location
-                        eRemain.parent = mNext # manually set parent
-                        #eRemain.offset = 0
-
-                        # this use of elements is dangerous and needs special
-                        # handling
-                        #mNext.elements = [eRemain] + mNext.elements
-                        mNext.insert(0, eRemain)
-
-                        # alternative approach (same slowness)
-                        #mNext.insert(0, eRemain)
-                        #mNext = mNext.sorted
+                            #eRemain.parent = mNext # manually set parent   
+                            dst.insert(0, eRemain)
     
-                        # we are not sure that this element fits 
-                        # completely in the next measure, thus, need to continue
-                        # processing each measure
-                        if mNextAdd:
-                            environLocal.printDebug(['makeTies() inserting mNext into returnObj', mNext])
-                            returnObj.insert(mNext.offset, mNext)
-                    elif overshot > 0:
-                        environLocal.printDebug(['makeTies() found and skipping extremely small overshot into next measure', overshot])
+                            # we are not sure that this element fits 
+                            # completely in the next measure, thus, need to 
+                            # continue processing each measure
+                            if mNextAdd:
+                                environLocal.printDebug(['makeTies() inserting mNext into returnObj', mNext])
+                                returnObj.insert(mNext.offset, mNext)
+                        elif overshot > 0:
+                            environLocal.printDebug(['makeTies() found and skipping extremely small overshot into next measure', overshot])
             mCount += 1
 
         return returnObj
@@ -6014,6 +6034,23 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # voice processing routines
+
+    def internalize(self, container=None, 
+                    classFilterList=['GeneralNote', 'Rest', 'Chord']):
+        '''Gather all notes and related classes of this Stream and place inside a new container (like a Voice) in this Stream.
+        '''
+        if container == None:
+            container = Voice
+        dst = container()
+        for e in self.getElementsByClass(classFilterList):
+            dst.insert(e.getOffsetBySite(self), e)
+            self.remove(e)
+        self.insert(0, dst)
+
+    def externalize(self):
+        '''Assuming there is a container in this Stream (like a Voice), remove the container and place all contents in the Stream. 
+        '''
+        pass
 
     def explode(self):
         '''If this Stream defines one or more voices, extract each into a Part, returning a Score.
@@ -11623,7 +11660,7 @@ class Test(unittest.TestCase):
 
 
 
-    def testVoicesBasic(self):
+    def testVoicesA(self):
 
         v1 = Voice()
         n1 = note.Note('c5')
@@ -11697,6 +11734,64 @@ class Test(unittest.TestCase):
 
         post = s.musicxml
         #s.show()
+
+
+
+    def testVoicesB(self):
+
+        # make sure strip ties works
+        v1 = Voice()
+        n1 = note.Note('c5')
+        n1.quarterLength = .5
+        v1.repeatAppend(n1, 27)
+
+        v2 = Voice()
+        n2 = note.Note('c4')
+        n2.quarterLength = 3
+        v2.repeatAppend(n2, 6)
+
+        v3 = Voice()
+        n3 = note.Note('c3')
+        n3.quarterLength = 8
+        v3.repeatAppend(n3, 4)
+
+        
+        s = Stream()
+        s.insert(0, v1)
+        s.insert(0, v2)
+        s.insert(0, v3)
+
+        sPost = s.makeNotation()
+        # voices are retained for all measures after make notation
+        self.assertEqual(len(sPost.getElementsByClass('Measure')), 8)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[0].voices), 3)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[1].voices), 3)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[5].voices), 3)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[7].voices), 3)
+
+        #s.show()
+
+
+    def testVoicesC(self):
+        v1 = Voice()
+        n1 = note.Note('c5')
+        n1.quarterLength = .25
+        v1.repeatInsert(n1, [2, 4.5, 7.25, 11.75])
+
+        v2 = Voice()
+        n2 = note.Note('c4')
+        n2.quarterLength = .25
+        v2.repeatInsert(n2, [.25, 3.75, 5.5, 13.75])
+
+        s = Stream()
+        s.insert(0, v1)
+        s.insert(0, v2)
+
+        sPost = s.makeRests(fillGaps=True, inPlace=False)
+        self.assertEqual(str([n for n in sPost.voices[0].notes]), '[<music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Rest rest>]')
+        self.assertEqual(str([n for n in sPost.voices[1].notes]), '[<music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Rest rest>, <music21.note.Note C>]')
+
+        #sPost.show()
 
 
     def testImplodeA(self):
@@ -11910,6 +12005,19 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s3), 2)
 
 
+    def testInternalize(self):
+        s = Stream()
+        n1 = note.Note()
+        s.repeatAppend(n1, 4)
+        self.assertEqual(len(s), 4)
+        
+        s.internalize()
+        # now have one component
+        self.assertEqual(len(s), 1)        
+        self.assertEqual(s[0].classes[0], 'Voice') # default is a Voice
+        self.assertEqual(len(s[0]), 4)        
+        self.assertEqual(str([n for n in s.voices[0].notes]), '[<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>]')        
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -11935,8 +12043,15 @@ if __name__ == "__main__":
         #t.testImplodeB()
         #t.testExplodeA()
 
+# 
+#         t.testStripTiesBuilt()
+#         t.testStripTiesImported()
+#         t.testStripTiesScore()
 
-        t.testStripTiesBuilt()
-        t.testStripTiesImported()
-        t.testStripTiesScore()
+        t.testMakeTies()
+        t.testVoicesA()
+        t.testVoicesB()
+        t.testVoicesC()
 
+        t.testInternalize()
+        t.testMakeRests()
