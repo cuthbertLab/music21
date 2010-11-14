@@ -99,3 +99,7 @@ def parseFile(filename):
 def parseData(data):
     return spineParser.HumdrumDataCollection(data)
 
+
+#------------------------------------------------------------------------------
+# eof
+

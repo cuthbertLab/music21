@@ -484,3 +484,7 @@ if __name__ == "__main__":
         #chordifyAnalysisBrief()
         #corpusMelodicIntervalSearchBrief()
         chordifyAnalysisBrief()
+
+#------------------------------------------------------------------------------
+# eof
+

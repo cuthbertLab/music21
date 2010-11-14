@@ -129,3 +129,8 @@ class FrontPaddedCadence(PolyphonicSnippet):
         self.findLongestCadence()
         for thisStream in self.streams:
             self.frontPadLine(thisStream)
+
+
+#------------------------------------------------------------------------------
+# eof
+

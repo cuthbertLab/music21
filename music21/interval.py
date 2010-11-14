@@ -2029,3 +2029,7 @@ if __name__ == "__main__":
         #t.testCreateIntervalFromPitch()
 
         t.testTransposeImported()
+
+#------------------------------------------------------------------------------
+# eof
+

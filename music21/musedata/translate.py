@@ -540,3 +540,7 @@ if __name__ == "__main__":
         #t.testAccidentals()
         #t.testTransposingInstruments()
         t.testBackBasic()
+
+#------------------------------------------------------------------------------
+# eof
+

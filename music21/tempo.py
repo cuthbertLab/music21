@@ -215,3 +215,7 @@ _DOC_ORDER = [TempoMark, MetronomeMark, interpolateElements]
 
 if __name__ == "__main__":
     music21.mainTest(Test)
+
+#------------------------------------------------------------------------------
+# eof
+

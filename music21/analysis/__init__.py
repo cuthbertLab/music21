@@ -5,10 +5,6 @@ __ALL__ = ['correlate', 'windowed', 'metrical', 'discrete']
 from music21.analysis import correlate, windowed, metrical, discrete
 
 
-
-
-
-
-
-
+#------------------------------------------------------------------------------
+# eof
 

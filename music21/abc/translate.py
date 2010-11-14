@@ -561,3 +561,7 @@ if __name__ == "__main__":
 
         t.testMultiWorkImported()
         t.testLocaleOfCompositionImport()
+
+#------------------------------------------------------------------------------
+# eof
+

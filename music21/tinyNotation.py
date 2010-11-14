@@ -464,3 +464,7 @@ _DOC_ORDER = [TinyNotationNote, TinyNotationStream, HarmonyStream, HarmonyNote]
 
 if __name__ == "__main__":
     music21.mainTest(TestExternal, Test)
+
+#------------------------------------------------------------------------------
+# eof
+

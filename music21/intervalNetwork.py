@@ -738,3 +738,8 @@ if __name__ == "__main__":
 # melodic/harmonic minor
 # abstracted in scale class
 # non uni-directional scale
+
+#------------------------------------------------------------------------------
+# eof
+
+

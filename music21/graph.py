@@ -3332,3 +3332,8 @@ if __name__ == "__main__":
         #te.testPlotWindowed('write')
 
         t.testPianoRollFromOpus()
+
+#------------------------------------------------------------------------------
+# eof
+
+

@@ -370,3 +370,7 @@ if __name__ == "__main__":
     #multipleSolve()
     #bentWolfSolution()
     possibleSolution()
+
+#------------------------------------------------------------------------------
+# eof
+

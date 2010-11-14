@@ -106,3 +106,8 @@ if __name__ == "__main__":
     s1.addTests(s2)
     runner = unittest.TextTestRunner()
     runner.run(s1)  
+
+#------------------------------------------------------------------------------
+# eof
+
+
