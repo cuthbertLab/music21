@@ -71,11 +71,11 @@ def runExampleB():
     n7.quarterLength = 2.0
     
     fb.addElement(n1)
-    fb.addElement(n2, '7,#')
+    fb.addElement(n2, '7,5,3#')
     fb.addElement(n3)
     fb.addElement(n4, '6')
     fb.addElement(n5, '6')
-    fb.addElement(n6, '7,#')
+    fb.addElement(n6, '7,5,3#')
     fb.addElement(n7)
     
     fb.solve()
@@ -99,7 +99,7 @@ def runExampleC():
     fb.addElement(n3, '6')
     fb.addElement(n4)
     fb.addElement(n5, '6,5')
-    fb.addElement(n6, '7,#')
+    fb.addElement(n6, '7,5,3#')
     fb.addElement(n7)
     
     fb.solve()
