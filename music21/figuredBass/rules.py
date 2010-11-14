@@ -189,9 +189,5 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    rules = FiguredBassRules()
-    rules.verbose = True
-    vlqA = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('G#3'), pitch.Pitch('B3'), pitch.Pitch('G#3'), pitch.Pitch('C3'))
-    #print rules.checkVoiceLeading(vlqA, "G#") #Parallel fifths = C->D, G->A
-    #music21.mainTest(Test)   
+    music21.mainTest(Test)   
     
