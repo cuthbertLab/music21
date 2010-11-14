@@ -119,7 +119,8 @@ class Rules:
         (d) No leaps of greater than an octave in either voice, as determined by absolute distance (NOT written distance)
         
         >>> from music21 import *
-        >>> rules = FiguredBassRules()
+        >>> from music21.figuredBass import rules
+        >>> rules = rules.Rules()
         >>> vlqA = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('D3'), pitch.Pitch('G3'), pitch.Pitch('A3'))
         >>> rules.checkVoiceLeading(vlqA) #Parallel fifths = C->D, G->A
         False
