@@ -13,6 +13,10 @@ from music21 import note
 
 
 def runExampleA():
+    '''
+    This was one of my (Jose Cabal-Ugaz) 21M.302 assignments.
+    The figured bass was composed by Charles Shadle.
+    '''
     fb = realizer.FiguredBass('3/2', 'C')
     
     n1 = note.Note('C3')
@@ -41,23 +45,26 @@ def runExampleA():
     n11.quarterLength = 2.0
     n12.quarterLength = 6.0
     
-    fb.addElement(n1, '')
+    fb.addElement(n1)
     fb.addElement(n2, '6')
     fb.addElement(n3, '6')
     fb.addElement(n4, '6')
     fb.addElement(n5, '7-,5,3')
-    fb.addElement(n6, '')
+    fb.addElement(n6)
     fb.addElement(n7, '6#,5,3')
     fb.addElement(n8, '6')
     fb.addElement(n9, '7,5,3#')
     fb.addElement(n10, '6,4')
     fb.addElement(n11, '5#,3#')
-    fb.addElement(n12, '')
+    fb.addElement(n12)
     
     fb.solve()
     fb.showRandomSolutions(20)
 
 def runExampleB():
+    '''
+    Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
+    '''
     fb = realizer.FiguredBass('4/4', 'D', 'minor')
     
     n1 = note.Note('D3')
@@ -82,6 +89,9 @@ def runExampleB():
     fb.showRandomSolutions(20)
     
 def runExampleC():
+    '''
+    Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
+    '''
     fb = realizer.FiguredBass('4/4', 'F#', 'minor')
     
     n1 = note.Note('F#2')
@@ -107,6 +117,6 @@ def runExampleC():
 
 
 if __name__ == "__main__":
-    #runExampleA()
-    runExampleB()
+    runExampleA()
+    #runExampleB()
     #runExampleC()
