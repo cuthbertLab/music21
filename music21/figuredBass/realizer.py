@@ -86,7 +86,7 @@ class FiguredBass:
         for i in range(amount):
             print("Progression #" + str(i + 1))
             chordProg = self.getRandomChordProgression()
-            printChordProgression(chordProg)        
+            printChordProgression(chordProg)       
     
     def getRandomChordProgression(self):
         chordIndices = self.allMovements.keys()
