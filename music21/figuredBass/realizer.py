@@ -65,6 +65,7 @@ class FiguredBass:
     
     def _trimAllMovements(self):
         chordIndices = self.allMovements.keys()
+        chordIndices.sort()
         chordIndices.reverse()
         
         for chordIndex in chordIndices:
@@ -89,6 +90,7 @@ class FiguredBass:
                             del currentMovements[possibleIndex]
                 else:
                     raise FiguredBassException("Error trimming all movements.")
+        
              
     def showRandomSolutions(self, amount):
         bassLine = stream.Part()
