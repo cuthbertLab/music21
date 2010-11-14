@@ -12,7 +12,7 @@ from music21.figuredBass import realizer
 from music21 import note
 
 
-def runExampleA():
+def exampleA():
     '''
     This was one of my (Jose Cabal-Ugaz) 21M.302 assignments.
     The figured bass was composed by Charles Shadle.
@@ -58,10 +58,9 @@ def runExampleA():
     fb.addElement(n11, '5#,3#')
     fb.addElement(n12)
     
-    fb.solve()
-    fb.showRandomSolutions(20)
+    return fb
 
-def runExampleB():
+def exampleB():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
@@ -85,10 +84,9 @@ def runExampleB():
     fb.addElement(n6, '7,5,3#')
     fb.addElement(n7)
     
-    fb.solve()
-    fb.showRandomSolutions(20)
+    return fb
     
-def runExampleC():
+def exampleC():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
@@ -112,10 +110,9 @@ def runExampleC():
     fb.addElement(n6, '7,5,3#')
     fb.addElement(n7)
     
-    fb.solve()
-    fb.showRandomSolutions(20)
+    return fb
 
-def runExampleD():
+def exampleD():
     '''
     Another one of my (Jose Cabal-Ugaz) assignments from 21M.302.
     This figured bass was composed by Charles Shadle.
@@ -170,11 +167,11 @@ def runExampleD():
     n14.quarterLength = 3.0
     fb.addElement(n14)
     
-    fb.solve()
-    fb.showRandomSolutions(20)
+    return fb
+
 
 if __name__ == "__main__":
-    #runExampleA()
-    #runExampleB()
-    #runExampleC()
-    runExampleD()
+    #exampleA(), exampleB(), exampleC(), exampleD()
+    fb = exampleD() #Set up the figured bass
+    fb.solve()
+    fb.showRandomSolutions(20)
