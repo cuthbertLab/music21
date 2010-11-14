@@ -1,3 +1,12 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         rules.py
+# Purpose:      music21 class to define rules used in composition
+# Authors:      Jose Cabal-Ugaz
+#
+# Copyright:    (c) 2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
 
 import music21
 import unittest
