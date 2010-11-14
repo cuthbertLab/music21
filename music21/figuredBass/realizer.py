@@ -23,10 +23,14 @@ from music21 import stream
 from music21 import meter
 from music21 import environment
 from music21 import chord
+from music21 import key
+
 
 class FiguredBass:
     def __init__(self, timeSig, key, mode = 'major'):
         self.timeSig = timeSig
+        self.key = key
+        self.mode = mode
         self.scale = realizerScale.FiguredBassScale(key, mode)
         self.rules = rules.Rules()
         self.octaveLimit = 5
@@ -35,7 +39,7 @@ class FiguredBass:
         self.allMovements = None
         self.bassNotes = []
     
-    def addElement(self, bassNote, notation):
+    def addElement(self, bassNote, notation = ''):
         self.bassNotes.append(bassNote)
         self.figuredBassList.append((bassNote.pitch, notation))
     
@@ -92,7 +96,10 @@ class FiguredBass:
         s = stream.Part()
         ts = meter.TimeSignature(self.timeSig)
         s.insert(0, ts)
-
+        numSharps = key.pitchToSharps(self.key, self.mode)
+        ks = key.KeySignature(numSharps)
+        s.insert(0, ks)
+        
         for i in range(amount):
             print("\nProgression #" + str(i + 1))
             chordProg = self.getRandomChordProgression()
@@ -385,6 +392,54 @@ def runExampleA():
     
     fb.solve()
     fb.showRandomSolutions(20)
+
+def runExampleB():
+    fb = FiguredBass('4/4', 'D', 'minor')
+    
+    n1 = note.Note('D3')
+    n2 = note.Note('A3')
+    n3 = note.Note('B-3')
+    n4 = note.Note('F3')
+    n5 = note.Note('G3')
+    n6 = note.Note('A3')
+    n7 = note.Note('D3')
+    
+    n7.quarterLength = 2.0
+    
+    fb.addElement(n1)
+    fb.addElement(n2, '7,#')
+    fb.addElement(n3)
+    fb.addElement(n4, '6')
+    fb.addElement(n5, '6')
+    fb.addElement(n6, '7,#')
+    fb.addElement(n7)
+    
+    fb.solve()
+    fb.showRandomSolutions(20)
+    
+def runExampleC():
+    fb = FiguredBass('4/4', 'F#', 'minor')
+    
+    n1 = note.Note('F#2')
+    n2 = note.Note('G#2')
+    n3 = note.Note('A2')
+    n4 = note.Note('F#2')
+    n5 = note.Note('B2')
+    n6 = note.Note('C#3')
+    n7 = note.Note('F#2')
+
+    n7.quarterLength = 2.0
+    
+    fb.addElement(n1)
+    fb.addElement(n2, '/6')
+    fb.addElement(n3, '6')
+    fb.addElement(n4)
+    fb.addElement(n5, '6,5')
+    fb.addElement(n6, '7,#')
+    fb.addElement(n7)
+    
+    fb.solve()
+    fb.showRandomSolutions(20)
     
     
 class FiguredBassException(music21.Music21Exception):
@@ -398,4 +453,6 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     music21.mainTest(Test)
-    runExampleA()
+    #runExampleA()
+    #runExampleB()
+    runExampleC()
