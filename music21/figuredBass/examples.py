@@ -115,8 +115,66 @@ def runExampleC():
     fb.solve()
     fb.showRandomSolutions(20)
 
+def runExampleD():
+    '''
+    Another one of my (Jose Cabal-Ugaz) assignments from 21M.302.
+    This figured bass was composed by Charles Shadle.
+    '''
+    fb = realizer.FiguredBass('3/4', 'b', 'minor')
+    
+    #Measure 1
+    n1 = note.Note('B2')
+    n2 = note.Note('C#3')
+    n3 = note.Note('D3')
+    fb.addElement(n1)
+    fb.addElement(n2, '/6')
+    fb.addElement(n3, '6')
+    
+    #Measure2
+    n4 = note.Note('E3')
+    n4.quarterLength = 2.0
+    n5 = note.Note('E#3')
+    fb.addElement(n4)
+    fb.addElement(n5, '6,5,/3')
+    
+    #Measure 3
+    n6 = note.Note('F#3')
+    n6.quarterLength = 2.0
+    n7 = note.Note('F#3')
+    fb.addElement(n6, '6,4')
+    fb.addElement(n7, '5,/3')
+    
+    #Measure 4
+    n8 = note.Note('G3')
+    n8.quarterLength = 2.0
+    n9 = note.Note('E3')
+    fb.addElement(n8)
+    fb.addElement(n9, '6')
+    
+    #Measure 5
+    n10 = note.Note('F#3')
+    n10.quarterLength = 2.0
+    n11 = note.Note('E3')
+    fb.addElement(n10, '6,4')
+    fb.addElement(n11, '/4,2')
+    
+    #Measure 6
+    n12 = note.Note('D3')
+    n12.quarterLength = 2.0
+    n13 = note.Note('E3')
+    fb.addElement(n12, '6')
+    fb.addElement(n13, '7,5,/3')
+    
+    #Measure 7
+    n14 = note.Note('A2')
+    n14.quarterLength = 3.0
+    fb.addElement(n14)
+    
+    fb.solve()
+    fb.showRandomSolutions(20)
 
 if __name__ == "__main__":
-    runExampleA()
+    #runExampleA()
     #runExampleB()
     #runExampleC()
+    runExampleD()
