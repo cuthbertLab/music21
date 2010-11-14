@@ -20,7 +20,6 @@ class Rules:
         self.allowVoiceCrossing = False
         self.bottomVoiceLeapOctaveLimit = 1.0
         self.topVoiceLeapOctaveLimit = 1.0
-        #self.leadingToneResolvesToTonic = True
 
         #Chord rules
         self.allowIncompleteChords = False
@@ -96,7 +95,7 @@ class Rules:
         return conformsToRules
             
                     
-    def checkVoiceLeading(self, vlq): #, leadingToneName = None):
+    def checkVoiceLeading(self, vlq):
         '''
         Takes in a VoiceLeadingQuartet and returns False if any voicing rules have
         been broken, although we can choose to relax the rules.
@@ -158,23 +157,6 @@ class Rules:
             if self.verbose:
                 self.environRules.warn("Greater than octave leap in top voice!")
             conformsToRules = False
-        '''
-        if self.leadingToneResolvesToTonic:
-            if leadingToneName == None:
-                raise FiguredBassRulesException("No leading tone provided to analyze resolution.")
-            lt = pitch.Pitch(leadingToneName)
-            tn = interval.transposePitch(lt, "m2")
-            if vlq.v1n1.name == leadingToneName:
-                if not vlq.v1n2.name == tn.name:
-                    if self.verbose:
-                        self.environRules.warn("Leading tone doesn't resolve to tonic in bottom voice!")
-                    conformsToRules = False
-            if vlq.v2n1.name == leadingToneName:
-                if not vlq.v2n2.name == tn.name:
-                    if self.verbose:
-                        self.environRules.warn("Leading tone doesn't resolve to tonic in top voice!")
-                    conformsToRules = False
-        '''
         
         return conformsToRules
 
@@ -189,5 +171,9 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    music21.mainTest(Test)   
+    music21.mainTest(Test)  
+
+#------------------------------------------------------------------------------
+# eof
+ 
     
