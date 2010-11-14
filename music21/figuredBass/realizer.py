@@ -98,7 +98,8 @@ class FiguredBass:
         s.insert(0, ts)
         numSharps = key.pitchToSharps(self.key, self.mode)
         ks = key.KeySignature(numSharps)
-        s.insert(0, ks)
+        bassLine.append(ks)
+        rightHand.append(ks)
         
         for i in range(amount):
             print("\nProgression #" + str(i + 1))
@@ -347,99 +348,6 @@ def printChordProgression(chordProgression):
     print(altoLine)
     print(tenorLine)
     print(bassLine)
-       
-def runExampleA():
-    fb = FiguredBass('3/2', 'C')
-    
-    n1 = note.Note('C3')
-    n2 = note.Note('D3')
-    n3 = note.Note('E3')
-    n4 = note.Note('F3')
-    n5 = note.Note('C#3')
-    n6 = note.Note('D3')
-    n7 = note.Note('B2')
-    n8 = note.Note('C3')
-    n9 = note.Note('A#2')
-    n10 = note.Note('B2')
-    n11 = note.Note('B2')
-    n12 = note.Note('E3')
-
-    n1.quarterLength = 2.0
-    n2.quarterLength = 2.0  
-    n3.quarterLength = 2.0
-    n4.quarterLength = 2.0
-    n5.quarterLength = 2.0
-    n6.quarterLength = 2.0
-    n7.quarterLength = 2.0
-    n8.quarterLength = 2.0  
-    n9.quarterLength = 2.0
-    n10.quarterLength = 4.0
-    n11.quarterLength = 2.0
-    n12.quarterLength = 6.0
-    
-    fb.addElement(n1, '')
-    fb.addElement(n2, '6')
-    fb.addElement(n3, '6')
-    fb.addElement(n4, '6')
-    fb.addElement(n5, '7-,5,3')
-    fb.addElement(n6, '')
-    fb.addElement(n7, '6#,5,3')
-    fb.addElement(n8, '6')
-    fb.addElement(n9, '7,5,3#')
-    fb.addElement(n10, '6,4')
-    fb.addElement(n11, '5#,3#')
-    fb.addElement(n12, '')
-    
-    fb.solve()
-    fb.showRandomSolutions(20)
-
-def runExampleB():
-    fb = FiguredBass('4/4', 'D', 'minor')
-    
-    n1 = note.Note('D3')
-    n2 = note.Note('A3')
-    n3 = note.Note('B-3')
-    n4 = note.Note('F3')
-    n5 = note.Note('G3')
-    n6 = note.Note('A3')
-    n7 = note.Note('D3')
-    
-    n7.quarterLength = 2.0
-    
-    fb.addElement(n1)
-    fb.addElement(n2, '7,#')
-    fb.addElement(n3)
-    fb.addElement(n4, '6')
-    fb.addElement(n5, '6')
-    fb.addElement(n6, '7,#')
-    fb.addElement(n7)
-    
-    fb.solve()
-    fb.showRandomSolutions(20)
-    
-def runExampleC():
-    fb = FiguredBass('4/4', 'F#', 'minor')
-    
-    n1 = note.Note('F#2')
-    n2 = note.Note('G#2')
-    n3 = note.Note('A2')
-    n4 = note.Note('F#2')
-    n5 = note.Note('B2')
-    n6 = note.Note('C#3')
-    n7 = note.Note('F#2')
-
-    n7.quarterLength = 2.0
-    
-    fb.addElement(n1)
-    fb.addElement(n2, '/6')
-    fb.addElement(n3, '6')
-    fb.addElement(n4)
-    fb.addElement(n5, '6,5')
-    fb.addElement(n6, '7,#')
-    fb.addElement(n7)
-    
-    fb.solve()
-    fb.showRandomSolutions(20)
     
     
 class FiguredBassException(music21.Music21Exception):
