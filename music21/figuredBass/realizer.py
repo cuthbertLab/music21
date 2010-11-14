@@ -11,6 +11,7 @@
 import music21
 import unittest
 import random
+import copy
 
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
@@ -21,6 +22,7 @@ from music21 import note
 from music21 import stream
 from music21 import meter
 from music21 import environment
+from music21 import chord
 
 class FiguredBass:
     def __init__(self, timeSig, key, mode = 'major'):
@@ -31,13 +33,15 @@ class FiguredBass:
         self.figuredBassList = []
         self.allChords = None
         self.allMovements = None
+        self.bassNotes = []
     
     def addElement(self, bassNote, notation):
+        self.bassNotes.append(bassNote)
         self.figuredBassList.append((bassNote.pitch, notation))
     
     def solve(self):
         (firstBass, firstNotation) = self.figuredBassList[0]
-        print("Finding possible starting chords...")
+        print("Finding possible starting chords for: " + str((firstBass, firstNotation)))
         startingChords = self._findPossibleStartingChords(firstBass, firstNotation)
         self.allChords = {}
         self.allMovements = {}
@@ -46,14 +50,14 @@ class FiguredBass:
         for chordIndex in range(1, len(self.figuredBassList)):
             (nextBass, nextNotation) = self.figuredBassList[chordIndex]
             prevChords = self.allChords[chordIndex - 1]
-            print("Finding next possibilities for: " + str((nextBass, nextNotation)))
+            print("Finding all possibilities for: " + str((nextBass, nextNotation)))
             (nextChords, prevMovements) = self._findNextPossibilities(prevChords, nextBass, nextNotation)
             self.allChords[chordIndex] = nextChords
             self.allMovements[chordIndex - 1] = prevMovements
         
         print("Trimming movements...")
         self._trimAllMovements()
-        print("Done solving.")
+        print("Solving complete.")
     
     def _trimAllMovements(self):
         chordIndices = self.allMovements.keys()
@@ -83,11 +87,40 @@ class FiguredBass:
                     raise FiguredBassException("Error trimming all movements.")
              
     def showRandomSolutions(self, amount):
+        bassLine = stream.Part()
+        rightHand = stream.Part()
+        s = stream.Part()
+        ts = meter.TimeSignature(self.timeSig)
+        s.insert(0, ts)
+
         for i in range(amount):
-            print("Progression #" + str(i + 1))
+            print("\nProgression #" + str(i + 1))
             chordProg = self.getRandomChordProgression()
-            printChordProgression(chordProg)       
-    
+            for j in range(len(self.bassNotes)):
+                givenChord = chordProg[j]
+                
+                bassNote = copy.deepcopy(self.bassNotes[j])                
+                rhChord = chord.Chord([givenChord[0], givenChord[1], givenChord[2]])
+                
+                rhChord.quarterLength = bassNote.quarterLength
+                
+                bassLine.append(bassNote)
+                rightHand.append(rhChord)
+            
+            rest1 = note.Rest()
+            rest1.quarterLength = ts.totalLength
+            rest2 = note.Rest()
+            rest2.quarterLength = ts.totalLength
+            bassLine.append(rest1)
+            rightHand.append(rest2)
+
+            printChordProgression(chordProg)
+        
+        s.insert(0, rightHand)
+        s.insert(0, bassLine)
+        
+        s.show()
+        
     def getRandomChordProgression(self):
         chordIndices = self.allMovements.keys()
         startIndices = self.allMovements[chordIndices[0]].keys()
@@ -297,35 +330,19 @@ def printChordProgression(chordProgression):
     tenorLine = ""
     bassLine = ""
     for chord in chordProgression:
-        sopranoLine += str(chord[0]) + "    "
-        altoLine += str(chord[1]) + "    "
-        tenorLine += str(chord[2]) + "    "
-        bassLine += str(chord[3]) + "    "
-        
-    print sopranoLine
-    print altoLine
-    print tenorLine
-    print bassLine
-    print
+        sopranoNote = chord[0]
+        sopranoLine += str(chord[0]) + "\t"
+        altoLine += str(chord[1]) + "\t"
+        tenorLine += str(chord[2]) + "\t"
+        bassLine += str(chord[3]) + "\t"
+    
+    print(sopranoLine)
+    print(altoLine)
+    print(tenorLine)
+    print(bassLine)
        
-     
-class FiguredBassException(music21.Music21Exception):
-    pass
-
-#-------------------------------------------------------------------------------
-class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
-if __name__ == "__main__":
-    #music21.mainTest(Test)
+def runExampleA():
     fb = FiguredBass('3/2', 'C')
-    #fb.addElement(note.Note('C3'), '')
-    #fb.addElement(note.Note('D3'), '6')
-    #fb.addElement(note.Note('E3'), '6')
-    #fb.solve()
-    #fb.showRandomSolutions(20)
     
     n1 = note.Note('C3')
     n2 = note.Note('D3')
@@ -339,6 +356,19 @@ if __name__ == "__main__":
     n10 = note.Note('B2')
     n11 = note.Note('B2')
     n12 = note.Note('E3')
+
+    n1.quarterLength = 2.0
+    n2.quarterLength = 2.0  
+    n3.quarterLength = 2.0
+    n4.quarterLength = 2.0
+    n5.quarterLength = 2.0
+    n6.quarterLength = 2.0
+    n7.quarterLength = 2.0
+    n8.quarterLength = 2.0  
+    n9.quarterLength = 2.0
+    n10.quarterLength = 4.0
+    n11.quarterLength = 2.0
+    n12.quarterLength = 6.0
     
     fb.addElement(n1, '')
     fb.addElement(n2, '6')
@@ -350,8 +380,22 @@ if __name__ == "__main__":
     fb.addElement(n8, '6')
     fb.addElement(n9, '7,5,3#')
     fb.addElement(n10, '6,4')
-    fb.addElement(n11, '5,3')
+    fb.addElement(n11, '5#,3#')
     fb.addElement(n12, '')
     
     fb.solve()
     fb.showRandomSolutions(20)
+    
+    
+class FiguredBassException(music21.Music21Exception):
+    pass
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+    runExampleA()
