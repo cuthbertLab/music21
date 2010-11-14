@@ -13,81 +13,283 @@ import unittest
 import random
 
 from music21.figuredBass import realizerScale
-
+from music21.figuredBass import rules
+from music21.pitch import Pitch
 from music21 import pitch
 from music21 import voiceLeading
 from music21 import note
 from music21 import stream
 from music21 import meter
+from music21 import environment
 
-
-def realizeFiguredBass(figuredBassList, scaleValue, scaleMode = 'major'):
-    sopranoLine = stream.Part()
-    altoLine = stream.Part()
-    tenorLine = stream.Part()
-    bassLine = stream.Part()
+class FiguredBass:
+    def __init__(self, timeSig, key, mode = 'major'):
+        self.timeSig = timeSig
+        self.scale = realizerScale.FiguredBassScale(key, mode)
+        self.rules = rules.Rules()
+        self.octaveLimit = 5
+        self.figuredBassList = []
+        self.allChords = None
+        self.allMovements = None
     
-    fbScale = realizerScale.FiguredBassScale(scaleValue, scaleMode)
-    (firstBassNote, firstNotation) = figuredBassList.pop(0)
+    def addElement(self, bassNote, notation):
+        self.figuredBassList.append((bassNote.pitch, notation))
+    
+    def solve(self):
+        (firstBass, firstNotation) = self.figuredBassList[0]
+        print("Finding possible starting chords...")
+        startingChords = self._findPossibleStartingChords(firstBass, firstNotation)
+        self.allChords = {}
+        self.allMovements = {}
+        self.allChords[0] = startingChords
         
-    startPossibilities = getStartingPitches(fbScale, firstBassNote.pitch, firstNotation)
-    #startPossibilities = [[pitch.Pitch('E5'), pitch.Pitch('G4'), pitch.Pitch('C4'), pitch.Pitch('C3')]]
-    allPossibilities = [startPossibilities]
-    allPossibleMovements = []
-    prevPossibilities = startPossibilities
-    
-    
-    for (nextBassNote, nextNotation) in figuredBassList:
-        nextBass = nextBassNote.pitch
-        (nextPossibilities, nextMovements) = getNextPossibilities(fbScale, prevPossibilities, nextBass, nextNotation)
-        #print nextPossibilities
-        #print nextMovements
-        allPossibilities.append(nextPossibilities)
-        allPossibleMovements.append(nextMovements)
-        #print len(nextPossibilities)
-        prevPossibilities = nextPossibilities
-    
-    allNumberProgressions = translateMovementsToNumberProgressions(allPossibleMovements)
-    print "Number of possible progressions: " + str(len(allNumberProgressions))
-    print 
-    
-    for i in range(20):
-        chordProgressionIndex = random.randint(0, len(allNumberProgressions)-1)
-        chordProgression = translateNumberProgressionToChordProgression(allPossibilities, allNumberProgressions[chordProgressionIndex])
-        print "Progression #"  + str(i+1)
-        printChordProgression(chordProgression)
-        for chord in chordProgression:
-            sopranoLine.append(note.Note(chord[0]))
-            altoLine.append(note.Note(chord[1]))
-            tenorLine.append(note.Note(chord[2]))
-            bassLine.append(note.Note(chord[3]))
-        sopranoLine.append(note.Rest())
-        altoLine.append(note.Rest())
-        tenorLine.append(note.Rest())
-        bassLine.append(note.Rest())
-
-
-    #printChordProgression(allChordProgressions[0])
+        for chordIndex in range(1, len(self.figuredBassList)):
+            (nextBass, nextNotation) = self.figuredBassList[chordIndex]
+            prevChords = self.allChords[chordIndex - 1]
+            print("Finding next possibilities for: " + str((nextBass, nextNotation)))
+            (nextChords, prevMovements) = self._findNextPossibilities(prevChords, nextBass, nextNotation)
+            self.allChords[chordIndex] = nextChords
+            self.allMovements[chordIndex - 1] = prevMovements
         
-    score = stream.Score()
-    score.insert(0, meter.TimeSignature('6/4'))
-    score.insert(0, sopranoLine)
-    score.insert(0, altoLine)
-    score.insert(0, tenorLine)
-    score.insert(0, bassLine)
-    score.show()
-    #sopranoLine.show()
-    return score
-
-
-def translateNumberProgressionToChordProgression(allPossibilities, numberProgression):
-    chords = []
-    for i in range(len(allPossibilities)):
-        index = numberProgression[i]
-        chords.append(allPossibilities[i][index])
+        print("Trimming movements...")
+        self._trimAllMovements()
+        print("Done solving.")
     
-    return chords
+    def _trimAllMovements(self):
+        chordIndices = self.allMovements.keys()
+        chordIndices.reverse()
+        
+        for chordIndex in chordIndices:
+            try:
+                previousMovements = self.allMovements[chordIndex - 1] 
+                currentMovements = self.allMovements[chordIndex]
+                eliminated = []
+                for possibleIndex in currentMovements.keys():
+                    if len(currentMovements[possibleIndex]) == 0:
+                        del currentMovements[possibleIndex]
+                        eliminated.append(possibleIndex)
+                for possibleIndex in previousMovements.keys():
+                    movements = previousMovements[possibleIndex]
+                    for eliminatedIndex in eliminated:
+                        if eliminatedIndex in movements:
+                            movements.remove(eliminatedIndex)
+            except KeyError:
+                if chordIndex == 0:
+                    currentMovements = self.allMovements[chordIndex]
+                    for possibleIndex in currentMovements.keys():
+                        if len(currentMovements[possibleIndex]) == 0:
+                            del currentMovements[possibleIndex]
+                else:
+                    raise FiguredBassException("Error trimming all movements.")
+             
+    def showRandomSolutions(self, amount):
+        for i in range(amount):
+            print("Progression #" + str(i + 1))
+            chordProg = self.getRandomChordProgression()
+            printChordProgression(chordProg)        
+    
+    def getRandomChordProgression(self):
+        chordIndices = self.allMovements.keys()
+        startIndices = self.allMovements[chordIndices[0]].keys()
+        randomIndex = random.randint(0, len(startIndices) - 1)
+        numberProgression = []
+        prevChordIndex = startIndices[randomIndex]
+        numberProgression.append(prevChordIndex)
+        
+        for chordIndex in chordIndices:
+            nextIndices = self.allMovements[chordIndex][prevChordIndex]
+            randomIndex = random.randint(0, len(nextIndices) - 1)
+            nextChordIndex = nextIndices[randomIndex]
+            numberProgression.append(nextChordIndex)
+            prevChordIndex = nextChordIndex
+        
+        chordProgression = self._translateNumberProgression(numberProgression)
+        return chordProgression 
+           
+    def _translateNumberProgression(self, numberProgression):
+        chords = []
+        for chordIndex in self.allChords:
+            elementIndex = numberProgression[chordIndex]
+            chords.append(self.allChords[chordIndex][elementIndex])
+            
+        return chords
 
+    def getNumSolutions(self):
+        pass
+    
+    def findSolutionsWithConstraint(self, voicePart, pitchList):
+        pass
+    
+    def _findPossibleStartingChords(self, firstBass, firstNotation = ''):
+        '''
+        >>> from music21 import *
+        >>> fb = FiguredBass('3/2', 'A', 'minor')
+        >>> fb.octaveLimit = 3
+        >>> fb._findPossibleStartingChords(Pitch('A2'), '')
+        [[E3, C3, A2, A2], [E3, C3, C3, A2], [E3, E3, C3, A2], [A3, E3, C3, A2]]
+        '''
+        possibilities = []
+        pitchesAboveBass = self.scale.getPitchesAboveBassPitchFromNotation(firstBass, firstNotation, self.octaveLimit)
+        sortedPitchesAboveBass = sortPitchListByDistanceToPitch(firstBass, pitchesAboveBass)
+        
+        #soprano >= alto >= tenor >= bass
+        for i in range(len(sortedPitchesAboveBass)):
+            firstTenor = sortedPitchesAboveBass[i]
+            for j in range(i, len(sortedPitchesAboveBass)):
+                firstAlto = sortedPitchesAboveBass[j]
+                for k in range(j, len(sortedPitchesAboveBass)):
+                    firstSoprano = sortedPitchesAboveBass[k]
+                    possibilities.append([firstSoprano, firstAlto, firstTenor, firstBass])
+        
+        pitchNamesInChord = self.scale.getPitchNamesFromNotation(firstBass, firstNotation)
+        allowedPossibilities = []
+        
+        for startingChord in possibilities:
+            ruleCheckA = self.rules.checkChord(startingChord, pitchNamesInChord)
+            if ruleCheckA:
+                allowedPossibilities.append(startingChord)
+            
+        return allowedPossibilities
+
+    def _findNextPossibilities(self, prevChords, nextBass, nextNotation = ''):
+        '''
+        >>> fb = FiguredBass('3/2', 'C')
+        >>> prevChords = [[Pitch('C4'), Pitch('G3'), Pitch('E3'), Pitch('C3')]]
+        >>> nextBass = pitch.Pitch('D3')
+        >>> nextNotation = '6'
+        >>> fb.rules.verbose = False
+        >>> fb._findNextPossibilities(prevChords, nextBass, nextNotation)
+        ([[B3, F3, D3, D3], [B3, F3, F3, D3], [F4, B3, F3, D3], [B3, B3, F3, D3]], {0: [0, 1, 2, 3]})
+        '''
+        nextChords = []
+        prevMovements = {}
+        potentialPitchList = self.scale.getPitchesAboveBassPitchFromNotation(nextBass, nextNotation, self.octaveLimit)
+        pitchesInNextChord = self.scale.getPitchNamesFromNotation(nextBass, nextNotation)
+        prevChordIndex = 0
+        for prevChord in prevChords:
+            nextPossibilities = allChordsToMoveTo(prevChord, potentialPitchList, nextBass, self.rules)
+            movements = []
+            for nextChord in nextPossibilities:
+                ruleCheckA = self.rules.checkChord(nextChord, pitchesInNextChord)
+                ruleCheckB = self.rules.checkChords(prevChord, nextChord)
+                if ruleCheckA and ruleCheckB:
+                    try:
+                        movements.append(nextChords.index(nextChord))
+                    except ValueError:
+                        nextChords.append(nextChord)
+                        movements.append(len(nextChords) - 1)
+            prevMovements[prevChordIndex] = movements
+            prevChordIndex += 1
+            
+        return (nextChords, prevMovements)
+    
+        
+#Helper Methods
+def pitchesToMoveTo(voicePairs, newPitchA, potentialPitchList, rules = None):
+    '''
+    Given a list of voice pairs, see which pitches in a potential list a new
+    pitch can move to, without violating any voice leading constraints specified
+    in rules. If no rules are specified, returns the provided list.
+    
+    >>> from music21 import *
+    >>> defaultRules = rules.Rules()
+    >>> bassPitches = (pitch.Pitch('C3'), pitch.Pitch('D3'))
+    >>> tenorPitchA = pitch.Pitch('G3')
+    >>> potentialTenorPitchB = [pitch.Pitch('A3'), pitch.Pitch('F3'), pitch.Pitch('B3'), pitch.Pitch('D4')]
+    >>> pitchesToMoveTo([bassPitches], tenorPitchA, potentialTenorPitchB, defaultRules) # Moving to A3 == Parallel fifths
+    [F3, B3, D4]
+    >>> tenorPitchA = pitch.Pitch('C4')
+    >>> pitchesToMoveTo([bassPitches], tenorPitchA, potentialTenorPitchB, defaultRules) # Moving to D4 == Parallel octaves
+    [A3, F3, B3]
+    >>> pitchesToMoveTo([bassPitches], tenorPitchA, potentialTenorPitchB)
+    [A3, F3, B3, D4]
+    '''
+    newPitchList = []
+    if rules == None:
+        return potentialPitchList
+    for newPitchB in potentialPitchList:
+        isGood = True
+        for (pitchA, pitchB) in voicePairs:
+            vlq = voiceLeading.VoiceLeadingQuartet(pitchA, pitchB, newPitchA, newPitchB)
+            if not rules.checkVoiceLeading(vlq):
+                isGood = False
+                break
+        if isGood:
+            newPitchList.append(newPitchB)
+            
+    return newPitchList
+
+def allChordsToMoveTo(prevChord, potentialPitchList, nextBass = None, rules = None):
+    '''
+    >>> from music21 import *
+    >>> defaultRules = rules.Rules()
+    >>> prevBass = pitch.Pitch('C3')
+    >>> prevTenor = pitch.Pitch('E3')
+    >>> prevAlto = pitch.Pitch('G3')
+    >>> prevChord = [prevAlto, prevTenor, prevBass] #SATB assumed
+    >>> potentialPitchList = [Pitch('D3'), Pitch('F3'), Pitch('B3')]
+    >>> nextBass = pitch.Pitch('D3')
+    >>> allChordsToMoveTo(prevChord, potentialPitchList, nextBass, defaultRules)
+    [[F3, D3, D3], [B3, D3, D3], [F3, F3, D3], [B3, F3, D3]]
+    '''
+    prevChord.reverse()
+    allChords = []
+    voicePairDict = {}
+    for voiceIndex in range(len(prevChord)):
+        voicePairDict[voiceIndex] = []
+    pitchList = {}
+    if not nextBass == None:
+        bassPair = (prevChord[0], nextBass)
+        voicePairDict[0].append([bassPair])
+    else:
+        for givenPitch in potentialPitchList:
+            bassPair = (prevChord[0], givenPitch)
+            voicePairDict[0].append([bassPair])
+    
+    for voiceIndex in range(1, len(prevChord)):
+        for prevVoicePairList in voicePairDict[voiceIndex - 1]:
+            prevPitch = prevChord[voiceIndex]
+            nextPitchList = pitchesToMoveTo(prevVoicePairList, prevChord[voiceIndex], potentialPitchList, rules)
+            for nextPitch in nextPitchList:
+                nextVoicePair = (prevPitch, nextPitch)
+                voicePairDict[voiceIndex].append(prevVoicePairList + [nextVoicePair])
+    
+    for voicePairList in voicePairDict[len(prevChord) - 1]:
+        potentialChord = []
+        for (prevPitch, nextPitch) in voicePairList:
+            potentialChord.append(nextPitch)
+        potentialChord.reverse()
+        allChords.append(potentialChord)
+    
+    prevChord.reverse() #Undo the initial reverse
+    
+    return allChords
+        
+def sortPitchListByDistanceToPitch(pitchZero, pitchList):
+    '''
+    Given a reference pitch, order a given list of pitches in terms of their
+    actual distance (not written distance) as determined by their pitch space
+    number. Ties are broken alphabetically, then numerically.
+    
+    >>> from music21 import *
+    >>> pitchZero = pitch.Pitch('C5')
+    >>> pitchList = [pitch.Pitch('C6'), pitch.Pitch('G4'), pitch.Pitch('C4'), pitch.Pitch('C3'), pitch.Pitch('E5')]
+    >>> sortPitchListByDistanceToPitch(pitchZero, pitchList)
+    [E5, G4, C4, C6, C3]
+    '''
+    pitchZero = realizerScale.convertToPitch(pitchZero)
+    pitchZeroPs = pitchZero.ps
+    newList = []
+    for pitchOne in pitchList:
+        pitchOne = realizerScale.convertToPitch(pitchOne)
+        pitchOnePs = pitchOne.ps
+        distance = abs(pitchOnePs - pitchZeroPs)
+        newList.append((distance, pitchOne))
+    newList.sort()
+    sortedList = []
+    for (distance, pitchOne) in newList:
+        sortedList.append(pitchOne)
+    return sortedList
 
 def printChordProgression(chordProgression):
     sopranoLine = ""
@@ -105,353 +307,8 @@ def printChordProgression(chordProgression):
     print tenorLine
     print bassLine
     print
-
-
-def translateMovementsToNumberProgressions(allPossibleMovements):
-    initialProgressions = []
-    for i in range(len(allPossibleMovements[0])):
-        for j in range(len(allPossibleMovements[0][i])):
-            initialProgressions.append([i, allPossibleMovements[0][i][j]])
-    
-    prevProgressions = initialProgressions
-    nextProgressions = []
-    for i in range(1, len(allPossibleMovements)):
-        lastIndex = len(prevProgressions[0]) - 1
-        for j in range(len(prevProgressions)):
-            lastNumber = prevProgressions[j][lastIndex]
-            for k in range(len(allPossibleMovements[i][lastNumber])):
-                nextProgressions.append(prevProgressions[j] + [allPossibleMovements[i][lastNumber][k]])
-        prevProgressions = nextProgressions
-        nextProgressions = []
-    
-    return prevProgressions 
-            
-
-def getStartingPitches(fbScale, firstBass, firstNotation, octaveLimit=5):
-    possibilities = []
-    pitchList = fbScale.getPitchesAboveBassPitchFromNotation(firstBass, firstNotation, octaveLimit)
-    pitchList = sortPitchListByDistanceToPitch(firstBass, pitchList)
-    
-    #soprano > alto > tenor > bass
-    for i in range(len(pitchList)):
-        firstTenor = pitchList[i]
-        for j in range(i+1, len(pitchList)):
-            firstAlto = pitchList[j]
-            for k in range(j+1, len(pitchList)):
-                firstSoprano = pitchList[k]
-                possibilities.append([firstSoprano, firstAlto, firstTenor, firstBass])
-    
-    newPossibilities = []
-    for firstPitches in possibilities:
-        if not isStartingRuleBreaker(fbScale, firstPitches, firstNotation):
-            newPossibilities.append(firstPitches)
-    
-    return newPossibilities
-    
-
-def isStartingRuleBreaker(fbScale, firstPitches, firstNotation):
-    if not(len(firstPitches) == 4):
-        raise FiguredBassException("A figured bass sequence consists of four voices")
-    firstSoprano = firstPitches[0]
-    firstAlto = firstPitches[1]
-    firstTenor = firstPitches[2]
-    firstBass = firstPitches[3]
-    
-    sopranoPs = firstSoprano.ps
-    altoPs = firstAlto.ps
-    tenorPs = firstTenor.ps
-    bassPs = firstBass.ps
-    
-    sopranoAltoMaxSep = 1.0 #Maximum separation between Soprano and Alto (in octaves)
-    altoTenorMaxSep = 1.0 #Maximum separation between Alto and Tenor (in octaves)
-    tenorBassMaxSep = 1.5 #Maximum separation between Tenor and Bass (in octaves)
-    
-    if abs(sopranoPs - altoPs) > sopranoAltoMaxSep * 12.0:
-        return True
-    if abs(altoPs - tenorPs) > altoTenorMaxSep * 12.0:
-        return True
-    if abs(tenorPs - bassPs) > tenorBassMaxSep * 12.0:
-        return True
-
-    #Only complete chords
-    pitchNames = [firstSoprano.name, firstAlto.name, firstTenor.name, firstBass.name]
-    pitchNamesInChord = fbScale.getPitchNamesFromNotation(firstBass, firstNotation)
-
-    for pitchName in pitchNamesInChord:
-        if pitchName not in pitchNames:
-            return True
-    
-    return False
-
-
-def getNextPossibilities(fbScale, prevPossibilities, nextBass, nextNotation = '-'):
-    allPossibilities = []
-    allMovements = []
-    for prevPitches in prevPossibilities:
-        nextPossibilities = findNextPitches(fbScale, prevPitches, nextBass, nextNotation)
-        movements = []
-        for nextPitches in nextPossibilities:
-            if not isExtendedRuleBreaker(fbScale, prevPitches, nextPitches, nextNotation):
-                try:
-                    movements.append(allPossibilities.index(nextPitches))
-                except ValueError:
-                    allPossibilities.append(nextPitches)
-                    movements.append(len(allPossibilities) - 1)
-        #movements.sort()
-        allMovements.append(movements)
-    return (allPossibilities, allMovements)
-
-
-def findNextPitches(fbScale, prevPitches, nextBass, nextNotation='-', octaveLimit=5):
-    '''
-    Given a scale, a set of previous pitches, a bass pitch and its notation,
-    return all sets of possibilities for the next pitches.
-    
-    prevPitches = [prevSoprano, prevAlto, prevTenor, prevBass]
-    Each set of possibilities is free of parallel fifths, parallel octaves,
-    voice crossings, and leaps of greater than an octave with respect to the 
-    previous pitches.
-    
-    >>> from music21 import *
-    >>> fbScale = realizerScale.FiguredBassScale('C')
-    >>> prevSoprano = pitch.Pitch('E4')
-    >>> prevAlto = pitch.Pitch('C4')
-    >>> prevTenor = pitch.Pitch('G3')
-    >>> prevBass = pitch.Pitch('C3')
-    >>> prevPitches = [prevSoprano, prevAlto, prevTenor, prevBass]
-    >>> nextBass = pitch.Pitch('D3')
-    >>> nextNotation = '6'
-    >>> findNextPitches(fbScale, prevPitches, nextBass, nextNotation)[0:3]
-    [[F4, B3, F3, D3], [D4, B3, F3, D3], [B4, B3, F3, D3]]
-    >>> len(findNextPitches(fbScale, prevPitches, nextBass, nextNotation))
-    12
-    '''
-    nextBass = __convertToPitch(nextBass)
-    for voiceIndex in range(len(prevPitches)):
-        prevPitches[voiceIndex] = __convertToPitch(prevPitches[voiceIndex])
-        
-    possibilities = []
-    
-    if not(len(prevPitches) == 4):
-        raise FiguredBassException("A figured bass sequence consists of four voices")
-    prevSoprano = prevPitches[0]
-    prevAlto = prevPitches[1]
-    prevTenor = prevPitches[2]
-    prevBass = prevPitches[3]
-    
-    pitchList = fbScale.getPitchesAboveBassPitchFromNotation(nextBass, nextNotation, octaveLimit)
-    bassPair = (prevBass, nextBass)
-    tenorList = possiblePitches([bassPair], prevTenor, pitchList)
-    
-    for nextTenor in tenorList:
-        tenorPair = (prevTenor, nextTenor)
-        altoList = possiblePitches([bassPair, tenorPair], prevAlto, pitchList)
-        for nextAlto in altoList:
-            altoPair = (prevAlto, nextAlto)
-            sopranoList = possiblePitches([bassPair, tenorPair, altoPair], prevSoprano, pitchList)
-            for nextSoprano in sopranoList:
-                nextPitches = [nextSoprano, nextAlto, nextTenor, nextBass]
-                possibilities.append(nextPitches)
-        
-    return possibilities
-    
-    
-def possiblePitches(voicePairs, pitchB1, pitchList):
-    '''
-    Provided a list of voice pairs (pitches in the same voice),
-    see which pitches in list of possible pitches a new pitch 
-    can actually move to, given voicing rules set about in the
-    method isAbsoluteRuleBreaker. 
-    
-    >>> from music21 import *
-    >>> voicePairA = (pitch.Pitch('C3'), pitch.Pitch('D3'))
-    >>> voicePairB = (pitch.Pitch('G3'), pitch.Pitch('B3'))
-    >>> pitchList = [pitch.Pitch('F3'), pitch.Pitch('B3'), pitch.Pitch('D4'), pitch.Pitch('F4'), pitch.Pitch('B4')]
-    >>> possiblePitches([voicePairA, voicePairB], pitch.Pitch('C4'), pitchList) #voice crossing (C4->F3), parallel octaves (C4->D4)
-    [B3, F4, B4]
-    >>> voicePairC1 = (pitch.Pitch('C4'), pitch.Pitch('F4'))
-    >>> possiblePitches([voicePairA, voicePairB, voicePairC1], pitch.Pitch('E4'), pitchList) #voice crossing (C4->F4, F4 higher than E4)
-    []
-    >>> voicePairC2 = (pitch.Pitch('C4'), pitch.Pitch('B3'))
-    >>> possiblePitches([voicePairA, voicePairB, voicePairC2], pitch.Pitch('E4'), pitchList) #voice crossing (E4->F3, E4->B3)
-    [F4, D4, B4]
-    '''
-    possibilities = []
-    pitchList = sortPitchListByDistanceToPitch(pitchB1, pitchList)
-    for pitchB2 in pitchList:
-        isGood = True
-        for (pitchA1, pitchA2) in voicePairs:
-            vlq = voiceLeading.VoiceLeadingQuartet(pitchA1, pitchA2, pitchB1, pitchB2)
-            if isAbsoluteRuleBreaker(vlq):
-                isGood = False
-                break
-        if isGood:
-            possibilities.append(pitchB2)
-    
-    return possibilities
-                
-
-def isAbsoluteRuleBreaker(vlq, verbose=False):
-    '''
-    Takes in a VoiceLeadingQuartet and returns True if any voicing rules have
-    been broken, although we can choose to relax the rules.
-    
-    Default voicing rules: 
-    (a) No parallel (or antiparallel) fifths between the two voices, 
-    (b) No parallel (or antiparallel) octaves between the two voices,
-    (c) No voice crossings, as determined by frequency crossing (NOT written crossing)
-    (d) No leaps of greater than an octave in either voice, as determined by absolute distance (NOT written distance)
-    
-    >>> from music21 import *
-    >>> vlqA = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('D3'), pitch.Pitch('G3'), pitch.Pitch('A3'))
-    >>> isAbsoluteRuleBreaker(vlqA, True) #Parallel fifths = C->D, G->A
-    Parallel fifths!
-    True
-    >>> vlqB = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('B3'), pitch.Pitch('G3'), pitch.Pitch('D3')) 
-    >>> isAbsoluteRuleBreaker(vlqB, True) #Voice crossing = C->A, higher than the G above C
-    Voice crossing!
-    True
-    >>> vlqC = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('D3'), pitch.Pitch('F3'), pitch.Pitch('G3')) 
-    >>> isAbsoluteRuleBreaker(vlqC, True) #Parallel fourths
-    False
-    
-    OMIT_FROM_DOCS
-    >>> vlqD = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('D3'), pitch.Pitch('C4'), pitch.Pitch('D4'))
-    >>> isAbsoluteRuleBreaker(vlqD, True) #Parallel octaves = C3->D3, C4->D4
-    Parallel octaves!
-    True
-    >>> vlqE = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('G4'), pitch.Pitch('E5'), pitch.Pitch('D5'))
-    >>> isAbsoluteRuleBreaker(vlqE, True)
-    Greater than octave leap in bottom voice!
-    True
-    >>> vlqF = voiceLeading.VoiceLeadingQuartet(pitch.Pitch('C3'), pitch.Pitch('D3'), pitch.Pitch('E5'), pitch.Pitch('G6'))
-    >>> isAbsoluteRuleBreaker(vlqF, True)
-    Greater than octave leap in top voice!
-    True
-    '''
-    allowParallelFifths = False
-    allowParallelOctaves = False
-    allowVoiceCrossing = False
-    allowMultiOctaveLeapsInBottomVoice = False
-    allowMultiOctaveLeapsInTopVoice = False
-    
-    if vlq.parallelFifth(): 
-        if not allowParallelFifths:
-            if verbose:
-                print "Parallel fifths!"
-            return True
-    if vlq.parallelOctave(): 
-        if not allowParallelOctaves:
-            if verbose:
-                print "Parallel octaves!"
-            return True
-    if vlq.voiceCrossing(): 
-        if not allowVoiceCrossing:
-            if verbose:
-                print "Voice crossing!"
-            return True
-    if abs(vlq.v1n1.ps - vlq.v1n2.ps) > 12.0: 
-        if not allowMultiOctaveLeapsInBottomVoice:
-            if verbose:            
-                print "Greater than octave leap in bottom voice!"
-            return True
-    if abs(vlq.v2n1.ps - vlq.v2n2.ps) > 12.0: 
-        if not allowMultiOctaveLeapsInTopVoice:
-            if verbose:
-                print "Greater than octave leap in top voice!"
-            return True
-    
-    return False
-
-
-def isExtendedRuleBreaker(fbScale, prevPitches, nextPitches, nextNotation, verbose = False):
-    '''
-    
-    '''
-    allowHiddenFifths = False
-    allowHiddenOctaves = False
-    allowIncompleteChords = False
-    
-    if not (len(prevPitches) == 4 or len(nextPitches) == 4):
-        raise FiguredBassException("A figured bass chord consists of four voices")
-    
-    prevSoprano = prevPitches[0]
-    prevBass = prevPitches[3]
-    
-    nextSoprano = nextPitches[0]
-    nextAlto = nextPitches[1]
-    nextTenor = nextPitches[2]
-    nextBass = nextPitches[3]
-    
-    
-    vlq = voiceLeading.VoiceLeadingQuartet(prevBass, nextBass, prevSoprano, nextSoprano)
-    if vlq.hiddenFifth():
-        if not allowHiddenFifths:
-            if verbose:
-                "Hidden fifth!"
-            return True
-    if vlq.hiddenOctave():
-        if not allowHiddenOctaves:
-            if verbose:
-                "Hidden octave!"
-            return True
-
-
-    pitchNames = [nextSoprano.name, nextAlto.name, nextTenor.name, nextBass.name]
-    pitchNamesInChord = fbScale.getPitchNamesFromNotation(nextBass, nextNotation)
-    for pitchName in pitchNamesInChord:
-        if pitchName not in pitchNames:
-            if not allowIncompleteChords:
-                if verbose:
-                    "Chord #2 is incomplete!"
-                return True
-
-    #Leading tone resolves to tonic (7th scale degree, a HALF STEP down from the tonic)
-    #The III chord in minor doesn't have a raised leading tone, and the seventh scale
-    #degree doesn't have to resolve to the tonic.
-
-    #Top three voices within an octave?
-    
-
-    return False
-
-
-def sortPitchListByDistanceToPitch(pitchZero, pitchList):
-    '''
-    Given a reference pitch, order a given list of pitches in terms of their
-    actual distance (not written distance) as determined by their pitch space
-    number. Ties are broken alphabetically, then numerically.
-    
-    >>> from music21 import *
-    >>> pitchZero = pitch.Pitch('C5')
-    >>> pitchList = [pitch.Pitch('C6'), pitch.Pitch('G4'), pitch.Pitch('C4'), pitch.Pitch('C3'), pitch.Pitch('E5')]
-    >>> sortPitchListByDistanceToPitch(pitchZero, pitchList)
-    [E5, G4, C4, C6, C3]
-    '''
-    pitchZero = __convertToPitch(pitchZero)
-    pitchZeroPs = pitchZero.ps
-    newList = []
-    for pitchOne in pitchList:
-        pitchOne = __convertToPitch(pitchOne)
-        pitchOnePs = pitchOne.ps
-        distance = abs(pitchOnePs - pitchZeroPs)
-        newList.append((distance, pitchOne))
-    newList.sort()
-    sortedList = []
-    for (distance, pitchOne) in newList:
-        sortedList.append(pitchOne)
-    return sortedList
-
-
-def __convertToPitch(pitchValue):
-    '''
-    Converts a pitch string to a music21 pitch, only if necessary.
-    '''
-    if type(pitchValue) == str:
-        pitchValue = pitch.Pitch(pitchValue)
-    return pitchValue
-
-
+       
+     
 class FiguredBassException(music21.Music21Exception):
     pass
 
@@ -462,10 +319,39 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    figuredBassList = [(note.Note('A2'), '-'),(note.Note('E3'), '#'),(note.Note('A2'), '-')]
-    realizeFiguredBass(figuredBassList, 'A', 'minor') 
+    #music21.mainTest(Test)
+    fb = FiguredBass('3/2', 'C')
+    #fb.addElement(note.Note('C3'), '')
+    #fb.addElement(note.Note('D3'), '6')
+    #fb.addElement(note.Note('E3'), '6')
+    #fb.solve()
+    #fb.showRandomSolutions(20)
     
-    #figuredBassList = [(note.Note('C3'), '-'), (note.Note('F3'), '6'), (note.Note('G3'), '6/4'), \
-    #                   (note.Note('F3'), '4/2'), (note.Note('E3'), '6')]
-    #realizeFiguredBass(figuredBassList, 'C', 'major') 
-    music21.mainTest(Test)
+    n1 = note.Note('C3')
+    n2 = note.Note('D3')
+    n3 = note.Note('E3')
+    n4 = note.Note('F3')
+    n5 = note.Note('C#3')
+    n6 = note.Note('D3')
+    n7 = note.Note('B2')
+    n8 = note.Note('C3')
+    n9 = note.Note('A#2')
+    n10 = note.Note('B2')
+    n11 = note.Note('B2')
+    n12 = note.Note('E3')
+    
+    fb.addElement(n1, '')
+    fb.addElement(n2, '6')
+    fb.addElement(n3, '6')
+    fb.addElement(n4, '6')
+    fb.addElement(n5, '7-,5,3')
+    fb.addElement(n6, '')
+    fb.addElement(n7, '6#,5,3')
+    fb.addElement(n8, '6')
+    fb.addElement(n9, '7,5,3#')
+    fb.addElement(n10, '6,4')
+    fb.addElement(n11, '5,3')
+    fb.addElement(n12, '')
+    
+    fb.solve()
+    fb.showRandomSolutions(20)
