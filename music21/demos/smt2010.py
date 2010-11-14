@@ -455,7 +455,7 @@ class Test(unittest.TestCase):
         #sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
         # ex03, ex01, ex02, ex04, ex01Alt, findHighestNotes,ex1_revised
         #for func in [findPotentialPassingTones]:
-        for func in [findHighestNotes, demoJesse, corpusMelodicIntervalSearchBrief]:
+        for func in [findHighestNotes, demoJesse, corpusMelodicIntervalSearchBrief, findPotentialPassingTones]:
 
             #func(show=False, op133=sStream)
             func(show=False)
