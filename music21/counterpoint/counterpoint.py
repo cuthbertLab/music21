@@ -1791,7 +1791,7 @@ def getRandomCF(mode = None):
 class TestExternal(unittest.TestCase):
     pass
    
-    def testGenerateFirstSpecies(self):
+    def xtestGenerateFirstSpecies(self):
         '''
         A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
         an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
@@ -1817,7 +1817,7 @@ class TestExternal(unittest.TestCase):
         score.show('midi')
         score.show('lily.png')
 
-    def xtestGenerateFirstSpeciesThreeVoices(self):
+    def testGenerateFirstSpeciesThreeVoices(self):
         '''
         A First Species, Three-Voice Counterpoint Generator by Jackie Rogoff (MIT 2010) written as continuation of 
         a UROP (Undergraduate Research Opportunities Program) project at M.I.T. summer 2010.
