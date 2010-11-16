@@ -165,8 +165,10 @@ class FiguredBass:
     
     def _findPossibleStartingChords(self, firstBass, firstNotation = ''):
         '''
+        OMIT_FROM_DOCS
         >>> from music21 import *
-        >>> fb = FiguredBass('3/2', 'A', 'minor')
+        >>> from music21.figuredBass import realizer
+        >>> fb = realizer.FiguredBass('3/2', 'A', 'minor')
         >>> fb.octaveLimit = 3
         >>> fb._findPossibleStartingChords(Pitch('A2'), '')
         [[E3, C3, A2, A2], [E3, C3, C3, A2], [E3, E3, C3, A2], [A3, E3, C3, A2]]
@@ -230,11 +232,29 @@ class FiguredBass:
 #Helper Methods
 def pitchesToMoveTo(voicePairs, newPitchA, potentialPitchList, rules = None):
     '''
-    Given a list of voice pairs, see which pitches in a potential list a new
-    pitch can move to, without violating any voice leading constraints specified
-    in rules. If no rules are specified, returns the provided list.
+    This method finds solutions to a particular voice-leading problem given some constraints.
     
+    It starts with two lists, L and M, and a single pitch P.
+    
+    L is a list of tuples where each tuple consists of two pitches that represent
+    the motion of a single voice (for instance if C3 moves to D3 at the same time G4 moves
+    to F4 then L = [ (Pitch('C3'), Pitch('D3')), (Pitch('G4'), Pitch('F4')) ]
+    
+    P is the Pitch that another voice (not one of the ones in L) starts on.
+    
+    M is a list of Pitches that the voice of P might possibly move to.
+    
+    This method returns a list that is a subset of M where if P moved to any of these
+    Pitches none of our voice-leading constraints would be broken.  Does not check harmony
+
+    So given L above, if P is C4 and M is [C4, B-3, A3, D4] then this method would
+    return [C4, A3]
+
+    Takes a rules.Rules() object that is used to check the voiceleading.
+    
+        
     >>> from music21 import *
+    >>> from music21.figuredBass import rules
     >>> defaultRules = rules.Rules()
     >>> bassPitches = (pitch.Pitch('C3'), pitch.Pitch('D3'))
     >>> tenorPitchA = pitch.Pitch('G3')
