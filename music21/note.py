@@ -80,12 +80,6 @@ class Lyric(object):
         '''
         return musicxmlTranslate.lyricToMx(self)
 
-#         mxLyric = musicxmlMod.Lyric()
-#         mxLyric.set('text', self.text)
-#         mxLyric.set('number', self.number)
-#         mxLyric.set('syllabic', self.syllabic)
-#         return mxLyric
-
     def _setMX(self, mxLyric):
         '''Given an mxLyric, fill the necessary parameters
         
@@ -98,10 +92,6 @@ class Lyric(object):
         'hello'
         '''
         musicxmlTranslate.mxToLyric(mxLyric, self)
-
-#         self.text = mxLyric.get('text')
-#         self.number = mxLyric.get('number')
-#         self.syllabic = mxLyric.get('syllabic')
 
     mx = property(_getMX, _setMX)    
 

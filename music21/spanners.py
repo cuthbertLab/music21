@@ -16,6 +16,10 @@ import unittest
 import music21
 from music21 import common
 
+from music21 import environment
+_MOD = "spanners.py"  
+environLocal = environment.Environment(_MOD)
+
 
 #-------------------------------------------------------------------------------
 # bass classes
@@ -63,7 +67,7 @@ class Spanners(Borg):
         # ex: id(Slur): Slur, [Note, Note]
         # ex: id(Crescendo): Crescendo, [Note, Note]
         # ex: id(Bracket): Bracket, [Part, Part, Part]
-        self._spanners = {}
+        self._storage = {}
 
         # store a dictionary of id(spanner): list of component spanners
         # this provides quick reference to permit finding a spanner from
@@ -74,10 +78,10 @@ class Spanners(Borg):
     def keys(self):
         '''Return all keys, or id() values of spanner objects.
         '''
-        return self._spanners.keys()
+        return self._storage.keys()
 
     def __len__(self):
-        return len(self._spanners.keys())
+        return len(self._storage.keys())
 
 
     def add(self, spanner, component):
@@ -102,10 +106,10 @@ class Spanners(Borg):
         '''
         idSpanner = id(spanner)
         if idSpanner not in self.keys():
-            self._spanners[idSpanner] = (common.wrapWeakref(spanner), [])
+            self._storage[idSpanner] = (common.wrapWeakref(spanner), [])
             self._idRef[idSpanner] = [] # just a list
 
-        refPair = self._spanners[idSpanner]
+        refPair = self._storage[idSpanner]
         idList = self._idRef[idSpanner]
 
         # presently this does not look for redundant entries
@@ -144,7 +148,7 @@ class Spanners(Borg):
         post = []
         # get all objects, unwrap
         # second index is list of components
-        for wr in self._spanners[idSpanner][1]:
+        for wr in self._storage[idSpanner][1]:
             post.append(common.unwrapWeakref(wr))
         return post
 
@@ -176,9 +180,20 @@ class Spanners(Borg):
         post = []
         for key in spannerKeys:
             # first index is spanner object
-            post.append(common.unwrapWeakref(self._spanners[key][0]))
+            post.append(common.unwrapWeakref(self._storage[key][0]))
 
         return post
+
+
+
+    def remove(self, spanner):
+        '''Given a spanner, remove it from the stored collection.
+        '''
+        idSpanner = id(spanner)
+        if idSpanner not in self.keys():
+            raise SpannersException('this spanner is not defined in the _storage references: %s' % repr(spanner))
+        del self._storage[idSpanner]
+
 
 
 #-------------------------------------------------------------------------------
@@ -218,6 +233,11 @@ class Test(unittest.TestCase):
 
         sp1 = Spanners()
         sp2 = Spanners()
+
+        # different instances
+        self.assertEqual(id(sp1) != id(sp2), True)
+        # but common storage
+        self.assertEqual(id(sp1._storage) == id(sp2._storage), True)
 
         sp1.add(tm1, n1)
         self.assertEqual(len(sp1), 1)
@@ -271,6 +291,11 @@ class Test(unittest.TestCase):
         self.assertEqual(sp1.getSpanner(p1), [tm2, tm3])
         self.assertEqual(sp2.getSpanner(n1), [tm1, tm3])
         self.assertEqual(sp2.getSpanner(p1), [tm2, tm3])
+
+
+        sp2.remove(tm2)
+        self.assertEqual(len(sp1), 2)
+        self.assertEqual(len(sp2), 2)
 
 
 #-------------------------------------------------------------------------------
