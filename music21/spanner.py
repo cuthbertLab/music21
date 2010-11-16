@@ -29,6 +29,11 @@ class Component(object):
         self._id = None # id() of stored object
         self._ref = None # weak ref to stored object
 
+
+        # each component may define and offset in quarterLengths
+        # to suggest positioning not exactly with the component
+        self.offset = 0.0
+
         # Spanner subclasses might define attributes, like weights
         if component is not None:    
             self.set(component)
@@ -41,20 +46,40 @@ class Component(object):
     def get(self):
         return common.unwrapWeakref(self._ref)
 
+    # for serialization, need to wrap and unwrap weakrefs
+    def freezeIds(self):
+        pass
+
+    def unfreezeIds(self):
+        pass
 
 
 class SpannerException(Exception):
     pass
 
 
+
+# calculating the duration of components, or even that start of components
+# from within the spanner is very hard: the problem is that we do not know 
+# what site of the component to use: it may be the parent, it may be otherwise
+# we may have a slur to two notes that do not have a common parent
+
+# but: if we store a weakref to the site, we can always be sure to get the 
+# the right offset
+
+# however, if the site is a measure, the offset will be relative to that measure; for a spanner that spans two measures, offset values will be irrelevant
+
+# thus, we cannot get any offset information unless the components share
+# all sites
+
+# linking the offset of the Spanner itself to its components is also problematic: when adding a component, we do not know what site is relevant for determining offset. we also cannot be sure that the Spanner will live in the same container as the component. we also have to override all defined contexts operations on the Spanner; and we still cannot be sure what site is relevant to the component to figure out what the offset of the spanner is.
+
+# thus, Spanner objects should be naive. 
+
 class Spanner(music21.Music21Object):
     '''
     Spanner objects live on Streams as other Music21Objects, but store connections between one or more Music21Objects.
     '''
-    # store a spanners object as a class instance; 
-    # this assures that only one will be created for all subclasses
-    # each instances shares a single
-    # storage dictionary and wraps all components in weak refs
     
 
     def __init__(self, *arguments, **keywords):
@@ -102,11 +127,42 @@ class Spanner(music21.Music21Object):
 # 
 
 
+    def getOffsetsBySite(self, site, componentOffset=True):
+        '''Given a site shared by all components, return a list of offset values.
+
+        To include `componentOffset` adjustments, set this value to True.
+        '''
+        post = []
+        idSite = id(site)
+        for c in self.getComponents():
+            # getting site ids is fast, as weakrefs do not have to be unpacked
+            if idSite in c.getSiteIds():
+                o = c.getOffsetBySite(site)
+                if componentOffset:
+                    post.append(o+c.offset)
+                else:    
+                    post.append(o)
+        return post
+
+    def getOffsetSpanBySite(self, site, componentOffset=True):
+        '''Return the span, or min and max values, of all offsets for a given site. 
+        '''
+        post = self.getOffsetsBySite(site, componentOffset=componentOffset)
+        return [min(post), max(post)]
+
 
 #-------------------------------------------------------------------------------
 # connect two or more notes anywhere in the score
 class Slur(Spanner):
-    pass
+
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+
+
+
+    
+
+
 
 # crescendo
 class Crescendo(Spanner):
@@ -181,6 +237,8 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s), 3)
         self.assertEqual(sg1.getComponents(), [p1, p2])
+        self.assertEqual(sg1.getOffsetsBySite(s), [0.0, 0.0])
+
         # make sure spanners is unified
 
         # how slurs might be defined
@@ -198,6 +256,9 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s), 3)
         self.assertEqual(slur1.getComponents(), [n1, n3])
+
+        self.assertEqual(slur1.getOffsetsBySite(p1), [0.0, 4.0])
+        self.assertEqual(slur1.getOffsetSpanBySite(p1), [0.0, 4.0])
 
 
 #-------------------------------------------------------------------------------

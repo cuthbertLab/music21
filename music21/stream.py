@@ -39,6 +39,7 @@ from music21.musicxml import translate as musicxmlTranslate
 from music21 import midi as midiModule
 from music21.midi import translate as midiTranslate
 from music21 import note
+from music21 import spanner
 from music21 import tie
 from music21 import metadata
 

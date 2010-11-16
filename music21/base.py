@@ -1666,6 +1666,8 @@ class Music21Object(JSONSerializer):
     def hasContext(self, obj):
         '''Return a Boolean if an object reference is stored in the object's DefinedContexts object.
 
+        This checks both all locations as well as all sites. 
+
         >>> class Mock(Music21Object): attr1=234
         >>> aObj = Mock()
         >>> aObj.attr1 = 'test'
@@ -1711,7 +1713,7 @@ class Music21Object(JSONSerializer):
         return self._definedContexts.getSites()
 
     def getSiteIds(self):
-        '''Return a lost of all site Ids, or the id() value of the sites of this object. 
+        '''Return a list of all site Ids, or the id() value of the sites of this object. 
         '''
         return self._definedContexts.getSiteIds()
 
