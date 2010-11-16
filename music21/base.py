@@ -181,8 +181,6 @@ class DefinedContexts(object):
     All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects 
 
     '''
-    #TODO: make locations, by default, use weak refs
-    # make contexts, by default, not use weak refs
 
     def __init__(self):
         # a dictionary of dictionaries

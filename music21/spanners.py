@@ -20,7 +20,12 @@ from music21 import common
 #-------------------------------------------------------------------------------
 # bass classes
 
+# based on models here:
 # http://code.activestate.com/recipes/66531/
+# http://stackoverflow.com/questions/31875/is-there-a-simple-elegant-way-to-define-singletons-in-python
+
+# note that both Borg and Singleton pass all present tests and likely exhibit
+# the same functionality for the design here.
 
 # class Singleton(object):
 #     def __new__(type):

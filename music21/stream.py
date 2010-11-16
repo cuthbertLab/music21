@@ -6655,48 +6655,48 @@ class Part(Stream):
 
 
 
-class Staff(Stream):
-    '''
-    A Stream subclass for designating music on a single staff
-    '''
-    # NOTE: not yet implemented
-    staffLines = 5
-
-
-class Performer(Stream):
-    '''
-    A Stream subclass for designating music to be performed by a
-    single Performer.  Should only be used when a single performer
-    performs on multiple parts.  E.g. Bass Drum and Triangle on separate
-    staves performed by one player.
-
-    a Part + changes of Instrument is fine for designating most cases
-    where a player changes instrument in a piece.  A part plus staves
-    with individual instrument changes could also be a way of designating
-    music that is performed by a single performer (see, for instance
-    the Piano doubling Celesta part in Lukas Foss's Time Cycle).  The
-    Performer Stream-subclass could be useful for analyses of, for instance,
-    how 5 percussionists chose to play a piece originally designated for 4
-    (or 6) percussionists in the score.
-    '''
-    # NOTE: not yet implemented
-    pass
-
-
-class System(Stream):
-    '''Totally optional: designation that all the music in this Stream
-    belongs in a single system.
-    '''
-    systemNumber = 0
-    systemNumbering = "Score" # or Page; when do system numbers reset?
-
-class Page(Stream):
-    '''
-    Totally optional: designation that all the music in this Stream
-    belongs on a single notated page
-    '''
-    pageNumber = 0
-    
+# class Staff(Stream):
+#     '''
+#     A Stream subclass for designating music on a single staff
+#     '''
+#     # NOTE: not yet implemented
+#     staffLines = 5
+# 
+# 
+# class Performer(Stream):
+#     '''
+#     A Stream subclass for designating music to be performed by a
+#     single Performer.  Should only be used when a single performer
+#     performs on multiple parts.  E.g. Bass Drum and Triangle on separate
+#     staves performed by one player.
+# 
+#     a Part + changes of Instrument is fine for designating most cases
+#     where a player changes instrument in a piece.  A part plus staves
+#     with individual instrument changes could also be a way of designating
+#     music that is performed by a single performer (see, for instance
+#     the Piano doubling Celesta part in Lukas Foss's Time Cycle).  The
+#     Performer Stream-subclass could be useful for analyses of, for instance,
+#     how 5 percussionists chose to play a piece originally designated for 4
+#     (or 6) percussionists in the score.
+#     '''
+#     # NOTE: not yet implemented
+#     pass
+# 
+# 
+# class System(Stream):
+#     '''Totally optional: designation that all the music in this Stream
+#     belongs in a single system.
+#     '''
+#     systemNumber = 0
+#     systemNumbering = "Score" # or Page; when do system numbers reset?
+# 
+# class Page(Stream):
+#     '''
+#     Totally optional: designation that all the music in this Stream
+#     belongs on a single notated page
+#     '''
+#     pageNumber = 0
+#     
 
 class Score(Stream):
     """A Stream subclass for handling multi-part music.
