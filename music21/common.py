@@ -930,9 +930,18 @@ def formatStr(msg, *arguments, **keywords):
     test 1 2 3
     <BLANKLINE>
     '''
+    if 'format' in keywords.keys():
+        format = keywords['format']
+    else:
+        format = None
+
     msg = [msg] + list(arguments)
     msg = [str(x) for x in msg]
-    return ' '.join(msg)+'\n'
+    if format == 'block':
+        return '\n*** '.join(msg)+'\n'
+    else: # catch all others
+        return ' '.join(msg)+'\n'
+
 
 
 def dirPartitioned(obj, skipLeading=['__']):

@@ -468,7 +468,7 @@ class Environment(object):
 
 
     
-    def printDebug(self, msg, statusLevel=common.DEBUG_USER):
+    def printDebug(self, msg, statusLevel=common.DEBUG_USER, format=None):
         '''Format one or more data elements into string, and print it 
         to stderr. The first arg can be a list of string; lists are 
         concatenated with common.formatStr(). 
@@ -481,7 +481,7 @@ class Environment(object):
             if msg[0] != self.modNameParent and self.modNameParent != None:
                 msg = [self.modNameParent + ':'] + msg
             # pass list to common.formatStr
-            msg = common.formatStr(*msg)
+            msg = common.formatStr(*msg, format=format)
             sys.stderr.write(msg)
     
 

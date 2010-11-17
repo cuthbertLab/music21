@@ -236,19 +236,12 @@ class Stream(music21.Music21Object):
             return e
     
         elif isinstance(key, slice): # get a slice of index values
-            # TODO: slice extraction needs testing; parent setting
-            # and locations adjustments seem to be problems
-            # NOTE: this copy may return locations references that are 
-            # not desirable
-            #found = copy.copy(self) # return a stream of elements
+            # manually inserting elements is critical to setting the element
+            # locations
             found = self.__class__()
-            found.elements = self.elements[key]
+            for e in self.elements[key]:
+                found.insert(e.getOffsetBySite(self), e)
             found._elementsChanged()
-
-            # NOTE: this used to iterate over the Stream: probably not needed
-            # all tests pass without
-            #for element in found:
-            #    pass ## sufficient to set parent properly
             return found
 
         elif common.isStr(key):
@@ -331,6 +324,8 @@ class Stream(music21.Music21Object):
    
     def _setElements(self, value):
         '''
+        TODO: this should be removed, as this is a bad way to add elements, as locations are not set properly. 
+
         >>> from music21 import *
         >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note("C"), range(10))
@@ -626,10 +621,8 @@ class Stream(music21.Music21Object):
         new = self.__class__()
         old = self
         for name in self.__dict__.keys():
-
             if name.startswith('__'):
                 continue
-           
             part = getattr(self, name)
                     
             # all subclasses of Music21Object that define their own
@@ -647,6 +640,7 @@ class Stream(music21.Music21Object):
             elif name == '_elements':
                 # must manually add elements to 
                 for e in self._elements: 
+                    #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.parent', e.parent, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
                     # this will work for all with __deepcopy___
                     newElement = copy.deepcopy(e, memo)
                     # get the old offset from the parent Stream     
@@ -2294,7 +2288,9 @@ class Stream(music21.Music21Object):
 
 
     def bestClef(self, allowTreble8vb = False):
-        '''Returns the clef that is the best fit for notes and chords found in thisStream.
+        '''Returns the clef that is the best fit for notes and chords found in this Stream.
+    
+        This does not automatically get a flat representation of the Stream.
 
         >>> a = Stream()
         >>> for x in range(30):
@@ -2325,24 +2321,24 @@ class Stream(music21.Music21Object):
 
         notes = self.getElementsByClass(note.GeneralNote)
 
-        def findHeight(thisPitch):
-            height = thisPitch.diatonicNoteNum
-            if thisPitch.diatonicNoteNum > 33: # a4
+        def findHeight(p):
+            height = p.diatonicNoteNum
+            if p.diatonicNoteNum > 33: # a4
                 height += 3 # bonus
-            elif thisPitch.diatonicNoteNum < 24: # Bass F or lower
+            elif p.diatonicNoteNum < 24: # Bass F or lower
                 height += -3 # bonus
             return height
         
-        for thisNote in notes:
-            if thisNote.isRest:
+        for n in notes:
+            if n.isRest:
                 pass
-            elif thisNote.isNote:
+            elif n.isNote:
                 totalNotes  += 1
-                totalHeight += findHeight(thisNote.pitch)
-            elif thisNote.isChord:
-                for thisPitch in thisNote.pitches:
+                totalHeight += findHeight(n.pitch)
+            elif n.isChord:
+                for p in n.pitches:
                     totalNotes += 1
-                    totalHeight += findHeight(thisPitch)
+                    totalHeight += findHeight(p)
         if totalNotes == 0:
             averageHeight = 29
         else:
@@ -3964,10 +3960,7 @@ class Stream(music21.Music21Object):
     def _getFlatOrSemiFlat(self, retainContainers):
         '''The `retainContainers` option, if True, returns a semiFlat version: containers are not discarded in flattening.
         '''
-        # if already flat, could just return a shallow copy?
-#         if self.isFlat == True:
-#             return self
-#         environLocal.printDebug(['_getFlatOrSemiFlat: break1: self', self, 'self.parent', self.parent])       
+        #environLocal.printDebug(['_getFlatOrSemiFlat(): self', self, 'self.parent', self.parent])       
 
         # this copy will have a shared locations object
         # not that copy.copy() in some cases seems to not cause secondary
@@ -3985,8 +3978,9 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['_getFlatOrSemiFlat(), sNew id', id(sNew)])
         for e in self._elements:
             # check for stream instance instead
-            # if this element is a Stream
-            if hasattr(e, "elements"): # recurse time:
+            # if this element is a Stream, recurse
+            #if isinstance(e, Stream): 
+            if hasattr(e, "elements"): 
                 recurseStreamOffset = e.getOffsetBySite(self)
                 if retainContainers is True: # semiFlat
                     #environLocal.printDebug(['_getFlatOrSemiFlat(), retaining containers, storing element:', e])
@@ -4005,6 +3999,9 @@ class Stream(music21.Music21Object):
                 for subEl in recurseStream:
                     oldOffset = subEl.getOffsetBySite(recurseStream)
                     sNew.insert(oldOffset + recurseStreamOffset, subEl)
+
+                    #environLocal.printDebug(['subElement', id(subEl), 'inserted in', sNew, 'id(sNew)', id(sNew)])
+
             # if element not a stream
             else:
                 # insert into new stream at offset in old stream
@@ -4077,7 +4074,28 @@ class Stream(music21.Music21Object):
         >>> r.flat[124].offset
         444.0
         '''
-        return self._getFlatOrSemiFlat(retainContainers = False)
+#         reCache = False
+#         if self._cache["flat"] == None:
+#             reCache = True
+#         # see if the ached Stream has cahced elements: if not, this
+#         # likely means that they have changed and that that Stream is no 
+#         # longer a good cached stream
+#         elif len(self._cache["flat"]._cache) == 0:
+#             reCache = True
+# 
+#         if reCache:
+#             #environLocal.printDebug(['reCache: flat', reCache, 'self', self])
+#             if self.isFlat:
+#                 self._cache["flat"] = self
+#             else:
+#                 self._cache["flat"] = self._getFlatOrSemiFlat(
+#                 retainContainers=False)
+# 
+#         #environLocal.printDebug(['cached: flat', self._cache["flat"], id(self._cache["flat"]), 'len', len(self._cache["flat"])])
+# 
+#         return self._cache["flat"]
+
+        return self._getFlatOrSemiFlat(retainContainers=False)
 
     flat = property(_getFlat, 
         doc='''Return a new Stream that has all sub-container flattened within.
@@ -6056,7 +6074,7 @@ class Stream(music21.Music21Object):
     def voicesToParts(self):
         '''If this Stream defines one or more voices, extract each into a Part, returning a Score.
 
-        If this Stream has no voice, return the Stream as a Part with in a Score. 
+        If this Stream has no voice, return the Stream as a Part within a Score. 
         '''
         s = Score()
         #s.metadata = self.metadata
@@ -6122,6 +6140,14 @@ class Stream(music21.Music21Object):
         else: 
             s[0].mergeElements(self)
 
+        # there is no way to assure proper clef information, so using 
+        # best clef here is desirable. 
+        for p in s.parts: 
+            # only add clef if measures are defined; otherwise, assume
+            # best clef will be assigned later
+            if p.hasMeasures():
+                # place in first measure
+                p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
         return s
 
 
@@ -9806,19 +9832,21 @@ class Test(unittest.TestCase):
         
 
     def testAugmentOrDiminishCorpus(self):
-        '''Extact phrases from the corpus and use for testing 
+        '''Extract phrases from the corpus and use for testing 
         '''
         from music21 import corpus
 
         # first method: iterating through notes
         src = corpus.parseWork('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
+        #environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'extracting notes:'])
         ex = src[0].flat.notes[0:30]
         # attach a couple of transformations
         s = Stream()
         for scalar in [.5, 1.5, 2, .25]:
             #n = note.Note()
             part = Part()
+            environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'pre augment or diminish', 'ex', ex, 'id(ex)', id(ex)])
             for n in ex.augmentOrDiminish(scalar, inPlace=False):
                 part.append(n)
             s.insert(0, part)
@@ -11995,7 +12023,7 @@ class Test(unittest.TestCase):
         #s2.show()
         s1 = s0.voicesToParts()
         self.assertEqual(len(s1.parts), 3)
-        self.assertEqual(len(s1.parts[0].flat), len(v1.flat))
+        #self.assertEqual(len(s1.parts[0].flat), len(v1.flat))
         self.assertEqual([e for e in s1.parts[0].flat], [e for e in v1.flat])
 
         self.assertEqual(len(s1.parts[1].flat), len(v2.flat))
@@ -12072,14 +12100,18 @@ if __name__ == "__main__":
 #         t.testStripTiesImported()
 #         t.testStripTiesScore()
 
-        t.testMakeTies()
-        t.testVoicesA()
-        t.testVoicesB()
-        t.testVoicesC()
+#         t.testMakeTies()
+#         t.testVoicesA()
+#         t.testVoicesB()
+#         t.testVoicesC()
+# 
+#         t.testInternalize()
+#         t.testMakeRests()
 
-        t.testInternalize()
-        t.testMakeRests()
+#         t.testAugmentOrDiminishCorpus()
+#         t.testAugmentOrDiminishHighestTimes()
 
+        t.testVoicesToPartsA()
 
 #------------------------------------------------------------------------------
 # eof
