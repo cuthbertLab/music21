@@ -6053,7 +6053,7 @@ class Stream(music21.Music21Object):
         '''
         pass
 
-    def explode(self):
+    def voicesToParts(self):
         '''If this Stream defines one or more voices, extract each into a Part, returning a Score.
 
         If this Stream has no voice, return the Stream as a Part with in a Score. 
@@ -6065,7 +6065,7 @@ class Stream(music21.Music21Object):
         # add all parts to one Score
         if self.hasPartLikeStreams():
             for p in self.parts:
-                sSub = p.explode()
+                sSub = p.voicesToParts()
                 for pSub in sSub:
                     s.insert(0, pSub)
             return s
@@ -6083,7 +6083,7 @@ class Stream(music21.Music21Object):
         else: # if no measure or voices, get one part
             partCount = 1 
 
-        environLocal.printDebug(['explode(): got partCount', partCount])
+        environLocal.printDebug(['voicesToParts(): got partCount', partCount])
 
         # create parts, naming ids by voice id?
         for sub in range(partCount):
@@ -6123,6 +6123,14 @@ class Stream(music21.Music21Object):
             s[0].mergeElements(self)
 
         return s
+
+
+
+    def explode(self):
+        '''Create a multi-part extraction from a single polyphonic Part.
+        '''
+        return voicesToParts()
+
 
 
 #-------------------------------------------------------------------------------
@@ -6923,7 +6931,7 @@ class Score(Stream):
             gatherArticulations=True, gatherNotations=True, inPlace=True)
         return post
 
-    def implode(self, voiceAllocation=2, permitOneVoicePerPart=False):
+    def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False):
         '''Given a multi-part :class:`~music21.stream.Score`, return a new Score that combines parts into voices. 
 
         The `voiceAllocation` parameter can be an integer: if so, this many parts will each be grouped into one part as voices
@@ -6959,7 +6967,7 @@ class Score(Stream):
         else:
             raise StreamException('incorrect voiceAllocation format: %s' % voiceAllocation)
 
-        environLocal.printDebug(['implode() bundle:', bundle]) 
+        environLocal.printDebug(['partsToVoices() bundle:', bundle]) 
 
         s = Score()
         s.metadata = self.metadata
@@ -7018,6 +7026,19 @@ class Score(Stream):
             pActive = None
             
         return s
+
+
+
+
+    def implode(self):
+        '''Reduce a polyphonic work into one or more staves.
+        '''
+        voiceAllocation=2
+        permitOneVoicePerPart=False
+
+        return self.partsToVoices(voiceAllocation=voiceAllocation,
+            permitOneVoicePerPart=permitOneVoicePerPart)
+
 
 
 # this was commented out as it is not immediately needed
@@ -11797,11 +11818,11 @@ class Test(unittest.TestCase):
         #sPost.show()
 
 
-    def testImplodeA(self):
+    def testPartsToVoicesA(self):
         from music21 import corpus
         s0 = corpus.parseWork('bwv66.6')
         #s.show()
-        s1 = s0.implode(2)
+        s1 = s0.partsToVoices(2)
         #s1.show()
         #s1.show('t')
         self.assertEqual(len(s1.parts), 2)
@@ -11855,11 +11876,11 @@ class Test(unittest.TestCase):
 
 
 
-    def testImplodeB(self):
+    def testPartsToVoicesB(self):
         from music21 import corpus
         # this work has five parts: results in e parts
         s0 = corpus.parseWork('hwv56', '1-18')
-        s1 = s0.implode(2, permitOneVoicePerPart=True)
+        s1 = s0.partsToVoices(2, permitOneVoicePerPart=True)
         self.assertEqual(len(s1.parts), 3)
         self.assertEqual(len(s1.parts[0].getElementsByClass(
             'Measure')[0].voices), 2)
@@ -11872,7 +11893,7 @@ class Test(unittest.TestCase):
 
         s0 = corpus.parseWork('hwv56', '1-05')
         # can use index values
-        s2 = s0.implode(([0,1], [2,4], 3), permitOneVoicePerPart=True)   
+        s2 = s0.partsToVoices(([0,1], [2,4], 3), permitOneVoicePerPart=True)   
         self.assertEqual(len(s2.parts), 3)
         self.assertEqual(len(s2.parts[0].getElementsByClass(
             'Measure')[0].voices), 2)
@@ -11881,7 +11902,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s2.parts[2].getElementsByClass(
             'Measure')[0].voices), 1)
 
-        s2 = s0.implode((['Violino I','Violino II'], ['Viola','Bassi'], ['Basso']), permitOneVoicePerPart=True)
+        s2 = s0.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], ['Basso']), permitOneVoicePerPart=True)
         self.assertEqual(len(s2.parts), 3)
         self.assertEqual(len(s2.parts[0].getElementsByClass(
             'Measure')[0].voices), 2)
@@ -11892,7 +11913,7 @@ class Test(unittest.TestCase):
 
 
         # this will keep the voice part unaltered
-        s2 = s0.implode((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'), permitOneVoicePerPart=False)
+        s2 = s0.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'), permitOneVoicePerPart=False)
         self.assertEqual(len(s2.parts), 3)
         self.assertEqual(len(s2.parts[0].getElementsByClass(
             'Measure')[0].voices), 2)
@@ -11904,7 +11925,7 @@ class Test(unittest.TestCase):
 
         # mm 16-19 are a good examples
         s1 = corpus.parseWork('hwv56', '1-05').measures(16, 19)
-        s2 = s1.implode((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'))
+        s2 = s1.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'))
         #s2.show()
 
         self.assertEqual(len(s2.parts), 3)
@@ -11917,27 +11938,27 @@ class Test(unittest.TestCase):
 
 
 
-    def testExplodeA(self):
+    def testVoicesToPartsA(self):
         
         from music21 import corpus
         s0 = corpus.parseWork('bwv66.6')
         #s.show()
-        s1 = s0.implode(2) # produce two parts each with two voices
+        s1 = s0.partsToVoices(2) # produce two parts each with two voices
 
-        s2 = s1.parts[0].explode()
+        s2 = s1.parts[0].voicesToParts()
         # now a two part score
         self.assertEqual(len(s2.parts), 2)
         # makes sure we have what we started with
         self.assertEqual(len(s2.parts[0].flat.notes), len(s0.parts[0].flat.notes))
 
 
-        s1 = s0.implode(4) # create one staff with all parts
+        s1 = s0.partsToVoices(4) # create one staff with all parts
         self.assertEqual(s1.classes[0], 'Score') # we get a Score back
         # we have a Score with one part and measures, each with 4 voices
         self.assertEqual(len(s1.parts[0].getElementsByClass(
             'Measure')[0].voices), 4)
         # need to access part
-        s2 = s1.explode() # return to four parts in a score; 
+        s2 = s1.voicesToParts() # return to four parts in a score; 
         # make sure we have what we started with
         self.assertEqual(len(s2.parts[0].flat.notes),
                          len(s0.parts[0].flat.notes))
@@ -11972,7 +11993,7 @@ class Test(unittest.TestCase):
         s0.insert(0, v2)
         s0.insert(0, v3)
         #s2.show()
-        s1 = s0.explode()
+        s1 = s0.voicesToParts()
         self.assertEqual(len(s1.parts), 3)
         self.assertEqual(len(s1.parts[0].flat), len(v1.flat))
         self.assertEqual([e for e in s1.parts[0].flat], [e for e in v1.flat])
