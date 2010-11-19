@@ -58,6 +58,14 @@ class Component(object):
         pass
 
 
+    def __deepcopy__(self, memo=None):
+        '''Manage deepcopying by creating a new reference.
+        '''
+        new = self.__class__()
+        new.set(self.get())
+        new.offset = self.offset
+        return new
+
 
 class SpannerException(Exception):
     pass
@@ -430,6 +438,23 @@ class Test(unittest.TestCase):
         self.assertEqual(sb[0], su1)
         self.assertEqual(sb[1], su2)
 
+
+    def testDeepcopySpanner(self):
+        from music21 import spanner, note
+        import copy
+
+        # how slurs might be defined
+        n1 = note.Note()
+        n2 = note.Note()
+        n3 = note.Note()
+
+        su1 = Slur()
+        su1.add([n1, n3])
+
+        su2 = copy.deepcopy(su1)
+
+        self.assertEqual(su1.get(), [n1, n3])
+        self.assertEqual(su2.get(), [n1, n3])
 
 
 #-------------------------------------------------------------------------------

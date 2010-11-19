@@ -453,13 +453,16 @@ class DefinedContexts(object):
         else:
             dict['time'] = timeValue
 
+        # TODO: store id() and class name for matching without unwrapping
+        # weakref!
+
         if updateNotAdd: # add new/missing information to dictionary
             self._definedContexts[idKey].update(dict)
         else: # add:
             self._definedContexts[idKey] = dict
 
-    def removeBySite(self, site):
-        '''Remove the object specified from DefinedContexts. Object provided can be a location site or a defined context. 
+    def remove(self, site):
+        '''Remove the object (a context or location site) specified from DefinedContexts. Object provided can be a location site or a defined context. 
 
         >>> class Mock(Music21Object): pass
         >>> aSite = Mock()
@@ -475,7 +478,7 @@ class DefinedContexts(object):
         >>> aContexts.add(cSite, 232223)
         >>> len(aContexts)
         3
-        >>> aContexts.removeBySite(aSite)
+        >>> aContexts.remove(aSite)
         >>> len(aContexts)
         2
 
@@ -496,7 +499,7 @@ class DefinedContexts(object):
             self._locationKeys.pop(self._locationKeys.index(siteId))
 
 
-    def removeBySiteId(self, idKey):
+    def removeById(self, idKey):
         '''Remove a defined contexts entry by id key, which is id() of the object. 
         '''
         if idKey == None:
@@ -545,7 +548,7 @@ class DefinedContexts(object):
 
 
     def get(self, locationsTrail=False, sortByCreationTime=False,
-            priorityTarget=None):
+            priorityTarget=None, autoPurge=True):
         '''Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added.
 
         The `locationsTrail` option forces locations to come after all other defined contexts.
@@ -553,6 +556,8 @@ class DefinedContexts(object):
         The `sortByCreationTime` option will sort objects by creation time, where most-recently assigned objects are returned first. 
 
         If `priorityTarget` is defined, this object will be placed first in the list of objects.
+
+        If `autoPurge` is True, this method automatically removes dead weak-refs. Thus, every time locations are gotten, any dead weakrefs are removed. This provides a modest performance boost. 
 
         >>> from music21 import *
         >>> import time
@@ -581,6 +586,8 @@ class DefinedContexts(object):
             keyRepository = self._definedContexts.keys()
 
         post = [] 
+        purgeKeys = []
+        
         # get partitioned lost of all, w/ locations last if necessary
         if locationsTrail:
             keys = []
@@ -597,12 +604,22 @@ class DefinedContexts(object):
         # get each dict from all defined contexts
         for key in keys:
             dict = self._definedContexts[key]
-            # need to check if these is weakref
-            #if common.isWeakref(dict['obj']):
-            if WEAKREF_ACTIVE:
-                post.append(common.unwrapWeakref(dict['obj']))
+            # check for None object; default location, not a weakref, keep
+            if dict['obj'] == None:
+                post.append(dict['obj'])
+            elif WEAKREF_ACTIVE:
+                obj = common.unwrapWeakref(dict['obj'])
+                if obj is None: # dead ref
+                    purgeKeys.append(key)
+                else:
+                    post.append(obj)
             else:
                 post.append(dict['obj'])
+
+        # remove dead references
+        if autoPurge:
+            for key in purgeKeys:
+                self.removeById(key)
 
         if priorityTarget is not None:
             if priorityTarget in post:
@@ -704,7 +721,7 @@ class DefinedContexts(object):
             if obj == None: # if None, it no longer exists
                 match.append(idKey)
         for id in match:
-            self.removeBySiteId(id)
+            self.removeById(id)
 
 
 #     def clearLocations(self):
@@ -713,7 +730,7 @@ class DefinedContexts(object):
 #         for idKey in self._locationKeys:
 #             if idKey == None: 
 #                 continue
-#             self.removeBySiteId(idKey)
+#             self.removeById(idKey)
 
 
     def _getOffsetBySiteId(self, idKey):
@@ -978,6 +995,7 @@ class DefinedContexts(object):
         count = 0
         # search any defined contexts first
         # need to sort: look at most-recently added objs are first
+
         # TODO: can optimize search of defined contexts if we store in advance
         # all class names; then weakrefs will not have to be used
         objs = self.get(locationsTrail=True,  
@@ -1086,7 +1104,7 @@ class DefinedContexts(object):
         1
         >>> aContexts.getAttrByName('attr1') == 234
         True
-        >>> aContexts.removeBySiteId(id(aObj))
+        >>> aContexts.removeById(id(aObj))
         >>> aContexts.add(bObj)
         >>> aContexts.getAttrByName('attr1') == 98
         True
@@ -1779,7 +1797,7 @@ class Music21Object(JSONSerializer):
         '''
         if not self._definedContexts.isSite(site):
             raise Music21ObjectException('supplied object (%s) is not a site in this object.')
-        self._definedContexts.removeBySite(site)
+        self._definedContexts.remove(site)
         # if parent is set to that site, reassign to None
 
         if self._getParent() == site:
@@ -1798,7 +1816,7 @@ class Music21Object(JSONSerializer):
         >>> n.parent == None
         True
         '''
-        self._definedContexts.removeBySiteId(siteId)
+        self._definedContexts.removeById(siteId)
         p = self._getParent()
         if p != None and id(p) == siteId:
             self._setParent(None)
@@ -1937,6 +1955,8 @@ class Music21Object(JSONSerializer):
         if hasattr(self, "elements"): 
             semiFlat = self.semiFlat
             # this memos updates to not exclude redundancies
+            # TODO: check if getContextByClass can be improved
+            # by adding these to memo
             memo[id(self)] = self
             memo[id(semiFlat)] = semiFlat
 
@@ -2181,7 +2201,6 @@ class Music21Object(JSONSerializer):
 
         '''
         self._definedContexts.unwrapWeakref()
-
         # doing direct access; not using property parent, as filters
         # through global WEAKREF_ACTIVE setting
         self._currentParent = common.unwrapWeakref(self._currentParent)

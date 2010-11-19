@@ -1353,7 +1353,7 @@ def wrapWeakref(referent):
 
 def unwrapWeakref(referent):
     '''
-    utility function that gets an object that might be an object itself
+    Utility function that gets an object that might be an object itself
     or a weak reference to an object.
     
     >>> class Mock(object): pass

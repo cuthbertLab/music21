@@ -223,11 +223,11 @@ class Test(unittest.TestCase):
 
 
 
-            (self.runParseABC, 
-                {
-                 '2010.10.20': 38.6760668755, 
-                 '2010.10.21': 35.4297668934,
-                }),
+#             (self.runParseABC, 
+#                 {
+#                  '2010.10.20': 38.6760668755, 
+#                  '2010.10.21': 35.4297668934,
+#                 }),
 
 
             (self.runCreateDurations, 
@@ -315,10 +315,13 @@ class Test(unittest.TestCase):
             testMethod()
             t.stop()
             dur = t()
+            items = best.items()
+            items.sort()
+            items.reverse()
             environLocal.printDebug(['\n\ntiming tolerance for:',     
                 str(testMethod.__doc__.strip()), 
                 '\nthis run:', dur, '\nbest runs:', 
-                ['%s: %s' % (x, y) for x, y in best.items()], '\n'
+                ['%s: %s' % (x, y) for x, y in items], '\n'
                 ]
             )
             #self.assertEqual(True, dur <= max) # performance test
