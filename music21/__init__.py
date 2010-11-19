@@ -53,7 +53,7 @@ __all__ = ['base',
            'metadata', 'meter', 'musedata', 
            'expressions', 'note', 
            'pitch', 'ratios', 
-           'scale', 'serial', 'stream', 
+           'spanner', 'scale', 'serial', 'stream', 
            'tempo', 'text', 'tie', 'tinyNotation', 
            'voiceLeading']
 

@@ -91,7 +91,7 @@ class Lyric(object):
         >>> a.text
         'hello'
         '''
-        musicxmlTranslate.mxToLyric(mxLyric, self)
+        musicxmlTranslate.mxToLyric(mxLyric, inputM21=self)
 
     mx = property(_getMX, _setMX)    
 
@@ -934,7 +934,7 @@ class Note(NotRest):
         >>> n = note.Note('c')
         >>> n.mx = mxNote
         '''
-        musicxmlTranslate.mxToNote(mxNote, self)
+        musicxmlTranslate.mxToNote(mxNote, inputM21=self)
 
 
     mx = property(_getMX, _setMX)    
@@ -1019,7 +1019,7 @@ class Rest(GeneralNote):
     def _setMX(self, mxNote):
         '''Given an mxNote, fille the necessary parameters
         '''
-        musicxmlTranslate.mxToRest(mxNote, self)
+        musicxmlTranslate.mxToRest(mxNote, inputM21=self)
 
     mx = property(_getMX, _setMX)    
 

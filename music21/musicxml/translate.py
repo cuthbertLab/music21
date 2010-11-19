@@ -435,19 +435,27 @@ def noteToMxNotes(n):
 
 
 
-def mxToNote(mxNote, inputM21):
+def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     '''Translate a MusicXML :class:`~music21.musicxml.Note` to a :class:`~music21.note.Note`.
 
+    The `spanners` parameter can be a list or a Stream for storing and processing Spanner objects. 
     '''
     from music21 import articulations
     from music21 import expressions
     from music21 import note
     from music21 import tie
+    from music21 import spanner
 
     if inputM21 == None:
-        n = note.Measure()
+        n = note.Note()
     else:
         n = inputM21
+
+    # doing this will create an instance, but will not be passed
+    # out of this method, and thus is only for testing
+    if spannerBundle == None:
+        #environLocal.printDebug(['mxToNote()', 'creating SpannerBundle'])
+        spannerBundle = spanner.SpannerBundle()
 
     # print object == 'no' and grace notes may have a type but not
     # a duration. they may be filtered out at the level of Stream 
@@ -470,6 +478,9 @@ def mxToNote(mxNote, inputM21):
         # n.tie is defined in GeneralNote as None by default
         n.tie = tieObj
 
+    # things found in notations object:
+    # articulations
+    # slurs
     mxNotations = mxNote.get('notationsObj')
     if mxNotations != None:
         # get a list of mxArticulationMarks, not mxArticulations
@@ -489,6 +500,35 @@ def mxToNote(mxNote, inputM21):
 
             #environLocal.printDebug(['_setMX(), n.mxFermataList', mxFermataList])
 
+        # get slurs; requires a spanner bundle
+        mxSlurList = mxNotations.getSlurs()
+        for mxObj in mxSlurList:
+            # look at all spanners and see if we have an open, matching
+            # slur to place this in
+            idFound = mxObj.get('number')
+            # returns a new spanner bundle with just the result of the search
+            #environLocal.printDebug(['spanner bundle: getByCompleteStatus(False)', spannerBundle.getByCompleteStatus(False)])
+
+            sb = spannerBundle.getByIdLocal(idFound).getByCompleteStatus(False)
+            if len(sb) > 0:
+                #environLocal.printDebug(['found a match in SpannerBundle'])
+                su = sb[0] # get the first
+            else:    
+                # create a new spanner
+                su = spanner.Slur()
+                su.idLocal = idFound
+
+            # add a reference of this note to this spanner
+            su.add(n)
+
+            if mxObj.get('type') == 'stop':
+                su.completeStatus = True
+
+            #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
+
+            spannerBundle.append(su)
+
+    return n
 
 
 def restToMxNotes(r):
@@ -629,7 +669,7 @@ def measureToMx(m):
     return mxMeasure
 
 
-def mxToMeasure(mxMeasure, inputM21):
+def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     '''Translate an mxMeasure (a MusicXML :class:`~music21.musicxml.Measure` object) into a music21 :class:`~music21.stream.Measure`.
 
     If an `inputM21` object reference is provided, this object will be configured and returned; otherwise, a new :class:`~music21.stream.Measure` object is created.  
@@ -643,11 +683,18 @@ def mxToMeasure(mxMeasure, inputM21):
     from music21 import bar
     from music21 import clef
     from music21 import meter
+    from music21 import spanner
 
     if inputM21 == None:
         m = stream.Measure()
     else:
         m = inputM21
+
+    # doing this will create an instance, but will not be passed
+    # out of this method, and thus is only for testing
+    if spannerBundle == None:
+        #environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
+        spannerBundle = spanner.SpannerBundle()
 
     mNum, mSuffix = common.getNumFromStr(mxMeasure.get('number'))
     # assume that measure numbers are integers
@@ -793,8 +840,9 @@ def mxToMeasure(mxMeasure, inputM21):
                     mxNoteList.append(mxNote)
                     offsetIncrement = 0
                 else:
-                    n = note.Note()
-                    n.mx = mxNote
+                    #n = note.Note()
+                    #n.mx = mxNote
+                    n = mxToNote(mxNote, spannerBundle=spannerBundle)
                     if useVoices:
                         m.voices[mxNote.voice].insert(offsetMeasureNote, n)
                     else:
@@ -850,7 +898,7 @@ def mxToMeasure(mxMeasure, inputM21):
                 w = dynamics.Wedge()
                 w.mx = mxObj     
                 m.insert(offsetMeasureNote, w)  
-
+    return m
 
 def measureToMusicXML(m):
     '''Translate a music21 Measure into a complete MusicXML string representation.
@@ -1112,7 +1160,7 @@ def streamToMx(s):
     return mxScore
 
 
-def mxToStreamPart(mxScore, partId, inputM21):
+def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     '''Load a part into a new Stream or one provided by `inputM21` given an mxScore and a part name.
     '''
     #environLocal.printDebug(['calling Stream._setMXPart'])
@@ -1127,13 +1175,19 @@ def mxToStreamPart(mxScore, partId, inputM21):
     from music21 import meter
     from music21 import instrument
     from music21 import stream
+    from music21 import spanner
 
 
     if inputM21 == None:
+        # need a Score to load parts into
         from music21 import stream
-        s = stream.Stream()
+        s = stream.Score()
     else:
         s = inputM21
+
+    if spannerBundle == None:
+        spannerBundle = spanner.SpannerBundle()
+
 
     mxPart = mxScore.getPart(partId)
     mxInstrument = mxScore.getInstrument(partId)
@@ -1157,8 +1211,10 @@ def mxToStreamPart(mxScore, partId, inputM21):
     lastTimeSignature = None
     for mxMeasure in mxPart:
         # create a music21 measure and then assign to mx attribute
-        m = stream.Measure()
-        m.mx = mxMeasure  # assign data into music21 measure 
+        #m = stream.Measure()
+        #m.mx = mxMeasure  # assign data into music21 measure 
+        m = mxToMeasure(mxMeasure, spannerBundle=spannerBundle)
+
         if m.timeSignature is not None:
             lastTimeSignature = m.timeSignature
         elif lastTimeSignature is None and m.timeSignature is None:
@@ -1202,11 +1258,12 @@ def mxToStreamPart(mxScore, partId, inputM21):
     s.insert(0, streamPart)
 
 
-def mxToStream(mxScore, inputM21):
-    '''Translate an mxScore into a music21 Stream object.
+def mxToStream(mxScore, spannerBundle=None, inputM21=None):
+    '''Translate an mxScore into a music21 Score object.
     '''
 
     from music21 import metadata
+    from music21 import spanner
 
     if inputM21 == None:
         from music21 import stream
@@ -1214,16 +1271,27 @@ def mxToStream(mxScore, inputM21):
     else:
         s = inputM21
 
+    if spannerBundle == None:
+        spannerBundle = spanner.SpannerBundle()
+
+
     partNames = mxScore.getPartNames().keys()
     partNames.sort()
     for partName in partNames: # part names are part ids
-        s._setMXPart(mxScore, partName)
+        mxToStreamPart(mxScore, partId=partName, 
+            spannerBundle=spannerBundle, inputM21=s)
+        #s._setMXPart(mxScore, partName)
 
     # add metadata object; this is placed after all other parts now
     # these means that both Parts and other objects live on Stream.
     md = metadata.Metadata()
     md.mx = mxScore
     s.insert(0, md)
+
+    # for now, just adding spanners to top-most level
+    for sp in spannerBundle:
+        s.insert(0, sp)
+    # add spanners to highest level object
 
 
 
@@ -1273,6 +1341,18 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testSlurInputA(self):
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.spannersSlurs33c)
+
+
+        s.show('t')
+
+        
+
+
 
 if __name__ == "__main__":
     import sys
@@ -1281,7 +1361,8 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         t = Test()
-        t.testVoices()
+        #t.testVoices()
+        t.testSlurInputA()
 
 
 

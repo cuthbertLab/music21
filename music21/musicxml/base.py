@@ -1627,6 +1627,15 @@ class Notations(MusicXMLElementList):
                 post.append(part)
         return post
 
+    def getSlurs(self):
+        '''Get a slurs.
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Slur):
+                post.append(part)
+        return post
+
 
 
 

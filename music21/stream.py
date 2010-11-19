@@ -58,7 +58,7 @@ class StreamException(Exception):
 
 
 #-------------------------------------------------------------------------------
-class StreamIterator():
+class StreamIterator(object):
     '''A simple Iterator object used to handle iteration of Streams and other 
     list-like objects. 
     '''
@@ -5150,13 +5150,13 @@ class Stream(music21.Music21Object):
         '''
         #environLocal.printDebug(['calling Stream._setMXPart'])
         # pass reference to self for building into
-        musicxmlTranslate.mxToStreamPart(mxScore, partId, self)
+        musicxmlTranslate.mxToStreamPart(mxScore, partId, inputM21=self)
 
 
     def _setMX(self, mxScore):
         '''Given an mxScore, build into this stream
         '''
-        musicxmlTranslate.mxToStream(mxScore, self)
+        musicxmlTranslate.mxToStream(mxScore, inputM21=self)
     
     mx = property(_getMX, _setMX)
         
