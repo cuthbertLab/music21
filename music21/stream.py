@@ -674,25 +674,18 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _addElementPreProcess(self, element):
-        '''Before adding an element, this method provides important checks to the element.
+        '''Before adding an element, this method provides important checks to that element.
 
         Used by both insert() and append()
         '''
         # using id() here b/c we do not want to get __eq__ comparisons
         if element is self: # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
-
-        # temporarily removed
-
         # if we do not purge locations here, we may have ids() for 
         # Stream that no longer exist stored in the locations entry
-        #element.purgeLocations()
-
-#         if id(self) in element.getSiteIds():
-#             environLocal.printDebug(['element site ids', element, element.getSiteIds()])
-#             environLocal.printDebug(['self id', self, id(self)])
-#             #self.show('t')
-#             raise StreamException('this element (%s, id %s) already has a location for this container (%s, id %s)' % (element, id(element), self, id(self)))
+        # note that dead locations are also purged from DefinedContexts during
+        # all get() calls. 
+        element.purgeLocations()
 
 
     def insert(self, offsetOrItemOrList, itemOrNone=None, 
@@ -2207,6 +2200,22 @@ class Stream(music21.Music21Object):
         >>> s.insert(0, stream.Voice()) 
         >>> s.insert(0, stream.Voice()) 
         >>> len(s.voices)
+        2
+        ''')
+
+    def _getSpanners(self):
+        '''        
+        '''
+        return self.getElementsByClass(spanner.Spanner)
+
+    spanners = property(_getSpanners, 
+        doc='''Return all :class:`~music21.spanner.Spanner` objects in a :class:`~music21.stream.Stream` or Stream subclass.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.insert(0, spanner.Slur()) 
+        >>> s.insert(0, spanner.Slur()) 
+        >>> len(s.spanners)
         2
         ''')
 

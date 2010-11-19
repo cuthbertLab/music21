@@ -582,7 +582,7 @@ class DefinedContexts(object):
             keyRepository = self._keysByTime(newFirst=True)
         elif sortByCreationTime in [-1]:
             keyRepository = self._keysByTime(newFirst=False)
-        else:
+        else: # None, or False
             keyRepository = self._definedContexts.keys()
 
         post = [] 
@@ -1004,7 +1004,7 @@ class DefinedContexts(object):
         for obj in objs:
             #environLocal.printDebug(['memo', memo])
             if obj is None: 
-                continue # in case the reference is dead
+                continue # a None context, or a dead reference
             if common.isStr(className):
                 if type(obj).__name__.lower() == className.lower():
                     post = obj       

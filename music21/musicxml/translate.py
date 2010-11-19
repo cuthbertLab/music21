@@ -373,12 +373,17 @@ def generalNoteToMusicXML(n):
     
 
 
-def noteToMxNotes(n):
+def noteToMxNotes(n, spannerBundle=None):
     '''Translate a music21 :class:`~music21.note.Note` into a list of :class:`~music21.musicxml.Note` objects.
     '''
     #Attributes of notes are merged from different locations: first from the 
     #duration objects, then from the pitch objects. Finally, GeneralNote 
     #attributes are added.
+
+    if spannerBundle is not None:
+        # this will get all spanners that participate with this note
+        spannerBundle = spannerBundle.getByComponent(n)
+        #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle])
 
     mxNoteList = []
     for mxNote in n.duration.mx: # returns a list of mxNote objs
@@ -394,7 +399,7 @@ def noteToMxNotes(n):
 
     # if this note, not a component duration, but this note has a tie, 
     # need to add this to the last-encountered mxNote
-    if n.tie != None:
+    if n.tie is not None:
         mxTieList, mxTiedList = n.tie.mx # get mxl objs from tie obj
         # if starting or continuing tie, add to last mxNote in mxNote list
         if n.tie.type in ['start', 'continue']:
@@ -431,6 +436,24 @@ def noteToMxNotes(n):
         obj = n.notations[i] 
         mxNoteList[0].notationsObj.componentList.append(obj.mx)
 
+    if spannerBundle is not None:
+        # already filtered for just the spanner that have this note as
+        # a component
+        for su in spannerBundle.getByClass('Slur'):     
+            mxSlur = musicxml.Slur()
+            mxSlur.set('number', su.idLocal)
+            mxSlur.set('placement', su.placement)
+            # is this note first in this spanner?
+            if su.isFirst(n):
+                mxSlur.set('type', 'start')
+            elif su.isLast(n):
+                mxSlur.set('type', 'stop')
+            else:
+                # this may no always be an error
+                raise TranslateException('have a slur that has this note as a component but that note is neither a start nor an end.')
+
+            mxNoteList[0].notationsObj.componentList.append(mxSlur)
+    
     return mxNoteList
 
 
@@ -514,14 +537,15 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
                 #environLocal.printDebug(['found a match in SpannerBundle'])
                 su = sb[0] # get the first
             else:    
-                # create a new spanner
+                # create a new slur
                 su = spanner.Slur()
                 su.idLocal = idFound
+                su.placement = mxObj.get('placement')
+                # type attribute, defined as start or stop, 
                 spannerBundle.append(su)
 
             # add a reference of this note to this spanner
-            su.add(n)
-
+            su.addComponents(n)
             if mxObj.get('type') == 'stop':
                 su.completeStatus = True
                 # only add after complete
@@ -575,9 +599,10 @@ def mxToRest(mxNote, inputM21=None):
 # Measures
 
 
-def measureToMx(m):
+def measureToMx(m, spannerBundle=None):
     '''Translate a :class:`~music21.stream.Measure` to a MusicXML :class:`~music21.musicxml.Measure` object.
     '''
+    #environLocal.printDebug(['measureToMx(): got spannerBundle:', spannerBundle])
 
     mxMeasure = musicxmlMod.Measure()
     mxMeasure.set('number', m.number)
@@ -629,8 +654,14 @@ def measureToMx(m):
             # iterate over each object in this voice
             offsetMeasureNote = 0 # offset of notes w/n measure  
             for obj in v.flat:
-                classes = obj.classes # store result of property call oince
-                if 'GeneralNote' in classes:
+                classes = obj.classes # store result of property call once
+                if 'Note' in classes:
+                    offsetMeasureNote += obj.quarterLength
+                    objList = noteToMxNotes(obj, spannerBundle=spannerBundle)
+                    for sub in objList:
+                        sub.voice = v.id # the voice id is the voice number
+                    mxMeasure.componentList += objList
+                elif 'GeneralNote' in classes:
                     # increment offset before getting mx, as this way a single
                     # chord provides only one value
                     offsetMeasureNote += obj.quarterLength
@@ -648,8 +679,11 @@ def measureToMx(m):
 
     else: # no voices
         for obj in m.flat:
-            classes = obj.classes # store result of property call oince
-            if 'GeneralNote' in classes:
+            classes = obj.classes # store result of property call once
+            if 'Note' in classes:
+                mxMeasure.componentList += noteToMxNotes(obj, 
+                    spannerBundle=spannerBundle)
+            elif 'GeneralNote' in classes:
                 # .mx here returns a list of notes
                 mxMeasure.componentList += obj.mx
             elif 'Dynamic' in classes:
@@ -948,7 +982,7 @@ def measureToMusicXML(m):
 
 
 def streamPartToMx(s, instObj=None, meterStream=None,
-                        refStreamOrTimeRange=None):
+                   refStreamOrTimeRange=None, spannerBundle=None):
     '''If there are Measures within this stream, use them to create and
     return an MX Part and ScorePart. 
 
@@ -1003,13 +1037,14 @@ def streamPartToMx(s, instObj=None, meterStream=None,
 
     # for each measure, call .mx to get the musicxml representation
     for obj in measureStream:
-        mxPart.append(obj.mx)
+        #mxPart.append(obj.mx)
+        mxPart.append(measureToMx(obj, spannerBundle=spannerBundle))
 
     # mxScorePart contains mxInstrument
     return mxScorePart, mxPart
 
 
-def streamToMx(s):
+def streamToMx(s, spannerBundle=None):
     '''Create and return a musicxml Score object. 
 
     >>> from music21 import *
@@ -1021,6 +1056,8 @@ def streamToMx(s):
     >>> mxScore = musicxml.translate.streamToMx(s1)
     >>> mxPartList = mxScore.get('partList')
     '''
+    from music21 import spanner
+
     if len(s) == 0:
         # create an empty work
         from music21 import stream, note, metadata
@@ -1036,7 +1073,13 @@ def streamToMx(s):
         # recursive call to this non-empty stream
         return streamToMx(out)
 
+    if spannerBundle is None: 
+        # no spanner bundle provided, get one from the flat stream
+        spannerBundle = spanner.SpannerBundle(s.flat)
+        environLocal.printDebug(['streamToMx(): loaded spannerBundle of size:', len(spannerBundle)])
+
     #environLocal.printDebug('calling Stream._getMX')
+    # stores pairs of mxScorePart and mxScore
     mxComponents = []
     instList = []
     
@@ -1055,14 +1098,8 @@ def streamToMx(s):
 
     if s.hasPartLikeStreams():
         #environLocal.printDebug('Stream._getMX: interpreting multipart')
-        # need to edit streams contained within streams
-        # must repack into a new stream at each step
-        #midStream = Stream()
-        #finalStream = Stream()
 
-        # NOTE: used to make a shallow copy here
-        # TODO: check; removed 4/16/2010
-        # TODO: now making a deepcopy, as we are going to edit internal objs
+        # making a deepcopy, as we are going to edit internal objs
         partStream = copy.deepcopy(s)
 
         for obj in partStream.getElementsByClass('Stream'):
@@ -1070,25 +1107,9 @@ def streamToMx(s):
             # apply this streams offset to elements
             obj.transferOffsetToElements() 
 
-# its not clear that this gathering, at the level of each part
-# is necessary, given how this is done for the entire score, or the 
-# flat score. 
-
-#             ts = obj.getTimeSignatures(sortByCreationTime=True, 
-#                  searchContext=False)
-#             # the longest meterStream is the meterStream for all parts
-#             if len(ts) > meterStream:
-#                 meterStream = ts
-
             ht = obj.highestTime
             if ht > highestTime:
                 highestTime = ht
-            # used to place in intermediary stream
-            #midStream.insert(obj)
-
-        #refStream = Stream()
-        #refStream.insert(0, music21.Music21Object()) # placeholder at 0
-        #refStream.insert(highestTime, music21.Music21Object()) 
 
         refStreamOrTimeRange = [0, highestTime]
 
@@ -1126,15 +1147,20 @@ def streamToMx(s):
             # force this instrument into this part
             # meterStream is only used here if there are no measures
             # defined in this part
-            # this method calls streamPartToMx()
-            mxComponents.append(obj._getMXPart(inst, meterStream,
-                            refStreamOrTimeRange))
+            mxComponents.append(streamPartToMx(obj, instObj=inst, 
+                meterStream=meterStream, 
+                refStreamOrTimeRange=refStreamOrTimeRange, 
+                spannerBundle=spannerBundle))
+            #mxComponents.append(obj._getMXPart(inst, meterStream, refStreamOrTimeRange))
 
     else: # assume this is the only part
         #environLocal.printDebug('Stream._getMX(): handling single-part Stream')
         # if no instrument is provided it will be obtained through s
         # when _getMxPart is called
-        mxComponents.append(s._getMXPart(None, meterStream))
+        #mxComponents.append(s._getMXPart(None, meterStream))
+        mxComponents.append(streamPartToMx(s,
+                meterStream=meterStream, 
+                spannerBundle=spannerBundle))
 
     # create score and part list
     # try to get mxScore from lead meta data first
@@ -1357,7 +1383,7 @@ class Test(unittest.TestCase):
         # try to get all spanners from the first note
         self.assertEqual(len(s.flat.notes[0].getAllContextsByClass('Spanner')), 5)
         #s.show('t')
-
+        #s.show()
         
 
 

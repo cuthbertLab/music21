@@ -47,7 +47,7 @@ class Component(object):
         self.id = id(component)
         self._ref = common.wrapWeakref(component)
 
-    def get(self):
+    def getComponents(self):
         return common.unwrapWeakref(self._ref)
 
     # for serialization, need to wrap and unwrap weakrefs
@@ -62,7 +62,7 @@ class Component(object):
         '''Manage deepcopying by creating a new reference.
         '''
         new = self.__class__()
-        new.set(self.get())
+        new.set(self.getComponents())
         new.offset = self.offset
         return new
 
@@ -77,12 +77,12 @@ class SpannerException(Exception):
 # what site of the component to use: it may be the parent, it may be otherwise
 # we may have a slur to two notes that do not have a common parent
 
-# but: if we store a weakref to the site, we can always be sure to get the 
+# but: if we store a weakref to the site, we can always be sure to getComponents the 
 # the right offset
 
 # however, if the site is a measure, the offset will be relative to that measure; for a spanner that spans two measures, offset values will be irrelevant
 
-# thus, we cannot get any offset information unless the components share
+# thus, we cannot getComponents any offset information unless the components share
 # all sites
 
 # linking the offset of the Spanner itself to its components is also problematic: when adding a component, we do not know what site is relevant for determining offset. we also cannot be sure that the Spanner will live in the same container as the component. we also have to override all defined contexts operations on the Spanner; and we still cannot be sure what site is relevant to the component to figure out what the offset of the spanner is.
@@ -101,11 +101,14 @@ class Spanner(music21.Music21Object):
         # an ordered list of Component objects
         self._components = []
 
-        # add any provided arguments
+        # store this so subclasses can replace
+        self._reprHead = '<music21.spanner.Spanner '
+
+        # addComponents any provided arguments
         if len(arguments) > 1:
-            self.add(arguments)
+            self.addComponents(arguments)
         elif len(arguments) == 1: # assume a list is first arg
-            self.add(arguments[0])
+            self.addComponents(arguments[0])
 
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
@@ -116,27 +119,29 @@ class Spanner(music21.Music21Object):
 
     
     def __repr__(self):
-        msg = ['<music21.spanner.Spanner ']
-        for obj in self.get():
+        msg = [self._reprHead]
+        for obj in self.getComponents():
             msg.append(repr(obj))
         msg.append('>')
         return ''.join(msg)
 
 
-    def get(self):
+    def getComponents(self):
         '''Return all components for this Spanner. 
+
+        As this is a Music21Object, the name here is more specific to avoid name clashes.
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> sl = spanner.Slur()
-        >>> sl.add(n1)
-        >>> sl.get() == [n1]
+        >>> sl.addComponents(n1)
+        >>> sl.getComponents() == [n1]
         True
-        >>> sl.add(n2)
-        >>> sl.get() == [n1, n2]
+        >>> sl.addComponents(n2)
+        >>> sl.getComponents() == [n1, n2]
         True
-        >>> sl.getIds() == [id(n1), id(n2)]
+        >>> sl.getComponentIds() == [id(n1), id(n2)]
         True
         >>> sl
         <music21.spanner.Slur <music21.note.Note G><music21.note.Note F#>>
@@ -144,13 +149,13 @@ class Spanner(music21.Music21Object):
         '''
         post = []
         for c in self._components:
-            q = c.get() # unwrap weakreference
+            q = c.getComponents() # unwrap weakreference
             if q != None:
                 post.append(q)
         return post
 
 
-    def getIds(self):
+    def getComponentIds(self):
         '''Return all id() for all stored objects.
 
         '''
@@ -161,12 +166,9 @@ class Spanner(music21.Music21Object):
             q = c.id # weakref may be dead!
             if q != None:
                 post.append(q)
-
         return post
 
-        
-
-    def add(self, components, *arguments, **keywords):  
+    def addComponents(self, components, *arguments, **keywords):  
         '''Associate one or more components with this Spanner.
 
         The order that components is added is retained and may or may not be significant to the spanner. 
@@ -179,10 +181,10 @@ class Spanner(music21.Music21Object):
         >>> n5 = note.Note('d-')
 
         >>> sl = spanner.Slur()
-        >>> sl.add(n1)
-        >>> sl.add(n2, n3)
-        >>> sl.add([n4, n5])
-        >>> sl.getIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
+        >>> sl.addComponents(n1)
+        >>> sl.addComponents(n2, n3)
+        >>> sl.addComponents([n4, n5])
+        >>> sl.getComponentIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
         True
 
         '''  
@@ -201,6 +203,41 @@ class Spanner(music21.Music21Object):
 #         self._spanners.remove(self)
 # 
 
+    def isFirst(self, component):
+        '''Given a component, is it first?
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> n3 = note.Note('e')
+        >>> n4 = note.Note('c')
+        >>> n5 = note.Note('d-')
+
+        >>> sl = spanner.Slur()
+        >>> sl.addComponents(n1, n2, n3, n4, n5)
+        >>> sl.isFirst(n2)
+        False
+        >>> sl.isFirst(n1)
+        True
+        >>> sl.isLast(n1)
+        False
+        >>> sl.isLast(n5)
+        True
+
+        '''
+        idTarget = id(component)
+        if self._components[0].id == idTarget:
+            return True
+        return False
+
+    def isLast(self, component):
+        '''Given a component, is it last?
+        '''
+        idTarget = id(component)
+        if self._components[-1].id == idTarget:
+            return True
+        return False
+
 
     def getOffsetsBySite(self, site, componentOffset=True):
         '''Given a site shared by all components, return a list of offset values.
@@ -209,7 +246,7 @@ class Spanner(music21.Music21Object):
         '''
         post = []
         idSite = id(site)
-        for c in self.get():
+        for c in self.getComponents():
             # getting site ids is fast, as weakrefs do not have to be unpacked
             if idSite in c.getSiteIds():
                 o = c.getOffsetBySite(site)
@@ -233,11 +270,19 @@ class Spanner(music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 class SpannerBundle(object):
-    '''A utility object for collecting and processing spannerin spanner creation and manipulation.
+    '''A utility object for collecting and processing collections of Spanner objects.
+
+    If a Stream or Stream subclass is provided as an argument, all Spanners on this Stream will be accumulated herein. 
     '''
 
-    def __init__(self):
+    def __init__(self, *arguments, **keywords):
         self._storage = []
+
+        for arg in arguments:
+            if 'Stream' in arg.classes:
+                for e in arg.spanners:
+                    self._storage.append(e)
+
 
     def append(self, other):
         self._storage.append(other)
@@ -256,6 +301,13 @@ class SpannerBundle(object):
     def __repr__(self):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
 
+    def asList(self):
+        '''Return the bundle as a list.
+        '''
+        post = []
+        for x in self._storage:
+            post.append(x)
+        return post
 
     def getByIdLocal(self, idLocal=None):
         '''Get spanners by `idLocal` or `complete` status.
@@ -284,7 +336,7 @@ class SpannerBundle(object):
         return post
 
     def getByCompleteStatus(self, completeStatus):
-        '''Get spanners by matchinging object id
+        '''Get spanners by matching status of `completeStatus` to the same attribute
 
         >>> from music21 import *
         >>> su1 = spanner.Slur()
@@ -309,6 +361,62 @@ class SpannerBundle(object):
         return post
 
 
+    def getByComponent(self, component):
+        '''Given a spanner component (an object), return a bundle of all Spanner objects that have this object as a component. 
+
+        >>> from music21 import *
+        >>> n1 = note.Note()
+        >>> n2 = note.Note()
+        >>> n3 = note.Note()
+        >>> su1 = spanner.Slur(n1, n2)
+        >>> su2 = spanner.Slur(n2, n3)
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> sb.append(su2)
+        >>> sb.getByComponent(n1).asList() == [su1]
+        True
+        >>> sb.getByComponent(n3).asList() == [su2]
+        True
+        >>> sb.getByComponent(n2).asList() == [su1, su2]
+        True
+        '''
+        idTarget = id(component)
+        post = self.__class__()
+        for sp in self._storage:
+            if idTarget in sp.getComponentIds():
+                post.append(sp)
+        return post
+
+
+
+    def getByClass(self, className):
+        '''Given a spanner class, return a bundle of all Spanners of the desired class. 
+
+        >>> from music21 import *
+        >>> su1 = spanner.Slur()
+        >>> su2 = spanner.StaffGroup()
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> sb.append(su2)
+        >>> sb.getByClass(spanner.Slur).asList() == [su1]
+        True
+        >>> sb.getByClass('Slur').asList() == [su1]
+        True
+        >>> sb.getByClass('StaffGroup').asList() == [su2]
+        True
+        '''
+        post = self.__class__()
+        for sp in self._storage:
+            if common.isStr(className):
+                if className in sp.classes:
+                    post.append(sp)
+            else:
+                if isinstance(sp, className):
+                    post.append(sp)
+        return post
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -318,16 +426,18 @@ class Slur(Spanner):
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
 
+        self.placement = None # can above or below, after musicxml
+
     def __repr__(self):
         msg = Spanner.__repr__(self)
-        msg = msg.replace('<music21.spanner.Spanner ', '<music21.spanner.Slur ')
+        msg = msg.replace(self._reprHead, '<music21.spanner.Slur ')
         return msg
     
 
 
 
 # crescendo
-class Crescendo(Spanner):
+class DynamicWedge(Spanner):
     pass
 
 
@@ -398,7 +508,7 @@ class Test(unittest.TestCase):
         s.insert(0, sg1)    
 
         self.assertEqual(len(s), 3)
-        self.assertEqual(sg1.get(), [p1, p2])
+        self.assertEqual(sg1.getComponents(), [p1, p2])
         self.assertEqual(sg1.getOffsetsBySite(s), [0.0, 0.0])
 
         # make sure spanners is unified
@@ -412,12 +522,12 @@ class Test(unittest.TestCase):
         p1.append(n3)
 
         slur1 = Slur()
-        slur1.add([n1, n3])
+        slur1.addComponents([n1, n3])
 
         p1.append(slur1)
 
         self.assertEqual(len(s), 3)
-        self.assertEqual(slur1.get(), [n1, n3])
+        self.assertEqual(slur1.getComponents(), [n1, n3])
 
         self.assertEqual(slur1.getOffsetsBySite(p1), [0.0, 4.0])
         self.assertEqual(slur1.getOffsetSpanBySite(p1), [0.0, 4.0])
@@ -425,7 +535,7 @@ class Test(unittest.TestCase):
 
 
     def testSpannerBundle(self):
-        from music21 import spanner
+        from music21 import spanner, stream
 
         su1 = spanner.Slur()
         su1.idLocal = 1
@@ -438,6 +548,17 @@ class Test(unittest.TestCase):
         self.assertEqual(sb[0], su1)
         self.assertEqual(sb[1], su2)
 
+        su3 = spanner.Slur()
+        su4 = spanner.Slur()
+
+        s = stream.Stream()
+        s.append(su3)
+        s.append(su4)
+        sb2 = spanner.SpannerBundle(s)
+        self.assertEqual(len(sb2), 2)
+        self.assertEqual(sb2[0], su3)
+        self.assertEqual(sb2[1], su4)
+
 
     def testDeepcopySpanner(self):
         from music21 import spanner, note
@@ -449,13 +570,14 @@ class Test(unittest.TestCase):
         n3 = note.Note()
 
         su1 = Slur()
-        su1.add([n1, n3])
+        su1.addComponents([n1, n3])
 
         su2 = copy.deepcopy(su1)
 
-        self.assertEqual(su1.get(), [n1, n3])
-        self.assertEqual(su2.get(), [n1, n3])
+        self.assertEqual(su1.getComponents(), [n1, n3])
+        self.assertEqual(su2.getComponents(), [n1, n3])
 
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
