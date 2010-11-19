@@ -978,6 +978,8 @@ class DefinedContexts(object):
         count = 0
         # search any defined contexts first
         # need to sort: look at most-recently added objs are first
+        # TODO: can optimize search of defined contexts if we store in advance
+        # all class names; then weakrefs will not have to be used
         objs = self.get(locationsTrail=True,  
                         sortByCreationTime=sortByCreationTime,
                         priorityTarget=priorityTarget)
@@ -1024,6 +1026,50 @@ class DefinedContexts(object):
             else: # post is not None
                 break
         return post
+
+
+
+    def getAllByClass(self, className, found=None, idFound=None, memo=None):
+        '''Return all known references of a given class
+
+        This will recursively search the defined contexts of existing defined contexts.
+
+        '''
+        if memo == None:
+            memo = {} # intialize
+        if found == None:
+            found = []
+        if idFound == None:
+            idFound = []
+
+        objs = self.get(locationsTrail=False)
+        for obj in objs:
+            #environLocal.printDebug(['memo', memo])
+            if obj is None: 
+                continue # in case the reference is dead
+            if common.isStr(className):
+                if type(obj).__name__.lower() == className.lower():
+                    found.append(obj)
+                    idFound.append(id(obj))
+            elif isinstance(obj, className):
+                    found.append(obj)
+                    idFound.append(id(obj))
+        for obj in objs:
+            if obj is None: 
+                continue # in case the reference is dead
+            # if after trying to match name, look in the defined contexts' 
+            # defined contexts [sic!]
+            if id(obj) not in memo.keys():
+                # if the object is a Musci21Object
+                if hasattr(obj, 'getContextByClass'):
+                    # store this object as having been searched
+                    memo[id(obj)] = obj
+                    # will add values to found
+                    #environLocal.printDebug(['getAllByClass()', 'about to call getAllContextsByClass', 'found', found, 'obj', obj])
+                    obj.getAllContextsByClass(className, found=found,
+                        idFound=idFound, memo=memo)
+        # returning found, but not necessary
+        return found
 
     def getAttrByName(self, attrName):
         '''Given an attribute name, search all objects and find the first
@@ -1873,6 +1919,43 @@ class Music21Object(JSONSerializer):
         return post
 
 
+
+    def getAllContextsByClass(self, className, found=None, idFound=None,
+                             memo=None):
+        '''Search both DefinedContexts as well as associated objects to find all matchinging classes. Returns [] if not match is found. 
+
+        '''
+        if memo is None:
+            memo = {} # intialize
+        if found == None:
+            found = []
+        if idFound == None:
+            idFound = []
+
+        post = None
+        # if this obj is a Stream
+        if hasattr(self, "elements"): 
+            semiFlat = self.semiFlat
+            # this memos updates to not exclude redundancies
+            memo[id(self)] = self
+            memo[id(semiFlat)] = semiFlat
+
+            for e in semiFlat.getElementsByClass([className]):
+                # cannot be sure if this element is already found, as we may be 
+                # looking at a flattened version of container
+                #if e not in found:
+                if id(e) not in idFound:
+                    found.append(e)
+                    idFound.append(id(e))
+
+        # next, search all defined contexts
+        self._definedContexts.getAllByClass(className, found=found,
+                                         idFound=idFound, memo=memo)
+
+        return found
+
+
+
     #---------------------------------------------------------------------------
     # properties
 
@@ -1881,7 +1964,7 @@ class Music21Object(JSONSerializer):
         if WEAKREF_ACTIVE:
             if self._currentParent is None: #leave None
                 return self._currentParent
-            else: # even if current parent is not a weakref, this will work
+            else: # even if current parent is not a weakref, this= will work
                 return common.unwrapWeakref(self._currentParent)
         else:
             return self._currentParent
@@ -3746,6 +3829,42 @@ class Test(unittest.TestCase):
         self.assertEqual(b1.getOffsetBySite(s), 50.0)
 
 
+
+    def testGetAllContextsByClass(self):
+        from music21 import base, note, stream, clef
+        s1 = stream.Stream()
+        s2 = stream.Stream()
+        n1 = note.Note()
+        n2 = note.Note()
+        c1 = clef.Clef()
+        c2 = clef.Clef()
+
+        s1.append(n1)
+        s1.append(c1)
+        s2.append(n2)
+        s2.append(c2)
+
+        # only get n1 here, as that is only level available
+        self.assertEqual(s1.getAllContextsByClass('Note'), [n1])
+        self.assertEqual(s2.getAllContextsByClass('Note'), [n2])
+        self.assertEqual(s1.getAllContextsByClass('Clef'), [c1])
+        self.assertEqual(s2.getAllContextsByClass('Clef'), [c2])
+
+        # attach s2 to s1
+        s2.append(s1)
+        # stream 1 gets both notes
+        self.assertEqual(s1.getAllContextsByClass('Note'), [n1, n2])
+        # clef 1 gets both notes
+        self.assertEqual(c1.getAllContextsByClass('Note'), [n1, n2])
+
+        # stream 2 gets all notes, b/c we take a flat version
+        self.assertEqual(s2.getAllContextsByClass('Note'), [n1, n2])
+        # clef 2 gets both notes
+        self.assertEqual(c2.getAllContextsByClass('Note'), [n1, n2])
+
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper, DefinedContexts]
@@ -3804,7 +3923,7 @@ if __name__ == "__main__":
 
         #t.testPickupMeauresBuilt()
         #t.testPickupMeauresImported()
-        t.testBoundLocations()
+        t.testGetAllContextsByClass()
 
 
 

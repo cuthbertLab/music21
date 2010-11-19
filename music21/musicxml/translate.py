@@ -517,16 +517,18 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
                 # create a new spanner
                 su = spanner.Slur()
                 su.idLocal = idFound
+                spannerBundle.append(su)
 
             # add a reference of this note to this spanner
             su.add(n)
 
             if mxObj.get('type') == 'stop':
                 su.completeStatus = True
+                # only add after complete
+                
 
             #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
 
-            spannerBundle.append(su)
 
     return n
 
@@ -1346,9 +1348,15 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spannersSlurs33c)
+        # have 10 spanners
+        self.assertEqual(len(s.flat.getElementsByClass('Spanner')), 5)
 
+        # can get the same from a a getAll search
+        self.assertEqual(len(s.getAllContextsByClass('Spanner')), 5)
 
-        s.show('t')
+        # try to get all spanners from the first note
+        self.assertEqual(len(s.flat.notes[0].getAllContextsByClass('Spanner')), 5)
+        #s.show('t')
 
         
 
