@@ -12163,10 +12163,10 @@ class Test(unittest.TestCase):
             else:
                 continue
         
-            if len(n.lyrics) > 0 and n.lyrics[0].syllabic == 'begin':
+            if len(n.lyrics) > 0:
                 nStart = n
             # if next is a begin, then this is an end
-            if (nStart != None and len(nNext.lyrics) > 0 and nNext.lyrics[0].syllabic == 'begin') or 'Rest' in nNext.classes:
+            elif nStart is not None and len(nNext.lyrics) > 0 and n.tie is None:
                 nEnd = n
             elif nNext is nLast:
                 nEnd = n
@@ -12177,13 +12177,21 @@ class Test(unittest.TestCase):
                 nStart = None
                 nEnd = None
         #ex.show()
-        
         exFlat = ex.flat
+        melismaByBeat = {}
         for sp in ex.spanners:  
             n = sp.getFirst()
             oMin, oMax = sp.getDurationSpanBySite(exFlat)
             dur = oMax - oMin
-            environLocal.printDebug(['start note:', n, 'beat:', n.beatStr, 'slured duration:', dur])
+            beatStr = n.beatStr
+            if beatStr not in melismaByBeat.keys():
+                melismaByBeat[beatStr] = []
+            melismaByBeat[beatStr].append(dur)
+            environLocal.printDebug(['start note:', n, 'beat:', beatStr, 'slured duration:', dur])
+
+        for beatStr in sorted(melismaByBeat.keys()):
+            avg = sum(melismaByBeat[beatStr]) / len(melismaByBeat[beatStr])
+            environLocal.printDebug(['melisma beat:', beatStr.ljust(6), 'average duration:', avg])
 
 
         # this approach looks for end conditions based on syllabic attributes
