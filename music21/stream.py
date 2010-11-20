@@ -625,16 +625,12 @@ class Stream(music21.Music21Object):
         # what happens here is that every time a Stream is copied, the 
         # all spanners bubble-up to the top of the point of copy; it is 
         # these that are copied
-        spannerBundle = spanner.SpannerBundle()
-        for sp in self.flat.spanners:
-        #for sp in self.flat.getAllContextsByClass('Spanner'):
-            # passing memo here might meant that lower-level Stream
-            # do not pass on spanners 
-            spannerBundle.append(copy.deepcopy(sp, memo))
-
-        # store a list of active spanners;
-        # only store these in the new copy; not yet implemented
-        activeSpanners = []
+#         spannerBundle = spanner.SpannerBundle()
+#         for sp in self.flat.spanners:
+#         #for sp in self.flat.getAllContextsByClass('Spanner'):
+#             # passing memo here might meant that lower-level Stream
+#             # do not pass on spanners 
+#             spannerBundle.append(copy.deepcopy(sp, memo))
 
         new = self.__class__()
         old = self
@@ -658,9 +654,6 @@ class Stream(music21.Music21Object):
             elif name == '_elements':
                 # must manually add elements to 
                 for e in self._elements: 
-                    # do not copy spanners; must handle at end
-                    if isinstance(e, spanner.Spanner):
-                        continue
                     #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.parent', e.parent, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
                     # this will work for all with __deepcopy___
                     newElement = copy.deepcopy(e, memo)
@@ -668,17 +661,6 @@ class Stream(music21.Music21Object):
                     # user here to provide new offset
                     new.insert(e.getOffsetBySite(old), newElement, 
                                ignoreSort=True)
-
-                    # after insertion, need to see if the old spanner
-                    # is found in any of our new spanners; if so, they
-                    # need to be updated; give old, new
-                    # note: another way to do this might be for each spanner
-                    # to have a an object that stores weak-refs to a spanner obj        
-                    # but these too would go out of date when copied
-                    #activeSpanners += spannerBundle.replaceComponent(e, 
-                    #                  newElement)
-                    spannerBundle.replaceComponent(e, newElement)
-
 
             elif name == '_endElements':
                 # must manually add elements to 
@@ -702,13 +684,20 @@ class Stream(music21.Music21Object):
                 #setattr() will call the set method of a named property.
                 setattr(new, name, newValue)
 
-        # after updating all copied spanners, add all to the 
-        # topmost level
-        # TODO: might only copy activeSpanners
-        for sp in spannerBundle:
-        #for sp in activeSpanners:
-            environLocal.printDebug(['adding spanner to new:', sp, 'id(sp)', id(sp), 'sp.getComponentIds()', sp.getComponentIds()])
-            new.insert(0, sp)
+        # do after all other copying
+        new._idLastDeepCopyOf = id(self)
+
+        # after copying all elements
+        # get all spanners at all levels from new: 
+        # these have references to old objects
+        # NOTE: it is likely that this only needs to be done at the highest
+        # level of recursion, not on component Streams
+        spannerBundle = spanner.SpannerBundle(new.flat.spanners)
+        # iterate over complete semi flat (need containers); find
+        # all new/old pairs
+        for e in new.semiFlat:
+            # update based on last id, new object
+            spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
 
         return new
 

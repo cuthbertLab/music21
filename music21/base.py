@@ -1397,10 +1397,6 @@ class Music21Object(JSONSerializer):
     id = None
     _priority = 0
     classSortOrder = 20  # default classSortOrder
-    _overriddenLily = None
-    # None is stored as the internal location of an obj w/o a parent
-    _currentParent = None
-    _currentParentId = None # cached id in case the weakref has gone away...
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['searchParentByAttr', 'getContextAttr', 'setContextAttr']
@@ -1443,6 +1439,15 @@ class Music21Object(JSONSerializer):
         # not in a local parameter
 #         if "offset" in keywords and not self.offset:
 #             self.offset = keywords["offset"]
+
+        self._overriddenLily = None
+        # None is stored as the internal location of an obj w/o a parent
+        self._currentParent = None
+        # cached id in case the weakref has gone away...
+        self._currentParentId = None 
+    
+        # if this element has been copied, store the id() of the last source
+        self._idLastDeepCopyOf = None
 
         if "id" in keywords and not self.id:
             self.id = keywords["id"]            
@@ -1524,6 +1529,7 @@ class Music21Object(JSONSerializer):
         '''
         # call class to get a new, empty instance
         new = self.__class__()
+        #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
         #for name in dir(self):
         for name in self.__dict__.keys():
             if name.startswith('__'):
@@ -1544,6 +1550,9 @@ class Music21Object(JSONSerializer):
                 newValue = copy.deepcopy(part, memo)
                 #setattr() will call the set method of a named property.
                 setattr(new, name, newValue)
+
+        # must do this after copying
+        new._idLastDeepCopyOf = id(self)
         return new
 
 
@@ -2968,9 +2977,12 @@ class ElementWrapper(Music21Object):
         (False, True)
         '''
         new = self.__copy__()
+
         # this object needs a new locations object
         new._definedContexts = copy.deepcopy(self._definedContexts)
         new.obj = copy.deepcopy(self.obj)
+
+        new._idLastDeepCopyOf = id(self)
         return new
 
     #---------------------------------------------------------------------------
@@ -3893,6 +3905,13 @@ class Test(unittest.TestCase):
 
 
 
+    def testStoreLastDeepCopyOf(self):
+        from music21 import note
+        
+        n1 = note.Note()
+        n2 = copy.deepcopy(n1)
+        self.assertEqual(n2._idLastDeepCopyOf, id(n1))
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper, DefinedContexts]
@@ -3951,8 +3970,9 @@ if __name__ == "__main__":
 
         #t.testPickupMeauresBuilt()
         #t.testPickupMeauresImported()
-        t.testGetAllContextsByClass()
+        #t.testGetAllContextsByClass()
 
+        t.testStoreLastDeepCopyOf()
 
 
 #------------------------------------------------------------------------------

@@ -1033,7 +1033,8 @@ def streamPartToMx(s, instObj=None, meterStream=None,
 
         # after calling measuresStream, need to update Spanners, as a deepcopy
         # has been made
-        # using getAll b/c might need spanners from a higher level container
+        # might need to getAll b/c might need spanners 
+        # from a higher level container
         #spannerBundle = spanner.SpannerBundle(
         #                measureStream.flat.getAllContextsByClass('Spanner'))
         # only getting spanners at this level
@@ -1408,6 +1409,7 @@ class Test(unittest.TestCase):
 
         # try to get all spanners from the first note
         self.assertEqual(len(s.flat.notes[0].getAllContextsByClass('Spanner')), 5)
+        post = s.musicxml
         #s.show('t')
         #s.show()
         

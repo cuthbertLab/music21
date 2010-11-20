@@ -200,12 +200,18 @@ class Spanner(music21.Music21Object):
 
     def replaceComponent(self, old, new):
         '''When copying a Spanner, we need to update the spanner with new references for copied components. Given the old component, this method will replace the old with the new.
+
+        The `old` parameter can be either an object or object id. 
         '''
-        idTarget = id(old)
+        if common.isNum(old): # assume this is an id
+            idTarget = old
+        else:
+            idTarget = id(old)
+
         # get index form id list; 
         indexTarget = self.getComponentIds().index(idTarget)
         self._components[indexTarget] = Component(new)
-        environLocal.printDebug(['replaceComponent()', 'id(old)', id(old), 'id(new)', id(new)])
+        #environLocal.printDebug(['replaceComponent()', 'id(old)', id(old), 'id(new)', id(new)])
 
 #     def __del__(self):
 #         '''On deletion, remove this reference from Spanners.
@@ -407,15 +413,25 @@ class SpannerBundle(object):
 
     def replaceComponent(self, old, new):
         '''Given a spanner component (an object), replace all old components with new components for all Spanner objects contained in this bundle.
+
+        The `old` parameter can be either an object or object id. 
         '''
-        idTarget = id(old)
-        post = self.__class__() # return a bundle of spanners that had changes
+        #environLocal.printDebug(['SpannerBundle.replaceComponent()', 'old', old, 'new', new])
+
+        if common.isNum(old): # assume this is an id
+            idTarget = old
+        else:
+            idTarget = id(old)
+        #post = self.__class__() # return a bundle of spanners that had changes
         for sp in self._storage:
+            #environLocal.printDebug(['looking at spanner', sp, sp.getComponentIds()])
+
             # must check to see if this id is in this spanner
             if idTarget in sp.getComponentIds():
                 sp.replaceComponent(old, new)
-                post.append(sp)
-        return post
+                #post.append(sp)
+                #environLocal.printDebug(['replaceComponent()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
+        #return post
 
 
     def getByClass(self, className):
