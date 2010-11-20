@@ -618,6 +618,24 @@ class Stream(music21.Music21Object):
         '''
         #environLocal.printDebug(['Stream calling __deepcopy__', self])
 
+        # get all spanners at or below this level in a spanner bundle
+        # it is possible to get spanners above this level too, by using 
+        # getAllContextsByClass, but this would orphan the spanner from 
+        # its container 
+        # what happens here is that every time a Stream is copied, the 
+        # all spanners bubble-up to the top of the point of copy; it is 
+        # these that are copied
+        spannerBundle = spanner.SpannerBundle()
+        for sp in self.flat.spanners:
+        #for sp in self.flat.getAllContextsByClass('Spanner'):
+            # passing memo here might meant that lower-level Stream
+            # do not pass on spanners 
+            spannerBundle.append(copy.deepcopy(sp, memo))
+
+        # store a list of active spanners;
+        # only store these in the new copy; not yet implemented
+        activeSpanners = []
+
         new = self.__class__()
         old = self
         for name in self.__dict__.keys():
@@ -640,6 +658,9 @@ class Stream(music21.Music21Object):
             elif name == '_elements':
                 # must manually add elements to 
                 for e in self._elements: 
+                    # do not copy spanners; must handle at end
+                    if isinstance(e, spanner.Spanner):
+                        continue
                     #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.parent', e.parent, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
                     # this will work for all with __deepcopy___
                     newElement = copy.deepcopy(e, memo)
@@ -647,6 +668,17 @@ class Stream(music21.Music21Object):
                     # user here to provide new offset
                     new.insert(e.getOffsetBySite(old), newElement, 
                                ignoreSort=True)
+
+                    # after insertion, need to see if the old spanner
+                    # is found in any of our new spanners; if so, they
+                    # need to be updated; give old, new
+                    # note: another way to do this might be for each spanner
+                    # to have a an object that stores weak-refs to a spanner obj        
+                    # but these too would go out of date when copied
+                    #activeSpanners += spannerBundle.replaceComponent(e, 
+                    #                  newElement)
+                    spannerBundle.replaceComponent(e, newElement)
+
 
             elif name == '_endElements':
                 # must manually add elements to 
@@ -669,7 +701,15 @@ class Stream(music21.Music21Object):
                 newValue = copy.deepcopy(part, memo)
                 #setattr() will call the set method of a named property.
                 setattr(new, name, newValue)
-                
+
+        # after updating all copied spanners, add all to the 
+        # topmost level
+        # TODO: might only copy activeSpanners
+        for sp in spannerBundle:
+        #for sp in activeSpanners:
+            environLocal.printDebug(['adding spanner to new:', sp, 'id(sp)', id(sp), 'sp.getComponentIds()', sp.getComponentIds()])
+            new.insert(0, sp)
+
         return new
 
     #---------------------------------------------------------------------------
@@ -12080,6 +12120,44 @@ class Test(unittest.TestCase):
         self.assertEqual(str([n for n in s.voices[0].notes]), '[<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>]')        
 
 
+
+    def testDeepcopySpanners(self):
+        from music21 import note, spanner, stream
+        n1 = note.Note()
+        n2 = note.Note('a4')
+        n3 = note.Note('g#4')
+        n3.quarterLength = .25
+
+        su1 = spanner.Slur(n1, n2)
+        s1 = stream.Stream()
+        s1.append(n1)
+        s1.repeatAppend(n3, 4)
+        s1.append(n2)
+        s1.insert(su1)
+   
+        self.assertEqual(s1.notes[0] in s1.spanners[0].getComponents(), True)
+        self.assertEqual(s1.notes[-1] in s1.spanners[0].getComponents(), True)
+ 
+        s2 = copy.deepcopy(s1)
+
+        # old relations are still valid
+        self.assertEqual(len(s1.spanners), 1)
+        self.assertEqual(s1.notes[0] in s1.spanners[0].getComponents(), True)
+        self.assertEqual(s1.notes[-1] in s1.spanners[0].getComponents(), True)
+
+        # new relations exist in new stream.
+        self.assertEqual(len(s2.spanners), 1)
+        self.assertEqual(s2.notes[0] in s2.spanners[0].getComponents(), True)
+        self.assertEqual(s2.notes[-1] in s2.spanners[0].getComponents(), True)
+
+
+        self.assertEqual(s2.spanners[0].getComponents(), [s2.notes[0], s2.notes[-1]])
+
+        post = s2.musicxml
+        #s2.show('t')
+        #s2.show()
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -12120,7 +12198,8 @@ if __name__ == "__main__":
 #         t.testAugmentOrDiminishCorpus()
 #         t.testAugmentOrDiminishHighestTimes()
 
-        t.testVoicesToPartsA()
+        #t.testVoicesToPartsA()
+        t.testDeepcopySpanners()
 
 #------------------------------------------------------------------------------
 # eof

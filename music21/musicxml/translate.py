@@ -382,7 +382,12 @@ def noteToMxNotes(n, spannerBundle=None):
 
     if spannerBundle is not None:
         # this will get all spanners that participate with this note
+        if len(spannerBundle) > 0:
+            pass
+            #environLocal.printDebug(['noteToMxNotes(): spannerBundle pre-filter:', spannerBundle, 'spannerBundle[0]', spannerBundle[0], 'id(spannerBundle[0])', id(spannerBundle[0]), 'spannerBundle[0].getComponentIds()', spannerBundle[0].getComponentIds(), 'id(n)', id(n)])
+
         spannerBundle = spannerBundle.getByComponent(n)
+
         #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle])
 
     mxNoteList = []
@@ -440,7 +445,7 @@ def noteToMxNotes(n, spannerBundle=None):
         # already filtered for just the spanner that have this note as
         # a component
         for su in spannerBundle.getByClass('Slur'):     
-            mxSlur = musicxml.Slur()
+            mxSlur = musicxmlMod.Slur()
             mxSlur.set('number', su.idLocal)
             mxSlur.set('placement', su.placement)
             # is this note first in this spanner?
@@ -990,6 +995,8 @@ def streamPartToMx(s, instObj=None, meterStream=None,
 
     The `meterStream`, if provides a template of meters. 
     '''
+    from music21 import spanner
+
     #environLocal.printDebug(['calling Stream._getMXPart'])
     # note: meterStream may have TimeSignature objects from an unrelated
     # Stream.
@@ -1022,6 +1029,16 @@ def streamPartToMx(s, instObj=None, meterStream=None,
         measureStream = s.makeNotation(meterStream=meterStream,
                         refStreamOrTimeRange=refStreamOrTimeRange)
         #environLocal.printDebug(['Stream._getMXPart: post makeNotation, length', len(measureStream)])
+
+
+        # after calling measuresStream, need to update Spanners, as a deepcopy
+        # has been made
+        # using getAll b/c might need spanners from a higher level container
+        #spannerBundle = spanner.SpannerBundle(
+        #                measureStream.flat.getAllContextsByClass('Spanner'))
+        # only getting spanners at this level
+        spannerBundle = spanner.SpannerBundle(measureStream.flat)
+
     else: # there are measures
         # check that first measure has any atributes in outer Stream
         # this is for non-standard Stream formations (some kern imports)
@@ -1073,11 +1090,6 @@ def streamToMx(s, spannerBundle=None):
         # recursive call to this non-empty stream
         return streamToMx(out)
 
-    if spannerBundle is None: 
-        # no spanner bundle provided, get one from the flat stream
-        spannerBundle = spanner.SpannerBundle(s.flat)
-        environLocal.printDebug(['streamToMx(): loaded spannerBundle of size:', len(spannerBundle)])
-
     #environLocal.printDebug('calling Stream._getMX')
     # stores pairs of mxScorePart and mxScore
     mxComponents = []
@@ -1101,6 +1113,13 @@ def streamToMx(s, spannerBundle=None):
 
         # making a deepcopy, as we are going to edit internal objs
         partStream = copy.deepcopy(s)
+
+        # must set spanner after copying
+        if spannerBundle is None: 
+            # no spanner bundle provided, get one from the flat stream
+            spannerBundle = spanner.SpannerBundle(partStream.flat)
+            environLocal.printDebug(['streamToMx(), hasPartLikeStreams(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
+
 
         for obj in partStream.getElementsByClass('Stream'):
             # may need to copy element here
@@ -1158,6 +1177,13 @@ def streamToMx(s, spannerBundle=None):
         # if no instrument is provided it will be obtained through s
         # when _getMxPart is called
         #mxComponents.append(s._getMXPart(None, meterStream))
+
+        if spannerBundle is None: 
+            # no spanner bundle provided, get one from the flat stream
+            spannerBundle = spanner.SpannerBundle(s.flat)
+            environLocal.printDebug(['streamToMx(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
+
+
         mxComponents.append(streamPartToMx(s,
                 meterStream=meterStream, 
                 spannerBundle=spannerBundle))

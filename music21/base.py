@@ -1526,12 +1526,9 @@ class Music21Object(JSONSerializer):
         new = self.__class__()
         #for name in dir(self):
         for name in self.__dict__.keys():
-
             if name.startswith('__'):
                 continue
-           
             part = getattr(self, name)
-            
             # attributes that require special handling
             if name == '_currentParent':
                 #environLocal.printDebug(['creating parent reference'])
@@ -1547,7 +1544,6 @@ class Music21Object(JSONSerializer):
                 newValue = copy.deepcopy(part, memo)
                 #setattr() will call the set method of a named property.
                 setattr(new, name, newValue)
-                
         return new
 
 
@@ -3853,15 +3849,21 @@ class Test(unittest.TestCase):
         from music21 import base, note, stream, clef
         s1 = stream.Stream()
         s2 = stream.Stream()
+        s3 = stream.Stream()
+
         n1 = note.Note()
         n2 = note.Note()
+        n3 = note.Note()
         c1 = clef.Clef()
         c2 = clef.Clef()
+        c3 = clef.Clef()
 
         s1.append(n1)
         s1.append(c1)
         s2.append(n2)
         s2.append(c2)
+        s3.append(n3)
+        s3.append(c3)
 
         # only get n1 here, as that is only level available
         self.assertEqual(s1.getAllContextsByClass('Note'), [n1])
@@ -3881,6 +3883,13 @@ class Test(unittest.TestCase):
         # clef 2 gets both notes
         self.assertEqual(c2.getAllContextsByClass('Note'), [n1, n2])
 
+
+        # attach s2 to s3
+        s3.append(s2)
+        # any stream can get all three notes
+        self.assertEqual(s1.getAllContextsByClass('Note'), [n1, n2, n3])
+        self.assertEqual(s2.getAllContextsByClass('Note'), [n1, n2, n3])
+        self.assertEqual(s3.getAllContextsByClass('Note'), [n1, n2, n3])
 
 
 

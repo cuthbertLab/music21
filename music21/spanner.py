@@ -15,7 +15,7 @@ import music21
 from music21 import common
 
 from music21 import environment
-_MOD = "spanners.py"  
+_MOD = "spanner.py"  
 environLocal = environment.Environment(_MOD)
 
 
@@ -59,7 +59,7 @@ class Component(object):
 
 
     def __deepcopy__(self, memo=None):
-        '''Manage deepcopying by creating a new reference.
+        '''Manage deepcopying by creating a new reference to the same object.
         '''
         new = self.__class__()
         new.set(self.getComponents())
@@ -197,6 +197,16 @@ class Spanner(music21.Music21Object):
             # create a component instance for each
             self._components.append(Component(c))
 
+
+    def replaceComponent(self, old, new):
+        '''When copying a Spanner, we need to update the spanner with new references for copied components. Given the old component, this method will replace the old with the new.
+        '''
+        idTarget = id(old)
+        # get index form id list; 
+        indexTarget = self.getComponentIds().index(idTarget)
+        self._components[indexTarget] = Component(new)
+        environLocal.printDebug(['replaceComponent()', 'id(old)', id(old), 'id(new)', id(new)])
+
 #     def __del__(self):
 #         '''On deletion, remove this reference from Spanners.
 #         '''
@@ -279,17 +289,20 @@ class SpannerBundle(object):
         self._storage = []
 
         for arg in arguments:
-            if 'Stream' in arg.classes:
+            if common.isListLike(arg):
+                for e in arg:
+                    self._storage.append(e)                
+            elif 'Stream' in arg.classes:
                 for e in arg.spanners:
                     self._storage.append(e)
-
-
+            # assume its a spanner
+            elif 'Spanner' in arg.classes:
+                self._storage.append(arg)
+    
     def append(self, other):
         self._storage.append(other)
 
     def __len__(self):
-        '''
-        '''
         return len(self._storage)
 
     def __iter__(self):
@@ -301,13 +314,17 @@ class SpannerBundle(object):
     def __repr__(self):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
 
-    def asList(self):
+    def _getList(self):
         '''Return the bundle as a list.
         '''
         post = []
         for x in self._storage:
             post.append(x)
         return post
+
+    list = property(_getList, 
+        doc='''Return the bundle as a list.
+        ''')
 
     def getByIdLocal(self, idLocal=None):
         '''Get spanners by `idLocal` or `complete` status.
@@ -373,11 +390,11 @@ class SpannerBundle(object):
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
-        >>> sb.getByComponent(n1).asList() == [su1]
+        >>> sb.getByComponent(n1).list == [su1]
         True
-        >>> sb.getByComponent(n3).asList() == [su2]
+        >>> sb.getByComponent(n3).list == [su2]
         True
-        >>> sb.getByComponent(n2).asList() == [su1, su2]
+        >>> sb.getByComponent(n2).list == [su1, su2]
         True
         '''
         idTarget = id(component)
@@ -387,6 +404,18 @@ class SpannerBundle(object):
                 post.append(sp)
         return post
 
+
+    def replaceComponent(self, old, new):
+        '''Given a spanner component (an object), replace all old components with new components for all Spanner objects contained in this bundle.
+        '''
+        idTarget = id(old)
+        post = self.__class__() # return a bundle of spanners that had changes
+        for sp in self._storage:
+            # must check to see if this id is in this spanner
+            if idTarget in sp.getComponentIds():
+                sp.replaceComponent(old, new)
+                post.append(sp)
+        return post
 
 
     def getByClass(self, className):
@@ -398,11 +427,11 @@ class SpannerBundle(object):
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
-        >>> sb.getByClass(spanner.Slur).asList() == [su1]
+        >>> sb.getByClass(spanner.Slur).list == [su1]
         True
-        >>> sb.getByClass('Slur').asList() == [su1]
+        >>> sb.getByClass('Slur').list == [su1]
         True
-        >>> sb.getByClass('StaffGroup').asList() == [su2]
+        >>> sb.getByClass('StaffGroup').list == [su2]
         True
         '''
         post = self.__class__()
@@ -578,6 +607,70 @@ class Test(unittest.TestCase):
         self.assertEqual(su2.getComponents(), [n1, n3])
 
         
+        sb1 = spanner.SpannerBundle(su1, su2)
+        sb2 = copy.deepcopy(sb1)
+        self.assertEqual(sb1[0].getComponents(), [n1, n3])
+        self.assertEqual(sb2[0].getComponents(), [n1, n3])
+        # spanners stored within are not the same objects
+        self.assertEqual(id(sb2[0]) != id(sb1[0]), True)
+
+
+
+    def testReplaceComponent(self):
+        from music21 import note, spanner
+
+        n1 = note.Note()
+        n2 = note.Note()
+        n3 = note.Note()
+        n4 = note.Note()
+        n5 = note.Note()
+
+
+        su1 = spanner.Slur()
+        su1.addComponents([n1, n3])
+
+        self.assertEqual(su1.getComponents(), [n1, n3])
+
+        su1.replaceComponent(n1, n2)
+        self.assertEqual(su1.getComponents(), [n2, n3])
+        # replace n2 w/ n1
+        su1.replaceComponent(n2, n1)
+        self.assertEqual(su1.getComponents(), [n1, n3])
+
+
+        su2 = spanner.Slur()
+        su2.addComponents([n3, n4])
+
+        su3 = spanner.Slur()
+        su3.addComponents([n4, n5])
+
+
+        n1a = note.Note()
+        n2a = note.Note()
+        n3a = note.Note()
+        n4a = note.Note()
+        n5a = note.Note()
+
+        sb1 = spanner.SpannerBundle(su1, su2, su3)
+        self.assertEqual(len(sb1), 3)
+        self.assertEqual(sb1.list, [su1, su2, su3])
+
+        # n3 is found in su1 and su2
+
+        sb1.replaceComponent(n3, n3a)
+        self.assertEqual(len(sb1), 3)
+        self.assertEqual(sb1.list, [su1, su2, su3])
+
+        self.assertEqual(sb1[0].getComponents(), [n1, n3a])
+        # check su2
+        self.assertEqual(sb1[1].getComponents(), [n3a, n4])
+
+        sb1.replaceComponent(n4, n4a)
+        self.assertEqual(sb1[1].getComponents(), [n3a, n4a])
+
+        # check su3
+        self.assertEqual(sb1[2].getComponents(), [n4a, n5])
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -592,7 +685,7 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
 
-
+        t.testReplaceComponent()
 
 
 
