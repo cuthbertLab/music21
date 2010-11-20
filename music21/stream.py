@@ -12147,6 +12147,17 @@ class Test(unittest.TestCase):
         #s2.show()
 
 
+    def testAddSlurByMelisma(self):
+        from music21 import corpus
+        s = corpus.parseWork('gloria')
+        ex = s.parts[0]
+        for n in ex.flat.notes:
+            if len(n.lyrics) > 0:
+            
+                print n.lyrics[0].syllabic
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
@@ -12188,7 +12199,9 @@ if __name__ == "__main__":
 #         t.testAugmentOrDiminishHighestTimes()
 
         #t.testVoicesToPartsA()
-        t.testDeepcopySpanners()
+        #t.testDeepcopySpanners()
+        t.testAddSlurByMelisma()
+
 
 #------------------------------------------------------------------------------
 # eof
