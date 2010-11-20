@@ -12148,14 +12148,68 @@ class Test(unittest.TestCase):
 
 
     def testAddSlurByMelisma(self):
-        from music21 import corpus
+        from music21 import corpus, spanner
         s = corpus.parseWork('gloria')
         ex = s.parts[0]
-        for n in ex.flat.notes:
-            if len(n.lyrics) > 0:
-            
-                print n.lyrics[0].syllabic
+        nStart = None
+        nEnd = None
+        
+        exFlatNotes = ex.flat.notes
+        nLast = exFlatNotes[-1]
+        
+        for i, n in enumerate(exFlatNotes):
+            if i < len(exFlatNotes) - 1:
+                nNext = exFlatNotes[i+1]
+            else:
+                continue
+        
+            if len(n.lyrics) > 0 and n.lyrics[0].syllabic == 'begin':
+                nStart = n
+            # if next is a begin, then this is an end
+            if (nStart != None and len(nNext.lyrics) > 0 and nNext.lyrics[0].syllabic == 'begin') or 'Rest' in nNext.classes:
+                nEnd = n
+            elif nNext is nLast:
+                nEnd = n
+        
+            if nStart is not None and nEnd is not None:
+                # insert in top-most container
+                ex.insert(spanner.Slur(nStart, nEnd))
+                nStart = None
+                nEnd = None
+        #ex.show()
+        
+        exFlat = ex.flat
+        for sp in ex.spanners:  
+            n = sp.getFirst()
+            oMin, oMax = sp.getDurationSpanBySite(exFlat)
+            dur = oMax - oMin
+            environLocal.printDebug(['start note:', n, 'beat:', n.beatStr, 'slured duration:', dur])
 
+
+        # this approach looks for end conditions based on syllabic attributes
+        # and ties
+        
+        #         getNextEndTie = False
+        #         for n in ex.flat.notes:
+        #             if len(n.lyrics) > 0:
+        #                 if n.lyrics[0].syllabic == 'begin':
+        #                     nStart = n
+        #                 elif n.lyrics[0].syllabic == 'end':
+        #                     if n.tie is not None and n.tie.type != 'stop':
+        #                         getNextEndTie = True
+        #                     else:
+        #                         nEnd = n
+        # 
+        #             if getNextEndTie:
+        #                 if n.tie.type == 'stop':
+        #                     nEnd = n
+        #                     getNextEndTie = False
+        # 
+        #             if nStart is not None and nEnd is not None:
+        #                 # insert in top-most container
+        #                 ex.insert(spanner.Slur(nStart, nEnd))
+        #                 nStart = None
+        #                 nEnd = None
 
 
 #-------------------------------------------------------------------------------

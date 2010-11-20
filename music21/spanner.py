@@ -47,7 +47,7 @@ class Component(object):
         self.id = id(component)
         self._ref = common.wrapWeakref(component)
 
-    def getComponents(self):
+    def get(self):
         return common.unwrapWeakref(self._ref)
 
     # for serialization, need to wrap and unwrap weakrefs
@@ -62,7 +62,7 @@ class Component(object):
         '''Manage deepcopying by creating a new reference to the same object.
         '''
         new = self.__class__()
-        new.set(self.getComponents())
+        new.set(self.get())
         new.offset = self.offset
         return new
 
@@ -126,8 +126,11 @@ class Spanner(music21.Music21Object):
         return ''.join(msg)
 
 
+    def __getitem__(self, key):
+        return self._components[key]
+
     def getComponents(self):
-        '''Return all components for this Spanner. 
+        '''Return all components for this Spanner as objects, without weak-refs.  
 
         As this is a Music21Object, the name here is more specific to avoid name clashes.
 
@@ -149,7 +152,7 @@ class Spanner(music21.Music21Object):
         '''
         post = []
         for c in self._components:
-            q = c.getComponents() # unwrap weakreference
+            q = c.get() # unwrap weakreference
             if q != None:
                 post.append(q)
         return post
@@ -246,6 +249,23 @@ class Spanner(music21.Music21Object):
             return True
         return False
 
+    def getFirst(self):
+        '''Get the object of the first component
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> n3 = note.Note('e')
+        >>> n4 = note.Note('c')
+        >>> n5 = note.Note('d-')
+
+        >>> sl = spanner.Slur()
+        >>> sl.addComponents(n1, n2, n3, n4, n5)
+        >>> sl.getFirst() is n1
+        True
+        '''
+        return self._components[0].get()
+
     def isLast(self, component):
         '''Given a component, is it last?
         '''
@@ -254,6 +274,23 @@ class Spanner(music21.Music21Object):
             return True
         return False
 
+    def getLast(self):
+        '''Get the object of the first component
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> n3 = note.Note('e')
+        >>> n4 = note.Note('c')
+        >>> n5 = note.Note('d-')
+
+        >>> sl = spanner.Slur()
+        >>> sl.addComponents(n1, n2, n3, n4, n5)
+        >>> sl.getLast() is n5
+        True
+
+        '''
+        return self._components[-1].get()
 
     def getOffsetsBySite(self, site, componentOffset=True):
         '''Given a site shared by all components, return a list of offset values.
@@ -262,10 +299,12 @@ class Spanner(music21.Music21Object):
         '''
         post = []
         idSite = id(site)
-        for c in self.getComponents():
+        for c in self._components:
+        #for c in self.getComponents():
+            obj = c.get()
             # getting site ids is fast, as weakrefs do not have to be unpacked
-            if idSite in c.getSiteIds():
-                o = c.getOffsetBySite(site)
+            if idSite in obj.getSiteIds():
+                o = obj.getOffsetBySite(site)
                 if componentOffset:
                     post.append(o+c.offset)
                 else:    
@@ -277,6 +316,40 @@ class Spanner(music21.Music21Object):
         '''
         post = self.getOffsetsBySite(site, componentOffset=componentOffset)
         return [min(post), max(post)]
+
+
+    def getDurationSpanBySite(self, site, componentOffset=True):
+        '''Return the duration span, or the distnace between the first component's offset and the last components offset plus duration. 
+        '''
+        # these are in order
+        post = []
+        idSite = id(site)
+        offsetComponent = [] # store pairs
+        for c in self._components:
+        #for c in self.getComponents():
+            # getting site ids is fast, as weakrefs do not have to be unpacked
+            obj = c.get()
+            if idSite in obj.getSiteIds():
+                o = obj.getOffsetBySite(site)
+                if componentOffset:
+                    oFinal = o+c.offset
+                else:    
+                    oFinal = o
+                offsetComponent.append([oFinal, obj])
+        offsetComponent.sort() # sort by offset
+        minOffset = offsetComponent[0][0]
+        minComponent = offsetComponent[0][1]
+
+        maxOffset = offsetComponent[-1][0]
+        maxComponent = offsetComponent[-1][1]
+        if maxComponent.duration is not None:
+            highestTime = maxOffset + maxComponent.duration.quarterLength
+        else:
+            highestTime = maxOffset
+    
+        return [minOffset, highestTime]
+
+
 
 
 
@@ -574,8 +647,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 3)
         self.assertEqual(slur1.getComponents(), [n1, n3])
 
-        self.assertEqual(slur1.getOffsetsBySite(p1), [0.0, 4.0])
-        self.assertEqual(slur1.getOffsetSpanBySite(p1), [0.0, 4.0])
+        self.assertEqual(slur1.getOffsetsBySite(p1), [0.0, 2.0])
+        self.assertEqual(slur1.getOffsetSpanBySite(p1), [0.0, 2.0])
 
 
 
