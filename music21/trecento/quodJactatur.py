@@ -1,6 +1,3 @@
-from music21 import *
-import copy
-
 #-------------------------------------------------------------------------------
 # Name:         quodJactatur.py
 # Purpose:      module for exploring the properties of QuodJactatur
@@ -44,6 +41,8 @@ without any problems.  Working on this problem also gave a great test
 of music21's ability to manipulate diatonic Streams.
 '''
 
+from music21 import *
+import copy
 
 
 def reverse(self, inPlace = False, 

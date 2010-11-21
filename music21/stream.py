@@ -6309,9 +6309,13 @@ class Measure(Stream):
         
     #---------------------------------------------------------------------------
     def mergeAttributes(self, other):
-        '''Given another Measure, configure all non-element attributes of this Measure with the attributes of the other Measure. No elements will be changed or copied.
+        '''
+        Given another Measure, configure all non-element attributes of this 
+        Measure with the attributes of the other Measure. No elements 
+        will be changed or copied.
 
-        This method is necessary because Measures, unlike some Streams, have attributes independent of any stored elements.
+        This method is necessary because Measures, unlike some Streams, 
+        have attributes independent of any stored elements.
         '''
         # calling bass class sets id, groups
         music21.Music21Object.mergeAttributes(self, other)
@@ -12170,7 +12174,7 @@ class Test(unittest.TestCase):
 
     def testAddSlurByMelisma(self):
         from music21 import corpus, spanner
-        s = corpus.parseWork('gloria')
+        s = corpus.parseWork('luca/gloria')
         ex = s.parts[0]
         nStart = None
         nEnd = None

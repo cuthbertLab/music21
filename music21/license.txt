@@ -3,6 +3,9 @@
 # Purpose:      The following license applies to all Python files distributed 
 #               with music21. This licenses does not apply to other content
 #               distributed with this package. 
+# Copyright:    music21 is Copyright 2010 The music21 Project and is
+#               freely licensed under the GNU Lesser General Public License
+#               reprinted below.
 #
 #-------------------------------------------------------------------------------
 

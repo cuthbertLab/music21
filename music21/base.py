@@ -1486,7 +1486,10 @@ class Music21Object(JSONSerializer):
     
 
     def mergeAttributes(self, other):
-        '''Merge all elementary, static attributes. Namely, `id` and `groups` attributes from another music21 object. Can be useful for copy-like operations.
+        '''
+        Merge all elementary, static attributes. Namely, 
+        `id` and `groups` attributes from another music21 object. 
+        Can be useful for copy-like operations.
         '''
         self.id = other.id
         self.groups = copy.deepcopy(other.groups)
