@@ -3707,12 +3707,21 @@ class Stream(music21.Music21Object):
 
     def stripTies(self, inPlace=False, matchByPitch=False,
          retainContainers=False):
-        '''Find all notes that are tied; remove all tied notes, then make the first of the tied notes have a duration equal to that of all tied 
-        constituents. Lastly, remove the formerly-tied notes.
+        '''
+        Find all notes that are tied; remove all tied notes, 
+        then make the first of the tied notes have a duration 
+        equal to that of all tied constituents. Lastly, 
+        remove the formerly-tied notes.
 
-        This method can be used on Stream and Stream subclasses. When used on a Score, Parts and Measures are retained. 
+        This method can be used on Stream and Stream subclasses. 
+        When used on a Score, Parts and Measures are retained. 
 
-        If `retainContainers` is False (by default), this method only returns Note objects; Measures and other structures are stripped from the Stream. Set `retainContainers` to True to remove ties from a :class:`~music21.part.Part` Stream that contains :class:`~music21.stream.Measure` Streams, and get back a multi-Measure structure.
+        If `retainContainers` is False (by default), this method only 
+        returns Note objects; Measures and other structures are stripped 
+        from the Stream. Set `retainContainers` to True to remove ties 
+        from a :class:`~music21.part.Part` Stream that contains 
+        :class:`~music21.stream.Measure` Streams, and get back a 
+        multi-Measure structure.
 
         Presently, this only works if tied notes are sequentual; ultimately
         this will need to look at .to and .from attributes (if they exist)
@@ -3868,7 +3877,14 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
 
     def sort(self):
-        '''Sort this Stream in place by offset, as well as by the standard class sort order.
+        '''
+        Sort this Stream in place by offset, then priority, then 
+        standard class sort order (e.g., Clefs before KeySignatures before
+        TimeSignatures).
+
+        Note that Streams automatically sort themsevlves unless
+        autoSort is set to False (as in the example below)
+
 
         >>> from music21 import *
         >>> n1 = note.Note('a')
@@ -3941,17 +3957,22 @@ class Stream(music21.Music21Object):
         {1.0} <music21.note.Note D>
         {0.0} <music21.note.Note C>
         
+        
         But a sorted version of the Stream puts the C first:
+        
         
         >>> s.sorted.show('text')
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         
+        
         While the original stream remains unsorted:
+        
         
         >>> s.show('text')
         {1.0} <music21.note.Note D>
         {0.0} <music21.note.Note C>
+        
         
         OMIT_FROM_DOCS
         >>> s = stream.Stream()

@@ -87,6 +87,18 @@ class TinyNotationStream(stream.Stream):
     
     example in 3/4:
     >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c", "3/4")
+    >>> stream1.show('text')
+    {0.0} <music21.meter.TimeSignature 3/4>
+    {0.0} <music21.note.Note E>
+    {1.0} <music21.note.Rest rest>
+    {2.0} <music21.note.Note F#>
+    {3.0} <music21.note.Note G>
+    {4.0} <music21.note.Note B->
+    {4.33333333333} <music21.note.Note A>
+    {4.66666666667} <music21.note.Note G>
+    {5.0} <music21.note.Note C>
+
+
     >>> stream1.getElementById("lastG").step
     'G'
     >>> stream1.notes[1].isRest

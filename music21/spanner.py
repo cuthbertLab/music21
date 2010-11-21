@@ -267,7 +267,7 @@ class Spanner(music21.Music21Object):
         return self._components[0].get()
 
     def isLast(self, component):
-        '''Given a component, is it last?
+        '''Given a component, is it last?  Returns True or False
         '''
         idTarget = id(component)
         if self._components[-1].id == idTarget:
