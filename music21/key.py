@@ -310,8 +310,8 @@ class KeySignature(music21.Music21Object):
         >>> from music21 import *
 
         >>> a = key.KeySignature(3)
-        >>> a._strDescription()
-        '3 sharps'
+        >>> a
+        <music21.key.KeySignature of 3 sharps>
         '''
         music21.Music21Object.__init__(self)
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
@@ -511,10 +511,24 @@ class KeySignature(music21.Music21Object):
         {8.0} <music21.note.Note F>
         
         
+        Test to make sure there are not linked accidentals (fixed bug 22 Nov. 2010)
+        
+        >>> nB1 = note.WholeNote("B")
+        >>> nB2 = note.WholeNote("B")
+        >>> s1.append(nB1)
+        >>> s1.append(nB2)
+        >>> for n in s1.notes:
+        ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
+        >>> (nB1.accidental, nB2.accidental)
+        (<accidental flat>, <accidental flat>)
+        >>> nB1.accidental.name = 'sharp'
+        >>> (nB1.accidental, nB2.accidental)
+        (<accidental sharp>, <accidental flat>)
+        
         '''
         for thisAlteration in reversed(self.alteredPitches):  # temp measure to fix dbl flats, etc.
             if thisAlteration.step.lower() == step.lower():
-                return thisAlteration.accidental
+                return copy.deepcopy(thisAlteration.accidental) # get a new one each time otherwise we have linked accidentals, YUK!
         
         return None
 

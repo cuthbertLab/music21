@@ -40,10 +40,10 @@ try out different solutions, moving notes over a measure or two, etc.
 without any problems.  Working on this problem also gave a great test
 of music21's ability to manipulate diatonic Streams.
 '''
-
+import music21
 from music21 import *
 import copy
-
+import doctest, unittest
 
 def reverse(self, inPlace = False, 
                 classesToMove = (key.KeySignature, meter.TimeSignature, clef.Clef, metadata.Metadata, instrument.Instrument, layout.SystemLayout), 
@@ -57,7 +57,8 @@ def reverse(self, inPlace = False,
         the elements are reversed in the current stream.  if inPlace is False then a new stream is returned.
 
         all elements of class classesToMove get moved to their current end locations before being reversed.  
-        This puts the clefs, TimeSignatures, etc. in their proper locations.  DOES NOT YET WORK
+        This puts the clefs, TimeSignatures, etc. in their proper locations.  (THIS DOES NOT YET WORK)
+        
         '''
         highestTime = self.highestTime
 
@@ -100,27 +101,44 @@ def reverse(self, inPlace = False,
         else:
             return returnObj
 
-def prependBlankMeasures(myStream, measuresToAppend = 1):
+def prependBlankMeasures(myStream, measuresToAppend = 1, inPlace = True):
+    '''
+    adds one (default) or more blank measures (filled with
+    rests) to be beginning of myStream
+    
+    >>> from music21 import *
+    >>> from music21.trecento import quodJactatur
+    >>> qj = quodJactatur.getQJ()
+    >>> qj.duration.quarterLength
+    70.0
+    >>> qj.flat.notes[0]
+    <music21.note.Note C>
+    >>> len(qj.getElementsByClass(stream.Measure))
+    35
+    >>> qj2 = quodJactatur.prependBlankMeasures(qj, 10, inPlace = False)
+    >>> qj2.duration.quarterLength
+    90.0
+    >>> qj2.flat.notes[0]
+    <music21.note.Rest rest>
+    >>> len(qj2.getElementsByClass(stream.Measure))
+    45
+    '''
+    
+    measureDuration = myStream.flat.getElementsByClass(meter.TimeSignature)[0].barDuration.quarterLength
+    
+    if inPlace == True:
+        ms = myStream
+    else:
+        ms = copy.deepcopy(myStream)
+    
     for i in range(measuresToAppend):
         qjBlankM = stream.Measure()
         hr = note.Rest()
-        hr.duration.quarterLength = 2
+        hr.duration.quarterLength = measureDuration
         qjBlankM.append(hr)
-        myStream.insertAndShift(0, qjBlankM)
-    return myStream.sorted
+        ms.insertAndShift(0, qjBlankM)
+    return ms
 
-def invertStreamAroundNote(myStream, inversionNote = note.Note() ):
-    inversionDNN = inversionNote.diatonicNoteNum
-    for n in myStream.flat.notes:
-        if n.isRest is False:
-            n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
-            if n.step != 'B':
-                n.pitch.accidental = None
-            else:
-                n.pitch.accidental = pitch.Accidental('flat')
-                n.pitch.accidental.displayStatus = None
-#            n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
-    return myStream
 
 def transposeStreamDiatonic(myStream, diatonicInterval = 1):
     if diatonicInterval == 1:
@@ -149,6 +167,16 @@ IMPERFCONS = ['m3','M3','m6','M6']
 cachedParts = {}
 
 def getQJ():
+    '''
+    loads Quod Jactatur from the corpus, transposes it to
+    an easy to view range and stores it in the cache.
+
+    >>> from music21.trecento import quodJactatur
+    >>> qj = quodJactatur.getQJ()
+    >>> qj.flat.notes[0]
+    <music21.note.Note C>
+    '''
+    
     qj = corpus.parseWork("ciconia/quod_jactatur")
     qjPart = qj.getElementsByClass(stream.Part)[0]
     qjPart.transpose("P-8", inPlace = True)
@@ -156,73 +184,67 @@ def getQJ():
     cachedParts['1-0-False-False'] = copy.deepcopy(qjPart)
     return qjPart
 
-def prepareSolutionOld(triplumTup, ctTup, tenorTup):
-    qjSolved = stream.Score()
-
-    for transpose, delay, invert, retro in [triplumTup, ctTup, tenorTup]:
-        idString = "%d-%d-%s-%s" % (transpose, delay, invert, retro)
-        if idString in cachedParts:
-            qjPart = copy.deepcopy(cachedParts[idString])
-        else:
-            qjPart = copy.deepcopy(cachedParts["1-0-False-False"])
-            if retro is True:
-                qjPart = reverse(qjPart, makeNotation = False)
-            if invert is True:
-                invertStreamAroundNote(qjPart, qjPart.flat.notes[0])
+def findRetrogradeVoices(show = True):
+    '''
+    the structure of the piece strongly suggests a retrograde solution
+    (e.g., there is a cadence in m5 and five measures from the end and one
+    at the exact center).  This method tries all transpositions of one
+    voice vs. the other and gives positive points to intervals of 3, 4,
+    5, 6, and 8 (incl. tritones, since they might be fixed w/ other voices;
+    4th is included since there could be a 3rd or 5th below it).
+    '''
+    
+    for transpose in [-2,3]: #[1, 2, -2, 3, -3, 4, -4]:
+        for invert in [False, True]:
+            qj1 = getQJ()
+            qj2 = getQJ()
             if transpose != 1:
-                transposeStreamDiatonic(qjPart, transpose)
-            if delay > 0:
-                qjPart = prependBlankMeasures(qjPart, delay)
-            cachedParts[idString] = copy.deepcopy(qjPart)
-        qjSolved.insert(0, qjPart)
-
-    p = qjSolved.parts
-    for i in range(len(p)):
-        for j in range(len(p)):
-            if i == j:
-                continue
-            
-
-       
-    qjTriplum = qjSolved.parts[0]
-    qjCt = qjSolved.parts[1]
-    qjTenor = qjSolved.parts[2] 
-    qjT2 = copy.deepcopy(qjTriplum)
-    qjT2.id = 'qjT2'
-
-    qjTriplum.flat.attachIntervalsBetweenStreams(qjTenor.flat)
-    qjCt.flat.attachIntervalsBetweenStreams(qjTenor.flat)
-    qjT2.flat.attachIntervalsBetweenStreams(qjCt.flat)
-
-    consScore = 0
-    totIntervals = 1
-
-    for thisSt in [qjTriplum, qjCt, qjT2]:
-        thisStid = thisSt.id
-        for n in thisSt.flat.notes:
-            if "Rest" in n.classes: continue
-            if n.editorial.harmonicInterval is None: continue
-            if n.offset == int(n.offset):
-                ssn = n.editorial.harmonicInterval.semiSimpleName
-                
-                thisScore = 0 
-                if ssn in PERFCONS:
-                    thisScore = 2
-                elif ssn in IMPERFCONS:
-                    thisScore = 1
-                elif ssn == 'P4' and thisStid == 'qjT2':
-                    thisScore = 1
+                transposeStreamDiatonic(qj2, transpose)            
+            if invert is True:
+                qj2.invertDiatonic(qj2.flat.notes[0], inPlace = True)
+            qj2 = reverse(qj2, makeNotation = False)
+            qj = stream.Score()
+            qj.insert(0, qj2.flat)
+            qj.insert(0, qj1.flat)
+            qjChords = qj.chordify()
+            consScore = 0
+            totIntervals = 0
+            for n in qjChords.flat.notes:
+                strength = getStrengthForNote(n)
+                if n.isRest is True or len(n.pitches) < 2:
+                    thisScore = strength
                 else:
-                    thisScore = -4
-                if (n.offset/2.0) == int(n.offset/2.0):
-                    thisScore = thisScore * 2
+                    int1 = interval.Interval(n.pitches[0], n.pitches[1])
+                    #print int1.generic.simpleUndirected
+                    if int1.generic.simpleUndirected in [1,3,4,5]:
+                        thisScore = strength
+                    elif int1.generic.simpleUndirected == 6: # less good
+                        thisScore = strength/2.0
+                    else:
+                        thisScore = -2 * strength
+                if n.duration.quarterLength < 2:
+                    thisScore = thisScore * n.duration.quarterLength
+                else:
+                    thisScore = thisScore * 8
                 consScore += thisScore
                 totIntervals += 1
                 n.lyric = str(thisScore)
-                n.editorial.harmonicInterval = None
-                
-    return (qjSolved, (consScore/(totIntervals + 0.0)))
-
+            
+            finalScore = int(100*(consScore + 0.0)/totIntervals)
+            qj.insert(0, qjChords.flat)
+            qj2.flat.notes[0].addLyric('Trans: ' + str(transpose))
+            qj2.flat.notes[0].addLyric('Invert: ' + str(invert))
+            qj1.flat.notes[0].addLyric('Score: ' + str(finalScore))
+            
+            if show == True:
+                qj.show()
+            else:
+                if invert == True:
+                    invStr = "Invert"
+                else:
+                    invStr = "      "
+                print str(transpose) + " " + invStr + " " + str(finalScore)
+    
 def prepareSolution(triplumTup, ctTup, tenorTup):
     qjSolved = stream.Score()
 
@@ -235,7 +257,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
             if retro is True:
                 qjPart = reverse(qjPart, makeNotation = False)
             if invert is True:
-                invertStreamAroundNote(qjPart, qjPart.flat.notes[0])
+                qjPart.invertDiatonic(qjPart.flat.notes[0], inPlace = True)
             if transpose != 1:
                 transposeStreamDiatonic(qjPart, transpose)
             if delay > 0:
@@ -259,12 +281,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
             continue
         else:
             startCounting = True
-        if (n.offset/2.0) == int(n.offset/2.0): # downbeat
-            strength = 4
-        elif (n.offset) == int(n.offset): # strong beat
-            strength = 2
-        else:
-            strength = 0.5
+        strength = getStrengthForNote(n)
               
         if n.isConsonant():
             thisScore = strength
@@ -277,6 +294,25 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
                 
     return (qjChords, (consScore/(totIntervals + 0.0)), qjSolved)
     
+def getStrengthForNote(n):
+    '''
+    returns a number (4, 2, 0.5) depending on if the
+    note is on a downbeat (4), a strong beat (2) or another beat (0.5)
+    
+    Used for weighing consonance vs. dissonance.
+    
+    For speed, it uses n.offset not n.beat; more general purpose
+    solutions should use n.beat
+    '''
+        
+    if (n.offset/2.0) == int(n.offset/2.0): # downbeat
+        strength = 4
+    elif (n.offset) == int(n.offset): # strong beat
+        strength = 2
+    else:
+        strength = 0.5
+
+    return strength
     
 
 def bentWolfSolution():
@@ -301,7 +337,7 @@ def possibleSolution():
  
 def multipleSolve():
     import csv
-    csvFile = csv.writer(open('d:/desktop/quodJ2.csv', 'wb'))
+    csvFile = csv.writer(open('d:/desktop/quodJ3.csv', 'wb'))
 
     getQJ()
     
@@ -364,12 +400,89 @@ def multipleSolve():
                     print str(i) + " ",
                 csvFile.writerow(writeLine)
 
-if __name__ == "__main__":
-    pass
-    #multipleSolve()
-    #bentWolfSolution()
-    possibleSolution()
 
+def multipleSolveRetro():
+    import csv
+    csvFile = csv.writer(open('d:/desktop/quodJ3.csv', 'wb'))
+
+    getQJ()
+    
+    transposeIntervals = [-5, -4, 1, 4, 5]
+    delayAmounts = [0, 5, 10]
+
+    maxScore = -100
+    i = 0
+    for lowestTrans in range(len(transposeIntervals)):
+     for middleTrans in range(lowestTrans, len(transposeIntervals)):
+      for highestTrans in range(middleTrans, len(transposeIntervals)):
+       transLowest = transposeIntervals[lowestTrans]
+       transMiddle = transposeIntervals[middleTrans]
+       transHighest = transposeIntervals[highestTrans]
+       if transLowest != 1 and transMiddle != 1 and transHighest != 1:
+           continue
+       
+       for delayLowest in delayAmounts:
+        for delayMiddle in delayAmounts:
+         for delayHighest in delayAmounts:
+          if delayLowest != 0 and delayMiddle != 0 and delayHighest != 0:
+              continue
+          for lowestInvert in [False, True]:
+           for middleInvert in [False, True]:
+            for highestInvert in [False, True]:
+             if lowestInvert is True and middleInvert is True and highestInvert is True:
+                 continue  # very low probability
+             for lowestRetro in [False, True]:
+              for middleRetro in [False, True]:
+               for highestRetro in [False, True]:
+                if lowestRetro is True and middleRetro is True and highestRetro is True:
+                    continue
+                if ((delayLowest == delayMiddle and lowestInvert == middleInvert and lowestRetro == middleRetro) or
+                    (delayLowest == delayHighest and lowestInvert == highestInvert and lowestRetro == highestRetro) or
+                    (delayMiddle == delayHighest and middleInvert == highestInvert and middleRetro == highestRetro)):
+                        continue # no continuous parallel motion            
+                if (transLowest == transMiddle and delayLowest == delayMiddle and lowestRetro == False and middleRetro == True):
+                    continue # same as lowestRetro == True and middleRetro == False
+                if (transLowest == transMiddle and delayLowest == delayMiddle and lowestInvert == False and middleInvert == True):
+                    continue # same as lowestInvert == True and middleInvert == False
+                if (transLowest == 1 and transMiddle == 1):
+                    continue # if transHighest == 4 then it's the same as (-4, -4, 1) except for a few tritones
+                             # if transHighest == 5 then it's the same as (-5, -5, 1) except for a few tritones 
+                
+                
+                i += 1
+                triplum = (transHighest, delayHighest, highestInvert, highestRetro)
+                ct = (transMiddle, delayMiddle, middleInvert, middleRetro)
+                tenor = (transLowest, delayLowest, lowestInvert, lowestRetro)
+                qjSolved, avgScore, fullScore = prepareSolution(triplum, ct, tenor)
+                #writeLine = (tripT, ctT, tenT, tripDelay, ctDelay, tenDelay, tripInvert, ctInvert, tenInvert, tripRetro, ctRetro, tenRetro, avgScore)
+                writeLine = (transHighest, delayHighest, highestInvert, highestRetro, transMiddle, delayMiddle, middleInvert, middleRetro, transLowest, delayLowest, lowestInvert, lowestRetro, avgScore)
+                if avgScore > 0:
+                    print ""
+                    if avgScore > maxScore:
+                        maxScore = avgScore
+                        print "***** ",
+                    print writeLine
+                else:
+                    print str(i) + " ",
+                csvFile.writerow(writeLine)
+
+
+
+class QuodJactaturException(music21.Music21Exception):
+    pass
+
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+
+
+if __name__ == "__main__":
+#    music21.mainTest()
+#    possibleSolution()
+    findRetrogradeVoices()
+    pass
 #------------------------------------------------------------------------------
 # eof
 

@@ -2469,6 +2469,89 @@ class Stream(music21.Music21Object):
             pass
         return post
 
+    def invertDiatonic(self, inversionNote = note.Note('C4'), inPlace = True ):
+        '''
+        inverts a stream diatonically around the given note (by default, middle C)
+        
+        For pieces where the key signature
+        does not change throughout the piece it is MUCH faster than
+        for pieces where the key signature changes.
+        
+        Here in this test, we put Ciconia's Quod Jactatur (a single voice
+        piece that should have a canon solution: see trecento.quodJactatur)
+        into 3 flats (instead of its original 1 flat) in measure 1, but 
+        into 5 sharps in measure 2 and then invert around F4, creating
+        a new piece.
+               
+        >>> from music21 import *
+        >>> qj = corpus.parseWork('ciconia/quod_jactatur').parts[0]
+        >>> qj.measures(1,2).show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.Treble8vbClef object at 0x...>
+            {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
+            {0.0} <music21.key.KeySignature of 1 flat>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.layout.SystemLayout object at 0x...>
+            {0.0} <music21.note.Note C>
+            {1.5} <music21.note.Note D>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.note.Note E>
+            {0.5} <music21.note.Note D>
+            {1.0} <music21.note.Note C>
+            {1.5} <music21.note.Note D>
+        >>> k1 = qj.flat.getElementsByClass(key.KeySignature)[0]
+        >>> qj.flat.replace(k1, key.KeySignature(-3))
+        >>> qj.getElementsByClass(stream.Measure)[1].insert(0, key.KeySignature(5))
+        >>> qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
+        >>> qj2.measures(1,2).show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.Treble8vbClef object at 0x...>
+            {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
+            {0.0} <music21.key.KeySignature of 3 flats>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.layout.SystemLayout object at 0x...>
+            {0.0} <music21.note.Note B->
+            {1.5} <music21.note.Note A->
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {2.0} <music21.key.KeySignature of 5 sharps>
+            {2.0} <music21.note.Note G#>
+            {2.5} <music21.note.Note A#>
+            {3.0} <music21.note.Note B>
+            {3.5} <music21.note.Note A#>
+        '''
+        keySigSearch = self.flat.getElementsByClass(key.KeySignature)
+        
+        quickSearch = True
+        if len(keySigSearch) == 0:
+            ourKey = key.KeySignature('C', 'major')
+        elif len(keySigSearch) == 1:
+            ourKey = keySigSearch[0]
+        else:
+            quickSearch = False
+        
+        if inPlace == True:
+            returnStream = self
+        else:
+            returnStream = copy.deepcopy(self)
+        
+        
+        inversionDNN = inversionNote.diatonicNoteNum
+        for n in returnStream.flat.notes:
+            if n.isRest is False:
+                n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
+                if quickSearch is True:
+                    n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
+                else:
+                    n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
+                if n.pitch.accidental is not None:
+                    n.pitch.accidental.displayStatus = None
+    #            if n.step != 'B':
+    #                n.pitch.accidental = None
+    #            else:
+    #                n.pitch.accidental = pitch.Accidental('flat')
+    #                n.pitch.accidental.displayStatus = None
+    ##            n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
+        return returnStream
 
 
 
