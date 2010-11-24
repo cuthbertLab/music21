@@ -42,9 +42,20 @@ except ImportError:
 
 
 class Edge(object):
-    '''Abstract an Interval as an Edge. 
+    '''Abstraction of an Interval as an Edge. 
+
+    Edges store an Interval object as well as a direction specification.
+
+    Weight values, as well as other attributes, can be stored. 
+
+    >>> from music21 import *
+    >>> from music21 import intervalNetwork
+    >>> i = interval.Interval('M3')
+    >>> e = intervalNetwork.Edge(i)
+    >>> i is e.interval
+    True
     '''
-    def __init__(self, intervalData=None, direction='bi'):
+    def __init__(self, intervalData=None, id=None, direction='bi'):
         if common.isStr(intervalData):
             i = interval.Interval(intervalData)
         else:
@@ -52,6 +63,8 @@ class Edge(object):
         self._interval = i
         self._direction = 'bi' # can be ascending, descending
         self.weight = 1.0
+        # store id
+        self.id = id
 
     def _getInterval(self):
         return self._interval
@@ -62,10 +75,82 @@ class Edge(object):
 
 
 
+class Node(object):
+    '''Abstraction of an unrealized Pitch node.
+
+    Nodes store a lost of directed connections between edges, represented by their id integer.
+
+    '''
+    def __init__(self, intervalData=None, direction='bi'):
+
+        # connections are a list of tuple pairs between edge ids
+        self._connections = []
+
+
+    def addDirectedConnection(self, e1, e2):
+        '''Provide two Edge objects that pass through this Node, in the direction from the first to the second. 
+
+        >>> from music21 import *
+        >>> from music21 import intervalNetwork
+        >>> i = interval.Interval('M3')
+        >>> e1 = intervalNetwork.Edge(i, id=0)
+        >>> e2 = intervalNetwork.Edge(i, id=1)
+        >>> n1 = Node()
+        >>> n1.addDirectedConnection(e1, e2)
+        >>> n1.connections
+        [(0, 1)]
+        '''
+        self._connections.append((e1.id, e2.id))
+
+
+    def addBiDirectedConnections(self, e1, e2):
+        '''Provide two Edge objects that pass through this Node, in the direction from the first to the second. 
+
+        >>> from music21 import *
+        >>> from music21 import intervalNetwork
+        >>> i = interval.Interval('M3')
+        >>> e1 = intervalNetwork.Edge(i, id=0)
+        >>> e2 = intervalNetwork.Edge(i, id=1)
+        >>> n1 = Node()
+        >>> n1.addBiDirectedConnections(e1, e2)
+        >>> n1.connections
+        [(0, 1), (1, 0)]
+        '''
+        # simply add both directions
+        self._connections.append((e1.id, e2.id))
+        self._connections.append((e2.id, e1.id))
+
+
+    def _getConnections(self):
+        return self._connections
+
+    connections = property(_getConnections, 
+        doc = '''Return a list of stored connections that pass through this node. Connections are stored as directed pairs of Edge indices. 
+        ''')
+
+
 
 class IntervalNetworkException(Exception):
     pass
 
+
+# presently edges are interval objects, can be marked as 
+# ascending, descending, or bi-directional
+# edges are stored in dictionary by index values 
+
+# nodes are undefined pitches; pitches are realized on demand
+# nodes are stored as an unordered list of coordinate pairs
+# pairs are edge indices: showing which edges connect to this node
+# could model multiple connections within an object
+
+# up:    a M2 b m2 C M2 D
+# down:  a M2 b   m3    D 
+
+# edges M2(1+-), m2(2+), M2(3+)
+# edges m3(4-)
+
+# nodes: a (low, 1; 1, low), b (1, 2; 4, 1), c (2, 3; 3, 2), 
+#        d (3, high; high, 3; high, 4)
 
 class IntervalNetwork(object):
     '''A graph of undefined Pitch nodes connected by a defined, ordered list of Interval objects as edges. 
@@ -73,11 +158,11 @@ class IntervalNetwork(object):
 
     def __init__(self, edgeList=None):
         # store each edge with and index that is incremented
-        self._edgeIndexCount = 0
+        self._edgeIdCount = 0
 
         # edges are stored Edge objects
 
-        # a dictionary of Edge object, where keys are _edgeIndexCount values
+        # a dictionary of Edge object, where keys are _edgeIdCount values
         self._edges = {}
 
         # nodes suggest Pitches, but Pitches are not stored
@@ -131,8 +216,8 @@ class IntervalNetwork(object):
             #i = interval.Interval(edge)
             #self._edges.append(i)
             # numbering starts at zero
-            self._edges[self._edgeIndexCount] = Edge(edge)
-            self._edgeIndexCount += 1
+            self._edges[self._edgeIdCount] = Edge(edge, id=self._edgeIdCount)
+            self._edgeIdCount += 1
         self._updateLinearNodes()
 
 
