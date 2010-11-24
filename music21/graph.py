@@ -54,6 +54,14 @@ try:
 except ImportError:
     _missingImport.append('numpy')
 
+try:
+    import networkx
+except ImportError:
+    # for now, this does nothing
+    pass
+    #_missingImport.append('networkx')
+
+
 if len(_missingImport) > 0:
     if environLocal['warnings'] in [1, '1', True]:
         environLocal.warn(common.getMissingImportStr(_missingImport),
@@ -401,6 +409,76 @@ class Graph(object):
                              edgecolor=self.colorBackgroundFigure)
 
         environLocal.launch('png', fp)
+
+
+
+
+class GraphNetworxGraph(Graph):
+    ''' Grid a networkx graph
+    
+    >>> from music21 import *
+    >>> #_DOCS_SHOW g = graph.GraphNetworxGraph()
+
+    .. image:: images/GraphNetworxGraph.*
+        :width: 600
+    '''
+    def __init__(self, *args, **keywords):
+        Graph.__init__(self, *args, **keywords)
+        self.axisKeys = ['x', 'y']
+        self._axisInit()
+
+        if 'figureSize' not in keywords:
+            self.setFigureSize([6, 6])
+        if 'title' not in keywords:
+            self.setTitle('Graph Plot')
+
+        if 'networkxGraph' in keywords.keys():
+            self.networkxGraph = keywords['networkxGraph']
+        else:
+            # testing default; temporary
+            g = networkx.Graph()
+            g.add_edge('a','b',weight=1.0)
+            g.add_edge('b','c',weight=0.6)
+            g.add_edge('c','d',weight=0.2)
+            g.add_edge('d','e',weight=0.6)
+            self.networkxGraph = g
+
+    def process(self):
+
+        # figure size can be set w/ figsize=(5,10)
+        self.fig = plt.figure()
+        ax = self.fig.add_subplot(1, 1, 1)
+
+        # positions for all nodes
+        pos = networkx.spring_layout(self.networkxGraph, weighted=True) 
+        # draw nodes
+        networkx.draw_networkx_nodes(self.networkxGraph, pos, node_size=400, ax=ax, node_color='#605C7F', alpha=1)
+
+        for (u,v,d) in self.networkxGraph.edges(data=True):
+            environLocal.printDebug(['GraphNetworxGraph', (u,v,d)])
+            #print (u,v,d)
+            # adding one at a time to permit individual alpha settings
+            edgelist = [(u,v)]
+            networkx.draw_networkx_edges(self.networkxGraph, pos, edgelist=edgelist, width=2, 
+            edge_color='#666666', alpha=d['weight'], ax=ax)
+        
+        # labels
+        networkx.draw_networkx_labels(self.networkxGraph, pos, font_size=self.labelFontSize, font_family=self.fontFamily, ax=ax)
+
+
+        #remove all labels
+        self.setAxisLabel('y', '')
+        self.setAxisLabel('x', '')
+        self.setTicks('y', [])
+        self.setTicks('x', [])
+        # turn off grid
+        self.grid = False
+        # standard procedures
+        self._adjustAxisSpines(ax, leftBottom=True)
+        self._applyFormatting(ax)
+        self.done()
+
+
 
 
 
@@ -3290,6 +3368,15 @@ class Test(unittest.TestCase):
         b.process()
 
 
+
+    def testGraphNetworxGraph(self):
+        
+        b = GraphNetworxGraph(doneAction=None)
+        #b = GraphNetworxGraph()
+        b.process()
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
@@ -3331,7 +3418,10 @@ if __name__ == "__main__":
         #te.testColorGridLegend('write')
         #te.testPlotWindowed('write')
 
-        t.testPianoRollFromOpus()
+        #t.testPianoRollFromOpus()
+
+        t.testGraphNetworxGraph()
+
 
 #------------------------------------------------------------------------------
 # eof

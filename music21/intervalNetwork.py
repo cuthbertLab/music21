@@ -33,127 +33,215 @@ _MOD = "intervalNetwork.py"
 environLocal = environment.Environment(_MOD)
 
 
-class IntervalNetwork:
+try:
+    import networkx
+except ImportError:
+    # lacking this does nothing
+    pass
+    #_missingImport.append('networkx')
+
+
+class Edge(object):
+    '''Abstract an Interval as an Edge. 
+    '''
+    def __init__(self, intervalData=None, direction='bi'):
+        if common.isStr(intervalData):
+            i = interval.Interval(intervalData)
+        else:
+            i = intervalData
+        self._interval = i
+        self._direction = 'bi' # can be ascending, descending
+        self.weight = 1.0
+
+    def _getInterval(self):
+        return self._interval
+
+    interval = property(_getInterval, 
+        doc = '''Return the stored Interval object
+        ''')
+
+
+
+
+class IntervalNetworkException(Exception):
+    pass
+
+
+class IntervalNetwork(object):
     '''A graph of undefined Pitch nodes connected by a defined, ordered list of Interval objects as edges. 
     '''
 
     def __init__(self, edgeList=None):
-        # edges are stored Interval objects, in order
-        self._edgesOrdered = []
+        # store each edge with and index that is incremented
+        self._edgeIndexCount = 0
+
+        # edges are stored Edge objects
+
+        # a dictionary of Edge object, where keys are _edgeIndexCount values
+        self._edges = {}
+
         # nodes suggest Pitches, but Pitches are not stored
         # instead, nodes are keys, pairs defining the two edges that connect
         # to this node
-        self._nodesOrdered = []
+        self._nodes = []
     
         # attributes (weights, etc) for edges might be defined as dictionaries
-        # for each index position in the self._edgesOrdered list
-        self._edgeAttributes = {}
+        # for each index position in the self._edges dict
+        #self._edgeAttributes = {}
         # attributes for nodes can be defined as dictionaries for each
         # store node key (a pair between edges) 
-        self._nodeAttributes = {}
+        #self._nodeAttributes = {}
 
         # these are just symbols/place holders; values do not matter as long
         # as they are not positive ints
-        self._start = 'start'
-        self._end = 'end'
+        self._terminusLow = 'terminusLow'
+        self._terminusHigh = 'terminusHigh'
 
         if edgeList != None: # auto initialize
-            self.setEdges(edgeList)
+            self.setAscendingEdges(edgeList)
 
-    def _updateNodes(self):
-        low = self._start
+    def _updateLinearNodes(self):
+        '''Nodes here are simply pairs of coordinates, connecting the indices of two edges. 
+
+        This assumes that all edges are linear and in order
+        '''
+        low = self._terminusLow
         high = None
-        for i in range(len(self._edgesOrdered)-1):
+        for i in sorted(self._edges.keys()):
             pair = (low, i)
-            self._nodesOrdered.append(pair)
+            self._nodes.append(pair)
             low = i
         # add last to end
-        self._nodesOrdered.append((i, self._end))
+        self._nodes.append((i, self._terminusHigh))
 
 
-    def setEdges(self, edgeList):
+    def setAscendingEdges(self, edgeList):
         '''Given a list of edges (Interval specifications), store and define nodes.
+
+        Nodes are defined as two indices, connected stored edges. 
     
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setEdges(edgeList)
-        >>> net._nodesOrdered
-        [('start', 0), (0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 'end')]
+        >>> net.setAscendingEdges(edgeList)
+        >>> net._nodes
+        [('terminusLow', 0), (0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 'terminusHigh')]
 
         '''
         for edge in edgeList:
-            i = interval.Interval(edge)
-            self._edgesOrdered.append(i)
-        self._updateNodes()
+            #i = interval.Interval(edge)
+            #self._edges.append(i)
+            # numbering starts at zero
+            self._edges[self._edgeIndexCount] = Edge(edge)
+            self._edgeIndexCount += 1
+        self._updateLinearNodes()
 
 
     #---------------------------------------------------------------------------
-    def _getFirstNode(self):
-        return self._nodesOrdered[0]
+    def _getTerminusLowNodes(self):
+        post = []
+        for n in self._nodes:
+            if self._terminusLow in n:
+                post.append(n)
+        # lowest valued will be first
+        post.sort()
+        return post
     
-    firstNode = property(_getFirstNode, 
-        doc='''Return the coordinates of the first Node. Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the strings 'start' or 'end.' As 
+    terminusLowNodes = property(_getTerminusLowNodes, 
+        doc='''Return a list of first Nodes, or Nodes that contain "start". Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the strings 'terminusLow' or 'terminusHigh.' As 
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setEdges(edgeList)
-        >>> net.firstNode
-        ('start', 0)
+        >>> net.setAscendingEdges(edgeList)
+        >>> net.terminusLowNodes[0]
+        ('terminusLow', 0)
         ''')
 
-    def _getLastNode(self):
-        return self._nodesOrdered[-1]
+    def _getTerminusHighNodes(self):
+        post = []
+        for n in self._nodes:
+            if self._terminusHigh in n:
+                post.append(n)
+        post.sort()
+        return post
+
+       # return self._nodes[-1]
     
-    lastNode = property(_getLastNode, 
-        doc='''Return the coordinates of the last Node. Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the
+    terminusHighNodes = property(_getTerminusHighNodes, 
+        doc='''Return a list of last Nodes, or Nodes that contain "end". Return the coordinates of the last Node. Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setEdges(edgeList)
-        >>> net.lastNode
-        (5, 'end')
+        >>> net.setAscendingEdges(edgeList)
+        >>> net.terminusHighNodes[0]
+        (6, 'terminusHigh')
         ''')
 
 
     #---------------------------------------------------------------------------
     def _filterNodeId(self, id):
-        '''Given a node id, return the edge coordinates.
+        '''Given a node id, return a list of edge coordinates.
 
         Node 1 is the first node, even though the edge coordinates are 'start' and 0.
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setEdges(edgeList)
-        >>> net._filterNodeId(1)
-        ('start', 0)
+        >>> net.setAscendingEdges(edgeList)
+        >>> net._filterNodeId(1)[0]
+        ('terminusLow', 0)
         >>> net._filterNodeId([3,4])
-        (3, 4)
-        >>> net._filterNodeId('last')
-        (5, 'end')
-        >>> net._filterNodeId('first')
-        ('start', 0)
+        [(3, 4)]
+        >>> net._filterNodeId('high')
+        [(6, 'terminusHigh')]
+        >>> net._filterNodeId('low')
+        [('terminusLow', 0)]
         '''
         if common.isNum(id):
             # assume counting nodes from 1
-            return self._nodesOrdered[id-1 % len(self._nodesOrdered)]
-        if common.isStr(id):
-            if id.lower() in ['start', 'first']:
-                return self._getFirstNode()
-            elif id.lower() in ['end', 'last']:
-                return self._getLastNode()
-
+            # place in a list for uniformity
+            return [self._nodes[id-1 % len(self._nodes)]]
+        elif common.isStr(id):
+            if id.lower() in ['terminuslow', 'low']:
+                return self._getTerminusLowNodes() # returns a list
+            elif id.lower() in ['terminushigh', 'high']:
+                return self._getTerminusHighNodes()# returns a list
+            else:
+                raise IntervalNetworkException('got a strin that has no match:', id)
         else: # match coords
-            if tuple(id) in self._nodesOrdered:
-                return tuple(id)
+            if tuple(id) in self._nodes:
+                return [tuple(id)] # return a list for consistency
+
+    def _getNextAscendingNodes(self, nodeStart):
+        '''Given a node, get the next node, searching all nodes to find the best match. 
+
+        There may be more than one possibility. 
+
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.setAscendingEdges(edgeList)
+        >>> net._filterNodeId(1)[0]
+        ('terminusLow', 0)
+        >>> net._getNextAscendingNodes(('terminusLow', 0))
+        [(0, 1)]
+        >>> net._getNextAscendingNodes((0, 1))
+        [(1, 2)]
+        '''
+        post = []
+        for n in self._nodes:
+            # need to check interval?
+            if nodeStart[1] == n[0]:
+                post.append(n)
+        return post
 
     
     def _fitRange(self, nodesRealized, minPitch=None, maxPitch=None):
         '''Given a realized pitch range, extend or crop between min and max.
 
+        Note that this operates on existing Pitch objects, extending them in either direction. 
+
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setEdges(edgeList)
+        >>> net.setAscendingEdges(edgeList)
         >>> net.realize(pitch.Pitch('G3'))
         [G3, A3, B3, C4, D4, E4, F#4, G4]
 
@@ -206,7 +294,7 @@ class IntervalNetwork:
             i = 0
             ref = localMax
             while True:
-                intervalObj = self._edgesOrdered[i % len(self._edgesOrdered)]
+                intervalObj = self._edges[i % len(self._edges)].interval
                 p = intervalObj.transposePitch(ref)
                 if p.ps > maxPitch.ps:
                     break
@@ -220,7 +308,7 @@ class IntervalNetwork:
             i = -1
             ref = localMin
             while True:
-                intervalObj = self._edgesOrdered[i % len(self._edgesOrdered)]
+                intervalObj = self._edges[i % len(self._edges)].interval
                 # reverse direction
                 p = intervalObj.reverse().transposePitch(ref)
                 if p.ps < minPitch.ps:
@@ -246,12 +334,14 @@ class IntervalNetwork:
 
 
     def realize(self, pitchObj, nodeId=None, minPitch=None, maxPitch=None):
-        '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of start, stop). 
+        '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
+
+        The nodeId, when a simple, linear network, can be used as a scale step value starting from one.
 
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setEdges(edgeList)
+        >>> net.setAscendingEdges(edgeList)
         >>> net.realize(pitch.Pitch('G3'))
         [G3, A3, B3, C4, D4, E4, F#4, G4]
 
@@ -271,9 +361,9 @@ class IntervalNetwork:
         [C#6, D#6, E6, F#6, G#6, A#6, B6]
         '''
         if nodeId == None: # assume first
-            nodeId = self._getFirstNode()
+            nodeId = self._getTerminusLowNodes()[0]
         else:
-            nodeId = self._filterNodeId(nodeId)
+            nodeId = self._filterNodeId(nodeId)[0]
             
         if common.isStr(pitchObj):
             pitchObj = pitch.Pitch(pitchObj)
@@ -281,26 +371,26 @@ class IntervalNetwork:
         post = []
         post.append(pitchObj)
 
-        # first, go upward
+        # first, go upward from this pitch to the high terminus
         ref = pitchObj
-        i = self._nodesOrdered.index(nodeId)
+        i = self._nodes.index(nodeId)
         while True:
-            intervalObj = self._edgesOrdered[i % len(self._edgesOrdered)]
+            intervalObj = self._edges[i % len(self._edges)].interval
             p = intervalObj.transposePitch(ref)
             post.append(p)
             ref = p
             i += 1
-            if i >= len(self._edgesOrdered):
+            if i >= len(self._edges):
                 break
 
-        # second, go downward
+        # second, go downward if this is no the low terminus
         pre = []
-        if self._nodesOrdered.index(nodeId) != 0:
+        if self._nodes.index(nodeId) != 0:
             ref = pitchObj # reset to origin
-            j = self._nodesOrdered.index(nodeId) - 1
+            j = self._nodes.index(nodeId) - 1
             while True:
-                #environLocal.printDebug([i, self._edgesOrdered[i]])
-                intervalObj = self._edgesOrdered[j % len(self._edgesOrdered)]
+                #environLocal.printDebug([i, self._edges[i]])
+                intervalObj = self._edges[j % len(self._edges)].interval
                 # do interval in reverse direction
                 p = intervalObj.reverse().transposePitch(ref)
                 pre.append(p)
@@ -310,8 +400,53 @@ class IntervalNetwork:
                     break
 
         pre.reverse()
+        # after realizing, can use fit range to extend in different direction
+
         return self._fitRange(pre + post, minPitch, maxPitch)
 
+
+
+    def _getNetworkxGraph(self, pitchObj, nodeId=None, 
+        minPitch=None, maxPitch=None):
+        '''Create a networx graph from this representation.
+        '''
+        realized = self.realize(pitchObj=pitchObj, nodeId=nodeId, 
+                   minPitch=minPitch, maxPitch=maxPitch)
+        g = networkx.Graph()
+        for i, p in enumerate(realized):
+            if i > len(realized) - 2: 
+                continue # will be last, will continue
+            pNext = realized[i+1]
+            g.add_edge(p.nameWithOctave, pNext.nameWithOctave, weight=0.6)
+        return g
+
+
+    networkxGraph = property(_getNetworkxGraph, doc='''
+        Return a networks Graph object representing a realized version of this IntervalNetwork
+        ''')
+
+    def plot(self, pitchObj=None, nodeId=None, minPitch=None, maxPitch=None, 
+            *args, **keywords):
+        '''Given a method and keyword configuration arguments, create and display a plot.
+        '''
+#         >>> from music21 import *
+#         >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+#         >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
+#         >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+#         >>> #_DOCS_SHOW s.plot('pianoroll')
+    
+#         .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
+#             :width: 600
+        if pitchObj is None:
+            pitchObj = pitch.Pitch('C4')
+
+        # import is here to avoid import of matplotlib problems
+        from music21 import graph
+        # first ordered arg can be method type
+        g = graph.GraphNetworxGraph( 
+            networkxGraph=self._getNetworkxGraph(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
+        print 'here'
+        g.process()
 
 
 
@@ -387,9 +522,9 @@ class IntervalNetwork:
 
         '''
         if nodeId == None: # assume first
-            nodeId = self._getFirstNode()
+            nodeId = self._getTerminusLowNodes()[0]
         else:
-            nodeId = self._filterNodeId(nodeId)
+            nodeId = self._filterNodeId(nodeId)[0]
 
         if common.isStr(pitchTest):
             pitchTest = pitch.Pitch(pitchTest)
@@ -407,7 +542,7 @@ class IntervalNetwork:
                 if pitchTest == nodesRealized[i]:
                     match = True
             if match:
-                return (i % len(self._edgesOrdered)) + 1 # first node is 1
+                return (i % len(self._edges.keys())) + 1 # first node is 1
 
         # need to look upward
         if pitchTest.ps > nodesRealized[-1].ps:
@@ -419,7 +554,7 @@ class IntervalNetwork:
             while True:
                 # add enharmonic comparison switch
                 if post[i].ps == pitchTest.ps:
-                    return (i % len(self._edgesOrdered)) + 1 # first node is 1
+                    return (i % len(self._edges.keys())) + 1 # first node is 1
                 else:
                     i += 1
                 if i >= len(post):
@@ -438,7 +573,7 @@ class IntervalNetwork:
                 if post[i].ps == pitchTest.ps:
                     # remove the length of the post added in before
                     # first node is 1
-                    return (count % len(self._edgesOrdered)) + 1 
+                    return (count % len(self._edges.keys())) + 1 
                 else:
                     i -= 1
                     count -= 1
@@ -505,9 +640,9 @@ class IntervalNetwork:
 
         '''
         if nodeId == None: # assume first
-            nodeId = self._getFirstNode()
+            nodeId = self._getTerminusLowNodes()[0]
         else:
-            nodeId = self._filterNodeId(nodeId)
+            nodeId = self._filterNodeId(nodeId)[0]
 
         pitchTest, minPitch, maxPitch = self._filterPitchList(pitchTest)
         nodesRealized = self.realize(pitchReference, nodeId, minPitch, maxPitch)
@@ -556,7 +691,7 @@ class IntervalNetwork:
 
         '''
 
-        nodeId = self._getFirstNode()
+        nodeId = self._getTerminusLowNodes()[0]
         sortList = []
 
         # for now, searching 12 pitches; this may be more than necessary
@@ -723,6 +858,12 @@ class Test(unittest.TestCase):
         self.assertEqual(netScale.getRelativeNodeId('d', 1, 'c#'), 7)
 
 
+    def testGraphedOutput(self):
+        # note this relies on networkx
+        edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        netScale = IntervalNetwork(edgeList)
+        #netScale.plot()
+
 
 if __name__ == "__main__":
     import sys
@@ -731,7 +872,7 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         a = Test()
-
+        a.testGraphedOutput()
 
 
 
