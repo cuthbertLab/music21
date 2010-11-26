@@ -75,10 +75,14 @@ class Edge(object):
         else:
             i = intervalData
         self._interval = i
-        self._direction = 'bi' # can be ascending, descending
+        self._direction = DIRECTION_BI # can be ascending, descending
         self.weight = 1.0
         # store id
         self.id = id
+
+    def __repr__(self):
+        return '<music21.intervalNetwork.Edge %s %s>' % (self._direction, 
+                                                    self._interval.name)
 
     def _getInterval(self):
         return self._interval
@@ -95,7 +99,7 @@ class Node(object):
     Nodes store a lost of directed connections between edges, represented by their id integer.
 
     '''
-    def __init__(self, intervalData=None, direction='bi'):
+    def __init__(self):
 
         # connections are a list of tuple pairs between edge ids
         self._connections = []
@@ -190,16 +194,21 @@ class Node(object):
     def getNextOptionsByPrevious(self, previous, direction):
         '''Given a previous Edge or edge id and a direction, get a list of possible destinations. 
         '''
+        # if no previous is defined, get index of all possible edges
+        post = []
+        if previous is None:
+            for x, y in self.getConnections(direction=direction):
+                post.append(y)
+            return post
+
         iPast = []
-        if isNum(previous) or isStr(previous):
+        if common.isNum(previous) or common.isStr(previous):
             iPast.append(previous)
         else: # its a Node
             for x, y in previous.getConnections(direction=direction):
-                iPast.appedn(y)
-
-        post = []
+                iPast.append(y)
         for x, y in self.getConnections(direction=direction):
-            if iPast == x:
+            if x in iPast:
                 post.append(y)
         return post
 
@@ -1059,15 +1068,59 @@ class Test(unittest.TestCase):
         #netScale.plot()
 
 
+
+    def testNode(self):
+        # note this relies on networkx
+        #netScale.plot()
+
+        from music21 import intervalNetwork
+        i = interval.Interval('M3')
+        e1 = intervalNetwork.Edge(i, id=0)
+        self.assertEqual(repr(e1), '<music21.intervalNetwork.Edge bi M3>')
+
+        e2 = intervalNetwork.Edge(i, id=1)
+        e3 = intervalNetwork.Edge(i, id=2)
+
+        n1 = Node()
+        n1.addBiDirectedConnections(TERMINUS_LOW, e1)
+        self.assertEqual(repr(n1), "<music21.intervalNetwork.Node [('terminusLow',0),(0,'terminusLow')]>")
+
+        n2 = Node()
+        n2.addBiDirectedConnections(e1, e2)
+        self.assertEqual(repr(n2), "<music21.intervalNetwork.Node [(0,1),(1,0)]>")
+
+        n3 = Node()
+        n3.addBiDirectedConnections(e2, e3)
+        n4 = Node()
+        n4.addBiDirectedConnections(e3, TERMINUS_HIGH)
+        self.assertEqual(repr(n4), "<music21.intervalNetwork.Node [(2,'terminusHigh'),('terminusHigh',2)]>")
+
+
+        # test directed from 2 to 1
+        nJunk = Node()
+        nJunk.addDirectedConnection(e3, e2)
+        self.assertEqual(repr(nJunk), "<music21.intervalNetwork.Node [(2,1)]>")
+
+        # test get next options
+        # if arriving at n2, previous was n1, what is the index of the next
+        # edge
+        self.assertEqual(n2.getNextOptionsByPrevious(n1, direction=DIRECTION_ASCENDING), [1])
+
+        self.assertEqual(n2.getNextOptionsByPrevious(None, direction=DIRECTION_ASCENDING), [1])
+
+        self.assertEqual(n2.getNextOptionsByPrevious(None, direction=DIRECTION_DESCENDING), [0])
+
+
+
 if __name__ == "__main__":
     import sys
 
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
-        a = Test()
-        a.testGraphedOutput()
-
+        t = Test()
+        #t.testGraphedOutput()
+        t.testNode()
 
 
 # melodic/harmonic minor
