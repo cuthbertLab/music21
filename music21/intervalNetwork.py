@@ -41,6 +41,20 @@ except ImportError:
     #_missingImport.append('networkx')
 
 
+# these are just symbols/place holders; values do not matter as long
+# as they are not positive ints
+TERMINUS_LOW = 'terminusLow'
+TERMINUS_HIGH = 'terminusHigh'
+DIRECTION_BI = 'bi'
+DIRECTION_ASCENDING = 'ascending'
+DIRECTION_DESCENDING = 'descending'
+
+
+
+class EdgeException(Exception):
+    pass
+
+
 class Edge(object):
     '''Abstraction of an Interval as an Edge. 
 
@@ -86,6 +100,9 @@ class Node(object):
         # connections are a list of tuple pairs between edge ids
         self._connections = []
 
+    def __repr__(self):
+        return '<music21.intervalNetwork.Node %s>' % (repr(self._connections).replace(' ', ''))
+
 
     def addDirectedConnection(self, e1, e2):
         '''Provide two Edge objects that pass through this Node, in the direction from the first to the second. 
@@ -100,7 +117,18 @@ class Node(object):
         >>> n1.connections
         [(0, 1)]
         '''
-        self._connections.append((e1.id, e2.id))
+        # may be Edge objects, or number, or string
+        if common.isStr(e1) or common.isNum(e1):
+            e1Id = e1
+        else: # assume an Edge
+            e1Id = e1.id
+
+        if common.isStr(e2) or common.isNum(e2):
+            e2Id = e2
+        else: # assume an Edge
+            e2Id = e2.id
+
+        self._connections.append((e1Id, e2Id))
 
 
     def addBiDirectedConnections(self, e1, e2):
@@ -115,21 +143,62 @@ class Node(object):
         >>> n1.addBiDirectedConnections(e1, e2)
         >>> n1.connections
         [(0, 1), (1, 0)]
+        >>> n1
+        <music21.intervalNetwork.Node [(0,1),(1,0)]>
         '''
-        # simply add both directions
-        self._connections.append((e1.id, e2.id))
-        self._connections.append((e2.id, e1.id))
+        # may be Edge objects, or number, or string
+        self.addDirectedConnection(e1, e2)
+        self.addDirectedConnection(e2, e1)
 
 
-    def _getConnections(self):
-        return self._connections
+    def getConnections(self, direction=DIRECTION_BI):
+        if direction == 'bi':
+            return self._connections
+        elif direction == DIRECTION_ASCENDING:
+            post = []
+            for pair in self._connections:
+                if pair[0] == TERMINUS_LOW: # if first is low, must be ascending
+                    post.append(pair)
+                elif pair[1] == TERMINUS_HIGH: # if second is high, ascending
+                    post.append(pair)
+                # numerical comparison
+                elif common.isNum(pair[0]) and common.isNum(pair[1]):
+                    if pair[1] > pair[0]:
+                        post.append(pair)
+            return post
+        elif direction == DIRECTION_DESCENDING:
+            post = []
+            for pair in self._connections:
+                if pair[0] == TERMINUS_HIGH: # if first is high, descending
+                    post.append(pair)
+                elif pair[1] == TERMINUS_LOW: # if second is low, descending
+                    post.append(pair)
+                # numerical comparison
+                elif common.isNum(pair[0]) and common.isNum(pair[1]):
+                    if pair[1] < pair[0]:
+                        post.append(pair)
+            return post
 
-    connections = property(_getConnections, 
+        else:
+            raise EdgeException('got invalid direction argument: %s' % direction)         
+
+    connections = property(getConnections, 
         doc = '''Return a list of stored connections that pass through this node. Connections are stored as directed pairs of Edge indices. 
         ''')
 
 
+    def getNextOptionsByPrevious(self, previous):
+        '''If previous is defined, get a list of possible destinations. 
+        '''
+        post = []
+        for x, y in self._connections:
+            if previous == x:
+                post.append(y)
+        return post
 
+
+
+#-------------------------------------------------------------------------------
 class IntervalNetworkException(Exception):
     pass
 
@@ -166,7 +235,7 @@ class IntervalNetwork(object):
         self._edges = {}
 
         # nodes suggest Pitches, but Pitches are not stored
-        # instead, nodes are keys, pairs defining the two edges that connect
+        # instead, nodes are pairs of keys defining edges that connect
         # to this node
         self._nodes = []
     
@@ -177,10 +246,6 @@ class IntervalNetwork(object):
         # store node key (a pair between edges) 
         #self._nodeAttributes = {}
 
-        # these are just symbols/place holders; values do not matter as long
-        # as they are not positive ints
-        self._terminusLow = 'terminusLow'
-        self._terminusHigh = 'terminusHigh'
 
         if edgeList != None: # auto initialize
             self.setAscendingEdges(edgeList)
@@ -190,14 +255,20 @@ class IntervalNetwork(object):
 
         This assumes that all edges are linear and in order
         '''
-        low = self._terminusLow
+        low = TERMINUS_LOW
         high = None
         for i in sorted(self._edges.keys()):
-            pair = (low, i)
-            self._nodes.append(pair)
+            n = Node()
+            n.addBiDirectedConnections(low, i)
+            self._nodes.append(n)
             low = i
         # add last to end
-        self._nodes.append((i, self._terminusHigh))
+
+        n = Node()
+        n.addBiDirectedConnections(i, TERMINUS_HIGH)
+        self._nodes.append(n)
+
+        #self._nodes.append((i, TERMINUS_HIGH))
 
 
     def setAscendingEdges(self, edgeList):
@@ -209,7 +280,7 @@ class IntervalNetwork(object):
         >>> net = IntervalNetwork()
         >>> net.setAscendingEdges(edgeList)
         >>> net._nodes
-        [('terminusLow', 0), (0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 'terminusHigh')]
+        [<music21.intervalNetwork.Node [('terminusLow',0),(0,'terminusLow')]>, <music21.intervalNetwork.Node [(0,1),(1,0)]>, <music21.intervalNetwork.Node [(1,2),(2,1)]>, <music21.intervalNetwork.Node [(2,3),(3,2)]>, <music21.intervalNetwork.Node [(3,4),(4,3)]>, <music21.intervalNetwork.Node [(4,5),(5,4)]>, <music21.intervalNetwork.Node [(5,6),(6,5)]>, <music21.intervalNetwork.Node [(6,'terminusHigh'),('terminusHigh',6)]>]
 
         '''
         for edge in edgeList:
@@ -223,29 +294,39 @@ class IntervalNetwork(object):
 
     #---------------------------------------------------------------------------
     def _getTerminusLowNodes(self):
+        '''
+        '''
         post = []
         for n in self._nodes:
-            if self._terminusLow in n:
-                post.append(n)
+            if n in post:
+                continue
+            for pair in n.connections:
+                if TERMINUS_LOW in pair:
+                    post.append(n)
+                    break
         # lowest valued will be first
         post.sort()
         return post
     
     terminusLowNodes = property(_getTerminusLowNodes, 
-        doc='''Return a list of first Nodes, or Nodes that contain "start". Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the strings 'terminusLow' or 'terminusHigh.' As 
+        doc='''Return a list of first Nodes, or Nodes that contain "terminusLow". Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the strings 
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
         >>> net.setAscendingEdges(edgeList)
         >>> net.terminusLowNodes[0]
-        ('terminusLow', 0)
+        <music21.intervalNetwork.Node [('terminusLow',0),(0,'terminusLow')]>
         ''')
 
     def _getTerminusHighNodes(self):
         post = []
         for n in self._nodes:
-            if self._terminusHigh in n:
-                post.append(n)
+            if n in post:
+                continue
+            for pair in n.connections:
+                if TERMINUS_HIGH in pair:
+                    post.append(n)
+                    break
         post.sort()
         return post
 
@@ -258,27 +339,27 @@ class IntervalNetwork(object):
         >>> net = IntervalNetwork()
         >>> net.setAscendingEdges(edgeList)
         >>> net.terminusHighNodes[0]
-        (6, 'terminusHigh')
+        <music21.intervalNetwork.Node [(6,'terminusHigh'),('terminusHigh',6)]>
         ''')
 
 
     #---------------------------------------------------------------------------
     def _filterNodeId(self, id):
-        '''Given a node id, return a list of edge coordinates.
+        '''Given a node id, return a lost of Nodes that match this identifications. 
 
-        Node 1 is the first node, even though the edge coordinates are 'start' and 0.
+        Node 1 is the first node, even though the edge coordinates are 'terminusLow' and 0.
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
         >>> net.setAscendingEdges(edgeList)
         >>> net._filterNodeId(1)[0]
-        ('terminusLow', 0)
+        <music21.intervalNetwork.Node [('terminusLow',0),(0,'terminusLow')]>
         >>> net._filterNodeId([3,4])
-        [(3, 4)]
+        [<music21.intervalNetwork.Node [(3,4),(4,3)]>]
         >>> net._filterNodeId('high')
-        [(6, 'terminusHigh')]
+        [<music21.intervalNetwork.Node [(6,'terminusHigh'),('terminusHigh',6)]>]
         >>> net._filterNodeId('low')
-        [('terminusLow', 0)]
+        [<music21.intervalNetwork.Node [('terminusLow',0),(0,'terminusLow')]>]
         '''
         if common.isNum(id):
             # assume counting nodes from 1
@@ -291,9 +372,17 @@ class IntervalNetwork(object):
                 return self._getTerminusHighNodes()# returns a list
             else:
                 raise IntervalNetworkException('got a strin that has no match:', id)
+        elif isinstance(id, Node):
+            # look for direct match     
+            for n in self._nodes:
+                if n is id: # could be a == comparison?
+                    return [n]
+
         else: # match coords
-            if tuple(id) in self._nodes:
-                return [tuple(id)] # return a list for consistency
+            for n in self._nodes:
+                for pair in n.connections:
+                    if tuple(id) == pair:
+                        return [n] # return a list for consistency
 
     def _getNextAscendingNodes(self, nodeStart):
         '''Given a node, get the next node, searching all nodes to find the best match. 
@@ -304,17 +393,29 @@ class IntervalNetwork(object):
         >>> net = IntervalNetwork()
         >>> net.setAscendingEdges(edgeList)
         >>> net._filterNodeId(1)[0]
-        ('terminusLow', 0)
+        <music21.intervalNetwork.Node [('terminusLow',0),(0,'terminusLow')]>
         >>> net._getNextAscendingNodes(('terminusLow', 0))
-        [(0, 1)]
+        [<music21.intervalNetwork.Node [(0,1),(1,0)]>]
         >>> net._getNextAscendingNodes((0, 1))
-        [(1, 2)]
+        [<music21.intervalNetwork.Node [(1,2),(2,1)]>]
         '''
+        dst = [] # get all possible destinations
+        if common.isListLike(nodeStart):
+            dst.append(nodeStart[1])
+        else: # assume a node
+            for pair in n.getConnections(direction=DIRECTION_ASCENDING):
+            #for pair in nodeStart.connections:
+                dst.append(pair[1])
+
         post = []
         for n in self._nodes:
-            # need to check interval?
-            if nodeStart[1] == n[0]:
-                post.append(n)
+            if n in post: # may have been added in a lower loop
+                continue
+            for pair in n.getConnections(direction=DIRECTION_ASCENDING):
+                for previous in dst:
+                    if previous == pair[0]:
+                        post.append(n)
+                        break
         return post
 
     
@@ -724,6 +825,7 @@ class IntervalNetwork(object):
         ([B-2, C3, E-3, E#3, F2, E--2], [B2])
 
         '''
+        # these return a Node, not a nodeId
         if nodeId == None: # assume first
             nodeId = self._getTerminusLowNodes()[0]
         else:
