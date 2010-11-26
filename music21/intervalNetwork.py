@@ -187,12 +187,19 @@ class Node(object):
         ''')
 
 
-    def getNextOptionsByPrevious(self, previous):
-        '''If previous is defined, get a list of possible destinations. 
+    def getNextOptionsByPrevious(self, previous, direction):
+        '''Given a previous Edge or edge id and a direction, get a list of possible destinations. 
         '''
+        iPast = []
+        if isNum(previous) or isStr(previous):
+            iPast.append(previous)
+        else: # its a Node
+            for x, y in previous.getConnections(direction=direction):
+                iPast.appedn(y)
+
         post = []
-        for x, y in self._connections:
-            if previous == x:
+        for x, y in self.getConnections(direction=direction):
+            if iPast == x:
                 post.append(y)
         return post
 
