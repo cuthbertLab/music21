@@ -35,7 +35,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
     fifth  = interval.stringToInterval("P5")
     octave = interval.stringToInterval("P8")
         
-    def __init__(self, v1n1, v1n2, v2n1, v2n2):
+    def __init__(self, v1n1 = None, v1n2 = None, v2n1 = None, v2n2 = None):
         self.v1n1 = v1n1
         self.v1n2 = v1n2
         self.v2n1 = v2n1
@@ -145,10 +145,11 @@ class VoiceLeadingQuartet(music21.Music21Object):
             else:
                 return False
  
-    def parallelMotion(self):
+    def parallelMotion(self, requiredInterval = None):
         '''returns True if both voices move with the same interval or an
-        octave duplicate of the interval
-
+        octave duplicate of the interval.  if requiredInterval is given
+        then returns True only if the parallel interval is that simple interval.
+        
 
         >>> from music21 import *
         >>> n1 = note.Note('G4')
@@ -166,6 +167,11 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.parallelMotion()
         True
+        >>> vl.parallelMotion('P8')
+        True
+        >>> vl.parallelMotion('M6')
+        False
+        
         >>> m2 = note.Note('A5')
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.parallelMotion()
@@ -174,10 +180,19 @@ class VoiceLeadingQuartet(music21.Music21Object):
         '''
         if not self.similarMotion():
             return False
-        else:
-            if self.vIntervals[0].directedSimpleName == self.vIntervals[1].directedSimpleName:
-                return True
+        elif self.vIntervals[0].directedSimpleName != self.vIntervals[1].directedSimpleName:
             return False
+        else:
+            if requiredInterval is None:
+                return True
+            else:
+                if common.isStr(requiredInterval):
+                    requiredInterval = interval.Interval(requiredInterval)
+
+                if self.vIntervals[0].simpleName == requiredInterval.simpleName:
+                    return True
+                else:
+                    return False                
     
     def contraryMotion(self):
         '''

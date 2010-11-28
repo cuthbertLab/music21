@@ -194,7 +194,7 @@ def findRetrogradeVoices(show = True):
     4th is included since there could be a 3rd or 5th below it).
     '''
     
-    for transpose in [-2,3]: #[1, 2, -2, 3, -3, 4, -4]:
+    for transpose in [1, 2, -2, 3, -3, 4, -4]:
         for invert in [False, True]:
             qj1 = getQJ()
             qj2 = getQJ()
@@ -480,8 +480,8 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
 #    music21.mainTest()
-#    possibleSolution()
-    findRetrogradeVoices()
+    possibleSolution()
+#    findRetrogradeVoices()
     pass
 #------------------------------------------------------------------------------
 # eof

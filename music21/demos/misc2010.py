@@ -1,4 +1,4 @@
-from music21 import converter, corpus, stream, note
+from music21 import *
 
 def richardBreedGetWell():
     '''
@@ -55,7 +55,7 @@ def countCs():
     '''
     count the number of Cs in a piece.
     
-    Based on a question on the humdrum list
+    Based on a question on the humdrum mailing list
     '''
     from music21 import converter
     wtcf1 = converter.parse('http://kern.ccarh.org/cgi-bin/ksdata?l=ccarh/class/2007/shchon&file=wtc1f01.krn&f=kern')
@@ -67,11 +67,82 @@ def countCs():
     print numberOfCs
     print wtcf1.analyze('key')
 
+def bachParallels():
+    '''
+    find all instances of parallel fifths or octaves in Bach chorales.
+    Checking the work of George Fitsioris and Darrell Conklin, 
+    "Parallel successions of perfect fifths in the Bach chorales"
+    Proceedings of the fourth Conference on Interdisciplinary Musicology (CIM08)
+    Thessaloniki, Greece, 3-6 July 2008, http://web.auth.gr/cim08/
+    '''
+    for fn in corpus.bachChorales:
+        print fn
+        c = corpus.parseWork(fn)
+        displayMe = False
+#        sc = stream.Score()
+#        p1 = stream.Part()
+#        p1.append(meter.TimeSignature('8/4'))
+#        p2 = stream.Part()
+#        p2.append(meter.TimeSignature('8/4'))
+        for i in range(len(c.parts) - 1):
+            for j in range(i+1, len(c.parts)):
+                iName = c.parts[i].id
+                jName = c.parts[j].id
+                if iName.lower() not in ['soprano', 'alto', 'tenor', 'bass']:
+                    continue
+                if jName.lower() not in ['soprano', 'alto', 'tenor', 'bass']:
+                    continue
+
+                ifn = c.parts[i].flat.notes
+                jfn = c.parts[j].flat.notes
+                omi = ifn.offsetMap
+                for k in range(len(omi) - 1):
+                    n1pi = omi[k]['element']
+                    n2pi = omi[k+1]['element']                    
+                    n1pj = jfn.getElementsByOffset(offsetStart = omi[k]['endTime'] - .001, offsetEnd = omi[k]['endTime'] - .001, mustBeginInSpan = False)[0]
+                    n2pj = jfn.getElementsByOffset(offsetStart = omi[k+1]['offset'], offsetEnd = omi[k+1]['offset'], mustBeginInSpan = False)[0]
+                    if n1pj is n2pj:
+                        continue # no oblique motion
+                    if n1pi.isRest or n2pi.isRest or n1pj.isRest or n2pj.isRest:
+                        continue
+                    if n1pi.isChord or n2pi.isChord or n1pj.isChord or n2pj.isChord:
+                        continue
+
+                    vlq = voiceLeading.VoiceLeadingQuartet(n1pi, n2pi, n1pj, n2pj)
+                    if vlq.parallelMotion('P8') is False and vlq.parallelMotion('P5') is False:
+                        continue
+                    displayMe = True
+                    n1pi.addLyric('par ' + str(vlq.vIntervals[0].name))
+                    n2pi.addLyric(' w/ ' + jName)
+#                    m1 = stream.Measure()
+#                    m1.append(n1pi)
+#                    m1.append(n2pi)
+#                    r1 = note.Rest()
+#                    r1.duration.quarterLength = 8 - m1.duration.quarterLength
+#                    m1.append(r1)
+#                    m2 = stream.Measure()
+#                    m2.append(n1pj)
+#                    m2.append(n2pj)
+#                    r2 = note.Rest()
+#                    r2.duration.quarterLength = 8 - m2.duration.quarterLength
+#                    m2.append(r2)
+#
+#                    p1.append(m1)
+#                    p2.append(m2)
+                    
+#        sc.append(p1)
+#        sc.append(p2)
+#        sc.show()
+        if displayMe:
+            c.show()
+    
+
 #-------------------------------------------------------------------------------
 if (__name__ == "__main__"):
 #    richardBreedGetWell()
 #    annotateWithGerman()
-    countCs()
+#    countCs()
+    bachParallels()
 #------------------------------------------------------------------------------
 # eof
 

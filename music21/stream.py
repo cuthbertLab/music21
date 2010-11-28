@@ -2160,9 +2160,13 @@ class Stream(music21.Music21Object):
 
 
     def measureOffsetMap(self, classFilterList=None):
-        '''If this Stream contains Measures, provide a dictionary where keys are offsets and values are a list of references to one or more Measures that start at that offset. The offset values is always in the frame of the calling Stream (self).
+        '''If this Stream contains Measures, provide a dictionary 
+        where keys are offsets and values are a list of references 
+        to one or more Measures that start at that offset. The 
+        offset values is always in the frame of the calling Stream (self).
 
-        The `classFilterList` argument can be a list of classes used to find Measures. A default of None uses Measure. 
+        The `classFilterList` argument can be a list of classes 
+        used to find Measures. A default of None uses Measure. 
 
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
@@ -2917,7 +2921,7 @@ class Stream(music21.Music21Object):
     def _getOffsetMap(self, srcObj=None):
         '''Needed for makeMeasures and a few other places
 
-        The Stream soruce of elements is self by default, unless a `srcObj` is provided. 
+        The Stream source of elements is self by default, unless a `srcObj` is provided. 
         '''
         if srcObj == None:
             srcObj = self
@@ -2945,9 +2949,39 @@ class Stream(music21.Music21Object):
                 offset = round(e.getOffsetBySite(group), 8)
                 # NOTE: used to make a copy.copy of elements here; 
                 # this is not necssary b/c making deepcopy of entire Stream
-                offsetMap.append((offset, offset + dur, e, voiceIndex))
+                offsetDict = {}
+                offsetDict['offset'] = offset
+                offsetDict['endTime'] = offset + dur
+                offsetDict['element'] = e
+                offsetDict['voiceIndex'] = voiceIndex
+                offsetMap.append(offsetDict)
+                #offsetMap.append((offset, offset + dur, e, voiceIndex))
                 #offsetMap.append([offset, offset + dur, copy.copy(e)])
         return offsetMap
+
+    offsetMap = property(_getOffsetMap, doc='''
+        returns a list where each element is a dictionary
+        consisting of the 'offset' of each element in a stream, the
+        'endTime' (that is, the offset plus the duration) and the 
+        'element' itself.  Also contains a 'voiceIndex' entry which
+        contains the voice number of the element, or None if there
+        are no voices.
+        
+        >>> from music21 import *
+        >>> n1 = note.QuarterNote()
+        >>> c1 = clef.AltoClef()
+        >>> n2 = note.HalfNote()
+        >>> s1 = stream.Stream()
+        >>> s1.append([n1, c1, n2])
+        >>> om = s1.offsetMap
+        >>> om[2]['offset']
+        1.0
+        >>> om[2]['endTime']
+        3.0
+        >>> om[2]['element'] is n2
+        True
+        >>> om[2]['voiceIndex']
+    ''')
 
     def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
         inPlace=False):
@@ -3041,11 +3075,11 @@ class Stream(music21.Music21Object):
         # for each element in stream, need to find max and min offset
         # assume that flat/sorted options will be set before procesing
         # list of start, start+dur, element
-        offsetMap = srcObj._getOffsetMap()
+        offsetMap = srcObj.offsetMap
         #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
         #offsetMap.sort() not necessary; just get min and max
-        oMin = min([start for start, end, e, voiceIndex in offsetMap])
-        oMax = max([end for start, end, e, voiceIndex in offsetMap])
+        oMin = min([x['offset'] for x in offsetMap])
+        oMax = max([x['endTime'] for x in offsetMap])
         
         # if a ref stream is provided, get highst time from there
         # only if it is greater thant the highest time yet encountered
@@ -3105,7 +3139,9 @@ class Stream(music21.Music21Object):
                 measureCount += 1
         
         # populate measures with elements
-        for start, end, e, voiceIndex in offsetMap:
+        for ob in offsetMap:
+            start, end, e, voiceIndex = ob['offset'], ob['endTime'], ob['element'], ob['voiceIndex']
+            
             # iterate through all measures, finding a measure that 
             # can contain this element
             match = False
@@ -5006,8 +5042,9 @@ class Stream(music21.Music21Object):
         # list of start, start+dur, element, all in abs offset time
         offsetMap = self._getOffsetMap(returnObj)
         
-        for oStart, oEnd, e, voiceCount in offsetMap:
+        for ob in offsetMap:
             # if target is defined, only modify that object
+            oStart, oEnd, e, voiceCount = ob['offset'], ob['endTime'], ob['element'], ob['voiceIndex']
             if target != None and id(e) != id(target):
                 continue
 
@@ -11859,7 +11896,7 @@ class Test(unittest.TestCase):
     def testVoicesA(self):
 
         v1 = Voice()
-        n1 = note.Note('c5')
+        n1 = note.Note('d5')
         n1.quarterLength = .5
         v1.repeatAppend(n1, 8)
 
@@ -11873,9 +11910,28 @@ class Test(unittest.TestCase):
         s.insert(0, v2)
 
         # test allocating streams and assigning indices
-        oMap = s._getOffsetMap() 
-        self.assertEqual(str(oMap), '[(0.0, 0.5, <music21.note.Note C>, 0), (0.5, 1.0, <music21.note.Note C>, 0), (1.0, 1.5, <music21.note.Note C>, 0), (1.5, 2.0, <music21.note.Note C>, 0), (2.0, 2.5, <music21.note.Note C>, 0), (2.5, 3.0, <music21.note.Note C>, 0), (3.0, 3.5, <music21.note.Note C>, 0), (3.5, 4.0, <music21.note.Note C>, 0), (0.0, 1.0, <music21.note.Note C>, 1), (1.0, 2.0, <music21.note.Note C>, 1), (2.0, 3.0, <music21.note.Note C>, 1), (3.0, 4.0, <music21.note.Note C>, 1)]')
-
+        oMap = s.offsetMap
+        oMapStr = "[\n" # construct string from dict in fixed order...
+        for ob in oMap:
+            oMapStr += "{'voiceIndex': " + str(ob['voiceIndex']) + ", 'element': " + str(ob['element']) + ", 'endTime': " + str(ob['endTime']) + ", 'offset': " + str(ob['offset']) + "},\n"
+        oMapStr += "]\n"
+        #print oMapStr
+        self.assertEqual(oMapStr, 
+        '''[
+{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 0.5, 'offset': 0.0},
+{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 1.0, 'offset': 0.5},
+{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 1.5, 'offset': 1.0},
+{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 2.0, 'offset': 1.5},
+{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 2.5, 'offset': 2.0},
+{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 3.0, 'offset': 2.5},
+{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 3.5, 'offset': 3.0},
+{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 4.0, 'offset': 3.5},
+{'voiceIndex': 1, 'element': <music21.note.Note C>, 'endTime': 1.0, 'offset': 0.0},
+{'voiceIndex': 1, 'element': <music21.note.Note C>, 'endTime': 2.0, 'offset': 1.0},
+{'voiceIndex': 1, 'element': <music21.note.Note C>, 'endTime': 3.0, 'offset': 2.0},
+{'voiceIndex': 1, 'element': <music21.note.Note C>, 'endTime': 4.0, 'offset': 3.0},
+]
+''')
         oMeasures = s.makeMeasures()
         self.assertEqual(len(oMeasures[0].voices), 2)
         self.assertEqual([e.offset for e in oMeasures[0].voices[0]], [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5])

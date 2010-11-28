@@ -455,7 +455,7 @@ class GenericInterval(music21.Music21Object):
         if self.directed == 1:
             self.direction = OBLIQUE
         elif self.directed == -1:
-            raise IntervalException("Descending P1s not allowed")
+            raise IntervalException("Descending P1s not allowed; did you mean to write a diminished unison instead?")
         elif self.directed == 0:
             raise IntervalException("The Zeroth is not an interval")
         elif self.directed == self.undirected:
