@@ -87,9 +87,9 @@ They are all greatly appreciated.
 
 * `Justin London`_ compiled and maintained the list of Second-Viennese row forms now available in serial.py.
 
-* `Craig Sapp`_ has always been generous in discussions about MIR.
+* `Craig Sapp`_ has always been generous in discussions about MIR and has been a great collaborator.
 
-* `Seymour Schlien`_ has kindly given permission to distribute his ABC encodings of the Essen folksong database with music21.
+* `Seymour Shlien`_ has kindly given permission to distribute his ABC encodings of the Essen folksong database with music21.
 
 * `Bryen Travis`_ has kindly gave permission to use his collection of Bach MIDI data in music21.
 
@@ -102,7 +102,7 @@ They are all greatly appreciated.
 .. _Craig Sapp: https://ccrma.stanford.edu/~craig/
 .. _Bryen Travis: http://www.bachcentral.com/
 .. _Ewa Dahlig-Turek: http://www.esac-data.org
-.. _Seymour Schlien: http://ifdo.pugmarks.com/~seymour/runabc/esac/esacdatabase.html
+.. _Seymour Shlien: http://ifdo.pugmarks.com/~seymour/runabc/esac/esacdatabase.html
 
 
 
