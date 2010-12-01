@@ -129,10 +129,10 @@ class Edge(object):
 
         self._connections.append((n1Id, n2Id))
 
-        if direction is not None:
-            if (direction not in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]):
-                raise EdgeException('must request a direction')
-            self._direction = direction
+        # must specify a direction
+        if (direction not in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]):
+            raise EdgeException('must request a direction')
+        self._direction = direction
 
 
     def addBiDirectedConnections(self, n1, n2):
@@ -153,10 +153,9 @@ class Edge(object):
         >>> e1
         <music21.intervalNetwork.Edge bi M3 [('terminusLow',1),(1,'terminusLow')]>
         '''
-        # may be Node objects, or number, or string
         # must assume here that n1 to n2 is ascending; need to know
-        self.addDirectedConnection(n1, n2)
-        self.addDirectedConnection(n2, n1)
+        self.addDirectedConnection(n1, n2, DIRECTION_ASCENDING)
+        self.addDirectedConnection(n2, n1, DIRECTION_DESCENDING)
         self._direction = DIRECTION_BI # can be ascending, descending
 
 
@@ -190,7 +189,7 @@ class Edge(object):
         if self._direction == direction:
             return self._connections
         
-        # if requesting bi and mono directional
+        # if requesting bi from a mono directional edge is an error
         if (direction in [DIRECTION_BI] and self._direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]):
             raise EdgeException('cannot request a bi direction from a mono direction')
 
@@ -205,7 +204,8 @@ class Edge(object):
                 return [self._connections[0]]
             elif direction == DIRECTION_DESCENDING:
                 return [self._connections[1]]
-
+        # if no connections are possible, return none
+        return None
 
     connections = property(getConnections, 
         doc = '''Return a list of stored connections that pass through this node. Connections are stored as directed pairs of Edge indices. 
@@ -335,16 +335,17 @@ class IntervalNetwork(object):
 
 
     def fillDirectedEdges(self, ascendingEdgeList, descendingEdgeList):
-        '''Given two lists of edges, one ascending and another descending, construct appropriate nodes. 
+        '''Given two lists of edges, one for ascending intervals and another for  descending, construct appropriate Nodes and Edges.
+
+        Note that the descending intervals should be given in ascending form. 
         '''
         self.clear()
 
         # if both are equal, than assigning steps is easy
-        if len(ascendingEdgeList) == len(descendingEdgeList):
-            pass
+        if len(ascendingEdgeList) != len(descendingEdgeList):
+            raise IntervalNetworkException('cannot manage unequawl sized directed edges')
 
         stepCount = 1 # steps start from one
-
         nLow = Node(id=TERMINUS_LOW, step=stepCount)        
         stepCount += 1
         self._nodes[nLow.id] = nLow
@@ -370,9 +371,41 @@ class IntervalNetwork(object):
             self._edges[e.id] = e
             self._edgeIdCount += 1
 
-            e.addDirectedConnections(nPrevious, nFollowing)
+            e.addDirectedConnection(nPrevious, nFollowing,
+                direction='ascending')
             # update previous with the node created after this edge
             nPrevious = nFollowing
+
+        # repeat for descending, but reverse direction, and use
+        # same low and high nodes
+        stepCount = 1 # steps start from one
+        nLow = self._nodes[TERMINUS_LOW] # get node; do not need to add
+        stepCount += 1
+        nPrevious = nLow
+        for i, eName in enumerate(descendingEdgeList):
+            
+            # first, create the next node
+            if i < len(descendingEdgeList) - 1: # if not last
+                n = Node(id=self._nodeIdCount, step=stepCount)        
+                self._nodeIdCount += 1
+                stepCount += 1
+                nFollowing = n
+                # add to node dictionary
+                self._nodes[nFollowing.id] = nFollowing
+            else: # if last
+                nHigh = self._nodes[TERMINUS_HIGH]
+                nFollowing = nHigh
+    
+            # then, create edge and connection
+            e = Edge(eName, id=self._edgeIdCount)
+            self._edges[e.id] = e
+            self._edgeIdCount += 1
+
+            # order here is reversed from above
+            e.addDirectedConnection(nFollowing, nPrevious, direction='descending')
+            # update previous with the node created after this edge
+            nPrevious = nFollowing
+
 
     #---------------------------------------------------------------------------
     def _getTerminusLowNodes(self):
@@ -504,14 +537,18 @@ class IntervalNetwork(object):
         for k in self._edges.keys():
             e = self._edges[k]
             # only getting ascending connections
-            for src, dst in e.getConnections(direction):
+            pairs = e.getConnections(direction)
+            if pairs is None:
+                continue
+            for src, dst in pairs:
                 if src == srcId:
                     postEdge.append(e)
                     postNodeId.append(dst)
 
         if len(postEdge) == 0:
             environLocal.printDebug(['nodeStart', nodeStart, 'direction', direction, 'postEdge', postEdge])
-            raise IntervalNetworkException('could not find any edges')
+            return None
+            #raise IntervalNetworkException('could not find any edges')
         
         # if we have multiple edges, we may need to select based on weight
         postNode = [self._nodes[nId] for nId in postNodeId]
@@ -520,14 +557,16 @@ class IntervalNetwork(object):
 
 
 
-    def realize(self, pitchObj, nodeId=None, minPitch=None, maxPitch=None):
-        '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
+    def realize(self, pitchObj, nodeId=None, minPitch=None, maxPitch=None, 
+        direction=DIRECTION_BI):
+        '''Realize the nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The nodeId, when a simple, linear network, can be used as a scale step value starting from one.
         '''
         # get first node
-        # TODO: accept a node instance
-        if nodeId == None: # assume first
+        if isinstance(nodeId, Node):
+            nodeObj = nodeId
+        elif nodeId == None: # assume first
             nodeObj = self._getTerminusLowNodes()[0]
         else:
             nodeObj = self._nodeNameToNodes(nodeId)[0]
@@ -575,7 +614,12 @@ class IntervalNetwork(object):
                 n = self._getTerminusLowNodes()[0]
 
             # this returns a list of possible edges and nodes
-            postEdge, postNode = self._getNext(n, DIRECTION_ASCENDING)
+            nextBundle = self._getNext(n, DIRECTION_ASCENDING)
+            # if we cannot continue to ascend, then we must break
+            if nextBundle is None:
+                break
+
+            postEdge, postNode = nextBundle
             intervalObj = postEdge[0].interval # get first
             p = intervalObj.transposePitch(p)
             n = postNode[0]
@@ -591,7 +635,12 @@ class IntervalNetwork(object):
             if n.id == TERMINUS_LOW:
                 if minPitch is None: # if not defined, stop at terminus high
                     break
-            postEdge, postNode = self._getNext(n, DIRECTION_DESCENDING)
+
+            nextBundle = self._getNext(n, DIRECTION_DESCENDING)
+            if nextBundle is None:
+                environLocal.printDebug(['realize():', 'cannot descend from n', n])
+                break
+            postEdge, postNode = nextBundle
             intervalObj = postEdge[0].interval # get first
             p = intervalObj.reverse().transposePitch(p)
             n = postNode[0]
@@ -1116,24 +1165,6 @@ class Test(unittest.TestCase):
         #netScale.plot(pitchObj='F#', nodeId=3, minPitch='c2', maxPitch='c5')
 
 
-    def testEdge(self):
-        # note this relies on networkx
-        #netScale.plot()
-
-        from music21 import intervalNetwork
-        i = interval.Interval('M3')
-        e1 = intervalNetwork.Edge(i, id=0)
-        self.assertEqual(repr(e1), '<music21.intervalNetwork.Edge bi M3 []>')
-
-        e2 = intervalNetwork.Edge(i, id=1)
-        e3 = intervalNetwork.Edge(i, id=2)
-
-        n1 = Node()
-        n2 = Node()
-        n3 = Node()
-        n4 = Node()
-
-
     def testBasic(self):
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         net = IntervalNetwork()
@@ -1188,6 +1219,31 @@ class Test(unittest.TestCase):
         self.assertEqual(str(net.realize('c#4', 7)), "([D3, E3, F#3, G3, A3, B3, C#4, D4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
 
+    def testDirectedA(self):
+        # test creating a harmonic minor scale
+
+        ascendingEdgeList = ['M2', 'm2', 'M2', 'M2', 'M2', 'M2', 'm2']
+        descendingEdgeList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']
+
+        net = IntervalNetwork()
+        net.fillDirectedEdges(ascendingEdgeList, descendingEdgeList)
+
+        self.assertEqual(repr(net._edges), "{0: <music21.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>, 1: <music21.intervalNetwork.Edge ascending m2 [(0,1)]>, 2: <music21.intervalNetwork.Edge ascending M2 [(1,2)]>, 3: <music21.intervalNetwork.Edge ascending M2 [(2,3)]>, 4: <music21.intervalNetwork.Edge ascending M2 [(3,4)]>, 5: <music21.intervalNetwork.Edge ascending M2 [(4,5)]>, 6: <music21.intervalNetwork.Edge ascending m2 [(5,'terminusHigh')]>, 7: <music21.intervalNetwork.Edge descending M2 [(6,'terminusLow')]>, 8: <music21.intervalNetwork.Edge descending m2 [(7,6)]>, 9: <music21.intervalNetwork.Edge descending M2 [(8,7)]>, 10: <music21.intervalNetwork.Edge descending M2 [(9,8)]>, 11: <music21.intervalNetwork.Edge descending m2 [(10,9)]>, 12: <music21.intervalNetwork.Edge descending M2 [(11,10)]>, 13: <music21.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>}")
+
+        # returns a list of edges and notes
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'ascending')), "([<music21.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.intervalNetwork.Node id=0>])")
+
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), "([<music21.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.intervalNetwork.Node id=11>])")
+
+        # high terminus gets the same result, as this is the wrapping point
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_HIGH], 'ascending')), "([<music21.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.intervalNetwork.Node id=0>])")
+
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), "([<music21.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.intervalNetwork.Node id=11>])")
+
+
+        # this is ascending from a4 to a5, then descending from a4 to a3
+        # not sure if this is what realize should do yet
+        self.assertEqual(str(net.realize('a4', 1, 'a3', 'a5')), "([A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F#5, G#5, A5], ['terminusLow', 6, 7, 8, 9, 10, 11, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
 
 #-------------------------------------------------------------------------------
@@ -1200,9 +1256,11 @@ if __name__ == "__main__":
         t = Test()
         #t.testGraphedOutput()
         #t.testNode()
-        t.testBasic()
-        t.testScaleModel()
-        t.testHarmonyModel()
+        #t.testBasic()
+        #t.testScaleModel()
+        #t.testHarmonyModel()
+        t.testDirectedA()
+
 
 # melodic/harmonic minor
 # abstracted in scale class
