@@ -109,7 +109,7 @@ class BachBWV773(VirtualWork):
 
 
 class ColtraneGiantSteps(VirtualWork):
-    # this does not work yet as we cannot handle mxl files
+    # post operation: needs make accidentals
     def __init__(self):
         VirtualWork.__init__(self)
 
