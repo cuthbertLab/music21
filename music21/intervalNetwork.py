@@ -77,6 +77,7 @@ class Edge(object):
         else:
             i = intervalData
         self._interval = i
+        # direction will generally be set when connections added 
         self._direction = DIRECTION_BI # can be ascending, descending
         self.weight = 1.0
         # store id
@@ -183,6 +184,7 @@ class Edge(object):
         '''
         if direction == None:
             direction = self._direction
+
         # do not need to supply direction, because direction is defined
         # in this Edge.
         if self._direction == direction:
@@ -215,12 +217,16 @@ class Node(object):
 
     The Node id is used to storing connections in Edges.
 
-    The first and last Nodes have the special ids: terminusLow, terminusHighs
-
+    Terminal Nodes have special ids: terminusLow, terminusHighs
     '''
-    def __init__(self, id=None):
-        # store id
+    def __init__(self, id=None, step=None):
+        # store id, either as string, such as terminusLow, or a number. 
+        # ids are unique to any node in the network
         self.id = id
+        # the step is used to define ordered node counts from the bottom
+        # the step is analogous to scale step. 
+        # more than one node may have the same step
+        self.step = step
         # node weight might be used to indicate importance of scale positions
         self.weight = 1.0
 
@@ -250,10 +256,6 @@ class IntervalNetworkException(Exception):
 # edges M2(1+-), m2(2+), M2(3+)
 # edges m3(4-)
 
-# nodes: a (low, 1; 1, low), b (1, 2; 4, 1), c (2, 3; 3, 2), 
-#        d (3, high; high, 3; high, 4)
-
-
 
 class IntervalNetwork(object):
     '''A graph of undefined Pitch nodes connected by a defined, ordered list of Interval objects as edges. 
@@ -273,66 +275,104 @@ class IntervalNetwork(object):
         self._nodes = {}
 
         if edgeList != None: # auto initialize
-            self.setBidirectionalEdges(edgeList)
+            self.fillBiDirectedEdges(edgeList)
 
-    def _createAscendingNodes(self):
-        '''Nodes here are simply pairs of coordinates, connecting the indices of two edges. 
-
-        This assumes that all edges are linear and in order
+    def clear(self):
+        '''Remove and reset all Nodes and Edges. 
         '''
-        # TODO: this needs to be adjusted to look at the direction
-        # of Edges and set proper Node connections
-        nodes = []
-        low = TERMINUS_LOW
-        high = None
-        for i in sorted(self._edges.keys()):
-            n = Node()
-            #n.addBiDirectedConnections(low, i)
-            if i == 0:
-                n.id = TERMINUS_LOW
-            else:
-                n.id = self._nodeIdCount
-                self._nodeIdCount += 1
-
-            nodes.append(n)
-            low = i
-        # add last to end
-        n = Node()
-        #n.addBiDirectedConnections(i, TERMINUS_HIGH)
-        n.id = TERMINUS_HIGH
-        nodes.append(n)
-
-        # add to self._nodes
-        for n in nodes:
-            self._nodes[n.id] = n
-
-        # order here is assumed
-        for i in sorted(self._edges.keys()):
-            e = self._edges[i]
-            nSrc = nodes[i]
-            nDst = nodes[i+1]
-            #environLocal.printDebug(['calling e.addBiDirectedConnections(nSrc, nDst)'])
-            e.addBiDirectedConnections(nSrc, nDst)
+        self._edgeIdCount = 0
+        self._nodeIdCount = 0
+        self._edges = {}
+        self._nodes = {}
 
 
-    def setBidirectionalEdges(self, edgeList):
-        '''Given a list of edges (Interval specifications), store and define nodes.
-
-        Nodes are defined as two indices, connected stored edges. 
+    def fillBiDirectedEdges(self, edgeList):
+        '''Given an ordered list of bi-directed edges given as Interval specifications, create and define appropriate Nodes. This assumes that all edges are bidirected and all all edges are in order.
     
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setBidirectionalEdges(edgeList)
-
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.realizePitch('g4')
+        [G4, A4, B4, C5, D5, E5, F#5, G5]
+        >>> # using another fill method creates a new network
+        >>> net.fillBiDirectedEdges(['M3', 'M3', 'M3'])
+        >>> net.realizePitch('g4')
+        [G4, B4, D#5, F##5]
         '''
-        for edge in edgeList:
-            #i = interval.Interval(edge)
-            #self._edges.append(i)
-            # numbering starts at zero
-            self._edges[self._edgeIdCount] = Edge(edge, id=self._edgeIdCount)
-            self._edgeIdCount += 1
-        self._createAscendingNodes()
+        self.clear()
 
+        stepCount = 1 # steps start from one
+
+        nLow = Node(id=TERMINUS_LOW, step=stepCount)        
+        stepCount += 1
+        self._nodes[nLow.id] = nLow
+
+        nPrevious = nLow
+        for i, eName in enumerate(edgeList):
+            
+            # first, create the next node
+            if i < len(edgeList) - 1: # if not last
+                n = Node(id=self._nodeIdCount, step=stepCount)        
+                self._nodeIdCount += 1
+                stepCount += 1
+                nFollowing = n
+            else: # if last
+                nHigh = Node(id=TERMINUS_HIGH, step=1)  # step is same as start
+                nFollowing = nHigh
+    
+            # add to node dictionary
+            self._nodes[nFollowing.id] = nFollowing
+
+            # then, create edge and connection
+            e = Edge(eName, id=self._edgeIdCount)
+            self._edges[e.id] = e # store
+            self._edgeIdCount += 1
+
+            e.addBiDirectedConnections(nPrevious, nFollowing)
+            # update previous with the node created after this edge
+            nPrevious = nFollowing
+
+
+
+    def fillDirectedEdges(self, ascendingEdgeList, descendingEdgeList):
+        '''Given two lists of edges, one ascending and another descending, construct appropriate nodes. 
+        '''
+        self.clear()
+
+        # if both are equal, than assigning steps is easy
+        if len(ascendingEdgeList) == len(descendingEdgeList):
+            pass
+
+        stepCount = 1 # steps start from one
+
+        nLow = Node(id=TERMINUS_LOW, step=stepCount)        
+        stepCount += 1
+        self._nodes[nLow.id] = nLow
+
+        nPrevious = nLow
+        for i, eName in enumerate(ascendingEdgeList):
+            
+            # first, create the next node
+            if i < len(ascendingEdgeList) - 1: # if not last
+                n = Node(id=self._nodeIdCount, step=stepCount)        
+                self._nodeIdCount += 1
+                stepCount += 1
+                nFollowing = n
+            else: # if last
+                nHigh = Node(id=TERMINUS_HIGH, step=1)  # step is same as start
+                nFollowing = nHigh
+    
+            # add to node dictionary
+            self._nodes[nFollowing.id] = nFollowing
+
+            # then, create edge and connection
+            e = Edge(eName, id=self._edgeIdCount)
+            self._edges[e.id] = e
+            self._edgeIdCount += 1
+
+            e.addDirectedConnections(nPrevious, nFollowing)
+            # update previous with the node created after this edge
+            nPrevious = nFollowing
 
     #---------------------------------------------------------------------------
     def _getTerminusLowNodes(self):
@@ -341,16 +381,6 @@ class IntervalNetwork(object):
         post = []
         # for now, there is only one
         post.append(self._nodes[TERMINUS_LOW])
-#         for nId in self._nodes.keys():
-#             n = self._nodes[nId]
-#             if n in post:
-#                 continue
-#             for pair in n.connections:
-#                 if TERMINUS_LOW in pair:
-#                     post.append(n)
-#                     break
-#         # lowest valued will be first
-#         post.sort()
         return post
     
     terminusLowNodes = property(_getTerminusLowNodes, 
@@ -358,27 +388,15 @@ class IntervalNetwork(object):
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setBidirectionalEdges(edgeList)
+        >>> net.fillBiDirectedEdges(edgeList)
         >>> net.terminusLowNodes[0]
         <music21.intervalNetwork.Node id='terminusLow'>
         ''')
 
     def _getTerminusHighNodes(self):
-
-
         post = []
         # for now, there is only one
         post.append(self._nodes[TERMINUS_HIGH])
-
-#         for nId in self._nodes.keys():
-#             n = self._nodes[nId]
-#             if n in post:
-#                 continue
-#             for pair in n.connections:
-#                 if TERMINUS_HIGH in pair:
-#                     post.append(n)
-#                     break
-#         post.sort()
         return post
 
     
@@ -387,7 +405,7 @@ class IntervalNetwork(object):
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setBidirectionalEdges(edgeList)
+        >>> net.fillBiDirectedEdges(edgeList)
         >>> net.terminusHighNodes[0]
         <music21.intervalNetwork.Node id='terminusHigh'>
         ''')
@@ -399,32 +417,11 @@ class IntervalNetwork(object):
 
         There may not be unambiguous way to determine step. Or, a step may have different meanings when ascending or descending.
         '''
-        # TODO: this should use a step attribute
-        group = []
-        keys = self._nodes.keys()
-
-        if TERMINUS_LOW in keys:
-            keys.pop(keys.index(TERMINUS_LOW))
-            group.append(self._nodes[TERMINUS_LOW])
-        # we assume that the sorted keys correspond to order
-        for k in sorted(keys):
-            if k in [TERMINUS_HIGH]: 
-                continue
-            group.append(self._nodes[k])
-        if TERMINUS_HIGH in keys:
-            keys.pop(keys.index(TERMINUS_HIGH))
-            group.append(self._nodes[TERMINUS_HIGH])
-
-        # step 1 returns the zeroth element
+        # TODO: this should be cached after network creation
         post = {}
-        for i, n in enumerate(group):
-            post[n.id] = i+1
-            # reassign terminus high to terminus low if low exists
-            if n.id == TERMINUS_HIGH and TERMINUS_LOW in post.keys():
-                post[n.id] = post[TERMINUS_LOW]
-
+        for nId, n in self._nodes.items():
+            post[nId] = n.step
         return post
-        
 
 
     def _nodeIdToNodeStep(self, nId, direction=None):
@@ -432,11 +429,9 @@ class IntervalNetwork(object):
 
         There may not be unambiguous way to determine step. Or, a step may have different meanings when ascending or descending.
         '''
-        # TODO: this should use a step attribute
         nodeStep = self._getNodeStepDictionary(direction=direction)
         return nodeStep[nId] # gets step integer
         
-
 
     def _nodeNameToNodes(self, id):
         '''A node name may be an id, a string, or integer step count of nodes position (steps). Return a list of Nodes that match this identifications. 
@@ -445,34 +440,25 @@ class IntervalNetwork(object):
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setBidirectionalEdges(edgeList)
+        >>> net.fillBiDirectedEdges(edgeList)
         >>> net._nodeNameToNodes(1)[0]
         <music21.intervalNetwork.Node id='terminusLow'>
         >>> net._nodeNameToNodes('high')
         [<music21.intervalNetwork.Node id='terminusHigh'>]
         >>> net._nodeNameToNodes('low')
         [<music21.intervalNetwork.Node id='terminusLow'>]
+
+        >>> # test using a nodeStep, or an integer nodeName
+        >>> net._nodeNameToNodes(1)
+        [<music21.intervalNetwork.Node id='terminusLow'>]
+        >>> net._nodeNameToNodes(2)
+        [<music21.intervalNetwork.Node id=0>]
         '''
         if common.isNum(id):
-            # assume counting nodes from 1
-            # place in a list for uniformity
-            # note: this may need to check an explicit step attribute
-            group = []
-            keys = self._nodes.keys()
-
-            if TERMINUS_LOW in keys:
-                keys.pop(keys.index(TERMINUS_LOW))
-                group.append(self._nodes[TERMINUS_LOW])
-            # we assume that the sorted keys correspond to order
-            for k in sorted(keys):
-                if k in [TERMINUS_HIGH]: 
-                    continue
-                group.append(self._nodes[k])
-            if TERMINUS_HIGH in keys:
-                keys.pop(keys.index(TERMINUS_HIGH))
-                group.append(self._nodes[TERMINUS_HIGH])
-            # step 1 returns the zeroth element
-            return [group[id-1 % len(group)]]
+            nodeStep = self._getNodeStepDictionary()
+            for nId, nStep in nodeStep.items():
+                if id == nStep:
+                    return [self._nodes[nId]]
 
         elif common.isStr(id):
             if id.lower() in ['terminuslow', 'low']:
@@ -489,15 +475,6 @@ class IntervalNetwork(object):
                     return [n]
         else: # match coords
             raise IntervalNetworkException('cannot filter by: %s', id)
-#             for nId in self._nodes.keys():
-#                 n = self._nodes[nId]
-#                 for pair in n.connections:
-#                     if tuple(id) == pair:
-#                         return [n] # return a list for consistency
-
-
-
-
 
 
     def _getNext(self, nodeStart, direction):
@@ -507,7 +484,7 @@ class IntervalNetwork(object):
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setBidirectionalEdges(edgeList)
+        >>> net.fillBiDirectedEdges(edgeList)
         >>> net._nodeNameToNodes(1)[0]
         <music21.intervalNetwork.Node id='terminusLow'>
         '''
@@ -662,7 +639,7 @@ class IntervalNetwork(object):
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
-        >>> net.setBidirectionalEdges(edgeList)
+        >>> net.fillBiDirectedEdges(edgeList)
         >>> net.realizePitch(pitch.Pitch('G3'))
         [G3, A3, B3, C4, D4, E4, F#4, G4]
 
@@ -1160,7 +1137,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         net = IntervalNetwork()
-        net.setBidirectionalEdges(edgeList)
+        net.fillBiDirectedEdges(edgeList)
 
         self.assertEqual(net._edges.keys(), [0, 1, 2, 3, 4, 5, 6])
         self.assertEqual(sorted(net._nodes.keys()), [0, 1, 2, 3, 4, 5, 'terminusHigh', 'terminusLow'])
