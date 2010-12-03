@@ -960,7 +960,7 @@ class ModalCounterpoint(object):
         >>> s1.append([n1, n2, n3, n4, n5, n6, n7, n8, n9])
         >>> s2.append([n1, n2, n3, n4, n5, n6, n7, n8, n9])
         >>> cp = ModalCounterpoint(s1, s2)
-        >>> aMinor = scale.ConcreteMinorScale(n3)
+        >>> aMinor = scale.MinorScale(n3)
         >>> s2 = cp.raiseLeadingTone(s1, aMinor)
         >>> s2.notes[1].name
         'G#'
@@ -1750,7 +1750,7 @@ class Test(unittest.TestCase):
         n107.name = "F"
     
         stream14 = Stream([n100, n101, n102, n103, n104, n105, n106, n107])
-        aMinor = scale.ConcreteMinorScale(n101)
+        aMinor = scale.MinorScale(n101)
         stream15 = counterpoint1.raiseLeadingTone(stream14, aMinor)
         names15 = [note1.name for note1 in stream15.notes]
         assert names15 == ["G#", "A", "D", "F#", "G#", "A", "G", "F"]
@@ -1807,7 +1807,7 @@ class TestExternal(unittest.TestCase):
         cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notes)
 
         baseNote = Note(cf['mode'])
-        thisScale = scale.ConcreteMinorScale(baseNote)
+        thisScale = scale.MinorScale(baseNote)
             
         top = counterpoint1.generateFirstSpecies(cantusFirmus, thisScale, 'random')
     
@@ -1833,7 +1833,7 @@ class TestExternal(unittest.TestCase):
         cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notes)
 
         baseNote = Note(cf['mode'])
-        thisScale = scale.ConcreteMinorScale(baseNote)
+        thisScale = scale.MinorScale(baseNote)
             
         (middleVoice, topVoice) = counterpoint1.generateFirstSpeciesThreeVoices(cantusFirmus, thisScale, 'random')
             

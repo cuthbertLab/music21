@@ -190,7 +190,7 @@ def pitchToSharps(value, mode=None):
             if pMixolydian.name == p.name:
                 match = i
                 break
-        elif mode in ['minor']:
+        elif mode in ['minor', 'aeolian']:
         #else: # match minor pitch
             if pMinor.name == p.name:
                 match = i
