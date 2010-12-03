@@ -96,7 +96,33 @@ class Edge(object):
 
     interval = property(_getInterval, 
         doc = '''Return the stored Interval object
+
+        >>> from music21 import *
+        >>> i = interval.Interval('M3')
+        >>> e1 = intervalNetwork.Edge(i, id=0)
+        >>> n1 = Node(id=0)
+        >>> n2 = Node(id=1)
+        >>> e1.addDirectedConnection(n1, n2, 'ascending')
+        >>> e1.interval
+        <music21.interval.Interval M3>
         ''')
+
+    def _geDirection(self):
+        return self._direction
+
+    direction = property(_geDirection, 
+        doc = '''Return the direction of the Edge.
+
+        >>> from music21 import *
+        >>> i = interval.Interval('M3')
+        >>> e1 = intervalNetwork.Edge(i, id=0)
+        >>> n1 = Node(id=0)
+        >>> n2 = Node(id=1)
+        >>> e1.addDirectedConnection(n1, n2, 'ascending')
+        >>> e1.direction
+        'ascending'
+        ''')
+
 
     def addDirectedConnection(self, n1, n2, direction=None):
         '''Provide two Node objects that connect this Edge, in the direction from the first to the second. 
@@ -104,7 +130,6 @@ class Edge(object):
         When calling directly, a direction, either ascending or descending, should be set here; this will override whatever the interval is.  If None, this will not be set. 
 
         >>> from music21 import *
-        >>> from music21 import intervalNetwork
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
         >>> n1 = Node(id=0)
@@ -317,7 +342,7 @@ class IntervalNetwork(object):
                 stepCount += 1
                 nFollowing = n
             else: # if last
-                nHigh = Node(id=TERMINUS_HIGH, step=1)  # step is same as start
+                nHigh = Node(id=TERMINUS_HIGH, step=stepCount)  # step is same as start
                 nFollowing = nHigh
     
             # add to node dictionary
@@ -360,7 +385,7 @@ class IntervalNetwork(object):
                 stepCount += 1
                 nFollowing = n
             else: # if last
-                nHigh = Node(id=TERMINUS_HIGH, step=1)  # step is same as start
+                nHigh = Node(id=TERMINUS_HIGH, step=stepCount)  # step is same as start
                 nFollowing = nHigh
     
             # add to node dictionary
@@ -445,15 +470,25 @@ class IntervalNetwork(object):
 
 
     #---------------------------------------------------------------------------
-    def _getNodeStepDictionary(self, direction=None):
+    def _getNodeStepDictionary(self, direction=None, equateTerminals=True):
         '''Return a dictionary of node id, node step pairs. The same step may be given for each node 
 
         There may not be unambiguous way to determine step. Or, a step may have different meanings when ascending or descending.
+
+        If `equateTerminals` is True, the terminals will be given the same step. 
         '''
         # TODO: this should be cached after network creation
         post = {}
         for nId, n in self._nodes.items():
-            post[nId] = n.step
+            if equateTerminals:
+                if nId == TERMINUS_HIGH:
+                    # get the same step as the low
+                    post[nId] = self._nodes[TERMINUS_LOW].step
+                else:
+                    post[nId] = n.step
+            else: # directly assign
+                post[nId] = n.step
+
         return post
 
 
@@ -710,7 +745,43 @@ class IntervalNetwork(object):
         return self.realize(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch)[0]
 
 
-    def _getNetworkxGraph(self, pitchObj, nodeId=None, 
+
+
+    def _getNetworkxGraph(self):
+        '''Create a networx graph from the raw Node representation.
+        '''
+        #g = networkx.DiGraph()
+        g = networkx.MultiDiGraph()
+
+        for eId, e in self._edges.items():
+            if e.direction == DIRECTION_ASCENDING:
+                weight = 0.9
+                style = 'solid'
+            elif e.direction == DIRECTION_DESCENDING:
+                weight = 0.6
+                style = 'solid'
+            elif e.direction == DIRECTION_BI:
+                weight = 1.0
+                style = 'solid'
+            for src, dst in e._connections:
+                g.add_edge(src, dst, weight=weight, style=style)
+
+        # set positions of all nodes based on step, where y value is step
+        # and x is count of values at that step
+        stepCount = {} # step, count pairs
+        # sorting nodes will help, but not insure, proper positioning
+        nKeys = self._nodes.keys()
+        nKeys.sort()
+        for nId in nKeys:
+            n = self._nodes[nId]
+            if n.step not in stepCount.keys():
+                stepCount[n.step] = 0
+            g.node[nId]['pos'] = (stepCount[n.step], n.step)
+            stepCount[n.step] += 1
+        environLocal.printDebug(['got step count', stepCount])
+        return g
+
+    def _getNetworkxRealizedGraph(self, pitchObj, nodeId=None, 
         minPitch=None, maxPitch=None):
         '''Create a networx graph from this representation.
         '''
@@ -726,7 +797,7 @@ class IntervalNetwork(object):
         return g
 
 
-    networkxGraph = property(_getNetworkxGraph, doc='''
+    networkxGraph = property(_getNetworkxRealizedGraph, doc='''
         Return a networks Graph object representing a realized version of this IntervalNetwork
         ''')
 
@@ -749,8 +820,9 @@ class IntervalNetwork(object):
         from music21 import graph
         # first ordered arg can be method type
         g = graph.GraphNetworxGraph( 
-            networkxGraph=self._getNetworkxGraph(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
-        print 'here'
+            networkxGraph=self._getNetworkxGraph())
+
+            #networkxGraph=self._getNetworkxRealizedGraph(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
         g.process()
 
 
@@ -866,8 +938,9 @@ class IntervalNetwork(object):
         1
 
         '''
-        nId =  self.getRelativeNodeId(pitchReference=pitchReference, nodeName=nodeName, pitchTest=pitchTest, 
-        permitEnharmonic=permitEnharmonic)
+        nId = self.getRelativeNodeId(pitchReference=pitchReference, 
+            nodeName=nodeName, pitchTest=pitchTest, 
+            permitEnharmonic=permitEnharmonic)
         if nId == None:
             return None
         else:
@@ -1244,6 +1317,8 @@ class Test(unittest.TestCase):
         # this is ascending from a4 to a5, then descending from a4 to a3
         # not sure if this is what realize should do yet
         self.assertEqual(str(net.realize('a4', 1, 'a3', 'a5')), "([A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F#5, G#5, A5], ['terminusLow', 6, 7, 8, 9, 10, 11, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
+    
+        #net.plot()
 
 
 #-------------------------------------------------------------------------------

@@ -450,20 +450,34 @@ class GraphNetworxGraph(Graph):
         ax = self.fig.add_subplot(1, 1, 1)
 
         # positions for all nodes
-        pos = networkx.spring_layout(self.networkxGraph, weighted=True) 
+        # positions are stored in the networkx graph as a pos attribute
+        posNodes = {}
+        posNodeLabels = {}
+        # returns a data dictionary
+        for nId, nData in self.networkxGraph.nodes(data=True):
+            posNodes[nId] = nData['pos']
+            # shift labels off center of nodes
+            posNodeLabels[nId] = (nData['pos'][0]+.125, nData['pos'][1])
+
+        environLocal.printDebug(['get position', posNodes])
+        #posNodes = networkx.spring_layout(self.networkxGraph, weighted=True) 
         # draw nodes
-        networkx.draw_networkx_nodes(self.networkxGraph, pos, node_size=400, ax=ax, node_color='#605C7F', alpha=1)
+        networkx.draw_networkx_nodes(self.networkxGraph, posNodes, 
+            node_size=300, ax=ax, node_color='#605C7F', alpha=.5)
 
         for (u,v,d) in self.networkxGraph.edges(data=True):
             environLocal.printDebug(['GraphNetworxGraph', (u,v,d)])
             #print (u,v,d)
             # adding one at a time to permit individual alpha settings
             edgelist = [(u,v)]
-            networkx.draw_networkx_edges(self.networkxGraph, pos, edgelist=edgelist, width=2, 
+            networkx.draw_networkx_edges(self.networkxGraph, posNodes, edgelist=edgelist, width=2, style=d['style'], 
             edge_color='#666666', alpha=d['weight'], ax=ax)
         
         # labels
-        networkx.draw_networkx_labels(self.networkxGraph, pos, font_size=self.labelFontSize, font_family=self.fontFamily, ax=ax)
+        networkx.draw_networkx_labels(self.networkxGraph, posNodeLabels, 
+            font_size=self.labelFontSize, 
+            font_family=self.fontFamily, font_color='#000000',
+            ax=ax)
 
 
         #remove all labels
