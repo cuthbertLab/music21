@@ -437,10 +437,10 @@ class GraphNetworxGraph(Graph):
         else:
             # testing default; temporary
             g = networkx.Graph()
-            g.add_edge('a','b',weight=1.0)
-            g.add_edge('b','c',weight=0.6)
-            g.add_edge('c','d',weight=0.2)
-            g.add_edge('d','e',weight=0.6)
+#             g.add_edge('a','b',weight=1.0)
+#             g.add_edge('b','c',weight=0.6)
+#             g.add_edge('c','d',weight=0.2)
+#             g.add_edge('d','e',weight=0.6)
             self.networkxGraph = g
 
     def process(self):

@@ -29,6 +29,9 @@ from music21 import environment
 _MOD = "counterpoint.py"
 environLocal = environment.Environment(_MOD)
 
+
+
+
 class ModalCounterpointException(Exception):
     pass
 
@@ -1131,7 +1134,7 @@ class ModalCounterpoint(object):
             possibleNotes.extend(goingDown)
         environLocal.printDebug(["possible: ", [note1.name for note1 in possibleNotes]])
 
-        goodNotes = minorScale.generateScaleList()
+        goodNotes = minorScale.ascending()
         goodNames = [note2.name for note2 in goodNotes]
         
         for note1 in possibleNotes:
@@ -1197,7 +1200,7 @@ class ModalCounterpoint(object):
             possibleNotes.extend(goingDown)
         environLocal.printDebug(["possible: ", [note1.name for note1 in possibleNotes]])
 
-        goodNotes = minorScale.generateScaleList()
+        goodNotes = minorScale.ascending()
         goodNames = [note2.name for note2 in goodNotes]
         
         for note1 in possibleNotes:
@@ -1390,7 +1393,7 @@ class ModalCounterpoint(object):
 ##            possibleNotes.extend(goingDown)
         environLocal.printDebug(["possible: ", [note1.name for note1 in possibleNotes]])
 
-        goodNotes = minorScale.generateScaleList()
+        goodNotes = minorScale.ascending()
         goodNames = [note2.name for note2 in goodNotes]
         
         for note1 in possibleNotes:
@@ -1415,12 +1418,8 @@ class ModalCounterpoint(object):
         print
         return valid
 
-##############################################################
-###
-###     TONS OF TESTING
-###
-##############################################################
 
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     pass
 
@@ -1788,8 +1787,12 @@ def getRandomCF(mode = None):
         raise Exception('Cantus firmus selection by mode does not yet exist')
     return random.choice(cantusFirmi)
 
+
+#-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
-    pass
+
+    def runTest(self):
+        pass
    
     def xtestGenerateFirstSpecies(self):
         '''
