@@ -18,26 +18,28 @@ import unittest, doctest
 
 import music21
 from music21 import pitch
-from music21.pitch import Pitch
-from music21 import stream
-from music21.stream import Stream
 from music21 import interval
 
 
+
+#-------------------------------------------------------------------------------
+class ScaleException(Exception):
+    pass
+
 class Scale(music21.Music21Object):
     '''
-    Generic class for all scales
-    
-    Not for general use because a scale can been so many things to
-    so many different people
+    Generic base class for all scales.
     '''
-    
     pass
+
 
 class DirectionlessScale(Scale):
     '''A DirectionlessScale is the same ascending and descending.
-    For instance, the major scale.  A DirectionSensitiveScale has
+    For instance, the major scale.  
+
+    A DirectionSensitiveScale has
     two different forms.  For instance, the natural-minor scale.
+    
     One could imagine more complex scales that have different forms
     depending on what scale degree you've just landed on.  Some
     Ragas might be expressible in that way.'''
@@ -56,13 +58,15 @@ class DirectionlessScale(Scale):
 class DirectionSensitiveScale(Scale):
     pass
 
+
+#-------------------------------------------------------------------------------
 class DiatonicScale(Scale):
-    def __init__(self, tonic = Pitch()):
-        spacer = " "
+    def __init__(self, tonic = pitch.Pitch()):
+
         self.tonic = tonic
         self.step = self.tonic.step
         self.accidental = self.tonic.accidental
-        self.name = spacer.join([self.tonic.name, self.type]) 
+        self.name = " ".join([self.tonic.name, self.type]) 
         self.scaleList = self.generateScaleList()
 
     def generateScaleList(self):
@@ -86,9 +90,16 @@ class DiatonicScale(Scale):
     def concrete(self):
         pass
     
+
+
+# class ScaleDegree(object):
+#     pass
+# 
+
+
 class ConcreteMajorScale(DiatonicScale, DirectionlessScale):
     '''
-    >>> d = Pitch(); d.name = "D"
+    >>> d = pitch.Pitch(); d.name = "D"
     >>> dScale = ConcreteMajorScale(d)
     >>> cis = dScale.pitchFromScaleDegree(7)
     >>> cis.name
@@ -125,6 +136,9 @@ class ConcreteMajorScale(DiatonicScale, DirectionlessScale):
 
     def getParallelMinor(self):
         return ConcreteMinorScale(self.tonic)
+
+
+
 
 class ConcreteMinorScale(DiatonicScale, DirectionlessScale):
     type = "minor"
@@ -185,19 +199,112 @@ class ConcreteMinorScale(DiatonicScale, DirectionlessScale):
     def getParallelMajor(self):
         return ConcreteMajorScale(self.tonic)
 
-class ScaleException(Exception):
-    pass
 
-class ScaleDegree(object):
-    pass
 
+
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
     def runTest(self):
         pass
 
+
+    def testBasicLegacy(self):
+        from music21 import note
+
+        n1 = note.Note()
+        
+        CMajor = ConcreteMajorScale(n1)
+        
+        assert CMajor.name == "C major"
+        assert CMajor.scaleList[6].step == "B"
+        
+        CScale = CMajor.getConcreteMajorScale()
+        
+        assert CScale[7].step == "C"
+        assert CScale[7].octave == 5
+        
+        CScale2 = CMajor.getAbstractMajorScale()
+        
+        for note1 in CScale2:
+            assert note1.octave == 0
+            #assert note1.duration.type == ""
+        assert [note1.name for note1 in CScale] == ["C", "D", "E", "F", "G", "A", "B", "C"]
+        
+        seventh = CMajor.pitchFromScaleDegree(7)
+        assert seventh.step == "B"
+        
+        dom = CMajor.getDominant()
+        assert dom.step == "G"
+        
+        n2 = note.Note()
+        n2.step = "A"
+        
+        aMinor = CMajor.getRelativeMinor()
+        assert aMinor.name == "A minor", "Got a different name: " + aMinor.name
+        
+        notes = [note1.name for note1 in aMinor.scaleList]
+        assert notes == ["A", "B", "C", "D", "E", "F", "G"]
+        
+        n3 = note.Note()
+        n3.name = "B-"
+        n3.octave = 5
+        
+        bFlatMinor = ConcreteMinorScale(n3)
+        assert bFlatMinor.name == "B- minor", "Got a different name: " + bFlatMinor.name
+        notes2 = [note1.name for note1 in bFlatMinor.scaleList]
+        assert notes2 == ["B-", "C", "D-", "E-", "F", "G-", "A-"]
+        assert bFlatMinor.scaleList[0] == n3
+        assert bFlatMinor.scaleList[6].octave == 6
+        
+        harmonic = bFlatMinor.getConcreteHarmonicMinorScale()
+        niceHarmonic = [note1.name for note1 in harmonic]
+        assert niceHarmonic == ["B-", "C", "D-", "E-", "F", "G-", "A", "B-"]
+        
+        harmonic2 = bFlatMinor.getAbstractHarmonicMinorScale()
+        assert [note1.name for note1 in harmonic2] == niceHarmonic
+        for note1 in harmonic2:
+            assert note1.octave == 0
+            #assert note1.duration.type == ""
+        
+        melodic = bFlatMinor.getConcreteMelodicMinorScale()
+        niceMelodic = [note1.name for note1 in melodic]
+        assert niceMelodic == ["B-", "C", "D-", "E-", "F", "G", "A", "B-", "A-", "G-", \
+                               "F", "E-", "D-", "C", "B-"]
+        
+        melodic2 = bFlatMinor.getAbstractMelodicMinorScale()
+        assert [note1.name for note1 in melodic2] == niceMelodic
+        for note1 in melodic2:
+            assert note1.octave == 0
+            #assert note1.duration.type == ""
+        
+        cNote = bFlatMinor.pitchFromScaleDegree(2)
+        assert cNote.name == "C"
+        fNote = bFlatMinor.getDominant()
+        assert fNote.name == "F"
+        
+        bFlatMajor = bFlatMinor.getParallelMajor()
+        assert bFlatMajor.name == "B- major"
+        scale = [note1.name for note1 in bFlatMajor.getConcreteMajorScale()]
+        assert scale == ["B-", "C", "D", "E-", "F", "G", "A", "B-"]
+        
+        dFlatMajor = bFlatMinor.getRelativeMajor()
+        assert dFlatMajor.name == "D- major"
+        assert dFlatMajor.getTonic().name == "D-"
+        assert dFlatMajor.getDominant().name == "A-"
+
+
+
+#-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    import sys
+
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        t = Test()
+
+
 
 #------------------------------------------------------------------------------
 # eof

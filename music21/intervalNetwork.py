@@ -486,9 +486,8 @@ class IntervalNetwork(object):
                     post[nId] = self._nodes[TERMINUS_LOW].step
                 else:
                     post[nId] = n.step
-            else: # directly assign
+            else: # directly assign from attribute
                 post[nId] = n.step
-
         return post
 
 
@@ -501,10 +500,10 @@ class IntervalNetwork(object):
         return nodeStep[nId] # gets step integer
         
 
-    def _nodeNameToNodes(self, id):
+    def _nodeNameToNodes(self, id, equateTerminals=True):
         '''A node name may be an id, a string, or integer step count of nodes position (steps). Return a list of Nodes that match this identifications. 
 
-        Node 1 is the first, lowest node, 'terminusLow'.
+        If `equateTerminals` is True, and the name given is a step number, then the first terminal will return both the first and last.
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
@@ -518,16 +517,20 @@ class IntervalNetwork(object):
 
         >>> # test using a nodeStep, or an integer nodeName
         >>> net._nodeNameToNodes(1)
+        [<music21.intervalNetwork.Node id='terminusLow'>, <music21.intervalNetwork.Node id='terminusHigh'>]
+        >>> net._nodeNameToNodes(1, equateTerminals=False)
         [<music21.intervalNetwork.Node id='terminusLow'>]
         >>> net._nodeNameToNodes(2)
         [<music21.intervalNetwork.Node id=0>]
         '''
         if common.isNum(id):
-            nodeStep = self._getNodeStepDictionary()
+            post = []
+            nodeStep = self._getNodeStepDictionary(
+                equateTerminals=equateTerminals)
             for nId, nStep in nodeStep.items():
                 if id == nStep:
-                    return [self._nodes[nId]]
-
+                    post.append(self._nodes[nId])
+            return post
         elif common.isStr(id):
             if id.lower() in ['terminuslow', 'low']:
                 return self._getTerminusLowNodes() # returns a list
@@ -566,7 +569,7 @@ class IntervalNetwork(object):
         if srcId == TERMINUS_LOW and direction == DIRECTION_DESCENDING:
             srcId = TERMINUS_HIGH
         # if we are at terminus high and ascending, must wrap around
-        if srcId == TERMINUS_HIGH and direction == DIRECTION_ASCENDING:
+        elif srcId == TERMINUS_HIGH and direction == DIRECTION_ASCENDING:
             srcId = TERMINUS_LOW
 
         for k in self._edges.keys():
@@ -588,6 +591,8 @@ class IntervalNetwork(object):
         # if we have multiple edges, we may need to select based on weight
         postNode = [self._nodes[nId] for nId in postNodeId]
         return postEdge, postNode
+
+
 
 
 
@@ -1293,9 +1298,12 @@ class Test(unittest.TestCase):
 
 
     def testDirectedA(self):
-        # test creating a harmonic minor scale
+
+        # test creating a harmonic minor scale by using two complete        
+        # ascending and descending scales
 
         ascendingEdgeList = ['M2', 'm2', 'M2', 'M2', 'M2', 'M2', 'm2']
+        # these are given in ascending order
         descendingEdgeList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']
 
         net = IntervalNetwork()
@@ -1315,9 +1323,26 @@ class Test(unittest.TestCase):
 
 
         # this is ascending from a4 to a5, then descending from a4 to a3
-        # not sure if this is what realize should do yet
+        # this seems like the right thing to do
         self.assertEqual(str(net.realize('a4', 1, 'a3', 'a5')), "([A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F#5, G#5, A5], ['terminusLow', 6, 7, 8, 9, 10, 11, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
+
+
+        # can get a descending form by setting reference pitch to top of range
+        self.assertEqual(str(net.realizePitch('a5', 1, 'a4', 'a5')), 
+        "[A4, B4, C5, D5, E5, F5, G5, A5]")
+
+        # can get a descending form by setting reference pitch to top of range
+        self.assertEqual(str(net.realizePitch('a4', 1, 'a4', 'a5')), 
+        "[A4, B4, C5, D5, E5, F#5, G#5, A5]")
     
+        # if we try to get a node by a name that is a step, we will get
+        # two results, as one is the ascending and one is the descending
+        # form
+        self.assertEqual(str(net._nodeNameToNodes(3)), 
+        "[<music21.intervalNetwork.Node id=1>, <music21.intervalNetwork.Node id=7>]")
+        self.assertEqual(str(net._nodeNameToNodes(7)), 
+        "[<music21.intervalNetwork.Node id=5>, <music21.intervalNetwork.Node id=11>]")
+
         #net.plot()
 
 
