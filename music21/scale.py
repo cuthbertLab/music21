@@ -86,13 +86,12 @@ class AbstractScale(Scale):
         self.net = None
 
 
-    def getStepModulus(self):
+    def getStepMaxUnique(self):
         '''Return the maximum number of scale steps, or the number to use as a 
         modulus. 
         '''
-        # temporary
-        return 7
-        #return self.net.stepModulus
+        # access from property
+        return self.net.stepMaxUnique
 
 
     def reverse(self):
@@ -122,6 +121,13 @@ class AbstractDiatonicScale(AbstractScale):
     def buildNetwork(self, mode=None):
         '''
         Given sub-class dependent parameters, build and assign the IntervalNetwork.
+
+        >>> from music21 import *
+        >>> sc = scale.AbstractDiatonicScale()
+        >>> sc.buildNetwork('lydian')
+        >>> sc.getRealization('f4', 1, 'f2', 'f6') 
+        [F2, G2, A2, B2, C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5, C6, D6, E6, F6]
+
         '''
 
         # nice reference here:
@@ -257,7 +263,7 @@ class ConcreteScale(Scale):
         '''
         from music21 import stream, note
         m = stream.Measure()
-        for i in range(1, self._abstract.getStepModulus()+1):
+        for i in range(1, self._abstract.getStepMaxUnique()+1):
             p = self.pitchFromScaleDegree(i)
             n = note.Note()
             n.pitch = p
@@ -333,10 +339,10 @@ class ConcreteScale(Scale):
         Or, get from intervalNetwork. 
         '''
         # get from network
-        if 0 < degree <= self._abstract.getStepModulus(): 
+        if 0 < degree <= self._abstract.getStepMaxUnique(): 
             return self.getPitchList()[degree - 1]
         else: 
-            raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getStepModulus())
+            raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getStepMaxUnique())
 
 
 #     def ascending(self):
@@ -425,7 +431,7 @@ class DiatonicScale(ConcreteScale):
         '''
         from music21 import stream, note
         m = stream.Measure()
-        for i in range(1, self._abstract.getStepModulus()+1):
+        for i in range(1, self._abstract.getStepMaxUnique()+1):
             p = self.pitchFromScaleDegree(i)
             n = note.Note()
             n.pitch = p

@@ -302,6 +302,7 @@ class IntervalNetwork(object):
         if edgeList != None: # auto initialize
             self.fillBiDirectedEdges(edgeList)
 
+
     def clear(self):
         '''Remove and reset all Nodes and Edges. 
         '''
@@ -309,6 +310,9 @@ class IntervalNetwork(object):
         self._nodeIdCount = 0
         self._edges = {}
         self._nodes = {}
+
+
+
 
 
     def fillBiDirectedEdges(self, edgeList):
@@ -319,10 +323,15 @@ class IntervalNetwork(object):
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.realizePitch('g4')
         [G4, A4, B4, C5, D5, E5, F#5, G5]
+        >>> net.stepMin, net.stepMax
+        (1, 8)
+
         >>> # using another fill method creates a new network
         >>> net.fillBiDirectedEdges(['M3', 'M3', 'M3'])
         >>> net.realizePitch('g4')
         [G4, B4, D#5, F##5]
+        >>> net.stepMin, net.stepMax
+        (1, 4)
         '''
         self.clear()
 
@@ -356,7 +365,6 @@ class IntervalNetwork(object):
             e.addBiDirectedConnections(nPrevious, nFollowing)
             # update previous with the node created after this edge
             nPrevious = nFollowing
-
 
 
     def fillDirectedEdges(self, ascendingEdgeList, descendingEdgeList):
@@ -433,6 +441,83 @@ class IntervalNetwork(object):
 
 
     #---------------------------------------------------------------------------
+    def _getStepMin(self):
+        '''
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net._getStepMin()
+        1
+        '''
+        x = None
+        for n in self._nodes.values():
+            if x == None:
+                x = n.step
+            if n.step < x:
+                x = n.step
+        return x
+
+    stepMin = property(_getStepMin, 
+        doc = '''Return the lowest step value.
+
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.stepMin    
+        1
+        ''')
+
+    def _getStepMax(self):
+        '''
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net._getStepMax() # returns eight, as this is the last node
+        8
+        '''
+        x = None
+        for n in self._nodes.values():
+            if x == None:
+                x = n.step
+            if n.step > x:
+                x = n.step
+        return x
+
+    stepMax = property(_getStepMax, 
+        doc = '''Return the largest step value.
+
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.stepMax    
+        8
+        ''')
+
+    
+    def _getStepMaxUnique(self):
+        x = None
+        for nId, n in self._nodes.items():
+            # reject terminus high, as this duplicates terminus low
+            if nId == TERMINUS_HIGH:
+                continue
+            if x == None:
+                x = n.step
+            if n.step > x:
+                x = n.step
+        return x
+
+    stepMaxUnique = property(_getStepMaxUnique, 
+        doc = '''Return the largest step value that represents a pitch level that is not a terminus of the scale. 
+
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.stepMaxUnique
+        7
+        ''')
+
+
+
     def _getTerminusLowNodes(self):
         '''
         '''
