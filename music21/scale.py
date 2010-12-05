@@ -370,13 +370,24 @@ class ConcreteScale(Scale):
 #             raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getStepMaxUnique())
 
 
-    def getScaleDegreeFromPitch(self, degree, direction=None, 
+    def getScaleDegreeFromPitch(self, pitchTarget, direction=None, 
             permitEnharmonic=True):
+        '''For a given pitch, return the appropriate scale degree.
 
-        pass
-        # use the following
-        #self._abstract.getRelativeNodeStep(pitchReference, nodeName, pitchTest, permitEnharmonic=True):
+        >>> from music21 import *
+        >>> sc = scale.MajorScale('e-')
+        >>> sc.getScaleDegreeFromPitch('e-2')
+        1
+        >>> sc.getScaleDegreeFromPitch('d')
+        7
+        '''
 
+        post = self._abstract.net.getRelativeNodeStep(
+            pitchReference=self._tonic, 
+            nodeName=self._abstract.tonicStep, 
+            pitchTarget=pitchTarget,      
+            permitEnharmonic=True)
+        return post
 
 
 #     def ascending(self):
