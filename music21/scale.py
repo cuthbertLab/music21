@@ -22,6 +22,8 @@ from music21 import pitch
 from music21 import interval
 from music21 import intervalNetwork
 
+from music21.musicxml import translate as musicxmlTranslate
+
 
 
 #-------------------------------------------------------------------------------
@@ -83,6 +85,16 @@ class AbstractScale(Scale):
         # store interval network within abstract scale
         self.net = None
 
+
+    def getStepModulus(self):
+        '''Return the maximum number of scale steps, or the number to use as a 
+        modulus. 
+        '''
+        # temporary
+        return 7
+        #return self.net.stepModulus
+
+
     def reverse(self):
         '''Reverse all intervals in this scale.
         '''
@@ -112,6 +124,8 @@ class AbstractDiatonicScale(AbstractScale):
         Given sub-class dependent parameters, build and assign the IntervalNetwork.
         '''
 
+        # nice reference here:
+        # http://cnx.org/content/m11633/latest/
         # most diatonic scales will start with this collection
         srcList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
 
@@ -236,7 +250,32 @@ class ConcreteScale(Scale):
         ''')
 
 
+    def _getMusicXML(self):
+        '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
 
+        >>> from music21 import *
+        '''
+        from music21 import stream, note
+        m = stream.Measure()
+        for i in range(1, self._abstract.getStepModulus()+1):
+            p = self.pitchFromScaleDegree(i)
+            n = note.Note()
+            n.pitch = p
+
+            if p.name == self.getTonic().name:
+                n.quarterLength = 4 # set longer
+            else:
+                n.quarterLength = 1
+            m.append(n)
+        m.timeSignature = m.bestTimeSignature()
+        return musicxmlTranslate.measureToMusicXML(m)
+
+    musicxml = property(_getMusicXML, 
+        doc = '''Return a complete musicxml representation.
+        ''')    
+
+
+    #---------------------------------------------------------------------------
     def getTonic(self):
         '''Return the tonic. 
 
@@ -248,7 +287,6 @@ class ConcreteScale(Scale):
         E-
         '''
         return self._tonic
-
 
 
     def getAbstract(self):
@@ -275,7 +313,7 @@ class ConcreteScale(Scale):
             pitchObj = self._tonic
             stepOfPitch = self._abstract.tonicStep
 
-            # this creates new pitche son each call
+            # this creates new pitches on each call
             return self._abstract.getRealization(pitchObj, stepOfPitch, 
                         minPitch=minPitch, maxPitch=maxPitch)
 
@@ -289,16 +327,16 @@ class ConcreteScale(Scale):
         ''')
 
     def pitchFromScaleDegree(self, degree):        
-        '''Return a pitch for a scale degree. 
+        '''Return a pitch for a scale degree or step 
 
         Subclass may override if there are different modulo degree sizes
         Or, get from intervalNetwork. 
         '''
         # get from network
-        if 0 < degree <= 7: 
+        if 0 < degree <= self._abstract.getStepModulus(): 
             return self.getPitchList()[degree - 1]
         else: 
-            raise("Scale degree is out of bounds: must be between 1 and 7.")
+            raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getStepModulus())
 
 
 #     def ascending(self):
@@ -378,6 +416,33 @@ class DiatonicScale(ConcreteScale):
             return interval.transposePitch(self.pitchFromScaleDegree(1), "M7")
         else:
             return self.pitchFromScaleDegree(7)
+
+
+    def _getMusicXML(self):
+        '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
+
+        >>> from music21 import *
+        '''
+        from music21 import stream, note
+        m = stream.Measure()
+        for i in range(1, self._abstract.getStepModulus()+1):
+            p = self.pitchFromScaleDegree(i)
+            n = note.Note()
+            n.pitch = p
+
+            if p.name == self.getTonic().name:
+                n.quarterLength = 4 # set longer
+            elif p.name == self.getDominant().name:
+                n.quarterLength = 2 # set longer
+            else:
+                n.quarterLength = 1
+            m.append(n)
+        m.timeSignature = m.bestTimeSignature()
+        return musicxmlTranslate.measureToMusicXML(m)
+
+    musicxml = property(_getMusicXML, 
+        doc = '''Return a complete musicxml representation.
+        ''')    
 
 
 
@@ -478,7 +543,7 @@ class DorianScale(DiatonicScale):
 
 
 class PhrygianScale(DiatonicScale):
-    '''A natural minor scale, or the Aeolian mode.
+    '''A phrygian scale
 
     >>> sc = PhrygianScale(pitch.Pitch('e'))
     >>> sc.pitchList
@@ -487,6 +552,26 @@ class PhrygianScale(DiatonicScale):
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
         self.type = "phrygian"
+        self._abstract.buildNetwork(self.type)
+
+
+
+class HypophrygianScale(DiatonicScale):
+    '''A hypophrygian scale
+
+    >>> sc = HypophrygianScale(pitch.Pitch('e'))
+    >>> sc.pitchList
+    [B3, C4, D4, E, F4, G4, A4, B4]
+    >>> sc.getTonic()
+    E
+    >>> sc.getDominant()
+    A4
+    >>> sc.pitchFromScaleDegree(1) # scale degree 1 is treated as lowest
+    B3
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "hypophrygian"
         self._abstract.buildNetwork(self.type)
 
 
