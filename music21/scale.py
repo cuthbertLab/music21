@@ -84,7 +84,8 @@ class AbstractScale(Scale):
         Scale.__init__(self)
         # store interval network within abstract scale
         self.net = None
-
+        # in most cases tonic/final of scale is step one, but not always
+        self.tonicStep = 1 # step of tonic
 
     def getStepMaxUnique(self):
         '''Return the maximum number of scale steps, or the number to use as a 
@@ -93,12 +94,10 @@ class AbstractScale(Scale):
         # access from property
         return self.net.stepMaxUnique
 
-
     def reverse(self):
         '''Reverse all intervals in this scale.
         '''
         pass
-
 
     def getRealization(self, pitchObj, stepOfPitch, 
                         minPitch=None, maxPitch=None):
@@ -108,6 +107,17 @@ class AbstractScale(Scale):
             raise ScaleException('no netowrk is defined.')
 
         return self.net.realizePitch(pitchObj, stepOfPitch, minPitch=minPitch, maxPitch=maxPitch)
+
+
+    def match(self, other):
+        '''Given another object of various forms (e.g., a Stream, a ConcreteScale, a list of pitches, return True if the pitches conform to this scale.
+        '''
+        pass
+
+    def getClosestConcrete(self, other):
+        '''Return the closest matching concrete scale for a collection of pitches, provided as a Stream, a ConcreteScale, a list of pitches)
+        '''
+        pass
 
 
 
@@ -230,7 +240,8 @@ class ConcreteScale(Scale):
         self.boundRange = False
 
         # here, tonic is a pitch
-
+        # the abstract scale defines what step the tonic is expected to be 
+        # found on
         if tonic is None:
             self._tonic = pitch.Pitch()
         elif common.isStr(tonic):
@@ -332,17 +343,40 @@ class ConcreteScale(Scale):
         doc ='''Get a default pitch list from this scale.
         ''')
 
-    def pitchFromScaleDegree(self, degree):        
-        '''Return a pitch for a scale degree or step 
+    def pitchFromScaleDegree(self, degree, direction=None):        
 
-        Subclass may override if there are different modulo degree sizes
-        Or, get from intervalNetwork. 
+        '''Given a scale degree, return the appropriate pitch. 
+
+        >>> from music21 import *
+        >>> sc = scale.MajorScale('e-')
+        >>> sc.pitchFromScaleDegree(2)
+        F4
+        >>> sc.pitchFromScaleDegree(7)
+        D5
         '''
-        # get from network
-        if 0 < degree <= self._abstract.getStepMaxUnique(): 
-            return self.getPitchList()[degree - 1]
-        else: 
-            raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getStepMaxUnique())
+        # TODO: rely here on intervalNetwork for caching
+        post = self._abstract.net.getPitchFromNodeStep(
+            pitchReference=self._tonic, # pitch defined here
+            nodeName=self._abstract.tonicStep, # defined in abstract class
+            nodeStepTarget=degree, # target looking for
+            direction=direction, 
+            minPitch=None, 
+            maxPitch=None)
+        return post
+
+#         if 0 < degree <= self._abstract.getStepMaxUnique(): 
+#             return self.getPitchList()[degree - 1]
+#         else: 
+#             raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getStepMaxUnique())
+
+
+    def getScaleDegreeFromPitch(self, degree, direction=None, 
+            permitEnharmonic=True):
+
+        pass
+        # use the following
+        #self._abstract.getRelativeNodeStep(pitchReference, nodeName, pitchTest, permitEnharmonic=True):
+
 
 
 #     def ascending(self):
@@ -359,6 +393,21 @@ class ConcreteScale(Scale):
 #         tempScale.reverse()
 #         return tempScale
 
+
+
+    #---------------------------------------------------------------------------
+    # comparison and evaluatoins
+
+    def compare(self, other):
+        '''Given another object of various forms (e.g., a Stream, a ConcreteScale, a list of pitches), return a list of matched counter matched pitches and counter unmatched pitches.
+        '''
+        pass
+
+
+    def match(self, other):
+        '''Given another object of various forms (e.g., a Stream, a ConcreteScale, a list of pitches), return True if the pitches conform to this scale.
+        '''
+        pass
 
 
 

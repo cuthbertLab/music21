@@ -585,7 +585,7 @@ class IntervalNetwork(object):
         return nodeStep[nId] # gets step integer
         
 
-    def _nodeNameToNodes(self, id, equateTerminals=True):
+    def _nodeNameToNodes(self, id, equateTerminals=True, permitStepModuli=True):
         '''A node name may be an id, a string, or integer step count of nodes position (steps). Return a list of Nodes that match this identifications. 
 
         If `equateTerminals` is True, and the name given is a step number, then the first terminal will return both the first and last.
@@ -607,6 +607,14 @@ class IntervalNetwork(object):
         [<music21.intervalNetwork.Node id='terminusLow'>]
         >>> net._nodeNameToNodes(2)
         [<music21.intervalNetwork.Node id=0>]
+        >>> # with step moduli, step zero is the top-most non-terminal (as terminals are redundant
+        >>> net._nodeNameToNodes(0)
+        [<music21.intervalNetwork.Node id=5>]
+        >>> net._nodeNameToNodes(-1)
+        [<music21.intervalNetwork.Node id=4>]
+        >>> net._nodeNameToNodes(8)
+        [<music21.intervalNetwork.Node id='terminusLow'>, <music21.intervalNetwork.Node id='terminusHigh'>]
+
         '''
         if common.isNum(id):
             post = []
@@ -615,6 +623,22 @@ class IntervalNetwork(object):
             for nId, nStep in nodeStep.items():
                 if id == nStep:
                     post.append(self._nodes[nId])
+            # if no matches, and moduli comparisons are permitted
+            if post == [] and permitStepModuli:
+                sMin = self._getStepMin()
+                sMax = self._getStepMax()
+                # the number of unique values; assumes redundancy in 
+                # top and bottom value, so 8 steps, from 1 to 8, have
+                # seven unique values
+                spanCount = sMax-sMin
+
+                for nId, nStep in nodeStep.items():
+                    # assume continuous span, assume start at min
+                    # example for diatonic scale step 3:
+                    # ((3-1) % 7)+1
+                    if (((id-1) % spanCount) + sMin) == nStep:
+                        post.append(self._nodes[nId])
+
             return post
         elif common.isStr(id):
             if id.lower() in ['terminuslow', 'low']:
@@ -1028,6 +1052,7 @@ class IntervalNetwork(object):
         1
 
         '''
+        # TODO: needs to use cached results if possible
         nId = self.getRelativeNodeId(pitchReference=pitchReference, 
             nodeName=nodeName, pitchTest=pitchTest, 
             permitEnharmonic=permitEnharmonic)
@@ -1037,7 +1062,44 @@ class IntervalNetwork(object):
             return self._nodeIdToNodeStep(nId)
 
 
+    def getPitchFromNodeStep(self, pitchReference, nodeName, nodeStepTarget, 
+        direction=None, permitEnharmonic=True, minPitch=None, 
+        maxPitch=None):
+        '''Given a reference pitch assigned to node id, determine the pitch for the the target node step. 
 
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork(edgeList)
+        >>> net.realizePitch(pitch.Pitch('e-2'))
+        [E-2, F2, G2, A-2, B-2, C3, D3, E-3]
+        >>> net.getPitchFromNodeStep('e4', 1, 1)
+        E4
+        >>> net.getPitchFromNodeStep('e4', 1, 7) # seventh scale degree
+        D#5
+        >>> net.getPitchFromNodeStep('e4', 1, 8) 
+        E4
+        >>> net.getPitchFromNodeStep('e4', 1, 9) 
+        F#4
+
+        '''
+        nodeId = self._nodeNameToNodes(nodeName)[0] # get the first
+        nodeTargetId = self._nodeNameToNodes(nodeStepTarget, 
+                        permitStepModuli=True)[0] # get the first
+
+        # pass direction as well when getting realization
+        realizedPitch, realizedNode = self.realize(
+            pitchObj=pitchReference, nodeId=nodeId, 
+            minPitch=minPitch, maxPitch=maxPitch, direction=direction)
+
+        # get the pitch when we have a node id match
+        for i, nId in enumerate(realizedNode):
+            #environLocal.printDebug(['comparing', nId, 'nodeTargetId', nodeTargetId])
+            if nId == nodeTargetId.id:
+                return realizedPitch[i]
+
+
+
+        
     def _filterPitchList(self, pitchTest):
         '''Given a list or one pitch, check if all are pitch objects; convert if necessary.
         '''
