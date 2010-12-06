@@ -1238,14 +1238,14 @@ class ModalCounterpoint(object):
         while (goodHarmony2 == False or goodMelody2 == False or thirdsGood2 == False or sixthsGood2 == False):
             try:
                 middle = self.getValidSecondVoice(bottom, minorScale, choice)
-                environLocal.printDebug([note1.name + str(note1.octave) for note1 in middle.notes])
+#                environLocal.printDebug([note1.name + str(note1.octave) for note1 in middle.notes])
         
                 goodHarmony2 = self.allValidHarmony(middle, bottom)
                 goodMelody2 = self.isValidMelody(middle)
                 thirdsGood2 = not self.tooManyThirds(middle, bottom)
                 sixthsGood2 = not self.tooManySixths(middle, bottom)
              
-                environLocal.printDebug([note1.name + str(note1.octave) for note1 in bottom.notes])
+#                environLocal.printDebug([note1.name + str(note1.octave) for note1 in bottom.notes])
                 if not goodHarmony2: environLocal.printDebug(["bad harmony"])
                 else: environLocal.printDebug(["harmony good"])
                 if not goodMelody2: environLocal.printDebug(["bad melody"])
@@ -1793,8 +1793,11 @@ class TestExternal(unittest.TestCase):
 
     def runTest(self):
         pass
+
+    def runTest(self):
+        pass
    
-    def xtestGenerateFirstSpecies(self):
+    def testGenerateFirstSpecies(self):
         '''
         A First Species Counterpoint Generator by Jackie Rogoff (MIT 2010) written as part of 
         an UROP (Undergraduate Research Opportunities Program) project at M.I.T. 2008.
@@ -1820,7 +1823,7 @@ class TestExternal(unittest.TestCase):
         score.show('midi')
         score.show('lily.png')
 
-    def testGenerateFirstSpeciesThreeVoices(self):
+    def xtestGenerateFirstSpeciesThreeVoices(self):
         '''
         A First Species, Three-Voice Counterpoint Generator by Jackie Rogoff (MIT 2010) written as continuation of 
         a UROP (Undergraduate Research Opportunities Program) project at M.I.T. summer 2010.
@@ -1828,7 +1831,7 @@ class TestExternal(unittest.TestCase):
 
         counterpoint1 = ModalCounterpoint()
         
-        cf = getRandomCF()
+        cf = cantusFirmi[0]# getRandomCF()
         environLocal.printDebug(['Using: ', cf['notes']])
         cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notes)
 

@@ -1,4 +1,5 @@
 from music21 import *
+import copy
 
 def richardBreedGetWell():
     '''
@@ -85,17 +86,18 @@ def bachParallels():
 #        p2 = stream.Part()
 #        p2.append(meter.TimeSignature('8/4'))
         for i in range(len(c.parts) - 1):
+            iName = c.parts[i].id
+            if iName.lower() not in ['soprano', 'alto', 'tenor', 'bass']:
+                continue
+            ifn = c.parts[i].flat.notes
+            omi = ifn.offsetMap
             for j in range(i+1, len(c.parts)):
-                iName = c.parts[i].id
                 jName = c.parts[j].id
-                if iName.lower() not in ['soprano', 'alto', 'tenor', 'bass']:
-                    continue
                 if jName.lower() not in ['soprano', 'alto', 'tenor', 'bass']:
                     continue
 
-                ifn = c.parts[i].flat.notes
+
                 jfn = c.parts[j].flat.notes
-                omi = ifn.offsetMap
                 for k in range(len(omi) - 1):
                     n1pi = omi[k]['element']
                     n2pi = omi[k+1]['element']                    
@@ -136,13 +138,80 @@ def bachParallels():
         if displayMe:
             c.show()
     
+def towersOfHanoi(show = False, numParts = 6, transpose = False):
+    '''
+    generates a score solution to the Tower of Hanoi problem
+    similar in spirit to the one that Tom Johnson made, but
+    with any number of parts.  iterating over numParts(1...8) and
+    setting transpose to False gives the same solution as 
+    Tom Johnson found.
+    '''
+    sc = stream.Score()
+    lowPitch = pitch.Pitch("C5")
+    medPitch = pitch.Pitch("D5")
+    highPitch = pitch.Pitch("E5")
+
+    descendingPitches = [medPitch, lowPitch, highPitch]
+    ascendingPitches = [lowPitch, medPitch, highPitch]
+
+    if (numParts/2.0) == int(numParts/2.0):
+        oddPitches = descendingPitches
+        evenPitches = ascendingPitches
+    else:
+        oddPitches = ascendingPitches
+        evenPitches = descendingPitches
+    
+    for i in range(1, numParts + 1):
+        baseQuarterLength = 2**(i-2) # .5, 1, 2, 4, etc.
+        firstNote = note.Note("E5")
+        firstNote.quarterLength = baseQuarterLength
+
+        if (i/2.0) == int(i/2.0):
+            pitchCycle = copy.deepcopy(evenPitches)
+        else:
+            pitchCycle = copy.deepcopy(oddPitches)
+        
+        if transpose == True and i != 1:
+            for pe in pitchCycle: # take down P4s
+                pe.transpose(-5 * (i-1), inPlace = True)
+            firstNote.transpose(-5 * (i-1), inPlace = True)
+
+                
+        
+        p = stream.Part()
+        p.id = "v. " + str(i)
+        p.append(firstNote)
+        pc = -1
+        
+        maxNumber = 2**(numParts-i)
+        for j in range(maxNumber):
+            pc += 1
+            if pc > 2:
+                pc = 0
+            n = note.Note()
+            n.duration.quarterLength = baseQuarterLength * 2
+            n.pitch = pitchCycle[pc]
+            if j == maxNumber - 1: # last note
+                n.duration.quarterLength = (baseQuarterLength) + 3.0
+            p.append(n)
+        
+        finalRest = note.Rest()
+        finalRest.duration.quarterLength = 1
+        p.append(finalRest)
+        
+        sc.insert(0, p)
+    
+    if show == True:
+        sc.show()
+
 
 #-------------------------------------------------------------------------------
 if (__name__ == "__main__"):
 #    richardBreedGetWell()
 #    annotateWithGerman()
 #    countCs()
-    bachParallels()
+#    bachParallels()
+    towersOfHanoi(show = False, transpose = False, numParts = 8)
 #------------------------------------------------------------------------------
 # eof
 
