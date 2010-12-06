@@ -48,6 +48,25 @@ class Scale(music21.Music21Object):
 
         ''')
 
+
+    def _extractPitchList(self, other, comparisonAttribute='nameWithOctave'):
+        '''Given a data format, extract all unique pitch space or pitch class values.
+        '''
+        pre = []
+        # if a ConcreteScale, Chord or Stream
+        if hasattr(other, 'pitches'):
+            pre = other.pitches
+        # if a list
+        elif common.isListLike(other):
+            # assume a list of pitches; possible permit conversions?
+            pre = other
+        elif hasatter(other, 'pitch'):
+            pre = [other.pitch] # get pitch attribute
+        return pre
+
+
+
+
 # instead of classes, these can be attributes on the scale object
 # class DirectionlessScale(Scale):
 #     '''A DirectionlessScale is the same ascending and descending.
@@ -61,14 +80,14 @@ class Scale(music21.Music21Object):
 #     Ragas might be expressible in that way.'''
 #     
 #     def ascending(self):
-#         return self.pitchList
+#         return self.pitches
 #     
 #     def descending(self):
-#         tempScale = copy(self.pitchList)
+#         tempScale = copy(self.pitches)
 #         return tempScale.reverse()
 #         ## we perform the reverse on a copy of the pitchList so that
 #         ## in case we are multithreaded later in life, we do not have
-#         ## a race condition where someone might get self.pitchList as
+#         ## a race condition where someone might get self.pitches as
 #         ## reversed
 # 
 # class DirectionSensitiveScale(Scale):
@@ -77,7 +96,9 @@ class Scale(music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 class AbstractScale(Scale):
-    '''An abstract scale is specific scale formation, but does not have a defined pitch collection or reference. For example, all Major scales can be represented by an AbstractScale; a ConcreteScale, however, is a specific Major Scale, such as G Major. 
+    '''An abstract scale is specific scale formation, but does not have a defined pitch collection or pitch reference. For example, all Major scales can be represented by an AbstractScale; a ConcreteScale, however, is a specific Major Scale, such as G Major. 
+
+    These classes primarily create and manipulate the stored IntervalNetwork object. Thus, they are rarely created or manipulated directly by most users.
     '''
     isConcrete = False
     def __init__(self):
@@ -109,24 +130,17 @@ class AbstractScale(Scale):
         return self.net.realizePitch(pitchObj, stepOfPitch, minPitch=minPitch, maxPitch=maxPitch)
 
 
-    def match(self, other):
-        '''Given another object of various forms (e.g., a Stream, a ConcreteScale, a list of pitches, return True if the pitches conform to this scale.
-        '''
-        pass
-
-    def getClosestConcrete(self, other):
-        '''Return the closest matching concrete scale for a collection of pitches, provided as a Stream, a ConcreteScale, a list of pitches)
-        '''
-        pass
-
-
 
 class AbstractDiatonicScale(AbstractScale):
-    def __init__(self, tonic = pitch.Pitch()):
+
+    def __init__(self, mode=None):
         AbstractScale.__init__(self)
         self.type = 'Abstract Diatonic'
         self.tonicStep = None # step of tonic
-        self.dominantStep = None # step of domiannt
+        self.dominantStep = None # step of dominant
+
+        if mode is not None:
+            self.buildNetwork(mode=mode)
 
     def buildNetwork(self, mode=None):
         '''
@@ -218,11 +232,16 @@ class AbstractDiatonicScale(AbstractScale):
 
 
 
+
+
+
+
+
 #-------------------------------------------------------------------------------
 class ConcreteScale(Scale):
-    '''A concrete scale is specific scale formation with a defined collection that may or may not be bound by specific range. For example, a specific Major Scale, such as G Major, from G2 to G4.
+    '''A concrete scale is specific scale formation with a defined pitch collection (a `tonic` Pitch) that may or may not be bound by specific range. For example, a specific Major Scale, such as G Major, from G2 to G4.
 
-    This is class is not generally used directly but a base class for all concrete scales.
+    This class is not generally used directly but is used as a base class for all concrete scales.
     '''
 
     isConcrete = True
@@ -267,6 +286,13 @@ class ConcreteScale(Scale):
         ''')
 
 
+
+    def __repr__(self):
+        return '<music21.scale.%s %s %s>' % (self.__class__.__name__, self._tonic, self.type)
+
+
+
+
     def _getMusicXML(self):
         '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
 
@@ -309,7 +335,7 @@ class ConcreteScale(Scale):
     def getAbstract(self):
         '''Return the underlying abstract scale
         '''
-        # TODO: make abtract a property?
+        # TODO: make abstract a property?
         # copy before returning?
         return self._abstract
 
@@ -320,7 +346,7 @@ class ConcreteScale(Scale):
         # thus, only concrete scales can be transposed. 
         pass
 
-    def getPitchList(self, minPitch=None, maxPitch=None, direction=None):
+    def getPitches(self, minPitch=None, maxPitch=None, direction=None):
         '''Return a list of Pitch objects, using a deepcopy of a cached version if available. 
         '''
         # get from interval network of abstract scale
@@ -339,7 +365,7 @@ class ConcreteScale(Scale):
             return []
         #raise ScaleException("Cannot generate a scale from a DiatonicScale class")
 
-    pitchList = property(getPitchList, 
+    pitches = property(getPitches, 
         doc ='''Get a default pitch list from this scale.
         ''')
 
@@ -365,14 +391,14 @@ class ConcreteScale(Scale):
         return post
 
 #         if 0 < degree <= self._abstract.getStepMaxUnique(): 
-#             return self.getPitchList()[degree - 1]
+#             return self.getPitches()[degree - 1]
 #         else: 
 #             raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getStepMaxUnique())
 
 
     def getScaleDegreeFromPitch(self, pitchTarget, direction=None, 
-            permitEnharmonic=True):
-        '''For a given pitch, return the appropriate scale degree.
+            comparisonAttribute='pitchClass'):
+        '''For a given pitch, return the appropriate scale degree. If no scale degree is available, None is returned.
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -380,13 +406,15 @@ class ConcreteScale(Scale):
         1
         >>> sc.getScaleDegreeFromPitch('d')
         7
+        >>> sc.getScaleDegreeFromPitch('d#', comparisonAttribute='name') == None
+        True
         '''
 
         post = self._abstract.net.getRelativeNodeStep(
             pitchReference=self._tonic, 
             nodeName=self._abstract.tonicStep, 
             pitchTarget=pitchTarget,      
-            permitEnharmonic=True)
+            comparisonAttribute=comparisonAttribute)
         return post
 
 
@@ -394,31 +422,107 @@ class ConcreteScale(Scale):
 #         '''Return ascending scale form.
 #         '''
 #         # get from pitch cache
-#         return self.getPitchList()
+#         return self.getPitches()
 #     
 #     def descending(self):
 #         '''Return descending scale form.
 #         '''
 #         # get from pitch cache
-#         tempScale = copy(self.getPitchList())
+#         tempScale = copy(self.getPitches())
 #         tempScale.reverse()
 #         return tempScale
 
 
 
     #---------------------------------------------------------------------------
-    # comparison and evaluatoins
+    # comparison and evaluation
 
-    def compare(self, other):
-        '''Given another object of various forms (e.g., a Stream, a ConcreteScale, a list of pitches), return a list of matched counter matched pitches and counter unmatched pitches.
+    def match(self, other, comparisonAttribute='pitchClass'):
+        '''Given another object of various forms (e.g., a Stream, a ConcreteScale, a list of pitches), return a named dictionary of pitch lists with keys 'matched' and 'notMatched'.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g')
+        >>> sc2 = scale.MajorScale('d')
+        >>> sc3 = scale.MajorScale('a')
+        >>> sc4 = scale.MajorScale('e')
+        >>> sc1.match(sc2)
+        {'notMatched': [C#5], 'matched': [D, E4, F#4, G4, A4, B4, D5]}
+        >>> sc2.match(sc3)
+        {'notMatched': [G#5], 'matched': [A, B4, C#5, D5, E5, F#5, A5]}
+
+        >>> sc1.match(sc4)
+        {'notMatched': [G#4, C#5, D#5], 'matched': [E, F#4, A4, B4, E5]}
+
         '''
-        pass
+
+        # strip out unique pitches in a list
+        # to do a pitch spa
+
+        otherPitches = self._extractPitchList(other,
+                        comparisonAttribute=comparisonAttribute)
+
+        # need to deal with direction here? or get an aggregate scale
+        matched, notMatched = self._abstract.net.match(
+            pitchReference=self._tonic, 
+            nodeId=self._abstract.tonicStep, 
+            pitchTarget=otherPitches, # can supply a list here
+            comparisonAttribute=comparisonAttribute)
+
+        post = {}
+        post['matched'] = matched
+        post['notMatched'] = notMatched
+        return post
 
 
-    def match(self, other):
-        '''Given another object of various forms (e.g., a Stream, a ConcreteScale, a list of pitches), return True if the pitches conform to this scale.
+
+
+
+    def deriveRanked(self, other, resultsReturned=4,
+         comparisonAttribute='pitchClass'):
+        '''Return a list of closest matching concrete scales given a collection of pitches, provided as a Stream, a ConcreteScale, a list of pitches)
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g')
+        >>> sc1.deriveRanked(['c', 'e', 'b'])
+        [(3, <music21.scale.MajorScale G major>), (3, <music21.scale.MajorScale C major>), (2, <music21.scale.MajorScale B major>), (2, <music21.scale.MajorScale A major>)]
+        >>> sc1.deriveRanked(['c#', 'e', 'g#'])
+        [(3, <music21.scale.MajorScale B major>), (3, <music21.scale.MajorScale A major>), (3, <music21.scale.MajorScale E major>), (3, <music21.scale.MajorScale C- major>)]
+
         '''
-        pass
+        otherPitches = self._extractPitchList(other,
+                        comparisonAttribute=comparisonAttribute)
+
+        pairs = self._abstract.net.find(pitchTarget=otherPitches,
+                             resultsReturned=resultsReturned,
+                             comparisonAttribute=comparisonAttribute)
+
+        post = []
+        for weight, p in pairs:
+            sc = self.__class__(tonic=p)
+            post.append((weight, sc))
+        return post
+
+    def derive(self, other, resultsReturned=4, 
+        comparisonAttribute='pitchClass'):
+        '''
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g')
+        >>> sc1.derive(['c#', 'e', 'g#'])
+        <music21.scale.MajorScale B major>
+        >>> sc1.derive(['e-', 'b-', 'd'], comparisonAttribute='name')
+        <music21.scale.MajorScale B- major>
+        '''
+        otherPitches = self._extractPitchList(other,
+                        comparisonAttribute=comparisonAttribute)
+
+        # weight target membership
+        pairs = self._abstract.net.find(pitchTarget=otherPitches,
+                             resultsReturned=resultsReturned,
+                            comparisonAttribute=comparisonAttribute)
+
+
+        return self.__class__(tonic=pairs[0][1])
+
 
 
 
@@ -512,8 +616,7 @@ class DiatonicScale(ConcreteScale):
 
 
 
-
-
+#-------------------------------------------------------------------------------
 class MajorScale(DiatonicScale):
     '''A Major Scale
 
@@ -534,10 +637,10 @@ class MajorScale(DiatonicScale):
         '''Return a relative minor scale based on this concrete major scale.
 
         >>> sc1 = MajorScale(pitch.Pitch('a'))
-        >>> sc1.pitchList
+        >>> sc1.pitches
         [A, B4, C#5, D5, E5, F#5, G#5, A5]
         >>> sc2 = sc1.getRelativeMinor()
-        >>> sc2.pitchList
+        >>> sc2.pitches
         [F#5, G#5, A5, B5, C#6, D6, E6, F#6]
         '''
         return MinorScale(self.pitchFromScaleDegree(6))
@@ -546,10 +649,10 @@ class MajorScale(DiatonicScale):
         '''Return a parallel minor scale based on this concrete major scale.
 
         >>> sc1 = MajorScale(pitch.Pitch('a'))
-        >>> sc1.pitchList
+        >>> sc1.pitches
         [A, B4, C#5, D5, E5, F#5, G#5, A5]
         >>> sc2 = sc1.getParallelMinor()
-        >>> sc2.pitchList
+        >>> sc2.pitches
         [A, B4, C5, D5, E5, F5, G5, A5]
         '''
         return MinorScale(self._tonic)
@@ -561,7 +664,7 @@ class MinorScale(DiatonicScale):
     '''A natural minor scale, or the Aeolian mode.
 
     >>> sc = MinorScale(pitch.Pitch('g'))
-    >>> sc.pitchList
+    >>> sc.pitches
     [G, A4, B-4, C5, D5, E-5, F5, G5]
     '''
     def __init__(self, tonic=None):
@@ -573,10 +676,10 @@ class MinorScale(DiatonicScale):
         '''Return a concrete relative major scale
 
         >>> sc1 = MinorScale(pitch.Pitch('g'))
-        >>> sc1.pitchList
+        >>> sc1.pitches
         [G, A4, B-4, C5, D5, E-5, F5, G5]
         >>> sc2 = sc1.getRelativeMajor()
-        >>> sc2.pitchList
+        >>> sc2.pitches
         [B-4, C5, D5, E-5, F5, G5, A5, B-5]
         '''
         return MajorScale(self.pitchFromScaleDegree(3))
@@ -585,10 +688,10 @@ class MinorScale(DiatonicScale):
         '''Return a concrete relative major scale
 
         >>> sc1 = MinorScale(pitch.Pitch('g'))
-        >>> sc1.pitchList
+        >>> sc1.pitches
         [G, A4, B-4, C5, D5, E-5, F5, G5]
         >>> sc2 = sc1.getParallelMajor()
-        >>> sc2.pitchList
+        >>> sc2.pitches
         [G, A4, B4, C5, D5, E5, F#5, G5]
         '''
         return MajorScale(self._tonic)
@@ -599,7 +702,7 @@ class DorianScale(DiatonicScale):
     '''A natural minor scale, or the Aeolian mode.
 
     >>> sc = DorianScale(pitch.Pitch('d'))
-    >>> sc.pitchList
+    >>> sc.pitches
     [D, E4, F4, G4, A4, B4, C5, D5]
     '''
     def __init__(self, tonic=None):
@@ -612,7 +715,7 @@ class PhrygianScale(DiatonicScale):
     '''A phrygian scale
 
     >>> sc = PhrygianScale(pitch.Pitch('e'))
-    >>> sc.pitchList
+    >>> sc.pitches
     [E, F4, G4, A4, B4, C5, D5, E5]
     '''
     def __init__(self, tonic=None):
@@ -626,7 +729,7 @@ class HypophrygianScale(DiatonicScale):
     '''A hypophrygian scale
 
     >>> sc = HypophrygianScale(pitch.Pitch('e'))
-    >>> sc.pitchList
+    >>> sc.pitches
     [B3, C4, D4, E, F4, G4, A4, B4]
     >>> sc.getTonic()
     E
@@ -643,7 +746,7 @@ class HypophrygianScale(DiatonicScale):
 
 
 #     def getConcreteHarmonicMinorScale(self):
-#         scale = self.pitchList[:]
+#         scale = self.pitches[:]
 #         scale[6] = self.getLeadingTone()
 #         scale.append(interval.transposePitch(self._tonic, "P8"))
 #         return scale
@@ -655,9 +758,6 @@ class HypophrygianScale(DiatonicScale):
 #             pitch1.octave = 0 #octave 0 means "octaveless"
 #         return abstract
 # 
-
-
-
 
 # melodic minor will be implemented in a different way
 #     def getConcreteMelodicMinorScale(self):
@@ -694,7 +794,7 @@ class Test(unittest.TestCase):
         CMajor = MajorScale(n1)
         
         assert CMajor.name == "C major"
-        assert CMajor.getPitchList()[6].step == "B"
+        assert CMajor.getPitches()[6].step == "B"
         
 #         CScale = CMajor.getConcreteMajorScale()
 #         assert CScale[7].step == "C"
@@ -719,7 +819,7 @@ class Test(unittest.TestCase):
         aMinor = CMajor.getRelativeMinor()
         assert aMinor.name == "A minor", "Got a different name: " + aMinor.name
         
-        notes = [note1.name for note1 in aMinor.getPitchList()]
+        notes = [note1.name for note1 in aMinor.getPitches()]
         self.assertEqual(notes, ["A", "B", "C", "D", "E", "F", "G", 'A'])
         
         n3 = note.Note()
@@ -728,10 +828,10 @@ class Test(unittest.TestCase):
         
         bFlatMinor = MinorScale(n3)
         assert bFlatMinor.name == "B- minor", "Got a different name: " + bFlatMinor.name
-        notes2 = [note1.name for note1 in bFlatMinor.getPitchList()]
+        notes2 = [note1.name for note1 in bFlatMinor.getPitches()]
         self.assertEqual(notes2, ["B-", "C", "D-", "E-", "F", "G-", "A-", 'B-'])
-        assert bFlatMinor.getPitchList()[0] == n3
-        assert bFlatMinor.getPitchList()[6].octave == 6
+        assert bFlatMinor.getPitches()[0] == n3
+        assert bFlatMinor.getPitches()[6].octave == 6
         
 #         harmonic = bFlatMinor.getConcreteHarmonicMinorScale()
 #         niceHarmonic = [note1.name for note1 in harmonic]
@@ -768,6 +868,29 @@ class Test(unittest.TestCase):
         assert dFlatMajor.name == "D- major"
         assert dFlatMajor.getTonic().name == "D-"
         assert dFlatMajor.getDominant().name == "A-"
+
+
+
+
+
+    def testDeriveA(self):
+        # deriving a scale from a Stream
+
+        from music21 import corpus
+        s = corpus.parseWork('bwv66.6')
+
+        # just get default, c-major, as derive will check all tonics
+
+        sc1 = MajorScale()
+        sc2 = MinorScale()
+        sc3 = sc1.derive(s.parts['soprano'])
+        self.assertEqual(str(sc3), '<music21.scale.MajorScale A major>')
+
+        sc3 = sc1.derive(s.parts['tenor'])
+        self.assertEqual(str(sc3), '<music21.scale.MajorScale A major>')
+
+        sc3 = sc2.derive(s.parts['bass'])
+        self.assertEqual(str(sc3), '<music21.scale.MinorScale F# minor>')
 
 
 

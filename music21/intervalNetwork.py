@@ -942,7 +942,7 @@ class IntervalNetwork(object):
 
 
     def getRelativeNodeId(self, pitchReference, nodeName, pitchTarget, 
-        permitEnharmonic=True):
+        comparisonAttribute='ps'):
         '''Given a reference pitch assigned to node id, determine the relative node id of pitchTarget, even if displaced over multiple octaves
 
         Returns None if no match.        
@@ -969,12 +969,15 @@ class IntervalNetwork(object):
 
             # comparison of attributes, not object
             match = False
-            if permitEnharmonic:
-                if pitchTarget.ps == realizedPitch[i].ps:
-                    match = True
-            else:
-                if pitchTarget == realizedPitch[i]:
-                    match = True
+            if getattr(pitchTarget, comparisonAttribute) == getattr(realizedPitch[i], comparisonAttribute):
+                match = True
+
+#             if comparisonAttribute:
+#                 if pitchTarget.ps == realizedPitch[i].ps:
+#                     match = True
+#             else:
+#                 if pitchTarget == realizedPitch[i]:
+#                     match = True
             if match:
                 #environLocal.printDebug(['getRelativeNodeId', 'pitchReference', pitchReference, 'input nodeId', nodeId, 'pitchTarget', pitchTarget, 'matched', realizedNode[i]])
                 return realizedNode[i]
@@ -982,7 +985,7 @@ class IntervalNetwork(object):
 
 
     def getRelativeNodeStep(self, pitchReference, nodeName, pitchTarget, 
-        permitEnharmonic=True):
+        comparisonAttribute='ps'):
         '''Given a reference pitch assigned to node id, determine the relative node id of pitchTarget, even if displaced over multiple octaves
         
         Need flags for pitch class and enharmonic comparison. 
@@ -1055,7 +1058,7 @@ class IntervalNetwork(object):
         # TODO: needs to use cached results if possible
         nId = self.getRelativeNodeId(pitchReference=pitchReference, 
             nodeName=nodeName, pitchTarget=pitchTarget, 
-            permitEnharmonic=permitEnharmonic)
+            comparisonAttribute=comparisonAttribute)
         if nId == None:
             return None
         else:
@@ -1063,7 +1066,7 @@ class IntervalNetwork(object):
 
 
     def getPitchFromNodeStep(self, pitchReference, nodeName, nodeStepTarget, 
-        direction=None, permitEnharmonic=True, minPitch=None, 
+        direction=None, comparisonAttribute='ps', minPitch=None, 
         maxPitch=None):
         '''Given a reference pitch assigned to node id, determine the pitch for the the target node step. 
 
@@ -1102,6 +1105,14 @@ class IntervalNetwork(object):
         
     def _filterPitchList(self, pitchTarget):
         '''Given a list or one pitch, check if all are pitch objects; convert if necessary.
+
+        >>> from music21 import *
+        >>> net = intervalNetwork.IntervalNetwork()
+        >>> net._filterPitchList('c#')
+        ([C#], C#, C#)
+
+        >>> net._filterPitchList(['c#4', 'f5', 'd3'])
+        ([C#4, F5, D3], D3, F5)
         '''
         if not common.isListLike(pitchTarget):
             if common.isStr(pitchTarget):
@@ -1116,6 +1127,7 @@ class IntervalNetwork(object):
             if len(temp) == len(pitchTarget):
                 pitchTarget = temp
 
+        # automatically derive a min and max from the supplied pitch
         sortList = [(pitchTarget[i].ps, i) for i in range(len(pitchTarget))]
         sortList.sort()
         minPitch = pitchTarget[sortList[0][1]] # first index
@@ -1124,8 +1136,9 @@ class IntervalNetwork(object):
         return pitchTarget, minPitch, maxPitch
 
 
-    def match(self, pitchReference, nodeId, pitchTarget, permitEnharmonic=True):
-        '''Given one or more pitches in `pitchTarget`, determine the number of pitch matches, pitch omissions, and non pitch tones in a realized network. 
+    def match(self, pitchReference, nodeId, pitchTarget, 
+        comparisonAttribute='pitchClass'):
+        '''Given one or more pitches in `pitchTarget`, return a list of matched pitches, and unmatched pitches. 
 
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -1161,6 +1174,8 @@ class IntervalNetwork(object):
             nodeId = self._nodeNameToNodes(nodeId)[0]
 
         pitchTarget, minPitch, maxPitch = self._filterPitchList(pitchTarget)
+
+        # TODO: need to do both directions
         nodesRealized = self.realizePitch(pitchReference, nodeId, minPitch, maxPitch)
 
         matched = []
@@ -1171,12 +1186,9 @@ class IntervalNetwork(object):
             for p in nodesRealized:
                 # enharmonic switch here
                 match = False
-                if permitEnharmonic:
-                    if target.ps == p.ps:
-                        match = True
-                else:
-                    if target == p:
-                        match = True
+                if getattr(p, comparisonAttribute) == getattr(target, comparisonAttribute):
+                    match = True
+
                 if match:
                     matched.append(target)
                     found = True
@@ -1192,7 +1204,8 @@ class IntervalNetwork(object):
                 
             
 
-    def find(self, pitchTarget, resultsReturned=4):
+    def find(self, pitchTarget, resultsReturned=4, 
+        comparisonAttribute='pitchClass'):
         '''Given a collection of pitches, test all transpositions of a realized version of this network, and return the number of matches in each for each pitch assigned to the first node. 
 
         >>> from music21 import *
@@ -1211,16 +1224,27 @@ class IntervalNetwork(object):
         sortList = []
 
         # for now, searching 12 pitches; this may be more than necessary
-        for p in [pitch.Pitch('c'), pitch.Pitch('c#'),
-                  pitch.Pitch('d'), pitch.Pitch('d#'),
+#         for p in [pitch.Pitch('c'), pitch.Pitch('c#'),
+#                   pitch.Pitch('d'), pitch.Pitch('d#'),
+#                   pitch.Pitch('e'), pitch.Pitch('f'),
+#                   pitch.Pitch('f#'), pitch.Pitch('g'),
+#                   pitch.Pitch('g#'), pitch.Pitch('a'),
+#                   pitch.Pitch('a#'), pitch.Pitch('b'),
+#                 ]:
+
+        for p in [pitch.Pitch('c'), pitch.Pitch('c#'), pitch.Pitch('d-'),
+                  pitch.Pitch('d'), pitch.Pitch('d#'), pitch.Pitch('e-'),
                   pitch.Pitch('e'), pitch.Pitch('f'),
                   pitch.Pitch('f#'), pitch.Pitch('g'),
-                  pitch.Pitch('g#'), pitch.Pitch('a'),
-                  pitch.Pitch('a#'), pitch.Pitch('b'),
+                  pitch.Pitch('g#'), pitch.Pitch('a'), pitch.Pitch('b-'),
+                  pitch.Pitch('a#'), pitch.Pitch('b'), pitch.Pitch('c-'),
                 ]:
-            matched, noMatch = self.match(p, nodeId, pitchTarget,
-                                         permitEnharmonic=True)
 
+
+            # realize scales from each pitch, and then compare to pitchTarget   
+            # pitchTarget may be a list of pitches
+            matched, noMatch = self.match(p, nodeId, pitchTarget,
+                               comparisonAttribute=comparisonAttribute)                
             sortList.append((len(matched), p))
 
         sortList.sort()
@@ -1341,7 +1365,7 @@ class Test(unittest.TestCase):
         
         # in this case, most likely an e triad
         results = net.find(['e', 'g#'])
-        self.assertEqual(str(results), '[(2, E), (1, A), (1, G#), (1, C#)]')
+        self.assertEqual(str(results), '[(2, E), (1, A), (1, G#), (1, D-)]')
         
         
         # we can do the same with larger or more complicated chords
