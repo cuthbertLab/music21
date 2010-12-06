@@ -65,7 +65,6 @@ class Edge(object):
     Weight values, as well as other attributes, can be stored. 
 
     >>> from music21 import *
-    >>> from music21 import intervalNetwork
     >>> i = interval.Interval('M3')
     >>> e = intervalNetwork.Edge(i)
     >>> i is e.interval
@@ -86,6 +85,29 @@ class Edge(object):
         # one or two pairs of Node ids that this Edge connects
         # if there are two, it is a bidirectional, w/ first ascending
         self._connections = []
+
+
+
+    def __eq__(self, other):
+        ''' 
+        >>> from music21 import *
+        >>> i1 = interval.Interval('M3')
+        >>> i2 = interval.Interval('M3')
+        >>> i3 = interval.Interval('m3')
+        >>> e1 = intervalNetwork.Edge(i1)
+        >>> e2 = intervalNetwork.Edge(i2)
+        >>> e3 = intervalNetwork.Edge(i3)
+        >>> e1 == e2
+        True
+        >>> e1 == e3
+        False
+        '''
+        return (isinstance(other, self.__class__)
+            and self.__dict__ == other.__dict__)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
     def __repr__(self):
         return '<music21.intervalNetwork.Edge %s %s %s>' % (self._direction, 
@@ -255,6 +277,23 @@ class Node(object):
         # node weight might be used to indicate importance of scale positions
         self.weight = 1.0
 
+    def __eq__(self, other):
+        ''' 
+        >>> from music21 import *
+        >>> n1 = intervalNetwork.Node(id=3)
+        >>> n2 = intervalNetwork.Node(id=3)
+        >>> n3 = intervalNetwork.Node(id=2)
+        >>> n1 == n2
+        True
+        >>> n1 == n3
+        False
+        '''
+        return (isinstance(other, self.__class__)
+            and self.__dict__ == other.__dict__)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return '<music21.intervalNetwork.Node id=%s>' % (repr(self.id))
 
@@ -313,6 +352,33 @@ class IntervalNetwork(object):
 
 
 
+    def __eq__(self, other):
+        '''
+        >>> from music21 import *
+        >>> edgeList1 = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> edgeList2 = ['M2', 'M2', 'm2', 'M2', 'A3', 'm2']
+
+        >>> net1 = intervalNetwork.IntervalNetwork()
+        >>> net1.fillBiDirectedEdges(edgeList1)
+
+        >>> net2 = intervalNetwork.IntervalNetwork()
+        >>> net2.fillBiDirectedEdges(edgeList1)
+
+        >>> net3 = intervalNetwork.IntervalNetwork()
+        >>> net3.fillBiDirectedEdges(edgeList2)
+
+        >>> net1 == net2
+        True
+        >>> net1 == net3
+        False
+        '''
+        # compare all nodes and edges; if the same, and all keys are the same,
+        # then matched
+        return (isinstance(other, self.__class__)
+            and self.__dict__ == other.__dict__)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
     def fillBiDirectedEdges(self, edgeList):

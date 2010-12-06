@@ -38,6 +38,7 @@ class Scale(music21.Music21Object):
         self.directionSensitive = False # can be true or false
         self.type = 'Scale' # could be mode, could be other indicator
 
+
     def _getName(self):
         '''Return or construct the name of this scale
         '''
@@ -108,6 +109,31 @@ class AbstractScale(Scale):
         # in most cases tonic/final of scale is step one, but not always
         self.tonicStep = 1 # step of tonic
 
+    def __eq__(self, other):
+        '''
+        >>> from music21 import *
+        >>> as1 = scale.AbstractScale()
+        >>> as2 = scale.AbstractScale()
+        >>> as1 == as2
+        True
+        >>> as1 == None
+        False
+        '''
+        # have to test each so as not to confuse with a subclass
+        if (isinstance(other, self.__class__) and 
+            isinstance(self, other.__class__) and 
+            self.tonicStep == other.tonicStep and
+            self.net == other.net
+            ):
+            return True     
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+
     def getStepMaxUnique(self):
         '''Return the maximum number of scale steps, or the number to use as a 
         modulus. 
@@ -141,6 +167,29 @@ class AbstractDiatonicScale(AbstractScale):
 
         if mode is not None:
             self.buildNetwork(mode=mode)
+
+    def __eq__(self, other):
+        '''
+        >>> from music21 import *
+        >>> as1 = scale.AbstractDiatonicScale('major')
+        >>> as2 = scale.AbstractDiatonicScale('lydian')
+        >>> as3 = scale.AbstractDiatonicScale('ionian')
+        >>> as1 == as2
+        False
+        >>> as1 == as3
+        True
+        '''
+        # have to test each so as not to confuse with a subclass
+        if (isinstance(other, self.__class__) and 
+            isinstance(self, other.__class__) and 
+            self.type == other.type and
+            self.tonicStep == other.tonicStep and
+            self.dominantStep == other.dominantStep and
+            self.net == other.net
+            ):
+            return True     
+        else:
+            return False
 
     def buildNetwork(self, mode=None):
         '''
@@ -199,7 +248,6 @@ class AbstractDiatonicScale(AbstractScale):
             self.tonicStep = 4
             self.dominantStep = 7
 
-
         elif mode in ['aeolian', 'minor']:
             intervalList = srcList[5:] + srcList[:5] # a to A
             self.tonicStep = 1
@@ -224,6 +272,9 @@ class AbstractDiatonicScale(AbstractScale):
             intervalList = srcList[3:] + srcList[:3] # f to f
             self.tonicStep = 4
             self.dominantStep = 7
+
+        else:
+            raise ScaleException('cannot create a scale of the following mode:' % mode)
 
         self.net = intervalNetwork.IntervalNetwork(intervalList)
         # might also set weights for tonic and dominant here
@@ -270,6 +321,39 @@ class ConcreteScale(Scale):
         else: # assume this is a pitch object
             self._tonic = tonic
 
+    def __eq__(self, other):
+        '''For concrete equality, the stored abstract objects must evaluate as equal, as well as local attributes. 
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale()
+        >>> sc2 = scale.MajorScale()
+        >>> sc3 = scale.MinorScale('c')
+        >>> sc4 = scale.MajorScale('g')
+
+        >>> sc1 == sc2
+        True
+        >>> sc1 == sc3
+        False
+        >>> sc1 == sc4
+        False
+        >>> sc1.abstract == sc4.abstract # can compare abstract forms
+        True
+
+        '''
+        # have to test each so as not to confuse with a subclass
+        # TODO: add pitch range comparison if defined
+        if (isinstance(other, self.__class__) and 
+            isinstance(self, other.__class__) and 
+            self._abstract == other._abstract and
+            self.boundRange == other.boundRange and
+            self._tonic == other._tonic 
+            ):
+            return True     
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def _getName(self):
         '''Return or construct the name of this scale
@@ -285,13 +369,8 @@ class ConcreteScale(Scale):
         'C Concrete'
         ''')
 
-
-
     def __repr__(self):
         return '<music21.scale.%s %s %s>' % (self.__class__.__name__, self._tonic, self.type)
-
-
-
 
     def _getMusicXML(self):
         '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
@@ -304,7 +383,8 @@ class ConcreteScale(Scale):
             p = self.pitchFromScaleDegree(i)
             n = note.Note()
             n.pitch = p
-
+            if i == 1:
+                n.addLyric(self.name)
             if p.name == self.getTonic().name:
                 n.quarterLength = 4 # set longer
             else:
@@ -332,12 +412,23 @@ class ConcreteScale(Scale):
         return self._tonic
 
 
-    def getAbstract(self):
+    def _getAbstract(self):
         '''Return the underlying abstract scale
         '''
-        # TODO: make abstract a property?
         # copy before returning?
         return self._abstract
+
+    abstract = property(_getAbstract, 
+        doc='''Return the AbstractScale instance governing this ConcreteScale.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('d')
+        >>> sc2 = scale.MajorScale('b-')
+        >>> sc1 == sc2
+        False
+        >>> sc1.abstract == sc2.abstract
+        True
+        ''')
 
     def transpose(self, value, inPlace=False):
         '''Transpose this Scale by the given interval
@@ -599,6 +690,8 @@ class DiatonicScale(ConcreteScale):
             p = self.pitchFromScaleDegree(i)
             n = note.Note()
             n.pitch = p
+            if i == 1:
+                n.addLyric(self.name)
 
             if p.name == self.getTonic().name:
                 n.quarterLength = 4 # set longer
@@ -779,6 +872,127 @@ class HypophrygianScale(DiatonicScale):
 
 
 
+
+#-------------------------------------------------------------------------------
+class Harmony(Scale):
+    '''A harmony
+
+    This class is not generally used directly but is used as a base class for all concrete scales.
+    '''
+
+    isConcrete = True
+
+    def __init__(self, tonic=None):
+        Scale.__init__(self)
+
+        self.type = 'Concrete'
+
+        # store an instance of an abstract scale
+        # subclasses might use multiple abstract scales?
+        self._abstract = None
+
+        # determine wether this is a limited range
+        self.boundRange = False
+
+        # here, tonic is a pitch
+        # the abstract scale defines what step the tonic is expected to be 
+        # found on
+        if tonic is None:
+            self._tonic = pitch.Pitch()
+        elif common.isStr(tonic):
+            self._tonic = pitch.Pitch(tonic)
+        elif hasattr(tonic, 'classes') and 'GeneralNote' in tonic.classes:
+            self._tonic = tonic.pitch
+        else: # assume this is a pitch object
+            self._tonic = tonic
+
+    def __eq__(self, other):
+        '''For concrete equality, the stored abstract objects must evaluate as equal, as well as local attributes. 
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale()
+        >>> sc2 = scale.MajorScale()
+        >>> sc3 = scale.MinorScale('c')
+        >>> sc4 = scale.MajorScale('g')
+
+        >>> sc1 == sc2
+        True
+        >>> sc1 == sc3
+        False
+        >>> sc1 == sc4
+        False
+        >>> sc1.abstract == sc4.abstract # can compare abstract forms
+        True
+
+        '''
+        # have to test each so as not to confuse with a subclass
+        # TODO: add pitch range comparison if defined
+        if (isinstance(other, self.__class__) and 
+            isinstance(self, other.__class__) and 
+            self._abstract == other._abstract and
+            self.boundRange == other.boundRange and
+            self._tonic == other._tonic 
+            ):
+            return True     
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def _getName(self):
+        '''Return or construct the name of this scale
+        '''
+        return " ".join([self._tonic.name, self.type]) 
+
+    name = property(_getName, 
+        doc = '''Return or construct the name of this scale.
+
+        >>> from music21 import *
+        >>> sc = scale.DiatonicScale()
+        >>> sc.name
+        'C Concrete'
+        ''')
+
+    def __repr__(self):
+        return '<music21.scale.%s %s %s>' % (self.__class__.__name__, self._tonic, self.type)
+
+    def _getMusicXML(self):
+        '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
+
+        >>> from music21 import *
+        '''
+        from music21 import stream, note
+        m = stream.Measure()
+        for i in range(1, self._abstract.getStepMaxUnique()+1):
+            p = self.pitchFromScaleDegree(i)
+            n = note.Note()
+            n.pitch = p
+
+            if p.name == self.getTonic().name:
+                n.quarterLength = 4 # set longer
+            else:
+                n.quarterLength = 1
+            m.append(n)
+        m.timeSignature = m.bestTimeSignature()
+        return musicxmlTranslate.measureToMusicXML(m)
+
+    musicxml = property(_getMusicXML, 
+        doc = '''Return a complete musicxml representation.
+        ''')    
+
+
+
+
+
+
+
+
+
+
+
+
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
@@ -893,6 +1107,17 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc3), '<music21.scale.MinorScale F# minor>')
 
 
+
+        # compare two different major scales
+        sc1 = MajorScale('g')
+        sc2 = MajorScale('a')
+        sc3 = MinorScale('f#')
+        self.assertEqual(sc1 == sc2, False)
+        self.assertEqual(sc1.abstract == sc2.abstract, True)
+        self.assertEqual(sc1 == sc3, False)
+        self.assertEqual(sc1.abstract == sc3.abstract, False)
+
+        #sc3.show()
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
