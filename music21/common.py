@@ -853,7 +853,7 @@ def toRoman(num):
     elif (num == 7):
         return 'VII'
     elif (num == 8): # TODO: add comment explaining if this is correct!
-        return 'VII'
+        return 'VIII'
     else:
         raise Exception("invalid input: must be integer 1-8")
 

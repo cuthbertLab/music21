@@ -651,6 +651,35 @@ class IntervalNetwork(object):
         return nodeStep[nId] # gets step integer
         
 
+    def _stepModulus(self, step):
+        '''Return the modulus of the step.
+
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net._stepModulus(3)
+        3
+        >>> net._stepModulus(8)
+        1
+        >>> net._stepModulus(9)
+        2
+        >>> net._stepModulus(0)
+        7
+        '''
+        # TODO: these need to be cached
+        sMin = self._getStepMin()
+        sMax = self._getStepMax()
+        # the number of unique values; assumes redundancy in 
+        # top and bottom value, so 8 steps, from 1 to 8, have
+        # seven unique values
+        spanCount = sMax-sMin
+        # assume continuous span, assume start at min
+        # example for diatonic scale step 3:
+        # ((3-1) % 7)+1
+        #if (((id-1) % spanCount) + sMin) == nStep:
+
+        return ((step-1) % spanCount) + sMin
+
     def _nodeNameToNodes(self, id, equateTerminals=True, permitStepModuli=True):
         '''A node name may be an id, a string, or integer step count of nodes position (steps). Return a list of Nodes that match this identifications. 
 
@@ -691,18 +720,8 @@ class IntervalNetwork(object):
                     post.append(self._nodes[nId])
             # if no matches, and moduli comparisons are permitted
             if post == [] and permitStepModuli:
-                sMin = self._getStepMin()
-                sMax = self._getStepMax()
-                # the number of unique values; assumes redundancy in 
-                # top and bottom value, so 8 steps, from 1 to 8, have
-                # seven unique values
-                spanCount = sMax-sMin
-
                 for nId, nStep in nodeStep.items():
-                    # assume continuous span, assume start at min
-                    # example for diatonic scale step 3:
-                    # ((3-1) % 7)+1
-                    if (((id-1) % spanCount) + sMin) == nStep:
+                    if self._stepModulus(id) == nStep:
                         post.append(self._nodes[nId])
 
             return post
@@ -926,6 +945,39 @@ class IntervalNetwork(object):
 
 
 
+    def realizePitchByStep(self, pitchObj, nodeId=None, nodeStepTargets=[1],
+        minPitch=None, maxPitch=None, direction=None):
+        '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
+
+        The `targetSteps` specifies the the steps to be included within the specified range. 
+
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+
+        >>> net.realizePitchByStep('g', 5, [1,5], 'c2', 'c4') 
+        [C2, G2, C3, G3, C4]
+
+        >>> net.realizePitchByStep('g', 5, [1,2,3], 'c1', 'c6') 
+        [C1, D1, E1, C2, D2, E2, C3, D3, E3, C4, D4, E4, D5, E5]
+        '''
+        realizedPitch, realizedNode = self.realize(
+            pitchObj=pitchObj, nodeId=nodeId, 
+            minPitch=minPitch, maxPitch=maxPitch, 
+            direction=direction)
+
+        # take modulus of all
+        nodeStepTargets = [self._stepModulus(s) for s in nodeStepTargets]
+
+        post = []
+        for i, p in enumerate(realizedPitch):
+            # get the node
+            n = self._nodes[realizedNode[i]]
+            if n.step in nodeStepTargets:
+                post.append(p)
+        return post
+
 
     def _getNetworkxGraph(self):
         '''Create a networx graph from the raw Node representation.
@@ -1037,13 +1089,6 @@ class IntervalNetwork(object):
             match = False
             if getattr(pitchTarget, comparisonAttribute) == getattr(realizedPitch[i], comparisonAttribute):
                 match = True
-
-#             if comparisonAttribute:
-#                 if pitchTarget.ps == realizedPitch[i].ps:
-#                     match = True
-#             else:
-#                 if pitchTarget == realizedPitch[i]:
-#                     match = True
             if match:
                 #environLocal.printDebug(['getRelativeNodeId', 'pitchReference', pitchReference, 'input nodeId', nodeId, 'pitchTarget', pitchTarget, 'matched', realizedNode[i]])
                 return realizedNode[i]
@@ -1149,6 +1194,11 @@ class IntervalNetwork(object):
         E4
         >>> net.getPitchFromNodeStep('e4', 1, 9) 
         F#4
+        >>> net.getPitchFromNodeStep('e4', 1, 3, minPitch='c2', maxPitch='c3') 
+        G#2
+        >>> # will always get the lowest
+        >>> net.getPitchFromNodeStep('e4', 1, 3, minPitch='c2', maxPitch='c10') 
+        G#2
 
         '''
         nodeId = self._nodeNameToNodes(nodeName)[0] # get the first
