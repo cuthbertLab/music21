@@ -789,6 +789,41 @@ class IntervalNetwork(object):
 
 
 
+
+
+    def _processAlteredNodes(self, alteredNodes, n, p, direction):
+        '''Return an altered pitch for given node, if an alteration is specified
+        in the alteredNodes dictionary
+        '''
+        if n.step in alteredNodes.keys():
+            # check if this direction is the list of directions
+
+            directionSpec = alteredNodes[n.step]['direction']
+            environLocal.printDebug(['processing altered node', n, p, 'direction', direction, 'directionSpec', directionSpec])
+
+            match = False
+
+            # if ascending or descending, and this is a bidirectinonal alt
+            # then applyt
+
+            if (direction == directionSpec):
+                match = True
+            # if request is bidrectional and the spec is for ascending and
+            # descending
+            elif (direction in [DIRECTION_BI] and directionSpec in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]):
+                match = True
+
+            elif (direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING] and directionSpec == DIRECTION_BI):
+                match = True
+
+            if match:
+                environLocal.printDebug(['matched direction', direction])
+                pPost = alteredNodes[n.step]['interval'].transposePitch(p)
+                return pPost
+        # return pitch unaltered
+        return p
+
+
     def nextPitch(self, pitchReference, nodeName, pitchOrigin, 
         direction=DIRECTION_ASCENDING, stepSize=1, alteredNodes={}, 
         getNeighbor=True):
@@ -806,20 +841,34 @@ class IntervalNetwork(object):
         E5
         >>> net.nextPitch('g', 1, 'f#5', 'ascending', 2) # two steps
         A5
-        >>> alteredNodes = {2:{'direction':None, 'interval':interval.Interval('-a1')}}
+        >>> alteredNodes = {2:{'direction':'bi', 'interval':interval.Interval('-a1')}}
         >>> net.nextPitch('g', 1, 'g2', 'ascending', alteredNodes=alteredNodes)
         A-2
         >>> net.nextPitch('g', 1, 'a-2', 'ascending', alteredNodes=alteredNodes)
-        B-2
+        B2
         '''
         if common.isStr(pitchOrigin):
             pitchObj = pitch.Pitch(pitchOrigin)
         else:
             pitchObj = copy.deepcopy(pitchOrigin)
 
-        # get the node, or the nearest neigbor
+        # get the node that we are looking for 
         nodeId = self.getRelativeNodeId(pitchReference, nodeName, 
-                    pitchTarget=pitchOrigin)
+                    pitchTarget=pitchOrigin, alteredNodes=alteredNodes)
+
+        # realize the pitch from the raw node; we may be getting an altered
+        # tone, and we need to transpose an unaltered tone
+        # leave out altered nodes argument
+        p = self.getPitchFromNodeStep(pitchReference=pitchReference, 
+            nodeName=nodeName, 
+            nodeStepTarget=self._nodes[nodeId].step, 
+            direction=direction, 
+            minPitch=None, 
+            maxPitch=None, alteredNodes={}
+            )
+        # transfer octave
+        p.octave = pitchObj.octave
+        pitchObj = p
 
         # if no match, get the neighbor
         if nodeId is None and getNeighbor in [True,     
@@ -833,8 +882,10 @@ class IntervalNetwork(object):
                 nodeId = highId
             else:
                 nodeId = lowId
-
             environLocal.printDebug(['looking for neighbor', 'nodeId', nodeId])
+
+            # TODO: need to adjust pitch object here to non altered
+            # pitchObj
 
         n = self._nodes[nodeId]
         p = pitchObj
@@ -848,24 +899,26 @@ class IntervalNetwork(object):
                 p = postEdge[0].interval.transposePitch(p)
             else:
                 p = postEdge[0].interval.reverse().transposePitch(p)
+            
+            pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
+                       n=n, p=p, direction=direction)
 
             # check for and apply altered nodes
-            if n.step in alteredNodes.keys():
-                # check if this direction is the list of directions
-                entry = alteredNodes[n.step]
-                if (alteredNodes[n.step]['direction'] is None or 
-                    direction in alteredNodes[n.step]['direction']):
-                    pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
-            else:
-                pCollect = p
+#             if n.step in alteredNodes.keys():
+#                 # check if this direction is the list of directions
+#                 entry = alteredNodes[n.step]
+#                 if (alteredNodes[n.step]['direction'] is None or 
+#                     direction in alteredNodes[n.step]['direction']):
+#                     pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
+#             else:
+#                 pCollect = p
 
         return pCollect
 
 
-
     # TODO: need to collect intervals as well 
 
-    def realize(self, pitchObj, nodeId=None, minPitch=None, maxPitch=None, 
+    def realize(self, pitchReference, nodeId=None, minPitch=None, maxPitch=None, 
         direction=DIRECTION_BI, alteredNodes={}):
         '''Realize the nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
@@ -879,11 +932,12 @@ class IntervalNetwork(object):
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.realize('c2', 1, 'c2', 'c3')
         ([C2, D2, E2, F2, G2, A2, B2, C3], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
-        >>> alteredNodes = {7:{'direction':None, 'interval':interval.Interval('-a1')}}
+        >>> alteredNodes = {7:{'direction':'bi', 'interval':interval.Interval('-a1')}}
         >>> net.realize('c2', 1, 'c2', 'c4', alteredNodes=alteredNodes)
         ([C2, D2, E2, F2, G2, A2, B-2, C3, D3, E3, F3, G3, A3, B-3, C4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
 
         '''
+        pitchObj = pitchReference
         # get first node
         if isinstance(nodeId, Node):
             nodeObj = nodeId
@@ -947,12 +1001,15 @@ class IntervalNetwork(object):
             pCollect = p
             n = postNode[0]
 
-            if n.step in alteredNodes.keys():
-                # check if this direction is the list of directions
-                entry = alteredNodes[n.step]
-                if (alteredNodes[n.step]['direction'] is None or 
-                    direction in alteredNodes[n.step]['direction']):
-                    pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
+            pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
+                       n=n, p=p, direction=direction)
+
+#             if n.step in alteredNodes.keys():
+#                 # check if this direction is the list of directions
+#                 entry = alteredNodes[n.step]
+#                 if (alteredNodes[n.step]['direction'] is None or 
+#                     direction in alteredNodes[n.step]['direction']):
+#                     pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
 
         #environLocal.printDebug(['got post pitch:', post])
         #environLocal.printDebug(['got post node id:', postNodeId])
@@ -977,12 +1034,15 @@ class IntervalNetwork(object):
             pCollect = p
             n = postNode[0]
 
-            if n.step in alteredNodes.keys():
-                # check if this direction is the list of directions
-                entry = alteredNodes[n.step]
-                if (alteredNodes[n.step]['direction'] is None or 
-                    direction in alteredNodes[n.step]['direction']):
-                    pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
+            pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
+                       n=n, p=p, direction=direction)
+
+#             if n.step in alteredNodes.keys():
+#                 # check if this direction is the list of directions
+#                 entry = alteredNodes[n.step]
+#                 if (alteredNodes[n.step]['direction'] is None or 
+#                     direction in alteredNodes[n.step]['direction']):
+#                     pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
 
             appendPitch = False
             if (minPitch is not None and p.ps >= minPitch.ps and 
@@ -1019,8 +1079,8 @@ class IntervalNetwork(object):
         return pre + post, preNodeId + postNodeId
 
 
-    def realizePitch(self, pitchObj, nodeId=None, minPitch=None, maxPitch=None, 
-        alteredNodes={}):
+    def realizePitch(self, pitchReference, nodeId=None, minPitch=None,
+        maxPitch=None, alteredNodes={}):
         '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The nodeId, when a simple, linear network, can be used as a scale step value starting from one.
@@ -1047,12 +1107,13 @@ class IntervalNetwork(object):
         >>> net.realizePitch(pitch.Pitch('a#2'), 7, 'c6', 'c7') 
         [C#6, D#6, E6, F#6, G#6, A#6, B6]
         '''
-        return self.realize(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)[0]
+        return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)[0]
 
 
 
-    def realizePitchByStep(self, pitchObj, nodeId=None, nodeStepTargets=[1],
-        minPitch=None, maxPitch=None, direction=None, alteredNodes={}):
+    def realizePitchByStep(self, pitchReference, nodeId=None, 
+        nodeStepTargets=[1],
+        minPitch=None, maxPitch=None, direction=DIRECTION_BI, alteredNodes={}):
         '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The `targetSteps` specifies the the steps to be included within the specified range. 
@@ -1069,7 +1130,7 @@ class IntervalNetwork(object):
         [C1, D1, E1, C2, D2, E2, C3, D3, E3, C4, D4, E4, D5, E5]
         '''
         realizedPitch, realizedNode = self.realize(
-            pitchObj=pitchObj, nodeId=nodeId, 
+            pitchReference=pitchReference, nodeId=nodeId, 
             minPitch=minPitch, maxPitch=maxPitch, 
             direction=direction, alteredNodes=alteredNodes)
 
@@ -1166,7 +1227,7 @@ class IntervalNetwork(object):
 
 
     def getRelativeNodeId(self, pitchReference, nodeName, pitchTarget, 
-        comparisonAttribute='ps'):
+        comparisonAttribute='ps', alteredNodes={}):
         '''Given a reference pitch assigned to node id, determine the relative node id of pitchTarget, even if displaced over multiple octaves
 
         Returns None if no match.
@@ -1194,7 +1255,7 @@ class IntervalNetwork(object):
         minPitch = pitchTarget.transpose(-12, inPlace=False)
         maxPitch = pitchTarget.transpose(12, inPlace=False)
 
-        realizedPitch, realizedNode = self.realize(pitchReference, nodeId, minPitch=minPitch, maxPitch=maxPitch)
+        realizedPitch, realizedNode = self.realize(pitchReference, nodeId, minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)
 
         for i in range(len(realizedPitch)):
             #environLocal.printDebug(['getRelativeNodeId', 'comparing',  realizedPitch[i], realizedNode[i]])
@@ -1208,7 +1269,8 @@ class IntervalNetwork(object):
                 return realizedNode[i]
         return None
 
-    def getNeighborNodeIds(self, pitchReference, nodeName, pitchTarget):
+    def getNeighborNodeIds(self, pitchReference, nodeName, pitchTarget,
+         alteredNodes={}):
         '''Given a reference pitch assigned to node id, determine the node ids that neighbor this pitch.
 
         Returns None if an exact match.
@@ -1234,7 +1296,7 @@ class IntervalNetwork(object):
         minPitch = pitchTarget.transpose(-12, inPlace=False)
         maxPitch = pitchTarget.transpose(12, inPlace=False)
 
-        realizedPitch, realizedNode = self.realize(pitchReference, nodeId, minPitch=minPitch, maxPitch=maxPitch)
+        realizedPitch, realizedNode = self.realize(pitchReference, nodeId, minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)
 
         lowNeighbor = None
         highNeighbor = None
@@ -1247,7 +1309,7 @@ class IntervalNetwork(object):
 
 
     def getRelativeNodeStep(self, pitchReference, nodeName, pitchTarget, 
-        comparisonAttribute='ps'):
+        comparisonAttribute='ps', alteredNodes={}):
         '''Given a reference pitch assigned to node id, determine the relative node id of pitchTarget, even if displaced over multiple octaves
         
         Need flags for pitch class and enharmonic comparison. 
@@ -1320,7 +1382,7 @@ class IntervalNetwork(object):
         # TODO: needs to use cached results if possible
         nId = self.getRelativeNodeId(pitchReference=pitchReference, 
             nodeName=nodeName, pitchTarget=pitchTarget, 
-            comparisonAttribute=comparisonAttribute)
+            comparisonAttribute=comparisonAttribute, alteredNodes=alteredNodes)
         if nId == None:
             return None
         else:
@@ -1328,7 +1390,7 @@ class IntervalNetwork(object):
 
 
     def getPitchFromNodeStep(self, pitchReference, nodeName, nodeStepTarget, 
-        direction=None, comparisonAttribute='ps', minPitch=None, 
+        direction=DIRECTION_BI, minPitch=None, 
         maxPitch=None, alteredNodes={}):
         '''Given a reference pitch assigned to node id, determine the pitch for the the target node step. 
 
@@ -1358,7 +1420,7 @@ class IntervalNetwork(object):
 
         # pass direction as well when getting realization
         realizedPitch, realizedNode = self.realize(
-            pitchObj=pitchReference, nodeId=nodeId, 
+            pitchReference=pitchReference, nodeId=nodeId, 
             minPitch=minPitch, maxPitch=maxPitch, direction=direction,
             alteredNodes=alteredNodes)
 

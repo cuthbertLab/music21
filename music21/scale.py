@@ -31,6 +31,11 @@ environLocal = environment.Environment(_MOD)
 
 
 
+DIRECTION_BI = intervalNetwork.DIRECTION_BI
+DIRECTION_ASCENDING = intervalNetwork.DIRECTION_ASCENDING
+DIRECTION_DESCENDING = intervalNetwork.DIRECTION_DESCENDING
+
+
 #-------------------------------------------------------------------------------
 class ScaleException(Exception):
     pass
@@ -122,6 +127,11 @@ class AbstractScale(Scale):
         # in most cases tonic/final of scale is step one, but not always
         self.tonicStep = 1 # step of tonic
 
+        # store parameter for interval network-based node modifcations
+        # entries are in the form: 
+        # step: {'direction':None, 'interval':Interval}
+        self._alteredNodes = {}
+
 
     def __eq__(self, other):
         '''
@@ -150,6 +160,11 @@ class AbstractScale(Scale):
 
 
 
+    def _buildNetwork(self):
+        '''Calling the _buildNetwork, with or without parameters, is main job of the AbstractScale class.
+        '''
+        pass
+
 
     def getStepMaxUnique(self):
         '''Return the maximum number of scale steps, or the number to use as a 
@@ -163,6 +178,9 @@ class AbstractScale(Scale):
         '''
         pass
 
+    # expose interface from network. these methods must be called (and not
+    # .net directly because they can pass the alteredNodes dictionary
+
     def getRealization(self, pitchObj, stepOfPitch, 
                         minPitch=None, maxPitch=None):
         '''Realize the abstract scale as a list of pitch objects, given a pitch object, the step of that pitch object, and a min and max pitch.
@@ -170,7 +188,76 @@ class AbstractScale(Scale):
         if self.net is None:
             raise ScaleException('no netowrk is defined.')
 
-        return self.net.realizePitch(pitchObj, stepOfPitch, minPitch=minPitch, maxPitch=maxPitch)
+        return self.net.realizePitch(pitchObj, stepOfPitch, 
+            minPitch=minPitch, maxPitch=maxPitch,
+            alteredNodes=self._alteredNodes)
+
+
+
+    def getPitchFromNodeStep(self, pitchReference, nodeName, nodeStepTarget, 
+            direction=None, minPitch=None, maxPitch=None):
+        '''Get a pitch for desired scale degree.
+        '''
+
+        post = self.net.getPitchFromNodeStep(
+            pitchReference=pitchReference, # pitch defined here
+            nodeName=nodeName, # defined in abstract class
+            nodeStepTarget=nodeStepTarget, # target looking for
+            direction=direction, 
+            minPitch=minPitch, 
+            maxPitch=maxPitch,
+            alteredNodes=self._alteredNodes
+            )
+        return post
+
+
+
+    def realizePitchByStep(self, pitchReference, nodeId, nodeStepTargets, 
+        direction=DIRECTION_BI, minPitch=None, maxPitch=None):        
+        '''Given one or more scale degrees, return a list of all matches over the entire range. 
+        '''
+        # TODO: rely here on intervalNetwork for caching
+        post = self.net.realizePitchByStep(
+            pitchReference=pitchReference, # pitch defined here
+            nodeId=nodeId, # defined in abstract class
+            nodeStepTargets=nodeStepTargets, # target looking for
+            direction=direction, 
+            minPitch=minPitch, 
+            maxPitch=maxPitch,
+            alteredNodes=self._alteredNodes
+            )
+        return post
+
+
+    def getRelativeNodeStep(self, pitchReference, nodeName, pitchTarget, 
+            comparisonAttribute='pitchClass'):
+        '''Expose functionality from IntervalNetwork, passing on the stored alteredNodes dictionary.
+        '''
+        post = self.net.getRelativeNodeStep(
+            pitchReference=pitchReference, 
+            nodeName=nodeName, 
+            pitchTarget=pitchTarget,      
+            comparisonAttribute=comparisonAttribute,
+            alteredNodes=self._alteredNodes
+            )
+        return post
+
+
+    def nextPitch(self, pitchReference, nodeName, pitchOrigin,
+             direction=DIRECTION_ASCENDING, stepSize=1):
+        '''Expose functionality from IntervalNetwork, passing on the stored alteredNodes dictionary.
+        '''
+        post = self.net.nextPitch(
+            pitchReference=pitchReference, 
+            nodeName=nodeName, 
+            pitchOrigin=pitchOrigin,      
+            direction=direction,
+            stepSize = stepSize,
+            alteredNodes=self._alteredNodes
+            )
+        return post
+
+
 
 
 
@@ -179,17 +266,16 @@ class AbstractOctatonicScale(AbstractScale):
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
         self.type = 'Abstract Octatonic'
-
         # here, accept None
-        self.buildNetwork(mode=mode)
+        self._buildNetwork(mode=mode)
 
-    def buildNetwork(self, mode=None):
+    def _buildNetwork(self, mode=None):
         '''
         Given sub-class dependent parameters, build and assign the IntervalNetwork.
 
         >>> from music21 import *
         >>> sc = scale.AbstractDiatonicScale()
-        >>> sc.buildNetwork('lydian')
+        >>> sc._buildNetwork('lydian')
         >>> sc.getRealization('f4', 1, 'f2', 'f6') 
         [F2, G2, A2, B2, C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5, C6, D6, E6, F6]
 
@@ -209,6 +295,28 @@ class AbstractOctatonicScale(AbstractScale):
 
 
 
+class AbstractHarmonicMinorScale(AbstractScale):
+    '''A true bi-directional scale that with the augmented second to a leading tone. 
+    '''
+    def __init__(self, mode=None):
+        AbstractScale.__init__(self)
+        self.type = 'Abstract Harmonic Minor'
+        self._buildNetwork()
+
+    def _buildNetwork(self):
+        '''
+        '''
+        srcList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        intervalList = srcList[5:] + srcList[:5] # a to A
+        self.tonicStep = 1
+        self.dominantStep = 5
+        self.net = intervalNetwork.IntervalNetwork(intervalList)
+
+        # raise the seventh in all directions
+        self._alteredNodes[7] = {'direction': intervalNetwork.DIRECTION_BI, 
+                               'interval': interval.Interval('a1')}
+
+
 
 
 class AbstractDiatonicScale(AbstractScale):
@@ -220,7 +328,7 @@ class AbstractDiatonicScale(AbstractScale):
         self.dominantStep = None # step of dominant
 
         if mode is not None:
-            self.buildNetwork(mode=mode)
+            self._buildNetwork(mode=mode)
 
     def __eq__(self, other):
         '''
@@ -245,13 +353,13 @@ class AbstractDiatonicScale(AbstractScale):
         else:
             return False
 
-    def buildNetwork(self, mode=None):
+    def _buildNetwork(self, mode=None):
         '''
         Given sub-class dependent parameters, build and assign the IntervalNetwork.
 
         >>> from music21 import *
         >>> sc = scale.AbstractDiatonicScale()
-        >>> sc.buildNetwork('lydian')
+        >>> sc._buildNetwork('lydian')
         >>> sc.getRealization('f4', 1, 'f2', 'f6') 
         [F2, G2, A2, B2, C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5, C6, D6, E6, F6]
 
@@ -331,7 +439,6 @@ class AbstractDiatonicScale(AbstractScale):
             raise ScaleException('cannot create a scale of the following mode:' % mode)
 
         self.net = intervalNetwork.IntervalNetwork(intervalList)
-        # might also set weights for tonic and dominant here
 
 
 
@@ -591,7 +698,6 @@ class ConcreteScale(Scale):
             return self._abstract.getRealization(pitchObj, 
                         stepOfPitch, 
                         minPitch=minPitch, maxPitch=maxPitch)
-            #return self._abstract.net.realizePitch(self._tonic, 1)
         else:
             return []
         #raise ScaleException("Cannot generate a scale from a DiatonicScale class")
@@ -613,7 +719,7 @@ class ConcreteScale(Scale):
         D5
         '''
         # TODO: rely here on intervalNetwork for caching
-        post = self._abstract.net.getPitchFromNodeStep(
+        post = self._abstract.getPitchFromNodeStep(
             pitchReference=self._tonic, # pitch defined here
             nodeName=self._abstract.tonicStep, # defined in abstract class
             nodeStepTarget=degree, # target looking for
@@ -629,7 +735,7 @@ class ConcreteScale(Scale):
 
 
     def pitchesFromScaleDegrees(self, degreeTargets, minPitch=None, 
-        maxPitch=None, direction=None):        
+        maxPitch=None, direction=DIRECTION_BI):        
 
         '''Given one or more scale degrees, return a list of all matches over the entire range. 
 
@@ -639,10 +745,14 @@ class ConcreteScale(Scale):
         [G4, D5]
         >>> sc.pitchesFromScaleDegrees([3,7], 'c2', 'c6')
         [D2, G2, D3, G3, D4, G4, D5, G5]
+
+        >>> sc = scale.HarmonicMinorScale('a')
+        >>> sc.pitchesFromScaleDegrees([3,7], 'c2', 'c6')
+        [C2, G#2, C3, G#3, C4, G#4, C5, G#5, C6]
         '''
         # TODO: rely here on intervalNetwork for caching
-        post = self._abstract.net.realizePitchByStep(
-            pitchObj=self._tonic, # pitch defined here
+        post = self._abstract.realizePitchByStep(
+            pitchReference=self._tonic, # pitch defined here
             nodeId=self._abstract.tonicStep, # defined in abstract class
             nodeStepTargets=degreeTargets, # target looking for
             direction=direction, 
@@ -665,9 +775,16 @@ class ConcreteScale(Scale):
         True
         >>> sc.getScaleDegreeFromPitch('d#', comparisonAttribute='pitchClass')
         1
+
+
+        >>> sc = scale.HarmonicMinorScale('a')
+        >>> sc.getScaleDegreeFromPitch('c')
+        3
+        >>> sc.getScaleDegreeFromPitch('g#')
+        7
         '''
 
-        post = self._abstract.net.getRelativeNodeStep(
+        post = self._abstract.getRelativeNodeStep(
             pitchReference=self._tonic, 
             nodeName=self._abstract.tonicStep, 
             pitchTarget=pitchTarget,      
@@ -688,8 +805,21 @@ class ConcreteScale(Scale):
         G5
         >>> sc.next('e-6', stepSize=3)
         A-6
+
+        >>> from music21 import *
+        >>> sc = scale.HarmonicMinorScale('g')
+        >>> sc.next('g4', 'descending')
+        F#4
+        >>> sc.next('F#4', 'descending')
+        E-4
+        >>> sc.next('E-4', 'descending')
+        D4
+        >>> sc.next('E-4', 'ascending', 1)
+        F#4
+        >>> sc.next('E-4', 'ascending', 2)
+        G4
         '''
-        post = self._abstract.net.nextPitch(
+        post = self._abstract.nextPitch(
             pitchReference=self._tonic, 
             nodeName=self._abstract.tonicStep, 
             pitchOrigin=pitchOrigin,      
@@ -763,7 +893,7 @@ class ConcreteScale(Scale):
         '''Return a list of closest matching concrete scales given a collection of pitches, provided as a Stream, a ConcreteScale, a list of pitches)
 
         >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g')
+        >>> sc1 = scale.MajorScale()
         >>> sc1.deriveRanked(['c', 'e', 'b'])
         [(3, <music21.scale.MajorScale G major>), (3, <music21.scale.MajorScale C major>), (2, <music21.scale.MajorScale B major>), (2, <music21.scale.MajorScale A major>)]
         >>> sc1.deriveRanked(['c#', 'e', 'g#'])
@@ -789,7 +919,7 @@ class ConcreteScale(Scale):
     def derive(self, other, comparisonAttribute='pitchClass'):
         '''
         >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g')
+        >>> sc1 = scale.MajorScale()
         >>> sc1.derive(['c#', 'e', 'g#'])
         <music21.scale.MajorScale B major>
         >>> sc1.derive(['e-', 'b-', 'd'], comparisonAttribute='name')
@@ -960,7 +1090,7 @@ class MajorScale(DiatonicScale):
         DiatonicScale.__init__(self, tonic=tonic)
         self.type = "major"
         # build the network for the appropriate scale
-        self._abstract.buildNetwork(self.type)
+        self._abstract._buildNetwork(self.type)
 
 
     def getRelativeMinor(self):
@@ -1000,7 +1130,7 @@ class MinorScale(DiatonicScale):
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
         self.type = "minor"
-        self._abstract.buildNetwork(self.type)
+        self._abstract._buildNetwork(self.type)
 
     def getRelativeMajor(self):
         '''Return a concrete relative major scale
@@ -1038,7 +1168,7 @@ class DorianScale(DiatonicScale):
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
         self.type = "dorian"
-        self._abstract.buildNetwork(self.type)
+        self._abstract._buildNetwork(self.type)
 
 
 class PhrygianScale(DiatonicScale):
@@ -1051,7 +1181,7 @@ class PhrygianScale(DiatonicScale):
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
         self.type = "phrygian"
-        self._abstract.buildNetwork(self.type)
+        self._abstract._buildNetwork(self.type)
 
 
 
@@ -1071,7 +1201,7 @@ class HypophrygianScale(DiatonicScale):
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
         self.type = "hypophrygian"
-        self._abstract.buildNetwork(self.type)
+        self._abstract._buildNetwork(self.type)
 
 
 
@@ -1107,6 +1237,31 @@ class HypophrygianScale(DiatonicScale):
 
 
 
+class HarmonicMinorScale(DiatonicScale):
+    '''A harmonic minor scale
+
+    >>> sc = HarmonicMinorScale('e4')
+    >>> sc.pitches
+    [E4, F#4, G4, A4, B4, C5, D#5, E5]
+    >>> sc.getTonic()
+    E4
+    >>> sc.getDominant()
+    B4
+    >>> sc.pitchFromDegree(1) # scale degree 1 is treated as lowest
+    E4
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "harmonic minor"
+        
+        # note: this changes the previously assigned AbstractDiatonicScale
+        # from the DiatonicScale base class
+
+        self._abstract = AbstractHarmonicMinorScale()
+        # network building happens on object creation
+        #self._abstract._buildNetwork()
+
+
 
 
 
@@ -1128,10 +1283,12 @@ class RomanNumeral(object):
         # store a mapping of scale steps from root
         self._members = [0]
 
-        # store as index within members
+        # store as index within members; keys are indicies
+        # into the _members list
         self._bassMemberIndex = 0
 
         # store mapping of alterations to members
+        # alterations here need to be stored as mappings of 
         self._alterations = {}
 
         # default is to make a triad; could be otherwise
@@ -1183,7 +1340,7 @@ class RomanNumeral(object):
         self._bassMemberIndex = (self._bassMemberIndex + 1) % len(self._members)
         
 
-    def _memberIndexToScaleDegree(self, memberIndex, minPitch=None,
+    def _memberIndexToPitch(self, memberIndex, minPitch=None,
          maxPitch=None, direction=None):
         '''Given a member index, return the scale degree
 
@@ -1191,19 +1348,62 @@ class RomanNumeral(object):
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g4')
         >>> h1 = scale.RomanNumeral(sc1, 5)
-        >>> h1._memberIndexToScaleDegree(0)
+        >>> h1._memberIndexToPitch(0)
         D5
-        >>> h1._memberIndexToScaleDegree(1)
+        >>> h1._memberIndexToPitch(1)
         F#5
         '''
-        return self.scale.pitchFromDegree(self.rootScaleStep + 
-                    self._members[memberIndex], 
+        return self.scale.pitchFromDegree(
+                    self._memberIndexToScaleDegree(memberIndex), 
                     minPitch=minPitch, maxPitch=maxPitch)
 
 
+    def _memberIndexToScaleDegree(self, memberIndex):
+        '''Return the degree in the underlying scale given a member index.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g4')
+        >>> h1 = scale.RomanNumeral(sc1, 5)
+        >>> h1._memberIndexToScaleDegree(0)
+        5
+        >>> h1._memberIndexToScaleDegree(1)
+        7
+        >>> h1._memberIndexToScaleDegree(2)
+        9
+        '''
+        # note that results are not taken to the modulus of the scale
+        # make an option
+        return self.rootScaleStep + self._members[memberIndex]
+
+
+    def _degreeToMemberIndex(self, degree):
+        '''Return the member index of a provided degree, assuming that degree is a member.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g4')
+        >>> h1 = scale.RomanNumeral(sc1, 5)
+        >>> h1._degreeToMemberIndex(1)
+        0
+        >>> h1._degreeToMemberIndex(3)
+        1
+        >>> h1._degreeToMemberIndex(5)
+        2
+        '''
+        return self._members.index(degree-1)
+
+
+
+    def _prepareAlterations(self):
+        '''Prepare the alterations dictionary to conform to the presentation necessary for use in IntervalNetwork. All stored member indexes need to be converted to scale degrees.
+        '''
+        post = {}
+        for key, value in self._alterations:
+            
+            post
+
     def pitchFromDegree(self, degree, minPitch=None,
          maxPitch=None, direction=None):
-        '''Given a degree, such as 1 (for root), 3 (for third chord degree), return the pitch.
+        '''Given a chord degree, such as 1 (for root), 3 (for third chord degree), return the pitch.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g4')
@@ -1221,21 +1421,24 @@ class RomanNumeral(object):
                     minPitch=minPitch, maxPitch=maxPitch)
 
 
-    def _degreeToMemberIndex(self, degree):
-        '''Return the member index of a provided degree, assuming that degree is a member.
+
+    def scaleDegreeFromDegree(self, degree, minPitch=None,
+         maxPitch=None, direction=None):
+        '''Given a degree in this Harmony, such as 3, or 5, return the scale degree in the underlying scale
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g4')
         >>> h1 = scale.RomanNumeral(sc1, 5)
-        >>> h1._degreeToMemberIndex(1)
-        0
-        >>> h1._degreeToMemberIndex(3)
-        1
-        >>> h1._degreeToMemberIndex(5)
-        2
+        >>> h1.scaleDegreeFromDegree(1)
+        5
+        >>> h1.scaleDegreeFromDegree(3)
+        7
         '''
-        return self._members.index(degree-1)
-        
+        # note: there may be a better way to do this that 
+        return self.scale.getScaleDegreeFromPitch(
+            self.pitchFromDegree(degree, minPitch=minPitch, maxPitch=maxPitch, direction=direction))
+
+
 
     def getPitches(self, minPitch=None, maxPitch=None, direction=None):
         '''Return the pitches the constitute this RomanNumeral with the present Scale.
@@ -1257,7 +1460,7 @@ class RomanNumeral(object):
         '''
         # first, get members, than orient bass/direction
         post = []
-        bass = self._memberIndexToScaleDegree(self._bassMemberIndex, 
+        bass = self._memberIndexToPitch(self._bassMemberIndex, 
                 minPitch=minPitch, maxPitch=maxPitch, direction=direction)
 
         #bass = self.scale.pitchFromDegree(self.rootScaleStep + 
@@ -1290,6 +1493,16 @@ class RomanNumeral(object):
         doc = '''Get the minimum default pitches for this RomanNumeral
         ''')
 
+
+    def _alterDegree(self, degree, alteration):
+        '''Given a scale degree as well as an alteration, configure the 
+        alteredDegrees dictionary.
+        '''
+        # TODO
+        pass
+
+
+
     def getChord(self, minPitch=None, maxPitch=None, direction=None):
         '''Return a realized chord for this harmony
         '''
@@ -1301,7 +1514,7 @@ class RomanNumeral(object):
         ''')
 
 
-    def parseFigure(self, figure):
+    def _parseFigure(self, figure):
         '''
         Given a figure string, returns a list of parsed elements.
         Each element is a tuple, consisting of the interval and the
@@ -1311,11 +1524,11 @@ class RomanNumeral(object):
         
         >>> from music21 import *   
         >>> h1 = scale.RomanNumeral()
-        >>> h1.parseFigure('6#,5,3')
+        >>> h1._parseFigure('6#,5,3')
         [(6, '#'), (5, None), (3, None)]
-        >>> h1.parseFigure('6-,3-')
+        >>> h1._parseFigure('6-,3-')
         [(6, '-'), (3, '-')]
-        >>> h1.parseFigure('7-,#3')
+        >>> h1._parseFigure('7-,#3')
         [(7, '-'), (3, '#')]
         '''
         pattern = '[,]'
@@ -1584,25 +1797,21 @@ class Test(unittest.TestCase):
         p2 = 'b3'
         sc = OctatonicScale('C4')
         for d, x in [('ascending', 1), ('descending', 2), ('ascending', 3), 
-                    ('descending', 2), 
-                    ('ascending', 1)]:
-            for y in [1, .5, .5, .25, .25, .25, .25]:
+                    ('descending', 2), ('ascending', 1)]:
+            for y in [1, .5, .25, .25]:
                 p1 = sc.next(p1, direction=d, stepSize=x)
                 n = note.Note(p1)
                 n.quarterLength = y
                 s1.append(n)
-
             if d == 'ascending':
                 d = 'descending'
             elif d == 'descending':
                 d = 'ascending'
-
-            for y in [.25, .25, .25, .25, .5, .5, 1]:
+            for y in [1, .5, .25, .25]:
                 p2 = sc.next(p2, direction=d, stepSize=x)
                 n = note.Note(p2)
                 n.quarterLength = y
                 s2.append(n)
-
         s = stream.Score()
         s.insert(0, s1)
         s.insert(0, s2)
