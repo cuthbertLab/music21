@@ -376,13 +376,14 @@ class ConcreteScale(Scale):
         else: # assume this is a pitch object
             self._tonic = tonic
 
+
     def _isConcrete(self):
         '''To be concrete, a Scale must have a defined tonic. An abstract Scale is not Concrete
         '''
         if self._tonic is None:
-            return True
-        else:
             return False
+        else:
+            return True
 
     isConcrete = property(_isConcrete, 
         doc = '''Return True if the scale is Concrete, that is, it has a defined Tonic. 
@@ -473,7 +474,7 @@ class ConcreteScale(Scale):
         from music21 import stream, note
         m = stream.Measure()
         for i in range(1, self._abstract.getStepMaxUnique()+1):
-            p = self.pitchFromScaleDegree(i)
+            p = self.pitchFromDegree(i)
             n = note.Note()
             n.pitch = p
             if i == 1:
@@ -551,6 +552,24 @@ class ConcreteScale(Scale):
         return post
 
 
+    def getRomanNumeral(self, degree, figure=None):
+        '''Return a RomanNumeral object built on the specified scale degree.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('a-4')
+        >>> h1 = sc1.getRomanNumeral(1)
+        >>> h1.root
+        A-4
+        >>> h5 = sc1.getRomanNumeral(5)
+        >>> h5.root
+        E-5
+        >>> h5.chord
+        <music21.chord.Chord E-5 G5 B-5>
+        '''
+        return RomanNumeral(self, degree, figure)
+
+
+
     def getPitches(self, minPitch=None, maxPitch=None, direction=None):
         '''Return a list of Pitch objects, using a deepcopy of a cached version if available. 
 
@@ -581,16 +600,16 @@ class ConcreteScale(Scale):
         doc ='''Get a default pitch list from this scale.
         ''')
 
-    def pitchFromScaleDegree(self, degree, minPitch=None, maxPitch=None, 
+    def pitchFromDegree(self, degree, minPitch=None, maxPitch=None, 
         direction=None):        
 
         '''Given a scale degree, return the appropriate pitch. 
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
-        >>> sc.pitchFromScaleDegree(2)
+        >>> sc.pitchFromDegree(2)
         F4
-        >>> sc.pitchFromScaleDegree(7)
+        >>> sc.pitchFromDegree(7)
         D5
         '''
         # TODO: rely here on intervalNetwork for caching
@@ -795,7 +814,7 @@ class ConcreteScale(Scale):
         from music21 import stream, note
         m = stream.Measure()
         for i in range(1, self._abstract.getStepMaxUnique()+1):
-            p = self.pitchFromScaleDegree(i)
+            p = self.pitchFromDegree(i)
             n = note.Note()
             n.pitch = p
             if i == 1:
@@ -839,7 +858,7 @@ class DiatonicScale(ConcreteScale):
         C#5
         '''
         # NOTE: override method on ConcreteScale that simply returns _tonic
-        return self.pitchFromScaleDegree(self._abstract.tonicStep)
+        return self.pitchFromDegree(self._abstract.tonicStep)
 
     def getDominant(self):
         '''Return the dominant. 
@@ -852,7 +871,7 @@ class DiatonicScale(ConcreteScale):
         >>> sc.getDominant()
         C#5
         '''
-        return self.pitchFromScaleDegree(self._abstract.dominantStep)
+        return self.pitchFromDegree(self._abstract.dominantStep)
     
 
     def getLeadingTone(self):
@@ -860,7 +879,7 @@ class DiatonicScale(ConcreteScale):
 
         >>> from music21 import *
         >>> sc = scale.MinorScale('c')
-        >>> sc.pitchFromScaleDegree(7)
+        >>> sc.pitchFromDegree(7)
         B-4
         >>> sc.getLeadingTone()
         B4
@@ -870,12 +889,12 @@ class DiatonicScale(ConcreteScale):
         '''
         # NOTE: must be adjust for modes that do not have a proper leading tone
         interval1to7 = interval.notesToInterval(self._tonic, 
-                        self.pitchFromScaleDegree(7))
+                        self.pitchFromDegree(7))
         if interval1to7.name != 'M7':
             # if not a major seventh from the tonic, get a pitch a M7 above
-            return interval.transposePitch(self.pitchFromScaleDegree(1), "M7")
+            return interval.transposePitch(self.pitchFromDegree(1), "M7")
         else:
-            return self.pitchFromScaleDegree(7)
+            return self.pitchFromDegree(7)
 
 
     def _getMusicXML(self):
@@ -887,7 +906,7 @@ class DiatonicScale(ConcreteScale):
         from music21 import stream, note
         m = stream.Measure()
         for i in range(1, self._abstract.getStepMaxUnique()+1):
-            p = self.pitchFromScaleDegree(i)
+            p = self.pitchFromDegree(i)
             n = note.Note()
             n.pitch = p
             if i == 1:
@@ -932,7 +951,7 @@ class MajorScale(DiatonicScale):
     '''A Major Scale
 
     >>> sc = MajorScale(pitch.Pitch('d'))
-    >>> sc.pitchFromScaleDegree(7).name
+    >>> sc.pitchFromDegree(7).name
     'C#'
     '''
     
@@ -954,7 +973,7 @@ class MajorScale(DiatonicScale):
         >>> sc2.pitches
         [F#5, G#5, A5, B5, C#6, D6, E6, F#6]
         '''
-        return MinorScale(self.pitchFromScaleDegree(6))
+        return MinorScale(self.pitchFromDegree(6))
 
     def getParallelMinor(self):
         '''Return a parallel minor scale based on this concrete major scale.
@@ -993,7 +1012,7 @@ class MinorScale(DiatonicScale):
         >>> sc2.pitches
         [B-4, C5, D5, E-5, F5, G5, A5, B-5]
         '''
-        return MajorScale(self.pitchFromScaleDegree(3))
+        return MajorScale(self.pitchFromDegree(3))
 
     def getParallelMajor(self):
         '''Return a concrete relative major scale
@@ -1046,7 +1065,7 @@ class HypophrygianScale(DiatonicScale):
     E
     >>> sc.getDominant()
     A4
-    >>> sc.pitchFromScaleDegree(1) # scale degree 1 is treated as lowest
+    >>> sc.pitchFromDegree(1) # scale degree 1 is treated as lowest
     B3
     '''
     def __init__(self, tonic=None):
@@ -1073,9 +1092,9 @@ class HypophrygianScale(DiatonicScale):
 # melodic minor will be implemented in a different way
 #     def getConcreteMelodicMinorScale(self):
 #         scale = self.getConcreteHarmonicMinorScale()
-#         scale[5] = interval.transposePitch(self.pitchFromScaleDegree(6), "A1")
+#         scale[5] = interval.transposePitch(self.pitchFromDegree(6), "A1")
 #         for n in range(0, 7):
-#             scale.append(self.pitchFromScaleDegree(7-n))
+#             scale.append(self.pitchFromDegree(7-n))
 #         return scale
 # 
 #     def getAbstractMelodicMinorScale(self):
@@ -1100,7 +1119,7 @@ class RomanNumeral(object):
     # a harmony might be seen as a subclass of a concrete scale, but this 
     # is not always the case.
     # more often, a harmony is collection of scale steps
-    def __init__(self, scale=None, rootScaleStep=1):
+    def __init__(self, scale=None, rootScaleStep=1, figure=None):
 
         # store a 'live' reference to the scale that this harmony is active one
         self.scale = scale
@@ -1120,20 +1139,20 @@ class RomanNumeral(object):
 
 
     def _getRoot(self):
-        return self.scale.pitchFromScaleDegree(self.rootScaleStep)
+        return self.scale.pitchFromDegree(self.rootScaleStep)
 
     root = property(_getRoot, 
         doc = '''Return the root of this harmony. 
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g')
-        >>> h1 = scale.RomanNumeral(sc1, 1)
+        >>> h1 = sc1.getRomanNumeral(1)
         >>> h1.root
         G
         ''')
 
     def _getBass(self):
-        return self.scale.pitchFromScaleDegree(self.rootScaleStep + self._members[self._bassMemberIndex])
+        return self.scale.pitchFromDegree(self.rootScaleStep + self._members[self._bassMemberIndex])
 
     bass = property(_getBass, 
         doc = '''Return the root of this harmony. 
@@ -1151,7 +1170,7 @@ class RomanNumeral(object):
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.TriadicHarmony(sc1, 5)
+        >>> h1 = scale.RomanNumeral(sc1, 5)
         >>> h1.getPitches()
         [D5, F#5, A5]
         >>> h1.nextInversion()
@@ -1164,20 +1183,66 @@ class RomanNumeral(object):
         self._bassMemberIndex = (self._bassMemberIndex + 1) % len(self._members)
         
 
-    def _memberIndexToScaleDegree(self, memberIndex):
+    def _memberIndexToScaleDegree(self, memberIndex, minPitch=None,
+         maxPitch=None, direction=None):
         '''Given a member index, return the scale degree
+
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g4')
+        >>> h1 = scale.RomanNumeral(sc1, 5)
+        >>> h1._memberIndexToScaleDegree(0)
+        D5
+        >>> h1._memberIndexToScaleDegree(1)
+        F#5
         '''
-        return self.scale.pitchFromScaleDegree(self.rootScaleStep + 
+        return self.scale.pitchFromDegree(self.rootScaleStep + 
                     self._members[memberIndex], 
                     minPitch=minPitch, maxPitch=maxPitch)
 
+
+    def pitchFromDegree(self, degree, minPitch=None,
+         maxPitch=None, direction=None):
+        '''Given a degree, such as 1 (for root), 3 (for third chord degree), return the pitch.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g4')
+        >>> h1 = scale.RomanNumeral(sc1, 5)
+        >>> h1.pitchFromDegree(1)
+        D5
+        >>> h1.pitchFromDegree(2) # not a member, but we can get pitch
+        E5
+        >>> h1.pitchFromDegree(3) # third
+        F#5
+
+        '''
+        return self.scale.pitchFromDegree(
+                    self.rootScaleStep + degree-1, 
+                    minPitch=minPitch, maxPitch=maxPitch)
+
+
+    def _degreeToMemberIndex(self, degree):
+        '''Return the member index of a provided degree, assuming that degree is a member.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g4')
+        >>> h1 = scale.RomanNumeral(sc1, 5)
+        >>> h1._degreeToMemberIndex(1)
+        0
+        >>> h1._degreeToMemberIndex(3)
+        1
+        >>> h1._degreeToMemberIndex(5)
+        2
+        '''
+        return self._members.index(degree-1)
+        
 
     def getPitches(self, minPitch=None, maxPitch=None, direction=None):
         '''Return the pitches the constitute this RomanNumeral with the present Scale.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.TriadicHarmony(sc1, 1)
+        >>> h1 = scale.RomanNumeral(sc1, 1)
         >>> h1.makeTriad()
         >>> h1.getPitches()
         [G4, B4, D5]
@@ -1192,9 +1257,12 @@ class RomanNumeral(object):
         '''
         # first, get members, than orient bass/direction
         post = []
-        bass = self.scale.pitchFromScaleDegree(self.rootScaleStep + 
-                    self._members[self._bassMemberIndex], 
-                    minPitch=minPitch, maxPitch=maxPitch)
+        bass = self._memberIndexToScaleDegree(self._bassMemberIndex, 
+                minPitch=minPitch, maxPitch=maxPitch, direction=direction)
+
+        #bass = self.scale.pitchFromDegree(self.rootScaleStep + 
+        #            self._members[self._bassMemberIndex], 
+        #            minPitch=minPitch, maxPitch=maxPitch)
 
         # for now, getting directly from network
         #self.scale.abstract.net.realizePitchByStep()
@@ -1242,7 +1310,7 @@ class RomanNumeral(object):
         Based on code by Jose Cabal-Ugaz.
         
         >>> from music21 import *   
-        >>> h1 = scale.TriadicHarmony()
+        >>> h1 = scale.RomanNumeral()
         >>> h1.parseFigure('6#,5,3')
         [(6, '#'), (5, None), (3, None)]
         >>> h1.parseFigure('6-,3-')
@@ -1301,7 +1369,7 @@ class RomanNumeral(object):
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.TriadicHarmony(sc1, 2)
+        >>> h1 = scale.RomanNumeral(sc1, 2)
         >>> h1.romanNumeral
         'ii'
         >>> h1.romanNumeral = 'vii'
@@ -1369,7 +1437,7 @@ class Test(unittest.TestCase):
 #             #assert note1.duration.type == ""
 #         assert [note1.name for note1 in CScale] == ["C", "D", "E", "F", "G", "A", "B", "C"]
         
-        seventh = CMajor.pitchFromScaleDegree(7)
+        seventh = CMajor.pitchFromDegree(7)
         assert seventh.step == "B"
         
         dom = CMajor.getDominant()
@@ -1416,7 +1484,7 @@ class Test(unittest.TestCase):
 #             assert note1.octave == 0
             #assert note1.duration.type == ""
         
-        cNote = bFlatMinor.pitchFromScaleDegree(2)
+        cNote = bFlatMinor.pitchFromDegree(2)
         assert cNote.name == "C"
         fNote = bFlatMinor.getDominant()
         assert fNote.name == "F"
@@ -1452,8 +1520,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc3.getPitches('c2', 'c5')), '[C2, D2, E2, F2, G2, A2, B2, C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5]')
         
         # getting pitches from scale degrees
-        self.assertEqual(str(sc3.pitchFromScaleDegree(3)), 'C4')
-        self.assertEqual(str(sc3.pitchFromScaleDegree(7)), 'G4')
+        self.assertEqual(str(sc3.pitchFromDegree(3)), 'C4')
+        self.assertEqual(str(sc3.pitchFromDegree(7)), 'G4')
         self.assertEqual(str(sc3.pitchesFromScaleDegrees([1,5,6])), '[A3, E4, F4]')
         self.assertEqual(str(sc3.pitchesFromScaleDegrees([2,3], minPitch='c6', maxPitch='c9')), '[C6, B6, C7, B7, C8, B8, C9]')
 
@@ -1472,8 +1540,8 @@ class Test(unittest.TestCase):
         # showing scales
         # this assumes that the tonic is not the first scale degree
         sc1 = HypophrygianScale('c4')
-        self.assertEqual(str(sc1.pitchFromScaleDegree(1)), "G3")
-        self.assertEqual(str(sc1.pitchFromScaleDegree(4)), "C4")
+        self.assertEqual(str(sc1.pitchFromDegree(1)), "G3")
+        self.assertEqual(str(sc1.pitchFromDegree(4)), "C4")
         #sc1.show()
 
         sc1 = MajorScale()
@@ -1563,11 +1631,11 @@ class Test(unittest.TestCase):
         # define undefined
         #rn3 = sc1.romanNumeral(3, figure="7")
 
-        h1 = TriadicHarmony(sc1, 1)
-        h2 = TriadicHarmony(sc1, 2)
-        h3 = TriadicHarmony(sc1, 3)
-        h4 = TriadicHarmony(sc1, 4)
-        h5 = TriadicHarmony(sc1, 5)
+        h1 = RomanNumeral(sc1, 1)
+        h2 = RomanNumeral(sc1, 2)
+        h3 = RomanNumeral(sc1, 3)
+        h4 = RomanNumeral(sc1, 4)
+        h5 = RomanNumeral(sc1, 5)
 
         # can get pitches or roman numerals
         self.assertEqual(str(h1.pitches), '[G4, B4, D5]')
@@ -1589,7 +1657,7 @@ class Test(unittest.TestCase):
 
 
         sc1 = MajorScale('g4')
-        h2 = TriadicHarmony(sc1, 2)
+        h2 = RomanNumeral(sc1, 2)
         h2.makeSeventhChord()
         self.assertEqual(str(h2.getPitches('c4', 'c6')), '[A4, C5, E5, A5, C6]')
 
