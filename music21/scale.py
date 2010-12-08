@@ -908,8 +908,6 @@ class DiatonicScale(ConcreteScale):
         ''')    
 
 
-
-
 class OctatonicScale(ConcreteScale):
     '''A concrete diatonic scale. Assumes that all such scales have 
     '''
@@ -918,6 +916,14 @@ class OctatonicScale(ConcreteScale):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractOctatonicScale(mode=mode)
         self.type = 'Octatonic'
+
+
+
+
+
+
+
+
 
 
 
@@ -1157,7 +1163,14 @@ class RomanNumeral(object):
         '''
         self._bassMemberIndex = (self._bassMemberIndex + 1) % len(self._members)
         
-    
+
+    def _memberIndexToScaleDegree(self, memberIndex):
+        '''Given a member index, return the scale degree
+        '''
+        return self.scale.pitchFromScaleDegree(self.rootScaleStep + 
+                    self._members[memberIndex], 
+                    minPitch=minPitch, maxPitch=maxPitch)
+
 
     def getPitches(self, minPitch=None, maxPitch=None, direction=None):
         '''Return the pitches the constitute this RomanNumeral with the present Scale.
