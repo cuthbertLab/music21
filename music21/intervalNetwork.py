@@ -22,6 +22,7 @@ Both nodes and edges can be weighted to suggest tonics, dominants, finals, or ot
 '''
 
 import unittest, doctest
+import copy
 
 import music21
 from music21 import interval
@@ -788,14 +789,100 @@ class IntervalNetwork(object):
 
 
 
+    def nextPitch(self, pitchReference, nodeName, pitchOrigin, 
+        direction=DIRECTION_ASCENDING, stepSize=1, alteredNodes={}, 
+        getNeighbor=True):
+        '''Given a pitchReference, nodeName, and a pitch origin, return the next pitch. 
+
+        The `step` attribute can be configured to permit different sized steps.
 
 
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.nextPitch('g', 1, 'f#5', 'ascending')
+        G5
+        >>> net.nextPitch('g', 1, 'f#5', 'descending')
+        E5
+        >>> net.nextPitch('g', 1, 'f#5', 'ascending', 2) # two steps
+        A5
+        >>> alteredNodes = {2:{'direction':None, 'interval':interval.Interval('-a1')}}
+        >>> net.nextPitch('g', 1, 'g2', 'ascending', alteredNodes=alteredNodes)
+        A-2
+        >>> net.nextPitch('g', 1, 'a-2', 'ascending', alteredNodes=alteredNodes)
+        B-2
+        '''
+        if common.isStr(pitchOrigin):
+            pitchObj = pitch.Pitch(pitchOrigin)
+        else:
+            pitchObj = copy.deepcopy(pitchOrigin)
+
+        # get the node, or the nearest neigbor
+        nodeId = self.getRelativeNodeId(pitchReference, nodeName, 
+                    pitchTarget=pitchOrigin)
+
+        # if no match, get the neighbor
+        if nodeId is None and getNeighbor in [True,     
+            DIRECTION_ASCENDING, DIRECTION_DESCENDING, DIRECTION_BI]:
+            lowId, highId = self.getNeighborNodeIds(
+                pitchReference=pitchReference, 
+                nodeName=nodeName, 
+                pitchTarget=pitchOrigin)
+            # replace the node with the nearest neighbor
+            if getNeighbor in [True, DIRECTION_ASCENDING, DIRECTION_BI]:
+                nodeId = highId
+            else:
+                nodeId = lowId
+
+            environLocal.printDebug(['looking for neighbor', 'nodeId', nodeId])
+
+        n = self._nodes[nodeId]
+        p = pitchObj
+        pCollect = p # usually p, unles altered
+        for x in range(stepSize):
+            postEdge, postNode = self._getNext(n, direction)
+            # already working with a copy
+            n = postNode[0]
+            # for now, only taking first edge
+            if direction == DIRECTION_ASCENDING:
+                p = postEdge[0].interval.transposePitch(p)
+            else:
+                p = postEdge[0].interval.reverse().transposePitch(p)
+
+            # check for and apply altered nodes
+            if n.step in alteredNodes.keys():
+                # check if this direction is the list of directions
+                entry = alteredNodes[n.step]
+                if (alteredNodes[n.step]['direction'] is None or 
+                    direction in alteredNodes[n.step]['direction']):
+                    pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
+            else:
+                pCollect = p
+
+        return pCollect
+
+
+
+    # TODO: need to collect intervals as well 
 
     def realize(self, pitchObj, nodeId=None, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_BI):
+        direction=DIRECTION_BI, alteredNodes={}):
         '''Realize the nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The nodeId, when a simple, linear network, can be used as a scale step value starting from one.
+
+        The `alteredNodes` dictionary permits creating mappings between node step and direction and interval transposition of intervals. 
+
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.realize('c2', 1, 'c2', 'c3')
+        ([C2, D2, E2, F2, G2, A2, B2, C3], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
+        >>> alteredNodes = {7:{'direction':None, 'interval':interval.Interval('-a1')}}
+        >>> net.realize('c2', 1, 'c2', 'c4', alteredNodes=alteredNodes)
+        ([C2, D2, E2, F2, G2, A2, B-2, C3, D3, E3, F3, G3, A3, B-3, C4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
+
         '''
         # get first node
         if isinstance(nodeId, Node):
@@ -817,17 +904,18 @@ class IntervalNetwork(object):
 
         # first, go upward from this pitch to the high terminus
         n = nodeObj
-        p = pitchObj
+        p = pitchObj # the expected node pitch
+        pCollect = p # usually p, unless the tone has been altered
         while True:
             #environLocal.printDebug(['here', p])
             appendPitch = False
-            if (minPitch is not None and p.ps >= minPitch.ps and 
-                maxPitch is not None and p.ps <= maxPitch.ps):
+            if (minPitch is not None and pCollect.ps >= minPitch.ps and 
+                maxPitch is not None and pCollect.ps <= maxPitch.ps):
                 appendPitch = True
-            elif (minPitch is not None and p.ps >= minPitch.ps and 
+            elif (minPitch is not None and pCollect.ps >= minPitch.ps and 
                 maxPitch is None):
                 appendPitch = True
-            elif (maxPitch is not None and p.ps <= maxPitch.ps and 
+            elif (maxPitch is not None and pCollect.ps <= maxPitch.ps and 
                 minPitch is None):
                 appendPitch = True
             elif minPitch is None and maxPitch is None: 
@@ -835,7 +923,7 @@ class IntervalNetwork(object):
                 appendPitch = True
 
             if appendPitch:
-                post.append(p)
+                post.append(pCollect)
                 postNodeId.append(n.id)
 
             if maxPitch is not None and p.ps >= maxPitch.ps:
@@ -856,13 +944,22 @@ class IntervalNetwork(object):
             postEdge, postNode = nextBundle
             intervalObj = postEdge[0].interval # get first
             p = intervalObj.transposePitch(p)
+            pCollect = p
             n = postNode[0]
+
+            if n.step in alteredNodes.keys():
+                # check if this direction is the list of directions
+                entry = alteredNodes[n.step]
+                if (alteredNodes[n.step]['direction'] is None or 
+                    direction in alteredNodes[n.step]['direction']):
+                    pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
 
         #environLocal.printDebug(['got post pitch:', post])
         #environLocal.printDebug(['got post node id:', postNodeId])
 
         n = nodeObj
         p = pitchObj
+        pCollect = p # usually p, unless the tone has been altered
         pre = []
         preNodeId = [] # store node ids as well
         while True:
@@ -877,7 +974,15 @@ class IntervalNetwork(object):
             postEdge, postNode = nextBundle
             intervalObj = postEdge[0].interval # get first
             p = intervalObj.reverse().transposePitch(p)
+            pCollect = p
             n = postNode[0]
+
+            if n.step in alteredNodes.keys():
+                # check if this direction is the list of directions
+                entry = alteredNodes[n.step]
+                if (alteredNodes[n.step]['direction'] is None or 
+                    direction in alteredNodes[n.step]['direction']):
+                    pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
 
             appendPitch = False
             if (minPitch is not None and p.ps >= minPitch.ps and 
@@ -894,7 +999,7 @@ class IntervalNetwork(object):
                 appendPitch = True
 
             if appendPitch:
-                pre.append(p)
+                pre.append(pCollect)
                 preNodeId.append(n.id)
 
             if minPitch is not None and p.ps <= minPitch.ps:
@@ -914,7 +1019,8 @@ class IntervalNetwork(object):
         return pre + post, preNodeId + postNodeId
 
 
-    def realizePitch(self, pitchObj, nodeId=None, minPitch=None, maxPitch=None):
+    def realizePitch(self, pitchObj, nodeId=None, minPitch=None, maxPitch=None, 
+        alteredNodes={}):
         '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The nodeId, when a simple, linear network, can be used as a scale step value starting from one.
@@ -941,12 +1047,12 @@ class IntervalNetwork(object):
         >>> net.realizePitch(pitch.Pitch('a#2'), 7, 'c6', 'c7') 
         [C#6, D#6, E6, F#6, G#6, A#6, B6]
         '''
-        return self.realize(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch)[0]
+        return self.realize(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)[0]
 
 
 
     def realizePitchByStep(self, pitchObj, nodeId=None, nodeStepTargets=[1],
-        minPitch=None, maxPitch=None, direction=None):
+        minPitch=None, maxPitch=None, direction=None, alteredNodes={}):
         '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The `targetSteps` specifies the the steps to be included within the specified range. 
@@ -965,7 +1071,7 @@ class IntervalNetwork(object):
         realizedPitch, realizedNode = self.realize(
             pitchObj=pitchObj, nodeId=nodeId, 
             minPitch=minPitch, maxPitch=maxPitch, 
-            direction=direction)
+            direction=direction, alteredNodes=alteredNodes)
 
         # take modulus of all
         nodeStepTargets = [self._stepModulus(s) for s in nodeStepTargets]
@@ -1063,9 +1169,17 @@ class IntervalNetwork(object):
         comparisonAttribute='ps'):
         '''Given a reference pitch assigned to node id, determine the relative node id of pitchTarget, even if displaced over multiple octaves
 
-        Returns None if no match.        
+        Returns None if no match.
 
-        Need flags for pitch class and enharmonic comparison. 
+        If `getNeighbor` is True, or direction, the nearest node will be returned. 
+
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork(edgeList)
+        >>> net.getRelativeNodeId('a', 1, 'a4')
+        'terminusLow'
+        >>> net.getRelativeNodeId('a', 1, 'b-4') == None
+        True
         '''
         if nodeName == None: # assume first
             nodeId = self._getTerminusLowNodes()[0]
@@ -1079,9 +1193,9 @@ class IntervalNetwork(object):
         # if a scale step is larger than an octave this will fail
         minPitch = pitchTarget.transpose(-12, inPlace=False)
         maxPitch = pitchTarget.transpose(12, inPlace=False)
+
         realizedPitch, realizedNode = self.realize(pitchReference, nodeId, minPitch=minPitch, maxPitch=maxPitch)
 
-        # check if in notesRealized
         for i in range(len(realizedPitch)):
             #environLocal.printDebug(['getRelativeNodeId', 'comparing',  realizedPitch[i], realizedNode[i]])
 
@@ -1092,6 +1206,43 @@ class IntervalNetwork(object):
             if match:
                 #environLocal.printDebug(['getRelativeNodeId', 'pitchReference', pitchReference, 'input nodeId', nodeId, 'pitchTarget', pitchTarget, 'matched', realizedNode[i]])
                 return realizedNode[i]
+        return None
+
+    def getNeighborNodeIds(self, pitchReference, nodeName, pitchTarget):
+        '''Given a reference pitch assigned to node id, determine the node ids that neighbor this pitch.
+
+        Returns None if an exact match.
+
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork(edgeList)
+        >>> net.getNeighborNodeIds('c4', 1, 'b-')
+        (4, 5)
+        >>> net.getNeighborNodeIds('c4', 1, 'b')
+        (5, 'terminusHigh')
+        '''
+        if nodeName == None: # assume first
+            nodeId = self._getTerminusLowNodes()[0]
+        else:
+            nodeId = self._nodeNameToNodes(nodeName)[0]
+
+        if common.isStr(pitchTarget):
+            pitchTarget = pitch.Pitch(pitchTarget)
+
+        # try an octave spread first
+        # if a scale step is larger than an octave this will fail
+        minPitch = pitchTarget.transpose(-12, inPlace=False)
+        maxPitch = pitchTarget.transpose(12, inPlace=False)
+
+        realizedPitch, realizedNode = self.realize(pitchReference, nodeId, minPitch=minPitch, maxPitch=maxPitch)
+
+        lowNeighbor = None
+        highNeighbor = None
+        for i in range(len(realizedPitch)):
+            if pitchTarget.ps < realizedPitch[i].ps:
+                highNeighbor = realizedNode[i]
+                return lowNeighbor, highNeighbor
+            lowNeighbor = realizedNode[i]
         return None
 
 
@@ -1178,7 +1329,7 @@ class IntervalNetwork(object):
 
     def getPitchFromNodeStep(self, pitchReference, nodeName, nodeStepTarget, 
         direction=None, comparisonAttribute='ps', minPitch=None, 
-        maxPitch=None):
+        maxPitch=None, alteredNodes={}):
         '''Given a reference pitch assigned to node id, determine the pitch for the the target node step. 
 
         >>> from music21 import *
@@ -1208,7 +1359,8 @@ class IntervalNetwork(object):
         # pass direction as well when getting realization
         realizedPitch, realizedNode = self.realize(
             pitchObj=pitchReference, nodeId=nodeId, 
-            minPitch=minPitch, maxPitch=maxPitch, direction=direction)
+            minPitch=minPitch, maxPitch=maxPitch, direction=direction,
+            alteredNodes=alteredNodes)
 
         # get the pitch when we have a node id match
         for i, nId in enumerate(realizedNode):
@@ -1253,7 +1405,7 @@ class IntervalNetwork(object):
 
 
     def match(self, pitchReference, nodeId, pitchTarget, 
-        comparisonAttribute='pitchClass'):
+        comparisonAttribute='pitchClass', alteredNodes={}):
         '''Given one or more pitches in `pitchTarget`, return a list of matched pitches, and unmatched pitches. 
 
         >>> from music21 import *
@@ -1292,7 +1444,8 @@ class IntervalNetwork(object):
         pitchTarget, minPitch, maxPitch = self._filterPitchList(pitchTarget)
 
         # TODO: need to do both directions
-        nodesRealized = self.realizePitch(pitchReference, nodeId, minPitch, maxPitch)
+        nodesRealized = self.realizePitch(pitchReference, nodeId, 
+                        minPitch, maxPitch, alteredNodes=alteredNodes)
 
         matched = []
         noMatch = []
@@ -1321,7 +1474,7 @@ class IntervalNetwork(object):
             
 
     def find(self, pitchTarget, resultsReturned=4, 
-        comparisonAttribute='pitchClass'):
+        comparisonAttribute='pitchClass', alteredNodes={}):
         '''Given a collection of pitches, test all transpositions of a realized version of this network, and return the number of matches in each for each pitch assigned to the first node. 
 
         >>> from music21 import *
@@ -1360,7 +1513,8 @@ class IntervalNetwork(object):
             # realize scales from each pitch, and then compare to pitchTarget   
             # pitchTarget may be a list of pitches
             matched, noMatch = self.match(p, nodeId, pitchTarget,
-                               comparisonAttribute=comparisonAttribute)                
+                               comparisonAttribute=comparisonAttribute,
+                               alteredNodes=alteredNodes)                
             sortList.append((len(matched), p))
 
         sortList.sort()

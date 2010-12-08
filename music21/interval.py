@@ -454,8 +454,8 @@ class GenericInterval(music21.Music21Object):
 
         if self.directed == 1:
             self.direction = OBLIQUE
-        elif self.directed == -1:
-            raise IntervalException("Descending P1s not allowed; did you mean to write a diminished unison instead?")
+#         elif self.directed == -1:
+#             raise IntervalException("Descending P1s not allowed; did you mean to write a diminished unison instead?")
         elif self.directed == 0:
             raise IntervalException("The Zeroth is not an interval")
         elif self.directed == self.undirected:
@@ -517,7 +517,7 @@ class GenericInterval(music21.Music21Object):
         self.simpleNiceName = common.musicOrdinals[self.simpleUndirected]
         self.semiSimpleNiceName = common.musicOrdinals[self.semiSimpleUndirected]
 
-        if self.directed == 1:
+        if abs(self.directed) == 1:
             self.staffDistance = 0
         elif self.directed > 1:
             self.staffDistance = self.directed - 1
@@ -1411,8 +1411,18 @@ class Interval(music21.Music21Object):
             while halfStepsToFix >= 12:
                 halfStepsToFix = halfStepsToFix - 12
                 pitch2.octave = pitch2.octave - 1
-            
-            pitch2.accidental = halfStepsToFix
+
+            # this will raise an exception if greater than 4            
+            # TODO: possibly set as an option if accidentals permit 
+            if abs(halfStepsToFix) > 4:
+                # just create new pitch, directly setting the pitch space value
+                pitchAlt = copy.deepcopy(pitch1)
+                pitchAlt.ps = pitch2.ps + halfStepsToFix
+                environLocal.printDebug('coercing pitch due to a transposition that requires an unsupported, extreme accidental: %s -> %s' % (pitch2, pitchAlt) )
+                pitch2 = pitchAlt
+            else:
+                pitch2.accidental = halfStepsToFix
+
             # inherit accidental display properties
             pitch2.inheritDisplay(pitch1)
             pitch2.setAccidentalDisplay(None) # set accidental display to None

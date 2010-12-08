@@ -5356,12 +5356,6 @@ class Stream(music21.Music21Object):
         '''
         see property `notes`, below
         '''
-        # in preliminary test, caching here shows no great performance benefit
-#         if self._cache["notes"] == None:
-#             # _elementsChanged has been called
-#             self._cache["notes"] =  self.getElementsByClass([note.GeneralNote, chord.Chord])
-#         return self._cache["notes"]
-
         return self.getElementsByClass([note.GeneralNote, chord.Chord])
 
     notes = property(_getNotes, doc='''
