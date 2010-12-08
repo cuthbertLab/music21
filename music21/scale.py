@@ -376,6 +376,28 @@ class ConcreteScale(Scale):
         else: # assume this is a pitch object
             self._tonic = tonic
 
+    def _isConcrete(self):
+        '''To be concrete, a Scale must have a defined tonic. An abstract Scale is not Concrete
+        '''
+        if self._tonic is None:
+            return True
+        else:
+            return False
+
+    isConcrete = property(_isConcrete, 
+        doc = '''Return True if the scale is Concrete, that is, it has a defined Tonic. 
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('c')
+        >>> sc1.isConcrete
+        True
+        >>> sc2 = scale.MajorScale()    
+        >>> sc2.isConcrete
+        False
+
+        ''')
+
+
     def __eq__(self, other):
         '''For concrete equality, the stored abstract objects must evaluate as equal, as well as local attributes. 
 
@@ -405,7 +427,7 @@ class ConcreteScale(Scale):
         # have to test each so as not to confuse with a subclass
         # TODO: add pitch range comparison if defined
 
-        if self._tonic is None or  other._tonic is None:
+        if not self.isConcrete or not other.isConcrete:
             # if tonic is none, then we automatically do an abstract comparison
             return self._abstract == other._abstract
         
