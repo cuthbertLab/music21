@@ -54,6 +54,15 @@ class Scale(music21.Music21Object):
 
         ''')
 
+    def _isConcrete(self):
+        '''To be concrete, a Scale must have a defined tonic. An abstract Scale is not Concrete
+        '''
+        return False
+
+    isConcrete = property(_isConcrete, 
+        doc = '''Return True if the scale is Concrete, that is, it has a defined Tonic. 
+        ''')
+
 
     def _extractPitchList(self, other, comparisonAttribute='nameWithOctave'):
         '''Given a data format, extract all unique pitch space or pitch class values.
@@ -106,13 +115,13 @@ class AbstractScale(Scale):
 
     These classes primarily create and manipulate the stored IntervalNetwork object. Thus, they are rarely created or manipulated directly by most users.
     '''
-    isConcrete = False
     def __init__(self):
         Scale.__init__(self)
         # store interval network within abstract scale
         self.net = None
         # in most cases tonic/final of scale is step one, but not always
         self.tonicStep = 1 # step of tonic
+
 
     def __eq__(self, other):
         '''
@@ -122,6 +131,8 @@ class AbstractScale(Scale):
         >>> as1 == as2
         True
         >>> as1 == None
+        False
+        >>> as1.isConcrete
         False
         '''
         # have to test each so as not to confuse with a subclass
@@ -136,6 +147,7 @@ class AbstractScale(Scale):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
 
 
 
@@ -1052,10 +1064,10 @@ class HypophrygianScale(DiatonicScale):
 
 
 #-------------------------------------------------------------------------------
-class Harmony(object):
-    '''A harmony
+class RomanNumeral(object):
+    '''An abstract harmony built from scale degree selections.
 
-    A Harmony is type of concrete scale where the root is the tonic and the bass is defined by step. 
+    A RomanNumeral is type of concrete scale where the root is the tonic and the bass is defined by step. 
     '''
     # a harmony might be seen as a subclass of a concrete scale, but this 
     # is not always the case.
@@ -1075,6 +1087,10 @@ class Harmony(object):
         # store mapping of alterations to members
         self._alterations = {}
 
+        # default is to make a triad; could be otherwise
+        self.makeTriad()
+
+
     def _getRoot(self):
         return self.scale.pitchFromScaleDegree(self.rootScaleStep)
 
@@ -1083,7 +1099,7 @@ class Harmony(object):
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g')
-        >>> h1 = scale.Harmony(sc1, 1)
+        >>> h1 = scale.RomanNumeral(sc1, 1)
         >>> h1.root
         G
         ''')
@@ -1096,7 +1112,7 @@ class Harmony(object):
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g')
-        >>> h1 = scale.Harmony(sc1, 1)
+        >>> h1 = scale.RomanNumeral(sc1, 1)
         >>> h1.bass
         G
         ''')
@@ -1122,7 +1138,7 @@ class Harmony(object):
     
 
     def getPitches(self, minPitch=None, maxPitch=None, direction=None):
-        '''Return the pitches the constitute this Harmony with the present Scale.
+        '''Return the pitches the constitute this RomanNumeral with the present Scale.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g4')
@@ -1168,7 +1184,7 @@ class Harmony(object):
         return post
 
     pitches = property(getPitches, 
-        doc = '''Get the minimum default pitches for this Harmony
+        doc = '''Get the minimum default pitches for this RomanNumeral
         ''')
 
     def getChord(self, minPitch=None, maxPitch=None, direction=None):
@@ -1180,14 +1196,6 @@ class Harmony(object):
     chord = property(getChord, 
         doc = '''Return a Chord object form this harmony over a default range
         ''')
-
-
-
-class TriadicHarmony(Harmony):
-
-    def __init__(self, scale=None, rootScaleStep=1):
-        Harmony.__init__(self, scale=scale, rootScaleStep=rootScaleStep)
-        self.makeTriad()
 
 
     def parseFigure(self, figure):
@@ -1286,7 +1294,7 @@ class TriadicHarmony(Harmony):
         self.rootScaleStep = common.fromRoman(numeral)
 
     romanNumeral = property(_getRomanNumeral, _setRomanNumeral,
-        doc='''Return the roman numeral representation of this Harmony, or set this Harmony with a roman numeral representation.
+        doc='''Return the roman numeral representation of this RomanNumeral, or set this RomanNumeral with a roman numeral representation.
         ''')
 
 
