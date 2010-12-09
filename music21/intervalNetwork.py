@@ -396,7 +396,7 @@ class IntervalNetwork(object):
         >>> # using another fill method creates a new network
         >>> net.fillBiDirectedEdges(['M3', 'M3', 'M3'])
         >>> net.realizePitch('g4')
-        [G4, B4, D#5, F##5]
+        [G4, B4, D#5, G5]
         >>> net.stepMin, net.stepMax
         (1, 4)
         '''
@@ -799,10 +799,9 @@ class IntervalNetwork(object):
             # check if this direction is the list of directions
 
             directionSpec = alteredNodes[n.step]['direction']
-            environLocal.printDebug(['processing altered node', n, p, 'direction', direction, 'directionSpec', directionSpec])
+            #environLocal.printDebug(['processing altered node', n, p, 'direction', direction, 'directionSpec', directionSpec])
 
             match = False
-
             # if ascending or descending, and this is a bidirectinonal alt
             # then applyt
 
@@ -817,8 +816,8 @@ class IntervalNetwork(object):
                 match = True
 
             if match:
-                environLocal.printDebug(['matched direction', direction])
-                pPost = alteredNodes[n.step]['interval'].transposePitch(p)
+                #environLocal.printDebug(['matched direction', direction])
+                pPost = alteredNodes[n.step]['interval'].transposePitch(p, maxAccidental=1)
                 return pPost
         # return pitch unaltered
         return p
@@ -896,22 +895,12 @@ class IntervalNetwork(object):
             n = postNode[0]
             # for now, only taking first edge
             if direction == DIRECTION_ASCENDING:
-                p = postEdge[0].interval.transposePitch(p)
+                p = postEdge[0].interval.transposePitch(p, maxAccidental=1)
             else:
-                p = postEdge[0].interval.reverse().transposePitch(p)
+                p = postEdge[0].interval.reverse().transposePitch(p, maxAccidental=1)
             
             pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
                        n=n, p=p, direction=direction)
-
-            # check for and apply altered nodes
-#             if n.step in alteredNodes.keys():
-#                 # check if this direction is the list of directions
-#                 entry = alteredNodes[n.step]
-#                 if (alteredNodes[n.step]['direction'] is None or 
-#                     direction in alteredNodes[n.step]['direction']):
-#                     pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
-#             else:
-#                 pCollect = p
 
         return pCollect
 
@@ -997,19 +986,12 @@ class IntervalNetwork(object):
 
             postEdge, postNode = nextBundle
             intervalObj = postEdge[0].interval # get first
-            p = intervalObj.transposePitch(p)
+            p = intervalObj.transposePitch(p, maxAccidental=1)
             pCollect = p
             n = postNode[0]
 
             pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
                        n=n, p=p, direction=direction)
-
-#             if n.step in alteredNodes.keys():
-#                 # check if this direction is the list of directions
-#                 entry = alteredNodes[n.step]
-#                 if (alteredNodes[n.step]['direction'] is None or 
-#                     direction in alteredNodes[n.step]['direction']):
-#                     pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
 
         #environLocal.printDebug(['got post pitch:', post])
         #environLocal.printDebug(['got post node id:', postNodeId])
@@ -1030,19 +1012,12 @@ class IntervalNetwork(object):
                 break
             postEdge, postNode = nextBundle
             intervalObj = postEdge[0].interval # get first
-            p = intervalObj.reverse().transposePitch(p)
+            p = intervalObj.reverse().transposePitch(p, maxAccidental=1)
             pCollect = p
             n = postNode[0]
 
             pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
                        n=n, p=p, direction=direction)
-
-#             if n.step in alteredNodes.keys():
-#                 # check if this direction is the list of directions
-#                 entry = alteredNodes[n.step]
-#                 if (alteredNodes[n.step]['direction'] is None or 
-#                     direction in alteredNodes[n.step]['direction']):
-#                     pCollect = alteredNodes[n.step]['interval'].transposePitch(p)
 
             appendPitch = False
             if (minPitch is not None and p.ps >= minPitch.ps and 
@@ -1350,7 +1325,7 @@ class IntervalNetwork(object):
         >>> net.realizePitch('f2')
         [F2, B-2, E-3, A-3]
         >>> net.realizePitch('f2', 1, 'f2', 'f6')
-        [F2, B-2, E-3, A-3, D-4, G-4, C-5, F-5,   B--5, E--6]
+        [F2, B-2, E-3, A-3, D-4, G-4, C-5, F-5, A5, D6]
 
         >>> net.getRelativeNodeStep('f2', 1, 'a-3') # could be 4 or 1
         1

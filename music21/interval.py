@@ -1361,12 +1361,15 @@ class Interval(music21.Music21Object):
         ''')
 
 
-    def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True):
+    def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True, 
+        maxAccidental=4):
         '''Given a :class:`~music21.pitch.Pitch`  object, return a new, 
         transposed Pitch, that is transformed 
         according to this Interval. This is the main public interface to all 
         transposition routines found on higher-level objects. 
 
+        The `maxAccidental` parameter sets an integer number of half step alterations that will be accepted in the transposed pitch. For example, a value of 2 will permit double sharps but not triple sharps. 
+        
         >>> from music21 import *
         >>> p1 = pitch.Pitch('a#')
         >>> i = interval.Interval('m3')
@@ -1376,6 +1379,8 @@ class Interval(music21.Music21Object):
         >>> p2 = i.transposePitch(p1, reverse=True)
         >>> p2
         F##4
+        >>> i.transposePitch(p1, reverse=True, maxAccidental=1)
+        G4
 
         OMIT_FROM_DOCS
         TODO: More tests here
@@ -1398,8 +1403,7 @@ class Interval(music21.Music21Object):
         pitch2.accidental = None
 
         # have right note name but not accidental
-        interval2 = notesToInterval(pitch1, pitch2)    
-
+        interval2 = notesToInterval(pitch1, pitch2)
         if not reverse:
             halfStepsToFix = (self.chromatic.semitones -
                           interval2.chromatic.semitones)
@@ -1414,12 +1418,13 @@ class Interval(music21.Music21Object):
 
             # this will raise an exception if greater than 4            
             # TODO: possibly set as an option if accidentals permit 
-            if abs(halfStepsToFix) > 4:
+            if abs(halfStepsToFix) > maxAccidental:
                 # just create new pitch, directly setting the pitch space value
-                pitchAlt = copy.deepcopy(pitch1)
-                pitchAlt.ps = pitch2.ps + halfStepsToFix
-                environLocal.printDebug('coercing pitch due to a transposition that requires an unsupported, extreme accidental: %s -> %s' % (pitch2, pitchAlt) )
-                pitch2 = pitchAlt
+                #pitchAlt = copy.deepcopy(pitch2)
+                #pitchAlt.ps = pitch2.ps + halfStepsToFix
+                #environLocal.printDebug('coercing pitch due to a transposition that requires a, extreme accidental: %s -> %s' % (pitch2, pitchAlt) )
+                #pitch2 = pitchAlt
+                pitch2.ps = pitch2.ps + halfStepsToFix
             else:
                 pitch2.accidental = halfStepsToFix
 
