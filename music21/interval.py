@@ -1306,6 +1306,7 @@ class Interval(music21.Music21Object):
         
         if self.chromatic is not None:
             self.isChromaticStep = self.chromatic.isChromaticStep
+            self.semitones = self.chromatic.semitones
 
         if self.chromatic is not None and self.diatonic is not None:
             self.isStep = self.isChromaticStep or self.isDiatonicStep

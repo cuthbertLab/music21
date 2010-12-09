@@ -155,6 +155,45 @@ class AbstractScale(Scale):
         return not self.__eq__(other)
 
 
+    def _sumIntervals(self, intervalList):
+        '''Given an interval list, either as Interval objects or strings, find the sum in half steps.
+
+        >>> from music21 import *
+        >>> asc = scale.AbstractScale()
+        >>> asc._sumIntervals(['m2', 'p5'])
+        8
+        >>> asc._sumIntervals(['m2', 'p5', interval.Interval('m2')])
+        9
+        >>> asc._sumIntervals(['M7', 'm2'])
+        12
+        '''
+        group = []
+        for i in intervalList:
+            if isinstance(i, interval.Interval):
+                group.append(i)
+            else:
+                group.append(interval.Interval(i))
+        return sum([i.semitones for i in group])
+
+    def _getOctaveComplement(self, intervalList):
+        '''Return an interval that completes an octave with the lowest implied pitch from the list of intervals. 
+
+        >>> from music21 import *
+        >>> asc = scale.AbstractScale()
+        >>> asc._getOctaveComplement(['m2', 'p5'])
+        <music21.interval.Interval M3>
+        >>> asc._getOctaveComplement(['M7'])
+        <music21.interval.Interval m2>
+        >>> asc._getOctaveComplement(['p8', 'm2'])
+        <music21.interval.Interval M7>
+        '''
+        value = self._sumIntervals(intervalList)
+        semitone = 12 - (value % 12)
+        if semitone == 0:
+            return None
+        else:
+            return interval.Interval(semitone)
+
     def _buildNetwork(self):
         '''Calling the _buildNetwork, with or without parameters, is main job of the AbstractScale class.
         '''
@@ -436,6 +475,30 @@ class AbstractCyclicalScale(AbstractScale):
 
 
 
+
+
+class AbstractOctaveRepeatingScale(AbstractScale):
+    '''A scale of any size built with an interval list that assumes octave completion. An additional interval to complete the octave will be added. This does not guarantee that the octave will be repeated in one octave, only the next octave above the last interval. 
+    '''
+    def __init__(self, mode=None):
+        AbstractScale.__init__(self)
+        self.type = 'Abstract Octave Repeating'
+        self._buildNetwork(mode=mode)
+
+    def _buildNetwork(self, mode):
+        '''
+        Here, mode is the list of intervals. 
+        '''
+        if not common.isListLike(mode):
+            mode = [mode] # place in list
+        # get the interval to complete the octave
+
+        iComplement = self._getOctaveComplement(mode)
+        if iComplement is not None:
+            mode.append(iComplement)
+
+        self.tonicStep = 1
+        self._net = intervalNetwork.IntervalNetwork(mode)
 
 
 
@@ -1258,6 +1321,30 @@ class OctatonicScale(ConcreteScale):
 
 
 
+class OctaveRepeatingScale(ConcreteScale):
+    '''A concrete cyclical scale, based on a cycle of intervals. These intervals do not have to be octave completing, and thus may produce scales that do no
+
+    >>> from music21 import *
+    >>> sc = scale.OctaveRepeatingScale('c4', ['m3', 'M3']) #
+    >>> sc.pitches
+    [C4, E-4, G4, C5]
+    >>> sc.getPitches('g2', 'g6') 
+    [G2, C3, E-3, G3, C4, E-4, G4, C5, E-5, G5, C6, E-6, G6]
+    >>> sc.getScaleDegreeFromPitch('c4')
+    1
+    >>> sc.getScaleDegreeFromPitch('e-')
+    2
+    '''
+
+    def __init__(self, tonic=None, intervalList=['m2']):
+        ConcreteScale.__init__(self, tonic=tonic)
+        self._abstract = AbstractOctaveRepeatingScale(mode=intervalList)
+        self.type = 'Cyclical'
+
+
+
+
+
 class CyclicalScale(ConcreteScale):
     '''A concrete cyclical scale, based on a cycle of intervals. These intervals do not have to be octave completing, and thus may produce scales that do no
 
@@ -1314,6 +1401,35 @@ class ChromaticScale(ConcreteScale):
         self.type = 'Chromatic'
 
 
+
+class WholeToneScale(ConcreteScale):
+    '''A concrete whole-tone scale. 
+
+    >>> from music21 import *
+    >>> sc = scale.WholeToneScale('g2') 
+    >>> sc.pitches
+    [G2, A2, B2, C#3, D#3, E#3, G3]
+    >>> sc.getPitches('g2', 'g6') 
+    [G2, A2, B2, C#3, D#3, E#3, G3, A3, B3, C#4, D#4, E#4, G4, A4, B4, C#5, D#5, E#5, G5, A5, B5, C#6, D#6, E#6, G6]
+    >>> sc.abstract.getStepMaxUnique()
+    6
+    >>> sc.pitchFromDegree(1) 
+    G2
+    >>> sc.pitchFromDegree(2) 
+    A2
+    >>> sc.pitchFromDegree(6) 
+    E#3
+    >>> sc.getScaleDegreeFromPitch('g2')
+    1
+    >>> sc.getScaleDegreeFromPitch('F6')
+    6
+    '''
+
+    def __init__(self, tonic=None):
+        ConcreteScale.__init__(self, tonic=tonic)
+        self._abstract = AbstractCyclicalScale(mode=['M2', 'M2',
+            'M2', 'M2', 'M2', 'M2'])
+        self.type = 'Chromatic'
 
 
 
