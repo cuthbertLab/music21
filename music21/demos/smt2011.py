@@ -27,14 +27,15 @@ environLocal = environment.Environment(_MOD)
 class Test(unittest.TestCase):
 
     def runTest(self):
+        '''
+        '''
         pass
     
 
 
     def testEx01(self):
-        ''' Basic scale operations
-        '''    
-        # a simple major scale
+        # Basic operations for creating and manipulating scales.
+
         sc1 = scale.MajorScale('a-')
 
         # get pitches from any range of this scale
@@ -88,21 +89,71 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc2.transpose('m2').pitches), '[G4, A4, B4, C#5, D#5, E#5, G5]')
 
 
+
+
     def testEx02(self): 
-        # labeling a part based on scale degree
+        # Labeling a vocal part based on scale degree derived from key signature and automated analysis.
 
         s = corpus.parseWork('hwv56/movement3-03.md')#.measures(1,7)
         basso = s.parts['basso']
         s.remove(basso)
 
         ksScale = s.flat.getElementsByClass('KeySignature')[0].getScale()
+        autoScale = scale.MajorScale(s.flat.analyze('key')[0])
         for n in basso.flat.getElementsByClass('Note'):
+            # get the scale degree from this pitch
             n.addLyric(ksScale.getScaleDegreeFromPitch(n.pitch))
+            n.addLyric(autoScale.getScaleDegreeFromPitch(n.pitch))
 
         display = stream.Score()
         display.insert(0, basso)
         display.insert(0, s.chordify())
-        #display.show()
+        display.show()
+
+
+
+
+    def testEx03(self):
+
+        # What is the most common closing soprano scale degree by key signature
+        # in the bach chorales?
+
+        results = {}
+        for fn in corpus.bachChorales[:2]:
+            s = corpus.parseWork(fn)
+            ksScale = s.flat.getElementsByClass('KeySignature')[0].getScale()
+            for p in s.parts:
+                if p.id.lower() == 'soprano':
+                    n = s.parts['soprano'].flat.getElementsByClass('Note')[-1]
+                    degree = ksScale.getScaleDegreeFromPitch(n.pitch)
+                    if degree not in results.keys():
+                        results[degree] = 0
+                    results[degree] += 1
+        print(results)
+
+        #{1: 307, 2: 3, 3: 11, 4: 31, 5: 34, 6: 5, 7: 2, None: 3}
+
+
+
+
+    def testEx04(self):
+        # what
+
+        sc = scale.MajorScale()
+
+        for region in ['shanxi']:
+            # Create storage units
+            intervalDict = {}
+            workCount = 0
+            intervalCount = 0
+            seventhCount = 0
+            # Perform a location search on the corpus and iterate over 
+            # resulting file name and work number
+#             for fp, n in corpus.search(region, 'locale'):
+# 
+#                 pass
+
+
 
 if __name__ == "__main__":
     import music21

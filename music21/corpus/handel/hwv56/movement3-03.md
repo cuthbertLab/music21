@@ -226,13 +226,13 @@ measure 6
 B3     2        e     d                    twink-
 B3     2        e     d                    ling
 C#4    2        e     d                    of
-G#3    2        e     d                    an
+G#3    2        e #   d                    an
 A3     4        q     d                    eye,
 rest   4        q
 measure 7
 rest   4        q
 D4     2        e     d                    at
-G#3    1        s     d                    the
+G#3    1        s #   d                    the
 A3     1        s     d                    last
 A3     2        e     d                    trum-
 E3     2        e     d                    pet.
