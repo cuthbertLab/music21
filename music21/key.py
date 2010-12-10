@@ -261,21 +261,23 @@ class Key(music21.Music21Object):
     '''
     
     def __init__(self, stream1 = None):
-        self.stream1 = stream1
-        self.step = ''
-        self.accidental = ''
-        self.type = ''
-
-        self.stepList = music21.pitch.STEPNAMES
-
-        # this information might be better dervied from somewhere in 
-        # note.py
-        self.accidentalList = ['--', '-', None, '#', '##']
-        self.typeList = ['major', 'minor']
-
-    def generateKey(self):
-        # want to use Krumhansl-Kessler algorithm; need to find explicit instructions
         pass
+
+#         self.stream1 = stream1
+#         self.step = ''
+#         self.accidental = ''
+#         self.type = ''
+# 
+#         self.stepList = music21.pitch.STEPNAMES
+# 
+#         # this information might be better dervied from somewhere in 
+#         # note.py
+#         self.accidentalList = ['--', '-', None, '#', '##']
+#         self.typeList = ['major', 'minor']
+# 
+#     def generateKey(self):
+#         # want to use Krumhansl-Kessler algorithm; need to find explicit instructions
+#         pass
 
     def setKey(self, name = "C", accidental = None, type = "major"):
         self.step = name
@@ -585,6 +587,26 @@ class KeySignature(music21.Music21Object):
         else:
             return None
 
+
+
+    def getScale(self):
+        '''Return a scale that is representative of this key.
+
+        >>> from music21 import *
+        >>> ks = key.KeySignature(3)
+        >>> ks
+        <music21.key.KeySignature of 3 sharps>
+        >>> ks.getScale()
+        <music21.scale.MajorScale A major>
+        '''
+        from music21 import scale
+        pitchObj, mode = self._getPitchAndMode()
+        if mode in [None, 'major']:
+            return scale.MajorScale(pitchObj)
+        elif mode in ['minor']:
+            return scale.MinorScale(pitchObj)
+        else:
+            raise KeySignatureException('not mapping for this mode yet: %s' % mode)
 
     #---------------------------------------------------------------------------
     # properties

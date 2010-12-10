@@ -292,6 +292,22 @@ class AbstractScale(Scale):
         return post
 
 
+    def getNewTonicPitch(self, pitchReference, nodeName, 
+        direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):
+        '''Define a pitch target and a node. 
+        '''
+        post = self._net.getPitchFromNodeStep(
+            pitchReference=pitchReference, 
+            nodeName=nodeName, 
+            nodeStepTarget=1, # get the pitch of the tonic 
+            direction=direction, 
+            minPitch=minPitch, 
+            maxPitch=maxPitch,
+            alteredNodes=self._alteredNodes
+            )
+        return post
+
+
 
 #-------------------------------------------------------------------------------
 # abstract subclasses
@@ -345,54 +361,80 @@ class AbstractDiatonicScale(AbstractScale):
             intervalList = srcList[1:] + srcList[:1] # d to d
             self.tonicStep = 1
             self.dominantStep = 5
+            self.relativeMajorStep = 7
+            self.relativeMinorStep = 5
         elif mode in ['phrygian']:
             intervalList = srcList[2:] + srcList[:2] # e to e
             self.tonicStep = 1
             self.dominantStep = 5
+            self.relativeMajorStep = 6
+            self.relativeMinorStep = 4
         elif mode in ['lydian']:
             intervalList = srcList[3:] + srcList[:3] # f to f
             self.tonicStep = 1
             self.dominantStep = 5
+            self.relativeMajorStep = 5
+            self.relativeMinorStep = 3
         elif mode in ['mixolydian']:
             intervalList = srcList[4:] + srcList[:4] # g to g
             self.tonicStep = 1
             self.dominantStep = 5
+            self.relativeMajorStep = 4
+            self.relativeMinorStep = 2
         elif mode in ['hypodorian']:
             intervalList = srcList[5:] + srcList[:5] # a to a
             self.tonicStep = 4
             self.dominantStep = 6
+            self.relativeMajorStep = 3
+            self.relativeMinorStep = 1
         elif mode in ['hypophrygian']:
             intervalList = srcList[6:] + srcList[:6] # b to b
             self.tonicStep = 4
             self.dominantStep = 7
+            self.relativeMajorStep = 2
+            self.relativeMinorStep = 7
         elif mode in ['hypolydian']: # c to c
             intervalList = srcList
             self.tonicStep = 4
             self.dominantStep = 6
+            self.relativeMajorStep = 1
+            self.relativeMinorStep = 6
         elif mode in ['hypomixolydian']:
             intervalList = srcList[1:] + srcList[:1] # d to d
             self.tonicStep = 4
             self.dominantStep = 7
+            self.relativeMajorStep = 7
+            self.relativeMinorStep = 5
         elif mode in ['aeolian', 'minor']:
             intervalList = srcList[5:] + srcList[:5] # a to A
             self.tonicStep = 1
             self.dominantStep = 5
+            self.relativeMajorStep = 3
+            self.relativeMinorStep = 1
         elif mode in [None, 'major', 'ionian']: # c to C
             intervalList = srcList
             self.tonicStep = 1
             self.dominantStep = 5
+            self.relativeMajorStep = 1
+            self.relativeMinorStep = 6
         elif mode in ['locrian']:
             intervalList = srcList[6:] + srcList[:6] # b to B
             self.tonicStep = 1
             self.dominantStep = 5
+            self.relativeMajorStep = 2
+            self.relativeMinorStep = 7
         elif mode in ['hypoaeolian']:
             intervalList = srcList[2:] + srcList[:2] # e to e
             self.tonicStep = 4
             self.dominantStep = 6
+            self.relativeMajorStep = 6
+            self.relativeMinorStep = 4
         elif mode in ['hupomixolydian']:
             intervalList = srcList[3:] + srcList[:3] # f to f
             self.tonicStep = 4
             self.dominantStep = 7
+            self.relativeMajorStep = 5
+            self.relativeMinorStep = 3
         else:
             raise ScaleException('cannot create a scale of the following mode:' % mode)
         self._net = intervalNetwork.IntervalNetwork(intervalList)
@@ -849,6 +891,9 @@ class ConcreteScale(Scale):
         return post
 
 
+
+
+
     def next(self, pitchOrigin, direction='ascending', stepSize=1):
         '''Get the next pitch.
 
@@ -973,6 +1018,7 @@ class ConcreteScale(Scale):
             post.append((weight, sc))
         return post
 
+
     def derive(self, other, comparisonAttribute='pitchClass'):
         '''
         >>> from music21 import *
@@ -990,6 +1036,28 @@ class ConcreteScale(Scale):
                             comparisonAttribute=comparisonAttribute)
 
         return self.__class__(tonic=pairs[0][1])
+
+
+
+    def deriveByDegree(self, degree, pitch):
+        '''Given a scale degree and a pitch, get a new Scale that satisfies that condition.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale()
+        >>> sc1.deriveByDegree(7, 'c') # what scale has c as its 7th degree
+        <music21.scale.MajorScale D- major>
+
+        '''
+
+        # weight target membership
+        p = self._abstract.getNewTonicPitch(pitchReference=pitch, 
+            nodeName=degree)
+        if p is None:
+            raise ScaleException('cannot derive new tonic')
+        
+        return self.__class__(tonic=p)
+
+
 
 
     #---------------------------------------------------------------------------
@@ -1087,6 +1155,66 @@ class DiatonicScale(ConcreteScale):
             return self.pitchFromDegree(7)
 
 
+    def getParallelMinor(self):
+        '''Return a parallel minor scale based on this concrete major scale.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale(pitch.Pitch('a'))
+        >>> sc1.pitches
+        [A, B4, C#5, D5, E5, F#5, G#5, A5]
+        >>> sc2 = sc1.getParallelMinor()
+        >>> sc2.pitches
+        [A, B4, C5, D5, E5, F5, G5, A5]
+        '''
+        return MinorScale(self._tonic)
+
+
+    def getParallelMajor(self):
+        '''Return a concrete relative major scale
+
+        >>> from music21 import *
+        >>> sc1 = scale.MinorScale(pitch.Pitch('g'))
+        >>> sc1.pitches
+        [G, A4, B-4, C5, D5, E-5, F5, G5]
+        >>> sc2 = sc1.getParallelMajor()
+        >>> sc2.pitches
+        [G, A4, B4, C5, D5, E5, F#5, G5]
+        '''
+        return MajorScale(self._tonic)
+
+
+
+    def getRelativeMinor(self):
+        '''Return a relative minor scale based on this concrete major scale.
+
+        >>> sc1 = MajorScale(pitch.Pitch('a'))
+        >>> sc1.pitches
+        [A, B4, C#5, D5, E5, F#5, G#5, A5]
+        >>> sc2 = sc1.getRelativeMinor()
+        >>> sc2.pitches
+        [F#5, G#5, A5, B5, C#6, D6, E6, F#6]
+        '''
+        return MinorScale(self.pitchFromDegree(self.abstract.relativeMinorStep))
+
+
+    def getRelativeMajor(self):
+        '''Return a concrete relative major scale
+
+        >>> sc1 = MinorScale(pitch.Pitch('g'))
+        >>> sc1.pitches
+        [G, A4, B-4, C5, D5, E-5, F5, G5]
+        >>> sc2 = sc1.getRelativeMajor()
+        >>> sc2.pitches
+        [B-4, C5, D5, E-5, F5, G5, A5, B-5]
+
+        >>> sc2 = DorianScale('d')
+        >>> sc2.getRelativeMajor().pitches
+        [C5, D5, E5, F5, G5, A5, B5, C6]
+        '''
+        return MajorScale(self.pitchFromDegree(self.abstract.relativeMajorStep))
+
+
+
     def _getMusicXML(self):
         '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
 
@@ -1135,34 +1263,6 @@ class MajorScale(DiatonicScale):
         # build the network for the appropriate scale
         self._abstract._buildNetwork(self.type)
 
-
-    def getRelativeMinor(self):
-        '''Return a relative minor scale based on this concrete major scale.
-
-        >>> sc1 = MajorScale(pitch.Pitch('a'))
-        >>> sc1.pitches
-        [A, B4, C#5, D5, E5, F#5, G#5, A5]
-        >>> sc2 = sc1.getRelativeMinor()
-        >>> sc2.pitches
-        [F#5, G#5, A5, B5, C#6, D6, E6, F#6]
-        '''
-        return MinorScale(self.pitchFromDegree(6))
-
-    def getParallelMinor(self):
-        '''Return a parallel minor scale based on this concrete major scale.
-
-        >>> sc1 = MajorScale(pitch.Pitch('a'))
-        >>> sc1.pitches
-        [A, B4, C#5, D5, E5, F#5, G#5, A5]
-        >>> sc2 = sc1.getParallelMinor()
-        >>> sc2.pitches
-        [A, B4, C5, D5, E5, F5, G5, A5]
-        '''
-        return MinorScale(self._tonic)
-
-
-
-
 class MinorScale(DiatonicScale):
     '''A natural minor scale, or the Aeolian mode.
 
@@ -1174,31 +1274,6 @@ class MinorScale(DiatonicScale):
         DiatonicScale.__init__(self, tonic=tonic)
         self.type = "minor"
         self._abstract._buildNetwork(self.type)
-
-    def getRelativeMajor(self):
-        '''Return a concrete relative major scale
-
-        >>> sc1 = MinorScale(pitch.Pitch('g'))
-        >>> sc1.pitches
-        [G, A4, B-4, C5, D5, E-5, F5, G5]
-        >>> sc2 = sc1.getRelativeMajor()
-        >>> sc2.pitches
-        [B-4, C5, D5, E-5, F5, G5, A5, B-5]
-        '''
-        return MajorScale(self.pitchFromDegree(3))
-
-    def getParallelMajor(self):
-        '''Return a concrete relative major scale
-
-        >>> sc1 = MinorScale(pitch.Pitch('g'))
-        >>> sc1.pitches
-        [G, A4, B-4, C5, D5, E-5, F5, G5]
-        >>> sc2 = sc1.getParallelMajor()
-        >>> sc2.pitches
-        [G, A4, B4, C5, D5, E5, F#5, G5]
-        '''
-        return MajorScale(self._tonic)
-
 
 
 class DorianScale(DiatonicScale):
@@ -1611,7 +1686,6 @@ class RomanNumeral(object):
         # note: there may be a better way to do this that 
         return self.scale.getScaleDegreeFromPitch(
             self.pitchFromDegree(degree, minPitch=minPitch, maxPitch=maxPitch, direction=direction))
-
 
 
     def getPitches(self, minPitch=None, maxPitch=None, direction=None):
@@ -2071,6 +2145,21 @@ class Test(unittest.TestCase):
         # ex: octatonic should always compare on pitchClass
 
 
+    def testDeriveByDegree(self):
+        from music21 import scale
+
+        sc1 = scale.MajorScale()
+        self.assertEqual(str(sc1.deriveByDegree(7, 'G#')),
+         '<music21.scale.MajorScale A major>')
+
+        sc1 = scale.HarmonicMinorScale()
+         # what scale has g# as its 7th degree
+        self.assertEqual(str(sc1.deriveByDegree(7, 'G#')), 
+        '<music21.scale.HarmonicMinorScale A harmonic minor>')
+        self.assertEqual(str(sc1.deriveByDegree(2, 'E')), 
+        '<music21.scale.HarmonicMinorScale D harmonic minor>')
+
+
         # add serial rows as scales
 
 #-------------------------------------------------------------------------------
@@ -2083,7 +2172,8 @@ if __name__ == "__main__":
         t = Test()
 
 
-        t.testCyclicalScales()
+        #t.testCyclicalScales()
+        t.testDeriveByDegree()
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
 

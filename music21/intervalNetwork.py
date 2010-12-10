@@ -820,7 +820,24 @@ class IntervalNetwork(object):
                 pPost = alteredNodes[n.step]['interval'].transposePitch(p, maxAccidental=1)
                 return pPost
         # return pitch unaltered
+        else:
+            pass
+            #environLocal.printDebug(['not processing altered node', n, p, 'direction', direction])
         return p
+
+    def _getUnalteredPitch(self, pitchObj, nodeObj, direction=DIRECTION_BI, 
+        alteredNodes={}):
+        '''Given a node, get the unaltered pitch.
+        '''
+        if alteredNodes != {}:
+            #TODO: need to take direction into account
+            # do reverse transposition
+            if nodeObj.step in alteredNodes.keys():
+                p = alteredNodes[nodeObj.step][
+                    'interval'].reverse().transposePitch(pitchObj, maxAccidental=1)
+                return p
+
+        return None
 
 
     def nextPitch(self, pitchReference, nodeName, pitchOrigin, 
@@ -926,7 +943,6 @@ class IntervalNetwork(object):
         ([C2, D2, E2, F2, G2, A2, B-2, C3, D3, E3, F3, G3, A3, B-3, C4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
 
         '''
-        pitchObj = pitchReference
         # get first node
         if isinstance(nodeId, Node):
             nodeObj = nodeId
@@ -935,8 +951,8 @@ class IntervalNetwork(object):
         else:
             nodeObj = self._nodeNameToNodes(nodeId)[0]
             
-        if common.isStr(pitchObj):
-            pitchObj = pitch.Pitch(pitchObj)
+        if common.isStr(pitchReference):
+            pitchReference = pitch.Pitch(pitchReference)
         if common.isStr(maxPitch):
             maxPitch = pitch.Pitch(maxPitch)
         if common.isStr(minPitch):
@@ -945,9 +961,17 @@ class IntervalNetwork(object):
         post = []
         postNodeId = [] # store node ids as well
 
+        # when the pitch reference is altered, we need to get the
+        # unaltered version of this pitch. 
+        pUnaltered = self._getUnalteredPitch(pitchReference, nodeObj,
+                     direction=direction, alteredNodes=alteredNodes)
+        if pUnaltered is not None:
+            pitchReference = pUnaltered
+        #environLocal.printDebug(['realize()', 'pitchReference', pitchReference, 'nodeId', nodeId, 'pUnaltered', pUnaltered])
+
         # first, go upward from this pitch to the high terminus
         n = nodeObj
-        p = pitchObj # the expected node pitch
+        p = pitchReference # the expected node pitch
         pCollect = p # usually p, unless the tone has been altered
         while True:
             #environLocal.printDebug(['here', p])
@@ -997,7 +1021,7 @@ class IntervalNetwork(object):
         #environLocal.printDebug(['got post node id:', postNodeId])
 
         n = nodeObj
-        p = pitchObj
+        p = pitchReference
         pCollect = p # usually p, unless the tone has been altered
         pre = []
         preNodeId = [] # store node ids as well
@@ -1389,15 +1413,26 @@ class IntervalNetwork(object):
         G#2
 
         '''
+        # this is the reference node
         nodeId = self._nodeNameToNodes(nodeName)[0] # get the first
+        #environLocal.printDebug(['getPitchFromNodeStep()', 'node reference', nodeId, 'node step', nodeId.step, 'pitchReference', pitchReference, 'alteredNodes', alteredNodes])
+
         nodeTargetId = self._nodeNameToNodes(nodeStepTarget, 
                         permitStepModuli=True)[0] # get the first
 
+        #environLocal.printDebug(['getPitchFromNodeStep()', 'nodeTargetId', nodeTargetId])
+
         # pass direction as well when getting realization
         realizedPitch, realizedNode = self.realize(
-            pitchReference=pitchReference, nodeId=nodeId, 
-            minPitch=minPitch, maxPitch=maxPitch, direction=direction,
+            pitchReference=pitchReference, 
+            nodeId=nodeId, 
+            minPitch=minPitch, 
+            maxPitch=maxPitch, 
+            direction=direction,
             alteredNodes=alteredNodes)
+
+        #environLocal.printDebug(['getPitchFromNodeStep()', 'realizedPitch', realizedPitch])
+
 
         # get the pitch when we have a node id match
         for i, nId in enumerate(realizedNode):
