@@ -976,8 +976,8 @@ class ModalCounterpoint(object):
         '''
         s1notes = stream1.notes
         stream2 = stream.Part()
-        sixth = minorScale.pitchFromScaleDegree(6).name
-        seventh = minorScale.pitchFromScaleDegree(7).name
+        sixth = minorScale.pitchFromDegree(6).name
+        seventh = minorScale.pitchFromDegree(7).name
         tonic = minorScale.getTonic().name
 
         maxNote = len(s1notes)

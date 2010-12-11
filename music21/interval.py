@@ -1419,7 +1419,8 @@ class Interval(music21.Music21Object):
 
             # this will raise an exception if greater than 4            
             # TODO: possibly set as an option if accidentals permit 
-            if abs(halfStepsToFix) > maxAccidental:
+            if (maxAccidental is not None and abs(halfStepsToFix) >   
+                maxAccidental):
                 # just create new pitch, directly setting the pitch space value
                 #pitchAlt = copy.deepcopy(pitch2)
                 #pitchAlt.ps = pitch2.ps + halfStepsToFix

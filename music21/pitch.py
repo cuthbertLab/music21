@@ -1421,7 +1421,7 @@ class Pitch(music21.Music21Object):
         return False
 
     def getHigherEnharmonic(self, inPlace=False):
-        '''Returns a Pitch enharmonic note that a dim-second above the current note
+        '''Returns a Pitch enharmonic note that a dim-second above the current note.
 
         >>> from music21 import *
         >>> p1 = pitch.Pitch('C#3')
@@ -1451,14 +1451,13 @@ class Pitch(music21.Music21Object):
         >>> p4.getHigherEnharmonic()
         Traceback (most recent call last):
         AccidentalException: -5 is not a supported accidental type
-
         
         '''
         intervalObj = interval.Interval('d2')
         if not inPlace:
-            return intervalObj.transposePitch(self)
+            return intervalObj.transposePitch(self, maxAccidental=None)
         else:
-            p = intervalObj.transposePitch(self)
+            p = intervalObj.transposePitch(self, maxAccidental=None)
             self._setName(p.nameWithOctave)
             self.accidental = p.accidental
             return None
