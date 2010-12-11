@@ -737,7 +737,12 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         #environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
         spannerBundle = spanner.SpannerBundle()
 
-    mNum, mSuffix = common.getNumFromStr(mxMeasure.get('number'))
+    mNumRaw = mxMeasure.get('number')
+    if mNumRaw is None:
+        mNum = None
+        mSuffix = None
+    else:
+        mNum, mSuffix = common.getNumFromStr(mNumRaw)
     # assume that measure numbers are integers
     if mNum not in [None, '']:
         m.number = int(mNum)

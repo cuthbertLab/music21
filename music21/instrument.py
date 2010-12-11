@@ -190,8 +190,12 @@ class Instrument(music21.Music21Object):
             # for now, just get first midi instrument
             mxMIDIInstrument = mxScorePart.midiInstrumentList[0]
             # musicxml counts from 1, not zero
-            self.midiProgram = int(mxMIDIInstrument.get('midiProgram')) - 1
-            self.midiChannel = int(mxMIDIInstrument.get('midiChannel')) - 1
+            mp = mxMIDIInstrument.get('midiProgram')
+            if mp is not None:
+                self.midiProgram = int(mp) - 1
+            mc = mxMIDIInstrument.get('midiChannel')
+            if mc is not None:
+                self.midiChannel = int(mc) - 1
 
     mx = property(_getMX, _setMX)
 
