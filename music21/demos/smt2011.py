@@ -66,7 +66,6 @@ class Test(unittest.TestCase):
             '[G3, A3, B3, C4, D4, E4, F#4, G4]')
 
 
-
         # a whole tone scale
         sc2 = scale.WholeToneScale('f#')
 
@@ -92,23 +91,29 @@ class Test(unittest.TestCase):
 
 
     def testEx02(self): 
-        # Labeling a vocal part based on scale degree derived from key signature and automated analysis.
+        # Labeling a vocal part based on scale degrees derived from key signature and from a specified target key.
 
         s = corpus.parseWork('hwv56/movement3-03.md')#.measures(1,7)
         basso = s.parts['basso']
         s.remove(basso)
 
         ksScale = s.flat.getElementsByClass('KeySignature')[0].getScale()
-        autoScale = scale.MajorScale(s.flat.analyze('key')[0])
+        targetScale = scale.MajorScale('A')
         for n in basso.flat.getElementsByClass('Note'):
             # get the scale degree from this pitch
             n.addLyric(ksScale.getScaleDegreeFromPitch(n.pitch))
-            n.addLyric(autoScale.getScaleDegreeFromPitch(n.pitch))
+            n.addLyric(targetScale.getScaleDegreeFromPitch(n.pitch))
+
+        reduction = s.chordify()
+        for c in reduction.flat.getElementsByClass('Chord'):
+            c.closedPosition(forceOctave=4, inPlace=True)
+            c.removeRedundantPitches(inPlace=True)
+    
 
         display = stream.Score()
         display.insert(0, basso)
-        display.insert(0, s.chordify())
-        display.show()
+        display.insert(0, reduction)
+        #display.show()
 
 
 
@@ -131,6 +136,7 @@ class Test(unittest.TestCase):
                     results[degree] += 1
         print(results)
 
+        # Results for all Bach chorales
         #{1: 307, 2: 3, 3: 11, 4: 31, 5: 34, 6: 5, 7: 2, None: 3}
 
 
@@ -139,19 +145,37 @@ class Test(unittest.TestCase):
     def testEx04(self):
         # what
 
-        sc = scale.MajorScale()
+        scSrc = scale.MajorScale()
 
-        for region in ['shanxi']:
-            # Create storage units
-            intervalDict = {}
+        niederlande = corpus.search('niederlande', 'locale')
+
+        results = {}
+        for name, group in [('niederlande', niederlande)]:
             workCount = 0
-            intervalCount = 0
-            seventhCount = 0
-            # Perform a location search on the corpus and iterate over 
-            # resulting file name and work number
-#             for fp, n in corpus.search(region, 'locale'):
-# 
-#                 pass
+
+            for fp, n in group:
+                workCount += 1
+    
+                s = converter.parse(fp, number=n)
+    
+                # derive a best-fit concrete major scale
+                scFound = scSrc.derive(s)
+
+                # if we find a scale with no unmatched pitches
+                if len(scFound.match(s)['notMatched']) == 0:
+                    # find out what pitches in major scale are not used
+                    post = scFound.findMissing(s)
+                    for p in post:
+                        degree = scFound.getScaleDegreeFromPitch(p)
+                        if degree not in results.keys():
+                            results[degree] = 0
+                        results[degree] += 1
+
+        print ('Of %s works, the following major scale degrees are not used the the following number of times:' % workCount)
+        print results
+
+        #Of 104 works, the following major scale degrees are not used the the following number of times:
+        #{4: 5, 5: 1, 6: 6, 7: 6}
 
 
 
@@ -164,6 +188,11 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
+        t.testEx02()
+        #t.testEx04()
+
+
 #------------------------------------------------------------------------------
 # eof
+
 

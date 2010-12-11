@@ -1079,7 +1079,7 @@ class IntervalNetwork(object):
 
 
     def realizePitch(self, pitchReference, nodeId=None, minPitch=None,
-        maxPitch=None, alteredNodes={}):
+        maxPitch=None, direction=DIRECTION_BI, alteredNodes={}):
         '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The nodeId, when a simple, linear network, can be used as a scale step value starting from one.
@@ -1106,7 +1106,7 @@ class IntervalNetwork(object):
         >>> net.realizePitch(pitch.Pitch('a#2'), 7, 'c6', 'c7') 
         [C#6, D#6, E6, F#6, G#6, A#6, B6]
         '''
-        return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)[0]
+        return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredNodes=alteredNodes)[0]
 
 
 
@@ -1521,6 +1521,7 @@ class IntervalNetwork(object):
 
         matched = []
         noMatch = []
+        notFound = []
 
         for target in pitchTarget:
             found = False
@@ -1537,13 +1538,71 @@ class IntervalNetwork(object):
             if not found:
                 noMatch.append(target)
 
+# possible add back
 #         for p in nodesRealized:
 #             if p not in matched:
 #                 notFound.append(p)
+
+#         for target in nodesRealized:
+#             # given realized pitches, which are not found in at all in
+#             # the collection
+#             for p in pitchTarget:
+#                 match = False
+#                 if getattr(p, comparisonAttribute) == getattr(target, comparisonAttribute):
+#                     match = True
+#                     break
+#                 if not match:
+#                     notFound.append(target)
+#             
+# 
             
         return matched, noMatch
                 
+
+    def findMissing(self, 
+            pitchReference, nodeId, 
+            pitchTarget, comparisonAttribute='pitchClass', 
+            minPitch=None, maxPitch=None, 
+            direction=DIRECTION_BI, alteredNodes={}):
+        '''Find all pitches in the realized scale that are not in the pitch target network based on the comparison attribute. 
+
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = intervalNetwork.IntervalNetwork(edgeList)
+        >>> net.realizePitch('G3')
+        [G3, A3, B3, C4, D4, E4, F#4, G4]
+        >>> net.findMissing('g', 1, ['g', 'a', 'b', 'd', 'f#'])
+        [C5, E5]
+        '''
             
+        # these return a Node, not a nodeId
+        if nodeId == None: # assume first
+            nodeId = self._getTerminusLowNodes()[0]
+        else:
+            nodeId = self._nodeNameToNodes(nodeId)[0]
+
+        # TODO: need to do both directions
+        nodesRealized = self.realizePitch(pitchReference, nodeId, 
+                        minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)
+
+        # note: reassigns min and max
+        pitchTarget, minPitch, maxPitch = self._filterPitchList(pitchTarget)
+
+        #environLocal.printDebug(['nodesRealzied:', nodesRealized,])
+        post = []
+        for target in nodesRealized:
+            match = False
+            for p in pitchTarget:
+                # enharmonic switch here
+                if getattr(p, comparisonAttribute) == getattr(target, comparisonAttribute):
+                    match = True
+                    break
+            #environLocal.printDebug(['looking at:', target, p, 'match', match])
+            if not match:
+                post.append(target)
+        return post
+
+
 
     def find(self, pitchTarget, resultsReturned=4, 
         comparisonAttribute='pitchClass', alteredNodes={}):
@@ -1578,7 +1637,7 @@ class IntervalNetwork(object):
                   pitch.Pitch('e'), pitch.Pitch('f'),
                   pitch.Pitch('f#'), pitch.Pitch('g'),
                   pitch.Pitch('g#'), pitch.Pitch('a'), pitch.Pitch('b-'),
-                  pitch.Pitch('a#'), pitch.Pitch('b'), pitch.Pitch('c-'),
+                  pitch.Pitch('b'), pitch.Pitch('c-'),
                 ]:
 
 

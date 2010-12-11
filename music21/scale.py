@@ -77,7 +77,7 @@ class Scale(music21.Music21Object):
         elif common.isListLike(other):
             # assume a list of pitches; possible permit conversions?
             pre = other
-        elif hasatter(other, 'pitch'):
+        elif hasattr(other, 'pitch'):
             pre = [other.pitch] # get pitch attribute
         return pre
 
@@ -967,10 +967,7 @@ class ConcreteScale(Scale):
         {'notMatched': [G#4, C#5, D#5], 'matched': [E, F#4, A4, B4, E5]}
 
         '''
-
         # strip out unique pitches in a list
-        # to do a pitch spa
-
         otherPitches = self._extractPitchList(other,
                         comparisonAttribute=comparisonAttribute)
 
@@ -988,18 +985,45 @@ class ConcreteScale(Scale):
 
 
 
+    def findMissing(self, other, comparisonAttribute='pitchClass', 
+        minPitch=None, maxPitch=None, direction=DIRECTION_BI,
+        alteredNodes={}):
+        '''
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g4')
+        >>> sc1.findMissing(['d'])
+        [G4, A4, B4, C5, E5, F#5, G5]
+        '''
+        # strip out unique pitches in a list
+        otherPitches = self._extractPitchList(other,
+                        comparisonAttribute=comparisonAttribute)
+        post = self._abstract._net.findMissing(
+            pitchReference=self._tonic, 
+            nodeId=self._abstract.tonicStep, 
+            pitchTarget=otherPitches, # can supply a list here
+            comparisonAttribute=comparisonAttribute,
+            minPitch=minPitch, maxPitch=maxPitch, direction=direction,
+            alteredNodes=alteredNodes,
+            )
+        return post        
+
 
 
     def deriveRanked(self, other, resultsReturned=4,
          comparisonAttribute='pitchClass'):
-        '''Return a list of closest matching concrete scales given a collection of pitches, provided as a Stream, a ConcreteScale, a list of pitches)
+        '''Return a list of closest matching concrete scales from this abstract scale, given a collection of pitches, provided as a Stream, a ConcreteScale, a list of pitches. Integer values returned represent the number of mathces. 
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale()
         >>> sc1.deriveRanked(['c', 'e', 'b'])
         [(3, <music21.scale.MajorScale G major>), (3, <music21.scale.MajorScale C major>), (2, <music21.scale.MajorScale B major>), (2, <music21.scale.MajorScale A major>)]
+
+        >>> sc1.deriveRanked(['c', 'e', 'e', 'e', 'b'])
+        [(5, <music21.scale.MajorScale G major>), (5, <music21.scale.MajorScale C major>), (4, <music21.scale.MajorScale B major>), (4, <music21.scale.MajorScale A major>)]
+
         >>> sc1.deriveRanked(['c#', 'e', 'g#'])
         [(3, <music21.scale.MajorScale B major>), (3, <music21.scale.MajorScale A major>), (3, <music21.scale.MajorScale E major>), (3, <music21.scale.MajorScale C- major>)]
+
 
         '''
         # possibly return dictionary with named parameters
@@ -1011,7 +1035,6 @@ class ConcreteScale(Scale):
         pairs = self._abstract._net.find(pitchTarget=otherPitches,
                              resultsReturned=resultsReturned,
                              comparisonAttribute=comparisonAttribute)
-
         post = []
         for weight, p in pairs:
             sc = self.__class__(tonic=p)
