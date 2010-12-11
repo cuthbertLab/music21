@@ -507,6 +507,37 @@ class IntervalNetwork(object):
             nPrevious = nFollowing
 
 
+
+    def fillArbitrary(self, nodeDict, edgeDict):
+        '''Fill any arbitrary network given node and edge definitions.
+
+        Nodes must be defined by a dictionary of id and step values. There must be a terminusLow and terminusHigh id as string.
+
+        nodes = ({'id':'terminusLow', 'step':1},
+                 {'id':0, 'step':2},
+                 {'id':'terminusHigh', 'step':3},
+                )
+
+        Edges must be defined by a dictionary of interval strings and connections. Id values will be automatically assigned. Each connection must define direction and pairs of valid node ids. 
+
+        edges = ({'interval':'m2', connections:(
+                        ['terminusLow', 0, 'bi'],
+                    )},
+                {'interval':'M3', connections:(
+                        [0, 'terminusHigh', 'bi'],
+                    )},
+                )
+
+        >>> from music21 import *
+        >>> nodes = ({'id':'terminusLow', 'step':1}, {'id':0, 'step':2}, {'id':'terminusHigh', 'step':3})
+        >>> edges = ({'interval':'m2', 'connections':(['terminusLow', 0, 'bi'],)},{'interval':'M3', 'connections':([0, 'terminusHigh', 'bi'],)},)
+
+        >>> net = IntervalNetwork()
+        >>> net.fillArbitrary(nodes, edges)
+        '''
+
+        self.clear()
+
     #---------------------------------------------------------------------------
     def _getStepMin(self):
         '''
@@ -1536,31 +1567,11 @@ class IntervalNetwork(object):
                     found = True
                     break
             if not found:
-                noMatch.append(target)
-
-# possible add back
-#         for p in nodesRealized:
-#             if p not in matched:
-#                 notFound.append(p)
-
-#         for target in nodesRealized:
-#             # given realized pitches, which are not found in at all in
-#             # the collection
-#             for p in pitchTarget:
-#                 match = False
-#                 if getattr(p, comparisonAttribute) == getattr(target, comparisonAttribute):
-#                     match = True
-#                     break
-#                 if not match:
-#                     notFound.append(target)
-#             
-# 
-            
+                noMatch.append(target)            
         return matched, noMatch
                 
 
-    def findMissing(self, 
-            pitchReference, nodeId, 
+    def findMissing(self, pitchReference, nodeId, 
             pitchTarget, comparisonAttribute='pitchClass', 
             minPitch=None, maxPitch=None, 
             direction=DIRECTION_BI, alteredNodes={}):
@@ -1914,8 +1925,32 @@ class Test(unittest.TestCase):
         "[<music21.intervalNetwork.Node id=1>, <music21.intervalNetwork.Node id=7>]")
         self.assertEqual(str(net._nodeNameToNodes(7)), 
         "[<music21.intervalNetwork.Node id=5>, <music21.intervalNetwork.Node id=11>]")
-
         #net.plot()
+
+
+    def testScaleArbitrary(self):
+
+        from music21 import scale
+
+        
+        sc1 = scale.MajorScale('g')
+        self.assertEqual(str(sorted(sc1.abstract._net._nodes.keys())), "[0, 1, 2, 3, 4, 5, 'terminusHigh', 'terminusLow']")
+        self.assertEqual(str(sorted(sc1.abstract._net._edges.keys())), "[0, 1, 2, 3, 4, 5, 6]")
+
+        nodes = ({'id':'terminusLow', 'step':1},
+                 {'id':0, 'step':2},
+                 {'id':'terminusHigh', 'step':3},
+                )
+
+        edges = ({'interval':'m2', 'connections':(
+                        ['terminusLow', 0, 'bi'],
+                    )},
+                {'interval':'M3', 'connections':(
+                        [0, 'terminusHigh', 'bi'],
+                    )},
+                )
+
+
 
 
 #-------------------------------------------------------------------------------
