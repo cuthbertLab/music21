@@ -533,7 +533,8 @@ class IntervalNetwork(object):
 
         >>> net = IntervalNetwork()
         >>> net.fillArbitrary(nodes, edges)
-        >>> 
+        >>> net.realizePitch('c4', 1)
+        [C4, D-4, F4]
         '''
 
         self.clear()
@@ -545,7 +546,6 @@ class IntervalNetwork(object):
         eId = 0
         for eDict in edges:
             e = Edge(eDict['interval'], id=eId)        
-
             for nId1, nId2, direction in eDict['connections']:
                 # do not need to access from _nodes dictionary here
                 # but useful as a check that the node has been defined. 
@@ -554,7 +554,6 @@ class IntervalNetwork(object):
                 else:
                     e.addDirectedConnection(self._nodes[nId1],
                     self._nodes[nId2], direction=direction)
-
             self._edges[e.id] = e
             eId += 1
 
@@ -1975,6 +1974,14 @@ class Test(unittest.TestCase):
         net = IntervalNetwork()
         net.fillArbitrary(nodes, edges)
 
+        self.assertEqual(str(net._edges), "{0: <music21.intervalNetwork.Edge bi m2 [('terminusLow',0),(0,'terminusLow')]>, 1: <music21.intervalNetwork.Edge bi M3 [(0,'terminusHigh'),('terminusHigh',0)]>}")
+
+        
+        self.assertEqual(net.stepMax, 3)
+        self.assertEqual(net.stepMaxUnique, 2)
+
+        self.assertEqual(str(net.realizePitch('c4', 1)), '[C4, D-4, F4]')
+
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -1989,7 +1996,7 @@ if __name__ == "__main__":
         #t.testBasic()
         #t.testScaleModel()
         #t.testHarmonyModel()
-        t.testDirectedA()
+        t.testScaleArbitrary()
 
 
 # melodic/harmonic minor
