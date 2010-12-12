@@ -164,15 +164,15 @@ class Edge(object):
         >>> e1
         <music21.intervalNetwork.Edge ascending M3 [(0,1)]>
         '''
-        # may be Edge objects, or number, or string
+        # may be Node objects, or number, or string
         if common.isStr(n1) or common.isNum(n1):
             n1Id = n1
-        else: # assume an Edge
+        else: # assume an Node
             n1Id = n1.id
 
         if common.isStr(n2) or common.isNum(n2):
             n2Id = n2
-        else: # assume an Edge
+        else: # assume an Node
             n2Id = n2.id
 
         self._connections.append((n1Id, n2Id))
@@ -466,7 +466,7 @@ class IntervalNetwork(object):
             # add to node dictionary
             self._nodes[nFollowing.id] = nFollowing
 
-            # then, create edge and connection
+            # then, create edge and connection; eName is interval
             e = Edge(eName, id=self._edgeIdCount)
             self._edges[e.id] = e
             self._edgeIdCount += 1
@@ -508,7 +508,7 @@ class IntervalNetwork(object):
 
 
 
-    def fillArbitrary(self, nodeDict, edgeDict):
+    def fillArbitrary(self, nodes, edges):
         '''Fill any arbitrary network given node and edge definitions.
 
         Nodes must be defined by a dictionary of id and step values. There must be a terminusLow and terminusHigh id as string.
@@ -527,16 +527,38 @@ class IntervalNetwork(object):
                         [0, 'terminusHigh', 'bi'],
                     )},
                 )
-
         >>> from music21 import *
         >>> nodes = ({'id':'terminusLow', 'step':1}, {'id':0, 'step':2}, {'id':'terminusHigh', 'step':3})
         >>> edges = ({'interval':'m2', 'connections':(['terminusLow', 0, 'bi'],)},{'interval':'M3', 'connections':([0, 'terminusHigh', 'bi'],)},)
 
         >>> net = IntervalNetwork()
         >>> net.fillArbitrary(nodes, edges)
+        >>> 
         '''
 
         self.clear()
+
+        for nDict in nodes:
+            n = Node(id=nDict['id'], step=nDict['step'])        
+            self._nodes[n.id] = n
+
+        eId = 0
+        for eDict in edges:
+            e = Edge(eDict['interval'], id=eId)        
+
+            for nId1, nId2, direction in eDict['connections']:
+                # do not need to access from _nodes dictionary here
+                # but useful as a check that the node has been defined. 
+                if direction == DIRECTION_BI:
+                    e.addBiDirectedConnections(self._nodes[nId1], self._nodes[nId2])
+                else:
+                    e.addDirectedConnection(self._nodes[nId1],
+                    self._nodes[nId2], direction=direction)
+
+            self._edges[e.id] = e
+            eId += 1
+
+
 
     #---------------------------------------------------------------------------
     def _getStepMin(self):
@@ -1950,7 +1972,8 @@ class Test(unittest.TestCase):
                     )},
                 )
 
-
+        net = IntervalNetwork()
+        net.fillArbitrary(nodes, edges)
 
 
 #-------------------------------------------------------------------------------
