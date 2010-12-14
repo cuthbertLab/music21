@@ -127,6 +127,10 @@ class AbstractScale(Scale):
         # in most cases tonic/final of scale is step one, but not always
         self.tonicStep = 1 # step of tonic
 
+        # declare if this scale is octave duplicating
+        # can be used as to optimize pitch gathering
+        self.octaveDuplicating = True
+
         # store parameter for interval network-based node modifcations
         # entries are in the form: 
         # step: {'direction':DIRECTION_BI, 'interval':Interval}
