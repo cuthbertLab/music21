@@ -35,6 +35,9 @@ DIRECTION_BI = intervalNetwork.DIRECTION_BI
 DIRECTION_ASCENDING = intervalNetwork.DIRECTION_ASCENDING
 DIRECTION_DESCENDING = intervalNetwork.DIRECTION_DESCENDING
 
+TERMINUS_LOW = intervalNetwork.TERMINUS_LOW
+TERMINUS_HIGH = intervalNetwork.TERMINUS_HIGH
+
 
 #-------------------------------------------------------------------------------
 class ScaleException(Exception):
@@ -496,6 +499,71 @@ class AbstractHarmonicMinorScale(AbstractScale):
                                'interval': interval.Interval('a1')}
 
 
+class AbstractMelodicMinorScale(AbstractScale):
+    '''A directional scale. 
+    '''
+    def __init__(self, mode=None):
+        AbstractScale.__init__(self)
+        self.type = 'Abstract Melodic Minor'
+        self._buildNetwork()
+
+    def _buildNetwork(self):
+        '''
+        '''
+        self.tonicStep = 1
+        self.dominantStep = 5
+
+        nodes = ({'id':'terminusLow', 'step':1}, # a
+                 {'id':0, 'step':2}, # b
+                 {'id':1, 'step':3}, # c
+                 {'id':2, 'step':4}, # d
+                 {'id':3, 'step':5}, # e
+
+                 {'id':4, 'step':6}, # f# ascending
+                 {'id':5, 'step':6}, # f
+                 {'id':6, 'step':7}, # g# ascending
+                 {'id':7, 'step':7}, # g
+                 {'id':'terminusHigh', 'step':8}, # a
+                )
+
+        edges = ({'interval':'M2', 'connections':(
+                        [TERMINUS_LOW, 0, DIRECTION_BI], # a to b
+                    )},
+                {'interval':'m2', 'connections':(
+                        [0, 1, DIRECTION_BI], # b to c
+                    )},
+                {'interval':'M2', 'connections':(
+                        [1, 2, DIRECTION_BI], # c to d
+                    )},
+                {'interval':'M2', 'connections':(
+                        [2, 3, DIRECTION_BI], # d to e
+                    )},
+
+                {'interval':'M2', 'connections':(
+                        [3, 4, DIRECTION_ASCENDING], # e to f#
+                    )},
+                {'interval':'M2', 'connections':(
+                        [4, 6, DIRECTION_ASCENDING], # f# to g#
+                    )},
+                {'interval':'m2', 'connections':(
+                        [6, TERMINUS_HIGH, DIRECTION_ASCENDING], # g# to a
+                    )},
+
+                {'interval':'M2', 'connections':(
+                        [TERMINUS_HIGH, 7, DIRECTION_DESCENDING], # a to g
+                    )},
+                {'interval':'M2', 'connections':(
+                        [7, 5, DIRECTION_DESCENDING], # g to f
+                    )},
+                {'interval':'m2', 'connections':(
+                        [5, 3, DIRECTION_DESCENDING], # f to e
+                    )},
+                )
+
+        self._net = intervalNetwork.IntervalNetwork()
+        self._net.fillArbitrary(nodes, edges)
+
+
 
 class AbstractCyclicalScale(AbstractScale):
     '''A scale of any size built with an interval list of any form. The resulting scale may be non octave repeating.
@@ -803,6 +871,16 @@ class ConcreteScale(Scale):
 
     pitches = property(getPitches, 
         doc ='''Get a default pitch list from this scale.
+        ''')
+
+    def getChord(self, minPitch=None, maxPitch=None, direction=None):
+        '''Return a realized chord for this scale
+        '''
+        from music21 import chord
+        return chord.Chord(self.getPitches(minPitch=minPitch, maxPitch=maxPitch, direction=direction))
+
+    chord = property(getChord, 
+        doc = '''Return a Chord object form this harmony over a default range
         ''')
 
     def pitchFromDegree(self, degree, minPitch=None, maxPitch=None, 
@@ -1404,6 +1482,23 @@ class HarmonicMinorScale(DiatonicScale):
         #self._abstract._buildNetwork()
 
 
+
+class MelodicMinorScale(DiatonicScale):
+    '''A melodic minor scale
+
+    >>> sc = MelodicMinorScale('e4')
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "melodic minor"
+        
+        # note: this changes the previously assigned AbstractDiatonicScale
+        # from the DiatonicScale base class
+        self._abstract = AbstractMelodicMinorScale()
+
+
+
+
 #-------------------------------------------------------------------------------
 # other sscales
 
@@ -1437,7 +1532,7 @@ class OctaveRepeatingScale(ConcreteScale):
     def __init__(self, tonic=None, intervalList=['m2']):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractOctaveRepeatingScale(mode=intervalList)
-        self.type = 'Cyclical'
+        self.type = 'Octave Repeating'
 
 
 
@@ -2185,6 +2280,26 @@ class Test(unittest.TestCase):
 
         # add serial rows as scales
 
+
+    def testMelodicMinorA(self):
+
+        mm = MelodicMinorScale('a')
+        self.assertEqual(str(mm.pitches), '[A, B4, C5, D5, E5, F#5, G#5, A5]')
+
+        self.assertEqual(str(mm.getPitches(direction='ascending')), '[A, B4, C5, D5, E5, F#5, G#5, A5]')
+
+        self.assertEqual(str(mm.getPitches('c1', 'c3', direction='descending')), '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
+
+
+        # TODO: this shows a problem with a bidirectional scale: we are 
+        # always starting at the tonic and moving up or down; so this is still
+        # giving a descended portion, even though an asecnding portion was requested
+        self.assertEqual(str(mm.getPitches('c1', 'c3', direction='ascending')), '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
+
+
+        
+
+
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
@@ -2196,7 +2311,7 @@ if __name__ == "__main__":
 
 
         #t.testCyclicalScales()
-        t.testDeriveByDegree()
+        t.testMelodicMinorA()
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
 

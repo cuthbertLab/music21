@@ -87,6 +87,8 @@ class Test(unittest.TestCase):
         print(sc2.transpose('m2').pitches)
         self.assertEqual(str(sc2.transpose('m2').pitches), '[G4, A4, B4, C#5, D#5, E#5, G5]')
 
+        # get as a chord and get its forte class
+        self.assertEqual(sc2.transpose('m2').chord.forteClass, '6-35')
 
 
 
@@ -96,20 +98,20 @@ class Test(unittest.TestCase):
         s = corpus.parseWork('hwv56/movement3-03.md')#.measures(1,7)
         basso = s.parts['basso']
         s.remove(basso)
-
+        
         ksScale = s.flat.getElementsByClass('KeySignature')[0].getScale()
         targetScale = scale.MajorScale('A')
         for n in basso.flat.getElementsByClass('Note'):
             # get the scale degree from this pitch
             n.addLyric(ksScale.getScaleDegreeFromPitch(n.pitch))
             n.addLyric(targetScale.getScaleDegreeFromPitch(n.pitch))
-
+        
         reduction = s.chordify()
         for c in reduction.flat.getElementsByClass('Chord'):
             c.closedPosition(forceOctave=4, inPlace=True)
             c.removeRedundantPitches(inPlace=True)
-    
-
+        
+        
         display = stream.Score()
         display.insert(0, basso)
         display.insert(0, reduction)
@@ -122,6 +124,7 @@ class Test(unittest.TestCase):
 
         # What is the most common closing soprano scale degree by key signature
         # in the bach chorales?
+        from music21 import graph
 
         results = {}
         for fn in corpus.bachChorales[:2]:
@@ -139,10 +142,11 @@ class Test(unittest.TestCase):
         # Results for all Bach chorales
         #{1: 307, 2: 3, 3: 11, 4: 31, 5: 34, 6: 5, 7: 2, None: 3}
 
+        #g = graph.GraphHistogram()
+        #g.setData([(x, y) for x, y in sorted(results.items())])
+        #g.process()
 
-
-
-    def testEx04(self):
+    def xtestEx04(self):
         # what
 
         scSrc = scale.MajorScale()
@@ -188,7 +192,8 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
-        t.testEx02()
+        #t.testEx02()
+        t.testEx03()
         #t.testEx04()
 
 
