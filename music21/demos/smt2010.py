@@ -262,7 +262,7 @@ def demoJesse(show=True):
 # new examples
 
 
-def corpusMelodicIntervalSearch():
+def corpusMelodicIntervalSearch(show = True):
     # this version compares china to netherlands
     from music21 import corpus
     from music21.analysis import discrete
@@ -327,11 +327,12 @@ def corpusMelodicIntervalSearchBrief(show=False):
 
         msg.append('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (region, pcentSevenths, intervalCount, workCount))
 
-    for sub in msg: 
-        print sub
+    if show == True:
+        for sub in msg: 
+            print sub
 
 
-def corpusFindMelodicSevenths():
+def corpusFindMelodicSevenths(show = True):
     # find and display melodic sevenths
     import os
     from music21 import corpus
@@ -375,7 +376,8 @@ def corpusFindMelodicSevenths():
                     m.makeAccidentals()
                     m.timeSignature = m.bestTimeSignature()
                     results.append(m)
-    results.show()
+    if show == True:
+        results.show()
 
 def chordifyAnalysis():
     from music21 import stream, interval

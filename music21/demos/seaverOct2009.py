@@ -165,32 +165,22 @@ def simple4b(show=True):
 
 
 def simple4c(show=True):
-    # question 178 Generate a set matrix for a given tone row. (python only)
-
-    p = [8,1,7,9,0,2,3,5,4,11,6,10]
-
-    i = [(12-x) % 12 for x in p]
-    matrix = [[(x+t) % 12 for x in p] for t in i]
-
-    for row in matrix:
-        msg = []
-        for pitch in row:
-            msg.append(str(pitch).ljust(3))
-        if show:
-            print (''.join(msg))
-
-
-def simple4c_b():
-
+    '''
+    question 178: Generate a set matrix for a given tone row.
+    '''
     from music21 import serial
-
     p = [8,1,7,9,0,2,3,5,4,11,6,10]
-    print(serial.rowToMatrix(p))
+
+    if show == True:
+        print(serial.rowToMatrix(p))
 
 
 def simple4d():
-    # question 11: Assemble syllables into words for some vocal text.
-
+    '''
+    question 11: Assemble syllables into words for some vocal text.
+    
+    music21 extension: then Google the lyrics if they contain the word exultavit
+    '''
     import webbrowser
     from music21 import converter
     from music21 import text

@@ -1115,7 +1115,9 @@ def ch2_analysis_B_3(show=True, *arguments, **keywords):
 def ch3_basic_I_A(show=True, *arguments, **keywords):
     '''p. 23
 
-    Write a chromatic scale beginning and ending with the given pitches. Use sharps in ascending chromatic and flats in descending.
+    Write a chromatic scale beginning and ending with the 
+    given pitches. Use sharps in ascending chromatic and 
+    flats in descending.
     '''
     pass
 
@@ -1135,7 +1137,8 @@ def ch3_basic_I_B(show=True, *arguments, **keywords):
 def ch3_basic_II_A(show=True, *arguments, **keywords):
     '''p. 24
 
-    Writing seven sharps and flats in order; say the name of the major key that goes with the signature. 
+    Writing seven sharps and flats in order; say the name of the 
+    major key that goes with the signature. 
     '''
     pass
 
@@ -1162,7 +1165,9 @@ def ch3_basic_II_C(show=True, *arguments, **keywords):
 def ch3_basic_III_A(show=True, *arguments, **keywords):
     '''p. 25
 
-    Given the scale degree, write the rest of the scale. Begin by writing whole notes on the lines and spaces adove and below the given pitch, then fill in the necessary accidentals. 
+    Given the scale degree, write the rest of the scale. 
+    Begin by writing whole notes on the lines and spaces 
+    above and below the given pitch, then fill in the necessary accidentals. 
     '''
     pass
 
@@ -1181,7 +1186,8 @@ def ch3_basic_III_B(show=True, *arguments, **keywords):
 def ch3_basic_IV_A(show=True, *arguments, **keywords):
     '''p. 26
 
-    Play a chromatic scale starting with the lowest pitch of your instrument and ending with the highest pitch you can play. 
+    Play a chromatic scale starting with the lowest pitch of your instrument 
+    and ending with the highest pitch you can play. 
     '''
     pass
 
@@ -1852,10 +1858,9 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    ch2_writing_III_A_1(show = True)
+    #ch2_writing_III_A_1(show = True)
     if len(sys.argv) == 1:
-        pass
-        #music21.mainTest(Test)
+        music21.mainTest(Test)
     else:
         pass
         #b = TestExternal()

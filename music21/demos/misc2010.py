@@ -204,6 +204,23 @@ def towersOfHanoi(show = False, numParts = 6, transpose = False):
     if show == True:
         sc.show()
 
+def pcsFromHumdrum(show = False):
+    '''
+    show how music21 can read Humdrum code to append the forte name to
+    each vertical simultaneity in a score.
+    
+    Asked by Fabio Kaiser on 12/8/2010
+    '''
+    from music21.humdrum import testFiles
+    myScore = converter.parse(testFiles.mazurka6)
+    onePartScore = myScore.chordify()
+    output = ""
+    for thisChord in onePartScore.flat.getElementsByClass(chord.Chord):
+        output = output + thisChord.forteName + "\n"
+    if show == True:
+        print output
+        
+
 
 #-------------------------------------------------------------------------------
 if (__name__ == "__main__"):
@@ -211,7 +228,8 @@ if (__name__ == "__main__"):
 #    annotateWithGerman()
 #    countCs()
 #    bachParallels()
-    towersOfHanoi(show = False, transpose = False, numParts = 8)
+#    towersOfHanoi(show = False, transpose = False, numParts = 8)
+    pcsFromHumdrum(show = True)
 #------------------------------------------------------------------------------
 # eof
 

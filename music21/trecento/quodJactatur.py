@@ -62,10 +62,12 @@ def reverse(self, inPlace = False,
         '''
         highestTime = self.highestTime
 
-        returnObj = stream.Part()
-
         if inPlace is True:
+            returnObj = self 
             raise Exception("Whoops haven't written inPlace = True yet for reverse")
+        else:
+            returnObj = stream.Part()
+
 
         currentContexts = common.defHash()
         sf = self.flat
@@ -328,12 +330,17 @@ def bentWolfSolution():
     
 def possibleSolution():
     getQJ()
+
+    triplum = (1, 0, False, False)  # transpose, delay, invert, retro
+    ct = (-5, 5, True, True)
+    tenor = (5, 5, False, False)
     
-    qjChords, avgScore, qjSolved = prepareSolution((1, 10, True, True), (-5, 0, False, False), (-5, 0, True, False))
-    qjSolved.show('musicxml')
-    qjChords.show('musicxml')
+    qjChords, avgScore, qjSolved = prepareSolution(triplum, ct, tenor)
     print avgScore
-    print cachedParts
+    qjSolved.insert(0, stream.Part())
+    qjSolved.insert(0, qjChords)
+    qjSolved.show('musicxml')
+#    qjChords.show('musicxml')
  
 def multipleSolve():
     import csv

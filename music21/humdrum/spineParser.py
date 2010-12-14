@@ -29,7 +29,6 @@ import music21.tie
 import music21.meter
 import music21.clef
 import music21.stream
-from music21 import ElementWrapper
 from music21 import common
 from music21.humdrum import testFiles, canonicalOutput
 from music21.dynamics import Dynamic, Wedge
@@ -62,7 +61,9 @@ class HumdrumDataCollection(object):
         (Craig Stuart Sapp confirmed this to me)
     
     You are probably better off running humdrum.parseFile("filename") 
-    which returns a humdrum.SpineCollection directly
+    which returns a humdrum.SpineCollection directly, or actually,
+    converter.parse("file.krn") which will just give you a stream.Score
+    instead.
     '''
     def __init__(self, dataStream = [] ):
         if dataStream is []:
@@ -71,7 +72,7 @@ class HumdrumDataCollection(object):
             dataStream = dataStream.splitlines()
         try:
             self.eventList = self.parseLines(dataStream)
-        except IOError:          
+        except IOError:
             raise
 
     def parseLines(self, dataStream):
@@ -198,10 +199,10 @@ class HumdrumDataCollection(object):
                     elif thisEvent.contents == "*-":  ## terminate spine
                         currentSpine.endingPosition = i
                     elif thisEvent.contents == "*^":  ## split spine
-                        newSpine1 = spineCollection.addSpine()
+                        newSpine1 = spineCollection.addSpine(newClass = music21.stream.Voice)
                         newSpine1.beginningPosition = i+1
                         newSpine1.upstream = [currentSpine.id]
-                        newSpine2 = spineCollection.addSpine()
+                        newSpine2 = spineCollection.addSpine(newClass = music21.stream.Voice)
                         newSpine2.beginningPosition = i+1
                         newSpine2.upstream = [currentSpine.id]
                         currentSpine.endingPosition = i
@@ -242,9 +243,9 @@ class HumdrumDataCollection(object):
         if self.spineCollection is None:
             raise HumdrumException("parse lines first!")
         elif self.spineCollection.spines is None:
-            raise HumdrumException("really? not a single spine in your data? um, not my problem!")
+            raise HumdrumException("really? not a single spine in your data? um, not my problem! (well, maybe it is...file a bug report if you have doubled checked your data)")
         elif self.spineCollection.spines[0].music21Objects is None:
-            raise HumdrumException("okay, you got at least one spine, but it aint got nothing in it; have you thought of taking up kindergarten teaching?")
+            raise HumdrumException("okay, you got at least one spine, but it aint got nothing in it; have you thought of taking up kindergarten teaching? (just kidding, check your data or file a bug report)")
         else:
             masterStream = music21.stream.Score()
             for thisSpine in self.spineCollection:
@@ -405,7 +406,7 @@ class HumdrumSpine(object):
            # out the spineType
 
     '''
-    def __init__(self, id, eventList = None):
+    def __init__(self, id=0, eventList = None, newClass = music21.stream.Stream):
         self.id = id
         if eventList is None:
             eventList = []
@@ -413,7 +414,7 @@ class HumdrumSpine(object):
             event.spineId = id
         
         self.eventList = eventList
-        self.music21Objects = music21.stream.Stream()
+        self.music21Objects = newClass()
         self.beginningPosition = 0
         self.endingPosition = 0
         self.upstream = []
@@ -520,7 +521,7 @@ class HumdrumSpine(object):
                     self._spineType = st
                     return st
                 else:
-                    raise HumdrumException("Could not determine spineType " +
+                    raise HumdrumException("Could not determine spineType " + 
                                            "for spine with id " + str(self.id))
     
     def _setSpineType(self, newSpineType = None):
@@ -547,7 +548,7 @@ class KernSpine(HumdrumSpine):
         lastNote = None
         
         for event in self.eventList:
-            eventC = str(event.contents)  # is str already; just for Eclipse
+            eventC = str(event.contents)  # is str already; just for Eclipse completion
             thisObject = None            
             if eventC == ".":
                 pass
@@ -558,9 +559,14 @@ class KernSpine(HumdrumSpine):
                     thisObject = tempObject
             elif eventC.startswith('='):
                 ## barline/measure processing
-                if thisContainer is not None:
-                    self.music21Objects.append(thisContainer)
-                thisContainer = hdStringToMeasure(eventC)                
+                oldContainer = thisContainer
+                thisContainer = hdStringToMeasure(eventC)
+                if oldContainer is not None:
+                    self.music21Objects.append(oldContainer)
+                    
+                    # deal with pickups
+                    if "Measure" in oldContainer.classes and oldContainer.number is None:
+                        oldContainer.number = thisContainer.number - 1
             elif eventC.startswith('!'):
                 ## TODO: process comments
                 pass
@@ -678,12 +684,12 @@ class SpineCollection(object):
         self.spines = []
         self.nextFreeId  = 0
         
-    def addSpine(self):
+    def addSpine(self, newClass = music21.stream.Part):
         '''
         addSpine() -- creates a new spine in the collection and returns it
         '''
         
-        self.newSpine = HumdrumSpine(self.nextFreeId)
+        self.newSpine = HumdrumSpine(self.nextFreeId, newClass = newClass)
         self.newSpine.spineCollection = weakref.ref(self)
         self.spines.append(self.newSpine)
         self.nextFreeId += 1
@@ -1129,8 +1135,9 @@ def miscTandamToControl(tandam):
     else:
         return MiscTandam(tandam)
 
-class MiscTandam(object):
-    def __init__(self, tandam):
+class MiscTandam(music21.Music21Object):
+    def __init__(self, tandam = ""):
+        music21.Music21Object.__init__(self)
         self.tandam = tandam
     def __repr__(self):
         return "<music21.humdrum.MiscTandam %s humdrum control>" % self.tandam
@@ -1183,6 +1190,13 @@ class Test(unittest.TestCase):
         assert m1.rightBarline.pause is not None
         assert isinstance(m1.rightBarline.pause, music21.expressions.Fermata)
 
+    def xtestFakePiece(self):
+        '''
+        test loading a fake piece with spine paths, lyrics, dynamics, etc.
+        '''
+        ms = HumdrumDataCollection(testFiles.fakeTest).stream
+        ms.show('text')
+
     def testSpineMazurka(self):    
 #        hf1 = HumdrumFile("d:/web/eclipse/music21misc/mazurka06-2.krn")    
         hf1 = HumdrumDataCollection(testFiles.mazurka6)
@@ -1216,8 +1230,8 @@ class Test(unittest.TestCase):
                         GsharpCount += 1
                            
                 
-                                   ## SOMETHING WRONG -- supposed to get 34, getting 20!
         self.assertEqual(GsharpCount, 34)
+#       masterStream.show('text')
         
 if __name__ == "__main__":
     music21.mainTest(Test)

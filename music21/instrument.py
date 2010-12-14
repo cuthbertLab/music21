@@ -1,16 +1,22 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         instrument.py
-# Purpose:      Class for basic insturment information
+# Purpose:      Class for basic instrument information
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-10 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''This module defines object models for instrument representations. Metadata for instrument realizations, including transpositions and default MIDI program numbers, are also included. 
+'''
+This module represents instruments through objects that contain general information
+such as Metadata for instrument names, classifications, transpositions and default 
+MIDI program numbers.  It also contains information specific to each instrument
+or instrument family, such as string pitches, etc.  Information about instrumental
+ensembles is also included here though it may later be separated out into its own
+ensemble.py module. 
 '''
 
 import unittest, doctest
@@ -38,6 +44,13 @@ class InstrumentException(Exception):
     pass
 
 class Instrument(music21.Music21Object):
+    '''
+    Base class for all musical instruments.  Designed
+    for subclassing, though usually a more specific
+    instrument class (such as StringInstrument) would
+    be better to subclass.
+    '''
+    
     classSortOrder = 1
 
     def __init__(self):
@@ -94,9 +107,37 @@ class Instrument(music21.Music21Object):
         self.instrumentId = idNew
          
 
-    def midiChannelAutoAssign(self, usedChannels=[]):
-        '''Force a midi channel
+    def autoAssignMidiChannel(self, usedChannels=[]):
         '''
+        Assign an unused midi channel given a list of
+        used ones.
+
+        assigns the number to self.midiChannel and returns
+        it as an int.
+
+        Note that midi channel 10 is special, and
+        thus is skipped.
+
+        Currently only 16 channels are used.
+
+        >>> from music21 import instrument
+        >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11]
+        >>> i = instrument.Violin()
+        >>> i.autoAssignMidiChannel(used)
+        12
+        >>> i.midiChannel
+        12
+        
+        
+        OMIT_FROM_DOCS
+        
+        >>> used2 = range(0,16)
+        >>> i = instrument.Instrument()
+        >>> i.autoAssignMidiChannel(used2)
+        Traceback (most recent call last):
+        InstrumentException: we are out of midi channels! help!
+        '''
+        maxMidi = 16
         filter = []
         for e in usedChannels:
             if e != None:
@@ -104,13 +145,20 @@ class Instrument(music21.Music21Object):
 
         if len(filter) == 0:
             self.midiChannel = 0
+            return 0
+        elif len(filter) >= maxMidi:
+            raise InstrumentException("we are out of midi channels! help!")
         else:
-            ch = max(filter)
-            ch += 1
-            if ch == 10:  # skip 10 /perc for now
-                ch += 1
-            ch = ch % 16 # wrap around if out
-            self.midiChannel = ch
+            for ch in range(maxMidi):
+                if ch in filter:
+                    continue
+                elif ch % 16 == 10:
+                    continue # skip 10 /perc for now
+                else:
+                    self.midiChannel = ch
+                    return ch
+            raise InstrumentException("we are out of midi channels and this was not already detected PROGRAM BUG!")
+            
 
 
     #---------------------------------------------------------------------------
@@ -164,7 +212,7 @@ class Instrument(music21.Music21Object):
 
             if self.midiChannel == None:
                 # TODO: need to allocate channels from a higher level
-                self.midiChannelAutoAssign()
+                self.autoAssignMidiChannel()
             mxMIDIInstrument.midiChannel = self.midiChannel + 1
             # add to mxScorePart
             mxScorePart.midiInstrumentList.append(mxMIDIInstrument)

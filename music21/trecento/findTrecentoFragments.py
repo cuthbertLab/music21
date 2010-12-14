@@ -203,6 +203,7 @@ if __name__ == "__main__":
 #    findCasanatense522()
 #    findRandomVerona()
 #    findRavi3ORegina()
+    searchForIntervals("D4 B4 D4 C4 D4")
     pass
 
 

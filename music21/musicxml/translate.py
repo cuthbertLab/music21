@@ -1161,7 +1161,7 @@ def streamToMx(s, spannerBundle=None):
 
             if (inst.midiChannel == None or 
                 inst.midiChannel in midiChannelList):
-                inst.midiChannelAutoAssign(usedChannels=midiChannelList)
+                inst.autoAssignMidiChannel(usedChannels=midiChannelList)
             midiChannelList.append(inst.midiChannel)
 
             #environLocal.printDebug(['midiChannel list', midiChannelList])
