@@ -354,6 +354,15 @@ class Bassoon(WoodwindInstrument):
         self.midiProgram = 70
 
 
+#http://home.comcast.net/~igpl/NWR.html
+# TODO: NEENA -- take list and continue to 100 -- just for fun...
+ensembleNameBySize = ["no performers", "solo", "duet", "trio", "quartet", 
+                      "quintet", "sextet", "septet", "octet", "nonet",
+                      "dectet", "undectet", "duodectet", "tredectet", "quattuordectet",
+                      "quindectet", "sexdectet", "septendectet", "octodectet"]
+        
+
+
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
