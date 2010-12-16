@@ -314,6 +314,7 @@ def getStrengthForNote(n):
     else:
         strength = 0.5
 
+    strength = strength * n.duration.quarterLength * 2
     return strength
     
 
@@ -335,10 +336,10 @@ def possibleSolution():
     ct = (-5, 5, True, True)
     tenor = (5, 5, False, False)
     
-    qjChords, avgScore, qjSolved = prepareSolution(triplum, ct, tenor)
+    qjChords, avgScore, qjSolved = prepareSolution(tenor, triplum, ct)
     print avgScore
-    qjSolved.insert(0, stream.Part())
-    qjSolved.insert(0, qjChords)
+#    qjSolved.insert(0, stream.Part())
+#    qjSolved.insert(0, qjChords)
     qjSolved.show('musicxml')
 #    qjChords.show('musicxml')
  

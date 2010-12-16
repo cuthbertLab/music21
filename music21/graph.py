@@ -10,7 +10,15 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. The :class:`~music21.graph.Graph` object subclasses abstract fundamental graphing archetypes using the matplotlib library. The :class:`~music21.graph.Plot` object subclasses provide reusable approaches to graphing data and structures in :class:`~music21.stream.Stream` objects.
+'''
+Object definitions for graphing and 
+plotting :class:`~music21.stream.Stream` objects. 
+The :class:`~music21.graph.Graph` object subclasses 
+abstract fundamental graphing archetypes using the 
+matplotlib library. The :class:`~music21.graph.Plot` 
+object subclasses provide reusable approaches 
+to graphing data and structures in 
+:class:`~music21.stream.Stream` objects.
 '''
 
 import unittest, doctest
@@ -94,21 +102,35 @@ def _substituteAccidentalSymbols(label):
 
 #-------------------------------------------------------------------------------
 class Graph(object):
-    '''An object representing a graph or plot, automating the creation and configuration of this graph in matplotlib.
+    '''
+    A music21.graph.Graph is an abstract object that represents a graph or 
+    plot, automating the creation and configuration of this graph in matplotlib.
+    It is a low-level object that most music21 users do not need to call directly
+    but because it most graphs will take keyword arguments that specify the
+    look of graphs, they are important to know about.
 
-    Graph objects do not manipulate Streams or other music21 data; they only manipulate raw data formatted for each Graph subclass.
+    The keyword arguments can be provided for configuration are: 
+    alpha (which describes how transparent elements of the graph are), 
+    colorBackgroundData, colorBackgroundFigure, colorGrid, title, 
+    doneAction (see below), 
+    figureSize, colors, tickFontSize, titleFontSize, labelFontSize, 
+    fontFamily.
 
-    Numerous keyword arguments can be provided for configuration: alpha,  colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, colors, tickFontSize, titleFontSize, labelFontSize, fontFamily.
+    Graph objects do not manipulate Streams or other music21 data; they only 
+    manipulate raw data formatted for each Graph subclass, hence why it is
+    unlikely that people will call this class directly.
 
-    The doneAction determines what happens after graph processing: either write a file ('write'), open an interactive GUI browser ('show') or None (do processing but do not write output.
+    The doneAction argument determines what happens after the graph 
+    has been processed. Currently there are three options, 'write' creates
+    a file on disk (this is the default), while 'show' opens an 
+    interactive GUI browser.  The
+    third option, None, does the processing but does not write any output.
     '''
 
     def __init__(self, *args, **keywords):
-        '''A base-class for basic setup of graphs, abstracting functionality provided by matplotlib.
-
-        Optional keyword arguments: alpha, colorBackgroundData, colorBackgroundFigure, colorGrid, title, doneAction, figureSize, tickFontSize, titleFontSize, labelFontSize, fontFamily
-
-        >>> a = Graph(title='green')
+        '''
+        >>> a = Graph(title='a graph of some data to be given soon', tickFontSize = 9)
+        >>> a.setData(['some', 'arbitrary', 'data', 14, 9.04, None])
         '''
         self.data = None
         # define a component dictionary for each axist
@@ -193,7 +215,8 @@ class Graph(object):
             self.axis[ax]['range'] = None
 
     def _getFigure(self):
-        '''Configure and return a figure object
+        '''
+        Configure and return a figure object -- does nothing in the abstract class
         '''
         pass
 
@@ -204,18 +227,26 @@ class Graph(object):
         self.title = title
 
     def setFigureSize(self, figSize):
-        '''Set the figure size as an x,y pair. Scales all graph components but not always all labels. 
+        '''
+        Set the figure size as an x,y pair. 
+        
+        Scales all graph components but because of matplotlib limitations
+        (esp. on 3d graphs) no all labels scale properly. 
         '''
         self.figureSize = figSize
 
     def setDoneAction(self, action):
+        '''
+        sets what should happen when the graph is created (see docs above)
+        default is 'write'.
+        '''
         if action in ['show', 'write', None]:
             self.doneAction = action
         else:
             raise GraphException('not such done action: %s' % action)
 
     def setTicks(self, axisKey, pairs):
-        '''paris are positions and labels
+        '''pairs are positions and labels
         '''
         if pairs != None:
             positions = []
@@ -390,12 +421,16 @@ class Graph(object):
             pass
 
     def show(self):
-        '''Calls the show() method of the matplotlib plot. For most matplotlib back ends, this will open a GUI window with the desired graph.
+        '''
+        Calls the show() method of the matplotlib plot. 
+        For most matplotlib back ends, this will open 
+        a GUI window with the desired graph.
         '''
         plt.show()
 
     def write(self, fp=None):
-        '''Writes the graph to a file. If no file path is given, a temporary file is used. 
+        '''
+        Writes the graph to a file. If no file path is given, a temporary file is used. 
         '''
         if fp == None:
             fp = environLocal.getTempFile('.png')
@@ -414,7 +449,9 @@ class Graph(object):
 
 
 class GraphNetworxGraph(Graph):
-    ''' Grid a networkx graph
+    ''' 
+    Grid a networkx graph -- which is a graph of nodes and edges.
+    Requires the optional networkx module.
     
     >>> from music21 import *
     >>> #_DOCS_SHOW g = graph.GraphNetworxGraph()
@@ -436,11 +473,13 @@ class GraphNetworxGraph(Graph):
             self.networkxGraph = keywords['networkxGraph']
         else:
             # testing default; temporary
+            ## TODO: Add import test.
             g = networkx.Graph()
 #             g.add_edge('a','b',weight=1.0)
 #             g.add_edge('b','c',weight=0.6)
 #             g.add_edge('c','d',weight=0.2)
 #             g.add_edge('d','e',weight=0.6)
+            
             self.networkxGraph = g
 
     def process(self):

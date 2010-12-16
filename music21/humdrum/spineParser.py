@@ -7,6 +7,16 @@
 # Copyright:    (c) 2009 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
+music21.humdrum.spineParser is a collection of utilities for changing
+native humdrum code into music21 streams.  Most music21 users will
+simply want to call:
+
+>>> from music21 import *
+>>> #_DOCS_SHOW myFile = converter.parse('myfile.krn')
+>>> #_DOCS_SHOW myFile.show()
+'''
+
 
 import doctest
 import unittest

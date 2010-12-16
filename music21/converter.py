@@ -10,10 +10,29 @@
 # Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''Public interface for importing various file formats into music21. 
+'''
+music21.converter contains tools for loading music from various file formats,
+whether from disk, from the web, or from text, into 
+music21.stream.:class:`~music21.stream.Score` objects (or
+other similar stream objects).  
 
-The most powerful and easy to use tool is the :func:`~music21.converter.parse` function. Simply provide a URL and, if the format is supported, a :class:`~music21.stream.Stream` will be returned. 
+The most powerful and easy to use tool is the :func:`~music21.converter.parse` 
+function. Simply provide a filename, URL, or text string and, if the format 
+is supported, a :class:`~music21.stream.Score` will be returned. 
 
+This is the most general public interface for all formats.  Programmers
+adding their own formats to the system should provide an interface here to
+their own parsers (such as humdrum, musicxml, etc.)
+
+The second and subsequent times that a file is loaded it will likely be much
+faster since we store a parsed version of each file as a "pickle" object in
+the temp folder on the disk.
+
+>>> from music21 import *
+>>> #_DOCS_SHOW s = converter.parse('d:/mydocs/schubert.krn')
+>>> s = converter.parse(humdrum.testFiles.schubert) #_DOCS_HIDE
+>>> s
+<music21.stream.Score object at 0x...>
 '''
 
 

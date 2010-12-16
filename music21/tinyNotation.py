@@ -39,6 +39,10 @@ Note octaves are specified as follows:
     c  to b = from middle C to the middle of treble clef
 
     c' to b' = from C in treble clef to B above treble clef
+    
+    Octaves below and above these are specified by further doublings of
+    letter (CCC) or apostrophes (c'') -- this is one of the note name
+    standards found in many music theory books.
 
 After the note name, a number may be placed indicating the note 
 length: 1 = whole note, 2 = half, 4 = quarter, 8 = eighth, 16 = sixteenth.  
@@ -182,7 +186,8 @@ class TinyNotationStream(stream.Stream):
 
 class TinyNotationNote(object):
     ''' 
-    >>> tcN = TinyNotationNote("AA-4.~=aflat_hel-")
+    >>> from music21 import *
+    >>> tcN = tinyNotation.TinyNotationNote("AA-4.~=aflat_hel-")
     >>> note1 = tcN.note
     >>> note1.name
     'A-'
@@ -192,18 +197,32 @@ class TinyNotationNote(object):
     'hel-'
     >>> note1.id
     'aflat'
+
+    OMIT_FROM_DOCS
+    
+    >>> tcn2 = tinyNotation.TinyNotationNote("c''##16").note
+    >>> tcn2.accidental
+    <accidental double-sharp>
+    >>> tcn2.octave
+    6
+    >>> tcn2.quarterLength
+    0.25
+
+    >>> tcn3 = tinyNotation.TinyNotationNote("d''(---)16").note
+    >>> tcn3.editorial.ficta
+    <accidental triple-flat>
     '''
     
     REST    = compile('r')
-    OCTAVE2 = compile('([A-G])[A-G]')
+    OCTAVE2 = compile('([A-G])+[A-G]')
     OCTAVE3 = compile('([A-G])')
-    OCTAVE5 = compile('([a-g])\'') 
+    OCTAVE5 = compile('([a-g])(\'+)') 
     OCTAVE4 = compile('([a-g])')
-    EDSHARP = compile('\(\#\)')
-    EDFLAT  = compile('\(\-\)')
+    EDSHARP = compile('\((\#+)\)')
+    EDFLAT  = compile('\((\-+)\)')
     EDNAT   = compile('\(n\)')
-    SHARP   = compile('^[A-Ga-g]+\#')  # simple notation has 
-    FLAT    = compile('^[A-Ga-g]+\-')  # no need for double sharps etc
+    SHARP   = compile('^[A-Ga-g]+\'*(\#+)')  # simple notation finds 
+    FLAT    = compile('^[A-Ga-g]+\'*(\-+)')  # double sharps too
     TYPE    = compile('(\d+)')
     TIE     = compile('.\~') # not preceding ties
     PRECTIE = compile('\~')  # front ties
@@ -230,11 +249,13 @@ class TinyNotationNote(object):
         elif (self.REST.match(stringRep) is not None): # rest
             noteObj = music21.note.Rest()
         elif (self.OCTAVE2.match(stringRep)): # BB etc.
-            noteObj = self._getPitch(self.OCTAVE2.match(stringRep), 2)
+            nn = self.OCTAVE2.match(stringRep)
+            noteObj = self._getPitch(nn, 3 - len(nn.group(1)))
         elif (self.OCTAVE3.match(stringRep)):
             noteObj = self._getPitch(self.OCTAVE3.match(stringRep), 3)
         elif (self.OCTAVE5.match(stringRep)): # must match octave 5 then 4!
-            noteObj = self._getPitch(self.OCTAVE5.match(stringRep), 5)
+            nn = self.OCTAVE5.match(stringRep)
+            noteObj = self._getPitch(nn, 4 + len(nn.group(2)))
         elif (self.OCTAVE4.match(stringRep)): 
             noteObj = self._getPitch(self.OCTAVE4.match(stringRep), 4)
         else:
@@ -290,11 +311,13 @@ class TinyNotationNote(object):
         ## get accidentals
         if (isinstance(noteObj, music21.note.Note)):
             if (self.EDSHARP.search(stringRep)): # must come before sharp
-                acc1 = pitch.Accidental("sharp")
+                alter = len(self.EDSHARP.search(stringRep).group(1))
+                acc1 = pitch.Accidental(alter)
                 noteObj.editorial.ficta = acc1
                 noteObj.editorial.misc['pmfc-ficta'] = acc1
             elif (self.EDFLAT.search(stringRep)): # must come before flat
-                acc1 = pitch.Accidental("flat")
+                alter = -1 * len(self.EDFLAT.search(stringRep).group(1))
+                acc1 = pitch.Accidental(alter)
                 noteObj.editorial.ficta = acc1
                 noteObj.editorial.misc['pmfc-ficta'] = acc1
             elif (self.EDNAT.search(stringRep)):
@@ -303,9 +326,11 @@ class TinyNotationNote(object):
                 noteObj.editorial.misc['pmfc-ficta'] = acc1
                 noteObj.accidental = acc1
             elif (self.SHARP.search(stringRep)):
-                noteObj.accidental = "sharp"
+                alter = len(self.SHARP.search(stringRep).group(1))
+                noteObj.accidental = pitch.Accidental(alter)
             elif (self.FLAT.search(stringRep)):
-                noteObj.accidental = "flat"
+                alter = -1 * len(self.FLAT.search(stringRep).group(1))
+                noteObj.accidental = pitch.Accidental(alter)
 
         self.customNotationMatch(noteObj, stringRep, storedDict)
 
@@ -475,7 +500,7 @@ class TestExternal(unittest.TestCase):
 _DOC_ORDER = [TinyNotationNote, TinyNotationStream, HarmonyStream, HarmonyNote]
 
 if __name__ == "__main__":
-    music21.mainTest(TestExternal, Test)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

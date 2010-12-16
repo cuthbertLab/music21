@@ -203,7 +203,9 @@ if __name__ == "__main__":
 #    findCasanatense522()
 #    findRandomVerona()
 #    findRavi3ORegina()
-    searchForIntervals("D4 B4 D4 C4 D4")
+    #searchForIntervals("D4 B4 D4 C4 D4") # cadence formula from 15th c. that Lisa Cotton was searching for in earlier sources -- none found
+    #searchForIntervals("G4 A4 G4 F4 E4 F4 G4 E4") # Prague XVII.J.17-14_1r piece 1 -- possible contrafact -- no correct matches
+    searchForIntervals("G4 A4 B4 G4 F4 G4 F4 E4") # Prague XVII.J.17-14_1r piece 2 -- possible contrafact -- no matches
     pass
 
 
