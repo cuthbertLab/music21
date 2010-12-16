@@ -364,6 +364,10 @@ class AbstractDiatonicScale(AbstractScale):
         self.dominantStep = None # step of dominant
         self._buildNetwork(mode=mode)
 
+        # all diatonic scales are octave duplicating
+        self.octaveDuplicating = True
+
+
     def __eq__(self, other):
         '''
         >>> from music21 import *
@@ -479,7 +483,8 @@ class AbstractDiatonicScale(AbstractScale):
             self.relativeMinorStep = 3
         else:
             raise ScaleException('cannot create a scale of the following mode:' % mode)
-        self._net = intervalNetwork.IntervalNetwork(intervalList)
+        self._net = intervalNetwork.IntervalNetwork(intervalList, 
+                    octaveDuplicating=self.octaveDuplicating)
 
 
 class AbstractOctatonicScale(AbstractScale):
@@ -490,6 +495,10 @@ class AbstractOctatonicScale(AbstractScale):
         self.type = 'Abstract Octatonic'
         # here, accept None
         self._buildNetwork(mode=mode)
+
+        # all octatonic scales are octave duplicating
+        self.octaveDuplicating = True
+
 
     def _buildNetwork(self, mode=None):
         '''
@@ -511,7 +520,8 @@ class AbstractOctatonicScale(AbstractScale):
             self.tonicStep = 1
         else:
             raise ScaleException('cannot create a scale of the following mode:' % mode)
-        self._net = intervalNetwork.IntervalNetwork(intervalList)
+        self._net = intervalNetwork.IntervalNetwork(intervalList,
+                                octaveDuplicating=self.octaveDuplicating)
         # might also set weights for tonic and dominant here
 
 
@@ -524,6 +534,8 @@ class AbstractHarmonicMinorScale(AbstractScale):
         self.type = 'Abstract Harmonic Minor'
         self._buildNetwork()
 
+        self.octaveDuplicating = True
+
     def _buildNetwork(self):
         '''
         '''
@@ -531,7 +543,8 @@ class AbstractHarmonicMinorScale(AbstractScale):
         intervalList = srcList[5:] + srcList[:5] # a to A
         self.tonicStep = 1
         self.dominantStep = 5
-        self._net = intervalNetwork.IntervalNetwork(intervalList)
+        self._net = intervalNetwork.IntervalNetwork(intervalList, 
+                        octaveDuplicating=self.octaveDuplicating)
 
         # raise the seventh in all directions
         self._alteredNodes[7] = {'direction': intervalNetwork.DIRECTION_BI, 
@@ -545,6 +558,9 @@ class AbstractMelodicMinorScale(AbstractScale):
         AbstractScale.__init__(self)
         self.type = 'Abstract Melodic Minor'
         self._buildNetwork()
+
+        self.octaveDuplicating = True
+
 
     def _buildNetwork(self):
         '''
@@ -599,7 +615,8 @@ class AbstractMelodicMinorScale(AbstractScale):
                     )},
                 )
 
-        self._net = intervalNetwork.IntervalNetwork()
+        self._net = intervalNetwork.IntervalNetwork(
+                        octaveDuplicating=self.octaveDuplicating)
         self._net.fillArbitrary(nodes, edges)
 
 
@@ -612,6 +629,11 @@ class AbstractCyclicalScale(AbstractScale):
         self.type = 'Abstract Cyclical'
         self._buildNetwork(mode=mode)
 
+        # cannot assume that abstract cyclical scales are octave duplicating
+        # until we have the intervals in use
+        self.octaveDuplicating = False
+
+
     def _buildNetwork(self, mode):
         '''
         Here, mode is the list of intervals. 
@@ -620,7 +642,8 @@ class AbstractCyclicalScale(AbstractScale):
             mode = [mode] # place in list
 
         self.tonicStep = 1
-        self._net = intervalNetwork.IntervalNetwork(mode)
+        self._net = intervalNetwork.IntervalNetwork(mode, 
+                        octaveDuplicating=self.octaveDuplicating)
 
 
 
@@ -633,6 +656,12 @@ class AbstractOctaveRepeatingScale(AbstractScale):
         AbstractScale.__init__(self)
         self.type = 'Abstract Octave Repeating'
         self._buildNetwork(mode=mode)
+
+
+        # by definition, these are forced to be octave duplicating
+        # though, do to some intervals, duplication may not happen every oct
+        self.octaveDuplicating = True
+
 
     def _buildNetwork(self, mode):
         '''
@@ -647,7 +676,8 @@ class AbstractOctaveRepeatingScale(AbstractScale):
             mode.append(iComplement)
 
         self.tonicStep = 1
-        self._net = intervalNetwork.IntervalNetwork(mode)
+        self._net = intervalNetwork.IntervalNetwork(mode, 
+                        octaveDuplicating=self.octaveDuplicating)
 
 
 
@@ -813,9 +843,9 @@ class ConcreteScale(Scale):
         '''Return the tonic. 
 
         >>> from music21 import *
-        >>> sc = scale.ConcreteScale('e-')
+        >>> sc = scale.ConcreteScale('e-4')
         >>> sc.getTonic()
-        E-
+        E-4
         '''
         return self._tonic
 
@@ -1076,12 +1106,12 @@ class ConcreteScale(Scale):
         >>> sc3 = scale.MajorScale('a')
         >>> sc4 = scale.MajorScale('e')
         >>> sc1.match(sc2)
-        {'notMatched': [C#5], 'matched': [D, E4, F#4, G4, A4, B4, D5]}
+        {'notMatched': [C#5], 'matched': [D4, E4, F#4, G4, A4, B4, D5]}
         >>> sc2.match(sc3)
-        {'notMatched': [G#5], 'matched': [A, B4, C#5, D5, E5, F#5, A5]}
+        {'notMatched': [G#5], 'matched': [A4, B4, C#5, D5, E5, F#5, A5]}
 
         >>> sc1.match(sc4)
-        {'notMatched': [G#4, C#5, D#5], 'matched': [E, F#4, A4, B4, E5]}
+        {'notMatched': [G#4, C#5, D#5], 'matched': [E4, F#4, A4, B4, E5]}
 
         '''
         # strip out unique pitches in a list
@@ -1301,10 +1331,10 @@ class DiatonicScale(ConcreteScale):
         >>> from music21 import *
         >>> sc1 = scale.MajorScale(pitch.Pitch('a'))
         >>> sc1.pitches
-        [A, B4, C#5, D5, E5, F#5, G#5, A5]
+        [A4, B4, C#5, D5, E5, F#5, G#5, A5]
         >>> sc2 = sc1.getParallelMinor()
         >>> sc2.pitches
-        [A, B4, C5, D5, E5, F5, G5, A5]
+        [A4, B4, C5, D5, E5, F5, G5, A5]
         '''
         return MinorScale(self._tonic)
 
@@ -1315,10 +1345,10 @@ class DiatonicScale(ConcreteScale):
         >>> from music21 import *
         >>> sc1 = scale.MinorScale(pitch.Pitch('g'))
         >>> sc1.pitches
-        [G, A4, B-4, C5, D5, E-5, F5, G5]
+        [G4, A4, B-4, C5, D5, E-5, F5, G5]
         >>> sc2 = sc1.getParallelMajor()
         >>> sc2.pitches
-        [G, A4, B4, C5, D5, E5, F#5, G5]
+        [G4, A4, B4, C5, D5, E5, F#5, G5]
         '''
         return MajorScale(self._tonic)
 
@@ -1329,7 +1359,7 @@ class DiatonicScale(ConcreteScale):
 
         >>> sc1 = MajorScale(pitch.Pitch('a'))
         >>> sc1.pitches
-        [A, B4, C#5, D5, E5, F#5, G#5, A5]
+        [A4, B4, C#5, D5, E5, F#5, G#5, A5]
         >>> sc2 = sc1.getRelativeMinor()
         >>> sc2.pitches
         [F#5, G#5, A5, B5, C#6, D6, E6, F#6]
@@ -1342,7 +1372,7 @@ class DiatonicScale(ConcreteScale):
 
         >>> sc1 = MinorScale(pitch.Pitch('g'))
         >>> sc1.pitches
-        [G, A4, B-4, C5, D5, E-5, F5, G5]
+        [G4, A4, B-4, C5, D5, E-5, F5, G5]
         >>> sc2 = sc1.getRelativeMajor()
         >>> sc2.pitches
         [B-4, C5, D5, E-5, F5, G5, A5, B-5]
@@ -1408,7 +1438,7 @@ class MinorScale(DiatonicScale):
 
     >>> sc = MinorScale(pitch.Pitch('g'))
     >>> sc.pitches
-    [G, A4, B-4, C5, D5, E-5, F5, G5]
+    [G4, A4, B-4, C5, D5, E-5, F5, G5]
     '''
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
@@ -1421,7 +1451,7 @@ class DorianScale(DiatonicScale):
 
     >>> sc = DorianScale(pitch.Pitch('d'))
     >>> sc.pitches
-    [D, E4, F4, G4, A4, B4, C5, D5]
+    [D4, E4, F4, G4, A4, B4, C5, D5]
     '''
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
@@ -1434,7 +1464,7 @@ class PhrygianScale(DiatonicScale):
 
     >>> sc = PhrygianScale(pitch.Pitch('e'))
     >>> sc.pitches
-    [E, F4, G4, A4, B4, C5, D5, E5]
+    [E4, F4, G4, A4, B4, C5, D5, E5]
     '''
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
@@ -1448,9 +1478,9 @@ class HypophrygianScale(DiatonicScale):
 
     >>> sc = HypophrygianScale(pitch.Pitch('e'))
     >>> sc.pitches
-    [B3, C4, D4, E, F4, G4, A4, B4]
+    [B3, C4, D4, E4, F4, G4, A4, B4]
     >>> sc.getTonic()
-    E
+    E4
     >>> sc.getDominant()
     A4
     >>> sc.pitchFromDegree(1) # scale degree 1 is treated as lowest
@@ -1711,7 +1741,7 @@ class RomanNumeral(object):
         >>> sc1 = scale.MajorScale('g')
         >>> h1 = sc1.getRomanNumeral(1)
         >>> h1.root
-        G
+        G4
         ''')
 
     def _getBass(self):
@@ -1724,7 +1754,7 @@ class RomanNumeral(object):
         >>> sc1 = scale.MajorScale('g')
         >>> h1 = scale.RomanNumeral(sc1, 1)
         >>> h1.bass
-        G
+        G4
         ''')
 
 
@@ -2234,7 +2264,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sc1.abstract == sc3.abstract, False)
 
         # getting details on comparison
-        self.assertEqual(str(sc1.match(sc2)), "{'notMatched': [C#5, G#5], 'matched': [A, B4, D5, E5, F#5, A5]}")
+        self.assertEqual(str(sc1.match(sc2)), "{'notMatched': [C#5, G#5], 'matched': [A4, B4, D5, E5, F#5, A5]}")
 
 
 
@@ -2323,9 +2353,9 @@ class Test(unittest.TestCase):
     def testMelodicMinorA(self):
 
         mm = MelodicMinorScale('a')
-        self.assertEqual(str(mm.pitches), '[A, B4, C5, D5, E5, F#5, G#5, A5]')
+        self.assertEqual(str(mm.pitches), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
-        self.assertEqual(str(mm.getPitches(direction='ascending')), '[A, B4, C5, D5, E5, F#5, G#5, A5]')
+        self.assertEqual(str(mm.getPitches(direction='ascending')), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
         self.assertEqual(str(mm.getPitches('c1', 'c3', direction='descending')), '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
 
