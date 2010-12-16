@@ -316,6 +316,41 @@ class AbstractScale(Scale):
 
 
 
+    def _getNetworkxGraph(self):
+        '''Create a networx graph from the stored network.
+        '''
+        return self._net._getNetworkxGraph()
+
+    networkxGraph = property(_getNetworkxGraph, doc='''
+        Return a networks Graph object representing a realized version of this IntervalNetwork
+        ''')
+
+
+
+    def plot(self, *args, **keywords):
+        '''Create and display a plot.
+        '''
+#         >>> from music21 import *
+#         >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+#         >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
+#         >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+#         >>> #_DOCS_SHOW s.plot('pianoroll')
+    
+#         .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
+#             :width: 600
+
+        # import is here to avoid import of matplotlib problems
+        from music21 import graph
+        # first ordered arg can be method type
+        g = graph.GraphNetworxGraph( 
+            networkxGraph=self._getNetworkxGraph(), *args, **keywords)
+            # for pitched version
+            #networkxGraph=self._getNetworkxRealizedGraph(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
+        g.process()
+
+
+
+
 #-------------------------------------------------------------------------------
 # abstract subclasses
 
@@ -2304,6 +2339,14 @@ class Test(unittest.TestCase):
         
 
 
+    def testPlot(self):
+
+        amms = AbstractMelodicMinorScale()
+        amms.plot(doneAction=None)
+
+
+
+
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
@@ -2315,7 +2358,9 @@ if __name__ == "__main__":
 
 
         #t.testCyclicalScales()
-        t.testMelodicMinorA()
+        #t.testMelodicMinorA()
+        t.testPlot()
+
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
 

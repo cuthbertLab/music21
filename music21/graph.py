@@ -467,7 +467,7 @@ class GraphNetworxGraph(Graph):
         if 'figureSize' not in keywords:
             self.setFigureSize([6, 6])
         if 'title' not in keywords:
-            self.setTitle('Graph Plot')
+            self.setTitle('Network Plot')
 
         if 'networkxGraph' in keywords.keys():
             self.networkxGraph = keywords['networkxGraph']

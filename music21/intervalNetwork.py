@@ -1467,23 +1467,23 @@ class IntervalNetwork(object):
         environLocal.printDebug(['got step count', stepCount])
         return g
 
-    def _getNetworkxRealizedGraph(self, pitchObj, nodeId=None, 
-        minPitch=None, maxPitch=None):
-        '''Create a networx graph from this representation.
-        '''
-        # this presently assumes that the realized form is in linear order
-        realized = self.realizePitch(pitchObj=pitchObj, nodeId=nodeId, 
-                   minPitch=minPitch, maxPitch=maxPitch)
-        g = networkx.Graph()
-        for i, p in enumerate(realized):
-            if i > len(realized) - 2: 
-                continue # will be last, will continue
-            pNext = realized[i+1]
-            g.add_edge(p.nameWithOctave, pNext.nameWithOctave, weight=0.6)
-        return g
+#     def _getNetworkxRealizedGraph(self, pitchObj, nodeId=None, 
+#         minPitch=None, maxPitch=None):
+#         '''Create a networx graph from this representation.
+#         '''
+#         # this presently assumes that the realized form is in linear order
+#         realized = self.realizePitch(pitchObj=pitchObj, nodeId=nodeId, 
+#                    minPitch=minPitch, maxPitch=maxPitch)
+#         g = networkx.Graph()
+#         for i, p in enumerate(realized):
+#             if i > len(realized) - 2: 
+#                 continue # will be last, will continue
+#             pNext = realized[i+1]
+#             g.add_edge(p.nameWithOctave, pNext.nameWithOctave, weight=0.6)
+#         return g
 
 
-    networkxGraph = property(_getNetworkxRealizedGraph, doc='''
+    networkxGraph = property(_getNetworkxGraph, doc='''
         Return a networks Graph object representing a realized version of this IntervalNetwork
         ''')
 
