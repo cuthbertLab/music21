@@ -351,6 +351,9 @@ class IntervalNetwork(object):
         self.octaveDuplicating = octaveDuplicating
         self.deterministic = deterministic
 
+        # store segments
+        self._ascendingCache = {}
+        self._descendingCache = {}
 
     def clear(self):
         '''Remove and reset all Nodes and Edges. 
@@ -359,6 +362,8 @@ class IntervalNetwork(object):
         self._nodeIdCount = 0
         self._edges = {}
         self._nodes = {}
+        self._ascendingCache = {}
+        self._descendingCache = {}
 
 
 
@@ -991,6 +996,23 @@ class IntervalNetwork(object):
 
     # TODO: need to collect intervals as well 
 
+    def _getCacheKey(self, nodeObj, pitchReference, minPitch, maxPitch, 
+                    includeReference=None):
+        '''Return key for caching based on critical components. 
+        '''
+        if minPitch is not None:
+            minKey = minPitch.nameWithOctave
+        else:
+            minKey = None
+
+        if maxPitch is not None:
+            maxKey = maxPitch.nameWithOctave
+        else:
+            maxKey = None
+        return (nodeObj.id, pitchReference.nameWithOctave, 
+                minKey, maxKey, includeReference)
+
+
 
     def _realizeAscending(self, pitchReference, nodeId=None, 
         minPitch=None, maxPitch=None, alteredNodes={}):
@@ -1007,7 +1029,6 @@ class IntervalNetwork(object):
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net._realizeAscending('c2', 1, 'c5', 'c6')
         ([C5, D5, E5, F5, G5, A5, B5, C6], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
-
         '''
         # get first node if no node is provided
         if isinstance(nodeId, Node):
@@ -1038,6 +1059,12 @@ class IntervalNetwork(object):
                      direction=DIRECTION_ASCENDING, alteredNodes=alteredNodes)
         if pUnaltered is not None:
             pitchReference = pUnaltered
+
+        # see if we can get from cache
+        if self.deterministic:
+            ck = self._getCacheKey(nodeObj, pitchReference, minPitch, maxPitch)
+            if ck in self._ascendingCache.keys():
+                return self._ascendingCache[ck]
 
 
         # if this network is octaveDuplicating, than we can shift 
@@ -1100,6 +1127,11 @@ class IntervalNetwork(object):
 
             pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
                        n=n, p=p, direction=DIRECTION_ASCENDING)
+
+
+        # store in cache
+        if self.deterministic:
+            self._ascendingCache[ck] = post, postNodeId
 
         return post, postNodeId
 
@@ -1165,6 +1197,13 @@ class IntervalNetwork(object):
                      direction=DIRECTION_DESCENDING, alteredNodes=alteredNodes)
         if pUnaltered is not None:
             pitchReference = pUnaltered
+
+        # see if we can get from cache
+        if self.deterministic:
+            ck = self._getCacheKey(nodeObj, pitchReference, minPitch, maxPitch, 
+                                   includeReference)
+            if ck in self._descendingCache.keys():
+                return self._descendingCache[ck]
 
 
         # if this network is octaveDuplicating, than we can shift 
@@ -1234,6 +1273,11 @@ class IntervalNetwork(object):
                 n = self._getTerminusHighNodes()[0]
         pre.reverse()
         preNodeId.reverse()
+
+        # store in cache
+        if self.deterministic:
+            self._descendingCache[ck] = pre, preNodeId
+
         return pre, preNodeId
 
 
