@@ -1288,7 +1288,7 @@ class IntervalNetwork(object):
 
 
     def realize(self, pitchReference, nodeId=None, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_BI, alteredNodes={}):
+        direction=DIRECTION_ASCENDING, alteredNodes={}):
         '''Realize the nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         Without a min or max pitch, the given pitch reference is assigned to the designated node, and then both ascends to the terminus and descends to the terminus.
@@ -1344,13 +1344,16 @@ class IntervalNetwork(object):
             if direction == DIRECTION_ASCENDING:
                 #environLocal.printDebug(['employing ascending scale'])
                 # move pitch reference to below minimum
-                while True:
-                    # ref 20, min 10, lower ref
-                    # ref 5, min 10, do not lower
-                    if pitchReference.ps - minPitch.ps <= 0:
-                        break
-                    # lower one octave
-                    pitchReference.octave -= 1
+
+                # shift octave down in place
+                pitchReference.transposeBelowTarget(minPitch)
+#                 while True:
+#                     # ref 20, min 10, lower ref
+#                     # ref 5, min 10, do not lower
+#                     if pitchReference.ps - minPitch.ps <= 0:
+#                         break
+#                     # lower one octave
+#                     pitchReference.octave -= 1
 
                 mergedPitches, mergedNodes = self._realizeAscending(
                 pitchReference=pitchReference, nodeId=nodeId, 
@@ -1359,13 +1362,17 @@ class IntervalNetwork(object):
             elif direction == DIRECTION_DESCENDING:
                 #environLocal.printDebug(['employing descending scale'])
                 # move pitch reference to above minimum
-                while True:
-                    # ref 20, max 10, do not raise ref
-                    # ref 5, max 10, raise ref to above max
-                    if pitchReference.ps - maxPitch.ps >= 0:
-                        break
-                    # raise one octave
-                    pitchReference.octave += 1
+
+                # shift octave down in place
+                pitchReference.transposeAboveTarget(maxPitch)
+
+#                 while True:
+#                     # ref 20, max 10, do not raise ref
+#                     # ref 5, max 10, raise ref to above max
+#                     if pitchReference.ps - maxPitch.ps >= 0:
+#                         break
+#                     # raise one octave
+#                     pitchReference.octave += 1
 
                 mergedPitches, mergedNodes = self._realizeDescending(
                 pitchReference=pitchReference, nodeId=nodeId, 
@@ -1399,7 +1406,7 @@ class IntervalNetwork(object):
 
 
     def realizePitch(self, pitchReference, nodeId=None, minPitch=None,
-        maxPitch=None, direction=DIRECTION_BI, alteredNodes={}):
+        maxPitch=None, direction=DIRECTION_ASCENDING, alteredNodes={}):
         '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The nodeId, when a simple, linear network, can be used as a scale step value starting from one.
@@ -1432,7 +1439,8 @@ class IntervalNetwork(object):
 
     def realizePitchByStep(self, pitchReference, nodeId=None, 
         nodeStepTargets=[1],
-        minPitch=None, maxPitch=None, direction=DIRECTION_BI, alteredNodes={}):
+        minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING,
+        alteredNodes={}):
         '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The `targetSteps` specifies the the steps to be included within the specified range. 
@@ -1715,7 +1723,7 @@ class IntervalNetwork(object):
 
 
     def getPitchFromNodeStep(self, pitchReference, nodeName, nodeStepTarget, 
-        direction=DIRECTION_BI, minPitch=None, 
+        direction=DIRECTION_ASCENDING, minPitch=None, 
         maxPitch=None, alteredNodes={}):
         '''Given a reference pitch assigned to node id, determine the pitch for the the target node step. 
 
@@ -1869,7 +1877,7 @@ class IntervalNetwork(object):
     def findMissing(self, pitchReference, nodeId, 
             pitchTarget, comparisonAttribute='pitchClass', 
             minPitch=None, maxPitch=None, 
-            direction=DIRECTION_BI, alteredNodes={}):
+            direction=DIRECTION_ASCENDING, alteredNodes={}):
         '''Find all pitches in the realized scale that are not in the pitch target network based on the comparison attribute. 
 
         >>> from music21 import *

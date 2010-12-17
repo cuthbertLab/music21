@@ -1737,6 +1737,62 @@ class Pitch(music21.Music21Object):
             self.accidental = p.accidental
             return None
 
+    #---------------------------------------------------------------------------
+    # utilities for pitch object manipulation
+
+    def transposeBelowTarget(self, target):
+        '''Given a source Pitch, shift it down octaves until it is below the target. Note: this manipulates src inPlace.
+    
+        >>> from music21 import *
+        >>> pitch.Pitch('g5').transposeBelowTarget(pitch.Pitch('c#4'))
+        G3
+        >>> # if already below the target, make no change
+        >>> pitch.Pitch('g#3').transposeBelowTarget(pitch.Pitch('c#6'))
+        G#3
+        >>> # accept the same pitch
+        >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
+        G#1
+        '''
+        # TODO: add inPlace as an option, default is True
+        src = self
+        while True:
+            # ref 20, min 10, lower ref
+            # ref 5, min 10, do not lower
+            if src.ps - target.ps <= 0:
+                break
+            # lower one octave
+            src.octave -= 1
+        return src
+    
+    
+    def transposeAboveTarget(self, target):
+        '''Given a source Pitch, shift it up octaves until it is above the target. Note: this manipulates src inPlace.
+    
+        >>> from music21 import *
+        >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
+        D5
+        >>> # if already above the target, make no change
+        >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'))
+        D7
+        >>> # accept the same pitch
+        >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('d8'))
+        D8
+        '''
+        src = self
+        while True:
+            # ref 20, max 10, do not raise ref
+            # ref 5, max 10, raise ref to above max
+            if src.ps - target.ps >= 0:
+                break
+            # raise one octave
+            src.octave += 1
+        return src
+    
+    
+
+    #---------------------------------------------------------------------------
+
+
 
     def inheritDisplay(self, other):
         '''Inherit display properties from another Pitch, including those found on the Accidental object.
