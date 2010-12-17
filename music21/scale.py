@@ -222,8 +222,8 @@ class AbstractScale(Scale):
     # expose interface from network. these methods must be called (and not
     # ._net directly because they can pass the alteredNodes dictionary
 
-    def getRealization(self, pitchObj, stepOfPitch, 
-                        minPitch=None, maxPitch=None):
+    def getRealization(self, pitchObj, stepOfPitch,      
+         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING):
         '''Realize the abstract scale as a list of pitch objects, given a pitch object, the step of that pitch object, and a min and max pitch.
         '''
         if self._net is None:
@@ -231,12 +231,12 @@ class AbstractScale(Scale):
 
         return self._net.realizePitch(pitchObj, stepOfPitch, 
             minPitch=minPitch, maxPitch=maxPitch,
-            alteredNodes=self._alteredNodes)
+            alteredNodes=self._alteredNodes, direction=direction)
 
 
 
     def getPitchFromNodeStep(self, pitchReference, nodeName, nodeStepTarget, 
-            direction=None, minPitch=None, maxPitch=None):
+            direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):
         '''Get a pitch for desired scale degree.
         '''
 
@@ -254,7 +254,7 @@ class AbstractScale(Scale):
 
 
     def realizePitchByStep(self, pitchReference, nodeId, nodeStepTargets, 
-        direction=DIRECTION_BI, minPitch=None, maxPitch=None):        
+        direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):        
         '''Given one or more scale degrees, return a list of all matches over the entire range. 
         '''
         # TODO: rely here on intervalNetwork for caching
@@ -271,7 +271,7 @@ class AbstractScale(Scale):
 
 
     def getRelativeNodeStep(self, pitchReference, nodeName, pitchTarget, 
-            comparisonAttribute='pitchClass'):
+            comparisonAttribute='pitchClass', direction=DIRECTION_ASCENDING):
         '''Expose functionality from IntervalNetwork, passing on the stored alteredNodes dictionary.
         '''
         post = self._net.getRelativeNodeStep(
@@ -279,6 +279,7 @@ class AbstractScale(Scale):
             nodeName=nodeName, 
             pitchTarget=pitchTarget,      
             comparisonAttribute=comparisonAttribute,
+            direction=direction,
             alteredNodes=self._alteredNodes
             )
         return post
@@ -933,7 +934,8 @@ class ConcreteScale(Scale):
             # this creates new pitches on each call
             return self._abstract.getRealization(pitchObj, 
                         stepOfPitch, 
-                        minPitch=minPitch, maxPitch=maxPitch)
+                        minPitch=minPitch, maxPitch=maxPitch, 
+                        direction=direction)
         else:
             return []
         #raise ScaleException("Cannot generate a scale from a DiatonicScale class")
@@ -1007,8 +1009,8 @@ class ConcreteScale(Scale):
         return post
 
 
-    def getScaleDegreeFromPitch(self, pitchTarget, direction=DIRECTION_BI, 
-            comparisonAttribute='pitchClass'):
+    def getScaleDegreeFromPitch(self, pitchTarget, 
+            direction=DIRECTION_ASCENDING, comparisonAttribute='pitchClass'):
         '''For a given pitch, return the appropriate scale degree. If no scale degree is available, None is returned.
 
         >>> from music21 import *
@@ -1034,7 +1036,8 @@ class ConcreteScale(Scale):
             pitchReference=self._tonic, 
             nodeName=self._abstract.tonicStep, 
             pitchTarget=pitchTarget,      
-            comparisonAttribute=comparisonAttribute)
+            comparisonAttribute=comparisonAttribute, 
+            direction=direction)
         return post
 
 
@@ -1618,7 +1621,7 @@ class CyclicalScale(ConcreteScale):
     [B-2, F3, C4, G4, D5, A5, E6]
     >>> sc.getScaleDegreeFromPitch('g4') # as single interval cycle, all are 1
     1
-    >>> sc.getScaleDegreeFromPitch('b-2') # as single interval cycle, all are 1
+    >>> sc.getScaleDegreeFromPitch('b-2', direction='bi')
     1
     '''
 
@@ -1875,7 +1878,8 @@ class RomanNumeral(object):
             self.pitchFromDegree(degree, minPitch=minPitch, maxPitch=maxPitch, direction=direction))
 
 
-    def getPitches(self, minPitch=None, maxPitch=None, direction=None):
+    def getPitches(self, minPitch=None, maxPitch=None,
+         direction=DIRECTION_ASCENDING):
         '''Return the pitches the constitute this RomanNumeral with the present Scale.
 
         >>> from music21 import *
@@ -2331,6 +2335,22 @@ class Test(unittest.TestCase):
         # how to get a spelling in different ways
         # ex: octatonic should always compare on pitchClass
 
+        # a very short cyclical scale
+        sc = scale.CyclicalScale('c4', 'p5') # can give one list
+        self.assertEqual(str(sc.pitches), '[C4, G4]')
+
+        self.assertEqual(str(sc.getPitches('g2', 'g6')), '[B-2, F3, C4, G4, D5, A5, E6]')
+
+        
+        # as single interval cycle, all are 1
+        environLocal.printDebug(['calling get scale degree from pitch'])
+        self.assertEqual(sc.getScaleDegreeFromPitch('g4'), 1)
+        self.assertEqual(sc.getScaleDegreeFromPitch('b-2', 
+            direction=DIRECTION_BI), 1)
+
+        
+
+
 
     def testDeriveByDegree(self):
         from music21 import scale
@@ -2363,10 +2383,28 @@ class Test(unittest.TestCase):
         # TODO: this shows a problem with a bidirectional scale: we are 
         # always starting at the tonic and moving up or down; so this is still
         # giving a descended portion, even though an asecnding portion was requested
-        self.assertEqual(str(mm.getPitches('c1', 'c3', direction='ascending')), '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
+        self.assertEqual(str(mm.getPitches('c1', 'c3', direction='ascending')), '[C1, D1, E1, F#1, G#1, A1, B1, C2, D2, E2, F#2, G#2, A2, B2, C3]')
+
+        self.assertEqual(str(mm.getPitches('c1', 'c3', direction='descending')), '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
 
 
-        
+        self.assertEqual(str(mm.getPitches('a5', 'a6', direction='ascending')), '[A5, B5, C6, D6, E6, F#6, G#6, A6]')
+
+        self.assertEqual(str(mm.getPitches('a5', 'a6', direction='descending')), '[A5, B5, C6, D6, E6, F6, G6, A6]')
+
+
+        self.assertEqual(mm.getScaleDegreeFromPitch('a3'), 1)
+        self.assertEqual(mm.getScaleDegreeFromPitch('b3'), 2)
+
+        # ascending, by default, has 7th scale degree as g#
+        self.assertEqual(mm.getScaleDegreeFromPitch('g#3'), 7)
+
+        # in descending, G# is not present
+        self.assertEqual(mm.getScaleDegreeFromPitch('g#3', direction='descending'), None)
+
+        # but, g is
+        self.assertEqual(mm.getScaleDegreeFromPitch('g3', direction='descending'), 7)
+
 
 
     def testPlot(self):
@@ -2388,8 +2426,8 @@ if __name__ == "__main__":
 
 
         #t.testCyclicalScales()
-        #t.testMelodicMinorA()
-        t.testPlot()
+        t.testMelodicMinorA()
+        #t.testPlot()
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
