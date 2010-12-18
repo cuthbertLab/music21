@@ -1039,13 +1039,14 @@ class IntervalNetwork(object):
             pitchObj = copy.deepcopy(pitchOrigin)
 
         # get the node id that we are looking for 
+        # compare to bi-directional form
         nodeId = self.getRelativeNodeId(pitchReference, 
                     nodeName=nodeName, 
                     pitchTarget=pitchOrigin, 
                     direction=direction,
                     alteredNodes=alteredNodes)
 
-        environLocal.printDebug(['nextPitch()', 'got node Id', nodeId, 'direction', direction, 'pitchOrigin', pitchOrigin])
+        #environLocal.printDebug(['nextPitch()', 'got node Id', nodeId, 'direction', direction, 'pitchOrigin', pitchOrigin])
 
         # realize the pitch from the raw node; we may be getting an altered
         # tone, and we need to transpose an unaltered tone
@@ -1059,7 +1060,7 @@ class IntervalNetwork(object):
             alteredNodes={} # need unaltered tone here, thus leaving out
             )
 
-        environLocal.printDebug(['nextPitch()', 'pitch from node step result', p])
+        #environLocal.printDebug(['nextPitch()', 'pitch from node step result', p])
 
         # transfer octave; this assumes octave equivalence
         p.octave = pitchObj.octave
@@ -1927,10 +1928,11 @@ class IntervalNetwork(object):
         G4
         >>> net.getPitchFromNodeStep('c', 1, 6, 'ascending')
         A4
+        >>> net.getPitchFromNodeStep('c', 1, 6, 'descending')
+        A-4
+
         '''
 # problem
-#         >>> net.getPitchFromNodeStep('c', 1, 6, 'descending')
-#         A-4
 
         # this shows that in some cases there will be two nodes that
         # are available
@@ -1985,7 +1987,7 @@ class IntervalNetwork(object):
             direction=direction,
             alteredNodes=alteredNodes)
 
-        environLocal.printDebug(['getPitchFromNodeStep()', 'realizedPitch', realizedPitch, 'realizedNode', realizedNode, 'nodeTargetId', nodeTargetId,])
+        #environLocal.printDebug(['getPitchFromNodeStep()', 'realizedPitch', realizedPitch, 'realizedNode', realizedNode, 'nodeTargetId', nodeTargetId,])
 
         # get the pitch when we have a node id match
         for i, nId in enumerate(realizedNode):

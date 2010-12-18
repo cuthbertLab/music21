@@ -2448,9 +2448,24 @@ class Test(unittest.TestCase):
         # todo: this is ambiguous case
         #self.assertEqual(mm.pitchFromDegree(6, direction='bi').nameWithOctave, 'F5')
 
-        # this is a problem: cannot get a descending scale with 
-        # undefined pitch boundaries
         self.assertEqual(str(mm.getPitches(None, None, direction='descending')), '[A4, B4, C5, D5, E5, F5, G5, A5]')
+        self.assertEqual(str(mm.getPitches(None, None, direction='ascending')), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
+
+
+
+        self.assertEqual(str(mm.next('a3', 'ascending')), 'B3')
+
+        self.assertEqual(str(mm.next('f#5', 'ascending')), 'G#5')
+        self.assertEqual(str(mm.next('G#5', 'ascending')), 'A5')
+
+        self.assertEqual(str(mm.next('f5', 'descending')), 'E5')
+        self.assertEqual(str(mm.next('G5', 'descending')), 'F5')
+        self.assertEqual(str(mm.next('A5', 'descending')), 'G5')
+
+
+        # TODO: stop this from returning None
+        #self.assertEqual(str(mm.next('f#5', 'descending')), 'E5')
+        #self.assertEqual(str(mm.next('f5', 'ascending')), 'G#5')
 
 
     def testPlot(self):
