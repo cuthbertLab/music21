@@ -365,10 +365,7 @@ class AbstractDiatonicScale(AbstractScale):
         self.dominantStep = None # step of dominant
         # all diatonic scales are octave duplicating
         self.octaveDuplicating = True
-
         self._buildNetwork(mode=mode)
-
-
 
     def __eq__(self, other):
         '''
@@ -1483,6 +1480,8 @@ class HypophrygianScale(DiatonicScale):
     '''A hypophrygian scale
 
     >>> sc = HypophrygianScale(pitch.Pitch('e'))
+    >>> sc.abstract.octaveDuplicating
+    True
     >>> sc.pitches
     [B3, C4, D4, E4, F4, G4, A4, B4]
     >>> sc.getTonic()
@@ -2442,11 +2441,16 @@ class Test(unittest.TestCase):
 
         self.assertEqual(mm.pitchFromDegree(5, direction='ascending').nameWithOctave, 'E5')
 
-        #self.assertEqual(mm.pitchFromDegree(6, direction='ascending').nameWithOctave, 'E5')
+        self.assertEqual(mm.pitchFromDegree(6, direction='ascending').nameWithOctave, 'F#5')
+
+        self.assertEqual(mm.pitchFromDegree(6, direction='descending').nameWithOctave, 'F5')
+
+        # todo: this is ambiguous case
+        #self.assertEqual(mm.pitchFromDegree(6, direction='bi').nameWithOctave, 'F5')
 
         # this is a problem: cannot get a descending scale with 
         # undefined pitch boundaries
-        #self.assertEqual(str(mm.getPitches(None, None, direction='descending')), '[A4, B4, C5, D5, E5, F5, G5, A5]')
+        self.assertEqual(str(mm.getPitches(None, None, direction='descending')), '[A4, B4, C5, D5, E5, F5, G5, A5]')
 
 
     def testPlot(self):
@@ -2455,6 +2459,12 @@ class Test(unittest.TestCase):
         amms.plot(doneAction=None)
 
 
+    def testPlagalModes(self):
+
+        hs = HypophrygianScale('c4')
+        self.assertEqual(str(hs.pitches), '[G3, A-3, B-3, C4, D-4, E-4, F4, G4]')
+
+        self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
 
 
 #-------------------------------------------------------------------------------
@@ -2471,6 +2481,7 @@ if __name__ == "__main__":
         #t.testMelodicMinorA()
         t.testMelodicMinorB()
         #t.testPlot()
+        #t.testPlagalModes()
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
