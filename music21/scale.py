@@ -363,10 +363,11 @@ class AbstractDiatonicScale(AbstractScale):
         self.type = 'Abstract Diatonic'
         self.tonicStep = None # step of tonic
         self.dominantStep = None # step of dominant
-        self._buildNetwork(mode=mode)
-
         # all diatonic scales are octave duplicating
         self.octaveDuplicating = True
+
+        self._buildNetwork(mode=mode)
+
 
 
     def __eq__(self, other):
@@ -494,11 +495,11 @@ class AbstractOctatonicScale(AbstractScale):
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
         self.type = 'Abstract Octatonic'
+        # all octatonic scales are octave duplicating
+        self.octaveDuplicating = True
         # here, accept None
         self._buildNetwork(mode=mode)
 
-        # all octatonic scales are octave duplicating
-        self.octaveDuplicating = True
 
 
     def _buildNetwork(self, mode=None):
@@ -533,9 +534,9 @@ class AbstractHarmonicMinorScale(AbstractScale):
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
         self.type = 'Abstract Harmonic Minor'
+        self.octaveDuplicating = True
         self._buildNetwork()
 
-        self.octaveDuplicating = True
 
     def _buildNetwork(self):
         '''
@@ -558,9 +559,9 @@ class AbstractMelodicMinorScale(AbstractScale):
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
         self.type = 'Abstract Melodic Minor'
+        self.octaveDuplicating = True
         self._buildNetwork()
 
-        self.octaveDuplicating = True
 
 
     def _buildNetwork(self):
@@ -628,11 +629,11 @@ class AbstractCyclicalScale(AbstractScale):
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
         self.type = 'Abstract Cyclical'
+        self.octaveDuplicating = False
         self._buildNetwork(mode=mode)
 
         # cannot assume that abstract cyclical scales are octave duplicating
         # until we have the intervals in use
-        self.octaveDuplicating = False
 
 
     def _buildNetwork(self, mode):
@@ -914,7 +915,8 @@ class ConcreteScale(Scale):
 
 
 
-    def getPitches(self, minPitch=None, maxPitch=None, direction=None):
+    def getPitches(self, minPitch=None, maxPitch=None, 
+        direction=DIRECTION_ASCENDING):
         '''Return a list of Pitch objects, using a deepcopy of a cached version if available. 
 
         '''
@@ -944,7 +946,8 @@ class ConcreteScale(Scale):
         doc ='''Get a default pitch list from this scale.
         ''')
 
-    def getChord(self, minPitch=None, maxPitch=None, direction=None):
+    def getChord(self, minPitch=None, maxPitch=None, 
+        direction=DIRECTION_ASCENDING):
         '''Return a realized chord for this scale
         '''
         from music21 import chord
@@ -955,7 +958,7 @@ class ConcreteScale(Scale):
         ''')
 
     def pitchFromDegree(self, degree, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_BI):        
+        direction=DIRECTION_ASCENDING):        
 
         '''Given a scale degree, return the appropriate pitch. 
 
@@ -983,7 +986,7 @@ class ConcreteScale(Scale):
 
 
     def pitchesFromScaleDegrees(self, degreeTargets, minPitch=None, 
-        maxPitch=None, direction=DIRECTION_BI):        
+        maxPitch=None, direction=DIRECTION_ASCENDING):        
 
         '''Given one or more scale degrees, return a list of all matches over the entire range. 
 
@@ -1136,7 +1139,7 @@ class ConcreteScale(Scale):
 
 
     def findMissing(self, other, comparisonAttribute='pitchClass', 
-        minPitch=None, maxPitch=None, direction=DIRECTION_BI,
+        minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING,
         alteredNodes={}):
         '''
         >>> from music21 import *
@@ -1780,7 +1783,7 @@ class RomanNumeral(object):
         
 
     def _memberIndexToPitch(self, memberIndex, minPitch=None,
-         maxPitch=None, direction=None):
+         maxPitch=None, direction=DIRECTION_ASCENDING):
         '''Given a member index, return the scale degree
 
 
@@ -1841,7 +1844,7 @@ class RomanNumeral(object):
             post
 
     def pitchFromDegree(self, degree, minPitch=None,
-         maxPitch=None, direction=None):
+         maxPitch=None, direction=DIRECTION_ASCENDING):
         '''Given a chord degree, such as 1 (for root), 3 (for third chord degree), return the pitch.
 
         >>> from music21 import *
@@ -1862,7 +1865,7 @@ class RomanNumeral(object):
 
 
     def scaleDegreeFromDegree(self, degree, minPitch=None,
-         maxPitch=None, direction=None):
+         maxPitch=None, direction=DIRECTION_ASCENDING):
         '''Given a degree in this Harmony, such as 3, or 5, return the scale degree in the underlying scale
 
         >>> from music21 import *
@@ -1942,7 +1945,8 @@ class RomanNumeral(object):
 
 
 
-    def getChord(self, minPitch=None, maxPitch=None, direction=None):
+    def getChord(self, minPitch=None, maxPitch=None,
+         direction=DIRECTION_ASCENDING):
         '''Return a realized chord for this harmony
         '''
         from music21 import chord
@@ -2318,6 +2322,7 @@ class Test(unittest.TestCase):
     def testCyclicalScales(self):
 
         from music21 import scale
+
         sc = scale.CyclicalScale('c4', ['m2', 'm2']) 
 
         # we get speling based on maxAccidental paramete
@@ -2328,6 +2333,7 @@ class Test(unittest.TestCase):
         # scale
 
         self.assertEqual(sc.abstract.getStepMaxUnique(), 2)
+
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
         self.assertEqual(str(sc.pitchFromDegree(1, 'c2', 'c3')), 'B#1')
 
@@ -2346,7 +2352,7 @@ class Test(unittest.TestCase):
         environLocal.printDebug(['calling get scale degree from pitch'])
         self.assertEqual(sc.getScaleDegreeFromPitch('g4'), 1)
         self.assertEqual(sc.getScaleDegreeFromPitch('b-2', 
-            direction=DIRECTION_BI), 1)
+            direction=DIRECTION_ASCENDING), 1)
 
         
 
@@ -2405,6 +2411,11 @@ class Test(unittest.TestCase):
         # but, g is
         self.assertEqual(mm.getScaleDegreeFromPitch('g3', direction='descending'), 7)
 
+        # the bi directional representation has a version of each instance
+        # merged
+        self.assertEqual(str(mm.getPitches('a4', 'a5', direction='bi')), '[A4, B4, C5, D5, E5, F#5, F5, G#5, G5, A5]')
+
+
 
 
     def testPlot(self):
@@ -2425,8 +2436,8 @@ if __name__ == "__main__":
         t = Test()
 
 
-        #t.testCyclicalScales()
-        t.testMelodicMinorA()
+        t.testCyclicalScales()
+        #t.testMelodicMinorA()
         #t.testPlot()
 
 # store implicit tonic or Not

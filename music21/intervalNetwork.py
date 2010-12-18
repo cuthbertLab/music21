@@ -1332,11 +1332,12 @@ class IntervalNetwork(object):
         else:
             # for now, bi direction returns false for directed;
             # todo: change
-            if self.octaveDuplicating and direction in [
-                DIRECTION_ASCENDING, DIRECTION_DESCENDING]:
+            #if self.octaveDuplicating and direction in [
+            #    DIRECTION_ASCENDING, DIRECTION_DESCENDING]:
+            if self.octaveDuplicating:
                 directedRealization = True
 
-        #environLocal.printDebug(['directedRealization', directedRealization, 'direction', direction, ])
+        #environLocal.printDebug(['directedRealization', directedRealization, 'direction', direction, 'octaveDuplicating', self.octaveDuplicating,  self._nodes])
 
         # realize by calling ascending/descengind
         if directedRealization:
@@ -1347,13 +1348,6 @@ class IntervalNetwork(object):
 
                 # shift octave down in place
                 pitchReference.transposeBelowTarget(minPitch)
-#                 while True:
-#                     # ref 20, min 10, lower ref
-#                     # ref 5, min 10, do not lower
-#                     if pitchReference.ps - minPitch.ps <= 0:
-#                         break
-#                     # lower one octave
-#                     pitchReference.octave -= 1
 
                 mergedPitches, mergedNodes = self._realizeAscending(
                 pitchReference=pitchReference, nodeId=nodeId, 
@@ -1366,23 +1360,57 @@ class IntervalNetwork(object):
                 # shift octave down in place
                 pitchReference.transposeAboveTarget(maxPitch)
 
-#                 while True:
-#                     # ref 20, max 10, do not raise ref
-#                     # ref 5, max 10, raise ref to above max
-#                     if pitchReference.ps - maxPitch.ps >= 0:
-#                         break
-#                     # raise one octave
-#                     pitchReference.octave += 1
-
                 mergedPitches, mergedNodes = self._realizeDescending(
                 pitchReference=pitchReference, nodeId=nodeId, 
                 minPitch=minPitch, maxPitch=maxPitch, 
                 alteredNodes=alteredNodes, includeFirst=True)
 
             elif direction == DIRECTION_BI:
-            # TODO: this should probably be a union of both ascending 
-            # and descending
-                pass
+            # this is a union of both ascending and descending
+                pitchReferenceA = copy.deepcopy(pitchReference)
+                pitchReferenceB = copy.deepcopy(pitchReference)
+
+                pitchReferenceA.transposeBelowTarget(minPitch)
+
+                post, postNodeId = self._realizeAscending(
+                pitchReference=pitchReferenceA, nodeId=nodeId, 
+                minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)
+
+                pitchReferenceB.transposeAboveTarget(maxPitch)
+
+                pre, preNodeId = self._realizeDescending(
+                pitchReference=pitchReferenceB, nodeId=nodeId, 
+                minPitch=minPitch, maxPitch=maxPitch, 
+                alteredNodes=alteredNodes, includeFirst=True)
+
+                # need to create union of both lists, but keep order, as well
+                # as keep the node id list in order
+
+                merged = []
+                foundPitches = [] # just for membership comparison
+                i = 0
+                j = 0
+                while True:
+                    if i < len(post) and post[i] not in foundPitches:
+                        foundPitches.append(post[i])
+                        merged.append((post[i], postNodeId[i]))
+                    i += 1
+                    if j < len(pre) and pre[j] not in foundPitches:
+                        foundPitches.append(pre[j])
+                        merged.append((pre[j], preNodeId[j]))
+                    j += 1
+                    # after increment, will be eq to len of list
+                    # when both complete, break
+                    if i >= len(post) and j >= len(pre):
+                        break
+                # transfer to two lists
+                mergedPitches = []
+                mergedNodes = []
+                for x, y in merged:
+                    mergedPitches.append(x)
+                    mergedNodes.append(y)
+            else:
+                raise IntervalNetworkException('cannot match direction specification: %s' % direction)
 
         else: # non directed realization
             # TODO: if not octave repeating, and ascending or descending, 

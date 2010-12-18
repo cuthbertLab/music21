@@ -1792,8 +1792,6 @@ class Pitch(music21.Music21Object):
 
     #---------------------------------------------------------------------------
 
-
-
     def inheritDisplay(self, other):
         '''Inherit display properties from another Pitch, including those found on the Accidental object.
 
