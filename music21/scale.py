@@ -570,57 +570,58 @@ class AbstractMelodicMinorScale(AbstractScale):
         self.tonicStep = 1
         self.dominantStep = 5
 
-        nodes = ({'id':'terminusLow', 'step':1}, # a
-                 {'id':0, 'step':2}, # b
-                 {'id':1, 'step':3}, # c
-                 {'id':2, 'step':4}, # d
-                 {'id':3, 'step':5}, # e
-
-                 {'id':4, 'step':6}, # f# ascending
-                 {'id':5, 'step':6}, # f
-                 {'id':6, 'step':7}, # g# ascending
-                 {'id':7, 'step':7}, # g
-                 {'id':'terminusHigh', 'step':8}, # a
-                )
-
-        edges = ({'interval':'M2', 'connections':(
-                        [TERMINUS_LOW, 0, DIRECTION_BI], # a to b
-                    )},
-                {'interval':'m2', 'connections':(
-                        [0, 1, DIRECTION_BI], # b to c
-                    )},
-                {'interval':'M2', 'connections':(
-                        [1, 2, DIRECTION_BI], # c to d
-                    )},
-                {'interval':'M2', 'connections':(
-                        [2, 3, DIRECTION_BI], # d to e
-                    )},
-
-                {'interval':'M2', 'connections':(
-                        [3, 4, DIRECTION_ASCENDING], # e to f#
-                    )},
-                {'interval':'M2', 'connections':(
-                        [4, 6, DIRECTION_ASCENDING], # f# to g#
-                    )},
-                {'interval':'m2', 'connections':(
-                        [6, TERMINUS_HIGH, DIRECTION_ASCENDING], # g# to a
-                    )},
-
-                {'interval':'M2', 'connections':(
-                        [TERMINUS_HIGH, 7, DIRECTION_DESCENDING], # a to g
-                    )},
-                {'interval':'M2', 'connections':(
-                        [7, 5, DIRECTION_DESCENDING], # g to f
-                    )},
-                {'interval':'m2', 'connections':(
-                        [5, 3, DIRECTION_DESCENDING], # f to e
-                    )},
-                )
+#         nodes = ({'id':'terminusLow', 'step':1}, # a
+#                  {'id':0, 'step':2}, # b
+#                  {'id':1, 'step':3}, # c
+#                  {'id':2, 'step':4}, # d
+#                  {'id':3, 'step':5}, # e
+# 
+#                  {'id':4, 'step':6}, # f# ascending
+#                  {'id':5, 'step':6}, # f
+#                  {'id':6, 'step':7}, # g# ascending
+#                  {'id':7, 'step':7}, # g
+#                  {'id':'terminusHigh', 'step':8}, # a
+#                 )
+# 
+#         edges = ({'interval':'M2', 'connections':(
+#                         [TERMINUS_LOW, 0, DIRECTION_BI], # a to b
+#                     )},
+#                 {'interval':'m2', 'connections':(
+#                         [0, 1, DIRECTION_BI], # b to c
+#                     )},
+#                 {'interval':'M2', 'connections':(
+#                         [1, 2, DIRECTION_BI], # c to d
+#                     )},
+#                 {'interval':'M2', 'connections':(
+#                         [2, 3, DIRECTION_BI], # d to e
+#                     )},
+# 
+#                 {'interval':'M2', 'connections':(
+#                         [3, 4, DIRECTION_ASCENDING], # e to f#
+#                     )},
+#                 {'interval':'M2', 'connections':(
+#                         [4, 6, DIRECTION_ASCENDING], # f# to g#
+#                     )},
+#                 {'interval':'m2', 'connections':(
+#                         [6, TERMINUS_HIGH, DIRECTION_ASCENDING], # g# to a
+#                     )},
+# 
+#                 {'interval':'M2', 'connections':(
+#                         [TERMINUS_HIGH, 7, DIRECTION_DESCENDING], # a to g
+#                     )},
+#                 {'interval':'M2', 'connections':(
+#                         [7, 5, DIRECTION_DESCENDING], # g to f
+#                     )},
+#                 {'interval':'m2', 'connections':(
+#                         [5, 3, DIRECTION_DESCENDING], # f to e
+#                     )},
+#                 )
 
         self._net = intervalNetwork.IntervalNetwork(
                         octaveDuplicating=self.octaveDuplicating)
-        self._net.fillArbitrary(nodes, edges)
-
+        # using representation stored in interval network
+        #self._net.fillArbitrary(nodes, edges)
+        self._net.fillMelodicMinor()
 
 
 class AbstractCyclicalScale(AbstractScale):
@@ -959,7 +960,6 @@ class ConcreteScale(Scale):
 
     def pitchFromDegree(self, degree, minPitch=None, maxPitch=None, 
         direction=DIRECTION_ASCENDING):        
-
         '''Given a scale degree, return the appropriate pitch. 
 
         >>> from music21 import *
@@ -2415,7 +2415,38 @@ class Test(unittest.TestCase):
         # merged
         self.assertEqual(str(mm.getPitches('a4', 'a5', direction='bi')), '[A4, B4, C5, D5, E5, F#5, F5, G#5, G5, A5]')
 
+        # in a bi-directional representation, both g and g# are will return
+        # scale degree 7
+        self.assertEqual(mm.getScaleDegreeFromPitch('g8', direction='bi'), 7)
+        self.assertEqual(mm.getScaleDegreeFromPitch('g#1', direction='bi'), 7)
+        self.assertEqual(mm.getScaleDegreeFromPitch('f8', direction='bi'), 6)
+        self.assertEqual(mm.getScaleDegreeFromPitch('f#1', direction='bi'), 6)
 
+
+        self.assertEqual(mm.next('e5', 'ascending').nameWithOctave, 'F#5')
+        #self.assertEqual(mm.next('f#5', 'ascending').nameWithOctave, 'F#5')
+
+        self.assertEqual(mm.next('e5', 'descending').nameWithOctave, 'D5')
+
+        self.assertEqual(mm.next('g#2', 'ascending').nameWithOctave, 'A2')
+        #self.assertEqual(mm.next('g2', 'descending').nameWithOctave, 'f2')
+
+
+    def testMelodicMinorB(self):
+        '''Need to test descending form of getting pitches with no defined min and max
+        '''
+        mm = MelodicMinorScale('a')
+#         self.assertEqual(str(mm.getPitches(None, None, direction='ascending')), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
+
+        self.assertEqual(mm.pitchFromDegree(2, direction='ascending').nameWithOctave, 'B4')
+
+        self.assertEqual(mm.pitchFromDegree(5, direction='ascending').nameWithOctave, 'E5')
+
+        #self.assertEqual(mm.pitchFromDegree(6, direction='ascending').nameWithOctave, 'E5')
+
+        # this is a problem: cannot get a descending scale with 
+        # undefined pitch boundaries
+        #self.assertEqual(str(mm.getPitches(None, None, direction='descending')), '[A4, B4, C5, D5, E5, F5, G5, A5]')
 
 
     def testPlot(self):
@@ -2436,8 +2467,9 @@ if __name__ == "__main__":
         t = Test()
 
 
-        t.testCyclicalScales()
+        #t.testCyclicalScales()
         #t.testMelodicMinorA()
+        t.testMelodicMinorB()
         #t.testPlot()
 
 # store implicit tonic or Not

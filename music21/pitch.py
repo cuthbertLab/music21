@@ -1740,9 +1740,11 @@ class Pitch(music21.Music21Object):
     #---------------------------------------------------------------------------
     # utilities for pitch object manipulation
 
-    def transposeBelowTarget(self, target):
+    def transposeBelowTarget(self, target, minimize=False):
         '''Given a source Pitch, shift it down octaves until it is below the target. Note: this manipulates src inPlace.
     
+        If `minimize` is True, a pitch below the the target will move up to the nearest octave. 
+
         >>> from music21 import *
         >>> pitch.Pitch('g5').transposeBelowTarget(pitch.Pitch('c#4'))
         G3
@@ -1752,6 +1754,13 @@ class Pitch(music21.Music21Object):
         >>> # accept the same pitch
         >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
         G#1
+
+        >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
+        G#2
+        >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+        G#7
+        >>> pitch.Pitch('f#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+        F#8
         '''
         # TODO: add inPlace as an option, default is True
         src = self
@@ -1762,12 +1771,24 @@ class Pitch(music21.Music21Object):
                 break
             # lower one octave
             src.octave -= 1
+
+        # case where self is below target and minimize is True
+        if minimize:
+            while True:
+                if target.ps - src.ps < 12:
+                    break
+                else:
+                    src.octave += 1
+
+
         return src
     
     
-    def transposeAboveTarget(self, target):
+    def transposeAboveTarget(self, target, minimize=False):
         '''Given a source Pitch, shift it up octaves until it is above the target. Note: this manipulates src inPlace.
-    
+
+        If `minimize` is True, a pitch above the the target will move down to the nearest octave. 
+
         >>> from music21 import *
         >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
         D5
@@ -1777,8 +1798,18 @@ class Pitch(music21.Music21Object):
         >>> # accept the same pitch
         >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('d8'))
         D8
+
+        >>> # if minimize is True, we go the closest position
+        >>> pitch.Pitch('d#8').transposeAboveTarget(pitch.Pitch('d2'), minimize=True)
+        D#2
+        >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
+        D3
+        >>> pitch.Pitch('d0').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
+        D3
+
         '''
         src = self
+        # case where self is below target
         while True:
             # ref 20, max 10, do not raise ref
             # ref 5, max 10, raise ref to above max
@@ -1786,6 +1817,16 @@ class Pitch(music21.Music21Object):
                 break
             # raise one octave
             src.octave += 1
+
+        # case where self is above target and minimize is True
+        if minimize:
+            while True:
+                if src.ps - target.ps < 12:
+                    break
+                else:
+                    src.octave -= 1 
+
+
         return src
     
     

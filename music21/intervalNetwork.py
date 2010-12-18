@@ -87,8 +87,6 @@ class Edge(object):
         # if there are two, it is a bidirectional, w/ first ascending
         self._connections = []
 
-
-
     def __eq__(self, other):
         ''' 
         >>> from music21 import *
@@ -230,7 +228,7 @@ class Edge(object):
 
         '''
         if direction == None:
-            direction = self._direction
+            direction = self._direction # assign native direction
 
         # do not need to supply direction, because direction is defined
         # in this Edge.
@@ -573,6 +571,68 @@ class IntervalNetwork(object):
 
 
 
+    def fillMelodicMinor(self):
+        '''A convenience routine for testing a complex, bi-directional scale.
+
+        >>> from music21 import *
+        >>> net = intervalNetwork.IntervalNetwork()
+        >>> net.fillMelodicMinor()
+        >>> net.realizePitch('c4')
+        [C4, D4, E-4, F4, G4, A4, B4, C5]
+
+        '''
+        nodes = ({'id':'terminusLow', 'step':1}, # a
+                 {'id':0, 'step':2}, # b
+                 {'id':1, 'step':3}, # c
+                 {'id':2, 'step':4}, # d
+                 {'id':3, 'step':5}, # e
+
+                 {'id':4, 'step':6}, # f# ascending
+                 {'id':5, 'step':6}, # f
+                 {'id':6, 'step':7}, # g# ascending
+                 {'id':7, 'step':7}, # g
+                 {'id':'terminusHigh', 'step':8}, # a
+                )
+
+        edges = ({'interval':'M2', 'connections':(
+                        [TERMINUS_LOW, 0, DIRECTION_BI], # a to b
+                    )},
+                {'interval':'m2', 'connections':(
+                        [0, 1, DIRECTION_BI], # b to c
+                    )},
+                {'interval':'M2', 'connections':(
+                        [1, 2, DIRECTION_BI], # c to d
+                    )},
+                {'interval':'M2', 'connections':(
+                        [2, 3, DIRECTION_BI], # d to e
+                    )},
+
+                {'interval':'M2', 'connections':(
+                        [3, 4, DIRECTION_ASCENDING], # e to f#
+                    )},
+                {'interval':'M2', 'connections':(
+                        [4, 6, DIRECTION_ASCENDING], # f# to g#
+                    )},
+                {'interval':'m2', 'connections':(
+                        [6, TERMINUS_HIGH, DIRECTION_ASCENDING], # g# to a
+                    )},
+
+                {'interval':'M2', 'connections':(
+                        [TERMINUS_HIGH, 7, DIRECTION_DESCENDING], # a to g
+                    )},
+                {'interval':'M2', 'connections':(
+                        [7, 5, DIRECTION_DESCENDING], # g to f
+                    )},
+                {'interval':'m2', 'connections':(
+                        [5, 3, DIRECTION_DESCENDING], # f to e
+                    )},
+                )
+        
+        self.fillArbitrary(nodes, edges)
+
+
+
+
     #---------------------------------------------------------------------------
     def _getStepMin(self):
         '''
@@ -718,6 +778,50 @@ class IntervalNetwork(object):
         return nodeStep[nId] # gets step integer
         
 
+    def _nodeIdToEdgeDirections(self, nId):
+        '''Given a Node id, find all edges associated with this node and report on their directions
+
+        >>> from music21 import *
+        >>> net = intervalNetwork.IntervalNetwork()
+        >>> net.fillMelodicMinor()
+        >>> net._nodeIdToEdgeDirections('terminusLow')
+        ['bi']
+        >>> net._nodeIdToEdgeDirections(0)
+        ['bi', 'bi']
+        >>> net._nodeIdToEdgeDirections(6)
+        ['ascending', 'ascending']
+        >>> net._nodeIdToEdgeDirections(5)
+        ['descending', 'descending']
+        >>> # this node has bi-directional (from below), 
+        >>> # ascending (to above), and descending (from above)
+        >>> # edge connections connections
+        >>> net._nodeIdToEdgeDirections(3) 
+        ['bi', 'ascending', 'descending']
+
+        '''
+        collection = []
+
+        if isinstance(nId, Node):
+            nObj = nId      
+            nId = nObj.id
+        else:
+            nObj = self._nodes[nId]
+
+        for eId in self._edges.keys():
+            eObj = self._edges[eId]
+            #environLocal.printDebug(['_nodeIdToEdgeDirections()', eObj])
+            for x, y in eObj.connections: # pairs of node ids
+                if x == nId: # this node is a source
+                    collection.append(eObj.direction)
+                    break # only get one direction for each edge
+                elif y == nId: # this node is a destination
+                    collection.append(eObj.direction)
+                    break
+        if len(collection) == 0:
+            raise IntervalNetworkException('failed to match an edges', nObj)
+        return collection
+
+
     def _stepModulus(self, step):
         '''Return the modulus of the step.
 
@@ -776,7 +880,6 @@ class IntervalNetwork(object):
         [<music21.intervalNetwork.Node id=4>]
         >>> net._nodeNameToNodes(8)
         [<music21.intervalNetwork.Node id='terminusLow'>, <music21.intervalNetwork.Node id='terminusHigh'>]
-
         '''
         if common.isNum(id):
             post = []
@@ -790,7 +893,6 @@ class IntervalNetwork(object):
                 for nId, nStep in nodeStep.items():
                     if self._stepModulus(id) == nStep:
                         post.append(self._nodes[nId])
-
             return post
         elif common.isStr(id):
             if id.lower() in ['terminuslow', 'low']:
@@ -804,13 +906,13 @@ class IntervalNetwork(object):
             for nId in self._nodes.keys():
                 n = self._nodes[nId]
                 if n is id: # could be a == comparison?
-                    return [n]
+                    return [n] # return only one
         else: # match coords
             raise IntervalNetworkException('cannot filter by: %s', id)
 
 
     def _getNext(self, nodeStart, direction):
-        '''Given a Node, get two lists, one of next Edges, and one of next Nodes, searching all Edges to find the best matcsh. 
+        '''Given a Node, get two lists, one of next Edges, and one of next Nodes, searching all Edges to find all matches. 
 
         There may be more than one possibility. If so, the caller must look at the Edges and determine which to use
 
@@ -844,10 +946,11 @@ class IntervalNetwork(object):
                     postEdge.append(e)
                     postNodeId.append(dst)
 
+        #this should actually never happen    
         if len(postEdge) == 0:
             environLocal.printDebug(['nodeStart', nodeStart, 'direction', direction, 'postEdge', postEdge])
-            return None
-            #raise IntervalNetworkException('could not find any edges')
+            #return None
+            raise IntervalNetworkException('could not find any edges')
         
         # if we have multiple edges, we may need to select based on weight
         postNode = [self._nodes[nId] for nId in postNodeId]
@@ -913,7 +1016,6 @@ class IntervalNetwork(object):
 
         The `step` attribute can be configured to permit different sized steps.
 
-
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
@@ -934,9 +1036,14 @@ class IntervalNetwork(object):
         else:
             pitchObj = copy.deepcopy(pitchOrigin)
 
-        # get the node that we are looking for 
-        nodeId = self.getRelativeNodeId(pitchReference, nodeName, 
-                    pitchTarget=pitchOrigin, alteredNodes=alteredNodes)
+        # get the node id that we are looking for 
+        nodeId = self.getRelativeNodeId(pitchReference, 
+                    nodeName=nodeName, 
+                    pitchTarget=pitchOrigin, 
+                    direction=direction,
+                    alteredNodes=alteredNodes)
+
+        environLocal.printDebug(['nextPitch()', 'got node Id', nodeId, 'direction', direction, 'pitchOrigin', pitchOrigin])
 
         # realize the pitch from the raw node; we may be getting an altered
         # tone, and we need to transpose an unaltered tone
@@ -946,9 +1053,13 @@ class IntervalNetwork(object):
             nodeStepTarget=self._nodes[nodeId].step, 
             direction=direction, 
             minPitch=None, 
-            maxPitch=None, alteredNodes={}
+            maxPitch=None, 
+            alteredNodes={} # need unaltered tone here, thus leaving out
             )
-        # transfer octave
+
+        environLocal.printDebug(['nextPitch()', 'pitch from node step result', p])
+
+        # transfer octave; this assumes octave equivalence
         p.octave = pitchObj.octave
         pitchObj = p
 
@@ -1070,12 +1181,14 @@ class IntervalNetwork(object):
         # if this network is octaveDuplicating, than we can shift 
         # reference up octaves to just below minPitch
         if self.octaveDuplicating and minPitch is not None:
-            while True:
-                if minPitch.ps - pitchReference.ps < 12:
-                    break
-                else:
-                    #environLocal.printDebug(['adding extra octave in realize ascending'])
-                    pitchReference.octave += 1 # add an octave
+            pitchReference.transposeBelowTarget(minPitch, minimize=True)
+
+#             while True:
+#                 if minPitch.ps - pitchReference.ps < 12:
+#                     break
+#                 else:
+#                     #environLocal.printDebug(['adding extra octave in realize ascending'])
+#                     pitchReference.octave += 1 # add an octave
 
 
         # first, go upward from this pitch to the high terminus
@@ -1161,7 +1274,6 @@ class IntervalNetwork(object):
         >>> net._realizeDescending('a6', 'high', includeFirst=True)
         ([A5, B5, C#6, D6, E6, F#6, G#6, A6], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
 
-
         >>> net = IntervalNetwork(octaveDuplicating=True)
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net._realizeDescending('c2', 1, 'c0', 'c1')
@@ -1171,8 +1283,9 @@ class IntervalNetwork(object):
         # get first node if no node is provided
         if isinstance(nodeId, Node):
             nodeObj = nodeId
-        elif nodeId is None: # assume first
-            #nodeObj = self._getTerminusHighNodes()[0]
+        elif nodeId is None: # assume low terminus by default
+            # this is useful for appending a descending segment with an 
+            # ascending segment
             nodeObj = self._getTerminusLowNodes()[0]
         else:
             nodeObj = self._nodeNameToNodes(nodeId)[0]
@@ -1205,17 +1318,15 @@ class IntervalNetwork(object):
             if ck in self._descendingCache.keys():
                 return self._descendingCache[ck]
 
-
         # if this network is octaveDuplicating, than we can shift 
         # reference down octaves to just above minPitch
         if self.octaveDuplicating and maxPitch is not None:
-            while True:
-                if pitchReference.ps - maxPitch.ps < 12:
-                    break
-                else:
-                    environLocal.printDebug(['removing extra octave in realize descending'])
-                    pitchReference.octave -= 1 # add an octave
-
+            pitchReference.transposeAboveTarget(maxPitch, minimize=True)
+#             while True:
+#                 if pitchReference.ps - maxPitch.ps < 12:
+#                     break
+#                 else:
+#                     pitchReference.octave -= 1 # add an octave
 
         n = nodeObj
         p = pitchReference
@@ -1223,10 +1334,8 @@ class IntervalNetwork(object):
         pre = []
         preNodeId = [] # store node ids as well
 
-
         isFirst = True
         while True:
-
             appendPitch = False
             if (minPitch is not None and p.ps >= minPitch.ps and 
                 maxPitch is not None and p.ps <= maxPitch.ps):
@@ -1249,13 +1358,11 @@ class IntervalNetwork(object):
 
             if minPitch is not None and p.ps <= minPitch.ps:
                 break
-
             if n.id == TERMINUS_LOW:
                 if minPitch is None: # if not defined, stop at terminus high
                     break
                 # get high and continue
                 n = self._getTerminusHighNodes()[0]
-
             if n.id == TERMINUS_LOW:
                 if minPitch is None: # if not defined, stop at terminus high
                     break
@@ -1273,11 +1380,8 @@ class IntervalNetwork(object):
             pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
                        n=n, p=p, direction=DIRECTION_DESCENDING)
 
-
-
         pre.reverse()
         preNodeId.reverse()
-
         # store in cache
         if self.deterministic:
             self._descendingCache[ck] = pre, preNodeId
@@ -1326,16 +1430,21 @@ class IntervalNetwork(object):
             maxPitch = pitch.Pitch(maxPitch)
 
         # determine what kind of realization procedure
+#         directedRealization = False
+#         if minPitch is None and maxPitch is None:
+#             directedRealization = False
+#         else:
+#             # for now, bi direction returns false for directed;
+#             # todo: change
+#             #if self.octaveDuplicating and direction in [
+#             #    DIRECTION_ASCENDING, DIRECTION_DESCENDING]:
+#             if self.octaveDuplicating:
+#                 directedRealization = True
+
         directedRealization = False
-        if minPitch is None and maxPitch is None:
-            directedRealization = False
-        else:
-            # for now, bi direction returns false for directed;
-            # todo: change
-            #if self.octaveDuplicating and direction in [
-            #    DIRECTION_ASCENDING, DIRECTION_DESCENDING]:
-            if self.octaveDuplicating:
-                directedRealization = True
+        if self.octaveDuplicating and minPitch is not None and maxPitch is not None:
+            directedRealization = True
+
 
         #environLocal.printDebug(['directedRealization', directedRealization, 'direction', direction, 'octaveDuplicating', self.octaveDuplicating,  self._nodes])
 
@@ -1346,8 +1455,9 @@ class IntervalNetwork(object):
                 #environLocal.printDebug(['employing ascending scale'])
                 # move pitch reference to below minimum
 
-                # shift octave down in place
-                pitchReference.transposeBelowTarget(minPitch)
+                # shift octave in place
+                if self.octaveDuplicating and minPitch is not None:
+                    pitchReference.transposeBelowTarget(minPitch)
 
                 mergedPitches, mergedNodes = self._realizeAscending(
                 pitchReference=pitchReference, nodeId=nodeId, 
@@ -1357,8 +1467,12 @@ class IntervalNetwork(object):
                 #environLocal.printDebug(['employing descending scale'])
                 # move pitch reference to above minimum
 
+                # shift octave in place
                 # shift octave down in place
-                pitchReference.transposeAboveTarget(maxPitch)
+                if self.octaveDuplicating and maxPitch is not None:
+                    pitchReference.transposeAboveTarget(maxPitch)
+
+                #pitchReference.transposeAboveTarget(maxPitch)
 
                 mergedPitches, mergedNodes = self._realizeDescending(
                 pitchReference=pitchReference, nodeId=nodeId, 
@@ -1370,13 +1484,20 @@ class IntervalNetwork(object):
                 pitchReferenceA = copy.deepcopy(pitchReference)
                 pitchReferenceB = copy.deepcopy(pitchReference)
 
-                pitchReferenceA.transposeBelowTarget(minPitch)
+                if self.octaveDuplicating and minPitch is not None:
+                    pitchReferenceA.transposeBelowTarget(minPitch)
+
+                #pitchReferenceA.transposeBelowTarget(minPitch)
 
                 post, postNodeId = self._realizeAscending(
                 pitchReference=pitchReferenceA, nodeId=nodeId, 
                 minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)
 
-                pitchReferenceB.transposeAboveTarget(maxPitch)
+
+                if self.octaveDuplicating and maxPitch is not None:
+                    pitchReferenceB.transposeAboveTarget(maxPitch)
+
+                #pitchReferenceB.transposeAboveTarget(maxPitch)
 
                 pre, preNodeId = self._realizeDescending(
                 pitchReference=pitchReferenceB, nodeId=nodeId, 
@@ -1461,8 +1582,26 @@ class IntervalNetwork(object):
         >>> net.realizePitch(pitch.Pitch('a#2'), 7, 'c6', 'c7') 
         [C#6, D#6, E6, F#6, G#6, A#6, B6]
         '''
-        return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredNodes=alteredNodes)[0]
+        return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredNodes=alteredNodes)[0] # just return first component
 
+
+    def realizeTermini(self, pitchReference, nodeId=None, alteredNodes={}):
+        '''Realize the pithches of the 'natural' terminus of a network. This (presently) must be done by ascending, and assumes only one valid terminus for both extremes. 
+
+        This suggests that in practice termini should not be affected by directionality. 
+
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.realizeTermini(pitch.Pitch('G3'))
+        (G3, G4)
+        >>> net.realizeTermini(pitch.Pitch('a6'))
+        (A6, A7)
+        '''
+        pList = self.realizePitch(pitchReference=pitchReference, nodeId=nodeId, 
+                alteredNodes=alteredNodes)
+        return pList[0], pList[-1]
 
 
     def realizePitchByStep(self, pitchReference, nodeId=None, 
@@ -1774,17 +1913,61 @@ class IntervalNetwork(object):
         >>> net.getPitchFromNodeStep('e4', 1, 3, minPitch='c2', maxPitch='c10') 
         G#2
 
+        >>> net.fillMelodicMinor()
+        >>> net.getPitchFromNodeStep('c', 1, 5)
+        G4
+        >>> net.getPitchFromNodeStep('c', 1, 6, 'ascending')
+        A4
         '''
+# problem
+#         >>> net.getPitchFromNodeStep('c', 1, 6, 'descending')
+#         A-4
+
+        # this shows that in some cases there will be two nodes that
+        # are available
+
+        #environLocal.printDebug(['getPitchFromNodeStep()', '_nodeNameToNodes()', self._nodeNameToNodes(nodeStepTarget)])
+
         # this is the reference node
         nodeId = self._nodeNameToNodes(nodeName)[0] # get the first
-        #environLocal.printDebug(['getPitchFromNodeStep()', 'node reference', nodeId, 'node step', nodeId.step, 'pitchReference', pitchReference, 'alteredNodes', alteredNodes])
+        environLocal.printDebug(['getPitchFromNodeStep()', 'node reference', nodeId, 'node step', nodeId.step, 'pitchReference', pitchReference, 'alteredNodes', alteredNodes])
 
-        nodeTargetId = self._nodeNameToNodes(nodeStepTarget, 
-                        permitStepModuli=True)[0] # get the first
+        # here, we give a node step, and return 1 or more nodes; 
+        # need to select the node that is appropriate to the directed
+        # realization
+        nodeTargetId = None
+        nodeTargetIdList = self._nodeNameToNodes(nodeStepTarget, 
+                        permitStepModuli=True,
+                        equateTerminals=True) # get the first
+        if len(nodeTargetIdList) == 1:
+            nodeTargetId = nodeTargetIdList[0] # easy case
+        # case where we eauate terminals and get both min and max
+        elif [n.id for n in nodeTargetIdList] == [TERMINUS_LOW, TERMINUS_HIGH]:
+            # get first, terminus low
+            nodeTargetId = nodeTargetIdList[0] # easy case
+        else: # have more than one node that is defined for a given step
+            for nId in nodeTargetIdList:
+                dirList = self._nodeIdToEdgeDirections(nId)
 
-        #environLocal.printDebug(['getPitchFromNodeStep()', 'nodeTargetId', nodeTargetId])
+                environLocal.printDebug(['getPitchFromNodeStep()', 'comparing dirList', dirList])
 
+                # for now, simply find the nId that has the requested
+                # direction. a more sophisticated matching may be needed
+                if direction in dirList:
+                    nodeTargetId = nId
+                    break                
+
+        if nodeTargetId is None:
+            # temporaryr
+            environLocal.printDebug(['getPitchFromNodeStep()', 'cannot select node based on direction', nodeTargetIdList])
+            nodeTargetId = nodeTargetIdList[0] # easy case
+
+        environLocal.printDebug(['getPitchFromNodeStep()', 'nodeTargetId', nodeTargetId])
+
+        # get a realization to find the node
         # pass direction as well when getting realization
+        # problem here is that if min and max are None, descending
+        # is not being realized
         realizedPitch, realizedNode = self.realize(
             pitchReference=pitchReference, 
             nodeId=nodeId, 
@@ -1793,8 +1976,7 @@ class IntervalNetwork(object):
             direction=direction,
             alteredNodes=alteredNodes)
 
-        #environLocal.printDebug(['getPitchFromNodeStep()', 'realizedPitch', realizedPitch])
-
+        environLocal.printDebug(['getPitchFromNodeStep()', 'realizedPitch', realizedPitch])
 
         # get the pitch when we have a node id match
         for i, nId in enumerate(realizedNode):
@@ -2337,6 +2519,30 @@ class Test(unittest.TestCase):
         self.assertEqual(str(net.realize('g4')), "([G4, A4, B4, C5, D5, E5, F#5, G5], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
         #self.assertEqual(str(net.realizePitch('g4')), '[G4, A4, B4, C5, D5, E5, F#5, G5]')
 
+
+    def testGetPitchFromNodeStep(self):
+
+        net = IntervalNetwork()
+        net.fillMelodicMinor()
+#         self.assertEqual(str(net.getPitchFromNodeStep('c4', 1, 1)), 'C4')
+# 
+# 
+#         self.assertEqual(str(net.getPitchFromNodeStep('c4', 1, 5)), 'G4')
+# 
+#         # ascending is default
+#         self.assertEqual(str(net.getPitchFromNodeStep('c4', 1, 6)), 'A4')
+# 
+
+        environLocal.printDebug(['ascending step 6'])
+
+        self.assertEqual(str(net.getPitchFromNodeStep('c4', 1, 6, direction='ascending')), 'A4')
+            
+        environLocal.printDebug(['descending step 6'])
+
+        # TODO: problem
+        #self.assertEqual(str(net.getPitchFromNodeStep('c4', 1, 6, direction='descending')), 'A-4')
+
+
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
@@ -2352,7 +2558,10 @@ if __name__ == "__main__":
         #t.testDirectedA()
         #t.testScaleArbitrary()
         #t.testRealizeDescending()
-        t.testBasicB()
+        #t.testBasicB()
+
+
+        t.testGetPitchFromNodeStep()
 
 
 # melodic/harmonic minor
