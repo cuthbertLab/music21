@@ -547,6 +547,7 @@ class AbstractHarmonicMinorScale(AbstractScale):
                         octaveDuplicating=self.octaveDuplicating)
 
         # raise the seventh in all directions
+        # 7 here is scale step/degree, not node id
         self._alteredNodes[7] = {'direction': intervalNetwork.DIRECTION_BI, 
                                'interval': interval.Interval('a1')}
 
@@ -1225,7 +1226,7 @@ class ConcreteScale(Scale):
         <music21.scale.MajorScale D- major>
 
         '''
-
+        # TODO: this does not work for directional scales yet
         # weight target membership
         p = self._abstract.getNewTonicPitch(pitchReference=pitch, 
             nodeName=degree)
@@ -2435,6 +2436,7 @@ class Test(unittest.TestCase):
         #self.assertEqual(mm.next('g2', 'descending').nameWithOctave, 'f2')
 
 
+
     def testMelodicMinorB(self):
         '''Need to test descending form of getting pitches with no defined min and max
         '''
@@ -2475,6 +2477,32 @@ class Test(unittest.TestCase):
         self.assertEqual(str(mm.next('f5', 'ascending')), 'G#5')
         self.assertEqual(str(mm.next('f5', 'ascending', 
             getNeighbor='descending')), 'F#5')
+
+
+
+        # composing with a scale
+        from music21 import stream, note
+        s = stream.Stream()
+        p = 'f#3'
+        #sc = PhrygianScale('e')
+        sc = MelodicMinorScale('g4')
+        for direction in range(8):
+            if direction % 2 == 0:
+                d = 'ascending'
+                qls = [1, .5, .5, 2, .25, .25, .25, .25]
+            else:
+                d = 'descending'                
+                qls = [1, .5, 1, .5, .5]
+            for y in qls:
+                p = sc.next(p, direction=d, stepSize=1)
+                n = note.Note(p)
+                n.quarterLength = y
+                s.append(n)
+        s.makeAccidentals()
+
+        self.assertEqual(str(s.pitches), '[G3, A3, B-3, C4, D4, E4, F#4, G4, F4, E-4, D4, C4, B-3, C4, D4, E4, F#4, G4, A4, B-4, C5, B-4, A4, G4, F4, E-4, F#4, G4, A4, B-4, C5, D5, E5, F#5, F5, E-5, D5, C5, B-4, C5, D5, E5, F#5, G5, A5, B-5, C6, B-5, A5, G5, F5, E-5]')
+        #s.show()
+
 
 
     def testPlot(self):
