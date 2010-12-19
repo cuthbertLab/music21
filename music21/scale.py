@@ -286,7 +286,7 @@ class AbstractScale(Scale):
 
 
     def nextPitch(self, pitchReference, nodeName, pitchOrigin,
-             direction=DIRECTION_ASCENDING, stepSize=1):
+             direction=DIRECTION_ASCENDING, stepSize=1, getNeighbor=True):
         '''Expose functionality from IntervalNetwork, passing on the stored alteredNodes dictionary.
         '''
         post = self._net.nextPitch(
@@ -295,7 +295,8 @@ class AbstractScale(Scale):
             pitchOrigin=pitchOrigin,      
             direction=direction,
             stepSize = stepSize,
-            alteredNodes=self._alteredNodes
+            alteredNodes=self._alteredNodes,
+            getNeighbor = getNeighbor
             )
         return post
 
@@ -1044,7 +1045,9 @@ class ConcreteScale(Scale):
 
 
 
-    def next(self, pitchOrigin, direction='ascending', stepSize=1):
+    def next(self, pitchOrigin, direction='ascending', stepSize=1, 
+        getNeighbor=True):
+
         '''Get the next pitch.
 
         The `direction` attribute must be either ascending or descending.
@@ -1076,7 +1079,8 @@ class ConcreteScale(Scale):
             nodeName=self._abstract.tonicStep, 
             pitchOrigin=pitchOrigin,      
             direction=direction,
-            stepSize = stepSize
+            stepSize = stepSize,
+            getNeighbor=getNeighbor
             )
         return post
 
@@ -2464,8 +2468,13 @@ class Test(unittest.TestCase):
 
 
         # TODO: stop this from returning None
-        #self.assertEqual(str(mm.next('f#5', 'descending')), 'E5')
-        #self.assertEqual(str(mm.next('f5', 'ascending')), 'G#5')
+        self.assertEqual(str(mm.next('f#5', 'descending')), 'F5')
+        self.assertEqual(str(mm.next('f#5', 'descending', 
+            getNeighbor='descending')), 'E5')
+
+        self.assertEqual(str(mm.next('f5', 'ascending')), 'G#5')
+        self.assertEqual(str(mm.next('f5', 'ascending', 
+            getNeighbor='descending')), 'F#5')
 
 
     def testPlot(self):

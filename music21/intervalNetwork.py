@@ -944,6 +944,7 @@ class IntervalNetwork(object):
             if pairs is None:
                 continue
             for src, dst in pairs:
+                #environLocal.printDebug(['_getNext()', 'src, dst', src, dst, 'trying to match source', srcId])
                 if src == srcId:
                     postEdge.append(e)
                     postNodeId.append(dst)
@@ -1048,23 +1049,6 @@ class IntervalNetwork(object):
 
         #environLocal.printDebug(['nextPitch()', 'got node Id', nodeId, 'direction', direction, 'pitchOrigin', pitchOrigin])
 
-        # realize the pitch from the raw node; we may be getting an altered
-        # tone, and we need to transpose an unaltered tone
-        # leave out altered nodes argument
-        p = self.getPitchFromNodeStep(pitchReference=pitchReference, 
-            nodeName=nodeName, 
-            nodeStepTarget=self._nodes[nodeId].step, 
-            direction=direction, 
-            minPitch=None, 
-            maxPitch=None, 
-            alteredNodes={} # need unaltered tone here, thus leaving out
-            )
-
-        #environLocal.printDebug(['nextPitch()', 'pitch from node step result', p])
-
-        # transfer octave; this assumes octave equivalence
-        p.octave = pitchObj.octave
-        pitchObj = p
 
         # if no match, get the neighbor
         if nodeId is None and getNeighbor in [True,     
@@ -1072,16 +1056,36 @@ class IntervalNetwork(object):
             lowId, highId = self.getNeighborNodeIds(
                 pitchReference=pitchReference, 
                 nodeName=nodeName, 
-                pitchTarget=pitchOrigin)
+                pitchTarget=pitchOrigin,
+                direction=direction) # must add direction
+
+            #environLocal.printDebug(['nextPitch()', 'looking for neighbor', 'getNeighbor', getNeighbor, 'source nodeId', nodeId, 'lowId/highId', lowId, highId])
+
             # replace the node with the nearest neighbor
             if getNeighbor in [True, DIRECTION_ASCENDING, DIRECTION_BI]:
                 nodeId = highId
             else:
                 nodeId = lowId
-            environLocal.printDebug(['looking for neighbor', 'nodeId', nodeId])
 
-            # TODO: need to adjust pitch object here to non altered
-            # pitchObj
+        # realize the pitch from the found node step
+        # we may be getting an altered
+        # tone, and we need to transpose an unaltered tone
+        # leave out altered nodes argument
+        p = self.getPitchFromNodeStep(pitchReference=pitchReference, 
+            nodeName=nodeName, 
+            nodeStepTarget=self._nodes[nodeId].step, 
+            direction=direction, 
+            minPitch=None, # not using a range here to get natural expans
+            maxPitch=None, 
+            alteredNodes={} # need unaltered tone here, thus leaving out
+            )
+
+        #environLocal.printDebug(['nextPitch()', 'pitch obtained based on node step', p, 'nodeId', nodeId])
+
+        # transfer octave; this assumes octave equivalence
+        p.octave = pitchObj.octave
+        pitchObj = p
+
 
         n = self._nodes[nodeId]
         p = pitchObj
@@ -1778,7 +1782,7 @@ class IntervalNetwork(object):
         return None
 
     def getNeighborNodeIds(self, pitchReference, nodeName, pitchTarget,
-         alteredNodes={}):
+        direction=DIRECTION_ASCENDING, alteredNodes={}):
         '''Given a reference pitch assigned to node id, determine the node ids that neighbor this pitch.
 
         Returns None if an exact match.
@@ -1804,13 +1808,19 @@ class IntervalNetwork(object):
         minPitch = pitchTarget.transpose(-12, inPlace=False)
         maxPitch = pitchTarget.transpose(12, inPlace=False)
 
-        realizedPitch, realizedNode = self.realize(pitchReference, nodeId, minPitch=minPitch, maxPitch=maxPitch, alteredNodes=alteredNodes)
+        realizedPitch, realizedNode = self.realize(pitchReference, 
+            nodeId, 
+            minPitch=minPitch, 
+            maxPitch=maxPitch, 
+            direction = direction, 
+            alteredNodes=alteredNodes)
 
         lowNeighbor = None
         highNeighbor = None
         for i in range(len(realizedPitch)):
             if pitchTarget.ps < realizedPitch[i].ps:
                 highNeighbor = realizedNode[i]
+                # low neighbor may be a previously-encountered pitch
                 return lowNeighbor, highNeighbor
             lowNeighbor = realizedNode[i]
         return None
@@ -1932,18 +1942,11 @@ class IntervalNetwork(object):
         A-4
 
         '''
-# problem
-
-        # this shows that in some cases there will be two nodes that
-        # are available
-
-        #environLocal.printDebug(['getPitchFromNodeStep()', '_nodeNameToNodes()', self._nodeNameToNodes(nodeStepTarget)])
-
         # this is the reference node
         nodeId = self._nodeNameToNodes(nodeName)[0] # get the first
         #environLocal.printDebug(['getPitchFromNodeStep()', 'node reference', nodeId, 'node step', nodeId.step, 'pitchReference', pitchReference, 'alteredNodes', alteredNodes])
 
-        # here, we give a node step, and return 1 or more nodes; 
+        # here, we give a node step, and may return 1 or more valid nodes; 
         # need to select the node that is appropriate to the directed
         # realization
         nodeTargetId = None
@@ -1959,17 +1962,13 @@ class IntervalNetwork(object):
         else: # have more than one node that is defined for a given step
             for nId in nodeTargetIdList:
                 dirList = self._nodeIdToEdgeDirections(nId)
-
                 #environLocal.printDebug(['getPitchFromNodeStep()', 'comparing dirList', dirList])
-
                 # for now, simply find the nId that has the requested
                 # direction. a more sophisticated matching may be needed
                 if direction in dirList:
                     nodeTargetId = nId
                     break                
-
         if nodeTargetId is None:
-            # temporaryr
             #environLocal.printDebug(['getPitchFromNodeStep()', 'cannot select node based on direction', nodeTargetIdList])
             nodeTargetId = nodeTargetIdList[0] # easy case
 
@@ -1989,7 +1988,7 @@ class IntervalNetwork(object):
 
         #environLocal.printDebug(['getPitchFromNodeStep()', 'realizedPitch', realizedPitch, 'realizedNode', realizedNode, 'nodeTargetId', nodeTargetId,])
 
-        # get the pitch when we have a node id match
+        # get the pitch when we have a node id to match match
         for i, nId in enumerate(realizedNode):
             #environLocal.printDebug(['comparing', nId, 'nodeTargetId', nodeTargetId])
 
@@ -2553,16 +2552,10 @@ class Test(unittest.TestCase):
         # if we include first, we get all values
         self.assertEqual(str(net._realizeDescending('g4', 'low', includeFirst=True, fillMinMaxIfNone=True)), "([G4, A4, B-4, C5, D5, E-5, F5, G5], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
 
-
-
-
         # because this is octave repeating, we can get a range when min 
         # and max are defined
         self.assertEqual(str(net._realizeDescending('g4', 'low', 'g4', 'g5')), "([G4, A4, B-4, C5, D5, E-5, F5], ['terminusLow', 0, 1, 2, 3, 5, 7])"  )
 
-
-
-        #self.assertEqual(str(net.realizePitch('g4')), '[G4, A4, B4, C5, D5, E5, F#5, G5]')
 
 
     def testGetPitchFromNodeStep(self):
@@ -2581,6 +2574,78 @@ class Test(unittest.TestCase):
         environLocal.printDebug(['descending step 6'])
 
         self.assertEqual(str(net.getPitchFromNodeStep('c4', 1, 6, direction='descending')), 'A-4')
+
+
+    def testNextPitch(self):
+
+
+        net = IntervalNetwork()
+        net.fillMelodicMinor()
+        
+        # ascending from known pitches
+        self.assertEqual(str(net.nextPitch('c4', 1, 'g4', 'ascending')), 'A4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a4', 'ascending')), 'B4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'b4', 'ascending')), 'C5')
+
+        # descending
+        self.assertEqual(str(net.nextPitch('c4', 1, 'c5', 'descending')), 'B-4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'b-4', 'descending')), 'A-4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a-4', 'descending')), 'G4')
+
+        # larger step sizes
+        self.assertEqual(str(net.nextPitch('c4', 1, 'c5', 'descending', stepSize=2)), 'A-4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a4', 'ascending', stepSize=2)), 'C5')
+
+
+        # moving from a non-scale step
+
+        # if we get the ascending neighbor, we move from the d to the e-
+        self.assertEqual(str(net.nextPitch('c4', 1, 'c#4', 'ascending',
+            getNeighbor='ascending')), 'E-4')
+
+        # if we get the descending neighbor, we move from  c to d
+        self.assertEqual(str(net.nextPitch('c4', 1, 'c#4', 'ascending',
+            getNeighbor='descending')), 'D4')
+
+        # if on a- and get ascending neighbor, move from a to b-
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a-', 'ascending',
+            getNeighbor='ascending')), 'B4')
+
+        # if on a- and get ascending neighbor, move from g to a
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a-', 'ascending',
+            getNeighbor='descending')), 'A4')
+
+
+        # if on b, ascending neighbor, move form c to b-
+        self.assertEqual(str(net.nextPitch('c4', 1, 'b', 'descending',
+            getNeighbor='ascending')), 'B-3')            
+
+        self.assertEqual(net.getNeighborNodeIds(
+            pitchReference='c4', nodeName=1, pitchTarget='c#'), 
+            ('terminusHigh', 0) )
+
+        self.assertEqual(net.getNeighborNodeIds(
+            pitchReference='c4', nodeName=1, pitchTarget='d#'), (1, 2))
+
+        self.assertEqual(net.getNeighborNodeIds(
+        pitchReference='c4', nodeName=1, pitchTarget='b'), (6, 'terminusHigh') )
+
+        self.assertEqual(net.getNeighborNodeIds(
+        pitchReference='c4', nodeName=1, pitchTarget='b-'), (4, 6))
+
+        self.assertEqual(net.getNeighborNodeIds(
+        pitchReference='c4', nodeName=1, pitchTarget='b', direction='descending'), (7, 'terminusLow'))
+
+        self.assertEqual(net.getNeighborNodeIds(
+        pitchReference='c4', nodeName=1, pitchTarget='b-', direction='descending'), (7, 'terminusLow'))
+
+
+        # if on b, descending neighbor, move form b- to a-
+        self.assertEqual(str(net.nextPitch('c4', 1, 'b4', 'descending',
+            getNeighbor='descending')), 'A-4')
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -2602,7 +2667,9 @@ if __name__ == "__main__":
         #t.testBasicB()
 
 
-        t.testGetPitchFromNodeStep()
+        #t.testGetPitchFromNodeStep()
+
+        t.testNextPitch()
 
 
 # melodic/harmonic minor
