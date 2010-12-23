@@ -1635,7 +1635,11 @@ class IntervalNetwork(object):
         [C2, G2, C3, G3, C4]
 
         >>> net.realizePitchByStep('g', 5, [1,2,3], 'c1', 'c6') 
-        [C1, D1, E1, C2, D2, E2, C3, D3, E3, C4, D4, E4, D5, E5]
+        [C1, D1, E1, C2, D2, E2, C3, D3, E3, C4, D4, E4, C5, D5, E5, C6]
+
+        >>> net.realizePitchByStep('c', 1, [1,5], 'c3', 'c6') 
+        [C3, G3, C4, G4, C5, G5, C6]
+
         '''
         realizedPitch, realizedNode = self.realize(
             pitchReference=pitchReference, nodeId=nodeId, 
@@ -1645,11 +1649,14 @@ class IntervalNetwork(object):
         # take modulus of all
         nodeStepTargets = [self._stepModulus(s) for s in nodeStepTargets]
 
+        #environLocal.printDebug(['realizePitchByStep(); nodeStepTargets', nodeStepTargets])
+
         post = []
         for i, p in enumerate(realizedPitch):
             # get the node
             n = self._nodes[realizedNode[i]]
-            if n.step in nodeStepTargets:
+            #environLocal.printDebug(['realizePitchByStep(); p', p, n.step])
+            if self._stepModulus(n.step) in nodeStepTargets:
                 post.append(p)
         return post
 
