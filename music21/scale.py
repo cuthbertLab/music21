@@ -2182,7 +2182,7 @@ class Test(unittest.TestCase):
         # getting pitches from scale degrees
         self.assertEqual(str(sc3.pitchFromDegree(3)), 'C4')
         self.assertEqual(str(sc3.pitchFromDegree(7)), 'G4')
-        self.assertEqual(str(sc3.pitchesFromScaleDegrees([1,5,6])), '[A3, E4, F4]')
+        self.assertEqual(str(sc3.pitchesFromScaleDegrees([1,5,6])), '[A3, E4, F4, A4]')
         self.assertEqual(str(sc3.pitchesFromScaleDegrees([2,3], minPitch='c6', maxPitch='c9')), '[C6, B6, C7, B7, C8, B8, C9]')
 
 
@@ -2315,10 +2315,10 @@ class Test(unittest.TestCase):
         sc1 = MajorScale('g4')
         h2 = RomanNumeral(sc1, 2)
         h2.makeSeventhChord()
-        self.assertEqual(str(h2.getPitches('c4', 'c6')), '[A4, C5, E5, A5, C6]')
+        self.assertEqual(str(h2.getPitches('c4', 'c6')), '[A4, C5, E5, G5, A5, C6]')
 
         h2.makeNinthChord()
-        self.assertEqual(str(h2.getPitches('c4', 'c6')), '[A4, B4, C5, E5, A5, B5, C6]')
+        self.assertEqual(str(h2.getPitches('c4', 'c6')), '[A4, B4, C5, E5, G5, A5, B5, C6]')
         #h2.chord.show()
 
 
