@@ -1,4 +1,3 @@
-#!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         scale.py
 # Purpose:      music21 classes for representing scales
@@ -657,6 +656,10 @@ class AbstractOctaveRepeatingScale(AbstractScale):
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
         self.type = 'Abstract Octave Repeating'
+
+        if mode is None:
+            # supply a default
+            mode = ['P8']
         self._buildNetwork(mode=mode)
 
 
@@ -775,6 +778,8 @@ class ConcreteScale(Scale):
         '''
         # have to test each so as not to confuse with a subclass
         # TODO: add pitch range comparison if defined
+        if other is None:
+            return False
 
         if not self.isConcrete or not other.isConcrete:
             # if tonic is none, then we automatically do an abstract comparison

@@ -61,6 +61,7 @@ Module Reference
    moduleKey
    moduleInstrument
    moduleInterval
+   moduleIntervalNetwork
    moduleMeter
    moduleMetadata
    moduleAnalysisMetrical
@@ -73,8 +74,10 @@ Module Reference
    moduleNote
    moduleNode
    modulePitch
-   moduleStream
+   moduleScale
    moduleSerial
+   moduleSieve
+   moduleStream
    moduleTempo
    moduleTinyNotation
    moduleAnalysisWindowed

@@ -943,7 +943,7 @@ class Pitch(music21.Music21Object):
             self._step = usrStr[0]
             self.accidental = Accidental(usrStr[1:])
         else:
-            raise PitchException("Cannot make a name out of %s" % usrStr)
+            raise PitchException("Cannot make a name out of %s" % repr(usrStr))
         if octFound != '': 
             octave = int(octFound)
             self.octave = octave
