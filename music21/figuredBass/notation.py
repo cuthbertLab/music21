@@ -52,8 +52,10 @@ class Notation:
         
     def _parseNotationColumn(self):
         '''
-        Given a notation column below a pitch, returns two tuples: one for 
-        the numbers and another for the modifier strings.
+        Given a notation column below a pitch, defines both self.numbers
+        and self.modifierStrings, which provide the intervals above the
+        bass and (if necessary) how to modify the corresponding pitches
+        accordingly.
     
         >>> from music21 import *
         >>> from music21.figuredBass import notation as n
@@ -106,15 +108,16 @@ class Notation:
 
     def _translateToLonghand(self):
         '''
-        Given a parsed column, translates it to longhand.
+        Provided the numbers and modifierStrings of a parsed notation column, 
+        translates it to longhand.
         
         >>> from music21 import *
         >>> from music21.figuredBass import notation as n
         >>> notation1 = n.Notation('#6,5') #__init__ method calls _parseNotationColumn()
-        >>> notation1.numbers
-        (6, 5, 3)
-        >>> notation1.modifierStrings
-        ('#', None, None)
+        >>> str(notation1.origNumbers) + " -> " + str(notation1.numbers)
+        '(6, 5) -> (6, 5, 3)'
+        >>> str(notation1.origModStrings) + " -> " + str(notation1.modifierStrings)
+        "('#', None) -> ('#', None, None)"
         >>> notation2 = n.Notation('-6,-')        
         >>> notation2.numbers
         (6, 3)
