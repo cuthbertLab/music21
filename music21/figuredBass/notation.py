@@ -14,6 +14,10 @@ import copy
 import re
 
 from music21 import pitch
+from music21 import key
+from music21 import note
+
+MAX_PITCH = pitch.Pitch('B7')
 
 shorthandNotation = {(None,) : (5,3),
                      (5,) : (5,3),
@@ -64,7 +68,7 @@ class Notation:
         self.figures = None
         self._getModifiers()
         self._getFigures()
-        
+    
     def _parseNotationColumn(self):
         '''
         Given a notation column below a pitch, defines both self.numbers
@@ -228,6 +232,7 @@ class Notation:
         
         self.figures = figures
 
+
 class NotationException(music21.Music21Exception):
     pass
 
@@ -241,16 +246,6 @@ class Figure:
         self.number = number
         self.modifier = modifier
     
-    def getPitch(self, scale, bassPitch):
-        bassSD = scale.getScaleDegreeFromPitch(bassPitch)
-        if bassSD == None:
-            #Get "pseudo scale degree"
-            pass
-        
-        pitchSD = bassSD + self.number - 1
-        pitchAtInterval = scale.pitchFromDegree(pitchSD)
-        return self.modifier.modifyPitch(pitchAtInterval)
-              
     def __repr__(self):
         return '<music21.figuredBass.notation.%s %s %s>' % (self.__class__.__name__, self.number, self.modifier)
 
@@ -353,11 +348,10 @@ class Modifier:
         >>> m5.modifyPitch(p2) #Double Flat
         F--5
         '''
-        if self.accidental == None:
-            return None
-        
         if not inPlace:
             pitchToAlter = copy.deepcopy(pitchToAlter)
+        if self.accidental == None:
+            return pitchToAlter
         if self.accidental.alter == 0.0:
             pitchToAlter.accidental = self.accidental
         else:
@@ -379,6 +373,26 @@ class ModifierException(music21.Music21Exception):
     pass   
 
 #-------------------------------------------------------------------------------
+
+# Helper Methods
+def convertToPitch(pitchString):
+    '''
+    Converts a pitch string to a music21 pitch, only if necessary.
+    
+    >>> from music21 import *
+    >>> pitchString = 'C5'
+    >>> convertToPitch(pitchString)
+    C5
+    >>> convertToPitch(pitch.Pitch('E4')) #does nothing
+    E4
+    '''
+    pitchValue = pitchString
+    if type(pitchString) == str:
+        pitchValue = pitch.Pitch(pitchString)
+    return pitchValue
+
+#-------------------------------------------------------------------------------
+
 class Test(unittest.TestCase):
 
     def runTest(self):
