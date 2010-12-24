@@ -1,3 +1,13 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         notation.py
+# Purpose:      music21 class for conveniently representing figured bass notation
+# Authors:      Jose Cabal-Ugaz
+#
+# Copyright:    (c) 2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 import music21
 import unittest
 import copy
@@ -15,40 +25,45 @@ shorthandNotation = {(None,) : (5,3),
                      }
 
 class Notation:
-    '''
-    Convenience class for representing a figured bass notation column.
-    
-    >>> from music21 import *
-    >>> from music21.figuredBass import notation as n
-    >>> n1 = n.Notation('')
-    >>> n1.figures
-    [<music21.figuredBass.notation.Figure 5 <modifier None None>>, <music21.figuredBass.notation.Figure 3 <modifier None None>>]
-    >>> n2 = n.Notation('#')
-    >>> n2.figures
-    [<music21.figuredBass.notation.Figure 5 <modifier None None>>, <music21.figuredBass.notation.Figure 3 <modifier # <accidental sharp>>>]
-    >>> n3 = n.Notation('-6,-')
-    >>> n3.figures
-    [<music21.figuredBass.notation.Figure 6 <modifier - <accidental flat>>>, <music21.figuredBass.notation.Figure 3 <modifier - <accidental flat>>>]
-    
-    OMIT_FROM_DOCS
-    >>> n4 = n.Notation('4,2+')
-    >>> n4.figures[0]
-    <music21.figuredBass.notation.Figure 6 <modifier None None>>
-    >>> n4.figures[1]
-    <music21.figuredBass.notation.Figure 4 <modifier None None>>
-    >>> n4.figures[2]
-    <music21.figuredBass.notation.Figure 2 <modifier + <accidental sharp>>>
-    '''
     def __init__(self, notationColumn):
+        '''
+        Convenience class for representing a figured bass notation column.
+        
+        >>> from music21 import *
+        >>> from music21.figuredBass import notation as n
+        >>> n1 = n.Notation('')
+        >>> n1.figures
+        [<music21.figuredBass.notation.Figure 5 <modifier None None>>, <music21.figuredBass.notation.Figure 3 <modifier None None>>]
+        >>> n2 = n.Notation('#')
+        >>> n2.figures
+        [<music21.figuredBass.notation.Figure 5 <modifier None None>>, <music21.figuredBass.notation.Figure 3 <modifier # <accidental sharp>>>]
+        >>> n3 = n.Notation('-6,-')
+        >>> n3.figures
+        [<music21.figuredBass.notation.Figure 6 <modifier - <accidental flat>>>, <music21.figuredBass.notation.Figure 3 <modifier - <accidental flat>>>]
+        
+        OMIT_FROM_DOCS
+        >>> n4 = n.Notation('4,2+')
+        >>> n4.figures[0]
+        <music21.figuredBass.notation.Figure 6 <modifier None None>>
+        >>> n4.figures[1]
+        <music21.figuredBass.notation.Figure 4 <modifier None None>>
+        >>> n4.figures[2]
+        <music21.figuredBass.notation.Figure 2 <modifier + <accidental sharp>>>
+        '''
+        #Parse notation string
         self.notationColumn = notationColumn
         self.origNumbers = None
-        self.origModStrings = None
+        self.origModStrings = None        
         self.numbers = None
         self.modifierStrings = None
-        self.figures = None
         self._parseNotationColumn()
         self._translateToLonghand()
-        self._getFigures()            
+        
+        #Convert to convenient notation
+        self.modifiers = None
+        self.figures = None
+        self._getModifiers()
+        self._getFigures()
         
     def _parseNotationColumn(self):
         '''
@@ -165,8 +180,36 @@ class Notation:
         self.numbers = newNumbers
         self.modifierStrings = newModifierStrings
     
+    def _getModifiers(self):
+        '''
+        Turns the modifier strings into Modifier objects.
+        A modifier object keeps track of both the modifier string
+        and its corresponding pitch Accidental.
+        
+        >>> from music21 import *
+        >>> from music21.figuredBass import notation as n
+        >>> notation1 = n.Notation('#4,2+') #__init__ method calls _getModifiers()
+        >>> notation1.modifiers[0]
+        <modifier None None>
+        >>> notation1.modifiers[1]
+        <modifier # <accidental sharp>>
+        >>> notation1.modifiers[2]
+        <modifier + <accidental sharp>>
+        '''
+        modifiers = []
+        
+        for i in range(len(self.numbers)):
+            modifierString = self.modifierStrings[i]
+            modifier = Modifier(modifierString)
+            modifiers.append(modifier)
+        
+        self.modifiers = tuple(modifiers)
+        
     def _getFigures(self):
         '''
+        Turns the numbers and Modifier objects into Figure objects, each corresponding
+        to a number with its Modifier.
+        
         >>> from music21 import *
         >>> from music21.figuredBass import notation as n
         >>> notation2 = n.Notation('-6,-') #__init__ method calls _getFigures()
@@ -176,11 +219,10 @@ class Notation:
         <music21.figuredBass.notation.Figure 3 <modifier - <accidental flat>>>
         '''
         figures = []
-
+        
         for i in range(len(self.numbers)):
             number = self.numbers[i]
-            modifierString = self.modifierStrings[i]
-            modifier = Modifier(modifierString)
+            modifier = self.modifiers[i]
             figure = Figure(number, modifier)
             figures.append(figure)
         
@@ -211,6 +253,7 @@ class Figure:
               
     def __repr__(self):
         return '<music21.figuredBass.notation.%s %s %s>' % (self.__class__.__name__, self.number, self.modifier)
+
 
 class FigureException(music21.Music21Exception):
     pass
@@ -259,6 +302,26 @@ class Modifier:
                 raise ModifierException("Figure modifier unsupported in music21.")
         
         return a
+    
+    def modifyPitchName(self, pitchNameToAlter):
+        '''
+        Given a pitch name, modify its accidental accordingly.
+        
+        >>> from music21 import *
+        >>> from music21.figuredBass import notation as n
+        >>> m1 = n.Modifier('#')
+        >>> m2 = n.Modifier('-')
+        >>> m3 = n.Modifier('n')
+        >>> m1.modifyPitchName('D') #Sharp
+        'D#'
+        >>> m2.modifyPitchName('F') #Flat
+        'F-'
+        >>> m3.modifyPitchName('C#') #Natural
+        'C'
+        '''
+        pitchToAlter = pitch.Pitch(pitchNameToAlter)
+        self.modifyPitch(pitchToAlter)
+        return pitchToAlter.name
     
     def modifyPitch(self, pitchToAlter, inPlace=True):
         '''
@@ -310,7 +373,8 @@ class Modifier:
                     raise ModifierException("Resulting pitch accidental unsupported in music21.")
     
         return pitchToAlter
-    
+
+
 class ModifierException(music21.Music21Exception):
     pass   
 
@@ -321,6 +385,4 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    notation = Notation("")
-    print notation.figures
     music21.mainTest(Test)
