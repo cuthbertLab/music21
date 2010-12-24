@@ -33,7 +33,7 @@ class FiguredBass:
         self.mode = mode
         self.scale = realizerScale.FiguredBassScale(key, mode)
         self.rules = rules.Rules()
-        self.octaveLimit = 5
+        self.maxPitch = pitch.Pitch('B5')
         self.figuredBassList = []
         self.allChords = None
         self.allMovements = None
@@ -169,12 +169,12 @@ class FiguredBass:
         >>> from music21 import *
         >>> from music21.figuredBass import realizer
         >>> fb = realizer.FiguredBass('3/2', 'A', 'minor')
-        >>> fb.octaveLimit = 3
+        >>> fb.maxPitch = pitch.Pitch('B3')
         >>> fb._findPossibleStartingChords(Pitch('A2'), '')
         [[E3, C3, A2, A2], [E3, C3, C3, A2], [E3, E3, C3, A2], [A3, E3, C3, A2]]
         '''
         possibilities = []
-        pitchesAboveBass = self.scale.getPitchesAboveBassPitchFromNotation(firstBass, firstNotation, self.octaveLimit)
+        pitchesAboveBass = self.scale.getPitches(firstBass, firstNotation, self.maxPitch)
         sortedPitchesAboveBass = sortPitchListByDistanceToPitch(firstBass, pitchesAboveBass)
         
         #soprano >= alto >= tenor >= bass
@@ -186,7 +186,7 @@ class FiguredBass:
                     firstSoprano = sortedPitchesAboveBass[k]
                     possibilities.append([firstSoprano, firstAlto, firstTenor, firstBass])
         
-        pitchNamesInChord = self.scale.getPitchNamesFromNotation(firstBass, firstNotation)
+        pitchNamesInChord = self.scale.getPitchNames(firstBass, firstNotation)
         allowedPossibilities = []
         
         for startingChord in possibilities:
@@ -208,8 +208,8 @@ class FiguredBass:
         '''
         nextChords = []
         prevMovements = {}
-        potentialPitchList = self.scale.getPitchesAboveBassPitchFromNotation(nextBass, nextNotation, self.octaveLimit)
-        pitchesInNextChord = self.scale.getPitchNamesFromNotation(nextBass, nextNotation)
+        potentialPitchList = self.scale.getPitches(nextBass, nextNotation, 'B5')
+        pitchesInNextChord = self.scale.getPitchNames(nextBass, nextNotation)
         prevChordIndex = 0
         for prevChord in prevChords:
             nextPossibilities = allChordsToMoveTo(prevChord, potentialPitchList, nextBass, self.rules)
