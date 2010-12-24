@@ -41,14 +41,15 @@ class Notation:
     '''
     def __init__(self, notationColumn):
         self.notationColumn = notationColumn
-        self.figures = self._getFigures()
+        self.origNumbers = None
+        self.origModStrings = None
+        self.numbers = None
+        self.modifierStrings = None
+        self.figures = None
+        self._parseNotationColumn()
+        self._translateToLonghand()
+        self._getFigures()            
         
-    def _getFigures(self):
-        columnInfo = self._parseNotationColumn()
-        newColumnInfo = self._translateToLonghand(columnInfo)
-        figures = self._toFigures(newColumnInfo)
-        return figures
-    
     def _parseNotationColumn(self):
         '''
         Given a notation column below a pitch, returns two tuples: one for 
@@ -56,12 +57,16 @@ class Notation:
     
         >>> from music21 import *
         >>> from music21.figuredBass import notation as n
-        >>> notation1 = n.Notation('#6,5')
-        >>> notation1._parseNotationColumn()
-        ((6, 5), ('#', None))
+        >>> notation1 = n.Notation('#6,5') #__init__ method calls _parseNotationColumn()
+        >>> notation1.origNumbers
+        (6, 5)
+        >>> notation1.origModStrings
+        ('#', None)
         >>> notation2 = n.Notation('-6,-')
-        >>> notation2._parseNotationColumn()
-        ((6, None), ('-', '-'))    
+        >>> notation2.origNumbers
+        (6, None)
+        >>> notation2.origModStrings
+        ('-', '-')
         '''
         delimiter = '[,]'
         figures = re.split(delimiter, self.notationColumn)
@@ -79,7 +84,7 @@ class Notation:
             for i in range(m2.count('')):
                 m2.remove('')
             if not (len(m1) <= 1 or len(m2) <= 1):
-                raise FiguredBassScaleException("Invalid Notation: " + figure)
+                raise NotationException("Invalid Notation: " + figure)
             
             number = None
             modifierString = None
@@ -93,33 +98,32 @@ class Notation:
     
         numbers = tuple(numbers)
         modifierStrings = tuple(modifierStrings)
-        columnInfo = (numbers, modifierStrings)
-        return columnInfo
+        
+        self.origNumbers = numbers #Keep original numbers
+        self.numbers = numbers #Will be converted to longhand
+        self.origModStrings = modifierStrings #Keep original modifier strings
+        self.modifierStrings = modifierStrings #Will be converted to longhand
 
-    def _translateToLonghand(self, columnInfo):
+    def _translateToLonghand(self):
         '''
         Given a parsed column, translates it to longhand.
         
         >>> from music21 import *
         >>> from music21.figuredBass import notation as n
-        >>> notation1 = n.Notation('#6,5')
-        >>> columnInfo1 = notation1._parseNotationColumn()
-        >>> newColumnInfo1 = notation1._translateToLonghand(columnInfo1)
-        >>> newColumnInfo1[0]
+        >>> notation1 = n.Notation('#6,5') #__init__ method calls _parseNotationColumn()
+        >>> notation1.numbers
         (6, 5, 3)
-        >>> newColumnInfo1[1]
+        >>> notation1.modifierStrings
         ('#', None, None)
-        >>> notation2 = n.Notation('-6,-')
-        >>> columnInfo2 = notation2._parseNotationColumn()
-        >>> newColumnInfo2 = notation2._translateToLonghand(columnInfo2)
-        >>> newColumnInfo2[0]
+        >>> notation2 = n.Notation('-6,-')        
+        >>> notation2.numbers
         (6, 3)
-        >>> newColumnInfo2[1]
+        >>> notation2.modifierStrings
         ('-', '-') 
         '''
-        oldNumbers = columnInfo[0]
+        oldNumbers = self.numbers
         newNumbers = oldNumbers
-        oldModifierStrings = columnInfo[1]
+        oldModifierStrings = self.modifierStrings
         newModifierStrings = oldModifierStrings
     
         try:
@@ -155,33 +159,29 @@ class Notation:
             
             newNumbers = tuple(temp)
         
-        return (newNumbers, newModifierStrings)
+        self.numbers = newNumbers
+        self.modifierStrings = newModifierStrings
     
-    def _toFigures(self, columnInfo):
+    def _getFigures(self):
         '''
         >>> from music21 import *
         >>> from music21.figuredBass import notation as n
-        >>> notation2 = n.Notation('-6,-')
-        >>> columnInfo2 = notation2._parseNotationColumn()
-        >>> newColumnInfo2 = notation2._translateToLonghand(columnInfo2)
-        >>> figures = notation2._toFigures(newColumnInfo2)
-        >>> figures[0]
+        >>> notation2 = n.Notation('-6,-') #__init__ method calls _getFigures()
+        >>> notation2.figures[0] 
         <music21.figuredBass.notation.Figure 6 <modifier - <accidental flat>>>
-        >>> figures[1]
+        >>> notation2.figures[1]
         <music21.figuredBass.notation.Figure 3 <modifier - <accidental flat>>>
         '''
         figures = []
-        numbers = columnInfo[0]
-        modifierStrings = columnInfo[1]
-        
-        for i in range(len(numbers)):
-            number = numbers[i]
-            modifierString = modifierStrings[i]
+
+        for i in range(len(self.numbers)):
+            number = self.numbers[i]
+            modifierString = self.modifierStrings[i]
             modifier = Modifier(modifierString)
             figure = Figure(number, modifier)
             figures.append(figure)
         
-        return figures
+        self.figures = figures
 
 class NotationException(music21.Music21Exception):
     pass
