@@ -70,11 +70,12 @@ class FiguredBassScale:
         for i in range(len(nt.numbers)):
             pitchSD = bassSD + nt.numbers[i] - 1
             samplePitch = self.realizerScale.pitchFromDegree(pitchSD)
-            nt.modifiers[i].modifyPitch(samplePitch)
-            pitchNames.append(samplePitch.name)
+            pitchName = nt.modifiers[i].modifyPitchName(samplePitch.name)
+            pitchNames.append(pitchName)
 
         pitchNames.append(bassPitch.name)
         pitchNames.reverse()
+        print pitchNames
         return pitchNames
  
     def getPitches(self, bassPitch, notationString = '', maxPitch=MAX_PITCH):
