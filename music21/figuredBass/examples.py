@@ -49,13 +49,13 @@ def exampleA():
     fb.addElement(n2, '6')
     fb.addElement(n3, '6')
     fb.addElement(n4, '6')
-    fb.addElement(n5, '7-,5,3')
+    fb.addElement(n5, '-7,5,3')
     fb.addElement(n6)
-    fb.addElement(n7, '6#,5,3')
+    fb.addElement(n7, '#6,5,3')
     fb.addElement(n8, '6')
-    fb.addElement(n9, '7,5,3#')
+    fb.addElement(n9, '#7,5,3')
     fb.addElement(n10, '6,4')
-    fb.addElement(n11, '5#,3#')
+    fb.addElement(n11, '#5,#3')
     fb.addElement(n12)
     
     return fb
