@@ -30,7 +30,12 @@ MAX_PITCH = pitch.Pitch('B7')
 class FiguredBassScale:
     def __init__(self, scaleValue, scaleType = 'major'):
         '''
-        Constructs a FiguredBassScale object, with a scaleValue (key) and a scaleMode (major is default).
+        Used to represent the concept of a figured bass scale, with a
+        scale value (key) and a scale type (major is default).
+        
+        Other scale types: minor, dorian, phrygian, hypophrygian
+        
+        An exception is raised if an invalid scale type is provided.
         '''
         try:
             foo = scaleTypes[scaleType]
