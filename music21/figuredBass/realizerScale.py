@@ -90,19 +90,17 @@ class FiguredBassScale:
         
         >>> from music21 import *
         >>> fbScale = FiguredBassScale('C')
-        >>> fbScale.getSamplePitches('D3', '6')
+        >>> fbScale.getSamplePitches('D3', '6') #First inversion triad
         [D3, F3, B3]
-        >>> fbScale.getSamplePitches('G3')
+        >>> fbScale.getSamplePitches('G3') #Root position triad
         [G3, B3, D4]
-        >>> fbScale.getSamplePitches('B3', '6,5')
+        >>> fbScale.getSamplePitches('B3', '6,5') #First inversion seventh chord
         [B3, D4, F4, G4]
         >>> fbScale.getSamplePitches('F3', '-6,-') #Neapolitan chord
         [F3, A-3, D-4]
-        >>> fbScale.getSamplePitches('C3', '4,3')
+        >>> fbScale.getSamplePitches('C3', '4,3') #Second inversion seventh chord
         [C3, E3, F3, A3]
-        >>> fbScale.getSamplePitches('C3', '4,-3')
-        [C3, E-3, F3, A3]
-        >>> fbScale.getSamplePitches('C#3', '-7') #Diminished seventh chord
+        >>> fbScale.getSamplePitches('C#3', '-7') #Fully diminished seventh chord
         [C#3, E3, G3, B-3]
         '''
         bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
@@ -141,11 +139,8 @@ class FiguredBassScale:
                 allPitches.append(pitch.Pitch(pitchName + str(i)))
     
         pitchesAboveNote = []
-        bassPs = bassPitch.ps
-        maxPs = maxPitch.ps
         for givenPitch in allPitches:
-            givenPitchPs = givenPitch.ps
-            if givenPitchPs >= bassPs and givenPitchPs <= maxPs:
+            if not (givenPitch < bassPitch) and not (givenPitch > maxPitch):
                 pitchesAboveNote.append(givenPitch)
         
         return pitchesAboveNote
