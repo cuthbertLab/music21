@@ -315,7 +315,7 @@ class Modifier:
         'C'
         '''
         pitchToAlter = pitch.Pitch(pitchNameToAlter)
-        self.modifyPitch(pitchToAlter)
+        self.modifyPitch(pitchToAlter, True)
         return pitchToAlter.name
     
     def modifyPitch(self, pitchToAlter, inPlace=False):
@@ -327,15 +327,14 @@ class Modifier:
         >>> m1 = n.Modifier('#')
         >>> m2 = n.Modifier('-')
         >>> m3 = n.Modifier('n')
-        >>> p1 = pitch.Pitch('D-5')
-        >>> m3.modifyPitch(p1) #Natural
-        D5
+        >>> p1 = pitch.Pitch('D5')
         >>> m1.modifyPitch(p1) #Sharp
         D#5
-        >>> m3.modifyPitch(p1) #Natural
-        D5
         >>> m2.modifyPitch(p1) #Flat
         D-5
+        >>> p15 = pitch.Pitch('D#5')
+        >>> m3.modifyPitch(p15)
+        D5
          
         OMIT_FROM_DOCS
         >>> m4 = n.Modifier('##')
@@ -343,8 +342,6 @@ class Modifier:
         >>> p2 = pitch.Pitch('F5')
         >>> m4.modifyPitch(p2) #Double Sharp
         F##5
-        >>> m3.modifyPitch(p2) #Natural
-        F5
         >>> m5.modifyPitch(p2) #Double Flat
         F--5
         '''
