@@ -318,7 +318,7 @@ class Modifier:
         self.modifyPitch(pitchToAlter)
         return pitchToAlter.name
     
-    def modifyPitch(self, pitchToAlter, inPlace=True):
+    def modifyPitch(self, pitchToAlter, inPlace=False):
         '''
         Given a pitch, modify its accidental accordingly.
         
