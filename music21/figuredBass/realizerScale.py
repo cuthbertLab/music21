@@ -80,9 +80,39 @@ class FiguredBassScale:
 
         pitchNames.append(bassPitch.name)
         pitchNames.reverse()
-        print pitchNames
         return pitchNames
- 
+    
+    def getSamplePitches(self, bassPitch, notationString = ''):
+        '''
+        Given a bass pitch and a corresponding notation string,
+        returns a list of corresponding pitches within the octave
+        above the bass pitch.
+        
+        >>> from music21 import *
+        >>> fbScale = FiguredBassScale('C')
+        >>> fbScale.getSamplePitches('D3', '6')
+        [D3, F3, B3]
+        >>> fbScale.getSamplePitches('G3')
+        [G3, B3, D4]
+        >>> fbScale.getSamplePitches('B3', '6,5')
+        [B3, D4, F4, G4]
+        >>> fbScale.getSamplePitches('F3', '-6,-') #Neapolitan chord
+        [F3, A-3, D-4]
+        >>> fbScale.getSamplePitches('C3', '4,3')
+        [C3, E3, F3, A3]
+        >>> fbScale.getSamplePitches('C3', '4,-3')
+        [C3, E-3, F3, A3]
+        >>> fbScale.getSamplePitches('C#3', '-7') #Diminished seventh chord
+        [C#3, E3, G3, B-3]
+        '''
+        bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
+        maxPitch = copy.deepcopy(bassPitch)
+        maxPitch.transpose('d7', True)
+        
+        samplePitches = self.getPitches(bassPitch, notationString, maxPitch)
+        samplePitches.sort()
+        return samplePitches
+        
     def getPitches(self, bassPitch, notationString = '', maxPitch=MAX_PITCH):
         '''
         Given a bass pitch and a corresponding notation string,
@@ -126,6 +156,7 @@ class FiguredBassScaleException(music21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 
+# Helper Methods
 def convertToPitch(pitchString):
     '''
     Converts a pitch string to a music21 pitch, only if necessary.
