@@ -374,7 +374,7 @@ def printChordProgression(chordProgression):
 
 def resolveDiminishedSeventh(pitches, inPlace=False):
     #TODO: Implement method.
-    pass
+    return pitches
     
 def resolveTritone(pitchA, pitchB, inPlace=False):
     '''
