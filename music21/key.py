@@ -665,10 +665,10 @@ class KeySignature(music21.Music21Object):
         >>> b.sharps
         5 
         '''
-        if len(mxKeyList) == 1:
+        if not common.isListLike(mxKeyList):
+            mxKey = mxKeyList
+        else: # there may be more than one if we have more staffs per part
             mxKey = mxKeyList[0]
-        else:
-            raise KeySignatureException('found a key from MusicXML that has more than one key defined')
 
         self.sharps = int(mxKey.get('fifths'))
         mxMode = mxKey.get('mode')

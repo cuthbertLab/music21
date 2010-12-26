@@ -953,6 +953,19 @@ class Part(MusicXMLElementList):
         # randomly generated in m21 object when needed    
         #self.set('id', defaults.partId)
 
+    def getStavesCount(self):
+        '''Look ahead into the measure Attributes and return the highest number of staves used in this part.
+        '''
+        max = 1
+        for c in self.componentList:
+            if c._tag == 'measure':
+                if c.attributesObj is not None:
+                    if c.attributesObj.staves is not None:
+                        count = int(c.attributesObj.staves)
+                        if count > max:
+                            max = count
+        return max
+
 
 class Measure(MusicXMLElementList):
     def __init__(self):
@@ -1078,9 +1091,6 @@ class Measure(MusicXMLElementList):
 class Attributes(MusicXMLElement):
     # store measure data; assuming that there is one per measure
 
-    # TODO: timeList needs to be replaced by a single
-    # time object.
-
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'attributes'
@@ -1088,7 +1098,9 @@ class Attributes(MusicXMLElement):
         self.divisions = None
         self.staves = None 
         # complex elements
-        self.keyList = [] # there can be one key for each staff in a Part
+        # there can be one key for each staff in a Part, and there can be
+        # more than one staff per part
+        self.keyList = [] 
         # more than one pair of beat and beat-type is used for composite signatures
         self.timeList = [] 
         self.clefList = []
@@ -1213,7 +1225,7 @@ class Time(MusicXMLElement):
         self._tag = 'time'
         # attributes
         self._attr['symbol'] = None
-        self._attr['number'] = None
+        self._attr['number'] = None # number here refers to staff number
         # simple elements
         self.componentList = [] # a list of beats and beatType
         #self.beats = None 
@@ -1252,21 +1264,18 @@ class BeatType(MusicXMLElement):
 
 
 
-
 class Clef(MusicXMLElement):
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'clef'
         # attributes:
-        self._attr['number'] = None
+        self._attr['number'] = None # clef number refers to staff number
         self._attr['additional'] = None
         # elements
         self.sign = None
         self.line = None
         self.clefOctaveChange = None # integer for transposing clefs
-
         self._crossReference['clefOctaveChange'] = ['octaveChange']
-
 
     def _getComponents(self):
         c = []
@@ -1291,9 +1300,11 @@ class Direction(MusicXMLElementList):
         self._attr['placement'] = None
         # elements
         self.componentList = []
+        self.staff = None # number, for parts w/ > 1 staff 
 
     def _getComponents(self):
         c = []
+        c.append(('staff', self.staff))
         c = c + self.componentList
         return c
 
@@ -2902,6 +2913,8 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'staff': 
             if self._noteObj != None: # not a forward/backup tag
                 self._noteObj.staff = self._currentTag.charData
+            elif self._directionObj != None: # not a forward/backup tag
+                self._directionObj.staff = self._currentTag.charData
             else:
                 pass
                 #environLocal.printDebug([' cannot deal with this staff', self._currentTag.charData])

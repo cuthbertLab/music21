@@ -640,7 +640,8 @@ def measureToMx(m, spannerBundle=None):
         # key.mx returns a Key ojbect, needs to be in a list
         mxAttributes.keyList = [m.keySignature.mx]
     if m.timeSignature is not None:
-        mxAttributes.timeList = m.timeSignature.mx 
+        mxAttributes.timeList = [m.timeSignature.mx]
+        #mxAttributes.timeList = m.timeSignature.mx
     mxMeasure.set('attributes', mxAttributes)
 
     # see if we have barlines
@@ -733,6 +734,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     else:
         m = inputM21
 
+    # staff assignments: can create a dictionary with components in each
+    # staff; this dictionary will then be used to copy this measure and 
+    # split components between two parts of more than one staff is defined
+    staffReference = {}
+
     # doing this will create an instance, but will not be passed
     # out of this method, and thus is only for testing
     if spannerBundle == None:
@@ -754,7 +760,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     data = mxMeasure.get('width')
     if data != None: # may need to do a format/unit conversion?
         m.layoutWidth = data
-        
+
+    # not yet implemented
     junk = mxMeasure.get('implicit')
 
     mxAttributes = mxMeasure.get('attributesObj')
@@ -775,15 +782,30 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     #environLocal.printDebug(['mxAttriutes clefList', mxAttributes.clefList, 
     #                        mxAttributesInternal])
 
+    # getting first for each of these for now
     if mxAttributesInternal and len(mxAttributes.timeList) != 0:
-        m.timeSignature = meter.TimeSignature()
-        m.timeSignature.mx = mxAttributes.timeList
+        for mxSub in mxAttributes.timeList:
+            m.timeSignature = meter.TimeSignature()
+            m.timeSignature.mx = mxSub
+            break # just get first for now
+#         m.timeSignature = meter.TimeSignature()
+#         m.timeSignature.mx = mxAttributes.timeList
     if mxAttributesInternal is True and len(mxAttributes.clefList) != 0:
-        m.clef = clef.Clef()
-        m.clef.mx = mxAttributes.clefList
+        for mxSub in mxAttributes.clefList:
+            m.clef = clef.Clef()
+            m.clef.mx = mxSub
+            break # just get first
+#         m.clef = clef.Clef()
+#         m.clef.mx = mxAttributes.clefList
+
     if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
-        m.keySignature = key.KeySignature()
-        m.keySignature.mx = mxAttributes.keyList
+        for mxSub in mxAttributes.keyList:
+            m.keySignature = key.KeySignature()
+            m.keySignature.mx = mxSub
+            break # just get first
+#         m.keySignature = key.KeySignature()
+#         m.keySignature.mx = mxAttributes.keyList
+
 
 
     if mxAttributes.divisions is not None:
@@ -1421,6 +1443,22 @@ class Test(unittest.TestCase):
         #s.show()
         
 
+    def testMultipleStavesPerPart(self):
+
+
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive
+        from music21.musicxml import base
+
+        mxDoc = base.Document()
+        mxDoc.read(testPrimitive.pianoStaff43a)
+
+        # parts are stored in component list
+        p1 = mxDoc.score.componentList[0] 
+        self.assertEqual(p1.getStavesCount(), 2)
+
+        s = converter.parse(testPrimitive.pianoStaff43a)
+
 
 
 if __name__ == "__main__":
@@ -1431,8 +1469,8 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
         #t.testVoices()
-        t.testSlurInputA()
-
+        #t.testSlurInputA()
+        t.testMultipleStavesPerPart()
 
 
 

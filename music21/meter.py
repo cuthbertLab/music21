@@ -3069,7 +3069,7 @@ class TimeSignature(music21.Music21Object):
 
 
     def _getMX(self):
-        '''Returns a list of one mxTime object.
+        '''Returns a single mxTime object.
         
         Compound meters are represented as multiple pairs of beat
         and beat-type elements
@@ -3081,7 +3081,7 @@ class TimeSignature(music21.Music21Object):
         >>> b = a.mx
 
         '''
-        mxTimeList = []
+        #mxTimeList = []
         mxTime = musicxml.Time()
         
         # always get a flat version to display any subivisions created
@@ -3101,9 +3101,9 @@ class TimeSignature(music21.Music21Object):
         mxTime.set('symbol', None)
         # for declaring no time signature present
         mxTime.set('senza-misura', None)
-        mxTimeList.append(mxTime)
-        return mxTimeList
-
+        #mxTimeList.append(mxTime)
+        #return mxTimeList
+        return mxTime
 
     def _setMX(self, mxTimeList):
         '''Given an mxTimeList, load this object 
@@ -3118,9 +3118,15 @@ class TimeSignature(music21.Music21Object):
         >>> c.numerator
         4
         '''
-        if len(mxTimeList) == 0:
-            raise MeterException('cannot create a TimeSignature from an empty MusicXML timeList: %s' % musicxml.Attributes() )
-        mxTime = mxTimeList[0] # only one for now
+        if not common.isListLike(mxTimeList): # if just one
+            mxTime = mxTimeList
+        else: # there may be more than one if we have more staffs per part
+            mxTime = mxTimeList[0]
+
+#         if len(mxTimeList) == 0:
+#             raise MeterException('cannot create a TimeSignature from an empty MusicXML timeList: %s' % musicxml.Attributes() )
+#         mxTime = mxTimeList[0] # only one for now
+
         n = []
         d = []
         for obj in mxTime.componentList:
