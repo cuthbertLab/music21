@@ -24,6 +24,7 @@ from music21 import meter
 from music21 import environment
 from music21 import chord
 from music21 import key
+from music21 import interval
 
 
 class FiguredBass:
@@ -204,7 +205,7 @@ class FiguredBass:
         >>> nextNotation = '6'
         >>> fb.rules.verbose = False
         >>> fb._findNextPossibilities(prevChords, nextBass, nextNotation)
-        ([[B3, F3, D3, D3], [B3, F3, F3, D3], [F4, B3, F3, D3], [B3, B3, F3, D3]], {0: [0, 1, 2, 3]})
+        ([[B3, F3, D3, D3], [B3, F3, F3, D3], [B3, B3, F3, D3], [F4, B3, F3, D3]], {0: [0, 1, 2, 3]})
         '''
         nextChords = []
         prevMovements = {}
@@ -370,8 +371,70 @@ def printChordProgression(chordProgression):
     print(altoLine)
     print(tenorLine)
     print(bassLine)
+
+def resolveDiminishedSeventh(pitches, inPlace=False):
+    #TODO: Implement method.
+    pass
     
+def resolveTritone(pitchA, pitchB, inPlace=False):
+    '''
+    Given two pitches, A and B, which form a tritone, either A4 or d5,
+    returns a tuple containing (resolutionA, resolutionB). 
+
+    Returns a FiguredBassException if the pitches do not form a tritone.
     
+    >>> from music21 import *
+    >>> from music21.figuredBass import realizer as r
+    >>> p1 = pitch.Pitch('F3')
+    >>> p2 = pitch.Pitch('B3')
+    >>> r.resolveTritone(p1, p2) #Diminished Fifth
+    (E3, C4)
+    >>> r.resolveTritone(p2, p1) #Order matters
+    (C4, E3)
+    >>> p3 = pitch.Pitch('F4')
+    >>> r.resolveTritone(p2, p3) #Augmented Fourth
+    (C4, E4)
+    >>> p4 = pitch.Pitch('C5')
+    >>> r.resolveTritone(p3, p4)
+    Traceback (most recent call last):
+    FiguredBassException: Pitches do not form a tritone.
+    '''
+    #Convert strings to pitches if necessary
+    pitchA = realizerScale.convertToPitch(pitchA)
+    pitchB = realizerScale.convertToPitch(pitchB)
+    
+    #Define tritone intervals
+    dimFifth = interval.stringToInterval('d5')
+    augFourth = interval.stringToInterval('A4')
+
+    #If resolution not in place, make copies
+    if not inPlace:
+        pitchA = copy.deepcopy(pitchA)
+        pitchB = copy.deepcopy(pitchB)
+
+    #Sort pitches from low to high
+    pitches = [pitchA, pitchB]
+    pitches.sort()
+    
+    #Find (positive) interval between pitches
+    tInterval = interval.notesToInterval(pitches[0], pitches[1])
+
+    #If interval not a tritone, exit method now.
+    if not (tInterval == dimFifth or tInterval == augFourth):
+        raise FiguredBassException("Pitches do not form a tritone.")
+    
+    if (tInterval == dimFifth): #Resolve inward in contrary motion
+        pitches[0].transpose('m2', True)
+        pitches[1].transpose('-m2', True)
+    if (tInterval == augFourth): #Resolve outward in contrary motion
+        pitches[0].transpose('-m2', True)
+        pitches[1].transpose('m2', True)
+    
+    if pitchB > pitchA:
+        return (pitches[0], pitches[1])
+    else:
+        return (pitches[1], pitches[0])
+
 class FiguredBassException(music21.Music21Exception):
     pass
 
