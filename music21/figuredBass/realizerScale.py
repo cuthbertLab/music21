@@ -19,13 +19,13 @@ from music21 import key
 from music21 import scale
 from music21.figuredBass import notation
 
+MAX_PITCH = pitch.Pitch('B5')
+
 scaleTypes = {'major' : scale.MajorScale,
               'minor' : scale.MinorScale,
               'dorian' : scale.DorianScale,
               'phrygian' : scale.PhrygianScale,
               'hypophrygian' : scale.HypophrygianScale}
-
-MAX_PITCH = pitch.Pitch('B7')
 
 class FiguredBassScale:
     def __init__(self, scaleValue, scaleType = 'major'):
@@ -98,14 +98,14 @@ class FiguredBassScale:
         [B3, D4, F4, G4]
         >>> fbScale.getSamplePitches('F3', '-6,-') #Neapolitan chord
         [F3, A-3, D-4]
-        >>> fbScale.getSamplePitches('C3', '4,3') #Second inversion seventh chord
-        [C3, E3, F3, A3]
+        >>> fbScale.getSamplePitches('C5', '4,3') #Second inversion seventh chord
+        [C5, E5, F5, A5]
         >>> fbScale.getSamplePitches('C#3', '-7') #Fully diminished seventh chord
         [C#3, E3, G3, B-3]
         '''
         bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
         maxPitch = copy.deepcopy(bassPitch)
-        maxPitch.transpose('d7', True)
+        maxPitch.transpose('d8', True)
         
         samplePitches = self.getPitches(bassPitch, notationString, maxPitch)
         samplePitches.sort()
@@ -121,11 +121,11 @@ class FiguredBassScale:
         >>> from music21 import *
         >>> fbScale = FiguredBassScale('C')
         >>> fbScale.getPitches('C3') #Root position triad
-        [C3, C4, C5, C6, C7, E3, E4, E5, E6, E7, G3, G4, G5, G6, G7]
+        [C3, E3, G3, C4, E4, G4, C5, E5, G5]
         >>> fbScale.getPitches('D3', '6') #First inversion triad
-        [D3, D4, D5, D6, D7, F3, F4, F5, F6, F7, B3, B4, B5, B6, B7]
-        >>> fbScale.getPitches(pitch.Pitch('G3'), '7', 'F5') #Root position seventh chord
-        [G3, G4, B3, B4, D4, D5, F4, F5]
+        [D3, F3, B3, D4, F4, B4, D5, F5, B5]
+        >>> fbScale.getPitches(pitch.Pitch('G3'), '7', 'F4') #Root position seventh chord
+        [G3, B3, D4, F4]
         '''
         bassPitch = convertToPitch(bassPitch)
         maxPitch = convertToPitch(maxPitch)
@@ -143,6 +143,7 @@ class FiguredBassScale:
             if not (givenPitch < bassPitch) and not (givenPitch > maxPitch):
                 pitchesAboveNote.append(givenPitch)
         
+        pitchesAboveNote.sort()
         return pitchesAboveNote
     
     
