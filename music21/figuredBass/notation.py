@@ -17,7 +17,7 @@ from music21 import pitch
 from music21 import key
 from music21 import note
 
-MAX_PITCH = pitch.Pitch('B7')
+MAX_PITCH = pitch.Pitch('B5')
 
 shorthandNotation = {(None,) : (5,3),
                      (5,) : (5,3),
@@ -226,8 +226,8 @@ class Notation:
         
         for i in range(len(self.numbers)):
             number = self.numbers[i]
-            modifier = self.modifiers[i]
-            figure = Figure(number, modifier)
+            modifierString = self.modifierStrings[i]
+            figure = Figure(number, modifierString)
             figures.append(figure)
         
         self.figures = figures
@@ -242,9 +242,10 @@ class Figure:
     A figure consists of a number with its modifier,
     if applicable.
     '''
-    def __init__(self, number, modifier=None):
+    def __init__(self, number, modifierString=''):
         self.number = number
-        self.modifier = modifier
+        self.modifierString = modifierString
+        self.modifier = Modifier(modifierString)
     
     def __repr__(self):
         return '<music21.figuredBass.notation.%s %s %s>' % (self.__class__.__name__, self.number, self.modifier)
