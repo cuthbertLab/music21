@@ -372,28 +372,51 @@ def printChordProgression(chordProgression):
     print(tenorLine)
     print(bassLine)
 
-def resolveDiminishedSeventh(pitches, inPlace=False):
-    #TODO: Implement method.
+#Resolving four part dominant seventh chord to tonic.
+def resolveDominantSeventh(pitches, inPlace=False):
+    if not inPlace:
+        pitches = copy.deepcopy(pitches) #Using a copy of the list, can then resolve in place.
+    
+    c = chord.Chord(pitches)
+    pitches = c.pitches #In case the pitches given are strings
+    if not c.isDominantSeventh():
+        raise FiguredBassException("Pitches don't form a dominant seventh chord.")
+    if not len(pitches) == 4:
+        raise FiguredBassException("Not a four part chord. Unsupported resolution.")
+    
+    print c.inversion()
+    #In a four part dominant seventh chord, resolution (to tonic) is like this:
+    #Tritone resolves. 
+    #If chord in root position, root goes to tonic. 
+    #Else, root stays the same.
+    #Fifth of chord goes to tonic. 
+    #Fifth can also go to third, but only really acceptable when it's the root (2nd inversion)
+    
+    #Need to keep the order intact (just in case)
+    #Step 1: Tritone(s) resolve
+    #Step 2: Resolve root
+    #Step 3: Resolve fifth
     return pitches
     
 def resolveTritone(pitchA, pitchB, inPlace=False):
     '''
-    Given two pitches, A and B, which form a tritone, either A4 or d5,
+    Given two pitches, A and B, which form a tritone,
     returns a tuple containing (resolutionA, resolutionB). 
+    Pitches do not have to be in closed position.
 
     Returns a FiguredBassException if the pitches do not form a tritone.
     
     >>> from music21 import *
     >>> from music21.figuredBass import realizer as r
     >>> p1 = pitch.Pitch('F3')
-    >>> p2 = pitch.Pitch('B3')
+    >>> p2 = pitch.Pitch('B4')
     >>> r.resolveTritone(p1, p2) #Diminished Fifth
-    (E3, C4)
+    (E3, C5)
     >>> r.resolveTritone(p2, p1) #Order matters
-    (C4, E3)
-    >>> p3 = pitch.Pitch('F4')
+    (C5, E3)
+    >>> p3 = pitch.Pitch('F5')
     >>> r.resolveTritone(p2, p3) #Augmented Fourth
-    (C4, E4)
+    (C5, E5)
     >>> p4 = pitch.Pitch('C5')
     >>> r.resolveTritone(p3, p4)
     Traceback (most recent call last):
@@ -416,8 +439,11 @@ def resolveTritone(pitchA, pitchB, inPlace=False):
     pitches = [pitchA, pitchB]
     pitches.sort()
     
-    #Find (positive) interval between pitches
-    tInterval = interval.notesToInterval(pitches[0], pitches[1])
+    c = chord.Chord(pitches)
+    newC = c.closedPosition()
+    
+    #Find (positive) interval between pitches in closed position
+    tInterval = interval.notesToInterval(newC.pitches[0], newC.pitches[1])
 
     #If interval not a tritone, exit method now.
     if not (tInterval == dimFifth or tInterval == augFourth):
@@ -445,6 +471,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    print resolveDominantSeventh(['D4', 'B3', 'F4', 'G4'])
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
