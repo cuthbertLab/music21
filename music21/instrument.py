@@ -384,7 +384,32 @@ class Contrabass(StringInstrument):
 
         self.lowestNote = pitch.Pitch("C2")
 
+class Guitar(StringInstrument):
+    pass
 
+class ElectricGuitar(Guitar):
+    def __init__(self):
+        Guitar.__init__(self)
+
+        self.instrumentName = 'Electric Guitar'
+        self.instrumentAbbreviation = 'Elec.Gtr.'
+        self.midiProgram = 26
+
+class ElectricBass(Guitar):
+    def __init__(self):
+        Guitar.__init__(self)
+
+        self.instrumentName = 'Electric Bass'
+        self.instrumentAbbreviation = 'Elec.b'
+        self.midiProgram = 33
+
+class Harp(StringInstrument):
+    def __init__(self):
+        StringInstrument.__init__(self)
+
+        self.instrumentName = 'Harp'
+        self.instrumentAbbreviation = 'Hp'
+        self.midiProgram = 46
 
 
 #-------------------------------------------------------------------------------
@@ -392,6 +417,37 @@ class WoodwindInstrument(Instrument):
     def __init__(self):
         Instrument.__init__(self)
 
+class Flute(WoodwindInstrument):
+    def __init__(self):
+        WoodwindInstrument.__init__(self)
+
+        self.instrumentName = 'Flute'
+        self.instrumentAbbreviation = 'Fl'
+        self.midiProgram = 73
+
+class Piccolo(Flute):
+    def __init__(self):
+        Flute.__init__(self)
+
+        self.instrumentName = 'Piccolo'
+        self.instrumentAbbreviation = 'Picc'
+        self.midiProgram = 72
+
+class Oboe(WoodwindInstrument):
+    def __init__(self):
+        WoodwindInstrument.__init__(self)
+
+        self.instrumentName = 'Oboe'
+        self.instrumentAbbreviation = 'Ob'
+        self.midiProgram = 68
+
+class Clarinet(WoodwindInstrument):
+    def __init__(self):
+        WoodwindInstrument.__init__(self)
+
+        self.instrumentName = 'Clarinet'
+        self.instrumentAbbreviation = 'Cl'
+        self.midiProgram = 71
 
 class Bassoon(WoodwindInstrument):
     def __init__(self):
@@ -401,6 +457,25 @@ class Bassoon(WoodwindInstrument):
         self.instrumentAbbreviation = 'Bs'
         self.midiProgram = 70
 
+#---------
+class PitchedPercussion(Instrument):
+    pass
+
+class Xylophone(PitchedPercussion):
+    def __init__(self):
+        PitchedPercussion.__init__(self)
+
+        self.instrumentName = 'Xylophone'
+        self.instrumentAbbreviation = 'Xyl.'
+        self.midiProgram = 13
+
+class Glockenspiel(PitchedPercussion):
+    def __init__(self):
+        PitchedPercussion.__init__(self)
+
+        self.instrumentName = 'Glockenspiel'
+        self.instrumentAbbreviation = 'Gsp'
+        self.midiProgram = 9
 
 #http://home.comcast.net/~igpl/NWR.html
 # TODO: NEENA -- take list and continue to 100 -- just for fun...
@@ -425,7 +500,7 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():

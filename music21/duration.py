@@ -1904,6 +1904,28 @@ class Duration(DurationCommon):
     def appendTuplet(self, newTuplet):
         self.tuplets = self.tuplets + (newTuplet,)
 
+    def _getOrdinal(self):
+        '''Get the ordinal value of the Duration.
+        
+        >>> from music21 import *
+        >>> d = duration.Duration()
+        >>> d.quarterLength = 2.0
+        >>> d.ordinal
+        5
+        
+        '''
+        if self._componentsNeedUpdating == True:
+            self._updateComponents()
+            
+        if len(self.components) > 1:
+            return 'complex'
+        elif len(self.components) == 1:
+            return self.components[0].ordinal
+        else:
+            return None
+#            raise DurationException("zero DurationUnits in components")
+
+    ordinal = property(_getOrdinal)
 
 
     #---------------------------------------------------------------------------

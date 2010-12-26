@@ -1,3 +1,4 @@
+﻿# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         tempo.py
 # Purpose:      Classes and tools relating to tempo
@@ -16,22 +17,63 @@ import unittest, doctest
 
 import music21
 import music21.note
+import music21.common
 
 _MOD = "tempo.py"
 
+# all lowercase, even german
+defaultTempoValues = {
+     'molto adagio': 40,
+     'adagio': 52,
+     'slow': 52,
+     'langsam': 52,
+     'andante': 72,
+     'moderato': 90,
+     'moderate': 90,
+     'allegretto': 108,
+     'allegro': 132,
+     'fast': 132,
+     'schnell': 132,
+     'molto allegro': 144,
+     'très vite': 144,
+     'presto': 168,
+     'prestissimo': 200}
 
 class TempoMark(music21.Music21Object):
     '''
-    >>> tm = TempoMark("adagio")
+    >>> import music21
+    >>> tm = music21.tempo.TempoMark("adagio")
     >>> tm.value
     'adagio'
+    
+    
+    
+    Common marks such as "adagio," "moderato," "molto allegro," etc.
+    get sensible default values.  If not found, uses a default of 90:
+    
+    >>> tm.number
+    52
+    >>> tm2 = music21.tempo.TempoMark("très vite")
+    >>> tm2.number
+    144
+    >>> tm3 = music21.tempo.TempoMark("extremely, wicked fast!")
+    >>> tm3.number
+    90
+    
     '''
     
     classSortOrder = 1
+    number = 90
     
     def __init__(self, value = None):
         music21.Music21Object.__init__(self)
-        self.value = value
+        if music21.common.isNum(value):
+            self.value = str(value)
+            self.number = value
+        else:
+            self.value = value
+            if value.lower() in defaultTempoValues:
+                self.number = defaultTempoValues[value]
     
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, self.value)
@@ -40,15 +82,31 @@ class TempoMark(music21.Music21Object):
 
 class MetronomeMark(TempoMark):
     '''
-    >>> a = MetronomeMark(40)
+    
+    A way of specifying only a particular tempo and referent and (optionally) a text description
+    
+    >>> from music21 import *
+    >>> a = tempo.MetronomeMark(40, note.HalfNote(), "slow")
     >>> a.number
     40
+    >>> a.referent
+    <music21.duration.Duration 2.0>
+    >>> a.referent.type
+    'half'
+    >>> a.value
+    'slow'
     '''
-    def __init__(self, number = 60, referent = None):
-        TempoMark.__init__(self, number)
+    def __init__(self, number = 60, referent = None, value = None):
+        if value is not None:
+            TempoMark.__init__(self, value)
+        else:
+            TempoMark.__init__(self, number)
 
         self.number = number
-        self.referent = referent # should be a music21.note.Duration object
+        if referent is not None and 'Duration' not in referent.classes:
+            self.referent = referent.duration
+        else:
+            self.referent = referent # should be a music21.duration.Duration object or a Music21Object with a duration or None
     
     def __repr__(self):
         return "<music21.tempo.MetronomeMark %s>" % str(self.number)
@@ -218,4 +276,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-

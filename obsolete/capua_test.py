@@ -1,7 +1,7 @@
 
 import music21
-from stream import Stream
-from note import Note
+from music21.stream import Stream
+from music21.note import Note
 import capua
 
 def colorCapuaFictaTest():

@@ -9,11 +9,30 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Classes for representing and processing articulations. Specific articulations are modeled as :class:`~music21.articulation.Articulation` subclasses. 
+'''
+Classes for representing and processing articulations. 
+Specific articulations are modeled as :class:`~music21.articulation.Articulation` subclasses. 
 
- A :class:`~music21.note.Note` object has a :attr:`~music21.note.Note.articulations` attribute. This list can be used to store one or more :class:`music21.articulation.Articulation` subclasses.
+ A :class:`~music21.note.Note` object has a :attr:`~music21.note.Note.articulations` attribute. 
+ This list can be used to store one or more :class:`music21.articulation.Articulation` subclasses.
 
-As much as possible, MusicXML names are used for Articulation classes, with xxx-yyy changed to XxxYyy 
+As much as possible, MusicXML names are used for Articulation classes, 
+with xxx-yyy changed to XxxYyy.  For instance, "strong-accent" in
+MusicXML is "StrongAccent" here.
+
+Fingering and other playing marks are found here.  Fermatas, trills, etc. 
+are found in music21.expressions.
+
+
+>>> from music21 import *
+>>> n1 = note.Note("D#4")
+>>> n1.articulations.append(articulations.Tenuto())
+>>> #_DOCS_SHOW n1.show()
+
+>>> c1 = chord.Chord(["C3","G4","E-5"])
+>>> c1.articulations = [articulations.OrganHeel(), articulations.Accent() ]
+>>> #_DOCS_SHOW c1.show()
+
 '''
 
 import doctest, unittest
@@ -32,7 +51,13 @@ class ArticulationException(Exception):
 
 #-------------------------------------------------------------------------------
 class Articulation(music21.Music21Object):
-    '''Base class for all Articulation sub-classes. 
+    '''
+    Base class for all Articulation sub-classes. 
+    
+    >>> from music21 import *
+    >>> x = articulations.Articulation()
+    >>> x.placement = 'below'
+    
     '''
     def __init__(self):
         music21.Music21Object.__init__(self)
@@ -40,21 +65,38 @@ class Articulation(music21.Music21Object):
         self.placement = 'above'
 
     def __eq__(self, other):
-        '''Equality. Based only on the class name, as not other attributes are independent of context and deployment.
+        '''
+        Equality. Based only on the class name, 
+        as other other attributes are independent of context and deployment.
 
         >>> from music21 import *
-        >>> at1 = StrongAccent()
-        >>> at2 = StrongAccent()
-        >>> at3 = Accent()
-        >>> at4 = Staccatissimo()
-        >>> at5 = Staccato()
-        >>> at6 = Spiccato()
+        >>> at1 = articulations.StrongAccent()
+        >>> at2 = articulations.StrongAccent()
+        >>> at1.placement = 'above'
+        >>> at2.placement = 'below'
         >>> at1 == at2
         True
+
+
+
+
+        Comparison between classes and with the object itself behaves as expected
+        
+
+
+
+        >>> at3 = articulations.Accent()
+        >>> at4 = articulations.Staccatissimo()
         >>> at1 == at3
         False
-        >>> at6 == at6
+        >>> at4 == at4
         True
+
+
+
+        #OMIT_FROM_DOCS
+        >>> at5 = articulations.Staccato()
+        >>> at6 = articulations.Spiccato()
         >>> [at1, at4, at3] == [at1, at4, at3]
         True
         >>> [at1, at2, at3] == [at2, at3, at1]
@@ -75,12 +117,12 @@ class Articulation(music21.Music21Object):
         '''Inequality. Needed for pitch comparisons.
 
         >>> from music21 import *
-        >>> at1 = StrongAccent()
-        >>> at2 = StrongAccent()
-        >>> at3 = Accent()
-        >>> at4 = Staccatissimo()
-        >>> at5 = Staccato()
-        >>> at6 = Spiccato()
+        >>> at1 = articulations.StrongAccent()
+        >>> at2 = articulations.StrongAccent()
+        >>> at3 = articulations.Accent()
+        >>> at4 = articulations.Staccatissimo()
+        >>> at5 = articulations.Staccato()
+        >>> at6 = articulations.Spiccato()
         >>> at1 != at2
         False
         >>> at1 != at3
@@ -91,13 +133,50 @@ class Articulation(music21.Music21Object):
 
 
     def _getMX(self):
-        '''Return an mxArticulationMark
+        '''
+        Advanced method for musicxml output.  Not needed by most users.
+
+        As a getter: Returns a class (mxArticulationMark) that represents the
+        MusicXML structure of an articulation mark.
 
         >>> from music21 import *
-        >>> a = Accent()
+        >>> a = articulations.Accent()
         >>> mxArticulationMark = a.mx
         >>> mxArticulationMark
         <accent placement=above>
+
+
+
+        As a setter: Provided an musicxml.ArticulationMark object (not an mxArticulations object)
+        configure the music21 object.
+
+
+        Create both a musicxml.ArticulationMark object and a conflicting music21 object:
+        
+        
+        
+        >>> from music21 import *
+        >>> mxArticulationMark = musicxml.ArticulationMark('accent')
+        >>> mxArticulationMark.set('placement', 'below')
+        >>> a = articulations.Tenuto()
+        >>> a.placement = 'above'
+
+
+
+        Now override the music21 object with the mxArticulationMark object's characteristics
+
+
+
+
+        >>> a.mx = mxArticulationMark
+        >>> a._mxName
+        'accent'
+        >>> 'Tenuto' in a.classes
+        False
+        >>> 'Accent' in a.classes
+        True
+        >>> a.placement
+        'below'
         '''
 
         #mxArticulations = musicxml.Articulations()
@@ -108,16 +187,6 @@ class Articulation(music21.Music21Object):
 
 
     def _setMX(self, mxArticulationMark):
-        '''Provided an mxArticulation object (not an mxArticulations object)
-        to configure the object.
-
-        >>> from music21 import *
-        >>> mxArticulationMark = musicxml.ArticulationMark('accent')
-        >>> a = Articulation()
-        >>> a.mx = mxArticulationMark
-        >>> a._mxName
-        'accent'
-        '''
         self.placement = mxArticulationMark.get('placement')
         self._mxName = mxArticulationMark.tag
         if self._mxName == 'accent':
@@ -162,7 +231,7 @@ class Accent(DynamicArticulation):
     def __init__(self):
         '''
         >>> from music21 import *
-        >>> a = Accent()
+        >>> a = articulations.Accent()
         '''
         DynamicArticulation.__init__(self)
         self._mxName = 'accent'
@@ -171,7 +240,7 @@ class StrongAccent(Accent):
     def __init__(self):
         '''
         >>> from music21 import *
-        >>> a = StrongAccent()
+        >>> a = articulations.StrongAccent()
         '''
         Accent.__init__(self)
         self._mxName = 'strong-accent'
@@ -180,7 +249,7 @@ class Staccato(LengthArticulation):
     def __init__(self):
         '''
         >>> from music21 import *
-        >>> a = Staccato()
+        >>> a = articulations.Staccato()
         '''
         LengthArticulation.__init__(self)
         self._mxName = 'staccato'
@@ -188,8 +257,11 @@ class Staccato(LengthArticulation):
 class Staccatissimo(Staccato):
     def __init__(self):
         '''
+        A very short note (derived from staccato), usually
+        represented as a wedge.
+        
         >>> from music21 import *
-        >>> a = Staccatissimo()
+        >>> a = articulations.Staccatissimo()
         '''
         Staccato.__init__(self)
         self._mxName = 'staccatissimo'
@@ -197,8 +269,10 @@ class Staccatissimo(Staccato):
 class Spiccato(Staccato):
     def __init__(self):
         '''
+        A staccato note + accent in one
+        
         >>> from music21 import *
-        >>> a = Spiccato()
+        >>> a = articulations.Spiccato()
         '''
         Staccato.__init__(self)
         self._mxName = 'spiccato'
@@ -207,7 +281,7 @@ class Tenuto(LengthArticulation):
     def __init__(self):
         '''
         >>> from music21 import *
-        >>> a = Tenuto()
+        >>> a = articulations.Tenuto()
         '''
         LengthArticulation.__init__(self)
         self._mxName = 'tenuto'
@@ -216,7 +290,7 @@ class DetachedLegato(LengthArticulation):
     def __init__(self):
         '''
         >>> from music21 import *
-        >>> a = DetachedLegato()
+        >>> a = articulations.DetachedLegato()
         '''
         LengthArticulation.__init__(self)
         self._mxName = 'detached-legato'
@@ -253,9 +327,11 @@ class Unstress(DynamicArticulation):
 
 
 #-------------------------------------------------------------------------------
-class TechnicalIndication(object):
+class TechnicalIndication(Articulation):
     '''
-    TechnicalIndications (MusicXML: technical) give performance indications specific to different instrument types.
+    TechnicalIndications (MusicXML: technical) give performance 
+    indications specific to different instrument types, such
+    as harmonics or bowing.
     '''
     pass
 
@@ -293,7 +369,8 @@ class StringFingering(Bowing):
 
 class Pizzicato(Bowing):
     '''
-    in MusicXML, Pizzicato is an element of every note.  Here we represent pizzes along with all bowing marks.
+    in MusicXML, Pizzicato is an element of every note.  
+    Here we represent pizzes along with all bowing marks.
     '''
     pass
     

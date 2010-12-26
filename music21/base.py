@@ -2420,8 +2420,9 @@ class Music21Object(JSONSerializer):
         Split an Element into two Elements at a provided QuarterLength into the Element.
 
         >>> from music21 import *
-        >>> a = note.NotRest()
+        >>> a = note.Note('C#5')
         >>> a.duration.type = 'whole'
+        >>> a.articulations = [articulations.Staccato()]
         >>> b, c = a.splitAtQuarterLength(3)
         >>> b.duration.type
         'half'
@@ -2429,12 +2430,16 @@ class Music21Object(JSONSerializer):
         1
         >>> b.duration.quarterLength
         3.0
+        >>> b.articulations
+        [<music21.articulations.Staccato object at 0x...>]
         >>> c.duration.type
         'quarter'
         >>> c.duration.dots
         0
         >>> c.duration.quarterLength
         1.0
+        >>> c.articulations
+        []
         '''
         # was note.splitNoteAtPoint
 
@@ -2451,6 +2456,11 @@ class Music21Object(JSONSerializer):
         else:
             e = copy.deepcopy(self)
         eRemain = copy.deepcopy(self)
+        
+        # clear articulations from remaining parts
+        if hasattr(eRemain, 'articulations'):
+            eRemain.articulations = []
+
 
         lenEnd = self.duration.quarterLength - quarterLength
         lenStart = self.duration.quarterLength - lenEnd
@@ -2507,7 +2517,10 @@ class Music21Object(JSONSerializer):
 
     def splitByQuarterLengths(self, quarterLengthList, addTies=True, 
         displayTiedAccidentals=False):
-        '''Given a list of quarter lengths, return a list of Music21Objects objects, copied from this Music21Objects, that are partitioned and tied with the specified quarter length list durations.
+        '''Given a list of quarter lengths, return a list of 
+        Music21Object objects, copied from this Music21Object, 
+        that are partitioned and tied with the specified quarter 
+        length list durations.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -2536,6 +2549,12 @@ class Music21Object(JSONSerializer):
             ql = quarterLengthList[i]
             e = copy.deepcopy(self)
             e.quarterLength = ql
+
+            if i != 0:
+                # clear articulations from remaining parts
+                if hasattr(e, 'articulations'):
+                    e.articulations = []
+
 
             if addTies:
                 # if not last
@@ -2616,6 +2635,12 @@ class Music21Object(JSONSerializer):
         if len(self.duration.components) == (len(self.duration.linkages) - 1):
             for i in range(len(self.duration.components)):
                 tempNote = copy.deepcopy(self)
+                if i != 0:
+                    # clear articulations from remaining parts
+                    if hasattr(tempNote, 'articulations'):
+                        tempNote.articulations = []
+
+                
                 # note that this keeps durations 
                 tempNote.duration = self.duration.components[i]
                 if i != (len(self.duration.components) - 1):
