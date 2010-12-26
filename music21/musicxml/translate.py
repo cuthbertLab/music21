@@ -454,8 +454,10 @@ def noteToMxNotes(n, spannerBundle=None):
             elif su.isLast(n):
                 mxSlur.set('type', 'stop')
             else:
-                # this may no always be an error
-                raise TranslateException('have a slur that has this note as a component but that note is neither a start nor an end.')
+                # this may not always be an error
+                environLocal.printDebug(['have a slur that has this note as a component but that note is neither a start nor an end.', su, n])
+                #raise TranslateException('have a slur that has this note as a component but that note is neither a start nor an end.')
+                continue
 
             mxNoteList[0].notationsObj.componentList.append(mxSlur)
     
