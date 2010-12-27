@@ -40,7 +40,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 3, 1) 
+VERSION_MINIMUM = (0, 3, 2) 
 
 
 #-------------------------------------------------------------------------------

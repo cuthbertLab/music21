@@ -20,6 +20,7 @@ import music21
 from music21 import musicxml as musicxmlMod
 from music21 import defaults
 from music21 import common
+from music21 import node
 
 # modules that import this include stream.py, chord.py, note.py
 # thus, cannot import these here
@@ -713,6 +714,29 @@ def measureToMx(m, spannerBundle=None):
     return mxMeasure
 
 
+def _addToStaffReference(mxObject, target, staffReference):
+    '''Utility routine for importing musicXML objects; here, we store a reference to the music21 object in a dictionary, where keys are the staff values. Staff values may be None, 1, 2, etc.  
+    '''
+    if common.isListLike(mxObject):
+        if len(mxObject) > 0:
+            mxObject = mxObject[0] # if a chord, get the first components
+        else: # if an empty list
+            return 
+    # add to staff reference
+    if hasattr(mxObject, 'staff'):
+        key = mxObject.staff
+    # some objects tore staff assignment simply as number
+    else:
+        try:
+            key = mxObject.get('number')
+        except node.NodeException:
+            environLocal.printDebug(['cannot find staff number in mxObject', mxObject])
+            return 
+    if key not in staffReference.keys():
+        staffReference[key] = []
+    staffReference[key].append(target)
+
+
 def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     '''Translate an mxMeasure (a MusicXML :class:`~music21.musicxml.Measure` object) into a music21 :class:`~music21.stream.Measure`.
 
@@ -785,28 +809,28 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     # getting first for each of these for now
     if mxAttributesInternal and len(mxAttributes.timeList) != 0:
         for mxSub in mxAttributes.timeList:
-            m.timeSignature = meter.TimeSignature()
-            m.timeSignature.mx = mxSub
-            break # just get first for now
-#         m.timeSignature = meter.TimeSignature()
-#         m.timeSignature.mx = mxAttributes.timeList
+            ts = meter.TimeSignature()
+            ts.mx = mxSub
+            _addToStaffReference(mxSub, ts, staffReference)
+            m.insert(0, ts)
+            #m.timeSignature = meter.TimeSignature()
+            #m.timeSignature.mx = mxSub
     if mxAttributesInternal is True and len(mxAttributes.clefList) != 0:
         for mxSub in mxAttributes.clefList:
-            m.clef = clef.Clef()
-            m.clef.mx = mxSub
-            break # just get first
-#         m.clef = clef.Clef()
-#         m.clef.mx = mxAttributes.clefList
-
+            cl = clef.Clef()
+            cl.mx = mxSub
+            _addToStaffReference(mxSub, cl, staffReference)
+            m.insert(0, cl)
+            #m.clef = clef.Clef()
+            #m.clef.mx = mxSub
     if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
         for mxSub in mxAttributes.keyList:
-            m.keySignature = key.KeySignature()
-            m.keySignature.mx = mxSub
-            break # just get first
-#         m.keySignature = key.KeySignature()
-#         m.keySignature.mx = mxAttributes.keyList
-
-
+            ks = key.KeySignature()
+            ks.mx = mxSub
+            _addToStaffReference(mxSub, ks, staffReference)
+            m.insert(0, ks)
+            #m.keySignature = key.KeySignature()
+            #m.keySignature.mx = mxSub
 
     if mxAttributes.divisions is not None:
         divisions = mxAttributes.divisions
@@ -913,6 +937,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     #n = note.Note()
                     #n.mx = mxNote
                     n = mxToNote(mxNote, spannerBundle=spannerBundle)
+                    _addToStaffReference(mxNote, n, staffReference)
                     if useVoices:
                         m.voices[mxNote.voice].insert(offsetMeasureNote, n)
                     else:
@@ -930,6 +955,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             else: # its a rest
                 n = note.Rest()
                 n.mx = mxNote # assign mxNote to rest obj
+                _addToStaffReference(mxNote, n, staffReference)
+
                 #m.insert(offsetMeasureNote, n)
                 if useVoices:
                     m.voices[mxNote.voice].insert(offsetMeasureNote, n)
@@ -946,6 +973,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 c.mx = mxNoteList
                 mxNoteList = [] # clear for next chord
                 #m.insert(offsetMeasureNote, c)
+                # just store first mxNote in chord; do not need all
+                _addToStaffReference(mxNoteList, c, staffReference)
                 if useVoices:
                     m.voices[mxNote.voice].insert(offsetMeasureNote, c)
                 else:
@@ -963,12 +992,16 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             if mxObj.getDynamicMark() is not None:
                 d = dynamics.Dynamic()
                 d.mx = mxObj
+                _addToStaffReference(mxObj, d, staffReference)
                 m.insert(offsetMeasureNote, d)  
             if mxObj.getWedge() is not None:
                 w = dynamics.Wedge()
                 w.mx = mxObj     
+                _addToStaffReference(mxObj, w, staffReference)
                 m.insert(offsetMeasureNote, w)  
-    return m
+
+    #environLocal.printDebug(['staffReference', staffReference])
+    return m, staffReference
 
 def measureToMusicXML(m):
     '''Translate a music21 Measure into a complete MusicXML string representation.
@@ -1058,7 +1091,6 @@ def streamPartToMx(s, instObj=None, meterStream=None,
         measureStream = s.makeNotation(meterStream=meterStream,
                         refStreamOrTimeRange=refStreamOrTimeRange)
         #environLocal.printDebug(['Stream._getMXPart: post makeNotation, length', len(measureStream)])
-
 
         # after calling measuresStream, need to update Spanners, as a deepcopy
         # has been made
@@ -1297,7 +1329,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         # create a music21 measure and then assign to mx attribute
         #m = stream.Measure()
         #m.mx = mxMeasure  # assign data into music21 measure 
-        m = mxToMeasure(mxMeasure, spannerBundle=spannerBundle)
+        m, staffReference = mxToMeasure(mxMeasure, spannerBundle=spannerBundle)
 
         if m.timeSignature is not None:
             lastTimeSignature = m.timeSignature

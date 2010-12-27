@@ -325,6 +325,8 @@ class Node(object):
             raise NodeException('this object does not have a %s (or %s) attribute' % (name, candidates))
         
     def get(self, name):
+        '''Get a data attrbiute from this Node. If available in the attribute dictionary, return this first. If available as an object attribute, return this second. 
+        '''
         if name in self._attr.keys():
             return self._attr[name]
 

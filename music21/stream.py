@@ -6808,7 +6808,11 @@ class Measure(Stream):
     def _setMX(self, mxMeasure):
         '''Given an mxMeasure, create a music21 measure
         '''
-        return musicxmlTranslate.mxToMeasure(mxMeasure, inputM21=self)
+        # in just getting value for one measure, cannot create multiple parts
+        # for multi-staff presentation
+        m, staffReference = musicxmlTranslate.mxToMeasure(mxMeasure,
+                            inputM21=self)
+        return m
 
     mx = property(_getMX, _setMX)    
 
