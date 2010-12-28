@@ -3220,13 +3220,10 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
-
         #environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
-
         if refStreamOrTimeRange == None: # use local
             oLowTarget = 0
             oHighTarget = returnObj.highestTime
-
         elif isinstance(refStreamOrTimeRange, Stream):
             oLowTarget = refStreamOrTimeRange.lowestOffset
             oHighTarget = refStreamOrTimeRange.highestTime
@@ -3252,14 +3249,12 @@ class Stream(music21.Music21Object):
                 #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
                 # place at oLowTarget to reach to oLow
                 v.insert(oLowTarget, r)
-        
             qLen = oHighTarget - oHigh
             if qLen > 0:
                 r = note.Rest()
                 r.duration.quarterLength = qLen
                 # place at oHigh to reach to oHighTarget
                 v.insert(oHigh, r)
-    
             if fillGaps:
                 gapStream = v.findGaps()
                 if gapStream != None:
@@ -6513,7 +6508,6 @@ class Measure(Stream):
         else:
             environLocal.printDebug(['padAsAnacrusis() called; however, no anacrusis shift necessary:', barDuration.quarterLength, proportion])
 
-
     #---------------------------------------------------------------------------
     def bestTimeSignature(self):
         '''Given a Measure with elements in it, get a TimeSignature that contains all elements.
@@ -6581,7 +6575,6 @@ class Measure(Stream):
         ts.loadRatio(numerator, denominator)
         return ts
 
-
     def _getBarDuration(self):
         '''Return the bar duration, or the Duration specified by the TimeSignature. 
 
@@ -6602,7 +6595,6 @@ class Measure(Stream):
     barDuration = property(_getBarDuration, 
         doc = '''Return the bar duration, or the Duration specified by the TimeSignature. TimeSignature is found first within the Measure, or within a context based search.
         ''')
-
 
     #---------------------------------------------------------------------------
     # Music21Objects are stored in the Stream's elements list 
@@ -6642,7 +6634,6 @@ class Measure(Stream):
 
     clef = property(_getClef, _setClef)    
 
-
     def _getTimeSignature(self):
         '''
         >>> a = Measure()
@@ -6678,7 +6669,6 @@ class Measure(Stream):
 
     timeSignature = property(_getTimeSignature, _setTimeSignature)   
 
-
     def _getKeySignature(self):
         '''
         >>> a = Measure()
@@ -6712,9 +6702,6 @@ class Measure(Stream):
 
     keySignature = property(_getKeySignature, _setKeySignature)   
 
-
-
-
     def _getLeftBarline(self):
         '''
         >>> a = Measure()
@@ -6746,8 +6733,6 @@ class Measure(Stream):
     leftBarline = property(_getLeftBarline, _setLeftBarline, 
         doc = '''Get or set the left barline, or the Barline object found at offset zero of the Measure.
         ''')   
-
-
 
     def _getRightBarline(self):
         # look on _endElements
@@ -6785,8 +6770,6 @@ class Measure(Stream):
         'light-heavy'
         ''')   
 
-
-
     #---------------------------------------------------------------------------
     def _getMX(self):
         '''Return a musicxml Measure, populated with notes, chords, rests
@@ -6804,7 +6787,6 @@ class Measure(Stream):
         '''
         return musicxmlTranslate.measureToMx(self)
 
-
     def _setMX(self, mxMeasure):
         '''Given an mxMeasure, create a music21 measure
         '''
@@ -6816,18 +6798,12 @@ class Measure(Stream):
 
     mx = property(_getMX, _setMX)    
 
-
-
     def _getMusicXML(self):
         '''Provide a complete MusicXML: representation. 
         '''
         return musicxmlTranslate.measureToMusicXML(self)
 
-
-
     musicxml = property(_getMusicXML)
-
-
 
 
 
@@ -6841,6 +6817,9 @@ class Part(Stream):
     assumes that this part fits on one staff and shares it with no other
     part
     '''
+
+    def __init__(self, *args, **keywords):
+        Stream.__init__(self, *args, **keywords)
 
     def makeAccidentals(self):
         '''
@@ -6868,6 +6847,17 @@ class Part(Stream):
         return lv2
     
     lily = property(_getLily)
+
+
+
+class PartStaff(Part):
+    '''A Part subclass for designating music that is represented on a single staff but may only be one of many staffs for a single part.
+    
+    '''
+    def __init__(self, *args, **keywords):
+        Part.__init__(self, *args, **keywords)
+
+
 
 
 

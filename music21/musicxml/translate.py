@@ -681,7 +681,7 @@ def measureToMx(m, spannerBundle=None):
                         sub.voice = v.id # the voice id is the voice number
                     mxMeasure.componentList += objList
             # create backup object configured to duration of accumulated
-            # notes
+            # notes, meaning that we always return to the start of the measure
             mxBackup = musicxmlMod.Backup()
             mxBackup.duration = int(divisions * offsetMeasureNote)
             mxMeasure.componentList.append(mxBackup)
@@ -717,20 +717,21 @@ def measureToMx(m, spannerBundle=None):
 def _addToStaffReference(mxObject, target, staffReference):
     '''Utility routine for importing musicXML objects; here, we store a reference to the music21 object in a dictionary, where keys are the staff values. Staff values may be None, 1, 2, etc.  
     '''
+    #environLocal.printDebug(['_addToStaffReference(): called with:', target])
     if common.isListLike(mxObject):
         if len(mxObject) > 0:
             mxObject = mxObject[0] # if a chord, get the first components
         else: # if an empty list
+            environLocal.printDebug(['got an mxObject as an empty list', mxObject])
             return 
     # add to staff reference
     if hasattr(mxObject, 'staff'):
         key = mxObject.staff
-    # some objects tore staff assignment simply as number
+    # some objects store staff assignment simply as number
     else:
         try:
             key = mxObject.get('number')
         except node.NodeException:
-            environLocal.printDebug(['cannot find staff number in mxObject', mxObject])
             return 
     if key not in staffReference.keys():
         staffReference[key] = []
@@ -836,7 +837,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         divisions = mxAttributes.divisions
     else:
         divisions = mxMeasure.external['divisions']
-
     #environLocal.printDebug(['mxToMeasure(): divisions', divisions, mxMeasure.getVoiceCount()])
 
     if mxMeasure.getVoiceCount() > 1:
@@ -868,10 +868,12 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         # check for backup and forward first
         if isinstance(mxObj, musicxmlMod.Backup):
             # resolve as quarterLength, subtract from measure offset
+            environLocal.printDebug(['found mxl backup:', mxObj.duration])
             offsetMeasureNote -= float(mxObj.duration) / float(divisions)
             continue
         elif isinstance(mxObj, musicxmlMod.Forward):
             # resolve as quarterLength, add to measure offset
+            environLocal.printDebug(['found mxl forward:', mxObj.duration])
             offsetMeasureNote += float(mxObj.duration) / float(divisions)
             continue
 
@@ -956,7 +958,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 n = note.Rest()
                 n.mx = mxNote # assign mxNote to rest obj
                 _addToStaffReference(mxNote, n, staffReference)
-
                 #m.insert(offsetMeasureNote, n)
                 if useVoices:
                     m.voices[mxNote.voice].insert(offsetMeasureNote, n)
@@ -971,17 +972,13 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 or mxNoteNext.get('chord') is False):
                 c = chord.Chord()
                 c.mx = mxNoteList
-                mxNoteList = [] # clear for next chord
-                #m.insert(offsetMeasureNote, c)
-                # just store first mxNote in chord; do not need all
                 _addToStaffReference(mxNoteList, c, staffReference)
                 if useVoices:
                     m.voices[mxNote.voice].insert(offsetMeasureNote, c)
                 else:
                     m.insert(offsetMeasureNote, c)
-
+                mxNoteList = [] # clear for next chord
                 offsetIncrement = c.quarterLength
-
             # only increment Chords after completion
             offsetMeasureNote += offsetIncrement
 
@@ -998,9 +995,15 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 w = dynamics.Wedge()
                 w.mx = mxObj     
                 _addToStaffReference(mxObj, w, staffReference)
-                m.insert(offsetMeasureNote, w)  
-
+                m.insert(offsetMeasureNote, w)
     #environLocal.printDebug(['staffReference', staffReference])
+
+    # if we have voices and/or if we used backup/forward, we may have
+    # empty space in the stream
+    if useVoices:
+        for v in m.voices:
+            if len(v) > 0: # do not bother with empty voices
+                v.makeRests(inPlace=True)
     return m, staffReference
 
 def measureToMusicXML(m):
@@ -1015,9 +1018,7 @@ def measureToMusicXML(m):
     >>> post[-100:].replace('\\n', '')
     ' <type>quarter</type>        <notations/>      </note>    </measure>  </part></score-partwise>'
     '''
-    
     from music21 import stream, duration
-
     # search for time signatures, either defined locally or in context
     found = m.getTimeSignatures(returnDefault=False)
     if len(found) == 0:
@@ -1028,7 +1029,6 @@ def measureToMusicXML(m):
             ts = None # get the default
     else:
         ts = found[0]
-
     # might similarly look for key signature, instrument, and clef
     # must copy here b/c do not want to alter original, and need to set
     # new objects in some cases (time signature, etc)
@@ -1180,14 +1180,12 @@ def streamToMx(s, spannerBundle=None):
         if spannerBundle is None: 
             # no spanner bundle provided, get one from the flat stream
             spannerBundle = spanner.SpannerBundle(partStream.flat)
-            environLocal.printDebug(['streamToMx(), hasPartLikeStreams(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
-
+            #environLocal.printDebug(['streamToMx(), hasPartLikeStreams(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
 
         for obj in partStream.getElementsByClass('Stream'):
             # may need to copy element here
             # apply this streams offset to elements
             obj.transferOffsetToElements() 
-
             ht = obj.highestTime
             if ht > highestTime:
                 highestTime = ht
@@ -1243,8 +1241,7 @@ def streamToMx(s, spannerBundle=None):
         if spannerBundle is None: 
             # no spanner bundle provided, get one from the flat stream
             spannerBundle = spanner.SpannerBundle(s.flat)
-            environLocal.printDebug(['streamToMx(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
-
+            #environLocal.printDebug(['streamToMx(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
 
         mxComponents.append(streamPartToMx(s,
                 meterStream=meterStream, 
@@ -1275,6 +1272,27 @@ def streamToMx(s, spannerBundle=None):
 
     return mxScore
 
+def _getUniqueStaffKeys(staffReferenceList):
+    '''Given a list of staffReference dictionaries, collect and return a list of all unique keys except None
+    '''
+    post = []
+    for staffReference in staffReferenceList:
+        for key in staffReference.keys():
+            if key is not None and key not in post:
+                post.append(key)
+    post.sort()
+    return post
+
+def _getStaffExclude(staffReference, targetKey):
+    '''Given a staff reference dictionary, remove and combine in a list all elements that are not part of the given key. Thus, remove all entries under None (common to all) and th e given key. This then is the list of all elements that should be deleted.
+    '''
+    post = []
+    for key in staffReference.keys():
+        if key is None or int(key) == int(targetKey):
+            continue
+        post += staffReference[key]
+    return post
+
 
 def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     '''Load a part into a new Stream or one provided by `inputM21` given an mxScore and a part name.
@@ -1293,7 +1311,6 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     from music21 import stream
     from music21 import spanner
 
-
     if inputM21 == None:
         # need a Score to load parts into
         from music21 import stream
@@ -1303,7 +1320,6 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 
     if spannerBundle == None:
         spannerBundle = spanner.SpannerBundle()
-
 
     mxPart = mxScore.getPart(partId)
     mxInstrument = mxScore.getInstrument(partId)
@@ -1322,14 +1338,15 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         streamPart.id = instrumentObj.bestName()
     streamPart.insert(instrumentObj) # add instrument at zero offset
 
+    staffReferenceList = []
     # offset is in quarter note length
     oMeasure = 0.0
     lastTimeSignature = None
     for mxMeasure in mxPart:
-        # create a music21 measure and then assign to mx attribute
-        #m = stream.Measure()
-        #m.mx = mxMeasure  # assign data into music21 measure 
+
         m, staffReference = mxToMeasure(mxMeasure, spannerBundle=spannerBundle)
+        # there will be one for each measure
+        staffReferenceList.append(staffReference)
 
         if m.timeSignature is not None:
             lastTimeSignature = m.timeSignature
@@ -1365,13 +1382,46 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
                 mOffsetShift = lastTimeSignature.barDuration.quarterLength 
         oMeasure += mOffsetShift
 
-    streamPart.addGroupForElements(partId) # set group for components 
-    streamPart.groups.append(partId) # set group for stream itself
+    # if we have multiple staves defined, add more parts
+    # note: this presently has to look at _idLastDeepCopyOf to get matches
+    # to find removed elements after copying; this is probably not the
+    # best way to do this. 
+    if mxPart.getStavesCount() > 1:
+        # get staves will return a number, between 1 and count
+        #for staffCount in range(mxPart.getStavesCount()):
+        for staffCount in _getUniqueStaffKeys(staffReferenceList):
+            partIdStaff = '%s-Staff%s' % (partId, staffCount)
+            #environLocal.printDebug(['partIdStaff', partIdStaff])
+            streamPartStaff = copy.deepcopy(streamPart)
+            # assign this as a PartStaff, a subclass of Part
+            streamPartStaff.__class__ = stream.PartStaff
+            # remove all elements that are not part of this staff
+            mStream = streamPartStaff.getElementsByClass('Measure')
+            for i, staffReference in enumerate(staffReferenceList):
+                staffExclude = _getStaffExclude(staffReference, staffCount)
+                m = mStream[i]
+                # may need to look for elements in voices as well
+                for eRemove in staffExclude:
+                    for eMeasure in m:
+                        if eMeasure._idLastDeepCopyOf == id(eRemove):
+                            m.remove(eMeasure)
+                    for v in m.voices:
+                        v.remove(eRemove)
+                        for eVoice in v:
+                            if eVoice._idLastDeepCopyOf == id(eRemove):
+                                v.remove(eVoice)
 
-    # add to this Stream
+            streamPartStaff.addGroupForElements(partIdStaff) 
+            streamPartStaff.groups.append(partIdStaff) 
+            s.insert(0, streamPartStaff)
+    else:
+        streamPart.addGroupForElements(partId) # set group for components 
+        streamPart.groups.append(partId) # set group for stream itself
+        s.insert(0, streamPart)
+
+    # when adding parts to this Score
     # this assumes all start at the same place
     # even if there is only one part, it will be placed in a Stream
-    s.insert(0, streamPart)
 
 
 def mxToStream(mxScore, spannerBundle=None, inputM21=None):
@@ -1475,11 +1525,10 @@ class Test(unittest.TestCase):
         #s.show()
         
 
-    def testMultipleStavesPerPart(self):
-
-
+    def testMultipleStavesPerPartA(self):
         from music21 import converter, stream
         from music21.musicxml import testPrimitive
+        from music21.musicxml import testFiles
         from music21.musicxml import base
 
         mxDoc = base.Document()
@@ -1490,6 +1539,32 @@ class Test(unittest.TestCase):
         self.assertEqual(p1.getStavesCount(), 2)
 
         s = converter.parse(testPrimitive.pianoStaff43a)
+        self.assertEqual(len(s.parts), 2)
+        #s.show()
+        self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 1)
+        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Note')), 1)
+
+        self.assertEqual(isinstance(s.parts[0], stream.PartStaff), True)
+        self.assertEqual(isinstance(s.parts[1], stream.PartStaff), True)
+
+
+    def testMultipleStavesPerPartB(self):
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive
+        from music21.musicxml import testFiles
+        from music21.musicxml import base
+
+        s = converter.parse(testFiles.moussorgskyPromenade)
+        self.assertEqual(len(s.parts), 2)
+
+        self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 19)
+        # only chords in the second part
+        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Note')), 0)
+
+        self.assertEqual(len(s.parts[0].flat.getElementsByClass('Chord')), 11)
+        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Chord')), 11)
+
+        #s.show()
 
 
 
@@ -1502,7 +1577,8 @@ if __name__ == "__main__":
         t = Test()
         #t.testVoices()
         #t.testSlurInputA()
-        t.testMultipleStavesPerPart()
+        #t.testMultipleStavesPerPartA()
+        t.testMultipleStavesPerPartB()
 
 
 
