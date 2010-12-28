@@ -1013,7 +1013,6 @@ class Measure(MusicXMLElementList):
         self.set('attributes', attributes)
         self.external['divisions'] = attributes.get('divisions')
 
-
     def update(self):
         '''This method looks at all note, forward, and backup objects and updates divisons and attributes references
         '''
@@ -1026,10 +1025,14 @@ class Measure(MusicXMLElementList):
             for attrObj in self._attributesObjList:
                 #environLocal.printDebug(['found multiple Attributes', attrObj])
                 attrConsolidate = attrConsolidate.merge(attrObj)
-            environLocal.printDebug(['Measure.updaate(); found multiple Attributes objects for a single measure', attrConsolidate])
+            #environLocal.printDebug(['Measure.updaate(); found multiple Attributes objects for a single measure', attrConsolidate])
             self.attributesObj = attrConsolidate
             self.external['attributes'] = self.attributesObj
-            self.external['divisions'] = self.attributesObj.divisions
+            # must make sure that this is not None, as we may get an incomplete
+            # attributes object here
+            if self.attributesObj.divisions is not None:
+                self.external['divisions'] = self.attributesObj.divisions
+            # keep existing divisions
 
         #counter = 0
         noteThis = None
@@ -1037,43 +1040,15 @@ class Measure(MusicXMLElementList):
         for pos in range(len(self.componentList)):
             #environLocal.printDebug(['Measure.update()', counter])
             obj = self.componentList[pos]
-
-# this mechanism was used for storing note 
-# locations within a measure; this is no longer necessary
-#             if obj.tag == 'forward':
-#                 counter += int(obj.duration)
-#                 continue
-#             elif obj.tag == 'backup':
-#                 counter -= int(obj.duration)
-#                 continue
             if obj.tag in ['note']:
                 if obj.voice is not None:
                     if obj.voice not in self._voiceIndices:
                         self._voiceIndices.append(obj.voice)
-
                 # may need to assign new, merged attributes obj to components
                 if updateAttributes:
                     obj.external['attributes'] = self.attributesObj     
                     if self.attributesObj.divisions != None:
                         obj.external['divisions'] = self.attributesObj.divisions     
-
-#                 noteThis = obj
-#                 # get a reference to the next note
-#                 if pos+1 == len(self.componentList):
-#                     noteNext = None
-#                 else:
-#                     for posSub in range(pos+1, len(self.componentList)):
-#                         if self.componentList[posSub].tag == 'note':
-#                             noteNext = self.componentList[posSub]
-#                             break
-#                 obj.external['start'] = counter
-#                 # only increment if next note is not a chord
-#                 if noteNext != None and not noteNext.chord:
-#                     if obj.duration == None: # a grace note
-#                         pass
-#                     else:
-#                         counter = counter + int(obj.duration)
-
         self._voiceIndices.sort()
 
 
@@ -2201,6 +2176,8 @@ class Handler(xml.sax.ContentHandler):
             # to the last defined time value; store here for access
             self._measureObj.external['time'] = self._timeObjLast
             self._measureObj.loadAttrs(attrs)
+
+            #environLocal.printDebug(['setting divisions from self._divisionsLast', 'self._measureObj.get("number")', self._measureObj.get("number"),  self._divisionsLast])
 
 
         elif name == 'slur':

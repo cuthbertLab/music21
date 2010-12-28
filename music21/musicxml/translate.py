@@ -837,7 +837,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         divisions = mxAttributes.divisions
     else:
         divisions = mxMeasure.external['divisions']
-    #environLocal.printDebug(['mxToMeasure(): divisions', divisions, mxMeasure.getVoiceCount()])
+    if divisions is None:
+        environLocal.printDebug(['cannot get a division from mxObject', m, "mxMeasure.external['divisions']", mxMeasure.external['divisions']])
+        raise TranslateException('cannot get a division from mxObject')
 
     if mxMeasure.getVoiceCount() > 1:
         useVoices = True
@@ -868,12 +870,12 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         # check for backup and forward first
         if isinstance(mxObj, musicxmlMod.Backup):
             # resolve as quarterLength, subtract from measure offset
-            environLocal.printDebug(['found mxl backup:', mxObj.duration])
+            #environLocal.printDebug(['found mxl backup:', mxObj.duration])
             offsetMeasureNote -= float(mxObj.duration) / float(divisions)
             continue
         elif isinstance(mxObj, musicxmlMod.Forward):
             # resolve as quarterLength, add to measure offset
-            environLocal.printDebug(['found mxl forward:', mxObj.duration])
+            #environLocal.printDebug(['found mxl forward:', mxObj.duration, 'divisions', divisions])
             offsetMeasureNote += float(mxObj.duration) / float(divisions)
             continue
 
@@ -1567,6 +1569,16 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testMultipleStavesPerPartC(self):
+
+        from music21 import corpus
+        s = corpus.parseWork('schoenberg/opus19/movement2')        
+        self.assertEqual(len(s.parts), 2)
+
+        s = corpus.parseWork('schoenberg/opus19/movement6')        
+        self.assertEqual(len(s.parts), 2)
+
+        #s.show()
 
 if __name__ == "__main__":
     import sys
@@ -1578,7 +1590,7 @@ if __name__ == "__main__":
         #t.testVoices()
         #t.testSlurInputA()
         #t.testMultipleStavesPerPartA()
-        t.testMultipleStavesPerPartB()
+        t.testMultipleStavesPerPartC()
 
 
 
