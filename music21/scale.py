@@ -475,9 +475,15 @@ class AbstractDiatonicScale(AbstractScale):
             self.relativeMajorStep = 6
             self.relativeMinorStep = 4
         elif mode in ['hupomixolydian']:
-            intervalList = srcList[3:] + srcList[:3] # f to f
+            intervalList = srcList[3:] + srcList[:3] 
             self.tonicStep = 4
             self.dominantStep = 7
+            self.relativeMajorStep = 5
+            self.relativeMinorStep = 3
+        elif mode in ['hypolocrian']:
+            intervalList = srcList[3:] + srcList[:3] # f to f
+            self.tonicStep = 4
+            self.dominantStep = 6
             self.relativeMajorStep = 5
             self.relativeMinorStep = 3
         else:
@@ -1485,6 +1491,52 @@ class PhrygianScale(DiatonicScale):
         self._abstract._buildNetwork(self.type)
 
 
+class LydianScale(DiatonicScale):
+    '''A lydian scale
+
+    >>> sc = LydianScale(pitch.Pitch('f'))
+    >>> sc.pitches
+    [F4, G4, A4, B4, C5, D5, E5, F5]
+    >>> sc = LydianScale(pitch.Pitch('c'))
+    >>> sc.pitches
+    [C4, D4, E4, F#4, G4, A4, B4, C5]
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "lydian"
+        self._abstract._buildNetwork(self.type)
+
+class MixolydianScale(DiatonicScale):
+    '''A mixolydian scale
+
+    >>> sc = MixolydianScale(pitch.Pitch('g'))
+    >>> sc.pitches
+    [G4, A4, B4, C5, D5, E5, F5, G5]
+    >>> sc = MixolydianScale(pitch.Pitch('c'))
+    >>> sc.pitches
+    [C4, D4, E4, F4, G4, A4, B-4, C5]
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "mixolydian"
+        self._abstract._buildNetwork(self.type)
+
+
+class HypodorianScale(DiatonicScale):
+    '''A hypodorian scale
+
+    >>> sc = HypodorianScale(pitch.Pitch('d'))
+    >>> sc.pitches
+    [A3, B3, C4, D4, E4, F4, G4, A4]
+    >>> sc = HypodorianScale(pitch.Pitch('c'))
+    >>> sc.pitches
+    [G3, A3, B-3, C4, D4, E-4, F4, G4]
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "hypodorian"
+        self._abstract._buildNetwork(self.type)
+
 
 class HypophrygianScale(DiatonicScale):
     '''A hypophrygian scale
@@ -1507,35 +1559,87 @@ class HypophrygianScale(DiatonicScale):
         self._abstract._buildNetwork(self.type)
 
 
+class HypolydianScale(DiatonicScale):
+    '''A hypolydian scale
 
-#     def getConcreteHarmonicMinorScale(self):
-#         scale = self.pitches[:]
-#         scale[6] = self.getLeadingTone()
-#         scale.append(interval.transposePitch(self._tonic, "P8"))
-#         return scale
+    >>> sc = HypolydianScale(pitch.Pitch('f'))
+    >>> sc.pitches
+    [C4, D4, E4, F4, G4, A4, B4, C5]
+    >>> sc = HypolydianScale(pitch.Pitch('c'))
+    >>> sc.pitches
+    [G3, A3, B3, C4, D4, E4, F#4, G4]
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "hypolydian"
+        self._abstract._buildNetwork(self.type)
 
-#     def getAbstractHarmonicMinorScale(self):
-#         concrete = self.getConcreteHarmonicMinorScale()
-#         abstract = copy.deepcopy(concrete)
-#         for pitch1 in abstract:
-#             pitch1.octave = 0 #octave 0 means "octaveless"
-#         return abstract
-# 
 
-# melodic minor will be implemented in a different way
-#     def getConcreteMelodicMinorScale(self):
-#         scale = self.getConcreteHarmonicMinorScale()
-#         scale[5] = interval.transposePitch(self.pitchFromDegree(6), "A1")
-#         for n in range(0, 7):
-#             scale.append(self.pitchFromDegree(7-n))
-#         return scale
-# 
-#     def getAbstractMelodicMinorScale(self):
-#         concrete = self.getConcreteMelodicMinorScale()
-#         abstract = copy.deepcopy(concrete)
-#         for pitch1 in abstract:
-#             pitch1.octave = 0 #octave 0 means "octaveless"
-#         return abstract
+class HypomixolydianScale(DiatonicScale):
+    '''A hypolydian scale
+
+    >>> sc = HypomixolydianScale(pitch.Pitch('g'))
+    >>> sc.pitches
+    [D4, E4, F4, G4, A4, B4, C5, D5]
+    >>> sc = HypomixolydianScale(pitch.Pitch('c'))
+    >>> sc.pitches
+    [G3, A3, B-3, C4, D4, E4, F4, G4]
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "hypomixolydian"
+        self._abstract._buildNetwork(self.type)
+
+
+class LocrianScale(DiatonicScale):
+    '''A locrian scale
+
+    >>> sc = LocrianScale(pitch.Pitch('b'))
+    >>> sc.pitches
+    [B4, C5, D5, E5, F5, G5, A5, B5]
+    >>> sc = LocrianScale(pitch.Pitch('c'))
+    >>> sc.pitches
+    [C4, D-4, E-4, F4, G-4, A-4, B-4, C5]
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "locrian"
+        self._abstract._buildNetwork(self.type)
+
+
+class HypolocrianScale(DiatonicScale):
+    '''A hypolocrian scale
+
+    >>> sc = HypolocrianScale(pitch.Pitch('b'))
+    >>> sc.pitches
+    [F4, G4, A4, B4, C5, D5, E5, F5]
+    >>> sc = HypolocrianScale(pitch.Pitch('c'))
+    >>> sc.pitches
+    [G-3, A-3, B-3, C4, D-4, E-4, F4, G-4]
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "hypolocrian"
+        self._abstract._buildNetwork(self.type)
+
+
+class HypoaeolianScale(DiatonicScale):
+    '''A hypoaeolian scale
+
+    >>> sc = HypoaeolianScale(pitch.Pitch('a'))
+    >>> sc.pitches
+    [E4, F4, G4, A4, B4, C5, D5, E5]
+    >>> sc = HypoaeolianScale(pitch.Pitch('c'))
+    >>> sc.pitches
+    [G3, A-3, B-3, C4, D4, E-4, F4, G4]
+    '''
+    def __init__(self, tonic=None):
+        DiatonicScale.__init__(self, tonic=tonic)
+        self.type = "hypoaeolian"
+        self._abstract._buildNetwork(self.type)
+
+
+
 
 
 
