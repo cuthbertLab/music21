@@ -1175,7 +1175,7 @@ class Pitch(music21.Music21Object):
         else:
             tempAlter = int(tempAlter)
         if tempStep == 'B':
-            if tempAlter >= 0:
+            if tempAlter != -1:
                 tempStep = 'H'
             else:
                 tempAlter += 1
@@ -1185,9 +1185,9 @@ class Pitch(music21.Music21Object):
             tempName = tempStep + (tempAlter * 'is')
             return tempName
         else: # flats
-            if self.name in ['C','D','F','G']:
+            if tempStep in ['C','D','F','G','H']:
                 firstFlatName = 'es'
-            else: # A, E.  Hb should never occur...
+            else: # A, E.  Bs should never occur...
                 firstFlatName = 's'
             multipleFlats = abs(tempAlter) - 1
             tempName =  tempStep + firstFlatName + (multipleFlats * 'es')
@@ -1212,6 +1212,12 @@ class Pitch(music21.Music21Object):
     >>> p1.german
     Traceback (most recent call last):
     PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade!
+    
+    OMIT_FROM_DOCS
+    >>> print Pitch('B--').german
+    Heses
+    >>> print Pitch('B#').german
+    His
     ''')
 
 
