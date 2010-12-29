@@ -117,7 +117,18 @@ def putVariableLengthNumber(x):
     '\\x04'
     >>> putVariableLengthNumber(127)
     '\\x7f'
+    >>> putVariableLengthNumber(0)
+    '\\x00'
+    >>> putVariableLengthNumber(1024)
+    '\\x88\\x00'
+    >>> putVariableLengthNumber(-1)
+    Traceback (most recent call last):
+    MidiException: cannot putVariableLengthNumber() when number is negative: -1
     '''
+    #environLocal.printDebug(['calling putVariableLengthNumber(x) with', x])
+    # note: negative numbers will cause an infinite loop here
+    if x < 0:
+        raise MidiException('cannot putVariableLengthNumber() when number is negative: %s' % x)
     lst = [ ] 
     while True: 
         y, x = x & 0x7F, x >> 7 

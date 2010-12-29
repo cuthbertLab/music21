@@ -562,6 +562,8 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
     # NOTE: this procedure requires that there are no overlaps between
     # adjacent events. 
 
+    environLocal.printDebug(['streamToMidiTrack()'])
+
     if instObj is None:
         # see if an instrument is defined in this or a parent stream
         instObj = inputM21.getInstrument()
@@ -770,7 +772,6 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 pass
             elif e.type == 'MIDI_PORT':
                 pass
-
 
     # first create meta events
     for t, obj in metaEvents:
@@ -1057,6 +1058,18 @@ class Test(unittest.TestCase):
         self.assertEqual(str(mtList[0].events[:10]), match)
 
 
+    def testOverlappedEvents(self):
+
+        from music21 import stream, note
+
+        s = stream.Stream()
+        s.insert(0, note.Note('c'))
+        s.insert(0, note.Note('g'))
+        mt = streamToMidiTrack(s)
+
+        # NOTE: this raises an error, as overlapping events presently fail
+        #s.show('midi')
+
 
 if __name__ == "__main__":
     import sys
@@ -1069,7 +1082,9 @@ if __name__ == "__main__":
 
         #a.testKeySignature()
 
-        a.testAnacrusisTiming()
+        #a.testAnacrusisTiming()
+
+        a.testOverlappedEvents()
 
 #------------------------------------------------------------------------------
 # eof
