@@ -1195,7 +1195,7 @@ class Pitch(music21.Music21Object):
     
     german = property(_getGerman, doc ='''
     returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.)
-    (Microtones raise an error).
+    (Microtones raise an error).  Note that Ases is used instead of the also acceptable Asas.
     
     >>> print Pitch('B-').german
     B
