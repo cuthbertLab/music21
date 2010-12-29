@@ -1774,7 +1774,6 @@ class ChromaticScale(ConcreteScale):
     >>> sc.getScaleDegreeFromPitch('F#6')
     12
     '''
-
     def __init__(self, tonic=None):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractCyclicalScale(mode=['m2','m2','m2',
@@ -1805,7 +1804,6 @@ class WholeToneScale(ConcreteScale):
     >>> sc.getScaleDegreeFromPitch('F6')
     6
     '''
-
     def __init__(self, tonic=None):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractCyclicalScale(mode=['M2', 'M2',

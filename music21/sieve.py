@@ -117,46 +117,55 @@ def eratosthenes():
 
 
 def rabinMiller(n):
-    """based on an implementatioin found here:
-    http://krenzel.info/?p=83
-    see also here: http://www.4dsolutions.net/ocn/numeracy2.html
+    """Implementation of Rabin Miller primality test. 
+
+    See also here: http://www.4dsolutions.net/ocn/numeracy2.html
 
     >>> rabinMiller(234)
-    0
+    False
+    >>> rabinMiller(5)
+    True
+    >>> rabinMiller(4)
+    False
     """
     n = abs(n)
-    if n in [2,3]: return 1
+    if n in [2,3]: 
+        return True
     m = n % 6 # if n (except 2 and 3) mod 6 is not 1 or 5, then n isn't prime
-    if m != 1 and m != 5: return 0
+    if m != 1 and m != 5: 
+        return False
     # first hundred primes, 2, 3 handled by mod 6
     primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97] 
     if n <= 100:
-        if n in primes: return 1 # must include 2,3
-        return 0
+        if n in primes: 
+            return True # must include 2,3
+        return False
     for prime in primes:
         if n % prime == 0: return 0
     s, r = n-1, 1
     while not s & 1:
         s >>= 1
         r = r + 1       
-    for i in range(0,10): # random tests
+    for i in range(10): # random tests
         # calculate a^s mod n, where a is a random number
         y = pow(random.randint(1, n-1), s, n)
-        if y == 1: continue # n passed test, is composite
+        if y == 1: 
+            continue # n passed test, is composite
         # try values of j from 1 to r-1
-        for j in range(1,r):
-            if y == n - 1: break # if y = n-1, n passed the test this time
+        for j in range(1, r):
+            if y == n - 1: 
+                break # if y = n-1, n passed the test this time
             y = pow(y,2,n) # a^((2^j)*s) mod n
         else:
-             return 0 # y never equaled n-1, then n is composite
+             return False # y never equaled n-1, then n is composite
     # n passed all of the tests, it is very likely prime
-    return 1
+    return True
 
 
 
 
 #-------------------------------------------------------------------------------
-# list processing routines
+# list processing and unit interval routines
 
 def discreteBinaryPad(series, fixRange=None):
     """Treat a sequence of integers as defining contiguous binary integers, where provided values are 1's and excluded values are zero.
@@ -554,6 +563,7 @@ class Residual(object):
 
     #---------------------------------------------------------------------------
     def copy(self):
+        # TODO: replace with deepcopy method
         m = copy.copy(self._m)
         shift = copy.copy(self._shift)
         neg = copy.copy(self.neg)
@@ -866,7 +876,7 @@ class CompressionSegment(object):
 # precedence is -, &, |
 
 class Sieve(object):
-    """create a sieve segment from a sieve logical string of any complexity
+    """Create a sieve segment from a sieve logical string of any complexity.
     """
     def __init__(self, usrStr, z=None):
         """
@@ -1475,6 +1485,7 @@ class Sieve(object):
         else: # int, integer
             return seg
 
+
     def period(self, state=None):
         """Return the period of the sieve.
 
@@ -1503,7 +1514,6 @@ class Sieve(object):
 
     def __call__(self, n=0, z=None, format=None):
         return self.segment(self._state, n, z, format)
-
 
 
     def collect(self, n, zMinimum, length, format, zStep=100):
@@ -1559,6 +1569,7 @@ class Sieve(object):
     def repr(self, state=None, style=None):
         """style of None is use for users; adds | to singel residuals
         style abs (absolute) does not add | tos single residual class"""
+        # TODO: rename __repr__
         if state == None:
             state = self._state
         if state == 'exp':
@@ -1733,6 +1744,14 @@ class SievePitch(object):
                     sieveSeg.append(p)
 
         return sieveSeg
+
+
+
+    def getIntervalSequence(self):
+        '''Return a list of Interval objects that defines the complete structure of this sieve.
+        '''
+        pass
+
 
 
 
