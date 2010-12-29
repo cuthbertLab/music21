@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         tempo.py
 # Purpose:      Classes and tools relating to tempo
@@ -134,9 +134,9 @@ def interpolateElements(element1, element2, sourceStream, destinationStream, aut
     >>> destinationStream.insert(25.0, element2)
     
     
-    If eA, eB, and eC are three quarter notes 
+    Suppose eA, eB, and eC are three quarter notes that lie
     between element1 and element2 in sourceStream
-    and destinationStream:
+    and destinationStream, as in:
     
     
     >>> eA = note.QuarterNote("D4")
@@ -145,7 +145,7 @@ def interpolateElements(element1, element2, sourceStream, destinationStream, aut
     >>> sourceStream.insert(11, eA)
     >>> sourceStream.insert(12, eB)
     >>> sourceStream.insert(13, eC)
-    >>> destinationStream.append([eA, eB, eC])  # not needed with autoAdd
+    >>> destinationStream.append([eA, eB, eC])  # not needed if autoAdd were true
     
     
     
