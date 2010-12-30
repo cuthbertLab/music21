@@ -374,6 +374,12 @@ def printChordProgression(chordProgression):
 
 #Resolving four part dominant seventh chord to tonic.
 def resolveDominantSeventh(pitches, inPlace=False):
+    '''
+    >>> from music21 import *
+    >>> from music21.figuredBass import realizer as r
+    >>> r.resolveDominantSeventh(['G2', 'B3', 'D5', 'F4'])
+    [C3, C4, C5, E4]
+    '''
     c = chord.Chord(pitches)
 
     if not c.isDominantSeventh():
@@ -423,7 +429,6 @@ def resolveDominantSeventh(pitches, inPlace=False):
     for i in range(len(pitches)):
         del pitches[i].order
 
-    print c.pitches
     return pitches
 
 def cmp(pitchA, pitchB):
@@ -508,7 +513,6 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    print resolveDominantSeventh(['G2', 'B3', 'D5', 'F4'])
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
