@@ -799,6 +799,45 @@ class Chord(note.NotRest):
 
         return False
     
+    def third(self, testRoot = None):
+        '''shortcut for scaleX(3)'''
+        return scaleX(3, testRoot)
+
+    def fifth(self, testRoot = None):
+        '''shortcut for scaleX(5)'''
+        return scaleX(5, testRoot)
+    
+    def seventh(self, testRoot = None):
+        '''shortcut for scaleX(7)'''
+        return scaleX(7, testRoot)
+    
+    def scaleX(self, scaleDegree, testRoot = None):
+        '''
+        Exactly like hasScaleX, except it returns the (first) pitch at the 
+        provided scaleDegree instead of the number of semitones.
+        
+        example:
+        >>> from music21 import *
+        >>> cmaj = chord.Chord(['C','E','G'])
+        >>> cmaj.scaleX(3) # will return the third of the chord
+        E
+        >>> cmaj.scaleX(5) # will return the fifth of the chord
+        G
+        >>> cmaj.scaleX(6)
+        False
+        '''
+        if (testRoot is None):
+            testRoot = self.root()
+            if (testRoot is None):
+                raise ChordException("Cannot run scaleX without a root")
+
+        for thisPitch in self.pitches:
+            thisInterval = interval.notesToInterval(testRoot, thisPitch)
+            if (thisInterval.diatonic.generic.mod7 == scaleDegree):
+                return thisPitch
+
+        return False
+    
     def hasSpecificX(self, scaleDegree, testRoot = None):
         '''Exactly like hasScaleX, except it returns the interval itself instead of the number
         of semitones.
