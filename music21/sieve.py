@@ -35,7 +35,7 @@ A CompressionSegment can be used to derive a Sieve from any sequence of integers
 The SievePitch class provides a quick generation of Pitch lists from Sieves.
 
 
->>> a = SievePitch('13@3|13@6|13@9, c1, c10, 1')
+>>> a = SievePitch('13@3|13@6|13@9', 'c1', 'c10', 'f#4')
 >>> a()
 [F#1, A1, C2, G2, B-2, C#3, G#3, B3, D4, A4, C5, E-5, B-5, C#6, E6, B6, D7, F7, C8, E-8, F#8, C#9, E9, G9]
 
@@ -53,6 +53,31 @@ from music21 import common
 from music21 import environment
 _MOD = 'sieve.py'
 environLocal = environment.Environment(_MOD)
+
+
+#-------------------------------------------------------------------------------
+class UnitException(Exception):
+    pass
+
+class ResidualException(Exception):
+    pass
+
+class SieveException(Exception):
+    pass
+
+class CompressionSegmentException(Exception):
+    pass
+
+
+
+LGROUP = '{'
+RGROUP = '}'
+AND = '&'
+OR = '|'
+XOR = '^'
+BOUNDS = [LGROUP,RGROUP, AND,OR,XOR]
+NEG = '-'
+RESIDUAL = list(string.digits) + ['@']
 
 
 
@@ -101,7 +126,6 @@ def eratosthenes():
         if p != None: # key (prime candidate) in dictionary
             # update dictionary w/ the next multiple of this prime not already
             # in dicitionary
-            # print 'p,q', p, q
             nextMult = p + q # prime prime plus the candidate; next multiple
             while nextMult in D.keys(): # incr x by p until it is a unique key
                 nextMult = nextMult + p
@@ -478,8 +502,8 @@ class Residual(object):
         #print 'residual init self._z', self._z
         self._m = m
         if neg not in [0, 1]:
-            raise TypeError('negative value must be 0, 1, or a Boolean')
-        self.neg = neg # negative, complement boolean
+            raise ResidualException('negative value must be 0, 1, or a Boolean')
+        self._neg = neg # negative, complement boolean
         if self._m == 0: # 0 mode causes ZeroDivisionError
             self._shift = shift
         else:
@@ -499,10 +523,11 @@ class Residual(object):
         """
         self._z = range(min, max+1)
 
-    def segFmtSet(self, fmt):
+    def setSegmentFormat(self, fmt):
         #fmt = drawer.strScrub(fmt, 'l')
-        fmt  = fmt.strip().lower()
-        assert fmt in self._segmentFormatOptions
+        fmt = fmt.strip().lower()
+        if fmt in self._segmentFormatOptions:
+            raise ResidualException('format not in format optoins: %s' % fmt)
         self._segmentFormat = fmt
 
     #---------------------------------------------------------------------------
@@ -518,21 +543,21 @@ class Residual(object):
         >>> a.segment(3, range(3,15))
         [5, 8, 11, 14]
         """
-        #print 'residual arg z', z
-        if z == None: # z is temporary; if none
+        if z is None: # z is temporary; if none
             z = self._z # assign to local
-        #print 'residual using z', z
-        if format == None:
+        if format is None:
             format = self._segmentFormat
 
         subset = []
-        if self._m == 0: return subset # empty
+        if self._m == 0: 
+            return subset # empty
+
         n = (n + self._shift) % self._m # check for n >= m
 
         for value in z:
             if n == value % self._m:
                 subset.append(value)
-        if self.neg: # find opposite
+        if self._neg: # find opposite
             compset = copy.deepcopy(z)
             for value in subset:
                 compset.remove(value)
@@ -550,7 +575,7 @@ class Residual(object):
         elif format in ['int', 'integer']: # int, integer
             return seg
         else:
-            raise TypeError('%s not a valid sieve format string.' % format)
+            raise ResidualException('%s not a valid sieve format string.' % format)
 
     def period(self):
         """period is M; obvious, but nice for completeness
@@ -566,7 +591,7 @@ class Residual(object):
         # TODO: replace with deepcopy method
         m = copy.copy(self._m)
         shift = copy.copy(self._shift)
-        neg = copy.copy(self.neg)
+        neg = copy.copy(self._neg)
         # provide ref, not copy, to z
         return Residual(m, shift, neg, self._z)
     
@@ -577,21 +602,20 @@ class Residual(object):
         >>> a()
         [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
         """ # if z is None, uses self._z
-        #print 'residual', self.repr()
         return self.segment(n, z, format)
 
-    def repr(self, style=None):
+    def represent(self, style=None):
         """does not show any logical operator but unary negation"""
         if style == 'classic': # mathmatical style
             if self._shift != 0:
                 str = '%s(%s+%s)' % (self._m, 'n', self._shift)
             else:
                 str = '%s(%s)' % (self._m, 'n')
-            if self.neg:
+            if self._neg:
                 str = '-%s' % str
         else: # do evaluatable stype
             str = '%s@%s' % (self._m, self._shift) # show w/ @
-            if self.neg:
+            if self._neg:
                 str = '-%s' % str
         return str
 
@@ -602,13 +626,13 @@ class Residual(object):
         >>> str(a)
         '3@2'
         """
-        return self.repr() #default style
+        return self.represent() #default style
 
     def __eq__(self, other):
         "==, compare residual classes in terms of m and shift"
         if other == None: return 0
         if (self._m == other._m and self._shift == other._shift and 
-             self.neg == other.neg):
+             self._neg == other._neg):
             return 1
         else: return 0
 
@@ -616,7 +640,7 @@ class Residual(object):
         "m and shift not equal"
         if other == None: return 1
         if (self._m != other._m or self._shift != other._shift or
-             self.neg != other.neg):
+             self._neg != other._neg):
             return 1
         else: return 0
 
@@ -635,8 +659,8 @@ class Residual(object):
             elif self._shift > other._shift:
                 return 1
             else: # shifts are equal
-                if self.neg != other.neg:
-                    if self.neg == 1: # its negative, then less
+                if self._neg != other._neg:
+                    if self._neg == 1: # its negative, then less
                         return -1
                     else: return 1
                 else: return 0
@@ -644,7 +668,7 @@ class Residual(object):
 
     def __neg__(self):
         """unary neg operators; return neg object"""
-        if self.neg: #if 1
+        if self._neg: #if 1
             neg = 0
         else: # if 0
             neg = 1
@@ -661,8 +685,8 @@ class Residual(object):
         >>> str(c)
         '15@11'
         """
-        if other.neg or self.neg:
-            raise TypeError('complented Residual objects cannot be intersected')
+        if other._neg or self._neg:
+            raise ResidualException('complemented Residual objects cannot be intersected')
         m, n = self._cmpIntersection(self._m, other._m, self._shift, other._shift)
         # get the union of both z
         zSet = set(self._z) | set(other._z) 
@@ -729,37 +753,46 @@ class CompressionSegment(object):
         >>> a = CompressionSegment([3,4,5,6,7,8,13,19])
         >>> str(a)
         '6@1|7@6|8@5|9@4|10@3|11@8'
+
+        >>> b = CompressionSegment([0, 2, 4, 6, 8])
+        >>> str(b)
+        '2@0'
+
+        >>> c = CompressionSegment([0, 2, 4, 5, 7, 9, 11, 12])
+        >>> str(c)
+        '5@2|5@4|6@5|7@0'
         """
-        self.src = list(copy.deepcopy(src))
-        self.src.sort()
-        self.match = [] # already sorted from src
-        for num in self.src: # remove redundancies
-            if num not in self.match:
-                self.match.append(num)
-        if len(self.match) <= 1:
-            raise ValueError('segment must have more than one element')
+        src = list(copy.deepcopy(src))
+        src.sort()
+        self._match = [] # already sorted from src
+
+        for num in src: # remove redundancies
+            if num not in self._match:
+                self._match.append(num)
+        if len(self._match) <= 1:
+            raise CompressionSegmentException('segment must have more than one element')
         self._zUpdate(z) # sets self._z
         # max mod should always be the max of z; this is b/c at for any segment
         # if the mod == max of seg, at least one point can be found in the segment
         # mod is the step size, so only one step will happen in the sequence
-        self.MAXMOD = len(self._z) # set maximum mod tried
-        # assign self.residuals and do analysis
+        self._maxMod = len(self._z) # set maximum mod tried
+        # assign self._residuals and do analysis
         try:
             self._process()
         except AssertionError:
-            raise ValueError('no Residual classes found for this z range')
+            raise CompressionSegmentException('no Residual classes found for this z range')
 
     def _zUpdate(self, z=None):
         # z must at least be a superset of match
         if z != None: # its a list
-            if not self._subset(self.match, z):
-                raise ValueError('z range must be a superset of desired segment')
+            if not self._subset(self._match, z):
+                raise CompressionSegmentException('z range must be a superset of desired segment')
             else: # okay, assign
                 self._z = z
             zMin, zMax = self._z[0], self._z[-1]
         # z is range from max to min, unless provided at init     
         else: # range from min, max; add 1 for range() to max
-            zMin, zMax = self.match[0], self.match[-1] 
+            zMin, zMax = self._match[0], self._match[-1] 
             self._z = range(zMin, (zMax + 1)) 
 
 
@@ -771,14 +804,14 @@ class CompressionSegment(object):
         >>> str(b[0])
         '1@0'
         """
-        return self.residuals
+        return self._residuals
 
     def __str__(self):
         resStr = []
-        if len(self.residuals) == 1: # single union must have an or
-            resStr = '%s' % str(self.residuals[0])
+        if len(self._residuals) == 1: # single union must have an or
+            resStr = '%s' % str(self._residuals[0])
         else:
-            for resObj in self.residuals:
+            for resObj in self._residuals:
                 resStr.append(str(resObj))
             resStr = '|'.join(resStr)
         return resStr
@@ -809,7 +842,7 @@ class CompressionSegment(object):
                 return obj, seg
             m = m + 1
             # a mod will always be found, at least 1 point; should never happen
-            assert m <= self.MAXMOD
+            assert m <= self._maxMod
         #print 'error, no mod found', n, part
 
     def _process(self):
@@ -818,20 +851,21 @@ class CompressionSegment(object):
         residual. when found (one will be found), keep it; remove the found 
         segments from the match, and repeat"""
         # process residuals
-        self.residuals = [] # list of objects
-        match = copy.copy(self.match) # scratch to work on
+        self._residuals = [] # list of objects
+        match = copy.copy(self._match) # scratch to work on
         while 1: # loop over whatever is left in the match copy
             n = match[0] # always get first item 
-            obj, seg = self._find(n, match, self.match)
-            assert obj != None # no residual found; should never happen
-            if obj not in self.residuals: # b/c __eq__ defined
-                self.residuals.append(obj)
+            obj, seg = self._find(n, match, self._match)
+            if obj is None: # no residual found; should never happen
+                raise CompressionSegmentException('_find() returned a None object')
+            if obj not in self._residuals: # b/c __eq__ defined
+                self._residuals.append(obj)
                 for x in seg: # clean found values from match
                     if x in match:
                         match.remove(x)
             if len(match) == 0:
                 break
-        self.residuals.sort()
+        self._residuals.sort()
 
 
 #-------------------------------------------------------------------------------
@@ -884,46 +918,37 @@ class Sieve(object):
         >>> b = Sieve('2&4&8|5')
         >>> c = Sieve('(5|2)&4&8')
         """
-        self.LGROUP = '{'
-        self.RGROUP = '}'
-        self.AND = '&'
-        self.OR = '|'
-        self.XOR = '^'
-        self.BOUNDS = [self.LGROUP,self.RGROUP,self.AND,self.OR,self.XOR]
-        self.NEG = '-'
-        self.RESIDUAL = list(string.digits) + ['@']
-                
         # note: this z should only be used if usrStr is a str, and not a list
-        if z == None and common.isStr(usrStr):
+        if z is None and common.isStr(usrStr):
             z = range(0, 100)
-        elif z == None and common.isListLike(usrStr): # if a list, keep as None
+        elif z is None and common.isListLike(usrStr): # if a list
             pass
         self._z = z # may be none; will be handled in self._load
         
         self._state = 'exp' # default start state
-        self.expType = None # either 'simple' or 'complex'; set w/ load
+        self._expType = None # either 'simple' or 'complex'; set w/ load
         self._segmentFormat = 'int'
         self._segmentFormatOptions = ['int', 'bin', 'unit', 'wid']
 
-        self.nonCompressible = 0 # if current z provides a nullSeg; no compression
+        self._nonCompressible = False # if current z provides a nullSeg; no compression
         # varaibles will reinit w/ dedicated methods
-        self.resLib = {} # store id and object
-        self.resId = 0 # used to calculate residual ids
+        self._resLib = {} # store id and object
+        self._resId = 0 # used to calculate residual ids
 
         # expanded, compressed form
         self._expTree = '' # string that stores representation
         self._expPeriod = None # only set if called
         self._cmpTree = '' # string that stores representation
         self._cmpPeriod = None # only set if called; may not be same as exp
-        self.usrStr = usrStr # store user string, may be noen
-        if self.usrStr != None:
+        self._usrStr = usrStr # store user string, may be noen
+        if self._usrStr is not None:
             self._load()
 
     #---------------------------------------------------------------------------
     def _load(self):
-        if common.isListLike(self.usrStr):
+        if common.isListLike(self._usrStr):
             self._resClear()
-            self._initLoadSegment(self.usrStr) # z will be provided
+            self._initLoadSegment(self._usrStr) # z will be provided
             self._initCompression()
         # normal instance, or a manual load
         else: # process usrStr
@@ -934,28 +959,28 @@ class Sieve(object):
     def _initCompression(self):
         # only negative that will show up is binary negative, not unary
         # some internal intersections may have a complemented residual class
-        self.expType = 'complex' # assume complex
-        if (self.NEG in self._expTree or self.LGROUP in self._expTree or 
-             self.RGROUP in self._expTree or self.XOR in self._expTree):
+        self._expType = 'complex' # assume complex
+        if (NEG in self._expTree or LGROUP in self._expTree or 
+             RGROUP in self._expTree or XOR in self._expTree):
             try:
-                self._cmpSegment() # will update self.nonCompressible
+                self._cmpSegment() # will update self._nonCompressible
             except IndexError: # case of z not providing a sufficent any segment
-                self.nonCompressible = 1
+                self._nonCompressible = 1
         else: # try intersection
             try:
                 self._cmpIntersection()
-                self.expType = 'simple' # only if sucessful
+                self._expType = 'simple' # only if sucessful
             except TypeError: # attempted intersection of complemented
                 try: 
                     self._cmpSegment()
                 except IndexError: # no segments available
-                    self.nonCompressible = 1
+                    self._nonCompressible = 1
 
-        if self.nonCompressible:
+        if self._nonCompressible:
             method = 'no compression possible'
-        elif self.expType == 'complex':
+        elif self._expType == 'complex':
             method = 'segment'
-        elif self.expType == 'simple':
+        elif self._expType == 'simple':
             method = 'intersection'
 
 
@@ -979,24 +1004,24 @@ class Sieve(object):
     def compress(self, z=None):         
         '''Set this sieve to its compressed state. 
         '''
-        if z != None and z != self._z: # only process if z has changed
+        if z is not None and z != self._z: # only process if z has changed
             self._z = z
             self._resClear('cmp') # clear compressed residuals
-            self._initCompression() # may update self.nonCompressible
-        if self.nonCompressible: # do not changes set
-            print 'no compression availabile at this z.'
+            self._initCompression() # may update self._nonCompressible
+        if self._nonCompressible: # do not changes set
+            pass # no compression availabile at this z
         else:
             self._state = 'cmp'
 
 
     #---------------------------------------------------------------------------
     def _getParameterData(self):
-        '''Provides a dictionary representation. 
+        '''Provides a dictionary data representation for exchange
         '''
         data = {}
-        data['logStr'] = self.repr('exp') # store expanded representation
+        data['logStr'] = self.represent('exp') # store expanded representation
         if self._z == None: # get from residual classes, always one at 
-            data['z'] = self.resLib[self._resKeyStr(0)].z
+            data['z'] = self._resLib[self._resKeyStr(0)].z
         else:
             data['z'] = self._z
         return data
@@ -1013,11 +1038,13 @@ class Sieve(object):
         """
         self._z = range(min, max+1)
 
-    def segFmtSet(self, fmt):
+    def setSegmentFormat(self, fmt):
         #fmt = drawer.strScrub(fmt, 'l')
         fmt = fmt.strip().lower()
-        assert fmt in self._segmentFormatOptions
+        if fmt not in self._segmentFormatOptions:
+            raise SieveException('cannot set to format: %s' % fmt)
         self._segmentFormat = fmt
+
 
     #---------------------------------------------------------------------------
     # operator overloading for sieves
@@ -1026,8 +1053,8 @@ class Sieve(object):
     def __neg__(self):
         """unary neg operators; return neg object"""
         dataSelf = self._getParameterData()
-        usrStr = '%s%s%s%s' % (self.NEG, self.LGROUP, 
-                                     dataSelf['logStr'], self.RGROUP)
+        usrStr = '%s%s%s%s' % (NEG, LGROUP, 
+                                     dataSelf['logStr'], RGROUP)
         z = dataSelf['z']
         return Sieve(usrStr, z)
 
@@ -1043,8 +1070,8 @@ class Sieve(object):
         """
         dataSelf = self._getParameterData()
         dataOther = other._getParameterData()
-        usrStr = '%s%s%s%s%s%s%s' % (self.LGROUP, dataOther['logStr'],
-            self.RGROUP, self.AND, self.LGROUP, dataSelf['logStr'], self.RGROUP)
+        usrStr = '%s%s%s%s%s%s%s' % (LGROUP, dataOther['logStr'],
+            RGROUP, AND, LGROUP, dataSelf['logStr'], RGROUP)
         # take union of z
         zSet = set(dataSelf['z']) | set(dataOther['z'])     
         z = list(zSet)
@@ -1063,8 +1090,8 @@ class Sieve(object):
         dataSelf = self._getParameterData()
         dataOther = other._getParameterData()
 
-        usrStr = '%s%s%s%s%s%s%s' % (self.LGROUP, dataOther['logStr'],           
-                self.RGROUP, self.OR, self.LGROUP, dataSelf['logStr'], self.RGROUP)
+        usrStr = '%s%s%s%s%s%s%s' % (LGROUP, dataOther['logStr'],           
+                RGROUP, OR, LGROUP, dataSelf['logStr'], RGROUP)
         # take union of z
         zSet = set(dataSelf['z']) | set(dataOther['z'])     
         z = list(zSet)
@@ -1075,8 +1102,8 @@ class Sieve(object):
         dataSelf = self._getParameterData()
         dataOther = other._getParameterData()
 
-        usrStr = '%s%s%s%s%s%s%s' % (self.LGROUP, dataOther['logStr'],           
-                self.RGROUP, self.XOR, self.LGROUP, dataSelf['logStr'], self.RGROUP)
+        usrStr = '%s%s%s%s%s%s%s' % (LGROUP, dataOther['logStr'],           
+                RGROUP, XOR, LGROUP, dataSelf['logStr'], RGROUP)
         # take union of z
         zSet = set(dataSelf['z']) | set(dataOther['z'])     
         z = list(zSet)
@@ -1107,21 +1134,24 @@ class Sieve(object):
             usrStr = usrStr.replace('@', ',')
         # remove any braces remain, remove
         # all parenthesis and brackets are converted to braces
-        usrStr = usrStr.replace(self.LGROUP, '')
-        usrStr = usrStr.replace(self.RGROUP, '')
+        usrStr = usrStr.replace(LGROUP, '')
+        usrStr = usrStr.replace(RGROUP, '')
 
         # check for not 
         if usrStr[0] == '-': # negative/complement
             neg = 1
-            usrStr = usrStr[1:].strip() # strip to remove any leading white space
+            # strip to remove any leading white space
+            usrStr = usrStr[1:].strip() 
         else:
             neg = 0
-        if len(usrStr) == 0: return None
+        if len(usrStr) == 0: 
+            return None
     
         try: # assume we have either an int (M), or a tuple (M,N)
             args = eval(usrStr) 
         except (NameError, SyntaxError, TypeError):
             return None
+
         if common.isNum(args): 
             m = int(args) # int is mod
             shift = 0    # 0 is given as default shift
@@ -1150,26 +1180,26 @@ class Sieve(object):
             usrStr = '%s@0' % int(usrStr)
     
         if usrStr.find('and') >= 0: # replace with '&'
-            usrStr = usrStr.replace('and', self.AND)
+            usrStr = usrStr.replace('and', AND)
         if usrStr.find('*') >= 0: # Xenakis notation'
-            usrStr = usrStr.replace('*', self.AND)
+            usrStr = usrStr.replace('*', AND)
         if usrStr.find('or') >= 0:
-            usrStr = usrStr.replace('or', self.OR)
+            usrStr = usrStr.replace('or', OR)
         if usrStr.find('+') >= 0:
-            usrStr = usrStr.replace('+', self.OR)
+            usrStr = usrStr.replace('+', OR)
         if usrStr.find('xor') >= 0:
-            usrStr = usrStr.replace('^', self.OR)
+            usrStr = usrStr.replace('^', OR)
         if usrStr.find('not') >= 0:
-            usrStr = usrStr.replace('not', self.NEG)
+            usrStr = usrStr.replace('not', NEG)
         # all gruoopings converted to braces
         if usrStr.find('[') >= 0: # replace brackets w/ parenthesis
-            usrStr = usrStr.replace('[', self.LGROUP)
+            usrStr = usrStr.replace('[', LGROUP)
         if usrStr.find(']') >= 0:
-            usrStr = usrStr.replace(']', self.RGROUP)
+            usrStr = usrStr.replace(']', RGROUP)
         if usrStr.find('(') >= 0: # replace braces as well
-            usrStr = usrStr.replace('(', self.LGROUP)
+            usrStr = usrStr.replace('(', LGROUP)
         if usrStr.find(')') >= 0:
-            usrStr = usrStr.replace(')', self.RGROUP)
+            usrStr = usrStr.replace(')', RGROUP)
         # remove space
         usrStr = usrStr.replace(' ','')
         return usrStr
@@ -1188,13 +1218,13 @@ class Sieve(object):
         assert state in ['cmp', 'exp']
         if state == 'cmp':
             libKeys = []
-            for key in self.resLib.keys():
+            for key in self._resLib.keys():
                 if key in self._cmpTree:
                     libKeys.append(key)
             return libKeys
         elif state == 'exp':
             libKeys = []
-            for key in self.resLib.keys():
+            for key in self._resLib.keys():
                 if key in self._expTree:
                     libKeys.append(key)
             return libKeys
@@ -1204,7 +1234,7 @@ class Sieve(object):
         via period() method"""
         mList = []
         for key in self._resKeys(state):
-            p = self.resLib[key].period()
+            p = self._resLib[key].period()
             if p not in mList:
                 mList.append(p)
         mList.sort()
@@ -1217,15 +1247,15 @@ class Sieve(object):
         resDict = self._parseResidual(''.join(resStr))
         if resDict == None:
             msg = 'cannot parse %s' % ''.join(resStr)
-            raise SyntaxError('bad residual class notation: (%r)' % msg)
+            raise SieveException('bad residual class notation: (%r)' % msg)
         resObj = Residual(resDict['m'],resDict['shift'],
                     resDict['neg'], self._z)
-        #print 'created', resDict, self._z
-        self.resLib[self._resKeyStr(id)] = resObj
+
+        self._resLib[self._resKeyStr(id)] = resObj
         return self._resKeyStr(id)
 
     def _resAssign(self, id, resObj):
-        self.resLib[self._resKeyStr(id)] = resObj
+        self._resLib[self._resKeyStr(id)] = resObj
         return self._resKeyStr(id)
 
     def _resToSetStr(self, id, n=0, z=None):
@@ -1236,45 +1266,45 @@ class Sieve(object):
             z = self._z 
         # z is valid, gets default from residual class
         if not common.isListLike(z) and z != None:
-            raise TypeError('z must be a list of integers.')
-        valList = self.resLib[id](n, z) # call residual object
+            raise SieveException('z must be a list of integers.')
+        valList = self._resLib[id](n, z) # call residual object
         return self._setInstantiateStr(valList)
 
-    def _resIdIncr(self):
-        """increment the resId"""
-        self.resId = self.resId + 1
+    def _resIdIncrement(self):
+        """increment the _resId"""
+        self._resId = self._resId + 1
 
     def _resResetId(self):
-        """reset self.resId to the next available number
+        """reset self._resId to the next available number
         may need to re-label some residual classes if gaps develop
         ids should be coniguous integer sequence"""
-        iVals = range(0, len(self.resLib.keys()))
+        iVals = range(0, len(self._resLib.keys()))
         for i in iVals:
             testKey = self._resKeyStr(i)
             if testKey not in self._cmpTree and testKey not in self._expTree:
-                raise KeyError('gap in residual keys')
-        # set resId to next availabe index, the length of the keys
-        self.resId = len(self.resLib.keys())
+                raise SieveException('gap in residual keys')
+        # set _resId to next availabe index, the length of the keys
+        self._resId = len(self._resLib.keys())
 
     def _resClear(self, state=None):
         if state == None: # clear all
-            self.resLib = {} # store id and object
-            self.resId = 0
+            self._resLib = {} # store id and object
+            self._resId = 0
         elif state == 'cmp':
             cmpKeys = self._resKeys(state)
             for key in cmpKeys:
-                del self.resLib[key]
+                del self._resLib[key]
             # reset id to reflect deleted classes
             self._resResetId()
         elif state == 'exp':
-            raise ValueError('expanded residual classes shold never be cleared')
+            raise SieveException('expanded residual classes shold never be cleared')
 
     #---------------------------------------------------------------------------
     # expansion methods
 
     def _initLoadSegment(self, usrData):
         """load from a segments
-        reload resId"""
+        reload _resId"""
         # clear first
         self._expTree = [] # string that stores representation
         # use dynamically generated z
@@ -1284,21 +1314,20 @@ class Sieve(object):
         union = segObj() # convert to residual classes
         for resObj in union:
             # store resKey in dict, store as string
-            self._expTree.append(self._resAssign(self.resId, resObj))
-            self._resIdIncr()
-        self._expTree = self.OR.join(self._expTree)
-        #print _MOD, 'expTree', self._expTree
+            self._expTree.append(self._resAssign(self._resId, resObj))
+            self._resIdIncrement()
+        self._expTree = OR.join(self._expTree)
 
 
     def _initParse(self, z=None):
         """process usrStr string into proper argument dictionaries for Residual
         """
         # clear first
-        self.resLib = {} # store id and object
-        self.resId = 0
+        self._resLib = {} # store id and object
+        self._resId = 0
         self._expTree = [] # string that stores representation
         # will remove all spaces
-        logStr = self._parseLogic(copy.deepcopy(self.usrStr)) # logical string
+        logStr = self._parseLogic(copy.deepcopy(self._usrStr)) # logical string
         i = 0
         while 1:
             if i == len(logStr): break
@@ -1309,32 +1338,31 @@ class Sieve(object):
             if i == len(logStr) - 1: charNext = None # last
             else: charNext = logStr[i+1]
 
-            #print char, '(%s,%s)' % (charPrevious, charNext)
 
             # if a boundary symbol ({}&|) symply add to string
-            if char in self.BOUNDS:
+            if char in BOUNDS:
                 self._expTree.append(char)
                 i = i + 1
 
             # if NEG is last char this is always an error
-            elif char == self.NEG and charNext == None:
+            elif char == NEG and charNext == None:
                 msg = 'negation cannot be used without operands'
-                raise SyntaxError('badly formed logical string (a): (%s)' % msg)
+                raise SieveException('badly formed logical string (a): (%s)' % msg)
             # attempting to use negationg as a binary operators
-            elif (char == self.NEG and charPrevious != None and 
-                charPrevious in self.RESIDUAL): # digit, or @ sign
+            elif (char == NEG and charPrevious != None and 
+                charPrevious in RESIDUAL): # digit, or @ sign
                 msg = 'negation cannot be used as a binary operator'
-                raise SyntaxError('badly formed logical string (b): (%s)' % msg)
-            # check if self.NEG is not folloed by a digit;
-            # special case of self.NEG; need to convert into a binary operator
-            elif (char == self.NEG and charNext != None and 
-                charNext == self.LGROUP):
+                raise SieveException('badly formed logical string (b): (%s)' % msg)
+            # check if NEG is not folloed by a digit;
+            # special case of NEG; need to convert into a binary operator
+            elif (char == NEG and charNext != None and 
+                charNext == LGROUP):
                 # if not first char, and the prevous char is not an operator or
                 # a delimter, this is an error (binary negation)
                 if (charPrevious != None and charPrevious not 
-                    in [self.LGROUP, self.AND, self.OR, self.XOR]):
+                    in [LGROUP, AND, OR, XOR]):
                     msg = 'negation must be of a group and isolated by delimiters'
-                    raise SyntaxError('badly formed logical string (c): (%s)' % msg)
+                    raise SieveException('badly formed logical string (c): (%s)' % msg)
                 # add a set of z, or 1@0
                 else: # maintain representation until evaluation
                     self._expTree.append(char)
@@ -1342,34 +1370,34 @@ class Sieve(object):
 
             # processing a normal residual class; only first 
             # char can be negative
-            # self.NEG, if present, will be followed by digits
-            elif char in string.digits or char == self.NEG:
+            # NEG, if present, will be followed by digits
+            elif char in string.digits or char == NEG:
                 resStr = [] # string just for this residual class
                 subStart = copy.copy(i)
                 subLen = 0
                 # fist check for leading NEG
-                if logStr[subStart + subLen] == self.NEG:
-                    resStr.append(self.NEG)
+                if logStr[subStart + subLen] == NEG:
+                    resStr.append(NEG)
                     subLen = subLen + 1
                 while 1:
                     # if at the end of the logical string
                     if (subStart + subLen) == len(logStr): break
                     subChar = logStr[subStart + subLen]
                     # neg is boundary, as alrady gathered above
-                    if subChar in self.BOUNDS or subChar == self.NEG:
+                    if subChar in BOUNDS or subChar == NEG:
                         break # do not increment
                     else:
                         resStr.append(subChar)
                         subLen = subLen + 1
-                #print _MOD, 'found residual:', ''.join(resStr)
-                self._expTree.append(self._resCreate(self.resId, ''.join(resStr))) 
-                self._resIdIncr()
+
+                self._expTree.append(self._resCreate(self._resId, ''.join(resStr))) 
+                self._resIdIncrement()
                 i = i + subLen
             else: # some other char is in here
                 i = i + 1
         # do some checks 
-        if len(self.resLib) == 0:
-            raise SyntaxError('no residual classes defined')
+        if len(self._resLib) == 0:
+            raise SieveException('no residual classes defined')
         self._expTree = ''.join(self._expTree)
 
 
@@ -1381,29 +1409,28 @@ class Sieve(object):
         self._cmpTree = []    #clear first
         logStr = copy.copy(self._expTree) # create scratch copy
         # if not a string but a number
-        orList = logStr.split(self.OR)
+        orList = logStr.split(OR)
         for orGroup in orList:
             if orGroup == '': continue
             # need deal with mixed not's in an andGroup
-            andList = orGroup.split(self.AND)
+            andList = orGroup.split(AND)
             # do intersections, reduce, and add
             if len(andList) == 1:
-                intersection = self.resLib[andList[0]]
+                intersection = self._resLib[andList[0]]
             else:
                 for i in range(0, len(andList)-1): # one less than len
                     if i == 0: # first, get first
-                        # problem was here w/ and list value not being in resLib
-                        a = self.resLib[andList[i]]
+                        # problem was here w/ and list value not being in _resLib
+                        a = self._resLib[andList[i]]
                     else:
                         a = intersection
-                    b = self.resLib[andList[i+1]] # get second
+                    b = self._resLib[andList[i+1]] # get second
                     # this may raise an exception if not possible
                     intersection = a & b # operator overloadin
             # store resKey in dict, store as string
-            self._cmpTree.append(self._resAssign(self.resId, intersection))
-            self._resIdIncr()
-        self._cmpTree = self.OR.join(self._cmpTree)
-        #print _MOD, 'cmpTree', self._cmpTree
+            self._cmpTree.append(self._resAssign(self._resId, intersection))
+            self._resIdIncrement()
+        self._cmpTree = OR.join(self._cmpTree)
 
     def _cmpSegment(self):
         """a bound sieve, uss a newly created segment"""
@@ -1416,10 +1443,9 @@ class Sieve(object):
         else:
             segObj = CompressionSegment(seg, self._z)
             for resObj in segObj():
-                self._cmpTree.append(self._resAssign(self.resId, resObj))
-                self._resIdIncr()
-            self._cmpTree = self.OR.join(self._cmpTree)
-        #print _MOD, 'cmpTree', self._cmpTree
+                self._cmpTree.append(self._resAssign(self._resId, resObj))
+                self._resIdIncrement()
+            self._cmpTree = OR.join(self._cmpTree)
 
 
 
@@ -1455,21 +1481,24 @@ class Sieve(object):
         # as long as binary negation is evaluated before & and |, this will work
         # see http://docs.python.org/ref/summary.html
         # must do this before converting segments (where there willneg numbers)
-        resObj = Residual(1,0,0,z) # create a temporary residual 1@!
+
+        resObj = Residual(1, 0, 0, z) # create a temporary residual 1@!
         setStr = self._setInstantiateStr(resObj()) # get segment
+
         evalStr = evalStr.replace('-', ('%s-' % setStr))
         # replace residuals (this will add - as -numbers)
         for key in keys:
             evalStr = evalStr.replace(key, self._resToSetStr(key, n, z))
+
         # convert all braces to parenthesis
-        evalStr = evalStr.replace(self.LGROUP,'(')
-        evalStr = evalStr.replace(self.RGROUP,')')
+        evalStr = evalStr.replace(LGROUP,'(')
+        evalStr = evalStr.replace(RGROUP,')')
 
         # this may raise an exception if mal-formed
         try:
             seg = eval(evalStr)
         except SyntaxError:
-            raise SyntaxError('badly formed logical string (%s)' % evalStr)
+            raise SieveException('badly formed logical string (%s)' % evalStr)
 
         seg = list(seg)
         seg.sort()
@@ -1503,14 +1532,18 @@ class Sieve(object):
         #for both exp and cmd, only one is calculated
         #period only calculated the fist time this method is called
 
-        if state == None:
+        if state is None:
             state = self._state
         # check and see if exp has been set yet
-        if self._expPeriod == None:
+        if self._expPeriod is None:
             self._initPeriod()
 
-        if state == 'exp': return self._expPeriod
-        elif state == 'cmp': return self._cmpPeriod
+        if state == 'exp': 
+            return self._expPeriod
+
+        elif state == 'cmp': 
+            return self._cmpPeriod
+
 
     def __call__(self, n=0, z=None, format=None):
         return self.segment(self._state, n, z, format)
@@ -1552,7 +1585,7 @@ class Sieve(object):
         # trim any extra
         seg = found[:length] 
         if len(seg) != length:
-            raise ValueError('desired length of sieve segment cannot be found')
+            raise SieveException('desired length of sieve segment cannot be found')
 
         # only width format comes out correct after concatenation
         # for unit and binary, derive new z based on min and max
@@ -1566,10 +1599,9 @@ class Sieve(object):
             return seg
 
 
-    def repr(self, state=None, style=None):
+    def represent(self, state=None, style=None):
         """style of None is use for users; adds | to singel residuals
         style abs (absolute) does not add | tos single residual class"""
-        # TODO: rename __repr__
         if state == None:
             state = self._state
         if state == 'exp':
@@ -1579,11 +1611,11 @@ class Sieve(object):
         # get keys for this library
         keys = self._resKeys(state)
         for key in keys:
-            msg = msg.replace(key, self.resLib[key].repr(style))
+            msg = msg.replace(key, self._resLib[key].represent(style))
         return msg
 
     def __str__(self):
-        return self.repr()
+        return self.represent()
 
 
 
@@ -1593,109 +1625,57 @@ class Sieve(object):
 # high level utility obj
 
 class SievePitch(object):
-    """Quick generation of Pitch lists from Sieves
+    """Quick utility generation of Pitch lists from Sieves
     """
     
-    def __init__(self, usrStr):
+    def __init__(self, sieveString, pitchLower=None, 
+                pitchUpper=None, pitchOrigin=None, eld=1):
         """
         >>> a = SievePitch('4@7')
+        >>> a()
+        [E-3, G3, B3, E-4, G4, B4]
         """
-        self.psLower = None #'c3'
-        self.psUpper = None #'c5' # default ps Range
-        self.psOrigin = None # psLower # default
-        self.sieveLogStr = '' # logical sieve string
-        # this may raise various exceptions including
-        # error.PitchSyntaxError, SyntaxError
-        self.sieveObj = None
-        self._parseUsrStr(usrStr)
+        self.pitchLower = None #'c3'
+        self.pitchUpper = None #'c5' # default ps Range
+        self.pitchOrigin = None # pitchLower # default
+        self.sieveString = sieveString # logical sieve string
 
+        # should be in a try block
+        self.sieveObj = Sieve(self.sieveString)
 
-    def _parseUsrStr(self, usrStr):
-        """when entering a pitch sieve, the logical argument
-        must be separated from the range args by commas, i.e.
-        8(n+4)|6(n+5)|4(n+1), c3, c8 # no commas can be used elsewhere
-        provide defaults if no range is given
-        range can be given w/ letter names, as well as ps class number 0 = c4
-
-        >>> a = SievePitch('4@7')
-        >>> a._parseUsrStr('13@3|13@6|13@9, c2, c7')
-        
-        """
-        psLower = None
-        psUpper = None
-        psOrigin = None
-        eld = None
-
-        strList = usrStr.split(',')
-        i = 0
-        for element in strList:
-            element = element.strip()
-            if element != '':
-                if i == 0: 
-                    self.sieveLogStr = element
-                if i == 1: 
-                    psLower = element
-                if i == 2: 
-                    psUpper = element
-                if i == 3: 
-                    psOrigin = element
-                if i == 4: 
-                    eld = element
-            i = i + 1
-        if self.sieveLogStr == '': # nothing was assigned to it
-            return None
-        # parse pitch bounaries; accept either string pcs or 
-        if psLower != None:
-            self.psLower = pitch.Pitch(psLower)
+        if pitchLower is not None:
+            self.pitchLower = pitch.Pitch(pitchLower)
         else:
-            self.psLower = pitch.Pitch('c3')
-        if psUpper != None:
-            self.psUpper = pitch.Pitch(psUpper)
+            self.pitchLower = pitch.Pitch('c3')
+
+        if pitchUpper is not None:
+            self.pitchUpper = pitch.Pitch(pitchUpper)
         else:
-            self.psUpper = pitch.Pitch('c5')
-        if psOrigin != None:
-            
-            if common.isNum(psOrigin):
-                self.psOrigin = pitch.Pitch()
-                self.psOrigin.ps = psOrigin
-            elif psOrigin in ['', ' ', None]:
-                self.psOrigin = pitch.Pitch() # get default pitch of c4
-            elif common.isStr(psOrigin) and psOrigin.isdigit():
-                self.psOrigin = pitch.Pitch()
-                self.psOrigin.ps = float(psOrigin)
-            else:
-                #environLocal.printDebug(['trying to make a pitch out of: %s', repr(psOrigin)])
-                self.psOrigin = pitch.Pitch(psOrigin)
+            self.pitchUpper = pitch.Pitch('c5')
 
-        else: # use psLower value
-            self.psOrigin = copy.deepcopy(self.psLower)
+        if pitchOrigin is not None:
+            self.pitchOrigin = pitch.Pitch(pitchOrigin)
+        else: # use pitchLower value
+            self.pitchOrigin = copy.deepcopy(self.pitchLower)
 
-        # scalable eld not yet implemented
-        if eld != None:
-            #self.eld = drawer.strToNum(eld, 'num', .00001, 100) # min, max
+        if eld is not None:
             self.eld = float(eld)
-            if not (self.eld <= 100 and self.eld >= .0001): # out of range
-                self.eld = 1
         else: 
             self.eld = 1 # default
-        
-        # create sieve ovject; this may raise exceptions
-        self.sieveObj = Sieve(self.sieveLogStr)
-            
+
 
     def __call__(self):
-        """Return a sieve segment as a list of Pitch objects, mapped to the range between psLower and psUpper.
+        """Return a sieve segment as a list of Pitch objects, mapped to the range between pitchLower and pitchUpper.
 
         >>> a = SievePitch('4@7&5@4')
         >>> a()
         [G4]
 
-        >>> a = SievePitch('13@3|13@6|13@9, c1, c10, 1')
+        >>> a = SievePitch('13@3|13@6|13@9', 'c1', 'c10')
         >>> a()
-        [F#1, A1, C2, G2, B-2, C#3, G#3, B3, D4, A4, C5, E-5, B-5, C#6, E6, B6, D7, F7, C8, E-8, F#8, C#9, E9, G9]
+        [E-1, F#1, A1, E2, G2, B-2, F3, G#3, B3, F#4, A4, C5, G5, B-5, C#6, G#6, B6, D7, A7, C8, E-8, B-8, C#9, E9, B9]
 
-
-        >>> a = SievePitch('3@0, c4, c5, c4, .5')
+        >>> a = SievePitch('3@0', 'c4', 'c5', 'c4', .5)
         >>> a.eld
         0.5
 
@@ -1705,15 +1685,15 @@ class SievePitch(object):
         >>> a()
         [C4, C4, E-4, E4, F#4, G4, A4, B4, C5]
 
-        >>> a = SievePitch('3@0, c4, c5, c#4, .5')
+        >>> a = SievePitch('3@0', 'c4', 'c5', 'c#4', .5)
         >>> a()
         [C4, D4, E4, F4, F4, G#4, A4, B4]
         >>> # [0.5, 2.0, 3.5, 5.0, 6.5, 8.0, 9.5, 11.0]
         """
-        min = self.psLower.ps
-        max = self.psUpper.ps
+        min = self.pitchLower.ps
+        max = self.pitchUpper.ps
         z = range(int(min), int(max+1))
-        n = self.psOrigin.ps # shift origin
+        n = self.pitchOrigin.ps # shift origin
 
         # get integer range
         if self.eld == 1:
@@ -1727,7 +1707,6 @@ class SievePitch(object):
         else: # microtonal eld
             # returns all posisble values in this range
             valList = unitNormStep(self.eld, min, max, normalized=False)
-            #environLocal.printDebug(valList)
 
             # this z will not be shifted
             # need to get list of apropriate size
@@ -1746,7 +1725,6 @@ class SievePitch(object):
         return sieveSeg
 
 
-
     def getIntervalSequence(self):
         '''Return a list of Interval objects that defines the complete structure of this sieve.
         '''
@@ -1758,45 +1736,6 @@ class SievePitch(object):
 
 
 
-#-------------------------------------------------------------------------------
-
-class TestOld:
-    def __init__(self):
-        self.testTimePoint()
-        self.testIntersection()
-        #self.testSieveParse()
-        self.testSievePitch()
-        self.testSieve()
-
-    #---------------------------------------------------------------------------
-    # may be usefull for testing
-    def complement(self, set, z=None):
-        """not, exclusion
-        may be notated, for subset F, as F' or F w/ line over top
-        """
-        if z == None:
-            z = range(0,100)
-        ab = []
-        for value in z:
-            if value not in set: # dont do anything
-                ab.append(value)
-        return ab
-    
-    def intersection(self, a, b):
-        """and
-        notated with an inverted U"""
-        ab = []
-        for value in a + b: # look at each value
-            if value in a and value in b:
-                if value not in ab:
-                    ab.append(value)
-        return ab
-
-
-    #---------------------------------------------------------------------------
-    def _clean(self, l):
-        "cleans a list"
-        return str(l).replace(' ', '')[1:-1]
 
 
 
@@ -1823,19 +1762,20 @@ class Test(unittest.TestCase):
         testArgs = ['-5 | 4 & 4sub3 & 6 | 4 & 4', 
                  '2 or 4 and 4 & 6 or 4 & 4', 
                  3,
-                 '3 and 4 or not 3,1 and 4,1 or not 3 and 4,2 or not 3,2 and 4,3',
+                # '3 and 4 or not 3,1 and 4,1 or not 3 and 4,2 or not 3,2 and 4,3',
                  (2,4,6,8),
                  (1,6,11,16,17),
                     ]
         for arg in testArgs:
+            #environLocal.printDebug(['testSieveParse', arg])
             testObj = Sieve(arg)
             post = testObj(0, range(0, 30))
 
 
     def testSievePitch(self):
-        testObj = SievePitch('-5 | 4 & 4sub3 & 6 , b3, f#4')
-        testObj = SievePitch('-5 | 4 & 4sub3 & 6 ')
-        post = testObj.psLower, testObj.psUpper
+        testObj = SievePitch('-5 | 4 & 4sub3 & 6', 'b3', 'f#4')
+        testObj = SievePitch('-5 | 4 & 4sub3 & 6')
+        post = testObj.pitchLower, testObj.pitchUpper
         post = testObj()
 
 
