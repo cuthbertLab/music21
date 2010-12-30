@@ -374,17 +374,40 @@ def printChordProgression(chordProgression):
 
 #Resolving four part dominant seventh chord to tonic.
 def resolveDominantSeventh(pitches, inPlace=False):
-    if not inPlace:
-        pitches = copy.deepcopy(pitches) #Using a copy of the list, can then resolve in place.
-    
     c = chord.Chord(pitches)
-    pitches = c.pitches #In case the pitches given are strings
+
     if not c.isDominantSeventh():
         raise FiguredBassException("Pitches don't form a dominant seventh chord.")
     if not len(pitches) == 4:
         raise FiguredBassException("Not a four part chord. Unsupported resolution.")
+
+    if not inPlace:
+        pitches = copy.deepcopy(pitches) #Using a copy of the list, can then resolve in place.
+
+    for i in range(len(pitches)):
+        pitches[i] = realizerScale.convertToPitch(pitches[i])
+        pitches[i].order = i
     
-    print c.inversion()
+    root = pitches[pitches.index(c.root())]
+    tritonePitchA = pitches[pitches.index(c.third())]
+    fifth = pitches[pitches.index(c.fifth())]
+    tritonePitchB = pitches[pitches.index(c.seventh())]
+
+    resolveTritone(tritonePitchA, tritonePitchB, True)
+
+    if c.inversion() == 0:
+        #Root goes to tonic
+        root.transpose('P4', True)
+
+    if c.inversion() == 2:
+        #Fifth goes to third
+        fifth.transpose('M2', True)
+    else:
+        #Fifth resolves to tonic
+        fifth.transpose('-M2', True)
+
+    #print pitches.remove(c.root())
+    
     #In a four part dominant seventh chord, resolution (to tonic) is like this:
     #Tritone resolves. 
     #If chord in root position, root goes to tonic. 
@@ -393,11 +416,25 @@ def resolveDominantSeventh(pitches, inPlace=False):
     #Fifth can also go to third, but only really acceptable when it's the root (2nd inversion)
     
     #Need to keep the order intact (just in case)
-    #Step 1: Tritone(s) resolve
-    #Step 2: Resolve root
-    #Step 3: Resolve fifth
+    #Step 1: Tritone resolves
+    #Step 2: Root resolves
+    #Step 3: Fifth resolves
+
+    for i in range(len(pitches)):
+        del pitches[i].order
+
+    print c.pitches
     return pitches
+
+def cmp(pitchA, pitchB):
+    if pitchA.order > pitchB.order:
+        return 1
+    elif pitchA.order == pitchB.order:
+        return 0
+    else:
+        return -1
     
+    #Tritone can resolve to either a M3/m6 or a m3/M6?
 def resolveTritone(pitchA, pitchB, inPlace=False):
     '''
     Given two pitches, A and B, which form a tritone,
@@ -471,7 +508,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    print resolveDominantSeventh(['D4', 'B3', 'F4', 'G4'])
+    print resolveDominantSeventh(['G2', 'B3', 'D5', 'F4'])
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
