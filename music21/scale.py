@@ -504,8 +504,6 @@ class AbstractOctatonicScale(AbstractScale):
         # here, accept None
         self._buildNetwork(mode=mode)
 
-
-
     def _buildNetwork(self, mode=None):
         '''
         Given sub-class dependent parameters, build and assign the IntervalNetwork.
@@ -567,14 +565,10 @@ class AbstractMelodicMinorScale(AbstractScale):
         self.octaveDuplicating = True
         self._buildNetwork()
 
-
-
     def _buildNetwork(self):
-        '''
-        '''
         self.tonicStep = 1
         self.dominantStep = 5
-
+# this is now stored in interval network, as it is useful for testing
 #         nodes = ({'id':'terminusLow', 'step':1}, # a
 #                  {'id':0, 'step':2}, # b
 #                  {'id':1, 'step':3}, # c
@@ -657,7 +651,7 @@ class AbstractCyclicalScale(AbstractScale):
 
 
 class AbstractOctaveRepeatingScale(AbstractScale):
-    '''A scale of any size built with an interval list that assumes octave completion. An additional interval to complete the octave will be added. This does not guarantee that the octave will be repeated in one octave, only the next octave above the last interval. 
+    '''A scale of any size built with an interval list that assumes octave completion. An additional interval to complete the octave will be added to the provided intervals. This does not guarantee that the octave will be repeated in one octave, only the next octave above the last interval will be provided. 
     '''
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
@@ -667,7 +661,6 @@ class AbstractOctaveRepeatingScale(AbstractScale):
             # supply a default
             mode = ['P8']
         self._buildNetwork(mode=mode)
-
 
         # by definition, these are forced to be octave duplicating
         # though, do to some intervals, duplication may not happen every oct
@@ -693,6 +686,82 @@ class AbstractOctaveRepeatingScale(AbstractScale):
 
 
 
+
+
+
+
+class AbstractRagAsawari(AbstractScale):
+    '''A pseudo raga-scale. 
+    '''
+    def __init__(self, mode=None):
+        AbstractScale.__init__(self)
+        self.type = 'Abstract Melodic Minor'
+        self.octaveDuplicating = True
+        self._buildNetwork()
+
+    def _buildNetwork(self):
+        self.tonicStep = 1
+        self.dominantStep = 5
+        nodes = ({'id':'terminusLow', 'step':1}, # c
+                 {'id':0, 'step':2}, # d
+                 {'id':1, 'step':4}, # f
+                 {'id':2, 'step':5}, # g
+                 {'id':3, 'step':6}, # a-
+                 {'id':'terminusHigh', 'step':8}, # c
+
+                 {'id':4, 'step':7}, # b-
+                 {'id':5, 'step':6}, # a-
+                 {'id':6, 'step':5}, # g
+                 {'id':7, 'step':4}, # f
+                 {'id':8, 'step':3}, # e-
+                 {'id':9, 'step':2}, # d
+                )
+        edges = (
+                # ascending
+                {'interval':'M2', 'connections':(
+                        [TERMINUS_LOW, 0, DIRECTION_ASCENDING], # a to b
+                    )},
+                {'interval':'m2', 'connections':(
+                        [0, 1, DIRECTION_ASCENDING], # b to c
+                    )},
+                {'interval':'M2', 'connections':(
+                        [1, 2, DIRECTION_ASCENDING], # c to d
+                    )},
+                {'interval':'M2', 'connections':(
+                        [2, 3, DIRECTION_ASCENDING], # d to e
+                    )},
+                {'interval':'M2', 'connections':(
+                        [3, TERMINUS_HIGH, DIRECTION_ASCENDING], # e to f#
+                    )},
+                # descending
+                {'interval':'M2', 'connections':(
+                        [TERMINUS_HIGH, 4, DIRECTION_DESCENDING], # a to g
+                    )},
+                {'interval':'M2', 'connections':(
+                        [4, 5, DIRECTION_DESCENDING], # g to f
+                    )},
+                {'interval':'m2', 'connections':(
+                        [5, 6, DIRECTION_DESCENDING], # f to e
+                    )},
+                {'interval':'m2', 'connections':(
+                        [6, 7, DIRECTION_DESCENDING], # f to e
+                    )},
+                {'interval':'m2', 'connections':(
+                        [7, 8, DIRECTION_DESCENDING], # f to e
+                    )},
+                {'interval':'m2', 'connections':(
+                        [8, 9, DIRECTION_DESCENDING], # f to e
+                    )},
+                {'interval':'m2', 'connections':(
+                        [9, TERMINUS_LOW, DIRECTION_DESCENDING], # f to e
+                    )},
+                )
+
+        self._net = intervalNetwork.IntervalNetwork(
+                        octaveDuplicating=self.octaveDuplicating)
+        # using representation stored in interval network
+        #self._net.fillArbitrary(nodes, edges)
+        self._net.fillMelodicMinor()
 
 
 
@@ -1831,7 +1900,7 @@ class SieveScale(ConcreteScale):
         ConcreteScale.__init__(self, tonic=tonic)
 
         self._pitchSieve = sieve.PitchSieve(sieveString)
-        #environLocal.printDebug(["here", self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
+        #environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
         # mode here is a list of intervals
         self._abstract = AbstractCyclicalScale(
                          mode=self._pitchSieve.getIntervalSequence())

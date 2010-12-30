@@ -461,7 +461,8 @@ class IntervalNetwork(object):
 
         # if both are equal, than assigning steps is easy
         if len(ascendingEdgeList) != len(descendingEdgeList):
-            raise IntervalNetworkException('cannot manage unequawl sized directed edges')
+            # problem here is that we cannot automatically assign step values
+            raise IntervalNetworkException('cannot manage unequal sized directed edges')
 
         stepCount = 1 # steps start from one
         nLow = Node(id=TERMINUS_LOW, step=stepCount)        
