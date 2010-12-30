@@ -21,6 +21,7 @@ from music21 import common
 from music21 import pitch
 from music21 import interval
 from music21 import intervalNetwork
+from music21 import sieve
 
 from music21.musicxml import translate as musicxmlTranslate
 
@@ -640,7 +641,6 @@ class AbstractCyclicalScale(AbstractScale):
         # cannot assume that abstract cyclical scales are octave duplicating
         # until we have the intervals in use
 
-
     def _buildNetwork(self, mode):
         '''
         Here, mode is the list of intervals. 
@@ -906,7 +906,6 @@ class ConcreteScale(Scale):
             post._tonic.transpose(value, inPlace=True)        
         # may need to clear cache here
         return post
-
 
     def getRomanNumeral(self, degree, figure=None):
         '''Return a RomanNumeral object built on the specified scale degree.
@@ -1813,6 +1812,30 @@ class WholeToneScale(ConcreteScale):
 
 
 
+class SieveScale(ConcreteScale):
+    '''A scale created from a Xenakis sieve logical string. The complete period of the sieve is realized as intervals and used to create a scale. 
+
+    >>> from music21 import *
+    >>> sc = scale.SieveScale('c4', '3@0') 
+    >>> sc.pitches
+    [C4, E-4]
+    >>> sc = scale.SieveScale('d4', '3@0') 
+    >>> sc.pitches
+    [D4, F4]
+    >>> sc = scale.SieveScale('c2', '(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)') 
+    >>> sc.pitches
+    [C2, D2, E2, F2, G2, A2, B2, C3]
+
+    '''
+    def __init__(self, tonic=None, sieveString='2@0'):
+        ConcreteScale.__init__(self, tonic=tonic)
+
+        self._pitchSieve = sieve.PitchSieve(sieveString)
+        #environLocal.printDebug(["here", self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
+        # mode here is a list of intervals
+        self._abstract = AbstractCyclicalScale(
+                         mode=self._pitchSieve.getIntervalSequence())
+        self.type = 'Sieve'
 
 
 

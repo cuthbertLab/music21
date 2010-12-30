@@ -342,7 +342,7 @@ class IntervalNetwork(object):
         # nodes suggest Pitches, but Pitches are not stored
         self._nodes = {}
 
-        if edgeList != None: # auto initialize
+        if edgeList is not None: # auto initialize
             self.fillBiDirectedEdges(edgeList)
 
         # define if pitches duplicate each octave
@@ -397,6 +397,7 @@ class IntervalNetwork(object):
     def fillBiDirectedEdges(self, edgeList):
         '''Given an ordered list of bi-directed edges given as Interval specifications, create and define appropriate Nodes. This assumes that all edges are bidirected and all all edges are in order.
     
+        >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
@@ -411,6 +412,10 @@ class IntervalNetwork(object):
         [G4, B4, D#5, G5]
         >>> net.stepMin, net.stepMax
         (1, 4)
+
+        >>> net.fillBiDirectedEdges([interval.Interval('M3'), interval.Interval('M3'), interval.Interval('M3')])
+        >>> net.realizePitch('c2')
+        [C2, E2, G#2, B#2]
         '''
         self.clear()
 
@@ -430,7 +435,8 @@ class IntervalNetwork(object):
                 stepCount += 1
                 nFollowing = n
             else: # if last
-                nHigh = Node(id=TERMINUS_HIGH, step=stepCount)  # step is same as start
+                # step is same as start
+                nHigh = Node(id=TERMINUS_HIGH, step=stepCount) 
                 nFollowing = nHigh
     
             # add to node dictionary

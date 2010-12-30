@@ -32,10 +32,10 @@ A CompressionSegment can be used to derive a Sieve from any sequence of integers
 '6@1|7@6|8@5|9@4|10@3|11@8'
 
 
-The SievePitch class provides a quick generation of Pitch lists from Sieves.
+The PitchSieve class provides a quick generation of Pitch lists from Sieves.
 
 
->>> a = SievePitch('13@3|13@6|13@9', 'c1', 'c10', 'f#4')
+>>> a = PitchSieve('13@3|13@6|13@9', 'c1', 'c10', 'f#4')
 >>> a()
 [F#1, A1, C2, G2, B-2, C#3, G#3, B3, D4, A4, C5, E-5, B-5, C#6, E6, B6, D7, F7, C8, E-8, F#8, C#9, E9, G9]
 
@@ -48,7 +48,7 @@ import unittest, doctest
 import music21
 from music21 import pitch
 from music21 import common
-
+from music21 import interval
 
 from music21 import environment
 _MOD = 'sieve.py'
@@ -68,7 +68,8 @@ class SieveException(Exception):
 class CompressionSegmentException(Exception):
     pass
 
-
+class PitchSieveException(Exception):
+    pass
 
 LGROUP = '{'
 RGROUP = '}'
@@ -795,7 +796,6 @@ class CompressionSegment(object):
             zMin, zMax = self._match[0], self._match[-1] 
             self._z = range(zMin, (zMax + 1)) 
 
-
     #---------------------------------------------------------------------------
     def __call__(self):
         """
@@ -817,7 +817,6 @@ class CompressionSegment(object):
         return resStr
 
     #---------------------------------------------------------------------------
-
     def _subset(self, sub, set):
         """true if sub is part of set; assumes no redundancies in each"""
         common = 0
@@ -1624,14 +1623,14 @@ class Sieve(object):
 #-------------------------------------------------------------------------------
 # high level utility obj
 
-class SievePitch(object):
+class PitchSieve(object):
     """Quick utility generation of Pitch lists from Sieves
     """
     
     def __init__(self, sieveString, pitchLower=None, 
                 pitchUpper=None, pitchOrigin=None, eld=1):
         """
-        >>> a = SievePitch('4@7')
+        >>> a = PitchSieve('4@7')
         >>> a()
         [E-3, G3, B3, E-4, G4, B4]
         """
@@ -1641,7 +1640,7 @@ class SievePitch(object):
         self.sieveString = sieveString # logical sieve string
 
         # should be in a try block
-        self.sieveObj = Sieve(self.sieveString)
+        self.sieveObject = Sieve(self.sieveString)
 
         if pitchLower is not None:
             self.pitchLower = pitch.Pitch(pitchLower)
@@ -1667,15 +1666,15 @@ class SievePitch(object):
     def __call__(self):
         """Return a sieve segment as a list of Pitch objects, mapped to the range between pitchLower and pitchUpper.
 
-        >>> a = SievePitch('4@7&5@4')
+        >>> a = PitchSieve('4@7&5@4')
         >>> a()
         [G4]
 
-        >>> a = SievePitch('13@3|13@6|13@9', 'c1', 'c10')
+        >>> a = PitchSieve('13@3|13@6|13@9', 'c1', 'c10')
         >>> a()
         [E-1, F#1, A1, E2, G2, B-2, F3, G#3, B3, F#4, A4, C5, G5, B-5, C#6, G#6, B6, D7, A7, C8, E-8, B-8, C#9, E9, B9]
 
-        >>> a = SievePitch('3@0', 'c4', 'c5', 'c4', .5)
+        >>> a = PitchSieve('3@0', 'c4', 'c5', 'c4', .5)
         >>> a.eld
         0.5
 
@@ -1685,7 +1684,7 @@ class SievePitch(object):
         >>> a()
         [C4, C4, E-4, E4, F#4, G4, A4, B4, C5]
 
-        >>> a = SievePitch('3@0', 'c4', 'c5', 'c#4', .5)
+        >>> a = PitchSieve('3@0', 'c4', 'c5', 'c#4', .5)
         >>> a()
         [C4, D4, E4, F4, F4, G#4, A4, B4]
         >>> # [0.5, 2.0, 3.5, 5.0, 6.5, 8.0, 9.5, 11.0]
@@ -1697,23 +1696,20 @@ class SievePitch(object):
 
         # get integer range
         if self.eld == 1:
-            sieveSegIntegers = self.sieveObj(n, z) # make value negative
+            sieveSegIntegers = self.sieveObject(n, z) # make value negative
             sieveSeg = []
             for psNum in sieveSegIntegers:
                 p = pitch.Pitch()
                 p.ps = psNum
                 sieveSeg.append(p)
-
         else: # microtonal eld
             # returns all posisble values in this range
             valList = unitNormStep(self.eld, min, max, normalized=False)
-
             # this z will not be shifted
             # need to get list of apropriate size
-            z = range(0, len(valList)) 
-            
+            z = range(len(valList)) 
             # get a binary segment
-            binSeg = self.sieveObj(n, z, 'bin')
+            binSeg = self.sieveObject(n, z, 'bin')
             sieveSeg = []
             # when there is activity on the unitSeg, return the value
             for i in range(len(binSeg)):
@@ -1721,15 +1717,46 @@ class SievePitch(object):
                     p = pitch.Pitch()
                     p.ps = valList[i]
                     sieveSeg.append(p)
-
         return sieveSeg
 
 
     def getIntervalSequence(self):
         '''Return a list of Interval objects that defines the complete structure of this sieve.
-        '''
-        pass
 
+        >>> a = PitchSieve('3@0')
+        >>> a.getIntervalSequence()
+        [<music21.interval.Interval m3>]
+
+        >>> a = PitchSieve('3@0|7@0')
+        >>> a.sieveObject.segment()
+        [0, 3, 6, 7, 9, 12, 14, 15, 18, 21, 24, 27, 28, 30, 33, 35, 36, 39, 42, 45, 48, 49, 51, 54, 56, 57, 60, 63, 66, 69, 70, 72, 75, 77, 78, 81, 84, 87, 90, 91, 93, 96, 98, 99]
+        >>> a.sieveObject.period()
+        21
+        >>> a.getIntervalSequence()
+        [<music21.interval.Interval m3>, <music21.interval.Interval m3>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval m3>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval m3>, <music21.interval.Interval m3>]
+
+        >>> b = PitchSieve('(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)') # major scale
+        >>> b.getIntervalSequence()
+        [<music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>]
+        '''
+        # get a z for the complete period
+        z = range(self.sieveObject.period()+1)
+        integerSteps = self.sieveObject(0, z, format='int')
+
+        post = []
+        for i, step in enumerate(integerSteps):
+            stepStart = step
+            if i < len(integerSteps)-1:
+                stepEnd = integerSteps[i+1]
+            else:
+                break
+            #environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
+            intervalObj = interval.Interval(stepEnd-stepStart)
+            post.append(intervalObj)
+
+        if len(post) == 0:
+            raise PitchSieveException('interval segment has no values')
+        return post
 
 
 
@@ -1773,8 +1800,8 @@ class Test(unittest.TestCase):
 
 
     def testSievePitch(self):
-        testObj = SievePitch('-5 | 4 & 4sub3 & 6', 'b3', 'f#4')
-        testObj = SievePitch('-5 | 4 & 4sub3 & 6')
+        testObj = PitchSieve('-5 | 4 & 4sub3 & 6', 'b3', 'f#4')
+        testObj = PitchSieve('-5 | 4 & 4sub3 & 6')
         post = testObj.pitchLower, testObj.pitchUpper
         post = testObj()
 
