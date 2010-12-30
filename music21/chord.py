@@ -801,15 +801,15 @@ class Chord(note.NotRest):
     
     def third(self, testRoot = None):
         '''shortcut for scaleX(3)'''
-        return scaleX(3, testRoot)
+        return self.scaleX(3, testRoot)
 
     def fifth(self, testRoot = None):
         '''shortcut for scaleX(5)'''
-        return scaleX(5, testRoot)
+        return self.scaleX(5, testRoot)
     
     def seventh(self, testRoot = None):
         '''shortcut for scaleX(7)'''
-        return scaleX(7, testRoot)
+        return self.scaleX(7, testRoot)
     
     def scaleX(self, scaleDegree, testRoot = None):
         '''
