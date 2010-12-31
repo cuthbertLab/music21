@@ -1,3 +1,13 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         resolution.py
+# Purpose:      Defines standard resolutions for chords
+# Authors:      Jose Cabal-Ugaz
+#
+# Copyright:    (c) 2010 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 import music21
 import unittest
 import copy
@@ -12,7 +22,7 @@ from music21 import interval
 #Used Ex.76 (page 46) from 'The Basis of Harmony' by Frederick J. Horwood
 resolveV43toI6 = False
 
-#Dominant seventh standard resolution
+#Dominant seventh -> tonic standard resolution
 def dominantSeventhToTonic(pitches, resolveTo='major', inPlace=False):
     '''
     Given a list of four pitches correctly spelling out a dominant seventh chord,
@@ -91,9 +101,71 @@ def dominantSeventhToTonic(pitches, resolveTo='major', inPlace=False):
 
     return pitches
 
-def dominantSeventhToSubmediant(pitches, scaleType='major', inPlace=False):
-    pass
+#Dominant seventh -> submediant standard resolution
+def dominantSeventhToSubmediant(pitches, resolveTo='major', inPlace=False):
+    '''
+    Given a list of four pitches correctly spelling out a dominant seventh chord in
+    root position, returns its standard resolution to either the major submediant (VI)
+    or the minor submediant (vi)
 
+    >>> from music21.figuredBass import resolution as r
+    >>> r.dominantSeventhToSubmediant(['C3', 'G3', 'E4', 'B-4'], 'major')
+    [D-3, F3, F4, A-4]
+    >>> r.dominantSeventhToSubmediant(['C3', 'G3', 'E4', 'B-4'], 'minor')
+    [D3, F3, F4, A4]
+    >>> r.dominantSeventhToSubmediant(['G3', 'C4', 'B-4', 'E5'], 'minor')
+    Traceback (most recent call last):
+    ResolutionException: A deceptive resolution can only happen on the root position V7.
+    '''
+    
+    c = chord.Chord(copy.deepcopy(pitches))
+
+    if not c.isDominantSeventh():
+        #TODO: Add support for root position V7 chords with missing fifth
+        raise ResolutionException("Pitches do not form a correctly spelled dominant seventh chord.")
+    if not len(pitches) == 4:
+        raise ResolutionException("Not a four part chord. Can't resolve.")
+    if not (resolveTo == 'major' or resolveTo == 'minor'):
+        raise ResolutionException("Unsupported scale type. Only major or minor.")
+    if not (c.inversion() == 0):
+        raise ResolutionException("A deceptive resolution can only happen on the root position V7.")
+    
+    if not inPlace:
+        pitches = copy.deepcopy(pitches)  #Make a copy of the list, can then resolve in place.
+        
+    for i in range(len(pitches)):
+        pitches[i] = realizerScale.convertToPitch(pitches[i])
+        pitches[i].order = i
+    
+    root = pitches[pitches.index(c.root())]
+    third = pitches[pitches.index(c.third())]
+    fifth = pitches[pitches.index(c.fifth())]
+    seventh = pitches[pitches.index(c.seventh())]
+    
+    if resolveTo == 'major':
+        root.transpose('m2', True)
+    elif resolveTo == 'minor':
+        root.transpose('M2', True)
+
+    #Resolve the fifth
+    fifth.transpose('-M2', True) #2nd scale degree descends to tonic
+
+    #Resolve the tritone:
+    #Resolve the third
+    third.transpose('m2', True) #Leading tone resolves to tonic
+    
+    #Resolve the seventh
+    if resolveTo == 'major':
+        seventh.transpose('-M2', True) #4th scale degree descends to 3rd
+    if resolveTo == 'minor':
+        seventh.transpose('-m2', True) #4th scale degree descends to 3rd
+   
+    for i in range(len(pitches)):
+        del pitches[i].order
+
+    return pitches
+
+#Tritone standard resolution
 def resolveTritone(pitchA, pitchB, resolveTo = 'major', inPlace=False):
     '''
     Given two pitches, A and B, which form a tritone,
