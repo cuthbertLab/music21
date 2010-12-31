@@ -22,7 +22,7 @@ from music21 import interval
 #Used Ex.76 (page 46) from 'The Basis of Harmony' by Frederick J. Horwood
 resolveV43toI6 = False
 
-#Dominant seventh -> tonic standard resolution
+#Dominant seventh -> tonic (standard resolution)
 def dominantSeventhToTonic(pitches, resolveTo='major', inPlace=False):
     '''
     Given a list of four pitches correctly spelling out a dominant seventh chord,
@@ -101,7 +101,7 @@ def dominantSeventhToTonic(pitches, resolveTo='major', inPlace=False):
 
     return pitches
 
-#Dominant seventh -> submediant standard resolution
+#Dominant seventh -> submediant (deceptive resolution)
 def dominantSeventhToSubmediant(pitches, resolveTo='major', inPlace=False):
     '''
     Given a list of four pitches correctly spelling out a dominant seventh chord in
@@ -121,7 +121,6 @@ def dominantSeventhToSubmediant(pitches, resolveTo='major', inPlace=False):
     c = chord.Chord(copy.deepcopy(pitches))
 
     if not c.isDominantSeventh():
-        #TODO: Add support for root position V7 chords with missing fifth
         raise ResolutionException("Pitches do not form a correctly spelled dominant seventh chord.")
     if not len(pitches) == 4:
         raise ResolutionException("Not a four part chord. Can't resolve.")
@@ -160,6 +159,65 @@ def dominantSeventhToSubmediant(pitches, resolveTo='major', inPlace=False):
     if resolveTo == 'minor':
         seventh.transpose('-m2', True) #4th scale degree descends to 3rd
    
+    for i in range(len(pitches)):
+        del pitches[i].order
+
+    return pitches
+
+#Dominant seventh -> subdominant (stationary resolution)
+def dominantSeventhToSubdominant(pitches, resolveTo='major', inPlace=False):
+    '''
+    Given a list of four pitches correctly spelling out a dominant seventh chord in
+    root position, returns its standard resolution to either the major subdominant (IV6)
+    or the minor subdominant (iv6)
+
+    >>> from music21.figuredBass import resolution as r
+    >>> r.dominantSeventhToSubdominant(['C3', 'G3', 'E4', 'B-4'], 'major')
+    [D3, F3, F4, B-4]
+    >>> r.dominantSeventhToSubdominant(['C3', 'G3', 'E4', 'B-4'], 'minor')
+    [D-3, F3, F4, B-4]
+    >>> r.dominantSeventhToSubdominant(['G3', 'C4', 'B-4', 'E5'], 'minor')
+    Traceback (most recent call last):
+    ResolutionException: A stationary resolution can only happen on the root position V7.
+    '''
+    #Resolution is just like V7->submediant except the seventh remains stationary.
+    c = chord.Chord(copy.deepcopy(pitches))
+
+    if not c.isDominantSeventh():
+        raise ResolutionException("Pitches do not form a correctly spelled dominant seventh chord.")
+    if not len(pitches) == 4:
+        raise ResolutionException("Not a four part chord. Can't resolve.")
+    if not (resolveTo == 'major' or resolveTo == 'minor'):
+        raise ResolutionException("Unsupported scale type. Only major or minor.")
+    if not (c.inversion() == 0):
+        raise ResolutionException("A stationary resolution can only happen on the root position V7.")
+    
+    if not inPlace:
+        pitches = copy.deepcopy(pitches)  #Make a copy of the list, can then resolve in place.
+        
+    for i in range(len(pitches)):
+        pitches[i] = realizerScale.convertToPitch(pitches[i])
+        pitches[i].order = i
+    
+    root = pitches[pitches.index(c.root())]
+    third = pitches[pitches.index(c.third())]
+    fifth = pitches[pitches.index(c.fifth())]
+    seventh = pitches[pitches.index(c.seventh())]
+    
+    if resolveTo == 'minor':
+        root.transpose('m2', True)
+    elif resolveTo == 'major':
+        root.transpose('M2', True)
+
+    #Resolve the fifth
+    fifth.transpose('-M2', True) #2nd scale degree descends to tonic
+
+    #Resolve the tritone:
+    #Resolve the third
+    third.transpose('m2', True) #Leading tone resolves to tonic
+    
+    #Seventh remains stationary.
+       
     for i in range(len(pitches)):
         del pitches[i].order
 
