@@ -53,7 +53,7 @@ def exampleA():
     fb.addElement(n5, '-7,5,3') #vii7/ii
     fb.addElement(n6) #ii
     #Modulates to E minor
-    fb.addElement(n7, '#6,5,3') #vii7/iv (vii7/vi) 
+    fb.addElement(n7, '#6,5,3') #vii6/5/iv (vii6/5/vi) 
     fb.addElement(n8, '6') #iv6 (vi6) 
     fb.addElement(n9, '-7,5,3') #vii7/V
     fb.addElement(n10, '6,4') #i6/4
