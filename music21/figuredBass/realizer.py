@@ -269,17 +269,16 @@ class FiguredBass:
                 self.figuredBassEnvironment.warn("Dominant seventh resolution: VI")
                 resolutionPitches = resolution.dominantSeventhToSubmediant(pitches)
         else:
-            self.figuredBassEnvironment.warn("Dominant seventh chord not realized properly.")
+            self.figuredBassEnvironment.warn("Dominant seventh resolution: No standard resolution available.")
             print pitches
             return None
         
         resolutionChord = chord.Chord(resolutionPitches)
         if not (resolutionChord.bass() == nextBass):
-            self.figuredBassEnvironment.warn("Bass note not resolved properly.")
+            self.figuredBassEnvironment.warn("Dominant seventh resolution: Bass note realized improperly in figured bass.")
             
         return resolutionPitches
         
-    
 #Helper Methods
 def pitchesToMoveTo(voicePairs, newPitchA, potentialPitchList, rules = None):
     '''
