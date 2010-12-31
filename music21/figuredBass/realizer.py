@@ -247,6 +247,7 @@ class FiguredBass:
         minorScale = dominantScale.getParallelMinor()       
         
         tonic = dominantScale.getTonic()
+        subdominant = dominantScale.pitchFromDegree(4)
         majSubmediant = dominantScale.pitchFromDegree(6)
         minSubmediant = minorScale.pitchFromDegree(6)
         
@@ -268,6 +269,13 @@ class FiguredBass:
             if sampleChord.isMajorTriad():
                 self.figuredBassEnvironment.warn("Dominant seventh resolution: VI")
                 resolutionPitches = resolution.dominantSeventhToSubmediant(pitches)
+        elif sampleChord.root().name == subdominant.name:
+            if sampleChord.isMajorTriad():
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: IV")
+                resolutionPitches = resolution.dominantSeventhToSubmediant(pitches)
+            elif sampleChord.isMinorTriad():
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: iv")
+                resolutionPitches = resolution.dominantSeventhToSubmediant(pitches, 'minor')
         else:
             self.figuredBassEnvironment.warn("Dominant seventh resolution: No standard resolution available.")
             print pitches
