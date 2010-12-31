@@ -234,6 +234,8 @@ def diminishedSeventhToTonic(pitches, resolveTo='major', inPlace=False):
     >>> r.doubledRootInDimSeventhResolution = True #2nd scale degree descends to tonic instead
     >>> r.diminishedSeventhToTonic(['C#3', 'G3', 'E4', 'B-4'], 'minor')
     [D3, F3, D4, A4]
+    >>> r.diminishedSeventhToTonic(['C#3', 'G3', 'E4', 'B-4'], 'major')
+    [D3, F#3, D4, A4]
     '''
     c = chord.Chord(copy.deepcopy(pitches))
 
@@ -276,7 +278,7 @@ def diminishedSeventhToTonic(pitches, resolveTo='major', inPlace=False):
         elif resolveTo == 'minor':
             third.transpose('m2', True)
     
-    #Resolve seventh, flattened 6th scale degree descends by step to 5th
+    #Resolve seventh, flattened 6th scale degree (in major) descends by step to 5th
     seventh.transpose('-m2', True)
         
     for i in range(len(pitches)):
