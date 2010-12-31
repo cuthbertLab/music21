@@ -14,13 +14,12 @@ import copy
 
 from music21.figuredBass import realizerScale
 from music21 import pitch
-from music21 import stream
-from music21 import environment
 from music21 import chord
 from music21 import interval
 
 #Used Ex.76 (page 46) from 'The Basis of Harmony' by Frederick J. Horwood
 resolveV43toI6 = False
+doubledRootInDimSeventhResolution = False
 
 #Dominant seventh -> tonic (standard resolution)
 def dominantSeventhToTonic(pitches, resolveTo='major', inPlace=False):
@@ -117,7 +116,7 @@ def dominantSeventhToSubmediant(pitches, resolveTo='major', inPlace=False):
     Traceback (most recent call last):
     ResolutionException: A deceptive resolution can only happen on the root position V7.
     '''
-    
+    #Resolution is just like standard resolution except root moves to submediant instead of tonic
     c = chord.Chord(copy.deepcopy(pitches))
 
     if not c.isDominantSeventh():
@@ -223,81 +222,67 @@ def dominantSeventhToSubdominant(pitches, resolveTo='major', inPlace=False):
 
     return pitches
 
-#Tritone standard resolution
-def resolveTritone(pitchA, pitchB, resolveTo = 'major', inPlace=False):
+#Diminished seventh -> tonic (standard resolution or alternate resolution)
+#Standard resolution = doubled third
+#Alternate resolution = doubled tonic
+def diminishedSeventhToTonic(pitches, resolveTo='major', inPlace=False):
     '''
-    Given two pitches, A and B, which form a tritone,
-    returns a tuple containing (resolutionA, resolutionB). 
-    Pitches do not have to be in closed position.
-
-    If resolveTo is 'major', then tritone resolves to a M3/m6 interval
-    If resolveTo is 'minor', then tritone resolves to a m3/M6 interval
-    
-    Returns a ResolutionException if the pitches do not form a tritone.
-    
-    >>> from music21 import *
     >>> from music21.figuredBass import resolution as r
-    >>> p1 = pitch.Pitch('F3')
-    >>> p2 = pitch.Pitch('B4')
-    >>> r.resolveTritone(p1, p2) #Diminished Fifth
-    (E3, C5)
-    >>> r.resolveTritone(p2, p1) #Order matters
-    (C5, E3)
-    >>> p3 = pitch.Pitch('F5')
-    >>> r.resolveTritone(p2, p3) #Augmented Fourth
-    (C5, E5)
-    >>> p4 = pitch.Pitch('C5')
-    >>> r.resolveTritone(p3, p4)
-    Traceback (most recent call last):
-    ResolutionException: Pitches do not form a tritone.
+    >>> r.doubledRootInDimSeventhResolution = False #Default
+    >>> r.diminishedSeventhToTonic(['C#3', 'G3', 'E4', 'B-4'], 'minor')
+    [D3, F3, F4, A4]
+    >>> r.doubledRootInDimSeventhResolution = True #2nd scale degree descends to tonic instead
+    >>> r.diminishedSeventhToTonic(['C#3', 'G3', 'E4', 'B-4'], 'minor')
+    [D3, F3, D4, A4]
     '''
+    c = chord.Chord(copy.deepcopy(pitches))
+
+    if not c.isDiminishedSeventh():
+        raise ResolutionException("Pitches do not form a correctly spelled diminished seventh chord.")
+    if not len(pitches) == 4:
+        raise ResolutionException("Not a four part chord. Can't resolve.")
     if not (resolveTo == 'major' or resolveTo == 'minor'):
         raise ResolutionException("Unsupported scale type. Only major or minor.")
     
-    #Convert strings to pitches if necessary
-    pitchA = realizerScale.convertToPitch(pitchA)
-    pitchB = realizerScale.convertToPitch(pitchB)
-    
-    #Define tritone intervals
-    dimFifth = interval.stringToInterval('d5')
-    augFourth = interval.stringToInterval('A4')
-
-    #If resolution not in place, make copies
     if not inPlace:
-        pitchA = copy.deepcopy(pitchA)
-        pitchB = copy.deepcopy(pitchB)
-
-    #Sort pitches from low to high
-    pitches = [pitchA, pitchB]
-    pitches.sort()
+        pitches = copy.deepcopy(pitches)  #Make a copy of the list, can then resolve in place.
+        
+    for i in range(len(pitches)):
+        pitches[i] = realizerScale.convertToPitch(pitches[i])
+        pitches[i].order = i
     
-    c = chord.Chord(pitches)
-    newC = c.closedPosition()
+    root = pitches[pitches.index(c.root())] #Scale degree 7
+    third = pitches[pitches.index(c.third())] #Scale degree 2
+    fifth = pitches[pitches.index(c.fifth())] #Scale degree 4
+    seventh = pitches[pitches.index(c.seventh())] #Scale degree 6
     
-    #Find (positive) interval between pitches in closed position
-    tInterval = interval.notesToInterval(newC.pitches[0], newC.pitches[1])
-
-    #If interval not a tritone, exit method now.
-    if not (tInterval == dimFifth or tInterval == augFourth):
-        raise ResolutionException("Pitches do not form a tritone.")
+    #If major, d7 resolves to M3/m3; if minor, d7 resolves to m3/M3
     
-    if (tInterval == dimFifth): #Resolve inward in contrary motion
-        pitches[0].transpose('m2', True)
-        if resolveTo == 'major':
-            pitches[1].transpose('-m2', True)
-        elif resolveTo == 'minor':
-            pitches[1].transpose('-M2', True)
-    if (tInterval == augFourth): #Resolve outward in contrary motion
-        if resolveTo == 'major':
-            pitches[0].transpose('-m2', True)
-        elif resolveTo == 'minor':
-            pitches[0].transpose('-M2', True)
-        pitches[1].transpose('m2', True)
+    #Resolve root (leading tone) -> goes to tonic.
+    root.transpose('m2', True)
     
-    if pitchB > pitchA:
-        return (pitches[0], pitches[1])
+    #Resolve fifth, 4th scale degree descends to 3rd
+    if resolveTo == 'major':
+        fifth.transpose('-m2', True)
+    elif resolveTo == 'minor':
+        fifth.transpose('-M2', True)
+        
+    #Resolve third, 2nd scale degree ascends to 3rd
+    if doubledRootInDimSeventhResolution:
+        third.transpose('-M2', True)
     else:
-        return (pitches[1], pitches[0])
+        if resolveTo == 'major':
+            third.transpose('M2', True)
+        elif resolveTo == 'minor':
+            third.transpose('m2', True)
+    
+    #Resolve seventh, flattened 6th scale degree descends by step to 5th
+    seventh.transpose('-m2', True)
+        
+    for i in range(len(pitches)):
+        del pitches[i].order
+
+    return pitches
 
 
 class ResolutionException(music21.Music21Exception):
