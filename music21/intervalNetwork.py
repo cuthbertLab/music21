@@ -1046,16 +1046,14 @@ class IntervalNetwork(object):
         else:
             pitchObj = copy.deepcopy(pitchOrigin)
 
-        # get the node id that we are looking for 
-        # compare to bi-directional form
+        # get the node id that we are starting with
         nodeId = self.getRelativeNodeId(pitchReference, 
                     nodeName=nodeName, 
                     pitchTarget=pitchOrigin, 
                     direction=direction,
                     alteredNodes=alteredNodes)
 
-        #environLocal.printDebug(['nextPitch()', 'got node Id', nodeId, 'direction', direction, 'pitchOrigin', pitchOrigin])
-
+        #environLocal.printDebug(['nextPitch()', 'got node Id', nodeId, 'direction', direction, 'self._nodes[nodeId].step', self._nodes[nodeId].step, 'pitchOrigin', pitchOrigin])
 
         # if no match, get the neighbor
         if nodeId is None and getNeighbor in [True,     
@@ -1076,7 +1074,7 @@ class IntervalNetwork(object):
 
         # realize the pitch from the found node step
         # we may be getting an altered
-        # tone, and we need to transpose an unaltered tone
+        # tone, and we need to transpose an unaltered tone, thus
         # leave out altered nodes argument
         p = self.getPitchFromNodeStep(pitchReference=pitchReference, 
             nodeName=nodeName, 
@@ -1087,7 +1085,7 @@ class IntervalNetwork(object):
             alteredNodes={} # need unaltered tone here, thus leaving out
             )
 
-        #environLocal.printDebug(['nextPitch()', 'pitch obtained based on node step', p, 'nodeId', nodeId])
+        #environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName', nodeName, 'p', p, 'nodeId', nodeId, 'self._nodes[nodeId].step', self._nodes[nodeId].step])
 
         # transfer octave; this assumes octave equivalence
         p.octave = pitchObj.octave
@@ -1207,7 +1205,7 @@ class IntervalNetwork(object):
         postNodeId = [] # store node ids as well
 
         while True:
-            #environLocal.printDebug(['here', p])
+            #environLocal.printDebug(['_realizeAscending()', 'p', p])
             appendPitch = False
             if (minPitch is not None and pCollect.ps >= minPitch.ps and 
                 maxPitch is not None and pCollect.ps <= maxPitch.ps):
@@ -1224,9 +1222,10 @@ class IntervalNetwork(object):
             if appendPitch:
                 post.append(pCollect)
                 postNodeId.append(n.id)
-
             if maxPitch is not None and p.ps >= maxPitch.ps:
                 break
+
+            #environLocal.printDebug(['_realizeAscending()', 'n', n, 'n.id', n.id])
 
             # must check first, and at end
             if n.id == TERMINUS_HIGH:
@@ -1236,6 +1235,8 @@ class IntervalNetwork(object):
 
             # this returns a list of possible edges and nodes
             nextBundle = self._getNext(n, DIRECTION_ASCENDING)
+            #environLocal.printDebug(['_realizeAscending()', 'n', n, 'nextBundle', nextBundle])
+
             # if we cannot continue to ascend, then we must break
             if nextBundle is None:
                 break
@@ -1248,7 +1249,6 @@ class IntervalNetwork(object):
 
             pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
                        n=n, p=p, direction=DIRECTION_ASCENDING)
-
 
         # store in cache
         if self.deterministic:
@@ -1438,21 +1438,7 @@ class IntervalNetwork(object):
         if common.isStr(maxPitch):
             maxPitch = pitch.Pitch(maxPitch)
 
-        # determine what kind of realization procedure
-#         directedRealization = False
-#         if minPitch is None and maxPitch is None:
-#             directedRealization = False
-#         else:
-#             # for now, bi direction returns false for directed;
-#             # todo: change
-#             #if self.octaveDuplicating and direction in [
-#             #    DIRECTION_ASCENDING, DIRECTION_DESCENDING]:
-#             if self.octaveDuplicating:
-#                 directedRealization = True
-
         directedRealization = False
-        #if self.octaveDuplicating and minPitch is not None and maxPitch is not None:
-
         if self.octaveDuplicating:
             directedRealization = True
 
@@ -1781,7 +1767,7 @@ class IntervalNetwork(object):
         realizedPitch, realizedNode = self.realize(pitchReference, nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, 
         alteredNodes=alteredNodes)
 
-        #environLocal.printDebug(['getRelativeNodeId()', 'realizedPitch', realizedPitch])
+        #environLocal.printDebug(['getRelativeNodeId()', 'nodeId', nodeId, 'realizedPitch', realizedPitch, 'realizedNode', realizedNode])
 
         for i in range(len(realizedPitch)):
             #environLocal.printDebug(['getRelativeNodeId', 'comparing',  realizedPitch[i], realizedNode[i]])
@@ -1791,7 +1777,7 @@ class IntervalNetwork(object):
             if getattr(pitchTarget, comparisonAttribute) == getattr(realizedPitch[i], comparisonAttribute):
                 match = True
             if match:
-                #environLocal.printDebug(['getRelativeNodeId', 'pitchReference', pitchReference, 'input nodeId', nodeId, 'pitchTarget', pitchTarget, 'matched', realizedNode[i]])
+                #environLocal.printDebug(['getRelativeNodeId', 'pitchReference', pitchReference, 'input nodeId', nodeId, 'pitchTarget', pitchTarget, 'matched:', realizedNode[i]])
                 return realizedNode[i]
         return None
 

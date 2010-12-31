@@ -693,7 +693,7 @@ class AbstractOctaveRepeatingScale(AbstractScale):
 class AbstractRagAsawari(AbstractScale):
     '''A pseudo raga-scale. 
     '''
-    def __init__(self, mode=None):
+    def __init__(self):
         AbstractScale.__init__(self)
         self.type = 'Abstract Melodic Minor'
         self.octaveDuplicating = True
@@ -719,49 +719,48 @@ class AbstractRagAsawari(AbstractScale):
         edges = (
                 # ascending
                 {'interval':'M2', 'connections':(
-                        [TERMINUS_LOW, 0, DIRECTION_ASCENDING], # a to b
+                        [TERMINUS_LOW, 0, DIRECTION_ASCENDING], # c to d
+                    )},
+                {'interval':'m3', 'connections':(
+                        [0, 1, DIRECTION_ASCENDING], # d to f
+                    )},
+                {'interval':'M2', 'connections':(
+                        [1, 2, DIRECTION_ASCENDING], # f to g
                     )},
                 {'interval':'m2', 'connections':(
-                        [0, 1, DIRECTION_ASCENDING], # b to c
+                        [2, 3, DIRECTION_ASCENDING], # g to a-
                     )},
-                {'interval':'M2', 'connections':(
-                        [1, 2, DIRECTION_ASCENDING], # c to d
-                    )},
-                {'interval':'M2', 'connections':(
-                        [2, 3, DIRECTION_ASCENDING], # d to e
-                    )},
-                {'interval':'M2', 'connections':(
-                        [3, TERMINUS_HIGH, DIRECTION_ASCENDING], # e to f#
+                {'interval':'M3', 'connections':(
+                        [3, TERMINUS_HIGH, DIRECTION_ASCENDING], # a- to c
                     )},
                 # descending
                 {'interval':'M2', 'connections':(
-                        [TERMINUS_HIGH, 4, DIRECTION_DESCENDING], # a to g
+                        [TERMINUS_HIGH, 4, DIRECTION_DESCENDING], # c to b-
                     )},
                 {'interval':'M2', 'connections':(
-                        [4, 5, DIRECTION_DESCENDING], # g to f
+                        [4, 5, DIRECTION_DESCENDING], # b- to a-
                     )},
                 {'interval':'m2', 'connections':(
-                        [5, 6, DIRECTION_DESCENDING], # f to e
+                        [5, 6, DIRECTION_DESCENDING], # a- to g
+                    )},
+                {'interval':'M2', 'connections':(
+                        [6, 7, DIRECTION_DESCENDING], # g to f
+                    )},
+                {'interval':'M2', 'connections':(
+                        [7, 8, DIRECTION_DESCENDING], # f to e-
                     )},
                 {'interval':'m2', 'connections':(
-                        [6, 7, DIRECTION_DESCENDING], # f to e
+                        [8, 9, DIRECTION_DESCENDING], # e- to d
                     )},
-                {'interval':'m2', 'connections':(
-                        [7, 8, DIRECTION_DESCENDING], # f to e
-                    )},
-                {'interval':'m2', 'connections':(
-                        [8, 9, DIRECTION_DESCENDING], # f to e
-                    )},
-                {'interval':'m2', 'connections':(
-                        [9, TERMINUS_LOW, DIRECTION_DESCENDING], # f to e
+                {'interval':'M2', 'connections':(
+                        [9, TERMINUS_LOW, DIRECTION_DESCENDING], # d to c
                     )},
                 )
 
         self._net = intervalNetwork.IntervalNetwork(
                         octaveDuplicating=self.octaveDuplicating)
         # using representation stored in interval network
-        #self._net.fillArbitrary(nodes, edges)
-        self._net.fillMelodicMinor()
+        self._net.fillArbitrary(nodes, edges)
 
 
 
@@ -1909,6 +1908,28 @@ class SieveScale(ConcreteScale):
 
 
 
+class RagAsawari(ConcreteScale):
+    '''A concrete pseudo-raga scale. 
+
+    >>> from music21 import *
+    >>> sc = scale.RagAsawari('c2') 
+    >>> sc.pitches
+    [C2, D2, F2, G2, A-2, C3]
+    >>> sc.getPitches(direction='descending')
+    [C2, D2, E-2, F2, G2, A-2, B-2, C3]
+    '''
+
+    def __init__(self, tonic=None):
+        ConcreteScale.__init__(self, tonic=tonic)
+        self._abstract = AbstractRagAsawari()
+        self.type = 'Rag Asawari'
+
+
+
+
+
+
+
 
 #-------------------------------------------------------------------------------
 class RomanNumeral(object):
@@ -2718,6 +2739,26 @@ class Test(unittest.TestCase):
         self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
 
 
+
+    def testRagAsawara(self):
+
+        sc = RagAsawari('c4')
+        self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
+
+        #    
+        # ascending should be:  [C2, D2, F2, G2, A-2, C3]
+
+        self.assertEqual(str(sc.next('c4', 'ascending')), 'D4')
+        self.assertEqual(str(sc.pitches), '[C4, D4, F4, G4, A-4, C5]')
+# 
+#         self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
+
+        self.assertEqual(str(sc.getPitches('c2', 'c4', direction='ascending')), '[C2, D2, F2, G2, A-2, C3, D3, F3, G3, A-3, C4]')
+
+        self.assertEqual(str(sc.getPitches('c2', 'c4', direction='descending')), '[C2, D2, E-2, F2, G2, A-2, B-2, C3, D3, E-3, F3, G3, A-3, B-3, C4]')
+
+
+
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
@@ -2730,9 +2771,10 @@ if __name__ == "__main__":
 
         #t.testCyclicalScales()
         #t.testMelodicMinorA()
-        t.testMelodicMinorB()
+        #t.testMelodicMinorB()
         #t.testPlot()
         #t.testPlagalModes()
+        t.testRagAsawara()
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
