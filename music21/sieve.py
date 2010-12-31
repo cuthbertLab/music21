@@ -90,7 +90,7 @@ RESIDUAL = list(string.digits) + ['@']
 # other implementations
 # http://c2.com/cgi-bin/wiki?SieveOfEratosthenesInManyProgrammingLanguages
 # http://www.mycgiserver.com/~gpiancastelli/blog/archives/000042.html
-def eratosthenes():
+def eratosthenes(firstCandidate = 2):
     """Yields the sequence of prime numbers via the Sieve of Eratosthenes.
     rather than creating a fixed list of a range (z) and crossing out
     multiples of sequential candidates, this algorithm stores primes under
@@ -114,6 +114,17 @@ def eratosthenes():
     2
     >>> a.next()
     3
+
+
+    We can also specify a starting value for the sequence, skipping over
+    initial primes smaller than this number:
+
+
+    >>> a = eratosthenes(95)
+    >>> a.next()
+    97
+    >>> a.next()
+    101
     """
     D = {}  # map composite integers to primes witnessing their compositeness
     # D stores largest composite: prime, pairs
@@ -136,13 +147,16 @@ def eratosthenes():
         else: # value not in dictionary
             nextMult = q * q # square is next multiple tt will be found
             D[nextMult] = q 
-            yield q # return prime
+            if q >= firstCandidate:
+                yield q # return prime
         q = q + 1 # incr. candidate
 
 
 
 def rabinMiller(n):
-    """Implementation of Rabin Miller primality test. 
+    """
+    Returns true if an integer is likely prime or false if it is likely composite using the
+    Rabin Miller primality test. 
 
     See also here: http://www.4dsolutions.net/ocn/numeracy2.html
 
@@ -152,6 +166,9 @@ def rabinMiller(n):
     True
     >>> rabinMiller(4)
     False
+    >>> rabinMiller(123986234193)
+    False
+
     """
     n = abs(n)
     if n in [2,3]: 
@@ -193,12 +210,19 @@ def rabinMiller(n):
 # list processing and unit interval routines
 
 def discreteBinaryPad(series, fixRange=None):
-    """Treat a sequence of integers as defining contiguous binary integers, where provided values are 1's and excluded values are zero.
+    """
+    Treat a sequence of integers as defining contiguous binary integers, where provided values are 1's and excluded values are zero.
+
+    For instance, running [3,10,12] through this method gives a 1 for 
+    the first entry (signifying 3), 0s for the next six entries (signifying 
+    4-9), a 1 (for 10), a 0 (for 11), and a 1 (for 12).  
+
+    >>> discreteBinaryPad([3,10,12])
+    [1, 0, 0, 0, 0, 0, 0, 1, 0, 1]
 
     >>> discreteBinaryPad([3,4,5])
     [1, 1, 1]
-    >>> discreteBinaryPad([3,20,22])
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1]
+
     """
     # make sure these are ints
     for x in series:
@@ -226,8 +250,22 @@ def discreteBinaryPad(series, fixRange=None):
 def unitNormRange(series, fixRange=None):
     """Given a list of numbers, create a proportional spacing across the unit interval. 
 
+    The first entry will always be 0 and the last 1, other entries will be spaced
+    according to their distance between these two units.  For instance, for 0, 3, 4
+    the middle entry will be 0.75 since 3 is 3/4 of the distance between 0 and 4:
+
     >>> unitNormRange([0,3,4])
     [0.0, 0.75, 1.0]
+    
+    
+    but for [1, 3, 4], it will be .666... because 3 is 2/3 of the distance between
+    1 and 4
+
+
+    >>> unitNormRange([1,3,4])
+    [0.0, 0.666..., 1.0]
+
+    
     """
     if fixRange != None:
         fixRange.sort()
@@ -253,10 +291,18 @@ def unitNormRange(series, fixRange=None):
 
 
 def unitNormEqual(parts):
-    """Given a certain number of parts, return a list unit-interval values between 0 and 1, with as many divisions as parts; 0 and 1 are always inclusive.
+    """Given a certain number of parts, return a list unit-interval values 
+    between 0 and 1, with as many divisions as parts; 0 and 1 are always inclusive.
 
     >>> unitNormEqual(3)
     [0.0, 0.5, 1]
+    
+    
+    If parts is 0 or 1, then a single entry of [0] is given:
+    
+    >>> unitNormEqual(1)
+    [0]
+    
     """
     if parts <= 1: return [0]
     elif parts == 2: return [0,1]
