@@ -15,6 +15,7 @@ import copy
 
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
+from music21.figuredBass import resolution
 from music21.pitch import Pitch
 from music21 import pitch
 from music21 import voiceLeading
@@ -25,7 +26,9 @@ from music21 import environment
 from music21 import chord
 from music21 import key
 from music21 import interval
+from music21 import scale
 
+_MOD = "realizer.py"
 
 class FiguredBass:
     def __init__(self, timeSig, key, mode = 'major'):
@@ -39,6 +42,7 @@ class FiguredBass:
         self.allChords = None
         self.allMovements = None
         self.bassNotes = []
+        self.figuredBassEnvironment = environment.Environment(_MOD)
     
     def addElement(self, bassNote, notation = ''):
         self.bassNotes.append(bassNote)
@@ -213,7 +217,11 @@ class FiguredBass:
         pitchesInNextChord = self.scale.getPitchNames(nextBass, nextNotation)
         prevChordIndex = 0
         for prevChord in prevChords:
-            nextPossibilities = allChordsToMoveTo(prevChord, potentialPitchList, nextBass, self.rules)
+            try:
+                nextPossibilities = [self._resolveDominantSeventh(prevChord, nextBass, nextNotation)]
+                self.rules.allowIncompleteChords = True
+            except FiguredBassException:
+                nextPossibilities = allChordsToMoveTo(prevChord, potentialPitchList, nextBass, self.rules)
             movements = []
             for nextChord in nextPossibilities:
                 ruleCheckA = self.rules.checkChord(nextChord, pitchesInNextChord)
@@ -226,10 +234,52 @@ class FiguredBass:
                         movements.append(len(nextChords) - 1)
             prevMovements[prevChordIndex] = movements
             prevChordIndex += 1
-            
+            self.rules.allowIncompleteChords = False
+        
         return (nextChords, prevMovements)
     
+    def _resolveDominantSeventh(self, pitches, nextBass, nextNotation=''):
+        dominantChord = chord.Chord(pitches)
+        if not dominantChord.isDominantSeventh():
+            raise FiguredBassException("Not dominant seventh chord.")
+        sc = scale.MajorScale()
+        dominantScale = sc.derive(pitches)
+        minorScale = dominantScale.getParallelMinor()       
         
+        tonic = dominantScale.getTonic()
+        majSubmediant = dominantScale.pitchFromDegree(6)
+        minSubmediant = minorScale.pitchFromDegree(6)
+        
+        samplePitches = self.scale.getSamplePitches(nextBass, nextNotation)
+        sampleChord = chord.Chord(samplePitches)
+        
+        if sampleChord.root().name == tonic.name:
+            if sampleChord.isMajorTriad():
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: I")
+                resolutionPitches = resolution.dominantSeventhToTonic(pitches)
+            elif sampleChord.isMinorTriad():
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: i")
+                resolutionPitches = resolution.dominantSeventhToTonic(pitches, 'minor')
+        elif sampleChord.root().name == majSubmediant.name:
+            if sampleChord.isMinorTriad():
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: vi")
+                resolutionPitches = resolution.dominantSeventhToSubmediant(pitches, 'minor')
+        elif sampleChord.root().name == minSubmediant.name:
+            if sampleChord.isMajorTriad():
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: VI")
+                resolutionPitches = resolution.dominantSeventhToSubmediant(pitches)
+        else:
+            self.figuredBassEnvironment.warn("Dominant seventh chord not realized properly.")
+            print pitches
+            return None
+        
+        resolutionChord = chord.Chord(resolutionPitches)
+        if not (resolutionChord.bass() == nextBass):
+            self.figuredBassEnvironment.warn("Bass note not resolved properly.")
+            
+        return resolutionPitches
+        
+    
 #Helper Methods
 def pitchesToMoveTo(voicePairs, newPitchA, potentialPitchList, rules = None):
     '''
@@ -374,62 +424,7 @@ def printChordProgression(chordProgression):
 
 #Resolving four part dominant seventh chord to tonic.
 def resolveDominantSeventh(pitches, inPlace=False):
-    '''
-    >>> from music21 import *
-    >>> from music21.figuredBass import realizer as r
-    >>> r.resolveDominantSeventh(['G2', 'B3', 'D5', 'F4'])
-    [C3, C4, C5, E4]
-    '''
-    c = chord.Chord(pitches)
-
-    if not c.isDominantSeventh():
-        raise FiguredBassException("Pitches don't form a dominant seventh chord.")
-    if not len(pitches) == 4:
-        raise FiguredBassException("Not a four part chord. Unsupported resolution.")
-
-    if not inPlace:
-        pitches = copy.deepcopy(pitches) #Using a copy of the list, can then resolve in place.
-
-    for i in range(len(pitches)):
-        pitches[i] = realizerScale.convertToPitch(pitches[i])
-        pitches[i].order = i
-    
-    root = pitches[pitches.index(c.root())]
-    tritonePitchA = pitches[pitches.index(c.third())]
-    fifth = pitches[pitches.index(c.fifth())]
-    tritonePitchB = pitches[pitches.index(c.seventh())]
-
-    resolveTritone(tritonePitchA, tritonePitchB, True)
-
-    if c.inversion() == 0:
-        #Root goes to tonic
-        root.transpose('P4', True)
-
-    if c.inversion() == 2:
-        #Fifth goes to third
-        fifth.transpose('M2', True)
-    else:
-        #Fifth resolves to tonic
-        fifth.transpose('-M2', True)
-
-    #print pitches.remove(c.root())
-    
-    #In a four part dominant seventh chord, resolution (to tonic) is like this:
-    #Tritone resolves. 
-    #If chord in root position, root goes to tonic. 
-    #Else, root stays the same.
-    #Fifth of chord goes to tonic. 
-    #Fifth can also go to third, but only really acceptable when it's the root (2nd inversion)
-    
-    #Need to keep the order intact (just in case)
-    #Step 1: Tritone resolves
-    #Step 2: Root resolves
-    #Step 3: Fifth resolves
-
-    for i in range(len(pitches)):
-        del pitches[i].order
-
-    return pitches
+    pass
 
 def cmp(pitchA, pitchB):
     if pitchA.order > pitchB.order:
