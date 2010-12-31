@@ -178,6 +178,6 @@ def exampleD():
 
 if __name__ == "__main__":
     #exampleA(), exampleB(), exampleC(), exampleD()
-    fb = exampleD() #Set up the figured bass
+    fb = exampleB() #Set up the figured bass
     fb.solve()
     fb.showRandomSolutions(20)
