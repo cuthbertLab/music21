@@ -275,7 +275,7 @@ class FiguredBass:
         
         resolutionChord = chord.Chord(resolutionPitches)
         if not (resolutionChord.bass() == nextBass):
-            self.figuredBassEnvironment.warn("Dominant seventh resolution: Bass note realized improperly in figured bass.")
+            self.figuredBassEnvironment.warn("Dominant seventh resolution: Bass note resolved improperly in figured bass.")
             
         return resolutionPitches
         
