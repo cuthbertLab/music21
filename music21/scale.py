@@ -2757,6 +2757,19 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(sc.getPitches('c2', 'c4', direction='descending')), '[C2, D2, E-2, F2, G2, A-2, B-2, C3, D3, E-3, F3, G3, A-3, B-3, C4]')
 
+        self.assertEqual(str(sc.next('c1', 'ascending')), 'D1')
+        self.assertEqual(str(sc.next('d1', 'ascending')), 'F1')
+        self.assertEqual(str(sc.next('f1', 'descending')), 'E-1')
+
+        self.assertEqual(str(sc.next('e-1', 'ascending', getNeighbor='descending')), 'F1')
+
+        self.assertEqual(str(sc.pitchFromDegree(1)), 'C1')
+        # there is no third step in ascending form
+        self.assertEqual(str(sc.pitchFromDegree(3)), 'None')
+        self.assertEqual(str(sc.pitchFromDegree(3, direction='descending')), 'E-4')
+
+        self.assertEqual(str(sc.pitchFromDegree(7)), 'None')
+        self.assertEqual(str(sc.pitchFromDegree(7, direction='descending')), 'B-4')
 
 
 #-------------------------------------------------------------------------------
