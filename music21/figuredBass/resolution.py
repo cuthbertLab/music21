@@ -13,6 +13,7 @@ import unittest
 import copy
 
 from music21.figuredBass import realizerScale
+from music21.figuredBass import notation
 from music21 import pitch
 from music21 import chord
 from music21 import interval
@@ -227,6 +228,9 @@ def dominantSeventhToSubdominant(pitches, resolveTo='major', inPlace=False):
 #Alternate resolution = doubled tonic
 def diminishedSeventhToTonic(pitches, resolveTo='major', inPlace=False):
     '''
+    Given a list of four pitches correctly spelling out a diminished seventh chord, 
+    returns its standard resolution to either the major tonic (I) or the minor tonic (i).
+
     >>> from music21.figuredBass import resolution as r
     >>> r.doubledRootInDimSeventhResolution = False #Default
     >>> r.diminishedSeventhToTonic(['C#3', 'G3', 'E4', 'B-4'], 'minor')
@@ -286,6 +290,55 @@ def diminishedSeventhToTonic(pitches, resolveTo='major', inPlace=False):
 
     return pitches
 
+def diminishedSeventhToSubdominant(pitches, resolveTo='major', inPlace=False):
+    '''
+    Given a list of four pitches correctly spelling out a diminished seventh chord, 
+    returns its standard resolution to either the major subdominant (IV) or the minor
+    subdominant (iv).
+
+    >>> from music21.figuredBass import resolution as r
+    >>> r.doubledRootInDimSeventhResolution = False #Default
+    >>> r.diminishedSeventhToSubdominant(['C#3', 'G3', 'E4', 'B-4'], 'minor') #inversion == 0
+    [D3, G3, D4, B-4]
+    >>> r.diminishedSeventhToSubdominant(['G3', 'C#4', 'E4', 'B-4'], 'minor') #inversion == 1
+    [G3, D4, D4, B-4]
+    >>> r.diminishedSeventhToSubdominant(['G3', 'C#4', 'E4', 'B-4'], 'major') #inversion == 1
+    [G3, D4, D4, B4]
+    '''
+    c = chord.Chord(copy.deepcopy(pitches))
+
+    if not c.isDiminishedSeventh():
+        raise ResolutionException("Pitches do not form a correctly spelled diminished seventh chord.")
+    if not len(pitches) == 4:
+        raise ResolutionException("Not a four part chord. Can't resolve.")
+    if not (resolveTo == 'major' or resolveTo == 'minor'):
+        raise ResolutionException("Unsupported scale type. Only major or minor.")
+    
+    if not inPlace:
+        pitches = copy.deepcopy(pitches)  #Make a copy of the list, can then resolve in place.
+        
+    for i in range(len(pitches)):
+        pitches[i] = realizerScale.convertToPitch(pitches[i])
+        pitches[i].order = i
+    
+    root = pitches[pitches.index(c.root())] #Scale degree 7
+    third = pitches[pitches.index(c.third())] #Scale degree 2
+    fifth = pitches[pitches.index(c.fifth())] #Scale degree 4
+    seventh = pitches[pitches.index(c.seventh())] #Scale degree 6
+
+    #Scale degrees 7,2 resolve to tonic.
+    root.transpose('m2', True)
+    third.transpose('-M2', True)
+    
+    #Sixth scale degree moves up a step.
+    if resolveTo == 'major':
+        mSharp = notation.Modifier("+")
+        mSharp.modifyPitch(seventh, True)
+        
+    for i in range(len(pitches)):
+        del pitches[i].order
+
+    return pitches
 
 class ResolutionException(music21.Music21Exception):
     pass
