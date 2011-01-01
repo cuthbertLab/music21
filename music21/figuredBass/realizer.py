@@ -221,7 +221,11 @@ class FiguredBass:
                 nextPossibilities = [self._resolveDominantSeventh(prevChord, nextBass, nextNotation)]
                 self.rules.allowIncompleteChords = True
             except FiguredBassException:
-                nextPossibilities = allChordsToMoveTo(prevChord, potentialPitchList, nextBass, self.rules)
+                try:
+                    nextPossibilities = [self._resolveDiminishedSeventh(prevChord, nextBass, nextNotation)]
+                    self.rules.allowIncompleteChords = True
+                except FiguredBassException:
+                    nextPossibilities = allChordsToMoveTo(prevChord, potentialPitchList, nextBass, self.rules)
             movements = []
             for nextChord in nextPossibilities:
                 ruleCheckA = self.rules.checkChord(nextChord, pitchesInNextChord)
@@ -241,7 +245,7 @@ class FiguredBass:
     def _resolveDominantSeventh(self, pitches, nextBass, nextNotation=''):
         dominantChord = chord.Chord(pitches)
         if not dominantChord.isDominantSeventh():
-            raise FiguredBassException("Not dominant seventh chord.")
+            raise FiguredBassException("Not a correctly spelled dominant seventh chord.")
         sc = scale.MajorScale()
         dominantScale = sc.derive(pitches)
         minorScale = dominantScale.getParallelMinor()       
@@ -256,37 +260,65 @@ class FiguredBass:
         
         if sampleChord.root().name == tonic.name:
             if sampleChord.isMajorTriad():
-                self.figuredBassEnvironment.warn("Dominant seventh resolution: I")
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: V7->I in " + dominantScale.name)
                 resolutionPitches = resolution.dominantSeventhToTonic(pitches)
             elif sampleChord.isMinorTriad():
-                self.figuredBassEnvironment.warn("Dominant seventh resolution: i")
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: V7->i in " + minorScale.name)
                 resolutionPitches = resolution.dominantSeventhToTonic(pitches, 'minor')
         elif sampleChord.root().name == majSubmediant.name:
             if sampleChord.isMinorTriad():
-                self.figuredBassEnvironment.warn("Dominant seventh resolution: vi")
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: V7->vi in " + dominantScale.name)
                 resolutionPitches = resolution.dominantSeventhToSubmediant(pitches, 'minor')
         elif sampleChord.root().name == minSubmediant.name:
             if sampleChord.isMajorTriad():
-                self.figuredBassEnvironment.warn("Dominant seventh resolution: VI")
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: V7->VI in " + minorScale.name)
                 resolutionPitches = resolution.dominantSeventhToSubmediant(pitches)
         elif sampleChord.root().name == subdominant.name:
             if sampleChord.isMajorTriad():
-                self.figuredBassEnvironment.warn("Dominant seventh resolution: IV")
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: V7->IV in " + dominantScale.name)
                 resolutionPitches = resolution.dominantSeventhToSubmediant(pitches)
             elif sampleChord.isMinorTriad():
-                self.figuredBassEnvironment.warn("Dominant seventh resolution: iv")
+                self.figuredBassEnvironment.warn("Dominant seventh resolution: V7->iv in " + minorScale.name)
                 resolutionPitches = resolution.dominantSeventhToSubmediant(pitches, 'minor')
         else:
             self.figuredBassEnvironment.warn("Dominant seventh resolution: No standard resolution available.")
-            print pitches
-            return None
+            raise FiguredBassException("Dominant seventh resolution: No standard resolution available.")
         
         resolutionChord = chord.Chord(resolutionPitches)
         if not (resolutionChord.bass() == nextBass):
             self.figuredBassEnvironment.warn("Dominant seventh resolution: Bass note resolved improperly in figured bass.")
             
         return resolutionPitches
+    
+    def _resolveDiminishedSeventh(self, pitches, nextBass, nextNotation=''):
+        diminishedChord = chord.Chord(pitches)
+        if not (diminishedChord.isDiminishedSeventh()):
+            raise FiguredBassException("Not a correctly spelled diminished seventh chord.")
+        sc = scale.HarmonicMinorScale()
+        diminishedScale = sc.deriveByDegree(7, diminishedChord.root())
+        minorScale = diminishedScale.getParallelMinor()
+        tonic = diminishedScale.getTonic()
+
+        samplePitches = self.scale.getSamplePitches(nextBass, nextNotation)
+        sampleChord = chord.Chord(samplePitches)
         
+        if sampleChord.root().name == tonic.name:
+            if sampleChord.isMajorTriad():
+                self.figuredBassEnvironment.warn("Diminished seventh resolution: vii7->I in " + diminishedScale.name)
+                resolutionPitches = resolution.diminishedSeventhToTonic(pitches)
+            elif sampleChord.isMinorTriad():
+                self.figuredBassEnvironment.warn("Diminished seventh resolution: vii7->i in " + minorScale.name)
+                resolutionPitches = resolution.diminishedSeventhToTonic(pitches, 'minor')
+        else:
+            self.figuredBassEnvironment.warn("Diminished seventh resolution: No standard resolution available.")           
+            raise FiguredBassException("Diminished seventh resolution: No standard resolution available.")
+
+        resolutionChord = chord.Chord(resolutionPitches)
+        if not (resolutionChord.bass() == nextBass):
+            self.figuredBassEnvironment.warn("Diminished seventh resolution: Bass note resolved improperly in figured bass.")
+            
+        return resolutionPitches
+
 #Helper Methods
 def pitchesToMoveTo(voicePairs, newPitchA, potentialPitchList, rules = None):
     '''
