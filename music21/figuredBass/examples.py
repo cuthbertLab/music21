@@ -54,8 +54,8 @@ def exampleA():
     fb.addElement(n6) #ii
     #Modulates to E minor
     fb.addElement(n7, '#6,5,3') #vii6/5/iv (vii6/5/vi) 
-    fb.addElement(n8, '6') #iv6 (vi6) 
-    fb.addElement(n9, '-7,5,3') #vii7/V
+    fb.addElement(n8, '6') #iv6 (vi6)
+    fb.addElement(n9, '7,5,#3') #vii7/V
     fb.addElement(n10, '6,4') #i6/4
     fb.addElement(n11, '#5,#3') #V
     fb.addElement(n12) #i
@@ -80,11 +80,11 @@ def exampleB():
     n7.quarterLength = 2.0
     
     fb.addElement(n1) #i
-    fb.addElement(n2, '7,5,3#') #V7
+    fb.addElement(n2, '7,5,#3') #V7
     fb.addElement(n3) #VI
     fb.addElement(n4, '6') #i6
     fb.addElement(n5, '6') #ii6
-    fb.addElement(n6, '7,5,3#') #V7
+    fb.addElement(n6, '7,5,#3') #V7
     fb.addElement(n7) #i
     
     return fb
@@ -178,6 +178,6 @@ def exampleD():
 
 if __name__ == "__main__":
     #exampleA(), exampleB(), exampleC(), exampleD()
-    fb = exampleB() #Set up the figured bass
+    fb = exampleA() #Set up the figured bass
     fb.solve()
     fb.showRandomSolutions(20)
