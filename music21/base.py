@@ -2424,6 +2424,7 @@ class Music21Object(JSONSerializer):
         >>> a.duration.type = 'whole'
         >>> a.articulations = [articulations.Staccato()]
         >>> a.lyric = 'hi'
+        >>> a.notations = [expressions.Mordent(), expressions.Trill(), expressions.Fermata()]
         >>> b, c = a.splitAtQuarterLength(3)
         >>> b.duration.type
         'half'
@@ -2435,6 +2436,8 @@ class Music21Object(JSONSerializer):
         [<music21.articulations.Staccato object at 0x...>]
         >>> b.lyric
         'hi'
+        >>> b.notations
+        [<music21.expressions.Mordent object at 0x...>, <music21.expressions.Trill object at 0x...>]
         >>> c.duration.type
         'quarter'
         >>> c.duration.dots
@@ -2444,6 +2447,9 @@ class Music21Object(JSONSerializer):
         >>> c.articulations
         []
         >>> c.lyric
+        >>> c.notations
+        [<music21.expressions.Trill object at 0x...>, <music21.expressions.Fermata object at 0x...>]
+
         '''
         # was note.splitNoteAtPoint
 
@@ -2452,7 +2458,7 @@ class Music21Object(JSONSerializer):
 
         if quarterLength > self.duration.quarterLength:
             raise duration.DurationException(
-            "cannont split a duration (%s) at this quarter length (%s)" % (
+            "cannot split a duration (%s) at this quarterLength (%s)" % (
             self.duration.quarterLength, quarterLength))
 
         if retainOrigin == True:
@@ -2466,6 +2472,23 @@ class Music21Object(JSONSerializer):
             eRemain.articulations = []
         if hasattr(eRemain, 'lyrics'):
             eRemain.lyrics = []
+
+        if hasattr(e, 'notations'):
+            tempNotations = e.notations
+            e.notations = []
+            eRemain.notations = []
+            for thisNotation in tempNotations:
+                if hasattr(thisNotation, 'tieAttach'):
+                    if thisNotation.tieAttach == 'first':
+                        e.notations.append(thisNotation)
+                    elif thisNotation.tieAttach == 'last':
+                        eRemain.notations.append(thisNotation)
+                    else:  # default = 'all'
+                        e.notations.append(thisNotation)
+                        eRemain.notations.append(thisNotation)
+                else: # default = 'all'
+                    e.notations.append(thisNotation)
+                    eRemain.notations.append(thisNotation)
 
 
         lenEnd = self.duration.quarterLength - quarterLength

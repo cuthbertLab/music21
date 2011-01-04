@@ -228,7 +228,8 @@ def convertSpecifier(specifier):
 
 
 def convertGeneric(value):
-    '''Convert an interval specified in terms of its name (second, third) into an integer. If integers are passed, assume the are correct.
+    '''Convert an interval specified in terms of its name (second, third) 
+    into an integer. If integers are passed, assume the are correct.
 
     >>> convertGeneric(3)
     3
