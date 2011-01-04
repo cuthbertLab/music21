@@ -2002,8 +2002,9 @@ class RagMarwa(ConcreteScale):
 
     >>> from music21 import *
     >>> sc = scale.RagMarwa('c2') 
+    >>> # this gets a pitch beyond the terminus b/c of descending form max
     >>> sc.pitches
-    [C2, D-2, E2, F#2, A2, B2, A2, C3]
+    [C2, D-2, E2, F#2, A2, B2, A2, C3, D-3]
     '''
 #     >>> sc.getPitches(direction='descending')
 #     [C2, D2, E2, G2, A2, C3]
@@ -2870,7 +2871,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
 
         self.assertEqual(str(sc.next('c4', 'ascending')), 'D-4')
-        self.assertEqual(str(sc.pitches), '[C4, D-4, E4, F#4, A4, B4, A4, C5]')
+
+        self.assertEqual(str(sc.pitches), '[C4, D-4, E4, F#4, A4, B4, A4, C5, D-5]')
 
         self.assertEqual(str(sc.getPitches('c2', 'c3', direction='ascending')), '[C2, D-2, E2, F#2, A2, B2, A2, C3]')
 
@@ -2887,15 +2889,9 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.next('d-1', 'ascending')), 'E1')
         self.assertEqual(str(sc.next('e1', 'ascending')), 'F#1')
         self.assertEqual(str(sc.next('f#1', 'ascending')), 'A1')
-        self.assertEqual(str(sc.next('A1', 'ascending')), 'B1')
+        # this is probabilistic
+        #self.assertEqual(str(sc.next('A1', 'ascending')), 'B1')
         self.assertEqual(str(sc.next('B1', 'ascending')), 'A1')
-
-        # there is no clear way to distinguish the move from A1 to C1, when
-        # given only a pitch; not sure what to do here: perhaps use weight?
-        #self.assertEqual(str(sc.next('A1', 'ascending')), 'C1')
-
-        # this fails: need to deal with two situations
-        #self.assertEqual(str(sc.next('D-2', 'descending')), 'D-2')
 
 
         self.assertEqual(str(sc.next('B2', 'descending')), 'A2')
@@ -2907,15 +2903,46 @@ class Test(unittest.TestCase):
 
 
     def testRagMarwaB(self):
-
-
         sc = RagMarwa('c4')
-        # there is no clear way to distinguish the move from A1 to C1, when
-        # given only a pitch; not sure what to do here: perhaps use weight?
-        #self.assertEqual(str(sc.next('A1', 'ascending')), 'C1')
 
-        # this fails: need to deal with two situations
-        #self.assertEqual(str(sc.next('D-2', 'descending')), 'D-2')
+        # for rag marwa, and given only the pitch a, the scale can move to 
+        # either b or c; this selection is determined by weighted random
+        # selection.
+        post = []
+        for x in range(100):
+            post.append(sc.getScaleDegreeFromPitch('A1', 'ascending'))
+        self.assertEqual(post.count(5) > 30, True)
+        self.assertEqual(post.count(7) > 30, True)
+
+
+        # for rag marwa, and given only the pitch d-, the scale can move to 
+        # either b or c; this selection is determined by weighted random
+        # selection; can be 2 or 7
+        post = []
+        for x in range(100):
+            post.append(sc.getScaleDegreeFromPitch('D-3', 'descending'))
+        self.assertEqual(post.count(2) > 30, True)
+        self.assertEqual(post.count(7) > 30, True)
+
+
+    def testRagMarwaC(self):
+        sc = RagMarwa('c4')
+
+        self.assertEqual(sc.abstract._net.realizeTermini('c1', 'terminusLow'), (pitch.Pitch('C1'), pitch.Pitch('C2')))
+
+        self.assertEqual(sc.abstract._net.realizeMinMax('c1', 'terminusLow'), (pitch.Pitch('C1'), pitch.Pitch('D-2')))
+
+        # descending from d-2, we can either go to c2 or b1
+        post = []
+        for x in range(100):
+            post.append(str(sc.next('D-2', 'descending')))
+        self.assertEqual(post.count('C2') > 30, True)
+        self.assertEqual(post.count('B1') > 30, True)
+
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -2936,7 +2963,8 @@ if __name__ == "__main__":
         #t.testRagAsawara()
         #t.testRagMarwaA()
 
-        t.testRagMarwaB()
+        #t.testRagMarwaB()
+        t.testRagMarwaC()
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract

@@ -655,6 +655,71 @@ def decimalToTuplet(decNum):
     return (int(jy), int(iy))
 
 
+
+
+def unitNormalizeProportion(values):
+    """Normalize values within the unit interval, where max is determined by the sum of the series.
+
+    >>> from music21 import *
+    >>> common.unitNormalizeProportion([0,3,4])
+    [0.0, 0.42857142857142855, 0.5714285714285714]
+    >>> common.unitNormalizeProportion([1,1,1])
+    [0.33333333333333331, 0.33333333333333331, 0.33333333333333331]
+    >>> common.unitNormalizeProportion([.2, .6, .2])
+    [0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
+    """
+    # note: negative values should be shifted to positive region first
+    sum = 0
+    for x in values:
+        if x < 0: 
+            raise ValueError('value members must be positive')
+        sum += x
+    unit = [] # weights on the unit interval; sum == 1
+    for x in values:
+        unit.append((x / float(sum)))
+    return unit
+
+def unitBoundaryProportion(series):
+    """Take a series of parts with an implied sum, and create unit-interval boundaries proportional to the series components.
+
+    >>> from music21 import *
+    >>> common.unitBoundaryProportion([1,1,2])
+    [(0, 0.25), (0.25, 0.5), (0.5, 1.0)]
+    >>> common.unitBoundaryProportion([8,1,1])
+    [(0, 0.80000000000000004), (0.80000000000000004, 0.90000000000000002), (0.90000000000000002, 1.0)]
+    """
+    unit = unitNormalizeProportion(series)
+    bounds = []
+    sum = 0
+    for i in range(len(unit)):
+        if i != len(unit) - 1: # not last
+            bounds.append((sum, sum + unit[i])) 
+            sum += unit[i]
+        else: # last, avoid rounding errors
+            bounds.append((sum, 1.0))            
+    return bounds
+
+
+def weightedSelection(values, weights, randomGenerator=None):
+    '''Given a list of values and an equal-sized list of weights, return a randomly selected value using the weight.
+
+    >>> from music21 import *
+    >>> # summing -1 and 1 for 100 values; should be around 0
+    >>> -20 < sum([common.weightedSelection([-1, 1], [1,1]) for x in range(100)]) < 20
+    True
+    '''
+    if randomGenerator is not None:
+        q = randomGenerator() # must be in unit interval
+    else: # use random uniform
+        q = random.random()
+    # normalize weights w/n unit interval
+    boundaries = unitBoundaryProportion(weights)
+    for i, (low, high) in enumerate(boundaries):
+        if q >= low and q <= high: # accepts both boundaries
+            return values[i]
+
+
+
 def euclidGCD(a, b):
     '''use Euclid\'s algorithm to find the GCD of a and b
     >>> euclidGCD(2,4)

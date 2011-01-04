@@ -208,6 +208,7 @@ def rabinMiller(n):
 
 #-------------------------------------------------------------------------------
 # list processing and unit interval routines
+# possible move to common.py if used elsewhere
 
 def discreteBinaryPad(series, fixRange=None):
     """
