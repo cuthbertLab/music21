@@ -33,6 +33,66 @@ are found in music21.expressions.
 >>> c1.articulations = [articulations.OrganHeel(), articulations.Accent() ]
 >>> #_DOCS_SHOW c1.show()
 
+
+
+
+A longer test showing the utility of the module:
+
+
+
+
+>>> from music21 import *
+
+
+>>> s = stream.Stream()
+>>> n1 = note.Note('c#5')
+>>> n1.articulations = [articulations.Accent()] 
+>>> n1.quarterLength = 1.25
+>>> s.append(n1)
+
+
+>>> n2 = note.Note('d5')
+>>> n2.articulations = [articulations.StrongAccent()] 
+>>> n2.quarterLength = 0.75
+>>> s.append(n2)
+
+
+>>> n3 = note.Note('b4')
+>>> n3.articulations = [articulations.Staccato()] 
+>>> n3.quarterLength = 1.25
+>>> n3.tie = tie.Tie('start')
+>>> s.append(n3)
+
+
+>>> n4 = note.Note('b4')
+>>> n4.articulations = [articulations.Staccatissimo()] 
+>>> n4.quarterLength = 0.75
+>>> s.append(n4)
+
+
+>>> n5 = note.Note('a4')
+>>> n5.articulations = [articulations.Tenuto()] 
+>>> n5.quarterLength = 1.3333333333333
+>>> s.append(n5)
+
+
+>>> n6 = note.Note('b-4')
+>>> n6.articulations = [articulations.Staccatissimo(), articulations.Tenuto()] 
+>>> n6.quarterLength = 0.6666666666667
+>>> s.append(n6)
+
+
+>>> s.metadata = metadata.Metadata()
+>>> s.metadata.title = 'Prova articolazioni' # ital: "Articulation Test"
+>>> s.metadata.composer = 'Giuliano Lancioni'
+
+
+>>> #_DOCS_SHOW s.show()
+
+.. image:: images/prova_articolazioni.*
+    :width: 628
+
+
 '''
 
 import doctest, unittest

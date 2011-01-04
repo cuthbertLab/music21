@@ -72,7 +72,7 @@ class TempoMark(music21.Music21Object):
             self.number = value
         else:
             self.value = value
-            if value.lower() in defaultTempoValues:
+            if value and value.lower() in defaultTempoValues:
                 self.number = defaultTempoValues[value]
     
     def __repr__(self):
