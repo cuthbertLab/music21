@@ -695,7 +695,7 @@ class AbstractRagAsawari(AbstractScale):
     '''
     def __init__(self):
         AbstractScale.__init__(self)
-        self.type = 'Abstract Melodic Minor'
+        self.type = 'Abstract Rag Asawari'
         self.octaveDuplicating = True
         self._buildNetwork()
 
@@ -761,6 +761,91 @@ class AbstractRagAsawari(AbstractScale):
                         octaveDuplicating=self.octaveDuplicating)
         # using representation stored in interval network
         self._net.fillArbitrary(nodes, edges)
+
+
+
+
+class AbstractRagMarwa(AbstractScale):
+    '''A pseudo raga-scale. 
+    '''
+    def __init__(self):
+        AbstractScale.__init__(self)
+        self.type = 'Abstract Rag Marwa'
+        self.octaveDuplicating = True 
+        self._buildNetwork()
+
+    def _buildNetwork(self):
+        self.tonicStep = 1
+        self.dominantStep = 5
+        nodes = ({'id':'terminusLow', 'step':1}, # c
+                 {'id':0, 'step':2}, # d-
+                 {'id':1, 'step':3}, # e
+                 {'id':2, 'step':4}, # f#
+                 {'id':3, 'step':5}, # a
+                 {'id':4, 'step':6}, # b
+                 {'id':5, 'step':7}, # a (could use id 3 again?)
+                 {'id':'terminusHigh', 'step':8}, # c
+
+                 {'id':6, 'step':7}, # d- (above terminus)
+                 {'id':7, 'step':6}, # b
+                 {'id':8, 'step':5}, # a
+                 {'id':9, 'step':4}, # f#
+                 {'id':10, 'step':3}, # e
+                 {'id':11, 'step':2}, # d-
+                )
+        edges = (
+                # ascending
+                {'interval':'m2', 'connections':(
+                        [TERMINUS_LOW, 0, DIRECTION_ASCENDING], # c to d-
+                    )},
+                {'interval':'A2', 'connections':(
+                        [0, 1, DIRECTION_ASCENDING], # d- to e
+                    )},
+                {'interval':'M2', 'connections':(
+                        [1, 2, DIRECTION_ASCENDING], # e to f#
+                    )},
+                {'interval':'m3', 'connections':(
+                        [2, 3, DIRECTION_ASCENDING], # f# to a
+                    )},
+                {'interval':'M2', 'connections':(
+                        [3, 4, DIRECTION_ASCENDING], # a to b
+                    )},
+                {'interval':'-M2', 'connections':(
+                        [4, 5, DIRECTION_ASCENDING], # b to a (downward)
+                    )},
+                {'interval':'m3', 'connections':(
+                        [5, TERMINUS_HIGH, DIRECTION_ASCENDING], # a to c
+                    )},
+
+                # descending
+                {'interval':'-m2', 'connections':(
+                        [TERMINUS_HIGH, 6, DIRECTION_DESCENDING], # c to d- (up)
+                    )},
+                {'interval':'d3', 'connections':(
+                        [6, 7, DIRECTION_DESCENDING], # d- to b
+                    )},
+                {'interval':'M2', 'connections':(
+                        [7, 8, DIRECTION_DESCENDING], # b to a
+                    )},
+                {'interval':'m3', 'connections':(
+                        [8, 9, DIRECTION_DESCENDING], # a to f#
+                    )},
+                {'interval':'M2', 'connections':(
+                        [9, 10, DIRECTION_DESCENDING], # f# to e
+                    )},
+                {'interval':'A2', 'connections':(
+                        [10, 11, DIRECTION_DESCENDING], # e to d-
+                    )},
+                {'interval':'m2', 'connections':(
+                        [11, TERMINUS_LOW, DIRECTION_DESCENDING], # d- to c
+                    )},
+                )
+
+        self._net = intervalNetwork.IntervalNetwork(
+                        octaveDuplicating=self.octaveDuplicating)
+        # using representation stored in interval network
+        self._net.fillArbitrary(nodes, edges)
+
 
 
 
@@ -1163,20 +1248,6 @@ class ConcreteScale(Scale):
             )
         return post
 
-
-#     def ascending(self):
-#         '''Return ascending scale form.
-#         '''
-#         # get from pitch cache
-#         return self.getPitches()
-#     
-#     def descending(self):
-#         '''Return descending scale form.
-#         '''
-#         # get from pitch cache
-#         tempScale = copy(self.getPitches())
-#         tempScale.reverse()
-#         return tempScale
 
 
 
@@ -1923,6 +1994,24 @@ class RagAsawari(ConcreteScale):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractRagAsawari()
         self.type = 'Rag Asawari'
+
+
+
+class RagMarwa(ConcreteScale):
+    '''A concrete pseudo-raga scale. 
+
+    >>> from music21 import *
+    >>> sc = scale.RagMarwa('c2') 
+    >>> sc.pitches
+    [C2, D-2, E2, F#2, A2, B2, A2, C3]
+    '''
+#     >>> sc.getPitches(direction='descending')
+#     [C2, D2, E2, G2, A2, C3]
+
+    def __init__(self, tonic=None):
+        ConcreteScale.__init__(self, tonic=tonic)
+        self._abstract = AbstractRagMarwa()
+        self.type = 'Rag Marwa'
 
 
 
@@ -2772,6 +2861,63 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.pitchFromDegree(7, direction='descending')), 'B-4')
 
 
+
+
+
+    def testRagMarwaA(self):
+
+        sc = RagMarwa('c4')
+        self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
+
+        self.assertEqual(str(sc.next('c4', 'ascending')), 'D-4')
+        self.assertEqual(str(sc.pitches), '[C4, D-4, E4, F#4, A4, B4, A4, C5]')
+
+        self.assertEqual(str(sc.getPitches('c2', 'c3', direction='ascending')), '[C2, D-2, E2, F#2, A2, B2, A2, C3]')
+
+
+        self.assertEqual(str(sc.getPitches('c2', 'c4', direction='ascending')), '[C2, D-2, E2, F#2, A2, B2, A2, C3, D-3, E3, F#3, A3, B3, A3, C4]')
+
+        self.assertEqual(str(sc.getPitches('c3', 'd-4', direction='descending')), '[C3, D-3, E3, F#3, A3, B3, D-4, C4, D-4]')
+ 
+        # is this correct: this cuts off the d-4, as it is outside of the range
+        self.assertEqual(str(sc.getPitches('c3', 'c4', direction='descending')), '[C3, D-3, E3, F#3, A3, B3, C4]')
+ 
+
+        self.assertEqual(str(sc.next('c1', 'ascending')), 'D-1')
+        self.assertEqual(str(sc.next('d-1', 'ascending')), 'E1')
+        self.assertEqual(str(sc.next('e1', 'ascending')), 'F#1')
+        self.assertEqual(str(sc.next('f#1', 'ascending')), 'A1')
+        self.assertEqual(str(sc.next('A1', 'ascending')), 'B1')
+        self.assertEqual(str(sc.next('B1', 'ascending')), 'A1')
+
+        # there is no clear way to distinguish the move from A1 to C1, when
+        # given only a pitch; not sure what to do here: perhaps use weight?
+        #self.assertEqual(str(sc.next('A1', 'ascending')), 'C1')
+
+        # this fails: need to deal with two situations
+        #self.assertEqual(str(sc.next('D-2', 'descending')), 'D-2')
+
+
+        self.assertEqual(str(sc.next('B2', 'descending')), 'A2')
+        self.assertEqual(str(sc.next('A2', 'descending')), 'F#2')
+        self.assertEqual(str(sc.next('E2', 'descending')), 'D-2')
+        # this is correct!
+        self.assertEqual(str(sc.next('C2', 'descending')), 'D-2')
+        self.assertEqual(str(sc.next('D-2', 'ascending')), 'E2')
+
+
+    def testRagMarwaB(self):
+
+
+        sc = RagMarwa('c4')
+        # there is no clear way to distinguish the move from A1 to C1, when
+        # given only a pitch; not sure what to do here: perhaps use weight?
+        #self.assertEqual(str(sc.next('A1', 'ascending')), 'C1')
+
+        # this fails: need to deal with two situations
+        #self.assertEqual(str(sc.next('D-2', 'descending')), 'D-2')
+
+
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
@@ -2787,7 +2933,10 @@ if __name__ == "__main__":
         #t.testMelodicMinorB()
         #t.testPlot()
         #t.testPlagalModes()
-        t.testRagAsawara()
+        #t.testRagAsawara()
+        #t.testRagMarwaA()
+
+        t.testRagMarwaB()
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract

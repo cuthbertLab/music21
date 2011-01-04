@@ -265,7 +265,7 @@ class Node(object):
 
     Terminal Nodes have special ids: terminusLow, terminusHighs
     '''
-    def __init__(self, id=None, step=None):
+    def __init__(self, id=None, step=None, weight=1.0):
         # store id, either as string, such as terminusLow, or a number. 
         # ids are unique to any node in the network
         self.id = id
@@ -559,7 +559,9 @@ class IntervalNetwork(object):
         self.clear()
 
         for nDict in nodes:
-            n = Node(id=nDict['id'], step=nDict['step'])        
+            n = Node(id=nDict['id'], step=nDict['step'])
+            if 'weight' in nDict.keys():
+                n.weight = nDict['weight']
             self._nodes[n.id] = n
 
         eId = 0
@@ -1097,7 +1099,11 @@ class IntervalNetwork(object):
         pCollect = p # usually p, unles altered
         for x in range(stepSize):
             postEdge, postNode = self._getNext(n, direction)
+
+            environLocal.printDebug(['nextPitch()', 'postNode', postNode])
+
             # already working with a copy
+            # TODO: fix
             n = postNode[0]
             # for now, only taking first edge
             if direction == DIRECTION_ASCENDING:
@@ -1204,6 +1210,8 @@ class IntervalNetwork(object):
         post = []
         postNodeId = [] # store node ids as well
 
+        #environLocal.printDebug(['_realizeAscending()', 'n', n])
+
         while True:
             #environLocal.printDebug(['_realizeAscending()', 'p', p])
             appendPitch = False
@@ -1253,6 +1261,8 @@ class IntervalNetwork(object):
         # store in cache
         if self.deterministic:
             self._ascendingCache[ck] = post, postNodeId
+
+        #environLocal.printDebug(['_realizeAscending()', 'post', post, 'postNodeId', postNodeId])
 
         return post, postNodeId
 
@@ -1662,7 +1672,7 @@ class IntervalNetwork(object):
 
         for eId, e in self._edges.items():
             if e.direction == DIRECTION_ASCENDING:
-                weight = 0.9
+                weight = 0.9 # these values are just for display
                 style = 'solid'
             elif e.direction == DIRECTION_DESCENDING:
                 weight = 0.6
@@ -1756,6 +1766,8 @@ class IntervalNetwork(object):
         else:
             nodeId = self._nodeNameToNodes(nodeName)[0]
 
+        environLocal.printDebug(['getRelativeNodeId', 'result of _nodeNameToNodes',  self._nodeNameToNodes(nodeName)])
+
         if common.isStr(pitchTarget):
             pitchTarget = pitch.Pitch(pitchTarget)
 
@@ -1767,7 +1779,9 @@ class IntervalNetwork(object):
         realizedPitch, realizedNode = self.realize(pitchReference, nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, 
         alteredNodes=alteredNodes)
 
-        #environLocal.printDebug(['getRelativeNodeId()', 'nodeId', nodeId, 'realizedPitch', realizedPitch, 'realizedNode', realizedNode])
+        # TODO: need to find cases where there are multiple possibilities
+        # of the target pitch
+        environLocal.printDebug(['getRelativeNodeId()', 'nodeId', nodeId, 'realizedPitch', realizedPitch, 'realizedNode', realizedNode])
 
         for i in range(len(realizedPitch)):
             #environLocal.printDebug(['getRelativeNodeId', 'comparing',  realizedPitch[i], realizedNode[i]])
