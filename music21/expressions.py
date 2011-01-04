@@ -15,7 +15,7 @@ This module provides object representations of expressions, that is
 notational symbols such as Fermatas, Mordents, Trills, Turns, etc.
 which are stored under a Music21Object's .notations attribute 
 '''
-
+import copy
 import doctest, unittest
 
 import music21
@@ -24,17 +24,95 @@ from music21 import musicxml
 
 _MOD = 'expressions'
 
-
+def realizeOrnaments(srcObject):
+    '''
+    given a Music21Object with Ornament expressions (notations),
+    convert them into a list of objects that represents
+    the performed version of the object:
+    
+    >>> from music21 import *
+    >>> n1 = note.Note("D5")
+    >>> n1.quarterLength = 1
+    >>> n1.notations.append(expressions.WholeStepMordent())
+    >>> expList = expressions.realizeOrnaments(n1)
+    >>> st1 = stream.Stream()
+    >>> st1.append(expList)
+    >>> #_DOCS_SHOW st1.show()
+    
+    .. image:: images/expressionsMordentRealize.*
+         :width: 218
+    
+    
+    '''
+    if not hasattr(srcObject, "notations"):
+        return [srcObject]
+    elif len(srcObject.notations) == 0:
+        return [srcObject]
+    else:
+        preExpandList = []
+        postExpandList = []
+        for thisNotation in srcObject.notations:
+            if not hasattr(thisNotation, 'realize'):
+                continue
+            preExpand, srcObject, postExpand = thisNotation.realize(srcObject)
+            for i in preExpand:
+                preExpandList.append(i)
+            for i in postExpand:
+                postExpandList.append(i)
+            if srcObject is None: # some ornaments eat up the entire source object. Trills for instance
+                break
+        retList = []
+        for i in preExpandList:
+            retList.append(i)
+        retList.append(srcObject)
+        for i in postExpandList:
+            retList.append(i)
+        return retList
 
 class Ornament(music21.Music21Object):
     connectedToPrevious = True  # should follow directly on previous; true for most "ornaments".
     tieAttach = 'first' # attach to first note of a tied group.
 
+    def realize(self, sourceObject):
+        '''
+        subclassible method call that takes a sourceObject
+        and returns a three-element tuple of a list of notes before the "main note",
+        the "main note" itself, and a list of notes after the "main note".
+        '''
+        return ([], sourceObject, [])
+
 class GeneralMordent(Ornament):
     direction = ""  # up or down
     size = None # music21.interval.Interval (General, etc.) class
+    quarterLength = 0.125 # 32nd note default 
     def __init__(self):
         self.size = music21.interval.GenericInterval(2)
+
+    def realize(self, srcObject):
+        '''
+        realize a mordent.
+        '''
+        if self.direction != 'up' and self.direction != 'down':
+            raise ExpressionException("Cannot realize a mordent if I do not know its direction")
+        if self.size == "":
+            raise ExpressionException("Cannot realize a mordent if there is no size given")
+        if srcObject.duration == None or srcObject.duration.quarterLength == 0:
+            raise ExpressionException("Cannot steal time from an object with no duration")
+
+        remainderDuration = srcObject.duration.quarterLength - 2 * self.quarterLength
+        if self.direction == "down":
+            transposeInterval = self.size.reverse()
+        else:
+            transposeInterval = self.size
+        
+        firstNote = copy.deepcopy(srcObject)
+        firstNote.duration.quarterLength = self.quarterLength
+        secondNote = copy.deepcopy(srcObject)
+        secondNote.duration.quarterLength = self.quarterLength
+        secondNote.transpose(transposeInterval, inPlace = True)
+        remainderNote = copy.deepcopy(srcObject)
+        remainderNote.duration.quarterLength = remainderDuration
+        return ([firstNote, secondNote], remainderNote, [])
 
 class Mordent(GeneralMordent):
     direction = "down"
@@ -172,7 +250,8 @@ class Fermata(music21.Music21Object):
 
     mx = property(_getMX, _setMX)
 
-
+class ExpressionException(music21.Music21Exception):
+    pass
 
 
 #-------------------------------------------------------------------------------
@@ -190,9 +269,24 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
-    def testBasic(self):
-        pass
-
+    def testRealize(self):
+        from music21 import note
+        from music21 import stream
+        n1 = note.Note("D4")
+        n1.quarterLength = 4
+        n1.notations.append(WholeStepMordent())
+        expList = realizeOrnaments(n1)
+        st1 = stream.Stream()
+        st1.append(expList)
+        st1n = st1.notes
+        self.assertEqual(st1n[0].name, "D")
+        self.assertEqual(st1n[0].quarterLength, 0.125)
+        self.assertEqual(st1n[1].name, "C")
+        self.assertEqual(st1n[1].quarterLength, 0.125)
+        self.assertEqual(st1n[2].name, "D")
+        self.assertEqual(st1n[2].quarterLength, 3.75)
+        
+        
 if __name__ == "__main__":
     music21.mainTest(Test)
 

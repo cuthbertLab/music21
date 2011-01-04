@@ -1329,9 +1329,27 @@ class Interval(music21.Music21Object):
         False
         >>> b in [a, c, d]
         True
+        
+        
+        Now, of course, this makes sense:
+        
+        >>> a == 'hello'
+        False
+        
+        
+        But note well that this is also a False expression:
+        
+        
+        >>> a == 'a4'
+        False
+        
+        
         '''
         if other == None:
             return False
+        elif not hasattr(other, 'diatonic') or not hasattr(other, 'chromatic'):
+            return False
+
         if (self.diatonic == other.diatonic and 
             self.chromatic == other.chromatic):
             return True

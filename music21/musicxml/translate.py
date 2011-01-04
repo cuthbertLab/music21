@@ -439,8 +439,9 @@ def noteToMxNotes(n, spannerBundle=None):
 
     # notations and articulations are mixed in musicxml
     for i in range(len(n.notations)):
-        obj = n.notations[i] 
-        mxNoteList[0].notationsObj.componentList.append(obj.mx)
+        obj = n.notations[i]
+        if hasattr(obj, 'mx'):
+            mxNoteList[0].notationsObj.componentList.append(obj.mx)
 
     if spannerBundle is not None:
         # already filtered for just the spanner that have this note as
