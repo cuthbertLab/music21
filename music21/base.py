@@ -2423,6 +2423,7 @@ class Music21Object(JSONSerializer):
         >>> a = note.Note('C#5')
         >>> a.duration.type = 'whole'
         >>> a.articulations = [articulations.Staccato()]
+        >>> a.lyric = 'hi'
         >>> b, c = a.splitAtQuarterLength(3)
         >>> b.duration.type
         'half'
@@ -2432,6 +2433,8 @@ class Music21Object(JSONSerializer):
         3.0
         >>> b.articulations
         [<music21.articulations.Staccato object at 0x...>]
+        >>> b.lyric
+        'hi'
         >>> c.duration.type
         'quarter'
         >>> c.duration.dots
@@ -2440,6 +2443,7 @@ class Music21Object(JSONSerializer):
         1.0
         >>> c.articulations
         []
+        >>> c.lyric
         '''
         # was note.splitNoteAtPoint
 
@@ -2460,6 +2464,8 @@ class Music21Object(JSONSerializer):
         # clear articulations from remaining parts
         if hasattr(eRemain, 'articulations'):
             eRemain.articulations = []
+        if hasattr(eRemain, 'lyrics'):
+            eRemain.lyrics = []
 
 
         lenEnd = self.duration.quarterLength - quarterLength

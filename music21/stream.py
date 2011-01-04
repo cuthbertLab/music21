@@ -2998,6 +2998,11 @@ class Stream(music21.Music21Object):
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
         
+        
+        A simple example: a single measure of 4/4 is created by adding three quarter
+        rests to a stream:
+        
+        
         >>> from music21 import *
         >>> sSrc = stream.Stream()
         >>> sSrc.repeatAppend(note.Rest(), 3)
@@ -3012,8 +3017,15 @@ class Stream(music21.Music21Object):
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 3/4>
             
+        
+        10 quarter notes are added to a stream, along with 10
+        more quarter notes on the upbeat.  After makeMeasures
+        is called, 3 measures of 4/4 are created:
+        
+    
         >>> sSrc = stream.Part()
         >>> n = note.Note()
+        >>> n.quarterLength = 1
         >>> sSrc.repeatAppend(n, 10)
         >>> sSrc.repeatInsert(n, [x+.5 for x in range(10)])
         >>> sMeasures = sSrc.makeMeasures()
@@ -3023,6 +3035,37 @@ class Stream(music21.Music21Object):
         'Part'
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
+        
+        
+        If after running makeMeasures you run makeTies, it will also split 
+        long notes into smaller notes with ties.  Lyrics and articulations
+        are attached to the first note.  Expressions (fermatas,
+        etc.) will soon be attached to the last note but are NOT YET:
+        
+        >>> p1 = stream.Part()
+        >>> p1.append(meter.TimeSignature('3/4'))
+        >>> longNote = note.Note("D#4")
+        >>> longNote.quarterLength = 7.5
+        >>> longNote.articulations = [articulations.Staccato()]
+        >>> longNote.lyric = "hello"
+        >>> p1.append(longNote)
+        >>> partWithMeasures = p1.makeMeasures()
+        >>> dummy = partWithMeasures.makeTies(inPlace = True)
+        >>> partWithMeasures.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.clef.TrebleClef object at 0x...>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note D#>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.note.Note D#>
+        {6.0} <music21.stream.Measure 3 offset=6.0>
+            {0.0} <music21.note.Note D#>
+        >>> allNotes = partWithMeasures.flat.notes
+        >>> [allNotes[0].articulations, allNotes[1].articulations, allNotes[2].articulations]
+        [[<music21.articulations.Staccato object at 0x...>], [], []]
+        >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
+        ['hello', None, None]
         '''
         #environLocal.printDebug(['calling Stream.makeMeasures()'])
 
