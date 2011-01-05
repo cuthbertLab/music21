@@ -2424,7 +2424,7 @@ class Music21Object(JSONSerializer):
         >>> a.duration.type = 'whole'
         >>> a.articulations = [articulations.Staccato()]
         >>> a.lyric = 'hi'
-        >>> a.notations = [expressions.Mordent(), expressions.Trill(), expressions.Fermata()]
+        >>> a.expressions = [expressions.Mordent(), expressions.Trill(), expressions.Fermata()]
         >>> b, c = a.splitAtQuarterLength(3)
         >>> b.duration.type
         'half'
@@ -2436,7 +2436,7 @@ class Music21Object(JSONSerializer):
         [<music21.articulations.Staccato object at 0x...>]
         >>> b.lyric
         'hi'
-        >>> b.notations
+        >>> b.expressions
         [<music21.expressions.Mordent object at 0x...>, <music21.expressions.Trill object at 0x...>]
         >>> c.duration.type
         'quarter'
@@ -2447,7 +2447,7 @@ class Music21Object(JSONSerializer):
         >>> c.articulations
         []
         >>> c.lyric
-        >>> c.notations
+        >>> c.expressions
         [<music21.expressions.Trill object at 0x...>, <music21.expressions.Fermata object at 0x...>]
 
         '''
@@ -2473,22 +2473,22 @@ class Music21Object(JSONSerializer):
         if hasattr(eRemain, 'lyrics'):
             eRemain.lyrics = []
 
-        if hasattr(e, 'notations'):
-            tempNotations = e.notations
-            e.notations = []
-            eRemain.notations = []
-            for thisNotation in tempNotations:
-                if hasattr(thisNotation, 'tieAttach'):
-                    if thisNotation.tieAttach == 'first':
-                        e.notations.append(thisNotation)
-                    elif thisNotation.tieAttach == 'last':
-                        eRemain.notations.append(thisNotation)
+        if hasattr(e, 'expressions'):
+            tempExpressions = e.expressions
+            e.expressions = []
+            eRemain.expressions = []
+            for thisExpression in tempExpressions:
+                if hasattr(thisExpression, 'tieAttach'):
+                    if thisExpression.tieAttach == 'first':
+                        e.expressions.append(thisExpression)
+                    elif thisExpression.tieAttach == 'last':
+                        eRemain.expressions.append(thisExpression)
                     else:  # default = 'all'
-                        e.notations.append(thisNotation)
-                        eRemain.notations.append(thisNotation)
+                        e.expressions.append(thisExpression)
+                        eRemain.expressions.append(thisExpression)
                 else: # default = 'all'
-                    e.notations.append(thisNotation)
-                    eRemain.notations.append(thisNotation)
+                    e.expressions.append(thisExpression)
+                    eRemain.expressions.append(thisExpression)
 
 
         lenEnd = self.duration.quarterLength - quarterLength

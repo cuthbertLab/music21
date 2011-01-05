@@ -6,14 +6,14 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
 '''
 This module provides object representations of expressions, that is
 notational symbols such as Fermatas, Mordents, Trills, Turns, etc.
-which are stored under a Music21Object's .notations attribute 
+which are stored under a Music21Object's .expressions attribute 
 '''
 import copy
 import doctest, unittest
@@ -26,14 +26,14 @@ _MOD = 'expressions'
 
 def realizeOrnaments(srcObject):
     '''
-    given a Music21Object with Ornament expressions (notations),
+    given a Music21Object with Ornament expressions,
     convert them into a list of objects that represents
     the performed version of the object:
     
     >>> from music21 import *
     >>> n1 = note.Note("D5")
     >>> n1.quarterLength = 1
-    >>> n1.notations.append(expressions.WholeStepMordent())
+    >>> n1.expressions.append(expressions.WholeStepMordent())
     >>> expList = expressions.realizeOrnaments(n1)
     >>> st1 = stream.Stream()
     >>> st1.append(expList)
@@ -44,17 +44,17 @@ def realizeOrnaments(srcObject):
     
     
     '''
-    if not hasattr(srcObject, "notations"):
+    if not hasattr(srcObject, "expressions"):
         return [srcObject]
-    elif len(srcObject.notations) == 0:
+    elif len(srcObject.expressions) == 0:
         return [srcObject]
     else:
         preExpandList = []
         postExpandList = []
-        for thisNotation in srcObject.notations:
-            if not hasattr(thisNotation, 'realize'):
+        for thisExpression in srcObject.expressions:
+            if not hasattr(thisExpression, 'realize'):
                 continue
-            preExpand, srcObject, postExpand = thisNotation.realize(srcObject)
+            preExpand, srcObject, postExpand = thisExpression.realize(srcObject)
             for i in preExpand:
                 preExpandList.append(i)
             for i in postExpand:
@@ -207,7 +207,7 @@ class Fermata(music21.Music21Object):
     >>> p1.append(meter.TimeSignature('6/8'))
     >>> n1 = note.Note("D-2")
     >>> n1.quarterLength = 6
-    >>> n1.notations.append(expressions.Fermata())
+    >>> n1.expressions.append(expressions.Fermata())
     >>> p1.append(n1)
     >>> #_DOCS_SHOW p1.show()
     .. image:: images/expressionsFermata.*
@@ -274,7 +274,7 @@ class Test(unittest.TestCase):
         from music21 import stream
         n1 = note.Note("D4")
         n1.quarterLength = 4
-        n1.notations.append(WholeStepMordent())
+        n1.expressions.append(WholeStepMordent())
         expList = realizeOrnaments(n1)
         st1 = stream.Stream()
         st1.append(expList)

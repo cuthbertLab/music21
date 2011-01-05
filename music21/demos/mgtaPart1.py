@@ -484,7 +484,7 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
         # if we have written more than fifteen notes 
         # and the last notes matches the first pitch class, then end.
         if len(s) > 4 and n.pitch.pitchClass == nStart.pitch.pitchClass:
-            n.notations.append(expressions.Fermata())
+            n.expressions.append(expressions.Fermata())
             break
         if len(s) > 30: # emergency break in case the piece is too long
             break

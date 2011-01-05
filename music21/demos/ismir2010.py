@@ -371,8 +371,8 @@ def demoBasic():
 #     sExtended = stream.Stream()
 #     sExtended.insert(0, meter.TimeSignature('6/4'))
 #     for n in sNotes.notes:
-#         #if isinstance(n.notations[0], expressions.Fermata):
-#         if len(n.notations) > 0:
+#         #if isinstance(n.expressions[0], expressions.Fermata):
+#         if len(n.expressions) > 0:
 #             n.duration.quarterLength = 4
 #             sExtended.append(n)
 #         else:

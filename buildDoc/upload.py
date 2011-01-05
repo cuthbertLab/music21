@@ -39,7 +39,7 @@ user = getpass.getpass()
 src = getDirBuildHtml()
 
 
-# -r flag makes this recurseive
+# -r flag makes this recursive
 cmdStr = 'scp -r %s %s@%s' % (src, user, DST_MIT)
 print(cmdStr)
 

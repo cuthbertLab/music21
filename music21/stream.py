@@ -2732,7 +2732,7 @@ class Stream(music21.Music21Object):
 
     def makeChords(self, minimumWindowSize=.125, includePostWindow=True,
             removeRedundantPitches=True,
-            gatherArticulations=True, gatherNotations=True, inPlace=False):
+            gatherArticulations=True, gatherExpressions=True, inPlace=False):
         '''Gather simultaneous Notes into a Chords.
         
         The gathering of elements, starting from offset 0.0, uses the `minimumWindowSize`, in quarter lengths, to collect all Notes that start between 0.0 and the minimum window size (this permits overlaps within a minimum tolerance). 
@@ -2743,7 +2743,8 @@ class Stream(music21.Music21Object):
         
         Each collection of Notes is formed into a Chord. The Chord is given the longest duration of all constituents, and is inserted at the start offset of the window from which it was gathered. 
         
-        Chords can gather both articulations and notations from found Notes using `gatherArticulations` and `gatherNotations`.
+        Chords can gather both articulations and expressions from found Notes 
+        using `gatherArticulations` and `gatherExpressions`.
         
         The resulting Stream, if not in-place, can also gather additional objects by placing class names in the `collect` list. By default, TimeSignature and KeySignature objects are collected. 
         
@@ -2771,7 +2772,7 @@ class Stream(music21.Music21Object):
                     includePostWindow=includePostWindow,
                     removeRedundantPitches=removeRedundantPitches,
                     gatherArticulations=gatherArticulations,
-                    gatherNotations=gatherNotations,
+                    gatherExpressions=gatherExpressions,
                     inPlace=True)
             return returnObj # exit
     
@@ -2781,7 +2782,7 @@ class Stream(music21.Music21Object):
                     includePostWindow=includePostWindow,
                     removeRedundantPitches=removeRedundantPitches,
                     gatherArticulations=gatherArticulations,
-                    gatherNotations=gatherNotations,
+                    gatherExpressions=gatherExpressions,
                     inPlace=True)
             return returnObj # exit
 
@@ -2837,9 +2838,9 @@ class Stream(music21.Music21Object):
                 if gatherArticulations:
                     for n in subNotes:
                         c.articulations += n.articulations
-                if gatherNotations:
+                if gatherExpressions:
                     for n in subNotes:
-                        c.notations += n.notations
+                        c.expressions += n.expressions
                 # always remove all the previous elements      
                 for n in subNotes:
                     returnObj.remove(n)
@@ -7168,7 +7169,7 @@ class Score(Stream):
         # do in place as already a copy has been made
         post = returnObj.flat.makeChords(includePostWindow=True, 
             removeRedundantPitches=True,
-            gatherArticulations=True, gatherNotations=True, inPlace=True)
+            gatherArticulations=True, gatherExpressions=True, inPlace=True)
         return post
 
     def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False):

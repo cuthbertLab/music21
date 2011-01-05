@@ -438,8 +438,8 @@ def noteToMxNotes(n, spannerBundle=None):
         mxNoteList[0].notationsObj.componentList.append(mxArticulations)
 
     # notations and articulations are mixed in musicxml
-    for i in range(len(n.notations)):
-        obj = n.notations[i]
+    for i in range(len(n.expressions)):
+        obj = n.expressions[i]
         if hasattr(obj, 'mx'):
             mxNoteList[0].notationsObj.componentList.append(obj.mx)
 
@@ -527,8 +527,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
         for mxObj in mxFermataList:
             fermataObj = expressions.Fermata()
             fermataObj.mx = mxObj
-            # placing this as an articulation for now
-            n.notations.append(fermataObj)
+            n.expressions.append(fermataObj)
 
             #environLocal.printDebug(['_setMX(), n.mxFermataList', mxFermataList])
 

@@ -120,7 +120,7 @@ class GeneralNote(music21.Music21Object):
 
         self.duration = duration.Duration(**keywords)
         self.lyrics = [] # a list of lyric objects
-        self.notations = []
+        self.expressions = []
         self.articulations = []
         self.editorial = editorial.NoteEditorial()
 
@@ -152,8 +152,8 @@ class GeneralNote(music21.Music21Object):
                 ret += " (in fact STARTS the tuplet)"
             elif self.duration.tuplets[0].type == "stop":
                 ret += " (in fact STOPS the tuplet)"
-        if len(self.notations) > 0:
-            if (isinstance(self.notations[0], music21.expressions.Fermata)):
+        if len(self.expressions) > 0:
+            if (isinstance(self.expressions[0], music21.expressions.Fermata)):
                 ret += " has Fermata"
         return ret
 
@@ -400,9 +400,9 @@ class GeneralNote(music21.Music21Object):
         if (self.tie is not None):
             if (self.tie.type != "stop"):
                 allNames += "~"
-        if (self.notations):
-            for thisNotation in self.notations:
-                if dir(thisNotation).count('lily') > 0:
+        if (self.expressions):
+            for thisExpression in self.expressions:
+                if dir(thisExpression).count('lily') > 0:
                     allNames += " " + thisNotation.lily
 
         allNames += self.editorial.lilyEnd()
@@ -1068,8 +1068,8 @@ def sendNoteInfo(music21noteObject):
             retstr += "   in fact STARTS the tuplet group\n"
         elif a.duration.tuplets[0].type == "stop":
             retstr += "   in fact STOPS the tuplet group\n"
-    if len(a.notations) > 0:
-        if (isinstance(a.notations[0], music21.expressions.Fermata)):
+    if len(a.expressions) > 0:
+        if (isinstance(a.expressions[0], music21.expressions.Fermata)):
             retstr += "Has a fermata on it\n"
     return retstr
 
@@ -1218,7 +1218,7 @@ class Test(unittest.TestCase):
         a = corpus.parseWork('bach/bwv5.7')
         found = []
         for n in a.flat.notes:
-            for obj in n.notations:
+            for obj in n.expressions:
                 if isinstance(obj, expressions.Fermata):
                     found.append(obj)
         self.assertEqual(len(found), 6)

@@ -271,7 +271,7 @@ class TinyNotationNote(object):
             if (typeNum == "0"): ## special case = full measure + fermata
                 noteObj.duration = storedDict['barDuration']
                 newFerm = expressions.Fermata()
-                noteObj.notations.append(newFerm)
+                noteObj.expressions.append(newFerm)
             else:
                 noteObj.duration.type = music21.duration.typeFromNumDict[int(typeNum)]
         else:

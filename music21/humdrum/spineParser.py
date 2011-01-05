@@ -873,27 +873,27 @@ def hdStringToNote(contents):
     
     ## 3.2.3 Ornaments    
     if contents.count('t'):
-        thisObject.notations.append(music21.expressions.HalfStepTrill())
+        thisObject.expressions.append(music21.expressions.HalfStepTrill())
     elif contents.count('T'):
-        thisObject.notations.append(music21.expressions.WholeStepTrill())
+        thisObject.expressions.append(music21.expressions.WholeStepTrill())
     
     if contents.count('w'):
-        thisObject.notations.append(music21.expressions.HalfStepInvertedMordent())
+        thisObject.expressions.append(music21.expressions.HalfStepInvertedMordent())
     elif contents.count('W'):
-        thisObject.notations.append(music21.expressions.WholeStepInvertedMordent())
+        thisObject.expressions.append(music21.expressions.WholeStepInvertedMordent())
     elif contents.count('m'):
-        thisObject.notations.append(music21.expressions.HalfStepMordent())
+        thisObject.expressions.append(music21.expressions.HalfStepMordent())
     elif contents.count('M'):
-        thisObject.notations.append(music21.expressions.WholeStepMordent())
+        thisObject.expressions.append(music21.expressions.WholeStepMordent())
 
     if contents.count('S'):
-        thisObject.notations.append(music21.expressions.Turn())
+        thisObject.expressions.append(music21.expressions.Turn())
     elif contents.count('$'):
-        thisObject.notations.append(music21.expressions.InvertedTurn())
+        thisObject.expressions.append(music21.expressions.InvertedTurn())
     elif contents.count('R'):
         t1 = music21.expressions.Turn()
         t1.connectedToPrevious = True  ## true by default, but explicitly
-        thisObject.notations.append(t1)
+        thisObject.expressions.append(t1)
     
     if contents.count(':'):
         ## TODO: deal with arpeggiation -- should have been in a 
@@ -901,7 +901,7 @@ def hdStringToNote(contents):
         pass
     
     if contents.count("O"):
-        thisObject.notations.append(music21.expressions.Ornament())  
+        thisObject.expressions.append(music21.expressions.Ornament())  
         # generic ornament
     
     # 3.2.4 Articulation Marks

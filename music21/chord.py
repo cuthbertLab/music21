@@ -320,17 +320,19 @@ class Chord(note.NotRest):
         mxArticulations = None
         for i in range(len(self.articulations)):
             obj = self.articulations[i]
-            if i == 0: # assign first
-                mxArticulations = obj.mx # mxArt... stores more than one artic
-            else: # concatenate any remaining
-                mxArticulations += obj.mx
+            if hasattr(obj, 'mx'):
+                if i == 0: # assign first
+                    mxArticulations = obj.mx # mxArt... stores more than one artic
+                else: # concatenate any remaining
+                    mxArticulations += obj.mx
         if mxArticulations != None:
             mxNoteList[0].notationsObj.componentList.append(mxArticulations)
 
         # notations and articulations are mixed in musicxml
-        for i in range(len(self.notations)):
-            obj = self.notations[i] 
-            mxNoteList[0].notationsObj.componentList.append(obj.mx)
+        for i in range(len(self.expressions)):
+            obj = self.expressions[i]
+            if hasattr(obj, 'mx'): 
+                mxNoteList[0].notationsObj.componentList.append(obj.mx)
 
         return mxNoteList
 
