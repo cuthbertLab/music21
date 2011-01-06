@@ -844,25 +844,21 @@ class Pitch(music21.Music21Object):
 
     def _getMidi(self):
         '''
-        >>> a = Pitch('C3')
-        >>> a.midi
-        48
-        >>> a.midi =  23.5
-        >>> a.midi
-        24
-        >>> a.midi = 128
-        >>> a.midi
-        116
-        >>> a.midi = -10
-        >>> a.midi
-        2
-        >>> a.implicitAccidental
-        True
+        see docs below, under property midi
         '''
         if self._pitchSpaceNeedsUpdating:
             self._updatePitchSpace()
             self._pitchSpaceNeedsUpdating = False
-        return int(round(self.ps))
+        roundedPS = int(round(self.ps))
+        if roundedPS > 127:
+            value = (12 * 9) + (roundedPS % 12)
+            if value < (127-12):
+                value += 12
+        elif roundedPS < 0:
+            value = 0 + (roundedPS % 12)
+        else:
+            value = roundedPS
+        return value
 
     def _setMidi(self, value):
         '''
@@ -872,6 +868,8 @@ class Pitch(music21.Music21Object):
         value = int(round(value))
         if value > 127:
             value = (12 * 9) + (value % 12) # highest oct plus modulus
+            if value < (127-12):
+                value += 12
         elif value < 0:
             value = 0 + (value % 12) # lowest oct plus modulus            
         self._setPs(value)
@@ -883,14 +881,38 @@ class Pitch(music21.Music21Object):
 
     
     midi = property(_getMidi, _setMidi, 
-        doc='''Get or set a pitch value in MIDI. MIDI pitch values are like ps values (pitchSpace) rounded to the nearest integer; the ps attribute will accomodate floats.
+        doc=''' 
+        Get or set a pitch value in MIDI. 
+        MIDI pitch values are like ps values (pitchSpace) rounded to 
+        the nearest integer; while the ps attribute will accommodate floats.
 
-        >>> a = Pitch('C3')
-        >>> a.midi
-        48
-        >>> a.midi =  23.5
-        >>> a.midi
+        Midi values are also constrained to the space 0-127.  Higher or lower
+        values will be transposed octaves to fit in this space.
+
+        >>> from music21 import *
+        >>> c = pitch.Pitch('C4')
+        >>> c.midi
+        60
+        >>> c.midi =  23.5
+        >>> c.midi
         24
+        
+        >>> veryHighFHalfFlat = pitch.Pitch("F")
+        >>> veryHighFHalfFlat.octave = 12
+        >>> veryHighFHalfFlat.accidental = pitch.Accidental('half-flat')
+        >>> veryHighFHalfFlat.ps
+        160.5
+        >>> veryHighFHalfFlat.midi
+        125
+
+        >>> a = pitch.Pitch()
+        >>> a.midi = -10
+        >>> a.midi
+        2
+        >>> a.ps
+        2
+        >>> a.implicitAccidental
+        True
         ''')
 
     def _getName(self):
