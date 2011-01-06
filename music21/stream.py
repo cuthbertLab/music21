@@ -7274,8 +7274,8 @@ class Score(Stream):
     def implode(self):
         '''Reduce a polyphonic work into one or more staves.
         '''
-        voiceAllocation=2
-        permitOneVoicePerPart=False
+        voiceAllocation = 2
+        permitOneVoicePerPart = False
 
         return self.partsToVoices(voiceAllocation=voiceAllocation,
             permitOneVoicePerPart=permitOneVoicePerPart)
