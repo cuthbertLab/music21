@@ -1362,10 +1362,16 @@ class Interval(music21.Music21Object):
     complement = property(_getComplement, 
         doc='''Return a new Interval object that is the complement of this Interval.
 
-        >>> aInterval = Interval('M3')
+        >>> from music21 import *
+        >>> aInterval = interval.Interval('M3')
         >>> bInterval = aInterval.complement
         >>> bInterval
         <music21.interval.Interval m6>
+
+        >>> cInterval = interval.Interval('A2')
+        >>> dInterval = cInterval.complement
+        >>> dInterval
+        <music21.interval.Interval d7>
         ''')
 
 
@@ -1672,13 +1678,13 @@ def getAbsoluteLowerNote(note1, note2):
 def transposePitch(pitch1, interval1):
     '''Given a :class:`~music21.pitch.Pitch` and a :class:`~music21.interval.Interval` object, return a new Pitch object at the appropriate pitch level. 
 
-    >>> from music21 import pitch
+    >>> from music21 import *
     >>> aPitch = pitch.Pitch('C4')
-    >>> aInterval = Interval('P5')
+    >>> aInterval = interval.Interval('P5')
     >>> bPitch = transposePitch(aPitch, aInterval)
     >>> bPitch
     G4
-    >>> bInterval = stringToInterval('P-5')
+    >>> bInterval = interval.Interval('P-5')
     >>> cPitch = transposePitch(aPitch, bInterval)
     >>> cPitch
     F3
@@ -1689,7 +1695,7 @@ def transposePitch(pitch1, interval1):
     # then convert it to interval object if necessary
     if common.isStr(interval1):
         #print interval1, "same name"
-        interval1 = stringToInterval(interval1) 
+        interval1 = Interval(interval1) 
         #print interval1.name, " int name" # del me
     else:
         pass # assuming it is an interval object
@@ -1798,26 +1804,94 @@ def notesToInterval(n1, n2 = None):
 
 
 def stringToInterval(string):
-    '''Given an interval string (such as "P5", "m3", "A2") return a :class:`~music21.interval.Interval` object.
-
-    >>> aInterval = stringToInterval('P5')
-    >>> aInterval
-    <music21.interval.Interval P5>
-    >>> aInterval = stringToInterval('m3')
-    >>> aInterval
-    <music21.interval.Interval m3>
     '''
-    # TODO: rename intervalFromString
-    # TODO: possibly remove: exact same functionality is available directly
-    # from Interval instance
+    REMOVED: just call interval.Interval("string") directly
+    '''
+    raise IntervalException("stringToInterval has been removed, just call music21.interval.Interval('string') directly")
 
-#     dInterval, cInterval = _stringToDiatonicChromatic(string)
-#     allInterval = Interval(diatonic = dInterval, chromatic = cInterval)
-#     return allInterval
-        
-    return Interval(string)
+def add(intervalList):
+    '''
+    add a list of intervals and return the composite interval
+    Intervals can be Interval objects or just strings.
+    
+    (Currently not particularly efficient for large lists...)
+    
+    
+    >>> from music21 import *
+    >>> A2 = interval.Interval('A2')
+    >>> P5 = interval.Interval('P5')
+    
+    >>> interval.add([A2, P5])
+    <music21.interval.Interval A6>
+    >>> interval.add([P5, "m2"])
+    <music21.interval.Interval m6>
+    >>> interval.add(["W","W","H","W","W","W","H"])
+    <music21.interval.Interval P8>
+    
+    
+    Direction does matter:
+    
+    
+    >>> interval.add([P5, "P-4"])
+    <music21.interval.Interval M2>
+    '''
+    from music21 import pitch
+    if len(intervalList) == 0:
+        raise IntervalException("Cannot add an empty set of intervals")
+    
+    n1 = pitch.Pitch()
+    n2 = pitch.Pitch()
+    for i in intervalList:
+        n2 = transposePitch(n2, i)
+    return Interval(noteStart=n1, noteEnd=n2)
+    
 
-
+def subtract(intervalList):
+    '''
+    starts with the first interval and subtracts the following intervals from it:
+    
+    >>> from music21 import *
+    >>> interval.subtract(["P5","M3"])
+    <music21.interval.Interval m3>
+    >>> interval.subtract(["P4","d3"])
+    <music21.interval.Interval A2>
+    
+    >>> m2Object = Interval("m2")
+    >>> interval.subtract(["M6","m2",m2Object])
+    <music21.interval.Interval AA4>
+    >>> interval.subtract(["P4", "M-2"])
+    <music21.interval.Interval P5>
+    >>> interval.subtract(["A2","A2"])
+    <music21.interval.Interval P1>
+    >>> interval.subtract(["A1","P1"])
+    <music21.interval.Interval A1>
+    >>> a = interval.subtract(["P5","A5"])
+    >>> a.niceName
+    'Augmented Unison'
+    >>> a.chromatic.semitones
+    -1
+    
+    
+    BUG: should be Descending Augmented Unison, currently giving Oblique Augmented Unison ! AARGH
+    
+    
+    '''
+    from music21 import pitch
+    if len(intervalList) == 0:
+        raise IntervalException("Cannot add an empty set of intervals")
+    
+    n1 = pitch.Pitch()
+    n2 = pitch.Pitch()
+    for i,intI in enumerate(intervalList):
+        if i == 0:
+            n2 = transposePitch(n2, intI)
+        else:
+            if not hasattr(intI, "chromatic"):
+                intervalObj = Interval(intI)
+            else:
+                intervalObj = intI
+            n2 = transposePitch(n2, intervalObj.reverse())
+    return Interval(noteStart=n1, noteEnd=n2)
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -1915,7 +1989,7 @@ class Test(unittest.TestCase):
         self.assertEqual(noteA4.name, "E#")
         self.assertEqual(noteA4.octave, 2)
         
-        interval1 = stringToInterval("P-5")
+        interval1 = Interval("P-5")
         
         n5 = transposePitch(n4, interval1)
         n6 = transposePitch(n4, "P-5")

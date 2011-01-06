@@ -4,8 +4,9 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -193,6 +194,8 @@ class AbstractScale(Scale):
         <music21.interval.Interval m2>
         >>> asc._getOctaveComplement(['p8', 'm2'])
         <music21.interval.Interval M7>
+        >>> asc._getOctaveComplement(['A2'])
+        <music21.interval.Interval D7>
         '''
         value = self._sumIntervals(intervalList)
         semitone = 12 - (value % 12)

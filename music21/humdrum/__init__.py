@@ -83,7 +83,7 @@ tonh            Note.germanName     NOT YET WRITTEN -- simple, but low priority
 trans           Note.transpose(Interval), Stream.transpose(Interval), etc -- not yet written, but interval.getNoteAboveNote(Note, Interval) works fine.  Modal transpositions still are needed
 urrhythm        analysis.JohnsonLaird.urrhythm(Stream)  NOT YET WRITTEN -- low priority
 veritas         None                Not needed.  use md5 or other checksum files
-vox             None                Chord.numNotes() works for a chord.  TwoStreamComparer has many methods for performing this function.
+vox             None                len(Chord.pitches()) works for a chord.  TwoStreamComparer has many methods for performing this function.
 xdelta          None                Not needed.
 yank            "if"
 ydelta          None                Not needed.

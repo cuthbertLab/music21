@@ -31,9 +31,9 @@ class VoiceLeadingQuartet(music21.Music21Object):
     '''
     
     motionType = None
-    unison = interval.stringToInterval("P1")
-    fifth  = interval.stringToInterval("P5")
-    octave = interval.stringToInterval("P8")
+    unison = interval.Interval("P1")
+    fifth  = interval.Interval("P5")
+    octave = interval.Interval("P8")
         
     def __init__(self, v1n1 = None, v1n2 = None, v2n1 = None, v2n2 = None):
         self.v1n1 = v1n1
@@ -487,8 +487,8 @@ class Test(unittest.TestCase):
         assert a.parallelMotion() == True
         assert a.antiParallelMotion() == False
         assert a.obliqueMotion() == False
-        assert a.parallelInterval(interval.stringToInterval("P5")) == True
-        assert a.parallelInterval(interval.stringToInterval("M3")) == False
+        assert a.parallelInterval(interval.Interval("P5")) == True
+        assert a.parallelInterval(interval.Interval("M3")) == False
     
         b = VoiceLeadingQuartet(C4, C4, G4, G4)
         assert b.noMotion() == True
@@ -498,7 +498,7 @@ class Test(unittest.TestCase):
             
         c = VoiceLeadingQuartet(C4, G4, C5, G4)
         assert c.antiParallelMotion() == True
-        assert c.hiddenInterval(interval.stringToInterval("P5")) == False
+        assert c.hiddenInterval(interval.Interval("P5")) == False
     
         d = VoiceLeadingQuartet(C4, D4, E4, A4)
         assert d.hiddenInterval(Interval("P5")) == True

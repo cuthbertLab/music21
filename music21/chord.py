@@ -6,11 +6,12 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
-This module defines the Chord object, a sub-class of :class:`~music21.note.GeneralNote`.
+This module defines the Chord object, a sub-class of :class:`~music21.note.GeneralNote`
+as well as other methods, functions, and objects related to chords.
 '''
  
 import copy
@@ -19,7 +20,6 @@ import unittest
 import music21
 from music21 import interval
 
-from music21.duration import Duration
 #from music21.note import Note
 from music21 import musicxml
 from music21 import midi as midiModule
@@ -27,7 +27,6 @@ from music21.midi import translate as midiTranslate
 from music21 import note
 from music21 import defaults
 
-from music21.lily import LilyString
 #from music21.pitch import Pitch
 from music21 import pitch
 from music21 import beam
@@ -47,11 +46,17 @@ class ChordException(Exception):
 class Chord(note.NotRest):
     '''Class for dealing with chords
     
-    A Chord is like a Note object but has multiple pitches.
+    A Chord functions like a Note object but has multiple pitches.
     
-    Create chords by creating Notes or Pitches:
-    
+    Create chords by passing a string of pitch names
+
     >>> from music21 import *
+    >>> dmaj = chord.Chord(["D","F#","A"])
+
+
+    Or you can combine already created Notes or Pitches:
+
+    
     >>> C = note.Note()
     >>> C.name = 'C'
     >>> E = note.Note()
@@ -59,11 +64,11 @@ class Chord(note.NotRest):
     >>> G = note.Note()
     >>> G.name = 'G'
     
-    And then create a chord with notes:    
-    >>> cmaj = Chord([C, E, G])
 
-    Or, more simply, just pass strings of pitch names:
-    >>> dmaj = Chord(["D","F#","A"])
+    And then create a chord with note objects:    
+
+
+    >>> cmaj = chord.Chord([C, E, G])
 
     
     Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
@@ -88,13 +93,15 @@ class Chord(note.NotRest):
     _DOC_ORDER = ['pitches']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'isNote': 'Boolean read-only value describing if this object is a Chord. Is False',
-    'isRest': 'Boolean read-only value describing if this is a Rest. Is False',
+    'isChord': 'Boolean read-only value describing if this GeneralNote object is a Chord. Is True',
+    'isNote': 'Boolean read-only value describing if this GeneralNote object is a Note. Is False',
+    'isRest': 'Boolean read-only value describing if this GeneralNote object is a Rest. Is False',
     'beams': 'A :class:`music21.beam.Beams` object.',
     }
     # update inherited _DOC_ATTR dictionary
-    note.NotRest._DOC_ATTR.update(_DOC_ATTR)
-    _DOC_ATTR = note.NotRest._DOC_ATTR
+    _TEMPDOC = note.NotRest._DOC_ATTR
+    _TEMPDOC.update(_DOC_ATTR)
+    _DOC_ATTR = _TEMPDOC
 
     def __init__(self, notes = [], **keywords):
         note.NotRest.__init__(self, **keywords)
@@ -129,7 +136,7 @@ class Chord(note.NotRest):
 
         if "duration" in keywords or "type" in keywords or \
             "quarterLength" in keywords: #dots dont cut it
-            self.duration = Duration(**keywords)
+            self.duration = music21.duration.Duration(**keywords)
 
         elif len(notes) > 0:
             for thisNote in notes:
@@ -148,8 +155,9 @@ class Chord(note.NotRest):
     def _preDurationLily(self):
         '''
         Method to return all the lilypond information that appears before the 
-        duration number.  Note that _getLily is the same as with notes but 
-        not yet subclassed...
+        duration number.  This is called from GeneralNote .lily, but we are
+        overridding the previously defined call. 
+        
         '''
         baseName = "<"
         baseName += self.editorial.lilyStart()
@@ -175,12 +183,6 @@ class Chord(note.NotRest):
         return baseName
 
     #---------------------------------------------------------------------------
-    def numNotes(self):
-        '''
-    	Returns the number of notes in the chord
-    	'''
-        return len(self.pitches)
-
     def __repr__(self):
         allPitches = []
         for thisPitch in self.pitches:

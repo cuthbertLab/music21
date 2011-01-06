@@ -503,8 +503,10 @@ def resolveTritone(pitchA, pitchB, inPlace=False):
     pitchB = realizerScale.convertToPitch(pitchB)
     
     #Define tritone intervals
-    dimFifth = interval.stringToInterval('d5')
-    augFourth = interval.stringToInterval('A4')
+#    dimFifth = interval.stringToInterval('d5')
+#    augFourth = interval.stringToInterval('A4')
+    dimFifth = interval.Interval('d5')
+    augFourth = interval.Interval('A4')
 
     #If resolution not in place, make copies
     if not inPlace:
