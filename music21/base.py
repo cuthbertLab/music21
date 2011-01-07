@@ -1374,19 +1374,18 @@ class Music21Object(JSONSerializer):
     
     All music21 objects encode 7 pieces of information:
     
-    (1) id        : unique identification string (optional)
-    (2) groups    : a Groups object: which is a list of strings identifying 
+    (1) id: identification string unique to the objects container (optional)
+    (2) groups: a Groups object: which is a list of strings identifying 
                     internal subcollections
                     (voices, parts, selections) to which this element belongs
-    (3) duration  : Duration object representing the length of the object
-    (4) locations : a DefinedContexts object (see above) that specifies connections of
-                    this object to one location in another object
-    (5) parent    : a reference or weakreference to a currently active Location
-    (6) offset    : a float or duration specifying the position of the object in parent 
-    (7) contexts  : a list of references or weakrefs for current contexts 
-                    of the object (similar to locations but without an offset)
-    (8) priority  : int representing the position of an object among all
+    (3) duration: Duration object representing the length of the object
+    (4) parent: a reference or weakreference to a currently active Location
+    (5) offset: a floating point value, generally in quarter lengths, specifying the position of the object in parent 
+    (6) priority: int representing the position of an object among all
                     objects at the same offset.
+
+    Contexts, locations, and offsets are stored in a  :class:`~music21.base.DefinedContexts` object. Locations specify connections of this object to one location in a Stream subclass. Contexts are weakrefs for current objects that are associated with this object (similar to locations but without an offset)
+
 
     Each of these may be passed in as a named keyword to any music21 object.
     Some of these may be intercepted by the subclassing object (e.g., duration within Note)

@@ -269,7 +269,8 @@ class Wedge(music21.Music21Object):
     
     def __init__(self, value = None):
         music21.Music21Object.__init__(self)
-        # use ineherited duration to show length n time
+        # use inherited duration to show length n time
+        # these correspond to start and stop
         self.type = None # crescendo, stop, or diminuendo
         self.spread = None
         # relative-y and relative-x are also defined in xml

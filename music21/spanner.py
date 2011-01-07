@@ -554,9 +554,85 @@ class Slur(Spanner):
 
 
 
-# crescendo
+#-------------------------------------------------------------------------------
 class DynamicWedge(Spanner):
-    pass
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+
+        self.type = None # crescendo or diminuendo
+        self.placement = 'below' # can above or below, after musicxml
+        self.spread = 15
+
+    def __repr__(self):
+        msg = Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.spanner.DynamicWedge ')
+        return msg
+    
+
+
+class Crescendo(DynamicWedge):
+    '''A spanner crescendo wedge.
+
+    >>> from music21 import spanner
+    >>> d = spanner.Crescendo()
+    >>> d.getStartParameters()
+    {'spread': 0, 'type': 'crescendo'}
+    >>> d.getEndParameters()
+    {'spread': 15, 'type': 'stop'}
+    '''
+    def __init__(self, *arguments, **keywords):
+        DynamicWedge.__init__(self, *arguments, **keywords)
+        self.type = 'crescendo'
+
+    def getStartParameters(self):
+        '''Return the parameters for the start of this spanner
+        ''' 
+        post = {}
+        post['type'] = self.type # cresc 
+        post['spread'] = 0 # start at zero
+        return post
+
+    def getEndParameters(self):
+        '''Return the parameters for the start of this spanner
+        ''' 
+        post = {}
+        post['type'] = 'stop'  # end is always stop
+        post['spread'] = self.spread # end with spread
+        return post
+
+
+class Diminuendo(DynamicWedge):
+    '''A spanner diminuendo wedge.
+
+    >>> from music21 import spanner
+    >>> d = spanner.Diminuendo()
+    >>> d.getStartParameters()
+    {'spread': 15, 'type': 'diminuendo'}
+    >>> d.getEndParameters()
+    {'spread': 0, 'type': 'stop'}
+    '''
+    def __init__(self, *arguments, **keywords):
+        DynamicWedge.__init__(self, *arguments, **keywords)
+        self.type = 'diminuendo'
+
+    def getStartParameters(self):
+        '''Return the parameters for the start of this spanner
+        ''' 
+        post = {}
+        post['type'] = self.type # dim
+        post['spread'] = self.spread # start with spread
+        return post
+
+    def getEndParameters(self):
+        '''Return the parameters for the start of this spanner
+        ''' 
+        post = {}
+        post['type'] = 'stop'  # end is always stop
+        post['spread'] = 0
+        return post
+
+
+
 
 
 # associate two or more notes to be beamed together
