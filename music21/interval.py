@@ -7,12 +7,12 @@
 #               Amy Hailes 
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''This module defines various types of interval objects. 
 Fundamental classes are :class:`~music21.interval.Interval`, 
-:class:`~music21.interval.DiatonicInterval`, 
+:class:`~music21.interval.GenericInterval`, 
 and :class:`~music21.interval.ChromaticInterval`.
 
 Numerous utility functions are provided for processing and generating intervals.
@@ -103,12 +103,18 @@ class IntervalException(Exception):
 
 
 def convertStaffDistanceToInterval(staffDist):
-    '''Returns the interval number from the given staff distance.
+    '''
+    Returns an integer of the generic interval number 
+    (P5 = 5, M3 = 3) etc. from the given staff distance.
 
     >>> convertStaffDistanceToInterval(3)
     4
     >>> convertStaffDistanceToInterval(7)
     8
+    >>> convertStaffDistanceToInterval(0)
+    1
+    >>> convertStaffDistanceToInterval(-1)
+    -2
     '''
     if staffDist == 0:
         return 1
@@ -119,7 +125,8 @@ def convertStaffDistanceToInterval(staffDist):
 
 
 def convertDiatonicNumberToStep(dn):
-    '''Convert a diatonic number to a step name (without accidental) and a octave integer. 
+    '''
+    Convert a diatonic number to a step name (without accidental) and a octave integer. 
     The lowest C on a Bosendorfer Imperial Grand is assigned 1 the D above it is 2,
     E is 3, etc.  See pitch.diatonicNoteNum for more details
 
@@ -177,7 +184,13 @@ def convertDiatonicNumberToStep(dn):
 
 
 def convertSpecifier(specifier):
-    '''Given an integer or a string, return the integer for the appropriate specifier. This permits specifiers to specified in a flexible manner.
+    '''
+    Given an integer or a string representing a "specifier" (major, minor,
+    perfect, diminished, etc.), return a tuple of (1) an integer which 
+    refers to the appropriate specifier in a list and (2) a standard form
+    for the specifier.
+
+    This function permits specifiers to specified in a flexible manner.
 
     >>> convertSpecifier(3)
     (3, 'm')
@@ -566,7 +579,8 @@ class GenericInterval(music21.Music21Object):
     def complement(self):
         '''Returns a new GenericInterval object where descending 3rds are 6ths, etc.
 
-        >>> aInterval = GenericInterval('Third')
+        >>> from music21 import *
+        >>> aInterval = interval.GenericInterval('Third')
         >>> aInterval.complement()
         <music21.interval.GenericInterval 6>
         '''
@@ -575,11 +589,12 @@ class GenericInterval(music21.Music21Object):
     def reverse(self):
         '''Returns a new GenericInterval object that is inverted. 
 
-        >>> aInterval = GenericInterval('Third')
+        >>> from music21 import *
+        >>> aInterval = interval.GenericInterval('Third')
         >>> aInterval.reverse()
         <music21.interval.GenericInterval -3>
 
-        >>> aInterval = GenericInterval(-13)
+        >>> aInterval = interval.GenericInterval(-13)
         >>> aInterval.direction
         -1
         >>> aInterval.reverse()
@@ -589,7 +604,7 @@ class GenericInterval(music21.Music21Object):
         Unisons invert to unisons
         
         
-        >>> aInterval = GenericInterval(1)
+        >>> aInterval = interval.GenericInterval(1)
         >>> aInterval.reverse()
         <music21.interval.GenericInterval 1>
         '''
@@ -845,8 +860,9 @@ class DiatonicInterval(music21.Music21Object):
 
 
 class ChromaticInterval(music21.Music21Object):
-    '''Chromatic interval class. Unlike a Diatonic interval, this Interval class treats interval spaces in half-steps. 
-
+    '''
+    Chromatic interval class. Unlike a Diatonic interval, this Interval 
+    class treats interval spaces in half-steps. 
     '''
     def __init__(self, value = 0):
         '''
@@ -940,13 +956,22 @@ class ChromaticInterval(music21.Music21Object):
         return ChromaticInterval(self.undirected * (-1 * self.direction))
 
     def getDiatonic(self):
-        '''Given a Chromatic interval, return a Diatonic interval object. 
+        '''Given a Chromatic interval, return a Diatonic interval object of the
+        same size. 
         
-        While there is more than one Generic Interval for any given chromatic interval, this is needed to to permit easy chromatic specification of Interval objects.
+        While there is more than one Generic Interval for any given chromatic 
+        interval, this is needed to to permit easy chromatic specification of 
+        Interval objects.  No augmented or diminished intervals are returned
+        except for for interval of 6 which returns a diminished fifth, not
+        augmented fourth.
 
         >>> aInterval = ChromaticInterval(5)
         >>> aInterval.getDiatonic()
         <music21.interval.DiatonicInterval P4>
+
+        >>> aInterval = ChromaticInterval(6)
+        >>> aInterval.getDiatonic()
+        <music21.interval.DiatonicInterval d5>
 
         >>> aInterval = ChromaticInterval(7)
         >>> aInterval.getDiatonic()
@@ -1054,11 +1079,13 @@ def notesToChromatic(n1, n2):
     <music21.interval.ChromaticInterval 15>
 
     '''
-    return ChromaticInterval(n2.midi - n1.midi)
+    return ChromaticInterval(int(n2.ps - n1.ps))
 
 
 def _getSpecifierFromGenericChromatic(gInt, cInt):
-    '''Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...).
+    '''
+    Given a :class:`~music21.interval.GenericInterval` and 
+    a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...).
     
     >>> aInterval = GenericInterval('seventh')
     >>> bInterval = ChromaticInterval(11)
@@ -1066,6 +1093,18 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     2
     >>> convertSpecifier('major')
     (2, 'M')
+    
+    
+    
+    Absurdly altered interval:
+    
+    
+    
+    >>> cInterval = GenericInterval('second')
+    >>> dInterval = ChromaticInterval(10)  # 8x augmented second
+    >>> _getSpecifierFromGenericChromatic(cInterval, dInterval)
+    Traceback (most recent call last):
+    IntervalException: cannot get a specifier for a note with this many semitones off of Major: 8
     '''
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
     
@@ -1077,9 +1116,16 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
         ## all normal intervals
         theseSemis  = cInt.undirected
     if gInt.perfectable:
-        specifier = perfSpecifiers[perfOffset + theseSemis - normalSemis]
+        try:
+            specifier = perfSpecifiers[perfOffset + theseSemis - normalSemis]
+        except IndexError:
+            raise IntervalException("cannot get a specifier for a note with this many semitones off of Perfect: " + str(theseSemis - normalSemis))
     else:
-        specifier = specifiers[majOffset + theseSemis - normalSemis]
+        try:
+            specifier = specifiers[majOffset + theseSemis - normalSemis]
+        except IndexError:
+            raise IntervalException("cannot get a specifier for a note with this many semitones off of Major: " + str(theseSemis - normalSemis))
+
     return specifier    
 
     
@@ -1097,7 +1143,25 @@ def intervalsToDiatonic(gInt, cInt):
     specifier = _getSpecifierFromGenericChromatic(gInt, cInt)
     return DiatonicInterval(specifier, gInt)
     
+def intervalFromGenericAndChromatic(gInt, cInt):
+    '''
+    Given a :class:`~music21.interval.GenericInterval` and a 
+    :class:`~music21.interval.ChromaticInterval` object, return 
+    a full :class:`~music21.interval.Interval`.    
 
+    >>> aInterval = GenericInterval('descending fifth')
+    >>> bInterval = ChromaticInterval(-8)
+    >>> cInterval = intervalFromGenericAndChromatic(aInterval, bInterval)
+    >>> cInterval
+    <music21.interval.Interval A-5>
+    >>> cInterval.directedNiceName
+    'Descending Augmented Fifth'
+    '''
+
+    # TODO: rename intervalsToDiatonic
+    specifier = _getSpecifierFromGenericChromatic(gInt, cInt)
+    dInt = DiatonicInterval(specifier, gInt)
+    return Interval(diatonic = dInt, chromatic = cInt)
 
 
 #-------------------------------------------------------------------------------
@@ -1796,9 +1860,9 @@ def notesToInterval(n1, n2 = None):
             n2 = music21.pitch.Pitch() 
     gInt = notesToGeneric(n1, n2)
     cInt = notesToChromatic(n1, n2)
-    dInt = intervalsToDiatonic(gInt, cInt)
-    intObj = Interval(diatonic = dInt, chromatic = cInt,
-                    note1 = n1, note2 = n2)
+    intObj = intervalFromGenericAndChromatic(gInt, cInt)
+    intObj._noteStart = n1  #use private so as not to trigger resetting behavior
+    intObj._noteEnd = n2
     return intObj
 
 
@@ -2124,7 +2188,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [notesToChromatic, intervalsToDiatonic, notesToInterval, 
+_DOC_ORDER = [notesToChromatic, intervalsToDiatonic, intervalFromGenericAndChromatic, 
               Interval]
 
 
