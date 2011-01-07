@@ -1797,7 +1797,7 @@ class MelodicMinorScale(DiatonicScale):
 # other sscales
 
 class OctatonicScale(ConcreteScale):
-    '''A concrete diatonic scale. Assumes that all such scales have 
+    '''A concrete Octatonic scale. Assumes that all such scales have   ???
     '''
 
     def __init__(self, tonic=None, mode=None):

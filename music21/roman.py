@@ -160,6 +160,19 @@ class RomanNumeral(chord.Chord):
     [0, 1, 2, 1, 1, 1]
     >>> alteredChordHalfDim3rdInv.commonName
     'half-diminished seventh chord'
+    
+    
+    Just for kicks (no worries if this is goobley-gook):
+    
+    >>> ots = scale.OctatonicScale("C2")
+    >>> rn = roman.RomanNumeral('I9', ots, caseMatters=False)
+    >>> rn.pitches
+    [C2, E-2, G-2, A2, C3]
+    >>> rn2 = roman.RomanNumeral('V7#5b3', ots, caseMatters = False)
+    >>> rn2.pitches
+    [G-2, A-2, C#3, E-3] 
+    
+    
     '''
 
     frontFlat = re.compile('^(b+)')
@@ -171,6 +184,8 @@ class RomanNumeral(chord.Chord):
         chord.Chord.__init__(self)
 
         self.caseMatters = caseMatters
+        self.scaleCardinality = 7
+        
         
         if isinstance(figure, int):
             self.caseMatters = False
@@ -257,6 +272,7 @@ class RomanNumeral(chord.Chord):
             else:
                 useScale = scale.MajorScale('C')
 
+        self.scaleCardinality = len(useScale.pitches) - 1 # should be 7 but hey, octatonic scales, etc.
 
         bassScaleDegree = self.bassScaleDegreeFromNotation(notationObj)
         bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction = scale.DIRECTION_ASCENDING)
@@ -685,7 +701,7 @@ class RomanNumeral(chord.Chord):
         tempChord = chord.Chord(pitches)
         rootDNN = tempChord.root().diatonicNoteNum
         staffDistanceFromBassToRoot = rootDNN - cDNN
-        bassSD = (self.scaleDegree - staffDistanceFromBassToRoot) % 7
+        bassSD = (self.scaleDegree - staffDistanceFromBassToRoot) % self.scaleCardinality
         if bassSD == 0:
             bassSD = 7
         return bassSD
