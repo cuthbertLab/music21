@@ -742,6 +742,91 @@ class Chord(note.NotRest):
         >>> c.duration = d
         ''')
 
+    def _getScaleDegrees(self):
+        '''
+        returns a list of two-element tuples for each
+        pitch in the chord where the first element of the tuple
+        is the scale degree as an int and the second is an Accidental
+        object that specifies the alteration from the scale degree (could
+        be None if the note is a part of the scale)
+        
+        
+        It is easiest to see the utility of this method using a
+        chord subclass, :class:`music21.roman.RomanNumeral`,
+        but it is also callable from this Chord object if the
+        Chord has a Key or Scale context set for it.
+        
+        
+        >>> from music21 import *
+        >>> k = key.Key('f#')  # 3-sharps minor
+
+        >>> rn = roman.RomanNumeral('V', k)
+        >>> rn.pitches
+        [C#5, E#5, G#5]
+        >>> rn.scaleDegrees
+        [(5, None), (7, <accidental sharp>), (2, None)] 
+        >>> rn2 = roman.RomanNumeral('N6', k)
+        >>> rn2.pitches
+        [B4, D5, G5]
+        >>> rn2.scaleDegrees # N.B. -- natural form used for minor!
+        [(4, None), (6, None), (2, <accidental flat>)]
+        
+        
+        As mentioned above, the property can also get its scale from context if
+        the chord is embedded in a Stream.  Let's great the same V in f#-minor
+        again, but give it a context of c-sharp minor, and then c-minor instead:
+        
+        
+        >>> chord1 = chord.Chord(["C#5", "E#5", "G#5"])
+        >>> st1 = stream.Stream()
+        >>> st1.append(key.Key('c#'))   # c-sharp minor
+        >>> st1.append(chord1)
+        >>> chord1.scaleDegrees
+        [(1, None), (3, <accidental sharp>), (5, None)]
+        
+        
+        >>> st2 = stream.Stream()
+        >>> st2.append(key.Key('c'))    # c minor
+        >>> st2.append(chord1)          # same pitches as before
+        >>> chord1.scaleDegrees
+        [(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]
+        
+        
+        >>> st3 = stream.Stream()
+        >>> st3.append(key.Key('C'))    # C major
+        >>> chord2 = chord.Chord(["C4","C#4","D4","E-4","E4","F4"])  # 1st 1/2 of chromatic
+        >>> st3.append(chord2)
+        >>> chord2.scaleDegrees
+        [(1, None), (1, <accidental sharp>), (2, None), (3, <accidental flat>), (3, None), (4, None)]
+                
+        '''
+        from music21 import scale
+        if hasattr(self, 'scale') and self.scale != None: # roman numerals have this built in
+            sc = self.scale
+        else:
+            sc = self.getContextByClass(scale.Scale)
+            if sc is None:
+                raise ChordException("Cannot find a Key or Scale context for this chord, so cannot find what scale degrees the pitches correspond to!")            
+        if hasattr(sc, 'mode'):
+            mode = sc.mode       ### POSSIBLY USE to describe #7 etc. properly in minor -- not sure...
+        else:
+            mode = ""      
+        degrees = []
+        for thisPitch in self.pitches:
+            degree = sc.getScaleDegreeFromPitch(thisPitch, comparisonAttribute='step', direction=scale.DIRECTION_DESCENDING)
+            if degree is None:
+                degrees.append((None, None))
+            else:
+                actualPitch = sc.pitchFromDegree(degree, direction=scale.DIRECTION_DESCENDING)
+                if actualPitch.name == thisPitch.name:
+                    degrees.append((degree, None))
+                else:
+                    actualPitch.octave = thisPitch.octave
+                    degrees.append((degree, pitch.Accidental(int(thisPitch.ps - actualPitch.ps))))
+        return degrees
+    
+    scaleDegrees = property(_getScaleDegrees)
+
 
 
 

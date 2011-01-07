@@ -85,7 +85,7 @@ class RomanNumeral(chord.Chord):
     >>> neapolitan.isMajorTriad()
     True
     >>> neapolitan.scaleDegreeWithAlteration
-    [2, <accidental flat>]
+    (2, <accidental flat>)
     >>> neapolitan.pitches  # default octaves
     [F#4, A4, D5]
 
@@ -126,7 +126,7 @@ class RomanNumeral(chord.Chord):
     
     >>> sharp3 = roman.RomanNumeral('#III6', scale.MajorScale('D-'))
     >>> sharp3.scaleDegreeWithAlteration
-    [3, <accidental sharp>]
+    (3, <accidental sharp>)
     >>> sharp3.pitches
     [A#4, C#5, F#5]
    
@@ -163,6 +163,8 @@ class RomanNumeral(chord.Chord):
     
     
     Just for kicks (no worries if this is goobley-gook):
+    
+    
     
     >>> ots = scale.OctatonicScale("C2")
     >>> rn = roman.RomanNumeral('I9', ots, caseMatters=False)
@@ -257,7 +259,7 @@ class RomanNumeral(chord.Chord):
 
         
         sd = self.scaleDegree
-        self.scaleDegreeWithAlteration = [sd, scaleAlter]
+        self.scaleDegreeWithAlteration = (sd, scaleAlter)
         
         shfig = expandShortHand(figure)
         
@@ -341,8 +343,6 @@ class RomanNumeral(chord.Chord):
                     acc = faultyPitch.accidental
                     acc.set(thisDefault - thisSemis + acc.alter)
         
-        
-
 
 #    def _getRoot(self):
 #        return self.scale.pitchFromDegree(self.rootScaleStep)
@@ -552,79 +552,6 @@ class RomanNumeral(chord.Chord):
 #
 #
 #
-#    def getChord(self, minPitch=None, maxPitch=None,
-#         direction=DIRECTION_ASCENDING):
-#        '''Return a realized chord for this harmony
-#        '''
-#        from music21 import chord
-#        return chord.Chord(self.getPitches(minPitch=minPitch, maxPitch=maxPitch, direction=direction))
-#
-#    chord = property(getChord, 
-#        doc = '''Return a Chord object form this harmony over a default range
-#        ''')
-#
-#
-#    def _parseFigure(self, figure):
-#        '''
-#        Given a figure string, returns a list of parsed elements.
-#        Each element is a tuple, consisting of the interval and the
-#        corresponding accidental string (None if there isn't any)
-#
-#        Based on code by Jose Cabal-Ugaz.
-#        
-#        >>> from music21 import *   
-#        >>> h1 = scale.RomanNumeral()
-#        >>> h1._parseFigure('6#,5,3')
-#        [(6, '#'), (5, None), (3, None)]
-#        >>> h1._parseFigure('6-,3-')
-#        [(6, '-'), (3, '-')]
-#        >>> h1._parseFigure('7-,#3')
-#        [(7, '-'), (3, '#')]
-#        '''
-#        pattern = '[,]'
-#        notations = re.split(pattern, figure)
-#        translations = []
-#        patternA1 = '[#-nN/][1-7]' #example: -6
-#        patternA2 = '[1-7][#-nN+/]' #example: 6+
-#        patternB = '[1-7]' #example: 6
-#        patternC = '[#-N+]' #example: # (which implies #3)
-#        intervalAboveBass = None
-#        accidentalString = None
-#
-#        for n in notations:
-#            n = n.strip()
-#            if re.match(patternA1, n) != None:
-#                intervalAboveBass = int(n[1])
-#                accidentalString = n[0]
-#            elif re.match(patternA2, n) != None:
-#                intervalAboveBass = int(n[0])
-#                accidentalString = n[1]
-#            elif re.match(patternB, n) != None:
-#                intervalAboveBass = int(n[0])
-#                accidentalString = None
-#            elif re.match(patternC, n) != None:
-#                intervalAboveBass = 3
-#                accidentalString = n[0]
-#            translations.append((intervalAboveBass, accidentalString))
-#            
-#        return translations
-#    
-#
-#
-#    def makeTriad(self):
-#        '''Configure this triad as a diatonic triad
-#        '''
-#        self._members = [0,2,4] 
-#
-#    def makeSeventhChord(self):
-#        '''Configure this triad as a diatonic seventh chord
-#        '''
-#        self._members = [0,2,4,6] 
-#
-#    def makeNinthChord(self):
-#        '''Configure this triad as a diatonic seventh chord
-#        '''
-#        self._members = [0,2,4,6,8] 
 #
 #
 #    def _getRomanNumeral(self):
