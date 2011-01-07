@@ -25,6 +25,7 @@ import random
 import inspect
 
 
+
 # define file extensions for various formats
 # keys are assumed to be formats
 fileExtensions = {
@@ -876,6 +877,9 @@ def fromRoman(num):
     2
     >>> fromRoman('vii')
     7
+    >>> fromRoman('vx')
+    Traceback (most recent call last):
+    Music21CommonException: invalid roman numeral vx
     '''
     if (num == 'I' or num == 'i'):
         return 1
@@ -894,7 +898,7 @@ def fromRoman(num):
     elif (num == 'VIII' or num == 'viii'):
         return 8
     else:
-        raise Exception("invalid roman numeral")
+        raise Music21CommonException("invalid roman numeral %s" % (num))
 
 def toRoman(num):
     '''
@@ -902,6 +906,9 @@ def toRoman(num):
     'II'
     >>> toRoman(7)
     'VII'
+    >>> toRoman("hi")
+    Traceback (most recent call last):
+    Music21CommonException: invalid input hi: must be integer 1-8
     '''
     if (num == 1):
         return 'I'
@@ -920,7 +927,7 @@ def toRoman(num):
     elif (num == 8): # TODO: add comment explaining if this is correct!
         return 'VIII'
     else:
-        raise Exception("invalid input: must be integer 1-8")
+        raise Music21CommonException("invalid input %s: must be integer 1-8" % (str(num)))
 
 def stripAddresses(textString, replacement = "ADDRESS"):
     '''
@@ -1525,7 +1532,8 @@ class Timer(object):
         return str(round(t,3))
 
 
-
+class Music21CommonException(Exception):
+    pass
 
 #-------------------------------------------------------------------------------
 class TestMock(object):

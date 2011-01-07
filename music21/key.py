@@ -22,7 +22,7 @@ from music21 import note
 from music21 import interval
 from music21 import musicxml
 from music21 import common
-
+from music21 import scale
 
 from music21 import environment
 _MOD = "key.py"
@@ -205,84 +205,7 @@ class KeySignatureException(Exception):
 
 #-------------------------------------------------------------------------------
 
-# some ideas
-# c1 = chord.Chord(["D", "F", "A"])
-# k1 = key.Key("C")
-# c2 = k1.chordByRoman("ii")
-# c1 == c2
-# True
 
-# 
-# key1 = Key("E", "major")
-# key1
-# <music21.key.Key E major>
-# key1.parallel
-# <music21.key.Key E minor>
-# key1.relative
-# <music21.key.Key c# minor>
-# 
-# ks1 = key1.signature
-# ks1
-# <music21.key.KeySignature 4 sharps>
-# ks1.sharpsOrFlats
-# 4
-# ks1.majorKey
-# <music21.key.Key E major>
-# ks1.minorKey
-# <music21.key.Key c# minor>
-# 
-# # Set this E major piece to use a signature of 1 flat
-# key1.signature = KeySignature(-1)
-# 
-# # Check that it's still E major
-# key1
-# <music21.key.Key E major>
-# key1.signature
-# <music21.key.KeySignature 1 flat>
-# key1.sharpsOrFlats
-# -1
-# 
-# # What major key would normally have this signature?
-# key1.signature.majorKey
-# <music21.key.Key F major>
-# 
-# # Modal piece in E
-# key2 = Key("E", None)
-# key2
-# <music21.key.Key E >
-# key2.signature
-# <music21.key.KeySignature natural>
-
-class Key(music21.Music21Object):
-    '''
-    Note that a key is a sort of hypothetical/conceptual object.
-    It probably has a scale (or scales) associated with it and a KeySignature,
-    but not necessarily.
-    '''
-    
-    def __init__(self, stream1 = None):
-        pass
-
-#         self.stream1 = stream1
-#         self.step = ''
-#         self.accidental = ''
-#         self.type = ''
-# 
-#         self.stepList = music21.pitch.STEPNAMES
-# 
-#         # this information might be better dervied from somewhere in 
-#         # note.py
-#         self.accidentalList = ['--', '-', None, '#', '##']
-#         self.typeList = ['major', 'minor']
-# 
-#     def generateKey(self):
-#         # want to use Krumhansl-Kessler algorithm; need to find explicit instructions
-#         pass
-
-    def setKey(self, name = "C", accidental = None, type = "major"):
-        self.step = name
-        self.accidental = accidental
-        self.type = type
 
 
 def keyFromString(strKey):
@@ -291,9 +214,6 @@ def keyFromString(strKey):
     #TODO: Write keyFromString
     return None
     #raise KeyException("keyFromString not yet written")
-
-
-
 
 
 
@@ -402,6 +322,8 @@ class KeySignature(music21.Music21Object):
         post = []
         if self.sharps > 0:
             pKeep = pitch.Pitch('B')
+            if self.sharps > 8:
+                pass
             for i in range(self.sharps):
                 pKeep.transpose('P5', inPlace=True)
                 p = copy.deepcopy(pKeep)
@@ -431,28 +353,28 @@ class KeySignature(music21.Music21Object):
         >>> a = key.KeySignature(3)
         >>> a.alteredPitches
         [F#, C#, G#]
-        >>> a = key.KeySignature(1)
-        >>> a.alteredPitches
+        >>> b = key.KeySignature(1)
+        >>> b.alteredPitches
         [F#]
 
-        >>> a = key.KeySignature(9)
-        >>> a.alteredPitches
+        >>> c = key.KeySignature(9)
+        >>> c.alteredPitches
         [F#, C#, G#, D#, A#, E#, B#, F##, C##]
 
-        >>> a = key.KeySignature(-3)
-        >>> a.alteredPitches
+        >>> d = key.KeySignature(-3)
+        >>> d.alteredPitches
         [B-, E-, A-]
 
-        >>> a = key.KeySignature(-1)
-        >>> a.alteredPitches
+        >>> e = key.KeySignature(-1)
+        >>> e.alteredPitches
         [B-]
 
-        >>> a = key.KeySignature(-6)
-        >>> a.alteredPitches
+        >>> f = key.KeySignature(-6)
+        >>> f.alteredPitches
         [B-, E-, A-, D-, G-, C-]
 
-        >>> a = key.KeySignature(-8)
-        >>> a.alteredPitches
+        >>> g = key.KeySignature(-8)
+        >>> g.alteredPitches
         [B-, E-, A-, D-, G-, C-, F-, B--]
         ''')
 
@@ -722,6 +644,90 @@ class KeySignature(music21.Music21Object):
 #         return None
 
 
+
+# some ideas
+# c1 = chord.Chord(["D", "F", "A"])
+# k1 = key.Key("C")
+# c2 = k1.chordFromRomanNumeral("ii")
+# c1 == c2
+# True
+
+# 
+# key1 = Key("E", "major")
+# key1
+# <music21.key.Key E major>
+# key1.parallel
+# <music21.key.Key E minor>
+# key1.relative
+# <music21.key.Key c# minor>
+# 
+# ks1 = key1.signature
+# ks1
+# <music21.key.KeySignature 4 sharps>
+# ks1.sharpsOrFlats
+# 4
+# ks1.majorKey
+# <music21.key.Key E major>
+# ks1.minorKey
+# <music21.key.Key c# minor>
+# 
+# # Set this E major piece to use a signature of 1 flat
+# key1.signature = KeySignature(-1)
+# 
+# # Check that it's still E major
+# key1
+# <music21.key.Key E major>
+# key1.signature
+# <music21.key.KeySignature 1 flat>
+# key1.sharpsOrFlats
+# -1
+# 
+# # What major key would normally have this signature?
+# key1.signature.majorKey
+# <music21.key.Key F major>
+# 
+
+
+class Key(KeySignature, scale.DiatonicScale):
+    '''
+    Note that a key is a sort of hypothetical/conceptual object.
+    It probably has a scale (or scales) associated with it and a KeySignature,
+    but not necessarily.
+
+    EXPERIMENTAL
+
+
+    >>> from music21 import *
+    >>> cm = key.Key('c')  # cminor.
+    >>> cm.sharps
+    -3
+    >>> cm.pitchFromDegree(3)
+    E-4
+
+    '''
+    _sharps = 0
+    _mode = None
+    def __init__(self, tonic = None, mode = None):
+        if tonic is not None:
+            if mode is None:
+                if 'm' in tonic:
+                    mode = 'minor'
+                    tonic = re.sub('m', '', tonic)
+                elif 'M' in tonic:
+                    mode = 'major'
+                    tonic = re.sub('M', '', tonic)
+                elif tonic.lower() == tonic:
+                    mode = 'minor'
+                else:
+                    mode = 'major'
+            sharps = pitchToSharps(tonic, mode)
+            KeySignature.__init__(self, sharps, mode)
+
+        scale.DiatonicScale.__init__(self, tonic=tonic)
+        self.type = mode
+        self.mode = mode
+        # build the network for the appropriate scale
+        self._abstract._buildNetwork(self.type)
 
 
 

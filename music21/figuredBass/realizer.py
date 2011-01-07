@@ -30,7 +30,7 @@ from music21 import scale
 
 _MOD = "realizer.py"
 
-class FiguredBass:
+class FiguredBass(object):
     def __init__(self, timeSig, key, mode = 'major'):
         self.timeSig = timeSig
         self.key = key

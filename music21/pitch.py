@@ -1746,7 +1746,7 @@ class Pitch(music21.Music21Object):
         C#-1
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
-        if hasattr(value, 'diatonic'): # its an Interval class
+        if hasattr(value, 'diatonic'): # its an Interval class with a DiatonicInterval class
             intervalObj = value
         else: # try to process
             intervalObj = interval.Interval(value)

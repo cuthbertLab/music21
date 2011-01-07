@@ -69,7 +69,14 @@ def realizeOrnaments(srcObject):
             retList.append(i)
         return retList
 
-class Ornament(music21.Music21Object):
+class Expression(music21.Music21Object):
+    pass
+
+    def __repr__(self):
+        return '<music21.expressions.%s>' % (self.__class__.__name__)
+
+
+class Ornament(Expression):
     connectedToPrevious = True  # should follow directly on previous; true for most "ornaments".
     tieAttach = 'first' # attach to first note of a tied group.
 
@@ -194,7 +201,7 @@ class InvertedTurn(Ornament):
 
 
 
-class Fermata(music21.Music21Object):
+class Fermata(Expression):
     '''
     Fermatas by default get appended to the last
     note if a note is split because of measures.

@@ -75,6 +75,7 @@ Module Reference
    moduleNote
    moduleNode
    modulePitch
+   moduleRoman
    moduleScale
    moduleSerial
    moduleSieve

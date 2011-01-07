@@ -55,8 +55,8 @@ class FiguredBassScale:
         ['D', 'F', 'B']
         >>> fbScale.getPitchNames('G3')
         ['G', 'B', 'D']
-        >>> fbScale.getPitchNames('B3', '6,5')
-        ['B', 'D', 'F', 'G']
+        >>> fbScale.getPitchNames('B3', '6,#5')
+        ['B', 'D', 'F#', 'G']
         '''
         bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
         bassSD = self.realizerScale.getScaleDegreeFromPitch(bassPitch)

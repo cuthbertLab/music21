@@ -759,7 +759,7 @@ class Chord(note.NotRest):
 
     def hasScaleX(self, scaleDegree, testRoot = None):
         '''
-        Each of these returns the number of semitones above the root
+        Each of these returns the number of semitones (mod12) above the root
         that the third, fifth, etc., of the chord lies, if there exists
         one.  Or False if it does not exist.
         
@@ -789,6 +789,16 @@ class Chord(note.NotRest):
         7
         >>> cchord.hasScaleX(6) # will return False
         False
+
+        >>> achord = chord.Chord(['a', 'c', 'e#7'])
+        >>> achord.hasScaleX(3) 
+        3
+        >>> achord.hasScaleX(5) 
+        8
+        >>> achord.hasScaleX(2) # will return False
+        False
+
+
         '''
         
         if (testRoot is None):
@@ -799,7 +809,7 @@ class Chord(note.NotRest):
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(testRoot, thisPitch)
             if (thisInterval.diatonic.generic.mod7 == scaleDegree):
-                return thisInterval.chromatic.semitones
+                return thisInterval.chromatic.mod12
 
         return False
     
@@ -822,11 +832,12 @@ class Chord(note.NotRest):
         
         example:
         >>> from music21 import *
-        >>> cmaj = chord.Chord(['C','E','G'])
+        >>> cmaj = chord.Chord(['C','E','G#'])
         >>> cmaj.scaleX(3) # will return the third of the chord
         E
-        >>> cmaj.scaleX(5) # will return the fifth of the chord
-        G
+        >>> gis = cmaj.scaleX(5) # will return the fifth of the chord
+        >>> gis.name
+        'G#'
         >>> cmaj.scaleX(6)
         False
         '''
@@ -849,11 +860,11 @@ class Chord(note.NotRest):
         example:
         >>> from music21 import *
         >>> cmaj = chord.Chord(['C', 'E', 'G'])
-        >>> cmaj.hasScaleX(3) #will return the interval between C and E
-        4
-        >>> cmaj.hasScaleX(5) #will return the interval between C and G
-        7
-        >>> cmaj.hasScaleX(6) #will return False
+        >>> cmaj.hasSpecificX(3) #will return the interval between C and E
+        <music21.interval.Interval M3>
+        >>> cmaj.hasSpecificX(5) #will return the interval between C and G
+        <music21.interval.Interval P5>
+        >>> cmaj.hasSpecificX(6) #will return False
         False
         '''
         if (testRoot is None):
@@ -1397,47 +1408,59 @@ class Chord(note.NotRest):
         else:
             return False
     
-    def determineType(self):
-        '''returns an abbreviation for the type of chord it is.
-        Add option to add inversion name to abbreviation?
+    def _getQuality(self):
+        '''
+        returns the quality of the underlying triad of a triad or 
+        seventh, either major, minor, diminished, augmented, or other.
 
         >>> from music21 import *
-        >>> a = chord.Chord(['a', 'c#', 'e'])
-        >>> a.determineType()
-        'Major Triad'
+        >>> a = chord.Chord(['a', 'c', 'e'])
+        >>> a.quality
+        'minor'
 
-        >>> a = chord.Chord(['g', 'b', 'd', 'f'])
-        >>> a.determineType()
-        'Dominant Seventh'
+        Inversions don't matter.
 
-        OMIT_FROM_DOCS
-        TODO: determine permanent designation abbreviation for every 
-        type of chord and inversion
+        >>> a = chord.Chord(['f', 'b', 'd', 'g'])
+        >>> a.quality
+        'major'
+
+        >>> a = chord.Chord(['c', 'a-', 'e'])
+        >>> a.quality
+        'augmented'
+
+        >>> a = chord.Chord(['c','c#','d'])
+        >>> a.quality
+        'other'
+
         '''
-        if (self.isTriad()):
-            if (self.isMajorTriad()):
-                return "Major Triad"
-            elif (self.isMinorTriad()):
-                return "Minor Triad"
-            elif (self.isDiminishedTriad()):
-                return "Diminished Triad"
-            elif (self.isAugmentedTriad()):
-                return "Augmented Triad"
+        third = self.hasScaleX(3)
+        fifth = self.hasScaleX(5)
+        if third == None:
+            return "other"        
+        elif self.hasRepeatedScaleX(3):
+            return "other"
+        elif fifth == None:
+            if third.semitones == 4:
+                return "major"
+            elif third.semitones == 3:
+                return "minor"
             else:
-                return "other Triad"
-        elif (self.isSeventh()):
-            if (self.isDominantSeventh()):
-                return "Dominant Seventh"
-            elif (self.isDiminishedSeventh()):
-                return "Dimininshed Seventh"
-            elif (self.isHalfDiminishedSeventh()):
-                return "Half Diminished Seventh"
-            elif (self.isFalseDiminishedSeventh()):
-                return "False Diminished Seventh"
-            else:
-                return "other Seventh"
-    
-    
+                return "other"
+        elif self.hasRepeatedScaleX(5):
+            return "other"
+        elif fifth == 7 and third == 4:
+            return "major"
+        elif fifth == 7 and third == 3:
+            return "minor"
+        elif fifth == 8 and third == 4:
+            return "augmented"
+        elif fifth == 6 and third == 3:
+            return "diminished"
+        else:
+            return "other"
+   
+    quality = property(_getQuality)
+     
     def canBeDominantV(self):
         '''
         Returns True if the chord is a Major Triad or a Dominant Seventh
@@ -2022,29 +2045,33 @@ class Chord(note.NotRest):
                 return False
 
     def _getCommonName(self):
-        '''Get the common name of the TN set class.
-
-        Possible rename forteIndex
+        self._updateChordTablesAddress()
+        ctn = chordTables.addressToCommonNames(self._chordTablesAddress)
+        if len(ctn) == 0:
+            return ''
+        else:
+            return ctn[0]
+        
+    commonName = property(_getCommonName, 
+        doc = '''
+        return the most common name associated with this Chord as a string.
+        does not currently check enharmonic equivalents.
 
         >>> from music21 import *
         >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.commonName
-        ['minor triad']
-
-        >>> c2 = chord.Chord(['c', 'e', 'g'])
-        >>> c2.commonName
-        ['major triad']
-        '''
-        self._updateChordTablesAddress()
-        return chordTables.addressToCommonNames(self._chordTablesAddress)
-        
-    commonName = property(_getCommonName, 
-        doc = '''Return a list of common names as strings that are associated with this Chord.
+        'minor triad'
 
         >>> from music21 import *
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.commonName
-        ['major triad']
+        'major triad'
+
+        >>> from music21 import *
+        >>> c3 = chord.Chord(['c', 'd-', 'e', 'f#'])
+        >>> c3.commonName
+        'all-interval tetrachord'
+
         ''')    
 
 
@@ -2152,13 +2179,13 @@ class Chord(note.NotRest):
         >>> c1.pitches
         [C2, G4, E3]
 
-        >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3'])
+        >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3', 'f-4'])
         >>> c2.removeRedundantPitchClasses()
         >>> c2.pitches
         [C5, G4, E3]
 
         '''
-        return self._removePitchByRedundantAttribute('name',
+        return self._removePitchByRedundantAttribute('pitchClass',
               inPlace=inPlace)
 
 
@@ -2624,11 +2651,11 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.isPrimeFormInversion, False)
         self.assertEqual(c1.hasZRelation, True)
         self.assertEqual(c1.areZRelations(Chord([0,1,4,6,7,9])), True)
-        self.assertEqual(c1.commonName[0], 'combinatorial RI (RI9)')
+        self.assertEqual(c1.commonName, 'combinatorial RI (RI9)')
 
     def testPostTonalChordsB(self):
         c1 = Chord([1, 4, 7, 10])
-        self.assertEqual(c1.commonName[0], 'diminished seventh chord')
+        self.assertEqual(c1.commonName, 'diminished seventh chord')
         self.assertEqual(c1.pitchedCommonName, 'C#-diminished seventh chord')
 
 

@@ -2432,11 +2432,11 @@ class Music21Object(JSONSerializer):
         >>> b.duration.quarterLength
         3.0
         >>> b.articulations
-        [<music21.articulations.Staccato object at 0x...>]
+        [<music21.articulations.Staccato>]
         >>> b.lyric
         'hi'
         >>> b.expressions
-        [<music21.expressions.Mordent object at 0x...>, <music21.expressions.Trill object at 0x...>]
+        [<music21.expressions.Mordent>, <music21.expressions.Trill>]
         >>> c.duration.type
         'quarter'
         >>> c.duration.dots
@@ -2447,7 +2447,7 @@ class Music21Object(JSONSerializer):
         []
         >>> c.lyric
         >>> c.expressions
-        [<music21.expressions.Trill object at 0x...>, <music21.expressions.Fermata object at 0x...>]
+        [<music21.expressions.Trill>, <music21.expressions.Fermata>]
 
         '''
         # was note.splitNoteAtPoint

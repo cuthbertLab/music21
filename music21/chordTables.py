@@ -2128,7 +2128,10 @@ TNREF = {  (1, 1,     0)     : 1,
 # http://www.sweb.cz/vladimir_ladma/english/music/structs/mus_rot.htm
 # Vladimir Ladma, Czech Republic 
 
-SCREF = {(1, 1,    0)     : {"name":("monad","singleton", "unison")},      
+# some changes: unison prefered to monad
+
+
+SCREF = {(1, 1,    0)     : {"name":("unison", "monad","singleton")},      
 (2, 1,      0)     : {"name":("minor second","m2","half step", "semitone")},   
 (2, 2,      0)     : {"name":("major second","M2", "whole step", "whole tone")},    
 (2, 3,      0)     : {"name":("minor third","m3",)},   
@@ -2244,7 +2247,7 @@ SCREF = {(1, 1,    0)     : {"name":("monad","singleton", "unison")},
 (5, 26,  1)    : {"name":("diminished-augmented ninth chord",)},    
 (5, 26, -1)    : {"name":("augmented-diminished ninth chord",)},    
 (5, 27,  1)    : {"name":("major-ninth chord",)},   
-(5, 27, -1)    : {"name":("minor-nonth chord",)},   
+(5, 27, -1)    : {"name":("minor-ninth chord",)},   
 (5, 28,  1)    : {"name":("augmented-sixth pentachord",)},      
 (5, 28, -1)    : {"name":("Javanese pentatonic", "augmented-sixth pentachord")},  
 (5, 29,  1)    : {"name":("Kumoi pentachord",)},   
@@ -2643,7 +2646,8 @@ def addressToZAddress(address):
         return zAddress
 
 def addressToCommonNames(address):
-    '''Given a TN address, return one or more common names if available
+    '''
+    Given a TN address, return one or more common names if available
 
     >>> addressToCommonNames((3,1,0))
     ['chromatic trimirror']
@@ -2658,7 +2662,7 @@ def addressToCommonNames(address):
         return None
 
 def addressToForteName(address, classification='tn'):
-    '''Given an addres, return the set-class name as a string.
+    '''Given an address, return the set-class name as a string.
 
     >>> addressToForteName((8,15,1))
     '8-15A'

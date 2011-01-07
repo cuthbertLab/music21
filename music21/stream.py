@@ -3064,7 +3064,7 @@ class Stream(music21.Music21Object):
             {0.0} <music21.note.Note D#>
         >>> allNotes = partWithMeasures.flat.notes
         >>> [allNotes[0].articulations, allNotes[1].articulations, allNotes[2].articulations]
-        [[<music21.articulations.Staccato object at 0x...>], [], []]
+        [[<music21.articulations.Staccato>], [], []]
         >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
         ['hello', None, None]
         '''

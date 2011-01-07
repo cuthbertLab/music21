@@ -163,47 +163,6 @@ class AbstractScale(Scale):
         return not self.__eq__(other)
 
 
-    def _sumIntervals(self, intervalList):
-        '''Given an interval list, either as Interval objects or strings, find the sum in half steps.
-
-        >>> from music21 import *
-        >>> asc = scale.AbstractScale()
-        >>> asc._sumIntervals(['m2', 'p5'])
-        8
-        >>> asc._sumIntervals(['m2', 'p5', interval.Interval('m2')])
-        9
-        >>> asc._sumIntervals(['M7', 'm2'])
-        12
-        '''
-        group = []
-        for i in intervalList:
-            if isinstance(i, interval.Interval):
-                group.append(i)
-            else:
-                group.append(interval.Interval(i))
-        return sum([i.semitones for i in group])
-
-    def _getOctaveComplement(self, intervalList):
-        '''Return an interval that completes an octave with the lowest implied pitch from the list of intervals. 
-
-        >>> from music21 import *
-        >>> asc = scale.AbstractScale()
-        >>> asc._getOctaveComplement(['m2', 'p5'])
-        <music21.interval.Interval M3>
-        >>> asc._getOctaveComplement(['M7'])
-        <music21.interval.Interval m2>
-        >>> asc._getOctaveComplement(['p8', 'm2'])
-        <music21.interval.Interval M7>
-        >>> asc._getOctaveComplement(['A2'])
-        <music21.interval.Interval D7>
-        '''
-        value = self._sumIntervals(intervalList)
-        semitone = 12 - (value % 12)
-        if semitone == 0:
-            return None
-        else:
-            return interval.Interval(semitone)
-
     def _buildNetwork(self):
         '''Calling the _buildNetwork, with or without parameters, is main job of the AbstractScale class.
         '''
@@ -678,7 +637,8 @@ class AbstractOctaveRepeatingScale(AbstractScale):
             mode = [mode] # place in list
         # get the interval to complete the octave
 
-        iComplement = self._getOctaveComplement(mode)
+        intervalSum = interval.add(mode)
+        iComplement = intervalSum.complement
         if iComplement is not None:
             mode.append(iComplement)
 
@@ -1037,19 +997,21 @@ class ConcreteScale(Scale):
         ''')
 
     def transpose(self, value, inPlace=False):
-        '''Transpose this Scale by the given interval
+        '''
+        Transpose this Scale by the given interval
+
+        note: it does not makes sense to transpose an abstract scale;
+        thus, only concrete scales can be transposed.
 
         >>> from music21 import *
-        >>> sc1 = scale.MajorScale('c')
+        >>> sc1 = scale.MajorScale('C')
         >>> sc2 = sc1.transpose('p5')
         >>> sc2
         <music21.scale.MajorScale G major>
         >>> sc3 = sc2.transpose('p5')
         >>> sc3
         <music21.scale.MajorScale D major>
-        '''
-        # note: it does not makes sense to transpose an abstract scale;
-        # thus, only concrete scales can be transposed. 
+        ''' 
         if inPlace:
             post = self
         else:
@@ -1063,21 +1025,23 @@ class ConcreteScale(Scale):
         # may need to clear cache here
         return post
 
-    def getRomanNumeral(self, degree, figure=None):
+    def romanNumeral(self, degree):
         '''Return a RomanNumeral object built on the specified scale degree.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('a-4')
-        >>> h1 = sc1.getRomanNumeral(1)
-        >>> h1.root
-        A-4
-        >>> h5 = sc1.getRomanNumeral(5)
-        >>> h5.root
-        E-5
-        >>> h5.chord
-        <music21.chord.Chord E-5 G5 B-5>
+        
+        #>>> h1 = sc1.romanNumeral(1)
+        #>>> h1.root
+        #A-4
+        #>>> h5 = sc1.romanNumeral(5)
+        #>>> h5.root
+        #E-5
+        #>>> h5
+        #<music21.chord.Chord E-5 G5 B-5>
         '''
-        return RomanNumeral(self, degree, figure)
+        from music21 import roman
+        return roman.RomanNumeral(degree, self)
 
 
 
@@ -1114,7 +1078,8 @@ class ConcreteScale(Scale):
 
     def getChord(self, minPitch=None, maxPitch=None, 
         direction=DIRECTION_ASCENDING):
-        '''Return a realized chord for this scale
+        '''Return a realized chord containing all the pitches in this scale within
+        a particular range
         '''
         from music21 import chord
         return chord.Chord(self.getPitches(minPitch=minPitch, maxPitch=maxPitch, direction=direction))
@@ -1426,7 +1391,7 @@ class ConcreteScale(Scale):
 
 
 class DiatonicScale(ConcreteScale):
-    '''A concrete diatonic scale. Assumes that all such scales have 
+    '''A concrete diatonic scale. Assumes that all such scales have TODO:CHRIS:finish this doc?
     '''
 
     def __init__(self, tonic=None):
@@ -2024,360 +1989,6 @@ class RagMarwa(ConcreteScale):
 
 
 
-#-------------------------------------------------------------------------------
-class RomanNumeral(object):
-    '''An abstract harmony built from scale degree selections.
-
-    A RomanNumeral is type of concrete scale where the root is the tonic and the bass is defined by step. 
-    '''
-    # a harmony might be seen as a subclass of a concrete scale, but this 
-    # is not always the case.
-    # more often, a harmony is collection of scale steps
-    def __init__(self, scale=None, rootScaleStep=1, figure=None):
-
-        # store a 'live' reference to the scale that this harmony is active one
-        self.scale = scale
-        self.rootScaleStep = rootScaleStep
-
-        # store a mapping of scale steps from root
-        self._members = [0]
-
-        # store as index within members; keys are indicies
-        # into the _members list
-        self._bassMemberIndex = 0
-
-        # store mapping of alterations to members
-        # alterations here need to be stored as mappings of 
-        self._alterations = {}
-
-        # default is to make a triad; could be otherwise
-        self.makeTriad()
-
-
-    def _getRoot(self):
-        return self.scale.pitchFromDegree(self.rootScaleStep)
-
-    root = property(_getRoot, 
-        doc = '''Return the root of this harmony. 
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g')
-        >>> h1 = sc1.getRomanNumeral(1)
-        >>> h1.root
-        G4
-        ''')
-
-    def _getBass(self):
-        return self.scale.pitchFromDegree(self.rootScaleStep + self._members[self._bassMemberIndex])
-
-    bass = property(_getBass, 
-        doc = '''Return the root of this harmony. 
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g')
-        >>> h1 = scale.RomanNumeral(sc1, 1)
-        >>> h1.bass
-        G4
-        ''')
-
-
-    def nextInversion(self):
-        '''Invert the harmony one position, or place the next member after the current bass as the bass
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.RomanNumeral(sc1, 5)
-        >>> h1.getPitches()
-        [D5, F#5, A5]
-        >>> h1.nextInversion()
-        >>> h1._bassMemberIndex
-        1
-        >>> h1.getPitches()
-        [F#5, A5, D6]
-
-        '''
-        self._bassMemberIndex = (self._bassMemberIndex + 1) % len(self._members)
-        
-
-    def _memberIndexToPitch(self, memberIndex, minPitch=None,
-         maxPitch=None, direction=DIRECTION_ASCENDING):
-        '''Given a member index, return the scale degree
-
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.RomanNumeral(sc1, 5)
-        >>> h1._memberIndexToPitch(0)
-        D5
-        >>> h1._memberIndexToPitch(1)
-        F#5
-        '''
-        return self.scale.pitchFromDegree(
-                    self._memberIndexToScaleDegree(memberIndex), 
-                    minPitch=minPitch, maxPitch=maxPitch)
-
-
-    def _memberIndexToScaleDegree(self, memberIndex):
-        '''Return the degree in the underlying scale given a member index.
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.RomanNumeral(sc1, 5)
-        >>> h1._memberIndexToScaleDegree(0)
-        5
-        >>> h1._memberIndexToScaleDegree(1)
-        7
-        >>> h1._memberIndexToScaleDegree(2)
-        9
-        '''
-        # note that results are not taken to the modulus of the scale
-        # make an option
-        return self.rootScaleStep + self._members[memberIndex]
-
-
-    def _degreeToMemberIndex(self, degree):
-        '''Return the member index of a provided degree, assuming that degree is a member.
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.RomanNumeral(sc1, 5)
-        >>> h1._degreeToMemberIndex(1)
-        0
-        >>> h1._degreeToMemberIndex(3)
-        1
-        >>> h1._degreeToMemberIndex(5)
-        2
-        '''
-        return self._members.index(degree-1)
-
-
-
-    def _prepareAlterations(self):
-        '''Prepare the alterations dictionary to conform to the presentation necessary for use in IntervalNetwork. All stored member indexes need to be converted to scale degrees.
-        '''
-        post = {}
-        for key, value in self._alterations:
-            
-            post
-
-    def pitchFromDegree(self, degree, minPitch=None,
-         maxPitch=None, direction=DIRECTION_ASCENDING):
-        '''Given a chord degree, such as 1 (for root), 3 (for third chord degree), return the pitch.
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.RomanNumeral(sc1, 5)
-        >>> h1.pitchFromDegree(1)
-        D5
-        >>> h1.pitchFromDegree(2) # not a member, but we can get pitch
-        E5
-        >>> h1.pitchFromDegree(3) # third
-        F#5
-
-        '''
-        return self.scale.pitchFromDegree(
-                    self.rootScaleStep + degree-1, 
-                    minPitch=minPitch, maxPitch=maxPitch)
-
-
-
-    def scaleDegreeFromDegree(self, degree, minPitch=None,
-         maxPitch=None, direction=DIRECTION_ASCENDING):
-        '''Given a degree in this Harmony, such as 3, or 5, return the scale degree in the underlying scale
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.RomanNumeral(sc1, 5)
-        >>> h1.scaleDegreeFromDegree(1)
-        5
-        >>> h1.scaleDegreeFromDegree(3)
-        7
-        '''
-        # note: there may be a better way to do this that 
-        return self.scale.getScaleDegreeFromPitch(
-            self.pitchFromDegree(degree, minPitch=minPitch, maxPitch=maxPitch, direction=direction))
-
-
-    def getPitches(self, minPitch=None, maxPitch=None,
-         direction=DIRECTION_ASCENDING):
-        '''Return the pitches the constitute this RomanNumeral with the present Scale.
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.RomanNumeral(sc1, 1)
-        >>> h1.makeTriad()
-        >>> h1.getPitches()
-        [G4, B4, D5]
-        >>> h1.rootScaleStep = 7
-        >>> h1.getPitches()
-        [F#5, A5, C6]
-
-        >>> h1.rootScaleStep = 5
-        >>> h1.getPitches('c2','c8')
-        [D2, F#2, A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5, D6, F#6, A6, D7, F#7, A7]
-
-        '''
-        # first, get members, than orient bass/direction
-        post = []
-        bass = self._memberIndexToPitch(self._bassMemberIndex, 
-                minPitch=minPitch, maxPitch=maxPitch, direction=direction)
-
-        #bass = self.scale.pitchFromDegree(self.rootScaleStep + 
-        #            self._members[self._bassMemberIndex], 
-        #            minPitch=minPitch, maxPitch=maxPitch)
-
-        # for now, getting directly from network
-        #self.scale.abstract._net.realizePitchByStep()
-
-        degreeTargets = [self.rootScaleStep + n for n in self._members]
-
-        if maxPitch is None:
-            # assume that we need within an octave above the bass
-            maxPitch = bass.transpose('M7')
-
-        # transpose up bass by m2, and assign to min
-        post = self.scale.pitchesFromScaleDegrees(
-            degreeTargets=degreeTargets, 
-            minPitch=bass.transpose('m2'), 
-            maxPitch=maxPitch, 
-            direction=direction)
-
-        #environLocal.printDebug(['getPitches', 'post', post, 'degreeTargets', degreeTargets, 'bass', bass, 'minPitch', minPitch, 'maxPitch', maxPitch])
-
-        # add bass in front
-        post.insert(0, bass)
-        return post
-
-    pitches = property(getPitches, 
-        doc = '''Get the minimum default pitches for this RomanNumeral
-        ''')
-
-
-    def _alterDegree(self, degree, alteration):
-        '''Given a scale degree as well as an alteration, configure the 
-        alteredDegrees dictionary.
-        '''
-        # TODO
-        pass
-
-
-
-    def getChord(self, minPitch=None, maxPitch=None,
-         direction=DIRECTION_ASCENDING):
-        '''Return a realized chord for this harmony
-        '''
-        from music21 import chord
-        return chord.Chord(self.getPitches(minPitch=minPitch, maxPitch=maxPitch, direction=direction))
-
-    chord = property(getChord, 
-        doc = '''Return a Chord object form this harmony over a default range
-        ''')
-
-
-    def _parseFigure(self, figure):
-        '''
-        Given a figure string, returns a list of parsed elements.
-        Each element is a tuple, consisting of the interval and the
-        corresponding accidental string (None if there isn't any)
-
-        Based on code by Jose Cabal-Ugaz.
-        
-        >>> from music21 import *   
-        >>> h1 = scale.RomanNumeral()
-        >>> h1._parseFigure('6#,5,3')
-        [(6, '#'), (5, None), (3, None)]
-        >>> h1._parseFigure('6-,3-')
-        [(6, '-'), (3, '-')]
-        >>> h1._parseFigure('7-,#3')
-        [(7, '-'), (3, '#')]
-        '''
-        pattern = '[,]'
-        notations = re.split(pattern, figure)
-        translations = []
-        patternA1 = '[#-nN/][1-7]' #example: -6
-        patternA2 = '[1-7][#-nN+/]' #example: 6+
-        patternB = '[1-7]' #example: 6
-        patternC = '[#-N+]' #example: # (which implies #3)
-        intervalAboveBass = None
-        accidentalString = None
-
-        for n in notations:
-            n = n.strip()
-            if re.match(patternA1, n) != None:
-                intervalAboveBass = int(n[1])
-                accidentalString = n[0]
-            elif re.match(patternA2, n) != None:
-                intervalAboveBass = int(n[0])
-                accidentalString = n[1]
-            elif re.match(patternB, n) != None:
-                intervalAboveBass = int(n[0])
-                accidentalString = None
-            elif re.match(patternC, n) != None:
-                intervalAboveBass = 3
-                accidentalString = n[0]
-            translations.append((intervalAboveBass, accidentalString))
-            
-        return translations
-    
-
-
-    def makeTriad(self):
-        '''Configure this triad as a diatonic triad
-        '''
-        self._members = [0,2,4] 
-
-    def makeSeventhChord(self):
-        '''Configure this triad as a diatonic seventh chord
-        '''
-        self._members = [0,2,4,6] 
-
-    def makeNinthChord(self):
-        '''Configure this triad as a diatonic seventh chord
-        '''
-        self._members = [0,2,4,6,8] 
-
-
-    def _getRomanNumeral(self):
-        '''
-
-        >>> from music21 import *
-        >>> sc1 = scale.MajorScale('g4')
-        >>> h1 = scale.RomanNumeral(sc1, 2)
-        >>> h1.romanNumeral
-        'ii'
-        >>> h1.romanNumeral = 'vii'
-        >>> h1.chord
-        <music21.chord.Chord F#5 A5 C6>
-        '''
-        notation = []
-        rawNumeral = common.toRoman(self.rootScaleStep)
-
-        # for now, can just look at chord to get is minor
-        # TODO: get intervals; measure intervals over the bass
-        # need to realize in tandem with returning intervals
-
-        c = self.chord
-        if c.isMinorTriad():
-            rawNumeral = rawNumeral.lower()
-        elif c.isMajorTriad():
-            rawNumeral = rawNumeral.upper()
-    
-        # todo: add inversion symbol
-        return rawNumeral
-
-    def _setRomanNumeral(self, numeral):
-        # TODO: strip off inversion figures and configure inversion
-        self.rootScaleStep = common.fromRoman(numeral)
-
-    romanNumeral = property(_getRomanNumeral, _setRomanNumeral,
-        doc='''Return the roman numeral representation of this RomanNumeral, or set this RomanNumeral with a roman numeral representation.
-        ''')
-
-
-    def setFromPitches(self):
-        '''Given a list of pitches or pitch-containing objects, find a root and inversion that provides the best fit.
-        '''
-        pass
 
 
 
@@ -2594,45 +2205,6 @@ class Test(unittest.TestCase):
 
 
 
-        # associating a harmony with a scale
-        sc1 = MajorScale('g4')
-
-        # define undefined
-        #rn3 = sc1.romanNumeral(3, figure="7")
-
-        h1 = RomanNumeral(sc1, 1)
-        h2 = RomanNumeral(sc1, 2)
-        h3 = RomanNumeral(sc1, 3)
-        h4 = RomanNumeral(sc1, 4)
-        h5 = RomanNumeral(sc1, 5)
-
-        # can get pitches or roman numerals
-        self.assertEqual(str(h1.pitches), '[G4, B4, D5]')
-        self.assertEqual(str(h2.pitches), '[A4, C5, E5]')
-        self.assertEqual(h2.romanNumeral, 'ii')
-        self.assertEqual(h5.romanNumeral, 'V')
-        
-        # can get pitches from various ranges, invert, and get bass
-        h5.nextInversion()
-        self.assertEqual(str(h5.bass), 'F#5')
-        self.assertEqual(str(h5.getPitches('c2', 'c6')), '[F#2, A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5]')
-
-        h5.nextInversion()
-        self.assertEqual(str(h5.getPitches('c2', 'c6')), '[A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5]')
-
-        h5.nextInversion()
-        self.assertEqual(str(h5.bass), 'D5')
-        self.assertEqual(str(h5.getPitches('c2', 'c6')), '[D2, F#2, A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5]')
-
-
-        sc1 = MajorScale('g4')
-        h2 = RomanNumeral(sc1, 2)
-        h2.makeSeventhChord()
-        self.assertEqual(str(h2.getPitches('c4', 'c6')), '[A4, C5, E5, G5, A5, C6]')
-
-        h2.makeNinthChord()
-        self.assertEqual(str(h2.getPitches('c4', 'c6')), '[A4, B4, C5, E5, G5, A5, B5, C6]')
-        #h2.chord.show()
 
 
 

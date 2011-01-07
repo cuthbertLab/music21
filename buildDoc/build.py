@@ -55,6 +55,7 @@ from music21.musicxml import translate as musicxmlTranslate
 from music21 import note
 from music21 import node
 from music21 import pitch
+from music21 import roman
 from music21 import scale
 from music21 import serial
 from music21 import sieve
@@ -131,7 +132,8 @@ MODULES = [
 
     note, 
     node, 
-    pitch, 
+    pitch,
+    roman, 
 
     scale,     
     serial,     

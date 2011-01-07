@@ -124,6 +124,9 @@ class Articulation(music21.Music21Object):
         self._mxName = None # specified in subclasses
         self.placement = 'above'
 
+    def __repr__(self):
+        return '<music21.articulations.%s>' % (self.__class__.__name__)
+    
     def __eq__(self, other):
         '''
         Equality. Based only on the class name, 

@@ -28,8 +28,8 @@ shorthandNotation = {(None,) : (5,3),
                      (4,2) : (6,4,2)
                      }
 
-class Notation:
-    def __init__(self, notationColumn):
+class Notation(object):
+    def __init__(self, notationColumn = ""):
         '''
         Convenience class for representing a figured bass notation column.
         
@@ -44,6 +44,12 @@ class Notation:
         >>> n3 = n.Notation('-6,-')
         >>> n3.figures
         [<music21.figuredBass.notation.Figure 6 <modifier - <accidental flat>>>, <music21.figuredBass.notation.Figure 3 <modifier - <accidental flat>>>]
+        >>> n3b = n.Notation('b6,b')
+        >>> n3b.figures
+        [<music21.figuredBass.notation.Figure 6 <modifier b <accidental flat>>>, <music21.figuredBass.notation.Figure 3 <modifier b <accidental flat>>>]
+        >>> n3b.numbers
+        (6, 3)
+
         
         OMIT_FROM_DOCS
         >>> n4 = n.Notation('4,2+')
