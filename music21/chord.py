@@ -1386,21 +1386,24 @@ class Chord(note.NotRest):
         >>> c11 = chord.Chord(['F3','D4','A4'])
         >>> c11.isConsonant()
         True
+        >>> c12 = chord.Chord(['F3','D4','A4','E#4'])
+        >>> c12.isConsonant()
+        False
         
         '''
-        c2 = self.removeRedundantPitchClasses(inPlace = False)
-        if c2.pitchClassCardinality == 1:
+        c2 = self.removeRedundantPitchNames(inPlace = False)
+        if len(c2.pitches) == 1:  
             return True
-        elif c2.pitchClassCardinality == 2:
+        elif len(c2.pitches) == 2:
             c3 = self.closedPosition()
-            c4 = c3.removeRedundantPitches(inPlace = False)
+            c4 = c3.removeRedundantPitches(inPlace = False) # to get from lowest to highest for P4 protection
             
             i = interval.notesToInterval(c4.pitches[0], c4.pitches[1])
             if i.simpleName == 'P5' or i.simpleName == 'm3' or i.simpleName == 'M3' or i.simpleName == 'm6' or i.simpleName == 'M6':
                 return True
             else:
                 return False
-        elif c2.pitchClassCardinality == 3:
+        elif len(c2.pitches) == 3:
             if (self.isMajorTriad() is True or self.isMinorTriad() is True) and (self.inversion() != 2):
                 return True
             else:
@@ -2187,6 +2190,25 @@ class Chord(note.NotRest):
         '''
         return self._removePitchByRedundantAttribute('pitchClass',
               inPlace=inPlace)
+
+    def removeRedundantPitchNames(self, inPlace=True):
+        '''Remove all but the FIRST instance of a pitch class with more than one instance of that pitch name
+        regardless of octave (but note that spelling matters, so that in the example, the F-flat stays even
+        though there is already an E.
+
+        If `inPlace` is True, a copy is not made and None is returned; otherwise a copy is made and that 
+        copy is returned.
+
+        >>> from music21 import *
+        >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3', 'f-4'])
+        >>> c2.removeRedundantPitchNames()
+        >>> c2.pitches
+        [C5, G4, E3, F-4]
+
+        '''
+        return self._removePitchByRedundantAttribute('name',
+              inPlace=inPlace)
+
 
 
     #---------------------------------------------------------------------------
