@@ -237,7 +237,7 @@ class NotationException(music21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class Figure:
+class Figure(object):
     '''
     A figure consists of a number with its modifier,
     if applicable.
@@ -257,9 +257,11 @@ class FigureException(music21.Music21Exception):
 #-------------------------------------------------------------------------------
 specialModifiers = {'+' : '#',
                     '/' : '-',
-                    '\\' : '#'}
+                    '\\' : '#',
+                    'b' : '-',
+                    }
 
-class Modifier:
+class Modifier(object):
     def __init__(self, modifierString):
         self.modifierString = modifierString
         self.accidental = self._toAccidental()
@@ -275,6 +277,7 @@ class Modifier:
         >>> m2 = n.Modifier('-')
         >>> m3 = n.Modifier('n')
         >>> m4 = n.Modifier('+') #Raises pitch by semitone
+        >>> m5 = n.Modifier('b') #acceptable for flat since note names not allowed
         >>> m1.accidental        
         <accidental sharp>
         >>> m2.accidental  
@@ -283,6 +286,8 @@ class Modifier:
         <accidental natural>
         >>> m4.accidental
         <accidental sharp>
+        >>> m5.accidental
+        <accidental flat>
         '''
         if self.modifierString == None:
             return None
