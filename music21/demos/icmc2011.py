@@ -35,15 +35,32 @@ class Test(unittest.TestCase):
 
     def testStreams01(self):
         from music21 import note, stream, clef
-        n1 = note.Note('g4', type='half')
-        n2 = note.Note('d5', type='half')
-        r1 = note.Rest(type='whole')
+        n1 = note.Note('g3', type='half')
+        n2 = note.Note('d4', type='half')
+        n3 = note.Note('g#3', quarterLength=.25)
+        n4 = note.Note('d-4', quarterLength=.75)
         cf1 = clef.AltoClef()
+
         m1 = stream.Measure()
-        m1.append([n1, n2, r1])
+        m1.append([n1, n2])
         m1.insert(0, cf1)
-        m1.show()
+        # test
+        self.assertEqual(m1.clef, cf1)
+
+        m2 = stream.Measure()
+        m2.append([n3, n4])
+
+        p1 = stream.Part()
+        p1.append([m1, m2])
+
+        s1 = stream.Score()
+        s1.append(p1)
         #s1.show()
+
+
+
+
+        r1 = note.Rest(type='whole')
 
 
 

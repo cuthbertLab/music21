@@ -1616,6 +1616,9 @@ class Duration(DurationCommon):
             self._quarterLengthNeedsUpdating = True
         if 'type' in keywords:
             self.addDurationUnit(DurationUnit(keywords['type']))
+        # permit as keyword so can be passed from notes
+        if 'quarterLength' in keywords:
+            self.quarterLength = keywords['quarterLength']
       
         # only apply default if components are empty
         # looking at private _components so as not to trigger
