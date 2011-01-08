@@ -38,9 +38,12 @@ class Test(unittest.TestCase):
         n1 = note.Note('g4', type='half')
         n2 = note.Note('d5', type='half')
         r1 = note.Rest(type='whole')
-        s1 = stream.Stream()
-        s1.append([n1, n2, r1])
-        s1.show()
+        cf1 = clef.AltoClef()
+        m1 = stream.Measure()
+        m1.append([n1, n2, r1])
+        m1.insert(0, cf1)
+        m1.show()
+        #s1.show()
 
 
 
