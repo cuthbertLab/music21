@@ -27,10 +27,22 @@ environLocal = environment.Environment(_MOD)
 class Test(unittest.TestCase):
 
     def runTest(self):
-        '''
+        ''' 
         '''
         pass
     
+
+
+    def testStreams01(self):
+        from music21 import note, stream, clef
+        n1 = note.Note('g4', type='half')
+        n2 = note.Note('d5', type='half')
+        r1 = note.Rest(type='whole')
+        s1 = stream.Stream()
+        s1.append([n1, n2, r1])
+        s1.show()
+
+
 
 
     def testEx01(self):
@@ -193,9 +205,10 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
         #t.testEx02()
-        t.testEx03()
+        #t.testEx03()
         #t.testEx04()
 
+        t.testStreams01()
 
 #------------------------------------------------------------------------------
 # eof

@@ -996,7 +996,7 @@ class Rest(GeneralNote):
     # as this is necessary in mxl
 
     def __init__(self, *arguments, **keywords):
-        GeneralNote.__init__(self)
+        GeneralNote.__init__(self, **keywords)
 
     def __repr__(self):
         return "<music21.note.Rest %s>" % self.name
