@@ -1141,7 +1141,7 @@ class Metadata(music21.Music21Object):
         # search for any keywords that match attributes 
         # these are for direct Contributor access, must have defined
         # properties
-        for attr in ['composer', 'date']:
+        for attr in ['composer', 'date', 'title']:
             if attr in keywords.keys():
                 setattr(self, attr, keywords[attr])
         

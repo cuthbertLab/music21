@@ -34,29 +34,104 @@ class Test(unittest.TestCase):
 
 
     def testStreams01(self):
-        from music21 import note, stream, clef
+        from music21 import note, stream, clef, metadata, spanner
+
+
+        #==== "fig-df02"
+
         n1 = note.Note('g3', type='half')
         n2 = note.Note('d4', type='half')
-        n3 = note.Note('g#3', quarterLength=.25)
-        n4 = note.Note('d-4', quarterLength=.75)
+        n3 = note.Note('g#3', quarterLength=0.5)
+        n4 = note.Note('d-4', quarterLength=3.5)
         cf1 = clef.AltoClef()
 
         m1 = stream.Measure()
         m1.append([n1, n2])
         m1.insert(0, cf1)
-        # test
-        self.assertEqual(m1.clef, cf1)
+
+        # the measure has three elements
+        assert len(m1) == 3
+        # the offset returned is the most-recently set
+        assert n2.offset == 2.0
+        # automatic sorting positions Clef first
+        assert m1[0] == cf1
+        # list-like indices follow sort order 
+        assert m1.index(n2) == 2
+        # can find an element based on a given offset
+        assert m1.getElementAtOrBefore(3) == n2 
 
         m2 = stream.Measure()
         m2.append([n3, n4])
 
+        # appended position is after n3
+        assert n4.offset == .5 
+        assert m2.highestOffset == .5 
+        # can access objects on elements
+        assert m2[1].duration.quarterLength == 3.5 
+        # the Stream duration is the highest offset + duration
+        assert m2.duration.quarterLength == 4 
+
         p1 = stream.Part()
         p1.append([m1, m2])
 
+        # the part has 2 components
+        assert len(p1) == 2
+        # the Stream duration is the highest offset + durations
+        assert p1.duration.quarterLength == 8
+        # can access notes using multiple indices
+        assert p1[1][0].pitch.nameWithOctave == 'G#3'
+
         s1 = stream.Score()
         s1.append(p1)
+        md = metadata.Metadata(title='The music21 Stream')
+        s1.insert(0, md)
+        # calling show by default renders musicxml output
         #s1.show()
 
+        #==== "fig-df02" end
+
+
+
+        #==== "fig-df03"
+        # show positioning the same element in multiple containers
+        # do not yet use a flat representation
+        s2 = stream.Stream()
+        s3 = stream.Stream()        
+        s2.insert(10, n2)
+        s3.insert(40, n2)
+            
+        # the offset attribute returns the last assigned
+        assert n2.offset == 40
+        # we can provide a site to finde a location-specific offset
+        assert n2.getOffsetBySite(m1) == 2.0
+        assert n2.getOffsetBySite(s2) == 10
+        # the None site provides a default offset
+        assert n2.getSites() == [None, m1, s2, s3]
+        # the same instance is found in all Streams
+        assert m1.hasElement(n2) == True
+        assert s2.hasElement(n2) == True
+        assert s3.hasElement(n2) == True
+
+        # only offset is independent to each location
+        n2.pitch.transpose('-M2', inPlace=True)
+        assert s2[s2.index(n2)].nameWithOctave == 'C4'
+        assert s3[s3.index(n2)].nameWithOctave == 'C4'
+        assert m1[m1.index(n2)].nameWithOctave == 'C4'
+
+        # the transposition is maintained in the original context
+        #s1.show()
+
+        #==== "fig-df03" end
+
+
+
+
+
+
+
+
+        # tests
+        self.assertEqual(m1.clef, cf1)
 
 
 
