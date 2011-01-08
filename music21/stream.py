@@ -2007,7 +2007,7 @@ class Stream(music21.Music21Object):
 
     def measures(self, numberStart, numberEnd, 
         collect=[clef.Clef, meter.TimeSignature, 
-        instrument.Instrument, key.KeySignature]):
+        instrument.Instrument, key.KeySignature], gatherSpanners=True):
         '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
         Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.  
@@ -2028,18 +2028,38 @@ class Stream(music21.Music21Object):
         mNumbersUnique = [] # store just the numbers
         mStream = self.getElementsByClass('Measure')
 
+        # TODO: calling .flat here causes unidentified problems in further
+        # processing of the returnObj; need to investigate further
+        #tempFlat = self.flat
+        #environLocal.printDebug(['measures(): post flat call', self, 'len(self.flat)', len(self.flat)])
+
+        # spanners may be store at the container level, not w/n a measure
+        # if they are within the Measure, or a voice, they will be transfered
+        # below
+        mStreamSpanners = self.spanners
+
         returnObj = self.__class__()
         returnObj.mergeAttributes(self) # get id and groups
         srcObj = self
 
         # if we have no Measure defined, call makeNotation
-        # this will over return a deepcopy of all objects
+        # this will  return a deepcopy of all objects
         if len(mStream) == 0:
             mStream = self.makeNotation(inPlace=False)
             # need to set srcObj to this new stream
             srcObj = mStream
+            # get spanners from make notation, as this will be a copy
+            # TODO: make sure that makeNotation copies spanners
+            mStreamSpanners = mStream.spanners
+
+        if gatherSpanners:
+            for sp in mStreamSpanners:
+                #environLocal.printDebug(['copying spanner to returnObj', sp])
+                # store in flat locations? could also be end elements?
+                returnObj.insert(sp.getOffsetBySite(allSpanners), sp)
 
         for m in mStream.elements:
+            #environLocal.printDebug(['m', m])
             # mId is a tuple of measure nmber and any suffix
             mId = (m.number, m.numberSuffix)
             # store unique measure numbers for reference
@@ -2051,7 +2071,7 @@ class Stream(music21.Music21Object):
             # there may be multiple None and/or 0 measure numbers
             mapRaw[mId].append(m)
 
-        #environLocal.printDebug(['mapRaw', mapRaw])
+        #environLocal.printDebug(['len(mapRaw)', len(mapRaw)])
 
         # if measure numbers are not defined, we should just count them 
         # in order, starting from 1
@@ -2067,6 +2087,7 @@ class Stream(music21.Music21Object):
         else:
             mapCooked = mapRaw
         #environLocal.printDebug(['mapCooked', mapCooked])
+        #environLocal.printDebug(['len(mapCooked)', len(mapCooked)])
 
         startOffset = None # set with the first measure
         startMeasure = None # store for adding other objects
@@ -2092,7 +2113,10 @@ class Stream(music21.Music21Object):
                 # this may not always be the case
                 if startOffset == None: # only set on first
                     startOffset = m.getOffsetBySite(srcObj)
+                    # store reference for collecting objects in src
                     startMeasure = m
+
+                #environLocal.printDebug(['startOffset', startOffset, 'startMeasure', startMeasure])
 
                 # create a new Measure container, but populate it 
                 # with the same elements
@@ -2102,7 +2126,8 @@ class Stream(music21.Music21Object):
                 if startMeasureNew is None:
                     startMeasureNew = mNew
 
-                # transfer elements to the new measure
+                # transfer elements to the new measure; these are not copies
+                # this might contain voices and/or spanners
                 for e in m._elements:
                     mNew.insert(e)
                 for e in m._endElements:
@@ -2123,7 +2148,8 @@ class Stream(music21.Music21Object):
             found = startMeasure.getElementsByClass(className)
             if len(found) > 0:
                 continue # already have one on this measure
-
+            # do a context search for the class, searching all stored
+            # locations
             found = startMeasure.getContextByClass(className)
             if found != None:
                 # only insert into measure new
@@ -2131,6 +2157,8 @@ class Stream(music21.Music21Object):
                 startMeasureNew.insert(0, found)
             else:
                 environLocal.printDebug(['measures(): cannot find requested class in stream:', className])
+
+        #environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
 
         return returnObj
 
@@ -7008,7 +7036,7 @@ class Score(Stream):
 
     def measures(self, numberStart, numberEnd, 
         collect=[clef.Clef, meter.TimeSignature, 
-        instrument.Instrument, key.KeySignature]):
+        instrument.Instrument, key.KeySignature], gatherSpanners=True):
         '''This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
         '''
         post = Score()
@@ -7016,14 +7044,20 @@ class Score(Stream):
         # note that this will strip all objects that are not Parts
         for p in self.getElementsByClass('Part'):
             # insert all at zero
-            post.insert(0, p.measures(numberStart, numberEnd,
-                        collect))
+            measuredPart = p.measures(numberStart, numberEnd,
+                        collect, gatherSpanners=gatherSpanners)
+            post.insert(0, measuredPart)
+        # must manually add any spanners; do not need to add .flat, as Stream.measures will handle lower level
+        if gatherSpanners:
+            spStream = self.spanners
+            for sp in spStream:
+                post.insert(0, sp)
         return post
 
 
     def measure(self, measureNumber, 
         collect=[clef.Clef, meter.TimeSignature, 
-        instrument.Instrument, key.KeySignature]):
+        instrument.Instrument, key.KeySignature], gatherSpanners=True):
         '''Given a measure number, return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
 
         This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
@@ -7039,9 +7073,15 @@ class Score(Stream):
         # note that this will strip all objects that are not Parts
         for p in self.getElementsByClass('Part'):
             # insert all at zero
-            mStream = p.measures(measureNumber, measureNumber, collect=collect)
+            mStream = p.measures(measureNumber, measureNumber, 
+                collect=collect, gatherSpanners=gatherSpanners)
             if len(mStream) > 0:
                 post.insert(0, mStream)
+
+        if gatherSpanners:
+            spStream = self.spanners
+            for sp in spStream:
+                post.insert(0, sp)
         return post
 
 
@@ -11787,13 +11827,18 @@ class Test(unittest.TestCase):
         from music21 import stream, corpus
         s = corpus.parseWork('gloria')
         #s.show()
-        post = s.measures(0,20).chordify()
-
-        self.assertEqual([e.offset for e in post.notes], [0.0, 3.0, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 21.5, 22.0, 22.5, 23.0, 23.5, 24.0, 24.5, 25.0, 25.5, 26.0, 26.5, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 40.5, 41.0, 42.0, 43.5, 45.0, 45.5, 46.0, 46.5, 47.0, 47.5, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 54.5, 55.0, 55.5, 56.0, 56.5, 57.0, 58.5, 59.5])
+        post = s.measures(0,20, gatherSpanners=False)
+        # somehow, this is doubling measures
         #post.show()
+
+        self.assertEqual([e.offset for e in post.parts[0].flat.notes], [0.0, 3.0, 3.5, 4.5, 5.0, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 41.0, 42.0, 43.5, 45.0, 45.5, 46.5, 47.0, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 55.5, 57.0, 58.5])
+
+        post = post.chordify()
+        self.assertEqual([e.offset for e in post.notes], [0.0, 3.0, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 21.5, 22.0, 22.5, 23.0, 23.5, 24.0, 24.5, 25.0, 25.5, 26.0, 26.5, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 40.5, 41.0, 42.0, 43.5, 45.0, 45.5, 46.0, 46.5, 47.0, 47.5, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 54.5, 55.0, 55.5, 56.0, 56.5, 57.0, 58.5, 59.5])
 
         self.assertEqual(len(post.getElementsByClass('Chord')), 71)
 
+# this is not write [0.0, 6.0, 6.5, 7.5, 8.0, 8.5, 12.0, 12.5, 13.5, 14.5, 18.0, 19.5, 24.0, 30.0, 31.5, 32.5, 36.0, 36.5, 37.0, 37.5, 38.0, 38.5, 42.0, 42.5, 43.0, 43.5, 44.0, 44.5, 48.0, 48.5, 49.0, 49.5, 50.0, 50.5, 54.0, 60.0, 66.0, 67.5, 68.5, 72.0, 73.5, 74.0, 78.0, 79.0, 79.5, 80.0, 84.0, 85.5, 90.0, 90.5, 91.0, 91.5, 92.0, 92.5, 96.0, 97.5, 102.0, 102.5, 103.0, 103.5, 104.0, 104.5, 108.0, 108.5, 109.0, 109.5, 110.0, 110.5, 114.0, 115.5, 116.5] 
 
     def testChordifyRests(self):
         # test that chordify does not choke on rests
@@ -12458,7 +12503,8 @@ if __name__ == "__main__":
 
         #t.testVoicesToPartsA()
         #t.testDeepcopySpanners()
-        t.testAddSlurByMelisma()
+        #t.testAddSlurByMelisma()
+        t.testChordifyImported()
 
 
 #------------------------------------------------------------------------------

@@ -1015,6 +1015,7 @@ class DefinedContexts(object):
         if post != None:
             return post
 
+        # all objs here are containers, as they are all locations
         for obj in objs:
             if obj is None: 
                 continue # in case the reference is dead
@@ -3994,6 +3995,7 @@ def mainTest(*testClasses):
             music21.mainTest(Test)
     '''
     
+
     if ('noDocTest' in testClasses):
         s1 = unittest.TestSuite()
     else: 
@@ -4015,6 +4017,8 @@ def mainTest(*testClasses):
     runner.verbosity = verbosity
     runner.run(s1)  
 
+
+#------------------------------------------------------------------------------
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         mainTest(Test)

@@ -1580,6 +1580,28 @@ class Test(unittest.TestCase):
 
         #s.show()
 
+
+    def testSpannersA(self):
+
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive
+        
+        s = converter.parse(testPrimitive.spanners33a)
+        # this number will change as more are being imported
+        self.assertEqual(len(s.spanners), 2)
+
+        self.assertEqual(len(s.spanners), 2)
+
+        environLocal.printDebug(['pre s.measures(2,3)', 's', s])
+        ex = s.measures(2, 3) # this needs to get all spanners too
+
+        # all spanners are referenced over; even ones that may not be relevant
+        self.assertEqual(len(ex.spanners), 2)
+        #ex.show()
+        
+        # slurs are on measures 2, 3
+        # crescendos are on measures 4, 5
+
 if __name__ == "__main__":
     import sys
 
@@ -1590,7 +1612,9 @@ if __name__ == "__main__":
         #t.testVoices()
         #t.testSlurInputA()
         #t.testMultipleStavesPerPartA()
-        t.testMultipleStavesPerPartC()
+        #t.testMultipleStavesPerPartC()
+        t.testSpannersA()
+
 
 
 

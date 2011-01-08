@@ -543,8 +543,10 @@ class Slur(Spanner):
 
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
-
         self.placement = None # can above or below, after musicxml
+        # line type is only needed as a start parameter; suggest that
+        # this should also have start/end parameters
+        self.lineType = None # can be "dashed" or None
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
@@ -567,8 +569,6 @@ class DynamicWedge(Spanner):
         msg = Spanner.__repr__(self)
         msg = msg.replace(self._reprHead, '<music21.spanner.DynamicWedge ')
         return msg
-    
-
 
 class Crescendo(DynamicWedge):
     '''A spanner crescendo wedge.
@@ -599,7 +599,6 @@ class Crescendo(DynamicWedge):
         post['type'] = 'stop'  # end is always stop
         post['spread'] = self.spread # end with spread
         return post
-
 
 class Diminuendo(DynamicWedge):
     '''A spanner diminuendo wedge.

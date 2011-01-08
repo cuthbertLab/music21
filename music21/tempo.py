@@ -19,7 +19,11 @@ import music21
 import music21.note
 import music21.common
 
+
+from music21 import environment
 _MOD = "tempo.py"
+environLocal = environment.Environment(_MOD)
+
 
 # all lowercase, even german
 defaultTempoValues = {
@@ -35,7 +39,7 @@ defaultTempoValues = {
      'fast': 132,
      'schnell': 132,
      'molto allegro': 144,
-     'très vite': 144,
+     u'très vite': 144,
      'presto': 168,
      'prestissimo': 200}
 
@@ -53,7 +57,11 @@ class TempoMark(music21.Music21Object):
     
     >>> tm.number
     52
-    >>> tm2 = music21.tempo.TempoMark("très vite")
+    >>> tm2 = music21.tempo.TempoMark(u"très vite")
+    >>> tm2.value.endswith('vite')
+    True
+    >>> tm2.value == u'très vite'
+    True
     >>> tm2.number
     144
     >>> tm3 = music21.tempo.TempoMark("extremely, wicked fast!")
@@ -72,8 +80,14 @@ class TempoMark(music21.Music21Object):
             self.number = value
         else:
             self.value = value
-            if value and value.lower() in defaultTempoValues:
+            if value.lower() in defaultTempoValues.keys():
+                self.number = defaultTempoValues[value.lower()]
+            elif value in defaultTempoValues.keys():
                 self.number = defaultTempoValues[value]
+            else:
+                pass
+                #print 'cannot match value', value
+                #environLocal.printDebug(['cannot match', value.decode('utf-8')])    
     
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, self.value)
@@ -111,7 +125,8 @@ class MetronomeMark(TempoMark):
     def __repr__(self):
         return "<music21.tempo.MetronomeMark %s>" % str(self.number)
 
-def interpolateElements(element1, element2, sourceStream, destinationStream, autoAdd = True):
+def interpolateElements(element1, element2, sourceStream, 
+    destinationStream, autoAdd = True):
     '''
     
     Assume that element1 and element2 are two elements in sourceStream 
@@ -272,6 +287,7 @@ _DOC_ORDER = [TempoMark, MetronomeMark, interpolateElements]
 
 
 if __name__ == "__main__":
+
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
