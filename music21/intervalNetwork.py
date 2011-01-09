@@ -5,20 +5,29 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-11 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
 
-'''An IntervalNetwork defines a scale or harmonic unit as a (weighted) digraph, or directed graph, where pitches are nodes and intervals are edges. Nodes, however, are not stored; instead, an ordered list of edges (Intervals) is provided as an archetype of adjacent nodes. 
+'''An IntervalNetwork defines a scale or harmonic unit as a (weighted) 
+digraph, or directed graph, where pitches are nodes and intervals are 
+edges. Nodes, however, are not stored; instead, an ordered list of edges 
+(Intervals) is provided as an archetype of adjacent nodes. 
 
-IntervalNetworks are unlike conventional graphs in that each graph must define a low and high terminus. These points are used to create a cyclic graph and are treated as point of cyclical overlap. 
+IntervalNetworks are unlike conventional graphs in that each graph must 
+define a low and high terminus. These points are used to create a cyclic 
+graph and are treated as point of cyclical overlap. 
 
-IntervalNetwork permits the definition of conventional octave repeating scales or harmonies (abstract chords), non-octave repeating scales and chords, and ordered interval sequences that might move in multiple directions. 
+IntervalNetwork permits the definition of conventional octave repeating 
+scales or harmonies (abstract chords), non-octave repeating scales and 
+chords, and ordered interval sequences that might move in multiple 
+directions. 
 
 A scale or harmony may be composed of one or more IntervalNetwork objects. 
 
-Both nodes and edges can be weighted to suggest tonics, dominants, finals, or other attributes of the network. 
+Both nodes and edges can be weighted to suggest tonics, dominants, 
+finals, or other attributes of the network. 
 '''
 
 import unittest, doctest
@@ -61,7 +70,8 @@ class Edge(object):
 
     Edges store an Interval object as well as a direction specification.
 
-    For directed Edges, the direction of the Interval may be used to suggest non-pitch ascending movements (even if the direction is ascending). 
+    For directed Edges, the direction of the Interval may be used to 
+    suggest non-pitch ascending movements (even if the direction is ascending). 
 
     Weight values, as well as other attributes, can be stored. 
 
@@ -121,8 +131,8 @@ class Edge(object):
         >>> from music21 import *
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> n1 = Node(id=0)
-        >>> n2 = Node(id=1)
+        >>> n1 = intervalNetwork.Node(id=0)
+        >>> n2 = intervalNetwork.Node(id=1)
         >>> e1.addDirectedConnection(n1, n2, 'ascending')
         >>> e1.interval
         <music21.interval.Interval M3>
@@ -137,8 +147,8 @@ class Edge(object):
         >>> from music21 import *
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> n1 = Node(id=0)
-        >>> n2 = Node(id=1)
+        >>> n1 = intervalNetwork.Node(id=0)
+        >>> n2 = intervalNetwork.Node(id=1)
         >>> e1.addDirectedConnection(n1, n2, 'ascending')
         >>> e1.direction
         'ascending'
@@ -148,13 +158,16 @@ class Edge(object):
     def addDirectedConnection(self, n1, n2, direction=None):
         '''Provide two Node objects that connect this Edge, in the direction from the first to the second. 
         
-        When calling directly, a direction, either ascending or descending, should be set here; this will override whatever the interval is.  If None, this will not be set. 
+        When calling directly, a direction, either 
+        ascending or descending, should be set here; 
+        this will override whatever the interval is.  
+        If None, this will not be set. 
 
         >>> from music21 import *
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> n1 = Node(id=0)
-        >>> n2 = Node(id=1)
+        >>> n1 = intervalNetwork.Node(id=0)
+        >>> n2 = intervalNetwork.Node(id=1)
 
         >>> e1.addDirectedConnection(n1, n2, 'ascending')
         >>> e1.connections
@@ -182,16 +195,14 @@ class Edge(object):
 
 
     def addBiDirectedConnections(self, n1, n2):
-        '''Provide two Edge objects that pass through this Node, in the direction from the first to the second. 
+        '''Provide two Edge objects that pass through 
+        this Node, in the direction from the first to the second. 
 
         >>> from music21 import *
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> e2 = intervalNetwork.Edge(i, id=1)
-        >>> n1 = Node(id='terminusLow')
-        >>> n2 = Node(id=1)
-        >>> n3 = Node(id=2)
-        >>> n4 = Node(id=2)
+        >>> n1 = intervalNetwork.Node(id='terminusLow')
+        >>> n2 = intervalNetwork.Node(id=1)
 
         >>> e1.addBiDirectedConnections(n1, n2)
         >>> e1.connections
@@ -206,20 +217,22 @@ class Edge(object):
 
 
     def getConnections(self, direction=None):
-        '''
-        Return a list of connections between Nodes, represented as pairs of Node ids. If a direction is specified, and if the Edge is directional, only the desired directed values will be returned. 
+        '''      
+        Callable as a property (.connections) or as a method 
+        (.getConnections(direction)):
+        
+        Return a list of connections between Nodes, represented as pairs 
+        of Node ids. If a direction is specified, and if the Edge is 
+        directional, only the desired directed values will be returned. 
 
         >>> from music21 import *
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> e2 = intervalNetwork.Edge(i, id=1)
-        >>> n1 = Node(id='terminusLow')
-        >>> n2 = Node(id=1)
-        >>> n3 = Node(id=2)
-        >>> n4 = Node(id=2)
+        >>> n1 = intervalNetwork.Node(id='terminusLow')
+        >>> n2 = intervalNetwork.Node(id=1)
 
         >>> e1.addBiDirectedConnections(n1, n2)
-        >>> e1.getConnections()
+        >>> e1.connections
         [('terminusLow', 1), (1, 'terminusLow')]
         >>> e1.getConnections('ascending')
         [('terminusLow', 1)]
@@ -253,9 +266,7 @@ class Edge(object):
         # if no connections are possible, return none
         return None
 
-    connections = property(getConnections, 
-        doc = '''Return a list of stored connections that pass through this node. Connections are stored as directed pairs of Edge indices. 
-        ''')
+    connections = property(getConnections)
 
 
 class Node(object):
@@ -278,6 +289,8 @@ class Node(object):
 
     def __eq__(self, other):
         ''' 
+        Nodes are equal if everything in the object.__dict__ is equal.
+        
         >>> from music21 import *
         >>> n1 = intervalNetwork.Node(id=3)
         >>> n2 = intervalNetwork.Node(id=3)
@@ -285,6 +298,9 @@ class Node(object):
         >>> n1 == n2
         True
         >>> n1 == n3
+        False
+        >>> n2.boogie = 'rightNow'
+        >>> n1 == n2
         False
         '''
         return (isinstance(other, self.__class__)
@@ -395,7 +411,9 @@ class IntervalNetwork(object):
 
 
     def fillBiDirectedEdges(self, edgeList):
-        '''Given an ordered list of bi-directed edges given as Interval specifications, create and define appropriate Nodes. This assumes that all edges are bidirected and all all edges are in order.
+        '''Given an ordered list of bi-directed edges given as Interval 
+        specifications, create and define appropriate Nodes. This 
+        assumes that all edges are bidirected and all all edges are in order.
     
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -453,7 +471,8 @@ class IntervalNetwork(object):
 
 
     def fillDirectedEdges(self, ascendingEdgeList, descendingEdgeList):
-        '''Given two lists of edges, one for ascending intervals and another for  descending, construct appropriate Nodes and Edges.
+        '''Given two lists of edges, one for ascending intervals and 
+        another for  descending, construct appropriate Nodes and Edges.
 
         Note that the descending intervals should be given in ascending form. 
         '''
@@ -550,7 +569,7 @@ class IntervalNetwork(object):
         >>> nodes = ({'id':'terminusLow', 'step':1}, {'id':0, 'step':2}, {'id':'terminusHigh', 'step':3})
         >>> edges = ({'interval':'m2', 'connections':(['terminusLow', 0, 'bi'],)},{'interval':'M3', 'connections':([0, 'terminusHigh', 'bi'],)},)
 
-        >>> net = IntervalNetwork()
+        >>> net = intervalNetwork.IntervalNetwork()
         >>> net.fillArbitrary(nodes, edges)
         >>> net.realizePitch('c4', 1)
         [C4, D-4, F4]
