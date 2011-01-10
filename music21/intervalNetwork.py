@@ -337,7 +337,7 @@ class IntervalNetworkException(Exception):
 
 
 class IntervalNetwork(object):
-    '''A graph of undefined Pitch nodes connected by a defined, ordered list of Interval objects as edges. 
+    '''A graph of undefined Pitch nodes connected by a defined, ordered list of :class:`~music21.interval.Interval` objects as edges. 
 
     An `octaveDuplicating` boolean, if defined, can be used to optimize pitch realization routines. 
 
@@ -411,7 +411,7 @@ class IntervalNetwork(object):
 
 
     def fillBiDirectedEdges(self, edgeList):
-        '''Given an ordered list of bi-directed edges given as Interval 
+        '''Given an ordered list of bi-directed edges given as :class:`~music21.interval.Interval` 
         specifications, create and define appropriate Nodes. This 
         assumes that all edges are bidirected and all all edges are in order.
     
@@ -471,10 +471,10 @@ class IntervalNetwork(object):
 
 
     def fillDirectedEdges(self, ascendingEdgeList, descendingEdgeList):
-        '''Given two lists of edges, one for ascending intervals and 
+        '''Given two lists of edges, one for ascending :class:`~music21.interval.Interval`s and 
         another for  descending, construct appropriate Nodes and Edges.
 
-        Note that the descending intervals should be given in ascending form. 
+        Note that the descending :class:`~music21.interval.Interval`s should be given in ascending form. 
         '''
         self.clear()
 
@@ -556,7 +556,7 @@ class IntervalNetwork(object):
                  {'id':'terminusHigh', 'step':3},
                 )
 
-        Edges must be defined by a dictionary of interval strings and connections. Id values will be automatically assigned. Each connection must define direction and pairs of valid node ids. 
+        Edges must be defined by a dictionary of :class:`~music21.interval.Interval` strings and connections. Id values will be automatically assigned. Each connection must define direction and pairs of valid node ids. 
 
         edges = ({'interval':'m2', connections:(
                         ['terminusLow', 0, 'bi'],
@@ -1432,7 +1432,7 @@ class IntervalNetwork(object):
 
         Without a min or max pitch, the given pitch reference is assigned to the designated node, and then both ascends to the terminus and descends to the terminus.
 
-        The `alteredNodes` dictionary permits creating mappings between node step and direction and interval transposition of intervals. 
+        The `alteredNodes` dictionary permits creating mappings between node step and direction and :class:`~music21.interval.Interval` based transpositions. 
 
         Returns two lists, a list of pitches, and a list of Node keys. 
 

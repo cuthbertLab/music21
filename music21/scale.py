@@ -10,7 +10,33 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Objects for defining scales. 
+'''
+The various Scale objects provide a bi-directional object representation of octave repeating and non-octave repeating scales built by network of :class:`~music21.interval.Interval` objects as modeled in :class:`~music21.intervalNetwork.IntervalNetwork`.
+
+The main public interface to these resources are the numerous :class:`~music21.scale.ConcreteScale` subclasses, such as :class:`~music21.scale.MajorScale`, :class:`~music21.scale.MinorScale`, and :class:`~music21.scale.MelodicMinorScale`.
+
+More unusual scales are also available, such as :class:`~music21.scale.OctatonicScale`, :class:`~music21.scale.SieveScale`, and :class:`~music21.scale.RagMarwa`.
+
+All :class:`~music21.scale.ConcreteScale` subclasses provide the ability to get a pitches across any range, get a pitch for scale step, get a scale step for pitch, and, for any given pitch ascend or descend to the next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
+
+>>> from music21 import *
+>>> sc1 = scale.MajorScale('a')
+>>> sc1.getPitches('g2', 'g4')
+[G#2, A2, B2, C#3, D3, E3, F#3, G#3, A3, B3, C#4, D4, E4, F#4]
+
+>>> sc2 = scale.MelodicMinorScale('a')
+>>> sc2.getPitches('g2', 'g4', direction='descending')
+[G4, F4, E4, D4, C4, B3, A3, G3, F3, E3, D3, C3, B2, A2, G2]
+>>> sc2.getPitches('g2', 'g4', direction='ascending')
+[G#2, A2, B2, C3, D3, E3, F#3, G#3, A3, B3, C4, D4, E4, F#4]
+
+>>> # a sieve-based scale using Xenakis's representation of the Major scale
+>>> sc3 = scale.SieveScale('a', '(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)')
+>>> sc3.getPitches('g2', 'g4')
+[G#2, A2, B2, C#3, D3, E3, F#3, G#3, A3, B3, C#4, D4, E4, F#4]
+    
+
+
 '''
 
 import copy
@@ -119,9 +145,10 @@ class Scale(music21.Music21Object):
 class AbstractScale(Scale):
     '''An abstract scale is specific scale formation, but does not have a defined pitch collection or pitch reference. For example, all Major scales can be represented by an AbstractScale; a ConcreteScale, however, is a specific Major Scale, such as G Major. 
 
-    These classes provide an interface to, and create and manipulate, the stored IntervalNetwork object. Thus, they are rarely created or manipulated directly by most users.
+    These classes provide an interface to, and create and manipulate, the stored :class:`~music21.intervalNetwork.IntervalNetwork` object. Thus, they are rarely created or manipulated directly by most users.
 
-    The AbstractScale additionally stores an `_alteredNodes` dictionary. Subclasses can define altered nodes in AbstractScale that are passed to the IntervalNetwork.
+    The AbstractScale additionally stores an `_alteredNodes` dictionary. Subclasses can define altered nodes in AbstractScale that are passed to the :class:`~music21.intervalNetwork.IntervalNetwork`.
+
     '''
     def __init__(self):
         Scale.__init__(self)
@@ -237,7 +264,7 @@ class AbstractScale(Scale):
 
     def getRelativeNodeStep(self, pitchReference, nodeName, pitchTarget, 
             comparisonAttribute='pitchClass', direction=DIRECTION_ASCENDING):
-        '''Expose functionality from IntervalNetwork, passing on the stored alteredNodes dictionary.
+        '''Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the stored alteredNodes dictionary.
         '''
         post = self._net.getRelativeNodeStep(
             pitchReference=pitchReference, 
@@ -252,7 +279,7 @@ class AbstractScale(Scale):
 
     def nextPitch(self, pitchReference, nodeName, pitchOrigin,
              direction=DIRECTION_ASCENDING, stepSize=1, getNeighbor=True):
-        '''Expose functionality from IntervalNetwork, passing on the stored alteredNodes dictionary.
+        '''Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the stored alteredNodes dictionary.
         '''
         post = self._net.nextPitch(
             pitchReference=pitchReference, 
@@ -289,7 +316,7 @@ class AbstractScale(Scale):
         return self._net._getNetworkxGraph()
 
     networkxGraph = property(_getNetworkxGraph, doc='''
-        Return a networks Graph object representing a realized version of this IntervalNetwork
+        Return a networks Graph object representing a realized version of this :class:`~music21.intervalNetwork.IntervalNetwork`.
         ''')
 
 
@@ -1034,14 +1061,14 @@ class ConcreteScale(Scale):
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('a-4')
         
-        #>>> h1 = sc1.romanNumeral(1)
-        #>>> h1.root
-        #A-4
-        #>>> h5 = sc1.romanNumeral(5)
-        #>>> h5.root
-        #E-5
-        #>>> h5
-        #<music21.chord.Chord E-5 G5 B-5>
+        >>> h1 = sc1.romanNumeral(1)
+        >>> h1.root()
+        A-4
+        >>> h5 = sc1.romanNumeral(5)
+        >>> h5.root()
+        E-5
+        >>> h5
+        <music21.chord.Chord E-5 G5 B-5>
         '''
         from music21 import roman
         return roman.RomanNumeral(degree, self)
@@ -1929,7 +1956,7 @@ class WholeToneScale(ConcreteScale):
 
 
 class SieveScale(ConcreteScale):
-    '''A scale created from a Xenakis sieve logical string. The complete period of the sieve is realized as intervals and used to create a scale. 
+    '''A scale created from a Xenakis sieve logical string, based on the :class:`~music21.sieve.Sieve` object definition. The complete period of the sieve is realized as intervals and used to create a scale. 
 
     >>> from music21 import *
     >>> sc = scale.SieveScale('c4', '3@0') 
@@ -2530,6 +2557,10 @@ class Test(unittest.TestCase):
 
 
 #-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [ConcreteScale, AbstractScale]
+
+
 if __name__ == "__main__":
     import sys
 
