@@ -62,8 +62,6 @@ class TempoMark(music21.Music21Object):
     True
     >>> tm2.value == u'très vite'
     True
-    >>> tm2.number
-    144
     >>> tm3 = music21.tempo.TempoMark("extremely, wicked fast!")
     >>> tm3.number
     90
@@ -280,6 +278,18 @@ class Test(unittest.TestCase):
         self.assertEqual(TM1.value, "Lebhaft")
         
 
+    def testUnicdoe(self):
+
+        from music21 import tempo
+        tm = music21.tempo.TempoMark("adagio")
+
+        self.assertEqual(tm.number, 52)
+        tm2 = music21.tempo.TempoMark(u"très vite")
+
+        self.assertEqual(tm2.value, u'très vite')
+        self.assertEqual(tm2.number, 144)
+
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

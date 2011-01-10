@@ -102,7 +102,7 @@ class Lyric(object):
 
 #-------------------------------------------------------------------------------
 class GeneralNote(music21.Music21Object):
-    '''A GeneralNote object is the parent object for the :class:`~music21.note.Note`, :class:`~music21.note.Rest`, :class:`~music21.note.Chord`, and related objects. 
+    '''A GeneralNote object is the base class object for the :class:`~music21.note.Note`, :class:`~music21.note.Rest`, :class:`~music21.note.Chord`, and related objects. 
     '''    
     isChord = False
 

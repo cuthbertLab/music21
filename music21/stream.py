@@ -78,9 +78,9 @@ class StreamIterator(object):
         # here, the .elements property concatenates both ._elements and 
         # ._endElements; this may be a performance detriment
         post = self.srcStream.elements[self.index]
-        # here, the parent of extracted element is being set to Stream
+        # here, the activeSite of extracted element is being set to Stream
         # that is the source of the iteration
-        post.parent = self.srcStream
+        post.activeSite = self.srcStream
         self.index += 1
         return post
 
@@ -229,10 +229,10 @@ class Stream(music21.Music21Object):
             self.sort() # will set isSorted to True
 
         if common.isNum(key):
-            # TODO: using self._elements here will retain parent, as opposed   
+            # TODO: using self._elements here will retain activeSite, as opposed   
             # to using .elements
             e = self.elements[key]
-            e.parent = self
+            e.activeSite = self
             return e
     
         elif isinstance(key, slice): # get a slice of index values
@@ -427,7 +427,7 @@ class Stream(music21.Music21Object):
         '''
         s = self.__class__()
         s.autoSort = self.autoSort
-        # may want to keep parent of source Stream?
+        # may want to keep activeSite of source Stream?
         #s.elements = self._elements + other._elements
         # need to iterate over elements and re-assign to create new locations
         for e in self._elements:
@@ -584,7 +584,7 @@ class Stream(music21.Music21Object):
             self._elementsChanged()
 
         # after removing, need to remove self from locations reference 
-        # and from parent reference, if set; this is taken care of with the 
+        # and from activeSite reference, if set; this is taken care of with the 
         # Music21Object method
         for obj in match:
             obj.removeLocationBySite(self)
@@ -640,9 +640,9 @@ class Stream(music21.Music21Object):
             part = getattr(self, name)
                     
             # all subclasses of Music21Object that define their own
-            # __deepcopy__ methods must be sure to not try to copy parent
-            if name == '_currentParent':
-                newValue = self.parent # keep a reference, not a deepcopy
+            # __deepcopy__ methods must be sure to not try to copy activeSite
+            if name == '_activeSite':
+                newValue = self.activeSite # keep a reference, not a deepcopy
                 setattr(new, name, newValue)
             # attributes that require special handling
             elif name == 'flattenedRepresentationOf':
@@ -654,7 +654,7 @@ class Stream(music21.Music21Object):
             elif name == '_elements':
                 # must manually add elements to 
                 for e in self._elements: 
-                    #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.parent', e.parent, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
+                    #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
                     # this will work for all with __deepcopy___
                     newElement = copy.deepcopy(e, memo)
                     # get the old offset from the parent Stream     
@@ -667,7 +667,7 @@ class Stream(music21.Music21Object):
                 for e in self._endElements: 
                     # this will work for all with __deepcopy___
                     newElement = copy.deepcopy(e, memo)
-                    # get the old offset from the parent Stream     
+                    # get the old offset from the activeSite Stream     
                     # user here to provide new offset
                     new.storeAtEnd(newElement, ignoreSort=True)
                 
@@ -803,9 +803,9 @@ class Stream(music21.Music21Object):
         self._addElementPreProcess(element)
 
         element.addLocation(self, offset)
-        # need to explicitly set the parent of the element
+        # need to explicitly set the activeSite of the element
         if setParent:
-            element.parent = self 
+            element.activeSite = self 
 
         if ignoreSort is False:
             if self.isSorted is True and self.highestTime <= offset:
@@ -888,8 +888,8 @@ class Stream(music21.Music21Object):
             # add this Stream as a location for the new elements, with the 
             # the offset set to the current highestTime
             element.addLocation(self, highestTime)
-            # need to explicitly set the parent of the element
-            element.parent = self 
+            # need to explicitly set the activeSite of the element
+            element.activeSite = self 
             self._elements.append(element)  
 
             # this should look to the contained object duration
@@ -935,8 +935,8 @@ class Stream(music21.Music21Object):
         self._addElementPreProcess(element)
 
         element.addLocation(self, 'highestTime')
-        # need to explicitly set the parent of the element
-        element.parent = self 
+        # need to explicitly set the activeSite of the element
+        element.activeSite = self 
         # element.addLocationAndParent(offset, self)
 
         # could also do self.elements = self.elements + [element]
@@ -1152,7 +1152,7 @@ class Stream(music21.Music21Object):
             # sites defined by the target and add them to the replacement
             # this would not put them in those locations elements, however
 
-            # remove this location from old; this will also adjust the parent
+            # remove this location from old; this will also adjust the activeSite
             # assignment if necessary
             target.removeLocationBySite(self)
 
@@ -2298,7 +2298,7 @@ class Stream(music21.Music21Object):
         # found
         post = self.getElementsByClass(meter.TimeSignature)
 
-        # search parent Streams through contexts    
+        # search activeSite Streams through contexts    
         if len(post) == 0 and searchContext:
             # returns a single value
             post = self.__class__()
@@ -2321,8 +2321,8 @@ class Stream(music21.Music21Object):
         return post
         
 
-    def getInstrument(self, searchParent=True, returnDefault=True):
-        '''Search this stream or parent streams for :class:`~music21.instrument.Instrument` objects, otherwise 
+    def getInstrument(self, searchActiveSite=True, returnDefault=True):
+        '''Search this stream or activeSite streams for :class:`~music21.instrument.Instrument` objects, otherwise 
         return a default
 
         >>> a = Stream()
@@ -2339,12 +2339,12 @@ class Stream(music21.Music21Object):
             #environLocal.printDebug(['found local instrument:', post[0]])
             instObj = post[0] # get first
         else:
-            if searchParent:
-                if isinstance(self.parent, Stream) and self.parent != self:
-                    #environLocal.printDebug(['searching parent Stream', 
-                    #    self, self.parent])
-                    instObj = self.parent.getInstrument(
-                              searchParent=searchParent, 
+            if searchActiveSite:
+                if isinstance(self.activeSite, Stream) and self.activeSite != self:
+                    #environLocal.printDebug(['searching activeSite Stream', 
+                    #    self, self.activeSite])
+                    instObj = self.activeSite.getInstrument(
+                              searchActiveSite=searchActiveSite, 
                               returnDefault=False) 
 
         # if still not defined, get default
@@ -2433,9 +2433,9 @@ class Stream(music21.Music21Object):
                 return clef.BassClef()
 
 
-    def getClefs(self, searchParent=False, searchContext=True, 
+    def getClefs(self, searchActiveSite=False, searchContext=True, 
         returnDefault=True):
-        '''Collect all :class:`~music21.clef.Clef` objects in this Stream in a new Stream. Optionally search the parent stream and/or contexts. 
+        '''Collect all :class:`~music21.clef.Clef` objects in this Stream in a new Stream. Optionally search the activeSite Stream and/or contexts. 
 
         If no Clef objects are defined, get a default using :meth:`~music21.stream.Stream.bestClef`
         
@@ -2448,14 +2448,14 @@ class Stream(music21.Music21Object):
         >>> len(c) == 1
         True
         '''
-        # TODO: parent searching is not yet implemented
+        # TODO: activeSite searching is not yet implemented
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass(clef.Clef)
 
         #environLocal.printDebug(['getClefs(); count of local', len(post), post])       
-        if len(post) == 0 and searchParent and self.parent != None:
-            environLocal.printDebug(['getClefs(): search parent'])       
-            post = self.parent.getElementsByClass(clef.Clef)
+        if len(post) == 0 and searchActiveSite and self.activeSite != None:
+            environLocal.printDebug(['getClefs(): search activeSite'])       
+            post = self.activeSite.getElementsByClass(clef.Clef)
 
         if len(post) == 0 and searchContext:
             # returns a single element match
@@ -2472,8 +2472,8 @@ class Stream(music21.Music21Object):
 
 
 
-    def getKeySignatures(self, searchParent=True, searchContext=True):
-        '''Collect all :class:`~music21.key.KeySignature` objects in this Stream in a new Stream. Optionally search the parent stream and/or contexts. 
+    def getKeySignatures(self, searchActiveSite=True, searchContext=True):
+        '''Collect all :class:`~music21.key.KeySignature` objects in this Stream in a new Stream. Optionally search the activeSite stream and/or contexts. 
 
         If no KeySignature objects are defined, returns an empty Stream 
         
@@ -2486,7 +2486,7 @@ class Stream(music21.Music21Object):
         >>> len(c) == 1
         True
         '''
-        # TODO: parent searching is not yet implemented
+        # TODO: activeSite searching is not yet implemented
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass(key.KeySignature)
         if len(post) == 0 and searchContext:
@@ -3117,7 +3117,7 @@ class Stream(music21.Music21Object):
             srcObj = copy.deepcopy(self.flat.sorted)
             voiceCount = 0
 
-        # may need to look in parent if no time signatures are found
+        # may need to look in activeSite if no time signatures are found
         if meterStream is None:
             # get from this Stream, or search the contexts
             meterStream = srcObj.flat.getTimeSignatures(returnDefault=True, 
@@ -3129,16 +3129,16 @@ class Stream(music21.Music21Object):
             meterStream = Stream()
             meterStream.insert(0, ts)
 
-        environLocal.printDebug(['Stream.makeMeasures(): srcObj.parent', srcObj.parent])
+        environLocal.printDebug(['Stream.makeMeasures(): srcObj.activeSite', srcObj.activeSite])
 
 
-        #environLocal.printDebug(['makeMeasures(): meterStream', 'meterStream[0]', meterStream[0], 'meterStream[0].offset',  meterStream[0].offset, 'meterStream.elements[0].parent', meterStream.elements[0].parent])
+        #environLocal.printDebug(['makeMeasures(): meterStream', 'meterStream[0]', meterStream[0], 'meterStream[0].offset',  meterStream[0].offset, 'meterStream.elements[0].activeSite', meterStream.elements[0].activeSite])
 
         # get a clef for the entire stream; this will use bestClef
         # presently, this only gets the first clef
         # may need to store a clefStream and access changes in clefs
         # as is done with meterStream
-        clefStream = srcObj.getClefs(searchParent=True, searchContext=True,
+        clefStream = srcObj.getClefs(searchActiveSite=True, searchContext=True,
                         returnDefault=True)
         clefObj = clefStream[0]
 
@@ -3381,7 +3381,7 @@ class Stream(music21.Music21Object):
     
         #environLocal.printDebug(['makeTies() processing measureStream, length', measureStream, len(measureStream)])
 
-        # may need to look in parent if no time signatures are found
+        # may need to look in activeSite if no time signatures are found
         # presently searchContext is False to save time
         if meterStream is None:
             meterStream = returnObj.getTimeSignatures(sortByCreationTime=True,             
@@ -3477,7 +3477,8 @@ class Stream(music21.Music21Object):
                                 else: # no voices in either
                                     dst = mNext
 
-                            #eRemain.parent = mNext # manually set parent   
+                            #eRemain.activeSite = mNext 
+                            # manually set activeSite   
                             dst.insert(0, eRemain)
     
                             # we are not sure that this element fits 
@@ -3703,7 +3704,7 @@ class Stream(music21.Music21Object):
         if isinstance(useKeySignature, key.KeySignature):
             addAlteredPitches = useKeySignature.alteredPitches
         elif useKeySignature == True: # get from defined contexts
-            # will search local, then parent
+            # will search local, then activeSite
             ksStream = self.getKeySignatures(
                 searchContext=searchKeySignatureByContext) 
             if len(ksStream) > 0:
@@ -4115,8 +4116,8 @@ class Stream(music21.Music21Object):
         newStream._elements = post
         for e in post:
             e.addLocation(newStream, e.getOffsetBySite(self))
-            # need to explicitly set parent
-            e.parent = newStream 
+            # need to explicitly set activeSite
+            e.activeSite = newStream 
 #         newStream.isSorted = True
 
         # now just sort this stream in place; this will update the 
@@ -4205,7 +4206,7 @@ class Stream(music21.Music21Object):
     def _getFlatOrSemiFlat(self, retainContainers):
         '''The `retainContainers` option, if True, returns a semiFlat version: containers are not discarded in flattening.
         '''
-        #environLocal.printDebug(['_getFlatOrSemiFlat(): self', self, 'self.parent', self.parent])       
+        #environLocal.printDebug(['_getFlatOrSemiFlat(): self', self, 'self.activeSite', self.activeSite])       
 
         # this copy will have a shared locations object
         # not that copy.copy() in some cases seems to not cause secondary
@@ -4230,8 +4231,8 @@ class Stream(music21.Music21Object):
                 if retainContainers is True: # semiFlat
                     #environLocal.printDebug(['_getFlatOrSemiFlat(), retaining containers, storing element:', e])
 
-                    # this will change the parent of e to be sNew, previously
-                    # this was the parent was the caller; thus, the parent here
+                    # this will change the activeSite of e to be sNew, previously
+                    # this was the activeSite was the caller; thus, the activeSite here
                     # should not be set
                     sNew.insert(recurseStreamOffset, e, setParent=False)
                     recurseStream = e.semiFlat
@@ -4261,7 +4262,7 @@ class Stream(music21.Music21Object):
         # TODO: this should probably be a weakref
         sNew.flattenedRepresentationOf = self #common.wrapWeakref(self)
 
-#         environLocal.printDebug(['_getFlatOrSemiFlat: break2: self', self, 'self.parent', self.parent])       
+#         environLocal.printDebug(['_getFlatOrSemiFlat: break2: self', self, 'self.activeSite', self.activeSite])       
 
         return sNew
     
@@ -4360,9 +4361,9 @@ class Stream(music21.Music21Object):
         '''Yield all containers (Stream subclasses), including self, and going downward.
         '''
         yield self
-        # using indices so as to not to create an iterator and new locations/parents
+        # using indices so as to not to create an iterator and new locations/activeSites
         for i in range(len(self._elements)):
-            # not using __getitem__, also to avoid new locations/parents
+            # not using __getitem__, also to avoid new locations/activeSites
             e = self._elements[i]
             if hasattr(e, 'elements'):
                 # this returns a generator, so need to iterate over it
@@ -4388,19 +4389,19 @@ class Stream(music21.Music21Object):
             if skipDuplicates:
                 memo.append(id(self))
 
-        # may need to make sure that parent is correctly assigned
-        p = self.parent
-        # if a parent exists, its always a stream!
+        # may need to make sure that activeSite is correctly assigned
+        p = self.activeSite
+        # if a activeSite exists, its always a stream!
         if p != None and hasattr(p, 'elements'):
-            # using indices so as to not to create an iterator and new locations/parents
+            # using indices so as to not to create an iterator and new locations/activeSites
             # here we access the private _elements, again: no iterator
             for i in range(len(p._elements)):
-                # not using __getitem__, also to avoid new locations/parents
+                # not using __getitem__, also to avoid new locations/activeSites
                 e = p._elements[i]
                 #environLocal.printDebug(['examining elements:', e])
 
-                # not a Stream; may or may not have a parent;
-                # its possible that it may have parent not identified elsewhere
+                # not a Stream; may or may not have a activeSite;
+                # its possible that it may have activeSite not identified elsewhere
                 if not hasattr(e, 'elements'):
                     if not excludeNonContainers:
                         if id(e) not in memo:
@@ -4408,22 +4409,22 @@ class Stream(music21.Music21Object):
                             if skipDuplicates:
                                 memo.append(id(e))
 
-                # for each element in the parent that is a Stream, 
-                # look at the parents
-                # if the parents are a Stream, recurse
-                elif (hasattr(e, 'elements') and e.parent != None 
-                    and hasattr(e.parent, 'elements')):
+                # for each element in the activeSite that is a Stream, 
+                # look at the activeSites
+                # if the activeSites are a Stream, recurse
+                elif (hasattr(e, 'elements') and e.activeSite != None 
+                    and hasattr(e.activeSite, 'elements')):
 
                     # this returns a generator, so need to iterate over it
                     # to get results
-                    # e.parent will be yielded at top of recurse
-                    for y in e.parent._yieldElementsUpward(memo,
+                    # e.activeSite will be yielded at top of recurse
+                    for y in e.activeSite._yieldElementsUpward(memo,
                             skipDuplicates=skipDuplicates, 
                             excludeNonContainers=excludeNonContainers):
                         yield y
                     # here, we have found a container at the same level of
                     # the caller; since it is a Stream, we yield
-                    # caller is contained in the parent; if e is self, skip
+                    # caller is contained in the activeSite; if e is self, skip
                     if id(e) != id(self): 
                         if id(e) not in memo:
                             yield e
@@ -4708,7 +4709,7 @@ class Stream(music21.Music21Object):
     def _getMeasureOffset(self):
         # this normally returns the offset of this object in its container
         # for now, simply return the offset
-        return self.getOffsetBySite(self.parent)
+        return self.getOffsetBySite(self.activeSite)
 
     def _getBeat(self):
         # this normally returns the beat within a measure; here, it could
@@ -6182,7 +6183,7 @@ class Stream(music21.Music21Object):
 
         # optionally, specify the site to get the offset from
         >>> n3._definedContexts.setOffsetBySite(None, 100)
-        >>> n3.parent = None
+        >>> n3.activeSite = None
         >>> s1.playingWhenAttacked(n3)
         <BLANKLINE>
         >>> s1.playingWhenAttacked(n3, s2).name
@@ -7654,7 +7655,7 @@ class TestExternal(unittest.TestCase):
         OMIT_FROM_DOCS
         TODO: this should show instruments
         this is presently not showing instruments 
-        probably b/c when appending to s Stream parent is set to that stream
+        probably b/c when appending to s Stream activeSite is set to that stream
         '''
         from music21 import corpus, converter
         a = converter.parse(corpus.getWork(['mozart', 'k155','movement2.xml']))
@@ -7844,11 +7845,11 @@ class Test(unittest.TestCase):
         assert(sf1[1] is n2)
         
 
-    def testParentCopiedStreams(self):
+    def testActiveSiteCopiedStreams(self):
         srcStream = Stream()
         srcStream.insert(3, note.Note())
-        # the note's parent is srcStream now
-        self.assertEqual(srcStream[0].parent, srcStream)
+        # the note's activeSite is srcStream now
+        self.assertEqual(srcStream[0].activeSite, srcStream)
 
         midStream = Stream()
         for x in range(2):
@@ -8221,7 +8222,7 @@ class Test(unittest.TestCase):
 
 
 
-    def testParents(self):
+    def testActiveSites(self):
         '''Test parent relationships.
 
         Note that here we see why sometimes qualified class names are needed.
@@ -8237,7 +8238,7 @@ class Test(unittest.TestCase):
         # test basic parent relationships
         b = a[3]
         self.assertEqual(isinstance(b, music21.stream.Part), True)
-        self.assertEqual(b.parent, a)
+        self.assertEqual(b.activeSite, a)
 
         # this, if called, actively destroys the parent relationship!
         # on the measures (as new Elements are not created)
@@ -8245,10 +8246,10 @@ class Test(unittest.TestCase):
         #self.assertEqual(isinstance(m, Measure), True)
 
         # this false b/c, when getting the measures, parents are lost
-        #self.assertEqual(m.parent, b) #measures parent should be part
+        #self.assertEqual(m.activeSite, b) #measures parent should be part
 
         self.assertEqual(isinstance(b[8], music21.stream.Measure), True)
-        self.assertEqual(b[8].parent, b) #measures parent should be part
+        self.assertEqual(b[8].activeSite, b) #measures parent should be part
 
 
         # a different test derived from a TestExternal
@@ -8265,10 +8266,10 @@ class Test(unittest.TestCase):
         s.insert(q)
         s.insert(r)
 
-        self.assertEqual(q.parent, s)
-        self.assertEqual(r.parent, s)
+        self.assertEqual(q.activeSite, s)
+        self.assertEqual(r.activeSite, s)
 
-    def testParentsMultiple(self):
+    def testActiveSitesMultiple(self):
         '''Test an object having multiple parents.
         '''
         a = Stream()
@@ -8308,18 +8309,18 @@ class Test(unittest.TestCase):
 
 #         b = a[3][10:20]
 #         # TODO: manually setting the parent is still necessary
-#         b.parent = a[3] # manually set the parent
+#         b.activeSite = a[3] # manually set the parent
 
         b = a.parts[3]
         # by calling the .part property, we create a new stream; thus, the
         # parent of b is no longer a
-        self.assertEqual(b.parent, None)
+        self.assertEqual(b.activeSite, None)
         instObj = b.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
         p = a[3] # get part
         # a mesausre within this part has as its parent the part
-        self.assertEqual(p[10].parent, a[3])
+        self.assertEqual(p[10].activeSite, a[3])
         instObj = p.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
@@ -8448,7 +8449,7 @@ class Test(unittest.TestCase):
                 environLocal.printDebug(['infinite loop', counter])
                 break
             environLocal.printDebug([x])
-            junk = x.getInstrument(searchParent=True)
+            junk = x.getInstrument(searchActiveSite=True)
             del junk
             counter += 1
 
@@ -8478,7 +8479,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b[0].numerator, 5)
         self.assertEqual(b[4].numerator, 10)
 
-        self.assertEqual(b[4].parent, b)
+        self.assertEqual(b[4].activeSite, b)
 
         # none of the offsets are being copied 
         offsets = [x.offset for x in b]
@@ -9204,18 +9205,18 @@ class Test(unittest.TestCase):
         s3.insert(0, s1)
         s3.insert(0, s2)
         
-        self.assertEqual(s1.parent, s3)
+        self.assertEqual(s1.activeSite, s3)
 
         s3.insert(0, clef.AltoClef())
         # both output parts have alto clefs
         #s3.show()
 
         # get clef form higher level stream; only option
-        self.assertEqual(s1.parent, s3)
+        self.assertEqual(s1.activeSite, s3)
         post = s1.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
         # TODO: isolated parent mangling problem here
-        #self.assertEqual(s1.parent, s3)
+        #self.assertEqual(s1.activeSite, s3)
 
         post = s2.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
@@ -9248,7 +9249,7 @@ class Test(unittest.TestCase):
         post = s1FlatCopy.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-        environLocal.printDebug(['s1.parent', s1.parent])
+        environLocal.printDebug(['s1.activeSite', s1.activeSite])
         s1Measures = s1.makeMeasures()
         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
 
@@ -9370,11 +9371,11 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s), 3)
 
-        self.assertEqual(n1.parent, s)
+        self.assertEqual(n1.activeSite, s)
         s.remove(n1)
         self.assertEqual(len(s), 2)
         # parent is Now sent to Nonte
-        self.assertEqual(n1.parent, None)
+        self.assertEqual(n1.activeSite, None)
 
 
     def testReplace(self):
@@ -10457,14 +10458,14 @@ class Test(unittest.TestCase):
         match = []
         for x in s1._yieldElementsDownward():
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.parent])
+            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
         self.assertEqual(match, ['1a', '2a', '3a', '3b', '3c', '2b', '3d', '3e', '2c', '3f'])
 
         #environLocal.printDebug(['downward with elements:'])
         match = []
         for x in s1._yieldElementsDownward(excludeNonContainers=False):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.parent])
+            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
         self.assertEqual(match, ['1a', 'n(1a)', '2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c', '2b', 'n2(2b)', '3d', '3e', '2c', '3f'])
 
 
@@ -10472,7 +10473,7 @@ class Test(unittest.TestCase):
         match = []
         for x in s2._yieldElementsDownward(excludeNonContainers=False):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.parent])
+            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
         # test downward
         self.assertEqual(match, ['2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c'])
 
@@ -10481,7 +10482,7 @@ class Test(unittest.TestCase):
         # must provide empty list for memo
         for x in s7._yieldElementsUpward([], skipDuplicates=True):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.parent])
+            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
         self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
 
 
@@ -10489,7 +10490,7 @@ class Test(unittest.TestCase):
         match = []
         for x in s10._yieldElementsUpward([]):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.parent])
+            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
 
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '2b'] )
 
@@ -10498,7 +10499,7 @@ class Test(unittest.TestCase):
         match = []
         for x in s10._yieldElementsUpward([], skipDuplicates=False):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.parent])
+            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
 
 
@@ -10508,7 +10509,7 @@ class Test(unittest.TestCase):
         for x in s8._yieldElementsUpward([], excludeNonContainers=False, 
             skipDuplicates=True):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.parent])
+            environLocal.printDebug([x, x.id, 'parent', x.activeSite])
         self.assertEqual(match, ['3d', 'n2(2b)', '2b', 'n(1a)', '1a', '2a', '2c', '3e'] )
 
 
@@ -10518,7 +10519,7 @@ class Test(unittest.TestCase):
         for x in s4._yieldElementsUpward([], excludeNonContainers=False, 
             skipDuplicates=True):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.parent])
+            environLocal.printDebug([x, x.id, 'parent', x.activeSite])
         # notice that this does not get the nonConatainers for 2b
         self.assertEqual(match, ['2c', 'n(1a)', '1a', '2a', '2b'] )
 
@@ -11361,14 +11362,14 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 1)
         self.assertEqual(s[0], n1)
         self.assertEqual(s.index(n1), 0)
-        self.assertEqual(s[0].parent, s)
+        self.assertEqual(s[0].activeSite, s)
 
         # insert bar in highest time position
         s.storeAtEnd(b1)
         self.assertEqual(len(s), 2)
         self.assertEqual(s[1], b1)
         self.assertEqual(s.index(b1), 1)
-        self.assertEqual(s[1].parent, s)
+        self.assertEqual(s[1].activeSite, s)
         # offset of b1 is at the highest time
         self.assertEqual([e.offset for e in s], [0.0, 30.0])
      
@@ -11926,32 +11927,32 @@ class Test(unittest.TestCase):
         s2 = Stream()
         s2.append(s1)
         
-        self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.activeSite, s2)
         junk = s1.semiFlat
-        self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.activeSite, s2)
         junk = s1.flat
-        self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.activeSite, s2)
         
         # this works fine
         junk = s2.flat
-        self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.activeSite, s2)
         
         # this was the key problem: getting the semiFlat of the parent   
         # looses the parent of the sub-stream; this is fixed by the inserting
         # of the sub-Stream with setParent False
         junk = s2.semiFlat
-        self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.activeSite, s2)
 
         # these test prove that getting a semiFlat stream does not change the
         # parent
         junk = s1._definedContexts.getByClass(meter.TimeSignature)
-        self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.activeSite, s2)
 
         junk = s1._definedContexts.getByClass(clef.Clef)
-        self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.activeSite, s2)
 
         junk = s1.getContextByClass('Clef')
-        self.assertEqual(s1.parent, s2)
+        self.assertEqual(s1.activeSite, s2)
 
 
 

@@ -74,8 +74,8 @@ class SpannerException(Exception):
 
 # calculating the duration of components, or even the start of components
 # from within the spanner is very hard: the problem is that we do not know 
-# what site of the component to use: it may be the parent, it may be otherwise
-# we may have a slur to two notes that do not have a common parent
+# what site of the component to use: it may be the activeSite, it may be otherwise
+# we may have a slur to two notes that do not have a common activeSite
 
 # but: if we store a weakref to the site, we can always be sure to getComponents the 
 # the right offset

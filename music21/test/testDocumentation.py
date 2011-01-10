@@ -296,7 +296,7 @@ class Test(unittest.TestCase):
             bs = n.beatStr
             n.addLyric(bs)
             beatStrList.append(bs)
-            #environLocal.printDebug(['offset/parent', n, n.offset, n.parent, beatStr, 'bestMeasure:', beatMeasure])
+            #environLocal.printDebug(['offset/activeSite', n, n.offset, n.activeSite, beatStr, 'bestMeasure:', beatMeasure])
 
         self.assertEquals(beatStrList[:10], ['1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '2 2/3'] )
 

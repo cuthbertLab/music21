@@ -1442,9 +1442,9 @@ class Music21Object(JSONSerializer):
 
         self._overriddenLily = None
         # None is stored as the internal location of an obj w/o a parent
-        self._currentParent = None
+        self._activeSite = None
         # cached id in case the weakref has gone away...
-        self._currentParentId = None 
+        self._activeSiteId = None 
     
         # if this element has been copied, store the id() of the last source
         self._idLastDeepCopyOf = None
@@ -1474,8 +1474,8 @@ class Music21Object(JSONSerializer):
             # use None as the name of the site
             self._definedContexts.add(None, 0.0)
 
-        if "parent" in keywords and self.parent is None:
-            self.parent = keywords["parent"]
+        if "activeSite" in keywords and self.activeSite is None:
+            self.activeSite = keywords["activeSite"]
         
 #         if ("definedContexts" in keywords and 
 #             keywords["definedContexts"] is not None and 
@@ -1483,7 +1483,6 @@ class Music21Object(JSONSerializer):
 #             self._definedContexts = keywords["definedContexts"]
 #         elif self._definedContexts is None:
 #             self._definedContexts = []
-    
 
     def mergeAttributes(self, other):
         '''
@@ -1539,9 +1538,9 @@ class Music21Object(JSONSerializer):
                 continue
             part = getattr(self, name)
             # attributes that require special handling
-            if name == '_currentParent':
+            if name == '_activeSite':
                 #environLocal.printDebug(['creating parent reference'])
-                newValue = self.parent # keep a reference, not a deepcopy
+                newValue = self.activeSite # keep a reference, not a deepcopy
                 setattr(new, name, newValue)
             # this is an error check, particularly for object that inherit
             # this object and place a Stream as an attribute
@@ -1617,7 +1616,7 @@ class Music21Object(JSONSerializer):
     
     #---------------------------------------------------------------------------
     # look at this object for an atttribute; if not here
-    # look up to parents
+    # look up to activeSite
 
     def searchParentByAttr(self, attrName):
         '''If this element is contained within a Stream or other Music21 element, 
@@ -1632,13 +1631,13 @@ class Music21Object(JSONSerializer):
         '''
         found = None
         try:
-            found = getattr(self.parent, attrName)
+            found = getattr(self.activeSite, attrName)
         except AttributeError:
             # not sure of passing here is the best action
             environLocal.printDebug(['searchParentByAttr call raised attribute error for attribute:', attrName])
             pass
         if found is None:
-            found = self.parent.searchParentByAttr(attrName)
+            found = self.activeSite.searchParentByAttr(attrName)
         return found
         
 
@@ -1798,9 +1797,9 @@ class Music21Object(JSONSerializer):
         >>> s = stream.Stream()
         >>> n = note.Note()
         >>> n.addLocation(s, 10)
-        >>> n.parent = s
+        >>> n.activeSite = s
         >>> n.removeLocationBySite(s)
-        >>> n.parent == None
+        >>> n.activeSite == None
         True
         '''
         if not self._definedContexts.isSite(site):
@@ -1808,8 +1807,8 @@ class Music21Object(JSONSerializer):
         self._definedContexts.remove(site)
         # if parent is set to that site, reassign to None
 
-        if self._getParent() == site:
-            self._setParent(None)
+        if self._getActiveSite() == site:
+            self._setActiveSite(None)
 
 
     def removeLocationBySiteId(self, siteId):
@@ -1819,15 +1818,15 @@ class Music21Object(JSONSerializer):
         >>> s = stream.Stream()
         >>> n = note.Note()
         >>> n.addLocation(s, 10)
-        >>> n.parent = s
+        >>> n.activeSite = s
         >>> n.removeLocationBySiteId(id(s))
-        >>> n.parent == None
+        >>> n.activeSite == None
         True
         '''
         self._definedContexts.removeById(siteId)
-        p = self._getParent()
+        p = self._getActiveSite()
         if p != None and id(p) == siteId:
-            self._setParent(None)
+            self._setActiveSite(None)
 
 
     def purgeLocations(self):
@@ -1857,13 +1856,13 @@ class Music21Object(JSONSerializer):
 
         The `prioritizeParent` parameter searches the objects parent before any other object. 
         '''
-        #environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.parent, 'callerFirst:', callerFirst, 'prioritizeParent', prioritizeParent])
+        #environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeParent', prioritizeParent])
     
         # this method will be called recursively on all object levels, ascending
         # thus, to do serial reverse search we need to 
         # look at parent flat and track back to first encountered class match
         if prioritizeParent:
-            priorityTarget = self.parent
+            priorityTarget = self.activeSite
         else:
             priorityTarget = None
 
@@ -1987,23 +1986,23 @@ class Music21Object(JSONSerializer):
     #---------------------------------------------------------------------------
     # properties
 
-    def _getParent(self):
+    def _getActiveSite(self):
         # can be None
         if WEAKREF_ACTIVE:
-            if self._currentParent is None: #leave None
-                return self._currentParent
-            else: # even if current parent is not a weakref, this= will work
-                return common.unwrapWeakref(self._currentParent)
+            if self._activeSite is None: #leave None
+                return self._activeSite
+            else: # even if current activeSite is not a weakref, this= will work
+                return common.unwrapWeakref(self._activeSite)
         else:
-            return self._currentParent
+            return self._activeSite
     
-    def _setParent(self, site):
+    def _setActiveSite(self, site):
         siteId = None
         if site != None: 
             siteId = id(site)
-            # check that the parent is not already set to this object
+            # check that the activeSite is not already set to this object
             # this avoids making another weakref
-            if self._currentParentId == siteId:
+            if self._activeSiteId == siteId:
                 return
 
         if site is not None and not self._definedContexts.hasSiteId(siteId):
@@ -2011,17 +2010,17 @@ class Music21Object(JSONSerializer):
         
         if WEAKREF_ACTIVE:
             if site is None: # leave None alone
-                self._currentParent = None
-                self._currentParentId = None
+                self._activeSite = None
+                self._activeSiteId = None
             else:
-                self._currentParent = common.wrapWeakref(site)
-                self._currentParentId = siteId
+                self._activeSite = common.wrapWeakref(site)
+                self._activeSiteId = siteId
         else:
-            self._currentParent = site
-            self._currentParentId = siteId
+            self._activeSite = site
+            self._activeSiteId = siteId
 
 
-    parent = property(_getParent, _setParent, 
+    activeSite = property(_getActiveSite, _setActiveSite, 
         doc='''A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
         ''')
 
@@ -2042,7 +2041,7 @@ class Music21Object(JSONSerializer):
         >>> offset = 20.0
         >>> st1._elements = [o1]
         >>> o1.addLocationAndParent(offset, st1, st1_wr)
-        >>> o1.parent is st1
+        >>> o1.activeSite is st1
         True
         >>> o1.getOffsetBySite(st1)
         20.0
@@ -2052,17 +2051,17 @@ class Music21Object(JSONSerializer):
         
         # if the current parent is already set, nothing to do
         # do not create a new weakref 
-        if self._currentParentId == parentId:
+        if self._activeSiteId == parentId:
             return 
 
         if WEAKREF_ACTIVE:
                 if parentWeakRef is None:
                     parentWeakRef = common.wrapWeakref(parent)
-                self._currentParent = parentWeakRef
-                self._currentParentId = parentId
+                self._activeSite = parentWeakRef
+                self._activeSiteId = parentId
         else:
-            self._currentParent = parent
-            self._currentParentId = parentId
+            self._activeSite = parent
+            self._activeSiteId = parentId
         
 
     def _getOffset(self):
@@ -2074,25 +2073,25 @@ class Music21Object(JSONSerializer):
         # the first case here would match
 
         parentId = None
-        if self.parent is not None:
-            parentId = id(self.parent)
-        elif self._currentParentId is not None:
-            parentId = self._currentParentId
+        if self.activeSite is not None:
+            parentId = id(self.activeSite)
+        elif self._activeSiteId is not None:
+            parentId = self._activeSiteId
         
         if parentId is not None and self._definedContexts.hasSiteId(parentId):
         # if parentId is not None and parentId in self._definedContexts.coordinates:
             return self._definedContexts.getOffsetBySiteId(parentId)
             #return self._definedContexts.coordinates[parentId]['offset']
-        elif self.parent is None: # assume we want self
+        elif self.activeSite is None: # assume we want self
             return self._definedContexts.getOffsetBySite(None)
         else:
             # try to look for it in all objects
-            environLocal.printDebug(['doing a manual parent search: problably means that id(self.parent) (%s) is not equal to self._currentParentId (%s)' % (id(self.parent), self._currentParentId)])
-            offset = self._definedContexts.getOffsetByObjectMatch(self.parent)
+            environLocal.printDebug(['doing a manual parent search: problably means that id(self.activeSite) (%s) is not equal to self._activeSiteId (%s)' % (id(self.activeSite), self._activeSiteId)])
+            offset = self._definedContexts.getOffsetByObjectMatch(self.activeSite)
             return offset
 
             environLocal.printDebug(['self._definedContexts', self._definedContexts._definedContexts])
-            raise Exception('request within %s for offset cannot be made with parent of %s (id: %s)' % (self.__class__, self.parent, parentId))            
+            raise Exception('request within %s for offset cannot be made with parent of %s (id: %s)' % (self.__class__, self.activeSite, parentId))            
 
     def _setOffset(self, value):
         '''Set the offset for the parent object. 
@@ -2114,10 +2113,10 @@ class Music21Object(JSONSerializer):
 #         else:
 #             raise Exception('We cannot set  %s as an offset' % value)
 
-        # using _currentParentId offers a considerable speed boost, as we
-        # do not have to unwrap a weakref of self.parent to get the id()
+        # using _activeSiteId offers a considerable speed boost, as we
+        # do not have to unwrap a weakref of self.activeSite to get the id()
         # of parent
-        self._definedContexts.setOffsetBySiteId(self._currentParentId, offset) 
+        self._definedContexts.setOffsetBySiteId(self._activeSiteId, offset) 
 
     
     offset = property(_getOffset, _setOffset, 
@@ -2211,7 +2210,7 @@ class Music21Object(JSONSerializer):
         self._definedContexts.unwrapWeakref()
         # doing direct access; not using property parent, as filters
         # through global WEAKREF_ACTIVE setting
-        self._currentParent = common.unwrapWeakref(self._currentParent)
+        self._activeSite = common.unwrapWeakref(self._activeSite)
 
     def wrapWeakref(self):
         '''Public interface to operation on DefinedContexts.
@@ -2229,12 +2228,12 @@ class Music21Object(JSONSerializer):
 
         # doing direct access; not using property parent, as filters
         # through global WEAKREF_ACTIVE setting
-        self._currentParent = common.wrapWeakref(self._currentParent)
+        self._activeSite = common.wrapWeakref(self._activeSite)
         # this is done both here and in unfreezeIds()
         # not sure if both are necesary
-        if self._currentParent is not None:
-            obj = common.unwrapWeakref(self._currentParent)
-            self._currentParentId = id(obj)
+        if self._activeSite is not None:
+            obj = common.unwrapWeakref(self._activeSite)
+            self._activeSiteId = id(obj)
 
 
     def freezeIds(self):
@@ -2246,20 +2245,20 @@ class Music21Object(JSONSerializer):
         >>> aM21Obj.getOffsetBySite(None)
         30.0
         >>> bM21Obj.addLocationAndParent(50, aM21Obj)   
-        >>> bM21Obj.parent != None
+        >>> bM21Obj.activeSite != None
         True
-        >>> oldParentId = bM21Obj._currentParentId
+        >>> oldParentId = bM21Obj._activeSiteId
         >>> bM21Obj.freezeIds()
-        >>> newParentId = bM21Obj._currentParentId
+        >>> newParentId = bM21Obj._activeSiteId
         >>> oldParentId == newParentId
         False
         '''
         self._definedContexts.freezeIds()
 
-        # _currentParent could be a weak ref; may need to manage
-        if self._currentParent is not None:
-            #environLocal.printDebug(['freezeIds: adjusting _currentParentId', self._currentParent])
-            self._currentParentId = uuid.uuid4() # a place holder
+        # _activeSite could be a weak ref; may need to manage
+        if self._activeSite is not None:
+            #environLocal.printDebug(['freezeIds: adjusting _activeSiteId', self._activeSite])
+            self._activeSiteId = uuid.uuid4() # a place holder
 
 
     def unfreezeIds(self):
@@ -2271,24 +2270,24 @@ class Music21Object(JSONSerializer):
         >>> aM21Obj.getOffsetBySite(None)
         30.0
         >>> bM21Obj.addLocationAndParent(50, aM21Obj)   
-        >>> bM21Obj.parent != None
+        >>> bM21Obj.activeSite != None
         True
-        >>> oldParentId = bM21Obj._currentParentId
+        >>> oldParentId = bM21Obj._activeSiteId
         >>> bM21Obj.freezeIds()
-        >>> newParentId = bM21Obj._currentParentId
+        >>> newParentId = bM21Obj._activeSiteId
         >>> oldParentId == newParentId
         False
         >>> bM21Obj.unfreezeIds()
-        >>> postParentId = bM21Obj._currentParentId
+        >>> postParentId = bM21Obj._activeSiteId
         >>> oldParentId == postParentId
         True
         '''
         #environLocal.printDebug(['unfreezing ids', self])
         self._definedContexts.unfreezeIds()
 
-        if self._currentParent is not None:
-            obj = common.unwrapWeakref(self._currentParent)
-            self._currentParentId = id(obj)
+        if self._activeSite is not None:
+            obj = common.unwrapWeakref(self._activeSite)
+            self._activeSiteId = id(obj)
 
 
 
@@ -2700,8 +2699,8 @@ class Music21Object(JSONSerializer):
         '''If this object is contained in a Measure, return the measure number
         '''
         mNumber = None # default for not defined
-        if self.parent != None and self.parent.isMeasure:
-            mNumber = self.parent.number
+        if self.activeSite != None and self.activeSite.isMeasure:
+            mNumber = self.activeSite.number
         else:
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
@@ -2733,11 +2732,11 @@ class Music21Object(JSONSerializer):
         [0.0, 0.5, 1.0, 1.5]
         '''
 
-        if self.parent != None and self.parent.isMeasure:
+        if self.activeSite != None and self.activeSite.isMeasure:
             environLocal.printDebug(['found parent as Measure, using for offset'])
-            offsetLocal = self.getOffsetBySite(self.parent)
+            offsetLocal = self.getOffsetBySite(self.activeSite)
         else:
-            #environLocal.printDebug(['did not find parent as Measure, doing context search', 'self.parent', self.parent])
+            #environLocal.printDebug(['did not find parent as Measure, doing context search', 'self.activeSite', self.activeSite])
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
             m = self.getContextByClass('Measure', sortByCreationTime=True, prioritizeParent=False)
@@ -2763,7 +2762,7 @@ class Music21Object(JSONSerializer):
         True
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> m.repeatAppend(n, 2)
-        >>> m[1].parent # here we get the parent, but not in m.notes
+        >>> m[1].activeSite # here we get the parent, but not in m.notes
         <music21.stream.Measure 0 offset=0.0>
 
         >>> m.notes[0]._getBeat()
@@ -3160,7 +3159,7 @@ class ElementWrapper(Music21Object):
            not hasattr(other, "priority") or \
            not hasattr(other, "id") or \
            not hasattr(other, "groups") or \
-           not hasattr(other, "parent") or \
+           not hasattr(other, "activeSite") or \
            not hasattr(other, "duration"):
             return False
 
@@ -3170,7 +3169,7 @@ class ElementWrapper(Music21Object):
             self.priority == other.priority and \
             self.id == other.id and \
             self.groups == other.groups and \
-            self.parent == other.parent and \
+            self.activeSite == other.activeSite and \
             self.duration == self.duration):
             return True
         else:
@@ -3191,7 +3190,7 @@ class ElementWrapper(Music21Object):
         
         # if not, change the attribute in the stored object
         storedobj = object.__getattribute__(self, "obj")
-        if name not in ['offset', '_offset', '_currentParent'] and \
+        if name not in ['offset', '_offset', '_activeSite'] and \
             storedobj is not None and hasattr(storedobj, name):
             setattr(storedobj, name, value)
         # unless neither has the attribute, in which case add it to the ElementWrapper
@@ -3220,7 +3219,7 @@ class ElementWrapper(Music21Object):
         a and b store either the same object OR objects that are equal
         and a.groups == b.groups 
         and a.id == b.id (or both are none) and duration are equal.
-        but does not require position, priority, or parent to be the same
+        but does not require position, priority, or activeSite to be the same
         In other words, is essentially the same object in a different context
              
         >>> import note
@@ -3360,13 +3359,13 @@ class Test(unittest.TestCase):
 #        self.assertEqual(loc.getSiteByIndex(-1), bMock)
 
         #del aMock
-        # if the parent has been deleted, the None will be returned
+        # if the activeSite has been deleted, the None will be returned
         # even though there is still an entry
         #self.assertEqual(loc.getSiteByIndex(0), None)
 
 
     def testLocationsNone(self):
-        '''Test assigning a None to parent
+        '''Test assigning a None to activeSite
         '''
         loc = DefinedContexts()
         loc.add(None, 0)
@@ -3395,19 +3394,19 @@ class Test(unittest.TestCase):
         self.assertEqual(a.getOffsetBySite(None), 30.0)
         self.assertEqual(a.offset, 30.0)
 
-        # assigning a parent directly
-        a.parent = b
+        # assigning a activeSite directly
+        a.activeSite = b
         # now we have two offsets in locations
         self.assertEqual(len(a._definedContexts), 2)
 
         a.offset = 40
-        # still have parent
-        self.assertEqual(a.parent, b)
-        # now the offst returns the value for the current parent 
+        # still have activeSite
+        self.assertEqual(a.activeSite, b)
+        # now the offst returns the value for the current activeSite 
         self.assertEqual(a.offset, 40.0)
 
-        # assigning a parent to None
-        a.parent = None
+        # assigning a activeSite to None
+        a.activeSite = None
         # properly returns original offset
         self.assertEqual(a.offset, 30.0)
         # we still have two locations stored
@@ -3426,18 +3425,18 @@ class Test(unittest.TestCase):
         post = []
         for x in range(30):
             b.id = 'test'
-            b.parent = a
+            b.activeSite = a
             c = copy.deepcopy(b)
             c.id = "c obj"
             post.append(c)
 
-        # have two locations: None, and that set by assigning parent
+        # have two locations: None, and that set by assigning activeSite
         self.assertEqual(len(b._definedContexts), 2)
         g = post[-1]._definedContexts
         self.assertEqual(len(post[-1]._definedContexts), 2)
 
         # this now works
-        self.assertEqual(post[-1].parent, a)
+        self.assertEqual(post[-1].activeSite, a)
 
 
         a = Music21Object()
@@ -3446,17 +3445,17 @@ class Test(unittest.TestCase):
         for x in range(30):
             b = Music21Object()
             b.id = 'test'
-            b.parent = a
+            b.activeSite = a
             b.offset = 30
             c = copy.deepcopy(b)
-            c.parent = b
+            c.activeSite = b
             post.append(c)
 
         self.assertEqual(len(post[-1]._definedContexts), 3)
 
-        # this works because the parent is being set on the object
-        self.assertEqual(post[-1].parent, b)
-        # the copied parent has been deepcopied, and cannot now be accessed
+        # this works because the activeSite is being set on the object
+        self.assertEqual(post[-1].activeSite, b)
+        # the copied activeSite has been deepcopied, and cannot now be accessed
         # this fails! post[-1].getOffsetBySite(a)
 
 
@@ -3518,7 +3517,7 @@ class Test(unittest.TestCase):
         # this seems more idiomatic
         self.assertEqual(s2.flat.getOffsetByElement(n2), 110)
         
-        # both notes can find the treble clef in the parent stream
+        # both notes can find the treble clef in the activeSite stream
         post = n1.getContextByClass(clef.TrebleClef)
         self.assertEqual(isinstance(post, clef.TrebleClef), True)
         
@@ -3543,7 +3542,7 @@ class Test(unittest.TestCase):
         measures = a[0].getElementsByClass('Measure') # measures of first part
 
         # the parent of measures[1] is set to the new output stream
-        self.assertEqual(measures[1].parent, measures)
+        self.assertEqual(measures[1].activeSite, measures)
         # the source Part should still be a context of this measure
         self.assertEqual(measures[1].hasContext(a[0]), True)
 

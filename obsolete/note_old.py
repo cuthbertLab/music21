@@ -22,7 +22,7 @@ stepnames = 'ABCDEFG'
 
 class GeneralNote(object):
     '''
-    A GeneralNote object is the parent object for the Note, Rest, Unpitched, and SimpleNote, etc. objects
+    A GeneralNote object is the base-class object for the Note, Rest, Unpitched, and SimpleNote, etc. objects
     It contains duration, notations, editorial, and tie fields.
     '''    
 
