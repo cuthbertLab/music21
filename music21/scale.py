@@ -119,7 +119,9 @@ class Scale(music21.Music21Object):
 class AbstractScale(Scale):
     '''An abstract scale is specific scale formation, but does not have a defined pitch collection or pitch reference. For example, all Major scales can be represented by an AbstractScale; a ConcreteScale, however, is a specific Major Scale, such as G Major. 
 
-    These classes primarily create and manipulate the stored IntervalNetwork object. Thus, they are rarely created or manipulated directly by most users.
+    These classes provide an interface to, and create and manipulate, the stored IntervalNetwork object. Thus, they are rarely created or manipulated directly by most users.
+
+    The AbstractScale additionally stores an `_alteredNodes` dictionary. Subclasses can define altered nodes in AbstractScale that are passed to the IntervalNetwork.
     '''
     def __init__(self):
         Scale.__init__(self)
@@ -176,16 +178,16 @@ class AbstractScale(Scale):
         # access from property
         return self._net.stepMaxUnique
 
-    def reverse(self):
-        '''Reverse all intervals in this scale.
-        '''
-        pass
+#     def reverse(self):
+#         '''Reverse all intervals in this scale.
+#         '''
+#         pass
 
     # expose interface from network. these methods must be called (and not
     # ._net directly because they can pass the alteredNodes dictionary
 
     def getRealization(self, pitchObj, stepOfPitch,      
-         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING):
+         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING, reverse=False):
         '''Realize the abstract scale as a list of pitch objects, given a pitch object, the step of that pitch object, and a min and max pitch.
         '''
         if self._net is None:
@@ -193,7 +195,8 @@ class AbstractScale(Scale):
 
         return self._net.realizePitch(pitchObj, stepOfPitch, 
             minPitch=minPitch, maxPitch=maxPitch,
-            alteredNodes=self._alteredNodes, direction=direction)
+            alteredNodes=self._alteredNodes, direction=direction,
+            reverse=reverse)
 
 
 
@@ -1063,11 +1066,17 @@ class ConcreteScale(Scale):
                 pitchObj = self._tonic
             stepOfPitch = self._abstract.tonicStep
 
+            if direction == DIRECTION_DESCENDING:
+                reverse = True # reverse presentation so pitches go high to low
+            else:
+                reverse = False
+
             # this creates new pitches on each call
             return self._abstract.getRealization(pitchObj, 
                         stepOfPitch, 
                         minPitch=minPitch, maxPitch=maxPitch, 
-                        direction=direction)
+                        direction=direction,
+                        reverse=reverse)
         else:
             return []
         #raise ScaleException("Cannot generate a scale from a DiatonicScale class")
@@ -1174,15 +1183,15 @@ class ConcreteScale(Scale):
         return post
 
 
-
-
-
     def next(self, pitchOrigin, direction='ascending', stepSize=1, 
         getNeighbor=True):
+        '''Get the next pitch given a `pitchOrigin` or None. 
 
-        '''Get the next pitch.
+        The `direction` attribute must be either ascending or descending. Default is `ascending`.
 
-        The `direction` attribute must be either ascending or descending.
+        An optional `stepSize` argument can be used to set the number of scle steps that are stepped through.
+
+        The `getNeighbor` will return a pitch from the scale if `pitchOrigin` is not in the scale. This value can be True, 'ascending', or 'descending'.
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -1955,7 +1964,7 @@ class RagAsawari(ConcreteScale):
     >>> sc.pitches
     [C2, D2, F2, G2, A-2, C3]
     >>> sc.getPitches(direction='descending')
-    [C2, D2, E-2, F2, G2, A-2, B-2, C3]
+    [C3, B-2, A-2, G2, F2, E-2, D2, C2]
     '''
 
     def __init__(self, tonic=None):
@@ -2272,7 +2281,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(mm.getPitches(direction='ascending')), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
-        self.assertEqual(str(mm.getPitches('c1', 'c3', direction='descending')), '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
+        self.assertEqual(str(mm.getPitches('c1', 'c3', direction='descending')), '[C3, B2, A2, G2, F2, E2, D2, C2, B1, A1, G1, F1, E1, D1, C1]')
 
 
         # TODO: this shows a problem with a bidirectional scale: we are 
@@ -2285,7 +2294,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(mm.getPitches('a5', 'a6', direction='ascending')), '[A5, B5, C6, D6, E6, F#6, G#6, A6]')
 
-        self.assertEqual(str(mm.getPitches('a5', 'a6', direction='descending')), '[A5, B5, C6, D6, E6, F6, G6, A6]')
+        self.assertEqual(str(mm.getPitches('a5', 'a6', direction='descending')), '[A6, G6, F6, E6, D6, C6, B5, A5]')
 
 
         self.assertEqual(mm.getScaleDegreeFromPitch('a3'), 1)
@@ -2339,7 +2348,7 @@ class Test(unittest.TestCase):
         # todo: this is ambiguous case
         #self.assertEqual(mm.pitchFromDegree(6, direction='bi').nameWithOctave, 'F5')
 
-        self.assertEqual(str(mm.getPitches(None, None, direction='descending')), '[A4, B4, C5, D5, E5, F5, G5, A5]')
+        self.assertEqual(str(mm.getPitches(None, None, direction='descending')), '[A5, G5, F5, E5, D5, C5, B4, A4]')
         self.assertEqual(str(mm.getPitches(None, None, direction='ascending')), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
 
@@ -2420,7 +2429,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(sc.getPitches('c2', 'c4', direction='ascending')), '[C2, D2, F2, G2, A-2, C3, D3, F3, G3, A-3, C4]')
 
-        self.assertEqual(str(sc.getPitches('c2', 'c4', direction='descending')), '[C2, D2, E-2, F2, G2, A-2, B-2, C3, D3, E-3, F3, G3, A-3, B-3, C4]')
+        self.assertEqual(str(sc.getPitches('c2', 'c4', direction='descending')), '[C4, B-3, A-3, G3, F3, E-3, D3, C3, B-2, A-2, G2, F2, E-2, D2, C2]')
 
         self.assertEqual(str(sc.next('c1', 'ascending')), 'D1')
         self.assertEqual(str(sc.next('d1', 'ascending')), 'F1')
@@ -2454,10 +2463,10 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(sc.getPitches('c2', 'c4', direction='ascending')), '[C2, D-2, E2, F#2, A2, B2, A2, C3, D-3, E3, F#3, A3, B3, A3, C4]')
 
-        self.assertEqual(str(sc.getPitches('c3', 'd-4', direction='descending')), '[C3, D-3, E3, F#3, A3, B3, D-4, C4, D-4]')
+        self.assertEqual(str(sc.getPitches('c3', 'd-4', direction='descending')), '[D-4, C4, D-4, B3, A3, F#3, E3, D-3, C3]')
  
         # is this correct: this cuts off the d-4, as it is outside of the range
-        self.assertEqual(str(sc.getPitches('c3', 'c4', direction='descending')), '[C3, D-3, E3, F#3, A3, B3, C4]')
+        self.assertEqual(str(sc.getPitches('c3', 'c4', direction='descending')), '[C4, B3, A3, F#3, E3, D-3, C3]')
  
 
         self.assertEqual(str(sc.next('c1', 'ascending')), 'D-1')

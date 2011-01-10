@@ -1282,7 +1282,7 @@ class IntervalNetwork(object):
 
     def _realizeDescending(self, pitchReference, nodeId=None, 
         minPitch=None, maxPitch=None, alteredNodes={}, 
-        includeFirst=False, fillMinMaxIfNone=False):
+        includeFirst=False, fillMinMaxIfNone=False, reverse=True):
         '''Given a reference pitch, realize downward to a minimum.
 
         If no minimum is is given, the terminus is used.
@@ -1413,8 +1413,10 @@ class IntervalNetwork(object):
             pCollect = self._processAlteredNodes(alteredNodes=alteredNodes, 
                        n=n, p=p, direction=DIRECTION_DESCENDING)
 
-        pre.reverse()
-        preNodeId.reverse()
+        if reverse:
+            pre.reverse()
+            preNodeId.reverse()
+
         # store in cache
         if self.deterministic:
             self._descendingCache[ck] = pre, preNodeId
@@ -1425,7 +1427,7 @@ class IntervalNetwork(object):
 
 
     def realize(self, pitchReference, nodeId=None, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_ASCENDING, alteredNodes={}):
+        direction=DIRECTION_ASCENDING, alteredNodes={}, reverse=False):
         '''Realize the nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         Without a min or max pitch, the given pitch reference is assigned to the designated node, and then both ascends to the terminus and descends to the terminus.
@@ -1566,14 +1568,19 @@ class IntervalNetwork(object):
                 alteredNodes=alteredNodes, includeFirst=False)
 
             #environLocal.printDebug(['realize()', 'pre', pre, preNodeId])
-            mergedPitches, mergedNodes =  pre + post, preNodeId + postNodeId
+            mergedPitches, mergedNodes = pre + post, preNodeId + postNodeId
+
+        if reverse:
+            mergedPitches.reverse()
+            mergedNodes.reverse()
 
         return mergedPitches, mergedNodes
 
 
 
     def realizePitch(self, pitchReference, nodeId=None, minPitch=None,
-        maxPitch=None, direction=DIRECTION_ASCENDING, alteredNodes={}):
+        maxPitch=None, direction=DIRECTION_ASCENDING, alteredNodes={}, 
+        reverse=False):
         '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
 
         The nodeId, when a simple, linear network, can be used as a scale step value starting from one.
@@ -1600,7 +1607,7 @@ class IntervalNetwork(object):
         >>> net.realizePitch(pitch.Pitch('a#2'), 7, 'c6', 'c7') 
         [C#6, D#6, E6, F#6, G#6, A#6, B6]
         '''
-        return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredNodes=alteredNodes)[0] # just return first component
+        return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredNodes=alteredNodes, reverse=reverse)[0] # just return first component
 
 
     def realizeTermini(self, pitchReference, nodeId=None, alteredNodes={}):
