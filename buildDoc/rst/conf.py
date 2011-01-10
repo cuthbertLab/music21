@@ -39,7 +39,7 @@ except ImportError:
 # General substitutions.
 project = 'music21'
 release = music21.VERSION_STR
-copyright = '2009-2010 The music21 Project'
+copyright = '2009-2011 The music21 Project'
 
 
 html_last_updated_fmt = '%b %d, %Y'
@@ -48,9 +48,16 @@ html_last_updated_fmt = '%b %d, %Y'
 html_index = 'index.html'
 
 html_theme = 'music21doc'
-html_theme_path = ["."] # search for theme in this dirs
+html_theme_path = ["."] # search for theme in this dir
 
 
+html_title = 'music21 Documentation'
+html_short_title = 'music21'
+html_sidebars = {'**': ['relations.html', 'localtoc.html', 'globaltoc.html',  'searchbox.html']}
+html_show_sourcelink = False
+
+html_theme_options = {
+    }
 
 
 def _shell():

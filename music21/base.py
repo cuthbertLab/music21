@@ -83,8 +83,8 @@ if len(_missingImport) > 0:
 
 
 #-------------------------------------------------------------------------------
-VERSION = (0, 3, 2)  # increment any time picked versions will be obsolete.
-VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a6'
+VERSION = (0, 3, 3)  # increment any time picked versions will be obsolete.
+VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a7'
 
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True

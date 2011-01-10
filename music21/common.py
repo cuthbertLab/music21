@@ -488,6 +488,23 @@ def isIterable(usrData):
         return False
 
 
+def toUnicode(usrStr):
+    '''Convert this tring to a uncode string; if already a unicode string, do nothing.
+        
+    >>> from music21 import *
+    >>> toUnicode('test')
+    u'test'
+    >>> toUnicode(u'test')
+    u'test'
+    '''
+    try:
+        usrStr = unicode(usrStr, 'utf-8')
+    # some documentation may already be in unicode; if so, a TypeException will be raised
+    except TypeError: #TypeError: decoding Unicode is not supported
+        pass
+    return usrStr
+
+
 def getNumFromStr(usrStr):
     '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
 

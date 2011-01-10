@@ -50,11 +50,11 @@ class TempoMark(music21.Music21Object):
     >>> tm.value
     'adagio'
     
-    
-    
+
     Common marks such as "adagio," "moderato," "molto allegro," etc.
     get sensible default values.  If not found, uses a default of 90:
-    
+
+
     >>> tm.number
     52
     >>> tm2 = music21.tempo.TempoMark(u"très vite")
@@ -70,7 +70,8 @@ class TempoMark(music21.Music21Object):
     
     classSortOrder = 1
     number = 90
-    
+    _DOC_ALL_INHERITED = False
+
     def __init__(self, value = None):
         music21.Music21Object.__init__(self)
         if music21.common.isNum(value):
@@ -78,7 +79,9 @@ class TempoMark(music21.Music21Object):
             self.number = value
         else:
             self.value = value
-            if value.lower() in defaultTempoValues.keys():
+            if value is None:
+                pass
+            elif value.lower() in defaultTempoValues.keys():
                 self.number = defaultTempoValues[value.lower()]
             elif value in defaultTempoValues.keys():
                 self.number = defaultTempoValues[value]
@@ -94,7 +97,6 @@ class TempoMark(music21.Music21Object):
 
 class MetronomeMark(TempoMark):
     '''
-    
     A way of specifying only a particular tempo and referent and (optionally) a text description
     
     >>> from music21 import *
@@ -126,7 +128,6 @@ class MetronomeMark(TempoMark):
 def interpolateElements(element1, element2, sourceStream, 
     destinationStream, autoAdd = True):
     '''
-    
     Assume that element1 and element2 are two elements in sourceStream 
     and destinationStream with other elements (say eA, eB, eC) between 
     them.  For instance, element1 could be the downbeat at offset 10
@@ -248,6 +249,10 @@ def interpolateElements(element1, element2, sourceStream,
 class TempoException(Exception):
     pass
 
+
+
+
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     def runTest(self):
@@ -281,6 +286,9 @@ class Test(unittest.TestCase):
     def testUnicdoe(self):
 
         from music21 import tempo
+        # test with no arguments
+        tm = music21.tempo.TempoMark()
+
         tm = music21.tempo.TempoMark("adagio")
 
         self.assertEqual(tm.number, 52)

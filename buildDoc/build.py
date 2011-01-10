@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         build.py
 # Purpose:      music21 documentation builder
@@ -9,6 +9,9 @@
 # Copyright:    (c) 2009-10 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+
+from __future__ import unicode_literals
+
 
 import unittest, doctest
 import os, sys, webbrowser, re
@@ -855,6 +858,9 @@ class RestructuredWriter(object):
         '''
         if doc == None:
             return ''
+        else:
+            # convert to unicode utf-8
+            doc = common.toUnicode(doc)
             #return '%sNo documentation.\n' % indent
         # define the start of lines that should not be changed
         rstExclude = ['.. image::', ':width:']
@@ -987,10 +993,11 @@ class CorpusDoc(RestructuredWriter):
                 workDict = composerDict['works'][workKey]
                 #msg += self._heading(workDict['title'], '~')
 
+                strTitle = common.toUnicode(workDict['title'])
                 if not workDict['virtual']: # if not virtual
-                    msg += self._para(workDict['title'])
+                    msg += self._para(strTitle)
                 else: # mark virtual sources
-                    msg += self._para(workDict['title'] + ' (*virtual*)')
+                    msg += self._para(strTitle + ' (*virtual*)')
 
                 msg.append('\n'*1)
 
@@ -999,9 +1006,14 @@ class CorpusDoc(RestructuredWriter):
                             d['format'], d['corpusPath'])
                             for d in workDict['files']]
                 else:
-                    fileList = ['%s (%s): `%s`, source: %s' % (d['title'], 
-                            d['format'], d['corpusPath'], d['url'])
-                            for d in workDict['files']]
+                    for d in workDict['files']:
+                        dTitle = common.toUnicode(d['title'])
+                        dFormat = common.toUnicode(d['format'])
+                        dCorpusPath = common.toUnicode(d['corpusPath'])
+                        dURL = common.toUnicode(d['url'])
+
+                        fileList = ['%s (%s): `%s`, source: %s' % (dTitle, 
+                            dFormat, dCorpusPath, dURL)]
 
                 msg += self._list(fileList)
                 #msg += self._list(fileList, INDENT*2)
@@ -1267,6 +1279,7 @@ class ModuleDoc(RestructuredWriter):
 
         msg.append(WARN_EDIT)
         # this defines this rst file as a module; does not create output
+        # this should be a list?
         msg += '.. module:: %s\n\n' % self.modName
         msg += self.docCooked
         msg.append('\n\n')
@@ -1276,16 +1289,21 @@ class ModuleDoc(RestructuredWriter):
             if len(names) == 0: continue
 
             for partName in names:
+                subMsg = [] 
                 if group == 'functions':
                     signature = self.partitionedModule.getSignature(partName)
-                    msg.append(self._fmtRstFunction(partName, signature))
+                    subMsg.append(self._fmtRstFunction(partName, signature))
                     #msg += '.. function:: %s()\n\n' % partName
                      #msg.append('%s\n' % self.functions[funcName]['doc'])
                 if group == 'classes':
                     qualifiedName = '%s.%s' % (self.modName, partName)
                     classDoc = ClassDoc(qualifiedName, modName=self.modName)
-                    msg += classDoc.getRestructuredClass()
-
+                    subMsg += classDoc.getRestructuredClass()
+                try:
+                    subStr = ''.join(subMsg)
+                except UnicodeDecodeError:
+                    environLocal.warn(['cannot output due to unicode decode error', 'group', group, 'partName', partName])
+                msg += [subStr]
         return ''.join(msg)
 
 
@@ -1421,9 +1439,9 @@ class Documentation(RestructuredWriter):
             f = open(os.path.join(self.dirRst, a.fileName), 'w')
 
 #             f.write(codecs.BOM_UTF8)
-#             f.write(a.getRestructured().encode( "utf-8" ) )
+            f.write(a.getRestructured().encode( "utf-8" ) )
 
-            f.write(a.getRestructured())
+            #f.write(a.getRestructured())
             f.close()
             self.chaptersModuleRef.append(a.fileRef)
 
@@ -1434,10 +1452,10 @@ class Documentation(RestructuredWriter):
         for obj in [CorpusDoc()]:
             f = open(os.path.join(self.dirRst, obj.fileName), 'w')
 
-            f.write(obj.getRestructured())
+#            f.write(obj.getRestructured())
 
 #             f.write(codecs.BOM_UTF8)
-#             f.write(obj.getRestructured().encode( "utf-8" ) )
+            f.write(obj.getRestructured().encode( "utf-8" ) )
 
             f.close()
             self.chaptersReference.append(obj.fileRef)
