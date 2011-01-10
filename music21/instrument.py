@@ -5,8 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
+#               Neena Parikh
 #
-# Copyright:    (c) 2009-10 The music21 Project
+# Copyright:    (c) 2009-11 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -449,6 +450,24 @@ class Clarinet(WoodwindInstrument):
         self.instrumentAbbreviation = 'Cl'
         self.midiProgram = 71
 
+class BassClarinet(Clarinet):
+    '''
+    >>> from music21 import *
+    >>> bcl = instrument.BassClarinet()
+    >>> bcl.instrumentName
+    'Bass clarinet'
+    >>> bcl.midiProgram
+    71
+    >>> 'WoodwindInstrument' in bcl.classes
+    True
+    '''
+    def __init__(self):
+        Clarinet.__init__(self)
+        
+        self.instrumentName = 'Bass clarinet'
+        self.instrumentAbbreviation = 'Bs.Cl.'
+        
+
 class Bassoon(WoodwindInstrument):
     def __init__(self):
         WoodwindInstrument.__init__(self)
@@ -479,6 +498,9 @@ class Glockenspiel(PitchedPercussion):
 
 #http://home.comcast.net/~igpl/NWR.html
 # TODO: NEENA -- take list and continue to 100 -- just for fun...
+# and write test code
+
+
 ensembleNameBySize = ["no performers", "solo", "duet", "trio", "quartet", 
                       "quintet", "sextet", "septet", "octet", "nonet",
                       "dectet", "undectet", "duodectet", "tredectet", "quattuordectet",
