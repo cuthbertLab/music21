@@ -726,6 +726,15 @@ class Test(unittest.TestCase):
         self.assertEqual(slur1.getOffsetSpanBySite(p1), [0.0, 2.0])
 
 
+        # can a spanner hold spanners: yes
+        sl1 = Slur()
+        sl2 = Slur()
+        sl3 = Slur()
+        sp = Spanner([sl1, sl2, sl3])
+        self.assertEqual(len(sp.getComponents()), 3)
+        self.assertEqual(sp.getComponents(), [sl1, sl2, sl3])
+
+
 
     def testSpannerBundle(self):
         from music21 import spanner, stream

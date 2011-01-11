@@ -2234,7 +2234,7 @@ class Stream(music21.Music21Object):
                 # -1 here is a reverse sort, where oldest objects are returned
                 # first
                 m = e.getContextByClass(Measure, sortByCreationTime=-1,
-                    prioritizeParent=False)
+                    prioritizeActiveSite=False)
                 if m is None: 
                     continue
                 # assuming that the offset returns the proper offset context

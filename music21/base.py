@@ -580,7 +580,8 @@ class DefinedContexts(object):
         '''
         if sortByCreationTime in [True, 1]:
             keyRepository = self._keysByTime(newFirst=True)
-        elif sortByCreationTime in [-1]:
+        # reverse creation time puts oldest elements first
+        elif sortByCreationTime in [-1, 'reverse']:
             keyRepository = self._keysByTime(newFirst=False)
         else: # None, or False
             keyRepository = self._definedContexts.keys()
@@ -953,7 +954,7 @@ class DefinedContexts(object):
     # for dealing with contexts or getting other information
 
     def getByClass(self, className, serialReverseSearch=True, callerFirst=None,
-             sortByCreationTime=False, prioritizeParent=False, 
+             sortByCreationTime=False, prioritizeActiveSite=False, 
              priorityTarget=None, memo=None):
         '''Return the most recently added reference based on className. Class name can be a string or the class name.
 
@@ -962,7 +963,7 @@ class DefinedContexts(object):
         The `callerFirst` parameters is simply used to pass a reference of the first caller; this
         is necessary if we are looking within a Stream for a flat offset position.
 
-        If `priorityTarget` is specified, this location will be searched first. The `prioritizeParent` is based to to any recursively called getContextByClass() calls. 
+        If `priorityTarget` is specified, this location will be searched first. The `prioritizeActiveSite` is based to to any recursively called getContextByClass() calls. 
 
         >>> class Mock(Music21Object): pass
         >>> import time
@@ -1032,7 +1033,7 @@ class DefinedContexts(object):
                                serialReverseSearch=serialReverseSearch,
                                callerFirst=callerFirst, 
                                sortByCreationTime=sortByCreationTime, 
-                               prioritizeParent=prioritizeParent,
+                               prioritizeActiveSite=prioritizeActiveSite,
                                memo=memo)
                         if post != None:
                             break
@@ -1841,7 +1842,7 @@ class Music21Object(JSONSerializer):
 
 
     def getContextByClass(self, className, serialReverseSearch=True,
-                          callerFirst=None, sortByCreationTime=False, prioritizeParent=True, memo=None):
+                          callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, memo=None):
         '''Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. 
 
         The a reference to the caller is required to find the offset of the 
@@ -1854,14 +1855,14 @@ class Music21Object(JSONSerializer):
 
         The `callerFirst` is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
 
-        The `prioritizeParent` parameter searches the objects parent before any other object. 
+        The `prioritizeActiveSite` parameter searches the objects parent before any other object. 
         '''
-        #environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeParent', prioritizeParent])
+        #environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeActiveSite', prioritizeActiveSite])
     
         # this method will be called recursively on all object levels, ascending
         # thus, to do serial reverse search we need to 
         # look at parent flat and track back to first encountered class match
-        if prioritizeParent:
+        if prioritizeActiveSite:
             priorityTarget = self.activeSite
         else:
             priorityTarget = None
@@ -1938,7 +1939,7 @@ class Music21Object(JSONSerializer):
                    callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, 
                    # make the priorityTarget the parent, meaning we search
                    # this object first
-                   prioritizeParent=prioritizeParent, 
+                   prioritizeActiveSite=prioritizeActiveSite, 
                    priorityTarget=priorityTarget, memo=memo)
 
         return post
@@ -2739,7 +2740,7 @@ class Music21Object(JSONSerializer):
             #environLocal.printDebug(['did not find parent as Measure, doing context search', 'self.activeSite', self.activeSite])
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
-            m = self.getContextByClass('Measure', sortByCreationTime=True, prioritizeParent=False)
+            m = self.getContextByClass('Measure', sortByCreationTime=True, prioritizeActiveSite=False)
             if m != None:
                 #environLocal.printDebug(['using found Measure for offset access'])            
                 offsetLocal = self.getOffsetBySite(m) + m.paddingLeft

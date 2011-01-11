@@ -38,6 +38,7 @@ class Test(unittest.TestCase):
 
 
         #==== "fig-df02"
+        # Storing, Ordering, and Timing Elements
 
         n1 = note.Note('g3', type='half')
         n2 = note.Note('d4', type='half')
@@ -78,13 +79,13 @@ class Test(unittest.TestCase):
         assert len(p1) == 2
         # the Stream duration is the highest offset + durations
         assert p1.duration.quarterLength == 8
-        # can access notes using multiple indices
+        # can access Notes from Part using multiple indices
         assert p1[1][0].pitch.nameWithOctave == 'G#3'
 
         s1 = stream.Score()
         s1.append(p1)
-        md = metadata.Metadata(title='The music21 Stream')
-        s1.insert(0, md)
+        md1 = metadata.Metadata(title='The music21 Stream')
+        s1.insert(0, md1)
         # calling show by default renders musicxml output
         #s1.show()
 
@@ -93,6 +94,7 @@ class Test(unittest.TestCase):
 
 
         #==== "fig-df03"
+        # Positioning the Same Element in Multiple Containers
         # show positioning the same element in multiple containers
         # do not yet use a flat representation
         s2 = stream.Stream()
@@ -126,8 +128,109 @@ class Test(unittest.TestCase):
 
 
 
+        #==== "fig-df04"
+        # Simultaneous Access to Hierarchical and Flat Representations
+        #s1.flat.show('t')
+
+        # lengths show the number of elements; indices are sequential
+        s1Flat = s1.flat
+        assert len(s1) == 2
+        assert len(s1Flat) == 6
+        assert s1Flat[4] == n3
+        assert s1Flat[5] == n4
+
+        # adding another Part to the Score results in a different flat representation
+        r1 = note.Rest(type='whole')
+        n5 = note.Note('a#1', quarterLength=2.5)
+        n6 = note.Note('b2', quarterLength=1.5)
+        cf2 = clef.BassClef()
+        m3 = stream.Measure()
+        m3.append([cf2, r1])
+        m4 = stream.Measure()
+        m4.append([n5, n6])
+        p2 = stream.Part()
+        p2.append([m3, m4])
+        s1.insert(0, p2)
 
 
+        #s1.flat.show('t')
+        #s1.show()
+
+        # objects are sorted by offset
+        s1Flat = s1.flat
+        assert len(s1) == 3
+        assert len(s1.flat) == 10
+        assert s1Flat[6] == n3
+        assert s1Flat[7] == n5
+        assert s1Flat[8] == n4
+        assert s1Flat[9] == n6
+
+        # the F-sharp in m. 2 now as offsets for both flat non-flat sites
+        assert n3.getOffsetBySite(m2) == 0
+        assert n3.getOffsetBySite(s1Flat) == 4
+        # the B in m. 2 now as offsets for both flat non-flat sites
+        assert n6.getOffsetBySite(m4) == 2.5
+        assert n6.getOffsetBySite(s1Flat) == 6.5
+
+        #==== "fig-df04" end
+
+
+
+
+        #==== "fig-df05"
+        # Iterating and Filtering Elements by Class
+
+
+        # get the Clef object, and report its sign, from Measure 1
+        assert m1.getElementsByClass('Clef')[0].sign == 'C'
+        # collect into a list the sign of all clefs in the flat Score
+        assert [cf.sign for cf in s1.flat.getElementsByClass('Clef')] == ['C', 'F']
+
+        # collect the offsets Measures in the first part
+        assert [e.offset for e in p1.elements] == [0.0, 4.0]
+        # collect the offsets of Note in the first part flattened
+        assert [e.offset for e in p1.flat.notes] == [0.0, 2.0, 4.0, 4.5]
+        # collect the offsets of Notes in all parts flattened
+        assert [e.offset for e in s1.flat.notes] == [0.0, 0.0, 2.0, 4.0, 4.0, 4.5, 6.5]
+
+
+        # get all pitch names
+        match = []
+        for e in s1.flat.getElementsByClass('Note'):
+            match.append(e.pitch.nameWithOctave)
+        assert match == ['G3', 'C4', 'G#3', 'A#1', 'D-4', 'B2']
+
+        # collect all Notes and transpose up a perfect fifth
+        for n in s1.flat.getElementsByClass('Note'):
+            n.transpose('P5', inPlace=True)
+        
+        # check that all pitches are correctly transposed
+        match = []
+        for e in s1.flat.getElementsByClass('Note'):
+            match.append(e.pitch.nameWithOctave)    
+        assert match == ['D4', 'G4', 'D#4', 'E#2', 'A-4', 'F#3']
+
+        #s1.show()
+
+        #==== "fig-df05" end
+
+
+
+
+
+        #==== "fig-df06"
+        # Searching by Locations and Contexts
+
+        assert n4.getContextByClass('Clef') == cf1
+
+        # as the Note has been in many Streams, must reset activeSite
+        #n6.activeSite = p2
+        # must prioritive in search
+        assert n6.getContextByClass('Clef', sortByCreationTime='reverse') == cf2
+
+#, prioritizeActiveSite=True
+
+        #==== "fig-df06" end
 
 
         # tests
@@ -135,7 +238,10 @@ class Test(unittest.TestCase):
 
 
 
-        r1 = note.Rest(type='whole')
+
+
+
+
 
 
 

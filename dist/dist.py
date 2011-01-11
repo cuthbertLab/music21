@@ -4,7 +4,7 @@
 #
 # Authors:       Christopher Ariza
 #
-# Copyright:     (c) 2010 Christopher Ariza
+# Copyright:     (c) 2010-2011 Christopher Ariza
 # License:       GPL
 #-------------------------------------------------------------------------------
 
@@ -15,6 +15,12 @@ from music21 import environment
 _MOD = 'dist.py'
 environLocal = environment.Environment(_MOD)
 
+
+'''
+Build and upload music21 in three formats: egg, exe, and tar.
+
+Simply call from the command line.
+'''
 
 
 class Distributor(object):
