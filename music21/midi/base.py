@@ -663,16 +663,18 @@ class MidiTrack(object):
 
 class MidiFile(object):
     '''
-    Low MIDI file writing, emulating methods from normal Python files. 
+    Low-level MIDI file writing, emulating methods from normal Python files. 
 
     The `ticksPerQuarterNote` attribute must be set before writing. 1024 is a common value.
+
+    This object is returned by some properties for directly writing files of midi representations.
     '''
     
     def __init__(self): 
         self.file = None 
         self.format = 1 
         self.tracks = [] 
-        self.ticksPerQuarterNote = None 
+        self.ticksPerQuarterNote = 1024 
         self.ticksPerSecond = None 
     
     def open(self, filename, attrib="rb"): 

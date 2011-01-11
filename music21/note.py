@@ -909,11 +909,16 @@ class Note(NotRest):
 
 
     midiFile = property(_getMidiFile,
-        doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.
+        doc = '''Return a complete :class:`music21.midi.base.MidiFile` object based on the Note.
+
+        The :class:`music21.midi.base.MidiFile` object can be used to write a MIDI file of this Note with default parameters using the :meth:`music21.midi.base.MidiFile.write` method, given a file path. The file must be opened in 'wb' mode.  
 
         >>> from music21 import *
         >>> n = note.Note()
         >>> mf = n.midiFile
+        >>> #_DOCS_SHOW mf.open('/Volumes/xdisc/_scratch/midi.mid', 'wb')
+        >>> #_DOCS_SHOW mf.write()
+        >>> #_DOCS_SHOW mf.close()
         ''')
 
 

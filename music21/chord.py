@@ -236,10 +236,16 @@ class Chord(note.NotRest):
 #         return mf
 
     midiFile = property(_getMidiFile,
-        doc = '''Return a complete :class:`music21.midi.base.MidiFile` object.
+        doc = '''Return a complete :class:`music21.midi.base.MidiFile` object based on the Chord.
 
-        >>> c = Chord(['c3','g#4', 'b5'])
+        The :class:`music21.midi.base.MidiFile` object can be used to write a MIDI file of this Chord with default parameters using the :meth:`music21.midi.base.MidiFile.write` method, given a file path. The file must be opened in 'wb' mode.  
+
+        >>> from music21 import *
+        >>> c = chord.Chord(['c3','g#4', 'b5'])
         >>> mf = c.midiFile
+        >>> #_DOCS_SHOW mf.open('/Volumes/xdisc/_scratch/midi.mid', 'wb')
+        >>> #_DOCS_SHOW mf.write()
+        >>> #_DOCS_SHOW mf.close()
         ''')
 
 

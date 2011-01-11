@@ -471,10 +471,10 @@ class IntervalNetwork(object):
 
 
     def fillDirectedEdges(self, ascendingEdgeList, descendingEdgeList):
-        '''Given two lists of edges, one for ascending :class:`~music21.interval.Interval`s and 
+        '''Given two lists of edges, one for ascending :class:`~music21.interval.Interval` objects and 
         another for  descending, construct appropriate Nodes and Edges.
 
-        Note that the descending :class:`~music21.interval.Interval`s should be given in ascending form. 
+        Note that the descending :class:`~music21.interval.Interval` ojbects should be given in ascending form. 
         '''
         self.clear()
 
