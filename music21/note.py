@@ -259,6 +259,15 @@ class GeneralNote(music21.Music21Object):
                 self.lyrics.append(Lyric(text, lyricNumber))
 
 
+    def hasLyrics(self):
+        '''Return True if this object has any lyrics defined
+        '''
+        if len(self.lyrics) > 0:
+            return True
+        else:
+            return False
+
+
     #---------------------------------------------------------------------------
     # properties common to Notes, Rests, 
     def _getQuarterLength(self):

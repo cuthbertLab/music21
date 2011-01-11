@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
         n4 = note.Note('d-4', quarterLength=3.5)
         cf1 = clef.AltoClef()
 
-        m1 = stream.Measure()
+        m1 = stream.Measure(number=1)
         m1.append([n1, n2])
         m1.insert(0, cf1)
 
@@ -61,7 +61,7 @@ class Test(unittest.TestCase):
         # can find an element based on a given offset
         assert m1.getElementAtOrBefore(3) == n2 
 
-        m2 = stream.Measure()
+        m2 = stream.Measure(number=2)
         m2.append([n3, n4])
 
         # appended position is after n3
@@ -144,9 +144,9 @@ class Test(unittest.TestCase):
         n5 = note.Note('a#1', quarterLength=2.5)
         n6 = note.Note('b2', quarterLength=1.5)
         cf2 = clef.BassClef()
-        m3 = stream.Measure()
+        m3 = stream.Measure(number=1)
         m3.append([cf2, r1])
-        m4 = stream.Measure()
+        m4 = stream.Measure(number=2)
         m4.append([n5, n6])
         p2 = stream.Part()
         p2.append([m3, m4])
@@ -221,25 +221,86 @@ class Test(unittest.TestCase):
         #==== "fig-df06"
         # Searching by Locations and Contexts
 
+        # a Note can always find a Clef
         assert n4.getContextByClass('Clef') == cf1
-
-        # as the Note has been in many Streams, must reset activeSite
-        #n6.activeSite = p2
-        # must prioritive in search
+        # must search oldest sites first
         assert n6.getContextByClass('Clef', sortByCreationTime='reverse') == cf2
 
-#, prioritizeActiveSite=True
 
+        # a Note can find their Measure number from a flat Part
+        match = []
+        for e in p1.flat.getElementsByClass('Note'):
+            match.append(e.getContextByClass('Measure').number)    
+        assert match == [1, 1, 2, 2]
+
+        # all Notes can find their Measure number from a flat Score
+        match = []
+        for e in s1.flat.notes:
+            match.append(e.getContextByClass('Measure').number)   
+        assert match == [1, 1, 1, 2, 2, 2, 2]
         #==== "fig-df06" end
 
 
-        # tests
+
+
+        #==== "fig-df06"
+        # Non-Hierarchical Object Associations
+
+        # Spanners can be positioned in Parts or Measures
+        sp1 = spanner.Slur([n1, n4])
+        p1.append(sp1)
+        sp2 = spanner.Slur([n5, n6])
+        m4.insert(0, sp2)
+
+        p1Flat = p1.flat
+        assert sp1.getDurationSpanBySite(p1Flat) == [0.0, 8.0]
+
+        p2Flat = p2.flat
+        assert sp2.getDurationSpanBySite(p2Flat) == [4.0, 8.0]
+
+        #s1.show()
+        #==== "fig-df06" end
+
+
+        # additional tests tests
         self.assertEqual(m1.clef, cf1)
 
 
 
 
+    def testStreams02(self):
 
+        # based on Stream.testAddSlurByMelisma(self):
+
+        from music21 import corpus, spanner
+        nStart = None; nEnd = None
+
+        ex = corpus.parseWork('luca/gloria').parts['cantus'].measures(1,11)        
+        exFlatNotes = ex.flat.notes
+        nLast = exFlatNotes[-1]
+        
+        for i, n in enumerate(exFlatNotes):
+            if i < len(exFlatNotes) - 1:
+                nNext = exFlatNotes[i+1]
+            else: continue
+        
+            if n.hasLyrics():
+                nStart = n
+            # if next is a begin, then this is an end
+            elif nStart is not None and nNext.hasLyrics() and n.tie is None:
+                nEnd = n
+            elif nNext is nLast:
+                nEnd = n
+            if nStart is not None and nEnd is not None:
+                ex.insert(spanner.Slur(nStart, nEnd))
+                nStart = None; nEnd = None
+
+        for sp in ex.spanners:  
+            dur = sp.getDurationBySite(exFlatNotes)
+            n = sp.getFirst()
+            print(n.nameWithOctave, n.beatStr, dur.quarterLength)
+
+        #ex.show()
 
 
 
@@ -410,7 +471,7 @@ if __name__ == "__main__":
         #t.testEx04()
 
         t.testStreams01()
-
+        t.testStreams02()
 #------------------------------------------------------------------------------
 # eof
 

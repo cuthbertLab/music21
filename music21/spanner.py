@@ -13,6 +13,7 @@ import unittest
 
 import music21
 from music21 import common
+from music21 import duration
 
 from music21 import environment
 _MOD = "spanner.py"  
@@ -350,10 +351,14 @@ class Spanner(music21.Music21Object):
         return [minOffset, highestTime]
 
 
-
-
-
-
+    def getDurationBySite(self, site, componentOffset=True):
+        '''Return a Duration object representing the value between the first component's offset and the last components offset plus duration. 
+        '''
+        low, high = self.getDurationSpanBySite(site=site,
+                   componentOffset=componentOffset)     
+        d = duration.Duration()
+        d.quarterLength = high-low
+        return d
 
 
 

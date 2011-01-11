@@ -126,7 +126,7 @@ class Stream(music21.Music21Object):
     }
 
 
-    def __init__(self, givenElements = None):
+    def __init__(self, givenElements=None, *args, **keywords):
         music21.Music21Object.__init__(self)
 
         # self._elements stores ElementWrapper and Music21Object objects. 
@@ -6470,7 +6470,10 @@ class Measure(Stream):
         self.paddingLeft = 0
         self.paddingRight = 0
 
-        self.number = 0 # 0 means undefined or pickup
+        if 'number' in keywords.keys():
+            self.number = keywords['number']
+        else:
+            self.number = 0 # 0 means undefined or pickup
         self.numberSuffix = None # for measure 14a would be "a"
     
         # we can request layout width, using the same units used
