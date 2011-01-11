@@ -292,13 +292,14 @@ class Test(unittest.TestCase):
             elif nNext is nLast:
                 nEnd = n
             if nStart is not None and nEnd is not None:
+                nStart.addLyric(nStart.beatStr)
                 ex.insert(spanner.Slur(nStart, nEnd))
                 nStart = None; nEnd = None
 
         for sp in ex.spanners:  
             dur = sp.getDurationBySite(exFlatNotes)
             n = sp.getFirst()
-            print(n.nameWithOctave, n.beatStr, dur.quarterLength)
+            print(n.nameWithOctave, dur.quarterLength)
 
         #ex.show()
 
