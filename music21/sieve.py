@@ -8,12 +8,13 @@
 #                (c) 2010-2011 The music21 Project
 # License:       LGPL
 #-------------------------------------------------------------------------------
-'''A comprehensive, object model of the Xenakis Sieve. Sieves can be created from high-level string notations, and used to generate line segments in various representation. Additional functionality is available through associated objects. 
+'''A comprehensive, object model of the Xenakis Sieve. :class:`music21.sieve.Sieve` objects can be created from high-level string notations, and used to generate line segments in various representation. Additional functionality is available through associated objects. 
 
 
-The Sieve class permits generation segments in four formats. 
+The :class:`music21.sieve.Sieve` class permits generation segments in four formats. 
 
->>> a = Sieve('3@2|7@1')
+>>> from music21 import *
+>>> a = sieve.Sieve('3@2|7@1')
 >>> a.segment()
 [1, 2, 5, 8, 11, 14, 15, 17, 20, 22, 23, 26, 29, 32, 35, 36, 38, 41, 43, 44, 47, 50, 53, 56, 57, 59, 62, 64, 65, 68, 71, 74, 77, 78, 80, 83, 85, 86, 89, 92, 95, 98, 99]
 >>> a.segment(format='binary')
@@ -24,18 +25,17 @@ The Sieve class permits generation segments in four formats.
 43
 
 
-A CompressionSegment can be used to derive a Sieve from any sequence of integers. 
+A :class:`music21.sieve.CompressionSegment` can be used to derive a Sieve from any sequence of integers. 
 
 
->>> a = CompressionSegment([3,4,5,6,7,8,13,19])
+>>> a = sieve.CompressionSegment([3,4,5,6,7,8,13,19])
 >>> str(a)
 '6@1|7@6|8@5|9@4|10@3|11@8'
 
 
-The PitchSieve class provides a quick generation of Pitch lists from Sieves.
+The :class:`music21.sieve.PitchSieve` class provides a quick generation of :class:`music21.pitch.Pitch` lists from Sieves.
 
-
->>> a = PitchSieve('13@3|13@6|13@9', 'c1', 'c10', 'f#4')
+>>> a = sieve.PitchSieve('13@3|13@6|13@9', 'c1', 'c10', 'f#4')
 >>> a()
 [F#1, A1, C2, G2, B-2, C#3, G#3, B3, D4, A4, C5, E-5, B-5, C#6, E6, B6, D7, F7, C8, E-8, F#8, C#9, E9, G9]
 
@@ -1671,7 +1671,12 @@ class Sieve(object):
 # high level utility obj
 
 class PitchSieve(object):
-    """Quick utility generation of Pitch lists from Sieves
+    """Quick utility generation of :class:`music21.pitch.Pitch` lists from :class:`music21.sieve.Sieve` objects.
+
+    >>> from music21 import *
+    >>> ps = sieve.PitchSieve('6@0', 'c4', 'c8')
+    >>> ps()
+    [C4, F#4, C5, F#5, C6, F#6, C7, F#7, C8]
     """
     
     def __init__(self, sieveString, pitchLower=None, 
@@ -1711,7 +1716,7 @@ class PitchSieve(object):
 
 
     def __call__(self):
-        """Return a sieve segment as a list of Pitch objects, mapped to the range between pitchLower and pitchUpper.
+        """Return a sieve segment as a list of :class:`music21.pitch.Pitch` objects, mapped to the range between pitchLower and pitchUpper.
 
         >>> a = PitchSieve('4@7&5@4')
         >>> a()
@@ -1768,7 +1773,7 @@ class PitchSieve(object):
 
 
     def getIntervalSequence(self):
-        '''Return a list of Interval objects that defines the complete structure of this sieve.
+        '''Return a list of Interval objects that defines the complete structure of this :class:`music21.sieve.Sieve`.  
 
         >>> a = PitchSieve('3@0')
         >>> a.getIntervalSequence()

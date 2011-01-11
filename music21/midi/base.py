@@ -703,12 +703,21 @@ class MidiFile(object):
         return r + ">" 
     
     def close(self): 
+        '''
+        Close the file. 
+        '''
         self.file.close() 
     
     def read(self): 
+        '''
+        Read and parse MIDI data stored in a file.
+        '''
         self.readstr(self.file.read()) 
     
     def readstr(self, str): 
+        '''
+        Read and parse MIDI data as a string.
+        '''
         if not str[:4] == "MThd":
             raise MidiException('badly formated midi string, got: %s' % str[:20])
         length, str = getNumber(str[4:], 4) 
@@ -743,10 +752,16 @@ class MidiFile(object):
             self.tracks.append(trk) 
     
     def write(self): 
+        '''
+        Write MIDI data as a file.
+        '''
         ws = self.writestr()
         self.file.write(ws) 
     
     def writestr(self): 
+        '''
+        Return MIDI data as a string. 
+        '''
         division = self.ticksPerQuarterNote 
         # Don't handle ticksPerSecond yet, too confusing 
         if (division & 0x8000) != 0:
