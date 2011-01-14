@@ -517,7 +517,7 @@ class RomanNumeral(chord.Chord):
 #        #            minPitch=minPitch, maxPitch=maxPitch)
 #
 #        # for now, getting directly from network
-#        #self.scale.abstract._net.realizePitchByStep()
+#        #self.scale.abstract._net.realizePitchByDegree()
 #
 #        degreeTargets = [self.rootScaleStep + n for n in self._members]
 #

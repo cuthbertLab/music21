@@ -203,7 +203,7 @@ class AbstractScale(Scale):
         modulus. 
         '''
         # access from property
-        return self._net.stepMaxUnique
+        return self._net.degreeMaxUnique
 
 #     def reverse(self):
 #         '''Reverse all intervals in this scale.
@@ -227,15 +227,15 @@ class AbstractScale(Scale):
 
 
 
-    def getPitchFromNodeStep(self, pitchReference, nodeName, nodeStepTarget, 
+    def getPitchFromNodeDegree(self, pitchReference, nodeName, nodeDegreeTarget, 
             direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):
         '''Get a pitch for desired scale degree.
         '''
 
-        post = self._net.getPitchFromNodeStep(
+        post = self._net.getPitchFromNodeDegree(
             pitchReference=pitchReference, # pitch defined here
             nodeName=nodeName, # defined in abstract class
-            nodeStepTarget=nodeStepTarget, # target looking for
+            nodeDegreeTarget=nodeDegreeTarget, # target looking for
             direction=direction, 
             minPitch=minPitch, 
             maxPitch=maxPitch,
@@ -245,15 +245,15 @@ class AbstractScale(Scale):
 
 
 
-    def realizePitchByStep(self, pitchReference, nodeId, nodeStepTargets, 
+    def realizePitchByDegree(self, pitchReference, nodeId, nodeDegreeTargets, 
         direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):        
         '''Given one or more scale degrees, return a list of all matches over the entire range. 
         '''
         # TODO: rely here on intervalNetwork for caching
-        post = self._net.realizePitchByStep(
+        post = self._net.realizePitchByDegree(
             pitchReference=pitchReference, # pitch defined here
             nodeId=nodeId, # defined in abstract class
-            nodeStepTargets=nodeStepTargets, # target looking for
+            nodeDegreeTargets=nodeDegreeTargets, # target looking for
             direction=direction, 
             minPitch=minPitch, 
             maxPitch=maxPitch,
@@ -262,11 +262,11 @@ class AbstractScale(Scale):
         return post
 
 
-    def getRelativeNodeStep(self, pitchReference, nodeName, pitchTarget, 
+    def getRelativeNodeDegree(self, pitchReference, nodeName, pitchTarget, 
             comparisonAttribute='pitchClass', direction=DIRECTION_ASCENDING):
         '''Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the stored alteredNodes dictionary.
         '''
-        post = self._net.getRelativeNodeStep(
+        post = self._net.getRelativeNodeDegree(
             pitchReference=pitchReference, 
             nodeName=nodeName, 
             pitchTarget=pitchTarget,      
@@ -297,10 +297,10 @@ class AbstractScale(Scale):
         direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):
         '''Define a pitch target and a node. 
         '''
-        post = self._net.getPitchFromNodeStep(
+        post = self._net.getPitchFromNodeDegree(
             pitchReference=pitchReference, 
             nodeName=nodeName, 
-            nodeStepTarget=1, # get the pitch of the tonic 
+            nodeDegreeTarget=1, # get the pitch of the tonic 
             direction=direction, 
             minPitch=minPitch, 
             maxPitch=maxPitch,
@@ -561,17 +561,17 @@ class AbstractMelodicMinorScale(AbstractScale):
         self.tonicStep = 1
         self.dominantStep = 5
 # this is now stored in interval network, as it is useful for testing
-#         nodes = ({'id':'terminusLow', 'step':1}, # a
-#                  {'id':0, 'step':2}, # b
-#                  {'id':1, 'step':3}, # c
-#                  {'id':2, 'step':4}, # d
-#                  {'id':3, 'step':5}, # e
+#         nodes = ({'id':'terminusLow', 'degree':1}, # a
+#                  {'id':0, 'degree':2}, # b
+#                  {'id':1, 'degree':3}, # c
+#                  {'id':2, 'degree':4}, # d
+#                  {'id':3, 'degree':5}, # e
 # 
-#                  {'id':4, 'step':6}, # f# ascending
-#                  {'id':5, 'step':6}, # f
-#                  {'id':6, 'step':7}, # g# ascending
-#                  {'id':7, 'step':7}, # g
-#                  {'id':'terminusHigh', 'step':8}, # a
+#                  {'id':4, 'degree':6}, # f# ascending
+#                  {'id':5, 'degree':6}, # f
+#                  {'id':6, 'degree':7}, # g# ascending
+#                  {'id':7, 'degree':7}, # g
+#                  {'id':'terminusHigh', 'degree':8}, # a
 #                 )
 # 
 #         edges = ({'interval':'M2', 'connections':(
@@ -695,19 +695,19 @@ class AbstractRagAsawari(AbstractScale):
     def _buildNetwork(self):
         self.tonicStep = 1
         self.dominantStep = 5
-        nodes = ({'id':'terminusLow', 'step':1}, # c
-                 {'id':0, 'step':2}, # d
-                 {'id':1, 'step':4}, # f
-                 {'id':2, 'step':5}, # g
-                 {'id':3, 'step':6}, # a-
-                 {'id':'terminusHigh', 'step':8}, # c
+        nodes = ({'id':'terminusLow', 'degree':1}, # c
+                 {'id':0, 'degree':2}, # d
+                 {'id':1, 'degree':4}, # f
+                 {'id':2, 'degree':5}, # g
+                 {'id':3, 'degree':6}, # a-
+                 {'id':'terminusHigh', 'degree':8}, # c
 
-                 {'id':4, 'step':7}, # b-
-                 {'id':5, 'step':6}, # a-
-                 {'id':6, 'step':5}, # g
-                 {'id':7, 'step':4}, # f
-                 {'id':8, 'step':3}, # e-
-                 {'id':9, 'step':2}, # d
+                 {'id':4, 'degree':7}, # b-
+                 {'id':5, 'degree':6}, # a-
+                 {'id':6, 'degree':5}, # g
+                 {'id':7, 'degree':4}, # f
+                 {'id':8, 'degree':3}, # e-
+                 {'id':9, 'degree':2}, # d
                 )
         edges = (
                 # ascending
@@ -770,21 +770,21 @@ class AbstractRagMarwa(AbstractScale):
     def _buildNetwork(self):
         self.tonicStep = 1
         self.dominantStep = 5
-        nodes = ({'id':'terminusLow', 'step':1}, # c
-                 {'id':0, 'step':2}, # d-
-                 {'id':1, 'step':3}, # e
-                 {'id':2, 'step':4}, # f#
-                 {'id':3, 'step':5}, # a
-                 {'id':4, 'step':6}, # b
-                 {'id':5, 'step':7}, # a (could use id 3 again?)
-                 {'id':'terminusHigh', 'step':8}, # c
+        nodes = ({'id':'terminusLow', 'degree':1}, # c
+                 {'id':0, 'degree':2}, # d-
+                 {'id':1, 'degree':3}, # e
+                 {'id':2, 'degree':4}, # f#
+                 {'id':3, 'degree':5}, # a
+                 {'id':4, 'degree':6}, # b
+                 {'id':5, 'degree':7}, # a (could use id 3 again?)
+                 {'id':'terminusHigh', 'degree':8}, # c
 
-                 {'id':6, 'step':7}, # d- (above terminus)
-                 {'id':7, 'step':6}, # b
-                 {'id':8, 'step':5}, # a
-                 {'id':9, 'step':4}, # f#
-                 {'id':10, 'step':3}, # e
-                 {'id':11, 'step':2}, # d-
+                 {'id':6, 'degree':7}, # d- (above terminus)
+                 {'id':7, 'degree':6}, # b
+                 {'id':8, 'degree':5}, # a
+                 {'id':9, 'degree':4}, # f#
+                 {'id':10, 'degree':3}, # e
+                 {'id':11, 'degree':2}, # d-
                 )
         edges = (
                 # ascending
@@ -1136,10 +1136,10 @@ class ConcreteScale(Scale):
         D5
         '''
         # TODO: rely here on intervalNetwork for caching
-        post = self._abstract.getPitchFromNodeStep(
+        post = self._abstract.getPitchFromNodeDegree(
             pitchReference=self._tonic, # pitch defined here
             nodeName=self._abstract.tonicStep, # defined in abstract class
-            nodeStepTarget=degree, # target looking for
+            nodeDegreeTarget=degree, # target looking for
             direction=direction, 
             minPitch=minPitch, 
             maxPitch=maxPitch)
@@ -1168,10 +1168,10 @@ class ConcreteScale(Scale):
         [C2, G#2, C3, G#3, C4, G#4, C5, G#5, C6]
         '''
         # TODO: rely here on intervalNetwork for caching
-        post = self._abstract.realizePitchByStep(
+        post = self._abstract.realizePitchByDegree(
             pitchReference=self._tonic, # pitch defined here
             nodeId=self._abstract.tonicStep, # defined in abstract class
-            nodeStepTargets=degreeTargets, # target looking for
+            nodeDegreeTargets=degreeTargets, # target looking for
             direction=direction, 
             minPitch=minPitch, 
             maxPitch=maxPitch)
@@ -1201,7 +1201,7 @@ class ConcreteScale(Scale):
         7
         '''
 
-        post = self._abstract.getRelativeNodeStep(
+        post = self._abstract.getRelativeNodeDegree(
             pitchReference=self._tonic, 
             nodeName=self._abstract.tonicStep, 
             pitchTarget=pitchTarget,      
