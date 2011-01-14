@@ -34,6 +34,8 @@ see trecento/xlrd/licenses.py for the complete disclaimer and conditions
 
 '''
 
+
+# this defines what  is loaded when importing __all__
 # put these in alphabetical order FIRST dirs then modules
 # but: base must come first; in some cases other modules depend on 
 # definitions in base
@@ -59,6 +61,8 @@ __all__ = ['base',
            'tempo', 'text', 'tie', 'tinyNotation', 
            'voiceLeading']
 
+
+#print __all__
 # skipped purposely, "base", "node"
 
 #-------------------------------------------------------------------------------
@@ -78,6 +82,10 @@ from base import *
 import converter
 parse = converter.parse
 
+
+#------------------------------------------------------------------------------
+# this bring all of the __all__ names into the music21 package namespace
+from music21 import *
 
 #------------------------------------------------------------------------------
 # eof
