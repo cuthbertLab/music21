@@ -45,11 +45,11 @@ class Test(unittest.TestCase):
         n3 = note.Note('g#3', quarterLength=0.5)
         n4 = note.Note('d-4', quarterLength=3.5)
         cf1 = clef.AltoClef()
-
+        
         m1 = stream.Measure(number=1)
         m1.append([n1, n2])
         m1.insert(0, cf1)
-
+        
         # the measure has three elements
         assert len(m1) == 3
         # the offset returned is the most-recently set
@@ -60,10 +60,10 @@ class Test(unittest.TestCase):
         assert m1.index(n2) == 2
         # can find an element based on a given offset
         assert m1.getElementAtOrBefore(3) == n2 
-
+        
         m2 = stream.Measure(number=2)
         m2.append([n3, n4])
-
+        
         # appended position is after n3
         assert n4.offset == .5 
         assert m2.highestOffset == .5 
@@ -71,17 +71,17 @@ class Test(unittest.TestCase):
         assert m2[1].duration.quarterLength == 3.5 
         # the Stream duration is the highest offset + duration
         assert m2.duration.quarterLength == 4 
-
+        
         p1 = stream.Part()
         p1.append([m1, m2])
-
+        
         # the part has 2 components
         assert len(p1) == 2
         # the Stream duration is the highest offset + durations
         assert p1.duration.quarterLength == 8
         # can access Notes from Part using multiple indices
         assert p1[1][0].pitch.nameWithOctave == 'G#3'
-
+        
         s1 = stream.Score()
         s1.append(p1)
         md1 = metadata.Metadata(title='The music21 Stream')
@@ -113,13 +113,13 @@ class Test(unittest.TestCase):
         assert m1.hasElement(n2) == True
         assert s2.hasElement(n2) == True
         assert s3.hasElement(n2) == True
-
+        
         # only offset is independent to each location
         n2.pitch.transpose('-M2', inPlace=True)
         assert s2[s2.index(n2)].nameWithOctave == 'C4'
         assert s3[s3.index(n2)].nameWithOctave == 'C4'
         assert m1[m1.index(n2)].nameWithOctave == 'C4'
-
+        
         # the transposition is maintained in the original context
         #s1.show()
 
@@ -138,7 +138,7 @@ class Test(unittest.TestCase):
         assert len(s1Flat) == 6
         assert s1Flat[4] == n3
         assert s1Flat[5] == n4
-
+        
         # adding another Part to the Score results in a different flat representation
         r1 = note.Rest(type='whole')
         n5 = note.Note('a#1', quarterLength=2.5)
@@ -151,11 +151,7 @@ class Test(unittest.TestCase):
         p2 = stream.Part()
         p2.append([m3, m4])
         s1.insert(0, p2)
-
-
-        #s1.flat.show('t')
-        #s1.show()
-
+        
         # objects are sorted by offset
         s1Flat = s1.flat
         assert len(s1) == 3
@@ -164,13 +160,15 @@ class Test(unittest.TestCase):
         assert s1Flat[7] == n5
         assert s1Flat[8] == n4
         assert s1Flat[9] == n6
-
+        
         # the F-sharp in m. 2 now as offsets for both flat non-flat sites
         assert n3.getOffsetBySite(m2) == 0
         assert n3.getOffsetBySite(s1Flat) == 4
         # the B in m. 2 now as offsets for both flat non-flat sites
         assert n6.getOffsetBySite(m4) == 2.5
         assert n6.getOffsetBySite(s1Flat) == 6.5
+        
+        #s1.show()
 
         #==== "fig-df04" end
 
@@ -185,21 +183,21 @@ class Test(unittest.TestCase):
         assert m1.getElementsByClass('Clef')[0].sign == 'C'
         # collect into a list the sign of all clefs in the flat Score
         assert [cf.sign for cf in s1.flat.getElementsByClass('Clef')] == ['C', 'F']
-
+        
         # collect the offsets Measures in the first part
         assert [e.offset for e in p1.elements] == [0.0, 4.0]
         # collect the offsets of Note in the first part flattened
         assert [e.offset for e in p1.flat.notes] == [0.0, 2.0, 4.0, 4.5]
         # collect the offsets of Notes in all parts flattened
         assert [e.offset for e in s1.flat.notes] == [0.0, 0.0, 2.0, 4.0, 4.0, 4.5, 6.5]
-
-
+        
+        
         # get all pitch names
         match = []
         for e in s1.flat.getElementsByClass('Note'):
             match.append(e.pitch.nameWithOctave)
         assert match == ['G3', 'C4', 'G#3', 'A#1', 'D-4', 'B2']
-
+        
         # collect all Notes and transpose up a perfect fifth
         for n in s1.flat.getElementsByClass('Note'):
             n.transpose('P5', inPlace=True)
@@ -209,7 +207,7 @@ class Test(unittest.TestCase):
         for e in s1.flat.getElementsByClass('Note'):
             match.append(e.pitch.nameWithOctave)    
         assert match == ['D4', 'G4', 'D#4', 'E#2', 'A-4', 'F#3']
-
+        
         #s1.show()
 
         #==== "fig-df05" end
@@ -225,14 +223,14 @@ class Test(unittest.TestCase):
         assert n4.getContextByClass('Clef') == cf1
         # must search oldest sites first
         assert n6.getContextByClass('Clef', sortByCreationTime='reverse') == cf2
-
-
+        
+        
         # a Note can find their Measure number from a flat Part
         match = []
         for e in p1.flat.getElementsByClass('Note'):
             match.append(e.getContextByClass('Measure').number)    
         assert match == [1, 1, 2, 2]
-
+        
         # all Notes can find their Measure number from a flat Score
         match = []
         for e in s1.flat.notes:
@@ -251,13 +249,13 @@ class Test(unittest.TestCase):
         p1.append(sp1)
         sp2 = spanner.Slur([n5, n6])
         m4.insert(0, sp2)
-
+        
         p1Flat = p1.flat
         assert sp1.getDurationSpanBySite(p1Flat) == [0.0, 8.0]
-
+        
         p2Flat = p2.flat
         assert sp2.getDurationSpanBySite(p2Flat) == [4.0, 8.0]
-
+        
         #s1.show()
         #==== "fig-df06" end
 
@@ -274,7 +272,7 @@ class Test(unittest.TestCase):
 
         from music21 import corpus, spanner
         nStart = None; nEnd = None
-
+        
         ex = corpus.parseWork('luca/gloria').parts['cantus'].measures(1,11)        
         exFlatNotes = ex.flat.notes
         nLast = exFlatNotes[-1]
@@ -295,12 +293,12 @@ class Test(unittest.TestCase):
                 nStart.addLyric(nStart.beatStr)
                 ex.insert(spanner.Slur(nStart, nEnd))
                 nStart = None; nEnd = None
-
+        
         for sp in ex.spanners:  
             dur = sp.getDurationBySite(exFlatNotes)
             n = sp.getFirst()
             print(n.nameWithOctave, dur.quarterLength)
-
+        
         #ex.show()
 
 
