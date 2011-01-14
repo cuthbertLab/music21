@@ -297,7 +297,7 @@ class Test(unittest.TestCase):
         for sp in ex.spanners:  
             dur = sp.getDurationBySite(exFlatNotes)
             n = sp.getFirst()
-            print(n.nameWithOctave, dur.quarterLength)
+            #print(n.nameWithOctave, dur.quarterLength)
         
         #ex.show()
 
@@ -312,29 +312,29 @@ class Test(unittest.TestCase):
         sc1 = scale.MajorScale('a-')
 
         # get pitches from any range of this scale
-        print(sc1.getPitches('g2', 'c4'))
+        #print(sc1.getPitches('g2', 'c4'))
         self.assertEqual(str(sc1.getPitches('g2', 'c4')), 
         '[G2, A-2, B-2, C3, D-3, E-3, F3, G3, A-3, B-3, C4]')
 
         # get a scale degree from a pitch
-        print(sc1.getScaleDegreeFromPitch('b-'))
+        #print(sc1.getScaleDegreeFromPitch('b-'))
         self.assertEqual(sc1.getScaleDegreeFromPitch('b-'), 2)
 
         # what is the scale degree of the pitch in relative minor
-        print(str(sc1.getRelativeMinor().getScaleDegreeFromPitch('b-')))
+        #print(str(sc1.getRelativeMinor().getScaleDegreeFromPitch('b-')))
         self.assertEqual(sc1.getRelativeMinor().getScaleDegreeFromPitch('b-'), 4)
 
         # given a pitch in this scale, what is the next pitch
-        print(sc1.next('g2', 'ascending'))
+        #print(sc1.next('g2', 'ascending'))
         self.assertEqual(str(sc1.next('g2', 'ascending')), 'A-2')
 
         # descending three scale steps
-        print(sc1.next('g2', 'descending', 3))
+        #print(sc1.next('g2', 'descending', 3))
         self.assertEqual(str(sc1.next('g2', 'descending', 3)), 'D-2')
 
 
         # derive a new major scale based on a pitch for a scale degree
-        print(sc1.deriveByDegree(7, 'f#4').pitches)
+        #print(sc1.deriveByDegree(7, 'f#4').pitches)
         self.assertEqual(str(sc1.deriveByDegree(7, 'f#4').pitches), 
             '[G3, A3, B3, C4, D4, E4, F#4, G4]')
 
@@ -343,21 +343,21 @@ class Test(unittest.TestCase):
         sc2 = scale.WholeToneScale('f#')
 
         # get pitches from any range of this scale
-        print str(sc2.getPitches('g2', 'c4'))
+        #print str(sc2.getPitches('g2', 'c4'))
         self.assertEqual(str(sc2.getPitches('g2', 'c4')), 
         '[A-2, B-2, C3, D3, F-3, G-3, A-3, B-3, C4]')
 
             # get a scale degree from a pitch
-        print(str(sc2.getScaleDegreeFromPitch('e')))
+        #print(str(sc2.getScaleDegreeFromPitch('e')))
         self.assertEqual(sc2.getScaleDegreeFromPitch('e'), 6)
 
         # given a pitch in this scale, what is the next pitch
-        print(sc2.next('d4', 'ascending'))
+        #print(sc2.next('d4', 'ascending'))
         self.assertEqual(str(sc2.next('d4', 'ascending')), 'E4')
 
 
         # transpose the scale
-        print(sc2.transpose('m2').pitches)
+        #print(sc2.transpose('m2').pitches)
         self.assertEqual(str(sc2.transpose('m2').pitches), '[G4, A4, B4, C#5, D#5, E#5, G5]')
 
         # get as a chord and get its forte class
@@ -410,7 +410,7 @@ class Test(unittest.TestCase):
                     if degree not in results.keys():
                         results[degree] = 0
                     results[degree] += 1
-        print(results)
+        #print(results)
 
         # Results for all Bach chorales
         #{1: 307, 2: 3, 3: 11, 4: 31, 5: 34, 6: 5, 7: 2, None: 3}

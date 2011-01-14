@@ -500,14 +500,59 @@ class Glockenspiel(PitchedPercussion):
 # TODO: NEENA -- take list and continue to 100 -- just for fun...
 # and write test code
 
+class InstrumentException(music21.Music21Exception):
+    pass
 
-ensembleNameBySize = ["no performers", "solo", "duet", "trio", "quartet", 
-                      "quintet", "sextet", "septet", "octet", "nonet",
-                      "dectet", "undectet", "duodectet", "tredectet", "quattuordectet",
-                      "quindectet", "sexdectet", "septendectet", "octodectet"]
+
+ensembleNamesBySize = ['no performers', 'solo', 'duet', 'trio', 'quartet', 
+                       'quintet', 'sextet', 'septet', 'octet', 'nonet', 'dectet', 
+                       'undectet', 'duodectet', 'tredectet', 'quattuordectet', 
+                       'quindectet', 'sexdectet', 'septendectet', 'octodectet', 
+                       'novemdectet', 'vigetet', 'unvigetet', 'duovigetet', 
+                       'trevigetet', 'quattuorvigetet', 'quinvigetet', 'sexvigetet', 
+                       'septenvigetet', 'octovigetet', 'novemvigetet', 
+                       'trigetet', 'untrigetet', 'duotrigetet', 'tretrigetet', 
+                       'quottuortrigetet', 'quintrigetet', 'sextrigetet', 
+                       'septentrigetet', 'octotrigetet', 'novemtrigetet', 
+                       'quadragetet', 'unquadragetet', 'duoquadragetet', 
+                       'trequadragetet', 'quattuorquadragetet', 'quinquadragetet', 
+                       'sexquadragetet', 'octoquadragetet', 'octoquadragetet', 
+                       'novemquadragetet', 'quinquagetet', 'unquinquagetet', 
+                       'duoquinquagetet', 'trequinguagetet', 'quattuorquinquagetet', 
+                       'quinquinquagetet', 'sexquinquagetet', 'septenquinquagetet', 
+                       'octoquinquagetet', 'novemquinquagetet', 'sexagetet', 
+                       'undexagetet', 'duosexagetet', 'tresexagetet', 
+                       'quoattuorsexagetet', 'quinsexagetet', 'sexsexagetet', 
+                       'septensexagetet', 'octosexagetet', 'novemsexagetet', 
+                       'septuagetet', 'unseptuagetet', 'duoseptuagetet', 'treseptuagetet', 
+                       'quattuorseptuagetet', 'quinseptuagetet', 'sexseptuagetet', 
+                       'septenseptuagetet', 'octoseptuagetet', 'novemseptuagetet', 
+                       'octogetet', 'unoctogetet', 'duooctogetet', 
+                       'treoctogetet', 'quattuoroctogetet', 'quinoctogetet', 
+                       'sexoctogetet', 'septoctogetet', 'octooctogetet', 
+                       'novemoctogetet', 'nonagetet', 'unnonagetet', 'duononagetet', 
+                       'trenonagetet', 'quattuornonagetet', 'quinnonagetet', 
+                       'sexnonagetet', 'septennonagetet', 'octononagetet', 
+                       'novemnonagetet', 'centet'] 
         
-
-
+def ensembleNameBySize(number):
+    '''
+    return the name of a generic ensemble with "number" players:
+    
+    >>> from music21 import *
+    >>> instrument.ensembleNameBySize(4)
+    'quartet'
+    >>> instrument.ensembleNameBySize(1)
+    'solo'
+    >>> instrument.ensembleNameBySize(83)
+    'treoctogetet'
+    '''
+    if number > 100:
+        raise InstrumentException('okay, youre on your own for this one buddy')
+    elif number < 0:
+        raise InstrumentException('okay, youre on your own for this one buddy')
+    else:
+        return ensembleNamesBySize[int(number)]
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

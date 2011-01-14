@@ -483,8 +483,9 @@ class ModalCounterpoint(object):
 
     def isValidMiddleHarmony(self, note11, note21):
         '''Determines if the harmonic interval between two given notes is
-        "legal" according to 21M.301 rules of counterpoint. Legal harmonic
-        intervals for middle voices include 'P1', 'P5', 'P8', 'm3', 'M3',
+        "legal" according to simple, species rules of counterpoint. Legal harmonic
+        intervals for middle voices (i.e., not above the bass) include 
+        'P1', 'P5', 'P8', 'm3', 'M3',
         'm6', and 'M6', from before. 'P4' is now included because it is legal
         for middle harmonies.
 

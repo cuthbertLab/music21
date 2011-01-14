@@ -93,7 +93,8 @@ class RomanNumeral(chord.Chord):
     >>> neapolitan2 = roman.RomanNumeral('bII6', 'g#') 
     >>> neapolitan2.pitches
     [C#5, E5, A5]
-   
+    >>> neapolitan2.scaleDegree
+    2
    
     >>> em = key.Key('e')
     >>> dominantV = roman.RomanNumeral('V7', em)
@@ -308,40 +309,42 @@ class RomanNumeral(chord.Chord):
         '''
         fixes notes that should be out of the scale
         based on what the chord "shouldBe" (major, minor, augmented, diminished)
-                
+        
+        an intermediary step in parsing figures
+        
         '''        
-        defaultScaleDegrees = (3,5,7)
+        scaleDegreesToExamine = (3,5,7)
         if shouldBe == 'major':
-            defaults = (4, 7)
+            correctSemitones = (4, 7)
         elif shouldBe == 'minor':
-            defaults = (3, 7)
+            correctSemitones = (3, 7)
         elif shouldBe == 'diminished':
             if len(self.pitches) == 2:
-                defaults = (3, 6)
+                correctSemitones = (3, 6)
             elif len(self.pitches) > 2:
-                defaults = (3, 6, 9)
+                correctSemitones = (3, 6, 9)
         elif shouldBe == 'half-diminished':
-            defaults = (3, 6, 10)
+            correctSemitones = (3, 6, 10)
         elif shouldBe == 'augmented':
-            defaults = (4, 8)
+            correctSemitones = (4, 8)
         else:
             return
 
-        for i in range(len(defaults)):
-            thisScaleDegree = defaultScaleDegrees[i]
-            thisDefault = defaults[i]
+        for i in range(len(correctSemitones)):
+            thisScaleDegree = scaleDegreesToExamine[i]
+            thisCorrect = correctSemitones[i]
             thisSemis = self.hasScaleX(thisScaleDegree)
             if thisSemis == 0:
                 continue
-            if thisSemis != thisDefault:
+            if thisSemis != thisCorrect:
                 faultyPitch = self.scaleX(thisScaleDegree)
                 if faultyPitch == None:
                     raise RomanException("this is very odd...")
                 if faultyPitch.accidental == None:
-                    faultyPitch.accidental = pitch.Accidental(thisDefault - thisSemis)
+                    faultyPitch.accidental = pitch.Accidental(thisCorrect - thisSemis)
                 else:
                     acc = faultyPitch.accidental
-                    acc.set(thisDefault - thisSemis + acc.alter)
+                    acc.set(thisCorrect - thisSemis + acc.alter)
         
 
 #    def _getRoot(self):

@@ -309,7 +309,7 @@ class ElementWrapper(object):
             # until a notation representation is needed. at that time,
             # when the duraton is linked, resolving a duration of 31.5 or 
             # otherwise can be dealt with. 
-            self._offset.unlink() # always unlink? MSC: I THINK No.
+            self._offset.unlink() # always unlink? 
             self._offset.quarterLength = offset
         else:
             # need to permit Duration object assignment here
@@ -445,7 +445,7 @@ class Stream(ElementWrapper):
     Otherwise, offset values might be set be the same as the 
     parent stream or in some other relative arrangement. 
     
-    TODO: Get Stream Duration working -- should be the total length of the Stream. -- see the ._getDuration() and ._setDuration() methods
+    
     '''
 
     def __init__(self):
@@ -1810,7 +1810,7 @@ class Stream(ElementWrapper):
         '''Search all elements with durations and find any gabs, or
         undefined time regions. 
 
-        TODO:
+        
         '''
         pass
 
@@ -1920,7 +1920,7 @@ class Stream(ElementWrapper):
                          includeCoincidentBoundaries=False):
         '''A stream is a sequence if it has no overlaps.
 
-        TODO: check that co-incident boundaries are properly handled
+        
 
         >>> a = Stream()
         >>> for x in [0,0,0,0,3,3,3]:
@@ -3754,7 +3754,7 @@ if __name__ == "__main__":
 #        '''Remove and return element form the sorted list at the specified
 #        position.
 #
-#        TODO: implement
+#        
 #
 #        Note: the challenge is finding where in _elements the element is
 #        '''
@@ -3767,7 +3767,7 @@ if __name__ == "__main__":
 #
 #    def index(self, element):
 #        '''
-#        TODO: implement
+#        
 #        '''
 #        pass
 #

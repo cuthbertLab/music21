@@ -456,7 +456,7 @@ class NotRest(GeneralNote):
     Parent class for objects that are not rests; or, object that can be tied.
     '''
     
-    # unspecified means that there may be a stem, but its orienation
+    # unspecified means that there may be a stem, but its orientation
     # has not been declared. 
     # TODO: import from MusicXML
     stemDirection = "unspecified"
@@ -479,10 +479,6 @@ class Note(NotRest):
     A Note knows both its total duration and how to express itself as a set of 
     tied notes of different lengths. For instance, a note of 2.5 quarters in 
     length could be half tied to eighth or dotted quarter tied to quarter.
-    
-    A ComplexNote will eventually be smart enough that if given a duration in 
-    quarters it will try to figure out a way to express itself as best it can if
-    it needs to be represented on page.  It does not know this now.
     '''
 
     isNote = True
@@ -496,7 +492,7 @@ class Note(NotRest):
     'isNote': 'Boolean read-only value describing if this object is a Note.',
     'isUnpitched': 'Boolean read-only value describing if this is Unpitched.',
     'isRest': 'Boolean read-only value describing if this is a Rest.',
-    'beams': 'A :class:`~music21.note.Beams` object.',
+    'beams': 'A :class:`~music21.beam.Beams` object.',
     'pitch': 'A :class:`~music21.pitch.Pitch` object.',
     }
 

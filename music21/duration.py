@@ -752,13 +752,15 @@ class Tuplet(object):
 
     Note that this is a duration modifier, or a generator of ratios to scale quarterLength values in Duration objects.
 
-    >>> myTup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+
+    >>> from music21 import duration
+    >>> myTup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
     >>> print(myTup.tupletMultiplier())
     0.8
-    >>> myTup2 = Tuplet(8, 5)
+    >>> myTup2 = duration.Tuplet(8, 5)
     >>> print(myTup2.tupletMultiplier())
     0.625
-    >>> myTup2 = Tuplet(6, 4, "16th")
+    >>> myTup2 = duration.Tuplet(6, 4, "16th")
     >>> print(myTup2.durationActual.type)
     16th
     >>> print(myTup2.tupletMultiplier())
@@ -773,7 +775,7 @@ class Tuplet(object):
     ...
     TupletException: A frozen tuplet (or one attached to a duration) is immutable
     
-    >>> myHalf = Duration("half")
+    >>> myHalf = duration.Duration("half")
     >>> myHalf.appendTuplet(myTup2)
     >>> myTup2.tupletActual = [5, 4]
     Traceback (most recent call last):
@@ -895,7 +897,8 @@ class Tuplet(object):
         '''Get a floating point value by which to scale the duration that 
         this Tuplet is associated with.
 
-        >>> myTuplet = Tuplet()
+        >>> from music21 import duration
+        >>> myTuplet = duration.Tuplet()
         >>> print(round(myTuplet.tupletMultiplier(), 3))
         0.667
         >>> myTuplet.tupletActual = [5, Duration('eighth')]
@@ -919,7 +922,8 @@ class Tuplet(object):
         5 half notes in the place of a 2 dotted half notes = 6.0
         (In the end it's only the denominator that matters) 
 
-        >>> a = Tuplet()
+        >>> from music21 import duration
+        >>> a = duration.Tuplet()
         >>> a.totalTupletLength()
         1.0
         >>> a.numberNotesActual = 3
@@ -942,7 +946,8 @@ class Tuplet(object):
         '''Set the ratio of actual divisions to represented in normal divisions.
         A triplet is 3 actual in the time of 2 normal.
 
-        >>> a = Tuplet()
+        >>> from music21 import duration
+        >>> a = duration.Tuplet()
         >>> a.tupletMultiplier()
         0.666...
         >>> a.setRatio(6,2)
@@ -950,10 +955,10 @@ class Tuplet(object):
         0.333...
 
         One way of expressing 6/4-ish triplets without numbers:
-        >>> a = Tuplet()
+        >>> a = duration.Tuplet()
         >>> a.setRatio(3,1)
-        >>> a.durationActual = DurationUnit('quarter')
-        >>> a.durationNormal = DurationUnit('half')
+        >>> a.durationActual = duration.DurationUnit('quarter')
+        >>> a.durationNormal = duration.DurationUnit('half')
         >>> a.tupletMultiplier()
         0.666...
         >>> a.totalTupletLength()
@@ -970,7 +975,8 @@ class Tuplet(object):
 
         A type string or quarter length can be given.
 
-        >>> a = Tuplet()
+        >>> from music21 import duration
+        >>> a = duration.Tuplet()
         >>> a.tupletMultiplier()
         0.666...
         >>> a.totalTupletLength()
@@ -1003,7 +1009,8 @@ class Tuplet(object):
     def augmentOrDiminish(self, scalar, inPlace=True):
         '''Given a scalar greater than zero, return a scaled version of this Duration.
 
-        >>> a = Tuplet()
+        >>> from music21 import duration
+        >>> a = duration.Tuplet()
         >>> a.setRatio(6,2)
         >>> a.tupletMultiplier()
         0.333...
@@ -1039,7 +1046,8 @@ class Tuplet(object):
         '''From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet.
         mxTuplet needs to be on the Notes mxNotations field
 
-        >>> a = Tuplet()
+        >>> from music21 import duration
+        >>> a = duration.Tuplet()
         >>> a.bracket = True
         >>> b, c = a.mx
         '''
@@ -1134,11 +1142,17 @@ class DurationCommon(object):
 
         This tuple is needed for MusicXML time-modification among other places
 
-        >>> complexDur = Duration('eighth')
-        >>> complexDur.appendTuplet(Tuplet())
+        >>> from music21 import duration
+        >>> complexDur = duration.Duration('eighth')
+        >>> complexDur.appendTuplet(duration.Tuplet())
         >>> complexDur.aggregateTupletRatio()
         (3, 2)
-        >>> tup2 = Tuplet()
+        
+        
+        Nested tuplets are possible...
+        
+        
+        >>> tup2 = duration.Tuplet()
         >>> tup2.setRatio(5, 4)
         >>> complexDur.appendTuplet(tup2)
         >>> complexDur.aggregateTupletRatio()

@@ -470,7 +470,8 @@ class Test(unittest.TestCase):
     
         # Print results
         for region, pcentSevenths, intervalCount, workCount in results: 
-            print('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (region, pcentSevenths, intervalCount, workCount))
+            pass
+        #print('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (region, pcentSevenths, intervalCount, workCount))
 
         region, pcentSevenths, intervalCount, workCount = results[0]
         self.assertEqual(region, 'shanxi')

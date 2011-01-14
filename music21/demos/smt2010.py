@@ -293,7 +293,8 @@ def corpusMelodicIntervalSearch(show = True):
 #             print intervalDict[key]
 
     for sub in msg: 
-        print sub
+        if show == True:
+            print sub
 
 
 

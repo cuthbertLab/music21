@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, math
+import sys
 
 from music21.trecento import xlrd
 

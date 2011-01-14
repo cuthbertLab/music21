@@ -22,6 +22,9 @@ import music21
 
 from music21.abc import base as abc
 from music21.abc import translate as abcTranslate
+from music21 import abjadM21
+from music21.abjadM21 import fromM21 as abjadFromM21
+
 
 from music21 import articulations
 from music21 import base
@@ -99,6 +102,7 @@ NO_DOC = 'No documentation.'
 MODULES = [
     abc,
     abcTranslate,
+    abjadFromM21,
     articulations,
     base,
     beam,

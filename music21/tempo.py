@@ -41,7 +41,8 @@ defaultTempoValues = {
      'molto allegro': 144,
      u'très vite': 144,
      'presto': 168,
-     'prestissimo': 200}
+     'prestissimo': 200
+     }
 
 class TempoMark(music21.Music21Object):
     '''
@@ -60,7 +61,7 @@ class TempoMark(music21.Music21Object):
     >>> tm2 = music21.tempo.TempoMark(u"très vite")
     >>> tm2.value.endswith('vite')
     True
-    >>> tm2.value == u'très vite'
+    >>> tm2.value == u'très vite'   # TODO: Make sure is working again....
     True
     >>> tm3 = music21.tempo.TempoMark("extremely, wicked fast!")
     >>> tm3.number

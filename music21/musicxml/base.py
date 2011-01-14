@@ -53,10 +53,9 @@ VERSION_MINIMUM = (0, 3, 2)
 # unicode and python issues
 # http://evanjones.ca/python-utf8.html
 
-# TODO:
-# handle direction-type metronome, beat-unit, etc.; test 31c
-# deal with grace notes, in particular duration handling
-# add print <print new-system="yes"/>
+# TODO: handle direction-type metronome, beat-unit, etc.; test 31c
+# TODO: deal with grace notes, in particular duration handling
+# TODO: add print <print new-system="yes"/>
 
 # tests matching
 # 01a, 01b, 01c, 01d
