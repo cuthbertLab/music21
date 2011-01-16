@@ -9,23 +9,39 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+import sys
 import copy
 import unittest
 import random
 
 import music21
-from music21 import *
+from music21 import duration
+from music21 import note
+from music21 import pitch
+from music21 import stream
+# DOENST WORK from music21 import *
 
 def pitchedPhase(cycles=None, show=False):
     '''
-    >>> from music21.composition import phasing
+    Creates a phase composition in the style of 
+    1970s minimalism, but bitonally.
+    
+    The source code describes how this works.
+    
+    >>> from music21 import *
+    >>> #_DOCS_SHOW composition.phasing.pitchedPhase(cycles = 4, show = True)
+    
+    .. image:: images/phasingDemo.*
+            :width: 576
+
     '''
 
-    sSrc = converter.parse("""E16 F# B c# d F# E c# B F# d c# 
+    sSrc = music21.parse("""E16 F# B c# d F# E c# B F# d c# 
                               E16 F# B c# d F# E c# B F# d c#""", '12/16')
     sPost = stream.Score()
+    sPost.title = 'phasing experiment'
     sPost.insert(0, stream.Part())
-    sPost.insert(0, stream.Part())
+    sPost.insert(0, music21.stream.Part())
 
     durationToShift = duration.Duration('64th')
     increment = durationToShift.quarterLength
@@ -61,15 +77,21 @@ class Test(unittest.TestCase):
         # run a reduced version
         pitchedPhase(cycles=cycles, show=show)
 
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+   
+
+    def testBasic(self, cycles=4, show=True):
+        # run a reduced version
+        pitchedPhase(cycles=cycles, show=show)
+
 
 if __name__ == "__main__":
-    import sys
-    t = Test()
-    t.testBasic(cycles=None, show=True)
-
 
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
+        music21.mainTest(TestExternal)
 
     elif len(sys.argv) > 1:
         t = Test()

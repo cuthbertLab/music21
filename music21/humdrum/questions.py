@@ -1,7 +1,7 @@
 import unittest
 
 import music21
-from music21 import *  # doing this because it will simplify the examples
+#from music21 import *  # doing this because it will simplify the examples
 
 # note: this are temporarily commented out until they work
 # add optional show argument to mask output for automated testing

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 
-__all__ = ['realizer', 'realizerScale']
+__all__ = ['realizer', 'realizerScale', 'notation', 'resolution', 'rules']
 
 #------------------------------------------------------------------------------
 # eof

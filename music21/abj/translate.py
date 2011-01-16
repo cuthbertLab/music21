@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         fromM21.py
+# Name:         translate.py
 # Purpose:      Translation from music21 into Abjad
 #
 # Authors:      Michael Scott Cuthbert
@@ -11,30 +11,27 @@
 #-------------------------------------------------------------------------------
 
 '''
-Conversion methods for going from music21 to Victor Adan and
+Translation methods for going from music21 to Victor Adan and
 Trevor Baca's Abjad framework -- a high-quality, Lilypond-based python
 framework for algorithmic music composition and post-tonal music.
 
 See http://packages.python.org/Abjad/ for more details.  Requires
 abjad 2.0 (not 1.1.1) to work.  Fetchable via SVN as of January 2011.
 
+automatically imported in music21.abj:
+
 '''
 
-
-
-import music21
 import abjad
-
 import unittest,doctest
-
+import music21
 import music21.note
-
 import music21.common
 
 import re
 
 
-class AbjadFromM21Exception(music21.Music21Exception):
+class AbjadTranslateException(music21.Music21Exception):
     pass
 
 def translateLilyStringPitch(lilyStringPitch):
@@ -53,7 +50,7 @@ def translateLilyStringPitch(lilyStringPitch):
     return lilyStringPitch   
     
 
-def translateM21Object(m21Object):
+def music21ObjectToAbjad(m21Object):
     '''
     translates an arbitrary object into abjad objects.
     
@@ -62,24 +59,24 @@ def translateM21Object(m21Object):
     
     '''
     if "Note" in m21Object.classes:
-        return translateNote(m21Object)
+        return noteToAbjad(m21Object)
     elif "Stream" in m21Object.classes:
-        return translateStream(m21Object)
+        return streamToAbjad(m21Object)
     else:
         pass
-        #raise AbjadFromM21Exception('cannot translate object of class %s', m21Object.__class__.__name__ )
+        #raise AbjadTranslateException('cannot translate object of class %s', m21Object.__class__.__name__ )
     
     
 
-def translateNote(m21Note):
+def noteToAbjad(m21Note):
     '''
     Translates a simple music21 Note (no ties or tuplets) to an abjad note.
     
     >>> import abjad
-    >>> from music21 import *
-    >>> m21Note1 = note.Note("C#5")
+    >>> import music21
+    >>> m21Note1 = music21.note.Note("C#5")
     >>> m21Note1.quarterLength = 2
-    >>> abjadNote1 = music21.abjadM21.fromM21.translateNote(m21Note1)
+    >>> abjadNote1 = music21.abj.noteToAbjad(m21Note1)
     >>> abjadNote1
     Note("cs''2")
     >>> #_DOCS_SHOW abjad.iotools.show(abjadNote1)
@@ -89,35 +86,35 @@ def translateNote(m21Note):
 
 
 
-    >>> m21Note2 = note.Note("D--2")
+    >>> m21Note2 = music21.note.Note("D--2")
     >>> m21Note2.quarterLength = 0.125
-    >>> abjadNote2 = music21.abjadM21.fromM21.translateNote(m21Note2)
+    >>> abjadNote2 = music21.abj.noteToAbjad(m21Note2)
     >>> abjadNote2
     Note('dff,32')
     
-    >>> m21Note3 = note.Note("E-6")
+    >>> m21Note3 = music21.note.Note("E-6")
     >>> m21Note3.quarterLength = 2.333333333333333
-    >>> abjadNote3 = music21.abjadM21.fromM21.translateNote(m21Note3)
+    >>> abjadNote3 = music21.abj.noteToAbjad(m21Note3)
     Traceback (most recent call last):
-    AbjadFromM21Exception: cannot translate complex notes directly
+    AbjadTranslateException: cannot translate complex notes directly
     '''
     if m21Note.duration.type == 'complex':
-        raise AbjadFromM21Exception("cannot translate complex notes directly")
+        raise AbjadTranslateException("cannot translate complex notes directly")
     elif len(m21Note.duration.tuplets) > 0:
-        raise AbjadFromM21Exception("cannot translate tuplet notes directly")
+        raise AbjadTranslateException("cannot translate tuplet notes directly")
     
     x = translateLilyStringPitch(str(m21Note.lily))
     abjadNote = abjad.Note(x)
     return abjadNote
 
-def translatePitch(m21Pitch):
+def pitchToAbjad(m21Pitch):
     '''
     translates a music21 :class:`music21.pitch.Pitch` object 
     to abjad.Pitch object
     
     >>> import music21
     >>> m21p = music21.pitch.Pitch("D--2")
-    >>> music21.abjadM21.fromM21.translatePitch(m21p)
+    >>> music21.abj.pitchToAbjad(m21p)
     NamedChromaticPitch('dff,')
     '''    
     music21name = m21Pitch.name
@@ -126,14 +123,14 @@ def translatePitch(m21Pitch):
     return abjadPitch
 
 
-def translateStream(m21Stream, makeNotation = True):
+def streamToAbjad(m21Stream, makeNotation = True):
     '''
     translates a Stream into an Abjad container
     
     >>> import abjad
-    >>> from music21 import *
-    >>> stream1 = converter.parse("c4 d8. e-16 FF2", "4/4")
-    >>> abjadContainer = abjadM21.fromM21.translateStream(stream1)
+    >>> import music21
+    >>> stream1 = music21.parse("c4 d8. e-16 FF2", "4/4")
+    >>> abjadContainer = music21.abj.streamToAbjad(stream1)
     >>> abjadContainer
     Staff{4}
     >>> abjadContainer.leaves[:]
@@ -153,7 +150,7 @@ def translateStream(m21Stream, makeNotation = True):
     abjadNotes = []
     
     for thisObject in m21FinishedStream:
-        x = translateM21Object(thisObject)
+        x = music21ObjectToAbjad(thisObject)
         if x is not None:
             abjadNotes.append(x) 
     
@@ -169,7 +166,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [translateNote]
+_DOC_ORDER = [noteToAbjad]
 
 
 if __name__ == "__main__":

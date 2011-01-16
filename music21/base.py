@@ -73,6 +73,12 @@ try:
 except ImportError:
     _missingImport.append('PIL')
 
+try:
+    import abjad
+except ImportError:
+    _missingImport.append('abjad')
+
+
 if len(_missingImport) > 0:
     if environLocal['warnings'] in [1, '1', True]:
         environLocal.warn(common.getMissingImportStr(_missingImport),

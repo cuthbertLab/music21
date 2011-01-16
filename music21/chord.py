@@ -505,6 +505,11 @@ class Chord(note.NotRest):
         [C4, E4, G#4]
         >>> [p.midi for p in c.pitches]
         [60, 64, 68]
+        
+        >>> d = chord.Chord()
+        >>> d.pitches = c.pitches
+        >>> d.pitches
+        [C4, E4, G#4]
         ''')
 
 
@@ -2337,7 +2342,7 @@ class Chord(note.NotRest):
         return returnObj
 
     def sortAscending(self, inPlace=False):
-        # TODO Check context
+        # TODO: Check context
         return self.sortDiatonicAscending(inPlace=inPlace)
 
     

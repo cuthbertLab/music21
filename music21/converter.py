@@ -56,14 +56,14 @@ from music21 import chord
 from music21 import clef
 from music21 import common
 from music21 import dynamics
+from music21 import expressions
 from music21 import humdrum
 from music21 import instrument
 from music21 import key
 from music21 import meter
-from music21 import musicxml
 from music21 import midi
+from music21 import musicxml
 from music21 import note
-from music21 import expressions
 from music21 import stream
 from music21 import tinyNotation
 

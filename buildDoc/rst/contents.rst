@@ -43,7 +43,7 @@ Module Reference
 
    moduleAbcBase
    moduleAbcTranslate
-   moduleAbjadM21FromM21
+   moduleAbjTranslate
    moduleArticulations
    moduleBase
    moduleBeam

@@ -89,9 +89,11 @@ yank            "if"
 ydelta          None                Not needed.
 '''
 
-__ALL__ = ['spineParser','testFiles','questions','utils']
+__ALL__ = ['spineParser','testFiles','questions']
 
 import spineParser
+import testFiles
+import questions
 
 def parseFile(filename):
     return spineParser.HumdrumFile(filename)
