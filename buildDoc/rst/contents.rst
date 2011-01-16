@@ -44,18 +44,20 @@ Module Reference
    moduleAbcBase
    moduleAbcTranslate
    moduleAbjTranslate
+   moduleAnalysisCorrelate
+   moduleAnalysisDiscrete
+   moduleAnalysisWindowed
    moduleArticulations
    moduleBase
    moduleBeam
    moduleClef
    moduleCommon
+   moduleCompositionPhasing
    moduleConverter
    moduleCorpusBase
-   moduleAnalysisCorrelate
    moduleChord
    moduleDuration
    moduleDynamics
-   moduleAnalysisDiscrete
    moduleEditorial
    moduleEnvironment
    moduleExpressions
@@ -67,12 +69,12 @@ Module Reference
    moduleMeter
    moduleMetadata
    moduleAnalysisMetrical
-   moduleMusicxmlTranslate
+   moduleMidiBase
+   moduleMidiTranslate
    moduleMusedataBase
    moduleMusedataTranslate
    moduleMusedataBase40
-   moduleMidiBase
-   moduleMidiTranslate
+   moduleMusicxmlTranslate
    moduleNote
    moduleNode
    modulePitch
@@ -83,7 +85,6 @@ Module Reference
    moduleStream
    moduleTempo
    moduleTinyNotation
-   moduleAnalysisWindowed
 
 
 Developer Reference
