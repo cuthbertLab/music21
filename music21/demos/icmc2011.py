@@ -306,14 +306,61 @@ class Test(unittest.TestCase):
 
 
     def testScales01(self):
-        from music21 import note, stream, clef, metadata, spanner
-
+        from music21 import note, stream, scale, pitch
 
 
         #==== "fig-py01"
-        # Iterating and Filtering Elements by Class
+
+        # Providing a tonic makes this concrete
+        sc1 = scale.MajorScale('g4')
+        sc2 = scale.MajorScale('e-3')
+
+        # Without arguments, getPitches() returns a single span 
+        assert str(sc1.getPitches()) == '[G4, A4, B4, C5, D5, E5, F#5, G5]'
+        assert str(sc2.getPitches('c2', 'c3')) == '[C2, D2, E-2, F2, G2, A-2, B-2, C3]'
+
+        # As a Chord, Scale pitches gain additional functionality
+        assert sc1.getChord().forteClass == '7-35'
+
+        # Given a degree, get the pitch
+        assert str(sc1.pitchFromDegree(5)) == 'D5'
+        assert str(sc2.pitchesFromScaleDegrees([7,2], 'e-6', 'e-9')) == '[F6, D7, F7, D8, F8, D9]'
+        
+        # Get a scale degree from a pitch
+        assert sc1.getScaleDegreeFromPitch('d') == 5
+        assert sc2.getScaleDegreeFromPitch('d') == 7
+
+        # Get the next pitch given step directions
+        match = [pitch.Pitch('g2')]
+        for dir in [1, 1, 1, -2, 4, -1, 1, 1, 1]:
+            # Append the next pitch based on the last-added pitch
+            match.append(sc1.next(match[-1], dir))
+        assert str(match), '[G2, A2, B2, C3, A2, E3, D3, E3, F#3, G3]'
+
+        # Derive new scales based on a provided collection or degree
+        assert str(sc1.derive(['c4', 'g4', 'b8', 'f2'])) == '<music21.scale.MajorScale C major>'
+        assert str(sc1.deriveByDegree(7, 'C#')) == '<music21.scale.MajorScale D major>'
+
+        # Methods unique to DiatonicScale subclasses
+        assert str(sc2.getRelativeMinor()) == '<music21.scale.MinorScale C minor>'
+
+
+
 
         #==== "fig-py01" end
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     def testEx01(self):
@@ -479,8 +526,10 @@ if __name__ == "__main__":
         #t.testEx03()
         #t.testEx04()
 
-        t.testStreams01()
-        t.testStreams02()
+        #t.testStreams01()
+        #t.testStreams02()
+
+        t.testScales01()
 #------------------------------------------------------------------------------
 # eof
 

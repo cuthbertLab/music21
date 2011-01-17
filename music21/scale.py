@@ -1152,7 +1152,6 @@ class ConcreteScale(Scale):
 
     def pitchesFromScaleDegrees(self, degreeTargets, minPitch=None, 
         maxPitch=None, direction=DIRECTION_ASCENDING):        
-
         '''Given one or more scale degrees, return a list of all matches over the entire range. 
 
         >>> from music21 import *
@@ -1213,7 +1212,7 @@ class ConcreteScale(Scale):
         getNeighbor=True):
         '''Get the next pitch given a `pitchOrigin` or None. 
 
-        The `direction` attribute must be either ascending or descending. Default is `ascending`.
+        The `direction` attribute may be either ascending or descending. Default is `ascending`. Optionally, positive or negative integers may be provided as directional stepSize scalars.
 
         An optional `stepSize` argument can be used to set the number of scle steps that are stepped through.
 
@@ -1241,12 +1240,27 @@ class ConcreteScale(Scale):
         >>> sc.next('E-4', 'ascending', 2)
         G4
         '''
+        # allow numerical directions
+        if common.isNum(direction):
+            if direction != 0:
+                # treat as a postive or negative step scalar
+                if direction > 0:
+                    stepScalar = direction
+                    direction = DIRECTION_ASCENDING
+                else: # negative non-zero
+                    stepScalar = abs(direction)
+                    direction = DIRECTION_DESCENDING
+            else:
+                raise ScaleException('direction cannot be zero')
+        else: # when direction is a string, use scalar of 1
+            stepScalar = 1 
+
         post = self._abstract.nextPitch(
             pitchReference=self._tonic, 
             nodeName=self._abstract.tonicDegree, 
             pitchOrigin=pitchOrigin,      
             direction=direction,
-            stepSize = stepSize,
+            stepSize = stepSize*stepScalar, # multiplied
             getNeighbor=getNeighbor
             )
         return post
@@ -1258,7 +1272,7 @@ class ConcreteScale(Scale):
     # comparison and evaluation
 
     def match(self, other, comparisonAttribute='pitchClass'):
-        '''Given another object of various forms (e.g., a Stream, a ConcreteScale, a list of pitches), return a named dictionary of pitch lists with keys 'matched' and 'notMatched'.
+        '''Given another object of various forms (e.g., a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), return a named dictionary of pitch lists with keys 'matched' and 'notMatched'.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g')
@@ -1295,7 +1309,8 @@ class ConcreteScale(Scale):
     def findMissing(self, other, comparisonAttribute='pitchClass', 
         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING,
         alteredNodes={}):
-        '''
+        '''Given another object of various forms (e.g., a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), return a list of pitches that are found in this Scale but are not found in the provided object. 
+
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g4')
         >>> sc1.findMissing(['d'])
@@ -1318,7 +1333,7 @@ class ConcreteScale(Scale):
 
     def deriveRanked(self, other, resultsReturned=4,
          comparisonAttribute='pitchClass'):
-        '''Return a list of closest matching concrete scales from this abstract scale, given a collection of pitches, provided as a Stream, a ConcreteScale, a list of pitches. Integer values returned represent the number of mathces. 
+        '''Return a list of closest-matching :class:`~music21.scale.ConcreteScale` objects based on this :class:`~music21.scale.AbstractScale`, provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, or a list of :class:`~music21.pitch.Pitch` objects. Returned integer values represent the number of mathces. 
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale()
@@ -1350,7 +1365,8 @@ class ConcreteScale(Scale):
 
 
     def derive(self, other, comparisonAttribute='pitchClass'):
-        '''
+        '''Return the closest-matching :class:`~music21.scale.ConcreteScale` based on the pitch collection provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, or a list of :class:`~music21.pitch.Pitch` objects.
+
         >>> from music21 import *
         >>> sc1 = scale.MajorScale()
         >>> sc1.derive(['c#', 'e', 'g#'])
@@ -1370,7 +1386,7 @@ class ConcreteScale(Scale):
 
 
     def deriveByDegree(self, degree, pitch):
-        '''Given a scale degree and a pitch, get a new Scale that satisfies that condition.
+        '''Given a scale degree and a pitch, return a new :class:`~music21.scale.ConcreteScale` that satisfies that condition.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale()
@@ -1426,16 +1442,15 @@ class ConcreteScale(Scale):
 
 
 class DiatonicScale(ConcreteScale):
-    '''A concrete diatonic scale. Assumes that all such scales have TODO:CHRIS:finish this doc?
+    '''A concrete diatonic scale. Each DiatonicScale has one instance of a  :class:`~music21.scale.AbstractDiatonicScale`.
     '''
-
     def __init__(self, tonic=None):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractDiatonicScale()
         self.type = 'Diatonic'
 
     def getTonic(self):
-        '''Return the dominant. 
+        '''Return the tonic. 
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
