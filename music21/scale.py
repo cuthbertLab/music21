@@ -75,7 +75,6 @@ class Scale(music21.Music21Object):
     Generic base class for all scales, both abstract and concrete.
     '''
     def __init__(self):
-        self.directionSensitive = False # can be true or false
         self.type = 'Scale' # could be mode, could be other indicator
 
 
@@ -155,7 +154,7 @@ class AbstractScale(Scale):
         # store interval network within abstract scale
         self._net = None
         # in most cases tonic/final of scale is step one, but not always
-        self.tonicStep = 1 # step of tonic
+        self.tonicDegree = 1 # step of tonic
 
         # declare if this scale is octave duplicating
         # can be used as to optimize pitch gathering
@@ -181,7 +180,7 @@ class AbstractScale(Scale):
         # have to test each so as not to confuse with a subclass
         if (isinstance(other, self.__class__) and 
             isinstance(self, other.__class__) and 
-            self.tonicStep == other.tonicStep and
+            self.tonicDegree == other.tonicDegree and
             self._net == other._net
             ):
             return True     
@@ -354,8 +353,8 @@ class AbstractDiatonicScale(AbstractScale):
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
         self.type = 'Abstract Diatonic'
-        self.tonicStep = None # step of tonic
-        self.dominantStep = None # step of dominant
+        self.tonicDegree = None # step of tonic
+        self.dominantDegree = None # step of dominant
         # all diatonic scales are octave duplicating
         self.octaveDuplicating = True
         self._buildNetwork(mode=mode)
@@ -375,8 +374,8 @@ class AbstractDiatonicScale(AbstractScale):
         if (isinstance(other, self.__class__) and 
             isinstance(self, other.__class__) and 
             self.type == other.type and
-            self.tonicStep == other.tonicStep and
-            self.dominantStep == other.dominantStep and
+            self.tonicDegree == other.tonicDegree and
+            self.dominantDegree == other.dominantDegree and
             self._net == other._net
             ):
             return True     
@@ -397,88 +396,88 @@ class AbstractDiatonicScale(AbstractScale):
         srcList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         if mode in ['dorian']:
             intervalList = srcList[1:] + srcList[:1] # d to d
-            self.tonicStep = 1
-            self.dominantStep = 5
-            self.relativeMajorStep = 7
-            self.relativeMinorStep = 5
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 7
+            self.relativeMinorDegree = 5
         elif mode in ['phrygian']:
             intervalList = srcList[2:] + srcList[:2] # e to e
-            self.tonicStep = 1
-            self.dominantStep = 5
-            self.relativeMajorStep = 6
-            self.relativeMinorStep = 4
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 6
+            self.relativeMinorDegree = 4
         elif mode in ['lydian']:
             intervalList = srcList[3:] + srcList[:3] # f to f
-            self.tonicStep = 1
-            self.dominantStep = 5
-            self.relativeMajorStep = 5
-            self.relativeMinorStep = 3
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 5
+            self.relativeMinorDegree = 3
         elif mode in ['mixolydian']:
             intervalList = srcList[4:] + srcList[:4] # g to g
-            self.tonicStep = 1
-            self.dominantStep = 5
-            self.relativeMajorStep = 4
-            self.relativeMinorStep = 2
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 4
+            self.relativeMinorDegree = 2
         elif mode in ['hypodorian']:
             intervalList = srcList[5:] + srcList[:5] # a to a
-            self.tonicStep = 4
-            self.dominantStep = 6
-            self.relativeMajorStep = 3
-            self.relativeMinorStep = 1
+            self.tonicDegree = 4
+            self.dominantDegree = 6
+            self.relativeMajorDegree = 3
+            self.relativeMinorDegree = 1
         elif mode in ['hypophrygian']:
             intervalList = srcList[6:] + srcList[:6] # b to b
-            self.tonicStep = 4
-            self.dominantStep = 7
-            self.relativeMajorStep = 2
-            self.relativeMinorStep = 7
+            self.tonicDegree = 4
+            self.dominantDegree = 7
+            self.relativeMajorDegree = 2
+            self.relativeMinorDegree = 7
         elif mode in ['hypolydian']: # c to c
             intervalList = srcList
-            self.tonicStep = 4
-            self.dominantStep = 6
-            self.relativeMajorStep = 1
-            self.relativeMinorStep = 6
+            self.tonicDegree = 4
+            self.dominantDegree = 6
+            self.relativeMajorDegree = 1
+            self.relativeMinorDegree = 6
         elif mode in ['hypomixolydian']:
             intervalList = srcList[1:] + srcList[:1] # d to d
-            self.tonicStep = 4
-            self.dominantStep = 7
-            self.relativeMajorStep = 7
-            self.relativeMinorStep = 5
+            self.tonicDegree = 4
+            self.dominantDegree = 7
+            self.relativeMajorDegree = 7
+            self.relativeMinorDegree = 5
         elif mode in ['aeolian', 'minor']:
             intervalList = srcList[5:] + srcList[:5] # a to A
-            self.tonicStep = 1
-            self.dominantStep = 5
-            self.relativeMajorStep = 3
-            self.relativeMinorStep = 1
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 3
+            self.relativeMinorDegree = 1
         elif mode in [None, 'major', 'ionian']: # c to C
             intervalList = srcList
-            self.tonicStep = 1
-            self.dominantStep = 5
-            self.relativeMajorStep = 1
-            self.relativeMinorStep = 6
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 1
+            self.relativeMinorDegree = 6
         elif mode in ['locrian']:
             intervalList = srcList[6:] + srcList[:6] # b to B
-            self.tonicStep = 1
-            self.dominantStep = 5
-            self.relativeMajorStep = 2
-            self.relativeMinorStep = 7
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 2
+            self.relativeMinorDegree = 7
         elif mode in ['hypoaeolian']:
             intervalList = srcList[2:] + srcList[:2] # e to e
-            self.tonicStep = 4
-            self.dominantStep = 6
-            self.relativeMajorStep = 6
-            self.relativeMinorStep = 4
+            self.tonicDegree = 4
+            self.dominantDegree = 6
+            self.relativeMajorDegree = 6
+            self.relativeMinorDegree = 4
         elif mode in ['hupomixolydian']:
             intervalList = srcList[3:] + srcList[:3] 
-            self.tonicStep = 4
-            self.dominantStep = 7
-            self.relativeMajorStep = 5
-            self.relativeMinorStep = 3
+            self.tonicDegree = 4
+            self.dominantDegree = 7
+            self.relativeMajorDegree = 5
+            self.relativeMinorDegree = 3
         elif mode in ['hypolocrian']:
             intervalList = srcList[3:] + srcList[:3] # f to f
-            self.tonicStep = 4
-            self.dominantStep = 6
-            self.relativeMajorStep = 5
-            self.relativeMinorStep = 3
+            self.tonicDegree = 4
+            self.dominantDegree = 6
+            self.relativeMajorDegree = 5
+            self.relativeMinorDegree = 3
         else:
             raise ScaleException('cannot create a scale of the following mode:' % mode)
         self._net = intervalNetwork.IntervalNetwork(intervalList, 
@@ -510,10 +509,10 @@ class AbstractOctatonicScale(AbstractScale):
         srcList = ['M2', 'm2', 'M2', 'm2', 'M2', 'm2', 'M2', 'm2']
         if mode in [None, 1, 'M2']:
             intervalList = srcList # start with M2
-            self.tonicStep = 1
+            self.tonicDegree = 1
         elif mode in [2, 'm2']:
             intervalList = srcList[1:] + srcList[:1] # start with m2
-            self.tonicStep = 1
+            self.tonicDegree = 1
         else:
             raise ScaleException('cannot create a scale of the following mode:' % mode)
         self._net = intervalNetwork.IntervalNetwork(intervalList,
@@ -537,8 +536,8 @@ class AbstractHarmonicMinorScale(AbstractScale):
         '''
         srcList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         intervalList = srcList[5:] + srcList[:5] # a to A
-        self.tonicStep = 1
-        self.dominantStep = 5
+        self.tonicDegree = 1
+        self.dominantDegree = 5
         self._net = intervalNetwork.IntervalNetwork(intervalList, 
                         octaveDuplicating=self.octaveDuplicating)
 
@@ -558,8 +557,8 @@ class AbstractMelodicMinorScale(AbstractScale):
         self._buildNetwork()
 
     def _buildNetwork(self):
-        self.tonicStep = 1
-        self.dominantStep = 5
+        self.tonicDegree = 1
+        self.dominantDegree = 5
 # this is now stored in interval network, as it is useful for testing
 #         nodes = ({'id':'terminusLow', 'degree':1}, # a
 #                  {'id':0, 'degree':2}, # b
@@ -634,7 +633,7 @@ class AbstractCyclicalScale(AbstractScale):
         if not common.isListLike(mode):
             mode = [mode] # place in list
 
-        self.tonicStep = 1
+        self.tonicDegree = 1
         self._net = intervalNetwork.IntervalNetwork(mode, 
                         octaveDuplicating=self.octaveDuplicating)
 
@@ -672,7 +671,7 @@ class AbstractOctaveRepeatingScale(AbstractScale):
         if iComplement is not None:
             mode.append(iComplement)
 
-        self.tonicStep = 1
+        self.tonicDegree = 1
         self._net = intervalNetwork.IntervalNetwork(mode, 
                         octaveDuplicating=self.octaveDuplicating)
 
@@ -693,8 +692,8 @@ class AbstractRagAsawari(AbstractScale):
         self._buildNetwork()
 
     def _buildNetwork(self):
-        self.tonicStep = 1
-        self.dominantStep = 5
+        self.tonicDegree = 1
+        self.dominantDegree = 5
         nodes = ({'id':'terminusLow', 'degree':1}, # c
                  {'id':0, 'degree':2}, # d
                  {'id':1, 'degree':4}, # f
@@ -768,8 +767,8 @@ class AbstractRagMarwa(AbstractScale):
         self._buildNetwork()
 
     def _buildNetwork(self):
-        self.tonicStep = 1
-        self.dominantStep = 5
+        self.tonicDegree = 1
+        self.dominantDegree = 5
         nodes = ({'id':'terminusLow', 'degree':1}, # c
                  {'id':0, 'degree':2}, # d-
                  {'id':1, 'degree':3}, # e
@@ -1091,7 +1090,7 @@ class ConcreteScale(Scale):
                 pitchObj = pitch.Pitch('C4')
             else:
                 pitchObj = self._tonic
-            stepOfPitch = self._abstract.tonicStep
+            stepOfPitch = self._abstract.tonicDegree
 
             if direction == DIRECTION_DESCENDING:
                 reverse = True # reverse presentation so pitches go high to low
@@ -1138,7 +1137,7 @@ class ConcreteScale(Scale):
         # TODO: rely here on intervalNetwork for caching
         post = self._abstract.getPitchFromNodeDegree(
             pitchReference=self._tonic, # pitch defined here
-            nodeName=self._abstract.tonicStep, # defined in abstract class
+            nodeName=self._abstract.tonicDegree, # defined in abstract class
             nodeDegreeTarget=degree, # target looking for
             direction=direction, 
             minPitch=minPitch, 
@@ -1170,7 +1169,7 @@ class ConcreteScale(Scale):
         # TODO: rely here on intervalNetwork for caching
         post = self._abstract.realizePitchByDegree(
             pitchReference=self._tonic, # pitch defined here
-            nodeId=self._abstract.tonicStep, # defined in abstract class
+            nodeId=self._abstract.tonicDegree, # defined in abstract class
             nodeDegreeTargets=degreeTargets, # target looking for
             direction=direction, 
             minPitch=minPitch, 
@@ -1203,7 +1202,7 @@ class ConcreteScale(Scale):
 
         post = self._abstract.getRelativeNodeDegree(
             pitchReference=self._tonic, 
-            nodeName=self._abstract.tonicStep, 
+            nodeName=self._abstract.tonicDegree, 
             pitchTarget=pitchTarget,      
             comparisonAttribute=comparisonAttribute, 
             direction=direction)
@@ -1244,7 +1243,7 @@ class ConcreteScale(Scale):
         '''
         post = self._abstract.nextPitch(
             pitchReference=self._tonic, 
-            nodeName=self._abstract.tonicStep, 
+            nodeName=self._abstract.tonicDegree, 
             pitchOrigin=pitchOrigin,      
             direction=direction,
             stepSize = stepSize,
@@ -1282,7 +1281,7 @@ class ConcreteScale(Scale):
         # need to deal with direction here? or get an aggregate scale
         matched, notMatched = self._abstract._net.match(
             pitchReference=self._tonic, 
-            nodeId=self._abstract.tonicStep, 
+            nodeId=self._abstract.tonicDegree, 
             pitchTarget=otherPitches, # can supply a list here
             comparisonAttribute=comparisonAttribute)
 
@@ -1307,7 +1306,7 @@ class ConcreteScale(Scale):
                         comparisonAttribute=comparisonAttribute)
         post = self._abstract._net.findMissing(
             pitchReference=self._tonic, 
-            nodeId=self._abstract.tonicStep, 
+            nodeId=self._abstract.tonicDegree, 
             pitchTarget=otherPitches, # can supply a list here
             comparisonAttribute=comparisonAttribute,
             minPitch=minPitch, maxPitch=maxPitch, direction=direction,
@@ -1447,7 +1446,7 @@ class DiatonicScale(ConcreteScale):
         C#5
         '''
         # NOTE: override method on ConcreteScale that simply returns _tonic
-        return self.pitchFromDegree(self._abstract.tonicStep)
+        return self.pitchFromDegree(self._abstract.tonicDegree)
 
     def getDominant(self):
         '''Return the dominant. 
@@ -1460,7 +1459,7 @@ class DiatonicScale(ConcreteScale):
         >>> sc.getDominant()
         C#5
         '''
-        return self.pitchFromDegree(self._abstract.dominantStep)
+        return self.pitchFromDegree(self._abstract.dominantDegree)
     
 
     def getLeadingTone(self):
@@ -1525,7 +1524,7 @@ class DiatonicScale(ConcreteScale):
         >>> sc2.pitches
         [F#5, G#5, A5, B5, C#6, D6, E6, F#6]
         '''
-        return MinorScale(self.pitchFromDegree(self.abstract.relativeMinorStep))
+        return MinorScale(self.pitchFromDegree(self.abstract.relativeMinorDegree))
 
 
     def getRelativeMajor(self):
@@ -1542,7 +1541,7 @@ class DiatonicScale(ConcreteScale):
         >>> sc2.getRelativeMajor().pitches
         [C5, D5, E5, F5, G5, A5, B5, C6]
         '''
-        return MajorScale(self.pitchFromDegree(self.abstract.relativeMajorStep))
+        return MajorScale(self.pitchFromDegree(self.abstract.relativeMajorDegree))
 
 
 

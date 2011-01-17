@@ -68,10 +68,10 @@ class EdgeException(Exception):
 class Edge(object):
     '''Abstraction of an Interval as an Edge. 
 
-    Edges store an Interval object as well as a direction specification.
+    Edges store an Interval object as well as a pathway direction specification. The pathway is the route through the network from terminus to terminus, and can either by ascending or descending. 
 
     For directed Edges, the direction of the Interval may be used to 
-    suggest non-pitch ascending movements (even if the direction is ascending). 
+    suggest non-pitch ascending movements (even if the pathway direction is ascending). 
 
     Weight values, as well as other attributes, can be stored. 
 
@@ -272,11 +272,14 @@ class Edge(object):
 class Node(object):
     '''Abstraction of an unrealized Pitch Node.
 
-    The Node `id` is used to storing connections in Edges.
+    The Node `id` is used to storing connections in Edges and has no real meaning.
 
-    The Node `degree` is translated to scale degree in various applications. 
+    Terminal Nodes have special ids: 'terminusLow', 'terminusHigh'
 
-    Terminal Nodes have special ids: terminusLow, terminusHighs
+    The Node `degree` is translated to scale degrees in various applications, and is used to request a pitch from the network.
+
+    The `weight` attribute is used to probabilistically select between multiple nodes when multiple nodes satisfy either a branching option in a pathway or a request for a degree. 
+
     '''
     def __init__(self, id=None, degree=None, weight=1.0):
         # store id, either as string, such as terminusLow, or a number. 

@@ -305,6 +305,16 @@ class Test(unittest.TestCase):
 
 
 
+    def testScales01(self):
+        from music21 import note, stream, clef, metadata, spanner
+
+
+
+        #==== "fig-py01"
+        # Iterating and Filtering Elements by Class
+
+        #==== "fig-py01" end
+
 
     def testEx01(self):
         # Basic operations for creating and manipulating scales.
