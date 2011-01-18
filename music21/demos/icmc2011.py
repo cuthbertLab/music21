@@ -343,20 +343,22 @@ class Test(unittest.TestCase):
 
         # Methods unique to DiatonicScale subclasses
         assert str(sc2.getRelativeMinor()) == '<music21.scale.MinorScale C minor>'
-
-
-
-
         #==== "fig-py01" end
 
 
 
+        #==== "fig-py02"
+        sc1 = scale.PhrygianScale('g4')
+        assert str(sc1.getPitches()) == '[G4, A-4, B-4, C5, D5, E-5, F5, G5]'
+        assert str(sc1.getRelativeMajor()) == '<music21.scale.MajorScale E- major>'
+        assert str(sc1.getTonic()), str(sc1.getDominant()) == ('G4', 'D5')
 
+        sc2 = scale.HypodorianScale('a6')
+        assert str(sc2.getPitches()) == '[E6, F#6, G6, A6, B6, C7, D7, E7]'
+        assert str(sc2.getRelativeMajor()) == '<music21.scale.MajorScale G major>'
+        assert str(sc2.getTonic()), str(sc2.getDominant()) == ('A6', 'C7')
 
-
-
-
-
+        #==== "fig-py02" end
 
 
 

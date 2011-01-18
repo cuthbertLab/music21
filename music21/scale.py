@@ -146,7 +146,7 @@ class AbstractScale(Scale):
 
     These classes provide an interface to, and create and manipulate, the stored :class:`~music21.intervalNetwork.IntervalNetwork` object. Thus, they are rarely created or manipulated directly by most users.
 
-    The AbstractScale additionally stores an `_alteredNodes` dictionary. Subclasses can define altered nodes in AbstractScale that are passed to the :class:`~music21.intervalNetwork.IntervalNetwork`.
+    The AbstractScale additionally stores an `_alteredDegrees` dictionary. Subclasses can define altered nodes in AbstractScale that are passed to the :class:`~music21.intervalNetwork.IntervalNetwork`.
 
     '''
     def __init__(self):
@@ -163,7 +163,7 @@ class AbstractScale(Scale):
         # store parameter for interval network-based node modifcations
         # entries are in the form: 
         # step: {'direction':DIRECTION_BI, 'interval':Interval}
-        self._alteredNodes = {}
+        self._alteredDegrees = {}
 
     def __eq__(self, other):
         '''
@@ -210,7 +210,7 @@ class AbstractScale(Scale):
 #         pass
 
     # expose interface from network. these methods must be called (and not
-    # ._net directly because they can pass the alteredNodes dictionary
+    # ._net directly because they can pass the alteredDegrees dictionary
 
     def getRealization(self, pitchObj, stepOfPitch,      
          minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING, reverse=False):
@@ -221,7 +221,7 @@ class AbstractScale(Scale):
 
         return self._net.realizePitch(pitchObj, stepOfPitch, 
             minPitch=minPitch, maxPitch=maxPitch,
-            alteredNodes=self._alteredNodes, direction=direction,
+            alteredDegrees=self._alteredDegrees, direction=direction,
             reverse=reverse)
 
 
@@ -238,7 +238,7 @@ class AbstractScale(Scale):
             direction=direction, 
             minPitch=minPitch, 
             maxPitch=maxPitch,
-            alteredNodes=self._alteredNodes
+            alteredDegrees=self._alteredDegrees
             )
         return post
 
@@ -256,14 +256,14 @@ class AbstractScale(Scale):
             direction=direction, 
             minPitch=minPitch, 
             maxPitch=maxPitch,
-            alteredNodes=self._alteredNodes
+            alteredDegrees=self._alteredDegrees
             )
         return post
 
 
     def getRelativeNodeDegree(self, pitchReference, nodeName, pitchTarget, 
             comparisonAttribute='pitchClass', direction=DIRECTION_ASCENDING):
-        '''Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the stored alteredNodes dictionary.
+        '''Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the stored alteredDegrees dictionary.
         '''
         post = self._net.getRelativeNodeDegree(
             pitchReference=pitchReference, 
@@ -271,14 +271,14 @@ class AbstractScale(Scale):
             pitchTarget=pitchTarget,      
             comparisonAttribute=comparisonAttribute,
             direction=direction,
-            alteredNodes=self._alteredNodes
+            alteredDegrees=self._alteredDegrees
             )
         return post
 
 
     def nextPitch(self, pitchReference, nodeName, pitchOrigin,
              direction=DIRECTION_ASCENDING, stepSize=1, getNeighbor=True):
-        '''Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the stored alteredNodes dictionary.
+        '''Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the stored alteredDegrees dictionary.
         '''
         post = self._net.nextPitch(
             pitchReference=pitchReference, 
@@ -286,7 +286,7 @@ class AbstractScale(Scale):
             pitchOrigin=pitchOrigin,      
             direction=direction,
             stepSize = stepSize,
-            alteredNodes=self._alteredNodes,
+            alteredDegrees=self._alteredDegrees,
             getNeighbor = getNeighbor
             )
         return post
@@ -303,7 +303,7 @@ class AbstractScale(Scale):
             direction=direction, 
             minPitch=minPitch, 
             maxPitch=maxPitch,
-            alteredNodes=self._alteredNodes
+            alteredDegrees=self._alteredDegrees
             )
         return post
 
@@ -543,7 +543,7 @@ class AbstractHarmonicMinorScale(AbstractScale):
 
         # raise the seventh in all directions
         # 7 here is scale step/degree, not node id
-        self._alteredNodes[7] = {'direction': intervalNetwork.DIRECTION_BI, 
+        self._alteredDegrees[7] = {'direction': intervalNetwork.DIRECTION_BI, 
                                'interval': interval.Interval('a1')}
 
 
@@ -1308,7 +1308,7 @@ class ConcreteScale(Scale):
 
     def findMissing(self, other, comparisonAttribute='pitchClass', 
         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING,
-        alteredNodes={}):
+        alteredDegrees={}):
         '''Given another object of various forms (e.g., a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), return a list of pitches that are found in this Scale but are not found in the provided object. 
 
         >>> from music21 import *
@@ -1325,7 +1325,7 @@ class ConcreteScale(Scale):
             pitchTarget=otherPitches, # can supply a list here
             comparisonAttribute=comparisonAttribute,
             minPitch=minPitch, maxPitch=maxPitch, direction=direction,
-            alteredNodes=alteredNodes,
+            alteredDegrees=alteredDegrees,
             )
         return post        
 
