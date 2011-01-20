@@ -428,11 +428,11 @@ class Test(unittest.TestCase):
         pLast = 'b-2'
         s = stream.Stream()
         for n in range(100):
-            n = note.Note(quarterLength=.25)
+            n = note.Note(quarterLength=random.choice([.5,.25,.25]))
             pLast = sc1.next(pLast, random.choice([-1, 1]))
             n.pitch = pLast
             s.append(n)
-        s.show()
+        #s.show()
 
 
     def testEx01(self):
