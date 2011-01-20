@@ -668,6 +668,34 @@ class IntervalNetwork(object):
 
 
 
+
+
+    #---------------------------------------------------------------------------
+    # for weighted selection of nodes
+
+    def weightedSelection(self, edges, nodes):
+        '''Perform weighted random selection on a parallel list of edges and corresponding nodes.
+
+        >>> from music21 import *
+        >>> n1 = intervalNetwork.Node(id='a', weight=10000)
+        >>> n2 = intervalNetwork.Node(id='b', weight=0.00001)
+        >>> e1 = intervalNetwork.Edge(interval.Interval('m3'), id='a')
+        >>> e2 = intervalNetwork.Edge(interval.Interval('m3'), id='b')
+        >>> net = intervalNetwork.IntervalNetwork()
+        >>> e, n = net.weightedSelection([e1, e2], [n1, n2])
+        >>> e.id # note: this may fail as there is a slight chance to get 'b'
+        'a'
+        >>> n.id
+        'a'
+        '''
+        # use index values as values
+        iValues = range(len(edges))
+        weights = [n.weight for n in nodes]
+        i = common.weightedSelection(iValues, weights)
+        # return corresponding edge and node
+        return edges[i], nodes[i]
+
+
     #---------------------------------------------------------------------------
     def _getDegreeMin(self):
         '''
@@ -801,6 +829,8 @@ class IntervalNetwork(object):
                     post[nId] = n.degree
             else: # directly assign from attribute
                 post[nId] = n.degree
+
+        #environLocal.printDebug(['_getNodeDegreeDictionary()', post])
         return post
 
 
@@ -886,10 +916,11 @@ class IntervalNetwork(object):
 
         return ((degree-1) % spanCount) + sMin
 
-    def _nodeNameToNodes(self, id, equateTerminals=True, permitDegreeModuli=True):
+    def _nodeNameToNodes(self, id, equateTerminals=True, 
+        permitDegreeModuli=True):
         '''The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, a node degree (as a number), a terminus string, or a None (indicating 'terminusLow'). 
 
-        Return a list of Nodes that match this identifications. 
+        Return a list of Node objects that match this identifications. 
 
         If `equateTerminals` is True, and the name given is a degree number, then the first terminal will return both the first and last.
 
@@ -1127,13 +1158,22 @@ class IntervalNetwork(object):
         for x in range(stepSize):
             postEdge, postNode = self._getNext(n, direction)
 
+            if len(postEdge) > 1:
+                # do weighted selection based on node weights, 
+                e, n = self.weightedSelection(postEdge, postNode)
+                intervalObj = e.interval
+            else:
+                intervalObj = postEdge[0].interval # get first
+                n = postNode[0] # n is passed on
+
             #environLocal.printDebug(['nextPitch()', 'postNode', postNode])
-            n = postNode[0]
+            #n = postNode[0]
+
             # for now, only taking first edge
             if direction == DIRECTION_ASCENDING:
-                p = postEdge[0].interval.transposePitch(p, maxAccidental=1)
+                p = intervalObj.transposePitch(p, maxAccidental=1)
             else:
-                p = postEdge[0].interval.reverse().transposePitch(p, maxAccidental=1)
+                p = intervalObj.reverse().transposePitch(p, maxAccidental=1)
             
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
                        n=n, p=p, direction=direction)
@@ -1266,10 +1306,19 @@ class IntervalNetwork(object):
             if nextBundle is None:
                 break
             postEdge, postNode = nextBundle
-            intervalObj = postEdge[0].interval # get first
+            # make probabilistic selection here if more than one
+            if len(postEdge) > 1:
+                # do weighted selection based on node weights, 
+                # return on edge, one node
+                #environLocal.printDebug(['_realizeAscending()', 'doing weighted selection'])
+                e, n = self.weightedSelection(postEdge, postNode)
+                intervalObj = e.interval
+            else:
+                intervalObj = postEdge[0].interval # get first
+                n = postNode[0] # n is passed on
+
             p = intervalObj.transposePitch(p, maxAccidental=1)
             pCollect = p
-            n = postNode[0]
 
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
                        n=n, p=p, direction=DIRECTION_ASCENDING)
@@ -1405,15 +1454,22 @@ class IntervalNetwork(object):
                     break
 
             nextBundle = self._getNext(n, DIRECTION_DESCENDING)
+            #environLocal.printDebug(['_realizeDescending()', 'n', n, 'nextBundle', nextBundle])
+
             if nextBundle is None:
-                #environLocal.printDebug(['realize():', 'cannot descend from n', n])
                 break
             postEdge, postNode = nextBundle
-            intervalObj = postEdge[0].interval # get first
-            p = intervalObj.reverse().transposePitch(p, maxAccidental=1)
-            pCollect = p
-            n = postNode[0]
+            if len(postEdge) > 1:
+                # do weighted selection based on node weights, 
+                # return on edge, one node
+                #environLocal.printDebug(['_realizeDescending()', 'doing weighted selection'])
+                e, n = self.weightedSelection(postEdge, postNode)
+                intervalObj = e.interval
+            else:
+                intervalObj = postEdge[0].interval # get first
+                n = postNode[0] # n is passed on
 
+            p = intervalObj.reverse().transposePitch(p, maxAccidental=1)
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
                        n=n, p=p, direction=DIRECTION_DESCENDING)
 
@@ -1915,7 +1971,7 @@ class IntervalNetwork(object):
 
     def getNeighborNodeIds(self, pitchReference, nodeName, pitchTarget,
         direction=DIRECTION_ASCENDING, alteredDegrees={}):
-        '''Given a reference pitch assigned to node id, determine the node ids that neighbor this pitch.
+        '''Given a reference pitch assigned to a node id, determine the node ids that neighbor this pitch.
 
         Returns None if an exact match.
 
@@ -2087,6 +2143,9 @@ class IntervalNetwork(object):
         nodeTargetIdList = self._nodeNameToNodes(nodeDegreeTarget, 
                         permitDegreeModuli=True,
                         equateTerminals=True) 
+
+        #environLocal.printDebug(['getPitchFromNodeDegree()', 'result of _nodeNameToNodes', nodeTargetIdList, 'nodeDegreeTarget', nodeDegreeTarget])
+
         if len(nodeTargetIdList) == 1:
             nodeTargetId = nodeTargetIdList[0] # easy case
         # case where we eauate terminals and get both min and max
@@ -2094,7 +2153,6 @@ class IntervalNetwork(object):
             # get first, terminus low
             nodeTargetId = nodeTargetIdList[0] # easy case
         else: # have more than one node that is defined for a given degree
-            # TODO: need to collect and add probabilistic selection
             for nId in nodeTargetIdList:
                 dirList = self._nodeIdToEdgeDirections(nId)
                 #environLocal.printDebug(['getPitchFromNodeDegree()', 'comparing dirList', dirList])
@@ -2111,29 +2169,34 @@ class IntervalNetwork(object):
 
         # get a realization to find the node
         # pass direction as well when getting realization
-        # problem here is that if min and max are None, descending
-        # is not being realized
-        realizedPitch, realizedNode = self.realize(
-            pitchReference=pitchReference, 
-            nodeId=nodeId, 
-            minPitch=minPitch, 
-            maxPitch=maxPitch, 
-            direction=direction,
-            alteredDegrees=alteredDegrees)
 
-        #environLocal.printDebug(['getPitchFromNodeDegree()', 'realizedPitch', realizedPitch, 'realizedNode', realizedNode, 'nodeTargetId', nodeTargetId,])
+        # TODO: need a way to force that we get a realization that 
+        # may goes through a particular node; we could start at that node?
+        # brut force approach might make multiple attempts to realize
 
-        # get the pitch when we have a node id to match match
-        for i, nId in enumerate(realizedNode):
-            #environLocal.printDebug(['comparing', nId, 'nodeTargetId', nodeTargetId])
-
-            if nId == nodeTargetId.id:
-                return realizedPitch[i]
-            # NOTE: this condition may be too generous, and was added to solve
-            # an untracked problem.
-            if (nId in [TERMINUS_HIGH, TERMINUS_LOW] and nodeTargetId.id in [TERMINUS_HIGH, TERMINUS_LOW]):
-                return realizedPitch[i]
-
+        # TODO: possibly cache results
+        for trial in range(10):
+            realizedPitch, realizedNode = self.realize(
+                pitchReference=pitchReference, 
+                nodeId=nodeId, 
+                minPitch=minPitch, 
+                maxPitch=maxPitch, 
+                direction=direction,
+                alteredDegrees=alteredDegrees)
+    
+            #environLocal.printDebug(['getPitchFromNodeDegree()', 'realizedPitch', realizedPitch, 'realizedNode', realizedNode, 'nodeTargetId', nodeTargetId,])
+    
+            # get the pitch when we have a node id to match match
+            for i, nId in enumerate(realizedNode):
+                #environLocal.printDebug(['comparing', nId, 'nodeTargetId', nodeTargetId])
+    
+                if nId == nodeTargetId.id:
+                    return realizedPitch[i]
+                # NOTE: this condition may be too generous, and was added to solve
+                # an untracked problem.
+                if (nId in [TERMINUS_HIGH, TERMINUS_LOW] and nodeTargetId.id in [TERMINUS_HIGH, TERMINUS_LOW]):
+                    return realizedPitch[i]
+            #environLocal.printDebug(['getPitchFromNodeDegree() on trial', trial, ', failed to find node', nodeTargetId])
 
         
     def _filterPitchList(self, pitchTarget):

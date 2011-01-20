@@ -361,8 +361,78 @@ class Test(unittest.TestCase):
         #==== "fig-py02" end
 
 
+        #==== "fig-py03"
+        sc1 = scale.HarmonicMinorScale('a3')
+        assert str(sc1.getPitches()) == '[A3, B3, C4, D4, E4, F4, G#4, A4]'
+        assert str(sc1.getTonic()), str(sc1.getDominant()) == ('A3', 'E4')
+        # add notation example
+        #==== "fig-py03" end
 
 
+
+        #==== "fig-py06"
+        # add a brief analytical example here
+
+        #==== "fig-py06" end
+
+
+        #==== "fig-py04"
+        sc1 = scale.MelodicMinorScale('c4')
+        assert str(sc1.getPitches(direction='ascending')) == '[C4, D4, E-4, F4, G4, A4, B4, C5]'
+        assert str(sc1.getPitches('c3', 'c5', direction='descending')) == '[C5, B-4, A-4, G4, F4, E-4, D4, C4, B-3, A-3, G3, F3, E-3, D3, C3]'
+        assert str(sc1.getTonic()), str(sc1.getDominant()) == ('C4', 'G4')
+
+        # add notation example
+        #==== "fig-py04" end
+
+
+
+        #==== "fig-py05"
+        sc1 = scale.OctatonicScale('e3', 'm2')
+        assert str(sc1.getPitches()) == '[E3, F3, G3, A-3, B-3, C-4, D-4, D4, E4]'
+        sc2 = scale.OctatonicScale('e3', 'M2')
+        assert str(sc2.getPitches()) == '[E3, F#3, G3, A3, B-3, C4, D-4, E-4, F-4]'
+
+        # add notation example; perhaps create tri-chords from scale-completing selections
+        #==== "fig-py05" end
+
+
+
+
+        #sc = scale.SieveScale('c2', '(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)') 
+
+        #==== "fig-py07"
+
+        sc1 = scale.SieveScale('c4', '3@0|4@0')
+
+        sc2 = scale.SieveScale('c4', '3@0|7@0')
+
+
+        #==== "fig-py07" end
+
+
+
+
+        #==== "fig-py08"
+
+        sc1 = scale.RagAsawari('g3')
+
+        sc2 = scale.RagMarwa('g3')
+
+
+        #==== "fig-py08" end
+
+
+        import random
+        sc1 = scale.WeightedHexatonicBlues('c3')
+        pLast = 'b-2'
+        s = stream.Stream()
+        for n in range(100):
+            n = note.Note(quarterLength=.25)
+            pLast = sc1.next(pLast, random.choice([-1, 1]))
+            n.pitch = pLast
+            s.append(n)
+        s.show()
 
 
     def testEx01(self):
@@ -421,6 +491,9 @@ class Test(unittest.TestCase):
 
         # get as a chord and get its forte class
         self.assertEqual(sc2.transpose('m2').chord.forteClass, '6-35')
+
+
+
 
 
 

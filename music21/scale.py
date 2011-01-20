@@ -160,6 +160,8 @@ class AbstractScale(Scale):
         # can be used as to optimize pitch gathering
         self.octaveDuplicating = True
 
+        # passed to intervalnetwork
+        self.deterministic = True
         # store parameter for interval network-based node modifcations
         # entries are in the form: 
         # step: {'direction':DIRECTION_BI, 'interval':Interval}
@@ -230,7 +232,6 @@ class AbstractScale(Scale):
             direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):
         '''Get a pitch for desired scale degree.
         '''
-
         post = self._net.getPitchFromNodeDegree(
             pitchReference=pitchReference, # pitch defined here
             nodeName=nodeName, # defined in abstract class
@@ -507,10 +508,10 @@ class AbstractOctatonicScale(AbstractScale):
 
         '''
         srcList = ['M2', 'm2', 'M2', 'm2', 'M2', 'm2', 'M2', 'm2']
-        if mode in [None, 1, 'M2']:
+        if mode in [None, 2, 'M2']:
             intervalList = srcList # start with M2
             self.tonicDegree = 1
-        elif mode in [2, 'm2']:
+        elif mode in [1, 'm2']:
             intervalList = srcList[1:] + srcList[:1] # start with m2
             self.tonicDegree = 1
         else:
@@ -842,6 +843,63 @@ class AbstractRagMarwa(AbstractScale):
 
 
 
+class AbstractWeightedHexatonicBlues(AbstractScale):
+    '''A dynamic, probabilistic mixture of minor pentatonic and a hexatonic blues scale
+    '''
+    def __init__(self):
+        AbstractScale.__init__(self)
+        self.type = 'Abstract Weighted Hexactonic Blues'
+        # probably not, as all may not have some pitches in each octave
+        self.octaveDuplicating = True 
+        self.deterministic = False
+        self._buildNetwork()
+
+    def _buildNetwork(self):
+        self.tonicDegree = 1
+        self.dominantDegree = 5
+        nodes = ({'id':'terminusLow', 'degree':1}, # c
+                 {'id':0, 'degree':2}, # e-
+                 {'id':1, 'degree':3}, # f
+                 {'id':2, 'degree':4}, # f#
+                 {'id':3, 'degree':5}, # g
+                 {'id':4, 'degree':6}, # b-
+                 {'id':'terminusHigh', 'degree':7}, # c
+                )
+        edges = (
+                # all bidirectional
+                {'interval':'m3', 'connections':(
+                        [TERMINUS_LOW, 0, DIRECTION_BI], # c to e-
+                    )},
+                {'interval':'M2', 'connections':(
+                        [0, 1, DIRECTION_BI], # e- to f
+                    )},
+                {'interval':'M2', 'connections':(
+                        [1, 3, DIRECTION_BI], # f to g
+                    )},
+                {'interval':'a1', 'connections':(
+                        [1, 2, DIRECTION_BI], # f to f#
+                    )},
+                {'interval':'m2', 'connections':(
+                        [2, 3, DIRECTION_BI], # f# to g
+                    )},
+                {'interval':'m3', 'connections':(
+                        [3, 4, DIRECTION_BI], # g to b-
+                    )},
+                {'interval':'M2', 'connections':(
+                        [4, TERMINUS_HIGH, DIRECTION_BI], # b- to c
+                    )},
+                )
+
+        self._net = intervalNetwork.IntervalNetwork(
+                        octaveDuplicating=self.octaveDuplicating, 
+                        deterministic=self.deterministic)
+        # using representation stored in interval network
+        self._net.fillArbitrary(nodes, edges)
+
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -1134,7 +1192,6 @@ class ConcreteScale(Scale):
         >>> sc.pitchFromDegree(7)
         D5
         '''
-        # TODO: rely here on intervalNetwork for caching
         post = self._abstract.getPitchFromNodeDegree(
             pitchReference=self._tonic, # pitch defined here
             nodeName=self._abstract.tonicDegree, # defined in abstract class
@@ -1254,6 +1311,13 @@ class ConcreteScale(Scale):
                 raise ScaleException('direction cannot be zero')
         else: # when direction is a string, use scalar of 1
             stepScalar = 1 
+
+        # pick reverse direction for neighbor
+        if getNeighbor is True:
+            if direction in [DIRECTION_ASCENDING]:
+                getNeighbor = DIRECTION_DESCENDING
+            elif direction in [DIRECTION_DESCENDING]:
+                getNeighbor = DIRECTION_ASCENDING
 
         post = self._abstract.nextPitch(
             pitchReference=self._tonic, 
@@ -1847,14 +1911,12 @@ class MelodicMinorScale(DiatonicScale):
 # other sscales
 
 class OctatonicScale(ConcreteScale):
-    '''A concrete Octatonic scale. Assumes that all such scales have   ???
+    '''A concrete Octatonic scale. Two modes
     '''
-
     def __init__(self, tonic=None, mode=None):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractOctatonicScale(mode=mode)
         self.type = 'Octatonic'
-
 
 
 
@@ -2035,6 +2097,17 @@ class RagMarwa(ConcreteScale):
 
 
 
+
+class WeightedHexatonicBlues(ConcreteScale):
+    '''A concrete scale based on a dynamic mixture of a minor pentatonic and the hexatonic blues scale.
+
+    >>> from music21 import *
+    '''
+
+    def __init__(self, tonic=None):
+        ConcreteScale.__init__(self, tonic=tonic)
+        self._abstract = AbstractWeightedHexatonicBlues()
+        self.type = 'Weighted Hexatonic Blues'
 
 
 
@@ -2404,12 +2477,11 @@ class Test(unittest.TestCase):
         self.assertEqual(str(mm.next('A5', 'descending')), 'G5')
 
 
-        # TODO: stop this from returning None
         self.assertEqual(str(mm.next('f#5', 'descending')), 'F5')
         self.assertEqual(str(mm.next('f#5', 'descending', 
             getNeighbor='descending')), 'E5')
 
-        self.assertEqual(str(mm.next('f5', 'ascending')), 'G#5')
+        self.assertEqual(str(mm.next('f5', 'ascending')), 'F#5')
         self.assertEqual(str(mm.next('f5', 'ascending', 
             getNeighbor='descending')), 'F#5')
 
@@ -2435,7 +2507,9 @@ class Test(unittest.TestCase):
                 s.append(n)
         s.makeAccidentals()
 
-        self.assertEqual(str(s.pitches), '[G3, A3, B-3, C4, D4, E4, F#4, G4, F4, E-4, D4, C4, B-3, C4, D4, E4, F#4, G4, A4, B-4, C5, B-4, A4, G4, F4, E-4, F#4, G4, A4, B-4, C5, D5, E5, F#5, F5, E-5, D5, C5, B-4, C5, D5, E5, F#5, G5, A5, B-5, C6, B-5, A5, G5, F5, E-5]')
+        self.assertEqual(str(s.pitches), '[G3, A3, B-3, C4, D4, E4, F#4, G4, F4, E-4, D4, C4, B-3, C4, D4, E4, F#4, G4, A4, B-4, C5, B-4, A4, G4, F4, E-4, E4, F#4, G4, A4, B-4, C5, D5, E5, E-5, D5, C5, B-4, A4, B-4, C5, D5, E5, F#5, G5, A5, B-5, A5, G5, F5, E-5, D5]')
+
+
         #s.show()
 
 
@@ -2518,7 +2592,6 @@ class Test(unittest.TestCase):
         #self.assertEqual(str(sc.next('A1', 'ascending')), 'B1')
         self.assertEqual(str(sc.next('B1', 'ascending')), 'A1')
 
-
         self.assertEqual(str(sc.next('B2', 'descending')), 'A2')
         self.assertEqual(str(sc.next('A2', 'descending')), 'F#2')
         self.assertEqual(str(sc.next('E2', 'descending')), 'D-2')
@@ -2565,7 +2638,62 @@ class Test(unittest.TestCase):
         self.assertEqual(post.count('B1') > 30, True)
 
 
+    def testWeightedHexatonicBluesA(self):
 
+        sc = WeightedHexatonicBlues('c4')
+
+        i = 0
+        j = 0
+        for x in range(50):
+            # over 50 iterations, it must be one of these two options
+            match = str(sc.getPitches('c3', 'c4'))
+            if match == '[C3, E-3, F3, G3, B-3, C4]':
+                i += 1
+            if match == '[C3, E-3, F3, F#3, G3, B-3, C4]':
+                j += 1
+            self.assertEqual(match in [
+            '[C3, E-3, F3, G3, B-3, C4]', 
+            '[C3, E-3, F3, F#3, G3, B-3, C4]'], 
+            True)
+        # check that we got at least one; this may fail rarely
+        self.assertEqual(i >= 1, True)
+        self.assertEqual(j >= 1, True)
+        
+
+        # test descending
+        i = 0
+        j = 0
+        for x in range(50):
+            # over 50 iterations, it must be one of these two options
+            match = str(sc.getPitches('c3', 'c4', direction='descending'))
+            if match == '[C4, B-3, G3, F3, E-3, C3]':
+                i += 1
+            if match == '[C4, B-3, G3, F#3, F3, E-3, C3]':
+                j += 1
+            self.assertEqual(match in [
+            '[C4, B-3, G3, F3, E-3, C3]', 
+            '[C4, B-3, G3, F#3, F3, E-3, C3]'], 
+            True)
+        # check that we got at least one; this may fail rarely
+        self.assertEqual(i >= 1, True)
+        self.assertEqual(j >= 1, True)
+
+
+        self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
+        self.assertEqual(str(sc.next('c4', 'ascending')), 'E-4')
+ 
+
+        # degree 4 is always the blues note in this model
+        self.assertEqual(str(sc.pitchFromDegree(4)), 'F#4')
+
+        # this should alway work, regardless of what scales is 
+        # realized
+        for trial in range(30):
+            self.assertEqual(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'], True)
+            # presently this might return the same note, if the
+            # F# is taken as out of the scale and then found back in the Scale
+            # in generation
+            self.assertEqual(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'], True)
 
 
 
@@ -2593,7 +2721,9 @@ if __name__ == "__main__":
         #t.testRagMarwaA()
 
         #t.testRagMarwaB()
-        t.testRagMarwaC()
+        #t.testRagMarwaC()
+
+        t.testWeightedHexatonicBluesA()
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
