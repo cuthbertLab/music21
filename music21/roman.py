@@ -446,7 +446,7 @@ class RomanNumeral(chord.Chord):
 #
 #
 #    def _prepareAlterations(self):
-#        '''Prepare the alterations dictionary to conform to the presentation necessary for use in IntervalNetwork. All stored member indexes need to be converted to scale degrees.
+#        '''Prepare the alterations dictionary to conform to the presentation necessary for use in BoundIntervalNetwork. All stored member indexes need to be converted to scale degrees.
 #        '''
 #        post = {}
 #        for key, value in self._alterations:

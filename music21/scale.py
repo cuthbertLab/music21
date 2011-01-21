@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 '''
-The various Scale objects provide a bi-directional object representation of octave repeating and non-octave repeating scales built by network of :class:`~music21.interval.Interval` objects as modeled in :class:`~music21.intervalNetwork.IntervalNetwork`.
+The various Scale objects provide a bi-directional object representation of octave repeating and non-octave repeating scales built by network of :class:`~music21.interval.Interval` objects as modeled in :class:`~music21.intervalNetwork.BoundIntervalNetwork`.
 
 The main public interface to these resources are the numerous :class:`~music21.scale.ConcreteScale` subclasses, such as :class:`~music21.scale.MajorScale`, :class:`~music21.scale.MinorScale`, and :class:`~music21.scale.MelodicMinorScale`.
 
@@ -144,9 +144,9 @@ class Scale(music21.Music21Object):
 class AbstractScale(Scale):
     '''An abstract scale is specific scale formation, but does not have a defined pitch collection or pitch reference. For example, all Major scales can be represented by an AbstractScale; a ConcreteScale, however, is a specific Major Scale, such as G Major. 
 
-    These classes provide an interface to, and create and manipulate, the stored :class:`~music21.intervalNetwork.IntervalNetwork` object. Thus, they are rarely created or manipulated directly by most users.
+    These classes provide an interface to, and create and manipulate, the stored :class:`~music21.intervalNetwork.BoundIntervalNetwork` object. Thus, they are rarely created or manipulated directly by most users.
 
-    The AbstractScale additionally stores an `_alteredDegrees` dictionary. Subclasses can define altered nodes in AbstractScale that are passed to the :class:`~music21.intervalNetwork.IntervalNetwork`.
+    The AbstractScale additionally stores an `_alteredDegrees` dictionary. Subclasses can define altered nodes in AbstractScale that are passed to the :class:`~music21.intervalNetwork.BoundIntervalNetwork`.
 
     '''
     def __init__(self):
@@ -264,7 +264,7 @@ class AbstractScale(Scale):
 
     def getRelativeNodeDegree(self, pitchReference, nodeName, pitchTarget, 
             comparisonAttribute='pitchClass', direction=DIRECTION_ASCENDING):
-        '''Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the stored alteredDegrees dictionary.
+        '''Expose functionality from :class:`~music21.intervalNetwork.BoundIntervalNetwork`, passing on the stored alteredDegrees dictionary.
         '''
         post = self._net.getRelativeNodeDegree(
             pitchReference=pitchReference, 
@@ -279,7 +279,7 @@ class AbstractScale(Scale):
 
     def nextPitch(self, pitchReference, nodeName, pitchOrigin,
              direction=DIRECTION_ASCENDING, stepSize=1, getNeighbor=True):
-        '''Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the stored alteredDegrees dictionary.
+        '''Expose functionality from :class:`~music21.intervalNetwork.BoundIntervalNetwork`, passing on the stored alteredDegrees dictionary.
         '''
         post = self._net.nextPitch(
             pitchReference=pitchReference, 
@@ -316,7 +316,7 @@ class AbstractScale(Scale):
         return self._net._getNetworkxGraph()
 
     networkxGraph = property(_getNetworkxGraph, doc='''
-        Return a networks Graph object representing a realized version of this :class:`~music21.intervalNetwork.IntervalNetwork`.
+        Return a networks Graph object representing a realized version of this :class:`~music21.intervalNetwork.BoundIntervalNetwork`.
         ''')
 
 
@@ -384,7 +384,7 @@ class AbstractDiatonicScale(AbstractScale):
             return False
 
     def _buildNetwork(self, mode=None):
-        '''Given sub-class dependent parameters, build and assign the IntervalNetwork.
+        '''Given sub-class dependent parameters, build and assign the BoundIntervalNetwork.
 
         >>> from music21 import *
         >>> sc = scale.AbstractDiatonicScale()
@@ -481,7 +481,7 @@ class AbstractDiatonicScale(AbstractScale):
             self.relativeMinorDegree = 3
         else:
             raise ScaleException('cannot create a scale of the following mode:' % mode)
-        self._net = intervalNetwork.IntervalNetwork(intervalList, 
+        self._net = intervalNetwork.BoundIntervalNetwork(intervalList, 
                     octaveDuplicating=self.octaveDuplicating)
 
 
@@ -498,7 +498,7 @@ class AbstractOctatonicScale(AbstractScale):
 
     def _buildNetwork(self, mode=None):
         '''
-        Given sub-class dependent parameters, build and assign the IntervalNetwork.
+        Given sub-class dependent parameters, build and assign the BoundIntervalNetwork.
 
         >>> from music21 import *
         >>> sc = scale.AbstractDiatonicScale()
@@ -516,7 +516,7 @@ class AbstractOctatonicScale(AbstractScale):
             self.tonicDegree = 1
         else:
             raise ScaleException('cannot create a scale of the following mode:' % mode)
-        self._net = intervalNetwork.IntervalNetwork(intervalList,
+        self._net = intervalNetwork.BoundIntervalNetwork(intervalList,
                                 octaveDuplicating=self.octaveDuplicating)
         # might also set weights for tonic and dominant here
 
@@ -539,7 +539,7 @@ class AbstractHarmonicMinorScale(AbstractScale):
         intervalList = srcList[5:] + srcList[:5] # a to A
         self.tonicDegree = 1
         self.dominantDegree = 5
-        self._net = intervalNetwork.IntervalNetwork(intervalList, 
+        self._net = intervalNetwork.BoundIntervalNetwork(intervalList, 
                         octaveDuplicating=self.octaveDuplicating)
 
         # raise the seventh in all directions
@@ -608,7 +608,7 @@ class AbstractMelodicMinorScale(AbstractScale):
 #                     )},
 #                 )
 
-        self._net = intervalNetwork.IntervalNetwork(
+        self._net = intervalNetwork.BoundIntervalNetwork(
                         octaveDuplicating=self.octaveDuplicating)
         # using representation stored in interval network
         #self._net.fillArbitrary(nodes, edges)
@@ -635,7 +635,7 @@ class AbstractCyclicalScale(AbstractScale):
             mode = [mode] # place in list
 
         self.tonicDegree = 1
-        self._net = intervalNetwork.IntervalNetwork(mode, 
+        self._net = intervalNetwork.BoundIntervalNetwork(mode, 
                         octaveDuplicating=self.octaveDuplicating)
 
 
@@ -673,7 +673,7 @@ class AbstractOctaveRepeatingScale(AbstractScale):
             mode.append(iComplement)
 
         self.tonicDegree = 1
-        self._net = intervalNetwork.IntervalNetwork(mode, 
+        self._net = intervalNetwork.BoundIntervalNetwork(mode, 
                         octaveDuplicating=self.octaveDuplicating)
 
 
@@ -750,7 +750,7 @@ class AbstractRagAsawari(AbstractScale):
                     )},
                 )
 
-        self._net = intervalNetwork.IntervalNetwork(
+        self._net = intervalNetwork.BoundIntervalNetwork(
                         octaveDuplicating=self.octaveDuplicating)
         # using representation stored in interval network
         self._net.fillArbitrary(nodes, edges)
@@ -834,7 +834,7 @@ class AbstractRagMarwa(AbstractScale):
                     )},
                 )
 
-        self._net = intervalNetwork.IntervalNetwork(
+        self._net = intervalNetwork.BoundIntervalNetwork(
                         octaveDuplicating=self.octaveDuplicating)
         # using representation stored in interval network
         self._net.fillArbitrary(nodes, edges)
@@ -890,7 +890,7 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
                     )},
                 )
 
-        self._net = intervalNetwork.IntervalNetwork(
+        self._net = intervalNetwork.BoundIntervalNetwork(
                         octaveDuplicating=self.octaveDuplicating, 
                         deterministic=self.deterministic)
         # using representation stored in interval network
