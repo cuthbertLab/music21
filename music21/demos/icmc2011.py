@@ -402,7 +402,7 @@ class Test(unittest.TestCase):
         #sc = scale.SieveScale('c2', '(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)') 
 
         #==== "fig-py07"
-
+        # add examples
         sc1 = scale.SieveScale('c4', '3@0|4@0')
 
         sc2 = scale.SieveScale('c4', '3@0|7@0')
@@ -423,6 +423,8 @@ class Test(unittest.TestCase):
         #==== "fig-py08" end
 
 
+        #==== "fig-py09"
+
         import random
         sc1 = scale.WeightedHexatonicBlues('c3')
         pLast = 'b-2'
@@ -433,6 +435,7 @@ class Test(unittest.TestCase):
             n.pitch = pLast
             s.append(n)
         #s.show()
+        #==== "fig-py09" end
 
 
     def testEx01(self):

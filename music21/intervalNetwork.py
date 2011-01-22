@@ -1117,9 +1117,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         B2
         '''
         if common.isStr(pitchOrigin):
-            pitchObj = pitch.Pitch(pitchOrigin)
+            pitchOrigin = pitch.Pitch(pitchOrigin)
         else:
-            pitchObj = copy.deepcopy(pitchOrigin)
+            pitchOrigin = copy.deepcopy(pitchOrigin)
+
 
         # get the node id that we are starting with
         nodeId = self.getRelativeNodeId(pitchReference, 
@@ -1162,12 +1163,12 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         #environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName', nodeName, 'p', p, 'nodeId', nodeId, 'self._nodes[nodeId].degree', self._nodes[nodeId].degree])
 
-        # transfer octave; this assumes octave equivalence
-        p.octave = pitchObj.octave
-        pitchObj = p
+        # transfer octave from origin to new pitch derived from node
+        # note: this assumes octave equivalence and may be a problem
+        p.octave = pitchOrigin.octave
+        #pitchObj = p
         n = self._nodes[nodeId]
-        p = pitchObj
-        pCollect = p # usually p, unles altered
+        #pCollect = p # usually p, unles altered
         for x in range(stepSize):
             postEdge, postNode = self._getNext(n, direction)
 
@@ -1179,7 +1180,7 @@ class BoundIntervalNetwork(IntervalNetwork):
                 intervalObj = postEdge[0].interval # get first
                 n = postNode[0] # n is passed on
 
-            #environLocal.printDebug(['nextPitch()', 'postNode', postNode])
+            #environLocal.printDebug(['nextPitch()', 'intervalObj', intervalObj, 'p', p, 'postNode', postNode])
             #n = postNode[0]
 
             # for now, only taking first edge
@@ -1187,7 +1188,6 @@ class BoundIntervalNetwork(IntervalNetwork):
                 p = intervalObj.transposePitch(p, maxAccidental=1)
             else:
                 p = intervalObj.reverse().transposePitch(p, maxAccidental=1)
-            
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
                        n=n, p=p, direction=direction)
 

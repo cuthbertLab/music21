@@ -1330,6 +1330,33 @@ class ConcreteScale(Scale):
         return post
 
 
+    def isNext(self, other, pitchOrigin, direction='ascending', stepSize=1, 
+        getNeighbor=True, comparisonAttribute='name'):
+        '''Given another pitch, as well as an origin and a direction, determine if this other pitch is in the next in the scale.
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale('g')
+        >>> sc1.isNext('d4', 'c4', 'ascending')
+        True
+        '''
+        if common.isStr(other): # convert to pitch
+            other = pitch.Pitch(other)
+        elif hasattr(other, 'pitch'): # possibly a note
+            other = other.pitch # just get pitch component
+        elif not isinstance(other, pitch.Pitch):
+            return False # cannot compare to nonpitch
+
+        nPitch = self.next(pitchOrigin, direction=direction, stepSize=stepSize, 
+                 getNeighbor=getNeighbor) 
+        if nPitch is None:
+            return None
+
+        if (getattr(nPitch, comparisonAttribute) == 
+            getattr(other, comparisonAttribute)):
+            return True
+        else:
+            return False
+
 
 
     #---------------------------------------------------------------------------
@@ -2697,6 +2724,25 @@ class Test(unittest.TestCase):
 
 
 
+    def testNextA(self):
+
+        sc = MajorScale('c4')
+
+        # ascending works in pitch space
+#         self.assertEqual(str(sc.next('a4', 'ascending', 1)),  'B4')
+#         self.assertEqual(str(sc.next('b4', 'ascending', 1)),  'C5')
+#         self.assertEqual(str(sc.next('b5', 'ascending', 1)),  'C6')
+#         self.assertEqual(str(sc.next('b3', 'ascending', 1)),  'C4')
+# 
+#         # descending works in pitch space
+#         self.assertEqual(str(sc.next('c3', 'descending', 1)),  'B2')
+#         self.assertEqual(str(sc.next('c8', 'descending', 1)),  'B7')
+
+
+        sc = MajorScale('a4')
+
+        self.assertEqual(str(sc.next('g#2', 'ascending', 1)),  'A2')
+        self.assertEqual(str(sc.next('g#4', 'ascending', 1)),  'A4')
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -2723,7 +2769,8 @@ if __name__ == "__main__":
         #t.testRagMarwaB()
         #t.testRagMarwaC()
 
-        t.testWeightedHexatonicBluesA()
+        #t.testWeightedHexatonicBluesA()
+        t.testNextA()
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
