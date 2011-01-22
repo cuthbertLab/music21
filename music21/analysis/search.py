@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 20011 The music21 Project
+# Copyright:    (c) 2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -32,14 +32,22 @@ class SearchModuleException(Exception):
 
 
 def findConsecutiveScale(source, targetScale, degreesRequired=5, 
-        stepwiseRequired=True, comparisonAttribute='name',   
+        stepSize=1, comparisonAttribute='name',   
         repeatsAllowed=True, restsAllowed=False):
     '''
-    Given a concrete scale, return references to the elements found within this scale.
+    Given a pitch source and a concrete scale, return references to all elements found that represent consecutive scale segments in one direction. 
 
-    Note that this only looks for complete degree spelling, not degree order
+    The `targetScale` is a concrete scale instance.
 
-    `comparisonAttribute` can force enharmonic or permit pitch class matching. 
+    The `degreesRequired` specifies how many consecutive scale degrees are required for grouping. Note that if more are found, the will continue to be gathered until a break is found.
+
+    The `stepSize` determines what scale step size is examined
+
+    The `comparisonAttribute` is the Pitch class attribute used for all pitch comparisons; this can be used to force enharmonic comparison ('name'), pitch space comparison ('nameWithOctave') or permit pitch class matching ('pitchClass'). 
+
+    If `repeatsAllowed` is True, repeated Pitches will be counted as part of the consecutive segment.
+
+    If `restsAllowed` is True, rests will not interrupt a consecutive segment. 
     '''
 
     if not isinstance(targetScale, scale.ConcreteScale):
@@ -85,8 +93,8 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
         # at this time, not handling chords
 
-        if eCount < len(source) - 1:
-            eNext = source[eCount+1]
+        if eCount < len(sourceClean) - 1:
+            eNext = sourceClean[eCount+1]
         else:
             eNext = None
 
@@ -97,7 +105,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             else:
                 pNext = None
 
-            environLocal.printDebug(['examining pitch', p, 'pNext', pNext, 'pLast', pLast])
+            environLocal.printDebug(['examining pitch', p, 'pNext', pNext, 'pLast', pLast, 'e.getOffsetBySite(sourceClean)', e.getOffsetBySite(sourceClean)])
             collect = False
             # first, see if this is a degreeLast
             d = targetScale.getScaleDegreeFromPitch(p, 
@@ -123,10 +131,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                 # attributes
                 elif repeatsAllowed and degreeLast-d == 0:
                     collect = True
-                # we know have a previous pitch/degree
-#                 elif (abs(degreeLast-d) == 1 or 
-#                     (degreeLast == dMax and d == 0) or 
-#                     (degreeLast == 0 and d == dMax)):
+                # in this case we know have a previous pitch/degree
                 elif targetScale.isNext(p, pLast, 'ascending', stepSize=1,
                     comparisonAttribute=comparisonAttribute) and directionLast in [None, 'ascending']:
 
@@ -165,10 +170,6 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
         if len(collDegrees) >= degreesRequired:
             # if next pitch is appropriate, than do not collect
             # this makes gathering greedy
-
-            temp = targetScale.next(p, directionLast, stepSize=1)
-            environLocal.printDebug(['temp', temp, 'p', p, 'directionLast', directionLast])
-
             if targetScale.isNext(pNext, p, directionLast, stepSize=1,
                     comparisonAttribute=comparisonAttribute):
                 environLocal.printDebug(['matched degree count but next pitch is in scale and direction', 'collDegrees', collDegrees])
@@ -177,7 +178,10 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                 match = True
 
         if match:
+            # collected matched elements into a stream
             post = stream.Stream()
+            environLocal.printDebug(['processing match', 'adding collElements', 'collPitches', collPitches])
+
             for e in collElements:
                 # use source offset positions
                 post.insert(e.getOffsetBySite(source), e)
@@ -191,6 +195,8 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                 clearCollect = True
 
         if clearCollect:
+            environLocal.printDebug(['clearCollect'])
+
             degreeLast = None
             directionLast = None
             collDegrees = set()
@@ -201,6 +207,8 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
         # case where we need to keep the element that broke
         # the chain; as in a leep to a new degree in the scale
         if clearCollectKeepLast:
+            environLocal.printDebug(['clearCollectKeepLast'])
+
             #degreeLast = None keep
             # always clear direction last
             directionLast = None 
@@ -232,12 +240,6 @@ class Test(unittest.TestCase):
 
         sc = scale.MajorScale('a4')
 
-#         s = corpus.parseWork('bwv66.6')
-#         part = s['Soprano']
-#         #part.show()
-# 
-# 
-# 
         # fixed collection
         part = stream.Stream()
         for pn in ['a4', 'b4', 'c#4', 'd4', 'e4', 'f#4', 'g#4', 'a4']:
@@ -286,6 +288,107 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post[1]), 5) # has last 6 elements
 
 
+
+        # three segments
+        part = stream.Stream()
+        for pn in  ['a4', 'b4', 'c#5', 'd-3', 'a4', 'b4', 'c#5', 'd-3', 'a4', 'b4', 'c#5', 'd-3']:
+            n = note.Note(pn)
+            part.append(n)
+        
+        # todo: presently this is still permitting gaps
+        post = findConsecutiveScale(part, sc, degreesRequired=4, comparisonAttribute='nameWithOctave')
+        self.assertEqual(len(post), 0) # no match
+        # set to groups of 3
+        post = findConsecutiveScale(part, sc, degreesRequired=3, comparisonAttribute='nameWithOctave')
+        self.assertEqual(len(post), 3) # no match
+
+        self.assertEqual(len(post[0]), 3) # each has 3
+        self.assertEqual(len(post[1]), 3) 
+        self.assertEqual(len(post[2]), 3) 
+
+
+        # changes in direction
+        part = stream.Stream()
+        stub = ['c#5', 'd3', 'e4', 'f#4', 'g#4']
+        stubReversed = ['c#5', 'd3', 'e4', 'f#4', 'g#4']
+        stubReversed.reverse()
+
+        for pn in (stub + stubReversed + stub + stubReversed + stubReversed):
+            n = note.Note(pn)
+            part.append(n)
+
+        # pitch space is not consecutive
+        post = findConsecutiveScale(part, sc, degreesRequired=5, comparisonAttribute='nameWithOctave')
+        self.assertEqual(len(post), 0) # five segments found
+
+        # pitch names are consecutive
+        post = findConsecutiveScale(part, sc, degreesRequired=5, comparisonAttribute='name')
+        self.assertEqual(len(post), 5) # five segments found
+
+        self.assertEqual(len(post[0]), 5) # each has 5
+        self.assertEqual(post[0][0].pitch.nameWithOctave, 'C#5') # each has 5
+        self.assertEqual(len(post[1]), 5) 
+        self.assertEqual(post[1][0].pitch.nameWithOctave, 'G#4') # each has 5
+        self.assertEqual(len(post[2]), 5) 
+        self.assertEqual(post[2][0].pitch.nameWithOctave, 'C#5') # each has 5
+        self.assertEqual(len(post[3]), 5)
+        self.assertEqual(post[3][0].pitch.nameWithOctave, 'G#4') # each has 5
+        self.assertEqual(len(post[4]), 5) 
+        self.assertEqual(post[4][0].pitch.nameWithOctave, 'G#4') # each has 5
+
+
+        # changes in direction with intermingled notes
+        part = stream.Stream()
+        stub = ['c#5', 'd3', 'e4', 'f#4', 'g#4']
+        stubReversed = ['c#5', 'd3', 'e4', 'f#4', 'g#4']
+        stubReversed.reverse()
+
+        for pn in (stub + stubReversed + ['g2', 'e#7'] + stub + ['a-2'] + stubReversed + ['a', 'b'] +   stubReversed):
+            n = note.Note(pn)
+            part.append(n)
+
+        # pitch space is not consecutive
+        post = findConsecutiveScale(part, sc, degreesRequired=5, comparisonAttribute='nameWithOctave')
+        self.assertEqual(len(post), 0) # five segments found
+
+        # pitch names are consecutive
+        post = findConsecutiveScale(part, sc, degreesRequired=5, comparisonAttribute='name')
+        self.assertEqual(len(post), 5) # five segments found
+
+        self.assertEqual(len(post[0]), 5) # each has 5
+        self.assertEqual(post[0][0].pitch.nameWithOctave, 'C#5') # each has 5
+        self.assertEqual(len(post[1]), 5) 
+        self.assertEqual(post[1][0].pitch.nameWithOctave, 'G#4') # each has 5
+        self.assertEqual(len(post[2]), 5) 
+        self.assertEqual(post[2][0].pitch.nameWithOctave, 'C#5') # each has 5
+        self.assertEqual(len(post[3]), 5)
+        self.assertEqual(post[3][0].pitch.nameWithOctave, 'G#4') # each has 5
+        self.assertEqual(len(post[4]), 5) 
+        self.assertEqual(post[4][0].pitch.nameWithOctave, 'G#4') # each has 5
+
+
+
+
+    def xtestfindConsecutiveScaleB(self):
+        from music21 import corpus, scale, note
+
+        scGMajor = scale.MajorScale('g4')
+        scAMajor = scale.MajorScale('a4')
+        scDMajor = scale.MajorScale('d4')
+
+        s = corpus.parseWork('k80/movement1').measures(1,28)
+
+        for sc in [scGMajor, scDMajor, scAMajor]:
+            for part in s.parts: # just first part
+                # must provide flat version
+                post = findConsecutiveScale(part.flat, sc, degreesRequired=5,             
+                       comparisonAttribute='name')
+                for g, group in enumerate(post):
+                    for n in group:
+                        n.addLyric('%s%s' % (sc.getTonic().name, g+1))
+
+        #s.show()
+
 #         ex = stream.Score()
 #         for sub in post:
 #             m = stream.Measure()
@@ -293,6 +396,11 @@ class Test(unittest.TestCase):
 #                 m.append(e)
 #             ex.append(m)
 #         ex.show()
+
+
+# 
+# 
+# 
 
 
 
@@ -303,7 +411,7 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     else:
         t = Test()
-        t.testfindConsecutiveScaleA()
+        t.testfindConsecutiveScaleB()
 
 
 
