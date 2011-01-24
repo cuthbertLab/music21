@@ -314,14 +314,18 @@ class Test(unittest.TestCase):
         # Providing a tonic makes this concrete
         sc1 = scale.MajorScale('g4')
         sc2 = scale.MajorScale('e-3')
-
+        
+        # Comparing Concrete and Abstract Scales
+        assert (sc1 == sc2) == False
+        assert (sc1.abstract == sc2.abstract) == True
+        
         # Without arguments, getPitches() returns a single span 
         assert str(sc1.getPitches()) == '[G4, A4, B4, C5, D5, E5, F#5, G5]'
         assert str(sc2.getPitches('c2', 'c3')) == '[C2, D2, E-2, F2, G2, A-2, B-2, C3]'
-
+        
         # As a Chord, Scale pitches gain additional functionality
         assert sc1.getChord().forteClass == '7-35'
-
+        
         # Given a degree, get the pitch
         assert str(sc1.pitchFromDegree(5)) == 'D5'
         assert str(sc2.pitchesFromScaleDegrees([7,2], 'e-6', 'e-9')) == '[F6, D7, F7, D8, F8, D9]'
@@ -329,18 +333,18 @@ class Test(unittest.TestCase):
         # Get a scale degree from a pitch
         assert sc1.getScaleDegreeFromPitch('d') == 5
         assert sc2.getScaleDegreeFromPitch('d') == 7
-
+        
         # Get the next pitch given step directions
         match = [pitch.Pitch('g2')]
         for dir in [1, 1, 1, -2, 4, -1, 1, 1, 1]:
             # Append the next pitch based on the last-added pitch
             match.append(sc1.next(match[-1], dir))
         assert str(match), '[G2, A2, B2, C3, A2, E3, D3, E3, F#3, G3]'
-
+        
         # Derive new scales based on a provided collection or degree
         assert str(sc1.derive(['c4', 'g4', 'b8', 'f2'])) == '<music21.scale.MajorScale C major>'
         assert str(sc1.deriveByDegree(7, 'C#')) == '<music21.scale.MajorScale D major>'
-
+        
         # Methods unique to DiatonicScale subclasses
         assert str(sc2.getRelativeMinor()) == '<music21.scale.MinorScale C minor>'
         #==== "fig-py01" end
@@ -352,37 +356,58 @@ class Test(unittest.TestCase):
         assert str(sc1.getPitches()) == '[G4, A-4, B-4, C5, D5, E-5, F5, G5]'
         assert str(sc1.getRelativeMajor()) == '<music21.scale.MajorScale E- major>'
         assert str(sc1.getTonic()), str(sc1.getDominant()) == ('G4', 'D5')
-
+        
         sc2 = scale.HypodorianScale('a6')
-        assert str(sc2.getPitches()) == '[E6, F#6, G6, A6, B6, C7, D7, E7]'
+        assert str(sc2.getPitches('e2', 'e3')) == '[E2, F#2, G2, A2, B2, C3, D3, E3]'
         assert str(sc2.getRelativeMajor()) == '<music21.scale.MajorScale G major>'
         assert str(sc2.getTonic()), str(sc2.getDominant()) == ('A6', 'C7')
 
         #==== "fig-py02" end
 
 
+
+        #==== "fig-py06"
+        # see below
+        #==== "fig-py06" end
+
+
+
+
         #==== "fig-py03"
+        #print('\n\nfig-py03')
+
         sc1 = scale.HarmonicMinorScale('a3')
         assert str(sc1.getPitches()) == '[A3, B3, C4, D4, E4, F4, G#4, A4]'
         assert str(sc1.getTonic()), str(sc1.getDominant()) == ('A3', 'E4')
-        # add notation example
+        
+        s = stream.Stream()    
+        for d in [1, 3, 2, 1, 6, 5, 8, 7, 8]:
+            s.append(note.Note(
+                sc1.pitchFromDegree(d, equateTermini=False),
+                type='eighth'))
+        #s.show()
         #==== "fig-py03" end
 
 
 
-        #==== "fig-py06"
-        # add a brief analytical example here
-
-        #==== "fig-py06" end
-
 
         #==== "fig-py04"
+        import random
+
+
         sc1 = scale.MelodicMinorScale('c4')
         assert str(sc1.getPitches(direction='ascending')) == '[C4, D4, E-4, F4, G4, A4, B4, C5]'
         assert str(sc1.getPitches('c3', 'c5', direction='descending')) == '[C5, B-4, A-4, G4, F4, E-4, D4, C4, B-3, A-3, G3, F3, E-3, D3, C3]'
         assert str(sc1.getTonic()), str(sc1.getDominant()) == ('C4', 'G4')
-
-        # add notation example
+        
+        s = stream.Stream()
+        p = None
+        for i in range(16):
+            dir = random.choice([-1, 1])
+            for j in range(2):
+                p = sc1.next(p, dir)
+                s.append(note.Note(p, quarterLength=.25))
+        #s.show()
         #==== "fig-py04" end
 
 
@@ -392,6 +417,30 @@ class Test(unittest.TestCase):
         assert str(sc1.getPitches()) == '[E3, F3, G3, A-3, B-3, C-4, D-4, D4, E4]'
         sc2 = scale.OctatonicScale('e3', 'M2')
         assert str(sc2.getPitches()) == '[E3, F#3, G3, A3, B-3, C4, D-4, E-4, F-4]'
+        
+        part1 = stream.Part()
+        part2 = stream.Part()
+        durPart1 = [1,1,.5,.5,1]
+        durPart2 = [3,1]
+        degrees = range(1,9)
+        for m in range(4):
+            random.shuffle(degrees)
+            random.shuffle(durPart1)
+            random.shuffle(durPart2)
+            i = 0
+            for dur in durPart1:
+                part1.append(note.Note(sc2.pitchFromDegree(degrees[i]),
+                            quarterLength = dur))
+                i += 1
+            for dur in durPart2:
+                part2.append(note.Note(
+                    sc2.pitchFromDegree(degrees[i], minPitch='c2', maxPitch='c3'),
+                    quarterLength=dur))
+                i += 1
+        s = stream.Score()
+        s.insert(0, part1)
+        s.insert(0, part2)
+        #s.show()
 
         # add notation example; perhaps create tri-chords from scale-completing selections
         #==== "fig-py05" end
@@ -404,10 +453,17 @@ class Test(unittest.TestCase):
         #==== "fig-py07"
         # add examples
         sc1 = scale.SieveScale('c4', '3@0|4@0')
-
-        sc2 = scale.SieveScale('c4', '3@0|7@0')
-
-
+        assert str(sc1.getPitches()) == '[C4, E-4, F-4, G-4, A-4, A4, C5]'
+        
+        sc2 = scale.SieveScale('c4', '5@0|7@0')
+        assert str(sc2.getPitches()) == '[C4, F4, G4, B-4, D5, E-5, A-5, A5, C#6, E6, F#6, B6]'
+        
+        s = stream.Stream()
+        pColection = sc2.getPitches('c3', 'c7')
+        random.shuffle(pColection)
+        for p in pColection:
+            s.append(note.Note(p, type='16th'))
+        #s.show()
         #==== "fig-py07" end
 
 
@@ -416,26 +472,109 @@ class Test(unittest.TestCase):
         #==== "fig-py08"
 
         sc1 = scale.RagAsawari('g3')
-
+        assert str(sc1.getPitches(direction='ascending')) == '[G3, A3, C4, D4, E-4, G4]'
+        assert str(sc1.getPitches(direction='descending')) == '[G4, F4, E-4, D4, C4, B-3, A3, G3]'
+        
+        
         sc2 = scale.RagMarwa('g3')
-
+        assert str(sc2.getPitches(direction='ascending')) == '[G3, A-3, B3, C#4, E4, F#4, E4, G4, A-4]'
+        assert str(sc2.getPitches(direction='descending')) == '[A-4, G4, A-4, F#4, E4, C#4, B3, A-3, G3]'
+        
+        
+        p1 = None
+        s = stream.Stream()
+        for dir in ([1]*10) + ([-1]*8) + ([1]*4) + ([-1]*3) + ([1]*4):
+            p1 = sc1.next(p1, dir)
+            s.append(note.Note(p1, quarterLength=.25))
+        #s.show()
+        
+        p1 = None
+        s = stream.Stream()
+        for dir in ([1]*10) + ([-1]*8) + ([1]*4) + ([-1]*3) + ([1]*4):
+            p1 = sc2.next(p1, dir)
+            s.append(note.Note(p1, quarterLength=.25))
+        #s.show()
 
         #==== "fig-py08" end
 
 
         #==== "fig-py09"
-
         import random
         sc1 = scale.WeightedHexatonicBlues('c3')
-        pLast = 'b-2'
+        p = 'c3'
         s = stream.Stream()
-        for n in range(100):
-            n = note.Note(quarterLength=random.choice([.5,.25,.25]))
-            pLast = sc1.next(pLast, random.choice([-1, 1]))
-            n.pitch = pLast
+        for n in range(32):
+            p = sc1.next(p, random.choice([-1, 1]))
+            n = note.Note(p, quarterLength=random.choice([.5,.25,.25]))
             s.append(n)
         #s.show()
         #==== "fig-py09" end
+
+
+
+
+    def testScalesPy06(self):
+        from music21 import corpus, scale, note
+        from music21 import analysis
+
+        scGMajor = scale.MajorScale('g4')
+        scDMajor = scale.MajorScale('d4')
+        s = corpus.parseWork('mozart/k80/movement1').measures(21,25)
+        s.remove(s['cello'])
+        s.remove(s['viola'])
+        for part in s.parts: 
+            for sc in [scGMajor, scDMajor]:
+                groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5, comparisonAttribute='name')
+                for group in groups:
+                    for n in group['stream'].notes:
+                        n.addLyric('%s^%s' % (sc.getTonic().name, sc.getScaleDegreeFromPitch(n.pitch)))
+        #s.show()
+
+
+
+    def testScalesPy10(self):
+        # look through s = corpus.parseWork('bwv1080/06')
+        #part = corpus.parseWork('bwv1080/03').measures(24,29).parts[0]
+        #part = corpus.parseWork('bwv1080/03').parts[0]
+
+        from music21 import corpus, scale, note
+        from music21 import analysis
+
+        scDMelodicMinor = scale.MelodicMinorScale('d4')
+        scGMelodicMinor = scale.MelodicMinorScale('g4')
+        part = corpus.parseWork('bwv1080/03').parts[0].measures(46,53)
+        
+        for sc in [scDMelodicMinor, scGMelodicMinor]:
+            groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
+            for group in groups:
+                for n in group['stream'].notes:
+                    n.addLyric('%s^%s' % (sc.getTonic().name.lower(), sc.getScaleDegreeFromPitch(n.pitch, group['direction'])))
+        #part.show()
+
+
+
+
+
+        # this is applied to all  parts
+#         s = corpus.parseWork('mozart/k80/movement1').measures(1,28)
+#         for sc in [scGMajor, scDMajor, scAMajor]:
+#             for part in s.parts: 
+#                 post = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5,             
+#                        comparisonAttribute='name')
+#                 for g, group in enumerate(post):
+#                     for n in group:
+#                         n.addLyric('%s%s' % (sc.getTonic().name, g+1))
+#         s.show()
+
+
+
+
+
+
+
+
+
+
 
 
     def testEx01(self):
@@ -608,6 +747,9 @@ if __name__ == "__main__":
         #t.testStreams02()
 
         t.testScales01()
+        #t.testScalesPy06()
+
+
 #------------------------------------------------------------------------------
 # eof
 

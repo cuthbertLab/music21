@@ -229,7 +229,8 @@ class AbstractScale(Scale):
 
 
     def getPitchFromNodeDegree(self, pitchReference, nodeName, nodeDegreeTarget, 
-            direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):
+            direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None,
+            equateTermini=True):
         '''Get a pitch for desired scale degree.
         '''
         post = self._net.getPitchFromNodeDegree(
@@ -239,7 +240,8 @@ class AbstractScale(Scale):
             direction=direction, 
             minPitch=minPitch, 
             maxPitch=maxPitch,
-            alteredDegrees=self._alteredDegrees
+            alteredDegrees=self._alteredDegrees,
+            equateTermini=equateTermini
             )
         return post
 
@@ -1182,7 +1184,7 @@ class ConcreteScale(Scale):
         ''')
 
     def pitchFromDegree(self, degree, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_ASCENDING):        
+        direction=DIRECTION_ASCENDING, equateTermini=True):        
         '''Given a scale degree, return the appropriate pitch. 
 
         >>> from music21 import *
@@ -1198,7 +1200,8 @@ class ConcreteScale(Scale):
             nodeDegreeTarget=degree, # target looking for
             direction=direction, 
             minPitch=minPitch, 
-            maxPitch=maxPitch)
+            maxPitch=maxPitch, 
+            equateTermini=equateTermini)
         return post
 
 #         if 0 < degree <= self._abstract.getStepMaxUnique(): 
@@ -1265,9 +1268,9 @@ class ConcreteScale(Scale):
         return post
 
 
-    def next(self, pitchOrigin, direction='ascending', stepSize=1, 
+    def next(self, pitchOrigin=None, direction='ascending', stepSize=1, 
         getNeighbor=True):
-        '''Get the next pitch given a `pitchOrigin` or None. 
+        '''Get the next pitch given a `pitchOrigin` or None. If the `pitchOrigin` is None, the tonic pitch is returned. This is useful when starting a chain of iterative calls. 
 
         The `direction` attribute may be either ascending or descending. Default is `ascending`. Optionally, positive or negative integers may be provided as directional stepSize scalars.
 
@@ -1297,6 +1300,9 @@ class ConcreteScale(Scale):
         >>> sc.next('E-4', 'ascending', 2)
         G4
         '''
+        if pitchOrigin is None:
+            return self._tonic
+
         # allow numerical directions
         if common.isNum(direction):
             if direction != 0:

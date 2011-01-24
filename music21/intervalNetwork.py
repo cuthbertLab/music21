@@ -824,17 +824,17 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     #---------------------------------------------------------------------------
-    def _getNodeDegreeDictionary(self, direction=None, equateTerminals=True):
+    def _getNodeDegreeDictionary(self, direction=None, equateTermini=True):
         '''Return a dictionary of node id, node degree pairs. The same degree may be given for each node 
 
         There may not be unambiguous way to determine degree. Or, a degree may have different meanings when ascending or descending.
 
-        If `equateTerminals` is True, the terminals will be given the same degree. 
+        If `equateTermini` is True, the terminals will be given the same degree. 
         '''
         # TODO: this should be cached after network creation
         post = {}
         for nId, n in self._nodes.items():
-            if equateTerminals:
+            if equateTermini:
                 if nId == TERMINUS_HIGH:
                     # get the same degree as the low
                     post[nId] = self._nodes[TERMINUS_LOW].degree
@@ -929,13 +929,13 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         return ((degree-1) % spanCount) + sMin
 
-    def _nodeNameToNodes(self, id, equateTerminals=True, 
+    def _nodeNameToNodes(self, id, equateTermini=True, 
         permitDegreeModuli=True):
         '''The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, a node degree (as a number), a terminus string, or a None (indicating 'terminusLow'). 
 
         Return a list of Node objects that match this identifications. 
 
-        If `equateTerminals` is True, and the name given is a degree number, then the first terminal will return both the first and last.
+        If `equateTermini` is True, and the name given is a degree number, then the first terminal will return both the first and last.
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = BoundIntervalNetwork()
@@ -950,7 +950,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> # test using a nodeStep, or an integer nodeName
         >>> net._nodeNameToNodes(1)
         [<music21.intervalNetwork.Node id='terminusLow'>, <music21.intervalNetwork.Node id='terminusHigh'>]
-        >>> net._nodeNameToNodes(1, equateTerminals=False)
+        >>> net._nodeNameToNodes(1, equateTermini=False)
         [<music21.intervalNetwork.Node id='terminusLow'>]
         >>> net._nodeNameToNodes(2)
         [<music21.intervalNetwork.Node id=0>]
@@ -966,7 +966,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         if common.isNum(id):
             post = []
             nodeStep = self._getNodeDegreeDictionary(
-                equateTerminals=equateTerminals)
+                equateTermini=equateTermini)
             for nId, nStep in nodeStep.items():
                 if id == nStep:
                     post.append(self._nodes[nId])
@@ -2113,7 +2113,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def getPitchFromNodeDegree(self, pitchReference, nodeName, nodeDegreeTarget, 
         direction=DIRECTION_ASCENDING, minPitch=None, 
-        maxPitch=None, alteredDegrees={}):
+        maxPitch=None, alteredDegrees={}, equateTermini=True):
         '''Given a reference pitch assigned to node id, determine the pitch for the the target node degree. 
 
         >>> from music21 import *
@@ -2155,7 +2155,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         nodeTargetId = None
         nodeTargetIdList = self._nodeNameToNodes(nodeDegreeTarget, 
                         permitDegreeModuli=True,
-                        equateTerminals=True) 
+                        equateTermini=equateTermini) 
 
         #environLocal.printDebug(['getPitchFromNodeDegree()', 'result of _nodeNameToNodes', nodeTargetIdList, 'nodeDegreeTarget', nodeDegreeTarget])
 
@@ -2207,8 +2207,11 @@ class BoundIntervalNetwork(IntervalNetwork):
                     return realizedPitch[i]
                 # NOTE: this condition may be too generous, and was added to solve
                 # an untracked problem.
-                if (nId in [TERMINUS_HIGH, TERMINUS_LOW] and nodeTargetId.id in [TERMINUS_HIGH, TERMINUS_LOW]):
-                    return realizedPitch[i]
+                # only match this generously if we are equating termini
+                if equateTermini:
+                    if (nId in [TERMINUS_HIGH, TERMINUS_LOW] and nodeTargetId.id in [TERMINUS_HIGH, TERMINUS_LOW]):
+                        return realizedPitch[i]
+                
             #environLocal.printDebug(['getPitchFromNodeDegree() on trial', trial, ', failed to find node', nodeTargetId])
 
         
