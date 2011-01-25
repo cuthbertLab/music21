@@ -258,12 +258,16 @@ class KeyboardInstrument(Instrument):
 
 
 class Piano(KeyboardInstrument):   
+    '''
+    >>> import music21
+    >>> p = music21.instrument.Piano()
+    >>> p.instrumentName
+    'Piano'
+    >>> p.midiProgram
+    0
+    '''
     def __init__(self):
         KeyboardInstrument.__init__(self)
-
-        self.instrumentName = 'Piano'
-        self.instrumentAbbreviation = 'Pno'
-        self.midiProgram = 0
 
 class Harpsichord(KeyboardInstrument):   
     def __init__(self):

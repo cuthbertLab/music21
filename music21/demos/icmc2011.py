@@ -140,17 +140,21 @@ class Test(unittest.TestCase):
         assert s1Flat[5] == n4
         
         # adding another Part to the Score results in a different flat representation
-        r1 = note.Rest(type='whole')
         n5 = note.Note('a#1', quarterLength=2.5)
         n6 = note.Note('b2', quarterLength=1.5)
-        cf2 = clef.BassClef()
-        m3 = stream.Measure(number=1)
-        m3.append([cf2, r1])
         m4 = stream.Measure(number=2)
         m4.append([n5, n6])
+        
+        r1 = note.Rest(type='whole')
+        cf2 = m4.bestClef() # = BassClef
+        m3 = stream.Measure(number=1)
+        m3.append([cf2, r1])
+        
         p2 = stream.Part()
         p2.append([m3, m4])
         s1.insert(0, p2)
+
+        assert 'BassClef' in cf2.classes
         
         # objects are sorted by offset
         s1Flat = s1.flat
@@ -225,17 +229,17 @@ class Test(unittest.TestCase):
         assert n6.getContextByClass('Clef', sortByCreationTime='reverse') == cf2
         
         
-        # a Note can find their Measure number from a flat Part
-        match = []
-        for e in p1.flat.getElementsByClass('Note'):
-            match.append(e.getContextByClass('Measure').number)    
-        assert match == [1, 1, 2, 2]
+#        # a Note can find their Measure number from a flat Part
+#        match = []
+#        for e in p1.flat.getElementsByClass('Note'):
+#            match.append(e.getContextByClass('Measure').number)    
+#        assert match == [1, 1, 2, 2]
         
         # all Notes can find their Measure number from a flat Score
         match = []
         for e in s1.flat.notes:
-            match.append(e.getContextByClass('Measure').number)   
-        assert match == [1, 1, 1, 2, 2, 2, 2]
+            match.append([e.name, e.getContextByClass('Measure').number])   
+        assert match == [['D', 1], ['rest', 1], ['G', 1], ['D#', 2], ['E#', 2], ['A-', 2], ['F#', 2]]
         #==== "fig-df06" end
 
 
