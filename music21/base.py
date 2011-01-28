@@ -2031,10 +2031,12 @@ class Music21Object(JSONSerializer):
         doc='''A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
         ''')
 
-    def addLocationAndParent(self, offset, parent, parentWeakRef = None):
+    def addLocationAndActiveSite(self, offset, activeSite, activeSiteWeakRef = None):
         '''
-        This method is for advanced usage, generally as a speedup tool that adds a new location element and a new parent.  Called
-        by Stream.insert -- this saves some dual processing.  Does not do safety checks that
+        This method is for advanced usage, generally as a speedup tool that adds a 
+        new location element and a new activeSite.  Formerly called
+        by Stream.insert -- this saves some dual processing.  
+        Does not do safety checks that
         the siteId doesn't already exist etc., because that is done earlier.
         
         This speeds up things like stream.getElementsById substantially.
@@ -2047,36 +2049,36 @@ class Music21Object(JSONSerializer):
         >>> st1_wr = common.wrapWeakref(st1)
         >>> offset = 20.0
         >>> st1._elements = [o1]
-        >>> o1.addLocationAndParent(offset, st1, st1_wr)
+        >>> o1.addLocationAndActiveSite(offset, st1, st1_wr)
         >>> o1.activeSite is st1
         True
         >>> o1.getOffsetBySite(st1)
         20.0
         '''
-        parentId = id(parent)
-        self._definedContexts.add(parent, offset, idKey=parentId) 
+        activeSiteId = id(activeSite)
+        self._definedContexts.add(activeSite, offset, idKey=activeSiteId) 
         
         # if the current parent is already set, nothing to do
         # do not create a new weakref 
-        if self._activeSiteId == parentId:
+        if self._activeSiteId == activeSiteId:
             return 
 
         if WEAKREF_ACTIVE:
-                if parentWeakRef is None:
-                    parentWeakRef = common.wrapWeakref(parent)
-                self._activeSite = parentWeakRef
-                self._activeSiteId = parentId
+                if activeSiteWeakRef is None:
+                    activeSiteWeakRef = common.wrapWeakref(activeSite)
+                self._activeSite = activeSiteWeakRef
+                self._activeSiteId = activeSiteId
         else:
-            self._activeSite = parent
-            self._activeSiteId = parentId
+            self._activeSite = activeSite
+            self._activeSiteId = activeSiteId
         
 
     def _getOffset(self):
-        '''Get the offset for the set the parent object.
+        '''Get the offset for the activeSite.
 
         '''
-        #there is a problem if a new parent is being set and no offsets have 
-        # been provided for that parent; when self.offset is called, 
+        #there is a problem if a new activeSite is being set and no offsets have 
+        # been provided for that activeSite; when self.offset is called, 
         # the first case here would match
 
         parentId = None
@@ -2101,7 +2103,7 @@ class Music21Object(JSONSerializer):
             raise Exception('request within %s for offset cannot be made with parent of %s (id: %s)' % (self.__class__, self.activeSite, parentId))            
 
     def _setOffset(self, value):
-        '''Set the offset for the parent object. 
+        '''Set the offset for the activeSite. 
         '''
         # assume that most times this is a number; in that case, the fastest
         # thing to do is simply try to set the offset w/ float(value)
@@ -2127,7 +2129,36 @@ class Music21Object(JSONSerializer):
 
     
     offset = property(_getOffset, _setOffset, 
-        doc = '''The offset property sets the position of this object from the start of its container (a Stream or Stream sub-class) in quarter lengths.
+        doc = '''The offset property returns the position of this object from 
+        the start of its most recently referenced container (a Stream or 
+        Stream sub-class found in activeSite) in quarter lengths.
+
+        It can also set the offset for the object if no container has been
+        set
+
+        >>> from music21 import *
+        >>> n1 = note.Note()
+        >>> n1.id = 'hi'
+        >>> n1.offset = 20
+        >>> n1.offset
+        20.0
+        >>> s1 = stream.Stream()
+        >>> s1.append(n1)
+        >>> n1.offset
+        0.0
+        >>> s2 = stream.Stream()
+        >>> s2.insert(30.5, n1)
+        >>> n1.offset
+        30.5
+        >>> n2 = s1.getElementById('hi')
+        >>> n2 is n1
+        True
+        >>> n2.offset
+        0.0
+        >>> for thisElement in s2:
+        ...     print thisElement.offset
+        30.5
+        
         ''')
 
 
@@ -2210,7 +2241,7 @@ class Music21Object(JSONSerializer):
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
-        >>> aM21Obj.addLocationAndParent(50, bM21Obj)
+        >>> aM21Obj.addLocationAndActiveSite(50, bM21Obj)
         >>> aM21Obj.unwrapWeakref()
 
         '''
@@ -2227,7 +2258,7 @@ class Music21Object(JSONSerializer):
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
-        >>> aM21Obj.addLocationAndParent(50, bM21Obj)
+        >>> aM21Obj.addLocationAndActiveSite(50, bM21Obj)
         >>> aM21Obj.unwrapWeakref()
         >>> aM21Obj.wrapWeakref()
         '''
@@ -2251,7 +2282,7 @@ class Music21Object(JSONSerializer):
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
-        >>> bM21Obj.addLocationAndParent(50, aM21Obj)   
+        >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
         >>> bM21Obj.activeSite != None
         True
         >>> oldParentId = bM21Obj._activeSiteId
@@ -2276,7 +2307,7 @@ class Music21Object(JSONSerializer):
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
-        >>> bM21Obj.addLocationAndParent(50, aM21Obj)   
+        >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
         >>> bM21Obj.activeSite != None
         True
         >>> oldParentId = bM21Obj._activeSiteId

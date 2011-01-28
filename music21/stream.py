@@ -657,7 +657,7 @@ class Stream(music21.Music21Object):
                     #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
                     # this will work for all with __deepcopy___
                     newElement = copy.deepcopy(e, memo)
-                    # get the old offset from the parent Stream     
+                    # get the old offset from the activeSite Stream     
                     # user here to provide new offset
                     new.insert(e.getOffsetBySite(old), newElement, 
                                ignoreSort=True)
@@ -718,7 +718,7 @@ class Stream(music21.Music21Object):
 
 
     def insert(self, offsetOrItemOrList, itemOrNone=None, 
-                     ignoreSort=False, setParent=True):
+                     ignoreSort=False, setActiveSite=True):
         '''
         Inserts an item(s) at the given offset(s). 
 
@@ -726,8 +726,9 @@ class Stream(music21.Music21Object):
         change whether the Stream is sorted or not (much faster if you're going to be inserting dozens
         of items that don't change the sort status)
 
-        The `setParent` parameter should nearly always be True; only for 
-        advanced Stream manipulation. 
+        The `setActiveSite` parameter should nearly always be True; only for 
+        advanced Stream manipulation would you not change 
+        the activeSite after inserting an element. 
         
         Has three forms: in the two argument form, inserts an element at the given offset:
         
@@ -804,7 +805,7 @@ class Stream(music21.Music21Object):
 
         element.addLocation(self, offset)
         # need to explicitly set the activeSite of the element
-        if setParent:
+        if setActiveSite:
             element.activeSite = self 
 
         if ignoreSort is False:
@@ -937,7 +938,6 @@ class Stream(music21.Music21Object):
         element.addLocation(self, 'highestTime')
         # need to explicitly set the activeSite of the element
         element.activeSite = self 
-        # element.addLocationAndParent(offset, self)
 
         # could also do self.elements = self.elements + [element]
         #self._elements.append(element)  
@@ -1661,9 +1661,11 @@ class Stream(music21.Music21Object):
         '''Returns the first encountered element for a given id. Return None
         if no match
 
+        >>> import music21
         >>> e = 'test'
-        >>> a = Stream()
-        >>> a.insert(0, music21.ElementWrapper(e))
+        >>> a = music21.stream.Stream()
+        >>> ew = music21.ElementWrapper(e)
+        >>> a.insert(0, ew)
         >>> a[0].id = 'green'
         >>> None == a.getElementById(3)
         True
@@ -1671,6 +1673,22 @@ class Stream(music21.Music21Object):
         'green'
         >>> a.getElementById('Green').id  # case does not matter
         'green'
+        
+        
+        Getting an element by getElementById changes its activeSite
+        
+        
+        >>> b = music21.stream.Stream()
+        >>> b.append(ew)
+        >>> ew.activeSite is b
+        True
+        >>> ew2 = a.getElementById('green')
+        >>> ew2 is ew
+        True
+        >>> ew2.activeSite is a
+        True
+        >>> ew.activeSite is a
+        True
         '''
         # accessing .elements assures an autoSort check
         for element in self.elements:
@@ -1685,10 +1703,12 @@ class Stream(music21.Music21Object):
             if match:
                 if classFilter is not None:
                     if element.isClass(classFilter):
+                        element.activeSite = self
                         return element
                     else:
                         continue # id may match but not proper class
                 else:
+                    element.activeSite = self
                     return element
         return None
 
@@ -2239,7 +2259,7 @@ class Stream(music21.Music21Object):
                     continue
                 # assuming that the offset returns the proper offset context
                 # this is, the current offset may not be the stream that 
-                # contains this Measure; its current parent
+                # contains this Measure; its current activeSite
                 offset = m.offset
                 if offset not in map.keys():
                     map[offset] = []
@@ -4234,7 +4254,7 @@ class Stream(music21.Music21Object):
                     # this will change the activeSite of e to be sNew, previously
                     # this was the activeSite was the caller; thus, the activeSite here
                     # should not be set
-                    sNew.insert(recurseStreamOffset, e, setParent=False)
+                    sNew.insert(recurseStreamOffset, e, setActiveSite=False)
                     recurseStream = e.semiFlat
                 else:
                     recurseStream = e.flat
@@ -8235,7 +8255,7 @@ class Test(unittest.TestCase):
 
 
     def testActiveSites(self):
-        '''Test parent relationships.
+        '''Test activeSite relationships.
 
         Note that here we see why sometimes qualified class names are needed.
         This test passes fine with class names Part and Measure when run interactively, 
@@ -8247,21 +8267,21 @@ class Test(unittest.TestCase):
         from music21 import corpus, converter
         a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
 
-        # test basic parent relationships
+        # test basic activeSite relationships
         b = a[3]
         self.assertEqual(isinstance(b, music21.stream.Part), True)
         self.assertEqual(b.activeSite, a)
 
-        # this, if called, actively destroys the parent relationship!
+        # this, if called, actively destroys the activeSite relationship!
         # on the measures (as new Elements are not created)
         #m = b.getElementsByClass('Measure')[5]
         #self.assertEqual(isinstance(m, Measure), True)
 
-        # this false b/c, when getting the measures, parents are lost
-        #self.assertEqual(m.activeSite, b) #measures parent should be part
+        # this false b/c, when getting the measures, activeSites are lost
+        #self.assertEqual(m.activeSite, b) #measures activeSite should be part
 
         self.assertEqual(isinstance(b[8], music21.stream.Measure), True)
-        self.assertEqual(b[8].activeSite, b) #measures parent should be part
+        self.assertEqual(b[8].activeSite, b) #measures activeSite should be part
 
 
         # a different test derived from a TestExternal
@@ -8282,7 +8302,7 @@ class Test(unittest.TestCase):
         self.assertEqual(r.activeSite, s)
 
     def testActiveSitesMultiple(self):
-        '''Test an object having multiple parents.
+        '''Test an object having multiple activeSites.
         '''
         a = Stream()
         b = Stream()
@@ -8290,7 +8310,7 @@ class Test(unittest.TestCase):
         n.offset = 10
         a.insert(n)
         b.insert(n)
-        # the objects elements has been transfered to each parent
+        # the objects elements has been transfered to each activeSite
         # stream in the same way
         self.assertEqual(n.getOffsetBySite(a), n.getOffsetBySite(b))
         self.assertEqual(n.getOffsetBySite(a), 10)
@@ -8315,23 +8335,23 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus, converter, instrument
 
-        # manuall set parent to associate 
+        # manually set activeSite to associate 
         a = converter.parse(corpus.getWork(['haydn', 'opus74no2', 
                                             'movement4.xml']))
 
 #         b = a[3][10:20]
-#         # TODO: manually setting the parent is still necessary
-#         b.activeSite = a[3] # manually set the parent
+#         # TODO: manually setting the activeSite is still necessary
+#         b.activeSite = a[3] # manually set the activeSite
 
         b = a.parts[3]
         # by calling the .part property, we create a new stream; thus, the
-        # parent of b is no longer a
+        # activeSite of b is no longer a
         self.assertEqual(b.activeSite, None)
         instObj = b.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
         p = a[3] # get part
-        # a mesausre within this part has as its parent the part
+        # a mesausre within this part has as its activeSite the part
         self.assertEqual(p[10].activeSite, a[3])
         instObj = p.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
@@ -8347,7 +8367,7 @@ class Test(unittest.TestCase):
 
 
         #import pdb; pdb.set_trace()
-        # search parent from a measure within
+        # search activeSite from a measure within
 
         # a different test derived from a TestExternal
         q = Stream()
@@ -8403,7 +8423,7 @@ class Test(unittest.TestCase):
 
 
         #import pdb; pdb.set_trace()
-        # search parent from a measure within
+        # search activeSite from a measure within
 
         # a different test derived from a TestExternal
         q = Stream()
@@ -9227,7 +9247,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s1.activeSite, s3)
         post = s1.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
-        # TODO: isolated parent mangling problem here
+        # TODO: isolated activeSite mangling problem here
         #self.assertEqual(s1.activeSite, s3)
 
         post = s2.getClefs()[0]
@@ -9386,7 +9406,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.activeSite, s)
         s.remove(n1)
         self.assertEqual(len(s), 2)
-        # parent is Now sent to Nonte
+        # activeSite is Now sent to None
         self.assertEqual(n1.activeSite, None)
 
 
@@ -10470,14 +10490,14 @@ class Test(unittest.TestCase):
         match = []
         for x in s1._yieldElementsDownward():
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
+            #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['1a', '2a', '3a', '3b', '3c', '2b', '3d', '3e', '2c', '3f'])
 
         #environLocal.printDebug(['downward with elements:'])
         match = []
         for x in s1._yieldElementsDownward(excludeNonContainers=False):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
+            #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['1a', 'n(1a)', '2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c', '2b', 'n2(2b)', '3d', '3e', '2c', '3f'])
 
 
@@ -10485,7 +10505,7 @@ class Test(unittest.TestCase):
         match = []
         for x in s2._yieldElementsDownward(excludeNonContainers=False):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
+            #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         # test downward
         self.assertEqual(match, ['2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c'])
 
@@ -10494,7 +10514,7 @@ class Test(unittest.TestCase):
         # must provide empty list for memo
         for x in s7._yieldElementsUpward([], skipDuplicates=True):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
+            #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
 
 
@@ -10502,7 +10522,7 @@ class Test(unittest.TestCase):
         match = []
         for x in s10._yieldElementsUpward([]):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
+            #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
 
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '2b'] )
 
@@ -10511,7 +10531,7 @@ class Test(unittest.TestCase):
         match = []
         for x in s10._yieldElementsUpward([], skipDuplicates=False):
             match.append(x.id)
-            #environLocal.printDebug([x, x.id, 'parent', x.activeSite])
+            #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
 
 
@@ -10521,7 +10541,7 @@ class Test(unittest.TestCase):
         for x in s8._yieldElementsUpward([], excludeNonContainers=False, 
             skipDuplicates=True):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.activeSite])
+            environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['3d', 'n2(2b)', '2b', 'n(1a)', '1a', '2a', '2c', '3e'] )
 
 
@@ -10531,7 +10551,7 @@ class Test(unittest.TestCase):
         for x in s4._yieldElementsUpward([], excludeNonContainers=False, 
             skipDuplicates=True):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'parent', x.activeSite])
+            environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         # notice that this does not get the nonConatainers for 2b
         self.assertEqual(match, ['2c', 'n(1a)', '1a', '2a', '2b'] )
 
@@ -11932,7 +11952,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.metadata.title, 'Es fuhr sich ein Pfalzgraf')
 
     
-    def testParentMangling(self):
+    def testActiveSiteMangling(self):
         import clef, meter
 
         s1 = Stream()
@@ -11949,14 +11969,14 @@ class Test(unittest.TestCase):
         junk = s2.flat
         self.assertEqual(s1.activeSite, s2)
         
-        # this was the key problem: getting the semiFlat of the parent   
-        # looses the parent of the sub-stream; this is fixed by the inserting
-        # of the sub-Stream with setParent False
+        # this was the key problem: getting the semiFlat of the activeSite   
+        # looses the activeSite of the sub-stream; this is fixed by the inserting
+        # of the sub-Stream with setActiveSite False
         junk = s2.semiFlat
         self.assertEqual(s1.activeSite, s2)
 
         # these test prove that getting a semiFlat stream does not change the
-        # parent
+        # activeSite
         junk = s1._definedContexts.getByClass(meter.TimeSignature)
         self.assertEqual(s1.activeSite, s2)
 
