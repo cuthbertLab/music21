@@ -733,9 +733,10 @@ def weightedSelection(values, weights, randomGenerator=None):
     # normalize weights w/n unit interval
     boundaries = unitBoundaryProportion(weights)
     for i, (low, high) in enumerate(boundaries):
-        if q >= low and q <= high: # accepts both boundaries
+        if q >= low and q < high: # accepts both boundaries
             return values[i]
-
+    # just in case we get the high boundary
+    return values[i]
 
 
 def euclidGCD(a, b):
@@ -1670,6 +1671,47 @@ class Test(unittest.TestCase):
         self.assertEqual(c.attr1, c.attr2)
         
 
+    def testWeightedSelection(self):
+
+        from music21 import environment
+        _MOD = "common.py"
+        environLocal = environment.Environment(_MOD)
+        
+
+        # test equal selection
+        for j in range(10):
+            x = 0
+            for i in range(1000):
+                # equal chance of -1, 1
+                x += weightedSelection([-1, 1], [1,1])
+            environLocal.printDebug(['weightedSelection([-1, 1], [1,1])', x])
+            self.assertEqual(-100 < x < 100, True)
+
+
+        # test a strongly weighed boudnary
+        for j in range(10):
+            x = 0
+            for i in range(1000):
+                # equal chance of -1, 1
+                x += weightedSelection([0, 1], [10000,1])
+            environLocal.printDebug(['weightedSelection([0, 1], [10000,1])', x])
+            self.assertEqual(0 <= x < 5, True)
+
+        for j in range(10):
+            x = 0
+            for i in range(1000):
+                # equal chance of -1, 1
+                x += weightedSelection([0, 1], [1, 10000])
+            environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
+            self.assertEqual(980 <= x < 1020, True)
+
+
+        for j in range(10):
+            x = 0
+            for i in range(1000):
+                x += weightedSelection([0, 1], [1, 0])
+            environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
+            self.assertEqual(x == 0, True)
 
 
 
@@ -1679,12 +1721,20 @@ _DOC_ORDER = [fromRoman, toRoman, Scalar]
 
 
 if __name__ == "__main__":
-    ## do this the old way to avoid music21 import
-    s1 = doctest.DocTestSuite(__name__)
-    s2 = unittest.defaultTestLoader.loadTestsFromTestCase(Test)
-    s1.addTests(s2)
-    runner = unittest.TextTestRunner()
-    runner.run(s1)  
+    if len(sys.argv) == 1: # normal conditions
+
+        ## do this the old way to avoid music21 import
+        s1 = doctest.DocTestSuite(__name__)
+        s2 = unittest.defaultTestLoader.loadTestsFromTestCase(Test)
+        s1.addTests(s2)
+        runner = unittest.TextTestRunner()
+        runner.run(s1)  
+
+    elif len(sys.argv) > 1:
+        t = Test()
+
+        t.testWeightedSelection()
+
 
 #------------------------------------------------------------------------------
 # eof
