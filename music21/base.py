@@ -89,7 +89,7 @@ if len(_missingImport) > 0:
 
 
 #-------------------------------------------------------------------------------
-VERSION = (0, 3, 3)  # increment any time picked versions will be obsolete.
+VERSION = (0, 3, 3)  # increment any time picked versions will be obsolete or other significant changes have been made
 VERSION_STR = '.'.join([str(x) for x in VERSION]) + 'a7'
 
 # define whether weakrefs are used for storage of object locations
@@ -101,16 +101,16 @@ class Music21Exception(Exception):
     pass
 
 # should be renamed:
-class DefinedContextsException(Exception):
+class DefinedContextsException(Music21Exception):
     pass
 
-class Music21ObjectException(Exception):
+class Music21ObjectException(Music21Exception):
     pass
 
-class ElementException(Exception):
+class ElementException(Music21Exception):
     pass
 
-class GroupException(Exception):
+class GroupException(Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -1429,7 +1429,12 @@ class Music21Object(JSONSerializer):
         >>> ks.classSortOrder
         1
         
+        
+        
         New classes can define their own default classSortOrder
+        
+        
+        
         >>> class ExampleClass(base.Music21Object):
         ...     classSortOrderDefault = 5
         ...
@@ -1463,6 +1468,8 @@ class Music21Object(JSONSerializer):
         
         if "duration" in keywords and self.duration is None:
             self.duration = keywords["duration"]
+        else:
+            self.duration = duration.Duration(0)
         
         if "groups" in keywords and keywords["groups"] is not None and \
             (not hasattr(self, "groups") or self.groups is None):

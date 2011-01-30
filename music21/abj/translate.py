@@ -22,13 +22,27 @@ automatically imported in music21.abj:
 
 '''
 
-import abjad
 import unittest,doctest
 import music21
 import music21.note
 import music21.common
 
 import re
+
+try:
+    import abjad
+except ImportError:
+    abjad = None
+    
+if abjad is not None:
+    try:
+        x = int(abjad.cfgtools.get_abjad_revision_string())
+        if x < 4000:
+            raise ImportError('This version of abjad is not compatible with music21, please upgrade')
+            abjad = None
+    except:
+        abjad = None
+
 
 
 class AbjadTranslateException(music21.Music21Exception):

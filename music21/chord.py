@@ -84,7 +84,6 @@ class Chord(note.NotRest):
     
     _bass = None
     _root = None
-    _duration = None
     isChord = True
     isNote = False
     isRest = False
@@ -104,20 +103,23 @@ class Chord(note.NotRest):
     _DOC_ATTR = _TEMPDOC
 
     def __init__(self, notes = [], **keywords):
+        # the list of pitch objects is managed by a property; this permits
+        # only updating the _chordTablesAddress when pitches has changed
+        
+        # duration looks at _pitches and __init__ sets .duration
+        # so we need to set _pitches to [] first...
+        self._pitches = []
+        self._chordTablesAddress = None
+        self._chordTablesAddressNeedsUpdating = True # only update when needed
+        # here, pitch and duration data is extracted from notes
+        # if provided
+        
         note.NotRest.__init__(self, **keywords)
 
         # inherit Duration object from GeneralNote
         # keep it here in case we have no notes
         #self.duration = None  # inefficient, since note.Note.__init__ set it
         #del(self.pitch)
-
-        # the list of pitch objects is managed by a property; this permits
-        # only updating the _chordTablesAddress when pitches has changed
-        self._pitches = []
-        self._chordTablesAddress = None
-        self._chordTablesAddressNeedsUpdating = True # only update when needed
-        # here, pitch and duration data is extracted from notes
-        # if provided
 
         for thisNote in notes:
             if isinstance(thisNote, music21.pitch.Pitch):
@@ -728,8 +730,9 @@ class Chord(note.NotRest):
         '''
         Gets the DurationObject of the object or None
         '''
-        if self._duration is None and len(self.pitches) > 0:
-            self._duration = self.pitches[0].duration
+        if self._duration is None and len(self._pitches) > 0:
+            pitchZeroDuration = self._pitches[0].duration
+            self._duration = pitchZeroDuration
         return self._duration
 
     def _setDuration(self, durationObj):
@@ -798,7 +801,7 @@ class Chord(note.NotRest):
         
         >>> st2 = stream.Stream()
         >>> st2.append(key.Key('c'))    # c minor
-        >>> st2.append(chord1)          # same pitches as before
+        >>> st2.append(chord1)          # same pitches as before gives different scaleDegrees
         >>> chord1.scaleDegrees
         [(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]
         
@@ -2775,6 +2778,28 @@ class Test(unittest.TestCase):
         c1 = Chord([1, 4, 7, 10])
         self.assertEqual(c1.commonName, 'diminished seventh chord')
         self.assertEqual(c1.pitchedCommonName, 'C#-diminished seventh chord')
+
+    def testScaleDegrees(self):
+        chord1 = Chord(["C#5", "E#5", "G#5"])
+        st1 = music21.stream.Stream()
+        st1.append(music21.key.Key('c#'))   # c-sharp minor
+        st1.append(chord1)
+        self.assertEqual(repr(chord1.scaleDegrees), "[(1, None), (3, <accidental sharp>), (5, None)]")
+          
+        st2 = music21.stream.Stream()
+        st2.append(music21.key.Key('c'))    # c minor
+        st2.append(chord1)          # same pitches as before gives different scaleDegrees
+        sd2 = chord1.scaleDegrees
+        self.assertEqual(repr(sd2), "[(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]")
+        
+        
+        st3 = music21.stream.Stream()
+        st3.append(music21.key.Key('C'))    # C major
+        chord2 = Chord(["C4","C#4","D4","E-4","E4","F4"])  # 1st 1/2 of chromatic
+        st3.append(chord2)
+        sd3 = chord2.scaleDegrees
+        self.assertEqual(repr(sd3), '[(1, None), (1, <accidental sharp>), (2, None), (3, <accidental flat>), (3, None), (4, None)]')
+        
 
 
 

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''The duration module contains  
@@ -1634,12 +1634,6 @@ class Duration(DurationCommon):
         if 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']
       
-        # only apply default if components are empty
-        # looking at private _components so as not to trigger
-        # _updateComponents
-        if self.quarterLength == 0 and len(self._components) == 0:
-            self.addDurationUnit(DurationUnit('quarter'))
-
         # linkages are a list of things used to connect durations.  
         # If undefined, Ties are used.  Other sorts of things could be 
         # dotted-ties, arrows, none, etc. As of Sep. 2008 -- not used.

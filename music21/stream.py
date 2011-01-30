@@ -929,8 +929,8 @@ class Stream(music21.Music21Object):
             element = item
 
         # cannot support elements with Durations in the highest time list
-        if element.duration != None:
-            raise StreamException('cannot insert an object with a Duration into the highest time elements list')
+        if element.duration != None and element.duration.quarterLength != 0:
+            raise StreamException('cannot insert an object with a non-zero Duration into the highest time elements list')
 
         # checks of element is self; possibly performs additional checks
         self._addElementPreProcess(element)

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''Classes and functions for creating and manipulating notes, ties, and durations.
@@ -116,9 +116,17 @@ class GeneralNote(music21.Music21Object):
     'tie': 'either None or a :class:`~music21.note.Tie` object.'
     }    
     def __init__(self, *arguments, **keywords):
-        music21.Music21Object.__init__(self)
+        tempDuration = duration.Duration(**keywords)
+        music21.Music21Object.__init__(self, duration = tempDuration)
+        self._duration = tempDuration
 
-        self.duration = duration.Duration(**keywords)
+        # only apply default if components are empty
+        # looking at private _components so as not to trigger
+        # _updateComponents
+
+        if self.duration.quarterLength == 0 and len(self.duration._components) == 0:
+            self.duration.addDurationUnit(duration.DurationUnit('quarter'))
+
         self.lyrics = [] # a list of lyric objects
         self.expressions = []
         self.articulations = []
