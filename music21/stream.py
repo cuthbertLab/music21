@@ -1831,40 +1831,83 @@ class Stream(music21.Music21Object):
         Return one element or None if no elements are at or preceded by this 
         offset. 
 
-        >>> a = Stream()
+        >>> import music21
+        >>> stream1 = music21.stream.Stream()
 
-        >>> x = music21.Music21Object()
+        >>> x = music21.note.Note('D4')
         >>> x.id = 'x'
-        >>> y = music21.Music21Object()
+        >>> y = music21.note.Note('E4')
         >>> y.id = 'y'
-        >>> z = music21.Music21Object()
+        >>> z = music21.note.Rest()
         >>> z.id = 'z'
 
-        >>> a.insert(20, x)
-        >>> a.insert(10, y)
-        >>> a.insert( 0, z)
+        >>> stream1.insert(20, x)
+        >>> stream1.insert(10, y)
+        >>> stream1.insert( 0, z)
 
-        >>> b = a.getElementAtOrBefore(21)
+        >>> b = stream1.getElementAtOrBefore(21)
         >>> b.offset, b.id
         (20.0, 'x')
 
-        >>> b = a.getElementAtOrBefore(19)
+        >>> b = stream1.getElementAtOrBefore(19)
         >>> b.offset, b.id
         (10.0, 'y')
 
-        >>> b = a.getElementAtOrBefore(0)
+        >>> b = stream1.getElementAtOrBefore(0)
         >>> b.offset, b.id
         (0.0, 'z')
-        >>> b = a.getElementAtOrBefore(0.1)
+        >>> b = stream1.getElementAtOrBefore(0.1)
         >>> b.offset, b.id
         (0.0, 'z')
-        >>> c = a.getElementAtOrBefore(0.1, [music21.Music21Object])
+        
+        
+        
+        You can give a list of acceptable classes to return, and non-matching
+        elements will be ignored
+        
+                
+        >>> c = stream1.getElementAtOrBefore(100, [music21.clef.TrebleClef, music21.note.Rest])
         >>> c.offset, c.id
         (0.0, 'z')
 
 
+        Getting an object via getElementAtOrBefore sets the activeSite
+        for that object to the Stream, and thus sets its offset
+
+
+        >>> stream2 = music21.stream.Stream()
+        >>> stream2.insert(100.5, x)
+        >>> x.offset
+        100.5
+        >>> d = stream1.getElementAtOrBefore(20)
+        >>> d is x
+        True
+        >>> x.activeSite is stream1
+        True
+        >>> x.offset
+        20.0
+
+
         OMIT_FROM_DOCS
         TODO: include sort order for concurrent matches?
+
+        The sort order of returned items is the reverse
+        of the normal sort order, so that, for instance,
+        if there's a clef and a note at offset 20,
+        getting the object before offset 21 will give
+        you the note, and not the clef, since clefs
+        sort before notes:
+        
+
+        #>>> clef1 = music21.clef.BassClef()
+        #>>> stream1.insert(20, clef1)
+        #>>> e = stream1.getElementAtOrBefore(21)
+        #>>> e
+        #<music21.note.Note D4>
+        # FAILS, returns the clef!
+
+
+
         '''
         candidates = []
         nearestTrailSpan = offset # start with max time
@@ -1903,6 +1946,7 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
         if len(candidates) > 0:
             candidates.sort()
+            candidates[0][1].activeSite = self
             return candidates[0][1]
         else:
             return None
@@ -1983,12 +2027,16 @@ class Stream(music21.Music21Object):
             if elPos == len(elements) - 1:
                 return None
             else:
-                return elements[elPos + 1]
+                el =  elements[elPos + 1]
+                el.activeSite = self
+                return el
         else:
             for i in range(elPos + 1, len(elements)):
                 for cl in classList:
                     if isinstance(elements[i], cl): 
-                        return elements[i]
+                        el = elements[i]
+                        el.activeSite = self
+                        return el
             return None
 
 
