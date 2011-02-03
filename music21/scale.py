@@ -199,7 +199,7 @@ class AbstractScale(Scale):
         pass
 
 
-    def getStepMaxUnique(self):
+    def getDegreeMaxUnique(self):
         '''Return the maximum number of scale steps, or the number to use as a 
         modulus. 
         '''
@@ -1037,7 +1037,7 @@ class ConcreteScale(Scale):
         '''
         from music21 import stream, note
         m = stream.Measure()
-        for i in range(1, self._abstract.getStepMaxUnique()+1):
+        for i in range(1, self._abstract.getDegreeMaxUnique()+1):
             p = self.pitchFromDegree(i)
             n = note.Note()
             n.pitch = p
@@ -1084,6 +1084,11 @@ class ConcreteScale(Scale):
         >>> sc1.abstract == sc2.abstract
         True
         ''')
+
+    def getDegreeMaxUnique(self):
+        '''Convenience routine to get this from the AbstractScale.
+        '''
+        return self._abstract.getDegreeMaxUnique()
 
     def transpose(self, value, inPlace=False):
         '''
@@ -1204,10 +1209,10 @@ class ConcreteScale(Scale):
             equateTermini=equateTermini)
         return post
 
-#         if 0 < degree <= self._abstract.getStepMaxUnique(): 
+#         if 0 < degree <= self._abstract.getDegreeMaxUnique(): 
 #             return self.getPitches()[degree - 1]
 #         else: 
-#             raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getStepMaxUnique())
+#             raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getDegreeMaxUnique())
 
 
     def pitchesFromScaleDegrees(self, degreeTargets, minPitch=None, 
@@ -1511,7 +1516,7 @@ class ConcreteScale(Scale):
         '''
         from music21 import stream, note
         m = stream.Measure()
-        for i in range(1, self._abstract.getStepMaxUnique()+1):
+        for i in range(1, self._abstract.getDegreeMaxUnique()+1):
             p = self.pitchFromDegree(i)
             n = note.Note()
             n.pitch = p
@@ -1665,7 +1670,7 @@ class DiatonicScale(ConcreteScale):
         # note: overidding behavior on 
         from music21 import stream, note
         m = stream.Measure()
-        for i in range(1, self._abstract.getStepMaxUnique()+1):
+        for i in range(1, self._abstract.getDegreeMaxUnique()+1):
             p = self.pitchFromDegree(i)
             n = note.Note()
             n.pitch = p
@@ -2008,7 +2013,7 @@ class ChromaticScale(ConcreteScale):
     [G2, A-2, A2, B-2, C-3, C3, D-3, D3, E-3, F-3, F3, G-3, G3]
     >>> sc.getPitches('g2', 'g6') 
     [G2, A-2, A2, B-2, C-3, C3, D-3, D3, E-3, F-3, F3, G-3, G3, A-3, A3, B-3, C-4, C4, D-4, D4, E-4, F-4, F4, G-4, G4, A-4, A4, B-4, C-5, C5, D-5, D5, E-5, F-5, F5, G-5, G5, A-5, A5, B-5, C-6, C6, D-6, D6, E-6, F-6, F6, G-6, G6]
-    >>> sc.abstract.getStepMaxUnique()
+    >>> sc.abstract.getDegreeMaxUnique()
     12
     >>> sc.pitchFromDegree(1) 
     G2
@@ -2042,7 +2047,7 @@ class WholeToneScale(ConcreteScale):
     [G2, A2, B2, C#3, D#3, E#3, G3]
     >>> sc.getPitches('g2', 'g6') 
     [G2, A2, B2, C#3, D#3, E#3, G3, A3, B3, C#4, D#4, E#4, G4, A4, B4, C#5, D#5, E#5, G5, A5, B5, C#6, D#6, E#6, G6]
-    >>> sc.abstract.getStepMaxUnique()
+    >>> sc.abstract.getDegreeMaxUnique()
     6
     >>> sc.pitchFromDegree(1) 
     G2
@@ -2377,7 +2382,7 @@ class Test(unittest.TestCase):
         # pitches in different registers, as this is a non-octave repeating
         # scale
 
-        self.assertEqual(sc.abstract.getStepMaxUnique(), 2)
+        self.assertEqual(sc.abstract.getDegreeMaxUnique(), 2)
 
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
         self.assertEqual(str(sc.pitchFromDegree(1, 'c2', 'c3')), 'B#1')

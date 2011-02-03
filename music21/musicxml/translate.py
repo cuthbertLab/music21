@@ -442,6 +442,101 @@ def durationToMusicXML(d):
 
 
 
+#-------------------------------------------------------------------------------
+# Meters
+
+def timeSignatureToMx(ts):
+    '''Returns a single mxTime object.
+    
+    Compound meters are represented as multiple pairs of beat
+    and beat-type elements
+
+    >>> from music21 import *
+    >>> a = meter.TimeSignature('3/4')
+    >>> b = a.mx
+    >>> a = meter.TimeSignature('3/4+2/4')
+    >>> b = a.mx
+    '''
+    #mxTimeList = []
+    mxTime = musicxmlMod.Time()
+    # always get a flat version to display any subivisions created
+    fList = [(mt.numerator, mt.denominator) for mt in ts.displaySequence.flat._partition]
+    if ts.summedNumerator:
+        # this will try to reduce any common denominators into 
+        # a common group
+        fList = fractionToSlashMixed(fList)
+
+    for n,d in fList:
+        mxBeats = musicxmlMod.Beats(n)
+        mxBeatType = musicxmlMod.BeatType(d)
+        mxTime.componentList.append(mxBeats)
+        mxTime.componentList.append(mxBeatType)
+
+    # can set this to common when necessary
+    mxTime.set('symbol', None)
+    # for declaring no time signature present
+    mxTime.set('senza-misura', None)
+    #mxTimeList.append(mxTime)
+    #return mxTimeList
+    return mxTime
+
+def mxToTimeSignature(mxTimeList, inputM21=None):
+    '''Given an mxTimeList, load this object 
+
+    >>> from music21 import *
+    >>> a = musicxml.Time()
+    >>> a.setDefaults()
+    >>> b = musicxml.Attributes()
+    >>> b.timeList.append(a)
+    >>> c = meter.TimeSignature()
+    >>> c.mx = b.timeList
+    >>> c.numerator
+    4
+    '''
+    from music21 import meter
+    if inputM21 == None:
+        ts = meter.TimeSignature()
+    else:
+        ts = inputM21
+
+    if not common.isListLike(mxTimeList): # if just one
+        mxTime = mxTimeList
+    else: # there may be more than one if we have more staffs per part
+        mxTime = mxTimeList[0]
+
+#         if len(mxTimeList) == 0:
+#             raise MeterException('cannot create a TimeSignature from an empty MusicXML timeList: %s' % musicxml.Attributes() )
+#         mxTime = mxTimeList[0] # only one for now
+
+    n = []
+    d = []
+    for obj in mxTime.componentList:
+        if isinstance(obj, musicxmlMod.Beats):
+            n.append(obj.charData) # may be 3+2
+        if isinstance(obj, musicxmlMod.BeatType):
+            d.append(obj.charData)
+
+    #n = mxTime.get('beats')
+    #d = mxTime.get('beat-type')
+    # convert into a string
+    msg = []
+    for i in range(len(n)):
+        msg.append('%s/%s' % (n[i], d[i]))
+
+    #environLocal.printDebug(['loading meter string:', '+'.join(msg)])
+    ts.load('+'.join(msg))
+    
+
+def timeSignatureToMusicXML(ts):
+    # return a complete musicxml representation
+    from music21 import stream, note
+    tsCopy = copy.deepcopy(ts)
+#         m = stream.Measure()
+#         m.timeSignature = tsCopy
+#         m.append(note.Rest())
+    out = stream.Stream()
+    out.append(tsCopy)
+    return out.musicxml
 
 #-------------------------------------------------------------------------------
 # Notes

@@ -71,7 +71,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
     
     # assume 0 to max unique; this is 1 to 7 for diatonic
-    dMax = targetScale.abstract.getStepMaxUnique()
+    dMax = targetScale.abstract.getDegreeMaxUnique()
     targetDegrees = set(range(1, dMax))
 
     # if rests are allowed, first

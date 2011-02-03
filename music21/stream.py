@@ -3588,7 +3588,7 @@ class Stream(music21.Music21Object):
         TODO: inPlace=False does not work in many cases
         '''
 
-        #environLocal.printDebug(['calling Stream.makeBeams()'])
+        environLocal.printDebug(['calling Stream.makeBeams()'])
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
@@ -3612,6 +3612,8 @@ class Stream(music21.Music21Object):
             if lastTimeSignature is None:
                 raise StreamException('cannot proces beams in a Measure without a time signature')
 
+            #environLocal.printDebug(['makeBeams(): lastTimeSignature', lastTimeSignature])
+
             noteGroups = []
             if m.hasVoices():
                 for v in m.voices:
@@ -3619,8 +3621,9 @@ class Stream(music21.Music21Object):
             else:
                 noteGroups.append(m.notes)
 
-            for noteStream in noteGroups:
+            #environLocal.printDebug(['noteGroups', noteGroups, 'len(noteGroups[0])',  len(noteGroups[0])])
 
+            for noteStream in noteGroups:
                 if len(noteStream) <= 1: 
                     continue # nothing to beam
     
@@ -5505,7 +5508,10 @@ class Stream(music21.Music21Object):
         '''
         see property `notes`, below
         '''
-        return self.getElementsByClass([note.GeneralNote, chord.Chord])
+        #return self.getElementsByClass([note.GeneralNote, chord.Chord])
+        # using string class names is import for some test contexts where
+        # absolute class name matching fails
+        return self.getElementsByClass(['GeneralNote', 'Chord'])
 
     notes = property(_getNotes, doc='''
         The notes property of a Stream returns a new Stream object
@@ -12559,37 +12565,8 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
         te = TestExternal()
-
-
-
-        #t.testGetElementsByContextStream()
-
-        #t.testMeasureOffsetMap()
-
-        #t.testImplodeA()
-        #t.testImplodeB()
-        #t.testExplodeA()
-
-# 
-#         t.testStripTiesBuilt()
-#         t.testStripTiesImported()
-#         t.testStripTiesScore()
-
-#         t.testMakeTies()
-#         t.testVoicesA()
-#         t.testVoicesB()
-#         t.testVoicesC()
-# 
-#         t.testInternalize()
-#         t.testMakeRests()
-
-#         t.testAugmentOrDiminishCorpus()
-#         t.testAugmentOrDiminishHighestTimes()
-
-        #t.testVoicesToPartsA()
-        #t.testDeepcopySpanners()
-        #t.testAddSlurByMelisma()
-        t.testChordifyImported()
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
 
 #------------------------------------------------------------------------------

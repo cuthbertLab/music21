@@ -2627,6 +2627,8 @@ class Test(unittest.TestCase):
 
 
     def testQuarterToneA(self):
+        import stream, note, scale, pitch
+
         p1 = Pitch('D#~')
         #environLocal.printDebug([p1, p1.accidental])
         self.assertEqual(str(p1), 'D#~')
@@ -2637,6 +2639,34 @@ class Test(unittest.TestCase):
         xmlout = xmlout.replace(' ', '')
         xmlout = xmlout.replace('\n', '')
         self.assertEqual(xmlout.find(match), 621)
+
+        s = stream.Stream()
+        for pStr in ['A~', 'A#~', 'A`', 'A-`']:
+            p = Pitch(pStr)
+            self.assertEqual(str(p), pStr)
+            n = note.Note()
+            n.pitch = p
+            s.append(n)
+        self.assertEqual(len(s), 4)
+        match = [e.ps for e in s]
+        self.assertEqual(match, [69.5, 70.5, 68.5, 67.5] )
+
+        s = stream.Stream()
+        alterList = [.5, 1.5, -.5, -1.5]
+        sc = scale.MajorScale('c4')
+        for x in range(1, 10):
+            n = note.Note(sc.pitchFromDegree(x%sc.getDegreeMaxUnique()))
+            n.quarterLength = .5
+            n.pitch.accidental = pitch.Accidental(alterList[x%len(alterList)])
+            s.append(n)
+
+        match = [str(n.pitch) for n in s.notes]
+        self.assertEqual(match, ['C~4', 'D#~4', 'E-`4', 'F~4', 'G#~4', 'A`4', 'B-`4', 'C~4', 'D#~4'])
+
+        
+        match = [e.ps for e in s]
+        self.assertEqual(match, [60.5, 63.5, 62.5, 65.5, 68.5, 68.5, 69.5, 60.5, 63.5] )
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
