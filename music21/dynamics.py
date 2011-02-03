@@ -19,8 +19,8 @@ import unittest, doctest
 import copy
 
 import music21
-from music21 import musicxml
-musicxmlMod = musicxml # alias as to avoid name conflicts
+from music21 import musicxml as musicxmlMod 
+from music21.musicxml import translate as musicxmlTranslate
 
 from music21 import common
 
@@ -148,79 +148,82 @@ class Dynamic(music21.Music21Object):
 
 
     def _getMX(self):
-        '''
-        returns a musicxml.Direction object
-
-        >>> from music21 import *
-        >>> a = dynamics.Dynamic('ppp')
-        >>> a.posRelativeY = -10
-        >>> b = a.mx
-        >>> b[0][0][0].get('tag')
-        'ppp'
-        >>> b.get('placement')
-        'below'
-        '''
-        mxDynamicMark = musicxml.DynamicMark(self.value)
-        mxDynamics = musicxml.Dynamics()
-        for src, dst in [(self.posDefaultX, 'default-x'), 
-                         (self.posDefaultY, 'default-y'), 
-                         (self.posRelativeX, 'relative-x'),
-                         (self.posRelativeY, 'relative-y')]:
-            if src != None:
-                mxDynamics.set(dst, src)
-        mxDynamics.append(mxDynamicMark) # store on component list
-        mxDirectionType = musicxmlMod.DirectionType()
-        mxDirectionType.append(mxDynamics)
-        mxDirection = musicxmlMod.Direction()
-        mxDirection.append(mxDirectionType)
-        mxDirection.set('placement', self.posPlacement)
-        return mxDirection
+        return musicxmlTranslate.dyanmicToMx(self)
+#         '''
+#         returns a musicxml.Direction object
+# 
+#         >>> from music21 import *
+#         >>> a = dynamics.Dynamic('ppp')
+#         >>> a.posRelativeY = -10
+#         >>> b = a.mx
+#         >>> b[0][0][0].get('tag')
+#         'ppp'
+#         >>> b.get('placement')
+#         'below'
+#         '''
+#         mxDynamicMark = musicxml.DynamicMark(self.value)
+#         mxDynamics = musicxml.Dynamics()
+#         for src, dst in [(self.posDefaultX, 'default-x'), 
+#                          (self.posDefaultY, 'default-y'), 
+#                          (self.posRelativeX, 'relative-x'),
+#                          (self.posRelativeY, 'relative-y')]:
+#             if src != None:
+#                 mxDynamics.set(dst, src)
+#         mxDynamics.append(mxDynamicMark) # store on component list
+#         mxDirectionType = musicxmlMod.DirectionType()
+#         mxDirectionType.append(mxDynamics)
+#         mxDirection = musicxmlMod.Direction()
+#         mxDirection.append(mxDirectionType)
+#         mxDirection.set('placement', self.posPlacement)
+#         return mxDirection
 
     def _setMX(self, mxDirection):
-        '''Given an mxDirection, load instance
+        musicxmlTranslate.mxToDynamic(mxDirection, self)
 
-        >>> from music21 import *
-        >>> mxDirection = musicxml.Direction()
-        >>> mxDirectionType = musicxml.DirectionType()
-        >>> mxDynamicMark = musicxml.DynamicMark('ff')
-        >>> mxDynamics = musicxml.Dynamics()
-        >>> mxDynamics.set('default-y', -20)
-        >>> mxDynamics.append(mxDynamicMark)
-        >>> mxDirectionType.append(mxDynamics)
-        >>> mxDirection.append(mxDirectionType)
-        >>> a = Dynamic()
-        >>> a.mx = mxDirection
-        >>> a.value
-        'ff'
-        >>> a.posDefaultY
-        -20
-        >>> a.posPlacement
-        'below'
-        '''
-        mxDynamics = None
-        for mxObj in mxDirection:
-            if isinstance(mxObj, musicxmlMod.DirectionType):
-                for mxObjSub in mxObj:
-                    if isinstance(mxObjSub, musicxmlMod.Dynamics):
-                        mxDynamics = mxObjSub
-        if mxDynamics == None:
-            raise DynamicException('when importing a Dyanmics object from MusicXML, did not find a DyanmicMark')            
-        if len(mxDynamics) > 1:
-            raise DynamicException('when importing a Dyanmics object from MusicXML, found more than one DyanmicMark contained')
-
-        # palcement is found in outermost object
-        if mxDirection.get('placement') != None:
-            self.posPlacement = mxDirection.get('placement') 
-
-        # the tag is the dynmic mark value
-        mxDynamicMark = mxDynamics.componentList[0].get('tag')
-        self.value = mxDynamicMark
-        for dst, src in [('posDefaultX', 'default-x'), 
-                         ('posDefaultY', 'default-y'), 
-                         ('posRelativeX', 'relative-x'),
-                         ('posRelativeY', 'relative-y')]:
-            if mxDynamics.get(src) != None:
-                setattr(self, dst, mxDynamics.get(src))
+#         '''Given an mxDirection, load instance
+# 
+#         >>> from music21 import *
+#         >>> mxDirection = musicxml.Direction()
+#         >>> mxDirectionType = musicxml.DirectionType()
+#         >>> mxDynamicMark = musicxml.DynamicMark('ff')
+#         >>> mxDynamics = musicxml.Dynamics()
+#         >>> mxDynamics.set('default-y', -20)
+#         >>> mxDynamics.append(mxDynamicMark)
+#         >>> mxDirectionType.append(mxDynamics)
+#         >>> mxDirection.append(mxDirectionType)
+#         >>> a = Dynamic()
+#         >>> a.mx = mxDirection
+#         >>> a.value
+#         'ff'
+#         >>> a.posDefaultY
+#         -20
+#         >>> a.posPlacement
+#         'below'
+#         '''
+#         mxDynamics = None
+#         for mxObj in mxDirection:
+#             if isinstance(mxObj, musicxmlMod.DirectionType):
+#                 for mxObjSub in mxObj:
+#                     if isinstance(mxObjSub, musicxmlMod.Dynamics):
+#                         mxDynamics = mxObjSub
+#         if mxDynamics == None:
+#             raise DynamicException('when importing a Dyanmics object from MusicXML, did not find a DyanmicMark')            
+#         if len(mxDynamics) > 1:
+#             raise DynamicException('when importing a Dyanmics object from MusicXML, found more than one DyanmicMark contained')
+# 
+#         # palcement is found in outermost object
+#         if mxDirection.get('placement') != None:
+#             self.posPlacement = mxDirection.get('placement') 
+# 
+#         # the tag is the dynmic mark value
+#         mxDynamicMark = mxDynamics.componentList[0].get('tag')
+#         self.value = mxDynamicMark
+#         for dst, src in [('posDefaultX', 'default-x'), 
+#                          ('posDefaultY', 'default-y'), 
+#                          ('posRelativeX', 'relative-x'),
+#                          ('posRelativeY', 'relative-y')]:
+#             if mxDynamics.get(src) != None:
+#                 setattr(self, dst, mxDynamics.get(src))
 
     mx = property(_getMX, _setMX)
 
@@ -294,7 +297,7 @@ class Wedge(music21.Music21Object):
         >>> mxWedge.get('type')
         'crescendo'
         '''
-        mxWedge = musicxml.Wedge()
+        mxWedge = musicxmlMod.Wedge()
         mxWedge.set('type', self.type)
         mxWedge.set('spread', self.spread)
 

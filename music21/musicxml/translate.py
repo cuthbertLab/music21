@@ -539,6 +539,187 @@ def timeSignatureToMusicXML(ts):
     return out.musicxml
 
 #-------------------------------------------------------------------------------
+# Dyanmics
+
+def dyanmicToMx(d):
+    'Return an mx direction'
+    '''
+    returns a musicxml.Direction object
+
+    >>> from music21 import *
+    >>> a = dynamics.Dynamic('pp# p')
+    >>> a.posRelativeY = -10
+    >>> b = a.mx
+    >>> b[0][0][0].get('tag')
+    'ppp'
+    >>> b.get('placement')
+    'below'
+    '''
+    mxDynamicMark = musicxmlMod.DynamicMark(d.value)
+    mxDynamics = musicxmlMod.Dynamics()
+    for src, dst in [(d.posDefaultX, 'default-x'), 
+                     (d.posDefaultY, 'default-y'), 
+                     (d.posRelativeX, 'relative-x'),
+                     (d.posRelativeY, 'relative-y')]:
+        if src is not None:
+            mxDynamics.set(dst, src)
+    mxDynamics.append(mxDynamicMark) # store on component list
+    mxDirectionType = musicxmlMod.DirectionType()
+    mxDirectionType.append(mxDynamics)
+    mxDirection = musicxmlMod.Direction()
+    mxDirection.append(mxDirectionType)
+    mxDirection.set('placement', d.posPlacement)
+    return mxDirection
+
+
+def mxToDynamic(mxDirection, inputM21=None):
+    '''
+    Given an mxDirection, load instance
+
+    >>> from music21 import *
+    >>> mxDirection = musicxml.Direction()
+    >>> mxDirectionType = musicxml.DirectionType()
+    >>> mxDynamicMark = musicxml.DynamicMark('ff')
+    >>> mxDynamics = musicxml.Dynamics()
+    >>> mxDynamics.set('default-y', -20)
+    >>> mxDynamics.append(mxDynamicMark)
+    >>> mxDirectionType.append(mxDynamics)
+    >>> mxDirection.append(mxDirectionType)
+    >>> a = dynamics.Dynamic()
+    >>> a.mx = mxDirection
+    >>> a.value
+    'ff'
+    >>> a.posDefaultY
+    -20
+    >>> a.posPlacement
+    'below'
+    '''
+
+    from music21 import dynamics
+    if inputM21 is None:
+        d = dynamics.Dynamic()
+    else:
+        d = inputM21
+
+    mxDynamics = None
+    for mxObj in mxDirection:
+        if isinstance(mxObj, musicxmlMod.DirectionType):
+            for mxObjSub in mxObj:
+                if isinstance(mxObjSub, musicxmlMod.Dynamics):
+                    mxDynamics = mxObjSub
+    if mxDynamics == None:
+        raise dynamics.DynamicException('when importing a Dyanmics object from MusicXML, did not find a DyanmicMark')            
+    if len(mxDynamics) > 1:
+        raise dynamics.DynamicException('when importing a Dyanmics object from MusicXML, found more than one DyanmicMark contained')
+
+    # palcement is found in outermost object
+    if mxDirection.get('placement') is not None:
+        d.posPlacement = mxDirection.get('placement') 
+
+    # the tag is the dynmic mark value
+    mxDynamicMark = mxDynamics.componentList[0].get('tag')
+    d.value = mxDynamicMark
+    for dst, src in [('posDefaultX', 'default-x'), 
+                     ('posDefaultY', 'default-y'), 
+                     ('posRelativeX', 'relative-x'),
+                     ('posRelativeY', 'relative-y')]:
+        if mxDynamics.get(src) is not None:
+            setattr(d, dst, mxDynamics.get(src))
+
+
+
+
+
+#-------------------------------------------------------------------------------
+# Instruments
+
+
+def instrumentToMx(i):
+    '''
+    >>> from music21 import *
+    >>> i = instrument.Celesta()
+    >>> mxScorePart = i.mx
+    >>> len(mxScorePart.scoreInstrumentList)
+    1
+    >>> mxScorePart.scoreInstrumentList[0].instrumentName
+    'Celesta'
+    >>> mxScorePart.midiInstrumentList[0].midiProgram
+    9
+    '''
+    mxScorePart = musicxmlMod.ScorePart()
+
+    # get a random id if None set
+    if i.partId == None:
+        i.partIdRandomize()
+
+    if i.instrumentId == None:
+        i.instrumentIdRandomize()
+
+    # note: this is id, not partId!
+    mxScorePart.set('id', i.partId)
+
+    if i.partName != None:
+        mxScorePart.partName = i.partName
+    elif i.partName == None: # get default, as required
+        mxScorePart.partName = defaults.partName
+
+    if i.partAbbreviation != None:
+        mxScorePart.partAbbreviation = i.partAbbreviation
+
+    if i.instrumentName != None or i.instrumentAbbreviation != None:
+        mxScoreInstrument = musicxmlMod.ScoreInstrument()
+        # set id to same as part for now
+        mxScoreInstrument.set('id', i.instrumentId)
+        # can set these to None
+        mxScoreInstrument.instrumentName = i.instrumentName
+        mxScoreInstrument.instrumentAbbreviation = i.instrumentAbbreviation
+        # add to mxScorePart
+        mxScorePart.scoreInstrumentList.append(mxScoreInstrument)
+
+    if i.midiProgram != None:
+        mxMIDIInstrument = musicxmlMod.MIDIInstrument()
+        mxMIDIInstrument.set('id', i.instrumentId)
+        # shift to start from 1
+        mxMIDIInstrument.midiProgram = i.midiProgram + 1 
+
+        if i.midiChannel == None:
+            # TODO: need to allocate channels from a higher level
+            i.autoAssignMidiChannel()
+        mxMIDIInstrument.midiChannel = i.midiChannel + 1
+        # add to mxScorePart
+        mxScorePart.midiInstrumentList.append(mxMIDIInstrument)
+
+    return mxScorePart
+
+
+def mxToInstrument(mxScorePart, inputM21=None):
+    if inputM21 is None:
+        i = instrument.Instrument()
+    else:
+        i = inputM21
+
+    i.partId = mxScorePart.get('id')
+    i.partName = mxScorePart.get('partName')
+    i.partAbbreviation = mxScorePart.get('partAbbreviation')
+
+    # for now, just get first instrument
+    if len(mxScorePart.scoreInstrumentList) > 0:
+        mxScoreInstrument = mxScorePart.scoreInstrumentList[0]
+        i.instrumentName = mxScoreInstrument.get('instrumentName')
+        i.instrumentAbbreviation = mxScoreInstrument.get(
+                                        'instrumentAbbreviation')
+    if len(mxScorePart.midiInstrumentList) > 0:
+        # for now, just get first midi instrument
+        mxMIDIInstrument = mxScorePart.midiInstrumentList[0]
+        # musicxml counts from 1, not zero
+        mp = mxMIDIInstrument.get('midiProgram')
+        if mp is not None:
+            i.midiProgram = int(mp) - 1
+        mc = mxMIDIInstrument.get('midiChannel')
+        if mc is not None:
+            i.midiChannel = int(mc) - 1
+
+#-------------------------------------------------------------------------------
 # Notes
 
 def generalNoteToMusicXML(n):

@@ -28,6 +28,7 @@ from music21 import common
 from music21 import defaults
 from music21 import pitch
 from music21 import interval
+from music21.musicxml import translate as musicxmlTranslate
 
 from music21 import environment
 _MOD = "instrument.py"
@@ -168,87 +169,95 @@ class Instrument(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getMX(self):
+        '''Return a mxScorePart based on this instrument.
         '''
-        >>> from music21 import *
-        >>> i = instrument.Celesta()
-        >>> mxScorePart = i.mx
-        >>> len(mxScorePart.scoreInstrumentList)
-        1
-        >>> mxScorePart.scoreInstrumentList[0].instrumentName
-        'Celesta'
-        >>> mxScorePart.midiInstrumentList[0].midiProgram
-        9
-        '''
-        mxScorePart = musicxml.ScorePart()
+        return musicxmlTranslate.instrumentToMx(self)
 
-        # get a random id if None set
-        if self.partId == None:
-            self.partIdRandomize()
 
-        if self.instrumentId == None:
-            self.instrumentIdRandomize()
-
-        # note: this is id, not partId!
-        mxScorePart.set('id', self.partId)
-
-        if self.partName != None:
-            mxScorePart.partName = self.partName
-        elif self.partName == None: # get default, as required
-            mxScorePart.partName = defaults.partName
-
-        if self.partAbbreviation != None:
-            mxScorePart.partAbbreviation = self.partAbbreviation
-
-        if self.instrumentName != None or self.instrumentAbbreviation != None:
-            mxScoreInstrument = musicxml.ScoreInstrument()
-            # set id to same as part for now
-            mxScoreInstrument.set('id', self.instrumentId)
-            # can set these to None
-            mxScoreInstrument.instrumentName = self.instrumentName
-            mxScoreInstrument.instrumentAbbreviation = self.instrumentAbbreviation
-            # add to mxScorePart
-            mxScorePart.scoreInstrumentList.append(mxScoreInstrument)
-
-        if self.midiProgram != None:
-            mxMIDIInstrument = musicxml.MIDIInstrument()
-            mxMIDIInstrument.set('id', self.instrumentId)
-            # shift to start from 1
-            mxMIDIInstrument.midiProgram = self.midiProgram + 1 
-
-            if self.midiChannel == None:
-                # TODO: need to allocate channels from a higher level
-                self.autoAssignMidiChannel()
-            mxMIDIInstrument.midiChannel = self.midiChannel + 1
-            # add to mxScorePart
-            mxScorePart.midiInstrumentList.append(mxMIDIInstrument)
-
-        return mxScorePart
+#         '''
+#         >>> from music21 import *
+#         >>> i = instrument.Celesta()
+#         >>> mxScorePart = i.mx
+#         >>> len(mxScorePart.scoreInstrumentList)
+#         1
+#         >>> mxScorePart.scoreInstrumentList[0].instrumentName
+#         'Celesta'
+#         >>> mxScorePart.midiInstrumentList[0].midiProgram
+#         9
+#         '''
+#         mxScorePart = musicxml.ScorePart()
+# 
+#         # get a random id if None set
+#         if self.partId == None:
+#             self.partIdRandomize()
+# 
+#         if self.instrumentId == None:
+#             self.instrumentIdRandomize()
+# 
+#         # note: this is id, not partId!
+#         mxScorePart.set('id', self.partId)
+# 
+#         if self.partName != None:
+#             mxScorePart.partName = self.partName
+#         elif self.partName == None: # get default, as required
+#             mxScorePart.partName = defaults.partName
+# 
+#         if self.partAbbreviation != None:
+#             mxScorePart.partAbbreviation = self.partAbbreviation
+# 
+#         if self.instrumentName != None or self.instrumentAbbreviation != None:
+#             mxScoreInstrument = musicxml.ScoreInstrument()
+#             # set id to same as part for now
+#             mxScoreInstrument.set('id', self.instrumentId)
+#             # can set these to None
+#             mxScoreInstrument.instrumentName = self.instrumentName
+#             mxScoreInstrument.instrumentAbbreviation = self.instrumentAbbreviation
+#             # add to mxScorePart
+#             mxScorePart.scoreInstrumentList.append(mxScoreInstrument)
+# 
+#         if self.midiProgram != None:
+#             mxMIDIInstrument = musicxml.MIDIInstrument()
+#             mxMIDIInstrument.set('id', self.instrumentId)
+#             # shift to start from 1
+#             mxMIDIInstrument.midiProgram = self.midiProgram + 1 
+# 
+#             if self.midiChannel == None:
+#                 # TODO: need to allocate channels from a higher level
+#                 self.autoAssignMidiChannel()
+#             mxMIDIInstrument.midiChannel = self.midiChannel + 1
+#             # add to mxScorePart
+#             mxScorePart.midiInstrumentList.append(mxMIDIInstrument)
+# 
+#         return mxScorePart
         
 
     def _setMX(self, mxScorePart):
         '''
         provide a score part object
         '''
-        self.partId = mxScorePart.get('id')
-        self.partName = mxScorePart.get('partName')
-        self.partAbbreviation = mxScorePart.get('partAbbreviation')
-
-        # for now, just get first instrument
-        if len(mxScorePart.scoreInstrumentList) > 0:
-            mxScoreInstrument = mxScorePart.scoreInstrumentList[0]
-            self.instrumentName = mxScoreInstrument.get('instrumentName')
-            self.instrumentAbbreviation = mxScoreInstrument.get(
-                                            'instrumentAbbreviation')
-        if len(mxScorePart.midiInstrumentList) > 0:
-            # for now, just get first midi instrument
-            mxMIDIInstrument = mxScorePart.midiInstrumentList[0]
-            # musicxml counts from 1, not zero
-            mp = mxMIDIInstrument.get('midiProgram')
-            if mp is not None:
-                self.midiProgram = int(mp) - 1
-            mc = mxMIDIInstrument.get('midiChannel')
-            if mc is not None:
-                self.midiChannel = int(mc) - 1
+        # load an instrument from a ScorePart into self
+        musicxmlTranslate.mxToInstrument(mxScorePart, self)
+        
+#         self.partId = mxScorePart.get('id')
+#         self.partName = mxScorePart.get('partName')
+#         self.partAbbreviation = mxScorePart.get('partAbbreviation')
+# 
+#         # for now, just get first instrument
+#         if len(mxScorePart.scoreInstrumentList) > 0:
+#             mxScoreInstrument = mxScorePart.scoreInstrumentList[0]
+#             self.instrumentName = mxScoreInstrument.get('instrumentName')
+#             self.instrumentAbbreviation = mxScoreInstrument.get(
+#                                             'instrumentAbbreviation')
+#         if len(mxScorePart.midiInstrumentList) > 0:
+#             # for now, just get first midi instrument
+#             mxMIDIInstrument = mxScorePart.midiInstrumentList[0]
+#             # musicxml counts from 1, not zero
+#             mp = mxMIDIInstrument.get('midiProgram')
+#             if mp is not None:
+#                 self.midiProgram = int(mp) - 1
+#             mc = mxMIDIInstrument.get('midiChannel')
+#             if mc is not None:
+#                 self.midiChannel = int(mc) - 1
 
     mx = property(_getMX, _setMX)
 
