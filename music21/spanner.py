@@ -34,7 +34,6 @@ class Component(object):
         self.id = None # id() of stored object
         self._ref = None # weak ref to stored object
 
-
         # each component may define and offset in quarterLengths
         # to suggest positioning not exactly with the component
         self.offset = 0.0
@@ -95,6 +94,10 @@ class Spanner(music21.Music21Object):
     Spanner objects live on Streams as other Music21Objects, but store connections between one or more Music21Objects.
     '''
     
+    # possible replace Component with WeakElementWrapper
+    # store a Stream in Spanner, and map relevant methods to public 
+    # interface of Spanner
+
 
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)

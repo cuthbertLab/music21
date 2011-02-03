@@ -1854,7 +1854,7 @@ class Duration(DurationCommon):
         elif len(self.components) == 1:
             return self.components[0].dots
         else: # there must be 1 or more components
-            raise DurationException("zero DurationUnits in components")
+            raise DurationException("unexpected number DurationUnits in components: %s" % len(self.components))
 
     def _setDots(self, value):
         '''Set dots if a number, as first element
