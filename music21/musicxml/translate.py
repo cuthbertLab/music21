@@ -39,6 +39,102 @@ class TranslateException(Exception):
 
 
 
+#-------------------------------------------------------------------------------
+# Pitch and pitch components
+
+def pitchToMx(p):
+    '''
+    Returns a musicxml.Note() object
+
+    >>> from music21 import *
+    >>> a = pitch.Pitch('g#4')
+    >>> c = a.mx
+    >>> c.get('pitch').get('step')
+    'G'
+    '''
+    mxPitch = musicxmlMod.Pitch()
+    mxPitch.set('step', p.step)
+    if p.accidental is not None:
+        # need to use integers when possible in order to support
+        # xml readers that force alter to be an integer
+        mxPitch.set('alter', common.numToIntOrFloat(p.accidental.alter))
+    mxPitch.set('octave', p.implicitOctave)
+
+    mxNote = musicxmlMod.Note()
+    mxNote.setDefaults()
+    mxNote.set('pitch', mxPitch)
+
+    if (p.accidental is not None and 
+        p.accidental.displayStatus in [True, None]):
+        mxNote.set('accidental', p.accidental.mx)
+    # should this also return an xml accidental object
+    return mxNote # return element object
+
+def mxToPitch(mxNote, inputM21=None):
+    '''
+    Given a MusicXML Note object, set this Pitch object to its values. 
+
+    >>> from music21 import *
+    >>> b = musicxml.Pitch()
+    >>> b.set('octave', 3)
+    >>> b.set('step', 'E')
+    >>> b.set('alter', -1)
+    >>> c = musicxml.Note()
+    >>> c.set('pitch', b)
+    >>> a = pitch.Pitch('g#4')
+    >>> a.mx = c
+    >>> print(a)
+    E-3
+    '''
+    from music21 import pitch
+
+    if inputM21 == None:
+        p = pitch.Pitch()
+    else:
+        p = inputM21
+
+    # assume this is an object
+    mxPitch = mxNote.get('pitchObj')
+    mxAccidental = mxNote.get('accidentalObj')
+
+    p.step = mxPitch.get('step')
+
+    # sometimes we have an accidental defined but no alter value, due to 
+    # a natural; need to look at mxAccidental directly
+    mxAccidentalCharData = None
+    if mxAccidental != None:
+        mxAccidentalCharData = mxAccidental.get('charData')
+        #environLocal.printDebug(['found mxAccidental charData', mxAccidentalCharData])
+
+    acc = mxPitch.get('alter')
+    # None is used in musicxml but not in music21
+    if acc != None or mxAccidentalCharData != None: 
+        if mxAccidental is not None: # the source had wanted to show alter
+            accObj = pitch.Accidental()
+            accObj.mx = mxAccidental
+        # used to to just use acc value
+        #self.accidental = Accidental(float(acc))
+        # better to use accObj if possible
+            p.accidental = accObj
+            p.accidental.displayStatus = True
+        else:
+            # here we generate an accidental object from the alter value
+            # but in the source, there was not a defined accidental
+            p.accidental = pitch.Accidental(float(acc))
+            p.accidental.displayStatus = False
+    p.octave = int(mxPitch.get('octave'))
+    p._pitchSpaceNeedsUpdating = True
+
+
+def pitchToMusicXML(p):
+    from music21 import stream, note
+    n = note.Note()
+    n.pitch = copy.deepcopy(p)
+    out = stream.Stream()
+    out.append(n)
+    # call the musicxml property on Stream
+    return out.musicxml
+
 
 #-------------------------------------------------------------------------------
 # Ties

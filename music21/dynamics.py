@@ -16,6 +16,8 @@ Classes and functions for creating and manipulating dynamic symbols. Rather than
 
 import unittest, doctest
 
+import copy
+
 import music21
 from music21 import musicxml
 musicxmlMod = musicxml # alias as to avoid name conflicts
@@ -228,35 +230,39 @@ class Dynamic(music21.Music21Object):
     def _getMusicXML(self):
         '''Provide a complete MusicXML representation.
         '''
-        mxDirection = self._getMX()
+        
+        from music21 import stream, note
+        dCopy = copy.deepcopy(self)
+        out = stream.Stream()
+        out.append(dCopy)
+        # call the musicxml property on Stream
+        return out.musicxml
+ 
 
-        mxMeasure = musicxml.Measure()
-        mxMeasure.setDefaults()
-        mxMeasure.append(mxDirection)
+#         mxDirection = self._getMX()
+# 
+#         mxMeasure = musicxml.Measure()
+#         mxMeasure.setDefaults()
+#         mxMeasure.append(mxDirection)
+# 
+#         mxPart = musicxml.Part()
+#         mxPart.setDefaults()
+#         mxPart.append(mxMeasure)
+#         mxScorePart = musicxml.ScorePart()
+#         mxScorePart.setDefaults()
+#         mxPartList = musicxml.PartList()
+#         mxPartList.append(mxScorePart)
+#         mxIdentification = musicxml.Identification()
+#         mxIdentification.setDefaults() # will create a composer
+#         mxScore = musicxml.Score()
+#         mxScore.setDefaults()
+#         mxScore.set('partList', mxPartList)
+#         mxScore.set('identification', mxIdentification)
+#         mxScore.append(mxPart)
+# 
+#         return mxScore.xmlStr()
 
-        mxPart = musicxml.Part()
-        mxPart.setDefaults()
-        mxPart.append(mxMeasure)
-        mxScorePart = musicxml.ScorePart()
-        mxScorePart.setDefaults()
-        mxPartList = musicxml.PartList()
-        mxPartList.append(mxScorePart)
-        mxIdentification = musicxml.Identification()
-        mxIdentification.setDefaults() # will create a composer
-        mxScore = musicxml.Score()
-        mxScore.setDefaults()
-        mxScore.set('partList', mxPartList)
-        mxScore.set('identification', mxIdentification)
-        mxScore.append(mxPart)
-
-        return mxScore.xmlStr()
-
-    def _setMusicXML(self, mxNote):
-        '''
-        '''
-        pass
-
-    musicxml = property(_getMusicXML, _setMusicXML)
+    musicxml = property(_getMusicXML)
 
 
 
@@ -403,15 +409,27 @@ class Test(unittest.TestCase):
         self.assertEquals(len(b), 4)
 
 
+    def testMusicxmlOutput(self):
+        # test direct rendering of musicxml
+        d = Dynamic('p')
+        xmlout = d.musicxml
+        match = '<p/>'
+        self.assertEquals(xmlout.find(match), 888)
 
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Dynamic, Wedge]
 
-
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    import sys
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        t = Test()
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
+
 
 #------------------------------------------------------------------------------
 # eof
