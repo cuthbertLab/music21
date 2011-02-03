@@ -290,7 +290,7 @@ class Node(object):
         # more than one node may have the same degree
         self.degree = degree
         # node weight might be used to indicate importance of scale positions
-        self.weight = 1.0
+        self.weight = weight
 
     def __eq__(self, other):
         ''' 
@@ -690,8 +690,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         '''Perform weighted random selection on a parallel list of edges and corresponding nodes.
 
         >>> from music21 import *
-        >>> n1 = intervalNetwork.Node(id='a', weight=10000)
-        >>> n2 = intervalNetwork.Node(id='b', weight=0.00001)
+        >>> n1 = intervalNetwork.Node(id='a', weight=1000000)
+        >>> n2 = intervalNetwork.Node(id='b', weight=1)
         >>> e1 = intervalNetwork.Edge(interval.Interval('m3'), id='a')
         >>> e2 = intervalNetwork.Edge(interval.Interval('m3'), id='b')
         >>> net = intervalNetwork.BoundIntervalNetwork()
@@ -704,6 +704,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         # use index values as values
         iValues = range(len(edges))
         weights = [n.weight for n in nodes]
+        #environLocal.printDebug(['weights', weights])
         i = common.weightedSelection(iValues, weights)
         # return corresponding edge and node
         return edges[i], nodes[i]
