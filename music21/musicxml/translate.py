@@ -1137,6 +1137,7 @@ def streamToMx(s, spannerBundle=None):
     >>> mxScore = musicxml.translate.streamToMx(s1)
     >>> mxPartList = mxScore.get('partList')
     '''
+    environLocal.printDebug(['streamToMx:'])
     from music21 import spanner
 
     if len(s) == 0:
@@ -1165,9 +1166,12 @@ def streamToMx(s, spannerBundle=None):
     # this meter  stream is passed to makeMeasures()
     meterStream = s.getTimeSignatures(searchContext=False,
                     sortByCreationTime=False, returnDefault=False) 
+    #environLocal.printDebug(['streamToMx: post meterStream search', meterStream, meterStream[0]])
     if len(meterStream) == 0:
+        # note: this will return a default if no meters are found
         meterStream = s.flat.getTimeSignatures(searchContext=False,
                     sortByCreationTime=True, returnDefault=True) 
+
 
     # we need independent sub-stream elements to shift in presentation
     highestTime = 0

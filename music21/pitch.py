@@ -1434,12 +1434,7 @@ class Pitch(music21.Music21Object):
 # 
 #         return mxScore.xmlStr()
 
-    def _setMusicXML(self, mxNote):
-        '''
-        '''
-        pass
-
-    musicxml = property(_getMusicXML, _setMusicXML)
+    musicxml = property(_getMusicXML)
 
     def lilyNoOctave(self):
         '''
@@ -2637,6 +2632,8 @@ class Test(unittest.TestCase):
         p1 = Pitch('D#~')
         #environLocal.printDebug([p1, p1.accidental])
         self.assertEqual(str(p1), 'D#~')
+        # test generation of raw musicxml output
+        xmlOut = p1.musicxml
         #p1.show()
 
 #-------------------------------------------------------------------------------
@@ -2652,7 +2649,7 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
         te = TestExternal()
-        # are is test to launch
+        # arg[1] is test to launch
         if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
 #------------------------------------------------------------------------------

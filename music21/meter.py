@@ -3149,66 +3149,46 @@ class TimeSignature(music21.Music21Object):
     mx = property(_getMX, _setMX)
 
 
-
-
     def _getMusicXML(self):
         '''Return a complete MusicXML string
         '''
-        mxAttributes = musicxml.Attributes()
-        # need a lost of time 
-        mxAttributes.set('time', self._getMX())
+        from music21 import stream, note
+        tsCopy = copy.deepcopy(self)
+#         m = stream.Measure()
+#         m.timeSignature = tsCopy
+#         m.append(note.Rest())
+        out = stream.Stream()
+        out.append(tsCopy)
+        return out.musicxml
 
-        mxMeasure = musicxml.Measure()
-        mxMeasure.setDefaults()
-        mxMeasure.set('attributes', mxAttributes)
-
-        mxPart = musicxml.Part()
-        mxPart.setDefaults()
-        mxPart.append(mxMeasure)
-
-        mxScorePart = musicxml.ScorePart()
-        mxScorePart.setDefaults()
-        mxPartList = musicxml.PartList()
-        mxPartList.append(mxScorePart)
-
-        mxIdentification = musicxml.Identification()
-        mxIdentification.setDefaults() # will create a composer
-
-        mxScore = musicxml.Score()
-        mxScore.setDefaults()
-        mxScore.set('partList', mxPartList)
-        mxScore.set('identification', mxIdentification)
-        mxScore.append(mxPart)
-        return mxScore.xmlStr()
-
-
-    def _setMusicXML(self, mxNote):
-        '''
-        '''
-        pass
-
-    musicxml = property(_getMusicXML, _setMusicXML)
-
-
-    #---------------------------------------------------------------------------
-    # override these methods for json functionality
-
-#     def jsonAttributes(self):
-#         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
-#         '''
-#         # only string notation is stored, meaning that any non-default
-#         # internal representations will not be saved
-#         # a new default will be created when restored
-#         return ['stringNotation']
+#         mxAttributes = musicxml.Attributes()
+#         # need a lost of time 
+#         mxAttributes.set('time', [self._getMX()])
 # 
-#     def jsonComponentFactory(self, idStr):
-#         '''Given a stored string during JSON serialization, return an object'
+#         mxMeasure = musicxml.Measure()
+#         mxMeasure.setDefaults()
+#         mxMeasure.set('attributes', mxAttributes)
 # 
-#         The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
-#         '''
-#         return None
+#         mxPart = musicxml.Part()
+#         mxPart.setDefaults()
+#         mxPart.append(mxMeasure)
+# 
+#         mxScorePart = musicxml.ScorePart()
+#         mxScorePart.setDefaults()
+#         mxPartList = musicxml.PartList()
+#         mxPartList.append(mxScorePart)
+# 
+#         mxIdentification = musicxml.Identification()
+#         mxIdentification.setDefaults() # will create a composer
+# 
+#         mxScore = musicxml.Score()
+#         mxScore.setDefaults()
+#         mxScore.set('partList', mxPartList)
+#         mxScore.set('identification', mxIdentification)
+#         mxScore.append(mxPart)
+#         return mxScore.xmlStr()
 
-
+    musicxml = property(_getMusicXML)
 
 
 
@@ -3620,6 +3600,17 @@ class Test(unittest.TestCase):
 #         ts.json = jsString
 #         self.assertEqual(ts.stringNotation, '3/4')
 
+
+    def testMusicxmlDirectOut(self):
+        # test rendering musicxml directly from meter
+        ts = TimeSignature('3/8')
+        xmlout = ts.musicxml
+
+        match = '<time><beats>3</beats><beat-type>8</beat-type></time>'
+        xmlout = xmlout.replace(' ', '')
+        xmlout = xmlout.replace('\n', '')
+        self.assertEqual(xmlout.find(match), 501)
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [TimeSignature, CompoundTimeSignature]
@@ -3634,11 +3625,9 @@ if __name__ == "__main__":
     else:
 
         t = Test()
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
-#         t.testBeatProportionFromTimeSignature()
-        t.testSubdividePartitionsEqual()
-        t.testSetDefaultAccentWeights()
-        t.testJSONStorage()
 
 
 #------------------------------------------------------------------------------

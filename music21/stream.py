@@ -2364,7 +2364,8 @@ class Stream(music21.Music21Object):
         '''
         # even if this is a Measure, the TimeSignatue in the Stream will be 
         # found
-        post = self.getElementsByClass(meter.TimeSignature)
+        #post = self.getElementsByClass(meter.TimeSignature)
+        post = self.getElementsByClass('TimeSignature')
 
         # search activeSite Streams through contexts    
         if len(post) == 0 and searchContext:
@@ -3172,8 +3173,6 @@ class Stream(music21.Music21Object):
         # position components, and sub-streams might hide elements that
         # should be contained
 
-        # TODO: make inPlace an option
-
         if self.hasVoices():
             #environLocal.printDebug(['make measures found voices'])
             # cannot make flat here, as this would destroy stream partitions
@@ -3185,12 +3184,16 @@ class Stream(music21.Music21Object):
             srcObj = copy.deepcopy(self.flat.sorted)
             voiceCount = 0
 
+        #environLocal.printDebug(['Stream.makeMeasures(): passed in meterStream', meterStream, meterStream[0]])
+
         # may need to look in activeSite if no time signatures are found
         if meterStream is None:
             # get from this Stream, or search the contexts
             meterStream = srcObj.flat.getTimeSignatures(returnDefault=True, 
                           searchContext=False,
                           sortByCreationTime=False)
+            environLocal.printDebug(['Stream.makeMeasures(): found meterStream', meterStream[0]])
+
         # if meterStream is a TimeSignature, use it
         elif isinstance(meterStream, meter.TimeSignature):
             ts = meterStream
@@ -3247,13 +3250,18 @@ class Stream(music21.Music21Object):
             # get active time signature at this offset
             # make a copy and it to the meter
             thisTimeSignature = meterStream.getElementAtOrBefore(o)
-            if thisTimeSignature == None and lastTimeSignature == None:
+
+            #environLocal.printDebug(['meterStream.getElementAtOrBefore(o)', meterStream.getElementAtOrBefore(o), 'lastTimeSignature', lastTimeSignature, 'thisTimeSignature', thisTimeSignature ])
+
+            if thisTimeSignature is None and lastTimeSignature is None:
                 raise StreamException('failed to find TimeSignature in meterStream; cannot process Measures')
 
-            if thisTimeSignature != lastTimeSignature:
-                lastTimeSignature = meterStream.getElementAtOrBefore(o)
+            if thisTimeSignature is not lastTimeSignature and thisTimeSignature is not None:
+                lastTimeSignature = thisTimeSignature
+                # this seems redundant
+                #lastTimeSignature = meterStream.getElementAtOrBefore(o)
                 m.timeSignature = deepcopy(thisTimeSignature)
-                environLocal.printDebug(['assigned time sig', m.timeSignature])
+                #environLocal.printDebug(['assigned time sig', m.timeSignature])
 
             # only add a clef for the first measure when automatically 
             # creating Measures; this clef is from getClefs, called above
@@ -3849,6 +3857,7 @@ class Stream(music21.Music21Object):
                 m.makeAccidentals(useKeySignature=ksLast, 
                     searchKeySignatureByContext=False)
 
+        #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         measureStream.makeTies(meterStream, inPlace=True)
 
         #measureStream.makeBeams(inPlace=True)
@@ -3866,7 +3875,6 @@ class Stream(music21.Music21Object):
         # this means that they will never extend beyond one measure
         for m in measureStream.getElementsByClass('Measure'):
             m.makeTupletBrackets(inPlace=True)
-
 
         if len(measureStream) == 0:            
             raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
@@ -5468,14 +5476,12 @@ class Stream(music21.Music21Object):
         # returns an mxScore object
         return musicxmlTranslate.streamToMx(self)
 
-
     def _setMXPart(self, mxScore, partId):
         '''Load a part given an mxScore and a part name.
         '''
         #environLocal.printDebug(['calling Stream._setMXPart'])
         # pass reference to self for building into
         musicxmlTranslate.mxToStreamPart(mxScore, partId, inputM21=self)
-
 
     def _setMX(self, mxScore):
         '''Given an mxScore, build into this stream
@@ -5484,13 +5490,11 @@ class Stream(music21.Music21Object):
     
     mx = property(_getMX, _setMX)
         
-
     def _getMusicXML(self):
         '''Provide a complete MusicXML representation. 
         '''
         mxScore = self._getMX()
         return mxScore.xmlStr()
-
 
     musicxml = property(_getMusicXML,
         doc = '''Return a complete MusicXML reprsentatoin as a string. 
@@ -6795,7 +6799,7 @@ class Measure(Stream):
         (2, 4)
         '''
         # there could be more than one
-        tsList = self.getElementsByClass(music21.meter.TimeSignature)
+        tsList = self.getElementsByClass('TimeSignature')
         #environLocal.printDebug(['matched Measure classes of type TimeSignature', tsList, len(tsList)])
         # only return timeSignatures at offset = 0.0
         tsList = tsList.getElementsByOffset(0)
