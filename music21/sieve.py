@@ -1734,11 +1734,11 @@ class PitchSieve(object):
         >>> # displayed; true values are 
         >>> # [0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0]
         >>> a()
-        [C4, C4, E-4, E4, F#4, G4, A4, B4, C5]
+        [C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5]
 
         >>> a = PitchSieve('3@0', 'c4', 'c5', 'c#4', .5)
         >>> a()
-        [C4, D4, E4, F4, F4, G#4, A4, B4]
+        [C~4, D4, E`4, F4, F#~4, G#4, A~4, B4]
         >>> # [0.5, 2.0, 3.5, 5.0, 6.5, 8.0, 9.5, 11.0]
         """
         min = self.pitchLower.ps

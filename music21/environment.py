@@ -467,7 +467,6 @@ class Environment(object):
         os.system(cmd)
 
 
-    
     def printDebug(self, msg, statusLevel=common.DEBUG_USER, format=None):
         '''Format one or more data elements into string, and print it 
         to stderr. The first arg can be a list of string; lists are 

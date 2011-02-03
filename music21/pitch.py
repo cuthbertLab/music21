@@ -45,6 +45,26 @@ STEPNAMES = ['C','D','E','F','G','A','B']
 
 TWELFTH_ROOT_OF_TWO = 2.0 ** (1.0/12)
 
+# basic accidental string and symbol definitions; additional symbolic and text-based alternatives are given in the set Accidental.set() method
+accidentalNameToModifier = {
+    'natural' : '',
+    'sharp' : '#',
+    'double-sharp':'##',
+    'triple-sharp':'###',
+    'quadruple-sharp':'###',
+
+    'flat':'-',
+    'double-flat':'--',
+    'triple-flat':'---',
+    'quadruple-flat':'----',
+
+    'half-sharp':'~',
+    'one-and-a-half-sharp':'#~',
+    'half-flat':'`',
+    'one-and-a-half-flat':'-`',
+}
+
+
 #-------------------------------------------------------------------------------
 # utility functions
 def convertPitchClassToNumber(ps):
@@ -305,7 +325,7 @@ class Accidental(music21.Music21Object):
         #alterExp  = [0,0,0] # exponental alteration 
         # (e.g., [2,3,19] = 2**(3/19))
         #alterHarm = 0       # altered according to a harmonic
-
+        #environLocal.printDebug(['specifier', specifier])
         self.set(specifier)
 
     def __repr__(self):
@@ -408,58 +428,63 @@ class Accidental(music21.Music21Object):
         if name in ['natural', "n", 0]: 
             self.name = 'natural'
             self.alter = 0.0
-            self.modifier = ''
-        elif name in ['sharp', "#", "is", 1, 1.0]:
+        elif name in ['sharp', accidentalNameToModifier['sharp'], "is", 1, 1.0]:
             self.name = 'sharp'
             self.alter = 1.0
-            self.modifier = '#'
-        elif name in ['double-sharp', "##", "isis", 2]:
+        elif name in ['double-sharp', accidentalNameToModifier['double-sharp'], 
+            "isis", 2]:
             self.name = 'double-sharp'
             self.alter = 2.0
-            self.modifier = '##'
-        elif name in ['flat', "-", "es", -1]:
+        elif name in ['flat', accidentalNameToModifier['flat'], "es", -1]:
             self.name = 'flat'
             self.alter = -1.0
-            self.modifier = '-'
-        elif name in ['double-flat', "--", "eses", -2]:
+        elif name in ['double-flat', accidentalNameToModifier['double-flat'], 
+            "eses", -2]:
             self.name = 'double-flat'
             self.alter = -2.0
-            self.modifier = '--'
         
-        elif name in ['half-sharp', 'quarter-sharp', 'ih', 'semisharp', .5]:
+        elif name in ['half-sharp', accidentalNameToModifier['half-sharp'], 
+            'quarter-sharp', 'ih', 'semisharp', .5]:
             self.name = 'half-sharp'
             self.alter = 0.5
-        elif name in ['one-and-a-half-sharp', 'three-quarter-sharp', \
-             'three-quarters-sharp', 'isih', 'sesquisharp', 1.5]:
+        elif name in ['one-and-a-half-sharp', 
+            accidentalNameToModifier['one-and-a-half-sharp'],
+            'three-quarter-sharp', 'three-quarters-sharp', 'isih', 
+            'sesquisharp', 1.5]:
             self.name = 'one-and-a-half-sharp'
             self.alter = 1.5  
-        elif name in ['half-flat', 'quarter-flat', 'eh', 'semiflat', -.5]:
+        elif name in ['half-flat', accidentalNameToModifier['half-flat'], 
+            'quarter-flat', 'eh', 'semiflat', -.5]:
             self.name = 'half-flat'
             self.alter = -0.5
-        elif name in ['one-and-a-half-flat', 'three-quarter-flat', \
-             'three-quarters-flat', 'eseh', 'sesquiflat', -1.5]:
+        elif name in ['one-and-a-half-flat', 
+            accidentalNameToModifier['one-and-a-half-flat'],
+            'three-quarter-flat', 'three-quarters-flat', 'eseh', 
+            'sesquiflat', -1.5]:
             self.name = 'one-and-a-half-flat'
             self.alter = -1.5
-            
-        elif name in ['triple-sharp', '###', 'isisis', 3]:
+        elif name in ['triple-sharp', accidentalNameToModifier['triple-sharp'], 
+            'isisis', 3]:
             self.name = 'triple-sharp'
             self.alter = 3.0
-            self.modifier = "###"
-        elif name in ['quadruple-sharp', '####', 'isisisis', 4]:
+        elif name in ['quadruple-sharp', 
+            accidentalNameToModifier['quadruple-sharp'], 'isisisis', 4]:
             self.name = 'quadruple-sharp'
             self.alter = 4.0
-            self.modifier = "####"
-        elif name in ['triple-flat', '---', 'eseses', -3]:
+        elif name in ['triple-flat', accidentalNameToModifier['triple-flat'],
+            'eseses', -3]:
             self.name = 'triple-flat'
             self.alter = -3.0
-            self.modifier = '---'
-        elif name in ['quadruple-flat', '----', 'eseseses', -4]:
+        elif name in ['quadruple-flat', 
+            accidentalNameToModifier['quadruple-flat'], 'eseseses', -4]:
             self.name = 'quadruple-flat'
             self.alter = -4.0
-            self.modifier = '----'
-        
         else:
             raise AccidentalException('%s is not a supported accidental type' % name)
+
+        # always set modifier from dictionary
+        self.modifier = accidentalNameToModifier[self.name]
+
 
 
     #---------------------------------------------------------------------------
@@ -532,7 +557,6 @@ class Accidental(music21.Music21Object):
         if (self.name == "one-and-a-half-sharp"): lilyRet = "isih"
         if (self.name == "half-flat"): lilyRet = "eh"
         if (self.name == "one-and-a-half-flat"): lilyRet = "eseh"
-        
         return lilyRet
         
     def _setLily(self, value):
@@ -648,7 +672,6 @@ class Accidental(music21.Music21Object):
 class Pitch(music21.Music21Object):
     '''An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.
     '''
-
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi']
     # documentation for all attributes (not properties or methods)
@@ -699,7 +722,7 @@ class Pitch(music21.Music21Object):
         # name combines step, octave, and accidental
         if name is not None:
             if not common.isNum(name):       
-                self._setName(name)
+                self._setName(name) # set based on string
             else: # is a number
                 self._setPitchClass(name)
 
@@ -957,10 +980,11 @@ class Pitch(music21.Music21Object):
                 octNot.append(char)
         usrStr = ''.join(octNot)
         octFound = ''.join(octFound)
-
+        # we have nothing but pitch specification
         if len(usrStr) == 1 and usrStr in STEPREF.keys():
             self._step = usrStr
             self.accidental = None
+        # assume everything following pitch is accidental specification
         elif len(usrStr) > 1 and usrStr[0] in STEPREF.keys():
             self._step = usrStr[0]
             self.accidental = Accidental(usrStr[1:])
@@ -1378,29 +1402,37 @@ class Pitch(music21.Music21Object):
     def _getMusicXML(self):
         '''Provide a complete MusicXML representation. Presently, this is based on 
         '''
-        mxNote = self._getMX()
-        mxMeasure = musicxml.Measure()
-        mxMeasure.setDefaults()
-        mxMeasure.append(mxNote)
-        mxPart = musicxml.Part()
-        mxPart.setDefaults()
-        mxPart.append(mxMeasure)
+        from music21 import stream, note
+        n = note.Note()
+        n.pitch = copy.deepcopy(self)
+        out = stream.Stream()
+        out.append(n)
+        # call the musicxml property on Stream
+        return out.musicxml
 
-        mxScorePart = musicxml.ScorePart()
-        mxScorePart.setDefaults()
-        mxPartList = musicxml.PartList()
-        mxPartList.append(mxScorePart)
-
-        mxIdentification = musicxml.Identification()
-        mxIdentification.setDefaults() # will create a composer
-
-        mxScore = musicxml.Score()
-        mxScore.setDefaults()
-        mxScore.set('partList', mxPartList)
-        mxScore.set('identification', mxIdentification)
-        mxScore.append(mxPart)
-
-        return mxScore.xmlStr()
+#         mxNote = self._getMX()
+#         mxMeasure = musicxml.Measure()
+#         mxMeasure.setDefaults()
+#         mxMeasure.append(mxNote)
+#         mxPart = musicxml.Part()
+#         mxPart.setDefaults()
+#         mxPart.append(mxMeasure)
+# 
+#         mxScorePart = musicxml.ScorePart()
+#         mxScorePart.setDefaults()
+#         mxPartList = musicxml.PartList()
+#         mxPartList.append(mxScorePart)
+# 
+#         mxIdentification = musicxml.Identification()
+#         mxIdentification.setDefaults() # will create a composer
+# 
+#         mxScore = musicxml.Score()
+#         mxScore.setDefaults()
+#         mxScore.set('partList', mxPartList)
+#         mxScore.set('identification', mxIdentification)
+#         mxScore.append(mxPart)
+# 
+#         return mxScore.xmlStr()
 
     def _setMusicXML(self, mxNote):
         '''
@@ -2601,6 +2633,12 @@ class Test(unittest.TestCase):
         self.assertEqual(lowC.octave, -1)
 
 
+    def testQuarterToneA(self):
+        p1 = Pitch('D#~')
+        #environLocal.printDebug([p1, p1.accidental])
+        self.assertEqual(str(p1), 'D#~')
+        #p1.show()
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Pitch, Accidental]
@@ -2612,16 +2650,10 @@ if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
-        a = Test()
-        b = TestExternal()
-
-#         a.testUpdateAccidentalDisplayComplete()
-# 
-#         a.testUpdateAccidentalDisplaySeriesKeySignature()
-
-        #a.testPitchEquality()  
-
-        a.testUpdateAccidentalDisplaySimple()
+        t = Test()
+        te = TestExternal()
+        # are is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
 #------------------------------------------------------------------------------
 # eof
