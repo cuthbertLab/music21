@@ -46,7 +46,10 @@ class Test(unittest.TestCase):
 
     
     def test_Ch6_basic_I_A(self, *arguments, **keywords):
-
+        '''p55
+        Write a whole note on the specified generic interval. Do not add sharps or flats. 
+        '''
+        # note: sharps and flats are still being added: need generic transposition or scale-based approach
         pitches = ['d4', 'f4', 'e4', 'c4', 'a4']
         # these are generic intervals
         intervals = [2, 5, 3, 7, 4]
@@ -85,7 +88,6 @@ class Test(unittest.TestCase):
                 # convert generic to chromatic
                 interval.convertGenericToSemitone(intervals[i])) 
             c = chord.Chord([p, p.transpose(iObj)], type='whole')
-        
             s.append(c)
 
         if 'show' in keywords.keys() and keywords['show']:
@@ -103,6 +105,47 @@ class Test(unittest.TestCase):
             self.assertEqual(c.pitches[0].ps > c.pitches[1].ps, True)
 
 
+#-------------------------------------------------------------------------------
+# II. Writing major and perfect pitch intervals
+
+    def test_Ch6_basic_II_A(self, *arguments, **keywords):
+        # combines 1 and 2
+
+        pitches1 = ['e-4', 'f#4', 'a-4', 'd4', 'f4']
+        intervals1 = ['M6', 'p5', 'M3', 'M7', 'P4']
+
+        pitches2 = ['c#4', 'f3', 'a3', 'b-3', 'e-3']
+        intervals2 = ['-M6', '-p5', '-M7', '-M2', '-P4']
+
+        pitches = pitches1 + pitches2
+        intervals = intervals1 + intervals2
+
+        s = stream.Stream()
+        for i, p in enumerate(pitches):
+            if i == 0:
+                s.append(clef.TrebleClef())
+            if i == len(pitches1):
+                s.append(clef.BassClef())
+
+            p = pitch.Pitch(p) # convert string to obj
+            iObj = interval.Interval(intervals[i])
+            c = chord.Chord([p, p.transpose(iObj)], type='whole')
+            s.append(c)
+
+        if 'show' in keywords.keys() and keywords['show']:
+            s.show()    
+
+        match = []
+        for c in s.getElementsByClass('Chord'):
+            # append second pitch as a string
+            match.append(str(c.pitches[1]))
+        self.assertEqual(match, ['C5', 'C#5', 'C5', 'C#5', 'B-4', 'E3', 'B-2', 'B-2', 'A-3', 'B-2'])
+
+
+    def test_Ch6_basic_II_B(self, *arguments, **keywords):
+        pass
+
+
 
 
 if __name__ == "__main__":
@@ -115,7 +158,7 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
 
-        #t.test_Ch6_basic_I_B(show=True)
+        #t.test_Ch6_basic_II_A(show=True)
 
 
 
