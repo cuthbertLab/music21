@@ -73,6 +73,34 @@ class Test(unittest.TestCase):
 
 
 
+    def test_Ch6_basic_I_B(self, *arguments, **keywords):
+        pitches = ['g3', 'e3', 'd3', 'c3', 'g3']
+        # these are generic intervals
+        intervals = [-7, -5, -3, -2, -4]
+    
+        s = stream.Stream()
+        for i, p in enumerate(pitches):
+            p = pitch.Pitch(p) # convert string to obj
+            iObj = interval.Interval(
+                # convert generic to chromatic
+                interval.convertGenericToSemitone(intervals[i])) 
+            c = chord.Chord([p, p.transpose(iObj)], type='whole')
+        
+            s.append(c)
+
+        if 'show' in keywords.keys() and keywords['show']:
+            s.show()    
+
+        self.assertEqual(len(s), 5)
+        self.assertEqual(s[0].forteClass, '2-1')
+        self.assertEqual(s[1].forteClass, '2-5')
+        self.assertEqual(s[2].forteClass, '2-4')
+        self.assertEqual(s[3].forteClass, '2-2')
+        self.assertEqual(s[4].forteClass, '2-5')
+
+        for c in s.getElementsByClass('Chord'):
+            # first pitch is higher than second
+            self.assertEqual(c.pitches[0].ps > c.pitches[1].ps, True)
 
 
 
@@ -87,4 +115,7 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
 
-        t.test_Ch6_basic_I_A(show=False)
+        #t.test_Ch6_basic_I_B(show=True)
+
+
+

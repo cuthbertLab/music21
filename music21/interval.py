@@ -326,39 +326,48 @@ def convertGenericToSemitone(value):
     '''Convert a generic specification into an interval count. This uses a default mapping. 
     '''
     # translate strings; return number
+    # note: this may be negative
     value = convertGeneric(value)
+    directionScalar = 1
+    if value < 0:
+        directionScalar = -1
+    value = abs(value)
+
+    st = None
     if value == 1:
-        return 0
+        st = 0
     elif value == 2:
-        return 2
+        st = 2
     elif value == 3:
-        return 4
+        st = 4
     elif value == 4:
-        return 5
+        st = 5
     elif value == 5:
-        return 7
+        st = 7
     elif value == 6:
-        return 9
+        st = 9
     elif value == 7:
-        return 11
+        st = 11
     elif value == 8:
-        return 12
+        st = 12
     elif value == 9:
-        return 2 + 12
+        st = 2 + 12
     elif value == 10:
-        return 4 + 12
+        st = 4 + 12
     elif value == 11:
-        return 5 + 12
+        st = 5 + 12
     elif value == 12:
-        return 7 + 12
+        st = 7 + 12
     elif value == 13:
-        return 9 + 12
+        st = 9 + 12
     elif value == 14:
-        return 11 + 12
+        st = 11 + 12
     elif value == 15:
-        return 12 + 12
+        st = 12 + 12
     elif value == 16:
-        return 2 + 24
+        st = 2 + 24
+
+    return st * directionScalar
     
 
 def convertSemitoneToSpecifierGeneric(count):
