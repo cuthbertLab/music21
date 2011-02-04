@@ -457,6 +457,7 @@ class Stream(music21.Music21Object):
                 return True
         return False
 
+
     def mergeElements(self, other, classFilterList=[]):
         '''Given another Stream, store references of each element in the other Stream in this Stream. This does not make copies of any elements, but simply stores all of them in this Stream.
 
@@ -498,10 +499,26 @@ class Stream(music21.Music21Object):
                 self.storeAtEnd(e)
         #self._elementsChanged()
 
+
+    def getElementByObjectId(self, objId):
+        '''Low-level tool to get an element based only on the object id. This does not yet handle ElementWrapper objects
+        '''
+        # TODO: refactor to handle possibility of multiple values
+        for e in self._elements:
+            if id(e) == objId: 
+                return e
+        for e in self._endElements:
+            if id(e) == objId: 
+                return e
+        return None
+
+
     def indexList(self, obj, firstMatchOnly=False):
         '''Return a list of one or more index values where the supplied object is found on this Stream's `elements` list. 
 
         To just return the first matched index, set `firstMatchOnly` to True.
+
+        The `obj` parameter may be an object or an id of an object. 
 
         No matches are found, an empty list is returned.
 
@@ -520,16 +537,22 @@ class Stream(music21.Music21Object):
         [0]
         >>> s.indexList(n2)
         [1]
-
         '''
+        # NOTE: this supports multiple instances of the same object in one 
+        # stream. to be developed.
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
+        if common.isNum(obj):
+            objId = obj
+        else:
+            objId = id(obj)
 
         iMatch = []
         elements = self.elements # store once as concatenating
         for i in range(len(elements)):
-            if id(elements[i]) == id(obj):
+            if id(elements[i]) == objId:
                 iMatch.append(i)
+            # for object wrappers
             elif (hasattr(elements[i], "obj") and obj == elements[i].obj):
                 iMatch.append(i)
             if firstMatchOnly and len(iMatch) > 0:
@@ -1132,12 +1155,23 @@ class Stream(music21.Music21Object):
         '''Given a `target` object, replace all references of that object with 
         references to the supplied `replacement` object.
 
+        
+
         If `allTargetSites` is True (as it is by default), all sites that 
         have a reference for the replacement will be similarly changed. 
         This is useful for altering both a flat and nested representation.         
         '''
         # get all indices in this Stream that match
-        iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+        if common.isNum(target): # matching object id number
+            iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+        else: # matching object directly
+            iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+
+        # target can be given as an obj id number
+        if common.isNum(target):
+            # replace target id with target
+            target = self.getElementByObjectId(target) 
+
         eLen = len(self._elements)
         for i in iMatch:
             # replace all index target with the replacement
@@ -1166,6 +1200,7 @@ class Stream(music21.Music21Object):
                 if site == None or site == self:
                     continue
                 site.replace(target, replacement, firstMatchOnly=firstMatchOnly)
+
 
 
     #---------------------------------------------------------------------------
@@ -7601,10 +7636,7 @@ class Opus(Stream):
                     mdNew.composer = md.composer
 
         sNew.insert(0, mdNew)
-
         return sNew
-
-    
 
     #---------------------------------------------------------------------------
     def write(self, fmt=None, fp=None):
@@ -7625,6 +7657,26 @@ class Opus(Stream):
         for s in self.scores:
             s.show(fmt=fmt, app=app)
 
+
+
+#-------------------------------------------------------------------------------
+class SpannerStorage(Stream):
+    '''
+    For advanced use. This Stream subclass is used inside of a Spanner object to provide object storage.
+
+    This subclass name can be used to search an object's DefinedContexts and find any and all locations that are SpannerStorage objects.
+
+    A `spannerParent` keyword argument must be provided by the Spanner in creation. 
+    '''
+    def __init__(self, *arguments, **keywords):
+        Stream.__init__(self, *arguments, **keywords)
+
+        # must provide a keyword argument with a reference to the spanner parent
+        # could name spannerContainer or other?
+        #environLocal.printDebug('keywords', keywords)
+        self.spannerParent = None
+        if 'spannerParent' in keywords.keys():
+            self.spannerParent = keywords['spannerParent']
 
 
 

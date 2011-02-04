@@ -3284,235 +3284,216 @@ class ElementWrapper(Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class WeakElementWrapper(Music21Object):
-    '''An element wraps a :class:`~music21.base.Music21Object` and stores it as a weak reference.
-    
-    The object stored within ElementWrapper is available from the the :attr:`~music21.base.ElementWrapper.obj` property.
-    
-    Providing an object at initialization is mandatory. 
-    '''
-
-    _DOC_ORDER = ['obj']
-    _DOC_ATTR = {
-    'obj': 'The object this wrapper wraps.',
-    }
-
-    def __init__(self, obj):
-        self._obj = None # actual storage
-        # store object id() for comparison without unwrapping
-        self._objId = None
-        # must define above first, before calling this
-        Music21Object.__init__(self)
-        self._setObj(obj) # object set with property
-        self._unlinkedDuration = None
-
-    def _setObj(self, obj):
-        self._objId = id(obj)
-        self._obj = common.wrapWeakref(obj)
-        environLocal.printDebug(['setting object', obj])
-
-    def _getObj(self):
-        return common.unwrapWeakref(self._obj)
-
-    obj = property(_getObj, _setObj)
-
-    # for serialization, need to wrap and unwrap weakrefs
-    def freezeIds(self):
-        pass
-
-    def unfreezeIds(self):
-        pass
-
-    def __copy__(self):
-        '''
-        Makes a copy of this element with a reference
-        to the SAME object but with unlinked offset, priority
-        and a cloned Groups object
-        '''
-        # will be None if obj has gone out of scope
-        if self.obj is None:
-            return None
-        # this calls a new class with a dereferenced copy
-        new = self.__class__(self.obj)
-        for name in self.__dict__.keys():
-            if name.startswith('__'):
-                continue
-            part = getattr(self, name)
-            newValue = part # just provide a reference
-            setattr(new, name, newValue)
-
-        # it is assumed that we need new objects for groups, contexts
-        # and locations in order to position / group this object
-        # independently
-        new.groups = copy.deepcopy(self.groups)
-        new._definedContexts = copy.deepcopy(self._definedContexts)
-        return new
-
-    def __deepcopy__(self, memo=None):
-        '''
-        '''
-        new = self.__copy__()
-        new._idLastDeepCopyOf = id(self)
-        return new
-
-
-    def _getClasses(self):
-        # if stored object is not None, return its classes
-        objRef = self.obj
-        if objRef is not None:
-            return [x.__name__ for x in objRef.__class__.mro()] 
-        else:
-            return [x.__name__ for x in self.__class__.mro()] 
-
-    classes = property(_getClasses, 
-        doc='''Returns a list containing the names (strings, not objects) of classes that are found in the object contained in this wrapper
-    
-        >>> from music21 import *
-        >>> n1 = note.QuarterNote()
-        >>> wew = WeakElementWrapper(n1)
-        >>> wew.classes[:5]
-        ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object']
-        >>> del n1
-        >>> wew.classes
-        ['WeakElementWrapper', 'Music21Object', 'JSONSerializer', 'object']
-        ''')
-
-
-
-    #---------------------------------------------------------------------------
-    # properties
-
-    def getId(self):
-        objRef = self.obj
-        if objRef is not None:
-            if hasattr(objRef, "id"):
-                return objRef.id
-        return None
-
-    def setId(self, newId):
-        objRef = self.obj
-        if objRef is not None:
-            if hasattr(objRef, "id"):
-                objRef.id = newId
-
-    id = property(getId, setId)
-
-
-    def _getDuration(self):
-        '''
-        Gets the duration of the WeakElementWrapper (if separately set), but
-        normal returns the duration of the component object if available, otherwise returns None.
-        '''
-        objRef = self.obj
-        if self._unlinkedDuration is not None:
-            #environLocal.printDebug(['returning unlinkedDuration'])
-            return self._unlinkedDuration
-        elif objRef is not None and hasattr(objRef, 'duration'):
-            #environLocal.printDebug(['returning objRef.duration'])
-            return objRef.duration
-        else:
-            #environLocal.printDebug(['get get duration; returning None'])
-            return None
-
-    def _setDuration(self, durationObj):
-        '''
-        Set the offset as a quarterNote length
-        '''
-        #environLocal.printDebug(['calling _setDuration', 'durationObj', durationObj])
-        if not hasattr(durationObj, "quarterLength"):
-            raise Exception('this must be a Duration object, not %s' % durationObj)
-        objRef = self.obj        
-        if objRef is not None and hasattr(objRef, 'duration'):
-            # if a number assume it is a quarter length
-            objRef.duration = durationObj
-        else:
-            self._unlinkedDuration = durationObj
-            
-    duration = property(_getDuration, _setDuration)
-
-    offset = property(Music21Object._getOffset, Music21Object._setOffset)
-
-    #---------------------------------------------------------------------------
-    def __repr__(self):
-        shortObj = (str(self.obj))[0:30]
-        if len(str(self.obj)) > 30:
-            shortObj += "..."
-        if self.id is not None:
-            return '<%s id=%s offset=%s obj="%s">' % \
-                (self.__class__.__name__, self.id, self.offset, shortObj)
-        else:
-            return '<%s offset=%s obj="%s">' % \
-                (self.__class__.__name__, self.offset, shortObj)
-
-
-    def __eq__(self, other):
-        '''Test WeakElementWrapper equality
-
-        >>> import note
-        >>> n1 = note.Note("C#")
-        >>> a = WeakElementWrapper(n1)
-        >>> a.offset = 3.0
-        >>> b = WeakElementWrapper(n1)
-        >>> b.offset = 1.0
-        >>> a == b # offset does not matter here
-        True
-        '''
-        if hasattr(other, "obj"):
-            if self.obj == other.obj:
-                return True
-        return False
-
-    def __ne__(self, other):
-        '''
-        '''
-        return not self.__eq__(other)
-
-# this leads to complications; may not be necessary, as objects should be
-# dereference from .obj property for setting values
-#     def __setattr__(self, name, value):
-#         #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
+# class WeakElementWrapper(Music21Object):
+#     '''An element wraps a :class:`~music21.base.Music21Object` and stores it as a weak reference.
+#     
+#     The object stored within ElementWrapper is available from the the :attr:`~music21.base.ElementWrapper.obj` property.
+#     
+#     Providing an object at initialization is mandatory. 
+#     '''
 # 
-#         # if in the ElementWrapper already, set that first
-#         if name in self.__dict__:  
-#             object.__setattr__(self, name, value)
+#     _DOC_ORDER = ['obj']
+#     _DOC_ATTR = {
+#     'obj': 'The object this wrapper wraps.',
+#     }
+# 
+#     def __init__(self, obj):
+#         self._obj = None # actual storage
+#         # store object id() for comparison without unwrapping
+#         self._objId = None
+#         # must define above first, before calling this
+#         Music21Object.__init__(self)
+#         self._setObj(obj) # object set with property
+#         self._unlinkedDuration = None
+# 
+#     def _setObj(self, obj):
+#         self._objId = id(obj)
+#         self._obj = common.wrapWeakref(obj)
+#         environLocal.printDebug(['setting object', obj])
+# 
+#     def _getObj(self):
+#         return common.unwrapWeakref(self._obj)
+# 
+#     obj = property(_getObj, _setObj)
+# 
+#     # for serialization, need to wrap and unwrap weakrefs
+#     def freezeIds(self):
+#         pass
+# 
+#     def unfreezeIds(self):
+#         pass
+# 
+#     def __copy__(self):
+#         '''
+#         Makes a copy of this element with a reference
+#         to the SAME object but with unlinked offset, priority
+#         and a cloned Groups object
+#         '''
+#         # will be None if obj has gone out of scope
+#         if self.obj is None:
+#             return None
+#         # this calls a new class with a dereferenced copy
+#         new = self.__class__(self.obj)
+#         for name in self.__dict__.keys():
+#             if name.startswith('__'):
+#                 continue
+#             part = getattr(self, name)
+#             newValue = part # just provide a reference
+#             setattr(new, name, newValue)
+# 
+#         # it is assumed that we need new objects for groups, contexts
+#         # and locations in order to position / group this object
+#         # independently
+#         new.groups = copy.deepcopy(self.groups)
+#         new._definedContexts = copy.deepcopy(self._definedContexts)
+#         return new
+# 
+#     def __deepcopy__(self, memo=None):
+#         '''
+#         '''
+#         new = self.__copy__()
+#         new._idLastDeepCopyOf = id(self)
+#         return new
+# 
+# 
+#     def _getClasses(self):
+#         # if stored object is not None, return its classes
+#         objRef = self.obj
+#         if objRef is not None:
+#             return [x.__name__ for x in objRef.__class__.mro()] 
 #         else:
-#             # if not, change the attribute in the stored object
-#             storedobj = self._getObj()
-#             #storedobj = object.__getattribute__(self, "obj")
-#             if name not in ['offset', '_offset', '_activeSite'] and \
-#                 storedobj is not None and hasattr(storedobj, name):
-#                 setattr(storedobj, name, value)
-#             # unless neither has the attribute, in which case add it to the ElementWrapper
-#             else:  
-#                 object.__setattr__(self, name, value)
-
-    def __getattr__(self, name):
-        '''This method is only called when __getattribute__() fails.
-        Using this also avoids the potential recursion problems of subclassing
-        __getattribute__()_
-        
-        see: http://stackoverflow.com/questions/371753/python-using-getattribute-method for examples
-
-        >>> import note
-        >>> n1 = note.Note("C#4")
-        >>> a = WeakElementWrapper(n1)
-        >>> a.pitch.nameWithOctave
-        'C#4'
-        >>> del n1
-        >>> a.pitch.nameWithOctave
-        Traceback (most recent call last):
-        AttributeError: Could not get attribute 'pitch'
-        >>> a.obj == None
-        True
-        '''
-        storedobj = self._getObj()
-        if name == 'obj': # return unwrapped object
-            return storedobj
-
-        if storedobj is None:
-            raise AttributeError("Could not get attribute '" + name + "'")
-        else:
-            return object.__getattribute__(storedobj, name)
+#             return [x.__name__ for x in self.__class__.mro()] 
+# 
+#     classes = property(_getClasses, 
+#         doc='''Returns a list containing the names (strings, not objects) of classes that are found in the object contained in this wrapper
+#     
+#         >>> from music21 import *
+#         >>> n1 = note.QuarterNote()
+#         >>> wew = WeakElementWrapper(n1)
+#         >>> wew.classes[:5]
+#         ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object']
+#         >>> del n1
+#         >>> wew.classes
+#         ['WeakElementWrapper', 'Music21Object', 'JSONSerializer', 'object']
+#         ''')
+# 
+# 
+# 
+#     #---------------------------------------------------------------------------
+#     # properties
+# 
+#     def getId(self):
+#         objRef = self.obj
+#         if objRef is not None:
+#             if hasattr(objRef, "id"):
+#                 return objRef.id
+#         return None
+# 
+#     def setId(self, newId):
+#         objRef = self.obj
+#         if objRef is not None:
+#             if hasattr(objRef, "id"):
+#                 objRef.id = newId
+# 
+#     id = property(getId, setId)
+# 
+# 
+#     def _getDuration(self):
+#         '''
+#         Gets the duration of the WeakElementWrapper (if separately set), but
+#         normal returns the duration of the component object if available, otherwise returns None.
+#         '''
+#         objRef = self.obj
+#         if self._unlinkedDuration is not None:
+#             #environLocal.printDebug(['returning unlinkedDuration'])
+#             return self._unlinkedDuration
+#         elif objRef is not None and hasattr(objRef, 'duration'):
+#             #environLocal.printDebug(['returning objRef.duration'])
+#             return objRef.duration
+#         else:
+#             #environLocal.printDebug(['get get duration; returning None'])
+#             return None
+# 
+#     def _setDuration(self, durationObj):
+#         '''
+#         Set the offset as a quarterNote length
+#         '''
+#         #environLocal.printDebug(['calling _setDuration', 'durationObj', durationObj])
+#         if not hasattr(durationObj, "quarterLength"):
+#             raise Exception('this must be a Duration object, not %s' % durationObj)
+#         objRef = self.obj        
+#         if objRef is not None and hasattr(objRef, 'duration'):
+#             # if a number assume it is a quarter length
+#             objRef.duration = durationObj
+#         else:
+#             self._unlinkedDuration = durationObj
+#             
+#     duration = property(_getDuration, _setDuration)
+# 
+#     offset = property(Music21Object._getOffset, Music21Object._setOffset)
+# 
+#     #---------------------------------------------------------------------------
+#     def __repr__(self):
+#         shortObj = (str(self.obj))[0:30]
+#         if len(str(self.obj)) > 30:
+#             shortObj += "..."
+#         if self.id is not None:
+#             return '<%s id=%s offset=%s obj="%s">' % \
+#                 (self.__class__.__name__, self.id, self.offset, shortObj)
+#         else:
+#             return '<%s offset=%s obj="%s">' % \
+#                 (self.__class__.__name__, self.offset, shortObj)
+# 
+# 
+#     def __eq__(self, other):
+#         '''Test WeakElementWrapper equality
+# 
+#         >>> import note
+#         >>> n1 = note.Note("C#")
+#         >>> a = WeakElementWrapper(n1)
+#         >>> a.offset = 3.0
+#         >>> b = WeakElementWrapper(n1)
+#         >>> b.offset = 1.0
+#         >>> a == b # offset does not matter here
+#         True
+#         '''
+#         if hasattr(other, "obj"):
+#             if self.obj == other.obj:
+#                 return True
+#         return False
+# 
+#     def __ne__(self, other):
+#         '''
+#         '''
+#         return not self.__eq__(other)
+# 
+#     def __getattr__(self, name):
+#         '''This method is only called when __getattribute__() fails.
+#         Using this also avoids the potential recursion problems of subclassing
+#         __getattribute__()_
+#         
+#         see: http://stackoverflow.com/questions/371753/python-using-getattribute-method for examples
+# 
+#         >>> import note
+#         >>> n1 = note.Note("C#4")
+#         >>> a = WeakElementWrapper(n1)
+#         >>> a.pitch.nameWithOctave
+#         'C#4'
+#         >>> del n1
+#         >>> a.pitch.nameWithOctave
+#         Traceback (most recent call last):
+#         AttributeError: Could not get attribute 'pitch'
+#         >>> a.obj == None
+#         True
+#         '''
+#         storedobj = self._getObj()
+#         if name == 'obj': # return unwrapped object
+#             return storedobj
+# 
+#         if storedobj is None:
+#             raise AttributeError("Could not get attribute '" + name + "'")
+#         else:
+#             return object.__getattribute__(storedobj, name)
 
 
 
@@ -4226,25 +4207,25 @@ class Test(unittest.TestCase):
         self.assertEqual(n2._idLastDeepCopyOf, id(n1))
 
     
-    def testWeakElementWrapper(self):
-        from music21 import note
-        n = note.Note('g2')
-        n.quarterLength = 1.5
-        self.assertEqual(n.quarterLength, 1.5)
-
-        self.assertEqual(n, n)
-        wew = WeakElementWrapper(n)
-        unwrapped = wew.obj
-        self.assertEqual(str(unwrapped), '<music21.note.Note G>')
-
-        self.assertEqual(unwrapped.pitch, n.pitch)
-        self.assertEqual(unwrapped.pitch.nameWithOctave, 'G2')
-
-        self.assertEqual(unwrapped.quarterLength, n.quarterLength)
-        self.assertEqual(unwrapped.quarterLength, 1.5)
-        self.assertEqual(n.quarterLength, 1.5)
-
-        self.assertEqual(n, unwrapped)
+#     def testWeakElementWrapper(self):
+#         from music21 import note
+#         n = note.Note('g2')
+#         n.quarterLength = 1.5
+#         self.assertEqual(n.quarterLength, 1.5)
+# 
+#         self.assertEqual(n, n)
+#         wew = WeakElementWrapper(n)
+#         unwrapped = wew.obj
+#         self.assertEqual(str(unwrapped), '<music21.note.Note G>')
+# 
+#         self.assertEqual(unwrapped.pitch, n.pitch)
+#         self.assertEqual(unwrapped.pitch.nameWithOctave, 'G2')
+# 
+#         self.assertEqual(unwrapped.quarterLength, n.quarterLength)
+#         self.assertEqual(unwrapped.quarterLength, 1.5)
+#         self.assertEqual(n.quarterLength, 1.5)
+# 
+#         self.assertEqual(n, unwrapped)
 
 
 #-------------------------------------------------------------------------------
