@@ -2973,30 +2973,6 @@ class ElementWrapper(Music21Object):
         self.obj = obj # object stored here        
         self._unlinkedDuration = None
 
-#     def isClass(self, className):
-#         '''
-#         DEPRICATED DON'T USE
-#         
-#         Returns true if the object embedded is a particular class.
-# 
-#         Used by getElementsByClass in Stream
-# 
-#         >>> import note
-#         >>> a = ElementWrapper(None)
-#         >>> a.isClass(note.Note)
-#         False
-#         >>> a.isClass(types.NoneType)
-#         True
-#         >>> b = ElementWrapper(note.Note('A4'))
-#         >>> b.isClass(note.Note)
-#         True
-#         >>> b.isClass(types.NoneType)
-#         False
-#         '''
-#         if isinstance(self.obj, className):
-#             return True
-#         else:
-#             return False
 
     def __copy__(self):
         '''
@@ -3083,6 +3059,9 @@ class ElementWrapper(Music21Object):
 
         new._idLastDeepCopyOf = id(self)
         return new
+
+
+
 
     #---------------------------------------------------------------------------
     # properties
@@ -3306,7 +3285,7 @@ class ElementWrapper(Music21Object):
 
 #-------------------------------------------------------------------------------
 class WeakElementWrapper(Music21Object):
-    '''An element wraps any object that is or is not :class:`~music21.base.Music21Object` and stores it as a weak reference.
+    '''An element wraps a :class:`~music21.base.Music21Object` and stores it as a weak reference.
     
     The object stored within ElementWrapper is available from the the :attr:`~music21.base.ElementWrapper.obj` property.
     
@@ -3376,6 +3355,30 @@ class WeakElementWrapper(Music21Object):
         new._idLastDeepCopyOf = id(self)
         return new
 
+
+    def _getClasses(self):
+        # if stored object is not None, return its classes
+        objRef = self.obj
+        if objRef is not None:
+            return [x.__name__ for x in objRef.__class__.mro()] 
+        else:
+            return [x.__name__ for x in self.__class__.mro()] 
+
+    classes = property(_getClasses, 
+        doc='''Returns a list containing the names (strings, not objects) of classes that are found in the object contained in this wrapper
+    
+        >>> from music21 import *
+        >>> n1 = note.QuarterNote()
+        >>> wew = WeakElementWrapper(n1)
+        >>> wew.classes[:5]
+        ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object']
+        >>> del n1
+        >>> wew.classes
+        ['WeakElementWrapper', 'Music21Object', 'JSONSerializer', 'object']
+        ''')
+
+
+
     #---------------------------------------------------------------------------
     # properties
 
@@ -3398,8 +3401,7 @@ class WeakElementWrapper(Music21Object):
     def _getDuration(self):
         '''
         Gets the duration of the WeakElementWrapper (if separately set), but
-        normal returns the duration of the component object if available, otherwise
-        returns None.
+        normal returns the duration of the component object if available, otherwise returns None.
         '''
         objRef = self.obj
         if self._unlinkedDuration is not None:
@@ -3416,11 +3418,11 @@ class WeakElementWrapper(Music21Object):
         '''
         Set the offset as a quarterNote length
         '''
-        environLocal.printDebug(['calling _setDuration', 'durationObj', durationObj])
+        #environLocal.printDebug(['calling _setDuration', 'durationObj', durationObj])
         if not hasattr(durationObj, "quarterLength"):
             raise Exception('this must be a Duration object, not %s' % durationObj)
         objRef = self.obj        
-        if hasattr(objRef, 'duration'):
+        if objRef is not None and hasattr(objRef, 'duration'):
             # if a number assume it is a quarter length
             objRef.duration = durationObj
         else:
@@ -3435,7 +3437,6 @@ class WeakElementWrapper(Music21Object):
         shortObj = (str(self.obj))[0:30]
         if len(str(self.obj)) > 30:
             shortObj += "..."
-            
         if self.id is not None:
             return '<%s id=%s offset=%s obj="%s">' % \
                 (self.__class__.__name__, self.id, self.offset, shortObj)
@@ -3445,50 +3446,29 @@ class WeakElementWrapper(Music21Object):
 
 
     def __eq__(self, other):
-        '''Test ElementWrapper equality
+        '''Test WeakElementWrapper equality
 
         >>> import note
-        >>> n = note.Note("C#")
-        >>> a = ElementWrapper(n)
+        >>> n1 = note.Note("C#")
+        >>> a = WeakElementWrapper(n1)
         >>> a.offset = 3.0
-        >>> b = ElementWrapper(n)
-        >>> b.offset = 3.0
-        >>> a == b
+        >>> b = WeakElementWrapper(n1)
+        >>> b.offset = 1.0
+        >>> a == b # offset does not matter here
         True
-        >>> a is not b
-        True
-        >>> c = ElementWrapper(n)
-        >>> c.offset = 2.0
-        >>> c.offset
-        2.0
-        >>> a == c
-        False
         '''
-        if not hasattr(other, "obj") or \
-           not hasattr(other, "offset") or \
-           not hasattr(other, "priority") or \
-           not hasattr(other, "id") or \
-           not hasattr(other, "groups") or \
-           not hasattr(other, "activeSite") or \
-           not hasattr(other, "duration"):
-            return False
-
-        if (self.obj == other.obj and \
-            self.offset == other.offset and \
-            self.priority == other.priority and \
-            self.id == other.id and \
-            self.groups == other.groups and \
-            self.activeSite == other.activeSite and \
-            self.duration == self.duration):
-            return True
-        else:
-            return False
+        if hasattr(other, "obj"):
+            if self.obj == other.obj:
+                return True
+        return False
 
     def __ne__(self, other):
         '''
         '''
         return not self.__eq__(other)
 
+# this leads to complications; may not be necessary, as objects should be
+# dereference from .obj property for setting values
 #     def __setattr__(self, name, value):
 #         #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 # 
@@ -3512,63 +3492,27 @@ class WeakElementWrapper(Music21Object):
         __getattribute__()_
         
         see: http://stackoverflow.com/questions/371753/python-using-getattribute-method for examples
+
+        >>> import note
+        >>> n1 = note.Note("C#4")
+        >>> a = WeakElementWrapper(n1)
+        >>> a.pitch.nameWithOctave
+        'C#4'
+        >>> del n1
+        >>> a.pitch.nameWithOctave
+        Traceback (most recent call last):
+        AttributeError: Could not get attribute 'pitch'
+        >>> a.obj == None
+        True
         '''
-        #storedobj = Music21Object.__getattribute__(self, "obj")
         storedobj = self._getObj()
         if name == 'obj': # return unwrapped object
             return storedobj
 
         if storedobj is None:
-            raise AttributeError("Could not get attribute '" + name + "' in an object-less element")
+            raise AttributeError("Could not get attribute '" + name + "'")
         else:
             return object.__getattribute__(storedobj, name)
-
-
-
-    def isTwin(self, other):
-        '''A weaker form of equality.  a.isTwin(b) is true if
-        a and b store either the same object OR objects that are equal
-        and a.groups == b.groups 
-        and a.id == b.id (or both are none) and duration are equal.
-        but does not require position, priority, or activeSite to be the same
-        In other words, is essentially the same object in a different context
-             
-        >>> import note
-        >>> aE = ElementWrapper(obj = note.Note("A-"))
-        >>> aE.id = "aflat-Note"
-        >>> aE.groups.append("out-of-range")
-        >>> aE.offset = 4.0
-        >>> aE.priority = 4
-        
-        >>> bE = copy.copy(aE)
-        >>> aE is bE
-        False
-        >>> aE == bE
-        True
-        >>> aE.isTwin(bE)
-        True
-
-        >>> bE.offset = 14.0
-        >>> bE.priority = -4
-        >>> aE == bE
-        False
-        >>> aE.isTwin(bE)
-        True
-        '''
-        if not hasattr(other, "obj") or \
-           not hasattr(other, "id") or \
-           not hasattr(other, "duration") or \
-           not hasattr(other, "groups"):
-            return False
-
-        if (self.obj == other.obj and \
-            self.id == other.id and \
-            self.duration == self.duration and \
-            self.groups == other.groups):
-            return True
-        else:
-            return False
-
 
 
 

@@ -366,12 +366,11 @@ class Spanner(music21.Music21Object):
 
 
 
-
+#-------------------------------------------------------------------------------
 class SpannerStream(music21.Music21Object):
     '''
     Spanner objects live on Streams as other Music21Objects, but store connections between one or more Music21Objects.
     '''
-
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)
 
@@ -380,15 +379,22 @@ class SpannerStream(music21.Music21Object):
 
         # an ordered list of Component objects
         self._components = stream.Stream()
+        # we do not want to auto sort based on offset or class, as 
+        # both are meaning less inside of this Stream (and only have meaning
+        # in Stream external to this 
+        self._components.autoSort = False
 
         # store this so subclasses can replace
         self._reprHead = '<music21.spanner.Spanner '
 
-        # addComponents any provided arguments
-        if len(arguments) > 1:
-            self._components.insert(arguments)
-        elif len(arguments) == 1: # assume a list is first arg
-            self._components.insert(arguments[0])
+        # add arguments as a list or single item
+        for c in arguments:
+            self._components.append(c)
+
+#         if len(arguments) > 1:
+#             self._components.append(arguments)
+#         elif len(arguments) == 1: # assume a list is first arg
+#                 self._components.append(c)
 
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
@@ -407,7 +413,21 @@ class SpannerStream(music21.Music21Object):
 
 
     def __getitem__(self, key):
-        return self._components[key]
+        '''
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> c1 = clef.BassClef()
+        >>> sl = spanner.SpannerStream([n1, n2, c1])
+        >>> sl[0] == n1
+        True
+        >>> sl[-1] == c1
+        True
+        >>> sl[clef.BassClef][0] == c1
+        True
+        '''
+        # delegate to Stream subclass
+        return self._components.__getitem__(key)
 
     def getComponents(self):
         '''Return all components for this Spanner as objects, without weak-refs.  
@@ -417,7 +437,7 @@ class SpannerStream(music21.Music21Object):
         >>> from music21 import *
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
-        >>> sl = spanner.Slur()
+        >>> sl = spanner.SpannerStream()
         >>> sl.addComponents(n1)
         >>> sl.getComponents() == [n1]
         True
@@ -426,17 +446,37 @@ class SpannerStream(music21.Music21Object):
         True
         >>> sl.getComponentIds() == [id(n1), id(n2)]
         True
-        >>> sl
-        <music21.spanner.Slur <music21.note.Note G><music21.note.Note F#>>
-
+        >>> c1 = clef.TrebleClef()
+        >>> sl.addComponents(c1)
+        >>> sl.getComponents() == [n1, n2, c1] # make sure that not sorting
+        True
         '''
         post = []
         for c in self._components:
 #             q = c.get() # unwrap weakreference
 #             if q != None:
-            post.append(q)
+            post.append(c)
         return post
 
+    def getComponentsByClass(self, classFilterList):
+        '''
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> c1 = clef.AltoClef()
+        >>> sl = spanner.SpannerStream()
+        >>> sl.addComponents([n1, n2, c1])
+        >>> sl.getComponentsByClass('Note') == [n1, n2]
+        True
+        >>> sl.getComponentsByClass('Clef') == [c1]
+        True
+        '''
+        # returns a Stream; pack in a list
+        postStream = self._components.getElementsByClass(classFilterList)
+        post = []
+        for e in postStream:
+            post.append(e)
+        return post
 
     def getComponentIds(self):
         '''Return all id() for all stored objects.
@@ -448,7 +488,7 @@ class SpannerStream(music21.Music21Object):
         for c in self._components:
             #q = c.id # weakref may be dead!
             #if q != None:
-            post.append(q)
+            post.append(id(c))
         return post
 
     def addComponents(self, components, *arguments, **keywords):  
@@ -463,7 +503,7 @@ class SpannerStream(music21.Music21Object):
         >>> n4 = note.Note('c')
         >>> n5 = note.Note('d-')
 
-        >>> sl = spanner.Slur()
+        >>> sl = spanner.SpannerStream()
         >>> sl.addComponents(n1)
         >>> sl.addComponents(n2, n3)
         >>> sl.addComponents([n4, n5])
@@ -486,7 +526,18 @@ class SpannerStream(music21.Music21Object):
         '''When copying a Spanner, we need to update the spanner with new references for copied components. Given the old component, this method will replace the old with the new.
 
         The `old` parameter can be either an object or object id. 
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> c1 = clef.AltoClef()
+        >>> c2 = clef.BassClef()
+        >>> sl = spanner.SpannerStream([n1, n2, c1])
+        >>> sl.replaceComponent(c1, c2)
+        >>> sl[-1] == c2
+        True
         '''
+        # TODO: rename replace
         if common.isNum(old): # assume this is an id
             idTarget = old
         else:
@@ -515,7 +566,7 @@ class SpannerStream(music21.Music21Object):
         >>> n4 = note.Note('c')
         >>> n5 = note.Note('d-')
 
-        >>> sl = spanner.Slur()
+        >>> sl = spanner.SpannerStream()
         >>> sl.addComponents(n1, n2, n3, n4, n5)
         >>> sl.isFirst(n2)
         False
@@ -543,7 +594,7 @@ class SpannerStream(music21.Music21Object):
         >>> n4 = note.Note('c')
         >>> n5 = note.Note('d-')
 
-        >>> sl = spanner.Slur()
+        >>> sl = spanner.SpannerStream()
         >>> sl.addComponents(n1, n2, n3, n4, n5)
         >>> sl.getFirst() is n1
         True
@@ -569,7 +620,7 @@ class SpannerStream(music21.Music21Object):
         >>> n4 = note.Note('c')
         >>> n5 = note.Note('d-')
 
-        >>> sl = spanner.Slur()
+        >>> sl = spanner.SpannerStream()
         >>> sl.addComponents(n1, n2, n3, n4, n5)
         >>> sl.getLast() is n5
         True
@@ -586,7 +637,7 @@ class SpannerStream(music21.Music21Object):
         idSite = id(site)
         for c in self._components:
         #for c in self.getComponents():
-            obj = c.get()
+            obj = c #c.get()
             # getting site ids is fast, as weakrefs do not have to be unpacked
             if idSite in obj.getSiteIds():
                 o = obj.getOffsetBySite(site)
@@ -613,7 +664,7 @@ class SpannerStream(music21.Music21Object):
         for c in self._components:
         #for c in self.getComponents():
             # getting site ids is fast, as weakrefs do not have to be unpacked
-            obj = c.get()
+            obj = c #c.get()
             if idSite in obj.getSiteIds():
                 o = obj.getOffsetBySite(site)
                 if componentOffset:

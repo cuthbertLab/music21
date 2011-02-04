@@ -880,6 +880,7 @@ class Stream(music21.Music21Object):
         for item in others:    
             # if not an element, embed
             if not isinstance(item, music21.Music21Object): 
+                environLocal.printDebug(['wrapping item in ElementWrapper:', item])
                 element = music21.ElementWrapper(item)
             else:
                 element = item
