@@ -589,10 +589,7 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
 
 
         #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
-
-        #if obj.isClass(note.GeneralNote):
         classes = obj.classes
-
         # test: match to 'GeneralNote'
         if 'Note' in classes or 'Rest' in classes or 'Chord' in classes:
         #if obj.isNote or obj.isRest or obj.isChord:

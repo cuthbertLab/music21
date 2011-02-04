@@ -1572,31 +1572,32 @@ class Music21Object(JSONSerializer):
         return new
 
 
-    def isClass(self, className):
-        '''
-        DEPRECATED: DO NOT USE!
-        
-        Returns a boolean value depending on if the object is a particular class or not.
-        
-        In Music21Object, it just returns the result of `isinstance`. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.isClass(note.Note)
-        True
-        >>> e = ElementWrapper(3.2)
-        >>> e.isClass(note.Note)
-        False
-        >>> e.isClass(float)
-        True
-
-        '''
-        if isinstance(self, className):
-            return True
-        else:
-            return False
+#     def isClass(self, className):
+#         '''
+#         DEPRECATED: DO NOT USE!
+#         
+#         Returns a boolean value depending on if the object is a particular class or not.
+#         
+#         In Music21Object, it just returns the result of `isinstance`. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.
+# 
+#         >>> from music21 import *
+#         >>> n = note.Note()
+#         >>> n.isClass(note.Note)
+#         True
+#         >>> e = ElementWrapper(3.2)
+#         >>> e.isClass(note.Note)
+#         False
+#         >>> e.isClass(float)
+#         True
+# 
+#         '''
+#         if isinstance(self, className):
+#             return True
+#         else:
+#             return False
 
     def _getClasses(self):
+        # TODO: cache this as a stored list?
         return [x.__name__ for x in self.__class__.mro()] 
 
     classes = property(_getClasses, 
@@ -2552,8 +2553,6 @@ class Music21Object(JSONSerializer):
         if addTies and ('Note' in e.classes or 
             'Chord' in e.classes or 
             'Unpitched' in e.classes):
-        #if (e.isClass(note.Note) or e.isClass(note.Unpitched)):
-            #environLocal.printDebug(['tieing in makeTies', e])
 
             forceEndTieType = 'stop'
             if e.tie != None:
@@ -2974,30 +2973,30 @@ class ElementWrapper(Music21Object):
         self.obj = obj # object stored here        
         self._unlinkedDuration = None
 
-    def isClass(self, className):
-        '''
-        DEPRICATED DON'T USE
-        
-        Returns true if the object embedded is a particular class.
-
-        Used by getElementsByClass in Stream
-
-        >>> import note
-        >>> a = ElementWrapper(None)
-        >>> a.isClass(note.Note)
-        False
-        >>> a.isClass(types.NoneType)
-        True
-        >>> b = ElementWrapper(note.Note('A4'))
-        >>> b.isClass(note.Note)
-        True
-        >>> b.isClass(types.NoneType)
-        False
-        '''
-        if isinstance(self.obj, className):
-            return True
-        else:
-            return False
+#     def isClass(self, className):
+#         '''
+#         DEPRICATED DON'T USE
+#         
+#         Returns true if the object embedded is a particular class.
+# 
+#         Used by getElementsByClass in Stream
+# 
+#         >>> import note
+#         >>> a = ElementWrapper(None)
+#         >>> a.isClass(note.Note)
+#         False
+#         >>> a.isClass(types.NoneType)
+#         True
+#         >>> b = ElementWrapper(note.Note('A4'))
+#         >>> b.isClass(note.Note)
+#         True
+#         >>> b.isClass(types.NoneType)
+#         False
+#         '''
+#         if isinstance(self.obj, className):
+#             return True
+#         else:
+#             return False
 
     def __copy__(self):
         '''
@@ -3307,8 +3306,7 @@ class ElementWrapper(Music21Object):
 
 #-------------------------------------------------------------------------------
 class WeakElementWrapper(Music21Object):
-    '''
-    An element wraps any object that is or is not :class:`~music21.base.Music21Object` and stores it as a weak reference.
+    '''An element wraps any object that is or is not :class:`~music21.base.Music21Object` and stores it as a weak reference.
     
     The object stored within ElementWrapper is available from the the :attr:`~music21.base.ElementWrapper.obj` property.
     
@@ -3321,7 +3319,6 @@ class WeakElementWrapper(Music21Object):
     }
 
     def __init__(self, obj):
-        # this sets Duration
         self._obj = None # actual storage
         # store object id() for comparison without unwrapping
         self._objId = None
@@ -3346,17 +3343,6 @@ class WeakElementWrapper(Music21Object):
 
     def unfreezeIds(self):
         pass
-
-
-    def isClass(self, className):
-        '''
-        DEPRICATED DON'T USE
-        
-        '''
-        if isinstance(self.obj, className):
-            return True
-        else:
-            return False
 
     def __copy__(self):
         '''
@@ -3406,7 +3392,7 @@ class WeakElementWrapper(Music21Object):
             if hasattr(objRef, "id"):
                 objRef.id = newId
 
-    id = property (getId, setId)
+    id = property(getId, setId)
 
 
     def _getDuration(self):
@@ -3502,7 +3488,6 @@ class WeakElementWrapper(Music21Object):
         '''
         '''
         return not self.__eq__(other)
-
 
 #     def __setattr__(self, name, value):
 #         #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])

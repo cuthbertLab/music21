@@ -365,6 +365,290 @@ class Spanner(music21.Music21Object):
 
 
 
+
+
+class SpannerStream(music21.Music21Object):
+    '''
+    Spanner objects live on Streams as other Music21Objects, but store connections between one or more Music21Objects.
+    '''
+
+    def __init__(self, *arguments, **keywords):
+        music21.Music21Object.__init__(self)
+
+        # store a Stream inside of Spanner
+        from music21 import stream
+
+        # an ordered list of Component objects
+        self._components = stream.Stream()
+
+        # store this so subclasses can replace
+        self._reprHead = '<music21.spanner.Spanner '
+
+        # addComponents any provided arguments
+        if len(arguments) > 1:
+            self._components.insert(arguments)
+        elif len(arguments) == 1: # assume a list is first arg
+            self._components.insert(arguments[0])
+
+        # parameters that spanners need in loading and processing
+        # local id is the id for the local area; used by musicxml
+        self.idLocal = None
+        # after all components have been gathered, setting complete
+        # will mark that all parts have been gathered. 
+        self.completeStatus = False
+
+    
+    def __repr__(self):
+        msg = [self._reprHead]
+        for obj in self.getComponents():
+            msg.append(repr(obj))
+        msg.append('>')
+        return ''.join(msg)
+
+
+    def __getitem__(self, key):
+        return self._components[key]
+
+    def getComponents(self):
+        '''Return all components for this Spanner as objects, without weak-refs.  
+
+        As this is a Music21Object, the name here is more specific to avoid name clashes.
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> sl = spanner.Slur()
+        >>> sl.addComponents(n1)
+        >>> sl.getComponents() == [n1]
+        True
+        >>> sl.addComponents(n2)
+        >>> sl.getComponents() == [n1, n2]
+        True
+        >>> sl.getComponentIds() == [id(n1), id(n2)]
+        True
+        >>> sl
+        <music21.spanner.Slur <music21.note.Note G><music21.note.Note F#>>
+
+        '''
+        post = []
+        for c in self._components:
+#             q = c.get() # unwrap weakreference
+#             if q != None:
+            post.append(q)
+        return post
+
+
+    def getComponentIds(self):
+        '''Return all id() for all stored objects.
+
+        '''
+        # this does not unwrap weakrefs, but simply gets the stored id 
+        # from the Component object
+        post = []
+        for c in self._components:
+            #q = c.id # weakref may be dead!
+            #if q != None:
+            post.append(q)
+        return post
+
+    def addComponents(self, components, *arguments, **keywords):  
+        '''Associate one or more components with this Spanner.
+
+        The order that components is added is retained and may or may not be significant to the spanner. 
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> n3 = note.Note('e')
+        >>> n4 = note.Note('c')
+        >>> n5 = note.Note('d-')
+
+        >>> sl = spanner.Slur()
+        >>> sl.addComponents(n1)
+        >>> sl.addComponents(n2, n3)
+        >>> sl.addComponents([n4, n5])
+        >>> sl.getComponentIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
+        True
+
+        '''  
+        # presently, this does not look for redundancies
+        if not common.isListLike(components):
+            components = [components]
+        # assume all other arguments
+        components += arguments
+        for c in components:
+            # create a component instance for each
+            #self._components.append(Component(c))
+            self._components.append(c)
+
+
+    def replaceComponent(self, old, new):
+        '''When copying a Spanner, we need to update the spanner with new references for copied components. Given the old component, this method will replace the old with the new.
+
+        The `old` parameter can be either an object or object id. 
+        '''
+        if common.isNum(old): # assume this is an id
+            idTarget = old
+        else:
+            idTarget = id(old)
+
+        self._components.replace(old, new)
+
+        # get index form id list; 
+#         indexTarget = self.getComponentIds().index(idTarget)
+#         self._components[indexTarget] = Component(new)
+        #environLocal.printDebug(['replaceComponent()', 'id(old)', id(old), 'id(new)', id(new)])
+
+#     def __del__(self):
+#         '''On deletion, remove this reference from Spanners.
+#         '''
+#         self._spanners.remove(self)
+# 
+
+    def isFirst(self, component):
+        '''Given a component, is it first?
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> n3 = note.Note('e')
+        >>> n4 = note.Note('c')
+        >>> n5 = note.Note('d-')
+
+        >>> sl = spanner.Slur()
+        >>> sl.addComponents(n1, n2, n3, n4, n5)
+        >>> sl.isFirst(n2)
+        False
+        >>> sl.isFirst(n1)
+        True
+        >>> sl.isLast(n1)
+        False
+        >>> sl.isLast(n5)
+        True
+
+        '''
+        idTarget = id(component)
+        if id(self._components[0]) == idTarget:
+        #if self._components[0].id == idTarget:
+            return True
+        return False
+
+    def getFirst(self):
+        '''Get the object of the first component
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> n3 = note.Note('e')
+        >>> n4 = note.Note('c')
+        >>> n5 = note.Note('d-')
+
+        >>> sl = spanner.Slur()
+        >>> sl.addComponents(n1, n2, n3, n4, n5)
+        >>> sl.getFirst() is n1
+        True
+        '''
+        return self._components[0]
+
+    def isLast(self, component):
+        '''Given a component, is it last?  Returns True or False
+        '''
+        idTarget = id(component)
+        if id(self._components[-1]) == idTarget:
+        #if self._components[-1].id == idTarget:
+            return True
+        return False
+
+    def getLast(self):
+        '''Get the object of the first component
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> n3 = note.Note('e')
+        >>> n4 = note.Note('c')
+        >>> n5 = note.Note('d-')
+
+        >>> sl = spanner.Slur()
+        >>> sl.addComponents(n1, n2, n3, n4, n5)
+        >>> sl.getLast() is n5
+        True
+
+        '''
+        return self._components[-1]
+
+    def getOffsetsBySite(self, site, componentOffset=True):
+        '''Given a site shared by all components, return a list of offset values.
+
+        To include `componentOffset` adjustments, set this value to True.
+        '''
+        post = []
+        idSite = id(site)
+        for c in self._components:
+        #for c in self.getComponents():
+            obj = c.get()
+            # getting site ids is fast, as weakrefs do not have to be unpacked
+            if idSite in obj.getSiteIds():
+                o = obj.getOffsetBySite(site)
+                if componentOffset:
+                    post.append(o+c.offset)
+                else:    
+                    post.append(o)
+        return post
+
+    def getOffsetSpanBySite(self, site, componentOffset=True):
+        '''Return the span, or min and max values, of all offsets for a given site. 
+        '''
+        post = self.getOffsetsBySite(site, componentOffset=componentOffset)
+        return [min(post), max(post)]
+
+
+    def getDurationSpanBySite(self, site, componentOffset=True):
+        '''Return the duration span, or the distnace between the first component's offset and the last components offset plus duration. 
+        '''
+        # these are in order
+        post = []
+        idSite = id(site)
+        offsetComponent = [] # store pairs
+        for c in self._components:
+        #for c in self.getComponents():
+            # getting site ids is fast, as weakrefs do not have to be unpacked
+            obj = c.get()
+            if idSite in obj.getSiteIds():
+                o = obj.getOffsetBySite(site)
+                if componentOffset:
+                    oFinal = o+c.offset
+                else:    
+                    oFinal = o
+                offsetComponent.append([oFinal, obj])
+        offsetComponent.sort() # sort by offset
+        minOffset = offsetComponent[0][0]
+        minComponent = offsetComponent[0][1]
+
+        maxOffset = offsetComponent[-1][0]
+        maxComponent = offsetComponent[-1][1]
+        if maxComponent.duration is not None:
+            highestTime = maxOffset + maxComponent.duration.quarterLength
+        else:
+            highestTime = maxOffset
+    
+        return [minOffset, highestTime]
+
+
+    def getDurationBySite(self, site, componentOffset=True):
+        '''Return a Duration object representing the value between the first component's offset and the last components offset plus duration. 
+        '''
+        low, high = self.getDurationSpanBySite(site=site,
+                   componentOffset=componentOffset)     
+        d = duration.Duration()
+        d.quarterLength = high-low
+        return d
+
+
+
+
+
+
 #-------------------------------------------------------------------------------
 class SpannerBundle(object):
     '''A utility object for collecting and processing collections of Spanner objects.

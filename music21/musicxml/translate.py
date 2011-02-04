@@ -1068,7 +1068,6 @@ def measureToMx(m, spannerBundle=None):
                 # .mx here returns a list of notes
                 mxMeasure.componentList += obj.mx
             elif 'Dynamic' in classes:
-            #elif obj.isClass(dynamics.Dynamic):
                 # returns an mxDirection object
                 mxMeasure.append(obj.mx)
             else: # other objects may have already been added

@@ -1099,28 +1099,28 @@ class Stream(music21.Music21Object):
         self._elementsChanged()         
 
 
-    def isClass(self, className):
-        '''Returns true if the Stream or Stream Subclass is a particular class or subclasses that class.
-
-        Used by getElementsByClass in Stream
-
-        >>> from music21 import *
-        >>> a = stream.Stream()
-        >>> a.isClass(note.Note)
-        False
-        >>> a.isClass(stream.Stream)
-        True
-        >>> b = stream.Measure()
-        >>> b.isClass(stream.Measure)
-        True
-        >>> b.isClass(stream.Stream)
-        True
-        '''
-        ## same as Music21Object.isClass, not ElementWrapper.isClass
-        if isinstance(self, className):
-            return True
-        else:
-            return False
+#     def isClass(self, className):
+#         '''Returns true if the Stream or Stream Subclass is a particular class or subclasses that class.
+# 
+#         Used by getElementsByClass in Stream
+# 
+#         >>> from music21 import *
+#         >>> a = stream.Stream()
+#         >>> a.isClass(note.Note)
+#         False
+#         >>> a.isClass(stream.Stream)
+#         True
+#         >>> b = stream.Measure()
+#         >>> b.isClass(stream.Measure)
+#         True
+#         >>> b.isClass(stream.Stream)
+#         True
+#         '''
+#         ## same as Music21Object.isClass, not ElementWrapper.isClass
+#         if isinstance(self, className):
+#             return True
+#         else:
+#             return False
 
 
     #---------------------------------------------------------------------------
@@ -1442,7 +1442,7 @@ class Stream(music21.Music21Object):
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, (list, tuple)):
-            classFilterList = [classFilterList]
+            classFilterList = tuple([classFilterList])
 
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
@@ -1453,29 +1453,42 @@ class Stream(music21.Music21Object):
             for className in classFilterList:
                 # new method uses string matching of .classes attribute
                 # temporarily check to see if this is a string
-                if isinstance(className, str):
-                    if className in eClasses:
-                        found.insert(e.getOffsetBySite(self), e,         
-                            ignoreSort=True)
-                        break # match first class and break to next e
-                # old method uses isClass matching
-                elif e.isClass(className):
+                if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
                     found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
                     break # match first class and break to next e
+
+#                 if isinstance(className, str):
+#                     if className in eClasses:
+#                         found.insert(e.getOffsetBySite(self), e,         
+#                             ignoreSort=True)
+#                         break # match first class and break to next e
+#                 # old method uses isClass matching
+#                 #elif e.isClass(className):
+#                 elif isinstance(e, className):
+#                     found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
+#                     break # match first class and break to next e
 
         for e in self._endElements:
             eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
-                # new method uses string matching of .classes attribute
-                # temporarily check to see if this is a string
-                if isinstance(className, str):
-                    if className in eClasses:
-                        found.storeAtEnd(e, ignoreSort=True)
-                        break # match first class and break to next e
-                # old method uses isClass matching
-                elif e.isClass(className):
+
+                if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
+
                     found.storeAtEnd(e, ignoreSort=True)
                     break # match first class and break to next e
+
+
+                # new method uses string matching of .classes attribute
+                # temporarily check to see if this is a string
+#                 if isinstance(className, str):
+#                     if className in eClasses:
+#                         found.storeAtEnd(e, ignoreSort=True)
+#                         break # match first class and break to next e
+#                 # old method uses isClass matching
+#                 #elif e.isClass(className):
+#                 elif isinstance(e, className):
+#                     found.storeAtEnd(e, ignoreSort=True)
+#                     break # match first class and break to next e
 
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
@@ -1524,15 +1537,19 @@ class Stream(music21.Music21Object):
         # classes it was appendedTwice
         # need both _elements and _endElements
         for e in self._elements:
+            eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
-                if e.isClass(className):
+                if className in eClasses or isinstance(e, className):
+                #if e.isClass(className):
                     break # if a match to any of the classes, break
                 # only insert after all no match to all classes   
                 found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
 
         for e in self._endElements:
+            eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
-                if e.isClass(className):
+                if className in eClasses or isinstance(e, className):
+                #if e.isClass(className):
                     break # if a match to any of the classes, break
                 # only insert after all no match to all classes   
                 found.storeAtEnd(e, ignoreSort=True)
@@ -1702,7 +1719,9 @@ class Stream(music21.Music21Object):
                     match = True
             if match:
                 if classFilter is not None:
-                    if element.isClass(classFilter):
+                    eClasses = e.classes # store once, as this is property call
+                    #if element.isClass(classFilter):
+                    if classFilter in eClasses or isinstance(e, classFilter):
                         element.activeSite = self
                         return element
                     else:
@@ -3594,7 +3613,8 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
-        if self.isClass(Measure):
+        #if self.isClass(Measure):
+        if 'Measure' in self.classes:
             mColl = [] # store a list of measures for processing
             mColl.append(returnObj)
         elif len(self.getElementsByClass('Measure')) > 0:
