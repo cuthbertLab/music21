@@ -1138,6 +1138,8 @@ class Test(unittest.TestCase):
         self.assertEqual(slur1.getOffsetsBySite(p1), [0.0, 2.0])
         self.assertEqual(slur1.getOffsetSpanBySite(p1), [0.0, 2.0])
 
+        # a note can access what spanners it is part of 
+        self.assertEqual(n1.getSpannerSites(), [slur1])
 
         # can a spanner hold spanners: yes
         sl1 = Slur()
@@ -1147,6 +1149,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sp.getComponents()), 3)
         self.assertEqual(sp.getComponents(), [sl1, sl2, sl3])
 
+        self.assertEqual(sl1.getSpannerSites(), [sp])
 
 
     def testSpannerBundle(self):
@@ -1187,12 +1190,18 @@ class Test(unittest.TestCase):
         su1 = Slur()
         su1.addComponents([n1, n3])
 
+        self.assertEqual(n1.getSpannerSites(), [su1])
+        self.assertEqual(n3.getSpannerSites(), [su1])
+
         su2 = copy.deepcopy(su1)
 
         self.assertEqual(su1.getComponents(), [n1, n3])
         self.assertEqual(su2.getComponents(), [n1, n3])
 
-        
+        self.assertEqual(n1.getSpannerSites(), [su1, su2])
+        self.assertEqual(n3.getSpannerSites(), [su1, su2])
+
+
         sb1 = spanner.SpannerBundle(su1, su2)
         sb2 = copy.deepcopy(sb1)
         self.assertEqual(sb1[0].getComponents(), [n1, n3])
@@ -1211,17 +1220,23 @@ class Test(unittest.TestCase):
         n4 = note.Note()
         n5 = note.Note()
 
-
         su1 = spanner.Slur()
         su1.addComponents([n1, n3])
 
         self.assertEqual(su1.getComponents(), [n1, n3])
+        self.assertEqual(n1.getSpannerSites(), [su1])
 
         su1.replaceComponent(n1, n2)
         self.assertEqual(su1.getComponents(), [n2, n3])
+        # this note now has no spanner sites
+        self.assertEqual(n1.getSpannerSites(), [])
+        self.assertEqual(n2.getSpannerSites(), [su1])
+
         # replace n2 w/ n1
         su1.replaceComponent(n2, n1)
         self.assertEqual(su1.getComponents(), [n1, n3])
+        self.assertEqual(n2.getSpannerSites(), [])
+        self.assertEqual(n1.getSpannerSites(), [su1])
 
 
         su2 = spanner.Slur()

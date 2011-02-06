@@ -754,7 +754,7 @@ class DefinedContexts(object):
         >>> dc = music21.DefinedContexts()
         >>> dc.add(aSite, 0)
         >>> dc.add(bSite) # a context
-        >>> dc.getSiteIds == [id(aSite)]
+        >>> dc.getSiteIds() == [id(aSite)]
         True
         '''
         # may want to convert to tuple to avoid user editing?
@@ -791,16 +791,6 @@ class DefinedContexts(object):
                 match.append(idKey)
         for id in match:
             self.removeById(id)
-
-
-#     def clearLocations(self):
-#         '''Remove all locations.
-#         '''
-#         for idKey in self._locationKeys:
-#             if idKey == None: 
-#                 continue
-#             self.removeById(idKey)
-
 
     def _getOffsetBySiteId(self, idKey):
         '''Main method for getting an offset from a location key.
@@ -1122,6 +1112,16 @@ class DefinedContexts(object):
         '''Return all known references of a given class found in any association with this DefinedContexts.
 
         This will recursively search the defined contexts of existing defined contexts, and return a list of all objects that match the given class.
+
+        >>> from music21 import *; import music21
+        >>> class Mock(Music21Object): pass
+        >>> import time
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> dc = music21.DefinedContexts()
+        >>> dc.add(aObj)
+        >>> dc.add(bObj)
+        >>> dc.getAllByClass = [aObj, bObj]
         '''
         if memo == None:
             memo = {} # intialize
@@ -1864,6 +1864,28 @@ class Music21Object(JSONSerializer):
         '''Return a list of all site Ids, or the id() value of the sites of this object. 
         '''
         return self._definedContexts.getSiteIds()
+
+    def getSpannerSites(self):
+        '''Return a list of all sites that are Spanner or Spanner subclasses. This provides a way for objects to be aware of what Spanners they reside in. Note that Spanners are not Stream subclasses, but Music21Objects that are composed with a specialized Stream subclass.
+
+        >>> from music21 import *
+        >>> n1 = note.Note()
+        >>> n2 = note.Note()
+        >>> sp1 = spanner.Slur(n1, n2)
+        >>> n1.getSpannerSites() == [sp1]
+        True
+        >>> sp2 = spanner.Slur(n2, n1)
+        >>> n2.getSpannerSites() == [sp1, sp2]
+        True
+        '''
+        found = self._definedContexts.getSitesByClass('SpannerStorage')
+        post = []
+        # get reference to actual spanner stored in each SpannerStorage obj
+        # these are the Spanners
+        for obj in found:
+            post.append(obj.spannerParent)
+        return post
+
 
     def removeLocationBySite(self, site):
         '''Remove a location in the :class:`~music21.base.DefinedContexts` object.
