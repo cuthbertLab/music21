@@ -746,6 +746,16 @@ class DefinedContexts(object):
 
     def getSiteIds(self):
         '''Return a list of all site Ids.
+
+        >>> from music21 import *; import music21
+        >>> class Mock(Music21Object): pass
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> dc = music21.DefinedContexts()
+        >>> dc.add(aSite, 0)
+        >>> dc.add(bSite) # a context
+        >>> dc.getSiteIds == [id(aSite)]
+        True
         '''
         # may want to convert to tuple to avoid user editing?
         return self._locationKeys
