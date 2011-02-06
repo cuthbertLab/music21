@@ -727,16 +727,16 @@ class DefinedContexts(object):
     def hasSiteId(self, siteId):
         '''Return True or False if this DefinedContexts object already has this site id defined as a location
 
-        >>> from music21 import *
+        >>> from music21 import *; import music21
         >>> class Mock(Music21Object): pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> dc = music21.DefinedContexts()
         >>> dc.add(aSite, 0)
-        >>> dc.add(cSite) # a context
+        >>> dc.add(bSite) # a context
         >>> dc.hasSiteId(id(aSite))
         True
-        >>> dc.hasSiteId(id(cSite))
+        >>> dc.hasSiteId(id(bSite))
         False
         '''
         if siteId in self._locationKeys:
