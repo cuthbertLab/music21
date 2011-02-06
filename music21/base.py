@@ -640,6 +640,7 @@ class DefinedContexts(object):
     def getSites(self):
         '''Get all defined contexts that are locations; unwrap from weakrefs
 
+        >>> from music21 import *
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
         >>> bObj = Mock()
@@ -664,6 +665,45 @@ class DefinedContexts(object):
                 post.append(common.unwrapWeakref(s1))
         return post
     
+
+    def getSitesByClass(self, className):
+        '''Return sites that match the provided class.
+
+        >>> from music21 import *
+        >>> class Mock(Music21Object): pass
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> cObj = stream.Stream()
+        >>> aContexts = DefinedContexts()
+        >>> aContexts.add(aObj, 234)
+        >>> aContexts.add(bObj, 3000)
+        >>> aContexts.add(cObj, 200)
+        >>> aContexts.getSitesByClass(Mock) == [aObj, bObj]
+        True
+        >>> aContexts.getSitesByClass('Stream') == [cObj]
+        True
+        '''
+        found = []
+        for idKey in self._locationKeys:
+            objRef = self._definedContexts[idKey]['obj']
+            if objRef is None:
+                continue
+            if not WEAKREF_ACTIVE: # leave None alone
+                obj = objRef
+            else:
+                obj = common.unwrapWeakref(objRef)
+            match = False
+            if common.isStr(className):
+                if hasattr(obj, 'classes'):
+                    if className in obj.classes:
+                        match = True
+                elif type(obj).__name__.lower() == className.lower():
+                    match = True
+            elif isinstance(obj, className):
+                match = True
+            if match:
+                found.append(obj)
+        return found
 
     def isSite(self, obj):
         '''Given an object, determine if it is a site stored in this DefinedContexts. This will return False if the object is simply a context and not a location
@@ -1012,6 +1052,7 @@ class DefinedContexts(object):
             #environLocal.printDebug(['memo', memo])
             if obj is None: 
                 continue # a None context, or a dead reference
+            # TODO: look for classes attribute
             if common.isStr(className):
                 if type(obj).__name__.lower() == className.lower():
                     post = obj       
@@ -1056,10 +1097,9 @@ class DefinedContexts(object):
 
 
     def getAllByClass(self, className, found=None, idFound=None, memo=None):
-        '''Return all known references of a given class
+        '''Return all known references of a given class found in any association with this DefinedContexts.
 
-        This will recursively search the defined contexts of existing defined contexts.
-
+        This will recursively search the defined contexts of existing defined contexts, and return a list of all objects that match the given class.
         '''
         if memo == None:
             memo = {} # intialize
