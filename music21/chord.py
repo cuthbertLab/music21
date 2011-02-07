@@ -818,7 +818,9 @@ class Chord(note.NotRest):
         if hasattr(self, 'scale') and self.scale != None: # roman numerals have this built in
             sc = self.scale
         else:
-            sc = self.getContextByClass(scale.Scale)
+
+            sc = self.getContextByClass(scale.Scale, 
+                prioritizeActiveSite=True, sortByCreationTime=True)
             if sc is None:
                 raise ChordException("Cannot find a Key or Scale context for this chord, so cannot find what scale degrees the pitches correspond to!")            
         if hasattr(sc, 'mode'):
@@ -2779,7 +2781,7 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.commonName, 'diminished seventh chord')
         self.assertEqual(c1.pitchedCommonName, 'C#-diminished seventh chord')
 
-    def testScaleDegrees(self):
+    def testScaleDegreesA(self):
         chord1 = Chord(["C#5", "E#5", "G#5"])
         st1 = music21.stream.Stream()
         st1.append(music21.key.Key('c#'))   # c-sharp minor
@@ -2801,6 +2803,26 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(sd3), '[(1, None), (1, <accidental sharp>), (2, None), (3, <accidental flat>), (3, None), (4, None)]')
         
 
+    def testScaleDegreesB(self):
+        from music21 import chord, stream, key
+        # trying to isolate problematic context searches
+        chord1 = chord.Chord(["C#5", "E#5", "G#5"])
+        st1 = stream.Stream()
+        st1.append(key.Key('c#'))   # c-sharp minor
+        st1.append(chord1)
+        self.assertEqual(chord1.activeSite, st1)
+        self.assertEqual(str(chord1.scaleDegrees), 
+        "[(1, None), (3, <accidental sharp>), (5, None)]")
+        
+        st2 = stream.Stream()
+        st2.append(key.Key('c'))    # c minor
+        st2.append(chord1)          # same pitches as before gives different scaleDegrees
+
+        self.assertEqual(chord1.activeSite, st2)
+        self.assertEqual(str(chord1.scaleDegrees), 
+        "[(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]")
+
+
 
 
 
@@ -2809,7 +2831,14 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Chord]
 
 if __name__ == '__main__':
-    music21.mainTest(Test)
+    import sys
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        t = Test()
+        te = TestExternal()
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
 #------------------------------------------------------------------------------
 # eof
