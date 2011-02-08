@@ -1021,7 +1021,7 @@ class DefinedContexts(object):
         The `callerFirst` parameters is simply used to pass a reference of the first caller; this
         is necessary if we are looking within a Stream for a flat offset position.
 
-        If `priorityTarget` is specified, this location will be searched first. The `prioritizeActiveSite` is based to to any recursively called getContextByClass() calls. 
+        If `priorityTarget` is specified, this location will be searched first. The `prioritizeActiveSite` is pased to to any recursively called getContextByClass() calls. 
 
         >>> class Mock(Music21Object): pass
         >>> import time

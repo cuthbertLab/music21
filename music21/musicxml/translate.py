@@ -719,6 +719,145 @@ def mxToInstrument(mxScorePart, inputM21=None):
         if mc is not None:
             i.midiChannel = int(mc) - 1
 
+
+#-------------------------------------------------------------------------------
+# Chords
+
+def chordToMx(c):
+    '''
+    Returns a List of mxNotes
+    Attributes of notes are merged from different locations: first from the 
+    duration objects, then from the pitch objects. Finally, GeneralNote 
+    attributes are added
+
+    >>> from music21 import *
+    >>> a = chord.Chord()
+    >>> a.quarterLength = 2
+    >>> b = pitch.Pitch('A-')
+    >>> c = pitch.Pitch('D-')
+    >>> d = pitch.Pitch('E-')
+    >>> e = a.pitches = [b, c, d]
+    >>> len(e)
+    3
+    >>> mxNoteList = a.mx
+    >>> len(mxNoteList) # get three mxNotes
+    3
+    >>> mxNoteList[0].get('chord')
+    False
+    >>> mxNoteList[1].get('chord')
+    True
+    >>> mxNoteList[2].get('chord')
+    True
+    '''
+    mxNoteList = []
+    durPos = 0 # may have more than one dur
+    durPosLast = len(c.duration.mx) - 1
+    for mxNoteBase in c.duration.mx: # returns a list of mxNote objs
+        # merge method returns a new object
+        chordPos = 0
+        mxNoteChordGroup = []
+        for pitchObj in c.pitches:
+            mxNote = copy.deepcopy(mxNoteBase)
+
+            #mxNote.pitch = None # clear before each iteration
+            mxNote = mxNote.merge(pitchObj.mx)
+            if chordPos > 0:
+                mxNote.set('chord', True)
+            # get color from within .editorial using attribute
+            mxNote.set('color', c.color)
+
+            # only add beam to first note in group
+            if c.beams != None and chordPos == 0:
+                mxNote.beamList = c.beams.mx
+
+            # if this note, not a component duration,
+            # need to add this to the last-encountered mxNote
+            if c.tie != None:
+                # get mxl objs from tie obj
+                mxTieList, mxTiedList = c.tie.mx 
+                # if starting a tie, add to all mxNotes in the chord
+                # but only add to the last duration in the dur group
+                if (c.tie.type in ['start', 'continue'] and 
+                    durPos == durPosLast):
+                    mxNote.tieList += mxTieList
+                    mxNote.notationsObj.componentList += mxTiedList
+                # if ending a tie, set first duration of dur group
+                elif (c.tie.type == 'stop' and durPos == 0):
+                    mxNote.tieList += mxTieList
+                    mxNote.notationsObj.componentList += mxTiedList
+
+            chordPos += 1
+            mxNoteChordGroup.append(mxNote)
+        
+        # add chord group to note list
+        mxNoteList += mxNoteChordGroup
+        durPos += 1
+
+    # only applied to first note
+    for lyricObj in c.lyrics:
+        mxNoteList[0].lyricList.append(lyricObj.mx)
+
+    # if we have any articulations, they only go on the first of any 
+    # component notes
+    mxArticulations = None
+    for i in range(len(c.articulations)):
+        obj = c.articulations[i]
+        if hasattr(obj, 'mx'):
+            if i == 0: # assign first
+                mxArticulations = obj.mx # mxArt... stores more than one artic
+            else: # concatenate any remaining
+                mxArticulations += obj.mx
+    if mxArticulations != None:
+        mxNoteList[0].notationsObj.componentList.append(mxArticulations)
+
+    # notations and articulations are mixed in musicxml
+    for i in range(len(c.expressions)):
+        obj = c.expressions[i]
+        if hasattr(obj, 'mx'): 
+            mxNoteList[0].notationsObj.componentList.append(obj.mx)
+
+    return mxNoteList
+
+def mxToChord(mxNoteList, inputM21=None):
+    '''Given an a list of mxNotes, fill the necessary parameters
+
+    >>> from music21 import *
+    >>> a = musicxml.Note()
+    >>> a.setDefaults()
+    >>> b = musicxml.Note()
+    >>> b.setDefaults()
+    >>> b.set('chord', True)
+    >>> m = musicxml.Measure()
+    >>> m.setDefaults()
+    >>> a.external['measure'] = m # assign measure for divisions ref
+    >>> a.external['divisions'] = m.external['divisions']
+    >>> b.external['measure'] = m # assign measure for divisions ref
+    >>> b.external['divisions'] = m.external['divisions']
+    >>> c = chord.Chord()
+    >>> c.mx = [a, b]
+    >>> len(c.pitches)
+    2
+    '''
+    from music21 import chord
+    from music21 import pitch
+
+    if inputM21 == None:
+        c = chord.Chord()
+    else:
+        c = inputM21
+
+    # assume that first chord is the same duration for all parts
+    c.duration.mx = mxNoteList[0]
+    pitches = []
+    for mxNote in mxNoteList:
+        # extract pitch pbjects     
+        p = pitch.Pitch()
+        p.mx = mxNote # will extact pitch info form mxNote
+        pitches.append(p)
+    # set all at once
+    c.pitches = pitches
+
+
 #-------------------------------------------------------------------------------
 # Notes
 
@@ -1298,7 +1437,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 continue
 
             # the first note of a chord is not identified directly; only
-            # by looking at the next note can we tell if we have a chord
+            # by looking at the next note can we tell if we have the first
+            # note of a chord
             if mxNoteNext is not None and mxNoteNext.get('chord') is True:
                 if mxNote.get('chord') is False:
                     mxNote.set('chord', True) # set the first as a chord
@@ -1344,6 +1484,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             if len(mxNoteList) > 0 and (mxNoteNext is None 
                 or mxNoteNext.get('chord') is False):
                 c = chord.Chord()
+                # TODO: use chord conversion
                 c.mx = mxNoteList
                 _addToStaffReference(mxNoteList, c, staffReference)
                 if useVoices:
