@@ -225,19 +225,6 @@ class Chord(note.NotRest):
         '''Provide a complete MIDI file representation. 
         '''
         return midiTranslate.chordToMidiFile(self)
-        # get a list of mid tracks objects
-#         mt = midiModule.MidiTrack(1)
-#         mt.events += midiModule.getStartEvents(mt)
-#         mt.events += self._getMidiEvents()
-#         mt.events += midiModule.getEndEvents(mt)
-# 
-#         # set all events to have this track
-#         mt.updateEvents()
-# 
-#         mf = midiModule.MidiFile()
-#         mf.tracks = [mt]
-#         mf.ticksPerQuarterNote = defaults.ticksPerQuarter
-#         return mf
 
     midiFile = property(_getMidiFile,
         doc = '''Return a complete :class:`music21.midi.base.MidiFile` object based on the Chord.
@@ -256,132 +243,9 @@ class Chord(note.NotRest):
     def _getMX(self):
         return musicxmlTranslate.chordToMx(self)
 
-#         '''
-#         Returns a List of mxNotes
-#         Attributes of notes are merged from different locations: first from the 
-#         duration objects, then from the pitch objects. Finally, GeneralNote 
-#         attributes are added
-# 
-#         >>> from music21 import *
-#         >>> a = chord.Chord()
-#         >>> a.quarterLength = 2
-#         >>> b = pitch.Pitch('A-')
-#         >>> c = pitch.Pitch('D-')
-#         >>> d = pitch.Pitch('E-')
-#         >>> e = a.pitches = [b, c, d]
-#         >>> len(e)
-#         3
-#         >>> mxNoteList = a.mx
-#         >>> len(mxNoteList) # get three mxNotes
-#         3
-#         >>> mxNoteList[0].get('chord')
-#         False
-#         >>> mxNoteList[1].get('chord')
-#         True
-#         >>> mxNoteList[2].get('chord')
-#         True
-#         '''
-#         mxNoteList = []
-#         durPos = 0 # may have more than one dur
-#         durPosLast = len(self.duration.mx) - 1
-#         for mxNoteBase in self.duration.mx: # returns a list of mxNote objs
-#             # merge method returns a new object
-#             chordPos = 0
-#             mxNoteChordGroup = []
-#             for pitchObj in self.pitches:
-#                 mxNote = copy.deepcopy(mxNoteBase)
-# 
-#                 #mxNote.pitch = None # clear before each iteration
-#                 mxNote = mxNote.merge(pitchObj.mx)
-#                 if chordPos > 0:
-#                     mxNote.set('chord', True)
-#                 # get color from within .editorial using attribute
-#                 mxNote.set('color', self.color)
-# 
-#                 # only add beam to first note in group
-#                 if self.beams != None and chordPos == 0:
-#                     mxNote.beamList = self.beams.mx
-# 
-#                 # if this note, not a component duration,
-#                 # need to add this to the last-encountered mxNote
-#                 if self.tie != None:
-#                     # get mxl objs from tie obj
-#                     mxTieList, mxTiedList = self.tie.mx 
-#                     # if starting a tie, add to all mxNotes in the chord
-#                     # but only add to the last duration in the dur group
-#                     if (self.tie.type in ['start', 'continue'] and 
-#                         durPos == durPosLast):
-#                         mxNote.tieList += mxTieList
-#                         mxNote.notationsObj.componentList += mxTiedList
-#                     # if ending a tie, set first duration of dur group
-#                     elif (self.tie.type == 'stop' and durPos == 0):
-#                         mxNote.tieList += mxTieList
-#                         mxNote.notationsObj.componentList += mxTiedList
-# 
-#                 chordPos += 1
-#                 mxNoteChordGroup.append(mxNote)
-#             
-#             # add chord group to note list
-#             mxNoteList += mxNoteChordGroup
-#             durPos += 1
-# 
-#         # only applied to first note
-#         for lyricObj in self.lyrics:
-#             mxNoteList[0].lyricList.append(lyricObj.mx)
-# 
-#         # if we have any articulations, they only go on the first of any 
-#         # component notes
-#         mxArticulations = None
-#         for i in range(len(self.articulations)):
-#             obj = self.articulations[i]
-#             if hasattr(obj, 'mx'):
-#                 if i == 0: # assign first
-#                     mxArticulations = obj.mx # mxArt... stores more than one artic
-#                 else: # concatenate any remaining
-#                     mxArticulations += obj.mx
-#         if mxArticulations != None:
-#             mxNoteList[0].notationsObj.componentList.append(mxArticulations)
-# 
-#         # notations and articulations are mixed in musicxml
-#         for i in range(len(self.expressions)):
-#             obj = self.expressions[i]
-#             if hasattr(obj, 'mx'): 
-#                 mxNoteList[0].notationsObj.componentList.append(obj.mx)
-# 
-#         return mxNoteList
-
     def _setMX(self, mxNoteList):
         # build parameters into self
         musicxmlTranslate.mxToChord(mxNoteList, self)
-#         '''Given an a list of mxNotes, fill the necessary parameters
-# 
-#         >>> from music21 import *
-#         >>> a = musicxml.Note()
-#         >>> a.setDefaults()
-#         >>> b = musicxml.Note()
-#         >>> b.setDefaults()
-#         >>> b.set('chord', True)
-#         >>> m = musicxml.Measure()
-#         >>> m.setDefaults()
-#         >>> a.external['measure'] = m # assign measure for divisions ref
-#         >>> a.external['divisions'] = m.external['divisions']
-#         >>> b.external['measure'] = m # assign measure for divisions ref
-#         >>> b.external['divisions'] = m.external['divisions']
-#         >>> c = chord.Chord()
-#         >>> c.mx = [a, b]
-#         >>> len(c.pitches)
-#         2
-#         '''
-# 
-#         # assume that first chord is the same duration for all parts
-#         self.duration.mx = mxNoteList[0]
-#         pitches = []
-#         for mxNote in mxNoteList:
-#             # extract pitch pbjects     
-#             p = pitch.Pitch()
-#             p.mx = mxNote # will extact pitch info form mxNote
-#             pitches.append(p)
-#         self.pitches = pitches
 
     mx = property(_getMX, _setMX)    
 
@@ -548,6 +412,48 @@ class Chord(note.NotRest):
         This overloads the behavior of the tie attribute found in all NotRest classes.
         ''')
 
+    def getTie(self, p):
+        '''Given a pitch in this Chord, return an associated Tie object, or return None if not defined for that Pitch.
+
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['d', 'e-', 'b-'])
+        >>> t1 = tie.Tie('start')
+        >>> c1.setTie(t1, c1.pitches[2]) # just to b-
+        >>> c1.getTie(c1.pitches[2]) == t1
+        True
+        >>> c1.getTie(c1.pitches[0]) == None
+        True
+        '''
+        for d in self._pitches:
+            # this is an equality comparison, not object
+            if d['pitch'] == p:
+                if 'tie' in d.keys():
+                    return d['tie']
+                else:
+                    return None
+        return None
+
+    def setTie(self, t, pitchTarget):
+        '''Given a pitch in this Chord, return an associated Tie object, or return None if not defined for that Pitch.
+
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['d', 'e-', 'b-'])
+        >>> t1 = tie.Tie('start')
+        >>> c1.setTie(t1, c1.pitches[2]) # just to b-
+        >>> c1.getTie(c1.pitches[2]) == t1
+        True
+        '''
+        # assign to first pitch by default
+        if pitchTarget is None and len(self._pitches) > 0: # if no pitch target
+            pitchTarget = self._pitches[0]['pitch']
+        match = False
+        for d in self._pitches:
+            if d['pitch'] == pitchTarget:
+                d['tie'] = t
+                match = True
+                break
+        if not match:
+            raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
 
     def _getPitchNames(self):
@@ -2880,11 +2786,24 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.tie, t1)
         # try to set all ties for all pitches using the .tie attribute
         c1.tie = t2
-        self.assertEqual(c1.tie, t2)
-        self.assertEqual(c1._pitches[0]['tie'], t2)
-        self.assertEqual(c1._pitches[1]['tie'], t2)
-        self.assertEqual(c1._pitches[2]['tie'], t2)
+        # must do id comparisons, as == comparisons are based on attributes
+        self.assertEqual(id(c1.tie), id(t2))
+        self.assertEqual(id(c1._pitches[0]['tie']), id(t2))
+        self.assertEqual(id(c1._pitches[1]['tie']), id(t2))
+        self.assertEqual(id(c1._pitches[2]['tie']), id(t2))
 
+        # set ties for specific pitches
+        t3 = tie.Tie()
+        t4 = tie.Tie()
+        t5 = tie.Tie()
+        
+        c1.setTie(t3, c1.pitches[0])
+        c1.setTie(t4, c1.pitches[1])
+        c1.setTie(t5, c1.pitches[2])
+
+        self.assertEqual(id(c1.getTie(c1.pitches[0])), id(t3))
+        self.assertEqual(id(c1.getTie(c1.pitches[1])), id(t4))
+        self.assertEqual(id(c1.getTie(c1.pitches[2])), id(t5))
 
         from music21.musicxml import testPrimitive
         from music21 import converter
