@@ -106,9 +106,9 @@ class Chord(note.NotRest):
         # the list of pitch objects is managed by a property; this permits
         # only updating the _chordTablesAddress when pitches has changed
         
-        # duration looks at _pitches and __init__ sets .duration
-        # so we need to set _pitches to [] first...
-        self._pitches = []
+        # duration looks at _pitches to get first duration of a pitch 
+        # if no other pitches are defined 
+        self._pitches = [] # a list of dictionaries; each storing pitch, tie key
         self._chordTablesAddress = None
         self._chordTablesAddressNeedsUpdating = True # only update when needed
         # here, pitch and duration data is extracted from notes
@@ -121,19 +121,20 @@ class Chord(note.NotRest):
         #self.duration = None  # inefficient, since note.Note.__init__ set it
         #del(self.pitch)
 
-        for thisNote in notes:
-            if isinstance(thisNote, music21.pitch.Pitch):
-                self.pitches.append(thisNote)
-            elif isinstance(thisNote, music21.note.Note):
-                self.pitches.append(thisNote.pitch)
-            elif isinstance(thisNote, Chord):
-                for thisPitch in thisNote.pitches:
-                    self.pitches.append(thisPitch)
-            elif isinstance(thisNote, basestring) or \
-                isinstance(thisNote, int):
-                self.pitches.append(music21.pitch.Pitch(thisNote))
+        for n in notes:
+            if isinstance(n, music21.pitch.Pitch):
+                self._pitches.append({'pitch':n})
+            elif isinstance(n, music21.note.Note):
+                self._pitches.append({'pitch':n.pitch})
+            elif isinstance(n, Chord):
+                for p in n.pitches:
+                    # this might better make a deepcopy of the pitch
+                    self._pitches.append({'pitch':p})
+            elif isinstance(n, basestring) or \
+                isinstance(n, int):
+                self._pitches.append({'pitch':music21.pitch.Pitch(n)})
             else:
-                raise ChordException("Could not process pitch %s" % thisNote)
+                raise ChordException("Could not process pitch %s" % n)
 
 
         if "duration" in keywords or "type" in keywords or \
@@ -491,12 +492,17 @@ class Chord(note.NotRest):
         a better way to do this needs to be found
         '''
         self._chordTablesAddressNeedsUpdating = True
-        return self._pitches
+        post = [d['pitch'] for d in self._pitches]
+        #return self._pitches
+        return post
 
     def _setPitches(self, value):
-        if value != self._pitches:
+        if value != [d['pitch'] for d in self._pitches]:
             self._chordTablesAddressNeedsUpdating = True
-        self._pitches = value
+        self._pitches = []
+        # assume we have pitch objects here
+        for p in value:
+            self._pitches.append({'pitch':p})
 
     pitches = property(_getPitches, _setPitches, 
         doc = '''Get or set a list of all Pitch objects in this Chord.
@@ -515,15 +521,39 @@ class Chord(note.NotRest):
         ''')
 
 
+    def _setTie(self, value):
+        '''If setting a tie, tie is applied to all pitches. 
+        '''
+        for d in self._pitches:
+            # set the same instance for each pitch
+            d['tie'] = value
+
+    def _getTie(self):
+        # this finds the tie on the first pitch; it might alternatively
+        # return the first tie available 
+        if len(self._pitches) > 0:
+            if 'tie' in self._pitches[0].keys():
+                return self._pitches[0]['tie']
+        # otherwise, return None
+        return None
+
+    tie = property(_getTie, _setTie, 
+        doc = '''Get or set a single tie based on all the ties in this Chord.
+
+        This overloads the behavior of the tie attribute found in all NotRest classes.
+        ''')
+
+
+
     def _getPitchNames(self):
-        return [p.name for p in self._pitches]
+        return [d['pitch'].name for d in self._pitches]
 
     def _setPitchNames(self, value):
         if common.isListLike(value):
             if common.isStr(value[0]): # only checking first
                 self._pitches = [] # clear
                 for name in value:
-                    self._pitches.append(pitch.Pitch(name))
+                    self._pitches.append({'pitch':pitch.Pitch(name)})
             else:
                 raise NoteException('must provide a list containing a Pitch, not: %s' % value)
         else:
@@ -731,7 +761,7 @@ class Chord(note.NotRest):
         Gets the DurationObject of the object or None
         '''
         if self._duration is None and len(self._pitches) > 0:
-            pitchZeroDuration = self._pitches[0].duration
+            pitchZeroDuration = self._pitches[0]['pitch'].duration
             self._duration = pitchZeroDuration
         return self._duration
 
@@ -2235,9 +2265,11 @@ class Chord(note.NotRest):
                 delete.append(p)
 
         #environLocal.printDebug(['unique, delete', self, unique, delete])
+        altered = returnObj.pitches
         for p in delete:
-            returnObj.pitches.remove(p)
+            altered.remove(p)
 
+        returnObj.pitches = altered
         if len(delete) > 0:
             returnObj._chordTablesAddressNeedsUpdating = True
 
@@ -2342,7 +2374,11 @@ class Chord(note.NotRest):
         else:
             returnObj = copy.deepcopy(self)
 
-        returnObj.pitches.sort(cmp=lambda x,y: cmp(x.diatonicNoteNum, y.diatonicNoteNum) or cmp(x.ps, y.ps))
+        altered = returnObj.pitches
+        altered.sort(cmp=lambda x,y: cmp(x.diatonicNoteNum, y.diatonicNoteNum)
+                     or cmp(x.ps, y.ps))
+        # must re-assign altered list, as a new list is created
+        returnObj.pitches = altered
 
         return returnObj
 
@@ -2823,7 +2859,26 @@ class Test(unittest.TestCase):
         "[(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]")
 
 
+    def testTiesA(self):
+        # test creating independent ties for each Pitch
+        from music21 import chord, stream, pitch, tie
 
+        c1 = chord.Chord(['c', 'd', 'b'])
+        # as this is a subclass of Note, we have a .tie attribute already
+        # here, it is managed by a property
+        self.assertEqual(c1.tie, None)
+        # directly manipulate pitches
+        t1 = tie.Tie()
+        t2 = tie.Tie()
+        c1._pitches[0]['tie'] = t1
+        # now, the tie attribute returns the tie found on the first pitch
+        self.assertEqual(c1.tie, t1)
+        # try to set all ties for all pitches using the .tie attribute
+        c1.tie = t2
+        self.assertEqual(c1.tie, t2)
+        self.assertEqual(c1._pitches[0]['tie'], t2)
+        self.assertEqual(c1._pitches[1]['tie'], t2)
+        self.assertEqual(c1._pitches[2]['tie'], t2)
 
 
 #-------------------------------------------------------------------------------
