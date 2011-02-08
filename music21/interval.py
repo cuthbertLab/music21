@@ -592,7 +592,7 @@ class GenericInterval(music21.Music21Object):
         self.mod7inversion = 9 - self.semiSimpleUndirected 
 
         if self.direction == DESCENDING:
-            self.mod7 = self.mod7inversion  ## see chord.hasScaleX for usage...
+            self.mod7 = self.mod7inversion  ## see chord.semitonesFromChordStep for usage...
         else:
             self.mod7 = self.simpleDirected
 

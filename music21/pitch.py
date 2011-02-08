@@ -742,14 +742,27 @@ class Pitch(music21.Music21Object):
         False
         >>> a != b
         True
+        
+        >>> c = 7
+        >>> a == c
+        False
+        
+        >>> a != c
+        True
         '''
         if other is None:
             return False
-        if (self.octave == other.octave and self.step == other.step and 
+        elif (hasattr(other, 'octave') == False or hasattr(other, 'step') == False or
+              hasattr(other, 'step') == False):
+            return False
+        elif (self.octave == other.octave and self.step == other.step and 
             self.accidental == other.accidental):
             return True
         else:
             return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def __lt__(self, other):
         '''Do not accept enharmonic equivalence. Based entirely on pitch space 

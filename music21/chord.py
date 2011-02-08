@@ -160,7 +160,7 @@ class Chord(note.NotRest):
         '''
         Method to return all the lilypond information that appears before the 
         duration number.  This is called from GeneralNote .lily, but we are
-        overridding the previously defined call. 
+        overriding the previously defined call. 
         
         '''
         baseName = "<"
@@ -229,7 +229,9 @@ class Chord(note.NotRest):
     midiFile = property(_getMidiFile,
         doc = '''Return a complete :class:`music21.midi.base.MidiFile` object based on the Chord.
 
-        The :class:`music21.midi.base.MidiFile` object can be used to write a MIDI file of this Chord with default parameters using the :meth:`music21.midi.base.MidiFile.write` method, given a file path. The file must be opened in 'wb' mode.  
+        The :class:`music21.midi.base.MidiFile` object can be used to write a MIDI file 
+        of this Chord with default parameters using the :meth:`music21.midi.base.MidiFile.write` 
+        method, given a file path. The file must be opened in 'wb' mode.  
 
         >>> from music21 import *
         >>> c = chord.Chord(['c3','g#4', 'b5'])
@@ -356,7 +358,7 @@ class Chord(note.NotRest):
         OMIT_FROM_DOCS
 
         TODO: presently, whenever pitches are accessed, it sets
-        the _chordTablesAddressNeedsUpdating value to false
+        the _chordTablesAddressNeedsUpdating value to True
         this is b/c the pitches list can be accessed and appended to
         a better way to do this needs to be found
         '''
@@ -513,13 +515,20 @@ class Chord(note.NotRest):
     #---------------------------------------------------------------------------
 
     def transpose(self, value, inPlace=False):
-        '''Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
+        '''Transpose the Note by the user-provided value. If the value 
+        is an integer, the transposition is treated in half steps and 
+        enharmonics might be simplified (not done yet). If the value is a 
+        string, any Interval string specification can be provided.
+
+        if inPlace is set to True (default = False) then the original
+        chord is changed.  Otherwise a new Chord is returned.
 
         >>> from music21 import *
         >>> a = chord.Chord(['g4', 'a3', 'c#6'])
         >>> b = a.transpose('m3')
         >>> b
         <music21.chord.Chord B-4 C4 E6>
+
         >>> aInterval = interval.Interval(-6)
         >>> b = a.transpose(aInterval)
         >>> b
@@ -563,28 +572,31 @@ class Chord(note.NotRest):
         bass for instance...  v o9.
         
         example:
+        
+        
         >>> from music21 import *
-        >>> cmaj = chord.Chord(['C', 'E', 'G'])
-        >>> cmaj.bass() # returns C
-        C
+        >>> cmaj1stInv = chord.Chord(['C4', 'E3', 'G5'])
+        >>> cmaj1stInv.bass() 
+        E3
         '''
         if (newbass):
             self._bass = newbass
         elif (self._bass is None):
-            self._bass = self.findBass()
+            self._bass = self._findBass()
 
         return self._bass
 
-    def findBass(self):
+    def _findBass(self):
         ''' Returns the lowest note in the chord
         The only time findBass should be called is by bass() when it is figuring out what 
         the bass note of the chord is.
         Generally call bass() instead
         
         example:
+        
         >>> from music21 import *
         >>> cmaj = chord.Chord(['C4', 'E3', 'G4'])
-        >>> cmaj.findBass() # returns E3
+        >>> cmaj._findBass() # returns E3
         E3
         '''
         
@@ -603,10 +615,12 @@ class Chord(note.NotRest):
         '''Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.)
         
         example:
+        
+        
         >>> from music21 import *
-        >>> cmaj = chord.Chord(['C', 'E', 'G'])
-        >>> cmaj.root() # returns C
-        C
+        >>> cmaj = chord.Chord(['E3', 'C4', 'G5'])
+        >>> cmaj.root()
+        C4
         '''
         if newroot:
             self._root = newroot
@@ -636,7 +650,7 @@ class Chord(note.NotRest):
             elif (len(oldRoots) == 0):
                 raise ChordException("no notes in chord")
             for testRoot in oldRoots:
-                if self.hasScaleX(n, testRoot): ##n>7 = bug
+                if self.getChordStep(n, testRoot): ##n>7 = bug
                     newRoots.append(testRoot)
                     roots = roots + 1
             if (roots == 1):
@@ -741,9 +755,10 @@ class Chord(note.NotRest):
         
         
         >>> st2 = stream.Stream()
+        >>> chord2 = chord.Chord(["C#5", "E#5", "G#5"])
         >>> st2.append(key.Key('c'))    # c minor
-        >>> st2.append(chord1)          # same pitches as before gives different scaleDegrees
-        >>> chord1.scaleDegrees
+        >>> st2.append(chord2)          # same pitches as before gives different scaleDegrees
+        >>> chord2.scaleDegrees
         [(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]
         
         
@@ -787,23 +802,11 @@ class Chord(note.NotRest):
 
 
 
-    def hasThird(self, testRoot = None):
-        '''Shortcut for hasScaleX(3)'''
-        return self.hasScaleX(3, testRoot)
-
-    def hasFifth(self, testRoot = None):
-        '''Shortcut for hasScaleX(5)'''
-        return self.hasScaleX(5, testRoot)
-
-    def hasSeventh(self, testRoot = None):
-        '''Shortcut for hasScaleX(7)'''
-        return self.hasScaleX(7, testRoot)
-
-    def hasScaleX(self, scaleDegree, testRoot = None):
+    def semitonesFromChordStep(self, chordStep, testRoot = None):
         '''
-        Each of these returns the number of semitones (mod12) above the root
-        that the third, fifth, etc., of the chord lies, if there exists
-        one.  Or False if it does not exist.
+        Returns the number of semitones (mod12) above the root
+        that the chordStep lies (i.e., 3 = third of the chord; 5 = fifth, etc.)
+        if one exists.  Or False if it does not exist.
         
         You can optionally specify a note.Note object to try as the root.  It does
         not change the Chord.root object.  We use these methods to figure out
@@ -813,154 +816,165 @@ class Chord(note.NotRest):
         third (e.g., "c" => "e----"), this function will incorrectly claim
         no third exists.  Perhaps this be construed as a feature.
 
-        In the case of chords such as C, E-, E, hasThird
-        will return 3, not 4, nor a list object (3,4).  You probably do not
+        In the case of chords such as C, E-, E, semitonesFromChordStep(3)
+        will return the number for the first third, in this case 3.  It
+        will not return 4, nor a list object (3,4).  You probably do not
         want to be using tonal chord manipulation functions on chords such
-        as these anyway.
+        as these anyway.  Check for such cases with 
+        chord.hasAnyRepeatedDiatonicNote first.
         
-        note.Note that in Chord, we're using "Scale" to mean a diatonic scale step.
-        It will not tell you if a chord has a specific scale degree in another
-        scale system.  That functionality might be added to scale.py someday.
+        Tools with the expression "chordStep" in them refer to the diatonic 
+        third, fifth, etc., of the chord.  They have little to do with
+        the scale degree of the scale or key that the chord is embedded
+        within.  See "chord.scaleDegrees" for this functionality.
+        
         
         example:
-        >>> from music21 import *
-        >>> cchord = chord.Chord(['C', 'E', 'E-', 'G'])
-        >>> cchord.hasScaleX(3) #
-        4
-        >>> cchord.hasScaleX(5) # will return 7
-        7
-        >>> cchord.hasScaleX(6) # will return False
-        False
-
-        >>> achord = chord.Chord(['a', 'c', 'e#7'])
-        >>> achord.hasScaleX(3) 
-        3
-        >>> achord.hasScaleX(5) 
-        8
-        >>> achord.hasScaleX(2) # will return False
-        False
-
-
-        '''
         
-        if (testRoot is None):
-            testRoot = self.root()
-            if (testRoot is None):
-                raise ChordException("Cannot run hasScaleX without a root")
+        
+        >>> from music21 import *
+        >>> cchord = chord.Chord(['E3', 'C4', 'G5'])
+        >>> cchord.semitonesFromChordStep(3) # distance from C to E
+        4
+        >>> cchord.semitonesFromChordStep(5) # C to G
+        7
+        >>> cchord.semitonesFromChordStep(6) # will return False
+        False
 
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(testRoot, thisPitch)
-            if (thisInterval.diatonic.generic.mod7 == scaleDegree):
-                return thisInterval.chromatic.mod12
+        >>> achord = chord.Chord(['a2', 'c4', 'c#5', 'e#7'])
+        >>> achord.semitonesFromChordStep(3) # returns the semitones to the FIRST third.
+        3
+        >>> achord.semitonesFromChordStep(5) 
+        8
+        >>> achord.semitonesFromChordStep(2) # will return False
+        False
 
-        return False
-    
-    def third(self, testRoot = None):
-        '''shortcut for scaleX(3)'''
-        return self.scaleX(3, testRoot)
-
-    def fifth(self, testRoot = None):
-        '''shortcut for scaleX(5)'''
-        return self.scaleX(5, testRoot)
-    
-    def seventh(self, testRoot = None):
-        '''shortcut for scaleX(7)'''
-        return self.scaleX(7, testRoot)
-    
-    def scaleX(self, scaleDegree, testRoot = None):
         '''
-        Exactly like hasScaleX, except it returns the (first) pitch at the 
+        tempInt = self.intervalFromChordStep(chordStep, testRoot)
+        if tempInt is False:
+            return False
+        else:
+            return tempInt.chromatic.mod12
+    
+    def _getThird(self):
+        '''shortcut for getChordStep(3)'''
+        return self.getChordStep(3)
+
+    third = property(_getThird)
+
+    def _getFifth(self):
+        '''shortcut for getChordStep(5)'''
+        return self.getChordStep(5)
+    
+    fifth = property(_getFifth)
+    
+    def _getSeventh(self):
+        '''shortcut for getChordStep(7)'''
+        return self.getChordStep(7)
+    
+    seventh = property(_getSeventh)
+    
+    def getChordStep(self, chordStep, testRoot = None):
+        '''
+        Exactly like semitonesFromChordStep, except it returns the (first) pitch at the 
         provided scaleDegree instead of the number of semitones.
         
         example:
         >>> from music21 import *
         >>> cmaj = chord.Chord(['C','E','G#'])
-        >>> cmaj.scaleX(3) # will return the third of the chord
+        >>> cmaj.getChordStep(3) # will return the third of the chord
         E
-        >>> gis = cmaj.scaleX(5) # will return the fifth of the chord
+        >>> gis = cmaj.getChordStep(5) # will return the fifth of the chord
         >>> gis.name
         'G#'
-        >>> cmaj.scaleX(6)
+        >>> cmaj.getChordStep(6)
         False
         '''
         if (testRoot is None):
             testRoot = self.root()
             if (testRoot is None):
-                raise ChordException("Cannot run scaleX without a root")
+                raise ChordException("Cannot run getChordStep without a root")
 
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(testRoot, thisPitch)
-            if (thisInterval.diatonic.generic.mod7 == scaleDegree):
+            if (thisInterval.diatonic.generic.mod7 == chordStep):
                 return thisPitch
 
         return False
     
-    def hasSpecificX(self, scaleDegree, testRoot = None):
-        '''Exactly like hasScaleX, except it returns the interval itself instead of the number
+    def intervalFromChordStep(self, chordStep, testRoot = None):
+        '''Exactly like semitonesFromChordStep, except it returns the interval itself instead of the number
         of semitones.
         
         example:
+        
+        
         >>> from music21 import *
         >>> cmaj = chord.Chord(['C', 'E', 'G'])
-        >>> cmaj.hasSpecificX(3) #will return the interval between C and E
+        >>> cmaj.intervalFromChordStep(3) #will return the interval between C and E
         <music21.interval.Interval M3>
-        >>> cmaj.hasSpecificX(5) #will return the interval between C and G
+        >>> cmaj.intervalFromChordStep(5) #will return the interval between C and G
         <music21.interval.Interval P5>
-        >>> cmaj.hasSpecificX(6) #will return False
+        >>> cmaj.intervalFromChordStep(6) #will return False
         False
         '''
         if (testRoot is None):
             testRoot = self.root()
             if (testRoot is None):
-                raise ChordException("Cannot run hasSpecificX without a root")
+                raise ChordException("Cannot run intervalFromChordStep without a root")
 
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(testRoot, thisPitch)
-            if (thisInterval.diatonic.generic.mod7 == scaleDegree):
+            if (thisInterval.diatonic.generic.mod7 == chordStep):
                 return thisInterval
 
         return False
 
-    def hasRepeatedScaleX(self, scaleDeg, testRoot = None):
-        '''Returns True if scaleDeg above testRoot (or self.root()) has two
+    def hasRepeatedChordStep(self, chordStep, testRoot = None):
+        '''Returns True if chordStep above testRoot (or self.root()) has two
         or more different notes (such as E and E-) in it.  Otherwise
         returns false.
        
         example:
+       
+       
         >>> from music21 import *
-        >>> cchord = chord.Chord (['C', 'E', 'E-', 'G'])
-        >>> cchord.hasRepeatedScaleX(3) # returns true
+        >>> cchord = chord.Chord (['G2', 'E4', 'E-5', 'C6'])
+        >>> cchord.hasRepeatedChordStep(3)
         True
+        >>> cchord.hasRepeatedChordStep(5)
+        False
         '''
         if (testRoot is None):
             testRoot = self.root()
             if (testRoot is None):
-                raise ChordException("Cannot run hasRepeatedScaleX without a root")
+                raise ChordException("Cannot run hasRepeatedChordStep without a root")
 
-        first = self.hasSpecificX(scaleDeg)
+        first = self.intervalFromChordStep(chordStep)
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(testRoot, thisPitch)
-            if (thisInterval.diatonic.generic.mod7 == scaleDeg):
+            if (thisInterval.diatonic.generic.mod7 == chordStep):
                 if (thisInterval.chromatic.mod12 - first.chromatic.mod12 != 0):
                     return True
                 
         return False
 
-    def hasAnyRepeatedScale(self, testRoot = None):
-        '''Returns True if for any scale degree there are two or more different notes (such
-        as E and E-) in the chord. If there are no repeated scale degrees, return false.
+    def hasAnyRepeatedDiatonicNote(self, testRoot = None):
+        '''Returns True if for any diatonic note (e.g., C or C# = C) there are two or more 
+        different notes (such as E and E-) in the chord. If there are no repeated 
+        scale degrees, return false.
         
         example:
         >>> from music21 import *
         >>> cchord = chord.Chord (['C', 'E', 'E-', 'G'])
         >>> other = chord.Chord (['C', 'E', 'F-', 'G'])
-        >>> cchord.hasAnyRepeatedScale() 
+        >>> cchord.hasAnyRepeatedDiatonicNote() 
         True
-        >>> other.hasAnyRepeatedScale() # returns false (chromatically identical notes of different scale degrees do not count.
+        >>> other.hasAnyRepeatedDiatonicNote() # returns false (chromatically identical notes of different scale degrees do not count).
         False
         '''
         for i in range(1,8): ## == 1 - 7 inclusive
-            if (self.hasRepeatedScaleX(i, testRoot) == True):
+            if (self.hasRepeatedChordStep(i, testRoot) == True):
                 return True
         return False
 
@@ -978,8 +992,8 @@ class Chord(note.NotRest):
         True
         '''
 
-        third = self.hasThird()
-        fifth = self.hasFifth()
+        third = self.third
+        fifth = self.fifth
 
         if (third is False or fifth is False):
             return False
@@ -1002,8 +1016,8 @@ class Chord(note.NotRest):
         >>> other.isTriad() 
         False
         '''
-        third = self.hasThird()
-        fifth = self.hasFifth()
+        third = self.third
+        fifth = self.fifth
 
         if (third is False or fifth is False):
             return False
@@ -1012,7 +1026,7 @@ class Chord(note.NotRest):
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.diatonic.generic.mod7 != 1) and (thisInterval.diatonic.generic.mod7 != 3) and (thisInterval.diatonic.generic.mod7 != 5):
                 return False
-            if (self.hasAnyRepeatedScale() == True):
+            if (self.hasAnyRepeatedDiatonicNote() == True):
                 return False
                 
         return True
@@ -1030,9 +1044,9 @@ class Chord(note.NotRest):
         True
         '''
 
-        third = self.hasThird()
-        fifth = self.hasFifth()
-        seventh = self.hasSeventh()
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
 
         if (third is False or fifth is False or seventh is False):
             return False
@@ -1055,20 +1069,19 @@ class Chord(note.NotRest):
         False
         '''
         
-        third = self.hasThird()
-        fifth = self.hasFifth()
-        seventh = self.hasSeventh()
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
 
         if (third is False or fifth is False or seventh is False):
             return False
 
-        # unused variable
-        # firstThird = self.hasSpecificX(3)
+        if self.hasAnyRepeatedDiatonicNote():
+            return False
+
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
             if (thisInterval.diatonic.generic.mod7 != 1) and (thisInterval.diatonic.generic.mod7 != 3) and (thisInterval.diatonic.generic.mod7 != 5) and (thisInterval.diatonic.generic.mod7 != 7):
-                return False
-            if self.hasAnyRepeatedScale():
                 return False
                 
         return True
@@ -1088,9 +1101,9 @@ class Chord(note.NotRest):
         >>> other.isMajorTriad() # returns False
         False
         '''
-        third = self.hasSpecificX(3)
-        fifth = self.hasSpecificX(5)
-        if (third is False or fifth is False):
+        third = self.third
+        fifth = self.fifth
+        if (third == False or fifth == False):
             return False
  
         ### TODO: rewrite so that [C,E+++,G---] does not return True
@@ -1117,9 +1130,9 @@ class Chord(note.NotRest):
         >>> other.isMinorTriad() # returns False
         False
         '''
-        third = self.hasSpecificX(3)
-        fifth = self.hasSpecificX(5)
-        if (third is False or fifth is False):
+        third = self.third
+        fifth = self.fifth
+        if (third == False or fifth == False):
             return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
@@ -1153,8 +1166,8 @@ class Chord(note.NotRest):
         >>> c3.isIncompleteMajorTriad()
         False        
         '''
-        third = self.hasSpecificX(3)
-        if (third is False):
+        third = self.third
+        if (third == False):
             return False
  
         for thisPitch in self.pitches:
@@ -1184,8 +1197,8 @@ class Chord(note.NotRest):
         >>> c3.isIncompleteMinorTriad()
         False        
         '''
-        third = self.hasSpecificX(3)
-        if (third is False):
+        third = self.third
+        if (third == False):
             return False
  
         for thisPitch in self.pitches:
@@ -1213,8 +1226,8 @@ class Chord(note.NotRest):
         False
         '''
 
-        third = self.hasSpecificX(3)
-        fifth = self.hasSpecificX(5)
+        third = self.third
+        fifth = self.fifth
         
         if (third is False or fifth is False):
             return False
@@ -1257,10 +1270,10 @@ class Chord(note.NotRest):
         >>> c.isAugmentedTriad()
         False
         '''
-        third = self.hasSpecificX(3)
-        fifth = self.hasSpecificX(5)
+        third = self.third
+        fifth = self.fifth
 
-        if (third is False or fifth is False):
+        if (third == False or fifth == False):
             return False
                 
         for thisPitch in self.pitches:
@@ -1281,11 +1294,11 @@ class Chord(note.NotRest):
         True
         '''
         
-        third = self.hasSpecificX(3)
-        fifth = self.hasSpecificX(5)
-        seventh = self.hasSpecificX(7)
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
         
-        if (third is False or fifth is False or seventh is False):
+        if (third == False or fifth == False or seventh == False):
             return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
@@ -1305,9 +1318,9 @@ class Chord(note.NotRest):
         >>> a.isDiminishedSeventh()
         True
         '''
-        third = self.hasSpecificX(3)
-        fifth = self.hasSpecificX(5)
-        seventh = self.hasSpecificX(7)
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
         
         if (third is False or fifth is False or seventh is False):
             return False
@@ -1339,9 +1352,9 @@ class Chord(note.NotRest):
         >>> c3.isHalfDiminishedSeventh()
         False
         '''
-        third = self.hasSpecificX(3)
-        fifth = self.hasSpecificX(5)
-        seventh = self.hasSpecificX(7)
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
         
         if (third is False or fifth is False or seventh is False):
             return False
@@ -1478,11 +1491,11 @@ class Chord(note.NotRest):
         'other'
 
         '''
-        third = self.hasScaleX(3)
-        fifth = self.hasScaleX(5)
+        third = self.semitonesFromChordStep(3)
+        fifth = self.semitonesFromChordStep(5)
         if third == None:
             return "other"        
-        elif self.hasRepeatedScaleX(3):
+        elif self.hasRepeatedChordStep(3):
             return "other"
         elif fifth == None:
             if third.semitones == 4:
@@ -1491,7 +1504,7 @@ class Chord(note.NotRest):
                 return "minor"
             else:
                 return "other"
-        elif self.hasRepeatedScaleX(5):
+        elif self.hasRepeatedChordStep(5):
             return "other"
         elif fifth == 7 and third == 4:
             return "major"
@@ -1565,8 +1578,12 @@ class Chord(note.NotRest):
             raise ChordException("Not a normal inversion")
 
     def inversionName(self):
-        ''' Returns an integer representing the common abbreviation for the inversion the chord is in.
+        ''' 
+        Returns an integer representing the common abbreviation 
+        for the inversion the chord is in.
         If chord is not in a common inversion, returns None.
+
+        Third inversion sevenths return 42 not 2
 
         >>> from music21 import *
         >>> a = chord.Chord(['G3', 'B3', 'F3', 'D3'])
@@ -1578,7 +1595,7 @@ class Chord(note.NotRest):
         except ChordException:
             return None
         
-        if self.isSeventh() or self.hasScaleX(7):
+        if self.isSeventh() or self.seventh is not False:
             if inv == 0:
                 return 7
             elif inv == 1:
@@ -2404,7 +2421,7 @@ class Test(unittest.TestCase):
         LowG.octave = 3
     
         chord1 = Chord([HighEFlat, MiddleC, LowG])
-        assert chord1.hasScaleX(3, MiddleC) is not False
+        assert chord1.getChordStep(3, testRoot = MiddleC) is not False
         chord1.root(MiddleC)
     
         HighAFlat = note.Note()
@@ -2412,8 +2429,8 @@ class Test(unittest.TestCase):
         HighAFlat.octave = 5
         
         chord2 = Chord([MiddleC, HighEFlat, LowG, HighAFlat])
-        assert chord1.hasThird() is not False
-        assert chord1.hasFifth() is not False
+        assert chord1.third is not False
+        assert chord1.fifth is not False
         assert chord1.containsTriad()  == True
         assert chord1.isTriad() == True
         assert chord2.containsTriad() == True
@@ -2491,10 +2508,10 @@ class Test(unittest.TestCase):
         
         chord13 = Chord([MiddleC, MiddleE, LowG, LowGFlat])
         
-        assert chord13.hasScaleX(5) is not False
-        assert chord13.hasRepeatedScaleX(5) == True
-        assert chord13.hasAnyRepeatedScale() == True
-        assert chord13.hasScaleX(2) == False
+        assert chord13.getChordStep(5) is not False
+        assert chord13.hasRepeatedChordStep(5) == True
+        assert chord13.hasAnyRepeatedDiatonicNote() == True
+        assert chord13.getChordStep(2) == False
         assert chord13.containsTriad() == True
         assert chord13.isTriad() == False
         
@@ -2535,7 +2552,7 @@ class Test(unittest.TestCase):
         chord18 = Chord([MiddleC, LowE, LowGFlat])
         
         assert chord18.inversion() == 1
-        assert chord18.inversionName() == 6
+        self.assertEqual(chord18.inversionName(), 6)
         
         LowBFlat = note.Note()
         LowBFlat.name = 'B-'
@@ -2562,7 +2579,7 @@ class Test(unittest.TestCase):
         
         chord22 = Chord([MiddleC, MiddleF, LowA])
         assert chord22.root().name == 'F'
-        assert chord22.inversionName() == 6
+        self.assertEqual(chord22.inversionName(), 6)
         
         chord23 = Chord([MiddleC, MiddleF, LowA, HighEFlat])
         assert chord23.root().name == 'F'

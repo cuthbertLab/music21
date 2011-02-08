@@ -333,11 +333,11 @@ class RomanNumeral(chord.Chord):
         for i in range(len(correctSemitones)):
             thisScaleDegree = scaleDegreesToExamine[i]
             thisCorrect = correctSemitones[i]
-            thisSemis = self.hasScaleX(thisScaleDegree)
+            thisSemis = self.semitonesFromChordStep(thisScaleDegree)
             if thisSemis == 0:
                 continue
             if thisSemis != thisCorrect:
-                faultyPitch = self.scaleX(thisScaleDegree)
+                faultyPitch = self.getChordStep(thisScaleDegree)
                 if faultyPitch == None:
                     raise RomanException("this is very odd...")
                 if faultyPitch.accidental == None:

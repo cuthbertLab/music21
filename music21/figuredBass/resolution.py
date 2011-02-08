@@ -66,9 +66,9 @@ def dominantSeventhToTonic(pitches, resolveTo='major', inPlace=False):
         pitches[i].order = i
     
     root = pitches[pitches.index(c.root())]
-    third = pitches[pitches.index(c.third())]
-    fifth = pitches[pitches.index(c.fifth())]
-    seventh = pitches[pitches.index(c.seventh())]
+    third = pitches[pitches.index(c.third)]
+    fifth = pitches[pitches.index(c.fifth)]
+    seventh = pitches[pitches.index(c.seventh)]
     
     #Resolve the root (if necessary)
     if c.inversion() == 0:
@@ -137,9 +137,9 @@ def dominantSeventhToSubmediant(pitches, resolveTo='major', inPlace=False):
         pitches[i].order = i
     
     root = pitches[pitches.index(c.root())]
-    third = pitches[pitches.index(c.third())]
-    fifth = pitches[pitches.index(c.fifth())]
-    seventh = pitches[pitches.index(c.seventh())]
+    third = pitches[pitches.index(c.third)]
+    fifth = pitches[pitches.index(c.fifth)]
+    seventh = pitches[pitches.index(c.seventh)]
     
     if resolveTo == 'major':
         root.transpose('m2', True)
@@ -200,9 +200,9 @@ def dominantSeventhToSubdominant(pitches, resolveTo='major', inPlace=False):
         pitches[i].order = i
     
     root = pitches[pitches.index(c.root())]
-    third = pitches[pitches.index(c.third())]
-    fifth = pitches[pitches.index(c.fifth())]
-    seventh = pitches[pitches.index(c.seventh())]
+    third = pitches[pitches.index(c.third)]
+    fifth = pitches[pitches.index(c.fifth)]
+    seventh = pitches[pitches.index(c.seventh)]
     
     if resolveTo == 'minor':
         root.transpose('m2', True)
@@ -258,9 +258,9 @@ def diminishedSeventhToTonic(pitches, resolveTo='major', inPlace=False):
         pitches[i].order = i
     
     root = pitches[pitches.index(c.root())] #Scale degree 7
-    third = pitches[pitches.index(c.third())] #Scale degree 2
-    fifth = pitches[pitches.index(c.fifth())] #Scale degree 4
-    seventh = pitches[pitches.index(c.seventh())] #Scale degree 6
+    third = pitches[pitches.index(c.third)] #Scale degree 2
+    fifth = pitches[pitches.index(c.fifth)] #Scale degree 4
+    seventh = pitches[pitches.index(c.seventh)] #Scale degree 6
     
     #If major, d7 resolves to M3/m3; if minor, d7 resolves to m3/M3
     
@@ -308,9 +308,9 @@ def diminishedSeventhToSubdominant(pitches, resolveTo='major', inPlace=False):
     c = chord.Chord(copy.deepcopy(pitches))
 
     if not c.isDiminishedSeventh():
-        raise ResolutionException("Pitches do not form a correctly spelled diminished seventh chord.")
+        raise ResolutionException("Pitches do not form a correctly-spelled diminished-seventh chord.")
     if not len(pitches) == 4:
-        raise ResolutionException("Not a four part chord. Can't resolve.")
+        raise ResolutionException("Not a four-part chord. Can't resolve.")
     if not (resolveTo == 'major' or resolveTo == 'minor'):
         raise ResolutionException("Unsupported scale type. Only major or minor.")
     
@@ -322,9 +322,9 @@ def diminishedSeventhToSubdominant(pitches, resolveTo='major', inPlace=False):
         pitches[i].order = i
     
     root = pitches[pitches.index(c.root())] #Scale degree 7
-    third = pitches[pitches.index(c.third())] #Scale degree 2
-    fifth = pitches[pitches.index(c.fifth())] #Scale degree 4
-    seventh = pitches[pitches.index(c.seventh())] #Scale degree 6
+    third = pitches[pitches.index(c.third)] #Scale degree 2
+    fifth = pitches[pitches.index(c.fifth)] #Scale degree 4
+    seventh = pitches[pitches.index(c.seventh)] #Scale degree 6
 
     #Scale degrees 7,2 resolve to tonic.
     root.transpose('m2', True)
