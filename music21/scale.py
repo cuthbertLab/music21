@@ -1177,12 +1177,12 @@ class ConcreteScale(Scale):
         ''')
 
     def getChord(self, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_ASCENDING):
+        direction=DIRECTION_ASCENDING, **keywords):
         '''Return a realized chord containing all the pitches in this scale within
         a particular range
         '''
         from music21 import chord
-        return chord.Chord(self.getPitches(minPitch=minPitch, maxPitch=maxPitch, direction=direction))
+        return chord.Chord(self.getPitches(minPitch=minPitch, maxPitch=maxPitch, direction=direction), **keywords)
 
     chord = property(getChord, 
         doc = '''Return a Chord object form this harmony over a default range

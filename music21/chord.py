@@ -2829,6 +2829,18 @@ class Test(unittest.TestCase):
         self.assertEqual(out.find("""<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><notations><tiedtype="start"/></notations>"""), 1149)
 
         
+    def testTiesB(self):
+        from music21 import chord, stream, tie, scale
+        sc = scale.WholeToneScale()
+        s = stream.Stream()
+        for i in range(7):
+            tiePos = range(i+1)
+            c = sc.getChord('c4', 'c5', quarterLength=1)
+            for pos in tiePos:
+                c.setTie(tie.Tie('start'), c.pitches[pos])
+            s.append(c)
+        #s.show()
+
 
 
 #-------------------------------------------------------------------------------
