@@ -749,6 +749,7 @@ def chordToMx(c):
     >>> mxNoteList[2].get('chord')
     True
     '''
+    #environLocal.printDebug(['chordToMx', c])
     mxNoteList = []
     durPos = 0 # may have more than one dur
     durPosLast = len(c.duration.mx) - 1
@@ -772,20 +773,27 @@ def chordToMx(c):
 
             # if this note, not a component duration,
             # need to add this to the last-encountered mxNote
-            if c.tie != None:
-                # get mxl objs from tie obj
-                mxTieList, mxTiedList = c.tie.mx 
+
+            # get mxl objs from tie obj
+            #mxTieList, mxTiedList = c.tie.mx 
+            tieObj = c.getTie(pitchObj) # get for each pitch
+            if tieObj is not None:
+                #environLocal.printDebug(['chordToMx: found tie for pitch', pitchObj])
+
+                mxTieList, mxTiedList = tieObj.mx 
                 # if starting a tie, add to all mxNotes in the chord
                 # but only add to the last duration in the dur group
-                if (c.tie.type in ['start', 'continue'] and 
+                if (tieObj.type in ['start', 'continue'] and 
                     durPos == durPosLast):
                     mxNote.tieList += mxTieList
                     mxNote.notationsObj.componentList += mxTiedList
                 # if ending a tie, set first duration of dur group
-                elif (c.tie.type == 'stop' and durPos == 0):
+                elif (tieObj.type == 'stop' and durPos == 0):
                     mxNote.tieList += mxTieList
                     mxNote.notationsObj.componentList += mxTiedList
-
+                else:
+                    pass
+                    #environLocal.printDebug(['rejecting tie creation', 'tieObj.type', tieObj.type, 'durPos', durPos])
             chordPos += 1
             mxNoteChordGroup.append(mxNote)
         
@@ -840,6 +848,7 @@ def mxToChord(mxNoteList, inputM21=None):
     '''
     from music21 import chord
     from music21 import pitch
+    from music21 import tie
 
     if inputM21 == None:
         c = chord.Chord()
@@ -849,13 +858,28 @@ def mxToChord(mxNoteList, inputM21=None):
     # assume that first chord is the same duration for all parts
     c.duration.mx = mxNoteList[0]
     pitches = []
+    ties = [] # store equally spaced list; use None if not defined
     for mxNote in mxNoteList:
         # extract pitch pbjects     
         p = pitch.Pitch()
-        p.mx = mxNote # will extact pitch info form mxNote
+        p.mx = mxNote # will extract pitch info form mxNote
         pitches.append(p)
+
+        if len(mxNote.tieList) > 0:
+            tieObj = tie.Tie() # m21 tie object
+            tieObj.mx = mxNote # provide entire Note
+            #environLocal.printDebug(['found tie in chord', tieObj])
+            ties.append(tieObj)
+        else: # need place holder for each pitch
+            ties.append(None)
     # set all at once
     c.pitches = pitches
+
+    # set ties based on pitches
+    for i, t in enumerate(ties):
+        if t is not None:
+            # provide pitch to assign tie to based on index number
+            c.setTie(t, pitches[i])
 
 
 #-------------------------------------------------------------------------------
@@ -1014,6 +1038,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     n.duration.mx = mxNote
     n.beams.mx = mxNote.beamList
 
+    # can use mxNote.tieList instead
     mxTieList = mxNote.get('tieList')
     if len(mxTieList) > 0:
         tieObj = tie.Tie() # m21 tie object

@@ -2808,7 +2808,28 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         from music21 import converter
         s = converter.parse(testPrimitive.chordIndependentTies)
+        chords = s.flat.getElementsByClass('Chord')
+        # the middle pitch should have a tie
+        self.assertEqual(chords[0].getTie(pitch.Pitch('a4')).type, 'start')
+        self.assertEqual(chords[0].getTie(pitch.Pitch('c5')), None)
+        self.assertEqual(chords[0].getTie(pitch.Pitch('f4')), None)
+
+        self.assertEqual(chords[1].getTie(pitch.Pitch('a4')).type, 'continue')
+        self.assertEqual(chords[1].getTie(pitch.Pitch('g5')), None)
+
+        self.assertEqual(chords[2].getTie(pitch.Pitch('a4')).type, 'continue')
+        self.assertEqual(chords[2].getTie(pitch.Pitch('f4')).type, 'start')
+        self.assertEqual(chords[2].getTie(pitch.Pitch('c5')), None)
+
         #s.show()
+        out = s.musicxml
+        out = out.replace(' ', '')
+        out = out.replace('\n', '')
+        #print out
+        self.assertEqual(out.find("""<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><notations><tiedtype="start"/></notations>"""), 1149)
+
+        
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
