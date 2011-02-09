@@ -52,7 +52,7 @@ accidentalNameToModifier = {
     'sharp' : '#',
     'double-sharp':'##',
     'triple-sharp':'###',
-    'quadruple-sharp':'###',
+    'quadruple-sharp':'####',
 
     'flat':'-',
     'double-flat':'--',
