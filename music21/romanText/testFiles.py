@@ -1,9 +1,29 @@
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         romanText/base.py
+# Purpose:      test files for roman numeral text analysis
+#
+# Authors:      Christopher Ariza
+#
+# Copyright:    (c) 2011 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
+'''Objects for processing roman numeral analysis text files, as defined and demonstrated by Dmitri Tymoczko.
+'''
+import unittest
+import music21
+
+
+
+
+
 
 
 monteverdi_4_12 = """
 Composer: Claudio Monteverdi
 Madrigal: 4.12
-Title: Ohimè, se tanto amate
+Title: OhimÃ‹, se tanto amate
 Time Signature: 4/4
 
 m1 g: i
@@ -266,6 +286,39 @@ m139 I"""
 
 
 
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+    
+
+
+
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = []
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        t = Test()
+        te = TestExternal()
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
+
+#------------------------------------------------------------------------------
+# eof
 
 
 
