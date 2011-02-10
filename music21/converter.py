@@ -7,7 +7,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -71,6 +71,10 @@ from music21.abc import base as abcModule
 from music21.abc import translate as abcTranslate
 from music21.musedata import base as musedataModule
 from music21.musedata import translate as musedataTranslate
+
+from music21.romanText import base as romanTextModule
+from music21.romanText import translate as romanTextTranslate
+
 
 from music21 import environment
 _MOD = 'converter.py'
@@ -594,6 +598,37 @@ class ConverterABC(object):
     stream = property(_getStream)
 
 
+class ConverterRomanText(object):
+    '''Simple class wrapper for parsing roman text harmonic definitions.
+    '''
+
+    def __init__(self):
+        # always create a score instance
+        self._stream = stream.Score()
+
+    def parseData(self, strData, number=None):
+        '''
+        '''
+        rtf = romanTextModule.RTFile()
+        rtHandler = rtf.readstr(strData) 
+        romanTextTranslate.romanTextToStreamScore(rtHandler, self._stream)
+
+    def parseFile(self, fp, number=None):
+        '''
+        '''
+        rtf = romanTextModule.RTFile()
+        rtf.open(fp)
+        # returns a handler instance of parse tokens
+        rtHandler = rtf.read() 
+        rtf.close()
+        romanTextTranslate.romanTextToStreamScore(rtHandler, self._stream)
+
+    def _getStream(self):
+        return self._stream
+
+    stream = property(_getStream)
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -692,6 +727,10 @@ class Converter(object):
             self._converter = ConverterABC()
         elif format == 'musedata':
             self._converter = ConverterMuseData()
+        elif format == 'text': # based on extension
+            # presently, all text files are treated as roman text
+            # need to handle various text formats
+            self._converter = ConverterRomanText()
         else:
             raise ConverterException('no such format: %s' % format)
 
@@ -739,6 +778,8 @@ class Converter(object):
                 format = 'musedata'
             elif 'M:' in dataStr and 'K:' in dataStr:
                 format = 'abc'
+            elif 'Time Signature:' in dataStr and 'm1' in dataStr:
+                format = 'romanText'
             else:
                 raise ConverterException('no such format found for: %s' % dataStr)
 

@@ -14,6 +14,7 @@
 
 import unittest
 import re
+import codecs
 try:
     import StringIO # python 2 
 except:
@@ -608,12 +609,12 @@ class RTFile(object):
     def close(self): 
         self.file.close() 
     
-    def read(self, number=None): 
+    def read(self): 
         '''Read a file. Note that this calls readstring, which processes all tokens. 
 
         If `number` is given, a work number will be extracted if possible. 
         '''
-        return self.readstr(self.file.read(), number) 
+        return self.readstr(self.file.read()) 
     
     def readstr(self, strSrc): 
         '''Read a string and process all Tokens. Returns a ABCHandler instance.
@@ -730,7 +731,6 @@ class Test(unittest.TestCase):
         self.assertEqual(rtm.number, [59])
         self.assertEqual(rtm.tag, 'm59')
         self.assertEqual(rtm.variantNumber, None)
-
 
         rtm = RTMeasure('m3-4 = m1-2')
         self.assertEqual(rtm.data, '= m1-2')

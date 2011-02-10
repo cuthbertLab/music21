@@ -52,9 +52,6 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     tsCurrent = None # store initial time signature
     tsSet = False # store if set to a measure
 
-
-
-
     for t in rtHandler.tokens:
         if t.isTitle():
             md.title = t.data            
@@ -163,9 +160,6 @@ class Test(unittest.TestCase):
 
         s = romanTextStringToStreamScore(testFiles.riemenschneider001)
         #s.show()
-
-
-
 
 
 #-------------------------------------------------------------------------------
