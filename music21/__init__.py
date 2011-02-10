@@ -45,7 +45,7 @@ __all__ = ['base',
            # sub folders
            'abc', 'abj', 'analysis', 'composition', 'counterpoint', 'corpus', 
            'demos', 'doc', 'figuredBass', 'humdrum', 
-           'lily', 'musicxml', 'test', 'trecento', 'midi',
+           'lily', 'musicxml', 'romanText', 'test', 'trecento', 'midi', 
            
            # individual modules
            'articulations', 'bar',
