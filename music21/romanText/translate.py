@@ -63,10 +63,11 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
 
         elif t.isMeasure():
-            pass
-            #print t
-
-
+            # pass this off to measure creation tools
+            for a in t.atoms:
+                pass
+                #print a
+            #print 
         # need to get time signature here
 
 

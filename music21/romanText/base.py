@@ -34,6 +34,8 @@ reMeasureTag = re.compile('m[0-9]+[a-b]*-*[0-9]*[a-b]*')
 reVariant = re.compile('var[0-9]+')
 reNoteTag = re.compile('[Nn]ote:')
 
+reKeyAtom = re.compile('[A-Ga-g]*[b#]+:')
+
 
 
 #-------------------------------------------------------------------------------
@@ -58,7 +60,7 @@ class RTToken(object):
         self.src = src # store source character sequence
 
     def __repr__(self):
-        return '<RomanTextoken %r>' % self.src
+        return '<RTToken %r>' % self.src
 
     def isComposer(self):
         return False
@@ -79,7 +81,7 @@ class RTToken(object):
         return False
 
     def isForm(self):
-        '''Occasional found in header.
+        '''Occasionally found in header.
         '''
         return False
 
@@ -90,6 +92,11 @@ class RTToken(object):
         return False
 
     def isWork(self):
+        return False
+
+    def isAtom(self):
+        '''Atoms are any untagged data; generally only found inside of a measure definition. 
+        '''
         return False
 
 
@@ -214,6 +221,10 @@ class RTMeasure(RTToken):
         self.number = [] # one or more measure numbers
         self.repeatLetter = [] # one or more repeat letters
         self.variantNumber = None # if defined a variant
+
+        # store processed tokens associated with this measure
+        self.atoms = []
+
         if len(src) > 0:
             self._parseAttributes(src)
 
@@ -282,6 +293,95 @@ class RTMeasure(RTToken):
 
 
 
+class RTAtom(RTToken):
+    '''In roman text, within each measure are definitions of chords, phrases boundaries, open/close parenthesis, and beat indicators. These will be called Atoms, as they are data that is not tagged.
+
+    Store a reference to the container (a RTMeasure) in each atom.
+    '''
+    def __init__(self, src =u'', container=None):
+        '''
+        >>> from music21 import *
+        '''
+        # this stores the source
+        RTToken.__init__(self, src)
+        self.container = container
+
+    def __repr__(self):
+        return '<RTAtom %r>' % self.src
+
+    def isAtom(self):
+        return True
+
+    # for lower level distinctions, use isinstance(), as each type has its own subclass.
+
+
+class RTChord(RTAtom):
+    def __init__(self, src =u'', container=None):
+        '''
+        >>> from music21 import *
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTChord %r>' % self.src
+
+
+class RTBeat(RTAtom):
+    def __init__(self, src =u'', container=None):
+        '''
+        >>> from music21 import *
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTBeat %r>' % self.src
+
+
+class RTKey(RTAtom):
+    def __init__(self, src =u'', container=None):
+        '''
+        >>> from music21 import *
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTKey %r>' % self.src
+
+
+class RTOpenParens(RTAtom):
+    def __init__(self, src =u'', container=None):
+        '''
+        >>> from music21 import *
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTOpenParens %r>' % self.src
+
+
+class RTCloseParens(RTAtom):
+    def __init__(self, src =u'', container=None):
+        '''
+        >>> from music21 import *
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTCloseParens %r>' % self.src
+
+
+class RTPhraseBoundary(RTAtom):
+    def __init__(self, src =u'', container=None):
+        '''
+        >>> from music21 import *
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTPhraseBoundary %r>' % self.src
+
+
+
 #-------------------------------------------------------------------------------
 class RTHandler(object):
 
@@ -292,7 +392,6 @@ class RTHandler(object):
         # tokens are strongly divided between header and body, so can 
         # divide here
         self._tokens = []
-
 
     def _splitAtHeader(self, lines):
         '''Divide string into header and non-header.
@@ -322,6 +421,28 @@ class RTHandler(object):
             post.append(RTTagged(l))
         return post
 
+    def _tokenizeAtoms(self, line, container=None):
+        '''Given a line of data stored in measure consisting only of Atoms, tokenize and return a list. 
+        '''
+        post = []
+        # break by spaces
+        for word in line.split(' '):
+            word = word.strip()
+            if word == '': continue
+            elif word == '||':
+                post.append(RTPhraseBoundary(word, container))
+            elif word == '(':
+                post.append(RTOpenParens(word, container))
+            elif word == ')':
+                post.append(RTCloseParens(word, container))
+            elif word.startswith('b'):
+                post.append(RTBeat(word, container))
+            # from here, all that is left is keys or chords
+            elif reKeyAtom.match(word) is not None:
+                post.append(RTKey(word, container))
+            else: # only option is that it is a chord
+                post.append(RTChord(word, container))
+        return post
 
     def _tokenizeBody(self, lines):
         '''In the body, we may have measure, time signature, or note declarations, as well as possible other tagged definitions
@@ -334,16 +455,12 @@ class RTHandler(object):
             # first, see if it is a measure definition, if not, than assume it is tagged data
             if reMeasureTag.match(l) is not None:
                 rtm = RTMeasure(l)
+                rtm.atoms = self._tokenizeAtoms(rtm.data, container=rtm)
                 post.append(rtm)
+                # store items in a measure tag outside of the measure
             else:
                 post.append(RTTagged(l))
-
         return post
-            
-            #if l.startswith()
-
-            #self._tokensBody.append(t)
-
 
 
 
@@ -486,6 +603,22 @@ class Test(unittest.TestCase):
         # this only works if it starts the string
         g = reVariant.match('var1 IV6 b4 C: V')
         self.assertEqual(g.group(0), 'var1')
+
+        g = reKeyAtom.match('Bb:')
+        self.assertEqual(g.group(0), 'Bb:')
+        g = reKeyAtom.match('F#:')
+        self.assertEqual(g.group(0), 'F#:')
+        g = reKeyAtom.match('f#:')
+        self.assertEqual(g.group(0), 'f#:')
+        g = reKeyAtom.match('b:')
+        self.assertEqual(g.group(0), 'b:')
+        g = reKeyAtom.match('bb:')
+        self.assertEqual(g.group(0), 'bb:')
+
+        # beats do not have a colon
+        self.assertEqual(reKeyAtom.match('b2'), None)
+        self.assertEqual(reKeyAtom.match('b2.5'), None)
+
 
 
     def testMeasureAttributeProcessing(self):
