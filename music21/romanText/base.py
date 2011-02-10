@@ -34,7 +34,9 @@ reMeasureTag = re.compile('m[0-9]+[a-b]*-*[0-9]*[a-b]*')
 reVariant = re.compile('var[0-9]+')
 reNoteTag = re.compile('[Nn]ote:')
 
-reKeyAtom = re.compile('[A-Ga-g]*[b#]+:')
+reKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
+# must distinguish b3 from bVII; there may be b1.66.5
+reBeatAtom = re.compile('b[1-9.]+')
 
 
 
@@ -423,6 +425,18 @@ class RTHandler(object):
 
     def _tokenizeAtoms(self, line, container=None):
         '''Given a line of data stored in measure consisting only of Atoms, tokenize and return a list. 
+
+        >>> from music21 import *
+        >>> rth = romanText.RTHandler()
+        >>> str(rth._tokenizeAtoms('IV b3 ii7 b4 ii'))
+        "[<RTChord 'IV'>, <RTBeat 'b3'>, <RTChord 'ii7'>, <RTBeat 'b4'>, <RTChord 'ii'>]"
+
+        >>> str(rth._tokenizeAtoms('V7 b2 V13 b3 V7 iio6/5[no5]'))
+        "[<RTChord 'V7'>, <RTBeat 'b2'>, <RTChord 'V13'>, <RTBeat 'b3'>, <RTChord 'V7'>, <RTChord 'iio6/5[no5]'>]"
+
+        >>> str(rth._tokenizeAtoms('I b2 I b2.25 V/ii b2.5 bVII b2.75 V g: IV'))
+        "[<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, <RTKey 'g:'>, <RTChord 'IV'>]"
+
         '''
         post = []
         # break by spaces
@@ -435,7 +449,7 @@ class RTHandler(object):
                 post.append(RTOpenParens(word, container))
             elif word == ')':
                 post.append(RTCloseParens(word, container))
-            elif word.startswith('b'):
+            elif reBeatAtom.match(word) is not None:
                 post.append(RTBeat(word, container))
             # from here, all that is left is keys or chords
             elif reKeyAtom.match(word) is not None:
@@ -455,6 +469,7 @@ class RTHandler(object):
             # first, see if it is a measure definition, if not, than assume it is tagged data
             if reMeasureTag.match(l) is not None:
                 rtm = RTMeasure(l)
+                # note: could places these in-line, after post
                 rtm.atoms = self._tokenizeAtoms(rtm.data, container=rtm)
                 post.append(rtm)
                 # store items in a measure tag outside of the measure
@@ -614,10 +629,21 @@ class Test(unittest.TestCase):
         self.assertEqual(g.group(0), 'b:')
         g = reKeyAtom.match('bb:')
         self.assertEqual(g.group(0), 'bb:')
+        g = reKeyAtom.match('g:')
+        self.assertEqual(g.group(0), 'g:')
 
         # beats do not have a colon
         self.assertEqual(reKeyAtom.match('b2'), None)
         self.assertEqual(reKeyAtom.match('b2.5'), None)
+
+        g = reBeatAtom.match('b2.5')
+        self.assertEqual(g.group(0), 'b2.5')
+
+        g = reBeatAtom.match('bVII')
+        self.assertEqual(g, None)
+
+        g = reBeatAtom.match('b1.66.5')
+        self.assertEqual(g.group(0), 'b1.66.5')
 
 
 

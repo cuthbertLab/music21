@@ -60,18 +60,15 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             md.composer = t.data
         elif t.isTimeSignature():
             tsCurrent = meter.TimeSignature(t.data)
-
+            environLocal.printDebug(['tsCurrent:', tsCurrent])
 
         elif t.isMeasure():
             # pass this off to measure creation tools
-            for a in t.atoms:
+            for i, a in enumerate(t.atoms):
                 pass
                 #print a
             #print 
         # need to get time signature here
-
-
-    environLocal.printDebug(['tsCurrent:', tsCurrent])
     
     return s
 
