@@ -310,6 +310,9 @@ def nearestCommonFraction(x, grain=1e-2):
     >>> common.nearestCommonFraction(.125)
     0.125
     '''
+    if isStr(x):
+        x = float(x)
+
     values = [1/3., 2/3., 
               1/6., 2/6., 3/6., 4/6., 5/6.]
     for v in values:

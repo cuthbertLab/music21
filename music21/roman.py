@@ -202,12 +202,16 @@ class RomanNumeral(chord.Chord):
         else:
             self.impliedScale = False
         
-        self._parseFigure(figure)
+        # need to permit object creation with no arguments
+        if figure is not None:
+            self._parseFigure(figure)
 
 
     def _parseFigure(self, figure):
-        self.figure = figure
+        if not common.isStr(figure):
+            raise RomanException('got a non-string figure: %r', figure)
 
+        self.figure = figure
         flatAlteration = 0
         sharpAlteration = 0
         figure = re.sub('^N', 'bII', figure)

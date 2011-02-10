@@ -2962,6 +2962,8 @@ class TimeSignature(music21.Music21Object):
         # resolve .33 to .3333333
         beatFraction = common.nearestCommonFraction(beatFraction)
 
+        if beatInt-1 > len(self.beatSequence)-1:
+            raise TimeSignatureException('requested beat value (%s) not found in beat partitions (%s) of ts %s' % (beatInt, self.beatSequence, self))
         # get a duration object for the beat; will translate into quarterLength
         # beat int counts from 1; subtrack 1 to get index
         beatDur = self.beatSequence[beatInt-1].duration

@@ -231,7 +231,7 @@ Note: ascending 5-6 sequence
 m91 V b1.5 III+6 b2 VI b2.5 iv6
 m92 V || b1.5 F: IV
 m93 I b1.5 V6 b2 IV6 b2.5 ii6
-m94 V b1.5 I6/4 b3 V
+m94 V b1.5 I6/4 b2 V
 m95 I ||
 Time Signature: 3/2
 m96 V b3 I
@@ -273,7 +273,7 @@ m127 iv b2 VII
 m128 III
 m129 i b1.5 ii b2 i6 b2.5 IV
 m130 V
-m131 I || Bb: b2: vi
+m131 I || Bb: b2 vi
 m132 ii b2 V
 m133 I
 Note: reading passing motion in the following measures, embellishing a single G minor chord.

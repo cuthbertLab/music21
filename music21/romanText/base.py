@@ -324,6 +324,11 @@ class RTChord(RTAtom):
         '''
         RTAtom.__init__(self, src, container)
 
+        # store offset within measure
+        self.offset = None
+        # store a quarterlength duration
+        self.quarterLength = None
+
     def __repr__(self):
         return '<RTChord %r>' % self.src
 
@@ -338,6 +343,52 @@ class RTBeat(RTAtom):
     def __repr__(self):
         return '<RTBeat %r>' % self.src
 
+    def getOffset(self, timeSignature):
+        '''Given a time signature, return the offset position specified by this beat.
+
+        >>> from music21 import *
+        >>> rtb = romanText.RTBeat('b1.5')
+        >>> rtb.getOffset(meter.TimeSignature('3/4'))
+        0.5
+        >>> rtb.getOffset(meter.TimeSignature('6/8'))
+        0.75
+
+        >>> rtb = romanText.RTBeat('b2')
+        >>> rtb.getOffset(meter.TimeSignature('3/4'))
+        1.0
+        >>> rtb.getOffset(meter.TimeSignature('6/8'))
+        1.5
+
+        '''
+        from music21 import meter
+        beatStr = self.src.replace('b', '')
+        # there may be more than one decimal in the number, such as
+        # 1.66.5, to show halfway through 2/3rd of a beat
+        if '.' in beatStr:
+            parts = beatStr.split('.')
+            if len(parts) == 2:
+                beat = int(parts[0]) + common.nearestCommonFraction(
+                                    '.' + parts[1])
+            # assume not more than 2 decimals are given
+            elif len(parts) == 3:
+                beat = int(parts[0]) + common.nearestCommonFraction(parts[1])
+                # TODO: need to treat the third part as a fraction of the beat division that has just been specified
+                environLocal.printDebug(['discarding beat specification for beat indcation: %s' % self.src])
+            else:
+                environLocal.printDebug(['got unexpected beat: %s' % self.src])
+                raise RTTokenException('cannot handle specification: %s' %  self.src)
+        else: # assume it is an integer
+            beat = int(beatStr)
+        #environLocal.printDebug(['using beat value:', beat])
+        # TODO: check for exceptions/errors if this beat is bad
+        try:
+            post = timeSignature.getOffsetFromBeat(beat)
+        except meter.TimeSignatureException:
+            environLocal.printDebug(['bad beat specification: %s in a meter of %s' % (self.src, timeSignature)])
+            post = 0.0 
+
+        return post
+
 
 class RTKey(RTAtom):
     def __init__(self, src =u'', container=None):
@@ -349,6 +400,13 @@ class RTKey(RTAtom):
     def __repr__(self):
         return '<RTKey %r>' % self.src
 
+    def getKey(self):
+        from music21 import key
+        # alter flat symbol
+        keyStr = self.src.replace('b', '-')
+        keyStr = keyStr.replace(':', '')
+        #environLocal.printDebug(['create a key from:', keyStr])
+        return key.Key(keyStr)
 
 class RTOpenParens(RTAtom):
     def __init__(self, src =u'', container=None):
