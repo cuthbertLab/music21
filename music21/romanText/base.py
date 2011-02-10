@@ -31,6 +31,8 @@ environLocal = environment.Environment(_MOD)
 # alternate endings might end with a,b,c for non 
 # zero or more for everything after the first number
 reMeasureTag = re.compile('m[0-9]+[a-b]*-*[0-9]*[a-b]*')
+reVariant = re.compile('var[0-9]+')
+reNoteTag = re.compile('[Nn]ote:')
 
 
 
@@ -58,12 +60,44 @@ class RTToken(object):
     def __repr__(self):
         return '<RomanTextoken %r>' % self.src
 
+    def isComposer(self):
+        return False
+
+    def isTitle(self):
+        return False
+
+    def isAnalyst(self):
+        return False
+
+    def isProofreader(self):
+        return False
+
+    def isTimeSignature(self):
+        return False
+
+    def isNote(self):
+        return False
+
+    def isForm(self):
+        '''Occasional found in header.
+        '''
+        return False
+
+    def isMeasure(self):
+        return False
+
+    def isPedal(self):
+        return False
+
+    def isWork(self):
+        return False
 
 
+class RTTagged(RTToken):
+    '''In roman text, some data elements are tagged: there is tag, followed by some data. In other elements, there is just data.
 
-
-class RTHeader(RTToken):
-
+    All tagged tokens are subclasses of this class. Examples are Title:
+    '''
     def __init__(self, src =u''):
         RTToken.__init__(self, src)
         # try to split off tag from data
@@ -78,13 +112,13 @@ class RTHeader(RTToken):
             self.data = src
 
     def __repr__(self):
-        return '<RTHeader %r>' % self.src
+        return '<RTTagged %r>' % self.src
 
 
     def isComposer(self):
         '''
         >>> from music21 import *
-        >>> rth = romanText.RTHeader('Composer: Claudio Monteverdi')
+        >>> rth = romanText.RTTagged('Composer: Claudio Monteverdi')
         >>> rth.isComposer()
         True
         >>> rth.isTitle()
@@ -114,7 +148,25 @@ class RTHeader(RTToken):
         return False
 
     def isTimeSignature(self):
+        '''TimeSignature header data can be found intermingled with measures. 
+        '''
         if self.tag.lower() in ['timesignature', 'time signature']:
+            return True
+        return False
+
+    def isNote(self):
+        if self.tag.lower() in ['note']:
+            return True
+        return False
+
+
+    def isForm(self):
+        if self.tag.lower() in ['form']:
+            return True
+        return False
+
+    def isPedal(self):
+        if self.tag.lower() in ['pedal']:
             return True
         return False
 
@@ -122,7 +174,7 @@ class RTHeader(RTToken):
         '''The work is not defined as a header tag, but is used to represent all tags, often placed after Composer, for the work or pieces designation. 
 
         >>> from music21 import *
-        >>> rth = romanText.RTHeader('Madrigal: 4.12')
+        >>> rth = romanText.RTTagged('Madrigal: 4.12')
         >>> rth.isTitle()
         False
         >>> rth.isWork()
@@ -133,9 +185,100 @@ class RTHeader(RTToken):
         '4.12'
 
         '''
-        if not self.isComposer() and not self.isTitle() and not self.isAnalyst() and not self.isProofreader() and not self.isTimeSignature():
+        if not self.isComposer() and not self.isTitle() and not self.isAnalyst() and not self.isProofreader() and not self.isTimeSignature() and not self.isNote() and not self.isForm() and not self.isPedal() and not self.isMeasure():
             return True
         return False
+
+
+
+class RTMeasure(RTToken):
+    '''In roman text, measures are given one per line and always start with 'm'.
+
+    Measure ranges can be used and copied, such as m3-4=m1-2
+
+    Variants are not part of the tag, but are read into an attribute: m1var1 ii
+    '''
+    def __init__(self, src =u''):
+        '''
+        >>> from music21 import *
+        >>> rtm = RTMeasure('m15 V6 b1.5 V6/5 b2 I b3 viio6')
+        >>> rtm.data
+        'V6 b1.5 V6/5 b2 I b3 viio6'
+        >>> rtm.number
+        [15]
+        '''
+        RTToken.__init__(self, src)
+        # try to split off tag from data
+        self.tag = '' # the measure number or range
+        self.data = '' # only chord, phrase, and similar definitions
+        self.number = [] # one or more measure numbers
+        self.repeatLetter = [] # one or more repeat letters
+        self.variantNumber = None # if defined a variant
+        if len(src) > 0:
+            self._parseAttributes(src)
+
+    def _getMeasureNumberData(self, src):
+        '''Return the number or numbers as a list, as well as any repeat indications. 
+
+        >>> from music21 import *
+        >>> rtm = romanText.RTMeasure()
+        >>> rtm._getMeasureNumberData('m77')
+        ([77], [''])
+        >>> rtm._getMeasureNumberData('m123b-432b')
+        ([123, 432], ['b', 'b'])
+        '''
+        if '-' in src: # its a range
+            mnStart, mnEnd = src.split('-')
+            proc = [mnStart, mnEnd]
+        else:
+            proc = [src] # treat as one
+        
+        number = []
+        repeatLetter = []
+        for mn in proc:
+            # append in order, start, end
+            numStr, alphaStr = common.getNumFromStr(mn)
+            number.append(int(numStr))
+            # remove all 'm' in alpha
+            alphaStr = alphaStr.replace('m', '')
+            repeatLetter.append(alphaStr)    
+        return number, repeatLetter
+
+
+    def _parseAttributes(self, src):
+        # assume that we have already checked that this is a measure
+        g = reMeasureTag.match(src)
+        if g is None: # not measure tag found
+            raise RTHandlerException('found no measure tag: %s' % src)
+        iEnd = g.end() # get end index
+        rawTag = src[:iEnd].strip()
+        self.tag = rawTag
+        rawData = src[iEnd:].strip() # may have variant
+
+        # get the number list from the tag
+        self.number, self.repeatLetter = self._getMeasureNumberData(rawTag)
+ 
+        # strip a variant indication off of rawData if found
+        g = reVariant.match(rawData)
+        if g is not None: # there is a variant
+            varStr = g.group(0)
+            self.variantNumber = int(common.getNumFromStr(varStr)[0])
+            self.data = rawData[g.end():].strip()
+        else:
+            self.data = rawData
+
+    def __repr__(self):
+        if len(self.number) == 1:
+            numberStr = '%s' % self.number[0]
+        else:
+            numberStr = '%s-%s' % (self.number[0], self.number[1])
+
+        return '<RTMeasure %s>' % numberStr
+
+    def isMeasure(self):
+        return True
+
+
 
 
 
@@ -148,8 +291,7 @@ class RTHandler(object):
         # tokens are ABC objects in a linear stream
         # tokens are strongly divided between header and body, so can 
         # divide here
-        self._tokensHeader = []
-        self._tokensBody = []
+        self._tokens = []
 
 
     def _splitAtHeader(self, lines):
@@ -170,11 +312,41 @@ class RTHandler(object):
         return lines[:iStartBody], lines[iStartBody:]
     
     def _tokenizeHeader(self, lines):
+        '''In the header, we only have tagged tokens. We can this process these all as the same class.
+        '''
+        post = []
         for l in lines:
             l = l.strip()
             if l == '': continue
             # wrap each line in a header token
-            self._tokensHeader.append(RTHeader(l))
+            post.append(RTTagged(l))
+        return post
+
+
+    def _tokenizeBody(self, lines):
+        '''In the body, we may have measure, time signature, or note declarations, as well as possible other tagged definitions
+        '''
+        post = []
+        for l in lines:
+            l = l.strip()
+            if l == '': continue
+
+            # first, see if it is a measure definition, if not, than assume it is tagged data
+            if reMeasureTag.match(l) is not None:
+                rtm = RTMeasure(l)
+                post.append(rtm)
+            else:
+                post.append(RTTagged(l))
+
+        return post
+            
+            #if l.startswith()
+
+            #self._tokensBody.append(t)
+
+
+
+
 
     def tokenize(self, src):
         '''Walk the RT string, creating RT objects along the way.
@@ -185,23 +357,36 @@ class RTHandler(object):
         #environLocal.printDebug([linesHeader])
         
         # this will fill self._tokensHeader
-        self._tokenizeHeader(linesHeader)        
+        self._tokens += self._tokenizeHeader(linesHeader)        
+        # this will fill self._tokensBody
+        self._tokens += self._tokenizeBody(linesBody)        
+
 
     def process(self, src):
         '''Given an entire specification as a single source string, strSrc. This is usually provided in a file. 
         '''
-        self._tokensBody = []
+        self._tokens = []
         self.tokenize(src)
 
-    def getBodyTokens(self):
-        if len(self._tokensBody) == 0:
-            raise RTHandlerException('no body tokens defined')
-        return self._tokensBody
 
-    def getHeaderTokens(self):
-        if len(self._tokensHeader) == 0:
-            raise RTHandlerException('no header tokens defined')
-        return self._tokensHeader
+
+    #---------------------------------------------------------------------------
+    # access tokens
+
+    def _getTokens(self):
+        if self._tokens == []:
+            raise RTHandlerException('must process tokens before calling split')
+        return self._tokens
+
+    def _setTokens(self, tokens):
+        '''Assign tokens to this Handler
+        '''
+        self._tokens = tokens
+
+    tokens = property(_getTokens, _setTokens,
+        doc = '''Get or set tokens for this Handler
+        ''')
+
 
 
 #-------------------------------------------------------------------------------
@@ -287,6 +472,59 @@ class Test(unittest.TestCase):
 
         g = reMeasureTag.match('m123b-432b=m1120a-24234a')
         self.assertEqual(g.group(0), 'm123b-432b')
+
+
+        g = reNoteTag.match('Note: this is a note')
+        self.assertEqual(g.group(0), 'Note:')
+        g = reNoteTag.match('note: this is a note')
+        self.assertEqual(g.group(0), 'note:')
+
+
+        g = reMeasureTag.match('m231var1 IV6 b4 C: V')
+        self.assertEqual(g.group(0), 'm231')
+
+        # this only works if it starts the string
+        g = reVariant.match('var1 IV6 b4 C: V')
+        self.assertEqual(g.group(0), 'var1')
+
+
+    def testMeasureAttributeProcessing(self):
+        rtm = RTMeasure('m17var1 vi b2 IV b2.5 viio6/4 b3.5 I')
+        self.assertEqual(rtm.data, 'vi b2 IV b2.5 viio6/4 b3.5 I')
+        self.assertEqual(rtm.number, [17])
+        self.assertEqual(rtm.tag, 'm17')
+        self.assertEqual(rtm.variantNumber, 1)
+
+
+        rtm = RTMeasure('m20 vi b2 ii6/5 b3 V b3.5 V7')
+        self.assertEqual(rtm.data, 'vi b2 ii6/5 b3 V b3.5 V7')
+        self.assertEqual(rtm.number, [20])
+        self.assertEqual(rtm.tag, 'm20')
+        self.assertEqual(rtm.variantNumber, None)
+
+        rtm = RTMeasure('m0 b3 G: I')
+        self.assertEqual(rtm.data, 'b3 G: I')
+        self.assertEqual(rtm.number, [0])
+        self.assertEqual(rtm.tag, 'm0')
+        self.assertEqual(rtm.variantNumber, None)
+
+        rtm = RTMeasure('m59 = m57')
+        self.assertEqual(rtm.data, '= m57')
+        self.assertEqual(rtm.number, [59])
+        self.assertEqual(rtm.tag, 'm59')
+        self.assertEqual(rtm.variantNumber, None)
+
+
+        rtm = RTMeasure('m3-4 = m1-2')
+        self.assertEqual(rtm.data, '= m1-2')
+        self.assertEqual(rtm.number, [3,4])
+        self.assertEqual(rtm.tag, 'm3-4')
+        self.assertEqual(rtm.variantNumber, None)
+
+
+
+
+
 
 
 

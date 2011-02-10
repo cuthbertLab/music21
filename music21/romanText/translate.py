@@ -48,26 +48,29 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     s.insert(0, md)
 
     p = stream.Part()
-    # only one time signature is defined per work at this point
-    tsHeader = None # store initial time signature
+    # ts indication are found in header, and also found elsewhere
+    tsCurrent = None # store initial time signature
 
-    for t in rtHandler.getHeaderTokens():    
+    for t in rtHandler.tokens:
         if t.isTitle():
-            md.title = t.data
-        
+            md.title = t.data            
         elif t.isWork():
             md.alternativeTitle = t.data
-
         elif t.isComposer():
             md.composer = t.data
-
         elif t.isTimeSignature():
-            tsHeader = meter.TimeSignature(t.data)
+            tsCurrent = meter.TimeSignature(t.data)
+
+
+        elif t.isMeasure():
+            pass
+            #print t
+
 
         # need to get time signature here
 
 
-    environLocal.printDebug(['ts in header:', tsHeader])
+    environLocal.printDebug(['tsCurrent:', tsCurrent])
     
     return s
 
