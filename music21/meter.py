@@ -2928,6 +2928,50 @@ class TimeSignature(music21.Music21Object):
         return self.beatSequence[self.beatSequence.positionToIndex(qLenPos)].duration
 
 
+    def getOffsetFromBeat(self, beat):
+        '''Given a beat value, convert into an offset position. 
+
+        >>> from music21 import *
+        >>> ts1 = meter.TimeSignature('3/4')
+        >>> ts1.getOffsetFromBeat(1)
+        0.0
+        >>> ts1.getOffsetFromBeat(2)
+        1.0
+        >>> ts1.getOffsetFromBeat(3)
+        2.0
+        >>> ts1.getOffsetFromBeat(3.5)
+        2.5
+        >>> ts1.getOffsetFromBeat(3.25)
+        2.25
+
+        >>> ts1 = meter.TimeSignature('6/8')
+        >>> ts1.getOffsetFromBeat(1)
+        0.0
+        >>> ts1.getOffsetFromBeat(2)
+        1.5
+        >>> ts1.getOffsetFromBeat(2.33)
+        2.0
+        >>> ts1.getOffsetFromBeat(2.5) # will be + .5 * 1.5
+        2.25
+        >>> ts1.getOffsetFromBeat(2.66)
+        2.5
+        '''
+        # divide into integer and floating point components
+        beatInt, beatFraction = divmod(beat, 1)
+        beatInt = int(beatInt) # convert to integer
+        # resolve .33 to .3333333
+        beatFraction = common.nearestCommonFraction(beatFraction)
+
+        # get a duration object for the beat; will translate into quarterLength
+        # beat int counts from 1; subtrack 1 to get index
+        beatDur = self.beatSequence[beatInt-1].duration
+        oStart, oEnd = self.beatSequence.getLevelSpan()[beatInt-1]
+        post = oStart + (beatDur.quarterLength * beatFraction)
+        # round to 3 values
+        return round(post, 4)
+
+
+
     def getBeatProgress(self, qLenPos):
         '''Given a quarterLength position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos
         is. 

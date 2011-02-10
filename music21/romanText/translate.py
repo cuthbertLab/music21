@@ -50,6 +50,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     p = stream.Part()
     # ts indication are found in header, and also found elsewhere
     tsCurrent = None # store initial time signature
+    tsSet = False # store if set to a measure
 
     for t in rtHandler.tokens:
         if t.isTitle():
@@ -60,10 +61,20 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             md.composer = t.data
         elif t.isTimeSignature():
             tsCurrent = meter.TimeSignature(t.data)
+            tsSet = False
             environLocal.printDebug(['tsCurrent:', tsCurrent])
-
+            
         elif t.isMeasure():
             # pass this off to measure creation tools
+            m = stream.Measure()
+            if not tsSet:
+                m.timeSignature = ts
+                tsSet = True # only set when changed
+
+            if len(t.number) == 1: # if not a range
+                m.number = t.number[0]
+            else:
+                environLocal.printDebug(['cannot yet handle measure tokens defining measure ranges: %s' % t.number])
             for i, a in enumerate(t.atoms):
                 pass
                 #print a

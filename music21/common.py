@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''Utility constants, dictionaries, functions, and objects used throughout music21.
@@ -293,6 +293,30 @@ def almostEquals(x, y = 0.0, grain=1e-7):
         return False
 
 almostEqual = almostEquals
+
+
+def nearestCommonFraction(x, grain=1e-2):
+    '''Given a value that suggests a floating point fraction, like .33, return a float that provides greater specification, such as .333333333
+        
+    >>> from music21 import *
+    >>> common.nearestCommonFraction(.333) == 1/3.
+    True
+    >>> common.nearestCommonFraction(.33) == 1/3.
+    True
+    >>> common.nearestCommonFraction(.35) == 1/3.
+    False
+    >>> common.nearestCommonFraction(.2) == .2
+    True
+    >>> common.nearestCommonFraction(.125)
+    0.125
+    '''
+    values = [1/3., 2/3., 
+              1/6., 2/6., 3/6., 4/6., 5/6.]
+    for v in values:
+        if almostEquals(x, v, grain=grain):
+            return v
+    return x
+
 
 def greaterThan(x, y = 0.0):
     '''
