@@ -353,6 +353,8 @@ class RTBeat(RTAtom):
         0.5
         >>> rtb.getOffset(meter.TimeSignature('6/8'))
         0.75
+        >>> rtb.getOffset(meter.TimeSignature('2/2'))
+        1.0
 
         >>> rtb = romanText.RTBeat('b2')
         >>> rtb.getOffset(meter.TimeSignature('3/4'))
@@ -528,15 +530,14 @@ class RTHandler(object):
         for l in lines:
             l = l.strip()
             if l == '': continue
-
             # first, see if it is a measure definition, if not, than assume it is tagged data
             if reMeasureTag.match(l) is not None:
-                rtm = RTMeasure(l)
+                rtm = RTMeasure(l)                
                 # note: could places these in-line, after post
                 rtm.atoms = self._tokenizeAtoms(rtm.data, container=rtm)
                 post.append(rtm)
-                # store items in a measure tag outside of the measure
             else:
+                # store items in a measure tag outside of the measure
                 post.append(RTTagged(l))
         return post
 

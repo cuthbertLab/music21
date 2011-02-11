@@ -3,6 +3,7 @@
 # Purpose:      Translation routines for roman numeral analysis text files
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
 # Copyright:    (c) 2011 The music21 Project
 # License:      LGPL
@@ -13,7 +14,7 @@
 '''
 import unittest
 import music21
-
+import copy
 
 
 from music21.romanText import base as romanTextModule
@@ -35,7 +36,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     from music21 import meter
     from music21 import key
     from music21 import roman
-
+    from music21 import tie
 
 
     if inputM21 == None:
@@ -43,7 +44,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     else:
         s = inputM21
 
-    # meta data can be first
+    # metadata can be first
     md = metadata.Metadata()
     s.insert(0, md)
 
@@ -51,7 +52,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     # ts indication are found in header, and also found elsewhere
     tsCurrent = None # store initial time signature
     tsSet = False # store if set to a measure
-
+    lastMeasureNumber = 0
+    previousChord = None
+    
     for t in rtHandler.tokens:
         if t.isTitle():
             md.title = t.data            
@@ -69,6 +72,24 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 environLocal.printDebug(['skipping variant: %s' % t])
                 continue
             # pass this off to measure creation tools
+            if (t.number[0] > lastMeasureNumber + 1) and (previousChord is not None):
+                for i in range(lastMeasureNumber + 1, t.number[0]):
+                    fillM = stream.Measure()
+                    fillM.number = i
+                    newRn = copy.deepcopy(previousChord)
+                    newRn.lyric = ""
+                    newRn.duration = copy.deepcopy(tsCurrent.barDuration)
+                    if previousChord.tie == None:
+                        previousChord.tie = tie.Tie('start')
+                    else:
+                        previousChord.tie.type = 'continue'
+
+                    newRn.tie = tie.Tie('stop')
+                    previousChord = newRn
+                    
+                    fillM.append(newRn)
+                    p.append(fillM)
+                lastMeasureNumber = t.number[0] - 1
             m = stream.Measure()
             if not tsSet:
                 m.timeSignature = tsCurrent
@@ -76,11 +97,13 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
             if len(t.number) == 1: # if not a range
                 m.number = t.number[0]
+                lastMeasureNumber = t.number[0]
             else:
+                lastMeasureNumber = t.number[1]
                 environLocal.printDebug(['cannot yet handle measure tokens defining measure ranges: %s' % t.number])
 
             o = 0.0 # start offsets at zero
-            previousChord = None
+            previousChordInMeasure = None
             for i, a in enumerate(t.atoms):
                 if isinstance(a, romanTextModule.RTKey):
                     kCurrent = a.getKey()
@@ -88,14 +111,27 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 if isinstance(a, romanTextModule.RTBeat):
                     # set new offset based on beat
                     o = a.getOffset(tsCurrent)
-                
+                    if previousChordInMeasure is None and previousChord is not None:
+                        # setting a new beat before giving any chords
+                        firstChord = copy.deepcopy(previousChord)
+                        firstChord.quarterLength = o
+                        firstChord.lyric = ""
+                        if previousChord.tie == None:
+                            previousChord.tie = tie.Tie('start')
+                        else:
+                            previousChord.tie.type = 'continue'    
+                        firstChord.tie = tie.Tie('stop')
+                        previousChord = firstChord
+                        previousChordInMeasure = firstChord
+                        m.insert(0, firstChord)
+                        
                 if isinstance(a, romanTextModule.RTChord):
                     # probably best to find duration
-                    if previousChord is None:
-                        pass # use default duratoin
-                    else: # update duration of previous chord
-                        oPrevious = previousChord.getOffsetBySite(m)
-                        previousChord.quarterLength = o - oPrevious
+                    if previousChordInMeasure is None:
+                        pass # use default duration
+                    else: # update duration of previous chord in Measure
+                        oPrevious = previousChordInMeasure.getOffsetBySite(m)
+                        previousChordInMeasure.quarterLength = o - oPrevious
                     # use source to evaluation roman 
                     try:
                         rn = roman.RomanNumeral(a.src, kCurrent)
@@ -104,10 +140,12 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                         rn = note.Note() # create placeholder 
                     rn.addLyric(a.src)
                     m.insert(o, rn)
+                    previousChordInMeasure = rn
                     previousChord = rn
             # may need to adjust duration of last chord added
             previousChord.quarterLength = tsCurrent.barDuration.quarterLength - o
             p.append(m)
+    p.makeBeams()
     s.insert(0,p)
     return s
 
@@ -128,7 +166,6 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
-
     def testBasicA(self):
         from music21 import romanText
         from music21.romanText import testFiles
@@ -151,7 +188,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.metadata.composer, 'J. S. Bach')
         self.assertEqual(s.metadata.title, 'Aus meines Herzens Grunde')
 
-        s = romanTextStringToStreamScore(testFiles.monteverdi_4_12)
+        s = romanTextStringToStreamScore(testFiles.monteverdi_3_13)
         self.assertEqual(s.metadata.composer, 'Claudio Monteverdi')
 
     def testBasicB(self):
@@ -161,6 +198,20 @@ class Test(unittest.TestCase):
         s = romanTextStringToStreamScore(testFiles.riemenschneider001)
         #s.show()
 
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+ 
+    def testExternalA(self):
+        from music21 import romanText
+        from music21.romanText import testFiles
+
+        for tf in testFiles.ALL:
+            rtf = romanText.RTFile()
+            rth = rtf.readstr(tf) # return handler, processes tokens
+            s = romanTextToStreamScore(rth)
+            s.show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -170,7 +221,7 @@ _DOC_ORDER = []
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
+        music21.mainTest(TestExternal)
     elif len(sys.argv) > 1:
         t = Test()
         # arg[1] is test to launch

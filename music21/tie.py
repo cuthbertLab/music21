@@ -28,6 +28,8 @@ class Tie(object):
     >>> note1.tieStyle = "normal" # or could be dotted or dashed
     >>> note1.tie.type
     'start'
+    >>> note1.tie
+    <music21.tie.Tie start>
 
     Differences from MusicXML:
        notes do not need to know if they are tied from a
@@ -90,7 +92,8 @@ class Tie(object):
         '''
         return not self.__eq__(other)
 
-
+    def __repr__(self):
+        return '<music21.tie.Tie %s>' % self.type
 
 
 

@@ -412,6 +412,15 @@ class Chord(note.NotRest):
         doc = '''Get or set a single tie based on all the ties in this Chord.
 
         This overloads the behavior of the tie attribute found in all NotRest classes.
+        
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c4','g4'])
+        >>> tie1 = tie.Tie('start')
+        >>> c1.tie = tie1
+        >>> c1.tie
+        <music21.tie.Tie start>
+        >>> c1.getTie(c1.pitches[1])
+        <music21.tie.Tie start>
         ''')
 
     def getTie(self, p):
