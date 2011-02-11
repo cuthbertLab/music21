@@ -224,7 +224,8 @@ class RTMeasure(RTToken):
         self.number = [] # one or more measure numbers
         self.repeatLetter = [] # one or more repeat letters
         self.variantNumber = None # if defined a variant
-
+        # store boolean if this measure defines copying another reange
+        self.isCopyDefinition = False
         # store processed tokens associated with this measure
         self.atoms = []
 
@@ -241,12 +242,13 @@ class RTMeasure(RTToken):
         >>> rtm._getMeasureNumberData('m123b-432b')
         ([123, 432], ['b', 'b'])
         '''
+        # note: this is separate procedure b/c it is used to get copy
+        # boundaries
         if '-' in src: # its a range
             mnStart, mnEnd = src.split('-')
             proc = [mnStart, mnEnd]
         else:
             proc = [src] # treat as one
-        
         number = []
         repeatLetter = []
         for mn in proc:
@@ -257,7 +259,6 @@ class RTMeasure(RTToken):
             alphaStr = alphaStr.replace('m', '')
             repeatLetter.append(alphaStr)    
         return number, repeatLetter
-
 
     def _parseAttributes(self, src):
         # assume that we have already checked that this is a measure
@@ -274,12 +275,15 @@ class RTMeasure(RTToken):
  
         # strip a variant indication off of rawData if found
         g = reVariant.match(rawData)
-        if g is not None: # there is a variant
+        if g is not None: # there is a variant tag
             varStr = g.group(0)
             self.variantNumber = int(common.getNumFromStr(varStr)[0])
             self.data = rawData[g.end():].strip()
         else:
             self.data = rawData
+
+        if self.data.startswith('='):
+            self.isCopyDefinition = True
 
     def __repr__(self):
         if len(self.number) == 1:
@@ -292,8 +296,25 @@ class RTMeasure(RTToken):
     def isMeasure(self):
         return True
 
+    def getCopyTarget(self):
+        '''If this measure defines a copy operation, return two lists defining the measures to copy.
 
+        >>> from music21 import *
+        >>> rtm = romanText.RTMeasure('m35-36 = m29-30')
+        >>> rtm.number
+        [35, 36]
+        >>> rtm.getCopyTarget()
+        ([29, 30], ['', ''])
 
+        >>> rtm = romanText.RTMeasure('m4 = m1')
+        >>> rtm.number
+        [4]
+        >>> rtm.getCopyTarget()
+        ([1], [''])
+        '''
+        # remove equal sign
+        rawData = self.data.replace('=', '').strip()
+        return self._getMeasureNumberData(rawData)
 
 
 class RTAtom(RTToken):
@@ -500,12 +521,19 @@ class RTHandler(object):
         "[<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, <RTKey 'g:'>, <RTChord 'IV'>]"
         >>> tokenList[9].getKey()
         <music21.key.Key of g minor>
+
+        >>> str(rth._tokenizeAtoms('= m3'))
+        '[]'
         '''
         post = []
         # break by spaces
         for word in line.split(' '):
             word = word.strip()
-            if word == '': continue
+            if word == '': 
+                continue
+            elif word == '=':
+                # if an = is found, this is a copy definition, and no atoms here
+                break
             elif word == '||':
                 post.append(RTPhraseBoundary(word, container))
             elif word == '(':
@@ -551,11 +579,8 @@ class RTHandler(object):
         # break into lines
         lines = src.split('\n')
         linesHeader, linesBody = self._splitAtHeader(lines)
-        #environLocal.printDebug([linesHeader])
-        
-        # this will fill self._tokensHeader
+        #environLocal.printDebug([linesHeader])        
         self._tokens += self._tokenizeHeader(linesHeader)        
-        # this will fill self._tokensBody
         self._tokens += self._tokenizeBody(linesBody)        
 
 
@@ -725,24 +750,28 @@ class Test(unittest.TestCase):
         self.assertEqual(rtm.number, [20])
         self.assertEqual(rtm.tag, 'm20')
         self.assertEqual(rtm.variantNumber, None)
+        self.assertEqual(rtm.isCopyDefinition, False)
 
         rtm = RTMeasure('m0 b3 G: I')
         self.assertEqual(rtm.data, 'b3 G: I')
         self.assertEqual(rtm.number, [0])
         self.assertEqual(rtm.tag, 'm0')
         self.assertEqual(rtm.variantNumber, None)
+        self.assertEqual(rtm.isCopyDefinition, False)
 
         rtm = RTMeasure('m59 = m57')
         self.assertEqual(rtm.data, '= m57')
         self.assertEqual(rtm.number, [59])
         self.assertEqual(rtm.tag, 'm59')
         self.assertEqual(rtm.variantNumber, None)
+        self.assertEqual(rtm.isCopyDefinition, True)
 
         rtm = RTMeasure('m3-4 = m1-2')
         self.assertEqual(rtm.data, '= m1-2')
         self.assertEqual(rtm.number, [3,4])
         self.assertEqual(rtm.tag, 'm3-4')
         self.assertEqual(rtm.variantNumber, None)
+        self.assertEqual(rtm.isCopyDefinition, True)
 
 
 

@@ -189,29 +189,47 @@ class RomanNumeral(chord.Chord):
         self.caseMatters = caseMatters
         self.scaleCardinality = 7
         
-        
         if isinstance(figure, int):
             self.caseMatters = False
             figure = common.toRoman(figure)
- 
+        # store raw figure
+        self.figure = figure
+
         if common.isStr(keyOrScale):
             keyOrScale = key.Key(keyOrScale)
+
+        # setKeyOrScale will configure these attribnutes
+        self.scale = None
+        self.impliedScale = None
+        self.setKeyOrScale(keyOrScale)
+
+
+    def setKeyOrScale(self, keyOrScale):
+        '''Provide a new key or scale, and re-configure the RN with the existing figure. 
+        
+        >>> from music21 import *
+        >>> r1 = RomanNumeral('V')
+        >>> r1.pitches
+        [G4, B4, D5]
+        >>> r1.setKeyOrScale(key.Key('A'))
+        >>> r1.pitches
+        [E5, G#5, B5]
+        '''
         self.scale = keyOrScale
-        if keyOrScale == None or (hasattr(keyOrScale, "isConcrete") and keyOrScale.isConcrete == False):
+        if keyOrScale == None or (hasattr(keyOrScale, "isConcrete") and 
+            keyOrScale.isConcrete == False):
             self.impliedScale = True
         else:
-            self.impliedScale = False
-        
+            self.impliedScale = False        
         # need to permit object creation with no arguments
-        if figure is not None:
-            self._parseFigure(figure)
+        if self.figure is not None:
+            self._parseFigure(self.figure)
 
 
     def _parseFigure(self, figure):
         if not common.isStr(figure):
             raise RomanException('got a non-string figure: %r', figure)
 
-        self.figure = figure
         flatAlteration = 0
         sharpAlteration = 0
         figure = re.sub('^N', 'bII', figure)
@@ -262,7 +280,6 @@ class RomanNumeral(chord.Chord):
         elif self.caseMatters and romanNumeralAlone.lower() == romanNumeralAlone:
             shouldBe = 'minor'
 
-        
         sd = self.scaleDegree
         self.scaleDegreeWithAlteration = (sd, scaleAlter)
         
