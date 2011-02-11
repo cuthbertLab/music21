@@ -493,9 +493,11 @@ class RTHandler(object):
         >>> str(rth._tokenizeAtoms('V7 b2 V13 b3 V7 iio6/5[no5]'))
         "[<RTChord 'V7'>, <RTBeat 'b2'>, <RTChord 'V13'>, <RTBeat 'b3'>, <RTChord 'V7'>, <RTChord 'iio6/5[no5]'>]"
 
-        >>> str(rth._tokenizeAtoms('I b2 I b2.25 V/ii b2.5 bVII b2.75 V g: IV'))
+        >>> tokenList = rth._tokenizeAtoms('I b2 I b2.25 V/ii b2.5 bVII b2.75 V g: IV')
+        >>> str(tokenList)
         "[<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, <RTKey 'g:'>, <RTChord 'IV'>]"
-
+        >>> tokenList[9].getKey()
+        <music21.key.Key of g minor>
         '''
         post = []
         # break by spaces
@@ -518,7 +520,9 @@ class RTHandler(object):
         return post
 
     def _tokenizeBody(self, lines):
-        '''In the body, we may have measure, time signature, or note declarations, as well as possible other tagged definitions
+        '''
+        In the body, we may have measure, time signature, or 
+        note declarations, as well as possible other tagged definitions
         '''
         post = []
         for l in lines:
@@ -540,7 +544,8 @@ class RTHandler(object):
 
 
     def tokenize(self, src):
-        '''Walk the RT string, creating RT objects along the way.
+        '''
+        Walk the RT string, creating RT objects along the way.
         '''
         # break into lines
         lines = src.split('\n')

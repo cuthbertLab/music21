@@ -699,10 +699,16 @@ class Key(KeySignature, scale.DiatonicScale):
 
     >>> from music21 import *
     >>> cm = key.Key('c')  # cminor.
+    >>> cm
+    <music21.key.Key of c minor>
     >>> cm.sharps
     -3
     >>> cm.pitchFromDegree(3)
     E-4
+
+    >>> Csharpmaj = key.Key('C#')
+    >>> Csharpmaj
+    <music21.key.Key of C# major>
 
     '''
     _sharps = 0
@@ -724,11 +730,19 @@ class Key(KeySignature, scale.DiatonicScale):
             KeySignature.__init__(self, sharps, mode)
 
         scale.DiatonicScale.__init__(self, tonic=tonic)
+        self.tonic = tonic
         self.type = mode
         self.mode = mode
         # build the network for the appropriate scale
         self._abstract._buildNetwork(self.type)
 
+    def __repr__(self):
+        return "<music21.key.Key of %s>" % self.__str__()
+
+    def __str__(self):
+        # string representation needs to be complete, as is used
+        # for metadata comparisons
+        return "%s %s" % (self.tonic, self.mode)
 
 
 
