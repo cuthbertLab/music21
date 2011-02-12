@@ -25,6 +25,12 @@ from music21 import pitch
 from music21 import scale
 from music21.figuredBass import notation as fbNotation
 
+
+from music21 import environment
+_MOD = 'roman.py'
+environLocal = environment.Environment(_MOD)
+
+
 #-------------------------------------------------------------------------------
 
 SHORTHAND_RE = re.compile('#*-*b*o*[1-9xyz]')
@@ -216,7 +222,6 @@ class RomanNumeral(chord.Chord):
         self.caseMatters = caseMatters
         self.scaleCardinality = 7
         
-        
         if isinstance(figure, int):
             self.caseMatters = False
             figure = common.toRoman(figure)
@@ -252,7 +257,7 @@ class RomanNumeral(chord.Chord):
         if self.figure is not None:
             self._parseFigure(self.figure)
 
- 
+        #environLocal.printDebug(['Roman.setKeyOrScale:', 'called w/ scale', self.scale, 'figure', self.figure, 'pitches', self.pitches])
 
 
     def _parseFigure(self, figure):

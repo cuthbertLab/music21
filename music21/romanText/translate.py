@@ -139,6 +139,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             environLocal.printDebug(['tsCurrent:', tsCurrent])
             
         elif t.isMeasure():
+            #environLocal.printDebug(['handling measure token:', t])
+
             if t.variantNumber is not None:
                 environLocal.printDebug(['skipping variant: %s' % t])
                 continue
@@ -192,6 +194,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 previousChordInMeasure = None
                 for i, a in enumerate(t.atoms):
                     if isinstance(a, romanTextModule.RTKey):
+                        environLocal.printDebug(['handling key token:', a])
                         kCurrent, prefixLyric = _getKeyAndPrefix(a)
                         #kCurrent = a.getKey()
                         #prefixLyric = kCurrent.tonic + ": "
@@ -307,7 +310,7 @@ class Test(unittest.TestCase):
         s = romanTextStringToStreamScore(testFiles.riemenschneider001)
         #s.show()
 
-    def testMeasureCopying(self):
+    def testMeasureCopyingA(self):
         from music21 import romanText
         from music21.romanText import testFiles
 
@@ -392,9 +395,44 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testMeasureCopyingB(self):
+        from music21 import converter
+
+        src = """m1 G: IV || b3 d: III b4 ii
+m2 v b2 III6 b3 iv6 b4 ii/o6/5
+m3 i6/4 b3 V
+m4-5 = m2-3
+m6-7 = m4-5
+"""
+        s = converter.parse(src, format='romantext')
+        rnStream = s.flat.getElementsByClass('RomanNumeral')
+
+        for offset in [0, 6, 12]:
+            self.assertEqual(rnStream[offset+ 4].figure, 'III6')
+            self.assertEqual(str(rnStream[offset+ 4].pitches), '[A4, C5, F5]')
+
+            self.assertEqual(rnStream[offset+ 4].pitches[2].accidental, None)
+
+            self.assertEqual(rnStream[offset+ 5].figure, 'iv6')
+            self.assertEqual(str(rnStream[offset+ 5].pitches), '[B-4, D5, G5]')
+
+            self.assertEqual(rnStream[offset+ 5].pitches[0].accidental.displayStatus, None)
 
 
 
+        from music21.romanText import testFiles
+        s = converter.parse(testFiles.monteverdi_3_13)
+        m25 = s.measure(25)
+        rn = m25.flat.getElementsByClass('RomanNumeral')
+        self.assertEqual(rn[1].figure, 'III')
+        self.assertEqual(str(rn[1].scale), 'd minor')
+
+        # TODO: this is getting the F#m even though the key and figure are 
+        # correect
+        #self.assertEqual(str(rn[1].pitches), '[F4, A4, C5]')
+
+        #s.show()
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
