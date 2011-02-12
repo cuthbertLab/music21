@@ -30,6 +30,8 @@ class TranslateRomanTextException(Exception):
 
 
 def _copySingleMeasure(t, p, kCurrent):
+    '''Given a RomanText token, a Part used as the current container, and the current Key, return a Measure copied from the past of the Part. 
+    '''
     # copy from a past location; need to change key
     targetNumber, targetRepeat = t.getCopyTarget()
     if len(targetNumber) > 1: # this is an encoding error
@@ -49,17 +51,20 @@ def _copySingleMeasure(t, p, kCurrent):
     return m
 
 def _copyMultipleMeasures(t, p, kCurrent):
+    '''Given a RomanText token for a RTMeasure, a Part used as the current container, and the current Key, return a Measure range copied from the past of the Part.
+    '''
     from music21 import stream
     # the key provided needs to be the current key
-    environLocal.printDebug(['cannot yet handle measure tokens defining measure ranges: %s' % t.number])
-
 
     targetNumbers, targetRepeat = t.getCopyTarget()
     if len(targetNumbers) == 1: # this is an encoding error
         raise TranslateRomanTextException('a multiple measure range cannot copy a single measure')
     # TODO: ignoring repeat letters
     # TODO: check for overlap:  m20-25 = m17-22
-    # TODO: check for range equality: m20-30 = m10-19
+    # check for range equality: m20-30 = m10-19
+    if t.number[1] - t.number[0] != targetNumbers[1] - targetNumbers[0]:
+        raise TranslateRomanTextException('a multiple measure range copy attempting to copy an unequal sized region')
+
     targetStart = targetNumbers[0]
     targetEnd = targetNumbers[1]
     measures = []
@@ -314,6 +319,50 @@ class Test(unittest.TestCase):
         self.assertEqual(str(rn1.figure), 'V')
         rn2 = mStream[3].getElementsByClass('RomanNumeral')[1]
         self.assertEqual(str(rn2.figure), 'i')
+
+
+        # test multiple measure copying
+        s = romanTextStringToStreamScore(testFiles.monteverdi_3_13)
+        mStream = s.parts[0].getElementsByClass('Measure')
+        for m in mStream:
+            if m.number == 41: #m49-51 = m41-43
+                m1a = m
+            elif m.number == 42: #m49-51 = m41-43
+                m2a = m
+            elif m.number == 43: #m49-51 = m41-43
+                m3a = m
+            elif m.number == 49: #m49-51 = m41-43
+                m1b = m
+            elif m.number == 50: #m49-51 = m41-43
+                m2b = m
+            elif m.number == 51: #m49-51 = m41-43
+                m3b = m
+
+        rn = m1a.getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(str(rn.figure), 'IV')        
+        rn = m1a.getElementsByClass('RomanNumeral')[1]
+        self.assertEqual(str(rn.figure), 'I')        
+
+        rn = m1b.getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(str(rn.figure), 'IV')        
+        rn = m1b.getElementsByClass('RomanNumeral')[1]
+        self.assertEqual(str(rn.figure), 'I')        
+
+        rn = m2a.getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(str(rn.figure), 'I')        
+        rn = m2a.getElementsByClass('RomanNumeral')[1]
+        self.assertEqual(str(rn.figure), 'ii')        
+
+        rn = m2b.getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(str(rn.figure), 'I')        
+        rn = m2b.getElementsByClass('RomanNumeral')[1]
+        self.assertEqual(str(rn.figure), 'ii')        
+
+        rn = m3a.getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(str(rn.figure), 'V/ii')        
+        rn = m3b.getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(str(rn.figure), 'V/ii')        
+
 
 
 
