@@ -721,7 +721,7 @@ class Converter(object):
             self._converter = ConverterMidi()
         elif format == 'humdrum':
             self._converter = ConverterHumdrum()
-        elif format == 'tinyNotation':
+        elif format.lower() in ['tinynotation']:
             self._converter = ConverterTinyNotation()
         elif format == 'abc':
             self._converter = ConverterABC()
@@ -729,7 +729,9 @@ class Converter(object):
             self._converter = ConverterMuseData()
         elif format == 'text': # based on extension
             # presently, all text files are treated as roman text
-            # need to handle various text formats
+            # may need to handle various text formats
+            self._converter = ConverterRomanText()
+        elif format.lower() in ['romantext']:
             self._converter = ConverterRomanText()
         else:
             raise ConverterException('no such format: %s' % format)
@@ -739,31 +741,32 @@ class Converter(object):
             raise ValueError
         return os.path.join(dir, 'm21-' + common.getMd5(url) + ext)
 
-    def parseFile(self, fp, number=None, forceSource=False):
+    def parseFile(self, fp, number=None, format=None, forceSource=False):
         '''Given a file path, parse and store a music21 Stream.
         '''
-
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):
             raise ConverterFileException('no such file eists: %s' % fp)
 
-        # if the file path is to a directory, assume it is a collection of 
-        # musedata parts
-        if os.path.isdir(fp):
-            format = 'musedata'
-        else:
-            format = common.findFormatFile(fp) 
+        if format is None:
+            # if the file path is to a directory, assume it is a collection of 
+            # musedata parts
+            if os.path.isdir(fp):
+                format = 'musedata'
+            else:
+                format = common.findFormatFile(fp) 
         self._setConverter(format, forceSource=forceSource)
         self._converter.parseFile(fp, number=number)
 
-    def parseData(self, dataStr, number=None, forceSource=False):
+
+    def parseData(self, dataStr, number=None, format=None, forceSource=False):
         '''Given raw data, determine format and parse into a music21 Stream.
         '''
-        format = None
         if common.isListLike(dataStr):
             format = 'tinyNotation'
-        
-        if format == None: # its a string
+
+        # get from data in string if not specified        
+        if format is None: # its a string
             dataStr = dataStr.lstrip()
             if dataStr.startswith('<?xml') or dataStr.startswith('musicxml:'):
                 format = 'musicxml'
@@ -787,7 +790,7 @@ class Converter(object):
         self._converter.parseData(dataStr, number=number)
 
 
-    def parseURL(self, url, number=None):
+    def parseURL(self, url, format=None, number=None):
         '''Given a url, download and parse the file into a music21 Stream.
 
         Note that this checks the user Environment `autoDownlaad` setting before downloading. 
@@ -796,17 +799,18 @@ class Converter(object):
         if autoDownload == 'allow':
             pass
         elif autoDownload in ['deny', 'ask']:
+            # TODO: plan here is to use an interactive dialog
             raise ConverterException('automatic downloading of URLs is presently set to "%s"; configure your Environment "autoDownload" setting to "allow" to permit automatic downloading.' % autoDownload)
 
-        #url = urllib.quote(url) may need?
-        format, ext = common.findFormatExtURL(url)
-        if format == None: # cannot figure out what it is
+        # this format check is here first to see if we can find the format
+        # in the url; if forcing a format we do not need this
+        # we do need the file extension to construct file path below
+        formatFromURL, ext = common.findFormatExtURL(url)
+        if formatFromURL is None: # cannot figure out what it is
             raise ConverterException('cannot determine file format of url: %s' % url)
+
         dir = environLocal.getRootTempDir()
-        #dst = environLocal.getTempFile(ext)
-
         dst = self._getDownloadFp(dir, ext, url)
-
         if not os.path.exists(dst):
             try:
                 environLocal.printDebug(['downloading to:', dst])
@@ -818,7 +822,8 @@ class Converter(object):
             fp = dst
 
         # update format based on downloaded fp
-        format = common.findFormatFile(fp) 
+        if format is None: # if not provided as an argument
+            format = common.findFormatFile(fp) 
         self._setConverter(format, forceSource=False)
         self._converter.parseFile(fp, number=number)
 
@@ -842,27 +847,25 @@ class Converter(object):
 # module level convenience methods
 
 
-def parseFile(fp, number=None, forceSource=False):
+def parseFile(fp, number=None, format=None, forceSource=False):
     '''Given a file path, attempt to parse the file into a Stream.
     '''
     v = Converter()
-    v.parseFile(fp, number=number, forceSource=forceSource)
+    v.parseFile(fp, number=number, format=format, forceSource=forceSource)
     return v.stream
 
-def parseData(dataStr, number=None):
+def parseData(dataStr, number=None, format=None):
     '''Given musical data represented within a Python string, attempt to parse the data into a Stream.
     '''
-#     if common.isListLike(dataStr):
-#         environLocal.printDebug(['parseData dataStr', dataStr])
     v = Converter()
-    v.parseData(dataStr, number=number)
+    v.parseData(dataStr, number=number, format=format)
     return v.stream
 
-def parseURL(url, number=None, forceSource=False):
+def parseURL(url, number=None, format=None, forceSource=False):
     '''Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
     '''
     v = Converter()
-    v.parseURL(url)
+    v.parseURL(url, format=format)
     return v.stream
 
 def parse(value, *args, **keywords):
@@ -899,20 +902,25 @@ def parse(value, *args, **keywords):
     else:   
         number = None
 
+    if 'format' in keywords.keys():
+        format = keywords['format']
+    else:   
+        format = None
+
     if common.isListLike(value) or len(args) > 0: # tiny notation list
         if len(args) > 0: # add additional args to a lost
             value = [value] + list(args)
         return parseData(value, number=number)
      # a midi string, must come before os.path.exists test
     elif value.startswith('MThd'):
-        return parseData(value, number=number)
+        return parseData(value, number=number, format=format)
     elif os.path.exists(value):
-        return parseFile(value, number=number, forceSource=forceSource)
+        return parseFile(value, number=number, format=format, forceSource=forceSource)
     elif value.startswith('http://'): 
         # its a url; may need to broaden these criteria
-        return parseURL(value, number=number, forceSource=forceSource)
+        return parseURL(value, number=number, format=format, forceSource=forceSource)
     else:
-        return parseData(value, number=number)
+        return parseData(value, number=number, format=format)
 
 
 

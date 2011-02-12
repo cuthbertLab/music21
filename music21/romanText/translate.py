@@ -16,7 +16,7 @@ import unittest
 import music21
 import copy
 
-
+from music21 import common
 from music21.romanText import base as romanTextModule
 
 from music21 import environment
@@ -83,6 +83,17 @@ def _copyMultipleMeasures(t, p, kCurrent):
     return measures
 
 
+def _getKeyAndPrefix(rtKeyOrString):
+    '''Given an RTKey specification, return the Key and a string prefix. 
+    '''
+    from music21 import key
+    if common.isStr(rtKeyOrString):
+        k = key.Key(rtKeyOrString)
+    else:
+        k = rtKeyOrString.getKey()
+
+    prefix = k.tonic + ": "
+    return k, prefix
 
 def romanTextToStreamScore(rtHandler, inputM21=None):
     '''Given a roman text handler, return or fill a Score Stream.
@@ -109,12 +120,11 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
     p = stream.Part()
     # ts indication are found in header, and also found elsewhere
-    tsCurrent = None # store initial time signature
+    tsCurrent = meter.TimeSignature('4/4') # create default 4/4
     tsSet = False # store if set to a measure
     lastMeasureNumber = 0
     previousRn = None
-    kCurrent = None # key is set inside of measure
-    prefixToLyric = ""
+    kCurrent, prefixLyric = _getKeyAndPrefix('C')
 
     for t in rtHandler.tokens:
         if t.isTitle():
@@ -182,8 +192,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 previousChordInMeasure = None
                 for i, a in enumerate(t.atoms):
                     if isinstance(a, romanTextModule.RTKey):
-                        kCurrent = a.getKey()
-                        prefixLyric = kCurrent.tonic + ": "
+                        kCurrent, prefixLyric = _getKeyAndPrefix(a)
+                        #kCurrent = a.getKey()
+                        #prefixLyric = kCurrent.tonic + ": "
                     if isinstance(a, romanTextModule.RTBeat):
                         # set new offset based on beat
                         o = a.getOffset(tsCurrent)
@@ -365,6 +376,24 @@ class Test(unittest.TestCase):
         self.assertEqual(str(rn.figure), 'V/ii')        
         rn = m3b.getElementsByClass('RomanNumeral')[0]
         self.assertEqual(str(rn.figure), 'V/ii')        
+
+
+    def testRomanTextString(self):
+        from music21 import converter
+        s = converter.parse('m1 I \n m2 V6/5 \n m3 I b3 V7 \n m4 vi \n m5 a: i b3 V4/2 \n m6 I', format='romantext')
+
+        rnStream = s.flat.getElementsByClass('RomanNumeral')
+        self.assertEqual(rnStream[0].figure, 'I')
+        self.assertEqual(rnStream[1].figure, 'V6/5')        
+        self.assertEqual(rnStream[2].figure, 'I')
+        self.assertEqual(rnStream[3].figure, 'V7')
+        self.assertEqual(rnStream[4].figure, 'vi')
+        self.assertEqual(rnStream[5].figure, 'i')
+        self.assertEqual(rnStream[6].figure, 'V4/2')
+        self.assertEqual(rnStream[7].figure, 'I')
+
+        #s.show()
+
 
 
 
