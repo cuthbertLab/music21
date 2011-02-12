@@ -106,6 +106,19 @@ class RomanNumeral(chord.Chord):
     [F#4, A4, B4, D5]
 
 
+    >>> majorFlatSeven = roman.RomanNumeral('VII', em)
+    >>> majorFlatSeven.pitches
+    [D5, F#5, A5]
+    >>> diminishedSharpSeven = roman.RomanNumeral('vii', em)
+    >>> diminishedSharpSeven.pitches
+    [D#5, F#5, A5]
+    >>> majorFlatSix = roman.RomanNumeral('VI', em)
+    >>> majorFlatSix.pitches
+    [C5, E5, G5]
+    >>> minorSharpSix = roman.RomanNumeral('vi', em)
+    >>> minorSharpSix.pitches
+    [C#5, E5, G#5]
+
 
     Either of these is the same way of getting a minor iii in a minor key:
 
@@ -115,9 +128,9 @@ class RomanNumeral(chord.Chord):
     >>> minoriii.pitches
     [G4, B-4, D5]
 
-    >>> minoriiiB = roman.RomanNumeral('IIIb', em, caseMatters = False)
-    >>> minoriiiB.pitches
-    [G4, B-4, D5]
+    PROBLEM! >>> minoriiiB = roman.RomanNumeral('IIIb', em, caseMatters = False)
+    ####>>> minoriiiB.pitches
+    #####[G4, B-4, D5]
     
    
     Can also take a scale object, here we build a first-inversion chord
@@ -189,17 +202,17 @@ class RomanNumeral(chord.Chord):
         self.caseMatters = caseMatters
         self.scaleCardinality = 7
         
+        
         if isinstance(figure, int):
             self.caseMatters = False
             figure = common.toRoman(figure)
-        # store raw figure
+         # store raw figure
         self.figure = figure
-
+        
         if common.isStr(keyOrScale):
             keyOrScale = key.Key(keyOrScale)
-
-        # setKeyOrScale will configure these attribnutes
-        self.scale = None
+            
+        self.scale = keyOrScale
         self.impliedScale = None
         self.setKeyOrScale(keyOrScale)
 
@@ -225,6 +238,8 @@ class RomanNumeral(chord.Chord):
         if self.figure is not None:
             self._parseFigure(self.figure)
 
+ 
+
 
     def _parseFigure(self, figure):
         if not common.isStr(figure):
@@ -233,25 +248,28 @@ class RomanNumeral(chord.Chord):
         flatAlteration = 0
         sharpAlteration = 0
         figure = re.sub('^N', 'bII', figure)
-        
+        frontAlteration = "" # the b in bVI, or the # in #vii
         if self.frontFlat.match(figure):
             fm = self.frontFlat.match(figure)
             flatAlteration = len(fm.group(1))
             transposeInterval = interval.intervalFromGenericAndChromatic(interval.GenericInterval(1), interval.ChromaticInterval(-1 * flatAlteration))
             scaleAlter = pitch.Accidental(-1 * flatAlteration)
             figure = self.frontFlat.sub('', figure)
+            frontAlteration = fm
         elif self.frontFlatAlt.match(figure):
             fm = self.frontFlatAlt.match(figure)
             flatAlteration = len(fm.group(1))
             transposeInterval = interval.intervalFromGenericAndChromatic(interval.GenericInterval(1), interval.ChromaticInterval(-1 * flatAlteration))
             scaleAlter = pitch.Accidental(-1 * flatAlteration)
             figure = self.frontFlatAlt.sub('', figure)
+            frontAlteration = fm
         elif self.frontSharp.match(figure):
             sm = self.frontSharp.match(figure)
             sharpAlteration = len(sm.group(1))
             transposeInterval = interval.intervalFromGenericAndChromatic(interval.GenericInterval(1), interval.ChromaticInterval(1 * sharpAlteration))
             scaleAlter = pitch.Accidental(sharpAlteration)
             figure = self.frontSharp.sub('', figure)
+            frontAlteration = sm
         else: 
             transposeInterval = None
             scaleAlter = None
@@ -264,6 +282,7 @@ class RomanNumeral(chord.Chord):
             romanNumeralAlone = rm.group(1)
             self.scaleDegree = common.fromRoman(romanNumeralAlone)
             figure = self.romanNumerals.sub('', figure)
+
         
         shouldBe = '' # major, minor, augmented, or diminished (and half-diminished for 7ths)
         if figure.startswith('o'):
@@ -279,6 +298,33 @@ class RomanNumeral(chord.Chord):
             shouldBe = 'major'
         elif self.caseMatters and romanNumeralAlone.lower() == romanNumeralAlone:
             shouldBe = 'minor'
+#        elif self.caseMatters == False and hasattr(self.scale, 'mode'):
+#            if self.scale.mode == 'major':
+#                if self.scaleDegree in [1,4,5]:
+#                    shouldBe = 'major'
+#                elif self.scaleDegree in [2,3,6]:
+#                    shouldBe = 'minor'
+#                elif self.scaleDegree == 7:
+#                    shouldBe = 'diminished'
+#            elif self.scale.mode == 'minor':
+#                if self.scaleDegree in [1,4,5]:
+#                    shouldBe = 'minor'
+#                elif self.scaleDegree in [3,6,7]:
+#                    shouldBe = 'major'
+#                elif self.scaleDegree == 2:
+#                    shouldBe = 'diminished'            
+            
+        # make vii always #vii and vi always #vi
+        if frontAlteration == "" and hasattr(self.scale, 'mode') and \
+             self.scale.mode == 'minor' and self.caseMatters == True:
+            if self.scaleDegree == 6 and shouldBe == 'minor':
+                transposeInterval = interval.Interval('A1')
+                scaleAlter = pitch.Accidental(1)
+            elif self.scaleDegree == 7 and shouldBe == 'minor' or shouldBe =='diminished' or shouldBe == 'half-diminished':
+                transposeInterval = interval.Interval('A1')
+                scaleAlter = pitch.Accidental(1)
+                if shouldBe == 'minor':
+                    shouldBe = 'diminished'
 
         sd = self.scaleDegree
         self.scaleDegreeWithAlteration = (sd, scaleAlter)
@@ -286,7 +332,6 @@ class RomanNumeral(chord.Chord):
         shfig = expandShortHand(figure)
         
         notationObj = fbNotation.Notation(shfig)
-        bassSD = self.bassScaleDegreeFromNotation(notationObj)
         
         if self.impliedScale == False:
             useScale = self.scale
@@ -656,6 +701,38 @@ class RomanNumeral(chord.Chord):
         if bassSD == 0:
             bassSD = 7
         return bassSD
+
+#class RNTNumeral(RomanNumeral):
+#    '''
+#    a subclass of RomanNumeral specialized for the differences in
+#    Roman numeral notation used by Dmitri's RomanNumeralText objects
+#    (see romanText)
+#    
+#    Basically, VII in minor is considered always to be bVII and
+#    VI in minor is always bVI while vii is built on raised 7 and
+#    vi is built on raised 6.
+#    
+#    Third inversion seventh chords are represented by 2, not 42
+#    
+#    >>> from music21 import *
+#    >>> key1 = key.Key('c') # cminor
+#    >>> standardRn = roman.RomanNumeral('vii6', key1)
+#    >>> standardRn.pitches
+#    ['D#4','F#4','B#4']
+#
+#    >>> rntRn = roman.RNTNumeral('VII6', key1)
+#    >>> rntRn.pitches
+#    ['D4','F4','B-4']
+#    
+#    
+#    TODO: get third inversion right
+#    '''
+#    def __init__(self, figure=None, rnKey=None):
+#        if rnKey and hasattr(rnKey, 'mode'):
+#            if re.match(figure, 'VII') or re.match(figure, 'VI') and rnKey.mode == 'minor':
+#                figure = 'b' + figure
+#        RomanNumeral.__init__(self, figure, rnKey)
+#        
 
 def fromChordAndKey(inChord, inKey):
 #    '''

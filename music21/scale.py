@@ -11,13 +11,24 @@
 #-------------------------------------------------------------------------------
 
 '''
-The various Scale objects provide a bi-directional object representation of octave repeating and non-octave repeating scales built by network of :class:`~music21.interval.Interval` objects as modeled in :class:`~music21.intervalNetwork.BoundIntervalNetwork`.
+The various Scale objects provide a bi-directional object representation 
+of octave repeating and non-octave repeating scales built by network of 
+:class:`~music21.interval.Interval` objects as modeled in 
+:class:`~music21.intervalNetwork.BoundIntervalNetwork`.
 
-The main public interface to these resources are the numerous :class:`~music21.scale.ConcreteScale` subclasses, such as :class:`~music21.scale.MajorScale`, :class:`~music21.scale.MinorScale`, and :class:`~music21.scale.MelodicMinorScale`.
+The main public interface to these resources are subclasses of
+:class:`~music21.scale.ConcreteScale`, such as 
+:class:`~music21.scale.MajorScale`, :class:`~music21.scale.MinorScale`, 
+and :class:`~music21.scale.MelodicMinorScale`.
 
-More unusual scales are also available, such as :class:`~music21.scale.OctatonicScale`, :class:`~music21.scale.SieveScale`, and :class:`~music21.scale.RagMarwa`.
+More unusual scales are also available, such as 
+:class:`~music21.scale.OctatonicScale`, 
+:class:`~music21.scale.SieveScale`, and :class:`~music21.scale.RagMarwa`.
 
-All :class:`~music21.scale.ConcreteScale` subclasses provide the ability to get a pitches across any range, get a pitch for scale step, get a scale step for pitch, and, for any given pitch ascend or descend to the next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
+All :class:`~music21.scale.ConcreteScale` subclasses provide the ability 
+to get a pitches across any range, get a pitch for scale step, get a 
+scale step for pitch, and, for any given pitch ascend or descend to the 
+next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 
 >>> from music21 import *
 >>> sc1 = scale.MajorScale('a')
@@ -979,11 +990,11 @@ class ConcreteScale(Scale):
         False
         >>> sc1.abstract == sc4.abstract # can compare abstract forms
         True
-        >>> sc4 == sc5 # implicit abstract comparisoin
+        >>> sc4 == sc5 # implicit abstract comparison
         True
-        >>> sc5 == sc2 # implicit abstract comparisoin
+        >>> sc5 == sc2 # implicit abstract comparison
         True
-        >>> sc5 == sc3 # implicit abstract comparisoin
+        >>> sc5 == sc3 # implicit abstract comparison
         False
 
         '''

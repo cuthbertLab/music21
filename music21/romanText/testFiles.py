@@ -26,6 +26,7 @@ Madrigal: 3.13
 Title: Ch'io non t'ami, cor mio
 Time Signature: 4/4
 Analyst: Michael Scott Cuthbert
+Key Signature:
 
 m1 a: v b3 i b4 VI
 m2 b2 III b4 iv
@@ -38,36 +39,36 @@ m8 I b3 IV ( b4 IV7
 m9 VII ) b3 a: i6
 Note: m9 is a murky transition with voice-leading chords; next passage alternates between a minor and A major
 m10 V
-m11 i b4 I
+m11 i || b4 I
 m13 b2 iv b3 III
-m14 b2 III6 b4 I
+m14 b2 III6 || b4 I
 m16 b2 iv b3 G: IV
-m17 b4 vi
+m17 || b4 vi
 m19 b2 viio6 b3 I
 m21 I6 b3 IV b4 ii6/5
 m22 I
 m23 b3 IV6/4
 m24 I
-m25 IV b3 d: III b4 ii
+m25 IV || b3 d: III b4 ii
 m26 v b2 III6 b3 iv6 b4 iio6/5
 m27 i6/4 b3 V
 m28 I6 b3 IV
 m29 VII6 b2 v b3 V b4 vi6
 m30 V/V
 m31 v b2 VII b3 III b4 ii
-Note: mm31-37 are basically a repeat of mm25-31 but not coming out of a previous key, m31 is labelled differently
+Note: mm31-37 are basically a repeat of mm25-31 but not coming out of a previous key, m31 is labeled differently
 m32-33 = m26-27
 m34 I b3 IV
 m35-36 = m29-30
-m37 v
+m37 v ||
 m38 C: IV b4 I
-Note: mm. 38 to 44 could also be labelled in F since IV plays such a prominent role
+Note: mm. 38 to 44 could also be labeled in F since IV plays such a prominent role
 m39 b4 ii
 m40 V/ii
 m41 IV b4 I
 m42 b4 ii
 m43 V/ii
-m44 V/V b2 V[no3] b3 I
+m44 V/V || b2 V[no3] b3 I
 m46 b3 IV
 m47 b3 V b4 vi
 m48 V b3 I
@@ -76,8 +77,8 @@ m52-54 = m38-40
 m55-57 = m44-46
 m58 b3 vi
 m59 V
-m60 I
-m61 b3 V
+m60 I ||
+m61 I b3 V
 m62 a: i b2 V b4 VI
 m63 V
 m64 b2 i b3 VII
@@ -86,17 +87,17 @@ Note: mm 65-70 could be analyzed in G as well)
 m66 ( VII
 m67 b4 v7
 m68 ii6 b4 VII6/4
-m67 IV
-m68 b3 iv )
-m69 VI b3 v6
-m70 i
-m72 III b3 ii6
-m73 V
-m77 i
-m78 VI b3 III
-m79 d: i b2 V b4 VI
-m80 V
-m81 b2 i b3 C: I
+m69 IV
+m70 b3 iv )
+m71 VI b3 v6
+m72 i
+m74 III b3 ii6
+m75 V
+m79 i ||
+m80 VI b3 III
+m81 d: i b2 V b4 VI
+m82 V
+m83 b2 i b3 C: I
 m85 V b3 vi b4 V/vi
 m86 b2 IV b3 V/vi
 m87 b4 vi

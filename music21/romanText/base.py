@@ -297,7 +297,8 @@ class RTMeasure(RTToken):
         return True
 
     def getCopyTarget(self):
-        '''If this measure defines a copy operation, return two lists defining the measures to copy.
+        '''If this measure defines a copy operation, return two lists defining the measures to copy; the second list
+        has the repeat data.
 
         >>> from music21 import *
         >>> rtm = romanText.RTMeasure('m35-36 = m29-30')

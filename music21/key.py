@@ -705,6 +705,8 @@ class Key(KeySignature, scale.DiatonicScale):
     -3
     >>> cm.pitchFromDegree(3)
     E-4
+    >>> cm.pitchFromDegree(7)
+    B-4
 
     >>> Csharpmaj = key.Key('C#')
     >>> Csharpmaj

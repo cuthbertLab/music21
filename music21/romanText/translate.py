@@ -60,6 +60,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     lastMeasureNumber = 0
     previousRn = None
     kCurrent = None # key is set inside of measure
+    prefixToLyric = ""
 
     for t in rtHandler.tokens:
         if t.isTitle():
@@ -100,83 +101,129 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     p.append(mFill)
                 lastMeasureNumber = t.number[0] - 1
             # create a new measure or copy a past measure
-            if len(t.number) == 1: # if not a range
-                if not t.isCopyDefinition:
-                    m = stream.Measure()
-                else: # copy from a past location; need to change key
-                    targetNumber, targetRepeat = t.getCopyTarget()
-                    if len(targetNumber) > 1: # this is an encoding error
-                        raise TranslateRomanTextException('a single measure cannot define a copy operation for multiple measures')
-                    # TODO: ignoring repeat letters
-                    target = targetNumber[0]
-                    for mPast in p.getElementsByClass('Measure'):
-                        if mPast.number == target:
-                            m = copy.deepcopy(mPast)
-                            # update all keys
-                            for rnPast in m.getElementsByClass('RomanNumeral'):
-                                if kCurrent is None: # should not happen
-                                    raise TranslateRomanTextException('attempting to copy a measure but no past key definitions are found')
-                                rnPast.setKeyOrScale(kCurrent)
-                            break
+            if len(t.number) == 1 and t.isCopyDefinition: # if not a range
+                m = copySingleMeasure(t, p, kCurrent)
+                p.append(m)
+                lastMeasureNumber = m.number
+                romans = m.getElementsByClass(roman.RomanNumeral)
+                if len(romans) > 0:
+                    previousRn = romans[-1] 
+            elif len(t.number) > 1:
+                measures = copyMultipleMeasures(t, p, kCurrent)
+                p.append(measures)
+                lastMeasureNumber = measures[-1].number
+                romans = measures[-1].getElementsByClass(roman.RomanNumeral)
+                if len(romans) > 0:
+                    previousRn = romans[-1]
+            else:
+                m = stream.Measure()
                 m.number = t.number[0]
                 lastMeasureNumber = t.number[0]
-            else: # TODO: copy a range of measure; 
-                # the key provided needs to be the current key
-                lastMeasureNumber = t.number[1]
-                environLocal.printDebug(['cannot yet handle measure tokens defining measure ranges: %s' % t.number])
-
-            if not tsSet:
-                m.timeSignature = tsCurrent
-                tsSet = True # only set when changed
-
-            o = 0.0 # start offsets at zero
-            previousChordInMeasure = None
-            for i, a in enumerate(t.atoms):
-                if isinstance(a, romanTextModule.RTKey):
-                    kCurrent = a.getKey()
-
-                if isinstance(a, romanTextModule.RTBeat):
-                    # set new offset based on beat
-                    o = a.getOffset(tsCurrent)
-                    if (previousChordInMeasure is None and 
-                        previousRn is not None):
-                        # setting a new beat before giving any chords
-                        firstChord = copy.deepcopy(previousRn)
-                        firstChord.quarterLength = o
-                        firstChord.lyric = ""
-                        if previousRn.tie == None:
-                            previousRn.tie = tie.Tie('start')
-                        else:
-                            previousRn.tie.type = 'continue'    
-                        firstChord.tie = tie.Tie('stop')
-                        previousRn = firstChord
-                        previousChordInMeasure = firstChord
-                        m.insert(0, firstChord)
-                        
-                if isinstance(a, romanTextModule.RTChord):
-                    # probably best to find duration
-                    if previousChordInMeasure is None:
-                        pass # use default duration
-                    else: # update duration of previous chord in Measure
-                        oPrevious = previousChordInMeasure.getOffsetBySite(m)
-                        previousChordInMeasure.quarterLength = o - oPrevious
-                    # use source to evaluation roman 
-                    try:
-                        rn = roman.RomanNumeral(a.src, kCurrent)
-                    except:
-                        environLocal.printDebug('cannot create RN from: %s' % a.src)
-                        rn = note.Note() # create placeholder 
-                    rn.addLyric(a.src)
-                    m.insert(o, rn)
-                    previousChordInMeasure = rn
-                    previousRn = rn
-            # may need to adjust duration of last chord added
-            previousRn.quarterLength = tsCurrent.barDuration.quarterLength - o
-            p.append(m)
+                
+                if not tsSet:
+                    m.timeSignature = tsCurrent
+                    tsSet = True # only set when changed
+    
+                o = 0.0 # start offsets at zero
+                previousChordInMeasure = None
+                for i, a in enumerate(t.atoms):
+                    if isinstance(a, romanTextModule.RTKey):
+                        kCurrent = a.getKey()
+                        prefixLyric = kCurrent.tonic + ": "
+                    if isinstance(a, romanTextModule.RTBeat):
+                        # set new offset based on beat
+                        o = a.getOffset(tsCurrent)
+                        if (previousChordInMeasure is None and 
+                            previousRn is not None):
+                            # setting a new beat before giving any chords
+                            firstChord = copy.deepcopy(previousRn)
+                            firstChord.quarterLength = o
+                            firstChord.lyric = ""
+                            if previousRn.tie == None:
+                                previousRn.tie = tie.Tie('start')
+                            else:
+                                previousRn.tie.type = 'continue'    
+                            firstChord.tie = tie.Tie('stop')
+                            previousRn = firstChord
+                            previousChordInMeasure = firstChord
+                            m.insert(0, firstChord)
+                            
+                    if isinstance(a, romanTextModule.RTChord):
+                        # probably best to find duration
+                        if previousChordInMeasure is None:
+                            pass # use default duration
+                        else: # update duration of previous chord in Measure
+                            oPrevious = previousChordInMeasure.getOffsetBySite(m)
+                            previousChordInMeasure.quarterLength = o - oPrevious
+                        # use source to evaluation roman 
+                        try:
+                            rn = roman.RomanNumeral(a.src, kCurrent)
+                        except:
+                            environLocal.printDebug('cannot create RN from: %s' % a.src)
+                            rn = note.Note() # create placeholder 
+                        rn.addLyric(prefixLyric + a.src)
+                        prefixLyric = ""
+                        m.insert(o, rn)
+                        previousChordInMeasure = rn
+                        previousRn = rn
+                # may need to adjust duration of last chord added
+                previousRn.quarterLength = tsCurrent.barDuration.quarterLength - o
+                p.append(m)
     p.makeBeams()
     s.insert(0,p)
     return s
 
+
+def copySingleMeasure(t, p, kCurrent):
+    # copy from a past location; need to change key
+    targetNumber, targetRepeat = t.getCopyTarget()
+    if len(targetNumber) > 1: # this is an encoding error
+        raise TranslateRomanTextException('a single measure cannot define a copy operation for multiple measures')
+    # TODO: ignoring repeat letters
+    target = targetNumber[0]
+    for mPast in p.getElementsByClass('Measure'):
+        if mPast.number == target:
+            m = copy.deepcopy(mPast)
+            m.number = t.number[0]
+            # update all keys
+            for rnPast in m.getElementsByClass('RomanNumeral'):
+                if kCurrent is None: # should not happen
+                    raise TranslateRomanTextException('attempting to copy a measure but no past key definitions are found')
+                rnPast.setKeyOrScale(kCurrent)
+            break
+    return m
+
+def copyMultipleMeasures(t, p, kCurrent):
+    from music21 import stream
+    # the key provided needs to be the current key
+    environLocal.printDebug(['cannot yet handle measure tokens defining measure ranges: %s' % t.number])
+
+
+    targetNumbers, targetRepeat = t.getCopyTarget()
+    if len(targetNumbers) == 1: # this is an encoding error
+        raise TranslateRomanTextException('a multiple measure range cannot copy a single measure')
+    # TODO: ignoring repeat letters
+    # TODO: check for overlap:  m20-25 = m17-22
+    # TODO: check for range equality: m20-30 = m10-19
+    targetStart = targetNumbers[0]
+    targetEnd = targetNumbers[1]
+    measures = []
+    for mPast in p.getElementsByClass('Measure'):
+        if mPast.number in range(targetStart, targetEnd +1):
+            m = copy.deepcopy(mPast)
+            m.number = t.number[0] + mPast.number - targetStart
+            measures.append(m)
+            # update all keys
+            for rnPast in m.getElementsByClass('RomanNumeral'):
+                if kCurrent is None: # should not happen
+                    raise TranslateRomanTextException('attempting to copy a measure but no past key definitions are found')
+                rnPast.setKeyOrScale(kCurrent)
+        if mPast.number == targetEnd:
+            break
+    return measures
+
+
+                
 
 def romanTextStringToStreamScore(rtString, inputM21=None):
     '''Convenience routine for geting a score from string, not a handler
