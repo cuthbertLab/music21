@@ -211,7 +211,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             previousChordInMeasure.quarterLength = o - oPrevious
                         # use source to evaluation roman 
                         try:
-                            rn = roman.RomanNumeral(a.src, kCurrent)
+                            useFigure = a.src
+                            if useFigure == 'III':
+                                pass
+                            rn = roman.RomanNumeral(useFigure, kCurrent)
                         except:
                             environLocal.printDebug('cannot create RN from: %s' % a.src)
                             rn = note.Note() # create placeholder 

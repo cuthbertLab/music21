@@ -45,7 +45,10 @@ def expandShortHand(shorthand):
     'b13,#9,-6'
     >>> expandShortHand("-")
     '5,-3'
+    >>> expandShortHand("6/4")
+    '6,4'
     '''
+    shorthand = shorthand.replace('/', '')
     if ENDWITHFLAT_RE.match(shorthand):
         shorthand += "3"
     shorthand = re.sub('11', 'x', shorthand)
@@ -189,6 +192,17 @@ class RomanNumeral(chord.Chord):
     [G-2, A-2, C#3, E-3] 
     
     
+    OMIT_FROM_DOCS
+    Things that were giving us trouble
+    >>> dminor = key.Key('d')
+    >>> rn = roman.RomanNumeral('ii/o65', dminor)
+    >>> rn.pitches
+    [G4, B-4, D5, E5]
+    
+    >>> rn3 = roman.RomanNumeral('III', dminor)
+    >>> rn3.pitches
+    [F4, A4, C5]
+    
     '''
 
     frontFlat = re.compile('^(b+)')
@@ -320,7 +334,7 @@ class RomanNumeral(chord.Chord):
             if self.scaleDegree == 6 and shouldBe == 'minor':
                 transposeInterval = interval.Interval('A1')
                 scaleAlter = pitch.Accidental(1)
-            elif self.scaleDegree == 7 and shouldBe == 'minor' or shouldBe =='diminished' or shouldBe == 'half-diminished':
+            elif self.scaleDegree == 7 and (shouldBe == 'minor' or shouldBe =='diminished' or shouldBe == 'half-diminished'):
                 transposeInterval = interval.Interval('A1')
                 scaleAlter = pitch.Accidental(1)
                 if shouldBe == 'minor':
@@ -799,6 +813,10 @@ class Test(unittest.TestCase):
 
         cM = scale.MajorScale('C')
         r2 = RomanNumeral('ii', cM)
+
+        dminor = key.Key('d')
+        rn = RomanNumeral('ii/o65', dminor)
+        self.assertEqual(rn.pitches, chord.Chord(['G4','B-4','D5','E5']).pitches)
         
         
 #    def xtestFirst(self):                  

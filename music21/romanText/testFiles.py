@@ -35,8 +35,8 @@ m4 i b3 v b4 VI
 m5 b2 g: IV b4 V
 m6 i
 m7 D: V
-m8 I b3 IV ( b4 IV7
-m9 VII ) b3 a: i6
+m8 I b3 IV
+m9 VII b3 a: i6
 Note: m9 is a murky transition with voice-leading chords; next passage alternates between a minor and A major
 m10 V
 m11 i || b4 I
@@ -50,7 +50,7 @@ m22 I
 m23 b3 IV6/4
 m24 I
 m25 IV || b3 d: III b4 ii
-m26 v b2 III6 b3 iv6 b4 iio6/5
+m26 v b2 III6 b3 iv6 b4 ii/o6/5
 m27 i6/4 b3 V
 m28 I6 b3 IV
 m29 VII6 b2 v b3 V b4 vi6
