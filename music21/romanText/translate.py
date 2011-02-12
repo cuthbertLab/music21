@@ -29,6 +29,55 @@ class TranslateRomanTextException(Exception):
     pass
 
 
+def _copySingleMeasure(t, p, kCurrent):
+    # copy from a past location; need to change key
+    targetNumber, targetRepeat = t.getCopyTarget()
+    if len(targetNumber) > 1: # this is an encoding error
+        raise TranslateRomanTextException('a single measure cannot define a copy operation for multiple measures')
+    # TODO: ignoring repeat letters
+    target = targetNumber[0]
+    for mPast in p.getElementsByClass('Measure'):
+        if mPast.number == target:
+            m = copy.deepcopy(mPast)
+            m.number = t.number[0]
+            # update all keys
+            for rnPast in m.getElementsByClass('RomanNumeral'):
+                if kCurrent is None: # should not happen
+                    raise TranslateRomanTextException('attempting to copy a measure but no past key definitions are found')
+                rnPast.setKeyOrScale(kCurrent)
+            break
+    return m
+
+def _copyMultipleMeasures(t, p, kCurrent):
+    from music21 import stream
+    # the key provided needs to be the current key
+    environLocal.printDebug(['cannot yet handle measure tokens defining measure ranges: %s' % t.number])
+
+
+    targetNumbers, targetRepeat = t.getCopyTarget()
+    if len(targetNumbers) == 1: # this is an encoding error
+        raise TranslateRomanTextException('a multiple measure range cannot copy a single measure')
+    # TODO: ignoring repeat letters
+    # TODO: check for overlap:  m20-25 = m17-22
+    # TODO: check for range equality: m20-30 = m10-19
+    targetStart = targetNumbers[0]
+    targetEnd = targetNumbers[1]
+    measures = []
+    for mPast in p.getElementsByClass('Measure'):
+        if mPast.number in range(targetStart, targetEnd +1):
+            m = copy.deepcopy(mPast)
+            m.number = t.number[0] + mPast.number - targetStart
+            measures.append(m)
+            # update all keys
+            for rnPast in m.getElementsByClass('RomanNumeral'):
+                if kCurrent is None: # should not happen
+                    raise TranslateRomanTextException('attempting to copy a measure but no past key definitions are found')
+                rnPast.setKeyOrScale(kCurrent)
+        if mPast.number == targetEnd:
+            break
+    return measures
+
+
 
 def romanTextToStreamScore(rtHandler, inputM21=None):
     '''Given a roman text handler, return or fill a Score Stream.
@@ -102,14 +151,14 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 lastMeasureNumber = t.number[0] - 1
             # create a new measure or copy a past measure
             if len(t.number) == 1 and t.isCopyDefinition: # if not a range
-                m = copySingleMeasure(t, p, kCurrent)
+                m = _copySingleMeasure(t, p, kCurrent)
                 p.append(m)
                 lastMeasureNumber = m.number
                 romans = m.getElementsByClass(roman.RomanNumeral)
                 if len(romans) > 0:
                     previousRn = romans[-1] 
             elif len(t.number) > 1:
-                measures = copyMultipleMeasures(t, p, kCurrent)
+                measures = _copyMultipleMeasures(t, p, kCurrent)
                 p.append(measures)
                 lastMeasureNumber = measures[-1].number
                 romans = measures[-1].getElementsByClass(roman.RomanNumeral)
@@ -174,53 +223,6 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     return s
 
 
-def copySingleMeasure(t, p, kCurrent):
-    # copy from a past location; need to change key
-    targetNumber, targetRepeat = t.getCopyTarget()
-    if len(targetNumber) > 1: # this is an encoding error
-        raise TranslateRomanTextException('a single measure cannot define a copy operation for multiple measures')
-    # TODO: ignoring repeat letters
-    target = targetNumber[0]
-    for mPast in p.getElementsByClass('Measure'):
-        if mPast.number == target:
-            m = copy.deepcopy(mPast)
-            m.number = t.number[0]
-            # update all keys
-            for rnPast in m.getElementsByClass('RomanNumeral'):
-                if kCurrent is None: # should not happen
-                    raise TranslateRomanTextException('attempting to copy a measure but no past key definitions are found')
-                rnPast.setKeyOrScale(kCurrent)
-            break
-    return m
-
-def copyMultipleMeasures(t, p, kCurrent):
-    from music21 import stream
-    # the key provided needs to be the current key
-    environLocal.printDebug(['cannot yet handle measure tokens defining measure ranges: %s' % t.number])
-
-
-    targetNumbers, targetRepeat = t.getCopyTarget()
-    if len(targetNumbers) == 1: # this is an encoding error
-        raise TranslateRomanTextException('a multiple measure range cannot copy a single measure')
-    # TODO: ignoring repeat letters
-    # TODO: check for overlap:  m20-25 = m17-22
-    # TODO: check for range equality: m20-30 = m10-19
-    targetStart = targetNumbers[0]
-    targetEnd = targetNumbers[1]
-    measures = []
-    for mPast in p.getElementsByClass('Measure'):
-        if mPast.number in range(targetStart, targetEnd +1):
-            m = copy.deepcopy(mPast)
-            m.number = t.number[0] + mPast.number - targetStart
-            measures.append(m)
-            # update all keys
-            for rnPast in m.getElementsByClass('RomanNumeral'):
-                if kCurrent is None: # should not happen
-                    raise TranslateRomanTextException('attempting to copy a measure but no past key definitions are found')
-                rnPast.setKeyOrScale(kCurrent)
-        if mPast.number == targetEnd:
-            break
-    return measures
 
 
                 

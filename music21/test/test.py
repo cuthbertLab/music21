@@ -46,6 +46,8 @@ class ModuleGather(object):
             '__init__.py', 
             'timeGraphs.py',
             'exceldiff.py', 
+            # not testing translate due to dependency
+            'abj/translate.py', 
 
             ]
         # skip any path that contains this string
