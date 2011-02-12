@@ -2408,6 +2408,14 @@ class Test(unittest.TestCase):
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
 
+        c1 = Chord(['C4','E-4','G4'])
+        c2 = copy.deepcopy(c1)
+        c1.pitches[0].accidental = pitch.Accidental('sharp')
+        c1.pitches[1].accidental.set(1)
+        self.assertEqual(c1.__repr__(), "<music21.chord.Chord C#4 E#4 G4>")
+        self.assertEqual(c2.__repr__(), "<music21.chord.Chord C4 E-4 G4>")
+        
+
 
     def testConstruction(self):
         HighEFlat = note.Note ()
