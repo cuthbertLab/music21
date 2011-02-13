@@ -330,7 +330,7 @@ def diminishedSeventhToSubdominant(pitches, resolveTo='major', inPlace=False):
     root.transpose('m2', True)
     third.transpose('-M2', True)
     
-    #Sixth scale degree moves up a step.
+    #Sixth scale degree moves up a step if in major
     if resolveTo == 'major':
         mSharp = notation.Modifier("+")
         mSharp.modifyPitch(seventh, True)
