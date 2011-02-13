@@ -3662,6 +3662,26 @@ class Test(unittest.TestCase):
         xmlout = xmlout.replace('\n', '')
         self.assertEqual(xmlout.find(match), 501)
 
+
+    def testSlowSixEight(self):
+        # create a meter with 6 beats but beams in 2 groups
+        from music21 import meter, stream, note
+        ts = meter.TimeSignature('6/8')
+        ts.beatSequence.partition(6)
+        self.assertEqual(str(ts.beatSequence), '{1/8+1/8+1/8+1/8+1/8+1/8}')
+        self.assertEqual(str(ts.beamSequence), '{3/8+3/8}')
+
+        # check that beats are calculated properly
+        m = stream.Measure()
+        m.timeSignature = ts
+        n = note.Note(quarterLength=0.5)
+        m.repeatAppend(n, 6)
+        match = [n.beatStr for n in m.notes]
+        self.assertEqual(match, ['1', '2', '3', '4', '5', '6'])
+        m.makeBeams()
+        #m.show()
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [TimeSignature, CompoundTimeSignature]
