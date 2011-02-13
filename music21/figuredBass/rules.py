@@ -4,7 +4,7 @@
 # Purpose:      music21 class to define rules used in composition
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010 The music21 Project    
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -185,5 +185,4 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
- 
-    
+  
