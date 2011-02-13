@@ -32,8 +32,8 @@ PY_BIN = ['python']
 # to run on a local svn check out, and assuming that checkout is in ~/music21, 
 # first build a source distribution
 # python setup.py sdist
-# then pass path to source distribution to test routine
-# python music21/test/testInstallation.py ~/music21/dist/music21-0.3.0a5.tar.gz
+# then pass path to source distribution to test routine (update the version)
+# python music21/test/testInstallation.py ~/music21/dist/music21-0.3.4a8.tar.gz
 
 
 #-------------------------------------------------------------------------------
