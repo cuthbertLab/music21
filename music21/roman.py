@@ -550,17 +550,47 @@ class RomanNumeral(chord.Chord):
         return bassSD
 
 def fromChordAndKey(inChord, inKey):
-#    '''
-#    return a RomanNumeral object from the given chord in the given key.
-#    
-#    >>> dim7chord = chord.Chord(["E2", "C#3", "B-3", "G4"])
-#    >>> viio65 = roman.fromChordAndKey(dim7chord, key.Key('D'))
-#    >>> viio65.pitches   # retains octave
-#    ['E2', 'C#3', 'B-3', 'G4']
-#    >>> viio65.figure
-#    'viio65'
-#    '''
-    pass
+    '''
+    return a RomanNumeral object from the given chord in the given key.
+    
+    >>> from music21 import *
+    >>> dim7chord = chord.Chord(["E2", "C#3", "B-3", "G4"])
+    >>> viio65 = roman.fromChordAndKey(dim7chord, key.Key('D'))
+    >>> viio65
+    'VII'
+    >>> roman.fromChordAndKey(["E-3","G4","B-5"], key.Key('D'))
+    'bII'
+    >>> roman.fromChordAndKey(["G#3","B#4","D#5"], key.Key('D'))
+    '#IV'
+
+    
+    #>>> viio65.pitches   # retains octave
+    #['E2', 'C#3', 'B-3', 'G4']
+    #>>> viio65.figure
+    #'viio65'
+    '''
+    if isinstance(inChord, list):
+        inChord = chord.Chord(inChord)
+    chordRoot = inChord.root()
+    chordBass = inChord.bass()
+    frontPrefix = ""
+    scaleDeg = inKey.getScaleDegreeFromPitch(chordRoot)
+    if scaleDeg is None:
+        tempChordRoot = copy.deepcopy(chordRoot)
+        tempChordRoot.accidental = pitch.Accidental(tempChordRoot.accidental.alter + 1)
+        scaleDeg = inKey.getScaleDegreeFromPitch(tempChordRoot, comparisonAttribute='name')
+        if scaleDeg is not None:
+            frontPrefix = 'b'
+        else:        
+            tempChordRoot = copy.deepcopy(chordRoot)
+            tempChordRoot.accidental = pitch.Accidental(tempChordRoot.accidental.alter - 1)
+            scaleDeg = inKey.getScaleDegreeFromPitch(tempChordRoot, comparisonAttribute='name')
+            if scaleDeg is not None:
+                frontPrefix = '#'
+            else:
+                raise RomanException('could not find this note as a scale degree in the given key (double-sharps and flats, such as bbVII are not currently searched)')
+    rootScaleDeg = frontPrefix + common.toRoman(int(scaleDeg))
+    return rootScaleDeg
 
 
 

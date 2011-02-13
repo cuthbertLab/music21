@@ -1253,8 +1253,11 @@ class ConcreteScale(Scale):
 
 
     def getScaleDegreeFromPitch(self, pitchTarget, 
-            direction=DIRECTION_ASCENDING, comparisonAttribute='pitchClass'):
+            direction=DIRECTION_ASCENDING, comparisonAttribute='name'):
         '''For a given pitch, return the appropriate scale degree. If no scale degree is available, None is returned.
+
+        Note -- by default comparse on NAME not on PitchClass because this is used so commonly by tonal functions
+        
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -1273,6 +1276,7 @@ class ConcreteScale(Scale):
         3
         >>> sc.getScaleDegreeFromPitch('g#')
         7
+        >>> sc.getScaleDegreeFromPitch('g')
         '''
 
         post = self._abstract.getRelativeNodeDegree(
@@ -2036,9 +2040,9 @@ class ChromaticScale(ConcreteScale):
     D3
     >>> sc.pitchFromDegree(12) 
     G-3
-    >>> sc.getScaleDegreeFromPitch('g2')
+    >>> sc.getScaleDegreeFromPitch('g2', comparisonAttribute='pitchClass')
     1
-    >>> sc.getScaleDegreeFromPitch('F#6')
+    >>> sc.getScaleDegreeFromPitch('F#6', comparisonAttribute='pitchClass')
     12
     '''
     def __init__(self, tonic=None):
@@ -2066,9 +2070,9 @@ class WholeToneScale(ConcreteScale):
     A2
     >>> sc.pitchFromDegree(6) 
     E#3
-    >>> sc.getScaleDegreeFromPitch('g2')
+    >>> sc.getScaleDegreeFromPitch('g2', comparisonAttribute='pitchClass')
     1
-    >>> sc.getScaleDegreeFromPitch('F6')
+    >>> sc.getScaleDegreeFromPitch('F6', comparisonAttribute='pitchClass')
     6
     '''
     def __init__(self, tonic=None):
@@ -2285,11 +2289,11 @@ class Test(unittest.TestCase):
         # given a pitch, get the scale degree
         sc4 = MajorScale('A-')
         self.assertEqual(sc4.getScaleDegreeFromPitch('a-'), 1)
-        # default is pitch class matching
-        self.assertEqual(sc4.getScaleDegreeFromPitch('g#'), 1)
-        # can set pitch comparison attribute
+        # default is name matching
+        self.assertEqual(sc4.getScaleDegreeFromPitch('g#'), None)
+        # can set pitchClass comparison attribute
         self.assertEqual(sc4.getScaleDegreeFromPitch('g#', 
-            comparisonAttribute='name'), None)
+            comparisonAttribute='pitchClass'), 1)
         self.assertEqual(sc4.getScaleDegreeFromPitch('e-', 
             comparisonAttribute='name'), 5)
 
