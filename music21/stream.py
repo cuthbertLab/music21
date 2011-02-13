@@ -7050,6 +7050,8 @@ class Part(Stream):
             m = measureStream[i]
             if m.keySignature != None:
                 ksLast = m.keySignature
+            else:
+                ksLast = None
             # if beyond the first measure, use the pitches from the last
             # measure for context
             if i > 0:
@@ -7927,7 +7929,7 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in this module
         '''
         for part in sys.modules[self.__module__].__dict__.keys():
             if part.startswith('_') or part.startswith('__'):

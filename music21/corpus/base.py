@@ -51,6 +51,8 @@ from music21.corpus import haydn
 from music21.corpus.haydn import opus74no1  
 from music21.corpus.haydn import opus74no2  
 
+from music21.corpus import monteverdi
+
 from music21.corpus import mozart
 from music21.corpus.mozart import k80
 from music21.corpus.mozart import k155
@@ -87,6 +89,8 @@ MODULES = [
             opus74no1,
             opus74no2,
 
+            monteverdi,
+
             mozart,
             k80,
             k155,
@@ -114,21 +118,23 @@ _ALL_EXTENSIONS = (common.findInputExtension('abc') +
                    common.findInputExtension('lily') +
                    common.findInputExtension('musicxml') +
                    common.findInputExtension('musedata') +
-                   common.findInputExtension('humdrum'))
+                   common.findInputExtension('humdrum') +
+                   common.findInputExtension('romantext'))
 
 # store all composers in the corpus (not virtual) 
 # as two element tuples of path name, full name
 COMPOSERS = [
+    ('bach', 'Johann Sebastian Bach'),
     ('beethoven', 'Ludwig van Beethoven'),
     ('ciconia', 'Johannes Ciconia'),
     ('haydn', 'Joseph Haydn'),
     ('handel', 'George Frideric Handel'),
+    ('josquin', 'Josquin des Prez'),
+    ('luca', 'D. Luca'),
+    ('monteverdi', "Claudio Monteverdi"),
     ('mozart', 'Wolfgang Amadeus Mozart'),
     ('schoenberg', 'Arnold Schoenberg'),
     ('schumann', 'Robert Schumann'),
-    ('luca', 'Luca'),
-    ('bach', 'Johann Sebastian Bach'),
-    ('josquin', 'Josquin des Prez'),
     ]
 
 # instantiate an instance of each virtual work object in a module

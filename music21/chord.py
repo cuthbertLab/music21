@@ -2415,6 +2415,20 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.__repr__(), "<music21.chord.Chord C#4 E#4 G4>")
         self.assertEqual(c2.__repr__(), "<music21.chord.Chord C4 E-4 G4>")
         
+        c1 = Chord(["C#3", "E4"])
+        c2 = copy.deepcopy(c1)
+        self.assertTrue(c1 is not c2)
+        self.assertTrue(c1.pitches[0] is not c2.pitches[0])
+        self.assertTrue(c1.pitches[0].accidental is not c2.pitches[0].accidental)
+
+        from music21 import stream
+        stream1 = stream.Stream()
+        stream1.append(c1)
+        stream2 = copy.deepcopy(stream1)
+        self.assertTrue(stream1 is not stream2)
+        self.assertTrue(stream1.notes[0].pitches[0] is not stream2.notes[0].pitches[0])
+        self.assertTrue(stream1.notes[0].pitches[0].accidental is not stream2.notes[0].pitches[0].accidental)
+        
 
 
     def testConstruction(self):

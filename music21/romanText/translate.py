@@ -60,13 +60,14 @@ def _copyMultipleMeasures(t, p, kCurrent):
     if len(targetNumbers) == 1: # this is an encoding error
         raise TranslateRomanTextException('a multiple measure range cannot copy a single measure')
     # TODO: ignoring repeat letters
-    # TODO: check for overlap:  m20-25 = m17-22
-    # check for range equality: m20-30 = m10-19
-    if t.number[1] - t.number[0] != targetNumbers[1] - targetNumbers[0]:
-        raise TranslateRomanTextException('a multiple measure range copy attempting to copy an unequal sized region')
-
     targetStart = targetNumbers[0]
     targetEnd = targetNumbers[1]
+    
+    if t.number[1] - t.number[0] != targetEnd - targetStart:
+        raise TranslateRomanTextException('both the source and destination sections need to have the same number of measures')
+    elif t.number[0] < targetEnd:
+        raise TranslateRomanTextException('the source section cannot overlap with the destination section')
+
     measures = []
     for mPast in p.getElementsByClass('Measure'):
         if mPast.number in range(targetStart, targetEnd +1):
@@ -181,7 +182,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 romans = measures[-1].getElementsByClass(roman.RomanNumeral)
                 if len(romans) > 0:
                     previousRn = romans[-1]
-            else:
+            else:       
                 m = stream.Measure()
                 m.number = t.number[0]
                 lastMeasureNumber = t.number[0]
@@ -192,6 +193,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     
                 o = 0.0 # start offsets at zero
                 previousChordInMeasure = None
+                pivotChordPossible = False
                 for i, a in enumerate(t.atoms):
                     if isinstance(a, romanTextModule.RTKey):
                         environLocal.printDebug(['handling key token:', a])
@@ -215,7 +217,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             previousRn = firstChord
                             previousChordInMeasure = firstChord
                             m.insert(0, firstChord)
-                            
+                        pivotChordPossible = False
                     if isinstance(a, romanTextModule.RTChord):
                         # probably best to find duration
                         if previousChordInMeasure is None:
@@ -225,19 +227,28 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             previousChordInMeasure.quarterLength = o - oPrevious
                         # use source to evaluation roman 
                         try:
-                            rn = roman.RomanNumeral(a.src, kCurrent)
+                            rn = roman.RomanNumeral(a.src, copy.deepcopy(kCurrent))
                         except:
                             environLocal.printDebug('cannot create RN from: %s' % a.src)
                             rn = note.Note() # create placeholder 
-                        rn.addLyric(prefixLyric + a.src)
-                        prefixLyric = ""
-                        m.insert(o, rn)
-                        previousChordInMeasure = rn
-                        previousRn = rn
+                        if pivotChordPossible == False:
+                            rn.addLyric(prefixLyric + a.src)
+                            prefixLyric = ""
+                            m.insert(o, rn)
+                            previousChordInMeasure = rn
+                            previousRn = rn
+                            pivotChordPossible = True
+                        else:
+                            previousChordInMeasure.lyric += "//" + prefixLyric + a.src
+                            prefixLyric = ""
+                            pivotChordPossible = False
+
+                
                 # may need to adjust duration of last chord added
                 previousRn.quarterLength = tsCurrent.barDuration.quarterLength - o
                 p.append(m)
     p.makeBeams()
+    p.makeAccidentals()
     s.insert(0,p)
     return s
 
@@ -442,7 +453,7 @@ _DOC_ORDER = []
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
+        music21.mainTest(TestExternal)
     elif len(sys.argv) > 1:
         t = Test()
         # arg[1] is test to launch

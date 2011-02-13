@@ -652,7 +652,7 @@ class RTFile(object):
         '''Read a string and process all Tokens. Returns a ABCHandler instance.
         '''
         handler = RTHandler()
-        # return the handler instanc
+        # return the handler instance
         handler.process(strSrc)
         return handler
     

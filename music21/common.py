@@ -43,6 +43,7 @@ fileExtensions = {
     'png'  : {'input': ['png'], 'output': 'png'},
     'pdf'  : {'input': ['pdf'], 'output': 'pdf'},
     'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
+    'romantext' : {'input': ['rntxt', 'rntext', 'romantext'], 'output': 'rntxt'},
 }
 
 
