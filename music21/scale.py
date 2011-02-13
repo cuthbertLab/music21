@@ -232,11 +232,11 @@ class AbstractScale(Scale):
         if self._net is None:
             raise ScaleException('no netowrk is defined.')
 
-        return self._net.realizePitch(pitchObj, stepOfPitch, 
+        post = self._net.realizePitch(pitchObj, stepOfPitch, 
             minPitch=minPitch, maxPitch=maxPitch,
             alteredDegrees=self._alteredDegrees, direction=direction,
             reverse=reverse)
-
+        return copy.deepcopy(post)
 
 
     def getPitchFromNodeDegree(self, pitchReference, nodeName, nodeDegreeTarget, 
@@ -254,7 +254,7 @@ class AbstractScale(Scale):
             alteredDegrees=self._alteredDegrees,
             equateTermini=equateTermini
             )
-        return post
+        return copy.deepcopy(post)
 
 
 
@@ -272,7 +272,7 @@ class AbstractScale(Scale):
             maxPitch=maxPitch,
             alteredDegrees=self._alteredDegrees
             )
-        return post
+        return copy.deepcopy(post)
 
 
     def getRelativeNodeDegree(self, pitchReference, nodeName, pitchTarget, 
@@ -287,7 +287,7 @@ class AbstractScale(Scale):
             direction=direction,
             alteredDegrees=self._alteredDegrees
             )
-        return post
+        return copy.deepcopy(post)
 
 
     def nextPitch(self, pitchReference, nodeName, pitchOrigin,
@@ -303,7 +303,7 @@ class AbstractScale(Scale):
             alteredDegrees=self._alteredDegrees,
             getNeighbor = getNeighbor
             )
-        return post
+        return copy.deepcopy(post)
 
 
     def getNewTonicPitch(self, pitchReference, nodeName, 
@@ -319,7 +319,7 @@ class AbstractScale(Scale):
             maxPitch=maxPitch,
             alteredDegrees=self._alteredDegrees
             )
-        return post
+        return copy.deepcopy(post)
 
 
 
@@ -1143,7 +1143,7 @@ class ConcreteScale(Scale):
         >>> h5.root()
         E-5
         >>> h5
-        <music21.chord.Chord E-5 G5 B-5>
+        <music21.roman.RomanNumeral V>
         '''
         from music21 import roman
         return roman.RomanNumeral(degree, self)
@@ -1201,7 +1201,7 @@ class ConcreteScale(Scale):
 
     def pitchFromDegree(self, degree, minPitch=None, maxPitch=None, 
         direction=DIRECTION_ASCENDING, equateTermini=True):        
-        '''Given a scale degree, return the appropriate pitch. 
+        '''Given a scale degree, return a deepcopy of the appropriate pitch. 
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -1209,6 +1209,17 @@ class ConcreteScale(Scale):
         F4
         >>> sc.pitchFromDegree(7)
         D5
+        
+        OMIT_FROM_DOCS
+        Test deepcopy
+        >>> d = sc.pitchFromDegree(7)
+        >>> d.accidental = pitch.Accidental('sharp')
+        >>> d
+        D#5
+        >>> sc.pitchFromDegree(7)
+        D5
+        
+        
         '''
         post = self._abstract.getPitchFromNodeDegree(
             pitchReference=self._tonic, # pitch defined here

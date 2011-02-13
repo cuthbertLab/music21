@@ -36,7 +36,7 @@ reVariant = re.compile('var[0-9]+')
 reNoteTag = re.compile('[Nn]ote:')
 
 reOptKeyOpenAtom = re.compile('\?\([A-Ga-g]+[b#]*:')
-reOptKeyCloseAtom = re.compile('\?\)[A-Ga-g]+[b#]*:')
+reOptKeyCloseAtom = re.compile('\?\)[A-Ga-g]+[b#]*:?')
 reKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
 # must distinguish b3 from bVII; there may be b1.66.5
 reBeatAtom = re.compile('b[1-9.]+')
@@ -386,6 +386,14 @@ class RTBeat(RTAtom):
         >>> rtb.getOffset(meter.TimeSignature('6/8'))
         1.5
 
+        >>> rtb = romanText.RTBeat('b1.66')
+        >>> rtb.getOffset(meter.TimeSignature('6/8'))
+        1.0
+        >>> rtc = romanText.RTBeat('b1.66.5')
+        >>> rtc.getOffset(meter.TimeSignature('6/8'))
+        1.25
+        
+
         '''
         from music21 import meter
         beatStr = self.src.replace('b', '')
@@ -398,9 +406,15 @@ class RTBeat(RTAtom):
                                     '.' + parts[1])
             # assume not more than 2 decimals are given
             elif len(parts) == 3:
-                beat = int(parts[0]) + common.nearestCommonFraction(parts[1])
+                if parts[1] == '66' and parts[2] == '5':
+                    add = .833333333333333333333
+                elif parts[1] == '0' and parts[2] == '5':
+                    add = .16666666666666666666
+                else: 
+                    raise RTTokenException('cannot handle specification: %s' %  self.src)
+                beat = int(parts[0]) + add
                 # TODO: need to treat the third part as a fraction of the beat division that has just been specified
-                environLocal.printDebug(['discarding beat specification for beat indcation: %s' % self.src])
+                environLocal.printDebug(['discarding beat specification for beat indication: %s' % self.src])
             else:
                 environLocal.printDebug(['got unexpected beat: %s' % self.src])
                 raise RTTokenException('cannot handle specification: %s' %  self.src)
@@ -435,10 +449,13 @@ class RTKey(RTAtom):
     def getKey(self):
         from music21 import key
         # alter flat symbol
-        keyStr = self.src.replace('b', '-')
-        keyStr = keyStr.replace(':', '')
-        #environLocal.printDebug(['create a key from:', keyStr])
-        return key.Key(keyStr)
+        if self.src == 'b:':
+            return key.Key('b')
+        else:
+            keyStr = self.src.replace('b', '-')
+            keyStr = keyStr.replace(':', '')
+            #environLocal.printDebug(['create a key from:', keyStr])
+            return key.Key(keyStr)
 
 class RTOpenParens(RTAtom):
     def __init__(self, src =u'(', container=None):
@@ -497,12 +514,15 @@ class RTOptionalKeyOpen(RTAtom):
     def getKey(self):
         from music21 import key
         # alter flat symbol
-        keyStr = self.src.replace('b', '-')
-        keyStr = keyStr.replace(':', '')
-        keyStr = keyStr.replace('?', '')
-        keyStr = keyStr.replace('(', '')
-        #environLocal.printDebug(['create a key from:', keyStr])
-        return key.Key(keyStr)
+        if self.src == '?(b:':
+            return key.Key('b')
+        else:   
+            keyStr = self.src.replace('b', '-')
+            keyStr = keyStr.replace(':', '')
+            keyStr = keyStr.replace('?', '')
+            keyStr = keyStr.replace('(', '')
+            #environLocal.printDebug(['create a key from:', keyStr])
+            return key.Key(keyStr)
         
 class RTOptionalKeyClose(RTAtom):
     def __init__(self, src=u'', container=None):
@@ -526,12 +546,15 @@ class RTOptionalKeyClose(RTAtom):
     def getKey(self):
         from music21 import key
         # alter flat symbol
-        keyStr = self.src.replace('b', '-')
-        keyStr = keyStr.replace(':', '')
-        keyStr = keyStr.replace('?', '')
-        keyStr = keyStr.replace(')', '')
-        #environLocal.printDebug(['create a key from:', keyStr])
-        return key.Key(keyStr)
+        if self.src == '?)b:' or self.src == '?)b':
+            return key.Key('b')
+        else:
+            keyStr = self.src.replace('b', '-')
+            keyStr = keyStr.replace(':', '')
+            keyStr = keyStr.replace('?', '')
+            keyStr = keyStr.replace(')', '')
+            #environLocal.printDebug(['create a key from:', keyStr])
+            return key.Key(keyStr)
 
 
 

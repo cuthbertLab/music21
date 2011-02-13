@@ -197,7 +197,13 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 for i, a in enumerate(t.atoms):
                     if isinstance(a, romanTextModule.RTKey):
                         environLocal.printDebug(['handling key token:', a])
-                        kCurrent, prefixLyric = _getKeyAndPrefix(a)
+                        currentSharps = kCurrent.sharps
+                        try:
+                            kCurrent, prefixLyric = _getKeyAndPrefix(a)
+                        except:
+                            raise TranslateRomanTextException('cannot get key from %s in line %s' % (a.src, t.src))
+                        kCurrent.sharps = currentSharps
+                        m.insert(o, kCurrent)
                         #kCurrent = a.getKey()
                         #prefixLyric = kCurrent.tonic + ": "
                     if isinstance(a, romanTextModule.RTBeat):
@@ -219,19 +225,23 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             m.insert(0, firstChord)
                         pivotChordPossible = False
                     if isinstance(a, romanTextModule.RTChord):
-                        # probably best to find duration
-                        if previousChordInMeasure is None:
-                            pass # use default duration
-                        else: # update duration of previous chord in Measure
-                            oPrevious = previousChordInMeasure.getOffsetBySite(m)
-                            previousChordInMeasure.quarterLength = o - oPrevious
                         # use source to evaluation roman 
                         try:
-                            rn = roman.RomanNumeral(a.src, copy.deepcopy(kCurrent))
+                            rn = roman.RomanNumeral(a.src, kCurrent)
                         except:
                             environLocal.printDebug('cannot create RN from: %s' % a.src)
                             rn = note.Note() # create placeholder 
                         if pivotChordPossible == False:
+                            # probably best to find duration
+                            if previousChordInMeasure is None:
+                                pass # use default duration
+                            else: # update duration of previous chord in Measure
+                                oPrevious = previousChordInMeasure.getOffsetBySite(m)
+                                newQL = o - oPrevious
+                                if newQL <= 0:
+                                    raise TranslateRomanTextException('too many notes in this measure: %s' % t.src)
+                                previousChordInMeasure.quarterLength = newQL                          
+                            
                             rn.addLyric(prefixLyric + a.src)
                             prefixLyric = ""
                             m.insert(o, rn)
@@ -408,6 +418,7 @@ class Test(unittest.TestCase):
 
     def testMeasureCopyingB(self):
         from music21 import converter
+        from music21 import pitch
 
         src = """m1 G: IV || b3 d: III b4 ii
 m2 v b2 III6 b3 iv6 b4 ii/o6/5
@@ -422,7 +433,9 @@ m6-7 = m4-5
             self.assertEqual(rnStream[offset+ 4].figure, 'III6')
             self.assertEqual(str(rnStream[offset+ 4].pitches), '[A4, C5, F5]')
 
-            self.assertEqual(rnStream[offset+ 4].pitches[2].accidental, None)
+            x = rnStream[offset+ 4].pitches[2].accidental
+            if x == None: x = pitch.Accidental('natural')
+            self.assertEqual(x.alter, 0)
 
             self.assertEqual(rnStream[offset+ 5].figure, 'iv6')
             self.assertEqual(str(rnStream[offset+ 5].pitches), '[B-4, D5, G5]')
@@ -453,7 +466,7 @@ _DOC_ORDER = []
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
+        music21.mainTest(TestExternal)
     elif len(sys.argv) > 1:
         t = Test()
         # arg[1] is test to launch

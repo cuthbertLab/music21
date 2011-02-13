@@ -260,6 +260,12 @@ class RomanNumeral(chord.Chord):
         self.impliedScale = None
         self.setKeyOrScale(keyOrScale)
 
+    def __repr__(self):
+        if hasattr(self.scale, 'tonic'):
+            return '<music21.roman.RomanNumeral %s in %s %s>' % (self.figure, self.scale.tonic, self.scale.mode)
+        else:
+            return '<music21.roman.RomanNumeral %s>' % (self.figure)
+
 
     def setKeyOrScale(self, keyOrScale):
         '''Provide a new key or scale, and re-configure the RN with the existing figure. 
@@ -271,6 +277,8 @@ class RomanNumeral(chord.Chord):
         >>> r1.setKeyOrScale(key.Key('A'))
         >>> r1.pitches
         [E5, G#5, B5]
+        >>> r1
+        <music21.roman.RomanNumeral V in A major>
         '''
         self.scale = keyOrScale
         if keyOrScale == None or (hasattr(keyOrScale, "isConcrete") and 

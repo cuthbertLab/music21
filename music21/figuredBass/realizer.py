@@ -182,7 +182,7 @@ class FiguredBass(object):
         possibilities = []
         pitchesAboveBass = self.scale.getPitches(firstBass, firstNotation, self.maxPitch)
         samplePitches = self.scale.getSamplePitches(firstBass, firstNotation)
-        print classifier.getRomanNumeral(samplePitches, self.scale.realizerScale)
+        #print classifier.getRomanNumeral(samplePitches, self.scale.realizerScale)
         sortedPitchesAboveBass = sortPitchListByDistanceToPitch(firstBass, pitchesAboveBass)
         
         #soprano >= alto >= tenor >= bass
@@ -219,7 +219,7 @@ class FiguredBass(object):
         potentialPitchList = self.scale.getPitches(nextBass, nextNotation, 'B5')
         pitchesInNextChord = self.scale.getPitchNames(nextBass, nextNotation)
         samplePitches = self.scale.getSamplePitches(nextBass, nextNotation)
-        print classifier.getRomanNumeral(samplePitches, self.scale.realizerScale)
+        #print classifier.getRomanNumeral(samplePitches, self.scale.realizerScale)
 
         prevChordIndex = 0
         for prevChord in prevChords:

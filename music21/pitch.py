@@ -2670,20 +2670,20 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [69.5, 70.5, 68.5, 67.5] )
 
         s = stream.Stream()
-        alterList = [.5, 1.5, -.5, -1.5]
+        alterList = [None, .5, 1.5, -1.5, -.5, 'half-sharp', 'one-and-a-half-sharp', 'half-flat', 'one-and-a-half-flat', '~']
         sc = scale.MajorScale('c4')
         for x in range(1, 10):
-            n = note.Note(sc.pitchFromDegree(x%sc.getDegreeMaxUnique()))
+            n = note.Note(sc.pitchFromDegree(x % sc.getDegreeMaxUnique()))
             n.quarterLength = .5
-            n.pitch.accidental = pitch.Accidental(alterList[x%len(alterList)])
+            n.pitch.accidental = pitch.Accidental(alterList[x])
             s.append(n)
 
         match = [str(n.pitch) for n in s.notes]
-        self.assertEqual(match, ['C~4', 'D#~4', 'E-`4', 'F~4', 'G#~4', 'A`4', 'B-`4', 'C~4', 'D#~4'])
+        self.assertEqual(match, ['C~4', 'D#~4', 'E-`4', 'F`4', 'G~4', 'A#~4', 'B`4', 'C-`4', 'D~4'])
 
         
         match = [e.ps for e in s]
-        self.assertEqual(match, [60.5, 63.5, 62.5, 65.5, 68.5, 68.5, 69.5, 60.5, 63.5] )
+        self.assertEqual(match, [60.5, 63.5, 62.5, 64.5, 67.5, 70.5, 70.5, 58.5, 62.5] )
 
 
 #-------------------------------------------------------------------------------

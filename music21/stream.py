@@ -4083,7 +4083,7 @@ class Stream(music21.Music21Object):
         # not sure if this must be sorted
         # but: tied notes must be in consecutive order
         #  returnObj = returnObj.sorted
-        notes = returnObj.flat.notes
+        notes = returnObj.flat #.notes
 
         posConnected = [] # temporary storage for index of tied notes
         posDelete = [] # store deletions to be processed later
@@ -4135,6 +4135,16 @@ class Stream(music21.Music21Object):
                         and hasattr(nLast, "pitch") and hasattr(n, "pitch")
                         and nLast.pitch == n.pitch):
                         endMatch = True
+                    elif (nLast is not Note and iLast in posConnected
+                          and hasattr(nLast, "pitches") and hasattr(n, "pitches")
+                          and len(nLast.pitches) == len(n.pitches)):
+                        allPitchesMatched = True
+                        for i in range(nLast.pitches):
+                            if nLast.pitches[i] != n.pitches[i]:
+                                allPitchesMatched = False
+                                break
+                        if allPitchesMatched == True:
+                            endMatch = True
 
             # process end condition
             if endMatch:
@@ -8787,8 +8797,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s1.flat.notes), 2)
 
         sUntied = s1.stripTies()
-        self.assertEqual(len(sUntied), 1)
-        self.assertEqual(sUntied[0].quarterLength, 6)
+        self.assertEqual(len(sUntied.notes), 1)
+        self.assertEqual(sUntied.notes[0].quarterLength, 6)
 
         n = note.Note()        
         n.quarterLength = 3
@@ -8842,7 +8852,7 @@ class Test(unittest.TestCase):
         # original should be unchanged
         self.assertEqual(len(p4.flat.notes), 16)
         # lesser notes
-        self.assertEqual(len(p4Notes), 10)
+        self.assertEqual(len(p4Notes.notes), 10)
     
 
     def testStripTiesScore(self):
@@ -9090,11 +9100,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(altoPostTie.notes), 69)
         
         # we can still get measure numbers:
-        mNo = altoPostTie[3].getContextByClass(stream.Measure).number
+        mNo = altoPostTie.notes[3].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 1)
-        mNo = altoPostTie[8].getContextByClass(stream.Measure).number
+        mNo = altoPostTie.notes[8].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 2)
-        mNo = altoPostTie[15].getContextByClass(stream.Measure).number
+        mNo = altoPostTie.notes[15].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 4)
         
         # can we get an offset Measure map by looking for measures
