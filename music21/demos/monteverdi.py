@@ -9,10 +9,8 @@ def spliceAnalysis(book = 3, madrigal = 13):
 
     # get from first part
     aMeasures = analysis.parts[0].measures(1,20)
-    #aMeasures.getElementsByClass('Measure').show('t')
     aMeasures.getElementsByClass('Measure')[0].clef = clef.TrebleClef()
     excerpt.insert(0, aMeasures)
-    
     excerpt.show()
     
 if __name__ == '__main__':
