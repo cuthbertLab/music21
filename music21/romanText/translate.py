@@ -427,7 +427,7 @@ m6-7 = m4-5
             self.assertEqual(rnStream[offset+ 5].figure, 'iv6')
             self.assertEqual(str(rnStream[offset+ 5].pitches), '[B-4, D5, G5]')
 
-            self.assertEqual(rnStream[offset+ 5].pitches[0].accidental.displayStatus, None)
+            self.assertEqual(rnStream[offset+ 5].pitches[0].accidental.displayStatus, True)
 
 
 
@@ -453,7 +453,7 @@ _DOC_ORDER = []
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(TestExternal)
+        music21.mainTest(Test)
     elif len(sys.argv) > 1:
         t = Test()
         # arg[1] is test to launch

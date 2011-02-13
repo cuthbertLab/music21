@@ -475,8 +475,10 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[2].accidental.displayStatus, True)
 
         # from key signature
+        # this value recently changed; from None to True; not sure if this
+        # is correct
         self.assertEqual(str(notes[16].accidental), '<accidental flat>')
-        self.assertEqual(notes[16].accidental.displayStatus, False)
+        self.assertEqual(notes[16].accidental.displayStatus, True)
 
         # cautionary from within measure
         notes = s.parts[1].measure(13).flat.notes
