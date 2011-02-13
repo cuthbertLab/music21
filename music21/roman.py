@@ -549,38 +549,6 @@ class RomanNumeral(chord.Chord):
             bassSD = 7
         return bassSD
 
-#class RNTNumeral(RomanNumeral):
-#    '''
-#    a subclass of RomanNumeral specialized for the differences in
-#    Roman numeral notation used by Dmitri's RomanNumeralText objects
-#    (see romanText)
-#    
-#    Basically, VII in minor is considered always to be bVII and
-#    VI in minor is always bVI while vii is built on raised 7 and
-#    vi is built on raised 6.
-#    
-#    Third inversion seventh chords are represented by 2, not 42
-#    
-#    >>> from music21 import *
-#    >>> key1 = key.Key('c') # cminor
-#    >>> standardRn = roman.RomanNumeral('vii6', key1)
-#    >>> standardRn.pitches
-#    ['D#4','F#4','B#4']
-#
-#    >>> rntRn = roman.RNTNumeral('VII6', key1)
-#    >>> rntRn.pitches
-#    ['D4','F4','B-4']
-#    
-#    
-#    TODO: get third inversion right
-#    '''
-#    def __init__(self, figure=None, rnKey=None):
-#        if rnKey and hasattr(rnKey, 'mode'):
-#            if re.match(figure, 'VII') or re.match(figure, 'VI') and rnKey.mode == 'minor':
-#                figure = 'b' + figure
-#        RomanNumeral.__init__(self, figure, rnKey)
-#        
-
 def fromChordAndKey(inChord, inKey):
 #    '''
 #    return a RomanNumeral object from the given chord in the given key.
@@ -589,7 +557,8 @@ def fromChordAndKey(inChord, inKey):
 #    >>> viio65 = roman.fromChordAndKey(dim7chord, key.Key('D'))
 #    >>> viio65.pitches   # retains octave
 #    ['E2', 'C#3', 'B-3', 'G4']
-#
+#    >>> viio65.figure
+#    'viio65'
 #    '''
     pass
 

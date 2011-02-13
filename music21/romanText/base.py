@@ -35,6 +35,8 @@ reMeasureTag = re.compile('m[0-9]+[a-b]*-*[0-9]*[a-b]*')
 reVariant = re.compile('var[0-9]+')
 reNoteTag = re.compile('[Nn]ote:')
 
+reOptKeyOpenAtom = re.compile('\?\([A-Ga-g]+[b#]*:')
+reOptKeyCloseAtom = re.compile('\?\)[A-Ga-g]+[b#]*:')
 reKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
 # must distinguish b3 from bVII; there may be b1.66.5
 reBeatAtom = re.compile('b[1-9.]+')
@@ -419,6 +421,11 @@ class RTKey(RTAtom):
     def __init__(self, src =u'', container=None):
         '''
         >>> from music21 import *
+        >>> gminor = romanText.RTKey('g:')
+        >>> gminor
+        <RTKey 'g:'>
+        >>> gminor.getKey()
+        <music21.key.Key of g minor>
         '''
         RTAtom.__init__(self, src, container)
 
@@ -434,7 +441,7 @@ class RTKey(RTAtom):
         return key.Key(keyStr)
 
 class RTOpenParens(RTAtom):
-    def __init__(self, src =u'', container=None):
+    def __init__(self, src =u'(', container=None):
         '''
         >>> from music21 import *
         '''
@@ -445,7 +452,7 @@ class RTOpenParens(RTAtom):
 
 
 class RTCloseParens(RTAtom):
-    def __init__(self, src =u'', container=None):
+    def __init__(self, src =u')', container=None):
         '''
         >>> from music21 import *
         '''
@@ -456,14 +463,75 @@ class RTCloseParens(RTAtom):
 
 
 class RTPhraseBoundary(RTAtom):
-    def __init__(self, src =u'', container=None):
+    def __init__(self, src =u'||', container=None):
         '''
         >>> from music21 import *
+        >>> phrase = romanText.RTPhraseBoundary('||')
+        >>> phrase
+        <RTPhraseBoundary '||'>
         '''
         RTAtom.__init__(self, src, container)
 
     def __repr__(self):
         return '<RTPhraseBoundary %r>' % self.src
+
+class RTOptionalKeyOpen(RTAtom):
+    def __init__(self, src=u'', container=None):
+        '''
+        Marks the beginning of an optional Key area which does not
+        affect the roman numeral analysis.  (For instance, it is
+        possible to analyze in Bb major, while remaining in g minor)
+        
+        >>> from music21 import *
+        >>> possibleKey = romanText.RTOptionalKeyOpen('?(Bb:')
+        >>> possibleKey
+        <RTOptionalKeyOpen '?(Bb:'>
+        >>> possibleKey.getKey()
+        <music21.key.Key of B- major>
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTOptionalKeyOpen %r>' % self.src
+    
+    def getKey(self):
+        from music21 import key
+        # alter flat symbol
+        keyStr = self.src.replace('b', '-')
+        keyStr = keyStr.replace(':', '')
+        keyStr = keyStr.replace('?', '')
+        keyStr = keyStr.replace('(', '')
+        #environLocal.printDebug(['create a key from:', keyStr])
+        return key.Key(keyStr)
+        
+class RTOptionalKeyClose(RTAtom):
+    def __init__(self, src=u'', container=None):
+        '''
+        Marks the end of an optional Key area which does not
+        affect the roman numeral analysis.  (For instance, it is
+        possible to analyze in Bb major, while remaining in g minor)
+        
+        >>> from music21 import *
+        >>> possibleKey = romanText.RTOptionalKeyClose('?)Bb:')
+        >>> possibleKey
+        <RTOptionalKeyClose '?)Bb:'>
+        >>> possibleKey.getKey()
+        <music21.key.Key of B- major>
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTOptionalKeyClose %r>' % self.src
+    
+    def getKey(self):
+        from music21 import key
+        # alter flat symbol
+        keyStr = self.src.replace('b', '-')
+        keyStr = keyStr.replace(':', '')
+        keyStr = keyStr.replace('?', '')
+        keyStr = keyStr.replace(')', '')
+        #environLocal.printDebug(['create a key from:', keyStr])
+        return key.Key(keyStr)
 
 
 
@@ -525,6 +593,12 @@ class RTHandler(object):
 
         >>> str(rth._tokenizeAtoms('= m3'))
         '[]'
+
+        >>> tokenList = rth._tokenizeAtoms('g: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i')
+        >>> str(tokenList)
+        "[<RTKey 'g:'>, <RTChord 'V'>, <RTBeat 'b2'>, <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, <RTChord 'i'>]"
+
+
         '''
         post = []
         # break by spaces
@@ -544,6 +618,10 @@ class RTHandler(object):
             elif reBeatAtom.match(word) is not None:
                 post.append(RTBeat(word, container))
             # from here, all that is left is keys or chords
+            elif reOptKeyOpenAtom.match(word) is not None:
+                post.append(RTOptionalKeyOpen(word, container))
+            elif reOptKeyCloseAtom.match(word) is not None:
+                post.append(RTOptionalKeyClose(word, container))
             elif reKeyAtom.match(word) is not None:
                 post.append(RTKey(word, container))
             else: # only option is that it is a chord
