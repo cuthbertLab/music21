@@ -60,6 +60,8 @@ from music21.musedata import translate as musedataTranslate
 from music21.musedata import base40
 from music21.musicxml import base as musicxml
 from music21.musicxml import translate as musicxmlTranslate
+from music21.romanText import base as romanText
+from music21.romanText import translate as romanTextTranslate
 
 from music21 import note
 from music21 import node
@@ -150,6 +152,8 @@ MODULES = [
 
     musicxmlTranslate,
 
+    romanText,
+    romanTextTranslate,
 
     note, 
     node, 

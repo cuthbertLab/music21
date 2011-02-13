@@ -75,6 +75,8 @@ Module Reference
    moduleMusedataTranslate
    moduleMusedataBase40
    moduleMusicxmlTranslate
+   moduleRomanTextBase
+   moduleRomanTextTranslate
    moduleNote
    moduleNode
    modulePitch
