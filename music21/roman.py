@@ -12,7 +12,6 @@
 Music21 class for dealing with Roman Numeral analysis
 '''
 
-
 import doctest,unittest
 import copy
 import re
@@ -184,6 +183,20 @@ class RomanNumeral(chord.Chord):
     >>> alteredChordHalfDim3rdInv.commonName
     'half-diminished seventh chord'
     
+
+    >>> openFifth = roman.RomanNumeral('V[no3]', key.Key('F'))
+    >>> openFifth.pitches
+    [C5, G5]
+
+    
+    Some theoretical traditions express a viio7 as a V9 chord with omitted root.  Music21 allows that:
+
+
+    >>> fiveOhNine = roman.RomanNumeral('V9[no1]', key.Key('g'))
+    >>> fiveOhNine.pitches
+    [F#5, A5, C6, E-6]
+
+
     
     Just for kicks (no worries if this is goobley-gook):
     
@@ -226,7 +239,7 @@ class RomanNumeral(chord.Chord):
     frontSharp = re.compile('^(\#+)')
     romanNumerals = re.compile('(i?v?i*)', re.IGNORECASE)
     secondarySlash = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
-    
+    omitNote = re.compile('\[no([1-9])\].*')
     
     def __init__(self, figure=None, keyOrScale=None, caseMatters = True):
         chord.Chord.__init__(self)
@@ -302,6 +315,11 @@ class RomanNumeral(chord.Chord):
             figure = primaryFigure
         else:
             figure = prelimFigure
+
+        omit = self.omitNote.search(figure)
+        if omit:
+            omit = int(omit.group(1))
+            figure = self.omitNote.sub('', figure)
 
         flatAlteration = 0
         sharpAlteration = 0
@@ -423,6 +441,15 @@ class RomanNumeral(chord.Chord):
                 
         self.remainingFigure = figure
         self.scaleOffset = transposeInterval
+        
+        if omit:
+            omittedPitch = self.getChordStep(omit)
+            newPitches = []
+            for thisPitch in pitches:
+                if omittedPitch != thisPitch:
+                    newPitches.append(thisPitch)
+            self.pitches = newPitches
+            
 
     def _fixAccidentals(self, shouldBe):
         '''
