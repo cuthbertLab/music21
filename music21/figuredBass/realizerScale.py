@@ -17,6 +17,9 @@ from music21 import note
 from music21 import pitch
 from music21 import key
 from music21 import scale
+from music21 import chord
+from music21 import common
+from music21 import roman
 from music21.figuredBass import notation
 
 MAX_PITCH = pitch.Pitch('B5')
@@ -146,6 +149,8 @@ class FiguredBassScale:
         pitchesAboveNote.sort()
         return pitchesAboveNote
     
+        
+
     
 class FiguredBassScaleException(music21.Music21Exception):
     pass
