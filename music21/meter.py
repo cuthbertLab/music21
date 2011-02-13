@@ -3670,7 +3670,7 @@ class Test(unittest.TestCase):
         ts.beatSequence.partition(6)
         self.assertEqual(str(ts.beatSequence), '{1/8+1/8+1/8+1/8+1/8+1/8}')
         self.assertEqual(str(ts.beamSequence), '{3/8+3/8}')
-
+        
         # check that beats are calculated properly
         m = stream.Measure()
         m.timeSignature = ts
