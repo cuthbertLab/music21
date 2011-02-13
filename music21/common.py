@@ -43,7 +43,7 @@ fileExtensions = {
     'png'  : {'input': ['png'], 'output': 'png'},
     'pdf'  : {'input': ['pdf'], 'output': 'pdf'},
     'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
-    'romantext' : {'input': ['rntxt', 'rntext', 'romantext'], 'output': 'rntxt'},
+    'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
 }
 
 
@@ -1178,7 +1178,8 @@ def getPackageData():
     '''
     # include these extensions for all directories, even if they are not normally there.
     ext = ['txt', 'xml', 'krn', 'mxl', 'html', 'png', 
-           'css', 'js', 'pdf', 'xls', 'mid', 'abc', 'json', 'md', 'zip']
+           'css', 'js', 'pdf', 'xls', 'mid', 'abc', 'json', 'md', 
+           'zip', 'rntxt']
 
     # need all dirs, not just packages, and relative to music21
     fpList = getPackageDir(fpMusic21=None, relative=True, remapSep=None,
