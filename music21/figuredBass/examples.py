@@ -57,7 +57,7 @@ def exampleA():
     fb.addElement(n8, '6') #iv6 (vi6)
     fb.addElement(n9, '7,5,#3') #vii7/V
     fb.addElement(n10, '6,4') #i6/4
-    fb.addElement(n11, '#5,#3') #V
+    fb.addElement(n11, '7,5#,3#') #V7
     fb.addElement(n12) #i
     
     return fb
@@ -178,6 +178,6 @@ def exampleD():
 
 if __name__ == "__main__":
     #exampleA(), exampleB(), exampleC(), exampleD()
-    fb = exampleA() #Set up the figured bass
+    fb = exampleB() #Set up the figured bass
     fb.solve()
     fb.showRandomSolutions(20)
