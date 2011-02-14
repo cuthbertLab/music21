@@ -315,7 +315,11 @@ class RomanNumeral(chord.Chord):
             primaryFigure = secondary.group(1)
             secondaryFigure = secondary.group(2)
             secRoman = RomanNumeral(secondaryFigure, useScale, self.caseMatters)
-            if secRoman.semitonesFromChordStep(3) == 3:
+            if secRoman.quality == 'minor':
+                secondaryMode = 'minor'
+            elif secRoman.quality == 'major':
+                secondaryMode = 'major'
+            elif secRoman.semitonesFromChordStep(3) == 3:
                 secondaryMode = 'minor'
             else:
                 secondaryMode = 'major'
@@ -328,7 +332,7 @@ class RomanNumeral(chord.Chord):
         if omit:
             omit = int(omit.group(1))
             figure = self.omitNote.sub('', figure)
-
+        
         flatAlteration = 0
         sharpAlteration = 0
         figure = re.sub('^N', 'bII', figure)

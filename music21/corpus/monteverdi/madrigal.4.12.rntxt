@@ -1,6 +1,6 @@
 Composer: Claudio Monteverdi
 Madrigal: 4.12
-Title: Ohimè, se tanto amate
+Title: Ohime`, se tanto amate
 Time Signature: 4/4
 Analyst: Michael Scott Cuthbert and John Wild
 Key Signature: Bb
@@ -26,7 +26,7 @@ m10varA b3 IV b4 viio6/4
 m11 V/V ?)d
 m11varA V/vi
 Note: III before I is common enough in the late Renaissance that I didnt bother to switch keys to avoid it
-m12 F: I v3 vi b4 viio6/V
+m12 F: I b3 vi b4 viio6/V
 m12varA I b3 vi C: ii b4 viio6
 m13 V 
 m13varA I ||
@@ -83,8 +83,8 @@ m46 iv b3 I
 m47 b2 Bb: I
 m49 V6 b2 I b3 iv6 b4 V6
 m50 V6/vi b2 IV6 b3 II6 b4 iii6
-m51 I6 b2 ii6 b3 vii6 g: ii6 b4 iii6
-Note: substitution of iii6 for V happens at final cadence also
+m51 I6 b2 ii6 b3 vii6 g: ii6 b4 #iii6
+Note: substitution of #iii6 for V happens at final cadence also
 m52 i ||
 m53 i
 Pedal: 1 m54 b1 m55 b2
@@ -101,5 +101,5 @@ m63 b3 ii b4 v
 m64 iio6 b3 IV
 Note: putting the chord changes on the beat with suspensions resolving to actually create the chords on b2 b4
 m65 i b3 v
-m66 b3 V b4 iii6
+m66 b3 V b4 #iii6
 m67 I

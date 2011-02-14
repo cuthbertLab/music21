@@ -72,8 +72,8 @@ except ImportError:
 
 if len(_missingImport) > 0:
     if environLocal['warnings'] in [1, '1', True]:
-        environLocal.warn(common.getMissingImportStr(_missingImport),
-        header='music21:')
+        pass
+        #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
 
 
 #-------------------------------------------------------------------------------

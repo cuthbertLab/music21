@@ -33,6 +33,7 @@ environLocal = environment.Environment(_MOD)
 # zero or more for everything after the first number
 reMeasureTag = re.compile('m[0-9]+[a-b]*-*[0-9]*[a-b]*')
 reVariant = re.compile('var[0-9]+')
+reVariantLetter = re.compile('var([A-Z]+)')
 reNoteTag = re.compile('[Nn]ote:')
 
 reOptKeyOpenAtom = re.compile('\?\([A-Ga-g]+[b#]*:')
@@ -80,6 +81,9 @@ class RTToken(object):
         return False
 
     def isTimeSignature(self):
+        return False
+
+    def isKeySignature(self):
         return False
 
     def isNote(self):
@@ -166,6 +170,17 @@ class RTTagged(RTToken):
             return True
         return False
 
+    def isKeySignature(self):
+        '''
+        KeySignatures are represented like "Key Signature: Bb" meaning one flat
+        
+        So far that's the only one that exists
+        '''
+        if self.tag.lower() in ['keysignature', 'key signature']:
+            return True
+        else:
+            return False
+    
     def isNote(self):
         if self.tag.lower() in ['note']:
             return True
@@ -183,7 +198,10 @@ class RTTagged(RTToken):
         return False
 
     def isWork(self):
-        '''The work is not defined as a header tag, but is used to represent all tags, often placed after Composer, for the work or pieces designation. 
+        '''
+        The "work" is not defined as a header tag, but is used 
+        to represent all tags, often placed after Composer, for 
+        the work or pieces designation. 
 
         >>> from music21 import *
         >>> rth = romanText.RTTagged('Madrigal: 4.12')
@@ -197,11 +215,25 @@ class RTTagged(RTToken):
         '4.12'
 
         '''
-        if not self.isComposer() and not self.isTitle() and not self.isAnalyst() and not self.isProofreader() and not self.isTimeSignature() and not self.isNote() and not self.isForm() and not self.isPedal() and not self.isMeasure():
+        if self.tag == 'Work' or self.tag == 'Madrigal':
             return True
-        return False
+        else:
+            return False
 
-
+    def keySignatureSharps(self):
+        '''
+        if the token is a KeySignature, return the number of sharps (or if flats,
+        negative number)
+        '''
+        if self.isKeySignature() is False:
+            return None
+        else:
+            if self.data == 'Bb':
+                return -1
+            elif self.data == '' or self.data == 'blank':
+                return 0
+            else:
+                raise RTTokenException('cannot parse this KeySignature: %s' % self.data) 
 
 class RTMeasure(RTToken):
     '''In roman text, measures are given one per line and always start with 'm'.
@@ -225,8 +257,9 @@ class RTMeasure(RTToken):
         self.data = '' # only chord, phrase, and similar definitions
         self.number = [] # one or more measure numbers
         self.repeatLetter = [] # one or more repeat letters
-        self.variantNumber = None # if defined a variant
-        # store boolean if this measure defines copying another reange
+        self.variantNumber = None # a one-measure or short variant
+        self.variantLetter = None # a longer-variant that defines a different way of reading a large section 
+        # store boolean if this measure defines copying another range
         self.isCopyDefinition = False
         # store processed tokens associated with this measure
         self.atoms = []
@@ -283,6 +316,12 @@ class RTMeasure(RTToken):
             self.data = rawData[g.end():].strip()
         else:
             self.data = rawData
+        g = reVariantLetter.match(rawData)
+        if g is not None: # there is a variant letter tag
+            varStr = g.group(1)
+            self.variantLetter = varStr
+            self.data = rawData[g.end():].strip()
+            
 
         if self.data.startswith('='):
             self.isCopyDefinition = True
@@ -478,20 +517,6 @@ class RTCloseParens(RTAtom):
     def __repr__(self):
         return '<RTCloseParens %r>' % self.src
 
-
-class RTPhraseBoundary(RTAtom):
-    def __init__(self, src =u'||', container=None):
-        '''
-        >>> from music21 import *
-        >>> phrase = romanText.RTPhraseBoundary('||')
-        >>> phrase
-        <RTPhraseBoundary '||'>
-        '''
-        RTAtom.__init__(self, src, container)
-
-    def __repr__(self):
-        return '<RTPhraseBoundary %r>' % self.src
-
 class RTOptionalKeyOpen(RTAtom):
     def __init__(self, src=u'', container=None):
         '''
@@ -555,6 +580,51 @@ class RTOptionalKeyClose(RTAtom):
             keyStr = keyStr.replace(')', '')
             #environLocal.printDebug(['create a key from:', keyStr])
             return key.Key(keyStr)
+
+
+class RTPhraseMarker(RTAtom):
+    def __init__(self, src=u'', container=None):
+        RTAtom.__init__(self, src, container)
+        
+
+class RTPhraseBoundary(RTPhraseMarker):
+    def __init__(self, src =u'||', container=None):
+        '''
+        >>> from music21 import *
+        >>> phrase = romanText.RTPhraseBoundary('||')
+        >>> phrase
+        <RTPhraseBoundary '||'>
+        '''
+        RTPhraseMarker.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTPhraseBoundary %r>' % self.src
+
+class RTEllisonStart(RTPhraseMarker):
+    def __init__(self, src =u'|*', container=None):
+        '''
+        >>> from music21 import *
+        >>> phrase = romanText.RTEllisonStart('|*')
+        >>> phrase
+        <RTEllisonStart '|*'>
+        '''
+        RTPhraseMarker.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTEllisonStart %r>' % self.src
+
+class RTEllisonStop(RTPhraseMarker):
+    def __init__(self, src =u'|*', container=None):
+        '''
+        >>> from music21 import *
+        >>> phrase = romanText.RTEllisonStop('*|')
+        >>> phrase
+        <RTEllisonStop '*|'>
+        '''
+        RTPhraseMarker.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTEllisonStop %r>' % self.src
 
 
 
@@ -845,6 +915,11 @@ class Test(unittest.TestCase):
         self.assertEqual(rtm.number, [17])
         self.assertEqual(rtm.tag, 'm17')
         self.assertEqual(rtm.variantNumber, 1)
+
+
+        rtm = RTMeasure('m17varC vi b2 IV b2.5 viio6/4 b3.5 I')
+        self.assertEqual(rtm.data, 'vi b2 IV b2.5 viio6/4 b3.5 I')
+        self.assertEqual(rtm.variantLetter, "C")
 
 
         rtm = RTMeasure('m20 vi b2 ii6/5 b3 V b3.5 V7')

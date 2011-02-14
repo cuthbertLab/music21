@@ -1,11 +1,45 @@
 .. _environment:
 
 
+Tutorial: Setting up your Environment to make Finale Work
+=============================================================
 
-Setting up and Configuring Environment Settings
-====================================================
+Most of the features of music21 work the same no matter whether 
+you're working on a Mac or PC, use Finale or Lilypond, make
+graphics or just analyze scores.  But some features of music21
+require external applications to do their job, and music21 needs
+to find these applications.  Often the software can find them
+itself, but sometimes it needs a little help.  The most common
+scenario is that you are a Mac user who has Finale installed on 
+your system but music21 isn't finding it.  Here's how you can 
+help it along:
 
-Music21 features an environment configuration system. This permits the user to configure and customize settings used by many Music21 objects, and have those settings persist across many Python sessions.
+Start python by typing 'python' in the Terminal app.  Then
+type the following commands to create a user environment
+for music21 and change the musicxml reader path.
+
+>>> from music21 import *
+>>> us = environment.UserSettings()
+>>> us.create()
+>>> us['musicxmlPath']
+'/Applications/Finale Reader.app'
+>>> us['musicxmlPath'] = '/Applications/Finale 2009/Finale 2009.app'
+>>> quit()
+
+
+if you discover that you made a mistake in the filename, 
+do what you did above, but you can skip the us.create() step (as
+well as the next step, which just lets you see what you've currently
+done)
+
+Advanced configuring Environment Settings
+---------------------------------------------------------------
+
+
+Music21 features an environment configuration system which lets users 
+configure and customize settings.  These settings will be saved
+so that the next time the user starts Python, the settings will still
+work.
 
 Environment configuration is particularly useful for setting default third-party applications (necessary for handling Music21 output in different media formats such as MusicXML, lilypond, and graphics files) and for setting a default scratch directory (for writing output without providing explitic file paths).
 
@@ -17,7 +51,7 @@ Creating and Configuring the UserSettings Object
 
 Environment configuration files are not created by default. To create an environment configuration file, import environment form Music21 and create an :class:`~music21.environment.UserSettings` object. Then, call the  :meth:`~music21.environment.UserSettings.create` method to create an XML environment file.
 
-    >>> from music21 import environment
+    >>> from music21 import *
     >>> us = environment.UserSettings()
     >>> us.create()
 
@@ -52,14 +86,14 @@ On Windows computers the configuration file is generally located in the Applicat
 
 The path to the environment settings file can always be found with the :meth:`~music21.environment.UserSettings.getSettingsPath` method.
 
-    >>> from music21 import environment
+    >>> from music21 import *
     >>> us = environment.UserSettings()
     >>> us.getSettingsPath()
     '/Users/ariza/.music21rc'
 
 To permanently delete the environment configuration file, call the :meth:`~music21.environment.UserSettings.delete` method.
 
-    >>> from music21 import environment
+    >>> from music21 import *
     >>> us = environment.UserSettings()
     >>> us.delete()
 

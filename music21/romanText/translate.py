@@ -123,8 +123,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     # ts indication are found in header, and also found elsewhere
     tsCurrent = meter.TimeSignature('4/4') # create default 4/4
     tsSet = False # store if set to a measure
+    ksSet = True  # set a keySignature
     lastMeasureNumber = 0
     previousRn = None
+    ksCurrent = None
     kCurrent, prefixLyric = _getKeyAndPrefix('C')
 
     for t in rtHandler.tokens:
@@ -138,13 +140,20 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             tsCurrent = meter.TimeSignature(t.data)
             tsSet = False
             environLocal.printDebug(['tsCurrent:', tsCurrent])
-            
+        elif t.isKeySignature():
+            ksCurrent = key.KeySignature(t.keySignatureSharps())
+            ksSet = False
+            environLocal.printDebug(['ksCurrent:', ksCurrent])
         elif t.isMeasure():
             #environLocal.printDebug(['handling measure token:', t])
 
             if t.variantNumber is not None:
                 environLocal.printDebug(['skipping variant: %s' % t])
                 continue
+            if t.variantLetter is not None:
+                environLocal.printDebug(['skipping variant: %s' % t])
+                continue
+
             # if this measure number is more than 1 greater than the last
             # defined measure number, and the previous chord is not None, 
             # then fill with copies of the last-defined measure
@@ -190,6 +199,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 if not tsSet:
                     m.timeSignature = tsCurrent
                     tsSet = True # only set when changed
+                if not ksSet:
+                    m.insert(0, ksCurrent)
+                    ksSet = True # only set when changed
     
                 o = 0.0 # start offsets at zero
                 previousChordInMeasure = None
@@ -197,20 +209,21 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 for i, a in enumerate(t.atoms):
                     if isinstance(a, romanTextModule.RTKey):
                         environLocal.printDebug(['handling key token:', a])
-                        currentSharps = kCurrent.sharps
+                        currentSharps = ksCurrent.sharps
                         try:
                             kCurrent, prefixLyric = _getKeyAndPrefix(a)
                         except:
                             raise TranslateRomanTextException('cannot get key from %s in line %s' % (a.src, t.src))
                         kCurrent.sharps = currentSharps
                         m.insert(o, kCurrent)
-                        #kCurrent = a.getKey()
-                        #prefixLyric = kCurrent.tonic + ": "
                     if isinstance(a, romanTextModule.RTBeat):
                         # set new offset based on beat
-                        o = a.getOffset(tsCurrent)
+                        try:
+                            o = a.getOffset(tsCurrent)
+                        except ValueError:
+                            raise TranslateRomanTextException("cannot properly get an offset from beat data %s under timeSignature %s in line %s" % (a.src, tsCurrent, t.src))
                         if (previousChordInMeasure is None and 
-                            previousRn is not None):
+                            previousRn is not None and o > 0):
                             # setting a new beat before giving any chords
                             firstChord = copy.deepcopy(previousRn)
                             firstChord.quarterLength = o

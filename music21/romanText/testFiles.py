@@ -26,7 +26,6 @@ Madrigal: 3.13
 Title: Ch'io non t'ami, cor mio
 Time Signature: 4/4
 Analyst: Michael Scott Cuthbert
-Key Signature:
 
 m1 a: v b3 i b4 VI
 m2 b2 III b4 iv

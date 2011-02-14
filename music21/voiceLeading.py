@@ -21,6 +21,9 @@ from music21 import common
 from music21.note import Note
 from music21.interval import Interval
 
+#TODO: rename VoiceLeadingQuartet -> Pairwise
+#TODO: add chordwise -- add parsimonious (all move by step or not at all)
+
 #-------------------------------------------------------------------------------
 class VoiceLeadingQuartet(music21.Music21Object):
     '''An object consisting of four pitches: v1n1, v1n2, v2n1, v2n2

@@ -1484,8 +1484,10 @@ class Chord(note.NotRest):
         >>> a = chord.Chord(['a', 'c', 'e'])
         >>> a.quality
         'minor'
+        
 
-        Inversions don't matter.
+        Inversions don't matter, nor do added tones so long as a root can be found.
+
 
         >>> a = chord.Chord(['f', 'b', 'd', 'g'])
         >>> a.quality
@@ -1499,6 +1501,20 @@ class Chord(note.NotRest):
         >>> a.quality
         'other'
 
+
+        Incomplete triads are returned as major or minor:
+        
+        
+        >>> a = chord.Chord(['c','e-'])
+        >>> a.quality
+        'minor'
+
+
+        >>> a = chord.Chord(['e-','g'])
+        >>> a.quality
+        'major'
+
+
         '''
         third = self.semitonesFromChordStep(3)
         fifth = self.semitonesFromChordStep(5)
@@ -1507,9 +1523,9 @@ class Chord(note.NotRest):
         elif self.hasRepeatedChordStep(3):
             return "other"
         elif fifth == None:
-            if third.semitones == 4:
+            if third == 4:
                 return "major"
-            elif third.semitones == 3:
+            elif third == 3:
                 return "minor"
             else:
                 return "other"

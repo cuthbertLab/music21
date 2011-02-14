@@ -2,11 +2,19 @@
 
 
 
-Installing Music21
+Installing Music21 and Python
 ======================================
 
-Music21 can be installed with a number of different methods. We give two 
-different options depending on if you are a PC (Windows) or Mac (OS X) / Linux / Unix user. 
+`Music21` can be installed in many (too many!) different ways.
+Advanced users can read the specific instructions at the bottom,
+but for the most basic uses, we'll give two different normal 
+solutions, one for Windows, and one for Macs (also useful for
+Linux/Unix).
+
+Macs (and most Unix systems) come with Python.  Windows does not. 
+Mac users aren't completely out of the woods yet though, since 
+some Macs come with out-of-date versions of Python. You may need to
+upgrade to a newer version (see below).
 
 
 Windows Install instructions
@@ -19,19 +27,21 @@ Python is a simple but powerful programming language that music21
 is written in and in which you will write your own programs that 
 use music21.  
 
-Whereas many operating systems come with Python, Windows does not. 
-Windows users will need to download and install Python version 2.6
-(or 2.7, 2.8, etc. but NOT 3.0 or above).
+Windows users should download and install Python version 2.7 or
+2.8, 2.9, etc. but not 3.0, 3.1, etc.  (If you have 2.6 already,
+that will work fine). 
 
-Go to http://www.python.org/download/ and click on the "Windows installer"
-link.  It is probably the first link.  Save the file to your desktop
+To get Python 2.7 for Windows, go to http://www.python.org/download/ 
+and click on the "Windows installer" link.  It is probably the 
+first link.  Save the file to your desktop
 and then click on it there.
 
 To test to see if Python has been installed properly, go
 to the start menu and run (either by clicking "Run" in older
-Windows or by typing in the search box) IDLE.  Type 
-`2+2`.  If your system then
-displays `4` you've installed everything properly so far.
+Windows or by typing in the search box) a program called `IDLE`.  
+Once it's started, type `2+2`.  If your system then
+displays `4` python is working properly and we can start thinking
+about installing `music21`.
 
 
 1B. Updating Python
