@@ -60,7 +60,7 @@ m48 IV b3 ii6 b4 viio6 g: iio6
 m49 V7 b2 i6/4 b3 V
 m50 I 
 m51-53 = m42-44
-m54 I || b3 ii b3 I6
+m54 I || b3 ii b4 I6
 m55 ii6 b2 V b3 I
 Note: mm56ff largely echo mm46ff, metrically displaced by one beat.
 m56 I || b4 vi
@@ -98,7 +98,7 @@ m85 V7 b2 i6/4 b3 V
 Note: m87 transposes m83 modally down by fifth; suggests RN labels may not be very appropriate here
 Note: "V" chord in m86 is a bare octave
 m86 i b3 F: V b4 b4 vi6
-m87 ii b3 V6 b3 IV6
+m87 ii b3 V6 b4 IV6
 Note: following measure difficult to parse, with many suspensions and sounding seventh chords. Unclear whether there's a single underlying harmonic progression here
 m88 viio6 b3 iii7 b4 IV7
 m89 V b2 g: V b3 i

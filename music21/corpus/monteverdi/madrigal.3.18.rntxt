@@ -1,14 +1,13 @@
 Composer: Monteverdi
 Madrigal: 3.18
-Lumi, Miei Cari Lumi
+Title: Lumi, Miei Cari Lumi
 Analyst: Clifton Callender
 Time Signature: 4/4
 Key Signature: Bb
  
 Note: m. 1 - 5 in one and two voices
  
-m1 g:
-m6 i
+m1 g: i
 m7 v6 b3 v
 m8 i
 m10 v
