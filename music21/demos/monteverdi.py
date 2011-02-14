@@ -22,7 +22,7 @@ def showAnalysis(book = 3, madrigal = 13):
     print major
     print minor
     
-def analyzeBooks(books = [3], start = 1, end = 20, show = False):
+def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False):
     majorFig = ""
     minorFig = ""
     majorSt = ""
@@ -32,12 +32,16 @@ def analyzeBooks(books = [3], start = 1, end = 20, show = False):
     for book in books:
         for i in range(start, end+1):
             filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, i)
-#            try:
-            analysis = corpus.parseWork(filename)
-            print book,i
-#            except:
-#                print "Cannot parse %s, maybe it does not exist..." % (filename)
-#                continue
+            if strict == True:
+                analysis = corpus.parseWork(filename)
+                print book,i
+            else:
+                try:
+                    analysis = corpus.parseWork(filename)
+                    print book,i
+                except:
+                    print "Cannot parse %s, maybe it does not exist..." % (filename)
+                    continue
             if show == True:
                 analysis.show()
             (MF, mF) = iqChordsAndPercentage(analysis)
@@ -149,4 +153,5 @@ def iqRootsAndPercentage(analysisStream):
     
 if __name__ == '__main__':
     #spliceAnalysis()
-    analyzeBooks(books = [4], start = 14, end = 14, show = True)
+    analyzeBooks(books = [3,4,5])
+#    analyzeBooks(books = [3], start=12, end=12, show=True, strict=True)

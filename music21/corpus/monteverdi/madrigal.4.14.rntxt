@@ -9,7 +9,7 @@ Note: m1 b1 = rest
 m1 g: b2 i
 m2 b2 VII b3 III
 m4 b3 VII b4 v6
-m5 i[no5] V ||
+m5 i[no5] b3 V ||
 Note: m6 b1 = rest; m6-7: I'm reading the F#/A's as passers, not V[no1], cf. 8-10 and observe that 6-12 ~ 1-5
 m6 b2 i
 m7 b3 VII
@@ -20,7 +20,7 @@ m12 i[no5] b3 V ||
 m13 i[no5] b3 VII[no5]
 m14 VI b3 v[no5]
 Note: top voice passes through the 5 of VII on m14 b2
-m14 VI[no5] b3 v[no5]
+m14var1 VI[no5] b3 v[no5]
 Note: the two changes between m15 and m15var1 are more-or-less independent
 m15 iv b3 III[no5]
 m15var1 iv b.25 viio6/II[no5] b3 III b4.5 V4/3[no3]
@@ -39,7 +39,7 @@ Note: voices 2-3 jump in 28-29 to avoid parallel 8ves or 5ths
 m28 V
 m29 vi d: iv b4.5 IV
 m29var1 vi d: iv
-m30 V b2 i46/4 b3 V
+m30 V b2 i6/4 b3 V
 m31 I ||
 m32 ?(g:
 m33 i
