@@ -26,8 +26,8 @@ m19 V
 m20 i
 m21 d: v b2 viio6/ b3 VII
 m22 IV b2 I6 b3 V
-m23 I b3 G: V I
-m24 bVII b3 IV iv I6
+m23 I b3 G: V b4 I
+m24 bVII b3 IV b4 iv b4.5 I6
 m25 V
 m26 I
 m27 b4 IV
@@ -60,7 +60,7 @@ m51 IV b2 I6 b3 I
 m52 b3 V6
 m53 IV6
 m54 a: V
-m55 iv i6 i
+m55 iv b2 i6 b3 i
 m56 VI6 b3 iv6/4
 m57 b3 i
 m58 d: i6/4

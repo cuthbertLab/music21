@@ -5,33 +5,6 @@ Analyst: Noam D. Elkies
 Time Signature: 4/4
 Key Signature: Bb
 
-Note: A basic harmonic figure in this madrigal is a series of root-position chords moving by thirds, linked by their common duads (and thus avoiding flagrant parallel fifths).  Often the new note is introduced as an upbeat; then a "var" harmony is indicated to allow the new chord to start on the upbeat or the next downbeat.
-m1 F: I
-m3 b3 vi
-m3var1 b2 vi
-m4 b3 IV
-m4var1 b2 IV
-Note: the D in 6.4 may be heard as ornaments even though they're not in stepwise motion.  cf. 10 and 17 where no chord change is indicated even as a "var" because the motif is ornamental in other voices (though it feels functional in 25).
-m6 b2 vi b3 I
-m6var1 b2 vi b3 I b4 vi
-m7 V
-m8 I ||
-m9 b3 IV
-m10 I
-m11
-m11var1 b4 vi6
-m12 vi b3 IV
-m13 b3 ii
-m14 bVII b4 IV
-m15 V7 b2 I6/4 b3 V
-m16 I ||
-m19 b3 IV
-m20 I
-m23 b3 IV
-m25 IV6/4 b2 I C: IV b3 V6/5 b4 I6
-m26 V b3 I || F: V
-Note: in 27var1 and 28var1 the iii and vi chords could be heard as nonfunctional chords formed by accented passing notes in the bass.
-m27 b3 I
 m27var1 iii b3 I
 m28
 m28var1 b3 vi
