@@ -1,0 +1,87 @@
+Composer: Claudio Monteverdi
+Madrigal: 4.15
+Title: Non piu guerra, pietate
+Analyst: Noam D. Elkies
+Time Signature: 4/4
+Key Signature: Bb
+
+Note: A basic harmonic figure in this madrigal is a series of root-position chords moving by thirds, linked by their common duads (and thus avoiding flagrant parallel fifths).  Often the new note is introduced as an upbeat; then a "var" harmony is indicated to allow the new chord to start on the upbeat or the next downbeat.
+m1 F: I
+m3 b3 vi
+m3var1 b2 vi
+m4 b3 IV
+m4var1 b2 IV
+Note: the D in 6.4 may be heard as ornaments even though they're not in stepwise motion.  cf. 10 and 17 where no chord change is indicated even as a "var" because the motif is ornamental in other voices (though it feels functional in 25).
+m6 b2 vi b3 I
+m6var1 b2 vi b3 I b4 vi
+m7 V
+m8 I ||
+m9 b3 IV
+m10 I
+m11
+m11var1 b4 vi6
+m12 vi b3 IV
+m13 b3 ii
+m14 bVII b4 IV
+m15 V7 b2 I6/4 b3 V
+m16 I ||
+m19 b3 IV
+m20 I
+m23 b3 IV
+m25 IV6/4 b2 I C: IV b3 V6/5 b4 I6
+m26 V b3 I || F: V
+Note: in 27var1 and 28var1 the iii and vi chords could be heard as nonfunctional chords formed by accented passing notes in the bass.
+m27 b3 I
+m27var1 iii b3 I
+m28
+m28var1 b3 vi
+m29 IV b4 IV6
+m30 V7 b2 I6/4 b3 V
+m31 I
+m33
+m33var1 IV b3 I6
+m34 I
+m39 V
+m42 vi
+m43 V
+m44 I ||
+m46 V
+m48 vi
+m48var1 IV6 b3 vi
+m49 V
+m50 I
+m51 b3 IV b4 viio6
+m52 I ||
+Note: rather unusually the first 2/3 of the madrigal is basically in one key
+m54
+m54var1 g: ii6[no5]
+m55 g: V7 b3 i6/4
+m56 V
+m57 I || C: V b3 i6/4
+m58 V
+m58var1 V b4 V7
+Note: I keep the key at F from here to the end.  62-65 feints at C but uses v/C instead of the expected V/C to turns back to F.
+m59 I || F: V
+m59 I F: V b4 V2
+m60 iii
+m60var1 I6
+m61 I
+m62 vi
+m63 b3 V/ii
+Note: the "bVII6/5 chord" is a suspension + accented leading tone of the following v6/4, but it does last a full half note.
+m64 v6/4
+m64var1 bVII6/5 b3: v6/4
+Note: 4-3 suspension in half notes, so we expect it to resolve to V/V
+m65 ii
+m66 V7 b3 I6/4
+m67 b3 V
+Note: cf. m64var1 with m68var1.  Here the "6/5 chord" lasts even longer, and the E is not passing but a leap down from C (with a rest in beat 1)
+m68 I6/4
+m68var1 iii6/5 b4 I6/4
+m69 V
+m70 I ||
+Note: normally I wouldn't bother with m72var1, but see the note before m1
+m72 V
+m72var1 iii
+m73 V
+m77 I

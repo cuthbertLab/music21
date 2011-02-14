@@ -1,0 +1,116 @@
+Composer: Claudio Monteverdi
+Madrigal: 3.6
+Title: O rossignuol ch'in queste verdi fronde
+Time Signature: 4/4
+Analyst: Panos Mavromatis
+Key signature: Bb
+
+m1 g: i[no3]
+m2 i
+m3 b3 i6/4
+m4 VII b2 i b3 VII b4 i6/4
+m5 VII
+m7 b2 v b3 VII
+m9 VI b2 iio6/4 b3 V
+m10 b1 V || b3 III
+m12 b3 VII
+m13 VI6 b2 i b3 v6
+m14 iv6
+m15 i6/4 b3 V
+m16 d: i
+m17 b3 III
+m18 b3 v b4 III6
+m19 v b2 i6/4 b3 v
+m20 b3 v[no3] b4 i6/4
+m21 V b2 i6/4 b3 V
+m22 i || g: b4 V
+m23 i b3 i6 b4 i
+m24 VII b4 VII6
+m25 i
+m26 VII Bb: V
+m27 I
+m28 IV6 b3 IV
+m29 V
+m30 I ||
+m31 V b2 I6 b3 ii b4 I6
+m32 IV g: VI b2 iio6 b3 i6 b4 iio6
+m33 V b2 i6/4 b3 V
+m34 i || Bb: I
+m35-37 = m31-33
+m38 i ||
+m39 VI6 b3 v6
+m40 iv6 b3 III6
+m41 ii
+m42 i6 b3 Bb: i
+m43 IV b3 vi6/4
+m44 ii b3 viio6
+m45 I b3 vi6
+m46 viio6 b3 I6
+m47 ii6/5 b3 V
+m48 I6/5 b3 IV g: VI
+m49 V b3 I
+m50 iio2 b3 viio
+m51 i ||
+m52-55 = m47-50
+m56 i || b3 i6
+m57 v b4 V
+m58 VI b3 i
+m59 b3 i6
+m60 V b4 i
+m61 V
+m62 I ||
+m63 iv
+m64 b3 VII6
+m65 III
+m67 v
+m68 b3 i6 d: iv6
+m69 V b3 i6/4
+m70 V
+m71 I || g: V
+m72 i
+m73 iv6
+m74 III6
+m75 Bb: ii7 b3 viio6
+m76 I ||
+m77 b4 V
+m78 vi g: i b3 V
+m79 b3 i b4 V[no3]
+m80 i b3 i6
+m81 V
+m82 VI
+m83 V
+m84 i6/4
+m85 V
+m86 i ||
+m87 b2 v6 b3 VI b4 iv6
+m88 V
+m89 i b3 i6 b4 IV
+m90 V
+m91 VI b4 iv6
+m92 v
+m95 i
+m96 V6
+m97 i ||
+m99 VI7 b3 iv6
+m100 v7 b3 III6
+m101 Bb: ii7 b3 viio6
+m102 I || b3 V
+m104 F: I b2 V b3 vi d: i
+m105 V ||
+m106 i
+m107 b2 v6 b3 VI b4 iv6
+m108 V || b4 i
+m109 VI Bb: I b3 I6
+m110 V b3 iii
+m111 IV7 b3 ii6 g: iv6
+m112 V7 b3 i6/4
+m113 V
+m114 i || b3 i6
+m115 V
+m116 VI b4 iv6
+m117 V b4 i
+m118 i b2 VII b3 III b4 II
+m119 v b3 VII
+m120 VI b3 iv
+m121 V7 b2 i6/4 b3 V
+m122 I

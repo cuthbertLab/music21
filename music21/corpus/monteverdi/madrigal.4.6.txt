@@ -1,0 +1,61 @@
+Composer: Claudio Monteverdi
+Madrigal: 4.6
+Title: Anima mia, perdona
+Time Signature: 4/4
+Key Signature: Bb
+
+m1 g: I
+m2 b3 iv6
+m3 V ||
+m6 V/V ||
+m7 V
+m8 i
+m9 b1.5 VI6 b2 v6 b2.5 iv6 b3 v6 b4 ii
+m10 V || b4 III6 
+m11 b4 V/III b4.5 III
+m12 iio6 b2 iv6 b3 V ||
+m13 b2 V/V b4 v
+m14 F: V b4 I6
+m15 IV b2 viio6 b3 I ||
+m16 b2 V/ii b4 ii
+m17 Bb: V b4 I6
+m18 IV b2 viio6 b3 I ||
+m19 b3 V b4 iii6
+m20 vi b3 V/vi ||
+m21-22 = m19-20
+m26 g: V/V
+m27 V ||
+m28 i
+m31 V
+m32 I ||
+m33 V
+m35 b4 i6/4
+m36 ii b4 V/v
+m37 b2.5 v6/4 b3 V/V
+m38 V ||
+m39 b4 i
+m40 V/III
+m41 b4 III
+m42 V/V
+m43 b2 V
+m44 b3 i ||
+m45 i b4 iv Bb: ii b4.5 viio6
+m46 I || b2.5 C: vi
+m47 b2 ii b2.5 viio6 b3 I b4.5 IV F: I
+m48 IV b1.5 b2 I ||
+m50 b2 viio6 b3 I6 b4 ii6
+m51 V b2 I6/4 b4 V
+m52 vi
+m54 b: VI7 b3 iv6
+m55 V7 d: i6
+m56 V
+m57 i || b3.5 g: V
+m58 b2 i b3 V/III b4.5 III Bb: I
+m59 ii6 b1.5 V b2 I ||
+m61 b2 viio6 b3 I6 b4 ii6
+m62 V b2 I6/4 b4 V
+m63 vi
+m65 e: VI7 b3 iv6
+m66 V7 g: I6
+m67 V
+m68 I

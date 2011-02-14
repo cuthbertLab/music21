@@ -1,0 +1,73 @@
+Composer: Monteverdi
+Madrigal: 5.5
+Title: Ma, se con la pieta non e in te spenta
+Analyst: Fernando Benadon
+Time Signature: 4/4
+Key signature: Bb
+
+m1 Bb: I
+m4 b3 IV
+m5 b3 ii b4 V
+m6 I b3 IV
+m7 V b3 I ||
+m8 vi g: i
+m9 VI
+m10 iv
+m11 V ||
+m12 i6[no1] d: iv6[no1]
+m13 iv7[no3]
+m14 V
+m15 b3 i[no3] || b4 VI
+m16 b1.5 v6 b2 viio6/VII b3 VII6
+m17 viio6/VII b3 VII b4 VI6 g: III6
+Note: modal from mm16-21, analyzed as G dorian (instead of D minor) because of the two mild cadences in G.
+m18 b1.5 ii6 b2 i6 b3 viio6
+m19 i[no3] || b2 i
+m20 ( #vi6 b2 IV6 b3 V/IV )	
+m21 IV[no3] b2 v6 b3.5 IV6 b4 i
+m22 V b3 i[no3] ||
+m23 I
+m24 b4 IV
+m25 Bb: I
+Note: The I - IV - bIII progression; see also 3.15 m.5
+m26 IV b3 I6
+m27 V
+m28 b3.5 ii6 b4 V
+m29 I ||	
+m30 b3 vi
+m31 V F: I b3 vi6
+m32 V b3 I6
+m33 V
+m34 I6/4
+m35 V b3 I[no3] ||
+m35var1 ii6/5 b2 V b3 I[no3] 
+m36 V/vi
+m37 b3 vi
+m37var1 b3 vi b4 viio6/V
+m38 V
+m39 I b3 V6
+m40 V/V
+m41 b3.5 vi6 b4 V/V
+m42 V
+m44 b3 I[no3]
+m45 V b2 iii6 b4 ii6
+m46 I6 b3 viio6
+m47 I b3 vi
+m47var1 I b3.5 vi b4 iii b4.5 IV6 
+m48 V b3 I
+m48var1 V b3.5 I b4 V b4.5 vi
+m49 V b4 vi C: ii
+m50 I6 b2 IV7 b3 V
+m51 I || b4 IV
+m53 b3 V/ii g: V/V
+m54 b2 i6 b3 V/V
+m55 i ||
+m57 b3 V b4 VI
+m58 V
+m59 F: V
+m61 I ||
+m62 b2 V b2.5 vi d: i b3 V b4 iv6
+Note: Again the progression Amaj - gmin, though in a slightly different tonal context (compare with mm. 54-55)
+m63 V
+m66 I || g: V
+m68 i

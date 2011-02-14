@@ -1,0 +1,93 @@
+Composer: Monteverdi
+Madrigal: 3.11
+Title: O Primavera, Gioventù de l'Anno
+Analyst: John Halle
+Time Signature: 4/4
+Key Signature: Bb
+
+Note: piece starts with unison F, assuming tonic.
+
+m1 F: I
+m2 b3 ii b4 viio6
+m3 I
+m4 b2 vi b3 VI6/5 b4 viio7
+m5 I
+m6 ii b2 viio6 b3 I
+m8 vi6 b3 IV[no5] b4 viio7
+m9 iii b3 IV b4 viio6[no5]
+m10 vi b3 iii6 b4 iii
+m11 IV6 b3 V
+m12 I ||
+m13 b3 IV6 b4 viio
+m14 I
+m15 b3 V/v
+m16 I6 b3 I
+m17 I b3 IV6 b4 IV
+m18 ii b2.5 viio6 b3 I
+m19 vi b3 I[no5]
+m20 ii6/4 b2 viio7 b3 I
+m21 b3 ii b4 viio6[no5]
+m22 I
+m23 V b2 V2[no3] b3 ii b4.5 viio[no5]
+m24 vi6 b2 vi b3 V6 b4.5 I
+m25 vi7 b2 vi b3 V
+m26 IV b3 I
+m27 ii6 b3 V
+m28 I[no3] || 
+m29 b3 V6
+m30 IV6
+m31 iii6 b3 I6
+m32 ii6 b4 viio4/3
+m33 I6
+m34 IV b4 viio7
+m35 I
+m36 ii
+m37 I
+m38 IV b3 IV6
+m39 vi b3 iii6
+m40 vi6
+m41 I6 b3 I
+m42 ii
+m43 I
+m44 ii b4 viio6
+m45 I b4 I6
+m46 ii6 b2 iii6[no5] b3 IV6 b4 viio
+m47 I
+m48 ii
+m49 I
+m50 viio[no5] b3 V[no5]
+m51 I b2 V6 b3 I b4 IV6
+m52 I b4 IV6
+m53 iii6 b2.5 V4/3 b3 I
+m53var1 iii6 b3 I
+m54 V b3 vi7 C: ii7 b4 viio6
+m55 I II b3 F: IV
+m56 V b3 I ||
+m57 V b3 I b4 vi6
+m58 I b3 vi6
+m59 I b3 vi b4 V6
+m60 vi7 b3 IV
+m61 V b3 I ||
+m62 IV6[no5]
+m63 IV6 b3 V[no5]
+m64 IV
+m65 viio6
+m66 I
+m67 viio[no5] b3 I[no5]
+m68 IV b3 vi
+m69 V6 b3 I
+m70 b3 IV6[no5]
+m71 V[no3] b3 IV
+m72 b3 I b4 ii[no5]
+m73 I
+m74 b3 V b4 vii6/V
+m75 V
+m76 I[no3] || b3 IV6
+m77 viio b3 I
+m78 IV
+m79 I
+m80 ii
+m81 I6
+m82 V b3 I6/4
+m83 V
+m84 I ||

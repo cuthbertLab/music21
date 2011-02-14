@@ -1,0 +1,43 @@
+Composer: Monteverdi
+Madrigal: 3.15
+Title: Vivro fra i miei tormenti e le mie cure
+Analyst: Fernando Benadon
+Time Signature: 4/4
+Key signature: 
+
+m1 D: I
+m4 b4 IV
+Note: in at least one recording, the above G major chord is sung as G minor.
+m5 F: I
+Note: The I - IV - bIII progression; See also (eg) 5.15 m.25
+m7 IV
+m8 b2 vi b3 V
+m9 I[no3] || b3 V
+m11 V/V C: V b2 IV6 b3 V
+m12 I ||
+m14 vi b4 IV
+m15 b2 ii d: i b3 V
+m16 I ||
+m17 i
+m19 v b2 i b3 iv
+m20 b3 iv6
+m21 i6/4 b3 V
+m22 i
+m23 b3 VI b4 iv6 F: ii6
+m24 V b2 IV6 b3 V
+m25 I ||
+m26 V
+m27 b2 V/V b3 V
+m28 b2 I b3 vi d: i
+m29 V
+m30 b3 i
+m31 b3 iv
+m32 VII6 C: I6 b3 IV b4 I6
+m33 V b3 I
+m34 b3 vi
+m35 ii F: vi b3 IV b4 ii6
+m36 V
+m37 I || b3 IV
+m38 ii d: iv b3 v
+m39 i
+m40 V

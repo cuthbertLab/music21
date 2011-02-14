@@ -1,0 +1,85 @@
+Composer: Monteverdi
+Madrigal: 4.10
+Title: Voi Pur da me Partite, Anima Dura
+Analyst: John Halle
+Time Signature: 4/4
+Key Signature:
+
+m1 a: i
+m2 V
+m3 i
+m4 IV b3 VII
+m6 b3 III[no3]
+m7 b2.5 i b3 V6/5 b4 i
+m8 V6/5 b3 I
+m9 b3 VI6 b4 VI6/4
+m10 i6 b2 vi/o7 b3 VII
+m11 b2 i b2.5 VII b3 III b4 iv6
+m12 b2 III6 b3 VII
+m13 VII6/5 b2 iio b3 III
+m14 b2 III[no5] b3 VII
+m15 b3 iv7[no5]
+m16 V
+m17 i6[no1] b2 III b3 VII
+m18 b3 IV7
+m19 V
+m20 i6[no1] b2 VI b3 i b4 V6
+m21 i6 b2 V b3 vi/o7 b4 V6
+m22 i b3 i6
+m23 V
+m24 I ||
+m25 i b4 III
+m26 b2 IV7
+m26var1 b2 IV4/2, b3 IV4/3
+m27 VII[no5] b3 VII
+m28 b2 III
+m29 iv6 b2 iv7 b3 V
+m30 i[no3] ||
+m31 v[no5]
+m32 b4 v2[no5]
+m33 b2 viio/iv b3 IV[no5]
+m34 b2 ii
+Note: A B C# D cluster results from passing tones in lower parts.
+m35var1 b4 viio
+m36 b2 viio
+m37 I b2 IV b3 ii[no5]
+m37var1 I b2 IV G: b3 I[no1]
+m38 G: viio6 b2 I b3 V
+m39 I ||
+m41 V6
+m42 I C: V
+m43 I6 b3 ii vi6
+m44 V
+m45 I ||
+m47 V
+m48 I[no5] b3 I G: IV II
+m49 b4 vi
+m49 V
+m50 I[no5] ||
+m52 vi
+m53 V
+m54 I[no3no5] II b3 vi6 b4 vi
+m55 IV b3 I6 b4 ii a: i
+m56 V
+m57 i ||
+m58 VI b3 v b4 iv d: i
+m59 V
+m60 i[no3] II
+m62 V
+m63 I a: iv ||
+m65 V
+m66 i ||
+m67 ii[no3] e: v b2 iv6 b3 V
+m68 V b3 I ||
+m70 VI
+m71 III
+m72 VI c: I
+m74 IV[no3] b3 vi
+m75 V
+m76 I || a: III b4 vio6
+m77 VII b2 VI[no3] b3 V
+m78 V
+Pedal: 5 m78 m84
+m80 b4 vio
+m81 V
+m84 I ||

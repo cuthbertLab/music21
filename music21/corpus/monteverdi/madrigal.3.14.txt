@@ -1,0 +1,100 @@
+Composer: Claudio Monteverdi
+Madrigal: 3.14
+Title: Occhi, un tempo mia vita
+Analyst: Noam D. Elkies
+Time Signature: 4/4
+Key signature: Bb
+
+m1 g: I
+m2 b3 III
+m3 VII b4 i
+m4 V
+Note: 6-9 harmony = 2-5 with interpolated i6/4 before the V; different text but same start "occhi"
+m6 || d: I b3 III
+m7 VII b4 i
+m8 i6/4 b3 V
+m9 i[no3][no5] || b3 g: III6
+Note: 9.3-12 = fauxbordon of tune introduced in 6-9 (except 11.1 is C-E-C, not a C6 chord); 12.3-15 = pt. of imit. on same tune; text repeats in 6-9, 9.3-12, 12.3-15, and final two words also 15.3-17
+m10 VII6 b2 i6 b3 ii6 b3.5 i6 b4 ii6 b4.5 viio6/IV
+m11 IV[no5] b2 III6 b3.5 ii6 b4 i6
+m12 viio6 b3 i || d: iv
+m13 VI b3 v b4 i
+m14 VII b4 III
+m15 b1.5 VII b2 i b3 V
+m16 I g: V
+Note: the cadential figure in 17, V to I6/4 to V with 4-3 suspension, appears several times in half-note rather than quarter-note motion (see 28-29); if we notate the 6/4 chord there we must at least allow it as a variant here.
+m17
+m17var1 b2 i6/4 b3 V
+m18 i[no3][no5] ||
+Note: 22-24 = 19-21 transposed up5/down4, same text, in both cases with unorthodox voice leading including leaps up and down dim4 on "ahime".  Same motif in 25-27 but harmony changes and the leaps are ony perfect fourths.
+m19 I
+m20 b3 iv
+m21 I ||
+m22 V
+m23 b3 i
+m24 V ||
+m25 Bb: I
+m26 vi6 b3 IV
+m27 vi
+m28 V b3 I6/4
+m29 V
+Note: 35-39.1 = 30-34 transposed up 5th, same text; m35var1: chord is F A F
+m30 I || g: III
+m32 VII
+m33 b4 i
+m34 V ||
+m35 d: i b3 III
+m35var1 d: I
+m36 III
+m37 VII
+m38 b2 i b3 V
+m39 b3 i F: vi
+m40 IV[no3] b2 I6 b3 V
+Note: 45-48 ~ 41-44 transposed down5/up4, with IV to iv6 cross relation
+m41 I d: III
+m42 i6 b3 iv
+m43 VI b3 V
+m44 b3 I[no3][no5] || g: v[no3][no5] b4 v[no5]
+m45 b2 III b3 i6
+m46 IV b3 iv6
+m47 i6/4 b3 V
+Note: 52-55 ~ 48.3-52 transposed up5/down 4; var1: passing notes form IV7 with missing 3rd, but in 51 voice 3 leaps to the 5th and back (avoiding parallel 5ths with voice 1)
+m48 i[no3] || b3 Bb: vi
+m50 b3 I
+m51 ii6 b3 V
+m51var1 ii6 b2 IV7[no3] b3 V
+m52 I || F: IV
+m53 vi
+m54 I b3 ii6
+m54var1 I b3 ii6 b4 IV7[no3]
+m55 V b3 I || g: VII
+Note: leap to 7th, half-note motion, so it pretty much has to be called iv7
+m57 III b3 iv7
+m58 V ||
+m59 III
+Note: comparison with 57 suggests hearing iv7 here too
+m60 b3 iio6 b4 iv7
+m60var1 b3 iv7
+m60var2 b3 iio6
+m61 V
+m63 b3 i6/4
+m64 V
+m65 i || d: iv
+m66 VI
+Note: 67.3 IV has 9-8 susp. and 6-5 passing tone; 68 could also be heard as plain V, with cadential figure similar to that of 17, which recurs at half speed at the end of the madrigal
+m67 i b3 IV
+m68 V7 b2 i6/4 b3 V
+m69 I g: V ||
+m70 v
+Note: 71.2-72 is fauxbourdon
+m71 III6 b3 ii6 b4 i6
+m71var1 b2 III6 b3 ii6 b4 i6
+m72 viio6 b3 i
+m73 III
+m74 b3 VII b4 i
+m75 V
+m76 VII
+m77 b3 iv6
+m78 V7 b3 i6/4
+m79 V
+m80 I

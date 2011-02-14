@@ -1,0 +1,64 @@
+Composer: Monteverdi
+Madrigal: 4.11
+Title: A un Giro sol de' Belli Occhi Lucenti
+Analyst: John Halle
+Time Signature: 4/4
+Key Signature: 
+
+m1 a: i
+m2 b3 VII
+m3 b3 VI
+m4 v b3 III[no5]
+m5 VII d: IV
+m6 viio6
+m7 i ||
+m8 IV c: V b3 ii6
+m9 V b3 vi6
+m10 V b3 vi6
+m11 V b3 vi6
+m12 V b3 vi6
+m13 V b3 vi6
+m14 V b3 vi6
+m15 V b3 I[no3] ||
+m24 V
+Note: anti parallel fifths alto and bass
+m30 I6 b2 I b3 V
+m31 I b3 V6
+m32-33 = m30-31
+m34 I b3 V6
+m35 I b3 V
+m36 I || b3 V a: VII
+m37 V
+m38 b3 i
+m39 V
+m41 b3 iv6
+m42 V
+m45 iv[no5]
+m46 III[no5]
+m47 iio[no5]
+m48 i[no5]
+m49 b3 V6[no5]
+m50 iv6/4
+m51 i
+m52 b3 iio[no5]
+m53 b3 i6/4
+m54 V
+m55 i[no3] b3 vio[no5] e: iio[no5]
+m56 V b3 i6/4
+m57 V
+m58 iv
+m59 v6
+m60 iio[no5]
+m60var1 viio[no1]
+m61 i
+m62 V6
+m63 iv6/4
+m64 v
+m65 vio[no5]
+m66 v[no5] e: i
+m67 V
+m68 I[no3] b3 vi
+m69 iv[no3] b3 VII[no1]
+m70 VII a: IV b3 ii
+m71 V
+m73 I ||
