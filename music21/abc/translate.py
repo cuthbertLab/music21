@@ -279,7 +279,6 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
 
     environLocal.printDebug(['abcToStreamOpus: got number', number])
 
-
     # returns a dictionary of numerical key
     if abcHandler.definesReferenceNumbers():
         abcDict = abcHandler.splitByReferenceNumber()

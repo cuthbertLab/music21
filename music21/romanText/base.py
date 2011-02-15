@@ -106,6 +106,9 @@ class RTToken(object):
     def isWork(self):
         return False
 
+    def isMovement(self):
+        return False
+
     def isAtom(self):
         '''Atoms are any untagged data; generally only found inside of a measure definition. 
         '''
@@ -227,21 +230,6 @@ class RTTagged(RTToken):
             return True
         else:
             return False
-
-    def keySignatureSharps(self):
-        '''
-        if the token is a KeySignature, return the number of sharps (or if flats,
-        negative number)
-        '''
-        if self.isKeySignature() is False:
-            return None
-        else:
-            if self.data == 'Bb':
-                return -1
-            elif self.data == '' or self.data == 'blank':
-                return 0
-            else:
-                raise RTTokenException('cannot parse this KeySignature: %s' % self.data) 
 
 class RTMeasure(RTToken):
     '''In roman text, measures are given one per line and always start with 'm'.
@@ -494,6 +482,9 @@ class RTKey(RTAtom):
         return '<RTKey %r>' % self.src
 
     def getKey(self):
+        '''
+        This returns a Key, not a KeySignature object
+        '''
         from music21 import key
         # alter flat symbol
         if self.src == 'b:':
@@ -503,6 +494,26 @@ class RTKey(RTAtom):
             keyStr = keyStr.replace(':', '')
             #environLocal.printDebug(['create a key from:', keyStr])
             return key.Key(keyStr)
+
+    def getKeySignature(self):
+        '''Get a KeySignature object.
+        '''
+        if self.src == 'b:':
+            return key.Key('b')
+        else:
+            # source may be empty
+            keyStr = self.src.replace('b', '-')
+            keyStr = keyStr.replace(':', '')
+            return key.KeySignature(keyStr)
+
+#         if self.data == 'Bb':
+#             return -1
+#         elif self.data == '' or self.data == 'blank':
+#             return 0
+#         else:
+#             raise RTTokenException('cannot parse this KeySignature: %s' % self.data) 
+
+
 
 class RTOpenParens(RTAtom):
     def __init__(self, src =u'(', container=None):

@@ -143,7 +143,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             tsSet = False
             environLocal.printDebug(['tsCurrent:', tsCurrent])
         elif t.isKeySignature():
-            keySigCurrent = key.KeySignature(t.keySignatureSharps())
+            #keySigCurrent = key.KeySignature(t.keySignatureSharps())
+            keySigCurrent = t.getKeySignature()
             keySigSet = False
             environLocal.printDebug(['keySigCurrent:', keySigCurrent])
         elif t.isMeasure():
@@ -282,11 +283,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     s.insert(0,p)
     return s
 
-
-
-
-                
-
+            
 def romanTextStringToStreamScore(rtString, inputM21=None):
     '''Convenience routine for geting a score from string, not a handler
     '''
@@ -295,6 +292,13 @@ def romanTextStringToStreamScore(rtString, inputM21=None):
     rth = rtf.readstr(rtString) # return handler, processes tokens
     s = romanTextToStreamScore(rth, inputM21=inputM21)
     return s
+
+
+def romanTextToStreamOpus(rtHandler, inputM21=None):
+    '''Return either a Score object, or, if a multi-movement work is defined, an Opus object. 
+    '''
+
+    pass
 
 
 #-------------------------------------------------------------------------------
