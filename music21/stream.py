@@ -3087,6 +3087,8 @@ class Stream(music21.Music21Object):
         else: # create a single collection
             groups = [(srcObj, None)]
 
+        environLocal.printDebug(['_getOffsetMap', groups])
+
         for group, voiceIndex in groups:
             for e in group:
                 # do not include barlines
