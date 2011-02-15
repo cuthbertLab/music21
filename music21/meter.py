@@ -1096,7 +1096,7 @@ class MeterSequence(MeterTerminal):
         elif common.isNum(value):
             self.partitionByCount(value, loadDefault=False)
         else:
-            raise MeterException('cannot process partition arguemtn %s' % value)
+            raise MeterException('cannot process partition argument %s' % value)
 
 
     def subdividePartitionsEqual(self, divisions=None):
@@ -1312,7 +1312,7 @@ class MeterSequence(MeterTerminal):
 
     def load(self, value, partitionRequest=None, autoWeight=False,
             targetWeight=None):
-        '''This method is called when a MeterSequence is created, or if a MeterSequece is re-set. 
+        '''This method is called when a MeterSequence is created, or if a MeterSequence is re-set. 
 
         User can enter a list of values or an abbreviated slash notation.
 
@@ -1723,7 +1723,7 @@ class MeterSequence(MeterTerminal):
 
     
     def setLevelWeight(self, weightList, level=0):
-        '''The `weightList` is an array of weights to be applied to a single level of the MeterSequence..
+        '''The `weightList` is an array of weights to be applied to a single level of the MeterSequence.
 
         >>> from music21 import *
         >>> a = meter.MeterSequence('4/4', 4)
@@ -1966,8 +1966,61 @@ class MeterSequence(MeterTerminal):
 
 #-------------------------------------------------------------------------------
 class TimeSignature(music21.Music21Object):
+    '''The TimeSignature object is multi-faceted representation of nested hierarchical structures.
+
+    For complete details on using this object, see :ref:`overviewMeters`.
+
+    In general, providing a string representation of a meter will get the desired meter, properly configured. For example, we can create a 3/4 TimeSignature, below.
+
+    >>> from music21 import *
+    >>> ts = TimeSignature('3/4')
+    >>> ts.beatCount
+    3
+    >>> ts.beatCountName
+    'Triple'
+    >>> ts.beatDuration.quarterLength
+    1.0
+
+
+    TimeSignature objects are generally positioned in Streams at offset positions, or assigned to special property in Measure that positions the TimeSignature at the start of a Measure. Once a Note has a local TimeSignature, a Note can get its beat positions and other meter-specific parameters
+
+
+    >>> m = stream.Measure()
+    >>> m.timeSignature = meter.TimeSignature('3/4')
+    >>> n = note.Note(quarterLength=.5)
+    >>> m.repeatAppend(n, 6)
+    >>> [n.beatStr for n in m.notes]
+    ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
+    >>> m.timeSignature = meter.TimeSignature('6/8')
+    >>> [n.beatStr for n in m.notes]
+    ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
+
+
+    Numerous attributes of TimeSignature objects can be configured, including the multi-level partitioning of independent :class:`~music21.meter.MeterSequence` objects for beat, beam, accent, and display. For complete control, direct configuration of :attr:`~music21.meter.TimeSignature.beatSequence`, :attr:`~music21.meter.TimeSignature.beamSequence`, :attr:`~music21.meter.TimeSignature.accentSequence`, and :attr:`~music21.meter.TimeSignature.displaySequence` is necessary. Some high-level shortcuts are provided. For example, to set a different number of beats, the :attr:`~music21.meter.TimeSignature.beatCount` property can be set with a new value.
+
+
+    >>> ts = meter.TimeSignature('6/8')
+    >>> ts.beatCount
+    2
+    >>> ts.beatDuration.quarterLength
+    1.5
+    >>> ts.beatDivisionCountName
+    'Compound'
+    >>> ts.beatCount = 6
+    >>> ts.beatDuration.quarterLength
+    0.5
+    >>> ts.beatDivisionCountName
+    'Simple'
+    '''
 
     classSortOrder = 4
+
+    _DOC_ATTR = {
+    'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',    
+    'beamSequence': 'A :class:`~music21.meter.MeterSequence` governing automatic beaming.',    
+    'accentSequence': 'A :class:`~music21.meter.MeterSequence` governing accent partitioning.',    
+    'displaySequence': 'A :class:`~music21.meter.MeterSequence` governing the display of the TimeSignature.',    
+        }
     
     def __init__(self, value='4/4', partitionRequest=None):
         music21.Music21Object.__init__(self)
@@ -2019,16 +2072,6 @@ class TimeSignature(music21.Music21Object):
         >>> len(ts.beatSequence) # first, not zeroth, level stores beat
         3
         '''
-#         tsStr = '%s/%s' % (self.numerator, self.denominator)
-#         firstPartitionForm = len(self.displaySequence)
-#         cacheKey = None #(tsStr, firstPartitionForm)
-# 
-#         try:
-#             self.beatSequence = copy.deepcopy(
-#                                 _meterSequenceBeatArchetypes[cacheKey])
-#             #environLocal.printDebug(['using stored accent archetype:'])
-#         except KeyError:
-
         # if a non-compound meter has been given, as in 
         # not 3+1/4; just 5/4
         if len(self.displaySequence) == 1:
@@ -2056,9 +2099,6 @@ class TimeSignature(music21.Music21Object):
         # create subdivisions, and thus define compound/simple distinction
         if len(self.beatSequence) > 1: # if partitioned
             self.beatSequence.subdividePartitionsEqual()
-
-#             if cacheKey != None:
-#                 _meterSequenceBeatArchetypes[cacheKey] = copy.deepcopy(self.beatSequence)
 
 
                     
@@ -2341,13 +2381,50 @@ class TimeSignature(music21.Music21Object):
         # level partition. 
         return len(self.beatSequence)
 
-    beatCount = property(_getBeatCount,
-        doc = '''Return the count of beat units, or the number of beats in this TimeSignature
+    def _setBeatCount(self, value):
+        '''Setting a beat-count directly is a simple, high-level way to configure the beatSequence. Note that his may not configure lower level partitions correctly, and will raise an error if the provided beat count is not supported by the overall duration of the .beatSequence MeterSequence.
+
+        >>> from music21 import *
+        >>> ts = meter.TimeSignature('6/8')
+        >>> ts.beatCount # default is 2 beats
+        2
+        >>> ts.beatSequence
+        <MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
+        >>> ts.beatDivisionCountName
+        'Compound'
+        >>> ts.beatCount = 6
+        >>> ts.beatSequence
+        <MeterSequence {{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}}>
+        >>> ts.beatDivisionCountName
+        'Simple'
+        >>> ts.beatCount = 123
+        Traceback (most recent call last):
+        TimeSignatureException: cannot partion beat with provided value: 123
+        '''
+        try:
+            self.beatSequence.partition(value)
+        except MeterException:
+            raise TimeSignatureException('cannot partion beat with provided value: %s' % value)
+        # create subdivisions using default parameters
+        if len(self.beatSequence) > 1: # if partitioned
+            self.beatSequence.subdividePartitionsEqual()
+
+    beatCount = property(_getBeatCount, _setBeatCount, 
+        doc = '''Return or set the count of beat units, or the number of beats in this TimeSignature. 
+
+        When setting beat units, one level of sub-partitions is automatically defined. Users can provide beat count values as integers or as lists of durations. For more precise configuration of the beat MeterSequence, manipulate the .beatSequence attribute directly. 
 
         >>> from music21 import *
         >>> ts = TimeSignature('3/4')
         >>> ts.beatCount
         3
+        >>> ts.beatDuration.quarterLength
+        1.0
+        >>> ts.beatCount = [1,1,1,1,1,1]
+        >>> ts.beatCount
+        6
+        >>> ts.beatDuration.quarterLength
+        0.5
         ''')
 
     def _getBeatCountName(self):

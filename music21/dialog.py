@@ -57,8 +57,7 @@ def getResponseOrTimeout(prompt='provide a value', timeOutTime=16):
         #o.join() # wait until the thread terminates
 
     post = current.status
-    # pass timeout of 0 to kill
-    #current.join(timeout=0)
+    # this thread will remain active until the user provides values
 
     if post == None:
         print('got no value')
