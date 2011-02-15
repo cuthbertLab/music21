@@ -732,6 +732,170 @@ class MeterSequence(MeterTerminal):
     #---------------------------------------------------------------------------
     # load common meter templates into this sequence
 
+    def _divisionOptionsFractionsUpward(self, n, d, opts=None):
+        '''This simply gets restatements of the same fraction in smaller units, up to the largest valid denominator. 
+
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence()
+        >>> ms._divisionOptionsFractionsUpward(2, 4)
+        [['4/8'], ['8/16'], ['16/32'], ['32/64'], ['64/128']]
+        >>> ms._divisionOptionsFractionsUpward(3, 4)
+        [['6/8'], ['12/16'], ['24/32'], ['48/64'], ['96/128']]
+        '''
+        if opts is None:
+            opts = []
+        # equivalent fractions upward
+        if d < validDenominators[-1]:
+            nMod = n * 2
+            dMod = d * 2
+            while True:
+                if dMod > validDenominators[-1]:
+                    break
+                opts.append(['%s/%s' % (nMod, dMod)])    
+                dMod = dMod * 2
+                nMod = nMod * 2
+        return opts
+
+    def _divisionOptionsFractionsDownward(self, n, d, opts=None):
+        '''Get restatements of the saem fraction in larger units
+
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence()
+        >>> ms._divisionOptionsFractionsDownward(2, 4)
+        [['1/2']]
+        >>> ms._divisionOptionsFractionsDownward(6, 8)
+        [['3/4']]
+        '''
+        if opts is None:
+            opts = []
+        if d > validDenominators[0] and n % 2 == 0:
+            nMod = n / 2
+            dMod = d / 2
+            while True:
+                if dMod < validDenominators[0]:
+                    break
+                opts.append(['%s/%s' % (nMod, dMod)])    
+                if nMod % 2 != 0: # no longer even
+                    break
+                dMod = dMod / 2
+                nMod = nMod / 2
+        return opts
+
+    def _divisionOptionsAdditiveMultiplesDownward(self, n, d, opts=None):
+        '''
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence()
+        >>> ms._divisionOptionsAdditiveMultiplesDownward(1, 16)
+        [['1/32', '1/32'], ['1/64', '1/64', '1/64', '1/64'], ['1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128']]
+        '''
+        if opts is None:
+            opts = []
+        # this only takes n == 1
+        if d < validDenominators[-1] and n == 1:
+            i = 2
+            dMod = d * 2
+            while True:
+                if dMod > validDenominators[-1]:
+                    break
+                seq = []
+                for x in range(i):
+                    seq.append('%s/%s' % (n, dMod))    
+                opts.append(seq)
+                dMod = dMod * 2
+                i *= 2
+        return opts
+
+    def _divisionOptionsAdditiveMultiples(self, n, d, opts=None):
+        '''Additive multiples with the same denominators.
+
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence()
+        >>> ms._divisionOptionsAdditiveMultiples(4, 16)
+        [['2/16', '2/16']]
+        >>> ms._divisionOptionsAdditiveMultiples(6, 4)
+        [['3/4', '3/4']]
+        '''
+        if opts is None:
+            opts = []
+        if n > 3 and n % 2 == 0:
+            div = 2
+            i = div
+            nMod = n / div
+            while True:
+                if nMod <= 1:
+                    break
+                seq = []
+                for x in range(i):
+                    seq.append('%s/%s' % (nMod, d))  
+                if seq not in opts:  # may be cases defined elsewhere 
+                    opts.append(seq)
+                nMod = nMod / div
+                i *= div
+        return opts
+
+    def _divisionOptionsAdditiveMultiplesEvenDivision(self, n, d, opts=None):
+        '''
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence()
+        >>> ms._divisionOptionsAdditiveMultiplesEvenDivision(4, 16)
+        [['1/8', '1/8']]
+        >>> ms._divisionOptionsAdditiveMultiplesEvenDivision(4, 4)
+        [['1/2', '1/2']]
+        >>> ms._divisionOptionsAdditiveMultiplesEvenDivision(3, 4)
+        []
+        '''
+        if opts is None:
+            opts = []
+            # divided additive multiples
+        # if given 4/4, get 2/4+2/4 
+        if n % 2 == 0 and d / 2 >= 1:
+            nMod = n / 2
+            dMod = d / 2
+            while True:
+                if dMod < 1 or nMod <= 1:
+                    break
+                seq = []
+                for x in range(nMod):
+                    seq.append('%s/%s' % (1, dMod))    
+                opts.append(seq)
+                if nMod % 2 != 0: # if no longer even must stop
+                    break
+                dMod = dMod / 2
+                nMod = nMod / 2
+        return opts
+
+    def _divisionOptionsAdditiveMultiplesUpward(self, n, d, opts=None):
+        '''
+        >>> from music21 import *
+        >>> ms = meter.MeterSequence()
+        >>> ms._divisionOptionsAdditiveMultiplesUpward(4, 16)
+        [['1/16', '1/16', '1/16', '1/16'], ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], ['1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64']]
+        >>> ms._divisionOptionsAdditiveMultiplesUpward(3, 4)
+        [['1/4', '1/4', '1/4'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16']]
+        '''
+        if opts is None:
+            opts = []
+        if n > 1 and d >= 1:
+            dCurrent = d
+            nCount = n
+            if n > 16: # go up to n if greater than 16
+                nCountLimit = n
+            else:
+                nCountLimit = 16
+
+            while True:
+                # place practical limits on number of units to get
+                if dCurrent > validDenominators[-1] or nCount > nCountLimit:
+                    break
+                seq = []
+                for x in range(nCount):
+                    seq.append('%s/%s' % (1, dCurrent))    
+                opts.append(seq)
+                # double count, double denominator
+                dCurrent *= 2
+                nCount *= 2
+        return opts
+
     def _divisionOptionsAlgo(self, n, d):
         '''
         This is a primitive approach to algorithmic division production.
@@ -742,26 +906,25 @@ class MeterSequence(MeterTerminal):
         >>> from music21 import *
         >>> a = meter.MeterSequence()
         >>> a._divisionOptionsAlgo(4,4)
-        [['1/4', '1/4', '1/4', '1/4'], ['1/2', '1/2'], ['4/4'], ['2/4', '2/4'], ['2/2'], ['1/1'], ['8/8'], ['16/16'], ['32/32'], ['64/64'], ['128/128']]
+        [['1/4', '1/4', '1/4', '1/4'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['1/2', '1/2'], ['4/4'], ['2/4', '2/4'], ['2/2'], ['1/1'], ['8/8'], ['16/16'], ['32/32'], ['64/64'], ['128/128']]
 
         >>> a._divisionOptionsAlgo(1,4)
         [['1/4'], ['1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16'], ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], ['1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64'], ['1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128'], ['2/8'], ['4/16'], ['8/32'], ['16/64'], ['32/128']]
 
         >>> a._divisionOptionsAlgo(2,2)
-        [['1/2', '1/2'], ['2/2'], ['1/1'], ['4/4'], ['8/8'], ['16/16'], ['32/32'], ['64/64'], ['128/128']]
+        [['1/2', '1/2'], ['1/4', '1/4', '1/4', '1/4'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['2/2'], ['1/1'], ['4/4'], ['8/8'], ['16/16'], ['32/32'], ['64/64'], ['128/128']]
 
         >>> a._divisionOptionsAlgo(3,8)
-        [['1/8', '1/8', '1/8'], ['3/8'], ['6/16'], ['12/32'], ['24/64'], ['48/128']]
+        [['1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], ['3/8'], ['6/16'], ['12/32'], ['24/64'], ['48/128']]
 
         >>> a._divisionOptionsAlgo(6,8)
-        [['3/8', '3/8'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/4', '1/4', '1/4'], ['6/8'], ['3/4'], ['12/16'], ['24/32'], ['48/64'], ['96/128']]
+        [['3/8', '3/8'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['1/4', '1/4', '1/4'], ['6/8'], ['3/4'], ['12/16'], ['24/32'], ['48/64'], ['96/128']]
 
         >>> a._divisionOptionsAlgo(12,8)
         [['3/8', '3/8', '3/8', '3/8'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/4', '1/4', '1/4', '1/4', '1/4', '1/4'], ['1/2', '1/2', '1/2'], ['12/8'], ['6/8', '6/8'], ['6/4'], ['3/2'], ['24/16'], ['48/32'], ['96/64'], ['192/128']]
 
         >>> a._divisionOptionsAlgo(5,8)
-        [['2/8', '3/8'], ['3/8', '2/8'], ['1/8', '1/8', '1/8', '1/8', '1/8'], ['5/8'], ['10/16'], ['20/32'], ['40/64'], ['80/128']]
-
+        [['2/8', '3/8'], ['3/8', '2/8'], ['1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['5/8'], ['10/16'], ['20/32'], ['40/64'], ['80/128']]
 
         >>> a._divisionOptionsAlgo(18,4)
         [['3/4', '3/4', '3/4', '3/4', '3/4', '3/4'], ['1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4'], ['1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2'], ['18/4'], ['9/4', '9/4'], ['4/4', '4/4', '4/4', '4/4'], ['2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4'], ['9/2'], ['36/8'], ['72/16'], ['144/32'], ['288/64'], ['576/128']]
@@ -778,7 +941,6 @@ class MeterSequence(MeterTerminal):
             for x in range(n/3):
                 seq.append('%s/%s' % (3, d))
             opts.append(seq)
-
         # odd meters with common groupings
         if n == 5:
             for group in [[2,3], [3,2]]:
@@ -786,14 +948,12 @@ class MeterSequence(MeterTerminal):
                 for nMod in group:
                     seq.append('%s/%s' % (nMod, d))
                 opts.append(seq)
-
         if n == 7:
             for group in [[2,2,3], [3,2,2], [2,3,2]]:
                 seq = []
                 for nMod in group:
                     seq.append('%s/%s' % (nMod, d))
                 opts.append(seq)
-
         # not really necessary but an example of a possibility
         if n == 10:
             for group in [[2,2,3,3]]:
@@ -803,86 +963,23 @@ class MeterSequence(MeterTerminal):
                 opts.append(seq)
 
         # simple additive options uses the minimum numerator of 1
-        if n > 1 and d >= 1:
-            seq = []
-            for x in range(n):
-                seq.append('%s/%s' % (1, d))    
-            opts.append(seq)
-
+        # given 3/4, get 1/4 three times
+        self._divisionOptionsAdditiveMultiplesUpward(n, d, opts)
         # divided additive multiples
-        if n % 2 == 0 and d / 2 >= 1:
-            nMod = n / 2
-            dMod = d / 2
-            while True:
-                if dMod < 1 or nMod <= 1:
-                    break
-                seq = []
-                for x in range(nMod):
-                    seq.append('%s/%s' % (1, dMod))    
-                opts.append(seq)
-                if nMod % 2 != 0: # if no longer even must stop
-                    break
-                dMod = dMod / 2
-                nMod = nMod / 2
-
+        # if given 4/4, get 2/4+2/4 
+        self._divisionOptionsAdditiveMultiplesEvenDivision(n, d, opts)
         # add src representation
         opts.append(['%s/%s' % (n,d)])
-
         # additive multiples with the same denominators
-        # numerators must be even, do not take numerator to 1
-        if n > 3 and n % 2 == 0:
-            i = 2
-            nMod = n / 2
-            while True:
-                if nMod <= 1:
-                    break
-                seq = []
-                for x in range(i):
-                    seq.append('%s/%s' % (nMod, d))  
-                if seq not in opts:  # may be cases defined elsewhere 
-                    opts.append(seq)
-                nMod = nMod / 2
-                i *= 2
-
+        # add to opts in-place
+        self._divisionOptionsAdditiveMultiples(n, d, opts)
         # additive multiples with smaller denominators
         # only doing this for numerators of 1 for now
-        if d < validDenominators[-1] and n == 1:
-            i = 2
-            dMod = d * 2
-            while True:
-                if dMod > validDenominators[-1]:
-                    break
-                seq = []
-                for x in range(i):
-                    seq.append('%s/%s' % (n, dMod))    
-                opts.append(seq)
-                dMod = dMod * 2
-                i *= 2
-                  
+        self._divisionOptionsAdditiveMultiplesDownward(n, d, opts)                  
         # equivalent fractions downward
-        if d > validDenominators[0] and n % 2 == 0:
-            nMod = n / 2
-            dMod = d / 2
-            while True:
-                if dMod < validDenominators[0]:
-                    break
-                opts.append(['%s/%s' % (nMod, dMod)])    
-                if nMod % 2 != 0: # no longer even
-                    break
-                dMod = dMod / 2
-                nMod = nMod / 2
-
+        self._divisionOptionsFractionsDownward(n, d, opts)
         # equivalent fractions upward
-        if d < validDenominators[-1]:
-            nMod = n * 2
-            dMod = d * 2
-            while True:
-                if dMod > validDenominators[-1]:
-                    break
-                opts.append(['%s/%s' % (nMod, dMod)])    
-                dMod = dMod * 2
-                nMod = nMod * 2
-
+        self._divisionOptionsFractionsUpward(n, d, opts)
         return opts            
 
 
@@ -2400,6 +2497,11 @@ class TimeSignature(music21.Music21Object):
         >>> ts.beatCount = 123
         Traceback (most recent call last):
         TimeSignatureException: cannot partion beat with provided value: 123
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.beatCount = 6
+        >>> ts.beatDuration.quarterLength
+        0.5
         '''
         try:
             self.beatSequence.partition(value)
