@@ -239,7 +239,8 @@ class RomanNumeral(chord.Chord):
     frontSharp = re.compile('^(\#+)')
     romanNumerals = re.compile('(i?v?i*)', re.IGNORECASE)
     secondarySlash = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
-    omitNote = re.compile('\[no([1-9])\].*')
+    omitNotes = re.compile('\[no([1-9])no([1-9])\]')
+    omitNote = re.compile('\[no([1-9])\]')
     
     def __init__(self, figure=None, keyOrScale=None, caseMatters = True):
         chord.Chord.__init__(self)
@@ -328,10 +329,16 @@ class RomanNumeral(chord.Chord):
         else:
             figure = prelimFigure
 
-        omit = self.omitNote.search(figure)
+        omit = self.omitNotes.search(figure)
         if omit:
-            omit = int(omit.group(1))
-            figure = self.omitNote.sub('', figure)
+            omit = [int(omit.group(1)), int(omit.group(2))]
+            figure = self.omitNotes.sub('', figure)
+        else:
+            omit = self.omitNote.search(figure)
+            if omit:
+                omit = [int(omit.group(1))]
+                figure = self.omitNote.sub('', figure)
+            
         
         flatAlteration = 0
         sharpAlteration = 0
@@ -455,10 +462,12 @@ class RomanNumeral(chord.Chord):
         self.scaleOffset = transposeInterval
         
         if omit:
-            omittedPitch = self.getChordStep(omit)
+            omittedPitches = []
+            for thisCS in omit:
+                omittedPitches.append(self.getChordStep(thisCS).name)
             newPitches = []
             for thisPitch in pitches:
-                if omittedPitch != thisPitch:
+                if thisPitch.name not in omittedPitches:
                     newPitches.append(thisPitch)
             self.pitches = newPitches
             
@@ -661,6 +670,15 @@ class Test(unittest.TestCase):
         dminor = key.Key('d')
         rn = RomanNumeral('ii/o65', dminor)
         self.assertEqual(rn.pitches, chord.Chord(['G4','B-4','D5','E5']).pitches)
+        
+        rnOmit = RomanNumeral('V[no3]', dminor)
+        self.assertEqual(rnOmit.pitches, chord.Chord(['A4', 'E5']).pitches)
+        
+        rnOmit = RomanNumeral('V[no5]', dminor)
+        self.assertEqual(rnOmit.pitches, chord.Chord(['A4', 'C#5']).pitches)
+        
+        rnOmit = RomanNumeral('V[no3no5]', dminor)
+        self.assertEqual(rnOmit.pitches, chord.Chord(['A4']).pitches)
         
         
 #    def xtestFirst(self):                  
