@@ -72,6 +72,11 @@ def expandShortHand(shorthand):
     return ','.join(shGroupOut)
         
 
+
+class RomanNumeralException(Exception):
+    pass
+
+
 class RomanNumeral(chord.Chord):
     '''
     
@@ -257,7 +262,7 @@ class RomanNumeral(chord.Chord):
         if common.isStr(keyOrScale):
             keyOrScale = key.Key(keyOrScale)
             
-        self.scale = keyOrScale
+        self.scale = None # this is set when setKeyOrScale() is called
         self.impliedScale = None
         self.setKeyOrScale(keyOrScale)
 
@@ -287,10 +292,10 @@ class RomanNumeral(chord.Chord):
             self.impliedScale = True
         else:
             self.impliedScale = False        
-        # need to permit object creation with no arguments
+        # need to permit object creation with no arguments, thus
+        # self.figure can be None
         if self.figure is not None:
             self._parseFigure(self.figure)
-
         #environLocal.printDebug(['Roman.setKeyOrScale:', 'called w/ scale', self.scale, 'figure', self.figure, 'pitches', self.pitches])
 
 
@@ -470,7 +475,10 @@ class RomanNumeral(chord.Chord):
                 if thisPitch.name not in omittedPitches:
                     newPitches.append(thisPitch)
             self.pitches = newPitches
-            
+
+        if len(self.pitches) == 0:
+            raise RomanNumeralException('_parseFigure() was unable to derive pitches from the figure: %s' % self.prelimFigure)
+        
 
     def _fixAccidentals(self, shouldBe):
         '''

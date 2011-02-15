@@ -85,7 +85,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
 
 
 def _getKeyAndPrefix(rtKeyOrString):
-    '''Given an RTKey specification, return the Key and a string prefix. 
+    '''Given an RTKey specification, return the Key and a string prefix based on the tonic. 
     '''
     from music21 import key
     if common.isStr(rtKeyOrString):
@@ -123,10 +123,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     # ts indication are found in header, and also found elsewhere
     tsCurrent = meter.TimeSignature('4/4') # create default 4/4
     tsSet = False # store if set to a measure
-    ksSet = True  # set a keySignature
     lastMeasureNumber = 0
     previousRn = None
-    ksCurrent = None
+    keySigCurrent = None
+    keySigSet = True  # set a keySignature
     kCurrent, prefixLyric = _getKeyAndPrefix('C')
 
     for t in rtHandler.tokens:
@@ -141,19 +141,17 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             tsSet = False
             environLocal.printDebug(['tsCurrent:', tsCurrent])
         elif t.isKeySignature():
-            ksCurrent = key.KeySignature(t.keySignatureSharps())
-            ksSet = False
-            environLocal.printDebug(['ksCurrent:', ksCurrent])
+            keySigCurrent = key.KeySignature(t.keySignatureSharps())
+            keySigSet = False
+            environLocal.printDebug(['keySigCurrent:', keySigCurrent])
         elif t.isMeasure():
             #environLocal.printDebug(['handling measure token:', t])
-
             if t.variantNumber is not None:
                 environLocal.printDebug(['skipping variant: %s' % t])
                 continue
             if t.variantLetter is not None:
                 environLocal.printDebug(['skipping variant: %s' % t])
                 continue
-
             # if this measure number is more than 1 greater than the last
             # defined measure number, and the previous chord is not None, 
             # then fill with copies of the last-defined measure
@@ -199,22 +197,28 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 if not tsSet:
                     m.timeSignature = tsCurrent
                     tsSet = True # only set when changed
-                if not ksSet:
-                    m.insert(0, ksCurrent)
-                    ksSet = True # only set when changed
+                if not keySigSet:
+                    m.insert(0, keySigCurrent)
+                    keySigSet = True # only set when changed
     
                 o = 0.0 # start offsets at zero
                 previousChordInMeasure = None
                 pivotChordPossible = False
                 for i, a in enumerate(t.atoms):
                     if isinstance(a, romanTextModule.RTKey):
-                        environLocal.printDebug(['handling key token:', a])
-                        currentSharps = ksCurrent.sharps
-                        try:
+                        #environLocal.printDebug(['handling key token:', a])
+                        try: # this sets the key, not the keysignature
                             kCurrent, prefixLyric = _getKeyAndPrefix(a)
                         except:
                             raise TranslateRomanTextException('cannot get key from %s in line %s' % (a.src, t.src))
-                        kCurrent.sharps = currentSharps
+                        # if, within a measure, we find a definition of a key
+                        # need to update both the key sig current as well as
+                        # the Key object, kCurrent
+                        if keySigCurrent is not None:
+                            kCurrent.sharps = keySigCurrent.sharps
+                        else: pass
+                            # probably should do something here?
+                            # create a KeySignature based on Key
                         m.insert(o, kCurrent)
                     if isinstance(a, romanTextModule.RTBeat):
                         # set new offset based on beat
@@ -240,8 +244,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     if isinstance(a, romanTextModule.RTChord):
                         # use source to evaluation roman 
                         try:
-                            rn = roman.RomanNumeral(a.src, kCurrent)
-                        except:
+                            rn = roman.RomanNumeral(a.src, copy.deepcopy(kCurrent))
+                        except (roman.RomanNumeralException, 
+                            common.Music21CommonException): 
                             environLocal.printDebug('cannot create RN from: %s' % a.src)
                             rn = note.Note() # create placeholder 
                         if pivotChordPossible == False:
@@ -327,7 +332,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.metadata.composer, 'Heinrich Schutz')
         # this is defined as a Piece tag, but shows up here as a title, after
         # being set as an alternate title
-        self.assertEqual(s.metadata.title, 'Warum toben die Heiden, Psalmen Davids no. 2, SWV 23')
+        #self.assertEqual(s.metadata.title, 'Warum toben die Heiden, Psalmen Davids no. 2, SWV 23')
         
 
         s = romanTextStringToStreamScore(testFiles.riemenschneider001)
@@ -479,7 +484,7 @@ _DOC_ORDER = []
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(TestExternal)
+        music21.mainTest(Test)
     elif len(sys.argv) > 1:
         t = Test()
         # arg[1] is test to launch
