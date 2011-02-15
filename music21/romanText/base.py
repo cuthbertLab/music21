@@ -74,6 +74,9 @@ class RTToken(object):
     def isTitle(self):
         return False
 
+    def isPiece(self):
+        return False
+
     def isAnalyst(self):
         return False
 
@@ -150,6 +153,11 @@ class RTTagged(RTToken):
 
     def isTitle(self):
         if self.tag.lower() in ['title']:
+            return True
+        return False
+
+    def isPiece(self):
+        if self.tag.lower() in ['piece']:
             return True
         return False
 

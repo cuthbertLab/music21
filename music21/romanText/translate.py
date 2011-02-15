@@ -134,6 +134,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             md.title = t.data            
         elif t.isWork():
             md.alternativeTitle = t.data
+        elif t.isPiece():
+            md.alternativeTitle = t.data
         elif t.isComposer():
             md.composer = t.data
         elif t.isTimeSignature():
@@ -332,7 +334,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.metadata.composer, 'Heinrich Schutz')
         # this is defined as a Piece tag, but shows up here as a title, after
         # being set as an alternate title
-        #self.assertEqual(s.metadata.title, 'Warum toben die Heiden, Psalmen Davids no. 2, SWV 23')
+        self.assertEqual(s.metadata.title, 'Warum toben die Heiden, Psalmen Davids no. 2, SWV 23')
         
 
         s = romanTextStringToStreamScore(testFiles.riemenschneider001)
