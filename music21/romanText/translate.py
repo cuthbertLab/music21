@@ -97,8 +97,13 @@ def _getKeyAndPrefix(rtKeyOrString):
     return k, prefix
 
 def romanTextToStreamScore(rtHandler, inputM21=None):
-    '''Given a roman text handler, return or fill a Score Stream.
+    '''Given a roman text handler or string, return or fill a Score Stream.
     '''
+    # accept a string directly; mostly for testing
+    if common.isStr(rtHandler):
+        rtf = romanTextModule.RTFile()
+        rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
+
     # this could be just a Stream, but b/c we are creating metadata, perhaps better to match presentation of other scores. 
     from music21 import metadata
     from music21 import stream
@@ -128,6 +133,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     kCurrent, prefixLyric = _getKeyAndPrefix('C') # default if none defined
 
     for t in rtHandler.tokens:
+        #environLocal.printDebug(['token', t])
         if t.isTitle():
             md.title = t.data            
         elif t.isWork():
@@ -280,22 +286,30 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     s.insert(0,p)
     return s
 
-            
-def romanTextStringToStreamScore(rtString, inputM21=None):
-    '''Convenience routine for geting a score from string, not a handler
-    '''
-    # create an empty file obj to get handler from string
-    rtf = romanTextModule.RTFile()
-    rth = rtf.readstr(rtString) # return handler, processes tokens
-    s = romanTextToStreamScore(rth, inputM21=inputM21)
-    return s
-
 
 def romanTextToStreamOpus(rtHandler, inputM21=None):
     '''Return either a Score object, or, if a multi-movement work is defined, an Opus object. 
     '''
+    from music21 import stream
+    if common.isStr(rtHandler):
+        rtf = romanTextModule.RTFile()
+        rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
 
-    pass
+    if rtHandler.definesMovements(): # create an opus
+        if inputM21 == None:
+            s = stream.Opus()
+        else:
+            s = inputM21
+        # copy the common header to each of the sub-handlers
+        handlerBundles = rtHandler.splitByMovement(duplicateHeader=True)
+        # see if we have header information
+        for h in handlerBundles:
+            print h, len(h)
+            # append to opus
+            s.append(romanTextToStreamScore(h))
+        return s # an opus
+    else: # create a Score
+        return romanTextToStreamScore(rtHandler, inputM21=inputM21)
 
 
 #-------------------------------------------------------------------------------
@@ -331,32 +345,32 @@ class Test(unittest.TestCase):
             #s.show()
 
         
-        s = romanTextStringToStreamScore(testFiles.swv23)
+        s = romanTextToStreamScore(testFiles.swv23)
         self.assertEqual(s.metadata.composer, 'Heinrich Schutz')
         # this is defined as a Piece tag, but shows up here as a title, after
         # being set as an alternate title
         self.assertEqual(s.metadata.title, 'Warum toben die Heiden, Psalmen Davids no. 2, SWV 23')
         
 
-        s = romanTextStringToStreamScore(testFiles.riemenschneider001)
+        s = romanTextToStreamScore(testFiles.riemenschneider001)
         self.assertEqual(s.metadata.composer, 'J. S. Bach')
         self.assertEqual(s.metadata.title, 'Aus meines Herzens Grunde')
 
-        s = romanTextStringToStreamScore(testFiles.monteverdi_3_13)
+        s = romanTextToStreamScore(testFiles.monteverdi_3_13)
         self.assertEqual(s.metadata.composer, 'Claudio Monteverdi')
 
     def testBasicB(self):
         from music21 import romanText
         from music21.romanText import testFiles
 
-        s = romanTextStringToStreamScore(testFiles.riemenschneider001)
+        s = romanTextToStreamScore(testFiles.riemenschneider001)
         #s.show()
 
     def testMeasureCopyingA(self):
         from music21 import romanText
         from music21.romanText import testFiles
 
-        s = romanTextStringToStreamScore(testFiles.swv23)
+        s = romanTextToStreamScore(testFiles.swv23)
         mStream = s.parts[0].getElementsByClass('Measure')
         # the first four measures should all have the same content
         rn1 = mStream[1].getElementsByClass('RomanNumeral')[0]
@@ -378,7 +392,7 @@ class Test(unittest.TestCase):
 
 
         # test multiple measure copying
-        s = romanTextStringToStreamScore(testFiles.monteverdi_3_13)
+        s = romanTextToStreamScore(testFiles.monteverdi_3_13)
         mStream = s.parts[0].getElementsByClass('Measure')
         for m in mStream:
             if m.number == 41: #m49-51 = m41-43
@@ -478,6 +492,16 @@ m6-7 = m4-5
 
         #s.show()
         
+
+    def testOpus(self):
+        from music21 import stream
+        from music21 import romanText
+        from music21.romanText import testFiles
+
+        o = romanTextToStreamOpus(testFiles.mozartK279)
+
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

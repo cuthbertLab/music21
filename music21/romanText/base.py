@@ -665,8 +665,10 @@ class RTHandler(object):
         # divide here
         self._tokens = []
 
+
+
     def _splitAtHeader(self, lines):
-        '''Divide string into header and non-header.
+        '''Divide string into header and non-header; this is done before tokenization. 
 
         >>> from music21 import *
         >>> rth = romanText.RTHandler()
@@ -716,8 +718,6 @@ class RTHandler(object):
         >>> tokenList = rth._tokenizeAtoms('g: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i')
         >>> str(tokenList)
         "[<RTKey 'g:'>, <RTChord 'V'>, <RTBeat 'b2'>, <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, <RTChord 'i'>]"
-
-
         '''
         post = []
         # break by spaces
@@ -786,7 +786,9 @@ class RTHandler(object):
         self._tokens = []
         self.tokenize(src)
 
-    def definesMovements(self):
+
+
+    def definesMovements(self, countRequired=2):
         '''Return True if more than one movement is defined in a RT file.
 
         >>> from music21 import *
@@ -804,9 +806,81 @@ class RTHandler(object):
         for t in self._tokens:
             if t.isMovement():
                 count += 1
-                if count >= 2:
+                if count >= countRequired:
                     return True
         return False
+
+    def definesMovement(self):
+        '''If this handler has 1 or more movement
+
+        >>> from music21 import *
+        >>> rth = romanText.RTHandler()
+        >>> rth.process('Movement: 1 \\n \\n m1')
+        >>> rth.definesMovements()
+        False
+        >>> rth.definesMovement()
+        True
+        '''
+        return self.definesMovements(countRequired=1)
+
+    def splitByMovement(self, duplicateHeader=True):
+        '''If we have movements defined, return a list of RTHandler objects, representing header information and each movement, in order. 
+
+        >>> from music21 import *
+        >>> rth = romanText.RTHandler()
+        >>> rth.process('Title: Test \\n Movement: 1 \\n m1 \\n Movement: 2 \\n m1')
+        >>> post = rth.splitByMovement(False)
+        >>> len(post)
+        3
+        >>> len(post[0])
+        1
+        >>> post[0].__class__
+        <class 'music21.romanText.base.RTHandler'>
+        >>> len(post[1]), len(post[2])
+        (2, 2)
+
+        >>> post = rth.splitByMovement(duplicateHeader=True)
+        >>> len(post)
+        2
+        >>> len(post[0]), len(post[1])
+        (3, 3)
+        '''
+        post = []
+        sub = []
+        for t in self._tokens:
+            if t.isMovement():
+                # when finding a movement, we are ending a previous 
+                # and starting a new; this may just have metadata
+                rth = RTHandler()
+                rth.tokens = sub
+                post.append(rth) 
+                sub = []
+            sub.append(t)
+        if len(sub) > 0:
+            rth = RTHandler()
+            rth.tokens = sub
+            post.append(rth)
+
+        if duplicateHeader:
+            alt = []
+            # if no movement in this first handler, assume it is header info
+            if not post[0].definesMovement():
+                handlerHead = post[0]
+                iStart = 1
+            else:
+                handlerHead = None
+                iStart = 0
+            for h in post[iStart:]:
+                if handlerHead is not None:
+                    h = handlerHead + h # add metadata
+                alt.append(h)
+            # reassign
+            post = alt
+
+        return post
+
+
+
 
     #---------------------------------------------------------------------------
     # access tokens
@@ -824,6 +898,21 @@ class RTHandler(object):
     tokens = property(_getTokens, _setTokens,
         doc = '''Get or set tokens for this Handler
         ''')
+
+    def __len__(self):
+        return len(self._tokens)
+
+    def __add__(self, other):
+        '''Return a new handler adding the tokens in both
+
+        >>> from music21 import *
+        '''
+        rth = self.__class__() # will get the same class type
+        rth.tokens = self._tokens + other._tokens
+        return rth
+
+
+
 
 
 
