@@ -3078,10 +3078,8 @@ class Stream(music21.Music21Object):
         '''
         if srcObj == None:
             srcObj = self
-            
         # assume that flat/sorted options will be set before procesing
         offsetMap = [] # list of start, start+dur, element
-
         if srcObj.hasVoices():
             groups = []
             for i, v in enumerate(srcObj.voices):
@@ -3107,6 +3105,7 @@ class Stream(music21.Music21Object):
                 offsetDict['endTime'] = offset + dur
                 offsetDict['element'] = e
                 offsetDict['voiceIndex'] = voiceIndex
+                #environLocal.printDebug(['_getOffsetMap: offsetDict', offsetDict])
                 offsetMap.append(offsetDict)
                 #offsetMap.append((offset, offset + dur, e, voiceIndex))
                 #offsetMap.append([offset, offset + dur, copy.copy(e)])
@@ -3274,7 +3273,7 @@ class Stream(music21.Music21Object):
         # assume that flat/sorted options will be set before procesing
         # list of start, start+dur, element
         offsetMap = srcObj.offsetMap
-        #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
+        environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
         #offsetMap.sort() not necessary; just get min and max
         oMin = min([x['offset'] for x in offsetMap])
         oMax = max([x['endTime'] for x in offsetMap])
@@ -12611,31 +12610,13 @@ class Test(unittest.TestCase):
             environLocal.printDebug(['melisma beat:', beatStr.ljust(6), 'average duration:', avg])
 
 
-        # this approach looks for end conditions based on syllabic attributes
-        # and ties
-        
-        #         getNextEndTie = False
-        #         for n in ex.flat.notes:
-        #             if len(n.lyrics) > 0:
-        #                 if n.lyrics[0].syllabic == 'begin':
-        #                     nStart = n
-        #                 elif n.lyrics[0].syllabic == 'end':
-        #                     if n.tie is not None and n.tie.type != 'stop':
-        #                         getNextEndTie = True
-        #                     else:
-        #                         nEnd = n
-        # 
-        #             if getNextEndTie:
-        #                 if n.tie.type == 'stop':
-        #                     nEnd = n
-        #                     getNextEndTie = False
-        # 
-        #             if nStart is not None and nEnd is not None:
-        #                 # insert in top-most container
-        #                 ex.insert(spanner.Slur(nStart, nEnd))
-        #                 nStart = None
-        #                 nEnd = None
 
+    def testTwoZeroOffset(self):
+        from music21 import stream, note, instrument
+        p = stream.Part()
+        p.append(instrument.Voice())
+        p.append(note.Note("D#4"))
+        environLocal.printDebug([p.offsetMap])
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

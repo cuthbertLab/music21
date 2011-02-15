@@ -533,7 +533,7 @@ def toUnicode(usrStr):
     return usrStr
 
 
-def getNumFromStr(usrStr):
+def getNumFromStr(usrStr, numbers='0123456789'):
     '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
 
     >>> getNumFromStr('23a')
@@ -543,7 +543,6 @@ def getNumFromStr(usrStr):
     >>> getNumFromStr('')
     ('', '')
     '''
-    numbers = '0123456789'
     found = []
     remain = []
     for char in usrStr:

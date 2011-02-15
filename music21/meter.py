@@ -51,20 +51,28 @@ def slashToFraction(value):
     '''
     >>> from music21 import *
     >>> meter.slashToFraction('3/8')
-    (3, 8)
+    (3, 8, None)
     >>> meter.slashToFraction('7/32')
-    (7, 32)
-
-    OMIT_FROM_DOCS
-    TODO: it seems like this should return only integers; not sure
-    why these originally were floats.
+    (7, 32, None)
+    >>> meter.slashToFraction('slow 6/8')
+    (6, 8, 'slow')
     '''
-    value = value.strip() # rem whitespace
-    matches = re.match("(\d+)\/(\d+)", value)
+    tempoIndication = None
+    # split by numbers, include slash
+    valueNumbers, valueChars = common.getNumFromStr(value, 
+                            numbers='0123456789/')
+    valueNumbers = valueNumbers.strip() # remove whitespace
+    valueChars = valueChars.strip() # remove whitespace
+    if 'slow' in valueChars.lower():
+        tempoIndication = 'slow'
+    elif 'fast' in valueChars.lower():
+        tempoIndication = 'fast'
+
+    matches = re.match("(\d+)\/(\d+)", valueNumbers)
     if matches is not None:
         n = int(matches.group(1))
         d = int(matches.group(2))
-        return n,d
+        return n, d, tempoIndication
     else:
         environLocal.printDebug(['slashToFraction() cannot find two part fraction', value])
         return None
@@ -88,7 +96,8 @@ def slashCompoundToFraction(value):
         if m == None: 
             pass
         else:
-            post.append(m)
+            n, d, tempoIndication = m
+            post.append((n, d))
     return post
 
 
@@ -129,7 +138,8 @@ def slashMixedToFraction(valueSrc):
             fraction = slashToFraction(part)
             if fraction == None:
                 raise TimeSignatureException('cannot create time signature from:', valueSrc)
-            pre.append(list(fraction))
+            n, d, tempoIndication = fraction
+            pre.append([n, d])
         else: # its just a numerator
             pre.append([int(part), None])
     # when encountering a missing denominator, find the fist defined
@@ -298,7 +308,11 @@ class MeterTerminal(object):
         if slashNotation != None:
             # assign directly to values, not properties, to avoid
             # calling _ratioChanged more than necessary
-            self._numerator, self._denominator = slashToFraction(slashNotation)
+            values = slashToFraction(slashNotation)
+            if values is not None: # if failed to parse
+                n, d, tempoIndication = values
+            self._numerator = n
+            self._denominator = d
         self._ratioChanged() # sets self._duration
 
         # this will call _setWeight property for data checking
@@ -619,7 +633,6 @@ class MeterTerminal(object):
 class MeterSequence(MeterTerminal):
     '''A meter sequence is a list of MeterTerminals, or other MeterSequences
     '''
-
     def __init__(self, value=None, partitionRequest=None):
         MeterTerminal.__init__(self)
 
@@ -1264,7 +1277,6 @@ class MeterSequence(MeterTerminal):
         self._levelListCache = {}
         return post
 
-
     def subdivideNestedHierarchy(self, depth, firstPartitionForm=None, 
             normalizeDenominators=True):
         '''Create nested structure down to a specified depth; the first division is set to one; the second division may be by 2 or 3; remaining divisions are always by 2.
@@ -1398,11 +1410,7 @@ class MeterSequence(MeterTerminal):
         <MeterSequence {1/4+1/4+1/4+1/4+1/4+1/4}>
         >>> ms.partitionStr
         'Sextuple'
-
         ''')
-
-
-
 
     #---------------------------------------------------------------------------
     # loading is always destructive
@@ -2161,7 +2169,7 @@ class TimeSignature(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    def _setDefaultBeatPartitions(self):
+    def _setDefaultBeatPartitions(self, favorCompound=True):
         '''Set default beat partitions based on numerator and denominator.
 
         >>> from music21 import *
@@ -2173,18 +2181,22 @@ class TimeSignature(music21.Music21Object):
         # not 3+1/4; just 5/4
         if len(self.displaySequence) == 1:
             # create toplevel partitions
-            if self.numerator in [2, 6]: # duple meters
+            if self.numerator in [2]: # duple meters
+                self.beatSequence.partition(2)
+            elif self.numerator in [6] and favorCompound: # duple meters
                 self.beatSequence.partition(2)
             elif self.numerator in [3]: # triple meters
                 self.beatSequence.partition([1,1,1])
-            elif self.numerator in [9]: # triple meters
+            elif self.numerator in [9] and favorCompound: # triple meters
                 self.beatSequence.partition([3,3,3])
-            elif self.numerator in [4, 12]: # quadruple meters
+            elif self.numerator in [4]: # quadruple meters
                 self.beatSequence.partition(4)
-            elif self.numerator in [15]: # quintuple meters
+            elif self.numerator in [12] and favorCompound: 
+                self.beatSequence.partition(4)
+            elif self.numerator in [15] and favorCompound: # quintuple meters
                 self.beatSequence.partition([3,3,3,3,3])
             # skip 6 numerators; covered above
-            elif self.numerator in [18]: # sextuple meters
+            elif self.numerator in [18] and favorCompound: # sextuple meters
                 self.beatSequence.partition([3,3,3,3,3,3])
             else: # case of odd meters: 5, 7
                 self.beatSequence.partition(self.numerator)
@@ -2197,21 +2209,9 @@ class TimeSignature(music21.Music21Object):
         if len(self.beatSequence) > 1: # if partitioned
             self.beatSequence.subdividePartitionsEqual()
 
-
-                    
     def _setDefaultBeamPartitions(self):
         '''This sets default beam partitions when partitionRequest is None.
         '''
-#         tsStr = '%s/%s' % (self.numerator, self.denominator)
-#         firstPartitionForm = len(self.displaySequence)
-#         cacheKey = None #(tsStr, firstPartitionForm)
-# 
-#         try:
-#             self.beamSequence = copy.deepcopy(
-#                                 _meterSequenceBeamArchetypes[cacheKey])
-#             #environLocal.printDebug(['using stored beam archetype:'])
-#         except KeyError:
-
         # more general, based only on numerator
         if self.numerator in [2, 3, 4]:
             self.beamSequence.partition(self.numerator)
@@ -2219,7 +2219,6 @@ class TimeSignature(music21.Music21Object):
             if self.denominator in [4]:
                 for i in range(len(self.beamSequence)): # subdivide  each beat in 2
                     self.beamSequence[i] = self.beamSequence[i].subdivide(2)
-
         elif self.numerator == 5:
             default = [2,3]
             self.beamSequence.partition(default)
@@ -2324,6 +2323,13 @@ class TimeSignature(music21.Music21Object):
         self.displaySequence = MeterSequence(value)
         self.summedNumerator = self.displaySequence.summedNumerator
 
+        # get simple representation; presently, only slashToFraction
+        # supports the fast/slow indication
+        if common.isStr(value):
+            n, d, tempoIndication = slashToFraction(value)
+        else:       
+            tempoIndication = None
+
         # used for beaming
         self.beamSequence = MeterSequence(value, partitionRequest)
         # used for getting beat divisions
@@ -2332,8 +2338,19 @@ class TimeSignature(music21.Music21Object):
         self.accentSequence = MeterSequence(value, partitionRequest)
 
         if partitionRequest == None: # set default beam partitions
+            # beam is not adjust by tempo indication
             self._setDefaultBeamPartitions()
-            self._setDefaultBeatPartitions()
+
+            if tempoIndication is None:
+                self._setDefaultBeatPartitions()
+            else: # use beatCount property, as this also creates subdivisions
+                if tempoIndication == 'slow':
+                    self._setDefaultBeatPartitions(favorCompound=False)
+                elif tempoIndication == 'fast':
+                    self._setDefaultBeatPartitions(favorCompound=True)
+                else:
+                    raise TimeSignatureException('got an unknown tempo indication: %s' % tempoIndication)
+
             # for some summed meters default accent weights are difficult
             # to obtain
             try:
@@ -3859,6 +3876,21 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['1', '2', '3', '4', '5', '6'])
         m.makeBeams()
         #m.show()
+
+        # try with extra creation args
+        ts = meter.TimeSignature('slow 6/8')
+        self.assertEqual(ts.beatDivisionCountName, 'Simple')
+        self.assertEqual(str(ts.beatSequence), '{{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}}')
+
+        ts = meter.TimeSignature('6/8')
+        self.assertEqual(ts.beatDivisionCountName, 'Compound')
+        self.assertEqual(str(ts.beatSequence), '{{1/8+1/8+1/8}+{1/8+1/8+1/8}}')
+
+        ts = meter.TimeSignature('6/8 fast')
+        self.assertEqual(ts.beatDivisionCountName, 'Compound')
+        self.assertEqual(str(ts.beatSequence), '{{1/8+1/8+1/8}+{1/8+1/8+1/8}}')
+
+                
 
 
 #-------------------------------------------------------------------------------
