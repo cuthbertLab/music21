@@ -183,9 +183,9 @@ class RTTagged(RTToken):
 
     def isKeySignature(self):
         '''
-        KeySignatures are represented like "Key Signature: Bb" meaning one flat
+        KeySignatures are a type of tagged data found outside of measures, such as"Key Signature: Bb," meaning one flat.
         
-        So far that's the only one that exists
+        Note: this is not the same as a key definition found inside of a Measure: these are represented by RTKey objects, defined below, and are not RTTagged objects, but RTAtom subclasses. 
         '''
         if self.tag.lower() in ['keysignature', 'key signature']:
             return True
@@ -230,6 +230,13 @@ class RTTagged(RTToken):
             return True
         else:
             return False
+
+    def isMovement(self):
+        if self.tag.lower() in ['movement']:
+            return True
+        return False
+
+
 
 class RTMeasure(RTToken):
     '''In roman text, measures are given one per line and always start with 'm'.
@@ -667,7 +674,7 @@ class RTHandler(object):
         (['Title: s', 'Time Signature:', ''], ['m1 g: i'])
 
         '''
-        # iterate over lines and fine the first measure definition
+        # iterate over lines and find the first measure definition
         for i, l in enumerate(lines):
             if reMeasureTag.match(l.strip()) is not None:
                 # found a measure definition
@@ -761,8 +768,6 @@ class RTHandler(object):
         return post
 
 
-
-
     def tokenize(self, src):
         '''
         Walk the RT string, creating RT objects along the way.
@@ -781,7 +786,27 @@ class RTHandler(object):
         self._tokens = []
         self.tokenize(src)
 
+    def definesMovements(self):
+        '''Return True if more than one movement is defined in a RT file.
 
+        >>> from music21 import *
+        >>> rth = romanText.RTHandler()
+        >>> rth.process('Movement: 1 \\n Movement: 2 \\n \\n m1')
+        >>> rth.definesMovements()
+        True
+        >>> rth.process('Movement: 1 \\n m1')
+        >>> rth.definesMovements()
+        False
+        '''
+        if len(self._tokens) == 0:
+            raise RTHandlerException('must create tokens first')
+        count = 0
+        for t in self._tokens:
+            if t.isMovement():
+                count += 1
+                if count >= 2:
+                    return True
+        return False
 
     #---------------------------------------------------------------------------
     # access tokens
@@ -971,7 +996,36 @@ class Test(unittest.TestCase):
 
 
 
+    def testTokenDefinition(self):
+        # test that we are always getting the right number of tokens
 
+        from music21.romanText import testFiles
+        rth = RTHandler()
+        rth.process(testFiles.mozartK279)
+
+        count = 0
+        for t in rth._tokens:
+            if t.isMovement():
+                count += 1
+        self.assertEqual(count, 3)
+
+
+        rth.process(testFiles.riemenschneider001)
+        count = 0
+        for t in rth._tokens:
+            if t.isMeasure():
+                #print t.src
+                count += 1
+        # 21, 2 variants, and one pickup
+        self.assertEqual(count, 21+3)
+
+        count = 0
+        for t in rth._tokens:
+            if t.isMeasure():
+                for a in t.atoms:
+                    if isinstance(a, RTKey):
+                        count += 1
+        self.assertEqual(count, 1)
 
 
 
@@ -989,7 +1043,6 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         t = Test()
-        te = TestExternal()
         # arg[1] is test to launch
         if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 

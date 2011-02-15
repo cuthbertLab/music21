@@ -100,7 +100,6 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     '''Given a roman text handler, return or fill a Score Stream.
     '''
     # this could be just a Stream, but b/c we are creating metadata, perhaps better to match presentation of other scores. 
-
     from music21 import metadata
     from music21 import stream
     from music21 import note
@@ -108,7 +107,6 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     from music21 import key
     from music21 import roman
     from music21 import tie
-
 
     if inputM21 == None:
         s = stream.Score()
@@ -127,7 +125,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     previousRn = None
     keySigCurrent = None
     keySigSet = True  # set a keySignature
-    kCurrent, prefixLyric = _getKeyAndPrefix('C')
+    kCurrent, prefixLyric = _getKeyAndPrefix('C') # default if none defined
 
     for t in rtHandler.tokens:
         if t.isTitle():
@@ -143,7 +141,6 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             tsSet = False
             environLocal.printDebug(['tsCurrent:', tsCurrent])
         elif t.isKeySignature():
-            #keySigCurrent = key.KeySignature(t.keySignatureSharps())
             keySigCurrent = t.getKeySignature()
             keySigSet = False
             environLocal.printDebug(['keySigCurrent:', keySigCurrent])
