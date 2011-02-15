@@ -611,7 +611,11 @@ class ConverterRomanText(object):
         '''
         rtf = romanTextModule.RTFile()
         rtHandler = rtf.readstr(strData) 
-        romanTextTranslate.romanTextToStreamScore(rtHandler, self._stream)
+        if rtHandler.definesMovements():
+            # this re-defines Score as an Opus
+            self._stream = romanTextTranslate.romanTextToStreamOpus(rtHandler)
+        else:
+            romanTextTranslate.romanTextToStreamScore(rtHandler, self._stream)
 
     def parseFile(self, fp, number=None):
         '''

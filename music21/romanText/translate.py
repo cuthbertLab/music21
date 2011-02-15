@@ -142,6 +142,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             md.alternativeTitle = t.data
         elif t.isComposer():
             md.composer = t.data
+        elif t.isMovement():
+            md.movementNumber = t.data
+
         elif t.isTimeSignature():
             tsCurrent = meter.TimeSignature(t.data)
             tsSet = False
@@ -499,9 +502,24 @@ m6-7 = m4-5
         from music21.romanText import testFiles
 
         o = romanTextToStreamOpus(testFiles.mozartK279)
+        self.assertEqual(o.scores[0].metadata.movementNumber, '1')
+        self.assertEqual(o.scores[0].metadata.composer, 'Mozart')
+        self.assertEqual(o.scores[1].metadata.movementNumber, '2')
+        self.assertEqual(o.scores[1].metadata.composer, 'Mozart')
+        self.assertEqual(o.scores[2].metadata.movementNumber, '3')
+        self.assertEqual(o.scores[2].metadata.composer, 'Mozart')
 
 
+        # test using converter.
+        from music21 import converter
+        s = converter.parse(testFiles.mozartK279)
+        self.assertEqual('Opus' in s.classes, True)
+        self.assertEqual(len(s.scores), 3)
 
+        # make sure a normal file is still a Score
+        s = converter.parse(testFiles.riemenschneider001)
+        self.assertEqual('Score' in s.classes, True)
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
