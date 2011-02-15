@@ -345,12 +345,305 @@ m138 V
 m139 I
 """
 
+mozartK279 = """Composer: Mozart
+Piece: K279
+Analyst: Dmitri Tymoczko
+Proofreader: David Castro
+Note: please email corrections to dmitri@princeton.edu
+
+Movement: 1
+Tempo: Allegro
+Time Signature: 4/4
+
+Form: exposition
+m1 C: I
+m2 ii6 b3.5 I6 b4 ii6 b4.5 V
+m2var1 ii6 b2 V2 b3.5 I6 b4 ii6 b4.5 V
+m3-4 = m1-2
+m5 I b3 V6
+m6 b3 I
+m7 b2 V7/IV b3 IV6/4
+m8 b3 I
+m9 I6 b3 IV
+m10 b1.5 I6/4 b2 V7 b3 viio7/vi b4 vi ||
+m11 = m9
+m12 b1.5 I6/4 b2 V7 b3 I b4 V7/IV
+m13 b1.5 IV6/4 b2.5 viio6 b3 I b4 V7/IV
+m14 b1.5 IV6/4 b2.5 viio6 b3 I6 b3.5 I6/4 b4 V7
+m15 I6/4 b2 V7 b3 I6 b4.5 ii6
+m16 I6/4 b1.5 V ||
+Form: second theme
+m17 G: V7/ii
+m18 ii
+m19 V7
+m20 I b2 I6 b3 IV
+m21 I6 b2 I b3 IV
+m22 I6 b2.5 V6/5/ii b3 ii b4.5 V6/5
+m23 I b2.5 IV6 b3 ii6 b4.5 V6/5/V
+m24 V b2.5 V6/5/ii b3 V7/V b4.5 V6/5
+m25 I b2.5 IV6 b3 ii6/5 b4 I6/4
+m26 IV6 b2 I6/4 b3 ii6/5 b4 I6/4
+m27 IV6 b2 I6 b3 ii6
+m30 I6/4 b3 V7
+m31 I b3 V6
+m32 I b3 ii6 b4 V7
+m33 I b3 V6/5
+m34 I b3 ii6 b4 V7
+m35 I
+m36 ii b3 V7
+m37 I
+Form: development
+m39 g: i
+m40 V2/V d: V2
+m41 i6 C: ii6
+m42 V2
+m43 I6
+m44 a: N6
+m45 V7 b3 i g: ii
+m46 V7 b3 i F: ii
+m47 V7 b3 I
+m48 C: IV b3 I6
+m49 V4/3 b3 I
+m50 b3 V6
+m51 V4/3/V b3 V
+m52 V7 b3 I6/4
+m53 b3 V
+m54 V7 b3 I6/4
+m55 I6/4 b3 V b4 I6/4
+m56 V b2 I b3 V7
+Form: recapitulation
+m58-61 = m1-4
+m62 I b3 V2/IV
+m63 b3 IV6
+m64 b3 viio4/3/ii
+m65 b3 viio4/3
+m66 I6 b2 i6 b3 V7/V b4 V6/5
+m67 I b2 viio7/V b3 V7
+m68 I6/4 b2.5 viio6/V b3 V7
+m69 I6/4 b2.5 viio6/V b3 V
+Form: second theme
+m70 b3 V7/ii
+m72 ii
+m73 V7
+m74 b3 I
+m75 IV6/4 b3 I
+m76 IV6/4 b3 I b4.5 V6/5/ii
+m77 ii b2.5 V6/5 b3 I b4.5 IV6
+m78 ii6 b2.5 V6/5/V b3 V b4 I6
+m79 IV b3 I6 b4 I
+m80 IV b3 I6 b4.5 V6/5/ii
+m81 V7/V b2.5 V6/5 b3 I b4.5 IV6
+m82 ii6 b3 iii6
+m83 IV6 b3 V6
+m84 V2 b3 I6 b4 V7
+m85 I6/4 b2 V7 b3 I6 b4.5 ii6
+m86 I6/4 b1.5 V || b3 ii6/5 b4 I6/4
+m87 IV6 b2 I6/4 b3 ii6/5 b4 I6/4
+m88 IV6 b2 I6/4 b3 ii6
+m91 I6/4 b3 V7
+m92 I b3 V6
+m93 I b3 ii6 b4 V7
+m94 I b3 V6
+m95 I b3 ii6 b4 V7
+m96 I
+m97 ii b3 V7
+m98 I
+
+Movement: 2
+Tempo: Andante
+Time Signature: 3/4
+
+Form: exposition
+m1 F: I b2 V4/3 b3 I
+m2 V6/5 b2 V7 b3 I
+m3 ii6 b2 I6/4 b3 V7 
+m4 IV6 b2 V6/5 b3 I
+m5 ii6 b2 I6/4 b3 V7
+m6 I
+m7 V
+m8 I b2 V6/5/IV
+m9 IV b3 V6/5/V
+m10 V C: I
+Form: second theme
+m11 V4/3
+m12 I6
+m13 V6/5
+m14 I
+m15 V6/5/V b2 V b3.5 V2
+m16 I6 b1.5 IV b2 I6/4 b3 V7
+m17 I6
+m18 viio7/V b2 V b3 vii/o7
+m19 I b2 viio7/vi b3 vi
+m20 ii6 b2 I6/4 b3 V7
+m21 I b2 viio6 b3 I6
+m22 ii6
+m23 viio7/V
+m24 I6/4
+m25 V6/5 b2 I6/4 b3 V
+m26 I b3 V7
+m27 I b3 V7
+m28 I
+Form: development
+m30 V6 d: IV6
+m31 iv6
+m32 i6/4 b2 V
+m33 viio4/3 b2 i6 b3 i
+m34 iio6 b2 i6/4 b3 V
+m35 viio6/4 b2 i6 b3 i
+m36 = m34
+m37 viio6/5/iv
+m38 iv6 F: ii6
+m41 I6/4 b2 V7
+Form: recapitulation
+m43-45 = m1-3
+m46 viio2 b2 V7 b3 viio2
+m47 V7 b2 viio7/vi b3 vi
+m48 V6/5/V
+m49 V4/3/V
+m49var1 viio6/V
+m50 V
+Form: second theme
+m51 V4/3
+m52 I6
+m53 V6/5 
+m54 I
+m55 V6/5/V b2 V b3.5 V2
+m56 I6 b1.5 IV b2 I6/4 b3 V7
+m57 I6
+m58-61 = m18-21
+m62-63 = m20-21
+m64 ii6/5
+m65 V6/5/V
+m66 I6/4
+m67 V6/5/V b2 V7
+m68 I
+m69 V
+m70 I b2 V6/5/IV
+m71 IV b2 I6/4 b3 V7
+m72 I b3 V7
+m73 = m72
+m74 I
+
+Movement: 3
+Tempo: Allegro
+Time Signature: 2/4
+
+Form: exposition
+m1 C: I
+m2 V7
+m3 I b2 ii6 b2.5 V6/5/V
+m4 V
+m5-6 = m1-2
+m7 I b2 V6/5
+m8 = m7
+m9 I b1.5 I6 b2 ii6 b2.5 V
+m10 I
+m11 I
+m12 V6 G: I6
+m14 viio6
+m15 V7
+m16 IV6 b2 iii6
+m17 ii6 b2.5 V6/5/V
+m18 V b2 V2 b2.5 I6
+m19 V6/4 b1.5 I b2 V6/5 b2.5 I
+m20-21 = m18-19
+m22 V
+Form: second theme
+m24 vi b2 viio6/V b2.5 V
+m25 iii
+m26 IV b2 ii6 b2.5 iii
+m27 I
+m28 ii b2 viio6 b2.5 I
+m29 IV b2 viio/V
+m30 V b2 i6/4
+m31 V b2 i6/4
+m32 V
+m33 I
+m34 IV6 b2 iii6 b2.5 ii6
+m35 I6 b1.5 viio6 b2 vi6 b2.5 V6
+m36 IV6 b1.5 iii6 b2 ii6 b2.5 I6
+m37 ii6 b2 I6/4 b2.5 V
+m38 I b2 IV6
+m39 I6/4 b2 V2
+m40 I6 b2 IV6
+m41-42 = m39-40
+m43 = m39
+m44 I6 b2 ii6
+m45 I6/4 b2 V7
+m46 I
+m47 viio6/V b2 viio b2.5 I
+m48 ii6
+m49 I6/4 b2 V
+m50 I
+m51-53 = m47-49
+m54 I b2 V7
+m55 = m54
+m56 I
+Form: development
+m58 b2 vii/o7/V b2.5 V
+m59 iii e: v
+m60 i6 b2 viio7/V b2.5 v
+m61 C: V6/5 b2 I
+m62 vi a: i b2.5 V
+m64 i b2 viio4/3/V b2.5 v6
+m65 F: V
+m66 I b2 vii/o4/3/V b2.5 V6
+m67 iii d: v
+m68 i b2 viio4/3/V b2.5 v6
+m69 a: Ger6/5
+m70 V
+m71 Ger6/5
+m72 V b1.5 i b2 V6 b2.5 i6/4
+m73 V b1.5 i6/4 b2 V b2.5 i6/4
+m74 V b1.5 i6/4 b2 V b2.5 i6/4
+m75 V
+m77 e: i
+m78 V7
+m79 i b1.5 d: ii/o7
+m80 V2
+m81 i6 b2.5 i
+m82 V7
+m83 i C: ii
+m84 V2
+m85 I6 b2.5 I
+m86 V7
+Form: recapitulation
+m87-90 = m1-4
+m91 I
+m92 V2
+m93 I6 b2 V2
+m94 I6 b2 V6/5
+m95 = m9
+m96 I
+m97 V7/IV
+m98 IV6/4
+m100 I
+m101 I6
+m102 ii6
+m103 b2.5 V6/5/V
+m104-131 = m18-45
+m132 I b2 i6/4
+m133 V b2 i6/4
+Form: second theme
+m134 V
+m137 viio/V b2.5 V
+m138 viio[b3]/iii b2.5 iii
+m139 viio b2.5 I6/4
+m141 vi6 b2 viio6/V b2.5 V6
+m142 iii
+m143 viio4/3/iii b2.5 iii6
+m144 I
+m145 ii6 b2 viio6/4 b2.5 I6
+m146 ii6 b2 I6/4 b2.5 V
+m147-156 = m46-55
+m157 I b2 V7
+m158 I
+"""
 
 
 
 
-
-ALL  = [monteverdi_3_13, riemenschneider001, swv23]
+ALL  = [monteverdi_3_13, riemenschneider001, swv23, mozartK279]
 
 
 

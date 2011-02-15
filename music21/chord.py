@@ -1518,11 +1518,13 @@ class Chord(note.NotRest):
         '''
         third = self.semitonesFromChordStep(3)
         fifth = self.semitonesFromChordStep(5)
-        if third == None:
+        #environLocal.printDebug(['third, fifth', third, fifth])
+        if third is None:
             return "other"        
         elif self.hasRepeatedChordStep(3):
+            #environLocal.printDebug('self.hasRepeatedChordStep(3)', self.hasRepeatedChordStep(3))
             return "other"
-        elif fifth == None:
+        elif fifth is False:
             if third == 4:
                 return "major"
             elif third == 3:
@@ -2905,7 +2907,10 @@ class Test(unittest.TestCase):
             s.append(c)
         #s.show()
 
-
+    def testChordQuality(self):
+        from music21 import chord
+        c1 = chord.Chord(['c','e-'])
+        self.assertEqual(c1.quality, 'minor')
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
