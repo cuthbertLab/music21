@@ -725,7 +725,7 @@ class Stream(music21.Music21Object):
         return new
 
     #---------------------------------------------------------------------------
-    def _addElementPreProcess(self, element):
+    def _addElementPreProcess(self, element, checkRedundancy=True):
         '''Before adding an element, this method provides important checks to that element.
 
         Used by both insert() and append()
@@ -733,6 +733,17 @@ class Stream(music21.Music21Object):
         # using id() here b/c we do not want to get __eq__ comparisons
         if element is self: # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
+
+        if checkRedundancy:
+            # TODO: might optimize this by storing a list of all obj ids with every insertion and deletion 
+            idElement = id(element)
+            for e in self._elements:
+                if idElement == id(e):
+                    raise StreamException('the object (%s) is already found in this Stream (%s)' % (element, self))
+            for e in self._endElements:
+                if idElement == id(e):
+                    raise StreamException('the object (%s) is already found in this Stream (%s)' % (element, self))
+            
         # if we do not purge locations here, we may have ids() for 
         # Stream that no longer exist stored in the locations entry
         # note that dead locations are also purged from DefinedContexts during
@@ -3086,9 +3097,7 @@ class Stream(music21.Music21Object):
                 groups.append((v.flat, i))
         else: # create a single collection
             groups = [(srcObj, None)]
-
-        environLocal.printDebug(['_getOffsetMap', groups])
-
+        #environLocal.printDebug(['_getOffsetMap', groups])
         for group, voiceIndex in groups:
             for e in group:
                 # do not include barlines
@@ -3257,8 +3266,6 @@ class Stream(music21.Music21Object):
             meterStream.insert(0, ts)
 
         environLocal.printDebug(['Stream.makeMeasures(): srcObj.activeSite', srcObj.activeSite])
-
-
         #environLocal.printDebug(['makeMeasures(): meterStream', 'meterStream[0]', meterStream[0], 'meterStream[0].offset',  meterStream[0].offset, 'meterStream.elements[0].activeSite', meterStream.elements[0].activeSite])
 
         # get a clef for the entire stream; this will use bestClef
@@ -3275,7 +3282,7 @@ class Stream(music21.Music21Object):
         # assume that flat/sorted options will be set before procesing
         # list of start, start+dur, element
         offsetMap = srcObj.offsetMap
-        environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
+        #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
         #offsetMap.sort() not necessary; just get min and max
         oMin = min([x['offset'] for x in offsetMap])
         oMax = max([x['endTime'] for x in offsetMap])
@@ -12616,7 +12623,7 @@ class Test(unittest.TestCase):
     def testTwoZeroOffset(self):
         from music21 import stream, note, instrument
         p = stream.Part()
-        p.append(instrument.Voice())
+        #p.append(instrument.Voice())
         p.append(note.Note("D#4"))
         environLocal.printDebug([p.offsetMap])
 

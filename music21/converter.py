@@ -1554,6 +1554,16 @@ class Test(unittest.TestCase):
         cmd = ConverterMuseData()
         cmd.parseFile(fp)
 
+
+
+    def testMadrigalsA(self):
+
+        from music21 import corpus, converter
+        s = corpus.parseWork('madrigal.3.12.xml')
+
+        #s.show()
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, Converter, ConverterMusicXML, ConverterHumdrum]
@@ -1568,17 +1578,8 @@ if __name__ == "__main__":
 
     elif len(sys.argv) > 1:
         t = Test()
-        #t.testConversionMXLayout()
-        #t.testConversionMXTies()
-        #t.testConversionMXInstrument()
-        #t.testConversionMXRepeats()
-
-        #t.testConversionABCOpus()
-        #t.testConversionMusedata()
-
-        #t.testMixedArchiveHandling()
-
-        t.testConversionABCWorkFromOpus()
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
 
 #------------------------------------------------------------------------------
