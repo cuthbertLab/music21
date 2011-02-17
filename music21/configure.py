@@ -78,12 +78,24 @@ class NoInput(DialogError):
 
 
 
+
+
+#-------------------------------------------------------------------------------
+class DialogException(Exception):
+    pass
+
 #-------------------------------------------------------------------------------
 class Dialog(object):
     '''
     Model a dialog as a question and response. Have different subclases for different types of questions. Store all in a Conversation, or multiple dialog passes.
+
+    A `default`, if provided, is returned if the users provides no input and just enters return. 
+
+    The `tryAgain` option determines if, if a user provides incomplete or no response, and there is no default (for no response), whether the user is given another chance to provide valid input. 
+
+    The `promptHeader` is a string header that is placed in front of any common header for this dialog.
     '''
-    def __init__(self, default=None):
+    def __init__(self, default=None, tryAgain=True, promptHeader=None):
         # store the result obtained from the user
         self._result = None
         # store a previously entered value, permitting undoing an action
@@ -97,6 +109,10 @@ class Dialog(object):
         else:
             # default is None by default; this cannot be a default value then
             self._default = None
+        # if we try again
+        self._tryAgain = tryAgain
+        self._promptHeader = promptHeader
+
 
     def _writeToUser(self, msg):
         sys.stdout.write(msg)
@@ -104,25 +120,87 @@ class Dialog(object):
     def _readFromUser(self):
         '''Collect from user; return None if an empty response.
         '''
-        post = None
         try:
             post = raw_input()
+            return post
         except KeyboardInterrupt:
             return KeyInterruptError()
         except:
             return DialogError()
         return NoInput()
 
-    def _incompleteInput(self, default=None):
+    def _askTryAgain(self, default=True, force=None):
         '''What to do if input is incomplete
+
+        >>> from music21 import *
+        >>> d = configure.YesOrNo(default=True)
+        >>> d._askTryAgain(force='yes')
+        True
+        >>> d._askTryAgain(force='n')
+        False
+        >>> d._askTryAgain(force='') # gets default
+        True
+        >>> d._askTryAgain(force='weree') # error gets false
+        False
         '''
         # need to call a yes or no on using default
-        return True
+        d = YesOrNo(default=default, tryAgain=False, 
+            promptHeader='Your input was not understood. Try Again?')
+        d.askUser(force=force)
+        post = d.getResult()
+        # if any errors are found, return False
+        if isinstance(post, DialogError):
+            return False
+        else:
+            return post
+
+    def _rawQueryPrepareHeader(self, msg=''):
+        '''Prepare the header, given a string.
+
+        >>> from music21 import configure
+        >>> d = configure.Dialog()
+        >>> d._rawQueryPrepareHeader('test')
+        'test'
+        >>> d = configure.Dialog(promptHeader='what are you doing?')
+        >>> d._rawQueryPrepareHeader('test')
+        'what are you doing? test'
+        '''
+        if self._promptHeader is not None:
+            header = self._promptHeader.strip()
+            if header.endswith('?'):
+                div = ''
+            else:
+                div = ':'
+            msg = '%s%s %s' % (header, div, msg)
+        return msg
+
+    def _rawQueryPrepareFooter(self, msg=''):
+        '''Prepare the end of the query message
+        '''
+        if self._default is not None:
+            msg = msg.strip()
+            if msg.endswith(':'):
+                div = ':'
+                msg = msg[:-1]
+                msg.strip()
+            else:   
+                div = ''
+            default = self._formatResultForUser(self._default)
+            # leave a space at end
+            msg = '%s (default: %s)%s ' % (msg, default, div)
+        return msg
+
 
     def _rawQuery(self):
         '''Return a multiline presentation of the question.
         '''
         pass
+
+    def _formatResultForUser(self, result):
+        '''For various result options, we may need to at times convert the internal representation of the result into something else. For example, we might present the user with 'Yes' or 'No' but store the result as True or False.
+        '''
+        # override in subclass
+        return resut
 
     def _parseUserInput(self, raw):
         '''Translate string to desired output. Pass None through (as no input), convert '' to None, and pass all other outputs as IncompleteInput objects. 
@@ -151,20 +229,26 @@ class Dialog(object):
             if isinstance(rawInput, KeyboardInterrupt):
                 # might return sam class back to caller as self._result
                 break #fall out
-            if isinstance(rawInput, DialogError):
-                # issue ask if want to continue?
-                break
 
+            # need to not catch no NoInput nor IncompleteInput classes, as they 
+            # will be handled in evaluation
             cookedInput = self._evaluateUserInput(rawInput)
             environLocal.printDebug(['cookedInput', cookedInput])
-            if isinstance(cookedInput, IncompleteInput):
-                # incomprehensible: should try again
-                post = self._incompleteInput()
-                if post is True: # continue
-                    continue
+
+            # if no default and no input, we get here (default supplied in 
+            # evaluate
+            if (isinstance(cookedInput, NoInput) or 
+                isinstance(cookedInput, IncompleteInput)):
+                # set result to these objects whether or not try again
+                self._result = cookedInput
+                if self._tryAgain:
+                    # only returns True or False
+                    if self._askTryAgain():
+                        pass
+                    else: # this will keep whatever the cooked was
+                        break 
                 else:
                     break
-            # everything else is good:
             else:
                 # should be in proper format after evaluation
                 self._result = cookedInput
@@ -181,6 +265,7 @@ class Dialog(object):
         '''Return the result, or None if not set. This may also do a processing routine that is part of the desired result. 
         '''
         self._performAction()
+        # result may be NoInput or IncompleteInput objects
         return self._result 
 
 
@@ -193,26 +278,47 @@ class YesOrNo(Dialog):
     >>> d.askUser('yes') # force arg for testing
     >>> d.getResult()
     True
+
+    >>> d = configure.YesOrNo(tryAgain=False)
+    >>> d.askUser('junk') # force arg for testing
+    >>> d.getResult()
+     <music21.configure.IncompleteInput: junk>
     '''
-    def __init__(self, default=None):
-        Dialog.__init__(self, default=default) 
+    def __init__(self, default=None, tryAgain=True, promptHeader=None):
+        Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
     
+
+    def _formatResultForUser(self, result):
+        '''For various result options, we may need to at times convert the internal representation of the result into something else. For example, we might present the user with 'Yes' or 'No' but store the result as True or False.
+        '''
+        if result is True:
+            return 'Yes'
+        elif result is False:
+            return 'No'
+        # while a result might be an error object, this method should probably 
+        # neve be called with such objects.
+        else:
+            raise DialogException('attempting to format result for user: %s' % result)
+
     def _rawQuery(self):
         '''Return a multiline presentation of the question.
 
         >>> from music21 import *
         >>> d = configure.YesOrNo(default=True)
         >>> d._rawQuery()
-        'Enter [Y]es or No: '
+        'Enter Yes or No (default: Yes):'
         >>> d = configure.YesOrNo(default=False)
         >>> d._rawQuery()
-        'Enter Yes or [N]o: '
+        'Enter Yes or No (default: No):'
+
+        >>> from music21 import *
+        >>> d = configure.YesOrNo(default=True, promptHeader='Would you like more time?')
+        >>> d._rawQuery()
+        'Would you like more time? Enter Yes or Nso (default: Yes):'
         '''
         msg = 'Enter Yes or No: '
-        if self._default is True:
-            msg = 'Enter [Y]es or No: '
-        elif self._default is False:
-            msg = 'Enter Yes or [N]o: '
+        msg = self._rawQueryPrepareHeader(msg)
+        msg = self._rawQueryPrepareFooter(msg)
         return msg
 
     def _parseUserInput(self, raw):
@@ -244,7 +350,7 @@ class YesOrNo(Dialog):
         return IncompleteInput(raw)
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, or IncompleteInput object. 
+        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
     
         >>> from music21 import *
         >>> d = configure.YesOrNo()
@@ -350,10 +456,20 @@ class TestExternal(unittest.TestCase):
         pass
 
     def testYesOrNo(self):
+        print
+        environLocal.printDebug(['starting: YesOrNo()'])
+        d = YesOrNo()
+        d.askUser()
+        environLocal.printDebug(['getResult():', d.getResult()])
+
+        print
+        environLocal.printDebug(['starting: YesOrNo(default=True)'])
         d = YesOrNo(default=True)
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
 
+        print
+        environLocal.printDebug(['starting: YesOrNo(default=False)'])
         d = YesOrNo(default=False)
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
