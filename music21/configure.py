@@ -58,16 +58,27 @@ class Action(threading.Thread):
 #-------------------------------------------------------------------------------
 # error objects, not exceptions
 class DialogError(object):
-    pass
+    def __init__(self, src=None):
+        self.src = src
+    def __repr__(self):
+        return '<music21.configure.%s: %s>' % (self.__class__.__name__, self.src)
+
 
 class KeyInterruptError(DialogError):
-    pass
+    def __init__(self, src=None):
+        DialogError.__init__(self, src=src)
 
 class IncompleteInput(DialogError):
-    pass
+    def __init__(self, src=None):
+        DialogError.__init__(self, src=src)
+
+class NoInput(DialogError):
+    def __init__(self, src=None):
+        DialogError.__init__(self, src=src)
 
 
 
+#-------------------------------------------------------------------------------
 class Dialog(object):
     '''
     Model a dialog as a question and response. Have different subclases for different types of questions. Store all in a Conversation, or multiple dialog passes.
@@ -77,7 +88,15 @@ class Dialog(object):
         self._result = None
         # store a previously entered value, permitting undoing an action
         self._resultPrior = None
-        self._default = default
+        # set the default
+        # parse the default to permit expressive flexibility
+        defaultCooked = self._parseUserInput(default)
+        # if not any class of error:
+        if not isinstance(defaultCooked, DialogError):
+            self._default = defaultCooked
+        else:
+            # default is None by default; this cannot be a default value then
+            self._default = None
 
     def _writeToUser(self, msg):
         sys.stdout.write(msg)
@@ -92,7 +111,7 @@ class Dialog(object):
             return KeyInterruptError()
         except:
             return DialogError()
-        return post
+        return NoInput()
 
     def _incompleteInput(self, default=None):
         '''What to do if input is incomplete
@@ -105,14 +124,19 @@ class Dialog(object):
         '''
         pass
 
+    def _parseUserInput(self, raw):
+        '''Translate string to desired output. Pass None through (as no input), convert '' to None, and pass all other outputs as IncompleteInput objects. 
+        '''
+        return raw
+
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry; this may also try to perform a secondary arction
+        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, or IncompleteInput object. 
         '''
         pass
         # define in subclass
 
     def askUser(self, force=None):
-        '''Ask the user, display the querry.
+        '''Ask the user, display the querry. The force argument can be provided to test. Sets self._result; does not return a value.
         '''
         # ten attempts; not using a while so will ultimately break
         for i in range(10):
@@ -122,9 +146,7 @@ class Dialog(object):
             else:
                 environLocal.printDebug(['writeToUser:', self._rawQuery()])
                 rawInput = force
-
             environLocal.printDebug(['rawInput', rawInput])
-
             # check for errors and handle
             if isinstance(rawInput, KeyboardInterrupt):
                 # might return sam class back to caller as self._result
@@ -136,7 +158,7 @@ class Dialog(object):
             cookedInput = self._evaluateUserInput(rawInput)
             environLocal.printDebug(['cookedInput', cookedInput])
             if isinstance(cookedInput, IncompleteInput):
-                # incomprehensible: should tyr again
+                # incomprehensible: should try again
                 post = self._incompleteInput()
                 if post is True: # continue
                     continue
@@ -148,7 +170,6 @@ class Dialog(object):
                 self._result = cookedInput
                 break
         # self._result may still be None
-        return None # do not return values?
 
     def _performAction(self):
         '''The query might require an action to be performed: this would happen here, after getting the result from the user. 
@@ -163,7 +184,7 @@ class Dialog(object):
         return self._result 
 
 
-
+#-------------------------------------------------------------------------------
 class YesOrNo(Dialog):
     '''Ask a yes or no question.
 
@@ -194,8 +215,36 @@ class YesOrNo(Dialog):
             msg = 'Enter Yes or [N]o: '
         return msg
 
+    def _parseUserInput(self, raw):
+        '''Translate string to desired output. Pass None and '' (as no input), as NoInput objects, and pass all other outputs as IncompleteInput objects. 
+
+        >>> from music21 import *
+        >>> d = configure.YesOrNo()
+        >>> d._parseUserInput('y')
+        True
+        >>> d._parseUserInput('')
+        <music21.configure.NoInput: None>
+        >>> d._parseUserInput('asdf')
+        <music21.configure.IncompleteInput: asdf>
+        '''
+        if raw is None:
+            return NoInput()
+        # string; 
+        raw = str(raw)
+        raw = raw.strip()
+        raw = raw.lower()
+        if raw is '':
+            return NoInput()
+
+        if raw in ['yes', 'y', '1', 'true']:
+            return True
+        elif raw in ['no', 'n', '0', 'false']:
+            return False
+        # if no match, or an empty string
+        return IncompleteInput(raw)
+
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry
+        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, or IncompleteInput object. 
     
         >>> from music21 import *
         >>> d = configure.YesOrNo()
@@ -203,22 +252,32 @@ class YesOrNo(Dialog):
         True
         >>> d._evaluateUserInput('False')
         False
+        >>> d._evaluateUserInput('') # there is no default, 
+        <music21.configure.NoInput: None>
+        >>> d._evaluateUserInput('wer') # there is no default, 
+        <music21.configure.IncompleteInput: wer>
+
+        >>> d = configure.YesOrNo('yes')
+        >>> d._evaluateUserInput('') # there is a default
+        True
+        >>> d._evaluateUserInput('wbf') # there is a default
+        <music21.configure.IncompleteInput: wbf>
+
+        >>> d = configure.YesOrNo('n')
+        >>> d._evaluateUserInput('') # there is a default
+        False
+        >>> d._evaluateUserInput(None) # None is processed as NoInput
+        False
+        >>> d._evaluateUserInput('asdfer') # None is processed as NoInput
+        <music21.configure.IncompleteInput: asdfer>
         '''
-        if raw is None: # means no answer: return default
-            return self._default 
-
-        raw = raw.strip()
-        raw = raw.lower()
-        if raw in ['yes', 'y', 1, 'true']:
-            return True
-        elif raw in ['no', 'n', 0, 'false']:
-            return False
-        elif raw == '': # no answer
+        rawParsed = self._parseUserInput(raw)
+        # means no answer: return default
+        if isinstance(rawParsed, NoInput): 
             if self._default is not None:
-                return self._default 
-        # if nothing passes, return an incomplete input object
-        return IncompleteInput()
-
+                return self._default
+        # could be IncompleteInput, NoInput, or a proper, valid answer
+        return rawParsed
 
 
 
