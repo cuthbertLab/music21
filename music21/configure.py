@@ -16,6 +16,11 @@ import sys
 import threading 
 import unittest
 
+try:
+    import readline
+except ImportError:
+    pass
+
 
 import music21
 
@@ -78,7 +83,7 @@ class Dialog(object):
         sys.stdout.write(msg)
 
     def _readFromUser(self):
-        '''Collect from user; return 
+        '''Collect from user; return None if an empty response.
         '''
         post = None
         try:
@@ -87,6 +92,7 @@ class Dialog(object):
             return KeyInterruptError()
         except:
             return DialogError()
+        return post
 
     def _incompleteInput(self, default=None):
         '''What to do if input is incomplete
@@ -102,7 +108,8 @@ class Dialog(object):
     def _evaluateUserInput(self, raw):
         '''Evaluate the user's string entry; this may also try to perform a secondary arction
         '''
-        raw = raw.strip()
+        pass
+        # define in subclass
 
     def askUser(self, force=None):
         '''Ask the user, display the querry.
@@ -116,6 +123,8 @@ class Dialog(object):
                 environLocal.printDebug(['writeToUser:', self._rawQuery()])
                 rawInput = force
 
+            environLocal.printDebug(['rawInput', rawInput])
+
             # check for errors and handle
             if isinstance(rawInput, KeyboardInterrupt):
                 # might return sam class back to caller as self._result
@@ -125,6 +134,7 @@ class Dialog(object):
                 break
 
             cookedInput = self._evaluateUserInput(rawInput)
+            environLocal.printDebug(['cookedInput', cookedInput])
             if isinstance(cookedInput, IncompleteInput):
                 # incomprehensible: should tyr again
                 post = self._incompleteInput()
@@ -198,9 +208,10 @@ class YesOrNo(Dialog):
             return self._default 
 
         raw = raw.strip()
-        if raw.lower() in [True, 'yes', 'y', 1, 'true']:
+        raw = raw.lower()
+        if raw in ['yes', 'y', 1, 'true']:
             return True
-        elif raw.lower() in [False, 'no', 'n', 0, 'false']:
+        elif raw in ['no', 'n', 0, 'false']:
             return False
         elif raw == '': # no answer
             if self._default is not None:
@@ -280,11 +291,11 @@ class TestExternal(unittest.TestCase):
         pass
 
     def testYesOrNo(self):
-        d = YesOrNo(default='yes')
+        d = YesOrNo(default=True)
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
 
-        d = YesOrNo(default='no')
+        d = YesOrNo(default=False)
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
 
