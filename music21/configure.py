@@ -104,6 +104,8 @@ class Dialog(object):
         # parse the default to permit expressive flexibility
         defaultCooked = self._parseUserInput(default)
         # if not any class of error:
+        #environLocal.printDebug(['Dialog: defaultCooked:', defaultCooked])
+
         if not isinstance(defaultCooked, DialogError):
             self._default = defaultCooked
         else:
@@ -187,7 +189,7 @@ class Dialog(object):
                 div = ''
             default = self._formatResultForUser(self._default)
             # leave a space at end
-            msg = '%s (default: %s)%s ' % (msg, default, div)
+            msg = '%s (default is %s)%s ' % (msg, default, div)
         return msg
 
 
@@ -306,15 +308,15 @@ class YesOrNo(Dialog):
         >>> from music21 import *
         >>> d = configure.YesOrNo(default=True)
         >>> d._rawQuery()
-        'Enter Yes or No (default: Yes):'
+        'Enter Yes or No (default is Yes): '
         >>> d = configure.YesOrNo(default=False)
         >>> d._rawQuery()
-        'Enter Yes or No (default: No):'
+        'Enter Yes or No (default is No): '
 
         >>> from music21 import *
         >>> d = configure.YesOrNo(default=True, promptHeader='Would you like more time?')
         >>> d._rawQuery()
-        'Would you like more time? Enter Yes or Nso (default: Yes):'
+        'Would you like more time? Enter Yes or No (default is Yes): '
         '''
         msg = 'Enter Yes or No: '
         msg = self._rawQueryPrepareHeader(msg)
@@ -393,15 +395,6 @@ class SelectFromList(Dialog):
     '''General class to select values from a list.
 
     >>> from music21 import *
-    >>> d = configure.YesOrNo(default=True)
-    >>> d.askUser('yes') # force arg for testing
-    >>> d.getResult()
-    True
-
-    >>> d = configure.YesOrNo(tryAgain=False)
-    >>> d.askUser('junk') # force arg for testing
-    >>> d.getResult()
-     <music21.configure.IncompleteInput: junk>
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
@@ -411,7 +404,7 @@ class SelectFromList(Dialog):
         '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
         '''
         # customize in subclass
-        if corce is not None:
+        if force is not None:
             return force
         else:
             return []
@@ -426,48 +419,54 @@ class SelectFromList(Dialog):
         '''Return a multiline presentation of the question.
 
         >>> from music21 import *
-        >>> d = configure.SelectFromList(default=True)
+        >>> d = configure.SelectFromList()
         >>> d._rawQuery(['a', 'b', 'c'])
+        '[1] a\\n[2] b\\n[3] c\\nSelect a number from the preceding options: '
+
+        >>> d = configure.SelectFromList(default=1)
+        >>> d._default
+        1
+        >>> d._rawQuery(['a', 'b', 'c'])
+        '[1] a\\n[2] b\\n[3] c\\nSelect a number from the preceding options (default is 1): '
+
         '''
         msg = []
         i = 1
-        for entry in self._getValidResults(force=force)
+        for entry in self._getValidResults(force=force):
             sub = self._formatResultForUser(entry)
             msg.append('[%s] %s' % (i, sub))
             i += 1
+        head = '\n'.join(msg)
 
-        msg = 'Select a number from the preceding options: '
-        msg = self._rawQueryPrepareHeader(msg)
-        msg = self._rawQueryPrepareFooter(msg)
-        return msg
+        tail = 'Select a number from the preceding options: '
+        tail = self._rawQueryPrepareHeader(tail)
+        tail = self._rawQueryPrepareFooter(tail)
+        return head + '\n' + tail
 
     def _parseUserInput(self, raw):
-        '''Translate string to desired output. Pass None and '' (as no input), as NoInput objects, and pass all other outputs as IncompleteInput objects. 
+        '''Convert all values to an integer, or return NoInput or IncompleteInput. Do not yet evaluate whether the number is valid in the context of the selection choices. 
 
         >>> from music21 import *
         >>> d = configure.SelectFromList()
         '''
+        #environLocal.printDebug(['SelectFromList', '_parseUserInput', 'raw', raw])
         if raw is None:
             return NoInput()
-        # string; 
-        raw = str(raw)
-        raw = raw.strip()
-        raw = raw.lower()
         if raw is '':
             return NoInput()
+        # try to convert string into a number
+        try:
+            post = int(raw)
+        # catch all problems
+        except (ValueError, TypeError, ZeroDivisionError):
+            return IncompleteInput(raw)
+        return post
 
-        if raw in ['yes', 'y', '1', 'true']:
-            return True
-        elif raw in ['no', 'n', '0', 'false']:
-            return False
-        # if no match, or an empty string
-        return IncompleteInput(raw)
-
+    
     def _evaluateUserInput(self, raw):
         '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
     
         >>> from music21 import *
-        >>> d = configure.YesOrNo()
         '''
         rawParsed = self._parseUserInput(raw)
         # means no answer: return default
@@ -572,6 +571,11 @@ class Test(unittest.TestCase):
     
     def runTest(self):
         pass
+
+    def testSelectFromList(self):
+        from music21 import configure
+        d = configure.SelectFromList(default=1)
+        self.assertEqual(d._default, 1)
 
 
 
