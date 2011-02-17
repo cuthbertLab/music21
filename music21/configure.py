@@ -388,6 +388,98 @@ class YesOrNo(Dialog):
 
 
 
+#-------------------------------------------------------------------------------
+class SelectFromList(Dialog):
+    '''General class to select values from a list.
+
+    >>> from music21 import *
+    >>> d = configure.YesOrNo(default=True)
+    >>> d.askUser('yes') # force arg for testing
+    >>> d.getResult()
+    True
+
+    >>> d = configure.YesOrNo(tryAgain=False)
+    >>> d.askUser('junk') # force arg for testing
+    >>> d.getResult()
+     <music21.configure.IncompleteInput: junk>
+    '''
+    def __init__(self, default=None, tryAgain=True, promptHeader=None):
+        Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+    
+
+    def _getValidResults(self, force=None):
+        '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
+        '''
+        # customize in subclass
+        if corce is not None:
+            return force
+        else:
+            return []
+
+    def _formatResultForUser(self, result):
+        '''Reduce each complet file path to stub, or otherwise compact display
+        '''
+        return result
+
+
+    def _rawQuery(self, force=None):
+        '''Return a multiline presentation of the question.
+
+        >>> from music21 import *
+        >>> d = configure.SelectFromList(default=True)
+        >>> d._rawQuery(['a', 'b', 'c'])
+        '''
+        msg = []
+        i = 1
+        for entry in self._getValidResults(force=force)
+            sub = self._formatResultForUser(entry)
+            msg.append('[%s] %s' % (i, sub))
+            i += 1
+
+        msg = 'Select a number from the preceding options: '
+        msg = self._rawQueryPrepareHeader(msg)
+        msg = self._rawQueryPrepareFooter(msg)
+        return msg
+
+    def _parseUserInput(self, raw):
+        '''Translate string to desired output. Pass None and '' (as no input), as NoInput objects, and pass all other outputs as IncompleteInput objects. 
+
+        >>> from music21 import *
+        >>> d = configure.SelectFromList()
+        '''
+        if raw is None:
+            return NoInput()
+        # string; 
+        raw = str(raw)
+        raw = raw.strip()
+        raw = raw.lower()
+        if raw is '':
+            return NoInput()
+
+        if raw in ['yes', 'y', '1', 'true']:
+            return True
+        elif raw in ['no', 'n', '0', 'false']:
+            return False
+        # if no match, or an empty string
+        return IncompleteInput(raw)
+
+    def _evaluateUserInput(self, raw):
+        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
+    
+        >>> from music21 import *
+        >>> d = configure.YesOrNo()
+        '''
+        rawParsed = self._parseUserInput(raw)
+        # means no answer: return default
+        if isinstance(rawParsed, NoInput): 
+            if self._default is not None:
+                return self._default
+        # could be IncompleteInput, NoInput, or a proper, valid answer
+        return rawParsed
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
