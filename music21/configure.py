@@ -110,6 +110,9 @@ class Dialog(object):
         self._tryAgain = tryAgain
         self._promptHeader = promptHeader
 
+        # how many times to ask the user again and again for the same thing
+        self._maxAttempts = 8
+
 
     def _writeToUser(self, msg):
         sys.stdout.write(msg)
@@ -121,6 +124,7 @@ class Dialog(object):
             post = raw_input()
             return post
         except KeyboardInterrupt:
+            # store as own class so as a subclass of dialog error
             return KeyInterruptError()
         except:
             return DialogError()
@@ -214,23 +218,25 @@ class Dialog(object):
         '''Ask the user, display the querry. The force argument can be provided to test. Sets self._result; does not return a value.
         '''
         # ten attempts; not using a while so will ultimately break
-        for i in range(10):
+        for i in range(self._maxAttempts):
             if force is None:
                 self._writeToUser(self._rawQuery())
                 rawInput = self._readFromUser()
             else:
                 environLocal.printDebug(['writeToUser:', self._rawQuery()])
                 rawInput = force
-            environLocal.printDebug(['rawInput', rawInput])
+            # rawInput here could be an error or a value
+            environLocal.printDebug(['received as rawInput', rawInput])
             # check for errors and handle
-            if isinstance(rawInput, KeyboardInterrupt):
-                # might return sam class back to caller as self._result
-                break #fall out
+            if isinstance(rawInput, KeyInterruptError):
+                # set as result KeyInterruptError
+                self._result = rawInput
+                break
 
             # need to not catch no NoInput nor IncompleteInput classes, as they 
             # will be handled in evaluation
             cookedInput = self._evaluateUserInput(rawInput)
-            environLocal.printDebug(['cookedInput', cookedInput])
+            environLocal.printDebug(['post _evaluateUserInput() cookedInput', cookedInput])
 
             # if no default and no input, we get here (default supplied in 
             # evaluate
@@ -404,10 +410,9 @@ class SelectFromList(Dialog):
             return []
 
     def _formatResultForUser(self, result):
-        '''Reduce each complet file path to stub, or otherwise compact display
+        '''Reduce each complete file path to stub, or otherwise compact display
         '''
         return result
-
 
     def _rawQuery(self, force=None):
         '''Return a multiline presentation of the question.
@@ -422,7 +427,6 @@ class SelectFromList(Dialog):
         1
         >>> d._rawQuery(['a', 'b', 'c'])
         '[1] a\\n[2] b\\n[3] c\\nSelect a number from the preceding options (default is 1): '
-
         '''
         msg = []
         i = 1
@@ -512,6 +516,32 @@ class SelectFilePath(SelectFromList):
         return []
 
 
+    def _evaluateUserInput(self, raw):
+        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
+    
+        Here, we convert the user-selected number into a file path
+        >>> from music21 import *
+        '''
+        rawParsed = self._parseUserInput(raw)
+        # of NoInput: and a default, return default
+        if isinstance(rawParsed, NoInput): 
+            if self._default is not None:
+                # do not return the default, as this here is a number
+                # and proper results are file paths. thus, set rawParsed
+                # to default; will get converted later
+                rawParsed = self._default
+
+        # could be IncompleteInput, NoInput, or a proper, valid answer
+        if isinstance(rawParsed, DialogError): # keep as is
+            return rawParsed
+
+        # else, translate a number into a file path; assume zero is 1
+        options = self._getValidResults()
+        if rawParsed >= 1 and rawParsed <= len(options):
+            return options[rawParsed-1]
+        else:
+            return IncompleteInput(rawParsed)
+
 
 
 class SelectMusicXMLReader(SelectFilePath):
@@ -560,7 +590,6 @@ class SelectMusicXMLReader(SelectFilePath):
         '''
         return []
 
-
     def _getValidResults(self, force=None):
         '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
         '''
@@ -575,7 +604,6 @@ class SelectMusicXMLReader(SelectFilePath):
             post = self._getMusicXMLReaderDarwin()
         elif platform == 'nix':
             post = self._getMusicXMLReaderNix()
-
         return post
 
 
@@ -677,6 +705,15 @@ class TestExternal(unittest.TestCase):
         d = SelectMusicXMLReader()
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
+
+
+        print 
+        environLocal.printDebug(['starting: SelectMusicXMLReader(default=1)'])
+        d = SelectMusicXMLReader(default=1)
+        d.askUser()
+        environLocal.printDebug(['getResult():', d.getResult()])
+
+
 
 
 class Test(unittest.TestCase):
