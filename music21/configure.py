@@ -21,24 +21,19 @@ try:
 except ImportError:
     pass
 
-
-import music21
-
-
-# for time-out gather of arguments: possibly look at:
-# http://code.activestate.com/recipes/576780/
-# http://www.garyrobinson.net/2009/10/non-blocking-raw_input-for-python.html
-
-
+# may need to not import any music21 here
+from music21 import common
 from music21 import environment
 _MOD = "configure.py"
 environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-reMacFinaleA = re.compile('/Applications/Finale 20[0-1][0-9][a-z]*/Finale 20[0-1][0-9][a-z]*.app')
-# maybe not in a directory
-reMacFinaleB = re.compile('/Applications/Finale 20[0-1][0-9][a-z]*.app')
+# match finale name, which may be directory or something else
+reFinaleApp = re.compile('Finale 20[0-1][0-9][a-z]*.app')
+reFinaleExe = re.compile('Finale 20[0-1][0-9][a-z]*.exe')
+reFinaleReaderApp = re.compile('Finale Reader.app')
+reMuseScoreApp = re.compile('MuseScore.app')
 
 
 
@@ -398,7 +393,6 @@ class SelectFromList(Dialog):
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
-    
 
     def _getValidResults(self, force=None):
         '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
@@ -479,9 +473,119 @@ class SelectFromList(Dialog):
 
 
 
+class SelectFilePath(SelectFromList):
+    '''General class to select values from a list.
+
+    >>> from music21 import *
+    '''
+    def __init__(self, default=None, tryAgain=True, promptHeader=None):
+        SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+
+    def _getDarwinApp(self, comparisonFunction):
+        '''Provide a comparison function that returns True or False based on the file name. This looks at everything in Applications, as well as every directory in Applications
+        '''
+        post = []
+        path0 = '/Applications'
+        for sub1 in os.listdir(path0):
+            path1 = os.path.join(path0, sub1)
+            if os.path.isdir(path1):
+                # on macos, .apps are (always?) directories; thus, look
+                # at these names directly
+                if comparisonFunction(sub1):
+                    post.append(path1)
+                    continue
+                #environLocal.printDebug(['_getDarwinApp: dir', path1])
+                for sub2 in os.listdir(path1):
+                    path2 = os.path.join(path1, sub2)
+                    if comparisonFunction(sub2):
+                        post.append(path2)
+            else:        
+                if comparisonFunction(sub1):
+                    post.append(path1)
+        return post
+
+
+    def _getWinApp(self, comparisonFunction):
+        '''Provide a comparison function that returns True or False based on the file name. 
+        '''
+        # provide a similar method to _getDarwinApp
+        return []
+
+
+
+
+class SelectMusicXMLReader(SelectFilePath):
+    '''Select a MusicXML Reader by presenting a user a list of options. 
+
+    >>> from music21 import *
+    '''
+    def __init__(self, default=None, tryAgain=True, promptHeader=None):
+        SelectFilePath.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+
+    def _getMusicXMLReaderDarwin(self):
+        '''Get all possible finale paths on Darwin
+        '''
+        # order here results in ranks
+        def comparisonFinale(name):
+            m = reFinaleApp.match(name)
+            if m is not None: return True
+            else: return False
+        results = self._getDarwinApp(comparisonFinale)
+
+        def comparisonMuseScore(name):
+            m = reMuseScoreApp.match(name)
+            if m is not None: return True
+            else: return False
+        results += self._getDarwinApp(comparisonMuseScore)
+
+        def comparisonFinaleReader(name):
+            m = reFinaleReaderApp.match(name)
+            if m is not None: return True
+            else: return False
+        results += self._getDarwinApp(comparisonFinaleReader)
+
+        return results
+        
+        # only go two levels deep in /Applications: all things there, 
+        # and all things in directories stored there.
+
+
+    def _getMusicXMLReaderWin(self):
+        '''Get all possible finale paths on Darwin
+        '''
+        return []
+
+    def _getMusicXMLReaderNix(self):
+        '''Get all possible finale paths on Darwin
+        '''
+        return []
+
+
+    def _getValidResults(self, force=None):
+        '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
+        '''
+        # customize in subclass
+        if force is not None:
+            return force
+
+        platform = common.getPlatform()
+        if platform == 'win':
+            post = self._getMusicXMLReaderWin()
+        elif platform == 'darwin':
+            post = self._getMusicXMLReaderDarwin()
+        elif platform == 'nix':
+            post = self._getMusicXMLReaderNix()
+
+        return post
+
+
 
 
 #-------------------------------------------------------------------------------
+# for time-out gather of arguments: possibly look at:
+# http://code.activestate.com/recipes/576780/
+# http://www.garyrobinson.net/2009/10/non-blocking-raw_input-for-python.html
+
 # class Prompt(threading.Thread):
 #     def __init__ (self, prompt, timeOutTime):
 #         threading.Thread.__init__(self)
@@ -566,6 +670,14 @@ class TestExternal(unittest.TestCase):
         environLocal.printDebug(['getResult():', d.getResult()])
 
 
+    def testSelectMusicXMLReader(self):
+
+        print 
+        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        d = SelectMusicXMLReader()
+        d.askUser()
+        environLocal.printDebug(['getResult():', d.getResult()])
+
 
 class Test(unittest.TestCase):
     
@@ -578,10 +690,27 @@ class Test(unittest.TestCase):
         self.assertEqual(d._default, 1)
 
 
+    def testRe(self):
+        
+        g = reFinaleApp.match('Finale 2011.app')
+        self.assertEqual(g.group(0), 'Finale 2011.app')
+
+        self.assertEqual(reFinaleApp.match('final adsf 2011'), None)
+
+        g = reFinaleApp.match('Finale 2009.app')
+        self.assertEqual(g.group(0), 'Finale 2009.app')
+
+        self.assertEqual(reFinaleApp.match('Finale 1992.app'), None)
+
+
 
 
 if __name__ == "__main__":
     import sys
+
+
+    # only if running tests
+    import music21
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
