@@ -187,7 +187,10 @@ def quarterLengthToClosestType(qLen):
                 continue
             elif (4.0 / qLen) < numDict and (8.0 / qLen) > numDict:
                 return (typeFromNumDict[numDict], False)
-        raise DurationException("Cannot return types greater than double duplex-maxima: remove this when we are sure this works...")
+        # CUTHBERT ATTEMPT AT FIX Feb 2011
+        if qLen < 0.005:
+            return (None, False)
+        raise DurationException("Cannot return types greater than double duplex-maxima, your length was %s : remove this when we are sure this works..." % qLen)
 
 def musicXMLTypeToType(value):
     '''Convert a MusicXML type to an music21 type.
@@ -261,11 +264,17 @@ def dottedMatch(qLen, maxDots=4):
     >>> dottedMatch(1.875, 2)
     (False, False)
 
+    >>> dottedMatch(0.00001, 2)
+    (False, False)
+
     '''
     for dots in range(0, maxDots + 1):
         ## assume qLen has n dots, so find its non-dotted length
         preDottedLength = (qLen + 0.0) / common.dotMultiplier(dots)
-        durType, match = quarterLengthToClosestType(preDottedLength)
+        try:
+            durType, match = quarterLengthToClosestType(preDottedLength)
+        except DurationException:
+            continue
         if match is True:
             return (dots, durType)
     return (False, False)
@@ -410,6 +419,8 @@ def quarterLengthToDurations(qLen):
     >>> unitSpec(quarterLengthToDurations(1.0/6.0))
     [(0.1666..., '16th', 0, 3, 2, '16th')]
 
+    >>> quarterLengthToDurations(.18333333333333)
+    [<music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.03125>, <music21.duration.DurationUnit 0.015625>, <music21.duration.DurationUnit 0.0078125>]
     '''
     post = []
     typeLargest = None # largest found type that is less than
@@ -417,7 +428,9 @@ def quarterLengthToDurations(qLen):
 
     if qLen < 0:
         raise DurationException("qLen cannot be less than Zero.  Read Lewin, GMIT for more details...")
-    elif common.almostEquals(qLen, 0.0):
+
+    ## CUTHBERT: TRIED INCREASING 0.0 to < 0.005 but did not help...
+    elif common.almostEqual(qLen, 0.0):
         post.append(ZeroDuration)
         return post
     
@@ -459,9 +472,9 @@ def quarterLengthToDurations(qLen):
         qLenRemainder = qLen - typeToDuration[typeFound]
         if qLenRemainder < 0: 
             raise DurationException('cannot reduce quarter length (%s)' % qLenRemainder)
-        # trying a fixed minimumum limit
+        # trying a fixed minimum limit
         # this it do deal with common errors in processing
-        if qLenRemainder > .003:
+        if qLenRemainder > .004:
 
             try:
                 if len(post) > 6: # we probably have a problem
@@ -1369,7 +1382,7 @@ class DurationUnit(DurationCommon):
         >>> c.type
         Traceback (most recent call last):
             ...
-        DurationException: Cannot return types greater than double duplex-maxima: remove this when we are sure this works...
+        DurationException: Cannot return types greater than double duplex-maxima, your length was 129 : remove this when we are sure this works...
         '''
         if not common.isNum(value):
             raise DurationException(
@@ -1592,7 +1605,6 @@ class ZeroDuration(DurationUnit):
 class DurationException(Exception):
     pass
 
-
 class Duration(DurationCommon):
     '''
     Durations are one of the most important objects in music21. A Duration
@@ -1798,7 +1810,11 @@ class Duration(DurationCommon):
         good if the components are already configured as you like
         '''
         self._quarterLengthNeedsUpdating = False
-        self.components = quarterLengthToDurations(self.quarterLength)
+        try:
+            self.components = quarterLengthToDurations(self.quarterLength)
+        except DurationException:
+            print ("problem updating components of note with quarterLength %s, chokes quarterLengthToDurations\n" % self.quarterLength)
+            raise
         self._componentsNeedUpdating = False
 
 
@@ -2833,6 +2849,18 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.25>')
 
+    def xtestTupletAddition(self):
+        from music21 import stream
+        from music21 import note
+        import random
+        a = stream.Stream()
+        for i in range(100):
+            ql = random.choice([.2, .25, .33333333333333333])
+            n = note.Note()
+            n.quarterLength = ql
+            a.append(n)
+        a.musicxml
+        
 
 
 #-------------------------------------------------------------------------------

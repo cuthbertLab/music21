@@ -1002,7 +1002,9 @@ class ConcreteScale(Scale):
         # TODO: add pitch range comparison if defined
         if other is None:
             return False
-
+        if (not hasattr(self, 'isConcrete')) or (not hasattr(other, 'isConcrete')):
+            return False
+        
         if not self.isConcrete or not other.isConcrete:
             # if tonic is none, then we automatically do an abstract comparison
             return self._abstract == other._abstract

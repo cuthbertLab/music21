@@ -1,4 +1,5 @@
 import music21
+from music21 import *
 from music21.common import *
 from music21.humdrum import *
 import music21.note
@@ -196,31 +197,17 @@ def simple4d():
 
 def simple4e(show=True):
     # 250.    Identify the longest note in a score
-    from music21 import stream
-    
     qLenMax = 0
-    beethovenQuartet = corpus.parseWork('opus18no1', 3, extList=['xml'])
-    maxNote = None
-    for part in beethovenQuartet.getElementsByClass(stream.Part):
-#         lily.LilyString("{ \\time 2/4 " + str(part.bestClef().lily) + " " + str(part.lily) + "}").showPNG()
-
-        # note: this probably is not re-joining tied notes
-        pf = part.flat.notes
-        for n in pf:
-            if n.quarterLength >= qLenMax and n.isNote==True:
+    beethovenQuartet = corpus.parseWork('beethoven/opus18no1/movement4.xml')
+    maxMeasure = 0
+    for part in beethovenQuartet.parts:
+        partStripped = part.stripTies()
+        for n in partStripped.flat.notes:
+            if n.quarterLength > qLenMax and n.isRest is False:
                 qLenMax = n.quarterLength
-                maxNote = n
-        maxNote.color = 'red'
-
-        offset = part.flat.getOffsetByElement(maxNote)
-        if offset == None:
-            raise Exception('cannot find this note in the Stream: %s' % offset)
-        display = part.flat.extractContext(maxNote, before = 4.0, after = 6.0)
-               
+                maxMeasure = n.measureNumber
     if show:
-        print('longest duration was: %s quarters long' % (qLenMax))
-        lily.LilyString("{ \\time 2/4 " + str(display.bestClef().lily) + " " + str(display.lily) + "}").showPNG()
-        display.show()
+        beethovenQuartet.measures(maxMeasure - 2, maxMeasure + 2).show()
 
 
 
@@ -495,8 +482,9 @@ class TestExternal(unittest.TestCase):
         '''Test showing functions
         '''
         #
-        for func in tests:
-            func(show=True)
+        simple4e(show=True)
+#        for func in tests:
+#            func(show=True)
 
 
 
@@ -514,8 +502,8 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
 
-    music21.mainTest(Test)
-    #music21.mainTest(TestExternal)
+    #music21.mainTest(Test)
+    music21.mainTest(TestExternal)
 
 
 

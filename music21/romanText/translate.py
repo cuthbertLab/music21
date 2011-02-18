@@ -105,6 +105,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
         rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
 
     # this could be just a Stream, but b/c we are creating metadata, perhaps better to match presentation of other scores. 
+
     from music21 import metadata
     from music21 import stream
     from music21 import note
@@ -112,6 +113,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     from music21 import key
     from music21 import roman
     from music21 import tie
+
 
     if inputM21 == None:
         s = stream.Score()
@@ -155,12 +157,14 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             environLocal.printDebug(['keySigCurrent:', keySigCurrent])
         elif t.isMeasure():
             #environLocal.printDebug(['handling measure token:', t])
+
             if t.variantNumber is not None:
                 environLocal.printDebug(['skipping variant: %s' % t])
                 continue
             if t.variantLetter is not None:
                 environLocal.printDebug(['skipping variant: %s' % t])
                 continue
+
             # if this measure number is more than 1 greater than the last
             # defined measure number, and the previous chord is not None, 
             # then fill with copies of the last-defined measure

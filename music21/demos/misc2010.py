@@ -227,9 +227,9 @@ if (__name__ == "__main__"):
 #    richardBreedGetWell()
 #    annotateWithGerman()
 #    countCs()
-#    bachParallels()
+    bachParallels()
 #    towersOfHanoi(show = False, transpose = False, numParts = 8)
-    pcsFromHumdrum(show = True)
+#    pcsFromHumdrum(show = True)
 #------------------------------------------------------------------------------
 # eof
 

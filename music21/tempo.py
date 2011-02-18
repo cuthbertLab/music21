@@ -66,7 +66,6 @@ class TempoMark(music21.Music21Object):
     >>> tm3 = music21.tempo.TempoMark("extremely, wicked fast!")
     >>> tm3.number
     90
-    
     '''
     
     classSortOrder = 1

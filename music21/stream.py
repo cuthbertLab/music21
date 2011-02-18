@@ -3284,8 +3284,12 @@ class Stream(music21.Music21Object):
         offsetMap = srcObj.offsetMap
         #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])    
         #offsetMap.sort() not necessary; just get min and max
-        oMin = min([x['offset'] for x in offsetMap])
-        oMax = max([x['endTime'] for x in offsetMap])
+        if len(offsetMap) > 0:
+            oMin = min([x['offset'] for x in offsetMap])
+            oMax = max([x['endTime'] for x in offsetMap])
+        else:
+            oMin = 0
+            oMax = 0
         
         # if a ref stream is provided, get highst time from there
         # only if it is greater thant the highest time yet encountered

@@ -141,9 +141,9 @@ class RomanNumeral(chord.Chord):
     >>> minoriii.pitches
     [G4, B-4, D5]
 
-    PROBLEM! >>> minoriiiB = roman.RomanNumeral('IIIb', em, caseMatters = False)
-    ####>>> minoriiiB.pitches
-    #####[G4, B-4, D5]
+    >>> minoriiiB = roman.RomanNumeral('IIIb', em, caseMatters = False)
+    >>> minoriiiB.pitches
+    [G4, B-4, D5]
     
    
     Can also take a scale object, here we build a first-inversion chord

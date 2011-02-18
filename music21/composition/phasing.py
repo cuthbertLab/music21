@@ -41,7 +41,7 @@ def pitchedPhase(cycles=None, show=False):
     sPost = stream.Score()
     sPost.title = 'phasing experiment'
     sPost.insert(0, stream.Part())
-    sPost.insert(0, music21.stream.Part())
+    sPost.insert(0, stream.Part())
 
     durationToShift = duration.Duration('64th')
     increment = durationToShift.quarterLength
@@ -83,7 +83,7 @@ class TestExternal(unittest.TestCase):
         pass
    
 
-    def testBasic(self, cycles=4, show=True):
+    def testBasic(self, cycles=8, show=True):
         # run a reduced version
         pitchedPhase(cycles=cycles, show=show)
 

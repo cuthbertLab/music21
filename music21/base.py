@@ -1466,6 +1466,7 @@ class Music21Object(JSONSerializer):
     id = None
     _priority = 0
     classSortOrder = 20  # default classSortOrder
+    hideObjectOnPrint = False
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['searchParentByAttr', 'getContextAttr', 'setContextAttr']
@@ -1504,7 +1505,7 @@ class Music21Object(JSONSerializer):
         >>> ec1.classSortOrder
         5
         ''',
-
+        'hideObjectOnPrint': 'if set to True will not print upon output (only to MusicXML at this point)',
     }
 
     def __init__(self, *arguments, **keywords):
@@ -2506,6 +2507,8 @@ class Music21Object(JSONSerializer):
 
         if fmt == None: # get setting in environment
             fmt = environLocal['showFormat']
+        if common.isStr(fmt) != True:
+            raise Music21ObjectException('format must be a string, not whatever this is: %s' % fmt)
 
         format, ext = common.findFormat(fmt)
         if format not in common.VALID_SHOW_FORMATS:
@@ -2823,7 +2826,7 @@ class Music21Object(JSONSerializer):
     # temporal and beat based positioning
 
 
-    def _getMeasureNumberLocal(self):
+    def _getMeasureNumber(self):
         '''If this object is contained in a Measure, return the measure number
         '''
         mNumber = None # default for not defined
@@ -2837,7 +2840,7 @@ class Music21Object(JSONSerializer):
                 mNumber = m.number
         return mNumber
 
-    measureNumberLocal = property(_getMeasureNumberLocal, 
+    measureNumber = property(_getMeasureNumber, 
         doc = '''Return the measure number of a Measure that contains this object. 
         ''')  
 
@@ -4011,11 +4014,11 @@ class Test(unittest.TestCase):
         p1 = s.parts['Soprano']
         for classStr in ['Clef', 'KeySignature', 'TimeSignature']:
             self.assertEqual(p1.flat.getElementsByClass(
-                classStr)[0].measureNumberLocal, 0)
+                classStr)[0].measureNumber, 0)
         
         match = []
         for n in p1.flat.notes:
-            match.append(n.measureNumberLocal)
+            match.append(n.measureNumber)
         self.assertEqual(match, [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 9] )
         
         
@@ -4025,11 +4028,11 @@ class Test(unittest.TestCase):
         m2 = stream.Measure()
         m2.number = 74
         n = note.Note()
-        self.assertEqual(n.measureNumberLocal, None) # not in a Meaure
+        self.assertEqual(n.measureNumber, None) # not in a Meaure
         m1.append(n)
-        self.assertEqual(n.measureNumberLocal, 3) 
+        self.assertEqual(n.measureNumber, 3) 
         m2.append(n)
-        self.assertEqual(n.measureNumberLocal, 74)
+        self.assertEqual(n.measureNumber, 74)
 
 
 

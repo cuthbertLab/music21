@@ -1170,46 +1170,59 @@ class WindMachine(Percussion):
 
 #------------------------------------------------------
 
-class Voice(Instrument):
+class Vocalist(Instrument):
+    '''
+    n.b. called Vocalist to not be confused with stream.Voice
+    '''
     def __init__(self):
         Instrument.__init__(self)
 
+        self.instrumentName = 'Voice'
+        self.instrumentAbbreviation = 'V'
         self.midiProgram = 52
         
-class Soprano(Voice):
+class Soprano(Vocalist):
     def __init__(self):
         Voice.__init__(self)
         
         self.instrumentName = 'Soprano'
         self.instrumentAbbreviation = 'S'
         
-class MezzoSoprano(Voice):
+class MezzoSoprano(Soprano):
     def __init__(self):
         Voice.__init__(self)
         
         self.instrumentName = 'Mezzo-Soprano'
         self.instrumentAbbreviation = 'Mez'
         
-class Contralto(Voice):
+class Alto(Vocalist):
     def __init__(self):
         Voice.__init__(self)
         
-        self.instrumentName = 'Contralto'
-        self.instrumentAbbreviation = 'C'
+        self.instrumentName = 'Alto'
+        self.instrumentAbbreviation = 'A'
 
-class Tenor(Voice):
+class Tenor(Vocalist):
     def __init__(self):
         Voice.__init__(self)
         
         self.instrumentName = 'Tenor'
         self.instrumentAbbreviation = 'T'
         
-class Baritone(Voice):
+class Baritone(Vocalist):
     def __init__(self):
         Voice.__init__(self)
         
         self.instrumentName = 'Baritone'
         self.instrumentAbbreviation = 'Bar'
+
+class Bass(Vocalist):
+    def __init__(self):
+        Voice.__init__(self)
+        
+        self.instrumentName = 'Bass'
+        self.instrumentAbbreviation = 'B'
+
  
 #------------------------------------------------------       
 class InstrumentException(music21.Music21Exception):

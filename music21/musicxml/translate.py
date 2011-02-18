@@ -932,6 +932,8 @@ def noteToMxNotes(n, spannerBundle=None):
         mxNote = mxNote.merge(n.pitch.mx)
         # get color from within .editorial using attribute
         mxNote.set('color', n.color)
+        if n.hideObjectOnPrint == True:
+            mxNote.set('printObject', "no")
         mxNoteList.append(mxNote)
 
     # note: lyric only applied to first note
@@ -1028,6 +1030,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     # a duration. they may be filtered out at the level of Stream 
     # processing
     if mxNote.get('printObject') == 'no':
+        n.hideObjectOnPrint = True
         environLocal.printDebug(['got mxNote with printObject == no'])
 
     mxGrace = mxNote.get('graceObj')
