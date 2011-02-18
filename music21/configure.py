@@ -41,6 +41,9 @@ reMuseScoreApp = re.compile('MuseScore.app')
 urlMusic21 = 'http://mit.edu/music21'
 urlFinaleReader = 'http://www.finalemusic.com/Reader'
 urlMuseScore = 'http://musescore.org'
+urlGettingStarted = 'http://mit.edu/music21/doc/html/quickStart.html'
+
+LINE_WIDTH = 80
 
 #-------------------------------------------------------------------------------
 # class Action(threading.Thread):
@@ -58,17 +61,45 @@ urlMuseScore = 'http://musescore.org'
 #-------------------------------------------------------------------------------
 
 
-def writeToUser(msg, wrap=False):
+def writeToUser(msg, wrap=True):
     '''Display a message to the user
     '''
     # wrap everything to 60 lines
-    if wrap:
-        lines = textwrap.wrap(msg, 60)
-        for l in lines:
-            sys.stdout.write(l)
+    if common.isListLike(msg):
+        lines = msg
     else:
-        sys.stdout.write(msg)
-
+        # divide into lines if lines breaks are already in place
+        lines = msg.split('\n')
+    #print lines
+    post = []
+    if wrap:
+        for sub in lines:
+            if sub == '':
+                post.append('')
+            elif sub == ' ':
+                post.append(' ')
+            else:
+                # concatenate lines 
+                post += textwrap.wrap(sub, LINE_WIDTH)
+    else:
+        post = lines
+    #print post
+    for i, l in enumerate(post):
+        if l == '': # treat an empty line as a break
+            l = '\n'
+        # if first and there is more than one line
+        elif i == 0 and len(post) > 1:
+            # add a leading space
+            l = '\n%s \n' % l # 
+        # if only one line
+        elif i == 0 and len(post) == 1:
+            l = '\n%s ' % l # 
+        elif i < len(post) - 1: # if not last
+            l = '%s \n' % l 
+        else: # if last, add trailing space, do not add trailing return
+            l = '%s ' % l 
+        sys.stdout.write(l)
+        sys.stdout.flush()
 
 
 # error objects, not exceptions
@@ -264,6 +295,11 @@ class Dialog(object):
         return msg
 
 
+    def _rawIntroduction(self):
+        '''Return a multiline presentation of an introduction.
+        '''
+        return None
+
     def _rawQuery(self):
         '''Return a multiline presentation of the question.
         '''
@@ -295,6 +331,11 @@ class Dialog(object):
     def askUser(self, force=None):
         '''Ask the user, display the querry. The force argument can be provided to test. Sets self._result; does not return a value.
         '''
+        # if an introduction is defined, try to use it
+        intro = self._rawIntroduction()
+        if intro is not None:
+            self._writeToUser(intro)
+
         # always call preAskUser: can customize in subclass. must return True
         # or False. if False, askUser cannot continue
         post = self._preAskUser(force=force)
@@ -321,7 +362,7 @@ class Dialog(object):
                 rawInput = force
 
             # rawInput here could be an error or a value
-            environLocal.printDebug(['received as rawInput', rawInput])
+            #environLocal.printDebug(['received as rawInput', rawInput])
             # check for errors and handle
             if isinstance(rawInput, KeyInterruptError):
                 # set as result KeyInterruptError
@@ -331,7 +372,7 @@ class Dialog(object):
             # need to not catch no NoInput nor IncompleteInput classes, as they 
             # will be handled in evaluation
             cookedInput = self._evaluateUserInput(rawInput)
-            environLocal.printDebug(['post _evaluateUserInput() cookedInput', cookedInput])
+            #environLocal.printDebug(['post _evaluateUserInput() cookedInput', cookedInput])
 
             # if no default and no input, we get here (default supplied in 
             # evaluate
@@ -363,7 +404,7 @@ class Dialog(object):
         '''
         result = self.getResult()
         if isinstance(self._result, DialogError):
-            environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
+            #environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
             pass # nothing to do
         # perform action
 
@@ -609,15 +650,15 @@ class SelectFromList(Dialog):
         >>> from music21 import *
         >>> d = configure.SelectFromList()
         >>> d._rawQuery(['a', 'b', 'c'])
-        '[1] a\\n[2] b\\n[3] c\\nSelect a number from the preceding options: '
+        ['[1] a', '[2] b', '[3] c', ' ', 'Select a number from the preceding options: ']
 
         >>> d = configure.SelectFromList(default=1)
         >>> d._default
         1
         >>> d._rawQuery(['a', 'b', 'c'])
-        '[1] a\\n[2] b\\n[3] c\\nSelect a number from the preceding options (default is 1): '
+        ['[1] a', '[2] b', '[3] c', ' ', 'Select a number from the preceding options (default is 1): ']
         '''
-        msg = []
+        head = []
         i = 1
         options = self._getValidResults(force=force)
         # if no options, cannot form query: return bad conditions
@@ -626,14 +667,13 @@ class SelectFromList(Dialog):
 
         for entry in options:
             sub = self._formatResultForUser(entry)
-            msg.append('[%s] %s' % (i, sub))
+            head.append('[%s] %s' % (i, sub))
             i += 1
-        head = '\n'.join(msg)
 
         tail = 'Select a number from the preceding options: '
         tail = self._rawQueryPrepareHeader(tail)
         tail = self._rawQueryPrepareFooter(tail)
-        return head + '\n' + tail
+        return head + [' ', tail]
 
     def _parseUserInput(self, raw):
         '''Convert all values to an integer, or return NoInput or IncompleteInput. Do not yet evaluate whether the number is valid in the context of the selection choices. 
@@ -746,6 +786,11 @@ class SelectMusicXMLReader(SelectFilePath):
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         SelectFilePath.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
+    def _rawIntroduction(self):
+        '''Return a multiline presentation of an introduction.
+        '''
+        return ['Defining an XML Reader permits automatically opening music21-generated MusicXML in an editor for display and manipulation when calling the show() method. Setting this option is highly recommended.', ' ']
+
     def _getMusicXMLReaderDarwin(self):
         '''Get all possible finale paths on Darwin
         '''
@@ -837,6 +882,67 @@ class SelectMusicXMLReader(SelectFilePath):
                     if post is True:
                         break
             return post
+
+
+
+#-------------------------------------------------------------------------------
+class ConfigurationAssistant(object):
+    def __init__(self):
+        
+        self._dialogs = []
+
+        d = SelectMusicXMLReader(default=1)
+        self._dialogs.append(d)
+
+
+        # note: this is the on-line URL: 
+        # might be better to find local documentaiton
+        d = OpenInBrowser(urlTarget=urlGettingStarted, promptHeader='Would you like to view the music21 Quick Start?')
+        self._dialogs.append(d)
+
+
+    def _introduction(self):
+        msg = []
+        msg.append('''Welcome the music21 Configuration Assistant. You will be guided through a number of questions to install and setup music21. Simply pressing return at a prompt will select a default, if available.''')
+        msg.append('') # will cause a line break
+        msg.append('''You may run this configuration again at a later time by running configure.py.''')
+        msg.append(' ') # will cause a blank line
+
+        writeToUser(msg)
+
+    def _conclusion(self):
+        msg = []
+        msg.append('''This concludes the music21 Configuration Assistant.''')
+        msg.append('')
+        writeToUser(msg)
+
+
+    def _hr(self):
+        '''Draw a line
+        '''
+        msg = []
+        msg.append('_' * LINE_WIDTH)
+        msg.append(' ') # add a space
+        writeToUser(msg)
+
+    def run(self):
+        self._hr()
+        self._introduction()
+        for d in self._dialogs:
+            self._hr()
+            d.askUser()
+            post = d.getResult()
+            # post may be an error; no problem calling perform action anyways
+            d.performAction()
+
+        self._hr()
+        self._conclusion()
+
+
+
+
+
+
 
 #-------------------------------------------------------------------------------
 # for time-out gather of arguments: possibly look at:
@@ -974,6 +1080,10 @@ class TestExternal(unittest.TestCase):
 
 
 
+    def testConfigurationAssistant(self):
+
+        ca = ConfigurationAssistant()
+        ca.run()
 
         
 
@@ -1046,18 +1156,25 @@ if __name__ == "__main__":
 
 
     # only if running tests
-    import music21
     if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
+        #music21.mainTest(Test)
+        ca = ConfigurationAssistant()
+        ca.run()
+
     elif len(sys.argv) > 1:
         t = Test()
         te = TestExternal()
 
+        if sys.argv[1] in ['all', 'test']:
+            import music21
+            music21.mainTest(Test)
+        
         # arg[1] is test to launch
-        if sys.argv[1] == 'te':
+        elif sys.argv[1] == 'te':
             # run test external
             getattr(te, sys.argv[2])()
-        if hasattr(t, sys.argv[1]): 
+        # just run named Test
+        elif hasattr(t, sys.argv[1]): 
             getattr(t, sys.argv[1])()
 
 #------------------------------------------------------------------------------
