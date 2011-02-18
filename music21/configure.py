@@ -130,6 +130,46 @@ class Dialog(object):
             return DialogError()
         return NoInput()
 
+
+    def prependPromptHeader(self, msg):
+        '''
+        >>> from music21 import *
+        >>> d = configure.Dialog()
+        >>> d.prependPromptHeader('test')
+        >>> d._promptHeader
+        'test'
+
+        >>> d = configure.Dialog(promptHeader='this is it')
+        >>> d.prependPromptHeader('test')
+        >>> d._promptHeader
+        'test this is it'
+        '''
+        msg = msg.strip()
+        if self._promptHeader is not None:
+            self._promptHeader = '%s %s' % (msg, self._promptHeader)
+        else:
+            self._promptHeader = msg
+
+    def appendPromptHeader(self, msg):
+        '''
+        >>> from music21 import *
+        >>> d = configure.Dialog()
+        >>> d.appendPromptHeader('test')
+        >>> d._promptHeader
+        'test'
+
+        >>> d = configure.Dialog(promptHeader='this is it')
+        >>> d.appendPromptHeader('test')
+        >>> d._promptHeader
+        'this is it test'
+        '''
+        msg = msg.strip()
+        if self._promptHeader is not None:
+            self._promptHeader = '%s %s' % (self._promptHeader, msg)
+        else:
+            self._promptHeader = msg
+
+
     def _askTryAgain(self, default=True, force=None):
         '''What to do if input is incomplete
 
@@ -258,18 +298,19 @@ class Dialog(object):
                 break
         # self._result may still be None
 
-    def _performAction(self):
-        '''The query might require an action to be performed: this would happen here, after getting the result from the user. 
-        '''
-        # possibly return an error class or None
-        pass
-
-    def getResult(self):
+    def getResult(self, simulate=True):
         '''Return the result, or None if not set. This may also do a processing routine that is part of the desired result. 
         '''
-        self._performAction()
-        # result may be NoInput or IncompleteInput objects
         return self._result 
+
+    def performAction(self, result=None):
+        '''After getting a result, the query might require an action to be performed. If result is None, this will use whatever value is found in _result. 
+        '''
+        result = self.getResult()
+        if isinstance(self._result, DialogError):
+            environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
+            pass # nothing to do
+        # perform action
 
 
 #-------------------------------------------------------------------------------
@@ -387,6 +428,37 @@ class YesOrNo(Dialog):
                 return self._default
         # could be IncompleteInput, NoInput, or a proper, valid answer
         return rawParsed
+
+
+
+#-------------------------------------------------------------------------------
+class OpenInBrowser(YesOrNo):
+    '''Ask the user if the want to open a URL in a browser.
+
+    >>> from music21 import *
+    >>> d = configure.OpenInBrowser('http://mit.edu/music21')
+    '''
+    def __init__(self, urlTarget, default=True, tryAgain=True,
+        promptHeader=None):
+        YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+    
+        self._urlTarget = urlTarget
+        # need to update prompt header
+        msg = 'Open the following URL (%s) in a web browser?' % self._urlTarget
+        self.appendPromptHeader(msg)
+
+    def performAction(self, result=None):
+        '''The action here is to open the stored URL in a browser, if the user agrees. 
+        '''
+        result = self.getResult()
+        if isinstance(self._result, DialogError) or result is None:
+            environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
+            pass # nothing to do
+
+        if result is True: # if True            
+            import webbrowser
+            webbrowser.open_new(self._urlTarget)
+        # perform action
 
 
 
@@ -715,6 +787,15 @@ class TestExternal(unittest.TestCase):
 
 
 
+    def testOpenInBrowser(self):
+
+        print 
+        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        d = OpenInBrowser('http://mit.edu/music21')
+        d.askUser()
+        environLocal.printDebug(['getResult():', d.getResult()])
+        d.performAction()
+        
 
 class Test(unittest.TestCase):
     
