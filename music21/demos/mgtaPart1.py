@@ -10,7 +10,7 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-
+import copy
 import unittest, doctest
 import sys
 
@@ -568,13 +568,13 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     data = [[('d6',1.5)], 
             [('d6',1.5)],
             [('d6',.5),('c6',.5),('b5',.5)],
-            [(None,.5),('b5',.25),('c6',.25),('d6',.5)],
+            [('rest',.5),('b5',.25),('c6',.25),('d6',.5)],
            ]
 
     for mData in data:
         m = stream.Measure()
         for p, d in mData:
-            if p == None: 
+            if p == 'rest': 
                 n = note.Rest()
             else:
                 n = note.Note(p)
@@ -590,7 +590,7 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     # make sure these time signatures agree
     assert ts1.ratioEqual(ts2)
     for m in ex.getElementsByClass('Measure'):
-        m.insert(0, ts1)
+        m.insert(0, copy.deepcopy(ts1))
     # append answers to first note
     ex.flat.notes[0].addLyric('Meter: %s' % ts1)
     ex.flat.notes[0].addLyric('Meter type: %s' % ts1.classification)
@@ -690,11 +690,11 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
     for tsStr in ['2/4', '3/16', '4/4', '3/8', '2/2', '4/8', '6/8', '9/16', '15/4']:
         ts = meter.TimeSignature(tsStr)
 
-        ex.append(prepareMeter(ts))
-        ex.append(prepareMeterType(ts))
-        ex.append(prepareBeatUnit(ts))
-        ex.append(prepareBeatDivision(ts))
-        ex.append(prepareBeatSubDivision(ts))
+        ex.append(prepareMeter(copy.deepcopy(ts)))
+        ex.append(prepareMeterType(copy.deepcopy(ts)))
+        ex.append(prepareBeatUnit(copy.deepcopy(ts)))
+        ex.append(prepareBeatDivision(copy.deepcopy(ts)))
+        ex.append(prepareBeatSubDivision(copy.deepcopy(ts)))
         
     if show:
         ex.show()

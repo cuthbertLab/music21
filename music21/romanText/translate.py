@@ -311,7 +311,7 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
         handlerBundles = rtHandler.splitByMovement(duplicateHeader=True)
         # see if we have header information
         for h in handlerBundles:
-            print h, len(h)
+            #print h, len(h)
             # append to opus
             s.append(romanTextToStreamScore(h))
         return s # an opus

@@ -371,7 +371,7 @@ class Test(unittest.TestCase):
                 m = stream.Measure()
                 m.append(c1)
                 m.append(c2)
-                display.append(m)
+                display.append(copy.deepcopy(m))
         
         self.assertEqual(len(display.flat.getElementsByClass('Chord')), 14)
         for m in display.getElementsByClass('Measure'):

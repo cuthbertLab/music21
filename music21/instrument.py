@@ -1183,42 +1183,42 @@ class Vocalist(Instrument):
         
 class Soprano(Vocalist):
     def __init__(self):
-        Voice.__init__(self)
+        Vocalist.__init__(self)
         
         self.instrumentName = 'Soprano'
         self.instrumentAbbreviation = 'S'
         
 class MezzoSoprano(Soprano):
     def __init__(self):
-        Voice.__init__(self)
+        Vocalist.__init__(self)
         
         self.instrumentName = 'Mezzo-Soprano'
         self.instrumentAbbreviation = 'Mez'
         
 class Alto(Vocalist):
     def __init__(self):
-        Voice.__init__(self)
+        Vocalist.__init__(self)
         
         self.instrumentName = 'Alto'
         self.instrumentAbbreviation = 'A'
 
 class Tenor(Vocalist):
     def __init__(self):
-        Voice.__init__(self)
+        Vocalist.__init__(self)
         
         self.instrumentName = 'Tenor'
         self.instrumentAbbreviation = 'T'
         
 class Baritone(Vocalist):
     def __init__(self):
-        Voice.__init__(self)
+        Vocalist.__init__(self)
         
         self.instrumentName = 'Baritone'
         self.instrumentAbbreviation = 'Bar'
 
 class Bass(Vocalist):
     def __init__(self):
-        Voice.__init__(self)
+        Vocalist.__init__(self)
         
         self.instrumentName = 'Bass'
         self.instrumentAbbreviation = 'B'

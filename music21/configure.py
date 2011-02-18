@@ -1134,7 +1134,7 @@ class Test(unittest.TestCase):
         d.askUser('n') # reject option to open in a browser
         post = d.getResult()
         # returns a bad condition b/c there are no options and user entered 'n'
-        self.assertEqual(isinstance(post, music21.configure.BadConditions), True)
+        self.assertEqual(isinstance(post, configure.BadConditions), True)
 
     def testRe(self):
         
