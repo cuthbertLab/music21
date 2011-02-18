@@ -589,7 +589,11 @@ class Spanner(music21.Music21Object):
         for c in components:
             # create a component instance for each
             #self._components.append(Component(c))
-            self._components.append(c)
+
+            if not self._components.hasElement(c): # not already in storage
+                self._components.append(c)
+            else:
+                environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s' % (c, self)])
 
 
     def replaceComponent(self, old, new):
