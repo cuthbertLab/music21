@@ -15,6 +15,8 @@ import time
 import sys
 import threading 
 import unittest
+import textwrap
+
 
 try:
     import readline
@@ -36,21 +38,39 @@ reFinaleReaderApp = re.compile('Finale Reader.app')
 reMuseScoreApp = re.compile('MuseScore.app')
 
 
+urlMusic21 = 'http://mit.edu/music21'
+urlFinaleReader = 'http://www.finalemusic.com/Reader'
+urlMuseScore = 'http://musescore.org'
 
 #-------------------------------------------------------------------------------
-class Action(threading.Thread):
-    '''
-    A thread-based action for performing remote actions, like downloading or opening in a webbrowser. 
-    '''
-    def __init__ (self, prompt, timeOutTime):
-        threading.Thread.__init__(self)
-        self.status = None
-
-    def run(self):
-        pass
+# class Action(threading.Thread):
+#     '''
+#     A thread-based action for performing remote actions, like downloading or opening in a webbrowser. 
+#     '''
+#     def __init__ (self, prompt, timeOutTime):
+#         threading.Thread.__init__(self)
+#         self.status = None
+# 
+#     def run(self):
+#         pass
 
 
 #-------------------------------------------------------------------------------
+
+
+def writeToUser(msg, wrap=False):
+    '''Display a message to the user
+    '''
+    # wrap everything to 60 lines
+    if wrap:
+        lines = textwrap.wrap(msg, 60)
+        for l in lines:
+            sys.stdout.write(l)
+    else:
+        sys.stdout.write(msg)
+
+
+
 # error objects, not exceptions
 class DialogError(object):
     def __init__(self, src=None):
@@ -64,10 +84,20 @@ class KeyInterruptError(DialogError):
         DialogError.__init__(self, src=src)
 
 class IncompleteInput(DialogError):
+    '''The user has provided incomplete input that cannot be understood. 
+    '''
     def __init__(self, src=None):
         DialogError.__init__(self, src=src)
 
 class NoInput(DialogError):
+    '''The user has provided no input, and there is not a default.
+    '''
+    def __init__(self, src=None):
+        DialogError.__init__(self, src=src)
+
+class BadConditions(DialogError):
+    '''The users system does support the action of the dialog: something is missing or otherwise prohibits operation. 
+    '''
     def __init__(self, src=None):
         DialogError.__init__(self, src=src)
 
@@ -115,7 +145,9 @@ class Dialog(object):
 
 
     def _writeToUser(self, msg):
-        sys.stdout.write(msg)
+        '''Write output to user. Call module-level function
+        '''
+        writeToUser(msg)
 
     def _readFromUser(self):
         '''Collect from user; return None if an empty response.
@@ -254,17 +286,40 @@ class Dialog(object):
         pass
         # define in subclass
 
+    def _preAskUser(self, force=None):
+        '''Call this method immediately before calling askUser. Can be used for configuration getting additional information. 
+        '''
+        pass
+        # define in subclass
+
     def askUser(self, force=None):
         '''Ask the user, display the querry. The force argument can be provided to test. Sets self._result; does not return a value.
         '''
+        # always call preAskUser: can customize in subclass. must return True
+        # or False. if False, askUser cannot continue
+        post = self._preAskUser(force=force)
+        if post is False:
+            self._result = BadConditions()
+            return
+
         # ten attempts; not using a while so will ultimately break
         for i in range(self._maxAttempts):
+            # in some cases, the query might not be able to be formed: 
+            # for example, in selecting values from a list, and not having
+            # any values. thus, query may be an error
+            query = self._rawQuery()
+            if isinstance(query, DialogError):
+                # set result as error
+                self._result = query
+                break
+
             if force is None:
-                self._writeToUser(self._rawQuery())
+                self._writeToUser(query)
                 rawInput = self._readFromUser()
             else:
-                environLocal.printDebug(['writeToUser:', self._rawQuery()])
+                environLocal.printDebug(['writeToUser:', query])
                 rawInput = force
+
             # rawInput here could be an error or a value
             environLocal.printDebug(['received as rawInput', rawInput])
             # check for errors and handle
@@ -468,6 +523,17 @@ class SelectFromList(Dialog):
     '''General class to select values from a list.
 
     >>> from music21 import *
+    >>> d = configure.SelectFromList() # empty selection list
+    >>> d.askUser('no') # results in bad condition
+    >>> d.getResult()
+    <music21.configure.BadConditions: None>
+
+    >>> d = configure.SelectFromList() # empty selection list
+    >>> def validResults(force=None): return range(5)
+    >>> d._getValidResults = validResults # provide alt function for testing
+    >>> d.askUser(2) # results in bad condition
+    >>> d.getResult()
+    2
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
@@ -475,6 +541,7 @@ class SelectFromList(Dialog):
     def _getValidResults(self, force=None):
         '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
         '''
+        # this might need to be cached
         # customize in subclass
         if force is not None:
             return force
@@ -485,6 +552,56 @@ class SelectFromList(Dialog):
         '''Reduce each complete file path to stub, or otherwise compact display
         '''
         return result
+
+
+    def _askFillEmptyList(self, default=None, force=None):
+        '''What to do if the selection list is empty. Only return True or False: if we should continue or not.
+
+        >>> from music21 import *
+        >>> d = configure.SelectFromList(default=True)
+        >>> d._askFillEmptyList(force='yes')
+        True
+        >>> d._askFillEmptyList(force='n')
+        False
+        >>> d._askFillEmptyList(force='') # no default, returns False
+        False
+        >>> d._askFillEmptyList(force='weree') # error gets false
+        False
+        '''
+        # this does not do anything: customize in subclass
+        d = YesOrNo(default=default, tryAgain=False, 
+            promptHeader='The selection list is empty. Try Again?')
+        d.askUser(force=force)
+        post = d.getResult()
+        # if any errors are found, return False
+        if isinstance(post, DialogError):
+            return False
+        else: # must be True or False
+            if post not in [True, False]:
+                raise DialogError('_askFillEmptyList(): sub-command returned non True/False value')
+            return post
+
+    def _preAskUser(self, force=None):
+        '''Before we ask user, we need to to run _askFillEmptyList list if the list is empty.
+
+        >>> from music21 import *
+        >>> d = configure.SelectFromList()
+        >>> d._preAskUser('no') # force for testing
+        False
+        >>> d._preAskUser('yes') # force for testing
+        True
+        >>> d._preAskUser('') # no default, returns False
+        False
+        >>> d._preAskUser('x') # bad input returns false
+        False
+        '''
+        options = self._getValidResults()
+        if len(options) == 0:
+            # must return True/False, 
+            post = self._askFillEmptyList(force=force)
+            return post 
+        else: # if we have options, return True
+            return True
 
     def _rawQuery(self, force=None):
         '''Return a multiline presentation of the question.
@@ -502,7 +619,12 @@ class SelectFromList(Dialog):
         '''
         msg = []
         i = 1
-        for entry in self._getValidResults(force=force):
+        options = self._getValidResults(force=force)
+        # if no options, cannot form query: return bad conditions
+        if len(options) == 0:
+            return BadConditions('no options available')
+
+        for entry in options:
             sub = self._formatResultForUser(entry)
             msg.append('[%s] %s' % (i, sub))
             i += 1
@@ -679,7 +801,42 @@ class SelectMusicXMLReader(SelectFilePath):
         return post
 
 
+    def _askFillEmptyList(self, default=None, force=None):
+        '''If we do not have an musicxml readers, ask user if they want to download. 
 
+        >>> from music21 import *
+        '''
+        platform = common.getPlatform()
+        if platform == 'win':
+            urlTarget = urlFinaleReader
+        elif platform == 'darwin':
+            urlTarget = urlFinaleReader
+        elif platform == 'nix':
+            urlTarget = urlMuseScore
+        
+        # this does not do anything: customize in subclass
+        d = OpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False, 
+            promptHeader='No available MusicXML readers are found on your system. It is reccomended to download and install a reader.')
+        d.askUser(force=force)
+        post = d.getResult()
+        # can call regardless of result; will only function if result is True
+        d.performAction() 
+        # if any errors are found, return False; this will end execution of 
+        # askUser and return a BadConditions error
+        if isinstance(post, DialogError):
+            return False
+        else: # must be True or False
+            # if user selected to open webpage, give them time to download
+            # and install; so ask if ready to continue
+            if post is True: 
+                for x in range(self._maxAttempts):
+                    d = YesOrNo(default=True, tryAgain=False, 
+                        promptHeader='Are you ready to continue?')
+                    d.askUser(force=force)
+                    post = d.getResult()
+                    if post is True:
+                        break
+            return post
 
 #-------------------------------------------------------------------------------
 # for time-out gather of arguments: possibly look at:
@@ -788,13 +945,36 @@ class TestExternal(unittest.TestCase):
 
 
     def testOpenInBrowser(self):
-
         print 
         environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = OpenInBrowser('http://mit.edu/music21')
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
         d.performAction()
+
+
+    def testSelectMusicXMLReader(self):
+        print 
+        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        d = SelectMusicXMLReader()
+        d.askUser()
+        environLocal.printDebug(['getResult():', d.getResult()])
+        d.performAction()
+
+
+        print 
+        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        d = SelectMusicXMLReader()
+        # force request to user by returning no valid results
+        def getValidResults(force=None): return []
+        d._getValidResults = getValidResults
+        d.askUser()
+        environLocal.printDebug(['getResult():', d.getResult()])
+        d.performAction()
+
+
+
+
         
 
 class Test(unittest.TestCase):
@@ -802,11 +982,49 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testYesOrNo(self):
+        from music21 import configure
+        d = configure.YesOrNo(default=True, tryAgain=False, 
+                        promptHeader='Are you ready to continue?')
+        d.askUser('n')
+        self.assertEqual(str(d.getResult()), 'False')
+        d.askUser('y')
+        self.assertEqual(str(d.getResult()), 'True')
+        d.askUser('') # gets default
+        self.assertEqual(str(d.getResult()), 'True')
+        d.askUser('werwer') # gets default
+        self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: werwer>')
+
+
+        d = configure.YesOrNo(default=None, tryAgain=False, 
+                        promptHeader='Are you ready to continue?')
+        d.askUser('n')
+        self.assertEqual(str(d.getResult()), 'False')
+        d.askUser('y')
+        self.assertEqual(str(d.getResult()), 'True')
+        d.askUser('') # gets default
+        self.assertEqual(str(d.getResult()), '<music21.configure.NoInput: None>')
+        d.askUser('werwer') # gets default
+        self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: werwer>')
+
+
+
     def testSelectFromList(self):
         from music21 import configure
         d = configure.SelectFromList(default=1)
         self.assertEqual(d._default, 1)
 
+
+    def testSelectMusicXMLReaders(self):
+        from music21 import configure
+        d = configure.SelectMusicXMLReader()
+        # force request to user by returning no valid results
+        def getValidResults(force=None): return []
+        d._getValidResults = getValidResults
+        d.askUser('n') # reject option to open in a browser
+        post = d.getResult()
+        # returns a bad condition b/c there are no options and user entered 'n'
+        self.assertEqual(isinstance(post, music21.configure.BadConditions), True)
 
     def testRe(self):
         
