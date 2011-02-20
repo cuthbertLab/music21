@@ -23,7 +23,8 @@ try:
 except ImportError:
     pass
 
-# may need to not import any music21 here
+# assume that we will manually add this dire to sys.path top get access to
+# all modules before installation
 from music21 import common
 from music21 import environment
 _MOD = "configure.py"
@@ -173,6 +174,9 @@ class Dialog(object):
 
         # how many times to ask the user again and again for the same thing
         self._maxAttempts = 8
+
+        # set platforms this dialog should run in 
+        self._platforms = ['win', 'darwin', 'nix']
 
 
     def _writeToUser(self, msg):
@@ -399,13 +403,26 @@ class Dialog(object):
         '''
         return self._result 
 
-    def performAction(self, result=None):
+    def _performAction(self, simulate=False):
+        '''
+        '''
+        pass 
+        # define in subclass
+
+    def performAction(self, simulate=False):
         '''After getting a result, the query might require an action to be performed. If result is None, this will use whatever value is found in _result. 
+
+        If simulate is True, no action will be taken.
         '''
         result = self.getResult()
         if isinstance(self._result, DialogError):
-            #environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
-            pass # nothing to do
+            environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
+            self._writeToUser(['No action taken.', ' '])
+
+        elif simulate: # do not operate
+            environLocal.printDebug('performAction() called, but in simulation mode: %s' % self._result)
+        else:
+            self._performAction(simulate=simulate)
         # perform action
 
 
@@ -528,11 +545,11 @@ class YesOrNo(Dialog):
 
 
 #-------------------------------------------------------------------------------
-class OpenInBrowser(YesOrNo):
+class AskOpenInBrowser(YesOrNo):
     '''Ask the user if the want to open a URL in a browser.
 
     >>> from music21 import *
-    >>> d = configure.OpenInBrowser('http://mit.edu/music21')
+    >>> d = configure.AskOpenInBrowser('http://mit.edu/music21')
     '''
     def __init__(self, urlTarget, default=True, tryAgain=True,
         promptHeader=None):
@@ -543,18 +560,45 @@ class OpenInBrowser(YesOrNo):
         msg = 'Open the following URL (%s) in a web browser?' % self._urlTarget
         self.appendPromptHeader(msg)
 
-    def performAction(self, result=None):
+    def _performAction(self, simulate=False):
         '''The action here is to open the stored URL in a browser, if the user agrees. 
         '''
         result = self.getResult()
-        if isinstance(self._result, DialogError) or result is None:
-            environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
-            pass # nothing to do
-
         if result is True: # if True            
             import webbrowser
             webbrowser.open_new(self._urlTarget)
+        elif result is False:
+            pass
+            #self._writeToUser(['No URL is opened.', ' '])
+
         # perform action
+
+
+class AskAutoDownload(YesOrNo):
+    '''Ask the user if they want to enable auto-downloading
+
+    >>> from music21 import *
+    '''
+    def __init__(self, default=True, tryAgain=True,
+        promptHeader=None):
+        YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+
+        msg = 'Would you like music21 to automatically download music data files when a URL is given to Converter?'
+        self.appendPromptHeader(msg)
+
+    def _performAction(self, simulate=False):
+        '''The action here is to open the stored URL in a browser, if the user agrees. 
+        '''
+        result = self.getResult()
+        if result in [True, False]: 
+            reload(environment)
+            us = environment.UserSettings()
+            if result is True:
+                us['autoDownload'] = 'allow' # automatically writes
+            elif result is False:
+                us['autoDownload'] = 'deny' # automatically writes
+            self._writeToUser(['Auto download preference set to: %s' % 
+                us['autoDownload'], ' '])
 
 
 
@@ -686,12 +730,16 @@ class SelectFromList(Dialog):
             return NoInput()
         if raw is '':
             return NoInput()
-        # try to convert string into a number
-        try:
-            post = int(raw)
-        # catch all problems
-        except (ValueError, TypeError, ZeroDivisionError):
-            return IncompleteInput(raw)
+        # accept yes as 1
+        
+        if raw in ['yes', 'y', '1', 'true']:
+            post = 1
+        else: # try to convert string into a number
+            try:
+                post = int(raw)
+            # catch all problems
+            except (ValueError, TypeError, ZeroDivisionError):
+                return IncompleteInput(raw)
         return post
 
     
@@ -786,6 +834,9 @@ class SelectMusicXMLReader(SelectFilePath):
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         SelectFilePath.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
+        # define platforms that this will run on
+        self._platforms = ['darwin']
+
     def _rawIntroduction(self):
         '''Return a multiline presentation of an introduction.
         '''
@@ -860,8 +911,8 @@ class SelectMusicXMLReader(SelectFilePath):
             urlTarget = urlMuseScore
         
         # this does not do anything: customize in subclass
-        d = OpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False, 
-            promptHeader='No available MusicXML readers are found on your system. It is reccomended to download and install a reader.')
+        d = AskOpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False, 
+            promptHeader='No available MusicXML readers are found on your system. It is reccomended to download and install a reader before continuing.')
         d.askUser(force=force)
         post = d.getResult()
         # can call regardless of result; will only function if result is True
@@ -881,23 +932,49 @@ class SelectMusicXMLReader(SelectFilePath):
                     post = d.getResult()
                     if post is True:
                         break
+                    elif isinstance(post, DialogError):
+                        break
+
             return post
+
+
+    def _performAction(self, simulate=False):
+        '''The action here is to open the stored URL in a browser, if the user agrees. 
+        '''
+        result = self.getResult()
+        if result is not None and not isinstance(result, DialogError): 
+            reload(environment)
+            us = environment.UserSettings()
+            us['musicxmlPath'] = result # automatically writes
+            self._writeToUser(['MusicXML Reader set to: %s' % 
+                us['musicxmlPath'], ' '])
+
 
 
 
 #-------------------------------------------------------------------------------
 class ConfigurationAssistant(object):
-    def __init__(self):
-        
+    '''
+    Class for managing numerous configuration tasks.
+
+    '''
+    def __init__(self, simulate=False):
+
+        self._simulate = simulate        
+        self._platform = common.getPlatform()
+
+        # add dialogs to list
         self._dialogs = []
 
         d = SelectMusicXMLReader(default=1)
         self._dialogs.append(d)
 
+        d = AskAutoDownload(default=True)
+        self._dialogs.append(d)
 
         # note: this is the on-line URL: 
         # might be better to find local documentaiton
-        d = OpenInBrowser(urlTarget=urlGettingStarted, promptHeader='Would you like to view the music21 Quick Start?')
+        d = AskOpenInBrowser(urlTarget=urlGettingStarted, promptHeader='Would you like to view the music21 Quick Start?')
         self._dialogs.append(d)
 
 
@@ -905,14 +982,14 @@ class ConfigurationAssistant(object):
         msg = []
         msg.append('''Welcome the music21 Configuration Assistant. You will be guided through a number of questions to install and setup music21. Simply pressing return at a prompt will select a default, if available.''')
         msg.append('') # will cause a line break
-        msg.append('''You may run this configuration again at a later time by running configure.py.''')
+        msg.append('''You may run this configuration again at a later time by running music21/configure.py.''')
         msg.append(' ') # will cause a blank line
 
         writeToUser(msg)
 
     def _conclusion(self):
         msg = []
-        msg.append('''This concludes the music21 Configuration Assistant.''')
+        msg.append('''The music21 Configuration Assistant is complete.''')
         msg.append('')
         writeToUser(msg)
 
@@ -925,15 +1002,29 @@ class ConfigurationAssistant(object):
         msg.append(' ') # add a space
         writeToUser(msg)
 
-    def run(self):
+    def run(self, forceList=[]):
+        '''
+        The forceList, if provided, is a list of string arguments passed in order to the included dialogs. Used for testing. 
+        '''
         self._hr()
         self._introduction()
-        for d in self._dialogs:
+
+        for i, d in enumerate(self._dialogs):
+            # if this platform is not in those defined for the dialog, continue
+            if self._platform not in d._platforms:
+                continue
+
             self._hr()
-            d.askUser()
+
+            if len(forceList) > i:
+                force = forceList[i]
+            else:
+                force = None
+
+            d.askUser(force=force)
             post = d.getResult()
             # post may be an error; no problem calling perform action anyways
-            d.performAction()
+            d.performAction(simulate=self._simulate)
 
         self._hr()
         self._conclusion()
@@ -1053,7 +1144,7 @@ class TestExternal(unittest.TestCase):
     def testOpenInBrowser(self):
         print 
         environLocal.printDebug(['starting: SelectMusicXMLReader()'])
-        d = OpenInBrowser('http://mit.edu/music21')
+        d = AskOpenInBrowser('http://mit.edu/music21')
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
         d.performAction()
@@ -1082,7 +1173,7 @@ class TestExternal(unittest.TestCase):
 
     def testConfigurationAssistant(self):
 
-        ca = ConfigurationAssistant()
+        ca = ConfigurationAssistant(simulate=True)
         ca.run()
 
         
@@ -1147,6 +1238,11 @@ class Test(unittest.TestCase):
         self.assertEqual(g.group(0), 'Finale 2009.app')
 
         self.assertEqual(reFinaleApp.match('Finale 1992.app'), None)
+
+
+    def testConfigurationAssistant(self):
+        ca = ConfigurationAssistant(simulate=True)
+
 
 
 

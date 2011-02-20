@@ -341,7 +341,7 @@ class Environment(object):
 
         # need to use __getitem__ here b/c need to covnert debug value
         # to an integer
-        self.printDebug([_MOD, 'writing preference file', self.ref])
+        #self.printDebug([_MOD, 'writing preference file', self.ref])
 
         dir, fn = os.path.split(fp)
         if fp == None or not os.path.exists(dir):
