@@ -26,8 +26,8 @@ import xml.dom.minidom
 import music21
 from music21 import defaults
 from music21 import common
-from music21 import node
-xml.dom.minidom.Element.writexml = node.fixed_writexml
+from music21 import xmlnode
+xml.dom.minidom.Element.writexml = xmlnode.fixed_writexml
 
 from music21 import environment
 _MOD = 'musicxml.py'
@@ -451,7 +451,7 @@ class TagLib(object):
 
 
 #-------------------------------------------------------------------------------
-class MusicXMLElement(node.Node):
+class MusicXMLElement(xmlnode.XMLNode):
     '''MusicXML elements are an abstraction of MusicXML into an object oriented framework. Some, not all, of MusicXML elements are represented as objects. Some sub-elements are much more simply placed as attributes of parent objects. These simple elements have only a tag and character data. Elements that have attributes and/or sub-elements, however, must be represented as objects.
     '''
 
@@ -489,7 +489,7 @@ class MusicXMLElement(node.Node):
 
 
         '''
-        node.Node.__init__(self)
+        xmlnode.XMLNode.__init__(self)
         self.external = {} # references to external objects
     
         self._attr = {} # store attributes in dictionary

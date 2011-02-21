@@ -20,7 +20,7 @@ import music21
 from music21 import musicxml as musicxmlMod
 from music21 import defaults
 from music21 import common
-from music21 import node
+from music21 import xmlnode
 
 # modules that import this include stream.py, chord.py, note.py
 # thus, cannot import these here
@@ -1269,7 +1269,7 @@ def _addToStaffReference(mxObject, target, staffReference):
     else:
         try:
             key = mxObject.get('number')
-        except node.NodeException:
+        except xmlnode.XMLNodeException:
             return 
     if key not in staffReference.keys():
         staffReference[key] = []

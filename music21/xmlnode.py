@@ -1,12 +1,12 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         node.py
-# Purpose:      XML base class for SAX-based xml objects
+# Name:         xmlnode.py
+# Purpose:      Base class for SAX-based xml objects
 #
 # Authors:      Christopher Ariza
 #               
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ import doctest, unittest
 import re
 from music21 import common
 
-_MOD = 'node.py'
+_MOD = 'xmlnode.py'
 
 # these module-level dictionaries cache used xml name conversion
 # store converted names for reuse
@@ -71,13 +71,13 @@ def fixed_writexml(self, writer, indent="", addindent="", newl=""):
 
 
 #-------------------------------------------------------------------------------
-class NodeException(Exception):
+class XMLNodeException(Exception):
     pass
 
-class Node(object):
+class XMLNode(object):
     def __init__(self):
         '''
-        >>> a = Node()
+        >>> a = XMLNode()
         >>> a.set('charData', 'test')
         '''
         self._attr = {} # store attributes in dictionary
@@ -96,7 +96,7 @@ class Node(object):
 
     def _getAttributes(self):
         '''Return a list of attribute names / value pairs
-        >>> a = Node()
+        >>> a = XMLNode()
         >>> a._getAttributes()
         []
         '''
@@ -104,7 +104,7 @@ class Node(object):
 
 
     def _getComponents(self):
-        '''Get all sub-components, in order. This may be Node subclasses, or may be simple entities. Simple entities do not have attributes and are only used as containers for character data. These entities are generally not modelled as objects '''
+        '''Get all sub-components, in order. This may be XMLNode subclasses, or may be simple entities. Simple entities do not have attributes and are only used as containers for character data. These entities are generally not modelled as objects '''
         return []
 
 
@@ -127,7 +127,7 @@ class Node(object):
 
         All options need to be lower case.
 
-        >>> a = Node()
+        >>> a = XMLNode()
         >>> a._convertNameCrossReference('characterData')
         'charData'
         '''
@@ -140,7 +140,7 @@ class Node(object):
     def _convertNameFromXml(self, nameSrc):
         '''Given an xml attribute/entity name, try to convert it to a Python attribute name. If the python name is given, without and - dividers, the the proper name should be returned
 
-        >>> a = Node()
+        >>> a = XMLNode()
         >>> a._convertNameFromXml('char-data')
         'charData'
         '''
@@ -162,7 +162,7 @@ class Node(object):
         '''Given an a Python attribute name, try to convert it to a XML name.
         If already an XML name, leave alone.
 
-        >>> a = Node()
+        >>> a = XMLNode()
         >>> a._convertNameToXml('charData')
         'char-data'
         '''
@@ -196,7 +196,7 @@ class Node(object):
         '''Get all public names from this object.
         Used in merging. 
 
-        >>> a = Node()
+        >>> a = XMLNode()
         >>> len(a._publicAttributes())
         2
         >>> print(a._publicAttributes())
@@ -226,18 +226,18 @@ class Node(object):
         pass
 
     def merge(self, other, favorSelf=True):
-        '''Given another similar or commonly used Node object, combine
+        '''Given another similar or commonly used XMLNode object, combine
         all attributes and return a new object.
 
-        >>> a = Node()
+        >>> a = XMLNode()
         >>> a.set('charData', 'green')
-        >>> b = Node()
+        >>> b = XMLNode()
         >>> c = b.merge(a)
         >>> c.get('charData')
         'green'
         '''
-        if not isinstance(other, Node):
-            raise NodeException('can only merge with other nodes')
+        if not isinstance(other, XMLNode):
+            raise XMLNodeException('can only merge with other nodes')
 
         new = copy.deepcopy(self)
 
@@ -278,7 +278,7 @@ class Node(object):
                     else:
                         new.set(otherAttr[i], otherAttr.get(otherAttr[i]))
         else:
-            raise NodeException('cannot merge: %s, %s' % (self, other))
+            raise XMLNodeException('cannot merge: %s, %s' % (self, other))
             #print _MOD, 
 
         # call local merge special
@@ -322,10 +322,10 @@ class Node(object):
                 setattr(self, candidate, value)
                 match = True
         if not match:
-            raise NodeException('this object does not have a %s (or %s) attribute' % (name, candidates))
+            raise XMLNodeException('this object does not have a %s (or %s) attribute' % (name, candidates))
         
     def get(self, name):
-        '''Get a data attrbiute from this Node. If available in the attribute dictionary, return this first. If available as an object attribute, return this second. 
+        '''Get a data attrbiute from this XMLNode. If available in the attribute dictionary, return this first. If available as an object attribute, return this second. 
         '''
         if name in self._attr.keys():
             return self._attr[name]
@@ -354,7 +354,7 @@ class Node(object):
                 match = True
                 return getattr(self, candidate)
         if not match:
-            raise NodeException('this object does not have a %s (or %s) attribute' % (name, candidate))
+            raise XMLNodeException('this object does not have a %s (or %s) attribute' % (name, candidate))
         
 
     def setDefaults(self):
@@ -447,7 +447,7 @@ class Node(object):
                         #entry = str(content)
                     sub.appendChild(doc.createTextNode(entry))
                 node.appendChild(sub)
-            elif isinstance(component, Node): # its a Node subclass
+            elif isinstance(component, XMLNode): # its a XMLNode subclass
                 # parent is this node
                 # if we have sub objects, we need to attach them to caller node
                 component.toxml(doc, node, 0)
@@ -457,7 +457,7 @@ class Node(object):
                 # the problem is generally not here, but in the higher-level
                 print(['cannot process component object', component, 'doc', doc, 'parent', parent])
             else:
-                raise NodeException(
+                raise XMLNodeException(
                     'cannot process component object: %s' % component)
 
         # append completed node to parent (from arg) or document
@@ -476,9 +476,9 @@ class Node(object):
 
 
 
-class NodeList(Node):
+class XMLNodeList(XMLNode):
     '''
-To understand what a NodeList is, we need to first see that Nodes are simply 
+To understand what a XMLNodeList is, we need to first see that Nodes are simply 
 xml-like containers. Though many xml-like containers store just character 
 data, like::
 
@@ -509,7 +509,7 @@ nodes that give us list-like functionality for the cases where we need them.
 '''
 
     def __init__(self):
-        Node.__init__(self)
+        XMLNode.__init__(self)
         # basic storage location
         self.componentList = [] 
         # self._index = 0
@@ -580,7 +580,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Node, NodeList]
+_DOC_ORDER = [XMLNode, XMLNodeList]
 
 
 if __name__ == "__main__":

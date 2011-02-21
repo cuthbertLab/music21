@@ -64,7 +64,7 @@ __all__ = ['base',
 
 
 #print __all__
-# skipped purposely, "base", "node"
+# skipped purposely, "base", "xmlnode"
 
 #-------------------------------------------------------------------------------
 # for sub packages, need to manually add the modules in these subpackages

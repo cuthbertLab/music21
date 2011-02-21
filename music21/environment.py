@@ -28,7 +28,7 @@ import xml.sax
 
 import music21
 from music21 import common
-from music21 import node
+from music21 import xmlnode
 
 
 _MOD = 'environment.py'
@@ -43,14 +43,14 @@ class UserSettingsException(Exception):
 
 
 #-------------------------------------------------------------------------------
-class Settings(node.NodeList):
+class Settings(xmlnode.XMLNodeList):
     '''
     '''
     def __init__(self):
         '''
         >>> a = Settings()
         '''
-        node.NodeList.__init__(self)
+        xmlnode.XMLNodeList.__init__(self)
         self._tag = 'settings' # assumed for now
         self.componentList = [] # list of Part objects
 
@@ -58,14 +58,14 @@ class Settings(node.NodeList):
         return self.componentList
 
 
-class Preference(node.Node):
+class Preference(xmlnode.XMLNode):
     '''
     '''
     def __init__(self):
         '''
         >>> a = Preference()
         '''
-        node.Node.__init__(self)
+        xmlnode.XMLNode.__init__(self)
         self._tag = 'preference' # assumed for now
         # attributes
         self._attr['name'] = None
