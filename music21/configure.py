@@ -16,7 +16,7 @@ import sys
 import threading 
 import unittest
 import textwrap
-
+import distutils
 
 try:
     import readline
@@ -63,7 +63,7 @@ LINE_WIDTH = 80
 
 
 def writeToUser(msg, wrap=True):
-    '''Display a message to the user
+    '''Display a message to the user, handling multiple lines as necessary and wrapping text
     '''
     # wrap everything to 60 lines
     if common.isListLike(msg):
@@ -101,6 +101,34 @@ def writeToUser(msg, wrap=True):
             l = '%s ' % l 
         sys.stdout.write(l)
         sys.stdout.flush()
+
+
+
+def findInstallations():
+    '''Find all music21 references found in site packages, or possibly look at the running code as well.
+    '''
+    found = []
+    dir = distutils.sysconfig.get_python_lib()
+    for fn in os.listdir(dir):
+        if dir.startswith('music21'):
+            found.append(os.path.join(dir, fn))
+    try:
+        # see if we can import music21
+        import music21
+        found.append(music21.__path__[0]) # list, get first item
+    except ImportError:
+        pass
+
+    return found
+
+
+
+def getUserData():
+    '''Return a dictionary with user data
+    '''
+    post = {}
+
+
 
 
 # error objects, not exceptions
@@ -1015,7 +1043,6 @@ class ConfigurationAssistant(object):
                 continue
 
             self._hr()
-
             if len(forceList) > i:
                 force = forceList[i]
             else:
