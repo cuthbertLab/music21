@@ -23,6 +23,12 @@ try:
 except ImportError:
     pass
 
+try:
+    import StringIO # python 2 
+except:
+    from io import StringIO # python3 (also in python 2.6+)
+
+
 # assume that we will manually add this dire to sys.path top get access to
 # all modules before installation
 from music21 import common
@@ -103,12 +109,14 @@ def writeToUser(msg, wrap=True):
         sys.stdout.flush()
 
 
+def getSitePackages():
+    return distutils.sysconfig.get_python_lib()
 
 def findInstallations():
     '''Find all music21 references found in site packages, or possibly look at the running code as well.
     '''
     found = []
-    dir = distutils.sysconfig.get_python_lib()
+    dir = getSitePackages()
     for fn in os.listdir(dir):
         if dir.startswith('music21'):
             found.append(os.path.join(dir, fn))
@@ -129,8 +137,59 @@ def getUserData():
     post = {}
 
 
+def _crawlPathUpward(start, target):
+    '''Ascend up paths given a start; return when target file has been found.
+    '''
+    lastDir = start
+    thisDir = lastDir
+    match = None
+    # first, ascend upward
+    while True:
+        environLocal.printDebug('at dir: %s' % thisDir)
+        if match is not None:
+            break
+        for fn in os.listdir(thisDir):
+            if fn == target:
+                match = os.path.join(thisDir, fn)
+                break
+        lastDir = thisDir
+        thisDir, junk = os.path.split(thisDir)
+        if thisDir == lastDir: # at top level
+            break
+    return match
 
 
+def findSetup():    
+    '''Find the setup.py script 
+    '''
+    # find setup.py
+    # look in current directory and ascending
+    match = _crawlPathUpward(start=os.getcwd(), target='setup.py')
+    # if no match, search downward if music21 is in this directory
+    if match is None:
+        if 'music21' in os.listdir(os.getcwd()):
+            sub = os.path.join(os.getcwd(), 'music21')
+            if 'setup.py' in os.listdir(sub):
+                match = os.path.join(sub, 'setup.py')
+
+    # if still not found, try to get from importing music21. 
+    # this may not be correct, as this might be a previous music21 installation
+#     if match is None:
+#         try:
+#             import music21
+#             fpMusic21 = music21.__path__[0] # list, get first item
+#         except ImportError:
+#             fpMusic21 = None
+#         if fpMusic21 is not None:
+#             match = _crawlPathUpward(start=fpMusic21, target='setup.py')
+                        
+    environLocal.printDebug(['found setup.py: %s' % match])
+    return match
+
+
+
+
+#-------------------------------------------------------------------------------
 # error objects, not exceptions
 class DialogError(object):
     def __init__(self, src=None):
@@ -629,6 +688,61 @@ class AskAutoDownload(YesOrNo):
                 us['autoDownload'], ' '])
 
 
+class AskInstall(YesOrNo):
+    '''Ask the user if they want to enable auto-downloading
+
+    >>> from music21 import *
+    '''
+    def __init__(self, default=True, tryAgain=True,
+        promptHeader=None):
+        YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+
+        # define platforms that this will run on
+        self._platforms = ['darwin', 'nix']
+
+        msg = 'Would you like to install music21 in Python site-packages?'
+        self.appendPromptHeader(msg)
+
+
+    def _performActionNix(self, simulate=False):
+        '''
+        '''
+        fp = findSetup()
+        if fp is not None:
+
+            self._writeToUser(['Because you are writing files to the following directory:', getSitePackages(), ' ', 'you will be prompted to provide your user password to complete this opperation.', ' '])
+
+            stdoutSrc = sys.stdout
+            stderrSrc = sys.stderr
+
+            fileLikeOpen = StringIO.StringIO()
+            sys.stdout = fileLikeOpen
+
+            dir, fn = os.path.split(fp)
+            pyPath = sys.executable
+            cmd = 'cd %s; sudo %s setup.py install' % (dir, pyPath)
+            post = os.system(cmd)
+
+            fileLikeOpen.close()
+            sys.stdout = stdoutSrc
+            sys.stderr = stderrSrc
+            return post
+
+    def _performAction(self, simulate=False):
+        '''The action here is to open the stored URL in a browser, if the user agrees. 
+        '''
+        platform = common.getPlatform()
+        if platform == 'win':
+            pass
+        elif platform == 'darwin':
+            post = self._performActionNix()
+        elif platform == 'nix':
+            post = self._performActionNix()
+        return post
+
+
+
+        
 
 
 #-------------------------------------------------------------------------------
@@ -994,6 +1108,9 @@ class ConfigurationAssistant(object):
         # add dialogs to list
         self._dialogs = []
 
+        d = AskInstall(default=1)
+        self._dialogs.append(d)
+
         d = SelectMusicXMLReader(default=1)
         self._dialogs.append(d)
 
@@ -1270,8 +1387,12 @@ class Test(unittest.TestCase):
     def testConfigurationAssistant(self):
         ca = ConfigurationAssistant(simulate=True)
 
-
-
+    
+    def testAskInstall(self):
+        d = AskInstall()
+        d.askUser()
+        d.getResult()
+        d.performAction()
 
 
 if __name__ == "__main__":
