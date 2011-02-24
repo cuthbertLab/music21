@@ -17,6 +17,7 @@ import threading
 import unittest
 import textwrap
 import distutils
+import webbrowser
 
 try:
     import readline
@@ -135,9 +136,29 @@ def getUserData():
     '''Return a dictionary with user data
     '''
     post = {}
+    try:
+        import music21
+        post['music21.version'] = music21.VERSION_STR
+    except ImportError:
+        post['music21.version'] = 'None'
+        
+    post['sys.platform'] = sys.platform
 
-def mailToStr():
-    msg = '''mailto:astark1@unl.edu?subject=music21 install report&body=The message first paragraph.\nSecond paragraph.'''
+    try:
+        uname = os.uname()
+        post['os.uname'] = '%s, %s, %s' % (uname[0], uname[2], uname[4])
+    except: # catch all
+        post['os.uname'] = 'None'
+
+    post['time.gmtime'] = time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())
+    post['time.timezone'] = time.timezone
+
+    tzname = time.tzname
+    if len(tzname) == 2 and tzname[1] not in [None, 'None', '']:
+        post['time.tzname'] = tzname[1]
+    else:
+        post['time.tzname'] = tzname[0]
+    return post
 
 
 def _crawlPathUpward(start, target):
@@ -643,20 +664,23 @@ class AskOpenInBrowser(YesOrNo):
     >>> d = configure.AskOpenInBrowser('http://mit.edu/music21')
     '''
     def __init__(self, urlTarget, default=True, tryAgain=True,
-        promptHeader=None):
+        promptHeader=None, prompt=None):
         YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
     
         self._urlTarget = urlTarget
-        # need to update prompt header
-        msg = 'Open the following URL (%s) in a web browser?' % self._urlTarget
-        self.appendPromptHeader(msg)
+        # try to directly set prompt header
+        if prompt is not None:
+            # override whatever is already in the prompt
+            self._promptHeader = prompt
+        else: # else, append 
+            msg = 'Open the following URL (%s) in a web browser?' % self._urlTarget
+            self.appendPromptHeader(msg)
 
     def _performAction(self, simulate=False):
         '''The action here is to open the stored URL in a browser, if the user agrees. 
         '''
         result = self.getResult()
         if result is True: # if True            
-            import webbrowser
             webbrowser.open_new(self._urlTarget)
         elif result is False:
             pass
@@ -745,6 +769,46 @@ class AskInstall(YesOrNo):
             elif platform == 'nix':
                 post = self._performActionNix()
             return post
+
+
+
+
+class AskSendInstallationReport(YesOrNo):
+    '''Ask the user if they want to send a report regarding their system and usage.
+
+    >>> from music21 import *
+    '''
+    def __init__(self, default=True, tryAgain=True,
+        promptHeader=None):
+        YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+
+        msg = 'Would you like to send a pre-formatted email to music21 regarding your installation? Installation reports help us make music21 work better for you'
+        self.appendPromptHeader(msg)
+
+    def _getMailToStr(self):
+        body = []
+        body.append('Please send the following email; your return email address will never be used in any way.')
+        body.append('')
+        body.append('The following information on your installation will be used only for research.')
+        body.append('')
+
+        userData = getUserData()
+        for key in sorted(userData.keys()):
+            body.append('%s // %s' % (key, userData[key]))
+
+        body.append('')
+        body.append('Below, please provide a few words about how you use music21. Thanks!')
+        body.append('')
+
+        msg = '''mailto:report@music21.mit.edu?subject=music21 Installation Report&body=%s''' % '\n'.join(body)
+        return msg # pass this to webbrowser
+
+    def _performAction(self, simulate=False):
+        '''The action here is to open the stored URL in a browser, if the user agrees. 
+        '''
+        result = self.getResult()
+        if result is True:
+            webbrowser.open(self._getMailToStr())
 
 
 
@@ -1123,9 +1187,12 @@ class ConfigurationAssistant(object):
         d = AskAutoDownload(default=True)
         self._dialogs.append(d)
 
+        d = AskSendInstallationReport(default=True)
+        self._dialogs.append(d)
+
         # note: this is the on-line URL: 
         # might be better to find local documentaiton
-        d = AskOpenInBrowser(urlTarget=urlGettingStarted, promptHeader='Would you like to view the music21 Quick Start?')
+        d = AskOpenInBrowser(urlTarget=urlGettingStarted, prompt='Would you like to view the music21 Quick Start in a web browser?')
         self._dialogs.append(d)
 
 
@@ -1400,6 +1467,16 @@ class Test(unittest.TestCase):
         #d.getResult()
         #d.performAction()
 
+
+    def testGetUserData(self):
+        print getUserData()
+
+        d = AskSendInstallationReport()
+#         d.askUser()
+#         d.getResult()
+#         d.performAction()
+
+        
 
 if __name__ == "__main__":
     import sys
