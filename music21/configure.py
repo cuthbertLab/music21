@@ -735,14 +735,16 @@ class AskInstall(YesOrNo):
     def _performAction(self, simulate=False):
         '''The action here is to open the stored URL in a browser, if the user agrees. 
         '''
-        platform = common.getPlatform()
-        if platform == 'win':
-            pass
-        elif platform == 'darwin':
-            post = self._performActionNix()
-        elif platform == 'nix':
-            post = self._performActionNix()
-        return post
+        result = self.getResult()
+        if result is True: 
+            platform = common.getPlatform()
+            if platform == 'win':
+                pass
+            elif platform == 'darwin':
+                post = self._performActionNix()
+            elif platform == 'nix':
+                post = self._performActionNix()
+            return post
 
 
 
@@ -1394,9 +1396,9 @@ class Test(unittest.TestCase):
     
     def testAskInstall(self):
         d = AskInstall()
-        d.askUser()
-        d.getResult()
-        d.performAction()
+        #d.askUser()
+        #d.getResult()
+        #d.performAction()
 
 
 if __name__ == "__main__":
