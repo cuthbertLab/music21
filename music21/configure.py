@@ -119,7 +119,7 @@ def findInstallations():
     found = []
     dir = getSitePackages()
     for fn in os.listdir(dir):
-        if dir.startswith('music21'):
+        if fn.startswith('music21'):
             found.append(os.path.join(dir, fn))
     try:
         # see if we can import music21
@@ -127,9 +127,28 @@ def findInstallations():
         found.append(music21.__path__[0]) # list, get first item
     except ImportError:
         pass
-
     return found
 
+def findInstallationsEggInfo():
+    '''Find all music21 references found in site packages, or possibly look at the running code as well.
+    '''
+    found = findInstallations()
+    # only get those that end w/ egg-info
+    post = []
+    for fp in found:
+        dir, fn = os.path.split(fp)
+        if fn.endswith('egg-info') or fn.endswith('egg'):
+            post.append(fn)
+    return post
+
+def findInstallationsEggInfoStr():
+    '''Return a string presentation, or None
+    '''
+    found = findInstallationsEggInfo()
+    if found == []:
+        return 'None'
+    else:
+        return ','.join(found)
 
 
 def getUserData():
@@ -142,7 +161,7 @@ def getUserData():
     except ImportError:
         post['music21.version'] = 'None'
         
-    post['sys.platform'] = sys.platform
+    post['music21 egg-info current'] = findInstallationsEggInfoStr()
 
     try:
         uname = os.uname()
@@ -738,7 +757,7 @@ class AskInstall(YesOrNo):
         fp = findSetup()
         if fp is not None:
 
-            self._writeToUser(['Because you are writing files to the following directory:', getSitePackages(), ' ', 'you will be prompted to provide your user password to complete this opperation.', ' '])
+            self._writeToUser(['You must authorize writing in the following directory:', getSitePackages(), ' ', 'Please provide your user password to complete this opperation.', ''])
 
             stdoutSrc = sys.stdout
             stderrSrc = sys.stderr
@@ -779,9 +798,10 @@ class AskSendInstallationReport(YesOrNo):
     >>> from music21 import *
     '''
     def __init__(self, default=True, tryAgain=True,
-        promptHeader=None):
+        promptHeader=None, additionalEntries={}):
         YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
+        self._additionalEntries = additionalEntries
         msg = 'Would you like to send a pre-formatted email to music21 regarding your installation? Installation reports help us make music21 work better for you'
         self.appendPromptHeader(msg)
 
@@ -793,11 +813,13 @@ class AskSendInstallationReport(YesOrNo):
         body.append('')
 
         userData = getUserData()
+        # add any additional entries; this is used for adding the original egg info
+        userData.update(self._additionalEntries)
         for key in sorted(userData.keys()):
             body.append('%s // %s' % (key, userData[key]))
 
         body.append('')
-        body.append('Below, please provide a few words about how you use music21. Thanks!')
+        body.append('Below, please provide a few words about what sorts of tasks or problems you plan to explore with music21. Any information on your background is also appreciated (e.g., amateur musician, computer programmer, professional music researcher). Thanks!')
         body.append('')
 
         msg = '''mailto:music21stats@gmail.com?subject=music21 Installation Report&body=%s''' % '\n'.join(body)
@@ -1175,6 +1197,10 @@ class ConfigurationAssistant(object):
         self._simulate = simulate        
         self._platform = common.getPlatform()
 
+        # get and store if there is a current egg-info files
+        self._lastEggInfo = findInstallationsEggInfoStr()
+
+
         # add dialogs to list
         self._dialogs = []
 
@@ -1187,7 +1213,9 @@ class ConfigurationAssistant(object):
         d = AskAutoDownload(default=True)
         self._dialogs.append(d)
 
-        d = AskSendInstallationReport(default=True)
+        # provide original egg info files
+        additionalEntries = {'music21 egg-info previous': self._lastEggInfo}
+        d = AskSendInstallationReport(default=True, additionalEntries=additionalEntries)
         self._dialogs.append(d)
 
         # note: this is the on-line URL: 
@@ -1469,7 +1497,6 @@ class Test(unittest.TestCase):
 
 
     def testGetUserData(self):
-        print getUserData()
 
         d = AskSendInstallationReport()
 #         d.askUser()
