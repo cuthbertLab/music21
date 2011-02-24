@@ -78,7 +78,6 @@ Module Reference
    moduleRomanTextBase
    moduleRomanTextTranslate
    moduleNote
-   moduleNode
    modulePitch
    moduleRoman
    moduleScale
@@ -87,6 +86,7 @@ Module Reference
    moduleStream
    moduleTempo
    moduleTinyNotation
+   moduleXmlnode
 
 
 Developer Reference

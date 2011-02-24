@@ -64,7 +64,7 @@ from music21.romanText import base as romanText
 from music21.romanText import translate as romanTextTranslate
 
 from music21 import note
-from music21 import node
+from music21 import xmlnode
 from music21 import pitch
 from music21 import roman
 from music21 import scale
@@ -156,7 +156,6 @@ MODULES = [
     romanTextTranslate,
 
     note, 
-    node, 
     pitch,
     roman, 
 
@@ -167,6 +166,8 @@ MODULES = [
   
     tempo,     
     tinyNotation,
+
+    xmlnode, 
 
 #   musicxml, 
 #   musicxmlTranslate,
