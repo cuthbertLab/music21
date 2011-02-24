@@ -136,6 +136,9 @@ def getUserData():
     '''
     post = {}
 
+def mailToStr():
+    msg = '''mailto:astark1@unl.edu?subject=music21 install report&body=The message first paragraph.\nSecond paragraph.'''
+
 
 def _crawlPathUpward(start, target):
     '''Ascend up paths given a start; return when target file has been found.
@@ -188,6 +191,7 @@ def findSetup():
 
 
 
+    
 
 #-------------------------------------------------------------------------------
 # error objects, not exceptions
