@@ -800,7 +800,7 @@ class AskSendInstallationReport(YesOrNo):
         body.append('Below, please provide a few words about how you use music21. Thanks!')
         body.append('')
 
-        msg = '''mailto:report@music21.mit.edu?subject=music21 Installation Report&body=%s''' % '\n'.join(body)
+        msg = '''mailto:music21stats@gmail.com?subject=music21 Installation Report&body=%s''' % '\n'.join(body)
         return msg # pass this to webbrowser
 
     def _performAction(self, simulate=False):

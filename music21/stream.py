@@ -8796,7 +8796,7 @@ class Test(unittest.TestCase):
         ## TODO: Many more tests
         
 
-    def testStripTiesBuilt(self):
+    def testStripTiesBuiltA(self):
         s1 = Stream()
         n1 = note.Note()
         n1.quarterLength = 6
@@ -12630,6 +12630,40 @@ class Test(unittest.TestCase):
         #p.append(instrument.Voice())
         p.append(note.Note("D#4"))
         environLocal.printDebug([p.offsetMap])
+
+
+    def testStripTiesBuiltB(self):
+        from music21 import stream, note, meter
+        s1 = stream.Stream()
+        s1.append(meter.TimeSignature('4/4'))
+        s1.append(note.Note(type='quarter'))
+        s1.append(note.Note(type='half'))
+        s1.append(note.Note(type='half'))
+        s1.append(note.Note(type='half'))
+        s1.append(note.Note(type='quarter'))
+        s2 = s1.makeNotation()
+        
+        self.assertEqual(len(s2.flat.notes), 6)
+        self.assertEqual(str([n.tie for n in s2.flat.notes]), '[None, None, <music21.tie.Tie start>, <music21.tie.Tie stop>, None, None]')
+        self.assertEqual([n.quarterLength for n in s2.flat.notes], [1.0, 2.0, 1.0, 1.0, 2.0, 1.0])
+        
+        s3 = s2.stripTies(retainContainers=True)
+        self.assertEqual(str([n.tie for n in s3.flat.notes]), '[None, None, None, None, None]')
+        self.assertEqual([n.quarterLength for n in s3.flat.notes], [1.0, 2.0, 2.0, 2.0, 1.0])
+        
+        self.assertEqual([n.offset for n in s3.getElementsByClass('Measure')[0].notes], [0.0, 1.0, 3.0])
+        self.assertEqual([n.quarterLength for n in s3.getElementsByClass('Measure')[0].notes], [1.0, 2.0, 2.0])
+        self.assertEqual([n.beatStr for n in s3.getElementsByClass('Measure')[0].notes], ['1', '2', '4'])
+        
+        self.assertEqual([n.offset for n in s3.getElementsByClass('Measure')[1].notes], [1.0, 3.0])
+        self.assertEqual([n.quarterLength for n in s3.getElementsByClass('Measure')[1].notes], [2.0, 1.0])
+        self.assertEqual([n.beatStr for n in s3.getElementsByClass('Measure')[1].notes], ['2', '4'])
+
+        
+        #s3.show()
+
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
