@@ -4062,7 +4062,7 @@ class Stream(music21.Music21Object):
 
         In some cases (under makeMeasures()) a continuation note will not have a 
         Tie object with a stop attribute set. In that case, we need to look
-        for sequential notes with matching pitches. The matchByPitch option can 
+        for sequential notes with matching pitches. The `matchByPitch` option can 
         be used to use this technique. 
 
         >>> a = Stream()
@@ -4092,10 +4092,9 @@ class Stream(music21.Music21Object):
                             retainContainers=True)
             return returnObj # exit
 
-        # not sure if this must be sorted
-        # but: tied notes must be in consecutive order
-        #  returnObj = returnObj.sorted
-        notes = returnObj.flat #.notes
+        # assume this is sorted
+        # need to just get .notes, as there may be other objects in the Measure         # that come before the first Note, such as a SystemLayout object
+        notes = returnObj.flat.notes
 
         posConnected = [] # temporary storage for index of tied notes
         posDelete = [] # store deletions to be processed later
@@ -4147,9 +4146,11 @@ class Stream(music21.Music21Object):
                         and hasattr(nLast, "pitch") and hasattr(n, "pitch")
                         and nLast.pitch == n.pitch):
                         endMatch = True
-                    elif (nLast is not Note and iLast in posConnected
-                          and hasattr(nLast, "pitches") and hasattr(n, "pitches")
-                          and len(nLast.pitches) == len(n.pitches)):
+                    # looking for two chords of equal size
+                    elif (nLast is not None and 'Note' not in nLast.classes and 
+                        iLast in posConnected
+                        and hasattr(nLast, "pitches") and hasattr(n, "pitches")
+                        and len(nLast.pitches) == len(n.pitches)):
                         allPitchesMatched = True
                         for i in range(nLast.pitches):
                             if nLast.pitches[i] != n.pitches[i]:
@@ -8835,7 +8836,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(c.notes), 40)
 
 
-    def testStripTiesImported(self):
+    def testStripTiesImportedA(self):
         from music21 import corpus, converter
         from music21.musicxml import testPrimitive
 
@@ -12663,7 +12664,28 @@ class Test(unittest.TestCase):
         #s3.show()
 
 
+    def testStripTiesImportedB(self):
+        from music21 import corpus
 
+        # this file was imported by sibelius and does not have completeing ties
+        sMonte = corpus.parseWork('monteverdi/madrigal.4.2.xml')
+        s1 = sMonte.parts['Alto']
+        mStream = s1.getElementsByClass('Measure')
+        self.assertEqual([n.offset for n in mStream[3].notes], [0.0])
+        self.assertEqual(str([n.tie for n in mStream[3].notes]), '[<music21.tie.Tie start>]')
+        self.assertEqual([n.offset for n in mStream[4].notes], [0.0, 2.0])
+        self.assertEqual(str([n.tie for n in mStream[4].notes]), '[None, None]')
+
+        # post strip ties; must use matchByPitch
+        s2 = s1.stripTies(retainContainers=True, matchByPitch=True)
+        mStream = s2.getElementsByClass('Measure')
+        self.assertEqual([n.offset for n in mStream[3].notes], [0.0])
+        self.assertEqual(str([n.tie for n in mStream[3].notes]), '[None]')
+
+        self.assertEqual([n.offset for n in mStream[4].notes], [2.0])
+        self.assertEqual(str([n.tie for n in mStream[4].notes]), '[None]')
+
+        self.assertEqual([n.offset for n in mStream[5].notes], [0.0, 0.5, 1.0, 1.5, 2.0, 3.0])
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
