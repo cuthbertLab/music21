@@ -50,6 +50,7 @@ urlMusic21 = 'http://mit.edu/music21'
 urlFinaleReader = 'http://www.finalemusic.com/Reader'
 urlMuseScore = 'http://musescore.org'
 urlGettingStarted = 'http://mit.edu/music21/doc/html/quickStart.html'
+urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 80
 
@@ -553,8 +554,12 @@ class Dialog(object):
         elif simulate: # do not operate
             environLocal.printDebug('performAction() called, but in simulation mode: %s' % self._result)
         else:
-            self._performAction(simulate=simulate)
-        # perform action
+            try:
+                self._performAction(simulate=simulate)
+            except DialogError:
+                # in some cases, the action selected requires exciting the 
+                # configuration assistant
+                raise DialogError('perform action raised a dialog exception')
 
 
 #-------------------------------------------------------------------------------
@@ -708,31 +713,6 @@ class AskOpenInBrowser(YesOrNo):
         # perform action
 
 
-class AskAutoDownload(YesOrNo):
-    '''Ask the user if they want to enable auto-downloading
-
-    >>> from music21 import *
-    '''
-    def __init__(self, default=True, tryAgain=True,
-        promptHeader=None):
-        YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
-
-        msg = 'Would you like music21 to automatically download music data files when a URL is given to Converter?'
-        self.appendPromptHeader(msg)
-
-    def _performAction(self, simulate=False):
-        '''The action here is to open the stored URL in a browser, if the user agrees. 
-        '''
-        result = self.getResult()
-        if result in [True, False]: 
-            reload(environment)
-            us = environment.UserSettings()
-            if result is True:
-                us['autoDownload'] = 'allow' # automatically writes
-            elif result is False:
-                us['autoDownload'] = 'deny' # automatically writes
-            self._writeToUser(['Auto download preference set to: %s' % 
-                us['autoDownload'], ' '])
 
 
 class AskInstall(YesOrNo):
@@ -991,6 +971,104 @@ class SelectFromList(Dialog):
         return rawParsed
 
 
+ 
+# class AskAutoDownload(YesOrNo):
+#     '''Ask the user if they want to enable auto-downloading
+# 
+#     >>> from music21 import *
+#     '''
+#     def __init__(self, default=True, tryAgain=True,
+#         promptHeader=None):
+#         YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+# 
+#         msg = 'Would you like music21 to automatically download music data files when a URL is given to Converter?'
+#         self.appendPromptHeader(msg)
+# 
+#     def _performAction(self, simulate=False):
+#         '''The action here is to open the stored URL in a browser, if the user agrees. 
+#         '''
+#         result = self.getResult()
+#         if result in [True, False]: 
+#             reload(environment)
+#             us = environment.UserSettings()
+#             if result is True:
+#                 us['autoDownload'] = 'allow' # automatically writes
+#             elif result is False:
+#                 us['autoDownload'] = 'deny' # automatically writes
+#             self._writeToUser(['Auto download preference set to: %s' % 
+#                 us['autoDownload'], ' '])
+
+
+class AskAutoDownload(SelectFromList):
+    '''General class to select values from a list.
+
+    >>> from music21 import *
+    '''
+    def __init__(self, default=1, tryAgain=True, promptHeader=None):
+        SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+
+    def _rawIntroduction(self):
+        '''Return a multiline presentation of an introduction.
+        '''
+        return ['The LGPL music21 software is distributed with a corpus of encoded compositions which are distributed with the permission of the encoders (and, where needed, the composers or arrangers) and where permitted under United States copyright law. Some encodings included in the corpus may not be used for commercial uses or have other restrictions: please see the licenses embedded in individual compositions or directories for more details.', 
+        ' ',
+        'In addition to the corpus distributed with music21, other pieces are not included in this distribution, but are indexed as links to other web sites where they can be downloaded (the "virtual corpus"). If you would like, music21 can help your computer automatically resolve these links and bring them to your hard drive for analysis. See corpus/virtual.py for a list of sites that music21 might index.',
+        ' ',
+        'To the best of our knowledge, the music (if not the encodings) in the corpus are either out of copyright in the United States and/or are licensed for non-commercial use. These works, along with any works linked to in the virtual corpus, may or may not be free in your jurisdiction. If you believe this message to be in error regarding one or more works please contact Michael Cuthbert at the address provided on http://mit.edu/music21/doc/html/about.html.',
+        ' ',
+        'Would you like to:'
+        ]
+
+    def _getValidResults(self, force=None):
+        '''Just return number options
+        '''
+        if force is not None:
+            return force
+        else:
+            return ['Acknowledge these terms and allow music21 to aid in finding pieces in the corpus',
+            'Acknowledge these terms and block the virtual corpus',
+            'Do not agree to these terms and will not use music21 (agreeing to the terms of the corpus is mandatory for using the system).']
+
+    def _evaluateUserInput(self, raw):
+        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
+        '''
+        rawParsed = self._parseUserInput(raw)
+        # if NoInput: and a default, return default
+        if isinstance(rawParsed, NoInput): 
+            if self._default is not None:
+                # do not return the default, as this here is a number
+                # and proper results are file paths. thus, set rawParsed
+                # to default; will get converted later
+                rawParsed = self._default
+
+        # could be IncompleteInput, NoInput, or a proper, valid answer
+        if isinstance(rawParsed, DialogError): # keep as is
+            return rawParsed
+
+        if rawParsed >= 1 and rawParsed <= 3:
+            return rawParsed
+        else:
+            return IncompleteInput(rawParsed)
+
+
+    def _performAction(self, simulate=False):
+        '''
+        '''
+        result = self.getResult()
+        if result in [1, 2, 3]: 
+            reload(environment)
+            us = environment.UserSettings()
+            if result == 1:
+                us['autoDownload'] = 'allow' # automatically writes
+            elif result == 2:
+                us['autoDownload'] = 'deny' # automatically writes
+            elif result == 3:
+                raise DialogException('user selected an option that terminates installer.')
+
+        if result in [1, 2]: 
+            self._writeToUser(['Autio Download set to: %s' % 
+                us['autoDownload'], ' '])
+
 
 
 class SelectFilePath(SelectFromList):
@@ -1039,7 +1117,7 @@ class SelectFilePath(SelectFromList):
         >>> from music21 import *
         '''
         rawParsed = self._parseUserInput(raw)
-        # of NoInput: and a default, return default
+        # if NoInput: and a default, return default
         if isinstance(rawParsed, NoInput): 
             if self._default is not None:
                 # do not return the default, as this here is a number
@@ -1218,6 +1296,10 @@ class ConfigurationAssistant(object):
         d = AskSendInstallationReport(default=True, additionalEntries=additionalEntries)
         self._dialogs.append(d)
 
+
+        d = AskOpenInBrowser(urlTarget=urlMusic21List, prompt='The music21 discussion group provides a forum for asking questions and getting help. Would you like to visit the music21 dicussion group in a web browser?')
+        self._dialogs.append(d)
+
         # note: this is the on-line URL: 
         # might be better to find local documentaiton
         d = AskOpenInBrowser(urlTarget=urlGettingStarted, prompt='Would you like to view the music21 Quick Start in a web browser?')
@@ -1269,7 +1351,11 @@ class ConfigurationAssistant(object):
             d.askUser(force=force)
             post = d.getResult()
             # post may be an error; no problem calling perform action anyways
-            d.performAction(simulate=self._simulate)
+            try:
+                d.performAction(simulate=self._simulate)
+            except DialogException:
+                # a user may have selected an option that requires breaking
+                break
 
         self._hr()
         self._conclusion()
@@ -1504,6 +1590,15 @@ class Test(unittest.TestCase):
 #         d.performAction()
 
         
+    def testGetUserData(self):
+
+        d = AskAutoDownload()
+#         d.askUser()
+#         d.getResult()
+#         d.performAction()
+
+
+
 
 if __name__ == "__main__":
     import sys
