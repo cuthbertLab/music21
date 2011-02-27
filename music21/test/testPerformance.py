@@ -315,7 +315,7 @@ class Test(unittest.TestCase):
 
             (self.runParseMonteverdiRNText, 
                 {'2011.02.27': 6.411, 
-                 '2011.02.28': 5.17, 
+                 '2011.02.28': 2.944, 
                 }),
 
 

@@ -35,7 +35,8 @@ environLocal = environment.Environment(_MOD)
 SHORTHAND_RE = re.compile('#*-*b*o*[1-9xyz]')
 ENDWITHFLAT_RE = re.compile('[b\-]$')
 
-# cache all scales found and used 
+# cache all Key/Scale objects created or passed in; re-use
+# permits using internally scored pitch segments
 _scaleCache = {}
 
 def expandShortHand(shorthand):
@@ -264,11 +265,28 @@ class RomanNumeral(chord.Chord):
         if isinstance(figure, int):
             self.caseMatters = False
             figure = common.toRoman(figure)
-         # store raw figure
+         # store raw figure before calling setKeyOrScale
         self.figure = figure
         
+
+        # try to get Scale or Key object from cache: this will offer
+        # performance boost as Scale stores cached pitch segments
         if common.isStr(keyOrScale):
-            keyOrScale = key.Key(keyOrScale)
+            if keyOrScale in _scaleCache.keys():
+                keyOrScale = _scaleCache[keyOrScale]
+            else:
+                keyOrScale = key.Key(keyOrScale)
+                _scaleCache[keyOrScale] = keyOrScale
+        elif keyOrScale is not None:
+            #environLocal.printDebug(['got keyOrScale', keyOrScale])
+            if keyOrScale.name in _scaleCache.keys():
+                # use stored scale as already has cache
+                keyOrScale = _scaleCache[keyOrScale.name]
+            else:
+                _scaleCache[keyOrScale.name] = keyOrScale
+        else:
+            pass
+            # cache object if passed directly
             
         self.scale = None # this is set when setKeyOrScale() is called
         self.impliedScale = None
@@ -310,7 +328,6 @@ class RomanNumeral(chord.Chord):
     def _parseFigure(self, prelimFigure):
         '''
         '''
-        
         if not common.isStr(prelimFigure):
             raise RomanException('got a non-string figure: %r', prelimFigure)
 
