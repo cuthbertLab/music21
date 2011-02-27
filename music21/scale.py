@@ -1265,6 +1265,24 @@ class ConcreteScale(Scale):
         return post
 
 
+    def intervalBetweenDegrees(self, degreeStart, degreeEnd):
+        '''Given two degrees, provide the interval
+
+        >>> from music21 import *
+        >>> sc = scale.MajorScale('e-')
+        >>> sc.intervalBetweenDegrees(3, 7)
+        <music21.interval.Interval P5>
+
+        '''
+        # get pitches for each degree
+        pStart = self.pitchFromDegree(degreeStart)
+        pEnd = self.pitchFromDegree(degreeEnd)
+        if pStart is None:
+            raise ScaleException('cannot get a pitch for scale degree: %s' % pStart)
+        elif pEnd is None:
+            raise ScaleException('cannot get a pitch for scale degree: %s' % pStart)
+        return interval.Interval(pStart, pEnd)
+
     def getScaleDegreeFromPitch(self, pitchTarget, 
             direction=DIRECTION_ASCENDING, comparisonAttribute='name'):
         '''For a given pitch, return the appropriate scale degree. If no scale degree is available, None is returned.
@@ -2768,20 +2786,30 @@ class Test(unittest.TestCase):
         sc = MajorScale('c4')
 
         # ascending works in pitch space
-#         self.assertEqual(str(sc.next('a4', 'ascending', 1)),  'B4')
-#         self.assertEqual(str(sc.next('b4', 'ascending', 1)),  'C5')
-#         self.assertEqual(str(sc.next('b5', 'ascending', 1)),  'C6')
-#         self.assertEqual(str(sc.next('b3', 'ascending', 1)),  'C4')
-# 
-#         # descending works in pitch space
-#         self.assertEqual(str(sc.next('c3', 'descending', 1)),  'B2')
-#         self.assertEqual(str(sc.next('c8', 'descending', 1)),  'B7')
+        self.assertEqual(str(sc.next('a4', 'ascending', 1)),  'B4')
+        self.assertEqual(str(sc.next('b4', 'ascending', 1)),  'C5')
+        self.assertEqual(str(sc.next('b5', 'ascending', 1)),  'C6')
+        self.assertEqual(str(sc.next('b3', 'ascending', 1)),  'C4')
 
+        # descending works in pitch space
+        self.assertEqual(str(sc.next('c3', 'descending', 1)),  'B2')
+        self.assertEqual(str(sc.next('c8', 'descending', 1)),  'B7')
 
         sc = MajorScale('a4')
 
         self.assertEqual(str(sc.next('g#2', 'ascending', 1)),  'A2')
         self.assertEqual(str(sc.next('g#4', 'ascending', 1)),  'A4')
+
+
+    def testIntervalBetweenDegrees(self):
+
+        sc = MajorScale('c4')
+        self.assertEqual(str(sc.intervalBetweenDegrees(3,4)), '<music21.interval.Interval m2>')
+        self.assertEqual(str(sc.intervalBetweenDegrees(1,7)), '<music21.interval.Interval M7>')
+        self.assertEqual(str(sc.intervalBetweenDegrees(1,5)), '<music21.interval.Interval P5>')
+        self.assertEqual(str(sc.intervalBetweenDegrees(2,4)), '<music21.interval.Interval m3>')
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -2795,21 +2823,8 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         t = Test()
-
-
-        #t.testCyclicalScales()
-        #t.testMelodicMinorA()
-        #t.testMelodicMinorB()
-        #t.testPlot()
-        #t.testPlagalModes()
-        #t.testRagAsawara()
-        #t.testRagMarwaA()
-
-        #t.testRagMarwaB()
-        #t.testRagMarwaC()
-
-        #t.testWeightedHexatonicBluesA()
-        t.testNextA()
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract

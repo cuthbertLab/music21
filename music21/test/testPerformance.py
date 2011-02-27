@@ -205,6 +205,15 @@ class Test(unittest.TestCase):
                     assert post != None
             
 
+
+    def runParseMonteverdiRNText(self):
+        '''Loading file: beethoven/opus59no2/movement3
+        '''
+        x = corpus.parseWork('monteverdi/madrigal.5.3.rntxt', forceSource=True)
+
+
+
+
     #---------------------------------------------------------------------------
     def testTimingTolerance(self):
         '''Test the performance of methods defined above, comparing the resulting time to the time obtained in past runs. 
@@ -215,92 +224,97 @@ class Test(unittest.TestCase):
         # provide work and expected min/max in seconds
         for testMethod, best in [
 
-            (self.runGetElementsByContext, 
-                {
-                 '2010.11.10': 7.3888170, 
-                 '2010.11.11': 3.96121883392, 
-                }),
-
-
-
-#             (self.runParseABC, 
+#             (self.runGetElementsByContext, 
 #                 {
-#                  '2010.10.20': 38.6760668755, 
-#                  '2010.10.21': 35.4297668934,
+#                  '2010.11.10': 7.3888170, 
+#                  '2010.11.11': 3.96121883392, 
 #                 }),
+# 
+# 
+# 
+# #             (self.runParseABC, 
+# #                 {
+# #                  '2010.10.20': 38.6760668755, 
+# #                  '2010.10.21': 35.4297668934,
+# #                 }),
+# 
+# 
+#             (self.runCreateDurations, 
+#                 {
+#                  '2010.10.07': 0.201117992401, 
+# 
+#                 }),
+# 
+#             (self.runCreateTimeSignatures, 
+#                 {
+#                  '2010.10.07': 2.88308691978, 
+#                  '2010.10.08': 1.40892004967 , 
+# 
+#                 }),
+# 
+# 
+#             (self.runStreamIterationByIterator, 
+#                 {'2010.09.20': 2.2524, 
+#                  '2010.10.07': 1.8214, 
+#                 }),
+# 
+#             (self.runStreamIterationByElements, 
+#                 {'2010.09.20': 0.8317, 
+#                 }),
+# 
+# 
+#             (self.runGetElementsByClassType, 
+#                 {'2010.09.20': 3.28, 
+#                 }),
+# 
+#             (self.runGetElementsByClassString, 
+#                 {'2010.09.20': 3.22, 
+#                 }),
+# 
+#             (self.runParseBeethoven, 
+#                 {'2009.12.14': 7.42, 
+#                  '2009.12.15': 6.686,
+#                  '2010.06.24': 7.475,
+#                  '2010.07.08': 3.562,
+#                 }),
+# 
+#             (self.runMusicxmlOutPartsBeethoven, 
+#                 {'2010.09.20': 7.706, 
+#                 }),
+# 
+#             (self.runMusicxmlOutScoreBeethoven, 
+#                 {'2010.09.20': 33.273, 
+#                  '2010.10.07': 11.9290, 
+#                 }),
+# 
+# 
+#             (self.runParseHaydn, 
+#                 {'2009.12.14': 4.08, 
+#                  '2009.12.15': 3.531,
+#                  '2010.06.24': 3.932,
+#                  '2010.07.08': 1.935,
+#                 }),
+#             (self.runParseSchumann, 
+#                 {'2009.12.14': 5.88, 
+#                  '2009.12.15': 5.126,
+#                  '2010.06.24': 5.799,
+#                  '2010.07.08': 2.761,
+#                 }),
+#             (self.runParseLuca, 
+#                 {'2009.12.14': 3.174, 
+#                  '2009.12.15': 2.954,
+#                  '2010.06.24': 3.063,
+#                  '2010.07.08': 1.508,
+#                 }),
+# 
+#             (self.runMusicxmlOutLuca, 
+#                 {'2010.09.20': 8.372, 
+#                  '2010.10.07': 4.5613, 
+#                 }),
+# 
 
-
-            (self.runCreateDurations, 
-                {
-                 '2010.10.07': 0.201117992401, 
-
-                }),
-
-            (self.runCreateTimeSignatures, 
-                {
-                 '2010.10.07': 2.88308691978, 
-                 '2010.10.08': 1.40892004967 , 
-
-                }),
-
-
-            (self.runStreamIterationByIterator, 
-                {'2010.09.20': 2.2524, 
-                 '2010.10.07': 1.8214, 
-                }),
-
-            (self.runStreamIterationByElements, 
-                {'2010.09.20': 0.8317, 
-                }),
-
-
-            (self.runGetElementsByClassType, 
-                {'2010.09.20': 3.28, 
-                }),
-
-            (self.runGetElementsByClassString, 
-                {'2010.09.20': 3.22, 
-                }),
-
-            (self.runParseBeethoven, 
-                {'2009.12.14': 7.42, 
-                 '2009.12.15': 6.686,
-                 '2010.06.24': 7.475,
-                 '2010.07.08': 3.562,
-                }),
-
-            (self.runMusicxmlOutPartsBeethoven, 
-                {'2010.09.20': 7.706, 
-                }),
-
-            (self.runMusicxmlOutScoreBeethoven, 
-                {'2010.09.20': 33.273, 
-                 '2010.10.07': 11.9290, 
-                }),
-
-
-            (self.runParseHaydn, 
-                {'2009.12.14': 4.08, 
-                 '2009.12.15': 3.531,
-                 '2010.06.24': 3.932,
-                 '2010.07.08': 1.935,
-                }),
-            (self.runParseSchumann, 
-                {'2009.12.14': 5.88, 
-                 '2009.12.15': 5.126,
-                 '2010.06.24': 5.799,
-                 '2010.07.08': 2.761,
-                }),
-            (self.runParseLuca, 
-                {'2009.12.14': 3.174, 
-                 '2009.12.15': 2.954,
-                 '2010.06.24': 3.063,
-                 '2010.07.08': 1.508,
-                }),
-
-            (self.runMusicxmlOutLuca, 
-                {'2010.09.20': 8.372, 
-                 '2010.10.07': 4.5613, 
+            (self.runParseMonteverdiRNText, 
+                {'2011.02.28': 6.411, 
                 }),
 
 

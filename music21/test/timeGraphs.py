@@ -225,8 +225,6 @@ class TestParseABC(CallTest):
         self.t.runParseABC()
 
 
-#         s = corpus.parseWork('monteverdi/madrigal.5.3.rntxt')
-# 
 
 
 class TestMusicXMLObjectTypeChecking(CallTest):
@@ -297,6 +295,17 @@ class TestGetContextByClass(CallTest):
 
 
 
+class TestParseRNText(CallTest):
+
+    def __init__(self):
+        from music21.test import testPerformance
+        self.t = testPerformance.Test()
+
+    def testFocus(self):
+        self.t.runParseMonteverdiRNText()
+
+
+
 
 
 
@@ -321,7 +330,8 @@ class CallGraph:
 
         #self.callTest = TestParseABC
         #self.callTest = TestMusicXMLObjectTypeChecking
-        self.callTest = TestGetContextByClass
+        #self.callTest = TestGetContextByClass
+        self.callTest = TestParseRNText
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
