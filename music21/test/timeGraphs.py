@@ -225,6 +225,8 @@ class TestParseABC(CallTest):
         self.t.runParseABC()
 
 
+#         s = corpus.parseWork('monteverdi/madrigal.5.3.rntxt')
+# 
 
 
 class TestMusicXMLObjectTypeChecking(CallTest):

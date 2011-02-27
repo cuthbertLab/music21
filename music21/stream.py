@@ -9775,7 +9775,7 @@ class Test(unittest.TestCase):
 
 
 
-    def testMakeAccidentals(self):
+    def testMakeAccidentalsA(self):
         '''Test accidental display setting
         '''
         s = Stream()
@@ -12686,6 +12686,27 @@ class Test(unittest.TestCase):
         self.assertEqual(str([n.tie for n in mStream[4].notes]), '[None]')
 
         self.assertEqual([n.offset for n in mStream[5].notes], [0.0, 0.5, 1.0, 1.5, 2.0, 3.0])
+
+
+    def testMakeAccidentalsB(self):
+        from music21 import corpus
+        s = corpus.parseWork('monteverdi/madrigal.5.3.rntxt')
+        m34 = s.parts[0].getElementsByClass('Measure')[33]
+        c = m34.getElementsByClass('Chord')
+        # assuming not showing accidental b/c of key
+        self.assertEqual(str(c[1].pitches), '[B-4, D5, F5]')
+        # because of key
+        self.assertEqual(str(c[1].pitches[0].accidental.displayStatus), 'False')
+
+        s = corpus.parseWork('monteverdi/madrigal.5.4.rntxt')
+        m74 = s.parts[0].getElementsByClass('Measure')[73]
+        c = m74.getElementsByClass('Chord')
+        # has correct pitches but natural not showing on C
+        self.assertEqual(str(c[1].pitches), '[C5, E5, G5]')
+        self.assertEqual(str(c[1].pitches[0].accidental), '<accidental natural>')
+        self.assertEqual(str(c[1].pitches[0].accidental.displayStatus), 'True')
+        #m74.show()
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
