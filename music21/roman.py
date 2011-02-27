@@ -35,6 +35,9 @@ environLocal = environment.Environment(_MOD)
 SHORTHAND_RE = re.compile('#*-*b*o*[1-9xyz]')
 ENDWITHFLAT_RE = re.compile('[b\-]$')
 
+# cache all scales found and used 
+_scaleCache = {}
+
 def expandShortHand(shorthand):
     '''
     expands shorthand notation into comma notation
