@@ -32,6 +32,9 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
+# store a cache of already-found values
+_sharpsToPitchCache = {}
+
 def sharpsToPitch(sharpCount):
     '''Given a number a positive/negative number of sharps, return a Pitch 
     object set to the appropriate major key value.
@@ -58,6 +61,10 @@ def sharpsToPitch(sharpCount):
     >>> k1.accidental
     <accidental sharp>
     '''
+    if sharpCount in _sharpsToPitchCache.keys():
+        # return a deepcopy of the pitch
+        return copy.deepcopy(_sharpsToPitchCache[sharpCount])
+
     pitchInit = pitch.Pitch('C')
     pitchInit.octave = None
     # keyPc = (self.sharps * 7) % 12
@@ -72,6 +79,8 @@ def sharpsToPitch(sharpCount):
     for x in range(abs(sharpCount)):
         pitchInit = intervalObj.transposePitch(pitchInit)    
     pitchInit.octave = None
+
+    _sharpsToPitchCache[sharpCount] = pitchInit
     return pitchInit
 
 

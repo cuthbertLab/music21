@@ -549,6 +549,17 @@ class UserSettings(object):
         self._environment.restoreDefaults()
         self._environment.write()
 
+
+    def _updateAllEnvironments(self):
+        '''Iterate through all modules; find any that have environLocal, and replace with a new environment.
+        '''
+        from music21 import base # must update this one to get show to work
+        reload(sys)
+        for mStr, m in sys.modules.items():
+            if hasattr(m, 'environLocal'):
+                #self._environment.printDebug(['reinstantiating Environment on %s' % m])
+                m.environLocal = Environment()
+
     def __getitem__(self, key):
         '''Dictionary like getting. 
         '''
@@ -573,7 +584,7 @@ class UserSettings(object):
         # location specific, cannot test further
         self._environment.__setitem__(key, value)
         self._environment.write()
-
+        self._updateAllEnvironments()
 
     def __repr__(self):
         '''Return a string representation. 
