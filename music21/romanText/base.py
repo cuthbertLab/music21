@@ -685,7 +685,8 @@ class RTHandler(object):
         return lines[:iStartBody], lines[iStartBody:]
     
     def _tokenizeHeader(self, lines):
-        '''In the header, we only have tagged tokens. We can this process these all as the same class.
+        '''In the header, we only have tagged tokens. 
+        We can this process these all as the same class.
         '''
         post = []
         for l in lines:

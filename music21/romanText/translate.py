@@ -152,7 +152,12 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             tsSet = False
             environLocal.printDebug(['tsCurrent:', tsCurrent])
         elif t.isKeySignature():
-            keySigCurrent = t.getKeySignature()
+            if t.data == "":
+                keySigCurrent = key.KeySignature(0)
+            elif t.data == "Bb":
+                keySigCurrent = key.KeySignature(-1)
+            else:
+                raise TranslateRomanTextException("still need to write a generic RomanText KeySignature routine.  this is just temporary")
             keySigSet = False
             environLocal.printDebug(['keySigCurrent:', keySigCurrent])
         elif t.isMeasure():
@@ -471,18 +476,18 @@ m6-7 = m4-5
         s = converter.parse(src, format='romantext')
         rnStream = s.flat.getElementsByClass('RomanNumeral')
 
-        for offset in [0, 6, 12]:
-            self.assertEqual(rnStream[offset+ 4].figure, 'III6')
-            self.assertEqual(str(rnStream[offset+ 4].pitches), '[A4, C5, F5]')
+        for elementNumber in [0, 6, 12]:
+            self.assertEqual(rnStream[elementNumber + 4].figure, 'III6')
+            self.assertEqual(str(rnStream[elementNumber + 4].pitches), '[A4, C5, F5]')
 
-            x = rnStream[offset+ 4].pitches[2].accidental
+            x = rnStream[elementNumber + 4].pitches[2].accidental
             if x == None: x = pitch.Accidental('natural')
             self.assertEqual(x.alter, 0)
 
-            self.assertEqual(rnStream[offset+ 5].figure, 'iv6')
-            self.assertEqual(str(rnStream[offset+ 5].pitches), '[B-4, D5, G5]')
+            self.assertEqual(rnStream[elementNumber + 5].figure, 'iv6')
+            self.assertEqual(str(rnStream[elementNumber + 5].pitches), '[B-4, D5, G5]')
 
-            self.assertEqual(rnStream[offset+ 5].pitches[0].accidental.displayStatus, True)
+            self.assertEqual(rnStream[elementNumber + 5].pitches[0].accidental.displayStatus, True)
 
 
 

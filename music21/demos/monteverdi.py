@@ -230,9 +230,75 @@ def monteverdiParallels(books = [3], start = 1, end = 20, show = True, strict = 
             if displayMe and show:
                 c.show()
                 
+def findPhraseBoundaries(book = 4, madrigal = 12):
+    filename = 'monteverdi/madrigal.%s.%s' % (book, madrigal)
+    sc = corpus.parseWork(filename + '.xml')
+    analysis = corpus.parseWork(filename + '.rntxt')
+    analysisFlat  = analysis.flat.stripTies().getElementsByClass(roman.RomanNumeral)
+
+    phraseScoresByOffset = {}
+
+    for p in sc.parts:
+        partNotes = p.flat.stripTies(matchByPitch = True).notes
+        thisPartPhraseScores = [] # keeps track of the likelihood that a phrase boundary is after note i
+        for i in range(2, len(partNotes) - 2): # start on the third note and stop searching on the third to last note...
+            thisScore = 0
+            twoNotesBack = partNotes[i-2]
+            previousNote = partNotes[i-1]
+            thisNote = partNotes[i]
+            nextNote = partNotes[i+1]
+            nextAfterThatNote = partNotes[i+2]
+            
+            phraseOffset = nextNote.offset
+            if phraseOffset in phraseScoresByOffset:
+                existingScore = phraseScoresByOffset[phraseOffset]
+            else:
+                phraseScoresByOffset[phraseOffset] = 0
+                existingScore = 0
+            
+            if thisNote.isRest == True:
+                continue
+
+            if nextNote.isRest == True:
+                thisScore = thisScore + 10
+            else:
+                intervalToNextNote = interval.notesToInterval(thisNote, nextNote)
+                if intervalToNextNote.chromatic.undirected >= 6: # a tritone or bigger
+                    thisScore = thisScore + 10
+            if (thisNote.quarterLength > previousNote.quarterLength) and \
+                (thisNote.quarterLength > nextNote.quarterLength):
+                thisScore = thisScore + 10
+            if (thisNote.quarterLength > previousNote.quarterLength) and \
+                (thisNote.quarterLength > twoNotesBack.quarterLength) and \
+                (nextNote.quarterLength > nextAfterThatNote.quarterLength):
+                thisScore = thisScore + 10
+
+            previousNoteAnalysis = analysisFlat.getElementAtOrBefore(previousNote.offset)
+            thisNoteAnalysis = analysisFlat.getElementAtOrBefore(thisNote.offset)
+            
+            if previousNoteAnalysis.romanNumeral == 'V' and thisNoteAnalysis.romanNumeral.upper() == 'I':
+                thisScore = thisScore + 10
+            elif previousNoteAnalysis.romanNumeral.upper() == 'II' and thisNoteAnalysis.romanNumeral.upper() == 'I':
+                thisScore = thisScore + 5
+                
+            if thisNote.lyric is not None and thisNote.lyric.endswith('.'):
+                thisScore = thisScore + 15 # would be higher but our lyrics data is bad.
+                
+            phraseScoresByOffset[phraseOffset] = existingScore + thisScore
+
+    flattenedBass = sc.parts[-1].flat.notes
+    for thisOffset in sorted(phraseScoresByOffset.keys()):
+        psbo = phraseScoresByOffset[thisOffset]
+        if psbo > 0: 
+            print thisOffset, psbo
+            relevantNote = flattenedBass.getElementAtOrBefore(thisOffset - 0.1)
+            relevantNote.addLyric(str(psbo))
+    sc.show()
+
 
 if __name__ == '__main__':
     #spliceAnalysis()
     #analyzeBooks(books = [3,4,5])
-    analyzeBooks(books = [4], start=10, end=10, show=True, strict=True)
+    #analyzeBooks(books = [4], start=10, end=10, show=True, strict=True)
+    findPhraseBoundaries(book = 4, madrigal = 12)
     #monteverdiParallels(books = [3], start=1, end=1, show=True, strict=True)

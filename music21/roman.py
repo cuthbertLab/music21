@@ -187,7 +187,10 @@ class RomanNumeral(chord.Chord):
     [0, 1, 2, 1, 1, 1]
     >>> alteredChordHalfDim3rdInv.commonName
     'half-diminished seventh chord'
-    
+    >>> alteredChordHalfDim3rdInv.romanNumeral
+    '-ii'
+    >>> alteredChordHalfDim3rdInv.romanNumeralAlone
+    'ii'
 
     >>> openFifth = roman.RomanNumeral('V[no3]', key.Key('F'))
     >>> openFifth.pitches
@@ -232,6 +235,8 @@ class RomanNumeral(chord.Chord):
     >>> rn = roman.RomanNumeral('ii/o65', dminor)
     >>> rn.pitches
     [G4, B-4, D5, E5]
+    >>> rn.romanNumeral
+    'ii'
     
     >>> rn3 = roman.RomanNumeral('III', dminor)
     >>> rn3.pitches
@@ -382,7 +387,7 @@ class RomanNumeral(chord.Chord):
             romanNumeralAlone = rm.group(1)
             self.scaleDegree = common.fromRoman(romanNumeralAlone)
             figure = self.romanNumerals.sub('', figure)
-
+            self.romanNumeralAlone = romanNumeralAlone
         
         shouldBe = '' # major, minor, augmented, or diminished (and half-diminished for 7ths)
         if figure.startswith('o'):
@@ -428,6 +433,10 @@ class RomanNumeral(chord.Chord):
 
         sd = self.scaleDegree
         self.scaleDegreeWithAlteration = (sd, scaleAlter)
+        if scaleAlter is None:
+            self.romanNumeral = self.romanNumeralAlone
+        else:
+            self.romanNumeral = scaleAlter.modifier + self.romanNumeralAlone
         
         shfig = expandShortHand(figure)
         
