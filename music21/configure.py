@@ -727,7 +727,7 @@ class AskInstall(YesOrNo):
         # define platforms that this will run on
         self._platforms = ['darwin', 'nix']
 
-        msg = 'Would you like to install music21 in Python site-packages?'
+        msg = 'Would you like to install music21 in the normal place for Python packages (i.e., site-packages)?'
         self.appendPromptHeader(msg)
 
 
@@ -1066,7 +1066,7 @@ class AskAutoDownload(SelectFromList):
                 raise DialogException('user selected an option that terminates installer.')
 
         if result in [1, 2]: 
-            self._writeToUser(['Autio Download set to: %s' % 
+            self._writeToUser(['Auto Download set to: %s' % 
                 us['autoDownload'], ' '])
 
 
@@ -1297,7 +1297,7 @@ class ConfigurationAssistant(object):
         self._dialogs.append(d)
 
 
-        d = AskOpenInBrowser(urlTarget=urlMusic21List, prompt='The music21 discussion group provides a forum for asking questions and getting help. Would you like to visit the music21 dicussion group in a web browser?')
+        d = AskOpenInBrowser(urlTarget=urlMusic21List, prompt='The music21 discussion group provides a forum for asking questions and getting help. Would you like to see the music21 discussion list or sign up for updates?')
         self._dialogs.append(d)
 
         # note: this is the on-line URL: 
