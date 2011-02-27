@@ -292,7 +292,7 @@ class RomanNumeral(chord.Chord):
         <music21.roman.RomanNumeral V in A major>
         '''
         self.scale = keyOrScale
-        if keyOrScale == None or (hasattr(keyOrScale, "isConcrete") and 
+        if keyOrScale is None or (hasattr(keyOrScale, "isConcrete") and 
             keyOrScale.isConcrete == False):
             self.impliedScale = True
         else:
@@ -311,7 +311,7 @@ class RomanNumeral(chord.Chord):
         if not common.isStr(prelimFigure):
             raise RomanException('got a non-string figure: %r', prelimFigure)
 
-        if self.impliedScale == False:
+        if self.impliedScale is False:
             useScale = self.scale
         else:
             if self.scale != None:
@@ -357,21 +357,25 @@ class RomanNumeral(chord.Chord):
         if self.frontFlat.match(figure):
             fm = self.frontFlat.match(figure)
             flatAlteration = len(fm.group(1))
-            transposeInterval = interval.intervalFromGenericAndChromatic(interval.GenericInterval(1), interval.ChromaticInterval(-1 * flatAlteration))
+            transposeInterval = interval.intervalFromGenericAndChromatic(
+                interval.GenericInterval(1), 
+                interval.ChromaticInterval(-1 * flatAlteration))
             scaleAlter = pitch.Accidental(-1 * flatAlteration)
             figure = self.frontFlat.sub('', figure)
             frontAlteration = fm
         elif self.frontFlatAlt.match(figure):
             fm = self.frontFlatAlt.match(figure)
             flatAlteration = len(fm.group(1))
-            transposeInterval = interval.intervalFromGenericAndChromatic(interval.GenericInterval(1), interval.ChromaticInterval(-1 * flatAlteration))
+            transposeInterval = interval.intervalFromGenericAndChromatic(
+                interval.GenericInterval(1), interval.ChromaticInterval(-1 * flatAlteration))
             scaleAlter = pitch.Accidental(-1 * flatAlteration)
             figure = self.frontFlatAlt.sub('', figure)
             frontAlteration = fm
         elif self.frontSharp.match(figure):
             sm = self.frontSharp.match(figure)
             sharpAlteration = len(sm.group(1))
-            transposeInterval = interval.intervalFromGenericAndChromatic(interval.GenericInterval(1), interval.ChromaticInterval(1 * sharpAlteration))
+            transposeInterval = interval.intervalFromGenericAndChromatic(
+                interval.GenericInterval(1), interval.ChromaticInterval(1 * sharpAlteration))
             scaleAlter = pitch.Accidental(sharpAlteration)
             figure = self.frontSharp.sub('', figure)
             frontAlteration = sm
@@ -442,10 +446,12 @@ class RomanNumeral(chord.Chord):
         
         notationObj = fbNotation.Notation(shfig)
         
-        self.scaleCardinality = len(useScale.pitches) - 1 # should be 7 but hey, octatonic scales, etc.
+        #self.scaleCardinality = len(useScale.pitches) - 1 # should be 7 but hey, octatonic scales, etc.
+        self.scaleCardinality = useScale.getDegreeMaxUnique()
 
         bassScaleDegree = self.bassScaleDegreeFromNotation(notationObj)
-        bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction = scale.DIRECTION_ASCENDING)
+        bassPitch = useScale.pitchFromDegree(bassScaleDegree, 
+                    direction = scale.DIRECTION_ASCENDING)
         pitches = [bassPitch]
         lastPitch = bassPitch
         numberNotes = len(notationObj.numbers)
@@ -453,10 +459,13 @@ class RomanNumeral(chord.Chord):
         for j in range(numberNotes):
             i = numberNotes - j - 1
             thisSD = bassScaleDegree + notationObj.numbers[i] - 1
-            newPitch = useScale.pitchFromDegree(thisSD, direction = scale.DIRECTION_ASCENDING)
+            newPitch = useScale.pitchFromDegree(thisSD, 
+                        direction = scale.DIRECTION_ASCENDING)
             pitchName = notationObj.modifiers[i].modifyPitchName(newPitch.name)
             newnewPitch = pitch.Pitch(pitchName + str(newPitch.octave))
-            if newnewPitch.midi < lastPitch.midi:
+            #if newnewPitch.midi < lastPitch.midi:
+            # better to compare pitch space, as midi has limits and rounding
+            if newnewPitch.ps < lastPitch.ps:
                 newnewPitch.octave += 1
             pitches.append(newnewPitch)
             lastPitch = newnewPitch

@@ -236,6 +236,8 @@ class AbstractScale(Scale):
             minPitch=minPitch, maxPitch=maxPitch,
             alteredDegrees=self._alteredDegrees, direction=direction,
             reverse=reverse)
+        # here, we copy the list of pitches so as not to allow editing of 
+        # cached pitch values later
         return copy.deepcopy(post)
 
 

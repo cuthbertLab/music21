@@ -386,6 +386,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         # store segments
         self._ascendingCache = {}
         self._descendingCache = {}
+        # store min/max, as this is evaluated before getting cache values
+        self._minMaxCache = {}
 
     def clear(self):
         '''Remove and reset all Nodes and Edges. 
@@ -1266,6 +1268,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         # see if we can get from cache
         if self.deterministic:
+            #environLocal.printDebug('using cached scale segment')
             ck = self._getCacheKey(nodeObj, pitchReference, minPitch, maxPitch)
             if ck in self._ascendingCache.keys():
                 return self._ascendingCache[ck]
@@ -1727,6 +1730,17 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net = BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         '''
+        # only cache if altered degrees is None
+        if len(alteredDegrees) == 0:
+            # if pitch reference is a string, take it as it is
+            if common.isStr(pitchReference):
+                cacheKey = (pitchReference, nodeId)
+            else:
+                cacheKey = (pitchReference.nameWithOctave, nodeId)
+        else:
+            cacheKey = None
+        if cacheKey in self._minMaxCache.keys():
+            return self._minMaxCache[cacheKey]
 
         # first, get termini, then extend by an octave.
         low, high = self.realizeTermini(pitchReference=pitchReference, 
@@ -1790,6 +1804,10 @@ class BoundIntervalNetwork(IntervalNetwork):
                 minPitch = p
             if p.ps > maxPitch.ps:
                 maxPitch = p            
+
+        # store if possible
+        if cacheKey is not None:
+            self._minMaxCache[cacheKey] = (minPitch, maxPitch)
 
         # may not be first or last to get min/max
         return minPitch, maxPitch

@@ -38,7 +38,7 @@ _MOD = 'environment.py'
 class EnvironmentException(Exception):
     pass
 
-class UserSettingsException(Exception):
+class UserSettingsException(EnvironmentException):
     pass
 
 
@@ -115,13 +115,22 @@ class Environment(object):
         >>> post = a['writeFormat']
         '''
         self.ref = {}
+
+        # define all settings that are paths
+        # store names of all values that are keys; check for validity
+        self._keysToPaths = [] 
+        self._keysToPaths.append('lilypondPath')
+        self._keysToPaths.append('musicxmlPath')
+        self._keysToPaths.append('graphicsPath')
+        self._keysToPaths.append('pdfPath')
+        self._keysToPaths.append('midiPath')
+
         self.loadDefaults() # defines all valid keys in ref
         # read will only right over values if set in field
         self.read() # load a stored file if available
         # store the name of the module that is using this object
         # this is used for printing debug information
         self.modNameParent = modName
-
 
     def loadDefaults(self):
         '''Load defaults. All keys are derived from these defaults.
@@ -164,7 +173,6 @@ class Environment(object):
 
                 ]:
                 self.__setitem__(name, value) # use for key checking
-
 
     def restoreDefaults(self):
         '''Restore only defaults for all parameters. Useful for testing. 
@@ -259,9 +267,13 @@ class Environment(object):
         if not valid:
             raise EnvironmentException('%s is not an acceptable value for preference: %s' % (value, key))
 
+        # need to escape problematic characters for xml storage
         if common.isStr(value):
             value = xml.sax.saxutils.escape(value).encode('UTF-8')
+
+        # set value
         self.ref[key] = value
+
 
     def __repr__(self):
         return '<Environment>'
@@ -546,7 +558,18 @@ class UserSettings(object):
 
     def __setitem__(self, key, value):
         '''Dictionary-like setting. Changes are made and written to the user configuration file.
+
+        >>> from music21 import *
+        >>> us = environment.UserSettings()
+        >>> us['musicxmlPath'] = 'asdfwerasdffasdfwer'
+        Traceback (most recent call last):
+        UserSettingsException: attempting to set a path that does not exist: asdfwerasdffasdfwer
         '''
+        # before setting value, see if this is a path and test existence
+        if key in self._environment._keysToPaths:
+            if not os.path.exists(value):
+                raise UserSettingsException('attempting to set a path that does not exist: %s' % value)
+
         # location specific, cannot test further
         self._environment.__setitem__(key, value)
         self._environment.write()
