@@ -10,6 +10,10 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+
+# base -- the convention within music21 is that __init__ files contain:
+#    from base import *
+
 '''
 Music21 base classes for :class:`~music21.stream.Stream` objects and elements 
 contained within them. Additional objects for defining and manipulating 
@@ -23,18 +27,16 @@ available after importing music21.
 >>> music21.Music21Object
 <class 'music21.base.Music21Object'>
 
+>>> music21.VERSION_STR
+'0.3.4.a8'
+
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
 
 >>> from music21 import *
 >>> base.Music21Object
 <class 'music21.base.Music21Object'>
-
 '''
-
-# base -- the convention within music21 is that __init__ files contain:
-#    from base import *
-
 
 #-------------------------------------------------------------------------------
 VERSION_STR = "0.3.4.a8"
