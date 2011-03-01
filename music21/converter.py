@@ -803,8 +803,7 @@ class Converter(object):
         if autoDownload == 'allow':
             pass
         elif autoDownload in ['deny', 'ask']:
-            # TODO: plan here is to use an interactive dialog
-            raise ConverterException('automatic downloading of URLs is presently set to "%s"; configure your Environment "autoDownload" setting to "allow" to permit automatic downloading.' % autoDownload)
+            raise ConverterException("""automatic downloading of URLs is presently set to "%s"; configure your Environment "autoDownload" setting to "allow" to permit automatic downloading: environment.set('autoDownload', 'allow')""" % autoDownload)
 
         # this format check is here first to see if we can find the format
         # in the url; if forcing a format we do not need this
