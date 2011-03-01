@@ -12702,10 +12702,8 @@ class Test(unittest.TestCase):
         m74 = s.parts[0].getElementsByClass('Measure')[73]
         c = m74.getElementsByClass('Chord')
         # has correct pitches but natural not showing on C
-        self.assertEqual(str(c[1].pitches), '[C5, E5, G5]')
-        self.assertEqual(str(c[1].pitches[0].accidental), '<accidental natural>')
-        self.assertEqual(str(c[1].pitches[0].accidental.displayStatus), 'True')
-        #m74.show()
+        self.assertEqual(str(c[0].pitches), '[C5, E5, G5]')
+        self.assertEqual(str(c[0].pitches[0].accidental), 'None')
 
 
 #-------------------------------------------------------------------------------
