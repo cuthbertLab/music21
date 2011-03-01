@@ -1267,7 +1267,8 @@ class ConcreteScale(Scale):
         return post
 
 
-    def intervalBetweenDegrees(self, degreeStart, degreeEnd):
+    def intervalBetweenDegrees(self, degreeStart, degreeEnd, 
+        direction=DIRECTION_ASCENDING, equateTermini=True):
         '''Given two degrees, provide the interval
 
         >>> from music21 import *
@@ -1277,8 +1278,10 @@ class ConcreteScale(Scale):
 
         '''
         # get pitches for each degree
-        pStart = self.pitchFromDegree(degreeStart)
-        pEnd = self.pitchFromDegree(degreeEnd)
+        pStart = self.pitchFromDegree(degreeStart, direction=direction, 
+                equateTermini=equateTermini)
+        pEnd = self.pitchFromDegree(degreeEnd, direction=direction, 
+                equateTermini=equateTermini)
         if pStart is None:
             raise ScaleException('cannot get a pitch for scale degree: %s' % pStart)
         elif pEnd is None:
@@ -2811,7 +2814,19 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.intervalBetweenDegrees(1,5)), '<music21.interval.Interval P5>')
         self.assertEqual(str(sc.intervalBetweenDegrees(2,4)), '<music21.interval.Interval m3>')
 
-
+        # with a probabilistic non deterministci scale, 
+        # an exception may be raised for step that may not exist
+        sc = WeightedHexatonicBlues('g3')
+        exceptCount = 0
+        for x in range(10):
+            post = None
+            try:
+                post = sc.intervalBetweenDegrees(3, 4)
+            except ScaleException:
+                exceptCount += 1
+            if post is not None:
+                self.assertEqual(str(post), '<music21.interval.Interval A1>')
+        self.assertEqual(exceptCount < 3, True)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

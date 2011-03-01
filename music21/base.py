@@ -2184,7 +2184,8 @@ class Music21Object(JSONSerializer):
         doc='''A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
         ''')
 
-    def addLocationAndActiveSite(self, offset, activeSite, activeSiteWeakRef = None):
+    def addLocationAndActiveSite(self, offset, activeSite, 
+        activeSiteWeakRef=None):
         '''
         This method is for advanced usage, generally as a speedup tool that adds a 
         new location element and a new activeSite.  Formerly called

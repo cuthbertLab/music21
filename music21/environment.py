@@ -447,25 +447,28 @@ class Environment(object):
         # see common.fileExtensions for format names 
         format, ext = common.findFormat(fmt)
         if format == 'lilypond':
-            fpApp = self.ref['lilypondPath']
+            environmentKey = 'lilypondPath'
         elif format in ['png', 'jpeg']:
-            fpApp = self.ref['graphicsPath']   
+            environmentKey = 'graphicsPath'
         elif format in ['pdf']:
-            fpApp = self.ref['pdfPath']   
+            environmentKey = 'pdfPath'
         elif format == 'musicxml':
-            fpApp = self.ref['musicxmlPath']   
+            environmentKey = 'musicxmlPath'
         elif format == 'midi':
-            fpApp = self.ref['midiPath']   
+            environmentKey = 'midiPath'
         else:
+            environmentKey = None
             fpApp = None
 
-        # substitute provided app
-        if app != None:
+        fpApp = self.ref[environmentKey]
+
+        # substitute app provided via argument
+        if app is not None:
             fpApp = app 
 
         platform = common.getPlatform()
         if fpApp is None and platform != 'win':
-            raise EnvironmentException("Cannot find an application for format %s, specify this in your environment" % fmt)
+            raise EnvironmentException("Cannot find a valid application path for format %s. Specify this in your Environment by calling environment.set(%r, 'pathToApplication')" % (format, environmentKey))
         
         if platform == 'win' and fpApp is None:
             # no need to specify application here: windows starts the program based on the file extension
@@ -535,6 +538,9 @@ class UserSettings(object):
     >>> #_DOCS_SHOW us['musicxmlPath'] = '/Applications/Finale Reader.app'
     >>> #_DOCS_SHOW us['musicxmlPath']
     u'/Applications/Finale Reader.app'
+
+
+    Alternatively, the environment.py module provides convenience functions for setting these settings: :func:`~music21.environment.keys`, :func:`~music21.environment.get`, and :func:`~music21.environment.set`.
     '''
 
     def __init__(self):
@@ -631,6 +637,46 @@ class UserSettings(object):
             raise UserSettingsException('an environment configuration file does not exist.')
 
 
+#-------------------------------------------------------------------------------
+# convenience routines for accessing UserSettings. 
+
+def keys():
+    '''Return all valid UserSettings keys.
+    '''
+    us = UserSettings()
+    return us.keys()
+
+
+def set(key, value):
+    '''Directly set a single UserSettings key, by providing a key and the appropriate value. This will create a user settings file if necessary.
+
+    >>> from music21 import *
+    >>> environment.keys()
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+    >>> environment.set('wer', 'asdf')
+    Traceback (most recent call last):
+    EnvironmentException: no preference: wer
+    >>> #_DOCS_SHOW environment.set('musicxmlPath', '/Applications/Finale Reader.app')
+    '''
+    us = UserSettings()
+    try:
+        us.create() # no problem if this does not exist
+    except UserSettingsException:
+        pass # this means it already exists
+    us[key] = value # this may raise an exception
+
+def get(key):
+    '''Return the current setting of a UserSettings key. This will create a user settings file if necessary.
+
+    >>> from music21 import *
+    >>> environment.keys()
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+    >>> #_DOCS_SHOW environment.get('musicxmlPath')
+    '/Applications/Finale Reader.app'
+    '''
+    us = UserSettings()
+    return us[key]
+    
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
