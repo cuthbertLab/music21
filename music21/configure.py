@@ -971,33 +971,6 @@ class SelectFromList(Dialog):
         return rawParsed
 
 
- 
-# class AskAutoDownload(YesOrNo):
-#     '''Ask the user if they want to enable auto-downloading
-# 
-#     >>> from music21 import *
-#     '''
-#     def __init__(self, default=True, tryAgain=True,
-#         promptHeader=None):
-#         YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
-# 
-#         msg = 'Would you like music21 to automatically download music data files when a URL is given to Converter?'
-#         self.appendPromptHeader(msg)
-# 
-#     def _performAction(self, simulate=False):
-#         '''The action here is to open the stored URL in a browser, if the user agrees. 
-#         '''
-#         result = self.getResult()
-#         if result in [True, False]: 
-#             reload(environment)
-#             us = environment.UserSettings()
-#             if result is True:
-#                 us['autoDownload'] = 'allow' # automatically writes
-#             elif result is False:
-#                 us['autoDownload'] = 'deny' # automatically writes
-#             self._writeToUser(['Auto download preference set to: %s' % 
-#                 us['autoDownload'], ' '])
-
 
 class AskAutoDownload(SelectFromList):
     '''General class to select values from a list.
@@ -1057,17 +1030,20 @@ class AskAutoDownload(SelectFromList):
         result = self.getResult()
         if result in [1, 2, 3]: 
             reload(environment)
-            us = environment.UserSettings()
+            #us = environment.UserSettings()
             if result == 1:
-                us['autoDownload'] = 'allow' # automatically writes
+                # calling this function will check to see if a file is created
+                environment.set('autoDownload', 'allow')
+                #us['autoDownload'] = 'allow' # automatically writes
             elif result == 2:
-                us['autoDownload'] = 'deny' # automatically writes
+                #us['autoDownload'] = 'deny' # automatically writes
+                environment.set('autoDownload', 'deny')
             elif result == 3:
                 raise DialogException('user selected an option that terminates installer.')
 
         if result in [1, 2]: 
             self._writeToUser(['Auto Download set to: %s' % 
-                us['autoDownload'], ' '])
+                environment.get('autoDownload'), ' '])
 
 
 
@@ -1256,10 +1232,11 @@ class SelectMusicXMLReader(SelectFilePath):
         result = self.getResult()
         if result is not None and not isinstance(result, DialogError): 
             reload(environment)
-            us = environment.UserSettings()
-            us['musicxmlPath'] = result # automatically writes
+            #us = environment.UserSettings()
+            #us['musicxmlPath'] = result # automatically writes
+            environment.set('musicxmlPath', result)
             self._writeToUser(['MusicXML Reader set to: %s' % 
-                us['musicxmlPath'], ' '])
+                environment.get('musicxmlPath'), ' '])
 
 
 
