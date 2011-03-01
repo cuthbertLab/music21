@@ -765,7 +765,6 @@ class DefinedContexts(object):
         # may want to convert to tuple to avoid user editing?
         return self._locationKeys
 
-
     def purgeLocations(self):
         '''Clean all locations that refer to objects that no longer exist.
 
@@ -1870,6 +1869,62 @@ class Music21Object(JSONSerializer):
         '''Return a list of all site Ids, or the id() value of the sites of this object. 
         '''
         return self._definedContexts.getSiteIds()
+
+
+    def getCommonSiteIds(self, other):
+        '''Given another music21 object, return a list of all common site ids. Do not include the default empty site, None. 
+
+        >>> from music21 import note, stream
+        >>> s1 = stream.Stream()
+        >>> s2 = stream.Stream()
+        >>> n1 = note.Note()
+        >>> n2 = note.Note()
+        >>> s1.append(n1)
+        >>> s1.append(n2)
+        >>> s2.append(n2)
+        >>> n1.getCommonSiteIds(n2) == [id(s1)]
+        True
+        >>> s2.append(n1)
+        >>> n1.getCommonSiteIds(n2) == [id(s1), id(s2)]
+        True
+        '''
+        src = self.getSiteIds()
+        dst = other.getSiteIds()
+        post = []
+        for i in src:
+            if i is None:
+                continue
+            if i in dst:
+                post.append(i)
+        return post
+
+    def getCommonSites(self, other):
+        '''Given another object, return a lost of all common sites. 
+
+        >>> from music21 import note, stream
+        >>> s1 = stream.Stream()
+        >>> s2 = stream.Stream()
+        >>> n1 = note.Note()
+        >>> n2 = note.Note()
+        >>> s1.append(n1)
+        >>> s1.append(n2)
+        >>> s2.append(n2)
+        >>> n1.getCommonSites(n2) == [s1]
+        True
+        >>> s2.append(n1)
+        >>> n1.getCommonSites(n2) == [s1, s2]
+        True
+
+        '''
+        src = self.getSites()
+        dstIds = other.getSiteIds()
+        post = []
+        for obj in src:
+            if obj is None:
+                continue
+            if id(obj) in dstIds:
+                post.append(obj)
+        return post
 
     def getSpannerSites(self):
         '''Return a list of all sites that are Spanner or Spanner subclasses. This provides a way for objects to be aware of what Spanners they reside in. Note that Spanners are not Stream subclasses, but Music21Objects that are composed with a specialized Stream subclass.
