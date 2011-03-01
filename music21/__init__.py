@@ -51,7 +51,7 @@ __all__ = ['base',
            # individual modules
            'articulations', 'bar',
            'chord', 'chordTables', 'clef','common', 'converter',
-           'defaults', 'duration', 'dynamics',
+           'defaults', 'derivation', 'duration', 'dynamics',
            'editorial', 'environment', 
            'graph', 
            'interval', 'intervalNetwork', 'instrument', 'key', 'layout',
