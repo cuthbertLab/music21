@@ -131,8 +131,7 @@ class Range:
         '''
         validPitches = []
         for possiblePitch in pitchList:
-            if not (self.lowestPitch > possiblePitch):
-                if not (possiblePitch > self.highestPitch):
+            if not (self.lowestPitch > possiblePitch) and not (possiblePitch > self.highestPitch):
                     validPitches.append(possiblePitch)
                 
         if len(validPitches) == 0:
