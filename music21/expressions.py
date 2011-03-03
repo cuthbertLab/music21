@@ -99,9 +99,13 @@ class TextExpression(Expression, text.TextFormat):
     >>> te.style = 'bolditalic'
     >>> te.getMXLParameters()['font-weight']
     'bold'
+    >>> te.letterSpacing = 0.5
+    >>> te.getMXLParameters()['enclosure'] == None
+    True
     '''
     def __init__(self, content=None):
         Expression.__init__(self)
+        # numerous properties are inherited from TextFormat
         text.TextFormat.__init__(self)
 
         # the text string to be displayed; not that line breaks
@@ -112,7 +116,45 @@ class TextExpression(Expression, text.TextFormat):
 
         # numerous parameters are inherited from text.TextFormat
 
+        # these are the attribute names used for Dyanmics; should 
+        # use uniform naming convention
+        # not sure if values should be handled differently
+        self.posDefaultX = None
+        self.posDefaultY = None
+        self.posRelativeX = None 
+        self.posRelativeY = None
 
+
+
+    def _getEnclosure(self):
+        return self._enclosure
+    
+    def _setEnclosure(self, value):
+        if value is None:
+            self._enclosure = value
+        elif value.lower() in ['oval', 'rectangle']:
+            self._enclosure = value.lower()
+        else:
+            raise TextFormatException('Not a supported justification: %s' % value)
+    
+    enclosure = property(_getEnclosure, _setEnclosure, 
+        doc = '''Get or set the the enclosure.
+
+        >>> from music21 import *
+        >>> te = expressions.TextExpression()
+        >>> te.justify = 'center'
+        >>> te.enclosure = None
+        >>> te.enclosure = 'rectangle'
+        ''')
+
+
+    def getMXLParameters(self):
+        '''Return as musicxml parameters
+        '''
+        post = text.TextFormat.getMXLParameters(self)
+        post['enclosure'] = self._getEnclosure()
+        return post
+        
 
 #-------------------------------------------------------------------------------
 class Ornament(Expression):
