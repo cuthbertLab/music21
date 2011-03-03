@@ -20,34 +20,61 @@ from music21 import common
 class Derivation(object):
     '''
     >>> from music21 import *  
-    >>> d = derivation.Derivation()
-    >>> s = stream.Stream()
-    >>> d.setAncestor(s)
-    >>> d.getAncestor() is s
+    >>> s1 = stream.Stream()
+    >>> s2 = stream.Stream()
+    >>> d1 = derivation.Derivation(s1)
+    >>> d1.setAncestor(s2)
+    >>> d1.getAncestor() is s2
     True    
+    >>> d1.getContainer() is s1
+    True    
+    >>> import copy
+    >>> d2 = copy.deepcopy(d1)
     '''
     def __init__(self, container=None):
         # store a reference to the Stream that contains this derivation
-        self.container = container
-        # ancestor should probably be stored as a weak ref
+        self._container = None
+        self._containerId = None # store id to optimize w/o unwrapping
+
+        # ancestor should be stored as a weak ref
         self._ancestor = None
-        self._ancestorId = None # store id to optimize w/o unwrapping
+        #self._ancestorId = None # store id to optimize w/o unwrapping
+
+        # set container; can handle None
+        self.setContainer(container)
+
+    def setContainer(self, container):
+        # container is the Stream that contains
+        if container is None:
+            self._containerId = None
+            self._container = None
+        else:
+            self._containerId = id(container)
+            self._container = common.wrapWeakref(container)
+
+    def getContainer(self):
+        return common.unwrapWeakref(self._container)
+
 
     def setAncestor(self, ancestor):
+        # for now, ancestor is not a weak ref
         if ancestor is None:
             self._ancestorId = None
             self._ancestor = None
         else:
             self._ancestorId = id(ancestor)
-            self._ancestor = common.wrapWeakref(ancestor)
+            self._ancestor = ancestor
+            #self._ancestor = common.wrapWeakref(ancestor)
 
     def getAncestor(self):
-        return common.unwrapWeakref(self._ancestor)
+        return self._ancestor
+        #return common.unwrapWeakref(self._ancestor)
 
     def __deepcopy__(self, memo=None):
         '''Manage deepcopying by creating a new reference to the same object. If the ancestor no longer exists, than ancestor is set to None
         '''
         new = self.__class__()
+        new.setContainer(self.getContainer())
         new.setAncestor(self.getAncestor())
         return new
 

@@ -25,6 +25,7 @@ from music21 import common
 from music21 import clef
 from music21 import chord
 from music21 import defaults
+from music21 import derivation
 from music21 import duration
 from music21 import dynamics
 from music21 import instrument
@@ -135,6 +136,10 @@ class Stream(music21.Music21Object):
         # self._endElements stores ElementWrapper and Music21Object found at
         # the highestTime of this Stream. 
         self._endElements = [] 
+
+        # store a derivation object to track derivations from other Streams
+        # pass a reference to this object
+        self._derivation = derivation.Derivation(self)
 
         self._unlinkedDuration = None
 
@@ -438,6 +443,54 @@ class Stream(music21.Music21Object):
         return s
 
 
+
+    def setDerivation(self, target):
+        '''Manually set the Stream that this Stream was derived from. This operation is generally completed automatically. 
+        '''
+        self._derivation.setAncestor(target)
+
+    def _getDerivation(self):
+        '''Return a reference to the Stream that created this Stream, if such a Stream exists. 
+        '''
+        return self._derivation.getAncestor()
+
+    derivesFrom = property(_getDerivation, 
+        doc = '''Return a reference to the Stream that created this Stream, if such a Stream exists. 
+
+        >>> from music21 import *
+        >>> s1 = stream.Stream()
+        >>> s1.repeatAppend(note.Note(), 10)
+        >>> s1.repeatAppend(note.Rest(), 10)
+        >>> s2 = s1.getElementsByClass('Note')
+        >>> s2.derivesFrom == s1
+        True
+        ''')
+
+    def _getRootDerivation(self):
+        '''Return a reference to the Stream that created this Stream, if such a Stream exists. 
+        '''
+        focus = self
+        while True:
+            # keep deriving until we get None; then return what we have
+            rd = focus._derivation.getAncestor()
+            if rd is None:
+                # return what we have
+                return focus
+            focus = rd
+
+    rootDerivation = property(_getRootDerivation, 
+        doc = '''Return a reference to the oldest source of this Stream; that is, chain calls to derivesFrom until we get to a Stream that cannot be further derived. 
+
+        >>> from music21 import *
+        >>> s1 = stream.Stream()
+        >>> s1.repeatAppend(note.Note(), 10)
+        >>> s1.repeatAppend(note.Rest(), 10)
+        >>> s2 = s1.getElementsByClass('Note')
+        >>> s2.derivesFrom == s1
+        True
+        ''')
+
+
     def hasElement(self, obj):
         '''Return True if an element, provided as an argument, is contained in this Stream.
 
@@ -671,6 +724,11 @@ class Stream(music21.Music21Object):
             elif name == 'flattenedRepresentationOf':
                 # keep a reference, not a deepcopy
                 newValue = self.flattenedRepresentationOf
+                setattr(new, name, newValue)
+            elif name == '_derivation':
+                # keep the old ancestor but need to update the conainer
+                newValue = copy.deepcopy(self._derivation)
+                newValue.setContainer(new)
                 setattr(new, name, newValue)
             elif name == '_cache':
                 continue # skip for now
@@ -1486,6 +1544,7 @@ class Stream(music21.Music21Object):
             found = self.__class__()
         else:
             found = Stream()
+        found.setDerivation(self)
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, (list, tuple)):
@@ -1574,6 +1633,7 @@ class Stream(music21.Music21Object):
             found = self.__class__()
         except:
             found = Stream()
+        found.setDerivation(self)
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, list):
@@ -1639,6 +1699,8 @@ class Stream(music21.Music21Object):
             groupFilterList = [groupFilterList]
 
         returnStream = self.__class__()
+        returnStream.setDerivation(self)
+
         # need both _elements and _endElements
         # must handle independently b/c inserting
         for e in self._elements:
@@ -1850,6 +1912,7 @@ class Stream(music21.Music21Object):
             offsetEnd = offsetStart
         
         found = self.__class__()
+        found.setDerivation(self)
 
 
         # need both _elements and _endElements
@@ -2173,6 +2236,7 @@ class Stream(music21.Music21Object):
         mStreamSpanners = self.spanners
 
         returnObj = self.__class__()
+        returnObj.setDerivation(self)
         returnObj.mergeAttributes(self) # get id and groups
         srcObj = self
 
@@ -2437,6 +2501,8 @@ class Stream(music21.Music21Object):
         if len(post) == 0 and searchContext:
             # returns a single value
             post = self.__class__()
+            post.setDerivation(self)
+
             # sort by time to search the most recent objects
             obj = self.getContextByClass(meter.TimeSignature, 
                   sortByCreationTime=sortByCreationTime)
@@ -2856,6 +2922,7 @@ class Stream(music21.Music21Object):
             display = self.__class__()
         else:
             display = forceOutputClass()
+        display.setDerivation(self)
 
         found = None
         foundOffset = 0
@@ -2923,6 +2990,7 @@ class Stream(music21.Music21Object):
             #returnObj = Stream()
             #returnObj = self.__class__() # for output
             returnObj = copy.deepcopy(self)
+            returnObj.setDerivation(self)
         else:
             returnObj = self
 
@@ -3305,6 +3373,8 @@ class Stream(music21.Music21Object):
         # create a stream of measures to contain the offsets range defined
         # create as many measures as needed to fit in oMax
         post = self.__class__()
+        post.setDerivation(self)
+
         o = 0.0 # initial position of first measure is assumed to be zero
         measureCount = 0
         lastTimeSignature = None
@@ -3655,7 +3725,7 @@ class Stream(music21.Music21Object):
         TODO: inPlace=False does not work in many cases
         '''
 
-        environLocal.printDebug(['calling Stream.makeBeams()'])
+        #environLocal.printDebug(['calling Stream.makeBeams()'])
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
@@ -4367,10 +4437,14 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['_getFlatOrSemiFlat(): self', self, 'self.activeSite', self.activeSite])       
 
         # this copy will have a shared locations object
-        # not that copy.copy() in some cases seems to not cause secondary
+        # note that copy.copy() in some cases seems to not cause secondary
         # problems that self.__class__() does
         sNew = copy.copy(self)
-        #sNew = self.__class__()
+        #sNew = self.__class__
+
+        # call with container as first arg, not self
+        sNew._derivation = derivation.Derivation(sNew)
+        sNew.setDerivation(self)
 
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
@@ -12704,6 +12778,83 @@ class Test(unittest.TestCase):
         # has correct pitches but natural not showing on C
         self.assertEqual(str(c[0].pitches), '[C5, E5, G5]')
         self.assertEqual(str(c[0].pitches[0].accidental), 'None')
+
+    def testDerivationA(self):
+        from music21 import stream, corpus
+
+        s1 = stream.Stream()
+        s1.repeatAppend(note.Note(), 10)
+        s1.repeatAppend(chord.Chord(), 10)
+
+        # for testing against
+        s2 = stream.Stream()
+
+        s3 = s1.getElementsByClass('GeneralNote')
+        self.assertEqual(len(s3), 20)
+        #environLocal.printDebug(['s3.derivesFrom', s3.derivesFrom])
+        self.assertEqual(s3.derivesFrom is s1, True)
+        self.assertEqual(s3.derivesFrom is not s2, True)
+
+        s4 = s3.getElementsByClass('Chord')
+        self.assertEqual(len(s4), 10)
+        self.assertEqual(s4.derivesFrom is s3, True)
+
+
+        # test imported and flat
+        s = corpus.parseWork('bach/bwv66.6')
+        p1 = s.parts[0]
+        # the part is not derived from anything yet
+        self.assertEqual(p1.derivesFrom, None)
+
+        p1Flat = p1.flat
+        self.assertEqual(p1.flat.derivesFrom is p1, True)
+        self.assertEqual(p1.flat.derivesFrom is s, False)
+        
+        p1FlatNotes = p1Flat.notes
+        self.assertEqual(p1FlatNotes.derivesFrom is p1Flat, True)
+        self.assertEqual(p1FlatNotes.derivesFrom is p1, False)
+
+        # we cannot do this, as each call to flat produces a new Stream
+        self.assertEqual(p1.flat.notes.derivesFrom is p1.flat, False)
+        # chained calls to .derives from can be used
+        self.assertEqual(p1.flat.notes.derivesFrom.derivesFrom is p1, True)
+
+        # can use rootDerivation to get there faster
+        self.assertEqual(p1.flat.notes.rootDerivation is p1, True)
+
+        # this does not work because are taking an item via in index
+        # value, and this Measure is not derived from a Part
+        self.assertEqual(p1.getElementsByClass(
+            'Measure')[3].flat.notes.rootDerivation is p1, False)
+
+        # the root here is the Measure 
+        self.assertEqual(p1.getElementsByClass(
+            'Measure')[3].flat.notes.rootDerivation is p1.getElementsByClass(
+            'Measure')[3], True)
+
+        self.assertEqual(s.flat.getElementsByClass(
+            'Rest').rootDerivation is s, True) 
+
+        # we cannot use the activeSite to get the Part from the Measure, as
+        # the activeSite was set when doing the getElementsByClass operation
+        self.assertEqual(p1.getElementsByClass(
+            'Measure')[3].activeSite is p1, False)
+
+
+
+    def testDerivationB(self):
+        from music21 import stream
+        s1 = stream.Stream()
+        s1.repeatAppend(note.Note(), 10)
+        s1Flat = s1.flat
+        self.assertEqual(s1Flat.derivesFrom is s1, True)
+        # check what the derivation object thinks its container is
+        self.assertEqual(s1Flat._derivation.getContainer() is s1Flat, True)
+
+        s2  = copy.deepcopy(s1Flat)
+        self.assertEqual(s2.derivesFrom is s1, True)
+        # check low level attrbiutes
+        self.assertEqual(s2._derivation.getContainer() is s2, True)
 
 
 #-------------------------------------------------------------------------------
