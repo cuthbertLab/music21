@@ -1538,6 +1538,15 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 w.mx = mxObj     
                 _addToStaffReference(mxObj, w, staffReference)
                 m.insert(offsetMeasureNote, w)
+            if mxObj.getWords() is not None:
+                # will return a list of Words objects
+                mxWordsList = mxObj.getWords()
+                environLocal.printDebug(['found mxWords object', mxWordsList])
+                #te = expressions.TextExpression()
+                #te.mx = mxObj     
+                #_addToStaffReference(mxObj, te, staffReference)
+                #m.insert(offsetMeasureNote, te)
+
     #environLocal.printDebug(['staffReference', staffReference])
 
     # if we have voices and/or if we used backup/forward, we may have
@@ -2146,6 +2155,18 @@ class Test(unittest.TestCase):
         # slurs are on measures 2, 3
         # crescendos are on measures 4, 5
 
+
+    def testTextExpressionsA(self):
+
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive
+        
+        s = converter.parse(testPrimitive.textExpressions)
+        #s.show()
+
+
+
+
 if __name__ == "__main__":
     import sys
 
@@ -2153,11 +2174,8 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         t = Test()
-        #t.testVoices()
-        #t.testSlurInputA()
-        #t.testMultipleStavesPerPartA()
-        #t.testMultipleStavesPerPartC()
-        t.testSpannersA()
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
 
 

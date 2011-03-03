@@ -21,6 +21,7 @@ import doctest, unittest
 import music21
 import music21.interval
 from music21 import musicxml
+from music21 import text
 
 _MOD = 'expressions'
 
@@ -69,13 +70,32 @@ def realizeOrnaments(srcObject):
             retList.append(i)
         return retList
 
-class Expression(music21.Music21Object):
+
+#-------------------------------------------------------------------------------
+class ExpressionException(music21.Music21Exception):
     pass
+
+
+class Expression(music21.Music21Object):
+    '''This base class is inherited by many diverse expressions. 
+    '''
+    def __init__(self):
+        music21.Music21Object.__init__(self)
 
     def __repr__(self):
         return '<music21.expressions.%s>' % (self.__class__.__name__)
 
 
+
+#-------------------------------------------------------------------------------
+class TextExpression(Expression):
+
+    def __init__(self):
+        Expression.__init__(self)
+
+
+
+#-------------------------------------------------------------------------------
 class Ornament(Expression):
     connectedToPrevious = True  # should follow directly on previous; true for most "ornaments".
     tieAttach = 'first' # attach to first note of a tied group.
@@ -257,8 +277,6 @@ class Fermata(Expression):
 
     mx = property(_getMX, _setMX)
 
-class ExpressionException(music21.Music21Exception):
-    pass
 
 
 #-------------------------------------------------------------------------------

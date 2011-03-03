@@ -230,6 +230,7 @@ class TagLib(object):
 ('grace', False, Grace),  
 
 # this position is not based on measured tag usage
+('words', True, Words),  
 ('print', False, Print),  
 ('system-layout', False, SystemLayout),  
 ('system-margins', False, SystemMargins),  
@@ -1271,6 +1272,7 @@ class Direction(MusicXMLElementList):
         MusicXMLElementList.__init__(self)
         self._tag = 'direction'
         # attributes
+        # note that placement does not seem to make a difference for some types
         self._attr['placement'] = None
         # elements
         self.componentList = []
@@ -1320,10 +1322,31 @@ class Direction(MusicXMLElementList):
                     return obj
         return None
 
+    def getWords(self):
+        '''Search this direction and determine if it contains a Words entity.
+
+        >>> a = Direction()
+        >>> b = DirectionType()
+        >>> c = Words('crescendo')
+        >>> b.append(c)
+        >>> a.append(b)
+        >>> a.getWords() == [c]
+        True
+        '''
+        post = [] # return a lost
+        for directionType in self.componentList:
+            for obj in directionType:
+                if isinstance(obj, Words):
+                    post.append(obj)
+        if len(post) > 0:
+            return post
+        else:
+            return None
+
 
 
 class DirectionType(MusicXMLElementList):
-    '''DirectionType stores objects like Pedal, dynamics, wedge
+    '''DirectionType stores objects like Pedal, dynamics, wedge, and words
     '''
     def __init__(self):
         MusicXMLElementList.__init__(self)
@@ -1336,6 +1359,48 @@ class DirectionType(MusicXMLElementList):
         c = []
         c = c + self.componentList
         return c
+
+
+
+class Words(MusicXMLElement):
+    '''A direction tupe that can be used for arbitrary text expressions, and font formatting 
+    '''
+    def __init__(self, charData=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'words'
+        # attributes
+        self._attr['justify'] = None # left, center, right; where the text hangs
+
+        self._attr['font-family'] = None # in points
+        self._attr['font-style'] = None # italic, bold
+        self._attr['font-size'] = None # in points
+        self._attr['font-weight'] = None # normal, bold
+        
+        self._attr['letter-spacing'] = None # not sure the units .5 is double
+        # this does not seem to work w/ multiline text expressions
+        # values can be normal, 100, 120 , etc
+        self._attr['line-height'] = None # text leading, number is % of font 
+        self._attr['enclosure'] = None # rectangle, oval
+
+        # postions all seem relative to the top line of the staff, regardless
+        # of the direction position attribute
+        self._attr['default-y'] = None # in 10ths of a staff
+        self._attr['default-x'] = None
+    
+        # not likely to be used
+        self._attr['text-direction'] = None
+        self._attr['print-style'] = None
+        self._attr['halign'] = None
+        self._attr['valign'] = None # top, middle, bottom
+
+        # text-rotation and text-decoration did not seem work on finale reader
+        # import
+
+        # elements
+        # char data stores the text to be displayed
+        self.charData = charData
+
+
 
 
 class MeasureStyle(MusicXMLElement):
@@ -2075,6 +2140,7 @@ class Handler(xml.sax.ContentHandler):
         self._directionTypeObj = None
         self._graceObj = None
         self._wedgeObj = None
+        self._wordsObj = None
 
         self._printObj = None
         self._systemLayoutObj = None
@@ -2204,10 +2270,8 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'direction-type': 
             self._directionTypeObj = DirectionType()
 
-
         elif name == 'dot': 
             self._dotObj = Dot()
-
 
         elif name == 'dynamics': 
             self._dynamicsObj = Dynamics()
@@ -2271,6 +2335,11 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'technical': 
             self._technicalObj = Technical()
+
+
+        elif name == 'words': 
+            self._wordsObj = Words()
+            self._wordsObj.loadAttrs(attrs)
 
         elif name == 'wedge': 
             self._wedgeObj = Wedge()
@@ -2641,11 +2710,18 @@ class Handler(xml.sax.ContentHandler):
             self._notationsObj.componentList.append(self._technicalObj)
             self._technicalObj = None
 
+        elif name == 'words':
+            if self._directionTypeObj != None: 
+                self._directionTypeObj.componentList.append(self._wordsObj)
+            else:
+                raise MusicXMLException('missing a container for a Words: %s' % self._wordsObj)
+            self._wordsObj = None
+
         elif name == 'wedge': 
             if self._directionTypeObj != None: 
                 self._directionTypeObj.componentList.append(self._wedgeObj)
             else:
-                raise MusicXMLException('do not know where this wedge goes', self._wedgeObj)
+                raise MusicXMLException('do not know where this wedge goes: %s' % self._wedgeObj)
             self._wedgeObj = None
 
         elif name == 'ornaments': 
@@ -3731,8 +3807,6 @@ class Test(unittest.TestCase):
 </score-partwise>
 """
         self._compareXml(mxScore1, mxScore1XMLStr)
-
-
         mxScore2 = Score()
         self.assertEqual(mxScore2.get('movementNumber'), None)
         mxScore2 = mxScore2.merge(mxScore1)

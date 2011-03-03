@@ -422,6 +422,7 @@ class ConverterMusicXML(object):
         c.read(xmlString)
         self._mxScore = c.score #  the mxScore object from the musicxml Document
         if len(self._mxScore) == 0:
+            print xmlString
             raise ConverterException('score from xmlString (%s...) has no parts defined' % xmlString[:30])
         self.load()
 

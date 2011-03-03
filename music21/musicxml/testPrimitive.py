@@ -12509,13 +12509,118 @@ chordIndependentTies = """<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>
 """
 
+textExpressions = """<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1" width="492">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <sound tempo="120"/>
+      <note default-x="83">
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="0.5">up</stem>
+      </note>
+      <note default-x="196">
+        <rest/>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+      <note default-x="307">
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2" width="421">
+      <direction>
+        <direction-type>
+          <words default-y="60" relative-x="0" line-height="2000" enclosure="rectangle" valign="top" font-size="12">muy agitato
+with a long text
+with a long text
+            </words>
+        </direction-type>
+      </direction>
+
+      <note default-x="13">
+        <pitch>
+          <step>D</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem default-y="-10">up</stem>
+      </note>
+      <direction placement="above">
+        <direction-type>
+          <words default-y="-80" font-style="italic"  font-size="24" font-weight="bold" relative-x="0" enclosure="rectangle" letter-spacing="0.5">agitato</words>
+        </direction-type>
+      </direction>
+      <note default-x="124">
+        <rest/>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+      <note default-x="232">
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+      </note>
+      <direction placement="above">
+        <direction-type>
+          <words default-y="-60" font-style="italic" font-size="8" relative-x="0" justify="right">after last element</words>
+        </direction-type>
+      </direction>
+
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+  <!--=========================================================-->
+</score-partwise>
+"""
+
+
 ALL = [articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,
 beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a,
 
 barlines46a, simpleRepeat45a, repeatMultipleTimes45c,
 spannersSlurs33c,
 
-multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, chordIndependentTies,
+multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, chordIndependentTies, textExpressions,
 
 voiceDouble, pianoStaff43a, spanners33a,
 
