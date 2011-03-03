@@ -132,11 +132,136 @@ def postpendArticle(src, language=None):
 
 
 #-------------------------------------------------------------------------------
+class TextFormatException(music21.Music21Exception):
+    pass
+
+class TextFormat(object):
+    '''An object for defining text formatting. This object can be multiple-inherited by object that storage and i/o of text settings. 
+    '''
+    def __init__(self):
+        # these could all be in a text s
+        self._justify = None
+        self._style = None
+        self._size = None
+        self._letterSpacing = None
+
+        # TODO: a comma separated list; can also be generic font styles
+        self._fontFamily = None 
+
+    def _getJustify(self):
+        return self._justify    
+    
+    def _setJustify(self, value):
+        if value.lower() not in ['left', 'center', 'right']:
+            raise TextFormatException('Not a supported justification: %s' % value)
+        self._justify = value.lower()
+
+    justify = property(_getJustify, _setJustify, 
+        doc = '''Get or set the the justification.
+
+        >>> from music21 import *
+        >>> tf = TextFormat()
+        >>> tf.justify = 'center'
+        >>> tf.justify
+        'center'
+        ''')
+
+    def _getStyle(self):
+        return self._style    
+    
+    def _setStyle(self, value):
+        if value.lower() not in ['italic', 'normal', 'bold', 'bolditalic']:
+            raise TextFormatException('Not a supported justification: %s' % value)
+        self._style = value.lower()
+
+    style = property(_getStyle, _setStyle, 
+        doc = '''Get or set the style, as normal, italic, bold, and bolditalic.
+
+        >>> from music21 import *
+        >>> tf = TextFormat()
+        >>> tf.style = 'bold'
+        >>> tf.style
+        'bold'
+        ''')
 
 
+    def _getSize(self):
+        return self._size    
+    
+    def _setSize(self, value):
+        try:
+            value = float(value)
+        except (ValueError):
+            raise TextFormatException('Not a supported size: %s' % value)
+        self._size = value
+
+    size = property(_getSize, _setSize, 
+        doc = '''Get or set the style, as normal, italic, bold, and bolditalic.
+
+        >>> from music21 import *
+        >>> tf = TextFormat()
+        >>> tf.size = 20
+        >>> tf.size
+        20.0
+        ''')
 
 
+    def _getLetterSpacing(self):
+        return self._letterSpacing    
+    
+    def _setLetterSpacing(self, value):
+        if value != 'normal':            
+            # convert to number
+            try:
+                value = float(value)
+            except (ValueError):
+                raise TextFormatException('Not a supported size: %s' % value)
 
+        self._letterSpacing = value
+
+    letterSpacing = property(_getLetterSpacing, _setLetterSpacing, 
+        doc = '''Get or set the letter spacing.
+
+        >>> from music21 import *
+        >>> tf = TextFormat()
+        >>> tf.letterSpacing = 20
+        >>> tf.letterSpacing
+        20.0
+        >>> tf.letterSpacing = 'normal'
+        ''')
+
+
+    def getMXLParameters(self):
+        '''Return a dictionary with the attribute of this object notated as needed for MusicXML output
+
+        >>> from music21 import *
+        >>> tf = TextFormat()
+        >>> tf.style = 'bolditalic'
+        >>> tf.getMXLParameters()['font-weight']
+        'bold'
+        >>> tf.getMXLParameters()['font-style']
+        'italic'
+        '''
+        post = {}
+        post['justify'] = self._justify
+
+        post['font-style'] = 'normal'
+        post['font-weight'] = 'normal'
+        if self._style == 'normal':
+            pass            
+        elif self._style == 'italic':
+            post['font-style'] = 'italic'
+        elif self._style == 'bold':
+            post['font-weight'] = 'bold'
+        elif self._style == 'bolditalic':
+            post['font-weight'] = 'bold'
+            post['font-style'] = 'italic'
+
+        post['font-size'] = self._getSize()
+        post['letter-spacing'] = self._getLetterSpacing()
+
+        # font family not yet being specified
+        return post
 
 
 #-------------------------------------------------------------------------------

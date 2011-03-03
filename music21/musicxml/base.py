@@ -1370,23 +1370,23 @@ class Words(MusicXMLElement):
         self._tag = 'words'
         # attributes
         self._attr['justify'] = None # left, center, right; where the text hangs
-
-        self._attr['font-family'] = None # in points
-        self._attr['font-style'] = None # italic, bold
+        # font family does not display a difference with finale reader
+        self._attr['font-family'] = None # comma sep. list
+        self._attr['font-style'] = None # italic, normal
         self._attr['font-size'] = None # in points
-        self._attr['font-weight'] = None # normal, bold
-        
+        self._attr['font-weight'] = None # normal, bold        
         self._attr['letter-spacing'] = None # not sure the units .5 is double
-        # this does not seem to work w/ multiline text expressions
-        # values can be normal, 100, 120 , etc
-        self._attr['line-height'] = None # text leading, number is % of font 
         self._attr['enclosure'] = None # rectangle, oval
 
         # postions all seem relative to the top line of the staff, regardless
         # of the direction position attribute
         self._attr['default-y'] = None # in 10ths of a staff
         self._attr['default-x'] = None
-    
+
+
+        # line-height does not seem to work w/ multiline text expressions
+        # values can be normal, 100, 120 , etc
+        self._attr['line-height'] = None # text leading, number is % of font     
         # not likely to be used
         self._attr['text-direction'] = None
         self._attr['print-style'] = None

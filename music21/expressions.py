@@ -88,17 +88,40 @@ class Expression(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class TextExpression(Expression):
+class TextExpression(Expression, text.TextFormat):
+    '''A TextExpression is a word, phrase, or similar bit of text that is positioned in a Stream or Measure. Conventional expressive indications are text like "agitato" or "con fuoco."
 
-    def __init__(self):
+    >>> from music21 import *
+    >>> te = expressions.TextExpression('testing')
+    >>> te.size = 24
+    >>> te.size
+    24.0
+    >>> te.style = 'bolditalic'
+    >>> te.getMXLParameters()['font-weight']
+    'bold'
+    '''
+    def __init__(self, content=None):
         Expression.__init__(self)
+        text.TextFormat.__init__(self)
+
+        # the text string to be displayed; not that line breaks
+        # are given in the xml with this non-printing character: (
+#)
+        self._content = content
+        self._enclosure = None
+
+        # numerous parameters are inherited from text.TextFormat
 
 
 
 #-------------------------------------------------------------------------------
 class Ornament(Expression):
-    connectedToPrevious = True  # should follow directly on previous; true for most "ornaments".
+    connectedToPrevious = True  
+    # should follow directly on previous; true for most "ornaments".
     tieAttach = 'first' # attach to first note of a tied group.
+
+    def __init__(self):
+        Expression.__init__(self)
 
     def realize(self, sourceObject):
         '''
@@ -112,7 +135,10 @@ class GeneralMordent(Ornament):
     direction = ""  # up or down
     size = None # music21.interval.Interval (General, etc.) class
     quarterLength = 0.125 # 32nd note default 
+
     def __init__(self):
+        Ornament.__init__(self)
+
         self.size = music21.interval.GenericInterval(2)
 
     def realize(self, srcObject):
@@ -148,10 +174,12 @@ class Mordent(GeneralMordent):
 
 class HalfStepMordent(Mordent):
     def __init__(self):
+        Mordent.__init__(self)
         self.size = music21.interval.Interval("m2")
 
 class WholeStepMordent(Mordent):
     def __init__(self):
+        Mordent.__init__(self)
         self.size = music21.interval.Interval("M2")
 
 class InvertedMordent(GeneralMordent):
@@ -161,10 +189,12 @@ class InvertedMordent(GeneralMordent):
 
 class HalfStepInvertedMordent(InvertedMordent):
     def __init__(self):
+        InvertedMordent.__init__(self)
         self.size = music21.interval.Interval("m2")
 
 class WholeStepInvertedMordent(InvertedMordent):
     def __init__(self):
+        InvertedMordent.__init__(self)
         self.size = music21.interval.Interval("M2")
 
 class Trill(Ornament):
@@ -173,6 +203,7 @@ class Trill(Ornament):
     tieAttach = 'all'
 
     def __init__(self):
+        Ornament.__init__(self)
         self.size = music21.interval.GenericInterval(2)
 
     def _getMX(self):
@@ -207,10 +238,12 @@ class Trill(Ornament):
 
 class HalfStepTrill(Trill):
     def __init__(self):
+        Trill.__init__(self)
         self.size = music21.interval.Interval("m2")
 
 class WholeStepTrill(Trill):
     def __init__(self):
+        Trill.__init__(self)
         self.size = music21.interval.Interval("M2")
 
 class Turn(Ornament):
