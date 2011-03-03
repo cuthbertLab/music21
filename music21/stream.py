@@ -2357,7 +2357,6 @@ class Stream(music21.Music21Object):
                 environLocal.printDebug(['measures(): cannot find requested class in stream:', className])
 
         #environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
-
         return returnObj
 
 
@@ -12785,27 +12784,27 @@ class Test(unittest.TestCase):
         s1 = stream.Stream()
         s1.repeatAppend(note.Note(), 10)
         s1.repeatAppend(chord.Chord(), 10)
-
+        
         # for testing against
         s2 = stream.Stream()
-
+        
         s3 = s1.getElementsByClass('GeneralNote')
         self.assertEqual(len(s3), 20)
         #environLocal.printDebug(['s3.derivesFrom', s3.derivesFrom])
         self.assertEqual(s3.derivesFrom is s1, True)
         self.assertEqual(s3.derivesFrom is not s2, True)
-
+        
         s4 = s3.getElementsByClass('Chord')
         self.assertEqual(len(s4), 10)
         self.assertEqual(s4.derivesFrom is s3, True)
-
-
+        
+        
         # test imported and flat
         s = corpus.parseWork('bach/bwv66.6')
         p1 = s.parts[0]
         # the part is not derived from anything yet
         self.assertEqual(p1.derivesFrom, None)
-
+        
         p1Flat = p1.flat
         self.assertEqual(p1.flat.derivesFrom is p1, True)
         self.assertEqual(p1.flat.derivesFrom is s, False)
@@ -12813,28 +12812,37 @@ class Test(unittest.TestCase):
         p1FlatNotes = p1Flat.notes
         self.assertEqual(p1FlatNotes.derivesFrom is p1Flat, True)
         self.assertEqual(p1FlatNotes.derivesFrom is p1, False)
-
+        
         # we cannot do this, as each call to flat produces a new Stream
         self.assertEqual(p1.flat.notes.derivesFrom is p1.flat, False)
         # chained calls to .derives from can be used
         self.assertEqual(p1.flat.notes.derivesFrom.derivesFrom is p1, True)
-
+        
         # can use rootDerivation to get there faster
         self.assertEqual(p1.flat.notes.rootDerivation is p1, True)
-
+        
         # this does not work because are taking an item via in index
         # value, and this Measure is not derived from a Part
         self.assertEqual(p1.getElementsByClass(
             'Measure')[3].flat.notes.rootDerivation is p1, False)
-
+        
         # the root here is the Measure 
         self.assertEqual(p1.getElementsByClass(
             'Measure')[3].flat.notes.rootDerivation is p1.getElementsByClass(
             'Measure')[3], True)
 
+        m4 = p1.measure(4)
+        self.assertEqual(m4.flat.notes.rootDerivation is m4, True)
+        
+        # part is the root derivation of a measures() call
+        mRange = p1.measures(4, 6)
+        self.assertEqual(mRange.rootDerivation, p1)
+        self.assertEqual(mRange.flat.notes.rootDerivation, p1)
+
+
         self.assertEqual(s.flat.getElementsByClass(
             'Rest').rootDerivation is s, True) 
-
+        
         # we cannot use the activeSite to get the Part from the Measure, as
         # the activeSite was set when doing the getElementsByClass operation
         self.assertEqual(p1.getElementsByClass(
