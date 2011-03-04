@@ -629,6 +629,42 @@ def mxToDynamic(mxDirection, inputM21=None):
             setattr(d, dst, mxDynamics.get(src))
 
 
+def textExpressionToMx(te):
+    '''
+    returns a musicxml.Direction object
+
+    >>> from music21 import *
+    '''
+    mxWords = musicxmlMod.Words(te.content)
+    for src, dst in [#(te.posDefaultX, 'default-x'), 
+                     (te.positionVertical, 'default-y'), 
+#                      (te.posRelativeX, 'relative-x'),
+#                      (te.posRelativeY, 'relative-y')]:
+                      (te.enclosure, 'enclosure'),
+                      (te.justify, 'justify'),
+                      (te.size, 'font-size'),
+                      (te.letterSpacing, 'letter-spacing'),
+                    ]:
+        if src is not None:
+            mxWords.set(dst, src)
+    if te.style == 'bolditalic':
+        mxWords.set('font-style', 'italic')
+        mxWords.set('font-weight', 'bold')
+    elif te.style == 'italic':
+        mxWords.set('font-style', 'italic')
+    elif te.style == 'bold':
+        mxWords.set('font-weight', 'bold')
+
+    mxDirectionType = musicxmlMod.DirectionType()
+    mxDirectionType.append(mxWords)
+
+    mxDirection = musicxmlMod.Direction()
+    mxDirection.append(mxDirectionType)
+    # this parameter does not seem to do anything with text expressions
+    #mxDirection.set('placement', d.posPlacement)
+    return mxDirection
+
+
 def mxToTextExpression(mxDirection):
     '''
     Given an mxDirection, create on or more TextExpressions
@@ -646,7 +682,7 @@ def mxToTextExpression(mxDirection):
         te.size = mxWords.get('font-size')
         te.letterSpacing = mxWords.get('letter-spacing')
         te.enclosure = mxWords.get('enclosure')
-        te.verticalPosition = mxWords.get('default-y')
+        te.positionVertical = mxWords.get('default-y')
 
         # two parameters that are combined
         style = mxWords.get('font-style')
@@ -1276,6 +1312,9 @@ def measureToMx(m, spannerBundle=None):
             elif 'Dynamic' in classes:
                 # returns an mxDirection object
                 mxMeasure.append(obj.mx)
+            elif 'TextExpression' in classes:
+                # returns an mxDirection object
+                mxMeasure.append(textExpressionToMx(obj))
             else: # other objects may have already been added
                 pass
                 #environLocal.printDebug(['_getMX of Measure is not processing', obj])
@@ -1578,15 +1617,13 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 _addToStaffReference(mxObj, w, staffReference)
                 m.insert(offsetMeasureNote, w)
             if mxObj.getWords() is not None:
-                # will return a list of Words objects
                 #environLocal.printDebug(['found mxWords object', mxObj])
+                # convert into a list of TextExpression objects
                 for te in mxToTextExpression(mxObj):
-                    environLocal.printDebug(['got TextExpression object', te])
-
-                #te = expressions.TextExpression()
-                #te.mx = mxObj     
-                #_addToStaffReference(mxObj, te, staffReference)
-                #m.insert(offsetMeasureNote, te)
+                    #environLocal.printDebug(['got TextExpression object', repr(te)])
+                    # not sure if this is necessary
+                    _addToStaffReference(mxObj, te, staffReference)
+                    m.insert(offsetMeasureNote, te)
 
     #environLocal.printDebug(['staffReference', staffReference])
 
@@ -2199,14 +2236,66 @@ class Test(unittest.TestCase):
 
     def testTextExpressionsA(self):
 
-        from music21 import converter, stream
+        from music21 import converter, stream, expressions
         from music21.musicxml import testPrimitive
+    
         
         s = converter.parse(testPrimitive.textExpressions)
         #s.show()
+        
+        self.assertEqual(len(s.flat.getElementsByClass('TextExpression')), 3)
 
+        p1 = s.parts[0]
+        m1 = p1.getElementsByClass('Measure')[0]
+        self.assertEqual(len(m1.getElementsByClass('TextExpression')), 0)
+        # all in measure 2
+        m2 = p1.getElementsByClass('Measure')[1]
+        self.assertEqual(len(m2.getElementsByClass('TextExpression')), 3)
 
+        teStream = m2.getElementsByClass('TextExpression')
+        self.assertEqual([te.offset for te in teStream], [0.0, 1.0, 4.0])
 
+        #s.show()
+
+    def testTextExpressionsB(self):
+        from music21 import stream, expressions, note
+        textSrc = ['loud', 'soft', 'with\nspirit', 'with\nless\nintensity']
+        sizeSrc = [8, 10, 12, 18, 24]
+        positionVerticalSrc = [20, -80, 20]
+        enclosureSrc = [None, None, None, 'rectangle', 'oval']
+        styleSrc = ['italic', 'bold', None, 'bolditalic']
+        
+        p = stream.Part()
+        for i in range(20):
+            te = expressions.TextExpression(textSrc[i%len(textSrc)])
+            te.size = sizeSrc[i%len(sizeSrc)]
+            te.justify = 'left'
+            te.positionVertical = positionVerticalSrc[
+                                    i%len(positionVerticalSrc)]
+            te.enclosure = enclosureSrc[i%len(enclosureSrc)]
+            te.style = styleSrc[i%len(styleSrc)]
+        
+            p.append(te)
+            p.append(note.Note(type='quarter'))
+            for x in range(4):
+                p.append(note.Rest(type='16th'))
+        
+        s = stream.Score()
+        s.insert(0, p)
+        #s.show()
+
+        musicxml = s.musicxml
+        match = """<measure number="10">
+      <attributes>
+        <divisions>10080</divisions>
+      </attributes>
+      <direction>
+        <direction-type>
+          <words default-y="20.0" enclosure="rectangle" font-size="18.0" justify="left">with
+spirit</words>
+        </direction-type>
+      </direction>"""
+        self.assertEqual(match in musicxml, True)
 
 if __name__ == "__main__":
     import sys

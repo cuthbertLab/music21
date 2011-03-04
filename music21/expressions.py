@@ -126,6 +126,22 @@ class TextExpression(Expression, text.TextFormat):
         else:
             return '<music21.expressions.%s>' % (self.__class__.__name__)
 
+    def _getContent(self):
+        return self._content
+    
+    def _setContent(self, value):
+        self._content = str(value)
+    
+    content = property(_getContent, _setContent, 
+        doc = '''Get or set the the content.
+
+        >>> from music21 import *
+        >>> te = expressions.TextExpression('testing')
+        >>> te.content
+        'testing'
+        ''')
+
+
 
     def _getEnclosure(self):
         return self._enclosure
@@ -153,11 +169,15 @@ class TextExpression(Expression, text.TextFormat):
         return self._positionVertical
     
     def _setPositionVertical(self, value):
-        try:
-            value = float(value)
-        except (ValueError):
-            raise TextExpressionException('Not a supported size: %s' % value)
-        self._positionVertical = value
+        if value is None:
+            # do nothing or set to zero?
+            pass
+        else:
+            try:
+                value = float(value)
+            except (ValueError):
+                raise TextExpressionException('Not a supported size: %s' % value)
+            self._positionVertical = value
     
     positionVertical = property(_getPositionVertical, _setPositionVertical, 
         doc = '''Get or set the the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.

@@ -175,9 +175,12 @@ class TextFormat(object):
         return self._style    
     
     def _setStyle(self, value):
-        if value.lower() not in ['italic', 'normal', 'bold', 'bolditalic']:
-            raise TextFormatException('Not a supported justification: %s' % value)
-        self._style = value.lower()
+        if value is None:
+            self._style = None
+        else:
+            if value.lower() not in ['italic', 'normal', 'bold', 'bolditalic']:
+                raise TextFormatException('Not a supported justification: %s' % value)
+            self._style = value.lower()
 
     style = property(_getStyle, _setStyle, 
         doc = '''Get or set the style, as normal, italic, bold, and bolditalic.
