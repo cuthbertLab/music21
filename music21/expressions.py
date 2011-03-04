@@ -88,6 +88,10 @@ class Expression(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
+class TextExpressionException(ExpressionException):
+    pass
+
+
 class TextExpression(Expression, text.TextFormat):
     '''A TextExpression is a word, phrase, or similar bit of text that is positioned in a Stream or Measure. Conventional expressive indications are text like "agitato" or "con fuoco."
 
@@ -97,11 +101,7 @@ class TextExpression(Expression, text.TextFormat):
     >>> te.size
     24.0
     >>> te.style = 'bolditalic'
-    >>> te.getMXLParameters()['font-weight']
-    'bold'
     >>> te.letterSpacing = 0.5
-    >>> te.getMXLParameters()['enclosure'] == None
-    True
     '''
     def __init__(self, content=None):
         Expression.__init__(self)
@@ -109,21 +109,22 @@ class TextExpression(Expression, text.TextFormat):
         text.TextFormat.__init__(self)
 
         # the text string to be displayed; not that line breaks
-        # are given in the xml with this non-printing character: (
-#)
+        # are given in the xml with this non-printing character: (#)
         self._content = content
         self._enclosure = None
 
         # numerous parameters are inherited from text.TextFormat
 
-        # these are the attribute names used for Dyanmics; should 
-        # use uniform naming convention
-        # not sure if values should be handled differently
-        self.posDefaultX = None
-        self.posDefaultY = None
-        self.posRelativeX = None 
-        self.posRelativeY = None
+        self._positionVertical = 20 # two staff lines above
 
+
+    def __repr__(self):
+        if self._content is not None and len(self._content) > 10:
+            return '<music21.expressions.%s "%s...">' % (self.__class__.__name__, self._content[:10])
+        elif self._content is not None:
+            return '<music21.expressions.%s "%s">' % (self.__class__.__name__, self._content)
+        else:
+            return '<music21.expressions.%s>' % (self.__class__.__name__)
 
 
     def _getEnclosure(self):
@@ -135,7 +136,7 @@ class TextExpression(Expression, text.TextFormat):
         elif value.lower() in ['oval', 'rectangle']:
             self._enclosure = value.lower()
         else:
-            raise TextFormatException('Not a supported justification: %s' % value)
+            raise TextExpressionException('Not a supported justification: %s' % value)
     
     enclosure = property(_getEnclosure, _setEnclosure, 
         doc = '''Get or set the the enclosure.
@@ -148,13 +149,41 @@ class TextExpression(Expression, text.TextFormat):
         ''')
 
 
-    def getMXLParameters(self):
-        '''Return as musicxml parameters
-        '''
-        post = text.TextFormat.getMXLParameters(self)
-        post['enclosure'] = self._getEnclosure()
-        return post
-        
+    def _getPositionVertical(self):
+        return self._positionVertical
+    
+    def _setPositionVertical(self, value):
+        try:
+            value = float(value)
+        except (ValueError):
+            raise TextExpressionException('Not a supported size: %s' % value)
+        self._positionVertical = value
+    
+    positionVertical = property(_getPositionVertical, _setPositionVertical, 
+        doc = '''Get or set the the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.
+
+        >>> from music21 import *
+        >>> te = expressions.TextExpression()
+        >>> te.positionVertical = 10
+        >>> te.positionVertical
+        10.0
+        ''')
+
+#     def _getMxParameters(self):
+#         '''Return as musicxml parameters
+#         '''
+#         post = text.TextFormat._getMxParameters(self)
+#         post['enclosure'] = self._getEnclosure()
+#         # translate position vertical to default y; this is found
+#         # to work better than relative-x
+#         post['default-y'] = self._getPositionVertical()
+#         return post        
+# 
+#     mxParameters = property = (_getMxParameters)
+
+
+
+
 
 #-------------------------------------------------------------------------------
 class Ornament(Expression):

@@ -601,6 +601,8 @@ def mxToDynamic(mxDirection, inputM21=None):
     else:
         d = inputM21
 
+    # can probably replace this with mxDirection.getDynamicMark()'
+    # need to test
     mxDynamics = None
     for mxObj in mxDirection:
         if isinstance(mxObj, musicxmlMod.DirectionType):
@@ -627,7 +629,44 @@ def mxToDynamic(mxDirection, inputM21=None):
             setattr(d, dst, mxDynamics.get(src))
 
 
+def mxToTextExpression(mxDirection):
+    '''
+    Given an mxDirection, create on or more TextExpressions
+    '''
 
+    from music21 import expressions
+    post = []
+    mxWordsList = mxDirection.getWords()
+    for mxWords in mxWordsList:
+        #environLocal.printDebug(['mxToTextExpression()', mxWords, mxWords.charData])
+        # content can be be passed with creation argument
+        te = expressions.TextExpression(mxWords.charData)
+
+        te.justify = mxWords.get('justify')
+        te.size = mxWords.get('font-size')
+        te.letterSpacing = mxWords.get('letter-spacing')
+        te.enclosure = mxWords.get('enclosure')
+        te.verticalPosition = mxWords.get('default-y')
+
+        # two parameters that are combined
+        style = mxWords.get('font-style')
+        if style == 'normal':
+            style = None
+        weight = mxWords.get('font-weight')
+        if weight == 'normal':
+            weight = None
+        if style is not None and weight is not None:
+            if style == 'italic' and weight == 'bold':
+                te.style = 'bolditalic'
+        # one is None
+        elif style == 'italic':
+            te.style = 'italic'
+        elif weight == 'bold':
+            te.style = 'bold'
+
+        post.append(te)
+        
+    return post
 
 
 #-------------------------------------------------------------------------------
@@ -1540,8 +1579,10 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 m.insert(offsetMeasureNote, w)
             if mxObj.getWords() is not None:
                 # will return a list of Words objects
-                mxWordsList = mxObj.getWords()
-                environLocal.printDebug(['found mxWords object', mxWordsList])
+                #environLocal.printDebug(['found mxWords object', mxObj])
+                for te in mxToTextExpression(mxObj):
+                    environLocal.printDebug(['got TextExpression object', te])
+
                 #te = expressions.TextExpression()
                 #te.mx = mxObj     
                 #_addToStaffReference(mxObj, te, staffReference)

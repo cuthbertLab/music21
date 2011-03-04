@@ -154,9 +154,12 @@ class TextFormat(object):
         return self._justify    
     
     def _setJustify(self, value):
-        if value.lower() not in ['left', 'center', 'right']:
-            raise TextFormatException('Not a supported justification: %s' % value)
-        self._justify = value.lower()
+        if value is None:
+            self._justify = None
+        else:
+            if value.lower() not in ['left', 'center', 'right']:
+                raise TextFormatException('Not a supported justification: %s' % value)
+            self._justify = value.lower()
 
     justify = property(_getJustify, _setJustify, 
         doc = '''Get or set the the justification.
@@ -186,15 +189,15 @@ class TextFormat(object):
         'bold'
         ''')
 
-
     def _getSize(self):
         return self._size    
     
     def _setSize(self, value):
-        try:
-            value = float(value)
-        except (ValueError):
-            raise TextFormatException('Not a supported size: %s' % value)
+        if value is not None:
+            try:
+                value = float(value)
+            except (ValueError):
+                raise TextFormatException('Not a supported size: %s' % value)
         self._size = value
 
     size = property(_getSize, _setSize, 
@@ -207,12 +210,12 @@ class TextFormat(object):
         20.0
         ''')
 
-
     def _getLetterSpacing(self):
         return self._letterSpacing    
     
     def _setLetterSpacing(self, value):
-        if value != 'normal':            
+        
+        if value != 'normal' and value is not None:            
             # convert to number
             try:
                 value = float(value)
@@ -233,37 +236,37 @@ class TextFormat(object):
         ''')
 
 
-    def getMXLParameters(self):
-        '''Return a dictionary with the attribute of this object notated as needed for MusicXML output
-
-        >>> from music21 import *
-        >>> tf = TextFormat()
-        >>> tf.style = 'bolditalic'
-        >>> tf.getMXLParameters()['font-weight']
-        'bold'
-        >>> tf.getMXLParameters()['font-style']
-        'italic'
-        '''
-        post = {}
-        post['justify'] = self._justify
-
-        post['font-style'] = 'normal'
-        post['font-weight'] = 'normal'
-        if self._style == 'normal':
-            pass            
-        elif self._style == 'italic':
-            post['font-style'] = 'italic'
-        elif self._style == 'bold':
-            post['font-weight'] = 'bold'
-        elif self._style == 'bolditalic':
-            post['font-weight'] = 'bold'
-            post['font-style'] = 'italic'
-
-        post['font-size'] = self._getSize()
-        post['letter-spacing'] = self._getLetterSpacing()
-
-        # font family not yet being specified
-        return post
+#     def _getMxParameters(self):
+#         '''Return a dictionary with the attribute of this object notated as needed for MusicXML output
+# 
+#         >>> from music21 import *
+#         >>> tf = TextFormat()
+#         >>> tf.style = 'bolditalic'
+#         >>> tf._getMxParameters()['font-weight']
+#         'bold'
+#         >>> tf._getMxParameters()['font-style']
+#         'italic'
+#         '''
+#         post = {}
+#         post['justify'] = self._justify
+# 
+#         post['font-style'] = 'normal'
+#         post['font-weight'] = 'normal'
+#         if self._style == 'normal':
+#             pass            
+#         elif self._style == 'italic':
+#             post['font-style'] = 'italic'
+#         elif self._style == 'bold':
+#             post['font-weight'] = 'bold'
+#         elif self._style == 'bolditalic':
+#             post['font-weight'] = 'bold'
+#             post['font-style'] = 'italic'
+# 
+#         post['font-size'] = self._getSize()
+#         post['letter-spacing'] = self._getLetterSpacing()
+# 
+#         # font family not yet being specified
+#         return post
 
 
 #-------------------------------------------------------------------------------

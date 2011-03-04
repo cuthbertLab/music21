@@ -1332,6 +1332,8 @@ class Direction(MusicXMLElementList):
         >>> a.append(b)
         >>> a.getWords() == [c]
         True
+        >>> a.getWords()[0].charData
+        'crescendo'
         '''
         post = [] # return a lost
         for directionType in self.componentList:
@@ -1382,7 +1384,6 @@ class Words(MusicXMLElement):
         # of the direction position attribute
         self._attr['default-y'] = None # in 10ths of a staff
         self._attr['default-x'] = None
-
 
         # line-height does not seem to work w/ multiline text expressions
         # values can be normal, 100, 120 , etc
@@ -2178,18 +2179,14 @@ class Handler(xml.sax.ContentHandler):
         # the sax do cs explain why: The Parser will call this method to report each chunk of character data. SAX parsers may return all contiguous character data in a single chunk, or they may split it into several chunks
 
 
-        # the old approach: iterated over all tags to find which was open:
-#         for tag in self.t.tagsCharData:
-#             if self.t[tag].status:
-#                 self.t[tag].charData += charData
-#                 break
-
         # the new approach simply uses the currentTag reference:
         # this is much faster!
-
+        # Note: must manually pass char data from the Tag to the object in the
+        # handler. see 'words' for an example
+        #environLocal.printDebug(['got charData', repr(charData), self._currentTag.tag])
         if self._currentTag.status:
             self.t[self._currentTag.tag].charData += charData
-
+            #environLocal.printDebug(['added charData', self._currentTag.tag])
 
 
     #---------------------------------------------------------------------------
@@ -2712,6 +2709,9 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'words':
             if self._directionTypeObj != None: 
+                #environLocal.printDebug(['closing Words', 'self._wordsObj.charData',  self._wordsObj.charData])
+                # must manually attach collected charData
+                self._wordsObj.charData = self._currentTag.charData
                 self._directionTypeObj.componentList.append(self._wordsObj)
             else:
                 raise MusicXMLException('missing a container for a Words: %s' % self._wordsObj)
