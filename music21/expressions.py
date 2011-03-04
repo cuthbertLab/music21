@@ -103,6 +103,10 @@ class TextExpression(Expression, text.TextFormat):
     >>> te.style = 'bolditalic'
     >>> te.letterSpacing = 0.5
     '''
+
+    # always need to be first, before even clefs
+    classSortOrder = -10
+
     def __init__(self, content=None):
         Expression.__init__(self)
         # numerous properties are inherited from TextFormat

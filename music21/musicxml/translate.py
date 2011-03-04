@@ -2297,6 +2297,25 @@ spirit</words>
       </direction>"""
         self.assertEqual(match in musicxml, True)
 
+
+    def testTextExpressionsC(self):
+        from music21 import corpus, expressions
+        s =  corpus.parseWork('bwv66.6')
+        p = s.parts[0]
+        for m in p.getElementsByClass('Measure'):
+            for n in m.flat.notes:
+                if n.pitch.name in ['B']:
+                    msg = '%s\n%s' % (n.pitch.nameWithOctave, n.duration.quarterLength)
+                    te = expressions.TextExpression(msg)
+                    te.size = 14
+                    te.style = 'bold'
+                    te.justify = 'center'
+                    te.enclosure = 'rectangle'
+                    te.positionVertical = -80
+                    m.insert(n.offset, te)
+        #p.show()        
+
+
 if __name__ == "__main__":
     import sys
 
