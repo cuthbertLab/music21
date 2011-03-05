@@ -439,8 +439,13 @@ class VoiceLeadingQuartet(music21.Music21Object):
         True
         '''
         isCrossing = False
-        if (self.v1n2.ps >= self.v2n1.ps) or (self.v1n1.ps >= self.v2n2.ps):
-            isCrossing = True
+        if self.v1n1 < self.v2n1:
+            if not (self.v1n2 < self.v2n1) or not (self.v1n1 < self.v2n2):
+                isCrossing = True
+        else:
+            if not (self.v2n2 < self.v1n1) or not (self.v2n1 < self.v1n2):
+                isCrossing = True
+
         return isCrossing
 
 class VoiceLeadingException(Exception):
