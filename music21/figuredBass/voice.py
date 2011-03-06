@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         realizer.py
-# Purpose:      music21 class which will find all valid solutions of a given figured bass
+# Purpose:      music21 class which represents the concept of a voice and its range.
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    (c) 2011 The music21 Project
