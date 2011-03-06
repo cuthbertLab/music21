@@ -427,7 +427,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
     def hiddenOctave(self):
         return self.hiddenInterval(self.octave)
     
-    def voiceCrossing(self):
+    def voiceOverlap(self):
         '''
         >>> from music21 import *
         >>> v1n1 = pitch.Pitch('C3')
@@ -435,18 +435,27 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> v2n1 = pitch.Pitch('E3')
         >>> v2n2 = pitch.Pitch('G3')
         >>> vlq = VoiceLeadingQuartet(v1n1, v1n2, v2n1, v2n2)
-        >>> vlq.voiceCrossing()
+        >>> vlq.voiceOverlap()
         True
         '''
-        isCrossing = False
-        if self.v1n1 < self.v2n1:
+        isOverlapping = False
+        if (self.v1n1 < self.v2n1) or (self.v1n1 == self.v2n1):
             if not (self.v1n2 < self.v2n1) or not (self.v1n1 < self.v2n2):
-                isCrossing = True
-        else:
+                isOverlapping = True
+        elif self.v1n1 > self.v2n1:
             if not (self.v2n2 < self.v1n1) or not (self.v2n1 < self.v1n2):
-                isCrossing = True
+                isOverlapping = True
+        
+        return isOverlapping
 
-        return isCrossing
+    def voiceCrossing(self):
+        isCrossing = False
+        if (self.v1n1 < self.v2n1) and (self.v1n2 > self.v2n2):
+            isCrossing = True
+        elif (self.v1n1 > self.v2n1) and (self.v1n2 < self.v2n2):
+            isCrossing = True
+        else: #self.v1n1 == self.v2n1
+            raise VoiceLeadingException("Cannot determine voice crossing using just pitches.")
 
 class VoiceLeadingException(Exception):
     pass
