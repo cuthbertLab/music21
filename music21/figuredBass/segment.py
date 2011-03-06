@@ -11,6 +11,7 @@
 import music21
 import unittest
 import copy
+import random
 
 from music21 import note
 
@@ -70,8 +71,8 @@ class Segment:
             for possibleIndex in newPathList.keys():
                 numSolutions += newPathList[possibleIndex]
             return numSolutions
-            
-            
+    
+                
 class AntecedentSegment(Segment):
     def __init__(self, fbInformation, bassNote, notation = ''):
         Segment.__init__(self, fbInformation, bassNote, notation)
@@ -197,37 +198,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    v1 = voice.Voice('Bass', voice.Range('E2', 'E4'))
-    v2 = voice.Voice('Tenor', voice.Range('C3', 'A4'))
-    v3 = voice.Voice('Alto', voice.Range('F3', 'G5'))
-    v4 = voice.Voice('Soprano', voice.Range('C4', 'A5'))
-    
-    voiceList = [v1, v2, v3, v4]
-    voiceList.sort()
-    
-    fbScale = realizerScale.FiguredBassScale('C')
-    
-    fbInfo = Information(fbScale, voiceList)
-    s1 = AntecedentSegment(fbInfo, note.Note('C3'))
-    s2 = ConsequentSegment(fbInfo, s1, note.Note('G2'), '7')
-    s3 = ConsequentSegment(fbInfo, s2, note.Note('C3'))
-    
-    print len(s1.possibilities)
-    for result in s1.possibilities:
-       print result
-    
-    print len(s2.possibilities)
-    for result in s2.possibilities:
-       print result
-    
-    print len(s3.possibilities)
-    for result in s3.possibilities:
-       print result
-
-    s3.trimAllMovements()
-    print s1.nextMovements
-    print s2.nextMovements
-    print s2.getNumSolutions()
+    pass
     #music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
