@@ -1,3 +1,13 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         rules.py
+# Purpose:      music21 class to define a possibility (possible resolution) for a note
+# Authors:      Jose Cabal-Ugaz
+#
+# Copyright:    (c) 2010 The music21 Project    
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 import music21
 import unittest
 
