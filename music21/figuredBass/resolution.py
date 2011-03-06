@@ -4,7 +4,7 @@
 # Purpose:      Defines standard resolutions for chords
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 

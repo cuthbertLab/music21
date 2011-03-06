@@ -1,3 +1,13 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         realizer.py
+# Purpose:      music21 class which will find all valid solutions of a given figured bass
+# Authors:      Jose Cabal-Ugaz
+#
+# Copyright:    (c) 2011 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 import music21
 import unittest
 import copy
