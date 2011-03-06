@@ -26,17 +26,21 @@ class Rules:
         #Voicing Rules
         self.allowParallelFifths = False
         self.allowParallelOctaves = False
-        self.allowVoiceCrossing = False
+        self.allowVoiceOverlap = False
         self.bottomVoiceLeapOctaveLimit = 1.0
         self.topVoiceLeapOctaveLimit = 1.0
 
         #Chord rules
-        self.allowIncompleteChords = False
-        self.topThreeVoicesWithinOctave = True
+        self.allowIncompletePossibilities = False
+        self.topVoicesWithinOctave = True
+        self.filterPitchesByRange = True
 
         #Chord To Chord Rules
         self.allowHiddenFifths = False
         self.allowHiddenOctaves = False
+        
+        #AntecedentPossibilityRules
+        self.allowVoiceCrossing = False #No voice crossing
         
     def checkChords(self, pitchListA, pitchListB):
         conformsToRules = True
@@ -83,7 +87,7 @@ class Rules:
                     if self.verbose:
                         self.environRules.warn("Incomplete Chord!")
                     conformsToRules = False
-        if self.topThreeVoicesWithinOctave:
+        if self.topVoicesWithinOctave:
             soprano = pitchList[0]
             alto = pitchList[1]
             tenor = pitchList[2]
