@@ -1,5 +1,6 @@
 import music21
 import unittest
+import random
 
 from music21 import pitch
 from music21 import note
@@ -46,36 +47,7 @@ class FiguredBass(object):
         self.lastSegment.trimAllMovements()
         numSolutions = self.lastSegment.getNumSolutions()
         print("Solving complete. Number of solutions: " + str(numSolutions))
-
-    def getRandomRealizations(self):
-        
-        chordIndices = self.allMovements.keys()
-        startIndices = self.allMovements[chordIndices[0]].keys()
-        randomIndex = random.randint(0, len(startIndices) - 1)
-        numberProgression = []
-        prevChordIndex = startIndices[randomIndex]
-        numberProgression.append(prevChordIndex)
-        
-        for chordIndex in chordIndices:
-            nextIndices = self.allMovements[chordIndex][prevChordIndex]
-            randomIndex = random.randint(0, len(nextIndices) - 1)
-            nextChordIndex = nextIndices[randomIndex]
-            numberProgression.append(nextChordIndex)
-            prevChordIndex = nextChordIndex
-        
-        chordProgression = self._translateNumberProgression(numberProgression)
-        return chordProgression 
-
-
-        numberProgression = []
-        for seg in self.allSegments:
-            randomIndex = random.randint(0, len(nextIndices) - 1)
-            
-        
-    def showRandomRealizations(self, numToShow):
-        pass
-    
-    
+       
 class FiguredBassException(music21.Music21Exception):
     pass
 
