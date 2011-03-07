@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         realizer.py
+# Name:         voice.py
 # Purpose:      music21 class which represents the concept of a voice and its range.
 # Authors:      Jose Cabal-Ugaz
 #
