@@ -351,7 +351,8 @@ class Test(unittest.TestCase):
         from music21 import corpus, stream, note
         
         # Parse a work from the corpus
-        s = corpus.parseWork('bwv66.6')        
+        s = corpus.parseWork('bwv66.6')
+        #s.show()        
         # Reduce the work to a series of simultaneities, then extract only
         # the resultant Chords
         chords = s.chordify().getElementsByClass('Chord')
@@ -366,8 +367,8 @@ class Test(unittest.TestCase):
                 c2 = note.Rest()
             
             # If the root of the Chord is A, collect and display this Chord
-            # and the next Chord
-            if c1.findRoot().name == 'A':
+            # and the next Chord; need the isTriad etc. checks, because A,B,E,B finds A as the root of a 9th chord!)
+            if c1.findRoot().name == 'A' and (c1.isTriad() is True or c1.isSeventh() is True):
                 m = stream.Measure()
                 m.append(c1)
                 m.append(c2)
