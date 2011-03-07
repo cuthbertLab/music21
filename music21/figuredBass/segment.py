@@ -36,6 +36,12 @@ class Segment:
         raise SegmentException("solve() is specific to an Antecedent or Consequent Segment.")
     
     def trimAllMovements(self, eliminated = []):
+        '''
+        Trims all movements beginning at the segment it is
+        called upon and moving backwards, stopping at the
+        AntecedentSection. Intended to be called by the last
+        segment to trim the movements of a fbLine.
+        '''
         for possibleIndex in self.nextMovements.keys():
             movements = self.nextMovements[possibleIndex]
             for eliminatedIndex in eliminated:
@@ -53,6 +59,13 @@ class Segment:
             pass
         
     def getNumSolutions(self, pathList = {}):
+        '''
+        Obtains the number of solutions up to and including the given segment,
+        by calculating the total number of paths, the sum of paths to each
+        possibility in the given segment. Intended to be called by the last
+        segment to return the total number of solutions to a fbLine, but could
+        conceivably be used in other ways as well.
+        '''
         newPathList = {}
         if len(pathList.keys()) == 0:
             for possibleIndex in self.nextMovements.keys():
