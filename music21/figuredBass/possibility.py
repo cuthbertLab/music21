@@ -229,9 +229,6 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    p1 = Possibility({'Alto': pitch.Pitch('G4'), 'Soprano': pitch.Pitch('G4'), 'Bass': pitch.Pitch('C3'), 'Tenor': pitch.Pitch('E4')})
-    p2 = Possibility({'Alto': pitch.Pitch('B4'), 'Soprano': pitch.Pitch('F4'), 'Bass': pitch.Pitch('D3'), 'Tenor': pitch.Pitch('D4')})
-    print p1.containsVoiceOverlap(p2)
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
