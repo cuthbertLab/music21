@@ -1481,7 +1481,7 @@ class Pitch(music21.Music21Object):
         >>> p4.isEnharmonic(p5)
         True
         '''
-        # if pitch space are equal, these are enharmoincs
+        # if pitch space are equal, these are enharmonics
         if other.ps == self.ps:
             return True
         return False
@@ -1520,12 +1520,18 @@ class Pitch(music21.Music21Object):
         
         '''
         intervalObj = interval.Interval('d2')
+        octaveStored = self.octave # may be None
         if not inPlace:
-            return intervalObj.transposePitch(self, maxAccidental=None)
+            post = intervalObj.transposePitch(self, maxAccidental=None)
+            if octaveStored is None:
+                post.octave = None
+            return post
         else:
             p = intervalObj.transposePitch(self, maxAccidental=None)
             self._setName(p.nameWithOctave)
             self.accidental = p.accidental
+            if octaveStored is None:
+                self.octave = None
             return None
     
     def getLowerEnharmonic(self, inPlace=False):
@@ -1542,12 +1548,18 @@ class Pitch(music21.Music21Object):
         B##2
         '''
         intervalObj = interval.Interval('-d2')
+        octaveStored = self.octave # may be None
         if not inPlace:
-            return intervalObj.transposePitch(self)
+            post = intervalObj.transposePitch(self)
+            if octaveStored is None:
+                post.octave = None
+            return post
         else:
             p = intervalObj.transposePitch(self)
             self._setName(p.nameWithOctave)
             self.accidental = p.accidental
+            if octaveStored is None:
+                self.octave = None
             return None
 
     def simplifyEnharmonic(self, inPlace=False):
@@ -1596,7 +1608,6 @@ class Pitch(music21.Music21Object):
                 # by reseting the pitch space value, we will get a simplyer
                 # enharmonic spelling
                 returnObj.ps = self.ps
-
         if inPlace:
             return None
         else:
@@ -1626,7 +1637,7 @@ class Pitch(music21.Music21Object):
         >>> from music21 import *
         >>> p = pitch.Pitch('d#')
         >>> p.getEnharmonic()
-        E-4
+        E-
         >>> p = pitch.Pitch('e-8')
         >>> p.getEnharmonic()
         D#8
@@ -1640,7 +1651,9 @@ class Pitch(music21.Music21Object):
         D5
         >>> pitch.Pitch('g3').getEnharmonic() # presently does not alter
         G3
-
+        >>> p = pitch.Pitch('a-')
+        >>> p.getEnharmonic() # should not have octave
+        G#
         '''
         psRef = self.ps
         if inPlace:

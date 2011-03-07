@@ -997,7 +997,8 @@ class Contributor(music21.JSONSerializer):
             self.role = mxCreatorType
         else: # roles are not defined in musicxml
             environLocal.printDebug(['_setMX:', 'received unknown Contributor role: %s' % mxCreatorType])
-        self.name = mxCreator.get('charData')
+        # remove any whitespace found
+        self.name = mxCreator.get('charData').strip()
 
 
     mx = property(_getMX, _setMX)    

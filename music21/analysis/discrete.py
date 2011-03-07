@@ -349,6 +349,7 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
             # pitch objects created here
             likelyKeys[i] = (pitch.Pitch(keyResults.index(a[i])),
                              differences[keyResults.index(a[i])])
+            #environLocal.printDebug(['added likely key', likelyKeys[i]])
         return likelyKeys
         
         
@@ -505,9 +506,9 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> s = converter.parse('b-4 e- f g-', '4/4')
         >>> p._bestKeyEnharmonic(pitch.Pitch('e#'), 'minor', s)
-        F4
+        F
         >>> p._bestKeyEnharmonic(pitch.Pitch('f-'), 'major', s)
-        E4
+        E
 
         '''
         if pitchObj == None:
@@ -542,9 +543,10 @@ class KrumhanslSchmuckler(DiscreteAnalysis):
         elif mode == 'minor':
             if pitchObj.name not in self.keysValidMinor:
                 flipEnharmonic = True
-
+        #environLocal.printDebug(['pre flip enharmonic', pitchObj])
         if flipEnharmonic:
             pitchObj.getEnharmonic(inPlace=True)
+        #environLocal.printDebug(['post flip enharmonic', pitchObj])
         return pitchObj
 
 
@@ -1097,6 +1099,15 @@ class Test(unittest.TestCase):
         self.assertEqual(str(id.countMelodicIntervals(s)), "{'M3': [<music21.interval.Interval M3>, 1], 'P4': [<music21.interval.Interval P4>, 5], 'P5': [<music21.interval.Interval P5>, 2], 'M2': [<music21.interval.Interval M2>, 8], 'm3': [<music21.interval.Interval m3>, 3], 'm2': [<music21.interval.Interval m2>, 1]}")
         
 
+    def testKeyAnalysisSpelling(self):
+        '''
+        '''
+        from music21 import stream, note
+            
+        for p in ['A', 'B-', 'A-']:
+            s = stream.Stream()
+            s.append(note.Note(p))
+            self.assertEqual(str(s.analyze('key')[0]), p)
 
 #------------------------------------------------------------------------------
 
@@ -1105,11 +1116,8 @@ if __name__ == "__main__":
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         t = Test()
-
-        #t.testKrumhansl()
-
-        t.testIntervalDiversity()
-
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
 
 
