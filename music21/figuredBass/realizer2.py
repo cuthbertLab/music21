@@ -12,6 +12,7 @@ import music21
 import unittest
 import random
 import copy
+import time
 
 from music21 import pitch
 from music21 import note
@@ -42,6 +43,7 @@ class FiguredBass(object):
         self.figuredBassList.append((bassNote, notation))
 
     def solve(self):
+        startTime = time.time()
         (startBass, startNotation) = self.figuredBassList[0]
         print("Finding starting possibilities for: " + str((startBass.pitch, startNotation)))
         a1 = segment.AntecedentSegment(self.fbInfo, startBass, startNotation)
@@ -62,6 +64,10 @@ class FiguredBass(object):
             numberProgressions = self.calculateAllNumberProgressions()
             print("Number of solutions, as calculated empirically: " + str(len(numberProgressions)) + ".")
         print("Solving complete. Number of solutions, as calculated by path counting: " + str(numSolutions) + ".\n")
+        endTime = time.time()
+        minutesElapsed = int((endTime - startTime) / 60)
+        secondsElapsed = round((endTime - startTime) % 60)
+        print("Time elapsed: " + str(minutesElapsed) + " minutes " + str(secondsElapsed) + " seconds.")
                 
     def calculateAllNumberProgressions(self):
         if len(self.allSegments) <= 1:
