@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         rules.py
+# Name:         possibility.py
 # Purpose:      music21 class to define a possibility (possible resolution) for a note
 # Authors:      Jose Cabal-Ugaz
 #
