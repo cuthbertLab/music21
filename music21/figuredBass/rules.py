@@ -108,7 +108,7 @@ class Rules:
         return conformsToRules
             
                     
-    def checkVoiceLeading(self, vlq):
+    #def checkVoiceLeading(self, vlq):
         '''
         Takes in a VoiceLeadingQuartet and returns False if any voicing rules have
         been broken, although we can choose to relax the rules.
@@ -146,6 +146,7 @@ class Rules:
         >>> rules.checkVoiceLeading(vlqF)
         False
         '''
+'''     
         conformsToRules = True
         
         if not self.allowParallelFifths:
@@ -173,7 +174,7 @@ class Rules:
             conformsToRules = False
         
         return conformsToRules
-
+'''
 
 class FiguredBassRulesException(music21.Music21Exception):
     pass
@@ -185,7 +186,8 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    music21.mainTest(Test)  
+    pass
+    #music21.mainTest(Test)  
 
 #------------------------------------------------------------------------------
 # eof
