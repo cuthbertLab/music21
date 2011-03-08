@@ -567,8 +567,6 @@ def dynamicToMx(d):
     >>> b = a.mx
     >>> b[0][0][0].get('tag')
     'ppp'
-    >>> b.get('placement')
-    'below'
     '''
     mxDynamicMark = musicxmlMod.DynamicMark(d.value)
     mxDynamics = musicxmlMod.Dynamics()
@@ -606,8 +604,6 @@ def mxToDynamic(mxDirection, inputM21=None):
     'ff'
     >>> a._positionDefaultY
     -20
-    >>> a._positionPlacement
-    'below'
     '''
 
     from music21 import dynamics
