@@ -108,7 +108,7 @@ class Rules:
         return conformsToRules
             
                     
-    #def checkVoiceLeading(self, vlq):
+    def checkVoiceLeading(self, vlq):
         '''
         Takes in a VoiceLeadingQuartet and returns False if any voicing rules have
         been broken, although we can choose to relax the rules.
@@ -146,7 +146,6 @@ class Rules:
         >>> rules.checkVoiceLeading(vlqF)
         False
         '''
-'''     
         conformsToRules = True
         
         if not self.allowParallelFifths:
@@ -159,11 +158,11 @@ class Rules:
                 if self.verbose:
                     self.environRules.warn("Parallel octaves!")
                 conformsToRules = False
-        if not self.allowVoiceCrossing:
-            if vlq.voiceCrossing(): 
-                if self.verbose:
-                    self.environRules.warn("Voice crossing!")
-                conformsToRules = False
+        #if not self.allowVoiceCrossing:
+        #    if vlq.voiceCrossing(): 
+        #        if self.verbose:
+        #            self.environRules.warn("Voice crossing!")
+        #        conformsToRules = False
         if abs(vlq.v1n1.ps - vlq.v1n2.ps) > (12.0 * self.bottomVoiceLeapOctaveLimit): 
             if self.verbose:
                 self.environRules.warn("Greater than octave leap in bottom voice!")
@@ -174,7 +173,6 @@ class Rules:
             conformsToRules = False
         
         return conformsToRules
-'''
 
 class FiguredBassRulesException(music21.Music21Exception):
     pass
