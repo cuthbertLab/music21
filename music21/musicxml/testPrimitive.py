@@ -12569,6 +12569,7 @@ with a long text
 with a long text
             </words>
         </direction-type>
+      <offset>1.5</offset>
       </direction>
 
       <note default-x="13">
@@ -12656,7 +12657,14 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    import sys
+    if len(sys.argv) == 1: # normal conditions
+        music21.mainTest(Test)
+    elif len(sys.argv) > 1:
+        t = Test()
+        # arg[1] is test to launch
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
+
 
 #------------------------------------------------------------------------------
 # eof

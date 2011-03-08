@@ -195,10 +195,12 @@ class TagLib(object):
         # store tag, charDataBool, className
         # charDataBool is if this tag stores char data
         # order here is based on most-often used, found through empircal tests
+        # all tags under collection must be defined here, even if they do not   
+        # have an ojbect
         _tags = [
 ('voice', True), 
 ('note', False, Note), 
-('duration', True), 
+('duration', True), # no object, just a tag
 ('type', True), 
 ('beam', True, Beam), 
 ('step', True), 
@@ -231,6 +233,7 @@ class TagLib(object):
 
 # this position is not based on measured tag usage
 ('words', True, Words),  
+('offset', True),  # no object
 ('print', False, Print),  
 ('system-layout', False, SystemLayout),  
 ('system-margins', False, SystemMargins),  
@@ -1277,6 +1280,10 @@ class Direction(MusicXMLElementList):
         # elements
         self.componentList = []
         self.staff = None # number, for parts w/ > 1 staff 
+        # position of this direction can be configured with a number in
+        # divisions. this is given within <direction> and after <direction-type>
+        self.offset = None # number, in divisions.
+
 
     def _getComponents(self):
         c = []
@@ -1400,6 +1407,15 @@ class Words(MusicXMLElement):
         # elements
         # char data stores the text to be displayed
         self.charData = charData
+
+class Offset(MusicXMLElement):
+    '''A musicxml <offset> element can be found defined in the <direction> element. the charData stores a number that is the shift in divisions from the location of the tag. 
+    '''
+    def __init__(self, charData=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'offset'
+        self.charData = charData
+
 
 
 
@@ -2707,6 +2723,16 @@ class Handler(xml.sax.ContentHandler):
             self._notationsObj.componentList.append(self._technicalObj)
             self._technicalObj = None
 
+
+        elif name == 'offset':
+            if self._directionObj is not None:
+                environLocal.printDebug(['got an offset tag for a directionObj', self._currentTag.charData])
+                self._directionObj.offset = self._currentTag.charData
+            else: # ignoring figured-bass
+                environLocal.printDebug(['got an offset tag but no open directionObj', self._currentTag.charData])
+                pass
+
+
         elif name == 'words':
             if self._directionTypeObj != None: 
                 #environLocal.printDebug(['closing Words', 'self._wordsObj.charData',  self._wordsObj.charData])
@@ -2716,6 +2742,7 @@ class Handler(xml.sax.ContentHandler):
             else:
                 raise MusicXMLException('missing a container for a Words: %s' % self._wordsObj)
             self._wordsObj = None
+
 
         elif name == 'wedge': 
             if self._directionTypeObj != None: 
