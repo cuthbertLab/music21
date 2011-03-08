@@ -1448,7 +1448,7 @@ class Stream(music21.Music21Object):
         >>> s.analyze('ambitus')
         <music21.interval.Interval m21>
         >>> s.analyze('key')
-        (F#, 'minor', 0.81547089257624916)
+        <music21.key.Key of F# minor>
         '''
 
         from music21.analysis import discrete
@@ -11062,17 +11062,30 @@ class Test(unittest.TestCase):
             sTest = sub[i]
             post = sTest.analyze('KrumhanslSchmuckler')
             # returns three values; match 2
-            self.assertEqual(post[:2][0].name, matchKrumhansl[i][0].name)
-            self.assertEqual(post[:2][1], matchKrumhansl[i][1])
+            self.assertEqual(post.tonic.name, matchKrumhansl[i][0].name)
+            self.assertEqual(post.mode, matchKrumhansl[i][1])
 
         # match values under different strings provided to analyze
-        for idStr in ['key', 'krumhansl', 'keyscape']:
+        for idStr in ['krumhansl']:
             for i in range(len(sub)):
                 sTest = sub[i]
                 post = sTest.analyze(idStr)
                 # returns three values; match 2
-                self.assertEqual(post[:2][0].name, matchKrumhansl[i][0].name)
-                self.assertEqual(post[:2][1], matchKrumhansl[i][1])
+                self.assertEqual(post.tonic.name, matchKrumhansl[i][0].name)
+                self.assertEqual(post.mode, matchKrumhansl[i][1])
+
+        matchArden = [(pitch.Pitch('F#'), 'minor'), 
+                          (pitch.Pitch('C#'), 'minor'), 
+                          (pitch.Pitch('F#'), 'minor') , 
+                          (pitch.Pitch('E'), 'major') ]
+        for idStr in ['arden']:
+            for i in range(len(sub)):
+                sTest = sub[i]
+                post = sTest.analyze(idStr)
+                # returns three values; match 2
+                self.assertEqual(post.tonic.name, matchArden[i][0].name)
+                self.assertEqual(post.mode, matchArden[i][1])
+
 
             
 

@@ -25,6 +25,7 @@ from music21 import meter
 from music21 import pitch
 from music21 import stream 
 from music21 import interval
+from music21 import key
 
 
 
@@ -365,7 +366,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         bottomLeft = [0] * 12
             
         toneWeights = self._getWeights(weightType)
-
         profileAverage = float(sum(toneWeights)) / len(toneWeights)
         histogramAverage = float(sum(pcDistribution)) / len(pcDistribution) 
             
@@ -377,7 +377,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
                 bottomRight[i] = bottomRight[i] + ((
                     toneWeights[(j-i)%12]-profileAverage)**2)
-
                 bottomLeft[i] = bottomLeft[i] + ((
                     pcDistribution[j]-histogramAverage)**2)
 
@@ -563,9 +562,17 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         likelyKeysMajor, likelyKeysMinor = self._likelyKeys(sStream)
 
         #find the largest correlation value to use to select major or minor as the resulting key
+        # values are the result of _getLikelyKeys
+        # each first index is the sorted results; there will be 12
+        # each first index is tuple
+        # the tuple defines a Pitch, as well as the differences value
+        # from _getDifference
+
         if likelyKeysMajor == None or likelyKeysMinor == None:
             mode = None
             solution = (None, mode, 0)
+        # see which has a higher confidence value, the first major or the
+        # the first minor
         elif likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
             mode = 'major'
             solution = (likelyKeysMajor[0][0], mode, likelyKeysMajor[0][1])
@@ -579,28 +586,30 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         color = self.solutionToColor(solution)
 
-
         # store solutions for compressed legend generation
         self._solutionsFound.append((solution, color))
         return solution, color        
     
 
     def getSolution(self, sStream):
-        ''' procedure to only return a text solution
+        '''Return a music21 key object defining the results of the analysis.
+
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
         >>> p = KrumhanslSchmuckler()
         >>> p.getSolution(s) # this seems correct
-        (F#, 'minor', 0.81547089257624916)
+        <music21.key.Key of F# minor>
 
         >>> s = corpus.parseWork('bach/bwv57.8')
         >>> p = KrumhanslSchmuckler(s)
         >>> p.getSolution(s) 
-        (B-, 'major', 0.89772788962941652)
+        <music21.key.Key of B- major>
         '''
         # always take a flat version here, otherwise likely to get nothing
         solution, color = self.process(sStream.flat)
-        return solution
+        k = key.Key(tonic=solution[0], mode=solution[1])
+        k.confidence = solution[2]
+        return k
 
 
 
@@ -608,11 +617,11 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 # specialize subclass by class
 
 class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
-    ''' Implementation of the Krumhansl-Schmuckler key determination algorithm
+    ''' Implementation of Krumhansl-Schmuckler weightings for Krumhansl-Schmuckler key determination algorithm.
     '''
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Schmuckler Key Analysis'
-    identifiers = ['krumhansl', 'schmuckler', 'key', 'keyscape']
+    identifiers = ['krumhansl', 'schmuckler',  'krumhansl-schmuckler']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -637,12 +646,14 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
 
 
 class KrumhanslKessler(KeyWeightKeyAnalysis):
-    ''' Implementation of the Krumhansl-Kessler key determination algorithm
+    '''Implementation of Krumhansl-Kessler weightings for Krumhansl-Schmuckler key determination algorithm.
+
+    Values from from http://extra.humdrum.org/man/keycor, which describes these weightings as "Strong tendancy to identify the dominant key as the tonic."
     '''
-    # from http://extra.humdrum.org/man/keycor/
+    # from http://extra.humdrum.org/man/keycor
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Kessler Key Analysis'
-    identifiers = ['krumhansl', 'kessler', 'key', 'keyscape']
+    identifiers = ['krumhansl', 'kessler', 'krumhansl-kessler']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -669,12 +680,17 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
 
 
 class AardenEssen(KeyWeightKeyAnalysis):
-    ''' Implementation of the Aarden-Essen key determination algorithm
+    '''Implementation of Aarden-Essen weightings for Krumhansl-Schmuckler key determination algorithm.
+
+    Values from from http://extra.humdrum.org/man/keycor, which describes these weightings as "Weak tendancy to identify the subdominant key as the tonic."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Aarden Essen Key Analysis'
-    identifiers = ['aarden', 'essen', 'key', 'keyscape']
+    identifiers = ['aarden', 'essen', 'aarden-essen']
+    # adding these identifiers make this the default
+    identifiers.append('key')
+    identifiers.append('keyscape')
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -703,12 +719,14 @@ class AardenEssen(KeyWeightKeyAnalysis):
 
 
 class SimpleWeights(KeyWeightKeyAnalysis):
-    ''' Implementation of the Craig Sapp's simple weights for key determination
+    '''Implementation of Craig Sapp's simple weights for Krumhansl-Schmuckler key determination algorithm.
+
+    Values from from http://extra.humdrum.org/man/keycor, which describes these weightings as "Performs most consistently with large regions of music, becomes noiser with smaller regions of music."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Simple Weight Key Analysis'
-    identifiers = ['simple', 'weight', 'key', 'keyscape']
+    identifiers = ['simple', 'weight', 'simple-weight']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -734,12 +752,14 @@ class SimpleWeights(KeyWeightKeyAnalysis):
 
 
 class BellmanBudge(KeyWeightKeyAnalysis):
-    ''' Implementation of the Bellman-Budge key determination algorithm
+    '''Implementation of Bellman-Budge weightings for Krumhansl-Schmuckler key determination algorithm.
+
+    Values from from http://extra.humdrum.org/man/keycor, which describes these weightings as "No particular tendancies for confusions with neighboring keys."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Bellman Budge Key Analysis'
-    identifiers = ['bellman', 'budge', 'key', 'keyscape']
+    identifiers = ['bellman', 'budge', 'bellman-budge']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -766,12 +786,14 @@ class BellmanBudge(KeyWeightKeyAnalysis):
 
 
 class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
-    ''' Implementation of the Bellman-Budge key determination algorithm
+    '''Implementation of Temperley-Kostka-Payne weightings for Krumhansl-Schmuckler key determination algorithm.
+
+    Values from from http://extra.humdrum.org/man/keycor, which describes these weightings as "Strong tendancy to identify the relative major as the tonic in minor keys. Well-balanced for major keys."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Temperley Kostka Payne Key Analysis'
-    identifiers = ['temperley', 'kostka', 'pain', 'key', 'keyscape']
+    identifiers = ['temperley', 'kostka', 'payne']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -1166,18 +1188,23 @@ def analyzeStream(streamObj, *args, **keywords):
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv66.6')
     >>> analysis.discrete.analyzeStream(s, 'Krumhansl')
-    (F#, 'minor', 0.81547089257624916)
+    <music21.key.Key of F# minor>
     >>> analysis.discrete.analyzeStream(s, 'ambitus')
     <music21.interval.Interval m21>
 
-    >>> analysis.discrete.analyzeStream(s, 'key')[:2]
-    (F#, 'minor')
+    >>> analysis.discrete.analyzeStream(s, 'key')
+    <music21.key.Key of F# minor>
     >>> analysis.discrete.analyzeStream(s, 'range')
     <music21.interval.Interval m21>
     '''
     analysisClasses = [
         Ambitus,
         KrumhanslSchmuckler,
+        KrumhanslKessler,
+        AardenEssen,
+        SimpleWeights,
+        BellmanBudge,
+        TemperleyKostkaPayne,
     ]
 
     if 'method' in keywords:
@@ -1314,7 +1341,7 @@ class Test(unittest.TestCase):
         for p in ['A', 'B-', 'A-']:
             s = stream.Stream()
             s.append(note.Note(p))
-            self.assertEqual(str(s.analyze('key')[0]), p)
+            self.assertEqual(str(s.analyze('key').tonic), p)
 
 
     def testKeyAnalysisDiverseWeights(self):
@@ -1324,34 +1351,40 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.edgefield82b)
 
         p = KrumhanslSchmuckler()
-        post = p.getSolution(s)
+        k = p.getSolution(s)
+        post = [k.tonic, k.mode, k.confidence]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'major')
         self.assertEqual(str(post[2]), '0.812100774572')
 
         p = KrumhanslKessler()
-        post = p.getSolution(s)
+        k = p.getSolution(s)
+        post = [k.tonic, k.mode, k.confidence]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'major')
 
         p = AardenEssen()
-        post = p.getSolution(s)
+        k = p.getSolution(s)
+        post = [k.tonic, k.mode, k.confidence]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'minor')
 
         p = SimpleWeights()
-        post = p.getSolution(s)
+        k = p.getSolution(s)
+        post = [k.tonic, k.mode, k.confidence]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'minor')
 
         p = BellmanBudge()
-        post = p.getSolution(s)
+        k = p.getSolution(s)
+        post = [k.tonic, k.mode, k.confidence]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'minor')
 
 
         p = TemperleyKostkaPayne()
-        post = p.getSolution(s)
+        k = p.getSolution(s)
+        post = [k.tonic, k.mode, k.confidence]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'minor')
 
