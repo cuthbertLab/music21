@@ -577,8 +577,8 @@ def demoBachSearchBrief():
       pieceName = fileName.replace('.xml', '')
       chorale = converter.parse(filePath)
       print fileName
-      key, mode = chorale.analyze('key')[:2]
-      if mode == 'minor':
+      key = chorale.analyze('key')
+      if key.mode == 'minor':
         lastChordPitches = []
         for part in chorale.parts:
           lastChordPitches.append(part.flat.pitches[-1])

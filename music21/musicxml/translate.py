@@ -262,7 +262,7 @@ def mxToDuration(mxNote, inputM21):
         d = inputM21
 
     if mxNote.external['measure'] == None:
-        raise DurationException(
+        raise TranslateException(
         "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
 
     mxDivisions = mxNote.external['divisions']
@@ -300,7 +300,7 @@ def mxToDuration(mxNote, inputM21):
             #environLocal.printDebug(['forced to use raw duration', durRaw])
             try:
                 d.components = durRaw.components
-            except DurationException:
+            except duration.DurationException:
                 environLocal.warn(['Duration._setMX', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
                 environLocal.printDebug(['Duration._setMX', 'raw qLen', qLen, type, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
                 durRaw.quarterLength = 1.
@@ -439,6 +439,21 @@ def durationToMusicXML(d):
     n.duration = dCopy
     # call the musicxml property on Stream
     return generalNoteToMusicXML(n)
+
+
+
+def mxToOffset(mxDirection, mxDivisions):
+    '''Translate a MusicXML :class:`~music21.musicxml.Direction` with an offset value to an offset in music21. 
+    '''
+    if mxDivisions is None:
+        raise TranslateException(
+        "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
+    if mxDirection.offset is None:
+        return 0.0
+    else:
+        #environLocal.printDebug(['mxDirection.offset', mxDirection.offset, 'mxDivisions', mxDivisions])
+        return float(mxDirection.offset) / float(mxDivisions)
+
 
 
 
@@ -1301,7 +1316,8 @@ def measureToMx(m, spannerBundle=None):
             mxMeasure.componentList.append(mxBackup)
 
     else: # no voices
-        for obj in m.flat:
+        mFlat = m.flat
+        for obj in mFlat:
             classes = obj.classes # store result of property call once
             if 'Note' in classes:
                 mxMeasure.componentList += noteToMxNotes(obj, 
@@ -1313,8 +1329,13 @@ def measureToMx(m, spannerBundle=None):
                 # returns an mxDirection object
                 mxMeasure.append(obj.mx)
             elif 'TextExpression' in classes:
-                # returns an mxDirection object
-                mxMeasure.append(textExpressionToMx(obj))
+                # convert m21 offset to mxl divisions
+                mxOffset = int(defaults.divisionsPerQuarter * 
+                           obj.getOffsetBySite(mFlat))
+                mxDirection = textExpressionToMx(obj)
+                mxDirection.offset = mxOffset 
+                # place at zero position, as offset value determines horizontal position, not location amongst notes
+                mxMeasure.insert(0, mxDirection)
             else: # other objects may have already been added
                 pass
                 #environLocal.printDebug(['_getMX of Measure is not processing', obj])
@@ -1606,6 +1627,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         elif isinstance(mxObj, musicxmlMod.Direction):
 #                 mxDynamicsFound, mxWedgeFound = m._getMxDynamics(mxObj)
 #                 for mxDirection in mxDynamicsFound:
+            # will return 0 if not defined
+            offsetDirection = mxToOffset(mxObj, divisions)
             if mxObj.getDynamicMark() is not None:
                 d = dynamics.Dynamic()
                 d.mx = mxObj
@@ -1621,9 +1644,10 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 # convert into a list of TextExpression objects
                 for te in mxToTextExpression(mxObj):
                     #environLocal.printDebug(['got TextExpression object', repr(te)])
-                    # not sure if this is necessary
+                    # offset here is a combination of the current position
+                    # (offsetMeasureNote) and and the direction's offset
                     _addToStaffReference(mxObj, te, staffReference)
-                    m.insert(offsetMeasureNote, te)
+                    m.insert(offsetMeasureNote + offsetDirection, te)
 
     #environLocal.printDebug(['staffReference', staffReference])
 
@@ -2253,7 +2277,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(m2.getElementsByClass('TextExpression')), 3)
 
         teStream = m2.getElementsByClass('TextExpression')
-        self.assertEqual([te.offset for te in teStream], [0.0, 1.0, 4.0])
+        self.assertEqual([te.offset for te in teStream], [1.0, 1.5, 4.0])
 
         #s.show()
 
@@ -2285,15 +2309,13 @@ class Test(unittest.TestCase):
         #s.show()
 
         musicxml = s.musicxml
-        match = """<measure number="10">
-      <attributes>
-        <divisions>10080</divisions>
-      </attributes>
-      <direction>
+        #print musicxml
+        match = """<direction>
         <direction-type>
           <words default-y="20.0" enclosure="rectangle" font-size="18.0" justify="left">with
 spirit</words>
         </direction-type>
+        <offset>0</offset>
       </direction>"""
         self.assertEqual(match in musicxml, True)
 
@@ -2314,6 +2336,45 @@ spirit</words>
                     te.positionVertical = -80
                     m.insert(n.offset, te)
         #p.show()        
+
+
+    def testTextExpressionsD(self):
+        from music21 import corpus, expressions
+        # test placing text expression in arbitrary locations
+        s =  corpus.parseWork('bwv66.6')
+        p = s.parts[-1] # get bass
+        for m in p.getElementsByClass('Measure')[1:]:
+            for pos in [1.5, 2.5]:
+                te = expressions.TextExpression(pos)
+                te.style = 'bold'
+                te.justify = 'center'
+                te.enclosure = 'rectangle'
+                m.insert(pos, te)
+        #p.show()
+
+    def testTextExpressionsE(self):
+        import random
+        from music21 import stream, note, expressions, layout
+        s = stream.Stream()
+        for i in range(6):
+            m = stream.Measure(number=i+1)
+            m.append(layout.SystemLayout(isNew=True))
+            m.append(note.Rest(type='whole'))
+            s.append(m)
+        for m in s.getElementsByClass('Measure'):
+            offsets = [x*.25 for x in range(16)]
+            random.shuffle(offsets)
+            offsets = offsets[:4]
+            for o in offsets:
+                te = expressions.TextExpression(o)
+                te.style = 'bold'
+                te.justify = 'center'
+                te.enclosure = 'rectangle'
+                m.insert(o, te)
+        #s.show()      
+
+
+
 
 
 if __name__ == "__main__":

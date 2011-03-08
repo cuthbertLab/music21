@@ -39,8 +39,8 @@ under the module "base":
 '''
 
 #-------------------------------------------------------------------------------
-VERSION_STR = "0.3.4.a8"
-VERSION = (0, 3, 4)  # increment any time picked versions will be obsolete or other significant changes have been made
+VERSION_STR = "0.3.5.a8"
+VERSION = (0, 3, 5)  # increment any time picked versions will be obsolete or other significant changes have been made
 #-------------------------------------------------------------------------------
 
 

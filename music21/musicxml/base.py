@@ -40,7 +40,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 3, 2) 
+VERSION_MINIMUM = (0, 3, 5) 
 
 
 #-------------------------------------------------------------------------------
@@ -532,6 +532,9 @@ class MusicXMLElementList(MusicXMLElement):
     def append(self, item):
         self.componentList.append(item)
 
+    def insert(self, position, item):
+        self.componentList.insert(position, item)
+
     def __len__(self):
         return len(self.componentList)
 
@@ -975,7 +978,7 @@ class Measure(MusicXMLElementList):
         MusicXMLElementList.__init__(self)
         self._tag = 'measure'
         # not all measures store an attributes object
-        # yet, a measure can refere to a divisons setting
+        # yet, a measure can refer to a divisons setting
         # established in previous measures
         self.external['attributes'] = None
         self.external['divisions'] = None
@@ -1289,6 +1292,8 @@ class Direction(MusicXMLElementList):
         c = []
         c.append(('staff', self.staff))
         c = c + self.componentList
+        # this position is conventional, not necessarily the most common
+        c.append(('offset', self.offset)) 
         return c
 
     def getDynamicMark(self):
@@ -2726,7 +2731,7 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'offset':
             if self._directionObj is not None:
-                environLocal.printDebug(['got an offset tag for a directionObj', self._currentTag.charData])
+                #environLocal.printDebug(['got an offset tag for a directionObj', self._currentTag.charData])
                 self._directionObj.offset = self._currentTag.charData
             else: # ignoring figured-bass
                 environLocal.printDebug(['got an offset tag but no open directionObj', self._currentTag.charData])

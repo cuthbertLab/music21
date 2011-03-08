@@ -22,6 +22,7 @@ import music21
 import music21.interval
 from music21 import musicxml
 from music21 import text
+from music21 import common
 
 _MOD = 'expressions'
 
@@ -114,7 +115,11 @@ class TextExpression(Expression, text.TextFormat):
 
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
-        self._content = content
+        if not common.isStr(content):
+            self._content = str(content)
+        else:
+            self._content = content
+
         self._enclosure = None
 
         # numerous parameters are inherited from text.TextFormat
