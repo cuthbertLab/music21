@@ -121,7 +121,6 @@ class Possibility(dict):
     def hasCorrectVoiceLeading(self, consequentPossibility, fbRules = rules.Rules(), verbose = False):
         # Imitates checkVoiceLeading() from rules.py, BUT it has the added advantage
         # of being able to be used for 2 -> n voices.
-        # Also imitates checkChords() for checking of hidden fifths/hidden octaves
         '''
         Returns True if all voicing rules as specified in the rules object are followed
         in the progression of one possibility to another. This encompasses parallel fifths, 
@@ -252,6 +251,8 @@ class Possibility(dict):
     
     # HIDDEN INTERVAL RULES
     def checkHiddenIntervals(self, consequentPossibility, vlTop, vlBottom, fbRules = rules.Rules(), verbose = False):
+        # Imitates checkChords() from rules.py for checking of hidden fifths/hidden octave, BUT has the
+        # advantage of being able to be used for 2->n voices.
         '''
         Checks for hidden fifths and octaves between self and a consequent possibility, as specified in fbRules. 
         To remove ambiguities, asked to provide the key of the top voice and the key of the bottom voice.
