@@ -86,7 +86,7 @@ class Possibility(dict):
     
     def topVoicesWithinOctave(self, verbose = False):
         '''
-        Returns true if upper voices are found within an octave of each other.
+        Returns True if upper voices are found within an octave of each other.
         
         >>> from music21 import *
         >>> from music21.figuredBass import possibility
@@ -225,7 +225,7 @@ class Possibility(dict):
         
     def containsParallelOctaves(self, consequentPossibility, verbose = False):
         '''
-        Checks for parallel fifths between self and a consequent possibility.
+        Checks for parallel octaves between self and a consequent possibility.
         
         >>> from music21 import *
         >>> from music21.figuredBass import possibility
