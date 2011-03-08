@@ -539,9 +539,9 @@ class Test(unittest.TestCase):
         for fp in corpus.bachChorales[310:330]:
             # Parse, and then analyze the key
             chorale = converter.parse(fp)
-            key, mode = chorale.analyze('key')[:2]
+            key = chorale.analyze('key')
             # Select minor-mode chorales
-            if mode == 'minor':
+            if key.mode == 'minor':
                 # Gather last pitches from all parts into a Chord
                 lastChordPitches = []
                 for part in chorale.parts:

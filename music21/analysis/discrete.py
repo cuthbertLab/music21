@@ -793,7 +793,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Temperley Kostka Payne Key Analysis'
-    identifiers = ['temperley', 'kostka', 'payne']
+    identifiers = ['temperley', 'kostka', 'payne', 'temperley-kostka-payne']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -1233,6 +1233,7 @@ def analyzeStream(streamObj, *args, **keywords):
 
     if match != None:
         obj = analysisClassName()
+        #environLocal.printDebug(['analysis method used:', obj])
         return obj.getSolution(streamObj)
 
 
