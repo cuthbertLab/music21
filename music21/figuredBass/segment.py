@@ -92,7 +92,7 @@ class AntecedentSegment(Segment):
         self.possibilities = self.solve()
 
     def solve(self):
-        # Imitates _findPossibleStartingChords from realizer
+        # Imitates _findPossibleStartingChords from realizer.py
         possibilities = []
         
         bassPossibility = possibility.Possibility()
@@ -136,7 +136,7 @@ class ConsequentSegment(Segment):
         self.possibilities = self.solve()
     
     def solve(self):
-        # Imitates _findNextPossibilities from realizer
+        # Imitates _findNextPossibilities from realizer.py
         prevPossibilities = self.prevSegment.possibilities
         nextPossibilities = []
 
@@ -157,6 +157,7 @@ class ConsequentSegment(Segment):
         return nextPossibilities
 
     def resolvePossibility(self, prevPossib):
+        # Imitates allChordsToMoveTo from realizer.py
         nextPossibilities = []
         
         bassPossibility = possibility.Possibility()
@@ -165,6 +166,7 @@ class ConsequentSegment(Segment):
         nextPossibilities.append(bassPossibility)
         
         for voiceNumber in range(1, len(self.fbVoices)):
+            # Imitates pitchesToMoveTo from realizer.py
             oldLength = len(nextPossibilities)
             currentVoice = self.fbVoices[voiceNumber]
             
