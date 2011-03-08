@@ -10,11 +10,16 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Modular analysis procedures for use alone or applied with :class:`music21.analysis.windowed.WindowedAnalysis` class. 
+'''Modular analysis procedures for use alone or 
+applied with :class:`music21.analysis.windowed.WindowedAnalysis` class. 
 
-All procedures should inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`, or provide a similar interface. 
+All procedures should inherit from 
+:class:`music21.analysis.discrete.DiscreteAnalysis`, 
+or provide a similar interface. 
 
-The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
+The :class:`music21.analysis.discrete.KrumhanslSchmuckler` 
+(for algorithmic key detection) and 
+:class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
 '''
 
 import unittest
@@ -546,11 +551,17 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
 
     def process(self, sStream):    
-        ''' Takes in a Stream or sub-Stream and performs analysis on all contents of the Stream. The :class:`~music21.analysis.windowed.WindowedAnalysis` windowing system can be used to get numerous results by calling this method. 
+        '''
+        Takes in a Stream or sub-Stream and performs analysis 
+        on all contents of the Stream. The 
+        :class:`~music21.analysis.windowed.WindowedAnalysis` 
+        windowing system can be used to get numerous results 
+        by calling this method. 
 
         Returns two values, a solution data list and a color string.
 
-        The data list contains a key (as a string), a mode (as a string), and a correlation value (degree of certainty)
+        The data list contains a key (as a string), a mode 
+        (as a string), and a correlation value (degree of certainty)
         '''
         sStream = sStream.flat.notes
         # this is the sample distribution used in the paper, for some testing purposes
@@ -596,12 +607,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = KrumhanslSchmuckler()
+        >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> p.getSolution(s) # this seems correct
         <music21.key.Key of F# minor>
 
         >>> s = corpus.parseWork('bach/bwv57.8')
-        >>> p = KrumhanslSchmuckler(s)
+        >>> p = analysis.discrete.KrumhanslSchmuckler(s)
         >>> p.getSolution(s) 
         <music21.key.Key of B- major>
         '''
@@ -890,7 +901,7 @@ class Ambitus(DiscreteAnalysis):
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = Ambitus()
+        >>> p = analysis.discrete.Ambitus()
         >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
         (66, 71)
         >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[6])
@@ -929,7 +940,7 @@ class Ambitus(DiscreteAnalysis):
         '''For a given subStream, return the smallest difference between any two pitches and the largest difference between any two pitches. This is used to get the smallest and largest ambitus possible in a given work. 
 
         >>> from music21 import *
-        >>> p = Ambitus()
+        >>> p = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
@@ -1032,7 +1043,7 @@ class Ambitus(DiscreteAnalysis):
     def solutionToColor(self, result):
         '''
         >>> from music21 import *
-        >>> p = Ambitus()
+        >>> p = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
@@ -1077,7 +1088,7 @@ class Ambitus(DiscreteAnalysis):
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
-        >>> p = Ambitus()
+        >>> p = analysis.discrete.Ambitus()
         >>> p.getSolution(s)
         <music21.interval.Interval m21>
 
@@ -1196,6 +1207,17 @@ def analyzeStream(streamObj, *args, **keywords):
     <music21.key.Key of F# minor>
     >>> analysis.discrete.analyzeStream(s, 'range')
     <music21.interval.Interval m21>
+
+
+    Note that the same results can be obtained by calling "analyze" directly on the stream object:
+    >>> s.analyze('key')
+    <music21.key.Key of F# minor>
+    >>> s.analyze('range')
+    <music21.interval.Interval m21>
+
+
+
+
     '''
     analysisClasses = [
         Ambitus,
@@ -1342,7 +1364,7 @@ class Test(unittest.TestCase):
         for p in ['A', 'B-', 'A-']:
             s = stream.Stream()
             s.append(note.Note(p))
-            self.assertEqual(str(s.analyze('key').tonic), p)
+            self.assertEqual(str(s.analyze('Krumhansl').tonic), p)
 
 
     def testKeyAnalysisDiverseWeights(self):
