@@ -164,7 +164,7 @@ class FiguredBass(object):
     def printChordProgression(self, chordProgression):
         linesToPrint = []
         for v in self.fbInfo.fbVoices:
-            voiceLine = ""
+            voiceLine = v.label + ":\n"
             for chord in chordProgression:
                 voiceLine += str(chord[v.label]) + "\t"
             linesToPrint.append(voiceLine)
