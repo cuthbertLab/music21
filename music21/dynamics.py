@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -13,17 +13,13 @@
 Classes and functions for creating and manipulating dynamic symbols. Rather than subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters. 
 '''
 
-
 import unittest, doctest
-
 import copy
 
 import music21
 from music21 import musicxml as musicxmlMod 
 from music21.musicxml import translate as musicxmlTranslate
-
 from music21 import common
-
 from music21 import environment
 _MOD = 'dynamics.py'
 environLocal = environment.Environment(_MOD)
@@ -123,7 +119,6 @@ class Dynamic(music21.Music21Object):
             value = dynamicStrFromDecimal(value)
 
         self.value = value
-
         if self.value in longNames:
             self.longName = longNames[self.value]
         else:
@@ -136,31 +131,54 @@ class Dynamic(music21.Music21Object):
 
         # for position, as musicxml, all units are in tenths of interline space
         # position is needed as default positions are often incorrect
-        self.posDefaultX = None
-        self.posDefaultY = None
-        self.posRelativeX = -36 # this value provides good 16th note alignment
-        self.posRelativeY = None
-        self.posPlacement = 'below' # attr in mxDirection, below or above
-
+        self._positionDefaultX = -36
+        self._positionDefaultY = -80 # below top line
+        # this value provides good 16th note alignment
+        self._positionRelativeX = None
+        self._positionRelativeY = None
+        # this does not do anything if default y is defined
+        self._positionPlacement = None
 
     def __repr__(self):
         return "<music21.dynamics.Dynamic %s >" % self.value
 
 
-    def _getMX(self):
-        return musicxmlTranslate.dyanmicToMx(self)
+    def _getPositionVertical(self):
+        return self._positionDefaultY
+    
+    def _setPositionVertical(self, value):
+        if value is None:
+            self._positionDefaultY = None
+        else:
+            try:
+                value = float(value)
+            except (ValueError):
+                raise TextExpressionException('Not a supported size: %s' % value)
+            self._positionDefaultY = value
+    
+    positionVertical = property(_getPositionVertical, _setPositionVertical, 
+        doc = '''Get or set the the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.
 
+        >>> from music21 import *
+        >>> te = expressions.TextExpression()
+        >>> te.positionVertical = 10
+        >>> te.positionVertical
+        10.0
+        ''')
+
+
+
+    def _getMX(self):
+        return musicxmlTranslate.dynamicToMx(self)
 
     def _setMX(self, mxDirection):
         musicxmlTranslate.mxToDynamic(mxDirection, self)
 
     mx = property(_getMX, _setMX)
 
-
     def _getMusicXML(self):
         '''Provide a complete MusicXML representation.
         '''
-        
         from music21 import stream, note
         dCopy = copy.deepcopy(self)
         out = stream.Stream()
@@ -186,7 +204,7 @@ class Wedge(music21.Music21Object):
         self.type = None # crescendo, stop, or diminuendo
         self.spread = None
         # relative-y and relative-x are also defined in xml
-        self.posPlacement = 'below' # defined in mxDirection
+        self._positionPlacement = 'below' # defined in mxDirection
 
     def _getMX(self):
         '''
@@ -208,7 +226,7 @@ class Wedge(music21.Music21Object):
         mxDirectionType.append(mxWedge)
         mxDirection = musicxmlMod.Direction()
         mxDirection.append(mxDirectionType)
-        mxDirection.set('placement', self.posPlacement)
+        mxDirection.set('placement', self._positionPlacement)
         return mxDirection
 
 
@@ -230,7 +248,7 @@ class Wedge(music21.Music21Object):
         'crescendo'
         '''
         if mxDirection.get('placement') != None:
-            self.posPlacement = mxDirection.get('placement') 
+            self._positionPlacement = mxDirection.get('placement') 
 
         mxWedge = mxDirection.getWedge()
         if mxWedge == None:
@@ -320,7 +338,41 @@ class Test(unittest.TestCase):
         d = Dynamic('p')
         xmlout = d.musicxml
         match = '<p/>'
-        self.assertEquals(xmlout.find(match), 888)
+        self.assertEquals(xmlout.find(match), 885)
+
+
+    def testDynamicsPositionA(self):
+        from music21 import stream, note, dynamics
+        s = stream.Stream()
+        selections = ['pp', 'f', 'mf', 'fff']
+        positions = [-20, 0, 20]
+        for i in range(10):
+            d = dynamics.Dynamic(selections[i%len(selections)])
+            #d.positionVertical = positions[i%len(positions)]
+            s.append(d)
+            s.append(note.Note('c1'))
+        #s.show()
+
+    def testDynamicsPositionB(self):
+        import random
+        from music21 import stream, note, expressions, layout, dynamics
+        s = stream.Stream()
+        for i in range(6):
+            m = stream.Measure(number=i+1)
+            m.append(layout.SystemLayout(isNew=True))
+            m.append(note.Rest(type='whole'))
+            s.append(m)
+        for m in s.getElementsByClass('Measure'):
+            offsets = [x*.25 for x in range(16)]
+            random.shuffle(offsets)
+            offsets = offsets[:4]
+            for o in offsets:
+                d = dynamics.Dynamic('mf')
+                d.positionVertical = 20
+                m.insert(o, d)
+
+        #s.show()
+
 
 
 #-------------------------------------------------------------------------------

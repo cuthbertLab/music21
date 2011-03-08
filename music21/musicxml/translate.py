@@ -556,14 +556,14 @@ def timeSignatureToMusicXML(ts):
 #-------------------------------------------------------------------------------
 # Dyanmics
 
-def dyanmicToMx(d):
-    'Return an mx direction'
+def dynamicToMx(d):
     '''
+    Return an mx direction
     returns a musicxml.Direction object
 
     >>> from music21 import *
-    >>> a = dynamics.Dynamic('pp# p')
-    >>> a.posRelativeY = -10
+    >>> a = dynamics.Dynamic('ppp')
+    >>> a._positionRelativeY = -10
     >>> b = a.mx
     >>> b[0][0][0].get('tag')
     'ppp'
@@ -572,10 +572,10 @@ def dyanmicToMx(d):
     '''
     mxDynamicMark = musicxmlMod.DynamicMark(d.value)
     mxDynamics = musicxmlMod.Dynamics()
-    for src, dst in [(d.posDefaultX, 'default-x'), 
-                     (d.posDefaultY, 'default-y'), 
-                     (d.posRelativeX, 'relative-x'),
-                     (d.posRelativeY, 'relative-y')]:
+    for src, dst in [(d._positionDefaultX, 'default-x'), 
+                     (d._positionDefaultY, 'default-y'), 
+                     (d._positionRelativeX, 'relative-x'),
+                     (d._positionRelativeY, 'relative-y')]:
         if src is not None:
             mxDynamics.set(dst, src)
     mxDynamics.append(mxDynamicMark) # store on component list
@@ -583,7 +583,7 @@ def dyanmicToMx(d):
     mxDirectionType.append(mxDynamics)
     mxDirection = musicxmlMod.Direction()
     mxDirection.append(mxDirectionType)
-    mxDirection.set('placement', d.posPlacement)
+    mxDirection.set('placement', d._positionPlacement)
     return mxDirection
 
 
@@ -604,9 +604,9 @@ def mxToDynamic(mxDirection, inputM21=None):
     >>> a.mx = mxDirection
     >>> a.value
     'ff'
-    >>> a.posDefaultY
+    >>> a._positionDefaultY
     -20
-    >>> a.posPlacement
+    >>> a._positionPlacement
     'below'
     '''
 
@@ -631,17 +631,18 @@ def mxToDynamic(mxDirection, inputM21=None):
 
     # palcement is found in outermost object
     if mxDirection.get('placement') is not None:
-        d.posPlacement = mxDirection.get('placement') 
+        d._positionPlacement = mxDirection.get('placement') 
 
     # the tag is the dynmic mark value
     mxDynamicMark = mxDynamics.componentList[0].get('tag')
     d.value = mxDynamicMark
-    for dst, src in [('posDefaultX', 'default-x'), 
-                     ('posDefaultY', 'default-y'), 
-                     ('posRelativeX', 'relative-x'),
-                     ('posRelativeY', 'relative-y')]:
+    for dst, src in [('_positionDefaultX', 'default-x'), 
+                     ('_positionDefaultY', 'default-y'), 
+                     ('_positionRelativeX', 'relative-x'),
+                     ('_positionRelativeY', 'relative-y')]:
         if mxDynamics.get(src) is not None:
             setattr(d, dst, mxDynamics.get(src))
+    return d
 
 
 def textExpressionToMx(te):
@@ -651,10 +652,10 @@ def textExpressionToMx(te):
     >>> from music21 import *
     '''
     mxWords = musicxmlMod.Words(te.content)
-    for src, dst in [#(te.posDefaultX, 'default-x'), 
+    for src, dst in [#(te._positionDefaultX, 'default-x'), 
                      (te.positionVertical, 'default-y'), 
-#                      (te.posRelativeX, 'relative-x'),
-#                      (te.posRelativeY, 'relative-y')]:
+#                      (te._positionRelativeX, 'relative-x'),
+#                      (te._positionRelativeY, 'relative-y')]:
                       (te.enclosure, 'enclosure'),
                       (te.justify, 'justify'),
                       (te.size, 'font-size'),
@@ -676,7 +677,7 @@ def textExpressionToMx(te):
     mxDirection = musicxmlMod.Direction()
     mxDirection.append(mxDirectionType)
     # this parameter does not seem to do anything with text expressions
-    #mxDirection.set('placement', d.posPlacement)
+    #mxDirection.set('placement', d._positionPlacement)
     return mxDirection
 
 
@@ -1327,7 +1328,12 @@ def measureToMx(m, spannerBundle=None):
                 mxMeasure.componentList += obj.mx
             elif 'Dynamic' in classes:
                 # returns an mxDirection object
-                mxMeasure.append(obj.mx)
+                mxOffset = int(defaults.divisionsPerQuarter * 
+                           obj.getOffsetBySite(mFlat))
+                #mxDirection = obj.mx
+                mxDirection = dynamicToMx(obj)
+                mxDirection.offset = mxOffset 
+                mxMeasure.insert(0, mxDirection)
             elif 'TextExpression' in classes:
                 # convert m21 offset to mxl divisions
                 mxOffset = int(defaults.divisionsPerQuarter * 
@@ -1633,7 +1639,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 d = dynamics.Dynamic()
                 d.mx = mxObj
                 _addToStaffReference(mxObj, d, staffReference)
-                m.insert(offsetMeasureNote, d)  
+                #m.insert(offsetMeasureNote, d)
+                m.insert(offsetMeasureNote + offsetDirection, d)
             if mxObj.getWedge() is not None:
                 w = dynamics.Wedge()
                 w.mx = mxObj     

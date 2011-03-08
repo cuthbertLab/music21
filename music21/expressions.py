@@ -124,7 +124,13 @@ class TextExpression(Expression, text.TextFormat):
 
         # numerous parameters are inherited from text.TextFormat
 
-        self._positionVertical = 20 # two staff lines above
+        self._positionDefaultX = None
+        self._positionDefaultY = 20 # two staff lines above
+        # these values provided for musicxml compatibility
+        self._positionRelativeX = None
+        self._positionRelativeY = None
+        # this does not do anything if default y is defined
+        self._positionPlacement = None
 
 
     def __repr__(self):
@@ -175,18 +181,17 @@ class TextExpression(Expression, text.TextFormat):
 
 
     def _getPositionVertical(self):
-        return self._positionVertical
+        return self._positionDefaultY
     
     def _setPositionVertical(self, value):
         if value is None:
-            # do nothing or set to zero?
-            pass
+            self._positionDefaultY = None
         else:
             try:
                 value = float(value)
             except (ValueError):
                 raise TextExpressionException('Not a supported size: %s' % value)
-            self._positionVertical = value
+            self._positionDefaultY = value
     
     positionVertical = property(_getPositionVertical, _setPositionVertical, 
         doc = '''Get or set the the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.

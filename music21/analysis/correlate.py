@@ -116,7 +116,7 @@ class ActivityMatch(object):
         >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
         >>> data = am.pitchToDynamic()
         >>> len(data)
-        401
+        388
         '''
         objNameSrc = note.Note
         objNameDst = dynamics.Dynamic
@@ -199,7 +199,9 @@ class Test(unittest.TestCase):
         # just get the soprano part
         b = ActivityMatch(a[0].flat.sorted)
         dataPairs = b.pitchToDynamic()
-        self.assertEqual(len(dataPairs), 401)
+        #print dataPairs
+        # previous pair count was 401
+        self.assertEqual(len(dataPairs), 388)
 
 
 #-------------------------------------------------------------------------------
