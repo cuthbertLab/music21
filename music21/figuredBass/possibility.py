@@ -438,7 +438,7 @@ class Possibility(dict):
                 hasCorrectTessitura = False
             if not verbose:
                 return hasCorrectTessitura
-        if not fbRules.filterPitchesByRange:
+        if fbRules.filterPitchesByRange:
             pitchesInRange = self.pitchesWithinRange(sortedVoiceList, verbose)
             if not pitchesInRange:
                 hasCorrectTessitura = False
