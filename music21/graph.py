@@ -1843,6 +1843,29 @@ class PlotHistogram(PlotStream):
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
+    def _extactChordData(self, fx, c):
+        '''Look for Note-like attributes in a Chord.
+        '''
+        values = []
+        for p in c.pitches:
+            # try to get get values from pitch first, then chord
+            value = None
+            try:
+                value = fx(p)
+            except AttributeError:
+                break # do not try others
+            if value is not None:
+                values.append(value)
+        if values == []: # still not set, get form chord
+            value = None
+            try:
+                value = fx(c)
+            except AttributeError:
+                pass # do not try others
+            if value is not None:
+                values.append(value)
+        return values
+
     def _extractData(self, dataValueLegit=True):
         data = {}
         dataTick = {}
@@ -1854,27 +1877,42 @@ class PlotHistogram(PlotStream):
         else:
             sSrc = self.streamObj
 
+        # first, collect all unique data values
         dataValues = []
         for noteObj in sSrc.getElementsByClass(note.Note):
             value = self.fx(noteObj)
             if value not in dataValues:
                 dataValues.append(value)
+        for chordObj in sSrc.getElementsByClass(chord.Chord):
+            values = self._extactChordData(self.fx, chordObj)
+            for value in values:
+                if value not in dataValues:
+                    dataValues.append(value)
+
         dataValues.sort()
 
-        for noteObj in sSrc.getElementsByClass(note.Note):
-            if dataValueLegit: # use the real values
-                value = self.fx(noteObj)
-            else:
-                value = dataValues.index(self.fx(noteObj))
+        # second, count instances
+        for obj in sSrc.getElementsByClass([note.Note, chord.Chord]):
+            if 'Chord' in obj.classes:
+                values = self._extactChordData(self.fx, obj)
+                ticks = self._extactChordData(self.fxTick, obj)
+            else: # simulate a list
+                values = [self.fx(obj)]            
+                ticks = [self.fxTick(obj)]            
 
-            if value not in data.keys():
-                data[value] = 0
-                # this is the offset that is used to shift labels
-                # into bars; this only is .5 if x values are integers
-                dataTick[value+.4] = self.fxTick(noteObj)
-            data[value] += 1
-            if data[value] >= countMax:
-                countMax = data[value]
+            for i, value in enumerate(values):
+                if not dataValueLegit: 
+                    # get the index position, not the value
+                    value = dataValues.index(value)
+    
+                if value not in data.keys():
+                    data[value] = 0
+                    # this is the offset that is used to shift labels
+                    # into bars; this only is .5 if x values are integers
+                    dataTick[value+.4] = ticks[i]
+                data[value] += 1
+                if data[value] >= countMax:
+                    countMax = data[value]
 
         data = data.items()
         data.sort()
@@ -2054,6 +2092,8 @@ class PlotScatter(PlotStream):
         self.fxTicks = self.ticksQuarterLength
 
     def _extractData(self, xLog=False):
+
+        # TODO: need to add support for Chords. 
         data = []
         xValues = []
         yValues = []
@@ -2304,6 +2344,7 @@ class PlotHorizontalBar(PlotStream):
         self.fxTicks = self.ticksOffset
 
     def _extractData(self):
+        # TODO: add support for chords
         # find listing for any single pitch name
         dataUnique = {}
         xValues = []
@@ -2475,6 +2516,7 @@ class PlotScatterWeighted(PlotStream):
             sSrc = self.streamObj
 
         # find all combinations of x/y
+        # TODO: add support for chords
         for noteObj in sSrc.getElementsByClass(note.Note):
             x = self.fx(noteObj)
             if xLog:
@@ -2677,6 +2719,7 @@ class Plot3DBars(PlotStream):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
     def _extractData(self):
+        # TODO: add support for chords
         data = {}
         xValues = []
         yValues = []
@@ -3429,6 +3472,16 @@ class Test(unittest.TestCase):
         b.process()
 
 
+    def testPlotChords(self):
+        from music21 import stream, note, chord
+        s = stream.Stream()
+        s.append(chord.Chord(['b', 'c#', 'd']))
+        s.append(note.Note('c3'))
+        s.append(note.Note('c5'))
+
+        b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)
+        b.process()
+        #s.plot('pitchclass')
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -3458,22 +3511,8 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         t = Test()
         te = TestExternal()
-        #a.testPlotScatterWeightedPitchSpaceQuarterLength()
+        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
 
-        #t.testPlotQuarterLength()
-        #t.testPlotScatterPitchSpaceQuarterLength()
-        #t.testPlotScatterPitchSpaceDynamicSymbol()
-
-        #t.writeGraphColorGrid()
-        #t.writeAllGraphs()
-        #t.writeAllPlots()
-
-        #te.testColorGridLegend('write')
-        #te.testPlotWindowed('write')
-
-        #t.testPianoRollFromOpus()
-
-        t.testGraphNetworxGraph()
 
 
 #------------------------------------------------------------------------------

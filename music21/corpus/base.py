@@ -253,18 +253,6 @@ def _updateMetadataBundle():
             # must update access paths for the files found on this system
             _METADATA_BUNDLES[d].updateAccessPaths(f())
 
-#     if 'core' in domain:
-#         if _METADATA_BUNDLES['core'] == None:
-#             _METADATA_BUNDLES['core'] = metadata.MetadataBundle('core')
-#             _METADATA_BUNDLES['core'].read()
-#             # must update access paths for the files found on this system
-#             _METADATA_BUNDLES['core'].updateAccessPaths(getPaths())
-#     if 'virtual' in domain:
-#         if _METADATA_BUNDLES['virtual'] == None:
-#             _METADATA_BUNDLES['virtual'] = metadata.MetadataBundle('virtual')
-#             _METADATA_BUNDLES['virtual'].read()
-#             # must update access paths for the files found on this system
-#             _METADATA_BUNDLES['virtual'].updateAccessPaths(getVirtualPaths())
 #     if 'local' in domain:
 #         pass
 

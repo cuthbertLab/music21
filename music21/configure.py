@@ -331,7 +331,8 @@ class Dialog(object):
 
 
     def prependPromptHeader(self, msg):
-        '''
+        '''Add a message to the front of the stored prompt header.
+
         >>> from music21 import *
         >>> d = configure.Dialog()
         >>> d.prependPromptHeader('test')
@@ -445,7 +446,7 @@ class Dialog(object):
         '''For various result options, we may need to at times convert the internal representation of the result into something else. For example, we might present the user with 'Yes' or 'No' but store the result as True or False.
         '''
         # override in subclass
-        return resut
+        return result
 
     def _parseUserInput(self, raw):
         '''Translate string to desired output. Pass None through (as no input), convert '' to None, and pass all other outputs as IncompleteInput objects. 
@@ -563,6 +564,34 @@ class Dialog(object):
 
 
 #-------------------------------------------------------------------------------
+class AnyKey(Dialog):
+    '''Press any key to continue
+
+    '''
+    def __init__(self, default=None, tryAgain=False, promptHeader=None):
+        Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+    
+
+    def _rawQuery(self):
+        '''Return a multiline presentation of the question.
+        '''
+        msg = 'Press any key to continue.'
+        msg = self._rawQueryPrepareHeader(msg)
+        # footer provides default; here, ignore
+        #msg = self._rawQueryPrepareFooter(msg)
+        return msg
+
+    def _parseUserInput(self, raw):
+        '''Always returns True
+        '''
+        return True
+
+
+
+
+
+
+#-------------------------------------------------------------------------------
 class YesOrNo(Dialog):
     '''Ask a yes or no question.
 
@@ -677,6 +706,8 @@ class YesOrNo(Dialog):
                 return self._default
         # could be IncompleteInput, NoInput, or a proper, valid answer
         return rawParsed
+
+
 
 
 
@@ -1574,6 +1605,13 @@ class Test(unittest.TestCase):
 #         d.getResult()
 #         d.performAction()
 
+
+    def testAnyKey(self):
+
+        d = AnyKey()
+#         d.askUser()
+#         d.getResult()
+#         d.performAction()
 
 
 

@@ -203,7 +203,12 @@ class Wedge(music21.Music21Object):
         # these correspond to start and stop
         self.type = None # crescendo, stop, or diminuendo
         self.spread = None
-        # relative-y and relative-x are also defined in xml
+
+        # all musicxml-related positioning
+        self._positionDefaultX = None
+        self._positionDefaultY = None
+        self._positionRelativeX = None
+        self._positionRelativeY = None
         self._positionPlacement = 'below' # defined in mxDirection
 
     def _getMX(self):
