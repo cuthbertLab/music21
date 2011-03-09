@@ -146,8 +146,9 @@ This example creates a chordal reduction of a polyphonic work and then searches 
         else:
             c2 = note.Rest()
         # If the root of the Chord is A, collect and display this Chord
-        # and the next Chord
-        if c1.findRoot().name == 'A':
+        # and the next Chord (the last bit eliminates some passing 9th chords that can
+        # be analyzed as having an A root)
+        if c1.findRoot().name == 'A' and (c1.isTriad() is True or c1.isSeventh() is True):
             m = stream.Measure()
             m.append(c1)
             m.append(c2)

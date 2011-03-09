@@ -582,7 +582,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if likelyKeysMajor == None or likelyKeysMinor == None:
             mode = None
             solution = (None, mode, 0)
-        # see which has a higher confidence value, the first major or the
+        # see which has a higher correlation coefficient, the first major or the
         # the first minor
         elif likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
             mode = 'major'
@@ -619,7 +619,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         # always take a flat version here, otherwise likely to get nothing
         solution, color = self.process(sStream.flat)
         k = key.Key(tonic=solution[0], mode=solution[1])
-        k.confidence = solution[2]
+        k.correlationCoefficient = solution[2]
         return k
 
 
@@ -1375,39 +1375,39 @@ class Test(unittest.TestCase):
 
         p = KrumhanslSchmuckler()
         k = p.getSolution(s)
-        post = [k.tonic, k.mode, k.confidence]
+        post = [k.tonic, k.mode, k.correlationCoefficient]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'major')
         self.assertEqual(str(post[2]), '0.812100774572')
 
         p = KrumhanslKessler()
         k = p.getSolution(s)
-        post = [k.tonic, k.mode, k.confidence]
+        post = [k.tonic, k.mode, k.correlationCoefficient]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'major')
 
         p = AardenEssen()
         k = p.getSolution(s)
-        post = [k.tonic, k.mode, k.confidence]
+        post = [k.tonic, k.mode, k.correlationCoefficient]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'minor')
 
         p = SimpleWeights()
         k = p.getSolution(s)
-        post = [k.tonic, k.mode, k.confidence]
+        post = [k.tonic, k.mode, k.correlationCoefficient]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'minor')
 
         p = BellmanBudge()
         k = p.getSolution(s)
-        post = [k.tonic, k.mode, k.confidence]
+        post = [k.tonic, k.mode, k.correlationCoefficient]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'minor')
 
 
         p = TemperleyKostkaPayne()
         k = p.getSolution(s)
-        post = [k.tonic, k.mode, k.confidence]
+        post = [k.tonic, k.mode, k.correlationCoefficient]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'minor')
 

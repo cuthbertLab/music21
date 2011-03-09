@@ -277,9 +277,9 @@ def findPhraseBoundaries(book = 4, madrigal = 12):
             thisNoteAnalysis = analysisFlat.getElementAtOrBefore(thisNote.offset)
             
             if previousNoteAnalysis.romanNumeral == 'V' and thisNoteAnalysis.romanNumeral.upper() == 'I':
-                thisScore = thisScore + 10
+                thisScore = thisScore + 11
             elif previousNoteAnalysis.romanNumeral.upper() == 'II' and thisNoteAnalysis.romanNumeral.upper() == 'I':
-                thisScore = thisScore + 5
+                thisScore = thisScore + 6
                 
             if thisNote.lyric is not None and thisNote.lyric.endswith('.'):
                 thisScore = thisScore + 15 # would be higher but our lyrics data is bad.
@@ -292,7 +292,15 @@ def findPhraseBoundaries(book = 4, madrigal = 12):
         if psbo > 0: 
             print thisOffset, psbo
             relevantNote = flattenedBass.getElementAtOrBefore(thisOffset - 0.1)
-            relevantNote.addLyric(str(psbo))
+            if hasattr(relevantNote, 'score'):
+                print "adjusting score from %d to %d for note in measure %d" % (relevantNote.score, relevantNote.score + psbo, relevantNote.measureNumber)
+                relevantNote.score += psbo
+            else:
+                relevantNote.score = psbo
+    for n in flattenedBass:
+        if hasattr(n, 'score'):
+            n.lyric = str(n.score)
+    
     sc.show()
 
 

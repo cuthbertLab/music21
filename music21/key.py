@@ -752,8 +752,8 @@ class Key(KeySignature, scale.DiatonicScale):
         self._abstract._buildNetwork(self.type)
 
         # optionally filled attributes
-        # store a floating point value between 0 and 1 regarding confidence
-        self.confidence = None
+        # store a floating point value between 0 and 1 regarding correlation coefficent between the detected key and the algorithm for detecting the key
+        self.correlationCoefficient = None
 
     def __repr__(self):
         return "<music21.key.Key of %s>" % self.__str__()
