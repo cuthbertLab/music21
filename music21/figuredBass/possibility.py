@@ -44,7 +44,7 @@ class Possibility(dict):
         if not fbRules.allowIncompletePossibilities:
             if pitchNamesToHave is None:
                 raise PossibilityException("Pitch names to analyze completeness not provided.")
-            if self.isIncomplete(pitchNamesToHave, verbose):
+            if self.incomplete(pitchNamesToHave, verbose):
                 correctlyFormed = False
                 if not verbose:
                     return correctlyFormed
@@ -55,7 +55,7 @@ class Possibility(dict):
         
         return correctlyFormed
     
-    def isIncomplete(self, pitchNamesToHave, verbose = False):
+    def incomplete(self, pitchNamesToHave, verbose = False):
         '''
         A possibility is incomplete if it doesn't contain at least
         one of each pitch name.
@@ -64,10 +64,10 @@ class Possibility(dict):
         >>> from music21.figuredBass import possibility
         >>> pitchNames = ['C','E','G']
         >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('E4'), 'B': pitch.Pitch('C3')})
-        >>> p1.isIncomplete(pitchNames)
+        >>> p1.incomplete(pitchNames)
         False
         >>> p1['T'] = pitch.Pitch('C4')
-        >>> p1.isIncomplete(pitchNames)
+        >>> p1.incomplete(pitchNames)
         True
         '''
         pitchNamesContained = []
@@ -99,7 +99,7 @@ class Possibility(dict):
         False
         '''
         topVoicesWithinLimit = True
-        if topVoicesMaxIntervalSeparation:
+        if topVoicesMaxIntervalSeparation == None:
             return topVoicesWithinLimit
         pitchesContained = []
         for voiceLabel in self.keys():
