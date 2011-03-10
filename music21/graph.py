@@ -100,6 +100,48 @@ def _substituteAccidentalSymbols(label):
         label = label.replace('#', r'$\sharp$')
     return label
 
+FORMATS = ['horizontalbar', 'histogram', 'scatter', 'scatterweighted', 
+            '3dbars', 'colorgrid']
+
+def userFormatsToFormat(value):
+    '''Replace possible user format strings with defined format names as used herein. Returns string unaltered if no match.
+    '''
+    value = value.lower()
+    value = value.replace(' ', '')
+    if value in ['bar', 'horizontal', 'horizontalbar', 'pianoroll', 'piano']:
+        return 'horizontalbar'
+    elif value in ['histogram', 'histo', 'count']:
+        return 'histogram'
+    elif value in ['scatter', 'point']:
+        return 'scatter'
+    elif value in ['weightedscatter', 'weighted', 'scatterweighted']:
+        return 'scatterweighted'
+    elif value in ['3dbars', '3d']:
+        return '3dbars'
+    else: # return unaltered if no mathc
+        return value
+
+def userValuesToValues(valueList):
+    '''Given a value list, replace string with synonymes. Let unmatched values pass.
+    '''  
+    post = []
+    for value in valueList:
+        value = value.lower()
+        value = value.replace(' ', '')
+        if value in ['pitch', 'pitchspace', 'ps']:
+            post.append('pitch')
+        elif value in ['pitchclass', 'pc']:
+            post.append('pitchclass')
+        elif value in ['duration', 'quarterlength']:
+            post.append('quarterlength')
+        elif value in ['offset', 'time']:
+            post.append('offset')
+        elif value in ['dynamic', 'dynamics']:
+            post.append('dynamics')
+        else:
+            post.append(value)
+    return post
+
 #-------------------------------------------------------------------------------
 class Graph(object):
     '''
@@ -899,7 +941,10 @@ class GraphScatterWeighted(Graph):
                 zNorm.append([0, 0])
             else:
                 # this will make the minimum scalar 0 when z is zero
-                scalar = (z-zMin) / zRange # shifted part / range
+                if zRange != 0:
+                    scalar = (z-zMin) / zRange # shifted part / range
+                else:
+                    scalar = .5 # if all the same size, use .5
                 scaled = self._minDiameter + (self._rangeDiameter * scalar)
                 zNorm.append([scaled, scalar])
 
@@ -1231,6 +1276,104 @@ class PlotStream(object):
         # store axis label type for time-based plots
         # either measure or offset
         self._axisLabelUsesMeasures = None
+
+    #---------------------------------------------------------------------------
+    def _extractChordDataOneAxis(self, fx, c):
+        '''Look for Note-like attributes in a Chord. This is done by first looking at the Chord, and then, if attributes are not found, looking at each pitch. 
+        '''
+        values = []
+        value = None
+        try:
+            value = fx(c)
+        except AttributeError:
+            pass # do not try others
+        if value is not None:
+            values.append(value)
+
+        if values == []: # still not set, get form chord
+            for p in c.pitches:
+                # try to get get values from pitch first, then chord
+                value = None
+                try:
+                    value = fx(p)
+                except AttributeError:
+                    break # do not try others
+                if value is not None:
+                    values.append(value)
+        return values
+
+
+    def _extractChordDataTwoAxis(self, fx, fy, c, matchPitchCount=False):
+        xValues = []
+        yValues = []
+        x = None
+        y = None
+
+        for b in [(fx, x, xValues), (fy, y, yValues)]:
+            #environLocal.printDebug(['b', b])
+            f, target, dst = b
+            try:
+                target = f(c)
+            except AttributeError:
+                pass 
+            if target is not None:
+                dst.append(target)
+
+        #environLocal.printDebug(['after looking at Chord:', 'xValues', xValues, 'yValues', yValues])
+        # get form pitches only if cannot be gotten from chord;
+        # this is necessary as pitches have an offset, but here we are likley
+        # looking for chord offset, etc.
+
+        if (xValues == [] and yValues == []): # still not set, get form chord
+            bundleGroups = [(fx, x, xValues), (fy, y, yValues)]
+            environLocal.printDebug(['trying to fill x + y'])
+        # x values not set from pitch; get form chord
+        elif (xValues == [] and yValues != []): # still not set, get form chord
+            bundleGroups = [(fx, x, xValues)]
+            #environLocal.printDebug(['trying to fill x'])
+        # y values not set from pitch; get form chord
+        elif (yValues == [] and xValues != []):
+            bundleGroups = [(fy, y, yValues)]
+            #environLocal.printDebug(['trying to fill y'])
+        else:
+            bundleGroups = []
+
+        for b in bundleGroups:
+            for p in c.pitches:
+                x = None
+                y = None
+                f, target, dst = b
+                try:
+                    target = f(p)
+                except AttributeError:
+                    pass # must try others
+                if target is not None:
+                    dst.append(target)
+
+        #environLocal.printDebug(['after looking at Pitch:', 'xValues', xValues, 'yValues', yValues])
+
+        # if we only have one attribute form the Chrod, and many from the 
+        # Pitches, need to make the number of data points equal by 
+        # duplicating data
+        if matchPitchCount: 
+            if len(xValues) == 1 and len(yValues) > 1:
+                #environLocal.printDebug(['balancing x'])
+                for i in range(len(yValues) - 1):
+                    xValues.append(xValues[0])
+            elif len(yValues) == 1 and len(xValues) > 1:
+                #environLocal.printDebug(['balancing y'])
+                for i in range(len(xValues) - 1):
+                    yValues.append(yValues[0])
+
+        return xValues, yValues
+
+
+
+
+    def _extractData(self):
+        '''Override in subclass
+        '''
+        return None
 
     def process(self):
         '''This will process all data, as well as call the done() method. What happens when the done() is called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph).
@@ -1848,30 +1991,6 @@ class PlotHistogram(PlotStream):
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
-    def _extractChordData(self, fx, c):
-        '''Look for Note-like attributes in a Chord.
-        '''
-        values = []
-        value = None
-        try:
-            value = fx(c)
-        except AttributeError:
-            pass # do not try others
-        if value is not None:
-            values.append(value)
-
-        if values == []: # still not set, get form chord
-            for p in c.pitches:
-                # try to get get values from pitch first, then chord
-                value = None
-                try:
-                    value = fx(p)
-                except AttributeError:
-                    break # do not try others
-                if value is not None:
-                    values.append(value)
-        return values
-
     def _extractData(self, dataValueLegit=True):
         data = {}
         dataTick = {}
@@ -1890,7 +2009,7 @@ class PlotHistogram(PlotStream):
             if value not in dataValues:
                 dataValues.append(value)
         for chordObj in sSrc.getElementsByClass(chord.Chord):
-            values = self._extractChordData(self.fx, chordObj)
+            values = self._extractChordDataOneAxis(self.fx, chordObj)
             for value in values:
                 if value not in dataValues:
                     dataValues.append(value)
@@ -1900,8 +2019,8 @@ class PlotHistogram(PlotStream):
         # second, count instances
         for obj in sSrc.getElementsByClass([note.Note, chord.Chord]):
             if 'Chord' in obj.classes:
-                values = self._extractChordData(self.fx, obj)
-                ticks = self._extractChordData(self.fxTick, obj)
+                values = self._extractChordDataOneAxis(self.fx, obj)
+                ticks = self._extractChordDataOneAxis(self.fxTick, obj)
             else: # simulate a list
                 values = [self.fx(obj)]            
                 ticks = [self.fxTick(obj)]            
@@ -2098,74 +2217,7 @@ class PlotScatter(PlotStream):
         self.fxTicks = self.ticksQuarterLength
 
 
-    def _extractChordData(self, fx, fy, c, matchPitchCount=False):
-        xValues = []
-        yValues = []
-        x = None
-        y = None
-
-        for b in [(fx, x, xValues), (fy, y, yValues)]:
-            #environLocal.printDebug(['b', b])
-            f, target, dst = b
-            try:
-                target = f(c)
-            except AttributeError:
-                pass 
-            if target is not None:
-                dst.append(target)
-
-
-        #environLocal.printDebug(['after looking at Chord:', 'xValues', xValues, 'yValues', yValues])
-        # get form pitches only if cannot be gotten from chord;
-        # this is necessary as pitches have an offset, but here we are likley
-        # looking for chord offset, etc.
-
-        if (xValues == [] and yValues == []): # still not set, get form chord
-            bundleGroups = [(fx, x, xValues), (fy, y, yValues)]
-            environLocal.printDebug(['trying to fill x + y'])
-        # x values not set from pitch; get form chord
-        elif (xValues == [] and yValues != []): # still not set, get form chord
-            bundleGroups = [(fx, x, xValues)]
-            #environLocal.printDebug(['trying to fill x'])
-        # y values not set from pitch; get form chord
-        elif (yValues == [] and xValues != []):
-            bundleGroups = [(fy, y, yValues)]
-            #environLocal.printDebug(['trying to fill y'])
-        else:
-            bundleGroups = []
-
-        for b in bundleGroups:
-            for p in c.pitches:
-                x = None
-                y = None
-                f, target, dst = b
-                try:
-                    target = f(p)
-                except AttributeError:
-                    pass # must try others
-                if target is not None:
-                    dst.append(target)
-
-        #environLocal.printDebug(['after looking at Pitch:', 'xValues', xValues, 'yValues', yValues])
-
-        # if we only have one attribute form the Chrod, and many from the 
-        # Pitches, need to make the number of data points equal by 
-        # duplicating data
-        if matchPitchCount: 
-            if len(xValues) == 1 and len(yValues) > 1:
-                #environLocal.printDebug(['balancing x'])
-                for i in range(len(yValues) - 1):
-                    xValues.append(xValues[0])
-            elif len(yValues) == 1 and len(xValues) > 1:
-                #environLocal.printDebug(['balancing y'])
-                for i in range(len(xValues) - 1):
-                    yValues.append(yValues[0])
-
-        return xValues, yValues
-
-
     def _extractData(self, xLog=False):
-        # TODO: need to add support for Chords. 
         data = []
         xValues = []
         yValues = []
@@ -2186,7 +2238,7 @@ class PlotScatter(PlotStream):
             if y not in xValues:
                 yValues.append(x)            
         for chordObj in sSrc.getElementsByClass(chord.Chord):
-            xSrc, ySrc = self._extractChordData(self.fx, self.fy, 
+            xSrc, ySrc = self._extractChordDataTwoAxis(self.fx, self.fy, 
                          chordObj, matchPitchCount=False)
             for x in xSrc:
                 if x not in xValues:
@@ -2208,7 +2260,7 @@ class PlotScatter(PlotStream):
 
         for chordObj in sSrc.getElementsByClass(chord.Chord):
             # here, need an x for every y, so match pitch count
-            xSrc, ySrc = self._extractChordData(self.fx, self.fy, 
+            xSrc, ySrc = self._extractChordDataTwoAxis(self.fx, self.fy, 
                          chordObj, matchPitchCount=True)
             #environLocal.printDebug(['xSrc', xSrc, 'ySrc', ySrc])
             for i, x in enumerate(xSrc):
@@ -2431,7 +2483,7 @@ class PlotHorizontalBar(PlotStream):
     '''A graph of events, sorted by pitch, over time
 
     '''
-    format = 'horizontalBar'
+    format = 'horizontalbar'
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
@@ -2451,18 +2503,39 @@ class PlotHorizontalBar(PlotStream):
         else:
             sSrc = self.streamObj
 
-        for noteObj in sSrc.getElementsByClass(note.Note):
-            # numeric value here becomes y axis
-            numericValue = int(round(self.fy(noteObj)))
-            if numericValue not in dataUnique.keys():
-                dataUnique[numericValue] = []
-            # all work with offset
-            start = noteObj.offset
-            # this is not the end, but instead the length
-            end = noteObj.quarterLength
-            xValues.append(start)
-            xValues.append(end)
-            dataUnique[numericValue].append((start, end))
+        for obj in sSrc.getElementsByClass((note.Note, chord.Chord)):
+            classes = obj.classes       
+            if 'Chord' in classes:
+                values = self._extractChordDataOneAxis(self.fy, obj)
+                valueObjPairs = [(v, obj) for v in values]
+            else: # its a Note
+                valueObjPairs = [(self.fy(obj), obj)]
+
+            for v, objSub in valueObjPairs:
+                numericValue = int(v)
+                if numericValue not in dataUnique.keys():
+                    dataUnique[numericValue] = []
+                # all work with offset
+                start = objSub.offset
+                # this is not the end, but instead the length
+                end = objSub.quarterLength
+                xValues.append(start)
+                xValues.append(end)
+                dataUnique[numericValue].append((start, end))
+
+#         for noteObj in sSrc.getElementsByClass(note.Note):
+#             # numeric value here becomes y axis
+#             numericValue = int(round(self.fy(noteObj)))
+#             if numericValue not in dataUnique.keys():
+#                 dataUnique[numericValue] = []
+#             # all work with offset
+#             start = noteObj.offset
+#             # this is not the end, but instead the length
+#             end = noteObj.quarterLength
+#             xValues.append(start)
+#             xValues.append(end)
+#             dataUnique[numericValue].append((start, end))
+            
 
         # create final data list
         # get labels from ticks
@@ -2481,7 +2554,6 @@ class PlotHorizontalBar(PlotStream):
 
         # use default args for now
         xTicks = self.fxTicks()
-
         # yTicks are returned, even though they are not used after this method
         return data, xTicks, yTicks
 
@@ -2500,7 +2572,6 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
         :width: 600
 
     '''
-
     values = ['pitchClass', 'offset', 'pianoroll']
     def __init__(self, streamObj, *args, **keywords):
         PlotHorizontalBar.__init__(self, streamObj, *args, **keywords)
@@ -2611,17 +2682,21 @@ class PlotScatterWeighted(PlotStream):
         else:
             sSrc = self.streamObj
 
-        # find all combinations of x/y
-        # TODO: add support for chords
-        for noteObj in sSrc.getElementsByClass(note.Note):
-            x = self.fx(noteObj)
-            if xLog:
-                x = self.remapQuarterLength(x)
-            if x not in xValues:
-                xValues.append(x)
-            y = self.fy(noteObj)
-            if y not in yValues:
-                yValues.append(y)
+        for obj in sSrc.getElementsByClass([note.Note, chord.Chord]):
+            if 'Chord' in obj.classes:
+                xSrc, ySrc = self._extractChordDataTwoAxis(self.fx, self.fy, obj, matchPitchCount=False)
+            else: # Note, just one value
+                xSrc = [self.fx(obj)]
+                ySrc = [self.fy(obj)]
+            for x in xSrc:
+                if xLog:
+                    x = self.remapQuarterLength(x)
+                if x not in xValues:
+                    xValues.append(x)
+            for y in ySrc:
+                if y not in yValues:
+                    yValues.append(y)
+
 
         xValues.sort()
         yValues.sort()
@@ -2634,19 +2709,36 @@ class PlotScatterWeighted(PlotStream):
             dataCount[y] = [[x, 0] for x in xValues]
 
         maxCount = 0 # this is the max z value
-        for noteObj in sSrc.getElementsByClass(note.Note):
-            x = self.fx(noteObj)
-            if xLog:
-                x = self.remapQuarterLength(x)
-            indexToIncrement = xValues.index(x)
 
-            # second position stores increment
-            dataCount[self.fy(noteObj)][indexToIncrement][1] += 1
-            if dataCount[self.fy(noteObj)][indexToIncrement][1] > maxCount:
-                maxCount = dataCount[self.fy(noteObj)][indexToIncrement][1]
+        for obj in sSrc.getElementsByClass([note.Note, chord.Chord]):
+            if 'Chord' in obj.classes:
+                xSrc, ySrc = self._extractChordDataTwoAxis(self.fx, self.fy, obj, matchPitchCount=True)
+            else: # Note, just one value
+                xSrc = [self.fx(obj)]
+                ySrc = [self.fy(obj)]
+            for i, x in enumerate(xSrc):
+                y = ySrc[i]
+                if xLog:
+                    x = self.remapQuarterLength(x)
+                indexToIncrement = xValues.index(x)
+                # second position stores increment
+                dataCount[y][indexToIncrement][1] += 1
+                if dataCount[y][indexToIncrement][1] > maxCount:
+                    maxCount = dataCount[y][indexToIncrement][1]
+
+
+#         for noteObj in sSrc.getElementsByClass(note.Note):
+#             x = self.fx(noteObj)
+#             if xLog:
+#                 x = self.remapQuarterLength(x)
+#             indexToIncrement = xValues.index(x)
+# 
+#             # second position stores increment
+#             dataCount[self.fy(noteObj)][indexToIncrement][1] += 1
+#             if dataCount[self.fy(noteObj)][indexToIncrement][1] > maxCount:
+#                 maxCount = dataCount[self.fy(noteObj)][indexToIncrement][1]
 
         xTicks = self.fxTicks(min(xValues), max(xValues), remap=xLog)
-
         # create final data list using fy ticks to get values
         data = []
         for y, label in self.fyTicks(yMin, yMax):
@@ -2795,7 +2887,7 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.setFigureSize([12,12])
+            self.graph.setFigureSize([10,10])
         if 'title' not in keywords:
             self.graph.setTitle('Count of Pitch Class and Quarter Length')
         if 'alpha' not in keywords:
@@ -2825,13 +2917,27 @@ class Plot3DBars(PlotStream):
         else:
             sSrc = self.streamObj
 
-        for noteObj in sSrc.getElementsByClass(note.Note):
-            x = self.fx(noteObj)
-            if x not in xValues:
-                xValues.append(x)
-            y = self.fy(noteObj)
-            if y not in yValues:
-                yValues.append(y)
+        for obj in sSrc.getElementsByClass([note.Note, chord.Chord]):
+            if 'Chord' in obj.classes:
+                xSrc, ySrc = self._extractChordDataTwoAxis(self.fx, self.fy, 
+                         obj, matchPitchCount=False)
+            else: # Note, just one value
+                xSrc = [self.fx(obj)]
+                ySrc = [self.fy(obj)]
+            for x in xSrc:
+                if x not in xValues:
+                    xValues.append(x)
+            for y in ySrc:
+                if y not in yValues:
+                    yValues.append(y)
+
+#         for noteObj in sSrc.getElementsByClass(note.Note):
+#             x = self.fx(noteObj)
+#             if x not in xValues:
+#                 xValues.append(x)
+#             y = self.fy(noteObj)
+#             if y not in yValues:
+#                 yValues.append(y)
         xValues.sort()
         yValues.sort()
         # prepare data dictionary; need to pack all values
@@ -2844,14 +2950,31 @@ class Plot3DBars(PlotStream):
         #print _MOD, 'data keys', data.keys()
 
         maxCount = 0
-        for noteObj in sSrc.getElementsByClass(note.Note):
-            indexToIncrement = xValues.index(self.fx(noteObj))
-            # second position stores increment
-            #print _MOD, fy(noteObj), indexToIncrement
 
-            data[self.fy(noteObj)][indexToIncrement][1] += 1
-            if data[self.fy(noteObj)][indexToIncrement][1] > maxCount:
-                maxCount = data[self.fy(noteObj)][indexToIncrement][1]
+        for obj in sSrc.getElementsByClass([note.Note, chord.Chord]):
+            if 'Chord' in obj.classes:
+                xSrc, ySrc = self._extractChordDataTwoAxis(self.fx, self.fy, obj, matchPitchCount=True)
+            else: # Note, just one value
+                xSrc = [self.fx(obj)]
+                ySrc = [self.fy(obj)]
+
+            for i, x in enumerate(xSrc):
+                y = ySrc[i]
+                indexToIncrement = xValues.index(x)
+                # second position stores increment
+                data[y][indexToIncrement][1] += 1
+                if data[y][indexToIncrement][1] > maxCount:
+                    maxCount = data[y][indexToIncrement][1]
+
+
+#         for noteObj in sSrc.getElementsByClass(note.Note):
+#             indexToIncrement = xValues.index(self.fx(noteObj))
+#             # second position stores increment
+#             #print _MOD, fy(noteObj), indexToIncrement
+# 
+#             data[self.fy(noteObj)][indexToIncrement][1] += 1
+#             if data[self.fy(noteObj)][indexToIncrement][1] > maxCount:
+#                 maxCount = data[self.fy(noteObj)][indexToIncrement][1]
 
         # setting of ticks does not yet work in matplotlib
         xTicks = [(40, 'test')]
@@ -2994,9 +3117,22 @@ def plotStream(streamObj, *args, **keywords):
     if 'values' in keywords:
         values = keywords['values'] # should be a list
 
-    if len(args) > 0:
+    environLocal.printDebug(['got args', args])
+
+    # if no args, use pianooll
+    if len(args) == 0 and format == '' and values == []:
+        format = 'horizontalbar'
+        values = 'pitch'
+    elif len(args) == 1:
+        formatCandidate = userFormatsToFormat(args[0])
+        if formatCandidate in FORMATS:
+            format = formatCandidate
+            values = 'pitch'
+        else: # if one arg, assume it is values and use histogram
+            format = 'histogram'
+            values = [args[0]]
+    elif len(args) > 1:
         format = args[0]
-    if len(args) > 1:
         values = args[1:] # get all remaining
 
     if not common.isListLike(values):
@@ -3004,6 +3140,10 @@ def plotStream(streamObj, *args, **keywords):
     # make sure we have a list
     values = list(values)
 
+    # clean data and process synonyms
+    # will return unaltered if no change
+    format = userFormatsToFormat(format) 
+    values = userValuesToValues(values)
     environLocal.printDebug(['plotStream: stream', streamObj, 
                              'format, values', format, values])
 
@@ -3011,15 +3151,18 @@ def plotStream(streamObj, *args, **keywords):
     if format.lower() == 'all':
         plotMake = plotClasses
     else:
+        plotMakeCanddidates = [] # store pairs of score, class
         for plotClassName in plotClasses:
             # try to match by complete class name
             if plotClassName.__name__.lower() == format.lower():
+                #environLocal.printDebug(['got plot class:', plotClassName])
                 plotMake.append(plotClassName)
 
             # try direct match of format and values
             plotClassNameValues = [x.lower() for x in plotClassName.values]
             plotClassNameFormat = plotClassName.format.lower()
             if plotClassNameFormat == format.lower():
+                environLocal.printDebug(['matching format', format])
                 # see if a matching set of values is specified
                 # normally plots need to match all values 
                 match = []
@@ -3031,22 +3174,28 @@ def plotStream(streamObj, *args, **keywords):
                             match.append(requestedValue)
                 if len(match) == len(values):
                     plotMake.append(plotClassName)
+                else:
+                    plotMakeCanddidates.append([len(match), plotClassName])
 
         # if no matches, try something more drastic:
         if len(plotMake) == 0:
-            for plotClassName in plotClasses:
-                # create a lost of all possible identifiers
-                plotClassIdentifiers = [plotClassName.format.lower()]
-                plotClassIdentifiers += [x.lower() for x in 
-                                        plotClassName.values]
-                # combine format and values args
-                for requestedValue in [format] + values:
-                    if requestedValue.lower() in plotClassIdentifiers:
-                        plotMake.append(plotClassName)
+            if len(plotMakeCanddidates) > 0:
+                plotMakeCanddidates.sort()
+                # last in list has highest score; second item is class
+                plotMake.append(plotMakeCanddidates[-1][1])
+            else:
+                for plotClassName in plotClasses:
+                    # create a list of all possible identifiers
+                    plotClassIdentifiers = [plotClassName.format.lower()]
+                    plotClassIdentifiers += [x.lower() for x in 
+                                            plotClassName.values]
+                    # combine format and values args
+                    for requestedValue in [format] + values:
+                        if requestedValue.lower() in plotClassIdentifiers:
+                            plotMake.append(plotClassName)
+                            break
+                    if len(plotMake) > 0: # found a match
                         break
-                if len(plotMake) > 0: # found a match
-                    break
-
 
     environLocal.printDebug(['plotClassName found', plotMake])
     for plotClassName in plotMake:
@@ -3568,14 +3717,14 @@ class Test(unittest.TestCase):
         b.process()
 
 
-    def testPlotChords(self):
+    def testPlotChordsA(self):
         from music21 import stream, note, chord, scale
         sc = scale.MajorScale('c4')
 
         b = PlotHistogram(stream.Stream(), doneAction=None)
         c = chord.Chord(['b', 'c', 'd'])
         fx = lambda n:n.midi
-        self.assertEqual(b._extractChordData(fx, c), [71, 60, 62])
+        self.assertEqual(b._extractChordDataOneAxis(fx, c), [71, 60, 62])
 
 
         s = stream.Stream()
@@ -3611,10 +3760,10 @@ class Test(unittest.TestCase):
         c = chord.Chord(['b', 'c', 'd'], quarterLength=.5)
         fx = lambda n:n.midi
         fy = lambda n:n.quarterLength
-        self.assertEqual(b._extractChordData(fx, fy, c), ([71, 60, 62], [0.5]))
+        self.assertEqual(b._extractChordDataTwoAxis(fx, fy, c), ([71, 60, 62], [0.5]))
         c = chord.Chord(['b', 'c', 'd'], quarterLength=.5)
         # matching the number of pitches for each data point may be needed
-        self.assertEqual(b._extractChordData(fx, fy, c, matchPitchCount=True), ([71, 60, 62], [0.5, 0.5, 0.5]) )
+        self.assertEqual(b._extractChordDataTwoAxis(fx, fy, c, matchPitchCount=True), ([71, 60, 62], [0.5, 0.5, 0.5]) )
 
 
         s = stream.Stream()
@@ -3666,9 +3815,137 @@ class Test(unittest.TestCase):
         #b.write()
 
 
+    def testPlotChordsB(self):
+        from music21 import stream, note, chord, scale
+        sc = scale.MajorScale('c4')
+
+        s = stream.Stream()
+        s.append(note.Note('c3'))
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        #s.append(note.Note('c3', quarterLength=2))
+        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+
+        b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)
+        b.process()
+        self.assertEqual(b.data, [['C', [(0.0, 1.0), (1.5, 1.5)]], ['', []], ['D', [(1.5, 1.5)]], ['', []], ['E', [(1.0, 0.5), (1.5, 1.5)]], ['F', [(1.0, 0.5)]], ['', []], ['G', [(1.0, 0.5)]], ['', []], ['A', [(1.0, 0.5)]], ['', []], ['B', [(1.5, 1.5)]]] )
+        #b.write()
+
+
+        s = stream.Stream()
+        s.append(note.Note('c3'))
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        #s.append(note.Note('c3', quarterLength=2))
+        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+
+        b = PlotHorizontalBarPitchSpaceOffset(s, doneAction=None)
+        b.process()
+        self.assertEqual(b.data, [['C3', [(0.0, 1.0)]], ['', []], ['', []], ['', []], ['E3', [(1.0, 0.5)]], ['F3', [(1.0, 0.5)]], ['', []], ['G3', [(1.0, 0.5)]], ['', []], ['A3', [(1.0, 0.5)]], ['', []], ['B3', [(1.5, 1.5)]], ['C4', [(1.5, 1.5)]], ['', []], ['D4', [(1.5, 1.5)]], ['', []], ['E4', [(1.5, 1.5)]]] )
+        #b.write()
+
+
+        s = stream.Stream()
+        s.append(note.Note('c3'))
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        #s.append(note.Note('c3', quarterLength=2))
+        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(note.Note('c5', quarterLength=3))
+
+        b = PlotScatterWeightedPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
+        b.process()
+        self.assertEqual(b.data, [[0.5, 48, 0], [1.0, 48, 1], [1.5, 48, 0], [3, 48, 0], [0.5, 49, 0], [1.0, 49, 0], [1.5, 49, 0], [3, 49, 0], [0.5, 50, 0], [1.0, 50, 0], [1.5, 50, 0], [3, 50, 0], [0.5, 51, 0], [1.0, 51, 0], [1.5, 51, 0], [3, 51, 0], [0.5, 52, 1], [1.0, 52, 0], [1.5, 52, 0], [3, 52, 0], [0.5, 53, 1], [1.0, 53, 0], [1.5, 53, 0], [3, 53, 0], [0.5, 54, 0], [1.0, 54, 0], [1.5, 54, 0], [3, 54, 0], [0.5, 55, 1], [1.0, 55, 0], [1.5, 55, 0], [3, 55, 0], [0.5, 56, 0], [1.0, 56, 0], [1.5, 56, 0], [3, 56, 0], [0.5, 57, 1], [1.0, 57, 0], [1.5, 57, 0], [3, 57, 0], [0.5, 58, 0], [1.0, 58, 0], [1.5, 58, 0], [3, 58, 0], [0.5, 59, 0], [1.0, 59, 0], [1.5, 59, 1], [3, 59, 0], [0.5, 60, 0], [1.0, 60, 0], [1.5, 60, 1], [3, 60, 0], [0.5, 61, 0], [1.0, 61, 0], [1.5, 61, 0], [3, 61, 0], [0.5, 62, 0], [1.0, 62, 0], [1.5, 62, 1], [3, 62, 0], [0.5, 63, 0], [1.0, 63, 0], [1.5, 63, 0], [3, 63, 0], [0.5, 64, 0], [1.0, 64, 0], [1.5, 64, 1], [3, 64, 0], [0.5, 65, 0], [1.0, 65, 0], [1.5, 65, 0], [3, 65, 2], [0.5, 66, 0], [1.0, 66, 0], [1.5, 66, 0], [3, 66, 0], [0.5, 67, 0], [1.0, 67, 0], [1.5, 67, 0], [3, 67, 2], [0.5, 68, 0], [1.0, 68, 0], [1.5, 68, 0], [3, 68, 0], [0.5, 69, 0], [1.0, 69, 0], [1.5, 69, 0], [3, 69, 2], [0.5, 70, 0], [1.0, 70, 0], [1.5, 70, 0], [3, 70, 0], [0.5, 71, 0], [1.0, 71, 0], [1.5, 71, 0], [3, 71, 2], [0.5, 72, 0], [1.0, 72, 0], [1.5, 72, 0], [3, 72, 3], [0.5, 73, 0], [1.0, 73, 0], [1.5, 73, 0], [3, 73, 0], [0.5, 74, 0], [1.0, 74, 0], [1.5, 74, 0], [3, 74, 2], [0.5, 75, 0], [1.0, 75, 0], [1.5, 75, 0], [3, 75, 0], [0.5, 76, 0], [1.0, 76, 0], [1.5, 76, 0], [3, 76, 2], [0.5, 77, 0], [1.0, 77, 0], [1.5, 77, 0], [3, 77, 2], [0.5, 78, 0], [1.0, 78, 0], [1.5, 78, 0], [3, 78, 0], [0.5, 79, 0], [1.0, 79, 0], [1.5, 79, 0], [3, 79, 2]] )
+        #b.write()
 
 
 
+        s = stream.Stream()
+        s.append(note.Note('c3'))
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        #s.append(note.Note('c3', quarterLength=2))
+        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(note.Note('c5', quarterLength=3))
+
+        b = PlotScatterWeightedPitchClassQuarterLength(s, doneAction=None, xLog=False)
+        b.process()
+        self.assertEqual(b.data, [[0.5, 0, 0], [1.0, 0, 1], [1.5, 0, 1], [3, 0, 3], [0.5, 1, 0], [1.0, 1, 0], [1.5, 1, 0], [3, 1, 0], [0.5, 2, 0], [1.0, 2, 0], [1.5, 2, 1], [3, 2, 2], [0.5, 3, 0], [1.0, 3, 0], [1.5, 3, 0], [3, 3, 0], [0.5, 4, 1], [1.0, 4, 0], [1.5, 4, 1], [3, 4, 2], [0.5, 5, 1], [1.0, 5, 0], [1.5, 5, 0], [3, 5, 4], [0.5, 6, 0], [1.0, 6, 0], [1.5, 6, 0], [3, 6, 0], [0.5, 7, 1], [1.0, 7, 0], [1.5, 7, 0], [3, 7, 4], [0.5, 8, 0], [1.0, 8, 0], [1.5, 8, 0], [3, 8, 0], [0.5, 9, 1], [1.0, 9, 0], [1.5, 9, 0], [3, 9, 2], [0.5, 10, 0], [1.0, 10, 0], [1.5, 10, 0], [3, 10, 0], [0.5, 11, 0], [1.0, 11, 0], [1.5, 11, 1], [3, 11, 2]])
+        #b.write()
+
+
+        from music21 import dynamics
+
+        s = stream.Stream()
+        s.append(dynamics.Dynamic('f'))
+        #s.append(note.Note('c3'))
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        #s.append(note.Note('c3', quarterLength=2))
+        s.append(dynamics.Dynamic('mf'))
+        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(dynamics.Dynamic('pp'))
+        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(note.Note('c5', quarterLength=3))
+
+        b = PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None, xLog=False)
+        b.process()
+        self.assertEqual(b.data, [(69, 4, 2), (74, 4, 2), (76, 7, 1), (65, 4, 2), (59, 7, 1), (79, 7, 1), (72, 7, 1), (59, 8, 1), (64, 8, 1), (62, 7, 1), (69, 7, 1), (55, 8, 1), (62, 8, 1), (60, 8, 1), (71, 4, 2), (76, 4, 2), (65, 7, 1), (57, 8, 1), (67, 4, 2), (72, 4, 3), (77, 4, 2), (52, 8, 1), (71, 7, 1), (53, 8, 1), (64, 7, 1), (67, 7, 1), (74, 7, 1), (77, 7, 1), (79, 4, 2), (60, 7, 1)])
+        #b.write()
+
+
+
+
+        s = stream.Stream()
+        s.append(dynamics.Dynamic('f'))
+        s.append(note.Note('c3'))
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(dynamics.Dynamic('mf'))
+        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(dynamics.Dynamic('pp'))
+        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(note.Note('c5', quarterLength=3))
+
+        b = Plot3DBarsPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
+        b.process()
+        self.assertEqual(b.data, {48: [[0.5, 0], [1.0, 1], [1.5, 0], [3, 0]], 49: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 50: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 51: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 52: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 53: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 54: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 55: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 56: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 57: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 58: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 59: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 60: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 61: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 62: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 63: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 64: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 65: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 66: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 67: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 68: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 69: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 70: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 71: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 72: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 2]], 73: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 74: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 75: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 76: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 77: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 78: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 79: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]]})
+        #b.write()
+
+
+
+    def testPlotChordsC(self):
+        from music21 import stream, dynamics, note, scale
+
+        sc = scale.MajorScale('c4')
+
+        s = stream.Stream()
+        s.append(dynamics.Dynamic('f'))
+        s.append(note.Note('c4'))
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        #s.append(note.Note('c3', quarterLength=2))
+        s.append(dynamics.Dynamic('mf'))
+        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(dynamics.Dynamic('pp'))
+        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(note.Note('c5', quarterLength=3))
+        
+        for args in [
+            ('histogram', 'pitch'),
+            ('histogram', 'pitchclass'), 
+            ('histogram', 'quarterlength'), 
+            ('scatter', 'pitch', 'quarterlength'), 
+            ('scatter', 'pitchspace', 'offset'), 
+            ('scatter', 'pitch', 'offset'), 
+            ('scatter', 'dynamics'), 
+            ('bar', 'pitch'), 
+            ('bar', 'pc'), 
+            ('weighted', 'pc', 'duration'), 
+            ('weighted', 'dynamics'), 
+                    ]:
+            #s.plot(*args, doneAction='write')
+            s.plot(*args, doneAction=None)
+        
 
 
 #-------------------------------------------------------------------------------

@@ -1390,9 +1390,9 @@ class Stream(music21.Music21Object):
     def plot(self, *args, **keywords):
         '''Given a method and keyword configuration arguments, create and display a plot.
 
-        Note: plot() requires matplotib to be installed.
+        Note: plot() requires the Python package matplotib to be installed.
 
-        For details on arguments, see :func:`~music21.graph.plotStream`.
+        For details on arguments this function takes, see :func:`~music21.graph.plotStream`.
    
         Available plots include the following Plot classes:
     
