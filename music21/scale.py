@@ -1193,8 +1193,9 @@ class ConcreteScale(Scale):
 
     def getChord(self, minPitch=None, maxPitch=None, 
         direction=DIRECTION_ASCENDING, **keywords):
-        '''Return a realized chord containing all the pitches in this scale within
-        a particular range
+        '''Return a realized chord containing all the pitches in this scale within a particular inclusive range defined by two pitches.
+
+        All keyword arguments are passed on to the Chord, permitting specification of `quarterLength` and similar parameters.
         '''
         from music21 import chord
         return chord.Chord(self.getPitches(minPitch=minPitch, maxPitch=maxPitch, direction=direction), **keywords)

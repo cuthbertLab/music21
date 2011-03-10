@@ -1515,7 +1515,7 @@ class PlotStream(object):
         # see if this stream has any Measures, or has any references to
         # Measure obtained through contexts
         # look at measures first, as this will always be faster
-        environLocal.printDebug(['ticksOffset: about to call measure offset', self.streamObj])
+        #environLocal.printDebug(['ticksOffset: about to call measure offset', self.streamObj])
 
         if self.streamObj.hasPartLikeStreams():
             # if we have part-like sub streams; we can assume that all parts
@@ -1535,7 +1535,7 @@ class PlotStream(object):
         else:
             self._axisLabelUsesMeasures = False
 
-        environLocal.printDebug(['ticksOffset: got offset map keys', offsetMap.keys(), self._axisLabelUsesMeasures])
+        #environLocal.printDebug(['ticksOffset: got offset map keys', offsetMap.keys(), self._axisLabelUsesMeasures])
 
 
         ticks = [] # a list of graphed value, string label pairs
@@ -1583,7 +1583,7 @@ class PlotStream(object):
             for i in range(oMin, oMax+1, offsetStepSize):
                 ticks.append([i, '%s' % i])
 
-        environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
+        #environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
         return ticks
 
     def remapQuarterLength(self, x):
@@ -1852,23 +1852,24 @@ class PlotHistogram(PlotStream):
         '''Look for Note-like attributes in a Chord.
         '''
         values = []
-        for p in c.pitches:
-            # try to get get values from pitch first, then chord
-            value = None
-            try:
-                value = fx(p)
-            except AttributeError:
-                break # do not try others
-            if value is not None:
-                values.append(value)
+        value = None
+        try:
+            value = fx(c)
+        except AttributeError:
+            pass # do not try others
+        if value is not None:
+            values.append(value)
+
         if values == []: # still not set, get form chord
-            value = None
-            try:
-                value = fx(c)
-            except AttributeError:
-                pass # do not try others
-            if value is not None:
-                values.append(value)
+            for p in c.pitches:
+                # try to get get values from pitch first, then chord
+                value = None
+                try:
+                    value = fx(p)
+                except AttributeError:
+                    break # do not try others
+                if value is not None:
+                    values.append(value)
         return values
 
     def _extractData(self, dataValueLegit=True):
@@ -2097,8 +2098,70 @@ class PlotScatter(PlotStream):
         self.fxTicks = self.ticksQuarterLength
 
 
-    def _extractChordData(self, fx, c):
-        pass
+    def _extractChordData(self, fx, fy, c, matchPitchCount=False):
+        xValues = []
+        yValues = []
+        x = None
+        y = None
+
+        for b in [(fx, x, xValues), (fy, y, yValues)]:
+            #environLocal.printDebug(['b', b])
+            f, target, dst = b
+            try:
+                target = f(c)
+            except AttributeError:
+                pass 
+            if target is not None:
+                dst.append(target)
+
+
+        #environLocal.printDebug(['after looking at Chord:', 'xValues', xValues, 'yValues', yValues])
+        # get form pitches only if cannot be gotten from chord;
+        # this is necessary as pitches have an offset, but here we are likley
+        # looking for chord offset, etc.
+
+        if (xValues == [] and yValues == []): # still not set, get form chord
+            bundleGroups = [(fx, x, xValues), (fy, y, yValues)]
+            environLocal.printDebug(['trying to fill x + y'])
+        # x values not set from pitch; get form chord
+        elif (xValues == [] and yValues != []): # still not set, get form chord
+            bundleGroups = [(fx, x, xValues)]
+            #environLocal.printDebug(['trying to fill x'])
+        # y values not set from pitch; get form chord
+        elif (yValues == [] and xValues != []):
+            bundleGroups = [(fy, y, yValues)]
+            #environLocal.printDebug(['trying to fill y'])
+        else:
+            bundleGroups = []
+
+        for b in bundleGroups:
+            for p in c.pitches:
+                x = None
+                y = None
+                f, target, dst = b
+                try:
+                    target = f(p)
+                except AttributeError:
+                    pass # must try others
+                if target is not None:
+                    dst.append(target)
+
+        #environLocal.printDebug(['after looking at Pitch:', 'xValues', xValues, 'yValues', yValues])
+
+        # if we only have one attribute form the Chrod, and many from the 
+        # Pitches, need to make the number of data points equal by 
+        # duplicating data
+        if matchPitchCount: 
+            if len(xValues) == 1 and len(yValues) > 1:
+                #environLocal.printDebug(['balancing x'])
+                for i in range(len(yValues) - 1):
+                    xValues.append(xValues[0])
+            elif len(yValues) == 1 and len(xValues) > 1:
+                #environLocal.printDebug(['balancing y'])
+                for i in range(len(xValues) - 1):
+                    yValues.append(yValues[0])
+
+        return xValues, yValues
 
 
     def _extractData(self, xLog=False):
@@ -2112,25 +2175,49 @@ class PlotScatter(PlotStream):
         else:
             sSrc = self.streamObj
 
+        # get all unique values for both x and y
         for noteObj in sSrc.getElementsByClass(note.Note):
             x = self.fx(noteObj)
             if xLog:
                 x = self.remapQuarterLength(x)
-
             y = self.fy(noteObj)
             if x not in xValues:
                 xValues.append(x)            
             if y not in xValues:
                 yValues.append(x)            
-   
+        for chordObj in sSrc.getElementsByClass(chord.Chord):
+            xSrc, ySrc = self._extractChordData(self.fx, self.fy, 
+                         chordObj, matchPitchCount=False)
+            for x in xSrc:
+                if x not in xValues:
+                    xValues.append(x)            
+            for y in ySrc:
+                if y not in xValues:
+                    yValues.append(y)     
+
         xValues.sort()
         yValues.sort()
+
+        # count the frequency of each item
         for noteObj in sSrc.getElementsByClass(note.Note):
             x = self.fx(noteObj)
             if xLog:
                 x = self.remapQuarterLength(x)
             y = self.fy(noteObj)
             data.append([x, y])
+
+        for chordObj in sSrc.getElementsByClass(chord.Chord):
+            # here, need an x for every y, so match pitch count
+            xSrc, ySrc = self._extractChordData(self.fx, self.fy, 
+                         chordObj, matchPitchCount=True)
+            #environLocal.printDebug(['xSrc', xSrc, 'ySrc', ySrc])
+            for i, x in enumerate(xSrc):
+                y = ySrc[i]
+                if xLog:
+                    x = self.remapQuarterLength(x)
+                data.append([x, y])
+
+        #environLocal.printDebug(['data', data])
 
         xVals = [x for x,y in data]
         yVals = [y for x,y in data]
@@ -3485,6 +3572,12 @@ class Test(unittest.TestCase):
         from music21 import stream, note, chord, scale
         sc = scale.MajorScale('c4')
 
+        b = PlotHistogram(stream.Stream(), doneAction=None)
+        c = chord.Chord(['b', 'c', 'd'])
+        fx = lambda n:n.midi
+        self.assertEqual(b._extractChordData(fx, c), [71, 60, 62])
+
+
         s = stream.Stream()
         s.append(chord.Chord(['b', 'c#', 'd']))
         s.append(note.Note('c3'))
@@ -3511,6 +3604,66 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data, [(0, 1), (1, 1)])
 
 
+        # test scatter plots
+
+
+        b = PlotScatter(stream.Stream(), doneAction=None)
+        c = chord.Chord(['b', 'c', 'd'], quarterLength=.5)
+        fx = lambda n:n.midi
+        fy = lambda n:n.quarterLength
+        self.assertEqual(b._extractChordData(fx, fy, c), ([71, 60, 62], [0.5]))
+        c = chord.Chord(['b', 'c', 'd'], quarterLength=.5)
+        # matching the number of pitches for each data point may be needed
+        self.assertEqual(b._extractChordData(fx, fy, c, matchPitchCount=True), ([71, 60, 62], [0.5, 0.5, 0.5]) )
+
+
+        s = stream.Stream()
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('b3','c5', quarterLength=1.5))
+        s.append(note.Note('c3', quarterLength=2))
+        b = PlotScatterPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
+        b.process()
+        self.assertEqual(b.data, [[2, 48], [0.5, 52], [0.5, 53], [0.5, 55], [0.5, 57], [1.5, 59], [1.5, 60], [1.5, 62], [1.5, 64], [1.5, 65], [1.5, 67], [1.5, 69], [1.5, 71], [1.5, 72]])
+        #b.write()
+
+
+        s = stream.Stream()
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('b3','c5', quarterLength=1.5))
+        s.append(note.Note('c3', quarterLength=2))
+        b = PlotScatterPitchClassQuarterLength(s, doneAction=None, xLog=False)
+        b.process()
+        self.assertEqual(b.data, [[2, 0], [0.5, 4], [0.5, 5], [0.5, 7], [0.5, 9], [1.5, 11], [1.5, 0], [1.5, 2], [1.5, 4], [1.5, 5], [1.5, 7], [1.5, 9], [1.5, 11], [1.5, 0]] )
+        #b.write()
+
+        s = stream.Stream()
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(note.Note('c3', quarterLength=2))
+        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(note.Note('d3', quarterLength=2))
+        self.assertEqual([e.offset for e in s], [0.0, 0.5, 2.5, 4.0])
+
+        #s.show()
+        b = PlotScatterPitchClassOffset(s, doneAction=None)
+        b.process()
+        self.assertEqual(b.data, [[0.5, 0], [4.0, 2], [0.0, 4], [0.0, 5], [0.0, 7], [0.0, 9], [2.5, 11], [2.5, 0], [2.5, 2], [2.5, 4]] )
+        #b.write()
+
+
+        from music21 import dynamics
+        s = stream.Stream()
+        s.append(dynamics.Dynamic('f'))
+        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        #s.append(note.Note('c3', quarterLength=2))
+        s.append(dynamics.Dynamic('p'))
+        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        #s.append(note.Note('d3', quarterLength=2))
+
+        #s.show()
+        b = PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None)
+        b.process()
+        self.assertEqual(b.data, [[52, 8], [53, 8], [55, 8], [57, 8], [59, 8], [59, 5], [60, 8], [60, 5], [62, 8], [62, 5], [64, 8], [64, 5]])
+        #b.write()
 
 
 

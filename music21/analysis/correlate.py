@@ -22,6 +22,7 @@ from music21 import common
 from music21 import converter
 from music21 import stream
 from music21 import note
+from music21 import chord
 from music21 import dynamics
 from music21 import pitch
 from music21 import duration
@@ -67,7 +68,7 @@ class ActivityMatch(object):
 
         '''        
         if objNameSrc == None:
-            objNameSrc = note.Note
+            objNameSrc = (note.Note, chord.Chord)
         if objNameDst == None:
             objNameDst = dynamics.Dynamic
 
@@ -97,6 +98,7 @@ class ActivityMatch(object):
                     entry['dst'].append(element)            
                 
         self.data = post
+        #environLocal.printDebug(['_findActive', self.data])
         return self.data
 
 
@@ -116,9 +118,10 @@ class ActivityMatch(object):
         >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
         >>> data = am.pitchToDynamic()
         >>> len(data)
-        388
+        427
         '''
-        objNameSrc = note.Note
+        objNameSrc = (note.Note, chord.Chord)
+        #objNameSrc = note.Note
         objNameDst = dynamics.Dynamic
 
         for objName in [objNameSrc, objNameDst]:
@@ -132,12 +135,25 @@ class ActivityMatch(object):
         # get index value used for dynamics
         fy = lambda e: dynamics.shortNames.index(e.value)
 
+        # TODO: needs to handle chords as entrySrc
         pairs = []
         for entry in self.data:
             entrySrc = entry['src']
             # there may be multiple dst:
-            for entryDst in entry['dst']:
-                pairs.append([fx(entrySrc), fy(entryDst)])
+
+            if hasattr(entrySrc, 'pitches'): # a chord
+                sub = entrySrc.pitches
+            else:   
+                sub = [entrySrc]
+
+            for entrySrc in sub:
+                for entryDst in entry['dst']:
+                    x = fx(entrySrc)
+                    y = fy(entryDst)
+                    if x is None or y is None:
+                        pass
+                    else:
+                        pairs.append([x, y])
 
         # if requesting data points, just return all points
         if dataPoints:
@@ -201,7 +217,7 @@ class Test(unittest.TestCase):
         dataPairs = b.pitchToDynamic()
         #print dataPairs
         # previous pair count was 401
-        self.assertEqual(len(dataPairs), 388)
+        self.assertEqual(len(dataPairs), 427)
 
 
 #-------------------------------------------------------------------------------
