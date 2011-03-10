@@ -1207,6 +1207,8 @@ class Graph3DPolygonBars(Graph):
 
 class PlotStream(object):
     '''Approaches to plotting and graphing a stream. A base class from which Stream plotting Classes inherit.
+
+    This class has a number of public attributes, but these are generally not intended for direct user application. The `data` attribute, for example, exposes the internal data format of this plotting routine for testing, but no effort is made to make this data useful outside of the context of the Plot.
     '''
     # the following static parameters are used to for matching this
     # plot based on user-requested string aguments
@@ -1223,6 +1225,7 @@ class PlotStream(object):
             raise PlotStreamException('non-stream provided as argument: %s' % streamObj)
         self.streamObj = streamObj
         self.flatten = flatten
+        self.data = None # store native data representation, useful for testing
         self.graph = None  # store instance of graph class here
 
         # store axis label type for time-based plots
@@ -1231,6 +1234,8 @@ class PlotStream(object):
 
     def process(self):
         '''This will process all data, as well as call the done() method. What happens when the done() is called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph).
+
+        Subclass dependent data extracted is stored in the self.data attribute. 
         '''
         self.graph.process()
 
@@ -1843,7 +1848,7 @@ class PlotHistogram(PlotStream):
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
-    def _extactChordData(self, fx, c):
+    def _extractChordData(self, fx, c):
         '''Look for Note-like attributes in a Chord.
         '''
         values = []
@@ -1884,7 +1889,7 @@ class PlotHistogram(PlotStream):
             if value not in dataValues:
                 dataValues.append(value)
         for chordObj in sSrc.getElementsByClass(chord.Chord):
-            values = self._extactChordData(self.fx, chordObj)
+            values = self._extractChordData(self.fx, chordObj)
             for value in values:
                 if value not in dataValues:
                     dataValues.append(value)
@@ -1894,8 +1899,8 @@ class PlotHistogram(PlotStream):
         # second, count instances
         for obj in sSrc.getElementsByClass([note.Note, chord.Chord]):
             if 'Chord' in obj.classes:
-                values = self._extactChordData(self.fx, obj)
-                ticks = self._extactChordData(self.fxTick, obj)
+                values = self._extractChordData(self.fx, obj)
+                ticks = self._extractChordData(self.fxTick, obj)
             else: # simulate a list
                 values = [self.fx(obj)]            
                 ticks = [self.fxTick(obj)]            
@@ -1954,13 +1959,13 @@ class PlotHistogramPitchSpace(PlotHistogram):
         # replace with self.ticksPitchSpaceUsage
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData()
+        self.data, xTicks, yTicks = self._extractData()
 
         # filter xTicks to remove - in flat lables
         xTicks = self._filterPitchLabel(xTicks)
 
         self.graph = GraphHistogram(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setTicks('x', xTicks)
         self.graph.setTicks('y', yTicks)
@@ -2005,13 +2010,13 @@ class PlotHistogramPitchClass(PlotHistogram):
         # replace with self.ticksPitchClassUsage
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData()
+        self.data, xTicks, yTicks = self._extractData()
 
         # filter xTicks to remove - in flat lables
         xTicks = self._filterPitchLabel(xTicks)
 
         self.graph = GraphHistogram(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setTicks('x', xTicks)
         self.graph.setTicks('y', yTicks)
@@ -2050,10 +2055,10 @@ class PlotHistogramQuarterLength(PlotHistogram):
         self.fxTick = lambda n: n.quarterLength
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(dataValueLegit=False)
+        self.data, xTicks, yTicks = self._extractData(dataValueLegit=False)
 
         self.graph = GraphHistogram(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setTicks('x', xTicks)
         self.graph.setTicks('y', yTicks)
@@ -2091,8 +2096,12 @@ class PlotScatter(PlotStream):
         self.fx = lambda n:n.quarterLength
         self.fxTicks = self.ticksQuarterLength
 
-    def _extractData(self, xLog=False):
 
+    def _extractChordData(self, fx, c):
+        pass
+
+
+    def _extractData(self, xLog=False):
         # TODO: need to add support for Chords. 
         data = []
         xValues = []
@@ -2157,10 +2166,10 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
         self.fxTicks = self.ticksQuarterLength
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(xLog=self.xLog)
+        self.data, xTicks, yTicks = self._extractData(xLog=self.xLog)
 
         self.graph = GraphScatter(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
@@ -2204,10 +2213,10 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
         self.fxTicks = self.ticksQuarterLength
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData(xLog=self.xLog)
+        self.data, xTicks, yTicks = self._extractData(xLog=self.xLog)
 
         self.graph = GraphScatter(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
@@ -2255,10 +2264,10 @@ class PlotScatterPitchClassOffset(PlotScatter):
 #             xLog = keywords['xLog']
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks = self._extractData()
+        self.data, xTicks, yTicks = self._extractData()
 
         self.graph = GraphScatter(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
@@ -2297,17 +2306,17 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
 
         # get data from correlate object
         am = correlate.ActivityMatch(self.streamObj)
-        data  = am.pitchToDynamic(dataPoints=True)
+        self.data  = am.pitchToDynamic(dataPoints=True)
 
-        xVals = [x for x,y in data]
-        yVals = [y for x,y in data]
+        xVals = [x for x,y in self.data]
+        yVals = [y for x,y in self.data]
 
         xTicks = self.fxTicks(min(xVals), max(xVals))
         # ticks dynamics takes no args
         yTicks = self.fyTicks(min(yVals), max(yVals))
 
         self.graph = GraphScatter(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
@@ -2413,10 +2422,10 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
         self.fyTicks = self.ticksPitchClassUsage
         self.fxTicks = self.ticksOffset
 
-        data, xTicks, yTicks = self._extractData()
+        self.data, xTicks, yTicks = self._extractData()
 
         self.graph = GraphHorizontalBar(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         # only need to add x ticks; y ticks added from data labels
         #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset:', 'xTicks before setting to self.graph', xTicks])
@@ -2456,10 +2465,10 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
         self.fyTicks = self.ticksPitchSpaceUsage
         self.fxTicks = self.ticksOffset
 
-        data, xTicks, yTicks = self._extractData()
+        self.data, xTicks, yTicks = self._extractData()
 
         self.graph = GraphHorizontalBar(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         # only need to add x ticks; y ticks added from data labels
         self.graph.setTicks('x', xTicks)  
@@ -2586,10 +2595,10 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchSpaceUsage
 
-        data, xTicks, yTicks = self._extractData(xLog=self.xLog)
+        self.data, xTicks, yTicks = self._extractData(xLog=self.xLog)
 
         self.graph = GraphScatterWeighted(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setAxisLabel('x', self._axisLabelQuarterLength(
                                 remap=self.xLog))
@@ -2631,10 +2640,10 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchClassUsage
 
-        data, xTicks, yTicks = self._extractData(xLog = self.xLog)
+        self.data, xTicks, yTicks = self._extractData(xLog = self.xLog)
 
         self.graph = GraphScatterWeighted(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setAxisLabel('x', self._axisLabelQuarterLength(
                                 remap=self.xLog))
@@ -2678,10 +2687,10 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
 
         # get data from correlate object
         am = correlate.ActivityMatch(self.streamObj)
-        data  = am.pitchToDynamic(dataPoints=False)
+        self.data = am.pitchToDynamic(dataPoints=False)
 
-        xVals = [x for x,y,z in data]
-        yVals = [y for x,y,z in data]
+        xVals = [x for x,y,z in self.data]
+        yVals = [y for x,y,z in self.data]
 
         xTicks = self.fxTicks(min(xVals), max(xVals))
         # ticks dynamics takes no args
@@ -2689,7 +2698,7 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
 
 
         self.graph = GraphScatterWeighted(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         self.graph.setAxisLabel('x', 'Pitch')
         self.graph.setAxisLabel('y', 'Dynamics')
@@ -2790,10 +2799,10 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
         self.fyTicks = self.ticksPitchSpaceUsage
 
         # will use self.fx and self.fxTick to extract data
-        data, xTicks, yTicks, zTicks = self._extractData()
+        self.data, xTicks, yTicks, zTicks = self._extractData()
 
         self.graph = Graph3DPolygonBars(*args, **keywords)
-        self.graph.setData(data)
+        self.graph.setData(self.data)
 
         #self.graph.setTicks('y', yTicks)
         #self.graph.setTicks('x', xTicks)
@@ -2957,7 +2966,7 @@ def plotStream(streamObj, *args, **keywords):
         obj = plotClassName(streamObj, *args, **keywords)
         obj.process()
 
-
+        
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
@@ -3473,15 +3482,41 @@ class Test(unittest.TestCase):
 
 
     def testPlotChords(self):
-        from music21 import stream, note, chord
+        from music21 import stream, note, chord, scale
+        sc = scale.MajorScale('c4')
+
         s = stream.Stream()
         s.append(chord.Chord(['b', 'c#', 'd']))
         s.append(note.Note('c3'))
         s.append(note.Note('c5'))
-
-        b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)
+        b = PlotHistogramPitchSpace(s, doneAction=None)
         b.process()
-        #s.plot('pitchclass')
+        #b.write()
+        self.assertEqual(b.data, [(48, 1), (61, 1), (62, 1), (71, 1), (72, 1)])
+
+        s = stream.Stream()
+        s.append(sc.getChord('e3','a3'))
+        s.append(note.Note('c3'))
+        b = PlotHistogramPitchClass(s, doneAction=None)
+        b.process()
+        #b.write()
+        self.assertEqual(b.data, [(0, 1), (4, 1), (5, 1), (7, 1), (9, 1)])
+
+        s = stream.Stream()
+        s.append(sc.getChord('e3','a3', quarterLength=2))
+        s.append(note.Note('c3', quarterLength=.5))
+        b = PlotHistogramQuarterLength(s, doneAction=None)
+        b.process()
+        #b.write()
+        self.assertEqual(b.data, [(0, 1), (1, 1)])
+
+
+
+
+
+
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
