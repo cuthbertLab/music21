@@ -408,7 +408,7 @@ class Dialog(object):
         '''
         if self._promptHeader is not None:
             header = self._promptHeader.strip()
-            if header.endswith('?'):
+            if header.endswith('?') or header.endswith('.'):
                 div = ''
             else:
                 div = ':'
@@ -833,7 +833,14 @@ class AskSendInstallationReport(YesOrNo):
         body.append('Below, please provide a few words about what sorts of tasks or problems you plan to explore with music21. Any information on your background is also appreciated (e.g., amateur musician, computer programmer, professional music researcher). Thanks!')
         body.append('')
 
-        msg = '''mailto:music21stats@gmail.com?subject=music21 Installation Report&body=%s''' % '\n'.join(body)
+        platform = common.getPlatform()
+        if platform == 'win': # need to add proper return carriage fro win
+            body = '\r\n'.join(body)
+        else:
+            body = '\n'.join(body)
+
+
+        msg = '''mailto:music21stats@gmail.com?subject=music21 Installation Report&body=%s''' % body
         return msg # pass this to webbrowser
 
     def _performAction(self, simulate=False):
@@ -1313,6 +1320,10 @@ class ConfigurationAssistant(object):
         d = AskOpenInBrowser(urlTarget=urlGettingStarted, prompt='Would you like to view the music21 Quick Start in a web browser?')
         self._dialogs.append(d)
 
+        d = AnyKey(promptHeader='The music21 Configuration Assistant is complete.')
+        self._dialogs.append(d)
+
+
 
     def _introduction(self):
         msg = []
@@ -1324,10 +1335,11 @@ class ConfigurationAssistant(object):
         writeToUser(msg)
 
     def _conclusion(self):
-        msg = []
-        msg.append('''The music21 Configuration Assistant is complete.''')
-        msg.append('')
-        writeToUser(msg)
+        pass
+#         msg = []
+#         msg.append('''The music21 Configuration Assistant is complete.''')
+#         msg.append('')
+#         writeToUser(msg)
 
 
     def _hr(self):
@@ -1365,7 +1377,7 @@ class ConfigurationAssistant(object):
                 # a user may have selected an option that requires breaking
                 break
 
-        self._hr()
+        #self._hr()
         self._conclusion()
 
 
