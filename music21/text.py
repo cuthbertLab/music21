@@ -40,7 +40,19 @@ articleReference = {
 
 #-------------------------------------------------------------------------------
 def assembleLyrics(streamIn):
-    '''Concatenate text from a stream.
+    '''
+    Concatenate text from a stream.
+    
+    >>> from music21 import *
+    >>> s = stream.Stream()
+    >>> n1 = note.Note()
+    >>> n1.lyric = "Hi"
+    >>> n2 = note.Note()
+    >>> n2.lyric = "there"
+    >>> s.append(n1)
+    >>> s.append(n2)
+    >>> text.assembleLyrics(s)
+    'Hi there'
     '''
     word = []; words = []
     noteStream = streamIn.flat.notes
