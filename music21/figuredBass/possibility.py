@@ -15,6 +15,7 @@ from music21 import pitch
 from music21 import voiceLeading
 from music21 import interval
 from music21 import environment
+from music21 import chord
 
 from music21.figuredBass import rules
 from music21.figuredBass import voice
@@ -704,6 +705,27 @@ class Possibility(dict):
             voiceLabels.append(v.label)
         
         return voiceLabels
+    
+    def chordify(self):
+        '''
+        Turns self into a music21 chord.Chord instance.
+        
+        >>> from music21 import pitch
+        >>> from music21.figuredBass import possibility
+        >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'T': pitch.Pitch('E4'), 'B': pitch.Pitch('C4')})
+        >>> p1.chordify()
+        <music21.chord.Chord C4 E4 C5>
+        >>> p2 = possibility.Possibility({'S': pitch.Pitch('B4'), 'T': pitch.Pitch('D4'), 'B': pitch.Pitch('D4')})
+        >>> p2.chordify()
+        <music21.chord.Chord D4 D4 B4>
+        '''
+        
+        pitchesInChord = []
+        for vl in self.keys():
+            pitchesInChord.append(self[vl])
+        
+        pitchesInChord.sort()
+        return chord.Chord(pitchesInChord)
         
 
 class PossibilityException(music21.Music21Exception):
