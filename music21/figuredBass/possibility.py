@@ -478,6 +478,10 @@ class Possibility(dict):
         hasCorrectTessitura = True
         orderedVoiceLabels = self.extractVoiceLabels(orderedVoiceList)
 
+        leapsWithinLimits = self.voiceLeapsWithinLimits(nextPossibility, orderedVoiceList, verbose)
+        if not leapsWithinLimits:
+            hasCorrectTessitura = False
+        
         if not fbRules.allowVoiceOverlap:
             hasVoiceOverlap = self.containsVoiceOverlap(nextPossibility, orderedVoiceLabels, verbose)
             if hasVoiceOverlap:
@@ -485,10 +489,6 @@ class Possibility(dict):
                 if not verbose:
                     return hasCorrectTessitura
 
-        leapsWithinLimits = self.voiceLeapsWithinLimits(nextPossibility, orderedVoiceList, verbose)
-        if not leapsWithinLimits:
-            hasCorrectTessitura = False
-        
         return hasCorrectTessitura
     
     def containsVoiceOverlap(self, nextPossibility, orderedVoiceLabels, verbose = False):
