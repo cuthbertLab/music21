@@ -164,15 +164,15 @@ class NextSegment(Segment):
         self.possibilities = nextPossibilities
 
     def checkVoiceLeading(self, prevPossib, nextPossib):
-        if not prevPossib.correctVoiceLeading(nextPossib, self.fbRules):
-            return False
-        
         vlTop = self.fbVoices[-1].label
         vlBottom = self.fbVoices[0].label
         if not prevPossib.noHiddenIntervals(nextPossib, vlTop, vlBottom, self.fbRules):
             return False
-        
+
         if not prevPossib.correctVoiceLeading2(nextPossib, self.fbVoices, self.fbRules):
+            return False
+        
+        if not prevPossib.correctVoiceLeading(nextPossib, self.fbRules):
             return False
         
         return True
