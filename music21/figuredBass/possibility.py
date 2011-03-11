@@ -354,16 +354,16 @@ class Possibility(dict):
         '''
         hasCorrectTessitura = True
         orderedVoiceLabels = self.extractVoiceLabels(orderedVoiceList)
-        
-        if not fbRules.allowVoiceCrossing:
-            hasVoiceCrossing = self.containsVoiceCrossing(orderedVoiceLabels, verbose)
-            if hasVoiceCrossing:
-                hasCorrectTessitura = False
-            if not verbose:
-                return hasCorrectTessitura
+
         if fbRules.filterPitchesByRange:
             pitchesInRange = self.pitchesWithinRange(orderedVoiceList, verbose)
             if not pitchesInRange:
+                hasCorrectTessitura = False
+            if not verbose:
+                return hasCorrectTessitura
+        if not fbRules.allowVoiceCrossing:
+            hasVoiceCrossing = self.containsVoiceCrossing(orderedVoiceLabels, verbose)
+            if hasVoiceCrossing:
                 hasCorrectTessitura = False
             if not verbose:
                 return hasCorrectTessitura
@@ -473,7 +473,24 @@ class Possibility(dict):
                     return pitchesInRange
 
         return pitchesInRange
-       
+    
+    def correctVoiceLeading2(self, nextPossibility, orderedVoiceList, fbRules = rules.Rules(), verbose = False):
+        hasCorrectTessitura = True
+        orderedVoiceLabels = self.extractVoiceLabels(orderedVoiceList)
+
+        if not fbRules.allowVoiceOverlap:
+            hasVoiceOverlap = self.containsVoiceOverlap(nextPossibility, orderedVoiceLabels, verbose)
+            if hasVoiceOverlap:
+                hasCorrectTessitura = False
+                if not verbose:
+                    return hasCorrectTessitura
+
+        leapsWithinLimits = self.voiceLeapsWithinLimits(nextPossibility, orderedVoiceList, verbose)
+        if not leapsWithinLimits:
+            hasCorrectTessitura = False
+        
+        return hasCorrectTessitura
+    
     def containsVoiceOverlap(self, nextPossibility, orderedVoiceLabels, verbose = False):
         '''
         Returns True if voice overlap is present between self and next possibility. 
@@ -549,7 +566,7 @@ class Possibility(dict):
                 if lowerPitch1 > higherPitch0 or higherPitch1 < lowerPitch0:
                     if verbose:
                         environRules = environment.Environment(_MOD)
-                        environRules.warn("Voice overlap between " + v0.label + " and " + v1.label + ".")
+                        environRules.warn("Voice overlap between " + vl1 + " and " + vl2 + ".")
                     hasVoiceOverlap = True
                     if not verbose:
                         return hasVoiceOverlap
