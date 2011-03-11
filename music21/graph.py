@@ -519,14 +519,16 @@ class GraphNetworxGraph(Graph):
             self.networkxGraph = keywords['networkxGraph']
         else:
             # testing default; temporary
-            ## TODO: Add import test.
-            g = networkx.Graph()
+            try:
+                g = networkx.Graph()
 #             g.add_edge('a','b',weight=1.0)
 #             g.add_edge('b','c',weight=0.6)
 #             g.add_edge('c','d',weight=0.2)
 #             g.add_edge('d','e',weight=0.6)
             
-            self.networkxGraph = g
+                self.networkxGraph = g
+            except NameError:
+                self.networkxGraph = None
 
     def process(self):
 

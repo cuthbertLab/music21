@@ -1208,7 +1208,9 @@ class Metadata(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def setWorkId(self, idStr, value):
-        '''Directly set a workd id, given either as a full string name or as a three character abbreviation. 
+        '''Directly set a workd id, given either as a full string name or as a three character abbreviation. The following work id abbreviations and their full id string are given as follows. In many cases the Metadata object support properties for convenient access to these work ids. 
+
+        Id abbreviations and strings: otl / title, otp / popularTitle, ota / alternativeTitle, opr / parentTitle, oac / actNumber, osc / sceneNumber, omv / movementNumber, omd / movementName, ops / opusNumber, onm / number, ovm / volume, ode / dedication, oco / commission, gtl / groupTitle, gaw / associatedWork, gco / collectionDesignation, txo / textOriginalLanguage, txl / textLanguage, ocy / countryOfComposition, opc / localeOfComposition.
 
         >>> md = Metadata(title='Quartet')
         >>> md.title
