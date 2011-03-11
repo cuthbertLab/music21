@@ -33,7 +33,7 @@ class Possibility(dict):
         # Imitates checkChord() from rules.py, but one calls the method on the Possibility object,
         # rather than providing the pitches as an argument and calling a Rules object.
         '''
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import rules
         >>> from music21.figuredBass import possibility
         >>> fbRules = rules.Rules()
@@ -66,7 +66,7 @@ class Possibility(dict):
         A possibility is incomplete if it doesn't contain at least
         one of each pitch name.
         
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> pitchNames = ['C','E','G']
         >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('E4'), 'B': pitch.Pitch('C3')})
@@ -95,7 +95,7 @@ class Possibility(dict):
         Returns True if upper voices are found within topVoicesMaxIntervalSeparation of each other, a.k.a.
         if the upper voices are found within that many semitones of each other.
         
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('E4'), 'B': pitch.Pitch('C3')})
         >>> p1.topVoicesWithinLimit(interval.Interval('P8'))
@@ -134,16 +134,13 @@ class Possibility(dict):
         # of being able to be used for 2 -> n voices.
         '''
         Returns True if all voicing rules as specified in the rules object are followed
-        in the progression of one possibility to another. This encompasses parallel fifths, 
-        parallel octaves, and voice leaps.
+        in the progression of one possibility to another. This encompasses parallel fifths and
+        parallel octaves.
         
-        Note that the next possibility need not have all the voices of the previous
-        possibility. What matters is that all the voices in the next possibility
-        be found in the previous possibility. For example, having {'S','A','T','B'} as 
-        a previous possibility and then having {'T','B'} as the next possibility
-        is OK. The method will then check the voice leading of only 'T' and 'B'.
+        Ignores voices which aren't shared between the possibilities, 
+        but raises an error if not enough voices are shared.
         
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import rules
         >>> from music21.figuredBass import possibility
         >>> fbRules = rules.Rules()
@@ -161,9 +158,6 @@ class Possibility(dict):
         >>> p2['Tenor'] = pitch.Pitch('G3')
         >>> p1.correctVoiceLeading(p2, fbRules)
         True
-        >>> p2['Bass'] = pitch.Pitch('C5')
-        >>> p1.correctVoiceLeading(p2, fbRules)
-        False
         '''
         hasCorrectVoiceLeading = True
 
@@ -180,24 +174,16 @@ class Possibility(dict):
                 if not verbose:
                     return hasCorrectVoiceLeading
 
-        botWithinLimit = self.topVoiceLeapsWithinLimit(nextPossibility, fbRules.topVoiceLeapIntervalLimit, verbose)
-        if not botWithinLimit:
-            hasCorrectVoiceLeading = False
-            if not verbose:
-                return hasCorrectVoiceLeading
-        topWithinLimit = self.bottomVoiceLeapWithinLimit(nextPossibility, fbRules.bottomVoiceLeapIntervalLimit, verbose)
-        if not topWithinLimit:
-            hasCorrectVoiceLeading = False
-            if not verbose:
-                return hasCorrectVoiceLeading
-
         return hasCorrectVoiceLeading
 
     def containsParallelFifths(self, nextPossibility, verbose = False):
         '''
         Checks for parallel fifths between self and a next possibility.
+
+        Ignores voices which aren't shared between the possibilities, 
+        but raises an error if not enough voices are shared.
         
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Tenor': pitch.Pitch('G3'), 'Bass': pitch.Pitch('C3')})
         >>> p2 = possibility.Possibility({'Tenor': pitch.Pitch('A3'), 'Bass': pitch.Pitch('D3')})
@@ -205,7 +191,10 @@ class Possibility(dict):
         True
         ''' 
         hasParallelFifth = False
-        voiceQuartets = self.findVoiceQuartets(nextPossibility)
+        try:
+            voiceQuartets = self.findVoiceQuartets(nextPossibility)
+        except PossibilityException:
+            raise PossibilityException("Need at least two shared voices to check for parallel fifths.")
         
         for (pitchA1, pitchA2, vl1, pitchB1, pitchB2, vl2) in voiceQuartets:
             vlq = voiceLeading.VoiceLeadingQuartet(pitchA1, pitchA2, pitchB1, pitchB2)
@@ -223,7 +212,10 @@ class Possibility(dict):
         '''
         Checks for parallel octaves between self and a next possibility.
         
-        >>> from music21 import *
+        Ignores voices which aren't shared between the possibilities, 
+        but raises an error if not enough voices are shared.
+
+        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Tenor': pitch.Pitch('C4'), 'Bass': pitch.Pitch('C3')})
         >>> p2 = possibility.Possibility({'Tenor': pitch.Pitch('D4'), 'Bass': pitch.Pitch('D3')})
@@ -231,7 +223,10 @@ class Possibility(dict):
         True
         '''        
         hasParallelOctave = False
-        voiceQuartets = self.findVoiceQuartets(nextPossibility)
+        try:
+            voiceQuartets = self.findVoiceQuartets(nextPossibility)
+        except PossibilityException:
+            raise PossibilityException("Need at least two shared voices to check for parallel octaves.")
         
         for (pitchA1, pitchA2, vl1, pitchB1, pitchB2, vl2) in voiceQuartets:
             vlq = voiceLeading.VoiceLeadingQuartet(pitchA1, pitchA2, pitchB1, pitchB2)
@@ -244,77 +239,7 @@ class Possibility(dict):
                     return hasParallelOctave
         
         return hasParallelOctave
-    
-    def topVoiceLeapsWithinLimit(self, nextPossibility, topVoiceLeapIntervalLimit = None, verbose = False):
-        '''
-        Returns True if there is no voice leap in any of the upper voices, a.k.a. the number of semitones difference
-        in the previous and next pitches of any of the upper voices is not greater than topVoiceLeapIntervalLimit.
         
-        >>> from music21 import *
-        >>> from music21.figuredBass import possibility
-        >>> p1 = possibility.Possibility({'Soprano': pitch.Pitch('C5'), 'Tenor': pitch.Pitch('C4'), 'Bass': pitch.Pitch('C3')})
-        >>> p2 = possibility.Possibility({'Soprano': pitch.Pitch('B4'), 'Tenor': pitch.Pitch('D4'), 'Bass': pitch.Pitch('D3')})
-        >>> p1.topVoiceLeapsWithinLimit(p2, interval.Interval('P5'))
-        True
-        >>> p2['Tenor'] = pitch.Pitch('B4')
-        >>> p1.topVoiceLeapsWithinLimit(p2, interval.Interval('P5'))
-        False
-        '''
-
-        withinLimit = True
-        if topVoiceLeapIntervalLimit == None:
-            return withinLimit
-        i0 = topVoiceLeapIntervalLimit
-
-        voicePairs = self.findVoicePairs(nextPossibility)        
-        voicePairs.sort()
-        
-        for voiceIndex in range(1, len(voicePairs)):
-            (v1n1, v1n2, vl) = voicePairs[voiceIndex]
-            i1 = interval.notesToInterval(v1n1, v1n2)
-            if abs(i1.chromatic.semitones) > abs(i0.chromatic.semitones):
-                if verbose:
-                    environRules = environment.Environment(_MOD)
-                    environRules.warn("Voice leap in " + vl + " voice.")
-                withinLimit = False
-                if not verbose:
-                    return withinLimit
-                
-        return withinLimit
-        
-    def bottomVoiceLeapWithinLimit(self, nextPossibility, bottomVoiceLeapIntervalLimit = None, verbose = False):
-        '''
-        Returns True if there is no voice leap in the lowest voice, a.k.a. the number of semitones difference
-        in the previous and next pitches of the lowest voice is not greater than bottomVoiceLeapIntervalLimit.
-        
-        >>> from music21 import *
-        >>> from music21.figuredBass import possibility
-        >>> p1 = possibility.Possibility({'Tenor': pitch.Pitch('C4'), 'Bass': pitch.Pitch('C3')})
-        >>> p2 = possibility.Possibility({'Tenor': pitch.Pitch('D4'), 'Bass': pitch.Pitch('D3')})
-        >>> p1.bottomVoiceLeapWithinLimit(p2, interval.Interval('P8'))
-        True
-        >>> p2['Bass'] = pitch.Pitch('D4')
-        >>> p1.bottomVoiceLeapWithinLimit(p2, interval.Interval('P8'))
-        False
-        '''
-        withinLimit = True
-        if bottomVoiceLeapIntervalLimit == None:
-            return withinLimit
-        i0 = bottomVoiceLeapIntervalLimit
-        
-        voicePairs = self.findVoicePairs(nextPossibility)        
-        voicePairs.sort()
-
-        (v0n1, v0n2, vl) = voicePairs[0]
-        i1 = interval.notesToInterval(v0n1, v0n2)
-        if abs(i1.chromatic.semitones) > abs(i0.chromatic.semitones):
-            if verbose:
-                environRules = environment.Environment(_MOD)
-                environRules.warn("Voice leap in " + vl + " voice.")
-            withinLimit = False
-            
-        return withinLimit
-    
     # HIDDEN INTERVAL RULES
     def noHiddenIntervals(self, nextPossibility, vlTop, vlBottom, fbRules = rules.Rules(), verbose = False):
         # Imitates checkChords() from rules.py for checking of hidden fifths/hidden octave, BUT has the
@@ -323,7 +248,7 @@ class Possibility(dict):
         Checks for hidden fifths and octaves between self and a next possibility, as specified in fbRules. 
         To remove ambiguities, asked to provide the dictionary key of the top voice and the key of the bottom voice.
         
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> from music21.figuredBass import rules
         >>> fbRules = rules.Rules()
@@ -358,7 +283,7 @@ class Possibility(dict):
         Checks for hidden fifths between self and a next possibility. To remove ambiguities,
         asked to provide the dictionary key of the top voice and the key of the bottom voice.
         
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Soprano': pitch.Pitch('E5'), 'Bass': pitch.Pitch('C3')})
         >>> p2 = possibility.Possibility({'Soprano': pitch.Pitch('A5'), 'Bass': pitch.Pitch('D3')})
@@ -385,7 +310,7 @@ class Possibility(dict):
         Checks for hidden octaves between self and a next possibility. To remove ambiguities,
         asked to provide the dictionary key of the top voice and the key of the bottom voice.
         
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Soprano': pitch.Pitch('A5'), 'Bass': pitch.Pitch('C3')})
         >>> p2 = possibility.Possibility({'Soprano': pitch.Pitch('D6'), 'Bass': pitch.Pitch('D3')})
@@ -410,7 +335,7 @@ class Possibility(dict):
     # TESSITURA RULES    
     def correctTessitura(self, orderedVoiceList, fbRules = rules.Rules(), verbose = False):
         '''
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import voice
         >>> from music21.figuredBass import possibility
         >>> from music21.figuredBass import rules
@@ -701,45 +626,53 @@ class Possibility(dict):
     # HELPER METHODS
     def findVoicePairs(self, nextPossibility):
         '''
-        Group the previous and next pitches of every voice together.
+        Group the previous and next pitches of every voice together. Ignores voices which
+        aren't shared by both possibilities.
         
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
-        >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'T': pitch.Pitch('E4'), 'B': pitch.Pitch('C4')})
+        >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'B': pitch.Pitch('C4')})
         >>> p2 = possibility.Possibility({'S': pitch.Pitch('B4'), 'T': pitch.Pitch('D4'), 'B': pitch.Pitch('D4')})
         >>> p1.findVoicePairs(p2)
-        [(C5, B4, 'S'), (C4, D4, 'B'), (E4, D4, 'T')]
+        [(C5, B4, 'S'), (C4, D4, 'B')]
+        >>> p3 = possibility.Possibility({'X': pitch.Pitch('B4'), 'Y': pitch.Pitch('D4')})
+        >>> p1.findVoicePairs(p3)
+        Traceback (most recent call last):
+        PossibilityException: No shared voices to group together.
         '''
-        cp = nextPossibility
+        np = nextPossibility
         
         voicePairs = []
-        for voiceLabel in cp.keys():
-            if voiceLabel not in self.keys():
-                raise PossibilityException("Key not shared among both self and next possibilities.")
-            voicePair = (self[voiceLabel], cp[voiceLabel], voiceLabel)
-            voicePairs.append(voicePair)
-
+        for voiceLabel in self.keys():
+            if voiceLabel in np.keys():
+                voicePair = (self[voiceLabel], np[voiceLabel], voiceLabel)
+                voicePairs.append(voicePair)
+        
+        if len(voicePairs) == 0:
+            raise PossibilityException("No shared voices to group together.")
+        
         return voicePairs
     
     def findVoiceQuartets(self, nextPossibility):
         '''
-        Group the previous and next pitches of one voice with those of another.
+        Group the previous and next pitches of one voice with those of another. Raises an error if there are not
+        at least two shared voices between the two possibilities.
         
-        >>> from music21 import *
+        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'T': pitch.Pitch('E4'), 'B': pitch.Pitch('C4')})
         >>> p2 = possibility.Possibility({'S': pitch.Pitch('B4'), 'T': pitch.Pitch('D4'), 'B': pitch.Pitch('D4')})
         >>> p1.findVoiceQuartets(p2)
         [(C5, B4, 'S', C4, D4, 'B'), (C5, B4, 'S', E4, D4, 'T'), (C4, D4, 'B', E4, D4, 'T')]
-        '''
-        cp = nextPossibility
-        if len(cp.keys()) <= 1:
-            raise PossibilityException("Not enough voices provided in next possibility.")
-        for voiceLabel in cp.keys():
-            if voiceLabel not in self.keys():
-                raise PossibilityException("Key not shared among both self and next possibilities.")
-            
+        >>> p3 = possibility.Possibility({'X': pitch.Pitch('B4'), 'Y': pitch.Pitch('D4'), 'B': pitch.Pitch('D4')})
+        >>> p1.findVoiceQuartets(p3)
+        Traceback (most recent call last):
+        PossibilityException: Need at least two shared voices to find voice quartets.
+        '''            
         voicePairs = self.findVoicePairs(nextPossibility)        
+        if len(voicePairs) == 1:
+            raise PossibilityException("Need at least two shared voices to find voice quartets.")
+        
         voiceQuartets = []
         
         for i in range(len(voicePairs)):
