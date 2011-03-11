@@ -33,13 +33,56 @@ class Segment:
         self.nextSegment = None
 
     def solve(self):
-        raise SegmentException("solve() is specific to an Antecedent or Consequent Segment.")
+        raise SegmentException("Must specifically create PreviousSegment or NextSegment to call this method.")
+    
+    def allPossibilities(self):
+        possibilities = []
+        
+        bassPossibility = possibility.Possibility()
+        previousVoice = self.fbVoices[0]
+        bassPossibility[previousVoice.label] = self.bassNote.pitch
+        possibilities.append(bassPossibility)
+        
+        for voiceNumber in range(1, len(self.fbVoices)):
+            oldLength = len(possibilities)
+            currentVoice = self.fbVoices[voiceNumber]
+            for oldPossibIndex in range(oldLength):
+                oldPossib = possibilities.pop(0)
+                validPitches = self.pitchesAboveBass
+                for validPitch in validPitches:
+                    newPossib = copy.copy(oldPossib)
+                    newPossib[currentVoice.label] = validPitch
+                    possibilities.append(newPossib)
+                
+            previousVoice = currentVoice
+        
+        return possibilities
+    
+    def correctPossibilities(self):
+        '''
+        Default rules:
+        (1) No incomplete possibilities
+        (2) Top voices within interval.Interval
+        (3) Pitches in each voice within range
+        (4) No voice crossing
+        '''
+        allPossibilities = self.allPossibilities()
+        
+        newPossibilities = []
+        for possib in allPossibilities:
+            if not possib.correctlyFormed(self.pitchNamesInChord, self.fbRules):
+                continue
+            if not possib.correctTessitura(self.fbVoices, self.fbRules):
+                continue
+            newPossibilities.append(possib)
+        
+        return newPossibilities
     
     def trimAllMovements(self, eliminated = []):
         '''
         Trims all movements beginning at the segment it is
         called upon and moving backwards, stopping at the
-        AntecedentSection. Intended to be called by the last
+        PreviousSection. Intended to be called by the last
         segment to trim the movements of a fbLine.
         '''
         for possibleIndex in self.nextMovements.keys():
@@ -86,116 +129,54 @@ class Segment:
             return numSolutions
     
                 
-class AntecedentSegment(Segment):
+class PreviousSegment(Segment):
     def __init__(self, fbInformation, bassNote, notation = ''):
         Segment.__init__(self, fbInformation, bassNote, notation)
-        self.possibilities = self.solve()
+        self.solve()
 
     def solve(self):
         # Imitates _findPossibleStartingChords from realizer.py
-        possibilities = []
-        
-        bassPossibility = possibility.Possibility()
-        previousVoice = self.fbVoices[0]
-        bassPossibility[previousVoice.label] = self.bassNote.pitch
-        possibilities.append(bassPossibility)
-        
-        for voiceNumber in range(1, len(self.fbVoices)):
-            oldLength = len(possibilities)
-            currentVoice = self.fbVoices[voiceNumber]
-            
-            for oldPossibIndex in range(oldLength):
-                oldPossib = possibilities.pop(0)
-                pitchBelow = oldPossib[previousVoice.label]
-                
-                validPitches = self.pitchesAboveBass
-                if self.fbRules.filterPitchesByRange:
-                    validPitches = currentVoice.pitchesInRange(self.pitchesAboveBass)
-                
-                for validPitch in validPitches:
-                    if (self.fbRules.allowVoiceCrossing) or not (validPitch < pitchBelow):
-                        newPossib = copy.copy(oldPossib)
-                        newPossib[currentVoice.label] = validPitch
-                        possibilities.append(newPossib)
-                
-            previousVoice = currentVoice
-        
-        newPossibilities = []
-        for possib in possibilities:
-            if possib.isCorrectlyFormed(self.pitchNamesInChord, self.fbRules):
-                newPossibilities.append(possib)
-            possibilities = newPossibilities
-        
-        return possibilities
+        self.possibilities = self.correctPossibilities()
     
-    
-class ConsequentSegment(Segment):
+class NextSegment(Segment):
     def __init__(self, fbInformation, prevSegment, bassNote, notation = ''):
         Segment.__init__(self, fbInformation, bassNote, notation)
         self.prevSegment = prevSegment
-        self.possibilities = self.solve()
+        self.solve()
     
     def solve(self):
         # Imitates _findNextPossibilities from realizer.py
         prevPossibilities = self.prevSegment.possibilities
-        nextPossibilities = []
-
+        nextPossibilities = self.correctPossibilities()
+            
         prevPossibIndex = 0
         for prevPossib in prevPossibilities:
-            nextPossibSubset = self.resolvePossibility(prevPossib)
             movements = []
-            for nextPossib in nextPossibSubset:
-                try:
-                    movements.append(nextPossibilities.index(nextPossib))
-                except ValueError:
-                    nextPossibilities.append(nextPossib)
-                    movements.append(len(nextPossibilities) - 1)
+            nextPossibIndex = 0
+            for nextPossib in nextPossibilities:
+                if self.checkVoiceLeading(prevPossib, nextPossib):
+                    movements.append(nextPossibIndex)
+                nextPossibIndex += 1
             self.prevSegment.nextMovements[prevPossibIndex] = movements
             prevPossibIndex += 1
         
         self.prevSegment.nextSegment = self
-        return nextPossibilities
+        self.possibilities = nextPossibilities
 
-    def resolvePossibility(self, prevPossib):
-        # Imitates allChordsToMoveTo from realizer.py
-        nextPossibilities = []
+    def checkVoiceLeading(self, prevPossib, nextPossib):
+        if not prevPossib.correctVoiceLeading(nextPossib, self.fbRules):
+            return False
         
-        bassPossibility = possibility.Possibility()
-        previousVoice = self.fbVoices[0]
-        bassPossibility[previousVoice.label] = self.bassNote.pitch
-        nextPossibilities.append(bassPossibility)
+        vlTop = self.fbVoices[-1].label
+        vlBottom = self.fbVoices[0].label
+        if not prevPossib.noHiddenIntervals(nextPossib, vlTop, vlBottom, self.fbRules):
+            return False
         
-        for voiceNumber in range(1, len(self.fbVoices)):
-            # Imitates pitchesToMoveTo from realizer.py
-            oldLength = len(nextPossibilities)
-            currentVoice = self.fbVoices[voiceNumber]
-            
-            for oldPossibIndex in range(oldLength):
-                oldPossib = nextPossibilities.pop(0)
-                pitchBelow = oldPossib[previousVoice.label]
-                
-                validPitches = self.pitchesAboveBass
-                if self.fbRules.filterPitchesByRange:
-                    validPitches = currentVoice.pitchesInRange(self.pitchesAboveBass)
-                
-                for validPitch in validPitches:
-                    newPossib = copy.copy(oldPossib)
-                    newPossib[currentVoice.label] = validPitch
-                    if (self.fbRules.allowVoiceCrossing) or not (validPitch < pitchBelow):
-                        if prevPossib.hasCorrectVoiceLeading(newPossib, self.fbRules):
-                            nextPossibilities.append(newPossib)
-                
-            previousVoice = currentVoice
+        if not prevPossib.correctVoiceLeading2(nextPossib, self.fbVoices, self.fbRules):
+            return False
         
-        correctPossibilities = []
-        for possib in nextPossibilities:
-            if possib.isCorrectlyFormed(self.pitchNamesInChord, self.fbRules):
-                correctPossibilities.append(possib)
-            nextPossibilities = correctPossibilities
+        return True
         
-        return nextPossibilities
-        
-
 class SegmentException(music21.Music21Exception):
     pass
 
@@ -213,8 +194,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    pass
-    #music21.mainTest(Test)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof
