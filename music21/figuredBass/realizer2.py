@@ -28,6 +28,8 @@ from music21.figuredBass import voice
 
 class FiguredBass(object):
     def __init__(self, voiceList, timeSig, key, mode = 'major'):
+        '''
+        '''
         self.timeSig = timeSig
         self.key = key
         self.mode = mode
@@ -46,14 +48,14 @@ class FiguredBass(object):
         startTime = time.time()
         (startBass, startNotation) = self.figuredBassList[0]
         print("Finding starting possibilities for: " + str((startBass.pitch, startNotation)))
-        a1 = segment.AntecedentSegment(self.fbInfo, startBass, startNotation)
+        a1 = segment.PreviousSegment(self.fbInfo, startBass, startNotation)
         self.allSegments.append(a1)
         self.lastSegment = a1
             
         for fbIndex in range(1, len(self.figuredBassList)):
             (nextBass, nextNotation) = self.figuredBassList[fbIndex]
             print("Finding all possibilities for: " + str((nextBass.pitch, nextNotation)))
-            c1 = segment.ConsequentSegment(self.fbInfo, self.lastSegment, nextBass, nextNotation)
+            c1 = segment.NextSegment(self.fbInfo, self.lastSegment, nextBass, nextNotation)
             self.allSegments.append(c1)
             self.lastSegment = c1
        
@@ -117,10 +119,14 @@ class FiguredBass(object):
         chordProgression = self.numberToChordProgression(numberProgression)
         return chordProgression
 
-    def showRandomSolutions(self, amountToShow):
+    def showRandomSolutions(self, amountToShow = 20):
+        s = self.generateRandomSolutions(amountToShow)
+        s.show()
+        
+    def generateRandomSolutions(self, amountToShow = 20):
         bassLine = stream.Part()
         rightHand = stream.Part()
-        s = stream.Part()
+        s = stream.Score()
         ts = meter.TimeSignature(self.timeSig)
         numSharps = key.pitchToSharps(self.key, self.mode)
         ks = key.KeySignature(numSharps)
@@ -159,8 +165,8 @@ class FiguredBass(object):
         s.insert(0, rightHand)
         s.insert(0, bassLine)
         
-        s.show()
-        
+        return s
+
     def printChordProgression(self, chordProgression):
         linesToPrint = []
         for v in self.fbInfo.fbVoices:
@@ -182,8 +188,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    pass
-    #music21.mainTest(Test)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof
