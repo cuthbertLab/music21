@@ -3968,15 +3968,8 @@ _DOC_ORDER = [PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQua
 
 
 if __name__ == "__main__":
-    #music21.mainTest(Test, TestExternal)
-
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-
-    elif len(sys.argv) > 1:
-        t = Test()
-        te = TestExternal()
-        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
 
 

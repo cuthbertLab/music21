@@ -4401,38 +4401,72 @@ def mainTest(*testClasses):
         if __name__ == '__main__':
             music21.mainTest(Test)
     '''
-    
+    #environLocal.printDebug(['mainTest()', testClasses])
 
-    if ('noDocTest' in testClasses):
+    runAllTests = True    
+
+    # start with doc tests, then add unit tests
+    if ('noDocTest' in testClasses or 'noDocTest' in sys.argv 
+        or 'nodoctest' in sys.argv):
+        # create a test suite for storage
         s1 = unittest.TestSuite()
     else: 
+        # create test suite derived from doc tests
+        # here we use '__main__' instead of a module
         s1 = doctest.DocTestSuite('__main__', 
         optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
 
-    if ('verbose') in testClasses:
-        verbosity = 2
-    else:
-        verbosity = 1
+    verbosity = 1
+    if 'verbose' in testClasses or 'verbose' in sys.argv:
+        verbosity = 2 # this seems to hide most display
 
-    for thisClass in testClasses:
-        if isinstance(thisClass, str):
-            pass
-        else:
-            s2 = unittest.defaultTestLoader.loadTestsFromTestCase(thisClass)
+    displayNames = False
+    if 'list' in sys.argv or 'display' in sys.argv:
+        displayNames = True
+        runAllTests = False
+
+    runThisTest = None
+    if len(sys.argv) == 2:
+        arg = sys.argv[1].lower()
+        if arg not in ['list', 'display', 'verbose', 'nodoctest']:
+            # run a test directly named in this module
+            runThisTest = sys.argv[1]    
+
+    # -f, --failfast
+
+    for t in testClasses:
+        if not isinstance(t, str):
+            if displayNames:
+                for tName in unittest.defaultTestLoader.getTestCaseNames(t):
+                    print('Unit Test Method: %s' % tName)
+            if runThisTest is not None:
+                tObj = t() # call class
+                # search all names for case-insensitive match
+                for name in dir(tObj):
+                    if name.lower() == runThisTest.lower():
+                        runThisTest = name
+                        break
+                if hasattr(tObj, runThisTest): 
+                    print('Running Named Test Method: %s' % runThisTest)
+                    getattr(tObj, runThisTest)()
+                    runAllTests = False
+                    break
+
+            # normally operation collects all tests
+            s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
             s1.addTests(s2) 
-    runner = unittest.TextTestRunner()
-    runner.verbosity = verbosity
-    runner.run(s1)  
+
+
+    if runAllTests:
+        runner = unittest.TextTestRunner()
+        runner.verbosity = verbosity
+        testResult = runner.run(s1) 
 
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-        # arg[1] is test to launch
-        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
+    mainTest(Test)
+
 
 #------------------------------------------------------------------------------
 # eof

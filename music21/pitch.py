@@ -244,12 +244,12 @@ def convertPsToFq(ps):
     Assumes A4 = 440 Hz
     >>> convertPsToFq(69)
     440.0
-    >>> convertPsToFq(60)
-    261.62556530059862
-    >>> convertPsToFq(2)
-    9.1770239974189884
-    >>> convertPsToFq(135)
-    19912.126958213179
+    >>> str(convertPsToFq(60))
+    '261.625565301'
+    >>> str(convertPsToFq(2))
+    '9.17702399742'
+    >>> str(convertPsToFq(135))
+    '19912.1269582'
 
     OMIT_FROM_DOCS
     NOT CURRENTLY USED: since freq440 had its own conversion
@@ -2705,14 +2705,9 @@ _DOC_ORDER = [Pitch, Accidental]
 
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-        te = TestExternal()
-        # arg[1] is test to launch
-        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
+
 
 #------------------------------------------------------------------------------
 # eof

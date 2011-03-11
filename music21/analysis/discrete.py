@@ -1416,12 +1416,8 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-        # arg[1] is test to launch
-        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
 
 

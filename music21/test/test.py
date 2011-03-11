@@ -122,26 +122,28 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False):
     >>> print(None)
     None
     '''    
-
+    docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
     # in case there are any tests here, get a suite to load up later
-    s1 = doctest.DocTestSuite(__name__, 
-        optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
+    s1 = doctest.DocTestSuite(__name__, optionflags=docTestOptions)
 
     modGather = ModuleGather()
     modules = modGather.load(restoreEnvironmentDefaults)
 
-    environLocal.printDebug('looking for Test classes...\n')
+    verbosity = 1
+    if 'verbose' in sys.argv:
+        verbosity = 2 # this seems to hide most display
 
+    environLocal.printDebug('looking for Test classes...\n')
+    # look over each module and gather doc tests and unittests
     for module in common.sortModules(modules):
-        #print _MOD, timeStr, module
         unitTestCases = []
     
+        # get Test classes in module
         if not hasattr(module, 'Test'):
             environLocal.printDebug('%s has no Test class' % module)
         else:
             if 'test' in testGroup:
                 unitTestCases.append(module.Test)
-
         if not hasattr(module, 'TestExternal'):
             pass
             #environLocal.printDebug('%s has no TestExternal class\n' % module)
@@ -149,22 +151,26 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False):
             if 'external' in testGroup or 'testExternal' in testGroup:
                 unitTestCases.append(module.TestExternal)
 
-        # get unittest test
+
+
+        # for each Test class, add load this into a suite
         for testCase in unitTestCases:
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(testCase)
             s1.addTests(s2)
-
         try:
-            s3 = doctest.DocTestSuite(module, 
-                optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
+            s3 = doctest.DocTestSuite(module, optionflags=docTestOptions)
             s1.addTests(s3)
         except ValueError:
             environLocal.printDebug('%s cannot load Doctests' % module)
             continue
     
     environLocal.printDebug('running Tests...\n')
-    runner = unittest.TextTestRunner(verbosity=2)
-    runner.run(s1)  
+    runner = unittest.TextTestRunner(verbosity=verbosity)
+    testResult = runner.run(s1)  
+
+    # this should work but requires python 2.7 and the testRunner arg does not
+    # seem to work properly
+    #unittest.main(testRunner=runner, failfast=True)
                  
 
 #-------------------------------------------------------------------------------

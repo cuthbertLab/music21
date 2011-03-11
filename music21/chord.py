@@ -2917,14 +2917,8 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Chord]
 
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-        te = TestExternal()
-        # arg[1] is test to launch
-        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

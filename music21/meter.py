@@ -3899,16 +3899,8 @@ _DOC_ORDER = [TimeSignature, CompoundTimeSignature]
 
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) == 1:
-
-        #music21.mainTest(Test, TestExternal)
-        music21.mainTest(Test)
-    else:
-
-        t = Test()
-        # arg[1] is test to launch
-        if hasattr(t, sys.argv[1]): getattr(t, sys.argv[1])()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
 
 

@@ -222,7 +222,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-
+    # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)
 
 
