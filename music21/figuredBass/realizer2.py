@@ -124,6 +124,9 @@ class FiguredBass(object):
         s.show()
         
     def generateRandomSolutions(self, amountToShow = 20):
+        # TODO: If amountToShow > self.lastSegment.getNumSolutions(), then should return all solutions and that's it.
+        # Also, if self.lastSegment.getNumSolutions() == 0, then should either raise an exception or just return without 
+        # going into the for loop and print a warning to the user.
         bassLine = stream.Part()
         rightHand = stream.Part()
         s = stream.Score()
