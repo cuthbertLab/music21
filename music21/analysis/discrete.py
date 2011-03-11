@@ -6,7 +6,7 @@
 # Authors:      Jared Sadoian
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -63,6 +63,9 @@ class DiscreteAnalysis(object):
         # that have been produced.
         # store pairs of sol, color
         self._solutionsFound = []
+
+        # store alternative solutions, which may be sorted or not
+        self._alternativeSolutions = []
 
     def _rgbToHex(self, rgb):
         '''Utility conversion method
@@ -397,9 +400,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         >>> from music21 import *
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> post = p.solutionLegend()
-
         '''
-
         # need a presentation order for legend; not alphabetical
         _keySortOrder = ['C-', 'C', 'C#',
                           'D-', 'D', 'D#',
@@ -409,7 +410,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                           'A-', 'A', 'A#',
                           'B-', 'B',
                         ]
-
         if compress:
             colorsUsed = self.getColorsUsed()
             solutionsUsed = self.getSolutionsUsed()
@@ -425,7 +425,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                         break
         else:
             keySortOrderFiltered = _keySortOrder
-        
 
         data = []
         for yLabel in ['Major', 'Minor']:
@@ -433,7 +432,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 valid = self.keysValidMajor
             elif yLabel == 'Minor':
                 valid = self.keysValidMinor
-
             row = []
             row.append(yLabel)
             pairs = []
@@ -550,7 +548,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         return pitchObj
 
 
-    def process(self, sStream):    
+    def process(self, sStream, storeAlternatives=False):    
         '''
         Takes in a Stream or sub-Stream and performs analysis 
         on all contents of the Stream. The 
@@ -579,31 +577,48 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         # the tuple defines a Pitch, as well as the differences value
         # from _getDifference
 
-        if likelyKeysMajor == None or likelyKeysMinor == None:
+        if likelyKeysMajor is None or likelyKeysMinor is None:
             mode = None
             solution = (None, mode, 0)
+
         # see which has a higher correlation coefficient, the first major or the
         # the first minor
-        elif likelyKeysMajor[0][1] > likelyKeysMinor[0][1]:
-            mode = 'major'
-            solution = (likelyKeysMajor[0][0], mode, likelyKeysMajor[0][1])
-        else:
-            mode = 'minor'
-            solution = (likelyKeysMinor[0][0], mode, likelyKeysMinor[0][1])
+        sortList = [(coefficient, p, 'major') for 
+                    (p, coefficient) in likelyKeysMajor]
+        sortList += [(coefficient, p, 'minor') for 
+                    (p, coefficient) in likelyKeysMinor]
+        sortList.sort()
+        sortList.reverse()
+        #environLocal.printDebug(['sortList', sortList])
 
-        # first solution is pitch object
-        p = self._bestKeyEnharmonic(solution[0], mode, sStream)
-        solution = (p, mode, solution[2])
+        coefficient, p, mode = sortList[0]
+        p = self._bestKeyEnharmonic(p, mode, sStream)
+        solution = (p, mode, coefficient)
 
         color = self.solutionToColor(solution)
+
+        # store all aleternatives in solution format
+        if storeAlternatives:
+            self._alternativeSolutions = []
+            # get all but first
+            for coefficient, p, mode in sortList[1:]:
+                # adjust enharmonic spelling
+                p = self._bestKeyEnharmonic(p, mode, sStream)
+                self._alternativeSolutions.append((p, mode, coefficient))
 
         # store solutions for compressed legend generation
         self._solutionsFound.append((solution, color))
         return solution, color        
     
+    def _solutionToObject(self, solution):
+        '''Convert a solution into an appropriate object representation
+        '''
+        k = key.Key(tonic=solution[0], mode=solution[1])
+        k.correlationCoefficient = solution[2]
+        return k
 
     def getSolution(self, sStream):
-        '''Return a music21 key object defining the results of the analysis.
+        '''Return a music21 Key object defining the results of the analysis. Do not call process before calling this method, as this method calls process. 
 
         >>> from music21 import *
         >>> s = corpus.parseWork('bach/bwv66.6')
@@ -617,9 +632,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         <music21.key.Key of B- major>
         '''
         # always take a flat version here, otherwise likely to get nothing
-        solution, color = self.process(sStream.flat)
-        k = key.Key(tonic=solution[0], mode=solution[1])
-        k.correlationCoefficient = solution[2]
+        solution, color = self.process(sStream.flat, storeAlternatives=True)
+        # assign best solution
+        k = self._solutionToObject(solution)
+        for sol in self._alternativeSolutions:
+            # append each additional interpretation
+            k.alternateInterpretations.append(self._solutionToObject(sol))
         return k
 
 
@@ -632,7 +650,8 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     '''
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Schmuckler Key Analysis'
-    identifiers = ['krumhansl', 'schmuckler',  'krumhansl-schmuckler']
+    identifiers = ['krumhansl', 'schmuckler',  'krumhansl-schmuckler', 
+                   'krumhanslschmuckler']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -664,7 +683,7 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Kessler Key Analysis'
-    identifiers = ['krumhansl', 'kessler', 'krumhansl-kessler']
+    identifiers = ['krumhansl', 'kessler', 'krumhansl-kessler', 'krumhanslkessler']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -698,7 +717,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Aarden Essen Key Analysis'
-    identifiers = ['aarden', 'essen', 'aarden-essen']
+    identifiers = ['aarden', 'essen', 'aarden-essen', 'aardenessen']
     # adding these identifiers make this the default
     identifiers.append('key')
     identifiers.append('keyscape')
@@ -737,7 +756,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Simple Weight Key Analysis'
-    identifiers = ['simple', 'weight', 'simple-weight']
+    identifiers = ['simple', 'weight', 'simple-weight', 'simpleweight']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -770,7 +789,7 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Bellman Budge Key Analysis'
-    identifiers = ['bellman', 'budge', 'bellman-budge']
+    identifiers = ['bellman', 'budge', 'bellman-budge', 'bellmanbudge']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -804,7 +823,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Temperley Kostka Payne Key Analysis'
-    identifiers = ['temperley', 'kostka', 'payne', 'temperley-kostka-payne']
+    identifiers = ['temperley', 'kostka', 'payne', 'temperley-kostka-payne', 'temperleykostkapayne']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -855,7 +874,7 @@ class Ambitus(DiscreteAnalysis):
     '''
     _DOC_ALL_INHERITED = False
 
-    name = 'Sadoian Ambitus Analysis'
+    name = 'Ambitus Analysis'
     # provide possible string matches for this processor
     identifiers = ['ambitus', 'range', 'span']
 
@@ -1412,6 +1431,23 @@ class Test(unittest.TestCase):
         self.assertEqual(str(post[1]), 'minor')
 
 
+    def testKeyAnalysisLikelyKeys(self):
+        from music21 import note, stream
+        s = stream.Stream()
+        s.repeatAppend(note.Note('c'), 6)
+        s.repeatAppend(note.Note('g'), 4)
+        s.repeatAppend(note.Note('a'), 2)
+        
+        k = s.analyze('KrumhanslSchmuckler')
+        self.assertEqual(str(k), 'C major')
+        self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of C minor>, <music21.key.Key of G major>, <music21.key.Key of A minor>, <music21.key.Key of F major>, <music21.key.Key of G minor>, <music21.key.Key of E minor>, <music21.key.Key of F minor>, <music21.key.Key of E- major>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of D minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of B minor>, <music21.key.Key of B- minor>, <music21.key.Key of C# minor>, <music21.key.Key of F# minor>, <music21.key.Key of C# major>, <music21.key.Key of E major>, <music21.key.Key of G# minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of E- minor>]')
+        
+        k = s.analyze('AardenEssen')
+        self.assertEqual(str(k), 'F major')
+        self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of C major>, <music21.key.Key of C minor>, <music21.key.Key of G minor>, <music21.key.Key of F minor>, <music21.key.Key of A minor>, <music21.key.Key of G major>, <music21.key.Key of D minor>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of E- major>, <music21.key.Key of E minor>, <music21.key.Key of B- minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of F# minor>, <music21.key.Key of C# major>, <music21.key.Key of B minor>, <music21.key.Key of E major>, <music21.key.Key of C# minor>, <music21.key.Key of E- minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of G# minor>]')
+        
+        #s.plot('grid', 'KrumhanslSchmuckler')
+        s.plot('windowed', 'aarden')
 
 #------------------------------------------------------------------------------
 

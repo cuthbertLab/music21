@@ -1436,6 +1436,11 @@ class Stream(music21.Music21Object):
         :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
     
         :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
+        :class:`~music21.graph.PlotWindowedKrumhanslKessler`
+        :class:`~music21.graph.PlotWindowedAardenEssen`
+        :class:`~music21.graph.PlotWindowedSimpleWeights`
+        :class:`~music21.graph.PlotWindowedBellmanBudge`
+        :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`
         :class:`~music21.graph.PlotWindowedAmbitus`
 
         >>> from music21 import *

@@ -755,6 +755,9 @@ class Key(KeySignature, scale.DiatonicScale):
         # store a floating point value between 0 and 1 regarding correlation coefficent between the detected key and the algorithm for detecting the key
         self.correlationCoefficient = None
 
+        # store an ordered list of alternative Key objects
+        self.alternateInterpretations = []
+
     def __repr__(self):
         return "<music21.key.Key of %s>" % self.__str__()
 

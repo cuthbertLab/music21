@@ -106,6 +106,7 @@ FORMATS = ['horizontalbar', 'histogram', 'scatter', 'scatterweighted',
 def userFormatsToFormat(value):
     '''Replace possible user format strings with defined format names as used herein. Returns string unaltered if no match.
     '''
+    environLocal.printDebug(['calling user userFormatsToFormat:', value])
     value = value.lower()
     value = value.replace(' ', '')
     if value in ['bar', 'horizontal', 'horizontalbar', 'pianoroll', 'piano']:
@@ -118,7 +119,10 @@ def userFormatsToFormat(value):
         return 'scatterweighted'
     elif value in ['3dbars', '3d']:
         return '3dbars'
+    elif value in ['colorgrid', 'grid', 'window', 'windowed']:
+        return 'colorGrid'
     else: # return unaltered if no mathc
+        environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
         return value
 
 def userValuesToValues(valueList):
@@ -1935,7 +1939,7 @@ class PlotWindowedAnalysis(PlotStream):
 
     
 class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
-    '''Stream plotting of windowed version of Krumhansl-Schmuckler analysis routine.
+    '''Stream plotting of windowed version of Krumhansl-Schmuckler analysis routine. See :class:`~music21.analysis.discrete.KrumhanslSchmuckler` for more details.
 
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv66.6.xml') #_DOCS_HIDE
@@ -1951,14 +1955,54 @@ class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
 
     '''
     values = discrete.KrumhanslSchmuckler.identifiers
-
     def __init__(self, streamObj, *args, **keywords):
         PlotWindowedAnalysis.__init__(self, streamObj, 
             discrete.KrumhanslSchmuckler(streamObj), *args, **keywords)
     
+class PlotWindowedKrumhanslKessler(PlotWindowedAnalysis):
+    '''Stream plotting of windowed version of Krumhansl-Kessler analysis routine. See :class:`~music21.analysis.discrete.KrumhanslKessler` for more details.
+    '''
+    values = discrete.KrumhanslKessler.identifiers
+    def __init__(self, streamObj, *args, **keywords):
+        PlotWindowedAnalysis.__init__(self, streamObj, 
+            discrete.KrumhanslKessler(streamObj), *args, **keywords)
+
+class PlotWindowedAardenEssen(PlotWindowedAnalysis):
+    '''Stream plotting of windowed version of Aarden-Essen analysis routine. See :class:`~music21.analysis.discrete.AardenEssen` for more details.
+    '''
+    values = discrete.AardenEssen.identifiers
+    def __init__(self, streamObj, *args, **keywords):
+        PlotWindowedAnalysis.__init__(self, streamObj, 
+            discrete.AardenEssen(streamObj), *args, **keywords)
+
+class PlotWindowedSimpleWeights(PlotWindowedAnalysis):
+    '''Stream plotting of windowed version of Simple Weights analysis routine. See :class:`~music21.analysis.discrete.SimpleWeights` for more details.
+    '''
+    values = discrete.SimpleWeights.identifiers
+    def __init__(self, streamObj, *args, **keywords):
+        PlotWindowedAnalysis.__init__(self, streamObj, 
+            discrete.SimpleWeights(streamObj), *args, **keywords)
+
+class PlotWindowedBellmanBudge(PlotWindowedAnalysis):
+    '''Stream plotting of windowed version of Bellman-Budge analysis routine. See :class:`~music21.analysis.discrete.BellmanBudge` for more details.
+    '''
+    values = discrete.BellmanBudge.identifiers
+    def __init__(self, streamObj, *args, **keywords):
+        PlotWindowedAnalysis.__init__(self, streamObj, 
+            discrete.BellmanBudge(streamObj), *args, **keywords)
+
+class PlotWindowedTemperleyKostkaPayne(PlotWindowedAnalysis):
+    '''Stream plotting of windowed version of Temperley-Kostka-Payne analysis routine. See :class:`~music21.analysis.discrete.TemperleyKostkaPayne` for more details.
+    '''
+    values = discrete.TemperleyKostkaPayne.identifiers
+    def __init__(self, streamObj, *args, **keywords):
+        PlotWindowedAnalysis.__init__(self, streamObj, 
+            discrete.TemperleyKostkaPayne(streamObj), *args, **keywords)
+
+    
 
 class PlotWindowedAmbitus(PlotWindowedAnalysis):
-    '''Stream plotting of basic pitch span.
+    '''Stream plotting of basic pitch span. 
 
     >>> from music21 import *
     >>> s = corpus.parseWork('bach/bwv66.6.xml') #_DOCS_HIDE
@@ -3034,59 +3078,8 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
 
 #-------------------------------------------------------------------------------
 # public function
-
-def plotStream(streamObj, *args, **keywords):
-    '''Given a stream and any keyword configuration arguments, create and display a plot.
-
-    Note: plots requires matplotib to be installed.
-
-    Plot methods can be specified as additional arguments or by keyword. Two keyword arguments can be given: `format` and `values`. If positional arguments are given, the first is taken as `format` and the rest are collected as `values`. If `format` is the class name, that class is collected. Additionally, every :class:`~music21.graph.PlotStream` subclass defines one `format` string and a list of `values` strings. The `format` parameter defines the type of Graph (e.g. scatter, histogram, colorGrid). The `values` list defines what values are graphed (e.g. quarterLength, pitch, pitchClass). 
-
-    If a user provides a `format` and one or more `values` strings, a plot with the corresponding profile, if found, will be generated. If not, the first Plot to match any of the defined specifiers will be created. 
-
-    In the case of :class:`~music21.graph.PlotWindowedAnalysis` subclasses, the :class:`~music21.analysis.discrete.DiscreteAnalysis` subclass :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers` list is added to the Plot's `values` list. 
-
-    Available plots include the following:
-
-    :class:`~music21.graph.PlotHistogramPitchSpace`
-    :class:`~music21.graph.PlotHistogramPitchClass`
-    :class:`~music21.graph.PlotHistogramQuarterLength`
-
-    :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
-    :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
-    :class:`~music21.graph.PlotScatterPitchClassOffset`
-    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol`
-
-    :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
-    :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
-
-    :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
-    :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`
-    :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
-
-    :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
-
-    :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
-    :class:`~music21.graph.PlotWindowedAmbitus`
-
-    >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
-    >>> s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
-    >>> #_DOCS_SHOW s.plot('histogram', 'pitch')
-
-    .. image:: images/PlotHistogramPitchSpace.*
-        :width: 600
-
-
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
-    >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
-    >>> #_DOCS_SHOW s.plot('pianoroll')
-
-    .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
-        :width: 600
-
+def _getPlotsToMake(*args, **keywords):
+    '''Given format and values arguments, return a list of plot classes.
     '''
     plotClasses = [
         # histograms
@@ -3105,6 +3098,12 @@ def plotStream(streamObj, *args, **keywords):
         Plot3DBarsPitchSpaceQuarterLength,
         # windowed plots
         PlotWindowedKrumhanslSchmuckler,
+        PlotWindowedKrumhanslKessler,
+        PlotWindowedAardenEssen,
+        PlotWindowedSimpleWeights,
+        PlotWindowedBellmanBudge,
+        PlotWindowedTemperleyKostkaPayne,
+
         PlotWindowedAmbitus,
     ]
 
@@ -3117,9 +3116,9 @@ def plotStream(streamObj, *args, **keywords):
     if 'values' in keywords:
         values = keywords['values'] # should be a list
 
-    environLocal.printDebug(['got args', args])
+    environLocal.printDebug(['got args pre conversion', args])
 
-    # if no args, use pianooll
+    # if no args, use pianoroll
     if len(args) == 0 and format == '' and values == []:
         format = 'horizontalbar'
         values = 'pitch'
@@ -3132,7 +3131,7 @@ def plotStream(streamObj, *args, **keywords):
             format = 'histogram'
             values = [args[0]]
     elif len(args) > 1:
-        format = args[0]
+        format = userFormatsToFormat(args[0])
         values = args[1:] # get all remaining
 
     if not common.isListLike(values):
@@ -3140,12 +3139,13 @@ def plotStream(streamObj, *args, **keywords):
     # make sure we have a list
     values = list(values)
 
+    environLocal.printDebug(['got args post conversion', 'format', format, 'values', values])
+
     # clean data and process synonyms
     # will return unaltered if no change
     format = userFormatsToFormat(format) 
     values = userValuesToValues(values)
-    environLocal.printDebug(['plotStream: stream', streamObj, 
-                             'format, values', format, values])
+    environLocal.printDebug(['plotStream: format, values', format, values])
 
     plotMake = []
     if format.lower() == 'all':
@@ -3196,6 +3196,69 @@ def plotStream(streamObj, *args, **keywords):
                             break
                     if len(plotMake) > 0: # found a match
                         break
+    return plotMake
+
+def plotStream(streamObj, *args, **keywords):
+    '''Given a stream and any keyword configuration arguments, create and display a plot.
+
+    Note: plots requires matplotib to be installed.
+
+    Plot methods can be specified as additional arguments or by keyword. Two keyword arguments can be given: `format` and `values`. If positional arguments are given, the first is taken as `format` and the rest are collected as `values`. If `format` is the class name, that class is collected. Additionally, every :class:`~music21.graph.PlotStream` subclass defines one `format` string and a list of `values` strings. The `format` parameter defines the type of Graph (e.g. scatter, histogram, colorGrid). The `values` list defines what values are graphed (e.g. quarterLength, pitch, pitchClass). 
+
+    If a user provides a `format` and one or more `values` strings, a plot with the corresponding profile, if found, will be generated. If not, the first Plot to match any of the defined specifiers will be created. 
+
+    In the case of :class:`~music21.graph.PlotWindowedAnalysis` subclasses, the :class:`~music21.analysis.discrete.DiscreteAnalysis` subclass :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers` list is added to the Plot's `values` list. 
+
+    Available plots include the following:
+
+    :class:`~music21.graph.PlotHistogramPitchSpace`
+    :class:`~music21.graph.PlotHistogramPitchClass`
+    :class:`~music21.graph.PlotHistogramQuarterLength`
+
+    :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
+    :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
+    :class:`~music21.graph.PlotScatterPitchClassOffset`
+    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol`
+
+    :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
+    :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
+
+    :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
+    :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`
+    :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
+
+    :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
+
+    :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
+    :class:`~music21.graph.PlotWindowedKrumhanslKessler`
+    :class:`~music21.graph.PlotWindowedAardenEssen`
+    :class:`~music21.graph.PlotWindowedSimpleWeights`
+    :class:`~music21.graph.PlotWindowedBellmanBudge`
+    :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`
+
+    :class:`~music21.graph.PlotWindowedAmbitus`
+
+    >>> from music21 import *
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s.plot('histogram', 'pitch')
+
+    .. image:: images/PlotHistogramPitchSpace.*
+        :width: 600
+
+
+    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s.plot('pianoroll')
+
+    .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
+        :width: 600
+
+    '''
+
+    plotMake = _getPlotsToMake(*args, **keywords)
 
     environLocal.printDebug(['plotClassName found', plotMake])
     for plotClassName in plotMake:
@@ -3947,10 +4010,55 @@ class Test(unittest.TestCase):
             s.plot(*args, doneAction=None)
         
 
+    def testGetPlotsToMake(self):
+
+        
+        post = _getPlotsToMake(format='grid', values='krumhansl-schmuckler')
+        self.assertEqual(post, [PlotWindowedKrumhanslSchmuckler])
+        post = _getPlotsToMake(format='grid', values='aarden')
+        self.assertEqual(post, [PlotWindowedAardenEssen])
+        post = _getPlotsToMake(format='grid', values='simple')
+        self.assertEqual(post, [PlotWindowedSimpleWeights])
+        post = _getPlotsToMake(format='grid', values='bellman')
+        self.assertEqual(post, [PlotWindowedBellmanBudge])
+        post = _getPlotsToMake(format='grid', values='kostka')
+        self.assertEqual(post, [PlotWindowedTemperleyKostkaPayne])
+        post = _getPlotsToMake(format='grid', values='KrumhanslKessler')
+        self.assertEqual(post, [PlotWindowedKrumhanslKessler])
+
+
+        # no args get pitch space piano roll
+        post = _getPlotsToMake()
+        self.assertEqual(post, [PlotHorizontalBarPitchSpaceOffset])
+
+        # one arg gives a histogram of that parameters
+        post = _getPlotsToMake('duration')
+        self.assertEqual(post, [PlotHistogramQuarterLength])
+        post = _getPlotsToMake('quarterLength')
+        self.assertEqual(post, [PlotHistogramQuarterLength])
+        post = _getPlotsToMake('ps')
+        self.assertEqual(post, [PlotHistogramPitchSpace])
+        post = _getPlotsToMake('pitch')
+        self.assertEqual(post, [PlotHistogramPitchSpace])
+        post = _getPlotsToMake('pitchspace')
+        self.assertEqual(post, [PlotHistogramPitchSpace])
+        post = _getPlotsToMake('pc')
+        self.assertEqual(post, [PlotHistogramPitchClass])
+
+        post = _getPlotsToMake('scatter', 'ps')
+        self.assertEqual(post, [PlotScatterPitchSpaceQuarterLength])
+        post = _getPlotsToMake('scatter', 'ps', 'duration')
+        self.assertEqual(post, [PlotScatterPitchSpaceQuarterLength])
+
+        post = _getPlotsToMake('scatter', 'pc', 'offset')
+        self.assertEqual(post, [PlotScatterPitchClassOffset])
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
+_DOC_ORDER = [
+        PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
         # windowed
         PlotWindowedKrumhanslSchmuckler, PlotWindowedAmbitus,
         # scatters
