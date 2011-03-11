@@ -12,10 +12,12 @@ import music21
 import unittest
 import copy
 
+from music21 import interval
+
 from music21.figuredBass import realizerScale
 
 class Voice:
-    def __init__(self, label, range=None):
+    def __init__(self, label, range = None, maxIntervalLeap = interval.Interval('P8')):
         '''
         >>> from music21 import *
         >>> sc = realizerScale.FiguredBassScale('C')
@@ -30,6 +32,7 @@ class Voice:
         '''
         self.label = label
         self.range = range
+        self.maxIntervalLeap = maxIntervalLeap
         # A voice also has these associations:
         # Clef -> Treble/Bass (or less commonly alto, tenor, soprano) 
         # These last two are more properties of the bar than anything:
@@ -237,39 +240,6 @@ class Range:
 class RangeException(music21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
-
-#def voiceOverlap(self):
-    '''
-    >>> from music21 import *
-    >>> v1n1 = pitch.Pitch('C3')
-    >>> v1n2 = pitch.Pitch('F3')
-    >>> v2n1 = pitch.Pitch('E3')
-    >>> v2n2 = pitch.Pitch('G3')
-    >>> vlq = VoiceLeadingQuartet(v1n1, v1n2, v2n1, v2n2)
-    >>> vlq.voiceOverlap()
-    True
-    '''
-'''
-    isOverlapping = False
-    if (self.v1n1 < self.v2n1) or (self.v1n1 == self.v2n1):
-        if not (self.v1n2 < self.v2n1) or not (self.v1n1 < self.v2n2):
-            isOverlapping = True
-    elif self.v1n1 > self.v2n1:
-        if not (self.v2n2 < self.v1n1) or not (self.v2n1 < self.v1n2):
-            isOverlapping = True
-    
-    return isOverlapping
-
-def voiceCrossing(self):
-    isCrossing = False
-    if (self.v1n1 < self.v2n1) and (self.v1n2 > self.v2n2):
-        isCrossing = True
-    elif (self.v1n1 > self.v2n1) and (self.v1n2 < self.v2n2):
-        isCrossing = True
-    else: #self.v1n1 == self.v2n1
-        raise VoiceLeadingException("Cannot determine voice crossing using just pitches.")
-'''
 #-------------------------------------------------------------------------------  
 class Test(unittest.TestCase):
 
