@@ -15,12 +15,15 @@ from music21 import interval
 
 class Rules:
     def __init__(self):
+        '''
+        >>> from music21.figuredBass import rules
+        >>> fbRules = rules.Rules()
+        >>> fbRules.allowParallelFifths = True
+        '''
         #Voicing Rules
         self.allowParallelFifths = False
         self.allowParallelOctaves = False
         self.allowVoiceOverlap = False
-        self.bottomVoiceLeapIntervalLimit = interval.Interval('P8')
-        self.topVoiceLeapIntervalLimit = interval.Interval('P8')
 
         #Chord rules
         self.allowIncompletePossibilities = False
