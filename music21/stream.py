@@ -466,17 +466,38 @@ class Stream(music21.Music21Object):
         True
         ''')
 
-    def _getRootDerivation(self):
-        '''Return a reference to the Stream that created this Stream, if such a Stream exists. 
+    def _getDerivationChain(self):
+        '''Return a list of all Streams that created this Stream, if such a Stream exists. 
         '''
+        post = []
         focus = self
         while True:
             # keep deriving until we get None; then return what we have
             rd = focus._derivation.getAncestor()
-            if rd is None:
-                # return what we have
-                return focus
+            if rd is None: # nothing more to derive
+                break
+            post.append(rd)
             focus = rd
+        return post
+
+    derivationChain = property(_getDerivationChain, 
+        doc = '''Return a list Stream subclasses that this Stream was derved from.
+
+        >>> from music21 import *
+        >>> s1 = stream.Stream()
+        >>> s1.repeatAppend(note.Note(), 10)
+        >>> s1.repeatAppend(note.Rest(), 10)
+        >>> s2 = s1.getElementsByClass('GeneralNote')
+        >>> s3 = s2.getElementsByClass('Note')
+        >>> s3.derivationChain == [s2, s1]
+        True
+        ''')
+
+
+    def _getRootDerivation(self):
+        '''Return a reference to the Stream that created this Stream, if such a Stream exists. 
+        '''
+        return self._getDerivationChain()[-1]
 
     rootDerivation = property(_getRootDerivation, 
         doc = '''Return a reference to the oldest source of this Stream; that is, chain calls to derivesFrom until we get to a Stream that cannot be further derived. 
@@ -12826,6 +12847,9 @@ class Test(unittest.TestCase):
         self.assertEqual(p1FlatNotes.derivesFrom is p1Flat, True)
         self.assertEqual(p1FlatNotes.derivesFrom is p1, False)
         
+        self.assertEqual(p1FlatNotes.derivationChain, [p1Flat, p1])
+
+
         # we cannot do this, as each call to flat produces a new Stream
         self.assertEqual(p1.flat.notes.derivesFrom is p1.flat, False)
         # chained calls to .derives from can be used
@@ -12863,6 +12887,7 @@ class Test(unittest.TestCase):
 
 
 
+
     def testDerivationB(self):
         from music21 import stream
         s1 = stream.Stream()
@@ -12876,6 +12901,18 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.derivesFrom is s1, True)
         # check low level attrbiutes
         self.assertEqual(s2._derivation.getContainer() is s2, True)
+
+
+
+
+    def testDerivationC(self):
+        from music21 import corpus
+        s = corpus.parseWork('bach/bwv66.6')
+        p1 = s.parts['Soprano']
+        pMeasures = p1.measures(3, 10)
+        pMeasuresFlat = pMeasures.flat
+        pMeasuresFlatNotes = pMeasuresFlat.notes
+        self.assertEqual(pMeasuresFlatNotes.derivationChain, [pMeasuresFlat, pMeasures, p1])
 
 
 #-------------------------------------------------------------------------------
