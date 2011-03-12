@@ -835,7 +835,7 @@ class AskSendInstallationReport(YesOrNo):
 
         platform = common.getPlatform()
         if platform == 'win': # need to add proper return carriage fro win
-            body = '\r\n'.join(body)
+            body = '%0D%0A'.join(body)
         else:
             body = '\n'.join(body)
 
