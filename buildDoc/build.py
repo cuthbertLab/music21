@@ -26,10 +26,10 @@ from music21 import abj
 from music21.abj import translate as abjTranslate
 
 from music21.analysis import correlate as analysisCorrelate
-from music21.analysis import metrical as analysisMetrical
 from music21.analysis import discrete as analysisDiscrete
-from music21.analysis import windowed as analysisWindowed
+from music21.analysis import metrical as analysisMetrical
 from music21.analysis import patel as analysisPatel
+from music21.analysis import windowed as analysisWindowed
 
 
 from music21 import articulations
@@ -114,9 +114,11 @@ MODULES = [
     abjTranslate,
 
     # analysis.
-    correlate,
-    discrete,
-    windowed,
+    analysisCorrelate,
+    analysisDiscrete,
+    analysisMetrical,
+    analysisPatel,
+    analysisWindowed,
     
     articulations,
     base,
@@ -143,7 +145,6 @@ MODULES = [
 
     meter, 
     metadata,
-    metrical,
 
     midi,
     midiTranslate,
@@ -171,9 +172,6 @@ MODULES = [
 
     xmlnode, 
 
-#   musicxml, 
-#   musicxmlTranslate,
-#   #  scale,
 
 # trecento
 #    trecentoCadencebook

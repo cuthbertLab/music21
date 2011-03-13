@@ -1449,10 +1449,13 @@ class Test(unittest.TestCase):
         #s.plot('grid', 'KrumhanslSchmuckler')
         #s.plot('windowed', 'aarden')
 
+
+# define presented order in documentation
+_DOC_ORDER = [analyzeStream, DiscreteAnalysis, Ambitus, MelodicIntervalDiversity, KeyWeightKeyAnalysis, SimpleWeights, AardenEssen, BellmanBudge, KrumhanslSchmuckler, KrumhanslKessler, TemperleyKostkaPayne]
+
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)
 
 

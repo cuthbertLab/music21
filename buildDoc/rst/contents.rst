@@ -46,6 +46,8 @@ Module Reference
    moduleAbjTranslate
    moduleAnalysisCorrelate
    moduleAnalysisDiscrete
+   moduleAnalysisMetrical
+   moduleAnalysisPatel
    moduleAnalysisWindowed
    moduleArticulations
    moduleBase
@@ -68,7 +70,6 @@ Module Reference
    moduleIntervalNetwork
    moduleMeter
    moduleMetadata
-   moduleAnalysisMetrical
    moduleMidiBase
    moduleMidiTranslate
    moduleMusedataBase

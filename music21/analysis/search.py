@@ -422,12 +422,6 @@ class Test(unittest.TestCase):
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) == 1:
-        music21.mainTest(Test)
-    else:
-        t = Test()
-        t.testfindConsecutiveScaleB()
-
+    music21.mainTest(Test)
 
 
