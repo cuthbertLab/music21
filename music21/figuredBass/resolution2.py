@@ -34,7 +34,7 @@ def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
     if inPlace:
         dpCopy = dominantPossib
     else:
-        dpCopy = copy.copy(dominantPossib)
+        dpCopy = copy.deepcopy(dominantPossib)
     
     V7chord = dpCopy.chordify()
     if not V7chord.isDominantSeventh():
@@ -86,9 +86,12 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
     >>> resolution2.dominantSeventhToMinorTonic(possibD, True)
     {'A': C5, 'S': F5, 'B': A-3, 'T': C4}
     '''
-    dpCopy = copy.copy(dominantPossib)
+    if inPlace:
+        dpCopy = dominantPossib
+    else:
+        dpCopy = copy.deepcopy(dominantPossib)
+
     V7chord = dpCopy.chordify()
-    
     if not V7chord.isDominantSeventh():
         raise ResolutionException("Possibility does not form a correctly spelled dominant seventh chord.")
     
@@ -136,7 +139,7 @@ def dominantSeventhToMajorSubmediant(dominantPossib, inPlace = False):
     if inPlace:
         dpCopy = dominantPossib
     else:
-        dpCopy = copy.copy(dominantPossib)
+        dpCopy = copy.deepcopy(dominantPossib)
     
     V7chord = dpCopy.chordify()
     if not V7chord.isDominantSeventh():
@@ -177,9 +180,12 @@ def dominantSeventhToMinorSubmediant(dominantPossib, inPlace = False):
     >>> resolution2.dominantSeventhToMinorSubmediant(possibB)
     {'A': F3, 'S': A3, 'B': D3, 'T': F3}
     '''
-    dpCopy = copy.copy(dominantPossib)
+    if inPlace:
+        dpCopy = dominantPossib
+    else:
+        dpCopy = copy.deepcopy(dominantPossib)
+
     V7chord = dpCopy.chordify()
-    
     if not V7chord.isDominantSeventh():
         raise ResolutionException("Possibility does not form a correctly spelled dominant seventh chord.")
     if not V7chord.inversion() == 0:
@@ -222,7 +228,7 @@ def dominantSeventhToMajorSubdominant(dominantPossib, inPlace = False):
     if inPlace:
         dpCopy = dominantPossib
     else:
-        dpCopy = copy.copy(dominantPossib)
+        dpCopy = copy.deepcopy(dominantPossib)
     
     V7chord = dpCopy.chordify()
     if not V7chord.isDominantSeventh():
@@ -261,9 +267,12 @@ def dominantSeventhToMinorSubdominant(dominantPossib, inPlace = False):
     >>> resolution2.dominantSeventhToMinorSubdominant(possibB)
     {'A': F3, 'S': B-3, 'B': D-3, 'T': F3}
     '''
-    dpCopy = copy.copy(dominantPossib)
+    if inPlace:
+        dpCopy = dominantPossib
+    else:
+        dpCopy = copy.deepcopy(dominantPossib)
+
     V7chord = dpCopy.chordify()
-    
     if not V7chord.isDominantSeventh():
         raise ResolutionException("Possibility does not form a correctly spelled dominant seventh chord.")
     if not V7chord.inversion() == 0:
@@ -289,22 +298,170 @@ def dominantSeventhToMinorSubdominant(dominantPossib, inPlace = False):
     return dpCopy
 
 #-------------------------------------------------------------------------------
-# DIMINISHED SEVENTH RESOLUTIONS
+# FULLY DIMINISHED SEVENTH RESOLUTIONS
 
 # STANDARD RESOLUTIONS = Doubled 3rd
 # ALTERNATE RESOLUTIONS  = Doubled root
-def diminishedSeventhToMajorTonic(dominantPossib, doubledRoot = False, inPlace = False):
-    pass
+def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace = False):
+    '''
+    >>> from music21 import pitch
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import resolution2
+    >>> possibA = possibility.Possibility({'B': pitch.Pitch('C#3'), 'T': pitch.Pitch('G3'), 'A': pitch.Pitch('E4'), 'S': pitch.Pitch('B-4')})
+    >>> resolution2.diminishedSeventhToMajorTonic(possibA)
+    {'A': F#4, 'S': A4, 'B': D3, 'T': F#3}
+    >>> resolution2.diminishedSeventhToMajorTonic(possibA, True) # Alternate resolution, contains parallel fifths
+    {'A': D4, 'S': A4, 'B': D3, 'T': F#3}
+    '''
+    if inPlace:
+        dpCopy = diminishedPossib
+    else:
+        dpCopy = copy.deepcopy(diminishedPossib)
+    
+    dim7chord = dpCopy.chordify()
+    if not dim7chord.isDiminishedSeventh():
+        raise ResolutionException("Possibility does not form a correctly spelled fully diminished seventh chord.")
+    
+    root = dim7chord.root()
+    bass = dim7chord.bass()
+    rootName = root.name
+    thirdName = root.transpose(interval.Interval('m3')).name
+    fifthName = root.transpose(interval.Interval('d5')).name
+    seventhName = root.transpose(interval.Interval('d7')).name
+    
+    for vl in dpCopy.keys():
+        samplePitch = dpCopy[vl]
+        isBass = (samplePitch == bass)
+        if samplePitch.name == rootName:
+            samplePitch.transpose('m2', True)
+        elif samplePitch.name == thirdName:
+            if doubledRoot:
+                samplePitch.transpose('-M2', True)
+            else:
+                samplePitch.transpose('M2', True)
+        elif samplePitch.name == fifthName:
+            samplePitch.transpose('-m2', True)
+        elif samplePitch.name == seventhName:
+            samplePitch.transpose('-m2', True)
+        
+    return dpCopy
 
-def diminishedSeventhToMinorTonic(dominantPossib, doubledRoot = False, inPlace = False):
-    pass
+def diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot = False, inPlace = False):
+    '''
+    >>> from music21 import pitch
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import resolution2
+    >>> possibA = possibility.Possibility({'B': pitch.Pitch('C#3'), 'T': pitch.Pitch('G3'), 'A': pitch.Pitch('E4'), 'S': pitch.Pitch('B-4')})
+    >>> resolution2.diminishedSeventhToMinorTonic(possibA)
+    {'A': F4, 'S': A4, 'B': D3, 'T': F3}
+    >>> resolution2.diminishedSeventhToMinorTonic(possibA, True) # Alternate resolution, contains parallel fifths
+    {'A': D4, 'S': A4, 'B': D3, 'T': F3}
+    '''
+    if inPlace:
+        dpCopy = diminishedPossib
+    else:
+        dpCopy = copy.deepcopy(diminishedPossib)
+    
+    dim7chord = dpCopy.chordify()
+    if not dim7chord.isDiminishedSeventh():
+        raise ResolutionException("Possibility does not form a correctly spelled fully diminished seventh chord.")
+    
+    root = dim7chord.root()
+    bass = dim7chord.bass()
+    rootName = root.name
+    thirdName = root.transpose(interval.Interval('m3')).name
+    fifthName = root.transpose(interval.Interval('d5')).name
+    seventhName = root.transpose(interval.Interval('d7')).name
+    
+    for vl in dpCopy.keys():
+        samplePitch = dpCopy[vl]
+        isBass = (samplePitch == bass)
+        if samplePitch.name == rootName:
+            samplePitch.transpose('m2', True)
+        elif samplePitch.name == thirdName:
+            if doubledRoot:
+                samplePitch.transpose('-M2', True)
+            else:
+                samplePitch.transpose('m2', True)
+        elif samplePitch.name == fifthName:
+            samplePitch.transpose('-M2', True)
+        elif samplePitch.name == seventhName:
+            samplePitch.transpose('-m2', True)
+        
+    return dpCopy
 
 # SUBDOMINANT RESOLUTIONS
-def diminishedSeventhToMajorSubdominant(dominantPossib, inPlace = False):
-    pass
+def diminishedSeventhToMajorSubdominant(diminishedPossib, inPlace = False):
+    '''
+    >>> from music21 import pitch
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import resolution2
+    >>> possibA = possibility.Possibility({'B': pitch.Pitch('C#3'), 'T': pitch.Pitch('G3'), 'A': pitch.Pitch('E4'), 'S': pitch.Pitch('B-4')})
+    >>> resolution2.diminishedSeventhToMajorSubdominant(possibA)
+    {'A': D4, 'S': B4, 'B': D3, 'T': G3}
+    '''
+    if inPlace:
+        dpCopy = diminishedPossib
+    else:
+        dpCopy = copy.deepcopy(diminishedPossib)
+    
+    dim7chord = dpCopy.chordify()
+    if not dim7chord.isDiminishedSeventh():
+        raise ResolutionException("Possibility does not form a correctly spelled fully diminished seventh chord.")
+    
+    root = dim7chord.root()
+    bass = dim7chord.bass()
+    rootName = root.name
+    thirdName = root.transpose(interval.Interval('m3')).name
+    fifthName = root.transpose(interval.Interval('d5')).name
+    seventhName = root.transpose(interval.Interval('d7')).name
+    
+    for vl in dpCopy.keys():
+        samplePitch = dpCopy[vl]
+        isBass = (samplePitch == bass)
+        if samplePitch.name == rootName:
+            samplePitch.transpose('m2', True)
+        elif samplePitch.name == thirdName:
+            samplePitch.transpose('-M2', True)
+        elif samplePitch.name == seventhName:
+            samplePitch.transpose('A1', True)
+        
+    return dpCopy
 
-def diminishedSeventhToMinorSubdominant(dominantPossib, inPlace = False):
-    pass
+def diminishedSeventhToMinorSubdominant(diminishedPossib, inPlace = False):
+    '''
+    >>> from music21 import pitch
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import resolution2
+    >>> possibA = possibility.Possibility({'B': pitch.Pitch('C#3'), 'T': pitch.Pitch('G3'), 'A': pitch.Pitch('E4'), 'S': pitch.Pitch('B-4')})
+    >>> resolution2.diminishedSeventhToMinorSubdominant(possibA)
+    {'A': D4, 'S': B-4, 'B': D3, 'T': G3}
+    '''
+    if inPlace:
+        dpCopy = diminishedPossib
+    else:
+        dpCopy = copy.deepcopy(diminishedPossib)
+    
+    dim7chord = dpCopy.chordify()
+    if not dim7chord.isDiminishedSeventh():
+        raise ResolutionException("Possibility does not form a correctly spelled fully diminished seventh chord.")
+    
+    root = dim7chord.root()
+    bass = dim7chord.bass()
+    rootName = root.name
+    thirdName = root.transpose(interval.Interval('m3')).name
+    fifthName = root.transpose(interval.Interval('d5')).name
+    seventhName = root.transpose(interval.Interval('d7')).name
+    
+    for vl in dpCopy.keys():
+        samplePitch = dpCopy[vl]
+        isBass = (samplePitch == bass)
+        if samplePitch.name == rootName:
+            samplePitch.transpose('m2', True)
+        elif samplePitch.name == thirdName:
+            samplePitch.transpose('-M2', True)
+        
+    return dpCopy
 
 #-------------------------------------------------------------------------------
 class ResolutionException(music21.Music21Exception):
