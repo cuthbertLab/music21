@@ -25,6 +25,13 @@ from music21.abc import translate as abcTranslate
 from music21 import abj
 from music21.abj import translate as abjTranslate
 
+from music21.analysis import correlate as analysisCorrelate
+from music21.analysis import metrical as analysisMetrical
+from music21.analysis import discrete as analysisDiscrete
+from music21.analysis import windowed as analysisWindowed
+from music21.analysis import patel as analysisPatel
+
+
 from music21 import articulations
 from music21 import base
 from music21 import beam
@@ -76,11 +83,6 @@ from music21 import tempo
 from music21 import tinyNotation
 
 from music21.trecento import cadencebook as trecentoCadencebook
-
-from music21.analysis import correlate
-from music21.analysis import metrical
-from music21.analysis import discrete
-from music21.analysis import windowed
 
 
 #from music21 import environment #redundant

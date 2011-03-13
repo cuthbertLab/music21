@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         windowed.py
+# Name:         discrete.py
 # Purpose:      Framework for modular, windowed analysis
 #
 # Authors:      Jared Sadoian
@@ -1447,7 +1447,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of C major>, <music21.key.Key of C minor>, <music21.key.Key of G minor>, <music21.key.Key of F minor>, <music21.key.Key of A minor>, <music21.key.Key of G major>, <music21.key.Key of D minor>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of E- major>, <music21.key.Key of E minor>, <music21.key.Key of B- minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of F# minor>, <music21.key.Key of C# major>, <music21.key.Key of B minor>, <music21.key.Key of E major>, <music21.key.Key of C# minor>, <music21.key.Key of E- minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of G# minor>]')
         
         #s.plot('grid', 'KrumhanslSchmuckler')
-        s.plot('windowed', 'aarden')
+        #s.plot('windowed', 'aarden')
 
 #------------------------------------------------------------------------------
 
