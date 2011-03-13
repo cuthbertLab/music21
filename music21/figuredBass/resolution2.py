@@ -1,3 +1,12 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         resolution2.py
+# Purpose:      Defines standard resolutions for possibility instances
+# Authors:      Jose Cabal-Ugaz
+#
+# Copyright:    (c) 2011 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
 import music21
 import copy 
 import unittest
@@ -8,6 +17,7 @@ from music21 import interval
 
 from music21.figuredBass import possibility
 
+#Used Ex.76 (page 46) from 'The Basis of Harmony' by Frederick J. Horwood
 #-------------------------------------------------------------------------------
 # DOMINANT SEVENTH RESOLUTIONS
 
