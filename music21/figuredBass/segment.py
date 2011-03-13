@@ -32,7 +32,7 @@ class Segment:
         self.nextMovements = {}
         self.nextSegment = None
 
-    def solve(self):
+    def resolve(self):
         raise SegmentException("Must specifically create PreviousSegment or NextSegment to call this method.")
     
     def allPossibilities(self):
@@ -132,9 +132,9 @@ class Segment:
 class PreviousSegment(Segment):
     def __init__(self, fbInformation, bassNote, notation = ''):
         Segment.__init__(self, fbInformation, bassNote, notation)
-        self.solve()
+        self.resolve()
 
-    def solve(self):
+    def resolve(self):
         # Imitates _findPossibleStartingChords from realizer.py
         self.possibilities = self.correctPossibilities()
     
@@ -142,9 +142,9 @@ class NextSegment(Segment):
     def __init__(self, fbInformation, prevSegment, bassNote, notation = ''):
         Segment.__init__(self, fbInformation, bassNote, notation)
         self.prevSegment = prevSegment
-        self.solve()
+        self.resolve()
     
-    def solve(self):
+    def resolve(self):
         # Imitates _findNextPossibilities from realizer.py
         prevPossibilities = self.prevSegment.possibilities
         nextPossibilities = self.correctPossibilities()
@@ -168,10 +168,8 @@ class NextSegment(Segment):
         vlBottom = self.fbVoices[0].label
         if not prevPossib.noHiddenIntervals(nextPossib, vlTop, vlBottom, self.fbRules):
             return False
-
         if not prevPossib.correctVoiceLeading2(nextPossib, self.fbVoices, self.fbRules):
             return False
-        
         if not prevPossib.correctVoiceLeading(nextPossib, self.fbRules):
             return False
         
