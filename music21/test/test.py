@@ -129,9 +129,9 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False):
     modGather = ModuleGather()
     modules = modGather.load(restoreEnvironmentDefaults)
 
-    verbosity = 1
+    verbosity = 2
     if 'verbose' in sys.argv:
-        verbosity = 2 # this seems to hide most display
+        verbosity = 1 # this seems to hide most display
 
     environLocal.printDebug('looking for Test classes...\n')
     # look over each module and gather doc tests and unittests
