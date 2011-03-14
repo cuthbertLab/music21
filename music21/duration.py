@@ -1019,8 +1019,21 @@ class Tuplet(object):
         self.durationNormal = DurationUnit(durType)        
 
 
-    def augmentOrDiminish(self, scalar, inPlace=True):
-        '''Given a scalar greater than zero, return a scaled version of this Duration.
+    def augmentOrDiminish(self, amountToScale, inPlace=True):
+        '''
+        Given a number greater than zero, 
+        multiplies the current quarterLength of the 
+        duration by the number and resets the components
+        for the duration (by default).  Or if inPlace is
+        set to False, returns a new duration that has
+        the new length.
+        
+        
+        Note that the default for inPlace is the opposite
+        of what it is for augmentOrDiminish on a Stream.
+        This is done purposely to reflect the most common
+        usage.
+
 
         >>> from music21 import duration
         >>> a = duration.Tuplet()
@@ -1035,8 +1048,8 @@ class Tuplet(object):
         >>> a.tupletMultiplier()
         0.333...
         '''
-        if not scalar > 0:
-            raise DurationException('scalar must be greater than zero')
+        if not amountToScale > 0:
+            raise DurationException('amountToScale must be greater than zero')
         # TODO: scale the triplet in the same manner as Durations
 
         if inPlace:
@@ -1046,8 +1059,8 @@ class Tuplet(object):
             post = copy.deepcopy(self)
 
         # duration units scale
-        post.durationActual.augmentOrDiminish(scalar, inPlace=True)
-        post.durationNormal.augmentOrDiminish(scalar, inPlace=True)
+        post.durationActual.augmentOrDiminish(amountToScale, inPlace=True)
+        post.durationNormal.augmentOrDiminish(amountToScale, inPlace=True)
 
         # ratios stay the same
         #self.numberNotesActual = actual
@@ -1301,9 +1314,22 @@ class DurationUnit(DurationCommon):
         self.linkStatus = False
 
 
-    def augmentOrDiminish(self, scalar, inPlace=True):
-        '''Given a scalar greater than one, return a scaled version of this duration.
-
+    def augmentOrDiminish(self, amountToScale, inPlace=True):
+        '''
+        Given a number greater than zero, 
+        multiplies the current quarterLength of the 
+        duration by the number and resets the components
+        for the duration (by default).  Or if inPlace is
+        set to False, returns a new duration that has
+        the new length.
+        
+        
+        Note that the default for inPlace is the opposite
+        of what it is for augmentOrDiminish on a Stream.
+        This is done purposely to reflect the most common
+        usage.
+        
+        
         >>> bDur = DurationUnit('16th') 
         >>> bDur.augmentOrDiminish(2)
         >>> bDur.quarterLength
@@ -1321,8 +1347,8 @@ class DurationUnit(DurationCommon):
         >>> cDur, bDur
         (<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>)
         '''
-        if not scalar > 0:
-            raise DurationException('scalar must be greater than zero')
+        if not amountToScale > 0:
+            raise DurationException('amountToScale must be greater than zero')
 
         if inPlace:
             post = self
@@ -1331,14 +1357,14 @@ class DurationUnit(DurationCommon):
             
         # note: this is not yet necessary, as changes are configured
         # by quarterLength, and this process generates new tuplets
-        # if altnerative scaling methods are used for performance, this
+        # if alternative scaling methods are used for performance, this
         # method can be used. 
 #         for tup in post._tuplets:
-#             tup.augmentOrDiminish(scalar, inPlace=True)
+#             tup.augmentOrDiminish(amountToScale, inPlace=True)
 
         # possible look for convenient optimizations for easy scaling
         # not sure if linkStatus should be altered?
-        post.quarterLength = self.quarterLength * scalar
+        post.quarterLength = self.quarterLength * amountToScale
 
         if not inPlace:
             return post
@@ -2353,8 +2379,21 @@ class Duration(DurationCommon):
 
 
 
-    def augmentOrDiminish(self, scalar, retainComponents=False, inPlace=True):
-        '''Given a scalar greater than zero, return a scaled version of this duration.
+    def augmentOrDiminish(self, amountToScale, retainComponents=False, inPlace=True):
+        '''
+        Given a number greater than zero, 
+        multiplies the current quarterLength of the 
+        duration by the number and resets the components
+        for the duration (by default).  Or if inPlace is
+        set to False, returns a new duration that has
+        the new length.
+        
+        
+        Note that the default for inPlace is the opposite
+        of what it is for augmentOrDiminish on a Stream.
+        This is done purposely to reflect the most common
+        usage.
+
 
         >>> aDur = Duration()
         >>> aDur.quarterLength = 1.5 # dotted quarter
@@ -2382,8 +2421,8 @@ class Duration(DurationCommon):
 
 
         '''
-        if not scalar > 0:
-            raise DurationException('scalar must be greater than zero')
+        if not amountToScale > 0:
+            raise DurationException('amountToScale must be greater than zero')
 
         if inPlace:
             post = self
@@ -2392,11 +2431,11 @@ class Duration(DurationCommon):
 
         if retainComponents:
             for d in post.components:
-                d.augmentOrDiminish(scalar, inPlace=True)
+                d.augmentOrDiminish(amountToScale, inPlace=True)
             self._typeNeedsUpdating = True
             self._quarterLengthNeedsUpdating = True
         else:
-            post.quarterLength = post.quarterLength * scalar
+            post.quarterLength = post.quarterLength * amountToScale
 
         if not inPlace:
             return post

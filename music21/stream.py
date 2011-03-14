@@ -5430,22 +5430,38 @@ class Stream(music21.Music21Object):
             return None
 
 
-    def scaleOffsets(self, scalar, anchorZero='lowest', 
+    def scaleOffsets(self, amountToScale, anchorZero='lowest', 
             anchorZeroRecurse=None, inPlace=True):
         '''
-        Scale all offsets by a provided scalar. Durations are not altered. 
+        Scale all offsets by a multiplication factor given
+        in `amountToScale`. Durations are not altered. 
 
 
-        To augment or diminish a Stream, see the :meth:`~music21.stream.Stream.augmentOrDiminish` method. 
+        To augment or diminish a Stream, 
+        see the :meth:`~music21.stream.Stream.augmentOrDiminish` method. 
 
 
-        The `anchorZero` parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), "lowest", or "highest". 
+        The `anchorZero` parameter determines if and/or where 
+        the zero offset is established for the set of 
+        offsets in this Stream before processing. 
+        Offsets are shifted to make either the lower 
+        or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), "lowest", or "highest". 
 
 
-        The `anchorZeroRecurse` parameter determines the anchorZero for all embedded Streams, and Streams embedded within those Streams. If the lowest offset in an embedded Stream is non-zero, setting this value to None will a the space between the start of that Stream and the first element to be scaled. If the lowest offset in an embedded Stream is non-zero, setting this value to 'lowest' will not alter the space between the start of that Stream and the first element to be scaled. 
+        The `anchorZeroRecurse` parameter determines the 
+        anchorZero for all embedded Streams, and Streams 
+        embedded within those Streams. If the lowest offset 
+        in an embedded Stream is non-zero, setting this value 
+        to None will a the space between the start of that 
+        Stream and the first element to be scaled. If the 
+        lowest offset in an embedded Stream is non-zero, 
+        setting this value to 'lowest' will not alter the 
+        space between the start of that Stream and the first 
+        element to be scaled. 
 
 
-        To shift all the elements in a Stream, see the :meth:`~music21.stream.Stream.shiftElements` method. 
+        To shift all the elements in a Stream, see the 
+        :meth:`~music21.stream.Stream.shiftElements` method. 
 
 
         '''
@@ -5457,8 +5473,8 @@ class Stream(music21.Music21Object):
         # we scale by 2; if we do not anchor at lower, we get 20, 24, 28
         # if we anchor, we get 10, 14, 18
 
-        if not scalar > 0:
-            raise StreamException('scalar must be greater than zero')
+        if not amountToScale > 0:
+            raise StreamException('amountToScale must be greater than zero')
 
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
@@ -5478,8 +5494,8 @@ class Stream(music21.Music21Object):
         for e in returnObj._elements:
 
             # subtract the offset shift (and lowestOffset of 80 becomes 0)
-            # then apply the scalar
-            o = (e.getOffsetBySite(returnObj) - offsetShift) * scalar
+            # then apply the amountToScale
+            o = (e.getOffsetBySite(returnObj) - offsetShift) * amountToScale
             # after scaling, return the shift taken away
             o += offsetShift
 
@@ -5490,21 +5506,23 @@ class Stream(music21.Music21Object):
             # on them, with inPlace == True, as already copied if 
             # inPlace is != True
             if hasattr(e, "elements"): # recurse time:
-                e.scaleOffsets(scalar, anchorZero=anchorZeroRecurse, anchorZeroRecurse=anchorZeroRecurse,
+                e.scaleOffsets(amountToScale, 
+                               anchorZero=anchorZeroRecurse, 
+                               anchorZeroRecurse=anchorZeroRecurse,
                 inPlace=True)
 
         returnObj._elementsChanged() 
         return returnObj
 
 
-    def scaleDurations(self, scalar, inPlace=True):
+    def scaleDurations(self, amountToScale, inPlace=True):
         '''Scale all durations by a provided scalar. Offsets are not modified.
 
         To augment or diminish a Stream, see the :meth:`~music21.stream.Stream.augmentOrDiminish` method. 
 
         '''
-        if not scalar > 0:
-            raise StreamException('scalar must be greater than zero')
+        if not amountToScale > 0:
+            raise StreamException('amountToScale must be greater than zero')
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
@@ -5514,22 +5532,39 @@ class Stream(music21.Music21Object):
             # check if its a Stream, first, as duration is dependent
             # and do not want to override
             if hasattr(e, "elements"): # recurse time:
-                e.scaleDurations(scalar)
+                e.scaleDurations(amountToScale)
             elif hasattr(e, 'duration'):
                 if e.duration != None:
                     # inPlace is True as a  copy has already been made if nec
-                    e.duration.augmentOrDiminish(scalar, inPlace=True)
+                    e.duration.augmentOrDiminish(amountToScale, inPlace=True)
 
         returnObj._elementsChanged() 
         return returnObj
 
 
-    def augmentOrDiminish(self, scalar, inPlace=False):
-        '''Scale this Stream by a provided numerical scalar. A scalar of .5 is half the durations and relative offset positions; a scalar of 2 is twice the durations and relative offset positions.
-    
-        If `inPlace` is True, the alteration will be made to the calling object. Otherwise, a new Stream is returned. 
+    def augmentOrDiminish(self, amountToScale, inPlace=False):
+        '''
+        Given a number greater than zero, 
+        multiplies the current quarterLength of the 
+        duration of each element by this number 
+        as well as their offset and returns a new Stream.  
+        Or if `inPlace` is
+        set to True, modifies the durations of each
+        element within the stream.
+        
+        
+        A number of .5 will halve the durations and relative 
+        offset positions; a number of 2 will double the 
+        durations and relative offset positions.
+ 
+        
+        
+        Note that the default for inPlace is the opposite
+        of what it is for augmentOrDiminish on a Duration.
+        This is done purposely to reflect the most common
+        usage.
 
-
+        
         >>> from music21 import *
         >>> s = stream.Stream()
         >>> n = note.Note()
@@ -5543,17 +5578,17 @@ class Stream(music21.Music21Object):
         >>> s1.highestOffset, s1.highestTime
         (4.5, 5.0)
         '''
-        if not scalar > 0:
-            raise StreamException('scalar must be greater than zero')
+        if not amountToScale > 0:
+            raise StreamException('amountToScale must be greater than zero')
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
             returnObj = self
 
         # inPlace is True as a copy has already been made if nec
-        returnObj.scaleOffsets(scalar=scalar, anchorZero='lowest', 
+        returnObj.scaleOffsets(amountToScale=amountToScale, anchorZero='lowest', 
             anchorZeroRecurse=None, inPlace=True)
-        returnObj.scaleDurations(scalar=scalar, inPlace=True)
+        returnObj.scaleDurations(amountToScale=amountToScale, inPlace=True)
         returnObj._elementsChanged() 
 
         # do not need to call elements changed, as called in sub methods
