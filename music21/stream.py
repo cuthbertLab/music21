@@ -147,7 +147,6 @@ class Stream(music21.Music21Object):
         self.autoSort = True
         self.isFlat = True  # does it have no embedded Streams
 
-        # seems that this should be named with a leading lower case?
         # when deriving a flat stream, store a reference to the non-flat Stream          
         # from which this was taken
         self.flattenedRepresentationOf = None 
@@ -158,6 +157,12 @@ class Stream(music21.Music21Object):
             for e in givenElements:
                 self.insert(e)
 
+
+    def __repr__(self):
+        if self.id is not None:
+            return '<music21.stream.%s %s>' % (self.__class__.__name__, self.id)
+        else:
+            return Music21Object.__repr__(self)
 
     #---------------------------------------------------------------------------
     # sequence like operations
@@ -844,30 +849,37 @@ class Stream(music21.Music21Object):
         the activeSite after inserting an element. 
         
         Has three forms: in the two argument form, inserts an element at the given offset:
+
+
+        >>> from music21 import *
         
-        >>> st1 = Stream()
+        >>> st1 = stream.Stream()
         >>> st1.insert(32, note.Note("B-"))
         >>> st1._getHighestOffset()
         32.0
+
         
         In the single argument form with an object, inserts the element at its stored offset:
+
         
         >>> n1 = note.Note("C#")
         >>> n1.offset = 30.0
-        >>> st1 = Stream()
+        >>> st1 = stream.Stream()
         >>> st1.insert(n1)
-        >>> st2 = Stream()
+        >>> st2 = stream.Stream()
         >>> st2.insert(40.0, n1)
         >>> n1.getOffsetBySite(st1)
         30.0
+
         
         In single argument form with a list, the list should contain pairs that alternate
         offsets and items; the method then, obviously, inserts the items
         at the specified offsets:
+
         
         >>> n1 = note.Note("G")
         >>> n2 = note.Note("F#")
-        >>> st3 = Stream()
+        >>> st3 = stream.Stream()
         >>> st3.insert([1.0, n1, 2.0, n2])
         >>> n1.getOffsetBySite(st3)
         1.0
@@ -876,9 +888,10 @@ class Stream(music21.Music21Object):
         >>> len(st3)
         2
 
+
         OMIT_FROM_DOCS
         Raise an error if offset is not a number
-        >>> Stream().insert("l","g")
+        >>> stream.Stream().insert("l","g")
         Traceback (most recent call last):
         StreamException: ...
         
@@ -945,7 +958,9 @@ class Stream(music21.Music21Object):
 
         runs fast for multiple addition and will preserve isSorted if True
 
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> notes = []
         >>> for x in range(0,3):
         ...     n = note.Note('G#')
@@ -961,8 +976,12 @@ class Stream(music21.Music21Object):
         >>> a.highestOffset, a.highestTime
         (6.0, 9.0)
         >>> notes2 = []
-        >>> # since notes are not embedded in Elements here, their offset
-        >>> # changes when added to a stream!
+        
+        
+        since notes are not embedded in Elements here, their offset
+        changes when they are added to a stream!
+        
+        
         >>> for x in range(0,3):
         ...     n = note.Note("A-")
         ...     n.duration.quarterLength = 3
@@ -974,7 +993,11 @@ class Stream(music21.Music21Object):
         >>> a.isSequence()
         True
         
-        Add a note that already has an offset set -- does nothing different!
+        
+        Adding a note that already has an offset set does nothing different
+        from above!  That is, it is still added to the end of the Stream:
+        
+        
         >>> n3 = note.Note("B-")
         >>> n3.offset = 1
         >>> n3.duration.quarterLength = 3
@@ -1022,9 +1045,16 @@ class Stream(music21.Music21Object):
 
     def storeAtEnd(self, itemOrList, ignoreSort=False):
         '''
-        Inserts an item or items at the end of the Stream, stored in the special _endElements
+        Inserts an item or items at the end of the Stream, 
+        stored in the special box (called _endElements).
+        
+        This method is useful for putting things such as
+        right bar lines or courtesy clefs that should always
+        be at the end of a Stream no matter what else is appended
+        to it
 
-        As sorting is only by priority and class, cannot avoid setting isSorted to False. 
+        As sorting is done only by priority and class, 
+        it cannot avoid setting isSorted to False. 
         
         '''
         if isinstance(itemOrList, list):
@@ -1067,15 +1097,17 @@ class Stream(music21.Music21Object):
 
         That is item.getOffsetBySite(None); in fact, the entire code is self.insert(item.getOffsetBySite(None), item)
 
+        >>> from music21 import *
+
         >>> n1 = note.Note("F-")
         >>> n1.offset = 20.0
-        >>> stream1 = Stream()
+        >>> stream1 = stream.Stream()
         >>> stream1.append(n1)
         >>> n1.getOffsetBySite(stream1)
         0.0
         >>> n1.offset
         0.0
-        >>> stream2 = Stream()
+        >>> stream2 = stream.Stream()
         >>> stream2.insertAtNativeOffset(n1)
         >>> stream2[0].offset
         20.0
@@ -1089,7 +1121,9 @@ class Stream(music21.Music21Object):
 
         This presently does not shift elements that have durations that extend into the lowest insert position.
 
-        >>> st1 = Stream()
+        >>> from music21 import *
+
+        >>> st1 = stream.Stream()
         >>> st1.insertAndShift(32, note.Note("B-"))
         >>> st1.highestOffset
         32.0
@@ -1097,32 +1131,36 @@ class Stream(music21.Music21Object):
         >>> st1.highestOffset
         33.0
         
+        
         In the single argument form with an object, inserts the element at its stored offset:
+        
         
         >>> n1 = note.Note("C#")
         >>> n1.offset = 30.0
         >>> n2 = note.Note("C#")
         >>> n2.offset = 30.0
-        >>> st1 = Stream()
+        >>> st1 = stream.Stream()
         >>> st1.insertAndShift(n1)
         >>> st1.insertAndShift(n2) # should shift offset of n1
         >>> n1.getOffsetBySite(st1)
         31.0
         >>> n2.getOffsetBySite(st1)
         30.0
-        >>> st2 = Stream()
+        >>> st2 = stream.Stream()
         >>> st2.insertAndShift(40.0, n1)
         >>> st2.insertAndShift(40.0, n2)
         >>> n1.getOffsetBySite(st2)
         41.0        
 
+
         In single argument form with a list, the list should contain pairs that alternate
         offsets and items; the method then, obviously, inserts the items
         at the specified offsets:
+
         
         >>> n1 = note.Note("G")
         >>> n2 = note.Note("F#")
-        >>> st3 = Stream()
+        >>> st3 = stream.Stream()
         >>> st3.insertAndShift([1.0, n1, 2.0, n2])
         >>> n1.getOffsetBySite(st3)
         1.0
@@ -1297,10 +1335,12 @@ class Stream(music21.Music21Object):
     def _recurseRepr(self, thisStream, prefixSpaces=0, 
                     addBreaks=True, addIndent=True):
         '''
+        >>> from music21 import *
+
         >>> import note
-        >>> s1 = Stream()
-        >>> s2 = Stream()
-        >>> s3 = Stream()
+        >>> s1 = stream.Stream()
+        >>> s2 = stream.Stream()
+        >>> s3 = stream.Stream()
         >>> n1 = note.Note()
         >>> s3.append(n1)
         >>> s2.append(s3)
@@ -1347,9 +1387,12 @@ class Stream(music21.Music21Object):
     # temporary storage
 
     def setupPickleScaffold(self):
-        '''Prepare this stream and all of its contents for pickling.
+        '''Prepare this stream and all of its contents for pickling, that
+        is, storing on disk.
 
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> n = note.Note()
         >>> n.duration.type = "whole"
         >>> a.repeatAppend(n, 10)
@@ -1370,7 +1413,9 @@ class Stream(music21.Music21Object):
     def teardownPickleScaffold(self):
         '''After rebuilding this stream from pickled storage, prepare this as a normal Stream.
 
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> n = note.Note()
         >>> n.duration.type = "whole"
         >>> a.repeatAppend(n, 10)
@@ -1493,7 +1538,9 @@ class Stream(music21.Music21Object):
         belong to a certain class (or for Streams which are themselves of
         a certain class) are set.
          
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> a.repeatAppend(note.Note('A-'), 30)
         >>> a.repeatAppend(note.Rest(), 30)
         >>> a.addGroupForElements('flute')
@@ -1632,7 +1679,9 @@ class Stream(music21.Music21Object):
     def getElementsNotOfClass(self, classFilterList):
         '''Return a list of all Elements that do not match the one or more classes in the `classFilterList`. A single class can be provided to the `classFilterList` parameter.
         
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> a.repeatInsert(note.Rest(), range(10))
         >>> for x in range(4):
         ...     n = note.Note('G#')
@@ -1642,7 +1691,7 @@ class Stream(music21.Music21Object):
         >>> len(found)
         10
 
-        >>> b = Stream()
+        >>> b = stream.Stream()
         >>> b.repeatInsert(note.Rest(), range(15))
         >>> a.insert(b)
         >>> # here, it gets elements from within a stream
@@ -1694,7 +1743,8 @@ class Stream(music21.Music21Object):
 
     def getElementsByGroup(self, groupFilterList):
         '''        
-        >>> from music21 import note
+        >>> from music21 import *
+
         >>> n1 = note.Note("C")
         >>> n1.groups.append('trombone')
         >>> n2 = note.Note("D")
@@ -1702,7 +1752,7 @@ class Stream(music21.Music21Object):
         >>> n2.groups.append('tuba')
         >>> n3 = note.Note("E")
         >>> n3.groups.append('tuba')
-        >>> s1 = Stream()
+        >>> s1 = stream.Stream()
         >>> s1.append(n1)
         >>> s1.append(n2)
         >>> s1.append(n3)
@@ -1746,7 +1796,9 @@ class Stream(music21.Music21Object):
     def groupCount(self):
         '''Get a dictionary for each groupId and the count of instances.
 
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> n = note.Note()
         >>> a.repeatAppend(n, 30)
         >>> a.addGroupForElements('P1')
@@ -1775,14 +1827,16 @@ class Stream(music21.Music21Object):
         '''Given an object, return the offset of that object in the context of
         this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure. 
 
+        >>> from music21 import *
+
         >>> n1 = note.Note('A')
         >>> n2 = note.Note('B')
 
-        >>> s1 = Stream()
+        >>> s1 = stream.Stream()
         >>> s1.insert(10, n1)
         >>> s1.insert(100, n2)
 
-        >>> s2 = Stream()
+        >>> s2 = stream.Stream()
         >>> s2.insert(10, s1)
 
         >>> s2.flat.getOffsetBySite(n1) # this will not work
@@ -1813,10 +1867,10 @@ class Stream(music21.Music21Object):
         '''Returns the first encountered element for a given id. Return None
         if no match
 
-        >>> import music21
-        >>> e = 'test'
-        >>> a = music21.stream.Stream()
-        >>> ew = music21.ElementWrapper(e)
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
+        >>> ew = note.Note()
         >>> a.insert(0, ew)
         >>> a[0].id = 'green'
         >>> None == a.getElementById(3)
@@ -1830,7 +1884,7 @@ class Stream(music21.Music21Object):
         Getting an element by getElementById changes its activeSite
         
         
-        >>> b = music21.stream.Stream()
+        >>> b = stream.Stream()
         >>> b.append(ew)
         >>> ew.activeSite is b
         True
@@ -1867,21 +1921,66 @@ class Stream(music21.Music21Object):
         return None
 
     def getElementsByOffset(self, offsetStart, offsetEnd=None,
-                    includeEndBoundary=True, mustFinishInSpan=False, mustBeginInSpan=True):
-        '''Return a Stream of all Elements that are found at a certain offset or within a certain offset time range, specified as start and stop values.
-
-        If `mustFinishInSpan` is True then an event that begins between offsetStart and offsetEnd but which ends after offsetEnd will not be included.  For instance, a half note at offset 2.0 will be found in.
-
-        The `includeEndBoundary` option determines if an element begun just at offsetEnd should be included.  Setting includeEndBoundary to False at the same time as mustFinishInSpan is set to True is probably NOT what you ever want to do.
+                    includeEndBoundary=True, mustFinishInSpan=False, 
+                    mustBeginInSpan=True):
+        '''
+        Returns a Stream containing all Music21Objects that 
+        are found at a certain offset or within a certain 
+        offset time range (given the start and optional stop values).
         
-        Setting `mustBeginInSpan` to False is a good way of finding 
         
+        There are several attributes that govern how this range is
+        determined:
+
+
+        If `mustFinishInSpan` is True then an event that begins 
+        between offsetStart and offsetEnd but which ends after offsetEnd 
+        will not be included.  The default is False.
+
+        
+        For instance, a half note at offset 2.0 will be found in 
+        getElementsByOffset(1.5, 2.5) or getElementsByOffset(1.5, 2.5,
+        mustFinishInSpan = False) but not by getElementsByOffset(1.5, 2.5, 
+        mustFinishInSpan = True).  
+
+
+        The `includeEndBoundary` option determines if an element 
+        begun just at the offsetEnd should be included.  For instance,
+        the half note at offset 2.0 above would be found by
+        getElementsByOffset(0, 2.0) or by getElementsByOffset(0, 2.0,
+        includeEndBoundary = True) but not by getElementsByOffset(0, 2.0,
+        includeEndBoundary = False).
+        
+
+        Setting includeEndBoundary to False at the same time as 
+        mustFinishInSpan is set to True is probably NOT what you want to do
+        unless you want to find things like clefs at the end of the region
+        to display as courtesy clefs.
+        
+
+        The `mustBeginInSpan` option determines whether notes or other
+        objects that do not begin in the region but are still sounding
+        at the beginning of the region are excluded.  The default is 
+        True -- that is, these notes will not be included.  
+        For instance the half note at offset 2.0 from above would not be found by
+        getElementsByOffset(3.0, 3.5) or getElementsByOffset(3.0, 3.5, 
+        mustBeginInSpan = True) but it would be found by
+        getElementsByOffset(3.0, 3.5, mustBeginInSpan = False)
+        
+
+        This chart, and the examples below, demonstrate the various
+        features of getElementsByOffset.  It is one of the most complex
+        methods of music21 but also one of the most powerful, so it
+        is worth learning at least the basics.
+
 
             .. image:: images/getElementsByOffset.*
                 :width: 600
 
 
-        >>> st1 = Stream()
+        >>> from music21 import *
+
+        >>> st1 = stream.Stream()
         >>> n0 = note.Note("C")
         >>> n0.duration.type = "half"
         >>> n0.offset = 0
@@ -1921,11 +2020,14 @@ class Stream(music21.Music21Object):
         2
         >>> [el.step for el in out7]
         ['C', 'D']
-        >>> a = Stream()
+        
+        
+        
+        >>> a = stream.Stream()
         >>> n = note.Note('G')
         >>> n.quarterLength = .5
         >>> a.repeatInsert(n, range(8))
-        >>> b = Stream()
+        >>> b = stream.Stream()
         >>> b.repeatInsert(a, [0, 3, 6])
         >>> c = b.getElementsByOffset(2,6.9)
         >>> len(c)
@@ -1986,14 +2088,15 @@ class Stream(music21.Music21Object):
         Return one element or None if no elements are at or preceded by this 
         offset. 
 
-        >>> import music21
-        >>> stream1 = music21.stream.Stream()
+        >>> from music21 import *
 
-        >>> x = music21.note.Note('D4')
+        >>> stream1 = stream.Stream()
+
+        >>> x = note.Note('D4')
         >>> x.id = 'x'
-        >>> y = music21.note.Note('E4')
+        >>> y = note.Note('E4')
         >>> y.id = 'y'
-        >>> z = music21.note.Rest()
+        >>> z = note.Rest()
         >>> z.id = 'z'
 
         >>> stream1.insert(20, x)
@@ -2030,7 +2133,7 @@ class Stream(music21.Music21Object):
         for that object to the Stream, and thus sets its offset
 
 
-        >>> stream2 = music21.stream.Stream()
+        >>> stream2 = stream.Stream()
         >>> stream2.insert(100.5, x)
         >>> x.offset
         100.5
@@ -2054,7 +2157,7 @@ class Stream(music21.Music21Object):
         sort before notes:
         
 
-        #>>> clef1 = music21.clef.BassClef()
+        #>>> clef1 = clef.BassClef()
         #>>> stream1.insert(20, clef1)
         #>>> e = stream1.getElementAtOrBefore(21)
         #>>> e
@@ -2111,7 +2214,6 @@ class Stream(music21.Music21Object):
         '''Given an offset, find the element at this offset, or with the offset
         greater than and nearest to.
 
-        OMIT_FROM_DOCS
         TODO: write this
         '''
         raise Exception("not yet implemented")
@@ -2119,7 +2221,6 @@ class Stream(music21.Music21Object):
     def getElementBeforeOffset(self, offset, classList=None):
         '''Get element before a provided offset
 
-        OMIT_FROM_DOCS
         TODO: write this
         '''
         raise Exception("not yet implemented")
@@ -2127,7 +2228,6 @@ class Stream(music21.Music21Object):
     def getElementAfterOffset(self, offset, classList = None):
         '''Get element after a provided offset
 
-        OMIT_FROM_DOCS
         TODO: write this
         '''
         raise Exception("not yet implemented")
@@ -2136,7 +2236,6 @@ class Stream(music21.Music21Object):
     def getElementBeforeElement(self, element, classList = None):
         '''given an element, get the element before
 
-        OMIT_FROM_DOCS
         TODO: write this
         '''
         raise Exception("not yet implemented")
@@ -2144,8 +2243,10 @@ class Stream(music21.Music21Object):
     def getElementAfterElement(self, element, classList = None):
         '''given an element, get the next element.  If classList is specified, 
         check to make sure that the element is an instance of the class list
+
+        >>> from music21 import *
         
-        >>> st1 = Stream()
+        >>> st1 = stream.Stream()
         >>> n1 = note.Note()
         >>> n2 = note.Note()
         >>> r3 = note.Rest()
@@ -2237,7 +2338,7 @@ class Stream(music21.Music21Object):
 
         While all elements in the source are made available in the extracted region, new Measure objects are created and returned. 
 
-        >>> from music21 import corpus
+        >>> from music21 import *
         >>> a = corpus.parseWork('bach/bwv324.xml')
         >>> b = a[0].measures(4,6)
         >>> len(b)
@@ -2393,7 +2494,7 @@ class Stream(music21.Music21Object):
 
         This method is distinguished from :meth:`~music21.stream.Stream.measures` in that this method returns a single Measure object, not a Stream containing one or more Measure objects.
 
-        >>> from music21 import corpus
+        >>> from music21 import *
         >>> a = corpus.parseWork('bach/bwv324.xml')
         >>> a[0].measure(3)
         <music21.stream.Measure 3 offset=0.0>
@@ -2419,7 +2520,7 @@ class Stream(music21.Music21Object):
         The `classFilterList` argument can be a list of classes 
         used to find Measures. A default of None uses Measure. 
 
-        >>> from music21 import corpus
+        >>> from music21 import *
         >>> a = corpus.parseWork('bach/bwv324.xml')
         >>> sorted(a[0].measureOffsetMap().keys())
         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]
@@ -2508,8 +2609,10 @@ class Stream(music21.Music21Object):
         sortByCreationTime=True):
         '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default
+
+        >>> from music21 import *
         
-        >>> a = Stream()
+        >>> a = stream.Stream()
         >>> b = meter.TimeSignature('3/4')
         >>> a.insert(b)
         >>> a.repeatInsert(note.Note("C#"), range(10)) 
@@ -2551,7 +2654,9 @@ class Stream(music21.Music21Object):
         '''Search this stream or activeSite streams for :class:`~music21.instrument.Instrument` objects, otherwise 
         return a default
 
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> b = a.getInstrument() # a default will be returned
         '''
         #environLocal.printDebug(['searching for instrument, called from:', 
@@ -2588,7 +2693,8 @@ class Stream(music21.Music21Object):
     
         This does not automatically get a flat representation of the Stream.
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> for x in range(30):
         ...    n = note.Note()
         ...    n.midi = random.choice(range(60,72))
@@ -2599,7 +2705,7 @@ class Stream(music21.Music21Object):
         >>> b.sign
         'G'
 
-        >>> c = Stream()
+        >>> c = stream.Stream()
         >>> for x in range(30):
         ...    n = note.Note()
         ...    n.midi = random.choice(range(35,55))
@@ -2665,8 +2771,8 @@ class Stream(music21.Music21Object):
 
         If no Clef objects are defined, get a default using :meth:`~music21.stream.Stream.bestClef`
         
-        >>> from music21 import clef
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> b = clef.AltoClef()
         >>> a.insert(0, b)
         >>> a.repeatInsert(note.Note("C#"), range(10)) 
@@ -2703,8 +2809,8 @@ class Stream(music21.Music21Object):
 
         If no KeySignature objects are defined, returns an empty Stream 
         
-        >>> from music21 import clef
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> b = key.KeySignature(3)
         >>> a.insert(0, b)
         >>> a.repeatInsert(note.Note("C#"), range(10)) 
@@ -2817,9 +2923,16 @@ class Stream(music21.Music21Object):
     # offset manipulation
 
     def shiftElements(self, offset, classFilterList=None):
-        '''Add offset value to every offset of contained Elements. Elements that are stored on the _endElements list will not be changed
+        '''
+        Add the given offset value to every offset of 
+        the objects found in the Stream. Objects that are 
+        specifically placed at the end of the Stream via
+        .storeAtEnd() (such as right barlines) are
+        not affected.
 
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note("C"), range(0,10))
         >>> a.shiftElements(30)
         >>> a.lowestOffset
@@ -2848,7 +2961,9 @@ class Stream(music21.Music21Object):
         '''Transfer the offset of this stream to all internal elements; then set
         the offset of this stream to zero.
 
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note("C"), range(0,10))
         >>> a.offset = 30
         >>> a.transferOffsetToElements()
@@ -2871,10 +2986,13 @@ class Stream(music21.Music21Object):
 
     def repeatAppend(self, item, numberOfTimes):
         '''
-        Given an object and a number, run append that many times on a deepcopy of the object.
+        Given an object and a number, run append that many times on 
+        a deepcopy of the object.
         numberOfTimes should of course be a positive integer.
         
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> n = note.Note()
         >>> n.duration.type = "whole"
         >>> a.repeatAppend(n, 10)
@@ -2893,10 +3011,14 @@ class Stream(music21.Music21Object):
             self.append(deepcopy(element))
     
     def repeatInsert(self, item, offsets):
-        '''Given an object, create a deep copy of each object at each positions specified by 
+        '''
+        Given an object, create a deep copy of each object at 
+        each positions specified by 
         the offset list:
 
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> n = note.Note('G-')
         >>> n.quarterLength = 1
         
@@ -2923,19 +3045,24 @@ class Stream(music21.Music21Object):
 
     def extractContext(self, searchElement, before = 4.0, after = 4.0, 
                        maxBefore = None, maxAfter = None, forceOutputClass=None):
-        '''Extracts elements around the given element within (before) quarter notes and (after) quarter notes (default 4), and returns a new Stream.
+        '''
+        Extracts elements around the given element within (before) 
+        quarter notes and (after) quarter notes (default 4), and 
+        returns a new Stream.
                 
-        >>> from music21 import note
+        >>> from music21 import *
         >>> qn = note.QuarterNote()
-        >>> qtrStream = Stream()
+        >>> qtrStream = stream.Stream()
         >>> qtrStream.repeatInsert(qn, [0, 1, 2, 3, 4, 5])
         >>> hn = note.HalfNote()
         >>> hn.name = "B-"
         >>> qtrStream.append(hn)
         >>> qtrStream.repeatInsert(qn, [8, 9, 10, 11])
         >>> hnStream = qtrStream.extractContext(hn, 1.0, 1.0)
-        >>> hnStream._reprText()
-        '{5.0} <music21.note.Note C>\\n{6.0} <music21.note.Note B->\\n{8.0} <music21.note.Note C>'
+        >>> hnStream.show('text')
+        {5.0} <music21.note.Note C>
+        {6.0} <music21.note.Note B->
+        {8.0} <music21.note.Note C>
 
         OMIT_FROM_DOCS
         TODO: maxBefore -- maximum number of elements to return before; etc.
@@ -2988,20 +3115,37 @@ class Stream(music21.Music21Object):
     def makeChords(self, minimumWindowSize=.125, includePostWindow=True,
             removeRedundantPitches=True,
             gatherArticulations=True, gatherExpressions=True, inPlace=False):
-        '''Gather simultaneous Notes into a Chords.
+        '''
+        Gathers simultaneous Notes into a Chords.
         
-        The gathering of elements, starting from offset 0.0, uses the `minimumWindowSize`, in quarter lengths, to collect all Notes that start between 0.0 and the minimum window size (this permits overlaps within a minimum tolerance). 
+        The gathering of elements, starting from offset 0.0, uses 
+        the `minimumWindowSize`, in quarter lengths, to collect 
+        all Notes that start between 0.0 and the minimum window 
+        size (this permits overlaps within a minimum tolerance). 
         
-        After collection, the maximum duration of collected elements is found; this duration is then used to set the new starting offset. A possible gap then results between the end of the window and offset specified by the maximum duration; these additional notes are gathered in a second pass if `includePostWindow` is True.
+        After collection, the maximum duration of collected elements 
+        is found; this duration is then used to set the new 
+        starting offset. A possible gap then results between the end 
+        of the window and offset specified by the maximum duration; 
+        these additional notes are gathered in a second pass if 
+        `includePostWindow` is True.
         
-        The new start offset is shifted to the larger of either the minimum window or the maximum duration found in the collected group. The process is repeated until all offsets are covered.
+        The new start offset is shifted to the larger of either 
+        the minimum window or the maximum duration found in the 
+        collected group. The process is repeated until all offsets 
+        are covered.
         
-        Each collection of Notes is formed into a Chord. The Chord is given the longest duration of all constituents, and is inserted at the start offset of the window from which it was gathered. 
+        Each collection of Notes is formed into a Chord. The Chord 
+        is given the longest duration of all constituents, and is 
+        inserted at the start offset of the window from which it 
+        was gathered. 
         
         Chords can gather both articulations and expressions from found Notes 
         using `gatherArticulations` and `gatherExpressions`.
         
-        The resulting Stream, if not in-place, can also gather additional objects by placing class names in the `collect` list. By default, TimeSignature and KeySignature objects are collected. 
+        The resulting Stream, if not in-place, can also gather 
+        additional objects by placing class names in the `collect` list. 
+        By default, TimeSignature and KeySignature objects are collected. 
         
         '''
         # gather lyrics as an option
@@ -3140,28 +3284,59 @@ class Stream(music21.Music21Object):
 #         pass
 
 
-    def splitByClass(self, objName, fx):
-        '''Given a stream, get all objects specified by objName and then form
-        two new streams.  Fx should be a lambda or other function on elements.
+    def splitByClass(self, classObj, fx):
+        '''
+        Given a stream, get all objects of type classObj and divide them into
+        two new streams depending on the results of fx.
+        Fx should be a lambda or other function on elements.
         All elements where fx returns True go in the first stream.
         All other elements are put in the second stream.
+
+
+        If classObj is None then all elements are returned.  ClassObj
+        can also be a list of classes.
+
+
+        In this example, we will create 50 notes from midi note 30 (two
+        octaves and a tritone below middle C) to midi note 80 (an octave
+        and a minor sixth above middle C) and add them to a Stream.
+        We then create a lambda function to split between those notes
+        below middle C (midi note 60) and those above
+        (google "lambda functions in Python" for more information on
+        what these powerful tools are).
         
-        >>> stream1 = Stream()
+
+        >>> from music21 import *
+        
+        >>> stream1 = stream.Stream()
         >>> for x in range(30,81):
         ...     n = note.Note()
-        ...     n.offset = x
         ...     n.midi = x
-        ...     stream1.insert(n)
-        >>> fx = lambda n: n.midi > 60
+        ...     stream1.append(n)
+        >>> fx = lambda n: n.midi < 60
         >>> b, c = stream1.splitByClass(note.Note, fx)
+
+
+        Stream b now contains all the notes below middle C,
+        that is, 30 notes, beginning with F#1 and ending with B3
+        while Stream c has the 21 notes from C4 to A-5:
+
+
         >>> len(b)
-        20
+        30
+        >>> (b[0].nameWithOctave, b[-1].nameWithOctave)
+        ('F#1', 'B3')
         >>> len(c)
-        31
+        21
+        >>> (c[0].nameWithOctave, c[-1].nameWithOctave)
+        ('C4', 'G#5')
         '''
         a = self.__class__()
         b = self.__class__()
-        found = self.getElementsByClass(objName)
+        if classObj is not None:
+            found = self.getElementsByClass(classObj)
+        else:
+            found = self
         for e in found._elements:
             if fx(e):
                 a.insert(e) # provide an offset here
@@ -3178,7 +3353,8 @@ class Stream(music21.Music21Object):
     def _getOffsetMap(self, srcObj=None):
         '''Needed for makeMeasures and a few other places
 
-        The Stream source of elements is self by default, unless a `srcObj` is provided. 
+        The Stream source of elements is self by default, 
+        unless a `srcObj` is provided. 
         '''
         if srcObj == None:
             srcObj = self
@@ -3241,69 +3417,118 @@ class Stream(music21.Music21Object):
 
     def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
         inPlace=False):
-        '''Take a stream and partition all elements into measures based on 
-        one or more TimeSignature defined within the stream. If no TimeSignatures are defined, a default is used.
+        '''
+        Takes a stream and places all of its elements into 
+        measures (:class:`~music21.stream.Measure` objects) 
+        based on the :class:`~music21.meter.TimeSignature` objects
+        placed within 
+        the stream. If no TimeSignatures are found in the
+        stream, a default of 4/4 is used.
 
-        This always creates a new stream with Measures, though objects are not
-        copied from self stream. 
-    
-        If `meterStream` is provided, this is used to establish a sequence of :class:`~music21.meter.TimeSignature` objects, instead of any 
-        found in the Stream. Alternatively, a TimeSignature object can be provided. 
-    
-        If `refStreamOrTimeRange` is provided, this is used to provide minimum and maximum offset values, necessary to fill empty rests and similar.
 
-        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+        If `inPlace` is True, the original Stream is modified and lost
+        if `inPlace` is False, this returns a modified deep copy.
+
+
+        Two advanced features are provided:
+    
         
-        
-        A simple example: a single measure of 4/4 is created by adding three quarter
-        rests to a stream:
-        
+        (1) If a `meterStream` is provided, the TimeSignatures in this
+        stream are used instead of any 
+        found in the Stream. Alternatively, a single TimeSignature object 
+        can be provided in lieu of the stream. This feature lets you
+        test out how a group of notes might be interpreted as measures
+        in a number of different metrical schemes.
+    
+    
+        (2) If `refStreamOrTimeRange` is provided, this Stream or List
+        is used to give the span that you want to make measures for 
+        necessary to fill empty rests at the ends or beginnings of
+        Streams, etc.  Say for instance you'd like to make a complete
+        score from a short ossia section, then you might use another
+        Part from the Score as a `refStreamOrTimeRange` to make sure
+        that the appropriate measures of rests are added at either side.
+
+               
+        Here is a simple example of makeMeasures: 
+        a single measure of 4/4 is created by from a stream
+        containing only three quarter notes:        
         
         >>> from music21 import *
         >>> sSrc = stream.Stream()
-        >>> sSrc.repeatAppend(note.Rest(), 3)
+        >>> sSrc.append(note.QuarterNote('C4'))
+        >>> sSrc.append(note.QuarterNote('D4'))
+        >>> sSrc.append(note.QuarterNote('E4'))
         >>> sMeasures = sSrc.makeMeasures()
-        >>> len(sMeasures.getElementsByClass('Measure'))
-        1
+        >>> sMeasures.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.clef.TrebleClef object at 0x...>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.note.Note E>
+        
+        
+        Notice that the last measure is incomplete -- makeMeasures
+        does not fill up incomplete measures.
+        
+        We can also check that the measure created has
+        the correct TimeSignature:
+        
+
         >>> sMeasures[0].timeSignature
         <music21.meter.TimeSignature 4/4>
 
-        >>> sSrc.insert(0.0, meter.TimeSignature('3/4'))
-        >>> sMeasures = sSrc.makeMeasures()
-        >>> sMeasures[0].timeSignature
-        <music21.meter.TimeSignature 3/4>
-            
-        
-        10 quarter notes are added to a stream, along with 10
-        more quarter notes on the upbeat.  After makeMeasures
-        is called, 3 measures of 4/4 are created:
+
+        Now let's redo this work in 2/4 by putting a TimeSignature
+        of 2/4 at the beginning of the stream and rerunning
+        makeMeasures. Now we will have two measures, each with
+        correct measure numbers:
+
+
+        >>> sSrc.insert(0.0, meter.TimeSignature('2/4'))
+        >>> sMeasuresTwoFour = sSrc.makeMeasures()
+        >>> sMeasuresTwoFour.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.clef.TrebleClef object at 0x...>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.note.Note E>        
+
+
+        Let us put 10 quarter notes in a Part. 
+        After we run makeMeasures, we will have 
+        3 measures of 4/4 in a new Part object. This experiment
+        demonstrates that running makeMeasures does not
+        change the type of Stream you are using:
         
     
         >>> sSrc = stream.Part()
-        >>> n = note.Note()
+        >>> n = note.Note('E-4')
         >>> n.quarterLength = 1
         >>> sSrc.repeatAppend(n, 10)
-        >>> sSrc.repeatInsert(n, [x+.5 for x in range(10)])
         >>> sMeasures = sSrc.makeMeasures()
         >>> len(sMeasures.getElementsByClass('Measure'))
         3
         >>> sMeasures.__class__.__name__
         'Part'
-        >>> sMeasures[0].timeSignature
-        <music21.meter.TimeSignature 4/4>
         
         
         If after running makeMeasures you run makeTies, it will also split 
         long notes into smaller notes with ties.  Lyrics and articulations
         are attached to the first note.  Expressions (fermatas,
-        etc.) will soon be attached to the last note but are NOT YET:
+        etc.) will soon be attached to the last note but this is not yet done:
+        
         
         >>> p1 = stream.Part()
         >>> p1.append(meter.TimeSignature('3/4'))
         >>> longNote = note.Note("D#4")
         >>> longNote.quarterLength = 7.5
         >>> longNote.articulations = [articulations.Staccato()]
-        >>> longNote.lyric = "hello"
+        >>> longNote.lyric = "hi"
         >>> p1.append(longNote)
         >>> partWithMeasures = p1.makeMeasures()
         >>> dummy = partWithMeasures.makeTies(inPlace = True)
@@ -3321,7 +3546,7 @@ class Stream(music21.Music21Object):
         >>> [allNotes[0].articulations, allNotes[1].articulations, allNotes[2].articulations]
         [[<music21.articulations.Staccato>], [], []]
         >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
-        ['hello', None, None]
+        ['hi', None, None]
         '''
         #environLocal.printDebug(['calling Stream.makeMeasures()'])
 
@@ -3384,7 +3609,7 @@ class Stream(music21.Music21Object):
             oMin = 0
             oMax = 0
         
-        # if a ref stream is provided, get highst time from there
+        # if a ref stream is provided, get highest time from there
         # only if it is greater thant the highest time yet encountered
 
         if refStreamOrTimeRange != None:
@@ -3509,8 +3734,10 @@ class Stream(music21.Music21Object):
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, 
         this returns a modified deepcopy.
+
+        >>> from music21 import *
         
-        >>> a = Stream()
+        >>> a = stream.Stream()
         >>> a.insert(20, note.Note())
         >>> len(a)
         1
@@ -3588,8 +3815,10 @@ class Stream(music21.Music21Object):
         Note that his method assumes that there is appropriate space in the next Measure: this will not shift Note, but instead allocate them evenly over barlines. Generall, makeMeasures is called prior to calling this method.
     
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+
+        >>> from music21 import *
                 
-        >>> d = Stream()
+        >>> d = stream.Stream()
         >>> n = note.Note()
         >>> n.quarterLength = 12
         >>> d.repeatAppend(n, 10)
@@ -3739,7 +3968,9 @@ class Stream(music21.Music21Object):
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
 
-        >>> aMeasure = Measure()
+        >>> from music21 import *
+
+        >>> aMeasure = stream.Measure()
         >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
         >>> aNote = note.Note()
         >>> aNote.quarterLength = .25
@@ -3992,7 +4223,7 @@ class Stream(music21.Music21Object):
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
 
-        >>> from music21 import stream, note
+        >>> from music21 import *
         >>> s = stream.Stream()
         >>> n = note.Note('g')
         >>> n.quarterLength = 1.5
@@ -4060,13 +4291,15 @@ class Stream(music21.Music21Object):
         If `inPlace` is True, this is done in-place; if `inPlace` is 
         False, this returns a modified deep copy.
         
-        >>> import music21.dynamics
-        >>> stream1 = Stream()
+        >>> from music21 import *
+        
+        >>> stream1 = stream.Stream()
         >>> n = note.QuarterNote()
         >>> n.duration.quarterLength
         1.0
         >>> stream1.repeatInsert(n, [0, 10, 20, 30, 40])
-        >>> dyn = music21.dynamics.Dynamic('ff')
+        
+        >>> dyn = dynamics.Dynamic('ff')
         >>> stream1.insert(15, dyn)
         >>> sort1 = stream1.sorted
         >>> sort1[-1].offset # offset of last element
@@ -4160,7 +4393,9 @@ class Stream(music21.Music21Object):
         for sequential notes with matching pitches. The `matchByPitch` option can 
         be used to use this technique. 
 
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> n = note.Note()
         >>> n.quarterLength = 6
         >>> a.append(n)
@@ -4526,9 +4761,97 @@ class Stream(music21.Music21Object):
 
     def _getFlat(self):
         '''
-        Returns a new Stream where no elements nest within other elements
+        A very important property that returns a new Stream 
+        that has all sub-containers "flattened" within it,
+        that is, it returns a new Stream where no elements nest within 
+        other elements.
         
-        >>> s = Stream()
+        
+        Here is a simple example of the usefulness of .flat.  We
+        will create a Score with two Parts in it, each with two Notes:
+        
+                
+        >>> from music21 import *
+
+        >>> sc = stream.Score()
+        >>> p1 = stream.Part()
+        >>> p1.id = 'part1'
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('D4')
+        >>> p1.append(n1)
+        >>> p1.append(n2)
+        
+        >>> p2 = stream.Part()
+        >>> p2.id = 'part2'
+        >>> n3 = note.Note('E4')
+        >>> n4 = note.Note('F4')
+        >>> p2.append(n3)
+        >>> p2.append(n4)
+
+        >>> sc.insert(0, p1)
+        >>> sc.insert(0, p2)
+        
+        
+        When we look at sc, we will see only the two parts:
+        
+        
+        >>> sc.elements
+        [<music21.stream.Part part1>, <music21.stream.Part part2>]
+        
+        
+        we can get at the notes by using the indices of the
+        stream to get the parts and then looking at the .elements
+        there:
+        
+        
+        >>> sc[0].elements
+        [<music21.note.Note C>, <music21.note.Note D>]
+        >>> sc.getElementById('part2').elements
+        [<music21.note.Note E>, <music21.note.Note F>]
+        
+        
+        but if we want to get all the notes, the easiest way
+        is via calling .flat on sc and looking at the elements
+        there:
+        
+        
+        >>> sc.flat.elements
+        [<music21.note.Note C>, <music21.note.Note E>, <music21.note.Note D>, <music21.note.Note F>]
+        
+        
+        Flattening a stream is a great way to get at all the notes in
+        a larger piece.  For instance if we load a four-part
+        Bach chorale into music21 from the integrated corpus, it
+        will appear at first that there are no notes in the piece:
+        
+        
+        >>> bwv66 = corpus.parseWork('bach/bwv66.6')
+        >>> len(bwv66.notes)
+        0
+        
+        
+        This is because all the notes in the piece lie within :class:`music21.stream.Measure`
+        objects and those measures lie within :class:`music21.stream.Part`
+        objects.  It'd be a pain to navigate all the way through all those
+        objects just to count notes.  Fortunately we can get a Stream of
+        all the notes in the piece with .flat.notes and then use the
+        length of that Stream to count notes:
+        
+        
+        >>> bwv66flat = bwv66.flat
+        >>> len(bwv66flat.notes)
+        165
+        
+
+
+        If you look back to our simple example of four notes above,
+        you can see that the E (the first note in part2) comes before the D 
+        (the second note of part1).  This is because the flat stream
+        is automatically sorted like all streams are by default.  The
+        next example shows how to change this behavior.
+        
+        
+        >>> s = stream.Stream()
         >>> s.autoSort = False
         >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
         >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
@@ -4548,9 +4871,9 @@ class Stream(music21.Music21Object):
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; '
 
-        >>> q = Stream()
+        >>> q = stream.Stream()
         >>> for i in range(5):
-        ...   p = Stream()
+        ...   p = stream.Stream()
         ...   p.repeatInsert(music21.Music21Object(), range(5))
         ...   q.insert(i * 10, p) 
         >>> len(q)
@@ -4562,11 +4885,11 @@ class Stream(music21.Music21Object):
         44.0
 
         OMIT_FROM_DOCS
-        >>> r = Stream()
+        >>> r = stream.Stream()
         >>> for j in range(5):
-        ...   q = Stream()
+        ...   q = stream.Stream()
         ...   for i in range(5):
-        ...      p = Stream()
+        ...      p = stream.Stream()
         ...      p.repeatInsert(music21.Music21Object(), range(5))
         ...      q.insert(i * 10, p) 
         ...   r.insert(j * 100, q)
@@ -4600,9 +4923,7 @@ class Stream(music21.Music21Object):
 
         return self._getFlatOrSemiFlat(retainContainers=False)
 
-    flat = property(_getFlat, 
-        doc='''Return a new Stream that has all sub-container flattened within.
-        ''')
+    flat = property(_getFlat)
 
 
     def _getSemiFlat(self):
@@ -4610,7 +4931,36 @@ class Stream(music21.Music21Object):
 
 
     semiFlat = property(_getSemiFlat, doc='''
-        Returns a flat-like Stream representation. Stream sub-classed containers, such as Measure or Part, are retained in the output Stream, but positioned at their relative offset. 
+        Returns a flat-like Stream representation. 
+        Stream sub-classed containers, such as Measure or Part, 
+        are retained in the output Stream, but positioned at their 
+        relative offset. 
+        
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        
+        >>> p1 = stream.Part()
+        >>> p1.id = 'part1'
+        >>> n1 = note.Note('C5')
+        >>> p1.append(n1)
+        
+        >>> p2 = stream.Part()
+        >>> p2.id = 'part2'
+        >>> n2 = note.Note('D5')
+        >>> p2.append(n2)
+        
+        >>> s.insert(0, p1)
+        >>> s.insert(0, p2)
+        >>> sf = s.semiFlat
+        >>> sf.elements
+        [<music21.stream.Part part1>, <music21.note.Note C>, <music21.stream.Part part2>, <music21.note.Note D>]
+        >>> sf[0]
+        <music21.stream.Part part1>
+        >>> sf[1]
+        <music21.note.Note C>
+        >>> sf[0][0]
+        <music21.note.Note C>
+        
         ''')
 
 
@@ -4693,7 +5043,8 @@ class Stream(music21.Music21Object):
     
     def _getHighestOffset(self):
         '''
-        >>> p = Stream()
+        >>> from music21 import *
+        >>> p = stream.Stream()
         >>> p.repeatInsert(note.Note("C"), range(5))
         >>> p.highestOffset
         4.0
@@ -4719,7 +5070,9 @@ class Stream(music21.Music21Object):
         Note the difference between this property and highestTime
         which gets the end time of the highestOffset
 
-        >>> stream1 = Stream()
+        >>> from music21 import *
+
+        >>> stream1 = stream.Stream()
         >>> for offset in [0, 4, 8]:
         ...     n = note.WholeNote('G#')
         ...     stream1.insert(offset, n)
@@ -4732,12 +5085,14 @@ class Stream(music21.Music21Object):
     def _getHighestTime(self):
         '''returns the largest offset plus duration.
       
+        >>> from music21 import *
+
         >>> n = note.Note('C#')
         >>> n.quarterLength = 3
 
-        >>> q = Stream()
+        >>> q = stream.Stream()
         >>> for i in [20, 0, 10, 30, 40]:
-        ...    p = Stream()
+        ...    p = stream.Stream()
         ...    p.repeatInsert(n, [0, 1, 2, 3, 4])
         ...    q.insert(i, p) # insert out of order
         >>> len(q.flat)
@@ -4790,12 +5145,20 @@ class Stream(music21.Music21Object):
         expressed as a Duration object, but it can be set separately 
         for advanced operations.
 
-        Example insert a dotted quarter at positions 0, 1, 2, 3, 4:
+        Example insert a dotted half note first at position 0 then 
+        at positions 1, 2, 3, 4 and see when the final note cuts off:
+
+        >>> from music21 import *
 
         >>> n = note.Note('A-')
         >>> n.quarterLength = 3
-        >>> p1 = Stream()
-        >>> p1.repeatInsert(n, [0, 1, 2, 3, 4])
+        >>> p1 = stream.Stream()
+        >>> p1.insert(0, n)
+        >>> p1.highestTime
+        3.0
+    
+        
+        >>> p1.repeatInsert(n, [1, 2, 3, 4])
         >>> p1.highestTime # 4 + 3
         7.0
         ''')
@@ -4803,15 +5166,18 @@ class Stream(music21.Music21Object):
     
     def _getLowestOffset(self):
         '''
-        >>> p = Stream()
-        >>> p.repeatInsert(None, range(5))
-        >>> q = Stream()
+        
+        >>> from music21 import *
+
+        >>> p = stream.Stream()
+        >>> p.repeatInsert(note.Note('D5'), range(5))
+        >>> q = stream.Stream()
         >>> q.repeatInsert(p, range(0,50,10))
         >>> len(q.flat)        
         25
         >>> q.lowestOffset
         0.0
-        >>> r = Stream()
+        >>> r = stream.Stream()
         >>> r.repeatInsert(q, range(97, 500, 100))
         >>> len(r.flat)
         125
@@ -4841,7 +5207,9 @@ class Stream(music21.Music21Object):
     lowestOffset = property(_getLowestOffset, doc='''
         Get the start time of the Element with the lowest offset in the Stream.        
 
-        >>> stream1 = Stream()
+        >>> from music21 import *
+
+        >>> stream1 = stream.Stream()
         >>> for x in range(3,5):
         ...     n = note.Note('G#')
         ...     stream1.insert(x, n)
@@ -4849,9 +5217,11 @@ class Stream(music21.Music21Object):
         >>> stream1.lowestOffset
         3.0
         
+        
         If the Stream is empty, then the lowest offset is 0.0:
+        
                 
-        >>> stream2 = Stream()
+        >>> stream2 = stream.Stream()
         >>> stream2.lowestOffset
         0.0
 
@@ -4896,7 +5266,9 @@ class Stream(music21.Music21Object):
         Returns the total duration of the Stream, from the beginning of the stream until the end of the final element.
         May be set independently by supplying a Duration object.
     
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> q = note.QuarterNote()
         >>> a.repeatInsert(q, [0,1,2,3])
         >>> a.highestOffset
@@ -4906,7 +5278,10 @@ class Stream(music21.Music21Object):
         >>> a.duration.quarterLength
         4.0
         
-        >>> # Advanced usage: overriding the duration
+        
+        Advanced usage: override the duration from what is set:
+        
+        
         >>> newDuration = duration.Duration("half")
         >>> newDuration.quarterLength
         2.0
@@ -4925,11 +5300,13 @@ class Stream(music21.Music21Object):
 
     def _getMetadata(self):
         '''
-        >>> a = Stream()
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
         >>> a.metadata = metadata.Metadata()
         '''
         mdList = self.getElementsByClass(metadata.Metadata)
-        # only return clefs that have offset = 0.0 
+        # only return metadata that has an offset = 0.0 
         mdList = mdList.getElementsByOffset(0)
         if len(mdList) == 0:
             return None
@@ -4951,9 +5328,13 @@ class Stream(music21.Music21Object):
             self.insert(0, metadataObj)
 
     metadata = property(_getMetadata, _setMetadata, 
-        doc = '''Get or set the :class:`~music21.metadata.Metadata` object found at offset zero for this Stream.
+        doc = '''
+        Get or set the :class:`~music21.metadata.Metadata` object 
+        found at the beginning (offset 0) of this Stream.
 
-        >>> s = Stream()
+        >>> from music21 import *
+
+        >>> s = stream.Stream()
         >>> s.metadata = metadata.Metadata()
         >>> s.metadata.composer = 'frank'
         >>> s.metadata.composer
@@ -4978,19 +5359,19 @@ class Stream(music21.Music21Object):
     def _getBeatStr(self):
         return None
 
-    beatStr = property(_getBeatStr)
+    beatStr = property(_getBeatStr, doc='unlike other Music21Objects, streams always have beatStr (beat string) of None')
   
     def _getBeatDuration(self):
         # this returns the duration of the active beat
         return None
 
-    beatDuration = property(_getBeatDuration)
+    beatDuration = property(_getBeatDuration, doc='unlike other Music21Objects, streams always have beatDuration of None')
   
     def _getBeatStrength(self):
         # this returns the accent weight of the active beat
         return None
 
-    beatStrength = property(_getBeatStrength)
+    beatStrength = property(_getBeatStrength, doc='unlike other Music21Objects, streams always have beatStrength of None')
 
 
     #---------------------------------------------------------------------------
@@ -5009,9 +5390,10 @@ class Stream(music21.Music21Object):
         optional "inPlace" key is set to True then
         it modifies pitches in place.
 
+        >>> from music21 import *
+
         >>> aInterval = interval.Interval('d5')
         
-        >>> from music21 import corpus
         >>> aStream = corpus.parseWork('bach/bwv324.xml')
         >>> part = aStream[0]
         >>> aStream[0].pitches[:10]
@@ -5050,21 +5432,22 @@ class Stream(music21.Music21Object):
 
     def scaleOffsets(self, scalar, anchorZero='lowest', 
             anchorZeroRecurse=None, inPlace=True):
-        '''Scale all offsets by a provided scalar. Durations are not altered. 
+        '''
+        Scale all offsets by a provided scalar. Durations are not altered. 
+
 
         To augment or diminish a Stream, see the :meth:`~music21.stream.Stream.augmentOrDiminish` method. 
 
+
         The `anchorZero` parameter determines if and/or where the zero offset is established for the set of offsets in this Stream before processing. Offsets are shifted to make either the lower or upper values the new zero; then offsets are scaled; then the shifts are removed. Accepted values are None (no offset shifting), "lowest", or "highest". 
+
 
         The `anchorZeroRecurse` parameter determines the anchorZero for all embedded Streams, and Streams embedded within those Streams. If the lowest offset in an embedded Stream is non-zero, setting this value to None will a the space between the start of that Stream and the first element to be scaled. If the lowest offset in an embedded Stream is non-zero, setting this value to 'lowest' will not alter the space between the start of that Stream and the first element to be scaled. 
 
+
         To shift all the elements in a Stream, see the :meth:`~music21.stream.Stream.shiftElements` method. 
 
-        >>> from music21 import note
-        >>> n = note.Note()
-        >>> n.quarterLength = 2
-        >>> s = Stream()
-        >>> s.repeatAppend(n, 20)
+
         '''
 
         # if we have offsets at 0, 2, 4
@@ -5646,10 +6029,11 @@ class Stream(music21.Music21Object):
     def _getMX(self):
         '''Create and return a musicxml Score object. 
 
+        >>> from music21 import *
         >>> n1 = note.Note()
-        >>> measure1 = Measure()
+        >>> measure1 = stream.Measure()
         >>> measure1.insert(n1)
-        >>> str1 = Stream()
+        >>> str1 = stream.Stream()
         >>> str1.insert(measure1)
         >>> mxScore = str1.mx
         '''
@@ -5700,7 +6084,7 @@ class Stream(music21.Music21Object):
         in the stream.
 
         >>> from music21 import *
-        >>> s1 = Stream()
+        >>> s1 = stream.Stream()
         >>> k1 = key.KeySignature(0) # key of C
         >>> n1 = note.Note('B')
         >>> c1 = chord.Chord(['A', 'B-'])
@@ -5735,15 +6119,17 @@ class Stream(music21.Music21Object):
         return post
     
     pitches = property(_getPitches, doc='''
-        Return all :class:`~music21.pitch.Pitch` objects found in any 
+        Returns all :class:`~music21.pitch.Pitch` objects found in any 
         element in the Stream as a Python List. Elements such as 
         Streams, and Chords will have their Pitch objects accumulated as 
         well. For that reason, a flat representation may not be required. 
 
+
         Pitch objects are returned in a List, not a Stream.  This usage
         differs from the notes property, but makes sense since Pitch
         objects are usually durationless.  (That's the main difference
-        between them and notes)
+        between them and :class:`music21.note.Note` objects)
+
 
         >>> from music21 import corpus
         >>> a = corpus.parseWork('bach/bwv324.xml')
@@ -5752,30 +6138,51 @@ class Stream(music21.Music21Object):
         25
         >>> voiceOnePitches[0:10]
         [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
+
         
         Note that the pitches returned above are 
         objects, not text:
+
         
         >>> voiceOnePitches[0].octave
         4
         
-        Since pitches are found from internal objects,
+
+        Since pitches are found from within internal objects,
         flattening the stream is not required:
+
         
         >>> len(a.pitches)
         104
 
+
         Pitch objects are also retrieved when stored directly on a Stream.
 
-        >>> from music21 import pitch
+
+        >>> from music21 import *
         >>> pitch1 = pitch.Pitch()
-        >>> st1 = Stream()
+        >>> st1 = stream.Stream()
         >>> st1.append(pitch1)
         >>> foundPitches = st1.pitches
         >>> len(foundPitches)
         1
         >>> foundPitches[0] is pitch1
         True
+        
+        
+        
+        Chords get their pitches found as well:
+        
+        >>> c = chord.Chord(['C4','E4','G4'])
+        >>> n = note.Note('F#4')
+        >>> m = stream.Measure()
+        >>> m.append(n)
+        >>> m.append(c)
+        >>> m.pitches
+        [F#4, C4, E4, G4]
+        
+        
+        
         ''')
 
 
@@ -5988,7 +6395,8 @@ class Stream(music21.Music21Object):
         '''Given a flat stream, create a list of the start and end 
         times (as a tuple pair) of all elements in the Stream.
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> a.repeatInsert(note.HalfNote(), range(5))
         >>> a._getDurSpan(a.flat)
         [(0.0, 2.0), (1.0, 3.0), (2.0, 4.0), (3.0, 5.0), (4.0, 6.0)]
@@ -6016,7 +6424,8 @@ class Stream(music21.Music21Object):
         this behaviour, where ending and starting 3.0 being a type of overlap
         is set by the includeEndBoundary being True. 
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> a._durSpanOverlap([0, 10], [11, 12], False)
         False
         >>> a._durSpanOverlap([11, 12], [0, 10], False)
@@ -6202,7 +6611,9 @@ class Stream(music21.Music21Object):
             
     def getSimultaneous(self, includeDurationless=True):
         '''Find and return any elements that start at the same time. 
-        >>> stream1 = Stream()
+        
+        >>> from music21 import *
+        >>> stream1 = stream.Stream()
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.offset = x * 0
@@ -6211,7 +6622,7 @@ class Stream(music21.Music21Object):
         >>> b = stream1.getSimultaneous()
         >>> len(b[0]) == 4
         True
-        >>> stream2 = Stream()
+        >>> stream2 = stream.Stream()
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.offset = x * 3
@@ -6241,7 +6652,8 @@ class Stream(music21.Music21Object):
         This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps
         is determined by the includeEndBoundary parameter. 
 
-        >>> a = Stream()
+        >>> from music21 import *
+        >>> a = stream.Stream()
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('quarter')
@@ -6256,7 +6668,7 @@ class Stream(music21.Music21Object):
         1
         >>> len(d[0])
         4
-        >>> a = Stream()
+        >>> a = stream.Stream()
         >>> for x in [0,0,0,0,13,13,13]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('half')
@@ -6268,7 +6680,7 @@ class Stream(music21.Music21Object):
         4
         >>> len(d[13])
         3
-        >>> a = Stream()
+        >>> a = stream.Stream()
         >>> for x in [0,0,0,0,3,3,3]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
@@ -6333,8 +6745,10 @@ class Stream(music21.Music21Object):
         returns an ordered list of offsets where elements are started (attacked) in both
         stream1 and stream2.
     
-        >>> st1 = Stream()
-        >>> st2 = Stream()
+        >>> from music21 import *
+
+        >>> st1 = stream.Stream()
+        >>> st2 = stream.Stream()
         >>> n11 = note.Note()
         >>> n12 = note.Note()
         >>> n21 = note.Note()
@@ -6425,14 +6839,16 @@ class Stream(music21.Music21Object):
         in that Stream is used.  Otherwise, the current offset in el is used.  It is just
         in case you are paranoid that el.offset might not be what you want.
         
+        >>> from music21 import *
+
         >>> n1 = note.Note("G#")
         >>> n2 = note.Note("D#")
-        >>> s1 = Stream()
+        >>> s1 = stream.Stream()
         >>> s1.insert(20.0, n1)
         >>> s1.insert(21.0, n2)
         
         >>> n3 = note.Note("C#")
-        >>> s2 = Stream()
+        >>> s2 = stream.Stream()
         >>> s2.insert(20.0, n3)
         
         >>> s1.playingWhenAttacked(n3).name
@@ -6943,7 +7359,9 @@ class Measure(Stream):
 
     def _getClef(self):
         '''
-        >>> a = Measure()
+        >>> from music21 import *
+
+        >>> a = stream.Measure()
         >>> a.clef = clef.TrebleClef()
         >>> a.clef.sign  # clef is an element
         'G'
@@ -6959,7 +7377,9 @@ class Measure(Stream):
     
     def _setClef(self, clefObj):
         '''
-        >>> a = Measure()
+        >>> from music21 import *
+
+        >>> a = stream.Measure()
         >>> a.clef = clef.TrebleClef()
         >>> a.clef.sign    # clef is an element
         'G'
@@ -6977,7 +7397,9 @@ class Measure(Stream):
 
     def _getTimeSignature(self):
         '''
-        >>> a = Measure()
+        >>> from music21 import *
+
+        >>> a = stream.Measure()
         >>> a.timeSignature = meter.TimeSignature('2/4')
         >>> a.timeSignature.numerator, a.timeSignature.denominator 
         (2, 4)
@@ -6994,7 +7416,9 @@ class Measure(Stream):
     
     def _setTimeSignature(self, tsObj):
         '''
-        >>> a = Measure()
+        >>> from music21 import *
+
+        >>> a = stream.Measure()
         >>> a.timeSignature = meter.TimeSignature('5/4')
         >>> a.timeSignature.numerator, a.timeSignature.denominator 
         (5, 4)
@@ -7012,7 +7436,9 @@ class Measure(Stream):
 
     def _getKeySignature(self):
         '''
-        >>> a = Measure()
+        >>> from music21 import *
+
+        >>> a = stream.Measure()
         >>> a.keySignature = key.KeySignature(0)
         >>> a.keySignature.sharps 
         0
@@ -7027,13 +7453,23 @@ class Measure(Stream):
     
     def _setKeySignature(self, keyObj):
         '''
-        >>> a = Measure()
-        >>> a.keySignature = key.KeySignature(3)
-        >>> a.keySignature.sharps   
-        3
+        >>> from music21 import *
+
+        >>> a = stream.Measure()
         >>> a.keySignature = key.KeySignature(6)
         >>> a.keySignature.sharps
         6
+
+
+        A key.Key object can be used instead of key.KeySignature,
+        since the former derives from the latter.
+        
+
+        >>> a.keySignature = key.Key('E-', 'major')
+        >>> a.keySignature.sharps   
+        -3
+
+
         '''
         oldKey = self._getKeySignature()
         if oldKey is not None:
@@ -7044,9 +7480,6 @@ class Measure(Stream):
     keySignature = property(_getKeySignature, _setKeySignature)   
 
     def _getLeftBarline(self):
-        '''
-        >>> a = Measure()
-        '''
         barList = []
         # directly access _elements, as do not want to get any bars
         # in _endElements
@@ -7061,9 +7494,6 @@ class Measure(Stream):
             return barList[0]    
     
     def _setLeftBarline(self, barlineObj):
-        '''
-        >>> a = Measure()
-        '''
         oldLeftBarline = self._getLeftBarline()
         barlineObj.location = 'left'
 
@@ -7072,7 +7502,9 @@ class Measure(Stream):
         self.insert(0, barlineObj)
 
     leftBarline = property(_getLeftBarline, _setLeftBarline, 
-        doc = '''Get or set the left barline, or the Barline object found at offset zero of the Measure.
+        doc = '''
+        Get or set the left barline, or the Barline object 
+        found at offset zero of the Measure.
         ''')   
 
     def _getRightBarline(self):
@@ -7113,12 +7545,20 @@ class Measure(Stream):
 
     #---------------------------------------------------------------------------
     def _getMX(self):
-        '''Return a musicxml Measure, populated with notes, chords, rests
-        and a musixcml Attributes, populated with time, meter, key, etc
+        '''
+        Return a music21.musicxml.Measure object, 
+        populated with notes, chords, rests
+        and a music21.musixcml.Attributes object, 
+        populated with time, meter, key, etc
+
+        Not needed for most users.  Call myMeasure.show('musicxml') or
+        myMeasure.write('musicxml') instead.
+
+        >>> from music21 import *
 
         >>> a = note.Note()
         >>> a.quarterLength = 4
-        >>> b = Measure()
+        >>> b = stream.Measure()
         >>> b.insert(0, a)
         >>> len(b) 
         1
@@ -7140,7 +7580,7 @@ class Measure(Stream):
     mx = property(_getMX, _setMX)    
 
     def _getMusicXML(self):
-        '''Provide a complete MusicXML: representation. 
+        '''Provide a complete MusicXML representation of the measure. 
         '''
         return musicxmlTranslate.measureToMusicXML(self)
 

@@ -182,7 +182,7 @@ A Chord, like a Note and Pitch, can be transposed by an interval specified in an
     :width: 600
 
 
-Finally, a Chord, like a Note, can have one or my lyrics. The :meth:`~music21.note.GeneralNote.addLyric` method functions the same as it does for Note. In the following example, a text annotation of the Forte set class name is added to the Chord.
+Finally, a Chord, like a Note, can have one or more lyrics. The :meth:`~music21.note.GeneralNote.addLyric` method functions the same as it does for Note. In the following example, a text annotation of the Forte set class name is added to the Chord.
 
 
 >>> c2.addLyric(c2.forteClass)
