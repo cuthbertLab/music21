@@ -24,10 +24,10 @@ _MOD = "possibility.py"
 
 class Possibility(dict):
     '''
-    Defines a possibility, essentially a chord that could correspond to a figure/bass note pair
-    in figured bass, as a python dictionary, where the voice names are keys and pitches are values. 
-    Extends the dictionary object through methods that can perform rule checks on a possibility or
-    sequence of two possibilities.
+    Extends the concept of a chord in music21 by allowing the labeling of voices through the subclassing
+    of the python dictionary. Named Possibility because it is intended to encapsulate a possibility for
+    a figured bass note/figure combination, but can be used in many other ways.
+    
     '''
     def __setitem__(self, voiceLabel, pitchValue):
         '''
@@ -39,10 +39,10 @@ class Possibility(dict):
         C3
         >>> p1['A'] = 'Not a pitch'
         Traceback (most recent call last):
-        PossibilityException: The key of a Possibility instance can correspond only to a music21 pitch.Pitch.
+        PossibilityException: The key of a Possibility instance can correspond only to a music21 pitch.Pitch!
         '''
         if not isinstance(pitchValue, pitch.Pitch):
-            raise PossibilityException("The key of a Possibility instance can correspond only to a music21 pitch.Pitch.")
+            raise PossibilityException("The key of a Possibility instance can correspond only to a music21 pitch.Pitch!")
         dict.__setitem__(self, voiceLabel, pitchValue)
     
     # CHORD FORMATION RULES
