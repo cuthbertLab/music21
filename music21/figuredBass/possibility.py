@@ -29,6 +29,24 @@ class Possibility(dict):
     a figured bass note/figure combination, but can be used in many other ways.
     
     '''
+    def __init__(self, *args):
+        '''
+        '''
+        try:
+            for voiceLabel in args[0].keys():
+                pitchValue = args[0][voiceLabel]
+                if not isinstance(pitchValue, pitch.Pitch):
+                    if type(pitchValue) == str:
+                        try:
+                            args[0][voiceLabel] = pitch.Pitch(pitchValue)
+                        except pitch.PitchException:
+                            raise PossibilityException("Cannot create Possibility: " + pitchValue + " not a valid pitch or pitch string!")
+                    else:
+                        raise PossibilityException("Cannot create Possibility: " + pitchValue + " not a valid pitch or pitch string!")
+            dict.__init__(self, *args)
+        except IndexError:
+            dict.__init__(self, *args)
+    
     def __setitem__(self, voiceLabel, pitchValue):
         '''
         >>> from music21 import pitch
@@ -37,13 +55,21 @@ class Possibility(dict):
         >>> p1['B'] = pitch.Pitch('C3')
         >>> p1['B']
         C3
-        >>> p1['A'] = 'Not a pitch'
+        >>> p1['T'] = 'G3'
+        >>> p1['T']
+        G3
+        >>> p1['A'] = 'Not a pitch or pitch string'
         Traceback (most recent call last):
-        PossibilityException: The key of a Possibility instance can correspond only to a music21 pitch.Pitch!
+        PossibilityException: Cannot convert input to a music21 pitch.Pitch instance!
         '''
+        newPitchValue = pitchValue
         if not isinstance(pitchValue, pitch.Pitch):
-            raise PossibilityException("The key of a Possibility instance can correspond only to a music21 pitch.Pitch!")
-        dict.__setitem__(self, voiceLabel, pitchValue)
+            if type(pitchValue) == str:
+                try:
+                    newPitchValue = pitch.Pitch(pitchValue)
+                except pitch.PitchException:
+                    raise PossibilityException("Cannot convert input to a music21 pitch.Pitch instance!")
+        dict.__setitem__(self, voiceLabel, newPitchValue)
     
     # CHORD FORMATION RULES
     def correctlyFormed(self, pitchNamesToHave = None, fbRules = rules.Rules(), verbose = False):
@@ -55,10 +81,10 @@ class Possibility(dict):
         >>> from music21.figuredBass import possibility
         >>> fbRules = rules.Rules()
         >>> pitchNames = ['C','E','G']
-        >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('E4'), 'B': pitch.Pitch('C3')})
+        >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'T': 'E4', 'B': 'C3'})
         >>> p1.correctlyFormed(pitchNames, fbRules)
         True
-        >>> p1['T'] = pitch.Pitch('C3')
+        >>> p1['T'] = 'C3'
         >>> p1.correctlyFormed(pitchNames, fbRules)
         False
         '''
