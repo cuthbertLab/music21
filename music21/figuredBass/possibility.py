@@ -27,10 +27,23 @@ class Possibility(dict):
     Extends the concept of a chord in music21 by allowing the labeling of voices through the subclassing
     of the python dictionary. Named Possibility because it is intended to encapsulate a possibility for
     a figured bass note/figure combination, but can be used in many other ways.
-    
     '''
     def __init__(self, *args):
         '''
+        >>> from music21 import pitch
+        >>> from music21.figuredBass import possibility
+        >>> p1 = possibility.Possibility({'S': 'C5', 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('D4'), 'B': 'C3'})
+        >>> p1
+        {'A': G4, 'S': C5, 'B': C3, 'T': D4}
+        >>> p2 = possibility.Possibility()
+        >>> p2
+        {}
+        >>> p2['B'] = pitch.Pitch('C3')
+        >>> p2['T'] = pitch.Pitch('D4')
+        >>> p2['A'] = 'G4'
+        >>> p2['S'] = 'C5'
+        >>> p2
+        {'A': G4, 'S': C5, 'B': C3, 'T': D4}        
         '''
         try:
             for voiceLabel in args[0].keys():
@@ -40,9 +53,9 @@ class Possibility(dict):
                         try:
                             args[0][voiceLabel] = pitch.Pitch(pitchValue)
                         except pitch.PitchException:
-                            raise PossibilityException("Cannot create Possibility: " + pitchValue + " not a valid pitch or pitch string!")
+                            raise PossibilityException("Cannot create Possibility: ->" + pitchValue + "<- not a valid pitch or pitch string!")
                     else:
-                        raise PossibilityException("Cannot create Possibility: " + pitchValue + " not a valid pitch or pitch string!")
+                        raise PossibilityException("Cannot create Possibility: ->" + pitchValue + "<- not a valid pitch or pitch string!")
             dict.__init__(self, *args)
         except IndexError:
             dict.__init__(self, *args)
@@ -60,7 +73,7 @@ class Possibility(dict):
         G3
         >>> p1['A'] = 'Not a pitch or pitch string'
         Traceback (most recent call last):
-        PossibilityException: Cannot convert input to a music21 pitch.Pitch instance!
+        PossibilityException: Can't set ->A<-: Can't convert ->Not a pitch or pitch string<- to a music21 pitch.Pitch instance!
         '''
         newPitchValue = pitchValue
         if not isinstance(pitchValue, pitch.Pitch):
@@ -68,7 +81,7 @@ class Possibility(dict):
                 try:
                     newPitchValue = pitch.Pitch(pitchValue)
                 except pitch.PitchException:
-                    raise PossibilityException("Cannot convert input to a music21 pitch.Pitch instance!")
+                    raise PossibilityException("Can't set ->" + voiceLabel + "<-: Can't convert ->" + pitchValue + "<- to a music21 pitch.Pitch instance!")
         dict.__setitem__(self, voiceLabel, newPitchValue)
     
     # CHORD FORMATION RULES
@@ -76,7 +89,6 @@ class Possibility(dict):
         # Imitates checkChord() from rules.py, but one calls the method on the Possibility object,
         # rather than providing the pitches as an argument and calling a Rules object.
         '''
-        >>> from music21 import pitch
         >>> from music21.figuredBass import rules
         >>> from music21.figuredBass import possibility
         >>> fbRules = rules.Rules()
@@ -109,13 +121,12 @@ class Possibility(dict):
         A possibility is incomplete if it doesn't contain at least
         one of each pitch name.
         
-        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> pitchNames = ['C','E','G']
-        >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('E4'), 'B': pitch.Pitch('C3')})
+        >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'T': 'E4', 'B': 'C3'})
         >>> p1.incomplete(pitchNames)
         False
-        >>> p1['T'] = pitch.Pitch('C4')
+        >>> p1['T'] = 'C4'
         >>> p1.incomplete(pitchNames)
         True
         '''
@@ -138,12 +149,11 @@ class Possibility(dict):
         Returns True if upper voices are found within topVoicesMaxIntervalSeparation of each other, a.k.a.
         if the upper voices are found within that many semitones of each other.
         
-        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
-        >>> p1 = possibility.Possibility({'S': pitch.Pitch('C5'), 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('E4'), 'B': pitch.Pitch('C3')})
+        >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'T': 'E4', 'B': 'C3'})
         >>> p1.topVoicesWithinLimit(interval.Interval('P8'))
         True
-        >>> p1['T'] = pitch.Pitch('E3')
+        >>> p1['T'] = 'E3'
         >>> p1.topVoicesWithinLimit(interval.Interval('P8'))
         False
         '''
@@ -183,22 +193,21 @@ class Possibility(dict):
         Ignores voices which aren't shared between the possibilities, 
         but raises an error if not enough voices are shared.
         
-        >>> from music21 import pitch
         >>> from music21.figuredBass import rules
         >>> from music21.figuredBass import possibility
         >>> fbRules = rules.Rules()
         >>> fbRules.topVoiceLeapIntervalLimit = interval.Interval('P8') # Default is None
         >>> fbRules.bottomVoiceLeapIntervalLimit = interval.Interval('P8') # Default is None
-        >>> p1 = possibility.Possibility({'Tenor': pitch.Pitch('G3'), 'Bass': pitch.Pitch('C3'), 'Soprano': pitch.Pitch('C5')})
-        >>> p2 = possibility.Possibility({'Tenor': pitch.Pitch('A3'), 'Bass': pitch.Pitch('D3')})
+        >>> p1 = possibility.Possibility({'Tenor': 'G3', 'Bass': 'C3', 'Soprano': 'C5'})
+        >>> p2 = possibility.Possibility({'Tenor': 'A3', 'Bass': 'D3'})
         >>> p1.correctVoiceLeading(p2, fbRules)
         False
-        >>> p1['Tenor'] = pitch.Pitch('C4')
-        >>> p2['Tenor'] = pitch.Pitch('D4')
+        >>> p1['Tenor'] = 'C4'
+        >>> p2['Tenor'] = 'D4'
         >>> p1.correctVoiceLeading(p2, fbRules)
         False
-        >>> p1['Tenor'] = pitch.Pitch('F3')
-        >>> p2['Tenor'] = pitch.Pitch('G3')
+        >>> p1['Tenor'] = 'F3'
+        >>> p2['Tenor'] = 'G3'
         >>> p1.correctVoiceLeading(p2, fbRules)
         True
         '''
@@ -226,10 +235,9 @@ class Possibility(dict):
         Ignores voices which aren't shared between the possibilities, 
         but raises an error if not enough voices are shared.
         
-        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
-        >>> p1 = possibility.Possibility({'Tenor': pitch.Pitch('G3'), 'Bass': pitch.Pitch('C3')})
-        >>> p2 = possibility.Possibility({'Tenor': pitch.Pitch('A3'), 'Bass': pitch.Pitch('D3')})
+        >>> p1 = possibility.Possibility({'Tenor': 'G3', 'Bass': 'C3'})
+        >>> p2 = possibility.Possibility({'Tenor': 'A3', 'Bass': 'D3'})
         >>> p1.containsParallelFifths(p2)
         True
         ''' 
@@ -258,10 +266,9 @@ class Possibility(dict):
         Ignores voices which aren't shared between the possibilities, 
         but raises an error if not enough voices are shared.
 
-        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
-        >>> p1 = possibility.Possibility({'Tenor': pitch.Pitch('C4'), 'Bass': pitch.Pitch('C3')})
-        >>> p2 = possibility.Possibility({'Tenor': pitch.Pitch('D4'), 'Bass': pitch.Pitch('D3')})
+        >>> p1 = possibility.Possibility({'Tenor': 'C4', 'Bass': 'C3'})
+        >>> p2 = possibility.Possibility({'Tenor': 'D4', 'Bass': 'D3'})
         >>> p1.containsParallelOctaves(p2)
         True
         '''        
@@ -291,16 +298,15 @@ class Possibility(dict):
         Checks for hidden fifths and octaves between self and a next possibility, as specified in fbRules. 
         To remove ambiguities, asked to provide the dictionary key of the top voice and the key of the bottom voice.
         
-        >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
         >>> from music21.figuredBass import rules
         >>> fbRules = rules.Rules()
-        >>> p1 = possibility.Possibility({'Soprano': pitch.Pitch('E5'), 'Bass': pitch.Pitch('C3'), 'Tenor': pitch.Pitch('G4')})
-        >>> p2 = possibility.Possibility({'Soprano': pitch.Pitch('A5'), 'Bass': pitch.Pitch('D3'), 'Tenor': pitch.Pitch('F4')})
+        >>> p1 = possibility.Possibility({'Soprano': 'E5', 'Bass': 'C3', 'Tenor': 'G4'})
+        >>> p2 = possibility.Possibility({'Soprano': 'A5', 'Bass': 'D3', 'Tenor': 'F4'})
         >>> p1.noHiddenIntervals(p2, 'Soprano', 'Bass', fbRules)
         False
-        >>> p1['Soprano'] = pitch.Pitch('A5')
-        >>> p2['Soprano'] = pitch.Pitch('D6')
+        >>> p1['Soprano'] = 'A5'
+        >>> p2['Soprano'] = 'D6'
         >>> p1.noHiddenIntervals(p2, 'Soprano', 'Bass', fbRules)
         False
         '''
