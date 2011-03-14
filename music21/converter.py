@@ -32,7 +32,7 @@ the temp folder on the disk.
 >>> #_DOCS_SHOW s = converter.parse('d:/mydocs/schubert.krn')
 >>> s = converter.parse(humdrum.testFiles.schubert) #_DOCS_HIDE
 >>> s
-<music21.stream.Score object at 0x...>
+<music21.stream.Score ...>
 '''
 
 

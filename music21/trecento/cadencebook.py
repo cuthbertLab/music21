@@ -288,8 +288,8 @@ class TrecentoCadenceWork(object):
         >>> dummyPiece.convertBlockToStreams(block1)
         >>> for x in block1:
         ...     print(x)
-        <music21.trecento.trecentoCadence.TrecentoCadenceStream object at 0x...>
-        <music21.trecento.trecentoCadence.TrecentoCadenceStream object at 0x...>
+        <music21.trecento.trecentoCadence.TrecentoCadenceStream ...>
+        <music21.trecento.trecentoCadence.TrecentoCadenceStream ...>
         <BLANKLINE>
         no-cadence
         2/4
