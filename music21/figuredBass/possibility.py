@@ -29,6 +29,22 @@ class Possibility(dict):
     Extends the dictionary object through methods that can perform rule checks on a possibility or
     sequence of two possibilities.
     '''
+    def __setitem__(self, voiceLabel, pitchValue):
+        '''
+        >>> from music21 import pitch
+        >>> from music21.figuredBass import possibility
+        >>> p1 = possibility.Possibility()
+        >>> p1['B'] = pitch.Pitch('C3')
+        >>> p1['B']
+        C3
+        >>> p1['A'] = 'Not a pitch'
+        Traceback (most recent call last):
+        PossibilityException: The key of a Possibility instance can correspond only to a music21 pitch.Pitch.
+        '''
+        if not isinstance(pitchValue, pitch.Pitch):
+            raise PossibilityException("The key of a Possibility instance can correspond only to a music21 pitch.Pitch.")
+        dict.__setitem__(self, voiceLabel, pitchValue)
+    
     # CHORD FORMATION RULES
     def correctlyFormed(self, pitchNamesToHave = None, fbRules = rules.Rules(), verbose = False):
         # Imitates checkChord() from rules.py, but one calls the method on the Possibility object,
@@ -726,6 +742,20 @@ class Possibility(dict):
         
         pitchesInChord.sort()
         return chord.Chord(pitchesInChord)
+    
+    def isDominantSeventh(self):
+        dominantSeventh = self.chordify()
+        if dominantSeventh.isDominantSeventh():
+            return True
+        else:
+            return False
+        
+    def isDiminishedSeventh(self):
+        diminishedSeventh = self.chordify()
+        if diminishedSeventh.isDiminishedSeventh():
+            return True
+        else:
+            return False
         
 
 class PossibilityException(music21.Music21Exception):
