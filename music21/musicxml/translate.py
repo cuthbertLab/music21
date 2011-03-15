@@ -216,6 +216,7 @@ def lyricToMx(l):
     mxLyric = musicxmlMod.Lyric()
     mxLyric.set('text', l.text)
     mxLyric.set('number', l.number)
+    # mxl expects begin, middle, end, as well as single
     mxLyric.set('syllabic', l.syllabic)
     return mxLyric
 

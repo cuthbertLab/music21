@@ -1943,7 +1943,7 @@ class Lyric(MusicXMLElement):
         # can be a number for mult line or name (e.g. chorus)
         self._attr['number'] = None
         # entities
-        self.syllabic = None
+        self.syllabic = None # begin, middle, end, or single
         self.text = None
 
     def filterLyric(self, text):

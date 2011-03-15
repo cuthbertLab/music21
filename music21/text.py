@@ -14,6 +14,11 @@
 import doctest, unittest
 import music21 # needed to properly do isinstance checking
 
+from music21 import environment
+_MOD = "text.py"  
+environLocal = environment.Environment(_MOD)
+
+
 
 # using ISO 639-1 Code from here:
 # http://www.loc.gov/standards/iso639-2/php/code_list.php
@@ -39,9 +44,11 @@ articleReference = {
     }
 
 #-------------------------------------------------------------------------------
-def assembleLyrics(streamIn):
+def assembleLyrics(streamIn, lineNumber=1):
     '''
-    Concatenate text from a stream.
+    Concatenate text from a stream. The Stream is automatically flattened. 
+
+    The `lineNumber` parameter determines which line of text is assembled.
     
     >>> from music21 import *
     >>> s = stream.Stream()
@@ -54,18 +61,27 @@ def assembleLyrics(streamIn):
     >>> text.assembleLyrics(s)
     'Hi there'
     '''
-    word = []; words = []
+    word = []
+    words = []
     noteStream = streamIn.flat.notes
+    # need to find maximum number of lyrics on each note
     for n in noteStream:
-        for lyricObj in n.lyrics: # a list of lyric objs
-            #print lyricObj, lyricObj.syllabic, lyricObj.text
-            # need to match case of non-defined syllabic attribute
-            if lyricObj.syllabic in ['begin', 'middle']:
-                word.append(lyricObj.text)
-            elif lyricObj.syllabic in ['end', 'single', None]:
-                word.append(lyricObj.text)
-                words.append(''.join(word))
-                word = []
+        try:
+            lyricObj = n.lyrics[lineNumber-1] # a list of lyric objs
+        except IndexError:
+            continue
+        #environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text, 'lyricObj.syllabic', lyricObj.syllabic, 'word', word])
+
+        # need to match case of non-defined syllabic attribute
+        if lyricObj.syllabic in ['begin', 'middle']:
+            word.append(lyricObj.text)
+        elif lyricObj.syllabic in ['end', 'single', None]:
+            word.append(lyricObj.text)
+            #environLocal.printDebug(['word pre-join', word])
+            words.append(''.join(word))
+            word = []
+        else:
+            raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
     return ' '.join(words)
         
 
@@ -300,6 +316,25 @@ class Test(unittest.TestCase):
         a = converter.parse(corpus.getWork('luca/gloria'))
         post = assembleLyrics(a)
         self.assertEqual(post.startswith('Et in terra pax hominibus bone voluntatis'), True) 
+
+
+    def testAssembleLyricsA(self):
+        from music21 import text, stream, note
+        s = stream.Stream()
+        for syl in ['hel-', '-lo', 'a-', '-gain']:
+            n = note.Note()
+            n.lyric = syl
+            s.append(n)
+        post = assembleLyrics(s)
+        self.assertEqual(post, 'hello again')
+
+        s = stream.Stream()
+        for syl in ['a-', '-ris-', '-to-', '-crats', 'are', 'great']:
+            n = note.Note()
+            n.lyric = syl
+            s.append(n)
+        post = assembleLyrics(s)
+        self.assertEqual(post, 'aristocrats are great')
 
 
 

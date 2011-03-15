@@ -54,17 +54,41 @@ class LyricException(Exception):
 class Lyric(object):
 
     def __init__(self, text=None, number=1, syllabic=None):
-        if not common.isStr(text):
-            # do not want to do this unless we are sure this is not a string
-            # possible might alter unicode or other string-like representations
-            self.text = str(text)         
-        else:
-            self.text = text
+        # these are set by _setTextAndSyllabic
+        self.text = None
+        # given as begin, middle, end, or single
+        self.syllabic = None
+        
+        self._setTextAndSyllabic(text)
+
         if not common.isNum(number):
             raise LyricException('Number best be number')
         self.number = number
-        self.syllabic = syllabic # can be begin, middle, or end
 
+
+    def _setTextAndSyllabic(self, rawText):
+        # do not want to do this unless we are sure this is not a string
+        # possible might alter unicode or other string-like representations
+
+        if not common.isStr(rawText):
+            rawText = str(rawText)         
+        else:
+            rawText = rawText
+        # check for hyphens
+        if rawText.startswith('-') and not rawText.endswith('-'):
+            self.text = rawText[1:]
+            self.syllabic = 'end'
+        elif not rawText.startswith('-') and rawText.endswith('-'):
+            self.text = rawText[:-1]
+            self.syllabic = 'begin'
+        elif rawText.startswith('-') and rawText.endswith('-'):
+            self.text = rawText[1:-1]
+            self.syllabic = 'middle'
+        else: # assume single
+            self.text = rawText
+            self.syllabic = 'single'
+
+        #environLocal.printDebug(['Lyric:', 'self.text', self.text, 'self.syllabic', self.syllabic])
 
     #---------------------------------------------------------------------------
     def _getMX(self):
