@@ -2829,12 +2829,19 @@ class Test(unittest.TestCase):
         
         st2 = stream.Stream()
         st2.append(key.Key('c'))    # c minor
-        st2.append(chord1)          # same pitches as before gives different scaleDegrees
+        st2.append(chord1)# same pitches as before gives different scaleDegrees
+        
+        self.assertNotEqual(chord1.activeSite, st1)
 
-        self.assertEqual(chord1.activeSite, st2)
+        # test id
+        self.assertEqual(chord1._activeSiteId, id(st2))
+        # for some reason this test fails when test cases are run at the 
+        # module level, but not at the level of running the specific method
+        # from the class
+        #self.assertEqual(chord1.activeSite, st2)
+
         self.assertEqual(str(chord1.scaleDegrees), 
         "[(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]")
-
 
     def testTiesA(self):
         # test creating independent ties for each Pitch

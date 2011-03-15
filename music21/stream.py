@@ -2528,7 +2528,8 @@ class Stream(music21.Music21Object):
                 # TODO: may want to deepcopy inserted object here
                 startMeasureNew.insert(0, found)
             else:
-                environLocal.printDebug(['measures(): cannot find requested class in stream:', className])
+                pass
+                #environLocal.printDebug(['measures(): cannot find requested class in stream:', className])
 
         #environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
@@ -3539,7 +3540,6 @@ class Stream(music21.Music21Object):
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.clef.TrebleClef object at 0x...>
-            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
         {2.0} <music21.stream.Measure 2 offset=2.0>
@@ -3583,7 +3583,6 @@ class Stream(music21.Music21Object):
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.clef.TrebleClef object at 0x...>
-            {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.note.Note D#>
         {3.0} <music21.stream.Measure 2 offset=3.0>
             {0.0} <music21.note.Note D#>
@@ -3630,7 +3629,8 @@ class Stream(music21.Music21Object):
             meterStream = Stream()
             meterStream.insert(0, ts)
 
-        environLocal.printDebug(['Stream.makeMeasures(): srcObj.activeSite', srcObj.activeSite])
+        #assert len(meterStream), 1
+
         #environLocal.printDebug(['makeMeasures(): meterStream', 'meterStream[0]', meterStream[0], 'meterStream[0].offset',  meterStream[0].offset, 'meterStream.elements[0].activeSite', meterStream.elements[0].activeSite])
 
         # get a clef for the entire stream; this will use bestClef
@@ -3658,7 +3658,6 @@ class Stream(music21.Music21Object):
         
         # if a ref stream is provided, get highest time from there
         # only if it is greater thant the highest time yet encountered
-
         if refStreamOrTimeRange != None:
             if isinstance(refStreamOrTimeRange, Stream):
                 refStreamHighestTime = refStream.highestTime
@@ -3685,7 +3684,7 @@ class Stream(music21.Music21Object):
             # make a copy and it to the meter
             thisTimeSignature = meterStream.getElementAtOrBefore(o)
 
-            #environLocal.printDebug(['meterStream.getElementAtOrBefore(o)', meterStream.getElementAtOrBefore(o), 'lastTimeSignature', lastTimeSignature, 'thisTimeSignature', thisTimeSignature ])
+            #environLocal.printDebug(['m.number', m.number, 'meterStream.getElementAtOrBefore(o)', meterStream.getElementAtOrBefore(o), 'lastTimeSignature', lastTimeSignature, 'thisTimeSignature', thisTimeSignature ])
 
             if thisTimeSignature is None and lastTimeSignature is None:
                 raise StreamException('failed to find TimeSignature in meterStream; cannot process Measures')
@@ -3752,12 +3751,19 @@ class Stream(music21.Music21Object):
 
             # insert element at this offset in the measure
             # not copying elements here!
+
             # in the case of a Clef, and possibly other measure attributes, 
             # the element may have already been placed in this measure
-            #environLocal.printDebug(['compare e, clef', e, m.clef])
-            if m.clef == e:
+            # we need to only exclude elements that are placed in the special
+            # first position
+            if m.clef is e:
+                continue
+            # do not accept another time signature at the zero position: this
+            # is handled above
+            if oNew == 0 and 'TimeSignature' in e.classes:
                 continue
 
+            #environLocal.printDebug(['makeMeasures()', 'inserting', oNew, e])
             if voiceIndex == None:
                 m.insert(oNew, e)
             else: # insert into voice specified by the voice index
@@ -11857,7 +11863,7 @@ class Test(unittest.TestCase):
         mStream = sSub.makeMeasures()
         mStream.makeTies(inPlace=True)
 
-        self.assertEqual(len(mStream.flat), 46)
+        self.assertEqual(len(mStream.flat), 45)
 
         #mStream.show()
 
@@ -13441,6 +13447,33 @@ class Test(unittest.TestCase):
         pMeasuresFlatNotes = pMeasuresFlat.notes
         self.assertEqual(pMeasuresFlatNotes.derivationChain, [pMeasuresFlat, pMeasures, p1])
 
+
+    def testMakeMeasuresTimeSignatures(self):
+        from music21 import stream, note
+        sSrc = stream.Stream()
+        sSrc.append(note.QuarterNote('C4'))
+        sSrc.append(note.QuarterNote('D4'))
+        sSrc.append(note.QuarterNote('E4'))
+        sMeasures = sSrc.makeMeasures()
+        # added 4/4 here as default
+        self.assertEqual(str(sMeasures[0].timeSignature), '4/4')
+
+        # no time signature are in the source
+        self.assertEqual(len(sSrc.flat.getElementsByClass('TimeSignature')), 0)
+        # we add one time signature
+        sSrc.insert(0.0, meter.TimeSignature('2/4'))
+        self.assertEqual(len(sSrc.flat.getElementsByClass('TimeSignature')), 1)
+
+        sMeasuresTwoFour = sSrc.makeMeasures()
+        self.assertEqual(str(sMeasuresTwoFour[0].timeSignature), '2/4')
+        self.assertEqual(sMeasuresTwoFour.isSorted, True)
+        
+        # check how many time signature we have:
+        # we should have 1
+        self.assertEqual(len(
+            sMeasuresTwoFour.flat.getElementsByClass('TimeSignature')), 1)
+
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
