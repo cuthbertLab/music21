@@ -430,10 +430,10 @@ class Possibility(dict):
         crossings present, although either/both of these checks can be disabled by modifying
         the appropriate flag(s) in the optional rules.Rules() input.
         
-        Takes in a list of Voice instances as input. Indicating range in a Voice is optional,
-        and if no range is provided for a voice, then all the pitches associated with that voice
-        are presumed to be in range. Voice crossing is determined using order of voices without
-        preference to range. 
+        Takes in a list of Voice instances as input, ordered from low to high. Indicating range 
+        in a Voice is optional, and if no range is provided for a voice, then all the pitches 
+        associated with that voice are presumed to be in range. Voice crossing is determined 
+        using order of voices without preference to range. 
         
         >>> from music21.figuredBass import voice
         >>> from music21.figuredBass import possibility
@@ -456,7 +456,7 @@ class Possibility(dict):
         True
         '''
         hasCorrectTessitura = True
-        orderedVoiceLabels = self.extractVoiceLabels(orderedVoiceList)
+        orderedVoiceLabels = extractVoiceLabels(orderedVoiceList)
 
         if fbRules.filterPitchesByRange:
             pitchesInRange = self.pitchesWithinRange(orderedVoiceList, verbose)
@@ -475,11 +475,13 @@ class Possibility(dict):
 
     def voiceCrossing(self, orderedVoiceLabels, verbose = False):
         '''
-        Returns True if voice crossing is present in self. Takes in an
-        ordered list of voice labels which correspond to those in self.
-        Raises an error if a voice label in self is not present in the 
-        sorted list of voice labels.
-                
+        Returns True if Possibility (self) contains a voice crossing.
+        Takes in an ordered list of voice labels, from lowest to highest,
+        which correspond to keys in Possibility. 
+        
+        Raises an error if a voice label(s) in Possibility is not present in the 
+        ordered list.
+
         >>> from music21.figuredBass import voice
         >>> from music21.figuredBass import possibility
         >>> orderedVoiceLabels = ['B', 'T', 'A', 'S'] #From lowest to highest
@@ -526,9 +528,14 @@ class Possibility(dict):
     
     def pitchesWithinRange(self, voiceList, verbose = False):
         '''
-        Returns true if all pitches in self fall within the upper and lower ranges
-        of their respective voices. Raises an error if there are voice labels in 
-        self that don't correspond to voices in voiceList.
+        Returns True if the pitch of each voice falls within its upper and lower
+        ranges. 
+        
+        Takes in a list of Voice instances. Supplying a Range to a Voice is optional,
+        and if omitted for a certain Voice then all pitches are presumed in range.
+        
+        Raises an error if a voice label(s) in Possibility doesn't correspond to Voice 
+        instances in voiceList.
         
         >>> from music21.figuredBass import voice
         >>> from music21.figuredBass import possibility
@@ -550,7 +557,7 @@ class Possibility(dict):
         '''
         pitchesInRange = True
         
-        voiceLabels = self.extractVoiceLabels(voiceList)
+        voiceLabels = extractVoiceLabels(voiceList)
         voicesNotCompared = []       
         for vl in self.keys():
             if vl not in voiceLabels:
@@ -576,6 +583,9 @@ class Possibility(dict):
         return pitchesInRange
     
     def correctVoiceLeading2(self, nextPossibility, orderedVoiceList, fbRules = rules.Rules(), verbose = False):
+        '''
+        Returns True if there is correct voice leading tessitura between 
+        '''
         hasCorrectTessitura = True
         orderedVoiceLabels = self.extractVoiceLabels(orderedVoiceList)
 
@@ -594,12 +604,13 @@ class Possibility(dict):
     
     def voiceOverlap(self, nextPossibility, orderedVoiceLabels, verbose = False):
         '''
-        Returns True if voice overlap is present between self and next possibility. 
-        Also takes an ordered list of voice labels as an argument.
+        Returns True if there is voice overlap between prevPossibility (self) and nextPossibility.
+        Takes in a list of ordered voice labels, from lowest to highest.
         
-        Raises an error if there are voice labels shared between self and next possibility
-        which can't be found in orderedVoiceLabels. Ignores voices which aren't shared
-        between the two, but raises an error if no voices are shared.
+        Ignores voices which aren't shared between the two, but raises an error if (1) There are
+        voices shared between the two Possibility instances which correspond to voice labels not 
+        found in the ordered list and (2) If less than two voices are shared between the two
+        Possibility instances.
         
         >>> from music21.figuredBass import voice
         >>> from music21.figuredBass import possibility
@@ -675,14 +686,12 @@ class Possibility(dict):
     
     def voiceLeapsWithinLimits(self, nextPossibility, voiceList, verbose = False):
         '''
-        Checks if voice leaps occur in each voice that is shared among self 
-        and next possibility, where a voice leap is defined as a jump greater 
-        than maxIntervalLeap as specified in a Voice object. The default 
-        maxIntervalLeap for voices is a perfect octave. 
-    
-        Raises an error if there are voice labels shared between self and next possibility
-        which don't correspond to voices in voiceList. Ignores voices which aren't shared
-        between the two, but raises an error if no voices are shared.
+        Returns True if there are voice leaps present between prevPossibility (self) and nextPossibility.
+        Takes in a list of Voice instances which supply the maximum interval jump allowed for each voice.
+        The default max interval is a perfect octave.
+        
+        Ignores voices which aren't shared between the two Possibility instances, but raises an error if
+        there are voices shared between the two that don't correspond to Voice instances in voiceList.
          
         >>> from music21.figuredBass import voice
         >>> from music21.figuredBass import possibility
@@ -714,7 +723,7 @@ class Possibility(dict):
         if len(voiceLabelsCompared) == 0:
             raise PossibilityException("No voices to check.")
 
-        voiceLabels = self.extractVoiceLabels(voiceList)       
+        voiceLabels = extractVoiceLabels(voiceList)       
         voicesNotCompared = []
         for vl in voiceLabelsCompared:
             if vl not in voiceLabels:
@@ -742,8 +751,10 @@ class Possibility(dict):
     # HELPER METHODS
     def voicePairs(self, nextPossibility):
         '''
-        Group the previous and next pitches of every voice together. Ignores voices which
-        aren't shared by both possibilities.
+        Group pitches of prevPossibility (self) and nextPossibility which 
+        correspond to the same voice together.
+        Raises an error if the Possibility instances don't share at least
+        one voice in common.
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'S': 'C5', 'B': 'C4'})
@@ -770,8 +781,8 @@ class Possibility(dict):
     
     def voiceQuartets(self, nextPossibility):
         '''
-        Group the previous and next pitches of one voice with those of another. Raises an error if there are not
-        at least two shared voices between the two possibilities.
+        Group all voice pairs of prevPossibility (self) and nextPossibility together.
+        Raises an error if the Possibility instances don't have at least two voices in common.
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'S': 'C5', 'T': 'E4', 'B': 'C4'})
@@ -795,16 +806,9 @@ class Possibility(dict):
         
         return voiceQuartets
     
-    def extractVoiceLabels(self, voiceList):
-        voiceLabels = []
-        for v in voiceList:
-            voiceLabels.append(v.label)
-        
-        return voiceLabels
-    
     def chordify(self):
         '''
-        Turns self into a music21 chord.Chord instance.
+        Turns Possibility (self) into a music21 chord.Chord instance.
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'S': 'C5', 'T': 'E4', 'B': 'C4'})
@@ -823,6 +827,17 @@ class Possibility(dict):
         return chord.Chord(pitchesInChord)
     
     def isDominantSeventh(self):
+        '''
+        Returns True if Possibility (self) is a Dominant Seventh. Possibility must be correctly spelled.
+        
+        >>> from music21.figuredBass import possibility
+        >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
+        >>> possibA.isDominantSeventh()
+        True
+        >>> possibB = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'B5'})
+        >>> possibB.isDominantSeventh() # Missing fifth
+        False
+        '''
         dominantSeventh = self.chordify()
         if dominantSeventh.isDominantSeventh():
             return True
@@ -830,12 +845,44 @@ class Possibility(dict):
             return False
         
     def isDiminishedSeventh(self):
+        '''
+        Returns True if Possibility (self) is a (fully) Diminished Seventh. Possibility must be correctly spelled.
+    
+        >>> from music21.figuredBass import possibility
+        >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
+        >>> possibA.isDiminishedSeventh()
+        True
+        >>> possibB = possibility.Possibility({'B': 'C#3', 'T': 'E3', 'A': 'E4', 'S': 'B-4'})
+        >>> possibB.isDiminishedSeventh() # Missing fifth
+        False
+        '''
         diminishedSeventh = self.chordify()
         if diminishedSeventh.isDiminishedSeventh():
             return True
         else:
             return False
-        
+
+
+def extractVoiceLabels(voiceList):
+    '''
+    Extract voice labels in order from a voice list, and then return them.
+    
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import voice
+    >>> v1 = voice.Voice('B', voice.Range('E2', 'E4'))
+    >>> v2 = voice.Voice('T', voice.Range('C3', 'A4'))
+    >>> v3 = voice.Voice('A', voice.Range('F3', 'G5'))
+    >>> v4 = voice.Voice('S', voice.Range('C4', 'A5'))
+    >>> orderedVoiceList = [v1, v2, v3, v4]
+    >>> possibility.extractVoiceLabels(orderedVoiceList)
+    ['B', 'T', 'A', 'S']
+    '''
+    voiceLabels = []
+    for v in voiceList:
+        voiceLabels.append(v.label)
+    
+    return voiceLabels
+    
 
 class PossibilityException(music21.Music21Exception):
     pass
