@@ -409,7 +409,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.notes), 34)
         self.assertEqual(len(s.parts[1].flat.notes), 9)
 
-        self.assertEqual(s.parts[0].flat.notes[2].lyric, 'Be-')
+        # note that hyphens are stripped on import
+        self.assertEqual(s.parts[0].flat.notes[2].lyric, 'Be')
         self.assertEqual(s.parts[0].flat.notes[3].lyric, 'hold,')
 
         #s.show()
@@ -435,7 +436,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s.parts[3].getElementsByClass(
             'Measure')[3].notes[0].beams), '<music21.beam.Beams >')
         self.assertEqual(str(s.parts[3].getElementsByClass(
-            'Measure')[3].notes[0].lyric), 'sud-')
+            'Measure')[3].notes[0].lyric), 'sud')
 
         # the bottom part has 8ths beamed two to a bar
         self.assertEqual(str(s.parts[4].getElementsByClass(

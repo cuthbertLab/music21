@@ -194,7 +194,7 @@ class TinyNotationNote(object):
     >>> note1.octave
     2
     >>> note1.lyric
-    'hel-'
+    'hel'
     >>> note1.id
     'aflat'
 
@@ -387,8 +387,8 @@ class HarmonyStream(TinyNotationStream):
     'C'
     >>> ns[0].editorial.misc['harmony']
     'F'
-    >>> ns[0].lyric
-    'Mi-'
+    >>> ns[0].lyric # note that hyphens are removed
+    'Mi'
     >>> ns[2].isRest
     True
     >>> ns[5].name
@@ -470,7 +470,7 @@ Total duration of Stream: 6.0
         nst1 = hns.notes
         self.assertEqual(nst1[0].step, "C")
         self.assertEqual(nst1[0].editorial.misc['harmony'], "F")
-        self.assertEqual(nst1[0].lyric, "Mi-")
+        self.assertEqual(nst1[0].lyric, "Mi")
         self.assertEqual(nst1[2].isRest, True)
         self.assertEqual(nst1[5].name, "G")
         self.assertEqual(nst1[7].name, "A-")

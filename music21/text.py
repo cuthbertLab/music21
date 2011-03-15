@@ -327,7 +327,7 @@ class Test(unittest.TestCase):
             s.append(n)
         post = assembleLyrics(s)
         self.assertEqual(post, 'hello again')
-
+        
         s = stream.Stream()
         for syl in ['a-', '-ris-', '-to-', '-crats', 'are', 'great']:
             n = note.Note()
