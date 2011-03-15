@@ -1329,6 +1329,7 @@ class MuseDataWork(object):
 
         for fp in fpList:
             mdf = MuseDataFile()
+            environLocal.printDebug('processing MuseData file: %s' % fp)
             mdf.open(fp)
             mdf.read()  # process string and break into parts
             mdf.close()
@@ -1381,24 +1382,64 @@ class MuseDataDirectory(object):
         self.paths = []
         self.groups = {} # use fp as key; store 'number'
 
-        self._perpareGroups(dirOrList)
+        self._prepareGroups(dirOrList)
 
-    def _perpareGroups(self, dirOrList):
+    def _prepareGroups(self, dirOrList):
+        #environLocal.printDebug(['_prepareGroups', dirOrList])
+
+        allPaths = []
+        source = None # set where files are coming from
         if common.isListLike(dirOrList):
             # assume a flat list from a zip file
-            sep = '/' # sep is always backslash
-            for fp in dirOrList:
-                if self.isMusedataFile(fp):
-                    self.paths.append(fp)
+            sep = '/' # sep is always backslash for zip files
+            source = 'zip'
+            allPaths = dirOrList
+#             for fp in dirOrList:
+#                 if self.isMusedataFile(fp):
+#                     self.paths.append(fp)
         elif os.path.isdir(dirOrList):
+            source = 'dir'
             sep = os.sep # sep os.sep
             # first, get the contents of the dir and see if it has md files
             for fn in os.listdir(dirOrList):
+                allPaths.append(os.path.join(dirOrList, fn))
+#                 if not self.isMusedataFile(fn):
+#                     continue
+#                 numStr, nonNumStr = common.getNumFromStr(fn)
+#                 # if we cannot get a number out of the file name
+#                 if numStr == '':
+#                     continue
+#                 else:
+#                     self.paths.append(os.path.join(dirOrList, fn))
+        else:
+            raise MuseDataException('cannot get files from the following entity', dirOrList)
+
+        for fp in allPaths:
+            dir, fn = os.path.split(fp)
+            if not self.isMusedataFile(fn):
+                continue
+            numStr, nonNumStr = common.getNumFromStr(fn)
+            # if we cannot get a number out of the file name
+            if numStr == '':
+                continue
+            else:
+                self.paths.append(fp)
+
+        # on second pass, remove any score file if we have part files
+        # score files start with an s
+        popList = []
+        if len(self.paths) > 1:
+            for i, fp in enumerate(self.paths):
+                dir, fn = os.path.split(fp)
+                # if it has a number and starts with s
                 numStr, nonNumStr = common.getNumFromStr(fn)
-                if numStr == '' and not self.isMusedataFile(fn):
-                    continue
-                else:
-                    self.paths.append(os.path.join(dirOrList, fn))
+                if numStr != '' and nonNumStr.startswith('s'):
+                    popList.append(i)
+            popList.reverse()
+            for i in popList:
+                self.paths.pop(i)
+        else: # if only one file, use it
+            pass
 
             #rawPaths = []
 #             for dirpath, dirnames, filenames in os.walk(dirOrList):
@@ -1412,23 +1453,26 @@ class MuseDataDirectory(object):
             # see if top level is directory
             #environLocal.printDebug(['here', rawPaths])
 
-        else:
-            raise MuseDataException('cannot get files from the following entity', dirOrList)
+
 
         # after gathering paths, may need to sort/get by groups
         self.paths.sort()
-
-        environLocal.printDebug(['self.paths', self.paths])
+        #environLocal.printDebug(['self.paths', self.paths])
 
     def isMusedataFile(self, fp):
         # look for file extension; not often used
-        # cannot open file and look, as names from a zip archive are note
+        # cannot open file and look, as names from a zip archive are not
         # directly openable
+        #environLocal.printDebug(['isMusedataFile: checking:', fp])
+
+        dir, fn = os.path.split(fp)
         if fp.endswith('.md'):
             return True
+        elif fn.startswith('mchan'): # ignore midi declaration files
+            return False
         # directories from a zip will end in '/', or os.sep
         elif (fp.endswith('.py') or fp.endswith('/') or 
-            fp.endswith(os.sep)  or fp.startswith('.') or
+            fp.endswith(os.sep)  or fn.startswith('.') or
             fp.endswith('.svn-base')):
             return False
         return True
@@ -1436,8 +1480,7 @@ class MuseDataDirectory(object):
     def getPaths(self, group=None):
         '''Return sorted paths for a group, or None
         '''
-        environLocal.printDebug(['getPaths() called with self.paths', self.paths])
-
+        #environLocal.printDebug(['getPaths() called with self.paths', self.paths])
         return self.paths
 
 

@@ -69,6 +69,55 @@ from music21.corpus import luca
 
 from music21.corpus import bach
 from music21.corpus.bach import bwv1080
+from music21.corpus.bach import bwv846
+
+from music21.corpus.bach import bwv847
+from music21.corpus.bach import bwv848
+from music21.corpus.bach import bwv849
+from music21.corpus.bach import bwv850
+from music21.corpus.bach import bwv851
+from music21.corpus.bach import bwv852
+from music21.corpus.bach import bwv853
+from music21.corpus.bach import bwv854
+from music21.corpus.bach import bwv855
+from music21.corpus.bach import bwv856
+from music21.corpus.bach import bwv857
+from music21.corpus.bach import bwv858
+from music21.corpus.bach import bwv859
+from music21.corpus.bach import bwv860
+from music21.corpus.bach import bwv861
+from music21.corpus.bach import bwv862
+from music21.corpus.bach import bwv863
+from music21.corpus.bach import bwv864
+from music21.corpus.bach import bwv865
+from music21.corpus.bach import bwv866
+from music21.corpus.bach import bwv867
+from music21.corpus.bach import bwv868
+from music21.corpus.bach import bwv869
+from music21.corpus.bach import bwv870
+from music21.corpus.bach import bwv871
+from music21.corpus.bach import bwv872
+from music21.corpus.bach import bwv873
+from music21.corpus.bach import bwv874
+from music21.corpus.bach import bwv875
+from music21.corpus.bach import bwv876
+from music21.corpus.bach import bwv877
+from music21.corpus.bach import bwv878
+from music21.corpus.bach import bwv879
+from music21.corpus.bach import bwv880
+from music21.corpus.bach import bwv881
+from music21.corpus.bach import bwv882
+from music21.corpus.bach import bwv883
+from music21.corpus.bach import bwv884
+from music21.corpus.bach import bwv885
+from music21.corpus.bach import bwv886
+from music21.corpus.bach import bwv887
+from music21.corpus.bach import bwv888
+from music21.corpus.bach import bwv889
+from music21.corpus.bach import bwv890
+from music21.corpus.bach import bwv891
+from music21.corpus.bach import bwv892
+from music21.corpus.bach import bwv893
 
 
 MODULES = [
@@ -107,6 +156,56 @@ MODULES = [
 
             bach,
             bwv1080,
+            bwv846,
+            bwv847,
+            bwv848,
+            bwv849,
+            bwv850,
+            bwv851,
+            bwv852,
+            bwv853,
+            bwv854,
+            bwv855,
+            bwv856,
+            bwv857,
+            bwv858,
+            bwv859,
+            bwv860,
+            bwv861,
+            bwv862,
+            bwv863,
+            bwv864,
+            bwv865,
+            bwv866,
+            bwv867,
+            bwv868,
+            bwv869,
+            bwv870,
+            bwv871,
+            bwv872,
+            bwv873,
+            bwv874,
+            bwv875,
+            bwv876,
+            bwv877,
+            bwv878,
+            bwv879,
+            bwv880,
+            bwv881,
+            bwv882,
+            bwv883,
+            bwv884,
+            bwv885,
+            bwv886,
+            bwv887,
+            bwv888,
+            bwv889,
+            bwv890,
+            bwv891,
+            bwv892,
+            bwv893,
+
+
     ]
 
 
@@ -175,7 +274,6 @@ def getPaths(extList=None, expandExtensions=True):
     '''
     if not common.isListLike(extList):
         extList = [extList]
-
     if extList == [None]:
         extList = _ALL_EXTENSIONS
     elif expandExtensions:
@@ -207,6 +305,7 @@ def getPaths(extList=None, expandExtensions=True):
                 if fp.endswith(ext):
                     match = True
                     break 
+
             if match:
                 if fp not in paths:
                     paths.append(fp)    
@@ -360,7 +459,6 @@ def getWorkList(workName, movementNumber=None, extList=None):
     1
     >>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
     0
-
     >>> len(getWorkList('handel/hwv56', '1-01', '.md'))
     1
     >>> len(getWorkList('handel/hwv56', (1,1), '.md'))
@@ -390,7 +488,7 @@ def getWorkList(workName, movementNumber=None, extList=None):
         elif workSlashes.lower() in path.lower():
             post.append(path)
 
-    #environLocal.printDebug(['post', post])
+    #environLocal.printDebug(['getWorkList(): post', post])
 
     postMvt = []
     if movementNumber is not None and len(post) > 0:
@@ -891,6 +989,31 @@ class Test(unittest.TestCase):
         # there are two versions of this file        
         self.assertEqual(len(getWorkList('beethoven/opus18no1', 1)), 2)
 
+        # if specify movement
+        for bwv in ['bwv846', 'bwv847', 'bwv848', 'bwv849', 'bwv850', 'bwv851', 'bwv852', 'bwv853', 'bwv854', 'bwv855', 'bwv856', 'bwv857', 'bwv858', 'bwv859', 'bwv860', 'bwv861', 'bwv862', 'bwv863', 'bwv864', 'bwv865', 'bwv866', 'bwv867', 'bwv868', 'bwv869', 'bwv870', 'bwv871', 'bwv872', 'bwv873', 'bwv874', 'bwv875', 'bwv876', 'bwv877', 'bwv878', 'bwv879', 'bwv880', 'bwv881', 'bwv882', 'bwv883', 'bwv884', 'bwv885', 'bwv886', 'bwv887', 'bwv888', 'bwv889', 'bwv890', 'bwv891', 'bwv892', 'bwv893']:
+            self.assertEqual(len(getWorkList(bwv)), 2)
+            self.assertEqual(len(getWorkList(bwv, 1)), 1)
+            self.assertEqual(len(getWorkList(bwv, 2)), 1)
+
+
+    def testWTCImport(self):
+        from music21 import corpus
+        s = corpus.parseWork('bach/bwv846', 1)
+        self.assertEqual(s.metadata.title, 'WTC I: Prelude and Fugue in C major')
+        self.assertEqual(s.metadata.movementNumber, '1')
+        s = corpus.parseWork('bach/bwv846', 2)
+        self.assertEqual(s.metadata.movementName, 'Fugue  I. ')
+        self.assertEqual(s.metadata.movementNumber, '2')
+
+
+        s = corpus.parseWork('bach/bwv862', 1)
+        self.assertEqual(s.metadata.title, 'WTC I: Prelude and Fugue in A flat major')
+
+
+        s = corpus.parseWork('bach/bwv888', 1)
+        self.assertEqual(s.metadata.title, 'WTC II: Prelude and Fugue in A major')
+        #s.show()
+
 
 
 #-------------------------------------------------------------------------------
@@ -899,20 +1022,8 @@ _DOC_ORDER = [parseWork, getWork]
 
 
 if __name__ == "__main__":
-    import sys
+    music21.mainTest(Test)
 
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-
-    elif len(sys.argv) > 1:
-        t = Test()
-        #t.testEssenImport()
-
-        #t.testDesPrezImport()
-
-        t.testSearch()
-
-        #t.testGetWorkList()
 
 #------------------------------------------------------------------------------
 # eof
