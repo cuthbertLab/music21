@@ -2834,7 +2834,7 @@ class Stream(music21.Music21Object):
 
         #environLocal.printDebug(['getClefs(); count of local', len(post), post])       
         if len(post) == 0 and searchActiveSite and self.activeSite != None:
-            environLocal.printDebug(['getClefs(): search activeSite'])       
+            #environLocal.printDebug(['getClefs(): search activeSite'])       
             post = self.activeSite.getElementsByClass(clef.Clef)
 
         if len(post) == 0 and searchContext:
@@ -3621,7 +3621,7 @@ class Stream(music21.Music21Object):
             meterStream = srcObj.flat.getTimeSignatures(returnDefault=True, 
                           searchContext=False,
                           sortByCreationTime=False)
-            environLocal.printDebug(['Stream.makeMeasures(): found meterStream', meterStream[0]])
+            #environLocal.printDebug(['Stream.makeMeasures(): found meterStream', meterStream[0]])
 
         # if meterStream is a TimeSignature, use it
         elif isinstance(meterStream, meter.TimeSignature):
@@ -4328,7 +4328,7 @@ class Stream(music21.Music21Object):
 
         if len(measureStream) == 0:            
             raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
-        environLocal.printDebug(['Stream.makeNotation(): created measures:', len(measureStream)])
+        #environLocal.printDebug(['Stream.makeNotation(): created measures:', len(measureStream)])
 
         return measureStream
 
@@ -6039,7 +6039,6 @@ class Stream(music21.Music21Object):
         return midiTranslate.streamToMidiTrack(self, instObj)
 
     def _setMidiTracksPart(self, mt, ticksPerQuarter=None, quantizePost=True):
-        environLocal.printDebug(['got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
         '''Given a MIDI track, configure a Stream.
         '''
         # pass self as reference to configure this object

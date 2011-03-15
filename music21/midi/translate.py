@@ -569,7 +569,7 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
         instObj = inputM21.getInstrument()
 
     # each part will become midi track
-    # each needs an id; can be adjusted later
+    # the 1 here becomes the midi track index
     mt = midiModule.MidiTrack(1)
     mt.events += midiModule.getStartEvents(mt, instObj.partName)
 
@@ -586,7 +586,6 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
     # probably already flat and sorted
     for obj in s.sorted:
         tDurEvent = 0 # the found delta ticks in each event
-
 
         #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
         classes = obj.classes
@@ -687,6 +686,8 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     >>> len(s.notes)
     9
     '''
+    environLocal.printDebug(['midiTrackToStream(): got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
+
     if inputM21 == None:
         from music21 import stream
         s = stream.Stream()
@@ -711,9 +712,10 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     # first delta time
     i = 0
     while i < len(mt.events):
-        #environLocal.printDebug(['index', i, mt.events[i]])
-        #environLocal.printDebug(['index', i+1, mt.events[i+1]])
-        
+        # in pairs, first should be delta time, second should be event
+        environLocal.printDebug(['midiTrackToStream(): index', 'i', i, mt.events[i]])
+        environLocal.printDebug(['midiTrackToStream(): index', 'i+1', i+1, mt.events[i+1]])
+
         # need to find pairs of delta time and events
         # in some cases, there are delta times that are out of order, or
         # packed in the beginning
@@ -724,11 +726,21 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             events.append([t, e])
             i += 2
             continue
+        elif (not mt.events[i].isDeltaTime() and not 
+            mt.events[i+1].isDeltaTime()):
+            environLocal.printDebug(['midiTrackToStream(): got two non delta times in a row'])
+            i += 1
+            continue
+        elif mt.events[i].isDeltaTime() and mt.events[i+1].isDeltaTime():
+            environLocal.printDebug(['midiTrackToStream(): got two delta times in a row'])
+            i += 1
+            continue
         else:
             # cannot pair delta time to the next event; skip by 1
             environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
             i += 1
             continue
+
 
     #environLocal.printDebug(['raw event pairs', events])
 
@@ -737,7 +749,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     metaEvents = [] # store pairs of abs time, m21 object
     memo = [] # store already matched note off
     for i in range(len(events)):
-        #environLocal.printDebug(['paired events', events[i][0], events[i][1]])
+        #environLocal.printDebug(['midiTrackToStream(): paired events', events[i][0], events[i][1]])
 
         if i in memo:
             continue
@@ -745,25 +757,30 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
         # for each note on event, we need to search for a match in all future
         # events
         if e.isNoteOn():
+            match = None
             for j in range(i+1, len(events)):
                 if j in memo: 
                     continue
                 tSub, eSub = events[j]
                 if e.matchedNoteOff(eSub):
                     memo.append(j)
-                    notes.append([events[i], events[j]])
+                    match = i, j
                     break
+            if match is not None:
+                i, j = match
+                notes.append([events[i], events[j]])
+            else:
+                environLocal.printDebug(['midiTrackToStream(): cannot find a note off for a note on', e])
         else:
             if e.type == 'TIME_SIGNATURE':
                 # time signature should be 4 bytes
                 metaEvents.append([t, midiEventsToTimeSignature(e)])
-
             elif e.type == 'KEY_SIGNATURE':
                 metaEvents.append([t, midiEventsToKeySignature(e)])
-                
             elif e.type == 'SET_TEMPO':
                 pass
             elif e.type == 'INSTRUMENT_NAME':
+                # TODO import instrument object
                 pass
             elif e.type == 'PROGRAM_CHANGE':
                 pass
@@ -774,6 +791,9 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     for t, obj in metaEvents:
         environLocal.printDebug(['insert midi meta event:', t, obj])
         s.insert(t / float(ticksPerQuarter), obj)
+
+
+    environLocal.printDebug(['midiTrackToStream(): found notes ready for Stream import', len(notes)])
 
     # collect notes with similar start times into chords
     # create a composite list of both notes and chords
@@ -876,6 +896,8 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
                 ticksPerQuarter=ticksPerQuarter, quantizePost=quantizePost)
             s.insert(0, streamPart)
         else:
+            # note: in some cases a track such as this might have metadata
+            # such as the time sig, tempo, or other parameters
             environLocal.printDebug(['skipping midi track with no notes', mt])
     
     return s
