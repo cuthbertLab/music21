@@ -70,10 +70,19 @@ class Segment:
         
         newPossibilities = []
         for possib in allPossibilities:
-            if not possib.correctlyFormed(self.pitchNamesInChord, self.fbRules):
+            if not self.fbRules.allowIncompletePossibilities:
+                if possib.isIncomplete(self.pitchNamesInChord):
+                    continue
+            if not possib.topVoicesWithinLimit(self.fbRules.topVoicesMaxIntervalSeparation):
                 continue
-            if not possib.correctTessitura(self.fbVoices, self.fbRules):
-                continue
+            if self.fbRules.filterPitchesByRange:
+                pitchesInRange = possib.pitchesWithinRange(self.fbVoices)
+                if not pitchesInRange:
+                    continue
+            if not self.fbRules.allowVoiceCrossing:
+                hasVoiceCrossing = possib.voiceCrossing(possibility.extractVoiceLabels(self.fbVoices))
+                if hasVoiceCrossing:
+                    continue
             newPossibilities.append(possib)
         
         return newPossibilities
@@ -166,13 +175,32 @@ class NextSegment(Segment):
     def checkVoiceLeading(self, prevPossib, nextPossib):
         vlTop = self.fbVoices[-1].label
         vlBottom = self.fbVoices[0].label
-        if not prevPossib.noHiddenIntervals(nextPossib, vlTop, vlBottom, self.fbRules):
-            return False
-        if not prevPossib.correctVoiceLeading2(nextPossib, self.fbVoices, self.fbRules):
-            return False
-        if not prevPossib.correctVoiceLeading(nextPossib, self.fbRules):
-            return False
+        if not self.fbRules.allowHiddenFifths:
+            hasHiddenFifth = prevPossib.hiddenFifth(nextPossib, vlTop, vlBottom)
+            if hasHiddenFifth:
+                return False
+        if not self.fbRules.allowHiddenOctaves:
+            hasHiddenOctave = prevPossib.hiddenOctave(nextPossib, vlTop, vlBottom)
+            if hasHiddenOctave:
+                return False
         
+        leapsWithinLimits = prevPossib.voiceLeapsWithinLimits(nextPossib, self.fbVoices)
+        if not leapsWithinLimits:
+            return False
+        if not self.fbRules.allowVoiceOverlap:
+            hasVoiceOverlap = prevPossib.voiceOverlap(nextPossib, possibility.extractVoiceLabels(self.fbVoices))
+            if hasVoiceOverlap:
+                return False
+
+        if not self.fbRules.allowParallelFifths:
+            hasParallelFifth = prevPossib.parallelFifths(nextPossib)
+            if hasParallelFifth:
+                return False
+        if not self.fbRules.allowParallelOctaves:
+            hasParallelOctave = prevPossib.parallelOctaves(nextPossib)
+            if hasParallelOctave:
+                return False
+
         return True
         
 class SegmentException(music21.Music21Exception):
