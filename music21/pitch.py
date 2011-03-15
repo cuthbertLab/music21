@@ -128,16 +128,19 @@ def convertNameToPitchClass(pitchName):
 def convertNameToPs(pitchName):
     '''Utility conversion: from a pitch name to a pitch space number (floating point MIDI pitch values).
 
-    >>> convertNameToPs('c4')
+    >>> from music21 import *
+    >>> pitch.convertNameToPs('c4')
     60
-    >>> convertNameToPs('c2#')
-    37.0
-    >>> convertNameToPs('d7-')
-    97.0
-    >>> convertNameToPs('e1--')
-    26.0
-    >>> convertNameToPs('b2##')
-    49.0
+    >>> pitch.convertNameToPs('c2#')
+    37
+    >>> pitch.convertNameToPs('d7-')
+    97
+    >>> pitch.convertNameToPs('e1--')
+    26
+    >>> pitch.convertNameToPs('b2##')
+    49
+    >>> pitch.convertNameToPs('c~4')
+    60.5
     '''
     # use pitch name reading in Pitch object, 
     # as an Accidental object is created.
@@ -218,37 +221,45 @@ def convertPsToStep(ps):
 
 def convertStepToPs(step, oct, acc=None):
     '''Utility conversion; does not process internals.
-    Takes in a note name string, octave number, and optional accidental (as integer).
+    Takes in a note name string, octave number, and optional 
+    Accidental object.
     Returns a midiNote number.
-    >>> convertStepToPs('c', 4, 1)
+
+    >>> from music21 import *
+    >>> pitch.convertStepToPs('c', 4, pitch.Accidental('sharp'))
     61
-    >>> convertStepToPs('d', 2, -2)
+    >>> pitch.convertStepToPs('d', 2, pitch.Accidental(-2))
     36
-    >>> convertStepToPs('b', 3, 3)
+    >>> pitch.convertStepToPs('b', 3, pitch.Accidental(3))
     62
+    >>> pitch.convertStepToPs('c', 4, pitch.Accidental('half-flat'))
+    59.5
     '''
     step = step.strip().upper()
     ps = ((oct + 1) * 12) + STEPREF[step]
     if acc is None:
         return ps
-    # this does not work
-    elif common.isNum(acc):
-        return ps + acc
     else: # assume that this is an accidental object
-        return ps + acc.alter
+        a = acc.alter
+        if a == int(a):
+            a = int(a)
+        return ps + a
 
 def convertPsToFq(ps):
     '''Utility conversion; does not process internals.
     
     Converts a midiNote number to a frequency in Hz.
     Assumes A4 = 440 Hz
-    >>> convertPsToFq(69)
+    
+    
+    >>> from music21 import *
+    >>> pitch.convertPsToFq(69)
     440.0
-    >>> str(convertPsToFq(60))
+    >>> str(pitch.convertPsToFq(60))
     '261.625565301'
-    >>> str(convertPsToFq(2))
+    >>> str(pitch.convertPsToFq(2))
     '9.17702399742'
-    >>> str(convertPsToFq(135))
+    >>> str(pitch.convertPsToFq(135))
     '19912.1269582'
 
     OMIT_FROM_DOCS
@@ -289,7 +300,13 @@ class PitchException(Exception):
 
 #-------------------------------------------------------------------------------
 class Accidental(music21.Music21Object):
-    '''Accidental class.
+    '''
+    Accidental class.
+    
+    
+    Two accidentals are considered equal if
+    their names are equal.
+    
     '''
     # manager by properties
     _displayType = "normal" # always, never, unless-repeated, even-tied
@@ -671,7 +688,22 @@ class Accidental(music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 class Pitch(music21.Music21Object):
-    '''An object for storing pitch values. All values are represented internally as a scale step (self.step), and octave and an accidental object. In addition, pitches know their pitchSpace representation (self._ps); altering any of the first three changes the pitchSpace representation. Similarly, altering the pitchSpace representation alters the first three.
+    '''
+    An object for storing pitch values. 
+    All values are represented internally as a 
+    scale step (self.step), and octave and an 
+    accidental object. In addition, pitches know their 
+    pitch space representation (self.ps); altering any 
+    of the first three changes the pitch space (ps) representation. 
+    Similarly, altering the .ps representation 
+    alters the first three.
+    
+    
+    Two Pitches are equal if they represent the same
+    pitch and are spelled the same.  A Pitch is greater
+    than another Pitch if its pitchSpace is greater than
+    the other.  Thus C##4 > D-4.
+    
     '''
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi']
@@ -683,7 +715,8 @@ class Pitch(music21.Music21Object):
 
         Optional parameter name should include a step and accidental character(s)
 
-        it can also include an octave number ("C#4", "B--3", etc.) so long as it's 0 or higher.
+        it can also include an octave number ("C#4", "B--3", etc.) so long 
+        as it's 0 or higher.
 
         >>> from music21 import *
         >>> p1 = pitch.Pitch('a#')
@@ -692,6 +725,10 @@ class Pitch(music21.Music21Object):
         >>> p2 = pitch.Pitch(3)
         >>> p2
         E-
+        
+        
+        This is B-double flat in octave 3, not B- in octave -3.
+        
         
         >>> p3 = pitch.Pitch("B--3")
         >>> p3.accidental
@@ -732,10 +769,12 @@ class Pitch(music21.Music21Object):
 
     def __eq__(self, other):
         '''Do not accept enharmonic equivalance.
-        >>> a = Pitch('c2')
+        
+        >>> from music21 import *
+        >>> a = pitch.Pitch('c2')
         >>> a.octave
         2
-        >>> b = Pitch('c4')
+        >>> b = pitch.Pitch('c#4')
         >>> b.octave
         4
         >>> a == b
@@ -749,6 +788,11 @@ class Pitch(music21.Music21Object):
         
         >>> a != c
         True
+        
+        >>> d = pitch.Pitch('d-4')
+        >>> b == d
+        False
+        
         '''
         if other is None:
             return False
@@ -767,8 +811,10 @@ class Pitch(music21.Music21Object):
     def __lt__(self, other):
         '''Do not accept enharmonic equivalence. Based entirely on pitch space 
         representation.
-        >>> a = Pitch('c4')
-        >>> b = Pitch('c#4')
+        
+        >>> from music21 import *
+        >>> a = pitch.Pitch('c4')
+        >>> b = pitch.Pitch('c#4')
         >>> a < b
         True
         '''
@@ -780,8 +826,10 @@ class Pitch(music21.Music21Object):
     def __gt__(self, other):
         '''Do not accept enharmonic equivialance. Based entirely on pitch space 
         representation.
-        >>> a = Pitch('d4')
-        >>> b = Pitch('d8')
+        
+        >>> from music21 import *
+        >>> a = pitch.Pitch('d4')
+        >>> b = pitch.Pitch('d8')
         >>> a > b
         False
         '''
@@ -792,22 +840,9 @@ class Pitch(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getAccidental(self):
-        '''
-        >>> a = Pitch('D-2')
-        >>> a.accidental.alter
-        -1.0
-        '''
         return self._accidental
     
     def _setAccidental(self, value):
-        '''
-        >>> a = Pitch('E')
-        >>> a.ps  # here this is an int
-        64
-        >>> a.accidental = '#'
-        >>> a.ps  # here this is a float
-        65.0
-        '''
         if (isinstance(value, basestring) or common.isNum(value)):
             self._accidental = Accidental(value)
         else: # assume an accidental object
@@ -815,14 +850,26 @@ class Pitch(music21.Music21Object):
         self._pitchSpaceNeedsUpdating = True
     
     accidental = property(_getAccidental, _setAccidental,
-        doc='''Stores an optional accidental object contained within the
-        picth object.
+        doc='''
+        Stores an optional accidental object contained within the
+        Pitch object.  This might return None.
 
-        >>> a = Pitch('E-')
+        >>> from music21 import *
+        >>> a = pitch.Pitch('E-')
         >>> a.accidental.alter
         -1.0
         >>> a.accidental.modifier
         '-'
+        
+        >>> b = pitch.Pitch('C4')
+        >>> b.accidental is None
+        True
+        >>> b.accidental = pitch.Accidental('natural')
+        >>> b.accidental is None
+        False
+        >>> b.accidental
+        <accidental natural>
+        
         ''')
 
     def _getPs(self):
@@ -835,23 +882,25 @@ class Pitch(music21.Music21Object):
         >>> from music21 import *
         >>> p = pitch.Pitch()
         >>> p.ps = 61
+        >>> p.ps
+        61
         >>> p.implicitAccidental
         True
         '''
         # set default enharmonics to minor key names
 
-        self._ps = value
+        self._ps = float(value)
         self._pitchSpaceNeedsUpdating = False
 
         ### this should eventually change to "stepEtcNeedsUpdating"
         ### but we'll see if it's a bottleneck
-        self.step, acc = convertPsToStep(self._ps)
+        self.step, acc = convertPsToStep(value)
         # replace a natural with a None
         if acc.name == 'natural':
             self.accidental = None
         else:
             self.accidental = acc
-        self.octave = convertPsToOct(self._ps)
+        self.octave = convertPsToOct(value)
 
         # all ps settings must set implicit to True, as we do not know
         # what accidental this is
@@ -861,14 +910,20 @@ class Pitch(music21.Music21Object):
     ps = property(_getPs, _setPs, 
         doc='''The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent).
 
-        >>> a = Pitch()
+        >>> from music21 import *
+        >>> a = pitch.Pitch()
         >>> a.ps = 45
         >>> a
         A2
-        >>> a.ps = 60
-        >>> a
-        C4
+        >>> a.ps
+        45
 
+        >>> a.ps = 61
+        >>> a
+        C#4
+        >>> a.ps
+        61
+        
         ''')
 
     def _updatePitchSpace(self):
@@ -923,8 +978,6 @@ class Pitch(music21.Music21Object):
         MIDI pitch values are like ps values (pitchSpace) rounded to 
         the nearest integer; while the ps attribute will accommodate floats.
 
-        Midi values are also constrained to the space 0-127.  Higher or lower
-        values will be transposed octaves to fit in this space.
 
         >>> from music21 import *
         >>> c = pitch.Pitch('C4')
@@ -933,6 +986,13 @@ class Pitch(music21.Music21Object):
         >>> c.midi =  23.5
         >>> c.midi
         24
+
+
+
+        Midi values are also constrained to the space 0-127.  Higher or lower
+        values will be transposed octaves to fit in this space.
+
+
         
         >>> veryHighFHalfFlat = pitch.Pitch("F")
         >>> veryHighFHalfFlat.octave = 12
@@ -941,6 +1001,7 @@ class Pitch(music21.Music21Object):
         160.5
         >>> veryHighFHalfFlat.midi
         125
+
 
         >>> a = pitch.Pitch()
         >>> a.midi = -10
@@ -955,9 +1016,8 @@ class Pitch(music21.Music21Object):
     def _getName(self):
         '''Name presently returns pitch name and accidental without octave.
 
-        Perhaps better named getNameClass
-
-        >>> a = Pitch('G#')
+        >>> from music21 import *
+        >>> a = pitch.Pitch('G#')
         >>> a.name
         'G#'
         '''
@@ -969,19 +1029,7 @@ class Pitch(music21.Music21Object):
     def _setName(self, usrStr):
         '''
         Set name, which may be provided with or without octave values. C4 or D-3
-        are both accepted. 
-        
-        >>> from music21 import *
-        >>> p = pitch.Pitch()
-        >>> p.name = 'C#'
-        >>> p.implicitAccidental 
-        False
-        >>> p.ps = 61
-        >>> p.implicitAccidental 
-        True
-        >>> p.name = 'C#'
-        >>> p.implicitAccidental 
-        False
+        are both accepted.         
         '''
         usrStr = usrStr.strip().upper()
         # extract any numbers that may be octave designations
@@ -1013,17 +1061,35 @@ class Pitch(music21.Music21Object):
 
         self._pitchSpaceNeedsUpdating = True
     
-    name = property(_getName, _setName)
+    name = property(_getName, _setName, doc='''
+        Gets or sets the name (pitch name with accidental but
+        without octave) of the Pitch.
+
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch()
+        >>> p.name = 'C#'
+        >>> p.implicitAccidental 
+        False
+        >>> p.ps = 61
+        >>> p.implicitAccidental 
+        True
+        >>> p.name
+        'C#'
+        >>> p.ps = 58
+        >>> p.name
+        'B-'
+
+        >>> p.name = 'C#'
+        >>> p.implicitAccidental 
+        False
+
+    ''')
 
 
     def _getNameWithOctave(self):
         '''Returns pitch name with octave
 
-        Perhaps better default action for getName
-
-        >>> a = Pitch('G#4')
-        >>> a.nameWithOctave
-        'G#4'
         '''
         if self.octave is None:
             return self.name
@@ -1031,12 +1097,29 @@ class Pitch(music21.Music21Object):
             return self.name + str(self.octave)
 
     nameWithOctave = property(_getNameWithOctave, 
-        doc = '''The pitch name with an octave designation. If no octave as been set, no octave value is returned. 
+        doc = '''
+        The pitch name with an octave designation. 
+        If no octave as been set, no octave value is returned. 
+
+        
+        Read only attribute.  Set name and octave separately (TODO: Change).
+
+        >>> from music21 import *
+        >>> a = pitch.Pitch('G#4')
+        >>> a.nameWithOctave
+        'G#4'
+        >>> a.name = 'A-'
+        >>> a.octave = -1
+        >>> a.nameWithOctave
+        'A--1'
+        
+        
         ''')
 
     def _getStep(self):
         '''
-        >>> a = Pitch('C#3')
+        >>> from music21 import *
+        >>> a = pitch.Pitch('C#3')
         >>> a._getStep()
         'C'
         '''
@@ -1056,7 +1139,9 @@ class Pitch(music21.Music21Object):
         doc='''The diatonic name of the note; i.e. does not give the 
         accidental or octave.  Is case insensitive.
 
-        >>> a = Pitch('B-3')
+
+        >>> from music21 import *
+        >>> a = pitch.Pitch('B-3')
         >>> a.step
         'B'
         
@@ -1065,9 +1150,11 @@ class Pitch(music21.Music21Object):
         'C-3'
         
         
-        Giving an accidentals raises an exception
+        Giving a name with an accidental raises a PitchException.
+        Use .name instead.
         
-        >>> b = Pitch('E4')
+        >>> from music21 import *
+        >>> b = pitch.Pitch('E4')
         >>> b.step = "E-"
         Traceback (most recent call last):
         PitchException: Cannot make a step out of 'E-'
@@ -1081,41 +1168,32 @@ class Pitch(music21.Music21Object):
             return self.step + str(self.octave)
 
     stepWithOctave = property(_getStepWithOctave, 
-        doc = '''Returns the pitch step (F, G, etc) with octave designation. If no octave as been set, no octave value is returned. 
+        doc = '''
+        Returns the pitch step (F, G, etc) with 
+        octave designation. If no octave has been set, 
+        no octave value is returned. 
 
-        >>> a = Pitch('G#4')
+        >>> from music21 import *
+        >>> a = pitch.Pitch('G#4')
         >>> a.stepWithOctave
         'G4'
 
-        >>> a = Pitch('A#')
+
+        >>> a = pitch.Pitch('A#')
         >>> a.stepWithOctave
         'A'
+
         ''')
 
 
     def _getPitchClass(self):
-        '''
-        >>> a = Pitch('a3')
-        >>> a._getPitchClass()
-        9
-        >>> dis = Pitch('d3')
-        >>> dis.pitchClass
-        2
-        >>> dis.accidental = Accidental("#")
-        >>> dis.pitchClass
-        3
-        >>> dis.pitchClass = 11
-        >>> dis.pitchClass
-        11
-        >>> dis.name
-        'B'
-        '''
         return int(round(self.ps % 12))
 
     def _setPitchClass(self, value):
         '''Set the pitchClass.
 
-        >>> a = Pitch('a3')
+        >>> from music21 import *
+        >>> a = pitch.Pitch('a3')
         >>> a.pitchClass = 3
         >>> a
         E-3
@@ -1137,17 +1215,20 @@ class Pitch(music21.Music21Object):
         #self.ps = convertStepToPs(self.step, self.implicitOctave, self.accidental)
       
     pitchClass = property(_getPitchClass, _setPitchClass,
-        doc='''Returns the integer value for the pitch, 0-11, where C=0,
+        doc='''
+        Returns or sets the integer value for the pitch, 0-11, where C=0,
         C#=1, D=2...B=11. Can be set using integers (0-11) or 'A' or 'B'
         for 10 or 11.
         
-        >>> a = Pitch('a3')
-        >>> a._getPitchClass()
+        
+        >>> from music21 import *
+        >>> a = pitch.Pitch('a3')
+        >>> a.pitchClass
         9
-        >>> dis = Pitch('d3')
+        >>> dis = pitch.Pitch('d3')
         >>> dis.pitchClass
         2
-        >>> dis.accidental = Accidental("#")
+        >>> dis.accidental = pitch.Accidental("#")
         >>> dis.pitchClass
         3
         >>> dis.pitchClass = 11
@@ -1160,19 +1241,28 @@ class Pitch(music21.Music21Object):
 
     def _getPitchClassString(self):
         '''
-        >>> a = Pitch('a3')
+        >>> from music21 import *
+
+        >>> a = pitch.Pitch('a3')
         >>> a._getPitchClassString()
         '9'
-        >>> a = Pitch('a#3')
+        >>> a = pitch.Pitch('a#3')
         >>> a._getPitchClassString()
         'A'
         '''
         return convertPitchClassToStr(self._getPitchClass())
 
     pitchClassString = property(_getPitchClassString, _setPitchClass, 
-        doc = '''Return a string representation of the pitch class, where integers greater than 10 are replaced by A and B, respectively. Can be used to set pitch class by a string representation as well (though this is also possible with :attr:`~music21.pitch.Pitch.pitchClass`.
+        doc = '''
+        Returns or sets a string representation of the pitch class, 
+        where integers greater than 10 are replaced by A and B, 
+        respectively. Can be used to set pitch class by a 
+        string representation as well (though this is also 
+        possible with :attr:`~music21.pitch.Pitch.pitchClass`.
     
-        >>> a = Pitch('a3')
+    
+        >>> from music21 import *
+        >>> a = pitch.Pitch('a3')
         >>> a.pitchClassString = 'B'
         >>> a.pitchClass
         11
@@ -1194,10 +1284,13 @@ class Pitch(music21.Music21Object):
         self._pitchSpaceNeedsUpdating = True
 
     octave = property(_getOctave, _setOctave, doc='''
-        returns or sets the octave of the note.  Setting the octave
+        Returns or sets the octave of the note.  
+        Setting the octave
         updates the pitchSpace attribute.
 
-        >>> a = Pitch('g')
+        >>> from music21 import *
+
+        >>> a = pitch.Pitch('g')
         >>> a.octave is None
         True
         >>> a.implicitOctave
@@ -1206,7 +1299,10 @@ class Pitch(music21.Music21Object):
         67
         >>> a.name
         'G'
+
         >>> a.octave = 14
+        >>> a.octave
+        14
         >>> a.implicitOctave
         14
         >>> a.name
@@ -1220,7 +1316,9 @@ class Pitch(music21.Music21Object):
         else: return self.octave
         
     implicitOctave = property(_getImplicitOctave, doc='''
-    returns the octave of the Pitch, or defaultOctave if octave was never set
+    Returns the octave of the Pitch, or defaultOctave if 
+    octave was never set. To set an octave, use .octave.
+    Default octave is usually 4.
     ''')
 
 
@@ -1254,29 +1352,36 @@ class Pitch(music21.Music21Object):
             return tempName
     
     german = property(_getGerman, doc ='''
-    returns the name of a Pitch in the German system (where B-flat = B, B = H, etc.)
-    (Microtones raise an error).  Note that Ases is used instead of the also acceptable Asas.
+    Read-only attribute. Returns the name 
+    of a Pitch in the German system 
+    (where B-flat = B, B = H, etc.)
+    (Microtones raise an error).  Note that 
+    Ases is used instead of the also acceptable Asas.
     
-    >>> print Pitch('B-').german
+    >>> from music21 import *
+    >>> print pitch.Pitch('B-').german
     B
-    >>> print Pitch('B').german
+    >>> print pitch.Pitch('B').german
     H
-    >>> print Pitch('E-').german
+    >>> print pitch.Pitch('E-').german
     Es
-    >>> print Pitch('C#').german
+    >>> print pitch.Pitch('C#').german
     Cis
-    >>> print Pitch('A--').german
+    >>> print pitch.Pitch('A--').german
     Ases
-    >>> p1 = Pitch('C')
-    >>> p1.accidental = Accidental('half-sharp')
+    >>> p1 = pitch.Pitch('C')
+    >>> p1.accidental = pitch.Accidental('half-sharp')
     >>> p1.german
     Traceback (most recent call last):
     PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade!
+
     
-    OMIT_FROM_DOCS
-    >>> print Pitch('B--').german
+    Note these rarely used pitches:
+    
+    
+    >>> print pitch.Pitch('B--').german
     Heses
-    >>> print Pitch('B#').german
+    >>> print pitch.Pitch('B#').german
     His
     ''')
 
@@ -1284,18 +1389,7 @@ class Pitch(music21.Music21Object):
     def _getFrequency(self):        
         return self._getfreq440()
 
-    def _setFrequency(self, value):
-        '''
-        >>> a = Pitch()
-        >>> a.frequency = 440.0
-        >>> a.frequency
-        440.0
-        >>> a.name
-        'A'
-        >>> a.octave
-        4
-        '''
-        
+    def _setFrequency(self, value):     
         # store existing octave
         ps = convertFqToPs(value)
         # should get microtones
@@ -1312,6 +1406,18 @@ class Pitch(music21.Music21Object):
         the pitch in hertz.  
         If the frequency has not been overridden, then
         it is computed based on A440Hz and equal temperament
+
+        >>> from music21 import *
+        >>> a = pitch.Pitch()
+        >>> a.frequency = 440.0
+        >>> a.frequency
+        440.0
+        >>> a.name
+        'A'
+        >>> a.octave
+        4
+
+
     ''')
 
 
@@ -1319,7 +1425,8 @@ class Pitch(music21.Music21Object):
     # name of method and property could be more clear
     def _getfreq440(self):
         '''
-        >>> a = Pitch('A4')
+        >>> from music21 import *
+        >>> a = pitch.Pitch('A4')
         >>> a.freq440
         440.0
         '''
@@ -1332,7 +1439,16 @@ class Pitch(music21.Music21Object):
     def _setfreq440(self, value):
         self._overridden_freq440 = value
 
-    freq440 = property(_getfreq440, _setfreq440)
+    freq440 = property(_getfreq440, _setfreq440, doc='''
+    Gets the frequency of the note as if it's in an equal temperment
+    context where A4 = 440hz.  The same as .frequency so long
+    as no other temperments are currently being used.
+    
+    
+    Since we don't have any other temperament objects as
+    of alpha 7, this is the same as .frequency always.
+    
+    ''')
 
 
     def _getMX(self):
@@ -1535,7 +1651,13 @@ class Pitch(music21.Music21Object):
             return None
     
     def getLowerEnharmonic(self, inPlace=False):
-        '''returns a Pitch enharmonic note that is a dim-second below the current note
+        '''
+        returns a Pitch enharmonic note that is a diminished second 
+        below the current note
+        
+        If `inPlace` is set to true, changes the current Pitch.
+        
+        
         >>> from music21 import *
         >>> p1 = pitch.Pitch('C-3')
         >>> p2 = p1.getLowerEnharmonic()
@@ -1590,9 +1712,22 @@ class Pitch(music21.Music21Object):
         >>> p4.simplifyEnharmonic()
         F#2
 
-        >>> pList = [pitch.Pitch("B"), pitch.Pitch("C#"), pitch.Pitch("G")]
+        
+        Note that pitches with implicit octaves retain their implicit octaves.
+        This might change the pitch space for B#s and C-s.
+
+
+        >>> pList = [pitch.Pitch("B"), pitch.Pitch("C#"), pitch.Pitch("G"), pitch.Pitch("A--")]
         >>> [p.simplifyEnharmonic() for p in pList]
-        [B, C#, G]
+        [B, C#, G, G]
+
+
+        >>> pList = [pitch.Pitch("C-"), pitch.Pitch("B#")]
+        >>> [p.ps for p in pList]
+        [59, 72]
+        >>> [p.simplifyEnharmonic().ps for p in pList]
+        [71, 60]
+
         '''
 
         if inPlace:
@@ -1607,7 +1742,10 @@ class Pitch(music21.Music21Object):
             else:
                 # by reseting the pitch space value, we will get a simplyer
                 # enharmonic spelling
+                saveOctave = self.octave
                 returnObj.ps = self.ps
+                if saveOctave is None:
+                    returnObj.octave = None
         if inPlace:
             return None
         else:
@@ -1915,10 +2053,11 @@ class Pitch(music21.Music21Object):
     def inheritDisplay(self, other):
         '''Inherit display properties from another Pitch, including those found on the Accidental object.
 
-        >>> 
-        >>> a = Pitch('c#')
+        >>> from music21 import *
+
+        >>> a = pitch.Pitch('c#')
         >>> a.accidental.displayType = 'always'
-        >>> b = Pitch('c-')
+        >>> b = pitch.Pitch('c-')
         >>> b.inheritDisplay(a)
         >>> b.accidental.displayType
         'always'
@@ -1967,9 +2106,9 @@ class Pitch(music21.Music21Object):
     def _nameInKeySignature(self, alteredPitches):
         '''Determine if this pitch is in the collection of supplied altered pitches, derived from a KeySignature object
 
-        >>> from music21 import key
-        >>> a = Pitch('c#')
-        >>> b = Pitch('g#')
+        >>> from music21 import *
+        >>> a = pitch.Pitch('c#')
+        >>> b = pitch.Pitch('g#')
         >>> ks = key.KeySignature(2)
         >>> a._nameInKeySignature(ks.alteredPitches)
         True
@@ -1985,9 +2124,9 @@ class Pitch(music21.Music21Object):
     def _stepInKeySignature(self, alteredPitches):
         '''Determine if this pitch is in the collection of supplied altered pitches, derived from a KeySignature object
 
-        >>> from music21 import key
-        >>> a = Pitch('c')
-        >>> b = Pitch('g')
+        >>> from music21 import *
+        >>> a = pitch.Pitch('c')
+        >>> b = pitch.Pitch('g')
         >>> ks = key.KeySignature(2)
         >>> a._stepInKeySignature(ks.alteredPitches)
         True
@@ -2004,8 +2143,10 @@ class Pitch(music21.Music21Object):
     def setAccidentalDisplay(self, value=None):
         '''If this Pitch has an accidental, set its displayStatus, which can be True, False, or None. 
 
-        >>> a = Pitch('a')
-        >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
+        >>> from music21 import *
+
+        >>> a = pitch.Pitch('a')
+        >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
         >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
         >>> a.accidental, a.accidental.displayStatus
         (<accidental natural>, True)
@@ -2020,32 +2161,42 @@ class Pitch(music21.Music21Object):
     def updateAccidentalDisplay(self, pitchPast=[], alteredPitches=[],
             cautionaryPitchClass=True, cautionaryAll=False, 
             overrideStatus=False, cautionaryNotImmediateRepeat=True):
-        '''Given a list of Pitch objects in `pitchPast`, determine if this pitch's Accidental object needs to be created or updated with a natural or other cautionary accidental.
+        '''
+        Given a list of Pitch objects in `pitchPast`, 
+        determine if this pitch's Accidental object needs 
+        to be created or updated with a natural or other cautionary accidental.
+
 
         Changes to this Pitch object's Accidental object are made in-place.
 
+
         The `alteredPitches` list supplies pitches from a :class:`music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. 
+
 
         If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. 
 
+
         If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the Accidental. By default this does not happen. If `displayStatus` is set to None, the Accidental's `displayStatus` is set. 
+
 
         If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
 
-        >>> a = Pitch('a')
-        >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
+        >>> from music21 import *
+
+        >>> a = pitch.Pitch('a')
+        >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
         >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
         >>> a.accidental, a.accidental.displayStatus
         (<accidental natural>, True)
 
-        >>> b = Pitch('a')
-        >>> past = [Pitch('a#'), Pitch('c#'), Pitch('c')]
+        >>> b = pitch.Pitch('a')
+        >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
         >>> b.updateAccidentalDisplay(past) # should add a natural
         >>> b.accidental, b.accidental.displayStatus
         (<accidental natural>, True)
 
-        >>> c = Pitch('a4')
-        >>> past = [Pitch('a3#'), Pitch('c#'), Pitch('c')]
+        >>> c = pitch.Pitch('a4')
+        >>> past = [pitch.Pitch('a3#'), pitch.Pitch('c#'), pitch.Pitch('c')]
         >>> # will not add a natural because match is pitchSpace
         >>> c.updateAccidentalDisplay(past, cautionaryPitchClass=False)
         >>> c.accidental == None

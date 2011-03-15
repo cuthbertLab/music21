@@ -1637,12 +1637,65 @@ class Duration(DurationCommon):
     represents a span of musical time measurable in terms of quarter notes
     (or in advanced usage other units). For instance, "57 quarter notes" 
     or "dotted half tied to quintuplet sixteenth note" or simply "quarter note."
+
     
-    A Duration object is made of one or more DurationUnit objects stored on the `components` list. 
+    A Duration object is made of one or more DurationUnit objects 
+    stored on the `components` list. 
 
-    Multiple DurationUnits in a single Duration may be used to express tied notes, or may be used to split duration across barlines or beam groups. Some Duration objects are not expressable as a single notation unit. 
 
-    Duration objects are not Music21Objects. Duration objects share many properties and attributes with DurationUnit objects, but Duration is not a subclass of DurationUnit.
+    Multiple DurationUnits in a single Duration may be used 
+    to express tied notes, or may be used to split duration 
+    across barlines or beam groups. Some Duration objects are 
+    not expressable as a single notation unit. 
+
+
+    Duration objects are not Music21Objects. Duration objects share 
+    many properties and attributes with DurationUnit objects, 
+    but Duration is not a subclass of DurationUnit.
+    
+    
+    If a single argument is passed to Duration() and it is
+    a string, then it is assumed to be a type, such as
+    'half', 'eighth', or '16th', etc.  If that single argument
+    is a number then it is assumed to be a quarterLength (2 for
+    half notes, .5 for eighth notes, .75 for dotted eighth notes,
+    .333333333 for a triplet eighth, etc.).  If one or more
+    named arguments are passed then the Duration() is configured
+    according to those arguments.  Supported arguments are
+    'type', 'dots', or 'components' (a list of :class:`music21.duration.DurationUnit` objects),
+    
+    
+    Example 1: a triplet eighth configured by quarterLength:
+    
+    
+    >>> from music21 import *
+    >>> d = duration.Duration(.333333333)
+    >>> d.type
+    'eighth'
+    >>> d.tuplets
+    (<music21.duration.Tuplet 3/2/eighth>,)
+
+
+    Example 2: A Duration made up of multiple :class:`music21.duration.DurationUnit`s
+    automatically configured by the specified quarterLength.
+
+
+    >>> d2 = duration.Duration(.625)
+    >>> d2.type
+    'complex'
+    >>> d2.components
+    [<music21.duration.DurationUnit 0.5>, <music21.duration.DurationUnit 0.125>]
+    
+    
+    
+    Example 3: A Duration configured by keywords.
+    
+
+    >>> d3 = duration.Duration(type = 'half', dots = 2)
+    >>> d3.quarterLength
+    3.5
+    
+    
     '''
 
     def __init__(self, *arguments, **keywords):
@@ -1662,12 +1715,20 @@ class Duration(DurationCommon):
                 self.quarterLength = arguments[0]
             else:
                 self.addDurationUnit(DurationUnit(arguments[0]))
-        
+        if 'dots' in keywords:
+            storeDots = keywords['dots']
+        else:
+            storeDots = 0
+            
         if "components" in keywords:
             self.components = keywords["components"]
             self._quarterLengthNeedsUpdating = True
+
         if 'type' in keywords:
-            self.addDurationUnit(DurationUnit(keywords['type']))
+            du = DurationUnit(keywords['type'])
+            if storeDots > 0:
+                du.dots = storeDots
+            self.addDurationUnit(du)
         # permit as keyword so can be passed from notes
         if 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']

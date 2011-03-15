@@ -102,7 +102,32 @@ class Lyric(object):
 
 #-------------------------------------------------------------------------------
 class GeneralNote(music21.Music21Object):
-    '''A GeneralNote object is the base class object for the :class:`~music21.note.Note`, :class:`~music21.note.Rest`, :class:`~music21.note.Chord`, and related objects. 
+    '''
+    A GeneralNote object is the base class object 
+    for the :class:`~music21.note.Note`, 
+    :class:`~music21.note.Rest`, :class:`~music21.note.Chord`, 
+    and related objects. 
+    
+    
+    Keywords can be passed to
+    a GeneralNote which are then passed to the
+    underlying :class:`music21.duration.Duration`.  
+    These keywords might be listed like
+    type='16th', dots=2 etc. to create a
+    double-dotted sixteenth note.
+    
+    
+    In almost every circumstance, you should
+    create note.Note() or note.Rest() or note.Chord()
+    objects directly, and not use this underlying
+    structure.
+    
+    
+    >>> from music21 import *
+    >>> gn = note.GeneralNote(type = '16th', dots = 2)
+    >>> gn.quarterLength
+    0.4375
+    
     '''    
     isChord = False
 
@@ -461,7 +486,8 @@ class GeneralNote(music21.Music21Object):
 #-------------------------------------------------------------------------------
 class NotRest(GeneralNote):
     '''
-    Parent class for objects that are not rests; or, object that can be tied.
+    Parent class for objects that are not rests; or, an 
+    object with a stem that can be tied.
     '''
     
     # unspecified means that there may be a stem, but its orientation
@@ -481,12 +507,34 @@ class NoteException(Exception):
 #-------------------------------------------------------------------------------
 class Note(NotRest):
     '''
-    Note class for notes (not rests or unpitched elements) 
-    that can be represented by one or more notational units
+    One of the most important music21 classes, a Note 
+    stores a single note (that is, not a rest or an unpitched element) 
+    that can be represented by one or more notational units -- so
+    for instance a C quarter-note and a D# eighth-tied-to-32nd are both
+    a single Note object.
+    
 
     A Note knows both its total duration and how to express itself as a set of 
     tied notes of different lengths. For instance, a note of 2.5 quarters in 
     length could be half tied to eighth or dotted quarter tied to quarter.
+    
+    
+    The first argument to the Note is the pitch name (with or without
+    octave, see the introduction to :class:`music21.pitch.Pitch`).
+    Further arguments can be specified as keywords (such as type, dots, etc.)
+    and are passed to the underlying :class:`music21.duration.Duration` element.
+        
+
+    Two notes are considered equal if their most important attributes 
+    (such as pitch, duration, 
+    articulations, and ornaments) are equal.  Attributes
+    that might change based on the wider context 
+    of a note (such as offset, beams, stem direction)
+    are not compared. This test presently does not look at lyrics in 
+    establishing equality.  It may in the future.
+
+
+    
     '''
 
     isNote = True
@@ -529,9 +577,10 @@ class Note(NotRest):
 
 
     def __eq__(self, other):
-        '''Equality. Based on attributes (such as pitch, accidental, duration, articulations, and ornaments) that are  not dependent on the wider context of a note (such as offset, beams, stem direction).
-
-        This presently does not look at lyrics in establishing equality.
+        '''
+        Tests Equality. See docs under Note above
+        (since __eq__'s docs don't display)
+        
 
         >>> from music21 import *
         >>> n1 = note.Note()

@@ -90,19 +90,66 @@ class StreamIterator(object):
 
 class Stream(music21.Music21Object):
     '''
-    This is the fundamental container for Music21Objects; objects may be ordered and/or placed in time based on offsets from the start of this container's offset. 
+    This is the fundamental container for Music21Objects; 
+    objects may be ordered and/or placed in time based on 
+    offsets from the start of this container's offset. 
+
     
-    Like the base class, Music21Object, Streams have offsets, priority, id, and groups
+    Like the base class, Music21Object, Streams have offsets, 
+    priority, id, and groups
     they also have an elements attribute which returns a list of elements; 
+
     
     The Stream has a duration that is usually the 
     release time of the chronologically last element in the Stream (that is,
     the highest onset plus duration of any element in the Stream).
     However, it can either explicitly set in which case we say that the
-    duration is unlinked
+    duration is unlinked.
+
 
     Streams may be embedded within other Streams.
     
+
+    The first element passed to the Stream is an optional list,
+    tuple, or other Stream of music21 objects which is used to
+    populate the Stream by inserting each object at its `.offset`
+    property.  Other arguments and keywords are ignored, but are
+    allowed so that subclassing the Stream is easier. 
+
+
+    >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(note.HalfNote('C#4'))
+    >>> s1.append(note.QuarterNote('D5'))
+    >>> s1.duration.quarterLength
+    3.0
+    >>> for thisNote in s1.notes:
+    ...     print thisNote.octave
+    4
+    5
+    
+    
+    Demonstration of starting a Stream with other elements,
+    including embedded Streams (in this case, :class:`music21.stream.Part`,
+    a Stream subclass):
+
+    
+    >>> c1 = clef.TrebleClef()
+    >>> c1.offset = 0.0
+    >>> n1 = note.EighthNote("E-6")
+    >>> n1.offset = 1.0
+    >>> p1 = stream.Part()
+    >>> p1.offset = 0.0
+    >>> p1.id = 'embeddedPart'
+    >>> p1.append(note.Rest()) # quarter rest
+    >>> s2 = stream.Stream([c1, n1, p1])
+    >>> s2.show('text')
+    {0.0} <music21.clef.TrebleClef object at 0x...>
+    {0.0} <music21.stream.Part embeddedPart>
+        {0.0} <music21.note.Rest rest>
+    {1.0} <music21.note.Note E->
+    
+
     OMIT_FROM_DOCS
     TODO: Get Stream Duration working -- should be the total length of the 
     Stream. -- see the ._getDuration() and ._setDuration() methods
