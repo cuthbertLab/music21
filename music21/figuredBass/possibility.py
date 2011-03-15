@@ -37,18 +37,18 @@ class Possibility(dict):
         >>> from music21 import pitch
         >>> from music21 import note
         >>> from music21.figuredBass import possibility
-        >>> p1 = possibility.Possibility({'S': 'C5', 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('D4'), 'B': 'C3'})
+        >>> p1 = possibility.Possibility({'S': 'C5', 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('E4'), 'B': 'C3'})
         >>> p1
-        {'A': G4, 'S': C5, 'B': C3, 'T': D4}
+        {'A': G4, 'S': C5, 'B': C3, 'T': E4}
         >>> p2 = possibility.Possibility()
         >>> p2
         {}
         >>> p2['B'] = pitch.Pitch('C3')
-        >>> p2['T'] = pitch.Pitch('D4')
+        >>> p2['T'] = pitch.Pitch('E4')
         >>> p2['A'] = 'G4'
         >>> p2['S'] = 'C5'
         >>> p2
-        {'A': G4, 'S': C5, 'B': C3, 'T': D4}    
+        {'A': G4, 'S': C5, 'B': C3, 'T': E4}    
         >>> p2['Tuba'] = note.Note('C3')
         Traceback (most recent call last):
         PossibilityException: Can't set ->Tuba<-: Can't convert -><music21.note.Note C><- to a music21 pitch.Pitch instance!
