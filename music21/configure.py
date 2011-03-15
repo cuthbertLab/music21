@@ -52,7 +52,7 @@ urlMuseScore = 'http://musescore.org'
 urlGettingStarted = 'http://mit.edu/music21/doc/html/quickStart.html'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
-LINE_WIDTH = 80
+LINE_WIDTH = 78
 
 #-------------------------------------------------------------------------------
 # class Action(threading.Thread):
@@ -70,7 +70,8 @@ LINE_WIDTH = 80
 #-------------------------------------------------------------------------------
 
 
-def writeToUser(msg, wrap=True):
+
+def writeToUser(msg, wrap=True, linesPerPage=20):
     '''Display a message to the user, handling multiple lines as necessary and wrapping text
     '''
     # wrap everything to 60 lines
@@ -93,6 +94,7 @@ def writeToUser(msg, wrap=True):
     else:
         post = lines
     #print post
+    lineCount = 0
     for i, l in enumerate(post):
         if l == '': # treat an empty line as a break
             l = '\n'
@@ -107,9 +109,13 @@ def writeToUser(msg, wrap=True):
             l = '%s \n' % l 
         else: # if last, add trailing space, do not add trailing return
             l = '%s ' % l 
+        if lineCount > 0 and lineCount % linesPerPage == 0:
+            # ask user to continue
+            d = AnyKey(promptHeader='Pausing for page.')
+            d.askUser()
         sys.stdout.write(l)
         sys.stdout.flush()
-
+        lineCount += 1
 
 def getSitePackages():
     return distutils.sysconfig.get_python_lib()
@@ -571,11 +577,10 @@ class AnyKey(Dialog):
     def __init__(self, default=None, tryAgain=False, promptHeader=None):
         Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
     
-
     def _rawQuery(self):
         '''Return a multiline presentation of the question.
         '''
-        msg = 'Press any key to continue.'
+        msg = 'Press return to continue.'
         msg = self._rawQueryPrepareHeader(msg)
         # footer provides default; here, ignore
         #msg = self._rawQueryPrepareFooter(msg)
