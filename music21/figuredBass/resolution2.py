@@ -24,20 +24,19 @@ from music21.figuredBass import possibility
 # STANDARD RESOLUTIONS
 def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('G2'), 'T': pitch.Pitch('B3'), 'A': pitch.Pitch('F4'), 'S': pitch.Pitch('D5')})
+    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
     >>> resolution2.dominantSeventhToMajorTonic(possibA)
     {'A': E4, 'S': C5, 'B': C3, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': pitch.Pitch('C3'), 'T': pitch.Pitch('E3'), 'A': pitch.Pitch('G3'), 'S': pitch.Pitch('B-3')})
+    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
     >>> resolution2.dominantSeventhToMajorTonic(possibB)
     {'A': F3, 'S': A3, 'B': F3, 'T': F3}
-    >>> possibC = possibility.Possibility({'B': pitch.Pitch('G3'), 'T': pitch.Pitch('C4'), 'A': pitch.Pitch('B-4'), 'S': pitch.Pitch('E5')})
+    >>> possibC = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
     >>> resolution2.dominantSeventhToMajorTonic(possibC)
     {'A': A4, 'S': F5, 'B': F3, 'T': C4}
     >>> resolution2.resolveV43toI6 = True
-    >>> possibD = possibility.Possibility({'B': pitch.Pitch('G3'), 'T': pitch.Pitch('C4'), 'A': pitch.Pitch('B-4'), 'S': pitch.Pitch('E5')})
+    >>> possibD = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
     >>> resolution2.dominantSeventhToMajorTonic(possibD, True)
     {'A': C5, 'S': F5, 'B': A3, 'T': C4}
     '''
@@ -80,19 +79,18 @@ def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
 
 def dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6 = False, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('G2'), 'T': pitch.Pitch('B3'), 'A': pitch.Pitch('F4'), 'S': pitch.Pitch('D5')})
+    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
     >>> resolution2.dominantSeventhToMinorTonic(possibA)
     {'A': E-4, 'S': C5, 'B': C3, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': pitch.Pitch('C3'), 'T': pitch.Pitch('E3'), 'A': pitch.Pitch('G3'), 'S': pitch.Pitch('B-3')})
+    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
     >>> resolution2.dominantSeventhToMinorTonic(possibB)
     {'A': F3, 'S': A-3, 'B': F3, 'T': F3}
-    >>> possibC = possibility.Possibility({'B': pitch.Pitch('G3'), 'T': pitch.Pitch('C4'), 'A': pitch.Pitch('B-4'), 'S': pitch.Pitch('E5')})
+    >>> possibC = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
     >>> resolution2.dominantSeventhToMinorTonic(possibC)
     {'A': A-4, 'S': F5, 'B': F3, 'T': C4}
-    >>> possibD = possibility.Possibility({'B': pitch.Pitch('G3'), 'T': pitch.Pitch('C4'), 'A': pitch.Pitch('B-4'), 'S': pitch.Pitch('E5')})
+    >>> possibD = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
     >>> resolution2.dominantSeventhToMinorTonic(possibD, True)
     {'A': C5, 'S': F5, 'B': A-3, 'T': C4}
     '''
@@ -136,13 +134,12 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
 # DECEPTIVE RESOLUTIONS
 def dominantSeventhToMajorSubmediant(dominantPossib, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('G2'), 'T': pitch.Pitch('B3'), 'A': pitch.Pitch('F4'), 'S': pitch.Pitch('D5')})
+    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
     >>> resolution2.dominantSeventhToMajorSubmediant(possibA)
     {'A': E-4, 'S': C5, 'B': A-2, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': pitch.Pitch('C3'), 'T': pitch.Pitch('E3'), 'A': pitch.Pitch('G3'), 'S': pitch.Pitch('B-3')})
+    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
     >>> resolution2.dominantSeventhToMajorSubmediant(possibB)
     {'A': F3, 'S': A-3, 'B': D-3, 'T': F3}
     '''
@@ -180,13 +177,12 @@ def dominantSeventhToMajorSubmediant(dominantPossib, inPlace = False):
 
 def dominantSeventhToMinorSubmediant(dominantPossib, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('G2'), 'T': pitch.Pitch('B3'), 'A': pitch.Pitch('F4'), 'S': pitch.Pitch('D5')})
+    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
     >>> resolution2.dominantSeventhToMinorSubmediant(possibA)
     {'A': E4, 'S': C5, 'B': A2, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': pitch.Pitch('C3'), 'T': pitch.Pitch('E3'), 'A': pitch.Pitch('G3'), 'S': pitch.Pitch('B-3')})
+    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
     >>> resolution2.dominantSeventhToMinorSubmediant(possibB)
     {'A': F3, 'S': A3, 'B': D3, 'T': F3}
     '''
@@ -225,13 +221,12 @@ def dominantSeventhToMinorSubmediant(dominantPossib, inPlace = False):
 # STATIONARY RESOLUTIONS
 def dominantSeventhToMajorSubdominant(dominantPossib, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('G2'), 'T': pitch.Pitch('B3'), 'A': pitch.Pitch('F4'), 'S': pitch.Pitch('D5')})
+    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
     >>> resolution2.dominantSeventhToMajorSubdominant(possibA)
     {'A': F4, 'S': C5, 'B': A2, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': pitch.Pitch('C3'), 'T': pitch.Pitch('E3'), 'A': pitch.Pitch('G3'), 'S': pitch.Pitch('B-3')})
+    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
     >>> resolution2.dominantSeventhToMajorSubdominant(possibB)
     {'A': F3, 'S': B-3, 'B': D3, 'T': F3}
     '''
@@ -267,13 +262,12 @@ def dominantSeventhToMajorSubdominant(dominantPossib, inPlace = False):
 
 def dominantSeventhToMinorSubdominant(dominantPossib, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('G2'), 'T': pitch.Pitch('B3'), 'A': pitch.Pitch('F4'), 'S': pitch.Pitch('D5')})
+    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
     >>> resolution2.dominantSeventhToMinorSubdominant(possibA)
     {'A': F4, 'S': C5, 'B': A-2, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': pitch.Pitch('C3'), 'T': pitch.Pitch('E3'), 'A': pitch.Pitch('G3'), 'S': pitch.Pitch('B-3')})
+    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
     >>> resolution2.dominantSeventhToMinorSubdominant(possibB)
     {'A': F3, 'S': B-3, 'B': D-3, 'T': F3}
     '''
@@ -314,10 +308,9 @@ def dominantSeventhToMinorSubdominant(dominantPossib, inPlace = False):
 # ALTERNATE RESOLUTIONS  = Doubled root
 def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('C#3'), 'T': pitch.Pitch('G3'), 'A': pitch.Pitch('E4'), 'S': pitch.Pitch('B-4')})
+    >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
     >>> resolution2.diminishedSeventhToMajorTonic(possibA)
     {'A': F#4, 'S': A4, 'B': D3, 'T': F#3}
     >>> resolution2.diminishedSeventhToMajorTonic(possibA, True) # Alternate resolution, contains parallel fifths
@@ -358,10 +351,9 @@ def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace
 
 def diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot = False, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('C#3'), 'T': pitch.Pitch('G3'), 'A': pitch.Pitch('E4'), 'S': pitch.Pitch('B-4')})
+    >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
     >>> resolution2.diminishedSeventhToMinorTonic(possibA)
     {'A': F4, 'S': A4, 'B': D3, 'T': F3}
     >>> resolution2.diminishedSeventhToMinorTonic(possibA, True) # Alternate resolution, contains parallel fifths
@@ -403,10 +395,9 @@ def diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot = False, inPlace
 # SUBDOMINANT RESOLUTIONS
 def diminishedSeventhToMajorSubdominant(diminishedPossib, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('C#3'), 'T': pitch.Pitch('G3'), 'A': pitch.Pitch('E4'), 'S': pitch.Pitch('B-4')})
+    >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
     >>> resolution2.diminishedSeventhToMajorSubdominant(possibA)
     {'A': D4, 'S': B4, 'B': D3, 'T': G3}
     '''
@@ -440,10 +431,9 @@ def diminishedSeventhToMajorSubdominant(diminishedPossib, inPlace = False):
 
 def diminishedSeventhToMinorSubdominant(diminishedPossib, inPlace = False):
     '''
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
-    >>> possibA = possibility.Possibility({'B': pitch.Pitch('C#3'), 'T': pitch.Pitch('G3'), 'A': pitch.Pitch('E4'), 'S': pitch.Pitch('B-4')})
+    >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
     >>> resolution2.diminishedSeventhToMinorSubdominant(possibA)
     {'A': D4, 'S': B-4, 'B': D3, 'T': G3}
     '''
