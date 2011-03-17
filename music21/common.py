@@ -1712,7 +1712,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # equal chance of -1, 1
                 x += weightedSelection([-1, 1], [1,1])
-            environLocal.printDebug(['weightedSelection([-1, 1], [1,1])', x])
+            #environLocal.printDebug(['weightedSelection([-1, 1], [1,1])', x])
             self.assertEqual(-100 < x < 100, True)
 
 
@@ -1722,7 +1722,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # equal chance of -1, 1
                 x += weightedSelection([0, 1], [10000,1])
-            environLocal.printDebug(['weightedSelection([0, 1], [10000,1])', x])
+            #environLocal.printDebug(['weightedSelection([0, 1], [10000,1])', x])
             self.assertEqual(0 <= x < 5, True)
 
         for j in range(10):
@@ -1730,7 +1730,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # equal chance of -1, 1
                 x += weightedSelection([0, 1], [1, 10000])
-            environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
+            #environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
             self.assertEqual(980 <= x < 1020, True)
 
 
@@ -1738,7 +1738,7 @@ class Test(unittest.TestCase):
             x = 0
             for i in range(1000):
                 x += weightedSelection([0, 1], [1, 0])
-            environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
+            #environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
             self.assertEqual(x == 0, True)
 
 

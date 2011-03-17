@@ -284,8 +284,112 @@ def convertFqToPs(fq):
     '''
     return 12 * (math.log(fq / 440.0) / math.log(2)) + 69   
 
+def convertMicrotoneToCents(value):
+    '''Convert a variety of microtone representations into a numerical cents deviation
+    value.
 
+    Numerical values are treated like other alter values, where 1 is 1 half-step. 
 
+    Returns None if no conversion is available. 
+
+    >>> from music21 import *
+    >>> convertMicrotoneToCents(.5) # numbers are half-step scalars
+    50.0
+    >>> convertMicrotoneToCents(-.5) # numbers are half-step scalars
+    -50.0
+    >>> convertMicrotoneToCents('+20') # strings are cents
+    20.0
+    >>> convertMicrotoneToCents('20.53') # strings are cents
+    20.53...
+    >>> convertMicrotoneToCents('-20') # strings are cents
+    -20.0
+    '''
+    # if a number, assume that the number is halfsteps
+    # this is consistent with other accidental notations, where
+    # .5 is a quarter tone
+    if common.isNum(value):
+        # these are practical, though not necessary, limits
+        if value < -3 or value > 3:
+            return None 
+        return value * 100
+    elif common.isStr(value) and len(value) > 0:
+        if value[0] in ['+'] or value[0].isdigit():
+            # positive cent representation
+            num, junk = common.getNumFromStr(value, numbers='0123456789.')
+            if num == '':
+                return None
+            else:
+                return float(num)
+        elif value[0] in ['-']:
+            num, junk = common.getNumFromStr(value[1:], numbers='0123456789.')
+            return float(num) * -1
+    return None # no conversions are available
+
+def convertMicrotoneToCentsStr(value, roundedDigits=1):
+    '''Provide a string representation for a microtone expressed in cents, with a mandatory +/- sign used to show that this a cent notation.
+
+    Numerical values are treated like other alter values, where 1 is 1 half-step. 
+
+    >>> from music21 import *
+    >>> pitch.convertMicrotoneToCentsStr('0.0')
+    '+0'
+    >>> pitch.convertMicrotoneToCentsStr('20')
+    '+20'
+    >>> pitch.convertMicrotoneToCentsStr('20.2')
+    '+20.2'
+    >>> pitch.convertMicrotoneToCentsStr('20.25')
+    '+20.3'
+    >>> pitch.convertMicrotoneToCentsStr('-20')
+    '-20'
+    >>> pitch.convertMicrotoneToCentsStr('-20.2')
+    '-20.2'
+    >>> pitch.convertMicrotoneToCentsStr('-20.25')
+    '-20.3'
+
+    >>> pitch.convertMicrotoneToCentsStr(.5)
+    '+50'
+    >>> pitch.convertMicrotoneToCentsStr(.25)
+    '+25'
+
+    '''
+    centNumber = convertMicrotoneToCents(value)
+    #centNumber = convertMicrotoneToCents(value)
+    if centNumber is None:
+        return None
+    # get floating-point portion
+    centInt, centDecimal = divmod(centNumber, 1)
+    if centDecimal == 0:
+        num = int(centInt)
+    else: # what to round to?
+        num = float(round(centNumber, roundedDigits))
+
+    if centNumber >= 0:
+        return '+%s' % num
+    elif centNumber < 0:
+        # negative sign will automatically be included
+        return '%s' % num
+
+def convertCentsToAlter(value):
+    '''Given a cents value, expressed as string or a number, return a floating point alter value, where 1 is 1 half-step.
+
+    >>> from music21 import *
+    >>> pitch.convertCentsToAlter('+50')
+    0.5...
+    >>> pitch.convertCentsToAlter('+1')
+    0.01...
+
+    >>> pitch.convertCentsToAlter('-50')
+    -0.5...
+    >>> pitch.convertCentsToAlter(-50) # numerical values are treated as alters
+    -0.5...
+    '''
+    # this function handles strings and returns a numerical value
+    if common.isStr(value):
+        # may return None
+        value = convertMicrotoneToCents(value)
+        if value is None:
+            return value
+    return value * .01
 
 
 #-------------------------------------------------------------------------------
@@ -301,12 +405,27 @@ class PitchException(Exception):
 #-------------------------------------------------------------------------------
 class Accidental(music21.Music21Object):
     '''
-    Accidental class.
+    Accidental class, representing the symbolic and numerical representation of pitch deviation from a pitch name (e.g., G, B). 
     
-    
-    Two accidentals are considered equal if
-    their names are equal.
-    
+    Two accidentals are considered equal if their names are equal.
+
+    Accidentals have three defining attributes: a name, a modifier, and an alter. For microtonal specifications, the name and modifier are the same'
+
+    >>> from music21 import pitch
+    >>> a = pitch.Accidental('sharp')
+    >>> a.name, a.alter, a.modifier
+    ('sharp', 1.0, '#')
+    >>> a = pitch.Accidental('+25') # a 25 cent deviation
+    >>> a.name, a.alter, a.modifier
+    ('+25', 0.25, '+25')
+
+    >>> a = pitch.Accidental(.25) # a 25 cent deviation
+    >>> a.name, a.alter, a.modifier
+    ('+25', 0.25, '+25')
+
+    >>> a = pitch.Accidental(-.333) # a 25 cent deviation
+    >>> a.name, a.alter, a.modifier
+    ('-33.3', -0.333..., '-33.3')
     '''
     # manager by properties
     _displayType = "normal" # always, never, unless-repeated, even-tied
@@ -361,6 +480,15 @@ class Accidental(music21.Music21Object):
         True
         >>> a == c
         False
+
+        >>> d = pitch.Accidental('-20')
+        >>> e = pitch.Accidental(-.2)
+        >>> f = pitch.Accidental('+25')
+        >>> d == e
+        True
+        >>> d == f
+        False
+
         '''
         if other is None or not isinstance(other, Accidental):
             return False
@@ -497,11 +625,19 @@ class Accidental(music21.Music21Object):
             accidentalNameToModifier['quadruple-flat'], 'eseseses', -4]:
             self.name = 'quadruple-flat'
             self.alter = -4.0
+        # support microtones notated with +/ notation
+        # first, check if it can be converted
+        elif convertMicrotoneToCents(name) is not None:
+            self.name = convertMicrotoneToCentsStr(name)
+            self.alter = convertCentsToAlter(convertMicrotoneToCents(name))
         else:
             raise AccidentalException('%s is not a supported accidental type' % name)
 
         # always set modifier from dictionary
-        self.modifier = accidentalNameToModifier[self.name]
+        if self.name.startswith('+') or self.name.startswith('-'):
+            self.modifier = self.name
+        else:
+            self.modifier = accidentalNameToModifier[self.name]
 
 
 
@@ -2576,7 +2712,7 @@ class Test(unittest.TestCase):
                 past.append(p)
 
         def compare(past, result):
-            environLocal.printDebug(['accidental compare'])
+            #environLocal.printDebug(['accidental compare'])
             for i in range(len(result)):
                 p = past[i]
                 if p.accidental == None:
@@ -2589,7 +2725,7 @@ class Test(unittest.TestCase):
                 targetName = result[i][0]
                 targetDisplayStatus = result[i][1]
 
-                environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
+                #environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
                 self.assertEqual(pName, targetName)
                 self.assertEqual(pDisplayStatus, targetDisplayStatus)
 
@@ -2682,7 +2818,7 @@ class Test(unittest.TestCase):
                 past.append(p)
 
         def compare(past, result):
-            environLocal.printDebug(['accidental compare'])
+            #environLocal.printDebug(['accidental compare'])
             for i in range(len(result)):
                 p = past[i]
                 if p.accidental == None:
@@ -2695,7 +2831,7 @@ class Test(unittest.TestCase):
                 targetName = result[i][0]
                 targetDisplayStatus = result[i][1]
 
-                environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
+                #environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
                 self.assertEqual(pName, targetName)
                 self.assertEqual(pDisplayStatus, targetDisplayStatus)
 
@@ -2913,6 +3049,9 @@ class Test(unittest.TestCase):
         
         match = [e.ps for e in s]
         self.assertEqual(match, [60.5, 63.5, 62.5, 64.5, 67.5, 70.5, 70.5, 58.5, 62.5] )
+
+
+
 
 
 #-------------------------------------------------------------------------------
