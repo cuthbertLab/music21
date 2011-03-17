@@ -1178,7 +1178,7 @@ def getPackageData():
     # include these extensions for all directories, even if they are not normally there.
     ext = ['txt', 'xml', 'krn', 'mxl', 'html', 'png', 
            'css', 'js', 'pdf', 'xls', 'mid', 'abc', 'json', 'md', 
-           'zip', 'rntxt']
+           'zip', 'rntxt', 'command']
 
     # need all dirs, not just packages, and relative to music21
     fpList = getPackageDir(fpMusic21=None, relative=True, remapSep=None,

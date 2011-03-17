@@ -47,23 +47,30 @@ STEPNAMES = ['C','D','E','F','G','A','B']
 TWELFTH_ROOT_OF_TWO = 2.0 ** (1.0/12)
 
 # basic accidental string and symbol definitions; additional symbolic and text-based alternatives are given in the set Accidental.set() method
+MICROTONE_OPEN = '('
+MICROTONE_CLOSE = ')'
 accidentalNameToModifier = {
     'natural' : '',
     'sharp' : '#',
     'double-sharp':'##',
     'triple-sharp':'###',
     'quadruple-sharp':'####',
-
     'flat':'-',
     'double-flat':'--',
     'triple-flat':'---',
     'quadruple-flat':'----',
-
     'half-sharp':'~',
     'one-and-a-half-sharp':'#~',
     'half-flat':'`',
     'one-and-a-half-flat':'-`',
 }
+
+# sort modifiers by length, from longest to shortest
+accidentalModifiersSorted = []
+for i in (4,3,2,1):
+    for sym in accidentalNameToModifier.values():
+        if len(sym) == i:
+            accidentalModifiersSorted.append(sym)
 
 
 #-------------------------------------------------------------------------------
@@ -130,15 +137,15 @@ def convertNameToPs(pitchName):
 
     >>> from music21 import *
     >>> pitch.convertNameToPs('c4')
-    60
+    60.0
     >>> pitch.convertNameToPs('c2#')
-    37
+    37.0
     >>> pitch.convertNameToPs('d7-')
-    97
+    97.0
     >>> pitch.convertNameToPs('e1--')
-    26
+    26.0
     >>> pitch.convertNameToPs('b2##')
-    49
+    49.0
     >>> pitch.convertNameToPs('c~4')
     60.5
     '''
@@ -223,27 +230,25 @@ def convertStepToPs(step, oct, acc=None):
     '''Utility conversion; does not process internals.
     Takes in a note name string, octave number, and optional 
     Accidental object.
-    Returns a midiNote number.
+
+    Returns a floating point midiNote number.
 
     >>> from music21 import *
     >>> pitch.convertStepToPs('c', 4, pitch.Accidental('sharp'))
-    61
+    61.0
     >>> pitch.convertStepToPs('d', 2, pitch.Accidental(-2))
-    36
+    36.0
     >>> pitch.convertStepToPs('b', 3, pitch.Accidental(3))
-    62
+    62.0
     >>> pitch.convertStepToPs('c', 4, pitch.Accidental('half-flat'))
     59.5
     '''
     step = step.strip().upper()
     ps = ((oct + 1) * 12) + STEPREF[step]
     if acc is None:
-        return ps
+        return float(ps) # always returns a float
     else: # assume that this is an accidental object
-        a = acc.alter
-        if a == int(a):
-            a = int(a)
-        return ps + a
+        return ps + acc.alter
 
 def convertPsToFq(ps):
     '''Utility conversion; does not process internals.
@@ -285,10 +290,7 @@ def convertFqToPs(fq):
     return 12 * (math.log(fq / 440.0) / math.log(2)) + 69   
 
 def convertMicrotoneToCents(value):
-    '''Convert a variety of microtone representations into a numerical cents deviation
-    value.
-
-    Numerical values are treated like other alter values, where 1 is 1 half-step. 
+    '''Convert a variety of microtone representations into a numerical cents deviation value. Numerical values are treated like other alter values, where 1 is 1 half-step. 
 
     Returns None if no conversion is available. 
 
@@ -308,11 +310,16 @@ def convertMicrotoneToCents(value):
     # this is consistent with other accidental notations, where
     # .5 is a quarter tone
     if common.isNum(value):
-        # these are practical, though not necessary, limits
+        # these are practical, though not necessary, limits,
+        # from -300 to 300 cents
         if value < -3 or value > 3:
             return None 
         return value * 100
     elif common.isStr(value) and len(value) > 0:
+        # strip any delimiters
+        value = value.replace(MICROTONE_OPEN, '')
+        value = value.replace(MICROTONE_CLOSE, '')
+
         if value[0] in ['+'] or value[0].isdigit():
             # positive cent representation
             num, junk = common.getNumFromStr(value, numbers='0123456789.')
@@ -370,7 +377,7 @@ def convertMicrotoneToCentsStr(value, roundedDigits=1):
         return '%s' % num
 
 def convertCentsToAlter(value):
-    '''Given a cents value, expressed as string or a number, return a floating point alter value, where 1 is 1 half-step.
+    '''Given a numerical or string cents value, expressed as string or a number, return a floating point alter value, where 1 is 1 half-step.
 
     >>> from music21 import *
     >>> pitch.convertCentsToAlter('+50')
@@ -423,7 +430,7 @@ class Accidental(music21.Music21Object):
     >>> a.name, a.alter, a.modifier
     ('+25', 0.25, '+25')
 
-    >>> a = pitch.Accidental(-.333) # a 25 cent deviation
+    >>> a = pitch.Accidental(-.333) 
     >>> a.name, a.alter, a.modifier
     ('-33.3', -0.333..., '-33.3')
     '''
@@ -1055,7 +1062,7 @@ class Pitch(music21.Music21Object):
         >>> p = pitch.Pitch()
         >>> p.ps = 61
         >>> p.ps
-        61
+        61.0
         >>> p.implicitAccidental
         True
         '''
@@ -1088,13 +1095,13 @@ class Pitch(music21.Music21Object):
         >>> a
         A2
         >>> a.ps
-        45
+        45.0
 
         >>> a.ps = 61
         >>> a
         C#4
         >>> a.ps
-        61
+        61.0
         
         ''')
 
@@ -1180,7 +1187,7 @@ class Pitch(music21.Music21Object):
         >>> a.midi
         2
         >>> a.ps
-        2
+        2.0
         >>> a.implicitAccidental
         True
         ''')
@@ -1497,7 +1504,7 @@ class Pitch(music21.Music21Object):
         >>> a.implicitOctave
         4
         >>> a.ps  ## will use implicitOctave
-        67
+        67.0
         >>> a.name
         'G'
 
@@ -1509,7 +1516,7 @@ class Pitch(music21.Music21Object):
         >>> a.name
         'G'
         >>> a.ps
-        187
+        187.0
     ''')
 
     def _getImplicitOctave(self):
@@ -1925,9 +1932,9 @@ class Pitch(music21.Music21Object):
 
         >>> pList = [pitch.Pitch("C-"), pitch.Pitch("B#")]
         >>> [p.ps for p in pList]
-        [59, 72]
+        [59.0, 72.0]
         >>> [p.simplifyEnharmonic().ps for p in pList]
-        [71, 60]
+        [71.0, 60.0]
 
         '''
 
@@ -2919,63 +2926,6 @@ class Test(unittest.TestCase):
 
 
 
-# the updateAccidentalKeySignature() method was not implemented
-# as testd here
-
-#     def testUpdateAccidentalKeySignature(self):
-#         '''Test updating accidental display.
-#         '''
-#         from music21 import key
-# 
-#         def proc(pList, ks=[]):
-#             for p in pList:
-#                 p.updateAccidentalKeySignature(ks)
-# 
-#         def compare(past, result):
-#             #environLocal.printDebug(['accidental compare'])
-#             for i in range(len(result)):
-#                 p = past[i]
-#                 if p.accidental == None:
-#                     pName = None
-#                     pDisplayStatus = None
-#                 else:
-#                     pName = p.accidental.name
-#                     pDisplayStatus = p.accidental.displayStatus
-# 
-#                 targetName = result[i][0]
-#                 targetDisplayStatus = result[i][1]
-# 
-#                 #environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
-#                 self.assertEqual(pName, targetName)
-#                 self.assertEqual(pDisplayStatus, targetDisplayStatus)
-# 
-#         # a scale
-#         pList = [Pitch('f#3'), Pitch('c#3'), Pitch('g#3'), 
-#         Pitch('d#3'), Pitch('a#3')]
-#         result = [('sharp', False), ('sharp', False), ('sharp', False), 
-#         ('sharp', False), ('sharp', False)]
-#         ks = key.KeySignature(9)
-#         # supply the key's altered pitches
-#         proc(pList, ks.alteredPitches)        
-#         compare(pList, result)
-# 
-#         pList = [Pitch('f#3'), Pitch('c3'), Pitch('g3'), 
-#         Pitch('c#3'), Pitch('g#5') ]
-#         result = [('sharp', False), ('natural', True), ('natural', True), 
-#         ('sharp', False), ('sharp', False)]
-#         ks = key.KeySignature(3)
-#         # supply the key's altered pitches
-#         proc(pList, ks.alteredPitches)        
-#         compare(pList, result)
-# 
-#         pList = [Pitch('b3'), Pitch('b-3'), Pitch('a3'), 
-#         Pitch('c#3'), Pitch('g#5'), Pitch('d-3')]
-#         result = [('natural', True), ('flat', False), ('natural', True), 
-#         ('sharp', None), ('sharp', None), ('flat', None)]
-#         ks = key.KeySignature(-3)
-#         # supply the key's altered pitches
-#         proc(pList, ks.alteredPitches)        
-#         compare(pList, result)
 
 
     def testPitchEquality(self):
@@ -3051,6 +3001,15 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [60.5, 63.5, 62.5, 64.5, 67.5, 70.5, 70.5, 58.5, 62.5] )
 
 
+    def testMicrotoneA(self):
+        
+        from music21 import pitch
+
+
+        #p = pitch.Pitch('a+25')
+        
+        
+        #for name, ps in (['a+20', ])
 
 
 
