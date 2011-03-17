@@ -2,7 +2,8 @@
 
 import os, sys
 
-print "Starting music21 Configuration Assistant, this could take 10-60 seconds, please wait..."
+sys.stdout.write("Starting the music21 Configuration Assistant.\nModule loading could take a few moments, please wait...")
+sys.stdout.flush()
 
 if 'music21' in os.listdir(os.getcwd()):
     p1 = os.path.join(os.getcwd(), 'music21')

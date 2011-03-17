@@ -118,7 +118,9 @@ def writeToUser(msg, wrap=True, linesPerPage=20):
         lineCount += 1
 
 def getSitePackages():
+    import distutils.sysconfig
     return distutils.sysconfig.get_python_lib()
+
 
 def findInstallations():
     '''Find all music21 references found in site packages, or possibly look at the running code as well.
