@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -541,7 +541,46 @@ class Accidental(music21.Music21Object):
         the next program down the line cannot evaluate displayType
         ''')
 
-        
+
+    def _getUnicode(self):
+        '''Return a unicode representation of this accidental.
+        '''
+        # all unicode musical symbols can be found here:
+        # http://www.fileformat.info/info/unicode/block/musical_symbols/images.htm
+
+        if self.name == 'natural':
+            # 266E
+            return u'\u266e'
+
+        elif self.name == 'sharp':
+            # 266F
+            return u'\u266f'
+        # http://www.fileformat.info/info/unicode/char/1d12a/index.htm
+        elif self.name == 'double-sharp':
+            # 1D12A
+            # note that this must be expressed as a surrogate pair
+            return u'\uD834\uDD2A'
+        elif self.name == 'half-sharp':
+            # 1D132
+            return u"\uD834\uDD32"
+
+        elif self.name == 'flat':
+            # 266D
+            return u'\u266D'
+        elif self.name == 'double-flat':
+            # 1D12B
+            return u'\uD834\uDD2B'
+        elif self.name == 'half-flat':
+            # 1D133
+            # raised flat: 1D12C
+            return u"\uD834\uDD33" 
+
+        else: # get our best ascii representation
+            return self.modifier
+
+    unicode = property(_getUnicode, 
+        doc = '''Return a unicode representation of this accidental. 
+        ''')
 
     #---------------------------------------------------------------------------
     def inheritDisplay(self, other):
@@ -635,13 +674,10 @@ class Accidental(music21.Music21Object):
             mxName = self.name
 
         mxAccidental = musicxmlMod.Accidental()
-
 # need to remove display in this case and return None
 #         if self.displayStatus == False:
 #             pass
-            
         mxAccidental.set('charData', mxName)
-
         return mxAccidental
 
 
@@ -1087,6 +1123,23 @@ class Pitch(music21.Music21Object):
     ''')
 
 
+    def _getUnicodeName(self):
+        '''Name presently returns pitch name and accidental without octave.
+
+        >>> from music21 import *
+        >>> a = pitch.Pitch('G#')
+        >>> a.name
+        'G#'
+        '''
+        if self.accidental is not None:
+            return self.step + self.accidental.unicode
+        else:
+            return self.step
+
+    unicodeName = property(_getUnicodeName, 
+        doc = '''Return the pitch name in a unicode encoding. 
+        ''')
+
     def _getNameWithOctave(self):
         '''Returns pitch name with octave
 
@@ -1114,6 +1167,18 @@ class Pitch(music21.Music21Object):
         'A--1'
         
         
+        ''')
+
+    def _getUnicodeNameWithOctave(self):
+        '''Returns pitch name with octave and unicode accidentals
+        '''
+        if self.octave is None:
+            return self.unicodeName
+        else:
+            return self.unicodeName + str(self.octave)
+
+    unicodeNameWithOctave = property(_getUnicodeNameWithOctave, 
+        doc = '''Return the pitch name with octave with unicode accidental symbols, if available. 
         ''')
 
     def _getStep(self):
