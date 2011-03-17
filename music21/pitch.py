@@ -289,8 +289,8 @@ def convertFqToPs(fq):
     '''
     return 12 * (math.log(fq / 440.0) / math.log(2)) + 69   
 
-def convertMicrotoneToCents(value):
-    '''Convert a variety of microtone representations into a numerical cents deviation value. Numerical values are treated like other alter values, where 1 is 1 half-step. 
+def convertMicrotoneToCents(value, acc=None):
+    '''Convert a variety of microtone representations into a numerical cents deviation value. Numerical values are treated like other alter values, where 1 is 1 half-step. An Accidental object, or string representation, may be provided with the `acc` argument. 
 
     Returns None if no conversion is available. 
 
@@ -299,22 +299,41 @@ def convertMicrotoneToCents(value):
     50.0
     >>> convertMicrotoneToCents(-.5) # numbers are half-step scalars
     -50.0
-    >>> convertMicrotoneToCents('+20') # strings are cents
+    >>> convertMicrotoneToCents('(+20)') # strings are cents
     20.0
     >>> convertMicrotoneToCents('20.53') # strings are cents
     20.53...
     >>> convertMicrotoneToCents('-20') # strings are cents
     -20.0
+
+    >>> convertMicrotoneToCents('25', '#') # providing an accidental
+    125.0
+    >>> convertMicrotoneToCents('25', '-') 
+    -75.0
+    >>> convertMicrotoneToCents('-25', '-') 
+    -125.0
+    >>> convertMicrotoneToCents('-25', '##')
+    175.0
+    >>> convertMicrotoneToCents('-50', '~')  # negates to zero
+    0.0
+    >>> convertMicrotoneToCents('50', '`')  # negates to zero
+    0.0
+
     '''
     # if a number, assume that the number is halfsteps
     # this is consistent with other accidental notations, where
     # .5 is a quarter tone
+    if acc is not None:
+        if common.isStr(acc):
+            acc = Accidental(acc)
+
+    centValue = None
     if common.isNum(value):
         # these are practical, though not necessary, limits,
         # from -300 to 300 cents
         if value < -3 or value > 3:
             return None 
-        return value * 100
+        centValue = value * 100
     elif common.isStr(value) and len(value) > 0:
         # strip any delimiters
         value = value.replace(MICROTONE_OPEN, '')
@@ -326,13 +345,19 @@ def convertMicrotoneToCents(value):
             if num == '':
                 return None
             else:
-                return float(num)
+                centValue = float(num)
         elif value[0] in ['-']:
             num, junk = common.getNumFromStr(value[1:], numbers='0123456789.')
-            return float(num) * -1
+            centValue = float(num) * -1
+
+    if centValue is not None:
+        if acc is None:
+            return centValue
+        else: # add accidental difference
+            return centValue + (acc.alter * 100)
     return None # no conversions are available
 
-def convertMicrotoneToCentsStr(value, roundedDigits=1):
+def convertMicrotoneToCentsStr(value, acc=None, roundedDigits=1):
     '''Provide a string representation for a microtone expressed in cents, with a mandatory +/- sign used to show that this a cent notation.
 
     Numerical values are treated like other alter values, where 1 is 1 half-step. 
@@ -359,7 +384,11 @@ def convertMicrotoneToCentsStr(value, roundedDigits=1):
     '+25'
 
     '''
-    centNumber = convertMicrotoneToCents(value)
+    if acc is not None:
+        if common.isStr(acc):
+            acc = Accidental(acc)
+
+    centNumber = convertMicrotoneToCents(value, acc=acc)
     #centNumber = convertMicrotoneToCents(value)
     if centNumber is None:
         return None
