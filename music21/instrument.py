@@ -3,9 +3,10 @@
 # Name:         instrument.py
 # Purpose:      Class for basic instrument information
 #
-# Authors:      Christopher Ariza
+# Authors:      Neena Parikh
+#               Christopher Ariza
 #               Michael Scott Cuthbert
-#               Neena Parikh
+#               
 #
 # Copyright:    (c) 2009-11 The music21 Project
 # License:      LGPL
@@ -410,25 +411,36 @@ class StringInstrument(Instrument):
     stringPitches = property(_getStringPitches, _setStringPitches, doc = '''
             stringPitches is a property that stores a list of Pitches (or pitch names, 
             such as "C4") that represent the pitch of the open strings from lowest to
-            highest[#reentrant]_
+            highest.[*]
+
+            
             
             >>> vln1 = Violin()
             >>> vln1.stringPitches
             [G3, D4, A4, E5]
             
-            instrument.stringPitches are full pitch objects, not just names
+            
+            instrument.stringPitches are full pitch objects, not just names:
+
+
             >>> [x.octave for x in vln1.stringPitches]
             [3, 4, 4, 5]
             
-            scordatura for Scelsi's *Anahit*. N.B. string to pitch conversion
+            
+            Scordatura for Scelsi's violin concerto *Anahit*.
+            (N.B. that string to pitch conversion is happening automatically)
+            
+            
             >>> vln1.stringPitches = ["G3","G4","B4","D4"]
             >>> vln1.stringPitches
             [G3, G4, B4, D4]
             
-            ..[#reentrant] In some tuning methods such as reentrant tuning on the ukulele,
+            
+            (`[*]In some tuning methods such as reentrant tuning on the ukulele,
             lute, or five-string banjo the order might not strictly be from lowest to
             highest.  The same would hold true for certain violin scordatura pieces, such
-            as some of Biber's *Mystery Sonatas*
+            as some of Biber's *Mystery Sonatas*`)
+            
             ''')
                        
 class Violin(StringInstrument):   

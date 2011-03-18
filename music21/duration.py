@@ -1676,7 +1676,8 @@ class Duration(DurationCommon):
     (<music21.duration.Tuplet 3/2/eighth>,)
 
 
-    Example 2: A Duration made up of multiple :class:`music21.duration.DurationUnit`s
+    Example 2: A Duration made up of multiple :class:`music21.duration.DurationUnit`
+    objects 
     automatically configured by the specified quarterLength.
 
 

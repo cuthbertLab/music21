@@ -76,6 +76,7 @@ class Chord(note.NotRest):
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
     it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. 
     
+    
     NOTE: For now, the examples used in documentation give chords made from notes that are not
     defined. In the future, it may be possible to define a chord without first creating notes,
     but for now note that notes that appear in chords are simply shorthand instead of creating notes
@@ -529,8 +530,14 @@ class Chord(note.NotRest):
         enharmonics might be simplified (not done yet). If the value is a 
         string, any Interval string specification can be provided.
 
-        if inPlace is set to True (default = False) then the original
+
+        If inPlace is set to True (default = False) then the original
         chord is changed.  Otherwise a new Chord is returned.
+
+
+        We take a three-note chord (G, A, C#) and transpose it up a minor third,
+        getting the chord B-flat, C, E.
+        
 
         >>> from music21 import *
         >>> a = chord.Chord(['g4', 'a3', 'c#6'])
@@ -538,10 +545,21 @@ class Chord(note.NotRest):
         >>> b
         <music21.chord.Chord B-4 C4 E6>
 
+
+        Here we create the interval object first (rather than giving
+        a string) and specify transposing down six semitones, instead
+        of saying A-4.
+
+
         >>> aInterval = interval.Interval(-6)
         >>> b = a.transpose(aInterval)
         >>> b
         <music21.chord.Chord C#4 D#3 F##5>
+        
+        
+        If `inPlace` is True then rather than returning a new chord, the
+        chord itself is changed.  
+        
         
         >>> a.transpose(aInterval, inPlace=True)
         >>> a
@@ -574,11 +592,8 @@ class Chord(note.NotRest):
     # analytical routines
 
     def bass(self, newbass = 0):
-        '''returns the bass note or sets it to note.
+        '''returns the bass Pitch or sets it to the given Pitch.
 
-        Usually defined to the lowest note in the chord,
-        but we want to be able to override this.  You might want an implied
-        bass for instance...  v o9.
         
         example:
         
@@ -587,13 +602,43 @@ class Chord(note.NotRest):
         >>> cmaj1stInv = chord.Chord(['C4', 'E3', 'G5'])
         >>> cmaj1stInv.bass() 
         E3
+        
+        
+        The bass is usually defined to the lowest note in the chord,
+        but we want to be able to override this.  You might want an implied
+        bass for instance some people (following the music theorist
+        Rameau) call a diminished seventh chord (vii7)
+        a dominant chord with a omitted bass -- here we will specify the bass
+        to be a note not in the chord:
+        
+        
+        >>> vo9 = chord.Chord(['B3', 'D4', 'F4', 'A-4'])
+        >>> vo9.bass()
+        B3
+        >>> vo9.bass(pitch.Pitch('G3'))
+        >>> vo9.bass()
+        G3
+        
+        
+        
+        OMIT_FROM_DOCS
+        
+        Test to make sure that cached basses still work by calling twice:
+        
+        >>> a = chord.Chord(['C4'])
+        >>> a.bass()
+        C4
+        >>> a.bass()
+        C4
+        
         '''
         if (newbass):
             self._bass = newbass
         elif (self._bass is None):
             self._bass = self._findBass()
-
-        return self._bass
+            return self._bass
+        else:
+            return self._bass
 
     def _findBass(self):
         ''' Returns the lowest note in the chord

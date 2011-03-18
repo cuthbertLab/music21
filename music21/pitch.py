@@ -1118,21 +1118,60 @@ class Pitch(music21.Music21Object):
 
 
     ps = property(_getPs, _setPs, 
-        doc='''The ps property permits getting and setting a pitch space value, a floating point number representing pitch space, where 60 is C4, middle C, integers are half-steps, and floating point values are microtonal tunings (.01 is equal to one cent).
+        doc='''
+        The ps property permits getting and setting 
+        a pitch space value, a floating point number 
+        representing pitch space, where 60.0 is C4, middle C, 
+        61.0 is C#4 or D-4, and floating point values are 
+        microtonal tunings (.01 is equal to one cent), so
+        a quarter-tone sharp above C5 is 72.5.
+        
+        Note that the choice of 60.0 for C4 makes it identical
+        to the integer value of 60 for .midi, but .midi
+        does not allow for microtones and is limited to 0-127
+        while .ps allows for notes before midi 0 or above midi 127.
+        
 
         >>> from music21 import *
-        >>> a = pitch.Pitch()
+        >>> a = pitch.Pitch("C4")
+        >>> a.ps
+        60.0
+        
+        
+        Changing the ps value for
+        A will change the step and octave:
+        
+        
         >>> a.ps = 45
         >>> a
         A2
         >>> a.ps
         45.0
 
+        
+        Notice that ps 61 represents both
+        C# and D-flat.  Thus "implicitAccidental"
+        will be true after setting our pitch to 61:
+        
+        
         >>> a.ps = 61
         >>> a
         C#4
         >>> a.ps
         61.0
+        >>> a.implicitAccidental
+        True
+        
+        
+        Microtones are allowed, as are extreme ranges:
+        
+        
+        >>> b = pitch.Pitch('B9')
+        >>> b.accidental = pitch.Accidental('half-flat')
+        >>> b
+        B`9
+        >>> b.ps
+        130.5
         
         ''')
 
@@ -1211,6 +1250,10 @@ class Pitch(music21.Music21Object):
         160.5
         >>> veryHighFHalfFlat.midi
         125
+
+
+        Note that the conversion of improper midi values to proper
+        midi values is done before assigning .ps:
 
 
         >>> a = pitch.Pitch()
