@@ -146,7 +146,6 @@ class Groups(list):
         else:
             raise GroupException("Only strings can be used as list names")
         
-
     def __eq__(self, other):
         '''Test Group equality. In normal lists, order matters; here it does not. 
 
@@ -169,7 +168,6 @@ class Groups(list):
     def __ne__(self, other):
         '''In normal lists, order matters; here it does not. 
         '''
-
         if other is None or not isinstance(other, Groups):
             return True
         if (list.sort(self) == other.sort()):
@@ -1558,12 +1556,6 @@ class Music21Object(JSONSerializer):
         if "activeSite" in keywords and self.activeSite is None:
             self.activeSite = keywords["activeSite"]
         
-#         if ("definedContexts" in keywords and 
-#             keywords["definedContexts"] is not None and 
-#             self._definedContexts is None):
-#             self._definedContexts = keywords["definedContexts"]
-#         elif self._definedContexts is None:
-#             self._definedContexts = []
 
     def mergeAttributes(self, other):
         '''

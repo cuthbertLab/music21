@@ -357,7 +357,7 @@ def convertMicrotoneToCents(value, acc=None):
             return centValue + (acc.alter * 100)
     return None # no conversions are available
 
-def convertMicrotoneToCentsStr(value, acc=None, roundedDigits=1):
+def convertMicrotoneToCentsStr(value, roundedDigits=1):
     '''Provide a string representation for a microtone expressed in cents, with a mandatory +/- sign used to show that this a cent notation.
 
     Numerical values are treated like other alter values, where 1 is 1 half-step. 
@@ -384,12 +384,9 @@ def convertMicrotoneToCentsStr(value, acc=None, roundedDigits=1):
     '+25'
 
     '''
-    if acc is not None:
-        if common.isStr(acc):
-            acc = Accidental(acc)
-
-    centNumber = convertMicrotoneToCents(value, acc=acc)
-    #centNumber = convertMicrotoneToCents(value)
+    # do not pass accidental to conversion, as, for display, we want the value
+    # cent deviation without the additional change of the accidental
+    centNumber = convertMicrotoneToCents(value)
     if centNumber is None:
         return None
     # get floating-point portion
@@ -405,7 +402,7 @@ def convertMicrotoneToCentsStr(value, acc=None, roundedDigits=1):
         # negative sign will automatically be included
         return '%s' % num
 
-def convertCentsToAlter(value):
+def convertCentsToAlter(value, acc=None):
     '''Given a numerical or string cents value, expressed as string or a number, return a floating point alter value, where 1 is 1 half-step.
 
     >>> from music21 import *
@@ -413,16 +410,21 @@ def convertCentsToAlter(value):
     0.5...
     >>> pitch.convertCentsToAlter('+1')
     0.01...
-
     >>> pitch.convertCentsToAlter('-50')
     -0.5...
     >>> pitch.convertCentsToAlter(-50) # numerical values are treated as alters
     -0.5...
+
+    >>> pitch.convertCentsToAlter('-25', '-') # passing an accidental as well
+    -1.25
+    >>> pitch.convertCentsToAlter('-25', '##') # passing an accidental as well
+    1.75
+
     '''
     # this function handles strings and returns a numerical value
     if common.isStr(value):
         # may return None
-        value = convertMicrotoneToCents(value)
+        value = convertMicrotoneToCents(value, acc=acc)
         if value is None:
             return value
     return value * .01
