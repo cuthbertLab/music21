@@ -786,10 +786,8 @@ class Test(unittest.TestCase):
         # through sequential iteration
         s1 = copy.deepcopy(s)
         for p in s1.parts:
-            environLocal.printDebug(['removing', p])
             for m in p.getElementsByClass('Measure'):
                 for e in m.getElementsByClass('KeySignature'):
-                    environLocal.printDebug(['s1: removing', e])
                     m.remove(e)
 
         self.assertEqual(len(s1.flat.getElementsByClass('KeySignature')), 0)
@@ -800,7 +798,6 @@ class Test(unittest.TestCase):
         for e in s2.flat.getElementsByClass('KeySignature'):
             for site in e.getSites():
                 if site is not None:
-                    environLocal.printDebug(['s2: found', e])
                     site.remove(e)
         #s2.show()
 
@@ -808,10 +805,9 @@ class Test(unittest.TestCase):
         # yield elements and containers
         s3 = copy.deepcopy(s)
         self.assertEqual(len(s3.flat.getElementsByClass('KeySignature')), targetCount)
+
         for e in s3._yieldElementsDownward(excludeNonContainers=True):
-            environLocal.printDebug(['s3: found', e])
             if 'KeySignature' in e.classes:
-                environLocal.printDebug(['s3: found for removal', e])
                 # all active sites are None; 
                 if e.activeSite is not None:                
                     e.activeSite.remove(e)
@@ -822,8 +818,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s4.flat.getElementsByClass('KeySignature')), targetCount)
         for c in s4._yieldElementsDownward(excludeNonContainers=False):
             environLocal.printDebug(['s4: found', c])
-            #c.removeElementsByClass('KeySignature')
+            for e in getElementsByClass('KeySignature'):
+                c.remove(e)
             
+        s4.show()
 
 #             if 'KeySignature' in e.classes:
 #                 environLocal.printDebug(['s3: found for removal', e])
