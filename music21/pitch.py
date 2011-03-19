@@ -430,6 +430,105 @@ def convertCentsToAlter(value, acc=None):
     return value * .01
 
 
+def convertHarmonicToCents(value):
+    '''Given a harmonic number, return the total number shift in cents assuming 12 tone equal temperament. 
+    
+    >>> convertHarmonicToCents(8)
+    3600
+    >>> [convertHarmonicToCents(x) for x in [16, 17, 18, 19]]
+    [4800, 4905, 5004, 5098]
+
+    >>> [convertHarmonicToCents(x) for x in range(1, 32)]
+    [0, 1200, 1902, 2400, 2786, 3102, 3369, 3600, 3804, 3986, 4151, 4302, 4441, 4569, 4688, 4800, 4905, 5004, 5098, 5186, 5271, 5351, 5428, 5502, 5573, 5641, 5706, 5769, 5830, 5888, 5945]
+    '''
+    # table employed: http://en.wikipedia.org/wiki/Harmonic_series_(music)s
+    hs = 100 # halfstep is 100 cents
+
+    # octaves
+    if value == 1:
+        return 0
+    elif value == 2:
+        return (1200 * 1)
+    elif value == 4:
+        return (1200 * 2)
+    elif value == 8:
+        return (1200 * 3)
+    elif value == 16:
+        return (1200 * 4)
+
+    elif value == 17:
+        return ((100 * 1)+(1200 * 4)) + 5
+
+    elif value == 9:
+        return ((100 * 2)+(1200 * 3)) + 4
+    elif value == 18:
+        return ((100 * 2)+(1200 * 4)) + 4
+
+    elif value == 19:
+        return ((100 * 3)+(1200 * 4)) - 2
+
+    elif value == 5:
+        return ((100 * 4)+(1200 * 2)) - 14
+    elif value == 10:
+        return ((100 * 4)+(1200 * 3)) - 14
+    elif value == 20:
+        return ((100 * 4)+(1200 * 4)) - 14
+
+    elif value == 21:
+        return ((100 * 5)+(1200 * 4)) - 29
+
+    elif value == 11:
+        return ((100 * 6)+(1200 * 3)) - 49
+    elif value == 22:
+        return ((100 * 6)+(1200 * 4)) - 49
+
+    elif value == 23:
+        return ((100 * 6)+(1200 * 4)) + 28
+
+    elif value == 3:
+        return ((100 * 7)+(1200 * 1)) + 2
+    elif value == 6:
+        return ((100 * 7)+(1200 * 2)) + 2
+    elif value == 12:
+        return ((100 * 7)+(1200 * 3)) + 2
+    elif value == 24:
+        return ((100 * 7)+(1200 * 4)) + 2
+
+    elif value == 25:
+        return ((100 * 8)+(1200 * 4)) - 27
+
+    elif value == 13:
+        return ((100 * 8)+(1200 * 3)) + 41
+    elif value == 26:
+        return ((100 * 8)+(1200 * 4)) + 41
+
+    elif value == 27:
+        return ((100 * 9)+(1200 * 4)) + 6
+
+    elif value == 7:
+        return ((100 * 10)+(1200 * 2)) - 31
+    elif value == 14:
+        return ((100 * 10)+(1200 * 3)) - 31
+    elif value == 28:
+        return ((100 * 10)+(1200 * 4)) - 31
+
+    elif value == 29:
+        return ((100 * 10)+(1200 * 4)) + 30
+
+    elif value == 15:
+        return ((100 * 11)+(1200 * 3)) - 12
+    elif value == 30:
+        return ((100 * 11)+(1200 * 4)) - 12
+
+    elif value == 31:
+        return ((100 * 11)+(1200 * 4)) + 45
+
+    else:
+        raise Exception('no such harmonic defined: %s' % value)
+
+
+
+
 #-------------------------------------------------------------------------------
 class AccidentalException(Exception):
     pass
@@ -437,6 +536,49 @@ class AccidentalException(Exception):
 class PitchException(Exception):
     pass
 
+class MicrotoneException(Exception):
+    pass
+
+#-------------------------------------------------------------------------------
+class Microtone(object):
+    '''
+    The Microtone object defines a pitch transformation above or below a standard Pitch
+
+    >>> m = Microtone(20)
+    >>> m.cents
+    20
+    >>> m.alter
+    0.200...
+    '''
+    validHarmonics = range(1, 32)
+
+    def __init__(self, cents=0):
+        self._centShift = cents # specify harmonic in cents
+        self._harmonicShift = 1 # the first harmonic is the start
+
+    def _setHarmonic(self, value):
+        if value not in validHarmonics:
+            raise MicrotoneException('not a valud harmonic: %s' % value)
+        self._harmonicShift = value
+
+
+    def _getCents(self):
+        '''Return the value as an alter value, where 1 is 1 half step.
+        '''
+        return convertHarmonicToCents(self._harmonicShift) + self._centShift
+
+    cents = property(_getCents, 
+        doc = '''Return the microtone value in cents.
+        ''')
+
+    def _getAlter(self):
+        '''Return the value as an alter value, where 1 is 1 half step.
+        '''
+        return self._getCents() * .01
+        
+    alter = property(_getAlter, 
+        doc = '''Return the microtone value in accidental alter values. 
+        ''')
 
 
 
@@ -453,17 +595,7 @@ class Accidental(music21.Music21Object):
     >>> a = pitch.Accidental('sharp')
     >>> a.name, a.alter, a.modifier
     ('sharp', 1.0, '#')
-    >>> a = pitch.Accidental('+25') # a 25 cent deviation
-    >>> a.name, a.alter, a.modifier
-    ('+25', 0.25, '+25')
 
-    >>> a = pitch.Accidental(.25) # a 25 cent deviation
-    >>> a.name, a.alter, a.modifier
-    ('+25', 0.25, '+25')
-
-    >>> a = pitch.Accidental(-.333) 
-    >>> a.name, a.alter, a.modifier
-    ('-33.3', -0.333..., '-33.3')
     '''
     # manager by properties
     _displayType = "normal" # always, never, unless-repeated, even-tied
@@ -517,14 +649,6 @@ class Accidental(music21.Music21Object):
         >>> a == b   
         True
         >>> a == c
-        False
-
-        >>> d = pitch.Accidental('-20')
-        >>> e = pitch.Accidental(-.2)
-        >>> f = pitch.Accidental('+25')
-        >>> d == e
-        True
-        >>> d == f
         False
 
         '''
@@ -665,17 +789,17 @@ class Accidental(music21.Music21Object):
             self.alter = -4.0
         # support microtones notated with +/ notation
         # first, check if it can be converted
-        elif convertMicrotoneToCents(name) is not None:
-            self.name = convertMicrotoneToCentsStr(name)
-            self.alter = convertCentsToAlter(convertMicrotoneToCents(name))
+#         elif convertMicrotoneToCents(name) is not None:
+#             self.name = convertMicrotoneToCentsStr(name)
+#             self.alter = convertCentsToAlter(convertMicrotoneToCents(name))
         else:
             raise AccidentalException('%s is not a supported accidental type' % name)
 
         # always set modifier from dictionary
-        if self.name.startswith('+') or self.name.startswith('-'):
-            self.modifier = self.name
-        else:
-            self.modifier = accidentalNameToModifier[self.name]
+#         if self.name.startswith('+') or self.name.startswith('-'):
+#             self.modifier = self.name
+#         else:
+        self.modifier = accidentalNameToModifier[self.name]
 
 
 
