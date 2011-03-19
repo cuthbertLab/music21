@@ -770,11 +770,70 @@ class Test(unittest.TestCase):
  
 
 
+    def testYieldRemoveA(self):
+        from music21 import corpus, stream, key, note
+#        s = corpus.parse('madrigal.3.1.rntxt')
+        m = stream.Measure()
+        m.append(key.KeySignature(4))
+        m.append(note.Note())
+        p = stream.Part()
+        p.append(m)
+        s = stream.Score()
+        s.append(p)
+        targetCount = 1
+        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), targetCount)
+
+        # through sequential iteration
+        s1 = copy.deepcopy(s)
+        for p in s1.parts:
+            environLocal.printDebug(['removing', p])
+            for m in p.getElementsByClass('Measure'):
+                for e in m.getElementsByClass('KeySignature'):
+                    environLocal.printDebug(['s1: removing', e])
+                    m.remove(e)
+
+        self.assertEqual(len(s1.flat.getElementsByClass('KeySignature')), 0)
+
+
+        s2 = copy.deepcopy(s)
+        self.assertEqual(len(s2.flat.getElementsByClass('KeySignature')), targetCount)
+        for e in s2.flat.getElementsByClass('KeySignature'):
+            for site in e.getSites():
+                if site is not None:
+                    environLocal.printDebug(['s2: found', e])
+                    site.remove(e)
+        #s2.show()
+
+
+        # yield elements and containers
+        s3 = copy.deepcopy(s)
+        self.assertEqual(len(s3.flat.getElementsByClass('KeySignature')), targetCount)
+        for e in s3._yieldElementsDownward(excludeNonContainers=True):
+            environLocal.printDebug(['s3: found', e])
+            if 'KeySignature' in e.classes:
+                environLocal.printDebug(['s3: found for removal', e])
+                # all active sites are None; 
+                if e.activeSite is not None:                
+                    e.activeSite.remove(e)
+        #s3.show()
+
+        # yield containers
+        s4 = copy.deepcopy(s)
+        self.assertEqual(len(s4.flat.getElementsByClass('KeySignature')), targetCount)
+        for c in s4._yieldElementsDownward(excludeNonContainers=False):
+            environLocal.printDebug(['s4: found', c])
+            #c.removeElementsByClass('KeySignature')
+            
+
+#             if 'KeySignature' in e.classes:
+#                 environLocal.printDebug(['s3: found for removal', e])
+#                 if 
+#                 e.activeSite.remove(e)
+# 
+
+
 _DOC_ORDER = [RomanNumeral, fromChordAndKey]
 
 
 if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
+    music21.mainTest(Test)
