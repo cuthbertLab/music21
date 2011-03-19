@@ -1753,13 +1753,18 @@ class Music21Object(JSONSerializer):
 
 
     def setOffsetBySite(self, site, value):
-        '''Direct access to the DefinedContexts setOffsetBySite() method. This should only be used for advanced processing of known site that already has been added.
+        '''
+        Direct access to the DefinedContexts setOffsetBySite() method. 
+        This should only be used for advanced processing of known site 
+        that already has been added.
 
         >>> class Mock(Music21Object): pass
         >>> aSite = Mock()
         >>> a = Music21Object()
         >>> a.addLocation(aSite, 20)
         >>> a.setOffsetBySite(aSite, 30)
+        >>> a.getOffsetBySite(aSite)
+        
         '''
         return self._definedContexts.setOffsetBySite(site, value)
 

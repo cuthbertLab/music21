@@ -7689,27 +7689,38 @@ class Part(Stream):
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
 
-    def makeAccidentals(self):
+    def makeAccidentals(self, alteredPitches = None, 
+         cautionaryPitchClass=True,
+         cautionaryAll=False, inPlace=True, 
+         overrideStatus = False, cautionaryNotImmediateRepeat=True):
         '''
-        This overridden method of Stream.makeAccidentals provides the management of passing pitches from a past Measure to each new measure for processing. 
+        This overridden method of Stream.makeAccidentals 
+        provides the management of passing pitches from 
+        a past Measure to each new measure for processing. 
+
         '''
         # process make accidentals for each measure
         measureStream = self.getElementsByClass('Measure')
+        ksLast = None
         for i in range(len(measureStream)):
             m = measureStream[i]
             if m.keySignature != None:
                 ksLast = m.keySignature
-            else:
-                ksLast = None
             # if beyond the first measure, use the pitches from the last
             # measure for context
             if i > 0:
-                m.makeAccidentals(measureStream[i-1].pitches,
-                    useKeySignature=ksLast, searchKeySignatureByContext=False)
+                pitchPast = measureStream[i-1].pitches
             else:
-                m.makeAccidentals(useKeySignature=ksLast, 
-                    searchKeySignatureByContext=False)
-
+                pitchPast = None
+            m.makeAccidentals(pitchPast = pitchPast,
+                    useKeySignature=ksLast, alteredPitches=alteredPitches,
+                    searchKeySignatureByContext=False,
+                    cautionaryPitchClass = cautionaryPitchClass,
+                    cautionaryAll = cautionaryAll,
+                    inPlace = inPlace,
+                    overrideStatus = overrideStatus,
+                    cautionaryNotImmediateRepeat = cautionaryNotImmediateRepeat)
+            
 
     def _getLily(self):
         lv = Stream._getLily(self)

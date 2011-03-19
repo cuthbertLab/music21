@@ -38,18 +38,22 @@ reNoteTag = re.compile('[Nn]ote:')
 
 reOptKeyOpenAtom = re.compile('\?\([A-Ga-g]+[b#]*:')
 reOptKeyCloseAtom = re.compile('\?\)[A-Ga-g]+[b#]*:?')
-reKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
+reKeyAtom = re.compile('[A-Ga-g]+[b#]*;:')
+reAnalyticKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
+reKeySignatureAtom = re.compile('[A-Ga-g]+[b#]*;')
 # must distinguish b3 from bVII; there may be b1.66.5
 reBeatAtom = re.compile('b[1-9.]+')
 
 
 
 #-------------------------------------------------------------------------------
-class RTTokenException(Exception):
+class RomanTextException(music21.Music21Exception):
     pass
-class RTHandlerException(Exception):
+class RTTokenException(music21.Music21Exception):
     pass
-class RTFileException(Exception):
+class RTHandlerException(music21.Music21Exception):
+    pass
+class RTFileException(music21.Music21Exception):
     pass
 
 
@@ -472,53 +476,130 @@ class RTBeat(RTAtom):
 
         return post
 
-
-class RTKey(RTAtom):
-    def __init__(self, src =u'', container=None):
-        '''
-        >>> from music21 import *
-        >>> gminor = romanText.RTKey('g:')
-        >>> gminor
-        <RTKey 'g:'>
-        >>> gminor.getKey()
-        <music21.key.Key of g minor>
-        '''
-        RTAtom.__init__(self, src, container)
-
+class RTKeyTypeAtom(RTAtom):
+    '''
+    RTKeyTypeAtoms contain utility
+    functions for all Key-type tokens
+    i.e., RTKey, RTAnalyticKey, and
+    RTKeySignature.
+    '''
     def __repr__(self):
-        return '<RTKey %r>' % self.src
+        return '<RTKeyTypeAtom %r>' % self.src
 
     def getKey(self):
         '''
         This returns a Key, not a KeySignature object
         '''
         from music21 import key
-        # alter flat symbol
-        if self.src == 'b:':
-            return key.Key('b')
-        else:
-            keyStr = self.src.replace('b', '-')
-            keyStr = keyStr.replace(':', '')
-            #environLocal.printDebug(['create a key from:', keyStr])
-            return key.Key(keyStr)
+        myKey = self.src.rstrip(self.footerStrip)
+        myKey = key.convertKeyStringToMusic21KeyString(myKey)
+        return key.Key(myKey)
 
     def getKeySignature(self):
         '''Get a KeySignature object.
         '''
-        if self.src == 'b:':
-            return key.Key('b')
-        else:
-            # source may be empty
-            keyStr = self.src.replace('b', '-')
-            keyStr = keyStr.replace(':', '')
-            return key.KeySignature(keyStr)
+        from music21 import key
+        myKey = self.getKey()
+        return key.KeySignature(myKey.sharps) 
 
-#         if self.data == 'Bb':
-#             return -1
-#         elif self.data == '' or self.data == 'blank':
-#             return 0
-#         else:
-#             raise RTTokenException('cannot parse this KeySignature: %s' % self.data) 
+class RTKey(RTKeyTypeAtom):
+    footerStrip = ';:'
+
+    def __init(self, src = u'', container=None):
+        '''
+        An RTKey(RTAtom) defines both a change
+        in KeySignature and a change in the analyzed Key
+        
+        
+        They are defined by ";:" after the Key.
+        
+              
+        
+        >>> from music21 import *
+        >>> gminor = romanText.RTKey('g;:')
+        >>> gminor
+        <RTKey 'g;:'>
+        >>> gminor.getKey()
+        <music21.key.Key of g minor>
+
+
+        >>> bminor = romanText.RTKey('bb;:')
+        >>> bminor
+        <RTKey 'bb;:'>
+        >>> bminor.getKey()
+        <music21.key.Key of b- minor>
+        >>> bminor.getKeySignature()
+        <music21.key.KeySignature of 5 flats>
+
+
+        >>> eflatmajor = romanText.RTKey('Eb;:')
+        >>> eflatmajor
+        <RTKey 'Eb;:'>
+        >>> eflatmajor.getKey()
+        <music21.key.Key of E- major>
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTKey %r>' % self.src
+
+
+
+class RTAnalyticKey(RTKeyTypeAtom):
+    footerStrip = ':'
+
+    def __init__(self, src =u'', container=None):
+        '''
+        An RTAnalyticKey(RTKeyTypeAtom) only defines
+        a change in the key being analyzed.  It
+        does not in itself create a :class:~'music21.key.Key'
+        object
+        
+        >>> from music21 import *
+        >>> gminor = romanText.RTAnalyticKey('g:')
+        >>> gminor
+        <RTAnalyticKey 'g:'>
+        >>> gminor.getKey()
+        <music21.key.Key of g minor>
+
+
+        >>> bminor = romanText.RTAnalyticKey('bb:')
+        >>> bminor
+        <RTAnalyticKey 'bb:'>
+        >>> bminor.getKey()
+        <music21.key.Key of b- minor>
+
+        '''
+        RTAtom.__init__(self, src, container)
+    
+    def __repr__(self):
+        return '<RTAnalyticKey %r>' % self.src
+
+
+class RTKeySignature(RTKeyTypeAtom):
+    footerStrip = ';'
+    def __init__(self, src =u'', container=None):
+        '''
+        An RTKeySignature(RTKeyTypeAtom) only defines
+        a change in the KeySignature.  It
+        does not in itself create a :class:~'music21.key.Key'
+        object, nor does it change the analysis
+        taking place.
+        
+        
+        >>> from music21 import *
+        >>> gminor = romanText.RTKeySignature('g;')
+        >>> gminor
+        <RTKeySignature 'g;'>
+        >>> gminor.getKeySignature()
+        <music21.key.KeySignature of 2 flats>
+
+        '''
+        RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTKeySignature %r>' % self.src
+
 
 
 
@@ -677,11 +758,14 @@ class RTHandler(object):
 
         '''
         # iterate over lines and find the first measure definition
+        iStartBody = None
         for i, l in enumerate(lines):
             if reMeasureTag.match(l.strip()) is not None:
                 # found a measure definition
                 iStartBody = i
                 break
+        if iStartBody is None:
+            raise RomanTextException("Cannot find the first measure definition in this file.  Dumping contextss: %s", lines)
         return lines[:iStartBody], lines[iStartBody:]
     
     def _tokenizeHeader(self, lines):
@@ -709,16 +793,16 @@ class RTHandler(object):
 
         >>> tokenList = rth._tokenizeAtoms('I b2 I b2.25 V/ii b2.5 bVII b2.75 V g: IV')
         >>> str(tokenList)
-        "[<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, <RTKey 'g:'>, <RTChord 'IV'>]"
+        "[<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, <RTAnalyticKey 'g:'>, <RTChord 'IV'>]"
         >>> tokenList[9].getKey()
         <music21.key.Key of g minor>
 
         >>> str(rth._tokenizeAtoms('= m3'))
         '[]'
 
-        >>> tokenList = rth._tokenizeAtoms('g: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i')
+        >>> tokenList = rth._tokenizeAtoms('g;: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i')
         >>> str(tokenList)
-        "[<RTKey 'g:'>, <RTChord 'V'>, <RTBeat 'b2'>, <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, <RTChord 'i'>]"
+        "[<RTKey 'g;:'>, <RTChord 'V'>, <RTBeat 'b2'>, <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, <RTChord 'i'>]"
         '''
         post = []
         # break by spaces
@@ -744,6 +828,11 @@ class RTHandler(object):
                 post.append(RTOptionalKeyClose(word, container))
             elif reKeyAtom.match(word) is not None:
                 post.append(RTKey(word, container))
+            elif reAnalyticKeyAtom.match(word) is not None:
+                post.append(RTAnalyticKey(word, container))
+            elif reKeySignatureAtom.match(word) is not None:
+                post.append(RTKeySignature(word, container))
+
             else: # only option is that it is a chord
                 post.append(RTChord(word, container))
         return post
@@ -1015,17 +1104,17 @@ class Test(unittest.TestCase):
         g = reVariant.match('var1 IV6 b4 C: V')
         self.assertEqual(g.group(0), 'var1')
 
-        g = reKeyAtom.match('Bb:')
+        g = reAnalyticKeyAtom.match('Bb:')
         self.assertEqual(g.group(0), 'Bb:')
-        g = reKeyAtom.match('F#:')
+        g = reAnalyticKeyAtom.match('F#:')
         self.assertEqual(g.group(0), 'F#:')
-        g = reKeyAtom.match('f#:')
+        g = reAnalyticKeyAtom.match('f#:')
         self.assertEqual(g.group(0), 'f#:')
-        g = reKeyAtom.match('b:')
+        g = reAnalyticKeyAtom.match('b:')
         self.assertEqual(g.group(0), 'b:')
-        g = reKeyAtom.match('bb:')
+        g = reAnalyticKeyAtom.match('bb:')
         self.assertEqual(g.group(0), 'bb:')
-        g = reKeyAtom.match('g:')
+        g = reAnalyticKeyAtom.match('g:')
         self.assertEqual(g.group(0), 'g:')
 
         # beats do not have a colon
@@ -1113,7 +1202,7 @@ class Test(unittest.TestCase):
         for t in rth._tokens:
             if t.isMeasure():
                 for a in t.atoms:
-                    if isinstance(a, RTKey):
+                    if isinstance(a, RTAnalyticKey):
                         count += 1
         self.assertEqual(count, 1)
 

@@ -873,7 +873,38 @@ def parseURL(url, number=None, format=None, forceSource=False):
     return v.stream
 
 def parse(value, *args, **keywords):
-    '''Given a file path, encoded data in a Python string, or a URL, attempt to parse the item into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
+    '''
+    Given a file path, encoded data in a Python string, 
+    or a URL, attempt to parse the item into a Stream. 
+    Note: URL downloading will not happen automatically unless 
+    the user has set their Environment "autoDownload" 
+    preference to "allow". 
+
+
+    Keywords can include `number` which specifies a piece number 
+    in a file of multipiece file.
+    
+    
+    `format` specifies the format to parse the line of text or the file as.
+    
+    
+    
+    
+    
+    A string of text is first checked to see if it is a 
+    filename that exists on disk.  If not it is searched
+    to see if it looks like a URL.  If not it is processed
+    as data.  
+
+    
+    The data is normally interpreted as a line of TinyNotation
+    with the first argument being the time signature:
+    
+
+    TODO: SHOW FILE
+    TODO: SHOW URL 
+    
+
 
     >>> from music21 import *
     >>> s = converter.parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
@@ -920,7 +951,7 @@ def parse(value, *args, **keywords):
         return parseData(value, number=number, format=format)
     elif os.path.exists(value):
         return parseFile(value, number=number, format=format, forceSource=forceSource)
-    elif value.startswith('http://'): 
+    elif (value.startswith('http://') or value.startswith('https://')): 
         # its a url; may need to broaden these criteria
         return parseURL(value, number=number, format=format, forceSource=forceSource)
     else:

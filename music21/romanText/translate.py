@@ -85,10 +85,27 @@ def _copyMultipleMeasures(t, p, kCurrent):
 
 
 def _getKeyAndPrefix(rtKeyOrString):
-    '''Given an RTKey specification, return the Key and a string prefix based on the tonic. 
+    '''
+    Given an RTKey specification, return 
+    the Key and a string prefix based on the tonic. 
+
+    >>> _getKeyAndPrefix('c')
+    (<music21.key.Key of c minor>, 'c: ')
+    >>> _getKeyAndPrefix('F#')
+    (<music21.key.Key of F# major>, 'F#: ')
+    >>> _getKeyAndPrefix('Eb')
+    (<music21.key.Key of E- major>, 'E-: ')
+    >>> _getKeyAndPrefix('Bb')
+    (<music21.key.Key of B- major>, 'B-: ')
+    >>> _getKeyAndPrefix('bb')
+    (<music21.key.Key of b- minor>, 'b-: ')
+    >>> _getKeyAndPrefix('b#')
+    (<music21.key.Key of b# minor>, 'b#: ')
+
     '''
     from music21 import key
     if common.isStr(rtKeyOrString):
+        rtKeyOrString = key.convertKeyStringToMusic21KeyString(rtKeyOrString)
         k = key.Key(rtKeyOrString)
     else:
         k = rtKeyOrString.getKey()
@@ -132,7 +149,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     previousRn = None
     keySigCurrent = None
     keySigSet = True  # set a keySignature
+    foundAKeySignatureSoFar = False
     kCurrent, prefixLyric = _getKeyAndPrefix('C') # default if none defined
+    prefixLyric = ''
 
     for t in rtHandler.tokens:
         #environLocal.printDebug(['token', t])
@@ -160,6 +179,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 raise TranslateRomanTextException("still need to write a generic RomanText KeySignature routine.  this is just temporary")
             keySigSet = False
             environLocal.printDebug(['keySigCurrent:', keySigCurrent])
+            foundAKeySignatureSoFar = True
         elif t.isMeasure():
             #environLocal.printDebug(['handling measure token:', t])
 
@@ -223,22 +243,46 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 previousChordInMeasure = None
                 pivotChordPossible = False
                 for i, a in enumerate(t.atoms):
-                    if isinstance(a, romanTextModule.RTKey):
+                    if isinstance(a, romanTextModule.RTKey) or \
+                       ((foundAKeySignatureSoFar == False) and \
+                        (isinstance(a, romanTextModule.RTAnalyticKey))): 
+                        # found a change of Key+KeySignature or
+                        # just found a change of analysis but no keysignature so far
+                
                         #environLocal.printDebug(['handling key token:', a])
-                        try: # this sets the key, not the keysignature
-                            kCurrent, prefixLyric = _getKeyAndPrefix(a)
+                        try: # this sets the key and the keysignature
+                            kCurrent, pl = _getKeyAndPrefix(a)
+                            prefixLyric += pl
                         except:
                             raise TranslateRomanTextException('cannot get key from %s in line %s' % (a.src, t.src))
-                        # if, within a measure, we find a definition of a key
-                        # need to update both the key sig current as well as
-                        # the Key object, kCurrent
-                        if keySigCurrent is not None:
-                            kCurrent.sharps = keySigCurrent.sharps
-                        else: pass
-                            # probably should do something here?
-                            # create a KeySignature based on Key
-                        m.insert(o, kCurrent)
-                    if isinstance(a, romanTextModule.RTBeat):
+                        #insert at beginning of measure if at beginning -- for things like pickups.
+                        if m.number < 2:
+                            m.insert(0, kCurrent)
+                        else:
+                            m.insert(o, kCurrent)
+                        foundAKeySignatureSoFar = True
+
+                    elif isinstance(a, romanTextModule.RTKeySignature):
+                        try: # this sets the keysignature but not the prefix text
+                            kCurrent, dummy = _getKeyAndPrefix(a)
+                        except:
+                            raise TranslateRomanTextException('cannot get key from %s in line %s' % (a.src, t.src))
+                        #insert at beginning of measure if at beginning -- for things like pickups.
+                        if m.number < 2:
+                            m.insert(0, kCurrent)
+                        else:
+                            m.insert(o, kCurrent)
+                        foundAKeySignatureSoFar = True
+
+                    elif isinstance(a, romanTextModule.RTAnalyticKey):
+                        # just a change in analyzed key, not a change in anything else
+                        try: # this sets the key, not the keysignature
+                            kCurrent, pl = _getKeyAndPrefix(a)
+                            prefixLyric += pl
+                        except:
+                            raise TranslateRomanTextException('cannot get key from %s in line %s' % (a.src, t.src))
+
+                    elif isinstance(a, romanTextModule.RTBeat):
                         # set new offset based on beat
                         try:
                             o = a.getOffset(tsCurrent)
@@ -259,7 +303,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             previousChordInMeasure = firstChord
                             m.insert(0, firstChord)
                         pivotChordPossible = False
-                    if isinstance(a, romanTextModule.RTChord):
+                    
+                    elif isinstance(a, romanTextModule.RTChord):
                         # use source to evaluation roman 
                         try:
                             rn = roman.RomanNumeral(a.src, copy.deepcopy(kCurrent))
@@ -536,7 +581,6 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

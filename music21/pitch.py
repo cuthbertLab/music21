@@ -2679,7 +2679,7 @@ class Pitch(music21.Music21Object):
         (<accidental natural>, True)
 
         >>> c = pitch.Pitch('a4')
-        >>> past = [pitch.Pitch('a3#'), pitch.Pitch('c#'), pitch.Pitch('c')]
+        >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
         >>> # will not add a natural because match is pitchSpace
         >>> c.updateAccidentalDisplay(past, cautionaryPitchClass=False)
         >>> c.accidental == None

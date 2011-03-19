@@ -35,6 +35,36 @@ environLocal = environment.Environment(_MOD)
 # store a cache of already-found values
 _sharpsToPitchCache = {}
 
+def convertKeyStringToMusic21KeyString(textString):
+    '''
+    Utility function to change strings in the form of "Eb" to
+    "E-" (for E-flat major) and leaves alone proper music21 strings
+    (like "E-" or "f#").  A little bit complex because of parsing
+    bb as B-flat minor and Bb as B-flat major.
+    
+    
+    >>> from music21 import *
+    >>> key.convertKeyStringToMusic21KeyString('Eb')
+    'E-'
+    >>> key.convertKeyStringToMusic21KeyString('f#')
+    'f#'
+    >>> key.convertKeyStringToMusic21KeyString('bb')
+    'b-'
+    >>> key.convertKeyStringToMusic21KeyString('Bb')
+    'B-'
+    >>> key.convertKeyStringToMusic21KeyString('b#')
+    'b#'
+    >>> key.convertKeyStringToMusic21KeyString('c')    
+    'c'
+    '''
+    if textString == 'bb':
+        textString = 'b-'
+    elif textString == 'Bb':
+        textString = 'B-'
+    elif textString.endswith('b') and not textString.startswith('b'):
+        textString = textString.rstrip('b') + '-'
+    return textString
+
 def sharpsToPitch(sharpCount):
     '''Given a number a positive/negative number of sharps, return a Pitch 
     object set to the appropriate major key value.
