@@ -424,7 +424,11 @@ class MidiEvent(object):
         self._parameter1 = value
 
     def _getPitch(self):
-        return self._parameter1
+        # only return pitch if this is note on /off
+        if self.type in ['NOTE_ON', 'NOTE_OFF']:
+            return self._parameter1
+        else:
+            return None
 
     pitch = property(_getPitch, _setPitch)
 
@@ -571,6 +575,7 @@ class MidiEvent(object):
             self.data = str[:length] 
             return str[length:]
 
+        # SEQUENCE_TRACK_NAME is here
         elif x == 0xFF: 
             #environLocal.printDebug(['MidiEvent.read(): got a variable length meta event', charToBinary(str[0])])
 
@@ -604,7 +609,7 @@ class MidiEvent(object):
             if self.type not in ['PROGRAM_CHANGE', 
                 'CHANNEL_KEY_PRESSURE']:
                 # this results in a two-part string, like '\x00\x00'
-                data = chr(self.pitch) + chr(self.velocity) 
+                data = chr(self._parameter1) + chr(self._parameter2) 
             else:  # all other messages
                 data = chr(self.data) 
             return x + data 

@@ -289,145 +289,145 @@ def convertFqToPs(fq):
     '''
     return 12 * (math.log(fq / 440.0) / math.log(2)) + 69   
 
-def convertMicrotoneToCents(value, acc=None):
-    '''Convert a variety of microtone representations into a numerical cents deviation value. Numerical values are treated like other alter values, where 1 is 1 half-step. An Accidental object, or string representation, may be provided with the `acc` argument. 
-
-    Returns None if no conversion is available. 
-
-    >>> from music21 import *
-    >>> convertMicrotoneToCents(.5) # numbers are half-step scalars
-    50.0
-    >>> convertMicrotoneToCents(-.5) # numbers are half-step scalars
-    -50.0
-    >>> convertMicrotoneToCents('(+20)') # strings are cents
-    20.0
-    >>> convertMicrotoneToCents('20.53') # strings are cents
-    20.53...
-    >>> convertMicrotoneToCents('-20') # strings are cents
-    -20.0
-
-    >>> convertMicrotoneToCents('25', '#') # providing an accidental
-    125.0
-    >>> convertMicrotoneToCents('25', '-') 
-    -75.0
-    >>> convertMicrotoneToCents('-25', '-') 
-    -125.0
-    >>> convertMicrotoneToCents('-25', '##')
-    175.0
-    >>> convertMicrotoneToCents('-50', '~')  # negates to zero
-    0.0
-    >>> convertMicrotoneToCents('50', '`')  # negates to zero
-    0.0
-
-    '''
-    # if a number, assume that the number is halfsteps
-    # this is consistent with other accidental notations, where
-    # .5 is a quarter tone
-    if acc is not None:
-        if common.isStr(acc):
-            acc = Accidental(acc)
-
-    centValue = None
-    if common.isNum(value):
-        # these are practical, though not necessary, limits,
-        # from -300 to 300 cents
-        if value < -3 or value > 3:
-            return None 
-        centValue = value * 100
-    elif common.isStr(value) and len(value) > 0:
-        # strip any delimiters
-        value = value.replace(MICROTONE_OPEN, '')
-        value = value.replace(MICROTONE_CLOSE, '')
-
-        if value[0] in ['+'] or value[0].isdigit():
-            # positive cent representation
-            num, junk = common.getNumFromStr(value, numbers='0123456789.')
-            if num == '':
-                return None
-            else:
-                centValue = float(num)
-        elif value[0] in ['-']:
-            num, junk = common.getNumFromStr(value[1:], numbers='0123456789.')
-            centValue = float(num) * -1
-
-    if centValue is not None:
-        if acc is None:
-            return centValue
-        else: # add accidental difference
-            return centValue + (acc.alter * 100)
-    return None # no conversions are available
-
-def convertMicrotoneToCentsStr(value, roundedDigits=1):
-    '''Provide a string representation for a microtone expressed in cents, with a mandatory +/- sign used to show that this a cent notation.
-
-    Numerical values are treated like other alter values, where 1 is 1 half-step. 
-
-    >>> from music21 import *
-    >>> pitch.convertMicrotoneToCentsStr('0.0')
-    '+0'
-    >>> pitch.convertMicrotoneToCentsStr('20')
-    '+20'
-    >>> pitch.convertMicrotoneToCentsStr('20.2')
-    '+20.2'
-    >>> pitch.convertMicrotoneToCentsStr('20.25')
-    '+20.3'
-    >>> pitch.convertMicrotoneToCentsStr('-20')
-    '-20'
-    >>> pitch.convertMicrotoneToCentsStr('-20.2')
-    '-20.2'
-    >>> pitch.convertMicrotoneToCentsStr('-20.25')
-    '-20.3'
-
-    >>> pitch.convertMicrotoneToCentsStr(.5)
-    '+50'
-    >>> pitch.convertMicrotoneToCentsStr(.25)
-    '+25'
-
-    '''
-    # do not pass accidental to conversion, as, for display, we want the value
-    # cent deviation without the additional change of the accidental
-    centNumber = convertMicrotoneToCents(value)
-    if centNumber is None:
-        return None
-    # get floating-point portion
-    centInt, centDecimal = divmod(centNumber, 1)
-    if centDecimal == 0:
-        num = int(centInt)
-    else: # what to round to?
-        num = float(round(centNumber, roundedDigits))
-
-    if centNumber >= 0:
-        return '+%s' % num
-    elif centNumber < 0:
-        # negative sign will automatically be included
-        return '%s' % num
-
-def convertCentsToAlter(value, acc=None):
-    '''Given a numerical or string cents value, expressed as string or a number, return a floating point alter value, where 1 is 1 half-step.
-
-    >>> from music21 import *
-    >>> pitch.convertCentsToAlter('+50')
-    0.5...
-    >>> pitch.convertCentsToAlter('+1')
-    0.01...
-    >>> pitch.convertCentsToAlter('-50')
-    -0.5...
-    >>> pitch.convertCentsToAlter(-50) # numerical values are treated as alters
-    -0.5...
-
-    >>> pitch.convertCentsToAlter('-25', '-') # passing an accidental as well
-    -1.25
-    >>> pitch.convertCentsToAlter('-25', '##') # passing an accidental as well
-    1.75
-
-    '''
-    # this function handles strings and returns a numerical value
-    if common.isStr(value):
-        # may return None
-        value = convertMicrotoneToCents(value, acc=acc)
-        if value is None:
-            return value
-    return value * .01
+# def convertMicrotoneToCents(value, acc=None):
+#     '''Convert a variety of microtone representations into a numerical cents deviation value. Numerical values are treated like other alter values, where 1 is 1 half-step. An Accidental object, or string representation, may be provided with the `acc` argument. 
+# 
+#     Returns None if no conversion is available. 
+# 
+#     >>> from music21 import *
+#     >>> convertMicrotoneToCents(.5) # numbers are half-step scalars
+#     50.0
+#     >>> convertMicrotoneToCents(-.5) # numbers are half-step scalars
+#     -50.0
+#     >>> convertMicrotoneToCents('(+20)') # strings are cents
+#     20.0
+#     >>> convertMicrotoneToCents('20.53') # strings are cents
+#     20.53...
+#     >>> convertMicrotoneToCents('-20') # strings are cents
+#     -20.0
+# 
+#     >>> convertMicrotoneToCents('25', '#') # providing an accidental
+#     125.0
+#     >>> convertMicrotoneToCents('25', '-') 
+#     -75.0
+#     >>> convertMicrotoneToCents('-25', '-') 
+#     -125.0
+#     >>> convertMicrotoneToCents('-25', '##')
+#     175.0
+#     >>> convertMicrotoneToCents('-50', '~')  # negates to zero
+#     0.0
+#     >>> convertMicrotoneToCents('50', '`')  # negates to zero
+#     0.0
+# 
+#     '''
+#     # if a number, assume that the number is halfsteps
+#     # this is consistent with other accidental notations, where
+#     # .5 is a quarter tone
+#     if acc is not None:
+#         if common.isStr(acc):
+#             acc = Accidental(acc)
+# 
+#     centValue = None
+#     if common.isNum(value):
+#         # these are practical, though not necessary, limits,
+#         # from -300 to 300 cents
+#         if value < -3 or value > 3:
+#             return None 
+#         centValue = value * 100
+#     elif common.isStr(value) and len(value) > 0:
+#         # strip any delimiters
+#         value = value.replace(MICROTONE_OPEN, '')
+#         value = value.replace(MICROTONE_CLOSE, '')
+# 
+#         if value[0] in ['+'] or value[0].isdigit():
+#             # positive cent representation
+#             num, junk = common.getNumFromStr(value, numbers='0123456789.')
+#             if num == '':
+#                 return None
+#             else:
+#                 centValue = float(num)
+#         elif value[0] in ['-']:
+#             num, junk = common.getNumFromStr(value[1:], numbers='0123456789.')
+#             centValue = float(num) * -1
+# 
+#     if centValue is not None:
+#         if acc is None:
+#             return centValue
+#         else: # add accidental difference
+#             return centValue + (acc.alter * 100)
+#     return None # no conversions are available
+# 
+# def convertMicrotoneToCentsStr(value, roundedDigits=1):
+#     '''Provide a string representation for a microtone expressed in cents, with a mandatory +/- sign used to show that this a cent notation.
+# 
+#     Numerical values are treated like other alter values, where 1 is 1 half-step. 
+# 
+#     >>> from music21 import *
+#     >>> pitch.convertMicrotoneToCentsStr('0.0')
+#     '+0'
+#     >>> pitch.convertMicrotoneToCentsStr('20')
+#     '+20'
+#     >>> pitch.convertMicrotoneToCentsStr('20.2')
+#     '+20.2'
+#     >>> pitch.convertMicrotoneToCentsStr('20.25')
+#     '+20.3'
+#     >>> pitch.convertMicrotoneToCentsStr('-20')
+#     '-20'
+#     >>> pitch.convertMicrotoneToCentsStr('-20.2')
+#     '-20.2'
+#     >>> pitch.convertMicrotoneToCentsStr('-20.25')
+#     '-20.3'
+# 
+#     >>> pitch.convertMicrotoneToCentsStr(.5)
+#     '+50'
+#     >>> pitch.convertMicrotoneToCentsStr(.25)
+#     '+25'
+# 
+#     '''
+#     # do not pass accidental to conversion, as, for display, we want the value
+#     # cent deviation without the additional change of the accidental
+#     centNumber = convertMicrotoneToCents(value)
+#     if centNumber is None:
+#         return None
+#     # get floating-point portion
+#     centInt, centDecimal = divmod(centNumber, 1)
+#     if centDecimal == 0:
+#         num = int(centInt)
+#     else: # what to round to?
+#         num = float(round(centNumber, roundedDigits))
+# 
+#     if centNumber >= 0:
+#         return '+%s' % num
+#     elif centNumber < 0:
+#         # negative sign will automatically be included
+#         return '%s' % num
+# 
+# def convertCentsToAlter(value, acc=None):
+#     '''Given a numerical or string cents value, expressed as string or a number, return a floating point alter value, where 1 is 1 half-step.
+# 
+#     >>> from music21 import *
+#     >>> pitch.convertCentsToAlter('+50')
+#     0.5...
+#     >>> pitch.convertCentsToAlter('+1')
+#     0.01...
+#     >>> pitch.convertCentsToAlter('-50')
+#     -0.5...
+#     >>> pitch.convertCentsToAlter(-50) # numerical values are treated as alters
+#     -0.5...
+# 
+#     >>> pitch.convertCentsToAlter('-25', '-') # passing an accidental as well
+#     -1.25
+#     >>> pitch.convertCentsToAlter('-25', '##') # passing an accidental as well
+#     1.75
+# 
+#     '''
+#     # this function handles strings and returns a numerical value
+#     if common.isStr(value):
+#         # may return None
+#         value = convertMicrotoneToCents(value, acc=acc)
+#         if value is None:
+#             return value
+#     return value * .01
 
 
 def convertHarmonicToCents(value):
@@ -435,6 +435,8 @@ def convertHarmonicToCents(value):
     
     >>> convertHarmonicToCents(8)
     3600
+    >>> [convertHarmonicToCents(x) for x in [5, 6, 7, 8]]
+    [2786, 3102, 3369, 3600]
     >>> [convertHarmonicToCents(x) for x in [16, 17, 18, 19]]
     [4800, 4905, 5004, 5098]
 
@@ -549,21 +551,96 @@ class Microtone(object):
     20
     >>> m.alter
     0.200...
-    '''
-    validHarmonics = range(1, 32)
+    >>> m
+    (+20c)
+    >>> m.harmonicShift = 3
+    >>> m
+    (+20c+3rdH)
+    >>> m.cents
+    1922
+    >>> m.alter
+    19.2...
 
-    def __init__(self, cents=0):
-        self._centShift = cents # specify harmonic in cents
+    >>> m = Microtone('(-33.333333)')
+    >>> m
+    (-33c)
+    >>> m = Microtone('33.333333')
+    >>> m
+    (+33c)
+    >>> m.alter
+    0.3333...
+    '''
+    _validHarmonics = range(1, 32)
+
+    def __init__(self, centsOrString=0):
+
+        self._centShift = 0
         self._harmonicShift = 1 # the first harmonic is the start
 
-    def _setHarmonic(self, value):
-        if value not in validHarmonics:
+        if common.isNum(centsOrString):
+            self._centShift = centsOrString # specify harmonic in cents
+        else:
+            self._parseString(centsOrString)
+
+
+    def _parseString(self, value):
+        '''Parse a string representation.
+        '''
+        # strip any delimiters
+        value = value.replace(MICROTONE_OPEN, '')
+        value = value.replace(MICROTONE_CLOSE, '')
+
+        # need to look for and split off harmonic definitions
+
+        if value[0] in ['+'] or value[0].isdigit():
+            # positive cent representation
+            num, junk = common.getNumFromStr(value, numbers='0123456789.')
+            if num == '':
+                raise MicrotoneException('no numbers found in string value: %s' % value)
+            else:
+                centValue = float(num)
+        elif value[0] in ['-']:
+            num, junk = common.getNumFromStr(value[1:], numbers='0123456789.')
+            centValue = float(num) * -1
+        
+        self._centShift = centValue
+
+
+    def __repr__(self):
+        '''Return a string representation
+        '''
+        # cent values may be of any resolution, but round to nearest int
+        
+        if self._centShift >= 0:
+            sub = '+%sc' % int(round(self._centShift))
+        elif self._centShift < 0:
+            sub = '%sc' % int(round(self._centShift))
+
+        # only show a harmonic if present
+        if self._harmonicShift != 1:
+            sub += '+%s%sH' % (self._harmonicShift,
+                            common.ordinalAbbreviation(self._harmonicShift))
+        return '%s%s%s' % (MICROTONE_OPEN, sub, MICROTONE_CLOSE)
+
+
+
+
+    def _getHarmonicShift(self):
+        return self._harmonicShift
+
+    def _setHarmonicShift(self, value):
+        if value not in self._validHarmonics:
             raise MicrotoneException('not a valud harmonic: %s' % value)
         self._harmonicShift = value
 
+    harmonicShift = property(_getHarmonicShift, _setHarmonicShift, 
+        doc = '''Set or get the harmonic shift.
+        ''')
+
+
 
     def _getCents(self):
-        '''Return the value as an alter value, where 1 is 1 half step.
+        '''Return the cents.
         '''
         return convertHarmonicToCents(self._harmonicShift) + self._centShift
 

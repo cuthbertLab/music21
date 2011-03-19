@@ -7731,13 +7731,6 @@ class PartStaff(Part):
 
 
 
-# class Staff(Stream):
-#     '''
-#     A Stream subclass for designating music on a single staff
-#     '''
-#     # NOTE: not yet implemented
-#     staffLines = 5
-# 
 # 
 # class Performer(Stream):
 #     '''
