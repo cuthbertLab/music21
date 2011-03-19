@@ -721,7 +721,8 @@ def getWork(workName, movementNumber=None, extList=None):
         return post
 
 
-def parseWork(workName, movementNumber=None, number=None, 
+
+def parse(workName, movementNumber=None, number=None, 
     extList=None, forceSource=False):
     '''Search the corpus, then the virtual corpus, for a work, and return a parsed :class:`music21.stream.Stream`.
 
@@ -750,6 +751,11 @@ def parseWork(workName, movementNumber=None, number=None,
       
     return converter.parse(fp, forceSource=forceSource, number=number)
 
+
+def parseWork(*arguments, **keywords):
+    '''This function exists for backwards compatibility. All calls should use :func:`~music21.corpus.parse` instead.
+    '''
+    return parse(*arguments, **keywords)
 
 
 #-------------------------------------------------------------------------------
@@ -1019,7 +1025,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [parseWork, getWork]
+_DOC_ORDER = [parse, parseWork, getWork]
 
 
 if __name__ == "__main__":
