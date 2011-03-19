@@ -448,13 +448,27 @@ class MidiEvent(object):
 
 
     def setPitchBend(self, cents, bendRange=2):
-        '''Treat this event as a pitch bend value, and set the ._parameter1 and ._parameter2 fields appropriately given a specified bend range
+        '''Treat this event as a pitch bend value, and set the ._parameter1 and ._parameter2 fields appropriately given a specified bend value in cents.
     
         The `bendRange` parameter gives the number of half steps in the bend range.
 
         >>> mt = MidiTrack(1)
         >>> me1 = MidiEvent(mt)
-
+        >>> me1.setPitchBend(50)
+        >>> me1._parameter1, me1._parameter2
+        (0, 80)
+        >>> me1.setPitchBend(100)
+        >>> me1._parameter1, me1._parameter2
+        (0, 96)
+        >>> me1.setPitchBend(200)
+        >>> me1._parameter1, me1._parameter2
+        (127, 127)
+        >>> me1.setPitchBend(-50)
+        >>> me1._parameter1, me1._parameter2
+        (0, 48)
+        >>> me1.setPitchBend(-100)
+        >>> me1._parameter1, me1._parameter2
+        (0, 32)
         '''
         # value range is 0, 16383
         # center should be 8192
@@ -464,10 +478,10 @@ class MidiEvent(object):
         bottomSpan = center
 
         if cents > 0:
-            shiftScalar = cents / centRange
+            shiftScalar = cents / float(centRange)
             shift = int(round(shiftScalar * topSpan))
         elif cents < 0:
-            shiftScalar = cents / centRange # will be negative
+            shiftScalar = cents / float(centRange) # will be negative
             shift = int(round(shiftScalar * bottomSpan)) # will be negative
         else: # cents is zero
             shift = 0
@@ -475,16 +489,19 @@ class MidiEvent(object):
 
         # produce a two-char value
         charValue = putVariableLengthNumber(target)
-        environLocal.printDebug(['got target char value', charValue, 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0]])
-
         d1, junk = getNumber(charValue[0], 1)
+        # need to convert from 8 bit to 7, so using & 0x7F
+        d1 = d1 & 0x7F
         if len(charValue) > 1:
             d2, junk = getNumber(charValue[1], 1)
+            d2 = d2 & 0x7F
         else:
             d2 = 0
 
+        #environLocal.printDebug(['got target char value', charValue, 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0], 'd1', d1, 'd2', d2,])
+
         self._parameter1 = d2
-        self._parameter2 = d1
+        self._parameter2 = d1 # d1 is msb here
         
 
 
@@ -509,7 +526,7 @@ class MidiEvent(object):
         if channelVoiceMessages.hasValue(y): 
             self.channel = (x & 0x0F) + 1  # this is same as y + 1
             self.type = channelVoiceMessages.whatis(y) 
-            environLocal.printDebug(['MidiEvent.read()', self.type])
+            #environLocal.printDebug(['MidiEvent.read()', self.type])
             if (self.type == "PROGRAM_CHANGE" or 
                 self.type == "CHANNEL_KEY_PRESSURE"): 
                 self.data = z 
@@ -555,7 +572,7 @@ class MidiEvent(object):
             return str[length:]
 
         elif x == 0xFF: 
-            environLocal.printDebug(['MidiEvent.read(): got a variable length meta event', charToBinary(str[0])])
+            #environLocal.printDebug(['MidiEvent.read(): got a variable length meta event', charToBinary(str[0])])
 
             if not metaEvents.hasValue(z): 
                 environLocal.printDebug(["unknown meta event: FF %02X" % z])
@@ -582,7 +599,7 @@ class MidiEvent(object):
         if channelVoiceMessages.hasattr(self.type): 
             x = chr((self.channel - 1) + 
                     getattr(channelVoiceMessages, self.type)) 
-            environLocal.printDebug(['writing channelVoiceMessages', self.type])
+            #environLocal.printDebug(['writing channelVoiceMessages', self.type])
             # for writing note-on/note-off
             if self.type not in ['PROGRAM_CHANGE', 
                 'CHANNEL_KEY_PRESSURE']:
@@ -1233,10 +1250,12 @@ class Test(unittest.TestCase):
 
             
 #(0 - 16383). The pitch value affects all playing notes on the current channel. Values below 8192 decrease the pitch, while values above 8192 increase the pitch. The pitch range may vary from instrument to instrument, but is usually +/-2 semi-tones.
-        pbValues = [64, 84, 44, 64]
+        #pbValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50] 
+        pbValues = [0, 25, 0, 50, 0, 100, 0, 150, 0, 200] 
+        pbValues += [-x for x in pbValues]
 
         # duration, pitch, velocity
-        data = [[1024, 60, 90], [1024, 60, 120], [1024, 60, 120], [1024, 60, 90]]
+        data = [[1024, 60, 90]] * 20
         t = 0
         tLast = 0
         for i, e in enumerate(data):
@@ -1247,13 +1266,11 @@ class Test(unittest.TestCase):
             # add to track events
             mt.events.append(dt)
 
-
             me = MidiEvent(mt, type="PITCH_BEND", channel=1)
+            #environLocal.printDebug(['creating event:', me, 'pbValues[i]', pbValues[i]])
             me.time = None #d
-            me.pitch = 0
-            me.velocity = pbValues[i] # msb
+            me.setPitchBend(pbValues[i]) # set values in cents
             mt.events.append(me)
-
 
             dt = DeltaTime(mt)
             dt.time = t - tLast
@@ -1292,7 +1309,7 @@ class Test(unittest.TestCase):
         me.data = '' # must set data to empty string
         mt.events.append(me)
 
-        # try setting differen channels
+        # try setting different channels
         mt.setChannel(3)
 
         mf = MidiFile()
@@ -1300,11 +1317,11 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
         
-        #fileLikeOpen = StringIO.StringIO()
+        fileLikeOpen = StringIO.StringIO()
         #mf.open('/_scratch/test.mid', 'wb')
-        #mf.openFileLike(fileLikeOpen)
-        #mf.write()
-        #mf.close()
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
 
 
 #-------------------------------------------------------------------------------
