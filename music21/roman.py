@@ -817,11 +817,11 @@ class Test(unittest.TestCase):
         s4 = copy.deepcopy(s)
         self.assertEqual(len(s4.flat.getElementsByClass('KeySignature')), targetCount)
         for c in s4._yieldElementsDownward(excludeNonContainers=False):
-            environLocal.printDebug(['s4: found', c])
-            for e in getElementsByClass('KeySignature'):
-                c.remove(e)
+            if 'Stream' in c.classes:
+                for e in c.getElementsByClass('KeySignature'):
+                    c.remove(e)
             
-        s4.show()
+        #s4.show()
 
 #             if 'KeySignature' in e.classes:
 #                 environLocal.printDebug(['s3: found for removal', e])
