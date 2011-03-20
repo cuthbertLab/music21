@@ -582,6 +582,9 @@ class Microtone(object):
         else:
             self._parseString(centsOrString)
 
+        # need to additional store a reference to a position in a 
+        # another pitches overtone series? 
+        # such as: A4(+69c [7thH/C3])?
 
     def _parseString(self, value):
         '''Parse a string representation.

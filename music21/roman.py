@@ -801,14 +801,13 @@ class Test(unittest.TestCase):
                     site.remove(e)
         #s2.show()
 
-
         # yield elements and containers
         s3 = copy.deepcopy(s)
         self.assertEqual(len(s3.flat.getElementsByClass('KeySignature')), targetCount)
 
-        for e in s3._yieldElementsDownward(excludeNonContainers=True):
+        for e in s3._yieldElementsDownward(streamsOnly=True):
             if 'KeySignature' in e.classes:
-                # all active sites are None; 
+                # all active sites are None because of deep-copying
                 if e.activeSite is not None:                
                     e.activeSite.remove(e)
         #s3.show()
@@ -816,18 +815,39 @@ class Test(unittest.TestCase):
         # yield containers
         s4 = copy.deepcopy(s)
         self.assertEqual(len(s4.flat.getElementsByClass('KeySignature')), targetCount)
-        for c in s4._yieldElementsDownward(excludeNonContainers=False):
+        for c in s4._yieldElementsDownward(streamsOnly=False):
             if 'Stream' in c.classes:
                 for e in c.getElementsByClass('KeySignature'):
                     c.remove(e)
-            
-        #s4.show()
 
-#             if 'KeySignature' in e.classes:
-#                 environLocal.printDebug(['s3: found for removal', e])
-#                 if 
-#                 e.activeSite.remove(e)
-# 
+
+    def testYieldRemoveB(self):
+        from music21 import stream, note, corpus
+
+        m = stream.Measure()
+        m.append(key.KeySignature(4))
+        m.append(note.Note())
+        p = stream.Part()
+        p.append(m)
+        s = stream.Score()
+        s.append(p)
+
+        #s = corpus.parse('madrigal.3.1.rntxt')
+
+        for e in s._yieldElementsDownward(streamsOnly=False):
+            environLocal.printDebug(['activeSite:', e, e.activeSite])
+
+            if 'KeySignature' in e.classes:
+                if e.activeSite is None:
+                    pass
+                else:
+                    e.activeSite.remove(e)
+
+        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
+
+
+        #s3.show()
+
 
 
 _DOC_ORDER = [RomanNumeral, fromChordAndKey]
