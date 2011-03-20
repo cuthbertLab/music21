@@ -755,6 +755,9 @@ def parse(workName, movementNumber=None, number=None,
 def parseWork(*arguments, **keywords):
     '''This function exists for backwards compatibility. All calls should use :func:`~music21.corpus.parse` instead.
     '''
+    import warnings
+    #raise DeprecationWarning('the corpus.parseWork() function is depcreciated: use corpus.parse()')
+    warnings.warn('the corpus.parseWork() function is depcreciated: use corpus.parse()', DeprecationWarning)
     return parse(*arguments, **keywords)
 
 
@@ -985,7 +988,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(getWorkList('handel/hwv56', (1,1), '.md')), 1)
 
         self.assertEqual(len(getWorkList('handel/hwv56', '1-01', '.md')), 1)
-
 
         self.assertEqual(len(getWorkList('bach/bwv1080')), 21)
 
