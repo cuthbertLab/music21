@@ -1764,7 +1764,7 @@ class Music21Object(JSONSerializer):
         >>> a.addLocation(aSite, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
-        
+        30
         '''
         return self._definedContexts.setOffsetBySite(site, value)
 
