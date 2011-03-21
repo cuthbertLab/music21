@@ -5017,12 +5017,28 @@ class Stream(music21.Music21Object):
         ''')
 
 
-    def _yieldElementsDownward(self, streamsOnly=False, restoreActiveSites=True):
+    def _yieldElementsDownward(self, streamsOnly=False, 
+            restoreActiveSites=True, classFilter=[]):
         '''Yield all containers (Stream subclasses), including self, and going downward.
         '''
+        def isOfClass(e, classes):
+            if not common.isListLike(classes):
+                classes = [classes]
+            eClasses = e.classes # store once, as this is property call
+            for className in classes:
+                if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
+                    return True
+            return False
+
         #environLocal.printDebug(['_yieldElementsDownward', 'self', self, 'self.activeSite', self.activeSite])
-        # TODO: may need to get _endElements too
-        yield self
+
+        # TODO: need to get _endElements too
+
+        if len(classFilter) > 0:
+            if isOfClass(self, classFilter):
+                yield self
+        else:
+            yield self
         # using indices so as to not to create an iterator and new locations/activeSites
         for i in range(len(self._elements)):
             # not using __getitem__, also to avoid new locations/activeSites
@@ -5038,21 +5054,35 @@ class Stream(music21.Music21Object):
             if hasattr(e, 'elements'):
                 # this returns a generator, so need to iterate over it
                 # to get results
-                for y in e._yieldElementsDownward(streamsOnly=streamsOnly):
-                    yield y
+                for y in e._yieldElementsDownward(streamsOnly=streamsOnly, restoreActiveSites=restoreActiveSites, classFilter=classFilter):
+                    #yield y
+                    if len(classFilter) > 0:
+                        if isOfClass(y, classFilter):
+                            yield y
+                    else:
+                        yield y
+
             # its an element on the Stream that is not a Stream
             else:
                 if not streamsOnly:
                     #environLocal.printDebug(['_yieldElementsDownward', 'e', e, 'e.activeSite', e.activeSite,]) #'e.getSites()', e.getSites()])
-                    yield e
+                    #yield e
+                    if len(classFilter) > 0:
+                        if isOfClass(e, classFilter):
+                            yield e
+                    else:
+                        yield e
 
 
-    def _yieldElementsUpward(self, memo, streamsOnly=True, 
-                             skipDuplicates=True):
+    def _yieldElementsUpward(self, memo, streamsOnly=False, 
+                             skipDuplicates=True, classFilter=[]):
         '''Yield all containers (Stream subclasses), including self, and going upward.
 
         Note: on first call, a new, fresh memo list must be provided; otherwise, values are retained from one call to the next.
         '''
+        # TODO: add support for filter list
+        # TODO: add add end elements
+
         if id(self) not in memo:
             yield self
             #environLocal.printDebug(['memoing:', self, memo])
@@ -5090,7 +5120,7 @@ class Stream(music21.Music21Object):
                     # e.activeSite will be yielded at top of recurse
                     for y in e.activeSite._yieldElementsUpward(memo,
                             skipDuplicates=skipDuplicates, 
-                            streamsOnly=streamsOnly):
+                            streamsOnly=streamsOnly, classFilter=classFilter):
                         yield y
                     # here, we have found a container at the same level of
                     # the caller; since it is a Stream, we yield
@@ -5100,6 +5130,23 @@ class Stream(music21.Music21Object):
                             yield e
                             if skipDuplicates:
                                 memo.append(id(e))
+
+    def recurse(self, direction='downward', streamsOnly=False, 
+        restoreActiveSites=True, skipDuplicates=True, classFilter=[]):
+        '''Return a list of all Music21Objects, starting with self, continuing with self's elements, and whenever finding a Stream subclass in self, that Stream subclasse's elements. 
+        '''
+        if direction in ['downward']:
+            return [e for e in         
+                self._yieldElementsDownward(streamsOnly=streamsOnly,     
+                restoreActiveSites=restoreActiveSites, 
+                classFilter=classFilter)]
+        elif direction in ['upward']:
+            return [e for e in         
+                self._yieldElementsUpward([], streamsOnly=streamsOnly,     
+                skipDuplicates=skipDuplicates, 
+                classFilter=classFilter)]
+        else:
+            raise StreamException('no such direction: %s' % direction)
 
     #---------------------------------------------------------------------------
     # duration and offset methods and properties
@@ -11309,7 +11356,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['upward, with skipDuplicates:'])
         match = []
         # must provide empty list for memo
-        for x in s7._yieldElementsUpward([], skipDuplicates=True):
+        for x in s7._yieldElementsUpward([], streamsOnly=True, skipDuplicates=True):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
@@ -11317,7 +11364,7 @@ class Test(unittest.TestCase):
 
         #environLocal.printDebug(['upward from a single node, with skipDuplicates'])
         match = []
-        for x in s10._yieldElementsUpward([]):
+        for x in s10._yieldElementsUpward([], streamsOnly=True):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
 
@@ -11326,7 +11373,7 @@ class Test(unittest.TestCase):
 
         #environLocal.printDebug(['upward with skipDuplicates=False:'])
         match = []
-        for x in s10._yieldElementsUpward([], skipDuplicates=False):
+        for x in s10._yieldElementsUpward([], streamsOnly=True, skipDuplicates=False):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
@@ -13533,6 +13580,55 @@ class Test(unittest.TestCase):
         self.assertEqual(id(rn1.activeSite), id(m1))
         self.assertEqual(id(m1.activeSite), id(p1))
         self.assertEqual(id(p1.activeSite), id(s1))
+
+
+    def testRecurseA(self):
+        from music21 import corpus
+        s = corpus.parse('bwv66.6')
+        # default
+        rElements = s.recurse()
+        self.assertEqual(len(rElements), 235)
+
+        rElements = s.recurse(streamsOnly=True)
+        self.assertEqual(len(rElements), 45)
+
+        s1 = rElements[0]
+        p1 = rElements[1]
+        m1 = rElements[2]
+        m2 = rElements[3]
+        m2 = rElements[4]
+        self.assertEqual(id(p1.activeSite), id(s1))
+        self.assertEqual(id(m1.activeSite), id(p1))
+        self.assertEqual(id(m2.activeSite), id(p1))
+
+
+        rElements = s.recurse(classFilter='KeySignature')
+        self.assertEqual(len(rElements), 4)
+        # the first elements active site is the measure
+        self.assertEqual(id(rElements[0].activeSite), id(m1))
+
+        rElements = s.recurse(classFilter=['TimeSignature'])
+        self.assertEqual(len(rElements), 4)
+
+
+        s = corpus.parse('bwv66.6')
+        m1 = s[1][1]
+        rElements = m1.recurse(direction='upward')
+        self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 'Instrument', 'Part', 'Score', 'Part', 'Part', 'Part', 'Metadata', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure'])
+        self.assertEqual(len(rElements), 17)
+
+
+
+    def testRecurseB(self):
+        from music21 import corpus
+
+        s = corpus.parse('madrigal.5.8.rntxt')
+        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 1)
+        for e in s.recurse(classFilter='KeySignature'):
+            e.activeSite.remove(e)
+        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
+
+
 
 
 #-------------------------------------------------------------------------------
