@@ -1297,6 +1297,7 @@ class Stream(music21.Music21Object):
         # call this is elements are now out of order
         self._elementsChanged()         
 
+        
 
 #     def isClass(self, className):
 #         '''Returns true if the Stream or Stream Subclass is a particular class or subclasses that class.
@@ -4058,9 +4059,7 @@ class Stream(music21.Music21Object):
                 lastTimeSignature = m.timeSignature
             if lastTimeSignature is None:
                 raise StreamException('cannot proces beams in a Measure without a time signature')
-
             #environLocal.printDebug(['makeBeams(): lastTimeSignature', lastTimeSignature])
-
             noteGroups = []
             if m.hasVoices():
                 for v in m.voices:
@@ -4229,7 +4228,7 @@ class Stream(music21.Music21Object):
         addAlteredPitches = []
         if isinstance(useKeySignature, key.KeySignature):
             addAlteredPitches = useKeySignature.alteredPitches
-        elif useKeySignature == True: # get from defined contexts
+        elif useKeySignature is True: # get from defined contexts
             # will search local, then activeSite
             ksStream = self.getKeySignatures(
                 searchContext=searchKeySignatureByContext) 
@@ -4237,6 +4236,7 @@ class Stream(music21.Music21Object):
                 # assume we want the first found; in some cases it is possible
                 # that this may not be true
                 addAlteredPitches = ksStream[0].alteredPitches
+
         alteredPitches += addAlteredPitches
         #environLocal.printDebug(['processing makeAccidentals() with alteredPitches:', alteredPitches])
 
@@ -5017,9 +5017,10 @@ class Stream(music21.Music21Object):
         ''')
 
 
-    def _yieldElementsDownward(self, streamsOnly=True):
+    def _yieldElementsDownward(self, streamsOnly=False, restoreActiveSites=True):
         '''Yield all containers (Stream subclasses), including self, and going downward.
         '''
+        #environLocal.printDebug(['_yieldElementsDownward', 'self', self, 'self.activeSite', self.activeSite])
         # TODO: may need to get _endElements too
         yield self
         # using indices so as to not to create an iterator and new locations/activeSites
@@ -5030,6 +5031,10 @@ class Stream(music21.Music21Object):
             except IndexError:
                 # this may happen in the number of elements has changed
                 continue
+
+            if restoreActiveSites:
+                e.activeSite = self
+
             if hasattr(e, 'elements'):
                 # this returns a generator, so need to iterate over it
                 # to get results
@@ -5038,6 +5043,7 @@ class Stream(music21.Music21Object):
             # its an element on the Stream that is not a Stream
             else:
                 if not streamsOnly:
+                    #environLocal.printDebug(['_yieldElementsDownward', 'e', e, 'e.activeSite', e.activeSite,]) #'e.getSites()', e.getSites()])
                     yield e
 
 
@@ -7703,12 +7709,14 @@ class Part(Stream):
         a past Measure to each new measure for processing. 
 
         '''
+        #TODO: inPlace=False will not work as expected here
+
         # process make accidentals for each measure
         measureStream = self.getElementsByClass('Measure')
         ksLast = None
         for i in range(len(measureStream)):
             m = measureStream[i]
-            if m.keySignature != None:
+            if m.keySignature is not None:
                 ksLast = m.keySignature
             # if beyond the first measure, use the pitches from the last
             # measure for context
@@ -7724,7 +7732,6 @@ class Part(Stream):
                     inPlace = inPlace,
                     overrideStatus = overrideStatus,
                     cautionaryNotImmediateRepeat = cautionaryNotImmediateRepeat)
-            
 
     def _getLily(self):
         lv = Stream._getLily(self)
@@ -11278,7 +11285,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['downward:'])
 
         match = []
-        for x in s1._yieldElementsDownward():
+        for x in s1._yieldElementsDownward(streamsOnly=True):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['1a', '2a', '3a', '3b', '3c', '2b', '3d', '3e', '2c', '3f'])

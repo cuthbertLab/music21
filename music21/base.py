@@ -2148,12 +2148,14 @@ class Music21Object(JSONSerializer):
         if WEAKREF_ACTIVE:
             if self._activeSite is None: #leave None
                 return self._activeSite
-            else: # even if current activeSite is not a weakref, this= will work
+            else: # even if current activeSite is not a weakref, this will work
+                #environLocal.printDebug(['_getActiveSite() called:', 'self._activeSite', self._activeSite])
                 return common.unwrapWeakref(self._activeSite)
         else:
             return self._activeSite
     
     def _setActiveSite(self, site):
+        #environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
         siteId = None
         if site != None: 
             siteId = id(site)

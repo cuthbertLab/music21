@@ -836,17 +836,30 @@ class Test(unittest.TestCase):
 
         for e in s._yieldElementsDownward(streamsOnly=False):
             environLocal.printDebug(['activeSite:', e, e.activeSite])
-
             if 'KeySignature' in e.classes:
-                if e.activeSite is None:
-                    pass
-                else:
-                    e.activeSite.remove(e)
+                e.activeSite.remove(e)
 
         self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
 
 
-        #s3.show()
+    def testYieldRemoveC(self):
+        from music21 import stream, note, corpus
+
+        s = corpus.parse('madrigal.5.8.rntxt')
+        # first measure's active site is the Part
+        self.assertEqual(id(s[1][0].activeSite), id(s[1]))
+        # first rn's active site is the Measure
+        self.assertEqual(id(s[1][0][2].activeSite), id(s[1][0]))
+        self.assertEqual(id(s[1][0][3].activeSite), id(s[1][0]))
+
+        self.assertEqual(s[1][0] in s[1][0][3].getSites(), True)
+
+
+        for e in s._yieldElementsDownward(streamsOnly=False):
+            if 'KeySignature' in e.classes:
+                e.activeSite.remove(e)
+
+        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
 
 
 

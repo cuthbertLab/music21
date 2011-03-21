@@ -33,6 +33,7 @@ def _copySingleMeasure(t, p, kCurrent):
     '''Given a RomanText token, a Part used as the current container, and the current Key, return a Measure copied from the past of the Part. 
     '''
     # copy from a past location; need to change key
+    #environLocal.printDebug(['calling _copySingleMeasure()'])
     targetNumber, targetRepeat = t.getCopyTarget()
     if len(targetNumber) > 1: # this is an encoding error
         raise TranslateRomanTextException('a single measure cannot define a copy operation for multiple measures')
@@ -55,6 +56,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
     '''
     from music21 import stream
     # the key provided needs to be the current key
+    #environLocal.printDebug(['calling _copyMultipleMeasures()'])
 
     targetNumbers, targetRepeat = t.getCopyTarget()
     if len(targetNumbers) == 1: # this is an encoding error
@@ -202,7 +204,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     newRn.lyric = ""
                     # set to entire bar duration and tie 
                     newRn.duration = copy.deepcopy(tsCurrent.barDuration)
-                    if previousRn.tie == None:
+                    if previousRn.tie is None:
                         previousRn.tie = tie.Tie('start')
                     else:
                         previousRn.tie.type = 'continue'
@@ -338,9 +340,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 # may need to adjust duration of last chord added
                 previousRn.quarterLength = tsCurrent.barDuration.quarterLength - o
                 p.append(m)
-    p.makeBeams()
-    p.makeAccidentals()
-    s.insert(0,p)
+    p.makeBeams(inPlace=True)
+    p.makeAccidentals(inPlace=True)
+    s.insert(0, p)
     return s
 
 
