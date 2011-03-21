@@ -13480,7 +13480,53 @@ class Test(unittest.TestCase):
         self.assertEqual(len(
             sMeasuresTwoFour.flat.getElementsByClass('TimeSignature')), 1)
 
+    def testDeepcopyActiveSite(self):
+        # test that active sites make sense after deepcopying
+        from music21 import stream, corpus
+        s = stream.Stream()
+        n = note.Note()
+        s.append(n)
+        self.assertEqual(id(n.activeSite), id(s))
+
+        # test that elements in stream get their active site properly copied
+        s1 = copy.deepcopy(s)
+        n1 = s1[0]    
+        self.assertEqual(id(n1.activeSite), id(s1))
         
+
+        s = stream.Stream()
+        m = stream.Measure()
+        n = note.Note()
+        m.append(n)
+        s.append(m)
+        self.assertEqual(id(n.activeSite), id(m))
+        self.assertEqual(id(m.activeSite), id(s))
+        
+        s1 = copy.deepcopy(s)
+        m1 = s1[0]
+        n1 = m1[0]    
+        self.assertEqual(id(n1.activeSite), id(m1))
+        self.assertEqual(id(m1.activeSite), id(s1))
+
+        # try imported
+        s = corpus.parse('madrigal.5.8.rntxt')
+        p = s[1]
+        m = p[0]
+        rn = m[2]
+
+        self.assertEqual(id(rn.activeSite), id(m))
+        self.assertEqual(id(m.activeSite), id(p))
+        self.assertEqual(id(p.activeSite), id(s))
+
+        s1 = copy.deepcopy(s)
+        p1 = s1[1]
+        m1 = p1[0]
+        rn1 = m1[2]
+
+        self.assertEqual(id(rn1.activeSite), id(m1))
+        self.assertEqual(id(m1.activeSite), id(p1))
+        self.assertEqual(id(p1.activeSite), id(s1))
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
