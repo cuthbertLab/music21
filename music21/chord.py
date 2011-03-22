@@ -2465,7 +2465,12 @@ def fromForteClass(notation):
 def fromIntervalVector(notation):
     '''Return one or more Chords given an interval vector. 
 
-s    '''
+    >>> from music21 import *
+    >>> chord.fromIntervalVector((1,1,1,1,1,1))
+    [<music21.chord.Chord C C# E F#>, <music21.chord.Chord C C# E- G>]
+    >>> chord.fromIntervalVector([0,0,0,0,0,1])
+    [<music21.chord.Chord C F#>]
+    '''
     addressList = None
     if common.isListLike(notation):
         if len(notation) == 6: #assume its an interval vector
