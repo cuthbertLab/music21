@@ -2624,15 +2624,18 @@ def addressToIntervalVector(address):
 
 
 def intervalVectorToAddress(vector):
-    '''Given a vector, collect all addresses that match
+    '''Given a vector, collect all addresses that match.
 
     >>> intervalVectorToAddress((7,6,5,4,4,2))
-    (8, 1)
+    [(8, 1)]
     >>> intervalVectorToAddress((12,12,12,12,12,6))
-    (12, 1)
+    [(12, 1)]
     >>> intervalVectorToAddress((2,2,3,1,1,1))
-    (5, 10)
+    [(5, 10)]
+    >>> intervalVectorToAddress((1,1,1,1,1,1))
+    [(4, 15), (4, 29)]
     '''
+    post = []
     vector = tuple(vector)
     for card in range(1,13):
         for num, sc in enumerate(FORTE[card]):
@@ -2640,8 +2643,8 @@ def intervalVectorToAddress(vector):
                 continue # first, used for spacing
             # index 1 is vector
             if sc[1] == vector:
-                return (card, num)
-
+                post.append((card, num))
+    return post
 
 def addressToZAddress(address):
     '''Given a TN address, return the address of the z set, if not None

@@ -2415,7 +2415,7 @@ class Chord(note.NotRest):
 # utility methods
 
 def fromForteClass(notation):
-    '''Return a Chord given a Forte-class notation. The Forte class can be specified as string (e.g., 3-11), as a list of cardinality and number (e.g., [8,1]), or as an interval vector (e.g., (1,0,2,2,1,0)).
+    '''Return a Chord given a Forte-class notation. The Forte class can be specified as string (e.g., 3-11) or as a list of cardinality and number (e.g., [8,1]).
 
     If no match is available, None is returned.
 
@@ -2428,9 +2428,6 @@ def fromForteClass(notation):
     <music21.chord.Chord C E- G>
     >>> chord.fromForteClass((11,1))
     <music21.chord.Chord C C# D E- E F F# G G# A B->
-
-    >>> chord.fromForteClass((1,1,1,1,1,1))
-    <music21.chord.Chord C C# E F#>
     '''
     card = None
     num = 1
@@ -2455,14 +2452,31 @@ def fromForteClass(notation):
                 num = notation[1]
             if len(notation) > 2:
                 inv = notation[2]
-        elif len(notation) == 6: #assume its an interval vector
-            card, num = chordTables.intervalVectorToAddress(notation)
+        else:
+            raise ChordException('cannot handle specified notation: %s' % notation)
     else:
         raise ChordException('cannot handle specified notation: %s' % notation)
 
     prime = chordTables.addressToNormalForm([card, num, inv])
     return Chord(prime)
 
+
+
+def fromIntervalVector(notation):
+    '''Return one or more Chords given an interval vector. 
+
+s    '''
+    addressList = None
+    if common.isListLike(notation):
+        if len(notation) == 6: #assume its an interval vector
+            addressList = chordTables.intervalVectorToAddress(notation)
+    if addressList is None:
+        raise ChordException('cannot handle specified notation: %s' % notation)
+        
+    post = []
+    for card, num in addressList:
+        post.append(Chord(chordTables.addressToNormalForm([card, num])))
+    return post
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
