@@ -300,7 +300,7 @@ dodecachord = (None, t1)
 
 
 #-------------------------------------------------------------------------------
-FORTE = (0, monad, diad, trichord, tetrachord, pentachord, hexachord, septachord, octachord, nonachord, decachord, undecachord, dodecachord)
+FORTE = (None, monad, diad, trichord, tetrachord, pentachord, hexachord, septachord, octachord, nonachord, decachord, undecachord, dodecachord)
 
 # to access the data for a single form, use:
 # forte   [size(tetra)] = 4
@@ -2547,7 +2547,7 @@ def _validateAddress(address):
         raise ChordTablesException('index %s not valid' % index)
 
     inversionsAvailable = forteIndexToInversionsAvailable(card, index)
-    if inversion != None:
+    if inversion is not None:
         if inversion not in inversionsAvailable:
             raise ChordTablesException('inversion %s not valid' % inversion)
 
@@ -2621,6 +2621,26 @@ def addressToIntervalVector(address):
     '''
     card, index, inversion = _validateAddress(address)
     return SCDICT[card][(index, inversion)][2]
+
+
+def intervalVectorToAddress(vector):
+    '''Given a vector, collect all addresses that match
+
+    >>> intervalVectorToAddress((7,6,5,4,4,2))
+    (8, 1)
+    >>> intervalVectorToAddress((12,12,12,12,12,6))
+    (12, 1)
+    >>> intervalVectorToAddress((2,2,3,1,1,1))
+    (5, 10)
+    '''
+    vector = tuple(vector)
+    for card in range(1,13):
+        for num, sc in enumerate(FORTE[card]):
+            if sc is None: 
+                continue # first, used for spacing
+            # index 1 is vector
+            if sc[1] == vector:
+                return (card, num)
 
 
 def addressToZAddress(address):

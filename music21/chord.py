@@ -2411,9 +2411,57 @@ class Chord(note.NotRest):
     
 
 
+#-------------------------------------------------------------------------------
+# utility methods
 
+def fromForteClass(notation):
+    '''Return a Chord given a Forte-class notation. The Forte class can be specified as string (e.g., 3-11), as a list of cardinality and number (e.g., [8,1]), or as an interval vector (e.g., (1,0,2,2,1,0)).
 
+    If no match is available, None is returned.
 
+    >>> from music21 import *
+    >>> chord.fromForteClass('3-11')
+    <music21.chord.Chord C E- G>
+    >>> chord.fromForteClass('3-11b')
+    <music21.chord.Chord C E G>
+    >>> chord.fromForteClass('3-11a')
+    <music21.chord.Chord C E- G>
+    >>> chord.fromForteClass((11,1))
+    <music21.chord.Chord C C# D E- E F F# G G# A B->
+
+    >>> chord.fromForteClass((1,1,1,1,1,1))
+    <music21.chord.Chord C C# E F#>
+    '''
+    card = None
+    num = 1
+    inv = None
+    if common.isStr(notation):
+        if '-' in notation:
+            parts = notation.split('-')
+            card = int(parts[0])
+            num, chars = common.getNumFromStr(parts[1])
+            num = int(num)
+            if 'a' in chars.lower():
+                inv = 1
+            elif 'b' in chars.lower():
+                inv = -1
+        else:
+            raise ChordException('cannot extract set class representation from string: %s' % notation)
+    elif common.isListLike(notation):
+        if len(notation) <= 3: # assume its a set class representation
+            if len(notation) > 0:
+                card = notation[0]
+            if len(notation) > 1:
+                num = notation[1]
+            if len(notation) > 2:
+                inv = notation[2]
+        elif len(notation) == 6: #assume its an interval vector
+            card, num = chordTables.intervalVectorToAddress(notation)
+    else:
+        raise ChordException('cannot handle specified notation: %s' % notation)
+
+    prime = chordTables.addressToNormalForm([card, num, inv])
+    return Chord(prime)
 
 
 #-------------------------------------------------------------------------------
