@@ -732,7 +732,7 @@ def parse(workName, movementNumber=None, number=None,
 
     If `forceSource` is True, the original file will always be loaded and pickled files, if available, will be ignored.
 
-    >>> aStream = parseWork('opus74no1/movement3')
+    >>> aStream = parse('opus74no1/movement3')
     '''
     if not common.isListLike(extList):
         extList = [extList]
@@ -883,7 +883,7 @@ class Test(unittest.TestCase):
     def testBachKeys(self):
         from music21 import key
         for fp in getComposer('bach')[-5:]: # get the last 10
-            s = parseWork(fp)
+            s = parse(fp)
             # get keys from first part
             keyStream = s[0].flat.getElementsByClass(key.KeySignature)
             keyObj = keyStream[0]
@@ -1007,19 +1007,19 @@ class Test(unittest.TestCase):
 
     def testWTCImport(self):
         from music21 import corpus
-        s = corpus.parseWork('bach/bwv846', 1)
+        s = corpus.parse('bach/bwv846', 1)
         self.assertEqual(s.metadata.title, 'WTC I: Prelude and Fugue in C major')
         self.assertEqual(s.metadata.movementNumber, '1')
-        s = corpus.parseWork('bach/bwv846', 2)
+        s = corpus.parse('bach/bwv846', 2)
         self.assertEqual(s.metadata.movementName, 'Fugue  I. ')
         self.assertEqual(s.metadata.movementNumber, '2')
 
 
-        s = corpus.parseWork('bach/bwv862', 1)
+        s = corpus.parse('bach/bwv862', 1)
         self.assertEqual(s.metadata.title, 'WTC I: Prelude and Fugue in A flat major')
 
 
-        s = corpus.parseWork('bach/bwv888', 1)
+        s = corpus.parse('bach/bwv888', 1)
         self.assertEqual(s.metadata.title, 'WTC II: Prelude and Fugue in A major')
         #s.show()
 
