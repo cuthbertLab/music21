@@ -4,8 +4,8 @@
 #
 # Authors:       Christopher Ariza
 #
-# Copyright:     (c) 2001-2010 Christopher Ariza
-# Copyright:     (c) 2010 The music21 Project
+# Copyright:     (c) 2001-2011 Christopher Ariza
+# Copyright:     (c) 2011 The music21 Project
 # License:       LGPL
 #-------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ class ChordTablesException(Exception):
 #-------------------------------------------------------------------------------
 # TNI structures are defined
 # 0=pitches, 1=ICV, 2=invariance vector (morris), 3 = Z-relation)
-# invariance vector can be used to determein symmetry
+# invariance vector can be used to determine symmetry
 # at index 1, a value of 1 is symmetrical
 
 t1   = ((0,), (0,0,0,0,0,0), (1,1,1,1,11,11,11,11), 0) #1-1

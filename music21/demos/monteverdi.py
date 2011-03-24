@@ -17,15 +17,14 @@ The workshop gave the excuse to add the romanText format, which DT and others
 have encoded lots of analyses in.  Some demos of the format are below
 '''
 
-
-from music21 import *
+import music21 
 
 def spliceAnalysis(book = 3, madrigal = 1):
     '''
     splice an analysis of the madrigal under the analysis itself
     '''
-    mad = corpus.parseWork('monteverdi/madrigal.%s.%s.xml' % (book, madrigal))
-    analysis = corpus.parseWork('monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal))
+    mad = music21.corpus.parseWork('monteverdi/madrigal.%s.%s.xml' % (book, madrigal))
+    analysis = music21.corpus.parseWork('monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal))
 
     # these are multiple parts in a score stream
     #excerpt = mad.measures(1,20)
@@ -43,7 +42,7 @@ def spliceAnalysis(book = 3, madrigal = 1):
 def showAnalysis(book = 3, madrigal = 13):
     #analysis = converter.parse('d:/docs/research/music21/dmitri_analyses/Mozart Piano Sonatas/k331.rntxt') 
     filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal)
-    analysis = corpus.parseWork(filename)
+    analysis = music21.corpus.parseWork(filename)
     #analysis.show()
     (major, minor) = iqSemitonesAndPercentage(analysis)
     print major
@@ -60,11 +59,11 @@ def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False)
         for i in range(start, end+1):
             filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, i)
             if strict == True:
-                analysis = corpus.parseWork(filename)
+                analysis = music21.corpus.parseWork(filename)
                 print book,i
             else:
                 try:
-                    analysis = corpus.parseWork(filename)
+                    analysis = music21.corpus.parseWork(filename)
                     print book,i
                 except:
                     print "Cannot parse %s, maybe it does not exist..." % (filename)

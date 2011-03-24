@@ -19,6 +19,7 @@ from music21 import common
 
 class Derivation(object):
     '''
+    >>> import copy
     >>> from music21 import *  
     >>> s1 = stream.Stream()
     >>> s2 = stream.Stream()
@@ -28,14 +29,18 @@ class Derivation(object):
     True    
     >>> d1.getContainer() is s1
     True    
-    >>> import copy
     >>> d2 = copy.deepcopy(d1)
+    >>> d2.getAncestor() is s2
+    True
+    >>> d1.setMethod('measure')
+    >>> d1.getMethod()
+    'measure'
     '''
     def __init__(self, container=None):
         # store a reference to the Stream that contains this derivation
         self._container = None
         self._containerId = None # store id to optimize w/o unwrapping
-
+        self._method = None
         # ancestor should be stored as a weak ref
         self._ancestor = None
         #self._ancestorId = None # store id to optimize w/o unwrapping
@@ -69,6 +74,16 @@ class Derivation(object):
     def getAncestor(self):
         return self._ancestor
         #return common.unwrapWeakref(self._ancestor)
+
+    def setMethod(self, method):
+        '''
+        sets a string identifying how the object was derived
+        '''
+        self._method = method
+
+    def getMethod(self):
+        return self._method
+
 
     def __deepcopy__(self, memo=None):
         '''Manage deepcopying by creating a new reference to the same object. If the ancestor no longer exists, than ancestor is set to None

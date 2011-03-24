@@ -510,7 +510,14 @@ class Chord(note.NotRest):
         return self._chordTablesAddress
 
     chordTablesAddress = property(_getChordTablesAddress, 
-        doc = '''Return a triple tuple that represents that raw data location for information on the set class interpretation of this Chord. The data format is Forte set class cardinality, index number, and inversion status (where 0 is invariant, and -1 and 1 represent inverted or not, respectively).
+        doc = '''
+        Return a three-element tuple that represents 
+        that raw data location for information on the 
+        set class interpretation of this Chord. 
+        The data format is Forte set class cardinality, 
+        index number, and inversion status 
+        (where 0 is invariant, and -1 and 1 represent 
+        inverted or not, respectively).
 
         >>> from music21 import *
         >>> c = chord.Chord(["C4", "E4", "G#4"])
@@ -520,7 +527,7 @@ class Chord(note.NotRest):
 
 
 
-# possibly add methods to create chords form pitch classes:
+# possibly add methods to create chords from pitch classes:
 # c2 = chord.fromPitchClasses([0, 1, 3, 7])
     #---------------------------------------------------------------------------
 

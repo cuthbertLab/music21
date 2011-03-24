@@ -564,6 +564,43 @@ class Stream(music21.Music21Object):
         ''')
 
 
+    def _getDerivationMethod(self):
+        return self._derivation.getMethod()
+        
+    def _setDerivationMethod(self, method):
+        self._derivation.setMethod(method)
+
+    derivationMethod = property(_getDerivationMethod, _setDerivationMethod, doc='''
+        Returns or sets a string representing how
+        this stream was derived from another stream.
+        
+        
+        There are currently no limitations on this string.
+        This might change.
+        
+        
+        OMIT_FROM_DOCS
+        
+        
+        DOES NOT WORK YET!
+        
+        #        For instance:
+        #        
+        #        
+        #        >>> from music21 import *
+        #        >>> s1 = converter.parse("C2 D2", "2/4")
+        #        >>> s1m = s1.makeMeasures()
+        #        >>> s1m1 = s1.measure(1)
+        #        >>> s1m1.derivesFrom is s1m
+        #        True
+        #        >>> s1m1.derivationMethod
+        #        'measure'
+        #        >>> s1m1.derivationMethod = 'getElementsByClass' 
+        #        >>> s1m1.derivationMethod
+        #        'getElementsByClass'
+    
+    ''')
+
     def hasElement(self, obj):
         '''Return True if an element, provided as an argument, is contained in this Stream.
 
@@ -1541,9 +1578,9 @@ class Stream(music21.Music21Object):
         :class:`~music21.graph.PlotWindowedAmbitus`
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+        >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
         >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
-        >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+        >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
         >>> #_DOCS_SHOW s.plot('pianoroll')
     
         .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
@@ -1567,7 +1604,7 @@ class Stream(music21.Music21Object):
         key -- :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> s.analyze('ambitus')
         <music21.interval.Interval m21>
         >>> s.analyze('key')
@@ -2391,7 +2428,7 @@ class Stream(music21.Music21Object):
         While all elements in the source are made available in the extracted region, new Measure objects are created and returned. 
 
         >>> from music21 import *
-        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a = corpus.parse('bach/bwv324.xml')
         >>> b = a[0].measures(4,6)
         >>> len(b)
         3
@@ -2499,6 +2536,7 @@ class Stream(music21.Music21Object):
                 # with the same elements
                 mNew = Measure()
                 mNew.mergeAttributes(m)
+
                 # will only set on first time through
                 if startMeasureNew is None:
                     startMeasureNew = mNew
@@ -2548,7 +2586,7 @@ class Stream(music21.Music21Object):
         This method is distinguished from :meth:`~music21.stream.Stream.measures` in that this method returns a single Measure object, not a Stream containing one or more Measure objects.
 
         >>> from music21 import *
-        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a = corpus.parse('bach/bwv324.xml')
         >>> a[0].measure(3)
         <music21.stream.Measure 3 offset=0.0>
         '''
@@ -2565,18 +2603,69 @@ class Stream(music21.Music21Object):
 
 
     def measureOffsetMap(self, classFilterList=None):
-        '''If this Stream contains Measures, provide a dictionary 
-        where keys are offsets and values are a list of references 
-        to one or more Measures that start at that offset. The 
-        offset values is always in the frame of the calling Stream (self).
+        '''
+        If this Stream contains Measures, provide a dictionary 
+        whose keys are the offsets of the start of each measure
+        and whose values are a list of references 
+        to the :class:`~music21.stream.Measure` objects that start 
+        at that offset. 
+        
+        
+        Even in normal music there may be more than
+        one Measure starting at each offset because each 
+        :class:`~music21.stream.Part` might define its own Measure.
+        However, you are unlikely to encounter such things unless you
+        run Score.semiFlat, which retains all the containers found in 
+        the score.
+        
+        
+        The offsets are always measured relative to the
+        calling Stream (self).
 
-        The `classFilterList` argument can be a list of classes 
-        used to find Measures. A default of None uses Measure. 
+
+        You can specify a `classFilterList` argument as a list of classes 
+        to find instead of Measures.  But the default will of course
+        find Measure objects. 
+
+
+        Example 1: This Bach chorale is in 4/4 without a pickup, so
+        as expected, measures are found every 4 offsets, until the
+        weird recitation in m. 7 which in our edition lasts 10 beats
+        and thus causes a gap in measureOffsetMap from 24.0 to 34.0.
+
 
         >>> from music21 import *
-        >>> a = corpus.parseWork('bach/bwv324.xml')
-        >>> sorted(a[0].measureOffsetMap().keys())
+        >>> chorale = corpus.parse('bach/bwv324.xml')
+        >>> alto = chorale.parts['alto']
+        >>> altoMeasures = alto.measureOffsetMap()
+        >>> sorted(altoMeasures.keys())
         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]
+        >>> altoMeasures[4.0]
+        [<music21.stream.Measure 2 offset=4.0>]
+        >>> altoMeasures[4.0][0].show('text')
+        {0.0} <music21.note.Note D>
+        {1.0} <music21.note.Note D#>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.note.Note F#>
+        
+
+        How to get all the measures from all parts (not the
+        most efficient way, but it works!):
+        
+        
+        >>> choraleSemiFlat = chorale.semiFlat
+        >>> choraleMeasures = chorale.measureOffsetMap()
+        >>> choraleMeasures[4.0]
+        [<music21.stream.Measure 2 offset=4.0>, <music21.stream.Measure 2 offset=4.0>, <music21.stream.Measure 2 offset=4.0>, <music21.stream.Measure 2 offset=4.0>]
+
+
+
+        .. image:: images/streamMeasureOffsetMapBWV324.*
+            :width: 572
+
+
+
+
 
         OMIT_FROM_DOCS
         see important examples in testMeasureOffsetMap() andtestMeasureOffsetMapPostTie()
@@ -2647,7 +2736,12 @@ class Stream(music21.Music21Object):
         return self.getElementsByClass(spanner.Spanner)
 
     spanners = property(_getSpanners, 
-        doc='''Return all :class:`~music21.spanner.Spanner` objects in a :class:`~music21.stream.Stream` or Stream subclass.
+        doc='''
+        Return all :class:`~music21.spanner.Spanner` objects 
+        (things such as Slurs, long trills, or anything that
+        connects many objects)
+        into a :class:`~music21.stream.Stream` or Stream subclass.
+
 
         >>> from music21 import *
         >>> s = stream.Stream()
@@ -2660,8 +2754,11 @@ class Stream(music21.Music21Object):
 
     def getTimeSignatures(self, searchContext=True, returnDefault=True,
         sortByCreationTime=True):
-        '''Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
-        If no TimeSignature objects are defined, get a default
+        '''
+        Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
+        If no TimeSignature objects are defined, get a default (4/4 or whatever
+        is defined in the defaults.py file).
+        
 
         >>> from music21 import *
         
@@ -2704,13 +2801,20 @@ class Stream(music21.Music21Object):
         
 
     def getInstrument(self, searchActiveSite=True, returnDefault=True):
-        '''Search this stream or activeSite streams for :class:`~music21.instrument.Instrument` objects, otherwise 
-        return a default
+        '''
+        Search this stream or activeSite streams for 
+        :class:`~music21.instrument.Instrument` objects, otherwise 
+        return a default Instrument
+        
+        
+        TODO: WRITE FULL EXAMPLES!
+        
 
         >>> from music21 import *
 
         >>> a = stream.Stream()
         >>> b = a.getInstrument() # a default will be returned
+        
         '''
         #environLocal.printDebug(['searching for instrument, called from:', 
         #                        self])
@@ -2901,7 +3005,7 @@ class Stream(music21.Music21Object):
         a new piece.
                
         >>> from music21 import *
-        >>> qj = corpus.parseWork('ciconia/quod_jactatur').parts[0]
+        >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0]
         >>> qj.measures(1,2).show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.Treble8vbClef object at 0x...>
@@ -3169,12 +3273,39 @@ class Stream(music21.Music21Object):
             removeRedundantPitches=True,
             gatherArticulations=True, gatherExpressions=True, inPlace=False):
         '''
-        Gathers simultaneous Notes into a Chords.
+        Gathers simultaneously sounding :class:`~music21.note.Note` objects 
+        into :class:`~music21.chord.Chord` objects, each of which
+        contains all the pitches sounding together.
+        
+        
+        This first example puts a part with three quarter notes (C4, D4, E4) 
+        together with a part consisting of a half note (C#5) and a 
+        quarter note (E#5) to make two Chords, the first containing the 
+        three :class:`~music21.pitch.Pitch` objects sounding at the 
+        beginning, the second consisting of the two Pitches sounding
+        on offset 2.0 (beat 3):
+        
+        
+        >>> from music21 import *
+        >>> p1 = stream.Part()
+        >>> p1.append([note.QuarterNote("C4"), note.QuarterNote("D4"), note.QuarterNote("E4")])
+        >>> p2 = stream.Part()
+        >>> p2.append([note.HalfNote("C#5"), note.QuarterNote("E#5")])
+        >>> sc1 = stream.Score()
+        >>> sc1.insert(0, p1)
+        >>> sc1.insert(0, p2)
+        >>> scChords = sc1.flat.makeChords()
+        >>> scChords.show('text')
+        {0.0} <music21.chord.Chord C4 C#5 D4>
+        {2.0} <music21.chord.Chord E4 E#5>        
+        
+        
         
         The gathering of elements, starting from offset 0.0, uses 
         the `minimumWindowSize`, in quarter lengths, to collect 
         all Notes that start between 0.0 and the minimum window 
         size (this permits overlaps within a minimum tolerance). 
+        
         
         After collection, the maximum duration of collected elements 
         is found; this duration is then used to set the new 
@@ -3183,22 +3314,27 @@ class Stream(music21.Music21Object):
         these additional notes are gathered in a second pass if 
         `includePostWindow` is True.
         
+        
         The new start offset is shifted to the larger of either 
         the minimum window or the maximum duration found in the 
         collected group. The process is repeated until all offsets 
         are covered.
+        
         
         Each collection of Notes is formed into a Chord. The Chord 
         is given the longest duration of all constituents, and is 
         inserted at the start offset of the window from which it 
         was gathered. 
         
+        
         Chords can gather both articulations and expressions from found Notes 
         using `gatherArticulations` and `gatherExpressions`.
+        
         
         The resulting Stream, if not in-place, can also gather 
         additional objects by placing class names in the `collect` list. 
         By default, TimeSignature and KeySignature objects are collected. 
+        
         
         '''
         # gather lyrics as an option
@@ -4882,7 +5018,7 @@ class Stream(music21.Music21Object):
         will appear at first that there are no notes in the piece:
         
         
-        >>> bwv66 = corpus.parseWork('bach/bwv66.6')
+        >>> bwv66 = corpus.parse('bach/bwv66.6')
         >>> len(bwv66.notes)
         0
         
@@ -5198,6 +5334,7 @@ class Stream(music21.Music21Object):
 
     def _getHighestTime(self):
         '''returns the largest offset plus duration.
+        see complete instructions in property highestTime.
       
         >>> from music21 import *
 
@@ -5255,15 +5392,17 @@ class Stream(music21.Music21Object):
         in quarter lengths. This value usually represents the last 
         "release" in the Stream.
 
+
         Stream.duration is usually equal to the highestTime 
         expressed as a Duration object, but it can be set separately 
         for advanced operations.
 
-        Example insert a dotted half note first at position 0 then 
-        at positions 1, 2, 3, 4 and see when the final note cuts off:
+
+        Example: Insert a dotted half note at position 0 and see where
+        it cuts off: 
+
 
         >>> from music21 import *
-
         >>> n = note.Note('A-')
         >>> n.quarterLength = 3
         >>> p1 = stream.Stream()
@@ -5272,8 +5411,13 @@ class Stream(music21.Music21Object):
         3.0
     
         
+        Now insert in the same stream, the dotted half note 
+        at positions 1, 2, 3, 4 and see when the final note cuts off:
+
+        
+        
         >>> p1.repeatInsert(n, [1, 2, 3, 4])
-        >>> p1.highestTime # 4 + 3
+        >>> p1.highestTime
         7.0
         ''')
 
@@ -5403,7 +5547,13 @@ class Stream(music21.Music21Object):
         >>> a.duration = newDuration
         >>> a.duration.quarterLength
         2.0
-        >>> a.highestTime # unchanged
+        
+        
+        Note that the highestTime for the stream is the same
+        whether duration is overriden or not:
+        
+        
+        >>> a.highestTime
         4.0
         ''')
 
@@ -5508,7 +5658,7 @@ class Stream(music21.Music21Object):
 
         >>> aInterval = interval.Interval('d5')
         
-        >>> aStream = corpus.parseWork('bach/bwv324.xml')
+        >>> aStream = corpus.parse('bach/bwv324.xml')
         >>> part = aStream[0]
         >>> aStream[0].pitches[:10]
         [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
@@ -6280,7 +6430,7 @@ class Stream(music21.Music21Object):
 
 
         >>> from music21 import corpus
-        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a = corpus.parse('bach/bwv324.xml')
         >>> voiceOnePitches = a[0].pitches
         >>> len(voiceOnePitches)
         25
@@ -6338,7 +6488,7 @@ class Stream(music21.Music21Object):
         '''Return a dictionary of pitch class usage (count) by selecting an attribute of the Pitch object. 
 
         >>> from music21 import corpus
-        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a = corpus.parse('bach/bwv324.xml')
         >>> a.pitchAttributeCount('pitchClass')
         {0: 3, 2: 25, 3: 3, 4: 14, 6: 15, 7: 13, 9: 17, 11: 14}
         >>> a.pitchAttributeCount('name')
@@ -6359,7 +6509,7 @@ class Stream(music21.Music21Object):
         '''Return a dictionary of attribute usage for one or more classes provided in a the `classFilterList` list and having the attribute specified by `attrName`.
 
         >>> from music21 import corpus
-        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a = corpus.parse('bach/bwv324.xml')
         >>> a[0].flat.attributeCount(note.Note, 'quarterLength')
         {1.0: 12, 2.0: 11, 4.0: 2}
         '''
@@ -6601,7 +6751,8 @@ class Stream(music21.Music21Object):
 
     def _findLayering(self, flatStream, includeDurationless=True,
                    includeEndBoundary=False):
-        '''Find any elements in an elementsSorted list that have simultaneities 
+        '''
+        Find any elements in an elementsSorted list that have simultaneities 
         or durations that cause overlaps.
         
         Returns two lists. Each list contains a list for each element in 
@@ -6890,27 +7041,23 @@ class Stream(music21.Music21Object):
 
     def simultaneousAttacks(self, stream2):
         '''
-        returns an ordered list of offsets where elements are started (attacked) in both
-        stream1 and stream2.
+        returns an ordered list of offsets where elements are started (attacked) 
+        at the same time in both self and stream2.
+        
+        
+        In this example, we create one stream of Qtr, Half, Qtr, and one of Half, Qtr, Qtr.
+        There are simultaneous attacks at offset 0.0 (the beginning) and at offset 3.0,
+        but not at 1.0 or 2.0:
+        
     
         >>> from music21 import *
 
         >>> st1 = stream.Stream()
         >>> st2 = stream.Stream()
-        >>> n11 = note.Note()
-        >>> n12 = note.Note()
-        >>> n21 = note.Note()
-        >>> n22 = note.Note()
-        
-        >>> st1.insert(10, n11)
-        >>> st2.insert(10, n21)
-        
-        >>> st1.insert(20, n12)
-        >>> st2.insert(20.5, n22)
-        
-        >>> simultaneous = st1.simultaneousAttacks(st2)
-        >>> simultaneous
-        [10.0]
+        >>> st1.append([note.QuarterNote(), note.HalfNote(), note.QuarterNote()])
+        >>> st2.append([note.HalfNote(), note.QuarterNote(), note.QuarterNote()])
+        >>> print st1.simultaneousAttacks(st2)
+        [0.0, 3.0]
         '''
         stream1Offsets = self.groupElementsByOffset()
         stream2Offsets = stream2.groupElementsByOffset()
@@ -6938,11 +7085,16 @@ class Stream(music21.Music21Object):
         editorial that is the interval between it and the element in cmpStream that
         is sounding at the moment the element in srcStream is attacked.
         
-        remember if comparing two streams with measures, etc., to run:
         
-            stream1.flat.attachIntervvalsBetweenStreams(stream2.flat)
+        Remember that if you are comparing two streams with measures, etc., 
+        you'll need to flatten each stream as follows:
+
+        
+        >>> #DOCS_SHOW stream1.flat.attachIntervvalsBetweenStreams(stream2.flat)
+        
             
-        example usage:
+        Example usage:
+    
     
         >>> from music21 import *
         >>> s1 = converter.parse('C4 d8 e f# g A2', '5/4')
@@ -6974,18 +7126,29 @@ class Stream(music21.Music21Object):
                         break
 
     def playingWhenAttacked(self, el, elStream = None):
-        '''Given an element (from another Stream) returns the single element in this Stream that is sounding while the given element starts. 
+        '''
+        Given an element (from another Stream) returns the single element 
+        in this Stream that is sounding while the given element starts. 
+    
         
-        If there are multiple elements sounding at the moment it is attacked, the method
-        returns the first element of the same class as this element, if any. If no element
-        is of the same class, then the first element encountered is returned.  
-        For more complex usages, use allPlayingWhileSounding.
+        If there are multiple elements sounding at the moment it is 
+        attacked, the method returns the first element of the same class 
+        as this element, if any. If no element
+        is of the same class, then the first element encountered is 
+        returned. For more complex usages, use allPlayingWhileSounding.
+    
     
         Returns None if no elements fit the bill.
     
-        The optional elStream is the stream in which el is found. If provided, el's offset
-        in that Stream is used.  Otherwise, the current offset in el is used.  It is just
-        in case you are paranoid that el.offset might not be what you want.
+    
+        The optional elStream is the stream in which el is found. 
+        If provided, el's offset
+        in that Stream is used.  Otherwise, the current offset in 
+        el is used.  It is just
+        in case you are paranoid that el.offset might not be what 
+        you want, because of some fancy manipulation of
+        el.activeSite
+        
         
         >>> from music21 import *
 
@@ -6993,33 +7156,34 @@ class Stream(music21.Music21Object):
         >>> n2 = note.Note("D#")
         >>> s1 = stream.Stream()
         >>> s1.insert(20.0, n1)
-        >>> s1.insert(21.0, n2)
-        
+        >>> s1.insert(21.0, n2)     
         >>> n3 = note.Note("C#")
         >>> s2 = stream.Stream()
         >>> s2.insert(20.0, n3)
-        
         >>> s1.playingWhenAttacked(n3).name
         'G#'
-        >>> n3._definedContexts.setOffsetBySite(s2, 20.5)
+        >>> n3.setOffsetBySite(s2, 20.5)
         >>> s1.playingWhenAttacked(n3).name
         'G#'
-        >>> n3._definedContexts.setOffsetBySite(s2, 21.0)
+        >>> n3.setOffsetBySite(s2, 21.0)
         >>> n3.offset
         21.0
         >>> s1.playingWhenAttacked(n3).name
         'D#'
 
-        # optionally, specify the site to get the offset from
-        >>> n3._definedContexts.setOffsetBySite(None, 100)
+
+
+        Optionally, specify the site to get the offset from:
+        
+        
+        
+        >>> n3.setOffsetBySite(None, 100)
         >>> n3.activeSite = None
         >>> s1.playingWhenAttacked(n3)
         <BLANKLINE>
         >>> s1.playingWhenAttacked(n3, s2).name
         'D#'
-        
-        OMIT_FROM_DOCS
-        perhaps the idea of 'playing' should be recast as 'sustain' or 'sounding' or some other term?
+                
 
         '''
     
@@ -7041,24 +7205,36 @@ class Stream(music21.Music21Object):
 
     def allPlayingWhileSounding(self, el, elStream = None, 
                                 requireClass = False):
-        '''Returns a new Stream of elements in this stream that sound at the same time as `el`, an element presumably in another Stream.
+        '''
+        Returns a new Stream of elements in this stream that sound 
+        at the same time as `el`, an element presumably in another Stream.
+    
         
-        The offset of this new Stream is set to el's offset, while the offset of elements within the 
-        Stream are adjusted relative to their position with respect to the start of el.  Thus, a note 
-        that is sounding already when el begins would have a negative offset.  The duration of otherStream is forced
-        to be the length of el -- thus a note sustained after el ends may have a release time beyond
-        that of the duration of the Stream.
+        The offset of this new Stream is set to el's offset, while the 
+        offset of elements within the Stream are adjusted relative to 
+        their position with respect to the start of el.  Thus, a note 
+        that is sounding already when el begins would have a negative 
+        offset.  The duration of otherStream is forced
+        to be the length of el -- thus a note sustained after el ends 
+        may have a release time beyond that of the duration of the Stream.
+    
     
         as above, elStream is an optional Stream to look up el's offset in.
         
 
+        The method always returns a Stream, but it might be an empty Stream.
+
+        
         OMIT_FROM_DOCS
         TODO: write: requireClass:
-        Takes as an optional parameter "requireClass".  If this parameter is boolean True then only elements 
-        of the same class as el are added to the new Stream.  If requireClass is list, it is used like 
-        classList in elsewhere in stream to provide a list of classes that the el must be a part of.
+        Takes as an optional parameter "requireClass".  If this parameter 
+        is boolean True then only elements 
+        of the same class as el are added to the new Stream.  If requireClass 
+        is list, it is used like 
+        classList in elsewhere in stream to provide a list of classes that the 
+        el must be a part of.
+    
         
-        The method always returns a Stream, but it might be an empty Stream.
         '''
         if requireClass is not False:
             raise Exception("requireClass is not implemented")
@@ -7126,7 +7302,9 @@ class Stream(music21.Music21Object):
 
     def internalize(self, container=None, 
                     classFilterList=['GeneralNote', 'Rest', 'Chord']):
-        '''Gather all notes and related classes of this Stream and place inside a new container (like a Voice) in this Stream.
+        '''
+        Gather all notes and related classes of this Stream 
+        and place inside a new container (like a Voice) in this Stream.
         '''
         if container == None:
             container = Voice
@@ -7136,10 +7314,13 @@ class Stream(music21.Music21Object):
             self.remove(e)
         self.insert(0, dst)
 
-    def externalize(self):
-        '''Assuming there is a container in this Stream (like a Voice), remove the container and place all contents in the Stream. 
-        '''
-        pass
+#    def externalize(self):
+#        '''
+#        Assuming there is a container in this Stream 
+#        (like a Voice), remove the container and place 
+#        all contents in the Stream. 
+#        '''
+#        pass
 
     def voicesToParts(self):
         '''If this Stream defines one or more voices, extract each into a Part, returning a Score.
@@ -7223,7 +7404,14 @@ class Stream(music21.Music21Object):
 
 
     def explode(self):
-        '''Create a multi-part extraction from a single polyphonic Part.
+        '''
+        Create a multi-part extraction from a single polyphonic Part.
+
+
+        Currently just runs :meth:`~music21.stream.Stream.voicesToParts` 
+        but that will change as part explosion develops, and this
+        method will use our best available quick method for part
+        extraction. 
         '''
         return voicesToParts()
 
@@ -7642,6 +7830,8 @@ class Measure(Stream):
             return barList[0]    
     
     def _setLeftBarline(self, barlineObj):
+        if common.isStr(barlineObj):
+            barlineObj = bar.Barline(barlineObj)
         oldLeftBarline = self._getLeftBarline()
         barlineObj.location = 'left'
 
@@ -7669,6 +7859,9 @@ class Measure(Stream):
             return barList[0]    
     
     def _setRightBarline(self, barlineObj):
+        if common.isStr(barlineObj):
+            barlineObj = bar.Barline(barlineObj)
+
         oldRightBarline = self._getRightBarline()
 
         barlineObj.location = 'right'
@@ -7689,6 +7882,28 @@ class Measure(Stream):
         >>> m.rightBarline = b
         >>> m.rightBarline.style
         'light-heavy'
+        
+        
+        OMIT_FROM_DOCS
+        
+        .measure currently isn't the same as the 
+        original measure...
+        
+        
+        A string can also be used instead:
+        
+        
+        >>> c = converter.parse("C8 D E F G A B4.", "3/8")
+        >>> cm = c.makeMeasures()
+        >>> cm.measure(1).rightBarline = 'light-light'
+        >>> cm.measure(3).rightBarline = 'light-heavy'
+        >>> #_DOCS_SHOW c.show()
+        
+        
+        .. image:: images/stream_barline_demo.*
+            :width: 211
+
+        
         ''')   
 
     #---------------------------------------------------------------------------
@@ -7892,7 +8107,7 @@ class Score(Stream):
         doc='''Return all :class:`~music21.stream.Part` objects in a :class:`~music21.stream.Score`.
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> parts = s.parts     
         >>> len(parts)
         4
@@ -7922,12 +8137,18 @@ class Score(Stream):
     def measure(self, measureNumber, 
         collect=[clef.Clef, meter.TimeSignature, 
         instrument.Instrument, key.KeySignature], gatherSpanners=True):
-        '''Given a measure number, return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
+        '''
+        Given a measure number, 
+        return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
 
-        This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
+
+        This method overrides the :meth:`~music21.stream.Stream.measures` method on Stream. 
+        This creates a new Score stream that has the 
+        same measure range for all Parts.
+
 
         >>> from music21 import corpus
-        >>> a = corpus.parseWork('bach/bwv324.xml')
+        >>> a = corpus.parse('bach/bwv324.xml')
         >>> len(a.measure(3)[0]) # contains 1 measure
         1
         '''
@@ -7950,7 +8171,12 @@ class Score(Stream):
 
 
     def measureOffsetMap(self, classFilterList=None):
-        '''This method overrides the :meth:`~music21.stream.Stream.measureOffsetMap` method of Stream. This creates a map based on all contained Parts in this Score. Measures found in multiple Parts with the same offset will be appended to the same list. 
+        '''
+        This method overrides the 
+        :meth:`~music21.stream.Stream.measureOffsetMap` method of Stream. 
+        This creates a map based on all contained Parts in this Score. 
+        Measures found in multiple Parts with the same offset will be 
+        appended to the same list. 
 
         This does not assume that all Parts have measures with identical offsets.
         '''
@@ -7987,7 +8213,10 @@ class Score(Stream):
         
 
     def sliceByGreatestDivisor(self, inPlace=True, addTies=True):
-        '''Slice all duration of all part by the minimum duration that can be summed to each concurrent duration. 
+        '''
+        Slice all duration of all part by the minimum duration 
+        that can be summed to each concurrent duration. 
+
 
         Overrides method defined on Stream.
         '''
@@ -8034,18 +8263,26 @@ class Score(Stream):
 
 
     def chordify(self, addTies=True, displayTiedAccidentals=False):
-        '''Split all Durations in all parts, if multi-part, by all unique offsets. All simultaneous durations are then gathered into single chords. 
+        '''
+        Split all Durations in all parts, if multi-part, 
+        by all unique offsets. All simultaneous durations are 
+        then gathered into single chords. 
+        
+        
+        addTies currently does not work for pitches in Chords
+        
         '''
         returnObj = deepcopy(self)
 
         mStream = returnObj.parts[0].getElementsByClass('Measure')
         mCount = len(mStream)
+        allParts = returnObj.getElementsByClass('Part')
         if mCount == 0:
             mCount = 1 # treat as a single measure
         for i in range(mCount): # may be 1
             # first, collect all unique offsets for each measure
             uniqueOffsets = []
-            for p in returnObj.getElementsByClass('Part'):
+            for p in allParts:
                 if p.hasMeasures():
                     m = p.getElementsByClass('Measure')[i]
                 else:
@@ -8059,7 +8296,7 @@ class Score(Stream):
 
             uniqueOffsets = sorted(uniqueOffsets)
 
-            for p in returnObj.getElementsByClass('Part'):
+            for p in allParts:
                 # get one measure at a time
                 if p.hasMeasures():
                     m = p.getElementsByClass('Measure')[i]
@@ -8266,7 +8503,7 @@ class Opus(Stream):
         '''Return a list of all numbers defined in this Opus.
 
         >>> from music21 import *
-        >>> o = corpus.parseWork('josquin/ovenusbant')
+        >>> o = corpus.parse('josquin/ovenusbant')
         >>> o.getNumbers()
         ['1', '2', '3']
         '''
@@ -8276,10 +8513,13 @@ class Opus(Stream):
         return post
 
     def getScoreByNumber(self, opusMatch):
-        '''Get Score objects from this Stream by number. Performs title search using the :meth:`~music21.metadata.Metadata.search` method, and returns the first result. 
+        '''Get Score objects from this Stream by number. 
+        Performs title search using the 
+        :meth:`~music21.metadata.Metadata.search` method, 
+        and returns the first result. 
 
         >>> from music21 import *
-        >>> o = corpus.parseWork('josquin/ovenusbant')
+        >>> o = corpus.parse('josquin/ovenusbant')
         >>> o.getNumbers()
         ['1', '2', '3']
         >>> s = o.getScoreByNumber(2)
@@ -8302,7 +8542,7 @@ class Opus(Stream):
         '''Get Score objects from this Stream by a title. Performs title search using the :meth:`~music21.metadata.Metadata.search` method, and returns the first result. 
 
         >>> from music21 import *
-        >>> o = corpus.parseWork('essenFolksong/erk5')
+        >>> o = corpus.parse('essenFolksong/erk5')
         >>> s = o.getScoreByTitle('Vrienden, kommt alle gaere')
         >>> s = o.getScoreByTitle('(.*)kommt(.*)') # regular expression
         >>> s.metadata.title
@@ -8329,7 +8569,7 @@ class Opus(Stream):
         '''Some Opus object represent numerous scores that are individual parts of the same work. This method will treat each contained Score as a Part, merging and returning a single Score with merged Metadata.
 
         >>> from music21 import *
-        >>> o = corpus.parseWork('josquin/milleRegrets')
+        >>> o = corpus.parse('josquin/milleRegrets')
         >>> s = o.mergeScores()
         >>> s.metadata.title
         'Mille regrets'
@@ -9598,7 +9838,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[3].flat.notes), 10)
 
         # just two ties here
-        s = corpus.parseWork('bach/bwv66.6')
+        s = corpus.parse('bach/bwv66.6')
         self.assertEqual(len(s.parts), 4)
 
         self.assertEqual(len(s.parts[0].flat.notes), 37)
@@ -9667,7 +9907,7 @@ class Test(unittest.TestCase):
 
     def testMeasureRange(self):
         from music21 import corpus
-        a = corpus.parseWork('bach/bwv324.xml')
+        a = corpus.parse('bach/bwv324.xml')
         b = a[3].measures(4,6)
         self.assertEqual(len(b), 3) 
         #b.show('t')
@@ -9710,7 +9950,7 @@ class Test(unittest.TestCase):
         #d.show()
 
         # try the score method
-        a = corpus.parseWork('bach/bwv324.xml')
+        a = corpus.parse('bach/bwv324.xml')
         b = a.measures(2,4)
         self.assertEqual(len(b[0].flat.getElementsByClass(clef.Clef)), 1) 
         self.assertEqual(len(b[1].flat.getElementsByClass(clef.Clef)), 1) 
@@ -9727,7 +9967,7 @@ class Test(unittest.TestCase):
 
     def testMeasureOffsetMap(self):
         from music21 import corpus
-        a = corpus.parseWork('bach/bwv324.xml')
+        a = corpus.parse('bach/bwv324.xml')
 
         mOffsetMap = a[0].measureOffsetMap()
 
@@ -9735,7 +9975,7 @@ class Test(unittest.TestCase):
             [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]  )
 
         # try on a complete score
-        a = corpus.parseWork('bach/bwv324.xml')
+        a = corpus.parse('bach/bwv324.xml')
         mOffsetMap = a.measureOffsetMap()
         #environLocal.printDebug([mOffsetMap])
         self.assertEqual(sorted(mOffsetMap.keys()), 
@@ -9746,7 +9986,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(value), 4)
 
         # we can get this information from Notes too!
-        a = corpus.parseWork('bach/bwv324.xml')
+        a = corpus.parse('bach/bwv324.xml')
         # get notes from one measure
 
         mOffsetMap = a[0].flat.measureOffsetMap(note.Note)
@@ -9783,7 +10023,7 @@ class Test(unittest.TestCase):
     def testMeasureOffsetMapPostTie(self):
         from music21 import corpus, stream
         
-        a = corpus.parseWork('bach/bwv4.8.xml')
+        a = corpus.parse('bach/bwv4.8.xml')
         # alto line syncopated/tied notes accross bars
         alto = a[1]
         self.assertEqual(len(alto.flat.notes), 73)
@@ -10202,7 +10442,7 @@ class Test(unittest.TestCase):
         '''Testing making measures of various sizes with a supplied single element meter stream. This illustrates an approach to partitioning elements by various sized windows. 
         '''
         from music21 import meter, corpus
-        sBach = corpus.parseWork('bach/bwv324.xml')
+        sBach = corpus.parse('bach/bwv324.xml')
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('2/4'))
         # need to call make ties to allocate notes
@@ -10283,7 +10523,7 @@ class Test(unittest.TestCase):
 
 
         from music21 import corpus
-        sBach = corpus.parseWork('bach/bwv324.xml')
+        sBach = corpus.parse('bach/bwv324.xml')
         partSoprano = sBach[0]
 
         c1 = partSoprano.flat.getElementsByClass(clef.Clef)[0]
@@ -10942,7 +11182,7 @@ class Test(unittest.TestCase):
         '''Need to make sure that highest offset and time are properly updated
         '''
         from music21 import corpus
-        src = corpus.parseWork('bach/bwv324.xml')
+        src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
         ex = src[0].flat.notes[0:30]
 
@@ -10973,7 +11213,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
 
         # first method: iterating through notes
-        src = corpus.parseWork('bach/bwv324.xml')
+        src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
         #environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'extracting notes:'])
         ex = src[0].flat.notes[0:30]
@@ -10990,7 +11230,7 @@ class Test(unittest.TestCase):
         #s.show()
     
         # second method: getting flattened stream
-        src = corpus.parseWork('bach/bwv323.xml')
+        src = corpus.parse('bach/bwv323.xml')
         # get notes from one part
         ex = src[0].flat.notes
         s = Score()
@@ -11560,7 +11800,7 @@ class Test(unittest.TestCase):
             self.assertEqual(triples, match)
         
 
-        s = corpus.parseWork('bach/bwv66.6')
+        s = corpus.parse('bach/bwv66.6')
         part = s.parts[0].measures(6,9) # last meausres
         #part.show('musicxml')
         #part.show('midi')
@@ -11648,7 +11888,7 @@ class Test(unittest.TestCase):
     def testAnalyze(self):
         from music21 import stream, corpus, pitch
 
-        s = corpus.parseWork('bach/bwv66.6')
+        s = corpus.parse('bach/bwv66.6')
 
         sub = [s.parts[0], s.parts[1], s.measures(4,5), 
                 s.parts[2].measures(4,5)]
@@ -11910,7 +12150,7 @@ class Test(unittest.TestCase):
             return post
 
 
-        s = corpus.parseWork('bach/bwv66.6')
+        s = corpus.parse('bach/bwv66.6')
         # this has accidentals in measures 2 and 6
         sSub = s[3].measures(2,6)
         #sSub.show()
@@ -12214,7 +12454,7 @@ class Test(unittest.TestCase):
 
     def testMakeChordsImported(self):
         from music21 import corpus
-        s = corpus.parseWork('bach/bwv66.6')
+        s = corpus.parse('bach/bwv66.6')
         #s.show()
         # using in place to get the stored flat version
         sMod = s.flat.makeChords(includePostWindow=False)
@@ -12539,7 +12779,7 @@ class Test(unittest.TestCase):
     def testSliceByQuarterLengthsImported(self):
 
         from music21 import corpus, converter
-        sSrc = corpus.parseWork('bwv66.6')
+        sSrc = corpus.parse('bwv66.6')
         s = copy.deepcopy(sSrc)
         for p in s.parts:
             p.sliceByQuarterLengths(.5, inPlace=True, addTies=False)
@@ -12609,7 +12849,7 @@ class Test(unittest.TestCase):
     def testSliceByGreatestDivisorImported(self):
 
         from music21 import corpus, converter
-        sSrc = corpus.parseWork('bwv66.6')
+        sSrc = corpus.parse('bwv66.6')
         s = copy.deepcopy(sSrc)
         for p in s.parts:
             p.sliceByGreatestDivisor(inPlace=True, addTies=True)
@@ -12667,7 +12907,7 @@ class Test(unittest.TestCase):
     def testSliceAtOffsetsImported(self):
 
         from music21 import corpus, converter
-        sSrc = corpus.parseWork('bwv66.6')
+        sSrc = corpus.parse('bwv66.6')
 
         post = sSrc.parts[0].flat.sliceAtOffsets([.25, 1.25, 3.25])
         self.assertEqual([e.offset for e in post], [0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.5, 1.0, 1.25, 2.0, 3.0, 3.25, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 35.0, 36.0] )
@@ -12711,7 +12951,7 @@ class Test(unittest.TestCase):
     def testSliceByBeatImported(self):
 
         from music21 import corpus, converter
-        sSrc = corpus.parseWork('bwv66.6')
+        sSrc = corpus.parse('bwv66.6')
         post = sSrc.parts[0].sliceByBeat()
         self.assertEqual([e.offset for e in post.flat.notes],  [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 34.5, 35.0])
 
@@ -12719,7 +12959,7 @@ class Test(unittest.TestCase):
 
     def testChordifyImported(self):
         from music21 import stream, corpus
-        s = corpus.parseWork('gloria')
+        s = corpus.parse('gloria')
         #s.show()
         post = s.measures(0,20, gatherSpanners=False)
         # somehow, this is doubling measures
@@ -12802,7 +13042,7 @@ class Test(unittest.TestCase):
     def testOpusSearch(self):
         from music21 import corpus
         import re
-        o = corpus.parseWork('essenFolksong/erk5')
+        o = corpus.parse('essenFolksong/erk5')
         s = o.getScoreByTitle('blauen')
         self.assertEqual(s.metadata.title, 'Ich sach mir einen blauen Storchen')
         
@@ -12852,7 +13092,7 @@ class Test(unittest.TestCase):
     def testGetElementsByContextStream(self):
         from music21 import corpus, meter, key, clef
 
-        s = corpus.parseWork('bwv66.6')
+        s = corpus.parse('bwv66.6')
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
                 post = m.getContextByClass(clef.Clef)
@@ -13021,7 +13261,7 @@ class Test(unittest.TestCase):
 
     def testPartsToVoicesA(self):
         from music21 import corpus
-        s0 = corpus.parseWork('bwv66.6')
+        s0 = corpus.parse('bwv66.6')
         #s.show()
         s1 = s0.partsToVoices(2)
         #s1.show()
@@ -13080,7 +13320,7 @@ class Test(unittest.TestCase):
     def testPartsToVoicesB(self):
         from music21 import corpus
         # this work has five parts: results in e parts
-        s0 = corpus.parseWork('hwv56', '1-18')
+        s0 = corpus.parse('hwv56', '1-18')
         s1 = s0.partsToVoices(2, permitOneVoicePerPart=True)
         self.assertEqual(len(s1.parts), 3)
         self.assertEqual(len(s1.parts[0].getElementsByClass(
@@ -13092,7 +13332,7 @@ class Test(unittest.TestCase):
 
         #s1.show()
 
-        s0 = corpus.parseWork('hwv56', '1-05')
+        s0 = corpus.parse('hwv56', '1-05')
         # can use index values
         s2 = s0.partsToVoices(([0,1], [2,4], 3), permitOneVoicePerPart=True)   
         self.assertEqual(len(s2.parts), 3)
@@ -13125,7 +13365,7 @@ class Test(unittest.TestCase):
 
 
         # mm 16-19 are a good examples
-        s1 = corpus.parseWork('hwv56', '1-05').measures(16, 19)
+        s1 = corpus.parse('hwv56', '1-05').measures(16, 19)
         s2 = s1.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'))
         #s2.show()
 
@@ -13142,7 +13382,7 @@ class Test(unittest.TestCase):
     def testVoicesToPartsA(self):
         
         from music21 import corpus
-        s0 = corpus.parseWork('bwv66.6')
+        s0 = corpus.parse('bwv66.6')
         #s.show()
         s1 = s0.partsToVoices(2) # produce two parts each with two voices
 
@@ -13284,7 +13524,7 @@ class Test(unittest.TestCase):
 
     def testAddSlurByMelisma(self):
         from music21 import corpus, spanner
-        s = corpus.parseWork('luca/gloria')
+        s = corpus.parse('luca/gloria')
         ex = s.parts[0]
         nStart = None
         nEnd = None
@@ -13373,7 +13613,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
 
         # this file was imported by sibelius and does not have completeing ties
-        sMonte = corpus.parseWork('monteverdi/madrigal.4.2.xml')
+        sMonte = corpus.parse('monteverdi/madrigal.4.2.xml')
         s1 = sMonte.parts['Alto']
         mStream = s1.getElementsByClass('Measure')
         self.assertEqual([n.offset for n in mStream[3].notes], [0.0])
@@ -13395,7 +13635,7 @@ class Test(unittest.TestCase):
 
     def testMakeAccidentalsB(self):
         from music21 import corpus
-        s = corpus.parseWork('monteverdi/madrigal.5.3.rntxt')
+        s = corpus.parse('monteverdi/madrigal.5.3.rntxt')
         m34 = s.parts[0].getElementsByClass('Measure')[33]
         c = m34.getElementsByClass('Chord')
         # assuming not showing accidental b/c of key
@@ -13403,7 +13643,7 @@ class Test(unittest.TestCase):
         # because of key
         self.assertEqual(str(c[1].pitches[0].accidental.displayStatus), 'False')
 
-        s = corpus.parseWork('monteverdi/madrigal.5.4.rntxt')
+        s = corpus.parse('monteverdi/madrigal.5.4.rntxt')
         m74 = s.parts[0].getElementsByClass('Measure')[73]
         c = m74.getElementsByClass('Chord')
         # has correct pitches but natural not showing on C
@@ -13432,7 +13672,7 @@ class Test(unittest.TestCase):
         
         
         # test imported and flat
-        s = corpus.parseWork('bach/bwv66.6')
+        s = corpus.parse('bach/bwv66.6')
         p1 = s.parts[0]
         # the part is not derived from anything yet
         self.assertEqual(p1.derivesFrom, None)
@@ -13467,7 +13707,7 @@ class Test(unittest.TestCase):
             'Measure')[3], True)
 
         m4 = p1.measure(4)
-        self.assertEqual(m4.flat.notes.rootDerivation is m4, True)
+        self.assertTrue(m4.flat.notes.rootDerivation is m4)
         
         # part is the root derivation of a measures() call
         mRange = p1.measures(4, 6)
@@ -13505,7 +13745,7 @@ class Test(unittest.TestCase):
 
     def testDerivationC(self):
         from music21 import corpus
-        s = corpus.parseWork('bach/bwv66.6')
+        s = corpus.parse('bach/bwv66.6')
         p1 = s.parts['Soprano']
         pMeasures = p1.measures(3, 10)
         pMeasuresFlat = pMeasures.flat
