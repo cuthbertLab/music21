@@ -185,7 +185,7 @@ def findEmbeddedChords(testSet = "0234589", cardinality = 3, skipInverse = False
 if __name__ == "__main__":
     music21.mainTest()
 
-print findEmbeddedChords(cardinality = 5)
+#print findEmbeddedChords(cardinality = 5)
 #p, t = priorProbability(1000000, enforce12Tone = False)
 #print p
 #print t
