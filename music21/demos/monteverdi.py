@@ -23,8 +23,8 @@ def spliceAnalysis(book = 3, madrigal = 1):
     '''
     splice an analysis of the madrigal under the analysis itself
     '''
-    mad = music21.corpus.parseWork('monteverdi/madrigal.%s.%s.xml' % (book, madrigal))
-    analysis = music21.corpus.parseWork('monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal))
+    mad = music21.corpus.parse('monteverdi/madrigal.%s.%s.xml' % (book, madrigal))
+    analysis = music21.corpus.parse('monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal))
 
     # these are multiple parts in a score stream
     #excerpt = mad.measures(1,20)
@@ -42,7 +42,7 @@ def spliceAnalysis(book = 3, madrigal = 1):
 def showAnalysis(book = 3, madrigal = 13):
     #analysis = converter.parse('d:/docs/research/music21/dmitri_analyses/Mozart Piano Sonatas/k331.rntxt') 
     filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal)
-    analysis = music21.corpus.parseWork(filename)
+    analysis = music21.corpus.parse(filename)
     #analysis.show()
     (major, minor) = iqSemitonesAndPercentage(analysis)
     print major
@@ -59,11 +59,11 @@ def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False)
         for i in range(start, end+1):
             filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, i)
             if strict == True:
-                analysis = music21.corpus.parseWork(filename)
+                analysis = music21.corpus.parse(filename)
                 print book,i
             else:
                 try:
-                    analysis = music21.corpus.parseWork(filename)
+                    analysis = music21.corpus.parse(filename)
                     print book,i
                 except:
                     print "Cannot parse %s, maybe it does not exist..." % (filename)
@@ -184,11 +184,11 @@ def monteverdiParallels(books = [3], start = 1, end = 20, show = True, strict = 
         for i in range(start, end+1):
             filename = 'monteverdi/madrigal.%s.%s.xml' % (book, i)
             if strict == True:
-                c = corpus.parseWork(filename)
+                c = corpus.parse(filename)
                 print book,i
             else:
                 try:
-                    c = corpus.parseWork(filename)
+                    c = corpus.parse(filename)
                     print book,i
                 except:
                     print "Cannot parse %s, maybe it does not exist..." % (filename)
@@ -231,8 +231,8 @@ def monteverdiParallels(books = [3], start = 1, end = 20, show = True, strict = 
                 
 def findPhraseBoundaries(book = 4, madrigal = 12):
     filename = 'monteverdi/madrigal.%s.%s' % (book, madrigal)
-    sc = corpus.parseWork(filename + '.xml')
-    analysis = corpus.parseWork(filename + '.rntxt')
+    sc = corpus.parse(filename + '.xml')
+    analysis = corpus.parse(filename + '.rntxt')
     analysisFlat  = analysis.flat.stripTies().getElementsByClass(roman.RomanNumeral)
 
     phraseScoresByOffset = {}

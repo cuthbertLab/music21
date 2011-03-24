@@ -401,7 +401,7 @@ class Test(unittest.TestCase):
         from music21 import musedata
         from music21 import corpus
 
-        s = corpus.parseWork('hwv56', '1-08')
+        s = corpus.parse('hwv56', '1-08')
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(s.parts[0].id, 'Contr\'alto')
         self.assertEqual(s.parts[1].id, 'Bassi')
@@ -430,7 +430,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(post), '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>')
 
 
-        s = corpus.parseWork('hwv56', '1-18')
+        s = corpus.parse('hwv56', '1-18')
         self.assertEqual(len(s.parts), 5)
         # the fourth part is vocal, and has no beams defined
         self.assertEqual(str(s.parts[3].getElementsByClass(
@@ -450,7 +450,7 @@ class Test(unittest.TestCase):
 
         #s.show()
         # test that stage1 files continue to have makeBeams called
-        s = corpus.parseWork('bwv1080', '16')
+        s = corpus.parse('bwv1080', '16')
         # measure two has 9/16 beamed in three beats of 16ths
         self.assertEqual(len(s.parts), 2)
 
@@ -466,8 +466,12 @@ class Test(unittest.TestCase):
 
 
     def testAccidentals(self):
+        '''
+        testing a piece with 1 flat to make sure that sharps appear but normal B-flats do not.
+        '''
+        
         from music21 import corpus
-        s = corpus.parseWork('bwv1080', '16')
+        s = corpus.parse('bwv1080', '16')
         self.assertEqual(len(s.parts[0].getKeySignatures()), 1)
         self.assertEqual(str(s.parts[0].getKeySignatures()[0]), 'sharps -1, mode None')
 
@@ -476,12 +480,11 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[2].accidental.displayStatus, True)
 
         # from key signature
-        # this value recently changed; from None to True; not sure if this
-        # is correct
+        # B-, thus no flat should appear.
         self.assertEqual(str(notes[16].accidental), '<accidental flat>')
-        self.assertEqual(notes[16].accidental.displayStatus, True)
+        self.assertEqual(notes[16].accidental.displayStatus, False)
 
-        # cautionary from within measure
+        # cautionary from within measure, the C follows a C#
         notes = s.parts[1].measure(13).flat.notes
         self.assertEqual(str(notes[8].accidental), '<accidental natural>')
         self.assertEqual(notes[8].accidental.displayStatus, True)

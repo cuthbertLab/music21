@@ -2140,12 +2140,12 @@ class Test(unittest.TestCase):
 
         #a = converter.parse(testPrimitive.simpleRepeat45a)
         # this is a good example with repeats
-        s = corpus.parseWork('k80/movement3')
+        s = corpus.parse('k80/movement3')
         for p in s.parts:
             post = p.flat.getElementsByClass('Repeat')
             self.assertEqual(len(post), 6)
 
-        #a = corpus.parseWork('opus41no1/movement3')
+        #a = corpus.parse('opus41no1/movement3')
         #s.show()
 
     def testVoices(self):
@@ -2231,10 +2231,10 @@ class Test(unittest.TestCase):
     def testMultipleStavesPerPartC(self):
 
         from music21 import corpus
-        s = corpus.parseWork('schoenberg/opus19/movement2')        
+        s = corpus.parse('schoenberg/opus19/movement2')        
         self.assertEqual(len(s.parts), 2)
 
-        s = corpus.parseWork('schoenberg/opus19/movement6')        
+        s = corpus.parse('schoenberg/opus19/movement6')        
         self.assertEqual(len(s.parts), 2)
 
         #s.show()
@@ -2326,7 +2326,7 @@ spirit</words>
 
     def testTextExpressionsC(self):
         from music21 import corpus, expressions
-        s =  corpus.parseWork('bwv66.6')
+        s =  corpus.parse('bwv66.6')
         p = s.parts[0]
         for m in p.getElementsByClass('Measure'):
             for n in m.flat.notes:
@@ -2345,7 +2345,7 @@ spirit</words>
     def testTextExpressionsD(self):
         from music21 import corpus, expressions
         # test placing text expression in arbitrary locations
-        s =  corpus.parseWork('bwv66.6')
+        s =  corpus.parse('bwv66.6')
         p = s.parts[-1] # get bass
         for m in p.getElementsByClass('Measure')[1:]:
             for pos in [1.5, 2.5]:

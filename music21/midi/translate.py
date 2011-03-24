@@ -1044,7 +1044,7 @@ class Test(unittest.TestCase):
 
         from music21 import corpus
 
-        s = corpus.parseWork('bach/bwv103.6')
+        s = corpus.parse('bach/bwv103.6')
 
         # get just the soprano part
         soprano = s.parts['soprano']

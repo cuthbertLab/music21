@@ -1020,7 +1020,7 @@ class TestExternal(unittest.TestCase):
         n = note.Note()
         s.append(n)
 
-        s = corpus.parseWork('bach')
+        s = corpus.parse('bach')
 
         aConverter = StreamFreezer(s)
         fp = aConverter.writePickle()
@@ -1199,7 +1199,7 @@ class Test(unittest.TestCase):
     def testConversionMXClefTimeCorpus(self):
     
         from music21 import corpus
-        a = corpus.parseWork('luca')
+        a = corpus.parse('luca')
 
         # there should be only one clef in each part
         clefs = a[0].flat.getElementsByClass(clef.Clef)
@@ -1221,7 +1221,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ts), 4)
 
         from music21 import corpus
-        a = corpus.parseWork('mozart/k156/movement4')
+        a = corpus.parse('mozart/k156/movement4')
 
         # violin part
         clefs = a[0].flat.getElementsByClass(clef.Clef)
@@ -1337,7 +1337,7 @@ class Test(unittest.TestCase):
 
     def testConversionMXInstrument(self):
         from music21 import corpus
-        s = corpus.parseWork('beethoven/opus18no1/movement3.xml')
+        s = corpus.parse('beethoven/opus18no1/movement3.xml')
         #s.show()
         is1 = s.parts[0].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is1), 1)
@@ -1489,7 +1489,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.notes), 66)
 
         # a small essen collection
-        op = corpus.parseWork('essenFolksong/teste')
+        op = corpus.parse('essenFolksong/teste')
         # get a Stream object, not an opus
         #self.assertEqual(isinstance(op, stream.Score), True)
         self.assertEqual(isinstance(op, stream.Opus), True)
@@ -1497,7 +1497,7 @@ class Test(unittest.TestCase):
         #op.show()
 
         # get one work from the opus
-        s = corpus.parseWork('essenFolksong/teste', number=6)
+        s = corpus.parse('essenFolksong/teste', number=6)
         self.assertEqual(isinstance(s, stream.Score), True)
         self.assertEqual(isinstance(s, stream.Opus), False)
         self.assertEqual(s.metadata.title, 'Moli hua')
@@ -1508,7 +1508,7 @@ class Test(unittest.TestCase):
     def testConversionABCWorkFromOpus(self):
         # test giving a work number at loading
         from music21 import corpus
-        s = corpus.parseWork('essenFolksong/han1', number=6)
+        s = corpus.parse('essenFolksong/han1', number=6)
         self.assertEqual(isinstance(s, stream.Score), True)
         self.assertEqual(s.metadata.title, 'Yi gan hongqi kongzhong piao')
         # make sure that beams are being made
@@ -1590,7 +1590,7 @@ class Test(unittest.TestCase):
     def testMadrigalsA(self):
 
         from music21 import corpus, converter
-        s = corpus.parseWork('madrigal.3.12.xml')
+        s = corpus.parse('madrigal.3.12.xml')
 
         #s.show()
 

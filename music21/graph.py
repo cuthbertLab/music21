@@ -1454,19 +1454,19 @@ class PlotStream(object):
         '''Get ticks and labels for pitch classes based on usage. That is, show the most commonly used enharmonic first.
 
         >>> from music21 import corpus
-        >>> s = corpus.parseWork('bach/bwv324.xml')
+        >>> s = corpus.parse('bach/bwv324.xml')
         >>> a = PlotStream(s)
         >>> [x for x, y in a.ticksPitchClassUsage(hideUnused=True)]
         [0, 2, 3, 4, 6, 7, 9, 11]
 
-        >>> s = corpus.parseWork('bach/bwv281.xml')
+        >>> s = corpus.parse('bach/bwv281.xml')
         >>> a = PlotStream(s)
         >>> [x for x, y in a.ticksPitchClassUsage(showEnharmonic=True, hideUnused=True)]
         [0, 2, 3, 4, 5, 7, 9, 10, 11]
         >>> [x for x, y in a.ticksPitchClassUsage(showEnharmonic=True, blankLabelUnused=False)]
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
-        >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
+        >>> s = corpus.parse('schumann/opus41no1/movement2.xml')
         >>> a = PlotStream(s)
         >>> [x for x, y in a.ticksPitchClassUsage(showEnharmonic=True)]
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -1511,7 +1511,7 @@ class PlotStream(object):
         '''Utility method to get ticks in pitch classes
 
         >>> from music21 import corpus
-        >>> s = corpus.parseWork('bach/bwv324.xml')
+        >>> s = corpus.parse('bach/bwv324.xml')
         >>> a = PlotStream(s)
         >>> [x for x,y in a.ticksPitchClass()]
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -1565,12 +1565,12 @@ class PlotStream(object):
         '''Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first.
 
         >>> from music21 import corpus
-        >>> s = corpus.parseWork('bach/bwv324.xml')
+        >>> s = corpus.parse('bach/bwv324.xml')
         >>> a = PlotStream(s[0])
         >>> [x for x, y in a.ticksPitchSpaceUsage(hideUnused=True)]
         [64, 66, 67, 69, 71, 72]
 
-        >>> s = corpus.parseWork('schumann/opus41no1/movement2.xml')
+        >>> s = corpus.parse('schumann/opus41no1/movement2.xml')
         >>> a = PlotStream(s)
         >>> [x for x, y in a.ticksPitchSpaceUsage(showEnharmonic=True, hideUnused=True)]
         [36, 38, 40, 41, 43, 44, 45, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]
@@ -1624,7 +1624,7 @@ class PlotStream(object):
         If `minMaxOnly` is True, only the first and last values will be provided.
 
         >>> from music21 import corpus, stream, note
-        >>> s = corpus.parseWork('bach/bwv281.xml')
+        >>> s = corpus.parse('bach/bwv281.xml')
         >>> a = PlotStream(s)
         >>> a.ticksOffset() # on whole score, showing anacrusis spacing
         [[1.0, '1'], [5.0, '2'], [9.0, '3'], [13.0, '4'], [17.0, '5'], [21.0, '6'], [25.0, '7'], [29.0, '8']]
@@ -1944,9 +1944,9 @@ class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
     '''Stream plotting of windowed version of Krumhansl-Schmuckler analysis routine. See :class:`~music21.analysis.discrete.KrumhanslSchmuckler` for more details.
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv66.6.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv66.6.xml') #_DOCS_HIDE
     >>> p = graph.PlotWindowedKrumhanslSchmuckler(s.parts[0], doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv66.6')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv66.6')
     >>> #_DOCS_SHOW p = graph.PlotWindowedKrumhanslSchmuckler(s.parts[0])
     >>> p.process() # with defaults and proper configuration, will open graph
 
@@ -2007,9 +2007,9 @@ class PlotWindowedAmbitus(PlotWindowedAnalysis):
     '''Stream plotting of basic pitch span. 
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv66.6.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv66.6.xml') #_DOCS_HIDE
     >>> p = graph.PlotWindowedAmbitus(s.parts[0], doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv66.6')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv66.6')
     >>> #_DOCS_SHOW p = graph.PlotWindowedAmbitus(s.parts[0])
     >>> p.process() # with defaults and proper configuration, will open graph
 
@@ -2105,9 +2105,9 @@ class PlotHistogramPitchSpace(PlotHistogram):
     '''A histogram of pitch space.
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHistogramPitchSpace(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHistogramPitchSpace(s)
     >>> p.id
     'histogram-pitch'
@@ -2155,9 +2155,9 @@ class PlotHistogramPitchClass(PlotHistogram):
     '''A histogram of pitch class
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHistogramPitchClass(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHistogramPitchClass(s)
     >>> p.id
     'histogram-pitchClass'
@@ -2201,9 +2201,9 @@ class PlotHistogramQuarterLength(PlotHistogram):
     '''A histogram of pitch class
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHistogramQuarterLength(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHistogramQuarterLength(s)
     >>> p.id
     'histogram-quarterLength'
@@ -2330,9 +2330,9 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     '''A scatter plot of pitch space and quarter length
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotScatterPitchSpaceQuarterLength(s)
     >>> p.id
     'scatter-pitch-quarterLength'
@@ -2375,9 +2375,9 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
     '''A scatter plot of pitch class and quarter length
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotScatterPitchClassQuarterLength(s)
     >>> p.id
     'scatter-pitchClass-quarterLength'
@@ -2422,9 +2422,9 @@ class PlotScatterPitchClassOffset(PlotScatter):
     '''A scatter plot of pitch class and offset
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotScatterPitchClassOffset(s)
     >>> p.id
     'scatter-pitchClass-offset'
@@ -2472,9 +2472,9 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
     '''A graph of dynamics used by pitch space.
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('schumann/opus41no1', 2) #_DOCS_HIDE
+    >>> s = corpus.parse('schumann/opus41no1', 2) #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('schumann/opus41no1', 2)
+    >>> #_DOCS_SHOW s = corpus.parse('schumann/opus41no1', 2)
     >>> #_DOCS_SHOW p = graph.PlotScatterPitchSpaceDynamicSymbol(s)
     >>> p.process()
 
@@ -2608,9 +2608,9 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
     '''A graph of events, sorted by pitch class, over time
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHorizontalBarPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHorizontalBarPitchClassOffset(s)
     >>> p.process() # with defaults and proper configuration, will open graph
 
@@ -2651,9 +2651,9 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
     '''A graph of events, sorted by pitch space, over time
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHorizontalBarPitchSpaceOffset(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotHorizontalBarPitchSpaceOffset(s)
     >>> p.process() # with defaults and proper configuration, will open graph
 
@@ -2801,9 +2801,9 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
     '''A graph of event, sorted by pitch, over time
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterWeightedPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotScatterWeightedPitchSpaceQuarterLength(s)
     >>> p.process() # with defaults and proper configuration, will open graph
 
@@ -2845,9 +2845,9 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
     '''A graph of event, sorted by pitch class, over time.
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterWeightedPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.PlotScatterWeightedPitchClassQuarterLength(s)
     >>> p.process() # with defaults and proper configuration, will open graph
 
@@ -2892,9 +2892,9 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
 
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('schumann/opus41no1', 2) #_DOCS_HIDE
+    >>> s = corpus.parse('schumann/opus41no1', 2) #_DOCS_HIDE
     >>> p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('schumann/opus41no1', 2)
+    >>> #_DOCS_SHOW s = corpus.parse('schumann/opus41no1', 2)
     >>> #_DOCS_SHOW p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s)
     >>> p.process() # with defaults and proper configuration, will open graph
 
@@ -3033,7 +3033,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     '''A scatter plot of pitch and quarter length
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.Plot3DBarsPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW from music21.musicxml import testFiles
     >>> #_DOCS_SHOW s = converter.parse(testFiles.mozartTrioK581Excerpt)
@@ -3241,18 +3241,18 @@ def plotStream(streamObj, *args, **keywords):
     :class:`~music21.graph.PlotWindowedAmbitus`
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW s.plot('histogram', 'pitch')
 
     .. image:: images/PlotHistogramPitchSpace.*
         :width: 600
 
 
-    >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW s.plot('pianoroll')
 
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
@@ -3341,7 +3341,7 @@ class TestExternal(unittest.TestCase):
 
     def testPlotHorizontalBarPitchSpaceOffset(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         # do not need to call flat version
         b = PlotHorizontalBarPitchSpaceOffset(a[0], title='Bach (soprano voice)')
         b.process()
@@ -3353,11 +3353,11 @@ class TestExternal(unittest.TestCase):
 
     def testPlotHorizontalBarPitchClassOffset(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = PlotHorizontalBarPitchClassOffset(a[0], title='Bach (soprano voice)')
         b.process()
 
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = PlotHorizontalBarPitchClassOffset(a[0].measures(3,6), title='Bach (soprano voice, mm 3-6)')
         b.process()
 
@@ -3381,13 +3381,13 @@ class TestExternal(unittest.TestCase):
         from music21 import corpus      
 
         for xLog in [True, False]:
-            a = corpus.parseWork('bach/bwv57.8')
+            a = corpus.parse('bach/bwv57.8')
             b = PlotScatterWeightedPitchSpaceQuarterLength(a[0].flat,
                             title='Pitch Space Bach (soprano voice)',
                             xLog=xLog)
             b.process()
     
-            a = corpus.parseWork('bach/bwv57.8')
+            a = corpus.parse('bach/bwv57.8')
             b = PlotScatterWeightedPitchClassQuarterLength(a[0].flat,
                             title='Pitch Class Bach (soprano voice)',
                             xLog=xLog)
@@ -3396,19 +3396,19 @@ class TestExternal(unittest.TestCase):
 
     def testPlotPitchSpace(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramPitchSpace(a[0].flat, title='Bach (soprano voice)')
         b.process()
 
     def testPlotPitchClass(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramPitchClass(a[0].flat, title='Bach (soprano voice)')
         b.process()
 
     def testPlotQuarterLength(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramQuarterLength(a[0].flat, title='Bach (soprano voice)')
         b.process()
 
@@ -3418,7 +3418,7 @@ class TestExternal(unittest.TestCase):
 
         for xLog in [True, False]:
 
-            a = corpus.parseWork('bach/bwv57.8')
+            a = corpus.parse('bach/bwv57.8')
             b = PlotScatterPitchSpaceQuarterLength(a[0].flat, title='Bach (soprano voice)', xLog=xLog)
             b.process()
     
@@ -3427,14 +3427,14 @@ class TestExternal(unittest.TestCase):
 
     def testPlotScatterPitchClassOffset(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = PlotScatterPitchClassOffset(a[0].flat, title='Bach (soprano voice)')
         b.process()
 
 
     def testPlotScatterPitchSpaceDynamicSymbol(self):
         from music21 import corpus      
-        a = corpus.parseWork('schumann/opus41no1', 2)
+        a = corpus.parse('schumann/opus41no1', 2)
         b = PlotScatterPitchSpaceDynamicSymbol(a[0].flat, title='Schumann (soprano voice)')
         b.process()
 
@@ -3445,7 +3445,7 @@ class TestExternal(unittest.TestCase):
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = Plot3DBarsPitchSpaceQuarterLength(a.flat, title='Bach (soprano voice)')
         b.process()
 
@@ -3453,7 +3453,7 @@ class TestExternal(unittest.TestCase):
 
     def testAll(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         plotStream(a.flat, 'all')
 
 
@@ -3553,7 +3553,7 @@ class TestExternal(unittest.TestCase):
 
 
 
-        sDefault = corpus.parseWork('bach/bwv57.8')
+        sDefault = corpus.parse('bach/bwv57.8')
 
         for plotClassName, work, titleStr in plotClasses:
             if work == None:
@@ -3689,32 +3689,32 @@ class Test(unittest.TestCase):
 
     def testPlotPitchSpaceDurationCount(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = PlotScatterWeightedPitchSpaceQuarterLength(a[0].flat, doneAction=None,
                         title='Bach (soprano voice)')
         b.process()
 
     def testPlotPitchSpace(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach')
+        a = corpus.parse('bach')
         b = PlotHistogramPitchSpace(a[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
 
     def testPlotPitchClass(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramPitchClass(a[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
 
     def testPlotQuarterLength(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramQuarterLength(a[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
 
     def testPitchDuration(self):
         from music21 import corpus      
-        a = corpus.parseWork('schumann/opus41no1', 2)
+        a = corpus.parse('schumann/opus41no1', 2)
         b = PlotScatterPitchSpaceDynamicSymbol(a[0].flat, doneAction=None, title='Schumann (soprano voice)')
         b.process()
 
@@ -3727,12 +3727,12 @@ class Test(unittest.TestCase):
         if doneAction != None:
             fp = random.choice(corpus.getBachChorales('.xml'))
             dir, fn = os.path.split(fp)
-            a = corpus.parseWork(fp)
+            a = corpus.parse(fp)
             windowStep = 3 #'2'
             #windowStep = random.choice([1,2,4,8,16,32])
             #a.show()
         else:
-            a = corpus.parseWork('bach/bwv66.6')
+            a = corpus.parse('bach/bwv66.6')
             fn = 'bach/bwv66.6'
             windowStep = 20 # set high to be fast
 
@@ -3750,7 +3750,7 @@ class Test(unittest.TestCase):
 
     def testAll(self):
         from music21 import corpus      
-        a = corpus.parseWork('bach/bwv57.8')
+        a = corpus.parse('bach/bwv57.8')
         plotStream(a.flat, doneAction=None)
 
 
@@ -3767,7 +3767,7 @@ class Test(unittest.TestCase):
 
     def testPianoRollFromOpus(self):
         from music21 import corpus
-        o = corpus.parseWork('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
+        o = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         s = o.mergeScores()
 
         b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)

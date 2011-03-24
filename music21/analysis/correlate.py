@@ -108,13 +108,13 @@ class ActivityMatch(object):
         If `dataPoints` is True, all data matches between source and destination are returned. If false, 3 point weighted coordinates are created for each unique match. 
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv8.6.xml')
+        >>> s = corpus.parse('bach/bwv8.6.xml')
         >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
         >>> am.pitchToDynamic()
         Traceback (most recent call last):
         CorrelateException: cannot create correlation an object that is not found in the Stream: <class 'music21.dynamics.Dynamic'>
 
-        >>> s = corpus.parseWork('schumann/opus41no1', 2)
+        >>> s = corpus.parse('schumann/opus41no1', 2)
         >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
         >>> data = am.pitchToDynamic()
         >>> len(data)
@@ -208,9 +208,9 @@ class Test(unittest.TestCase):
     def testActivityMatchPitchToDynamic(self):
         from music21 import corpus
 
-        #a = corpus.parseWork('bach/bwv8.6.xml')
-        #a = corpus.parseWork('beethoven/opus18no1', 2)
-        a = corpus.parseWork('schumann/opus41no1', 2)
+        #a = corpus.parse('bach/bwv8.6.xml')
+        #a = corpus.parse('beethoven/opus18no1', 2)
+        a = corpus.parse('schumann/opus41no1', 2)
 
         # just get the soprano part
         b = ActivityMatch(a[0].flat.sorted)

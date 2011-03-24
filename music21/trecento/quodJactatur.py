@@ -179,7 +179,7 @@ def getQJ():
     <music21.note.Note C>
     '''
     
-    qj = corpus.parseWork("ciconia/quod_jactatur")
+    qj = corpus.parse("ciconia/quod_jactatur")
     qjPart = qj.getElementsByClass(stream.Part)[0]
     qjPart.transpose("P-8", inPlace = True)
     qjPart.replace(qjPart.flat.getElementsByClass(clef.Clef)[0], clef.BassClef())

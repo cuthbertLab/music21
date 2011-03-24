@@ -3862,7 +3862,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n.lyric, '34')
 
 
-        violin1 = corpus.parseWork("beethoven/opus18no1", 
+        violin1 = corpus.parse("beethoven/opus18no1", 
                                 3, extList='xml').getElementById("Violin I")
         lastNote = violin1.flat.notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
@@ -3923,7 +3923,7 @@ class Test(unittest.TestCase):
         '''Can a measure determine the last Clef used?
         '''
         from music21 import corpus, clef, stream
-        a = corpus.parseWork('bach/bwv324.xml')
+        a = corpus.parse('bach/bwv324.xml')
         measures = a[0].getElementsByClass('Measure') # measures of first part
 
         # the parent of measures[1] is set to the new output stream
@@ -4002,7 +4002,7 @@ class Test(unittest.TestCase):
         '''Test getting beat data from various Music21Objects.
         '''
         from music21 import corpus
-        s = corpus.parseWork('bach/bwv66.6.xml')
+        s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['Soprano']
 
         # this does not work; cannot get these values from Measures
@@ -4070,7 +4070,7 @@ class Test(unittest.TestCase):
 
         from music21 import corpus, stream, note
         
-        s = corpus.parseWork('bach/bwv66.6.xml')
+        s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['Soprano']
         for classStr in ['Clef', 'KeySignature', 'TimeSignature']:
             self.assertEqual(p1.flat.getElementsByClass(
@@ -4180,7 +4180,7 @@ class Test(unittest.TestCase):
     
     def testPickupMeauresImported(self):
         from music21 import corpus
-        s = corpus.parseWork('bach/bwv103.6')
+        s = corpus.parse('bach/bwv103.6')
     
         p = s.parts['soprano']
         m1 = p.getElementsByClass('Measure')[0]

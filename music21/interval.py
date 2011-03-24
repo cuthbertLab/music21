@@ -2255,7 +2255,7 @@ class Test(unittest.TestCase):
             return post
 
         from music21 import corpus
-        s = corpus.parseWork('bach/bwv66.6')
+        s = corpus.parse('bach/bwv66.6')
         # this has accidentals in measures 2 and 6
         sSub = s[3].measures(2,6)
         

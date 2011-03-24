@@ -340,9 +340,9 @@ class AbstractScale(Scale):
         '''Create and display a plot.
         '''
 #         >>> from music21 import *
-#         >>> s = corpus.parseWork('bach/bwv324.xml') #_DOCS_HIDE
+#         >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
 #         >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
-#         >>> #_DOCS_SHOW s = corpus.parseWork('bach/bwv57.8')
+#         >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
 #         >>> #_DOCS_SHOW s.plot('pianoroll')
     
 #         .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
@@ -2344,7 +2344,7 @@ class Test(unittest.TestCase):
         sc1 = MajorScale()
         # deriving a new scale from the pitches found in a collection
         from music21 import corpus
-        s = corpus.parseWork('bwv66.6')
+        s = corpus.parse('bwv66.6')
         sc3 = sc1.derive(s.parts['soprano'])
         self.assertEqual(str(sc3), '<music21.scale.MajorScale A major>')
 

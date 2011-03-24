@@ -1306,7 +1306,7 @@ class Test(unittest.TestCase):
 
     def testMusicXMLFermata(self):
         from music21 import corpus
-        a = corpus.parseWork('bach/bwv5.7')
+        a = corpus.parse('bach/bwv5.7')
         found = []
         for n in a.flat.notes:
             for obj in n.expressions:
@@ -1404,7 +1404,7 @@ class Test(unittest.TestCase):
 
         for work, match in data:
             from music21 import corpus
-            s = corpus.parseWork(work)
+            s = corpus.parse(work)
             # always use tenor line    
             found = []
             for n in s[2].flat.notes:

@@ -106,12 +106,12 @@ class Test(unittest.TestCase):
     def runParseBeethoven(self):
         '''Loading file: beethoven/opus59no2/movement3
         '''
-        x = corpus.parseWork('beethoven/opus59no2/movement3', forceSource=True)
+        x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
     def runMusicxmlOutPartsBeethoven(self):
         '''Loading file and rendering musicxml output for each part: beethoven/opus59no2/movement3
         '''
-        x = corpus.parseWork('beethoven/opus59no2/movement3', forceSource=True)
+        x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
         #problem: doing each part is much faster than the whole score
         for p in x.parts:
             post = p.musicxml
@@ -119,30 +119,30 @@ class Test(unittest.TestCase):
     def runMusicxmlOutScoreBeethoven(self):
         '''Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3
         '''
-        x = corpus.parseWork('beethoven/opus59no2/movement3', forceSource=True)
+        x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
         #problem: doing each part is much faster than the whole score
         post = x.musicxml
 
     def runParseHaydn(self):
         '''Loading file: haydn/opus74no1/movement3
         '''
-        x = corpus.parseWork('haydn/opus74no1/movement3', forceSource=True)
+        x = corpus.parse('haydn/opus74no1/movement3', forceSource=True)
 
     def runParseSchumann(self):
         '''Loading file: schumann/opus41no1/movement2
         '''
-        x = corpus.parseWork('schumann/opus41no1/movement2', forceSource=True)
+        x = corpus.parse('schumann/opus41no1/movement2', forceSource=True)
 
     def runParseLuca(self):
         '''Loading file: luca/gloria
         '''
-        x = corpus.parseWork('luca/gloria', forceSource=True)
+        x = corpus.parse('luca/gloria', forceSource=True)
 
 
     def runMusicxmlOutLuca(self):
         '''Loading file and rendering musicxml output: luca/gloria
         '''
-        x = corpus.parseWork('luca/gloria', forceSource=True)
+        x = corpus.parse('luca/gloria', forceSource=True)
         post = x.musicxml
 
 
@@ -177,7 +177,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
 
-        s = corpus.parseWork('essenFolksong/han1')
+        s = corpus.parse('essenFolksong/han1')
 
 
 
@@ -186,7 +186,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus, clef, meter, key
 
-        s = corpus.parseWork('bwv66.6')
+        s = corpus.parse('bwv66.6')
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
                 post = m.getContextByClass(clef.Clef)
@@ -209,7 +209,7 @@ class Test(unittest.TestCase):
     def runParseMonteverdiRNText(self):
         '''Loading file: beethoven/opus59no2/movement3
         '''
-        x = corpus.parseWork('monteverdi/madrigal.5.3.rntxt', forceSource=True)
+        x = corpus.parse('monteverdi/madrigal.5.3.rntxt', forceSource=True)
 
 
 

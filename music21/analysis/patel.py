@@ -42,7 +42,7 @@ def nPVI(streamForAnalysis):
     >>> s3 = converter.parse('C4 D8 C4 D8 C4', '4/4').notes
     >>> nPVI(s3)
     66.6666...
-    >>> s4 = corpus.parseWork('bwv66.6').parts[0].flat.notes
+    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notes
     >>> nPVI(s4)
     12.96296...
     '''
@@ -83,7 +83,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     >>> s3 = converter.parse('C4 D E F G C', '4/4').notes
     >>> melodicIntervalVariability(s3)
     85.266688...
-    >>> s4 = corpus.parseWork('bwv66.6').parts[0].flat.notes
+    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notes
     >>> melodicIntervalVariability(s4)
     65.287...
     '''

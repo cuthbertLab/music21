@@ -995,7 +995,7 @@ class CorpusDoc(RestructuredWriter):
         msg += self._para('''The following list shows all files available in the music21 corpus and available through the virtual corpus. To load a work from the corpus, provide the file path stub provided. For example::
 
         >>> from music21 import corpus
-        >>> s = corpus.parseWork('bach/bwv108.6.xml')
+        >>> s = corpus.parse('bach/bwv108.6.xml')
         ''')
 
         refList = corpus.getWorkReferences(sort=True)

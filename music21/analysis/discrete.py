@@ -255,7 +255,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         '''Determine count of sharps and flats in a Stream
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> p = KrumhanslSchmuckler()
         >>> p._getSharpFlatCount(s.flat)
         (87, 0)
@@ -621,12 +621,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         '''Return a music21 Key object defining the results of the analysis. Do not call process before calling this method, as this method calls process. 
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> p.getSolution(s) # this seems correct
         <music21.key.Key of F# minor>
 
-        >>> s = corpus.parseWork('bach/bwv57.8')
+        >>> s = corpus.parse('bach/bwv57.8')
         >>> p = analysis.discrete.KrumhanslSchmuckler(s)
         >>> p.getSolution(s) 
         <music21.key.Key of B- major>
@@ -919,7 +919,7 @@ class Ambitus(DiscreteAnalysis):
         This public method may be used by other classes. 
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
         >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
         (66, 71)
@@ -968,7 +968,7 @@ class Ambitus(DiscreteAnalysis):
         >>> p.getPitchRanges(s)
         (26, 63)
 
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> p.getPitchRanges(s)
         (0, 34)
         '''
@@ -997,7 +997,7 @@ class Ambitus(DiscreteAnalysis):
         '''Return legend data. 
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus(s.parts[0]) #provide ref stream
         >>> len(p.solutionLegend())
         2
@@ -1007,7 +1007,7 @@ class Ambitus(DiscreteAnalysis):
         >>> [len(y) for y in [x for x in p.solutionLegend()]]
         [2, 2]
 
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> p = Ambitus()
         >>> p.solutionLegend(compress=True) # empty if nothing processed
         [['', []], ['', []]]
@@ -1106,7 +1106,7 @@ class Ambitus(DiscreteAnalysis):
         '''Procedure to only return an Inteval object.
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
         >>> p.getSolution(s)
         <music21.interval.Interval m21>
@@ -1216,7 +1216,7 @@ def analyzeStream(streamObj, *args, **keywords):
     :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
 
     >>> from music21 import *
-    >>> s = corpus.parseWork('bach/bwv66.6')
+    >>> s = corpus.parse('bach/bwv66.6')
     >>> analysis.discrete.analyzeStream(s, 'Krumhansl')
     <music21.key.Key of F# minor>
     >>> analysis.discrete.analyzeStream(s, 'ambitus')
@@ -1367,7 +1367,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(id.countMelodicIntervals(s, ignoreDirection=False)), """{'M-2': [<music21.interval.Interval M-2>, 1], 'M2': [<music21.interval.Interval M2>, 2]}""")
 
         id = MelodicIntervalDiversity()
-        s = corpus.parseWork('hwv56', '1-08')
+        s = corpus.parse('hwv56', '1-08')
         #s.show()
 
         self.assertEqual(str(id.countMelodicIntervals(s.parts[1])), "{'P5': [<music21.interval.Interval P5>, 1], 'P4': [<music21.interval.Interval P4>, 1], 'm3': [<music21.interval.Interval m3>, 1], 'M2': [<music21.interval.Interval M2>, 2]}")

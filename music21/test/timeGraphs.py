@@ -77,7 +77,7 @@ class TestTimeCapua2(CallTest):
 
 class TestTimeIsmir(CallTest):
     def testFocus(self):
-        s1 = corpus.parseWork('bach/bwv248')
+        s1 = corpus.parse('bach/bwv248')
         post = s1.musicxml
 
 
@@ -147,8 +147,8 @@ class TestMusicXMLOutputParts(CallTest):
     '''This tries to isolate a problem whereby part creation is much faster than score creation. 
     '''
     def __init__(self):
-        self.s = corpus.parseWork('bach/bwv66.6', forceSource=True)
-        #self.s = corpus.parseWork('beethoven/opus59no2/movement3', forceSource=True)
+        self.s = corpus.parse('bach/bwv66.6', forceSource=True)
+        #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
     def testFocus(self):
         for p in self.s.parts:
@@ -159,8 +159,8 @@ class TestMusicXMLOutputScore(CallTest):
     '''This tries to isolate a problem whereby part creation is much faster than score creation. 
     '''
     def __init__(self):
-        self.s = corpus.parseWork('bach/bwv66.6', forceSource=True)
-        #self.s = corpus.parseWork('beethoven/opus59no2/movement3', forceSource=True)
+        self.s = corpus.parse('bach/bwv66.6', forceSource=True)
+        #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
     def testFocus(self):
         post = self.s.musicxml
@@ -173,7 +173,7 @@ class TestABCImport(CallTest):
         pass
 
     def testFocus(self):
-        self.s = corpus.parseWork('essenFolksong/erk20.abc', forceSource=True)
+        self.s = corpus.parse('essenFolksong/erk20.abc', forceSource=True)
 
 
 class TestMetadataBundle(CallTest):
@@ -277,7 +277,7 @@ class TestGetContextByClass(CallTest):
     def __init__(self):
 
         from music21 import corpus, clef, meter, key
-        self.s = corpus.parseWork('bwv66.6')
+        self.s = corpus.parse('bwv66.6')
 
 
     def testFocus(self):

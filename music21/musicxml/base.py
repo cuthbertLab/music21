@@ -3871,7 +3871,7 @@ class Test(unittest.TestCase):
                         #print c.repeatObj.direction
 
 
-        s = corpus.parseWork('opus18no1/movement3', extList=['.xml'])
+        s = corpus.parse('opus18no1/movement3', extList=['.xml'])
 
 
 

@@ -40,7 +40,7 @@ class Test(unittest.TestCase):
 
     def testQuickStart(self):
         from music21 import stream, corpus, note
-        sBach = corpus.parseWork('bach/bwv7.7')
+        sBach = corpus.parse('bach/bwv7.7')
         # with metadata
         self.assertEquals(len(sBach), 5)
         self.assertEquals(len(sBach.parts), 4)
@@ -199,7 +199,7 @@ class Test(unittest.TestCase):
 
     def testOverviewMeterA(self):
 
-        sSrc = corpus.parseWork('bach/bwv13.6.xml')
+        sSrc = corpus.parse('bach/bwv13.6.xml')
         sPart = sSrc.getElementById('Bass')
 
         # create a new set of measure partitioning
@@ -218,7 +218,7 @@ class Test(unittest.TestCase):
 
 
         # from the docs:
-        sSrc = corpus.parseWork('bach/bwv57.8.xml')
+        sSrc = corpus.parse('bach/bwv57.8.xml')
         sPart = sSrc.getElementById('Alto')
         post = sPart.musicxml
 
@@ -256,7 +256,7 @@ class Test(unittest.TestCase):
             sRebar.insert(0, newPart)
         post = sRebar.musicxml
 
-        #sSrc = corpus.parseWork('bach/bwv57.8.xml')
+        #sSrc = corpus.parse('bach/bwv57.8.xml')
         sPart = sSrc.getElementById('Soprano')
         self.assertEquals(sPart.flat.notes[0].name, 'B-')
         self.assertEquals(sPart.flat.notes[4].beat, 2.5)
@@ -274,7 +274,7 @@ class Test(unittest.TestCase):
 
     def testOverviewMeterB(self):
 
-        sSrc = corpus.parseWork('bach/bwv13.6.xml')
+        sSrc = corpus.parse('bach/bwv13.6.xml')
 
         sPart = sSrc.getElementById('Alto')
         ts = meter.TimeSignature('6/8')
@@ -315,7 +315,7 @@ class Test(unittest.TestCase):
 
         # mensural cannon
         from music21 import stream, corpus
-        src = corpus.parseWork('bach/bwv323.xml')
+        src = corpus.parse('bach/bwv323.xml')
         ex = src.getElementById('Soprano').flat.notes[:20]
         
         s = stream.Score()
@@ -337,7 +337,7 @@ class Test(unittest.TestCase):
 
 
         # counting and searching musical elements
-        s = corpus.parseWork("bach/bwv30.6")                
+        s = corpus.parse("bach/bwv30.6")                
         total = 0
         for p in s.pitches:
             if p.name == 'G#':
@@ -351,7 +351,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, stream, note
         
         # Parse a work from the corpus
-        s = corpus.parseWork('bwv66.6')
+        s = corpus.parse('bwv66.6')
         #s.show()        
         # Reduce the work to a series of simultaneities, then extract only
         # the resultant Chords
@@ -388,7 +388,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, chord, stream
 
         # First, we parse the score and get just the Violin part
-        op133 = corpus.parseWork('beethoven/opus133.xml') 
+        op133 = corpus.parse('beethoven/opus133.xml') 
         violin2 = op133.getElementById('2nd Violin')        
         # An empty container is created for later display
         display = stream.Stream() 
@@ -491,7 +491,7 @@ class Test(unittest.TestCase):
     def testExamplesD(self):
         from music21 import corpus
         # Parse an Opus, a collection of Scores
-        o = corpus.parseWork('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
+        o = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         # Create a Score from a Measure range
         sExcerpt = o.mergeScores().measures(127, 133)
         # Create a reduction of Chords

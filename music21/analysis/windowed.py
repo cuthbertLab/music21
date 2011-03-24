@@ -58,7 +58,7 @@ class WindowedAnalysis(object):
         ''' Take the loaded stream and restructure it into measures of 1 quarter note duration.
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv324')
+        >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.Ambitus()
         >>> # placing one part into analysis
         >>> wa = WindowedAnalysis(s.parts[0], p)
@@ -95,7 +95,7 @@ class WindowedAnalysis(object):
         Returns two lists for results, each equal in size to the length of minimum windows minus the window size plus one. If we have 20 1/4 windows, then the results lists will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc. 
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv66.6')
+        >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
         >>> wa = WindowedAnalysis(s, p)
         >>> len(wa._windowedStream)
@@ -192,7 +192,7 @@ class WindowedAnalysis(object):
         If `includeTotalWindow` is True, the largest window size will always be added. 
 
         >>> from music21 import *
-        >>> s = corpus.parseWork('bach/bwv324')
+        >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> # placing one part into analysis
         >>> wa = WindowedAnalysis(s[0], p)
@@ -299,7 +299,7 @@ class Test(unittest.TestCase):
         from music21.analysis import discrete
         # get a procedure 
         
-        s = corpus.parseWork('bach/bwv324')
+        s = corpus.parse('bach/bwv324')
 
         for pClass in [discrete.KrumhanslSchmuckler, discrete.Ambitus]:
             p = pClass()
@@ -378,7 +378,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, graph
         
         p = discrete.KrumhanslSchmuckler()
-        s = corpus.parseWork('bach/bwv66.6')
+        s = corpus.parse('bach/bwv66.6')
 
         wa = WindowedAnalysis(s, p)
 

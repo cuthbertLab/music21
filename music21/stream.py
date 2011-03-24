@@ -7090,7 +7090,7 @@ class Stream(music21.Music21Object):
         you'll need to flatten each stream as follows:
 
         
-        >>> #DOCS_SHOW stream1.flat.attachIntervvalsBetweenStreams(stream2.flat)
+        >>> #_DOCS_SHOW stream1.flat.attachIntervvalsBetweenStreams(stream2.flat)
         
             
         Example usage:

@@ -2233,7 +2233,7 @@ class Test(unittest.TestCase):
 
         from music21 import corpus
 
-        s = corpus.parseWork('jactatur')
+        s = corpus.parse('jactatur')
         self.assertEqual(s.metadata.composer, 'Johannes Ciconia')
 
         rmd = RichMetadata()
@@ -2260,7 +2260,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(str(rmd.ambitus), '<music21.interval.Interval m7>')
 
 
-        s = corpus.parseWork('bwv66.6')
+        s = corpus.parse('bwv66.6')
         rmd = RichMetadata()
         rmd.merge(s.metadata)
 
@@ -2274,7 +2274,7 @@ class Test(unittest.TestCase):
 
 
         # test that work id values are copied
-        o = corpus.parseWork('essenFolksong/teste')
+        o = corpus.parse('essenFolksong/teste')
         self.assertEqual(len(o), 8)
 
         s = o.getScoreByNumber(4)
@@ -2290,8 +2290,7 @@ class Test(unittest.TestCase):
 
     def testMetadataSearch(self):
         from music21 import corpus
-        s = corpus.parseWork('ciconia')
-        print s.metadata.title
+        s = corpus.parse('ciconia')
         self.assertEqual(s.metadata.search('quod', 'title'), (True, 'title'))
         self.assertEqual(s.metadata.search('qu.d', 'title'), (True, 'title'))
         self.assertEqual(s.metadata.search(re.compile('(.*)canon(.*)')), (True, 'title'))
