@@ -2158,6 +2158,27 @@ class Chord(note.NotRest):
         False
         ''')    
 
+    def getZRelation(self):
+        '''Return a Z relation if it exists, otherwise return None.
+
+        >>> from music21 import *
+        >>> chord.fromIntervalVector((1,1,1,1,1,1))
+        <music21.chord.Chord C C# E F#>
+        >>> chord.fromIntervalVector((1,1,1,1,1,1)).getZRelation()
+        <music21.chord.Chord C C# E- G>
+        '''
+        if self.hasZRelation:
+            self._updateChordTablesAddress()
+            chordTablesAddress = tuple(self._chordTablesAddress)
+            v = chordTables.addressToIntervalVector(chordTablesAddress)
+            addresses = chordTables.intervalVectorToAddress(v)
+            #environLocal.printDebug(['addresses', addresses, 'chordTablesAddress', chordTablesAddress])
+            # addresses returned here are 2 elements lists
+            addresses.remove(chordTablesAddress[:2])
+            prime = chordTables.addressToNormalForm(addresses[0])
+            return Chord(prime)
+        else:
+            return None
 # c2.getZRelation()  # returns a list in non-ET12 space...
 # <music21.chord.ForteSet at 0x234892>
 
@@ -2469,14 +2490,21 @@ def fromForteClass(notation):
 
 
 
-def fromIntervalVector(notation):
+def fromIntervalVector(notation, getZRelation=False):
     '''Return one or more Chords given an interval vector. 
 
     >>> from music21 import *
-    >>> chord.fromIntervalVector((1,1,1,1,1,1))
-    [<music21.chord.Chord C C# E F#>, <music21.chord.Chord C C# E- G>]
     >>> chord.fromIntervalVector([0,0,0,0,0,1])
-    [<music21.chord.Chord C F#>]
+    <music21.chord.Chord C F#>
+    >>> chord.fromIntervalVector((5,5,5,5,5,5)) == None
+    True
+
+    >>> chord.fromIntervalVector((1,1,1,1,1,1))
+    <music21.chord.Chord C C# E F#>
+
+    >>> chord.fromIntervalVector((1,1,1,1,1,1), getZRelation=True)
+    <music21.chord.Chord C C# E- G>
+
     '''
     addressList = None
     if common.isListLike(notation):
@@ -2488,7 +2516,19 @@ def fromIntervalVector(notation):
     post = []
     for card, num in addressList:
         post.append(Chord(chordTables.addressToNormalForm([card, num])))
-    return post
+    # for now, return the first chord
+    # z-related chords will have more than one
+    if len(post) == 1:
+        return post[0]
+    elif len(post) == 2 and not getZRelation:
+        return post[0]
+    elif len(post) == 2 and getZRelation:
+        return post[1]
+    else:
+        return None
+
+
+
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
