@@ -725,9 +725,13 @@ class Stream(music21.Music21Object):
         '''
         iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
         match = []
+        baseElementCount = len(self._elements)
         for i in iMatch:
             # remove from stream with pop with index
-            match.append(self._elements.pop(i))
+            if i < baseElementCount:
+                match.append(self._elements.pop(i))
+            else: # its in end elements
+                match.append(self._endElements.pop(i-baseElementCount))
 
         if len(iMatch) > 0:
             self._elementsChanged()
