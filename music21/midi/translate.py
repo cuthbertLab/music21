@@ -605,7 +605,7 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
                 continue
 
             # get a list of midi events
-            # suing this property here is easier than using the above conversion
+            # using this property here is easier than using the above conversion
             # methods, as we do not need to know what the object is
             sub = obj.midiEvents
 

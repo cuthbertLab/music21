@@ -2501,10 +2501,10 @@ def fromIntervalVector(notation, getZRelation=False):
 
     >>> chord.fromIntervalVector((1,1,1,1,1,1))
     <music21.chord.Chord C C# E F#>
-
+    
     >>> chord.fromIntervalVector((1,1,1,1,1,1), getZRelation=True)
     <music21.chord.Chord C C# E- G>
-
+    
     >>> chord.fromIntervalVector((1,1,1,1,1,1)).getZRelation()
     <music21.chord.Chord C C# E- G>
 
