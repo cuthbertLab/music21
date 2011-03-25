@@ -168,63 +168,90 @@ def convertPsToOct(ps):
     return int(math.floor(ps / 12.)) - 1
 
 def convertPsToStep(ps):
-    '''Utility conversion; does not process internals.
-    Takes in a midiNote number (Assume C4 middle C, so 60 returns 4)
-    Returns a tuple of Step name and either a natural or a sharp
+    '''Utility conversion; does not process internal representations. 
+
+    Takes in a pitch space floating-point value or a MIDI note number (Assume C4 middle C, so 60 returns 4).
+
+    Returns a tuple of Step, an Accidental object, and a Microtone object or None.
     
     >>> convertPsToStep(60)
-    ('C', <accidental natural>)
+    ('C', <accidental natural>, None)
     >>> convertPsToStep(66)
-    ('F', <accidental sharp>)
+    ('F', <accidental sharp>, None)
     >>> convertPsToStep(67)
-    ('G', <accidental natural>)
+    ('G', <accidental natural>, None)
     >>> convertPsToStep(68)
-    ('G', <accidental sharp>)
+    ('G', <accidental sharp>, None)
     >>> convertPsToStep(-2)
-    ('B', <accidental flat>)
+    ('B', <accidental flat>, None)
 
     >>> convertPsToStep(60.5)
-    ('C', <accidental half-sharp>)
+    ('C', <accidental half-sharp>, None)
     >>> convertPsToStep(61.5)
-    ('C', <accidental one-and-a-half-sharp>)
+    ('C', <accidental one-and-a-half-sharp>, None)
     >>> convertPsToStep(62)
-    ('D', <accidental natural>)
+    ('D', <accidental natural>, None)
     >>> convertPsToStep(62.5)
-    ('D', <accidental half-sharp>)
+    ('D', <accidental half-sharp>, None)
     >>> convertPsToStep(135)
-    ('E', <accidental flat>)
+    ('E', <accidental flat>, None)
+    >>> convertPsToStep(70)
+    ('B', <accidental flat>, None)
+    >>> convertPsToStep(70.5)
+    ('B', <accidental half-flat>, None)
     '''
     # if this is a microtone it may have floating point vals
     pcReal = ps % 12 
+    # micro here will be between 0 and 1
     pc, micro = divmod(pcReal, 1)
+    # if close enough to a quarter tone
     if round(micro, 1) == 0.5:
-        micro = 0.5
+        # if can round to .5, than this is a quartertone accidental
+        alter = 0.5
+        # need to find microtonal alteration around this value
+        # of alter is 0.5 and micro is .7 than  micro should be .2
+        # of alter is 0.5 and micro is .4 than  micro should be -.1
+        micro = micro - alter
+    # if greater than .5
+    elif micro > .5:
+        alter = 0.5
+        micro = micro - alter
+    # not greater than .5
+    elif micro > 0:
+        alter = 0
+        micro = micro # no change necessary
     else:
+        alter = 0
         micro = 0
 
     pc = int(pc)
     # its a natural; nothing to do
     if pc in STEPREF.values():
-        acc = Accidental(0+micro)
+        acc = Accidental(0+alter)
         pcName = pc 
     # if we take the pc down a half-step, do we get a stepref (natural) value
     elif pc-1 in [0, 5, 7]: # c, f, g: can be sharped
-    #elif pc-1 in STEPREF.values():
         # then we need an accidental to accommodate; here, a sharp
-        acc = Accidental(1+micro)
+        acc = Accidental(1+alter)
         pcName = pc-1
     # if we take the pc up a half-step, do we get a stepref (natural) value
     elif pc+1 in [11, 4]: # b, e: can be flattened
-    #elif pc+1 in STEPREF.values():
         # then we need an accidental to accommodate; here, a flat
-        acc = Accidental(-1+micro) 
+        acc = Accidental(-1+alter) 
         pcName = pc+1
-
     for key, value in STEPREF.items():
         if pcName == value:
             name = key
             break
-    return name, acc
+
+    # if a micro is present, create object, else return None
+    if micro != 0:
+        # provide cents value; these are alter values
+        micro = Microtone(micro*100)
+    else:
+        micro = None
+
+    return name, acc, micro
 
 def convertStepToPs(step, oct, acc=None, microtone=None):
     '''Utility conversion; does not process internals.
@@ -294,146 +321,6 @@ def convertFqToPs(fq):
     '''
     return 12 * (math.log(fq / 440.0) / math.log(2)) + 69   
 
-# def convertMicrotoneToCents(value, acc=None):
-#     '''Convert a variety of microtone representations into a numerical cents deviation value. Numerical values are treated like other alter values, where 1 is 1 half-step. An Accidental object, or string representation, may be provided with the `acc` argument. 
-# 
-#     Returns None if no conversion is available. 
-# 
-#     >>> from music21 import *
-#     >>> convertMicrotoneToCents(.5) # numbers are half-step scalars
-#     50.0
-#     >>> convertMicrotoneToCents(-.5) # numbers are half-step scalars
-#     -50.0
-#     >>> convertMicrotoneToCents('(+20)') # strings are cents
-#     20.0
-#     >>> convertMicrotoneToCents('20.53') # strings are cents
-#     20.53...
-#     >>> convertMicrotoneToCents('-20') # strings are cents
-#     -20.0
-# 
-#     >>> convertMicrotoneToCents('25', '#') # providing an accidental
-#     125.0
-#     >>> convertMicrotoneToCents('25', '-') 
-#     -75.0
-#     >>> convertMicrotoneToCents('-25', '-') 
-#     -125.0
-#     >>> convertMicrotoneToCents('-25', '##')
-#     175.0
-#     >>> convertMicrotoneToCents('-50', '~')  # negates to zero
-#     0.0
-#     >>> convertMicrotoneToCents('50', '`')  # negates to zero
-#     0.0
-# 
-#     '''
-#     # if a number, assume that the number is halfsteps
-#     # this is consistent with other accidental notations, where
-#     # .5 is a quarter tone
-#     if acc is not None:
-#         if common.isStr(acc):
-#             acc = Accidental(acc)
-# 
-#     centValue = None
-#     if common.isNum(value):
-#         # these are practical, though not necessary, limits,
-#         # from -300 to 300 cents
-#         if value < -3 or value > 3:
-#             return None 
-#         centValue = value * 100
-#     elif common.isStr(value) and len(value) > 0:
-#         # strip any delimiters
-#         value = value.replace(MICROTONE_OPEN, '')
-#         value = value.replace(MICROTONE_CLOSE, '')
-# 
-#         if value[0] in ['+'] or value[0].isdigit():
-#             # positive cent representation
-#             num, junk = common.getNumFromStr(value, numbers='0123456789.')
-#             if num == '':
-#                 return None
-#             else:
-#                 centValue = float(num)
-#         elif value[0] in ['-']:
-#             num, junk = common.getNumFromStr(value[1:], numbers='0123456789.')
-#             centValue = float(num) * -1
-# 
-#     if centValue is not None:
-#         if acc is None:
-#             return centValue
-#         else: # add accidental difference
-#             return centValue + (acc.alter * 100)
-#     return None # no conversions are available
-# 
-# def convertMicrotoneToCentsStr(value, roundedDigits=1):
-#     '''Provide a string representation for a microtone expressed in cents, with a mandatory +/- sign used to show that this a cent notation.
-# 
-#     Numerical values are treated like other alter values, where 1 is 1 half-step. 
-# 
-#     >>> from music21 import *
-#     >>> pitch.convertMicrotoneToCentsStr('0.0')
-#     '+0'
-#     >>> pitch.convertMicrotoneToCentsStr('20')
-#     '+20'
-#     >>> pitch.convertMicrotoneToCentsStr('20.2')
-#     '+20.2'
-#     >>> pitch.convertMicrotoneToCentsStr('20.25')
-#     '+20.3'
-#     >>> pitch.convertMicrotoneToCentsStr('-20')
-#     '-20'
-#     >>> pitch.convertMicrotoneToCentsStr('-20.2')
-#     '-20.2'
-#     >>> pitch.convertMicrotoneToCentsStr('-20.25')
-#     '-20.3'
-# 
-#     >>> pitch.convertMicrotoneToCentsStr(.5)
-#     '+50'
-#     >>> pitch.convertMicrotoneToCentsStr(.25)
-#     '+25'
-# 
-#     '''
-#     # do not pass accidental to conversion, as, for display, we want the value
-#     # cent deviation without the additional change of the accidental
-#     centNumber = convertMicrotoneToCents(value)
-#     if centNumber is None:
-#         return None
-#     # get floating-point portion
-#     centInt, centDecimal = divmod(centNumber, 1)
-#     if centDecimal == 0:
-#         num = int(centInt)
-#     else: # what to round to?
-#         num = float(round(centNumber, roundedDigits))
-# 
-#     if centNumber >= 0:
-#         return '+%s' % num
-#     elif centNumber < 0:
-#         # negative sign will automatically be included
-#         return '%s' % num
-# 
-# def convertCentsToAlter(value, acc=None):
-#     '''Given a numerical or string cents value, expressed as string or a number, return a floating point alter value, where 1 is 1 half-step.
-# 
-#     >>> from music21 import *
-#     >>> pitch.convertCentsToAlter('+50')
-#     0.5...
-#     >>> pitch.convertCentsToAlter('+1')
-#     0.01...
-#     >>> pitch.convertCentsToAlter('-50')
-#     -0.5...
-#     >>> pitch.convertCentsToAlter(-50) # numerical values are treated as alters
-#     -0.5...
-# 
-#     >>> pitch.convertCentsToAlter('-25', '-') # passing an accidental as well
-#     -1.25
-#     >>> pitch.convertCentsToAlter('-25', '##') # passing an accidental as well
-#     1.75
-# 
-#     '''
-#     # this function handles strings and returns a numerical value
-#     if common.isStr(value):
-#         # may return None
-#         value = convertMicrotoneToCents(value, acc=acc)
-#         if value is None:
-#             return value
-#     return value * .01
-
 
 def convertHarmonicToCents(value):
     '''Given a harmonic number, return the total number shift in cents assuming 12 tone equal temperament. 
@@ -448,7 +335,7 @@ def convertHarmonicToCents(value):
     >>> [convertHarmonicToCents(x) for x in range(1, 32)]
     [0, 1200, 1902, 2400, 2786, 3102, 3369, 3600, 3804, 3986, 4151, 4302, 4441, 4569, 4688, 4800, 4905, 5004, 5098, 5186, 5271, 5351, 5428, 5502, 5573, 5641, 5706, 5769, 5830, 5888, 5945]
     '''
-    # table employed: http://en.wikipedia.org/wiki/Harmonic_series_(music)s
+    # table employed: http://en.wikipedia.org/wiki/Harmonic_series_(music)
     hs = 100 # halfstep is 100 cents
 
     # octaves
@@ -1335,6 +1222,16 @@ class Pitch(music21.Music21Object):
         61.0
         >>> p.implicitAccidental
         True
+        >>> p.ps = 61.5 # get a quarter tone
+        >>> p
+        C#~4
+        >>> p.ps = 61.7 # get a microtone
+        >>> p
+        C#~4(+20c)
+        >>> p.ps = 61.4 # get a microtone
+        >>> p
+        C#4(+40c)
+
         '''
         # set default enharmonics to minor key names
 
@@ -1343,7 +1240,9 @@ class Pitch(music21.Music21Object):
 
         ### this should eventually change to "stepEtcNeedsUpdating"
         ### but we'll see if it's a bottleneck
-        self.step, acc = convertPsToStep(value)
+
+        # can assign microtone here; will be either None or a Microtone object
+        self.step, acc, self._microtone = convertPsToStep(value)
         # replace a natural with a None
         if acc.name == 'natural':
             self.accidental = None
@@ -1727,7 +1626,7 @@ class Pitch(music21.Music21Object):
         # permit the submission of strings, like A an dB
         value = convertPitchClassToNumber(value)
         # get step and accidental w/o octave
-        self._step, self._accidental = convertPsToStep(value)  
+        self._step, self._accidental, self._microtone = convertPsToStep(value)  
         self._pitchSpaceNeedsUpdating = True
 
         # do not know what accidental is
@@ -1871,38 +1770,39 @@ class Pitch(music21.Music21Object):
             tempName =  tempStep + firstFlatName + (multipleFlats * 'es')
             return tempName
     
-    german = property(_getGerman, doc ='''
-    Read-only attribute. Returns the name 
-    of a Pitch in the German system 
-    (where B-flat = B, B = H, etc.)
-    (Microtones raise an error).  Note that 
-    Ases is used instead of the also acceptable Asas.
+    german = property(_getGerman, 
+        doc ='''
+        Read-only attribute. Returns the name 
+        of a Pitch in the German system 
+        (where B-flat = B, B = H, etc.)
+        (Microtones raise an error).  Note that 
+        Ases is used instead of the also acceptable Asas.
+        
+        >>> from music21 import *
+        >>> print pitch.Pitch('B-').german
+        B
+        >>> print pitch.Pitch('B').german
+        H
+        >>> print pitch.Pitch('E-').german
+        Es
+        >>> print pitch.Pitch('C#').german
+        Cis
+        >>> print pitch.Pitch('A--').german
+        Ases
+        >>> p1 = pitch.Pitch('C')
+        >>> p1.accidental = pitch.Accidental('half-sharp')
+        >>> p1.german
+        Traceback (most recent call last):
+        PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade!
     
-    >>> from music21 import *
-    >>> print pitch.Pitch('B-').german
-    B
-    >>> print pitch.Pitch('B').german
-    H
-    >>> print pitch.Pitch('E-').german
-    Es
-    >>> print pitch.Pitch('C#').german
-    Cis
-    >>> print pitch.Pitch('A--').german
-    Ases
-    >>> p1 = pitch.Pitch('C')
-    >>> p1.accidental = pitch.Accidental('half-sharp')
-    >>> p1.german
-    Traceback (most recent call last):
-    PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade!
-
-    
-    Note these rarely used pitches:
-    
-    
-    >>> print pitch.Pitch('B--').german
-    Heses
-    >>> print pitch.Pitch('B#').german
-    His
+        
+        Note these rarely used pitches:
+        
+        
+        >>> print pitch.Pitch('B--').german
+        Heses
+        >>> print pitch.Pitch('B#').german
+        His
     ''')
 
 
@@ -1911,10 +1811,8 @@ class Pitch(music21.Music21Object):
 
     def _setFrequency(self, value):     
         # store existing octave
-        ps = convertFqToPs(value)
-        # should get microtones
-        self.ps = int(round(ps))
-        self.step, self.accidental = convertPsToStep(self.ps)  
+        self.ps = convertFqToPs(value)
+        self.step, self.accidental, self._microtone = convertPsToStep(self.ps)  
         self.octave = convertPsToOct(self.ps)
       
         # do not know what accidental is
@@ -1936,7 +1834,9 @@ class Pitch(music21.Music21Object):
         'A'
         >>> a.octave
         4
-
+        >>> a.frequency = 450.0 # microtones are captured
+        >>> a
+        A4(+39c)
 
     ''')
 
@@ -1953,6 +1853,7 @@ class Pitch(music21.Music21Object):
         if self._overridden_freq440:
             return self._overridden_freq440
         else:
+            # works off of .ps values and thus will capture microtones
             A4offset = self.ps - 69
             return 440.0 * (self._twelfth_root_of_two ** A4offset)
             
@@ -2097,6 +1998,39 @@ class Pitch(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
+    def getHarmonic(self, number):
+        '''Return a Pitch object representing the harmonic found above this Pitch.
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('a4')
+        >>> p.getHarmonic(2)
+        A5
+        >>> p.getHarmonic(3)
+        E6(+2c)
+        >>> p.getHarmonic(4)
+        A6(+0c)
+        >>> p.getHarmonic(5)
+        C~7(+36c)
+        >>> p.getHarmonic(6)
+        E7(+2c)
+        >>> p.getHarmonic(7)
+        F#~7(+19c)
+        >>> p.getHarmonic(8)
+        A7(+0c)
+        '''
+        centShift = convertHarmonicToCents(number)
+        temp = copy.deepcopy(self)
+        # add this pitch's microtones plus the necessary cent shift
+        if temp.microtone is not None:
+            temp.microtone = temp.microtone.cents + centShift
+        else:
+            temp.microtone = centShift    
+        # get a pitch
+        final = Pitch()
+        # set with this frequency
+        final.frequency = temp.frequency
+        return final
+
     def isEnharmonic(self, other):
         '''Return True if other is an enharmonic equivalent of self. 
 

@@ -1535,7 +1535,7 @@ class PlotStream(object):
         ticks = []
         cVals = range(pitchMin,pitchMax,12)
         for i in cVals:
-            name, acc = pitch.convertPsToStep(i)
+            name, acc, micro = pitch.convertPsToStep(i)
             oct = pitch.convertPsToOct(i)
             ticks.append([i, '%s%s' % (name, oct)])
         ticks = self._filterPitchLabel(ticks)
@@ -1553,7 +1553,7 @@ class PlotStream(object):
         ticks = []
         cVals = range(pitchMin, pitchMax+1)
         for i in cVals:
-            name, acc = pitch.convertPsToStep(i)
+            name, acc, micro = pitch.convertPsToStep(i)
             oct = pitch.convertPsToOct(i)
             # should be able to just use nameWithOctave
             ticks.append([i, '%s%s%s' % (name, acc.modifier, oct)])
