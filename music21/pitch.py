@@ -438,7 +438,8 @@ class Microtone(object):
     '''
     The Microtone object defines a pitch transformation above or below a standard Pitch and its Accidental.
 
-    >>> m = Microtone(20)
+    >>> from music21 import *
+    >>> m = pitch.Microtone(20)
     >>> m.cents
     20
     >>> m.alter
@@ -453,10 +454,10 @@ class Microtone(object):
     >>> m.alter
     19.2...
 
-    >>> m = Microtone('(-33.333333)')
+    >>> m = pitch.Microtone('(-33.333333)')
     >>> m
     (-33c)
-    >>> m = Microtone('33.333333')
+    >>> m = pitch.Microtone('33.333333')
     >>> m
     (+33c)
     >>> m.alter

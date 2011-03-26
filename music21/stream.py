@@ -2394,10 +2394,15 @@ class Stream(music21.Music21Object):
         no need to call stream.sorted before running this,
         but it can't hurt.
         
+        
         it is DEFINITELY a feature that this method does not
         find elements within substreams that have the same
         absolute offset.  See Score.lily for how this is
         useful.  For the other behavior, call Stream.flat first.
+        
+        
+        
+        
         '''
         offsetsRepresented = common.defHash()
         for el in self.elements:
@@ -8178,19 +8183,29 @@ class Score(Stream):
         Measures found in multiple Parts with the same offset will be 
         appended to the same list. 
 
-        This does not assume that all Parts have measures with identical offsets.
+
+        If no parts are found in the score, then the normal 
+        :meth:`~music21.stream.Stream.measureOffsetMap` routine is called.
+        
+
+        This method is smart and does not assume that all Parts 
+        have measures with identical offsets.
         '''
         map = {}
-        for p in self.getElementsByClass(Part):
-            mapPartial = p.measureOffsetMap(classFilterList)
-            #environLocal.printDebug(['mapPartial', mapPartial])
-            for key in mapPartial.keys():
-                if key not in map.keys():
-                    map[key] = []
-                for m in mapPartial[key]: # get measures from partial
-                    if m not in map[key]:
-                        map[key].append(m)
-        return map
+        parts = self.getElementsByClass(Part)
+        if len(parts) == 0:
+            return Stream.measureOffsetMap(self, classFilterList)
+        else:
+            for p in parts:
+                mapPartial = p.measureOffsetMap(classFilterList)
+                #environLocal.printDebug(['mapPartial', mapPartial])
+                for key in mapPartial.keys():
+                    if key not in map.keys():
+                        map[key] = []
+                    for m in mapPartial[key]: # get measures from partial
+                        if m not in map[key]:
+                            map[key].append(m)
+            return map
 
 # functionality moved to Stream.stripTies()
 #     def stripTies(self, inPlace=False, matchByPitch=False):
