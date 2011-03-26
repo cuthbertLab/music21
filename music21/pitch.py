@@ -2018,6 +2018,27 @@ class Pitch(music21.Music21Object):
         F#~7(+19c)
         >>> p.getHarmonic(8)
         A7(+0c)
+        
+        
+        Or we can iterate over a list of the next 8 odd harmonics:
+        
+        
+        >>> for i in [9,11,13,15,17,19,21,23]:
+        ...     print p.getHarmonic(i),
+        B7(+4c) D~8(+1c) F8(+41c) G~8(+38c) B-8(+5c) B~8(+48c) C#~9(+21c) E-9(+28c)
+
+
+        Microtonally adjusted notes also generate harmonics:
+        
+        
+        >>> q = pitch.Pitch('C4')
+        >>> q.microtone = 10
+        >>> q.getHarmonic(2)
+        C5(+10c)
+        >>> q.getHarmonic(3)
+        G5(+12c)
+
+
         '''
         centShift = convertHarmonicToCents(number)
         temp = copy.deepcopy(self)
