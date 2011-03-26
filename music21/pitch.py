@@ -2025,12 +2025,122 @@ class Pitch(music21.Music21Object):
             temp.microtone = temp.microtone.cents + centShift
         else:
             temp.microtone = centShift    
-        # get a pitch
+        # possible optimize this to use only two Pitch objects
         final = Pitch()
         # set with this frequency
         final.frequency = temp.frequency
         return final
 
+
+    def _getEquivalentHarmonic(self, fundamental):
+        '''Given another Pitch as a fundamental, find the harmonic that describe this pitch
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('g4')
+        >>> str(p._getEquivalentHarmonic('c3'))
+        '(3, C3(-2c))'
+
+        '''
+        
+        if common.isStr(fundamental):
+            fundamental = Pitch(fundamental)
+        # else assume a Pitch object
+        # got through all harmonics and find the one closes to this ps value
+        target = self
+
+        if target.ps <= fundamental.ps:
+            raise PitchException('cannot find an equivalent harmonic for a fundamental (%s) that is not above this Pitch (%s)' % (fundamental, self))
+
+        # up to the 32 harmonic
+        found = [] # store a list
+        for i in range(1, 32):
+            # gather all until we are above the target
+            p = fundamental.getHarmonic(i)
+            found.append((i, p))
+            if p.ps > target.ps:
+                break
+        # it is either the last or the second to last
+        if len(found) < 2: # only 1
+            harmonicMatch, match = found[0]
+            if match.ps > target.ps:
+                gap = match.ps - target.ps
+            elif match.ps < target.ps:
+                gap = target.ps - match.ps
+            else:
+                gap = 0
+        else:
+            harmonicLower, candidateLower = found[-2]
+            harmonicHigher, candidateHigher = found[-1]
+
+            distanceLower = target.ps - candidateLower.ps
+            distanceHigher = candidateHigher.ps - target.ps
+
+            if distanceLower <= distanceHigher:
+                # the lower is closer, thus we need to raise gap
+                match = candidateLower
+                gap = abs(distanceLower)
+                harmonicMatch = harmonicLower
+            else:
+                # the higher is closer, thus we need to lower the gap
+                match = candidateHigher
+                gap = -abs(distanceHigher)
+                harmonicMatch = harmonicHigher
+        # need to found gap, otherwise may get very small values
+        gap = round(gap, 8)
+        # create a pitch with the appropriate gap as a Microtone
+        if fundamental.microtone is not None:
+            fundamental.microtone = fundamental.microtone.cents + (gap * 100)
+            if fundamental.microtone.cents == 0:
+                fundamental.microtone = None
+        else:
+            if gap != 0:
+                fundamental.microtone = gap * 100
+        return harmonicMatch, fundamental
+
+
+    def _getEquivalentHarmonicStr(self, fundamental):
+        '''Return a string representation of a harmonic equivalence. 
+
+        >>> from music21 import *
+        >>> pitch.Pitch('g4')._getEquivalentHarmonicStr('c3')
+        '3rdH/C3(-2c)'
+
+        >>> pitch.Pitch('c4')._getEquivalentHarmonicStr('c3')
+        '2ndH/C3'
+
+        >>> p = pitch.Pitch('c4')
+        >>> p.microtone = 20 # raise 20 
+        >>> p._getEquivalentHarmonicStr('c3')
+        '2ndH/C3(+20c)'
+
+        >>> p.microtone = -20 # raise 20 
+        >>> p._getEquivalentHarmonicStr('c3')
+        '2ndH/C3(-20c)'
+
+        >>> p = pitch.Pitch('c4')
+        >>> f = pitch.Pitch('c3')
+        >>> f.microtone = -20
+        >>> p._getEquivalentHarmonicStr(f)
+        '2ndH/C3'
+        >>> f.microtone = +20
+        >>> p._getEquivalentHarmonicStr(f)
+        '2ndH/C3'
+
+        >>> p = pitch.Pitch('A4')
+        >>> p.microtone = 69
+        >>> p._getEquivalentHarmonicStr('c2')
+        '7thH/C2'
+
+        >>> p = pitch.Pitch('A4')
+        >>> p._getEquivalentHarmonicStr('c2')
+        '7thH/C2(-69c)'
+
+        '''
+        harmonic, fundamental = self._getEquivalentHarmonic(fundamental)
+        return '%s%sH/%s' % (harmonic, common.ordinalAbbreviation(harmonic), 
+                            fundamental)
+
+    #---------------------------------------------------------------------------
     def isEnharmonic(self, other):
         '''Return True if other is an enharmonic equivalent of self. 
 
