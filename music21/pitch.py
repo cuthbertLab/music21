@@ -2104,19 +2104,19 @@ class Pitch(music21.Music21Object):
         >>> from music21 import *
         >>> pitch.Pitch('g4')._getEquivalentHarmonicStr('c3')
         '3rdH/C3(-2c)'
-
+        
         >>> pitch.Pitch('c4')._getEquivalentHarmonicStr('c3')
         '2ndH/C3'
-
+        
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20 # raise 20 
         >>> p._getEquivalentHarmonicStr('c3')
         '2ndH/C3(+20c)'
-
-        >>> p.microtone = -20 # raise 20 
+        
+        >>> p.microtone = -20 # lower 20 
         >>> p._getEquivalentHarmonicStr('c3')
         '2ndH/C3(-20c)'
-
+        
         >>> p = pitch.Pitch('c4')
         >>> f = pitch.Pitch('c3')
         >>> f.microtone = -20
@@ -2125,12 +2125,12 @@ class Pitch(music21.Music21Object):
         >>> f.microtone = +20
         >>> p._getEquivalentHarmonicStr(f)
         '2ndH/C3'
-
+        
         >>> p = pitch.Pitch('A4')
         >>> p.microtone = 69
         >>> p._getEquivalentHarmonicStr('c2')
         '7thH/C2'
-
+        
         >>> p = pitch.Pitch('A4')
         >>> p._getEquivalentHarmonicStr('c2')
         '7thH/C2(-69c)'
