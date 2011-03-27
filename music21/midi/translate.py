@@ -37,6 +37,12 @@ class TranslateException(Exception):
 #-------------------------------------------------------------------------------
 # Durations
 
+def offsetToMidi(o):
+    '''Convert an offset value to MIDI ticks.
+    '''
+    return int(round(o * defaults.ticksPerQuarter))
+
+
 def durationToMidi(d):
     if d._quarterLengthNeedsUpdating:
         d.updateQuarterLength()
@@ -134,7 +140,6 @@ def noteToMidiEvents(inputM21):
     >>> eventList
     [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=2560, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
     '''
-
     n = inputM21
 
     mt = None # use a midi track set to None
@@ -149,6 +154,7 @@ def noteToMidiEvents(inputM21):
     me.channel = 1
     me.time = None # not required
     me.pitch = n.midi
+    me.pitchSpace = n.ps
     me.velocity = 90 # default, can change later
     eventList.append(me)
 
@@ -163,6 +169,7 @@ def noteToMidiEvents(inputM21):
     me.channel = 1
     me.time = None #d
     me.pitch = n.midi
+    me.pitchSpace = n.ps
     me.velocity = 0 # must be zero
     eventList.append(me)
 
@@ -317,6 +324,7 @@ def chordToMidiEvents(inputM21):
         me.channel = 1
         me.time = None # not required
         me.pitch = pitchObj.midi
+        me.pitchSpace = pitchObj.ps
         me.velocity = 90 # default, can change later
         eventList.append(me)
 
@@ -338,6 +346,7 @@ def chordToMidiEvents(inputM21):
         me.channel = 1
         me.time = None #d
         me.pitch = pitchObj.midi
+        me.pitchSpace = pitchObj.ps
         me.velocity = 0 # must be zero
         eventList.append(me)
     return eventList 
@@ -542,9 +551,116 @@ def keySignatureToMidiEvents(ks):
 #-------------------------------------------------------------------------------
 # Streams
 
+def _getPacket(offset, midiEvent, obj, hasMicrotone=None):
+    '''Pack a dictionary of parameters for each event packet.
+    '''
+    post = {}
+    post['offset'] = offset
+    post['midiEvent'] = midiEvent
+    post['obj'] = obj # keep a reference to the source object
+    post['hasMicrotone'] = hasMicrotone
+    return post
+
+def streamToMidiTrackNew(inputM21, instObj=None, translateTimeSignature=True):
+    '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
+
+    This assumes that this Stream has only one Part. For Streams that contain sub-streams, use streamToMidiTracks.
+
+    >>> from music21 import *
+    >>> s = stream.Stream()
+    >>> n = note.Note('g#')
+    >>> n.quarterLength = .5
+    >>> s.repeatAppend(n, 4)
+    >>> mt = streamToMidiTrack(s)
+    >>> len(mt.events)
+    20
+    '''
+    environLocal.printDebug(['streamToMidiTrack()'])
+
+    if instObj is None:
+        # see if an instrument is defined in this or a parent stream
+        instObj = inputM21.getInstrument()
+
+    # each part will become midi track
+    # the 1 here becomes the midi track index
+    mt = midiModule.MidiTrack(1)
+    mt.events += midiModule.getStartEvents(mt, instObj.partName)
+
+
+    # have to be sorted, have to strip ties
+    # retain containers to get all elements: time signatures, dynamics, etc
+    s = inputM21.stripTies(inPlace=False, matchByPitch=False, 
+        retainContainers=True)
+    s = s.flat.sorted
+
+    # store all events by offset by offset without delta times
+    # as (absTime, event)
+    packetsByOffset = []
+
+    # probably already flat and sorted
+    for obj in s:
+        classes = obj.classes
+        # test: match to 'GeneralNote'
+        if 'Note' in classes or 'Rest' in classes or 'Chord' in classes:
+            if 'Rest' in classes:
+                continue
+            # get a list of midi events
+            # using this property here is easier than using the above conversion
+            # methods, as we do not need to know what the object is
+            sub = obj.midiEvents
+        elif 'Dynamic' in classes:
+            pass # configure dynamics
+        elif 'TimeSignature' in classes:
+            # return a pair of events
+            sub = timeSignatureToMidiEvents(obj)
+        elif 'KeySignature' in classes:
+            sub = keySignatureToMidiEvents(obj)
+        else: # other objects may have already been added
+            pass
+
+        # all events: delta/note-on/delta/note-off
+        # strip delta times
+        packets = []
+        for i in range(len(sub)):
+            if i % 2 == 0: 
+                continue # skip delta times
+            # store offset, midi event, object
+            # add channel and pitch change also
+            midiEvent = sub[i]
+            if midiEvent.type != 'NOTE_OFF':
+                # use offset
+                p = _getPacket(offsetToMidi(obj.getOffsetBySite(s)), 
+                              midiEvent, obj=obj)
+                packets.append(p)
+            else: # if its a note_off, use the duration
+                p = _getPacket(
+                    offsetToMidi(obj.getOffsetBySite(s)) + durationToMidi(obj.duration), 
+                    midiEvent, obj=obj)
+                packets.append(p)
+        packetsByOffset += packets
+
+    # add events to the list
+    # need to convert add delta times for all events
+
+    packetsByOffset.sort(
+        cmp=lambda x,y: cmp(x['offset'], y['offset'])
+        )
+
+    # convert subByOffset to delta times
+    for p in packetsByOffset:
+        environLocal.printDebug(['packetsByOffset', p])
+
+    mt.events += []
+    # must update all events with a ref to this MidiTrack
+    mt.updateEvents()
+    mt.events += midiModule.getEndEvents(mt)
+    return mt
+
+
+
+
 
 def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
-
     '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
 
     This assumes that this Stream has only one Part. For Streams that contain sub-streams, use streamToMidiTracks.
@@ -587,7 +703,6 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
     for obj in s.sorted:
         tDurEvent = 0 # the found delta ticks in each event
 
-        #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
         classes = obj.classes
         # test: match to 'GeneralNote'
         if 'Note' in classes or 'Rest' in classes or 'Chord' in classes:
@@ -598,7 +713,9 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
             # all values are in tpq; t stores abs time in tpq
             tDif = (obj.offset * defaults.ticksPerQuarter) - t
 
-            # includ 'Unpitched'
+            #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
+
+            # include 'Unpitched'
             if 'Rest' in classes:
                 # for a rest, do not do anything: difference in offset will 
                 # account for the gap
@@ -608,6 +725,7 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
             # using this property here is easier than using the above conversion
             # methods, as we do not need to know what the object is
             sub = obj.midiEvents
+            # need to tag these events with their local time for sorting
 
             # a note has 4 events: delta/note-on/delta/note-off
             if 'Note' in classes:
@@ -1079,31 +1197,33 @@ class Test(unittest.TestCase):
 
     def testOverlappedEvents(self):
 
-        from music21 import stream, note
+        from music21 import stream, note, chord, meter, key
 
         s = stream.Stream()
+        s.insert(key.KeySignature(3))
+        s.insert(meter.TimeSignature('2/4'))
         s.insert(0, note.Note('c'))
         s.insert(0, note.Note('g'))
-        mt = streamToMidiTrack(s)
+
+        s.append(chord.Chord(['d','f','a'], type='half'))
+
+        pos = s.highestTime
+        s.insert(pos, note.Note('e'))
+        s.insert(pos, note.Note('b'))
+
+        mt = streamToMidiTrackNew(s)
+
+        #mtList = streamsToMidiTracks(soprano)
 
         # NOTE: this raises an error, as overlapping events presently fail
         #s.show('midi')
 
 
+
+
+
 if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        a = Test()
-        #a.testPitchEquality()
-
-        #a.testKeySignature()
-
-        #a.testAnacrusisTiming()
-
-        a.testOverlappedEvents()
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

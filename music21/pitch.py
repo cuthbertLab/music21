@@ -765,6 +765,23 @@ class Accidental(music21.Music21Object):
         self.modifier = accidentalNameToModifier[self.name]
 
 
+    def isTwelveTone(self):
+        '''Return a boolean if this Accidental describes a twelve-tone pitch.
+
+        >>> from music21 import *
+        >>> a = pitch.Accidental('~')
+        >>> a.isTwelveTone()
+        False
+
+        >>> a = pitch.Accidental('###')
+        >>> a.isTwelveTone()
+        True
+
+        '''
+        if self.name in ['half-sharp', 'one-and-a-half-sharp', 'half-flat', 
+            'one-and-a-half-flat', ]:
+            return False
+        return True
 
     #---------------------------------------------------------------------------
     # main properties
@@ -1182,8 +1199,10 @@ class Pitch(music21.Music21Object):
     def _setMicrotone(self, value):
         if (isinstance(value, basestring) or common.isNum(value)):
             self._microtone = Microtone(value)
-        else: # assume an microtone object
+        else: # assume a microtone object
             self._microtone = value
+        # possibly look for microtones of 0 and set-back to None
+
         self._pitchSpaceNeedsUpdating = True
     
     microtone = property(_getMicrotone, _setMicrotone,
@@ -1206,6 +1225,29 @@ class Pitch(music21.Music21Object):
         E-4(-12c)
         ''')
 
+
+    def isTwelveTone(self):
+        '''Return a boolean describing if this Pitch is Twelve Tone: either has a non-zero microtonal adjustment or has a quarter tone accidental.
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('g4')
+        >>> p.isTwelveTone()
+        True
+        >>> p.microtone = -20
+        >>> p.isTwelveTone()
+        False
+
+        >>> p = pitch.Pitch('g~4')
+        >>> p.isTwelveTone()
+        False            
+        '''
+        if self.accidental is not None:
+            if not self.accidental.isTwelveTone():
+                return False
+        if self.microtone is not None:
+            if self.microtone.cents != 0:
+                return False
+        return True
 
     #---------------------------------------------------------------------------
 

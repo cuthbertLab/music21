@@ -395,6 +395,10 @@ class MidiEvent(object):
         self._parameter1 = None # pitch or first data value
         self._parameter2 = None # velocity or second data value
         #self.data = None # alternative data storage
+
+        # if this is a Note on/off, need to store original
+        # pitch space value in order to determine if this is has a microtone
+        self.pitchSpace = None
     
     def __cmp__(self, other): 
         return cmp(self.time, other.time) 
