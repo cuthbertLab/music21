@@ -222,9 +222,14 @@ def convertPsToStep(ps):
         # of alter is 0.5 and micro is .7 than  micro should be .2
         # of alter is 0.5 and micro is .4 than  micro should be -.1
         micro = micro - alter
+
     # if greater than .5
-    elif micro > .5:
+    elif micro > .5 and micro < .75:
         alter = 0.5
+        micro = micro - alter
+    # if closer to 1, than go to the higher alter and get negative micro
+    elif micro >= .75 and micro < 1:
+        alter = 1
         micro = micro - alter
     # not greater than .5
     elif micro > 0:
@@ -1946,80 +1951,9 @@ class Pitch(music21.Music21Object):
 
     def _getMX(self):
         return musicxmlTranslate.pitchToMx(self)
-#         '''
-#         Returns a musicxml.Note() object
-# 
-#         >>> a = Pitch('g#4')
-#         >>> c = a.mx
-#         >>> c.get('pitch').get('step')
-#         'G'
-#         '''
-#         mxPitch = musicxmlMod.Pitch()
-#         mxPitch.set('step', self.step)
-#         if self.accidental is not None:
-#             # need to use integers when possible in order to support
-#             # xml readers that force alter to be an integer
-#             mxPitch.set('alter', common.numToIntOrFloat(self.accidental.alter))
-#         mxPitch.set('octave', self.implicitOctave)
-# 
-#         mxNote = musicxmlMod.Note()
-#         mxNote.setDefaults()
-#         mxNote.set('pitch', mxPitch)
-# 
-#         if (self.accidental is not None and 
-#             self.accidental.displayStatus in [True, None]):
-#             mxNote.set('accidental', self.accidental.mx)
-#         # should this also return an xml accidental object
-#         return mxNote # return element object
 
     def _setMX(self, mxNote):
         return musicxmlTranslate.mxToPitch(mxNote, self)
-
-#         '''
-#         Given a MusicXML Note object, set this Pitch object to its values. 
-# 
-#         >>> b = musicxml.Pitch()
-#         >>> b.set('octave', 3)
-#         >>> b.set('step', 'E')
-#         >>> b.set('alter', -1)
-#         >>> c = musicxml.Note()
-#         >>> c.set('pitch', b)
-#         >>> a = Pitch('g#4')
-#         >>> a.mx = c
-#         >>> print(a)
-#         E-3
-#         '''
-#         # assume this is an object
-#         mxPitch = mxNote.get('pitchObj')
-#         mxAccidental = mxNote.get('accidentalObj')
-# 
-#         self.step = mxPitch.get('step')
-# 
-#         # sometimes we have an accidental defined but no alter value, due to 
-#         # a natural; need to look at mxAccidental directly
-#         mxAccidentalCharData = None
-#         if mxAccidental != None:
-#             mxAccidentalCharData = mxAccidental.get('charData')
-#             #environLocal.printDebug(['found mxAccidental charData', mxAccidentalCharData])
-# 
-#         acc = mxPitch.get('alter')
-#         # None is used in musicxml but not in music21
-#         if acc != None or mxAccidentalCharData != None: 
-#             if mxAccidental is not None: # the source had wanted to show alter
-#                 accObj = Accidental()
-#                 accObj.mx = mxAccidental
-#             # used to to just use acc value
-#             #self.accidental = Accidental(float(acc))
-#             # better to use accObj if possible
-#                 self.accidental = accObj
-#                 self.accidental.displayStatus = True
-#             else:
-#                 # here we generate an accidental object from the alter value
-#                 # but in the source, there was not a defined accidental
-#                 self.accidental = Accidental(float(acc))
-#                 self.accidental.displayStatus = False
-#         self.octave = int(mxPitch.get('octave'))
-#         self._pitchSpaceNeedsUpdating = True
 
     mx = property(_getMX, _setMX)
 
@@ -2029,30 +1963,6 @@ class Pitch(music21.Music21Object):
         '''Provide a complete MusicXML representation. Presently, this is based on 
         '''
         return musicxmlTranslate.pitchToMusicXML(self)
-
-#         mxNote = self._getMX()
-#         mxMeasure = musicxml.Measure()
-#         mxMeasure.setDefaults()
-#         mxMeasure.append(mxNote)
-#         mxPart = musicxml.Part()
-#         mxPart.setDefaults()
-#         mxPart.append(mxMeasure)
-# 
-#         mxScorePart = musicxml.ScorePart()
-#         mxScorePart.setDefaults()
-#         mxPartList = musicxml.PartList()
-#         mxPartList.append(mxScorePart)
-# 
-#         mxIdentification = musicxml.Identification()
-#         mxIdentification.setDefaults() # will create a composer
-# 
-#         mxScore = musicxml.Score()
-#         mxScore.setDefaults()
-#         mxScore.set('partList', mxPartList)
-#         mxScore.set('identification', mxIdentification)
-#         mxScore.append(mxPart)
-# 
-#         return mxScore.xmlStr()
 
     musicxml = property(_getMusicXML)
 
@@ -2082,7 +1992,7 @@ class Pitch(music21.Music21Object):
         >>> p.getHarmonic(4)
         A6
         >>> p.getHarmonic(5)
-        C~7(+36c)
+        C#7(-14c)
         >>> p.getHarmonic(6)
         E7(+2c)
         >>> p.getHarmonic(7)
@@ -2096,7 +2006,7 @@ class Pitch(music21.Music21Object):
         
         >>> for i in [9,11,13,15,17,19,21,23]:
         ...     print p.getHarmonic(i),
-        B7(+4c) D~8(+1c) F8(+41c) G~8(+38c) B-8(+5c) B~8(+48c) C#~9(+21c) E-9(+28c)
+        B7(+4c) D~8(+1c) F8(+41c) G#8(-12c) B-8(+5c) B#8(-2c) C#~9(+21c) E-9(+28c)
 
 
         Microtonally adjusted notes also generate harmonics:
