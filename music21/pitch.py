@@ -46,6 +46,10 @@ STEPNAMES = ['C','D','E','F','G','A','B']
 
 TWELFTH_ROOT_OF_TWO = 2.0 ** (1.0/12)
 
+# how many significant digits to keep in pitch space resolution
+# where 1 is a half step. this means that 4 sig digits of cents will be kept
+PITCH_SPACE_SIG_DIGITS = 6
+
 # basic accidental string and symbol definitions; additional symbolic and text-based alternatives are given in the set Accidental.set() method
 MICROTONE_OPEN = '('
 MICROTONE_CLOSE = ')'
@@ -200,10 +204,16 @@ def convertPsToStep(ps):
     >>> convertPsToStep(70.5)
     ('B', <accidental half-flat>, None)
     '''
-    # if this is a microtone it may have floating point vals
+    # rounding here is essential
+    ps = round(ps, PITCH_SPACE_SIG_DIGITS)
+    
     pcReal = ps % 12 
+
     # micro here will be between 0 and 1
     pc, micro = divmod(pcReal, 1)
+
+    environLocal.printDebug(['convertPsToStep(): post divmod',  'ps', repr(ps), 'pcReal', repr(pcReal), 'pc', repr(pc), 'micro', repr(micro)])
+
     # if close enough to a quarter tone
     if round(micro, 1) == 0.5:
         # if can round to .5, than this is a quartertone accidental
@@ -225,6 +235,9 @@ def convertPsToStep(ps):
         micro = 0
 
     pc = int(pc)
+
+    environLocal.printDebug(['convertPsToStep(): post', 'alter', alter, 'micro', micro, 'pc', pc])
+
     # its a natural; nothing to do
     if pc in STEPREF.values():
         acc = Accidental(0+alter)
@@ -239,6 +252,9 @@ def convertPsToStep(ps):
         # then we need an accidental to accommodate; here, a flat
         acc = Accidental(-1+alter) 
         pcName = pc+1
+    else:
+        raise PitchException('cannot match condition for pc: %s' % pc)
+
     for key, value in STEPREF.items():
         if pcName == value:
             name = key
@@ -319,7 +335,10 @@ def convertFqToPs(fq):
     >>> convertFqToPs(261.62556530059862)
     60.0
     '''
-    return 12 * (math.log(fq / 440.0) / math.log(2)) + 69   
+    post = 12 * (math.log(fq / 440.0) / math.log(2)) + 69 
+    #environLocal.printDebug(['convertFqToPs():', 'input', fq, 'output', repr(post)])
+    # rounding here is essential
+    return round(post, PITCH_SPACE_SIG_DIGITS)  
 
 
 def convertHarmonicToCents(value):
@@ -1199,9 +1218,12 @@ class Pitch(music21.Music21Object):
     def _setMicrotone(self, value):
         if (isinstance(value, basestring) or common.isNum(value)):
             self._microtone = Microtone(value)
-        else: # assume a microtone object
+        else: # assume a microtone object, or None
             self._microtone = value
-        # possibly look for microtones of 0 and set-back to None
+        # look for microtones of 0 and set-back to None
+        if self._microtone is not None:
+            if common.almostEquals(self._microtone.cents, 0.0):
+                self._microtone = None
 
         self._pitchSpaceNeedsUpdating = True
     
@@ -1211,17 +1233,18 @@ class Pitch(music21.Music21Object):
         Pitch object. This might return None.
 
         >>> from music21 import *
-
-        >>> a = pitch.Pitch('E4-')
-        >>> a.microtone is None
+        >>> p = pitch.Pitch('E4-')
+        >>> p.microtone is None
         True
-        >>> a.ps
+        >>> p.ps
         63.0
-        >>> a.microtone = 33 # adjustment in cents     
-        >>> a
+        >>> p.microtone = 33 # adjustment in cents     
+        >>> p
         E-4(+33c)
-        >>> a.microtone = '(-12c' # adjustment in cents     
-        >>> a
+        >>> p.name, p.nameWithOctave # these representations are unchanged
+        ('E-', 'E-4')
+        >>> p.microtone = '(-12c' # adjustment in cents     
+        >>> p
         E-4(-12c)
         ''')
 
@@ -1855,11 +1878,17 @@ class Pitch(music21.Music21Object):
     def _setFrequency(self, value):     
         # store existing octave
         self.ps = convertFqToPs(value)
-        self.step, self.accidental, self._microtone = convertPsToStep(self.ps)  
+
+        #environLocal.printDebug(['_setFrequency(), post convertFqToPs()', 'value', value, 'self', self, 'self.ps', self.ps])
+
+        self.step, self.accidental, self.microtone = convertPsToStep(self.ps)  
         self.octave = convertPsToOct(self.ps)
       
         # do not know what accidental is
         self.implicitAccidental = True
+
+        #environLocal.printDebug(['_setFrequency(): end', 'self._microtone', self._microtone])
+
 
 
     frequency = property(_getFrequency, _setFrequency, doc='''
@@ -2051,7 +2080,7 @@ class Pitch(music21.Music21Object):
         >>> p.getHarmonic(3)
         E6(+2c)
         >>> p.getHarmonic(4)
-        A6(+0c)
+        A6
         >>> p.getHarmonic(5)
         C~7(+36c)
         >>> p.getHarmonic(6)
@@ -2059,7 +2088,7 @@ class Pitch(music21.Music21Object):
         >>> p.getHarmonic(7)
         F#~7(+19c)
         >>> p.getHarmonic(8)
-        A7(+0c)
+        A7
         
         
         Or we can iterate over a list of the next 8 odd harmonics:
@@ -2084,15 +2113,25 @@ class Pitch(music21.Music21Object):
         '''
         centShift = convertHarmonicToCents(number)
         temp = copy.deepcopy(self)
+        # if no change, just return what we start with
+        if centShift == 0:
+            return temp
         # add this pitch's microtones plus the necessary cent shift
         if temp.microtone is not None:
             temp.microtone = temp.microtone.cents + centShift
         else:
             temp.microtone = centShift    
-        # possible optimize this to use only two Pitch objects
+
+        environLocal.printDebug(['getHarmonic()', 'self', self, 'self.frequency', self.frequency, 'centShift', centShift, 'temp', temp, 'temp.frequency', temp.frequency, 'temp.microtone', temp.microtone])
+
+        # possibly optimize this to use only two Pitch objects
         final = Pitch()
         # set with this frequency
         final.frequency = temp.frequency
+
+        environLocal.printDebug(['getHarmonic()', 'final', final, 'final.frequency', final.frequency])
+
+
         return final
 
 
@@ -2123,6 +2162,9 @@ class Pitch(music21.Music21Object):
             found.append((i, p))
             if p.ps > target.ps:
                 break
+
+        environLocal.printDebug(['_getEquivalentHarmonic():', 'fundamental', fundamental, 'found', found])
+
         # it is either the last or the second to last
         if len(found) < 2: # only 1
             harmonicMatch, match = found[0]
@@ -2139,6 +2181,8 @@ class Pitch(music21.Music21Object):
             distanceLower = target.ps - candidateLower.ps
             distanceHigher = candidateHigher.ps - target.ps
 
+            environLocal.printDebug(['_getEquivalentHarmonic():', 'distanceLower', distanceLower, 'distanceHigher', distanceHigher, 'target', target])
+
             if distanceLower <= distanceHigher:
                 # the lower is closer, thus we need to raise gap
                 match = candidateLower
@@ -2149,13 +2193,16 @@ class Pitch(music21.Music21Object):
                 match = candidateHigher
                 gap = -abs(distanceHigher)
                 harmonicMatch = harmonicHigher
+
+        environLocal.printDebug(['_getEquivalentHarmonic():', 'match', match, 'gap', gap, 'harmonicMatch', harmonicMatch])
+
         # need to found gap, otherwise may get very small values
-        gap = round(gap, 8)
+        gap = round(gap, PITCH_SPACE_SIG_DIGITS)
         # create a pitch with the appropriate gap as a Microtone
         if fundamental.microtone is not None:
+            # if the result is zero, .microtone will automatically 
+            # be set to None
             fundamental.microtone = fundamental.microtone.cents + (gap * 100)
-            if fundamental.microtone.cents == 0:
-                fundamental.microtone = None
         else:
             if gap != 0:
                 fundamental.microtone = gap * 100
@@ -3442,6 +3489,45 @@ class Test(unittest.TestCase):
         p = p.transpose(12)
         self.assertEqual(repr(p), 'A5(-10c)')
         self.assertEqual(p.ps, 80.90)
+
+
+
+    def testMicrotoneB(self):
+        from music21 import pitch
+
+        self.assertEqual(str(pitch.Pitch('c4').getHarmonic(1)), 'C4')
+
+        p = pitch.Pitch('c4')
+        p.microtone = 20
+        self.assertEqual(str(p), 'C4(+20c)')
+        self.assertEqual(str(p.getHarmonic(1)), 'C4(+20c)')
+
+        self.assertEqual(str(pitch.Pitch('c4').getHarmonic(2)), 'C5')
+        self.assertEqual(str(pitch.Pitch('c4').getHarmonic(3)), 'G5(+2c)')
+        self.assertEqual(str(pitch.Pitch('c4').getHarmonic(4)), 'C6')
+        #self.assertEqual(str(pitch.Pitch('c4').getHarmonic(5)), 'E6(-14c)')
+        self.assertEqual(str(pitch.Pitch('c4').getHarmonic(6)), 'G6(+2c)')
+        self.assertEqual(str(pitch.Pitch('c4').getHarmonic(7)), 'A~6(+19c)')
+
+
+        self.assertEqual(pitch.Pitch('g4')._getEquivalentHarmonicStr('c3'), '3rdH/C3(-2c)')
+
+        self.assertEqual(str(convertPsToStep(60.0)), "('C', <accidental natural>, None)")
+
+        self.assertEqual(str(pitch.Pitch('c4').getHarmonic(1)), 'C4')
+        self.assertEqual(str(pitch.Pitch('c3').getHarmonic(2)), 'C4')
+        self.assertEqual(str(pitch.Pitch('c2').getHarmonic(2)), 'C3')
+
+
+
+    def testMicrotoneC(self):
+        import pitch
+
+        self.assertEqual(pitch.Pitch('c4')._getEquivalentHarmonicStr('c3'), '2ndH/C3')
+
+
+
+
 
 
 
