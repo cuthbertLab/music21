@@ -266,14 +266,14 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
                     elif isinstance(a, romanTextModule.RTKeySignature):
                         try: # this sets the keysignature but not the prefix text
-                            kCurrent, dummy = _getKeyAndPrefix(a)
+                            thisSig = a.getKeySignature()
                         except:
                             raise TranslateRomanTextException('cannot get key from %s in line %s' % (a.src, t.src))
                         #insert at beginning of measure if at beginning -- for things like pickups.
                         if m.number < 2:
-                            m.insert(0, kCurrent)
+                            m.insert(0, thisSig)
                         else:
-                            m.insert(o, kCurrent)
+                            m.insert(o, thisSig)
                         foundAKeySignatureSoFar = True
 
                     elif isinstance(a, romanTextModule.RTAnalyticKey):
@@ -495,7 +495,7 @@ class Test(unittest.TestCase):
 
     def testRomanTextString(self):
         from music21 import converter
-        s = converter.parse('m1 I \n m2 V6/5 \n m3 I b3 V7 \n m4 vi \n m5 a: i b3 V4/2 \n m6 I', format='romantext')
+        s = converter.parse('m1 KS1 I \n m2 V6/5 \n m3 I b3 V7 \n m4 KS-3 vi \n m5 a: i b3 V4/2 \n m6 I', format='romantext')
 
         rnStream = s.flat.getElementsByClass('RomanNumeral')
         self.assertEqual(rnStream[0].figure, 'I')
@@ -506,6 +506,10 @@ class Test(unittest.TestCase):
         self.assertEqual(rnStream[5].figure, 'i')
         self.assertEqual(rnStream[6].figure, 'V4/2')
         self.assertEqual(rnStream[7].figure, 'I')
+
+        rnStreamKey = s.flat.getElementsByClass('KeySignature')
+        self.assertEqual(rnStreamKey[0].sharps, 1)
+        self.assertEqual(rnStreamKey[1].sharps, -3)
 
         #s.show()
 

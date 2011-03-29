@@ -40,7 +40,7 @@ reOptKeyOpenAtom = re.compile('\?\([A-Ga-g]+[b#]*:')
 reOptKeyCloseAtom = re.compile('\?\)[A-Ga-g]+[b#]*:?')
 reKeyAtom = re.compile('[A-Ga-g]+[b#]*;:')
 reAnalyticKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
-reKeySignatureAtom = re.compile('[A-Ga-g]+[b#]*;')
+reKeySignatureAtom = re.compile('KS\-?[0-7]')
 # must distinguish b3 from bVII; there may be b1.66.5
 reBeatAtom = re.compile('b[1-9.]+')
 
@@ -480,8 +480,7 @@ class RTKeyTypeAtom(RTAtom):
     '''
     RTKeyTypeAtoms contain utility
     functions for all Key-type tokens
-    i.e., RTKey, RTAnalyticKey, and
-    RTKeySignature.
+    i.e., RTKey, RTAnalyticKey. (no longer KeySignature)
     '''
     def __repr__(self):
         return '<RTKeyTypeAtom %r>' % self.src
@@ -576,32 +575,38 @@ class RTAnalyticKey(RTKeyTypeAtom):
         return '<RTAnalyticKey %r>' % self.src
 
 
-class RTKeySignature(RTKeyTypeAtom):
-    footerStrip = ';'
+class RTKeySignature(RTAtom):
     def __init__(self, src =u'', container=None):
         '''
-        An RTKeySignature(RTKeyTypeAtom) only defines
+        An RTKeySignature(RTAtom) only defines
         a change in the KeySignature.  It
         does not in itself create a :class:~'music21.key.Key'
         object, nor does it change the analysis
         taking place.
         
+        The number after KS defines the number of sharps (negative for flats)
+        
         
         >>> from music21 import *
-        >>> gminor = romanText.RTKeySignature('g;')
+        >>> gminor = romanText.RTKeySignature('KS-2')
         >>> gminor
-        <RTKeySignature 'g;'>
+        <RTKeySignature 'KS-2'>
         >>> gminor.getKeySignature()
         <music21.key.KeySignature of 2 flats>
-
+        
+        >>> Amajor = romanText.RTKeySignature('KS3')
+        >>> Amajor.getKeySignature()
+        <music21.key.KeySignature of 3 sharps>
+        
         '''
         RTAtom.__init__(self, src, container)
 
     def __repr__(self):
         return '<RTKeySignature %r>' % self.src
 
-
-
+    def getKeySignature(self):
+        numSharps = int(self.src[2:])
+        return music21.key.KeySignature(numSharps)
 
 class RTOpenParens(RTAtom):
     def __init__(self, src =u'(', container=None):
