@@ -211,7 +211,7 @@ def convertPsToStep(ps):
     # micro here will be between 0 and 1
     pc, micro = divmod(pcReal, 1)
 
-    #environLocal.printDebug(['convertPsToStep(): post divmod',  'ps', repr(ps), 'pcReal', repr(pcReal), 'pc', repr(pc), 'micro', repr(micro)])
+    environLocal.printDebug(['convertPsToStep(): post divmod',  'ps', repr(ps), 'pcReal', repr(pcReal), 'pc', repr(pc), 'micro', repr(micro)])
 
     # if close enough to a quarter tone
     if round(micro, 1) == 0.5:
@@ -2049,7 +2049,7 @@ class Pitch(music21.Music21Object):
         return final
 
 
-    def _getEquivalentHarmonic(self, fundamental):
+    def harmonicFromFundamental(self, fundamental):
         '''Given another Pitch as a fundamental, find the harmonic of that pitch that is equal to this Pitch. 
 
         Returns a tuple of harmonic number, and fundamental Pitch. 
@@ -2058,9 +2058,12 @@ class Pitch(music21.Music21Object):
 
         >>> from music21 import *
         >>> p = pitch.Pitch('g4')
-        >>> str(p._getEquivalentHarmonic('c3'))
-        '(3, C3(-2c))'
-
+        >>> f = pitch.Pitch('c3')
+        >>> p.harmonicFromFundamental(f)
+        (3, 2.0)
+        >>> p.microtone = p.harmonicFromFundamental(f)[1] # adjust microtone
+        >>> int(f.getHarmonic(3).frequency) == int(p.frequency)
+        True
         '''
         
         if common.isStr(fundamental):
@@ -2081,7 +2084,7 @@ class Pitch(music21.Music21Object):
             if p.ps > target.ps:
                 break
 
-        #environLocal.printDebug(['_getEquivalentHarmonic():', 'fundamental', fundamental, 'found', found])
+        #environLocal.printDebug(['harmonicFromFundamental():', 'fundamental', fundamental, 'found', found])
 
         # it is either the last or the second to last
         if len(found) < 2: # only 1
@@ -2099,36 +2102,70 @@ class Pitch(music21.Music21Object):
             distanceLower = target.ps - candidateLower.ps
             distanceHigher = candidateHigher.ps - target.ps
 
-            #environLocal.printDebug(['_getEquivalentHarmonic():', 'distanceLower', distanceLower, 'distanceHigher', distanceHigher, 'target', target])
+            #environLocal.printDebug(['harmonicFromFundamental():', 'distanceLower', distanceLower, 'distanceHigher', distanceHigher, 'target', target])
 
             if distanceLower <= distanceHigher:
-                #environLocal.printDebug(['_getEquivalentHarmonic():', 'distanceLower (%s); distanceHigher (%s); distance lower is closer to target: %s'  % (candidateLower, candidateHigher, target)])
+                #environLocal.printDebug(['harmonicFromFundamental():', 'distanceLower (%s); distanceHigher (%s); distance lower is closer to target: %s'  % (candidateLower, candidateHigher, target)])
 
                 # the lower is closer, thus we need to raise gap
                 match = candidateLower
-                gap = abs(distanceLower)
+                gap = -abs(distanceLower)
                 harmonicMatch = harmonicLower
             else:
                 # the higher is closer, thus we need to lower the gap
-                #environLocal.printDebug(['_getEquivalentHarmonic():', 'distanceLower (%s); distanceHigher (%s); distance higher is closer to target: %s'  % (candidateLower, candidateHigher, target)])
+                #environLocal.printDebug(['harmonicFromFundamental():', 'distanceLower (%s); distanceHigher (%s); distance higher is closer to target: %s'  % (candidateLower, candidateHigher, target)])
 
                 match = candidateHigher
-                gap = -abs(distanceHigher)
+                gap = abs(distanceHigher)
                 harmonicMatch = harmonicHigher
 
-        #environLocal.printDebug(['_getEquivalentHarmonic():', 'match', match, 'gap', gap, 'harmonicMatch', harmonicMatch])
+        gap = round(gap, PITCH_SPACE_SIG_DIGITS) * 100
+
+        return harmonicMatch, gap
+
+        #environLocal.printDebug(['harmonicFromFundamental():', 'match', match, 'gap', gap, 'harmonicMatch', harmonicMatch])
 
         # need to found gap, otherwise may get very small values
-        gap = round(gap, PITCH_SPACE_SIG_DIGITS)
+#         gap = round(gap, PITCH_SPACE_SIG_DIGITS)
+#         # create a pitch with the appropriate gap as a Microtone
+#         if fundamental.microtone is not None:
+#             # if the result is zero, .microtone will automatically 
+#             # be set to None
+#             fundamental.microtone = fundamental.microtone.cents + (gap * 100)
+#         else:
+#             if gap != 0:
+#                 fundamental.microtone = gap * 100
+#         return harmonicMatch, fundamental
+
+
+    def harmonicAndFundamentalFromPitch(self, target):
+        '''Given a Pitch that is a plausible target for a fundamental, return the harmonic number and a proper fundamental that describes this Pitch.
+
+        >>> from music21 import *
+        >>> pitch.Pitch('g4').harmonicAndFundamentalFromPitch('c3')
+        (3, C3(-2c))
+
+        '''
+        if common.isStr(target):
+            target = Pitch(target)
+        else: # make a copy
+            target = copy.deepcopy(target) 
+
+        harmonic, cents = self.harmonicFromFundamental(target)
+        # flip direction
+        cents = -cents
+
         # create a pitch with the appropriate gap as a Microtone
-        if fundamental.microtone is not None:
+        if target.microtone is not None:
             # if the result is zero, .microtone will automatically 
             # be set to None
-            fundamental.microtone = fundamental.microtone.cents + (gap * 100)
+            target.microtone = target.microtone.cents + cents
         else:
-            if gap != 0:
-                fundamental.microtone = gap * 100
-        return harmonicMatch, fundamental
+            if cents != 0:
+                target.microtone = cents
+        return harmonic, target
+
+
 
 
     def _getEquivalentHarmonicStr(self, fundamental):
@@ -2169,7 +2206,8 @@ class Pitch(music21.Music21Object):
         '7thH/C2(-69c)'
 
         '''
-        harmonic, fundamental = self._getEquivalentHarmonic(fundamental)
+        harmonic, fundamental = self.harmonicAndFundamentalFromPitch(
+            fundamental)
         return '%s%sH/%s' % (harmonic, common.ordinalAbbreviation(harmonic), 
                             fundamental)
 
@@ -3427,7 +3465,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(2)), 'C5')
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(3)), 'G5(+2c)')
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(4)), 'C6')
-        #self.assertEqual(str(pitch.Pitch('c4').getHarmonic(5)), 'E6(-14c)')
+        self.assertEqual(str(pitch.Pitch('c4').getHarmonic(5)), 'E6(-14c)')
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(6)), 'G6(+2c)')
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(7)), 'A~6(+19c)')
 
@@ -3457,14 +3495,18 @@ class Test(unittest.TestCase):
         f.microtone = +20
         self.assertEqual(p._getEquivalentHarmonicStr(f), '2ndH/C3')
 
+        p1 = pitch.Pitch('c1')
+        self.assertEqual(str(p1.getHarmonic(13)), 'G#4(+41c)')
+        
+        p2 = pitch.Pitch('a1')
+        self.assertEqual(str(p2.getHarmonic(13)), 'F5(+41c)')
+        
+        self.assertEqual(str(p1.transpose('M6')), 'A1')
+        self.assertEqual(str(p1.getHarmonic(13).transpose('M6')), 'E#5(+41c)')
+
 
     def testMicrotoneC(self):
         import pitch
-
-
-
-
-
 
 
 
