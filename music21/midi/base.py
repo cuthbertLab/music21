@@ -539,8 +539,6 @@ class MidiEvent(object):
                 self.type == "CHANNEL_KEY_PRESSURE"): 
                 self.data = z 
                 return str[2:] # only used x and z; return remainder
-                # seems like this might be 3:
-                # was originally 2
             elif (self.type == "CONTROLLER_CHANGE"):
                 # for now, do nothing with this data
                 # for a note, str[2] is velocity; here, it is the control value
@@ -604,16 +602,18 @@ class MidiEvent(object):
         '''
         sysex_event_dict = {"F0_SYSEX_EVENT": 0xF0, 
                             "F7_SYSEX_EVENT": 0xF7} 
-
         if channelVoiceMessages.hasattr(self.type): 
+            #environLocal.printDebug(['writing channelVoiceMessages', self.type])
             x = chr((self.channel - 1) + 
                     getattr(channelVoiceMessages, self.type)) 
-            #environLocal.printDebug(['writing channelVoiceMessages', self.type])
             # for writing note-on/note-off
             if self.type not in ['PROGRAM_CHANGE', 
                 'CHANNEL_KEY_PRESSURE']:
                 # this results in a two-part string, like '\x00\x00'
                 data = chr(self._parameter1) + chr(self._parameter2) 
+            elif self.type in ['PROGRAM_CHANGE']:
+                #environLocal.printDebug(['trying to add program change data: %s' % self.data])
+                data = chr(self.data) 
             else:  # all other messages
                 data = chr(self.data) 
             return x + data 
@@ -630,7 +630,7 @@ class MidiEvent(object):
             s = s + putVariableLengthNumber(len(self.data)) 
             return s + self.data 
 
-        elif metaEvents.hasattr(self.type): 
+        elif metaEvents.hasattr(self.type):                 
             s = chr(0xFF) + chr(getattr(metaEvents, self.type)) 
             s = s + putVariableLengthNumber(len(self.data)) 
             try: # TODO: need to handle unicode
@@ -752,10 +752,9 @@ class DeltaTime(MidiEvent):
     <MidiEvent DeltaTime, t=380, track=1, channel=None>
 
     '''
-    def __init__(self, track, time=None):
-        MidiEvent.__init__(self, track)
+    def __init__(self, track, time=None, channel=None):
+        MidiEvent.__init__(self, track, time=time, channel=channel)
         self.type = "DeltaTime" 
-        self.time = time
 
     def read(self, oldstr): 
         self.time, newstr = getVariableLengthNumber(oldstr) 
@@ -998,22 +997,42 @@ class MidiFile(object):
 # utility functions for getting commonly used event
 
 
-def getStartEvents(mt=None, partName='', partProgram=0):
+def getStartEvents(mt=None, partName='', partProgram=None):
     '''Provide a list of events found at the beginning of a track.
 
     A MidiTrack reference can be provided via the `mt` parameter.
     '''
+
+    # TODO: may need to provide channel as argument
+
     events = []
 
-    dt = DeltaTime(mt)
-    dt.time = 0
-    events.append(dt)
+    if partName is not None:
+        dt = DeltaTime(mt)
+        dt.time = 0
+        events.append(dt)
+    
+        me = MidiEvent(mt)
+        me.type = "SEQUENCE_TRACK_NAME"
+        me.time = 0 # always at zero?
+        me.data = partName
+        events.append(me)
 
-    me = MidiEvent(mt)
-    me.type = "SEQUENCE_TRACK_NAME"
-    me.time = 0 # always at zero?
-    me.data = partName
-    events.append(me)
+    # must have channel information
+    if partProgram is not None:
+        dt = DeltaTime(mt)
+        dt.time = 0
+        events.append(dt)
+    
+        environLocal.printDebug(['adding program change: %s' % partProgram])
+        me = MidiEvent(mt)
+        me.type = "PROGRAM_CHANGE"
+        me.time = 0 
+        me.channel = 1
+        me.data = partProgram
+        events.append(me)
+
+    environLocal.printDebug(['got start events', events])
 
     return events
 

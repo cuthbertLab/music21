@@ -838,6 +838,7 @@ class Accidental(music21.Music21Object):
             return False
         return True
 
+
     #---------------------------------------------------------------------------
     # main properties
 
@@ -1311,6 +1312,13 @@ class Pitch(music21.Music21Object):
             if self.microtone.cents != 0:
                 return False
         return True
+
+
+    def getCentShiftFromMidi(self):
+        '''Get cent deviation of this pitch from MIDI pitch.
+        '''
+        return (self.ps - self.midi) * 100
+
 
     #---------------------------------------------------------------------------
 
