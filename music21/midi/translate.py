@@ -127,7 +127,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     return n
 
 
-def noteToMidiEvents(inputM21):
+def noteToMidiEvents(inputM21, includeDeltaTime=True):
     '''Translate Note to four MIDI events.
 
     >>> from music21 import *
@@ -144,25 +144,29 @@ def noteToMidiEvents(inputM21):
 
     mt = None # use a midi track set to None
     eventList = []
-    dt = midiModule.DeltaTime(mt)
-    dt.time = 0 # set to zero; will be shifted later as necessary
-    # add to track events
-    eventList.append(dt)
+
+    if includeDeltaTime:
+        dt = midiModule.DeltaTime(mt)
+        dt.time = 0 # set to zero; will be shifted later as necessary
+        # add to track events
+        eventList.append(dt)
 
     me = midiModule.MidiEvent(mt)
     me.type = "NOTE_ON"
     me.channel = 1
     me.time = None # not required
     me.pitch = n.midi
-    me.pitchSpace = n.ps
+    if not n.pitch.isTwelveTone:
+        me.centShift = n.midi - n.ps
     me.velocity = 90 # default, can change later
     eventList.append(me)
 
-    # add note off / velocity zero message
-    dt = midiModule.DeltaTime(mt)
-    dt.time = n.duration.midi
-    # add to track events
-    eventList.append(dt)
+    if includeDeltaTime:
+        # add note off / velocity zero message
+        dt = midiModule.DeltaTime(mt)
+        dt.time = n.duration.midi
+        # add to track events
+        eventList.append(dt)
 
     me = midiModule.MidiEvent(mt)
     me.type = "NOTE_OFF"
@@ -170,6 +174,8 @@ def noteToMidiEvents(inputM21):
     me.time = None #d
     me.pitch = n.midi
     me.pitchSpace = n.ps
+    if not n.pitch.isTwelveTone:
+        me.centShift = n.midi - n.ps
     me.velocity = 0 # must be zero
     eventList.append(me)
 
@@ -296,7 +302,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
 
 
 
-def chordToMidiEvents(inputM21):
+def chordToMidiEvents(inputM21, includeDeltaTime=True):
     '''
     >>> from music21 import *
     >>> c = chord.Chord(['c3','g#4', 'b5'])
@@ -312,19 +318,23 @@ def chordToMidiEvents(inputM21):
     for i in range(len(c.pitches)):
         pitchObj = c.pitches[i]
 
-        dt = midiModule.DeltaTime(mt)
-        # for a chord, only the first delta time should have the offset
-        # here, all are zero
-        dt.time = 0 # set to zero; will be shifted later as necessary
-        # add to track events
-        eventList.append(dt)
+        if includeDeltaTime:
+            dt = midiModule.DeltaTime(mt)
+            # for a chord, only the first delta time should have the offset
+            # here, all are zero
+            dt.time = 0 # set to zero; will be shifted later as necessary
+            # add to track events
+            eventList.append(dt)
 
         me = midiModule.MidiEvent(mt)
         me.type = "NOTE_ON"
         me.channel = 1
         me.time = None # not required
         me.pitch = pitchObj.midi
-        me.pitchSpace = pitchObj.ps
+
+        if not pitchObj.isTwelveTone:
+            me.centShift = pitchObj.midi - pitchObj.ps
+
         me.velocity = 90 # default, can change later
         eventList.append(me)
 
@@ -332,14 +342,15 @@ def chordToMidiEvents(inputM21):
     for i in range(len(c.pitches)):
         pitchObj = c.pitches[i]
 
-        # add note off / velocity zero message
-        dt = midiModule.DeltaTime(mt)
-        # for a chord, only the first delta time should have the dur
-        if i == 0:
-            dt.time = c.duration.midi
-        else:
-            dt.time = 0
-        eventList.append(dt)
+        if includeDeltaTime:
+            # add note off / velocity zero message
+            dt = midiModule.DeltaTime(mt)
+            # for a chord, only the first delta time should have the dur
+            if i == 0:
+                dt.time = c.duration.midi
+            else:
+                dt.time = 0
+            eventList.append(dt)
 
         me = midiModule.MidiEvent(mt)
         me.type = "NOTE_OFF"
@@ -413,7 +424,7 @@ def midiEventsToTimeSignature(eventList):
     ts = meter.TimeSignature('%s/%s' % (n, d))
     return ts
 
-def timeSignatureToMidiEvents(ts):
+def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     '''Translate a m21 TiemSignature to a pair of events, including a DeltaTime.
 
     >>> from music21 import *
@@ -428,10 +439,11 @@ def timeSignatureToMidiEvents(ts):
 
     eventList = []
 
-    dt = midiModule.DeltaTime(mt)
-    dt.time = 0 # set to zero; will be shifted later as necessary
-    # add to track events
-    eventList.append(dt)
+    if includeDeltaTime:
+        dt = midiModule.DeltaTime(mt)
+        dt.time = 0 # set to zero; will be shifted later as necessary
+        # add to track events
+        eventList.append(dt)
 
     n = ts.numerator
     # need log base 2 to solve for exponent of 2
@@ -501,7 +513,7 @@ def midiEventsToKeySignature(eventList):
         ks.mode = 'minor'
     return ks
 
-def keySignatureToMidiEvents(ks):
+def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     '''Convert a single MIDI event into a music21 TimeSignature object.
 
     >>> from music21 import key
@@ -524,11 +536,11 @@ def keySignatureToMidiEvents(ks):
 
     eventList = []
 
-    dt = midiModule.DeltaTime(mt)
-    dt.time = 0 # set to zero; will be shifted later as necessary
-    # add to track events
-    eventList.append(dt)
-
+    if includeDeltaTime:
+        dt = midiModule.DeltaTime(mt)
+        dt.time = 0 # set to zero; will be shifted later as necessary
+        # add to track events
+        eventList.append(dt)
 
     sharpCount = ks.sharps
     if ks.mode == 'minor':        
@@ -551,17 +563,17 @@ def keySignatureToMidiEvents(ks):
 #-------------------------------------------------------------------------------
 # Streams
 
-def _getPacket(offset, midiEvent, obj, hasMicrotone=None):
+def _getPacket(offset, midiEvent, obj):
     '''Pack a dictionary of parameters for each event packet.
     '''
     post = {}
     post['offset'] = offset
     post['midiEvent'] = midiEvent
     post['obj'] = obj # keep a reference to the source object
-    post['hasMicrotone'] = hasMicrotone
+    post['centShift'] = midiEvent.centShift
     return post
 
-def streamToMidiTrackNew(inputM21, instObj=None, translateTimeSignature=True):
+def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
     '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
 
     This assumes that this Stream has only one Part. For Streams that contain sub-streams, use streamToMidiTracks.
@@ -601,29 +613,29 @@ def streamToMidiTrackNew(inputM21, instObj=None, translateTimeSignature=True):
     for obj in s:
         classes = obj.classes
         # test: match to 'GeneralNote'
-        if 'Note' in classes or 'Rest' in classes or 'Chord' in classes:
+        if 'Note' in classes or 'Rest' in classes:
             if 'Rest' in classes:
                 continue
             # get a list of midi events
             # using this property here is easier than using the above conversion
             # methods, as we do not need to know what the object is
-            sub = obj.midiEvents
+            sub = noteToMidiEvents(obj, includeDeltaTime=False)
+        elif 'Chord' in classes:
+            sub = chordToMidiEvents(obj, includeDeltaTime=False)
         elif 'Dynamic' in classes:
             pass # configure dynamics
         elif 'TimeSignature' in classes:
             # return a pair of events
-            sub = timeSignatureToMidiEvents(obj)
+            sub = timeSignatureToMidiEvents(obj, includeDeltaTime=False)
         elif 'KeySignature' in classes:
-            sub = keySignatureToMidiEvents(obj)
+            sub = keySignatureToMidiEvents(obj, includeDeltaTime=False)
         else: # other objects may have already been added
-            pass
+            continue
 
         # all events: delta/note-on/delta/note-off
         # strip delta times
         packets = []
         for i in range(len(sub)):
-            if i % 2 == 0: 
-                continue # skip delta times
             # store offset, midi event, object
             # add channel and pitch change also
             midiEvent = sub[i]
@@ -646,11 +658,20 @@ def streamToMidiTrackNew(inputM21, instObj=None, translateTimeSignature=True):
         cmp=lambda x,y: cmp(x['offset'], y['offset'])
         )
 
-    # convert subByOffset to delta times
+    # add delta times, also add pitch shift
+    events = []
+    lastOffset = 0
     for p in packetsByOffset:
-        environLocal.printDebug(['packetsByOffset', p])
+        t = p['offset'] - lastOffset
+        if t < 0:
+            raise TranslateException('got a negative delta time')
+        dt = midiModule.DeltaTime(mt, time=t)
+        #environLocal.printDebug(['packetsByOffset', p, 'dt', dt])
+        events.append(dt)
+        events.append(p['midiEvent'])
+        lastOffset = p['offset']
 
-    mt.events += []
+    mt.events += events
     # must update all events with a ref to this MidiTrack
     mt.updateEvents()
     mt.events += midiModule.getEndEvents(mt)
@@ -660,132 +681,132 @@ def streamToMidiTrackNew(inputM21, instObj=None, translateTimeSignature=True):
 
 
 
-def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
-    '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
-
-    This assumes that this Stream has only one Part. For Streams that contain sub-streams, use streamToMidiTracks.
-
-    >>> from music21 import *
-    >>> s = stream.Stream()
-    >>> n = note.Note('g#')
-    >>> n.quarterLength = .5
-    >>> s.repeatAppend(n, 4)
-    >>> mt = streamToMidiTrack(s)
-    >>> len(mt.events)
-    20
-    '''
-
-    # NOTE: this procedure requires that there are no overlaps between
-    # adjacent events. 
-
-    environLocal.printDebug(['streamToMidiTrack()'])
-
-    if instObj is None:
-        # see if an instrument is defined in this or a parent stream
-        instObj = inputM21.getInstrument()
-
-    # each part will become midi track
-    # the 1 here becomes the midi track index
-    mt = midiModule.MidiTrack(1)
-    mt.events += midiModule.getStartEvents(mt, instObj.partName)
-
-    # initial time is start of this Stream
-    #t = self.offset * defaults.ticksPerQuarter
-    # should shift at tracks level
-    t = 0 * defaults.ticksPerQuarter
-
-    # have to be sorted, have to strip ties
-    # retain containers to get all elements: time signatures, dynamics, etc
-    s = inputM21.stripTies(inPlace=False, matchByPitch=False, 
-        retainContainers=True)
-    s = s.flat
-    # probably already flat and sorted
-    for obj in s.sorted:
-        tDurEvent = 0 # the found delta ticks in each event
-
-        classes = obj.classes
-        # test: match to 'GeneralNote'
-        if 'Note' in classes or 'Rest' in classes or 'Chord' in classes:
-        #if obj.isNote or obj.isRest or obj.isChord:
-
-            # find difference since last event to this event
-            # cannot use getOffsetBySite(self), as need flat offset
-            # all values are in tpq; t stores abs time in tpq
-            tDif = (obj.offset * defaults.ticksPerQuarter) - t
-
-            #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
-
-            # include 'Unpitched'
-            if 'Rest' in classes:
-                # for a rest, do not do anything: difference in offset will 
-                # account for the gap
-                continue
-
-            # get a list of midi events
-            # using this property here is easier than using the above conversion
-            # methods, as we do not need to know what the object is
-            sub = obj.midiEvents
-            # need to tag these events with their local time for sorting
-
-            # a note has 4 events: delta/note-on/delta/note-off
-            if 'Note' in classes:
-                sub[0].time = int(round(tDif)) # set first delta 
-                # get the duration in ticks; this is the delta to 
-                # to the note off message; already set when midi events are 
-                # obtained
-                tDurEvent = int(round(sub[2].time))
-
-            # a chord has delta/note-on/delta/note-off for each memeber
-            # of the chord. on the first delta is the offset, and only
-            # the first delta preceding the first note-off is the duration
-            if 'Chord' in classes:
-                # divide events between note-on and note-off
-                sub[0].time = int(round(tDif)) # set first delta 
-                # only the delta before the first note-off has the event dur
-                # could also sum all durations before setting first
-                # this is the second half of events
-                tDurEvent = int(round(len(sub) / 2))
-
-            # to get new current time, need both the duration of the event
-            # as well as any difference found between the last event
-            t += tDif + tDurEvent
-            # add events to the list
-            mt.events += sub
-
-        elif 'Dynamic' in classes:
-            pass # configure dynamics
-
-        elif 'TimeSignature' in classes:
-            # find difference since last event to this event
-            # cannot use getOffsetBySite(self), as need flat offset
-            # all values are in tpq; t stores abs time in tpq
-            tDif = (obj.offset * defaults.ticksPerQuarter) - t
-            # return a pair of events
-            sub = timeSignatureToMidiEvents(obj)
-            # for a ts, this will usually be zero, but not always
-            sub[0].time = int(round(tDif)) # set first delta 
-            t += tDif
-            mt.events += sub
-
-        elif 'KeySignature' in classes:
-            tDif = (obj.offset * defaults.ticksPerQuarter) - t
-
-            environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
-
-            sub = keySignatureToMidiEvents(obj)
-            # for a ts, this will usually be zero, but not always
-            sub[0].time = int(round(tDif)) # set first delta 
-            t += tDif
-            mt.events += sub
-
-        else: # other objects may have already been added
-            pass
-
-    # must update all events with a ref to this MidiTrack
-    mt.updateEvents()
-    mt.events += midiModule.getEndEvents(mt)
-    return mt
-    
+# def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
+#     '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
+# 
+#     This assumes that this Stream has only one Part. For Streams that contain sub-streams, use streamToMidiTracks.
+# 
+#     >>> from music21 import *
+#     >>> s = stream.Stream()
+#     >>> n = note.Note('g#')
+#     >>> n.quarterLength = .5
+#     >>> s.repeatAppend(n, 4)
+#     >>> mt = streamToMidiTrack(s)
+#     >>> len(mt.events)
+#     20
+#     '''
+# 
+#     # NOTE: this procedure requires that there are no overlaps between
+#     # adjacent events. 
+# 
+#     environLocal.printDebug(['streamToMidiTrack()'])
+# 
+#     if instObj is None:
+#         # see if an instrument is defined in this or a parent stream
+#         instObj = inputM21.getInstrument()
+# 
+#     # each part will become midi track
+#     # the 1 here becomes the midi track index
+#     mt = midiModule.MidiTrack(1)
+#     mt.events += midiModule.getStartEvents(mt, instObj.partName)
+# 
+#     # initial time is start of this Stream
+#     #t = self.offset * defaults.ticksPerQuarter
+#     # should shift at tracks level
+#     t = 0 * defaults.ticksPerQuarter
+# 
+#     # have to be sorted, have to strip ties
+#     # retain containers to get all elements: time signatures, dynamics, etc
+#     s = inputM21.stripTies(inPlace=False, matchByPitch=False, 
+#         retainContainers=True)
+#     s = s.flat
+#     # probably already flat and sorted
+#     for obj in s.sorted:
+#         tDurEvent = 0 # the found delta ticks in each event
+# 
+#         classes = obj.classes
+#         # test: match to 'GeneralNote'
+#         if 'Note' in classes or 'Rest' in classes or 'Chord' in classes:
+#         #if obj.isNote or obj.isRest or obj.isChord:
+# 
+#             # find difference since last event to this event
+#             # cannot use getOffsetBySite(self), as need flat offset
+#             # all values are in tpq; t stores abs time in tpq
+#             tDif = (obj.offset * defaults.ticksPerQuarter) - t
+# 
+#             #environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
+# 
+#             # include 'Unpitched'
+#             if 'Rest' in classes:
+#                 # for a rest, do not do anything: difference in offset will 
+#                 # account for the gap
+#                 continue
+# 
+#             # get a list of midi events
+#             # using this property here is easier than using the above conversion
+#             # methods, as we do not need to know what the object is
+#             sub = obj.midiEvents
+#             # need to tag these events with their local time for sorting
+# 
+#             # a note has 4 events: delta/note-on/delta/note-off
+#             if 'Note' in classes:
+#                 sub[0].time = int(round(tDif)) # set first delta 
+#                 # get the duration in ticks; this is the delta to 
+#                 # to the note off message; already set when midi events are 
+#                 # obtained
+#                 tDurEvent = int(round(sub[2].time))
+# 
+#             # a chord has delta/note-on/delta/note-off for each memeber
+#             # of the chord. on the first delta is the offset, and only
+#             # the first delta preceding the first note-off is the duration
+#             if 'Chord' in classes:
+#                 # divide events between note-on and note-off
+#                 sub[0].time = int(round(tDif)) # set first delta 
+#                 # only the delta before the first note-off has the event dur
+#                 # could also sum all durations before setting first
+#                 # this is the second half of events
+#                 tDurEvent = int(round(len(sub) / 2))
+# 
+#             # to get new current time, need both the duration of the event
+#             # as well as any difference found between the last event
+#             t += tDif + tDurEvent
+#             # add events to the list
+#             mt.events += sub
+# 
+#         elif 'Dynamic' in classes:
+#             pass # configure dynamics
+# 
+#         elif 'TimeSignature' in classes:
+#             # find difference since last event to this event
+#             # cannot use getOffsetBySite(self), as need flat offset
+#             # all values are in tpq; t stores abs time in tpq
+#             tDif = (obj.offset * defaults.ticksPerQuarter) - t
+#             # return a pair of events
+#             sub = timeSignatureToMidiEvents(obj)
+#             # for a ts, this will usually be zero, but not always
+#             sub[0].time = int(round(tDif)) # set first delta 
+#             t += tDif
+#             mt.events += sub
+# 
+#         elif 'KeySignature' in classes:
+#             tDif = (obj.offset * defaults.ticksPerQuarter) - t
+# 
+#             environLocal.printDebug([str(obj).ljust(26), 't', str(t).ljust(10), 'tdif', tDif])
+# 
+#             sub = keySignatureToMidiEvents(obj)
+#             # for a ts, this will usually be zero, but not always
+#             sub[0].time = int(round(tDif)) # set first delta 
+#             t += tDif
+#             mt.events += sub
+# 
+#         else: # other objects may have already been added
+#             pass
+# 
+#     # must update all events with a ref to this MidiTrack
+#     mt.updateEvents()
+#     mt.events += midiModule.getEndEvents(mt)
+#     return mt
+#     
 
 def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     inputM21=None):
@@ -831,8 +852,8 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     i = 0
     while i < len(mt.events):
         # in pairs, first should be delta time, second should be event
-        environLocal.printDebug(['midiTrackToStream(): index', 'i', i, mt.events[i]])
-        environLocal.printDebug(['midiTrackToStream(): index', 'i+1', i+1, mt.events[i+1]])
+        #environLocal.printDebug(['midiTrackToStream(): index', 'i', i, mt.events[i]])
+        #environLocal.printDebug(['midiTrackToStream(): index', 'i+1', i+1, mt.events[i+1]])
 
         # need to find pairs of delta time and events
         # in some cases, there are delta times that are out of order, or
@@ -1195,7 +1216,22 @@ class Test(unittest.TestCase):
         self.assertEqual(str(mtList[0].events[:10]), match)
 
 
-    def testOverlappedEvents(self):
+
+    def testOverlappedEventsA(self):
+        from music21 import corpus
+        s = corpus.parse('bwv66.6')
+        sFlat = s.flat
+        mtList = streamsToMidiTracks(sFlat)
+        self.assertEqual(len(mtList), 1)
+
+        # its the same as before
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=65, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=58, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=54, velocity=90>, <MidiEvent DeltaTime, t=1024, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=66, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=58, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=54, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+
+        self.assertEqual(str(mtList[0].events[-20:]), match)
+
+
+
+    def testOverlappedEventsB(self):
 
         from music21 import stream, note, chord, meter, key
 
@@ -1203,7 +1239,9 @@ class Test(unittest.TestCase):
         s.insert(key.KeySignature(3))
         s.insert(meter.TimeSignature('2/4'))
         s.insert(0, note.Note('c'))
-        s.insert(0, note.Note('g'))
+        n = note.Note('g')
+        n.pitch.microtone = 25
+        s.insert(0, n)
 
         s.append(chord.Chord(['d','f','a'], type='half'))
 
@@ -1211,7 +1249,7 @@ class Test(unittest.TestCase):
         s.insert(pos, note.Note('e'))
         s.insert(pos, note.Note('b'))
 
-        mt = streamToMidiTrackNew(s)
+        mt = streamToMidiTrack(s)
 
         #mtList = streamsToMidiTracks(soprano)
 
@@ -1219,7 +1257,7 @@ class Test(unittest.TestCase):
         #s.show('midi')
 
 
-
+        
 
 
 if __name__ == "__main__":

@@ -1331,10 +1331,10 @@ class Pitch(music21.Music21Object):
         >>> p.ps = 61.5 # get a quarter tone
         >>> p
         C#~4
-        >>> p.ps = 61.7 # get a microtone
+        >>> p.ps = 61.7 # set a microtone
         >>> p
         C#~4(+20c)
-        >>> p.ps = 61.4 # get a microtone
+        >>> p.ps = 61.4 # set a microtone
         >>> p
         C#4(+40c)
 
@@ -1427,6 +1427,7 @@ class Pitch(music21.Music21Object):
         '''
         self._ps = convertStepToPs(self._step, self.implicitOctave,
                                    self.accidental, self.microtone)
+
 
     def _getMidi(self):
         '''

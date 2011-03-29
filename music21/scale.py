@@ -2257,7 +2257,7 @@ class Test(unittest.TestCase):
         assert bFlatMinor.name == "B- minor", "Got a different name: " + bFlatMinor.name
         notes2 = [note1.name for note1 in bFlatMinor.getPitches()]
         self.assertEqual(notes2, ["B-", "C", "D-", "E-", "F", "G-", "A-", 'B-'])
-        assert bFlatMinor.getPitches()[0] == n3
+        assert bFlatMinor.getPitches()[0] == n3.pitch
         assert bFlatMinor.getPitches()[6].octave == 6
         
 #         harmonic = bFlatMinor.getConcreteHarmonicMinorScale()

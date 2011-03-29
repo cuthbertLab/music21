@@ -11785,21 +11785,11 @@ class Test(unittest.TestCase):
             s.append(n)
         #s.show('midi')
         mf = s.midiFile
-        match = [(0, 'SEQUENCE_TRACK_NAME', None), 
-        (0, 'NOTE_ON', 36), 
-        (1024, 'NOTE_OFF', 36), 
-        (1024, 'NOTE_ON', 53), (0, 'NOTE_ON', 68), (0, 'NOTE_ON', 72), 
-        (1024, 'NOTE_OFF', 53), (0, 'NOTE_OFF', 68), (0, 'NOTE_OFF', 72), 
-        (1530, 'NOTE_ON', 46), 
-        (1024, 'NOTE_OFF', 46), 
-        (2048, 'NOTE_ON', 38), (0, 'NOTE_ON', 69), 
-        (512, 'NOTE_OFF', 38), (0, 'NOTE_OFF', 69), 
-        (508, 'NOTE_ON', 37), (0, 'NOTE_ON', 58), (0, 'NOTE_ON', 92), 
-        (512, 'NOTE_OFF', 37), (0, 'NOTE_OFF', 58), (0, 'NOTE_OFF', 92), 
-        (1530, 'NOTE_ON', 54), (0, 'NOTE_ON', 69), (0, 'NOTE_ON', 73), 
-        (4096, 'NOTE_OFF', 54), (0, 'NOTE_OFF', 69), (0, 'NOTE_OFF', 73), 
-        (0, 'END_OF_TRACK', None)]
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36), (1024, 'NOTE_ON', 53), (0, 'NOTE_ON', 68), (0, 'NOTE_ON', 72), (1024, 'NOTE_OFF', 53), (0, 'NOTE_OFF', 68), (0, 'NOTE_OFF', 72), (512, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46), (2048, 'NOTE_ON', 38), (0, 'NOTE_ON', 69), (512, 'NOTE_OFF', 38), (0, 'NOTE_OFF', 69), (0, 'NOTE_ON', 37), (0, 'NOTE_ON', 58), (0, 'NOTE_ON', 92), (512, 'NOTE_OFF', 37), (0, 'NOTE_OFF', 58), (0, 'NOTE_OFF', 92), (1024, 'NOTE_ON', 54), (0, 'NOTE_ON', 69), (0, 'NOTE_ON', 73), (4096, 'NOTE_OFF', 54), (0, 'NOTE_OFF', 69), (0, 'NOTE_OFF', 73), (0, 'END_OF_TRACK', None)]
         procCompare(mf, match)
+
+
+
 
 
     def testMidiEventsImported(self):

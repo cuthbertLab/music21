@@ -398,7 +398,7 @@ class MidiEvent(object):
 
         # if this is a Note on/off, need to store original
         # pitch space value in order to determine if this is has a microtone
-        self.pitchSpace = None
+        self.centShift = None
     
     def __cmp__(self, other): 
         return cmp(self.time, other.time) 
@@ -752,9 +752,10 @@ class DeltaTime(MidiEvent):
     <MidiEvent DeltaTime, t=380, track=1, channel=None>
 
     '''
-    def __init__(self, track):
+    def __init__(self, track, time=None):
         MidiEvent.__init__(self, track)
         self.type = "DeltaTime" 
+        self.time = time
 
     def read(self, oldstr): 
         self.time, newstr = getVariableLengthNumber(oldstr) 
