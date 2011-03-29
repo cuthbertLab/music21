@@ -551,6 +551,26 @@ class Microtone(object):
         return '%s%s%s' % (MICROTONE_OPEN, sub, MICROTONE_CLOSE)
 
 
+    def __eq__(self, other):
+        '''Compare cents.
+
+        >>> from music21 import *
+        >>> m1 = pitch.Microtone(20)
+        >>> m2 = pitch.Microtone(20)
+        >>> m1 == m2
+        True
+        '''
+        if other is None:
+            return False
+        if other.cents == self.cents:
+            return True
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+
 
     def _getHarmonicShift(self):
         return self._harmonicShift
@@ -1152,7 +1172,7 @@ class Pitch(music21.Music21Object):
               hasattr(other, 'step') == False):
             return False
         elif (self.octave == other.octave and self.step == other.step and 
-            self.accidental == other.accidental):
+            self.accidental == other.accidental and self.microtone == other.microtone):
             return True
         else:
             return False
