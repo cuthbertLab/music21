@@ -993,67 +993,6 @@ class MidiFile(object):
         return str 
 
 
-#-------------------------------------------------------------------------------
-# utility functions for getting commonly used event
-
-
-def getStartEvents(mt=None, partName='', partProgram=None):
-    '''Provide a list of events found at the beginning of a track.
-
-    A MidiTrack reference can be provided via the `mt` parameter.
-    '''
-
-    # TODO: may need to provide channel as argument
-
-    events = []
-
-    if partName is not None:
-        dt = DeltaTime(mt)
-        dt.time = 0
-        events.append(dt)
-    
-        me = MidiEvent(mt)
-        me.type = "SEQUENCE_TRACK_NAME"
-        me.time = 0 # always at zero?
-        me.data = partName
-        events.append(me)
-
-    # must have channel information
-    if partProgram is not None:
-        dt = DeltaTime(mt)
-        dt.time = 0
-        events.append(dt)
-    
-        environLocal.printDebug(['adding program change: %s' % partProgram])
-        me = MidiEvent(mt)
-        me.type = "PROGRAM_CHANGE"
-        me.time = 0 
-        me.channel = 1
-        me.data = partProgram
-        events.append(me)
-
-    environLocal.printDebug(['got start events', events])
-
-    return events
-
-
-def getEndEvents(mt=None, channelNumber=1):
-    '''Provide a list of events found at the end of a track.
-    '''
-    events = []
-
-    dt = DeltaTime(mt)
-    dt.time = 0
-    events.append(dt)
-
-    me = MidiEvent(mt)
-    me.type = "END_OF_TRACK"
-    me.channel = channelNumber
-    me.data = '' # must set data to empty string
-    events.append(me)
-
-    return events
-
 
 
 #-------------------------------------------------------------------------------

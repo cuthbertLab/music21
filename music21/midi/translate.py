@@ -64,6 +64,81 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21=None):
     return d
 
 
+
+
+#-------------------------------------------------------------------------------
+# utility functions for getting commonly used event
+
+
+def getStartEvents(mt=None, instrumentObj=None):
+    '''Provide a list of events found at the beginning of a track.
+
+    A MidiTrack reference can be provided via the `mt` parameter.
+    '''
+
+    # TODO: may need to provide channel as argument
+
+    events = []
+    if instrumentObj is None or instrumentObj.bestName() is None:
+        partName = ''
+    else:
+        partName = instrumentObj.bestName()
+
+    dt = midiModule.DeltaTime(mt)
+    dt.time = 0
+    events.append(dt)
+
+    me = midiModule.MidiEvent(mt)
+    me.type = "SEQUENCE_TRACK_NAME"
+    me.time = 0 # always at zero?
+    me.data = partName
+    events.append(me)
+
+    # must have channel information
+    if instrumentObj is not None and instrumentObj.midiProgram is not None:
+        sub = instrumentToMidiEvents(instrumentObj, includeDeltaTime=True)
+        for e in sub:
+            e.time = 0
+        events += sub
+
+#         dt = DeltaTime(mt)
+#         dt.time = 0
+#         events.append(dt)
+#     
+#         environLocal.printDebug(['adding program change: %s' % partProgram])
+#         me = MidiEvent(mt)
+#         me.type = "PROGRAM_CHANGE"
+#         me.time = 0 
+#         me.channel = 1
+#         me.data = partProgram
+#         events.append(me)
+
+    #environLocal.printDebug(['got start events', events])
+
+    return events
+
+
+def getEndEvents(mt=None, channelNumber=1):
+    '''Provide a list of events found at the end of a track.
+    '''
+    events = []
+
+    dt = midiModule.DeltaTime(mt)
+    dt.time = 0
+    events.append(dt)
+
+    me = midiModule.MidiEvent(mt)
+    me.type = "END_OF_TRACK"
+    me.channel = channelNumber
+    me.data = '' # must set data to empty string
+    events.append(me)
+
+    return events
+
+
+
+
+
 #-------------------------------------------------------------------------------
 # Notes
 
@@ -195,9 +270,9 @@ def noteToMidiFile(inputM21):
     '''
     n = inputM21
     mt = midiModule.MidiTrack(1)
-    mt.events += midiModule.getStartEvents(mt)
+    mt.events += getStartEvents(mt)
     mt.events += noteToMidiEvents(n)
-    mt.events += midiModule.getEndEvents(mt)
+    mt.events += getEndEvents(mt)
 
     # set all events to have this track
     mt.updateEvents()
@@ -303,6 +378,26 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
 
 
 
+def instrumentToMidiEvents(inputM21, includeDeltaTime=True):
+
+    inst = inputM21
+    mt = None # midi track 
+
+    events = []
+    if includeDeltaTime:
+        dt = midiModule.DeltaTime(mt)
+        dt.time = 0
+        events.append(dt)
+
+    me = midiModule.MidiEvent(mt)
+    me.type = "PROGRAM_CHANGE"
+    me.time = None 
+    me.channel = 1
+    me.data = inst.midiProgram
+    events.append(me)
+    return events
+
+
 def chordToMidiEvents(inputM21, includeDeltaTime=True):
     '''
     >>> from music21 import *
@@ -369,9 +464,9 @@ def chordToMidiFile(inputM21):
     c = inputM21
 
     mt = midiModule.MidiTrack(1)
-    mt.events += midiModule.getStartEvents(mt)
+    mt.events += getStartEvents(mt)
     mt.events += chordToMidiEvents(c)
-    mt.events += midiModule.getEndEvents(mt)
+    mt.events += getEndEvents(mt)
 
     # set all events to have this track
     mt.updateEvents()
@@ -596,8 +691,7 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
     # each part will become midi track
     # the 1 here becomes the midi track index
     mt = midiModule.MidiTrack(1)
-    mt.events += midiModule.getStartEvents(mt, instObj.partName, 
-                instObj.midiProgram)
+    mt.events += getStartEvents(mt, instObj)
 
 
     # have to be sorted, have to strip ties
@@ -630,6 +724,9 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
             sub = timeSignatureToMidiEvents(obj, includeDeltaTime=False)
         elif 'KeySignature' in classes:
             sub = keySignatureToMidiEvents(obj, includeDeltaTime=False)
+        # first instrument will have been gathered above with get start elements
+        elif 'Instrument' in classes and obj.getOffsetBySite(s) != 0:
+            sub = instrumentToMidiEvents(obj, includeDeltaTime=False)
         else: # other objects may have already been added
             environLocal.printDebug(['streamToMidiTrack: skipping', obj])
             continue
@@ -677,7 +774,7 @@ def streamToMidiTrack(inputM21, instObj=None, translateTimeSignature=True):
     mt.events += events
     # must update all events with a ref to this MidiTrack
     mt.updateEvents()
-    mt.events += midiModule.getEndEvents(mt)
+    mt.events += getEndEvents(mt)
     return mt
 
 
@@ -1255,6 +1352,28 @@ class Test(unittest.TestCase):
         #s.show('midi')
 
 
+    def testMidiProgramChangeB(self):
+
+        from music21 import stream, instrument, note, scale
+        import random
+
+        iList = [instrument.Harpsichord, instrument.Clavichord, instrument.Accordion, instrument.Celesta, instrument.Contrabass, instrument.Viola, instrument.Harp, instrument.ElectricGuitar, instrument.Ukulele, instrument.Banjo, instrument.Piccolo, instrument.AltoSaxophone, instrument.Trumpet]
+
+        sc = scale.MinorScale()
+        pitches = sc.getPitches('c2', 'c5')
+        random.shuffle(pitches)
+
+        s = stream.Stream()
+        for i in range(30):
+            n = note.Note(pitches[i%len(pitches)])
+            n.quarterLength = .5
+            inst = iList[i%len(iList)]() # call to create instance
+            s.append(inst)
+            s.append(n)
+
+        mts = streamsToMidiTracks(s)
+
+        #s.show('midi')
 
 
 
