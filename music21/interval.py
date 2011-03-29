@@ -1566,7 +1566,6 @@ class Interval(music21.Music21Object):
         TODO: More tests here
         '''
         # NOTE: this is a performance critical method
-
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
         oldDiatonicNum = pitch1.diatonicNoteNum
@@ -1612,6 +1611,10 @@ class Interval(music21.Music21Object):
             # inherit accidental display properties
             pitch2.inheritDisplay(pitch1)
             pitch2.setAccidentalDisplay(None) # set accidental display to None
+
+        if pitch1.fundamental is not None:
+            # recursively call method
+            pitch2.fundamental = self.transposePitch(pitch1.fundamental, reverse=reverse, clearAccidentalDisplay=clearAccidentalDisplay, maxAccidental=maxAccidental)
 
         return pitch2
 

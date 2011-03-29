@@ -557,8 +557,11 @@ class Microtone(object):
         >>> from music21 import *
         >>> m1 = pitch.Microtone(20)
         >>> m2 = pitch.Microtone(20)
+        >>> m3 = pitch.Microtone(21)
         >>> m1 == m2
         True
+        >>> m1 == m3
+        False
         '''
         if other is None:
             return False
@@ -1132,6 +1135,10 @@ class Pitch(music21.Music21Object):
                 self._setName(name) # set based on string
             else: # is a number
                 self._setPitchClass(name)
+
+        # the fundamental attribute stores an optional pitch
+        # that defines the fundamental used to create this Pitch
+        self.fundamental = None
 
     def __repr__(self):
         if self.microtone is not None:
@@ -2024,6 +2031,18 @@ class Pitch(music21.Music21Object):
         >>> p.getHarmonic(8)
         A7
         
+
+        >>> p2 = p.getHarmonic(2)
+        >>> p2
+        A5
+        >>> p2.fundamental
+        A4
+        >>> p2.transpose('p5', inPlace=True)
+        >>> p2
+        E6
+        >>> p2.fundamental
+        E5
+
         
         Or we can iterate over a list of the next 8 odd harmonics:
         
@@ -2042,6 +2061,7 @@ class Pitch(music21.Music21Object):
         C5(+10c)
         >>> q.getHarmonic(3)
         G5(+12c)
+        
 
 
         '''
@@ -2062,10 +2082,10 @@ class Pitch(music21.Music21Object):
         final = Pitch()
         # set with this frequency
         final.frequency = temp.frequency
+        # store a copy as the fundamental
+        final.fundamental = copy.deepcopy(self)
 
         #environLocal.printDebug(['getHarmonic()', 'final', final, 'final.frequency', final.frequency])
-
-
         return final
 
 
@@ -2074,7 +2094,7 @@ class Pitch(music21.Music21Object):
 
         Returns a tuple of harmonic number, and fundamental Pitch. 
 
-        Microtones applied to the fundamental are irrelevant, as the fundamental may be microtonally shifted to find a match to this Pitch. 
+        Microtones applied to the fundamental are irrelevant, as the fundamental may be microtonally shifted to find a match to this Pitch.         
 
         >>> from music21 import *
         >>> p = pitch.Pitch('g4')
@@ -2158,8 +2178,62 @@ class Pitch(music21.Music21Object):
 #         return harmonicMatch, fundamental
 
 
+
+    def harmonicStringFromFundamental(self, fundamental):
+        '''Return a string representation of a harmonic equivalence. 
+
+        >>> from music21 import *
+        >>> pitch.Pitch('g4').harmonicStringFromFundamental('c3')
+        '3rdH(-2c)/C3'
+        
+        >>> pitch.Pitch('c4').harmonicStringFromFundamental('c3')
+        '2ndH/C3'
+        
+        >>> p = pitch.Pitch('c4')
+        >>> p.microtone = 20 # raise 20 
+        >>> p.harmonicStringFromFundamental('c3')
+        '2ndH(+20c)/C3'
+        
+        >>> p.microtone = -20 # lower 20 
+        >>> p.harmonicStringFromFundamental('c3')
+        '2ndH(-20c)/C3'
+        
+        >>> p = pitch.Pitch('c4')
+        >>> f = pitch.Pitch('c3')
+        >>> f.microtone = -20
+        >>> p.harmonicStringFromFundamental(f)
+        '2ndH(+20c)/C3(-20c)'
+        >>> f.microtone = +20
+        >>> p.harmonicStringFromFundamental(f)
+        '2ndH(-20c)/C3(+20c)'
+        
+        >>> p = pitch.Pitch('A4')
+        >>> p.microtone = 69
+        >>> p.harmonicStringFromFundamental('c2')
+        '7thH/C2'
+        
+        >>> p = pitch.Pitch('A4')
+        >>> p.harmonicStringFromFundamental('c2')
+        '7thH(-69c)/C2'
+
+        '''
+        if common.isStr(fundamental):
+            fundamental = Pitch(fundamental)
+
+        harmonic, cents = self.harmonicFromFundamental(fundamental)
+        # need to invert cent shift, as we are suggesting a shifted harmonic
+        microtone = Microtone(-cents)
+        if cents == 0:
+            return '%s%sH/%s' % (harmonic, common.ordinalAbbreviation(harmonic), fundamental)
+        else:
+            return '%s%sH%s/%s' % (harmonic, common.ordinalAbbreviation(harmonic), 
+                            microtone, fundamental)
+
+
+
+
     def harmonicAndFundamentalFromPitch(self, target):
-        '''Given a Pitch that is a plausible target for a fundamental, return the harmonic number and a proper fundamental that describes this Pitch.
+        '''Given a Pitch that is a plausible target for a fundamental, return the harmonic number and a potentially shifted fundamental that describes this Pitch.
 
         >>> from music21 import *
         >>> pitch.Pitch('g4').harmonicAndFundamentalFromPitch('c3')
@@ -2187,42 +2261,41 @@ class Pitch(music21.Music21Object):
 
 
 
-
-    def _getEquivalentHarmonicStr(self, fundamental):
-        '''Return a string representation of a harmonic equivalence. 
+    def harmonicAndFundamentalStringFromPitch(self, fundamental):
+        '''Given a Pitch that is a plausible target for a fundamental, return the harmonic number and a potentially shifted fundamental that describes this Pitch. Return a string representation.
 
         >>> from music21 import *
-        >>> pitch.Pitch('g4')._getEquivalentHarmonicStr('c3')
+        >>> pitch.Pitch('g4').harmonicAndFundamentalStringFromPitch('c3')
         '3rdH/C3(-2c)'
         
-        >>> pitch.Pitch('c4')._getEquivalentHarmonicStr('c3')
+        >>> pitch.Pitch('c4').harmonicAndFundamentalStringFromPitch('c3')
         '2ndH/C3'
         
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20 # raise 20 
-        >>> p._getEquivalentHarmonicStr('c3')
+        >>> p.harmonicAndFundamentalStringFromPitch('c3')
         '2ndH/C3(+20c)'
         
         >>> p.microtone = -20 # lower 20 
-        >>> p._getEquivalentHarmonicStr('c3')
+        >>> p.harmonicAndFundamentalStringFromPitch('c3')
         '2ndH/C3(-20c)'
         
         >>> p = pitch.Pitch('c4')
         >>> f = pitch.Pitch('c3')
         >>> f.microtone = -20
-        >>> p._getEquivalentHarmonicStr(f)
+        >>> p.harmonicAndFundamentalStringFromPitch(f)
         '2ndH/C3'
         >>> f.microtone = +20
-        >>> p._getEquivalentHarmonicStr(f)
+        >>> p.harmonicAndFundamentalStringFromPitch(f)
         '2ndH/C3'
         
         >>> p = pitch.Pitch('A4')
         >>> p.microtone = 69
-        >>> p._getEquivalentHarmonicStr('c2')
+        >>> p.harmonicAndFundamentalStringFromPitch('c2')
         '7thH/C2'
         
         >>> p = pitch.Pitch('A4')
-        >>> p._getEquivalentHarmonicStr('c2')
+        >>> p.harmonicAndFundamentalStringFromPitch('c2')
         '7thH/C2(-69c)'
 
         '''
@@ -2230,6 +2303,9 @@ class Pitch(music21.Music21Object):
             fundamental)
         return '%s%sH/%s' % (harmonic, common.ordinalAbbreviation(harmonic), 
                             fundamental)
+
+
+
 
     #---------------------------------------------------------------------------
     def isEnharmonic(self, other):
@@ -2607,6 +2683,8 @@ class Pitch(music21.Music21Object):
             self._setOctave(p.octave)
             # manually copy accidental object
             self.accidental = p.accidental
+            # set fundamental
+            self.fundamental = p.fundamental
             return None
 
     #---------------------------------------------------------------------------
@@ -3490,7 +3568,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(7)), 'A~6(+19c)')
 
 
-        self.assertEqual(pitch.Pitch('g4')._getEquivalentHarmonicStr('c3'), '3rdH/C3(-2c)')
+        self.assertEqual(pitch.Pitch('g4').harmonicStringFromFundamental('c3'), '3rdH(-2c)/C3')
 
         #self.assertEqual(str(convertPsToStep(60.0)), "('C', <accidental natural>, None, 0)")
 
@@ -3498,7 +3576,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(pitch.Pitch('c3').getHarmonic(2)), 'C4')
         self.assertEqual(str(pitch.Pitch('c2').getHarmonic(2)), 'C3')
 
-        self.assertEqual(pitch.Pitch('c4')._getEquivalentHarmonicStr('c3'), '2ndH/C3')
+        self.assertEqual(pitch.Pitch('c4').harmonicStringFromFundamental('c3'), '2ndH/C3')
 
 
         f = pitch.Pitch('c3')
@@ -3510,10 +3588,10 @@ class Test(unittest.TestCase):
         f = pitch.Pitch('c3')
         f.microtone = -20
         # the third harmonic of c3 -20 is closer than the 
-        self.assertEqual(p._getEquivalentHarmonicStr(f), '2ndH/C3')
+        self.assertEqual(p.harmonicStringFromFundamental(f), '2ndH(+20c)/C3(-20c)')
 
         f.microtone = +20
-        self.assertEqual(p._getEquivalentHarmonicStr(f), '2ndH/C3')
+        self.assertEqual(p.harmonicStringFromFundamental(f), '2ndH(-20c)/C3(+20c)')
 
         p1 = pitch.Pitch('c1')
         self.assertEqual(str(p1.getHarmonic(13)), 'G#4(+41c)')
