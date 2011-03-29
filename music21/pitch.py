@@ -211,7 +211,7 @@ def convertPsToStep(ps):
     # micro here will be between 0 and 1
     pc, micro = divmod(pcReal, 1)
 
-    environLocal.printDebug(['convertPsToStep(): post divmod',  'ps', repr(ps), 'pcReal', repr(pcReal), 'pc', repr(pc), 'micro', repr(micro)])
+    #environLocal.printDebug(['convertPsToStep(): post divmod',  'ps', repr(ps), 'pcReal', repr(pcReal), 'pc', repr(pc), 'micro', repr(micro)])
 
     # if close enough to a quarter tone
     if round(micro, 1) == 0.5:
@@ -2062,8 +2062,33 @@ class Pitch(music21.Music21Object):
         >>> q.getHarmonic(3)
         G5(+12c)
         
+        
+        The fundamental is stored with the harmonic. 
 
 
+        >>> h7 = pitch.Pitch("A4").getHarmonic(7)
+        >>> h7
+        F#~7(+19c)
+        >>> h7.fundamental
+        A4
+        >>> h7.harmonicString()
+        '7thH/A4'
+        >>> h7.harmonicString('A3')
+        '14thH/A3'
+        
+        >>> h2 = h7.getHarmonic(2)
+        >>> h2
+        F#~8(+19c)
+        >>> h2.fundamental
+        F#~7(+19c)
+        >>> h2.fundamental.fundamental
+        A4
+        >>> h2.transpose(-24, inPlace=True)
+        >>> h2
+        F#6(+19c)
+        >>> h2.fundamental.fundamental
+        A2
+        
         '''
         centShift = convertHarmonicToCents(number)
         temp = copy.deepcopy(self)
@@ -2179,44 +2204,49 @@ class Pitch(music21.Music21Object):
 
 
 
-    def harmonicStringFromFundamental(self, fundamental):
+    def harmonicString(self, fundamental=None):
         '''Return a string representation of a harmonic equivalence. 
 
         >>> from music21 import *
-        >>> pitch.Pitch('g4').harmonicStringFromFundamental('c3')
+        >>> pitch.Pitch('g4').harmonicString('c3')
         '3rdH(-2c)/C3'
         
-        >>> pitch.Pitch('c4').harmonicStringFromFundamental('c3')
+        >>> pitch.Pitch('c4').harmonicString('c3')
         '2ndH/C3'
         
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20 # raise 20 
-        >>> p.harmonicStringFromFundamental('c3')
+        >>> p.harmonicString('c3')
         '2ndH(+20c)/C3'
         
         >>> p.microtone = -20 # lower 20 
-        >>> p.harmonicStringFromFundamental('c3')
+        >>> p.harmonicString('c3')
         '2ndH(-20c)/C3'
         
         >>> p = pitch.Pitch('c4')
         >>> f = pitch.Pitch('c3')
         >>> f.microtone = -20
-        >>> p.harmonicStringFromFundamental(f)
+        >>> p.harmonicString(f)
         '2ndH(+20c)/C3(-20c)'
         >>> f.microtone = +20
-        >>> p.harmonicStringFromFundamental(f)
+        >>> p.harmonicString(f)
         '2ndH(-20c)/C3(+20c)'
         
         >>> p = pitch.Pitch('A4')
         >>> p.microtone = 69
-        >>> p.harmonicStringFromFundamental('c2')
+        >>> p.harmonicString('c2')
         '7thH/C2'
         
         >>> p = pitch.Pitch('A4')
-        >>> p.harmonicStringFromFundamental('c2')
+        >>> p.harmonicString('c2')
         '7thH(-69c)/C2'
 
         '''
+        if fundamental is None:
+            if self.fundamental is None:
+                raise PitchException('no fundamental is defined for this Pitch: provide one as an arugment')
+            else:
+                fundamental = self.fundamental
         if common.isStr(fundamental):
             fundamental = Pitch(fundamental)
 
@@ -3568,7 +3598,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(7)), 'A~6(+19c)')
 
 
-        self.assertEqual(pitch.Pitch('g4').harmonicStringFromFundamental('c3'), '3rdH(-2c)/C3')
+        self.assertEqual(pitch.Pitch('g4').harmonicString('c3'), '3rdH(-2c)/C3')
 
         #self.assertEqual(str(convertPsToStep(60.0)), "('C', <accidental natural>, None, 0)")
 
@@ -3576,7 +3606,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(pitch.Pitch('c3').getHarmonic(2)), 'C4')
         self.assertEqual(str(pitch.Pitch('c2').getHarmonic(2)), 'C3')
 
-        self.assertEqual(pitch.Pitch('c4').harmonicStringFromFundamental('c3'), '2ndH/C3')
+        self.assertEqual(pitch.Pitch('c4').harmonicString('c3'), '2ndH/C3')
 
 
         f = pitch.Pitch('c3')
@@ -3588,10 +3618,10 @@ class Test(unittest.TestCase):
         f = pitch.Pitch('c3')
         f.microtone = -20
         # the third harmonic of c3 -20 is closer than the 
-        self.assertEqual(p.harmonicStringFromFundamental(f), '2ndH(+20c)/C3(-20c)')
+        self.assertEqual(p.harmonicString(f), '2ndH(+20c)/C3(-20c)')
 
         f.microtone = +20
-        self.assertEqual(p.harmonicStringFromFundamental(f), '2ndH(-20c)/C3(+20c)')
+        self.assertEqual(p.harmonicString(f), '2ndH(-20c)/C3(+20c)')
 
         p1 = pitch.Pitch('c1')
         self.assertEqual(str(p1.getHarmonic(13)), 'G#4(+41c)')
