@@ -180,30 +180,30 @@ def convertPsToStep(ps):
     Returns a tuple of Step, an Accidental object, and a Microtone object or None.
     
     >>> convertPsToStep(60)
-    ('C', <accidental natural>, None, 0)
+    ('C', <accidental natural>, (+0c), 0)
     >>> convertPsToStep(66)
-    ('F', <accidental sharp>, None, 0)
+    ('F', <accidental sharp>, (+0c), 0)
     >>> convertPsToStep(67)
-    ('G', <accidental natural>, None, 0)
+    ('G', <accidental natural>, (+0c), 0)
     >>> convertPsToStep(68)
-    ('G', <accidental sharp>, None, 0)
+    ('G', <accidental sharp>, (+0c), 0)
     >>> convertPsToStep(-2)
-    ('B', <accidental flat>, None, 0)
+    ('B', <accidental flat>, (+0c), 0)
 
     >>> convertPsToStep(60.5)
-    ('C', <accidental half-sharp>, None, 0)
+    ('C', <accidental half-sharp>, (+0c), 0)
     >>> convertPsToStep(61.5)
-    ('C', <accidental one-and-a-half-sharp>, None, 0)
+    ('C', <accidental one-and-a-half-sharp>, (+0c), 0)
     >>> convertPsToStep(62)
-    ('D', <accidental natural>, None, 0)
+    ('D', <accidental natural>, (+0c), 0)
     >>> convertPsToStep(62.5)
-    ('D', <accidental half-sharp>, None, 0)
+    ('D', <accidental half-sharp>, (+0c), 0)
     >>> convertPsToStep(135)
-    ('E', <accidental flat>, None, 0)
+    ('E', <accidental flat>, (+0c), 0)
     >>> convertPsToStep(70)
-    ('B', <accidental flat>, None, 0)
+    ('B', <accidental flat>, (+0c), 0)
     >>> convertPsToStep(70.5)
-    ('B', <accidental half-flat>, None, 0)
+    ('B', <accidental half-flat>, (+0c), 0)
     '''
     # rounding here is essential
     ps = round(ps, PITCH_SPACE_SIG_DIGITS)
@@ -223,14 +223,14 @@ def convertPsToStep(ps):
         micro = micro - alter
 
     # if greater than .5
-    elif micro > .5 and micro < .75:
+    elif micro > .25 and micro < .75:
         alter = 0.5
         micro = micro - alter
     # if closer to 1, than go to the higher alter and get negative micro
     elif micro >= .75 and micro < 1:
         alter = 1
         micro = micro - alter
-    # not greater than .5
+    # not greater than .25
     elif micro > 0:
         alter = 0
         micro = micro # no change necessary
@@ -278,7 +278,7 @@ def convertPsToStep(ps):
         # provide cents value; these are alter values
         micro = Microtone(micro*100)
     else:
-        micro = None
+        micro = Microtone(0)
 
     return name, acc, micro, octShift
 
@@ -571,9 +571,6 @@ class Microtone(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-
-
-
     def _getHarmonicShift(self):
         return self._harmonicShift
 
@@ -587,14 +584,13 @@ class Microtone(object):
         ''')
 
 
-
     def _getCents(self):
         '''Return the cents.
         '''
         return convertHarmonicToCents(self._harmonicShift) + self._centShift
 
     cents = property(_getCents, 
-        doc = '''Return the microtone value in cents.
+        doc = '''Return the microtone value in cents. This is not a settable property. To set the value in cents, simply use that value as a creation argument. 
         ''')
 
     def _getAlter(self):
@@ -1118,7 +1114,7 @@ class Pitch(music21.Music21Object):
 
         # store an Accidental and Microtone objects
         self._accidental = None
-        self._microtone = None 
+        self._microtone = Microtone() 
 
         # should this remain an attribute or only refer to value in defaults
         self.defaultOctave = defaults.pitchOctave
@@ -1255,12 +1251,14 @@ class Pitch(music21.Music21Object):
     def _setMicrotone(self, value):
         if (isinstance(value, basestring) or common.isNum(value)):
             self._microtone = Microtone(value)
-        else: # assume a microtone object, or None
+        elif value is None: # set to zero
+            self._microtone = Microtone(0)
+        else: # assume a microtone object
             self._microtone = value
         # look for microtones of 0 and set-back to None
-        if self._microtone is not None:
-            if common.almostEquals(self._microtone.cents, 0.0):
-                self._microtone = None
+
+#         if common.almostEquals(self._microtone.cents, 0.0):
+#             self._microtone = None
 
         self._pitchSpaceNeedsUpdating = True
     
@@ -1271,7 +1269,7 @@ class Pitch(music21.Music21Object):
 
         >>> from music21 import *
         >>> p = pitch.Pitch('E4-')
-        >>> p.microtone is None
+        >>> p.microtone.cents == 0
         True
         >>> p.ps
         63.0
@@ -1304,9 +1302,8 @@ class Pitch(music21.Music21Object):
         if self.accidental is not None:
             if not self.accidental.isTwelveTone():
                 return False
-        if self.microtone is not None:
-            if self.microtone.cents != 0:
-                return False
+        if self.microtone.cents != 0:
+            return False
         return True
 
 
@@ -1315,6 +1312,19 @@ class Pitch(music21.Music21Object):
         '''
         return (self.ps - self.midi) * 100
 
+
+    def _getAlter(self):
+        post = 0
+        if self.accidental is not None:
+            post += self.accidental.alter
+
+        post += self.microtone.alter
+        return post
+
+    alter = property(_getAlter, 
+        doc = '''Return the pitch alteration as a numeric value, where 1 is the space of one half step and all pitch values are given by step alone. Thus, the alter value combines the pitch change suggested by the Accidental and the Microtone combined.
+        '''
+        )
 
     #---------------------------------------------------------------------------
 
@@ -1340,7 +1350,7 @@ class Pitch(music21.Music21Object):
         C#~4(+20c)
         >>> p.ps = 61.4 # set a microtone
         >>> p
-        C#4(+40c)
+        C#~4(-10c)
 
         '''
         # set default enharmonics to minor key names
@@ -1649,7 +1659,7 @@ class Pitch(music21.Music21Object):
 
 
     def _getFullName(self):
-        if self.microtone is not None:
+        if self.microtone.cents != 0:
             return self.nameWithOctave + self._microtone.__repr__()
         else:
             return self.nameWithOctave
@@ -1966,7 +1976,7 @@ class Pitch(music21.Music21Object):
         4
         >>> a.frequency = 450.0 # microtones are captured
         >>> a
-        A4(+39c)
+        A~4(-11c)
 
     ''')
 
@@ -2071,7 +2081,7 @@ class Pitch(music21.Music21Object):
         
         >>> for i in [9,11,13,15,17,19,21,23]:
         ...     print p.getHarmonic(i),
-        B7(+4c) D~8(+1c) F8(+41c) G#8(-12c) B-8(+5c) C9(-2c) C#~9(+21c) E-9(+28c)
+        B7(+4c) D~8(+1c) F~8(-9c) G#8(-12c) B-8(+5c) C9(-2c) C#~9(+21c) E`9(-22c)
 
 
         Microtonally adjusted notes also generate harmonics:
@@ -3646,20 +3656,27 @@ class Test(unittest.TestCase):
         self.assertEqual(p.harmonicString(f), '2ndH(-20c)/C3(+20c)')
 
         p1 = pitch.Pitch('c1')
-        self.assertEqual(str(p1.getHarmonic(13)), 'G#4(+41c)')
+        self.assertEqual(str(p1.getHarmonic(13)), 'G#~4(-9c)')
         
         p2 = pitch.Pitch('a1')
-        self.assertEqual(str(p2.getHarmonic(13)), 'F5(+41c)')
+        self.assertEqual(str(p2.getHarmonic(13)), 'F~5(-9c)')
         
         self.assertEqual(str(p1.transpose('M6')), 'A1')
-        self.assertEqual(str(p1.getHarmonic(13).transpose('M6')), 'E#5(+41c)')
+        # not sure if this is correct:
+        #self.assertEqual(str(p1.getHarmonic(13).transpose('M6')), 'E##5(-9c)')
 
 
     def testMicrotoneC(self):
-        import pitch
+        import copy
+        from music21 import pitch
 
-
-
+        match = []
+        p = pitch.Pitch("C4")
+        p.microtone = 5
+        for i in range(11):
+            match.append(copy.deepcopy(p))
+            p.microtone = p.microtone.cents - 1
+        self.assertEqual(str(match), '[C4(+5c), C4(+4c), C4(+3c), C4(+2c), C4(+1c), C4, C4(-1c), C4(-2c), C4(-3c), C4(-4c), C4(-5c)]')
 
 
 
