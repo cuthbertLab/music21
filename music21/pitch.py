@@ -1317,14 +1317,81 @@ class Pitch(music21.Music21Object):
         post = 0
         if self.accidental is not None:
             post += self.accidental.alter
-
         post += self.microtone.alter
         return post
 
     alter = property(_getAlter, 
-        doc = '''Return the pitch alteration as a numeric value, where 1 is the space of one half step and all pitch values are given by step alone. Thus, the alter value combines the pitch change suggested by the Accidental and the Microtone combined.
+        doc = '''Return the pitch alteration as a numeric value, where 1 is the space of one half step and all base pitch values are given by step alone. Thus, the alter value combines the pitch change suggested by the Accidental and the Microtone combined.
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('g#4')
+        >>> p.alter
+        1.0
+        >>> p.microtone = -25 # in cents
+        >>> p.alter
+        0.75
         '''
         )
+
+
+    def convertQuarterTonesToMicrotones(self, inPlace=True):
+        '''Convert any quarter tone Accidentals to Microtones.
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('G#~')
+        >>> p, p.microtone
+        (G#~, (+0c))
+        >>> p.convertQuarterTonesToMicrotones(inPlace=True)
+        >>> p.ps
+        68.5
+        >>> p, p.microtone
+        (G#(+50c), (+50c))
+
+        >>> p = pitch.Pitch('A`')
+        >>> p, p.microtone
+        (A`, (+0c))
+        >>> x = p.convertQuarterTonesToMicrotones(inPlace=False)
+        >>> x, x.microtone
+        (A(-50c), (-50c))
+        >>> p, p.microtone
+        (A`, (+0c))
+        '''
+        if inPlace:
+            returnObj = self
+        else:
+            returnObj = copy.deepcopy(self)
+
+        if returnObj.accidental is not None:
+            if returnObj.accidental.name in ['half-flat']:
+                returnObj.accidental = None
+                returnObj.microtone = returnObj.microtone.cents - 50 # in cents
+    
+            elif returnObj.accidental.name in ['half-sharp']:
+                returnObj.accidental = None
+                returnObj.microtone = returnObj.microtone.cents + 50 # in cents
+    
+            elif returnObj.accidental.name in ['one-and-a-half-sharp']:
+                returnObj.accidental = 1.0
+                returnObj.microtone = returnObj.microtone.cents + 50 # in cents
+    
+            elif returnObj.accidental.name in ['one-and-a-half-flat']:
+                returnObj.accidental = -1.0
+                returnObj.microtone = returnObj.microtone.cents - 50 # in cents
+
+        if inPlace:
+            return None
+        else:
+            return returnObj
+
+
+
+
+
+
+    def convertMicrotonesToQuarterTones():
+        '''Convert any Microtones available to quarter tones, if possible. 
+        '''
+
 
     #---------------------------------------------------------------------------
 
