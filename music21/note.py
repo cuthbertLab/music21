@@ -842,6 +842,15 @@ class Note(NotRest):
         ''')
 
 
+    def _getMicrotone(self): 
+        return self.pitch.microtone
+
+    def _setMicrotone(self, value): 
+        self.pitch.microtone = value
+
+    microtone = property(_getMicrotone, _setMicrotone, 
+        doc = '''Return or set the microtone value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.microtone`.''')
+
     
     def _getPitchClass(self):
         '''Return pitch class
@@ -971,6 +980,35 @@ class Note(NotRest):
         else:
             return None
 
+
+
+    def _getFullName(self):
+        msg = []
+        msg.append('%s ' % self.pitch.fullName)
+        msg.append(self.duration.fullName)
+        return ''.join(msg)
+
+    fullName = property(_getFullName, 
+        doc = '''Return the most complete representation of this Note, providing duration and pitch information.
+
+        >>> from music21 import *
+        >>> n = note.Note('A-', quarterLength=1.5)
+        >>> n.fullName
+        'A- Dotted Quarter (1.5QL)'
+        
+        >>> n = note.Note('E~3', quarterLength=2)
+        >>> n.fullName
+        'E~3 Half (2.0QL)'
+        
+        >>> n = note.Note('D', quarterLength=.25)
+        >>> n.microtone = 25
+        >>> n.fullName
+        'D(+25c) 16Th (0.25QL)'
+        ''')
+
+    #---------------------------------------------------------------------------
+    # format conversions
+
     def _getMidiEvents(self):
         return midiTranslate.noteToMidiEvents(self)
 
@@ -978,7 +1016,6 @@ class Note(NotRest):
     def _setMidiEvents(self, eventList, ticksPerQuarter=None):
         midiTranslate.midiEventsToNote(eventList, 
             ticksPerQuarter, self)
-
 
     midiEvents = property(_getMidiEvents, _setMidiEvents, 
         doc='''Get or set this chord as a list of :class:`music21.midi.base.MidiEvent` objects.

@@ -543,7 +543,6 @@ class Microtone(object):
             sub = '+%sc' % int(round(self._centShift))
         elif self._centShift < 0:
             sub = '%sc' % int(round(self._centShift))
-
         # only show a harmonic if present
         if self._harmonicShift != 1:
             sub += '+%s%sH' % (self._harmonicShift,
@@ -1142,10 +1141,7 @@ class Pitch(music21.Music21Object):
         self.fundamental = None
 
     def __repr__(self):
-        if self.microtone is not None:
-            return self.nameWithOctave + self._microtone.__repr__()
-        else:
-            return self.nameWithOctave
+        return self._getFullName()
 
     def __eq__(self, other):
         '''Do not accept enharmonic equivalance.
@@ -1637,7 +1633,6 @@ class Pitch(music21.Music21Object):
         >>> a.nameWithOctave
         'A--1'
         
-        
         ''')
 
     def _getUnicodeNameWithOctave(self):
@@ -1651,6 +1646,24 @@ class Pitch(music21.Music21Object):
     unicodeNameWithOctave = property(_getUnicodeNameWithOctave, 
         doc = '''Return the pitch name with octave with unicode accidental symbols, if available. 
         ''')
+
+
+    def _getFullName(self):
+        if self.microtone is not None:
+            return self.nameWithOctave + self._microtone.__repr__()
+        else:
+            return self.nameWithOctave
+
+    fullName = property(_getFullName, 
+        doc = '''Return the most complete representation of this Pitch, providing name, octave, accidental, and any microtonal adjustments. 
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('A-3')
+        >>> p.microtone = 33.33
+        >>> p.fullName
+        'A-3(+33c)'
+        ''')
+
 
     def _getStep(self):
         '''
