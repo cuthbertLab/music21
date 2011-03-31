@@ -1346,7 +1346,7 @@ class Pitch(music21.Music21Object):
         68.5
         >>> p, p.microtone
         (G#(+50c), (+50c))
-
+        
         >>> p = pitch.Pitch('A`')
         >>> p, p.microtone
         (A`, (+0c))
@@ -1385,12 +1385,66 @@ class Pitch(music21.Music21Object):
 
 
 
-
-
-
-    def convertMicrotonesToQuarterTones():
+    def convertMicrotonesToQuarterTones(self, inPlace=True):
         '''Convert any Microtones available to quarter tones, if possible. 
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('g3')
+        >>> p.microtone = 78
+        >>> p
+        G3(+78c)
+        >>> p.convertMicrotonesToQuarterTones(inPlace=True)
+        >>> p
+        G#3(-22c)
+        
+        >>> p = pitch.Pitch('d#3')
+        >>> p.microtone = 46
+        >>> p
+        D#3(+46c)
+        >>> p.convertMicrotonesToQuarterTones(inPlace=True)
+        >>> p
+        D#~3(-4c)
+        
+        >>> p = pitch.Pitch('f#2')
+        >>> p.microtone = -38
+        >>> p.convertMicrotonesToQuarterTones(inPlace=True)
+        >>> p
+        F~2(+12c)
+
         '''
+        if inPlace:
+            returnObj = self
+        else:
+            returnObj = copy.deepcopy(self)
+
+        value = returnObj.microtone.cents
+
+        if value < -75: 
+            alterShift = -1
+            cents = value + 100
+        elif value < -25 and value > -75:
+            alterShift = -.5
+            cents = value + 50
+        elif value > 25 and value < 75:
+            alterShift = .5
+            cents = value - 50
+        elif value > 75: 
+            alterShift = 1
+            cents = value - 100
+
+        if returnObj.accidental is not None:
+            returnObj.accidental = Accidental(
+                            returnObj.accidental.alter + alterShift)
+        else:
+            returnObj.accidental = Accidental(alterShift)
+        returnObj.microtone = cents        
+
+        if inPlace:
+            return None
+        else:
+            return returnObj
+
+
 
 
     #---------------------------------------------------------------------------
