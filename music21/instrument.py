@@ -76,7 +76,13 @@ class Instrument(music21.Music21Object):
         self.transposition = None
 
     def __str__(self):
-        return '%s: %s: %s' % (self.partId, self.partName, self.instrumentName)
+        msg = []
+        if self.partId is not None:
+            msg.append('%s: ' % self.partId)
+        if self.partName is not None:
+            msg.append('%s: ' % self.partName)
+        msg.append(self.instrumentName)
+        return ''.join(msg)
 
     def __repr__(self):
         return "<music21.instrument.Instrument %s>" % self.__str__()

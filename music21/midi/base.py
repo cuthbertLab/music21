@@ -400,6 +400,10 @@ class MidiEvent(object):
         # pitch space value in order to determine if this is has a microtone
         self.centShift = None
     
+        # store a reference to a corresponding event
+        # if a noteOn, store the note off, and vice versa
+        self.correspondingEvent = None
+
     def __cmp__(self, other): 
         return cmp(self.time, other.time) 
     

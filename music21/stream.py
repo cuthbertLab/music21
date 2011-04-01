@@ -2810,16 +2810,27 @@ class Stream(music21.Music21Object):
         Search this stream or activeSite streams for 
         :class:`~music21.instrument.Instrument` objects, otherwise 
         return a default Instrument
-        
-        
-        TODO: WRITE FULL EXAMPLES!
-        
-
+                
         >>> from music21 import *
+        >>> s = stream.Score()
+        >>> p1 = stream.Part()
+        >>> p1.insert(instrument.Violin())
+        >>> m1p1 = stream.Measure()
+        >>> m1p1.append(note.Note('g'))
+        >>> p1.append(m1p1)
 
-        >>> a = stream.Stream()
-        >>> b = a.getInstrument() # a default will be returned
-        
+        >>> p2 = stream.Part()
+        >>> p2.insert(instrument.Viola())
+        >>> m1p2 = stream.Measure()
+        >>> m1p2.append(note.Note('f#'))
+        >>> p2.append(m1p2)
+
+        >>> s.insert(0, p1)
+        >>> s.insert(0, p2)
+        >>> p1.getInstrument(returnDefault=False).instrumentName
+        'Violin'
+        >>> p2.getInstrument(returnDefault=False).instrumentName
+        'Viola'
         '''
         #environLocal.printDebug(['searching for instrument, called from:', 
         #                        self])
@@ -2846,6 +2857,8 @@ class Stream(music21.Music21Object):
             # now set with .mx call
             #instObj.partId = defaults.partId # give a default id
             instObj.partName = defaults.partName # give a default id
+
+        # may return None
         return instObj
 
 
@@ -11811,7 +11824,7 @@ class Test(unittest.TestCase):
         #part.show('midi')
 
         mf = part.midiFile
-        match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'KEY_SIGNATURE', None), (0, 'TIME_SIGNATURE', None), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 71), (1024, 'NOTE_OFF', 71), (0, 'NOTE_ON', 73), (1024, 'NOTE_OFF', 73), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 68), (1024, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 68), (2048, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (512, 'NOTE_OFF', 66), (0, 'NOTE_ON', 65), (512, 'NOTE_OFF', 65), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'END_OF_TRACK', None)] 
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'PROGRAM_CHANGE', None), (0, 'KEY_SIGNATURE', None), (0, 'TIME_SIGNATURE', None), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 71), (1024, 'NOTE_OFF', 71), (0, 'NOTE_ON', 73), (1024, 'NOTE_OFF', 73), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 68), (1024, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 68), (2048, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (512, 'NOTE_OFF', 66), (0, 'NOTE_ON', 65), (512, 'NOTE_OFF', 65), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'END_OF_TRACK', None)] 
         procCompare(mf, match)
 
 
