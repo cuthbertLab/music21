@@ -787,6 +787,36 @@ def _streamToPackets(s, trackId=1):
     return packetsByOffset
 
 
+# what  we can do is keep a tuple for each moment in the offset map:
+# 
+# (channel, midi-patch, fractional-part-of-alter, free-after-offset)
+# 
+# when we encounter a pitch object, we see what its midi-patch and
+# fractional-part-of-alter is,
+# then we see if there is already a channel that matches that.  If so, we assign
+# that channel to this note and if this note's endTime is > free-after-offset, we
+# set free-after-offset to be endTime.  If there isn't a channel for this
+# midi-patch/fpoa and there are channels free, then we add an entry for that
+# channel, send the midi patch change and pitch bend info to that channel and
+# update the free-after-offset time to be endTime.  If there are no channels
+# free, we find the first one whose free-after-offset < currentNote.offset and we
+# put a midi-patch change and/or pitchbend change there and assign the note to
+# that channel, and set free-after-offset.  Only if there are no free channels
+# after that would we raise an exception.
+# 
+# It seems like conceptually in this model, MidiChannel should be a Stream
+# subclass that represents notes in a particular MidiChannel but also contains
+# MidiPatchChange objects and MidiPitchBend objects.  All in midi.py -- what do
+# you think?
+
+
+def _processPackets(packets):
+    '''Given a list of packets, assign each to a channel. Do each track one at time, based on the track id. Shift to different channels if a pitch bend is necessary. Keep track of which channels are available. Need to insert a program change in the empty channel to based on last instrument. Insert pitch bend messages as well, one for start of event, one for end of event.
+    '''
+    pass
+
+
+
 def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
     '''Given a list of packets, sort all packets and add proper delta times. Optionally filters packets by track Id. 
     '''

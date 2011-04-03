@@ -5705,7 +5705,6 @@ class Stream(music21.Music21Object):
         for e in post.getElementsByClass(classFilterList=classFilterList): 
             e.transpose(value, inPlace=True)            
 
-
         if not inPlace:
             return post
         else:       
@@ -13889,6 +13888,26 @@ class Test(unittest.TestCase):
         for e in s.recurse(classFilter='KeySignature'):
             e.activeSite.remove(e)
         self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
+
+
+    def testTransposeScore(self):
+        from music21 import pitch, corpus
+
+        s = corpus.parse('bwv66.6')
+        p1 = s.parts[0]
+        pitch1 = p1.flat.notes[0]
+        pitch2 = pitch1.transpose('P4', inPlace=False)
+        self.assertEqual(str(pitch1), '<music21.note.Note C#>')
+        self.assertEqual(str(pitch2), '<music21.note.Note F#>')
+
+        # cannot transpose a part alone; need to get a flat representation
+        p2 = p1.transpose('P4', inPlace=False)
+        self.assertEqual(str(p1.flat.notes[0]), '<music21.note.Note C#>')
+        self.assertEqual(str(p2.flat.notes[0]), '<music21.note.Note C#>')
+
+        p2 = p1.flat.transpose('P4', inPlace=False)
+        self.assertEqual(str(p1.flat.notes[0]), '<music21.note.Note C#>')
+        self.assertEqual(str(p2.flat.notes[0]), '<music21.note.Note F#>')
 
 
 
