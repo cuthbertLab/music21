@@ -48,14 +48,14 @@ class FiguredBass(object):
         startTime = time.time()
         (startBass, startNotation) = self.figuredBassList[0]
         print("Finding starting possibilities for: " + str((startBass.pitch, startNotation)))
-        a1 = segment.PreviousSegment(self.fbInfo, startBass, startNotation)
+        a1 = segment.StartSegment(self.fbInfo, startBass, startNotation)
         self.allSegments.append(a1)
         self.lastSegment = a1
             
         for fbIndex in range(1, len(self.figuredBassList)):
             (nextBass, nextNotation) = self.figuredBassList[fbIndex]
             print("Finding all possibilities for: " + str((nextBass.pitch, nextNotation)))
-            c1 = segment.NextSegment(self.fbInfo, self.lastSegment, nextBass, nextNotation)
+            c1 = segment.MiddleSegment(self.fbInfo, self.lastSegment, nextBass, nextNotation)
             self.allSegments.append(c1)
             self.lastSegment = c1
        
