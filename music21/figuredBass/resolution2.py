@@ -51,6 +51,7 @@ def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
     
     root = V7chord.root()
     bass = V7chord.bass()
+    inversion = V7chord.inversion()
     rootName = root.name
     thirdName = root.transpose(interval.Interval('M3')).name
     fifthName = root.transpose(interval.Interval('P5')).name
@@ -65,12 +66,12 @@ def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
         elif samplePitch.name == thirdName:
             samplePitch.transpose('m2', True)
         elif samplePitch.name == fifthName:
-            if V7chord.inversion() == 2 and resolveV43toI6:
+            if inversion == 2 and resolveV43toI6:
                 samplePitch.transpose('M2', True)
             else:
                 samplePitch.transpose('-M2', True)
         elif samplePitch.name == seventhName:
-            if V7chord.inversion() == 2 and resolveV43toI6:
+            if inversion == 2 and resolveV43toI6:
                 samplePitch.transpose('M2', True)
             else:
                 samplePitch.transpose('-m2', True)
@@ -105,6 +106,7 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
     
     root = V7chord.root()
     bass = V7chord.bass()
+    inversion = V7chord.inversion()
     rootName = root.name
     thirdName = root.transpose(interval.Interval('M3')).name
     fifthName = root.transpose(interval.Interval('P5')).name
@@ -119,12 +121,12 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
         elif samplePitch.name == thirdName:
             samplePitch.transpose('m2', True)
         elif samplePitch.name == fifthName:
-            if V7chord.inversion() == 2 and resolveV43toI6:
+            if inversion == 2 and resolveV43toI6:
                 samplePitch.transpose('m2', True)
             else:
                 samplePitch.transpose('-M2', True)
         elif samplePitch.name == seventhName:
-            if V7chord.inversion() == 2 and resolveV43toI6:
+            if inversion == 2 and resolveV43toI6:
                 samplePitch.transpose('M2', True)
             else:
                 samplePitch.transpose('-M2', True)
