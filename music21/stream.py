@@ -533,7 +533,7 @@ class Stream(music21.Music21Object):
         return post
 
     derivationChain = property(_getDerivationChain, 
-        doc = '''Return a list Stream subclasses that this Stream was derved from.
+        doc = '''Return a list Stream subclasses that this Stream was derved from. This provides a way to obtain all Streams that this element passed through, such as those created by getElementsByClass or flat searches. 
 
         >>> from music21 import *
         >>> s1 = stream.Stream()
@@ -570,7 +570,8 @@ class Stream(music21.Music21Object):
     def _setDerivationMethod(self, method):
         self._derivation.setMethod(method)
 
-    derivationMethod = property(_getDerivationMethod, _setDerivationMethod, doc='''
+    derivationMethod = property(_getDerivationMethod, _setDerivationMethod,     
+        doc='''
         Returns or sets a string representing how
         this stream was derived from another stream.
         
@@ -578,28 +579,20 @@ class Stream(music21.Music21Object):
         There are currently no limitations on this string.
         This might change.
         
+        For instance:        
         
-        OMIT_FROM_DOCS
-        
-        
-        DOES NOT WORK YET!
-        
-        #        For instance:
-        #        
-        #        
-        #        >>> from music21 import *
-        #        >>> s1 = converter.parse("C2 D2", "2/4")
-        #        >>> s1m = s1.makeMeasures()
-        #        >>> s1m1 = s1.measure(1)
-        #        >>> s1m1.derivesFrom is s1m
-        #        True
-        #        >>> s1m1.derivationMethod
-        #        'measure'
-        #        >>> s1m1.derivationMethod = 'getElementsByClass' 
-        #        >>> s1m1.derivationMethod
-        #        'getElementsByClass'
-    
-    ''')
+        >>> from music21 import *
+        >>> s1 = converter.parse("C2 D2", "2/4")
+        >>> s1m = s1.makeMeasures()
+        >>> s1m1 = s1m.measure(1)
+        >>> s1m1.derivesFrom is s1m
+        True
+        >>> s1m1.derivationMethod
+        'measure'
+        >>> s1m1.derivationMethod = 'getElementsByClass' 
+        >>> s1m1.derivationMethod
+        'getElementsByClass'
+        ''')
 
     def hasElement(self, obj):
         '''Return True if an element, provided as an argument, is contained in this Stream.
@@ -1707,6 +1700,7 @@ class Stream(music21.Music21Object):
         else:
             found = Stream()
         found.setDerivation(self)
+        found.derivationMethod = 'getElementsByClass'
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, (list, tuple)):
@@ -1798,6 +1792,7 @@ class Stream(music21.Music21Object):
         except:
             found = Stream()
         found.setDerivation(self)
+        found.derivationMethod = 'getElementsNotOfClass'
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, list):
@@ -1865,6 +1860,7 @@ class Stream(music21.Music21Object):
 
         returnStream = self.__class__()
         returnStream.setDerivation(self)
+        returnStream.derivationMethod = 'getElementsByGroup'
 
         # need both _elements and _endElements
         # must handle independently b/c inserting
@@ -2130,6 +2126,7 @@ class Stream(music21.Music21Object):
         
         found = self.__class__()
         found.setDerivation(self)
+        found.derivationMethod = 'getElementsByOffset'
 
 
         # need both _elements and _endElements
@@ -2458,6 +2455,7 @@ class Stream(music21.Music21Object):
 
         returnObj = self.__class__()
         returnObj.setDerivation(self)
+        returnObj.derivationMethod = 'measures'
         returnObj.mergeAttributes(self) # get id and groups
         srcObj = self
 
@@ -2598,12 +2596,17 @@ class Stream(music21.Music21Object):
         # we must be able to obtain a measure from this (not a flat) 
         # representation (e.g., this is a Stream or Part, not a Score)
         if len(self.getElementsByClass('Measure')) >= 1:
+            environLocal.printDebug(['got measures from getElementsByClass'])
             s = self.measures(measureNumber, measureNumber, collect=collect)
             if len(s) == 0:
                 return None
             else:
-                return s.getElementsByClass('Measure')[0]
+                m = s.getElementsByClass('Measure')[0]
+                m.setDerivation(self) # set to self, not s
+                m.derivationMethod = 'measure'
+                return m
         else:   
+            environLocal.printDebug(['got not measures from getElementsByClass'])
             return None
 
 
@@ -2785,6 +2788,7 @@ class Stream(music21.Music21Object):
             # returns a single value
             post = self.__class__()
             post.setDerivation(self)
+            post.derivationMethod = 'getTimeSignatures'
 
             # sort by time to search the most recent objects
             obj = self.getContextByClass(meter.TimeSignature, 
@@ -3250,6 +3254,7 @@ class Stream(music21.Music21Object):
         else:
             display = forceOutputClass()
         display.setDerivation(self)
+        display.derivationMethod = 'extractContext'
 
         found = None
         foundOffset = 0
@@ -3367,6 +3372,7 @@ class Stream(music21.Music21Object):
             #returnObj = self.__class__() # for output
             returnObj = copy.deepcopy(self)
             returnObj.setDerivation(self)
+            returnObj.derivationMethod = 'makeChords'
         else:
             returnObj = self
 
@@ -3829,6 +3835,8 @@ class Stream(music21.Music21Object):
         # create as many measures as needed to fit in oMax
         post = self.__class__()
         post.setDerivation(self)
+        post.derivationMethod = 'makeMeasures'
+
 
         o = 0.0 # initial position of first measure is assumed to be zero
         measureCount = 0
@@ -4916,6 +4924,10 @@ class Stream(music21.Music21Object):
         # call with container as first arg, not self
         sNew._derivation = derivation.Derivation(sNew)
         sNew.setDerivation(self)
+        if retainContainers:
+            sNew.derivationMethod = 'semiFlat'
+        else:
+            sNew.derivationMethod = 'flat'
 
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
@@ -13724,7 +13736,7 @@ class Test(unittest.TestCase):
             'Measure')[3], True)
 
         m4 = p1.measure(4)
-        self.assertTrue(m4.flat.notes.rootDerivation is m4)
+        self.assertTrue(m4.flat.notes.rootDerivation is p1)
         
         # part is the root derivation of a measures() call
         mRange = p1.measures(4, 6)
@@ -13768,6 +13780,32 @@ class Test(unittest.TestCase):
         pMeasuresFlat = pMeasures.flat
         pMeasuresFlatNotes = pMeasuresFlat.notes
         self.assertEqual(pMeasuresFlatNotes.derivationChain, [pMeasuresFlat, pMeasures, p1])
+
+
+
+    def testDerivationMethodA(self):
+        
+        from music21 import stream, converter
+        s1 = stream.Stream()
+        s1.repeatAppend(note.Note(), 10)
+        s1Flat = s1.flat
+        self.assertEqual(s1Flat.derivesFrom is s1, True)
+        self.assertEqual(s1Flat.derivationMethod is 'flat', True)
+
+        s1Elements = s1Flat.getElementsByClass('Note')
+        self.assertEqual(s1Elements.derivationMethod is 'getElementsByClass', True)
+
+
+        s1 = converter.parse("C2 D2", "2/4")
+        s1m = s1.makeMeasures()
+        self.assertEqual(s1m.derivationMethod, 'makeMeasures')
+        s1m1 = s1m.measure(1)
+        self.assertEqual(s1m1.derivesFrom is s1m, True)
+        self.assertEqual(s1m1.derivationMethod, 'measure')
+        s1m1.derivationMethod = 'getElementsByClass' 
+        self.assertEqual(s1m1.derivationMethod, 'getElementsByClass')
+
+
 
 
     def testMakeMeasuresTimeSignatures(self):
