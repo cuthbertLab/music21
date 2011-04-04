@@ -18,7 +18,7 @@ v1 = voice.Voice('Bass', voice.Range('E2', 'E4'))
 v2 = voice.Voice('Tenor', voice.Range('C3', 'A4'), interval.Interval('M3'))
 v3 = voice.Voice('Alto', voice.Range('F3', 'G5'), interval.Interval('M3'))
 v4 = voice.Voice('Soprano', voice.Range('C4', 'A5'), interval.Interval('M2'))
-#v5 = voice.Voice('Soprano1', voice.Range('C4', 'A5'), interval.Interval('M2'))
+v5 = voice.Voice('Soprano1', voice.Range('C4', 'A5'), interval.Interval('M2'))
 
 orderedVoiceList = [v1, v2, v3, v4] #, v5]
 
@@ -188,7 +188,7 @@ def exampleD():
 
 if __name__ == "__main__":
     #exampleA(), exampleB(), exampleC(), exampleD()
-    fb = exampleC() #Set up the figured bass
+    fb = exampleD() #Set up the figured bass
     #fb.fbInfo.fbRules.topVoicesMaxIntervalSeparation = None
     fb.solve()
     fb.showRandomSolutions()
