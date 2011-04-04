@@ -315,6 +315,7 @@ def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace
     {'A': F#4, 'S': A4, 'B': D3, 'T': F#3}
     >>> resolution2.diminishedSeventhToMajorTonic(possibA, True) # Alternate resolution, contains parallel fifths
     {'A': D4, 'S': A4, 'B': D3, 'T': F#3}
+    >>> possibB = resolution2.diminishedSeventhToMajorTonic(possibA, True)    
     '''
     if inPlace:
         dpCopy = diminishedPossib
