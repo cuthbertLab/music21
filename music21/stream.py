@@ -549,7 +549,11 @@ class Stream(music21.Music21Object):
     def _getRootDerivation(self):
         '''Return a reference to the Stream that created this Stream, if such a Stream exists. 
         '''
-        return self._getDerivationChain()[-1]
+        chain = self._getDerivationChain()
+        if len(chain) > 0:
+            return self._getDerivationChain()[-1]
+        else:
+            return None
 
     rootDerivation = property(_getRootDerivation, 
         doc = '''Return a reference to the oldest source of this Stream; that is, chain calls to derivesFrom until we get to a Stream that cannot be further derived. 
@@ -562,6 +566,8 @@ class Stream(music21.Music21Object):
         >>> s2.derivesFrom == s1
         True
         ''')
+
+
 
 
     def _getDerivationMethod(self):
@@ -13805,6 +13811,19 @@ class Test(unittest.TestCase):
         s1m1.derivationMethod = 'getElementsByClass' 
         self.assertEqual(s1m1.derivationMethod, 'getElementsByClass')
 
+
+    def testDerivationHierarchyA(self):
+        from music21 import corpus
+        s = corpus.parse('bach/bwv66.6')
+        # the part is not derived from anything yet
+        self.assertEqual([str(e.__class__) for e in s[0][2][3].derivationHierarchy], ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"])
+        
+        # after extraction and changing activeSite, cannot find
+        n = s.flat.notes[0]
+        self.assertEqual([str(e.__class__) for e in n.derivationHierarchy], [] )
+        
+        # still cannot get hierarchy
+        self.assertEqual([str(e.__class__) for e in s.parts[0].derivationHierarchy], [])
 
 
 

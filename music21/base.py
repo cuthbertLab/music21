@@ -2605,6 +2605,39 @@ class Music21Object(JSONSerializer):
     #---------------------------------------------------------------------------
     # duration manipulation, processing, and splitting
 
+    def _getDerivationHierarchy(self):
+        post = []
+        focus = self
+        while True:
+            # collect activeSite unless activeSite is None;
+            # if so, try to get rootDerivation
+            candidate = focus.activeSite
+            environLocal.printDebug(['_getDerivationHierarchy(): activeSite found:', candidate])
+            if candidate is None: # nothing more to derive
+                # if this is a Stream, we might find a root derivation
+                if hasattr(focus, 'rootDerivation'):
+                    environLocal.printDebug(['_getDerivationHierarchy(): found rootDerivation:', focus.rootDerivation])
+
+                    alt = focus.rootDerivation
+                    if alt is None:
+                        return post
+                    else:
+                        candidate = alt
+                else:
+                    return post
+            post.append(candidate)
+            focus = candidate
+        return post
+
+    derivationHierarchy = property(_getDerivationHierarchy, 
+        doc = '''Return a list of Stream subclasses that this Stream is contained within. This provides a way of seeing Streams contained within Streams.
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bach/bwv66.6')
+        >>> [str(e.__class__) for e in s[0][2][3].derivationHierarchy]
+        ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"]
+        ''')
+
 
     def splitAtQuarterLength(self, quarterLength, retainOrigin=True, 
         addTies=True, displayTiedAccidentals=False):
