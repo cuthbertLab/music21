@@ -31,13 +31,15 @@ class Possibility(dict):
     # INITIALIZATION METHODS
     def __init__(self, *args):
         '''
-        Creates a Possibility instance, where a voice label (key) corresponds to a music21 Pitch 
+        Creates a Possibility instance when you provide a python Dict, 
+        where a voice label (key) corresponds to a music21 Pitch 
         or pitch string (value). Pitch strings are automatically converted to Pitch instances. 
         Assigning a voice label to anything else results in an error.
         
         >>> from music21 import pitch
         >>> from music21 import note
         >>> from music21.figuredBass import possibility
+        
         >>> p1 = possibility.Possibility({'S': 'C5', 'A': pitch.Pitch('G4'), 'T': pitch.Pitch('E4'), 'B': 'C3'})
         >>> p1
         {'A': G4, 'S': C5, 'B': C3, 'T': E4}
@@ -144,6 +146,12 @@ class Possibility(dict):
         '''
         Returns True if upper voices are found within topVoicesMaxIntervalSeparation of each other, a.k.a.
         if the upper voices are found within that many semitones of each other.
+        
+        
+        For instance, if topVoicesMaxIntervalSeparation is P8 then if this method returns
+        true then all the notes of the implied chord except the bass can be played by
+        most adult pianists.
+        
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'T': 'E4', 'B': 'C3'})
@@ -252,14 +260,19 @@ class Possibility(dict):
     # HIDDEN INTERVAL RULES
     def hiddenFifth(self, nextPossibility, vlTop, vlBottom, verbose = False):
         '''
-        Returns True if there is no hidden fifth in going from prevPossibility (self) to nextPossibility.
-        Asked to provide the voice labels (keys) of the top and bottom voices. 
+        Returns True if there is no hidden fifth in going from prevPossibility (self) to nextPossibility
+        between the two voices specified as vlTop and vlBottom, which are usually the highest
+        and lowest voice parts in the piece (since these are the only two voices where 
+        hidden fifths are usually forbidden.
 
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Soprano': 'E5', 'Bass': 'C3'})
         >>> p2 = possibility.Possibility({'Soprano': 'A5', 'Bass': 'D3'})
         >>> p1.hiddenFifth(p2, 'Soprano', 'Bass')
         True
+        >>> p3 = possibility.Possibility({'Soprano': 'A#5', 'Bass': 'D3'})
+        >>> p1.hiddenFifth(p3, 'Soprano', 'Bass')
+        False
         '''
         cp = nextPossibility
         hasHiddenFifth = False
@@ -308,6 +321,7 @@ class Possibility(dict):
         Returns True if Possibility (self) contains a voice crossing.
         Takes in an ordered list of voice labels, from lowest to highest,
         which correspond to keys in Possibility. 
+        
         
         Raises an error if a voice label(s) in Possibility is not present in the 
         ordered list.
@@ -361,8 +375,10 @@ class Possibility(dict):
         Returns True if the pitch of each voice falls within its upper and lower
         ranges. 
         
+        
         Takes in a list of Voice instances. Supplying a Range to a Voice is optional,
         and if omitted for a certain Voice then all pitches are presumed in range.
+        
         
         Raises an error if a voice label(s) in Possibility doesn't correspond to Voice 
         instances in voiceList.
@@ -416,6 +432,7 @@ class Possibility(dict):
         '''
         Returns True if there is voice overlap between prevPossibility (self) and nextPossibility.
         Takes in a list of ordered voice labels, from lowest to highest.
+
         
         Ignores voices which aren't shared between the two, but raises an error if (1) There are
         voices shared between the two Possibility instances which correspond to voice labels not 
@@ -424,10 +441,6 @@ class Possibility(dict):
         
         >>> from music21.figuredBass import voice
         >>> from music21.figuredBass import possibility
-        >>> v1 = voice.Voice('B')
-        >>> v2 = voice.Voice('T')
-        >>> v3 = voice.Voice('A')
-        >>> v4 = voice.Voice('S')
         >>> orderedVoiceLabels = ['B', 'T', 'A', 'S'] #From lowest to highest
         >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'T': 'E4', 'B': 'C4'})
         >>> p2 = possibility.Possibility({'S': 'B4', 'A': 'F4', 'B': 'D4'})
@@ -496,9 +509,10 @@ class Possibility(dict):
     
     def voiceLeapsWithinLimits(self, nextPossibility, voiceList, verbose = False):
         '''
-        Returns True if there are voice leaps present between prevPossibility (self) and nextPossibility.
+        Returns True if there are no illegal voice leaps present between prevPossibility (self) and nextPossibility.
         Takes in a list of Voice instances which supply the maximum interval jump allowed for each voice.
-        The default max interval is a perfect octave.
+        The default max interval is a perfect octave. You can specify another max interval by inputting it as the
+        third input of each voice.  In the example below, the Soprano is limited to stepwise motion.
         
         Ignores voices which aren't shared between the two Possibility instances, but raises an error if
         there are voices shared between the two that don't correspond to Voice instances in voiceList.
@@ -510,17 +524,32 @@ class Possibility(dict):
         >>> v3 = voice.Voice('A', voice.Range('F3', 'G5'))
         >>> v4 = voice.Voice('S', voice.Range('C4', 'A5'), interval.Interval('M2'))
         >>> voiceList = [v1, v2, v3, v4]
+        
+        
+        This example is True because all voices move by step.
+        
+        
         >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'T': 'E4', 'B': 'C3'})
         >>> p2 = possibility.Possibility({'S': 'B4', 'A': 'F4', 'T': 'D4', 'B': 'D3'})
         >>> p1.voiceLeapsWithinLimits(p2, voiceList)
         True
+        
+        
+        This example is False because the Soprano moves by 4th and is restricted 
+        to stepwise motion.  The Alto also moves by 4th, but that's okay because
+        the max interval (by default) is an Octave.
+        
+        
+        >>> p3b = possibility.Possibility({'S':'G4', 'T': 'D4', 'Z': 'B3'})
+        >>> p1.voiceLeapsWithinLimits(p3b, voiceList)
+        False
+
+
+
         >>> p3a = possibility.Possibility({'W': 'G4', 'X': 'G4', 'Y': 'D4', 'Z': 'B3'})
         >>> p1.voiceLeapsWithinLimits(p3a, voiceList)
         Traceback (most recent call last):
         PossibilityException: No voices to check.
-        >>> p3b = possibility.Possibility({'S':'G4', 'T': 'D4', 'Z': 'B3'})
-        >>> p1.voiceLeapsWithinLimits(p3b, voiceList)
-        False
         '''
         leapsWithinLimits = True
         np = nextPossibility
