@@ -81,6 +81,7 @@ Module Reference
    moduleNote
    modulePitch
    moduleRoman
+   moduleRepeat
    moduleScale
    moduleSerial
    moduleSieve

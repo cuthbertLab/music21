@@ -40,7 +40,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
     This class models any mark added to a Score to mark repeat start and end points that are designated by expressions. 
     '''
     def __init__(self):
-        Expression.__init__(self)
+        expressions.Expression.__init__(self)
 
 
 
