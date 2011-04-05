@@ -210,15 +210,15 @@ class PartitionedName(object):
         >>> from music21 import pitch, meter, duration
         >>> a = PartitionedClass(pitch.Pitch)
         >>> a.getSignature('midi')
-        ''
+        u''
 
         >>> a = PartitionedClass(meter.MeterSequence)
         >>> a.getSignature('load')
-        '(value, partitionRequest=None, autoWeight=False, targetWeight=None)'
+        u'(value, partitionRequest=None, autoWeight=False, targetWeight=None)'
 
         >>> a = PartitionedClass(duration.Duration)
         >>> a.getSignature('__init__')
-        '(*arguments, **keywords)'
+        u'(*arguments, **keywords)'
 
 
         '''
@@ -384,9 +384,10 @@ class PartitionedModule(PartitionedName):
         >>> from music21 import pitch
         >>> a = PartitionedModule(pitch)
         >>> a.getNames('classes')
-        ['Pitch', 'Accidental']
+        ['Pitch', 'Accidental', 'Microtone']
         >>> a.getNames('functions')    
-        ['convertFqToPs', 'convertNameToPitchClass', 'convertNameToPs', 'convertPitchClassToNumber', 'convertPitchClassToStr', 'convertPsToFq', 'convertPsToOct', 'convertPsToStep', 'convertStepToPs']
+        ['convertFqToPs', 'convertHarmonicToCents', 'convertNameToPitchClass', 'convertNameToPs', 'convertPitchClassToNumber', 'convertPitchClassToStr', 'convertPsToFq', 'convertPsToOct', 'convertPsToStep', 'convertStepToPs']
+
         '''
 
         post = []
@@ -444,7 +445,7 @@ class PartitionedClass(PartitionedName):
         >>> len(a.names) > 30
         True
         >>> a.mro
-        (<class 'music21.pitch.Pitch'>, <class 'music21.base.Music21Object'>, <type 'object'>)
+        (<class 'music21.pitch.Pitch'>, <class 'music21.base.Music21Object'>, <class 'music21.base.JSONSerializer'>, <type 'object'>)
 
         '''
         PartitionedName.__init__(self, srcNameEval)
@@ -529,8 +530,8 @@ class PartitionedClass(PartitionedName):
 
         >>> from music21 import pitch
         >>> a = PartitionedClass(pitch.Pitch)
-        >>> len(a._createMroLive()) == 3
-        True
+        >>> len(a._createMroLive())
+        4
         '''
         post = []
         for entry in self.mro:
@@ -594,7 +595,7 @@ class PartitionedClass(PartitionedName):
         >>> from music21 import pitch
         >>> a = PartitionedClass(pitch.Pitch)
         >>> a.lastMroIndex()
-        2
+        3
         '''
         return len(self.mro)-1
 
@@ -634,7 +635,7 @@ class PartitionedClass(PartitionedName):
         >>> from music21 import editorial
         >>> b = PartitionedClass(editorial.Comment)
         >>> b.getDoc('__init__')
-        'No documentation.'
+        u'No documentation.'
         '''
         element = self.getElement(partName)
 
@@ -695,11 +696,11 @@ class PartitionedClass(PartitionedName):
         True
 
         >>> a.getNames('method', mroIndex=0)
-        ['__init__', 'getEnharmonic', 'getHigherEnharmonic', 'getLowerEnharmonic', 'inheritDisplay', 'isEnharmonic', 'lilyNoOctave', 'simplifyEnharmonic', 'transpose', 'updateAccidentalDisplay']
+        ['__init__', 'convertMicrotonesToQuarterTones', 'convertQuarterTonesToMicrotones', 'getCentShiftFromMidi', 'getEnharmonic', 'getHarmonic', 'getHigherEnharmonic', 'getLowerEnharmonic', 'harmonicAndFundamentalFromPitch', 'harmonicAndFundamentalStringFromPitch', 'harmonicFromFundamental', 'harmonicString', 'inheritDisplay', 'isEnharmonic', 'isTwelveTone', 'lilyNoOctave', 'setAccidentalDisplay', 'simplifyEnharmonic', 'transpose', 'transposeAboveTarget', 'transposeBelowTarget', 'updateAccidentalDisplay']
         >>> a.getNames('data', mroIndex=0)
-        ['defaultOctave']
+        ['fundamental', 'implicitAccidental', 'defaultOctave']
         >>> a.getNames('data', mroIndex=1)
-        ['classSortOrder', 'id', 'groups']
+        ['classSortOrder', 'hideObjectOnPrint', 'id', 'groups']
         >>> a.getNames('data', mroIndex=a.lastMroIndex())
         []
 
@@ -713,7 +714,7 @@ class PartitionedClass(PartitionedName):
         >>> len(a.getNames('methods')) > 10
         True
         >>> a.getNames('attributes', 1)
-        ['id', 'groups']
+        ['hideObjectOnPrint', 'id', 'groups']
 
         >>> from music21 import serial
         >>> a = PartitionedClass(serial.RowSchoenbergOp23No5)
@@ -826,7 +827,7 @@ class RestructuredWriter(object):
         True
         >>> post = rw.formatParent(inspect.getmro(note.Note)[4])
         >>> 'object' in post      
-        True
+        False
         '''
         modName = mroEntry.__module__
         className = mroEntry.__name__
@@ -889,11 +890,6 @@ class RestructuredWriter(object):
 
         docTestImportPackage = '>>> from music21 import *'
         docTestImportPackageReplace = """>>> from music21 import *"""
-#         docTestImportModNames = '>>> from %s import *' % modName
-#         # mod name here is qualified; need to remove package name
-#         if 'music21.' in modName:
-#             modStub = modName.replace('music21.', '')
-#         docTestImportMod = '>>> from music21 import %s' % modStub
 
         lines = doc.split('\n')
         sub = []
@@ -912,13 +908,17 @@ class RestructuredWriter(object):
             match = False
             for stub in rstExclude:
                 if line.startswith(stub):
-                    # do not strip
                     #environLocal.printDebug(['found rst in doc string:', repr(lineSrc)])
+
+                    # was only rstripping and 
+                    # prepending return carriages to keep indentation
+                    # now, indentation is added below
+
                     if stub == '.. image::':
-                        lineSrc = lineSrc.rstrip()
-                        sub.append('\n\n' + lineSrc) # do not strip
+                        lineSrc = lineSrc.strip()
+                        sub.append(lineSrc) # do not strip
                     elif stub == ':width:': # immediate follows
-                        lineSrc = lineSrc.rstrip()
+                        lineSrc = lineSrc.strip()
                         sub.append(lineSrc) # do not strip
                     else:
                         raise Exception('unexpected condition! %s' % sub)
@@ -941,6 +941,7 @@ class RestructuredWriter(object):
             else: 
                 post.append(line)
 
+        # create final message; add proper line breaks and indentation
         msg = [indent] # can add indent here
         inExamples = False # are we now in a code example?
         for line in post:
@@ -960,12 +961,17 @@ class RestructuredWriter(object):
                 else:
                     space = '\n'
                     msg.append(space + indent + line)
+            # images should be at the same indent level
+            elif line.strip().startswith('.. image::'):
+                # additional \n are necessary here; were added previously
+                # above; indent is important here: if incorrect, the docutils
+                # interprets as the end of the docs
+                msg.append('\n\n\n' + indent + line)
             elif line.strip().startswith(':width:'):
-                # these lines sometimes cause problems; never always add
-                # just one indent
-                msg.append('\n' + line)
+                # width must be indented in an additional line
+                msg.append('\n' + indent + '    ' + line + '\n')
             else: # continuing an existing line
-                if inExamples == False:
+                if not inExamples:
                     msg.append(line + ' ')
                 else: # assume we are in examples; 
                 # need to get python lines that do not start with delim
@@ -1456,15 +1462,14 @@ class Documentation(RestructuredWriter):
         '''
         for module in self.modulesToBuild:
             #environLocal.printDebug(['writing rst documentation:', module])
+
             a = ModuleDoc(module)
-            #a.scanModule()
+            # for debugging, can comment these three lines out and 
+            # edit rst files directly
             f = open(os.path.join(self.dirRst, a.fileName), 'w')
-
-#             f.write(codecs.BOM_UTF8)
             f.write(a.getRestructured().encode( "utf-8" ) )
-
-            #f.write(a.getRestructured())
             f.close()
+
             self.chaptersModuleRef.append(a.fileRef)
 
 
@@ -1536,8 +1541,132 @@ class Test(unittest.TestCase):
     def setUp(self):
         pass
 
-    def testToRoman(self):
-        self.assertEqual(True, True)
+    def testFormatDocStringA(self):
+
+        rw = RestructuredWriter()
+        
+        pre = '''
+        Given a step (C, D, E, F, etc.) return the accidental
+        for that note in this key (using the natural minor for minor)
+        or None if there is none.
+
+        >>> from music21 import *
+        
+        >>> g = key.KeySignature(1)
+        >>> g.accidentalByStep("F")
+        <accidental sharp>
+        >>> g.accidentalByStep("G")
+
+        >>> f = KeySignature(-1)
+        >>> bbNote = note.Note("B-5")
+        >>> f.accidentalByStep(bbNote.step)
+        <accidental flat>     
+
+
+        Fix a wrong note in F-major:
+
+        
+        >>> wrongBNote = note.Note("B#4")
+        >>> if f.accidentalByStep(wrongBNote.step) != wrongBNote.accidental:
+        ...    wrongBNote.accidental = f.accidentalByStep(wrongBNote.step)
+        >>> wrongBNote
+        <music21.note.Note B->
+       
+
+        .. image:: images/keyAccidentalByStep.*
+            :width: 400
+
+
+        Set all notes to the correct notes for a key using the note's Context:        
+        
+        
+        >>> from music21 import *
+        >>> s1 = stream.Stream()
+        >>> s1.append(key.KeySignature(4))  # E-major or C-sharp-minor
+        >>> s1.append(note.HalfNote("C"))
+        >>> s1.append(note.HalfNote("E-"))
+        >>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
+        >>> s1.append(note.WholeNote("A"))
+        >>> s1.append(note.WholeNote("F#"))
+        >>> for n in s1.notes:
+        ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
+        >>> #_DOCS_SHOW s1.show()
+
+
+        OMIT_FROM_DOCS
+        >>> s1.show('text')
+        {0.0} <music21.key.KeySignature of 4 sharps>
+        {0.0} <music21.note.Note C#>
+        {2.0} <music21.note.Note E>
+        {4.0} <music21.key.KeySignature of 4 flats>
+        {4.0} <music21.note.Note A->
+        {8.0} <music21.note.Note F>
+        
+        
+        Test to make sure there are not linked accidentals (fixed bug 22 Nov. 2010)
+        
+        >>> nB1 = note.WholeNote("B")
+        >>> nB2 = note.WholeNote("B")
+        >>> s1.append(nB1)
+        >>> s1.append(nB2)
+        >>> for n in s1.notes:
+        ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
+        >>> (nB1.accidental, nB2.accidental)
+        (<accidental flat>, <accidental flat>)
+        >>> nB1.accidental.name = 'sharp'
+        >>> (nB1.accidental, nB2.accidental)
+        (<accidental sharp>, <accidental flat>)
+        
+        '''
+
+        post = rw.formatDocString(pre)
+
+        match = """Given a step (C, D, E, F, etc.) return the accidental for that note in this key (using the natural minor for minor) or None if there is none. 
+
+>>> from music21 import *
+>>> g = key.KeySignature(1)
+>>> g.accidentalByStep("F")
+<accidental sharp> 
+>>> g.accidentalByStep("G")
+>>> f = KeySignature(-1)
+>>> bbNote = note.Note("B-5")
+>>> f.accidentalByStep(bbNote.step)
+<accidental flat> 
+
+
+Fix a wrong note in F-major: 
+
+
+>>> wrongBNote = note.Note("B#4")
+>>> if f.accidentalByStep(wrongBNote.step) != wrongBNote.accidental:
+...    wrongBNote.accidental = f.accidentalByStep(wrongBNote.step) 
+>>> wrongBNote
+<music21.note.Note B-> 
+
+
+
+
+.. image:: images/keyAccidentalByStep.*
+    :width: 400
+
+
+
+Set all notes to the correct notes for a key using the note's Context: 
+
+
+>>> from music21 import *
+>>> s1 = stream.Stream()
+>>> s1.append(key.KeySignature(4))  # E-major or C-sharp-minor
+>>> s1.append(note.HalfNote("C"))
+>>> s1.append(note.HalfNote("E-"))
+>>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
+>>> s1.append(note.WholeNote("A"))
+>>> s1.append(note.WholeNote("F#"))
+>>> for n in s1.notes:
+...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step) 
+>>> s1.show()
+"""
+        self.assertEqual(post.strip(), match.strip())
 
 
 

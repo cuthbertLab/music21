@@ -499,12 +499,13 @@ class GraphNetworxGraph(Graph):
     Grid a networkx graph -- which is a graph of nodes and edges.
     Requires the optional networkx module.
     
-    >>> from music21 import *
-    >>> #_DOCS_SHOW g = graph.GraphNetworxGraph()
-
-    .. image:: images/GraphNetworxGraph.*
-        :width: 600
     '''
+#     >>> from music21 import *
+#     >>> #_DOCS_SHOW g = graph.GraphNetworxGraph()
+# 
+#     .. image:: images/GraphNetworxGraph.*
+#         :width: 600
+
     def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']

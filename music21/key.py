@@ -419,7 +419,7 @@ class KeySignature(music21.Music21Object):
 
     def accidentalByStep(self, step):
         '''
-        given a step (C, D, E, F, etc.) return the accidental
+        Given a step (C, D, E, F, etc.) return the accidental
         for that note in this key (using the natural minor for minor)
         or None if there is none.
 
@@ -444,7 +444,7 @@ class KeySignature(music21.Music21Object):
         ...    wrongBNote.accidental = f.accidentalByStep(wrongBNote.step)
         >>> wrongBNote
         <music21.note.Note B->
-       
+
 
         Set all notes to the correct notes for a key using the note's Context:        
         
@@ -461,8 +461,10 @@ class KeySignature(music21.Music21Object):
         ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
         >>> #_DOCS_SHOW s1.show()
 
+
         .. image:: images/keyAccidentalByStep.*
             :width: 400
+
 
         OMIT_FROM_DOCS
         >>> s1.show('text')
@@ -489,7 +491,8 @@ class KeySignature(music21.Music21Object):
         (<accidental sharp>, <accidental flat>)
         
         '''
-        for thisAlteration in reversed(self.alteredPitches):  # temp measure to fix dbl flats, etc.
+        # temp measure to fix dbl flats, etc.
+        for thisAlteration in reversed(self.alteredPitches): 
             if thisAlteration.step.lower() == step.lower():
                 return copy.deepcopy(thisAlteration.accidental) # get a new one each time otherwise we have linked accidentals, YUK!
         
