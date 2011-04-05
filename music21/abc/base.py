@@ -603,7 +603,6 @@ class ABCBar(ABCToken):
         else:
             return False
 
-
     def getBarObject(self):
         '''Return a music21 bar object
 
@@ -614,8 +613,12 @@ class ABCBar(ABCToken):
         '''
         from music21 import bar
         if self.isRepeat():
-            post = bar.Repeat(self.barStyle, direction=self.repeatForm)
-                
+            if self.repeatForm in ['end', 'start']:
+                post = bar.Repeat(self.barStyle, direction=self.repeatForm)
+            # bidirectional repeat tokens should already have been replaced
+            # by end and start
+            else:
+                environLocal.printDebug(['found an unspported repeatForm in ABC: %s' % self.repeatForm])            
         elif self.barStyle == 'regular':
             post = None # do not need an object for regular
 
@@ -727,8 +730,9 @@ class ABCTuplet(ABCToken):
         #self.qlRemain = self._tupletObj.totalTupletLength()
 
 
-class ABCBrokenRhythmMarker(ABCToken):
 
+
+class ABCBrokenRhythmMarker(ABCToken):
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
     def __init__(self, src):
@@ -1277,7 +1281,12 @@ class ABCHandler(object):
                 if matchBars:
                     collect = strSrc[i:j]
                     #environLocal.printDebug(['got bars:', repr(collect)])  
-                    self._tokens.append(ABCBar(collect))
+                    if collect == '::':
+                        # create a start and and an end
+                        self._tokens.append(ABCBar(':|'))
+                        self._tokens.append(ABCBar('|:'))
+                    else:
+                        self._tokens.append(ABCBar(collect))
                     i = j
                     continue
                     
@@ -1990,11 +1999,11 @@ class Test(unittest.TestCase):
         from music21.abc import testFiles
 
         for (tf, countTokens, noteTokens, chrodTokens) in [
-            (testFiles.fyrareprisarn, 236, 152, 0), 
+            (testFiles.fyrareprisarn, 239, 152, 0), 
             (testFiles.mysteryReel, 188, 153, 0), 
             (testFiles.aleIsDear, 291, 206, 32),
             (testFiles.testPrimitive, 94, 75, 2),
-            (testFiles.kitchGirl, 125, 101, 2),
+            (testFiles.kitchGirl, 126, 101, 2),
             (testFiles.williamAndNancy, 127, 93, 0),
             (testFiles.morrisonsJig, 176, 137, 0),
 

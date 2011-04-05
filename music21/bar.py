@@ -137,10 +137,17 @@ class Barline(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
+
+# note that musicxml permits the barline to have attributes for segno and coda
+#		<xs:attribute name="segno" type="xs:token"/>
+#		<xs:attribute name="coda" type="xs:token"/>
+
+# type <ending> in musicxml is used to mark different endings
+
 class Repeat(repeat.RepeatMark, Barline):
     '''A Repeat barline.
 
-    The `direction` parameter can be one of 'start', 'end' or 'bidirectional'.
+    The `direction` parameter can be one of 'start' or 'end.'
 
     '''
 
@@ -153,11 +160,11 @@ class Repeat(repeat.RepeatMark, Barline):
         self._times = None  # if an end, how many repeats
 
         # start is forward, end is backward in musicxml
-        self._setDirection(direction) # start, end, or bidirectional
+        self._setDirection(direction) # start, end
         self._setTimes(times)
 
     def _setDirection(self, value):
-        if value.lower() in ['start', 'end', 'bidirectional']:
+        if value.lower() in ['start', 'end']:
             self._direction = value.lower()
         else:
             raise BarException('cannot set repeat direction to: %s' % value)
@@ -186,6 +193,9 @@ class Repeat(repeat.RepeatMark, Barline):
         doc = '''Get or set the times property of this barline. This defines how many times the repeat happens.
         ''')
 
+
+    # TODO: move to musicxml/translate.py
+
     def _getMX(self):
         '''
         >>> b = Repeat('light-heavy')
@@ -194,8 +204,10 @@ class Repeat(repeat.RepeatMark, Barline):
         'light-heavy'
         '''
         mxBarline = musicxml.Barline()
-        mxBarline.set('barStyle', self.style)
-        if self.location != None:
+        if self.style is not None:
+            mxBarline.set('barStyle', self.style)
+
+        if self.location is not None:
             mxBarline.set('location', self.location)
 
         mxRepeat = musicxml.Repeat()
@@ -203,8 +215,8 @@ class Repeat(repeat.RepeatMark, Barline):
             mxRepeat.set('direction', 'forward')
         elif self.direction == 'end':
             mxRepeat.set('direction', 'backward')
-        elif self.direction == 'bidirectional':
-            environLocal.printDebug(['skipping bi-directional repeat'])
+#         elif self.direction == 'bidirectional':
+#             environLocal.printDebug(['skipping bi-directional repeat'])
         else:
             raise BarException('cannot handle direction format:', self.direction)
 
