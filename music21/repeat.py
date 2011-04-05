@@ -60,8 +60,12 @@ class Test(unittest.TestCase):
         m1 = stream.Measure()
         m1.leftBarline = bar.Repeat(direction='start')
         m1.rightBarline = bar.Repeat(direction='end')
-
         self.assertEqual(len(m1.getElementsByClass('RepeatMark')), 2)
+
+        s.append(m1)
+        #s.show()
+
+        self.assertEqual(len(s.flat.getElementsByClass('RepeatMark')), 2)
 
 if __name__ == "__main__":
     music21.mainTest(Test)

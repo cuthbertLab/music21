@@ -138,20 +138,53 @@ class Barline(music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 class Repeat(repeat.RepeatMark, Barline):
-    '''A Repeat barline
+    '''A Repeat barline.
+
+    The `direction` parameter can be one of 'start', 'end' or 'bidirectional'.
 
     '''
 
     _repeatDots = None # not sure what this is for; inherited from old modles
 
-    def __init__(self, style=None, direction='start'):
+    def __init__(self, style=None, direction='start', times=None):
         Barline.__init__(self, style=style)
 
-        # must declare a direction
-        # start is forward, end is backward in musicxml
-        self.direction = direction # start, end, or bidirectional
-        self.times = None  # if an end, how many repeats
+        self._direction = None 
+        self._times = None  # if an end, how many repeats
 
+        # start is forward, end is backward in musicxml
+        self._setDirection(direction) # start, end, or bidirectional
+        self._setTimes(times)
+
+    def _setDirection(self, value):
+        if value.lower() in ['start', 'end', 'bidirectional']:
+            self._direction = value.lower()
+        else:
+            raise BarException('cannot set repeat direction to: %s' % value)
+
+    def _getDirection(self):
+        return self._direction
+
+    direction = property(_getDirection, _setDirection, 
+        doc = '''Get or set the direction of this Repeat barline. Can be start or end. 
+        ''')
+
+    def _setTimes(self, value):
+        if value is None:
+            self._times = None
+        else:
+            try:
+                candidate = int(value)
+                self._times = candidate
+            except ValueError:
+                raise BarException('cannot set repeat times to: %s' % value)
+
+    def _getTimes(self):
+        return self._times
+
+    times = property(_getTimes, _setTimes, 
+        doc = '''Get or set the times property of this barline. This defines how many times the repeat happens.
+        ''')
 
     def _getMX(self):
         '''
