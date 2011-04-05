@@ -16,6 +16,7 @@
 import unittest, doctest
 
 import music21
+from music21 import repeat
 from music21 import musicxml
 
 from music21 import environment
@@ -136,7 +137,7 @@ class Barline(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class Repeat(Barline):
+class Repeat(repeat.RepeatMark, Barline):
     '''A Repeat barline
 
     '''

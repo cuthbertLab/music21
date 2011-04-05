@@ -4547,15 +4547,12 @@ class Stream(music21.Music21Object):
         41.0
         >>> stream2[-1].offset
         40.0
-
-        OMIT_FROM_DOCS
-        TODO: Chris; what file is testFiles.ALL[2]?? 
         
-#        >>> from music21.musicxml import testFiles
-#        >>> from music21 import converter
-#        >>> mxString = testFiles.ALL[2] # has dynamics
-#        >>> a = converter.parse(mxString)
-#        >>> b = a.flat.extendDuration(dynamics.Dynamic)    
+       >>> from music21.musicxml import testFiles
+       >>> from music21 import converter
+       >>> # testing a file a file with dynamics
+       >>> a = converter.parse(testFiles.schumannOp48No1)
+       >>> b = a.flat.extendDuration(dynamics.Dynamic)    
         '''
     
         if not inPlace: # make a copy

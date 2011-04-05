@@ -203,19 +203,6 @@ class TextExpression(Expression, text.TextFormat):
         10.0
         ''')
 
-#     def _getMxParameters(self):
-#         '''Return as musicxml parameters
-#         '''
-#         post = text.TextFormat._getMxParameters(self)
-#         post['enclosure'] = self._getEnclosure()
-#         # translate position vertical to default y; this is found
-#         # to work better than relative-x
-#         post['default-y'] = self._getPositionVertical()
-#         return post        
-# 
-#     mxParameters = property = (_getMxParameters)
-
-
 
 
 
@@ -417,16 +404,11 @@ class Fermata(Expression):
 
 
 
+
+
+
+
 #-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
-    
-    def runTest(self):
-        pass
-    
-    def testBasic(self):
-        pass
-
-
 class Test(unittest.TestCase):
     
     def runTest(self):

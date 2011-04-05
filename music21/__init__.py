@@ -57,7 +57,7 @@ __all__ = ['base',
            'interval', 'intervalNetwork', 'instrument', 'key', 'layout',
            'metadata', 'meter', 'musedata', 
            'expressions', 'note', 
-           'pitch', 'ratios', 'roman',
+           'pitch', 'ratios', 'repeat', 'roman',
            'spanner', 'scale', 'serial', 'sieve', 'stream', 
            'tempo', 'text', 'tie', 'tinyNotation', 
            'voiceLeading']
