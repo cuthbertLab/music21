@@ -43,7 +43,7 @@ from music21 import note
 from music21 import spanner
 from music21 import tie
 from music21 import metadata
-
+from music21 import repeat
 
 from music21 import environment
 _MOD = "stream.py"
@@ -5934,6 +5934,19 @@ class Stream(music21.Music21Object):
                     #qlNew = common.nearestMultiple(ql, quarterLengthMin)
                     e.duration.quarterLength = qlNew
 
+
+    def expand(self):
+        '''Expand all repeats, as well as all repeat indications given by text expressions such as D.C. al Segno.
+
+        This method always returns a new Stream, with deepcopies of all contained elements at all level.
+    
+        NOTE: preliminary implementation.
+        TODO: overidden method on Score
+        '''
+        ex = repeat.Expander(self)
+        return ex.process()
+        
+
     #---------------------------------------------------------------------------
     # slicing and recasting a note as many notes
 
@@ -7862,14 +7875,22 @@ class Measure(Stream):
             return barList[0]    
     
     def _setLeftBarline(self, barlineObj):
+        insert = True
         if common.isStr(barlineObj):
             barlineObj = bar.Barline(barlineObj)
-        oldLeftBarline = self._getLeftBarline()
-        barlineObj.location = 'left'
+            barlineObj.location = 'left'
+        elif barlineObj is None: # assume removal
+            insert = False
+        else: # assume an Barline object
+            barlineObj.location = 'left'
 
+        oldLeftBarline = self._getLeftBarline()
         if oldLeftBarline is not None:
+            #environLocal.printDebug(['_setLeftBarline()', 'removing left barline'])
             junk = self.pop(self.index(oldLeftBarline))
-        self.insert(0, barlineObj)
+        if insert:
+            #environLocal.printDebug(['_setLeftBarline()', 'inserting new left barline', barlineObj])
+            self.insert(0, barlineObj)
 
     leftBarline = property(_getLeftBarline, _setLeftBarline, 
         doc = '''
@@ -7891,17 +7912,23 @@ class Measure(Stream):
             return barList[0]    
     
     def _setRightBarline(self, barlineObj):
+        insert = True
         if common.isStr(barlineObj):
             barlineObj = bar.Barline(barlineObj)
+            barlineObj.location = 'right'
+        elif barlineObj is None: # assume removal
+            insert = False
+        else: # assume an Barline object
+            barlineObj.location = 'right'
 
         oldRightBarline = self._getRightBarline()
 
-        barlineObj.location = 'right'
-
         if oldRightBarline is not None:
+            #environLocal.printDebug(['_setRightBarline()', 'removing right barline'])
             junk = self.pop(self.index(oldRightBarline))
         # insert into _endElements
-        self.storeAtEnd(barlineObj)
+        if insert:
+            self.storeAtEnd(barlineObj)
         
         #environLocal.printDebug(['post _setRightBarline', barlineObj, 'len of elements highest', len(self._endElements)])
 
@@ -8201,6 +8228,23 @@ class Score(Stream):
                 post.insert(0, sp)
         return post
 
+
+    def expand(self):
+        '''Expand all repeats, as well as all repeat indications given by text expressions such as D.C. al Segno.
+
+        This method always returns a new Stream, with deepcopies of all contained elements at all level.
+    
+        NOTE: preliminary implementation.
+        TODO: overidden method on Score
+        '''
+        post = Score()
+        # TODO: copy all things that are not Parts
+        post.mergeAttributes(self)
+        for p in self.getElementsByClass('Part'):
+            post.insert(0, p.expand())
+        #TODO: gather spanners?
+        return post
+        
 
     def measureOffsetMap(self, classFilterList=None):
         '''
