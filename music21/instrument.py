@@ -1217,7 +1217,40 @@ def ensembleNameBySize(number):
     else:
         return ensembleNamesBySize[int(number)]
 
+def instrumentFromMidiProgram(number):
+    '''
+    return the instrument with "number" as its assigned midi program:
+    
+    >>> from music21 import *
+    >>> instrument.instrumentFromMidiProgram(0)
+    <music21.instrument.Instrument Piano>
+    >>> instrument.instrumentFromMidiProgram(21)
+    <music21.instrument.Instrument Accordion>
+    >>> instrument.instrumentFromMidiProgram(500)
+    Traceback (most recent call last):
+        ...
+    InstrumentException: No instrument found with given midi program
 
+    
+    '''
+    import sys
+    
+    foundInstrument = False
+    
+    for myThing in sys.modules[__name__].__dict__.values():
+        try: 
+            i = myThing()
+            mp = getattr(i, 'midiProgram')
+            if mp == number:
+                foundInstrument = True
+                return i
+        except:
+            pass
+    if not foundInstrument:
+        raise InstrumentException('No instrument found with given midi program')
+
+    
+    
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
