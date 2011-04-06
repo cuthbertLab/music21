@@ -236,6 +236,15 @@ class GeneralMordent(Ornament):
     def realize(self, srcObject):
         '''
         realize a mordent.
+        
+        returns a three-element tuple.
+        The first is a list of the two notes that the beginning of the note were converted to.
+        The second is the rest of the note
+        The third is an empty list (since there are no notes at the end of a mordent)
+
+
+        TODO: write more docs...
+
         '''
         if self.direction != 'up' and self.direction != 'down':
             raise ExpressionException("Cannot realize a mordent if I do not know its direction")
@@ -251,12 +260,16 @@ class GeneralMordent(Ornament):
             transposeInterval = self.size
         
         firstNote = copy.deepcopy(srcObject)
+        #firstNote.expressions = None
+        #todo-clear lyrics.
         firstNote.duration.quarterLength = self.quarterLength
         secondNote = copy.deepcopy(srcObject)
         secondNote.duration.quarterLength = self.quarterLength
+        #secondNote.expressions = None
         secondNote.transpose(transposeInterval, inPlace = True)
         remainderNote = copy.deepcopy(srcObject)
         remainderNote.duration.quarterLength = remainderDuration
+        #TODO clear just mordent here...
         return ([firstNote, secondNote], remainderNote, [])
 
 class Mordent(GeneralMordent):
@@ -290,13 +303,23 @@ class WholeStepInvertedMordent(InvertedMordent):
         self.size = music21.interval.Interval("M2")
 
 class Trill(Ornament):
-    placement = None
-    nachschlag = False
+    placement = 'above'
+    nachschlag = False # play little notes at the end of the trill?
     tieAttach = 'all'
+    quarterLength = 0.125
 
     def __init__(self):
         Ornament.__init__(self)
         self.size = music21.interval.GenericInterval(2)
+
+    def realize(self):
+        '''
+        neena will write this...
+        with docs...
+        and examples...
+        '''
+        pass
+
 
     def _getMX(self):
         '''

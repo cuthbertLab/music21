@@ -1545,6 +1545,35 @@ class Test(unittest.TestCase):
 
         #s.show('midi')
 
+    def testExternalMidiProgramChangeB(self):
+
+        from music21 import stream, instrument, note, scale
+        import random
+
+        iList = [instrument.Harpsichord, instrument.Clavichord, instrument.Accordion, 
+                 instrument.Celesta, instrument.Contrabass, instrument.Viola, 
+                 instrument.Harp, instrument.ElectricGuitar, instrument.Ukulele, 
+                 instrument.Banjo, instrument.Piccolo, instrument.AltoSaxophone, 
+                 instrument.Trumpet, instrument.Clarinet, instrument.Flute,
+                 instrument.Violin, instrument.Soprano, instrument.Oboe,
+                 instrument.Tuba, instrument.Sitar, instrument.Ocarina,
+                 instrument.Piano]
+
+        sc = scale.MajorScale()
+        pitches = sc.getPitches('c2', 'c5')
+        #random.shuffle(pitches)
+
+        s = stream.Stream()
+        for i, p in enumerate(pitches):
+            n = note.Note(p)
+            n.quarterLength = 1.5
+            inst = iList[i]() # call to create instance
+            s.append(inst)
+            s.append(n)
+
+ 
+        mts = streamsToMidiTracks(s)
+        s.show('midi')
 
         
 

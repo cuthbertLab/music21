@@ -446,8 +446,9 @@ class KeySignature(music21.Music21Object):
         <music21.note.Note B->
 
 
-        Set all notes to the correct notes for a key using the note's Context:        
-        
+        Set all notes to the correct notes for a key using the 
+        note's Key Context.  Before:        
+      
         
         >>> from music21 import *
         >>> s1 = stream.Stream()
@@ -457,13 +458,28 @@ class KeySignature(music21.Music21Object):
         >>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
         >>> s1.append(note.WholeNote("A"))
         >>> s1.append(note.WholeNote("F#"))
+        >>> #_DOCS_SHOW s1.show()
+
+
+
+        .. image:: images/keyAccidentalByStep_Before.*
+            :width: 400
+
+  
+        After:
+
+
         >>> for n in s1.notes:
         ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
         >>> #_DOCS_SHOW s1.show()
 
 
+
         .. image:: images/keyAccidentalByStep.*
             :width: 400
+
+  
+
 
 
         OMIT_FROM_DOCS

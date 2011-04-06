@@ -2648,12 +2648,28 @@ class Stream(music21.Music21Object):
         and thus causes a gap in measureOffsetMap from 24.0 to 34.0.
 
 
+        .. image:: images/streamMeasureOffsetMapBWV324.*
+            :width: 572
+
+
+
         >>> from music21 import *
         >>> chorale = corpus.parse('bach/bwv324.xml')
         >>> alto = chorale.parts['alto']
         >>> altoMeasures = alto.measureOffsetMap()
         >>> sorted(altoMeasures.keys())
         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]
+
+
+        altoMeasures is a dictionary (hash) of the measures
+        that are found in the alto part, so we can get
+        the measure beginning on offset 4.0 (measure 2)
+        and display it (though it's the only measure
+        found at offset 4.0, there might be others as
+        in example 2, so we need to call altoMeasures[4.0][0]
+        to get this measure.):
+
+
         >>> altoMeasures[4.0]
         [<music21.stream.Measure 2 offset=4.0>]
         >>> altoMeasures[4.0][0].show('text')
@@ -2663,21 +2679,16 @@ class Stream(music21.Music21Object):
         {3.0} <music21.note.Note F#>
         
 
-        How to get all the measures from all parts (not the
-        most efficient way, but it works!):
+        Example 2: How to get all the measures from all parts (not the
+        most efficient way, but it works!).  Note that
+        you first need to call semiFlat, which finds all containers
+        (and other elements) nested inside all parts:
         
         
         >>> choraleSemiFlat = chorale.semiFlat
         >>> choraleMeasures = chorale.measureOffsetMap()
         >>> choraleMeasures[4.0]
         [<music21.stream.Measure 2 offset=4.0>, <music21.stream.Measure 2 offset=4.0>, <music21.stream.Measure 2 offset=4.0>, <music21.stream.Measure 2 offset=4.0>]
-
-
-
-        .. image:: images/streamMeasureOffsetMapBWV324.*
-            :width: 572
-
-
 
 
 

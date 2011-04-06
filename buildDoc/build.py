@@ -57,6 +57,7 @@ from music21 import instrument
 from music21 import interval
 from music21 import intervalNetwork
 
+from music21 import medren
 from music21 import metadata
 from music21 import meter
 
@@ -143,7 +144,8 @@ MODULES = [
     instrument,
     interval, 
     intervalNetwork,
-
+    
+    medren,
     meter, 
     metadata,
 

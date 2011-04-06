@@ -2,7 +2,9 @@
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
+  <movement-title>Gloria, Q15</movement-title>
   <identification>
+    <creator type="composer">D. Luca</creator>
     <encoding>
       <software>Finale 2010 for Windows</software>
       <software>Dolet Light for Finale 2010</software>
