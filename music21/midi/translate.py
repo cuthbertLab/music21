@@ -1573,7 +1573,7 @@ class Test(unittest.TestCase):
 
  
         mts = streamsToMidiTracks(s)
-        s.show('midi')
+        #s.show('midi')
 
         
 

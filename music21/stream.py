@@ -5728,7 +5728,13 @@ class Stream(music21.Music21Object):
 #             # do inplace transpositions on the deepcopy
 #             p.transpose(value, inPlace=True)            
 
-        for e in post.getElementsByClass(classFilterList=classFilterList): 
+#         for e in post.getElementsByClass(classFilterList=classFilterList): 
+#             e.transpose(value, inPlace=True)            
+    
+        # this will get all elements at this level and downward. 
+        for e in post._yieldElementsDownward(streamsOnly=False,     
+                restoreActiveSites=True, 
+                classFilter=classFilterList):
             e.transpose(value, inPlace=True)            
 
         if not inPlace:
@@ -14009,10 +14015,10 @@ class Test(unittest.TestCase):
         self.assertEqual(str(pitch1), '<music21.note.Note C#>')
         self.assertEqual(str(pitch2), '<music21.note.Note F#>')
 
-        # cannot transpose a part alone; need to get a flat representation
+        # can now transpose a part alone as is recursive
         p2 = p1.transpose('P4', inPlace=False)
         self.assertEqual(str(p1.flat.notes[0]), '<music21.note.Note C#>')
-        self.assertEqual(str(p2.flat.notes[0]), '<music21.note.Note C#>')
+        self.assertEqual(str(p2.flat.notes[0]), '<music21.note.Note F#>')
 
         p2 = p1.flat.transpose('P4', inPlace=False)
         self.assertEqual(str(p1.flat.notes[0]), '<music21.note.Note C#>')
