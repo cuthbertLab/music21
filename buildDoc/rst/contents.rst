@@ -17,6 +17,12 @@ Music21 Documentation
    overviewMeters
    examples
    install
+   installMac
+   installWindows
+   installLinux
+   installAdvanced
+   installAdditional
+   tutorialFinaleMac
    about
    applications
    environment
@@ -68,6 +74,7 @@ Module Reference
    moduleInstrument
    moduleInterval
    moduleIntervalNetwork
+   moduleMedren
    moduleMeter
    moduleMetadata
    moduleMidiBase
