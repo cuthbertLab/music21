@@ -1495,6 +1495,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     # set to zero for each measure
     offsetMeasureNote = 0 # offset of note w/n measure        
     mxNoteList = [] # for accumulating notes in chords
+    mxLyricList = [] # for accumulating lyrics assigned to chords
     for i in range(len(mxMeasure)):
 
         # try to get the next object for chord comparisons
@@ -1578,6 +1579,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 if mxNote.get('chord') is True:
                     mxNoteList.append(mxNote)
                     offsetIncrement = 0
+                    # store lyrics for latter processing
+                    for mxLyric in mxNote.lyricList:
+                        mxLyricList.append(mxLyric)
                 else:
                     #n = note.Note()
                     #n.mx = mxNote
@@ -1589,10 +1593,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         m.insert(offsetMeasureNote, n)
                     offsetIncrement = n.quarterLength
 
-                for mxLyric in mxNote.lyricList:
-                    lyricObj = note.Lyric()
-                    lyricObj.mx = mxLyric
-                    n.lyrics.append(lyricObj)
+                    for mxLyric in mxNote.lyricList:
+                        lyricObj = note.Lyric()
+                        lyricObj.mx = mxLyric
+                        n.lyrics.append(lyricObj)
+
                 if mxNote.get('notationsObj') is not None:
                     for mxObjSub in mxNote.get('notationsObj'):
                         # deal with ornaments, strill, etc
@@ -1616,12 +1621,20 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 c = chord.Chord()
                 # TODO: use chord conversion
                 c.mx = mxNoteList
+                # add any accumulated lyrics
+                for mxLyric in mxLyricList:
+                    lyricObj = note.Lyric()
+                    lyricObj.mx = mxLyric
+                    c.lyrics.append(lyricObj)
+
                 _addToStaffReference(mxNoteList, c, staffReference)
                 if useVoices:
                     m.voices[mxNote.voice].insert(offsetMeasureNote, c)
                 else:
                     m.insert(offsetMeasureNote, c)
                 mxNoteList = [] # clear for next chord
+                mxLyricList = []
+
                 offsetIncrement = c.quarterLength
             # only increment Chords after completion
             offsetMeasureNote += offsetIncrement
