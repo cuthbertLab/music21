@@ -22,6 +22,7 @@ Build and upload music21 in three formats: egg, exe, and tar.
 Simply call from the command line.
 '''
 
+PY = 'python2.6'
 
 class Distributor(object):
     def __init__(self):
@@ -78,11 +79,11 @@ class Distributor(object):
         '''Build all distributions. Update and rename file paths if necessary; remove extract build produts.
         '''
         # call setup.py
-        os.system('cd %s; python setup.py bdist_egg' % self.fpPackageDir)
-        os.system('cd %s; python setup.py bdist_wininst' % 
-                    self.fpPackageDir)
-        os.system('cd %s; python setup.py sdist' % 
-                    self.fpPackageDir)
+        os.system('cd %s; %s setup.py bdist_egg' % (self.fpPackageDir, PY))
+        os.system('cd %s; %s setup.py bdist_wininst' % 
+                    (self.fpPackageDir, PY))
+        os.system('cd %s; %s setup.py sdist' % 
+                    (self.fpPackageDir, PY))
 
         #os.system('cd %s; python setup.py sdist' % self.fpPackageDir)
         self._updatePaths()
@@ -136,9 +137,10 @@ class Distributor(object):
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
-    a = Distributor()
-    a.build()
-    a.upload()
+    import sys
+    d = Distributor()
+    d.build()
+    #a.upload()
 
 
 

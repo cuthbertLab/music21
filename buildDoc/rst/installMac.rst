@@ -1,9 +1,8 @@
 .. _installMac:
 
 
-Installing Music21 and Python on Mac
+Installing Music21 on Mac
 ============================================
-
 
 
 
@@ -35,6 +34,11 @@ it should display something like:
 
     Python 2.6.2
 
+
+.. image:: images/macScreenPythonVersion.*
+    :width: 600
+
+
 if so, you're okay.  If not, go to http://www.python.org/download
 and download a newer version.  Multiple versions of Python can exist 
 on a single computer without any problems. 
@@ -47,12 +51,12 @@ Download the most-recent music21 package from the following URL.
 
     http://code.google.com/p/music21/downloads/list
 
-Linux / Mac OS X users should download the .tar.gz file. 
+Mac OS X users should download the .tar.gz file. 
 
 
 
 
-Install Music21
+The Installation Destination
 ----------------------------------------------
 
 After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called 'site-packages'. The site-packages directory is located in different places depending on your platform. To find where your site-packages directory is located, you can enter the following command in the Python interpreter:
@@ -60,43 +64,66 @@ After downloading the music21 toolkit, the package is installed like any other P
     >>> import distutils.sysconfig
     >>> print(distutils.sysconfig.get_python_lib())
 
-First, uncompress the .tar.gz file. 
+.. image:: images/macScreenSitePackages.*
+    :width: 600
 
-Open a shell or terminal (e.g. Applications -> Utilities -> Terminal), 
-enter the outer-most music21 directory (using `cd`), and use 
-`python` to execute the setup.py file with the 'install' argument: ::
 
-    $ cd /path/to/dir/music21-version
-    $ python setup.py install
+Installing Music21 with the Configuration Assistant
+-----------------------------------------------------
 
-On Mac OS X, and possibly on other systems, you may need special 
-permission to write in the Python site-packages directory. An 
-easy way to temporarily gain this permission is to use the 
-`sudo` command. If the above returns a permissions error, 
-try the following: ::
 
-    $ sudo python setup.py install
+The Configuration Assistant provides a convenient way to install and configure music21. 
 
-If you cannot gain permission to install music21 in the Python 
-site-packages directory, you can still run and use music21. 
-Place the music21 folder anywhere convenient and note the file path. 
-Start Python, and add this file path to Python's list of directories 
-searched for modules:
+First, uncompress the .tar.gz file. You will see the following files stored in the directory.
 
-    >>> import sys
-    >>> sys.path.append('/Users/ariza/Desktop/music21')
-    >>>
 
-This can be done permanently by adding the music21 directory to the 
-Python PYTHONPATH environment variable. This is not necessary if 
-music21 is installed in the Python site-packages directory. See 
-the following link for more details:
+.. image:: images/macScreenMusic21Folder.*
+    :width: 600
 
-http://docs.python.org/using/cmdline.html#envvar-PYTHONPATH
 
-After successful installation, proceed to :ref:`quickStart` to begin 
-using music21.
+TODO:
 
+
+.. image:: images/macScreenConfigAssistantStart.*
+    :width: 600
+
+
+TODO:
+
+
+.. image:: images/macScreenConfigAssistantStart.*
+    :width: 600
+
+
+TODO:
+
+.. image:: images/macScreenConfigAssistantReader.*
+    :width: 600
+
+
+TODO:
+
+.. image:: images/macScreenConfigAssistantFinaleInstall.*
+    :width: 600
+
+
+TODO:
+
+.. image:: images/macScreenConfigAssistantSelect.*
+    :width: 600
+
+
+TODO:
+
+.. image:: images/macScreenConfigAssistantQuestions.*
+    :width: 600
+
+
+TODO:
+
+
+.. image:: images/macScreenShow.*
+    :width: 600
 
 
 

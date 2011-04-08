@@ -1,7 +1,7 @@
 .. _installWindows:
 
 
-Installing Music21 and Python in Windows
+Installing Music21 in Windows
 ============================================
 
 
