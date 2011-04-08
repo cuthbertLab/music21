@@ -26,11 +26,8 @@ Alternative Installation Methods
 The above instructions are for general users. If you are an advanced user and have installed other Python packages before, or want to use an EGG, SVN, PIP, or setuptools, you should read :ref:`installAdvanced`.
 
 
-
-
-
 Installation Help
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 If you have followed all the instructions and encounter problems, contact the music21 group for help:
 

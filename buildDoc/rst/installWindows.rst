@@ -92,3 +92,18 @@ You may want to configure your Environment to support opening MusicXML files in 
 
 
 
+
+
+
+Installation Help
+-------------------------------
+
+If you have followed all the instructions and encounter problems, contact the music21 group for help:
+
+http://groups.google.com/group/music21list
+
+
+
+
+
+

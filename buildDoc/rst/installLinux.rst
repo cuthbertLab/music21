@@ -13,7 +13,7 @@ The following instructions are for general users. If you are an advanced user an
 
 
 
-Check your version of Python
+Check Your Version of Python
 ----------------------------------------------
 
 Music21 requires Python 2.6 to run. Python 3 is not yet supported. 
@@ -44,13 +44,21 @@ Linux users should download the .tar.gz file.
 
 
 
-Install Music21
+The Installation Destination
 ----------------------------------------------
+
 
 After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called 'site-packages'. The site-packages directory is located in different places depending on your system. To find where your site-packages directory is located, you can enter the following command in the Python interpreter:
 
     >>> import distutils.sysconfig
     >>> print(distutils.sysconfig.get_python_lib())
+
+
+
+
+Installing Music21 with setup.py
+----------------------------------------------
+
 
 First, uncompress the .tar.gz file. 
 
@@ -94,7 +102,25 @@ begin using music21.
 
 You may need to install additional software to take advantage of some features of music21. For information on additional software you may need, see :ref:`installAdditional`.
 
-You may want to configure your Environment to support opening MusicXML files in Finale or adjusting other settings. To do so, see :ref:`environment`.
+You may want to configure your Environment to support opening MusicXML files in MuseData or adjusting other settings. To do so, see :ref:`environment`.
+
+
+
+
+
+
+Installation Help
+-------------------------------
+
+If you have followed all the instructions and encounter problems, contact the music21 group for help:
+
+http://groups.google.com/group/music21list
+
+
+
+
+
+
 
 
 
