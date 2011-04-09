@@ -1725,17 +1725,6 @@ class Stream(music21.Music21Object):
                     found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
                     break # match first class and break to next e
 
-#                 if isinstance(className, str):
-#                     if className in eClasses:
-#                         found.insert(e.getOffsetBySite(self), e,         
-#                             ignoreSort=True)
-#                         break # match first class and break to next e
-#                 # old method uses isClass matching
-#                 #elif e.isClass(className):
-#                 elif isinstance(e, className):
-#                     found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
-#                     break # match first class and break to next e
-
         for e in self._endElements:
             eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
@@ -1744,19 +1733,6 @@ class Stream(music21.Music21Object):
 
                     found.storeAtEnd(e, ignoreSort=True)
                     break # match first class and break to next e
-
-
-                # new method uses string matching of .classes attribute
-                # temporarily check to see if this is a string
-#                 if isinstance(className, str):
-#                     if className in eClasses:
-#                         found.storeAtEnd(e, ignoreSort=True)
-#                         break # match first class and break to next e
-#                 # old method uses isClass matching
-#                 #elif e.isClass(className):
-#                 elif isinstance(e, className):
-#                     found.storeAtEnd(e, ignoreSort=True)
-#                     break # match first class and break to next e
 
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
@@ -1811,8 +1787,7 @@ class Stream(music21.Music21Object):
         for e in self._elements:
             eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
-                if className in eClasses or isinstance(e, className):
-                #if e.isClass(className):
+                if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
                     break # if a match to any of the classes, break
                 # only insert after all no match to all classes   
                 found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
@@ -1820,8 +1795,7 @@ class Stream(music21.Music21Object):
         for e in self._endElements:
             eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
-                if className in eClasses or isinstance(e, className):
-                #if e.isClass(className):
+                if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
                     break # if a match to any of the classes, break
                 # only insert after all no match to all classes   
                 found.storeAtEnd(e, ignoreSort=True)
@@ -5952,7 +5926,7 @@ class Stream(music21.Music21Object):
                     e.duration.quarterLength = qlNew
 
 
-    def expand(self):
+    def expandRepeats(self):
         '''Expand all repeats, as well as all repeat indications given by text expressions such as D.C. al Segno.
 
         This method always returns a new Stream, with deepcopies of all contained elements at all level.
@@ -8195,6 +8169,7 @@ class Score(Stream):
         '''This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
         '''
         post = Score()
+        # this calls on Music21Object, transfers id, groups
         post.mergeAttributes(self)
         # note that this will strip all objects that are not Parts
         for p in self.getElementsByClass('Part'):
@@ -8230,6 +8205,7 @@ class Score(Stream):
         '''
 
         post = Score()
+        # this calls on Music21Object, transfers id, groups
         post.mergeAttributes(self)
         # note that this will strip all objects that are not Parts
         for p in self.getElementsByClass('Part'):
@@ -8246,7 +8222,7 @@ class Score(Stream):
         return post
 
 
-    def expand(self):
+    def expandRepeats(self):
         '''Expand all repeats, as well as all repeat indications given by text expressions such as D.C. al Segno.
 
         This method always returns a new Stream, with deepcopies of all contained elements at all level.
@@ -8255,10 +8231,16 @@ class Score(Stream):
         TODO: overidden method on Score
         '''
         post = Score()
-        # TODO: copy all things that are not Parts
+        # this calls on Music21Object, transfers id, groups
         post.mergeAttributes(self)
+        
+        # get all things in the score that are not Parts
+        for e in self.getElementsNotOfClass('Part'):
+            eNew = copy.deepcopy(e) # assume that this is needed
+            post.insert(e.getOffsetBySite(self), eNew)
+
         for p in self.getElementsByClass('Part'):
-            post.insert(0, p.expand())
+            post.insert(0, p.expandRepeats())
         #TODO: gather spanners?
         return post
         

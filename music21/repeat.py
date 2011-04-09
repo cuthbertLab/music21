@@ -122,7 +122,7 @@ class Expander(object):
         if self._srcMeasureCount == 0:
             raise ExpanderException('no measures found in the source stream to be expanded')
 
-    def _stripRepeatBarlines(self, m):
+    def _stripRepeatBarlines(self, m, newStyle='light-light'):
         '''Strip barlines if they are repeats, and replace with Barlines that are of the same style. Modify in place.
         '''
         # bar import repeat to make Repeat inherit from RepeatMark
@@ -135,14 +135,14 @@ class Expander(object):
             if lb.style in [None, 'none']:
                 m.leftBarline = None
             else:
-                environLocal.printDebug(['Expander._stripRepeatBarlines: add new left barline based on style:', lb.style])
-                m.leftBarline = bar.Barline(lb.style)
+                #environLocal.printDebug(['Expander._stripRepeatBarlines: add new left barline based on style:', lb.style])
+                m.leftBarline = bar.Barline(newStyle)
 
         if rb is not None and 'Repeat' in rb.classes:
             if rb.style in [None, 'none']:
                 m.rightBarline = None
             else:
-                m.rightBarline = bar.Barline(rb.style)
+                m.rightBarline = bar.Barline(newStyle)
 
 
     def repeatBarsAreCoherent(self):
@@ -195,10 +195,17 @@ class Expander(object):
 
 
     def process(self):
-        '''Process and return a new Stream.
+        '''Process and return a new Stream, likely a Part.
         '''
 
         new = self._src.__class__()
+
+        for e in self._src.getElementsNotOfClass('Measure'):
+            eNew = copy.deepcopy(e) # assume that this is needed
+            # the offset positions used here may not be relevant 
+            # in the new new stream
+            post.insert(e.getOffsetBySite(self._src), eNew)
+
 
         # need to gather everything that is not a Meausre (e.g., Instrument)
         # and add copies to new
@@ -366,8 +373,14 @@ class Test(unittest.TestCase):
         from music21 import converter
         
         s = converter.parse(testFiles.draughtOfAle)
+        self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 18)
+        self.assertEqual(s.metadata.title, '"A Draught of Ale"    (jig)     0912')
         #s.show()
-        post = s.expand()
+        post = s.expandRepeats()
+        self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 36)
+        # make sure metadata is copied
+        self.assertEqual(post.metadata.title, '"A Draught of Ale"    (jig)     0912')
+
         # add tests
         #post.show()
 
