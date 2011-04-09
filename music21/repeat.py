@@ -110,7 +110,7 @@ class ExpanderException(Exception):
     pass
 
 class Expander(object):
-    '''Expand a single Part or Part-like stream.
+    '''Expand a single Part or Part-like stream with repeats.
     '''
 
     def __init__(self, streamObj):
@@ -118,7 +118,6 @@ class Expander(object):
         # get and store the source measure count
         self._srcMeasureStream = self._src.getElementsByClass('Measure')
         self._srcMeasureCount = len(self._srcMeasureStream)
-        
         if self._srcMeasureCount == 0:
             raise ExpanderException('no measures found in the source stream to be expanded')
 
@@ -127,29 +126,18 @@ class Expander(object):
         '''
         # bar import repeat to make Repeat inherit from RepeatMark
         from music21 import bar
-
         lb = m.leftBarline
         rb = m.rightBarline
-
         if lb is not None and 'Repeat' in lb.classes:
-            if lb.style in [None, 'none']:
-                m.leftBarline = None
-            else:
-                #environLocal.printDebug(['Expander._stripRepeatBarlines: add new left barline based on style:', lb.style])
-                m.leftBarline = bar.Barline(newStyle)
-
+            environLocal.printDebug(['inserting new barline: %s' % newStyle])
+            m.leftBarline = bar.Barline(newStyle)
         if rb is not None and 'Repeat' in rb.classes:
-            if rb.style in [None, 'none']:
-                m.rightBarline = None
-            else:
-                m.rightBarline = bar.Barline(newStyle)
+            m.rightBarline = bar.Barline(newStyle)
 
 
-    def repeatBarsAreCoherent(self):
+    def _repeatBarsAreCoherent(self):
         '''Check that all repeat bars are paired properly.
         '''
-        # TODO: add case where we have a end, but not a start at the beginning
-        # of a work
         startCount = 0
         endCount = 0
         countBalance = 0
@@ -189,87 +177,147 @@ class Expander(object):
         environLocal.printDebug(['matched start and end repeat barline count of: %s/%s' % (startCount, endCount)])
         return True
 
-    
 
 
-    def process(self):
-        '''Process and return a new Stream, likely a Part.
+    def _hasRepeat(self, streamObj):
+        '''Return True if this Stream of Measures has a repeat pair left to process.
         '''
+        for i in range(len(streamObj)):
+            m = streamObj[i]
+            lb = m.leftBarline
+            rb = m.rightBarline
 
-        new = self._src.__class__()
+            # this does not check for well-balanced formations, 
+            # only presence
+            if (lb is not None and 'Repeat' in lb.classes):
+                return True
+            if (rb is not None and 'Repeat' in rb.classes and 
+                rb.direction == 'end'):
+                return True
+        return False
 
-        for e in self._src.getElementsNotOfClass('Measure'):
-            eNew = copy.deepcopy(e) # assume that this is needed
-            # the offset positions used here may not be relevant 
-            # in the new new stream
-            post.insert(e.getOffsetBySite(self._src), eNew)
-
-
-        # need to gather everything that is not a Meausre (e.g., Instrument)
-        # and add copies to new
-        
-        # renumber measures starting with the first number found here
-        number = self._srcMeasureStream[0].number
-        if number is None:
-            number = 1
-        # may define space not covered by a coda
-        codaGapIndices = []
-        segnoIndex = []
-
-        # bar designated repeat
-        barRepeatIndices = []
-        barRepeatOpen = False
+    
+    def _findInnermostRepeatIndices(self, streamObj):
+        '''Find the innermost repeat bars. Return raw index values.
+        For a single measure, this might be [2, 2]
+        For many contiguous measures, this might be [2, 3, 4, 5]
+        '''
+        # need to find only the first open and closed pair
+        startIndices = []
         # use index values instead of an interator
-        for i in range(self._srcMeasureCount):
+        for i in range(len(streamObj)):
             # iterate through each measure
-            m = copy.deepcopy(self._srcMeasureStream[i])
-
+            m = streamObj[i]
             lb = m.leftBarline
             rb = m.rightBarline
 
             if (lb is not None and 'Repeat' in lb.classes and 
                 lb.direction == 'start'):
-                barRepeatIndices.append(i)
-                barRepeatOpen = True
-            elif barRepeatOpen:
-                barRepeatIndices.append(i)
-
-            # after looking at the left barline, we can
-            m.number = number
-            new.append(m)
-            number += 1
+                startIndices.append(i)
 
             if (rb is not None and 'Repeat' in rb.classes and 
                 rb.direction == 'end'):
-                # handle case of a repeat given after the first bar
-                # without a start repeat
-                if not barRepeatOpen and len(barRepeatIndices) == 0:
+
+                # if this is the first end found and no starts found, 
+                # assume we are counting from zero
+                if len(startIndices) == 0:
                     # get from first to this one
                     barRepeatIndices = range(0, i+1)
-                else: # normal case, detected a start
-                    # must test as may have been added above
-                    if i not in barRepeatIndices:                    
-                        barRepeatIndices.append(i)
+                    break
+                # otherwise get the last start index
+                else:
+                    barRepeatIndices = range(startIndices[-1], i+1)
+                    break
+        return barRepeatIndices
 
-                # TODO: check for times; if found, multiply indices
-                barRepeatOpen = False
 
-            # strip now, after processing (will change in place)
-            self._stripRepeatBarlines(m)
+    def _processInnermostRepeat(self, streamObj):
+        '''Process and return a new Stream of Measures, likely a Part.
+        '''
+        # get class from src
+        new = streamObj.__class__()
 
-            # if bar repeat open has been closed, and we have repeat
-            # bar indices ready for processing, add these new measures
-            if not barRepeatOpen and len(barRepeatIndices) > 0:
-                for j in barRepeatIndices:
-                    mSub = copy.deepcopy(self._srcMeasureStream[j])
-                    self._stripRepeatBarlines(mSub)
-                    mSub.number = number
-                    new.append(mSub)
-                    number += 1
-                barRepeatIndices = []
+        # need to gather everything that is not a Meausre (e.g., Instrument)
+        # and add copies to new
+        
+        repeatIndices = self._findInnermostRepeatIndices(streamObj)
 
+        # renumber measures starting with the first number found here
+        number = streamObj[0].number
+        if number is None:
+            number = 1
+
+        # use index values instead of an interator
+        i = 0
+        while i < len(streamObj):
+        #for i in range(len(streamObj)):
+            environLocal.printDebug(['processing measure index:', i, 'repeatIndices', repeatIndices])
+            # if this index is the start of the repeat
+            if i == repeatIndices[0]:
+                mLast = streamObj[repeatIndices[-1]]
+
+                # repeat times may be 0, 1, 2 or higher
+                # value of 2 is a normal repeat (original + repeat)
+                if mLast.rightBarline is None:
+                    environLocal.printDebug(['got an mLast with no right barline:', mLast])
+                    raise ExpanderException('cannot find an end repeat where expected')
+                else:
+                    repeatTimes = mLast.rightBarline.times
+                    if repeatTimes is None:
+                        repeatTimes = 2
+    
+                for times in range(repeatTimes):
+                # copy the range of measures; this will include the first
+                # pass
+                    # do indices directly
+                    for j in repeatIndices:
+                        mSub = copy.deepcopy(streamObj[j])
+                        # must do for each pass, b/c not changing source
+                        # stream
+                        environLocal.printDebug(['got j, repeatIndicies', j, repeatIndices])
+                        if j in repeatIndices:
+                            # adjust in place
+                            self._stripRepeatBarlines(mSub)
+                        mSub.number = number
+                        new.append(mSub)
+                        number += 1
+                # set i to next measure after mLast
+                i = repeatIndices[-1] + 1
+            # just add this measure
+            else:
+                # iterate through each measure, always add first
+                m = copy.deepcopy(streamObj[i])
+                m.number = number
+                new.append(m) # this may be the first version
+                number += 1
+                i += 1
         return new
 
+
+
+    def isExpandable(self):
+        '''Return True or False if this Stream is expandable.
+        '''
+        if not self._repeatBarsAreCoherent():
+            return False
+        return True
+
+
+    def process(self):
+        if not self.isExpandable():
+            raise ExpanderException('cannot expand Stream: badly formed repeats')
+
+        post = copy.deepcopy(self._srcMeasureStream)
+
+        # cyclically process inntermost, one at a time
+        while True:
+            post = self._processInnermostRepeat(post)
+            if self._hasRepeat(post):                        
+                environLocal.printDebug([
+                    'self._findInnermostRepeatIndices(post)', self._findInnermostRepeatIndices(post)])
+            else:
+                break # nothing left to process
+        return post
 
 
 #-------------------------------------------------------------------------------
@@ -304,8 +352,81 @@ class Test(unittest.TestCase):
 
         # check coherance
         ex = repeat.Expander(s)
-        self.assertEqual(ex.repeatBarsAreCoherent(), True)
+        self.assertEqual(ex._repeatBarsAreCoherent(), True)
+        self.assertEqual(ex._findInnermostRepeatIndices(s), [0])
 
+
+
+    def testRepeatCoherneceA(self):
+        from music21 import stream, bar, repeat, note
+
+        s = stream.Part()
+        m1 = stream.Measure()
+        m1.leftBarline = bar.Repeat(direction='start')
+        m1.rightBarline = bar.Repeat(direction='end', times=2)
+        m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
+
+        m2 = stream.Measure()
+
+        m3 = stream.Measure()
+        m3.leftBarline = bar.Repeat(direction='start')
+        #m3.rightBarline = bar.Repeat(direction='end', times=2)
+        m3.repeatAppend(note.Note('d4', quarterLength=1), 4)
+
+        s.append(m1)
+        s.append(m2)
+        s.append(m3)
+
+        # check coherance: will raise
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), False)
+        self.assertEqual(ex._findInnermostRepeatIndices(s), [0])
+
+
+    def testRepeatCoherneceB(self):
+        from music21 import stream, bar, repeat, note
+
+        # a nested repeat; acceptable
+        s = stream.Part()
+        m1 = stream.Measure()
+        m1.leftBarline = bar.Repeat(direction='start')
+        #m1.rightBarline = bar.Repeat(direction='end', times=2)
+        m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
+
+        m2 = stream.Measure()
+        m2.leftBarline = bar.Repeat(direction='start')
+        #m2.rightBarline = bar.Repeat(direction='end', times=2)
+        m2.repeatAppend(note.Note('b3', quarterLength=1), 4)
+
+        m3 = stream.Measure()
+        #m3.leftBarline = bar.Repeat(direction='start')
+        m3.rightBarline = bar.Repeat(direction='end', times=2)
+        m3.repeatAppend(note.Note('d4', quarterLength=1), 4)
+
+        m4 = stream.Measure()
+        #m4.leftBarline = bar.Repeat(direction='start')
+        m4.rightBarline = bar.Repeat(direction='end', times=2)
+        m4.repeatAppend(note.Note('f4', quarterLength=1), 4)
+
+        s.append(m1)
+        s.append(m2)
+        s.append(m3)
+        s.append(m4)
+
+        #s.show()
+
+        # check coherance
+        ex = repeat.Expander(s)
+        self.assertEqual(ex._repeatBarsAreCoherent(), True)
+        self.assertEqual(ex._findInnermostRepeatIndices(s), [1, 2])
+
+        post = ex.process()
+        #post.show()
+        self.assertEqual(len(post.getElementsByClass('Measure')), 12)
+        self.assertEqual(len(post.flat.notes), 48)
+        self.assertEqual([m.offset for m in post.getElementsByClass('Measure')], [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0])
+
+        self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')], ['G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4', 'G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4'])
 
     def testExpandRepeatA(self):
         from music21 import stream, bar, repeat, note
@@ -354,6 +475,7 @@ class Test(unittest.TestCase):
         s.append(m1)
         s.append(m2)
         s.append(m3)
+        #s.show('t')
 
         ex = repeat.Expander(s)
         post = ex.process()
@@ -363,82 +485,32 @@ class Test(unittest.TestCase):
         self.assertEqual([m.offset for m in post.getElementsByClass('Measure')], [0.0, 4.0, 8.0, 12.0, 16.0])
         self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')], ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'F3', 'F3', 'F3', 'F3', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
 
-#         post.show('t')
-#         post.show()
+        #post.show('t')
+        #post.show()
         
 
     def testExpandRepeatB(self):
         from music21.abc import testFiles
-        from music21 import converter
+        from music21 import converter, repeat
         
         s = converter.parse(testFiles.draughtOfAle)
         self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 18)
         self.assertEqual(s.metadata.title, '"A Draught of Ale"    (jig)     0912')
+        self.assertEqual(len(s.flat.notes), 88)
+
         #s.show()
+        ex = repeat.Expander(s.parts[0])
+        # check boundaries here
 
         post = s.expandRepeats()
         self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 36)
         # make sure metadata is copied
         self.assertEqual(post.metadata.title, '"A Draught of Ale"    (jig)     0912')
+        self.assertEqual(len(post.flat.notes), 88 * 2)
 
-        # add tests
         #post.show()
 
-    def testRepeatCoherneceA(self):
-        from music21 import stream, bar, repeat, note
 
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.leftBarline = bar.Repeat(direction='start')
-        m1.rightBarline = bar.Repeat(direction='end', times=2)
-        m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
-
-        m2 = stream.Measure()
-
-        m3 = stream.Measure()
-        m3.leftBarline = bar.Repeat(direction='start')
-        #m3.rightBarline = bar.Repeat(direction='end', times=2)
-        m3.repeatAppend(note.Note('d4', quarterLength=1), 4)
-
-        s.append(m1)
-        s.append(m2)
-        s.append(m3)
-
-        # check coherance
-        ex = repeat.Expander(s)
-        self.assertEqual(ex.repeatBarsAreCoherent(), False)
-
-        # a nested repeat
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.leftBarline = bar.Repeat(direction='start')
-        #m1.rightBarline = bar.Repeat(direction='end', times=2)
-        m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
-
-        m2 = stream.Measure()
-        m2.leftBarline = bar.Repeat(direction='start')
-        #m2.rightBarline = bar.Repeat(direction='end', times=2)
-        m2.repeatAppend(note.Note('d4', quarterLength=1), 4)
-
-        m3 = stream.Measure()
-        #m3.leftBarline = bar.Repeat(direction='start')
-        m3.rightBarline = bar.Repeat(direction='end', times=2)
-        m3.repeatAppend(note.Note('g3', quarterLength=1), 4)
-
-        m4 = stream.Measure()
-        #m4.leftBarline = bar.Repeat(direction='start')
-        m4.rightBarline = bar.Repeat(direction='end', times=2)
-        m4.repeatAppend(note.Note('d4', quarterLength=1), 4)
-
-
-        s.append(m1)
-        s.append(m2)
-        s.append(m3)
-        s.append(m4)
-
-        # check coherance
-        ex = repeat.Expander(s)
-        self.assertEqual(ex.repeatBarsAreCoherent(), True)
 
 
 
