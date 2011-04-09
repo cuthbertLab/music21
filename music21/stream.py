@@ -5929,10 +5929,10 @@ class Stream(music21.Music21Object):
     def expandRepeats(self):
         '''Expand all repeats, as well as all repeat indications given by text expressions such as D.C. al Segno.
 
-        This method always returns a new Stream, with deepcopies of all contained elements at all level.
+        This method always returns a new Stream, with deepcopies of all contained elements at all levels.
     
-        NOTE: preliminary implementation.
-        TODO: overidden method on Score
+        NOTE: This preliminary implementation only handles repeats designated with repeat signs.
+
         '''
         ex = repeat.Expander(self)
         return ex.process()
