@@ -2590,7 +2590,7 @@ class Music21Object(JSONSerializer):
         elif fmt == 'lily.png':
             # TODO check that these use environLocal 
             return self.lily.showPNG()
-        elif fmt == 'lily':
+        elif fmt in ['lily', 'lilypond']:
             return self.lily.showPNG()
 
         elif fmt in ['musicxml', 'midi']: # a format that writes a file
