@@ -109,13 +109,13 @@ class ActivityMatch(object):
 
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv8.6.xml')
-        >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
+        >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat.sorted)
         >>> am.pitchToDynamic()
         Traceback (most recent call last):
         CorrelateException: cannot create correlation an object that is not found in the Stream: <class 'music21.dynamics.Dynamic'>
 
         >>> s = corpus.parse('schumann/opus41no1', 2)
-        >>> am = analysis.correlate.ActivityMatch(s[0].flat.sorted)
+        >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat.sorted)
         >>> data = am.pitchToDynamic()
         >>> len(data)
         427
@@ -213,7 +213,7 @@ class Test(unittest.TestCase):
         a = corpus.parse('schumann/opus41no1', 2)
 
         # just get the soprano part
-        b = ActivityMatch(a[0].flat.sorted)
+        b = ActivityMatch(a.parts[0].flat.sorted)
         dataPairs = b.pitchToDynamic()
         #print dataPairs
         # previous pair count was 401

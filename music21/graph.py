@@ -1567,7 +1567,7 @@ class PlotStream(object):
 
         >>> from music21 import corpus
         >>> s = corpus.parse('bach/bwv324.xml')
-        >>> a = PlotStream(s[0])
+        >>> a = PlotStream(s.parts[0])
         >>> [x for x, y in a.ticksPitchSpaceUsage(hideUnused=True)]
         [64, 66, 67, 69, 71, 72]
 
@@ -3691,35 +3691,35 @@ class Test(unittest.TestCase):
     def testPlotPitchSpaceDurationCount(self):
         from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
-        b = PlotScatterWeightedPitchSpaceQuarterLength(a[0].flat, doneAction=None,
+        b = PlotScatterWeightedPitchSpaceQuarterLength(a.parts[0].flat, doneAction=None,
                         title='Bach (soprano voice)')
         b.process()
 
     def testPlotPitchSpace(self):
         from music21 import corpus      
         a = corpus.parse('bach')
-        b = PlotHistogramPitchSpace(a[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b = PlotHistogramPitchSpace(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
 
     def testPlotPitchClass(self):
         from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramPitchClass(a[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b = PlotHistogramPitchClass(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
 
     def testPlotQuarterLength(self):
         from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramQuarterLength(a[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b = PlotHistogramQuarterLength(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
 
     def testPitchDuration(self):
         from music21 import corpus      
         a = corpus.parse('schumann/opus41no1', 2)
-        b = PlotScatterPitchSpaceDynamicSymbol(a[0].flat, doneAction=None, title='Schumann (soprano voice)')
+        b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schumann (soprano voice)')
         b.process()
 
-        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a[0].flat, doneAction=None, title='Schumann (soprano voice)')
+        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schumann (soprano voice)')
         b.process()
 
         

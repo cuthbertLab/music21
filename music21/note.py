@@ -1444,7 +1444,7 @@ class Test(unittest.TestCase):
             s = corpus.parse(work)
             # always use tenor line    
             found = []
-            for n in s[2].flat.notes:
+            for n in s.parts[2].flat.notes:
                 n.lyric = n.beatStr
                 found.append(n.beat)
             

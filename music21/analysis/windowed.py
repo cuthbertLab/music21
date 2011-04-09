@@ -195,7 +195,7 @@ class WindowedAnalysis(object):
         >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> # placing one part into analysis
-        >>> wa = WindowedAnalysis(s[0], p)
+        >>> wa = WindowedAnalysis(s.parts[0], p)
         >>> x, y, z = wa.process(1, 1, includeTotalWindow=False)
         >>> len(x) # we only have one series of windows
         1

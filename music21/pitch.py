@@ -3381,14 +3381,14 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         s = corpus.parse('bwv438.xml')
-        tenorMeasures = s[2].getElementsByClass('Measure')
+        tenorMeasures = s.parts[2].getElementsByClass('Measure')
         pAltered = tenorMeasures[0].pitches[1]
         self.assertEqual(pAltered.accidental.name, 'flat')
         self.assertEqual(pAltered.accidental.displayType, 'normal')
         # in key signature, so shuold not be shown
         self.assertEqual(pAltered.accidental.displayStatus, False)
 
-        altoMeasures = s[1].getElementsByClass('Measure')
+        altoMeasures = s.parts[1].getElementsByClass('Measure')
         pAltered = altoMeasures[6].pitches[2]
         self.assertEqual(pAltered.accidental.name, 'sharp')
         self.assertEqual(pAltered.accidental.displayStatus, True)

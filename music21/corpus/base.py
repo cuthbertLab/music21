@@ -885,7 +885,7 @@ class Test(unittest.TestCase):
         for fp in getComposer('bach')[-5:]: # get the last 10
             s = parse(fp)
             # get keys from first part
-            keyStream = s[0].flat.getElementsByClass(key.KeySignature)
+            keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)
             keyObj = keyStream[0]
             environLocal.printDebug([keyObj])
 

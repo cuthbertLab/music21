@@ -120,7 +120,7 @@ def simple4a(show=True):
     #s[0].show()
 
     for movement in [0]:
-        sPart = s[movement]
+        sPart = s.parts[movement]
         iObj = sPart.getElementsByClass(instrument.Instrument)[0]
         titleStr = '%s, Movement %s, %s' % (work, movementNumber, iObj.bestName())
     
@@ -129,7 +129,7 @@ def simple4a(show=True):
         else:
             doneAction = 'write'
 
-        p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s[0].flat,
+        p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s.parts[0].flat,
              doneAction=doneAction, title=titleStr)
         p.process()
 

@@ -1158,7 +1158,7 @@ class Test(unittest.TestCase):
 
         mxString = testPrimitive.beams01
         a = parse(mxString)
-        part = a[0]
+        part = a.parts[0]
         notes = part.flat.notes
         beams = []
         for n in notes:
@@ -1173,13 +1173,12 @@ class Test(unittest.TestCase):
 
         mxString = testPrimitive.timeSignatures11c
         a = parse(mxString)
-        part = a[0]
+        part = a.parts[0]
 
 
         mxString = testPrimitive.timeSignatures11d
         a = parse(mxString)
-        part = a[0]
-
+        part = a.parts[0]
 
         notes = part.flat.notes
         self.assertEqual(len(notes), 11)
@@ -1190,7 +1189,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         mxString = testPrimitive.clefs12a
         a = parse(mxString)
-        part = a[0]
+        part = a.parts[0]
 
         clefs = part.flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 18)
@@ -1202,12 +1201,12 @@ class Test(unittest.TestCase):
         a = corpus.parse('luca')
 
         # there should be only one clef in each part
-        clefs = a[0].flat.getElementsByClass(clef.Clef)
+        clefs = a.parts[0].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
         self.assertEqual(clefs[0].sign, 'G')
 
         # second part
-        clefs = a[1].flat.getElementsByClass(clef.Clef)
+        clefs = a.parts[1].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
         self.assertEqual(clefs[0].octaveChange, -1)
         self.assertEqual(type(clefs[0]).__name__, 'Treble8vbClef')
@@ -1224,23 +1223,23 @@ class Test(unittest.TestCase):
         a = corpus.parse('mozart/k156/movement4')
 
         # violin part
-        clefs = a[0].flat.getElementsByClass(clef.Clef)
+        clefs = a.parts[0].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
         self.assertEqual(clefs[0].sign, 'G')
 
         # viola
-        clefs = a[2].flat.getElementsByClass(clef.Clef)
+        clefs = a.parts[2].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
         self.assertEqual(clefs[0].sign, 'C')
 
         # violoncello
-        clefs = a[3].flat.getElementsByClass(clef.Clef)
+        clefs = a.parts[3].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
         self.assertEqual(clefs[0].sign, 'F')
 
         # check time signatures
         # there are
-        ts = a[0].flat.getElementsByClass(meter.TimeSignature)
+        ts = a.parts[0].flat.getElementsByClass(meter.TimeSignature)
         self.assertEqual(len(ts), 1)
 
 
@@ -1248,7 +1247,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         mxString = testPrimitive.articulations01
         a = parse(mxString)
-        part = a[0]
+        part = a.parts[0]
 
         notes = part.flat.getElementsByClass(note.Note)
         self.assertEqual(len(notes), 4)
@@ -1269,7 +1268,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         mxString = testPrimitive.keySignatures13a
         a = parse(mxString)
-        part = a[0]
+        part = a.parts[0]
 
         keyList = part.flat.getElementsByClass(key.KeySignature)
         self.assertEqual(len(keyList), 46)
@@ -1295,7 +1294,7 @@ class Test(unittest.TestCase):
         from music21 import bar
         from music21.musicxml import testPrimitive
         a = parse(testPrimitive.barlines46a)
-        part = a[0]
+        part = a.parts[0]
         barlineList = part.flat.getElementsByClass(bar.Barline)
         self.assertEqual(len(barlineList), 11)
 

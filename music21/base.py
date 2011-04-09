@@ -2634,7 +2634,7 @@ class Music21Object(JSONSerializer):
 
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> [str(e.__class__) for e in s[0][2][3].derivationHierarchy]
+        >>> [str(e.__class__) for e in s[1][2][3].derivationHierarchy]
         ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"]
         ''')
 
@@ -3957,12 +3957,12 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus, clef, stream
         a = corpus.parse('bach/bwv324.xml')
-        measures = a[0].getElementsByClass('Measure') # measures of first part
+        measures = a.parts[0].getElementsByClass('Measure') # measures of first part
 
         # the parent of measures[1] is set to the new output stream
         self.assertEqual(measures[1].activeSite, measures)
         # the source Part should still be a context of this measure
-        self.assertEqual(measures[1].hasContext(a[0]), True)
+        self.assertEqual(measures[1].hasContext(a.parts[0]), True)
 
         # from the first measure, we can get the clef by using 
         # getElementsByClass
@@ -3970,10 +3970,10 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post[0], clef.TrebleClef), True)
 
         # make sure we can find offset in a flat representation
-        self.assertEqual(a[0].flat.getOffsetByElement(a[0][3]), None)
+        self.assertEqual(a.parts[0].flat.getOffsetByElement(a.parts[0][3]), None)
 
         # for the second measure
-        post = a[0][3].getContextByClass(clef.Clef)
+        post = a.parts[0][3].getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.TrebleClef), True)
 
         # for the second measure accessed from measures
@@ -3987,7 +3987,7 @@ class Test(unittest.TestCase):
         # all previous locations are still available as a context
         self.assertEqual(measures[3].hasContext(newStream), True)
         self.assertEqual(measures[3].hasContext(measures), True)
-        self.assertEqual(measures[3].hasContext(a[0]), True)
+        self.assertEqual(measures[3].hasContext(a.parts[0]), True)
         # we can still access the clef through this measure on this
         # new stream
         post = newStream[0].getContextByClass(clef.Clef)

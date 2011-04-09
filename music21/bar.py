@@ -76,6 +76,8 @@ class Barline(music21.Music21Object):
     _style = None
     _pause = None  # can be music21.expressions.Fermata object
     
+    classSortOrder = -5 
+
     def __init__(self, style = None):
         music21.Music21Object.__init__(self)
 
@@ -283,6 +285,28 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
    
+
+    def testSortorder(self):
+        from music21 import stream, bar, clef, note, metadata
+        m = stream.Measure()
+        b = bar.Repeat()
+        m.leftBarline = b
+        c = clef.BassClef()
+        m.append(c)
+        n = note.Note()
+        m.append(n)
+
+        # check sort order
+        self.assertEqual(m[0], b)
+        self.assertEqual(m[1], c)
+        self.assertEqual(m[2], n)
+
+        # if we add metadata, it sorts ahead of bar
+        md = metadata.Metadata()
+        m.insert(0, md)
+
+        self.assertEqual(m[0], md)
+        self.assertEqual(m[1], b)
 
 
 if __name__ == '__main__':

@@ -2411,7 +2411,7 @@ class Stream(music21.Music21Object):
 
         >>> from music21 import *
         >>> a = corpus.parse('bach/bwv324.xml')
-        >>> b = a[0].measures(4,6)
+        >>> b = a.parts[0].measures(4,6)
         >>> len(b)
         3
 
@@ -2570,7 +2570,7 @@ class Stream(music21.Music21Object):
 
         >>> from music21 import *
         >>> a = corpus.parse('bach/bwv324.xml')
-        >>> a[0].measure(3)
+        >>> a.parts[0].measure(3)
         <music21.stream.Measure 3 offset=0.0>
         '''
         # we must be able to obtain a measure from this (not a flat) 
@@ -5677,13 +5677,13 @@ class Stream(music21.Music21Object):
         >>> aInterval = interval.Interval('d5')
         
         >>> aStream = corpus.parse('bach/bwv324.xml')
-        >>> part = aStream[0]
-        >>> aStream[0].pitches[:10]
+        >>> part = aStream.parts[0]
+        >>> aStream.parts[0].pitches[:10]
         [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
-        >>> bStream = aStream[0].flat.transpose('d5')
+        >>> bStream = aStream.parts[0].flat.transpose('d5')
         >>> bStream.pitches[:10]
         [F5, A-5, F5, F5, F5, F5, G-5, F5, E-5, E-5]
-        >>> aStream[0].pitches[:10]
+        >>> aStream.parts[0].pitches[:10]
         [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
         >>> cStream = bStream.flat.transpose('a4')
         >>> cStream.pitches[:10]
@@ -6467,7 +6467,7 @@ class Stream(music21.Music21Object):
 
         >>> from music21 import corpus
         >>> a = corpus.parse('bach/bwv324.xml')
-        >>> voiceOnePitches = a[0].pitches
+        >>> voiceOnePitches = a.parts[0].pitches
         >>> len(voiceOnePitches)
         25
         >>> voiceOnePitches[0:10]
@@ -6546,7 +6546,7 @@ class Stream(music21.Music21Object):
 
         >>> from music21 import corpus
         >>> a = corpus.parse('bach/bwv324.xml')
-        >>> a[0].flat.attributeCount(note.Note, 'quarterLength')
+        >>> a.parts[0].flat.attributeCount(note.Note, 'quarterLength')
         {1.0: 12, 2.0: 11, 4.0: 2}
         '''
         post = {}
@@ -9493,7 +9493,7 @@ class Test(unittest.TestCase):
     def testExtractedNoteAssignLyric(self):
         from music21 import converter, corpus, text
         a = converter.parse(corpus.getWork('opus74no1', 3))
-        b = a[1] 
+        b = a.parts[1] 
         c = b.flat
         for thisNote in c.getElementsByClass(note.Note):
             thisNote.lyric = thisNote.name
@@ -9523,9 +9523,9 @@ class Test(unittest.TestCase):
         instObj = b.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
-        p = a[3] # get part
+        p = a.parts[3] # get part
         # a mesausre within this part has as its activeSite the part
-        self.assertEqual(p[10].activeSite, a[3])
+        self.assertEqual(p[10].activeSite, a.parts[3])
         instObj = p.getInstrument()
         self.assertEqual(instObj.partName, 'Cello')
 
@@ -10054,7 +10054,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         a = corpus.parse('bach/bwv324.xml')
 
-        mOffsetMap = a[0].measureOffsetMap()
+        mOffsetMap = a.parts[0].measureOffsetMap()
 
         self.assertEqual(sorted(mOffsetMap.keys()), 
             [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]  )
@@ -10074,7 +10074,7 @@ class Test(unittest.TestCase):
         a = corpus.parse('bach/bwv324.xml')
         # get notes from one measure
 
-        mOffsetMap = a[0].flat.measureOffsetMap(note.Note)
+        mOffsetMap = a.parts[0].flat.measureOffsetMap(note.Note)
         self.assertEqual(sorted(mOffsetMap.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]   )
 
         self.assertEqual(str(mOffsetMap[0.0]), '[<music21.stream.Measure 1 offset=0.0>]')
@@ -10086,13 +10086,13 @@ class Test(unittest.TestCase):
         # instead of storing a time value for locations, use an index 
         # count
 
-        m1 = a[0].getElementsByClass('Measure')[1]
+        m1 = a.parts[0].getElementsByClass('Measure')[1]
         mOffsetMap = m1.measureOffsetMap(note.Note)
         # offset here is that of measure that originally contained this note
         environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
         self.assertEqual(sorted(mOffsetMap.keys()), [4.0] )
 
-        m2 = a[0].getElementsByClass('Measure')[2]
+        m2 = a.parts[0].getElementsByClass('Measure')[2]
         mOffsetMap = m2.measureOffsetMap(note.Note)
         # offset here is that of measure that originally contained this note
         self.assertEqual(sorted(mOffsetMap.keys()), [8.0] )
@@ -10110,7 +10110,7 @@ class Test(unittest.TestCase):
         
         a = corpus.parse('bach/bwv4.8.xml')
         # alto line syncopated/tied notes accross bars
-        alto = a[1]
+        alto = a.parts[1]
         self.assertEqual(len(alto.flat.notes), 73)
         
         # offset map for measures looking at the part's Measures
@@ -10124,7 +10124,7 @@ class Test(unittest.TestCase):
         
         
         # after stripping ties, we have a stream with fewer notes
-        altoPostTie = a[1].stripTies()
+        altoPostTie = a.parts[1].stripTies()
         # we can get the length of this directly b/c we just of a stream of 
         # notes, no Measures
         self.assertEqual(len(altoPostTie.notes), 69)
@@ -10609,7 +10609,7 @@ class Test(unittest.TestCase):
 
         from music21 import corpus
         sBach = corpus.parse('bach/bwv324.xml')
-        partSoprano = sBach[0]
+        partSoprano = sBach.parts[0]
 
         c1 = partSoprano.flat.getElementsByClass(clef.Clef)[0]
         self.assertEqual(isinstance(c1, clef.TrebleClef), True)
@@ -10619,7 +10619,7 @@ class Test(unittest.TestCase):
         partSoprano.flat.replace(c1, c2)
 
         # all views of the Stream have been updated
-        cTest = sBach[0].flat.getElementsByClass(clef.Clef)[0]
+        cTest = sBach.parts[0].flat.getElementsByClass(clef.Clef)[0]
         self.assertEqual(isinstance(cTest, clef.AltoClef), True)
 
         s1 = Stream()
@@ -11269,7 +11269,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
-        ex = src[0].flat.notes[0:30]
+        ex = src.parts[0].flat.notes[0:30]
 
         self.assertEqual(ex.highestOffset, 38.0)
         self.assertEqual(ex.highestTime, 42.0)
@@ -11301,7 +11301,7 @@ class Test(unittest.TestCase):
         src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
         #environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'extracting notes:'])
-        ex = src[0].flat.notes[0:30]
+        ex = src.parts[0].flat.notes[0:30]
         # attach a couple of transformations
         s = Stream()
         for scalar in [.5, 1.5, 2, .25]:
@@ -11317,7 +11317,7 @@ class Test(unittest.TestCase):
         # second method: getting flattened stream
         src = corpus.parse('bach/bwv323.xml')
         # get notes from one part
-        ex = src[0].flat.notes
+        ex = src.parts[0].flat.notes
         s = Score()
         for scalar in [1, 2, .5, 1.5]:
             part = ex.augmentOrDiminish(scalar, inPlace=False)
@@ -12227,7 +12227,7 @@ class Test(unittest.TestCase):
 
         s = corpus.parse('bach/bwv66.6')
         # this has accidentals in measures 2 and 6
-        sSub = s[3].measures(2,6)
+        sSub = s.parts[3].measures(2,6)
         #sSub.show()
         # only notes that deviate from key signature are True
         self.assertEqual(collectAccidentalDisplayStatus(sSub), ['x', (u'C#', False), 'x', 'x', (u'E#', True), (u'F#', False), 'x', (u'C#', False), (u'F#', False), (u'F#', False), (u'G#', False), (u'F#', False), (u'G#', False), 'x', 'x', 'x', (u'C#', False), (u'F#', False), (u'G#', False), 'x', 'x', 'x', 'x', (u'E#', True), (u'F#', False)] )
@@ -12728,11 +12728,11 @@ class Test(unittest.TestCase):
         s.append(n2)
         self.assertEqual([e.offset for e in s], [0.0, 30.0, 50.0, 50.0, 50.0] )
         # sorting of objects is by class
-        self.assertEqual([e.classes[0] for e in s], ['Note', 'Note', 'Treble8vaClef', 'TimeSignature', 'Barline']  )
+        self.assertEqual([e.classes[0] for e in s], ['Note', 'Note', 'Barline', 'Treble8vaClef', 'TimeSignature']  )
         
         b2 = bar.Barline()
         s.storeAtEnd(b2)
-        self.assertEqual([e.classes[0] for e in s], ['Note', 'Note', 'Treble8vaClef', 'TimeSignature', 'Barline', 'Barline'] )
+        self.assertEqual([e.classes[0] for e in s], ['Note', 'Note', 'Barline', 'Barline', 'Treble8vaClef', 'TimeSignature'] )
 
 
 
@@ -13856,7 +13856,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bach/bwv66.6')
         # the part is not derived from anything yet
-        self.assertEqual([str(e.__class__) for e in s[0][2][3].derivationHierarchy], ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"])
+        self.assertEqual([str(e.__class__) for e in s[1][2][3].derivationHierarchy], ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"])
         
         # after extraction and changing activeSite, cannot find
         n = s.flat.notes[0]
@@ -13970,9 +13970,9 @@ class Test(unittest.TestCase):
 
 
         s = corpus.parse('bwv66.6')
-        m1 = s[1][1]
+        m1 = s[2][1] # cannot use parts here as breaks active site
         rElements = m1.recurse(direction='upward')
-        self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 'Instrument', 'Part', 'Score', 'Part', 'Part', 'Part', 'Metadata', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure'])
+        self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 'Instrument', 'Part', 'Metadata', 'Score', 'Part', 'Part', 'Part', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure'])
         self.assertEqual(len(rElements), 17)
 
 

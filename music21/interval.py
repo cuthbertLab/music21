@@ -2260,7 +2260,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bach/bwv66.6')
         # this has accidentals in measures 2 and 6
-        sSub = s[3].measures(2,6)
+        sSub = s.parts[3].measures(2,6)
         
         self.assertEqual(collectAccidentalDisplayStatus(sSub), 
                         ['x', False, 'x', 'x', True, False, 'x', False, False, False, False, False, False, 'x', 'x', 'x', False, False, False, 'x', 'x', 'x', 'x', True, False])

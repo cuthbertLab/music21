@@ -331,10 +331,10 @@ class Test(unittest.TestCase):
         from music21 import corpus
         import music21
         a = corpus.parse('opus41no1/movement2') # has dynamics!
-        b = a[0].flat.getElementsByClass(music21.dynamics.Dynamic)
+        b = a.parts[0].flat.getElementsByClass(music21.dynamics.Dynamic)
         self.assertEquals(len(b), 35)
 
-        b = a[0].flat.getElementsByClass(music21.dynamics.Wedge)
+        b = a.parts[0].flat.getElementsByClass(music21.dynamics.Wedge)
         self.assertEquals(len(b), 4)
 
 

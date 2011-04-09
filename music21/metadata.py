@@ -1098,7 +1098,7 @@ class Metadata(music21.Music21Object):
     In many cases, each Stream will have a single Metadata object at the zero offset position. 
     '''
 
-    #classSortOrder = -1 # TODO: check that this is a good value
+    classSortOrder = -10 
 
     def __init__(self, *args, **keywords):
         '''

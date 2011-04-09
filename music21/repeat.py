@@ -152,9 +152,7 @@ class Expander(object):
         # of a work
         startCount = 0
         endCount = 0
-
-        repeatOpen = 0 # increment decrement for open close
-        repeatBadOrder = False
+        countBalance = 0
 
         for m in self._srcMeasureStream:
             lb = m.leftBarline
@@ -163,29 +161,29 @@ class Expander(object):
             if lb is not None and 'Repeat' in lb.classes:
                 if lb.direction == 'start':
                     startCount += 1
-                    # if we try to open a new repeat and we have not closed
-                    # an old start yet, then we have a problem
-                    if repeatOpen == 1:
-                        repeatBadOrder = True
-                        break
-                    repeatOpen += 1
+                    countBalance += 1
                 else:
                     raise ExpanderException('a left barline is found that cannot be processed: %s, %s' % (m, lb))
 
             if rb is not None and 'Repeat' in rb.classes:
                 if rb.direction == 'end':
+                    # if this is the first of all repeats found, then we
+                    # have an acceptable case where the first repeat is omitted
+                    if countBalance == 0: # the first repeat found
+                        startCount += 1 # simulate first
+                        countBalance += 1 # simulate first
                     endCount += 1
-                    if repeatOpen != 1:
-                        repeatBadOrder = True
-                        break
-                    repeatOpen -= 1 # should now be zero
+                    countBalance -= 1
+
                 else:
                     raise ExpanderException('a right barline is found that cannot be processed: %s, %s' % (m, rb))
 
-        if repeatBadOrder:
-            environLocal.printDebug(['found repeats that are started before being ended, or vice versa: %s' % (m)])
+        if countBalance != 0:
+            environLocal.printDebug(['Repeats are not balanced: countBalance: %s' % (countBalance)])
             return False
+
         if startCount != endCount:
+            environLocal.printDebug(['start count not the same as end count: %s / %s' % (startCount, endCount)])
             return False
 
         environLocal.printDebug(['matched start and end repeat barline count of: %s/%s' % (startCount, endCount)])
@@ -223,6 +221,7 @@ class Expander(object):
         barRepeatOpen = False
         # use index values instead of an interator
         for i in range(self._srcMeasureCount):
+            # iterate through each measure
             m = copy.deepcopy(self._srcMeasureStream[i])
 
             lb = m.leftBarline
@@ -376,6 +375,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 18)
         self.assertEqual(s.metadata.title, '"A Draught of Ale"    (jig)     0912')
         #s.show()
+
         post = s.expandRepeats()
         self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 36)
         # make sure metadata is copied
@@ -408,7 +408,7 @@ class Test(unittest.TestCase):
         ex = repeat.Expander(s)
         self.assertEqual(ex.repeatBarsAreCoherent(), False)
 
-
+        # a nested repeat
         s = stream.Part()
         m1 = stream.Measure()
         m1.leftBarline = bar.Repeat(direction='start')
@@ -438,7 +438,7 @@ class Test(unittest.TestCase):
 
         # check coherance
         ex = repeat.Expander(s)
-        self.assertEqual(ex.repeatBarsAreCoherent(), False)
+        self.assertEqual(ex.repeatBarsAreCoherent(), True)
 
 
 
