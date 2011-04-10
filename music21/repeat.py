@@ -150,8 +150,15 @@ class Expander(object):
                 if lb.direction == 'start':
                     startCount += 1
                     countBalance += 1
-                else:
-                    raise ExpanderException('a left barline is found that cannot be processed: %s, %s' % (m, lb))
+
+                # ends may be encountered on left of bar
+                elif lb.direction == 'end':
+                    if countBalance == 0: # the first repeat found
+                        startCount += 1 # simulate first
+                        countBalance += 1 # simulate first
+                    endCount += 1
+                    countBalance -= 1
+
 
             if rb is not None and 'Repeat' in rb.classes:
                 if rb.direction == 'end':
@@ -211,25 +218,57 @@ class Expander(object):
             lb = m.leftBarline
             rb = m.rightBarline
 
-            if (lb is not None and 'Repeat' in lb.classes and 
-                lb.direction == 'start'):
-                startIndices.append(i)
-
+            if lb is not None and 'Repeat' in lb.classes: 
+                if lb.direction == 'start':
+                    startIndices.append(i)
+                # an end may be placed on the left barline; of the next measuer
+                # meaning that we only want up until the previous
+                elif lb.direction == 'end':
+                    #environLocal.printDebug(['found an end in left barline: %s' % lb])
+                    if len(startIndices) == 0:
+                        # get from first to this one
+                        barRepeatIndices = range(0, i)
+                        break
+                    else: # otherwise get the last start index
+                        barRepeatIndices = range(startIndices[-1], i)
+                        break
             if (rb is not None and 'Repeat' in rb.classes and 
                 rb.direction == 'end'):
-
                 # if this is the first end found and no starts found, 
                 # assume we are counting from zero
-                if len(startIndices) == 0:
-                    # get from first to this one
+                if len(startIndices) == 0: # get from first to this one
                     barRepeatIndices = range(0, i+1)
                     break
-                # otherwise get the last start index
-                else:
+                else: # otherwise get the last start index
                     barRepeatIndices = range(startIndices[-1], i+1)
                     break
         return barRepeatIndices
 
+
+    def _getEndObjects(self, streamObj, index):
+        '''Get the last measure to be processed in the repeat, as well as the measure that has the end barline. These may not be the same: if an end bar is placed on the left of measure that is not actually being copied. 
+
+        The `index` parameter is the last measure to be copied.
+        '''
+        mLast = streamObj[index]
+        rb = mLast.rightBarline
+        if (rb is not None and 'Repeat' in rb.classes and 
+            rb.direction == 'end'):
+            mEndBarline = mLast # they are the same
+            repeatTimes = rb.times
+        else:
+            # try the next measure
+            mEndBarline = streamObj[index+1]
+            lb = mEndBarline.leftBarline
+            if (lb is not None and 'Repeat' in lb.classes and 
+                lb.direction == 'end'):
+                repeatTimes = lb.times
+            else:
+                raise ExpanderException('cannto find an end Repeat bar in the expected position')
+        # the default is 2 times, or 1 repeat
+        if repeatTimes is None:
+            repeatTimes = 2
+        return mLast, mEndBarline, repeatTimes
 
     def _processInnermostRepeat(self, streamObj):
         '''Process and return a new Stream of Measures, likely a Part.
@@ -239,13 +278,16 @@ class Expander(object):
 
         # need to gather everything that is not a Meausre (e.g., Instrument)
         # and add copies to new
-        
         repeatIndices = self._findInnermostRepeatIndices(streamObj)
+        environLocal.printDebug(['got new repeat indices:', repeatIndices])
 
         # renumber measures starting with the first number found here
         number = streamObj[0].number
         if number is None:
             number = 1
+
+        # handling of end repeat as left barline
+        stripFirstNextMeasure = False
 
         # use index values instead of an interator
         i = 0
@@ -254,18 +296,8 @@ class Expander(object):
             environLocal.printDebug(['processing measure index:', i, 'repeatIndices', repeatIndices])
             # if this index is the start of the repeat
             if i == repeatIndices[0]:
-                mLast = streamObj[repeatIndices[-1]]
-
-                # repeat times may be 0, 1, 2 or higher
-                # value of 2 is a normal repeat (original + repeat)
-                if mLast.rightBarline is None:
-                    environLocal.printDebug(['got an mLast with no right barline:', mLast])
-                    raise ExpanderException('cannot find an end repeat where expected')
-                else:
-                    repeatTimes = mLast.rightBarline.times
-                    if repeatTimes is None:
-                        repeatTimes = 2
-    
+                mLast, mEndBarline, repeatTimes = self._getEndObjects(
+                    streamObj, repeatIndices[-1])
                 for times in range(repeatTimes):
                 # copy the range of measures; this will include the first
                 # pass
@@ -275,18 +307,26 @@ class Expander(object):
                         # must do for each pass, b/c not changing source
                         # stream
                         environLocal.printDebug(['got j, repeatIndicies', j, repeatIndices])
-                        if j in repeatIndices:
-                            # adjust in place
+                        if j in [repeatIndices[0], repeatIndices[-1]]:
                             self._stripRepeatBarlines(mSub)
                         mSub.number = number
                         new.append(mSub)
                         number += 1
+                # check if need to clear repeats from next bar
+                if mLast is not mEndBarline:
+                    stripFirstNextMeasure = True
+
                 # set i to next measure after mLast
                 i = repeatIndices[-1] + 1
             # just add this measure
             else:
                 # iterate through each measure, always add first
                 m = copy.deepcopy(streamObj[i])
+                if stripFirstNextMeasure:
+                    self._stripRepeatBarlines(m)
+                    # change in source too
+                    self._stripRepeatBarlines(streamObj[i])
+                    stripFirstNextMeasure = False
                 m.number = number
                 new.append(m) # this may be the first version
                 number += 1
@@ -312,9 +352,10 @@ class Expander(object):
         # cyclically process inntermost, one at a time
         while True:
             post = self._processInnermostRepeat(post)
+            #post.show('t')
             if self._hasRepeat(post):                        
                 environLocal.printDebug([
-                    'self._findInnermostRepeatIndices(post)', self._findInnermostRepeatIndices(post)])
+                    'process() calling: self._findInnermostRepeatIndices(post)', self._findInnermostRepeatIndices(post)])
             else:
                 break # nothing left to process
         return post
@@ -510,6 +551,29 @@ class Test(unittest.TestCase):
 
         #post.show()
 
+
+    def testExpandRepeatC(self):
+        from music21.abc import testFiles
+        from music21 import converter, repeat
+        
+        s = converter.parse(testFiles.kingOfTheFairies)
+        self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 26)
+        self.assertEqual(s.metadata.title, 'King of the fairies')
+        self.assertEqual(len(s.flat.notes), 145)
+
+        #s.show()
+        ex = repeat.Expander(s.parts[0])
+        self.assertEqual(ex._findInnermostRepeatIndices(s.parts[0]), [0, 1, 2, 3, 4, 5, 6, 7, 8])
+        # check boundaries here
+
+        # note: this is not yet correct, and is making too many copies
+        post = s.expandRepeats()
+        self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 53)
+        # make sure metadata is copied
+        self.assertEqual(post.metadata.title, 'King of the fairies')
+        self.assertEqual(len(post.flat.notes), 286)
+
+        #post.show()
 
 
 
