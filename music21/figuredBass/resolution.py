@@ -25,7 +25,8 @@ from music21.figuredBass import possibility
 def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace = False):
     '''
     Takes a possibility which contains pitches forming a dominant seventh chord, and returns its proper
-    resolution to the major tonic (I), either in root position (5,3) or in first inversion (6,3).
+    resolution to the major tonic (I), either in root position (5,3) or in first inversion (6,3) as 
+    another possibility.
     
     Root position (7) and first inversion (6,5) dominant chords resolve to a root position (5,3) tonic chord.
     Third inversion (4,2) dominant chords resolve to a first inversion (6,3) tonic chord. Second inversion
@@ -36,6 +37,9 @@ def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
     
     A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
 
+    If inPlace = True, then pitches will be modified in place, and the input possibility will be returned.
+    If inPlace = False, then a new possibility will be returned.
+    
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
@@ -93,7 +97,8 @@ def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
 def dominantSeventhToMinorTonic(dominantPossib, resolveV43toi6 = False, inPlace = False):
     '''
     Takes a possibility which contains pitches forming a dominant seventh chord, and returns its proper
-    resolution to the minor tonic (i), either in root position (5,3) or in first inversion (6,3).
+    resolution to the minor tonic (i), either in root position (5,3) or in first inversion (6,3) as 
+    another possibility.
     
     Root position (7) and first inversion (6,5) dominant chords resolve to a root position tonic chord.
     Third inversion (4,2) dominant chords resolve to a first inversion tonic chord. Second inversion
@@ -104,6 +109,9 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toi6 = False, inPlace 
     
     A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
 
+    If inPlace = True, then pitches will be modified in place, and the input possibility will be returned.
+    If inPlace = False, then a new possibility will be returned.
+    
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
@@ -161,10 +169,10 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toi6 = False, inPlace 
 def dominantSeventhToMajorSubmediant(dominantPossib, inPlace = False):
     '''
     Takes a possibility which contains pitches forming a dominant seventh chord and returns its
-    proper resolution to the major submediant (VI) in root position.
+    proper resolution to the major submediant (VI) in root position as another possibility.
     
     A dominant possibility has to be in root position in order to properly resolve to its submediant.
-    Therefore, a ResolutionException is thrown if the possibility is not in root position.
+    Therefore, a ResolutionException is raised if the possibility is not in root position.
     
     A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
 
@@ -212,10 +220,10 @@ def dominantSeventhToMajorSubmediant(dominantPossib, inPlace = False):
 def dominantSeventhToMinorSubmediant(dominantPossib, inPlace = False):
     '''
     Takes a possibility which contains pitches forming a dominant seventh chord and returns its
-    proper resolution to the minor submediant (vi) in root position.
+    proper resolution to the minor submediant (vi) in root position as another possibility.
     
     A dominant possibility has to be in root position in order to properly resolve to its submediant.
-    Therefore, a ResolutionException is thrown if the possibility is not in root position.
+    Therefore, a ResolutionException is raised if the possibility is not in root position.
 
     A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
 
