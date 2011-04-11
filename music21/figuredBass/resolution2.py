@@ -354,12 +354,18 @@ def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace
 
 def diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot = False, inPlace = False):
     '''
+    Takes a possibility which contains pitches forming a diminished seventh chord, and
+    returns its proper resolution to the minor tonic or either of its inversions as another possibility. 
+    
+    If doubledRoot = False, then the resolution will have its third doubled.
+    If doubledRoot = True, then the resolution will have its root doubled.
+    
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution2
     >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
     >>> resolution2.diminishedSeventhToMinorTonic(possibA)
     {'A': F4, 'S': A4, 'B': D3, 'T': F3}
-    >>> resolution2.diminishedSeventhToMinorTonic(possibA, True) # Alternate resolution, contains parallel fifths
+    >>> resolution2.diminishedSeventhToMinorTonic(possibA, True) # Alternate resolution, contains parallel fifths, but not parallel perfect fifths
     {'A': D4, 'S': A4, 'B': D3, 'T': F3}
     '''
     if inPlace:
