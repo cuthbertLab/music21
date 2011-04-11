@@ -23,23 +23,39 @@ from music21.figuredBass import possibility
 from music21.figuredBass import realizerScale
 from music21.figuredBass import voice
 from music21.figuredBass import resolution2
+from music21.figuredBass import notation
 
 _MOD = 'segment.py'
 
 class Segment:
-    def __init__(self, fbInformation, bassNote, notation = ''):
+    def __init__(self, fbInformation, bassNote, notationString = ''):
         self.bassNote = bassNote
-        self.notation = notation
+        self.notationString = notationString
         self.fbScale = fbInformation.fbScale
         self.fbVoices = fbInformation.fbVoices
         self.fbRules = fbInformation.fbRules
-        self.pitchesAboveBass = self.fbScale.getPitches(self.bassNote.pitch, self.notation)
-        self.pitchNamesInChord = self.fbScale.getPitchNames(self.bassNote.pitch, self.notation)
+        self.pitchesAboveBass = self.fbScale.getPitches(self.bassNote.pitch, self.notationString)
+        self.pitchNamesInChord = self.fbScale.getPitchNames(self.bassNote.pitch, self.notationString)
         self.nextMovements = {}
         self.nextSegment = None
         self.isDominantSeventh = chord.Chord(self.pitchesAboveBass).isDominantSeventh()
         self.isDiminishedSeventh = chord.Chord(self.pitchesAboveBass).isDiminishedSeventh()
+        self.addLyricsToBassNote()
 
+    def addLyricsToBassNote(self):
+        n = notation.Notation(self.notationString)
+        if len(n.figureStrings) == 0:
+            return
+        maxLength = 0
+        for fs in n.figureStrings:
+            if len(fs) > maxLength:
+                maxLength = len(fs)
+        for fs in n.figureStrings:
+            spacesInFront = ''
+            for space in range(maxLength - len(fs)):
+                spacesInFront += ' '
+            self.bassNote.addLyric(spacesInFront + fs)
+    
     def correctPossibilities(self):
         raise SegmentException("Must specifically create StartSegment or MiddleSegment to call this method.")
     
