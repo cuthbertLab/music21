@@ -24,6 +24,18 @@ from music21.figuredBass import possibility
 # STANDARD RESOLUTIONS
 def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace = False):
     '''
+    Takes a possibility which contains pitches forming a dominant seventh chord, and returns its
+    proper resolution to the major tonic, either in root position (5,3) or in first inversion (6,3).
+    
+    Root position (7) and first inversion (6,5) dominant chords resolve to a root position (5,3) tonic chord.
+    Third inversion (4,2) dominant chords resolve to a first inversion (6,3) tonic chord. Second inversion
+    (4,3) dominant chords can resolve to either a root position or first inversion tonic chord.
+    
+    If resolveV43toI6 = True, then the resolution will be to a first inversion tonic chord.
+    If resolveV43toI6 = False, then the resolution will be to a root position tonic chord.
+    
+    A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
@@ -78,8 +90,20 @@ def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
         
     return dpCopy
 
-def dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6 = False, inPlace = False):
+def dominantSeventhToMinorTonic(dominantPossib, resolveV43toi6 = False, inPlace = False):
     '''
+    Takes a possibility which contains pitches forming a dominant seventh chord, and returns its
+    proper resolution to the minor tonic, either in root position (5,3) or in first inversion (6,3).
+    
+    Root position (7) and first inversion (6,5) dominant chords resolve to a root position tonic chord.
+    Third inversion (4,2) dominant chords resolve to a first inversion tonic chord. Second inversion
+    (4,3) dominant chords can resolve to either a root position or first inversion tonic chord.
+    
+    If resolveV43toi6 = True, then the resolution will be to a first inversion tonic chord.
+    If resolveV43toi6 = False, then the resolution will be to a root position tonic chord.
+    
+    A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
@@ -136,6 +160,9 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
 # DECEPTIVE RESOLUTIONS
 def dominantSeventhToMajorSubmediant(dominantPossib, inPlace = False):
     '''
+    
+    A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
@@ -179,6 +206,9 @@ def dominantSeventhToMajorSubmediant(dominantPossib, inPlace = False):
 
 def dominantSeventhToMinorSubmediant(dominantPossib, inPlace = False):
     '''
+    
+    A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
@@ -223,6 +253,9 @@ def dominantSeventhToMinorSubmediant(dominantPossib, inPlace = False):
 # STATIONARY RESOLUTIONS
 def dominantSeventhToMajorSubdominant(dominantPossib, inPlace = False):
     '''
+    
+    A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
@@ -264,6 +297,9 @@ def dominantSeventhToMajorSubdominant(dominantPossib, inPlace = False):
 
 def dominantSeventhToMinorSubdominant(dominantPossib, inPlace = False):
     '''
+
+    A ResolutionException is raised if the possibility does not spell out a dominant seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
@@ -310,6 +346,14 @@ def dominantSeventhToMinorSubdominant(dominantPossib, inPlace = False):
 # ALTERNATE RESOLUTIONS  = Doubled root
 def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace = False):
     '''
+    Takes a possibility which contains pitches forming a diminished seventh chord, and returns 
+    its proper resolution to the major tonic or either of its inversions as another possibility. 
+    
+    If doubledRoot = False, then the resolution will have its third doubled.
+    If doubledRoot = True, then the resolution will have its root doubled.
+    
+    A ResolutionException is raised if the possibility does not spell out a diminished seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
@@ -354,12 +398,14 @@ def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace
 
 def diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot = False, inPlace = False):
     '''
-    Takes a possibility which contains pitches forming a diminished seventh chord, and
-    returns its proper resolution to the minor tonic or either of its inversions as another possibility. 
+    Takes a possibility which contains pitches forming a diminished seventh chord, and returns 
+    its proper resolution to the minor tonic or either of its inversions as another possibility. 
     
     If doubledRoot = False, then the resolution will have its third doubled.
     If doubledRoot = True, then the resolution will have its root doubled.
     
+    A ResolutionException is raised if the possibility does not spell out a diminished seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
@@ -404,6 +450,9 @@ def diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot = False, inPlace
 # SUBDOMINANT RESOLUTIONS
 def diminishedSeventhToMajorSubdominant(diminishedPossib, inPlace = False):
     '''
+    
+    A ResolutionException is raised if the possibility does not spell out a diminished seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
@@ -440,6 +489,9 @@ def diminishedSeventhToMajorSubdominant(diminishedPossib, inPlace = False):
 
 def diminishedSeventhToMinorSubdominant(diminishedPossib, inPlace = False):
     '''
+
+    A ResolutionException is raised if the possibility does not spell out a diminished seventh chord.
+
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
