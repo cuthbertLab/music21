@@ -20,42 +20,55 @@ from music21 import stream
 from music21 import meter
 from music21 import key
 from music21 import chord
+from music21 import bar
 
 from music21.figuredBass import segment
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import voice
+from music21.figuredBass import notation
+
+MAX_PITCH = pitch.Pitch('B5')
 
 class FiguredBass(object):
-    def __init__(self, voiceList, timeSig, key, mode = 'major'):
+    def __init__(self, voiceList, timeSigString = '4/4', keyString = 'C', modeString = 'major'):
         '''
         '''
-        self.timeSig = timeSig
-        self.key = key
-        self.mode = mode
-        self.maxPitch = pitch.Pitch('B5')
+        #Converted to music21 TimeSignature, KeySignature objects
+        self.ts = meter.TimeSignature(timeSigString)
+        _numSharps = key.pitchToSharps(keyString, modeString)
+        self.ks = key.KeySignature(_numSharps)
+        
+        #fb bass notes, figures, bass line, other information
         self.figuredBassList = []
         self.bassNotes = []
-        self.fbInfo = segment.Information(realizerScale.FiguredBassScale(key, mode), voiceList, rules.Rules())
+        self.bassLine = stream.Part()
+        self.bassLine.insert(0, copy.copy(self.ts))
+        self.bassLine.insert(0, copy.copy(self.ks))
+        self.maxPitch = MAX_PITCH
+        self.fbInfo = segment.Information(realizerScale.FiguredBassScale(keyString, modeString), voiceList, rules.Rules())
+        
+        #Contains fb solutions
         self.allSegments = []
         self.lastSegment = None
         
-    def addElement(self, bassNote, notation = ''):
+    def addElement(self, bassNote, notationString = ''):
         self.bassNotes.append(bassNote)
-        self.figuredBassList.append((bassNote, notation))
+        self.bassLine.append(bassNote)
+        self.figuredBassList.append((bassNote, notationString))
 
     def solve(self):
         startTime = time.time()
-        (startBass, startNotation) = self.figuredBassList[0]
-        print("Finding starting possibilities for: " + str((startBass.pitch, startNotation)))
-        a1 = segment.StartSegment(self.fbInfo, startBass, startNotation)
+        (startBass, startNotationString) = self.figuredBassList[0]
+        print("Finding starting possibilities for: " + str((startBass.pitch, startNotationString)))
+        a1 = segment.StartSegment(self.fbInfo, startBass, startNotationString)
         self.allSegments.append(a1)
         self.lastSegment = a1
             
         for fbIndex in range(1, len(self.figuredBassList)):
-            (nextBass, nextNotation) = self.figuredBassList[fbIndex]
-            print("Finding all possibilities for: " + str((nextBass.pitch, nextNotation)))
-            c1 = segment.MiddleSegment(self.fbInfo, self.lastSegment, nextBass, nextNotation)
+            (nextBass, nextNotationString) = self.figuredBassList[fbIndex]
+            print("Finding all possibilities for: " + str((nextBass.pitch, nextNotationString)))
+            c1 = segment.MiddleSegment(self.fbInfo, self.lastSegment, nextBass, nextNotationString)
             self.allSegments.append(c1)
             self.lastSegment = c1
        
@@ -63,7 +76,7 @@ class FiguredBass(object):
         self.lastSegment.trimAllMovements()
         numSolutions = self.lastSegment.getNumSolutions()
         if numSolutions <= 200000:
-            numberProgressions = self.calculateAllNumberProgressions()
+            numberProgressions = self.getAllNumberProgressions()
             print("Number of solutions, as calculated empirically: " + str(len(numberProgressions)) + ".")
         print("Solving complete. Number of solutions, as calculated by path counting: " + str(numSolutions) + ".\n")
         endTime = time.time()
@@ -71,7 +84,7 @@ class FiguredBass(object):
         secondsElapsed = round((endTime - startTime) % 60)
         print("Time elapsed: " + str(minutesElapsed) + " minutes " + str(secondsElapsed) + " seconds.")
                 
-    def calculateAllNumberProgressions(self):
+    def getAllNumberProgressions(self):
         if len(self.allSegments) <= 1:
             raise FiguredBassException("One segment or less not enough for progression generator..")
         currMovements = self.allSegments[0].nextMovements
@@ -102,6 +115,16 @@ class FiguredBass(object):
             
         return chords
    
+    def getAllChordProgressions(self):
+        chordProgressions = []
+        numberProgressions = self.getAllNumberProgressions()
+
+        for numberProgression in numberProgressions:
+            chordProgression = self.numberToChordProgression(numberProgression)
+            chordProgressions.append(chordProgression)
+        
+        return chordProgressions
+    
     def getRandomChordProgression(self):
         if len(self.allSegments) <= 1:
             raise FiguredBassException("One segment or less not enough for progression generator.")
@@ -119,10 +142,86 @@ class FiguredBass(object):
         chordProgression = self.numberToChordProgression(numberProgression)
         return chordProgression
 
-    def showRandomSolutions(self, amountToShow = 20):
-        s = self.generateRandomSolutions(amountToShow)
-        s.show()
+    def showRandomSolution(self):
+        self.generateRandomSolution().show()
         
+    def generateRandomSolution(self):
+        '''
+        Generates a random solution as a stream.Score()
+        '''
+        chordProgression = self.getRandomChordProgression()
+        return self.generateSolutionFromChordProgression(chordProgression)
+        
+    def generateSolutionFromChordProgression(self, chordProgression):
+        '''
+        Generates a solution as a stream.Score() given a chord progression
+        
+        bass line is taken from the figured bass object, but is checked against
+        the chord progression for consistency.
+        '''
+        sol = stream.Score()
+        rightHand = stream.Part()
+        rightHand.insert(0, copy.copy(self.ts))
+        rightHand.insert(0, copy.copy(self.ks))
+
+        v0 = self.fbInfo.fbVoices[0]
+        
+        for j in range(len(chordProgression)):
+            givenPossib = chordProgression[j]
+            bassNote = self.bassNotes[j]
+
+            if givenPossib[v0.label] != bassNote.pitch:
+                raise FiguredBassException("Chord progression possibility doesn't match up with bass line.")
+        
+            rhPitches = []
+            for k in range(1, len(self.fbInfo.fbVoices)):
+                v1 = self.fbInfo.fbVoices[k]
+                rhPitches.append(copy.copy(givenPossib[v1.label]))
+                             
+            rhChord = chord.Chord(rhPitches)
+            rhChord.quarterLength = bassNote.quarterLength
+            rightHand.append(rhChord)
+    
+        sol.insert(0, rightHand)
+        sol.insert(0, copy.deepcopy(self.bassLine))
+        sol.append(bar.Barline('light-heavy'))
+
+        return sol
+      
+    def showAllSolutions(self, showAsText = False):
+        if showAsText:
+            self.generateAllSolutions().show('text')
+        else:
+            self.generateAllSolutions().show()
+        
+    def showRandomSolutions(self, amountToShow = 20, showAsText = False):
+        if showAsText:        
+            self.generateRandomSolutions(amountToShow).show('text')
+        else:
+            self.generateRandomSolutions(amountToShow).show()
+    
+    def generateAllSolutions(self):
+        allSols = stream.Score()
+        
+        chordProgressions = self.getAllChordProgressions()
+        for chordProgression in chordProgressions:
+            sol = self.generateSolutionFromChordProgression(chordProgression)
+            allSols.append(sol)
+        
+        return allSols
+    
+    def generateRandomSolutions(self, amountToShow = 20):
+        if amountToShow > self.lastSegment.getNumSolutions():
+            return self.generateAllSolutions()
+        
+        allSols = stream.Score()
+        for solutionCounter in range(amountToShow):
+            sol = self.generateRandomSolution()
+            allSols.append(sol)
+            
+        return allSols
+        
+    '''
     def generateRandomSolutions(self, amountToShow = 20):
         # TODO: If amountToShow > self.lastSegment.getNumSolutions(), then should return all solutions and that's it.
         # Also, if self.lastSegment.getNumSolutions() == 0, then should either raise an exception or just return without 
@@ -138,9 +237,9 @@ class FiguredBass(object):
         
         for i in range(amountToShow):
             print("\nProgression #" + str(i + 1))
-            chordProg = self.getRandomChordProgression()
+            chordProgression = self.getRandomChordProgression()
             for j in range(len(self.bassNotes)):
-                givenChord = chordProg[j]
+                givenChord = chordProgression[j]
                 
                 bassNote = copy.deepcopy(self.bassNotes[j])
                 rhPitches = []
@@ -163,13 +262,14 @@ class FiguredBass(object):
             bassLine.append(rest1)
             rightHand.append(rest2)
 
-            self.printChordProgression(chordProg)
+            self.printChordProgression(chordProgression)
         
         s.insert(0, rightHand)
         s.insert(0, bassLine)
         
         return s
-
+    '''
+    
     def printChordProgression(self, chordProgression):
         linesToPrint = []
         for v in self.fbInfo.fbVoices:
