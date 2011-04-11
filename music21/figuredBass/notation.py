@@ -66,6 +66,7 @@ class Notation(object):
         '''
         #Parse notation string
         self.notationColumn = notationColumn
+        self.figureStrings = None
         self.origNumbers = None
         self.origModStrings = None        
         self.numbers = None
@@ -89,11 +90,15 @@ class Notation(object):
         >>> from music21 import *
         >>> from music21.figuredBass import notation as n
         >>> notation1 = n.Notation('#6,5') #__init__ method calls _parseNotationColumn()
+        >>> notation1.figureStrings
+        ['#6', '5']
         >>> notation1.origNumbers
         (6, 5)
         >>> notation1.origModStrings
         ('#', None)
         >>> notation2 = n.Notation('-6,-')
+        >>> notation2.figureStrings
+        ['-6', '-']
         >>> notation2.origNumbers
         (6, None)
         >>> notation2.origModStrings
@@ -105,9 +110,11 @@ class Notation(object):
         patternA2 = '([^0-9]*)'
         numbers = []
         modifierStrings = []
+        figureStrings = []
         
         for figure in figures:
             figure = figure.strip()
+            figureStrings.append(figure)
             m1 = re.findall(patternA1, figure)
             m2 = re.findall(patternA2, figure)        
             for i in range(m1.count('')):
@@ -134,6 +141,7 @@ class Notation(object):
         self.numbers = numbers #Will be converted to longhand
         self.origModStrings = modifierStrings #Keep original modifier strings
         self.modifierStrings = modifierStrings #Will be converted to longhand
+        self.figureStrings = figureStrings
 
     def _translateToLonghand(self):
         '''
