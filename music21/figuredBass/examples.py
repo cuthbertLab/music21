@@ -11,7 +11,7 @@
 from music21 import interval
 from music21 import note
 
-from music21.figuredBass import realizer2
+from music21.figuredBass import realizer
 from music21.figuredBass import voice
 
 v1 = voice.Voice('Bass', voice.Range('E2', 'E4'))
@@ -27,7 +27,7 @@ def exampleA():
     This was one of my (Jose Cabal-Ugaz) 21M.302 assignments.
     The figured bass was composed by Charles Shadle.
     '''
-    fb = realizer2.FiguredBass(orderedVoiceList, '3/2', 'C')
+    fb = realizer.FiguredBass(orderedVoiceList, '3/2', 'C')
     ####     C major: C D E F G A B C
 
     n1 = note.Note('C3')
@@ -76,7 +76,7 @@ def exampleB():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
-    fb = realizer2.FiguredBass(orderedVoiceList, '4/4', 'D', 'minor')
+    fb = realizer.FiguredBass(orderedVoiceList, '4/4', 'D', 'minor')
     ####     D minor: D E F G A B- C(#) D
    
     n1 = note.Note('D3')
@@ -103,7 +103,7 @@ def exampleC():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
-    fb = realizer2.FiguredBass(orderedVoiceList, '4/4', 'F#', 'minor')
+    fb = realizer.FiguredBass(orderedVoiceList, '4/4', 'F#', 'minor')
     ####     F# minor: F# G# A B C# D E(#) F
     
     n1 = note.Note('F#2')
@@ -131,7 +131,7 @@ def exampleD():
     Another one of my (Jose Cabal-Ugaz) assignments from 21M.302.
     This figured bass was composed by Charles Shadle.
     '''
-    fb = realizer2.FiguredBass(orderedVoiceList, '3/4', 'b', 'minor')
+    fb = realizer.FiguredBass(orderedVoiceList, '3/4', 'b', 'minor')
     ####     B minor: B C# D E F# G A(#) B
 
     #Measure 1
@@ -188,9 +188,11 @@ def exampleD():
 
 if __name__ == "__main__":
     #exampleA(), exampleB(), exampleC(), exampleD()
-    fb = exampleD() #Set up the figured bass
+    fb = exampleB() #Set up the figured bass
     #fb.fbInfo.fbRules.topVoicesMaxIntervalSeparation = None
     fb.solve()
-    fb.showRandomSolutions()
+    fb.showRandomSolution() #This one works
+    fb.showRandomSolutions(20) #This one, not so much
+    fb.showRandomSolutions(20, True) #Same thing, but shown as text in the console
     #sc = fb.generateRandomSolutions(200)
     #sc.flat.plot('pitchClass')
