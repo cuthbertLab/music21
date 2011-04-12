@@ -6402,7 +6402,7 @@ class Stream(music21.Music21Object):
 
     def _getNotesAndRests(self):
         '''
-        see property `notes`, below
+        see property `notesAndRests`, below
         '''
         #return self.getElementsByClass([note.GeneralNote, chord.Chord])
         # using string class names is import for some test contexts where
@@ -6435,37 +6435,38 @@ class Stream(music21.Music21Object):
         ''')
 
 
-#     def _getNotes(self):
-#         '''
-#         see property `notes`, below
-#         '''
-#         #Rests are a subclass of GeneralNote, and thus General Note cannot
-#         # be used here
-#         return self.getElementsByClass(['NotRest'])
-# 
-#     notes = property(_getNotes, doc='''
-#         The notesAndRests property of a Stream returns a new Stream object
-#         that consists only of the notes (including 
-#         :class:`~music21.note.Note`, 
-#         :class:`~music21.chord.Chord`, etc.) found 
-#         in the stream.
-# 
-#         >>> from music21 import *
-#         >>> s1 = stream.Stream()
-#         >>> k1 = key.KeySignature(0) # key of C
-#         >>> n1 = note.Note('B')
-#         >>> c1 = chord.Chord(['A', 'B-'])
-#         >>> s1.append([k1, n1, c1])
-#         >>> s1.show('text')
-#         {0.0} <music21.key.KeySignature of no sharps or flats>
-#         {0.0} <music21.note.Note B>
-#         {1.0} <music21.chord.Chord A B->
-# 
-#         >>> notes1 = s1.notesAndRests
-#         >>> notes1.show('text')
-#         {0.0} <music21.note.Note B>
-#         {1.0} <music21.chord.Chord A B->       
-#         ''')
+    def _getNotes(self):
+        '''
+        see property `notes`, below
+        '''
+        #Rests are a subclass of GeneralNote, and thus General Note cannot
+        # be used here
+        return self.getElementsByClass(['NotRest'])
+
+    notes = property(_getNotes, doc='''
+        The notes property of a Stream returns a new Stream object
+        that consists only of the notes (including 
+        :class:`~music21.note.Note`, 
+        :class:`~music21.chord.Chord`, etc.) found 
+        in the stream. This excludes :class:`~music21.note.Rest` objects.
+
+        >>> from music21 import *
+        >>> s1 = stream.Stream()
+        >>> k1 = key.KeySignature(0) # key of C
+        >>> n1 = note.Note('B')
+        >>> r1 = note.Rest()
+        >>> c1 = chord.Chord(['A', 'B-'])
+        >>> s1.append([k1, n1, r1, c1])
+        >>> s1.show('text')
+        {0.0} <music21.key.KeySignature of no sharps or flats>
+        {0.0} <music21.note.Note B>
+        {1.0} <music21.note.Rest rest>
+        {2.0} <music21.chord.Chord A B->
+
+        >>> s1.notes.show('text')
+        {0.0} <music21.note.Note B>
+        {2.0} <music21.chord.Chord A B->       
+        ''')
 
 
 
