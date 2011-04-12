@@ -566,7 +566,7 @@ class Test(unittest.TestCase):
         self.assertEqual(ex._findInnermostRepeatIndices(s.parts[0]), [0, 1, 2, 3, 4, 5, 6, 7, 8])
         # check boundaries here
 
-        # note: this is not yet correct, and is making too many copies
+        # TODO: this is not yet correct, and is making too many copies
         post = s.expandRepeats()
         self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 53)
         # make sure metadata is copied
@@ -576,7 +576,110 @@ class Test(unittest.TestCase):
         #post.show()
 
 
+    def testExpandRepeatD(self):
+        
+        # test one back repeat at end of a measure
+        from music21 import stream, bar, note
 
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m2.rightBarline = bar.Repeat(direction='end')
+        self.assertEqual(m2.rightBarline.location, 'right')
+
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('b-4', type='half'), 2)
+    
+        s = stream.Part()
+        s.append([m1, m2, m3, m4])
+        self.assertEqual(len(s.flat.notes), 8)
+        post = s.expandRepeats()
+        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
+        self.assertEqual(len(post.flat.notes), 12)
+
+
+    def testExpandRepeatE(self):
+        
+        # test one back repeat at end of a measure
+        from music21 import stream, bar, note
+
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m2.leftBarline = bar.Repeat(direction='start')
+        rb = bar.Repeat(direction='end')
+        m2.rightBarline = rb
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+    
+        s = stream.Part()
+        s.append([m1, m2, m3])
+
+        self.assertEqual(len(s.flat.notes), 6)
+        self.assertEqual(len(s.getElementsByClass('Measure')), 3)
+
+        # default times is 2, or 1 repeat
+        post = s.expandRepeats()
+        self.assertEqual(len(post.flat.notes), 8)
+        self.assertEqual(len(post.getElementsByClass('Measure')), 4)
+
+        # can change times
+        rb.times = 1 # one is no repeat
+        post = s.expandRepeats()
+        self.assertEqual(len(post.flat.notes), 6)
+        self.assertEqual(len(post.getElementsByClass('Measure')), 3)
+
+        rb.times = 0 # removes the entire passage
+        post = s.expandRepeats()
+        self.assertEqual(len(post.flat.notes), 4)
+        self.assertEqual(len(post.getElementsByClass('Measure')), 2)
+
+        rb.times = 4
+        post = s.expandRepeats()
+        self.assertEqual(len(post.flat.notes), 12)
+        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
+
+
+
+    def testExpandRepeatF(self):
+        # an algorithmic approach
+        import random
+        from music21 import bar, note, stream, meter
+        
+        dur = [.125, .25, .5, .125]
+        durA = dur
+        durB = dur[1:] + dur[:1]
+        durC = dur[2:] + dur[:2]
+        durD = dur[3:] + dur[:3]
+        
+        s = stream.Stream()
+        repeatHandles = []
+        for dur in [durA, durB, durC, durD]:
+            m = stream.Measure()
+            m.timeSignature = meter.TimeSignature('1/4')
+            for d in dur:
+                m.append(note.Note(quarterLength=d))
+                m.leftBarline = bar.Repeat(direction='start')
+                rb = bar.Repeat(direction='end')
+                m.rightBarline = rb
+                m.makeBeams(inPlace=True)
+                repeatHandles.append(rb)
+            s.append(m)
+        
+        final = stream.Stream()
+        # alter all repeatTimes values, expand, and append to final
+        for i in range(6):
+            for rb in repeatHandles:
+                rb.times = random.choice([0,1,3,5])    
+            expanded = s.expandRepeats()
+            for m in expanded:
+                final.append(m)
+        #final.show()    
+            
 
 if __name__ == "__main__":
     music21.mainTest(Test)

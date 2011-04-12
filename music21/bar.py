@@ -152,7 +152,6 @@ class Repeat(repeat.RepeatMark, Barline):
     The `direction` parameter can be one of 'start' or 'end.'
 
     '''
-
     _repeatDots = None # not sure what this is for; inherited from old modles
 
     def __init__(self, style=None, direction='start', times=None):
@@ -184,15 +183,31 @@ class Repeat(repeat.RepeatMark, Barline):
         else:
             try:
                 candidate = int(value)
-                self._times = candidate
             except ValueError:
                 raise BarException('cannot set repeat times to: %s' % value)
+            if candidate < 0:
+                raise BarException('cannot set repeat times to a value less than zero: %s' % value)
+            if self._direction == 'start':
+                raise BarException('cannot set repeat times on a start Repeat')
+
+            self._times = candidate
 
     def _getTimes(self):
         return self._times
 
     times = property(_getTimes, _setTimes, 
-        doc = '''Get or set the times property of this barline. This defines how many times the repeat happens.
+        doc = '''Get or set the times property of this barline. This defines how many times the repeat happens. A standard repeat repeats 2 times; values equal to or greater than 0 are permitted. A repeat of 0 skips the repeated passage. 
+        
+        >>> from music21 import bar
+        >>> lb = bar.Repeat(direction='start')
+        >>> rb = bar.Repeat(direction='end')
+        >>> lb.times = 3
+        Traceback (most recent call last):
+        BarException: cannot set repeat times on a start Repeat
+        >>> rb.times = 3
+        >>> rb.times = -3
+        Traceback (most recent call last):
+        BarException: cannot set repeat times to a value less than zero: -3
         ''')
 
 
