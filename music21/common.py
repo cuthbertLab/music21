@@ -975,7 +975,7 @@ def toRoman(num):
         raise Music21CommonException("invalid input %s: must be integer 1-8" % (str(num)))
 
 
-def ordinalAbbreviation(value):
+def ordinalAbbreviation(value, plural=False):
     '''Return the ordinal abbreviations for integers
 
     >>> from music21 import common
@@ -983,26 +983,34 @@ def ordinalAbbreviation(value):
     'rd'
     >>> common.ordinalAbbreviation(255)
     'th'
+    >>> common.ordinalAbbreviation(255, plural=True)
+    'ths'
+
     '''
     valueStr = str(value)
     if value in [1]:
-        return 'st'
+        post = 'st'
     elif value in [0, 4, 5, 6, 7, 8, 9, 11, 12, 13]:
-        return 'th'
+        post = 'th'
     elif value in [2]:
-        return 'nd'
+        post = 'nd'
     elif value in [3]:
-        return 'rd'
+        post = 'rd'
     # test strings if not matched here
     elif valueStr[-1] in ['1']:
-        return 'st'
+        post = 'st'
     elif valueStr[-1] in ['2']:
-        return 'nd'
+        post = 'nd'
     elif valueStr[-1] in ['3']:
-        return 'rd'
+        post = 'rd'
     elif valueStr[-1] in ['0', '4', '5', '6', '7', '8', '9']:
-        return 'th'
+        post = 'th'
 
+    if post != 'st' and plural:
+        post += 's'
+    return post
+
+                
 
 
 def stripAddresses(textString, replacement = "ADDRESS"):

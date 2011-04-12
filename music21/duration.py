@@ -1067,6 +1067,41 @@ class Tuplet(object):
         #self.numberNotesNormal = normal
 
 
+
+    def _getFullName(self):
+        # actual is what is presented to viewer
+        numActual = self.numberNotesActual
+        numNormal = self.numberNotesNormal
+        dur = self.durationActual
+        
+        if numActual in [3] and numNormal in [2]:
+            return 'Triplet'
+        elif numActual in [4] and numNormal in [4]:
+            return 'Quintuplet'
+        elif numActual in [6] and numNormal in [4]:
+            return 'Sextuplet'
+        else:
+            ordStr = common.ordinalAbbreviation(numNormal, plural=True)
+            return 'Tuplet of %s/%s%s' % (numActual, numNormal, ordStr)
+
+    fullName = property(_getFullName, 
+        doc = '''Return the most complete representation of this tuplet in a readable form. 
+
+        >>> from music21 import *
+        >>> t = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+        >>> t.fullName
+        'Tuplet of 5/4ths'
+
+        >>> t = duration.Tuplet(numberNotesActual = 3, numberNotesNormal = 2)
+        >>> t.fullName
+        'Triplet'
+
+        ''')
+
+
+
+
+
     #---------------------------------------------------------------------------
     def _getMX(self):
         '''From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet.
@@ -1216,7 +1251,7 @@ class DurationUnit(DurationCommon):
         # rarely used: dotted-dotted notes; e.g. dotted-dotted half in 9/8
         # dots can be a float for expressing Crumb dots (1/2 dots)
         self._dots = [0] 
-        self._tuplets = ()
+        self._tuplets = () # an empty tuple
         
         if common.isNum(prototype):
             self._qtrLength = prototype
@@ -1617,6 +1652,70 @@ class DurationUnit(DurationCommon):
         return str(number_type) + dots
 
     lily = property(_getLily)
+
+
+
+    def _getFullName(self):
+        dots = self._getDots()
+        if dots == 1:
+            dotStr = 'Dotted'
+        elif dots == 2:
+            dotStr = 'Double Dotted'
+        elif dots == 3:
+            dotStr = 'Triple Dotted'
+        else:   
+            dotStr = None
+
+        tuplets = self._getTuplets()
+        #environLocal.printDebug(['tuplets', tuplets])
+        tupletStr = None
+        if len(tuplets) > 0:
+            tupletStr = []
+            for tup in tuplets:
+                tupletStr.append(tup._getFullName())
+            tupletStr = ' '.join(tupletStr)
+            #environLocal.printDebug(['tupletStr', tupletStr, tuplets])
+
+        msg = []
+        if dotStr is not None:
+            msg.append('%s ' % dotStr)
+
+        # type added here
+        typeStr = self._getType().title()
+        if typeStr.lower() == 'complex':
+            pass
+        else:
+            msg.append('%s ' % typeStr)
+
+        if tupletStr is not None:
+            msg.append('%s ' % tupletStr)
+        # only add QL display if there are no dots or tuplets
+        if tupletStr is not None or dots >= 3 or typeStr.lower() == 'complex':
+            msg.append('(%sQL)' % (round(self._getQuarterLength(), 2)))
+
+        return ''.join(msg).strip() # avoid extra space
+
+    fullName = property(_getFullName, 
+        doc = '''Return the most complete representation of this Duration, providing dots, type, tuplet, and quarter length representation. 
+
+        >>> from music21 import *
+        >>> d = duration.DurationUnit()
+        >>> d.quarterLength = 1.5
+        >>> d.fullName
+        'Dotted Quarter'
+
+        >>> from music21 import *
+        >>> d = duration.DurationUnit()
+        >>> d.quarterLength = 1.75
+        >>> d.fullName
+        'Double Dotted Quarter'
+        
+        >>> d = duration.DurationUnit()
+        >>> d.type = 'half'
+        >>> d.fullName
+        'Half'
+
+        ''')
 
 
 
@@ -2046,34 +2145,15 @@ class Duration(DurationCommon):
 
 
     def _getFullName(self):
-        dots = self._getDots()
-        if dots == 1:
-            dotStr = 'Dotted'
-        elif dots == 2:
-            dotStr = 'Double Dotted'
-        elif dots == 3:
-            dotStr = 'Triple Dotted'
-        else:   
-            dotStr = None
-
-        tuplets = self._getTuplets()
-        #environLocal.printDebug(['tuplets', tuplets])
-        tupletStr = None
-        if tuplets is not None:
-            if len(tuplets) >= 1:
-                tupletStr = repr(tuplets[0])
-
-        #environLocal.printDebug(['tupletStr', tupletStr, tuplets])
-
-        msg = []
-        if dotStr is not None:
-            msg.append('%s ' % dotStr)
-        msg.append('%s ' % (self._getType().title()))
-        if tupletStr is not None:
-            msg.append('%s ' % tupletStr)
-        msg.append('(%sQL)' % (round(self._getQuarterLength(), 2)))
-
-        return ''.join(msg)
+        if len(self.components) > 1:
+            msg = []
+            for part in self.components:
+                msg.append(part._getFullName())
+            msg = ' tied to '.join(msg)
+            msg += ' (%s total QL)' % self.quarterLength
+            return msg
+        else:
+            return self.components[0]._getFullName()
 
     fullName = property(_getFullName, 
         doc = '''Return the most complete representation of this Duration, providing dots, type, tuplet, and quarter length representation. 
@@ -2081,19 +2161,19 @@ class Duration(DurationCommon):
         >>> from music21 import *
         >>> d = duration.Duration(quarterLength=1.5)
         >>> d.fullName
-        'Dotted Quarter (1.5QL)'
+        'Dotted Quarter'
         
         >>> d = duration.Duration(type='half')
         >>> d.fullName
-        'Half (2.0QL)'
+        'Half'
         
         >>> d = duration.Duration(quarterLength=1.25)
         >>> d.fullName
-        'Complex (1.25QL)'
+        'Quarter tied to 16Th (1.25 total QL)'
         
         >>> d = duration.Duration(quarterLength=0.333333)
         >>> d.fullName
-        'Eighth <music21.duration.Tuplet 3/2/eighth> (0.33QL)'
+        'Eighth Triplet (0.33QL)'
 
         ''')
 
