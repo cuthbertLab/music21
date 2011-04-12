@@ -911,6 +911,22 @@ class Accidental(music21.Music21Object):
         doc = '''Return a unicode representation of this accidental. 
         ''')
 
+
+
+    def _getFullName(self):
+        # keep lower case for now
+        return self.name
+
+    fullName = property(_getFullName, 
+        doc = '''Return the most complete representation of this Accidental. 
+
+        >>> from music21 import *
+        >>> a = pitch.Accidental('double-flat')
+        >>> a.fullName
+        'double-flat'
+        ''')
+
+
     #---------------------------------------------------------------------------
     def inheritDisplay(self, other):
         '''Given another Accidental object, inherit all the display properites
@@ -1137,7 +1153,11 @@ class Pitch(music21.Music21Object):
         self.fundamental = None
 
     def __repr__(self):
-        return self._getFullName()
+        name = self.nameWithOctave
+        if self.microtone.cents != 0:
+            return name + self._microtone.__repr__()
+        else:
+            return name
 
     def __eq__(self, other):
         '''Do not accept enharmonic equivalance.
@@ -1276,7 +1296,7 @@ class Pitch(music21.Music21Object):
         >>> p.microtone = 33 # adjustment in cents     
         >>> p
         E-4(+33c)
-        >>> p.name, p.nameWithOctave # these representations are unchanged
+        >>> (p.name, p.nameWithOctave) # these representations are unchanged
         ('E-', 'E-4')
         >>> p.microtone = '(-12c' # adjustment in cents     
         >>> p
@@ -1740,7 +1760,6 @@ class Pitch(music21.Music21Object):
 
     def _getNameWithOctave(self):
         '''Returns pitch name with octave
-
         '''
         if self.octave is None:
             return self.name
@@ -1780,10 +1799,17 @@ class Pitch(music21.Music21Object):
 
 
     def _getFullName(self):
+        name = '%s' % self._step
+        if self.octave is not None:
+            name += '%s' % self.octave
+
+        if self.accidental is not None:
+            name += '-%s' % self.accidental._getFullName()
+
         if self.microtone.cents != 0:
-            return self.nameWithOctave + self._microtone.__repr__()
+            return name + ' ' + self._microtone.__repr__()
         else:
-            return self.nameWithOctave
+            return name
 
     fullName = property(_getFullName, 
         doc = '''Return the most complete representation of this Pitch, providing name, octave, accidental, and any microtonal adjustments. 
@@ -1792,7 +1818,11 @@ class Pitch(music21.Music21Object):
         >>> p = pitch.Pitch('A-3')
         >>> p.microtone = 33.33
         >>> p.fullName
-        'A-3(+33c)'
+        'A3-flat (+33c)'
+        
+        >>> p = pitch.Pitch('A`7')
+        >>> p.fullName
+        'A7-half-flat'
         ''')
 
 

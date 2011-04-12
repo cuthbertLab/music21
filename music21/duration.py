@@ -1681,7 +1681,12 @@ class DurationUnit(DurationCommon):
             msg.append('%s ' % dotStr)
 
         # type added here
-        typeStr = self._getType().title()
+        typeStr = self._getType()
+        if typeStr[0] in ['1', '2', '3', '5', '6']:
+            pass # do nothing with capitalization
+        else:
+            typeStr = typeStr.title()
+
         if typeStr.lower() == 'complex':
             pass
         else:
@@ -2150,7 +2155,7 @@ class Duration(DurationCommon):
             for part in self.components:
                 msg.append(part._getFullName())
             msg = ' tied to '.join(msg)
-            msg += ' (%s total QL)' % self.quarterLength
+            msg += ' (%s total QL)' % (round(self._getQuarterLength(), 2))
             return msg
         else:
             return self.components[0]._getFullName()
@@ -2169,11 +2174,23 @@ class Duration(DurationCommon):
         
         >>> d = duration.Duration(quarterLength=1.25)
         >>> d.fullName
-        'Quarter tied to 16Th (1.25 total QL)'
+        'Quarter tied to 16th (1.25 total QL)'
+        >>> d.addDurationUnit(duration.DurationUnit(.3333333))
+        >>> d.fullName
+        'Quarter tied to 16th tied to Eighth Triplet (0.33QL) (1.58 total QL)'
+
         
         >>> d = duration.Duration(quarterLength=0.333333)
         >>> d.fullName
         'Eighth Triplet (0.33QL)'
+
+        >>> d = duration.Duration(quarterLength=0.666666)
+        >>> d.fullName
+        'Quarter Triplet (0.67QL)'
+
+        >>> d = duration.Duration(quarterLength=0.571428)
+        >>> d.fullName
+        'Quarter Tuplet of 7/4ths (0.57QL)'
 
         ''')
 

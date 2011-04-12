@@ -994,16 +994,16 @@ class Note(NotRest):
         >>> from music21 import *
         >>> n = note.Note('A-', quarterLength=1.5)
         >>> n.fullName
-        'A- Dotted Quarter (1.5QL)'
+        'A-flat Dotted Quarter'
         
         >>> n = note.Note('E~3', quarterLength=2)
         >>> n.fullName
-        'E~3 Half (2.0QL)'
+        'E3-half-sharp Half'
         
         >>> n = note.Note('D', quarterLength=.25)
         >>> n.microtone = 25
         >>> n.fullName
-        'D(+25c) 16Th (0.25QL)'
+        'D (+25c) 16th'
         ''')
 
     #---------------------------------------------------------------------------
