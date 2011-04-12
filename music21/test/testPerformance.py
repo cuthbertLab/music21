@@ -170,6 +170,16 @@ class Test(unittest.TestCase):
             d.quarterLength = ql
             post = d.quarterLength
 
+    def runCreatePitches(self):
+        '''Creating 50000 Pitch objects
+        '''
+        from music21 import pitch
+        pList = [1.5, 5, 20.333333, 8, 2.5, 'A#', 'b`', 'c6#~']
+
+        for i in range(50000):
+            input = pList[i%len(pList)]
+            p = pitch.Pitch(input)
+            p.transpose('p5', inPlace=True)
 
 
     def runParseABC(self):
@@ -287,7 +297,13 @@ class Test(unittest.TestCase):
 #                  '2010.10.07': 11.9290, 
 #                 }),
 # 
-# 
+
+
+            (self.runCreatePitches, 
+                {'2011.04.12': 31.071, 
+                }),
+
+
 #             (self.runParseHaydn, 
 #                 {'2009.12.14': 4.08, 
 #                  '2009.12.15': 3.531,
@@ -313,10 +329,10 @@ class Test(unittest.TestCase):
 #                 }),
 # 
 
-            (self.runParseMonteverdiRNText, 
-                {'2011.02.27': 6.411, 
-                 '2011.02.28': 2.944, 
-                }),
+#             (self.runParseMonteverdiRNText, 
+#                 {'2011.02.27': 6.411, 
+#                  '2011.02.28': 2.944, 
+#                 }),
 
 
 

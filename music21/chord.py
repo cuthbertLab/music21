@@ -529,6 +529,31 @@ class Chord(note.NotRest):
 
 # possibly add methods to create chords from pitch classes:
 # c2 = chord.fromPitchClasses([0, 1, 3, 7])
+
+
+    #---------------------------------------------------------------------------
+    def _getFullName(self):
+        msg = []
+        sub = []
+        for p in self.pitches:
+            sub.append('%s' % p.fullName)
+        msg.append('{%s} ' % ' | '.join(sub))
+        msg.append(self.duration.fullName)
+        msg.append(' Chord')
+        return ''.join(msg) 
+
+    fullName = property(_getFullName, 
+        doc = '''Return the most complete representation of this Note, providing duration and pitch information.
+
+        >>> from music21 import *
+        >>> c = chord.Chord(["D","F#","A"])
+        >>> c.fullName
+        '{D | F-sharp | A} Quarter Chord'
+        
+        >>> chord.Chord(['d1', 'e4-', 'b3-'], quarterLength=2/3.).fullName
+        '{D1 | E4-flat | B3-flat} Quarter Triplet (0.67QL) Chord'
+        ''')
+
     #---------------------------------------------------------------------------
 
     def transpose(self, value, inPlace=False):

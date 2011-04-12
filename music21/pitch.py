@@ -1129,6 +1129,8 @@ class Pitch(music21.Music21Object):
         self._twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
         # store an Accidental and Microtone objects
+        # note that creating an Accidental objects is much more time consuming
+        # than a microtone
         self._accidental = None
         self._microtone = Microtone() 
 

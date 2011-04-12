@@ -986,7 +986,8 @@ class Note(NotRest):
         msg = []
         msg.append('%s ' % self.pitch.fullName)
         msg.append(self.duration.fullName)
-        return ''.join(msg)
+        msg.append(' Note')
+        return ''.join(msg) 
 
     fullName = property(_getFullName, 
         doc = '''Return the most complete representation of this Note, providing duration and pitch information.
@@ -994,16 +995,16 @@ class Note(NotRest):
         >>> from music21 import *
         >>> n = note.Note('A-', quarterLength=1.5)
         >>> n.fullName
-        'A-flat Dotted Quarter'
+        'A-flat Dotted Quarter Note'
         
         >>> n = note.Note('E~3', quarterLength=2)
         >>> n.fullName
-        'E3-half-sharp Half'
+        'E3-half-sharp Half Note'
         
         >>> n = note.Note('D', quarterLength=.25)
         >>> n.microtone = 25
         >>> n.fullName
-        'D (+25c) 16th'
+        'D (+25c) 16th Note'
         ''')
 
     #---------------------------------------------------------------------------
@@ -1128,6 +1129,26 @@ class Rest(GeneralNote):
 
     def __repr__(self):
         return "<music21.note.Rest %s>" % self.name
+
+
+    def _getFullName(self):
+        msg = []
+        msg.append(self.duration.fullName)
+        msg.append(' Rest')
+        return ''.join(msg) 
+
+    fullName = property(_getFullName, 
+        doc = '''Return the most complete representation of this Rest, providing duration information.
+
+        >>> from music21 import *
+        >>> r = note.Rest(quarterLength=1.5)
+        >>> r.fullName
+        'Dotted Quarter Rest'
+        
+        >>> note.Rest(type='whole').fullName
+        'Whole Rest'
+        ''')
+
 
     def _preDurationLily(self):
         return "r"
