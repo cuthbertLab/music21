@@ -537,9 +537,9 @@ class Chord(note.NotRest):
         sub = []
         for p in self.pitches:
             sub.append('%s' % p.fullName)
-        msg.append('{%s} ' % ' | '.join(sub))
+        msg.append('Chord')
+        msg.append(' {%s} ' % ' | '.join(sub))
         msg.append(self.duration.fullName)
-        msg.append(' Chord')
         return ''.join(msg) 
 
     fullName = property(_getFullName, 
@@ -548,10 +548,10 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> c = chord.Chord(["D","F#","A"])
         >>> c.fullName
-        '{D | F-sharp | A} Quarter Chord'
+        'Chord {D | F-sharp | A} Quarter'
         
         >>> chord.Chord(['d1', 'e4-', 'b3-'], quarterLength=2/3.).fullName
-        '{D1 | E4-flat | B3-flat} Quarter Triplet (0.67QL) Chord'
+        'Chord {D1 | E4-flat | B3-flat} Quarter Triplet (0.67QL)'
         ''')
 
     #---------------------------------------------------------------------------
