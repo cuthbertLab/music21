@@ -18,7 +18,7 @@ class IntervalSearcher(object):
         self.intervalLength = len(intervalList)
 
     def compareToStream(self, stream):
-        streamLength = len(stream.notes)
+        streamLength = len(stream.notesAndRests)
         if self.intervalLength > streamLength: 
             return False
         stIntervalList = stream.melodicIntervals(skipRests = True)
@@ -39,7 +39,7 @@ class IntervalSearcher(object):
             else:
                 for colorNote in range(i, self.intervalLength):
                     ## does not exactly work because of rests, oh well
-                    stream.notes[colorNote].editorial.color = "blue"
+                    stream.notesAndRests[colorNote].editorial.color = "blue"
                 return True
         return False
 
@@ -50,7 +50,7 @@ class NoteSearcher(object):
         self.noteLength = len(noteList)
 
     def compareToStream(self, stream):
-        sN = stream.notes
+        sN = stream.notesAndRests
         streamLength = len(sN)
         if streamLength < self.noteLength: return False
         for i in range(streamLength + 1 - self.noteLength):
@@ -92,7 +92,7 @@ def searchForNotes(notesStr):
             for i in range(len(thisCadence.streams)):
                 if searcher1.compareToStream(thisCadence.streams[i]) is True:
                     notesList = ""
-                    for thisNote in thisCadence.streams[i].notes:
+                    for thisNote in thisCadence.streams[i].notesAndRests:
                         #thisNote.editorial.color = "blue"
                         if hasattr(thisNote.lily, "value"):
                             notesList += thisNote.lily.value + " "
@@ -133,7 +133,7 @@ def searchForIntervals(notesStr):
             for i in range(len(thisCadence.streams)):
                 if searcher1.compareToStream(thisCadence.streams[i]) is True:
                     notesList = ""
-                    for thisNote in thisCadence.streams[i].notes:
+                    for thisNote in thisCadence.streams[i].notesAndRests:
                         notesList += thisNote.name + " "
                         #thisNote.editorial.color = "blue"
                     streamLily += "\\score {" + \
@@ -170,12 +170,12 @@ def searchForVat1969():
     for i in range(0, len(cadB2.streams)): 
         strB1 = cadB1.streams[i]
         strB2 = cadB2.streams[i]
-        if len(strB1.notes) < 3 or len(strB2.notes) < 3:
+        if len(strB1.notesAndRests) < 3 or len(strB2.notesAndRests) < 3:
             break
-            if findUpDown(strB1.notes[-3], strB1.notes[-2], strB1.notes[-1]):
-                if findUpDown(strB2.notes[-3], strB2.notes[-2], strB2.notes[-1]):
+            if findUpDown(strB1.notesAndRests[-3], strB1.notesAndRests[-2], strB1.notesAndRests[-1]):
+                if findUpDown(strB2.notesAndRests[-3], strB2.notesAndRests[-2], strB2.notesAndRests[-1]):
                     print(thisWork.title.encode('utf-8') + "   ",)
-                    b1b2int = interval.Interval(note1 = strB1.notes[-1], note2 = strB2.notes[-1])
+                    b1b2int = interval.Interval(note1 = strB1.notesAndRests[-1], note2 = strB2.notesAndRests[-1])
                     print(b1b2int.diatonic.generic.niceName)
                   
 def findUpDown(n1, n2, n3):

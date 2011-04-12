@@ -32,7 +32,7 @@ def spliceAnalysis(book = 3, madrigal = 1):
     # get from first part
     aMeasures = analysis.parts[0].measures(1,20)
     aMeasures.getElementsByClass('Measure')[0].clef = clef.TrebleClef()
-    for myN in aMeasures.flat.notes:
+    for myN in aMeasures.flat.notesAndRests:
         myN.hideObjectOnPrint = True
     x = aMeasures.write()    
     print x
@@ -196,12 +196,12 @@ def monteverdiParallels(books = [3], start = 1, end = 20, show = True, strict = 
             displayMe = False
             for i in range(len(c.parts) - 1):
                 iName = c.parts[i].id
-                ifn = c.parts[i].flat.notes
+                ifn = c.parts[i].flat.notesAndRests
                 omi = ifn.offsetMap
                 for j in range(i+1, len(c.parts)):
                     jName = c.parts[j].id      
     
-                    jfn = c.parts[j].flat.notes
+                    jfn = c.parts[j].flat.notesAndRests
                     for k in range(len(omi) - 1):
                         n1pi = omi[k]['element']
                         n2pi = omi[k+1]['element']                    
@@ -238,7 +238,7 @@ def findPhraseBoundaries(book = 4, madrigal = 12):
     phraseScoresByOffset = {}
 
     for p in sc.parts:
-        partNotes = p.flat.stripTies(matchByPitch = True).notes
+        partNotes = p.flat.stripTies(matchByPitch = True).notesAndRests
         thisPartPhraseScores = [] # keeps track of the likelihood that a phrase boundary is after note i
         for i in range(2, len(partNotes) - 2): # start on the third note and stop searching on the third to last note...
             thisScore = 0
@@ -285,7 +285,7 @@ def findPhraseBoundaries(book = 4, madrigal = 12):
                 
             phraseScoresByOffset[phraseOffset] = existingScore + thisScore
 
-    flattenedBass = sc.parts[-1].flat.notes
+    flattenedBass = sc.parts[-1].flat.notesAndRests
     for thisOffset in sorted(phraseScoresByOffset.keys()):
         psbo = phraseScoresByOffset[thisOffset]
         if psbo > 0: 

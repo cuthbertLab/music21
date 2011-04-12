@@ -155,7 +155,7 @@ def findHighestNotes(show=True, *arguments, **keywords):
         found.append(part.flat.getElementsByClass(music21.clef.Clef)[0])
         highestNoteNum = 0
         for m in part.getElementsByClass('Measure'):
-            for n in m.notes:
+            for n in m.notesAndRests:
                 if n.midi > highestNoteNum:
                     highestNoteNum = n.midi
                     highestNote = copy.deepcopy(n) # optional
@@ -212,7 +212,7 @@ def ex1_revised(show=True, *arguments, **keywords):
     
 def findPotentialPassingTones(show = True):
     g = corpus.parseWork('gloria')
-    gcn = g.parts['cantus'].measures(1,126).flat.notes
+    gcn = g.parts['cantus'].measures(1,126).flat.notesAndRests
 
     gcn[0].lyric = ""
     gcn[-1].lyric = ""
@@ -250,7 +250,7 @@ def findPotentialPassingTones(show = True):
 
 def demoJesse(show=True):
     luca = corpus.parseWork('luca/gloria')
-    for n in luca.measures(2, 20).flat.notes:
+    for n in luca.measures(2, 20).flat.notesAndRests:
         if n.isRest is False:
             n.lyric = n.pitch.german
     if show:   

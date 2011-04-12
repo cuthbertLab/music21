@@ -350,8 +350,8 @@ def split(streamObj, objName, fx):
 #         measureLength = timeSignature.barDuration.quarterLength
 #         currentQtrPosition = startingQtrPosition
 #         currentMeasure = startingMeasure
-#         for i in range(len(self.notes)):
-#             thisNote = self.notes[i]
+#         for i in range(len(self.notesAndRests)):
+#             thisNote = self.notesAndRests[i]
 
 # we probably do not need to continue to support a noteTimeInfo intermediary 
 # data structure
@@ -384,8 +384,8 @@ def split(streamObj, objName, fx):
 #             raise StreamException("Can't sliceDurationsForMeasures without a TimeSignature object")
 # 
 #         measureLength = timeSignature.barDuration.quarterLength
-#         for i in range(len(self.notes)):
-#             thisNote = self.notes[i]
+#         for i in range(len(self.notesAndRests)):
+#             thisNote = self.notesAndRests[i]
 #             qtrPosition = self.noteTimeInfo[i]['quarterPosition']
 #             noteLength = thisNote.duration.quarterLength
 #             if (noteLength + qtrPosition > measureLength):
@@ -445,8 +445,8 @@ def split(streamObj, objName, fx):
 #         returnMeasures.append(currentMeasureObject)
 #         lastNote = None
 # 
-#         for i in range(len(self.notes)):
-#             thisNote = self.notes[i]
+#         for i in range(len(self.notesAndRests)):
+#             thisNote = self.notesAndRests[i]
 #             thisNoteMeasure = self.noteTimeInfo[i]['measure']
 #             while thisNoteMeasure > currentMeasure:
 #                 currentMeasureObject.filled = True
@@ -456,7 +456,7 @@ def split(streamObj, objName, fx):
 #                 currentMeasureObject.timeSignature = timeSignature
 #                 currentMeasureObject.number = int(currentMeasure)
 #                 returnMeasures.append(currentMeasureObject)
-#             currentMeasureObject.notes.append(thisNote)
+#             currentMeasureObject.notesAndRests.append(thisNote)
 #             currentQtrPosition += thisNote.duration.quarterLength
 #             currentQtrPosition = currentQtrPosition % timeSignature.barDuration.quarterLength 
 #             lastNote = thisNote

@@ -70,7 +70,7 @@ class WindowedAnalysis(object):
         <music21.stream.Measure 1 offset=0.0>
         >>> post.getElementsByClass('Measure')[0].timeSignature # set to 1/4 time signature
         <music21.meter.TimeSignature 1/4>
-        >>> len(post.getElementsByClass('Measure')[1].notes) # one note in this measures 
+        >>> len(post.getElementsByClass('Measure')[1].notesAndRests) # one note in this measures 
         1
         '''
         # create a stream that contains just a 1/4 time signature; this is 
@@ -287,7 +287,7 @@ class TestMockProcesor(object):
     def process(self, subStream):
         '''Simply count the number of notes found
         '''
-        return len(subStream.flat.notes), None
+        return len(subStream.flat.notesAndRests), None
     
 class Test(unittest.TestCase):
 

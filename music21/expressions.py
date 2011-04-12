@@ -446,7 +446,7 @@ class Test(unittest.TestCase):
         expList = realizeOrnaments(n1)
         st1 = stream.Stream()
         st1.append(expList)
-        st1n = st1.notes
+        st1n = st1.notesAndRests
         self.assertEqual(st1n[0].name, "D")
         self.assertEqual(st1n[0].quarterLength, 0.125)
         self.assertEqual(st1n[1].name, "C")

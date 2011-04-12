@@ -100,8 +100,8 @@ class Distributor(object):
     def _uploadPyPi(self):
         '''Upload source package to PyPI
         '''
-        os.system('cd %s; python setup.py bdist_egg upload' % 
-                self.fpPackageDir)
+        os.system('cd %s; %s setup.py bdist_egg upload' % 
+                (self.fpPackageDir, PY))
 
     def _uploadGoogleCode(self, fp):
         '''Upload distributions to Google code. Requires googlecode_upload.py script from: 
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     import sys
     d = Distributor()
     d.build()
-    #a.upload()
+    d.upload()
 
 
 

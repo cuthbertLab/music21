@@ -92,7 +92,7 @@ class Test(unittest.TestCase):
         sCadence.insert(0, partLower)
 
         self.assertEquals(len(sCadence.getElementsByClass('Part')), 2)
-        self.assertEquals(len(sCadence.flat.notes), 7)
+        self.assertEquals(len(sCadence.flat.notesAndRests), 7)
 
         #sCadence.show()
 
@@ -204,7 +204,7 @@ class Test(unittest.TestCase):
 
         # create a new set of measure partitioning
         # we now have the same notes in new measure objects
-        sMeasures = sPart.flat.notes.makeMeasures(meter.TimeSignature('6/8'))
+        sMeasures = sPart.flat.notesAndRests.makeMeasures(meter.TimeSignature('6/8'))
 
         # measure 2 is at index 1
         self.assertEquals(sMeasures[1].number, 2)
@@ -230,7 +230,7 @@ class Test(unittest.TestCase):
         self.assertEquals(sPart.getElementsByClass('Measure')[0].timeSignature.numerator, 5)
         post = sPart.musicxml
 
-        sNew = sPart.flat.notes
+        sNew = sPart.flat.notesAndRests
         sNew.insert(0, meter.TimeSignature('2/4'))
         post = sNew.musicxml
 
@@ -251,18 +251,18 @@ class Test(unittest.TestCase):
 
         sRebar = stream.Stream()
         for part in sSrc.getElementsByClass(stream.Part):
-            newPart = part.flat.notes.makeMeasures(tsStream)
+            newPart = part.flat.notesAndRests.makeMeasures(tsStream)
             newPart.makeTies(inPlace=True)
             sRebar.insert(0, newPart)
         post = sRebar.musicxml
 
         #sSrc = corpus.parse('bach/bwv57.8.xml')
         sPart = sSrc.getElementById('Soprano')
-        self.assertEquals(sPart.flat.notes[0].name, 'B-')
-        self.assertEquals(sPart.flat.notes[4].beat, 2.5)
-        self.assertEquals(sPart.flat.notes[4].beatStr, '2 1/2')
+        self.assertEquals(sPart.flat.notesAndRests[0].name, 'B-')
+        self.assertEquals(sPart.flat.notesAndRests[4].beat, 2.5)
+        self.assertEquals(sPart.flat.notesAndRests[4].beatStr, '2 1/2')
 
-        for n in sPart.flat.notes:
+        for n in sPart.flat.notesAndRests:
             n.addLyric(n.beatStr)
         post = sPart.musicxml
 
@@ -279,7 +279,7 @@ class Test(unittest.TestCase):
         sPart = sSrc.getElementById('Alto')
         ts = meter.TimeSignature('6/8')
 
-        sMeasures = sPart.flat.notes.makeMeasures(ts)
+        sMeasures = sPart.flat.notesAndRests.makeMeasures(ts)
         #sMeasures.show('t')
 
         sMeasures.makeTies(inPlace=True)
@@ -292,7 +292,7 @@ class Test(unittest.TestCase):
         self.assertEquals(sMeasures[1].timeSignature, None)
 
         beatStrList = []
-        for n in sMeasures.flat.notes:
+        for n in sMeasures.flat.notesAndRests:
             bs = n.beatStr
             n.addLyric(bs)
             beatStrList.append(bs)
@@ -316,7 +316,7 @@ class Test(unittest.TestCase):
         # mensural cannon
         from music21 import stream, corpus
         src = corpus.parse('bach/bwv323.xml')
-        ex = src.getElementById('Soprano').flat.notes[:20]
+        ex = src.getElementById('Soprano').flat.notesAndRests[:20]
         
         s = stream.Score()
         for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
@@ -327,12 +327,12 @@ class Test(unittest.TestCase):
         #s.show()
         # all parts have the same number of notes
         for i in range(3):
-            self.assertEqual(len(s.parts[i].flat.notes), 20) 
+            self.assertEqual(len(s.parts[i].flat.notesAndRests), 20) 
 
-        self.assertEqual(len(s.parts[0].measures(1,4).flat.notes), 9) 
-        self.assertEqual(len(s.parts[1].measures(1,4).flat.notes), 6) 
-        self.assertEqual(len(s.parts[2].measures(1,4).flat.notes), 19) 
-        self.assertEqual(len(s.parts[3].measures(1,4).flat.notes), 10) 
+        self.assertEqual(len(s.parts[0].measures(1,4).flat.notesAndRests), 9) 
+        self.assertEqual(len(s.parts[1].measures(1,4).flat.notesAndRests), 6) 
+        self.assertEqual(len(s.parts[2].measures(1,4).flat.notesAndRests), 19) 
+        self.assertEqual(len(s.parts[3].measures(1,4).flat.notesAndRests), 10) 
         
 
 
@@ -411,7 +411,7 @@ class Test(unittest.TestCase):
                     # We label the Chord and the first Note of the Measure
                     c.lyric = "m. " + str(m.number)
                     primeForm = chord.Chord(m.pitches).primeFormString
-                    firstNote = m.notes[0]
+                    firstNote = m.notesAndRests[0]
                     firstNote.lyric = primeForm
                     # The chord (in closed position) and the Measures are 
                     # appended for display 

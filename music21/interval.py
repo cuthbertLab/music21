@@ -2250,7 +2250,7 @@ class Test(unittest.TestCase):
 
         def collectAccidentalDisplayStatus(s):
             post = []
-            for e in s.flat.notes:
+            for e in s.flat.notesAndRests:
                 if e.pitch.accidental != None:
                     post.append(e.pitch.accidental.displayStatus)
                 else: # mark as not having an accidental

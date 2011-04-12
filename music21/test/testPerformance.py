@@ -196,7 +196,7 @@ class Test(unittest.TestCase):
                 post = m.getContextByClass(key.KeySignature)
                 assert post != None
 
-                for n in m.notes:
+                for n in m.notesAndRests:
                     post = n.getContextByClass(clef.Clef)
                     assert post != None
                     post = n.getContextByClass(meter.TimeSignature)

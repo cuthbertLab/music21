@@ -1030,7 +1030,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     1
     >>> mt = mf.tracks[0] 
     >>> s = midiTrackToStream(mt)
-    >>> len(s.notes)
+    >>> len(s.notesAndRests)
     9
     '''
     environLocal.printDebug(['midiTrackToStream(): got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
@@ -1299,7 +1299,7 @@ def midiFileToStream(mf, inputM21=None):
     >>> len(mf.tracks)
     1
     >>> s = midiFileToStream(mf)
-    >>> len(s.flat.notes)
+    >>> len(s.flat.notesAndRests)
     9
     '''
 

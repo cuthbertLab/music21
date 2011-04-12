@@ -76,16 +76,16 @@ We can create a new TimeSignature object by providing a string representation of
 Rebaring with Changing Time Signatures 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To actually change the position of the notes, creating new Measures with new TimeSignatures, we need to rebar the music. The simplest way to do this is to get all the notes from a Part using the :attr:`~music21.stream.Stream.notes` property on a flat Stream representation. Then, by inserting a new TimeSignature at the start of this Stream using the :meth:`~music21.stream.Stream.insert` method, we can generate new notation with the show() method. Note that here we are not creating Measures directly; instead, we are assigning TimeSignature objects into a Stream of notes. When the show() method is called, Measures are created within a temporary Stream according to the relevant TimeSignature objects.
+To actually change the position of the notes, creating new Measures with new TimeSignatures, we need to rebar the music. The simplest way to do this is to get all the notes from a Part using the :attr:`~music21.stream.Stream.notesAndRests` property on a flat Stream representation. Then, by inserting a new TimeSignature at the start of this Stream using the :meth:`~music21.stream.Stream.insert` method, we can generate new notation with the show() method. Note that here we are not creating Measures directly; instead, we are assigning TimeSignature objects into a Stream of notes. When the show() method is called, Measures are created within a temporary Stream according to the relevant TimeSignature objects.
 
->>> sNew = sPart.flat.notes
+>>> sNew = sPart.flat.notesAndRests
 >>> sNew.insert(0, meter.TimeSignature('2/4'))
 >>> sNew.show()
 
 .. image:: images/overviewMeters-11.*
     :width: 600
 
-The :attr:`~music21.stream.Stream.notes` property, while useful, only gathers Notes, Rests, or other subclasses of :class:`~music21.note.GeneralNote`. Notice that, in the above example, the :class:`~music21.key.KeySignature` and :class:`~music21.instrument.Insturment` objects, as apparent in the notation, have been removed.  
+The :attr:`~music21.stream.Stream.notesAndRests` property, while useful, only gathers Notes, Rests, or other subclasses of :class:`~music21.note.GeneralNote`. Notice that, in the above example, the :class:`~music21.key.KeySignature` and :class:`~music21.instrument.Insturment` objects, as apparent in the notation, have been removed.  
 
 If we want to get all elements in the Stream except those that are a specific class, the :meth:`~music21.stream.Stream.getElementsNotOfClass` method can be used. In the example below, we gather all elements that are not TimeSignature objects, and then assign a new TimeSignature to the new Stream.
 
@@ -145,16 +145,16 @@ The Note :attr:`~music21.note.GeneralNote.beat` property will return, if availab
 
 >>> sSrc = corpus.parseWork('bach/bwv57.8.xml')
 >>> sPart = sSrc.getElementById('Soprano')
->>> sPart.flat.notes[0]
+>>> sPart.flat.notesAndRests[0]
 <music21.note.Note B->
->>> sPart.flat.notes[4].beat
+>>> sPart.flat.notesAndRests[4].beat
 2.5
->>> sPart.flat.notes[4].beatStr
+>>> sPart.flat.notesAndRests[4].beatStr
 '2 1/2'
 
 We can annotate each Note in the Part with the string returned by :attr:`~music21.note.GeneralNote.beatStr` using the Note :attr:`~music21.note.GeneralNote.addLyric` method. 
 
->>> for n in sPart.flat.notes:
+>>> for n in sPart.flat.notesAndRests:
 ...     n.addLyric(n.beatStr)
 ... 
 >>> sPart.show()
@@ -168,7 +168,7 @@ If we change the TimeSignature in a Part, the beat counts will reflect this chan
 >>> sPart = sPart.flat.getElementsNotOfClass(meter.TimeSignature)
 >>> sMeasures = sPart.makeMeasures(meter.TimeSignature('6/8'))
 >>> sMeasures.makeTies(inPlace=True)
->>> for n in sMeasures.flat.notes:
+>>> for n in sMeasures.flat.notesAndRests:
 ...     n.addLyric(n.beatStr)
 ... 
 >>> sMeasures.show()
@@ -477,7 +477,7 @@ In the following example, all leading tones, or C#s, are collected into a new St
             music21.clef.Clef)[0])
         for i in range(len(part.getElementsByClass('Measure'))):
             m = part.getElementsByClass('Measure')[i]
-            for n in m.notes:
+            for n in m.notesAndRests:
                 if n.name == 'C#': 
                     n.addLyric('%s, m. %s' %
                         (part.id[0], 
@@ -525,7 +525,7 @@ The number of hierarchical levels, found with the :meth:`~music21.meter.TimeSign
                     ts.beatSequence[h][i][j].subdivide(2)
     
     for m in partBass.getElementsByClass('Measure'):
-        for n in m.notes:
+        for n in m.notesAndRests:
             for i in range(ts.getBeatDepth(n.offset)):
                 n.addLyric('*')
     
@@ -570,7 +570,7 @@ The following example extracts the Bass line of a Bach chorale in 3/4 and, after
     
     for m in partBass.getElementsByClass('Measure'):
         lastBeat = None
-        for n in m.notes:
+        for n in m.notesAndRests:
             beat, progress = ts.getBeatProgress(n.offset)
             if beat != lastBeat and progress == 0:
                 if n.tie != None and n.tie.type == 'stop':

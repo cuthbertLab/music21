@@ -464,7 +464,7 @@ class Test(unittest.TestCase):
         post = ex.process()
         #post.show()
         self.assertEqual(len(post.getElementsByClass('Measure')), 12)
-        self.assertEqual(len(post.flat.notes), 48)
+        self.assertEqual(len(post.flat.notesAndRests), 48)
         self.assertEqual([m.offset for m in post.getElementsByClass('Measure')], [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0])
 
         self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')], ['G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4', 'G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4'])
@@ -491,7 +491,7 @@ class Test(unittest.TestCase):
         post = ex.process()
 
         self.assertEqual(len(post.getElementsByClass('Measure')), 4)
-        self.assertEqual(len(post.flat.notes), 16)
+        self.assertEqual(len(post.flat.notesAndRests), 16)
         self.assertEqual([m.offset for m in post.getElementsByClass('Measure')], [0.0, 4.0, 8.0, 12.0])
 
         self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')], ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
@@ -522,7 +522,7 @@ class Test(unittest.TestCase):
         post = ex.process()
 
         self.assertEqual(len(post.getElementsByClass('Measure')), 5)
-        self.assertEqual(len(post.flat.notes), 20)
+        self.assertEqual(len(post.flat.notesAndRests), 20)
         self.assertEqual([m.offset for m in post.getElementsByClass('Measure')], [0.0, 4.0, 8.0, 12.0, 16.0])
         self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')], ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'F3', 'F3', 'F3', 'F3', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
 
@@ -537,7 +537,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.draughtOfAle)
         self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 18)
         self.assertEqual(s.metadata.title, '"A Draught of Ale"    (jig)     0912')
-        self.assertEqual(len(s.flat.notes), 88)
+        self.assertEqual(len(s.flat.notesAndRests), 88)
 
         #s.show()
         ex = repeat.Expander(s.parts[0])
@@ -547,7 +547,7 @@ class Test(unittest.TestCase):
         self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 36)
         # make sure metadata is copied
         self.assertEqual(post.metadata.title, '"A Draught of Ale"    (jig)     0912')
-        self.assertEqual(len(post.flat.notes), 88 * 2)
+        self.assertEqual(len(post.flat.notesAndRests), 88 * 2)
 
         #post.show()
 
@@ -559,7 +559,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.kingOfTheFairies)
         self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 26)
         self.assertEqual(s.metadata.title, 'King of the fairies')
-        self.assertEqual(len(s.flat.notes), 145)
+        self.assertEqual(len(s.flat.notesAndRests), 145)
 
         #s.show()
         ex = repeat.Expander(s.parts[0])
@@ -571,7 +571,7 @@ class Test(unittest.TestCase):
         self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 53)
         # make sure metadata is copied
         self.assertEqual(post.metadata.title, 'King of the fairies')
-        self.assertEqual(len(post.flat.notes), 286)
+        self.assertEqual(len(post.flat.notesAndRests), 286)
 
         #post.show()
 

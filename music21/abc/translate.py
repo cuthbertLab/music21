@@ -364,8 +364,8 @@ class Test(unittest.TestCase):
         s = abcToStreamScore(af.readstr(tf))
 
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].flat.notes), 111)
-        self.assertEqual(len(s.parts[1].flat.notes), 127)
+        self.assertEqual(len(s.parts[0].flat.notesAndRests), 111)
+        self.assertEqual(len(s.parts[1].flat.notesAndRests), 127)
 
         # chords are defined in second part here
         self.assertEqual(len(s.parts[1].flat.getElementsByClass('Chord')), 32)
@@ -396,9 +396,9 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s.parts), 3)
         # must flatten b/c  there are measures
-        self.assertEqual(len(s.parts[0].flat.notes), 6)
-        self.assertEqual(len(s.parts[1].flat.notes), 17)
-        self.assertEqual(len(s.parts[2].flat.notes), 6)
+        self.assertEqual(len(s.parts[0].flat.notesAndRests), 6)
+        self.assertEqual(len(s.parts[1].flat.notesAndRests), 17)
+        self.assertEqual(len(s.parts[2].flat.notesAndRests), 6)
 
         #s.show()
         #s.show('midi')
@@ -414,7 +414,7 @@ class Test(unittest.TestCase):
         s = abcToStreamScore(af.readstr(tf))
         match = []
         # match strings for better comparison
-        for n in s.flat.notes:
+        for n in s.flat.notesAndRests:
             match.append(str(n.quarterLength))
         self.assertEqual(match, ['0.333333333333', '0.333333333333', '0.333333333333', '0.2', '0.2', '0.2', '0.2', '0.2', '0.166666666667', '0.166666666667', '0.166666666667', '0.166666666667', '0.166666666667', '0.166666666667', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.142857142857', '0.666666666667', '0.666666666667', '0.666666666667', '0.666666666667', '0.666666666667', '0.666666666667', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '0.0833333333333', '2.0'])
 
@@ -435,10 +435,10 @@ class Test(unittest.TestCase):
         # filled with two quarter notes
         self.assertEqual(m1.duration.quarterLength, 2.0)
         # notes are shown as being on beat 2 and 3
-        self.assertEqual(m1.notes[0]._getMeasureOffset(), 1.0)
-        self.assertEqual(m1.notes[0].beat, 2.0)
-        self.assertEqual(m1.notes[1]._getMeasureOffset(), 2.0)
-        self.assertEqual(m1.notes[1].beat, 3.0)
+        self.assertEqual(m1.notesAndRests[0]._getMeasureOffset(), 1.0)
+        self.assertEqual(m1.notesAndRests[0].beat, 2.0)
+        self.assertEqual(m1.notesAndRests[1]._getMeasureOffset(), 2.0)
+        self.assertEqual(m1.notesAndRests[1].beat, 3.0)
 
 
         # two 16th pickup in 4/4
@@ -452,10 +452,10 @@ class Test(unittest.TestCase):
         # filled with two 16th
         self.assertEqual(m1.duration.quarterLength, 0.5)
         # notes are shown as being on beat 2 and 3
-        self.assertEqual(m1.notes[0]._getMeasureOffset(), 3.5)
-        self.assertEqual(m1.notes[0].beat, 4.5)
-        self.assertEqual(m1.notes[1]._getMeasureOffset(), 3.75)
-        self.assertEqual(m1.notes[1].beat, 4.75)
+        self.assertEqual(m1.notesAndRests[0]._getMeasureOffset(), 3.5)
+        self.assertEqual(m1.notesAndRests[0].beat, 4.5)
+        self.assertEqual(m1.notesAndRests[1]._getMeasureOffset(), 3.75)
+        self.assertEqual(m1.notesAndRests[1].beat, 4.75)
 
 
     def testOpusImport(self):
@@ -487,9 +487,9 @@ class Test(unittest.TestCase):
     
         #s.show()
 #         self.assertEqual(len(s.parts), 3)
-#         self.assertEqual(len(s.parts[0].notes), 6)
-#         self.assertEqual(len(s.parts[1].notes), 20)
-#         self.assertEqual(len(s.parts[2].notes), 6)
+#         self.assertEqual(len(s.parts[0].notesAndRests), 6)
+#         self.assertEqual(len(s.parts[1].notesAndRests), 20)
+#         self.assertEqual(len(s.parts[2].notesAndRests), 6)
 # 
         #s.show()
         #s.show('midi')
@@ -505,19 +505,19 @@ class Test(unittest.TestCase):
         # each score in the opus is a Stream that contains a Part and metadata
         p1 = o.getScoreByNumber(1).parts[0] 
         self.assertEqual(p1.offset, 0.0)
-        self.assertEqual(len(p1.flat.notes), 89)
+        self.assertEqual(len(p1.flat.notesAndRests), 89)
 
         p2 = o.getScoreByNumber(2).parts[0] 
         self.assertEqual(p2.offset, 0.0)
-        self.assertEqual(len(p2.flat.notes), 81)
+        self.assertEqual(len(p2.flat.notesAndRests), 81)
 
         p3 = o.getScoreByNumber(3).parts[0] 
         self.assertEqual(p3.offset, 0.0)
-        self.assertEqual(len(p3.flat.notes), 83)
+        self.assertEqual(len(p3.flat.notesAndRests), 83)
 
         p4 = o.getScoreByNumber(4).parts[0] 
         self.assertEqual(p4.offset, 0.0)
-        self.assertEqual(len(p4.flat.notes), 79)
+        self.assertEqual(len(p4.flat.notesAndRests), 79)
 
 
         sMerged = o.mergeScores()

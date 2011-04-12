@@ -1345,7 +1345,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         a = corpus.parse('bach/bwv5.7')
         found = []
-        for n in a.flat.notes:
+        for n in a.flat.notesAndRests:
             for obj in n.expressions:
                 if isinstance(obj, expressions.Fermata):
                     found.append(obj)
@@ -1393,12 +1393,12 @@ class Test(unittest.TestCase):
             self.assertEqual(len(m), nCount+1)
 
             # test matching beat proportion value
-            post = [m.notes[i].beat for i in range(nCount)]
+            post = [m.notesAndRests[i].beat for i in range(nCount)]
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeat[i], 4)
 
             # test getting beat duration
-            post = [m.notes[i].beatDuration.quarterLength for i in range(nCount)]
+            post = [m.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
 
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
@@ -1418,16 +1418,16 @@ class Test(unittest.TestCase):
             m2 = stream.Measure()
             m2.repeatAppend(n, nCount)
             self.assertEqual(len(m2), nCount)
-            self.assertEqual(len(m2.notes), nCount)
+            self.assertEqual(len(m2.notesAndRests), nCount)
 
             p.append(m2)
 
             # test matching beat proportion value
-            post = [m2.notes[i].beat for i in range(nCount)]
+            post = [m2.notesAndRests[i].beat for i in range(nCount)]
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeat[i], 4)
             # test getting beat duration
-            post = [m2.notes[i].beatDuration.quarterLength for i in range(nCount)]
+            post = [m2.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
             for i in range(len(matchBeat)):
                 self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
 
@@ -1444,7 +1444,7 @@ class Test(unittest.TestCase):
             s = corpus.parse(work)
             # always use tenor line    
             found = []
-            for n in s.parts[2].flat.notes:
+            for n in s.parts[2].flat.notesAndRests:
                 n.lyric = n.beatStr
                 found.append(n.beat)
             
@@ -1558,7 +1558,7 @@ class Test(unittest.TestCase):
             n.quarterLength = dur   
             m.repeatAppend(n, nCount)
 
-            self.assertEqual([n.beatStrength for n in m.notes], match)
+            self.assertEqual([n.beatStrength for n in m.notesAndRests], match)
             
 
 

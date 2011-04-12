@@ -287,7 +287,7 @@ class TestGetContextByClass(CallTest):
                 post = m.getContextByClass(clef.Clef)
                 post = m.getContextByClass(meter.TimeSignature)
                 post = m.getContextByClass(key.KeySignature)
-                for n in m.notes:
+                for n in m.notesAndRests:
                     post = n.getContextByClass(clef.Clef)
                     post = n.getContextByClass(meter.TimeSignature)
                     post = n.getContextByClass(key.KeySignature)

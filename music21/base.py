@@ -2952,7 +2952,7 @@ class Music21Object(JSONSerializer):
         >>> n.quarterLength = .5
         >>> m = stream.Measure()
         >>> m.repeatAppend(n, 4)
-        >>> [n._getMeasureOffset() for n in m.notes]
+        >>> [n._getMeasureOffset() for n in m.notesAndRests]
         [0.0, 0.5, 1.0, 1.5]
         '''
 
@@ -2986,12 +2986,12 @@ class Music21Object(JSONSerializer):
         True
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> m.repeatAppend(n, 2)
-        >>> m[1].activeSite # here we get the parent, but not in m.notes
+        >>> m[1].activeSite # here we get the parent, but not in m.notesAndRests
         <music21.stream.Measure 0 offset=0.0>
 
-        >>> m.notes[0]._getBeat()
+        >>> m.notesAndRests[0]._getBeat()
         1.0
-        >>> m.notes[1]._getBeat()
+        >>> m.notesAndRests[1]._getBeat()
         3.0
         '''
         ts = self.getContextByClass('TimeSignature')
@@ -3009,11 +3009,11 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beat for i in range(6)]
+        >>> [m.notesAndRests[i].beat for i in range(6)]
         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beat for i in range(6)]
+        >>> [m.notesAndRests[i].beat for i in range(6)]
         [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
 
         ''')
@@ -3036,10 +3036,10 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatStr for i in range(6)]
+        >>> [m.notesAndRests[i].beatStr for i in range(6)]
         ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatStr for i in range(6)]
+        >>> [m.notesAndRests[i].beatStr for i in range(6)]
         ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
         ''')
 
@@ -3053,9 +3053,9 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> m.repeatAppend(n, 2)
-        >>> m.notes[0]._getBeatDuration()
+        >>> m.notesAndRests[0]._getBeatDuration()
         <music21.duration.Duration 1.0>
-        >>> m.notes[1]._getBeatDuration()
+        >>> m.notesAndRests[1]._getBeatDuration()
         <music21.duration.Duration 1.0>
         '''
         ts = self.getContextByClass('TimeSignature')
@@ -3072,11 +3072,11 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
+        >>> [m.notesAndRests[i].beatDuration.quarterLength for i in range(6)]
         [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
+        >>> [m.notesAndRests[i].beatDuration.quarterLength for i in range(6)]
         [1.5, 1.5, 1.5, 1.5, 1.5, 1.5]
         ''')
 
@@ -3093,11 +3093,11 @@ class Music21Object(JSONSerializer):
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> m.repeatAppend(n, 16)
 
-        >>> m.notes[0]._getBeatStrength()
+        >>> m.notesAndRests[0]._getBeatStrength()
         1.0
-        >>> m.notes[4]._getBeatStrength()
+        >>> m.notesAndRests[4]._getBeatStrength()
         0.25
-        >>> m.notes[8]._getBeatStrength()
+        >>> m.notesAndRests[8]._getBeatStrength()
         0.5
         '''
         ts = self.getContextByClass('TimeSignature')
@@ -3116,11 +3116,11 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatStrength for i in range(6)]
+        >>> [m.notesAndRests[i].beatStrength for i in range(6)]
         [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatStrength for i in range(6)]
+        >>> [m.notesAndRests[i].beatStrength for i in range(6)]
         [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
 
         ''')
@@ -3761,7 +3761,7 @@ class Test(unittest.TestCase):
         note1.duration.type = "whole"
         stream1 = stream.Stream()
         stream1.append(note1)
-        subStream = stream1.notes
+        subStream = stream1.notesAndRests
 
     def testLocationsRefs(self):
         aMock = TestMock()
@@ -3897,7 +3897,7 @@ class Test(unittest.TestCase):
 
         violin1 = corpus.parse("beethoven/opus18no1", 
                                 3, extList='xml').getElementById("Violin I")
-        lastNote = violin1.flat.notes[-1]
+        lastNote = violin1.flat.notesAndRests[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(lastNoteClef, clef.TrebleClef), True)
 
@@ -4061,13 +4061,13 @@ class Test(unittest.TestCase):
         # as the first bar is a pickup, the the measure offset here is returned
         # with padding (resulting in 3) 
         post = []
-        for n in p1.flat.notes:
+        for n in p1.flat.notesAndRests:
             post.append(n._getMeasureOffset())
         self.assertEqual(post, [3.0, 3.5, 0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0, 0.0, 0.5, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 0.0, 2.0, 3.0, 0.0, 1.0, 1.5, 2.0])
 
         # compare derived beat string
         post = []
-        for n in p1.flat.notes:
+        for n in p1.flat.notesAndRests:
             post.append(n.beatStr)
         self.assertEqual(post, ['4', '4 1/2', '1', '2', '3', '4', '1', '2', '3', '4', '1', '1 1/2', '2', '3', '4', '1', '2', '3', '4', '1', '2', '3', '4', '1', '2', '3', '4', '1', '2', '3', '1', '3', '4', '1', '2', '2 1/2', '3'])
 
@@ -4110,7 +4110,7 @@ class Test(unittest.TestCase):
                 classStr)[0].measureNumber, 0)
         
         match = []
-        for n in p1.flat.notes:
+        for n in p1.flat.notesAndRests:
             match.append(n.measureNumber)
         self.assertEqual(match, [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 9] )
         
@@ -4193,7 +4193,7 @@ class Test(unittest.TestCase):
         # highest time of score takes into account new measure
         self.assertEqual(s.highestTime, 5.0)
         # offset are contiguous when accessed in a flat form
-        self.assertEqual([n.offset for n in s.flat.notes], [0.0, 1.0])        
+        self.assertEqual([n.offset for n in s.flat.notesAndRests], [0.0, 1.0])        
     
     
         m3 = stream.Measure()        
@@ -4208,7 +4208,7 @@ class Test(unittest.TestCase):
         # highest time of score takes into account new measure
         self.assertEqual(s.highestTime, 8.0)
         # offset are contiguous when accessed in a flat form
-        self.assertEqual([n.offset for n in s.flat.notes], [0.0, 1.0, 5.0])        
+        self.assertEqual([n.offset for n in s.flat.notesAndRests], [0.0, 1.0, 5.0])        
     
     
     def testPickupMeauresImported(self):
@@ -4219,11 +4219,11 @@ class Test(unittest.TestCase):
         m1 = p.getElementsByClass('Measure')[0]
     
     
-        self.assertEqual([n.offset for n in m1.notes], [0.0, 0.5])
+        self.assertEqual([n.offset for n in m1.notesAndRests], [0.0, 0.5])
         self.assertEqual(m1.paddingLeft, 3.0)
         
         #offsets for flat representation have proper spacing
-        self.assertEqual([n.offset for n in p.flat.notes], [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 12.5, 13.0, 15.0, 16.0, 16.5, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 28.5, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 34.75, 35.0, 35.5, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 47.0, 48.0, 48.5, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 60.5, 61.0, 63.0] )
+        self.assertEqual([n.offset for n in p.flat.notesAndRests], [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 12.5, 13.0, 15.0, 16.0, 16.5, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 28.5, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 34.75, 35.0, 35.5, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 47.0, 48.0, 48.5, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 60.5, 61.0, 63.0] )
     
 
     def testBoundLocations(self):

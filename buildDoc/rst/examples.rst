@@ -171,7 +171,7 @@ This example creates a mensural canon from the Soprano part of a Bach chorale. T
 
     from music21 import *
     src = corpus.parseWork('bach/bwv323.xml')
-    ex = src.getElementById('Soprano').flat.notes
+    ex = src.getElementById('Soprano').flat.notesAndRests
     
     s = stream.Score()
     for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
@@ -229,7 +229,7 @@ Basic Counting of and Searching for Musical Elements
                 # We label the Chord and the first Note of the Measure
                 c.lyric = "m. " + str(m.number)
                 primeForm = chord.Chord(m.pitches).primeFormString
-                firstNote = m.notes[0]
+                firstNote = m.notesAndRests[0]
                 firstNote.lyric = primeForm
                 # The chord (in closed position) and the Measures are 
                 # appended for display 

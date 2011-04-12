@@ -202,7 +202,7 @@ def simple4e(show=True):
     maxMeasure = 0
     for part in beethovenQuartet.parts:
         partStripped = part.stripTies()
-        for n in partStripped.flat.notes:
+        for n in partStripped.flat.notesAndRests:
             if n.quarterLength > qLenMax and n.isRest is False:
                 qLenMax = n.quarterLength
                 maxMeasure = n.measureNumber
@@ -220,7 +220,7 @@ def simple4f(show=True):
     foundSets = []
     candidateSet = []
     for part in s.getElementsByClass(stream.Part):
-        eventStream = part.flat.notes
+        eventStream = part.flat.notesAndRests
         for i in range(len(eventStream)):
             e = eventStream[i]
             if isinstance(e, music21.note.Rest) or i == len(eventStream)-1:

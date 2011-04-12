@@ -103,7 +103,7 @@ class FrontPaddedCadence(PolyphonicSnippet):
         if (shortmeasures > 0):
             shortDuration = self.timeSig.barDuration
             offsetShift = shortDuration.quarterLength * shortmeasures
-            for thisNote in thisStream.notes:
+            for thisNote in thisStream.notesAndRests:
                 thisNote.setOffsetBySite(thisStream, thisNote.getOffsetBySite(thisStream) + offsetShift) 
 
             for i in range(0, shortmeasures):

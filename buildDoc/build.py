@@ -1598,7 +1598,7 @@ class Test(unittest.TestCase):
         >>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
         >>> s1.append(note.WholeNote("A"))
         >>> s1.append(note.WholeNote("F#"))
-        >>> for n in s1.notes:
+        >>> for n in s1.notesAndRests:
         ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
         >>> #_DOCS_SHOW s1.show()
 
@@ -1619,7 +1619,7 @@ class Test(unittest.TestCase):
         >>> nB2 = note.WholeNote("B")
         >>> s1.append(nB1)
         >>> s1.append(nB2)
-        >>> for n in s1.notes:
+        >>> for n in s1.notesAndRests:
         ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
         >>> (nB1.accidental, nB2.accidental)
         (<accidental flat>, <accidental flat>)
@@ -1672,7 +1672,7 @@ Set all notes to the correct notes for a key using the note's Context:
 >>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
 >>> s1.append(note.WholeNote("A"))
 >>> s1.append(note.WholeNote("F#"))
->>> for n in s1.notes:
+>>> for n in s1.notesAndRests:
 ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step) 
 >>> s1.show()
 """

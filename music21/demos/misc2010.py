@@ -19,7 +19,7 @@ def richardBreedGetWell():
             thisPart = beethovenScore[partNum]
             thisPart.title = workName + str(partNum)
             display = stream.Stream()
-            notes = thisPart.flat.notes 
+            notes = thisPart.flat.notesAndRests 
             for i in range(len(notes) - 5):
                 if (notes[i].isNote and notes[i].name == 'B') and \
                     notes[i+1].isRest is True and \
@@ -48,7 +48,7 @@ def annotateWithGerman():
     annotates a score with the German notes for each note
     '''
     bwv295 = corpus.parseWork('bach/bwv295')
-    for thisNote in bwv295.flat.notes:
+    for thisNote in bwv295.flat.notesAndRests:
         thisNote.addLyric(thisNote.pitch.german)
     bwv295.show()
 
@@ -89,7 +89,7 @@ def bachParallels():
             iName = c.parts[i].id
             if iName.lower() not in ['soprano', 'alto', 'tenor', 'bass']:
                 continue
-            ifn = c.parts[i].flat.notes
+            ifn = c.parts[i].flat.notesAndRests
             omi = ifn.offsetMap
             for j in range(i+1, len(c.parts)):
                 jName = c.parts[j].id
@@ -97,7 +97,7 @@ def bachParallels():
                     continue
 
 
-                jfn = c.parts[j].flat.notes
+                jfn = c.parts[j].flat.notesAndRests
                 for k in range(len(omi) - 1):
                     n1pi = omi[k]['element']
                     n2pi = omi[k+1]['element']                    

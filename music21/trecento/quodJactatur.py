@@ -113,14 +113,14 @@ def prependBlankMeasures(myStream, measuresToAppend = 1, inPlace = True):
     >>> qj = quodJactatur.getQJ()
     >>> qj.duration.quarterLength
     70.0
-    >>> qj.flat.notes[0]
+    >>> qj.flat.notesAndRests[0]
     <music21.note.Note C>
     >>> len(qj.getElementsByClass(stream.Measure))
     35
     >>> qj2 = quodJactatur.prependBlankMeasures(qj, 10, inPlace = False)
     >>> qj2.duration.quarterLength
     90.0
-    >>> qj2.flat.notes[0]
+    >>> qj2.flat.notesAndRests[0]
     <music21.note.Rest rest>
     >>> len(qj2.getElementsByClass(stream.Measure))
     45
@@ -147,7 +147,7 @@ def transposeStreamDiatonic(myStream, diatonicInterval = 1):
         return myStream
 #    genericInterval = interval.GenericInterval(diatonicNumber)
     
-    for n in myStream.flat.notes:
+    for n in myStream.flat.notesAndRests:
         if n.isRest is False:
             if diatonicInterval >= 1:
                 n.pitch.diatonicNoteNum += diatonicInterval - 1
@@ -175,7 +175,7 @@ def getQJ():
 
     >>> from music21.trecento import quodJactatur
     >>> qj = quodJactatur.getQJ()
-    >>> qj.flat.notes[0]
+    >>> qj.flat.notesAndRests[0]
     <music21.note.Note C>
     '''
     
@@ -203,7 +203,7 @@ def findRetrogradeVoices(show = True):
             if transpose != 1:
                 transposeStreamDiatonic(qj2, transpose)            
             if invert is True:
-                qj2.invertDiatonic(qj2.flat.notes[0], inPlace = True)
+                qj2.invertDiatonic(qj2.flat.notesAndRests[0], inPlace = True)
             qj2 = reverse(qj2, makeNotation = False)
             qj = stream.Score()
             qj.insert(0, qj2.flat)
@@ -211,7 +211,7 @@ def findRetrogradeVoices(show = True):
             qjChords = qj.chordify()
             consScore = 0
             totIntervals = 0
-            for n in qjChords.flat.notes:
+            for n in qjChords.flat.notesAndRests:
                 strength = getStrengthForNote(n)
                 if n.isRest is True or len(n.pitches) < 2:
                     thisScore = strength
@@ -234,9 +234,9 @@ def findRetrogradeVoices(show = True):
             
             finalScore = int(100*(consScore + 0.0)/totIntervals)
             qj.insert(0, qjChords.flat)
-            qj2.flat.notes[0].addLyric('Trans: ' + str(transpose))
-            qj2.flat.notes[0].addLyric('Invert: ' + str(invert))
-            qj1.flat.notes[0].addLyric('Score: ' + str(finalScore))
+            qj2.flat.notesAndRests[0].addLyric('Trans: ' + str(transpose))
+            qj2.flat.notesAndRests[0].addLyric('Invert: ' + str(invert))
+            qj1.flat.notesAndRests[0].addLyric('Score: ' + str(finalScore))
             
             if show == True:
                 qj.show()
@@ -259,7 +259,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
             if retro is True:
                 qjPart = reverse(qjPart, makeNotation = False)
             if invert is True:
-                qjPart.invertDiatonic(qjPart.flat.notes[0], inPlace = True)
+                qjPart.invertDiatonic(qjPart.flat.notesAndRests[0], inPlace = True)
             if transpose != 1:
                 transposeStreamDiatonic(qjPart, transpose)
             if delay > 0:
@@ -277,7 +277,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
 
     startCounting = False
 
-    for n in qjChords.flat.notes:
+    for n in qjChords.flat.notesAndRests:
         if not 'Chord' in n.classes: continue
         if (startCounting is False or n.offset >= 70) and len(n.pitches) < 2:
             continue

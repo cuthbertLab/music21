@@ -28,7 +28,7 @@ def nPVI(streamForAnalysis):
 
     
     n.b. -- takes the distance between each element, including clefs, keys, etc.
-    use .notes etc. to filter out elements that are not useful.
+    use .notesAndRests etc. to filter out elements that are not useful.
 
     
     n.b. # 2 -- duration is used rather than actual distance -- for gapless
@@ -36,13 +36,13 @@ def nPVI(streamForAnalysis):
 
 
     >>> from music21 import *
-    >>> s2 = converter.parse('C4 D E F G', '4/4').notes
+    >>> s2 = converter.parse('C4 D E F G', '4/4').notesAndRests
     >>> nPVI(s2)
     0.0
-    >>> s3 = converter.parse('C4 D8 C4 D8 C4', '4/4').notes
+    >>> s3 = converter.parse('C4 D8 C4 D8 C4', '4/4').notesAndRests
     >>> nPVI(s3)
     66.6666...
-    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notes
+    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests
     >>> nPVI(s4)
     12.96296...
     '''
@@ -77,13 +77,13 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     intervals.
     
     >>> from music21 import *
-    >>> s2 = converter.parse('C4 D E F# G#', '4/4').notes
+    >>> s2 = converter.parse('C4 D E F# G#', '4/4').notesAndRests
     >>> melodicIntervalVariability(s2)
     0.0
-    >>> s3 = converter.parse('C4 D E F G C', '4/4').notes
+    >>> s3 = converter.parse('C4 D E F G C', '4/4').notesAndRests
     >>> melodicIntervalVariability(s3)
     85.266688...
-    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notes
+    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests
     >>> melodicIntervalVariability(s4)
     65.287...
     '''

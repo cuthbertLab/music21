@@ -207,9 +207,9 @@ Gathering elements from a Stream based on the class of the element provides a wa
 >>> sOut.show('text')
 {4.0} <music21.note.Rest rest>
 
-A number of properties available with Stream instances make getting specific object classes from a Stream easier. The :attr:`~music21.stream.Stream.notes` property returns more than just Note objects; all subclasses of :class:`~music21.note.GeneralNote` and :class:`~music21.chord.Chord` are returned in a Stream. This property is very useful for stripping Note-like objects from notational elements such as :class:`~music21.meter.TimeSignature` and :class:`~music21.meter.Clef` objects. 
+A number of properties available with Stream instances make getting specific object classes from a Stream easier. The :attr:`~music21.stream.Stream.notesAndRests` property returns more than just Note objects; all subclasses of :class:`~music21.note.GeneralNote` and :class:`~music21.chord.Chord` are returned in a Stream. This property is very useful for stripping Note-like objects from notational elements such as :class:`~music21.meter.TimeSignature` and :class:`~music21.meter.Clef` objects. 
 
->>> sOut = s.notes
+>>> sOut = s.notesAndRests
 >>> len(sOut) == len(s)
 True
 
@@ -324,7 +324,7 @@ Element offsets are always relative to the Stream that contains them. For exampl
 >>> m = sBach[0].measure(8)
 >>> m.getOffsetBySite(sBach[0])
 21.0
->>> n = sBach[0].measure(8).notes[0]
+>>> n = sBach[0].measure(8).notesAndRests[0]
 >>> n
 <music21.note.Note B->
 >>> n.getOffsetBySite(m)

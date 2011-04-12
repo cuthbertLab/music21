@@ -1159,7 +1159,7 @@ class Test(unittest.TestCase):
         mxString = testPrimitive.beams01
         a = parse(mxString)
         part = a.parts[0]
-        notes = part.flat.notes
+        notes = part.flat.notesAndRests
         beams = []
         for n in notes:
             if "Note" in n.classes:
@@ -1180,7 +1180,7 @@ class Test(unittest.TestCase):
         a = parse(mxString)
         part = a.parts[0]
 
-        notes = part.flat.notes
+        notes = part.flat.notesAndRests
         self.assertEqual(len(notes), 11)
 
 
@@ -1324,7 +1324,7 @@ class Test(unittest.TestCase):
         for p in a.parts:
             post = p.getClefs()[0]
             self.assertEqual(isinstance(post, clef.TenorClef), True)
-            for n in p.flat.notes:
+            for n in p.flat.notesAndRests:
                 if n.tie != None:
                     countTies += 1
                     if n.tie.type == 'start' or n.tie.type =='continue':
@@ -1413,7 +1413,7 @@ class Test(unittest.TestCase):
         environLocal.printDebug(['\nopening fp', fp])
 
         #s.show()
-        dList = [n.quarterLength for n in s.flat.notes[:30]]
+        dList = [n.quarterLength for n in s.flat.notesAndRests[:30]]
         match = [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.33333333333333331, 0.33333333333333331, 0.33333333333333331, 0.5, 0.5, 1.0]
         self.assertEqual(dList, match)
 
@@ -1485,14 +1485,14 @@ class Test(unittest.TestCase):
         # get a Stream object, not an opus
         self.assertEqual(isinstance(s, stream.Score), True)
         self.assertEqual(isinstance(s, stream.Opus), False)
-        self.assertEqual(len(s.flat.notes), 66)
+        self.assertEqual(len(s.flat.notesAndRests), 66)
 
         # a small essen collection
         op = corpus.parse('essenFolksong/teste')
         # get a Stream object, not an opus
         #self.assertEqual(isinstance(op, stream.Score), True)
         self.assertEqual(isinstance(op, stream.Opus), True)
-        self.assertEqual([len(s.flat.notes) for s in op], [33, 51, 59, 33, 29, 174, 67, 88])
+        self.assertEqual([len(s.flat.notesAndRests) for s in op], [33, 51, 59, 33, 29, 174, 67, 88])
         #op.show()
 
         # get one work from the opus
@@ -1511,7 +1511,7 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(s, stream.Score), True)
         self.assertEqual(s.metadata.title, 'Yi gan hongqi kongzhong piao')
         # make sure that beams are being made
-        self.assertEqual(str(s.parts[0].flat.notes[4].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
+        self.assertEqual(str(s.parts[0].flat.notesAndRests[4].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
         #s.show()
 
 

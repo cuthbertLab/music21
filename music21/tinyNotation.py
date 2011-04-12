@@ -105,9 +105,9 @@ class TinyNotationStream(stream.Stream):
 
     >>> stream1.getElementById("lastG").step
     'G'
-    >>> stream1.notes[1].isRest
+    >>> stream1.notesAndRests[1].isRest
     True
-    >>> stream1.notes[0].octave
+    >>> stream1.notesAndRests[0].octave
     3    
     '''
 
@@ -382,7 +382,7 @@ class HarmonyStream(TinyNotationStream):
     >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
     
     >>> hns = HarmonyStream(michelle, "4/4")
-    >>> ns = hns.notes
+    >>> ns = hns.notesAndRests
     >>> ns[0].step
     'C'
     >>> ns[0].editorial.misc['harmony']
@@ -467,7 +467,7 @@ Total duration of Stream: 6.0
 
     def testHarmonyNotation(self):
         hns = HarmonyStream("c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er", "4/4")
-        nst1 = hns.notes
+        nst1 = hns.notesAndRests
         self.assertEqual(nst1[0].step, "C")
         self.assertEqual(nst1[0].editorial.misc['harmony'], "F")
         self.assertEqual(nst1[0].lyric, "Mi")

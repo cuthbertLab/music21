@@ -370,9 +370,9 @@ class Test(unittest.TestCase):
         self.assertEqual(s.parts[1].id, 'TENORE')
         self.assertEqual(s.parts[2].id, 'Continuo')
 
-        self.assertEqual(len(s.parts[0].flat.notes), 1062)
-        self.assertEqual(len(s.parts[1].flat.notes), 596)
-        self.assertEqual(len(s.parts[2].flat.notes), 626)
+        self.assertEqual(len(s.parts[0].flat.notesAndRests), 1062)
+        self.assertEqual(len(s.parts[1].flat.notesAndRests), 596)
+        self.assertEqual(len(s.parts[2].flat.notesAndRests), 626)
 
 
         # try stage 1
@@ -381,8 +381,8 @@ class Test(unittest.TestCase):
         mdw.addString(testFiles.bachContrapunctus1_part2)
 
         s = museDataWorkToStreamScore(mdw)
-        self.assertEqual(len(s.parts[0].flat.notes), 291)
-        self.assertEqual(len(s.parts[1].flat.notes), 293)
+        self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
+        self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
 
         post = s.musicxml
       
@@ -406,12 +406,12 @@ class Test(unittest.TestCase):
         self.assertEqual(s.parts[0].id, 'Contr\'alto')
         self.assertEqual(s.parts[1].id, 'Bassi')
 
-        self.assertEqual(len(s.parts[0].flat.notes), 34)
-        self.assertEqual(len(s.parts[1].flat.notes), 9)
+        self.assertEqual(len(s.parts[0].flat.notesAndRests), 34)
+        self.assertEqual(len(s.parts[1].flat.notesAndRests), 9)
 
         # note that hyphens are stripped on import
-        self.assertEqual(s.parts[0].flat.notes[2].lyric, 'Be')
-        self.assertEqual(s.parts[0].flat.notes[3].lyric, 'hold,')
+        self.assertEqual(s.parts[0].flat.notesAndRests[2].lyric, 'Be')
+        self.assertEqual(s.parts[0].flat.notesAndRests[3].lyric, 'hold,')
 
         #s.show()
 
@@ -434,19 +434,19 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts), 5)
         # the fourth part is vocal, and has no beams defined
         self.assertEqual(str(s.parts[3].getElementsByClass(
-            'Measure')[3].notes[0].beams), '<music21.beam.Beams >')
+            'Measure')[3].notesAndRests[0].beams), '<music21.beam.Beams >')
         self.assertEqual(str(s.parts[3].getElementsByClass(
-            'Measure')[3].notes[0].lyric), 'sud')
+            'Measure')[3].notesAndRests[0].lyric), 'sud')
 
         # the bottom part has 8ths beamed two to a bar
         self.assertEqual(str(s.parts[4].getElementsByClass(
-            'Measure')[3].notes[0].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>>')
+            'Measure')[3].notesAndRests[0].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>>')
         self.assertEqual(str(s.parts[4].getElementsByClass(
-            'Measure')[3].notes[1].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+            'Measure')[3].notesAndRests[1].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
         self.assertEqual(str(s.parts[4].getElementsByClass(
-            'Measure')[3].notes[2].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+            'Measure')[3].notesAndRests[2].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
         self.assertEqual(str(s.parts[4].getElementsByClass(
-            'Measure')[3].notes[3].beams), '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
+            'Measure')[3].notesAndRests[3].beams), '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
 
         #s.show()
         # test that stage1 files continue to have makeBeams called
@@ -457,11 +457,11 @@ class Test(unittest.TestCase):
         #s.parts[0].getElementsByClass('Measure')[1].show()
 
         self.assertEqual(str(s.parts[0].getElementsByClass(
-            'Measure')[1].notes[0].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
+            'Measure')[1].notesAndRests[0].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
         self.assertEqual(str(s.parts[0].getElementsByClass(
-            'Measure')[1].notes[1].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>')
+            'Measure')[1].notesAndRests[1].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>')
         self.assertEqual(str(s.parts[0].getElementsByClass(
-            'Measure')[1].notes[2].beams), '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
+            'Measure')[1].notesAndRests[2].beams), '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
 
 
 
@@ -475,7 +475,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].getKeySignatures()), 1)
         self.assertEqual(str(s.parts[0].getKeySignatures()[0]), 'sharps -1, mode None')
 
-        notes = s.parts[0].flat.notes
+        notes = s.parts[0].flat.notesAndRests
         self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
         self.assertEqual(notes[2].accidental.displayStatus, True)
 
@@ -485,7 +485,7 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[16].accidental.displayStatus, False)
 
         # cautionary from within measure, the C follows a C#
-        notes = s.parts[1].measure(13).flat.notes
+        notes = s.parts[1].measure(13).flat.notesAndRests
         self.assertEqual(str(notes[8].accidental), '<accidental natural>')
         self.assertEqual(notes[8].accidental.displayStatus, True)
 
@@ -500,7 +500,7 @@ class Test(unittest.TestCase):
         s = converter.parse(fpDir)
         p = s.parts['Clarinet in A']
         self.assertEqual(str(p.getElementsByClass('Measure')[0].keySignature), 'sharps 3, mode None')
-        self.assertEqual(str(p.flat.notes[0]), '<music21.note.Note A>')
+        self.assertEqual(str(p.flat.notesAndRests[0]), '<music21.note.Note A>')
 
         #s.show()
 
@@ -515,11 +515,11 @@ class Test(unittest.TestCase):
         # note: this is a multi-staff work, but presently gets encoded
         # as multiple voices
         measures = s.parts[0].measures(1,5)
-        self.assertEqual(len(measures[0].flat.notes), 6)
-        self.assertEqual(len(measures[1].flat.notes), 12)
-        self.assertEqual(len(measures[2].flat.notes), 5)
-        self.assertEqual(len(measures[3].flat.notes), 8)
-        self.assertEqual(len(measures[4].flat.notes), 7)
+        self.assertEqual(len(measures[0].flat.notesAndRests), 6)
+        self.assertEqual(len(measures[1].flat.notesAndRests), 12)
+        self.assertEqual(len(measures[2].flat.notesAndRests), 5)
+        self.assertEqual(len(measures[3].flat.notesAndRests), 8)
+        self.assertEqual(len(measures[4].flat.notesAndRests), 7)
 
         #s.show()
 

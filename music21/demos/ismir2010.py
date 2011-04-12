@@ -100,7 +100,7 @@ def newDomSev(show=True):
           testChord.lyric = "m. " + str(thisMeasure.number)
           
           primeForm = chord.Chord(thisMeasure.pitches).primeFormString
-          firstNote = thisMeasure.notes[0]
+          firstNote = thisMeasure.notesAndRests[0]
           firstNote.lyric = primeForm
           
           # Thus we append the chord in closed position and  then 
@@ -152,7 +152,7 @@ def melodicChordExpression(show=True):
                 display.append(emptyMeasure)
                 # append the source measure, tagging 
                 # the first note with the pitch classes used in the measure
-                measure.notes[0].lyric = chord.Chord(
+                measure.notesAndRests[0].lyric = chord.Chord(
                     measure.pitches).orderedPitchClassesString
                 display.append(measure)
     # showing the complete Stream will produce output
@@ -344,7 +344,7 @@ def demoBasic():
 
 
 
-    sNew = soprano.measures(14,16).flat.notes.transpose('p-5')
+    sNew = soprano.measures(14,16).flat.notesAndRests.transpose('p-5')
     sNew.makeAccidentals(overrideStatus=True)
     ts1 = meter.TimeSignature('3/4')
     ts2 = meter.TimeSignature('5/8')
@@ -355,14 +355,14 @@ def demoBasic():
     
 
     sNew.augmentOrDiminish(2, inPlace=True)  
-    for n in sNew.notes:
+    for n in sNew.notesAndRests:
         if n.pitch.name == 'G' and n.quarterLength == 2:
             n.addLyric('%s (2 QLs)' % n.name)
     sNew.show()
 
     # Any stream can be flattened to remove all hierarchical levels
     # All notes of a part can be gathered into a single Stream
-#     sNotes = soprano.flat.notes
+#     sNotes = soprano.flat.notesAndRests
 # 
 #     # Can add notation elements or other objects by appending to a Stream
 #     sNotes.insert(0, meter.TimeSignature('3/4'))
@@ -370,7 +370,7 @@ def demoBasic():
 #     # Can create a new, transformed Stream by looking for Fermatas and extending them
 #     sExtended = stream.Stream()
 #     sExtended.insert(0, meter.TimeSignature('6/4'))
-#     for n in sNotes.notes:
+#     for n in sNotes.notesAndRests:
 #         #if isinstance(n.expressions[0], expressions.Fermata):
 #         if len(n.expressions) > 0:
 #             n.duration.quarterLength = 4
@@ -402,7 +402,7 @@ def beethovenSearch():
         
         if testChord.isDominantSeventh():
           testChord.lyric = "m. " + str(m.number)
-          m.notes[0].lyric = chord.Chord(m.pitches).primeFormString
+          m.notesAndRests[0].lyric = chord.Chord(m.pitches).primeFormString
                
           chordMeasure = stream.Measure()
           chordMeasure.append(testChord.closedPosition())

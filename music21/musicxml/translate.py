@@ -2193,7 +2193,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.getAllContextsByClass('Spanner')), 5)
 
         # try to get all spanners from the first note
-        self.assertEqual(len(s.flat.notes[0].getAllContextsByClass('Spanner')), 5)
+        self.assertEqual(len(s.flat.notesAndRests[0].getAllContextsByClass('Spanner')), 5)
         post = s.musicxml
         #s.show('t')
         #s.show()
@@ -2342,7 +2342,7 @@ spirit</words>
         s =  corpus.parse('bwv66.6')
         p = s.parts[0]
         for m in p.getElementsByClass('Measure'):
-            for n in m.flat.notes:
+            for n in m.flat.notesAndRests:
                 if n.pitch.name in ['B']:
                     msg = '%s\n%s' % (n.pitch.nameWithOctave, n.duration.quarterLength)
                     te = expressions.TextExpression(msg)

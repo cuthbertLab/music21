@@ -2606,8 +2606,8 @@ class Test(unittest.TestCase):
         stream1.append(c1)
         stream2 = copy.deepcopy(stream1)
         self.assertTrue(stream1 is not stream2)
-        self.assertTrue(stream1.notes[0].pitches[0] is not stream2.notes[0].pitches[0])
-        self.assertTrue(stream1.notes[0].pitches[0].accidental is not stream2.notes[0].pitches[0].accidental)
+        self.assertTrue(stream1.notesAndRests[0].pitches[0] is not stream2.notesAndRests[0].pitches[0])
+        self.assertTrue(stream1.notesAndRests[0].pitches[0].accidental is not stream2.notesAndRests[0].pitches[0].accidental)
         
 
 

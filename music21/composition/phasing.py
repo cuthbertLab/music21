@@ -52,7 +52,7 @@ def pitchedPhase(cycles=None, show=False):
         sPost.parts[0].append(copy.deepcopy(sSrc))
         sMod = copy.deepcopy(sSrc)
         # increment last note
-        sMod.notes[-1].quarterLength += increment
+        sMod.notesAndRests[-1].quarterLength += increment
         
         randInterval = random.randint(-12,12)
         sMod.transpose(randInterval, inPlace=True)

@@ -191,9 +191,9 @@ class Test(unittest.TestCase):
         # collect the offsets Measures in the first part
         assert [e.offset for e in p1.elements] == [0.0, 4.0]
         # collect the offsets of Note in the first part flattened
-        assert [e.offset for e in p1.flat.notes] == [0.0, 2.0, 4.0, 4.5]
+        assert [e.offset for e in p1.flat.notesAndRests] == [0.0, 2.0, 4.0, 4.5]
         # collect the offsets of Notes in all parts flattened
-        assert [e.offset for e in s1.flat.notes] == [0.0, 0.0, 2.0, 4.0, 4.0, 4.5, 6.5]
+        assert [e.offset for e in s1.flat.notesAndRests] == [0.0, 0.0, 2.0, 4.0, 4.0, 4.5, 6.5]
         
         
         # get all pitch names
@@ -237,7 +237,7 @@ class Test(unittest.TestCase):
         
         # all Notes can find their Measure number from a flat Score
         match = []
-        for e in s1.flat.notes:
+        for e in s1.flat.notesAndRests:
             match.append([e.name, e.getContextByClass('Measure').number])   
         assert match == [['D', 1], ['rest', 1], ['G', 1], ['D#', 2], ['E#', 2], ['A-', 2], ['F#', 2]]
         #==== "fig-df06" end
@@ -278,7 +278,7 @@ class Test(unittest.TestCase):
         nStart = None; nEnd = None
         
         ex = corpus.parseWork('luca/gloria').parts['cantus'].measures(1,11)        
-        exFlatNotes = ex.flat.notes
+        exFlatNotes = ex.flat.notesAndRests
         nLast = exFlatNotes[-1]
         
         for i, n in enumerate(exFlatNotes):
@@ -530,7 +530,7 @@ class Test(unittest.TestCase):
             for sc in [scGMajor, scDMajor]:
                 groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5, comparisonAttribute='name')
                 for group in groups:
-                    for n in group['stream'].notes:
+                    for n in group['stream'].notesAndRests:
                         n.addLyric('%s^%s' % (sc.getTonic().name, sc.getScaleDegreeFromPitch(n.pitch)))
         #s.show()
 
@@ -551,7 +551,7 @@ class Test(unittest.TestCase):
         for sc in [scDMelodicMinor, scGMelodicMinor]:
             groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
             for group in groups:
-                for n in group['stream'].notes:
+                for n in group['stream'].notesAndRests:
                     n.addLyric('%s^%s' % (sc.getTonic().name.lower(), sc.getScaleDegreeFromPitch(n.pitch, group['direction'])))
         #part.show()
 

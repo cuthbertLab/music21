@@ -39,7 +39,7 @@ If we want to gather all :class:`~music21.pitch.Pitch` objects from this measure
 
 If we want to label the notes in our measure range with the Note's pitch class representation, we can iterate over the notes and assign the pitch class representation to the Note's lyric. This is a common way to annotate Note and Chord objects in music21. The results can be displayed with the show() method.
 
->>> for n in mRange.flat.notes:
+>>> for n in mRange.flat.notesAndRests:
 ...     if not n.isRest:
 ...             n.lyric = n.pitchClassString
 >>> mRange.show()

@@ -21,7 +21,7 @@ class NoteStream(object):
         a list of note objects as an argument.'''
         if notes is None:
             notes = []
-        self.notes = notes
+        self.notesAndRests = notes
         self.totalNotes = len(notes)
         self.iterIndex  = 0
         self.__lilyout  = None
@@ -47,7 +47,7 @@ class NoteStream(object):
         '''Returns the current note and increments the iteration index.'''
         if self.iterIndex == self.totalNotes:
             raise StopIteration
-        thisNote = self.notes[self.iterIndex]
+        thisNote = self.notesAndRests[self.iterIndex]
         self.iterIndex += 1
         return thisNote
 
@@ -55,7 +55,7 @@ class NoteStream(object):
         self.noteTimeInfo = []
         time = 0 
 
-        for note in self.notes:
+        for note in self.notesAndRests:
             length = float(note.duration.quarterLength)
             self.noteTimeInfo.append({'length': length, 'start': time})
             time += length
@@ -67,7 +67,7 @@ class NoteStream(object):
             return self.__overriddenDuration
 
         self.__totalDuration = 0.0
-        for thisNote in self.notes:
+        for thisNote in self.notesAndRests:
             self.__totalDuration += thisNote.duration.quarterLength
         return self.__totalDuration
     def __setDuration(self, value):
@@ -88,7 +88,7 @@ class NoteStream(object):
     
         clef = self.clef or self.bestClef()
         lilyout += clef.lily
-        for thisNote in self.notes:
+        for thisNote in self.notesAndRests:
             if hasattr(thisNote, "startTransparency") and thisNote.startTransparency == True:
                 lilyout += lilyModule.TRANSPARENCY_START
 
@@ -122,7 +122,7 @@ class NoteStream(object):
         '''Returns the clef that is the best fit for the stream.'''
         totalNotes = 0
         totalHeight = 0.0
-        for thisNote in self.notes:
+        for thisNote in self.notesAndRests:
             if isinstance(thisNote, note.Note):
                 totalNotes += 1
                 totalHeight += thisNote.diatonicNoteNum
@@ -158,12 +158,12 @@ class NoteStream(object):
             if 'start' not in self.noteTimeInfo[i]:
                 self.noteTimeInfo[i]['start'] = 0
             if almostEquals(self.noteTimeInfo[i]['start'], time1):
-                return self.notes[i]
+                return self.notesAndRests[i]
             elif self.noteTimeInfo[i]['start'] > time1:
-                return self.notes[i-1]
+                return self.notesAndRests[i-1]
 
         if self.totalDuration > time1:
-            return self.notes[-1]
+            return self.notesAndRests[-1]
         else:
             raise Exception("Cannot get a note at %f, it is longer than the stream %d" % (self.totalDuration, time1))
 
@@ -173,7 +173,7 @@ class NoteStream(object):
         returningNow = False
         returnMore = totalToReturn
         notesToReturn = []
-        for thisNote in self.notes:
+        for thisNote in self.notesAndRests:
             if returningNow == True:
                 if allowRests == True or \
                    thisNote.isRest == False:
@@ -196,7 +196,7 @@ class NoteStream(object):
     def getNoteStartEndTime(self, note):
         '''Returns [start time, end time] for the given note. Time is measured
         in quarter notes.'''
-        index = self.notes.index(note)
+        index = self.notesAndRests.index(note)
         if 'start' not in self.noteTimeInfo[index]:
             self.noteTimeInfo[index]['start'] = 0
         if 'length' not in self.noteTimeInfo[index]:
@@ -225,8 +225,8 @@ class NoteStream(object):
         measureLength = timeSignature.barDuration.quarterLength
         currentQtrPosition = startingQtrPosition
         currentMeasure = startingMeasure
-        for i in range(len(self.notes)):
-            thisNote = self.notes[i]
+        for i in range(len(self.notesAndRests)):
+            thisNote = self.notesAndRests[i]
             self.noteTimeInfo[i]['quarterPosition'] = currentQtrPosition
             self.noteTimeInfo[i]['measure'] = currentMeasure
             self.noteTimeInfo[i]['beat'] = timeSignature.quarterPositionToBeat(currentQtrPosition)
@@ -250,8 +250,8 @@ class NoteStream(object):
             raise StreamException("Can't sliceDurationsForMeasures without a TimeSignature object")
 
         measureLength = timeSignature.barDuration.quarterLength
-        for i in range(len(self.notes)):
-            thisNote = self.notes[i]
+        for i in range(len(self.notesAndRests)):
+            thisNote = self.notesAndRests[i]
             qtrPosition = self.noteTimeInfo[i]['quarterPosition']
             noteLength = thisNote.duration.quarterLength
             if (noteLength + qtrPosition > measureLength):
@@ -308,8 +308,8 @@ class NoteStream(object):
         returnMeasures.append(currentMeasureObject)
         lastNote = None
 
-        for i in range(len(self.notes)):
-            thisNote = self.notes[i]
+        for i in range(len(self.notesAndRests)):
+            thisNote = self.notesAndRests[i]
             thisNoteMeasure = self.noteTimeInfo[i]['measure']
             while thisNoteMeasure > currentMeasure:
                 currentMeasureObject.filled = True
@@ -319,7 +319,7 @@ class NoteStream(object):
                 currentMeasureObject.timeSignature = timeSignature
                 currentMeasureObject.number = int(currentMeasure)
                 returnMeasures.append(currentMeasureObject)
-            currentMeasureObject.notes.append(thisNote)
+            currentMeasureObject.notesAndRests.append(thisNote)
             currentQtrPosition += thisNote.duration.quarterLength
             currentQtrPosition = currentQtrPosition % timeSignature.barDuration.quarterLength 
             lastNote = thisNote
@@ -337,8 +337,8 @@ class NoteStream(object):
         cloneit gives a copy of the stream timeInfo instead of the actual timeInfo
         '''
 
-        for i in range(len(self.notes)):
-            thisNote = self.notes[i]
+        for i in range(len(self.notesAndRests)):
+            thisNote = self.notesAndRests[i]
             thisTimeInfo = self.noteTimeInfo[i]
             if (thisNote is None or thisTimeInfo is None):
                 raise StreamException("setNoteTimeInfo cannot be run without setting timeInfo; best also to run applyTimeSignature also!")
@@ -375,8 +375,8 @@ class NoteStream(object):
         iL = []
         iORL = []
         for i in range(0, self.totalNotes - 1):
-            n1 = self.notes[i]
-            n2 = self.notes[i+1]
+            n1 = self.notesAndRests[i]
+            n2 = self.notesAndRests[i+1]
             if n1 is None or n2 is None:
                 raise StreamException("Some reason a NoneType is Here...")
             if n1.isRest == True or n2.isRest == True:
@@ -477,7 +477,7 @@ if (__name__ == "__main__"):
 #      print "New Measure, number " + str(thisM.number)
 #      if thisM.filled is True:
 #           print "Filled up"
-#        for thisN in thisM.notes:
+#        for thisN in thisM.notesAndRests:
 #            print thisN.name
     
     note15 = note.Note()
@@ -503,6 +503,6 @@ if (__name__ == "__main__"):
     stream4 = ChordStream([note15, chord1, note16])
 #    assert stream4.maxChordNotes() == 3 
 #    (stream4a, stream4b, stream4c) = stream4.splitIntoNoteStreams(fillWithRests = False)
-#    assert stream4a.notes[0] is note15
-#    assert stream4a.notes[1] is nC
-#    assert stream4b.notes[1] is nE
+#    assert stream4a.notesAndRests[0] is note15
+#    assert stream4a.notesAndRests[1] is nC
+#    assert stream4b.notesAndRests[1] is nE

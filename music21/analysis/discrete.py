@@ -310,10 +310,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         '''
         # storage for 12 pitch classes
         pcDist = [0]*12
-        if len(streamObj.notes) == 0:
+        if len(streamObj.notesAndRests) == 0:
             return None
 
-        for n in streamObj.notes:        
+        for n in streamObj.notesAndRests:        
             if not n.isRest:
                 length = n.quarterLength
                 if n.isChord:
@@ -561,7 +561,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         The data list contains a key (as a string), a mode 
         (as a string), and a correlation value (degree of certainty)
         '''
-        sStream = sStream.flat.notes
+        sStream = sStream.flat.notesAndRests
         # this is the sample distribution used in the paper, for some testing purposes
         #pcDistribution = [7,0,5,0,7,16,0,16,0,15,6,0]
         
@@ -933,13 +933,13 @@ class Ambitus(DiscreteAnalysis):
         (45, 108)
         '''
         
-        if len(subStream.flat.notes) == 0:
+        if len(subStream.flat.notesAndRests) == 0:
             # need to handle case of no pitches
             return None
 
         # find the min and max pitch space value for all pitches
         psFound = []
-        for n in subStream.flat.notes:
+        for n in subStream.flat.notesAndRests:
             #environLocal.printDebug([n])
             pitches = []
             if 'Chord' in n.classes:
@@ -973,7 +973,7 @@ class Ambitus(DiscreteAnalysis):
         (0, 34)
         '''
         psFound = []
-        for n in subStream.flat.notes:
+        for n in subStream.flat.notesAndRests:
             pitches = []
             if 'Chord' in n.classes:
                 pitches = n.pitches
@@ -1088,7 +1088,7 @@ class Ambitus(DiscreteAnalysis):
         >>> p.process(s)
         (63, '#665288')
         '''
-        sStream = sStream.flat.notes
+        sStream = sStream.flat.notesAndRests
 
         post = self.getPitchSpan(sStream)
         if post != None:

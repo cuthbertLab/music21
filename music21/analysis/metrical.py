@@ -54,7 +54,7 @@ def labelBeatDepth(streamIn):
 
         ts.beatSequence.subdivideNestedHierarchy(depth=3)
 
-        for n in m.notes:
+        for n in m.notesAndRests:
             if n.tie != None:
                 environLocal.printDebug(['note, tie', n, n.tie, n.tie.type])
                 if n.tie.type == 'stop':
