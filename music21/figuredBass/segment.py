@@ -182,6 +182,22 @@ class MiddleSegment(Segment):
         self.correctPossibilities()
     
     def correctPossibilities(self):
+        try:
+            self.resolveAllDominantSevenths()
+            return
+        except SegmentException:
+            pass
+        
+        try:
+            self.resolveAllDiminishedSevenths()
+            return
+        except SegmentException:
+            pass
+        
+        self.resolveAllPossibilities()
+        return
+    
+    def resolveAllDominantSevenths(self):
         if self.prevSegment.isDominantSeventh and self.fbRules.resolveDominantSeventhProperly:
             dominantPossibilities = self.prevSegment.possibilities
             resolutionPossibilities = []
@@ -198,7 +214,12 @@ class MiddleSegment(Segment):
                 dominantPossibIndex += 1 
             self.prevSegment.nextSegment = self
             self.possibilities = resolutionPossibilities
-        elif self.prevSegment.isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:
+            return
+        
+        raise SegmentException("Segment not resolved yet.")
+    
+    def resolveAllDiminishedSevenths(self):
+        if self.prevSegment.isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:
             diminishedPossibilities = self.prevSegment.possibilities
             resolutionPossibilities = []
             diminishedPossibIndex = 0
@@ -214,22 +235,27 @@ class MiddleSegment(Segment):
                 diminishedPossibIndex += 1
             self.prevSegment.nextSegment = self
             self.possibilities = resolutionPossibilities
-        else:
-            prevPossibilities = self.prevSegment.possibilities
-            nextPossibilities = self.correctSelfContainedPossibilities()
-            prevPossibIndex = 0
-            for prevPossib in prevPossibilities:
-                movements = []
-                nextPossibIndex = 0
-                for nextPossib in nextPossibilities:
-                    if self.hasCorrectVoiceLeading(prevPossib, nextPossib):
-                        movements.append(nextPossibIndex)
-                    nextPossibIndex += 1
-                self.prevSegment.nextMovements[prevPossibIndex] = movements
-                prevPossibIndex += 1
-            self.prevSegment.nextSegment = self
-            self.possibilities = nextPossibilities
-      
+            return
+    
+        raise SegmentException("Segment not resolved yet.")
+
+    def resolveAllPossibilities(self):
+        prevPossibilities = self.prevSegment.possibilities
+        nextPossibilities = self.correctSelfContainedPossibilities()
+        prevPossibIndex = 0
+        for prevPossib in prevPossibilities:
+            movements = []
+            nextPossibIndex = 0
+            for nextPossib in nextPossibilities:
+                if self.hasCorrectVoiceLeading(prevPossib, nextPossib):
+                    movements.append(nextPossibIndex)
+                nextPossibIndex += 1
+            self.prevSegment.nextMovements[prevPossibIndex] = movements
+            prevPossibIndex += 1
+        self.prevSegment.nextSegment = self
+        self.possibilities = nextPossibilities
+        return
+    
     def resolveDominantSeventh(self, dominantPossib):
         environRules = environment.Environment(_MOD)
         if not dominantPossib.isDominantSeventh():
