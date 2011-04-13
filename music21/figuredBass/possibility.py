@@ -663,7 +663,9 @@ class Possibility(dict):
             pitchesInChord.append(self[vl])
         
         pitchesInChord.sort()
-        return chord.Chord(pitchesInChord)
+        c = chord.Chord(pitchesInChord)
+        c.quarterLength = 1
+        return c
     
     def isDominantSeventh(self):
         '''
