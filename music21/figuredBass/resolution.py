@@ -40,20 +40,28 @@ def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
     If inPlace = True, then pitches will be modified in place, and the input possibility will be returned.
     If inPlace = False, then a new possibility will be returned.
     
+    >>> from music21 import *
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
     >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
-    >>> resolution.dominantSeventhToMajorTonic(possibA)
+    >>> resolutionA = resolution.dominantSeventhToMajorTonic(possibA)
+    >>> resolutionA
     {'A': E4, 'S': C5, 'B': C3, 'T': C4}
+    >>> dominantChord = possibA.chordify()
+    >>> resolutionChord = resolutionA.chordify()
+    >>> p1 = stream.Part()
+    >>> p1.append(dominantChord)
+    >>> p1.append(resolutionChord)
+    >>> #_DOCS_SHOW p1.show()
+        
+    
     >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
     >>> resolution.dominantSeventhToMajorTonic(possibB)
     {'A': F3, 'S': A3, 'B': F3, 'T': F3}
     >>> possibC = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
     >>> resolution.dominantSeventhToMajorTonic(possibC)
     {'A': A4, 'S': F5, 'B': F3, 'T': C4}
-    >>> resolution.resolveV43toI6 = True
-    >>> possibD = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
-    >>> resolution.dominantSeventhToMajorTonic(possibD, True)
+    >>> resolution.dominantSeventhToMajorTonic(possibC, True)
     {'A': C5, 'S': F5, 'B': A3, 'T': C4}
     '''
     if inPlace:
@@ -123,8 +131,7 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toi6 = False, inPlace 
     >>> possibC = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
     >>> resolution.dominantSeventhToMinorTonic(possibC)
     {'A': A-4, 'S': F5, 'B': F3, 'T': C4}
-    >>> possibD = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
-    >>> resolution.dominantSeventhToMinorTonic(possibD, True)
+    >>> resolution.dominantSeventhToMinorTonic(possibC, True)
     {'A': C5, 'S': F5, 'B': A-3, 'T': C4}
     '''
     if inPlace:
@@ -153,12 +160,12 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toi6 = False, inPlace 
         elif samplePitch.name == thirdName:
             samplePitch.transpose('m2', True)
         elif samplePitch.name == fifthName:
-            if inversion == 2 and resolveV43toI6:
+            if inversion == 2 and resolveV43toi6:
                 samplePitch.transpose('m2', True)
             else:
                 samplePitch.transpose('-M2', True)
         elif samplePitch.name == seventhName:
-            if inversion == 2 and resolveV43toI6:
+            if inversion == 2 and resolveV43toi6:
                 samplePitch.transpose('M2', True)
             else:
                 samplePitch.transpose('-M2', True)
