@@ -43,8 +43,8 @@ class FiguredBass(object):
         self.figuredBassList = []
         self.bassNotes = []
         self.bassLine = stream.Part()
-        self.bassLine.insert(0, copy.copy(self.ts))
-        self.bassLine.insert(0, copy.copy(self.ks))
+        self.bassLine.append(copy.deepcopy(self.ts))
+        self.bassLine.append(copy.deepcopy(self.ks))
         self.maxPitch = MAX_PITCH
         self.fbInfo = segment.Information(realizerScale.FiguredBassScale(keyString, modeString), voiceList, rules.Rules())
         
@@ -161,8 +161,8 @@ class FiguredBass(object):
         '''
         sol = stream.Score()
         rightHand = stream.Part()
-        rightHand.insert(0, copy.copy(self.ts))
-        rightHand.insert(0, copy.copy(self.ks))
+        rightHand.append(copy.deepcopy(self.ts))
+        rightHand.append(copy.deepcopy(self.ks))
 
         v0 = self.fbInfo.fbVoices[0]
         
@@ -202,11 +202,17 @@ class FiguredBass(object):
     
     def generateAllSolutions(self):
         allSols = stream.Score()
-        
+        part1 = stream.Part()
+        part2 = stream.Part()
+        allSols.insert(0, part1)
+        allSols.insert(0, part2)
         chordProgressions = self.getAllChordProgressions()
         for chordProgression in chordProgressions:
             sol = self.generateSolutionFromChordProgression(chordProgression)
-            allSols.append(sol)
+            for m in sol.parts[0]:
+                part1.append(m)
+            for m in sol.parts[1]:
+                part2.append(m)
         
         return allSols
     
@@ -215,61 +221,19 @@ class FiguredBass(object):
             return self.generateAllSolutions()
         
         allSols = stream.Score()
+        part1 = stream.Part()
+        part2 = stream.Part()
+        allSols.insert(0, part1)
+        allSols.insert(0, part2)
         for solutionCounter in range(amountToShow):
             sol = self.generateRandomSolution()
-            allSols.append(sol)
+            for m in sol.parts[0]:
+                part1.append(m)
+            for m in sol.parts[1]:
+                part2.append(m)
             
         return allSols
         
-    '''
-    def generateRandomSolutions(self, amountToShow = 20):
-        # TODO: If amountToShow > self.lastSegment.getNumSolutions(), then should return all solutions and that's it.
-        # Also, if self.lastSegment.getNumSolutions() == 0, then should either raise an exception or just return without 
-        # going into the for loop and print a warning to the user.
-        bassLine = stream.Part()
-        rightHand = stream.Part()
-        s = stream.Score()
-        ts = meter.TimeSignature(self.timeSig)
-        numSharps = key.pitchToSharps(self.key, self.mode)
-        ks = key.KeySignature(numSharps)
-        s.insert(0, ts)
-        s.insert(0, ks)
-        
-        for i in range(amountToShow):
-            print("\nProgression #" + str(i + 1))
-            chordProgression = self.getRandomChordProgression()
-            for j in range(len(self.bassNotes)):
-                givenChord = chordProgression[j]
-                
-                bassNote = copy.deepcopy(self.bassNotes[j])
-                rhPitches = []
-                
-                for k in range(1, len(self.fbInfo.fbVoices)):
-                    v1 = self.fbInfo.fbVoices[k]
-                    rhPitches.append(copy.deepcopy(givenChord[v1.label]))
-                                 
-                rhChord = chord.Chord(rhPitches)
-                rhChord.quarterLength = bassNote.quarterLength
-                
-                bassLine.append(bassNote)
-                rightHand.append(rhChord)
-                
-            
-            rest1 = note.Rest()
-            rest1.quarterLength = ts.totalLength
-            rest2 = note.Rest()
-            rest2.quarterLength = ts.totalLength
-            bassLine.append(rest1)
-            rightHand.append(rest2)
-
-            self.printChordProgression(chordProgression)
-        
-        s.insert(0, rightHand)
-        s.insert(0, bassLine)
-        
-        return s
-    '''
-    
     def printChordProgression(self, chordProgression):
         linesToPrint = []
         for v in self.fbInfo.fbVoices:
