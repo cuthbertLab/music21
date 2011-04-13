@@ -188,11 +188,9 @@ def exampleD():
 
 if __name__ == "__main__":
     #exampleA(), exampleB(), exampleC(), exampleD()
-    fb = exampleB() #Set up the figured bass
+    fb = exampleD() #Set up the figured bass
     #fb.fbInfo.fbRules.topVoicesMaxIntervalSeparation = None
     fb.solve()
-    fb.showRandomSolution() #This one works
-    fb.showRandomSolutions(20) #This one, not so much
-    fb.showRandomSolutions(20, True) #Same thing, but shown as text in the console
+    fb.showRandomSolutions(20)
     #sc = fb.generateRandomSolutions(200)
     #sc.flat.plot('pitchClass')
