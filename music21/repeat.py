@@ -246,25 +246,29 @@ class Expander(object):
 
 
     def _getEndObjects(self, streamObj, index):
-        '''Get the last measure to be processed in the repeat, as well as the measure that has the end barline. These may not be the same: if an end bar is placed on the left of measure that is not actually being copied. 
+        '''Get the last measure to be processed in the repeat, as well as the measure that has the end barline. These may not be the same: if an end repeat bar is placed on the left of a measure that is not actually being copied. 
 
-        The `index` parameter is the last measure to be copied.
+        The `index` parameter is the index of the last measure to be copied. The streamObj expect to only have Measures. 
         '''
         mLast = streamObj[index]
         rb = mLast.rightBarline
+        # if right barline of end is a repeat
         if (rb is not None and 'Repeat' in rb.classes and 
             rb.direction == 'end'):
             mEndBarline = mLast # they are the same
             repeatTimes = rb.times
         else:
             # try the next measure
+            if len(streamObj) < index:
+                raise ExpanderException('cannot find an end Repeat bar after the given end: %s' % index)
+
             mEndBarline = streamObj[index+1]
             lb = mEndBarline.leftBarline
             if (lb is not None and 'Repeat' in lb.classes and 
                 lb.direction == 'end'):
                 repeatTimes = lb.times
             else:
-                raise ExpanderException('cannto find an end Repeat bar in the expected position')
+                raise ExpanderException('cannot find an end Repeat bar in the expected position')
         # the default is 2 times, or 1 repeat
         if repeatTimes is None:
             repeatTimes = 2
@@ -299,6 +303,7 @@ class Expander(object):
                 mLast, mEndBarline, repeatTimes = self._getEndObjects(
                     streamObj, repeatIndices[-1])
                 for times in range(repeatTimes):
+                    environLocal.printDebug(['repeat times:', times])    
                 # copy the range of measures; this will include the first
                 # pass
                     # do indices directly
@@ -306,7 +311,7 @@ class Expander(object):
                         mSub = copy.deepcopy(streamObj[j])
                         # must do for each pass, b/c not changing source
                         # stream
-                        environLocal.printDebug(['got j, repeatIndicies', j, repeatIndices])
+                        #environLocal.printDebug(['got j, repeatIndicies', j, repeatIndices])
                         if j in [repeatIndices[0], repeatIndices[-1]]:
                             self._stripRepeatBarlines(mSub)
                         mSub.number = number
@@ -318,7 +323,7 @@ class Expander(object):
 
                 # set i to next measure after mLast
                 i = repeatIndices[-1] + 1
-            # just add this measure
+            # if is not in repeat indicies, just add this measure
             else:
                 # iterate through each measure, always add first
                 m = copy.deepcopy(streamObj[i])
@@ -646,7 +651,7 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatF(self):
-        # an algorithmic approach
+        # an algorithmic generation approach
         import random
         from music21 import bar, note, stream, meter
         
@@ -674,12 +679,36 @@ class Test(unittest.TestCase):
         # alter all repeatTimes values, expand, and append to final
         for i in range(6):
             for rb in repeatHandles:
-                rb.times = random.choice([0,1,3,5])    
+                rb.times = random.choice([0,1,3])    
             expanded = s.expandRepeats()
             for m in expanded:
                 final.append(m)
         #final.show()    
             
+
+
+    def testExpandRepeatG(self):
+        
+        from music21.abc import testFiles
+        from music21 import converter, repeat, bar
+        
+        s = converter.parse(testFiles.kingOfTheFairies)
+        self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 26)
+        self.assertEqual(s.metadata.title, 'King of the fairies')
+        self.assertEqual(len(s.flat.notes), 145)
+
+        # the last has left-bound repeat
+        part = s.parts[0].getElementsByClass('Measure')[7:10]
+        #part.show()
+        self.assertEqual(isinstance(part[-1].leftBarline, bar.Repeat), True)
+        self.assertEqual(part[-1].leftBarline.direction, 'end')
+        self.assertEqual(part[-1].leftBarline.times, None)
+
+        post = part.expandRepeats()
+
+        post.show('t')
+
+
 
 if __name__ == "__main__":
     music21.mainTest(Test)
