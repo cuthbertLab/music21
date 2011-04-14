@@ -70,7 +70,14 @@ def styleToBarStyle(value):
 
 #-------------------------------------------------------------------------------
 class Barline(music21.Music21Object):
+    '''A the representation of a barline. Barlines are conventionally assigned to Measure objects using the leftBarline and rightBarline attributes.
 
+    >>> from music21 import *
+    >>> bl = bar.Barline(style='dashed')
+    >>> bl
+    <music21.bar.Barline style=dashed>
+
+    '''
     validStyles = barStyleDict.keys()
 
     _style = None
@@ -86,6 +93,9 @@ class Barline(music21.Music21Object):
 
         # this parameter does not seem to be needed in this object
         self.location = None # can be left, right, middle, None
+
+    def __repr__(self):
+        return "<music21.bar.Barline style=%s>" % (self.style)
 
     def _getStyle(self):
         return self._style
@@ -151,6 +161,11 @@ class Repeat(repeat.RepeatMark, Barline):
 
     The `direction` parameter can be one of 'start' or 'end.'
 
+    >>> from music21 import *
+    >>> bl = bar.Repeat(direction='end', times=3)
+    >>> bl
+    <music21.bar.Repeat direction=end times=3>
+
     '''
     _repeatDots = None # not sure what this is for; inherited from old modles
 
@@ -163,6 +178,14 @@ class Repeat(repeat.RepeatMark, Barline):
         # start is forward, end is backward in musicxml
         self._setDirection(direction) # start, end
         self._setTimes(times)
+
+    def __repr__(self):
+        if self._times is not None:
+            return "<music21.bar.Repeat direction=%s times=%s>" % (self.direction, self.times)
+        else:
+            return "<music21.bar.Repeat direction=%s>" % (self.direction)
+
+
 
     def _setDirection(self, value):
         if value.lower() in ['start', 'end']:
@@ -275,16 +298,18 @@ class Repeat(repeat.RepeatMark, Barline):
 
         #environLocal.printDebug(['mxRepeat', mxRepeat, mxRepeat._attr])
 
-        if mxRepeat.get('times') != None:
-            # make into a number
-            self.times = int(mxRepeat.get('times'))
-
         if mxDirection.lower() == 'forward':
             self.direction = 'start'
         elif mxDirection.lower() == 'backward':
             self.direction = 'end'
         else:
             raise BarException('cannot handle mx direction format:', mxDirection)
+
+
+        if mxRepeat.get('times') != None:
+            # make into a number
+            self.times = int(mxRepeat.get('times'))
+
 
 
     mx = property(_getMX, _setMX)    

@@ -27,12 +27,35 @@ environLocal = environment.Environment(_MOD)
 class FeatureExtractor(object):
     def __init__(self, streamObj, *arguments, **keywords):
         self._src = streamObj
+        self._feature = None
 
+        self._format = 'native' # can be jmusi
 
-    def extractFeature(self):
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        self._feature = None
+
+    def _formatJSymbolic(self, value):
+        '''Convert whatever output is returned into a data format similar to that created by JSymbolic.
+        '''
+        return value
+
+    def _formatNative(self, value):
+        '''Return a native Python / music21 format
+        '''
+        return value
+
+    def extract(self):
         '''Extract the feature and return the result. 
         '''
+        self._process()
+        if self._format == 'native':
+            return self._formatNative(value)
+        elif self._format == 'jsymbolic':
+            return self._formatJSymbolic(value)
     
+
 #-------------------------------------------------------------------------------
 # 112 feature extractors
 
@@ -117,28 +140,25 @@ class BasicPitchHistogramFeature(FeatureExtractor):
 
  
 class BeatHistogramFeature(FeatureExtractor):
-    '''
+    '''A feature exractor that finds a feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).
+
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
- 
-class BrassFractionFeature(FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
-
- 
+  
 class ChangesOfMeterFeature(FeatureExtractor):
-    '''
+    '''A feature exractor that sets the feature to 1 if the time signature is changed one or more times during the recording.
+
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+    def _process(self):
+        # flatten; look for more than one type of meter
+        pass
  
 class ChromaticMotionFeature(FeatureExtractor):
     '''
@@ -826,13 +846,24 @@ class VoiceSeparationFeature(FeatureExtractor):
 
 
 class AcousticGuitarFractionFeature(FeatureExtractor):
-    '''
+    '''A feature exractor that extracts the fraction of all Note Ons belonging to acoustic guitar patches (General MIDI patches 25 to 26).
+
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
  
+class BrassFractionFeature(FeatureExtractor):
+    '''A feature exractor that extracts the fraction of all Note Ons belonging to brass patches (General MIDI patches 57 or 68).
+
+    >>> from music21 import *
+    '''
+    def __init__(self, streamObj, *arguments, **keywords):
+        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+
+
 class ElectricGuitarFractionFeature(FeatureExtractor):
     '''
     >>> from music21 import *

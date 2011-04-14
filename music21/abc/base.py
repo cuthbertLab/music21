@@ -1775,28 +1775,46 @@ class ABCHandler(object):
         # collect start and end pairs of split
         pairs = []
         pairs.append([0, pos[0]])
-        i = pos[0]
+        i = pos[0] # get first bar position stored
+        # iterate through every other bar position
         for x in range(1, len(pos)):
             j = pos[x]
             pairs.append([i, j])
+            # the end becomes the new start
             i = j
         # add last
         pairs.append([i, len(self)])
 
+        # iterate through start and end pairs
         for x, y in pairs:
             ah = ABCHandlerBar()
+            # this will get the first to second to last
             ah.tokens = self._tokens[x:y]
 
+            # check if first is a bar; if so, assign and remove
             if isinstance(self._tokens[x], ABCBar):
-                ah.leftBarToken = self._tokens[x]
-                ah.tokens = ah._tokens[1:] # remove first
+                lbCandidate = self._tokens[x]
+                # if we get and end repeat, probably already assigned this
+                # in the last measure, so skip
+                if (lbCandidate.barType == 'repeat' and 
+                    lbCandidate.repeatForm == 'end'):
+                    pass
+                else: # assign
+                    ah.leftBarToken = lbCandidate
+                ah.tokens = ah._tokens[1:] # remove first, as not done above
         
             if y >= len(self):
-                if isinstance(self._tokens[y-1], ABCBar):
-                    ah.rightBarToken = self._tokens[y-1]
+                yTestIndex = y-i
             else:
-                if isinstance(self._tokens[y], ABCBar):
-                    ah.rightBarToken = self._tokens[y]
+                yTestIndex = y
+            if isinstance(self._tokens[yTestIndex], ABCBar):
+                rbCandidate = self._tokens[yTestIndex]
+                # if a start repeat, save it to be placed as a left barline
+                if (rbCandidate.barType == 'repeat' and 
+                    rbCandidate.repeatForm == 'start'):
+                    pass
+                else:
+                    ah.rightBarToken = self._tokens[yTestIndex]
 
             # after bar assign, if no bars known, reject
             if len(ah) == 0:
@@ -2131,13 +2149,14 @@ class Test(unittest.TestCase):
         ahm = ah.splitByMeasure()
 
         for i, l, r in [(0, None, None), # meta data
-                        (1, None, '|:'),
                         (2, '|:', '|'),
                         (3, '|', '|'),
                         (-2, '[1', ':|'),
                         (-1, '[2', '|'), 
                        ]:
-            #print i, l, r, ahm[i].tokens
+            #print 'expectiing', i, l, r, ahm[i].tokens
+            #print 'have', ahm[i].leftBarToken, ahm[i].rightBarToken
+            #print 
             if l == None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
@@ -2320,21 +2339,11 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-
-        #t.testNoteParse()
-        #t.testSplitByMeasure()
-        #t.testSplitByReferenceNumber()
-
-        t.testExtractReferenceNumber()
-
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------
 # eof
+
 

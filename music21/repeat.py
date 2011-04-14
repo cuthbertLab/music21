@@ -356,6 +356,8 @@ class Expander(object):
 
         # cyclically process inntermost, one at a time
         while True:
+            #environLocal.printDebug(['process(): top of loop'])
+            #post.show('t')
             post = self._processInnermostRepeat(post)
             #post.show('t')
             if self._hasRepeat(post):                        
@@ -573,10 +575,10 @@ class Test(unittest.TestCase):
 
         # TODO: this is not yet correct, and is making too many copies
         post = s.expandRepeats()
-        self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 53)
+        self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 35)
         # make sure metadata is copied
         self.assertEqual(post.metadata.title, 'King of the fairies')
-        self.assertEqual(len(post.flat.notesAndRests), 286)
+        self.assertEqual(len(post.flat.notesAndRests), 192)
 
         #post.show()
 
@@ -692,22 +694,10 @@ class Test(unittest.TestCase):
         from music21.abc import testFiles
         from music21 import converter, repeat, bar
         
-        s = converter.parse(testFiles.kingOfTheFairies)
-        self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 26)
-        self.assertEqual(s.metadata.title, 'King of the fairies')
-        self.assertEqual(len(s.flat.notes), 145)
-
-        # the last has left-bound repeat
-        part = s.parts[0].getElementsByClass('Measure')[7:10]
-        #part.show()
-        self.assertEqual(isinstance(part[-1].leftBarline, bar.Repeat), True)
-        self.assertEqual(part[-1].leftBarline.direction, 'end')
-        self.assertEqual(part[-1].leftBarline.times, None)
-
-        post = part.expandRepeats()
-
-        post.show('t')
-
+        s = converter.parse(testFiles.hectorTheHero)
+        # TODO: this file does not import correctly due to first/secon
+        # ending issues
+        #s.show()
 
 
 if __name__ == "__main__":
