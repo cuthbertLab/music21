@@ -93,15 +93,11 @@ def yesNoToBoolean(value):
     else:
         return False
 
-
 def booleanToYesNo(value):
     if value:
         return 'yes'
     else:
         return 'no'
-
-
-
 
 #-------------------------------------------------------------------------------
 class TagException(Exception):
@@ -274,6 +270,10 @@ class TagLib(object):
 ('fermata', True, Fermata), 
 ('barline', False, Barline), 
 ('ending', False, Ending), 
+
+('segno', False, Segno),  
+('coda', False, Coda),  
+
 ('bar-style', True), 
 ('repeat', False, Repeat), 
 ('measure-style', False, MeasureStyle), 
@@ -1357,6 +1357,39 @@ class Direction(MusicXMLElementList):
         else:
             return None
 
+    def getCoda(self):
+        '''Search this direction and determine if it contains a coda mark.
+
+        >>> a = Direction()
+        >>> b = DirectionType()
+        >>> c = Coda()
+        >>> b.append(c)
+        >>> a.append(b)
+        >>> a.getCoda() != None
+        True
+        '''
+        for directionType in self.componentList:
+            for obj in directionType:
+                if isinstance(obj, Coda):
+                    return obj
+        return None
+
+    def getSegno(self):
+        '''Search this direction and determine if it contains a segno mark.
+
+        >>> a = Direction()
+        >>> b = DirectionType()
+        >>> c = Segno()
+        >>> b.append(c)
+        >>> a.append(b)
+        >>> a.getSegno() != None
+        True
+        '''
+        for directionType in self.componentList:
+            for obj in directionType:
+                if isinstance(obj, Segno):
+                    return obj
+        return None
 
 
 class DirectionType(MusicXMLElementList):
@@ -1471,6 +1504,24 @@ class Ending(MusicXMLElement):
         # attributes
         self._attr['type'] = None # can be start, stop, discontinue
         self._attr['number'] = None # this is displayed indication
+
+
+class Segno(MusicXMLElement):
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'segno'
+        # attributes
+        self._attr['default-y'] = None
+        self._attr['default-x'] = None
+
+class Coda(MusicXMLElement):
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'coda'
+        # attributes
+        self._attr['default-y'] = None
+        self._attr['default-x'] = None
+
 
 
 class Repeat(MusicXMLElement):
@@ -2114,6 +2165,8 @@ class Handler(xml.sax.ContentHandler):
         self._beamObj = None
         self._barlineObj = None
         self._endingObj = None
+        self._segnoObj = None
+        self._codaObj = None
         self._repeatObj = None
         self._attributesObj = None
         # need to store last attribute obj accross multiple measures
@@ -2485,6 +2538,14 @@ class Handler(xml.sax.ContentHandler):
             self._endingObj = Ending()
             self._endingObj.loadAttrs(attrs)
 
+        elif name == 'segno':
+            self._segnoObj = Segno()
+            self._segnoObj.loadAttrs(attrs)
+
+        elif name == 'coda':
+            self._codaObj = Coda()
+            self._codaObj.loadAttrs(attrs)
+
         elif name == 'repeat': 
             self._repeatObj = Repeat()
             self._repeatObj.loadAttrs(attrs)
@@ -2755,6 +2816,23 @@ class Handler(xml.sax.ContentHandler):
             else:
                 raise MusicXMLException('do not know where this wedge goes: %s' % self._wedgeObj)
             self._wedgeObj = None
+
+        elif name == 'segno':
+            if self._directionTypeObj != None: 
+                #environLocal.printDebug(['closing Segno'])
+                self._directionTypeObj.componentList.append(self._segnoObj)
+            else:
+                raise MusicXMLException('missing a container for a Segno: %s' % self._segnoObj)
+            self._segnoObj = None
+
+        elif name == 'coda':
+            if self._directionTypeObj != None: 
+                #environLocal.printDebug(['closing Coda'])
+                self._directionTypeObj.componentList.append(self._codaObj)
+            else:
+                raise MusicXMLException('missing a container for a Coda: %s' % self._codaObj)
+            self._codaObj = None
+
 
         elif name == 'ornaments': 
             self._notationsObj.append(self._ornamentsObj)

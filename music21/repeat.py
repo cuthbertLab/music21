@@ -55,6 +55,17 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         self._textAlternatives = []
 
 
+        # for musicxml compatibility
+        self._positionDefaultX = None
+        self._positionDefaultY = 20 # two staff lines above
+        # these values provided for musicxml compatibility
+        self._positionRelativeX = None
+        self._positionRelativeY = None
+        # this does not do anything if default y is defined
+        self._positionPlacement = None
+
+
+
     def setText(self, value):
         if self._textExpression is None:
             self._textExpression = expressions.TextExpression(value)
@@ -62,18 +73,41 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             self._textExpression.content = value
         
 
+    def getTextExression(self):
+        '''Convert this to text expression object. 
+        '''
+        return copy.deepcopy(self._textExpression)
+
+
+
+
 class Coda(RepeatExpression):
     '''The coda symbol, or the word coda, as placed in a score. 
 
     >>> from music21 import *
     >>> rm = repeat.Coda()
     '''
+    # note that only Coda and Segno have non-text expression forms
     def __init__(self):
         RepeatExpression.__init__(self)
 
         # default text expression is coda
         self.setText('Coda')
         self._textAlternatives = ['to Coda']
+
+
+class Segno(RepeatExpression):
+    '''The fine word as placed in a score. 
+
+    >>> from music21 import *
+    >>> rm = repeat.Segno()
+    '''
+    # note that only Coda and Segno have non-text expression forms
+    def __init__(self):
+        RepeatExpression.__init__(self)
+        # default text expression is coda
+        self.setText('Segno')
+
 
 
 class Fine(RepeatExpression):
@@ -86,17 +120,6 @@ class Fine(RepeatExpression):
         RepeatExpression.__init__(self)
         # default text expression is coda
         self.setText('fine')
-
-class Segno(RepeatExpression):
-    '''The fine word as placed in a score. 
-
-    >>> from music21 import *
-    >>> rm = repeat.Segno()
-    '''
-    def __init__(self):
-        RepeatExpression.__init__(self)
-        # default text expression is coda
-        self.setText('Segno')
 
 
 
@@ -787,6 +810,10 @@ class Test(unittest.TestCase):
         # TODO: this file does not import correctly due to first/secon
         # ending issues
         #s.show()
+
+
+
+        
 
 
 if __name__ == "__main__":

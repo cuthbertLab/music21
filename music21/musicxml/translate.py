@@ -680,7 +680,7 @@ def textExpressionToMx(te):
 
 def mxToTextExpression(mxDirection):
     '''
-    Given an mxDirection, create on or more TextExpressions
+    Given an mxDirection, create one or more TextExpressions
     '''
 
     from music21 import expressions
@@ -717,6 +717,29 @@ def mxToTextExpression(mxDirection):
         
     return post
 
+
+def mxToCoda(mxCoda):
+    '''Translate a MusicXML :class:`~music21.musicxml.Coda` object to a music21 :class:`~music21.repeat.Coda` object. 
+    '''
+    from music21 import repeat
+    rm = repeat.Coda()
+    rm._positionDefaultX = mxCoda.get('default-x')
+    rm._positionDefaultY = mxCoda.get('default-y')
+    return rm
+
+def mxToSegno(mxCoda):
+    '''Translate a MusicXML :class:`~music21.musicxml.Coda` object to a music21 :class:`~music21.repeat.Coda` object. 
+    '''
+    from music21 import repeat
+    rm = repeat.Segno()
+    rm._positionDefaultX = mxCoda.get('default-x')
+    rm._positionDefaultY = mxCoda.get('default-y')
+    return rm
+
+def mxToRepeatExpression(mxDirection):
+    '''Given an mxDirection that may define a coda, segno, or other repeat expression statement, realize the appropriate music21 object. 
+    '''
+    pass
 
 #-------------------------------------------------------------------------------
 # Instruments
@@ -1640,6 +1663,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             offsetMeasureNote += offsetIncrement
 
         # load dynamics into Measure, not into Voice
+        # mxDirections can be dynamics, repeat expressions, text expressions
         elif isinstance(mxObj, musicxmlMod.Direction):
 #                 mxDynamicsFound, mxWedgeFound = m._getMxDynamics(mxObj)
 #                 for mxDirection in mxDynamicsFound:
@@ -1656,13 +1680,29 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 w.mx = mxObj     
                 _addToStaffReference(mxObj, w, staffReference)
                 m.insert(offsetMeasureNote, w)
+
+            if mxObj.getSegno() is not None:
+                rm = mxToSegno(mxObj.getSegno())
+                _addToStaffReference(mxObj, rm, staffReference)
+                m.insert(offsetMeasureNote, rm)
+            if mxObj.getCoda() is not None:
+                rm = mxToCoda(mxObj.getCoda())
+                _addToStaffReference(mxObj, rm, staffReference)
+                m.insert(offsetMeasureNote, rm)
+
             if mxObj.getWords() is not None:
                 #environLocal.printDebug(['found mxWords object', mxObj])
                 # convert into a list of TextExpression objects
+
+                # this may be a TextExpression, or a RepeatExpression
                 for te in mxToTextExpression(mxObj):
                     #environLocal.printDebug(['got TextExpression object', repr(te)])
                     # offset here is a combination of the current position
                     # (offsetMeasureNote) and and the direction's offset
+                    
+                    # TODO: look at text expression and see if we can 
+                    # convert it into a RepeatExpression
+
                     _addToStaffReference(mxObj, te, staffReference)
                     m.insert(offsetMeasureNote + offsetDirection, te)
 
@@ -2392,6 +2432,19 @@ spirit</words>
 
 
 
+    def testImportRepeatExpressionsA(self):
+
+        # test importing from muscixml
+        from music21.musicxml import testPrimitive
+        from music21 import converter, repeat
+
+        # has one segno
+        s = converter.parse(testPrimitive.repeatExpressionsA)
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.Segno)), 1)
+
+        # has two codas
+        s = converter.parse(testPrimitive.repeatExpressionsB)
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.Coda)), 2)
 
 
 if __name__ == "__main__":

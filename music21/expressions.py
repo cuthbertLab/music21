@@ -156,8 +156,6 @@ class TextExpression(Expression, text.TextFormat):
         'testing'
         ''')
 
-
-
     def _getEnclosure(self):
         return self._enclosure
     
@@ -204,6 +202,15 @@ class TextExpression(Expression, text.TextFormat):
         ''')
 
 
+    #---------------------------------------------------------------------------
+    # text expression in musicxml may be be repeat expressions
+    # need to see if this is a repeat expression, and if so
+    # return the appropriate object
+
+    def getRepeatExpression(self):
+        '''If this TextExpression can be a RepeatExpression, return a new RepeatExpression object.
+        '''
+        pass
 
 
 #-------------------------------------------------------------------------------
