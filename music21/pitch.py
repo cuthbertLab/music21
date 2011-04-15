@@ -3833,6 +3833,19 @@ class Test(unittest.TestCase):
 
 
 
+    def testMicrotoneD(self):
+        from music21 import pitch
+        # the microtonal scale used by padberg
+        f = [440, 458+1/3., 476+2/3., 495, 513+1/3., 531+2/3., 550, 568+1/3.,
+            586+2/3., 605, 623+1/3., 641+2/3., 660, 678+1/3., 696+2/3., 715, 733+1/3., 751+2/3., 770, 788+1/3., 806+2/3., 825, 843+1/3., 861+2/3.]
+        self.assertEqual(len(f), 24)
+        pList = []
+        for fq in f:
+            p = pitch.Pitch()
+            p.frequency = fq
+            pList.append(p)
+        self.assertEqual(str(pList), '[A4, A~4(+21c), B`4(-11c), B4(+4c), B~4(+17c), C~5(-22c), C#5(-14c), C#~5(-7c), C##5(-2c), D~5(+1c), E-5(+3c), E`5(+3c), E5(+2c), E~5(-1c), F5(-4c), F~5(-9c), F#5(-16c), F#~5(-23c), F#~5(+19c), G5(+10c), G~5(-1c), G#5(-12c), G#~5(-24c), G#~5(+14c)]')
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Pitch, Accidental]
