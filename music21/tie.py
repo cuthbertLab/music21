@@ -10,8 +10,7 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-import unittest
-
+import unittest, doctest
 
 import music21
 from music21.musicxml import translate as musicxmlTranslate
