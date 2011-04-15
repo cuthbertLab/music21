@@ -208,8 +208,12 @@ class TextExpression(Expression, text.TextFormat):
     # return the appropriate object
 
     def getRepeatExpression(self):
-        '''If this TextExpression can be a RepeatExpression, return a new RepeatExpression object.
+        '''If this TextExpression can be a RepeatExpression, return a new RepeatExpression object, otherwise, return None.
         '''
+        # use objects stored in
+        # repeat.repeatExpressionReferences for comparison to stored
+        # text; if compatible, create and return object
+        from music21 import repeat
         pass
 
 

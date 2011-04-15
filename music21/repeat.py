@@ -39,7 +39,6 @@ class RepeatMark(object):
 
 
 
-#-------------------------------------------------------------------------------
 
 
 class RepeatExpression(RepeatMark, expressions.Expression):
@@ -53,7 +52,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         self._textExpression = None
         # store a lost of alternative text representations
         self._textAlternatives = []
-
+        # for those that have symbols, declare if the symbol is to be used
+        self._useSymbol = False
 
         # for musicxml compatibility
         self._positionDefaultX = None
@@ -72,13 +72,29 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         else:
             self._textExpression.content = value
         
-
-    def getTextExression(self):
+    def getTextExpression(self):
         '''Convert this to text expression object. 
         '''
         return copy.deepcopy(self._textExpression)
 
 
+    def isValidText(self, value):
+        '''Return True or False if the supplied text could be used for this RepeatExpression.  
+        '''
+        def stripText(s):
+            # remove all spaces, punctuation, and make lower
+            s = s.strip()
+            s = s.replace(' ', '')
+            s = s.replace('.', '')
+            s = s.lower()
+            return s
+
+        for candidate in self._textAlternatives:
+            candidate = stripText(candidate)
+            value = stripText(value)
+            if value == candidate:
+                return True
+        return False
 
 
 class Coda(RepeatExpression):
@@ -92,9 +108,9 @@ class Coda(RepeatExpression):
         RepeatExpression.__init__(self)
 
         # default text expression is coda
-        self.setText('Coda')
-        self._textAlternatives = ['to Coda']
-
+        self._textAlternatives = ['Coda', 'to Coda', 'al Coda']
+        self.setText(self._textAlternatives[0])
+        self._useSymbol = True
 
 class Segno(RepeatExpression):
     '''The fine word as placed in a score. 
@@ -106,9 +122,9 @@ class Segno(RepeatExpression):
     def __init__(self):
         RepeatExpression.__init__(self)
         # default text expression is coda
-        self.setText('Segno')
-
-
+        self._textAlternatives = ['Segno']
+        self.setText(self._textAlternatives[0])
+        self._useSymbol = True
 
 class Fine(RepeatExpression):
     '''The fine word as placed in a score. 
@@ -119,7 +135,8 @@ class Fine(RepeatExpression):
     def __init__(self):
         RepeatExpression.__init__(self)
         # default text expression is coda
-        self.setText('fine')
+        self._textAlternatives = ['fine']
+        self.setText(self._textAlternatives[0])
 
 
 
@@ -129,9 +146,8 @@ class DaCapo(RepeatExpression):
     def __init__(self):
         RepeatExpression.__init__(self)
         # default text expression is coda
-        self.setText('Da Capo')
-        self._textAlternatives = ['D.C.']
-
+        self._textAlternatives = ['Da Capo', 'D.C.']
+        self.setText(self._textAlternatives[0])
 
 class DaCapoAlFine(RepeatExpression):
     '''The coda symbol, or the word coda, as placed in a score. 
@@ -142,8 +158,8 @@ class DaCapoAlFine(RepeatExpression):
     def __init__(self):
         RepeatExpression.__init__(self)
         # default text expression is coda
-        self.setText('Da Capo al fine')
-        self._textAlternatives = ['D.C. al fine']
+        self._textAlternatives = ['Da Capo al fine', 'D.C. al fine']
+        self.setText(self._textAlternatives[0])
 
 
 class DaCapoAlCoda(RepeatExpression):
@@ -154,13 +170,44 @@ class DaCapoAlCoda(RepeatExpression):
     '''
     def __init__(self):
         RepeatExpression.__init__(self)
-        # default text expression is coda
-        self.setText('Da Capo al Coda')
-        self._textAlternatives = ['D.C. al Coda']
+
+        self._textAlternatives = ['Da Capo al Coda', 'D.C. al Coda']
+        self.setText(self._textAlternatives[0])
+
+
+class DalSegnoAlFine(RepeatExpression):
+    '''The coda symbol, or the word coda, as placed in a score. 
+
+    >>> from music21 import *
+    >>> rm = repeat.DaCapoAlFine()
+    '''
+    def __init__(self):
+        RepeatExpression.__init__(self)
+        self._textAlternatives = ['Dal Segno al fine', 'D.S. al fine']
+        self.setText(self._textAlternatives[0])
+
+class DalSegnoAlCoda(RepeatExpression):
+    '''The coda symbol, or the word coda, as placed in a score.
+
+    >>> from music21 import *
+    >>> rm = repeat.DaCapoAlCoda() 
+    '''
+    def __init__(self):
+        RepeatExpression.__init__(self)
+        self._textAlternatives = ['Dal Segno al Coda', 'D.S. al Coda']
+        self.setText(self._textAlternatives[0])
+
 
 
 
     
+#-------------------------------------------------------------------------------
+# store a list of one each of RepeatExpression objects; these are used for t
+# testing TextExpressions 
+repeatExpressionReference = [Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(), 
+    DaCapoAlCoda(), DalSegnoAlFine(), DalSegnoAlCoda()]
+
+
 
 
 # from musicxml
@@ -812,8 +859,45 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testRepeatExpressionValidText(self):
+        from music21 import repeat
+        rm = repeat.Coda()
+        self.assertEqual(rm.isValidText('coda'), True)
+        self.assertEqual(rm.isValidText('Coda'), True)
+        self.assertEqual(rm.isValidText('TO Coda'), True)
+        self.assertEqual(rm.isValidText('D.C.'), False)
 
+        rm = repeat.Segno()
+        self.assertEqual(rm.isValidText('segno  '), True)
+        self.assertEqual(rm.isValidText('segNO  '), True)
         
+        rm = repeat.Fine()
+        self.assertEqual(rm.isValidText('FINE'), True)
+        self.assertEqual(rm.isValidText('fine'), True)
+        self.assertEqual(rm.isValidText('segno'), False)
+
+        rm = repeat.DaCapo()
+        self.assertEqual(rm.isValidText('DC'), True)
+        self.assertEqual(rm.isValidText('d.c.'), True)
+        self.assertEqual(rm.isValidText('d. c.   '), True)
+        self.assertEqual(rm.isValidText('d. c. al capo'), False)
+
+
+        rm = repeat.DaCapoAlFine()
+        self.assertEqual(rm.isValidText('d.c. al fine'), True)
+        self.assertEqual(rm.isValidText('da capo al fine'), True)
+
+        rm = repeat.DaCapoAlCoda()
+        self.assertEqual(rm.isValidText('da capo al coda'), True)
+
+        rm = repeat.DalSegnoAlFine()
+        self.assertEqual(rm.isValidText('d.s. al fine'), True)
+        self.assertEqual(rm.isValidText('dal segno al fine'), True)
+
+        rm = repeat.DalSegnoAlCoda()
+        self.assertEqual(rm.isValidText('d.s. al coda'), True)
+        self.assertEqual(rm.isValidText('dal segno al coda'), True)
+
 
 
 if __name__ == "__main__":

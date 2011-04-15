@@ -727,6 +727,26 @@ def mxToCoda(mxCoda):
     rm._positionDefaultY = mxCoda.get('default-y')
     return rm
 
+def codaToMx(rm):
+    '''Returns a musicxml.Direction object
+
+    >>> from music21 import *
+    '''
+    mxCoda = musicxmlMod.Coda()
+    for src, dst in [(rm._positionDefaultX, 'default-x'), 
+                     (rm._positionDefaultY, 'default-y'), 
+                     (rm._positionRelativeX, 'relative-x'),
+                     (rm._positionRelativeY, 'relative-y')]:
+        if src is not None:
+            mxCoda.set(dst, src)
+    mxDirectionType = musicxmlMod.DirectionType()
+    mxDirectionType.append(mxCoda)
+    mxDirection = musicxmlMod.Direction()
+    mxDirection.append(mxDirectionType)
+    mxDirection.set('placement', rm._positionPlacement)
+    return mxDirection
+
+
 def mxToSegno(mxCoda):
     '''Translate a MusicXML :class:`~music21.musicxml.Coda` object to a music21 :class:`~music21.repeat.Coda` object. 
     '''
@@ -735,6 +755,26 @@ def mxToSegno(mxCoda):
     rm._positionDefaultX = mxCoda.get('default-x')
     rm._positionDefaultY = mxCoda.get('default-y')
     return rm
+
+def segnoToMx(rm):
+    '''Returns a musicxml.Direction object
+
+    >>> from music21 import *
+    '''
+    mxSegno = musicxmlMod.Segno()
+    for src, dst in [(rm._positionDefaultX, 'default-x'), 
+                     (rm._positionDefaultY, 'default-y'), 
+                     (rm._positionRelativeX, 'relative-x'),
+                     (rm._positionRelativeY, 'relative-y')]:
+        if src is not None:
+            mxSegno.set(dst, src)
+    mxDirectionType = musicxmlMod.DirectionType()
+    mxDirectionType.append(mxSegno)
+    mxDirection = musicxmlMod.Direction()
+    mxDirection.append(mxDirectionType)
+    mxDirection.set('placement', rm._positionPlacement)
+    return mxDirection
+
 
 def mxToRepeatExpression(mxDirection):
     '''Given an mxDirection that may define a coda, segno, or other repeat expression statement, realize the appropriate music21 object. 
@@ -1350,10 +1390,24 @@ def measureToMx(m, spannerBundle=None):
                 # returns an mxDirection object
                 mxOffset = int(defaults.divisionsPerQuarter * 
                            obj.getOffsetBySite(mFlat))
-                #mxDirection = obj.mx
                 mxDirection = dynamicToMx(obj)
                 mxDirection.offset = mxOffset 
                 mxMeasure.insert(0, mxDirection)
+            elif 'Segno' in classes:
+                mxOffset = int(defaults.divisionsPerQuarter * 
+                           obj.getOffsetBySite(mFlat))
+                mxDirection = segnoToMx(obj)
+                mxDirection.offset = mxOffset 
+                mxMeasure.insert(0, mxDirection)
+            elif 'Coda' in classes:
+                mxOffset = int(defaults.divisionsPerQuarter * 
+                           obj.getOffsetBySite(mFlat))
+                mxDirection = codaToMx(obj)
+                mxDirection.offset = mxOffset 
+                mxMeasure.insert(0, mxDirection)
+
+            # TODO: look for other RepeatExpressions.
+
             elif 'TextExpression' in classes:
                 # convert m21 offset to mxl divisions
                 mxOffset = int(defaults.divisionsPerQuarter * 
@@ -2441,11 +2495,18 @@ spirit</words>
         # has one segno
         s = converter.parse(testPrimitive.repeatExpressionsA)
         self.assertEqual(len(s.flat.getElementsByClass(repeat.Segno)), 1)
+        raw = s.musicxml
+        self.assertEqual(raw.find('<segno') > 0, True)
 
         # has two codas
         s = converter.parse(testPrimitive.repeatExpressionsB)
         self.assertEqual(len(s.flat.getElementsByClass(repeat.Coda)), 2)
+        raw = s.musicxml
+        self.assertEqual(raw.find('<coda') > 0, True)
 
+
+        #s.show('t')
+        #s.show()
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
