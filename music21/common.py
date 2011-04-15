@@ -80,17 +80,17 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 def getMissingImportStr(modNameList):
     '''
     >>> getMissingImportStr(['PIL'])
-    'Missing optional package PIL; see http://mit.edu/music21/extras.html'
+    'Missing optional package PIL; see http://mit.edu/music21/installAdditional.html'
     >>> getMissingImportStr(['PIL', 'numpy'])
-    'Missing optional packages PIL, numpy; see http://mit.edu/music21/extras.html'
+    'Missing optional packages PIL, numpy; see http://mit.edu/music21/installAdditional.html'
 
     '''
     if len(modNameList) == 0:
         return None
     elif len(modNameList) == 1:
-        return 'Missing optional package %s; see http://mit.edu/music21/extras.html' % modNameList[0]
+        return 'Missing optional package %s; see http://mit.edu/music21/installAdditional.html' % modNameList[0]
     else:
-        return 'Missing optional packages %s; see http://mit.edu/music21/extras.html' % ', '.join(modNameList)
+        return 'Missing optional packages %s; see http://mit.edu/music21/installAdditional.html' % ', '.join(modNameList)
 
 #-------------------------------------------------------------------------------
 def findFormat(fmt):
@@ -709,9 +709,14 @@ def unitNormalizeProportion(values):
     >>> common.unitNormalizeProportion([0,3,4])
     [0.0, 0.42857142857142855, 0.5714285714285714]
     >>> common.unitNormalizeProportion([1,1,1])
-    [0.33333333333333331, 0.33333333333333331, 0.33333333333333331]
-    >>> common.unitNormalizeProportion([.2, .6, .2])
-    [0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
+    [0.3333333..., 0.333333..., 0.333333...]
+    
+    
+    On 32-bit computers this number is inexact.  On 64-bit it works fine.
+    
+    
+    #>>> common.unitNormalizeProportion([.2, .6, .2])
+    #[0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
     """
     # note: negative values should be shifted to positive region first
     sum = 0
@@ -731,7 +736,7 @@ def unitBoundaryProportion(series):
     >>> common.unitBoundaryProportion([1,1,2])
     [(0, 0.25), (0.25, 0.5), (0.5, 1.0)]
     >>> common.unitBoundaryProportion([8,1,1])
-    [(0, 0.80000000000000004), (0.80000000000000004, 0.90000000000000002), (0.90000000000000002, 1.0)]
+    [(0, 0.8...), (0.8..., 0.9...), (0.9..., 1.0)]
     """
     unit = unitNormalizeProportion(series)
     bounds = []
@@ -1791,7 +1796,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
 
         ## do this the old way to avoid music21 import
-        s1 = doctest.DocTestSuite(__name__)
+        s1 = doctest.DocTestSuite(__name__, optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
         s2 = unittest.defaultTestLoader.loadTestsFromTestCase(Test)
         s1.addTests(s2)
         runner = unittest.TextTestRunner()
