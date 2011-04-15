@@ -41,6 +41,7 @@ class RepeatMark(object):
 
 #-------------------------------------------------------------------------------
 
+
 class RepeatExpression(RepeatMark, expressions.Expression):
     '''
     This class models any mark added to a Score to mark repeat start and end points that are designated by expressions. 
@@ -48,6 +49,95 @@ class RepeatExpression(RepeatMark, expressions.Expression):
     def __init__(self):
         expressions.Expression.__init__(self)
 
+        # store a text version of this expression
+        self._textExpression = None
+        # store a lost of alternative text representations
+        self._textAlternatives = []
+
+
+    def setText(self, value):
+        if self._textExpression is None:
+            self._textExpression = expressions.TextExpression(value)
+        else:
+            self._textExpression.content = value
+        
+
+class Coda(RepeatExpression):
+    '''The coda symbol, or the word coda, as placed in a score. 
+
+    >>> from music21 import *
+    >>> rm = repeat.Coda()
+    '''
+    def __init__(self):
+        RepeatExpression.__init__(self)
+
+        # default text expression is coda
+        self.setText('Coda')
+        self._textAlternatives = ['to Coda']
+
+
+class Fine(RepeatExpression):
+    '''The fine word as placed in a score. 
+
+    >>> from music21 import *
+    >>> rm = repeat.Fine()
+    '''
+    def __init__(self):
+        RepeatExpression.__init__(self)
+        # default text expression is coda
+        self.setText('fine')
+
+class Segno(RepeatExpression):
+    '''The fine word as placed in a score. 
+
+    >>> from music21 import *
+    >>> rm = repeat.Segno()
+    '''
+    def __init__(self):
+        RepeatExpression.__init__(self)
+        # default text expression is coda
+        self.setText('Segno')
+
+
+
+class DaCapo(RepeatExpression):
+    '''The Da Capo statement
+    '''
+    def __init__(self):
+        RepeatExpression.__init__(self)
+        # default text expression is coda
+        self.setText('Da Capo')
+        self._textAlternatives = ['D.C.']
+
+
+class DaCapoAlFine(RepeatExpression):
+    '''The coda symbol, or the word coda, as placed in a score. 
+
+    >>> from music21 import *
+    >>> rm = repeat.DaCapoAlFine()
+    '''
+    def __init__(self):
+        RepeatExpression.__init__(self)
+        # default text expression is coda
+        self.setText('Da Capo al fine')
+        self._textAlternatives = ['D.C. al fine']
+
+
+class DaCapoAlCoda(RepeatExpression):
+    '''The coda symbol, or the word coda, as placed in a score.
+
+    >>> from music21 import *
+    >>> rm = repeat.DaCapoAlCoda() 
+    '''
+    def __init__(self):
+        RepeatExpression.__init__(self)
+        # default text expression is coda
+        self.setText('Da Capo al Coda')
+        self._textAlternatives = ['D.C. al Coda']
+
+
+
+    
 
 
 # from musicxml
@@ -158,7 +248,6 @@ class Expander(object):
                         countBalance += 1 # simulate first
                     endCount += 1
                     countBalance -= 1
-
 
             if rb is not None and 'Repeat' in rb.classes:
                 if rb.direction == 'end':
