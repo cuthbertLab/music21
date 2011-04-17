@@ -208,13 +208,22 @@ class TextExpression(Expression, text.TextFormat):
     # return the appropriate object
 
     def getRepeatExpression(self):
-        '''If this TextExpression can be a RepeatExpression, return a new RepeatExpression object, otherwise, return None.
+        '''If this TextExpression can be a RepeatExpression, return a new :class:`~music21.repeat.RepeatExpression`. object, otherwise, return None.
         '''
         # use objects stored in
         # repeat.repeatExpressionReferences for comparison to stored
         # text; if compatible, create and return object
         from music21 import repeat
-        pass
+        for obj in repeat.repeatExpressionReference:
+            if obj.isValidText(self._content):
+                re = copy.deepcopy(obj)
+                # set the text to whatever is used here
+                # create a copy of these text expression and set it
+                # this will transfer all positional/formatting settings
+                re.setTextExpression(copy.deepcopy(self)) 
+                return re
+        # if cannot be expressed as a repeat expression
+        return None
 
 
 #-------------------------------------------------------------------------------
@@ -582,7 +591,43 @@ class Test(unittest.TestCase):
         self.assertEqual(st1n[2].name, "D")
         self.assertEqual(st1n[2].quarterLength, 3.75)
         
+
+    def testGetRepeatExpression(self):
+        from music21 import stream, expressions, repeat
+
+        te = expressions.TextExpression('lightly')
+        # no repeat expression is possible
+        self.assertEqual(te.getRepeatExpression(), None)
         
+
+        te = expressions.TextExpression('d.c.')
+        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DaCapo "d.c.">')
+        re = te.getRepeatExpression()
+        self.assertEqual(re.getTextExpression().content, 'd.c.')
+
+        te = expressions.TextExpression('DC al coda')
+        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DaCapoAlCoda "DC al coda">')
+        re = te.getRepeatExpression()
+        self.assertEqual(re.getTextExpression().content, 'DC al coda')
+
+        te = expressions.TextExpression('DC al fine')
+        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DaCapoAlFine "DC al fine">')
+        re = te.getRepeatExpression()
+        self.assertEqual(re.getTextExpression().content, 'DC al fine')
+
+
+        te = expressions.TextExpression('ds al coda')
+        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DalSegnoAlCoda "ds al coda">')
+        re = te.getRepeatExpression()
+        self.assertEqual(re.getTextExpression().content, 'ds al coda')
+
+        te = expressions.TextExpression('d.s. al fine')
+        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DalSegnoAlFine "d.s. al fine">')
+        re = te.getRepeatExpression()
+        self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
+
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

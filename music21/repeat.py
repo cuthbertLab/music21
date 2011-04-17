@@ -38,12 +38,15 @@ class RepeatMark(object):
 
 
 
-
-
+#-------------------------------------------------------------------------------
+class RepeatExpressionException(music21.Music21Exception):
+    pass
 
 class RepeatExpression(RepeatMark, expressions.Expression):
     '''
-    This class models any mark added to a Score to mark repeat start and end points that are designated by expressions. 
+    This class models any mark added to a Score to mark repeat start and end points that are designated by text expressions. 
+
+    This class stores internally a :class:`~music21.expressions.TextExpression`. This object is used for rendering text output in translation. A properly configured TextExpression object can also be used to create an instance of a RepeatExpressions.
     '''
     def __init__(self):
         expressions.Expression.__init__(self)
@@ -65,6 +68,19 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         self._positionPlacement = None
 
 
+    def __repr__(self):
+        content = self.getText()
+        if content is not None and len(content) > 16:
+            return '<music21.repeat.%s "%s...">' % (self.__class__.__name__, content[:16])
+        elif content is not None:
+            return '<music21.repeat.%s "%s">' % (self.__class__.__name__, content)
+        else:
+            return '<music21.repeat.%s>' % (self.__class__.__name__)
+
+    def getText(self):
+        '''Get the text used for this expression.
+        '''
+        return self._textExpression.content
 
     def setText(self, value):
         if self._textExpression is None:
@@ -76,6 +92,22 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         '''Convert this to text expression object. 
         '''
         return copy.deepcopy(self._textExpression)
+
+
+    def setTextExpression(self, value):
+        '''Directly set a TextExpression object. 
+        '''
+        if not isinstance(value, expressions.TextExpression):
+            raise RepeatExpressionException('must set with a TextExpression object, not: %s' % value)
+        self._textExpression = value
+
+    def getTextExpression(self):
+        '''Return a copy of the TextExpression stored in this object.
+        '''
+        if self._textExpression is None:
+            return None
+        else:
+            return copy.deepcopy(self._textExpression)
 
 
     def isValidText(self, value):
