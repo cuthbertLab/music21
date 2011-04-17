@@ -325,12 +325,65 @@ class Trill(Ornament):
 
     def realize(self):
         '''
-        neena will write this...
-        with docs...
-        and examples...
+        realize a trill.
+        
+        returns a three-element tuple.
+        The first is a list of the notes that the note was converted to.
+        The second is a note of duration 0 because the trill "eats up" the whole note.
+        The third is a list of the notes at the end if nachschlag is True, and empty list if False.
+        
+        TODO: write more docs
         '''
-        pass
+        if self.size == "":
+            raise ExpressionException("Cannot realize a trill if there is no size given")
+        if srcObject.duration == None or srcObject.duration.quarterLength == 0:
+            raise ExpressionException("Cannot steal time from an object with no duration")
+        
+        remainderDuration = 0
+        transposeInterval = self.size
+        transposeIntervalReverse = self.size.reverse()
+        
+        if nachschlag:
+            numberOfTrillNotes = srcObject.duration.quarterLength / self.quarterLength - 2
+        else:
+            numberOfTrillNotes = srcObject.duration.quarterLength / self.quarterLength
+            
+        trillNotes = []
+        for i in range(numberOfTrillNotes):
+            firstNote = copy.deepcopy(srcObject)
+            #TODO: remove expressions
+            firstNote.duration.quarterLength = self.quarterLength
+            
+            secondNote = copy.deepcopy(srcObject)
+            #TODO: remove expressions
+            secondNote.duration.quarterLength = self.quarterLength 
+            secondNote.transpose(transposeInterval, inPlace = True)
+        
+            trillNotes.append(firstNote)
+            trillNotes.append(secondNote)
 
+        for n in trillNotes:
+            n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
+            
+        remainderNote = copy.deepcopy(srcObject)
+        remainderNote.duration.quarterLength = remainderDuration
+        
+        if nachschlag:
+            firstNoteNachschlag = copy.deepcopy(srcObject)
+            #TODO: remove expressions
+            firstNoteNachschlag.duration.quarterLength = self.quarterLength
+            
+            secondNoteNachschlag = copy.deepcopy(srcObject)
+            #TODO: remove expressions
+            secondNoteNachschlag.duration.quarterLength = self.quarterLength
+            secondNoteNachschlag.transpose(transposeIntervalReverse, inPlace = True)
+            
+            nachschlag = [firstNoteNachschlag, secondNoteNachschlag]
+            
+            return (trillNotes, remainderNote, nachschlag)
+        
+        else:
+            return (trillNotes, remainderNote, [])
 
     def _getMX(self):
         '''
@@ -373,10 +426,74 @@ class WholeStepTrill(Trill):
         self.size = music21.interval.Interval("M2")
 
 class Turn(Ornament):
-    pass
+    placement = 'above'
+    nachschlag = False # play little notes at the end of the trill?
+    tieAttach = 'all'
+    quarterLength = 0.25
 
-class InvertedTurn(Ornament):
-    pass
+    def __init__(self):
+        Ornament.__init__(self)
+        self.size = music21.interval.GenericInterval(2)
+
+    def realize(self):
+        '''
+        realize a turn.
+        
+        returns a three-element tuple.
+        The first is a list of the four notes that the beginning of the note was converted to.
+        The second is a note of duration 0 because the turn "eats up" the whole note.
+        The third is a list of the notes at the end if nachschlag is True, and empty list if False.
+        
+        TODO: write more docs
+        '''
+        if self.size == "":
+            raise ExpressionException("Cannot realize a turn if there is no size given")
+        if srcObject.duration == None or srcObject.duration.quarterLength == 0:
+            raise ExpressionException("Cannot steal time from an object with no duration")
+        
+        remainderDuration = 0
+        transposeIntervalUp = self.size
+        transposeIntervalDown = self.size.reverse()
+        
+        #TODO: if nachshlag...
+        
+        firstNote = copy.deepcopy(srcObject)
+        #TODO: remove expressions
+        firstNote.duration.quarterLength = self.quarterLength
+        firstNote.transpose(transposeIntervalUp, inPlace = True)
+        
+        secondNote = copy.deepcopy(srcObject)
+        #TODO: remove expressions
+        secondNote.duration.quarterLength = self.quarterLength 
+        
+        thirdNote = copy.deepcopy(srcObject)
+        #TODO: remove expressions
+        thirdNote.duration.quarterLength = self.quarterLength
+        thirdNote.transpose(transposeIntervalDown, inPlace = True)
+        
+        fourthNote = copy.deepcopy(srcObject)
+        #TODO: remove expressions
+        fourthNote.duration.quarterLength = self.quarterLength
+        
+    
+        turnNotes.append(firstNote)
+        turnNotes.append(secondNote)
+        turnNotes.append(thirdNote)
+        turnNotes.append(fourthNote)
+
+        for n in turnNotes:
+            n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
+            
+        remainderNote = copy.deepcopy(srcObject)
+        remainderNote.duration.quarterLength = remainderDuration
+        
+        
+        return (turnNotes, remainderNote, [])
+
+class InvertedTurn(Turn):
+    def __init__(self):
+        Turn.__init__(self)
+        self.size = (music21.interval.GenericInterval(2)).reverse()
 
 
 

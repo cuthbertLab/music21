@@ -178,6 +178,10 @@ class Graph(object):
         >>> a = Graph(title='a graph of some data to be given soon', tickFontSize = 9)
         >>> a.setData(['some', 'arbitrary', 'data', 14, 9.04, None])
         '''
+        try:
+            plt
+        except NameError:
+            raise GraphException('could not find matplotlib, graphing is not allowed')
         self.data = None
         # define a component dictionary for each axist
         self.axis = {}

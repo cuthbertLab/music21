@@ -475,7 +475,7 @@ class Microtone(object):
     >>> m.cents
     20
     >>> m.alter
-    0.200...
+    0.2...
     >>> m
     (+20c)
     >>> m.harmonicShift = 3

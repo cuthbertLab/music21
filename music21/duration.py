@@ -573,7 +573,7 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     
     >>> tup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
     >>> convertTypeToQuarterLength('quarter', 0, [tup])
-    0.800000...
+    0.8...
 
     >>> tup = Tuplet(numberNotesActual = 3, numberNotesNormal = 4)
     >>> convertTypeToQuarterLength('quarter', 0, [tup])
