@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 '''This module defines numerous subclasses of :class:`~music21.clef.Clef`, providing object representations for all commonly used clefs. Clef objects are often found within :class:`~music21.stream.Measure` objects.  
 '''
-
+ 
 import unittest
 
 import music21
