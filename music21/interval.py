@@ -865,6 +865,13 @@ class DiatonicInterval(music21.Music21Object):
         True
         
         '''
+        if other is None:
+            return False
+        elif not hasattr(other, "generic"):
+            return False
+        elif not hasattr(other, "specifier"):
+            return False
+
         if other == None:
             return False
         if self.generic == other.generic and self.specifier == other.specifier:
@@ -1022,6 +1029,9 @@ class ChromaticInterval(music21.Music21Object):
         '''
         if other == None:
             return False
+        elif not hasattr(other, "semitones"):
+            return False
+
         if self.semitones == other.semitones:
             return True
         else:
