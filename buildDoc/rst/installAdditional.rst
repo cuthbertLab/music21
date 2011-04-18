@@ -30,6 +30,11 @@ Lilypond is less good.
 
 http://www.pythonware.com/products/pil
 
+Users of 64-bit windows will want to install from the site below.
+Intel 64-bit users will want the win32
+
+http://www.lfd.uci.edu/~gohlke/pythonlibs/
+
 
 Matplotlib
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,6 +44,11 @@ Matplotlib itself has additional dependencies (such as SciPy).
 Please read the detailed instructions in the link below.
 
 http://matplotlib.sourceforge.net
+
+Users of 64-bit windows or Python 2.7 will need to download
+numpy and scipy from:
+
+http://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 
 

@@ -623,13 +623,22 @@ class GenericInterval(music21.Music21Object):
         True
         >>> a in [b, c, d]
         True
+        
+        >>> a == ""
+        False
+        >>> a == None
+        False
         '''
-        if self.value == other.value and self.directed == other.directed:
+        if other is None:
+            return False
+        elif not hasattr(other, "value"):
+            return False
+        elif not hasattr(other, "directed"):
+            return False
+        elif self.value == other.value and self.directed == other.directed:
             return True
         else:
             return False
-
-
 
     def complement(self):
         '''Returns a new GenericInterval object where descending 3rds are 6ths, etc.
