@@ -34,9 +34,12 @@ class FiguredBass(object):
     def __init__(self, voiceList, timeSigString = '4/4', keyString = 'C', modeString = 'major'):
         '''
         '''
+        self.keyString = keyString
+        self.modeString = modeString
+        self.timeSigString = timeSigString
         #Converted to music21 TimeSignature, KeySignature objects
-        self.ts = meter.TimeSignature(timeSigString)
-        _numSharps = key.pitchToSharps(keyString, modeString)
+        self.ts = meter.TimeSignature(self.timeSigString)
+        _numSharps = key.pitchToSharps(self.keyString, self.modeString)
         self.ks = key.KeySignature(_numSharps)
         
         #fb bass notes, figures, bass line, other information
