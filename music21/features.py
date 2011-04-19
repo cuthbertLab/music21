@@ -24,37 +24,55 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
+class Feature(object):
+    '''An object representation of a feature, capable of presentation in a variety of formats, and returned from FeatureExtractor objects.
+    '''
+    def __init__(self):
+        # these values will be filled by the extractor
+        self.name = None # string name representation
+        self.description = None # string description
+        self.isSequential = None # True or False
+        self.dimensions = None # number of dimensions
+
+        # data storage
+        self._vector = []
+
+#-------------------------------------------------------------------------------
 class FeatureExtractor(object):
     def __init__(self, streamObj, *arguments, **keywords):
         self._src = streamObj
-        self._feature = None
+        self._feature = None # Feature object
 
-        self._format = 'native' # can be jmusi
+        self.name = None # string name representation
+        self.description = None # string description
+        self.isSequential = None # True or False
+        self.dimensions = None # number of dimensions
+
+    def _fillFeautureAttributes(self, feature=None):
+        '''Fill the attributes of a Feature with the descriptors in the FeatureExtractor.
+        '''
+        # operate on passed-in feature or self._feature
+        if feature is None:
+            feature = self._feature
+        feature.name = self.name
+        feature.description = self.description
+        feature.isSequential = self.isSequential
+        feature.dimensions = self.dimensions
+        return feature
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        self._feature = None
+        self._feature = Feature()
+        self._fillFeautureAttributes() # will fill self._feature
 
-    def _formatJSymbolic(self, value):
-        '''Convert whatever output is returned into a data format similar to that created by JSymbolic.
-        '''
-        return value
-
-    def _formatNative(self, value):
-        '''Return a native Python / music21 format
-        '''
-        return value
-
-    def extract(self):
+    def extract(self, source=None):
         '''Extract the feature and return the result. 
         '''
-        self._process()
-        if self._format == 'native':
-            return self._formatNative(value)
-        elif self._format == 'jsymbolic':
-            return self._formatJSymbolic(value)
-    
+        if source is not None:
+            self._src = source
+        self._process() # will set feature object
+        return self._feature    
 
 #-------------------------------------------------------------------------------
 # 112 feature extractors
@@ -63,10 +81,22 @@ class FeatureExtractor(object):
 class AmountOfArpeggiationFeature(FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = stream.Stream()
+    >>> fe = features.AmountOfArpeggiationFeature(s)
+    >>> f = fe.extract()
+    >>> f.name
+    'Amount of Arpeggiation'
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
- 
+
+        self.name = 'Amount of Arpeggiation'
+        self.description = 'Fraction of horizontal intervals that are repeated notes, minor thirds, major thirds, perfect fifths, minor sevenths, major sevenths, octaves, minor tenths or major tenths.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
+
 class AverageMelodicIntervalFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -74,12 +104,23 @@ class AverageMelodicIntervalFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = 'Average Melodic Interval'
+        self.description = 'Average melodic interval (in semi-tones).'
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class AverageNoteDurationFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Average Note Duration'
+        self.description = 'Average duration of notes in seconds.s'
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class AverageNoteToNoteDynamicsChangeFeature(FeatureExtractor):
@@ -89,6 +130,11 @@ class AverageNoteToNoteDynamicsChangeFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Average Note To Note Dynamics Change'
+        self.description = 'Average change of loudness from one note to the next note in the same channel (in MIDI velocity units).'
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class AverageNumberOfIndependentVoicesFeature(FeatureExtractor):
     '''
@@ -96,6 +142,11 @@ class AverageNumberOfIndependentVoicesFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Average Number of Independent Voices'
+        self.description = 'Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.'
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class AverageRangeOfGlissandosFeature(FeatureExtractor):
@@ -105,6 +156,11 @@ class AverageRangeOfGlissandosFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Average Range of Glissandos'
+        self.description = 'Average range of Pitch Bends, where range is defined as the greatest value of the absolute difference between 64 and the second data byte of all MIDI Pitch Bend messages falling betweenthe Note On and Note Off messages of any note.'
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class AverageTimeBetweenAttacksFeature(FeatureExtractor):
     '''
@@ -112,6 +168,11 @@ class AverageTimeBetweenAttacksFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Average Time Between Attacks'
+        self.description = 'Average time in seconds between Note On events (regardless of channel).'
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class AverageTimeBetweenAttacksForEachVoiceFeature(FeatureExtractor):
@@ -121,13 +182,25 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Average Time Between Attacks For Each Voice'
+        self.description = 'Average of average times in seconds between Note On events on individual channels that contain at least one note.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
-class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(FeatureExtractor):
+class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
+    FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Average Variability of Time Between Attacks For Each Voice'
+        self.description = 'Average standard deviation, in seconds, of time between Note On events on individual channels that contain at least one note.'
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class BasicPitchHistogramFeature(FeatureExtractor):
@@ -147,6 +220,11 @@ class BeatHistogramFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
   
 class ChangesOfMeterFeature(FeatureExtractor):
     '''A feature exractor that sets the feature to 1 if the time signature is changed one or more times during the recording.
@@ -156,16 +234,27 @@ class ChangesOfMeterFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Changes of Meter'
+        self.description = 'Set to 1 if the time signature is changed one or more times during the recording'
+        self.isSequential = True
+        self.dimensions = 1
+
     def _process(self):
         # flatten; look for more than one type of meter
         pass
  
+
 class ChromaticMotionFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Chromatic Motion'
+        self.description = 'Fraction of melodic intervals corresponding to a semi-tone.'
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
@@ -175,6 +264,12 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Combined Strength of Two Strongest Rhythmic Pulses'
+        self.description = 'The sum of the frequencies of the two beat bins of the peaks with the highest frequencies.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class CompoundOrSimpleMeterFeature(FeatureExtractor):
     '''
@@ -182,6 +277,12 @@ class CompoundOrSimpleMeterFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Compound Or Simple Meter'
+        self.description = 'Set to 1 if the initial meter is compound (numerator of time signature is greater than or equal to 6 and is evenly divisible by 3) and to 0 if it is simple (if the above condition is not fulfilled).'
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class DirectionOfMotionFeature(FeatureExtractor):
@@ -191,6 +292,11 @@ class DirectionOfMotionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Direction of Motion'
+        self.description = 'Fraction of melodic intervals that are rising rather than falling.'
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class DistanceBetweenMostCommonMelodicIntervalsFeature(FeatureExtractor):
     '''
@@ -199,6 +305,12 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Distance Between Most Common Melodic Intervals'
+        self.description = 'Absolute value of the difference between the most common melodic interval and the second most common melodic interval.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class DominantSpreadFeature(FeatureExtractor):
     '''
@@ -206,6 +318,12 @@ class DominantSpreadFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Dominant Spread'
+        self.description = 'Largest number of consecutive pitch classes separated by perfect 5ths that accounted for at least 9% each of the notes.'
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class DurationFeature(FeatureExtractor):
@@ -216,6 +334,11 @@ class DurationFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Duration'
+        self.description = 'The total duration in seconds of the music.'
+        self.isSequential = False
+        self.dimensions = 1
+
  
 class DurationOfMelodicArcsFeature(FeatureExtractor):
     '''
@@ -224,6 +347,10 @@ class DurationOfMelodicArcsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Duration of Melodic Arcs'
+        self.description = 'Average number of notes that separate melodic peaks and troughs in any channel.'
+        self.isSequential = True
+        self.dimensions = 1
 
 
  
@@ -242,6 +369,11 @@ class GlissandoPrevalenceFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Glissando Prevalence'
+        self.description = 'Number of Note Ons that have at least one MIDI Pitch Bend associated with them divided by total number of pitched Note Ons.'
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class HarmonicityOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
     '''
@@ -249,6 +381,12 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Harmonicity of Two Strongest Rhythmic Pulses'
+        self.description = 'The bin label of the higher (in terms of bin label) of the two beat bins of the peaks with the highest frequency divided by the bin label of the lower.'
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class ImportanceOfBassRegisterFeature(FeatureExtractor):
@@ -258,6 +396,12 @@ class ImportanceOfBassRegisterFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Importance of Bass Register'
+        self.description = 'Fraction of Note Ons between MIDI pitches 0 and 54.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class ImportanceOfHighRegisterFeature(FeatureExtractor):
     '''
@@ -265,6 +409,12 @@ class ImportanceOfHighRegisterFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Importance of High Register'
+        self.description = 'Fraction of Note Ons between MIDI pitches 73 and 127.'
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class ImportanceOfLoudestVoiceFeature(FeatureExtractor):
@@ -274,6 +424,12 @@ class ImportanceOfLoudestVoiceFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Importance of Loudest Voice'
+        self.description = 'Difference between the average loudness of the loudest channel and the average loudness of the other channels that contain at least one note.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class ImportanceOfMiddleRegisterFeature(FeatureExtractor):
     '''
@@ -281,6 +437,12 @@ class ImportanceOfMiddleRegisterFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Importance of Middle Register'
+        self.description = 'Fraction of Note Ons between MIDI pitches 55 and 72.'
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class InitialTempoFeature(FeatureExtractor):
@@ -290,6 +452,12 @@ class InitialTempoFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Initial Tempo'
+        self.description = 'Tempo in beats per minute at the start of the recording.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class InitialTimeSignatureFeature(FeatureExtractor):
     '''
@@ -297,6 +465,12 @@ class InitialTimeSignatureFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class IntervalBetweenStrongestPitchClassesFeature(FeatureExtractor):
@@ -306,6 +480,12 @@ class IntervalBetweenStrongestPitchClassesFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Interval Between Strongest Pitch Classes'
+        self.description = 'Absolute value of the difference between the pitch classes of the two most common MIDI pitch classes.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class IntervalBetweenStrongestPitchesFeature(FeatureExtractor):
     '''
@@ -313,6 +493,12 @@ class IntervalBetweenStrongestPitchesFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Interval Between Strongest Pitches'
+        self.description = 'Absolute value of the difference between the pitches of the two most common MIDI pitches.'
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class MaximumNoteDurationFeature(FeatureExtractor):
@@ -322,6 +508,12 @@ class MaximumNoteDurationFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Maximum Note Duration'
+        self.description = 'Duration of the longest note (in seconds).'
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class MaximumNumberOfIndependentVoicesFeature(FeatureExtractor):
     '''
@@ -329,6 +521,12 @@ class MaximumNumberOfIndependentVoicesFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class MelodicFifthsFeature(FeatureExtractor):
@@ -338,6 +536,11 @@ class MelodicFifthsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class MelodicIntervalHistogramFeature(FeatureExtractor):
     '''
@@ -346,6 +549,12 @@ class MelodicIntervalHistogramFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class MelodicIntervalsInLowestLineFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -353,12 +562,24 @@ class MelodicIntervalsInLowestLineFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class MelodicOctavesFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class MelodicThirdsFeature(FeatureExtractor):
@@ -368,6 +589,12 @@ class MelodicThirdsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class MelodicTritonesFeature(FeatureExtractor):
     '''
@@ -375,6 +602,12 @@ class MelodicTritonesFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class MinimumNoteDurationFeature(FeatureExtractor):
@@ -384,12 +617,24 @@ class MinimumNoteDurationFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class MostCommonMelodicIntervalFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class MostCommonMelodicIntervalPrevalenceFeature(FeatureExtractor):
@@ -398,6 +643,12 @@ class MostCommonMelodicIntervalPrevalenceFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class MostCommonPitchClassFeature(FeatureExtractor):
@@ -408,6 +659,12 @@ class MostCommonPitchClassFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class MostCommonPitchClassPrevalenceFeature(FeatureExtractor):
     '''
@@ -415,6 +672,12 @@ class MostCommonPitchClassPrevalenceFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class MostCommonPitchFeature(FeatureExtractor):
@@ -424,6 +687,12 @@ class MostCommonPitchFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class MostCommonPitchPrevalenceFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -431,12 +700,23 @@ class MostCommonPitchPrevalenceFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class NoteDensityFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class NotePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
@@ -446,13 +726,24 @@ class NotePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
  
+
 class NotePrevalenceOfUnpitchedInstrumentsFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class NumberOfCommonMelodicIntervalsFeature(FeatureExtractor):
@@ -461,6 +752,12 @@ class NumberOfCommonMelodicIntervalsFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
 
 class NumberOfCommonPitchesFeature(FeatureExtractor):
@@ -478,6 +775,11 @@ class NumberOfModeratePulsesFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class NumberOfRelativelyStrongPulsesFeature(FeatureExtractor):
@@ -486,6 +788,11 @@ class NumberOfRelativelyStrongPulsesFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class NumberOfStrongPulsesFeature(FeatureExtractor):
@@ -505,6 +812,12 @@ class OverallDynamicRangeFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 
  
 class PitchClassDistributionFeature(FeatureExtractor):
@@ -514,6 +827,11 @@ class PitchClassDistributionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class PitchClassVarietyFeature(FeatureExtractor):
     '''
@@ -521,6 +839,12 @@ class PitchClassVarietyFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class PitchedInstrumentsPresentFeature(FeatureExtractor):
@@ -530,6 +854,12 @@ class PitchedInstrumentsPresentFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class PitchVarietyFeature(FeatureExtractor):
     '''
@@ -537,6 +867,12 @@ class PitchVarietyFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class PolyrhythmsFeature(FeatureExtractor):
@@ -546,6 +882,11 @@ class PolyrhythmsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class PrimaryRegisterFeature(FeatureExtractor):
     '''
@@ -554,6 +895,12 @@ class PrimaryRegisterFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class QualityFeature(FeatureExtractor):
     '''A feature exractor that sets the feature to 0 if the key signature indicates that a recording is major, set to 1 if it indicates that it is minor and set to 0 if key signature is unknown.
 
@@ -561,6 +908,11 @@ class QualityFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class QuintupleMeterFeature(FeatureExtractor):
@@ -570,6 +922,12 @@ class QuintupleMeterFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class RangeFeature(FeatureExtractor):
     '''
@@ -577,6 +935,12 @@ class RangeFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class RangeOfHighestLineFeature(FeatureExtractor):
@@ -594,6 +958,12 @@ class RelativeNoteDensityOfHighestLineFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class RelativeRangeOfLoudestVoiceFeature(FeatureExtractor):
     '''
@@ -601,6 +971,12 @@ class RelativeRangeOfLoudestVoiceFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class RelativeStrengthOfMostCommonIntervalsFeature(FeatureExtractor):
@@ -610,6 +986,12 @@ class RelativeStrengthOfMostCommonIntervalsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class RelativeStrengthOfTopPitchClassesFeature(FeatureExtractor):
     '''
@@ -618,12 +1000,24 @@ class RelativeStrengthOfTopPitchClassesFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class RelativeStrengthOfTopPitchesFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class RepeatedNotesFeature(FeatureExtractor):
@@ -633,12 +1027,23 @@ class RepeatedNotesFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class RhythmicLoosenessFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class RhythmicVariabilityFeature(FeatureExtractor):
@@ -647,6 +1052,11 @@ class RhythmicVariabilityFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
  
 
@@ -658,12 +1068,23 @@ class SecondStrongestRhythmicPulseFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class SizeOfMelodicArcsFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class StaccatoIncidenceFeature(FeatureExtractor):
@@ -673,6 +1094,12 @@ class StaccatoIncidenceFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class StepwiseMotionFeature(FeatureExtractor):
     '''
@@ -681,6 +1108,12 @@ class StepwiseMotionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class StrengthOfSecondStrongestRhythmicPulseFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -688,12 +1121,23 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class StrengthOfStrongestRhythmicPulseFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
@@ -702,6 +1146,11 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
 
  
@@ -712,6 +1161,11 @@ class StrongestRhythmicPulseFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class StrongTonalCentresFeature(FeatureExtractor):
     '''
@@ -719,6 +1173,12 @@ class StrongTonalCentresFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class TimePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
@@ -728,12 +1188,24 @@ class TimePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class TripleMeterFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 
@@ -745,6 +1217,12 @@ class VariabilityOfNoteDurationFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -752,12 +1230,24 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
-class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(FeatureExtractor):
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
+class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
+    FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class VariabilityOfNumberOfIndependentVoicesFeature(FeatureExtractor):
@@ -767,6 +1257,12 @@ class VariabilityOfNumberOfIndependentVoicesFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
  
 class VariabilityOfTimeBetweenAttacksFeature(FeatureExtractor):
     '''
@@ -775,12 +1271,24 @@ class VariabilityOfTimeBetweenAttacksFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class VariationOfDynamicsFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class VariationOfDynamicsInEachVoiceFeature(FeatureExtractor):
@@ -790,6 +1298,11 @@ class VariationOfDynamicsInEachVoiceFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class VibratoPrevalenceFeature(FeatureExtractor):
     '''
@@ -797,6 +1310,12 @@ class VibratoPrevalenceFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
  
 class VoiceEqualityDynamicsFeature(FeatureExtractor):
@@ -806,6 +1325,12 @@ class VoiceEqualityDynamicsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class VoiceEqualityMelodicLeapsFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -813,6 +1338,12 @@ class VoiceEqualityMelodicLeapsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class VoiceEqualityNoteDurationFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -820,6 +1351,12 @@ class VoiceEqualityNoteDurationFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class VoiceEqualityNumberOfNotesFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -827,6 +1364,12 @@ class VoiceEqualityNumberOfNotesFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class VoiceEqualityRangeFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -834,6 +1377,12 @@ class VoiceEqualityRangeFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class VoiceSeparationFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -841,6 +1390,12 @@ class VoiceSeparationFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
  
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 #-------------------------------------------------------------------------------
 # instrumentation specific
 
@@ -853,6 +1408,11 @@ class AcousticGuitarFractionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Acoustic Guitar Fraction'
+        self.description = 'Fraction of all Note Ons belonging to acoustic guitar patches (General MIDI patches 25 to 26).'
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class BrassFractionFeature(FeatureExtractor):
     '''A feature exractor that extracts the fraction of all Note Ons belonging to brass patches (General MIDI patches 57 or 68).
@@ -861,6 +1421,11 @@ class BrassFractionFeature(FeatureExtractor):
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = 'Brass Fraction'
+        self.description = 'Fraction of all Note Ons belonging to brass patches (GeneralMIDI patches 57 or 68).'
+        self.isSequential = True
+        self.dimensions = 1
 
 
 
@@ -871,6 +1436,10 @@ class ElectricGuitarFractionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Electric Guitar Fraction'
+        self.description = 'Fraction of all Note Ons belonging to electric guitar patches (GeneralMIDI patches 27 to 32).'
+        self.isSequential = True
+        self.dimensions = 1
 
  
 class ElectricInstrumentFractionFeature(FeatureExtractor):
@@ -880,6 +1449,11 @@ class ElectricInstrumentFractionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = 'Electric Instrument Fraction'
+        self.description = 'Fraction of all Note Ons belonging to electric instrument patches(General MIDI patches 5, 6, 17, 19, 27 to 32 or 34 to 40).'
+        self.isSequential = True
+        self.dimensions = 1
+
  
 class NumberOfPitchedInstrumentsFeature(FeatureExtractor):
     '''
@@ -888,12 +1462,24 @@ class NumberOfPitchedInstrumentsFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class NumberOfUnpitchedInstrumentsFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
 
 class OrchestralStringsFractionFeature(FeatureExtractor):
@@ -903,6 +1489,12 @@ class OrchestralStringsFractionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 
 class PercussionPrevalenceFeature(FeatureExtractor):
     '''
@@ -911,6 +1503,12 @@ class PercussionPrevalenceFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class SaxophoneFractionFeature(FeatureExtractor):
     '''
     >>> from music21 import *
@@ -918,12 +1516,24 @@ class SaxophoneFractionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class StringEnsembleFractionFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
 
 class StringKeyboardFractionFeature(FeatureExtractor):
@@ -933,12 +1543,24 @@ class StringKeyboardFractionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class UnpitchedInstrumentsPresentFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
 
 
 class ViolinFractionFeature(FeatureExtractor):
@@ -948,12 +1570,23 @@ class ViolinFractionFeature(FeatureExtractor):
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
 
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class WoodwindsFractionFeature(FeatureExtractor):
     '''
     >>> from music21 import *
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+
+        self.name = ''
+        self.description = ''
+        self.isSequential = True
+        self.dimensions = 1
 
  
 
