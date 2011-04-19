@@ -108,7 +108,7 @@ class FeatureExtractor(object):
         '''Common routines done on Streams prior to processing. Return a new Stream
         '''
         #TODO: add expand repeats
-        src = streamObj.stripTies()
+        src = streamObj.stripTies(retainContainers=True, inPlace=False)
         return src
 
 
@@ -260,10 +260,19 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
         self.dimensions = 1
 
  
+#The first histogram, called the basic pitch histogram, consisted of 128 bins, one for each MIDI pitch. The magnitude of each bin
+# 73
+# corresponded to the number of times that Note Ons occurred at that particular pitch. This histogram gave insights into the range and spread of notes.
+
 class BasicPitchHistogramFeature(FeatureExtractor):
     '''A feature exractor that finds a features array with bins corresponding to the values of the basic pitch histogram.
 
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.BasicPitchHistogramFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.052631578947368418, 0.0, 0.0, 0.052631578947368418, 0.052631578947368418, 0.26315789473684209, 0.0, 0.31578947368421051, 0.10526315789473684, 0.0, 0.052631578947368418, 0.15789473684210525, 0.52631578947368418, 0.0, 0.36842105263157893, 0.63157894736842102, 0.10526315789473684, 0.78947368421052633, 0.0, 1.0, 0.52631578947368418, 0.052631578947368418, 0.73684210526315785, 0.15789473684210525, 0.94736842105263153, 0.0, 0.36842105263157893, 0.47368421052631576, 0.0, 0.42105263157894735, 0.0, 0.36842105263157893, 0.0, 0.0, 0.052631578947368418, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
@@ -273,8 +282,23 @@ class BasicPitchHistogramFeature(FeatureExtractor):
         self.isSequential = True
         self.dimensions = 128
 
-        # presumably these are midi note numbers
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # only take flat if necessary
+        src = self._prepareStream(self._src)
+        if src.isFlat:
+            src = src.pitches
+        else:
+            src = src.flat.pitches
+
+        self._prepareFeature() # create the feature object
+        for p in src:
+            # vector already initialized with zero values
+            self._feature.vector[p.midi] += 1
  
+
+
 class BeatHistogramFeature(FeatureExtractor):
     '''A feature exractor that finds a feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).
 
@@ -293,6 +317,18 @@ class ChangesOfMeterFeature(FeatureExtractor):
     '''A feature exractor that sets the feature to 1 if the time signature is changed one or more times during the recording.
 
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(meter.TimeSignature('3/4'))
+    >>> s2 = stream.Stream()
+    >>> s2.append(meter.TimeSignature('3/4'))
+    >>> s2.append(meter.TimeSignature('4/4'))
+
+    >>> fe = features.ChangesOfMeterFeature(s1)
+    >>> fe.extract().vector
+    [0]
+    >>> fe = features.ChangesOfMeterFeature(s2)
+    >>> fe.extract().vector
+    [1]
     '''
     def __init__(self, streamObj, *arguments, **keywords):
         FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
@@ -304,7 +340,17 @@ class ChangesOfMeterFeature(FeatureExtractor):
 
     def _process(self):
         # flatten; look for more than one type of meter
-        pass
+        src = self._prepareStream(self._src)
+        if not src.isFlat:
+            src = src.flat
+        elements = src.getElementsByClass('TimeSignature')
+        if len(elements) <= 1:
+            return # vector already zero
+        first = elements[0]
+        for e in elements[1:]:
+            if not first.ratioEqual(e):
+                self._feature.vector[0] = 1
+                return 
  
 
 class ChromaticMotionFeature(FeatureExtractor):
@@ -446,8 +492,6 @@ class FifthsPitchHistogramFeature(FeatureExtractor):
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        # only take flat if necessary
-        #TODO: expand repeats
         src = self._prepareStream(self._src)
         if src.isFlat:
             src = src.pitches
@@ -954,7 +998,7 @@ class PitchClassDistributionFeature(FeatureExtractor):
         # only take flat if necessary
 
         #TODO: expand repeats
-        src = self._src.stripTies()
+        src = self._prepareStream(self._src)
         if src.isFlat:
             src = src.pitches
         else:
@@ -1733,7 +1777,11 @@ class WoodwindsFractionFeature(FeatureExtractor):
  
 
 # list all complete features
-features = [PitchClassDistributionFeature, FifthsPitchHistogramFeature]
+features = [
+PitchClassDistributionFeature, FifthsPitchHistogramFeature, BasicPitchHistogramFeature, 
+
+
+]
 
 
 
