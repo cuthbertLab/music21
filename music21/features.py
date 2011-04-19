@@ -33,7 +33,7 @@ class Feature(object):
         self.description = None # string description
         self.isSequential = None # True or False
         self.dimensions = None # number of dimensions
-
+        self.discrete = None # is discrete or continuous
         # data storage; possibly use numpy array
         self.vector = None
 
@@ -72,6 +72,7 @@ class FeatureExtractor(object):
         self.description = None # string description
         self.isSequential = None # True or False
         self.dimensions = None # number of dimensions
+        self.discrete = True # default
 
     def _fillFeautureAttributes(self, feature=None):
         '''Fill the attributes of a Feature with the descriptors in the FeatureExtractor.
@@ -83,6 +84,7 @@ class FeatureExtractor(object):
         feature.description = self.description
         feature.isSequential = self.isSequential
         feature.dimensions = self.dimensions
+        feature.discrete = self.discrete
         return feature
 
     def _prepareFeature(self):
@@ -281,6 +283,7 @@ class BasicPitchHistogramFeature(FeatureExtractor):
         self.description = 'A features array with bins corresponding to the values of the basic pitch histogram.'
         self.isSequential = True
         self.dimensions = 128
+        self.discrete = False
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
@@ -292,7 +295,6 @@ class BasicPitchHistogramFeature(FeatureExtractor):
         else:
             src = src.flat.pitches
 
-        self._prepareFeature() # create the feature object
         for p in src:
             # vector already initialized with zero values
             self._feature.vector[p.midi] += 1
@@ -311,7 +313,7 @@ class BeatHistogramFeature(FeatureExtractor):
         self.description = 'A feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).'
         self.isSequential = True
         self.dimensions = 161
-
+        self.discrete = False
   
 class ChangesOfMeterFeature(FeatureExtractor):
     '''A feature exractor that sets the feature to 1 if the time signature is changed one or more times during the recording.
@@ -339,10 +341,11 @@ class ChangesOfMeterFeature(FeatureExtractor):
         self.dimensions = 1
 
     def _process(self):
-        # flatten; look for more than one type of meter
         src = self._prepareStream(self._src)
+        # flatten; look for more than one type of meter
         if not src.isFlat:
             src = src.flat
+
         elements = src.getElementsByClass('TimeSignature')
         if len(elements) <= 1:
             return # vector already zero
@@ -483,6 +486,7 @@ class FifthsPitchHistogramFeature(FeatureExtractor):
         self.description = 'A feature array with bins corresponding to the values of the 5ths pitch class histogram.'
         self.isSequential = True
         self.dimensions = 12
+        self.discrete = False
 
         # create pc to index mapping
         self._mapping = {}
@@ -991,20 +995,19 @@ class PitchClassDistributionFeature(FeatureExtractor):
         self.description = 'A feature array with 12 entries where the first holds the frequency of the bin of the pitch class histogram with the highest frequency, and the following entries holding the successive bins of the histogram, wrapping around if necessary.'
         self.isSequential = True
         self.dimensions = 12
+        self.discrete = False
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
         # only take flat if necessary
 
-        #TODO: expand repeats
         src = self._prepareStream(self._src)
         if src.isFlat:
             src = src.pitches
         else:
             src = src.flat.pitches
 
-        self._prepareFeature() # create the feature object
         for p in src:
             # vector already initialized with zero values
             self._feature.vector[p.pitchClass] += 1
@@ -1778,12 +1781,37 @@ class WoodwindsFractionFeature(FeatureExtractor):
 
 # list all complete features
 features = [
-PitchClassDistributionFeature, FifthsPitchHistogramFeature, BasicPitchHistogramFeature, 
-
-
+PitchClassDistributionFeature, FifthsPitchHistogramFeature, BasicPitchHistogramFeature, ChangesOfMeterFeature,
 ]
 
 
+
+#-------------------------------------------------------------------------------
+
+class DataFile(object):
+    '''Provide output of data in an number of formats
+    '''
+    def __init__(self):
+        # assume a two dimensional array
+        self._rows = []
+    
+    def append(self, row):
+        self._rows.append(row)
+
+    def preperaTabDelimted(self):
+        msg = []
+        for row in self._rows:
+            sub = []
+            for e in row:
+                sub.append(str(e))
+            msg.append('\t'.join(sub))
+        return '\n'.join(msg)
+
+    def write(self, fp):
+        msg = self.preperaTabDelimted()
+        f = open(fp, 'w')
+        f.write(msg)
+        f.close()
 
 
 
@@ -1793,7 +1821,59 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testComposerClassification(self):
+        from music21 import stream, note, features, corpus
 
+        features = [
+            PitchClassDistributionFeature, FifthsPitchHistogramFeature, BasicPitchHistogramFeature, ChangesOfMeterFeature
+            ]
+        worksBach = [
+            'bwv3.6.xml', 'bwv5.7.xml', 'bwv32.6.xml',
+            ]
+        # monteverdi
+        worksPalestrina = [
+            'madrigal.3.1.xml', 'madrigal.3.2.xml', 'madrigal.3.9.xml',
+            ]
+
+        df = DataFile()
+
+        # create header:
+#         v1 = [] # lable
+#         v2 = [] # data type
+#         v3 = [] # optional flags
+#         s = stream.Stream()
+#         for feClass in features:
+#             fe = feClass(s)
+#             for i in range(fe.dimensions):
+#                 v1.append('%s %s' % (fe.name, i))
+#                 if fe.discrete:
+#                     v2.append('d')
+#                 else:
+#                     v2.append('c')
+#                 v3.append('')
+#         # last vector is class, here the composer
+#         v1.append('Composer')
+#         v2.append('d')
+#         v3.append('class') # place in last position
+#         df.append(v1)
+#         df.append(v2)
+#         df.append(v3)
+# 
+#         # add data
+#         for works, composer in [(worksBach, 'Bach'), 
+#                                  (worksPalestrina, 'Palestrina')]:
+#             for w in works:
+#                 s = corpus.parse(w)
+#                 environLocal.printDebug([s, s.metadata.title, s.metadata.composer])
+#                 v = [] # final vector
+#                 for feClass in features:
+#                     fe = feClass(s)
+#                     v += fe.extract().vector
+#                 # last vector is class, here the composer
+#                 v.append(composer)
+#                 df.append(v)
+# 
+#         df.write('/_scratch/test.tab')
 
 
 if __name__ == "__main__":
