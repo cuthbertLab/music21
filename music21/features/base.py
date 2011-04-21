@@ -413,6 +413,10 @@ class DataSet(object):
     def addFeatureExtractors(self, values):
         '''Add one or more FeatureExtractor objects, either as a list or as an individual object. 
         '''
+        # features are instantiated here
+        # however, they do not have a data assignment
+
+
         if common.isListLike(values):
             # need to create instances
             for sub in values:
