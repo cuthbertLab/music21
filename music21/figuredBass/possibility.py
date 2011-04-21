@@ -18,13 +18,13 @@ from music21 import pitch
 from music21 import voiceLeading
 
 from music21.figuredBass import rules
-from music21.figuredBass import voice
+from music21.figuredBass import part
 
 _MOD = "possibility.py"
 
 class Possibility(dict):
     '''
-    Extends the concept (but not the class) of a chord in music21 by allowing the labeling of voices 
+    Extends the concept (but not the class) of a chord in music21 by allowing the labeling of parts 
     through the subclassing of the python dictionary. Named Possibility because it is intended to 
     encapsulate a possibility for a figured bass note/figure combination, but can be used in many other ways.
     '''
@@ -32,9 +32,9 @@ class Possibility(dict):
     def __init__(self, *args):
         '''
         Creates a Possibility instance when you provide a python Dict, 
-        where a voice label (key) corresponds to a music21 Pitch 
+        where a part label (key) corresponds to a music21 Pitch 
         or pitch string (value). Pitch strings are automatically converted to Pitch instances. 
-        Assigning a voice label to anything else results in an error.
+        Assigning a part label to anything else results in an error.
         
         >>> from music21 import pitch
         >>> from music21 import note
@@ -60,12 +60,12 @@ class Possibility(dict):
         PossibilityException: Can't set ->Trombone<-: Can't convert ->Special trombone pitch<- to a music21 pitch.Pitch instance!
         '''
         try:
-            for voiceLabel in args[0].keys():
-                pitchValue = args[0][voiceLabel]
+            for partLabel in args[0].keys():
+                pitchValue = args[0][partLabel]
                 if not isinstance(pitchValue, pitch.Pitch):
                     if type(pitchValue) == str:
                         try:
-                            args[0][voiceLabel] = pitch.Pitch(pitchValue)
+                            args[0][partLabel] = pitch.Pitch(pitchValue)
                         except pitch.PitchException:
                             raise PossibilityException("Cannot create Possibility: ->" + str(pitchValue) + "<- not a valid pitch or pitch string!")
                     else:
@@ -74,11 +74,11 @@ class Possibility(dict):
         except IndexError:
             dict.__init__(self, *args)
     
-    def __setitem__(self, voiceLabel, pitchValue):
+    def __setitem__(self, partLabel, pitchValue):
         '''
-        Set a voice label to a music21 Pitch or pitch string. 
+        Set a part label to a music21 Pitch or pitch string. 
         Pitch strings are automatically converted to Pitch instances. 
-        Assigning a voice label to anything else results in an error.
+        Assigning a part label to anything else results in an error.
         
         >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
@@ -99,12 +99,12 @@ class Possibility(dict):
                 try:
                     newPitchValue = pitch.Pitch(pitchValue)
                 except pitch.PitchException:
-                    raise PossibilityException("Can't set ->" + str(voiceLabel) + "<-: Can't convert ->" + str(pitchValue) + "<- to a music21 pitch.Pitch instance!")
+                    raise PossibilityException("Can't set ->" + str(partLabel) + "<-: Can't convert ->" + str(pitchValue) + "<- to a music21 pitch.Pitch instance!")
             else:
-                raise PossibilityException("Can't set ->" + str(voiceLabel) + "<-: Can't convert ->" + str(pitchValue) + "<- to a music21 pitch.Pitch instance!")
-        dict.__setitem__(self, voiceLabel, newPitchValue)
+                raise PossibilityException("Can't set ->" + str(partLabel) + "<-: Can't convert ->" + str(pitchValue) + "<- to a music21 pitch.Pitch instance!")
+        dict.__setitem__(self, partLabel, newPitchValue)
     
-    def numVoices(self):
+    def numParts(self):
         return len(self.keys())
     
     #def __str__(self):
@@ -129,9 +129,9 @@ class Possibility(dict):
         True
         '''
         pitchNamesContained = []
-        for voiceLabel in self.keys():
-            if self[voiceLabel].name not in pitchNamesContained:
-                pitchNamesContained.append(self[voiceLabel].name)
+        for partLabel in self.keys():
+            if self[partLabel].name not in pitchNamesContained:
+                pitchNamesContained.append(self[partLabel].name)
         pitchNamesContained.sort()
         pitchNamesToContain.sort()
         if not cmp(pitchNamesContained, pitchNamesToContain):
@@ -142,33 +142,33 @@ class Possibility(dict):
                 environRules.warn("Incomplete Chord!")
             return True
     
-    def topVoicesWithinLimit(self, topVoicesMaxIntervalSeparation = None, verbose = False):
+    def topPartsWithinLimit(self, topPartsMaxIntervalSeparation = None, verbose = False):
         '''
-        Returns True if upper voices are found within topVoicesMaxIntervalSeparation of each other, a.k.a.
-        if the upper voices are found within that many semitones of each other.
+        Returns True if upper parts are found within topPartsMaxIntervalSeparation of each other, a.k.a.
+        if the upper parts are found within that many semitones of each other.
         
         
-        For instance, if topVoicesMaxIntervalSeparation is P8 then if this method returns
+        For instance, if topPartsMaxIntervalSeparation is P8 then if this method returns
         true then all the notes of the implied chord except the bass can be played by
         most adult pianists.
         
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'T': 'E4', 'B': 'C3'})
-        >>> p1.topVoicesWithinLimit(interval.Interval('P8'))
+        >>> p1.topPartsWithinLimit(interval.Interval('P8'))
         True
         >>> p1['T'] = 'E3'
-        >>> p1.topVoicesWithinLimit(interval.Interval('P8')) # Tenor and Soprano more than an octave apart
+        >>> p1.topPartsWithinLimit(interval.Interval('P8')) # Tenor and Soprano more than an octave apart
         False
         '''
-        topVoicesWithinLimit = True
-        if topVoicesMaxIntervalSeparation == None:
-            return topVoicesWithinLimit
+        topPartsWithinLimit = True
+        if topPartsMaxIntervalSeparation == None:
+            return topPartsWithinLimit
         pitchesContained = []
-        for voiceLabel in self.keys():
-            pitchesContained.append((self[voiceLabel], voiceLabel))
+        for partLabel in self.keys():
+            pitchesContained.append((self[partLabel], partLabel))
         pitchesContained.sort()
-        i0 = topVoicesMaxIntervalSeparation
+        i0 = topPartsMaxIntervalSeparation
         
         for pitch1Index in range(1, len(pitchesContained)):
             for pitch2Index in range(pitch1Index, len(pitchesContained)):
@@ -178,20 +178,20 @@ class Possibility(dict):
                 if i1.chromatic.semitones > i0.chromatic.semitones:
                     if verbose:
                         environRules = environment.Environment(_MOD)
-                        environRules.warn(vl1 + " and " + vl2 + " are greater than " + topVoicesMaxIntervalSeparation.semiSimpleName + " apart.")
-                    topVoicesWithinLimit = False
+                        environRules.warn(vl1 + " and " + vl2 + " are greater than " + topPartsMaxIntervalSeparation.semiSimpleName + " apart.")
+                    topPartsWithinLimit = False
                     if not verbose:
-                        return topVoicesWithinLimit
+                        return topPartsWithinLimit
         
-        return topVoicesWithinLimit
+        return topPartsWithinLimit
 
     # VOICE LEADING RULES
     def parallelFifths(self, nextPossibility, verbose = False):
         '''
         Returns True if there are parallel fifths between prevPossibility (self) and nextPossibility.
 
-        Ignores any voices which aren't shared between the two possibilities, but 
-        raises an error if not enough voices are shared.
+        Ignores any parts which aren't shared between the two possibilities, but 
+        raises an error if not enough parts are shared.
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Tenor': 'G3', 'Bass': 'C3'})
@@ -201,16 +201,16 @@ class Possibility(dict):
         >>> p3 = {'Soprano': 'D5', 'Alto': 'B4'}
         >>> p1.parallelFifths(p3)
         Traceback (most recent call last):
-        PossibilityException: Need at least two shared voices to check for parallel fifths.
+        PossibilityException: Need at least two shared parts to check for parallel fifths.
 
         ''' 
         hasParallelFifth = False
         try:
-            voiceQuartets = self.voiceQuartets(nextPossibility)
+            partQuartets = self.partQuartets(nextPossibility)
         except PossibilityException:
-            raise PossibilityException("Need at least two shared voices to check for parallel fifths.")
+            raise PossibilityException("Need at least two shared parts to check for parallel fifths.")
         
-        for (pitchA1, pitchA2, vl1, pitchB1, pitchB2, vl2) in voiceQuartets:
+        for (pitchA1, pitchA2, vl1, pitchB1, pitchB2, vl2) in partQuartets:
             vlq = voiceLeading.VoiceLeadingQuartet(pitchA1, pitchA2, pitchB1, pitchB2)
             if vlq.parallelFifth():
                 if verbose:
@@ -226,8 +226,8 @@ class Possibility(dict):
         '''
         Returns True if there are parallel octaves between prevPossibility (self) and nextPossibility.
 
-        Ignores any voices which aren't shared between the two possibilities, but 
-        raises an error if not enough voices are shared.
+        Ignores any parts which aren't shared between the two possibilities, but 
+        raises an error if not enough parts are shared.
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Tenor': 'C4', 'Bass': 'C3'})
@@ -237,15 +237,15 @@ class Possibility(dict):
         >>> p3 = {'Soprano': 'D5', 'Alto': 'B4'}
         >>> p1.parallelOctaves(p3)
         Traceback (most recent call last):
-        PossibilityException: Need at least two shared voices to check for parallel octaves.
+        PossibilityException: Need at least two shared parts to check for parallel octaves.
         '''        
         hasParallelOctave = False
         try:
-            voiceQuartets = self.voiceQuartets(nextPossibility)
+            partQuartets = self.partQuartets(nextPossibility)
         except PossibilityException:
-            raise PossibilityException("Need at least two shared voices to check for parallel octaves.")
+            raise PossibilityException("Need at least two shared parts to check for parallel octaves.")
         
-        for (pitchA1, pitchA2, vl1, pitchB1, pitchB2, vl2) in voiceQuartets:
+        for (pitchA1, pitchA2, vl1, pitchB1, pitchB2, vl2) in partQuartets:
             vlq = voiceLeading.VoiceLeadingQuartet(pitchA1, pitchA2, pitchB1, pitchB2)
             if vlq.parallelOctave():
                 if verbose:
@@ -261,8 +261,8 @@ class Possibility(dict):
     def hiddenFifth(self, nextPossibility, vlTop, vlBottom, verbose = False):
         '''
         Returns True if there is no hidden fifth in going from prevPossibility (self) to nextPossibility
-        between the two voices specified as vlTop and vlBottom, which are usually the highest
-        and lowest voice parts in the piece (since these are the only two voices where 
+        between the two parts specified as vlTop and vlBottom, which are usually the highest
+        and lowest part parts in the piece (since these are the only two parts where 
         hidden fifths are usually forbidden.
 
         >>> from music21.figuredBass import possibility
@@ -292,7 +292,7 @@ class Possibility(dict):
     def hiddenOctave(self, nextPossibility, vlTop, vlBottom, verbose = False):
         '''
         Returns True if there is no hidden fifth in going from prevPossibility (self) to nextPossibility.
-        Asked to provide the voice labels (keys) of the top and bottom voices. 
+        Asked to provide the part labels (keys) of the top and bottom parts. 
 
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Soprano': 'A5', 'Bass': 'C3'})
@@ -316,222 +316,223 @@ class Possibility(dict):
         return hasHiddenOctave
 
     # TESSITURA RULES    
-    def voiceCrossing(self, orderedVoiceLabels, verbose = False):
+    def voiceCrossing(self, orderedPartLabels, verbose = False):
         '''
         Returns True if Possibility (self) contains a voice crossing.
-        Takes in an ordered list of voice labels, from lowest to highest,
+        Takes in an ordered list of part (voice) labels, from lowest to highest,
         which correspond to keys in Possibility. 
         
         
-        Raises an error if a voice label(s) in Possibility is not present in the 
+        Raises an error if a part label(s) in Possibility is not present in the 
         ordered list.
 
-        >>> from music21.figuredBass import voice
+        >>> from music21.figuredBass import part
         >>> from music21.figuredBass import possibility
-        >>> orderedVoiceLabels = ['B', 'T', 'A', 'S'] #From lowest to highest
+        >>> orderedPartLabels = ['B', 'T', 'A', 'S'] #From lowest to highest
         >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G5', 'T': 'E4'})
-        >>> p1.voiceCrossing(orderedVoiceLabels) # Alto higher than Soprano  
+        >>> p1.voiceCrossing(orderedPartLabels) # Alto higher than Soprano  
         True
         >>> p2 = possibility.Possibility({'S': 'C5', 'T': 'E4', 'B': 'C4'})
-        >>> p2.voiceCrossing(orderedVoiceLabels)
+        >>> p2.voiceCrossing(orderedPartLabels)
         False
         >>> p3 = possibility.Possibility({'X': 'C5', 'Y': 'E4', 'T': 'F4'})
-        >>> p3.voiceCrossing(orderedVoiceLabels)
+        >>> p3.voiceCrossing(orderedPartLabels)
         Traceback (most recent call last):
-        PossibilityException: Voice labels ['Y', 'X'] not found in orderedVoiceLabels.
+        PossibilityException: Part labels ['Y', 'X'] not found in orderedPartLabels.
         '''
         hasVoiceCrossing = False
         
-        voicesNotCompared = []       
+        partsNotCompared = []       
         for vl in self.keys():
-            if vl not in orderedVoiceLabels:
-                voicesNotCompared.append(vl)
+            if vl not in orderedPartLabels:
+                partsNotCompared.append(vl)
                 
-        if not(len(voicesNotCompared) == 0):
-            raise PossibilityException("Voice labels " + str(voicesNotCompared) + " not found in orderedVoiceLabels.")
+        if not(len(partsNotCompared) == 0):
+            raise PossibilityException("Part labels " + str(partsNotCompared) + " not found in orderedPartLabels.")
         
-        for i in range(len(orderedVoiceLabels)):
-            v0 = orderedVoiceLabels[i]
+        for i in range(len(orderedPartLabels)):
+            v0 = orderedPartLabels[i]
             if not v0 in self.keys():
                 continue
             lowerPitch = self[v0]
-            for j in range(i+1, len(orderedVoiceLabels)):
-                v1 = orderedVoiceLabels[j]
+            for j in range(i+1, len(orderedPartLabels)):
+                v1 = orderedPartLabels[j]
                 if not v1 in self.keys():
                     continue
                 higherPitch = self[v1]
                 if higherPitch < lowerPitch:
                     if verbose:
                         environRules = environment.Environment(_MOD)
-                        environRules.warn("Voice crossing between " + v0 + " and " + v1 + ".")
+                        environRules.warn("Part crossing between " + v0 + " and " + v1 + ".")
                     hasVoiceCrossing = True
                     if not verbose:
                         return hasVoiceCrossing
         
         return hasVoiceCrossing
     
-    def pitchesWithinRange(self, voiceList, verbose = False):
+    def pitchesWithinRange(self, partList, verbose = False):
         '''
-        Returns True if the pitch of each voice falls within its upper and lower
+        Returns True if the pitch of each part falls within its upper and lower
         ranges. 
         
         
-        Takes in a list of Voice instances. Supplying a Range to a Voice is optional,
-        and if omitted for a certain Voice then all pitches are presumed in range.
+        Takes in a list of Part instances. Supplying a Range to a Part is optional,
+        and if omitted for a certain Part then all pitches are presumed in range.
         
         
-        Raises an error if a voice label(s) in Possibility doesn't correspond to Voice 
-        instances in voiceList.
+        Raises an error if a part label(s) in Possibility doesn't correspond to Part 
+        instances in partList.
         
-        >>> from music21.figuredBass import voice
+        >>> from music21.figuredBass import part
         >>> from music21.figuredBass import possibility
-        >>> v1 = voice.Voice('B', voice.Range('E2', 'E4'))
-        >>> v2 = voice.Voice('T', voice.Range('C3', 'A4'))
-        >>> v3 = voice.Voice('A', voice.Range('F3', 'G5'))
-        >>> v4 = voice.Voice('S', voice.Range('C4', 'A5'))
-        >>> voiceList = [v1, v2, v3, v4]
+        >>> p1 = part.Part('B','E2','E4')
+        >>> p2 = part.Part('T','C3','A4')
+        >>> p3 = part.Part('A','F3','G5')
+        >>> p4 = part.Part('S','C4','A5')
+        >>> partList = [p1, p2, p3, p4]        
         >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'B': 'C3'})
-        >>> p1.pitchesWithinRange(voiceList)
+        >>> p1.pitchesWithinRange(partList)
         True
         >>> p2 = possibility.Possibility({'S': 'B3', 'T': 'E3', 'B': 'C3'})
-        >>> p2.pitchesWithinRange(voiceList) #Soprano note too low
+        >>> p2.pitchesWithinRange(partList) #Soprano note too low
         False
         >>> p3 = possibility.Possibility({'X': 'C5', 'A': 'G4', 'B': 'F4'})
-        >>> p3.pitchesWithinRange(voiceList) # Bass too high
+        >>> p3.pitchesWithinRange(partList) # Bass too high
         Traceback (most recent call last):
-        PossibilityException: Voices with labels ['X'] not found in voiceList.
+        PossibilityException: Parts with labels ['X'] not found in partList.
         '''
-        pitchesInRange = True
+        pitchesInSoundingRange = True
         
-        voiceLabels = extractVoiceLabels(voiceList)
-        voicesNotCompared = []       
+        partLabels = extractPartLabels(partList)
+        partsNotCompared = []       
         for vl in self.keys():
-            if vl not in voiceLabels:
-                voicesNotCompared.append(vl)
+            if vl not in partLabels:
+                partsNotCompared.append(vl)
 
-        if not(len(voicesNotCompared) == 0):
-            raise PossibilityException("Voices with labels " + str(voicesNotCompared) + " not found in voiceList.")              
+        if not(len(partsNotCompared) == 0):
+            raise PossibilityException("Parts with labels " + str(partsNotCompared) + " not found in partList.")              
         
-        for givenVoice in voiceList:
-            if not givenVoice.label in self.keys():
+        for givenPart in partList:
+            if not givenPart.label in self.keys():
                 continue
-            pitchList = [self[givenVoice.label]]
+            pitchList = [self[givenPart.label]]
             try:
-                givenVoice.pitchesInRange(pitchList)
-            except voice.RangeException:
+                givenPart.pitchesInSoundingRange(pitchList)
+            except part.RangeException:
                 if verbose:
                     environRules = environment.Environment(_MOD)
-                    environRules.warn("Pitch in " + givenVoice.label + " voice not within range.")
-                pitchesInRange = False
+                    environRules.warn("Pitch in " + givenPart.label + " part not within range.")
+                pitchesInSoundingRange = False
                 if not verbose:
-                    return pitchesInRange
+                    return pitchesInSoundingRange
 
-        return pitchesInRange
+        return pitchesInSoundingRange
     
-    def voiceOverlap(self, nextPossibility, orderedVoiceLabels, verbose = False):
+    def voiceOverlap(self, nextPossibility, orderedPartLabels, verbose = False):
         '''
         Returns True if there is voice overlap between prevPossibility (self) and nextPossibility.
-        Takes in a list of ordered voice labels, from lowest to highest.
+        Takes in a list of ordered part (voice) labels, from lowest to highest.
 
         
-        Ignores voices which aren't shared between the two, but raises an error if (1) There are
-        voices shared between the two Possibility instances which correspond to voice labels not 
-        found in the ordered list and (2) If less than two voices are shared between the two
+        Ignores parts which aren't shared between the two, but raises an error if (1) There are
+        parts shared between the two Possibility instances which correspond to part labels not 
+        found in the ordered list and (2) If less than two parts are shared between the two
         Possibility instances.
         
-        >>> from music21.figuredBass import voice
+        >>> from music21.figuredBass import part
         >>> from music21.figuredBass import possibility
-        >>> orderedVoiceLabels = ['B', 'T', 'A', 'S'] #From lowest to highest
+        >>> orderedPartLabels = ['B', 'T', 'A', 'S'] #From lowest to highest
         >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'T': 'E4', 'B': 'C4'})
         >>> p2 = possibility.Possibility({'S': 'B4', 'A': 'F4', 'B': 'D4'})
-        >>> p1.voiceOverlap(p2, orderedVoiceLabels)
+        >>> p1.voiceOverlap(p2, orderedPartLabels)
         False
         >>> p3 = possibility.Possibility({'S': 'F4', 'A': 'F4', 'Flute': 'C6'})
-        >>> p1.voiceOverlap(p3, orderedVoiceLabels) # Voice overlap between alto/soprano, but no voice crossing
+        >>> p1.voiceOverlap(p3, orderedPartLabels) # Part overlap between alto/soprano, but no part crossing
         True
         
         OMIT_FROM_DOCS
         >>> p4a = possibility.Possibility({'Trombone': 'F4', 'Tuba': 'F4', 'Flute': 'C6'})
-        >>> p1.voiceOverlap(p4a, orderedVoiceLabels)
+        >>> p1.voiceOverlap(p4a, orderedPartLabels)
         Traceback (most recent call last):
-        PossibilityException: No voices to check.        
+        PossibilityException: No parts to check.        
         >>> p4b = possibility.Possibility({'Trombone': 'F4', 'Tuba': 'F4', 'S': 'C6'})
-        >>> p1.voiceOverlap(p4b, orderedVoiceLabels)
+        >>> p1.voiceOverlap(p4b, orderedPartLabels)
         Traceback (most recent call last):
-        PossibilityException: Need at least two voices to check for voice overlap.
+        PossibilityException: Need at least two parts to check for part overlap.
         >>> p5 = possibility.Possibility({'Trombone': 'G4', 'A': 'F4', 'S': 'C6'})
-        >>> p4b.voiceOverlap(p5, orderedVoiceLabels)
+        >>> p4b.voiceOverlap(p5, orderedPartLabels)
         Traceback (most recent call last):
-        PossibilityException: Voice labels ['Trombone'] not found in orderedVoiceLabels. 
+        PossibilityException: Part labels ['Trombone'] not found in orderedPartLabels. 
         '''
         hasVoiceOverlap = False
         np = nextPossibility
     
-        voiceLabelsCompared = []
+        partLabelsCompared = []
         for vl in self.keys():
             if vl in np.keys():
-                voiceLabelsCompared.append(vl)
+                partLabelsCompared.append(vl)
                 
-        if len(voiceLabelsCompared) == 0:
-            raise PossibilityException("No voices to check.")
-        elif len(voiceLabelsCompared) == 1:
-            raise PossibilityException("Need at least two voices to check for voice overlap.")
+        if len(partLabelsCompared) == 0:
+            raise PossibilityException("No parts to check.")
+        elif len(partLabelsCompared) == 1:
+            raise PossibilityException("Need at least two parts to check for part overlap.")
 
-        voicesNotCompared = []
-        for vl in voiceLabelsCompared:
-            if vl not in orderedVoiceLabels:
-                voicesNotCompared.append(vl)
+        partsNotCompared = []
+        for vl in partLabelsCompared:
+            if vl not in orderedPartLabels:
+                partsNotCompared.append(vl)
         
-        if not(len(voicesNotCompared) == 0):
-            raise PossibilityException("Voice labels " + str(voicesNotCompared) + " not found in orderedVoiceLabels.")
+        if not(len(partsNotCompared) == 0):
+            raise PossibilityException("Part labels " + str(partsNotCompared) + " not found in orderedPartLabels.")
 
-        for i in range(len(orderedVoiceLabels)):
-            vl1 = orderedVoiceLabels[i]
-            if not vl1 in voiceLabelsCompared:
+        for i in range(len(orderedPartLabels)):
+            vl1 = orderedPartLabels[i]
+            if not vl1 in partLabelsCompared:
                 continue
             lowerPitch0 = self[vl1]
             lowerPitch1 = np[vl1]
-            for j in range(i+1, len(orderedVoiceLabels)):
-                vl2 = orderedVoiceLabels[j]
-                if not vl2 in voiceLabelsCompared:
+            for j in range(i+1, len(orderedPartLabels)):
+                vl2 = orderedPartLabels[j]
+                if not vl2 in partLabelsCompared:
                     continue
                 higherPitch0 = self[vl2]
                 higherPitch1 = np[vl2]
                 if lowerPitch1 > higherPitch0 or higherPitch1 < lowerPitch0:
                     if verbose:
                         environRules = environment.Environment(_MOD)
-                        environRules.warn("Voice overlap between " + vl1 + " and " + vl2 + ".")
+                        environRules.warn("Part overlap between " + vl1 + " and " + vl2 + ".")
                     hasVoiceOverlap = True
                     if not verbose:
                         return hasVoiceOverlap
         
         return hasVoiceOverlap
     
-    def voiceLeapsWithinLimits(self, nextPossibility, voiceList, verbose = False):
+    def partMovementsWithinLimits(self, nextPossibility, partList, verbose = False):
         '''
         Returns True if there are no illegal voice leaps present between prevPossibility (self) and nextPossibility.
-        Takes in a list of Voice instances which supply the maximum interval jump allowed for each voice.
+        Takes in a list of Part instances which supply the maximum interval jump allowed for each part.
         The default max interval is a perfect octave. You can specify another max interval by inputting it as the
-        third input of each voice.  In the example below, the Soprano is limited to stepwise motion.
+        third input of each part.  In the example below, the Soprano is limited to stepwise motion.
         
-        Ignores voices which aren't shared between the two Possibility instances, but raises an error if
-        there are voices shared between the two that don't correspond to Voice instances in voiceList.
+        Ignores parts which aren't shared between the two Possibility instances, but raises an error if
+        there are parts shared between the two that don't correspond to Part instances in partList.
          
-        >>> from music21.figuredBass import voice
+        >>> from music21.figuredBass import part
         >>> from music21.figuredBass import possibility
-        >>> v1 = voice.Voice('B', voice.Range('E2', 'E4'))
-        >>> v2 = voice.Voice('T', voice.Range('C3', 'A4'))
-        >>> v3 = voice.Voice('A', voice.Range('F3', 'G5'))
-        >>> v4 = voice.Voice('S', voice.Range('C4', 'A5'), interval.Interval('M2'))
-        >>> voiceList = [v1, v2, v3, v4]
+        >>> p1 = part.Part('B','E2','E4')
+        >>> p2 = part.Part('T','C3','A4')
+        >>> p3 = part.Part('A','F3','G5')
+        >>> p4 = part.Part('S','C4','A5')
+        >>> p4.maxSeparation = interval.Interval('M2')
+        >>> partList = [p1, p2, p3, p4]        
         
         
-        This example is True because all voices move by step.
+        This example is True because all parts move by step.
         
         
         >>> p1 = possibility.Possibility({'S': 'C5', 'A': 'G4', 'T': 'E4', 'B': 'C3'})
         >>> p2 = possibility.Possibility({'S': 'B4', 'A': 'F4', 'T': 'D4', 'B': 'D3'})
-        >>> p1.voiceLeapsWithinLimits(p2, voiceList)
+        >>> p1.partMovementsWithinLimits(p2, partList)
         True
         
         
@@ -541,46 +542,46 @@ class Possibility(dict):
         
         
         >>> p3b = possibility.Possibility({'S':'G4', 'T': 'D4', 'Z': 'B3'})
-        >>> p1.voiceLeapsWithinLimits(p3b, voiceList)
+        >>> p1.partMovementsWithinLimits(p3b, partList)
         False
 
 
 
         >>> p3a = possibility.Possibility({'W': 'G4', 'X': 'G4', 'Y': 'D4', 'Z': 'B3'})
-        >>> p1.voiceLeapsWithinLimits(p3a, voiceList)
+        >>> p1.partMovementsWithinLimits(p3a, partList)
         Traceback (most recent call last):
-        PossibilityException: No voices to check.
+        PossibilityException: No parts to check.
         '''
         leapsWithinLimits = True
         np = nextPossibility
         
-        voiceLabelsCompared = []
+        partLabelsCompared = []
         for vl in self.keys():
             if vl in np.keys():
-                voiceLabelsCompared.append(vl)
+                partLabelsCompared.append(vl)
                 
-        if len(voiceLabelsCompared) == 0:
-            raise PossibilityException("No voices to check.")
+        if len(partLabelsCompared) == 0:
+            raise PossibilityException("No parts to check.")
 
-        voiceLabels = extractVoiceLabels(voiceList)       
-        voicesNotCompared = []
-        for vl in voiceLabelsCompared:
-            if vl not in voiceLabels:
-                voicesNotCompared.append(vl)
+        partLabels = extractPartLabels(partList)       
+        partsNotCompared = []
+        for vl in partLabelsCompared:
+            if vl not in partLabels:
+                partsNotCompared.append(vl)
         
-        if not(len(voicesNotCompared) == 0):
-            raise PossibilityException("Voices with labels " + str(voicesNotCompared) + " not found in voiceList.")              
+        if not(len(partsNotCompared) == 0):
+            raise PossibilityException("Parts with labels " + str(partsNotCompared) + " not found in partList.")              
 
-        for givenVoice in voiceList:
-            if not givenVoice.label in voiceLabelsCompared:
+        for givenPart in partList:
+            if not givenPart.label in partLabelsCompared:
                 continue
-            v1n1 = self[givenVoice.label]
-            v1n2 = np[givenVoice.label]
+            v1n1 = self[givenPart.label]
+            v1n2 = np[givenPart.label]
             i1 = interval.notesToInterval(v1n1, v1n2)
-            if abs(i1.chromatic.semitones) > abs(givenVoice.maxIntervalLeap.chromatic.semitones):
+            if abs(i1.chromatic.semitones) > abs(givenPart.maxSeparation.chromatic.semitones):
                 if verbose:
                     environRules = environment.Environment(_MOD)
-                    environRules.warn("Voice leap in " + givenVoice.label + " voice.")
+                    environRules.warn("Part leap in " + givenPart.label + " part.")
                 leapsWithinLimits = False
                 if not verbose:
                     return leapsWithinLimits
@@ -588,62 +589,62 @@ class Possibility(dict):
         return leapsWithinLimits
         
     # HELPER METHODS
-    def voicePairs(self, nextPossibility):
+    def partPairs(self, nextPossibility):
         '''
         Group pitches of prevPossibility (self) and nextPossibility which 
-        correspond to the same voice together.
+        correspond to the same part together.
         Raises an error if the Possibility instances don't share at least
-        one voice in common.
+        one part.
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'S': 'C5', 'B': 'C4'})
         >>> p2 = possibility.Possibility({'S': 'B4', 'T': 'D4', 'B': 'D4'})
-        >>> p1.voicePairs(p2)
+        >>> p1.partPairs(p2)
         [(C5, B4, 'S'), (C4, D4, 'B')]
         >>> p3 = possibility.Possibility({'X': 'B4', 'Y': 'D4'})
-        >>> p1.voicePairs(p3)
+        >>> p1.partPairs(p3)
         Traceback (most recent call last):
-        PossibilityException: No shared voices to group together.
+        PossibilityException: No shared parts to group together.
         '''
         np = nextPossibility
         
-        voicePairs = []
-        for voiceLabel in self.keys():
-            if voiceLabel in np.keys():
-                voicePair = (self[voiceLabel], np[voiceLabel], voiceLabel)
-                voicePairs.append(voicePair)
+        partPairs = []
+        for partLabel in self.keys():
+            if partLabel in np.keys():
+                partPair = (self[partLabel], np[partLabel], partLabel)
+                partPairs.append(partPair)
         
-        if len(voicePairs) == 0:
-            raise PossibilityException("No shared voices to group together.")
+        if len(partPairs) == 0:
+            raise PossibilityException("No shared parts to group together.")
         
-        return voicePairs
+        return partPairs
     
-    def voiceQuartets(self, nextPossibility):
+    def partQuartets(self, nextPossibility):
         '''
-        Group all voice pairs of prevPossibility (self) and nextPossibility together.
-        Raises an error if the Possibility instances don't have at least two voices in common.
+        Group all part pairs of prevPossibility (self) and nextPossibility together.
+        Raises an error if the Possibility instances don't have at least two parts in common.
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'S': 'C5', 'T': 'E4', 'B': 'C4'})
         >>> p2 = possibility.Possibility({'S': 'B4', 'T': 'D4', 'B': 'D4'})
-        >>> p1.voiceQuartets(p2)
+        >>> p1.partQuartets(p2)
         [(C5, B4, 'S', C4, D4, 'B'), (C5, B4, 'S', E4, D4, 'T'), (C4, D4, 'B', E4, D4, 'T')]
         >>> p3 = possibility.Possibility({'X': 'B4', 'Y': 'D4', 'B': 'D4'})
-        >>> p1.voiceQuartets(p3)
+        >>> p1.partQuartets(p3)
         Traceback (most recent call last):
-        PossibilityException: Need at least two shared voices to find voice quartets.
+        PossibilityException: Need at least two shared parts to find part quartets.
         '''            
-        voicePairs = self.voicePairs(nextPossibility)        
-        if len(voicePairs) == 1:
-            raise PossibilityException("Need at least two shared voices to find voice quartets.")
+        partPairs = self.partPairs(nextPossibility)        
+        if len(partPairs) == 1:
+            raise PossibilityException("Need at least two shared parts to find part quartets.")
         
-        voiceQuartets = []
+        partQuartets = []
         
-        for i in range(len(voicePairs)):
-            for j in range(i+1,len(voicePairs)):
-                voiceQuartets.append(voicePairs[i] + voicePairs[j])
+        for i in range(len(partPairs)):
+            for j in range(i+1,len(partPairs)):
+                partQuartets.append(partPairs[i] + partPairs[j])
         
-        return voiceQuartets
+        return partQuartets
     
     def chordify(self):
         '''
@@ -704,25 +705,25 @@ class Possibility(dict):
             return False
 
 
-def extractVoiceLabels(voiceList):
+def extractPartLabels(partList):
     '''
-    Extract voice labels in order from a voice list, and then return them.
+    Extract part labels in order from a part list, and then return them.
     
     >>> from music21.figuredBass import possibility
-    >>> from music21.figuredBass import voice
-    >>> v1 = voice.Voice('B', voice.Range('E2', 'E4'))
-    >>> v2 = voice.Voice('T', voice.Range('C3', 'A4'))
-    >>> v3 = voice.Voice('A', voice.Range('F3', 'G5'))
-    >>> v4 = voice.Voice('S', voice.Range('C4', 'A5'))
-    >>> orderedVoiceList = [v1, v2, v3, v4]
-    >>> possibility.extractVoiceLabels(orderedVoiceList)
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part('B','E2','E4')
+    >>> p2 = part.Part('T','C3','A4')
+    >>> p3 = part.Part('A','F3','G5')
+    >>> p4 = part.Part('S','C4','A5')
+    >>> partList = [p1, p2, p3, p4]        
+    >>> possibility.extractPartLabels(partList)
     ['B', 'T', 'A', 'S']
     '''
-    voiceLabels = []
-    for v in voiceList:
-        voiceLabels.append(v.label)
+    partLabels = []
+    for v in partList:
+        partLabels.append(v.label)
     
-    return voiceLabels
+    return partLabels
     
 
 class PossibilityException(music21.Music21Exception):
