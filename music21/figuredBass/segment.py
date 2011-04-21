@@ -21,7 +21,7 @@ from music21 import environment
 from music21.figuredBass import rules
 from music21.figuredBass import possibility
 from music21.figuredBass import realizerScale
-from music21.figuredBass import voice
+from music21.figuredBass import part
 from music21.figuredBass import resolution
 from music21.figuredBass import notation
 
@@ -32,7 +32,7 @@ class Segment:
         self.bassNote = bassNote
         self.notationString = notationString
         self.fbScale = fbInformation.fbScale
-        self.fbVoices = fbInformation.fbVoices
+        self.fbParts = fbInformation.fbParts
         self.fbRules = fbInformation.fbRules
         self.pitchesAboveBass = self.fbScale.getPitches(self.bassNote.pitch, self.notationString)
         self.pitchNamesInChord = self.fbScale.getPitchNames(self.bassNote.pitch, self.notationString)
@@ -63,13 +63,13 @@ class Segment:
         possibilities = []
         
         bassPossibility = possibility.Possibility()
-        previousVoice = self.fbVoices[0]
+        previousVoice = self.fbParts[0]
         bassPossibility[previousVoice.label] = self.bassNote.pitch
         possibilities.append(bassPossibility)
         
-        for voiceNumber in range(1, len(self.fbVoices)):
+        for partNumber in range(1, len(self.fbParts)):
             oldLength = len(possibilities)
-            currentVoice = self.fbVoices[voiceNumber]
+            currentVoice = self.fbParts[partNumber]
             for oldPossibIndex in range(oldLength):
                 oldPossib = possibilities.pop(0)
                 validPitches = self.pitchesAboveBass
@@ -86,8 +86,8 @@ class Segment:
         '''
         Default rules:
         (1) No incomplete possibilities
-        (2) Top voices within interval.Interval
-        (3) Pitches in each voice within range
+        (2) Top parts within interval.Interval
+        (3) Pitches in each part within range
         (4) No voice crossing
         '''
         allPossibilities = self.allPossibilities()
@@ -98,17 +98,17 @@ class Segment:
             if not self.fbRules.allowIncompletePossibilities:
                 if possib.isIncomplete(self.pitchNamesInChord):
                     continue
-            # Top voices within interval.Interval
-            if not possib.topVoicesWithinLimit(self.fbRules.topVoicesMaxIntervalSeparation):
+            # Top parts within interval.Interval
+            if not possib.topPartsWithinLimit(self.fbRules.topPartsMaxIntervalSeparation):
                 continue
-            # Pitches in each voice within range
+            # Pitches in each part within range
             if self.fbRules.filterPitchesByRange:
-                pitchesInRange = possib.pitchesWithinRange(self.fbVoices)
+                pitchesInRange = possib.pitchesWithinRange(self.fbParts)
                 if not pitchesInRange:
                     continue
-            # No voice crossing
+            # No part crossing
             if not self.fbRules.allowVoiceCrossing:
-                hasVoiceCrossing = possib.voiceCrossing(possibility.extractVoiceLabels(self.fbVoices))
+                hasVoiceCrossing = possib.voiceCrossing(possibility.extractPartLabels(self.fbParts))
                 if hasVoiceCrossing:
                     continue
             newPossibilities.append(possib)
@@ -340,8 +340,8 @@ class MiddleSegment(Segment):
         return resolutionPossib
 
     def hasCorrectVoiceLeading(self, prevPossib, nextPossib):
-        vlTop = self.fbVoices[-1].label
-        vlBottom = self.fbVoices[0].label
+        vlTop = self.fbParts[-1].label
+        vlBottom = self.fbParts[0].label
         # No hidden fifth
         if not self.fbRules.allowHiddenFifths:
             hasHiddenFifth = prevPossib.hiddenFifth(nextPossib, vlTop, vlBottom)
@@ -353,14 +353,14 @@ class MiddleSegment(Segment):
             if hasHiddenOctave:
                 return False
         
-        leapsWithinLimits = prevPossib.voiceLeapsWithinLimits(nextPossib, self.fbVoices)
-        # No voice leaps
-        if not leapsWithinLimits:
+        jumpsWithinLimits = prevPossib.partMovementsWithinLimits(nextPossib, self.fbParts)
+        # Movements in each part within corresponding maxSeparation
+        if not jumpsWithinLimits:
             return False
-        # No voice overlaps
+        # No part overlaps
         if not self.fbRules.allowVoiceOverlap:
-            hasVoiceOverlap = prevPossib.voiceOverlap(nextPossib, possibility.extractVoiceLabels(self.fbVoices))
-            if hasVoiceOverlap:
+            hasPartOverlap = prevPossib.voiceOverlap(nextPossib, possibility.extractPartLabels(self.fbParts))
+            if hasPartOverlap:
                 return False
 
         # No parallel fifths
@@ -381,9 +381,9 @@ class SegmentException(music21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 class Information:
-    def __init__(self, fbScale, fbVoices, fbRules = rules.Rules()):
+    def __init__(self, fbScale, fbParts, fbRules = rules.Rules()):
         self.fbScale = fbScale
-        self.fbVoices = fbVoices
+        self.fbParts = fbParts
         self.fbRules = fbRules
     
 #-------------------------------------------------------------------------------
