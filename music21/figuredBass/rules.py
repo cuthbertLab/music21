@@ -27,7 +27,7 @@ class Rules:
 
         #Chord rules
         self.allowIncompletePossibilities = False
-        self.topVoicesMaxIntervalSeparation = interval.Interval('P8')
+        self.topPartsMaxIntervalSeparation = interval.Interval('P8')
         self.filterPitchesByRange = True
 
         #Chord To Chord Rules
