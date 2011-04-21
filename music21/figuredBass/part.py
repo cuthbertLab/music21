@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         voice.py
-# Purpose:      music21 class which represents the concept of a voice and its range.
+# Name:         part.py
+# Purpose:      music21 class which represents the concept of a part and its range.
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    (c) 2011 The music21 Project
