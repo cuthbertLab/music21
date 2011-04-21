@@ -406,7 +406,7 @@ class Environment(object):
             return self.ref['directoryScratch']
 
     def getTempFile(self, suffix=''):
-        '''Return a file path to a temporary file with the specified suffix
+        '''Return a file path to a temporary file with the specified suffix (file extension). 
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
