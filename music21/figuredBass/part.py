@@ -14,12 +14,12 @@ import copy
 
 from music21 import interval
 from music21 import clef
+from music21 import pitch
 
 from music21.figuredBass import realizerScale
-from music21.figuredBass import realizer
 
 class Part:
-    def __init__(self, label, lowestWrittenPitch = realizer.MIN_PITCH, highestWrittenPitch = realizer.MAX_PITCH, soundingTransposition = interval.Interval('P1')):
+    def __init__(self, label, lowestWrittenPitch = pitch.Pitch('C1'), highestWrittenPitch = pitch.Pitch('B5'), soundingTransposition = interval.Interval('P1')):
         '''
         Creates a Part instance, which represents a part or voice in music, a single vocal part or instrument.
          
