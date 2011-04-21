@@ -12,6 +12,7 @@ import unittest
 import music21
 
 from music21 import stream
+from music21 import common
 
 from music21 import environment
 _MOD = 'features/base.py'
@@ -102,8 +103,28 @@ class FeatureExtractor(object):
             self._src = dataOrStream
             self.data = DataInstance(self._src)
 
+    def getAttributeLabels(self): 
+        '''Return a list of string in a form that is appropriate for data storage.
+    
+        >>> from music21 import *
+        >>> fe = features.jSymbolic.AmountOfArpeggiationFeature()
+        >>> fe.getAttributeLabels()
+        ['Amount_of_Arpeggiation']
 
-    def _fillFeautureAttributes(self, feature=None):
+        >>> fe = features.jSymbolic.FifthsPitchHistogramFeature()
+        >>> fe.getAttributeLabels()
+        ['Fifths_Pitch_Histogram_0', 'Fifths_Pitch_Histogram_1', 'Fifths_Pitch_Histogram_2', 'Fifths_Pitch_Histogram_3', 'Fifths_Pitch_Histogram_4', 'Fifths_Pitch_Histogram_5', 'Fifths_Pitch_Histogram_6', 'Fifths_Pitch_Histogram_7', 'Fifths_Pitch_Histogram_8', 'Fifths_Pitch_Histogram_9', 'Fifths_Pitch_Histogram_10', 'Fifths_Pitch_Histogram_11']
+
+        '''
+        post = []
+        if self.dimensions == 1:
+            post.append(self.name.replace(' ', '_'))
+        else:
+            for i in range(self.dimensions):
+                post.append('%s_%s' % (self.name.replace(' ', '_'), i))
+        return post
+
+    def _fillFeatureAttributes(self, feature=None):
         '''Fill the attributes of a Feature with the descriptors in the FeatureExtractor.
         '''
         # operate on passed-in feature or self._feature
@@ -131,7 +152,7 @@ class FeatureExtractor(object):
         [0, 0]
         '''
         self._feature = Feature()
-        self._fillFeautureAttributes() # will fill self._feature
+        self._fillFeatureAttributes() # will fill self._feature
         self._feature.prepareVectors() # will vector with necessary zeros
 
 
@@ -159,12 +180,15 @@ class FeatureExtractor(object):
 class DataInstance(object):
     '''A data instance for analysis. This object prepares a Stream and stores multiple common-used stream representations once, providing rapid processing. 
     '''
-    def __init__(self, streamObj):
+    def __init__(self, streamObj=None):
         self._src = streamObj
 
         # perform basic operations that are performed on all
         # streams
-        self._base = self._prepareStream(self._src)
+        if self._src is not None:
+            self._base = self._prepareStream(self._src)
+        else:       
+            self._base = None
 
         # store the class value for this data instance
         self._classValue = None
@@ -181,6 +205,18 @@ class DataInstance(object):
         #TODO: add expand repeats
         src = streamObj.stripTies(retainContainers=True, inPlace=False)
         return src
+
+    def setClassLabel(self, classLabel, classValue=None):
+        '''Set the class label, as well as the class value if known. The class label is the attribute name used to define the class of this data instance.
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bwv66.6')
+        >>> di = features.DataInstance(s)
+        >>> di.setClassLabel('Composer', 'Bach')
+        '''
+        self._classLabel = classLabel
+        self._classValue = classValue
+
 
     def _getForm(self, form='flat'):
         '''Get a form of this stream, using a cached version if available.
@@ -350,20 +386,19 @@ class DataSet(object):
     >>> fds = features.DataSet()
     '''
 
-    def __init__(self, format='tab'):
+    def __init__(self, format='tab', classLabel=None, featureExtractors=[]):
         # assume a two dimensional array
         self._dataInstances = []
         # order of feature extractors is the order used in the presentaitons
         self._featureExtractors = []
         # the label of the class
-        self._classLabel = None
+        self._classLabel = classLabel
         self._outputFormat = None
 
         # set the _outputFormat
         self.setOutputFormat(format)
-
-
-
+        # set extractors
+        self.addFeatureExtractors(featureExtractors)
         
     def setOutputFormat(self, format):
         '''Set the output format object. 
@@ -374,6 +409,42 @@ class DataSet(object):
             self._outputFormat = OutputCSV()
         elif format.lower() in ['arff', 'attribute']:
             self._outputFormat = OutputARFF()
+
+    def addFeatureExtractors(self, values):
+        '''Add one or more FeatureExtractor objects, either as a list or as an individual object. 
+        '''
+        if common.isListLike(values):
+            # need to create instances
+            for sub in values:
+                self._featureExtractors.append(sub())
+        else:
+            self._featureExtractors.append(values())
+
+    def getAttributeLabels(self, includeClassLabel=True):
+        '''
+        >>> from music21 import *
+        >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
+        >>> ds = features.DataSet(featureExtractors=f)
+        >>> ds.getAttributeLabels()
+        ['Pitch_Class_Distribution_0', 'Pitch_Class_Distribution_1', 'Pitch_Class_Distribution_2', 'Pitch_Class_Distribution_3', 'Pitch_Class_Distribution_4', 'Pitch_Class_Distribution_5', 'Pitch_Class_Distribution_6', 'Pitch_Class_Distribution_7', 'Pitch_Class_Distribution_8', 'Pitch_Class_Distribution_9', 'Pitch_Class_Distribution_10', 'Pitch_Class_Distribution_11', 'Changes_of_Meter']
+
+        '''
+        post = []
+        for fe in self._featureExtractors:
+            post += fe.getAttributeLabels()
+        if self._classLabel is not None:
+            post.append(self._classLabel.replace(' ', '_'))
+        return post
+
+    def addData(self, dataOrStream, classValue=None):
+        '''Add a Stream to this data set.
+
+        The class value passed here is assumed to be the same as the classLable assigned at startup. 
+        '''
+        # for now, we assume that all are streams
+        di = DataInstance(dataOrStream)
+        di.setClassLabel(self._classValue, classValue)
+        self._dataInstances.append(di)
 
 
 
