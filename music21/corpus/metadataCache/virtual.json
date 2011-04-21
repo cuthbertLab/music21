@@ -15,8 +15,6 @@
             }
           }, 
           "keySignatureFirst": "sharps 1, mode None", 
-          "pitchHighest": "67", 
-          "pitchLowest": "36", 
           "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
@@ -34,8 +32,6 @@
             }
           }, 
           "keySignatureFirst": "sharps 2, mode None", 
-          "pitchHighest": "86", 
-          "pitchLowest": "38", 
           "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
@@ -53,8 +49,6 @@
             }
           }, 
           "keySignatureFirst": "sharps 3, mode None", 
-          "pitchHighest": "81", 
-          "pitchLowest": "37", 
           "timeSignatureFirst": "2/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
@@ -72,8 +66,6 @@
             }
           }, 
           "keySignatureFirst": "sharps 0, mode None", 
-          "pitchHighest": "84", 
-          "pitchLowest": "36", 
           "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
@@ -91,8 +83,6 @@
             }
           }, 
           "keySignatureFirst": "sharps -3, mode None", 
-          "pitchHighest": "84", 
-          "pitchLowest": "36", 
           "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
@@ -170,8 +160,6 @@
             }
           }, 
           "keySignatureFirst": "sharps 0, mode major", 
-          "pitchHighest": "82", 
-          "pitchLowest": "63", 
           "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
@@ -189,8 +177,6 @@
             }
           }, 
           "keySignatureFirst": "sharps 3, mode major", 
-          "pitchHighest": "81", 
-          "pitchLowest": "37", 
           "timeSignatureFirst": "2/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
@@ -208,8 +194,6 @@
             }
           }, 
           "keySignatureFirst": "sharps 3, mode major", 
-          "pitchHighest": "69", 
-          "pitchLowest": "37", 
           "timeSignatureFirst": "2/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
@@ -227,8 +211,6 @@
             }
           }, 
           "keySignatureFirst": "sharps 3, mode major", 
-          "pitchHighest": "81", 
-          "pitchLowest": "44", 
           "timeSignatureFirst": "2/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
@@ -239,6 +221,6 @@
   "__version__": [
     0, 
     3, 
-    0
+    5
   ]
 }

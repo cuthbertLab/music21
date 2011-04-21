@@ -1752,7 +1752,7 @@ class RichMetadata(Metadata):
     def update(self, streamObj):
         '''Given a Stream object, update attributes with stored objects. 
         '''
-        environLocal.printDebug(['RichMetadata: calling update()'])
+        environLocal.printDebug(['RichMetadata: update(): start'])
 
         # must be a method-level import
         from music21.analysis import discrete
@@ -1792,13 +1792,18 @@ class RichMetadata(Metadata):
 #             if ks not in self.keySignatures:
 #                 self.keySignatures.append(ts)
 
-        
-        analysisObj = discrete.Ambitus(streamObj)    
-        psRange = analysisObj.getPitchSpan(streamObj)
-        if psRange != None: # may be none if no pitches are stored
-            # presently, these are numbers; convert to pitches later
-            self.pitchLowest = str(psRange[0]) 
-            self.pitchHighest = str(psRange[1])
+
+# commenting out temporarily due to memory error     
+# with corpus/beethoven/opus132.xml
+   
+#         environLocal.printDebug(['RichMetadata: update(): calling discrete.Ambitus(streamObj)'])
+# 
+#         analysisObj = discrete.Ambitus(streamObj)    
+#         psRange = analysisObj.getPitchSpan(streamObj)
+#         if psRange != None: # may be none if no pitches are stored
+#             # presently, these are numbers; convert to pitches later
+#             self.pitchLowest = str(psRange[0]) 
+#             self.pitchHighest = str(psRange[1])
 # 
 #         self.ambitus = analysisObj.getSolution(streamObj)
 
@@ -1883,6 +1888,7 @@ class MetadataBundle(music21.JSONSerializer):
         >>> len(mb._storage)
         1
         '''
+        import gc # get a garbage collector
         # converter imports modules that import metadata
         from music21 import converter
         for fp in pathList:
@@ -1906,6 +1912,7 @@ class MetadataBundle(music21.JSONSerializer):
                         cp = self.corpusPathToKey(fp, number=md.number)
                         environLocal.printDebug(['addFromPaths: storing:', cp])
                         self._storage[cp] = rmd
+                    del s # for memory conservation
             else:
                 md = post.metadata
                 if md is None:
@@ -1915,7 +1922,10 @@ class MetadataBundle(music21.JSONSerializer):
                 rmd.update(post) # update based on Stream
                 environLocal.printDebug(['updateMetadataCache: storing:', cp])
                 self._storage[cp] = rmd
-
+    
+            # explicitly delete the imported object for memory conservation
+            del post
+            gc.collect()
 
     def addFromVirtualWorks(self, pathList):
         pass

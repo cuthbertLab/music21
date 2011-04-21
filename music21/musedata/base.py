@@ -417,7 +417,7 @@ class MuseDataMeasure(object):
             blStyle = 'dotted'
         elif dataBar == 'double': 
             blStyle = 'light-light'
-        elif dataBar == 'heavy1': 
+        elif dataBar in ['heavy1', 'heavy']: 
             blStyle = 'heavy'
         elif dataBar == 'heavy2': 
             blStyle = 'light-heavy'

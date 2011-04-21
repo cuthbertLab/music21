@@ -43,9 +43,11 @@ def cacheCore():
         #print mdb._storage
         mdb.write() # will use a default file path and  name
 
+        environLocal.printDebug(['cache: writing time:', t, 'md items:', len(mdb._storage)])
 
-    environLocal.printDebug(['cache: writing time:', t, 'md items:', len(mdb._storage)])
+        del mdb
 
+    environLocal.printDebug(['cache: final writing time:', t])
 
 
 if __name__ == "__main__":

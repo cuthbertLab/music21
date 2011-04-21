@@ -305,7 +305,6 @@ def getPaths(extList=None, expandExtensions=True):
                 if fp.endswith(ext):
                     match = True
                     break 
-
             if match:
                 if fp not in paths:
                     paths.append(fp)    
