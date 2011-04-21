@@ -10,24 +10,36 @@
 
 from music21 import interval
 from music21 import note
+from music21 import clef
 
 from music21.figuredBass import realizer
-from music21.figuredBass import voice
+from music21.figuredBass import part
 
-v1 = voice.Voice('Bass', voice.Range('E2', 'E4'))
-v2 = voice.Voice('Tenor', voice.Range('C3', 'A4'), interval.Interval('M3'))
-v3 = voice.Voice('Alto', voice.Range('F3', 'G5'), interval.Interval('M3'))
-v4 = voice.Voice('Soprano', voice.Range('C4', 'A5'), interval.Interval('M2'))
-v5 = voice.Voice('Soprano1', voice.Range('C4', 'A5'), interval.Interval('M2'))
-
-orderedVoiceList = [v1, v2, v3, v4] #, v5]
+def createPartList():
+    b1 = part.Part('Bass','E2','E4')
+    t1 = part.Part('Tenor','C3','A4')
+    a1 = part.Part('Alto','F3','G5')
+    s2 = part.Part('Soprano2','C4','A5')
+    s1 = part.Part('Soprano1','C4','A5')
+    
+    b1.myClef = clef.BassClef()
+    t1.myClef = clef.Treble8vbClef()
+    
+    t1.maxSeparation = interval.Interval('M3')
+    a1.maxSeparation = interval.Interval('M3')
+    s2.maxSeparation = interval.Interval('M2')
+    s1.maxSeparation = interval.Interval('M2') 
+    
+    partList = [b1,t1,a1,s1]
+    return partList
 
 def exampleA():
     '''
     This was one of my (Jose Cabal-Ugaz) 21M.302 assignments.
     The figured bass was composed by Charles Shadle.
     '''
-    fb = realizer.FiguredBass(orderedVoiceList, '3/2', 'C')
+    partList = createPartList()
+    fb = realizer.FiguredBass(partList, '3/2', 'C')
     ####     C major: C D E F G A B C
 
     n1 = note.Note('C3')
@@ -76,7 +88,8 @@ def exampleB():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
-    fb = realizer.FiguredBass(orderedVoiceList, '4/4', 'D', 'minor')
+    partList = createPartList()
+    fb = realizer.FiguredBass(partList, '4/4', 'D', 'minor')
     ####     D minor: D E F G A B- C(#) D
    
     n1 = note.Note('D3')
@@ -103,7 +116,8 @@ def exampleC():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
-    fb = realizer.FiguredBass(orderedVoiceList, '4/4', 'F#', 'minor')
+    partList = createPartList()
+    fb = realizer.FiguredBass(partList, '4/4', 'F#', 'minor')
     ####     F# minor: F# G# A B C# D E(#) F
     
     n1 = note.Note('F#2')
@@ -131,7 +145,8 @@ def exampleD():
     Another one of my (Jose Cabal-Ugaz) assignments from 21M.302.
     This figured bass was composed by Charles Shadle.
     '''
-    fb = realizer.FiguredBass(orderedVoiceList, '3/4', 'b', 'minor')
+    partList = createPartList()
+    fb = realizer.FiguredBass(partList, '3/4', 'b', 'minor')
     ####     B minor: B C# D E F# G A(#) B
 
     #Measure 1
