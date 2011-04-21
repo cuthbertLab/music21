@@ -25,13 +25,14 @@ from music21 import bar
 from music21.figuredBass import segment
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
-from music21.figuredBass import voice
+from music21.figuredBass import part
 from music21.figuredBass import notation
 
+MIN_PITCH = pitch.Pitch('C1')
 MAX_PITCH = pitch.Pitch('B5')
 
 class FiguredBass(object):
-    def __init__(self, voiceList, timeSigString = '4/4', keyString = 'C', modeString = 'major'):
+    def __init__(self, partList, timeSigString = '4/4', keyString = 'C', modeString = 'major'):
         '''
         '''
         self.keyString = keyString
@@ -49,7 +50,7 @@ class FiguredBass(object):
         self.bassLine.append(copy.deepcopy(self.ts))
         self.bassLine.append(copy.deepcopy(self.ks))
         self.maxPitch = MAX_PITCH
-        self.fbInfo = segment.Information(realizerScale.FiguredBassScale(keyString, modeString), voiceList, rules.Rules())
+        self.fbInfo = segment.Information(realizerScale.FiguredBassScale(keyString, modeString), partList, rules.Rules())
         
         #Contains fb solutions
         self.allSegments = []
@@ -167,7 +168,7 @@ class FiguredBass(object):
         rightHand.append(copy.deepcopy(self.ts))
         rightHand.append(copy.deepcopy(self.ks))
 
-        v0 = self.fbInfo.fbVoices[0]
+        v0 = self.fbInfo.fbParts[0]
         
         for j in range(len(chordProgression)):
             givenPossib = chordProgression[j]
@@ -177,8 +178,8 @@ class FiguredBass(object):
                 raise FiguredBassException("Chord progression possibility doesn't match up with bass line.")
         
             rhPitches = []
-            for k in range(1, len(self.fbInfo.fbVoices)):
-                v1 = self.fbInfo.fbVoices[k]
+            for k in range(1, len(self.fbInfo.fbParts)):
+                v1 = self.fbInfo.fbParts[k]
                 rhPitches.append(copy.copy(givenPossib[v1.label]))
                              
             rhChord = chord.Chord(rhPitches)
@@ -239,14 +240,14 @@ class FiguredBass(object):
         
     def printChordProgression(self, chordProgression):
         linesToPrint = []
-        for v in self.fbInfo.fbVoices:
-            voiceLine = v.label + ":\n"
+        for v in self.fbInfo.fbParts:
+            partLine = v.label + ":\n"
             for chord in chordProgression:
-                voiceLine += str(chord[v.label]) + "\t"
-            linesToPrint.append(voiceLine)
+                partLine += str(chord[v.label]) + "\t"
+            linesToPrint.append(partLine)
         linesToPrint.reverse()
-        for voiceLine in linesToPrint:
-            print voiceLine
+        for partLine in linesToPrint:
+            print partLine
         
 class FiguredBassException(music21.Music21Exception):
     pass
