@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         features.py
+# Name:         features.jSymbolic.py
 # Purpose:      music21 functions for simple feature extraction
 #
 # Authors:      Christopher Ariza
@@ -10,130 +10,18 @@
 #-------------------------------------------------------------------------------
 
 
-# features here are a based on those found in a numerous other software 
-# packages, including  the following;
+# features here are a based on those found in 
 # jsymbolic (lgpl): http://jmir.sourceforge.net/jSymbolic.html
 
 
 import unittest
 import music21
 
+from music21.features import base as featuresModule
+
 from music21 import environment
-_MOD = 'repeat.py'
+_MOD = 'features/jSymbolic.py'
 environLocal = environment.Environment(_MOD)
-
-
-#-------------------------------------------------------------------------------
-class Feature(object):
-    '''An object representation of a feature, capable of presentation in a variety of formats, and returned from FeatureExtractor objects.
-    '''
-    def __init__(self):
-        # these values will be filled by the extractor
-        self.name = None # string name representation
-        self.description = None # string description
-        self.isSequential = None # True or False
-        self.dimensions = None # number of dimensions
-        self.discrete = None # is discrete or continuous
-        # data storage; possibly use numpy array
-        self.vector = None
-
-    def _getVectors(self):
-        '''Prepare a vector of appropriate size and return
-        '''
-        return [0] * self.dimensions
-
-    def prepareVectors(self):
-        '''Prepare the vector stored in this feature.
-        '''
-        self.vector = self._getVectors()
-
-    def normalize(self):
-        '''Normalize the vector between 0 and 1, assuming there is more than one value.
-        '''
-        if self.dimensions == 1:
-            return # do nothing
-        m = max(self.vector)
-        if max == 0:
-            return # do nothing
-        scalar = 1. / m # get floating point scalar for speed
-        temp = self._getVectors()
-        for i, v in enumerate(self.vector):
-            temp[i] = v * scalar
-        self.vector = temp
-
-
-#-------------------------------------------------------------------------------
-class FeatureExtractor(object):
-    def __init__(self, streamObj, *arguments, **keywords):
-        self._src = streamObj
-        self._feature = None # Feature object
-
-        self.name = None # string name representation
-        self.description = None # string description
-        self.isSequential = None # True or False
-        self.dimensions = None # number of dimensions
-        self.discrete = True # default
-
-    def _fillFeautureAttributes(self, feature=None):
-        '''Fill the attributes of a Feature with the descriptors in the FeatureExtractor.
-        '''
-        # operate on passed-in feature or self._feature
-        if feature is None:
-            feature = self._feature
-        feature.name = self.name
-        feature.description = self.description
-        feature.isSequential = self.isSequential
-        feature.dimensions = self.dimensions
-        feature.discrete = self.discrete
-        return feature
-
-    def _prepareFeature(self):
-        '''Prepare a new feature for data acquisition.
-
-        >>> from music21 import *
-        >>> s = stream.Stream()
-        >>> fe = InitialTimeSignatureFeature(s)
-        >>> fe._prepareFeature()
-        >>> fe._feature.name
-        'Initial Time Signature'
-        >>> fe._feature.dimensions
-        2
-        >>> fe._feature.vector
-        [0, 0]
-        '''
-        self._feature = Feature()
-        self._fillFeautureAttributes() # will fill self._feature
-        self._feature.prepareVectors() # will vector with necessary zeros
-
-
-    def _prepareStream(self, streamObj):
-        '''Common routines done on Streams prior to processing. Return a new Stream
-        '''
-        #TODO: add expand repeats
-        src = streamObj.stripTies(retainContainers=True, inPlace=False)
-        return src
-
-
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
-        '''
-        # do work in subclass
-        pass
-
-    def extract(self, source=None):
-        '''Extract the feature and return the result. 
-        '''
-        if source is not None:
-            self._src = source
-        self._prepareFeature()
-        self._process() # will set feature object
-
-        # assume we always want to normalize?
-        self._feature.normalize()
-
-        return self._feature    
-
-
 
 
 
@@ -143,17 +31,17 @@ class FeatureExtractor(object):
 # 112 feature extractors
 
 
-class AmountOfArpeggiationFeature(FeatureExtractor):
+class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     >>> s = stream.Stream()
-    >>> fe = features.AmountOfArpeggiationFeature(s)
+    >>> fe = features.jSymbolic.AmountOfArpeggiationFeature(s)
     >>> f = fe.extract()
     >>> f.name
     'Amount of Arpeggiation'
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Amount of Arpeggiation'
         self.description = 'Fraction of horizontal intervals that are repeated notes, minor thirds, major thirds, perfect fifths, minor sevenths, major sevenths, octaves, minor tenths or major tenths.'
@@ -162,12 +50,12 @@ class AmountOfArpeggiationFeature(FeatureExtractor):
 
 
 
-class AverageMelodicIntervalFeature(FeatureExtractor):
+class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Average Melodic Interval'
         self.description = 'Average melodic interval (in semi-tones).'
@@ -175,12 +63,12 @@ class AverageMelodicIntervalFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class AverageNoteDurationFeature(FeatureExtractor):
+class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Average Note Duration'
         self.description = 'Average duration of notes in seconds.s'
@@ -188,12 +76,12 @@ class AverageNoteDurationFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class AverageNoteToNoteDynamicsChangeFeature(FeatureExtractor):
+class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Average Note To Note Dynamics Change'
         self.description = 'Average change of loudness from one note to the next note in the same channel (in MIDI velocity units).'
@@ -201,12 +89,12 @@ class AverageNoteToNoteDynamicsChangeFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class AverageNumberOfIndependentVoicesFeature(FeatureExtractor):
+class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Average Number of Independent Voices'
         self.description = 'Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.'
@@ -214,12 +102,12 @@ class AverageNumberOfIndependentVoicesFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class AverageRangeOfGlissandosFeature(FeatureExtractor):
+class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Average Range of Glissandos'
         self.description = 'Average range of Pitch Bends, where range is defined as the greatest value of the absolute difference between 64 and the second data byte of all MIDI Pitch Bend messages falling betweenthe Note On and Note Off messages of any note.'
@@ -227,12 +115,12 @@ class AverageRangeOfGlissandosFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class AverageTimeBetweenAttacksFeature(FeatureExtractor):
+class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Average Time Between Attacks'
         self.description = 'Average time in seconds between Note On events (regardless of channel).'
@@ -240,12 +128,12 @@ class AverageTimeBetweenAttacksFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class AverageTimeBetweenAttacksForEachVoiceFeature(FeatureExtractor):
+class AverageTimeBetweenAttacksForEachVoiceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Average Time Between Attacks For Each Voice'
         self.description = 'Average of average times in seconds between Note On events on individual channels that contain at least one note.'
@@ -255,12 +143,12 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(FeatureExtractor):
 
  
 class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
-    FeatureExtractor):
+    featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Average Variability of Time Between Attacks For Each Voice'
         self.description = 'Average standard deviation, in seconds, of time between Note On events on individual channels that contain at least one note.'
@@ -272,18 +160,18 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 # 73
 # corresponded to the number of times that Note Ons occurred at that particular pitch. This histogram gave insights into the range and spread of notes.
 
-class BasicPitchHistogramFeature(FeatureExtractor):
+class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that finds a features array with bins corresponding to the values of the basic pitch histogram.
 
     >>> from music21 import *
     >>> s = corpus.parse('bwv66.6')
-    >>> fe = features.BasicPitchHistogramFeature(s)
+    >>> fe = features.jSymbolic.BasicPitchHistogramFeature(s)
     >>> f = fe.extract()
     >>> f.vector
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.052631578947368418, 0.0, 0.0, 0.052631578947368418, 0.052631578947368418, 0.26315789473684209, 0.0, 0.31578947368421051, 0.10526315789473684, 0.0, 0.052631578947368418, 0.15789473684210525, 0.52631578947368418, 0.0, 0.36842105263157893, 0.63157894736842102, 0.10526315789473684, 0.78947368421052633, 0.0, 1.0, 0.52631578947368418, 0.052631578947368418, 0.73684210526315785, 0.15789473684210525, 0.94736842105263153, 0.0, 0.36842105263157893, 0.47368421052631576, 0.0, 0.42105263157894735, 0.0, 0.36842105263157893, 0.0, 0.0, 0.052631578947368418, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Basic Pitch Histogram'
         self.description = 'A features array with bins corresponding to the values of the basic pitch histogram.'
@@ -307,13 +195,13 @@ class BasicPitchHistogramFeature(FeatureExtractor):
  
 
 
-class BeatHistogramFeature(FeatureExtractor):
+class BeatHistogramFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that finds a feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).
 
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Beat Histogram'
         self.description = 'A feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).'
@@ -321,7 +209,7 @@ class BeatHistogramFeature(FeatureExtractor):
         self.dimensions = 161
         self.discrete = False
   
-class ChangesOfMeterFeature(FeatureExtractor):
+class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that sets the feature to 1 if the time signature is changed one or more times during the recording.
 
     >>> from music21 import *
@@ -331,15 +219,15 @@ class ChangesOfMeterFeature(FeatureExtractor):
     >>> s2.append(meter.TimeSignature('3/4'))
     >>> s2.append(meter.TimeSignature('4/4'))
 
-    >>> fe = features.ChangesOfMeterFeature(s1)
+    >>> fe = features.jSymbolic.ChangesOfMeterFeature(s1)
     >>> fe.extract().vector
     [0]
-    >>> fe = features.ChangesOfMeterFeature(s2)
+    >>> fe = features.jSymbolic.ChangesOfMeterFeature(s2)
     >>> fe.extract().vector
     [1]
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Changes of Meter'
         self.description = 'Set to 1 if the time signature is changed one or more times during the recording'
@@ -362,12 +250,12 @@ class ChangesOfMeterFeature(FeatureExtractor):
                 return 
  
 
-class ChromaticMotionFeature(FeatureExtractor):
+class ChromaticMotionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Chromatic Motion'
         self.description = 'Fraction of melodic intervals corresponding to a semi-tone.'
@@ -375,12 +263,13 @@ class ChromaticMotionFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
+class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
+    featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Combined Strength of Two Strongest Rhythmic Pulses'
         self.description = 'The sum of the frequencies of the two beat bins of the peaks with the highest frequencies.'
@@ -389,12 +278,12 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
 
 
  
-class CompoundOrSimpleMeterFeature(FeatureExtractor):
+class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Compound Or Simple Meter'
         self.description = 'Set to 1 if the initial meter is compound (numerator of time signature is greater than or equal to 6 and is evenly divisible by 3) and to 0 if it is simple (if the above condition is not fulfilled).'
@@ -403,12 +292,12 @@ class CompoundOrSimpleMeterFeature(FeatureExtractor):
 
 
  
-class DirectionOfMotionFeature(FeatureExtractor):
+class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Direction of Motion'
         self.description = 'Fraction of melodic intervals that are rising rather than falling.'
@@ -416,12 +305,12 @@ class DirectionOfMotionFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class DistanceBetweenMostCommonMelodicIntervalsFeature(FeatureExtractor):
+class DistanceBetweenMostCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Distance Between Most Common Melodic Intervals'
         self.description = 'Absolute value of the difference between the most common melodic interval and the second most common melodic interval.'
@@ -430,12 +319,12 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(FeatureExtractor):
 
 
  
-class DominantSpreadFeature(FeatureExtractor):
+class DominantSpreadFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Dominant Spread'
         self.description = 'Largest number of consecutive pitch classes separated by perfect 5ths that accounted for at least 9% each of the notes.'
@@ -444,26 +333,26 @@ class DominantSpreadFeature(FeatureExtractor):
 
 
  
-class DurationFeature(FeatureExtractor):
+class DurationFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that extracts the duration in seconds.
 
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Duration'
         self.description = 'The total duration in seconds of the music.'
-        self.isSequential = False
+        self.isSequential = False # this is the only jSymbolc non seq feature
         self.dimensions = 1
 
  
-class DurationOfMelodicArcsFeature(FeatureExtractor):
+class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Duration of Melodic Arcs'
         self.description = 'Average number of notes that separate melodic peaks and troughs in any channel.'
@@ -476,17 +365,17 @@ class DurationOfMelodicArcsFeature(FeatureExtractor):
 # where b is the fifths pitch histogram bin and a is the corresponding pitch class histogram bin. The number seven is used because this is the number of semi-tones in a perfect fifth, and the number twelve is used because there are twelve pitch classes in total. This histogram was useful for measuring dominant tonic relationships and for looking at types of transpositions.
 
  
-class FifthsPitchHistogramFeature(FeatureExtractor):
+class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     >>> s = corpus.parse('bwv66.6')
-    >>> fe = features.FifthsPitchHistogramFeature(s)
+    >>> fe = features.jSymbolic.FifthsPitchHistogramFeature(s)
     >>> f = fe.extract()
     >>> f.vector
     [0.0, 0.0, 0.375, 0.6875, 0.5, 0.875, 0.90625, 1.0, 0.4375, 0.03125, 0.09375, 0.1875]
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Fifths Pitch Histogram'
         self.description = 'A feature array with bins corresponding to the values of the 5ths pitch class histogram.'
@@ -517,12 +406,12 @@ class FifthsPitchHistogramFeature(FeatureExtractor):
  
 
  
-class GlissandoPrevalenceFeature(FeatureExtractor):
+class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Glissando Prevalence'
         self.description = 'Number of Note Ons that have at least one MIDI Pitch Bend associated with them divided by total number of pitched Note Ons.'
@@ -530,12 +419,12 @@ class GlissandoPrevalenceFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class HarmonicityOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
+class HarmonicityOfTwoStrongestRhythmicPulsesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Harmonicity of Two Strongest Rhythmic Pulses'
         self.description = 'The bin label of the higher (in terms of bin label) of the two beat bins of the peaks with the highest frequency divided by the bin label of the lower.'
@@ -544,12 +433,12 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
 
 
  
-class ImportanceOfBassRegisterFeature(FeatureExtractor):
+class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Importance of Bass Register'
         self.description = 'Fraction of Note Ons between MIDI pitches 0 and 54.'
@@ -558,12 +447,12 @@ class ImportanceOfBassRegisterFeature(FeatureExtractor):
 
 
  
-class ImportanceOfHighRegisterFeature(FeatureExtractor):
+class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Importance of High Register'
         self.description = 'Fraction of Note Ons between MIDI pitches 73 and 127.'
@@ -572,12 +461,12 @@ class ImportanceOfHighRegisterFeature(FeatureExtractor):
 
 
  
-class ImportanceOfLoudestVoiceFeature(FeatureExtractor):
+class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Importance of Loudest Voice'
         self.description = 'Difference between the average loudness of the loudest channel and the average loudness of the other channels that contain at least one note.'
@@ -586,12 +475,12 @@ class ImportanceOfLoudestVoiceFeature(FeatureExtractor):
 
 
  
-class ImportanceOfMiddleRegisterFeature(FeatureExtractor):
+class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Importance of Middle Register'
         self.description = 'Fraction of Note Ons between MIDI pitches 55 and 72.'
@@ -600,12 +489,12 @@ class ImportanceOfMiddleRegisterFeature(FeatureExtractor):
 
 
  
-class InitialTempoFeature(FeatureExtractor):
+class InitialTempoFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Initial Tempo'
         self.description = 'Tempo in beats per minute at the start of the recording.'
@@ -614,11 +503,11 @@ class InitialTempoFeature(FeatureExtractor):
 
 
  
-class InitialTimeSignatureFeature(FeatureExtractor):
+class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
     '''
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Initial Time Signature'
         self.description = 'A feature array with two elements. The first is the numerator of the first occurring time signature and the second is the denominator of the first occurring time signature. Both are set to 0 if no time signature is present.'
@@ -627,12 +516,12 @@ class InitialTimeSignatureFeature(FeatureExtractor):
 
 
  
-class IntervalBetweenStrongestPitchClassesFeature(FeatureExtractor):
+class IntervalBetweenStrongestPitchClassesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Interval Between Strongest Pitch Classes'
         self.description = 'Absolute value of the difference between the pitch classes of the two most common MIDI pitch classes.'
@@ -641,12 +530,12 @@ class IntervalBetweenStrongestPitchClassesFeature(FeatureExtractor):
 
 
  
-class IntervalBetweenStrongestPitchesFeature(FeatureExtractor):
+class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Interval Between Strongest Pitches'
         self.description = 'Absolute value of the difference between the pitches of the two most common MIDI pitches.'
@@ -655,12 +544,12 @@ class IntervalBetweenStrongestPitchesFeature(FeatureExtractor):
 
 
  
-class MaximumNoteDurationFeature(FeatureExtractor):
+class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Maximum Note Duration'
         self.description = 'Duration of the longest note (in seconds).'
@@ -669,12 +558,12 @@ class MaximumNoteDurationFeature(FeatureExtractor):
 
 
  
-class MaximumNumberOfIndependentVoicesFeature(FeatureExtractor):
+class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Maximum Number of Independent Voices'
         self.description = 'Maximum number of different channels in which notes have sounded simultaneously.'
@@ -683,12 +572,12 @@ class MaximumNumberOfIndependentVoicesFeature(FeatureExtractor):
 
 
  
-class MelodicFifthsFeature(FeatureExtractor):
+class MelodicFifthsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Melodic Fifths'
         self.description = 'Fraction of melodic intervals that are perfect fifths.'
@@ -696,12 +585,12 @@ class MelodicFifthsFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class MelodicIntervalHistogramFeature(FeatureExtractor):
+class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Melodic Interval Histogram'
         self.description = 'A features array with bins corresponding to the values of the melodic interval histogram.'
@@ -709,12 +598,12 @@ class MelodicIntervalHistogramFeature(FeatureExtractor):
         self.dimensions = 128
 
 
-class MelodicIntervalsInLowestLineFeature(FeatureExtractor):
+class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Melodic Intervals in Lowest Line'
         self.description = 'Average melodic interval in semitones of the channel with the lowest average pitch divided by the average melodic interval of all channels that contain at least two notes.'
@@ -722,12 +611,12 @@ class MelodicIntervalsInLowestLineFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class MelodicOctavesFeature(FeatureExtractor):
+class MelodicOctavesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Melodic Octaves'
         self.description = 'Fraction of melodic intervals that are octaves.'
@@ -736,12 +625,12 @@ class MelodicOctavesFeature(FeatureExtractor):
 
 
  
-class MelodicThirdsFeature(FeatureExtractor):
+class MelodicThirdsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Melodic Thirds'
         self.description = 'Fraction of melodic intervals that are major or minor thirds.'
@@ -750,12 +639,12 @@ class MelodicThirdsFeature(FeatureExtractor):
 
 
  
-class MelodicTritonesFeature(FeatureExtractor):
+class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Melodic Tritones'
         self.description = 'Fraction of melodic intervals that are tritones.'
@@ -764,12 +653,12 @@ class MelodicTritonesFeature(FeatureExtractor):
 
 
  
-class MinimumNoteDurationFeature(FeatureExtractor):
+class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Minimum Note Duration'
         self.description = 'Duration of the shortest note (in seconds).'
@@ -777,12 +666,12 @@ class MinimumNoteDurationFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class MostCommonMelodicIntervalFeature(FeatureExtractor):
+class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Most Common Melodic Interval'
         self.description = 'Melodic interval with the highest frequency.'
@@ -791,12 +680,12 @@ class MostCommonMelodicIntervalFeature(FeatureExtractor):
 
 
  
-class MostCommonMelodicIntervalPrevalenceFeature(FeatureExtractor):
+class MostCommonMelodicIntervalPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Most Common Melodic Interval Prevalence'
         self.description = 'Fraction of melodic intervals that belong to the most common interval.'
@@ -805,13 +694,13 @@ class MostCommonMelodicIntervalPrevalenceFeature(FeatureExtractor):
 
 
  
-class MostCommonPitchClassFeature(FeatureExtractor):
+class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that finds the bin label of the most common pitch class.
 
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Most Common Pitch Class'
         self.description = 'Bin label of the most common pitch class.'
@@ -820,12 +709,12 @@ class MostCommonPitchClassFeature(FeatureExtractor):
         
 
  
-class MostCommonPitchClassPrevalenceFeature(FeatureExtractor):
+class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Most Common Pitch Class Prevalence'
         self.description = 'Fraction of Note Ons corresponding to the most common pitch class.'
@@ -834,12 +723,12 @@ class MostCommonPitchClassPrevalenceFeature(FeatureExtractor):
 
 
  
-class MostCommonPitchFeature(FeatureExtractor):
+class MostCommonPitchFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Most Common Pitch'
         self.description = 'Bin label of the most common pitch divided by the number of possible pitches.'
@@ -847,12 +736,12 @@ class MostCommonPitchFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class MostCommonPitchPrevalenceFeature(FeatureExtractor):
+class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Most Common Pitch Prevalence'
         self.description = 'Fraction of Note Ons corresponding to the most common pitch.'
@@ -860,12 +749,12 @@ class MostCommonPitchPrevalenceFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class NoteDensityFeature(FeatureExtractor):
+class NoteDensityFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Note Density'
         self.description = 'Average number of notes per second.'
@@ -873,12 +762,12 @@ class NoteDensityFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class NotePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
+class NotePrevalenceOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Note Prevalence of Pitched Instruments'
         self.description = 'The fraction of (pitched) notes played by each General MIDI Instrument. There is one entry for each instrument, which is set to the number of Note Ons played using the corresponding MIDI patch divided by the total number of Note Ons in the recording.'
@@ -886,12 +775,12 @@ class NotePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
         self.dimensions = 128
  
 
-class NotePrevalenceOfUnpitchedInstrumentsFeature(FeatureExtractor):
+class NotePrevalenceOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Note Prevalence of Unpitched Instruments'
         self.description = 'The fraction of (unpitched) notes played by each General MIDI Percussion Key Map Instrument. There is one entry for each instrument, which is set to the number of Note Ons played using the corresponding MIDI note value divided by the total number of Note Ons in the recording. It should be noted that only instruments 35 to 81 are included here, as they are the ones that meet the official standard. They are numbered in this array from 0 to 46.'
@@ -900,12 +789,12 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(FeatureExtractor):
 
 
  
-class NumberOfCommonMelodicIntervalsFeature(FeatureExtractor):
+class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Number of Common Melodic Intervals'
         self.description = 'Number of melodic intervals that represent at least 9% of all melodic intervals.'
@@ -914,12 +803,12 @@ class NumberOfCommonMelodicIntervalsFeature(FeatureExtractor):
 
 
 
-class NumberOfCommonPitchesFeature(FeatureExtractor):
+class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Number of Common Pitches'
         self.description = 'Number of pitches that account individually for at least 9% of all notes.'
@@ -927,12 +816,12 @@ class NumberOfCommonPitchesFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class NumberOfModeratePulsesFeature(FeatureExtractor):
+class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Number of Moderate Pulses'
         self.description = 'Number of beat peaks with normalized frequencies over 0.01.'
@@ -941,12 +830,12 @@ class NumberOfModeratePulsesFeature(FeatureExtractor):
 
 
  
-class NumberOfRelativelyStrongPulsesFeature(FeatureExtractor):
+class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Number of Relatively Strong Pulses'
         self.description = 'Number of beat peaks with frequencies at least 30% as high as the frequency of the bin with the highest frequency.'
@@ -954,12 +843,12 @@ class NumberOfRelativelyStrongPulsesFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class NumberOfStrongPulsesFeature(FeatureExtractor):
+class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Number of Strong Pulses'
         self.description = 'Number of beat peaks with normalized frequencies over 0.1.'
@@ -967,12 +856,12 @@ class NumberOfStrongPulsesFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class OverallDynamicRangeFeature(FeatureExtractor):
+class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Overall Dynamic Range'
         self.description = 'The maximum loudness minus the minimum loudness value.'
@@ -984,18 +873,18 @@ class OverallDynamicRangeFeature(FeatureExtractor):
 
 # The second histogram was called the 'pitch class histogram,' and had one bin for each of the twelve pitch classes. The magnitude of each bin corresponded to the number of times Note Ons occurred in a recording for a particular pitch class. Enharmonic equivalents were assigned the same pitch class number. This histogram gave insights into the types of scales used and the amount of transposition that was present.
  
-class PitchClassDistributionFeature(FeatureExtractor):
+class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     >>> s = corpus.parse('bwv66.6')
-    >>> fe = features.PitchClassDistributionFeature(s)
+    >>> fe = features.jSymbolic.PitchClassDistributionFeature(s)
     >>> f = fe.extract()
     >>> f.vector
     [0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375, 0.6875, 0.09375, 0.875]
 
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Pitch Class Distribution'
         self.description = 'A feature array with 12 entries where the first holds the frequency of the bin of the pitch class histogram with the highest frequency, and the following entries holding the successive bins of the histogram, wrapping around if necessary.'
@@ -1020,12 +909,12 @@ class PitchClassDistributionFeature(FeatureExtractor):
 
 
  
-class PitchClassVarietyFeature(FeatureExtractor):
+class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Pitch Class Variety'
         self.description = 'Number of pitch classes used at least once.'
@@ -1037,12 +926,12 @@ class PitchClassVarietyFeature(FeatureExtractor):
 
 
  
-class PitchVarietyFeature(FeatureExtractor):
+class PitchVarietyFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Pitch Variety'
         self.description = 'Number of pitches used at least once.'
@@ -1051,12 +940,12 @@ class PitchVarietyFeature(FeatureExtractor):
 
 
  
-class PolyrhythmsFeature(FeatureExtractor):
+class PolyrhythmsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Polyrhythms'
         self.description = 'Number of beat peaks with frequencies at least 30% of the highest frequency whose bin labels are not integer multiples or factors (using only multipliers of 1, 2, 3, 4, 6 and 8) (with an accepted error of +/- 3 bins) of the bin label of the peak with the highest frequency. This number is then divided by the total number of beat bins with frequencies over 30% of the highest frequency.'
@@ -1064,12 +953,12 @@ class PolyrhythmsFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class PrimaryRegisterFeature(FeatureExtractor):
+class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Primary Register'
         self.description = 'Average MIDI pitch.'
@@ -1077,13 +966,13 @@ class PrimaryRegisterFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class QualityFeature(FeatureExtractor):
+class QualityFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that sets the feature to 0 if the key signature indicates that a recording is major, set to 1 if it indicates that it is minor and set to 0 if key signature is unknown.
 
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Quality'
         self.description = 'Set to 0 if the key signature indicates that a recording is major, set to 1 if it indicates that it is minor and set to 0 if key signature is unknown.'
@@ -1091,12 +980,12 @@ class QualityFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class QuintupleMeterFeature(FeatureExtractor):
+class QuintupleMeterFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Quintuple Meter'
         self.description = 'Set to 1 if numerator of initial time signature is 5, set to 0 otherwise.'
@@ -1105,12 +994,12 @@ class QuintupleMeterFeature(FeatureExtractor):
 
 
  
-class RangeFeature(FeatureExtractor):
+class RangeFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Range'
         self.description = 'Difference between highest and lowest pitches.'
@@ -1119,12 +1008,12 @@ class RangeFeature(FeatureExtractor):
 
 
  
-class RangeOfHighestLineFeature(FeatureExtractor):
+class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Range of Highest Line'
         self.description = 'Difference between the highest note and the lowest note played in the channel with the highest average pitch divided by the difference between the highest note and the lowest note in the piece.'
@@ -1133,12 +1022,12 @@ class RangeOfHighestLineFeature(FeatureExtractor):
 
 
  
-class RelativeNoteDensityOfHighestLineFeature(FeatureExtractor):
+class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Relative Note Density of Highest Line'
         self.description = 'Number of Note Ons in the channel with the highest average pitch divided by the average number of Note Ons in all channels that contain at least one note.'
@@ -1147,12 +1036,12 @@ class RelativeNoteDensityOfHighestLineFeature(FeatureExtractor):
 
 
  
-class RelativeRangeOfLoudestVoiceFeature(FeatureExtractor):
+class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Relative Range of Loudest Voice'
         self.description = 'Difference between the highest note and the lowest note played in the channel with the highest average loudness divided by the difference between the highest note and the lowest note overall in the piece.'
@@ -1161,12 +1050,12 @@ class RelativeRangeOfLoudestVoiceFeature(FeatureExtractor):
 
 
  
-class RelativeStrengthOfMostCommonIntervalsFeature(FeatureExtractor):
+class RelativeStrengthOfMostCommonIntervalsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Relative Strength of Most Common Intervals'
         self.description = 'Fraction of melodic intervals that belong to the second most common interval divided by the fraction of melodic intervals belonging to the most common interval.'
@@ -1175,12 +1064,12 @@ class RelativeStrengthOfMostCommonIntervalsFeature(FeatureExtractor):
 
 
  
-class RelativeStrengthOfTopPitchClassesFeature(FeatureExtractor):
+class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Relative Strength of Top Pitch Classes'
         self.description = 'The frequency of the 2nd most common pitch class divided by the frequency of the most common pitch class.'
@@ -1188,12 +1077,12 @@ class RelativeStrengthOfTopPitchClassesFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class RelativeStrengthOfTopPitchesFeature(FeatureExtractor):
+class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Relative Strength of Top Pitches'
         self.description = 'The frequency of the 2nd most common pitch divided by the frequency of the most common pitch.'
@@ -1202,12 +1091,12 @@ class RelativeStrengthOfTopPitchesFeature(FeatureExtractor):
 
 
  
-class RepeatedNotesFeature(FeatureExtractor):
+class RepeatedNotesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Repeated Notes'
         self.description = 'Fraction of notes that are repeated melodically.'
@@ -1215,12 +1104,12 @@ class RepeatedNotesFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class RhythmicLoosenessFeature(FeatureExtractor):
+class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Rhythmic Looseness'
         self.description = 'Average width of beat histogram peaks (in beats per minute). Width is measured for all peaks with frequencies at least 30% as high as the highest peak, and is defined by the distance between the points on the peak in question that are 30% of the height of the peak.'
@@ -1228,12 +1117,12 @@ class RhythmicLoosenessFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class RhythmicVariabilityFeature(FeatureExtractor):
+class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Rhythmic Variability'
         self.description = 'Standard deviation of the bin values (except the first 40 empty ones).'
@@ -1243,12 +1132,12 @@ class RhythmicVariabilityFeature(FeatureExtractor):
  
 
  
-class SecondStrongestRhythmicPulseFeature(FeatureExtractor):
+class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Second Strongest Rhythmic Pulse'
         self.description = 'Bin label of the beat bin of the peak with the second highest frequency.'
@@ -1256,12 +1145,12 @@ class SecondStrongestRhythmicPulseFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class SizeOfMelodicArcsFeature(FeatureExtractor):
+class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Size of Melodic Arcs'
         self.description = 'Average melodic interval separating the top note of melodic peaks and the bottom note of melodic troughs.'
@@ -1269,12 +1158,12 @@ class SizeOfMelodicArcsFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class StaccatoIncidenceFeature(FeatureExtractor):
+class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Staccato Incidence'
         self.description = 'Number of notes with durations of less than a 10th of a second divided by the total number of notes in the recording.'
@@ -1283,12 +1172,12 @@ class StaccatoIncidenceFeature(FeatureExtractor):
 
 
  
-class StepwiseMotionFeature(FeatureExtractor):
+class StepwiseMotionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Stepwise Motion'
         self.description = 'Fraction of melodic intervals that corresponded to a minor or major second.'
@@ -1296,12 +1185,12 @@ class StepwiseMotionFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class StrengthOfSecondStrongestRhythmicPulseFeature(FeatureExtractor):
+class StrengthOfSecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Strength of Second Strongest Rhythmic Pulse'
         self.description = 'Frequency of the beat bin of the peak with the second highest frequency.'
@@ -1309,12 +1198,12 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class StrengthOfStrongestRhythmicPulseFeature(FeatureExtractor):
+class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Strength of Strongest Rhythmic Pulse'
         self.description = 'Frequency of the beat bin with the highest frequency.'
@@ -1322,12 +1211,12 @@ class StrengthOfStrongestRhythmicPulseFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
+class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Strength Ratio of Two Strongest Rhythmic Pulses'
         self.description = 'The frequency of the higher (in terms of frequency) of the two beat bins corresponding to the peaks with the highest frequency divided by the frequency of the lower.'
@@ -1336,12 +1225,12 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(FeatureExtractor):
 
 
  
-class StrongestRhythmicPulseFeature(FeatureExtractor):
+class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Strongest Rhythmic Pulse'
         self.description = 'Bin label of the beat bin with the highest frequency.'
@@ -1349,12 +1238,12 @@ class StrongestRhythmicPulseFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class StrongTonalCentresFeature(FeatureExtractor):
+class StrongTonalCentresFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Strong Tonal Centres'
         self.description = 'Number of peaks in the fifths pitch histogram that each account for at least 9% of all Note Ons.'
@@ -1363,12 +1252,12 @@ class StrongTonalCentresFeature(FeatureExtractor):
 
 
  
-class TimePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
+class TimePrevalenceOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Time Prevalence of Pitched Instruments'
         self.description = 'The fraction of the total time of the recording in which a note was sounding for each (pitched) General MIDI Instrument. There is one entry for each instrument, which is set to the total time in seconds during which a given instrument was sounding one or more notes divided by the total length in seconds of the piece.'
@@ -1376,12 +1265,12 @@ class TimePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
         self.dimensions = 128
 
 
-class TripleMeterFeature(FeatureExtractor):
+class TripleMeterFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Triple Meter'
         self.description = 'Set to 1 if numerator of initial time signature is 3, set to 0 otherwise.'
@@ -1392,12 +1281,12 @@ class TripleMeterFeature(FeatureExtractor):
  
 
  
-class VariabilityOfNoteDurationFeature(FeatureExtractor):
+class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Variability of Note Duration'
         self.description = 'Standard deviation of note durations in seconds.'
@@ -1405,12 +1294,12 @@ class VariabilityOfNoteDurationFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
+class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Variability of Note Prevalence of Pitched Instruments'
         self.description = 'Standard deviation of the fraction of Note Ons played by each (pitched) General MIDI instrument that is used to play at least one note.'
@@ -1419,12 +1308,12 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(FeatureExtractor):
 
 
 class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
-    FeatureExtractor):
+    featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Variability of Note Prevalence of Unpitched Instruments'
         self.description = 'Standard deviation of the fraction of Note Ons played by each (unpitched) MIDI Percussion Key Map instrument that is used to play at least one note. It should be noted that only instruments 35 to 81 are included here, as they are the ones that are included in the official standard.'
@@ -1432,12 +1321,12 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
         self.dimensions = 1
 
  
-class VariabilityOfNumberOfIndependentVoicesFeature(FeatureExtractor):
+class VariabilityOfNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Variability of Number of Independent Voices'
         self.description = 'Standard deviation of number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.'
@@ -1446,12 +1335,12 @@ class VariabilityOfNumberOfIndependentVoicesFeature(FeatureExtractor):
 
 
  
-class VariabilityOfTimeBetweenAttacksFeature(FeatureExtractor):
+class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Variability of Time Between Attacks'
         self.description = 'Standard deviation of the times, in seconds, between Note On events (regardless of channel).'
@@ -1459,12 +1348,12 @@ class VariabilityOfTimeBetweenAttacksFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class VariationOfDynamicsFeature(FeatureExtractor):
+class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Variation of Dynamics'
         self.description = 'Standard deviation of loudness levels of all notes.'
@@ -1473,12 +1362,12 @@ class VariationOfDynamicsFeature(FeatureExtractor):
 
 
  
-class VariationOfDynamicsInEachVoiceFeature(FeatureExtractor):
+class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Variation of Dynamics In Each Voice'
         self.description = 'The average of the standard deviations of loudness levels within each channel that contains at least one note.'
@@ -1486,12 +1375,12 @@ class VariationOfDynamicsInEachVoiceFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class VibratoPrevalenceFeature(FeatureExtractor):
+class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Vibrato Prevalence'
         self.description = 'Number of notes for which Pitch Bend messages change direction at least twice divided by total number of notes that have Pitch Bend messages associated with them.'
@@ -1500,12 +1389,12 @@ class VibratoPrevalenceFeature(FeatureExtractor):
 
 
  
-class VoiceEqualityDynamicsFeature(FeatureExtractor):
+class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Voice Equality - Dynamics'
         self.description = 'Standard deviation of the average volume of notes in each channel that contains at least one note.'
@@ -1513,12 +1402,12 @@ class VoiceEqualityDynamicsFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class VoiceEqualityMelodicLeapsFeature(FeatureExtractor):
+class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Voice Equality - Melodic Leaps'
         self.description = 'Standard deviation of the average melodic leap in MIDI pitches for each channel that contains at least one note.'
@@ -1526,12 +1415,12 @@ class VoiceEqualityMelodicLeapsFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class VoiceEqualityNoteDurationFeature(FeatureExtractor):
+class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Voice Equality - Note Duration'
         self.description = 'Standard deviation of the total duration of notes in seconds in each channel that contains at least one note.'
@@ -1539,12 +1428,12 @@ class VoiceEqualityNoteDurationFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class VoiceEqualityNumberOfNotesFeature(FeatureExtractor):
+class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Voice Equality - Number of Notes'
         self.description = 'Standard deviation of the total number of Note Ons in each channel that contains at least one note.'
@@ -1552,12 +1441,12 @@ class VoiceEqualityNumberOfNotesFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class VoiceEqualityRangeFeature(FeatureExtractor):
+class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Voice Equality - Range'
         self.description = 'Standard deviation of the differences between the highest and lowest pitches in each channel that contains at least one note.'
@@ -1565,12 +1454,12 @@ class VoiceEqualityRangeFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class VoiceSeparationFeature(FeatureExtractor):
+class VoiceSeparationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
  
         self.name = 'Voice Separation'
         self.description = 'Average separation in semi-tones between the average pitches of consecutive channels (after sorting based/non average pitch) that contain at least one note.'
@@ -1582,13 +1471,13 @@ class VoiceSeparationFeature(FeatureExtractor):
 # instrumentation specific
 
 
-class AcousticGuitarFractionFeature(FeatureExtractor):
+class AcousticGuitarFractionFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that extracts the fraction of all Note Ons belonging to acoustic guitar patches (General MIDI patches 25 to 26).
 
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Acoustic Guitar Fraction'
         self.description = 'Fraction of all Note Ons belonging to acoustic guitar patches (General MIDI patches 25 to 26).'
@@ -1596,13 +1485,13 @@ class AcousticGuitarFractionFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class BrassFractionFeature(FeatureExtractor):
+class BrassFractionFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that extracts the fraction of all Note Ons belonging to brass patches (General MIDI patches 57 or 68).
 
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Brass Fraction'
         self.description = 'Fraction of all Note Ons belonging to brass patches (GeneralMIDI patches 57 or 68).'
@@ -1611,12 +1500,12 @@ class BrassFractionFeature(FeatureExtractor):
 
 
 
-class ElectricGuitarFractionFeature(FeatureExtractor):
+class ElectricGuitarFractionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Electric Guitar Fraction'
         self.description = 'Fraction of all Note Ons belonging to electric guitar patches (GeneralMIDI patches 27 to 32).'
@@ -1624,12 +1513,12 @@ class ElectricGuitarFractionFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class ElectricInstrumentFractionFeature(FeatureExtractor):
+class ElectricInstrumentFractionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Electric Instrument Fraction'
         self.description = 'Fraction of all Note Ons belonging to electric instrument patches(General MIDI patches 5, 6, 17, 19, 27 to 32 or 34 to 40).'
@@ -1637,12 +1526,12 @@ class ElectricInstrumentFractionFeature(FeatureExtractor):
         self.dimensions = 1
 
  
-class NumberOfPitchedInstrumentsFeature(FeatureExtractor):
+class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Number of Pitched Instruments'
         self.description = 'Total number of General MIDI patches that are used to play at least one note.'
@@ -1650,12 +1539,12 @@ class NumberOfPitchedInstrumentsFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class NumberOfUnpitchedInstrumentsFeature(FeatureExtractor):
+class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Number of Unpitched Instruments'
         self.description = 'Number of distinct MIDI Percussion Key Map patches that were used to play at least one note. It should be noted that only instruments 35 to 81 are included here, as they are the ones that are included in the official standard.'
@@ -1664,12 +1553,12 @@ class NumberOfUnpitchedInstrumentsFeature(FeatureExtractor):
 
 
 
-class OrchestralStringsFractionFeature(FeatureExtractor):
+class OrchestralStringsFractionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Orchestral Strings Fraction'
         self.description = 'Fraction of all Note Ons belonging to orchestral strings patches(General MIDI patches 41 or 47).'
@@ -1678,12 +1567,12 @@ class OrchestralStringsFractionFeature(FeatureExtractor):
 
 
 
-class PercussionPrevalenceFeature(FeatureExtractor):
+class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Percussion Prevalence'
         self.description = 'Total number of Note Ons corresponding to unpitched percussion instruments divided by total number of Note Ons in the recording.'
@@ -1691,12 +1580,12 @@ class PercussionPrevalenceFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class SaxophoneFractionFeature(FeatureExtractor):
+class SaxophoneFractionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Saxophone Fraction'
         self.description = 'Fraction of all Note Ons belonging to saxophone patches (GeneralMIDI patches 65 or 68).'
@@ -1704,12 +1593,12 @@ class SaxophoneFractionFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class StringEnsembleFractionFeature(FeatureExtractor):
+class StringEnsembleFractionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'String Ensemble Fraction'
         self.description = 'Fraction of all Note Ons belonging to string ensemble patches(General MIDI patches 49 to 52).'
@@ -1718,12 +1607,12 @@ class StringEnsembleFractionFeature(FeatureExtractor):
 
 
 
-class StringKeyboardFractionFeature(FeatureExtractor):
+class StringKeyboardFractionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'String Keyboard Fraction'
         self.description = 'Fraction of all Note Ons belonging to string keyboard patches (GeneralMIDI patches 1 to 8).'
@@ -1731,12 +1620,12 @@ class StringKeyboardFractionFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class UnpitchedInstrumentsPresentFeature(FeatureExtractor):
+class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Unpitched Instruments Present'
         self.description = 'Which unpitched MIDI Percussion Key Map instruments are present. There is one entry for each instrument, which is set to 1.0 if there is at least one Note On in the recording corresponding to the instrument and to 0.0 if there is not. It should be noted that only instruments 35 to 81 are included here, as they are the ones that meet the official standard. They are numbered in this array from 0 to 46.'
@@ -1744,12 +1633,12 @@ class UnpitchedInstrumentsPresentFeature(FeatureExtractor):
         self.dimensions = 47
 
 
-class PitchedInstrumentsPresentFeature(FeatureExtractor):
+class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
 
         self.name = 'Pitched Instruments Present'
@@ -1758,12 +1647,12 @@ class PitchedInstrumentsPresentFeature(FeatureExtractor):
         self.dimensions = 128
 
 
-class ViolinFractionFeature(FeatureExtractor):
+class ViolinFractionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Violin Fraction'
         self.description = 'Fraction of all Note Ons belonging to violin patches (GeneralMIDI patches 41 or 111).'
@@ -1771,12 +1660,12 @@ class ViolinFractionFeature(FeatureExtractor):
         self.dimensions = 1
 
 
-class WoodwindsFractionFeature(FeatureExtractor):
+class WoodwindsFractionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    def __init__(self, streamObj, *arguments, **keywords):
-        FeatureExtractor.__init__(self, streamObj,  *arguments, **keywords)
+    def __init__(self, featureSetOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, featureSetOrStream=featureSetOrStream,  *arguments, **keywords)
 
         self.name = 'Woodwinds Fraction'
         self.description = 'Fraction of all Note Ons belonging to woodwind patches (GeneralMIDI patches 69 or 76).'
@@ -1792,34 +1681,6 @@ PitchClassDistributionFeature, FifthsPitchHistogramFeature, BasicPitchHistogramF
 
 
 
-#-------------------------------------------------------------------------------
-
-class DataFile(object):
-    '''Provide output of data in an number of formats
-    '''
-    def __init__(self):
-        # assume a two dimensional array
-        self._rows = []
-    
-    def append(self, row):
-        self._rows.append(row)
-
-    def preperaTabDelimted(self):
-        msg = []
-        for row in self._rows:
-            sub = []
-            for e in row:
-                sub.append(str(e))
-            msg.append('\t'.join(sub))
-        return '\n'.join(msg)
-
-    def write(self, fp):
-        msg = self.preperaTabDelimted()
-        f = open(fp, 'w')
-        f.write(msg)
-        f.close()
-
-
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -1827,59 +1688,6 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testComposerClassification(self):
-        from music21 import stream, note, features, corpus
-
-        features = [
-            PitchClassDistributionFeature, FifthsPitchHistogramFeature, BasicPitchHistogramFeature, ChangesOfMeterFeature
-            ]
-        worksBach = [
-            'bwv3.6.xml', 'bwv5.7.xml', 'bwv32.6.xml',
-            ]
-        # monteverdi
-        worksPalestrina = [
-            'madrigal.3.1.xml', 'madrigal.3.2.xml', 'madrigal.3.9.xml',
-            ]
-
-        df = DataFile()
-
-        # create header:
-#         v1 = [] # lable
-#         v2 = [] # data type
-#         v3 = [] # optional flags
-#         s = stream.Stream()
-#         for feClass in features:
-#             fe = feClass(s)
-#             for i in range(fe.dimensions):
-#                 v1.append('%s %s' % (fe.name, i))
-#                 if fe.discrete:
-#                     v2.append('d')
-#                 else:
-#                     v2.append('c')
-#                 v3.append('')
-#         # last vector is class, here the composer
-#         v1.append('Composer')
-#         v2.append('d')
-#         v3.append('class') # place in last position
-#         df.append(v1)
-#         df.append(v2)
-#         df.append(v3)
-# 
-#         # add data
-#         for works, composer in [(worksBach, 'Bach'), 
-#                                  (worksPalestrina, 'Palestrina')]:
-#             for w in works:
-#                 s = corpus.parse(w)
-#                 environLocal.printDebug([s, s.metadata.title, s.metadata.composer])
-#                 v = [] # final vector
-#                 for feClass in features:
-#                     fe = feClass(s)
-#                     v += fe.extract().vector
-#                 # last vector is class, here the composer
-#                 v.append(composer)
-#                 df.append(v)
-# 
-#         df.write('/_scratch/test.tab')
 
 
 if __name__ == "__main__":
