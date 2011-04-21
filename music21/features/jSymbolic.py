@@ -133,6 +133,12 @@ class FeatureExtractor(object):
 
         return self._feature    
 
+
+
+
+
+
+
 #-------------------------------------------------------------------------------
 # 112 feature extractors
 
