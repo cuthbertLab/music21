@@ -9,10 +9,13 @@
 #-------------------------------------------------------------------------------
 
 import unittest
+import os
 import music21
 
 from music21 import stream
 from music21 import common
+from music21 import corpus
+from music21 import converter
 
 from music21 import environment
 _MOD = 'features/base.py'
@@ -80,10 +83,10 @@ class FeatureExtractor(object):
     The extractor can be passed a Stream or a reference to a DataInstance. All Stream's are internally converted to a DataInstance if necessary. Usage of a DataInstance offers significant performance advantages, as common forms of the Stream are cached for easy processing. 
 
     '''
-    def __init__(self, dataOrStream, *arguments, **keywords):
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
         self._src = None # the original Stream, or None
         self.data = None # a DataInstance object: use to get data
-        self._setupDataOrStream(dataOrStream)
+        self.setData(dataOrStream)
 
         self._feature = None # Feature object that results from processing
 
@@ -93,15 +96,20 @@ class FeatureExtractor(object):
         self.dimensions = None # number of dimensions
         self.discrete = True # default
 
-    def _setupDataOrStream(self, dataOrStream):
-        if isinstance(dataOrStream, DataInstance):
-            self._src = None
-            self.data = dataOrStream
-        else:
-            # if we are passed a stream, create a DataInstrance to manage the
-            # its data; this is less efficient but is good for testing
-            self._src = dataOrStream
-            self.data = DataInstance(self._src)
+    def setData(self, dataOrStream):
+        '''Set the data that this FeatureExtractor will process. Either a Stream or a DataInstance object can be provided. 
+        '''
+        if dataOrStream is not None:
+            # if a DataInstance, do nothing
+            if isinstance(dataOrStream, DataInstance):
+                self._src = None
+                self.data = dataOrStream
+            else:
+                # if we are passed a stream, create a DataInstrance to 
+                # manage the
+                # its data; this is less efficient but is good for testing
+                self._src = dataOrStream
+                self.data = DataInstance(self._src)
 
     def getAttributeLabels(self): 
         '''Return a list of string in a form that is appropriate for data storage.
@@ -167,6 +175,7 @@ class FeatureExtractor(object):
         '''
         if source is not None:
             self._src = source
+        # preparing the feature always sets self._feature to a new instance
         self._prepareFeature()
         self._process() # will set Feature object to _feature
         # assume we always want to normalize?
@@ -190,10 +199,10 @@ class DataInstance(object):
         else:       
             self._base = None
 
-        # store the class value for this data instance
-        self._classValue = None
         # the attribute name in the data set for this label
         self._classLabel = None
+        # store the class value for this data instance
+        self._classValue = None
 
         # store a dictionary of stream forms that are made and stored
         # on demand
@@ -377,46 +386,40 @@ class OutputARFF(OutputFormat):
 
 
 #-------------------------------------------------------------------------------
+class DataSetException(music21.Music21Exception):
+    pass
+
 class DataSet(object):
     '''A set of features, as well as a collection of data to opperate on
 
     Multiple DataInstance objects, a FeatureSet, and an OutputFormat. 
 
     >>> from music21 import *
-    >>> fds = features.DataSet()
+    >>> ds = features.DataSet(classLabel='Composer')
+    >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
+    >>> ds.addFeatureExtractors(f)
+    >>> ds.addData('bwv66.6')
     '''
 
-    def __init__(self, format='tab', classLabel=None, featureExtractors=[]):
+    def __init__(self, classLabel=None, featureExtractors=[]):
         # assume a two dimensional array
         self._dataInstances = []
         # order of feature extractors is the order used in the presentaitons
         self._featureExtractors = []
         # the label of the class
         self._classLabel = classLabel
-        self._outputFormat = None
 
-        # set the _outputFormat
-        self.setOutputFormat(format)
+        # store a multidimensional storage of all features
+        self._features = [] 
+
         # set extractors
         self.addFeatureExtractors(featureExtractors)
         
-    def setOutputFormat(self, format):
-        '''Set the output format object. 
-        '''
-        if format.lower() in ['tab', 'orange', 'taborange', None]:
-            self._outputFormat = OutputTabOrange()
-        elif format.lower() in ['csv', 'comma']:
-            self._outputFormat = OutputCSV()
-        elif format.lower() in ['arff', 'attribute']:
-            self._outputFormat = OutputARFF()
-
     def addFeatureExtractors(self, values):
         '''Add one or more FeatureExtractor objects, either as a list or as an individual object. 
         '''
         # features are instantiated here
         # however, they do not have a data assignment
-
-
         if common.isListLike(values):
             # need to create instances
             for sub in values:
@@ -428,9 +431,9 @@ class DataSet(object):
         '''
         >>> from music21 import *
         >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
-        >>> ds = features.DataSet(featureExtractors=f)
+        >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getAttributeLabels()
-        ['Pitch_Class_Distribution_0', 'Pitch_Class_Distribution_1', 'Pitch_Class_Distribution_2', 'Pitch_Class_Distribution_3', 'Pitch_Class_Distribution_4', 'Pitch_Class_Distribution_5', 'Pitch_Class_Distribution_6', 'Pitch_Class_Distribution_7', 'Pitch_Class_Distribution_8', 'Pitch_Class_Distribution_9', 'Pitch_Class_Distribution_10', 'Pitch_Class_Distribution_11', 'Changes_of_Meter']
+        ['Pitch_Class_Distribution_0', 'Pitch_Class_Distribution_1', 'Pitch_Class_Distribution_2', 'Pitch_Class_Distribution_3', 'Pitch_Class_Distribution_4', 'Pitch_Class_Distribution_5', 'Pitch_Class_Distribution_6', 'Pitch_Class_Distribution_7', 'Pitch_Class_Distribution_8', 'Pitch_Class_Distribution_9', 'Pitch_Class_Distribution_10', 'Pitch_Class_Distribution_11', 'Changes_of_Meter', 'Composer']
 
         '''
         post = []
@@ -440,15 +443,57 @@ class DataSet(object):
             post.append(self._classLabel.replace(' ', '_'))
         return post
 
-    def addData(self, dataOrStream, classValue=None):
-        '''Add a Stream to this data set.
+    def addData(self, dataOrStreamOrPath, classValue=None):
+        '''Add a Stream, DataInstance, or path to a corpus or local file to this data set.
 
         The class value passed here is assumed to be the same as the classLable assigned at startup. 
         '''
-        # for now, we assume that all are streams
-        di = DataInstance(dataOrStream)
-        di.setClassLabel(self._classValue, classValue)
+        if self._classLabel is None:
+            raise DataSetException('cannot add data unless a class label for this DataSet has been set.')
+
+        if isinstance(dataOrStreamOrPath, DataInstance):
+            di = dataOrStream
+        elif common.isStr(dataOrStreamOrPath):
+            # could be corpus or file path
+            if os.path.exists(dataOrStreamOrPath):
+                s = converter.parse(dataOrStreamOrPath)
+            else: # assume corpus
+                s = corpus.parse(dataOrStreamOrPath)
+            di = DataInstance(s)
+        else:        
+            # for now, assume all else are streams
+            di = DataInstance(dataOrStream)
+
+        di.setClassLabel(self._classLabel, classValue)
         self._dataInstances.append(di)
+
+
+    def process(self):
+        '''Process all Data with all FeatureExtractors.
+        '''
+        # clear features; this stores Feature objects that result from
+        # processing
+        self._features = []
+
+        for data in self._dataInstances:
+            row = []
+            for fe in self._featureExtractors:
+                fe.setData(data)
+                row.append(fe.extract()) # get feature
+            # rows will allign with data the order of DataInstances
+            self._features.append(row)
+
+
+    def write(self, fp=None, format='tab'):
+        '''Set the output format object. 
+        '''
+        if format.lower() in ['tab', 'orange', 'taborange', None]:
+            outputFormat = OutputTabOrange()
+        elif format.lower() in ['csv', 'comma']:
+            outputFormat = OutputCSV()
+        elif format.lower() in ['arff', 'attribute']:
+            outputFormat = OutputARFF()
+
 
 
 

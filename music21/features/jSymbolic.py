@@ -215,9 +215,10 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.ChangesOfMeterFeature(s1)
     >>> fe.extract().vector
     [0]
-    >>> fe = features.jSymbolic.ChangesOfMeterFeature(s2)
+    >>> fe.setData(s2) # change the data
     >>> fe.extract().vector
     [1]
+
     '''
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -1159,7 +1160,8 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
 
-class StrengthOfSecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
+class StrengthOfSecondStrongestRhythmicPulseFeature(
+    featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
@@ -1185,7 +1187,8 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
  
-class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(featuresModule.FeatureExtractor):
+class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
+    featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
@@ -1269,7 +1272,8 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
 
-class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
+class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
+    featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''

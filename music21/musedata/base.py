@@ -429,7 +429,7 @@ class MuseDataMeasure(object):
             blStyle = 'light-heavy'
         elif dataBar == 'heavy3': 
             blStyle = 'heavy-light'
-        elif dataBar == 'heavy4': 
+        elif dataBar in ['heavy4', 'heave4']: 
             blStyle = 'heavy-heavy'
         else:
             raise MuseDataException('cannot process bar data definition: %s', dataBar)
