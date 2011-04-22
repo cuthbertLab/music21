@@ -320,25 +320,19 @@ class OutputFormatException(music21.Music21Exception):
     pass
 
 class OutputFormat(object):
-    '''Provide storage classes for data input and output
+    '''Provide output for a DataSet, passed as an initial argument.
     '''
-    def __init__(self):
+    def __init__(self, dataSet=None):
         # assume a two dimensional array
-        self._rows = []
         self._ext = None # store a fiel extension if necessare
-    
-    def append(self, row):
-        self._rows.append(row)
+        # pass a data set object
+        self._dataSet = dataSet
 
-    def getString(self):
-        # define in subclass
-        return ''
-
-    def getArray(self):
-        '''Get data in a numeric array. 
+    def getHeaderLines(self):
+        '''Get the header as a list of lines.
         '''
-        pass
-    
+        pass # define in subclass
+
     def write(self, fp=None):
         '''Write the file. If not file path is given, a temporary file will be written.
         '''
@@ -356,24 +350,52 @@ class OutputTabOrange(OutputFormat):
 
     http://orange.biolab.si/doc/reference/tabdelimited.htm
     '''
-    def __init__(self):
-        OutputFormat.__init__(self)
+    def __init__(self, dataSet=None):
+        OutputFormat.__init__(self, dataSet=dataSet)
         self._ext = '.tab'
 
-    def getString(self):
+    def getHeaderLines(self, includeClassLabel=True):
+        '''Get the header as a list of lines.
+        '''
+        post = []
+        post.append(self._dataSet.getAttributeLabels(
+            includeClassLabel=includeClassLabel))
+        row = []
+        for x in self._dataSet.getDiscreteLabels(
+            includeClassLabel=includeClassLabel):
+            if x: # if True, it is discrete
+                row.append('discrete')
+            else:
+                row.append('continuous')
+        post.append(row)
+
+        row = []
+        for x in self._dataSet.getClassPositionLabels():
+            if x: # if True, it is the class column
+                row.append('class')
+            else:
+                row.append('')
+        post.append(row)
+        return post
+
+    def getString(self, includeClassLabel=True):
         msg = []
-        for row in self._rows:
+        header = self.getHeaderLines(includeClassLabel=includeClassLabel)
+        data = header + self._dataSet.getFeaturesAsList(
+            includeClassLabel=includeClassLabel)
+        for row in data:
             sub = []
             for e in row:
                 sub.append(str(e))
             msg.append('\t'.join(sub))
         return '\n'.join(msg)
 
+
 class OutputCSV(OutputFormat):
     '''Comma-separated value list. 
     '''
-    def __init__(self):
-        OutputFormat.__init__(self)
+    def __init__(self, dataSet=None):
+        OutputFormat.__init__(self, dataSet=dataSet)
         self._ext = '.csv'
 
     def getString(self):
@@ -395,8 +417,8 @@ class OutputARFF(OutputFormat):
     >>> oa._ext
     '.arff'
     '''
-    def __init__(self):
-        OutputFormat.__init__(self)
+    def __init__(self, dataSet=None):
+        OutputFormat.__init__(self, dataSet=dataSet)
         self._ext = '.arff'
 
     def getString(self):
@@ -430,7 +452,7 @@ class DataSet(object):
     [0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375, 0.6875, 0.09375, 0.875, 0, 4, 4, 'Bach']
     >>> ds.getFeaturesAsList()[1]
     [0.12, 0.0, 1.0, 0.12, 0.560..., 0.0, 0.599999..., 0.52000..., 0.0, 0.680000..., 0.0, 0.5600000..., 0, 4, 4, 'Bach']
-
+    >>> ds = ds.getString()
     '''
 
     def __init__(self, classLabel=None, featureExtractors=[]):
@@ -466,14 +488,51 @@ class DataSet(object):
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getAttributeLabels()
         ['Pitch_Class_Distribution_0', 'Pitch_Class_Distribution_1', 'Pitch_Class_Distribution_2', 'Pitch_Class_Distribution_3', 'Pitch_Class_Distribution_4', 'Pitch_Class_Distribution_5', 'Pitch_Class_Distribution_6', 'Pitch_Class_Distribution_7', 'Pitch_Class_Distribution_8', 'Pitch_Class_Distribution_9', 'Pitch_Class_Distribution_10', 'Pitch_Class_Distribution_11', 'Changes_of_Meter', 'Composer']
-
         '''
         post = []
         for fe in self._featureExtractors:
             post += fe.getAttributeLabels()
-        if self._classLabel is not None:
+        if self._classLabel is not None and includeClassLabel:
             post.append(self._classLabel.replace(' ', '_'))
         return post
+
+    def getDiscreteLabels(self, includeClassLabel=True):
+        '''Return column labels for discrete status.
+
+        >>> from music21 import *
+        >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
+        >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
+        >>> ds.getDiscreteLabels()
+        [False, False, False, False, False, False, False, False, False, False, False, False, True, True]
+        '''
+        post = []
+        for fe in self._featureExtractors:
+            # need as many statements of discrete as there are dimensions
+            post += [fe.discrete] * fe.dimensions 
+        # class label is assumed always discrete
+        if self._classLabel is not None and includeClassLabel:
+            post.append(True)
+        return post
+
+
+    def getClassPositionLabels(self):
+        '''Return column labels for the presence of a class definition
+
+        >>> from music21 import *
+        >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
+        >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
+        >>> ds.getClassPositionLabels()
+        [False, False, False, False, False, False, False, False, False, False, False, False, False, True]
+        '''
+        post = []
+        for fe in self._featureExtractors:
+            # need as many statements of discrete as there are dimensions
+            post += [False] * fe.dimensions 
+        # class label is assumed always discrete
+        if self._classLabel is not None:
+            post.append(True)
+        return post
+
 
     def addData(self, dataOrStreamOrPath, classValue=None):
         '''Add a Stream, DataInstance, or path to a corpus or local file to this data set.
@@ -517,7 +576,7 @@ class DataSet(object):
 
 
     def getFeaturesAsList(self, includeClassLabel=True):
-        '''Get processed data as a list of lists.
+        '''Get processed data as a list of lists, merging any sub-lists in multi-dimensional features. 
         '''
         post = []
         for i, row in enumerate(self._features):
@@ -529,18 +588,29 @@ class DataSet(object):
             post.append(v)
         return post
 
+    def getString(self, format='tab'):
+        '''Get a string representation of the data set in a specific format.
+        '''
+        # pass reference to self to output
+        if format.lower() in ['tab', 'orange', 'taborange', None]:
+            outputFormat = OutputTabOrange(dataSet=self)
+        elif format.lower() in ['csv', 'comma']:
+            outputFormat = OutputCSV(dataSet=self)
+        elif format.lower() in ['arff', 'attribute']:
+            outputFormat = OutputARFF(dataSet=self)
+        return outputFormat.getString()
+
 
     def write(self, fp=None, format='tab'):
         '''Set the output format object. 
         '''
+        # pass reference to self to output
         if format.lower() in ['tab', 'orange', 'taborange', None]:
-            outputFormat = OutputTabOrange()
+            outputFormat = OutputTabOrange(dataSet=self)
         elif format.lower() in ['csv', 'comma']:
-            outputFormat = OutputCSV()
+            outputFormat = OutputCSV(dataSet=self)
         elif format.lower() in ['arff', 'attribute']:
-            outputFormat = OutputARFF()
-
-
+            outputFormat = OutputARFF(dataSet=self)
 
 
 
