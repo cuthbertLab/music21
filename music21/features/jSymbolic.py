@@ -178,6 +178,7 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 128
         self.discrete = False
+        self.normalize = True
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
@@ -201,6 +202,8 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 161
         self.discrete = False
+        self.normalize = True
+
   
 class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that sets the feature to 1 if the time signature is changed one or more times during the recording.
@@ -227,6 +230,7 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
         self.description = 'Set to 1 if the time signature is changed one or more times during the recording'
         self.isSequential = True
         self.dimensions = 1
+        self.normalize = False
 
     def _process(self):
         elements = self.data['flat.getElementsByClass.TimeSignature']
@@ -371,6 +375,7 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 12
         self.discrete = False
+        self.normalize = True
 
         # create pc to index mapping
         self._mapping = {}
@@ -497,9 +502,19 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 2
 
+    def _process(self):
+        elements = self.data['flat.getElementsByClass.TimeSignature']
+        if len(elements) < 1:
+            return # vector already zero
+        ts = elements[0]
+        environLocal.printDebug(['found ts', ts])
+        self._feature.vector[0] = elements[0].numerator
+        self._feature.vector[1] = elements[0].denominator
+ 
 
  
-class IntervalBetweenStrongestPitchClassesFeature(featuresModule.FeatureExtractor):
+class IntervalBetweenStrongestPitchClassesFeature(
+    featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
@@ -874,6 +889,7 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 12
         self.discrete = False
+        self.normalize = True
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
@@ -1656,6 +1672,8 @@ class WoodwindsFractionFeature(featuresModule.FeatureExtractor):
 # list all complete features
 features = [
 PitchClassDistributionFeature, FifthsPitchHistogramFeature, BasicPitchHistogramFeature, ChangesOfMeterFeature,
+InitialTimeSignatureFeature,
+
 ]
 
 

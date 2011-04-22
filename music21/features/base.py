@@ -95,6 +95,7 @@ class FeatureExtractor(object):
         self.isSequential = None # True or False
         self.dimensions = None # number of dimensions
         self.discrete = True # default
+        self.normalize = False # default is no
 
     def setData(self, dataOrStream):
         '''Set the data that this FeatureExtractor will process. Either a Stream or a DataInstance object can be provided. 
@@ -179,7 +180,8 @@ class FeatureExtractor(object):
         self._prepareFeature()
         self._process() # will set Feature object to _feature
         # assume we always want to normalize?
-        self._feature.normalize()
+        if self.normalize:
+            self._feature.normalize()
         return self._feature    
 
 
@@ -226,9 +228,14 @@ class DataInstance(object):
         self._classLabel = classLabel
         self._classValue = classValue
 
+    def getClassValue(self):    
+        if self._classValue is None:
+            return ''
+        else:
+            return self._classValue
 
     def _getForm(self, form='flat'):
-        '''Get a form of this stream, using a cached version if available.
+        '''Get a form of this Stream, using a cached version if available.
 
         >>> from music21 import *
         >>> s = corpus.parse('bwv66.6')
@@ -396,9 +403,16 @@ class DataSet(object):
 
     >>> from music21 import *
     >>> ds = features.DataSet(classLabel='Composer')
-    >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
+    >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature, features.jSymbolic.InitialTimeSignatureFeature]
     >>> ds.addFeatureExtractors(f)
-    >>> ds.addData('bwv66.6')
+    >>> ds.addData('bwv66.6', classValue='Bach')
+    >>> ds.addData('bach/bwv324.xml', classValue='Bach')
+    >>> ds.process()
+    >>> ds.getFeaturesAsList()[0]
+    [0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375, 0.6875, 0.09375, 0.875, 0, 4, 4, 'Bach']
+    >>> ds.getFeaturesAsList()[1]
+    [0.12, 0.0, 1.0, 0.12, 0.560..., 0.0, 0.599999..., 0.52000..., 0.0, 0.680000..., 0.0, 0.5600000..., 0, 4, 4, 'Bach']
+
     '''
 
     def __init__(self, classLabel=None, featureExtractors=[]):
@@ -479,9 +493,23 @@ class DataSet(object):
             row = []
             for fe in self._featureExtractors:
                 fe.setData(data)
-                row.append(fe.extract()) # get feature
+                row.append(fe.extract()) # get feature and store
             # rows will allign with data the order of DataInstances
             self._features.append(row)
+
+
+    def getFeaturesAsList(self, includeClassLabel=True):
+        '''Get processed data as a list of lists.
+        '''
+        post = []
+        for i, row in enumerate(self._features):
+            v = []
+            di = self._dataInstances[i]
+            for f in row:
+                v += f.vector
+            v.append(di.getClassValue())
+            post.append(v)
+        return post
 
 
     def write(self, fp=None, format='tab'):
@@ -517,50 +545,9 @@ class Test(unittest.TestCase):
         worksBach = [
             'bwv3.6.xml', 'bwv5.7.xml', 'bwv32.6.xml',
             ]
-        # monteverdi
-        worksPalestrina = [
+        worksMonteverdi = [
             'madrigal.3.1.xml', 'madrigal.3.2.xml', 'madrigal.3.9.xml',
             ]
-
-#        df = DataFile()
-
-        # create header:
-#         v1 = [] # lable
-#         v2 = [] # data type
-#         v3 = [] # optional flags
-#         s = stream.Stream()
-#         for feClass in features:
-#             fe = feClass(s)
-#             for i in range(fe.dimensions):
-#                 v1.append('%s %s' % (fe.name, i))
-#                 if fe.discrete:
-#                     v2.append('d')
-#                 else:
-#                     v2.append('c')
-#                 v3.append('')
-#         # last vector is class, here the composer
-#         v1.append('Composer')
-#         v2.append('d')
-#         v3.append('class') # place in last position
-#         df.append(v1)
-#         df.append(v2)
-#         df.append(v3)
-# 
-#         # add data
-#         for works, composer in [(worksBach, 'Bach'), 
-#                                  (worksPalestrina, 'Palestrina')]:
-#             for w in works:
-#                 s = corpus.parse(w)
-#                 environLocal.printDebug([s, s.metadata.title, s.metadata.composer])
-#                 v = [] # final vector
-#                 for feClass in features:
-#                     fe = feClass(s)
-#                     v += fe.extract().vector
-#                 # last vector is class, here the composer
-#                 v.append(composer)
-#                 df.append(v)
-# 
-#         df.write('/_scratch/test.tab')
 
 
 if __name__ == "__main__":
