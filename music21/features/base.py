@@ -259,6 +259,7 @@ class DataInstance(object):
         if form in self._forms.keys():
             return self._forms[form]
 
+        # else, process, store, and return
         elif form in ['flat']:
             self._forms['flat'] = self._base.flat
             return self._forms['flat']
@@ -289,6 +290,23 @@ class DataInstance(object):
         elif form in ['flat.getElementsByClass.TimeSignature']:
             self._forms['flat.getElementsByClass.TimeSignature'] = self._base.flat.getElementsByClass('TimeSignature')
             return self._forms['flat.getElementsByClass.TimeSignature']
+
+        # data lists / histograms
+
+        elif form in ['pitchClassHistogram']:
+            histo = [0] * 12
+            for p in self._getForm('flat.pitches'): # recursive call
+                histo[p.pitchClass] += 1
+            self._forms['pitchClassHistogram'] = histo
+            return self._forms['pitchClassHistogram']
+
+        elif form in ['midiPitchHistogram']:
+            histo = [0] * 128
+            for p in self._getForm('flat.pitches'): # recursive call
+                histo[p.midi] += 1
+            self._forms['midiPitchHistogram'] = histo
+            return self._forms['midiPitchHistogram']
+
         else:
             raise AttributeError('no such attribute: %s' % form)
 
