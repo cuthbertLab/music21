@@ -183,9 +183,15 @@ class MuseDataRecord(object):
         <accidental sharp>
         >>> mdr._getAccidentalObject().displayStatus == True
         True
+        >>> mdr = music21.musedata.MuseDataRecord('F#4    1        s ')
+        >>> mdr._getAccidentalObject() == None
+        True
         '''
         # this is not called by stage 1 
         from music21 import pitch
+        if len(self.src) <= 18:
+            return None
+
         data = self.src[18]
         acc = None
         if data == '#':
@@ -921,7 +927,7 @@ class MuseDataPart(object):
             n, d = int(n), int(d)
         # usage of 1/1 is common and seems to need replacement to 4/4, or 
         # common time
-        if n == 1 and d == 1:
+        if (n == 1 and d == 1) or d == 0:
             return '4/4'
         else:
             return '%s/%s' % (n, d)

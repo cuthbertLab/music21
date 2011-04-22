@@ -178,7 +178,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             elif t.data == "Bb":
                 keySigCurrent = key.KeySignature(-1)
             else:
-                raise TranslateRomanTextException("still need to write a generic RomanText KeySignature routine.  this is just temporary")
+                pass 
+                # better to print a message
+                environLocal.printDebug(['still need to write a generic RomanText KeySignature routine.  this is just temporary'])
+                #raise TranslateRomanTextException("still need to write a generic RomanText KeySignature routine.  this is just temporary")
             keySigSet = False
             environLocal.printDebug(['keySigCurrent:', keySigCurrent])
             foundAKeySignatureSoFar = True
@@ -237,7 +240,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 if not tsSet:
                     m.timeSignature = tsCurrent
                     tsSet = True # only set when changed
-                if not keySigSet:
+                if not keySigSet and keySigCurrent is not None:
                     m.insert(0, keySigCurrent)
                     keySigSet = True # only set when changed
     
