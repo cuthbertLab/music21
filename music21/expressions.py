@@ -53,16 +53,25 @@ def realizeOrnaments(srcObject):
     else:
         preExpandList = []
         postExpandList = []
-        for thisExpression in srcObject.expressions:
-            if not hasattr(thisExpression, 'realize'):
-                continue
-            preExpand, srcObject, postExpand = thisExpression.realize(srcObject)
-            for i in preExpand:
-                preExpandList.append(i)
-            for i in postExpand:
-                postExpandList.append(i)
-            if srcObject is None: # some ornaments eat up the entire source object. Trills for instance
-                break
+        while 1 == 1:
+            thisExpression = srcObject.expressions[0]
+            if hasattr(thisExpression, 'realize'):
+                preExpand, newSrcObject, postExpand = thisExpression.realize(srcObject)
+                for i in preExpand:
+                    preExpandList.append(i)
+                for i in postExpand:
+                    postExpandList.append(i)
+                if newSrcObject is None: # some ornaments eat up the entire source object. Trills for instance
+                    break
+                newSrcObject.expressions = srcObject.expressions[1:]            
+                srcObject = newSrcObject
+                if len(srcObject.expressions) == 0:
+                    break
+            else: # cannot realize this object
+                srcObject.expressions = srcObject.expressions[1:]
+                if len(srcObject.expressions) == 0:
+                    break
+                        
         retList = []
         for i in preExpandList:
             retList.append(i)
@@ -208,7 +217,10 @@ class TextExpression(Expression, text.TextFormat):
     # return the appropriate object
 
     def getRepeatExpression(self):
-        '''If this TextExpression can be a RepeatExpression, return a new :class:`~music21.repeat.RepeatExpression`. object, otherwise, return None.
+        '''If this TextExpression can be a RepeatExpression,
+        return a new :class:`~music21.repeat.RepeatExpression`. 
+        object, otherwise, return None.
+        
         '''
         # use objects stored in
         # repeat.repeatExpressionReferences for comparison to stored
@@ -251,7 +263,7 @@ class GeneralMordent(Ornament):
     def __init__(self):
         Ornament.__init__(self)
 
-        self.size = music21.interval.GenericInterval(2)
+        self.size = music21.interval.Interval(2)
 
     def realize(self, srcObject):
         '''
@@ -263,7 +275,21 @@ class GeneralMordent(Ornament):
         The third is an empty list (since there are no notes at the end of a mordent)
 
 
-        TODO: write more docs...
+        >>> from music21 import *
+        >>> n1 = note.Note("C4")
+        >>> n1.quarterLength = 0.5
+        >>> m1 = expressions.Mordent()
+        >>> m1.realize(n1)
+        ([<music21.note.Note C>, <music21.note.Note B>], <music21.note.Note C>, [])
+        
+        >>> from music21 import *
+        >>> n2 = note.Note("C4")
+        >>> n2.quarterLength = 0.125
+        >>> m2 = expressions.GeneralMordent()
+        >>> m2.realize(n2)
+        Traceback (most recent call last):
+            ...
+        ExpressionException: Cannot realize a mordent if I do not know its direction
 
         '''
         if self.direction != 'up' and self.direction != 'down':
@@ -272,12 +298,16 @@ class GeneralMordent(Ornament):
             raise ExpressionException("Cannot realize a mordent if there is no size given")
         if srcObject.duration == None or srcObject.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
+        if srcObject.duration < self.quarterLength*2:
+            raise ExpressionException("The note is not long enough to realize a mordent")
 
-        remainderDuration = srcObject.duration.quarterLength - 2 * self.quarterLength
+        remainderDuration = srcObject.duration.quarterLength - (2 * self.quarterLength)
         if self.direction == "down":
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
+            
+        mordNotes = []
         
         firstNote = copy.deepcopy(srcObject)
         #firstNote.expressions = None
@@ -287,10 +317,22 @@ class GeneralMordent(Ornament):
         secondNote.duration.quarterLength = self.quarterLength
         #secondNote.expressions = None
         secondNote.transpose(transposeInterval, inPlace = True)
+        
+        mordNotes.append(firstNote)
+        mordNotes.append(secondNote)
+        
+        currentKeySig = srcObject.getContextByClass(music21.key.KeySignature)
+        if currentKeySig is None:
+            currentKeySig = music21.key.KeySignature(0)
+
+        for n in mordNotes:            
+            n.accidental = currentKeySig.accidentalByStep(n.step)
+            
+            
         remainderNote = copy.deepcopy(srcObject)
         remainderNote.duration.quarterLength = remainderDuration
         #TODO clear just mordent here...
-        return ([firstNote, secondNote], remainderNote, [])
+        return (mordNotes, remainderNote, [])
 
 class Mordent(GeneralMordent):
     direction = "down"
@@ -330,35 +372,54 @@ class Trill(Ornament):
 
     def __init__(self):
         Ornament.__init__(self)
-        self.size = music21.interval.GenericInterval(2)
+        self.size = music21.interval.Interval("M2")
 
-    def realize(self):
+    def realize(self, srcObject):
         '''
         realize a trill.
         
         returns a three-element tuple.
         The first is a list of the notes that the note was converted to.
-        The second is a note of duration 0 because the trill "eats up" the whole note.
+        The second is None because the trill "eats up" the whole note.
         The third is a list of the notes at the end if nachschlag is True, and empty list if False.
         
-        TODO: write more docs
+        >>> from music21 import *
+        >>> n1 = note.Note("C4")
+        >>> n1.quarterLength = 0.5
+        >>> t1 = expressions.Trill()
+        >>> t1.realize(n1)
+        ([<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note C>, <music21.note.Note D>], None, [])
+        
+        >>> from music21 import *
+        >>> n2 = note.Note("C4")
+        >>> n2.quarterLength = 0.125
+        >>> t2 = expressions.Trill()
+        >>> t2.realize(n2)
+        Traceback (most recent call last):
+            ...
+        ExpressionException: The note is not long enough to realize a trill
+        
         '''
+        import music21.key
         if self.size == "":
             raise ExpressionException("Cannot realize a trill if there is no size given")
         if srcObject.duration == None or srcObject.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
+        if srcObject.duration.quarterLength < 2*self.quarterLength:
+            raise ExpressionException("The note is not long enough to realize a trill")
+        if srcObject.duration.quarterLength < 4*self.quarterLength and self.nachschlag:
+            raise ExpressionException("The note is not long enough for a nachschlag")
         
-        remainderDuration = 0
         transposeInterval = self.size
         transposeIntervalReverse = self.size.reverse()
         
-        if nachschlag:
-            numberOfTrillNotes = srcObject.duration.quarterLength / self.quarterLength - 2
+        if self.nachschlag:
+            numberOfTrillNotes = int(srcObject.duration.quarterLength / (self.quarterLength - 2))
         else:
-            numberOfTrillNotes = srcObject.duration.quarterLength / self.quarterLength
+            numberOfTrillNotes = int(srcObject.duration.quarterLength / self.quarterLength)
             
         trillNotes = []
-        for i in range(numberOfTrillNotes):
+        for i in range(numberOfTrillNotes / 2):
             firstNote = copy.deepcopy(srcObject)
             #TODO: remove expressions
             firstNote.duration.quarterLength = self.quarterLength
@@ -371,28 +432,32 @@ class Trill(Ornament):
             trillNotes.append(firstNote)
             trillNotes.append(secondNote)
 
+        currentKeySig = srcObject.getContextByClass(music21.key.KeySignature)
+        if currentKeySig is None:
+            currentKeySig = music21.key.KeySignature(0)
+
         for n in trillNotes:
-            n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
-            
-        remainderNote = copy.deepcopy(srcObject)
-        remainderNote.duration.quarterLength = remainderDuration
+            n.accidental = currentKeySig.accidentalByStep(n.step)
+
         
-        if nachschlag:
+        if self.nachschlag:
             firstNoteNachschlag = copy.deepcopy(srcObject)
             #TODO: remove expressions
             firstNoteNachschlag.duration.quarterLength = self.quarterLength
+            firstNoteNachschlag.accidental = currentKeySig.accidentalByStep(firstNoteNachschlag.step)
             
             secondNoteNachschlag = copy.deepcopy(srcObject)
             #TODO: remove expressions
             secondNoteNachschlag.duration.quarterLength = self.quarterLength
             secondNoteNachschlag.transpose(transposeIntervalReverse, inPlace = True)
+            secondNoteNachschlag.accidental = currentKeySig.accidentalByStep(secondNoteNachschlag.step)
             
             nachschlag = [firstNoteNachschlag, secondNoteNachschlag]
             
-            return (trillNotes, remainderNote, nachschlag)
+            return (trillNotes, None, nachschlag)
         
         else:
-            return (trillNotes, remainderNote, [])
+            return (trillNotes, None, [])
 
     def _getMX(self):
         '''
@@ -442,9 +507,9 @@ class Turn(Ornament):
 
     def __init__(self):
         Ornament.__init__(self)
-        self.size = music21.interval.GenericInterval(2)
+        self.size = music21.interval.Interval("M2")
 
-    def realize(self):
+    def realize(self, srcObject):
         '''
         realize a turn.
         
@@ -453,16 +518,35 @@ class Turn(Ornament):
         The second is a note of duration 0 because the turn "eats up" the whole note.
         The third is a list of the notes at the end if nachschlag is True, and empty list if False.
         
-        TODO: write more docs
+        >>> from music21 import *
+        >>> n1 = note.Note("C4")
+        >>> n1.quarterLength = 1
+        >>> t1 = expressions.Turn()
+        >>> t1.realize(n1)
+        ([], <music21.note.Note C>, [<music21.note.Note D>, <music21.note.Note C>, <music21.note.Note B>, <music21.note.Note C>])
+        
+        >>> from music21 import *
+        >>> n2 = note.Note("C4")
+        >>> n2.quarterLength = 0.125
+        >>> t2 = expressions.Turn()
+        >>> t2.realize(n2)
+        Traceback (most recent call last):
+            ...
+        ExpressionException: The note is not long enough to realize a turn
         '''
-        if self.size == "":
+        import music21.key
+
+        if self.size is None:
             raise ExpressionException("Cannot realize a turn if there is no size given")
         if srcObject.duration == None or srcObject.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
+        if srcObject.duration.quarterLength < 4*self.quarterLength:
+            raise ExpressionException("The note is not long enough to realize a turn")
         
-        remainderDuration = 0
+        remainderDuration = srcObject.duration.quarterLength - 4 * self.quarterLength
         transposeIntervalUp = self.size
         transposeIntervalDown = self.size.reverse()
+        turnNotes = []
         
         #TODO: if nachshlag...
         
@@ -490,19 +574,24 @@ class Turn(Ornament):
         turnNotes.append(thirdNote)
         turnNotes.append(fourthNote)
 
+        currentKeySig = srcObject.getContextByClass(music21.key.KeySignature)
+        if currentKeySig is None:
+            currentKeySig = music21.key.KeySignature(0)
+
+       
         for n in turnNotes:
-            n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
+            n.accidental = currentKeySig.accidentalByStep(n.step)
             
         remainderNote = copy.deepcopy(srcObject)
         remainderNote.duration.quarterLength = remainderDuration
         
         
-        return (turnNotes, remainderNote, [])
+        return ([], remainderNote, turnNotes)
 
 class InvertedTurn(Turn):
     def __init__(self):
         Turn.__init__(self)
-        self.size = (music21.interval.GenericInterval(2)).reverse()
+        self.size = self.size.reverse()
 
 
 
@@ -626,6 +715,24 @@ class Test(unittest.TestCase):
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
 
+    def testExpandTurns(self):
+        from music21 import note, stream, clef, key, meter
+        p1 = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        p1.append(clef.TrebleClef())
+        p1.append(key.Key('C', 'major'))
+        p1.append(meter.TimeSignature('2/4'))
+        n1 = note.HalfNote("C5")
+        n1.expressions.append(Turn())
+        n2 = note.HalfNote("B4")
+        n2.expressions.append(InvertedTurn())
+        m1.append(n1)
+        m2.append(key.KeySignature(5))
+        m2.append(n2)
+        p1.append(m1)
+        p1.append(m2)
+        #print realizeOrnaments(n2)
 
 
 if __name__ == "__main__":
