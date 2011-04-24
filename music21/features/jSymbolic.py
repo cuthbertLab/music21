@@ -192,7 +192,7 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
 
  
 class DurationFeature(featuresModule.FeatureExtractor):
-    '''A feature exractor that extracts the duration in seconds.
+    '''A feature extractor that extracts the duration in seconds.
 
     >>> from music21 import *
     '''

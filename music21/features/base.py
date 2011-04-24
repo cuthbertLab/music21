@@ -191,7 +191,10 @@ class FeatureExtractor(object):
 
 #-------------------------------------------------------------------------------
 class DataInstance(object):
-    '''A data instance for analysis. This object prepares a Stream and stores multiple common-used stream representations once, providing rapid processing. 
+    '''
+    A data instance for analysis. This object prepares a Stream 
+    (by stripping ties, etc.) and stores 
+    multiple commonly-used stream representations once, providing rapid processing. 
     '''
     def __init__(self, streamObj=None):
         self._src = streamObj

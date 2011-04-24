@@ -6715,24 +6715,61 @@ class Stream(music21.Music21Object):
         between Notes (and by default, Chords) that follow each other in a stream.
         the offset of the Interval is the offset of the beginning of the interval 
         (if two notes are adjacent, then this offset is equal to the offset of 
-        the second note)
+        the second note, but if skipRests is set to True or there is a gap
+        in the Stream, then these two numbers
+        will be different).
         
-        See Stream.findConsecutiveNotes for a discussion of what consecutive notes 
-        mean, and which keywords are allowed.
+        
+        See :meth:`~music21.stream.Stream.findConsecutiveNotes` in this class for 
+        a discussion of what is meant by default for "consecutive notes", and 
+        which keywords such as skipChords, skipRests, skipUnisons, etc. can be
+        used to change that behavior.
+        
         
         The interval between a Note and a Chord (or between two chords) is the 
-        interval between pitches[0]. For more complex interval calculations, 
-        run findConsecutiveNotes and then use notesToInterval.
-                
-        Returns None of there are not at least two elements found by 
+        interval to the first pitch of the Chord (pitches[0]) which is usually the lowest. 
+        For more complex interval calculations, 
+        run :meth:`~music21.stream.Stream.findConsecutiveNotes` and then calculate
+        your own intervals directly.
+        
+
+        Returns an empty Stream if there are not at least two elements found by 
         findConsecutiveNotes.
 
-        See Test.testMelodicIntervals() for usage details.
 
+        >>> from music21 import *  
+        >>> s1 = tinyNotation.TinyNotationStream("c4 d' r b b'", "3/4")
+        >>> #_DOCS_HIDE s1.show()    
+
+        
+        
+        .. image:: images/streamMelodicIntervals1.*
+            :width: 246
+
+
+
+        >>> intervalStream1 = s1.melodicIntervals()
+        >>> intervalStream1.show('text')
+        {1.0} <music21.interval.Interval M9>
+        {4.0} <music21.interval.Interval P8>
+        
+        
+        Using the skip attributes from :meth:`~music21.stream.Stream.findConsecutiveNotes`, 
+        we can alter which intervals are reported:
+        
+        
+        >>> intervalStream2 = s1.melodicIntervals(skipRests = True, skipOctaves=True)
+        >>> intervalStream2.show('text')
+        {1.0} <music21.interval.Interval M9>
+        {2.0} <music21.interval.Interval m-3>
+        
+        >>> m3 = intervalStream2[1]
+        >>> m3.directedNiceName
+        'Descending Minor Third'
         '''
         returnList = self.findConsecutiveNotes(**skipKeywords)
         if len(returnList) < 2:
-            return None
+            return self.__class__()
         
         returnStream = self.__class__()
         for i in range(len(returnList) - 1):
@@ -9839,12 +9876,13 @@ class Test(unittest.TestCase):
 
     def testMelodicIntervals(self):
         c4 = note.Note("C4")
-        c4.offset = 10
         d5 = note.Note("D5")
-        d5.offset = 11
-        s1 = Stream([c4, d5])
+        r1 = note.Rest()
+        b4 = note.Note("B4")
+        s1 = Stream()
+        s1.append([c4, d5, r1, b4])
         intS1 = s1.melodicIntervals()
-        self.assertTrue(len(intS1) == 1)
+        self.assertTrue(len(intS1) == 2)
         M9 = intS1[0]
         self.assertEqual(M9.niceName, "Major Ninth") 
         ## TODO: Many more tests
@@ -14053,7 +14091,7 @@ _DOC_ORDER = [Stream, Measure]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
-    music21.mainTest(Test)
+    music21.mainTest()
 
 
 #------------------------------------------------------------------------------
