@@ -101,16 +101,18 @@ class FeatureExtractor(object):
         '''Set the data that this FeatureExtractor will process. Either a Stream or a DataInstance object can be provided. 
         '''
         if dataOrStream is not None:
-            # if a DataInstance, do nothing
-            if isinstance(dataOrStream, DataInstance):
-                self._src = None
-                self.data = dataOrStream
-            else:
+            if (hasattr(dataOrStream, 'classes') and 'Stream' in         
+                dataOrStream.classes):
+                environLocal.printDebug(['creating new DataInstance: this should be a Stream:', dataOrStream])
                 # if we are passed a stream, create a DataInstrance to 
                 # manage the
                 # its data; this is less efficient but is good for testing
                 self._src = dataOrStream
                 self.data = DataInstance(self._src)
+            # if a DataInstance, do nothing
+            else:
+                self._src = None
+                self.data = dataOrStream
 
     def getAttributeLabels(self): 
         '''Return a list of string in a form that is appropriate for data storage.
@@ -337,13 +339,14 @@ class OutputFormat(object):
         '''Write the file. If not file path is given, a temporary file will be written.
         '''
         if fp is None:
-            fp = environment.getTempFile(suffix=self._ext)
+            fp = environLocal.getTempFile(suffix=self._ext)
         if not fp.endswith(self._ext):
             raise
         f = open(fp, 'w')
         f.write(self.getString())
         f.close()
         return fp
+
 
 class OutputTabOrange(OutputFormat):
     '''Tab delimited file format used with Orange.
@@ -360,6 +363,7 @@ class OutputTabOrange(OutputFormat):
         post = []
         post.append(self._dataSet.getAttributeLabels(
             includeClassLabel=includeClassLabel))
+        # second meta data
         row = []
         for x in self._dataSet.getDiscreteLabels(
             includeClassLabel=includeClassLabel):
@@ -369,6 +373,7 @@ class OutputTabOrange(OutputFormat):
                 row.append('continuous')
         post.append(row)
 
+        # third row metadata
         row = []
         for x in self._dataSet.getClassPositionLabels():
             if x: # if True, it is the class column
@@ -379,6 +384,8 @@ class OutputTabOrange(OutputFormat):
         return post
 
     def getString(self, includeClassLabel=True):
+        '''Get the complete DataSet as a string with the appropriate header.s
+        '''
         msg = []
         header = self.getHeaderLines(includeClassLabel=includeClassLabel)
         data = header + self._dataSet.getFeaturesAsList(
@@ -391,6 +398,7 @@ class OutputTabOrange(OutputFormat):
         return '\n'.join(msg)
 
 
+
 class OutputCSV(OutputFormat):
     '''Comma-separated value list. 
     '''
@@ -398,14 +406,27 @@ class OutputCSV(OutputFormat):
         OutputFormat.__init__(self, dataSet=dataSet)
         self._ext = '.csv'
 
-    def getString(self):
+    def getHeaderLines(self, includeClassLabel=True):
+        '''Get the header as a list of lines.
+        '''
+        post = []
+        post.append(self._dataSet.getAttributeLabels(
+            includeClassLabel=includeClassLabel))
+        return post
+
+    def getString(self, includeClassLabel=True):
         msg = []
-        for row in self._rows:
+        header = self.getHeaderLines(includeClassLabel=includeClassLabel)
+        data = header + self._dataSet.getFeaturesAsList(
+            includeClassLabel=includeClassLabel)
+        for row in data:
             sub = []
             for e in row:
                 sub.append(str(e))
             msg.append(','.join(sub))
         return '\n'.join(msg)
+
+
 
 class OutputARFF(OutputFormat):
     '''An ARFF (Attribute-Relation File Format) file.
@@ -421,9 +442,47 @@ class OutputARFF(OutputFormat):
         OutputFormat.__init__(self, dataSet=dataSet)
         self._ext = '.arff'
 
-    def getString(self):
+    def getHeaderLines(self, includeClassLabel=True):
+        '''Get the header as a list of lines.
+        '''
+        post = []
+        attrs = self._dataSet.getAttributeLabels(
+                includeClassLabel=includeClassLabel)
+
+        discreteLabels = self._dataSet.getDiscreteLabels(
+                includeClassLabel=includeClassLabel)
+
+        classLabels = self._dataSet.getClassPositionLabels()
+
+        post.append('@RELATION %s' % self._dataSet.getClassLabel())
+
+        for i, attrLabel in enumerate(attrs):
+            discrete = discreteLabels[i] 
+            classLabel = classLabels[i]
+            if not classLabel: # a normal attribute
+                # for now, doing these all as numeric
+                if discrete:
+                    post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
+                else:
+                    post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
+            else:
+                values = self._dataSet.getUniqueClassValues()
+                post.append('@ATTRIBUTE class {%s}' % ','.join(values))
+        # include start of data declaration
+        post.append('@DATA')
+        return post
+
+    def getString(self, includeClassLabel=True):
         msg = []
-        for row in self._rows:
+
+        header = self.getHeaderLines(includeClassLabel=includeClassLabel)
+        for row in header:
+            msg.append(row)
+
+        data = self._dataSet.getFeaturesAsList(
+                includeClassLabel=includeClassLabel)
+        # data is separated by commas
+        for row in data:
             sub = []
             for e in row:
                 sub.append(str(e))
@@ -462,24 +521,26 @@ class DataSet(object):
         self._featureExtractors = []
         # the label of the class
         self._classLabel = classLabel
-
         # store a multidimensional storage of all features
         self._features = [] 
-
         # set extractors
         self.addFeatureExtractors(featureExtractors)
         
+
+    def getClassLabel(self):
+        return self._classLabel
+
     def addFeatureExtractors(self, values):
         '''Add one or more FeatureExtractor objects, either as a list or as an individual object. 
         '''
+        from music21.features import jSymbolic
         # features are instantiated here
         # however, they do not have a data assignment
-        if common.isListLike(values):
-            # need to create instances
-            for sub in values:
-                self._featureExtractors.append(sub())
-        else:
-            self._featureExtractors.append(values())
+        if not common.isListLike(values):
+            values = [values]
+        # need to create instances
+        for sub in values:
+            self._featureExtractors.append(sub())
 
     def getAttributeLabels(self, includeClassLabel=True):
         '''
@@ -560,12 +621,10 @@ class DataSet(object):
 
 
     def process(self):
-        '''Process all Data with all FeatureExtractors.
+        '''Process all Data with all FeatureExtractors. Processed data is stored internally as numerous Feature objects. 
         '''
-        # clear features; this stores Feature objects that result from
-        # processing
+        # clear features
         self._features = []
-
         for data in self._dataInstances:
             row = []
             for fe in self._featureExtractors:
@@ -584,35 +643,44 @@ class DataSet(object):
             di = self._dataInstances[i]
             for f in row:
                 v += f.vector
-            v.append(di.getClassValue())
+            if includeClassLabel:
+                v.append(di.getClassValue())
             post.append(v)
         return post
 
-    def getString(self, format='tab'):
-        '''Get a string representation of the data set in a specific format.
+    def getUniqueClassValues(self):
+        '''Return a list of unique class values.
         '''
-        # pass reference to self to output
+        post = []
+        for di in self._dataInstances:
+            v = di.getClassValue()
+            if v not in post:
+                post.append(v)
+        return post
+
+    def _getOutputFormat(self, format):
         if format.lower() in ['tab', 'orange', 'taborange', None]:
             outputFormat = OutputTabOrange(dataSet=self)
         elif format.lower() in ['csv', 'comma']:
             outputFormat = OutputCSV(dataSet=self)
         elif format.lower() in ['arff', 'attribute']:
             outputFormat = OutputARFF(dataSet=self)
+        return outputFormat
+
+    def getString(self, format='tab'):
+        '''Get a string representation of the data set in a specific format.
+        '''
+        # pass reference to self to output
+        outputFormat = self._getOutputFormat(format)
         return outputFormat.getString()
 
 
     def write(self, fp=None, format='tab'):
         '''Set the output format object. 
         '''
-        # pass reference to self to output
-        if format.lower() in ['tab', 'orange', 'taborange', None]:
-            outputFormat = OutputTabOrange(dataSet=self)
-        elif format.lower() in ['csv', 'comma']:
-            outputFormat = OutputCSV(dataSet=self)
-        elif format.lower() in ['arff', 'attribute']:
-            outputFormat = OutputARFF(dataSet=self)
-
-
+        outputFormat = self._getOutputFormat(format)
+        outputFormat.write(fp=fp)
+        
 
 
 
@@ -622,20 +690,82 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testComposerClassification(self):
+    def xtestComposerClassification(self):
         from music21 import stream, note, features, corpus
+        from music21.features import jSymbolic
 
-        features = [
-            features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.FifthsPitchHistogramFeature, 
-            features.jSymbolic.BasicPitchHistogramFeature, 
-            features.jSymbolic.ChangesOfMeterFeature
-            ]
-        worksBach = [
-            'bwv3.6.xml', 'bwv5.7.xml', 'bwv32.6.xml',
-            ]
-        worksMonteverdi = [
-            'madrigal.3.1.xml', 'madrigal.3.2.xml', 'madrigal.3.9.xml',
-            ]
+        featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21']
+
+        # will return a list
+        featureExtractors = jSymbolic.featureExtractorsById(featureExtractors)
+
+        worksBach = corpus.bachChorales[:48] # first 48
+        worksMonteverdi = corpus.monteverdiMadrigals
+
+#         worksBach = corpus.bachChorales[:1] 
+#         worksMonteverdi = corpus.monteverdiMadrigals[:1]
+
+        # need to define what the class label will be
+        ds = DataSet(classLabel='Composer')
+        ds.addFeatureExtractors(featureExtractors)
+
+        # add works, defining the class value 
+        for w in worksBach:
+            ds.addData(w, classValue='Bach')
+        for w in worksMonteverdi:
+            ds.addData(w, classValue='Monteverdi')
+
+        # process with all feature extractors, store all features
+        ds.process()
+        ds.write(format='tab')
+        ds.write(format='csv')
+        ds.write(format='arff')
+
+    def xtestOrangeBayes(self):
+        import orange, orngTree
+        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a.tab')
+
+        classifier = orange.BayesLearner(data)
+        for i in range(len(data)):
+            c = classifier(data[i])
+            print "original", data[i].getclass(), "BayesLearner:", c
+
+
+    def xtestOrangeClassifiers(self):
+        import orange, orngTree
+        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a.tab')
+
+        # setting up the classifiers
+        majority = orange.MajorityLearner(data)
+        bayes = orange.BayesLearner(data)
+        tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
+        knn = orange.kNNLearner(data, k=21)
+        
+        majority.name="Majority"; bayes.name="Naive Bayes";
+        tree.name="Tree"; knn.name="kNN"        
+        classifiers = [majority, bayes, tree, knn]
+        
+        # print the head
+        print "Possible classes:", data.domain.classVar.values
+        print "Original Class",
+        for l in classifiers:
+            print "%-13s" % (l.name),
+        print
+        
+        for example in data:
+            print "(%-10s)  " % (example.getclass()),
+            for c in classifiers:
+                p = apply(c, [example, orange.GetProbabilities])
+                print "%5.3f        " % (p[0]),
+            print
+
+# 
+#         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
+#         for i in range(len(data)):
+#             p = tree(data[i], orange.GetProbabilities)
+#             print "%d: %5.3f (originally %s)" % (i+1, p[1], data[i].getclass())
+# 
+#         orngTree.printTxt(tree)
 
 
 if __name__ == "__main__":

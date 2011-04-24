@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -772,6 +772,7 @@ paths = getPaths()
 beethoven = getComposer('beethoven')
 josquin = getComposer('josquin')
 mozart = getComposer('mozart')
+monteverdi = getComposer('monteverdi')
 haydn = getComposer('haydn')
 handel = getComposer('handel')
 bach = getComposer('bach')
@@ -798,9 +799,7 @@ def getBachChorales(extList='xml'):
 
     baseDir = getComposerDir('bach')
     post = []
-
     paths = getPaths(extList)
-
     for fn in names:
         candidate = os.path.join(baseDir, fn)
         if candidate not in paths: # it may not match extensions
@@ -813,6 +812,38 @@ def getBachChorales(extList='xml'):
 
 bachChorales = getBachChorales('xml')
 
+
+
+
+def getMonteverdiMadrigals(extList='xml'):
+    '''Return the file name of all Monteverdi madrigals.
+
+    >>> from music21 import *
+    >>> a = getMonteverdiMadrigals()
+    >>> len(a) > 40
+    True
+    '''
+    names = ['madrigal.3.1.xml', 'madrigal.3.2.xml', 'madrigal.3.3.xml', 'madrigal.3.4.xml', 'madrigal.3.5.xml', 'madrigal.3.6.xml', 'madrigal.3.7.xml', 'madrigal.3.8.xml', 'madrigal.3.9.xml', 'madrigal.3.10.xml', 'madrigal.3.11.xml', 'madrigal.3.12.xml', 'madrigal.3.13.xml', 'madrigal.3.14.xml', 'madrigal.3.15.xml', 'madrigal.3.16.xml', 'madrigal.3.17.xml', 'madrigal.3.18.xml', 'madrigal.3.19.xml', 'madrigal.3.20.xml', 
+
+    'madrigal.4.1.xml', 'madrigal.4.2.xml', 'madrigal.4.3.xml', 'madrigal.4.4.xml', 'madrigal.4.5.xml', 'madrigal.4.6.xml', 'madrigal.4.7.xml', 'madrigal.4.8.xml', 'madrigal.4.9.xml', 'madrigal.4.10.xml', 'madrigal.4.11.xml', 'madrigal.4.12.xml', 'madrigal.4.13.xml', 'madrigal.4.14.xml', 'madrigal.4.15.xml', 'madrigal.4.16.xml', 'madrigal.4.17.xml', 'madrigal.4.18.xml', 'madrigal.4.19.xml', 'madrigal.4.20.xml',
+
+    'madrigal.5.1.xml', 'madrigal.5.2.xml', 'madrigal.5.3.xml', 'madrigal.5.5.xml', 'madrigal.5.5.xml', 'madrigal.5.6.xml', 'madrigal.5.7.xml', 'madrigal.5.8.xml', 
+    ]
+
+    baseDir = getComposerDir('monteverdi')
+    post = []
+    paths = getPaths(extList)
+    for fn in names:
+        candidate = os.path.join(baseDir, fn)
+        if candidate not in paths: # it may not match extensions
+            if not os.path.exists(candidate): # it does not exist at all 
+                environLocal.printDebug(['corpus missing expected file path', 
+                                    candidate])
+        else:
+            post.append(candidate)
+    return post
+
+monteverdiMadrigals = getMonteverdiMadrigals('xml')
 
 def getBeethovenStringQuartets(extList=None):
     '''Return all Beethoven String Quartets.
