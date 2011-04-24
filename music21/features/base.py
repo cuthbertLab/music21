@@ -691,30 +691,30 @@ class Test(unittest.TestCase):
         pass
 
     def xtestComposerClassification(self):
-        from music21 import stream, note, features, corpus
+        from music21 import features, corpus
         from music21.features import jSymbolic
-
+        
         featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21']
-
+        
         # will return a list
         featureExtractors = jSymbolic.featureExtractorsById(featureExtractors)
-
+        
         worksBach = corpus.bachChorales[:48] # first 48
         worksMonteverdi = corpus.monteverdiMadrigals
-
-#         worksBach = corpus.bachChorales[:1] 
-#         worksMonteverdi = corpus.monteverdiMadrigals[:1]
-
+        
+        #         worksBach = corpus.bachChorales[:1] 
+        #         worksMonteverdi = corpus.monteverdiMadrigals[:1]
+        
         # need to define what the class label will be
-        ds = DataSet(classLabel='Composer')
+        ds = features.DataSet(classLabel='Composer')
         ds.addFeatureExtractors(featureExtractors)
-
+        
         # add works, defining the class value 
         for w in worksBach:
             ds.addData(w, classValue='Bach')
         for w in worksMonteverdi:
             ds.addData(w, classValue='Monteverdi')
-
+        
         # process with all feature extractors, store all features
         ds.process()
         ds.write(format='tab')
@@ -723,8 +723,7 @@ class Test(unittest.TestCase):
 
     def xtestOrangeBayes(self):
         import orange, orngTree
-        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a.tab')
-
+        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
         classifier = orange.BayesLearner(data)
         for i in range(len(data)):
             c = classifier(data[i])
@@ -733,7 +732,7 @@ class Test(unittest.TestCase):
 
     def xtestOrangeClassifiers(self):
         import orange, orngTree
-        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a.tab')
+        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 
         # setting up the classifiers
         majority = orange.MajorityLearner(data)
