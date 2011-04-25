@@ -76,7 +76,7 @@ class FiguredBassScale:
 
         pitchNames = []
         for i in range(len(nt.numbers)):
-            pitchSD = bassSD + nt.numbers[i] - 1
+            pitchSD = (bassSD + nt.numbers[i] - 1) % 7
             samplePitch = self.realizerScale.pitchFromDegree(pitchSD)
             pitchName = nt.modifiers[i].modifyPitchName(samplePitch.name)
             pitchNames.append(pitchName)
