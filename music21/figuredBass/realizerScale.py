@@ -60,6 +60,9 @@ class FiguredBassScale:
         ['G', 'B', 'D']
         >>> fbScale.getPitchNames('B3', '6,#5')
         ['B', 'D', 'F#', 'G']
+        >>> fbScale.getPitchNames('C#3', '-7') #Fully diminished seventh chord
+        ['C#', 'E', 'G', 'B-']
+
         '''
         bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
         bassSD = self.realizerScale.getScaleDegreeFromPitch(bassPitch)
@@ -107,11 +110,9 @@ class FiguredBassScale:
         [C#3, E3, G3, B-3]
         '''
         bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
-        maxPitch = copy.deepcopy(bassPitch)
-        maxPitch.transpose('d8', True)
+        maxPitch = bassPitch.transpose('d8')
         
         samplePitches = self.getPitches(bassPitch, notationString, maxPitch)
-        samplePitches.sort()
         return samplePitches
         
     def getPitches(self, bassPitch, notationString = '', maxPitch=MAX_PITCH):
@@ -133,7 +134,6 @@ class FiguredBassScale:
         bassPitch = convertToPitch(bassPitch)
         maxPitch = convertToPitch(maxPitch)
         
-        nt = notation.Notation(notationString)
         pitchNames = self.getPitchNames(bassPitch, notationString)
         octaveLimit = maxPitch.octave
         allPitches = []
