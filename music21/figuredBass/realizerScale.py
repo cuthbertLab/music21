@@ -24,14 +24,14 @@ from music21.figuredBass import notation
 
 MAX_PITCH = pitch.Pitch('B5')
 
-scaleTypes = {'major' : scale.MajorScale,
+scaleModes = {'major' : scale.MajorScale,
               'minor' : scale.MinorScale,
               'dorian' : scale.DorianScale,
               'phrygian' : scale.PhrygianScale,
               'hypophrygian' : scale.HypophrygianScale}
 
 class FiguredBassScale:
-    def __init__(self, scaleValue, scaleType = 'major'):
+    def __init__(self, scaleValue, scaleMode = 'major'):
         '''
         Used to represent the concept of a figured bass scale, with a
         scale value (key) and a scale type (major is default).
@@ -41,11 +41,11 @@ class FiguredBassScale:
         An exception is raised if an invalid scale type is provided.
         '''
         try:
-            foo = scaleTypes[scaleType]
+            foo = scaleModes[scaleMode]
             self.realizerScale = foo(scaleValue)
-            self.keySig = key.KeySignature(key.pitchToSharps(scaleValue, scaleType))
+            self.keySig = key.KeySignature(key.pitchToSharps(scaleValue, scaleMode))
         except KeyError:
-            raise FiguredBassScaleException("Unsupported scale type-> " + scaleType)
+            raise FiguredBassScaleException("Unsupported scale type-> " + scaleMode)
     
     def getPitchNames(self, bassPitch, notationString=''):
         '''
