@@ -1227,7 +1227,7 @@ class Chord(note.NotRest):
 
     def isIncompleteMajorTriad(self):
         '''
-        returns True if the chord is an incomplete Major triad, or, essentially,
+        Returns True if the chord is an incomplete Major triad, or, essentially,
         a dyad of root and major third
         
         >>> from music21 import *
@@ -1869,7 +1869,8 @@ class Chord(note.NotRest):
         '''
         pcGroup = []
         for p in self.pitches:
-            if p.pitchClass in pcGroup: continue
+            if p.pitchClass in pcGroup: 
+                continue
             pcGroup.append(p.pitchClass)
         pcGroup.sort()
         return pcGroup            
@@ -1892,6 +1893,10 @@ class Chord(note.NotRest):
 
         >>> from music21 import *
         >>> c1 = chord.Chord(['f#', 'e-', 'g'])
+        >>> c1.orderedPitchClassesString
+        '<367>'
+        >>> # redundancies are removed
+        >>> c1 = chord.Chord(['f#', 'e-', 'e-', 'g'])
         >>> c1.orderedPitchClassesString
         '<367>'
         ''')    
@@ -2015,7 +2020,7 @@ class Chord(note.NotRest):
     def _getForteClassNumber(self):
         '''Get the Forte class index number.
 
-        Possible rename forteIndex
+        Possibly rename forteIndex
 
         >>> from music21 import *
         >>> c1 = chord.Chord(['c', 'e-', 'g'])
@@ -2064,6 +2069,9 @@ class Chord(note.NotRest):
         '''
         >>> from music21 import *
         >>> c1 = chord.Chord(['c', 'e-', 'g'])
+        >>> c1.primeFormString
+        '<037>'
+        >>> c1 = chord.Chord(['c', 'e', 'g'])
         >>> c1.primeFormString
         '<037>'
         '''

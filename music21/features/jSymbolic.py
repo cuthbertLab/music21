@@ -143,7 +143,7 @@ class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Average Range of Glissandos'
-        self.description = 'Average range of Pitch Bends, where range is defined as the greatest value of the absolute difference between 64 and the second data byte of all MIDI Pitch Bend messages falling betweenthe Note On and Note Off messages of any note.'
+        self.description = 'Average range of Pitch Bends, where range is defined as the greatest value of the absolute difference between 64 and the second data byte of all MIDI Pitch Bend messages falling between the Note On and Note Off messages of any note.'
         self.isSequential = True
         self.dimensions = 1
 
@@ -1430,6 +1430,13 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
  
 class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
     '''
+    >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(meter.TimeSignature('3/4'))
+    >>> fe = features.jSymbolic.InitialTimeSignatureFeature(s1)
+    >>> fe.extract().vector
+    [3, 4]
+
     '''
     id = 'R31'
     def __init__(self, dataOrStream=None, *arguments, **keywords):

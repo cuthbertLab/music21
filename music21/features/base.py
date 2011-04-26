@@ -260,8 +260,58 @@ class StreamForms(object):
             self._forms['flat.getElementsByClass.TimeSignature'] = self._base.flat.getElementsByClass('TimeSignature')
             return self._forms['flat.getElementsByClass.TimeSignature']
 
-        # data lists / histograms
 
+        # some methods that return new streams
+        elif key in ['chordify']:
+            self._forms['chordify'] = self._base.chordify()
+            return self._forms['chordify']
+
+        elif key in ['chordify.getElementsByClass.Chord']:
+            x = self.__getitem__('chordify').getElementsByClass('Chord')
+            self._forms['chordify.getElementsByClass.Chord'] = x
+            return self._forms['chordify.getElementsByClass.Chord']
+
+        # create a dictionary of encountered set classes and a count
+        elif key in ['chordifySetClassHistogram']:  
+            histo = {}
+            for c in self.__getitem__('chordify.getElementsByClass.Chord'):
+                key = c.forteClassTnI
+                if key not in histo.keys():
+                    histo[key] = 0
+                histo[key] += 1
+            self._forms['chordifySetClassHistogram'] = histo
+            return self._forms['chordifySetClassHistogram']
+
+        # a dictionary of pitch class sets
+        elif key in ['chordifyPitchClassHistogram']:  
+            histo = {}
+            for c in self.__getitem__('chordify.getElementsByClass.Chord'):
+                key = c.orderedPitchClassesString
+                if key not in histo.keys():
+                    histo[key] = 0
+                histo[key] += 1
+            self._forms['chordifyPitchClassHistogram'] = histo
+            return self._forms['chordifyPitchClassHistogram']
+
+        # dictionary of common chord types
+        elif key in ['chordifyTypesHistogram']:  
+            histo = {}
+            # keys are methods on Chord 
+            keys = ['isTriad', 'isSeventh', 'isMajorTriad', 'isMinorTriad', 'isIncompleteMajorTriad', 'isIncompleteMinorTriad', 'isDiminishedTriad', 'isAugmentedTriad', 'isDominantSeventh', 'isDiminishedSeventh', 'isHalfDiminishedSeventh']
+
+            for c in self.__getitem__('chordify.getElementsByClass.Chord'):
+                for key in keys:
+                    if key not in histo.keys():
+                        histo[key] = 0
+                    # get the function attr, call it, check bool
+                    if getattr(c, key)():
+                        histo[key] += 1
+                        # not breaking here means that we may get multiple 
+                        # hits for the same chord
+            self._forms['chordifyTypesHistogram'] = histo
+            return self._forms['chordifyTypesHistogram']
+
+        # data lists / histograms
         elif key in ['pitchClassHistogram']:
             histo = [0] * 12
             for p in self.__getitem__('flat.pitches'): # recursive call
@@ -758,6 +808,17 @@ class Test(unittest.TestCase):
         self.assertEqual(len(di['flat']), 57)
         self.assertEqual(len(di['flat.notes']), 30)
 
+        #di['chordify'].show('t')
+        self.assertEqual(len(di['chordify']), 43)
+        self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 24)
+
+
+        self.assertEqual(di['chordifySetClassHistogram'], {'2-2': 3, '2-3': 4, '3-9': 1, '2-4': 4, '2-5': 4, '1-1': 7, '4-13': 1})
+
+        self.assertEqual(di['chordifyPitchClassHistogram'], {'<A>': 4, '<2A>': 2, '<09>': 1, '<03>': 1, '<3>': 1, '<37>': 1, '<79>': 3, '<58>': 1, '<7A>': 1, '<0>': 1, '<59>': 1, '<2358>': 1, '<35A>': 1, '<5A>': 4, '<5>': 1})
+
+        self.assertEqual(di['chordifyTypesHistogram'], {'isMinorTriad': 0, 'isAugmentedTriad': 0, 'isTriad': 0, 'isSeventh': 0, 'isDiminishedTriad': 0, 'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 4, 'isHalfDiminishedSeventh': 0, 'isMajorTriad': 0, 'isDominantSeventh': 0, 'isIncompleteMinorTriad': 4})
+
         # can access parts by index
         self.assertEqual(len(di['parts']), 2)
         # stored in parts are StreamForms instances, caching their results
@@ -852,13 +913,18 @@ class Test(unittest.TestCase):
                 print "%5.3f        " % (p[0]),
             print
 
-# 
-#         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
-#         for i in range(len(data)):
-#             p = tree(data[i], orange.GetProbabilities)
-#             print "%d: %5.3f (originally %s)" % (i+1, p[1], data[i].getclass())
-# 
-#         orngTree.printTxt(tree)
+
+    def xtestOrangeClassifierTreeLearner(self):
+        import orange, orngTree
+        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+
+        tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
+        #tree = orngTree.TreeLearner(data)
+        for i in range(len(data)):
+            p = tree(data[i], orange.GetProbabilities)
+            print "%d: %5.3f (originally %s)" % (i+1, p[1], data[i].getclass())
+
+        orngTree.printTxt(tree)
 
 
 if __name__ == "__main__":
