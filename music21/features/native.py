@@ -282,7 +282,11 @@ class MostCommonSetClassSimultaneityPrevelance(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MostCommonSetClassSimultaneityPrevelance(s)
     >>> fe.extract().vector
-    [0.291666666666...]
+    [0.2916...]
+    >>> s2 = corpus.parse('schoenberg/opus19', 6)
+    >>> fe2 = features.native.MostCommonSetClassSimultaneityPrevelance(s2)
+    >>> fe2.extract().vector
+    [0.3846...]
     '''
     id = 'S4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -428,6 +432,10 @@ class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     >>> fe = features.native.TriadSimultaneityPrevelance(s)
     >>> fe.extract().vector 
     [0.7142857142...]
+    >>> s2 = corpus.parse('schoenberg/opus19', 2)
+    >>> fe2 = features.native.TriadSimultaneityPrevelance(s2)
+    >>> fe2.extract().vector
+    [0.04...]
     '''
     id = 'S9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):

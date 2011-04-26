@@ -1003,7 +1003,11 @@ class Chord(note.NotRest):
         False
         '''
         if (testRoot is None):
-            testRoot = self.root()
+            try:
+                testRoot = self.root()
+            except ChordException:
+                raise ChordException("Cannot run intervalFromChordStep without a root")
+
             if (testRoot is None):
                 raise ChordException("Cannot run intervalFromChordStep without a root")
 
@@ -1074,10 +1078,17 @@ class Chord(note.NotRest):
         True
         >>> other.containsTriad() #returns True
         True
-        '''
+        >>> scale = chord.Chord(['C', 'D-', 'E', 'F#', 'G', 'A#', 'B'])
+        >>> scale.containsTriad() #returns True
+        True
 
-        third = self.third
-        fifth = self.fifth
+
+        '''
+        try:
+            third = self.third
+            fifth = self.fifth
+        except ChordException:
+            return True  # the only reason it cannot find a third or a fifth is that there is a complete 7-note diatonic scale present.
 
         if (third is False or fifth is False):
             return False
@@ -1100,14 +1111,20 @@ class Chord(note.NotRest):
         >>> other.isTriad() 
         False
         '''
-        third = self.third
-        fifth = self.fifth
+        try:
+            third = self.third
+            fifth = self.fifth
+        except ChordException:
+            return False
 
         if (third is False or fifth is False):
             return False
         
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
+            try:
+                thisInterval = interval.notesToInterval(self.root(), thisPitch)
+            except ChordException:
+                return False
             if (thisInterval.diatonic.generic.mod7 != 1) and (thisInterval.diatonic.generic.mod7 != 3) and (thisInterval.diatonic.generic.mod7 != 5):
                 return False
             if (self.hasAnyRepeatedDiatonicNote() == True):
@@ -1152,10 +1169,12 @@ class Chord(note.NotRest):
         >>> other.isSeventh() # returns False
         False
         '''
-        
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
+        try:
+            third = self.third
+            fifth = self.fifth
+            seventh = self.seventh
+        except ChordException:
+            return False
 
         if (third is False or fifth is False or seventh is False):
             return False
@@ -1185,8 +1204,11 @@ class Chord(note.NotRest):
         >>> other.isMajorTriad() # returns False
         False
         '''
-        third = self.third
-        fifth = self.fifth
+        try:
+            third = self.third
+            fifth = self.fifth
+        except ChordException:
+            return False
         if (third == False or fifth == False):
             return False
  
@@ -1214,8 +1236,11 @@ class Chord(note.NotRest):
         >>> other.isMinorTriad() # returns False
         False
         '''
-        third = self.third
-        fifth = self.fifth
+        try:
+            third = self.third
+            fifth = self.fifth
+        except ChordException:
+            return False
         if (third == False or fifth == False):
             return False
         for thisPitch in self.pitches:
@@ -1250,7 +1275,11 @@ class Chord(note.NotRest):
         >>> c3.isIncompleteMajorTriad()
         False        
         '''
-        third = self.third
+        try:
+            third = self.third
+        except ChordException:
+            return False
+        
         if (third == False):
             return False
  
@@ -1281,7 +1310,10 @@ class Chord(note.NotRest):
         >>> c3.isIncompleteMinorTriad()
         False        
         '''
-        third = self.third
+        try:
+            third = self.third
+        except ChordException:
+            return False
         if (third == False):
             return False
  
@@ -1310,8 +1342,11 @@ class Chord(note.NotRest):
         False
         '''
 
-        third = self.third
-        fifth = self.fifth
+        try:
+            third = self.third
+            fifth = self.fifth
+        except ChordException:
+            return False
         
         if (third is False or fifth is False):
             return False
@@ -1354,8 +1389,11 @@ class Chord(note.NotRest):
         >>> c.isAugmentedTriad()
         False
         '''
-        third = self.third
-        fifth = self.fifth
+        try:
+            third = self.third
+            fifth = self.fifth
+        except ChordException:
+            return False
 
         if (third == False or fifth == False):
             return False
@@ -1377,11 +1415,13 @@ class Chord(note.NotRest):
         >>> a.isDominantSeventh()
         True
         '''
-        
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
-        
+        try:
+            third = self.third
+            fifth = self.fifth
+            seventh = self.seventh
+        except ChordException:
+            return False
+                
         if (third == False or fifth == False or seventh == False):
             return False
         for thisPitch in self.pitches:
@@ -1402,9 +1442,13 @@ class Chord(note.NotRest):
         >>> a.isDiminishedSeventh()
         True
         '''
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
+
+        try:
+            third = self.third
+            fifth = self.fifth
+            seventh = self.seventh
+        except ChordException:
+            return False
         
         if (third is False or fifth is False or seventh is False):
             return False
@@ -1436,9 +1480,12 @@ class Chord(note.NotRest):
         >>> c3.isHalfDiminishedSeventh()
         False
         '''
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
+        try:
+            third = self.third
+            fifth = self.fifth
+            seventh = self.seventh
+        except ChordException:
+            return False
         
         if (third is False or fifth is False or seventh is False):
             return False
@@ -1459,7 +1506,12 @@ class Chord(note.NotRest):
         third = False
         fifth = False
         seventh = False
-        
+
+        try: # check for no root
+            self.root()
+        except ChordException:
+            return False
+
         
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
@@ -1663,6 +1715,11 @@ class Chord(note.NotRest):
         >>> a.inversion()
         2
         '''
+        try:
+            self.root()
+        except ChordException:
+            raise ChordException("Not a normal inversion")
+
         
         bassNote = self.bass()
         

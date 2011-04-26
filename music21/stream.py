@@ -3302,17 +3302,17 @@ class Stream(music21.Music21Object):
         
         >>> from music21 import *
         >>> p1 = stream.Part()
-        >>> p1.append([note.QuarterNote("C4"), note.QuarterNote("D4"), note.QuarterNote("E4")])
+        >>> p1.append([note.QuarterNote("C4"), note.QuarterNote("D4"), note.QuarterNote("E4"), note.QuarterNote("B2")])
         >>> p2 = stream.Part()
-        >>> p2.append([note.HalfNote("C#5"), note.QuarterNote("E#5")])
+        >>> p2.append([note.HalfNote("C#5"), note.QuarterNote("E#5"), chord.Chord(["E4","G5","C#7"])])
         >>> sc1 = stream.Score()
         >>> sc1.insert(0, p1)
         >>> sc1.insert(0, p2)
         >>> scChords = sc1.flat.makeChords()
         >>> scChords.show('text')
         {0.0} <music21.chord.Chord C4 C#5 D4>
-        {2.0} <music21.chord.Chord E4 E#5>        
-        
+        {2.0} <music21.chord.Chord E4 E#5>
+        {3.0} <music21.chord.Chord B2 E4 G5 C#7>        
         
         
         The gathering of elements, starting from offset 0.0, uses 
@@ -3438,7 +3438,14 @@ class Stream(music21.Music21Object):
                 c = chord.Chord()
                 c.duration.quarterLength = qlMax
                 # these are references, not copies, for now
-                c.pitches = [n.pitch for n in subNotes]
+                tempPitches = []
+                for n in subNotes:
+                    if n.isChord:
+                        for p in n.pitches:
+                            tempPitches.append(p)
+                    else:
+                        tempPitches.append(n.pitch)
+                c.pitches = tempPitches
                 if gatherArticulations:
                     for n in subNotes:
                         c.articulations += n.articulations
@@ -14091,7 +14098,7 @@ _DOC_ORDER = [Stream, Measure]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
-    music21.mainTest()
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------
