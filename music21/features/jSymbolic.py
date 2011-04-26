@@ -2212,34 +2212,6 @@ FifthsPitchHistogramFeature, # p21
 
 
 
-def featureExtractorsById(idOrList):
-    '''Given one or more feature Ids, return the classes
-
-    >>> from music21 import *
-    >>> [x.id for x in features.jSymbolic.featureExtractorsById('p20')]
-    ['P20']
-    >>> [x.id for x in features.jSymbolic.featureExtractorsById(['p19', 'p20'])]
-    ['P19', 'P20']
-
-    >>> [x.id for x in features.jSymbolic.featureExtractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])]
-    ['R31', 'R32', 'R33', 'R34', 'R35', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P16', 'P19', 'P20', 'P21']
-
-    '''
-    if not common.isListLike(idOrList):
-        idOrList = [idOrList]
-
-    flatIds = []
-    for id in idOrList:
-        id = id.strip().lower()
-        id.replace('-', '')
-        id.replace(' ', '')
-        flatIds.append(id)
-
-    post = []
-    for fe in featureExtractors:
-        if fe.id.lower() in flatIds:
-            post.append(fe)
-    return post
 
 
 

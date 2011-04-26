@@ -101,6 +101,13 @@ class RangeOfQuarterLengths(featuresModule.FeatureExtractor):
 # various ways of looking at chordify representation
 
 class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.UniquePitchClassSetSimultaneities(s)
+    >>> fe.extract().vector
+    [15]
+    '''
     id = 'S1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -110,8 +117,26 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = True 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        count = 0
+        histo = self.data['chordifyPitchClassSetHistogram']
+        for key in histo:
+            # all defined keys should be greater than zero, but just in case
+            if histo[key] > 0:
+                count += 1
+        self._feature.vector[0] = count
+
 
 class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.UniqueSetClassSimultaneities(s)
+    >>> fe.extract().vector
+    [7]
+    '''
     id = 'S2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -121,21 +146,59 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = True 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        count = 0
+        histo = self.data['chordifySetClassHistogram']
+        for key in histo:
+            # all defined keys should be greater than zero, but just in case
+            if histo[key] > 0:
+                count += 1
+        self._feature.vector[0] = count
 
 
-class MostCommonPitchClassSimultaneityPrevelance(
+class MostCommonPitchClassSetSimultaneityPrevelance(
     featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.MostCommonPitchClassSetSimultaneityPrevelance(s)
+    >>> fe.extract().vector
+    [0.166666666...]
+    '''
     id = 'S3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Most Common Pitch Class Simultaneity Prevelance'
+        self.name = 'Most Common Pitch Class Set Simultaneity Prevelance'
         self.description = 'Fraction of all pitch class simultaneities that are the most common simultaneity.'
         self.dimensions = 1
         self.discrete = False 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        sum = 0 # count of all 
+        histo = self.data['chordifyPitchClassSetHistogram']
+        maxKey = 0 # max found for any one key
+        for key in histo:
+            # all defined keys should be greater than zero, but just in case
+            if histo[key] > 0:
+                sum += histo[key]
+                if histo[key] >= maxKey:
+                    maxKey = histo[key]
+        self._feature.vector[0] = maxKey / float(sum)
+
 
 class MostCommonSetClassSimultaneityPrevelance(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.MostCommonSetClassSimultaneityPrevelance(s)
+    >>> fe.extract().vector
+    [0.291666666666...]
+    '''
     id = 'S4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -145,57 +208,202 @@ class MostCommonSetClassSimultaneityPrevelance(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        sum = 0 # count of all 
+        histo = self.data['chordifySetClassHistogram']
+        maxKey = 0 # max found for any one key
+        for key in histo:
+            # all defined keys should be greater than zero, but just in case
+            if histo[key] > 0:
+                sum += histo[key]
+                if histo[key] >= maxKey:
+                    maxKey = histo[key]
+        self._feature.vector[0] = maxKey / float(sum)
+
 
 class MajorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.MajorTriadSimultaneityPrevelance(s)
+    >>> fe.extract().vector
+    [0.1666666666...]
+    '''
     id = 'S5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'MajorTriadSimultaneityPrevelance'
-        self.description = 'Percentage of all simultaneityies that are major triads.'
+        self.name = 'Major Triad Simultaneity Prevelance'
+        self.description = 'Percentage of all simultaneities that are major triads.'
         self.dimensions = 1
         self.discrete = False 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # use for total number of chords
+        total = len(self.data['chordify.getElementsByClass.Chord'])
+
+        histo = self.data['chordifyTypesHistogram']
+        # using incomplete
+        part = histo['isMajorTriad'] + histo['isIncompleteMajorTriad'] 
+        self._feature.vector[0] = part / float(total)
+
 
 class MinorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.MinorTriadSimultaneityPrevelance(s)
+    >>> fe.extract().vector # same as major in this work
+    [0.1666666666...]
+    '''
     id = 'S6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'MinorTriadSimultaneityPrevelance'
-        self.description = 'Percentage of all simultaneityies that are major triads.'
+        self.name = 'Minor Triad Simultaneity Prevelance'
+        self.description = 'Percentage of all simultaneities that are minor triads.'
         self.dimensions = 1
         self.discrete = False 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # use for total number of chords
+        total = len(self.data['chordify.getElementsByClass.Chord'])
+        histo = self.data['chordifyTypesHistogram']
+        # using incomplete
+        part = histo['isMinorTriad'] + histo['isIncompleteMinorTriad'] 
+        self._feature.vector[0] = part / float(total)
+
 
 class DominantSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.DominantSeventhSimultaneityPrevelance(s)
+    >>> fe.extract().vector 
+    [0.0]
+    '''
     id = 'S7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'DominantSeventhSimultaneityPrevelance'
-        self.description = 'Percentage of all simultaneityies that are major triads.'
+        self.name = 'Dominant Seventh Simultaneity Prevelance'
+        self.description = 'Percentage of all simultaneities that are major triads.'
         self.dimensions = 1
         self.discrete = False 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # use for total number of chords
+        total = len(self.data['chordify.getElementsByClass.Chord'])
+        histo = self.data['chordifyTypesHistogram']
+        # using incomplete
+        part = histo['isDominantSeventh']
+        self._feature.vector[0] = part / float(total)
+
 
 class DiminishedTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.native.DiminishedTriadSimultaneityPrevelance(s)
+    >>> fe.extract().vector 
+    [0.020408163265...]
+    '''
     id = 'S8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'DiminishedTriadSimultaneityPrevelance'
-        self.description = 'Percentage of all simultaneityies that are major triads.'
+        self.name = 'Diminished Triad Simultaneity Prevelance'
+        self.description = 'Percentage of all simultaneities that are major triads.'
         self.dimensions = 1
         self.discrete = False 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # use for total number of chords
+        total = len(self.data['chordify.getElementsByClass.Chord'])
+        histo = self.data['chordifyTypesHistogram']
+        # using incomplete
+        part = histo['isDiminishedTriad']
+        self._feature.vector[0] = part / float(total)
 
+
+class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.native.TriadSimultaneityPrevelance(s)
+    >>> fe.extract().vector 
+    [0.7142857142...]
+    '''
+    id = 'S9'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Triad Simultaneity Prevelance'
+        self.description = 'Percentage of all simultaneities that triads.'
+        self.dimensions = 1
+        self.discrete = False 
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # use for total number of chords
+        total = len(self.data['chordify.getElementsByClass.Chord'])
+        histo = self.data['chordifyTypesHistogram']
+        # using incomplete
+        part = histo['isTriad']
+        self._feature.vector[0] = part / float(total)
+
+
+class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.DiminishedSeventhSimultaneityPrevelance(s)
+    >>> fe.extract().vector 
+    [0.0]
+    '''
+    id = 'S10'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Diminished Seventh Simultaneity Prevelance'
+        self.description = 'Percentage of all simultaneities that are diminished seventh chords.'
+        self.dimensions = 1
+        self.discrete = False 
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # use for total number of chords
+        total = len(self.data['chordify.getElementsByClass.Chord'])
+        histo = self.data['chordifyTypesHistogram']
+        # using incomplete
+        part = histo['isDiminishedSeventh']
+        self._feature.vector[0] = part / float(total)
 
 
 featureExtractors = [
 
-UniquePitchClassSetSimultaneities, # r31
-UniqueSetClassSimultaneities,
+UniquePitchClassSetSimultaneities, # s1
+UniqueSetClassSimultaneities, # s2
+MostCommonPitchClassSetSimultaneityPrevelance, # s3
+MostCommonSetClassSimultaneityPrevelance, # s4
+MajorTriadSimultaneityPrevelance, # s5
+MinorTriadSimultaneityPrevelance, # s6
+DominantSeventhSimultaneityPrevelance, # s7
+DiminishedTriadSimultaneityPrevelance, # s8
+TriadSimultaneityPrevelance, # s9
+DiminishedSeventhSimultaneityPrevelance, # s10
 
 ]
 

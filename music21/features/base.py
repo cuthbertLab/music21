@@ -283,15 +283,15 @@ class StreamForms(object):
             return self._forms['chordifySetClassHistogram']
 
         # a dictionary of pitch class sets
-        elif key in ['chordifyPitchClassHistogram']:  
+        elif key in ['chordifyPitchClassSetHistogram']:  
             histo = {}
             for c in self.__getitem__('chordify.getElementsByClass.Chord'):
                 key = c.orderedPitchClassesString
                 if key not in histo.keys():
                     histo[key] = 0
                 histo[key] += 1
-            self._forms['chordifyPitchClassHistogram'] = histo
-            return self._forms['chordifyPitchClassHistogram']
+            self._forms['chordifyPitchClassSetHistogram'] = histo
+            return self._forms['chordifyPitchClassSetHistogram']
 
         # dictionary of common chord types
         elif key in ['chordifyTypesHistogram']:  
@@ -793,6 +793,53 @@ class DataSet(object):
 
 
 
+
+
+
+
+
+#-------------------------------------------------------------------------------
+def extractorsById(idOrList, library='jSymbolic'):
+    '''Given one or more :class:`~music21.features.FeatureExtractor` ids, return the appropriate  subclass. An optional `library` argument can be added to define which module is used. Current options are jSymbolic and native.
+
+    >>> from music21 import *
+    >>> [x.id for x in features.extractorsById('p20')]
+    ['P20']
+    >>> [x.id for x in features.extractorsById(['p19', 'p20'])]
+    ['P19', 'P20']
+
+    >>> [x.id for x in features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])]
+    ['R31', 'R32', 'R33', 'R34', 'R35', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P16', 'P19', 'P20', 'P21']
+
+    '''
+    from music21.features import jSymbolic
+    from music21.features import native
+
+    if library.lower() in ['jsymbolic']:
+        featureExtractors = jSymbolic.featureExtractors
+    if library.lower() in ['native']:
+        featureExtractors = native.featureExtractors
+
+    if not common.isListLike(idOrList):
+        idOrList = [idOrList]
+
+    flatIds = []
+    for id in idOrList:
+        id = id.strip().lower()
+        id.replace('-', '')
+        id.replace(' ', '')
+        flatIds.append(id)
+
+    post = []
+    for fe in featureExtractors:
+        if fe.id.lower() in flatIds:
+            post.append(fe)
+    return post
+
+
+
+
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
@@ -815,7 +862,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(di['chordifySetClassHistogram'], {'2-2': 3, '2-3': 4, '3-9': 1, '2-4': 4, '2-5': 4, '1-1': 7, '4-13': 1})
 
-        self.assertEqual(di['chordifyPitchClassHistogram'], {'<A>': 4, '<2A>': 2, '<09>': 1, '<03>': 1, '<3>': 1, '<37>': 1, '<79>': 3, '<58>': 1, '<7A>': 1, '<0>': 1, '<59>': 1, '<2358>': 1, '<35A>': 1, '<5A>': 4, '<5>': 1})
+        self.assertEqual(di['chordifyPitchClassSetHistogram'], {'<A>': 4, '<2A>': 2, '<09>': 1, '<03>': 1, '<3>': 1, '<37>': 1, '<79>': 3, '<58>': 1, '<7A>': 1, '<0>': 1, '<59>': 1, '<2358>': 1, '<35A>': 1, '<5A>': 4, '<5>': 1})
 
         self.assertEqual(di['chordifyTypesHistogram'], {'isMinorTriad': 0, 'isAugmentedTriad': 0, 'isTriad': 0, 'isSeventh': 0, 'isDiminishedTriad': 0, 'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 4, 'isHalfDiminishedSeventh': 0, 'isMajorTriad': 0, 'isDominantSeventh': 0, 'isIncompleteMinorTriad': 4})
 
@@ -848,7 +895,7 @@ class Test(unittest.TestCase):
         featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21']
         
         # will return a list
-        featureExtractors = jSymbolic.featureExtractorsById(featureExtractors)
+        featureExtractors = features.extractorsById(featureExtractors)
         
         worksBach = corpus.bachChorales[:48] # first 48
         worksMonteverdi = corpus.monteverdiMadrigals
