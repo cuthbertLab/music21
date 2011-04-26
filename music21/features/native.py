@@ -62,8 +62,45 @@ class FirstBeatAttackPrevelance(featuresModule.FeatureExtractor):
 #-------------------------------------------------------------------------------
 # employing symbolic durations
 
-class MostCommonQuarterLength(featuresModule.FeatureExtractor):
+
+class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.UniqueNoteQuarterLengths(s)
+    >>> fe.extract().vector 
+    [7]
+    '''
     id = 'D1'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Most Common Quarter Length.'
+        self.description = 'The value of the most common quarter length.'
+        self.dimensions = 1
+        self.discrete = True 
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        count = 0
+        histo = self.data['noteQuarterLengthHistogram']
+        for key in histo:
+            # all defined keys should be greater than zero, but just in case
+            if histo[key] > 0:
+                count += 1
+        self._feature.vector[0] = count
+
+
+class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.MostCommonNoteQuarterLength(s)
+    >>> fe.extract().vector 
+    [0.5]
+    '''
+    id = 'D2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -72,9 +109,29 @@ class MostCommonQuarterLength(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['noteQuarterLengthHistogram']
+        max = 0
+        ql = 0
+        for key in histo:
+            # all defined keys should be greater than zero, but just in case
+            if histo[key] >= max:
+                max = histo[key]
+                ql = key
+        self._feature.vector[0] = ql
 
-class MostCommonQuarterLengthPrevelance(featuresModule.FeatureExtractor):
-    id = 'D2'
+
+class MostCommonNoteQuarterLengthPrevelance(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.MostCommonNoteQuarterLengthPrevelance(s)
+    >>> fe.extract().vector 
+    [0.533333...]
+    '''
+    id = 'D3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -83,9 +140,31 @@ class MostCommonQuarterLengthPrevelance(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        sum = 0 # count of all 
+        histo = self.data['noteQuarterLengthHistogram']
+        maxKey = 0 # max found for any one key
+        for key in histo:
+            # all defined keys should be greater than zero, but just in case
+            if histo[key] > 0:
+                sum += histo[key]
+                if histo[key] >= maxKey:
+                    maxKey = histo[key]
+        self._feature.vector[0] = maxKey / float(sum)
 
-class RangeOfQuarterLengths(featuresModule.FeatureExtractor):
-    id = 'D3'
+
+
+class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.RangeOfNoteQuarterLengths(s)
+    >>> fe.extract().vector 
+    [3.75]
+    '''
+    id = 'D4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -95,6 +174,13 @@ class RangeOfQuarterLengths(featuresModule.FeatureExtractor):
         self.discrete = False
 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['noteQuarterLengthHistogram']
+        minVal = min(histo.keys())
+        maxVal = max(histo.keys())
+        self._feature.vector[0] = maxVal - minVal
 
 
 #-------------------------------------------------------------------------------
@@ -393,6 +479,10 @@ class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
 
 
 featureExtractors = [
+UniqueNoteQuarterLengths, # d1
+MostCommonNoteQuarterLength, # d2
+MostCommonNoteQuarterLengthPrevelance, # d3
+RangeOfNoteQuarterLengths, # d4
 
 UniquePitchClassSetSimultaneities, # s1
 UniqueSetClassSimultaneities, # s2

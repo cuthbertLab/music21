@@ -311,6 +311,19 @@ class StreamForms(object):
             self._forms['chordifyTypesHistogram'] = histo
             return self._forms['chordifyTypesHistogram']
 
+
+        # a dictionary of quarter length values
+        elif key in ['noteQuarterLengthHistogram']:  
+            histo = {}
+            for n in self.__getitem__('flat.notes'):
+                key = n.quarterLength
+                if key not in histo.keys():
+                    histo[key] = 0
+                histo[key] += 1
+            self._forms['noteQuarterLengthHistogram'] = histo
+            return self._forms['noteQuarterLengthHistogram']
+
+
         # data lists / histograms
         elif key in ['pitchClassHistogram']:
             histo = [0] * 12
@@ -865,6 +878,9 @@ class Test(unittest.TestCase):
         self.assertEqual(di['chordifyPitchClassSetHistogram'], {'<A>': 4, '<2A>': 2, '<09>': 1, '<03>': 1, '<3>': 1, '<37>': 1, '<79>': 3, '<58>': 1, '<7A>': 1, '<0>': 1, '<59>': 1, '<2358>': 1, '<35A>': 1, '<5A>': 4, '<5>': 1})
 
         self.assertEqual(di['chordifyTypesHistogram'], {'isMinorTriad': 0, 'isAugmentedTriad': 0, 'isTriad': 0, 'isSeventh': 0, 'isDiminishedTriad': 0, 'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 4, 'isHalfDiminishedSeventh': 0, 'isMajorTriad': 0, 'isDominantSeventh': 0, 'isIncompleteMinorTriad': 4})
+
+        self.assertEqual(di['noteQuarterLengthHistogram'], {0.5: 16, 1.0: 5, 2.0: 4, 3.0: 1, 4.0: 2, 0.75: 1, 0.25: 1})
+
 
         # can access parts by index
         self.assertEqual(len(di['parts']), 2)
