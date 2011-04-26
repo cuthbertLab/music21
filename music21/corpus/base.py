@@ -813,6 +813,50 @@ def getBachChorales(extList='xml'):
 bachChorales = getBachChorales('xml')
 
 
+def getHandelMessiah(extList='md'):
+    '''Return the file name of all of handel's messiah.
+
+    >>> from music21 import *
+    >>> a = getHandelMessiah()
+    >>> len(a)
+    43
+    '''
+    names = ['movement1-01.md', 'movement1-02.md', 'movement1-03.md', 
+             'movement1-04.md', 'movement1-05.md', 
+             'movement1-07.md', 'movement1-08.md', 'movement1-09.md', 
+             'movement1-10.md', 'movement1-11.md', 'movement1-12.md', 
+             'movement1-13.md', 'movement1-15.md', 
+             'movement1-17.md', 'movement1-18.md', 'movement1-19.md', 
+             'movement1-23.md', 
+
+            'movement2-01.md', 'movement2-03.md', 
+            'movement2-03.md', 'movement2-04.md', 'movement2-05.md', 
+            'movement2-06.md', 'movement2-07.md', 'movement2-08.md', 
+            'movement2-09.md', 'movement2-10.md', 'movement2-11.md', 
+            'movement2-12.md', 'movement2-13.md', 
+            'movement2-15.md', 'movement2-18.md', 'movement2-19.md', 
+            'movement2-21.md', 
+
+            'movement3-01.md', 'movement3-02.md', 'movement3-03.md', 
+            'movement3-04.md', 'movement3-05.md', 'movement3-07.md', 
+            'movement3-08.md', 'movement3-09.md', 'movement3-10.md', 
+    ]
+
+    baseDir = getComposerDir('handel')
+    post = []
+    paths = getPaths(extList)
+    for fn in names:
+        candidate = os.path.join(baseDir, 'hwv56', fn)
+        if candidate not in paths: # it may not match extensions
+            if not os.path.exists(candidate): # it does not exist at all 
+                environLocal.printDebug(['corpus missing expected file path', 
+                                    candidate])
+        else:
+            post.append(candidate)
+    return post
+
+handelMessiah = getHandelMessiah()
+
 
 
 def getMonteverdiMadrigals(extList='xml'):

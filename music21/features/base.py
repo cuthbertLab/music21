@@ -406,6 +406,13 @@ class DataInstance(object):
         else:
             return self._classValue
 
+    def getId(self):    
+        if self._id is None:
+            return ''
+        else:
+            # make sure there are no spaces
+            return self._id.replace(' ', '_')
+
     def __getitem__(self, key):
         '''Get a form of this Stream, using a cached version if available.
 
@@ -457,7 +464,7 @@ class OutputFormat(object):
         '''
         pass # define in subclass
 
-    def write(self, fp=None):
+    def write(self, fp=None, includeClassLabel=True, includeId=True):
         '''Write the file. If not file path is given, a temporary file will be written.
         '''
         if fp is None:
@@ -465,7 +472,8 @@ class OutputFormat(object):
         if not fp.endswith(self._ext):
             raise
         f = open(fp, 'w')
-        f.write(self.getString())
+        f.write(self.getString(includeClassLabel=includeClassLabel, 
+                               includeId=includeId))
         f.close()
         return fp
 
@@ -479,17 +487,35 @@ class OutputTabOrange(OutputFormat):
         OutputFormat.__init__(self, dataSet=dataSet)
         self._ext = '.tab'
 
-    def getHeaderLines(self, includeClassLabel=True):
+    def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
+
+        >>> from music21 import *
+        >>> f = [features.jSymbolic.ChangesOfMeterFeature]
+        >>> ds = features.DataSet()
+        >>> ds.addFeatureExtractors(f)
+        >>> of = features.OutputTabOrange(ds)
+        >>> of.getHeaderLines()
+        [['Identifier', 'Changes_of_Meter'], ['string', 'discrete'], ['meta', '']]
+
+        >>> ds = features.DataSet(classLabel='Composer')
+        >>> ds.addFeatureExtractors(f)
+        >>> of = features.OutputTabOrange(ds)
+        >>> of.getHeaderLines()
+        [['Identifier', 'Changes_of_Meter', 'Composer'], ['string', 'discrete', 'discrete'], ['meta', '', 'class']]
+
         '''
         post = []
         post.append(self._dataSet.getAttributeLabels(
-            includeClassLabel=includeClassLabel))
-        # second meta data
+            includeClassLabel=includeClassLabel, includeId=includeId))
+
+        # second row meta data
         row = []
         for x in self._dataSet.getDiscreteLabels(
-            includeClassLabel=includeClassLabel):
-            if x: # if True, it is discrete
+            includeClassLabel=includeClassLabel, includeId=includeId):
+            if x is None: # this is a string entry
+                row.append('string')
+            elif x is True: # if True, it is discrete
                 row.append('discrete')
             else:
                 row.append('continuous')
@@ -497,19 +523,22 @@ class OutputTabOrange(OutputFormat):
 
         # third row metadata
         row = []
-        for x in self._dataSet.getClassPositionLabels():
-            if x: # if True, it is the class column
+        for x in self._dataSet.getClassPositionLabels(includeId=includeId):
+            if x is None: # the id value
+                row.append('meta')
+            elif x is True: # if True, it is the class column
                 row.append('class')
             else:
                 row.append('')
         post.append(row)
         return post
 
-    def getString(self, includeClassLabel=True):
+    def getString(self, includeClassLabel=True, includeId=True, lineBreak='\n'):
         '''Get the complete DataSet as a string with the appropriate header.s
         '''
         msg = []
-        header = self.getHeaderLines(includeClassLabel=includeClassLabel)
+        header = self.getHeaderLines(includeClassLabel=includeClassLabel,
+                                     includeId=includeId)
         data = header + self._dataSet.getFeaturesAsList(
             includeClassLabel=includeClassLabel)
         for row in data:
@@ -517,36 +546,46 @@ class OutputTabOrange(OutputFormat):
             for e in row:
                 sub.append(str(e))
             msg.append('\t'.join(sub))
-        return '\n'.join(msg)
+        return lineBreak.join(msg)
 
 
 
 class OutputCSV(OutputFormat):
     '''Comma-separated value list. 
+
     '''
     def __init__(self, dataSet=None):
         OutputFormat.__init__(self, dataSet=dataSet)
         self._ext = '.csv'
 
-    def getHeaderLines(self, includeClassLabel=True):
+    def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
+
+        >>> from music21 import *
+        >>> f = [features.jSymbolic.ChangesOfMeterFeature]
+        >>> ds = features.DataSet(classLabel='Composer')
+        >>> ds.addFeatureExtractors(f)
+        >>> of = features.OutputCSV(ds)
+        >>> of.getHeaderLines()
+        [['Identifier', 'Changes_of_Meter', 'Composer']]
         '''
         post = []
         post.append(self._dataSet.getAttributeLabels(
-            includeClassLabel=includeClassLabel))
+            includeClassLabel=includeClassLabel, includeId=includeId))
         return post
 
-    def getString(self, includeClassLabel=True):
+    def getString(self, includeClassLabel=True, includeId=True, lineBreak='\n'):
         msg = []
-        header = self.getHeaderLines(includeClassLabel=includeClassLabel)
+        header = self.getHeaderLines(includeClassLabel=includeClassLabel, 
+                                    includeId=includeId)
         data = header + self._dataSet.getFeaturesAsList(
-            includeClassLabel=includeClassLabel)
+            includeClassLabel=includeClassLabel, includeId=includeId)
         for row in data:
             sub = []
             for e in row:
                 sub.append(str(e))
             msg.append(','.join(sub))
-        return '\n'.join(msg)
+        return lineBreak.join(msg)
 
 
 
@@ -564,17 +603,25 @@ class OutputARFF(OutputFormat):
         OutputFormat.__init__(self, dataSet=dataSet)
         self._ext = '.arff'
 
-    def getHeaderLines(self, includeClassLabel=True):
+    def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
+
+        >>> from music21 import *
+        >>> f = [features.jSymbolic.ChangesOfMeterFeature]
+        >>> ds = features.DataSet(classLabel='Composer')
+        >>> ds.addFeatureExtractors(f)
+        >>> of = features.OutputARFF(ds)
+        >>> of.getHeaderLines()
+        ['@RELATION Composer', '@ATTRIBUTE Identifier STRING', '@ATTRIBUTE Changes_of_Meter NUMERIC', '@ATTRIBUTE class {}', '@DATA']
         '''
         post = []
+
+        # get three parallel lists
         attrs = self._dataSet.getAttributeLabels(
-                includeClassLabel=includeClassLabel)
-
+                includeClassLabel=includeClassLabel, includeId=includeId)
         discreteLabels = self._dataSet.getDiscreteLabels(
-                includeClassLabel=includeClassLabel)
-
-        classLabels = self._dataSet.getClassPositionLabels()
+                includeClassLabel=includeClassLabel, includeId=includeId)
+        classLabels = self._dataSet.getClassPositionLabels(includeId=includeId)
 
         post.append('@RELATION %s' % self._dataSet.getClassLabel())
 
@@ -582,10 +629,11 @@ class OutputARFF(OutputFormat):
             discrete = discreteLabels[i] 
             classLabel = classLabels[i]
             if not classLabel: # a normal attribute
-                # for now, doing these all as numeric
-                if discrete:
+                if discrete is None: # this is an identifier
+                    post.append('@ATTRIBUTE %s STRING' % attrLabel)
+                elif discrete is True:
                     post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
-                else:
+                else: # this needs to be a NOMINAL type
                     post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
             else:
                 values = self._dataSet.getUniqueClassValues()
@@ -594,10 +642,11 @@ class OutputARFF(OutputFormat):
         post.append('@DATA')
         return post
 
-    def getString(self, includeClassLabel=True):
+    def getString(self, includeClassLabel=True, includeId=True, lineBreak='\n'):
         msg = []
 
-        header = self.getHeaderLines(includeClassLabel=includeClassLabel)
+        header = self.getHeaderLines(includeClassLabel=includeClassLabel, 
+                                    includeId=includeId)
         for row in header:
             msg.append(row)
 
@@ -609,7 +658,7 @@ class OutputARFF(OutputFormat):
             for e in row:
                 sub.append(str(e))
             msg.append(','.join(sub))
-        return '\n'.join(msg)
+        return lineBreak.join(msg)
 
 
 
@@ -630,9 +679,9 @@ class DataSet(object):
     >>> ds.addData('bach/bwv324.xml', classValue='Bach')
     >>> ds.process()
     >>> ds.getFeaturesAsList()[0]
-    [0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375, 0.6875, 0.09375, 0.875, 0, 4, 4, 'Bach']
+    ['bwv66.6', 0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375, 0.6875, 0.09375, 0.875, 0, 4, 4, 'Bach']
     >>> ds.getFeaturesAsList()[1]
-    [0.12, 0.0, 1.0, 0.12, 0.560..., 0.0, 0.599999..., 0.52000..., 0.0, 0.680000..., 0.0, 0.5600000..., 0, 4, 4, 'Bach']
+    ['bach/bwv324.xml', 0.12, 0.0, 1.0, 0.12, 0.560..., 0.0, 0.599999..., 0.52000..., 0.0, 0.680000..., 0.0, 0.5600000..., 0, 4, 4, 'Bach']
     >>> ds = ds.getString()
     '''
 
@@ -664,31 +713,38 @@ class DataSet(object):
         for sub in values:
             self._featureExtractors.append(sub())
 
-    def getAttributeLabels(self, includeClassLabel=True):
-        '''
+    def getAttributeLabels(self, includeClassLabel=True, 
+        includeId=True):
+        '''Return a list of all attribute labels. Optionally add a class label field and/or an id field.
+
         >>> from music21 import *
         >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
-        >>> ds.getAttributeLabels()
+        >>> ds.getAttributeLabels(includeId=False)
         ['Pitch_Class_Distribution_0', 'Pitch_Class_Distribution_1', 'Pitch_Class_Distribution_2', 'Pitch_Class_Distribution_3', 'Pitch_Class_Distribution_4', 'Pitch_Class_Distribution_5', 'Pitch_Class_Distribution_6', 'Pitch_Class_Distribution_7', 'Pitch_Class_Distribution_8', 'Pitch_Class_Distribution_9', 'Pitch_Class_Distribution_10', 'Pitch_Class_Distribution_11', 'Changes_of_Meter', 'Composer']
         '''
         post = []
+        # place ids first
+        if includeId:
+            post.append('Identifier')
         for fe in self._featureExtractors:
             post += fe.getAttributeLabels()
         if self._classLabel is not None and includeClassLabel:
             post.append(self._classLabel.replace(' ', '_'))
         return post
 
-    def getDiscreteLabels(self, includeClassLabel=True):
+    def getDiscreteLabels(self, includeClassLabel=True, includeId=True):
         '''Return column labels for discrete status.
 
         >>> from music21 import *
         >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getDiscreteLabels()
-        [False, False, False, False, False, False, False, False, False, False, False, False, True, True]
+        [None, False, False, False, False, False, False, False, False, False, False, False, False, True, True]
         '''
         post = []
+        if includeId:
+            post.append(None) # just a spacer
         for fe in self._featureExtractors:
             # need as many statements of discrete as there are dimensions
             post += [fe.discrete] * fe.dimensions 
@@ -698,16 +754,18 @@ class DataSet(object):
         return post
 
 
-    def getClassPositionLabels(self):
+    def getClassPositionLabels(self, includeId=True):
         '''Return column labels for the presence of a class definition
 
         >>> from music21 import *
         >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getClassPositionLabels()
-        [False, False, False, False, False, False, False, False, False, False, False, False, False, True]
+        [None, False, False, False, False, False, False, False, False, False, False, False, False, False, True]
         '''
         post = []
+        if includeId:
+            post.append(None) # just a spacer
         for fe in self._featureExtractors:
             # need as many statements of discrete as there are dimensions
             post += [False] * fe.dimensions 
@@ -717,7 +775,7 @@ class DataSet(object):
         return post
 
 
-    def addData(self, dataOrStreamOrPath, classValue=None):
+    def addData(self, dataOrStreamOrPath, classValue=None, id=None):
         '''Add a Stream, DataInstance, or path to a corpus or local file to this data set.
 
         The class value passed here is assumed to be the same as the classLable assigned at startup. 
@@ -733,10 +791,11 @@ class DataSet(object):
                 s = converter.parse(dataOrStreamOrPath)
             else: # assume corpus
                 s = corpus.parse(dataOrStreamOrPath)
-            di = DataInstance(s)
+            # assume we can use this string as an id
+            di = DataInstance(s, id=dataOrStreamOrPath)
         else:        
             # for now, assume all else are streams
-            di = DataInstance(dataOrStream)
+            di = DataInstance(dataOrStream, id=id)
 
         di.setClassLabel(self._classLabel, classValue)
         self._dataInstances.append(di)
@@ -756,13 +815,16 @@ class DataSet(object):
             self._features.append(row)
 
 
-    def getFeaturesAsList(self, includeClassLabel=True):
+    def getFeaturesAsList(self, includeClassLabel=True, includeId=True):
         '''Get processed data as a list of lists, merging any sub-lists in multi-dimensional features. 
         '''
         post = []
         for i, row in enumerate(self._features):
             v = []
             di = self._dataInstances[i]
+
+            if includeId:
+                v.append(di.getId())
             for f in row:
                 v += f.vector
             if includeClassLabel:
@@ -797,11 +859,11 @@ class DataSet(object):
         return outputFormat.getString()
 
 
-    def write(self, fp=None, format='tab'):
+    def write(self, fp=None, format='tab', includeClassLabel=True):
         '''Set the output format object. 
         '''
         outputFormat = self._getOutputFormat(format)
-        outputFormat.write(fp=fp)
+        outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
         
 
 
@@ -899,25 +961,60 @@ class Test(unittest.TestCase):
         self.assertEqual(di['pitchClassHistogram'], [1, 0, 3, 3, 0, 10, 0, 5, 1, 2, 5, 0])
 
 
+    def testDataSetOutput(self):
+        from music21 import features
+        # test just a few features
+        featureExtractors = features.extractorsById(['d1', 'd2', 'd3', 'd4'], 'native')
+        
+        # need to define what the class label will be
+        ds = features.DataSet(classLabel='Composer')
+        ds.addFeatureExtractors(featureExtractors)
+        
+        # add works, defining the class value 
+        ds.addData('bwv66.6', classValue='Bach')
+        ds.addData('hwv56/movement3-05.md', classValue='Handel')
+        
+        ds.process()
+
+        # manually create an output format and get output
+        of = OutputCSV(ds)
+        post = of.getString(lineBreak='//')
+        self.assertEqual(post, 'Identifier,Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Most_Common_Note_Quarter_Length_Prevalance,Range_of_Note_Quarter_Lengths,Composer//bwv66.6,3,1.0,0.601226993865,1.5,Bach//hwv56/movement3-05.md,7,0.5,0.533333333333,3.75,Handel')
+
+        # without id
+        post = of.getString(lineBreak='//', includeId=False)
+        self.assertEqual(post, 'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Most_Common_Note_Quarter_Length_Prevalance,Range_of_Note_Quarter_Lengths,Composer//3,1.0,0.601226993865,1.5,Bach//7,0.5,0.533333333333,3.75,Handel')
+
+        ds.write(format='tab')
+        ds.write(format='csv')
+        ds.write(format='arff')
 
 
 
-    def xtestComposerClassification(self):
+
+    #---------------------------------------------------------------------------
+    # silent tests
+
+
+    def xtestComposerClassificationJSymbolic(self):
         '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
         '''
         from music21 import features, corpus
         from music21.features import jSymbolic
         
-        featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21']
+        # leaving out 'p19', BasicPitchHistogramFeature
+        featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p20', 'p21']
         
         # will return a list
-        featureExtractors = features.extractorsById(featureExtractors)
+        featureExtractors = features.extractorsById(featureExtractors, 
+                            'jSymbolic')
         
-        worksBach = corpus.bachChorales[:48] # first 48
-        worksMonteverdi = corpus.monteverdiMadrigals
+        worksBach = corpus.bachChorales[100:143] # a middle range
+        worksMonteverdi = corpus.monteverdiMadrigals[:43]
+        worksHandel = corpus.handelMessiah # 43 total
         
-        #         worksBach = corpus.bachChorales[:1] 
-        #         worksMonteverdi = corpus.monteverdiMadrigals[:1]
+#         worksBach = corpus.bachChorales[:5] 
+#         worksMonteverdi = corpus.monteverdiMadrigals[:5]
         
         # need to define what the class label will be
         ds = features.DataSet(classLabel='Composer')
@@ -928,6 +1025,8 @@ class Test(unittest.TestCase):
             ds.addData(w, classValue='Bach')
         for w in worksMonteverdi:
             ds.addData(w, classValue='Monteverdi')
+        for w in worksHandel:
+            ds.addData(w, classValue='Handel')
         
         # process with all feature extractors, store all features
         ds.process()

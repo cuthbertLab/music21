@@ -75,8 +75,8 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Most Common Quarter Length.'
-        self.description = 'The value of the most common quarter length.'
+        self.name = 'Unique Note Quarter Lengths'
+        self.description = 'The number of unique note quarter lengths.'
         self.dimensions = 1
         self.discrete = True 
 
@@ -104,7 +104,7 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Most Common Quarter Length.'
+        self.name = 'Most Common Note Quarter Length'
         self.description = 'The value of the most common quarter length.'
         self.dimensions = 1
         self.discrete = False 
@@ -135,7 +135,7 @@ class MostCommonNoteQuarterLengthPrevelance(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Most Common Quarter Length Prevalance'
+        self.name = 'Most Common Note Quarter Length Prevalance'
         self.description = 'Fraction of notes that have the most common quarter length.'
         self.dimensions = 1
         self.discrete = False 
@@ -168,11 +168,10 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Range Of Quarter Lengths'
+        self.name = 'Range of Note Quarter Lengths'
         self.description = 'Difference between the longest and shortest quarter lengths.'
         self.dimensions = 1
         self.discrete = False
-
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
@@ -201,7 +200,7 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
         self.name = 'Unique Pitch Class Set Simultaneities'
         self.description = 'Number of unique pitch class simultaneities.'
         self.dimensions = 1
-        self.discrete = True 
+        self.discrete = False 
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
@@ -227,10 +226,10 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Unique Pitch Class Set Simultaneities'
+        self.name = 'Unique Set Class Simultaneities'
         self.description = 'Number of unique pitch class simultaneities.'
         self.dimensions = 1
-        self.discrete = True 
+        self.discrete = False 
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
