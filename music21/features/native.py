@@ -35,7 +35,7 @@ environLocal = environment.Environment(_MOD)
 # enhmaronic usage
 # chord analysis
 
-# key signature histgram
+# key signature histogram
 # array of circle of fiths
 
 
@@ -43,11 +43,11 @@ environLocal = environment.Environment(_MOD)
 class NoteStartOnFirstBeatFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
-    >>> s = stream.Stream()
+    >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.NoteStartOnFirstBeatFeature(s)
-    >>> f = fe.extract()
-    >>> f.name
-    'Note Start on First Beat'
+    >>> fe = features.jSymbolic.MostCommonPitchPrevalenceFeature(s)
+    >>> fe.extract().vector
+    [0.29999...]
     '''
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)

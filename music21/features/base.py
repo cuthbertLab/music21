@@ -36,13 +36,15 @@ class Feature(object):
     '''
     def __init__(self):
         # these values will be filled by the extractor
+        self.dimensions = None # number of dimensions
+        # data storage; possibly use numpy array
+        self.vector = None
+
+        # consider not storing this values, as may not be necessary
         self.name = None # string name representation
         self.description = None # string description
         self.isSequential = None # True or False
-        self.dimensions = None # number of dimensions
         self.discrete = None # is discrete or continuous
-        # data storage; possibly use numpy array
-        self.vector = None
 
     def _getVectors(self):
         '''Prepare a vector of appropriate size and return
@@ -189,6 +191,97 @@ class FeatureExtractor(object):
 
 
 
+
+
+#-------------------------------------------------------------------------------
+class StreamForms(object):
+    '''A dictionary-like wrapper of a Stream, providing numerous representations cached and on-demand.
+    '''
+    def __init__(self, streamObj, prepareStream=True):   
+        self._src = streamObj
+        if self._src is not None:
+            if prepareStream:
+                self._base = self._prepareStream(self._src)
+            else: # possibly make a copy?
+                self._base = self._src
+        else:       
+            self._base = None
+
+        # basic data storage is a dictionary
+        self._forms = {}    
+
+    def keys(self):
+        # will only return forms that are established
+        return self._forms.keys()
+
+    def _prepareStream(self, streamObj):
+        '''Common routines done on Streams prior to processing. Return a new Stream
+        '''
+        #streamObj = streamObj.expandRepeats()
+        streamObj = streamObj.stripTies(retainContainers=True, inPlace=False)
+        return streamObj
+
+    def __getitem__(self, key):
+        '''Get a form of this Stream, using a cached version if available.
+        '''
+        # get cached copy
+        if key in self._forms.keys():
+            return self._forms[key]
+
+        # else, process, store, and return
+        elif key in ['flat']:
+            self._forms['flat'] = self._base.flat
+            return self._forms['flat']
+
+        elif key in ['flat.pitches']:
+            self._forms['flat.pitches'] = self._base.flat.pitches
+            return self._forms['flat.pitches']
+
+        elif key in ['flat.notes']:
+            self._forms['flat.notes'] = self._base.flat.notes
+            return self._forms['flat.notes']
+
+        elif key in ['getElementsByClass.Measure']:
+            # need to determine if should concatenate
+            # measure for all parts if a score?
+            if 'Score' in self._base.classes:
+                post = stream.Stream()
+                for p in self._base.parts:
+                    # insert in overlapping offset positions
+                    for m in p.getElementsByClass('Measure'):
+                        post.insert(m.getOffsetBySite(p), m)
+            else:
+                post = self._base.getElementsByClass('Measure')
+
+            self._forms['getElementsByClass.Measure'] = post
+            return self._forms['getElementsByClass.Measure']
+
+        elif key in ['flat.getElementsByClass.TimeSignature']:
+            self._forms['flat.getElementsByClass.TimeSignature'] = self._base.flat.getElementsByClass('TimeSignature')
+            return self._forms['flat.getElementsByClass.TimeSignature']
+
+        # data lists / histograms
+
+        elif key in ['pitchClassHistogram']:
+            histo = [0] * 12
+            for p in self.__getitem__('flat.pitches'): # recursive call
+                histo[p.pitchClass] += 1
+            self._forms['pitchClassHistogram'] = histo
+            return self._forms['pitchClassHistogram']
+
+        elif key in ['midiPitchHistogram']:
+            histo = [0] * 128
+            for p in self.__getitem__('flat.pitches'): # recursive call
+                histo[p.midi] += 1
+            self._forms['midiPitchHistogram'] = histo
+            return self._forms['midiPitchHistogram']
+
+        else:
+            raise AttributeError('no such attribute: %s' % key)
+
+
+
+
 #-------------------------------------------------------------------------------
 class DataInstance(object):
     '''
@@ -196,31 +289,42 @@ class DataInstance(object):
     (by stripping ties, etc.) and stores 
     multiple commonly-used stream representations once, providing rapid processing. 
     '''
-    def __init__(self, streamObj=None):
+    def __init__(self, streamObj=None, id=None):
         self._src = streamObj
 
         # perform basic operations that are performed on all
         # streams
-        if self._src is not None:
-            self._base = self._prepareStream(self._src)
-        else:       
-            self._base = None
+
+        # store an id for the source stream: file path url, corpus url
+        # or metadata title
+        if id is not None:
+            self._id = id
+        else:
+            if hasattr(self._src, 'metadata'): 
+                self._id = self._src.metadata # may be None
 
         # the attribute name in the data set for this label
         self._classLabel = None
         # store the class value for this data instance
         self._classValue = None
 
-        # store a dictionary of stream forms that are made and stored
-        # on demand
-        self._forms = {}
+        # store a dictionary of StreamForms
+        self._forms = StreamForms(self._src)
+        
+        # if parts exist, store a forms for each
+        self._formsByPart = []
+        if hasattr(self._src, 'parts'):
+            for p in self._src.parts:
+                # note that this will join ties and expand rests again
+                self._formsByPart.append(StreamForms(p))
+    
+        # TODO: store a list of voices, extracted from each part, 
+        # presently this will only work on a measure stream
+        self._formsByVoice = []
+        if hasattr(self._src, 'voices'):
+            for v in self._src.voices:
+                self._formsByPart.append(StreamForms(v))
 
-    def _prepareStream(self, streamObj):
-        '''Common routines done on Streams prior to processing. Return a new Stream
-        '''
-        #TODO: add expand repeats
-        src = streamObj.stripTies(retainContainers=True, inPlace=False)
-        return src
 
     def setClassLabel(self, classLabel, classValue=None):
         '''Set the class label, as well as the class value if known. The class label is the attribute name used to define the class of this data instance.
@@ -239,85 +343,37 @@ class DataInstance(object):
         else:
             return self._classValue
 
-    def _getForm(self, form='flat'):
+    def __getitem__(self, key):
         '''Get a form of this Stream, using a cached version if available.
 
         >>> from music21 import *
         >>> s = corpus.parse('bwv66.6')
         >>> di = features.DataInstance(s)
-        >>> len(di._getForm('flat'))
+        >>> len(di['flat'])
         192
         >>> len(di['flat'])
         192
-        >>> len(di._getForm('flat.pitches'))
+        >>> len(di['flat.pitches'])
         163
-        >>> len(di._getForm('flat.notes'))
+        >>> len(di['flat.notes'])
         163
-        >>> len(di._getForm('getElementsByClass.Measure'))
+        >>> len(di['getElementsByClass.Measure'])
         40
         >>> len(di['getElementsByClass.Measure'])
         40
-        >>> len(di._getForm('flat.getElementsByClass.TimeSignature'))
+        >>> len(di['flat.getElementsByClass.TimeSignature'])
         4
         '''
-        # get cached copy
-        if form in self._forms.keys():
-            return self._forms[form]
+        if key in ['parts']:
+            # return a list of Forms for each part
+            return self._formsByPart
+        elif key in ['voices']:
+            # return a list of Forms for voices
+            return self._formsByVoices
+        # try to create by calling the attribute
+        # will raise an attribute error if there is a problem
+        return self._forms[key]
 
-        # else, process, store, and return
-        elif form in ['flat']:
-            self._forms['flat'] = self._base.flat
-            return self._forms['flat']
-
-        elif form in ['flat.pitches']:
-            self._forms['flat.pitches'] = self._base.flat.pitches
-            return self._forms['flat.pitches']
-
-        elif form in ['flat.notes']:
-            self._forms['flat.notes'] = self._base.flat.notes
-            return self._forms['flat.notes']
-
-        elif form in ['getElementsByClass.Measure']:
-            # need to determine if should concatenate
-            # measure for all parts if a score?
-            if 'Score' in self._base.classes:
-                post = stream.Stream()
-                for p in self._base.parts:
-                    # insert in overlapping offset positions
-                    for m in p.getElementsByClass('Measure'):
-                        post.insert(m.getOffsetBySite(p), m)
-            else:
-                post = self._base.getElementsByClass('Measure')
-
-            self._forms['getElementsByClass.Measure'] = post
-            return self._forms['getElementsByClass.Measure']
-
-        elif form in ['flat.getElementsByClass.TimeSignature']:
-            self._forms['flat.getElementsByClass.TimeSignature'] = self._base.flat.getElementsByClass('TimeSignature')
-            return self._forms['flat.getElementsByClass.TimeSignature']
-
-        # data lists / histograms
-
-        elif form in ['pitchClassHistogram']:
-            histo = [0] * 12
-            for p in self._getForm('flat.pitches'): # recursive call
-                histo[p.pitchClass] += 1
-            self._forms['pitchClassHistogram'] = histo
-            return self._forms['pitchClassHistogram']
-
-        elif form in ['midiPitchHistogram']:
-            histo = [0] * 128
-            for p in self._getForm('flat.pitches'): # recursive call
-                histo[p.midi] += 1
-            self._forms['midiPitchHistogram'] = histo
-            return self._forms['midiPitchHistogram']
-
-        else:
-            raise AttributeError('no such attribute: %s' % form)
-
-
-    def __getitem__(self, key):
-        return self._getForm(key)
 
 
 #-------------------------------------------------------------------------------
@@ -694,6 +750,8 @@ class Test(unittest.TestCase):
         pass
 
     def xtestComposerClassification(self):
+        '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
+        '''
         from music21 import features, corpus
         from music21.features import jSymbolic
         
@@ -725,6 +783,8 @@ class Test(unittest.TestCase):
         ds.write(format='arff')
 
     def xtestOrangeBayes(self):
+        '''Using an already created test file with a BayesLearner.
+        '''
         import orange, orngTree
         data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
         classifier = orange.BayesLearner(data)
@@ -734,6 +794,8 @@ class Test(unittest.TestCase):
 
 
     def xtestOrangeClassifiers(self):
+        '''This test shows how to compare four classifiers; replace the file path with a path to the .tab data file. 
+        '''
         import orange, orngTree
         data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 
