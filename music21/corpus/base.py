@@ -34,6 +34,8 @@ environLocal = environment.Environment(_MOD)
 
 
 # import corpus packages as python modules
+from music21.corpus import airdsAirs
+
 from music21.corpus import beethoven
 from music21.corpus.beethoven import opus18no1
 from music21.corpus.beethoven import opus59no1
@@ -57,6 +59,8 @@ from music21.corpus import mozart
 from music21.corpus.mozart import k80
 from music21.corpus.mozart import k155
 from music21.corpus.mozart import k156
+from music21.corpus.mozart import k157
+from music21.corpus.mozart import k370
 from music21.corpus.mozart import k458
 
 from music21.corpus import schoenberg
@@ -121,6 +125,8 @@ from music21.corpus.bach import bwv893
 
 
 MODULES = [
+            airdsAirs,
+            
             beethoven, 
             opus18no1,
             opus59no1,
@@ -144,6 +150,8 @@ MODULES = [
             k80,
             k155,
             k156,
+            k157,
+            k370,
             k458,
             
             schoenberg,
