@@ -758,7 +758,7 @@ class Test(unittest.TestCase):
         n1.expressions.append(Trill())
         m1.append(n1)
         p1.append(m1)
-        print realizeOrnaments(n1)
+        #print realizeOrnaments(n1)
         
 
 
