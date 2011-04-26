@@ -105,7 +105,7 @@ class FeatureExtractor(object):
         if dataOrStream is not None:
             if (hasattr(dataOrStream, 'classes') and 'Stream' in         
                 dataOrStream.classes):
-                environLocal.printDebug(['creating new DataInstance: this should be a Stream:', dataOrStream])
+                #environLocal.printDebug(['creating new DataInstance: this should be a Stream:', dataOrStream])
                 # if we are passed a stream, create a DataInstrance to 
                 # manage the
                 # its data; this is less efficient but is good for testing
@@ -748,6 +748,35 @@ class Test(unittest.TestCase):
     
     def runTest(self):
         pass
+
+    def testStreamForms(self):
+
+        from music21 import corpus, features
+
+        s = corpus.parse('hwv56/movement3-05.md')
+        di = features.DataInstance(s)
+        self.assertEqual(len(di['flat']), 57)
+        self.assertEqual(len(di['flat.notes']), 30)
+
+        # can access parts by index
+        self.assertEqual(len(di['parts']), 2)
+        # stored in parts are StreamForms instances, caching their results
+        self.assertEqual(len(di['parts'][0]['flat.notes']), 22)
+        self.assertEqual(len(di['parts'][1]['flat.notes']), 8)
+
+        # getting a measure by part
+        self.assertEqual(len(di['parts'][0]['getElementsByClass.Measure']), 5)
+        self.assertEqual(len(di['parts'][1]['getElementsByClass.Measure']), 5)
+
+        self.assertEqual(di['parts'][0]['pitchClassHistogram'], [0, 0, 3, 2, 0, 9, 0, 5, 0, 1, 2, 0])
+        self.assertEqual(di['parts'][1]['pitchClassHistogram'], [1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 3, 0])
+        # the sum of the two arrays is the pitch class histogram of the complete
+        # work
+        self.assertEqual(di['pitchClassHistogram'], [1, 0, 3, 3, 0, 10, 0, 5, 1, 2, 5, 0])
+
+
+
+
 
     def xtestComposerClassification(self):
         '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
