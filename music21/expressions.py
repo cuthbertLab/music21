@@ -391,7 +391,7 @@ class Trill(Ornament):
         ([<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note C>, <music21.note.Note D>], None, [])
         
         >>> from music21 import *
-        >>> n2 = note.Note("C4")
+        >>> n2 = note.Note("D4")
         >>> n2.quarterLength = 0.125
         >>> t2 = expressions.Trill()
         >>> t2.realize(n2)
@@ -517,13 +517,25 @@ class Turn(Ornament):
         The first is a list of the four notes that the beginning of the note was converted to.
         The second is a note of duration 0 because the turn "eats up" the whole note.
         The third is a list of the notes at the end if nachschlag is True, and empty list if False.
-        
-        >>> from music21 import *
-        >>> n1 = note.Note("C4")
-        >>> n1.quarterLength = 1
+
+        >>> from  music21 import *
+        >>> m1 = stream.Measure()
+        >>> m1.append(key.Key('F', 'major'))
+        >>> n1 = note.Note("C5")
+        >>> m1.append(n1)
         >>> t1 = expressions.Turn()
         >>> t1.realize(n1)
-        ([], <music21.note.Note C>, [<music21.note.Note D>, <music21.note.Note C>, <music21.note.Note B>, <music21.note.Note C>])
+        ([], <music21.note.Note C>, [<music21.note.Note D>, <music21.note.Note C>, <music21.note.Note B->, <music21.note.Note C>])
+        
+        >>> from music21 import *
+        >>> m2 = stream.Measure()
+        >>> m2.append(key.KeySignature(5))
+        >>> n2 = note.Note("B4")
+        >>> m2.append(n2)
+        >>> t2 = expressions.InvertedTurn()
+        >>> t2.realize(n2)
+        ([], <music21.note.Note B>, [<music21.note.Note A#>, <music21.note.Note B>, <music21.note.Note C#>, <music21.note.Note B>])
+
         
         >>> from music21 import *
         >>> n2 = note.Note("C4")
@@ -721,7 +733,7 @@ class Test(unittest.TestCase):
         m1 = stream.Measure()
         m2 = stream.Measure()
         p1.append(clef.TrebleClef())
-        p1.append(key.Key('C', 'major'))
+        p1.append(key.Key('F', 'major'))
         p1.append(meter.TimeSignature('2/4'))
         n1 = note.HalfNote("C5")
         n1.expressions.append(Turn())
@@ -732,7 +744,22 @@ class Test(unittest.TestCase):
         m2.append(n2)
         p1.append(m1)
         p1.append(m2)
+        #print realizeOrnaments(n1)
         #print realizeOrnaments(n2)
+    
+    def testExpandTrills(self):
+        from music21 import note, stream, clef, key, meter
+        p1 = stream.Part()
+        m1 = stream.Measure()
+        p1.append(clef.TrebleClef())
+        p1.append(key.Key('D', 'major'))
+        p1.append(meter.TimeSignature('2/4'))
+        n1 = note.EighthNote('E4')
+        n1.expressions.append(Trill())
+        m1.append(n1)
+        p1.append(m1)
+        print realizeOrnaments(n1)
+        
 
 
 if __name__ == "__main__":
