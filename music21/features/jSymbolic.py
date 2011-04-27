@@ -1595,10 +1595,17 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def _process(self):
+        from music21 import meter
+
         elements = self.data['flat.getElementsByClass.TimeSignature']
-        # not: not looking at other triple meters
-        if len(elements) > 0 and elements[0].beatDivisionCountName == 'Compound':
-            self._feature.vector[0] = 1
+
+        if len(elements) > 0:
+            try:
+                countName = elements[0].beatDivisionCountName
+            except meter.TimeSignatureException:
+                return # do nothing
+            if countName == 'Compound':
+                self._feature.vector[0] = 1
 
 
 

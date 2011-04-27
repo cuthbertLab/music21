@@ -548,9 +548,11 @@ class OutputTabOrange(OutputFormat):
         post.append(row)
         return post
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak='\n'):
+    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
         '''Get the complete DataSet as a string with the appropriate header.s
         '''
+        if lineBreak is None:
+            lineBreak = '\n'
         msg = []
         header = self.getHeaderLines(includeClassLabel=includeClassLabel,
                                      includeId=includeId)
@@ -589,7 +591,9 @@ class OutputCSV(OutputFormat):
             includeClassLabel=includeClassLabel, includeId=includeId))
         return post
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak='\n'):
+    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
+        if lineBreak is None:
+            lineBreak = '\n'
         msg = []
         header = self.getHeaderLines(includeClassLabel=includeClassLabel, 
                                     includeId=includeId)
@@ -662,7 +666,10 @@ class OutputARFF(OutputFormat):
         post.append('@DATA')
         return post
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak='\n'):
+    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
+        if lineBreak is None:
+            lineBreak = '\n'
+
         msg = []
 
         header = self.getHeaderLines(includeClassLabel=includeClassLabel, 
@@ -804,7 +811,7 @@ class DataSet(object):
             raise DataSetException('cannot add data unless a class label for this DataSet has been set.')
 
         if isinstance(dataOrStreamOrPath, DataInstance):
-            di = dataOrStream
+            di = dataOrStreamOrPath
         elif common.isStr(dataOrStreamOrPath):
             # could be corpus or file path
             if os.path.exists(dataOrStreamOrPath):
@@ -815,7 +822,7 @@ class DataSet(object):
             di = DataInstance(s, id=dataOrStreamOrPath)
         else:        
             # for now, assume all else are streams
-            di = DataInstance(dataOrStream, id=id)
+            di = DataInstance(dataOrStreamOrPath, id=id)
 
         di.setClassLabel(self._classLabel, classValue)
         self._dataInstances.append(di)
@@ -1022,14 +1029,13 @@ class Test(unittest.TestCase):
         from music21 import features, corpus
         from music21.features import jSymbolic
         
-        # leaving out 'p19', BasicPitchHistogramFeature
-        featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p20', 'p21']
+        featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21']
         
         # will return a list
         featureExtractors = features.extractorsById(featureExtractors, 
                             'jSymbolic')
         
-        worksBach = corpus.bachChorales[100:143] # a middle range
+        #worksBach = corpus.bachChorales[100:143] # a middle range
         worksMonteverdi = corpus.monteverdiMadrigals[:43]
         worksHandel = corpus.handelMessiah # 43 total
         
@@ -1041,8 +1047,8 @@ class Test(unittest.TestCase):
         ds.addFeatureExtractors(featureExtractors)
         
         # add works, defining the class value 
-        for w in worksBach:
-            ds.addData(w, classValue='Bach')
+#         for w in worksBach:
+#             ds.addData(w, classValue='Bach')
         for w in worksMonteverdi:
             ds.addData(w, classValue='Monteverdi')
         for w in worksHandel:
@@ -1053,6 +1059,50 @@ class Test(unittest.TestCase):
         ds.write(format='tab')
         ds.write(format='csv')
         ds.write(format='arff')
+
+
+
+
+    def xtestRegionClassificationJSymbolic(self):
+        '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
+        '''
+        from music21 import features, corpus
+        from music21.features import jSymbolic
+
+        featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 
+                            'jSymbolic')
+
+        oChina1 = corpus.parse('essenFolksong/han1')
+        oChina2 = corpus.parse('essenFolksong/han2')
+
+        oMitteleuropa1 = corpus.parse('essenFolksong/boehme10')
+        oMitteleuropa2 = corpus.parse('essenFolksong/boehme20')
+
+        ds = features.DataSet(classLabel='Region')
+        ds.addFeatureExtractors(featureExtractors)
+        
+        # add works, defining the class value 
+        for o, name in [(oChina1, 'han1'), 
+                        (oChina2, 'han2')]:
+            for w in o.scores:
+                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='China', id=id)
+
+        for o, name in [(oMitteleuropa1, 'boehme10'), 
+                        (oMitteleuropa2, 'boehme20')]:
+            for w in o.scores:
+                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='Mitteleuropa', id=id)
+
+        # process with all feature extractors, store all features
+        ds.process()
+        ds.write(format='tab')
+        ds.write(format='csv')
+        ds.write(format='arff')
+
+
+
+
 
     def xtestOrangeBayes(self):
         '''Using an already created test file with a BayesLearner.
@@ -1107,6 +1157,9 @@ class Test(unittest.TestCase):
             print "%d: %5.3f (originally %s)" % (i+1, p[1], data[i].getclass())
 
         orngTree.printTxt(tree)
+
+
+
 
 
 if __name__ == "__main__":

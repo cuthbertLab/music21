@@ -33,10 +33,22 @@ environLocal = environment.Environment(_MOD)
 
 # clef usage
 # enhmaronic usage
-# chord analysis
 
 # key signature histogram
 # array of circle of fiths
+
+# lyrics
+# luca gloria: is common
+# searching for numbers of hits
+# is vowel placed on strongest beat
+# wikifonia
+
+# essen local
+# getting elevation
+
+# automatic key analysis
+# as a method of feature extraction
+
 
 
 #-------------------------------------------------------------------------------
