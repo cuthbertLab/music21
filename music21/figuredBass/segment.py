@@ -261,8 +261,10 @@ class MiddleSegment(Segment):
         if not dominantPossib.isDominantSeventh():
             raise SegmentException("Possibility does not form a correctly spelled dominant seventh chord.")
         
+        dominantChord = dominantPossib.chordify()
+        domInversionName = str(dominantChord.inversionName())
         sc = scale.MajorScale()
-        dominantScale = sc.derive(dominantPossib.chordify().pitches)
+        dominantScale = sc.derive(dominantChord.pitches)
         minorScale = dominantScale.getParallelMinor()       
         
         tonic = dominantScale.getTonic()
@@ -271,31 +273,34 @@ class MiddleSegment(Segment):
         minSubmediant = minorScale.pitchFromDegree(6)
         
         resolutionChord = chord.Chord(self.pitchesAboveBass)
+        resInversionName = str(resolutionChord.inversionName())
+        if resInversionName == '53':
+            resInversionName = ''
         
         if resolutionChord.root().name == tonic.name:
             resolveV43toI6 = False
-            if dominantPossib.chordify().inversion() == 2 and resolutionChord.inversion() == 1:
+            if dominantChord.inversion() == 2 and resolutionChord.inversion() == 1:
                 resolveV43toI6 = True
             if resolutionChord.isMajorTriad():
-                environRules.warn("Dominant seventh resolution: V7->I in " + dominantScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6)
             elif resolutionChord.isMinorTriad():
-                environRules.warn("Dominant seventh resolution: V7->i in " + minorScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6)
         elif resolutionChord.root().name == majSubmediant.name:
             if sampleChord.isMinorTriad():
-                environRules.warn("Dominant seventh resolution: V7->vi in " + dominantScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorSubmediant(dominantPossib) #Major scale
         elif resolutionChord.root().name == minSubmediant.name:
             if resolutionChord.isMajorTriad():
-                environRules.warn("Dominant seventh resolution: V7->VI in " + minorScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorSubmediant(dominantPossib) #Minor scale
         elif resolutionChord.root().name == subdominant.name:
             if resolutionChord.isMajorTriad():
-                environRules.warn("Dominant seventh resolution: V7->IV in " + dominantScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorSubdominant(dominantPossib)
             elif resolutionChord.isMinorTriad():
-                environRules.warn("Dominant seventh resolution: V7->iv in " + minorScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorSubdominant(dominantPossib)
         else:
             raise SegmentException("Dominant seventh resolution: No standard resolution available.")
@@ -311,6 +316,7 @@ class MiddleSegment(Segment):
             raise SegmentException("Possibility does not form a correctly spelled diminished seventh chord.")
           
         diminishedChord = diminishedPossib.chordify()
+        dimInversionName = str(diminishedChord.inversionName())
         sc = scale.HarmonicMinorScale()
         diminishedScale = sc.deriveByDegree(7, diminishedChord.root())
         minorScale = diminishedScale.getParallelMinor()
@@ -319,26 +325,29 @@ class MiddleSegment(Segment):
         subdominant = diminishedScale.pitchFromDegree(4)
 
         resolutionChord = chord.Chord(self.pitchesAboveBass)
+        resInversionName = str(resolutionChord.inversionName())
+        if resInversionName == '53':
+            resInversionName = ''
         
         if resolutionChord.root().name == tonic.name:
             doubledRoot = self.fbRules.doubledRootInDim7
-            if diminishedPossib.chordify().inversion() == 1:
+            if diminishedChord.inversion() == 1:
                 if resolutionChord.inversion() == 0:
                     doubledRoot = True
                 elif resolutionChord.inversion() == 1:
                     doubledRoot = False
             if resolutionChord.isMajorTriad():
-                environRules.warn("Diminished seventh resolution: vii7->I in " + diminishedScale.name)
+                environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + diminishedScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot)
             elif resolutionChord.isMinorTriad():
-                environRules.warn("Diminished seventh resolution: vii7->i in " + minorScale.name)
+                environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot)
         elif resolutionChord.root().name == subdominant.name:
              if resolutionChord.isMajorTriad():
-                environRules.warn("Diminished seventh resolution: vii7->IV in " + diminishedScale.name)
+                environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + diminishedScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMajorSubdominant(diminishedPossib)
              elif resolutionChord.isMinorTriad():
-                environRules.warn("Diminished seventh resolution: vii7->iv in " + minorScale.name)
+                environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMinorSubdominant(diminishedPossib)
         else:
             raise SegmentException("Diminished seventh resolution: No standard resolution available.")
