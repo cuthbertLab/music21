@@ -54,8 +54,8 @@ class Segment:
             spacesInFront = ''
             for space in range(maxLength - len(fs)):
                 spacesInFront += ' '
-            self.bassNote.addLyric(spacesInFront + fs)
-    
+            self.bassNote.addLyric(spacesInFront + fs, applyRaw = True)
+            
     def correctPossibilities(self):
         raise SegmentException("Must specifically create StartSegment or MiddleSegment to call this method.")
     
@@ -321,12 +321,18 @@ class MiddleSegment(Segment):
         resolutionChord = chord.Chord(self.pitchesAboveBass)
         
         if resolutionChord.root().name == tonic.name:
+            doubledRoot = self.fbRules.doubledRootInDim7
+            if diminishedPossib.chordify().inversion() == 1:
+                if resolutionChord.inversion() == 0:
+                    doubledRoot = True
+                elif resolutionChord.inversion() == 1:
+                    doubledRoot = False
             if resolutionChord.isMajorTriad():
                 environRules.warn("Diminished seventh resolution: vii7->I in " + diminishedScale.name)
-                resolutionPossib = resolution.diminishedSeventhToMajorTonic(diminishedPossib, self.fbRules.doubledRootInDim7)
+                resolutionPossib = resolution.diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot)
             elif resolutionChord.isMinorTriad():
                 environRules.warn("Diminished seventh resolution: vii7->i in " + minorScale.name)
-                resolutionPossib = resolution.diminishedSeventhToMinorTonic(diminishedPossib, self.fbRules.doubledRootInDim7)
+                resolutionPossib = resolution.diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot)
         elif resolutionChord.root().name == subdominant.name:
              if resolutionChord.isMajorTriad():
                 environRules.warn("Diminished seventh resolution: vii7->IV in " + diminishedScale.name)
