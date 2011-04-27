@@ -29,8 +29,6 @@ environLocal = environment.Environment(_MOD)
 
 
 
-
-
 #-------------------------------------------------------------------------------
 # 112 feature extractors
 
@@ -83,18 +81,6 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
 
         self.name = 'Size of Melodic Arcs'
         self.description = 'Average melodic interval separating the top note of melodic peaks and the bottom note of melodic troughs.'
-        self.isSequential = True
-        self.dimensions = 1
-
-class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Average Range of Glissandos'
-        self.description = 'Average range of Pitch Bends, where range is defined as the greatest value of the absolute difference between 64 and the second data byte of all MIDI Pitch Bend messages falling between the Note On and Note Off messages of any note.'
         self.isSequential = True
         self.dimensions = 1
 
@@ -378,8 +364,8 @@ class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.MostCommonPitchPrevalenceFeature(s)
-    >>> fe.extract().vector
-    [0.29999...]
+    >>> fe.extract().vector[0] + .0001  # slightly less than .3 on 32-bit systems
+    0.3...
     '''
     id = 'P1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -921,7 +907,7 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.BasicPitchHistogramFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.052631578947368418, 0.0, 0.0, 0.052631578947368418, 0.052631578947368418, 0.26315789473684209, 0.0, 0.31578947368421051, 0.10526315789473684, 0.0, 0.052631578947368418, 0.15789473684210525, 0.52631578947368418, 0.0, 0.36842105263157893, 0.63157894736842102, 0.10526315789473684, 0.78947368421052633, 0.0, 1.0, 0.52631578947368418, 0.052631578947368418, 0.73684210526315785, 0.15789473684210525, 0.94736842105263153, 0.0, 0.36842105263157893, 0.47368421052631576, 0.0, 0.42105263157894735, 0.0, 0.36842105263157893, 0.0, 0.0, 0.052631578947368418, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.052631578..., 0.0, 0.0, 0.052631578..., 0.05263157894..., 0.2631578..., 0.0, 0.3157894..., 0.1052631..., 0.0, 0.052631..., 0.157894736..., 0.5263157..., 0.0, 0.368421052..., 0.6315789473..., 0.105263157..., 0.78947368..., 0.0, 1.0, 0.52631578..., 0.052631578..., 0.736842105..., 0.1578947..., 0.9473684..., 0.0, 0.36842105..., 0.47368421..., 0.0, 0.42105263..., 0.0, 0.36842105..., 0.0, 0.0, 0.052631578..., 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
     id = 'P19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1033,6 +1019,20 @@ class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
 
+class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'P23'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Average Range Of Glissandos'
+        self.description = 'Average range of MIDI Pitch Bends, where "range" is defined as the greatest value of the absolute difference between 64 and the second data byte of all MIDI Pitch Bend messages falling between the Note On and Note Off messages of any note.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
@@ -1046,9 +1046,19 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-
-
-
+#class PrevalenceOfMicroTonesFeature(featuresModule.FeatureExtractor):
+#    '''
+#    Not implemented in jSymbolic
+#    >>> from music21 import *
+#    '''
+#    id = 'P26'
+#    def __init__(self, dataOrStream=None, *arguments, **keywords):
+#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+#
+#        self.name = 'Prevalence Of Micro-tones'
+#        self.description = 'Number of Note Ons that are preceded by isolated MIDI Pitch Bend messages as a fraction of the total number of Note Ons.'
+#        self.isSequential = True
+#        self.dimensions = 1
 
 
 
@@ -1390,6 +1400,61 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
         self.isSequential = True
         self.dimensions = 1
 
+
+#class IncidenceOfCompleteRestsFeature(featuresModule.FeatureExtractor):
+#    '''
+#    Not implemented in jSymbolic
+#    >>> from music21 import *
+#    '''
+#    def __init__(self, dataOrStream=None, *arguments, **keywords):
+#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+#
+#        self.name = 'Incidence Of Complete Rests'
+#        self.description = 'Total amount of time in seconds in which no notes are sounding on any channel divided by the total length of the recording'
+#        self.isSequential = True
+#        self.dimensions = 1
+#
+#class MaximumCompleteRestDurationFeature(featuresModule.FeatureExtractor):
+#    '''
+#    Not implemented in jSymbolic
+#    >>> from music21 import *
+#    '''
+#    def __init__(self, dataOrStream=None, *arguments, **keywords):
+#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+#
+#        self.name = 'Maximumm Complete Rest Duration'
+#        self.description = 'Maximum amount of time in seconds in which no notes are sounding on any channel.'
+#        self.isSequential = True
+#        self.dimensions = 1
+#
+#class AverageRestDurationPerVoiceFeature(featuresModule.FeatureExtractor):
+#    '''
+#    Not implemented in jSymbolic
+#    >>> from music21 import *
+#    '''
+#    def __init__(self, dataOrStream=None, *arguments, **keywords):
+#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+#
+#        self.name = 'Average Rest Duration Per Voice'
+#        self.description = 'Average, in seconds, of the average amounts of time in each channel in which no note is sounding (counting only channels with at least one note), divided by the total duration of the recording'
+#        self.isSequential = True
+#        self.dimensions = 1
+#
+#class AverageVariabilityOfRestDurationsAcrossVoicesFeature(featuresModule.FeatureExtractor):
+#    '''
+#    Not implemented in jSymbolic
+#    >>> from music21 import *
+#    '''
+#    def __init__(self, dataOrStream=None, *arguments, **keywords):
+#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+#
+#        self.name = 'Average Variability Of Rest Durations Across Voices'
+#        self.description = ' Standard deviation, in seconds, of the average amounts of time in each channel in which no note is sounding (counting only channels with at least one note)'
+#        self.isSequential = True
+#        self.dimensions = 1
+
+                        
+                        
 
 
 class InitialTempoFeature(featuresModule.FeatureExtractor):
@@ -2142,6 +2207,217 @@ class ElectricInstrumentFractionFeature(featuresModule.FeatureExtractor):
 
 
 #------------------------------------------------------------------------------
+class JSymbolicFeatureException(featuresModule.FeatureException):
+    pass
+
+
+extractorsById = {'I': [None,
+                        PitchedInstrumentsPresentFeature,
+                        UnpitchedInstrumentsPresentFeature,
+                        NotePrevalenceOfPitchedInstrumentsFeature,
+                        NotePrevalenceOfUnpitchedInstrumentsFeature,
+                        TimePrevalenceOfPitchedInstrumentsFeature,
+                        VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature,
+                        VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature,
+                        NumberOfPitchedInstrumentsFeature,
+                        NumberOfUnpitchedInstrumentsFeature,
+                        PercussionPrevalenceFeature,
+                        StringKeyboardFractionFeature,
+                        AcousticGuitarFractionFeature,
+                        ElectricGuitarFractionFeature,
+                        ViolinFractionFeature,
+                        SaxophoneFractionFeature,
+                        BrassFractionFeature,
+                        WoodwindsFractionFeature,
+                        OrchestralStringsFractionFeature,
+                        StringEnsembleFractionFeature,
+                        ElectricInstrumentFractionFeature,
+                        
+                        
+                        ],
+                  'T': [None,
+                        MaximumNumberOfIndependentVoicesFeature,
+                        AverageNumberOfIndependentVoicesFeature,
+                        VariabilityOfNumberOfIndependentVoicesFeature,
+                        VoiceEqualityNumberOfNotesFeature,
+                        VoiceEqualityNoteDurationFeature,
+                        VoiceEqualityDynamicsFeature,
+                        ImportanceOfLoudestVoiceFeature,
+                        RelativeRangeOfLoudestVoiceFeature,
+                        None,#RelativeRangeIsolationOfLoudestVoiceFeature,
+                        RangeOfHighestLineFeature,
+                        RelativeNoteDensityOfHighestLineFeature,
+                        None,#RelativeNoteDurationsOfLowestLineFeature
+                        MelodicIntervalsInLowestLineFeature,
+                        None,#SimultaneityFeature
+                        None,#VariabilityOfSimultaneityFeature
+                        None,#VoiceOverlapFeature
+                        None,#ParallelMotionFeature
+                        VoiceSeparationFeature,
+                        
+                        ],
+                  'R': [None,
+                        StrongestRhythmicPulseFeature,
+                        SecondStrongestRhythmicPulseFeature,
+                        StrengthOfStrongestRhythmicPulseFeature,
+                        StrengthOfSecondStrongestRhythmicPulseFeature,
+                        StrengthRatioOfTwoStrongestRhythmicPulsesFeature,
+                        CombinedStrengthOfTwoStrongestRhythmicPulsesFeature,
+                        NumberOfStrongPulsesFeature,
+                        NumberOfModeratePulsesFeature,
+                        NumberOfRelativelyStrongPulsesFeature,
+                        RhythmicLoosenessFeature,
+                        PolyrhythmsFeature,
+                        RhythmicVariabilityFeature,
+                        BeatHistogramFeature,
+                        NoteDensityFeature,
+                        None,#NoteDensityVariabilityFeature
+                        AverageNoteDurationFeature,
+                        VariabilityOfNoteDurationFeature,
+                        MaximumNoteDurationFeature,
+                        MinimumNoteDurationFeature,
+                        StaccatoIncidenceFeature,
+                        AverageTimeBetweenAttacksFeature,
+                        VariabilityOfTimeBetweenAttacksFeature,
+                        AverageTimeBetweenAttacksForEachVoiceFeature,
+                        AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature,
+                        None,#IncidenceOfCompleteRestsFeature,
+                        None,#MaximumCompleteRestDurationFeature,
+                        None,#AverageRestDurationPerVoiceFeature,
+                        None,#AverageVariabilityOfRestDurationsAcrossVoicesFeature,
+                        InitialTempoFeature,
+                        InitialTimeSignatureFeature,
+                        CompoundOrSimpleMeterFeature,
+                        TripleMeterFeature,
+                        QuintupleMeterFeature,
+                        ChangesOfMeterFeature,
+                        
+                        ],
+                  'D': [None,
+                        OverallDynamicRangeFeature,
+                        VariationOfDynamicsFeature,
+                        VariationOfDynamicsInEachVoiceFeature,
+                        AverageNoteToNoteDynamicsChangeFeature,
+                        
+                        ],
+                  'P': [None,
+                        MostCommonPitchPrevalenceFeature,
+                        MostCommonPitchClassPrevalenceFeature,
+                        RelativeStrengthOfTopPitchesFeature,
+                        RelativeStrengthOfTopPitchClassesFeature,
+                        IntervalBetweenStrongestPitchesFeature,
+                        IntervalBetweenStrongestPitchClassesFeature,
+                        NumberOfCommonPitchesFeature,
+                        PitchVarietyFeature,
+                        PitchClassVarietyFeature,
+                        RangeFeature,
+                        MostCommonPitchFeature,
+                        PrimaryRegisterFeature,
+                        ImportanceOfBassRegisterFeature,
+                        ImportanceOfMiddleRegisterFeature,
+                        ImportanceOfHighRegisterFeature,
+                        MostCommonPitchClassFeature,
+                        DominantSpreadFeature,
+                        StrongTonalCentresFeature,
+                        BasicPitchHistogramFeature,
+                        FifthsPitchHistogramFeature,
+                        QualityFeature,
+                        GlissandoPrevalenceFeature,
+                        AverageRangeOfGlissandosFeature,
+                        VibratoPrevalenceFeature,
+                        None,#PrevalenceOfMicroTonesFeature,                        
+                        ],
+                  'M': [None,
+                        MelodicIntervalHistogramFeature,
+                        AverageMelodicIntervalFeature,
+                        MostCommonMelodicIntervalFeature,
+                        RelativeStrengthOfMostCommonIntervalsFeature,
+                        NumberOfCommonMelodicIntervalsFeature,
+                        AmountOfArpeggiationFeature,
+                        RepeatedNotesFeature,
+                        ChromaticMotionFeature,
+                        StepwiseMotionFeature,
+                        MelodicThirdsFeature,
+                        MelodicFifthsFeature,
+                        MelodicTritonesFeature,
+                        MelodicOctavesFeature,
+                        None,#EmbellishmentFeature,
+                        DirectionOfMotionFeature,
+                        DurationOfMelodicArcsFeature,
+                        SizeOfMelodicArcsFeature,
+                        None,#MelodicPitchVarietyFeature,
+                        ],
+                  'C': [None,
+                        None,#VerticalIntervalsFeature,
+                        None,#ChordTypesFeature,
+                        None,#MostCommonVerticalIntervalFeature,
+                        None,#SecondMostCommonVerticalIntervalFeature,
+                        None,#DistanceBetweenTwoMostCommonVerticalIntervalsFeature,
+                        None,#PrevalenceOfMostCommonVerticalIntervalFeature,
+                        None,#PrevalenceOfSecondMostCommonVerticalIntervalFeature,
+                        None,#RatioOfPrevalenceOfTwoMostCommonVerticalIntervalsFeature,
+                        None,#AverageNumberOfSimultaneousPitchClassesFeature,
+                        None,#VariabilityOfNumberOfSimultaneousPitchClassesFeature,
+                        None,#MinorMajorRatioFeature,
+                        None,#PerfectVerticalIntervalsFeature,
+                        None,#UnisonsFeature,
+                        None,#VerticalMinorSecondsFeature,
+                        None,#VerticalThirdsFeature,
+                        None,#VerticalFifthsFeature,
+                        None,#VerticalTritonesFeature,
+                        None,#VerticalOctavesFeature,
+                        None,#VerticalDissonanceRatioFeature,
+                        None,#PartialChordsFeature,
+                        None,#MinorMajorTriadRatioFeature,
+                        None,#StandardTriadsFeature,
+                        None,#DiminishedAndAugmentedTriadsFeature,
+                        None,#DominantSeventhChordsFeature,
+                        None,#SeventhsChordsFeature,
+                        None,#ComplexChordsFeature,
+                        None,#NonStandardChordsFeature,
+                        None,#ChordDurationFeature,
+                        ]
+                  
+                  }
+
+def getExtractorByTypeAndNumber(type, number):
+    '''
+    Typical usage:
+    
+    >>> from music21 import *
+    >>> getExtractorByTypeAndNumber('T', 5).__name__
+    'VoiceEqualityNoteDurationFeature'
+    
+    
+    Features unimplemented in jSymbolic but documented in the dissertation return None
+    
+    
+    >>> getExtractorByTypeAndNumber('C', 20) is None
+    True
+    
+    
+    Totally unknown features return an exception:
+    
+    
+    >>> getExtractorByTypeAndNumber('L', 900)
+    Traceback (most recent call last):
+    ...
+    JSymbolicFeatureException: Could not find any jSymbolic features of type L
+    >>> getExtractorByTypeAndNumber('C', 200)
+    Traceback (most recent call last):
+    ...
+    JSymbolicFeatureException: jSymbolic features of type C do not have number 200
+    
+    
+    '''   
+    try:
+        return extractorsById[type][number]
+    except KeyError:
+        raise JSymbolicFeatureException('Could not find any jSymbolic features of type %s' % (type))
+    except IndexError:
+        raise JSymbolicFeatureException('jSymbolic features of type %s do not have number %d' % (type, number))
+
+
 
 # list all implemented features features
 featureExtractors = [
@@ -2189,7 +2465,6 @@ class Test(unittest.TestCase):
     
     def runTest(self):
         pass
-
 
 
 if __name__ == "__main__":
