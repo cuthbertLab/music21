@@ -397,7 +397,8 @@ def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace
     its proper resolution to the major tonic (I) in root position or either inversion as another possibility. 
     
     If doubledRoot = False, then the resolution will have its third doubled.
-    If doubledRoot = True, then the resolution will have its root doubled.
+    If doubledRoot = True, then the resolution will have its root doubled, which involves a diminished fifth
+    resolving to a perfect fifth
     
     A ResolutionException is raised if the possibility does not spell out a diminished seventh chord.
 
@@ -409,7 +410,7 @@ def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace
     >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
     >>> resolution.diminishedSeventhToMajorTonic(possibA)
     {'A': F#4, 'S': A4, 'B': D3, 'T': F#3}
-    >>> resolution.diminishedSeventhToMajorTonic(possibA, True) # Alternate resolution, contains parallel fifths
+    >>> resolution.diminishedSeventhToMajorTonic(possibA, True) # Alternate resolution
     {'A': D4, 'S': A4, 'B': D3, 'T': F#3}
     >>> possibB = resolution.diminishedSeventhToMajorTonic(possibA, True)    
     '''
@@ -452,7 +453,8 @@ def diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot = False, inPlace
     its proper resolution to the minor tonic (i) in root position or either inversion as another possibility. 
     
     If doubledRoot = False, then the resolution will have its third doubled.
-    If doubledRoot = True, then the resolution will have its root doubled.
+    If doubledRoot = True, then the resolution will have its root doubled, which involves a diminished fifth
+    resolving to a perfect fifth
     
     A ResolutionException is raised if the possibility does not spell out a diminished seventh chord.
 
@@ -464,7 +466,7 @@ def diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot = False, inPlace
     >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
     >>> resolution.diminishedSeventhToMinorTonic(possibA)
     {'A': F4, 'S': A4, 'B': D3, 'T': F3}
-    >>> resolution.diminishedSeventhToMinorTonic(possibA, True) # Alternate resolution, contains parallel fifths, but not parallel perfect fifths
+    >>> resolution.diminishedSeventhToMinorTonic(possibA, True) # Alternate resolution
     {'A': D4, 'S': A4, 'B': D3, 'T': F3}
     '''
     if inPlace:
