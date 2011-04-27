@@ -260,6 +260,11 @@ class StreamForms(object):
             self._forms['flat.getElementsByClass.TimeSignature'] = self._base.flat.getElementsByClass('TimeSignature')
             return self._forms['flat.getElementsByClass.TimeSignature']
 
+        elif key in ['flat.getElementsByClass.KeySignature']:
+            self._forms['flat.getElementsByClass.KeySignature'] = self._base.flat.getElementsByClass('KeySignature')
+            return self._forms['flat.getElementsByClass.KeySignature']
+
+
 
         # some methods that return new streams
         elif key in ['chordify']:
@@ -339,9 +344,15 @@ class StreamForms(object):
             self._forms['midiPitchHistogram'] = histo
             return self._forms['midiPitchHistogram']
 
+
+        elif key in ['flat.analyzedKey']:
+            self._forms['analyzedKey'] = self.__getitem__('flat').analyze('key')
+            return self._forms['analyzedKey']
+        
         else:
             raise AttributeError('no such attribute: %s' % key)
 
+        
 
 
 
@@ -455,7 +466,7 @@ class OutputFormat(object):
     '''
     def __init__(self, dataSet=None):
         # assume a two dimensional array
-        self._ext = None # store a fiel extension if necessare
+        self._ext = None # store a file extension if necessary
         # pass a data set object
         self._dataSet = dataSet
 

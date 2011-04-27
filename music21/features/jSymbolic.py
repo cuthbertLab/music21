@@ -962,6 +962,9 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
  
 class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
+    A feature array with bins corresponding to the values of the 5ths pitch class histogram.
+
+
     >>> from music21 import *
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.FifthsPitchHistogramFeature(s)
@@ -994,19 +997,84 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
 
 class QualityFeature(featuresModule.FeatureExtractor):
     '''
+    Set to 0 if the key signature indicates that 
+    a recording is major, set to 1 if it indicates 
+    that it is minor.  In jSymbolic, this is set to 0 if key signature is unknown. 
+    A Music21
+    addition: if no key mode is found in the piece, analyze the piece to
+    discover what mode it is most likely in.
+
+
+    Example: Mozart k155, mvmt 2 (musicxml) is explicitly encoded as being in Major:
+    
+
     >>> from music21 import *
+    >>> mozart155mvmt2 = corpus.parse('mozart/k155', 2)
+    >>> fe = features.jSymbolic.QualityFeature(mozart155mvmt2)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0]
+
+
+    now we will try it with the last movement of Schoenberg's opus 19 which has
+    no mode explicitly encoded in the musicxml but which our analysis routines
+    believe (having very little to go on) fits the profile of e-minor best.  We
+    will also get the feature extractor by number this time:
+
+
+    >>> schoenberg19mvmt6= corpus.parse('schoenberg/opus19', 6)
+    >>> fe2 = features.jSymbolic.getExtractorByTypeAndNumber('P', 22)(schoenberg19mvmt6)
+    >>> f2 = fe2.extract()
+    >>> f2.vector
+    [1]
+
+
     '''
     id = 'P22'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Quality'
-        self.description = 'Set to 0 if the key signature indicates that a recording is major, set to 1 if it indicates that it is minor and set to 0 if key signature is unknown.'
+        self.description = '''
+            Set to 0 if the key signature indicates that 
+            a recording is major, set to 1 if it indicates 
+            that it is minor and set to 0 if key signature is unknown. Music21
+            addition: if no key mode is found in the piece, analyze the piece to
+            discover what mode it is most likely in.
+            '''
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        allKeys = self.data['flat.getElementsByClass.KeySignature']
+        keyFeature = None
+        for x in allKeys:
+            if x.mode == 'major':
+                keyFeature = 0
+                break
+            elif x.mode == 'minor':
+                keyFeature = 1
+                break
+        if keyFeature is None:
+            analyzedMode = self.data['flat.analyzedKey'].mode
+            if analyzedMode == 'major':
+                keyFeature = 0
+            elif analyzedMode == 'minor':
+                keyFeature = 1
+            else:
+                raise JSymbolicFeaturesException("should be able to get a mode from something here -- perhaps there are no notes?")
+
+        self._feature.vector[0] = keyFeature
+        
+        
+
 class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
+    Not yet implemented in music21
+    
     >>> from music21 import *
     '''
     id = 'P23'
@@ -2320,6 +2388,7 @@ extractorsById = {'I': [None,
                         DominantSpreadFeature,
                         StrongTonalCentresFeature,
                         BasicPitchHistogramFeature,
+                        PitchClassDistributionFeature,
                         FifthsPitchHistogramFeature,
                         QualityFeature,
                         GlissandoPrevalenceFeature,
