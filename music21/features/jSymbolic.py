@@ -2310,6 +2310,8 @@ extractorsById = {'I': [None,
                         VoiceEqualityNumberOfNotesFeature,
                         VoiceEqualityNoteDurationFeature,
                         VoiceEqualityDynamicsFeature,
+                        VoiceEqualityMelodicLeapsFeature,
+                        VoiceEqualityRangeFeature,
                         ImportanceOfLoudestVoiceFeature,
                         RelativeRangeOfLoudestVoiceFeature,
                         None,#RelativeRangeIsolationOfLoudestVoiceFeature,
@@ -2327,6 +2329,7 @@ extractorsById = {'I': [None,
                   'R': [None,
                         StrongestRhythmicPulseFeature,
                         SecondStrongestRhythmicPulseFeature,
+                        HarmonicityOfTwoStrongestRhythmicPulsesFeature,
                         StrengthOfStrongestRhythmicPulseFeature,
                         StrengthOfSecondStrongestRhythmicPulseFeature,
                         StrengthRatioOfTwoStrongestRhythmicPulsesFeature,
@@ -2400,6 +2403,8 @@ extractorsById = {'I': [None,
                         MelodicIntervalHistogramFeature,
                         AverageMelodicIntervalFeature,
                         MostCommonMelodicIntervalFeature,
+                        DistanceBetweenMostCommonMelodicIntervalsFeature,
+                        MostCommonMelodicIntervalPrevalenceFeature,
                         RelativeStrengthOfMostCommonIntervalsFeature,
                         NumberOfCommonMelodicIntervalsFeature,
                         AmountOfArpeggiationFeature,
@@ -2491,6 +2496,15 @@ def getExtractorByTypeAndNumber(type, number):
 # list all implemented features features
 featureExtractors = [
 
+#t11 not in jSymbolic
+
+#t14 not in jSymbolic
+
+#t16-19 not in jSymbolic
+
+#r26-29 not in jSymbolic
+
+
 InitialTimeSignatureFeature, # r31
 CompoundOrSimpleMeterFeature, # r32
 TripleMeterFeature, # r33
@@ -2513,11 +2527,17 @@ ImportanceOfBassRegisterFeature, # p13
 ImportanceOfMiddleRegisterFeature, # p14
 ImportanceOfHighRegisterFeature, # p15
 MostCommonPitchClassFeature, # p16
-
 BasicPitchHistogramFeature, # p19
 PitchClassDistributionFeature, #p20
 FifthsPitchHistogramFeature, # p21
+QualityFeature, #p22
+#p26 is not in jSymbolic
 
+#m16 is not in jSymbolic
+
+#m20 is not in jSymbolic
+
+#c types are not in jSymbolic
 ]
 
 
