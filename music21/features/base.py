@@ -506,14 +506,18 @@ class OutputTabOrange(OutputFormat):
         >>> ds = features.DataSet()
         >>> ds.addFeatureExtractors(f)
         >>> of = features.OutputTabOrange(ds)
-        >>> of.getHeaderLines()
-        [['Identifier', 'Changes_of_Meter'], ['string', 'discrete'], ['meta', '']]
+        >>> for x in of.getHeaderLines(): print x
+        ['Identifier', 'Changes_of_Meter']
+        ['string', 'discrete']
+        ['meta', '']
 
         >>> ds = features.DataSet(classLabel='Composer')
         >>> ds.addFeatureExtractors(f)
         >>> of = features.OutputTabOrange(ds)
-        >>> of.getHeaderLines()
-        [['Identifier', 'Changes_of_Meter', 'Composer'], ['string', 'discrete', 'discrete'], ['meta', '', 'class']]
+        >>> for x in of.getHeaderLines(): print x
+        ['Identifier', 'Changes_of_Meter', 'Composer']
+        ['string', 'discrete', 'discrete']
+        ['meta', '', 'class']
 
         '''
         post = []
@@ -577,8 +581,8 @@ class OutputCSV(OutputFormat):
         >>> ds = features.DataSet(classLabel='Composer')
         >>> ds.addFeatureExtractors(f)
         >>> of = features.OutputCSV(ds)
-        >>> of.getHeaderLines()
-        [['Identifier', 'Changes_of_Meter', 'Composer']]
+        >>> of.getHeaderLines()[0]
+        ['Identifier', 'Changes_of_Meter', 'Composer']
         '''
         post = []
         post.append(self._dataSet.getAttributeLabels(
@@ -622,8 +626,13 @@ class OutputARFF(OutputFormat):
         >>> ds = features.DataSet(classLabel='Composer')
         >>> ds.addFeatureExtractors(f)
         >>> of = features.OutputARFF(ds)
-        >>> of.getHeaderLines()
-        ['@RELATION Composer', '@ATTRIBUTE Identifier STRING', '@ATTRIBUTE Changes_of_Meter NUMERIC', '@ATTRIBUTE class {}', '@DATA']
+        >>> for x in of.getHeaderLines(): print x
+        @RELATION Composer
+        @ATTRIBUTE Identifier STRING
+        @ATTRIBUTE Changes_of_Meter NUMERIC
+        @ATTRIBUTE class {}
+        @DATA
+        
         '''
         post = []
 

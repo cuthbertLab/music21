@@ -69,6 +69,9 @@ Module Reference
    moduleEditorial
    moduleEnvironment
    moduleExpressions
+   moduleFeaturesBase
+   moduleFeaturesJSymbolic
+   moduleFeaturesNative
    moduleGraph
    moduleKey
    moduleInstrument
@@ -83,11 +86,11 @@ Module Reference
    moduleMusedataTranslate
    moduleMusedataBase40
    moduleMusicxmlTranslate
-   moduleRomanTextBase
-   moduleRomanTextTranslate
    moduleNote
    modulePitch
    moduleRoman
+   moduleRomanTextBase
+   moduleRomanTextTranslate
    moduleRepeat
    moduleScale
    moduleSerial
