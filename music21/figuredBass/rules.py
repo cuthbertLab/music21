@@ -33,7 +33,7 @@ class Rules:
         self.allowHiddenOctaves = False
         self.allowVoiceOverlap = False
 
-        #Resolution rules
+        #Special Resolution rules
         self.resolveDominantSeventhProperly = True
         self.resolveDiminishedSeventhProperly = True
         self.doubledRootInDim7 = False
