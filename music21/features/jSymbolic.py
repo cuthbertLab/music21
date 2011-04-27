@@ -2459,8 +2459,11 @@ def getExtractorByTypeAndNumber(type, number):
     Typical usage:
     
     >>> from music21 import *
-    >>> getExtractorByTypeAndNumber('T', 5).__name__
+    >>> t5 = getExtractorByTypeAndNumber('T', 5)
+    >>> t5.__name__
     'VoiceEqualityNoteDurationFeature'
+    >>> bachExample = corpus.parse('bach/bwv66.6')
+    >>> fe = t5(bachExample)
     
     
     Features unimplemented in jSymbolic but documented in the dissertation return None
@@ -2483,6 +2486,128 @@ def getExtractorByTypeAndNumber(type, number):
     JSymbolicFeatureException: jSymbolic features of type C do not have number 200
     
     
+    You could also find all the feature extractors this way:
+    
+    
+    >>> fs = features.jSymbolic.extractorsById
+    >>> for k in fs:
+    ...     for i in range(len(fs[k])):
+    ...       if fs[k][i] is not None:
+    ...         n = fs[k][i].__name__
+    ...         if fs[k][i] not in features.jSymbolic.featureExtractors:
+    ...            n += " (not implemented)"
+    ...         print k, i, n
+    D 1 OverallDynamicRangeFeature (not implemented)
+    D 2 VariationOfDynamicsFeature (not implemented)
+    D 3 VariationOfDynamicsInEachVoiceFeature (not implemented)
+    D 4 AverageNoteToNoteDynamicsChangeFeature (not implemented)
+    I 1 PitchedInstrumentsPresentFeature (not implemented)
+    I 2 UnpitchedInstrumentsPresentFeature (not implemented)
+    I 3 NotePrevalenceOfPitchedInstrumentsFeature (not implemented)
+    I 4 NotePrevalenceOfUnpitchedInstrumentsFeature (not implemented)
+    I 5 TimePrevalenceOfPitchedInstrumentsFeature (not implemented)
+    I 6 VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature (not implemented)
+    I 7 VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature (not implemented)
+    I 8 NumberOfPitchedInstrumentsFeature (not implemented)
+    I 9 NumberOfUnpitchedInstrumentsFeature (not implemented)
+    I 10 PercussionPrevalenceFeature (not implemented)
+    I 11 StringKeyboardFractionFeature (not implemented)
+    I 12 AcousticGuitarFractionFeature (not implemented)
+    I 13 ElectricGuitarFractionFeature (not implemented)
+    I 14 ViolinFractionFeature (not implemented)
+    I 15 SaxophoneFractionFeature (not implemented)
+    I 16 BrassFractionFeature (not implemented)
+    I 17 WoodwindsFractionFeature (not implemented)
+    I 18 OrchestralStringsFractionFeature (not implemented)
+    I 19 StringEnsembleFractionFeature (not implemented)
+    I 20 ElectricInstrumentFractionFeature (not implemented)
+    M 1 MelodicIntervalHistogramFeature (not implemented)
+    M 2 AverageMelodicIntervalFeature (not implemented)
+    M 3 MostCommonMelodicIntervalFeature (not implemented)
+    M 4 DistanceBetweenMostCommonMelodicIntervalsFeature (not implemented)
+    M 5 MostCommonMelodicIntervalPrevalenceFeature (not implemented)
+    M 6 RelativeStrengthOfMostCommonIntervalsFeature (not implemented)
+    M 7 NumberOfCommonMelodicIntervalsFeature (not implemented)
+    M 8 AmountOfArpeggiationFeature (not implemented)
+    M 9 RepeatedNotesFeature (not implemented)
+    M 10 ChromaticMotionFeature (not implemented)
+    M 11 StepwiseMotionFeature (not implemented)
+    M 12 MelodicThirdsFeature (not implemented)
+    M 13 MelodicFifthsFeature (not implemented)
+    M 14 MelodicTritonesFeature (not implemented)
+    M 15 MelodicOctavesFeature (not implemented)
+    M 17 DirectionOfMotionFeature (not implemented)
+    M 18 DurationOfMelodicArcsFeature (not implemented)
+    M 19 SizeOfMelodicArcsFeature (not implemented)
+    P 1 MostCommonPitchPrevalenceFeature
+    P 2 MostCommonPitchClassPrevalenceFeature
+    P 3 RelativeStrengthOfTopPitchesFeature
+    P 4 RelativeStrengthOfTopPitchClassesFeature
+    P 5 IntervalBetweenStrongestPitchesFeature
+    P 6 IntervalBetweenStrongestPitchClassesFeature
+    P 7 NumberOfCommonPitchesFeature
+    P 8 PitchVarietyFeature
+    P 9 PitchClassVarietyFeature
+    P 10 RangeFeature
+    P 11 MostCommonPitchFeature
+    P 12 PrimaryRegisterFeature
+    P 13 ImportanceOfBassRegisterFeature
+    P 14 ImportanceOfMiddleRegisterFeature
+    P 15 ImportanceOfHighRegisterFeature
+    P 16 MostCommonPitchClassFeature
+    P 17 DominantSpreadFeature (not implemented)
+    P 18 StrongTonalCentresFeature (not implemented)
+    P 19 BasicPitchHistogramFeature
+    P 20 PitchClassDistributionFeature
+    P 21 FifthsPitchHistogramFeature
+    P 22 QualityFeature
+    P 23 GlissandoPrevalenceFeature (not implemented)
+    P 24 AverageRangeOfGlissandosFeature (not implemented)
+    P 25 VibratoPrevalenceFeature (not implemented)
+    R 1 StrongestRhythmicPulseFeature (not implemented)
+    R 2 SecondStrongestRhythmicPulseFeature (not implemented)
+    R 3 HarmonicityOfTwoStrongestRhythmicPulsesFeature (not implemented)
+    R 4 StrengthOfStrongestRhythmicPulseFeature (not implemented)
+    R 5 StrengthOfSecondStrongestRhythmicPulseFeature (not implemented)
+    R 6 StrengthRatioOfTwoStrongestRhythmicPulsesFeature (not implemented)
+    R 7 CombinedStrengthOfTwoStrongestRhythmicPulsesFeature (not implemented)
+    R 8 NumberOfStrongPulsesFeature (not implemented)
+    R 9 NumberOfModeratePulsesFeature (not implemented)
+    R 10 NumberOfRelativelyStrongPulsesFeature (not implemented)
+    R 11 RhythmicLoosenessFeature (not implemented)
+    R 12 PolyrhythmsFeature (not implemented)
+    R 13 RhythmicVariabilityFeature (not implemented)
+    R 14 BeatHistogramFeature (not implemented)
+    R 15 NoteDensityFeature (not implemented)
+    R 17 AverageNoteDurationFeature (not implemented)
+    R 18 VariabilityOfNoteDurationFeature (not implemented)
+    R 19 MaximumNoteDurationFeature (not implemented)
+    R 20 MinimumNoteDurationFeature (not implemented)
+    R 21 StaccatoIncidenceFeature (not implemented)
+    R 22 AverageTimeBetweenAttacksFeature (not implemented)
+    R 23 VariabilityOfTimeBetweenAttacksFeature (not implemented)
+    R 24 AverageTimeBetweenAttacksForEachVoiceFeature (not implemented)
+    R 25 AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature (not implemented)
+    R 30 InitialTempoFeature (not implemented)
+    R 31 InitialTimeSignatureFeature
+    R 32 CompoundOrSimpleMeterFeature
+    R 33 TripleMeterFeature
+    R 34 QuintupleMeterFeature
+    R 35 ChangesOfMeterFeature
+    T 1 MaximumNumberOfIndependentVoicesFeature (not implemented)
+    T 2 AverageNumberOfIndependentVoicesFeature (not implemented)
+    T 3 VariabilityOfNumberOfIndependentVoicesFeature (not implemented)
+    T 4 VoiceEqualityNumberOfNotesFeature (not implemented)
+    T 5 VoiceEqualityNoteDurationFeature (not implemented)
+    T 6 VoiceEqualityDynamicsFeature (not implemented)
+    T 7 VoiceEqualityMelodicLeapsFeature (not implemented)
+    T 8 VoiceEqualityRangeFeature (not implemented)
+    T 9 ImportanceOfLoudestVoiceFeature (not implemented)
+    T 10 RelativeRangeOfLoudestVoiceFeature (not implemented)
+    T 12 RangeOfHighestLineFeature (not implemented)
+    T 13 RelativeNoteDensityOfHighestLineFeature (not implemented)
+    T 15 MelodicIntervalsInLowestLineFeature (not implemented)
+    T 20 VoiceSeparationFeature (not implemented)    
     '''   
     try:
         return extractorsById[type][number]

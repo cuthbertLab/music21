@@ -53,20 +53,20 @@ class LyricException(Exception):
 
 class Lyric(object):
 
-    def __init__(self, text=None, number=1, syllabic=None):
+    def __init__(self, text=None, number=1, syllabic=None, applyRaw = False):
         # these are set by _setTextAndSyllabic
         self.text = None
         # given as begin, middle, end, or single
         self.syllabic = None
         
-        self._setTextAndSyllabic(text)
+        self._setTextAndSyllabic(text, applyRaw)
 
         if not common.isNum(number):
             raise LyricException('Number best be number')
         self.number = number
 
 
-    def _setTextAndSyllabic(self, rawText):
+    def _setTextAndSyllabic(self, rawText, applyRaw):
         # do not want to do this unless we are sure this is not a string
         # possible might alter unicode or other string-like representations
 
@@ -75,13 +75,13 @@ class Lyric(object):
         else:
             rawText = rawText
         # check for hyphens
-        if rawText.startswith('-') and not rawText.endswith('-'):
+        if applyRaw is False and rawText.startswith('-') and not rawText.endswith('-'):
             self.text = rawText[1:]
             self.syllabic = 'end'
-        elif not rawText.startswith('-') and rawText.endswith('-'):
+        elif applyRaw is False and not rawText.startswith('-') and rawText.endswith('-'):
             self.text = rawText[:-1]
             self.syllabic = 'begin'
-        elif rawText.startswith('-') and rawText.endswith('-'):
+        elif applyRaw is False and rawText.startswith('-') and rawText.endswith('-'):
             self.text = rawText[1:-1]
             self.syllabic = 'middle'
         else: # assume single
@@ -261,21 +261,27 @@ class GeneralNote(music21.Music21Object):
 
         presently only creates one lyric, and destroys any existing
         lyrics
-
-        >>> from music21 import *
-        >>> a = note.GeneralNote()
-        >>> a.lyric = 'test'
-        >>> a.lyric
-        'test'
         '''
         self.lyrics = [] 
         self.lyrics.append(Lyric(value))
 
     lyric = property(_getLyric, _setLyric, 
-        doc = '''The lyric property can be used to get and set a lyric for this Note, Chord, or Rest. In most cases the :meth:`~music21.note.GeneralNote.addLyric` method should be used.
+        doc = '''The lyric property can 
+        be used to get and set a lyric for this 
+        Note, Chord, or Rest. This is a simplified version of the more general 
+        :meth:`~music21.note.GeneralNote.addLyric` method.
+        
+        
+        >>> from music21 import *
+        >>> a = note.GeneralNote()
+        >>> a.lyric = 'test'
+        >>> a.lyric
+        'test'
+
+        
         ''')
 
-    def addLyric(self, text, lyricNumber = None):
+    def addLyric(self, text, lyricNumber = None, applyRaw = False):
         '''Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. 
 
         >>> from music21 import *
@@ -285,26 +291,58 @@ class GeneralNote(music21.Music21Object):
         'hello'
         >>> n1.lyrics[0].number
         1
+
         
-        >>> # note that the option number specified gives the lyric number, not the list position
+        An added option gives the lyric number, not the list position
+
+
         >>> n1.addLyric("bye", 3)
         >>> n1.lyrics[1].text
         'bye'
         >>> n1.lyrics[1].number
         3
+        >>> for lyr in n1.lyrics: print lyr.text
+        hello
+        bye
         
-        >>> # replace existing lyric
+        
+        Replace an existing lyric by specifying the same number:
+
+        
         >>> n1.addLyric("ciao", 3)
         >>> n1.lyrics[1].text
         'ciao'
         >>> n1.lyrics[1].number
         3
+        
+        
+        Giving a lyric with a hyphen at either end will set whether it
+        is part of a multisyllable word:
+        
+        
+        >>> n1.addLyric("good-")
+        >>> n1.lyrics[2].text
+        'good'
+        >>> n1.lyrics[2].syllabic
+        'begin'
+        
+        
+        This feature can be overridden by specifying "applyRaw = True":
+
+
+        >>> n1.addLyric("-5", applyRaw = True)
+        >>> n1.lyrics[3].text
+        '-5'
+        >>> n1.lyrics[3].syllabic
+        'single'
+
+        
         '''
         if not common.isStr(text):
             text = str(text)
         if lyricNumber is None:
             maxLyrics = len(self.lyrics) + 1
-            self.lyrics.append(Lyric(text, maxLyrics))
+            self.lyrics.append(Lyric(text, maxLyrics, applyRaw = applyRaw))
         else:
             foundLyric = False
             for thisLyric in self.lyrics:
@@ -313,7 +351,7 @@ class GeneralNote(music21.Music21Object):
                     foundLyric = True
                     break
             if foundLyric is False:
-                self.lyrics.append(Lyric(text, lyricNumber))
+                self.lyrics.append(Lyric(text, lyricNumber, applyRaw = applyRaw))
 
 
     def hasLyrics(self):
