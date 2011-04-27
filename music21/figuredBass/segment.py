@@ -273,12 +273,15 @@ class MiddleSegment(Segment):
         resolutionChord = chord.Chord(self.pitchesAboveBass)
         
         if resolutionChord.root().name == tonic.name:
+            resolveV43toI6 = False
+            if dominantPossib.chordify().inversion() == 2 and resolutionChord.inversion():
+                resolveV43toI6 = True
             if resolutionChord.isMajorTriad():
                 environRules.warn("Dominant seventh resolution: V7->I in " + dominantScale.name)
-                resolutionPossib = resolution.dominantSeventhToMajorTonic(dominantPossib, self.fbRules.resolveV43toI6)
+                resolutionPossib = resolution.dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6)
             elif resolutionChord.isMinorTriad():
                 environRules.warn("Dominant seventh resolution: V7->i in " + minorScale.name)
-                resolutionPossib = resolution.dominantSeventhToMinorTonic(dominantPossib, self.fbRules.resolveV43toI6)
+                resolutionPossib = resolution.dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6)
         elif resolutionChord.root().name == majSubmediant.name:
             if sampleChord.isMinorTriad():
                 environRules.warn("Dominant seventh resolution: V7->vi in " + dominantScale.name)
