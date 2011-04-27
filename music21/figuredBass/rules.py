@@ -20,29 +20,23 @@ class Rules:
         >>> fbRules = rules.Rules()
         >>> fbRules.allowParallelFifths = True
         '''
-        #Voicing Rules
-        self.allowParallelFifths = False
-        self.allowParallelOctaves = False
-        self.allowVoiceOverlap = False
-
-        #Chord rules
+        #Single Possibility rules
         self.allowIncompletePossibilities = False
         self.topPartsMaxIntervalSeparation = interval.Interval('P8')
         self.filterPitchesByRange = True
-
-        #Chord To Chord Rules
-        self.allowHiddenFifths = False
-        self.allowHiddenOctaves = False
-        
-        #AntecedentPossibilityRules
         self.allowVoiceCrossing = False
         
+        #Consecutive Possibility rules
+        self.allowParallelFifths = False
+        self.allowParallelOctaves = False
+        self.allowHiddenFifths = False
+        self.allowHiddenOctaves = False
+        self.allowVoiceOverlap = False
+
         #Resolution rules
         self.resolveDominantSeventhProperly = True
         self.resolveDiminishedSeventhProperly = True
-        self.resolveV43toI6 = False
         self.doubledRootInDim7 = False
-        
         
 class FiguredBassRulesException(music21.Music21Exception):
     pass
