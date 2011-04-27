@@ -99,7 +99,7 @@ def rhythmicSearch(thisStream, searchStream):
     [2, 5]
     >>> for found in l:
     ...     thisStream[found].lyric = "*"
-    >>> #_DOCS_HIDE thisStream.show()
+    >>> #_DOCS_SHOW thisStream.show()
     
     
     .. image:: images/searchRhythmic1.*
