@@ -274,7 +274,7 @@ class MiddleSegment(Segment):
         
         if resolutionChord.root().name == tonic.name:
             resolveV43toI6 = False
-            if dominantPossib.chordify().inversion() == 2 and resolutionChord.inversion():
+            if dominantPossib.chordify().inversion() == 2 and resolutionChord.inversion() == 1:
                 resolveV43toI6 = True
             if resolutionChord.isMajorTriad():
                 environRules.warn("Dominant seventh resolution: V7->I in " + dominantScale.name)
