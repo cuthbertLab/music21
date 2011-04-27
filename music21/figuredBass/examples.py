@@ -11,6 +11,9 @@
 from music21 import interval
 from music21 import note
 from music21 import clef
+from music21 import stream
+from music21 import key
+from music21 import meter
 
 from music21.figuredBass import realizer
 from music21.figuredBass import part
@@ -79,7 +82,7 @@ def exampleA():
     fb.addElement(n8, '6') #iv6 (vi6)
     fb.addElement(n9, '7,5,#3') #vii7/V
     fb.addElement(n10, '6,4') #i6/4
-    fb.addElement(n11, '7,5#,3#') #V7
+    fb.addElement(n11, '7,#5,#3') #V7
     fb.addElement(n12) #i
     
     return fb
@@ -200,10 +203,58 @@ def exampleD():
     
     return fb
 
+def V43ResolutionExample():
+    partList = createPartList()
+    fb = realizer.FiguredBass(partList, '4/4', 'D')
+
+    n1 = note.Note('D3')
+    n2 = note.Note('E3')
+    n3 = note.Note('D3')
+    n4 = note.Note('E3')
+    n5 = note.Note('F#3')
+    
+    n1.quarterLength = 2.0
+    n2.quarterLength = 2.0
+    n3.quarterLength = 2.0
+    n4.quarterLength = 2.0
+    n5.quarterLength = 4.0
+    
+    fb.addElement(n1)           #I
+    fb.addElement(n2, '4,3')    #V4,3
+    fb.addElement(n3)           #I
+    fb.addElement(n4, '4,3')    #V4,3
+    fb.addElement(n5, '6')      #I6
+    
+    return fb
+
+def viio65ResolutionExample():
+    partList = createPartList()
+    fb = realizer.FiguredBass(partList, '4/4', 'D')
+
+    n1 = note.Note('D3')
+    n2 = note.Note('E3')
+    n3 = note.Note('D3')
+    n4 = note.Note('E3')
+    n5 = note.Note('F#3')
+    
+    n1.quarterLength = 2.0
+    n2.quarterLength = 2.0
+    n3.quarterLength = 2.0
+    n4.quarterLength = 2.0
+    n5.quarterLength = 4.0
+    
+    fb.addElement(n1)           #I
+    fb.addElement(n2, '6,-5')   #viio6,5
+    fb.addElement(n3)           #I
+    fb.addElement(n4, '6,-5')   #viio6,5
+    fb.addElement(n5, '6')      #I6
+    
+    return fb
 
 if __name__ == "__main__":
     #exampleA(), exampleB(), exampleC(), exampleD()
-    fb = exampleD() #Set up the figured bass
+    #fb = exampleA() #Set up the figured bass
+    fb = viio65ResolutionExample()
     #fb.fbInfo.fbRules.topVoicesMaxIntervalSeparation = None
     fb.solve()
     fb.showRandomSolutions(20)
