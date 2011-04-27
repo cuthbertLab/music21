@@ -93,6 +93,7 @@ Module Reference
    moduleRomanTextTranslate
    moduleRepeat
    moduleScale
+   moduleSearch
    moduleSerial
    moduleSieve
    moduleStream

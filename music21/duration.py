@@ -1196,6 +1196,14 @@ class DurationCommon(object):
     '''A base class for both Duration and DurationUnit objects.
     '''
 
+    def _getClasses(self):
+        return [x.__name__ for x in self.__class__.mro()] 
+
+    classes = property(_getClasses, doc='''Returns a list containing the names (strings, not objects) of classes that this 
+        object belongs to -- starting with the object's class name and going up the mro()
+        for the object.  Very similar to Perl's @ISA array.  See music21.Music21Object.classes for more details.''')
+
+
     def aggregateTupletRatio(self):
         '''Return the aggregate tuplet ratio. Say you have 3:2 under a 5:4.  This will give the equivalent
         in non-nested tuplets. Returns a tuple representing the tuplet(!).  In the case of 3:2 under 5:4,

@@ -275,7 +275,7 @@ class Test(unittest.TestCase):
                 b = copy.deepcopy(obj)
 
 
-    def setupTest(self):
+    def testSetup(self):
         MM1 = MetronomeMark(60, music21.note.QuarterNote() )
         self.assertEqual(MM1.number, 60)
 

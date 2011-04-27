@@ -81,6 +81,7 @@ from music21 import pitch
 from music21 import roman
 from music21 import repeat
 from music21 import scale
+from music21 import search
 from music21 import serial
 from music21 import sieve
 from music21 import stream
@@ -175,6 +176,7 @@ MODULES = [
     repeat,
 
     scale,     
+    search,
     serial,     
     sieve,   
     stream,     
