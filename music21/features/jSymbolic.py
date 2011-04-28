@@ -1070,7 +1070,7 @@ class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     '''
-    id = 'P23'
+    id = 'P24'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -1093,19 +1093,20 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-#class PrevalenceOfMicroTonesFeature(featuresModule.FeatureExtractor):
-#    '''
-#    Not implemented in jSymbolic
-#    >>> from music21 import *
-#    '''
-#    id = 'P26'
-#    def __init__(self, dataOrStream=None, *arguments, **keywords):
-#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-#
-#        self.name = 'Prevalence Of Micro-tones'
-#        self.description = 'Number of Note Ons that are preceded by isolated MIDI Pitch Bend messages as a fraction of the total number of Note Ons.'
-#        self.isSequential = True
-#        self.dimensions = 1
+
+# class PrevalenceOfMicroTonesFeature(featuresModule.FeatureExtractor):
+#     '''
+# 
+#     >>> from music21 import *
+#     '''
+#     id = 'P26'
+#     def __init__(self, dataOrStream=None, *arguments, **keywords):
+#         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+# 
+#         self.name = 'Prevalence Of Micro-tones'
+#         self.description = 'Number of Note Ons that are preceded by isolated MIDI Pitch Bend messages as a fraction of the total number of Note Ons.'
+#         self.isSequential = True
+#         self.dimensions = 1
 
 
 
@@ -1773,9 +1774,10 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 
  
 
+
+
 #-------------------------------------------------------------------------------
 # texture based
-
 
 class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
@@ -1992,7 +1994,6 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     id = 'I1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
 
         self.name = 'Pitched Instruments Present'
         self.description = 'Which pitched General MIDI Instruments are present. There is one entry for each instrument, which is set to 1.0 if there is at least one Note On in the recording corresponding to the instrument and to 0.0 if there is not.'

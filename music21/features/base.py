@@ -1191,7 +1191,7 @@ class Test(unittest.TestCase):
         ds.write('/_scratch/chinaMitteleuropaSplit-b.arff')
 
 
-    def xtestOrangeBayes(self):
+    def xtestOrangeBayesA(self):
         '''Using an already created test file with a BayesLearner.
         '''
         import orange, orngTree
@@ -1200,6 +1200,83 @@ class Test(unittest.TestCase):
         for i in range(len(data)):
             c = classifier(data[i])
             print "original", data[i].getclass(), "BayesLearner:", c
+
+
+    def xtestClassifiersA(self):
+        '''Using an already created test file with a BayesLearner.
+        '''
+        import orange, orngTree
+        data1 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
+        
+        data2 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab')
+        
+        majority = orange.MajorityLearner
+        bayes = orange.BayesLearner
+        tree = orngTree.TreeLearner
+        knn = orange.kNNLearner
+        
+        for classifierType in [majority, bayes, tree, knn]:
+            print('')
+            for classifierData, classifierStr, matchData, matchStr in [
+                (data1, 'data1', data1, 'data1'), 
+                (data1, 'data1', data2, 'data2'),
+                (data2, 'data2', data2, 'data2'), 
+                (data2, 'data2', data1, 'data1'),
+                ]:
+        
+                # train with data1
+                classifier = classifierType(classifierData)
+                mismatch = 0
+                for i in range(len(matchData)):
+                    c = classifier(matchData[i])
+                    if c != matchData[i].getclass():
+                        mismatch += 1
+        
+                print('%s %s: misclassified %s/%s of %s' % (classifierStr, classifierType, mismatch, len(matchData), matchStr))
+
+#             if classifierType == orngTree.TreeLearner:
+#                 orngTree.printTxt(classifier)
+
+
+
+    def xtestClassifiersB(self):
+        '''Using an already created test file with a BayesLearner.
+        '''
+        import orange, orngTree
+        data1 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
+        
+        data2 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab', use = data1.domain)
+        
+        data1.extend(data2)
+        data = data1
+        
+        majority = orange.MajorityLearner
+        bayes = orange.BayesLearner
+        tree = orngTree.TreeLearner
+        knn = orange.kNNLearner
+        
+        folds = 10
+        for classifierType in [majority, bayes, tree, knn]:
+            print('')
+        
+            cvIndices = orange.MakeRandomIndicesCV(data, folds)    
+            for fold in range(folds):
+                train = data.select(cvIndices, fold, negate=1)
+                test = data.select(cvIndices, fold)
+        
+                for classifierData, classifierStr, matchData, matchStr in [
+                    (train, 'train', test, 'test'),
+                    ]:
+        
+                    # train with data1
+                    classifier = classifierType(classifierData)
+                    mismatch = 0
+                    for i in range(len(matchData)):
+                        c = classifier(matchData[i])
+                        if c != matchData[i].getclass():
+                            mismatch += 1
+            
+                    print('%s %s: misclassified %s/%s of %s' % (classifierStr, classifierType, mismatch, len(matchData), matchStr))
 
 
     def xtestOrangeClassifiers(self):

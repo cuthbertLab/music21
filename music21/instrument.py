@@ -22,6 +22,7 @@ ensemble.py module.
 '''
 
 import unittest, doctest
+import sys
 
 import music21
 from music21 import musicxml
@@ -43,8 +44,7 @@ environLocal = environment.Environment(_MOD)
 #    '''
 #    eval(name + "()")
 
-
-class InstrumentException(Exception):
+class InstrumentException(music21.Music21Exception):
     pass
 
 class Instrument(music21.Music21Object):
@@ -81,7 +81,8 @@ class Instrument(music21.Music21Object):
             msg.append('%s: ' % self.partId)
         if self.partName is not None:
             msg.append('%s: ' % self.partName)
-        msg.append(self.instrumentName)
+        if self.instrumentName is not None:
+            msg.append(self.instrumentName)
         return ''.join(msg)
 
     def __repr__(self):
@@ -1163,9 +1164,8 @@ class Bass(Vocalist):
         self.instrumentAbbreviation = 'B'
 
  
-#------------------------------------------------------       
-class InstrumentException(music21.Music21Exception):
-    pass
+#------------------------------------------------------------------------------
+
 
 ensembleNamesBySize = ['no performers', 'solo', 'duet', 'trio', 'quartet', 
                        'quintet', 'sextet', 'septet', 'octet', 'nonet', 'dectet', 
@@ -1217,6 +1217,7 @@ def ensembleNameBySize(number):
     else:
         return ensembleNamesBySize[int(number)]
 
+
 def instrumentFromMidiProgram(number):
     '''
     return the instrument with "number" as its assigned midi program:
@@ -1232,11 +1233,8 @@ def instrumentFromMidiProgram(number):
     InstrumentException: No instrument found with given midi program
 
     
-    '''
-    import sys
-    
+    '''    
     foundInstrument = False
-    
     for myThing in sys.modules[__name__].__dict__.values():
         try: 
             i = myThing()
@@ -1250,7 +1248,46 @@ def instrumentFromMidiProgram(number):
         raise InstrumentException('No instrument found with given midi program')
 
     
+
+def partitionByInstrument(streamObj):
+    '''Given a single Stream, or a Score or similar multi-part structure, partition into a Part for each unique Instrument, joining events possibly from different parts.
+    '''
+    from music21 import stream
+
+    if not streamObj.hasPartLikeStreams():
+        # place in a score for uniform operations
+        s = stream.Score()
+        s.insert(0, streamObj)
+    else:
+        s = streamObj
+
+    # first, find all unique instruments
+    found = s.flat.getElementsByClass('Instrument')
+    if len(found) == 0:
+        return None # no partition is available
     
+    names = {} # store unique names
+    for e in found:
+        if e.instrumentName not in names.keys():
+            names[e.instrumentName] = e # just store one instance
+        
+    # create a return object that has a part for each instrument
+    post = stream.Score()
+    for iName in names.keys():
+        p = stream.Part()
+        # add the instrument instance
+        p.insert(0, names[iName])
+        post.insert(0, p)
+
+    return post
+
+
+
+
+
+
+
+
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
@@ -1308,19 +1345,48 @@ class Test(unittest.TestCase):
         #s3.show()
 
 
+    def testPartitionByInstrumentA(self):
+        from music21 import instrument, stream
+
+        # basic case of instruments in Parts
+        s = stream.Score()
+        p1 = stream.Part() 
+        p1.append(instrument.Piano())
+        
+        p2 = stream.Part() 
+        p2.append(instrument.Piccolo())
+        s.insert(0, p1)
+        s.insert(0, p2)
+
+        post = instrument.partitionByInstrument(s)
+        self.assertEqual(len(post), 2)
+        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
+
+        environLocal.printDebug(['post processing'])
+        #post.show('t')
+
+
+        # one Stream with multiple instruments
+        s = stream.Stream()
+        s.insert(0, instrument.PanFlute())
+        s.insert(20, instrument.ReedOrgan())
+        
+        post = instrument.partitionByInstrument(s)
+        self.assertEqual(len(post), 2)
+        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
+        #post.show('t')
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Instrument]
 
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        pass
-#        a = Test()
-#        a.testMusicXMLExport()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
+
+
 
 #------------------------------------------------------------------------------
 # eof
