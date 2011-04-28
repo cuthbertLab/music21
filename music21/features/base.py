@@ -913,11 +913,12 @@ class DataSet(object):
         '''Set the output format object. 
         '''
         if format is None and fp is not None:
-            # get format from fp if possible
-            if '.' in fp:
-                if self._getOutputFormat(fp.split('.')[-1]) is not None:
-                    format = fp.split('.')[-1]
-        outputFormat = self._getOutputFormat(format)
+            outputFormat = self._getOutputFormatFromFilePath(fp)
+        else:
+            outputFormat = self._getOutputFormat(format)
+        if OutputFormat is None:
+            raise DataSetException('no output format could be defined from file path %s or format %s' % (fp, format))
+
         outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
         
 
