@@ -50,6 +50,11 @@ from music21.corpus import handel
 from music21.corpus.handel import hwv56  
 
 from music21.corpus import haydn
+from music21.corpus.haydn import opus54no2
+from music21.corpus.haydn import opus55no1
+from music21.corpus.haydn import opus55no3
+from music21.corpus.haydn import opus64no1
+from music21.corpus.haydn import opus64no2
 from music21.corpus.haydn import opus74no1  
 from music21.corpus.haydn import opus74no2  
 
@@ -60,6 +65,10 @@ from music21.corpus.mozart import k80
 from music21.corpus.mozart import k155
 from music21.corpus.mozart import k156
 from music21.corpus.mozart import k157
+from music21.corpus.mozart import k158
+from music21.corpus.mozart import k159
+from music21.corpus.mozart import k160
+from music21.corpus.mozart import k168
 from music21.corpus.mozart import k370
 from music21.corpus.mozart import k458
 
@@ -141,6 +150,11 @@ MODULES = [
             hwv56,
 
             haydn,
+            opus54no2,
+            opus55no1,
+            opus55no3,
+            opus64no1,
+            opus64no2,
             opus74no1,
             opus74no2,
 
@@ -151,6 +165,10 @@ MODULES = [
             k155,
             k156,
             k157,
+            k158,
+            k159,
+            k160,
+            k168,
             k370,
             k458,
             
