@@ -126,7 +126,7 @@ class Part:
         '''
         if self.soundingRange > other.soundingRange:
             return True
-        elif self.soundingRange == other.soundingRange:
+        elif self.soundingRange == self.soundingRange:
             if self.label < other.label:
                 return True
             else:
@@ -141,9 +141,9 @@ class Part:
             return False
     
     def __lt__(self, other):
-        if self.range < other.range:
+        if self.soundingRange < self.soundingRange:
             return True
-        elif self.range == other.range and self.label > other.label:
+        elif self.soundingRange == self.soundingRange and self.label > other.label:
             return True
         else:
             return False
@@ -155,13 +155,13 @@ class Part:
             return False
     
     def __eq__(self, other):
-        if self.range == other.range and self.label == other.label:
+        if self.soundingRange == self.soundingRange and self.label == other.label:
             return True
         else:
             return False
     
     def __ne__(self, other):
-        if not (self.range == other.range):
+        if not (self.soundingRange == self.soundingRange):
             return True
         else:
             return False
@@ -402,8 +402,8 @@ class Range:
         validPitches = []
         for possiblePitch in pitchList:
             possiblePitch = realizerScale.convertToPitch(possiblePitch)
-            if not (self.lowestPitch > possiblePitch) and not (possiblePitch > self.highestPitch):
-                    validPitches.append(possiblePitch)
+            if self.pitchInRange(possiblePitch):
+                validPitches.append(possiblePitch)
                 
         if len(validPitches) == 0:
             raise RangeException("None of these pitches fall within the range " + str(self) + ": " +  str(pitchList))
