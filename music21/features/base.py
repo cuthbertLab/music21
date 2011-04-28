@@ -1142,11 +1142,11 @@ class Test(unittest.TestCase):
                             'jSymbolic')
 
         # first bundle
-        oChina1 = corpus.parse('essenFolksong/han1')
-        oMitteleuropa1 = corpus.parse('essenFolksong/boehme10')
-
         ds = features.DataSet(classLabel='Region')
         ds.addFeatureExtractors(featureExtractors)
+
+        oChina1 = corpus.parse('essenFolksong/han1')
+        oMitteleuropa1 = corpus.parse('essenFolksong/boehme10')
         
         # add works, defining the class value 
         for o, name in [(oChina1, 'han1')]:
@@ -1161,15 +1161,18 @@ class Test(unittest.TestCase):
 
         # process with all feature extractors, store all features
         ds.process()
-        ds.write(format='tab')
-        ds.write(format='csv')
-        ds.write(format='arff')
+        ds.write('/_scratch/chinaMitteleuropaSplit-a.tab')
+        ds.write('/_scratch/chinaMitteleuropaSplit-a.csv')
+        ds.write('/_scratch/chinaMitteleuropaSplit-a.arff')
+
 
 
         # create second data set from alternate collections
+        ds = features.DataSet(classLabel='Region')
+        ds.addFeatureExtractors(featureExtractors)
+
         oChina2 = corpus.parse('essenFolksong/han2')
         oMitteleuropa2 = corpus.parse('essenFolksong/boehme20')
-
         # add works, defining the class value 
         for o, name in [(oChina2, 'han2')]:
             for w in o.scores:
@@ -1183,9 +1186,9 @@ class Test(unittest.TestCase):
 
         # process with all feature extractors, store all features
         ds.process()
-        ds.write(format='tab')
-        ds.write(format='csv')
-        ds.write(format='arff')
+        ds.write('/_scratch/chinaMitteleuropaSplit-b.tab')
+        ds.write('/_scratch/chinaMitteleuropaSplit-b.csv')
+        ds.write('/_scratch/chinaMitteleuropaSplit-b.arff')
 
 
     def xtestOrangeBayes(self):

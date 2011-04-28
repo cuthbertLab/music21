@@ -37,79 +37,10 @@ environLocal = environment.Environment(_MOD)
 #-------------------------------------------------------------------------------
 # need to classify and add id
 
-
-
- 
-class RepeatedNotesFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
- 
-        self.name = 'Repeated Notes'
-        self.description = 'Fraction of notes that are repeated melodically.'
-        self.isSequential = True
-        self.dimensions = 1
-
-
-
- 
-class StepwiseMotionFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
- 
-        self.name = 'Stepwise Motion'
-        self.description = 'Fraction of melodic intervals that corresponded to a minor or major second.'
-        self.isSequential = True
-        self.dimensions = 1
-
-
-
  
 
 
-class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Size of Melodic Arcs'
-        self.description = 'Average melodic interval separating the top note of melodic peaks and the bottom note of melodic troughs.'
-        self.isSequential = True
-        self.dimensions = 1
-
-
-class ChromaticMotionFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Chromatic Motion'
-        self.description = 'Fraction of melodic intervals corresponding to a semi-tone.'
-        self.isSequential = True
-        self.dimensions = 1
-
-
- 
-class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Direction of Motion'
-        self.description = 'Fraction of melodic intervals that are rising rather than falling.'
-        self.isSequential = True
-        self.dimensions = 1
 
 
  
@@ -127,142 +58,7 @@ class DurationFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
  
-class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Duration of Melodic Arcs'
-        self.description = 'Average number of notes that separate melodic peaks and troughs in any channel.'
-        self.isSequential = True
-        self.dimensions = 1
-
-
- 
-class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
-        featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Harmonicity of Two Strongest Rhythmic Pulses'
-        self.description = 'The bin label of the higher (in terms of bin label) of the two beat bins of the peaks with the highest frequency divided by the bin label of the lower.'
-        self.isSequential = True
-        self.dimensions = 1
-
- 
-class MelodicFifthsFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Melodic Fifths'
-        self.description = 'Fraction of melodic intervals that are perfect fifths.'
-        self.isSequential = True
-        self.dimensions = 1
-
- 
-class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
- 
-        self.name = 'Melodic Interval Histogram'
-        self.description = 'A features array with bins corresponding to the values of the melodic interval histogram.'
-        self.isSequential = True
-        self.dimensions = 128
-
-
-class MelodicOctavesFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Melodic Octaves'
-        self.description = 'Fraction of melodic intervals that are octaves.'
-        self.isSequential = True
-        self.dimensions = 1
-
- 
-class MelodicThirdsFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Melodic Thirds'
-        self.description = 'Fraction of melodic intervals that are major or minor thirds.'
-        self.isSequential = True
-        self.dimensions = 1
-
- 
-class MelodicTritonesFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Melodic Tritones'
-        self.description = 'Fraction of melodic intervals that are tritones.'
-        self.isSequential = True
-        self.dimensions = 1
-
-
-
-
-class MostCommonMelodicIntervalPrevalenceFeature(
-    featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Most Common Melodic Interval Prevalence'
-        self.description = 'Fraction of melodic intervals that belong to the most common interval.'
-        self.isSequential = True
-        self.dimensions = 1
-
-
-
-
-class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
- 
-        self.name = 'Voice Equality - Melodic Leaps'
-        self.description = 'Standard deviation of the average melodic leap in MIDI pitches for each channel that contains at least one note.'
-        self.isSequential = True
-        self.dimensions = 1
-
- 
-class RelativeStrengthOfMostCommonIntervalsFeature(
-    featuresModule.FeatureExtractor):
-    '''
-    >>> from music21 import *
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
-
-        self.name = 'Relative Strength of Most Common Intervals'
-        self.description = 'Fraction of melodic intervals that belong to the second most common interval divided by the fraction of melodic intervals belonging to the most common interval.'
-        self.isSequential = True
-        self.dimensions = 1
 
 
 
@@ -271,6 +67,20 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
 
 #-------------------------------------------------------------------------------
 # melody based
+
+class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M1'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+ 
+        self.name = 'Melodic Interval Histogram'
+        self.description = 'A features array with bins corresponding to the values of the melodic interval histogram.'
+        self.isSequential = True
+        self.dimensions = 128
+
 class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
@@ -312,6 +122,39 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
         self.isSequential = True
         self.dimensions = 1
 
+
+class MostCommonMelodicIntervalPrevalenceFeature(
+    featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M5'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Most Common Melodic Interval Prevalence'
+        self.description = 'Fraction of melodic intervals that belong to the most common interval.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
+
+class RelativeStrengthOfMostCommonIntervalsFeature(
+    featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M6'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Relative Strength of Most Common Intervals'
+        self.description = 'Fraction of melodic intervals that belong to the second most common interval divided by the fraction of melodic intervals belonging to the most common interval.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
+
   
 class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
     '''
@@ -345,9 +188,145 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
 
+ 
+class RepeatedNotesFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M9'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+ 
+        self.name = 'Repeated Notes'
+        self.description = 'Fraction of notes that are repeated melodically.'
+        self.isSequential = True
+        self.dimensions = 1
 
 
+class ChromaticMotionFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'm10'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
+        self.name = 'Chromatic Motion'
+        self.description = 'Fraction of melodic intervals corresponding to a semi-tone.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
+ 
+class StepwiseMotionFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M11'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+ 
+        self.name = 'Stepwise Motion'
+        self.description = 'Fraction of melodic intervals that corresponded to a minor or major second.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
+class MelodicThirdsFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M12'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Melodic Thirds'
+        self.description = 'Fraction of melodic intervals that are major or minor thirds.'
+        self.isSequential = True
+        self.dimensions = 1
+
+ 
+class MelodicFifthsFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M13'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Melodic Fifths'
+        self.description = 'Fraction of melodic intervals that are perfect fifths.'
+        self.isSequential = True
+        self.dimensions = 1
+
+class MelodicTritonesFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M14'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Melodic Tritones'
+        self.description = 'Fraction of melodic intervals that are tritones.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
+class MelodicOctavesFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M15'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Melodic Octaves'
+        self.description = 'Fraction of melodic intervals that are octaves.'
+        self.isSequential = True
+        self.dimensions = 1
+
+ 
+
+class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'm17'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Direction of Motion'
+        self.description = 'Fraction of melodic intervals that are rising rather than falling.'
+        self.isSequential = True
+        self.dimensions = 1
+
+class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M18'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Duration of Melodic Arcs'
+        self.description = 'Average number of notes that separate melodic peaks and troughs in any channel.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
+class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'M19'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Size of Melodic Arcs'
+        self.description = 'Average melodic interval separating the top note of melodic peaks and the bottom note of melodic troughs.'
+        self.isSequential = True
+        self.dimensions = 1
 
 
 
@@ -1161,6 +1140,22 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
 
+ 
+class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
+        featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'R3'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Harmonicity of Two Strongest Rhythmic Pulses'
+        self.description = 'The bin label of the higher (in terms of bin label) of the two beat bins of the peaks with the highest frequency divided by the bin label of the lower.'
+        self.isSequential = True
+        self.dimensions = 1
+
+
 class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
@@ -1867,6 +1862,20 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
 
+class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    '''
+    id = 'T7'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+ 
+        self.name = 'Voice Equality - Melodic Leaps'
+        self.description = 'Standard deviation of the average melodic leap in MIDI pitches for each channel that contains at least one note.'
+        self.isSequential = True
+        self.dimensions = 1
+
+ 
 class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
