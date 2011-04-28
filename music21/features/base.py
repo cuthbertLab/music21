@@ -876,7 +876,30 @@ class DataSet(object):
             outputFormat = OutputCSV(dataSet=self)
         elif format.lower() in ['arff', 'attribute']:
             outputFormat = OutputARFF(dataSet=self)
+        else:
+            return None
         return outputFormat
+
+    def _getOutputFormatFromFilePath(self, fp):
+        '''Get an output format form a file path if possible, otherwise return None.
+
+        >>> from music21 import *
+        >>> ds = features.DataSet()
+        >>> ds._getOutputFormatFromFilePath('test.tab')
+        <music21.features.base.OutputTabOrange object at ...>
+        >>> ds._getOutputFormatFromFilePath('test.csv')
+        <music21.features.base.OutputCSV object at ...>
+        >>> ds._getOutputFormatFromFilePath('junk') is None
+        True
+
+        '''
+        # get format from fp if possible
+        of = None
+        if '.' in fp:
+            if self._getOutputFormat(fp.split('.')[-1]) is not None:
+                of = self._getOutputFormat(fp.split('.')[-1])
+        return of
+
 
     def getString(self, format='tab'):
         '''Get a string representation of the data set in a specific format.
@@ -886,9 +909,14 @@ class DataSet(object):
         return outputFormat.getString()
 
 
-    def write(self, fp=None, format='tab', includeClassLabel=True):
+    def write(self, fp=None, format=None, includeClassLabel=True):
         '''Set the output format object. 
         '''
+        if format is None and fp is not None:
+            # get format from fp if possible
+            if '.' in fp:
+                if self._getOutputFormat(fp.split('.')[-1]) is not None:
+                    format = fp.split('.')[-1]
         outputFormat = self._getOutputFormat(format)
         outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
         
@@ -1063,7 +1091,7 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestRegionClassificationJSymbolic(self):
+    def xtestRegionClassificationJSymbolicA(self):
         '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
         '''
         from music21 import features, corpus
@@ -1102,6 +1130,61 @@ class Test(unittest.TestCase):
 
 
 
+    def xtestRegionClassificationJSymbolicB(self):
+        '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
+        '''
+        from music21 import features, corpus
+        from music21.features import jSymbolic
+
+        # features common to both collections
+        featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 
+                            'jSymbolic')
+
+        # first bundle
+        oChina1 = corpus.parse('essenFolksong/han1')
+        oMitteleuropa1 = corpus.parse('essenFolksong/boehme10')
+
+        ds = features.DataSet(classLabel='Region')
+        ds.addFeatureExtractors(featureExtractors)
+        
+        # add works, defining the class value 
+        for o, name in [(oChina1, 'han1')]:
+            for w in o.scores:
+                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='China', id=id)
+
+        for o, name in [(oMitteleuropa1, 'boehme10')]:
+            for w in o.scores:
+                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='Mitteleuropa', id=id)
+
+        # process with all feature extractors, store all features
+        ds.process()
+        ds.write(format='tab')
+        ds.write(format='csv')
+        ds.write(format='arff')
+
+
+        # create second data set from alternate collections
+        oChina2 = corpus.parse('essenFolksong/han2')
+        oMitteleuropa2 = corpus.parse('essenFolksong/boehme20')
+
+        # add works, defining the class value 
+        for o, name in [(oChina2, 'han2')]:
+            for w in o.scores:
+                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='China', id=id)
+
+        for o, name in [(oMitteleuropa2, 'boehme20')]:
+            for w in o.scores:
+                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='Mitteleuropa', id=id)
+
+        # process with all feature extractors, store all features
+        ds.process()
+        ds.write(format='tab')
+        ds.write(format='csv')
+        ds.write(format='arff')
 
 
     def xtestOrangeBayes(self):

@@ -68,7 +68,8 @@ from music21.corpus.mozart import k157
 from music21.corpus.mozart import k158
 from music21.corpus.mozart import k159
 from music21.corpus.mozart import k160
-from music21.corpus.mozart import k168
+# not yet added
+#from music21.corpus.mozart import k168
 from music21.corpus.mozart import k370
 from music21.corpus.mozart import k458
 
@@ -168,7 +169,7 @@ MODULES = [
             k158,
             k159,
             k160,
-            k168,
+#            k168,
             k370,
             k458,
             
