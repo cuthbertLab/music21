@@ -86,7 +86,7 @@ class Segment:
         '''
         Default rules:
         (1) No incomplete possibilities
-        (2) Top parts within interval.Interval
+        (2) Top parts within maxSemitoneSeparation
         (3) Pitches in each part within range
         (4) No voice crossing
         '''
@@ -98,8 +98,8 @@ class Segment:
             if not self.fbRules.allowIncompletePossibilities:
                 if possib.isIncomplete(self.pitchNamesInChord):
                     continue
-            # Top parts within interval.Interval
-            if not possib.topPartsWithinLimit(self.fbRules.topPartsMaxIntervalSeparation):
+            # Top parts within maxSemitoneSeparation
+            if not possib.upperPartsWithinLimit(self.fbRules.upperPartsMaxSemitoneSeparation):
                 continue
             # Pitches in each part within range
             if self.fbRules.filterPitchesByRange:
@@ -289,23 +289,23 @@ class MiddleSegment(Segment):
                 resolutionPossib = resolution.dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6)
         elif resolutionChord.root().name == majSubmediant.name:
             if sampleChord.isMinorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + dominantScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->vi" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorSubmediant(dominantPossib) #Major scale
         elif resolutionChord.root().name == minSubmediant.name:
             if resolutionChord.isMajorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + minorScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->VI" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorSubmediant(dominantPossib) #Minor scale
         elif resolutionChord.root().name == subdominant.name:
             if resolutionChord.isMajorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + dominantScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->IV" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorSubdominant(dominantPossib)
             elif resolutionChord.isMinorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + minorScale.name)
+                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->iv" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorSubdominant(dominantPossib)
         else:
             raise SegmentException("Dominant seventh resolution: No standard resolution available.")
-        
-        if not (resolutionChord.bass() == self.bassNote.pitch):
+    
+        if not (resolutionPossib.chordify().bass() == self.bassNote.pitch):
             raise SegmentException("Dominant seventh resolution: Bass note resolved improperly in figured bass.")
             
         return resolutionPossib
