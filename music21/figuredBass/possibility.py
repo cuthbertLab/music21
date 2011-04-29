@@ -294,7 +294,7 @@ class Possibility(dict):
         >>> p3 = possibility.Possibility({'X': 'C5', 'Y': 'E4', 'T': 'F4'})
         >>> p3.voiceCrossing(partList)
         Traceback (most recent call last):
-        PossibilityException: Part labels ['Y', 'X'] not found in orderedPartLabels.
+        PossibilityException: Parts with labels ['Y', 'X'] not found in partList.
         '''
         hasVoiceCrossing = False
         
@@ -329,13 +329,16 @@ class Possibility(dict):
 
     # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
     # ---------------------------------------------
-    def parallelFifths(self, nextPossibility, verbose = False):
+    def parallelFifths(self, possibB, verbose = False):
         '''
-        Returns True if there are parallel fifths between prevPossibility (self) and nextPossibility.
-
-        Ignores any parts which aren't shared between the two possibilities, but 
-        raises an error if not enough parts are shared.
+        Returns True if there are parallel fifths between possibA (self) and
+        possibB, which comes directly after possibA.
         
+        The method organizes each set of two pitches in possibA and possibB 
+        into a quartet. If there are less than two shared parts and a quartet 
+        is unable to be formed, parallelFifths returns False, but a warning 
+        to the user will be printed regardless of what verbose is set to.
+                 
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Tenor': 'G3', 'Bass': 'C3'})
         >>> p2 = possibility.Possibility({'Tenor': 'A3', 'Bass': 'D3'})
@@ -343,33 +346,35 @@ class Possibility(dict):
         True
         >>> p3 = {'Soprano': 'D5', 'Alto': 'B4'}
         >>> p1.parallelFifths(p3)
-        Traceback (most recent call last):
-        PossibilityException: Need at least two shared parts to check for parallel fifths.
-
+        False
         ''' 
         hasParallelFifth = False
         try:
-            partQuartets = self.partQuartets(nextPossibility)
+            partQuartets = self.partQuartets(possibB)
         except PossibilityException:
-            raise PossibilityException("Need at least two shared parts to check for parallel fifths.")
+            self.environRules.warn("No parallel fifths between: " + str(self) + " and " + str(possibB) + ": Less than two shared parts.")
+            return False
         
         for (pitchA1, pitchA2, vl1, pitchB1, pitchB2, vl2) in partQuartets:
             vlq = voiceLeading.VoiceLeadingQuartet(pitchA1, pitchA2, pitchB1, pitchB2)
             if vlq.parallelFifth():
                 if verbose:
-                    self.environRules.warn("Parallel fifths between " + vl1 + " and " + vl2 + ".")
+                    self.environRules.warn("Parallel fifths between " + vl1 + " and " + vl2 + " in " + str(self) + ".")
                 hasParallelFifth = True
                 if not verbose:
                     return hasParallelFifth
         
         return hasParallelFifth
         
-    def parallelOctaves(self, nextPossibility, verbose = False):
+    def parallelOctaves(self, possibB, verbose = False):
         '''
-        Returns True if there are parallel octaves between prevPossibility (self) and nextPossibility.
+        Returns True if there are parallel octaves between possibA (self) and
+        possibB, which comes directly after possibA.
 
-        Ignores any parts which aren't shared between the two possibilities, but 
-        raises an error if not enough parts are shared.
+        The method organizes each set of two pitches in possibA and possibB 
+        into a quartet. If there are less than two shared parts and a quartet 
+        is unable to be formed, parallelFifths returns False, but a warning 
+        to the user will be printed regardless of what verbose is set to.
         
         >>> from music21.figuredBass import possibility
         >>> p1 = possibility.Possibility({'Tenor': 'C4', 'Bass': 'C3'})
@@ -378,20 +383,20 @@ class Possibility(dict):
         True
         >>> p3 = {'Soprano': 'D5', 'Alto': 'B4'}
         >>> p1.parallelOctaves(p3)
-        Traceback (most recent call last):
-        PossibilityException: Need at least two shared parts to check for parallel octaves.
+        False
         '''        
         hasParallelOctave = False
         try:
-            partQuartets = self.partQuartets(nextPossibility)
+            partQuartets = self.partQuartets(possibB)
         except PossibilityException:
-            raise PossibilityException("Need at least two shared parts to check for parallel octaves.")
+            self.environRules.warn("No parallel octaves between: " + str(self) + " and " + str(possibB) + ": Less than two shared parts.")
+            return False
         
         for (pitchA1, pitchA2, vl1, pitchB1, pitchB2, vl2) in partQuartets:
             vlq = voiceLeading.VoiceLeadingQuartet(pitchA1, pitchA2, pitchB1, pitchB2)
             if vlq.parallelOctave():
                 if verbose:
-                    self.environRules.warn("Parallel octaves between " + vl1 + " and " + vl2 + ".")
+                    self.environRules.warn("Parallel octaves between " + vl1 + " and " + vl2 + " in " + str(self) + ".")
                 hasParallelOctave = True
                 if not verbose:
                     return hasParallelOctave
