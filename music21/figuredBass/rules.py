@@ -22,7 +22,7 @@ class Rules:
         '''
         #Single Possibility rules
         self.allowIncompletePossibilities = False
-        self.topPartsMaxIntervalSeparation = interval.Interval('P8')
+        self.upperPartsMaxSemitoneSeparation = 12
         self.filterPitchesByRange = True
         self.allowVoiceCrossing = False
         
