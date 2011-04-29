@@ -1649,21 +1649,8 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Note, Rest]
 
 if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-        te = TestExternal()
-
-        
-
-        #t.testNoteEquality()
-        #t.testNoteBeatProperty()
-
-        #t.testMetricalAccent()
-        t.testTieContinue()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------

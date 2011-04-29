@@ -506,8 +506,6 @@ class Test(unittest.TestCase):
 
 
     def testBackBasic(self):
-        
-
         import os
         from music21 import converter, common
         fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test02')
@@ -533,19 +531,20 @@ class Test(unittest.TestCase):
 
 
 
+    def testMuseDataStage1A(self):
+        from music21 import corpus
+        s = corpus.parse('k168', 1)
+
+        self.assertEqual(len(s.parts), 4)
+        self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), '4/4')
+    
+        self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes], [0.0, 3.0, 3.5, 3.75])
+        self.assertEqual([n.offset for n in s.parts[1].getElementsByClass('Measure')[0].notes], [1.0, 2.0, 3.0])
+
 if __name__ == "__main__":
-    import sys
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-
-    elif len(sys.argv) > 1:
-        t = Test()
-        #t.testGetLyrics()
-        #t.testGetBeams()
-        #t.testAccidentals()
-        #t.testTransposingInstruments()
-        t.testBackBasic()
 
 #------------------------------------------------------------------------------
 # eof

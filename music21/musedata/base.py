@@ -547,19 +547,38 @@ class MuseDataPart(object):
         self.stage = stage
         if self.stage == None and len(self.src) > 0:
             self.stage = self._determineStage()
+        if self.stage == 1:
+            self.src = self._scrubStage1(self.src)
         environLocal.printDebug(['MuseDataPart: stage:', self.stage])
 
     def __repr__(self):
         return '<music21.musedata.MuseDataPart>'
     
     def _determineStage(self):
-        '''Determine the stage of this file. This is done by looking for an attributes record starting with a $; if nto found, it is stage 1
+        '''Determine the stage of this file. This is done by looking for an attributes record starting with a $; if not found, it is stage 1
         '''
         for i in range(len(self.src)):
             if self.src[i].startswith('$'):
                 return 2
         return 1
             
+
+    def _scrubStage1(self, src):
+        '''Some stage1 files start with a leading line of space. This needs to be removed, as each line matters. Provide a list of character lines.
+        '''
+        check = True
+        post = []
+        # remove all spaces found in leading lines
+        for l in src:
+            if check:
+                if l.strip() == '':
+                    continue
+                else:
+                    check = False
+            post.append(l)
+        return post
+
+                
 
     def _getDigitsFollowingTag(self, line, tag):
         '''
@@ -853,7 +872,9 @@ class MuseDataPart(object):
         '''
         if self.stage == 1:
             # combine the two lines into one, all space separated
-            return self.src[6].strip() + ' ' + self.src[7].strip()
+            record = self.src[6].strip() + ' ' + self.src[7].strip()
+            environLocal.printDebug(['got attributes record:', record])
+            return record
         else:
             i = 11 # start with index 11, move to line tt starts with $
             while not self.src[i].startswith('$'):
@@ -1142,6 +1163,7 @@ class MuseDataPart(object):
                 # data here is divisions per bar; need to divide by ts
                 # quarter length
                 self._divisionsPerQuarterNote = data / ts.barDuration.quarterLength
+                environLocal.printDebug(['stage1: self._divisionsPerQuarterNote', self._divisionsPerQuarterNote])
             else:
                 # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
                 self._divisionsPerQuarterNote = int(
@@ -1640,7 +1662,7 @@ class Test(unittest.TestCase):
         mdd = MuseDataDirectory(af.getNames())
 
 
-    def testStage1Basic(self):
+    def testStage1A(self):
 
         from music21.musedata import testFiles
         mdw = MuseDataWork()
@@ -1660,6 +1682,7 @@ class Test(unittest.TestCase):
         self.assertEquals(mdpObjs[0]._getKeyParameters(), -1)
         self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '2/2')
         self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
+
 
 
     def testGetLyrics(self):

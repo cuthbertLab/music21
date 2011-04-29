@@ -209,7 +209,7 @@ class Stream(music21.Music21Object):
         if self.id is not None:
             return '<%s.%s %s>' % (self.__module__, self.__class__.__name__, self.id)
         else:
-            return Music21Object.__repr__(self)
+            return music21.Music21Object.__repr__(self)
 
     #---------------------------------------------------------------------------
     # sequence like operations
@@ -9888,7 +9888,7 @@ class Test(unittest.TestCase):
         b4 = note.Note("B4")
         s1 = Stream()
         s1.append([c4, d5, r1, b4])
-        intS1 = s1.melodicIntervals()
+        intS1 = s1.melodicIntervals(skipRests=True)
         self.assertTrue(len(intS1) == 2)
         M9 = intS1[0]
         self.assertEqual(M9.niceName, "Major Ninth") 
