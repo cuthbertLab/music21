@@ -196,6 +196,10 @@ class FeatureExtractor(object):
 #-------------------------------------------------------------------------------
 class StreamForms(object):
     '''A dictionary-like wrapper of a Stream, providing numerous representations cached and on-demand.
+
+    A single StreamForms object can be created for an entire Score, as well as one for each Part and/or Voice. 
+
+    A DataSet object manages one or more StreamForms objects, and exposes them to FeatureExtractors for usage.
     '''
     def __init__(self, streamObj, prepareStream=True):   
         self._src = streamObj
@@ -264,8 +268,6 @@ class StreamForms(object):
             self._forms['flat.getElementsByClass.KeySignature'] = self._base.flat.getElementsByClass('KeySignature')
             return self._forms['flat.getElementsByClass.KeySignature']
 
-
-
         # some methods that return new streams
         elif key in ['chordify']:
             self._forms['chordify'] = self._base.chordify()
@@ -276,6 +278,13 @@ class StreamForms(object):
             self._forms['chordify.getElementsByClass.Chord'] = x
             return self._forms['chordify.getElementsByClass.Chord']
 
+        # create a Part in a Score for each Instrument
+        elif key in ['partitionByInstrument']:
+            from music21 import instrument
+            x = instrument.partitionByInstrument(self._base)
+            self._forms['partitionByInstrument'] = x
+            return self._forms['partitionByInstrument']
+            
         # create a dictionary of encountered set classes and a count
         elif key in ['chordifySetClassHistogram']:  
             histo = {}
@@ -316,7 +325,6 @@ class StreamForms(object):
             self._forms['chordifyTypesHistogram'] = histo
             return self._forms['chordifyTypesHistogram']
 
-
         # a dictionary of quarter length values
         elif key in ['noteQuarterLengthHistogram']:  
             histo = {}
@@ -327,7 +335,6 @@ class StreamForms(object):
                 histo[key] += 1
             self._forms['noteQuarterLengthHistogram'] = histo
             return self._forms['noteQuarterLengthHistogram']
-
 
         # data lists / histograms
         elif key in ['pitchClassHistogram']:

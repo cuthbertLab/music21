@@ -16,7 +16,7 @@
 
 import unittest
 import copy
-
+import math
 
 import music21
 
@@ -1990,6 +1990,14 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
 class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.AcousticGuitar())
+    >>> s1.append(note.Note())
+    >>> s1.append(instrument.Tuba())
+    >>> s1.append(note.Note())
+    >>> fe = features.jSymbolic.PitchedInstrumentsPresentFeature(s1)
+    >>> fe.extract().vector
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     '''
     id = 'I1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1999,6 +2007,20 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         self.description = 'Which pitched General MIDI Instruments are present. There is one entry for each instrument, which is set to 1.0 if there is at least one Note On in the recording corresponding to the instrument and to 0.0 if there is not.'
         self.isSequential = True
         self.dimensions = 128
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        s = self.data['partitionByInstrument']
+        # each part has content for each instrument
+        count = 0
+        for p in s.parts:
+            # always one instrument
+            i = p.getElementsByClass('Instrument')[0]
+            if len(p.flat.notes) > 0:
+                self._feature.vector[i.midiProgram] = 1
+
+
 
 class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
@@ -2014,11 +2036,23 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 47
 
+    # NOTE: this is incorrect: these are not instruments 35 to 81, but pitch
+    # values in for events on midi program channel 10
+
 
 class NotePrevalenceOfPitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.AcousticGuitar())
+    >>> s1.repeatAppend(note.Note(), 4)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.append(note.Note())
+    >>> fe = features.jSymbolic.NotePrevalenceOfPitchedInstrumentsFeature(s1)
+    >>> fe.extract().vector
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.80000..., 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2000000..., 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
     '''
     id = 'I3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2029,6 +2063,20 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
         self.isSequential = True
         self.dimensions = 128
  
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        s = self.data['partitionByInstrument']
+        total = sum(self.data['pitchClassHistogram'])
+        # each part has content for each instrument
+        count = 0
+        for p in s.parts:
+            # always one instrument
+            i = p.getElementsByClass('Instrument')[0]
+            if len(p.flat.notes) > 0:
+                self._feature.vector[i.midiProgram] = len(p.flat.notes) / float(total)
+
 
 class NotePrevalenceOfUnpitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
@@ -2044,7 +2092,7 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
         self.isSequential = True
         self.dimensions = 47
 
-
+    # TODO: need to find events in channel 10. 
 
  
 class TimePrevalenceOfPitchedInstrumentsFeature(
@@ -2060,12 +2108,22 @@ class TimePrevalenceOfPitchedInstrumentsFeature(
         self.description = 'The fraction of the total time of the recording in which a note was sounding for each (pitched) General MIDI Instrument. There is one entry for each instrument, which is set to the total time in seconds during which a given instrument was sounding one or more notes divided by the total length in seconds of the piece.'
         self.isSequential = True
         self.dimensions = 128
+    # TODO: this can be done by symbolic duration in native.py
 
 
 class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.AcousticGuitar())
+    >>> s1.repeatAppend(note.Note(), 5)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.append(note.Note())
+    >>> fe = features.jSymbolic.VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(s1)
+    >>> fe.extract().vector
+    [0.33333...]
+
     '''
     id = 'I6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2075,6 +2133,23 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
         self.description = 'Standard deviation of the fraction of Note Ons played by each (pitched) General MIDI instrument that is used to play at least one note.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        s = self.data['partitionByInstrument']
+        total = sum(self.data['pitchClassHistogram'])
+        # each part has content for each instrument
+        coll = []
+        for p in s.parts:
+            # always one instrument
+            i = p.getElementsByClass('Instrument')[0]
+            if len(p.flat.notes) > 0:
+                coll.append(len(p.flat.notes) / float(total))
+        # would be faster to use numpy
+        #numpy.std(coll)
+        mean = sum(coll) / len(coll)
+        # squared deviations from the mean
+        partial = [pow(n-mean, 2) for n in coll]
+        self._feature.vector[0] = math.sqrt(sum(partial) / len(partial))
 
 
 class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
@@ -2093,13 +2168,18 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
 
 
 
-
-
-
- 
 class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.AcousticGuitar())
+    >>> s1.append(note.Note())
+    >>> s1.append(instrument.Tuba())
+    >>> s1.append(note.Note())
+    >>> fe = features.jSymbolic.NumberOfPitchedInstrumentsFeature(s1)
+    >>> fe.extract().vector
+    [2]
+        
     '''
     id = 'I8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2109,6 +2189,20 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
         self.description = 'Total number of General MIDI patches that are used to play at least one note.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        s = self.data['partitionByInstrument']
+        # each part has content for each instrument
+        count = 0
+        for p in s.parts:
+            if len(p.flat.notes) > 0:
+                count += 1
+        self._feature.vector[0] = count
+
+
+
 
 
 class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
@@ -2142,150 +2236,268 @@ class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
 
 
 
-class StringKeyboardFractionFeature(featuresModule.FeatureExtractor):
+class InstrumentFractionFeature(featuresModule.FeatureExtractor):
+    '''This subclass is in-turn subclassed by all FeatureExtractors that look at the proportional usage of an Insutrment
+    '''
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        # subclasses must define
+        self._targetPrograms = []
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        s = self.data['partitionByInstrument']
+        total = sum(self.data['pitchClassHistogram'])
+        count = 0
+        for p in s.parts:
+            i = p.getElementsByClass('Instrument')[0]
+            if i.midiProgram in self._targetPrograms:
+                count += len(p.flat.notes)
+        self._feature.vector[0] = count / float(total)
+
+
+class StringKeyboardFractionFeature(InstrumentFractionFeature):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.Piano())
+    >>> s1.repeatAppend(note.Note(), 9)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.append(note.Note())
+    >>> fe = features.jSymbolic.StringKeyboardFractionFeature(s1)
+    >>> fe.extract().vector
+    [0.90000...]
     '''
     id = 'I11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'String Keyboard Fraction'
         self.description = 'Fraction of all Note Ons belonging to string keyboard patches (GeneralMIDI patches 1 to 8).'
         self.isSequential = True
         self.dimensions = 1
 
+        self._targetPrograms = range(0,8)
 
-class AcousticGuitarFractionFeature(featuresModule.FeatureExtractor):
+
+
+class AcousticGuitarFractionFeature(InstrumentFractionFeature):
     '''A feature exractor that extracts the fraction of all Note Ons belonging to acoustic guitar patches (General MIDI patches 25 to 26).
 
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.AcousticGuitar())
+    >>> s1.repeatAppend(note.Note(), 3)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.append(note.Note())
+    >>> fe = features.jSymbolic.AcousticGuitarFractionFeature(s1)
+    >>> fe.extract().vector
+    [0.75]
     '''
     id = 'I12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Acoustic Guitar Fraction'
         self.description = 'Fraction of all Note Ons belonging to acoustic guitar patches (General MIDI patches 25 to 26).'
         self.isSequential = True
         self.dimensions = 1
 
+        self._targetPrograms = [24, 25]
 
-class ElectricGuitarFractionFeature(featuresModule.FeatureExtractor):
+
+
+class ElectricGuitarFractionFeature(InstrumentFractionFeature):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.ElectricGuitar())
+    >>> s1.repeatAppend(note.Note(), 4)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.repeatAppend(note.Note(), 4)
+    >>> fe = features.jSymbolic.ElectricGuitarFractionFeature(s1)
+    >>> fe.extract().vector
+    [0.5]
     '''
     id = 'I13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Electric Guitar Fraction'
         self.description = 'Fraction of all Note Ons belonging to electric guitar patches (GeneralMIDI patches 27 to 32).'
         self.isSequential = True
         self.dimensions = 1
 
+        self._targetPrograms = range(26,32)
 
-class ViolinFractionFeature(featuresModule.FeatureExtractor):
+
+
+class ViolinFractionFeature(InstrumentFractionFeature):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.Violin())
+    >>> s1.repeatAppend(note.Note(), 2)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.repeatAppend(note.Note(), 8)
+    >>> fe = features.jSymbolic.ViolinFractionFeature(s1)
+    >>> fe.extract().vector
+    [0.2...]
     '''
     id = 'I14'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Violin Fraction'
         self.description = 'Fraction of all Note Ons belonging to violin patches (GeneralMIDI patches 41 or 111).'
         self.isSequential = True
         self.dimensions = 1
 
+        self._targetPrograms = [40, 110]
 
-class SaxophoneFractionFeature(featuresModule.FeatureExtractor):
+
+class SaxophoneFractionFeature(InstrumentFractionFeature):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.SopranoSaxophone())
+    >>> s1.repeatAppend(note.Note(), 6)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.repeatAppend(note.Note(), 4)
+    >>> fe = features.jSymbolic.SaxophoneFractionFeature(s1)
+    >>> print fe.extract().vector[0]
+    0.6
+
     '''
     id = 'I15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Saxophone Fraction'
-        self.description = 'Fraction of all Note Ons belonging to saxophone patches (GeneralMIDI patches 65 or 68).'
+        self.description = 'Fraction of all Note Ons belonging to saxophone patches (GeneralMIDI patches 65 or 68).' # note : incorrect
         self.isSequential = True
         self.dimensions = 1
 
-class BrassFractionFeature(featuresModule.FeatureExtractor):
+        self._targetPrograms = [64, 65, 66, 67]
+
+class BrassFractionFeature(InstrumentFractionFeature):
     '''A feature exractor that extracts the fraction of all Note Ons belonging to brass patches (General MIDI patches 57 or 68).
 
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.SopranoSaxophone())
+    >>> s1.repeatAppend(note.Note(), 6)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.repeatAppend(note.Note(), 4)
+    >>> fe = features.jSymbolic.BrassFractionFeature(s1)
+    >>> print fe.extract().vector[0]
+    0.4
     '''
     id = 'I16'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Brass Fraction'
-        self.description = 'Fraction of all Note Ons belonging to brass patches (GeneralMIDI patches 57 or 68).'
+        self.description = 'Fraction of all Note Ons belonging to brass patches (GeneralMIDI patches 57 or 68).' # note: incorrect
         self.isSequential = True
         self.dimensions = 1
 
+        self._targetPrograms = range(56,62)
 
 
-class WoodwindsFractionFeature(featuresModule.FeatureExtractor):
+
+class WoodwindsFractionFeature(InstrumentFractionFeature):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.Flute())
+    >>> s1.repeatAppend(note.Note(), 3)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.repeatAppend(note.Note(), 7)
+    >>> fe = features.jSymbolic.WoodwindsFractionFeature(s1)
+    >>> print fe.extract().vector[0]
+    0.3
     '''
     id = 'I17'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Woodwinds Fraction'
         self.description = 'Fraction of all Note Ons belonging to woodwind patches (GeneralMIDI patches 69 or 76).'
         self.isSequential = True
         self.dimensions = 1
 
+        self._targetPrograms = range(68, 80) # include ocarina!
 
 
 
-class OrchestralStringsFractionFeature(featuresModule.FeatureExtractor):
+
+class OrchestralStringsFractionFeature(InstrumentFractionFeature):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.Violoncello())
+    >>> s1.repeatAppend(note.Note(), 4)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.repeatAppend(note.Note(), 6)
+    >>> fe = features.jSymbolic.OrchestralStringsFractionFeature(s1)
+    >>> print fe.extract().vector[0]
+    0.4
     '''
     id = 'I18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Orchestral Strings Fraction'
         self.description = 'Fraction of all Note Ons belonging to orchestral strings patches(General MIDI patches 41 or 47).'
         self.isSequential = True
         self.dimensions = 1
 
+        self._targetPrograms = range(41, 46)
 
-class StringEnsembleFractionFeature(featuresModule.FeatureExtractor):
+
+class StringEnsembleFractionFeature(InstrumentFractionFeature):
     '''
     >>> from music21 import *
     '''
+    # TODO: add tests, do not yet have instrument to model
     id = 'I19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'String Ensemble Fraction'
         self.description = 'Fraction of all Note Ons belonging to string ensemble patches(General MIDI patches 49 to 52).'
         self.isSequential = True
         self.dimensions = 1
 
+        self._targetPrograms = [48, 49, 50, 51] 
+
  
  
-class ElectricInstrumentFractionFeature(featuresModule.FeatureExtractor):
+class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
     '''
     >>> from music21 import *
+    >>> s1 = stream.Stream()
+    >>> s1.append(instrument.ElectricOrgan())
+    >>> s1.repeatAppend(note.Note(), 8)
+    >>> s1.append(instrument.Tuba())
+    >>> s1.repeatAppend(note.Note(), 2)
+    >>> fe = features.jSymbolic.ElectricInstrumentFractionFeature(s1)
+    >>> print fe.extract().vector[0]
+    0.8
     '''
     id = 'I20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        InstrumentFractionFeature.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Electric Instrument Fraction'
         self.description = 'Fraction of all Note Ons belonging to electric instrument patches(General MIDI patches 5, 6, 17, 19, 27 to 32 or 34 to 40).'
         self.isSequential = True
         self.dimensions = 1
 
+        self._targetPrograms = [4, 5, 16, 18, 26, 27, 28, 29, 30, 31, 33, 34,  35, 36, 37, 38, 39] # accept synth bass
 
 
 
@@ -2296,177 +2508,179 @@ class JSymbolicFeatureException(featuresModule.FeatureException):
     pass
 
 
-extractorsById = {'I': [None,
-                        PitchedInstrumentsPresentFeature,
-                        UnpitchedInstrumentsPresentFeature,
-                        NotePrevalenceOfPitchedInstrumentsFeature,
-                        NotePrevalenceOfUnpitchedInstrumentsFeature,
-                        TimePrevalenceOfPitchedInstrumentsFeature,
-                        VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature,
-                        VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature,
-                        NumberOfPitchedInstrumentsFeature,
-                        NumberOfUnpitchedInstrumentsFeature,
-                        PercussionPrevalenceFeature,
-                        StringKeyboardFractionFeature,
-                        AcousticGuitarFractionFeature,
-                        ElectricGuitarFractionFeature,
-                        ViolinFractionFeature,
-                        SaxophoneFractionFeature,
-                        BrassFractionFeature,
-                        WoodwindsFractionFeature,
-                        OrchestralStringsFractionFeature,
-                        StringEnsembleFractionFeature,
-                        ElectricInstrumentFractionFeature,
-                        
-                        
+extractorsById = {'I': [
+    None,
+    PitchedInstrumentsPresentFeature,
+    UnpitchedInstrumentsPresentFeature,
+    NotePrevalenceOfPitchedInstrumentsFeature,
+    NotePrevalenceOfUnpitchedInstrumentsFeature,
+    TimePrevalenceOfPitchedInstrumentsFeature,
+    VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature,
+    VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature,
+    NumberOfPitchedInstrumentsFeature,
+    NumberOfUnpitchedInstrumentsFeature,
+    PercussionPrevalenceFeature,
+    StringKeyboardFractionFeature,
+    AcousticGuitarFractionFeature,
+    ElectricGuitarFractionFeature,
+    ViolinFractionFeature,
+    SaxophoneFractionFeature,
+    BrassFractionFeature,
+    WoodwindsFractionFeature,
+    OrchestralStringsFractionFeature,
+    StringEnsembleFractionFeature,
+    ElectricInstrumentFractionFeature,
                         ],
-                  'T': [None,
-                        MaximumNumberOfIndependentVoicesFeature,
-                        AverageNumberOfIndependentVoicesFeature,
-                        VariabilityOfNumberOfIndependentVoicesFeature,
-                        VoiceEqualityNumberOfNotesFeature,
-                        VoiceEqualityNoteDurationFeature,
-                        VoiceEqualityDynamicsFeature,
-                        VoiceEqualityMelodicLeapsFeature,
-                        VoiceEqualityRangeFeature,
-                        ImportanceOfLoudestVoiceFeature,
-                        RelativeRangeOfLoudestVoiceFeature,
-                        None,#RelativeRangeIsolationOfLoudestVoiceFeature,
-                        RangeOfHighestLineFeature,
-                        RelativeNoteDensityOfHighestLineFeature,
-                        None,#RelativeNoteDurationsOfLowestLineFeature
-                        MelodicIntervalsInLowestLineFeature,
-                        None,#SimultaneityFeature
-                        None,#VariabilityOfSimultaneityFeature
-                        None,#VoiceOverlapFeature
-                        None,#ParallelMotionFeature
-                        VoiceSeparationFeature,
-                        
+                  'T': [
+    None,
+    MaximumNumberOfIndependentVoicesFeature,
+    AverageNumberOfIndependentVoicesFeature,
+    VariabilityOfNumberOfIndependentVoicesFeature,
+    VoiceEqualityNumberOfNotesFeature,
+    VoiceEqualityNoteDurationFeature,
+    VoiceEqualityDynamicsFeature,
+    VoiceEqualityMelodicLeapsFeature,
+    VoiceEqualityRangeFeature,
+    ImportanceOfLoudestVoiceFeature,
+    RelativeRangeOfLoudestVoiceFeature,
+    None,#RelativeRangeIsolationOfLoudestVoiceFeature,
+    RangeOfHighestLineFeature,
+    RelativeNoteDensityOfHighestLineFeature,
+    None,#RelativeNoteDurationsOfLowestLineFeature
+    MelodicIntervalsInLowestLineFeature,
+    None,#SimultaneityFeature
+    None,#VariabilityOfSimultaneityFeature
+    None,#VoiceOverlapFeature
+    None,#ParallelMotionFeature
+    VoiceSeparationFeature,
                         ],
-                  'R': [None,
-                        StrongestRhythmicPulseFeature,
-                        SecondStrongestRhythmicPulseFeature,
-                        HarmonicityOfTwoStrongestRhythmicPulsesFeature,
-                        StrengthOfStrongestRhythmicPulseFeature,
-                        StrengthOfSecondStrongestRhythmicPulseFeature,
-                        StrengthRatioOfTwoStrongestRhythmicPulsesFeature,
-                        CombinedStrengthOfTwoStrongestRhythmicPulsesFeature,
-                        NumberOfStrongPulsesFeature,
-                        NumberOfModeratePulsesFeature,
-                        NumberOfRelativelyStrongPulsesFeature,
-                        RhythmicLoosenessFeature,
-                        PolyrhythmsFeature,
-                        RhythmicVariabilityFeature,
-                        BeatHistogramFeature,
-                        NoteDensityFeature,
-                        None,#NoteDensityVariabilityFeature
-                        AverageNoteDurationFeature,
-                        VariabilityOfNoteDurationFeature,
-                        MaximumNoteDurationFeature,
-                        MinimumNoteDurationFeature,
-                        StaccatoIncidenceFeature,
-                        AverageTimeBetweenAttacksFeature,
-                        VariabilityOfTimeBetweenAttacksFeature,
-                        AverageTimeBetweenAttacksForEachVoiceFeature,
-                        AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature,
-                        None,#IncidenceOfCompleteRestsFeature,
-                        None,#MaximumCompleteRestDurationFeature,
-                        None,#AverageRestDurationPerVoiceFeature,
-                        None,#AverageVariabilityOfRestDurationsAcrossVoicesFeature,
-                        InitialTempoFeature,
-                        InitialTimeSignatureFeature,
-                        CompoundOrSimpleMeterFeature,
-                        TripleMeterFeature,
-                        QuintupleMeterFeature,
-                        ChangesOfMeterFeature,
-                        
+                  'R': [
+    None,
+    StrongestRhythmicPulseFeature,
+    SecondStrongestRhythmicPulseFeature,
+    HarmonicityOfTwoStrongestRhythmicPulsesFeature,
+    StrengthOfStrongestRhythmicPulseFeature,
+    StrengthOfSecondStrongestRhythmicPulseFeature,
+    StrengthRatioOfTwoStrongestRhythmicPulsesFeature,
+    CombinedStrengthOfTwoStrongestRhythmicPulsesFeature,
+    NumberOfStrongPulsesFeature,
+    NumberOfModeratePulsesFeature,
+    NumberOfRelativelyStrongPulsesFeature,
+    RhythmicLoosenessFeature,
+    PolyrhythmsFeature,
+    RhythmicVariabilityFeature,
+    BeatHistogramFeature,
+    NoteDensityFeature,
+    None,#NoteDensityVariabilityFeature
+    AverageNoteDurationFeature,
+    VariabilityOfNoteDurationFeature,
+    MaximumNoteDurationFeature,
+    MinimumNoteDurationFeature,
+    StaccatoIncidenceFeature,
+    AverageTimeBetweenAttacksFeature,
+    VariabilityOfTimeBetweenAttacksFeature,
+    AverageTimeBetweenAttacksForEachVoiceFeature,
+    AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature,
+    None,#IncidenceOfCompleteRestsFeature,
+    None,#MaximumCompleteRestDurationFeature,
+    None,#AverageRestDurationPerVoiceFeature,
+    None,#AverageVariabilityOfRestDurationsAcrossVoicesFeature,
+    InitialTempoFeature,
+    InitialTimeSignatureFeature,
+    CompoundOrSimpleMeterFeature,
+    TripleMeterFeature,
+    QuintupleMeterFeature,
+    ChangesOfMeterFeature,
                         ],
-                  'D': [None,
-                        OverallDynamicRangeFeature,
-                        VariationOfDynamicsFeature,
-                        VariationOfDynamicsInEachVoiceFeature,
-                        AverageNoteToNoteDynamicsChangeFeature,
-                        
+                  'D': [
+    None,
+    OverallDynamicRangeFeature,
+    VariationOfDynamicsFeature,
+    VariationOfDynamicsInEachVoiceFeature,
+    AverageNoteToNoteDynamicsChangeFeature,                        
                         ],
-                  'P': [None,
-                        MostCommonPitchPrevalenceFeature,
-                        MostCommonPitchClassPrevalenceFeature,
-                        RelativeStrengthOfTopPitchesFeature,
-                        RelativeStrengthOfTopPitchClassesFeature,
-                        IntervalBetweenStrongestPitchesFeature,
-                        IntervalBetweenStrongestPitchClassesFeature,
-                        NumberOfCommonPitchesFeature,
-                        PitchVarietyFeature,
-                        PitchClassVarietyFeature,
-                        RangeFeature,
-                        MostCommonPitchFeature,
-                        PrimaryRegisterFeature,
-                        ImportanceOfBassRegisterFeature,
-                        ImportanceOfMiddleRegisterFeature,
-                        ImportanceOfHighRegisterFeature,
-                        MostCommonPitchClassFeature,
-                        DominantSpreadFeature,
-                        StrongTonalCentresFeature,
-                        BasicPitchHistogramFeature,
-                        PitchClassDistributionFeature,
-                        FifthsPitchHistogramFeature,
-                        QualityFeature,
-                        GlissandoPrevalenceFeature,
-                        AverageRangeOfGlissandosFeature,
-                        VibratoPrevalenceFeature,
-                        None,#PrevalenceOfMicroTonesFeature,                        
+                  'P': [
+    None,
+    MostCommonPitchPrevalenceFeature,
+    MostCommonPitchClassPrevalenceFeature,
+    RelativeStrengthOfTopPitchesFeature,
+    RelativeStrengthOfTopPitchClassesFeature,
+    IntervalBetweenStrongestPitchesFeature,
+    IntervalBetweenStrongestPitchClassesFeature,
+    NumberOfCommonPitchesFeature,
+    PitchVarietyFeature,
+    PitchClassVarietyFeature,
+    RangeFeature,
+    MostCommonPitchFeature,
+    PrimaryRegisterFeature,
+    ImportanceOfBassRegisterFeature,
+    ImportanceOfMiddleRegisterFeature,
+    ImportanceOfHighRegisterFeature,
+    MostCommonPitchClassFeature,
+    DominantSpreadFeature,
+    StrongTonalCentresFeature,
+    BasicPitchHistogramFeature,
+    PitchClassDistributionFeature,
+    FifthsPitchHistogramFeature,
+    QualityFeature,
+    GlissandoPrevalenceFeature,
+    AverageRangeOfGlissandosFeature,
+    VibratoPrevalenceFeature,
+    None,#PrevalenceOfMicroTonesFeature,                        
                         ],
-                  'M': [None,
-                        MelodicIntervalHistogramFeature,
-                        AverageMelodicIntervalFeature,
-                        MostCommonMelodicIntervalFeature,
-                        DistanceBetweenMostCommonMelodicIntervalsFeature,
-                        MostCommonMelodicIntervalPrevalenceFeature,
-                        RelativeStrengthOfMostCommonIntervalsFeature,
-                        NumberOfCommonMelodicIntervalsFeature,
-                        AmountOfArpeggiationFeature,
-                        RepeatedNotesFeature,
-                        ChromaticMotionFeature,
-                        StepwiseMotionFeature,
-                        MelodicThirdsFeature,
-                        MelodicFifthsFeature,
-                        MelodicTritonesFeature,
-                        MelodicOctavesFeature,
-                        None,#EmbellishmentFeature,
-                        DirectionOfMotionFeature,
-                        DurationOfMelodicArcsFeature,
-                        SizeOfMelodicArcsFeature,
-                        None,#MelodicPitchVarietyFeature,
+                  'M': [
+    None,
+    MelodicIntervalHistogramFeature,
+    AverageMelodicIntervalFeature,
+    MostCommonMelodicIntervalFeature,
+    DistanceBetweenMostCommonMelodicIntervalsFeature,
+    MostCommonMelodicIntervalPrevalenceFeature,
+    RelativeStrengthOfMostCommonIntervalsFeature,
+    NumberOfCommonMelodicIntervalsFeature,
+    AmountOfArpeggiationFeature,
+    RepeatedNotesFeature,
+    ChromaticMotionFeature,
+    StepwiseMotionFeature,
+    MelodicThirdsFeature,
+    MelodicFifthsFeature,
+    MelodicTritonesFeature,
+    MelodicOctavesFeature,
+    None,#EmbellishmentFeature,
+    DirectionOfMotionFeature,
+    DurationOfMelodicArcsFeature,
+    SizeOfMelodicArcsFeature,
+    None,#MelodicPitchVarietyFeature,
                         ],
-                  'C': [None,
-                        None,#VerticalIntervalsFeature,
-                        None,#ChordTypesFeature,
-                        None,#MostCommonVerticalIntervalFeature,
-                        None,#SecondMostCommonVerticalIntervalFeature,
-                        None,#DistanceBetweenTwoMostCommonVerticalIntervalsFeature,
-                        None,#PrevalenceOfMostCommonVerticalIntervalFeature,
-                        None,#PrevalenceOfSecondMostCommonVerticalIntervalFeature,
-                        None,#RatioOfPrevalenceOfTwoMostCommonVerticalIntervalsFeature,
-                        None,#AverageNumberOfSimultaneousPitchClassesFeature,
-                        None,#VariabilityOfNumberOfSimultaneousPitchClassesFeature,
-                        None,#MinorMajorRatioFeature,
-                        None,#PerfectVerticalIntervalsFeature,
-                        None,#UnisonsFeature,
-                        None,#VerticalMinorSecondsFeature,
-                        None,#VerticalThirdsFeature,
-                        None,#VerticalFifthsFeature,
-                        None,#VerticalTritonesFeature,
-                        None,#VerticalOctavesFeature,
-                        None,#VerticalDissonanceRatioFeature,
-                        None,#PartialChordsFeature,
-                        None,#MinorMajorTriadRatioFeature,
-                        None,#StandardTriadsFeature,
-                        None,#DiminishedAndAugmentedTriadsFeature,
-                        None,#DominantSeventhChordsFeature,
-                        None,#SeventhsChordsFeature,
-                        None,#ComplexChordsFeature,
-                        None,#NonStandardChordsFeature,
-                        None,#ChordDurationFeature,
+                  'C': [
+    None,
+    None,#VerticalIntervalsFeature,
+    None,#ChordTypesFeature,
+    None,#MostCommonVerticalIntervalFeature,
+    None,#SecondMostCommonVerticalIntervalFeature,
+    None,#DistanceBetweenTwoMostCommonVerticalIntervalsFeature,
+    None,#PrevalenceOfMostCommonVerticalIntervalFeature,
+    None,#PrevalenceOfSecondMostCommonVerticalIntervalFeature,
+    None,#RatioOfPrevalenceOfTwoMostCommonVerticalIntervalsFeature,
+    None,#AverageNumberOfSimultaneousPitchClassesFeature,
+    None,#VariabilityOfNumberOfSimultaneousPitchClassesFeature,
+    None,#MinorMajorRatioFeature,
+    None,#PerfectVerticalIntervalsFeature,
+    None,#UnisonsFeature,
+    None,#VerticalMinorSecondsFeature,
+    None,#VerticalThirdsFeature,
+    None,#VerticalFifthsFeature,
+    None,#VerticalTritonesFeature,
+    None,#VerticalOctavesFeature,
+    None,#VerticalDissonanceRatioFeature,
+    None,#PartialChordsFeature,
+    None,#MinorMajorTriadRatioFeature,
+    None,#StandardTriadsFeature,
+    None,#DiminishedAndAugmentedTriadsFeature,
+    None,#DominantSeventhChordsFeature,
+    None,#SeventhsChordsFeature,
+    None,#ComplexChordsFeature,
+    None,#NonStandardChordsFeature,
+    None,#ChordDurationFeature,
                         ]
                   
                   }
@@ -2518,26 +2732,26 @@ def getExtractorByTypeAndNumber(type, number):
     D 2 VariationOfDynamicsFeature (not implemented)
     D 3 VariationOfDynamicsInEachVoiceFeature (not implemented)
     D 4 AverageNoteToNoteDynamicsChangeFeature (not implemented)
-    I 1 PitchedInstrumentsPresentFeature (not implemented)
+    I 1 PitchedInstrumentsPresentFeature
     I 2 UnpitchedInstrumentsPresentFeature (not implemented)
-    I 3 NotePrevalenceOfPitchedInstrumentsFeature (not implemented)
+    I 3 NotePrevalenceOfPitchedInstrumentsFeature
     I 4 NotePrevalenceOfUnpitchedInstrumentsFeature (not implemented)
     I 5 TimePrevalenceOfPitchedInstrumentsFeature (not implemented)
-    I 6 VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature (not implemented)
+    I 6 VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature
     I 7 VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature (not implemented)
-    I 8 NumberOfPitchedInstrumentsFeature (not implemented)
+    I 8 NumberOfPitchedInstrumentsFeature
     I 9 NumberOfUnpitchedInstrumentsFeature (not implemented)
     I 10 PercussionPrevalenceFeature (not implemented)
-    I 11 StringKeyboardFractionFeature (not implemented)
-    I 12 AcousticGuitarFractionFeature (not implemented)
-    I 13 ElectricGuitarFractionFeature (not implemented)
-    I 14 ViolinFractionFeature (not implemented)
-    I 15 SaxophoneFractionFeature (not implemented)
-    I 16 BrassFractionFeature (not implemented)
-    I 17 WoodwindsFractionFeature (not implemented)
-    I 18 OrchestralStringsFractionFeature (not implemented)
-    I 19 StringEnsembleFractionFeature (not implemented)
-    I 20 ElectricInstrumentFractionFeature (not implemented)
+    I 11 StringKeyboardFractionFeature
+    I 12 AcousticGuitarFractionFeature
+    I 13 ElectricGuitarFractionFeature
+    I 14 ViolinFractionFeature
+    I 15 SaxophoneFractionFeature
+    I 16 BrassFractionFeature
+    I 17 WoodwindsFractionFeature
+    I 18 OrchestralStringsFractionFeature
+    I 19 StringEnsembleFractionFeature
+    I 20 ElectricInstrumentFractionFeature
     M 1 MelodicIntervalHistogramFeature (not implemented)
     M 2 AverageMelodicIntervalFeature (not implemented)
     M 3 MostCommonMelodicIntervalFeature (not implemented)
@@ -2637,6 +2851,23 @@ def getExtractorByTypeAndNumber(type, number):
 
 # list all implemented features features
 featureExtractors = [
+
+
+PitchedInstrumentsPresentFeature, # i1
+NotePrevalenceOfPitchedInstrumentsFeature, # i3
+VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature, #i6
+NumberOfPitchedInstrumentsFeature, # i8
+StringKeyboardFractionFeature, # i11
+AcousticGuitarFractionFeature, #i12
+ElectricGuitarFractionFeature, #i13
+ViolinFractionFeature, #i14
+SaxophoneFractionFeature, #i15
+BrassFractionFeature, #i16
+WoodwindsFractionFeature, #i17
+OrchestralStringsFractionFeature,  #i18
+StringEnsembleFractionFeature,  #i19
+ElectricInstrumentFractionFeature, #i20
+
 
 #t11 not in jSymbolic
 

@@ -1252,14 +1252,22 @@ def instrumentFromMidiProgram(number):
 def partitionByInstrument(streamObj):
     '''Given a single Stream, or a Score or similar multi-part structure, partition into a Part for each unique Instrument, joining events possibly from different parts.
     '''
+    # TODO: this might be generalized and placed on Stream?
     from music21 import stream
 
     if not streamObj.hasPartLikeStreams():
         # place in a score for uniform operations
         s = stream.Score()
-        s.insert(0, streamObj)
+        s.insert(0, streamObj.flat)
     else:
-        s = streamObj
+        s = stream.Score()
+        # append flat parts
+        for sub in streamObj.getElementsByClass('Stream'):
+            s.insert(0, sub.flat)
+
+    # first, lets extend the duration of each instrument to match stream
+    for sub in s.getElementsByClass('Stream'):
+        sub.extendDuration('Instrument')
 
     # first, find all unique instruments
     found = s.flat.getElementsByClass('Instrument')
@@ -1268,17 +1276,37 @@ def partitionByInstrument(streamObj):
     
     names = {} # store unique names
     for e in found:
+        # matching here by instrument name
         if e.instrumentName not in names.keys():
-            names[e.instrumentName] = e # just store one instance
+            names[e.instrumentName] = {'Instrument':e} # just store one instance
         
     # create a return object that has a part for each instrument
     post = stream.Score()
     for iName in names.keys():
         p = stream.Part()
         # add the instrument instance
-        p.insert(0, names[iName])
+        p.insert(0, names[iName]['Instrument'])
+        # store a handle to this part
+        names[iName]['Part'] = p
         post.insert(0, p)
 
+    # iterate over flat sources; get events within each defined instrument
+    # add to corresponding part
+    for sub in s:
+        for i in sub.getElementsByClass('Instrument'):
+            start = i.getOffsetBySite(sub) 
+            # duration will have been set with sub.extendDuration above
+            end = i.getOffsetBySite(sub) + i.duration.quarterLength
+            # get destination Part
+            p = names[i.instrumentName]['Part']
+            coll = sub.getElementsByOffset(start, end, 
+                    # do not include elements that start at the end
+                    includeEndBoundary=False, 
+                    mustFinishInSpan=False, mustBeginInSpan=True)
+            # add to part at original offset
+            # do not gather instrument
+            for e in coll.getElementsNotOfClass('Instrument'):
+                p.insert(e.getOffsetBySite(sub), e)
     return post
 
 
@@ -1362,7 +1390,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post), 2)
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
 
-        environLocal.printDebug(['post processing'])
         #post.show('t')
 
 
@@ -1375,6 +1402,153 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post), 2)
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
         #post.show('t')
+
+
+    def testPartitionByInstrumentB(self):
+        from music21 import instrument, stream, note
+
+        # basic case of instruments in Parts
+        s = stream.Score()
+        p1 = stream.Part() 
+        p1.append(instrument.Piano())
+        p1.repeatAppend(note.Note(), 6)
+        
+        p2 = stream.Part() 
+        p2.append(instrument.Piccolo())
+        p2.repeatAppend(note.Note(), 12)
+        s.insert(0, p1)
+        s.insert(0, p2)
+
+        post = instrument.partitionByInstrument(s)
+        self.assertEqual(len(post), 2)
+        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post.parts[0].notes), 6)
+        self.assertEqual(len(post.parts[1].notes), 12)
+
+
+    def testPartitionByInstrumentC(self):
+        from music21 import instrument, stream, note
+
+        # basic case of instruments in Parts
+        s = stream.Score()
+        p1 = stream.Part() 
+        p1.append(instrument.Piano())
+        p1.repeatAppend(note.Note('a'), 6)
+        # will go in next available offset
+        p1.append(instrument.AcousticGuitar())
+        p1.repeatAppend(note.Note('b'), 3)
+        
+        p2 = stream.Part() 
+        p2.append(instrument.Piccolo())
+        p2.repeatAppend(note.Note('c'), 2)
+        p2.append(instrument.Flute())
+        p2.repeatAppend(note.Note('d'), 4)
+
+        s.insert(0, p1)
+        s.insert(0, p2)
+
+        post = instrument.partitionByInstrument(s)
+        self.assertEqual(len(post), 4) # 4 instruments
+        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
+        self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
+        self.assertEqual(len(post.parts[0].notes), 6)
+        self.assertEqual(post.parts[1].getInstrument().instrumentName, 'Flute')
+        self.assertEqual(len(post.parts[1].notes), 4)
+
+        self.assertEqual(post.parts[2].getInstrument().instrumentName, 'Piccolo')
+        self.assertEqual(len(post.parts[2].notes), 2)
+
+        self.assertEqual(post.parts[3].getInstrument().instrumentName, 'Acoustic Guitar')
+        self.assertEqual(len(post.parts[3].notes), 3)
+
+        #environLocal.printDebug(['post processing'])
+        #post.show('t')
+
+
+    def testPartitionByInstrumentD(self):
+        from music21 import instrument, stream, note
+
+        # basic case of instruments in Parts
+        s = stream.Score()
+        p1 = stream.Part() 
+        p1.append(instrument.Piano())
+        p1.repeatAppend(note.Note('a'), 6)
+        # will go in next available offset
+        p1.append(instrument.AcousticGuitar())
+        p1.repeatAppend(note.Note('b'), 3)
+        p1.append(instrument.Piano())
+        p1.repeatAppend(note.Note('e'), 5)
+        
+        p2 = stream.Part() 
+        p2.append(instrument.Piccolo())
+        p2.repeatAppend(note.Note('c'), 2)
+        p2.append(instrument.Flute())
+        p2.repeatAppend(note.Note('d'), 4)
+        p2.append(instrument.Piano())
+        p2.repeatAppend(note.Note('f'), 1)
+
+        s.insert(0, p1)
+        s.insert(0, p2)
+
+        post = instrument.partitionByInstrument(s)
+        self.assertEqual(len(post), 4) # 4 instruments
+        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
+        # piano spans are joined together
+        self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
+        self.assertEqual(len(post.parts[0].notes), 12)
+
+        self.assertEqual([n.offset for n in post.parts[0].notes], [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 9.0, 10.0, 11.0, 12.0, 13.0])
+
+        #environLocal.printDebug(['post processing'])
+        #post.show('t')
+
+
+    def testPartitionByInstrumentE(self):
+        from music21 import instrument, stream, note
+
+        # basic case of instruments in Parts
+        s = stream.Score()
+        p1 = stream.Part() 
+        p1.append(instrument.Piano())
+        p1.repeatAppend(note.Note('a'), 6)
+        # will go in next available offset
+        p1.append(instrument.AcousticGuitar())
+        p1.repeatAppend(note.Note('b'), 3)
+        p1.append(instrument.Piano())
+        p1.repeatAppend(note.Note('e'), 5)
+        
+        p1.append(instrument.Piccolo())
+        p1.repeatAppend(note.Note('c'), 2)
+        p1.append(instrument.Flute())
+        p1.repeatAppend(note.Note('d'), 4)
+        p1.append(instrument.Piano())
+        p1.repeatAppend(note.Note('f'), 1)
+
+        s = p1
+
+        post = instrument.partitionByInstrument(s)
+        self.assertEqual(len(post), 4) # 4 instruments
+        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
+        # piano spans are joined together
+        self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
+        self.assertEqual(len(post.parts[0].notes), 12)
+
+        self.assertEqual([n.offset for n in post.parts[0].notes], [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
+
+
+    def testPartitionByInstrumentF(self):
+        from music21 import instrument, stream, note
+
+        s1 = stream.Stream()
+        s1.append(instrument.AcousticGuitar())
+        s1.append(note.Note())
+        s1.append(instrument.Tuba())
+        s1.append(note.Note())
+
+        post = instrument.partitionByInstrument(s1)
+        self.assertEqual(len(post), 2) # 4 instruments
+
+
 
 
 #-------------------------------------------------------------------------------
