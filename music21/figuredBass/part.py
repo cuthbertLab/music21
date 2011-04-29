@@ -111,11 +111,12 @@ class Part:
         '''
         Returns true if Part self is higher than other.
         
-        A Part is higher if it's sounding range is higher. 
+        A Part is higher if its sounding range is higher. 
         
         >>> from music21.figuredBass import part
         >>> soprano1 = part.Part('Soprano1','C4','A5')
         >>> soprano2 = part.Part('Soprano2','C4','A5')
+        >>> tenor = part.Part('Tenor', 'C3','A4')
         >>> bass = part.Part('Bass','E2','E4')
         >>> soprano1 > soprano2
         True
@@ -123,10 +124,12 @@ class Part:
         False
         >>> bass > soprano2
         False
+        >>> tenor > soprano1
+        False
         '''
         if self.soundingRange > other.soundingRange:
             return True
-        elif self.soundingRange == self.soundingRange:
+        elif self.soundingRange == other.soundingRange:
             if self.label < other.label:
                 return True
             else:
@@ -141,9 +144,9 @@ class Part:
             return False
     
     def __lt__(self, other):
-        if self.soundingRange < self.soundingRange:
+        if self.soundingRange < other.soundingRange:
             return True
-        elif self.soundingRange == self.soundingRange and self.label > other.label:
+        elif self.soundingRange == other.soundingRange and self.label > other.label:
             return True
         else:
             return False
@@ -155,13 +158,13 @@ class Part:
             return False
     
     def __eq__(self, other):
-        if self.soundingRange == self.soundingRange and self.label == other.label:
+        if self.soundingRange == other.soundingRange and self.label == other.label:
             return True
         else:
             return False
     
     def __ne__(self, other):
-        if not (self.soundingRange == self.soundingRange):
+        if not (self.soundingRange == other.soundingRange):
             return True
         else:
             return False
