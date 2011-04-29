@@ -539,6 +539,9 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), '4/4')
     
         self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes], [0.0, 3.0, 3.5, 3.75])
+
+        self.assertEqual([n.nameWithOctave for n in s.parts[0].getElementsByClass('Measure')[0].notes], ['F5', 'F5', 'E5', 'D5'])
+
         self.assertEqual([n.offset for n in s.parts[1].getElementsByClass('Measure')[0].notes], [1.0, 2.0, 3.0])
 
 if __name__ == "__main__":
