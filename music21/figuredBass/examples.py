@@ -18,30 +18,30 @@ from music21 import meter
 from music21.figuredBass import realizer
 from music21.figuredBass import part
 
-def createPartList():
-    b1 = part.Part('Bass','E2','E4')
-    t1 = part.Part('Tenor','C3','A4')
-    a1 = part.Part('Alto','F3','G5')
-    s2 = part.Part('Soprano2','C4','A5')
-    s1 = part.Part('Soprano1','C4','A5')
-    
-    b1.myClef = clef.BassClef()
-    t1.myClef = clef.Treble8vbClef()
-    
-    t1.maxSeparation = interval.Interval('M3')
-    a1.maxSeparation = interval.Interval('M3')
-    s2.maxSeparation = interval.Interval('M2')
-    s1.maxSeparation = interval.Interval('M2') 
+def createPartListA():
+    b1 = part.Part('Bass', None, 'E2','E4')
+    t1 = part.Part('Tenor', 4, 'C3','A4')
+    a1 = part.Part('Alto', 4, 'F3','G5')
+    s1 = part.Part('Soprano', 2, 'C4','A5')
     
     partList = [b1,t1,a1,s1]
     return partList
 
+def createPartListB():
+    part1 = part.Part(1,2)
+    part2 = part.Part(2)
+    part3 = part.Part(3)
+    part4 = part.Part(4)
+    
+    partList = [part1, part2, part3, part4]
+    return partList
+    
 def exampleA():
     '''
     This was one of my (Jose Cabal-Ugaz) 21M.302 assignments.
     The figured bass was composed by Charles Shadle.
     '''
-    partList = createPartList()
+    partList = createPartListB()
     fb = realizer.FiguredBass(partList, '3/2', 'C')
     ####     C major: C D E F G A B C
 
@@ -91,7 +91,7 @@ def exampleB():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
-    partList = createPartList()
+    partList = createPartListB()
     fb = realizer.FiguredBass(partList, '4/4', 'D', 'minor')
     ####     D minor: D E F G A B- C(#) D
    
@@ -119,7 +119,7 @@ def exampleC():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
-    partList = createPartList()
+    partList = createPartListB()
     fb = realizer.FiguredBass(partList, '4/4', 'F#', 'minor')
     ####     F# minor: F# G# A B C# D E(#) F
     
@@ -148,7 +148,7 @@ def exampleD():
     Another one of my (Jose Cabal-Ugaz) assignments from 21M.302.
     This figured bass was composed by Charles Shadle.
     '''
-    partList = createPartList()
+    partList = createPartListB()
     fb = realizer.FiguredBass(partList, '3/4', 'b', 'minor')
     ####     B minor: B C# D E F# G A(#) B
 
@@ -204,7 +204,7 @@ def exampleD():
     return fb
 
 def V43ResolutionExample():
-    partList = createPartList()
+    partList = createPartListB()
     fb = realizer.FiguredBass(partList, '4/4', 'D')
 
     n1 = note.Note('D3')
@@ -221,14 +221,14 @@ def V43ResolutionExample():
     
     fb.addElement(n1)           #I
     fb.addElement(n2, '4,3')    #V4,3
-    fb.addElement(n3)           #I
+    fb.addElement(n3)           #I, resolveV43toI6 = False
     fb.addElement(n4, '4,3')    #V4,3
-    fb.addElement(n5, '6')      #I6
+    fb.addElement(n5, '6')      #I6, resolveV43toI6 = True
     
     return fb
 
 def viio65ResolutionExample():
-    partList = createPartList()
+    partList = createPartListB()
     fb = realizer.FiguredBass(partList, '4/4', 'D')
 
     n1 = note.Note('D3')
@@ -245,17 +245,68 @@ def viio65ResolutionExample():
     
     fb.addElement(n1)           #I
     fb.addElement(n2, '6,-5')   #viio6,5
-    fb.addElement(n3)           #I
+    fb.addElement(n3)           #I, standard resolution, doubledRoot = False
     fb.addElement(n4, '6,-5')   #viio6,5
-    fb.addElement(n5, '6')      #I6
+    fb.addElement(n5, '6')      #I6, alternate resolution, doubledRoot = True
     
     return fb
 
+def twelveBarBlues():
+    partList = createPartListB()
+    fb = realizer.FiguredBass(partList, '4/4', 'B-')
+    
+    n1 = note.Note('B-3') #I
+    n2 = note.Note('E-3') #IV
+    n3 = note.Note('B-3') #I
+    n4 = note.Note('B-3') #I
+    n5 = note.Note('E-3') #IV
+    n6 = note.Note('E-3') #IV
+    n7 = note.Note('B-3') #I
+    n8 = note.Note('B-3') #I
+    n9 = note.Note('F3') #V
+    n10 = note.Note('G3') #IV
+    n11 = note.Note('B-3') #I
+    n12 = note.Note('B-3') #I
+    
+    n1.quarterLength = 1.0
+    n2.quarterLength = 1.0
+    n3.quarterLength = 1.0
+    n4.quarterLength = 1.0
+    n5.quarterLength = 1.0
+    n6.quarterLength = 1.0
+    n7.quarterLength = 1.0
+    n8.quarterLength = 1.0
+    n9.quarterLength = 1.0
+    n10.quarterLength = 1.0
+    n11.quarterLength = 1.0
+    n12.quarterLength = 1.0
+
+    fb.addElement(n1, '7')
+    fb.addElement(n2, '7')
+    fb.addElement(n3, '7')   
+    fb.addElement(n4, '7')
+    fb.addElement(n5, '7')
+    fb.addElement(n6, '7')
+    fb.addElement(n7, '7')
+    fb.addElement(n8, '7')
+    fb.addElement(n9, '7')
+    fb.addElement(n10, '6')
+    fb.addElement(n11, '7')
+    fb.addElement(n12, '7')
+    
+    return fb
+
+
+
 if __name__ == "__main__":
     #exampleA(), exampleB(), exampleC(), exampleD()
-    #fb = exampleA() #Set up the figured bass
-    fb = viio65ResolutionExample()
-    #fb.fbInfo.fbRules.topVoicesMaxIntervalSeparation = None
+    fb = exampleA() #Set up the figured bass
+    #fb = viio65ResolutionExample()
+    #fb = twelveBarBlues()
+    #fb.fbInfo.fbRules.allowParallelFifths = True
+    #fb.fbInfo.fbRules.allowParallelOctaves = True
+
+    #fb.fbInfo.fbRules.upperPartsMaxSemitoneSeparation = None
     fb.solve()
     fb.showRandomSolutions(20)
     #sc = fb.generateRandomSolutions(200)
