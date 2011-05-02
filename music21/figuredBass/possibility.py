@@ -590,7 +590,7 @@ class Possibility(dict):
                 vlq = voiceLeading.VoiceLeadingQuartet(lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
                 if vlq.parallelFifth():
                     if verbose:
-                        self.environRules.warn("Parallel fifths between " + lowerPart.label + " and " + higherPart.label + " in " + str(possibA) + ".")
+                        self.environRules.warn("Parallel fifths between " + str(lowerPart.label) + " and " + str(higherPart.label) + " in " + str(possibA) + ".")
                     hasParallelFifth = True
                     if not verbose:
                         return hasParallelFifth
@@ -649,7 +649,7 @@ class Possibility(dict):
                 vlq = voiceLeading.VoiceLeadingQuartet(lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
                 if vlq.parallelOctave():
                     if verbose:
-                        self.environRules.warn("Parallel octaves between " + lowerPart.label + " and " + higherPart.label + " in " + str(self) + ".")
+                        self.environRules.warn("Parallel octaves between " + str(lowerPart.label) + " and " + str(higherPart.label) + " in " + str(self) + ".")
                     hasParallelOctave = True
                     if not verbose:
                         return hasParallelOctave
@@ -707,7 +707,7 @@ class Possibility(dict):
         if vlq.hiddenFifth():
             hasHiddenFifth = True
             if verbose:
-                self.environRules.warn("Hidden fifth between the outer parts " + uppermostA.label + " and " + uppermostB.label + " in " + str(self) + ".")
+                self.environRules.warn("Hidden fifth between the outer parts " + str(uppermostA.label) + " and " + str(uppermostB.label) + " in " + str(self) + ".")
             return hasHiddenFifth
             
         return hasHiddenFifth
@@ -754,7 +754,7 @@ class Possibility(dict):
         if vlq.hiddenOctave():
             hasHiddenOctave = True
             if verbose:
-                self.environRules.warn("Hidden octave between the outer parts " + uppermostA.label + " and " + uppermostB.label + " in " + str(self) + ".")
+                self.environRules.warn("Hidden octave between the outer parts " + str(uppermostA.label) + " and " + str(uppermostB.label) + " in " + str(self) + ".")
             return hasHiddenOctave
             
         return hasHiddenOctave
@@ -784,8 +784,12 @@ class Possibility(dict):
         >>> possibB = possibility.Possibility({part1: 'F4', part2: 'F4'})
         >>> possibA.voiceOverlap(possibB) # Voice overlap between part2/part1, but no voice crossing
         True
+        >>> possibA.voiceCrossing()
+        False
+        >>> possibB.voiceCrossing()
+        False
         
-        Here, possibA and possibB have no parts in common.
+        Here, possibA and possibB have no parts in common.    
         >>> possibA = possibB 
         >>> possibB = possibility.Possibility({part3: 'D4', part4: 'B4'})
         >>> possibA.voiceOverlap(possibB)
@@ -815,7 +819,7 @@ class Possibility(dict):
                 (higherPart, higherPitchA, higherPitchB) = pairsList[pairIndex2]
                 if lowerPitchB > higherPitchA or higherPitchB < lowerPitchA:
                     if verbose:
-                        self.environRules.warn("Part overlap between " + vl1 + " and " + vl2 + ".")
+                        self.environRules.warn("Voice overlap between " + str(lowerPart.label) + " and " + str(higherPart.label) + ".")
                     hasVoiceOverlap = True
                     if not verbose:
                         return hasVoiceOverlap
@@ -862,7 +866,7 @@ class Possibility(dict):
             i1 = interval.notesToInterval(v1n1, v1n2)
             if abs(i1.chromatic.semitones) > abs(givenPart.maxSeparation):
                 if verbose:
-                    self.environRules.warn("Part leap in " + givenPart.label + " part.")
+                    self.environRules.warn("Part leap in " + str(givenPart.label) + " part.")
                 leapsWithinLimits = False
                 if not verbose:
                     return leapsWithinLimits
