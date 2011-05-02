@@ -12,82 +12,80 @@ import music21
 import unittest
 import copy
 
-from music21 import interval
-from music21 import clef
-from music21 import pitch
+from music21.interval import Interval
+from music21.pitch import Pitch
 
 from music21.figuredBass import realizerScale
 
-class Part:
-    def __init__(self, label, lowestWrittenPitch = pitch.Pitch('C1'), highestWrittenPitch = pitch.Pitch('B5'), soundingTransposition = interval.Interval('P1')):
+class Part(object):
+    def __init__(self, label, maxSeparation = 12, lowestPitch = 'A0', highestPitch = 'C8'):
         '''
-        Creates a Part instance, which represents a part or voice in music, a single vocal part or instrument.
-         
-        A Part is created by providing a lowestPitch and highestPitch for a given part, as represented on a staff, with an associated
-        music21 interval which represents the interval between the written pitches and the way they sound in the case of transposing 
-        parts. You can access a Part's writtenRange by calling self.writtenRange and soundingRange by calling self.soundingRange.
+        Creates a Part instance, which represents information for a line of music.
         
-        A Part can store other parameters as well:
-        (1) maxSeparation: maximum separation between two consecutive notes/pitches on a staff associated with this part. 
-        Default is a perfect octave. Represented as a music21 interval object.
-        (2) myClef: default clef to use in staff representation. Default is a Treble Clef. Represented as a music21 clef object.
+        A Part is created by providing the following parameters:
+        (1) A label, which names the part. 
+        (2) A lowestPitch and highestPitch, which is stored as a Range instance.
+        (3) A maxSeparation integer which represents, in semitones, the maximum separation 
+        allowed between two consecutive notes/pitches on an associated staff.
         
-        >>> from music21 import clef  
+        The default lowestPitch is A0, and the default highestPitch is C8, the typical range for a piano.
+        The default maxSeparation is 12 semitones, enharmonically equivalent to a perfect octave (P8).
+        
+        A Part is immmutable once it is created, to allow it to be hashable and act as a key for a Possibility.
+        
         >>> from music21.figuredBass import part
+        >>> upperLine1 = part.Part(1)
+        >>> upperLine1
+        <music21.figuredBass.part Part 1: A0->C8>
+        >>> upperLine1.label
+        1
+        >>> upperLine1.maxSeparation
+        12
+        >>> upperLine1.range.lowestPitch
+        A0
+        >>> upperLine1.range.highestPitch
+        C8
+         
+        >>> upperLine2 = part.Part(2, 2)
+        >>> upperLine2.maxSeparation # Major second, part limited to stepwise motion
+        2
         
-        >>> bassVoice = part.Part('Bass','E2','E4')
-        >>> bassVoice
-        <music21.figuredBass.part.Part Bass: E2->E4 (written and sounding)>
-        >>> bassVoice.myClef = clef.BassClef()
-        >>> bassVoice.maxSeparation
-        <music21.interval.Interval P8>
-        >>> bassVoice.writtenRange
-        <music21.figuredBass.part.WrittenRange E2->E4>
-        >>> bassVoice.soundingRange
-        <music21.figuredBass.part.SoundingRange E2->E4>
-        
-        >>> viola = part.Part('Viola','C3','C6')
-        >>> viola
-        <music21.figuredBass.part.Part Viola: C3->C6 (written and sounding)>
-        >>> viola.myClef = clef.AltoClef()
-        
-        >>> sopranoVoice = part.Part('Soprano','C4','A5')
-        >>> sopranoVoice
-        <music21.figuredBass.part.Part Soprano: C4->A5 (written and sounding)>
-        >>> sopranoVoice.maxSeparation = interval.Interval('M2')
-        >>> sopranoVoice.maxSeparation
-        <music21.interval.Interval M2>
-        
-        >>> doubleBass = part.Part('Double Bass','C2','C5', interval.Interval('P-8'))
-        >>> doubleBass
-        <music21.figuredBass.part.Part Double Bass: C2->C5 (written), C1->C4 (sounding)>
-        >>> doubleBass.myClef = clef.BassClef()
-        >>> doubleBass.writtenRange
-        <music21.figuredBass.part.WrittenRange C2->C5>
-        >>> doubleBass.soundingRange
-        <music21.figuredBass.part.SoundingRange C1->C4>
+        >>> bassLine = part.Part('Bass', 16, 'E2', 'E4')
+        >>> bassLine
+        <music21.figuredBass.part Part Bass: E2->E4>
+        >>> bassLine.label
+        'Bass'
+        >>> bassLine.maxSeparation # Major tenth
+        16
+        >>> bassLine.range.lowestPitch
+        E2
+        >>> bassLine.range.highestPitch
+        E4
         '''
-        self.label = label
-        self.writtenRange = WrittenRange(lowestWrittenPitch, highestWrittenPitch)
+        super(Part, self).__setattr__('label', label)
+        super(Part, self).__setattr__('range', Range(lowestPitch, highestPitch))
         
-        self.soundingTransposition = soundingTransposition
-        lowestSoundingPitch = self.writtenRange.lowestPitch.transpose(self.soundingTransposition)
-        highestSoundingPitch = self.writtenRange.highestPitch.transpose(self.soundingTransposition)
-        self.soundingRange = SoundingRange(lowestSoundingPitch, highestSoundingPitch)
+        if maxSeparation == None:
+            maxSeparation = 10E5 # ~ +INFINITY in this case
         
-        self.maxSeparation = interval.Interval('P8')
-        self.myClef = clef.TrebleClef()
+        super(Part, self).__setattr__('maxSeparation', maxSeparation)
+
+    def __setattr__(self, *args):
+        raise TypeError("Can't modify Part: It is an immutable instance.")
+    
+    __delattr__ = __setattr__
+    
+    def __hash__(self):
+        tup = (self.label, str(self.range.lowestPitch), str(self.range.highestPitch))
+        return hash(tup)
         
     def __str__(self):
-        if self.writtenRange == self.soundingRange:
-            return self.label + ": " + str(self.writtenRange) + " (written and sounding)"
-        else:
-            return self.label + ": " + str(self.writtenRange) + " (written)" + ", " + str(self.soundingRange) + " (sounding)"
-    
-    def __repr__(self):
-        return "<music21.figuredBass.part.Part " + str(self) + ">"
+        return str(self.label) + ": " + str(self.range)
 
-    def pitchesInSoundingRange(self, pitchList):
+    def __repr__(self):
+        return "<music21.figuredBass.part Part " + str(self) + ">"
+
+    def pitchesInRange(self, pitchList):
         '''
         >>> from music21.figuredBass import part
         >>> from music21.figuredBass import realizerScale
@@ -95,41 +93,25 @@ class Part:
         >>> pitchesAboveBass = sc.getPitches('C2')
         >>> pitchesAboveBass
         [C2, E2, G2, C3, E3, G3, C4, E4, G4, C5, E5, G5]
-        
-        >>> bassPart = part.Part('Bass','E2','E4')
-        >>> bassPart.pitchesInSoundingRange(pitchesAboveBass)
+
+        >>> upperLine1 = part.Part(1)
+        >>> upperLine1.pitchesInRange(pitchesAboveBass)
+        [C2, E2, G2, C3, E3, G3, C4, E4, G4, C5, E5, G5]
+       
+        >>> bassLine = part.Part('Bass', 16, 'E2', 'E4')
+        >>> bassLine.pitchesInRange(pitchesAboveBass)
         [E2, G2, C3, E3, G3, C4, E4]
-        >>> doubleBass = part.Part('Double Bass','C2','C5', interval.Interval('P-8'))
-        >>> doubleBass.soundingRange
-        <music21.figuredBass.part.SoundingRange C1->C4>        
-        >>> doubleBass.pitchesInSoundingRange(pitchesAboveBass)
-        [C2, E2, G2, C3, E3, G3, C4]
         '''
-        return self.soundingRange.pitchesInRange(pitchList)
+        return self.range.pitchesInRange(pitchList)
 
     def __gt__(self, other):
         '''
         Returns true if Part self is higher than other.
-        
-        A Part is higher if its sounding range is higher. 
-        
-        >>> from music21.figuredBass import part
-        >>> soprano1 = part.Part('Soprano1','C4','A5')
-        >>> soprano2 = part.Part('Soprano2','C4','A5')
-        >>> tenor = part.Part('Tenor', 'C3','A4')
-        >>> bass = part.Part('Bass','E2','E4')
-        >>> soprano1 > soprano2
-        True
-        >>> soprano2 > soprano1
-        False
-        >>> bass > soprano2
-        False
-        >>> tenor > soprano1
-        False
+        A Part is higher if its range is higher. 
         '''
-        if self.soundingRange > other.soundingRange:
+        if self.range > other.range:
             return True
-        elif self.soundingRange == other.soundingRange:
+        elif self.range == other.range:
             if self.label < other.label:
                 return True
             else:
@@ -144,9 +126,9 @@ class Part:
             return False
     
     def __lt__(self, other):
-        if self.soundingRange < other.soundingRange:
+        if self.range < other.range:
             return True
-        elif self.soundingRange == other.soundingRange and self.label > other.label:
+        elif self.range == other.range and self.label > other.label:
             return True
         else:
             return False
@@ -158,34 +140,77 @@ class Part:
             return False
     
     def __eq__(self, other):
-        if self.soundingRange == other.soundingRange and self.label == other.label:
+        if self.range == other.range and self.label == other.label:
             return True
         else:
             return False
     
     def __ne__(self, other):
-        if not (self.soundingRange == other.soundingRange):
+        if not (self.range == other.range):
             return True
         else:
             return False
     
+def convertToInterval(intervalString):
+    '''
+    Converts an interval string to a music21 Interval, only if necessary.
+    A PartException is raised if (1) an invalid interval string is provided or
+    (2) what is provided is not a string or Interval.
     
+    >>> from music21 import *
+    >>> convertToInterval('P8')
+    <music21.interval.Interval P8>
+    >>> convertToInterval(interval.Interval('P8')) #does nothing
+    <music21.interval.Interval P8>
+    >>> convertToInterval('C3') #Invalid string interval
+    Traceback (most recent call last):
+    PartException: Could not convert the string C3 to a music21 Interval.
+    >>> convertToInterval(note.Note('D3')) #Not an interval string or Interval
+    Traceback (most recent call last):
+    PartException: Could not convert <music21.note.Note D> to a music21 Interval.
+    '''    
+    if isinstance(intervalString, Interval):
+        return intervalString
+    
+    if isinstance(intervalString, str):
+        try:
+            return Interval(intervalString)
+        except:
+            raise PartException("Could not convert the string " + str(intervalString) + " to a music21 Interval.")
+
+    raise PartException("Could not convert " + str(intervalString) + " to a music21 Interval.")
+
+
 class PartException(music21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------  
-class Range:
+class Range(object):
     def __init__(self, lowestPitch, highestPitch):
         '''
         '''
-        pitchA = realizerScale.convertToPitch(lowestPitch)
-        pitchB = realizerScale.convertToPitch(highestPitch)
+        try:
+            pitchA = realizerScale.convertToPitch(lowestPitch)
+        except:
+            pitchA = realizerScale.convertToPitch(lowestPitch) 
+            raise RangeException("Cannot convert " + pitchA + " to a music21 Pitch.")
+        
+        try:
+            pitchB = realizerScale.convertToPitch(highestPitch)
+        except:
+            raise RangeException("Cannot convert " + pitchB + " to a music21 Pitch.")
+
         if pitchA > pitchB:
-            self.lowestPitch = pitchB
-            self.highestPitch = pitchA
+            super(Range, self).__setattr__('lowestPitch', pitchB)
+            super(Range, self).__setattr__('highestPitch', pitchA)
         else:
-            self.lowestPitch = pitchA
-            self.highestPitch = pitchB
+            super(Range, self).__setattr__('lowestPitch', pitchA)
+            super(Range, self).__setattr__('highestPitch', pitchB)        
+
+    def __setattr__(self, *args):
+        raise TypeError("Can't modify Range: It is an immutable instance.")
+    
+    __delattr__ = __setattr__
 
     def __str__(self):
         '''
@@ -209,13 +234,13 @@ class Range:
         '''
         Returns True if both the lowestPitch and highestPitch of self match those of other. Otherwise, returns False.
 
-        >>> from music21.figuredBass import part  
-        >>> sopranoWritten = part.WrittenRange('C4','A5')
-        >>> sopranoSounding = part.SoundingRange('C4','A5')
-        >>> bassWritten = part.WrittenRange('E2','E4')
-        >>> sopranoWritten == sopranoSounding
+        >>> from music21.figuredBass import part
+        >>> upperPart1 = part.Range('A0','C8')
+        >>> upperPart2 = part.Range('A0','C8')
+        >>> upperPart3 = part.Range('A0','E4')
+        >>> upperPart1 == upperPart2
         True
-        >>> sopranoWritten == bassWritten
+        >>> upperPart1 == upperPart3
         False
         '''
         if self.lowestPitch == other.lowestPitch and self.highestPitch == other.highestPitch:
@@ -227,13 +252,13 @@ class Range:
         '''
         Returns False if both the lowestPitch and highestPitch of self match those of other. Otherwise, returns True.
         
-        >>> from music21.figuredBass import part       
-        >>> sopranoWritten = part.WrittenRange('C4','A5')
-        >>> sopranoSounding = part.SoundingRange('C4','A5')
-        >>> bassWritten = part.WrittenRange('E2','E4')
-        >>> sopranoWritten != sopranoSounding
+        >>> from music21.figuredBass import part
+        >>> upperPart1 = part.Range('A0','C8')
+        >>> upperPart2 = part.Range('A0','C8')
+        >>> upperPart3 = part.Range('A0','E4')
+        >>> upperPart1 != upperPart2
         False
-        >>> sopranoWritten != bassWritten
+        >>> upperPart1 != upperPart3
         True
         '''
         if self.lowestPitch == other.lowestPitch and self.highestPitch == other.highestPitch:
@@ -357,7 +382,7 @@ class Range:
         Returns True if samplePitch is found between the Range's lowestPitch and highestPitch, inclusive.
         Otherwise, returns False.
         
-        SamplePitch can be either a music21 pitch or a pitch string.
+        samplePitch can be either a music21 pitch or a pitch string.
         
         >>> from music21 import pitch
         >>> from music21.figuredBass import part      
@@ -412,42 +437,6 @@ class Range:
             raise RangeException("None of these pitches fall within the range " + str(self) + ": " +  str(pitchList))
         
         return validPitches
-
-class WrittenRange(Range):
-    '''
-    '''
-    def __repr__(self):
-        '''
-        Returns the WrittenRange as a string with a "music21.figuredBass.part WrittenRange" designation.
-        
-        >>> from music21 import interval       
-        >>> from music21.figuredBass import part
-        >>> bassVoice = part.WrittenRange('E2','E4')
-        >>> doubleBass = part.WrittenRange('C2','C5')
-        >>> bassVoice
-        <music21.figuredBass.part.WrittenRange E2->E4>
-        >>> doubleBass
-        <music21.figuredBass.part.WrittenRange C2->C5>       
-        '''
-        return "<music21.figuredBass.part.WrittenRange " + str(self) + ">"
-
-class SoundingRange(Range):
-    '''
-    '''
-    def __repr__(self):
-        '''
-        Returns the SoundingRange as a string with a "music21.figuredBass.part SoundingRange" designation.
-        
-        >>> from music21 import interval       
-        >>> from music21.figuredBass import part
-        >>> bassVoice = part.SoundingRange('E2','E4')
-        >>> doubleBass = part.SoundingRange('C1','C4')
-        >>> bassVoice
-        <music21.figuredBass.part.SoundingRange E2->E4>
-        >>> doubleBass
-        <music21.figuredBass.part.SoundingRange C1->C4>       
-        '''
-        return "<music21.figuredBass.part.SoundingRange " + str(self) + ">"
 
 class RangeException(music21.Music21Exception):
     pass
