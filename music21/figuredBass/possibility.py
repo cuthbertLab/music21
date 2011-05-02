@@ -861,6 +861,8 @@ class Possibility(dict):
         for givenPart in possibA.parts():
             if givenPart not in possibB.parts():
                 continue
+            if givenPart.maxSeparation == None:
+                continue
             v1n1 = possibA[givenPart]
             v1n2 = possibB[givenPart]
             i1 = interval.notesToInterval(v1n1, v1n2)
