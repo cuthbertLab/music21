@@ -50,7 +50,9 @@ class FiguredBass(object):
         self.bassLine.append(copy.deepcopy(self.ts))
         self.bassLine.append(copy.deepcopy(self.ks))
         self.maxPitch = MAX_PITCH
-        self.fbInfo = segment.Information(realizerScale.FiguredBassScale(keyString, modeString), partList, rules.Rules())
+        self.fbScale = realizerScale.FiguredBassScale(keyString, modeString)
+        self.fbParts = partList
+        self.fbRules = rules.Rules()
         
         #Contains fb solutions
         self.allSegments = []
@@ -65,14 +67,14 @@ class FiguredBass(object):
         startTime = time.time()
         (startBass, startNotationString) = self.figuredBassList[0]
         print("Finding starting possibilities for: " + str((startBass.pitch, startNotationString)))
-        a1 = segment.StartSegment(self.fbInfo, startBass, startNotationString)
+        a1 = segment.StartSegment(self.fbScale, self.fbParts, self.fbRules, startBass, startNotationString)
         self.allSegments.append(a1)
         self.lastSegment = a1
             
         for fbIndex in range(1, len(self.figuredBassList)):
             (nextBass, nextNotationString) = self.figuredBassList[fbIndex]
             print("Finding all possibilities for: " + str((nextBass.pitch, nextNotationString)))
-            c1 = segment.MiddleSegment(self.fbInfo, self.lastSegment, nextBass, nextNotationString)
+            c1 = segment.MiddleSegment(self.fbScale, self.fbParts, self.fbRules, self.lastSegment, nextBass, nextNotationString)
             self.allSegments.append(c1)
             self.lastSegment = c1
        
@@ -168,7 +170,7 @@ class FiguredBass(object):
         rightHand.append(copy.deepcopy(self.ts))
         rightHand.append(copy.deepcopy(self.ks))
 
-        v0 = self.fbInfo.fbParts[0]
+        v0 = self.fbParts[0]
         
         for j in range(len(chordProgression)):
             givenPossib = chordProgression[j]
@@ -178,8 +180,8 @@ class FiguredBass(object):
                 raise FiguredBassException("Chord progression possibility doesn't match up with bass line.")
         
             rhPitches = []
-            for k in range(1, len(self.fbInfo.fbParts)):
-                v1 = self.fbInfo.fbParts[k]
+            for k in range(1, len(self.fbParts)):
+                v1 = self.fbParts[k]
                 rhPitches.append(copy.copy(givenPossib[v1]))
                              
             rhChord = chord.Chord(rhPitches)
@@ -240,7 +242,7 @@ class FiguredBass(object):
         
     def printChordProgression(self, chordProgression):
         linesToPrint = []
-        for v in self.fbInfo.fbParts:
+        for v in self.fbParts:
             partLine = v.label + ":\n"
             for chord in chordProgression:
                 partLine += str(chord[v.label]) + "\t"
