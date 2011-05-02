@@ -83,7 +83,7 @@ class Segment:
 
         return possibilities
     
-    def correctSelfContainedPossibilities(self):
+    def correctSelfContainedPossibilities(self, verbose = False):
         '''
         Default rules:
         (1) No incomplete possibilities
@@ -95,24 +95,34 @@ class Segment:
         
         newPossibilities = []
         for possib in allPossibilities:
+            correctPossib = True
             # No incomplete possibilities
             if not self.fbRules.allowIncompletePossibilities:
-                if possib.isIncomplete(self.pitchNamesInChord):
-                    continue
+                if possib.isIncomplete(self.pitchNamesInChord, verbose):
+                    correctPossib = False
+                    if not verbose:
+                        continue
             # Top parts within maxSemitoneSeparation
-            if not possib.upperPartsWithinLimit(self.fbRules.upperPartsMaxSemitoneSeparation):
-                continue
+            if not possib.upperPartsWithinLimit(self.fbRules.upperPartsMaxSemitoneSeparation, verbose):
+                correctPossib = False
+                if not verbose:
+                    continue
             # Pitches in each part within range
             if self.fbRules.filterPitchesByRange:
-                pitchesInRange = possib.pitchesWithinRange()
+                pitchesInRange = possib.pitchesWithinRange(verbose)
                 if not pitchesInRange:
-                    continue
+                    correctPossib = False
+                    if not verbose:
+                        continue
             # No part crossing
             if not self.fbRules.allowVoiceCrossing:
-                hasVoiceCrossing = possib.voiceCrossing()
+                hasVoiceCrossing = possib.voiceCrossing(verbose)
                 if hasVoiceCrossing:
-                    continue
-            newPossibilities.append(possib)
+                    correctPossib = False
+                    if not verbose:
+                        continue
+            if correctPossib:
+                newPossibilities.append(possib)
         
     
         return newPossibilities
@@ -258,7 +268,7 @@ class MiddleSegment(Segment):
         self.possibilities = nextPossibilities
         return
     
-    def resolveDominantSeventh(self, dominantPossib):
+    def resolveDominantSeventh(self, dominantPossib, verbose = False):
         environRules = environment.Environment(_MOD)
         if not dominantPossib.isDominantSeventh():
             raise SegmentException("Possibility does not form a correctly spelled dominant seventh chord.")
@@ -284,25 +294,31 @@ class MiddleSegment(Segment):
             if dominantChord.inversion() == 2 and resolutionChord.inversion() == 1:
                 resolveV43toI6 = True
             if resolutionChord.isMajorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + dominantScale.name)
+                if verbose:
+                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6)
             elif resolutionChord.isMinorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + minorScale.name)
+                if verbose:
+                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6)
         elif resolutionChord.root().name == majSubmediant.name:
             if sampleChord.isMinorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->vi" + resInversionName + " in " + dominantScale.name)
+                if verbose:
+                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->vi" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorSubmediant(dominantPossib) #Major scale
         elif resolutionChord.root().name == minSubmediant.name:
             if resolutionChord.isMajorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->VI" + resInversionName + " in " + minorScale.name)
+                if verbose:
+                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->VI" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorSubmediant(dominantPossib) #Minor scale
         elif resolutionChord.root().name == subdominant.name:
             if resolutionChord.isMajorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->IV" + resInversionName + " in " + dominantScale.name)
+                if verbose:
+                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->IV" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorSubdominant(dominantPossib)
             elif resolutionChord.isMinorTriad():
-                environRules.warn("Dominant seventh resolution: V" + domInversionName + "->iv" + resInversionName + " in " + minorScale.name)
+                if verbose:
+                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->iv" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorSubdominant(dominantPossib)
         else:
             raise SegmentException("Dominant seventh resolution: No standard resolution available.")
@@ -312,7 +328,7 @@ class MiddleSegment(Segment):
             
         return resolutionPossib
 
-    def resolveDiminishedSeventh(self, diminishedPossib):
+    def resolveDiminishedSeventh(self, diminishedPossib, verbose = False):
         environRules = environment.Environment(_MOD)       
         if not diminishedPossib.isDiminishedSeventh():
             raise SegmentException("Possibility does not form a correctly spelled diminished seventh chord.")
@@ -339,17 +355,21 @@ class MiddleSegment(Segment):
                 elif resolutionChord.inversion() == 1:
                     doubledRoot = False
             if resolutionChord.isMajorTriad():
-                environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + diminishedScale.name)
+                if verbose:
+                    environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + diminishedScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot)
             elif resolutionChord.isMinorTriad():
-                environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + minorScale.name)
+                if verbose:
+                    environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot)
         elif resolutionChord.root().name == subdominant.name:
              if resolutionChord.isMajorTriad():
-                environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + diminishedScale.name)
+                if verbose:
+                     environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + diminishedScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMajorSubdominant(diminishedPossib)
              elif resolutionChord.isMinorTriad():
-                environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + minorScale.name)
+                if verbose:
+                     environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMinorSubdominant(diminishedPossib)
         else:
             raise SegmentException("Diminished seventh resolution: No standard resolution available.")
@@ -359,40 +379,56 @@ class MiddleSegment(Segment):
             
         return resolutionPossib
 
-    def hasCorrectVoiceLeading(self, prevPossib, nextPossib):
-        # No hidden fifth
-        if not self.fbRules.allowHiddenFifths:
-            hasHiddenFifth = prevPossib.hiddenFifth(nextPossib)
-            if hasHiddenFifth:
-                return False
-        # No hidden octave
-        if not self.fbRules.allowHiddenOctaves:
-            hasHiddenOctave = prevPossib.hiddenOctave(nextPossib)
-            if hasHiddenOctave:
-                return False
+    def hasCorrectVoiceLeading(self, possibA, possibB, verbose = False):
+        hasCorrectVoiceLeading = True
         
-        jumpsWithinLimits = prevPossib.partMovementsWithinLimits(nextPossib)
+        # No hidden fifth between shared outer parts
+        if not self.fbRules.allowHiddenFifths:
+            hasHiddenFifth = possibA.hiddenFifth(possibB, verbose)
+            if hasHiddenFifth:
+                hasCorrectVoiceLeading = False
+                if not verbose:
+                    return hasCorrectVoiceLeading
+                
+        # No hidden octave between shared outer parts
+        if not self.fbRules.allowHiddenOctaves:
+            hasHiddenOctave = possibA.hiddenOctave(possibB, verbose)
+            if hasHiddenOctave:
+                hasCorrectVoiceLeading = False
+                if not verbose:
+                    return hasCorrectVoiceLeading
+        
+        jumpsWithinLimits = possibA.partMovementsWithinLimits(possibB, verbose)
         # Movements in each part within corresponding maxSeparation
         if not jumpsWithinLimits:
-            return False
+            hasCorrectVoiceLeading = False
+            if not verbose:
+                return hasCorrectVoiceLeading
         # No part overlaps
         if not self.fbRules.allowVoiceOverlap:
-            hasVoiceOverlap = prevPossib.voiceOverlap(nextPossib)
+            hasVoiceOverlap = possibA.voiceOverlap(possibB, verbose)
             if hasVoiceOverlap:
-                return False
+                hasCorrectVoiceLeading = False
+                if not verbose:
+                    return hasCorrectVoiceLeading
 
         # No parallel fifths
         if not self.fbRules.allowParallelFifths:
-            hasParallelFifth = prevPossib.parallelFifths(nextPossib)
+            hasParallelFifth = possibA.parallelFifths(possibB, verbose)
             if hasParallelFifth:
-                return False
+                hasCorrectVoiceLeading = False
+                if not verbose:
+                    return hasCorrectVoiceLeading
         # No parallel octaves
         if not self.fbRules.allowParallelOctaves:
-            hasParallelOctave = prevPossib.parallelOctaves(nextPossib)
+            hasParallelOctave = possibA.parallelOctaves(possibB, verbose)
             if hasParallelOctave:
-                return False
+                hasCorrectVoiceLeading = False
+                if not verbose:
+                    return hasCorrectVoiceLeading
+        
+        return hasCorrectVoiceLeading
 
-        return True
 
 class UnresolvedSegmentException(music21.Music21Exception):
     pass
