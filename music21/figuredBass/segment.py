@@ -63,8 +63,9 @@ class Segment:
         possibilities = []
         
         bassPossibility = possibility.Possibility()
+        self.fbParts.sort()
         previousVoice = self.fbParts[0]
-        bassPossibility[previousVoice.label] = self.bassNote.pitch
+        bassPossibility[previousVoice] = self.bassNote.pitch
         possibilities.append(bassPossibility)
         
         for partNumber in range(1, len(self.fbParts)):
@@ -75,11 +76,11 @@ class Segment:
                 validPitches = self.pitchesAboveBass
                 for validPitch in validPitches:
                     newPossib = copy.copy(oldPossib)
-                    newPossib[currentVoice.label] = validPitch
+                    newPossib[currentVoice] = validPitch
                     possibilities.append(newPossib)
                 
             previousVoice = currentVoice
-        
+
         return possibilities
     
     def correctSelfContainedPossibilities(self):
@@ -103,16 +104,17 @@ class Segment:
                 continue
             # Pitches in each part within range
             if self.fbRules.filterPitchesByRange:
-                pitchesInRange = possib.pitchesWithinRange(self.fbParts)
+                pitchesInRange = possib.pitchesWithinRange()
                 if not pitchesInRange:
                     continue
             # No part crossing
             if not self.fbRules.allowVoiceCrossing:
-                hasVoiceCrossing = possib.voiceCrossing(possibility.extractPartLabels(self.fbParts))
+                hasVoiceCrossing = possib.voiceCrossing()
                 if hasVoiceCrossing:
                     continue
             newPossibilities.append(possib)
         
+    
         return newPossibilities
     
     def trimAllMovements(self, eliminated = []):
@@ -185,13 +187,13 @@ class MiddleSegment(Segment):
         try:
             self.resolveAllDominantSevenths()
             return
-        except SegmentException:
+        except UnresolvedSegmentException:
             pass
         
         try:
             self.resolveAllDiminishedSevenths()
             return
-        except SegmentException:
+        except UnresolvedSegmentException:
             pass
         
         self.resolveAllPossibilities()
@@ -216,7 +218,7 @@ class MiddleSegment(Segment):
             self.possibilities = resolutionPossibilities
             return
         
-        raise SegmentException("Segment not resolved yet.")
+        raise UnresolvedSegmentException()
     
     def resolveAllDiminishedSevenths(self):
         if self.prevSegment.isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:
@@ -237,7 +239,7 @@ class MiddleSegment(Segment):
             self.possibilities = resolutionPossibilities
             return
     
-        raise SegmentException("Segment not resolved yet.")
+        raise UnresolvedSegmentException()
 
     def resolveAllPossibilities(self):
         prevPossibilities = self.prevSegment.possibilities
@@ -358,27 +360,25 @@ class MiddleSegment(Segment):
         return resolutionPossib
 
     def hasCorrectVoiceLeading(self, prevPossib, nextPossib):
-        vlTop = self.fbParts[-1].label
-        vlBottom = self.fbParts[0].label
         # No hidden fifth
         if not self.fbRules.allowHiddenFifths:
-            hasHiddenFifth = prevPossib.hiddenFifth(nextPossib, vlTop, vlBottom)
+            hasHiddenFifth = prevPossib.hiddenFifth(nextPossib)
             if hasHiddenFifth:
                 return False
         # No hidden octave
         if not self.fbRules.allowHiddenOctaves:
-            hasHiddenOctave = prevPossib.hiddenOctave(nextPossib, vlTop, vlBottom)
+            hasHiddenOctave = prevPossib.hiddenOctave(nextPossib)
             if hasHiddenOctave:
                 return False
         
-        jumpsWithinLimits = prevPossib.partMovementsWithinLimits(nextPossib, self.fbParts)
+        jumpsWithinLimits = prevPossib.partMovementsWithinLimits(nextPossib)
         # Movements in each part within corresponding maxSeparation
         if not jumpsWithinLimits:
             return False
         # No part overlaps
         if not self.fbRules.allowVoiceOverlap:
-            hasPartOverlap = prevPossib.voiceOverlap(nextPossib, possibility.extractPartLabels(self.fbParts))
-            if hasPartOverlap:
+            hasVoiceOverlap = prevPossib.voiceOverlap(nextPossib)
+            if hasVoiceOverlap:
                 return False
 
         # No parallel fifths
@@ -393,7 +393,10 @@ class MiddleSegment(Segment):
                 return False
 
         return True
-        
+
+class UnresolvedSegmentException(music21.Music21Exception):
+    pass
+
 class SegmentException(music21.Music21Exception):
     pass
 
