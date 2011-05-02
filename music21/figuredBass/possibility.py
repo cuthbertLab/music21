@@ -28,9 +28,9 @@ class Possibility(dict):
     Extends the concept (but not the class) of a chord in music21 by allowing the labeling of parts 
     through the subclassing of the python dictionary. 
     
-    Not intended to be used on its own, but rather intended to be used as a framework to encapsulate a 
-    "possibility" for a figured bass note/notation. The keys of Possibility are music21.figuredBass.part 
-    Part instances, and the values are music21.pitch Pitch instances. 
+    Not intended to be used on its own, but rather to be used as a framework to encapsulate a "possibility"
+    for a figured bass note/notation. The keys of Possibility are music21.figuredBass.part Part instances, 
+    and the values are music21.pitch Pitch instances. 
     '''
     # INITIALIZATION METHODS
     # ----------------------
@@ -64,7 +64,6 @@ class Possibility(dict):
         >>> p2a = possibility.Possibility({part1: 'C5', 'part2String': pitch.Pitch('G4'), part3: pitch.Pitch('E4'), part4: 'C3'})
         Traceback (most recent call last):        
         PossibilityException: Cannot create Possibility: -> part2String <- not an instance of music21 figuredBass.Part!
-        
         
         Here, an invalid pitch string was assigned to part2.
         >>> p2b = possibility.Possibility({part1: 'C5', part2: 'Not a pitch or pitch string', part3: pitch.Pitch('E4'), part4: 'C3'})
@@ -135,7 +134,7 @@ class Possibility(dict):
         try:
             pitchValue = realizerScale.convertToPitch(pitchValue)
         except:
-            raise PossibilityException("Cannot set part " + givenPart.label + ": -> " + str(pitchValue) + " <- not a valid pitch or pitch string!")                
+            raise PossibilityException("Cannot set part " + str(givenPart.label) + ": -> " + str(pitchValue) + " <- not a valid pitch or pitch string!")                
 
         dict.__setitem__(self, givenPart, pitchValue)
     
@@ -422,7 +421,8 @@ class Possibility(dict):
                 
         The default value of maxSemitoneSeparation is 12 semitones, enharmonically equivalent 
         to a perfect octave. If this method returns True for this default value, then all the
-        notes in the upper parts (1,2,3) can be played by most adult pianists.
+        notes in the upper parts (1,2,3) can be played by most adult pianists using just the
+        right hand.
         
         If maxSemitoneSeparation = None, the method just returns True.
         
@@ -499,8 +499,8 @@ class Possibility(dict):
     def voiceCrossing(self, verbose = False):
         '''
         Returns True if there is voice crossing present between any two parts.
-        The parts in increasing order must correspond to increasing pitches in
-        order for there to be no voice crossing.
+        The parts in increasing order must correspond to increasingly higher 
+        pitches in order for there to be no voice crossing.
 
         >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
@@ -541,7 +541,7 @@ class Possibility(dict):
     # ---------------------------------------------
     def parallelFifths(self, possibB, verbose = False):
         '''
-        Returns True if there are parallel fifths between shared parts of 
+        Returns True if there are parallel fifths between any two shared parts of 
         possibA (self) and possibB, which comes directly after possibA.
         
         A PossibilityException is raised if less than two parts are shared between 
@@ -599,7 +599,7 @@ class Possibility(dict):
 
     def parallelOctaves(self, possibB, verbose = False):
         '''
-        Returns True if there are parallel octaves between shared parts of 
+        Returns True if there are parallel octaves between any two shared parts of 
         possibA (self) and possibB, which comes directly after possibA.
 
         A PossibilityException is raised if less than two parts are shared between 
@@ -761,7 +761,7 @@ class Possibility(dict):
 
     def voiceOverlap(self, possibB, verbose = False):
         '''
-        Returns True if there is voice overlap between shared parts of 
+        Returns True if there is voice overlap between any two shared parts of 
         possibA (self) and possibB.
         
         A PossibilityException is raised if less than two parts are 
@@ -828,8 +828,8 @@ class Possibility(dict):
         are within each part's maxSeparation, in semitones. A maxSeparation can
         be provided to each part as the second parameter.
         
-        The default maxSeparation is 12 semitones, enharmonically equivalent to a
-        perfect octave.
+        The default maxSeparation in part.Part is 12 semitones, enharmonically 
+        equivalent to a perfect octave.
                     
         >>> from music21 import pitch
         >>> from music21.figuredBass import possibility
