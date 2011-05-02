@@ -64,10 +64,6 @@ class Part(object):
         '''
         super(Part, self).__setattr__('label', label)
         super(Part, self).__setattr__('range', Range(lowestPitch, highestPitch))
-        
-        if maxSeparation == None:
-            maxSeparation = 10E5 # ~ +INFINITY in this case
-        
         super(Part, self).__setattr__('maxSeparation', maxSeparation)
 
     def __setattr__(self, *args):
@@ -76,7 +72,7 @@ class Part(object):
     __delattr__ = __setattr__
     
     def __hash__(self):
-        tup = (self.label, str(self.range.lowestPitch), str(self.range.highestPitch))
+        tup = (self.label, self.maxSeparation, str(self.range.lowestPitch), str(self.range.highestPitch))
         return hash(tup)
         
     def __str__(self):
@@ -84,25 +80,6 @@ class Part(object):
 
     def __repr__(self):
         return "<music21.figuredBass.part Part " + str(self) + ">"
-
-    def pitchesInRange(self, pitchList):
-        '''
-        >>> from music21.figuredBass import part
-        >>> from music21.figuredBass import realizerScale
-        >>> sc = realizerScale.FiguredBassScale('C')
-        >>> pitchesAboveBass = sc.getPitches('C2')
-        >>> pitchesAboveBass
-        [C2, E2, G2, C3, E3, G3, C4, E4, G4, C5, E5, G5]
-
-        >>> upperLine1 = part.Part(1)
-        >>> upperLine1.pitchesInRange(pitchesAboveBass)
-        [C2, E2, G2, C3, E3, G3, C4, E4, G4, C5, E5, G5]
-       
-        >>> bassLine = part.Part('Bass', 16, 'E2', 'E4')
-        >>> bassLine.pitchesInRange(pitchesAboveBass)
-        [E2, G2, C3, E3, G3, C4, E4]
-        '''
-        return self.range.pitchesInRange(pitchList)
 
     def __gt__(self, other):
         '''
