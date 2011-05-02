@@ -13,27 +13,27 @@ import unittest
 import copy
 import random
 
-from music21 import note
 from music21 import chord
-from music21 import scale
 from music21 import environment
+from music21 import note
+from music21 import scale
 
-from music21.figuredBass import rules
+from music21.figuredBass import notation
+from music21.figuredBass import part
 from music21.figuredBass import possibility
 from music21.figuredBass import realizerScale
-from music21.figuredBass import part
 from music21.figuredBass import resolution
-from music21.figuredBass import notation
+from music21.figuredBass import rules
 
 _MOD = 'segment.py'
 
 class Segment:
-    def __init__(self, fbInformation, bassNote, notationString = ''):
+    def __init__(self, fbScale, fbParts, fbRules, bassNote, notationString = ''):
         self.bassNote = bassNote
         self.notationString = notationString
-        self.fbScale = fbInformation.fbScale
-        self.fbParts = fbInformation.fbParts
-        self.fbRules = fbInformation.fbRules
+        self.fbScale = fbScale
+        self.fbParts = fbParts
+        self.fbRules = fbRules
         self.pitchesAboveBass = self.fbScale.getPitches(self.bassNote.pitch, self.notationString)
         self.pitchNamesInChord = self.fbScale.getPitchNames(self.bassNote.pitch, self.notationString)
         self.nextMovements = {}
@@ -169,8 +169,8 @@ class Segment:
     
                 
 class StartSegment(Segment):
-    def __init__(self, fbInformation, bassNote, notation = ''):
-        Segment.__init__(self, fbInformation, bassNote, notation)
+    def __init__(self, fbScale, fbParts, fbRules, bassNote, notationString = ''):
+        Segment.__init__(self, fbScale, fbParts, fbRules, bassNote, notationString)
         self.correctPossibilities()
 
     def correctPossibilities(self):
@@ -178,8 +178,8 @@ class StartSegment(Segment):
         self.possibilities = self.correctSelfContainedPossibilities()
     
 class MiddleSegment(Segment):
-    def __init__(self, fbInformation, prevSegment, bassNote, notation = ''):
-        Segment.__init__(self, fbInformation, bassNote, notation)
+    def __init__(self, fbScale, fbParts, fbRules, prevSegment, bassNote, notationString = ''):
+        Segment.__init__(self, fbScale, fbParts, fbRules, bassNote, notationString)
         self.prevSegment = prevSegment
         self.correctPossibilities()
     
@@ -399,13 +399,6 @@ class UnresolvedSegmentException(music21.Music21Exception):
 
 class SegmentException(music21.Music21Exception):
     pass
-
-#-------------------------------------------------------------------------------
-class Information:
-    def __init__(self, fbScale, fbParts, fbRules = rules.Rules()):
-        self.fbScale = fbScale
-        self.fbParts = fbParts
-        self.fbRules = fbRules
     
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
