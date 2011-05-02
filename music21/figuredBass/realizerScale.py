@@ -169,10 +169,17 @@ def convertToPitch(pitchString):
     >>> convertToPitch(pitch.Pitch('E4')) #does nothing
     E4
     '''
-    pitchValue = pitchString
-    if type(pitchString) == str:
-        pitchValue = pitch.Pitch(pitchString)
-    return pitchValue
+    if isinstance(pitchString, pitch.Pitch):
+        return pitchString
+    
+    if isinstance(pitchString, str):
+        try:
+            return pitch.Pitch(pitchString)
+        except:
+            raise ValueError("Cannot convert string " + pitchString + " to a music21 Pitch.")
+    
+    raise TypeError("Cannot convert " + pitchString + " to a music21 Pitch.")
+
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
