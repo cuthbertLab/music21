@@ -174,13 +174,13 @@ class FiguredBass(object):
             givenPossib = chordProgression[j]
             bassNote = self.bassNotes[j]
 
-            if givenPossib[v0.label] != bassNote.pitch:
+            if givenPossib[v0] != bassNote.pitch:
                 raise FiguredBassException("Chord progression possibility doesn't match up with bass line.")
         
             rhPitches = []
             for k in range(1, len(self.fbInfo.fbParts)):
                 v1 = self.fbInfo.fbParts[k]
-                rhPitches.append(copy.copy(givenPossib[v1.label]))
+                rhPitches.append(copy.copy(givenPossib[v1]))
                              
             rhChord = chord.Chord(rhPitches)
             rhChord.quarterLength = bassNote.quarterLength
