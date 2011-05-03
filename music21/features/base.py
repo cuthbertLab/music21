@@ -325,6 +325,9 @@ class StreamForms(object):
             self._forms['chordifyTypesHistogram'] = histo
             return self._forms['chordifyTypesHistogram']
 
+        # a dictionary of intervals
+        #self.flat.melodicIntervals(skipRests=True, skipChords=False, skipGaps=True)
+
         # a dictionary of quarter length values
         elif key in ['noteQuarterLengthHistogram']:  
             histo = {}
@@ -350,6 +353,22 @@ class StreamForms(object):
                 histo[p.midi] += 1
             self._forms['midiPitchHistogram'] = histo
             return self._forms['midiPitchHistogram']
+
+        # bins for all abs spans between adjacent melodic notes
+        # this needs to be done for each part
+        elif key in ['midiIntervalHistogram']:
+            # returns a list of notes;
+            # noNone means that we will see all connections, even w/ a gap
+            post = self.__getitem__('flat').findConsecutiveNotes(skipRests=True, 
+                skipChords=False, skipGaps=True, noNone=True)
+            histo = [0] * 128
+            for i, n in enumerate(post):
+                if i < len(post) - 1: # if not last
+                    iNext = i + 1
+                    nNext = post[iNext]
+                    histo[abs(n.midi - nNext.midi)] += 1
+            self._forms['midiIntervalHistogram'] = histo
+            return self._forms['midiIntervalHistogram']
 
 
         elif key in ['flat.analyzedKey']:
@@ -395,10 +414,13 @@ class DataInstance(object):
         # if parts exist, store a forms for each
         self._formsByPart = []
         if hasattr(self._src, 'parts'):
+            self.partsCount = len(self._src.parts)
             for p in self._src.parts:
                 # note that this will join ties and expand rests again
                 self._formsByPart.append(StreamForms(p))
-    
+        else:
+            self.partsCount = 0
+
         # TODO: store a list of voices, extracted from each part, 
         # presently this will only work on a measure stream
         self._formsByVoice = []
@@ -984,7 +1006,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testStreamForms(self):
+    def testStreamFormsA(self):
 
         from music21 import corpus, features
 
@@ -1023,6 +1045,23 @@ class Test(unittest.TestCase):
         # work
         self.assertEqual(di['pitchClassHistogram'], [1, 0, 3, 3, 0, 10, 0, 5, 1, 2, 5, 0])
 
+
+    def testStreamFormsB(self):
+
+        from music21 import corpus, features, note, stream
+
+        s = stream.Stream()
+        for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5']:
+            s.append(note.Note(p))
+        di = features.DataInstance(s)
+        self.assertEqual(di['midiIntervalHistogram'], [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+        # in most cases will want to get a vector for each part
+        s = corpus.parse('hwv56/movement3-05.md')
+        di = features.DataInstance(s)
+        self.assertEqual(di['parts'][0]['midiIntervalHistogram'], [9, 1, 4, 3, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+        self.assertEqual(di['parts'][1]['midiIntervalHistogram'], [0, 1, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
     def testDataSetOutput(self):
         from music21 import features

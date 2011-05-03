@@ -68,9 +68,17 @@ class DurationFeature(featuresModule.FeatureExtractor):
 #-------------------------------------------------------------------------------
 # melody based
 
+
+#Each bin of such a histogram is labelled with a number indicating the number of semi- tones separating sequentially adjacent notes in a given channel (independently of direction of melodic motion).
+
 class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.MelodicIntervalHistogramFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [1.0, 0.2222..., 0.777777777..., 0.44444..., 0.1111..., 0.44444..., 0.11111..., 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
     id = 'M1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -80,6 +88,23 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
         self.description = 'A features array with bins corresponding to the values of the melodic interval histogram.'
         self.isSequential = True
         self.dimensions = 128
+        self.normalize = True
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # get histos for each part, sum
+        if self.data.partsCount > 0:
+            for i in range(self.data.partsCount):
+                histo = self.data['parts'][i]['midiIntervalHistogram']
+                for i, value in enumerate(histo):
+                    self._feature.vector[i] += value
+        else: # get from Stream alone
+            histo = self.data['midiIntervalHistogram']
+            for i, value in enumerat(histo):
+                self._feature.vector[i] += value
+ 
+
 
 class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
@@ -2850,6 +2875,7 @@ def getExtractorByTypeAndNumber(type, number):
 
 
 # list all implemented features features
+# 39 implemented features
 featureExtractors = [
 
 

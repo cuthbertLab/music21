@@ -6610,12 +6610,11 @@ class Stream(music21.Music21Object):
         skipGaps = False, getOverlaps = False, noNone = False, **keywords):
         '''
         Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list 
-        at any point there is a discontinuity (such as if there is a rest between two pitches).
-        
+        at any point there is a discontinuity (such as if there is a rest between two pitches), unless the `noNone` parameter is True. 
         
         How to determine consecutive pitches is a little tricky and there are many options.  
 
-        skipUnison uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are
+        The `skipUnison` parameter uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are
         also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because
         of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True)
         will give you the number of P1s in the piece, because there could be d2's in there as well.
