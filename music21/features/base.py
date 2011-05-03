@@ -355,21 +355,27 @@ class StreamForms(object):
             return self._forms['midiPitchHistogram']
 
         # bins for all abs spans between adjacent melodic notes
-        # this needs to be done for each part
         elif key in ['midiIntervalHistogram']:
-            # returns a list of notes;
-            # noNone means that we will see all connections, even w/ a gap
-            post = self.__getitem__('flat').findConsecutiveNotes(skipRests=True, 
-                skipChords=False, skipGaps=True, noNone=True)
+            # note that this does not optimize and cache part presentations            
             histo = [0] * 128
-            for i, n in enumerate(post):
-                if i < len(post) - 1: # if not last
-                    iNext = i + 1
-                    nNext = post[iNext]
-                    histo[abs(n.midi - nNext.midi)] += 1
+            # if we have parts, must add one at a time
+            if self._base.hasPartLikeStreams():
+                parts = self._base.parts
+            else:
+                parts = [self._base] # emulate a list
+            for p in parts:
+                # will be flat
+                p = p.stripTies(retainContainers=False)
+                # noNone means that we will see all connections, even w/ a gap
+                post = p.findConsecutiveNotes(skipRests=True, 
+                    skipChords=False, skipGaps=True, noNone=True)
+                for i, n in enumerate(post):
+                    if i < len(post) - 1: # if not last
+                        iNext = i + 1
+                        nNext = post[iNext]
+                        histo[abs(n.midi - nNext.midi)] += 1
             self._forms['midiIntervalHistogram'] = histo
             return self._forms['midiIntervalHistogram']
-
 
         elif key in ['flat.analyzedKey']:
             self._forms['analyzedKey'] = self.__getitem__('flat').analyze('key')

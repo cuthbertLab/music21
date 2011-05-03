@@ -93,22 +93,19 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        # get histos for each part, sum
-        if self.data.partsCount > 0:
-            for i in range(self.data.partsCount):
-                histo = self.data['parts'][i]['midiIntervalHistogram']
-                for i, value in enumerate(histo):
-                    self._feature.vector[i] += value
-        else: # get from Stream alone
-            histo = self.data['midiIntervalHistogram']
-            for i, value in enumerat(histo):
-                self._feature.vector[i] += value
+        histo = self.data['midiIntervalHistogram']
+        for i, value in enumerate(histo):
+            self._feature.vector[i] += value
  
-
 
 class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.AverageMelodicIntervalFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [2.0714...]
     '''
     id = 'M2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -119,9 +116,27 @@ class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        values = [] 
+        # already summed by part if parts exist
+        histo = self.data['midiIntervalHistogram']
+        for i, value in enumerate(histo):
+            for j in range(value):
+                values.append(i)
+        self._feature.vector[0] = sum(values) / float(len(values))
+ 
+
+
 class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.MostCommonMelodicIntervalFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0]
     '''
     id = 'M3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -132,11 +147,26 @@ class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        values = [] 
+        # already summed by part if parts exist
+        histo = self.data['midiIntervalHistogram']
+        maxValue = max(histo)
+        maxIndex = histo.index(maxValue)
+        self._feature.vector[0] = maxIndex
+
 
 class DistanceBetweenMostCommonMelodicIntervalsFeature(
     featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.DistanceBetweenMostCommonMelodicIntervalsFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [2]
     '''
     id = 'M4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -147,11 +177,30 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        values = [] 
+        # copy b/c will manipulate
+        histo = copy.deepcopy(self.data['midiIntervalHistogram'])
+        maxValue = max(histo)
+        maxIndex = histo.index(maxValue)
+        histo[maxIndex] = 0 # set to zero
+        secondValue = max(histo)
+        secondIndex = histo.index(secondValue)
+
+        self._feature.vector[0] = abs(maxIndex-secondIndex)
+
 
 class MostCommonMelodicIntervalPrevalenceFeature(
     featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.MostCommonMelodicIntervalPrevalenceFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.3214285...]
     '''
     id = 'M5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -162,12 +211,27 @@ class MostCommonMelodicIntervalPrevalenceFeature(
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        values = [] 
+        # copy b/c will manipulate
+        histo = copy.deepcopy(self.data['midiIntervalHistogram'])
+        maxValue = max(histo)
+        count = sum(histo)
+        self._feature.vector[0] = maxValue / float(count)
+
 
 
 class RelativeStrengthOfMostCommonIntervalsFeature(
     featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.RelativeStrengthOfMostCommonIntervalsFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.77777...]
     '''
     id = 'M6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -178,12 +242,30 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        values = [] 
+        # copy b/c will manipulate
+        histo = copy.deepcopy(self.data['midiIntervalHistogram'])
+        count = sum(histo)
+        maxValue = max(histo)
+        maxIndex = histo.index(maxValue)
+        histo[maxIndex] = 0 # set to zero
+        secondValue = max(histo)
+        secondIndex = histo.index(secondValue)
 
+        self._feature.vector[0] = (secondValue / float(count)) / (maxValue / float(count))
 
   
 class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.NumberOfCommonMelodicIntervalsFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [4]
     '''
     id = 'M7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -194,10 +276,22 @@ class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['midiIntervalHistogram']
+        total = sum(histo)
+        post = 0
+        for i, count in enumerate(histo):
+            if count / float(total) >= .09:
+                post += 1
+        self._feature.vector[0] = post
+
+
 class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
-    >>> s = stream.Stream()
+    >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.AmountOfArpeggiationFeature(s)
     >>> f = fe.extract()
     >>> f.name
@@ -211,6 +305,21 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
         self.description = 'Fraction of horizontal intervals that are repeated notes, minor thirds, major thirds, perfect fifths, minor sevenths, major sevenths, octaves, minor tenths or major tenths.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['midiIntervalHistogram']
+        total = sum(histo)
+        if total == 0:
+            return # do nothing
+        # intervals to look for
+        targets = [0, 3, 4, 7, 10, 11, 12, 15, 16]
+        total = sum(histo)
+        count = 0
+        for t in targets:
+            count += histo[t]
+        self._feature.vector[0] = count / float(total)
 
 
  
@@ -227,6 +336,21 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['midiIntervalHistogram']
+        total = sum(histo)
+        if total == 0:
+            return # do nothing
+        # intervals to look for
+        targets = [0]
+        total = sum(histo)
+        count = 0
+        for t in targets:
+            count += histo[t]
+        self._feature.vector[0] = count / float(total)
+
 
 class ChromaticMotionFeature(featuresModule.FeatureExtractor):
     '''
@@ -241,6 +365,20 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['midiIntervalHistogram']
+        total = sum(histo)
+        if total == 0:
+            return # do nothing
+        # intervals to look for
+        targets = [1]
+        total = sum(histo)
+        count = 0
+        for t in targets:
+            count += histo[t]
+        self._feature.vector[0] = count / float(total)
 
  
 class StepwiseMotionFeature(featuresModule.FeatureExtractor):
@@ -256,6 +394,21 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['midiIntervalHistogram']
+        total = sum(histo)
+        if total == 0:
+            return # do nothing
+        # intervals to look for
+        targets = [1, 2]
+        total = sum(histo)
+        count = 0
+        for t in targets:
+            count += histo[t]
+        self._feature.vector[0] = count / float(total)
+
 
 class MelodicThirdsFeature(featuresModule.FeatureExtractor):
     '''
@@ -269,6 +422,22 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
         self.description = 'Fraction of melodic intervals that are major or minor thirds.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['midiIntervalHistogram']
+        total = sum(histo)
+        if total == 0:
+            return # do nothing
+        # intervals to look for
+        targets = [3, 4]
+        total = sum(histo)
+        count = 0
+        for t in targets:
+            count += histo[t]
+        self._feature.vector[0] = count / float(total)
+
 
  
 class MelodicFifthsFeature(featuresModule.FeatureExtractor):
@@ -284,6 +453,23 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['midiIntervalHistogram']
+        total = sum(histo)
+        if total == 0:
+            return # do nothing
+        # intervals to look for
+        targets = [7]
+        total = sum(histo)
+        count = 0
+        for t in targets:
+            count += histo[t]
+        self._feature.vector[0] = count / float(total)
+
+
+
 class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
@@ -296,6 +482,22 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
         self.description = 'Fraction of melodic intervals that are tritones.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['midiIntervalHistogram']
+        total = sum(histo)
+        if total == 0:
+            return # do nothing
+        # intervals to look for
+        targets = [6]
+        total = sum(histo)
+        count = 0
+        for t in targets:
+            count += histo[t]
+        self._feature.vector[0] = count / float(total)
+
 
 
 class MelodicOctavesFeature(featuresModule.FeatureExtractor):
@@ -311,7 +513,26 @@ class MelodicOctavesFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        histo = self.data['midiIntervalHistogram']
+        total = sum(histo)
+        if total == 0:
+            return # do nothing
+        # intervals to look for
+        targets = [12, 24, 48, 60, 72, 84, 96, 108, 120]
+        total = sum(histo)
+        count = 0
+        for t in targets:
+            count += histo[t]
+        self._feature.vector[0] = count / float(total)
+
  
+
+
+
+
 
 class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
     '''
@@ -2777,21 +2998,21 @@ def getExtractorByTypeAndNumber(type, number):
     I 18 OrchestralStringsFractionFeature
     I 19 StringEnsembleFractionFeature
     I 20 ElectricInstrumentFractionFeature
-    M 1 MelodicIntervalHistogramFeature (not implemented)
-    M 2 AverageMelodicIntervalFeature (not implemented)
-    M 3 MostCommonMelodicIntervalFeature (not implemented)
-    M 4 DistanceBetweenMostCommonMelodicIntervalsFeature (not implemented)
-    M 5 MostCommonMelodicIntervalPrevalenceFeature (not implemented)
-    M 6 RelativeStrengthOfMostCommonIntervalsFeature (not implemented)
-    M 7 NumberOfCommonMelodicIntervalsFeature (not implemented)
-    M 8 AmountOfArpeggiationFeature (not implemented)
-    M 9 RepeatedNotesFeature (not implemented)
-    M 10 ChromaticMotionFeature (not implemented)
-    M 11 StepwiseMotionFeature (not implemented)
-    M 12 MelodicThirdsFeature (not implemented)
-    M 13 MelodicFifthsFeature (not implemented)
-    M 14 MelodicTritonesFeature (not implemented)
-    M 15 MelodicOctavesFeature (not implemented)
+    M 1 MelodicIntervalHistogramFeature
+    M 2 AverageMelodicIntervalFeature
+    M 3 MostCommonMelodicIntervalFeature
+    M 4 DistanceBetweenMostCommonMelodicIntervalsFeature
+    M 5 MostCommonMelodicIntervalPrevalenceFeature
+    M 6 RelativeStrengthOfMostCommonIntervalsFeature
+    M 7 NumberOfCommonMelodicIntervalsFeature
+    M 8 AmountOfArpeggiationFeature
+    M 9 RepeatedNotesFeature
+    M 10 ChromaticMotionFeature
+    M 11 StepwiseMotionFeature
+    M 12 MelodicThirdsFeature
+    M 13 MelodicFifthsFeature
+    M 14 MelodicTritonesFeature
+    M 15 MelodicOctavesFeature
     M 17 DirectionOfMotionFeature (not implemented)
     M 18 DurationOfMelodicArcsFeature (not implemented)
     M 19 SizeOfMelodicArcsFeature (not implemented)
@@ -2878,6 +3099,21 @@ def getExtractorByTypeAndNumber(type, number):
 # 39 implemented features
 featureExtractors = [
 
+MelodicIntervalHistogramFeature, # m1
+AverageMelodicIntervalFeature, # m2
+MostCommonMelodicIntervalFeature, # m3
+DistanceBetweenMostCommonMelodicIntervalsFeature, # m4
+MostCommonMelodicIntervalPrevalenceFeature, # m5
+RelativeStrengthOfMostCommonIntervalsFeature, # m6
+NumberOfCommonMelodicIntervalsFeature, # m7
+AmountOfArpeggiationFeature, # m8
+RepeatedNotesFeature, # m9
+ChromaticMotionFeature, # m10
+StepwiseMotionFeature, # m11
+MelodicThirdsFeature, # m12
+MelodicFifthsFeature,  # m13
+MelodicTritonesFeature,  # m14
+MelodicOctavesFeature,  # m15
 
 PitchedInstrumentsPresentFeature, # i1
 NotePrevalenceOfPitchedInstrumentsFeature, # i3
@@ -2953,6 +3189,212 @@ class Test(unittest.TestCase):
     
     def runTest(self):
         pass
+
+
+    def testAverageMelodicIntervalFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['p5', 'p5', 'p5', 'p4', 'p4', 'p4']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.AverageMelodicIntervalFeature(s)
+        f = fe.extract()
+        # average of 3 p5 and 3 p4 is the tritone
+        self.assertEqual(f.vector, [6.0])
+
+
+    def testMostCommonMelodicIntervalFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['p5', 'p5', 'p5', 'p4', 'p4', 'p4', 'p4']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.MostCommonMelodicIntervalFeature(s)
+        f = fe.extract()
+        # average of 3 p5 and 3 p4 is the tritone
+        self.assertEqual(f.vector, [5])
+        
+    def testDistanceBetweenMostCommonMelodicIntervalsFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['p5', 'p5', 'p5', 'p4', 'p4', 'p4', 'p4', 'm2', 'm3']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.DistanceBetweenMostCommonMelodicIntervalsFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [2])
+        
+
+    def testMostCommonMelodicIntervalPrevalenceFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['p5', 'p5', 'p4', 'p4', 'p4', 'p4', 'm2', 'm3']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.MostCommonMelodicIntervalPrevalenceFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [0.5])
+
+
+    def testRelativeStrengthOfMostCommonIntervalsFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['p5', 'p5', 'p5', 'p4', 'p4', 'p4', 'p4', 'm2', 'm3']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.RelativeStrengthOfMostCommonIntervalsFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [0.75])
+
+    def testNumberOfCommonMelodicIntervalsFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['p5', 'p4', 'p4', 'p4', 'p4', 'p4', 'p4', 'p4', 'p4', 'p4', 'p4', 'm2', 'm3']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.NumberOfCommonMelodicIntervalsFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [1])
+
+
+    def testAmountOfArpeggiationFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['m2', 'm2', 'M2', 'M3', 'p5', 'p8']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.AmountOfArpeggiationFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [0.5])
+
+
+    def testRepeatedNotesFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['p1', 'p1', 'p1', 'M2', 'M3', 'p5']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.RepeatedNotesFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [0.5])
+
+
+    def testChromaticMotionFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['m2', 'm2', 'm2', 'M2', 'M3', 'p5']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.ChromaticMotionFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [0.5])
+
+    def testStepwiseMotionFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['m2', 'm2', 'm2', 'M2', 'M3', 'p5']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.StepwiseMotionFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [2/3.])
+
+
+    def testMelodicThirdsFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['m2', 'm2', 'm2', 'M2', 'M3', 'p5']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.MelodicThirdsFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [1/6.])
+
+    def testMelodicFifthsFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['m2', 'm2', 'm2', 'M2', 'p5', 'p5']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.MelodicFifthsFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [2/6.])
+
+    def testMelodicTritonesFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['m2', 'm2', 'm2', 'M2', 'p5', 'd5']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.MelodicTritonesFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [1/6.])
+
+    def testMelodicOctavesFeature(self):
+        from music21 import stream, pitch, note, features
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+
+        for i in ['m2', 'm2', 'm2', 'M2', 'p5', 'p8']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+
+        fe = features.jSymbolic.MelodicOctavesFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [1/6.])
 
 
 if __name__ == "__main__":
