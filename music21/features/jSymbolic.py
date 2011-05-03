@@ -1253,7 +1253,6 @@ class QualityFeature(featuresModule.FeatureExtractor):
     >>> f2.vector
     [1]
 
-
     '''
     id = 'P22'
 
@@ -3395,6 +3394,20 @@ class Test(unittest.TestCase):
         fe = features.jSymbolic.MelodicOctavesFeature(s)
         f = fe.extract()
         self.assertEqual(f.vector, [1/6.])
+
+
+    def testFeatureCount(self):
+        from music21 import features
+        fs = features.jSymbolic.extractorsById
+        feTotal = 0
+        feImplemented = 0
+        for k in fs.keys():
+            for i in range(len(fs[k])):
+                if fs[k][i] is not None:
+                    feTotal += 1
+                    if fs[k][i] in features.jSymbolic.featureExtractors:
+                        feImplemented += 1
+        environLocal.printDebug(['fe total:', feTotal, 'fe implemented', feImplemented])
 
 
 if __name__ == "__main__":
