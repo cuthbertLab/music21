@@ -55,11 +55,8 @@ class Segment:
             for space in range(maxLength - len(fs)):
                 spacesInFront += ' '
             self.bassNote.addLyric(spacesInFront + fs, applyRaw = True)
-            
-    def correctPossibilities(self):
-        raise SegmentException("Must specifically create StartSegment or MiddleSegment to call this method.")
     
-    def allPossibilities(self):
+    def allSinglePossibilities(self):
         possibilities = []
         
         bassPossibility = possibility.Possibility()
@@ -83,7 +80,7 @@ class Segment:
 
         return possibilities
     
-    def correctSelfContainedPossibilities(self, verbose = False):
+    def correctSinglePossibilities(self, verbose = False):
         '''
         Default rules:
         (1) No incomplete possibilities
@@ -91,38 +88,38 @@ class Segment:
         (3) Pitches in each part within range
         (4) No voice crossing
         '''
-        allPossibilities = self.allPossibilities()
+        allPossibilities = self.allSinglePossibilities()
         
         newPossibilities = []
-        for possib in allPossibilities:
+        for possibA in allPossibilities:
             correctPossib = True
             # No incomplete possibilities
             if not self.fbRules.allowIncompletePossibilities:
-                if possib.isIncomplete(self.pitchNamesInChord, verbose):
+                if possibA.isIncomplete(self.pitchNamesInChord, verbose):
                     correctPossib = False
                     if not verbose:
                         continue
             # Top parts within maxSemitoneSeparation
-            if not possib.upperPartsWithinLimit(self.fbRules.upperPartsMaxSemitoneSeparation, verbose):
+            if not possibA.upperPartsWithinLimit(self.fbRules.upperPartsMaxSemitoneSeparation, verbose):
                 correctPossib = False
                 if not verbose:
                     continue
             # Pitches in each part within range
             if self.fbRules.filterPitchesByRange:
-                pitchesInRange = possib.pitchesWithinRange(verbose)
+                pitchesInRange = possibA.pitchesWithinRange(verbose)
                 if not pitchesInRange:
                     correctPossib = False
                     if not verbose:
                         continue
             # No part crossing
             if not self.fbRules.allowVoiceCrossing:
-                hasVoiceCrossing = possib.voiceCrossing(verbose)
+                hasVoiceCrossing = possibA.voiceCrossing(verbose)
                 if hasVoiceCrossing:
                     correctPossib = False
                     if not verbose:
                         continue
             if correctPossib:
-                newPossibilities.append(possib)
+                newPossibilities.append(possibA)
         
     
         return newPossibilities
@@ -131,7 +128,7 @@ class Segment:
         '''
         Trims all movements beginning at the segment it is
         called upon and moving backwards, stopping at the
-        PreviousSection. Intended to be called by the last
+        StartSection. Intended to be called by the last
         segment to trim the movements of a fbLine.
         '''
         for possibleIndex in self.nextMovements.keys():
@@ -154,7 +151,7 @@ class Segment:
         '''
         Obtains the number of solutions up to and including the given segment,
         by calculating the total number of paths, the sum of paths to each
-        possibility in the given segment. Intended to be called by the last
+        possibility in the given segment. Intended to be called on the last
         segment to return the total number of solutions to a fbLine, but could
         conceivably be used in other ways as well.
         '''
@@ -181,42 +178,38 @@ class Segment:
 class StartSegment(Segment):
     def __init__(self, fbScale, fbParts, fbRules, bassNote, notationString = ''):
         Segment.__init__(self, fbScale, fbParts, fbRules, bassNote, notationString)
-        self.correctPossibilities()
-
-    def correctPossibilities(self):
-        # Imitates _findPossibleStartingChords from realizer.py
-        self.possibilities = self.correctSelfContainedPossibilities()
+        self.possibilities = self.correctSinglePossibilities()
     
 class MiddleSegment(Segment):
     def __init__(self, fbScale, fbParts, fbRules, prevSegment, bassNote, notationString = ''):
         Segment.__init__(self, fbScale, fbParts, fbRules, bassNote, notationString)
         self.prevSegment = prevSegment
-        self.correctPossibilities()
+        self.correctConsecutivePossibilities()
     
-    def correctPossibilities(self):
+    def correctConsecutivePossibilities(self):
         try:
-            self.resolveAllDominantSevenths()
+            self.resolveAllDominantSeventhPossibilities()
             return
         except UnresolvedSegmentException:
             pass
         
         try:
-            self.resolveAllDiminishedSevenths()
+            self.resolveAllDiminishedSeventhPossibilities()
             return
         except UnresolvedSegmentException:
             pass
         
-        self.resolveAllPossibilities()
+        self.resolveAllConsecutivePossibilities()
         return
     
-    def resolveAllDominantSevenths(self):
+    def resolveAllDominantSeventhPossibilities(self):
         if self.prevSegment.isDominantSeventh and self.fbRules.resolveDominantSeventhProperly:
             dominantPossibilities = self.prevSegment.possibilities
             resolutionPossibilities = []
             dominantPossibIndex = 0
             for dominantPossib in dominantPossibilities:
                 movements = []
-                resolutionPossib = self.resolveDominantSeventh(dominantPossib)
+                resolutionPossib = self.resolveDominantSeventhPossibility(dominantPossib)
                 try:
                     movements.append(resolutionPossibilities.index(resolutionPossib))
                 except ValueError:
@@ -230,14 +223,14 @@ class MiddleSegment(Segment):
         
         raise UnresolvedSegmentException()
     
-    def resolveAllDiminishedSevenths(self):
+    def resolveAllDiminishedSeventhPossibilities(self):
         if self.prevSegment.isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:
             diminishedPossibilities = self.prevSegment.possibilities
             resolutionPossibilities = []
             diminishedPossibIndex = 0
             for diminishedPossib in diminishedPossibilities:
                 movements = []
-                resolutionPossib = self.resolveDiminishedSeventh(diminishedPossib)
+                resolutionPossib = self.resolveDiminishedSeventhPossibility(diminishedPossib)
                 try:
                     movements.append(resolutionPossibilities.index(resolutionPossib))
                 except ValueError:
@@ -251,15 +244,15 @@ class MiddleSegment(Segment):
     
         raise UnresolvedSegmentException()
 
-    def resolveAllPossibilities(self):
+    def resolveAllConsecutivePossibilities(self):
         prevPossibilities = self.prevSegment.possibilities
-        nextPossibilities = self.correctSelfContainedPossibilities()
+        nextPossibilities = self.correctSinglePossibilities()
         prevPossibIndex = 0
-        for prevPossib in prevPossibilities:
+        for possibA in prevPossibilities:
             movements = []
             nextPossibIndex = 0
-            for nextPossib in nextPossibilities:
-                if self.hasCorrectVoiceLeading(prevPossib, nextPossib):
+            for possibB in nextPossibilities:
+                if self.isCorrectConsecutivePossibility(possibA, possibB):
                     movements.append(nextPossibIndex)
                 nextPossibIndex += 1
             self.prevSegment.nextMovements[prevPossibIndex] = movements
@@ -268,7 +261,7 @@ class MiddleSegment(Segment):
         self.possibilities = nextPossibilities
         return
     
-    def resolveDominantSeventh(self, dominantPossib, verbose = False):
+    def resolveDominantSeventhPossibility(self, dominantPossib, verbose = False):
         environRules = environment.Environment(_MOD)
         if not dominantPossib.isDominantSeventh():
             raise SegmentException("Possibility does not form a correctly spelled dominant seventh chord.")
@@ -321,14 +314,14 @@ class MiddleSegment(Segment):
                     environRules.warn("Dominant seventh resolution: V" + domInversionName + "->iv" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorSubdominant(dominantPossib)
         else:
-            raise SegmentException("Dominant seventh resolution: No standard resolution available.")
+            raise SegmentException("Dominant seventh resolution: No proper resolution available.")
     
         if not (resolutionPossib.chordify().bass() == self.bassNote.pitch):
             raise SegmentException("Dominant seventh resolution: Bass note resolved improperly in figured bass.")
             
         return resolutionPossib
 
-    def resolveDiminishedSeventh(self, diminishedPossib, verbose = False):
+    def resolveDiminishedSeventhPossibility(self, diminishedPossib, verbose = False):
         environRules = environment.Environment(_MOD)       
         if not diminishedPossib.isDiminishedSeventh():
             raise SegmentException("Possibility does not form a correctly spelled diminished seventh chord.")
@@ -372,62 +365,62 @@ class MiddleSegment(Segment):
                      environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMinorSubdominant(diminishedPossib)
         else:
-            raise SegmentException("Diminished seventh resolution: No standard resolution available.")
+            raise SegmentException("Diminished seventh resolution: No proper resolution available.")
 
         if not (resolutionChord.bass() == self.bassNote.pitch):
             raise SegmentException("Diminished seventh resolution: Bass note resolved improperly in figured bass.")
             
         return resolutionPossib
 
-    def hasCorrectVoiceLeading(self, possibA, possibB, verbose = False):
-        hasCorrectVoiceLeading = True
+    def isCorrectConsecutivePossibility(self, possibA, possibB, verbose = False):
+        isCorrectPossib = True
         
         # No hidden fifth between shared outer parts
         if not self.fbRules.allowHiddenFifths:
             hasHiddenFifth = possibA.hiddenFifth(possibB, verbose)
             if hasHiddenFifth:
-                hasCorrectVoiceLeading = False
+                isCorrectPossib = False
                 if not verbose:
-                    return hasCorrectVoiceLeading
+                    return isCorrectPossib
                 
         # No hidden octave between shared outer parts
         if not self.fbRules.allowHiddenOctaves:
             hasHiddenOctave = possibA.hiddenOctave(possibB, verbose)
             if hasHiddenOctave:
-                hasCorrectVoiceLeading = False
+                isCorrectPossib = False
                 if not verbose:
-                    return hasCorrectVoiceLeading
+                    return isCorrectPossib
         
         jumpsWithinLimits = possibA.partMovementsWithinLimits(possibB, verbose)
         # Movements in each part within corresponding maxSeparation
         if not jumpsWithinLimits:
-            hasCorrectVoiceLeading = False
+            isCorrectPossib = False
             if not verbose:
-                return hasCorrectVoiceLeading
+                return isCorrectPossib
         # No part overlaps
         if not self.fbRules.allowVoiceOverlap:
             hasVoiceOverlap = possibA.voiceOverlap(possibB, verbose)
             if hasVoiceOverlap:
-                hasCorrectVoiceLeading = False
+                isCorrectPossib = False
                 if not verbose:
-                    return hasCorrectVoiceLeading
+                    return isCorrectPossib
 
         # No parallel fifths
         if not self.fbRules.allowParallelFifths:
             hasParallelFifth = possibA.parallelFifths(possibB, verbose)
             if hasParallelFifth:
-                hasCorrectVoiceLeading = False
+                isCorrectPossib = False
                 if not verbose:
-                    return hasCorrectVoiceLeading
+                    return isCorrectPossib
         # No parallel octaves
         if not self.fbRules.allowParallelOctaves:
             hasParallelOctave = possibA.parallelOctaves(possibB, verbose)
             if hasParallelOctave:
-                hasCorrectVoiceLeading = False
+                isCorrectPossib = False
                 if not verbose:
-                    return hasCorrectVoiceLeading
+                    return isCorrectPossib
         
-        return hasCorrectVoiceLeading
+        return isCorrectPossib
 
 
 class UnresolvedSegmentException(music21.Music21Exception):
