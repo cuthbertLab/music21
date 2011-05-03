@@ -31,6 +31,49 @@ from music21.figuredBass import notation
 MIN_PITCH = pitch.Pitch('C1')
 MAX_PITCH = pitch.Pitch('B5')
 
+def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = False):
+    '''
+    takes in a Stream part that has figures in the lyrics and
+    returns a realizer.FiguredBass object
+    
+    >>> from music21 import *
+    >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 C1', '4/4')
+    >>> fb = figuredBass.realizer.figuredBassFromStreamPart(s)
+    >>> fb.solve()
+    >>> fb.showRandomSolutions(20)
+    '''
+    if partList is None:
+        part1 = part.Part(1,2)
+        part2 = part.Part(2)
+        part3 = part.Part(3)
+        part4 = part.Part(4)
+    
+        partList = [part1, part2, part3, part4]
+    
+    sf = streamPart.flat
+    sfn = sf.notes
+    keyList = sf.getElementsByClass(key.KeySignature)
+    if len(keyList) == 0:
+        mykey = key.Key('C')
+    else:
+        mykey = keyList[0]
+
+    tsList = sf.getElementsByClass(meter.TimeSignature)
+    if len(tsList) == 0:
+        ts = meter.TimeSignature('4/4')
+    else:
+        ts = tsList[0]
+    
+    fb = FiguredBass(partList, str(ts), mykey.tonic, mykey.mode)
+    
+    for n in sfn:
+        if n.lyric != "" and n.lyric is not None:
+            fb.addElement(n, n.lyric)
+        else:
+            fb.addElement(n)
+    
+    return fb
+
 class FiguredBass(object):
     def __init__(self, partList, timeSigString = '4/4', keyString = 'C', modeString = 'major'):
         '''

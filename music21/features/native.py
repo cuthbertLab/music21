@@ -439,6 +439,10 @@ class DiminishedTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
 
 class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     '''
+    Gives the proportion of all simultaneities which form triads (major,
+    minor, diminished, or augmented
+    
+    
     >>> from music21 import *
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.TriadSimultaneityPrevelance(s)
@@ -454,7 +458,7 @@ class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Triad Simultaneity Prevelance'
-        self.description = 'Percentage of all simultaneities that triads.'
+        self.description = 'Proportion of all simultaneities that form triads.'
         self.dimensions = 1
         self.discrete = False 
 
