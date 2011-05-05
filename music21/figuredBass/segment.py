@@ -28,46 +28,29 @@ from music21.figuredBass import rules
 _MOD = 'segment.py'
 
 class Segment:
-    def __init__(self, fbScale, fbParts, fbRules, bassNote, notationString = ''):
+    def __init__(self, fbScale, partList, fbRules, bassNote, notationString = ''):
         self.bassNote = bassNote
         self.notationString = notationString
         self.fbScale = fbScale
-        self.fbParts = fbParts
+        self.partList = partList
         self.fbRules = fbRules
         self.pitchesAboveBass = self.fbScale.getPitches(self.bassNote.pitch, self.notationString)
         self.pitchNamesInChord = self.fbScale.getPitchNames(self.bassNote.pitch, self.notationString)
         self.nextMovements = {}
         self.nextSegment = None
-        self.isDominantSeventh = chord.Chord(self.pitchesAboveBass).isDominantSeventh()
-        self.isDiminishedSeventh = chord.Chord(self.pitchesAboveBass).isDiminishedSeventh()
-        self.addLyricsToBassNote()
-
-    def addLyricsToBassNote(self):
-        n = notation.Notation(self.notationString)
-        if len(n.figureStrings) == 0:
-            return
-        maxLength = 0
-        for fs in n.figureStrings:
-            if len(fs) > maxLength:
-                maxLength = len(fs)
-        for fs in n.figureStrings:
-            spacesInFront = ''
-            for space in range(maxLength - len(fs)):
-                spacesInFront += ' '
-            self.bassNote.addLyric(spacesInFront + fs, applyRaw = True)
     
     def allSinglePossibilities(self):
         possibilities = []
         
         bassPossibility = possibility.Possibility()
-        self.fbParts.sort()
-        previousVoice = self.fbParts[0]
+        self.partList.sort()
+        previousVoice = self.partList[0]
         bassPossibility[previousVoice] = self.bassNote.pitch
         possibilities.append(bassPossibility)
         
-        for partNumber in range(1, len(self.fbParts)):
+        for partNumber in range(1, len(self.partList)):
             oldLength = len(possibilities)
-            currentVoice = self.fbParts[partNumber]
+            currentVoice = self.partList[partNumber]
             for oldPossibIndex in range(oldLength):
                 oldPossib = possibilities.pop(0)
                 validPitches = self.pitchesAboveBass
@@ -176,13 +159,13 @@ class Segment:
     
                 
 class StartSegment(Segment):
-    def __init__(self, fbScale, fbParts, fbRules, bassNote, notationString = ''):
-        Segment.__init__(self, fbScale, fbParts, fbRules, bassNote, notationString)
+    def __init__(self, fbScale, partList, fbRules, bassNote, notationString = ''):
+        Segment.__init__(self, fbScale, partList, fbRules, bassNote, notationString)
         self.possibilities = self.correctSinglePossibilities()
     
 class MiddleSegment(Segment):
-    def __init__(self, fbScale, fbParts, fbRules, prevSegment, bassNote, notationString = ''):
-        Segment.__init__(self, fbScale, fbParts, fbRules, bassNote, notationString)
+    def __init__(self, fbScale, partList, fbRules, prevSegment, bassNote, notationString = ''):
+        Segment.__init__(self, fbScale, partList, fbRules, bassNote, notationString)
         self.prevSegment = prevSegment
         self.correctConsecutivePossibilities()
     
@@ -203,7 +186,8 @@ class MiddleSegment(Segment):
         return
     
     def resolveAllDominantSeventhPossibilities(self):
-        if self.prevSegment.isDominantSeventh and self.fbRules.resolveDominantSeventhProperly:
+        isDominantSeventh = chord.Chord(self.prevSegment.pitchesAboveBass).isDominantSeventh()
+        if isDominantSeventh and self.fbRules.resolveDominantSeventhProperly:
             dominantPossibilities = self.prevSegment.possibilities
             resolutionPossibilities = []
             dominantPossibIndex = 0
@@ -224,7 +208,8 @@ class MiddleSegment(Segment):
         raise UnresolvedSegmentException()
     
     def resolveAllDiminishedSeventhPossibilities(self):
-        if self.prevSegment.isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:
+        isDiminishedSeventh = chord.Chord(self.prevSegment.pitchesAboveBass).isDiminishedSeventh()
+        if isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:
             diminishedPossibilities = self.prevSegment.possibilities
             resolutionPossibilities = []
             diminishedPossibIndex = 0
