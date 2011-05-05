@@ -530,13 +530,14 @@ class MelodicOctavesFeature(featuresModule.FeatureExtractor):
 
  
 
-
-
-
-
 class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.DirectionOfMotionFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.5263...]
     '''
     id = 'm17'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -547,9 +548,37 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        rising = 0
+        falling = 0
+        cBundle = []
+        if self.data.partsCount > 0:
+            for i in range(self.data.partsCount):
+                cList = self.data['parts'][i]['contourList']
+                cBundle.append(cList)
+        else:
+            cList = self.data['contourList']
+            cBundle.append(cList)
+
+        for cList in cBundle:
+            for c in cList:
+                if c > 0:
+                    rising += 1
+                elif c < 0:
+                    falling += 1
+        self._feature.vector[0] = rising / float(falling+rising)
+
+ 
 class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [3.1666...]
     '''
     id = 'M18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -560,10 +589,64 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        rising = 0
+        falling = 0
+        cBundle = []
+        if self.data.partsCount > 0:
+            for i in range(self.data.partsCount):
+                cList = self.data['parts'][i]['contourList']
+                cBundle.append(cList)
+        else:
+            cList = self.data['contourList']
+            cBundle.append(cList)
 
+        spanList = [] # for averaging
+        for cList in cBundle:
+            pos = 0
+            posList = [pos]
+            for c in cList:
+                pos += c
+                posList.append(pos)
+
+            environLocal.printDebug(['posList', posList])   
+            # get start to max, any max to min, and to end
+            peak = max(posList)
+            trough = min(posList)
+            count = 0
+            store = False
+            environLocal.printDebug(['trough, peak', trough, peak])   
+
+            for i, val in enumerate(posList):
+                count += 1
+                if i == 0: # first
+                    count -= 1 # remove first
+                elif i == len(posList) - 1: # last
+                    store = True
+                elif val == peak or val == trough:
+                    store = True
+                # if store, then clear
+                #environLocal.printDebug([i, 'count', count, 'store', store])
+                if store:                
+                    span = count - 1 # remove this matched value
+                    if span > 0:
+                        spanList.append(span)
+                    count = 0
+                    store = False
+            #environLocal.printDebug(['spanList', spanList])   
+        self._feature.vector[0] = sum(spanList) / float(len(spanList))
+
+ 
 class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [8.5]
     '''
     id = 'M19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -575,6 +658,35 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
 
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        rising = 0
+        falling = 0
+        cBundle = []
+        if self.data.partsCount > 0:
+            for i in range(self.data.partsCount):
+                cList = self.data['parts'][i]['contourList']
+                cBundle.append(cList)
+        else:
+            cList = self.data['contourList']
+            cBundle.append(cList)
+
+        spanList = [] # for averaging
+        for cList in cBundle:
+            pos = 0
+            posList = [pos]
+            for c in cList:
+                pos += c
+                posList.append(pos)
+            environLocal.printDebug(['posList', posList])   
+            peak = max(posList)
+            trough = min(posList)
+            spanList.append(peak-trough)
+        environLocal.printDebug(['spanList', spanList])   
+        self._feature.vector[0] = sum(spanList) / float(len(spanList))
+
+ 
 
 
 
@@ -3012,9 +3124,9 @@ def getExtractorByTypeAndNumber(type, number):
     M 13 MelodicFifthsFeature
     M 14 MelodicTritonesFeature
     M 15 MelodicOctavesFeature
-    M 17 DirectionOfMotionFeature (not implemented)
-    M 18 DurationOfMelodicArcsFeature (not implemented)
-    M 19 SizeOfMelodicArcsFeature (not implemented)
+    M 17 DirectionOfMotionFeature
+    M 18 DurationOfMelodicArcsFeature
+    M 19 SizeOfMelodicArcsFeature
     P 1 MostCommonPitchPrevalenceFeature
     P 2 MostCommonPitchClassPrevalenceFeature
     P 3 RelativeStrengthOfTopPitchesFeature
@@ -3113,6 +3225,9 @@ MelodicThirdsFeature, # m12
 MelodicFifthsFeature,  # m13
 MelodicTritonesFeature,  # m14
 MelodicOctavesFeature,  # m15
+DirectionOfMotionFeature, # m17
+DurationOfMelodicArcsFeature, # m18
+SizeOfMelodicArcsFeature,  #m 19
 
 PitchedInstrumentsPresentFeature, # i1
 NotePrevalenceOfPitchedInstrumentsFeature, # i3
@@ -3396,6 +3511,91 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [1/6.])
 
 
+    def testDirectionOfMotionFeature(self):
+        from music21 import stream, pitch, note, features
+        # all up
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+        for i in ['m2', 'm2', 'm2', 'M2', 'p5', 'p8']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+        fe = features.jSymbolic.DirectionOfMotionFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [1.0])
+
+        # half down, half up
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+        for i in ['m2', 'm2', '-m2', '-M2', '-p5', 'p8']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+        fe = features.jSymbolic.DirectionOfMotionFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [0.5])
+
+        # downward only
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+        for i in ['-m2', '-m2', '-m2', '-M2', '-p5', '-p8']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+        fe = features.jSymbolic.DirectionOfMotionFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [0.0])
+
+
+
+    def testDurationOfMelodicArcsFeature(self):
+        from music21 import stream, pitch, note, features
+        # all up
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+        for i in ['m2', 'm2', 'm2', 'M2', 'p5', 'p8']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+        fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
+        f = fe.extract()
+        self.assertEqual(f.vector, [5])
+
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+        for i in ['m2', 'm2', '-p8', 'M2', 'p5', '-p8', 'p8', '-p8']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+        fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
+        f = fe.extract()
+        self.assertAlmostEqual(f.vector[0], 1+2/3.)
+
+
+    def testSizeOfMelodicArcsFeature(self):
+        from music21 import stream, pitch, note, features
+        # all up
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+        for i in ['m2', 'm2', 'm2', 'M2', 'p5', 'p8']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+        fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
+        f = fe.extract()
+        #self.assertEqual(f.vector, [5])
+
+        s = stream.Stream()
+        p = pitch.Pitch('c2')
+        s.append(note.Note(copy.deepcopy(p)))
+        for i in ['m2', 'm2', '-p8', 'M2', 'p5', '-p8', 'p8', '-p8']:
+            p = p.transpose(i)
+            s.append(note.Note(copy.deepcopy(p)))
+        fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
+        f = fe.extract()
+        #self.assertAlmostEqual(f.vector[0], 1+2/3.)
+
+
     def testFeatureCount(self):
         from music21 import features
         fs = features.jSymbolic.extractorsById
@@ -3407,7 +3607,7 @@ class Test(unittest.TestCase):
                     feTotal += 1
                     if fs[k][i] in features.jSymbolic.featureExtractors:
                         feImplemented += 1
-        environLocal.printDebug(['fe total:', feTotal, 'fe implemented', feImplemented])
+        environLocal.printDebug(['fe total:', feTotal, 'fe implemented', feImplemented, 'pcent', feImplemented/float(feTotal)])
 
 
 if __name__ == "__main__":

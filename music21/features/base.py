@@ -377,6 +377,32 @@ class StreamForms(object):
             self._forms['midiIntervalHistogram'] = histo
             return self._forms['midiIntervalHistogram']
 
+
+        elif key in ['contourList']:
+            # list of all directed half steps
+            cList = []
+            # if we have parts, must add one at a time
+            if self._base.hasPartLikeStreams():
+                parts = self._base.parts
+            else:
+                parts = [self._base] # emulate a list
+            for p in parts:
+                # this may be unnecessary but we cannot accessed cached part
+                # data
+                p = p.stripTies(retainContainers=False) # will be flat
+                # noNone means that we will see all connections, even w/ a gap
+                post = p.findConsecutiveNotes(skipRests=True, 
+                    skipChords=False, skipGaps=True, noNone=True)
+                for i, n in enumerate(post):
+                    if i < (len(post) - 1): # if not last
+                        iNext = i + 1
+                        nNext = post[iNext]
+                        cList.append(nNext.midi - n.midi)
+            #environLocal.printDebug(['contourList', cList])
+            self._forms['contourList'] = cList
+            return self._forms['contourList']
+
+
         elif key in ['flat.analyzedKey']:
             self._forms['analyzedKey'] = self.__getitem__('flat').analyze('key')
             return self._forms['analyzedKey']
