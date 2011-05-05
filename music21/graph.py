@@ -31,9 +31,15 @@ from music21 import duration
 from music21 import pitch
 from music21 import common
 from music21 import chord
+from music21 import corpus
+from music21 import converter
+
 from music21.analysis import windowed
 from music21.analysis import discrete
 from music21.analysis import correlate
+
+from music21 import features
+
 
 from music21 import environment
 _MOD = 'graph.py'
@@ -236,7 +242,7 @@ class Graph(object):
         if 'colors' in keywords:
             self.colors = keywords['colors']
         else:
-            self.colors = ['#605C7F']
+            self.colors = ['#605C7F', '#715c7f', '#5c7f60']
 
         # font info
         if 'tickFontSize' in keywords:
@@ -258,6 +264,10 @@ class Graph(object):
             self.fontFamily = keywords['fontFamily']
         else:
             self.fontFamily = 'serif'
+
+        self.xTickLabelRotation = 0
+        self.xTickLabelHorizontalAlignment = 'center'
+        self.xTickLabelVerticalAlignment = 'center'
 
     def _axisInit(self):
         for ax in self.axisKeys:
@@ -305,6 +315,7 @@ class Graph(object):
             for value, label in pairs:
                 positions.append(value)
                 labels.append(label)
+            #environLocal.printDebug(['got labels', labels])
             self.axis[axisKey]['ticks'] = positions, labels
 
     def setAxisRange(self, axisKey, valueRange, pad=False):
@@ -413,9 +424,12 @@ class Graph(object):
                         ax.set_xticks(values)
                         # using center alignment to account for odd spacing in 
                         # accidentals
+                        environLocal.printDebug(['setting labels', labels])
                         ax.set_xticklabels(labels, fontsize=self.tickFontSize,
                             family=self.fontFamily, 
-                            horizontalalignment='center', verticalalignment='center', y=-.01)
+                         horizontalalignment=self.xTickLabelHorizontalAlignment, verticalalignment=self.xTickLabelVerticalAlignment, 
+                            rotation=self.xTickLabelRotation,
+                            y=-.01)
 
                 elif axis == 'y':
                     # this is the old way ticks were set:
@@ -1086,6 +1100,86 @@ class GraphHistogram(Graph):
         self.done()
 
 
+
+class GraphGroupedVerticalBar(Graph):
+    '''Graph the count of on or more elements in vertical bars
+
+    Data set is simply a list of x and y pairs, where there
+    is only one of each x value, and y value is list of valu=e
+
+    >>> from music21 import *
+    >>> import random
+    >>> #_DOCS_SHOW g = graph.GraphGroupedVerticalBar()
+    >>> g = graph.GraphGroupedVerticalBar(doneAction=None) #_DOCS_HIDE
+    >>> data = [('bar%s' % x, {'a':3,'b':2,'c':1}) for x in range(10)]
+    >>> data
+    [('bar0', {'a': 3, 'c': 1, 'b': 2}), ('bar1', {'a': 3, 'c': 1, 'b': 2}), ('bar2', {'a': 3, 'c': 1, 'b': 2}), ('bar3', {'a': 3, 'c': 1, 'b': 2}), ('bar4', {'a': 3, 'c': 1, 'b': 2}), ('bar5', {'a': 3, 'c': 1, 'b': 2}), ('bar6', {'a': 3, 'c': 1, 'b': 2}), ('bar7', {'a': 3, 'c': 1, 'b': 2}), ('bar8', {'a': 3, 'c': 1, 'b': 2}), ('bar9', {'a': 3, 'c': 1, 'b': 2})]
+    >>> g.setData(data)
+    >>> g.process()
+
+    '''
+
+    def __init__(self, *args, **keywords):
+
+        Graph.__init__(self, *args, **keywords)
+        self.axisKeys = ['x', 'y']
+        self._axisInit()
+
+    def labelBars(self, ax, rects):
+        # attach some text labels
+        for rect in rects:
+            height = rect.get_height()
+            ax.text(rect.get_x()+rect.get_width()/2., height+.05, '%s'%str(round(height, 1)), ha='center', va='bottom', 
+            fontsize=self.tickFontSize, family=self.fontFamily)
+
+    def process(self):
+        self.fig = plt.figure()
+        self.fig.subplots_adjust(bottom=.3)
+        ax = self.fig.add_subplot(1, 1, 1)
+
+        # b value is a list of values for each bar
+        for a, b in self.data:
+            barsPerGroup = len(b)
+            # get for legend
+            subLabels = b.keys()
+            break
+        widthShift = 1 / float(barsPerGroup)
+
+        xVals = []
+        yBundles = []
+        for i, (a, b) in enumerate(self.data):
+            # create x vals from index values 
+            xVals.append(i)
+            yBundles.append([b[key] for key in sorted(b.keys())])
+
+        rects = []
+        for i in range(barsPerGroup):
+            yVals = []
+            for j, x in enumerate(xVals):
+                # get position, then get bar group
+                yVals.append(yBundles[j][i])
+            xValsShifted = []
+            for x in xVals:
+                xValsShifted.append(x + (widthShift * i))
+
+            rect = ax.bar(xValsShifted, yVals, width=widthShift, alpha=.8, 
+                    color=self.colors[i%len(self.colors)])
+            rects.append(rect)
+
+        colors = []
+        for rect in rects:
+            self.labelBars(ax, rect)
+            colors.append(rect[0])
+
+        font = matplotlib.font_manager.FontProperties(size=self.tickFontSize,
+                         family=self.fontFamily) 
+        ax.legend(colors, subLabels, prop=font)
+
+        self._adjustAxisSpines(ax)
+        self._applyFormatting(ax)
+        self.done()
+
+
 class _Graph3DBars(Graph):
     '''Not functioning in all matplotlib versions
     '''
@@ -1261,7 +1355,7 @@ class Graph3DPolygonBars(Graph):
 # graphing utilities that operate on streams
 
 class PlotStream(object):
-    '''Approaches to plotting and graphing a stream. A base class from which Stream plotting Classes inherit.
+    '''Approaches to plotting and graphing a Stream. A base class from which Stream plotting Classes inherit.
 
     This class has a number of public attributes, but these are generally not intended for direct user application. The `data` attribute, for example, exposes the internal data format of this plotting routine for testing, but no effort is made to make this data useful outside of the context of the Plot.
     '''
@@ -1813,10 +1907,69 @@ class PlotStream(object):
             ticks.append([i, r'$%s$' % dynamics.shortNames[i]])
         return ticks
     
-    
-    
-    
-    
+
+#-------------------------------------------------------------------------------
+# base class for multi-stream displays
+
+class PlotMultiStream(object):
+    '''Approaches to plotting and graphing multiple Streams. A base class from which Stream plotting Classes inherit.
+
+    '''
+    # the following static parameters are used to for matching this
+    # plot based on user-requested string aguments
+    # a string representation of the type of graph
+    format = ''
+    # store a list of parameters that are graphed
+    values = []
+
+    def __init__(self, streamList, labelList=[], *args, **keywords):
+        '''Provide a list of Streams as an argument. Optionally provide an additional list of labels for each list. If `flatten` is True, the Streams will automatically be flattened.
+        '''
+
+        self.streamList = []
+        foundPaths = []
+        for s in streamList:
+            # could be corpus or file path
+            if common.isStr(s):
+                foundPaths.append(os.path.basename(s))
+                if os.path.exists(s):
+                    s = converter.parse(s)
+                else: # assume corpus
+                    s = corpus.parse(s)
+            # otherwise assume a parsed stream
+            self.streamList.append(s)
+
+        # use found paths if no labels are provided
+        if len(labelList) == 0 and len(foundPaths) == len(streamList):
+            self.labelList = foundPaths
+        else:
+            self.labelList = labelList
+
+        self.data = None # store native data representation, useful for testing
+        self.graph = None  # store instance of graph class here
+
+
+    def process(self):
+        '''This will process all data, as well as call the done() method. What happens when the done() is called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph).
+
+        Subclass dependent data extracted is stored in the self.data attribute. 
+        '''
+        self.graph.process()
+
+    def show(self):
+        '''Call internal Graphs show() method independently of doneAction set and run with process()
+        '''
+        self.graph.show()
+
+    def write(self, fp=None):
+        '''Call internal Graphs write() method independently of doneAction set and run with process()
+        '''
+        self.graph.write(fp)
+
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -3082,6 +3235,98 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
 
 
 
+
+#-------------------------------------------------------------------------------
+# plot multi stream
+
+class PlotFeatures(PlotMultiStream):
+    '''
+    FeatureExtractors can be ids or classes. 
+    '''
+    format = 'features'
+
+    def __init__(self, streamList, featureExtractors, labelList=[], 
+        *args, **keywords):
+        PlotMultiStream.__init__(self, streamList, labelList, *args, **keywords)
+
+        self.featureExtractors = featureExtractors
+
+        # will use self.fx and self.fxTick to extract data
+        self.data, xTicks, yTicks = self._extractData()
+
+        self.graph = GraphGroupedVerticalBar(*args, **keywords)
+        self.graph.grid = False
+        self.graph.setData(self.data)
+
+        self.graph.setTicks('x', xTicks)
+        self.graph.setTicks('y', yTicks)
+
+
+        self.graph.xTickLabelRotation = 90
+        self.graph.xTickLabelHorizontalAlignment = 'left'
+        self.graph.xTickLabelVerticalAlignment = 'top'
+
+        #self.graph.setAxisLabel('y', 'Count')
+        #self.graph.setAxisLabel('x', 'Streams')
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([10,6])
+        if 'title' not in keywords:
+            self.graph.setTitle(None)
+
+
+    def _extractData(self):
+        if len(self.labelList) != len(self.streamList):
+            labelList = [x+1 for x in range(len(self.streamList))]
+        else:
+            labelList = self.labelList
+
+        feList = []
+        for fe in self.featureExtractors:
+            if common.isStr(fe):
+                post = features.extractorsById(fe)
+                for sub in post:
+                    feList.append(sub())
+            else: # assume a class
+                feList.append(fe())
+
+        # store each stream in a data instance
+        diList = []
+        for s in self.streamList:
+            di = features.DataInstance(s)
+            diList.append(di)
+
+        data = []
+        for i, di in enumerate(diList):
+            sub = {}
+            for fe in feList:
+                fe.setData(di)
+                v = fe.extract().vector
+                if len(v) == 1:
+                    sub[fe.name] = v[0]
+                # average all values?
+                else:
+                    sub[fe.name] = sum(v)/float(len(v))
+            dataPoint = [labelList[i], sub]
+            data.append(dataPoint)
+
+        #environLocal.printDebug(['data', data])
+
+        xTicks = []
+        for x, label in enumerate(labelList):
+            # first value needs to be center of bar
+            # value of tick is the string entry
+            xTicks.append([x+.5, '%s' % label])
+        # alway have min and max
+        yTicks = []
+        return data, xTicks, yTicks
+
+
+
+
+
+
 #-------------------------------------------------------------------------------
 # public function
 def _getPlotsToMake(*args, **keywords):
@@ -4060,6 +4305,32 @@ class Test(unittest.TestCase):
         self.assertEqual(post, [PlotScatterPitchClassOffset])
 
 
+
+        
+
+    def testGraphVerticalBar(self):
+        from music21 import graph
+        
+        g = graph.GraphGroupedVerticalBar(doneAction=None)
+        data = [('bar%s' % x, {'a':3,'b':2,'c':1}) for x in range(10)]
+        g.setData(data)
+        g.process()
+# 
+        streamList = ['bach/bwv66.6', 'hwv56/movement3-05.md', 'bach/bwv324.xml']
+        feList = ['ql1', 'ql2', 'ql3']
+
+        p = PlotFeatures(streamList, featureExtractors=feList, doneAction=None)
+        p.process()
+
+
+    def xtestGraphVerticalBar(self):
+
+        #streamList = corpus.parse('essenFolksong/han1')
+        streamList = corpus.bachChorales[100:108]
+        feList = ['m17', 'm18', 'm19', 'ql1']
+        #labelList = [os.path.basename(fp) for fp in streamList]
+        p = PlotFeatures(streamList, feList)
+        p.process()
 
 
 

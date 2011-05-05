@@ -77,6 +77,7 @@ class FirstBeatAttackPrevelance(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.FirstBeatAttackPrevelance(s)
     '''
+    id = 'MP1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -100,7 +101,7 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
     >>> fe.extract().vector 
     [7]
     '''
-    id = 'D1'
+    id = 'QL1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -129,7 +130,7 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
     >>> fe.extract().vector 
     [0.5]
     '''
-    id = 'D2'
+    id = 'QL2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -160,7 +161,7 @@ class MostCommonNoteQuarterLengthPrevelance(featuresModule.FeatureExtractor):
     >>> fe.extract().vector 
     [0.533333...]
     '''
-    id = 'D3'
+    id = 'QL3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -194,7 +195,7 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
     >>> fe.extract().vector 
     [3.75]
     '''
-    id = 'D4'
+    id = 'QL4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -224,7 +225,7 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
     >>> fe.extract().vector
     [15]
     '''
-    id = 'S1'
+    id = 'CS1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -254,7 +255,7 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
     >>> fe.extract().vector
     [7]
     '''
-    id = 'S2'
+    id = 'CS2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -285,7 +286,7 @@ class MostCommonPitchClassSetSimultaneityPrevelance(
     >>> fe.extract().vector
     [0.166666666...]
     '''
-    id = 'S3'
+    id = 'CS3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -322,7 +323,7 @@ class MostCommonSetClassSimultaneityPrevelance(featuresModule.FeatureExtractor):
     >>> fe2.extract().vector
     [0.3846...]
     '''
-    id = 'S4'
+    id = 'CS4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -355,7 +356,7 @@ class MajorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     >>> fe.extract().vector
     [0.1666666666...]
     '''
-    id = 'S5'
+    id = 'CS5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -385,7 +386,7 @@ class MinorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     >>> fe.extract().vector # same as major in this work
     [0.1666666666...]
     '''
-    id = 'S6'
+    id = 'CS6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -414,7 +415,7 @@ class DominantSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
     >>> fe.extract().vector 
     [0.0]
     '''
-    id = 'S7'
+    id = 'CS7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -443,7 +444,7 @@ class DiminishedTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     >>> fe.extract().vector 
     [0.020408163265...]
     '''
-    id = 'S8'
+    id = 'CS8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -479,7 +480,7 @@ class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     >>> fe2.extract().vector
     [0.04...]
     '''
-    id = 'S9'
+    id = 'CS9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -508,7 +509,7 @@ class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
     >>> fe.extract().vector 
     [0.0]
     '''
-    id = 'S10'
+    id = 'CS10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 

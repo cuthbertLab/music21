@@ -993,7 +993,7 @@ class DataSet(object):
 #-------------------------------------------------------------------------------
 # TODO: add all to get from both libraries
 
-def extractorsById(idOrList, library='jSymbolic'):
+def extractorsById(idOrList, library=['jSymbolic', 'native']):
     '''Given one or more :class:`~music21.features.FeatureExtractor` ids, return the appropriate  subclass. An optional `library` argument can be added to define which module is used. Current options are jSymbolic and native.
 
     >>> from music21 import *
@@ -1009,10 +1009,15 @@ def extractorsById(idOrList, library='jSymbolic'):
     from music21.features import jSymbolic
     from music21.features import native
 
-    if library.lower() in ['jsymbolic']:
-        featureExtractors = jSymbolic.featureExtractors
-    if library.lower() in ['native']:
-        featureExtractors = native.featureExtractors
+    if not common.isListLike(library):
+        library = [library]
+
+    featureExtractors = []
+    for l in library:
+        if l.lower() in ['jsymbolic']:
+            featureExtractors += jSymbolic.featureExtractors
+        elif l.lower() in ['native']:
+            featureExtractors += native.featureExtractors
 
     if not common.isListLike(idOrList):
         idOrList = [idOrList]
@@ -1100,7 +1105,7 @@ class Test(unittest.TestCase):
     def testDataSetOutput(self):
         from music21 import features
         # test just a few features
-        featureExtractors = features.extractorsById(['d1', 'd2', 'd3', 'd4'], 'native')
+        featureExtractors = features.extractorsById(['ql1', 'ql2', 'ql3', 'ql4'], 'native')
         
         # need to define what the class label will be
         ds = features.DataSet(classLabel='Composer')
