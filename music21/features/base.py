@@ -965,6 +965,8 @@ class DataSet(object):
 
 
 #-------------------------------------------------------------------------------
+# TODO: add all to get from both libraries
+
 def extractorsById(idOrList, library='jSymbolic'):
     '''Given one or more :class:`~music21.features.FeatureExtractor` ids, return the appropriate  subclass. An optional `library` argument can be added to define which module is used. Current options are jSymbolic and native.
 

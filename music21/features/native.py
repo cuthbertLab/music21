@@ -38,16 +38,33 @@ environLocal = environment.Environment(_MOD)
 # array of circle of fiths
 
 # lyrics
-# luca gloria: is common
+# luca gloria:
 # searching for numbers of hits
 # is vowel placed on strongest beat
 # wikifonia
+
+# idea of language specific
 
 # essen local
 # getting elevation
 
 # automatic key analysis
 # as a method of feature extraction
+
+
+# for monophonic melodies
+# incomplete measures / pickups for monophonic melodies
+
+# key detection on windowed segments
+# prevalence m/M over 4 bar windwows
+
+# chromatic alteration related to beat position
+
+
+# landini cadence
+# scales steps 7 / 7 / 6 / 1
+# antepenultimate note is half step below final
+
 
 
 
@@ -169,7 +186,8 @@ class MostCommonNoteQuarterLengthPrevelance(featuresModule.FeatureExtractor):
 
 
 class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
-    '''
+    '''Difference between the longest and shortest quarter lengths.
+
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.RangeOfNoteQuarterLengths(s)
@@ -198,7 +216,8 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
 # various ways of looking at chordify representation
 
 class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
-    '''
+    '''Number of unique pitch class simultaneities.
+
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.UniquePitchClassSetSimultaneities(s)
@@ -227,7 +246,8 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
 
 
 class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
-    '''
+    '''Number of unique set class simultaneities.
+
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.UniqueSetClassSimultaneities(s)
@@ -239,7 +259,7 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Unique Set Class Simultaneities'
-        self.description = 'Number of unique pitch class simultaneities.'
+        self.description = 'Number of unique set class simultaneities.'
         self.dimensions = 1
         self.discrete = False 
 
@@ -257,7 +277,8 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
 
 class MostCommonPitchClassSetSimultaneityPrevelance(
     featuresModule.FeatureExtractor):
-    '''
+    '''Fraction of all pitch class simultaneities that are the most common simultaneity.
+
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MostCommonPitchClassSetSimultaneityPrevelance(s)
@@ -289,7 +310,8 @@ class MostCommonPitchClassSetSimultaneityPrevelance(
 
 
 class MostCommonSetClassSimultaneityPrevelance(featuresModule.FeatureExtractor):
-    '''
+    '''Fraction of all set class simultaneities that are the most common simultaneity.
+
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MostCommonSetClassSimultaneityPrevelance(s)
@@ -325,7 +347,8 @@ class MostCommonSetClassSimultaneityPrevelance(featuresModule.FeatureExtractor):
 
 
 class MajorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
-    '''
+    '''Percentage of all simultaneities that are major triads.
+
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MajorTriadSimultaneityPrevelance(s)
@@ -354,7 +377,8 @@ class MajorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
 
 
 class MinorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
-    '''
+    '''Percentage of all simultaneities that are minor triads.
+
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MinorTriadSimultaneityPrevelance(s)
@@ -382,7 +406,8 @@ class MinorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
 
 
 class DominantSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
-    '''
+    '''Percentage of all simultaneities that are dominant seventh.
+
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.DominantSeventhSimultaneityPrevelance(s)
@@ -394,7 +419,7 @@ class DominantSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Dominant Seventh Simultaneity Prevelance'
-        self.description = 'Percentage of all simultaneities that are major triads.'
+        self.description = 'Percentage of all simultaneities that are dominant seventh.'
         self.dimensions = 1
         self.discrete = False 
 
@@ -410,7 +435,8 @@ class DominantSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
 
 
 class DiminishedTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
-    '''
+    '''Percentage of all simultaneities that are diminished triads.
+
     >>> from music21 import *
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DiminishedTriadSimultaneityPrevelance(s)
@@ -422,7 +448,7 @@ class DiminishedTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Diminished Triad Simultaneity Prevelance'
-        self.description = 'Percentage of all simultaneities that are major triads.'
+        self.description = 'Percentage of all simultaneities that are diminished triads.'
         self.dimensions = 1
         self.discrete = False 
 
@@ -474,7 +500,8 @@ class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
 
 
 class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
-    '''
+    '''Percentage of all simultaneities that are diminished seventh chords.
+
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.DiminishedSeventhSimultaneityPrevelance(s)
@@ -499,6 +526,15 @@ class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
         # using incomplete
         part = histo['isDiminishedSeventh']
         self._feature.vector[0] = part / float(total)
+
+
+
+
+
+
+
+
+
 
 
 featureExtractors = [
