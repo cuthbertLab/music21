@@ -37,7 +37,7 @@ def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = Fa
     returns a realizer.FiguredBass object
     
     >>> from music21 import *
-    >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 C1', '4/4')
+    >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
     >>> fb = figuredBass.realizer.figuredBassFromStreamPart(s)
     >>> fb.solve()
     >>> fb.showRandomSolutions(20)
@@ -65,6 +65,7 @@ def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = Fa
         ts = tsList[0]
     
     fb = FiguredBass(partList, str(ts), mykey.tonic, mykey.mode)
+    fb.addLyrics = False
     
     for n in sfn:
         if n.lyric != "" and n.lyric is not None:
@@ -73,6 +74,21 @@ def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = Fa
             fb.addElement(n)
     
     return fb
+
+def addLyricsToBassNote(bassNote, notationString):
+    n = notation.Notation(notationString)
+    if len(n.figureStrings) == 0:
+        return
+    maxLength = 0
+    for fs in n.figureStrings:
+        if len(fs) > maxLength:
+            maxLength = len(fs)
+    for fs in n.figureStrings:
+        spacesInFront = ''
+        for space in range(maxLength - len(fs)):
+            spacesInFront += ' '
+        bassNote.addLyric(spacesInFront + fs, applyRaw = True)
+
 
 class FiguredBass(object):
     def __init__(self, partList, timeSigString = '4/4', keyString = 'C', modeString = 'major'):
@@ -96,12 +112,16 @@ class FiguredBass(object):
         self.fbScale = realizerScale.FiguredBassScale(keyString, modeString)
         self.fbParts = partList
         self.fbRules = rules.Rules()
+        self.addLyrics = True
         
         #Contains fb solutions
+        self.isSolved = False
         self.allSegments = []
         self.lastSegment = None
         
     def addElement(self, bassNote, notationString = ''):
+        if self.addLyrics:
+            addLyricsToBassNote(bassNote, notationString)
         self.bassNotes.append(bassNote)
         self.bassLine.append(bassNote)
         self.figuredBassList.append((bassNote, notationString))
@@ -109,29 +129,30 @@ class FiguredBass(object):
     def solve(self):
         startTime = time.time()
         (startBass, startNotationString) = self.figuredBassList[0]
-        print("Finding starting possibilities for: " + str((startBass.pitch, startNotationString)))
+        #print("Finding starting possibilities for: " + str((startBass.pitch, startNotationString)))
         a1 = segment.StartSegment(self.fbScale, self.fbParts, self.fbRules, startBass, startNotationString)
         self.allSegments.append(a1)
         self.lastSegment = a1
             
         for fbIndex in range(1, len(self.figuredBassList)):
             (nextBass, nextNotationString) = self.figuredBassList[fbIndex]
-            print("Finding all possibilities for: " + str((nextBass.pitch, nextNotationString)))
+            #print("Finding all possibilities for: " + str((nextBass.pitch, nextNotationString)))
             c1 = segment.MiddleSegment(self.fbScale, self.fbParts, self.fbRules, self.lastSegment, nextBass, nextNotationString)
             self.allSegments.append(c1)
             self.lastSegment = c1
        
-        print("Trimming movements...")
+        #print("Trimming movements...")
         self.lastSegment.trimAllMovements()
         numSolutions = self.lastSegment.getNumSolutions()
         if numSolutions <= 200000:
             numberProgressions = self.getAllNumberProgressions()
-            print("Number of solutions, as calculated empirically: " + str(len(numberProgressions)) + ".")
-        print("Solving complete. Number of solutions, as calculated by path counting: " + str(numSolutions) + ".\n")
+            #print("Number of solutions, as calculated empirically: " + str(len(numberProgressions)) + ".")
+        #print("Solving complete. Number of solutions, as calculated by path counting: " + str(numSolutions) + ".\n")
         endTime = time.time()
         minutesElapsed = int((endTime - startTime) / 60)
         secondsElapsed = round((endTime - startTime) % 60)
-        print("Time elapsed: " + str(minutesElapsed) + " minutes " + str(secondsElapsed) + " seconds.")
+        #print("Time elapsed: " + str(minutesElapsed) + " minutes " + str(secondsElapsed) + " seconds.")
+        self.isSolved = True
                 
     def getAllNumberProgressions(self):
         if len(self.allSegments) <= 1:
