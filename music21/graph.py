@@ -571,7 +571,6 @@ class GraphNetworxGraph(Graph):
             font_family=self.fontFamily, font_color='#000000',
             ax=ax)
 
-
         #remove all labels
         self.setAxisLabel('y', '')
         self.setAxisLabel('x', '')
@@ -615,9 +614,8 @@ class GraphColorGrid(Graph):
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
-
-        plotShift = .08 # shift to make room for y axis label        
-        axTop = self.fig.add_subplot(1, 1, 1+plotShift)
+        self.fig.subplots_adjust(left=0.15)   
+        axTop = self.fig.add_subplot(1, 1, 1)
         # do not need grid for outer container
 
         # these approaches do not work:
@@ -642,8 +640,7 @@ class GraphColorGrid(Graph):
                 heights.append(1)
             
             # add a new subplot for each row    
-            ax = self.fig.add_subplot(rowCount, 1,
-                 len(self.data)-i+plotShift)
+            ax = self.fig.add_subplot(rowCount, 1, len(self.data)-i)
 
             # linewidth: .1 is the thinnest possible
             # antialiased = false, for small diagrams, provides tighter images
@@ -721,8 +718,7 @@ class GraphColorGridLegend(Graph):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
 
-        plotShift = 0        
-        axTop = self.fig.add_subplot(1, 1, 1+plotShift)
+        axTop = self.fig.add_subplot(1, 1, 1)
         
         for i in range(len(self.data)):
             rowLabel = self.data[i][0]
@@ -740,7 +736,7 @@ class GraphColorGridLegend(Graph):
                 heights.append(1)
             
             # add a new subplot for each row    
-            posTriple = (len(self.data), 1, i+1+plotShift)
+            posTriple = (len(self.data), 1, i+1)
             #environLocal.printDebug(['posTriple', posTriple])
             ax = self.fig.add_subplot(*posTriple)
             # 1 here is width
@@ -830,8 +826,8 @@ class GraphHorizontalBar(Graph):
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
-
-        ax = self.fig.add_subplot(1, 1, 1.1)
+        self.fig.subplots_adjust(left=0.15)   
+        ax = self.fig.add_subplot(1, 1, 1)
 
         yPos = 0
         xPoints = [] # store all to find min/max
@@ -916,7 +912,9 @@ class GraphScatterWeighted(Graph):
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
-        ax = self.fig.add_subplot(1, 1, 1.1)
+        # these need to be equal to maintain circle scatter points
+        self.fig.subplots_adjust(left=0.15, bottom=0.15)
+        ax = self.fig.add_subplot(1, 1, 1)
 
         # need to filter data to weight z values
         xList = [x for x, y, z in self.data]
@@ -1020,7 +1018,8 @@ class GraphScatter(Graph):
         '''
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
-        ax = self.fig.add_subplot(1, 1, 1.1)
+        self.fig.subplots_adjust(left=0.15)
+        ax = self.fig.add_subplot(1, 1, 1)
         xValues = []
         yValues = []
         i = 0
@@ -1072,8 +1071,8 @@ class GraphHistogram(Graph):
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
-        # added extra .1 in middle param to permit space on right 
-        ax = self.fig.add_subplot(1, 1.1, 1.05)
+        self.fig.subplots_adjust(left=0.15)
+        ax = self.fig.add_subplot(1, 1, 1)
 
         x = []
         y = []
@@ -4059,6 +4058,8 @@ class Test(unittest.TestCase):
 
         post = _getPlotsToMake('scatter', 'pc', 'offset')
         self.assertEqual(post, [PlotScatterPitchClassOffset])
+
+
 
 
 
