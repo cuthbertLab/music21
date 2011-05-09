@@ -1337,13 +1337,8 @@ class QualityFeature(featuresModule.FeatureExtractor):
     Set to 0 if the key signature indicates that 
     a recording is major, set to 1 if it indicates 
     that it is minor.  In jSymbolic, this is set to 0 if key signature is unknown. 
-    A Music21
-    addition: if no key mode is found in the piece, analyze the piece to
-    discover what mode it is most likely in.
 
-
-    Example: Mozart k155, mvmt 2 (musicxml) is explicitly encoded as being in Major:
-    
+    See features.native.QualityFeature for a music21 improvement on this method
 
     >>> from music21 import *
     >>> mozart155mvmt2 = corpus.parse('mozart/k155', 2)
@@ -1353,17 +1348,6 @@ class QualityFeature(featuresModule.FeatureExtractor):
     [0]
 
 
-    now we will try it with the last movement of Schoenberg's opus 19 which has
-    no mode explicitly encoded in the musicxml but which our analysis routines
-    believe (having very little to go on) fits the profile of e-minor best.  We
-    will also get the feature extractor by number this time:
-
-
-    >>> schoenberg19mvmt6= corpus.parse('schoenberg/opus19', 6)
-    >>> fe2 = features.jSymbolic.getExtractorByTypeAndNumber('P', 22)(schoenberg19mvmt6)
-    >>> f2 = fe2.extract()
-    >>> f2.vector
-    [1]
 
     '''
     id = 'P22'
@@ -1375,9 +1359,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
         self.description = '''
             Set to 0 if the key signature indicates that 
             a recording is major, set to 1 if it indicates 
-            that it is minor and set to 0 if key signature is unknown. Music21
-            addition: if no key mode is found in the piece, analyze the piece to
-            discover what mode it is most likely in.
+            that it is minor and set to 0 if key signature is unknown.
             '''
         self.isSequential = True
         self.dimensions = 1
@@ -1395,13 +1377,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
                 keyFeature = 1
                 break
         if keyFeature is None:
-            analyzedMode = self.data['flat.analyzedKey'].mode
-            if analyzedMode == 'major':
-                keyFeature = 0
-            elif analyzedMode == 'minor':
-                keyFeature = 1
-            else:
-                raise JSymbolicFeaturesException("should be able to get a mode from something here -- perhaps there are no notes?")
+            keyFeature = 0
 
         self._feature.vector[0] = keyFeature
         
@@ -2408,7 +2384,7 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
     >>> s1.append(note.Note())
     >>> fe = features.jSymbolic.NotePrevalenceOfPitchedInstrumentsFeature(s1)
     >>> fe.extract().vector
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.80000..., 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2000000..., 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.8..., 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2..., 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     '''
     id = 'I3'
@@ -2625,7 +2601,7 @@ class StringKeyboardFractionFeature(InstrumentFractionFeature):
     >>> s1.append(note.Note())
     >>> fe = features.jSymbolic.StringKeyboardFractionFeature(s1)
     >>> fe.extract().vector
-    [0.90000...]
+    [0.9...]
     '''
     id = 'I11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):

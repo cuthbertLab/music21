@@ -50,11 +50,91 @@ environLocal = environment.Environment(_MOD)
 
 # automatic key analysis
 # as a method of feature extraction
+class QualityFeature(featuresModule.FeatureExtractor):
+    '''
+    Extends the jSymbolic QualityFeature to automatically find mode
+    
+    Set to 0 if the key signature indicates that 
+    a recording is major, set to 1 if it indicates 
+    that it is minor.  A Music21
+    addition: if no key mode is found in the piece, analyze the piece to
+    discover what mode it is most likely in.
 
 
-# for monophonic melodies
-# incomplete measures / pickups for monophonic melodies
+    Example: Mozart k155, mvmt 2 (musicxml) is explicitly encoded as being in Major:
 
+    
+    >>> from music21 import *
+    >>> mozart155mvmt2 = corpus.parse('mozart/k155', 2)
+    >>> fe = features.native.QualityFeature(mozart155mvmt2)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0]
+
+
+    now we will try it with the last movement of Schoenberg's opus 19 which has
+    no mode explicitly encoded in the musicxml but which our analysis routines
+    believe (having very little to go on) fits the profile of e-minor best. 
+
+
+    >>> schoenberg19mvmt6= corpus.parse('schoenberg/opus19', 6)
+    >>> fe2 = features.native.QualityFeature(schoenberg19mvmt6)
+    >>> f2 = fe2.extract()
+    >>> f2.vector
+    [1]
+
+
+    OMIT_FROM_DOCS
+    
+    # for monophonic melodies
+    # incomplete measures / pickups for monophonic melodies
+
+    '''
+    id = 'P22'
+
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Quality'
+        self.description = '''
+            Set to 0 if the key signature indicates that 
+            a recording is major, set to 1 if it indicates 
+            that it is minor and set to 0 if key signature is unknown. Music21
+            addition: if no key mode is found in the piece, analyze the piece to
+            discover what mode it is most likely in.
+            '''
+        self.isSequential = True
+        self.dimensions = 1
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        allKeys = self.data['flat.getElementsByClass.KeySignature']
+        keyFeature = None
+        for x in allKeys:
+            if x.mode == 'major':
+                keyFeature = 0
+                break
+            elif x.mode == 'minor':
+                keyFeature = 1
+                break
+        if keyFeature is None:
+            analyzedMode = self.data['flat.analyzedKey'].mode
+            if analyzedMode == 'major':
+                keyFeature = 0
+            elif analyzedMode == 'minor':
+                keyFeature = 1
+            else:
+                raise NativeFeaturesException("should be able to get a mode from something here -- perhaps there are no notes?")
+
+        self._feature.vector[0] = keyFeature
+    
+    
+
+
+
+
+#=======
 # key detection on windowed segments
 # prevalence m/M over 4 bar windwows
 
@@ -528,17 +608,12 @@ class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
         part = histo['isDiminishedSeventh']
         self._feature.vector[0] = part / float(total)
 
-
-
-
-
-
-
-
-
-
+class NativeFeatureException(featuresModule.FeatureException):
+    pass
 
 featureExtractors = [
+QualityFeature, #p22
+
 UniqueNoteQuarterLengths, # d1
 MostCommonNoteQuarterLength, # d2
 MostCommonNoteQuarterLengthPrevelance, # d3
