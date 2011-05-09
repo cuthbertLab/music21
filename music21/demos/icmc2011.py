@@ -254,6 +254,10 @@ class Test(unittest.TestCase):
         sp2 = spanner.Slur([n5, n6])
         m4.insert(0, sp2)
         
+        # Elements can report on what Spanner the belong to
+        assert n1.getSpannerSites() == [sp1]
+        assert n6.getSpannerSites() == [sp2]
+
         p1Flat = p1.flat
         assert sp1.getDurationSpanBySite(p1Flat) == [0.0, 8.0]
         
@@ -264,7 +268,7 @@ class Test(unittest.TestCase):
         #==== "fig-df06" end
 
 
-        # additional tests tests
+        # additional tests 
         self.assertEqual(m1.clef, cf1)
 
 
@@ -747,10 +751,10 @@ if __name__ == "__main__":
         #t.testEx03()
         #t.testEx04()
 
-        #t.testStreams01()
+        t.testStreams01()
         #t.testStreams02()
 
-        t.testScales01()
+        #t.testScales01()
         #t.testScalesPy06()
 
 

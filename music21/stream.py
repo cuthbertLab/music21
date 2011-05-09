@@ -8785,7 +8785,7 @@ class SpannerStorage(Stream):
     '''
     For advanced use. This Stream subclass is used inside of a Spanner object to provide object storage.
 
-    This subclass name can be used to search an object's DefinedContexts and find any and all locations that are SpannerStorage objects.
+    This subclass name can be used to search in an object's DefinedContexts and find any and all locations that are SpannerStorage objects.
 
     A `spannerParent` keyword argument must be provided by the Spanner in creation. 
     '''

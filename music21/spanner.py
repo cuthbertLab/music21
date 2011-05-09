@@ -398,7 +398,7 @@ class Spanner(music21.Music21Object):
         # directly
         self._components = stream.SpannerStorage(spannerParent=self)
         # we do not want to auto sort based on offset or class, as 
-        # both are meaning less inside of this Stream (and only have meaning
+        # both are meaningless inside of this Stream (and only have meaning
         # in Stream external to this 
         self._components.autoSort = False
 
@@ -432,7 +432,7 @@ class Spanner(music21.Music21Object):
         return ''.join(msg)
 
     def __deepcopy__(self, memo=None):
-        '''This produces a new, independent object contain references to the same components.
+        '''This produces a new, independent object containing references to the same components.
 
         >>> from music21 import *
         >>> n1 = note.Note('g')

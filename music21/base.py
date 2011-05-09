@@ -1924,7 +1924,7 @@ class Music21Object(JSONSerializer):
         return post
 
     def getSpannerSites(self):
-        '''Return a list of all sites that are Spanner or Spanner subclasses. This provides a way for objects to be aware of what Spanners they reside in. Note that Spanners are not Stream subclasses, but Music21Objects that are composed with a specialized Stream subclass.
+        '''Return a list of all sites that are Spanner or Spanner subclasses. This provides a way for objects to be aware of what Spanners they reside in. Note that Spanners are not Stream subclasses, but Music21Objects that are composed with a specialized Stream subclass, SapnnerStroage
 
         >>> from music21 import *
         >>> n1 = note.Note()
