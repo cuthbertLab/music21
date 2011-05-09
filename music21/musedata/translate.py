@@ -544,6 +544,19 @@ class Test(unittest.TestCase):
 
         self.assertEqual([n.offset for n in s.parts[1].getElementsByClass('Measure')[0].notes], [1.0, 2.0, 3.0])
 
+    def testMuseDataStage1B(self):
+        from music21 import corpus
+        s = corpus.parse('k169', 3)
+        
+        self.assertEqual(len(s.parts), 4)
+        self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), '3/4')
+    
+        self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes], [0.0, 2.0])
+
+        self.assertEqual([n.nameWithOctave for n in s.parts[0].getElementsByClass('Measure')[0].notes], ['A4', 'B4'])
+
+        self.assertEqual([n.offset for n in s.parts[2].getElementsByClass('Measure')[0].notes], [0.0, 1.0, 2.0])
+
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)

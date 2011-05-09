@@ -50,6 +50,31 @@ from music21.corpus import handel
 from music21.corpus.handel import hwv56  
 
 from music21.corpus import haydn
+from music21.corpus.haydn import opus9no2
+from music21.corpus.haydn import opus9no3
+from music21.corpus.haydn import opus17no1
+from music21.corpus.haydn import opus17no2
+from music21.corpus.haydn import opus17no3
+from music21.corpus.haydn import opus17no5
+from music21.corpus.haydn import opus17no6
+from music21.corpus.haydn import opus20no1
+from music21.corpus.haydn import opus20no2
+from music21.corpus.haydn import opus20no4
+from music21.corpus.haydn import opus20no5
+from music21.corpus.haydn import opus20no6
+from music21.corpus.haydn import opus33no1
+from music21.corpus.haydn import opus33no2
+from music21.corpus.haydn import opus33no3
+from music21.corpus.haydn import opus33no4
+from music21.corpus.haydn import opus33no5
+from music21.corpus.haydn import opus33no6
+from music21.corpus.haydn import opus42
+from music21.corpus.haydn import opus50no1
+from music21.corpus.haydn import opus50no2
+from music21.corpus.haydn import opus50no3
+from music21.corpus.haydn import opus50no4
+from music21.corpus.haydn import opus50no5
+from music21.corpus.haydn import opus50no6
 from music21.corpus.haydn import opus54no2
 from music21.corpus.haydn import opus55no1
 from music21.corpus.haydn import opus55no3
@@ -68,14 +93,26 @@ from music21.corpus.mozart import k157
 from music21.corpus.mozart import k158
 from music21.corpus.mozart import k159
 from music21.corpus.mozart import k160
-# not yet added
 from music21.corpus.mozart import k168
 from music21.corpus.mozart import k169
 from music21.corpus.mozart import k170
 from music21.corpus.mozart import k171
 from music21.corpus.mozart import k172
+from music21.corpus.mozart import k173
+from music21.corpus.mozart import k285
+from music21.corpus.mozart import k298
 from music21.corpus.mozart import k370
+from music21.corpus.mozart import k387
+from music21.corpus.mozart import k421
+from music21.corpus.mozart import k428
 from music21.corpus.mozart import k458
+from music21.corpus.mozart import k464
+from music21.corpus.mozart import k465
+from music21.corpus.mozart import k499
+from music21.corpus.mozart import k546
+from music21.corpus.mozart import k575
+from music21.corpus.mozart import k589
+from music21.corpus.mozart import k590
 
 from music21.corpus import schoenberg
 from music21.corpus.schoenberg import opus19
@@ -155,6 +192,31 @@ MODULES = [
             hwv56,
 
             haydn,
+            opus9no2,
+            opus9no3,
+            opus17no1,
+            opus17no2,
+            opus17no3,
+            opus17no5,
+            opus17no6,
+            opus20no1,
+            opus20no2,
+            opus20no4,
+            opus20no5,
+            opus20no6,
+            opus33no1,
+            opus33no2,
+            opus33no3,
+            opus33no4,
+            opus33no5,
+            opus33no6,
+            opus42,
+            opus50no1,
+            opus50no2,
+            opus50no3,
+            opus50no4,
+            opus50no5,
+            opus50no6,
             opus54no2,
             opus55no1,
             opus55no3,
@@ -178,8 +240,21 @@ MODULES = [
             k170,
             k171,
             k172,
+            k173,
+            k285,
+            k298,
             k370,
+            k387,
+            k421,
+            k428,
             k458,
+            k464,
+            k465,
+            k499,
+            k546,
+            k575,
+            k589,
+            k590,
             
             schoenberg,
             opus19,
