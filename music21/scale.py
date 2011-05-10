@@ -2149,6 +2149,27 @@ class SieveScale(ConcreteScale):
 
 
 
+
+class ScalaScale(ConcreteScale):
+    '''A scale created from a Scala scale .scl file.
+
+    '''
+    def __init__(self, tonic=None, scalaString='2@0'):
+        ConcreteScale.__init__(self, tonic=tonic)
+
+        # TODO: read and parse a scala scale file
+        self._pitchSieve = sieve.PitchSieve(scalaString)
+        #environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
+        # mode here is a list of intervals
+        self._abstract = AbstractCyclicalScale(
+                         mode=self._pitchSieve.getIntervalSequence())
+        self.type = 'Scala'
+
+
+
+
+
+
 class RagAsawari(ConcreteScale):
     '''A concrete pseudo-raga scale. 
 
