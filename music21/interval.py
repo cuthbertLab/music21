@@ -987,6 +987,27 @@ class DiatonicInterval(music21.Music21Object):
         return ChromaticInterval(semitones)
 
 
+
+    def _getCents(self):
+        c = self.getChromatic()
+        return c.cents
+
+    cents = property(_getCents,
+        doc = '''Return a cents representation of this interval, always assuming equal an equal tempered presentation. 
+
+        >>> from music21 import *
+        >>> i = interval.DiatonicInterval('minor', 'second')
+        >>> i.niceName
+        'Minor Second'
+        >>> i.cents
+        100.0
+        ''')
+
+
+
+
+
+
 class ChromaticInterval(music21.Music21Object):
     '''
     Chromatic interval class. Unlike a Diatonic interval, this Interval 
@@ -1623,6 +1644,14 @@ class Interval(music21.Music21Object):
         400.0
         ''')
 
+
+    def diatonicIntervalCentShift(self):
+        '''Return the number of cents the diatonic interval needs to be shifted to correspond to microtonal value specified in the chromatic interval.
+        '''
+        dCents = self.diatonic.cents
+        cCents = self.chromatic.cents
+        return cCents - dCents
+        
 
     def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True, 
         maxAccidental=4):
@@ -2357,7 +2386,8 @@ class Test(unittest.TestCase):
 
 
     def testIntervalMicrotonesA(self):
-        from music21 import interval
+        from music21 import interval, pitch
+
         i = interval.Interval('m3')
         self.assertEqual(i.chromatic.cents, 300)
         self.assertEqual(i.cents, 300.0)
@@ -2373,6 +2403,32 @@ class Test(unittest.TestCase):
         i = interval.Interval(8.5)
         self.assertEqual(i.chromatic.cents, 850.0)
         self.assertEqual(i.cents, 850.0)
+
+
+        i = interval.Interval(5.25) # a sharp p4
+        self.assertEqual(i.cents, 525.0)
+        # we can subtract the two to get an offset
+        self.assertEqual(i.cents, 525.0)
+        self.assertEqual(str(i), '<music21.interval.Interval P4>')
+        self.assertEqual(i.diatonicIntervalCentShift(), 25)
+
+        i = interval.Interval(4.75) # a flat p4
+        self.assertEqual(str(i), '<music21.interval.Interval P4>')
+        self.assertEqual(i.diatonicIntervalCentShift(), -25)
+
+        i = interval.Interval(4.48) # a sharp M3
+        self.assertEqual(str(i), '<music21.interval.Interval M3>')
+        self.assertAlmostEqual(i.diatonicIntervalCentShift(), 48.0)
+
+        i = interval.Interval(4.5) # a sharp M3
+        self.assertEqual(str(i), '<music21.interval.Interval M3>')
+        self.assertAlmostEqual(i.diatonicIntervalCentShift(), 50.0)
+
+
+        i = interval.Interval(5.25) # a sharp p4
+        p1 = pitch.Pitch('c4')
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'F4(+25c)')
 
 
 #-------------------------------------------------------------------------------

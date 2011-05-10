@@ -354,6 +354,54 @@ def convertFqToPs(fq):
     return round(post, PITCH_SPACE_SIG_DIGITS)  
 
 
+
+def convertCentsToAlterAndCents(shift):
+    '''Given any floating point value, split into accidental and microtone components. 
+    
+    >>> from music21 import *
+    >>> pitch.convertCentsToAlterAndCents(125)
+    (1, 25.0)
+    >>> pitch.convertCentsToAlterAndCents(-75)
+    (-0.5, -25.0)
+    >>> pitch.convertCentsToAlterAndCents(-125)
+    (-1, -25.0)
+    >>> pitch.convertCentsToAlterAndCents(-200)
+    (-2, 0.0)
+    >>> pitch.convertCentsToAlterAndCents(235)
+    (2.5, -15.0)
+    '''
+    value = shift
+
+    alterAdd = 0
+    if value > 150:
+        while value > 100:
+            value -= 100
+            alterAdd += 1
+    elif value < -150:
+        while value < 100:
+            value += 100
+            alterAdd -= 1
+
+    if value < -75: 
+        alterShift = -1
+        cents = value + 100
+    elif value >= -75 and value < -25:
+        alterShift = -.5
+        cents = value + 50
+    elif value >= -25 and value <= 25:
+        alterShift = 0
+        cents = value
+    elif value > 25 and value <= 75:
+        alterShift = .5
+        cents = value - 50
+    elif value > 75: 
+        alterShift = 1
+        cents = value - 100
+    else:
+        raise Exception('value exceeded range: %s' % value)
+    return alterShift+alterAdd, float(cents)
+
+
 def convertHarmonicToCents(value):
     '''Given a harmonic number, return the total number shift in cents assuming 12 tone equal temperament. 
     
@@ -1237,8 +1285,14 @@ class Pitch(music21.Music21Object):
         return self._accidental
     
     def _setAccidental(self, value):
-        if (isinstance(value, basestring) or common.isNum(value)):
+        if isinstance(value, basestring):
             self._accidental = Accidental(value)
+        elif common.isNum(value):
+            # check and add any microtones
+            alter, cents = convertCentsToAlterAndCents(value*100.0)
+            self._accidental = Accidental(alter)
+            if abs(cents) > .001:
+                self._setMicrotone(cents)
         else: # assume an accidental object
             self._accidental = value
         self._pitchSpaceNeedsUpdating = True
@@ -1264,6 +1318,16 @@ class Pitch(music21.Music21Object):
         >>> b.accidental
         <accidental natural>
         
+        >>> b = pitch.Pitch('C4')
+        >>> b.accidental = 1.5
+        >>> b
+        C#4(+50c)
+        >>> b.accidental = 1.65
+        >>> b
+        C#~4(+15c)
+        >>> b.accidental = 1.95
+        >>> b
+        C##4(-5c)
         ''')
 
 
@@ -1286,8 +1350,8 @@ class Pitch(music21.Music21Object):
     
     microtone = property(_getMicrotone, _setMicrotone,
         doc='''
-        Stores an optional microtone object contained within the
-        Pitch object. This might return None.
+        Sets the microtone object contained within the
+        Pitch object. Microtones must be supplied in cents.
 
         >>> from music21 import *
         >>> p = pitch.Pitch('E4-')
@@ -1440,19 +1504,7 @@ class Pitch(music21.Music21Object):
             returnObj = copy.deepcopy(self)
 
         value = returnObj.microtone.cents
-
-        if value < -75: 
-            alterShift = -1
-            cents = value + 100
-        elif value < -25 and value > -75:
-            alterShift = -.5
-            cents = value + 50
-        elif value > 25 and value < 75:
-            alterShift = .5
-            cents = value - 50
-        elif value > 75: 
-            alterShift = 1
-            cents = value - 100
+        alterShift, cents = convertCentsToAlterAndCents(value)
 
         if returnObj.accidental is not None:
             returnObj.accidental = Accidental(
