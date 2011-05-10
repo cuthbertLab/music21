@@ -374,34 +374,43 @@ def convertGenericToSemitone(value):
     return st * directionScalar
     
 
-def convertSemitoneToSpecifierGeneric(count):
-    '''Given a number of semitones, return a default diatonic specifier.
+def convertSemitoneToSpecifierGenericMicrotone(count):
+    '''Given a number of semitones, return a default diatonic specifier and cent offset.
 
     >>> from music21 import *
-    >>> interval.convertSemitoneToSpecifierGeneric(0)
-    ('P', 1)
-    >>> interval.convertSemitoneToSpecifierGeneric(-2)
-    ('M', -2)
-    >>> interval.convertSemitoneToSpecifierGeneric(1)
-    ('m', 2)
-    >>> interval.convertSemitoneToSpecifierGeneric(7)
-    ('P', 5)
-    >>> interval.convertSemitoneToSpecifierGeneric(11)
-    ('M', 7)
-    >>> interval.convertSemitoneToSpecifierGeneric(12)
-    ('P', 8)
-    >>> interval.convertSemitoneToSpecifierGeneric(13)
-    ('m', 9)
-    >>> interval.convertSemitoneToSpecifierGeneric(-15)
-    ('m', -10)
-    >>> interval.convertSemitoneToSpecifierGeneric(24)
-    ('P', 15)
+
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(2.5)
+    ('M', 2, 50.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(2.25)
+    ('M', 2, 25.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(1.0)
+    ('m', 2, 0.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(1.75)
+    ('M', 2, -25.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(1.9)
+    ('M', 2, -10.0...)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(0.25)
+    ('P', 1, 25.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(12.25)
+    ('P', 8, 25.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(24.25)
+    ('P', 15, 25.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(23.75)
+    ('P', 15, -25.0)
     '''
     if count < 0: 
         dirScale = -1
     else:
         dirScale = 1
-    # use mod 13 here to get 12th value
+
+    count, micro = divmod(count, 1)
+    # convert micro to cents
+    cents = micro * 100.0
+    if cents > 50:
+        cents = cents - 100
+        count += 1
+
+    count = int(count)
     size = abs(count) % 12
     oct = abs(count) // 12 # let floor to int 
 
@@ -441,9 +450,44 @@ def convertSemitoneToSpecifierGeneric(count):
     elif size == 11:
         spec = 'M'
         generic = 7
+    else:
+        raise IntervalException('cannot match interval size: %s' % size)
 
-    return spec, (generic+(oct*7)) * dirScale
-    
+    return spec, (generic+(oct*7)) * dirScale, cents
+
+
+
+def convertSemitoneToSpecifierGeneric(count):
+    '''Given a number of semitones, return a default diatonic specifier.
+
+    >>> from music21 import *
+    >>> interval.convertSemitoneToSpecifierGeneric(0)
+    ('P', 1)
+    >>> interval.convertSemitoneToSpecifierGeneric(-2)
+    ('M', -2)
+    >>> interval.convertSemitoneToSpecifierGeneric(1)
+    ('m', 2)
+    >>> interval.convertSemitoneToSpecifierGeneric(7)
+    ('P', 5)
+    >>> interval.convertSemitoneToSpecifierGeneric(11)
+    ('M', 7)
+    >>> interval.convertSemitoneToSpecifierGeneric(12)
+    ('P', 8)
+    >>> interval.convertSemitoneToSpecifierGeneric(13)
+    ('m', 9)
+    >>> interval.convertSemitoneToSpecifierGeneric(-15)
+    ('m', -10)
+    >>> interval.convertSemitoneToSpecifierGeneric(24)
+    ('P', 15)
+    '''
+    # strip off microtone
+    return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
+
+
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -977,7 +1021,7 @@ class ChromaticInterval(music21.Music21Object):
         music21.Music21Object.__init__(self)
 
         self.semitones = value
-        self.cents = value * 100
+        self.cents = value * 100.0
         self.directed = value
         self.undirected = abs(value)
 
@@ -1081,6 +1125,7 @@ class ChromaticInterval(music21.Music21Object):
         <music21.interval.DiatonicInterval M7>
 
         '''
+        # ignoring microtone here
         specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
         return DiatonicInterval(specifier, generic)
     
@@ -1268,6 +1313,11 @@ def intervalFromGenericAndChromatic(gInt, cInt):
 
 
 #-------------------------------------------------------------------------------
+
+# store implicit diatonic if set from chromatic specification
+# if implicit, turing transpose, set to simplifyEnharmonic
+
+
 class Interval(music21.Music21Object):
     '''An Interval class that encapsulates both Chromatic and Diatonic intervals all in one model. 
 
@@ -1557,6 +1607,20 @@ class Interval(music21.Music21Object):
         >>> aInterval = interval.Interval('M3')
         >>> aInterval.intervalClass
         4
+        ''')
+
+
+
+    def _getCents(self):
+        return self.chromatic.cents
+
+    cents = property(_getCents,
+        doc = '''Return the cents from the chromatic interval.
+
+        >>> from music21 import *
+        >>> aInterval = interval.Interval('M3')
+        >>> aInterval.cents
+        400.0
         ''')
 
 
@@ -2290,24 +2354,40 @@ class Test(unittest.TestCase):
         self.assertEqual(collectAccidentalDisplayStatus(sTransposed), 
                         ['x', None, 'x', 'x', None, None, None, None, None, None, None, None, None, 'x', None, None, None, None, None, 'x', 'x', 'x', None, None, None])
 
+
+
+    def testIntervalMicrotonesA(self):
+        from music21 import interval
+        i = interval.Interval('m3')
+        self.assertEqual(i.chromatic.cents, 300)
+        self.assertEqual(i.cents, 300.0)
+
+        i = interval.Interval('p5')
+        self.assertEqual(i.chromatic.cents, 700)
+        self.assertEqual(i.cents, 700.0)
+
+        i = interval.Interval(8)
+        self.assertEqual(i.chromatic.cents, 800)
+        self.assertEqual(i.cents, 800.0)
+
+        i = interval.Interval(8.5)
+        self.assertEqual(i.chromatic.cents, 850.0)
+        self.assertEqual(i.cents, 850.0)
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [notesToChromatic, intervalsToDiatonic, intervalFromGenericAndChromatic, 
               Interval]
 
 
+
 if __name__ == "__main__":
-    import sys
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-
-        #t.testCreateIntervalFromPitch()
-
-        t.testTransposeImported()
 
 #------------------------------------------------------------------------------
 # eof
+
 
