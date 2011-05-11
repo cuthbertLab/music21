@@ -2211,7 +2211,7 @@ class SieveScale(ConcreteScale):
 
 
 class ScalaScale(ConcreteScale):
-    '''A scale created from a Scala scale .scl file.
+    '''A scale created from a Scala scale .scl file. Any file in the Scala archive can be given by name. Additionally, a file path to a Scala .scl file, or a raw string representation, can be used. 
 
     >>> sc = ScalaScale('g4', 'mbira banda')
     >>> sc.pitches
@@ -2229,17 +2229,19 @@ class ScalaScale(ConcreteScale):
             # if no match, this might be a complete Scala string
             self._scalaStorage = scala.ScalaStorage(scalaString)
             self._scalaStorage.parse()
-        else:
+        elif scalaString is not None:
             # try to load a named scale from a file path or stored
             # on the scala archive
             # returns None or a scala storage object
             self._scalaStorage = scala.parse(scalaString)
+        else: # grab a default
+            self._scalaStorage = scala.parse('fj-12test.scl')
 
-        if self._scalaStorage is not None:
-            self._abstract = AbstractCyclicalScale(
-                             mode=self._scalaStorage.getIntervalSequence())
-            self.type = 'Scala: %s' % self._scalaStorage.fileName
-            self.description = self._scalaStorage.description
+    
+        self._abstract = AbstractCyclicalScale(
+                         mode=self._scalaStorage.getIntervalSequence())
+        self.type = 'Scala: %s' % self._scalaStorage.fileName
+        self.description = self._scalaStorage.description
 
 
 
