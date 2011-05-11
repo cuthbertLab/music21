@@ -460,14 +460,15 @@ class Environment(object):
             environmentKey = None
             fpApp = None
 
-        fpApp = self.ref[environmentKey]
+        if environmentKey is not None:
+            fpApp = self.ref[environmentKey]
 
         # substitute app provided via argument
         if app is not None:
             fpApp = app 
 
         platform = common.getPlatform()
-        if fpApp is None and platform != 'win':
+        if fpApp is None and platform not in ['win', 'darwin']:
             raise EnvironmentException("Cannot find a valid application path for format %s. Specify this in your Environment by calling environment.set(%r, 'pathToApplication')" % (format, environmentKey))
         
         if platform == 'win' and fpApp is None:
@@ -475,6 +476,8 @@ class Environment(object):
             cmd = 'start %s' % (fp)
         elif platform == 'win':  # note extra set of quotes!
             cmd = '""%s" %s "%s""' % (fpApp, options, fp)
+        elif platform == 'darwin' and fpApp is None:
+            cmd = 'open %s %s' % (options, fp)
         elif platform == 'darwin':
             cmd = 'open -a"%s" %s %s' % (fpApp, options, fp)
         elif platform == 'nix':

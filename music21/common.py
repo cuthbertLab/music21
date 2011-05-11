@@ -44,6 +44,7 @@ fileExtensions = {
     'pdf'  : {'input': ['pdf'], 'output': 'pdf'},
     'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
     'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
+    'scala' : {'input': ['scl'], 'output': 'scl'},
 }
 
 
@@ -123,6 +124,8 @@ def findFormat(fmt):
     ('abc', '.abc')
     >>> findFormat('md')
     ('musedata', '.md')
+    >>> findFormat('scl')
+    ('scala', '.scl')
     '''
     # make lower case, as some lilypond processing used upper case
     fmt = fmt.lower().strip()

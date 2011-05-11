@@ -341,8 +341,8 @@ class AbstractScale(Scale):
         return copy.deepcopy(post)
 
 
-
-    def getScalaScale(self, direction=DIRECTION_ASCENDING):
+    #---------------------------------------------------------------------------
+    def getScalaStorage(self, direction=DIRECTION_ASCENDING):
         '''Get interval sequeeunce
         '''
         # get one octave of intervals
@@ -351,6 +351,33 @@ class AbstractScale(Scale):
         ss.description = self.__repr__()
         return ss
 
+    def write(self, fmt=None, fp=None, direction=DIRECTION_ASCENDING):
+        '''Write the scale in a format. Here, prepare scala format if requested.
+        '''
+        if fmt is not None:
+            format, ext = common.findFormat(fmt)
+            if fp is None:
+                fpLocal = environLocal.getTempFile(ext)
+            if format in ['scala']:
+                ss = self.getScalaStorage(direction=direction)
+                sf = scala.ScalaFile(ss) # pass storage to the file
+                sf.open(fpLocal, 'w')
+                sf.write()
+                sf.close()
+                return fpLocal
+        return Scale.write(self, fmt=fmt, fp=fp)
+
+
+    def show(self, fmt=None, app=None, direction=DIRECTION_ASCENDING):
+        '''Show the scale in a format. Here, prepare scala format if requested.
+        '''
+        if fmt is not None:
+            format, ext = common.findFormat(fmt)
+            if format in ['scala']:
+                returnedFilePath = self.write(format, direction=direction)
+                environLocal.launch(format, returnedFilePath, app=app)
+                return
+        Scale.show(self, fmt=fmt, app=app)
 
 
     def _getNetworkxGraph(self):
@@ -1564,13 +1591,34 @@ class ConcreteScale(Scale):
     # alternative outputs
 
 
-    def getScalaScale(self):
+    def getScalaStorage(self):
         '''Return a configured scale scale object
         '''
-        ss = self.abstract.getScalaScale()
+        ss = self.abstract.getScalaStorage()
         # customize with more specific representation
         ss.description = self.__repr__()
         return ss
+
+
+    def write(self, fmt=None, fp=None, direction=DIRECTION_ASCENDING):
+        '''Write the scale in a format. Here, prepare scala format if requested.
+        '''
+        if fmt is not None:
+            format, ext = common.findFormat(fmt)
+            if format in ['scala']:
+                return self.abstract.write(fmt=fmt, fp=fp, direction=direction)
+        return Scale.write(self, fmt=fmt, fp=fp)
+
+
+    def show(self, fmt=None, app=None, direction=DIRECTION_ASCENDING):
+        '''Show the scale in a format. Here, prepare scala format if requested.
+        '''
+        if fmt is not None:
+            format, ext = common.findFormat(fmt)
+            if format in ['scala']:
+                self.abstract.show(fmt=fmt, app=app, direction=direction)
+                return
+        Scale.show(self, fmt=fmt, app=app)
 
 
     def _getMusicXML(self):
@@ -2908,7 +2956,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testScalaScaleOutput(self):
         sc = MajorScale('c4')
-        ss = sc.getScalaScale()
+        ss = sc.getScalaStorage()
         self.assertEqual(ss.pitchCount, 7)
         msg = '''!
 <music21.scale.MajorScale C major>
