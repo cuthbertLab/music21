@@ -173,13 +173,17 @@ class GeneralNote(music21.Music21Object):
         # looking at private _components so as not to trigger
         # _updateComponents
 
-        if self.duration.quarterLength == 0 and len(self.duration._components) == 0:
+        if (self.duration.quarterLength == 0 and 
+            len(self.duration._components) == 0):
             self.duration.addDurationUnit(duration.DurationUnit('quarter'))
 
         self.lyrics = [] # a list of lyric objects
         self.expressions = []
         self.articulations = []
         self.editorial = editorial.NoteEditorial()
+
+        if "lyric" in keywords:
+            self.addLyric(keywords['lyric'])
 
         # note: Chord inherits this object, and thus has one Tie object
         # chords may need Tie objects for each pitch

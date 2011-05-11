@@ -2927,7 +2927,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testScalaScaleB(self):
         # test importing from scala archive
-        from music21 import scale
+        from music21 import scale, stream, meter, note
+
         sc = scale.ScalaScale('e2', 'fj 12tet')
         # this is showing that there are slight microtonal adjustments but they are less than one cent large
         self.assertEqual(str(sc.pitches), '[E2, F2(+0c), F#2(0c), G2(0c), A-2(+0c), G##2(-2c), B-2(+0c), B2(0c), C3(+1c), D-3(+0c), D3(+0c), D#3(-12c), E3]')
@@ -2941,19 +2942,31 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(str(sc.pitches), '[C2, D`2(+24c), D#2(-11c), F#2(-25c), F#2(+12c), G~2(+20c), B~2(-4c), A#2(-24c), E#3(-22c), D~3(+17c), F#~3(-2c), G#3(-13c), A3(+15c), C#~3(-24c), A3(+17c), B~3(-2c), C#~4(-22c), D~4(-4c), E~4(+10c), F#~4(-18c), G#4(+5c), B`4(+15c)]')
         #sc.show()
 
+        # two octave slendro scale
+        sc = scale.ScalaScale('c2', 'slendro_pliat')
+        self.assertEqual(str(sc.pitches), '[C2, D~2(-15c), E~2(+4c), G2(+5c), A~2(-23c), C3, D~3(-15c), E~3(+4c), G3(+5c), A~3(-23c)]')
+
+
         # 5 note slendro scale
-        sc = scale.ScalaScale('c2', 'slendro_ang')
-        self.assertEqual(str(sc.pitches), '[C2, D~2(-19c), E~2(+8c), F##2(-16c), A2(+23c), C3]')
+        sc = scale.ScalaScale('c2', 'slendro_ang2')
+        self.assertEqual(str(sc.pitches), '[C2, D#2(-22c), F~2(+19c), G~2(-10c), B`2(-8c), C3]')
 
         # 5 note slendro scale
         sc = scale.ScalaScale('c2', 'slendroc5.scl')
         self.assertEqual(str(sc.pitches), '[C2, D~2(-14c), E~2(+4c), G2(+5c), A~2(-22c), C3]')
 
+        s = stream.Stream()
+        s.append(meter.TimeSignature('6/4'))
 
-        # two octave slendro scale
-        sc = scale.ScalaScale('c2', 'slendro_pliat')
-        self.assertEqual(str(sc.pitches), '[C2, D~2(-15c), E~2(+4c), G2(+5c), A~2(-23c), C3, D~3(-15c), E~3(+4c), G3(+5c), A~3(-23c)]')
-
+        sc1 = scale.ScalaScale('c2', 'slendro_ang2')
+        sc2 = scale.ScalaScale('c2', 'slendroc5.scl')
+        p1 = stream.Part()
+        p1.append([note.Note(p, lyric=p.microtone) for p in sc1.pitches])
+        p2 = stream.Part()
+        p2.append([note.Note(p, lyric=p.microtone) for p in sc2.pitches])
+        s.insert(0, p1)
+        s.insert(0, p2)
+        #s.show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
