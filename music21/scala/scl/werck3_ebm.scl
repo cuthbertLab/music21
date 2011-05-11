@@ -1,0 +1,20 @@
+! werck3_ebm.scl
+!
+Harmonic equal-beating meta-version of Werckmeister III by Jacques Dudon (2006)
+ 12
+!
+ 256/243
+ 21995/19683
+ 32/27
+ 2740/2187
+ 4/3
+ 1024/729
+ 9808/6561
+ 128/81
+ 10960/6561
+ 16/9
+ 1370/729
+ 2/1
+! achieved with Comptine recurrent sequence x^3 = (3/5)x^2 + 2
+! (x = 1.494929263  or 696.09266484 c.), Dudon 2006
+! triple equal-beating property : 3A - 5C = 4E - 5C = 3D - 2A

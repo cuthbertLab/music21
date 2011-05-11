@@ -1,0 +1,18 @@
+! ckring9.scl
+!
+Double-tie circular mirroring with common pivot of 3:5:7:9
+ 13
+!
+ 10/9
+ 7/6
+ 6/5
+ 9/7
+ 4/3
+ 7/5
+ 10/7
+ 3/2
+ 14/9
+ 5/3
+ 12/7
+ 9/5
+ 2/1

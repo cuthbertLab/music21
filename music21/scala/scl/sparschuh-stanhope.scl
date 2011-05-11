@@ -1,0 +1,16 @@
+! sparschuh-stanhope.scl
+Sparschuh's (2010) septenarian variant of Stanhopes (1806) idea
+12
+!
+1394/1323 ! C# (256/243) * (6273/6272 ~+0.276...Cents sharper )
+494/441   ! D  (10/9) * (247/245 ~+14.075...Cents sharper )
+32/27     ! Eb 2^5/3^3 Pythagorean minor-3rd
+5/4       ! E
+4/3       ! F
+620/441   ! F# (45/32) * (3968/3969 ~-0.436...Cents flattend )
+3/2       ! G
+697//441  ! G# (128/81) * (6273/6272  ~+0.276...Cents sharper )
+82/49     ! A (5/3) * (246/245 ~+7.052...Cents sharper )
+16/9      ! Bb
+15/8      ! B
+2/1

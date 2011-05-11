@@ -1,0 +1,17 @@
+! farey12_116.scl
+!
+Common denominator=116 Farey approximation to 12-tET, well-temperament
+ 12
+!
+ 123/116
+ 65/58
+ 69/58
+ 73/58
+ 155/116
+ 41/29
+ 3/2
+ 46/29
+ 195/116
+ 207/116
+ 219/116
+ 2/1

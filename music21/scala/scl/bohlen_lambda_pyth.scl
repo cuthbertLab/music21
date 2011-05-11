@@ -1,0 +1,14 @@
+! bohlen_lambda_pyth.scl
+!
+Dave Benson's BP-Pythagorean scale, lambda mode of bohlen_pyth.scl
+ 9
+!
+ 19683/16807
+ 9/7
+ 343/243
+ 81/49
+ 49/27
+ 729/343
+ 7/3
+ 6561/2401
+ 3/1

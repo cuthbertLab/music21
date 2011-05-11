@@ -1,0 +1,16 @@
+! septenariusGG49.scl
+Sparschuh's version @ middle-c'=262Hz or a'=440Hz
+12
+!absolute pitches relativ to c=131 Hz
+555/524 ! c# 138.75 Hz
+147/131 ! d 
+156/131 ! eb
+165/131 ! e 
+175/131 ! f
+185/131 ! f#
+196/131 ! g
+208/131 ! g#
+220/131 ! a 440Hz/2
+234/131 ! bb
+247/131 ! b
+2/1

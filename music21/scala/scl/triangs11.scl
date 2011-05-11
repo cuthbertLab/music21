@@ -1,0 +1,15 @@
+! triangs11.scl
+!
+The first 11 terms of the triangular number series, octave reduced
+ 10
+!
+ 33/32
+ 9/8
+ 5/4
+ 21/16
+ 45/32
+ 3/2
+ 55/32
+ 7/4
+ 15/8
+ 2/1

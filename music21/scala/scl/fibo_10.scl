@@ -1,0 +1,15 @@
+! fibo_10.scl
+!
+First 13 Fibonacci numbers reduced by 2/1
+ 10
+!
+ 17/16
+ 9/8
+ 5/4
+ 21/16
+ 89/64
+ 3/2
+ 13/8
+ 55/32
+ 233/128
+ 2/1

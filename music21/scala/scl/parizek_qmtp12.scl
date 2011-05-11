@@ -1,0 +1,17 @@
+! parizek_qmtp12.scl
+!
+12-tone quasi-meantone tuning with 1/9 Pyth. comma as basic tempering unit (F...A#)
+ 12
+!
+ 77.19166
+ 196.09000
+ 268.06832
+ 8192/6561
+ 505.86500
+ 583.05666
+ 699.34833
+ 771.32665
+ 890.22500
+ 967.41665
+ 1083.70833
+ 2/1
