@@ -95,8 +95,10 @@ class ScalaPitch(object):
 
 
 
-class ScalaScale(object):
+class ScalaStorage(object):
     '''Object representation of data stored in a Scale scale file.
+
+    This is not called ScalaScale, as this name clashes with the scale.Scale that uses this object
     '''
     def __init__(self, sourceString=None, fileName=None):
         self.src = sourceString
@@ -177,6 +179,19 @@ class ScalaScale(object):
             post.append(interval.Interval(c*.01))
         return post
 
+    def setIntervalSequence(self, iList):
+        '''Set the scale from a list of Interval objects.
+        '''
+        self.pitchValues = []
+        location = 0
+        for i in iList:
+            # convert cent values to semitone values to create intervals
+            sp = ScalaPitch()
+            sp.cents = location + i.cents
+            location = sp.cents
+            self.pitchValues.append(sp)
+        self.noteCount = len(self.pitchValues)
+
     def getFileString(self):
         '''Return a string suitable for writing a Scale file
         '''
@@ -251,7 +266,7 @@ class ScalaFile(object):
     def readstr(self, strSrc): 
         '''Read a string and process all Tokens. Returns a ABCHandler instance.
         '''
-        ss = ScalaScale(strSrc, self.fileName)
+        ss = ScalaStorage(strSrc, self.fileName)
         ss.parse()
         self.data = ss
         return ss
@@ -261,7 +276,7 @@ class ScalaFile(object):
         self.file.write(ws) 
     
     def writestr(self): 
-        if isinstance(self.data, ScalaScale):
+        if isinstance(self.data, ScalaStorage):
             return self.data.getFileString()
         # handle Scale or other objects
         
@@ -299,7 +314,7 @@ A slendro type pentatonic which is based on intervals of 7, no. 2
  7/4
  2/1
 '''
-        ss = ScalaScale(msg)
+        ss = ScalaStorage(msg)
         ss.parse()
         self.assertEqual(ss.noteCount, 5)
         self.assertEqual(ss.fileName, 'slendro5_2.scl')
@@ -332,7 +347,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 2/1
 
 '''
-        ss = ScalaScale(msg)
+        ss = ScalaStorage(msg)
         ss.parse()
         self.assertEqual(ss.noteCount, 12)
         self.assertEqual(ss.fileName, 'fj-12tet.scl')
@@ -346,7 +361,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
 
         # test loading a new scala object from adjacent sets
-        ss2 = ScalaScale()
+        ss2 = ScalaStorage()
         ss2.setAdjacentCents(ss.getAdjacentCents())
         
         self.assertEqual([str(x) for x in ss2.getCentsAboveTonic()], ['100.099209825', '199.979843291', '299.97390361', '400.10848047', '498.044999135', '600.088323762', '699.997698171', '800.909593096', '900.02609639', '1000.02015671', '1088.26871473', '1200.0'])

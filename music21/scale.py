@@ -242,6 +242,22 @@ class AbstractScale(Scale):
         return copy.deepcopy(post)
 
 
+    def getIntervals(self, stepOfPitch=None,      
+         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING, reverse=False):
+        '''Realize the abstract scale as a list of pitch objects, given a pitch object, the step of that pitch object, and a min and max pitch.
+        '''
+        if self._net is None:
+            raise ScaleException('no network is defined.')
+
+        post = self._net.realizeIntervals(stepOfPitch, 
+            minPitch=minPitch, maxPitch=maxPitch,
+            alteredDegrees=self._alteredDegrees, direction=direction,
+            reverse=reverse)
+        # here, we copy the list of pitches so as not to allow editing of 
+        # cached pitch values later
+        return post
+
+
     def getPitchFromNodeDegree(self, pitchReference, nodeName, nodeDegreeTarget, 
             direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None,
             equateTermini=True):
@@ -323,6 +339,17 @@ class AbstractScale(Scale):
             alteredDegrees=self._alteredDegrees
             )
         return copy.deepcopy(post)
+
+
+
+    def getScalaScale(self, direction=DIRECTION_ASCENDING):
+        '''Get interval sequeeunce
+        '''
+        # get one octave of intervals
+        ss = scala.ScalaStorage()
+        ss.setIntervalSequence(self.getIntervals(direction=direction))
+        ss.description = self.__repr__()
+        return ss
 
 
 
@@ -931,7 +958,6 @@ class ConcreteScale(Scale):
         Scale.__init__(self)
 
         self.type = 'Concrete'
-
         # store an instance of an abstract scale
         # subclasses might use multiple abstract scales?
         self._abstract = None
@@ -1045,31 +1071,6 @@ class ConcreteScale(Scale):
 
     def __repr__(self):
         return '<music21.scale.%s %s %s>' % (self.__class__.__name__, self._tonic.name, self.type)
-
-    def _getMusicXML(self):
-        '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
-
-        >>> from music21 import *
-        '''
-        from music21 import stream, note
-        m = stream.Measure()
-        for i in range(1, self._abstract.getDegreeMaxUnique()+1):
-            p = self.pitchFromDegree(i)
-            n = note.Note()
-            n.pitch = p
-            if i == 1:
-                n.addLyric(self.name)
-            if p.name == self.getTonic().name:
-                n.quarterLength = 4 # set longer
-            else:
-                n.quarterLength = 1
-            m.append(n)
-        m.timeSignature = m.bestTimeSignature()
-        return musicxmlTranslate.measureToMusicXML(m)
-
-    musicxml = property(_getMusicXML, 
-        doc = '''Return a complete musicxml representation.
-        ''')    
 
 
     #---------------------------------------------------------------------------
@@ -1559,11 +1560,21 @@ class ConcreteScale(Scale):
         return self.__class__(tonic=p)
 
 
-
-
     #---------------------------------------------------------------------------
+    # alternative outputs
+
+
+    def getScalaScale(self):
+        '''Return a configured scale scale object
+        '''
+        ss = self.abstract.getScalaScale()
+        # customize with more specific representation
+        ss.description = self.__repr__()
+        return ss
+
+
     def _getMusicXML(self):
-        '''Return a complete musicxml representation as an xml string.
+        '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
 
         >>> from music21 import *
         '''
@@ -2159,8 +2170,9 @@ class ScalaScale(ConcreteScale):
         ConcreteScale.__init__(self, tonic=tonic)
 
         # TODO: try to load a named scale sale from the corpus
-        self._scalaScale = scala.ScalaScale(scalaString)
-        self._scalaScale.parse()
+        self._scalaScale = scala.ScalaStorage(scalaString)
+        if scalaString is not None:
+            self._scalaScale.parse()
 
         #environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
         # mode here is a list of intervals
@@ -2881,6 +2893,25 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(str(sc.getPitches('c2', 'c4')), '[C2(+0c), C#2(+0c), C##2(0c), D#2(0c), E2(+0c), E#2(-2c), F#2(+0c), F##2(0c), G#2(+1c), A2(+0c), B-2(+0c), B2(-12c), C3(+0c), C#3(+0c), C##3(0c), D#3(0c), E3(+0c), E#3(-2c), F#3(+0c), F##3(0c), G#3(+1c), A3(+0c), B-3(+0c), B3(-12c), C4]')
 
 
+
+    def testScalaScaleOutput(self):
+        sc = MajorScale('c4')
+        ss = sc.getScalaScale()
+        self.assertEqual(ss.noteCount, 7)
+        msg = '''!
+<music21.scale.MajorScale C major>
+7
+!
+200.0
+400.0
+500.0
+700.0
+900.0
+1100.0
+1200.0
+'''
+        self.assertEqual(ss.getFileString(), msg)
+        
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [ConcreteScale, AbstractScale]

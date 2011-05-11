@@ -1687,6 +1687,40 @@ class BoundIntervalNetwork(IntervalNetwork):
         return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredDegrees=alteredDegrees, reverse=reverse)[0] # just return first component
 
 
+
+
+    def realizeIntervals(self, nodeId=None, minPitch=None,
+        maxPitch=None, direction=DIRECTION_ASCENDING, alteredDegrees={}, 
+        reverse=False):
+        '''Realize the sequence of intervals between the specified pitches, or the termini. 
+
+        >>> from music21 import *
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = BoundIntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.realizeIntervals()
+        [<music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>]
+        '''
+        # note: there may be a more efficient way to do this, but we still
+        # need to realize the intervals due to probabilistic selection
+
+        # provide an arbitrary pitch refernece
+        pitchReference = 'c4'
+
+        pList = self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredDegrees=alteredDegrees, reverse=reverse)[0] # just return first component
+
+        iList = []
+        for i, p1 in enumerate(pList):
+            if i < len(pList) - 1:
+                p2 = pList[i+1]
+                iList.append(interval.Interval(p1, p2))
+        return iList
+
+
+            
+
+
+
     def realizeTermini(self, pitchReference, nodeId=None, alteredDegrees={}):
         '''Realize the pithches of the 'natural' terminus of a network. This (presently) must be done by ascending, and assumes only one valid terminus for both extremes. 
 
