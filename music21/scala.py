@@ -27,6 +27,8 @@ except:
 import music21 
 
 from music21 import common
+from music21 import interval
+
 from music21 import environment
 _MOD = "pitch.py"
 environLocal = environment.Environment(_MOD)
@@ -108,7 +110,6 @@ class ScalaScale(object):
         self.noteCount = None # number of lines w/ pitch values will follow        
         self.pitchValues = []
 
-
     def parse(self):
         '''Parse a scala file delivered as a long string with line breaks
         '''
@@ -166,6 +167,15 @@ class ScalaScale(object):
             self.pitchValues.append(sp)
         self.noteCount = len(self.pitchValues)
 
+
+    def getIntervalSequence(self):
+        '''Get the scale as a list of Interval objects.
+        '''
+        post = []
+        for c in self.getAdjacentCents():
+            # convert cent values to semitone values to create intervals
+            post.append(interval.Interval(c*.01))
+        return post
 
     def getFileString(self):
         '''Return a string suitable for writing a Scale file
@@ -300,6 +310,7 @@ A slendro type pentatonic which is based on intervals of 7, no. 2
         # sent values between scale degrees
         self.assertEqual([str(x) for x in ss.getAdjacentCents()], ['266.870905604', '231.174093531', '203.910001731', '266.870905604', '231.174093531'] )
 
+        self.assertEqual([str(x) for x in ss.getIntervalSequence()], ['<music21.interval.Interval m3 (-33c)>', '<music21.interval.Interval M2 (+31c)>', '<music21.interval.Interval M2 (+4c)>', '<music21.interval.Interval m3 (-33c)>', '<music21.interval.Interval M2 (+31c)>'])
 
     def testScalaScaleB(self):
         msg = '''! fj-12tet.scl
@@ -331,6 +342,9 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         self.assertEqual([str(x) for x in ss.getAdjacentCents()], ['100.099209825', '99.8806334662', '99.9940603187', '100.13457686', '97.9365186644', '102.043324627', '99.9093744091', '100.911894925', '99.1165032942', '99.9940603187', '88.2485580216', '111.73128527'])
 
+        self.assertEqual([str(x) for x in ss.getIntervalSequence()], ['<music21.interval.Interval m2 (+0c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (+0c)>', '<music21.interval.Interval m2 (-2c)>', '<music21.interval.Interval m2 (+2c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (+1c)>', '<music21.interval.Interval m2 (-1c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (-12c)>', '<music21.interval.Interval m2 (+12c)>'])
+
+
         # test loading a new scala object from adjacent sets
         ss2 = ScalaScale()
         ss2.setAdjacentCents(ss.getAdjacentCents())
@@ -361,8 +375,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
         #print ss.getFileString()
         self.assertEqual(ss.getFileString()[:1], msg[:1])
 
-
-
+        self.assertEqual([str(x) for x in ss.getIntervalSequence()], ['<music21.interval.Interval P1 (+50c)>', '<music21.interval.Interval m2 (+50c)>', '<music21.interval.Interval m3>', '<music21.interval.Interval M2>', '<music21.interval.Interval P1 (+50c)>', '<music21.interval.Interval m2 (+50c)>', '<music21.interval.Interval m3>'])
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

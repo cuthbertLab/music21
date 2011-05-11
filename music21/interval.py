@@ -1235,16 +1235,16 @@ def notesToChromatic(n1, n2):
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g#5')
     >>> notesToChromatic(aNote, bNote)
-    <music21.interval.ChromaticInterval 20>
+    <music21.interval.ChromaticInterval 20.0>
 
     >>> aPitch = pitch.Pitch('c#4')
     >>> bPitch = pitch.Pitch('f-5')
     >>> bInterval = notesToChromatic(aPitch, bPitch)
     >>> bInterval
-    <music21.interval.ChromaticInterval 15>
+    <music21.interval.ChromaticInterval 15.0>
 
     '''
-    return ChromaticInterval(int(n2.ps - n1.ps))
+    return ChromaticInterval(n2.ps - n1.ps)
 
 
 def _getSpecifierFromGenericChromatic(gInt, cInt):
@@ -1276,20 +1276,24 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
     
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
-    if gInt.direction != cInt.direction and gInt.direction != OBLIQUE and cInt.direction != OBLIQUE:
-        ## intervals like d2 and dd2 etc. (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
+
+    if (gInt.direction != cInt.direction and 
+        gInt.direction != OBLIQUE and cInt.direction != OBLIQUE):
+        # intervals like d2 and dd2 etc. (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
         theseSemis = -1 * cInt.undirected
     else:
-        ## all normal intervals
+        # all normal intervals
         theseSemis  = cInt.undirected
+    # round out microtones
+    semisRounded = int(round(theseSemis))
     if gInt.perfectable:
         try:
-            specifier = perfSpecifiers[perfOffset + theseSemis - normalSemis]
+            specifier = perfSpecifiers[perfOffset + semisRounded - normalSemis]
         except IndexError:
             raise IntervalException("cannot get a specifier for a note with this many semitones off of Perfect: " + str(theseSemis - normalSemis))
     else:
         try:
-            specifier = specifiers[majOffset + theseSemis - normalSemis]
+            specifier = specifiers[majOffset + semisRounded - normalSemis]
         except IndexError:
             raise IntervalException("cannot get a specifier for a note with this many semitones off of Major: " + str(theseSemis - normalSemis))
 
@@ -1556,7 +1560,13 @@ class Interval(music21.Music21Object):
             self.isStep = self.isChromaticStep or self.isDiatonicStep
 
     def __repr__(self):
-        return "<music21.interval.Interval %s>" % self.directedName
+        from music21 import pitch
+        shift = self._diatonicIntervalCentShift()
+        if shift != 0:
+            micro = pitch.Microtone(shift)
+            return "<music21.interval.Interval %s %s>" % (self.directedName, micro)
+        else:
+            return "<music21.interval.Interval %s>" % self.directedName
 
     def __eq__(self, other):
         '''
@@ -1645,13 +1655,12 @@ class Interval(music21.Music21Object):
         ''')
 
 
-    def diatonicIntervalCentShift(self):
+    def _diatonicIntervalCentShift(self):
         '''Return the number of cents the diatonic interval needs to be shifted to correspond to microtonal value specified in the chromatic interval.
         '''
         dCents = self.diatonic.cents
         cCents = self.chromatic.cents
         return cCents - dCents
-        
 
     def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True, 
         maxAccidental=4):
@@ -1681,6 +1690,7 @@ class Interval(music21.Music21Object):
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
         oldDiatonicNum = pitch1.diatonicNoteNum
+        centsOrigin = pitch1.microtone.cents
         distanceToMove = self.diatonic.generic.staffDistance
 
         if not reverse:
@@ -1692,15 +1702,19 @@ class Interval(music21.Music21Object):
         pitch2.step = newStep
         pitch2.octave = newOctave
         pitch2.accidental = None
+        pitch2.microtone = None
 
         # have right note name but not accidental
         interval2 = notesToInterval(pitch1, pitch2)
+        # halfStepsToFix already has any microtones
         if not reverse:
             halfStepsToFix = (self.chromatic.semitones -
                           interval2.chromatic.semitones)
         else:
             halfStepsToFix = (-self.chromatic.semitones -
                           interval2.chromatic.semitones)
+
+        #environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix, 'centsOrigin', centsOrigin, 'interval2', interval2])
 
         if halfStepsToFix != 0:
             while halfStepsToFix >= 12:
@@ -2130,7 +2144,7 @@ def subtract(intervalList):
     >>> a.niceName
     'Augmented Unison'
     >>> a.chromatic.semitones
-    -1
+    -1.0
     
     
     BUG: should be Descending Augmented Unison, currently giving Oblique Augmented Unison ! AARGH
@@ -2409,26 +2423,96 @@ class Test(unittest.TestCase):
         self.assertEqual(i.cents, 525.0)
         # we can subtract the two to get an offset
         self.assertEqual(i.cents, 525.0)
-        self.assertEqual(str(i), '<music21.interval.Interval P4>')
-        self.assertEqual(i.diatonicIntervalCentShift(), 25)
+        self.assertEqual(str(i), '<music21.interval.Interval P4 (+25c)>')
+        self.assertEqual(i._diatonicIntervalCentShift(), 25)
 
         i = interval.Interval(4.75) # a flat p4
-        self.assertEqual(str(i), '<music21.interval.Interval P4>')
-        self.assertEqual(i.diatonicIntervalCentShift(), -25)
+        self.assertEqual(str(i), '<music21.interval.Interval P4 (-25c)>')
+        self.assertEqual(i._diatonicIntervalCentShift(), -25)
 
         i = interval.Interval(4.48) # a sharp M3
-        self.assertEqual(str(i), '<music21.interval.Interval M3>')
-        self.assertAlmostEqual(i.diatonicIntervalCentShift(), 48.0)
+        self.assertEqual(str(i), '<music21.interval.Interval M3 (+48c)>')
+        self.assertAlmostEqual(i._diatonicIntervalCentShift(), 48.0)
 
         i = interval.Interval(4.5) # a sharp M3
-        self.assertEqual(str(i), '<music21.interval.Interval M3>')
-        self.assertAlmostEqual(i.diatonicIntervalCentShift(), 50.0)
+        self.assertEqual(str(i), '<music21.interval.Interval M3 (+50c)>')
+        self.assertAlmostEqual(i._diatonicIntervalCentShift(), 50.0)
 
 
         i = interval.Interval(5.25) # a sharp p4
         p1 = pitch.Pitch('c4')
         p2 = i.transposePitch(p1)
         self.assertEqual(str(p2), 'F4(+25c)')
+
+        i = interval.Interval(5.80) # a sharp p4
+        p1 = pitch.Pitch('c4')
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'G-4(-20c)')
+
+        i = interval.Interval(6.00) # a sharp p4
+        p1 = pitch.Pitch('c4')
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'G-4')
+
+
+        i = interval.Interval(5) # a sharp p4
+        p1 = pitch.Pitch('c4')
+        p1.microtone = 10 #c+20
+        self.assertEqual(str(p1), 'C4(+10c)')
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'F4(+10c)')
+
+        i = interval.Interval(7.20) # a sharp p4
+        p1 = pitch.Pitch('c4')
+        p1.microtone = -20 #c+20
+        self.assertEqual(str(p1), 'C4(-20c)')
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'G4')
+
+
+        i = interval.Interval(7.20) # a sharp p4
+        p1 = pitch.Pitch('c4')
+        p1.microtone = 80 #c+20
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'G#4')
+
+
+        i = interval.Interval(0.20) # a sharp p4
+        p1 = pitch.Pitch('e4')
+        p1.microtone = 10
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'E~4(-20c)')
+
+
+        i = interval.Interval(0.05) # a sharp p4
+        p1 = pitch.Pitch('e4')
+        p1.microtone = 5 
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'E4(+10c)')
+
+
+        i = interval.Interval(12.05) # a sharp p4
+        p1 = pitch.Pitch('e4')
+        p1.microtone = 5 
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'E5(+10c)')
+
+
+        i = interval.Interval(11.85) # a sharp p4
+        p1 = pitch.Pitch('e4')
+        p1.microtone = 5 
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'E5(-10c)')
+
+
+        i = interval.Interval(11.85) # a sharp p4
+        p1 = pitch.Pitch('e4')
+        p1.microtone = -20
+        p2 = i.transposePitch(p1)
+        self.assertEqual(str(p2), 'E`5(+15c)')
+
+
+
 
 
 #-------------------------------------------------------------------------------

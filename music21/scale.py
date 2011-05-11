@@ -60,6 +60,7 @@ from music21 import pitch
 from music21 import interval
 from music21 import intervalNetwork
 from music21 import sieve
+from music21 import scala
 
 from music21.musicxml import translate as musicxmlTranslate
 
@@ -2154,16 +2155,18 @@ class ScalaScale(ConcreteScale):
     '''A scale created from a Scala scale .scl file.
 
     '''
-    def __init__(self, tonic=None, scalaString='2@0'):
+    def __init__(self, tonic=None, scalaString=None):
         ConcreteScale.__init__(self, tonic=tonic)
 
-        # TODO: read and parse a scala scale file
-        self._pitchSieve = sieve.PitchSieve(scalaString)
+        # TODO: try to load a named scale sale from the corpus
+        self._scalaScale = scala.ScalaScale(scalaString)
+        self._scalaScale.parse()
+
         #environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
         # mode here is a list of intervals
         self._abstract = AbstractCyclicalScale(
-                         mode=self._pitchSieve.getIntervalSequence())
-        self.type = 'Scala'
+                         mode=self._scalaScale.getIntervalSequence())
+        self.type = 'Scala: %s' % self._scalaScale.fileName
 
 
 
@@ -2849,6 +2852,34 @@ class Test(unittest.TestCase):
             if post is not None:
                 self.assertEqual(str(post), '<music21.interval.Interval A1>')
         self.assertEqual(exceptCount < 3, True)
+
+
+    def testScalaScaleA(self):
+
+        msg = '''! fj-12tet.scl
+!  
+Franck Jedrzejewski continued fractions approx. of 12-tet 
+ 12
+!  
+89/84
+55/49
+44/37
+63/50
+4/3
+99/70
+442/295
+27/17
+37/22
+98/55
+15/8
+2/1
+
+'''
+        # provide a raw scala string
+        sc = ScalaScale('c4', msg)
+        self.assertEqual(str(sc), '<music21.scale.ScalaScale C Scala: fj-12tet.scl>')
+        self.assertEqual(str(sc.getPitches('c2', 'c4')), '[C2(+0c), C#2(+0c), C##2(0c), D#2(0c), E2(+0c), E#2(-2c), F#2(+0c), F##2(0c), G#2(+1c), A2(+0c), B-2(+0c), B2(-12c), C3(+0c), C#3(+0c), C##3(0c), D#3(0c), E3(+0c), E#3(-2c), F#3(+0c), F##3(0c), G#3(+1c), A3(+0c), B-3(+0c), B3(-12c), C4]')
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

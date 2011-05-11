@@ -2322,7 +2322,7 @@ class Pitch(music21.Music21Object):
         A4
         >>> h2.transpose(-24, inPlace=True)
         >>> h2
-        F#6(+19c)
+        F#~6(+19c)
         >>> h2.fundamental.fundamental
         A2
         
