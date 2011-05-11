@@ -2165,21 +2165,33 @@ class SieveScale(ConcreteScale):
 class ScalaScale(ConcreteScale):
     '''A scale created from a Scala scale .scl file.
 
+    >>> sc = ScalaScale('g4', 'mbira banda')
+    >>> sc.pitches
+    [G4, A4(-15c), B4(-11c), C#5(-7c), D~5(+6c), E5(+14c), F~5(+1c), A-5(+2c)]
+
     '''
     def __init__(self, tonic=None, scalaString=None):
         ConcreteScale.__init__(self, tonic=tonic)
 
-        # TODO: try to load a named scale sale from the corpus
-        self._scalaScale = scala.ScalaStorage(scalaString)
-        if scalaString is not None:
-            self._scalaScale.parse()
+        self._scalaStorage = None
+        self.description = None
 
-        #environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
-        # mode here is a list of intervals
-        self._abstract = AbstractCyclicalScale(
-                         mode=self._scalaScale.getIntervalSequence())
-        self.type = 'Scala: %s' % self._scalaScale.fileName
+        # this might be a raw scala file list
+        if scalaString.count('\n') > 3:
+            # if no match, this might be a complete Scala string
+            self._scalaStorage = scala.ScalaStorage(scalaString)
+            self._scalaStorage.parse()
+        else:
+            # try to load a named scale from a file path or stored
+            # on the scala archive
+            # returns None or a scala storage object
+            self._scalaStorage = scala.parse(scalaString)
 
+        if self._scalaStorage is not None:
+            self._abstract = AbstractCyclicalScale(
+                             mode=self._scalaStorage.getIntervalSequence())
+            self.type = 'Scala: %s' % self._scalaStorage.fileName
+            self.description = self._scalaStorage.description
 
 
 
@@ -2897,7 +2909,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
     def testScalaScaleOutput(self):
         sc = MajorScale('c4')
         ss = sc.getScalaScale()
-        self.assertEqual(ss.noteCount, 7)
+        self.assertEqual(ss.pitchCount, 7)
         msg = '''!
 <music21.scale.MajorScale C major>
 7
@@ -2912,6 +2924,37 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 '''
         self.assertEqual(ss.getFileString(), msg)
         
+
+    def testScalaScaleB(self):
+        # test importing from scala archive
+        from music21 import scale
+        sc = scale.ScalaScale('e2', 'fj 12tet')
+        # this is showing that there are slight microtonal adjustments but they are less than one cent large
+        self.assertEqual(str(sc.pitches), '[E2, F2(+0c), F#2(0c), G2(0c), A-2(+0c), G##2(-2c), B-2(+0c), B2(0c), C3(+1c), D-3(+0c), D3(+0c), D#3(-12c), E3]')
+
+        # 7 tone scale
+        sc = scale.ScalaScale('c2', 'mbira zimb')
+        self.assertEqual(str(sc.pitches), '[C2, C#2(-2c), D~2(+21c), E~2(+22c), F#~2(-8c), G~2(+21c), A~2(+2c), B~2(-2c)]')
+
+        # 21 tone scale
+        sc = scale.ScalaScale('c2', 'mbira_mude')
+        self.assertEqual(str(sc.pitches), '[C2, D`2(+24c), D#2(-11c), F#2(-25c), F#2(+12c), G~2(+20c), B~2(-4c), A#2(-24c), E#3(-22c), D~3(+17c), F#~3(-2c), G#3(-13c), A3(+15c), C#~3(-24c), A3(+17c), B~3(-2c), C#~4(-22c), D~4(-4c), E~4(+10c), F#~4(-18c), G#4(+5c), B`4(+15c)]')
+        #sc.show()
+
+        # 5 note slendro scale
+        sc = scale.ScalaScale('c2', 'slendro_ang')
+        self.assertEqual(str(sc.pitches), '[C2, D~2(-19c), E~2(+8c), F##2(-16c), A2(+23c), C3]')
+
+        # 5 note slendro scale
+        sc = scale.ScalaScale('c2', 'slendroc5.scl')
+        self.assertEqual(str(sc.pitches), '[C2, D~2(-14c), E~2(+4c), G2(+5c), A~2(-22c), C3]')
+
+
+        # two octave slendro scale
+        sc = scale.ScalaScale('c2', 'slendro_pliat')
+        self.assertEqual(str(sc.pitches), '[C2, D~2(-15c), E~2(+4c), G2(+5c), A~2(-23c), C3, D~3(-15c), E~3(+4c), G3(+5c), A~3(-23c)]')
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [ConcreteScale, AbstractScale]

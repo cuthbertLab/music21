@@ -1291,7 +1291,7 @@ class Pitch(music21.Music21Object):
             # check and add any microtones
             alter, cents = convertCentsToAlterAndCents(value*100.0)
             self._accidental = Accidental(alter)
-            if abs(cents) > .001:
+            if abs(cents) > .01:
                 self._setMicrotone(cents)
         else: # assume an accidental object
             self._accidental = value
