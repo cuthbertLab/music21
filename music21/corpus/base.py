@@ -50,6 +50,12 @@ from music21.corpus import handel
 from music21.corpus.handel import hwv56  
 
 from music21.corpus import haydn
+from music21.corpus.haydn import opus1no0
+from music21.corpus.haydn import opus1no1
+from music21.corpus.haydn import opus1no2
+from music21.corpus.haydn import opus1no3
+from music21.corpus.haydn import opus1no4
+from music21.corpus.haydn import opus1no6
 from music21.corpus.haydn import opus9no2
 from music21.corpus.haydn import opus9no3
 from music21.corpus.haydn import opus17no1
@@ -59,6 +65,7 @@ from music21.corpus.haydn import opus17no5
 from music21.corpus.haydn import opus17no6
 from music21.corpus.haydn import opus20no1
 from music21.corpus.haydn import opus20no2
+from music21.corpus.haydn import opus20no3
 from music21.corpus.haydn import opus20no4
 from music21.corpus.haydn import opus20no5
 from music21.corpus.haydn import opus20no6
@@ -75,13 +82,32 @@ from music21.corpus.haydn import opus50no3
 from music21.corpus.haydn import opus50no4
 from music21.corpus.haydn import opus50no5
 from music21.corpus.haydn import opus50no6
+from music21.corpus.haydn import opus54no1
 from music21.corpus.haydn import opus54no2
+from music21.corpus.haydn import opus54no3
 from music21.corpus.haydn import opus55no1
+from music21.corpus.haydn import opus55no2
 from music21.corpus.haydn import opus55no3
 from music21.corpus.haydn import opus64no1
 from music21.corpus.haydn import opus64no2
+from music21.corpus.haydn import opus64no3
+from music21.corpus.haydn import opus64no4
+from music21.corpus.haydn import opus64no5
+from music21.corpus.haydn import opus64no6
+from music21.corpus.haydn import opus71no1
+from music21.corpus.haydn import opus71no2
+from music21.corpus.haydn import opus71no3
 from music21.corpus.haydn import opus74no1  
-from music21.corpus.haydn import opus74no2  
+from music21.corpus.haydn import opus74no2 
+from music21.corpus.haydn import opus74no3
+from music21.corpus.haydn import opus76no1
+from music21.corpus.haydn import opus76no2
+from music21.corpus.haydn import opus76no3
+from music21.corpus.haydn import opus76no4
+from music21.corpus.haydn import opus76no5
+from music21.corpus.haydn import opus76no6
+from music21.corpus.haydn import opus77no1
+from music21.corpus.haydn import opus77no2 
 
 from music21.corpus import monteverdi
 
@@ -192,6 +218,12 @@ MODULES = [
             hwv56,
 
             haydn,
+            opus1no0,
+            opus1no1,
+            opus1no2,
+            opus1no3,
+            opus1no4,
+            opus1no6,
             opus9no2,
             opus9no3,
             opus17no1,
@@ -201,6 +233,7 @@ MODULES = [
             opus17no6,
             opus20no1,
             opus20no2,
+            opus20no3,
             opus20no4,
             opus20no5,
             opus20no6,
@@ -217,13 +250,32 @@ MODULES = [
             opus50no4,
             opus50no5,
             opus50no6,
+            opus54no1,
+            opus54no2,
             opus54no2,
             opus55no1,
+            opus55no2,
             opus55no3,
             opus64no1,
             opus64no2,
+            opus64no3,
+            opus64no4,
+            opus64no5,
+            opus64no6,
+            opus71no1,
+            opus71no2,
+            opus71no3,
             opus74no1,
             opus74no2,
+            opus74no3,
+            opus76no1,
+            opus76no2,
+            opus76no3,
+            opus76no4,
+            opus76no5,
+            opus76no6,
+            opus77no1,
+            opus77no2,
 
             monteverdi,
 
