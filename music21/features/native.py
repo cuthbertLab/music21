@@ -157,17 +157,17 @@ class QualityFeature(featuresModule.FeatureExtractor):
 #-------------------------------------------------------------------------------
 # features that use metrical distinctions
 
-class FirstBeatAttackPrevelance(featuresModule.FeatureExtractor):
+class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
-    >>> fe = features.native.FirstBeatAttackPrevelance(s)
+    >>> fe = features.native.FirstBeatAttackPrevalence(s)
     '''
     id = 'MP1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'First Beat Attack Prevelance'
+        self.name = 'First Beat Attack Prevalence'
         self.description = 'Fraction of first beats of a measure that have notes that start on this beat.'
         self.dimensions = 1
         self.discrete = False 
@@ -239,11 +239,11 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
         self._feature.vector[0] = ql
 
 
-class MostCommonNoteQuarterLengthPrevelance(featuresModule.FeatureExtractor):
+class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
-    >>> fe = features.native.MostCommonNoteQuarterLengthPrevelance(s)
+    >>> fe = features.native.MostCommonNoteQuarterLengthPrevalence(s)
     >>> fe.extract().vector 
     [0.533333...]
     '''
@@ -251,7 +251,7 @@ class MostCommonNoteQuarterLengthPrevelance(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Most Common Note Quarter Length Prevalance'
+        self.name = 'Most Common Note Quarter Length Prevalence'
         self.description = 'Fraction of notes that have the most common quarter length.'
         self.dimensions = 1
         self.discrete = False 
@@ -362,13 +362,13 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
         self._feature.vector[0] = count
 
 
-class MostCommonPitchClassSetSimultaneityPrevelance(
+class MostCommonPitchClassSetSimultaneityPrevalence(
     featuresModule.FeatureExtractor):
     '''Fraction of all pitch class simultaneities that are the most common simultaneity.
 
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
-    >>> fe = features.native.MostCommonPitchClassSetSimultaneityPrevelance(s)
+    >>> fe = features.native.MostCommonPitchClassSetSimultaneityPrevalence(s)
     >>> fe.extract().vector
     [0.166666666...]
     '''
@@ -376,7 +376,7 @@ class MostCommonPitchClassSetSimultaneityPrevelance(
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Most Common Pitch Class Set Simultaneity Prevelance'
+        self.name = 'Most Common Pitch Class Set Simultaneity Prevalence'
         self.description = 'Fraction of all pitch class simultaneities that are the most common simultaneity.'
         self.dimensions = 1
         self.discrete = False 
@@ -396,16 +396,16 @@ class MostCommonPitchClassSetSimultaneityPrevelance(
         self._feature.vector[0] = maxKey / float(sum)
 
 
-class MostCommonSetClassSimultaneityPrevelance(featuresModule.FeatureExtractor):
+class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Fraction of all set class simultaneities that are the most common simultaneity.
 
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
-    >>> fe = features.native.MostCommonSetClassSimultaneityPrevelance(s)
+    >>> fe = features.native.MostCommonSetClassSimultaneityPrevalence(s)
     >>> fe.extract().vector
     [0.2916...]
     >>> s2 = corpus.parse('schoenberg/opus19', 6)
-    >>> fe2 = features.native.MostCommonSetClassSimultaneityPrevelance(s2)
+    >>> fe2 = features.native.MostCommonSetClassSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
     [0.3846...]
     '''
@@ -413,7 +413,7 @@ class MostCommonSetClassSimultaneityPrevelance(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Most Common Set Class Simultaneity Prevelance'
+        self.name = 'Most Common Set Class Simultaneity Prevalence'
         self.description = 'Fraction of all set class simultaneities that are the most common simultaneity.'
         self.dimensions = 1
         self.discrete = False 
@@ -433,12 +433,12 @@ class MostCommonSetClassSimultaneityPrevelance(featuresModule.FeatureExtractor):
         self._feature.vector[0] = maxKey / float(sum)
 
 
-class MajorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
+class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are major triads.
 
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
-    >>> fe = features.native.MajorTriadSimultaneityPrevelance(s)
+    >>> fe = features.native.MajorTriadSimultaneityPrevalence(s)
     >>> fe.extract().vector
     [0.1666666666...]
     '''
@@ -446,7 +446,7 @@ class MajorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Major Triad Simultaneity Prevelance'
+        self.name = 'Major Triad Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are major triads.'
         self.dimensions = 1
         self.discrete = False 
@@ -463,12 +463,12 @@ class MajorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
         self._feature.vector[0] = part / float(total)
 
 
-class MinorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
+class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are minor triads.
 
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
-    >>> fe = features.native.MinorTriadSimultaneityPrevelance(s)
+    >>> fe = features.native.MinorTriadSimultaneityPrevalence(s)
     >>> fe.extract().vector # same as major in this work
     [0.1666666666...]
     '''
@@ -476,7 +476,7 @@ class MinorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Minor Triad Simultaneity Prevelance'
+        self.name = 'Minor Triad Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are minor triads.'
         self.dimensions = 1
         self.discrete = False 
@@ -492,12 +492,12 @@ class MinorTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
         self._feature.vector[0] = part / float(total)
 
 
-class DominantSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
+class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are dominant seventh.
 
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
-    >>> fe = features.native.DominantSeventhSimultaneityPrevelance(s)
+    >>> fe = features.native.DominantSeventhSimultaneityPrevalence(s)
     >>> fe.extract().vector 
     [0.0]
     '''
@@ -505,7 +505,7 @@ class DominantSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Dominant Seventh Simultaneity Prevelance'
+        self.name = 'Dominant Seventh Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are dominant seventh.'
         self.dimensions = 1
         self.discrete = False 
@@ -521,12 +521,12 @@ class DominantSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
         self._feature.vector[0] = part / float(total)
 
 
-class DiminishedTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
+class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are diminished triads.
 
     >>> from music21 import *
     >>> s = corpus.parse('bwv66.6')
-    >>> fe = features.native.DiminishedTriadSimultaneityPrevelance(s)
+    >>> fe = features.native.DiminishedTriadSimultaneityPrevalence(s)
     >>> fe.extract().vector 
     [0.020408163265...]
     '''
@@ -534,7 +534,7 @@ class DiminishedTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Diminished Triad Simultaneity Prevelance'
+        self.name = 'Diminished Triad Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are diminished triads.'
         self.dimensions = 1
         self.discrete = False 
@@ -550,18 +550,18 @@ class DiminishedTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
         self._feature.vector[0] = part / float(total)
 
 
-class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
+class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     Gives the proportion of all simultaneities which form triads (major,
     minor, diminished, or augmented)
     
     >>> from music21 import *
     >>> s = corpus.parse('bwv66.6')
-    >>> fe = features.native.TriadSimultaneityPrevelance(s)
+    >>> fe = features.native.TriadSimultaneityPrevalence(s)
     >>> fe.extract().vector 
     [0.7142857142...]
     >>> s2 = corpus.parse('schoenberg/opus19', 2)
-    >>> fe2 = features.native.TriadSimultaneityPrevelance(s2)
+    >>> fe2 = features.native.TriadSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
     [0.04...]
     '''
@@ -569,7 +569,7 @@ class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Triad Simultaneity Prevelance'
+        self.name = 'Triad Simultaneity Prevalence'
         self.description = 'Proportion of all simultaneities that form triads.'
         self.dimensions = 1
         self.discrete = False 
@@ -585,14 +585,13 @@ class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
         self._feature.vector[0] = part / float(total)
 
 
-#class IncorrectlySpelledTriad
 
-class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
+class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are diminished seventh chords.
 
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
-    >>> fe = features.native.DiminishedSeventhSimultaneityPrevelance(s)
+    >>> fe = features.native.DiminishedSeventhSimultaneityPrevalence(s)
     >>> fe.extract().vector 
     [0.0]
     '''
@@ -600,7 +599,7 @@ class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Diminished Seventh Simultaneity Prevelance'
+        self.name = 'Diminished Seventh Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are diminished seventh chords.'
         self.dimensions = 1
         self.discrete = False 
@@ -615,24 +614,36 @@ class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
         part = histo['isDiminishedSeventh']
         self._feature.vector[0] = part / float(total)
 
+class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
+    '''
+    Percentage of all triads that are spelled incorrectly.
 
+    example:
 
-
-class IncorrectlySpelledTriadPrevelance(featuresModule.FeatureExtractor):
-    '''Percentage of all 0,3,7 set classes that are incorrectly spelled triads..
+    Mozart k155 movement 2 has a single instance of an incorrectly spelled
+    triad (m. 17, where the C# of an A-major chord has a lower neighbor B#
+    thus temporarily creating an incorrectly spelled A-minor chord).
+    
+    We would expect highly chromatic music such as Reger or Wagner to have
+    a higher percentage, or automatically rendered MIDI
+    transcriptions (which don't distinguish between D# and Eb).
+    
+    (Aside to Mozart experts: shouldn't m. 18 beat 2 also be B#? seems a
+    mistake in most editions... -- it doesn't alter this analysis though
+    since the A and E in the bass are gone)
 
     >>> from music21 import *
-    >>> s = corpus.parse('hwv56/movement3-05.md')
-    >>> fe = features.native.DiminishedSeventhSimultaneityPrevelance(s)
+    >>> s = corpus.parse('mozart/k155', 2)
+    >>> fe = features.native.IncorrectlySpelledTriadPrevalence(s)
     >>> fe.extract().vector 
-    [0.0]
+    [0.00775...]
     '''
     id = 'CS11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
-        self.name = 'Incorrectly Spelled Triad Prevelance'
-        self.description = 'Percentage of all 0,3,7 set classes that are incorrectly spelled triads.'
+        self.name = 'Incorrectly Spelled Triad Prevalence'
+        self.description = 'Percentage of all triads that are spelled incorrectly.'
         self.dimensions = 1
         self.discrete = False 
 
@@ -640,27 +651,26 @@ class IncorrectlySpelledTriadPrevelance(featuresModule.FeatureExtractor):
         '''Do processing necessary, storing result in _feature.
         '''
         # use for total number of chords
-        #total = len(self.data['chordify.getElementsByClass.Chord'])
-
-        histo = self.data['chordifyTypesHistogram']        
-
-        # find number of chords that that are not triads but have 
-        # a 0,3,7 pitch class set
-        count = 0
-        for c in self.data['chordify.getElementsByClass.Chord']:
-            if c.normalForm == [0, 3, 7] and c.isTriad() is False:
-                count += 1
-        environLocal.printDebug(['got count', count])
-        # isTriad stores a count
-        total = histo['isTriad'] + count
-        self._feature.vector[0] = count / float(total)
-
-
-
+        histo = self.data['chordifyTypesHistogram']
+        # using incomplete
+        totalCorrectlySpelled = histo['isTriad']
+        forteData = self.data['chordifySetClassHistogram']
+        totalForteTriads = 0
+        if "3-11" in forteData:
+            totalForteTriads += forteData['3-11']
+        if "3-12" in forteData:
+            totalForteTriads += forteData['3-12']
+        if "3-10" in forteData:
+            totalForteTriads += forteData['3-10']
+        
+        totalIncorrectlySpelled = totalForteTriads - totalCorrectlySpelled
+        
+        self._feature.vector[0] = totalIncorrectlySpelled / float(totalForteTriads)
 
 
 
-
+class NativeFeatureException(featuresModule.FeatureException):
+    pass
 
 
 featureExtractors = [
@@ -668,21 +678,19 @@ QualityFeature, #p22
 
 UniqueNoteQuarterLengths, # ql1
 MostCommonNoteQuarterLength, # ql2
-MostCommonNoteQuarterLengthPrevelance, # ql3
+MostCommonNoteQuarterLengthPrevalence, # ql3
 RangeOfNoteQuarterLengths, # ql4
-
 UniquePitchClassSetSimultaneities, # cs1
 UniqueSetClassSimultaneities, # cs2
-MostCommonPitchClassSetSimultaneityPrevelance, # cs3
-MostCommonSetClassSimultaneityPrevelance, # cs4
-MajorTriadSimultaneityPrevelance, # cs5
-MinorTriadSimultaneityPrevelance, # cs6
-DominantSeventhSimultaneityPrevelance, # cs7
-DiminishedTriadSimultaneityPrevelance, # cs8
-TriadSimultaneityPrevelance, # cs9
-DiminishedSeventhSimultaneityPrevelance, # cs10
-IncorrectlySpelledTriadPrevelance, # cs10
-
+MostCommonPitchClassSetSimultaneityPrevalence, # cs3
+MostCommonSetClassSimultaneityPrevalence, # cs4
+MajorTriadSimultaneityPrevalence, # cs5
+MinorTriadSimultaneityPrevalence, # cs6
+DominantSeventhSimultaneityPrevalence, # cs7
+DiminishedTriadSimultaneityPrevalence, # cs8
+TriadSimultaneityPrevalence, # cs9
+DiminishedSeventhSimultaneityPrevalence, # cs10
+IncorrectlySpelledTriadPrevalence, # cs10
 ]
 
 
@@ -695,7 +703,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testIncorrectlySpelledTriadPrevelance(self):
+    def testIncorrectlySpelledTriadPrevalence(self):
         from music21 import stream, features, chord, corpus, graph
 
         s = stream.Stream()
@@ -704,7 +712,7 @@ class Test(unittest.TestCase):
         s.append(chord.Chord(['c', 'd#', 'g']))
         s.append(chord.Chord(['c', 'd#', 'g']))
 
-        fe = features.native.IncorrectlySpelledTriadPrevelance(s)
+        fe = features.native.IncorrectlySpelledTriadPrevalence(s)
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
 
 
