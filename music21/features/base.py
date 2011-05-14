@@ -270,7 +270,10 @@ class StreamForms(object):
 
         # some methods that return new streams
         elif key in ['chordify']:
-            self._forms['chordify'] = self._base.chordify()
+            if 'Score' in self._base.classes:
+                self._forms['chordify'] = self._base.chordify()
+            else: # for now, just return a normal Part or Stream
+                self._forms['chordify'] = self._base
             return self._forms['chordify']
 
         elif key in ['chordify.getElementsByClass.Chord']:

@@ -50,6 +50,12 @@ environLocal = environment.Environment(_MOD)
 
 # automatic key analysis
 # as a method of feature extraction
+
+class NativeFeatureException(featuresModule.FeatureException):
+    pass
+
+
+
 class QualityFeature(featuresModule.FeatureExtractor):
     '''
     Extends the jSymbolic QualityFeature to automatically find mode
@@ -609,27 +615,73 @@ class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
         part = histo['isDiminishedSeventh']
         self._feature.vector[0] = part / float(total)
 
-class NativeFeatureException(featuresModule.FeatureException):
-    pass
+
+
+
+class IncorrectlySpelledTriadPrevelance(featuresModule.FeatureExtractor):
+    '''Percentage of all 0,3,7 set classes that are incorrectly spelled triads..
+
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.DiminishedSeventhSimultaneityPrevelance(s)
+    >>> fe.extract().vector 
+    [0.0]
+    '''
+    id = 'CS11'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Incorrectly Spelled Triad Prevelance'
+        self.description = 'Percentage of all 0,3,7 set classes that are incorrectly spelled triads.'
+        self.dimensions = 1
+        self.discrete = False 
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # use for total number of chords
+        #total = len(self.data['chordify.getElementsByClass.Chord'])
+
+        histo = self.data['chordifyTypesHistogram']        
+
+        # find number of chords that that are not triads but have 
+        # a 0,3,7 pitch class set
+        count = 0
+        for c in self.data['chordify.getElementsByClass.Chord']:
+            if c.normalForm == [0, 3, 7] and c.isTriad() is False:
+                count += 1
+        environLocal.printDebug(['got count', count])
+        # isTriad stores a count
+        total = histo['isTriad'] + count
+        self._feature.vector[0] = count / float(total)
+
+
+
+
+
+
+
+
 
 featureExtractors = [
 QualityFeature, #p22
 
-UniqueNoteQuarterLengths, # d1
-MostCommonNoteQuarterLength, # d2
-MostCommonNoteQuarterLengthPrevelance, # d3
-RangeOfNoteQuarterLengths, # d4
+UniqueNoteQuarterLengths, # ql1
+MostCommonNoteQuarterLength, # ql2
+MostCommonNoteQuarterLengthPrevelance, # ql3
+RangeOfNoteQuarterLengths, # ql4
 
-UniquePitchClassSetSimultaneities, # s1
-UniqueSetClassSimultaneities, # s2
-MostCommonPitchClassSetSimultaneityPrevelance, # s3
-MostCommonSetClassSimultaneityPrevelance, # s4
-MajorTriadSimultaneityPrevelance, # s5
-MinorTriadSimultaneityPrevelance, # s6
-DominantSeventhSimultaneityPrevelance, # s7
-DiminishedTriadSimultaneityPrevelance, # s8
-TriadSimultaneityPrevelance, # s9
-DiminishedSeventhSimultaneityPrevelance, # s10
+UniquePitchClassSetSimultaneities, # cs1
+UniqueSetClassSimultaneities, # cs2
+MostCommonPitchClassSetSimultaneityPrevelance, # cs3
+MostCommonSetClassSimultaneityPrevelance, # cs4
+MajorTriadSimultaneityPrevelance, # cs5
+MinorTriadSimultaneityPrevelance, # cs6
+DominantSeventhSimultaneityPrevelance, # cs7
+DiminishedTriadSimultaneityPrevelance, # cs8
+TriadSimultaneityPrevelance, # cs9
+DiminishedSeventhSimultaneityPrevelance, # cs10
+IncorrectlySpelledTriadPrevelance, # cs10
 
 ]
 
@@ -643,6 +695,23 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testIncorrectlySpelledTriadPrevelance(self):
+        from music21 import stream, features, chord, corpus, graph
+
+        s = stream.Stream()
+        s.append(chord.Chord(['c', 'e', 'g']))
+        s.append(chord.Chord(['c', 'e', 'g']))
+        s.append(chord.Chord(['c', 'd#', 'g']))
+        s.append(chord.Chord(['c', 'd#', 'g']))
+
+        fe = features.native.IncorrectlySpelledTriadPrevelance(s)
+        self.assertEqual(str(fe.extract().vector[0]), '0.5')
+
+
+#         streamList = corpus.bachChorales[200:220]
+#         feList = ['cs9', 'cs11']
+#         p = graph.PlotFeatures(streamList, feList)
+#         p.process()
 
 
 

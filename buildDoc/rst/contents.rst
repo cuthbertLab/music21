@@ -92,6 +92,7 @@ Module Reference
    moduleRomanTextBase
    moduleRomanTextTranslate
    moduleRepeat
+   moduleScalaBase
    moduleScale
    moduleSearch
    moduleSerial

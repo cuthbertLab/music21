@@ -81,6 +81,10 @@ from music21 import pitch
 from music21 import roman
 from music21 import repeat
 from music21 import scale
+
+from music21.scala import base as scala
+
+
 from music21 import search
 from music21 import serial
 from music21 import sieve
@@ -175,6 +179,7 @@ MODULES = [
     romanTextTranslate,
     repeat,
 
+    scala,
     scale,     
     search,
     serial,     

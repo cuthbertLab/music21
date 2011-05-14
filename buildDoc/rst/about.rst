@@ -87,6 +87,8 @@ They are all greatly appreciated.
 
 * `Justin London`_ compiled and maintained the list of Second-Viennese row forms now available in serial.py.
 
+* `Manuel Op de Coul`_ has kindly gave permission to use the Scala scale archive of nearly 4000 scales in music21.
+
 * `Craig Sapp`_ has always been generous in discussions about MIR and has been a great collaborator.
 
 * `Seymour Shlien`_ has kindly given permission to distribute his ABC encodings of the Essen folksong database with music21.
@@ -103,6 +105,7 @@ They are all greatly appreciated.
 .. _Bryen Travis: http://www.bachcentral.com/
 .. _Ewa Dahlig-Turek: http://www.esac-data.org
 .. _Seymour Shlien: http://ifdo.pugmarks.com/~seymour/runabc/esac/esacdatabase.html
+.. _Manuel Op de Coul: http://www.huygens-fokker.org/scala
 
 
 

@@ -9,9 +9,24 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
-Classes and functions for representing data in a Scala scale file format as defined here:
+Tools for representing data from the Scala scale file format as defined here.
 
 http://www.huygens-fokker.org/scala/scl_format.html
+
+Utility functions are also provided to search and find scales in the Scala scale archive.
+
+To create a :class:`~music21.scale.ScalaScale` instance, simple provide a root pitch and the name of the scale. Scale names are given as a the scala .scl file name. File names can be found with the :func:`~music21.scala.search` function.
+
+
+>>> from music21 import *
+>>> scala.search('mbira')
+['mbira_mujuru.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_banda.scl', 'mbira_gondo.scl', 'mbira_zimb.scl', 'mbira_mude.scl', 'mbira_banda2.scl']
+>>> sc = scale.ScalaScale('a4', scala.search('mbira')[3])
+>>> sc.pitches
+[A4, B4(-15c), C#5(-11c), D#5(-7c), E~5(+6c), F#5(+14c), G~5(+1c), B-5(+2c)]
+
+
+
 '''
 
 import os
@@ -146,9 +161,9 @@ class ScalaPitch(object):
 
 
 class ScalaStorage(object):
-    '''Object representation of data stored in a Scale scale file.
+    '''Object representation of data stored in a Scale scale file. This objeject is used to access Scala information stored in a file. To create a music21 scale with a Scala file, use :class:`~music21.scale.ScalaScale`.
 
-    This is not called ScalaScale, as this name clashes with the scale.Scale that uses this object
+    This is not called ScalaScale, as this name clashes with the :class:`~music21.scale.ScalaScale` that uses this object.
     '''
     def __init__(self, sourceString=None, fileName=None):
         self.src = sourceString
@@ -274,7 +289,10 @@ class ScalaStorage(object):
 #-------------------------------------------------------------------------------
 class ScalaFile(object):
     '''
-    Scala File access
+    Interface for reading and writing scala files. On reading, returns a :class:`~music21.scala.ScalaStorage` object.
+
+    >>> from music21 import *
+    >>> sf = ScalaFile() 
     '''
     
     def __init__(self, data=None): 
@@ -330,7 +348,7 @@ class ScalaFile(object):
 
 #-------------------------------------------------------------------------------
 def parse(target):
-    '''Get a ScalaStorage object from stored bundled SCL archive.
+    '''Get a :class:`~music21.scala.ScalaStorage` object from the bundled SCL archive or a file path. 
 
     >>> from music21 import scala
     >>> ss = scala.parse('balafon6')

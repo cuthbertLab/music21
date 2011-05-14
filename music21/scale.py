@@ -2225,7 +2225,7 @@ class ScalaScale(ConcreteScale):
         self.description = None
 
         # this might be a raw scala file list
-        if scalaString.count('\n') > 3:
+        if scalaString is not None and scalaString.count('\n') > 3:
             # if no match, this might be a complete Scala string
             self._scalaStorage = scala.ScalaStorage(scalaString)
             self._scalaStorage.parse()
@@ -2235,9 +2235,7 @@ class ScalaScale(ConcreteScale):
             # returns None or a scala storage object
             self._scalaStorage = scala.parse(scalaString)
         else: # grab a default
-            self._scalaStorage = scala.parse('fj-12test.scl')
-
-    
+            self._scalaStorage = scala.parse('fj-12tet.scl')    
         self._abstract = AbstractCyclicalScale(
                          mode=self._scalaStorage.getIntervalSequence())
         self.type = 'Scala: %s' % self._scalaStorage.fileName
