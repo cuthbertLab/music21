@@ -547,8 +547,7 @@ class DiminishedTriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
 class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
     '''
     Gives the proportion of all simultaneities which form triads (major,
-    minor, diminished, or augmented
-    
+    minor, diminished, or augmented)
     
     >>> from music21 import *
     >>> s = corpus.parse('bwv66.6')
@@ -579,6 +578,8 @@ class TriadSimultaneityPrevelance(featuresModule.FeatureExtractor):
         part = histo['isTriad']
         self._feature.vector[0] = part / float(total)
 
+
+#class IncorrectlySpelledTriad
 
 class DiminishedSeventhSimultaneityPrevelance(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are diminished seventh chords.

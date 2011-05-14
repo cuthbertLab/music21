@@ -1110,6 +1110,13 @@ class Chord(note.NotRest):
         True
         >>> other.isTriad() 
         False
+        >>> incorrectlySpelled = chord.Chord(['C','D#','G'])
+        >>> incorrectlySpelled.isTriad()
+        False
+        >>> incorrectlySpelled.pitches[1].getEnharmonic(inPlace = True)
+        >>> incorrectlySpelled.isTriad()
+        True
+
         '''
         try:
             third = self.third

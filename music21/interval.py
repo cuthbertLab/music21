@@ -1041,6 +1041,9 @@ class ChromaticInterval(music21.Music21Object):
         '''
         music21.Music21Object.__init__(self)
 
+        if value == int(value):
+            value = int(value)
+
         self.semitones = value
         self.cents = value * 100.0
         self.directed = value
@@ -1235,13 +1238,13 @@ def notesToChromatic(n1, n2):
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g#5')
     >>> notesToChromatic(aNote, bNote)
-    <music21.interval.ChromaticInterval 20.0>
+    <music21.interval.ChromaticInterval 20>
 
     >>> aPitch = pitch.Pitch('c#4')
     >>> bPitch = pitch.Pitch('f-5')
     >>> bInterval = notesToChromatic(aPitch, bPitch)
     >>> bInterval
-    <music21.interval.ChromaticInterval 15.0>
+    <music21.interval.ChromaticInterval 15>
 
     '''
     return ChromaticInterval(n2.ps - n1.ps)
@@ -2144,7 +2147,7 @@ def subtract(intervalList):
     >>> a.niceName
     'Augmented Unison'
     >>> a.chromatic.semitones
-    -1.0
+    -1
     
     
     BUG: should be Descending Augmented Unison, currently giving Oblique Augmented Unison ! AARGH

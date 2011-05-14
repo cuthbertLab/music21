@@ -536,7 +536,7 @@ class Test(unittest.TestCase):
                 for group in groups:
                     for n in group['stream'].notesAndRests:
                         n.addLyric('%s^%s' % (sc.getTonic().name, sc.getScaleDegreeFromPitch(n.pitch)))
-        #s.show()
+        #s['violin i'].show()
 
 
 
@@ -555,9 +555,9 @@ class Test(unittest.TestCase):
         for sc in [scDMelodicMinor, scGMelodicMinor]:
             groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
             for group in groups:
-                for n in group['stream'].notesAndRests:
+                for n in group['stream'].notes:
                     n.addLyric('%s^%s' % (sc.getTonic().name.lower(), sc.getScaleDegreeFromPitch(n.pitch, group['direction'])))
-        #part.show()
+        part.show()
 
 
 
