@@ -41,16 +41,16 @@ class Notation(object):
         >>> from music21.figuredBass import notation as n
         >>> n1 = n.Notation('')
         >>> n1.figures
-        [<music21.figuredBass.notation.Figure 5 <modifier None None>>, <music21.figuredBass.notation.Figure 3 <modifier None None>>]
+        [<music21.figuredBass.notation Figure 5 <modifier None None>>, <music21.figuredBass.notation Figure 3 <modifier None None>>]
         >>> n2 = n.Notation('#')
         >>> n2.figures
-        [<music21.figuredBass.notation.Figure 5 <modifier None None>>, <music21.figuredBass.notation.Figure 3 <modifier # <accidental sharp>>>]
+        [<music21.figuredBass.notation Figure 5 <modifier None None>>, <music21.figuredBass.notation Figure 3 <modifier # <accidental sharp>>>]
         >>> n3 = n.Notation('-6,-')
         >>> n3.figures
-        [<music21.figuredBass.notation.Figure 6 <modifier - <accidental flat>>>, <music21.figuredBass.notation.Figure 3 <modifier - <accidental flat>>>]
+        [<music21.figuredBass.notation Figure 6 <modifier - <accidental flat>>>, <music21.figuredBass.notation Figure 3 <modifier - <accidental flat>>>]
         >>> n3b = n.Notation('b6,b')
         >>> n3b.figures
-        [<music21.figuredBass.notation.Figure 6 <modifier b <accidental flat>>>, <music21.figuredBass.notation.Figure 3 <modifier b <accidental flat>>>]
+        [<music21.figuredBass.notation Figure 6 <modifier b <accidental flat>>>, <music21.figuredBass.notation Figure 3 <modifier b <accidental flat>>>]
         >>> n3b.numbers
         (6, 3)
 
@@ -58,11 +58,11 @@ class Notation(object):
         OMIT_FROM_DOCS
         >>> n4 = n.Notation('4,2+')
         >>> n4.figures[0]
-        <music21.figuredBass.notation.Figure 6 <modifier None None>>
+        <music21.figuredBass.notation Figure 6 <modifier None None>>
         >>> n4.figures[1]
-        <music21.figuredBass.notation.Figure 4 <modifier None None>>
+        <music21.figuredBass.notation Figure 4 <modifier None None>>
         >>> n4.figures[2]
-        <music21.figuredBass.notation.Figure 2 <modifier + <accidental sharp>>>
+        <music21.figuredBass.notation Figure 2 <modifier + <accidental sharp>>>
         '''
         #Parse notation string
         self.notationColumn = notationColumn
@@ -236,9 +236,9 @@ class Notation(object):
         >>> from music21.figuredBass import notation as n
         >>> notation2 = n.Notation('-6,-') #__init__ method calls _getFigures()
         >>> notation2.figures[0] 
-        <music21.figuredBass.notation.Figure 6 <modifier - <accidental flat>>>
+        <music21.figuredBass.notation Figure 6 <modifier - <accidental flat>>>
         >>> notation2.figures[1]
-        <music21.figuredBass.notation.Figure 3 <modifier - <accidental flat>>>
+        <music21.figuredBass.notation Figure 3 <modifier - <accidental flat>>>
         '''
         figures = []
         
@@ -266,7 +266,7 @@ class Figure(object):
         self.modifier = Modifier(modifierString)
     
     def __repr__(self):
-        return '<music21.figuredBass.notation.%s %s %s>' % (self.__class__.__name__, self.number, self.modifier)
+        return '<music21.figuredBass.notation %s %s %s>' % (self.__class__.__name__, self.number, self.modifier)
 
 
 class FigureException(music21.Music21Exception):
