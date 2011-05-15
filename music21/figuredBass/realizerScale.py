@@ -31,7 +31,7 @@ scaleModes = {'major' : scale.MajorScale,
               'hypophrygian' : scale.HypophrygianScale}
 
 class FiguredBassScale:
-    def __init__(self, scaleValue, scaleMode = 'major'):
+    def __init__(self, scaleValue = "C", scaleMode = 'major'):
         '''
         Used to represent the concept of a figured bass scale, with a
         scale value (key) and a scale type (major is default).
