@@ -14,6 +14,7 @@ def notationExample1():
     >>> from music21.figuredBass import notation
     >>> notation1a = notation.Notation("6, 4+, 2")
     '''
+    pass
     
 def notationExample2():
     '''
@@ -24,6 +25,7 @@ def notationExample2():
     >>> notationStringA  = "6"
     >>> fbExample.addElement(noteA, notationStringA)
     '''
+    pass
     
 def notationExample3():
     '''
@@ -34,6 +36,7 @@ def notationExample3():
     >>> notation1a.origModStrings
     (None, '+', None)
     '''
+    pass
     
 def notationExample4():
     '''
@@ -48,6 +51,7 @@ def notationExample4():
     >>> notation1b.modifierStrings
     (None, '+', None)
     '''
+    pass
     
 def notationExample5():
     '''
@@ -68,6 +72,7 @@ def notationExample5():
     >>> notation4.modifierStrings
     (None, '#')
     '''
+    pass
     
 def notationExample6():
     '''
@@ -79,6 +84,7 @@ def notationExample6():
     >>> sharp.modifyPitchName("A")
     'A#'
     '''
+    pass
     
 def notationExample7():
     '''
@@ -87,6 +93,7 @@ def notationExample7():
     >>> notation1a.figures[1]
     <music21.figuredBass.notation Figure 4 <modifier + <accidental sharp>>>
     '''
+    pass
 
 #--------------------------------------------------
 # II. realizerScale.py
@@ -103,6 +110,7 @@ def realizerScaleExample1():
     >>> fbScale2.realizerScale
     <music21.scale.PhrygianScale E phrygian>
     '''
+    pass
     
 def realizerScaleExample2():
     '''
@@ -113,7 +121,8 @@ def realizerScaleExample2():
     C5
     >>> realizerScale.convertToPitch(pitch.Pitch('E4'))
     E4
-    ''' 
+    '''
+    pass
     
 def realizerScaleExample3():
     '''
@@ -122,6 +131,7 @@ def realizerScaleExample3():
     >>> fbScale1.getPitchNames("E3", "6")
     ['E', 'G', 'C#']
     '''
+    pass
     
 def realizerScaleExample4():
     '''
@@ -130,6 +140,7 @@ def realizerScaleExample4():
     >>> fbScale1.getPitchNames("C#3", "6, #5")
     ['C#', 'E', 'G#', 'A']
     '''
+    pass
 
 def realizerScaleExample5():
     '''
@@ -138,7 +149,8 @@ def realizerScaleExample5():
     >>> fbScale1.getPitchNames("D#3", "-7")
     ['D#', 'F#', 'A', 'C']
     '''
-    
+    pass
+
 def realizerScaleExample6():
     '''
     >>> from music21.figuredBass import realizerScale
@@ -146,6 +158,7 @@ def realizerScaleExample6():
     >>> fbScale1.getPitches("D3", "6")
     [D3, F#3, B3, D4, F#4, B4, D5, F#5, B5]
     '''
+    pass
 
 def realizerScaleExample7():
     '''
@@ -154,6 +167,7 @@ def realizerScaleExample7():
     >>> fbScale1.getSamplePitches("D3", "6")
     [D3, F#3, B3]
     '''
+    pass
 
 #--------------------------------------------------
 # III. rules.py
@@ -168,6 +182,7 @@ def rulesExample1():
     >>> fbRules.allowParallelFifths
     True
     '''
+    pass
 
 def rulesExample2():
     '''
@@ -182,6 +197,7 @@ def rulesExample2():
     >>> print(fbRules.upperPartsMaxSemitoneSeparation)
     None
     '''
+    pass
 
 def rulesExample3():
     '''
@@ -193,6 +209,7 @@ def rulesExample3():
     >>> fbRules.allowVoiceOverlap
     True
     '''
+    pass
     
 def rulesExample4():
     '''
@@ -204,6 +221,7 @@ def rulesExample4():
     >>> fbRules.doubledRootInDim7
     True
     '''
+    pass
 
 #--------------------------------------------------
 # IV. resolution.py
@@ -232,6 +250,7 @@ def resolutionExample1():
     >>> print(resolution.dominantSeventhToMajorSubdominant(Fdom7))
     {1: B-3, 2: F3, 3: F3, 4: D3}
     '''
+    pass
 
 def resolutionExample2():
     '''
@@ -252,6 +271,7 @@ def resolutionExample2():
     >>> print(resolution.diminishedSeventhToMinorSubdominant(Ddim7))
     {1: B-4, 2: D4, 3: G3, 4: D3}
     '''
+    pass
 
 #--------------------------------------------------
 # V. part.py
@@ -270,6 +290,7 @@ def partExample1():
     >>> range1.highestPitch
     C5
     '''
+    pass
 
 def partExample2():
     '''
@@ -283,6 +304,7 @@ def partExample2():
     >>> range0.pitchesInRange(pitchesAboveBass)
     [E2, G2, C3, E3, G3, C4, E4]
     '''
+    pass
     
 def partExample3():
     '''
@@ -292,6 +314,7 @@ def partExample3():
     >>> rangeB > rangeA
     True
     '''
+    pass
     
 def partExample4():
     '''
@@ -308,6 +331,7 @@ def partExample4():
     >>> bassVoice.range.highestPitch
     E4
     '''
+    pass
 
 def partExample5():
     '''
@@ -317,6 +341,7 @@ def partExample5():
     >>> partA > partB 
     True
     '''
+    pass
 
 #--------------------------------------------------
 # VI. possibility.py
@@ -333,6 +358,7 @@ def possibilityExample1():
     >>> print(Ddim7)
     {1: B-4, 2: E4, 3: G3, 4: C#3}
     '''
+    pass
 
 def possibilityExample2():
     '''
@@ -350,6 +376,7 @@ def possibilityExample2():
     >>> print(Ddim7)
     {1: B-4, 2: E4, 3: G3, 4: C#3}
     '''
+    pass
 
 def possibilityExample3():
     '''
@@ -369,7 +396,8 @@ def possibilityExample3():
     >>> Ddim7.highestPitch()
     B-4
     '''
-    
+    pass
+
 def possibilityExample4():
     '''
     >>> from music21.figuredBass import possibility
@@ -385,6 +413,7 @@ def possibilityExample4():
     >>> possibA2.isIncomplete(["C", "E", "G"])
     False
     '''
+    pass
 
 def possibilityExample5():
     '''
@@ -401,6 +430,7 @@ def possibilityExample5():
     >>> possibA2.upperPartsWithinLimit()
     False
     '''
+    pass
 
 def possibilityExample6():
     '''
@@ -417,6 +447,7 @@ def possibilityExample6():
     >>> possibA2.pitchesWithinRange()
     False
     '''
+    pass
     
 def possibilityExample7():
     '''
@@ -433,6 +464,7 @@ def possibilityExample7():
     >>> possibA2.voiceCrossing()
     True
     '''
+    pass
 
 def possibilityExample8():
     '''
@@ -445,6 +477,7 @@ def possibilityExample8():
     >>> possibA.parallelFifths(possibB)
     True
     '''
+    pass
 
 def possibilityExample9():
     '''
@@ -457,6 +490,7 @@ def possibilityExample9():
     >>> possibA.parallelOctaves(possibB)
     True
     '''
+    pass
 
 def possibilityExample10():
     '''
@@ -469,6 +503,7 @@ def possibilityExample10():
     >>> possibA.hiddenFifth(possibB)
     True
     '''
+    pass
 
 def possibilityExample11():
     '''
@@ -481,6 +516,7 @@ def possibilityExample11():
     >>> possibA.hiddenOctave(possibB)
     True
     '''
+    pass
 
 def possibilityExample12():
     '''
@@ -501,6 +537,7 @@ def possibilityExample12():
     >>> possibA1.voiceCrossing(possibB2)
     False
     '''
+    pass
 
 def possibilityExample13():
     '''
@@ -518,6 +555,7 @@ def possibilityExample13():
     >>> possibA1.partMovementsWithinLimits(possibB2)
     False
     '''
+    pass
 
 def possibilityExample14():
     '''
@@ -532,6 +570,7 @@ def possibilityExample14():
     
     ...........possibility.py: WARNING: Parallel fifths between 4 and 3 in {3: G3, 4: C3} and {3: A3, 4: D3}
     '''
+    pass
 
 def possibilityExample15():
     '''
@@ -552,6 +591,7 @@ def possibilityExample15():
     >>> Ddim7.isDiminishedSeventh()
     True
     '''
+    pass
 
 def possibilityExample16():
     '''
@@ -570,6 +610,7 @@ def possibilityExample16():
     >>> pairsList[1]
     (<music21.figuredBass.part Part 1: A0->C8>, C5, B4)
     '''
+    pass
 
 #--------------------------------------------------
 # VII. segment.py
@@ -596,6 +637,7 @@ def segmentExample1():
     >>> startSeg.possibilities[0]
     <music21.figuredBass.possibility Possibility: {1: A3, 2: F#3, 3: D3, 4: D3}>
     '''
+    pass
     
 def segmentExample2():
     '''
@@ -633,6 +675,7 @@ def segmentExample2():
     >>> midSeg.possibilities[4]
     <music21.figuredBass.possibility Possibility: {1: G4, 2: C#4, 3: G3, 4: E3}>
     '''
+    pass
 
 def segmentExample3():
     '''
@@ -659,6 +702,7 @@ def segmentExample3():
     >>> midSeg2.getNumSolutions()
     92
     '''
+    pass
 
 #--------------------------------------------------
 # VIII. realizer.py
@@ -672,6 +716,7 @@ def realizerExample1():
     >>> fbLine1.realize()
     >>> fbLine1.showAllRealizations()
     '''
+    pass
 
 def realizerExample2():
     '''
@@ -692,6 +737,7 @@ def realizerExample2():
     >>> fbLine2.addElement(bassNote3,  "6")     # I6
     >>> fbLine2.realize()
     '''
+    pass
 
 def realizerExample3():
     '''
@@ -715,6 +761,7 @@ def realizerExample3():
     >>> allSolsScore = fbLine2.generateAllRealizations()
     >>> fbLine2.showRandomRealization()
     '''
+    pass
     
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
