@@ -590,7 +590,7 @@ class Possibility(dict):
                 vlq = voiceLeading.VoiceLeadingQuartet(lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
                 if vlq.parallelFifth():
                     if verbose:
-                        self.environRules.warn("Parallel fifths between " + str(lowerPart.label) + " and " + str(higherPart.label) + " in " + str(possibA) + ".")
+                        self.environRules.warn("Parallel fifths between " + str(lowerPart.label) + " and " + str(higherPart.label) + " in " + str(self) + " and " + str(possibB) + ".")
                     hasParallelFifth = True
                     if not verbose:
                         return hasParallelFifth
@@ -649,7 +649,7 @@ class Possibility(dict):
                 vlq = voiceLeading.VoiceLeadingQuartet(lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
                 if vlq.parallelOctave():
                     if verbose:
-                        self.environRules.warn("Parallel octaves between " + str(lowerPart.label) + " and " + str(higherPart.label) + " in " + str(self) + ".")
+                        self.environRules.warn("Parallel octaves between " + str(lowerPart.label) + " and " + str(higherPart.label) + " in " + str(self) + " and " + str(possibB) + ".")
                     hasParallelOctave = True
                     if not verbose:
                         return hasParallelOctave
@@ -707,7 +707,7 @@ class Possibility(dict):
         if vlq.hiddenFifth():
             hasHiddenFifth = True
             if verbose:
-                self.environRules.warn("Hidden fifth between the outer parts " + str(uppermostA.label) + " and " + str(uppermostB.label) + " in " + str(self) + ".")
+                self.environRules.warn("Hidden fifth between the outer parts " + str(uppermostA.label) + " and " + str(uppermostB.label) + " in " + str(self) + " and " + str(possibB) + ".")
             return hasHiddenFifth
             
         return hasHiddenFifth
@@ -754,7 +754,7 @@ class Possibility(dict):
         if vlq.hiddenOctave():
             hasHiddenOctave = True
             if verbose:
-                self.environRules.warn("Hidden octave between the outer parts " + str(uppermostA.label) + " and " + str(uppermostB.label) + " in " + str(self) + ".")
+                self.environRules.warn("Hidden octave between the outer parts " + str(uppermostA.label) + " and " + str(uppermostB.label) + " in " + str(self) + " and " + str(possibB) + ".")
             return hasHiddenOctave
             
         return hasHiddenOctave
@@ -819,7 +819,7 @@ class Possibility(dict):
                 (higherPart, higherPitchA, higherPitchB) = pairsList[pairIndex2]
                 if lowerPitchB > higherPitchA or higherPitchB < lowerPitchA:
                     if verbose:
-                        self.environRules.warn("Voice overlap between " + str(lowerPart.label) + " and " + str(higherPart.label) + ".")
+                        self.environRules.warn("Voice overlap between " + str(lowerPart.label) + " and " + str(higherPart.label) + " in " + str(self) + " and " + str(possibB) + ".")
                     hasVoiceOverlap = True
                     if not verbose:
                         return hasVoiceOverlap
