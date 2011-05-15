@@ -43,26 +43,32 @@ def dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6 = False, inPlace 
     >>> from music21 import *
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'G2', p3: 'B3', p2: 'F4', p1: 'D5'})
     >>> resolutionA = resolution.dominantSeventhToMajorTonic(possibA)
     >>> resolutionA
-    {'A': E4, 'S': C5, 'B': C3, 'T': C4}
+    <music21.figuredBass.possibility Possibility: {1: C5, 2: E4, 3: C4, 4: C3}>
     >>> dominantChord = possibA.chordify()
     >>> resolutionChord = resolutionA.chordify()
-    >>> p1 = stream.Part()
-    >>> p1.append(dominantChord)
-    >>> p1.append(resolutionChord)
-    >>> #_DOCS_SHOW p1.show()
+    >>> score = stream.Part()
+    >>> score.append(dominantChord)
+    >>> score.append(resolutionChord)
+    >>> #_DOCS_SHOW score.show()
         
     
-    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
+    >>> possibB = possibility.Possibility({p4: 'C3', p3: 'E3', p2: 'G3', p1: 'B-3'})
     >>> resolution.dominantSeventhToMajorTonic(possibB)
-    {'A': F3, 'S': A3, 'B': F3, 'T': F3}
-    >>> possibC = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
+    <music21.figuredBass.possibility Possibility: {1: A3, 2: F3, 3: F3, 4: F3}>
+    >>> possibC = possibility.Possibility({p4: 'G3', p3: 'C4', p2: 'B-4', p1: 'E5'})
     >>> resolution.dominantSeventhToMajorTonic(possibC)
-    {'A': A4, 'S': F5, 'B': F3, 'T': C4}
+    <music21.figuredBass.possibility Possibility: {1: F5, 2: A4, 3: C4, 4: F3}>
     >>> resolution.dominantSeventhToMajorTonic(possibC, True)
-    {'A': C5, 'S': F5, 'B': A3, 'T': C4}
+    <music21.figuredBass.possibility Possibility: {1: F5, 2: C5, 3: C4, 4: A3}>
     '''
     if inPlace:
         dpCopy = dominantPossib
@@ -122,17 +128,23 @@ def dominantSeventhToMinorTonic(dominantPossib, resolveV43toi6 = False, inPlace 
     
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'G2', p3: 'B3', p2: 'F4', p1: 'D5'})
     >>> resolution.dominantSeventhToMinorTonic(possibA)
-    {'A': E-4, 'S': C5, 'B': C3, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
+    <music21.figuredBass.possibility Possibility: {1: C5, 2: E-4, 3: C4, 4: C3}>
+    >>> possibB = possibility.Possibility({p4: 'C3', p3: 'E3', p2: 'G3', p1: 'B-3'})
     >>> resolution.dominantSeventhToMinorTonic(possibB)
-    {'A': F3, 'S': A-3, 'B': F3, 'T': F3}
-    >>> possibC = possibility.Possibility({'B': 'G3', 'T': 'C4', 'A': 'B-4', 'S': 'E5'})
+    <music21.figuredBass.possibility Possibility: {1: A-3, 2: F3, 3: F3, 4: F3}>
+    >>> possibC = possibility.Possibility({p4: 'G3', p3: 'C4', p2: 'B-4', p1: 'E5'})
     >>> resolution.dominantSeventhToMinorTonic(possibC)
-    {'A': A-4, 'S': F5, 'B': F3, 'T': C4}
+    <music21.figuredBass.possibility Possibility: {1: F5, 2: A-4, 3: C4, 4: F3}>
     >>> resolution.dominantSeventhToMinorTonic(possibC, True)
-    {'A': C5, 'S': F5, 'B': A-3, 'T': C4}
+    <music21.figuredBass.possibility Possibility: {1: F5, 2: C5, 3: C4, 4: A-3}>
     '''
     if inPlace:
         dpCopy = dominantPossib
@@ -188,12 +200,18 @@ def dominantSeventhToMajorSubmediant(dominantPossib, inPlace = False):
     
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'G2', p3: 'B3', p2: 'F4', p1: 'D5'})
     >>> resolution.dominantSeventhToMajorSubmediant(possibA)
-    {'A': E-4, 'S': C5, 'B': A-2, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
+    <music21.figuredBass.possibility Possibility: {1: C5, 2: E-4, 3: C4, 4: A-2}>
+    >>> possibB = possibility.Possibility({p4: 'C3', p3: 'E3', p2: 'G3', p1: 'B-3'})
     >>> resolution.dominantSeventhToMajorSubmediant(possibB)
-    {'A': F3, 'S': A-3, 'B': D-3, 'T': F3}
+    <music21.figuredBass.possibility Possibility: {1: A-3, 2: F3, 3: F3, 4: D-3}>
     '''
     if inPlace:
         dpCopy = dominantPossib
@@ -242,12 +260,18 @@ def dominantSeventhToMinorSubmediant(dominantPossib, inPlace = False):
 
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'G2', p3: 'B3', p2: 'F4', p1: 'D5'})
     >>> resolution.dominantSeventhToMinorSubmediant(possibA)
-    {'A': E4, 'S': C5, 'B': A2, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
+    <music21.figuredBass.possibility Possibility: {1: C5, 2: E4, 3: C4, 4: A2}>
+    >>> possibB = possibility.Possibility({p4: 'C3', p3: 'E3', p2: 'G3', p1: 'B-3'})
     >>> resolution.dominantSeventhToMinorSubmediant(possibB)
-    {'A': F3, 'S': A3, 'B': D3, 'T': F3}
+    <music21.figuredBass.possibility Possibility: {1: A3, 2: F3, 3: F3, 4: D3}>
     '''
     if inPlace:
         dpCopy = dominantPossib
@@ -297,12 +321,18 @@ def dominantSeventhToMajorSubdominant(dominantPossib, inPlace = False):
 
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'G2', p3: 'B3', p2: 'F4', p1: 'D5'})
     >>> resolution.dominantSeventhToMajorSubdominant(possibA)
-    {'A': F4, 'S': C5, 'B': A2, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
+    <music21.figuredBass.possibility Possibility: {1: C5, 2: F4, 3: C4, 4: A2}>
+    >>> possibB = possibility.Possibility({p4: 'C3', p3: 'E3', p2: 'G3', p1: 'B-3'})
     >>> resolution.dominantSeventhToMajorSubdominant(possibB)
-    {'A': F3, 'S': B-3, 'B': D3, 'T': F3}
+    <music21.figuredBass.possibility Possibility: {1: B-3, 2: F3, 3: F3, 4: D3}>
     '''
     if inPlace:
         dpCopy = dominantPossib
@@ -349,12 +379,18 @@ def dominantSeventhToMinorSubdominant(dominantPossib, inPlace = False):
 
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'G2', 'T': 'B3', 'A': 'F4', 'S': 'D5'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'G2', p3: 'B3', p2: 'F4', p1: 'D5'})
     >>> resolution.dominantSeventhToMinorSubdominant(possibA)
-    {'A': F4, 'S': C5, 'B': A-2, 'T': C4}
-    >>> possibB = possibility.Possibility({'B': 'C3', 'T': 'E3', 'A': 'G3', 'S': 'B-3'})
+    <music21.figuredBass.possibility Possibility: {1: C5, 2: F4, 3: C4, 4: A-2}>
+    >>> possibB = possibility.Possibility({p4: 'C3', p3: 'E3', p2: 'G3', p1: 'B-3'})
     >>> resolution.dominantSeventhToMinorSubdominant(possibB)
-    {'A': F3, 'S': B-3, 'B': D-3, 'T': F3}
+    <music21.figuredBass.possibility Possibility: {1: B-3, 2: F3, 3: F3, 4: D-3}>
     '''
     if inPlace:
         dpCopy = dominantPossib
@@ -407,12 +443,17 @@ def diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot = False, inPlace
 
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'C#3', p3: 'G3', p2: 'E4', p1: 'B-4'})
     >>> resolution.diminishedSeventhToMajorTonic(possibA)
-    {'A': F#4, 'S': A4, 'B': D3, 'T': F#3}
+    <music21.figuredBass.possibility Possibility: {1: A4, 2: F#4, 3: F#3, 4: D3}>
     >>> resolution.diminishedSeventhToMajorTonic(possibA, True) # Alternate resolution
-    {'A': D4, 'S': A4, 'B': D3, 'T': F#3}
-    >>> possibB = resolution.diminishedSeventhToMajorTonic(possibA, True)    
+    <music21.figuredBass.possibility Possibility: {1: A4, 2: D4, 3: F#3, 4: D3}>
     '''
     if inPlace:
         dpCopy = diminishedPossib
@@ -463,11 +504,17 @@ def diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot = False, inPlace
 
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'C#3', p3: 'G3', p2: 'E4', p1: 'B-4'})
     >>> resolution.diminishedSeventhToMinorTonic(possibA)
-    {'A': F4, 'S': A4, 'B': D3, 'T': F3}
+    <music21.figuredBass.possibility Possibility: {1: A4, 2: F4, 3: F3, 4: D3}>
     >>> resolution.diminishedSeventhToMinorTonic(possibA, True) # Alternate resolution
-    {'A': D4, 'S': A4, 'B': D3, 'T': F3}
+    <music21.figuredBass.possibility Possibility: {1: A4, 2: D4, 3: F3, 4: D3}>
     '''
     if inPlace:
         dpCopy = diminishedPossib
@@ -515,9 +562,15 @@ def diminishedSeventhToMajorSubdominant(diminishedPossib, inPlace = False):
 
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'C#3', p3: 'G3', p2: 'E4', p1: 'B-4'})
     >>> resolution.diminishedSeventhToMajorSubdominant(possibA)
-    {'A': D4, 'S': B4, 'B': D3, 'T': G3}
+    <music21.figuredBass.possibility Possibility: {1: B4, 2: D4, 3: G3, 4: D3}>
     '''
     if inPlace:
         dpCopy = diminishedPossib
@@ -559,9 +612,15 @@ def diminishedSeventhToMinorSubdominant(diminishedPossib, inPlace = False):
 
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> possibA = possibility.Possibility({'B': 'C#3', 'T': 'G3', 'A': 'E4', 'S': 'B-4'})
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+
+    >>> possibA = possibility.Possibility({p4: 'C#3', p3: 'G3', p2: 'E4', p1: 'B-4'})
     >>> resolution.diminishedSeventhToMinorSubdominant(possibA)
-    {'A': D4, 'S': B-4, 'B': D3, 'T': G3}
+    <music21.figuredBass.possibility Possibility: {1: B-4, 2: D4, 3: G3, 4: D3}>
     '''
     if inPlace:
         dpCopy = diminishedPossib
