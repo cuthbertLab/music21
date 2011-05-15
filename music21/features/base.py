@@ -410,6 +410,10 @@ class StreamForms(object):
             self._forms['analyzedKey'] = self.__getitem__('flat').analyze('key')
             return self._forms['analyzedKey']
         
+        elif key in ['metadata']:
+            self._forms['metadata'] = self._base.metadata
+            return self._forms['metadata']
+        
         else:
             raise AttributeError('no such attribute: %s' % key)
 

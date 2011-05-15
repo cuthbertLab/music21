@@ -669,6 +669,71 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
 
 
 
+
+import webbrowser
+import urllib
+from urllib import FancyURLopener
+import re
+import math
+
+class URLOpenerUI(FancyURLopener):
+    version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
+
+googleResultsRE = re.compile('([\d\,]+) results')
+
+class ComposerPopularity(featuresModule.FeatureExtractor):
+    '''
+    composer's popularity today, as measured by the number of
+    Google search results (log-10)
+
+    >>> from music21 import *
+    >>> s = corpus.parse('mozart/k155', 2)
+    >>> fe = features.native.ComposerPopularity(s)
+    >>> fe.extract().vector 
+    [7...]
+    '''
+    id = 'MD1'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Composer Popularity'
+        self.description = 'Composer popularity today, as measured by the number of Google search results (log-10).'
+        self.dimensions = 1
+        self.discrete = False 
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # use for total number of chords
+        
+        resultsLog = 0
+#        try:
+        md = self.data['metadata']
+        if md is None:
+            return 0
+        composer = md.composer
+        if composer is None or composer == "":
+            return 0
+        paramsBasic = {'q': composer}
+
+        myGoogle = URLOpenerUI()
+        params = urllib.urlencode(paramsBasic)
+        page = myGoogle.open("http://www.google.com/search?%s" % params)
+        the_page = page.read()
+        m = googleResultsRE.search(the_page)
+        if m is not None and m.group(0):
+            totalRes = int(m.group(1).replace(',',""))
+            if totalRes > 0:
+                resultsLog = math.log(totalRes, 10)
+            else: 
+                resultsLog = -1
+#        except:
+#            resultsLog = 0
+        
+        self._feature.vector[0] = resultsLog
+
+
+
 class NativeFeatureException(featuresModule.FeatureException):
     pass
 
@@ -691,6 +756,8 @@ DiminishedTriadSimultaneityPrevalence, # cs8
 TriadSimultaneityPrevalence, # cs9
 DiminishedSeventhSimultaneityPrevalence, # cs10
 IncorrectlySpelledTriadPrevalence, # cs10
+
+ComposerPopularity, #md1
 ]
 
 
@@ -708,19 +775,25 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(chord.Chord(['c', 'e', 'g']))
-        s.append(chord.Chord(['c', 'e', 'g']))
+        s.append(chord.Chord(['c', 'e', 'a']))
         s.append(chord.Chord(['c', 'd#', 'g']))
-        s.append(chord.Chord(['c', 'd#', 'g']))
+        s.append(chord.Chord(['c', 'd#', 'a--']))
 
         fe = features.native.IncorrectlySpelledTriadPrevalence(s)
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
 
-
+        
+        
 #         streamList = corpus.bachChorales[200:220]
 #         feList = ['cs9', 'cs11']
 #         p = graph.PlotFeatures(streamList, feList)
 #         p.process()
 
+#    def testComposer(self):
+#        from music21 import corpus, features
+#        s = corpus.parse('mozart/k155', 2)
+#        fe = features.native.ComposerPopularity(s)
+#        x = fe.extract().vector[0] 
 
 
 if __name__ == "__main__":
