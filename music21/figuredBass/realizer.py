@@ -39,8 +39,8 @@ def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = Fa
     >>> from music21 import *
     >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
     >>> fb = figuredBass.realizer.figuredBassFromStreamPart(s)
-    >>> fb.solve()
-    >>> fb.showRandomSolutions(20)
+    >>> fb.realize()
+    >>> fb.showRandomRealizations(20)
     '''
     if partList is None:
         part1 = part.Part(1,2)
@@ -89,11 +89,19 @@ def addLyricsToBassNote(bassNote, notationString):
             spacesInFront += ' '
         bassNote.addLyric(spacesInFront + fs, applyRaw = True)
 
-
 class FiguredBass(object):
-    def __init__(self, partList, timeSigString = '4/4', keyString = 'C', modeString = 'major'):
+    def __init__(self, partList = None, timeSigString = '4/4', keyString = 'C', modeString = 'major'):
         '''
+        
         '''
+        if partList is None:
+            part1 = part.Part(1,2)
+            part2 = part.Part(2)
+            part3 = part.Part(3)
+            part4 = part.Part(4)
+
+            partList = [part1, part2, part3, part4]
+
         self.keyString = keyString
         self.modeString = modeString
         self.timeSigString = timeSigString
@@ -112,22 +120,26 @@ class FiguredBass(object):
         self.fbScale = realizerScale.FiguredBassScale(keyString, modeString)
         self.fbParts = partList
         self.fbRules = rules.Rules()
-        self.addLyrics = True
+        self.addNotationAsLyrics = True
         
         #Contains fb solutions
-        self.isSolved = False
+        self.isRealized = False
         self.allSegments = []
         self.lastSegment = None
         
     def addElement(self, bassNote, notationString = ''):
-        if self.addLyrics:
+        if self.addNotationAsLyrics:
             addLyricsToBassNote(bassNote, notationString)
         self.bassNotes.append(bassNote)
         self.bassLine.append(bassNote)
         self.figuredBassList.append((bassNote, notationString))
 
-    def solve(self):
+    def realize(self):
         startTime = time.time()
+        self.isRealized = False
+        self.allSegments = []
+        self.lastSegment = None
+        
         (startBass, startNotationString) = self.figuredBassList[0]
         #print("Finding starting possibilities for: " + str((startBass.pitch, startNotationString)))
         a1 = segment.StartSegment(self.fbScale, self.fbParts, self.fbRules, startBass, startNotationString)
@@ -143,18 +155,20 @@ class FiguredBass(object):
        
         #print("Trimming movements...")
         self.lastSegment.trimAllMovements()
-        numSolutions = self.lastSegment.getNumSolutions()
-        if numSolutions <= 200000:
-            numberProgressions = self.getAllNumberProgressions()
-            #print("Number of solutions, as calculated empirically: " + str(len(numberProgressions)) + ".")
-        #print("Solving complete. Number of solutions, as calculated by path counting: " + str(numSolutions) + ".\n")
+        numRealizations = self.lastSegment.getNumSolutions()
+        #if numRealizations <= 200000:
+            #numberProgressions = self.getAllIndexProgressions()
+            #print("Number of complete realizations, as calculated empirically: " + str(len(numberProgressions)) + ".")
+        #print("Solving complete. Number of complete realizations, as calculated by path counting: " + str(numRealizations) + ".\n")
         endTime = time.time()
         minutesElapsed = int((endTime - startTime) / 60)
         secondsElapsed = round((endTime - startTime) % 60)
-        #print("Time elapsed: " + str(minutesElapsed) + " minutes " + str(secondsElapsed) + " seconds.")
-        self.isSolved = True
-                
-    def getAllNumberProgressions(self):
+        print("Time elapsed: " + str(minutesElapsed) + " minutes " + str(secondsElapsed) + " seconds.")
+        self.isRealized = True
+      
+    # METHODS FOR GENERATION OF INDEX PROGRESSIONS
+    # --------------------------------------------
+    def getAllIndexProgressions(self):
         if len(self.allSegments) <= 1:
             raise FiguredBassException("One segment or less not enough for progression generator..")
         currMovements = self.allSegments[0].nextMovements
@@ -164,8 +178,8 @@ class FiguredBass(object):
             for nextIndex in allNextIndices:
                 progressions.append([prevIndex, nextIndex])
 
-        for cSegmentIndex in range(1, len(self.allSegments)-1):
-            currMovements = self.allSegments[cSegmentIndex].nextMovements
+        for mSegmentIndex in range(1, len(self.allSegments)-1):
+            currMovements = self.allSegments[mSegmentIndex].nextMovements
             progLength = len(progressions)
             for progIndex in range(progLength):
                 prog = progressions.pop(0)
@@ -176,58 +190,57 @@ class FiguredBass(object):
                     progressions.append(newProg)
         
         return progressions
-
-    def numberToChordProgression(self, numberProgression):
-        chords = []
-        for segmentIndex in range(len(self.allSegments)):
-            elementIndex = numberProgression[segmentIndex]
-            chords.append(self.allSegments[segmentIndex].possibilities[elementIndex])
-            
-        return chords
-   
-    def getAllChordProgressions(self):
-        chordProgressions = []
-        numberProgressions = self.getAllNumberProgressions()
-
-        for numberProgression in numberProgressions:
-            chordProgression = self.numberToChordProgression(numberProgression)
-            chordProgressions.append(chordProgression)
-        
-        return chordProgressions
     
-    def getRandomChordProgression(self):
+    def getRandomIndexProgression(self):
         if len(self.allSegments) <= 1:
             raise FiguredBassException("One segment or less not enough for progression generator.")
-        numberProgression = []
+        indexProgression = []
         currMovements = self.allSegments[0].nextMovements
         prevChordIndex = random.sample(currMovements.keys(), 1)[0]
-        numberProgression.append(prevChordIndex)
+        indexProgression.append(prevChordIndex)
 
-        for cSegmentIndex in range(0, len(self.allSegments)-1):
-            currMovements = self.allSegments[cSegmentIndex].nextMovements
+        for mSegmentIndex in range(0, len(self.allSegments)-1):
+            currMovements = self.allSegments[mSegmentIndex].nextMovements
             nextChordIndex = random.sample(currMovements[prevChordIndex], 1)[0]
-            numberProgression.append(nextChordIndex)
+            indexProgression.append(nextChordIndex)
             prevChordIndex = nextChordIndex
 
-        chordProgression = self.numberToChordProgression(numberProgression)
-        return chordProgression
+        return indexProgression
+        
+    # METHODS FOR GENERATION OF POSSIBILITY PROGRESSIONS
+    # --------------------------------------------------
+    def indexToPossibilityProgression(self, indexProgression):
+        possibilityProgression = []
+        
+        for segmentIndex in range(len(self.allSegments)):
+            elementIndex = indexProgression[segmentIndex]
+            possibilityProgression.append(self.allSegments[segmentIndex].possibilities[elementIndex])
+            
+        return possibilityProgression
+   
+    def getAllPossibilityProgressions(self):
+        possibilityProgressions = []
+        indexProgressions = self.getAllIndexProgressions()
 
-    def showRandomSolution(self):
-        self.generateRandomSolution().show()
+        for indexProgression in indexProgressions:
+            possibilityProgression = self.indexToPossibilityProgression(indexProgression)
+            possibilityProgressions.append(possibilityProgression)
         
-    def generateRandomSolution(self):
-        '''
-        Generates a random solution as a stream.Score()
-        '''
-        chordProgression = self.getRandomChordProgression()
-        return self.generateSolutionFromChordProgression(chordProgression)
-        
-    def generateSolutionFromChordProgression(self, chordProgression):
+        return possibilityProgressions
+    
+    def getRandomPossibilityProgression(self):
+        indexProgression = self.getRandomIndexProgression()
+        possibilityProgression = self.indexToPossibilityProgression(indexProgression)
+        return possibilityProgression
+
+    # METHODS FOR MUSIC21.STREAM SCORE GENERATION FROM POSSILITY PROGRESSIONS
+    # -----------------------------------------------------------------------
+    def generateRealizationFromPossibilityProgression(self, possibilityProgression):
         '''
         Generates a solution as a stream.Score() given a chord progression
         
         bass line is taken from the figured bass object, but is checked against
-        the chord progression for consistency.
+        the Possibility progression for consistency.
         '''
         sol = stream.Score()
         rightHand = stream.Part()
@@ -236,8 +249,8 @@ class FiguredBass(object):
 
         v0 = self.fbParts[0]
         
-        for j in range(len(chordProgression)):
-            givenPossib = chordProgression[j]
+        for j in range(len(possibilityProgression)):
+            givenPossib = possibilityProgression[j]
             bassNote = self.bassNotes[j]
 
             if givenPossib[v0] != bassNote.pitch:
@@ -256,39 +269,34 @@ class FiguredBass(object):
         sol.insert(0, copy.deepcopy(self.bassLine))
         sol.append(bar.Barline('light-heavy'))
 
-        return sol
-      
-    def showAllSolutions(self, showAsText = False):
-        if showAsText:
-            self.generateAllSolutions().show('text')
-        else:
-            self.generateAllSolutions().show()
-        
-    def showRandomSolutions(self, amountToShow = 20, showAsText = False):
-        if showAsText:        
-            self.generateRandomSolutions(amountToShow).show('text')
-        else:
-            self.generateRandomSolutions(amountToShow).show()
-    
-    def generateAllSolutions(self):
+        return sol   
+
+    def generateAllRealizations(self):
         allSols = stream.Score()
         part1 = stream.Part()
         part2 = stream.Part()
         allSols.insert(0, part1)
         allSols.insert(0, part2)
-        chordProgressions = self.getAllChordProgressions()
-        for chordProgression in chordProgressions:
-            sol = self.generateSolutionFromChordProgression(chordProgression)
+        possibilityProgressions = self.getAllPossibilityProgressions()
+        for possibilityProgression in possibilityProgressions:
+            sol = self.generateRealizationFromPossibilityProgression(possibilityProgression)
             for m in sol.parts[0]:
                 part1.append(m)
             for m in sol.parts[1]:
                 part2.append(m)
         
         return allSols
-    
-    def generateRandomSolutions(self, amountToShow = 20):
+
+    def generateRandomRealization(self):
+        '''
+        Generates a random solution as a stream.Score()
+        '''
+        possibilityProgression = self.getRandomPossibilityProgression()
+        return self.generateRealizationFromPossibilityProgression(possibilityProgression)
+      
+    def generateRandomRealizations(self, amountToShow = 20):
         if amountToShow > self.lastSegment.getNumSolutions():
-            return self.generateAllSolutions()
+            return self.generateAllRealizations()
         
         allSols = stream.Score()
         part1 = stream.Part()
@@ -296,20 +304,39 @@ class FiguredBass(object):
         allSols.insert(0, part1)
         allSols.insert(0, part2)
         for solutionCounter in range(amountToShow):
-            sol = self.generateRandomSolution()
+            sol = self.generateRandomRealization()
             for m in sol.parts[0]:
                 part1.append(m)
             for m in sol.parts[1]:
                 part2.append(m)
             
         return allSols
+    
+    # METHODS FOR DISPLAY OF MUSIC21.STREAM SCORE GENERATION FROM POSSIBILITY PROGRESSIONS
+    # ------------------------------------------------------------------------------------
+    def showRandomRealization(self):
+        self.generateRandomRealization().show()    
+      
+    def showAllRealizations(self, showAsText = False):
+        if showAsText:
+            self.generateAllRealizations().show('text')
+        else:
+            self.generateAllRealizations().show()
         
-    def printChordProgression(self, chordProgression):
+    def showRandomRealizations(self, amountToShow = 20, showAsText = False):
+        if showAsText:        
+            self.generateRandomRealizations(amountToShow).show('text')
+        else:
+            self.generateRandomRealizations(amountToShow).show()
+
+    # METHOD FOR CONSOLE PRINTING OF POSSIBILITY PROGRESSION
+    # ------------------------------------------------------
+    def printpossibilityProgression(self, possibilityProgression):
         linesToPrint = []
-        for v in self.fbParts:
-            partLine = v.label + ":\n"
-            for chord in chordProgression:
-                partLine += str(chord[v.label]) + "\t"
+        for p in self.partList:
+            partLine = p.label + ":\n"
+            for possib in possibilityProgression:
+                partLine += str(possib[p.label]) + "\t"
             linesToPrint.append(partLine)
         linesToPrint.reverse()
         for partLine in linesToPrint:
