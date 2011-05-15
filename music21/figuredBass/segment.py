@@ -189,6 +189,7 @@ class MiddleSegment(Segment):
         isDominantSeventh = chord.Chord(self.prevSegment.pitchesAboveBass).isDominantSeventh()
         if isDominantSeventh and self.fbRules.resolveDominantSeventhProperly:
             dominantPossibilities = self.prevSegment.possibilities
+            self.prevSegment.nextMovements = {}
             resolutionPossibilities = []
             dominantPossibIndex = 0
             for dominantPossib in dominantPossibilities:
@@ -211,6 +212,7 @@ class MiddleSegment(Segment):
         isDiminishedSeventh = chord.Chord(self.prevSegment.pitchesAboveBass).isDiminishedSeventh()
         if isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:
             diminishedPossibilities = self.prevSegment.possibilities
+            self.prevSegment.nextMovements = {}
             resolutionPossibilities = []
             diminishedPossibIndex = 0
             for diminishedPossib in diminishedPossibilities:
@@ -231,6 +233,7 @@ class MiddleSegment(Segment):
 
     def resolveAllConsecutivePossibilities(self):
         prevPossibilities = self.prevSegment.possibilities
+        self.prevSegment.nextMovements = {}
         nextPossibilities = self.correctSinglePossibilities()
         prevPossibIndex = 0
         for possibA in prevPossibilities:
