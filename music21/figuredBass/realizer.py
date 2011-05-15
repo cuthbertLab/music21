@@ -65,7 +65,7 @@ def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = Fa
         ts = tsList[0]
     
     fb = FiguredBass(partList, str(ts), mykey.tonic, mykey.mode)
-    fb.addLyrics = False
+    fb.addNotationAsLyrics = False
     
     for n in sfn:
         if n.lyric != "" and n.lyric is not None:
@@ -163,7 +163,7 @@ class FiguredBass(object):
         endTime = time.time()
         minutesElapsed = int((endTime - startTime) / 60)
         secondsElapsed = round((endTime - startTime) % 60)
-        print("Time elapsed: " + str(minutesElapsed) + " minutes " + str(secondsElapsed) + " seconds.")
+        #print("Time elapsed: " + str(minutesElapsed) + " minutes " + str(secondsElapsed) + " seconds.")
         self.isRealized = True
       
     # METHODS FOR GENERATION OF INDEX PROGRESSIONS
