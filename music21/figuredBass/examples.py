@@ -7,6 +7,7 @@
 # Copyright:    (c) 2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+import copy
 
 from music21 import interval
 from music21 import note
@@ -14,34 +15,24 @@ from music21 import clef
 from music21 import stream
 from music21 import key
 from music21 import meter
+from music21 import tempo
+from music21 import chord
 
 from music21.figuredBass import realizer
 from music21.figuredBass import part
 
-def createPartListA():
-    b1 = part.Part('Bass', None, 'E2','E4')
-    t1 = part.Part('Tenor', 4, 'C3','A4')
-    a1 = part.Part('Alto', 4, 'F3','G5')
-    s1 = part.Part('Soprano', 2, 'C4','A5')
-    
-    partList = [b1,t1,a1,s1]
-    return partList
-
-def createPartListB():
-    part1 = part.Part(1,2)
-    part2 = part.Part(2)
-    part3 = part.Part(3)
-    part4 = part.Part(4)
-    
-    partList = [part1, part2, part3, part4]
-    return partList
     
 def exampleA():
     '''
     This was one of my (Jose Cabal-Ugaz) 21M.302 assignments.
     The figured bass was composed by Charles Shadle.
     '''
-    partList = createPartListB()
+    part1 = part.Part(1,2)
+    part2 = part.Part(2)
+    part3 = part.Part(3)
+    part4 = part.Part(4, None)
+    
+    partList = [part1, part2, part3, part4]
     fb = realizer.FiguredBass(partList, '3/2', 'C')
     ####     C major: C D E F G A B C
 
@@ -91,7 +82,12 @@ def exampleB():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
-    partList = createPartListB()
+    part1 = part.Part(1,2)
+    part2 = part.Part(2)
+    part3 = part.Part(3)
+    part4 = part.Part(4, None)
+    
+    partList = [part1, part2, part3, part4]
     fb = realizer.FiguredBass(partList, '4/4', 'D', 'minor')
     ####     D minor: D E F G A B- C(#) D
    
@@ -119,7 +115,12 @@ def exampleC():
     '''
     Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
     '''
-    partList = createPartListB()
+    part1 = part.Part(1,2)
+    part2 = part.Part(2)
+    part3 = part.Part(3)
+    part4 = part.Part(4, None)
+    
+    partList = [part1, part2, part3, part4]
     fb = realizer.FiguredBass(partList, '4/4', 'F#', 'minor')
     ####     F# minor: F# G# A B C# D E(#) F
     
@@ -148,7 +149,12 @@ def exampleD():
     Another one of my (Jose Cabal-Ugaz) assignments from 21M.302.
     This figured bass was composed by Charles Shadle.
     '''
-    partList = createPartListB()
+    part1 = part.Part(1,2)
+    part2 = part.Part(2)
+    part3 = part.Part(3)
+    part4 = part.Part(4, None)
+    
+    partList = [part1, part2, part3, part4]
     fb = realizer.FiguredBass(partList, '3/4', 'b', 'minor')
     ####     B minor: B C# D E F# G A(#) B
 
@@ -252,62 +258,200 @@ def viio65ResolutionExample():
     return fb
 
 def twelveBarBlues():
-    partList = createPartListB()
+    part1 = part.Part(1,4)
+    part2 = part.Part(2)
+    part3 = part.Part(3)
+    part4 = part.Part(4)
+    
+    partList = [part1, part2, part3, part4]
     fb = realizer.FiguredBass(partList, '4/4', 'B-')
     
-    n1 = note.Note('B-3') #I
+    n1 = note.Note('B-2') #I
     n2 = note.Note('E-3') #IV
-    n3 = note.Note('B-3') #I
-    n4 = note.Note('B-3') #I
+    n3 = note.Note('B-2') #I
+    n4 = note.Note('B-2') #I7
     n5 = note.Note('E-3') #IV
     n6 = note.Note('E-3') #IV
-    n7 = note.Note('B-3') #I
-    n8 = note.Note('B-3') #I
-    n9 = note.Note('F3') #V
-    n10 = note.Note('G3') #IV
-    n11 = note.Note('B-3') #I
-    n12 = note.Note('B-3') #I
+    n7 = note.Note('B-2') #I
+    n8 = note.Note('B-2') #I7
+    n9 = note.Note('F3') #V7
+    n10 = note.Note('G3') #IV6
+    n11 = note.Note('B-2') #I
+    n12 = note.Note('B-2') #I
     
-    n1.quarterLength = 1.0
-    n2.quarterLength = 1.0
-    n3.quarterLength = 1.0
-    n4.quarterLength = 1.0
-    n5.quarterLength = 1.0
-    n6.quarterLength = 1.0
-    n7.quarterLength = 1.0
-    n8.quarterLength = 1.0
-    n9.quarterLength = 1.0
-    n10.quarterLength = 1.0
-    n11.quarterLength = 1.0
-    n12.quarterLength = 1.0
+    n1.quarterLength = 4.0
+    n2.quarterLength = 4.0
+    n3.quarterLength = 4.0
+    n4.quarterLength = 4.0
+    n5.quarterLength = 4.0
+    n6.quarterLength = 4.0
+    n7.quarterLength = 4.0
+    n8.quarterLength = 4.0
+    n9.quarterLength = 4.0
+    n10.quarterLength = 4.0
+    n11.quarterLength = 4.0
+    n12.quarterLength = 4.0
 
-    fb.addElement(n1, '7')
-    fb.addElement(n2, '7')
-    fb.addElement(n3, '7')   
+    fb.addElement(n1)
+    fb.addElement(n2)
+    fb.addElement(n3)   
     fb.addElement(n4, '7')
-    fb.addElement(n5, '7')
-    fb.addElement(n6, '7')
-    fb.addElement(n7, '7')
+    fb.addElement(n5)
+    fb.addElement(n6)
+    fb.addElement(n7)
     fb.addElement(n8, '7')
     fb.addElement(n9, '7')
     fb.addElement(n10, '6')
-    fb.addElement(n11, '7')
-    fb.addElement(n12, '7')
+    fb.addElement(n11)
+    fb.addElement(n12)
     
+    n1.addLyric("(I)")
+    n2.addLyric("(IV)")
+    n3.addLyric("(I)")
+    n4.addLyric("(I7)")
+    n5.addLyric("(IV)")
+    n6.addLyric("(IV)")
+    n7.addLyric("(I)")
+    n8.addLyric("(I7)")
+    n9.addLyric("(V7)")
+    n10.addLyric("(IV6)")
+    n11.addLyric("(I)")
+    n12.addLyric("(I)")
+    
+    fb.fbRules.allowVoiceOverlap = True
     return fb
 
-
-
 if __name__ == "__main__":
-    #exampleA(), exampleB(), exampleC(), exampleD()
-    fb = exampleA() #Set up the figured bass
-    #fb = viio65ResolutionExample()
-    #fb = twelveBarBlues()
-    #fb.fbInfo.fbRules.allowParallelFifths = True
-    #fb.fbInfo.fbRules.allowParallelOctaves = True
+    fbRealizer = exampleA()
+    #fbRealizer = exampleB()
+    #fbRealizer = exampleC()
+    #fbRealizer = exampleD()
+    #fbRealizer = V43ResolutionExample()
+    #fbRealizer = viio65ResolutionExample()
+    '''
+    #fbRealizer = twelveBarBlues()
+    #generateBoogieVamp(fbRealizer.generateRandomRealizations(5)).show()
+    #generateTripletBlues(fbRealizer.generateRandomRealizations(5).show()
+    #generateBluesVamp(fbRealizer.generateRandomRealizations(5).show()
+    '''
+    fbRealizer.realize()
+    fbRealizer.showRandomRealizations(20)
 
-    #fb.fbInfo.fbRules.upperPartsMaxSemitoneSeparation = None
-    fb.solve()
-    fb.showRandomSolutions(20)
-    #sc = fb.generateRandomSolutions(200)
-    #sc.flat.plot('pitchClass')
+# -----------------------------------------------------------------
+# METHODS FOR GENERATION OF BLUES VAMPS
+def generateBoogieVamp(sampleScore):
+    '''
+    Turns whole notes in bass line to blues boogie woogie bass line.
+    Run this on a solution to twelveBarBlues()
+    
+    >>> from music21.figuredBass import examples
+    >>> bluesLine = examples.twelveBarBlues()
+    >>> bluesLine.solve()
+    Finding starting possibilities for: (B-2, '')
+    Finding all possibilities for: (E-3, '')
+    Finding all possibilities for: (B-2, '')
+    ...
+    Finding all possibilities for: (B-2, '')
+    Solving complete. Number of solutions, as calculated by path counting: 2224978.
+
+    >>> examples.generateBoogieVamp(bluesLine.generateRandomSolutions(10)).show()
+    '''
+    boogieBassLine = stream.Part()
+    boogieBassLine.append(note.Note('B-2'))
+    boogieBassLine.append(note.Note('D3'))
+    boogieBassLine.append(note.Note('F3'))
+    boogieBassLine.append(note.Note('G3'))
+    boogieBassLine.append(note.Note('A-3'))
+    boogieBassLine.append(note.Note('G3'))
+    boogieBassLine.append(note.Note('F3'))
+    boogieBassLine.append(note.Note('D3'))
+    
+    for i in range(len(boogieBassLine.notes)):
+        if i % 2 == 0:
+            boogieBassLine.notes[i].quarterLength = 0.75
+        else:
+            boogieBassLine.notes[i].quarterLength = 0.25
+    
+    newBassLine = stream.Part()
+    newBassLine.append(sampleScore[1][0]) #Time signature
+    newBassLine.append(sampleScore[1][1]) #Key signature
+
+    for n in sampleScore[1].notes:
+        i = interval.notesToInterval(boogieBassLine[0], n)
+        tp = boogieBassLine.transpose(i)
+        for lyr in n.lyrics:
+            tp.notes[0].addLyric(lyr.text)
+        for m in tp.notes:
+            newBassLine.append(m)
+    
+    newScore = stream.Score()
+    newScore.insert(0, sampleScore[0])
+    newScore.insert(newBassLine)
+    
+    return newScore
+
+def generateTripletBlues(sampleScore): #12/8
+    tripletBassLine = stream.Part()
+    n1 = note.Note('B-2')
+    n2 = note.Note('B-2')
+    n3 = note.Note('D3')
+    n4 = note.Note('D3')
+    n5 = note.Note('F3')
+    n6 = note.Note('F3')
+    n7 = note.Note('A-3')
+    n8 = note.Note('G3')
+    n9 = note.Note('F3')
+
+    eighthNotes = [n2,n4,n6,n7,n8,n9]
+    for n in eighthNotes:
+        n.quarterLength = 0.5
+        
+    tripletBassLine.append(n1)
+    tripletBassLine.append(n2)
+    tripletBassLine.append(n3)
+    tripletBassLine.append(n4)
+    tripletBassLine.append(n5)
+    tripletBassLine.append(n6)
+    tripletBassLine.append(n7)
+    tripletBassLine.append(n8)
+    tripletBassLine.append(n9)
+
+    newBassLine = stream.Part()
+    for n in sampleScore[1].notes:
+        i = interval.notesToInterval(tripletBassLine[0], n)
+        tp = tripletBassLine.transpose(i)
+        for lyr in n.lyrics:
+            tp.notes[0].addLyric(lyr.text)
+        for m in tp.notes:
+            newBassLine.append(m)
+    
+    newTopLine = stream.Part()
+    for sampleChord in sampleScore[0].notes:
+        sampleChordCopy = copy.deepcopy(sampleChord)
+        sampleChordCopy.quarterLength = 6.0
+        newTopLine.append(sampleChordCopy)
+        
+    newScore = stream.Score()
+    newScore.append(meter.TimeSignature("12/8")) #Time signature
+    newScore.append(sampleScore[1][1]) #Key signature
+    newScore.insert(0, newTopLine)
+    newScore.insert(0, newBassLine)
+    return newScore
+
+def generateBluesVamp(sampleScore, topLineChordLengths = [1.0, 1.0, 1.0, 1.0]):
+    newTopLine = stream.Part()
+    newTopLine.append(sampleScore[0][0]) #Time signature
+    newTopLine.append(sampleScore[0][1]) #Key signature
+    
+    for sampleChord in sampleScore[0].notes:
+        for chordLength in topLineChordLengths:
+            newChord = copy.deepcopy(sampleChord)
+            newChord.quarterLength = chordLength
+            newTopLine.append(newChord)
+            
+    newScore = stream.Score()
+    newScore.insert(0, newTopLine)
+    newScore.insert(0, sampleScore[1])
+
+    return newScore
+    
