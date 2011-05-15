@@ -242,7 +242,7 @@ class Graph(object):
         if 'colors' in keywords:
             self.colors = keywords['colors']
         else:
-            self.colors = ['#605C7F', '#715c7f', '#5c7f60']
+            self.colors = ['#605C7F', '#5c7f60', '#715c7f']
 
         # font info
         if 'tickFontSize' in keywords:
@@ -1105,7 +1105,7 @@ class GraphGroupedVerticalBar(Graph):
     '''Graph the count of on or more elements in vertical bars
 
     Data set is simply a list of x and y pairs, where there
-    is only one of each x value, and y value is list of valu=e
+    is only one of each x value, and y value is a list of values
 
     >>> from music21 import *
     >>> import random
@@ -1124,12 +1124,16 @@ class GraphGroupedVerticalBar(Graph):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
+        if 'roundDigits' in keywords:
+            self.roundDigits = keywords['roundDigits']
+        else:
+            self.roundDigits = 1
 
     def labelBars(self, ax, rects):
         # attach some text labels
         for rect in rects:
             height = rect.get_height()
-            ax.text(rect.get_x()+rect.get_width()/2., height+.05, '%s'%str(round(height, 1)), ha='center', va='bottom', 
+            ax.text(rect.get_x()+rect.get_width()/2., height+.05, '%s'%str(round(height, self.roundDigits)), ha='center', va='bottom', 
             fontsize=self.tickFontSize, family=self.fontFamily)
 
     def process(self):
@@ -1141,7 +1145,7 @@ class GraphGroupedVerticalBar(Graph):
         for a, b in self.data:
             barsPerGroup = len(b)
             # get for legend
-            subLabels = b.keys()
+            subLabels = sorted(b.keys())
             break
         widthShift = 1 / float(barsPerGroup)
 
@@ -1163,7 +1167,7 @@ class GraphGroupedVerticalBar(Graph):
                 xValsShifted.append(x + (widthShift * i))
 
             rect = ax.bar(xValsShifted, yVals, width=widthShift, alpha=.8, 
-                    color=self.colors[i%len(self.colors)])
+                    color=self.colors[i % len(self.colors)])
             rects.append(rect)
 
         colors = []
@@ -3454,7 +3458,16 @@ def plotStream(streamObj, *args, **keywords):
 
     Note: plots requires matplotib to be installed.
 
-    Plot methods can be specified as additional arguments or by keyword. Two keyword arguments can be given: `format` and `values`. If positional arguments are given, the first is taken as `format` and the rest are collected as `values`. If `format` is the class name, that class is collected. Additionally, every :class:`~music21.graph.PlotStream` subclass defines one `format` string and a list of `values` strings. The `format` parameter defines the type of Graph (e.g. scatter, histogram, colorGrid). The `values` list defines what values are graphed (e.g. quarterLength, pitch, pitchClass). 
+    Plot methods can be specified as additional arguments or by keyword. 
+    Two keyword arguments can be given: `format` and `values`. 
+    If positional arguments are given, the first is taken as `format` 
+    and the rest are collected as `values`. If `format` is the class 
+    name, that class is collected. Additionally, every 
+    :class:`~music21.graph.PlotStream` subclass defines one `format` 
+    string and a list of `values` strings. The `format` parameter 
+    defines the type of Graph (e.g. scatter, histogram, colorGrid). The 
+    `values` list defines what values are graphed 
+    (e.g. quarterLength, pitch, pitchClass). 
 
     If a user provides a `format` and one or more `values` strings, a plot with the corresponding profile, if found, will be generated. If not, the first Plot to match any of the defined specifiers will be created. 
 

@@ -532,6 +532,8 @@ class MelodicOctavesFeature(featuresModule.FeatureExtractor):
 
 class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
     '''
+    Returns the fraction of melodic intervals that are rising rather than falling.  Unisons are omitted
+    
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.DirectionOfMotionFeature(s)
@@ -2347,12 +2349,18 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
         count = 0
-        for p in s.parts:
-            # always one instrument
-            i = p.getElementsByClass('Instrument')[0]
-            if len(p.flat.notes) > 0:
-                self._feature.vector[i.midiProgram] = 1
-
+        if s is not None:
+            for p in s.parts:
+                # always one instrument
+                x = p.getElementsByClass('Instrument')
+                if len(x) > 0 :
+                    i = x[0]
+                    if len(p.flat.notes) > 0:
+                        self._feature.vector[i.midiProgram] = 1
+                else:
+                    pass
+        else:
+            self._feature.vector[0] = 1
 
 
 class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):

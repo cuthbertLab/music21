@@ -54,10 +54,17 @@ TRANSPARENCY_STOP = r'''
 class LilyString(object):
     '''Class for representing complete processing of a lily pond string.
     '''
-
-    LILYEXEC = 'lilypond'
-    if sys.platform == "darwin":
-        LILYEXEC = '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'
+    if os.path.exists(environLocal['lilypondPath']):
+        LILYEXEC = environLocal['lilypondPath']
+    else:
+        if sys.platform == "darwin":
+            LILYEXEC = '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'
+        elif sys.platform == 'win32' and os.path.exists('c:/Program Files (x86)'):
+            LILYEXEC = 'c:/Program\ Files\ (x86)/lilypond/usr/bin/lilypond'
+        elif sys.platform == 'win32':
+            LILYEXEC = 'c:/Program\ Files/lilypond/usr/bin/lilypond'
+        else:
+            LILYEXEC = 'lilypond'
     format   = 'pdf'
     version  = '2.11' # this should be obtained from user and/or user's system
     backend  = 'ps'
@@ -82,7 +89,6 @@ class LilyString(object):
 
 indent = 0\mm
 force-assignment = #""
-line-width = #(- line-width (* mm  3.000000))
 oddFooterMarkup=##f
 oddHeaderMarkup=##f
 bookTitleMarkup=##f
@@ -209,7 +215,7 @@ scoreTitleMarkup=##f
         filename = self.tempName
         format   = self.format
         backend  = self.backend
-        lilyCommand = self.LILYEXEC + " --" + format + " " + \
+        lilyCommand = '"' + self.LILYEXEC + '"' + " --" + format + " " + \
                     self.backendString + backend + " -o " + filename + " " + filename
         
         try:

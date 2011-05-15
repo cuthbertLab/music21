@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         ismir2010.py
-# Purpose:      ismir2010.py
+# Purpose:      Examples for ISMIR 2010 paper
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert

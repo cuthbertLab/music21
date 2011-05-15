@@ -4574,9 +4574,10 @@ class Stream(music21.Music21Object):
     
         # handle last element
         #print elements[-1], qLenTotal, elements[-1].duration
-        elements[-1].duration.quarterLength = (qLenTotal -
-                    elements[-1].getOffsetBySite(self))
-        #print elements[-1], elements[-1].duration    
+        if len(elements) != 0:
+            elements[-1].duration.quarterLength = (qLenTotal -
+                        elements[-1].getOffsetBySite(self))
+            #print elements[-1], elements[-1].duration    
         return returnObj
     
 

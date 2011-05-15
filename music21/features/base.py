@@ -30,9 +30,12 @@ class FeatureException(music21.Music21Exception):
 
 
 class Feature(object):
-    '''An object representation of a feature, capable of presentation in a variety of formats, and returned from FeatureExtractor objects.
+    '''
+    An object representation of a feature, capable of presentation in a variety of formats, 
+    and returned from FeatureExtractor objects.
 
-    Feature objects are simple. It is FeatureExtractors that store all metadata and processing routines for creating Feature objects. 
+    Feature objects are simple. It is FeatureExtractors that store all metadata and processing 
+    routines for creating Feature objects. 
     '''
     def __init__(self):
         # these values will be filled by the extractor
@@ -92,12 +95,18 @@ class FeatureExtractor(object):
 
         self._feature = None # Feature object that results from processing
 
-        self.name = None # string name representation
-        self.description = None # string description
-        self.isSequential = None # True or False
-        self.dimensions = None # number of dimensions
-        self.discrete = True # default
-        self.normalize = False # default is no
+        if not hasattr(self, "name"):
+            self.name = None # string name representation
+        if not hasattr(self, "description"):
+            self.description = None # string description
+        if not hasattr(self, "isSequential"):
+            self.isSequential = None # True or False
+        if not hasattr(self, "dimensions"):
+            self.dimensions = None # number of dimensions
+        if not hasattr(self, "discrete"):
+            self.discrete = True # default
+        if not hasattr(self, "normalize"):
+            self.normalize = False # default is no
 
     def setData(self, dataOrStream):
         '''Set the data that this FeatureExtractor will process. Either a Stream or a DataInstance object can be provided. 
@@ -617,7 +626,7 @@ class OutputTabOrange(OutputFormat):
         return post
 
     def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
-        '''Get the complete DataSet as a string with the appropriate header.s
+        '''Get the complete DataSet as a string with the appropriate headers.
         '''
         if lineBreak is None:
             lineBreak = '\n'
@@ -782,8 +791,9 @@ class DataSet(object):
 
     def __init__(self, classLabel=None, featureExtractors=[]):
         # assume a two dimensional array
-        self._dataInstances = []
-        # order of feature extractors is the order used in the presentaitons
+        self.dataInstances = []
+        self.streams = []
+        # order of feature extractors is the order used in the presentations
         self._featureExtractors = []
         # the label of the class
         self._classLabel = classLabel
@@ -878,11 +888,13 @@ class DataSet(object):
         if self._classLabel is None:
             raise DataSetException('cannot add data unless a class label for this DataSet has been set.')
 
+        s = None
         if isinstance(dataOrStreamOrPath, DataInstance):
             di = dataOrStreamOrPath
+            s = di._src
         elif common.isStr(dataOrStreamOrPath):
             # could be corpus or file path
-            if os.path.exists(dataOrStreamOrPath):
+            if os.path.exists(dataOrStreamOrPath) or dataOrStreamOrPath.startswith('http'):
                 s = converter.parse(dataOrStreamOrPath)
             else: # assume corpus
                 s = corpus.parse(dataOrStreamOrPath)
@@ -890,10 +902,12 @@ class DataSet(object):
             di = DataInstance(s, id=dataOrStreamOrPath)
         else:        
             # for now, assume all else are streams
+            s = dataOrStreamOrPath
             di = DataInstance(dataOrStreamOrPath, id=id)
 
         di.setClassLabel(self._classLabel, classValue)
-        self._dataInstances.append(di)
+        self.dataInstances.append(di)
+        self.streams.append(s)
 
 
     def process(self):
@@ -901,12 +915,12 @@ class DataSet(object):
         '''
         # clear features
         self._features = []
-        for data in self._dataInstances:
+        for data in self.dataInstances:
             row = []
             for fe in self._featureExtractors:
                 fe.setData(data)
                 row.append(fe.extract()) # get feature and store
-            # rows will allign with data the order of DataInstances
+            # rows will align with data the order of DataInstances
             self._features.append(row)
 
 
@@ -916,7 +930,7 @@ class DataSet(object):
         post = []
         for i, row in enumerate(self._features):
             v = []
-            di = self._dataInstances[i]
+            di = self.dataInstances[i]
 
             if includeId:
                 v.append(di.getId())
@@ -931,7 +945,7 @@ class DataSet(object):
         '''Return a list of unique class values.
         '''
         post = []
-        for di in self._dataInstances:
+        for di in self.dataInstances:
             v = di.getClassValue()
             if v not in post:
                 post.append(v)
@@ -998,7 +1012,6 @@ class DataSet(object):
 
 
 #-------------------------------------------------------------------------------
-# TODO: add all to get from both libraries
 
 def extractorsById(idOrList, library=['jSymbolic', 'native']):
     '''Given one or more :class:`~music21.features.FeatureExtractor` ids, return the appropriate  subclass. An optional `library` argument can be added to define which module is used. Current options are jSymbolic and native.
@@ -1012,6 +1025,14 @@ def extractorsById(idOrList, library=['jSymbolic', 'native']):
     >>> [x.id for x in features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])]
     ['R31', 'R32', 'R33', 'R34', 'R35', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P16', 'P19', 'P20', 'P21']
 
+    
+    Get all feature extractors from all libraries
+    
+    
+    >>> y = [x.id for x in features.extractorsById('all')]
+    >>> y[0:3], y[-3:-1]
+    (['M1', 'M2', 'M3'], ['CS10', 'CS11'])
+
     '''
     from music21.features import jSymbolic
     from music21.features import native
@@ -1021,9 +1042,9 @@ def extractorsById(idOrList, library=['jSymbolic', 'native']):
 
     featureExtractors = []
     for l in library:
-        if l.lower() in ['jsymbolic']:
+        if l.lower() in ['jsymbolic', 'all']:
             featureExtractors += jSymbolic.featureExtractors
-        elif l.lower() in ['native']:
+        elif l.lower() in ['native', 'all']:
             featureExtractors += native.featureExtractors
 
     if not common.isListLike(idOrList):
@@ -1037,8 +1058,11 @@ def extractorsById(idOrList, library=['jSymbolic', 'native']):
         flatIds.append(id)
 
     post = []
+    if len(flatIds) == 0:
+        return post
+    
     for fe in featureExtractors:
-        if fe.id.lower() in flatIds:
+        if fe.id.lower() in flatIds or flatIds[0].lower() == 'all':
             post.append(fe)
     return post
 
@@ -1112,7 +1136,7 @@ class Test(unittest.TestCase):
     def testDataSetOutput(self):
         from music21 import features
         # test just a few features
-        featureExtractors = features.extractorsById(['ql1', 'ql2', 'ql3', 'ql4'], 'native')
+        featureExtractors = features.extractorsById(['ql1', 'ql2', 'ql4'], 'native')
         
         # need to define what the class label will be
         ds = features.DataSet(classLabel='Composer')
@@ -1127,11 +1151,11 @@ class Test(unittest.TestCase):
         # manually create an output format and get output
         of = OutputCSV(ds)
         post = of.getString(lineBreak='//')
-        self.assertEqual(post, 'Identifier,Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Most_Common_Note_Quarter_Length_Prevalance,Range_of_Note_Quarter_Lengths,Composer//bwv66.6,3,1.0,0.601226993865,1.5,Bach//hwv56/movement3-05.md,7,0.5,0.533333333333,3.75,Handel')
+        self.assertEqual(post, 'Identifier,Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,Composer//bwv66.6,3,1.0,1.5,Bach//hwv56/movement3-05.md,7,0.5,3.75,Handel')
 
         # without id
         post = of.getString(lineBreak='//', includeId=False)
-        self.assertEqual(post, 'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Most_Common_Note_Quarter_Length_Prevalance,Range_of_Note_Quarter_Lengths,Composer//3,1.0,0.601226993865,1.5,Bach//7,0.5,0.533333333333,3.75,Handel')
+        self.assertEqual(post, 'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,Composer//3,1.0,1.5,Bach//7,0.5,3.75,Handel')
 
         ds.write(format='tab')
         ds.write(format='csv')

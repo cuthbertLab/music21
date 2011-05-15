@@ -687,7 +687,10 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
     Google search results (log-10)
 
     >>> from music21 import *
-    >>> s = corpus.parse('mozart/k155', 2)
+    >>> #_DOCS_SHOW s = corpus.parse('mozart/k155', 2)
+    >>> s = stream.Score() #_DOCS_HIDE
+    >>> s.append(metadata.Metadata()) #_DOCS_HIDE
+    >>> s.metadata.composer = "W.A. Mozart" #_DOCS_HIDE
     >>> fe = features.native.ComposerPopularity(s)
     >>> fe.extract().vector 
     [7...]
@@ -755,7 +758,7 @@ DominantSeventhSimultaneityPrevalence, # cs7
 DiminishedTriadSimultaneityPrevalence, # cs8
 TriadSimultaneityPrevalence, # cs9
 DiminishedSeventhSimultaneityPrevalence, # cs10
-IncorrectlySpelledTriadPrevalence, # cs10
+IncorrectlySpelledTriadPrevalence, # cs11
 
 ComposerPopularity, #md1
 ]
