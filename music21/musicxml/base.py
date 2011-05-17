@@ -3168,6 +3168,7 @@ class Document(object):
             else:
                 environLocal.printDebug(msg)
 
+        # this is a MusicXML Score object
         self.score = h.getContent()
 
         if audit:

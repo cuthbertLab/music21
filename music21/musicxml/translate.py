@@ -643,7 +643,7 @@ def mxToDynamic(mxDirection, inputM21=None):
 
 
 def textExpressionToMx(te):
-    '''
+    '''Convert a TextExpression to a MusicXML mxDirectoin type.
     returns a musicxml.Direction object
 
     >>> from music21 import *
@@ -1416,6 +1416,18 @@ def measureToMx(m, spannerBundle=None):
                 mxDirection.offset = mxOffset 
                 # place at zero position, as offset value determines horizontal position, not location amongst notes
                 mxMeasure.insert(0, mxDirection)
+
+            elif 'RepeatExpression' in classes:
+                # subclass of RepeatMark and Expression
+                mxOffset = int(defaults.divisionsPerQuarter * 
+                           obj.getOffsetBySite(mFlat))
+                # just get the TextExpression stored in the RepeatExpression
+                mxDirection = textExpressionToMx(obj.getTextExpression())
+                mxDirection.offset = mxOffset 
+                # place at zero position, as offset value determines horizontal position, not location amongst notes
+                mxMeasure.insert(0, mxDirection)
+
+
             else: # other objects may have already been added
                 pass
                 #environLocal.printDebug(['_getMX of Measure is not processing', obj])
@@ -1754,14 +1766,17 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     # offset here is a combination of the current position
                     # (offsetMeasureNote) and and the direction's offset
                     
-                    # TODO: look at text expression and see if we can 
-                    # convert it into a RepeatExpression
-
-                    _addToStaffReference(mxObj, te, staffReference)
-                    m.insert(offsetMeasureNote + offsetDirection, te)
+                    re = te.getRepeatExpression()
+                    if re is not None:
+                        # the repeat expression stores a copy of the text
+                        # expression within it; replace it here on insertion
+                        _addToStaffReference(mxObj, re, staffReference)
+                        m.insert(offsetMeasureNote + offsetDirection, re)
+                    else:
+                        _addToStaffReference(mxObj, te, staffReference)
+                        m.insert(offsetMeasureNote + offsetDirection, te)
 
     #environLocal.printDebug(['staffReference', staffReference])
-
     # if we have voices and/or if we used backup/forward, we may have
     # empty space in the stream
     if useVoices:
@@ -2195,7 +2210,6 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     '''Translate an mxScore into a music21 Score object.
     '''
-
     from music21 import metadata
     from music21 import spanner
 
@@ -2226,6 +2240,7 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     for sp in spannerBundle:
         s.insert(0, sp)
     # add spanners to highest level object
+    return s
 
 
 
@@ -2495,18 +2510,24 @@ spirit</words>
         # has one segno
         s = converter.parse(testPrimitive.repeatExpressionsA)
         self.assertEqual(len(s.flat.getElementsByClass(repeat.Segno)), 1)
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.Fine)), 1)
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.DalSegnoAlFine)), 1)
+
         raw = s.musicxml
         self.assertEqual(raw.find('<segno') > 0, True)
+        self.assertEqual(raw.find('Fine') > 0, True)
+        self.assertEqual(raw.find('D.S. al Fine') > 0, True)
 
         # has two codas
         s = converter.parse(testPrimitive.repeatExpressionsB)
         self.assertEqual(len(s.flat.getElementsByClass(repeat.Coda)), 2)
+        # has one d.c.al coda
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapoAlCoda)), 1)
+
         raw = s.musicxml
         self.assertEqual(raw.find('<coda') > 0, True)
+        self.assertEqual(raw.find('D.C. al Coda') > 0, True)
 
-
-        #s.show('t')
-        #s.show()
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

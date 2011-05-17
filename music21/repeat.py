@@ -89,10 +89,9 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             self._textExpression.content = value
         
     def getTextExpression(self):
-        '''Convert this to text expression object. 
+        '''Convert this to text expression object and return a deepcopy. 
         '''
         return copy.deepcopy(self._textExpression)
-
 
     def setTextExpression(self, value):
         '''Directly set a TextExpression object. 
@@ -439,7 +438,7 @@ class Expander(object):
     def _getEndObjects(self, streamObj, index):
         '''Get the last measure to be processed in the repeat, as well as the measure that has the end barline. These may not be the same: if an end repeat bar is placed on the left of a measure that is not actually being copied. 
 
-        The `index` parameter is the index of the last measure to be copied. The streamObj expect to only have Measures. 
+        The `index` parameter is the index of the last measure to be copied. The streamObj expects to only have Measures. 
         '''
         mLast = streamObj[index]
         rb = mLast.rightBarline
@@ -929,6 +928,37 @@ class Test(unittest.TestCase):
         rm = repeat.DalSegnoAlCoda()
         self.assertEqual(rm.isValidText('d.s. al coda'), True)
         self.assertEqual(rm.isValidText('dal segno al coda'), True)
+
+
+    def testRepeatExpressionOnStream(self):
+        from music21 import stream, repeat, expressions, musicxml, meter
+
+        template = stream.Stream()
+        for i in range(5):
+            m = stream.Measure()
+            template.append(m)
+        s = copy.deepcopy(template)
+        s[3].insert(0, repeat.DaCapo())
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 1)
+        raw = s.musicxml
+        self.assertEqual(raw.find('Da Capo') > 0, True)
+
+        # can do the same thing starting form a text expression
+        s = copy.deepcopy(template)
+        s[0].timeSignature = meter.TimeSignature('4/4')
+        s[3].insert(0, expressions.TextExpression('da capo'))
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 0)
+        raw = s.musicxml
+        self.assertEqual(raw.find('da capo') > 0, True)
+            
+        mxlDocument = musicxml.Document()
+        mxlDocument.read(raw)
+        s2 = musicxml.translate.mxToStream(mxlDocument.score)
+        # now, reconverted from the musicxml, we have a RepeatExpression
+        self.assertEqual(len(s2.flat.getElementsByClass(repeat.DaCapo)), 1)
+
+        #s2.show('t')
+        #s2.show()
 
 
 
