@@ -68,10 +68,14 @@ Contributors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Additionally, the following individuals have contributed materials or knowledge to this project.  
-They are all greatly appreciated.
+Their contributions and generosity are greatly appreciated.
 
 * `Donald Byrd`_, researcher on University of Indiana who created a schema for computer-aided musicology 
   (along with the source of all sorts of examples of how music notation is difficult).
+
+* `Jack Campin`_ has kindly given permission to distribute his ABC editions of the Aird Collection, the Northumbrian Minstrelsy, and the Colonial and Civil War American Fife Music Collection. 
+
+* `John Chambers`_ has provided ABC editions to distribute with music21, including the Aird Collection, the O'Neill's Music of Ireland Collection, and Ryan's Mammoth Collection of fiddle tunes.
 
 * `Laura E. Conrad`_ has kindly given permission to distribute her ABC editions of renaissance polyphony from Serpent Publications.
 
@@ -106,7 +110,8 @@ They are all greatly appreciated.
 .. _Ewa Dahlig-Turek: http://www.esac-data.org
 .. _Seymour Shlien: http://ifdo.pugmarks.com/~seymour/runabc/esac/esacdatabase.html
 .. _Manuel Op de Coul: http://www.huygens-fokker.org/scala
-
+.. _John Chambers: http://trillian.mit.edu/~jc/music/book
+.. _Jack Campin: http://www.campin.me.uk/
 
 
 
