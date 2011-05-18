@@ -135,15 +135,16 @@ class FiguredBass(object):
         >>> bassNote3 = note.Note("F#3")
         >>> fbLine2.addElement(bassNote1)        # I
         >>> fbLine2.addElement(bassNote2, "6")   # viio6
-        >>> fbLine2.addElement(bassNote3,  "6")  # I6
+        >>> fbLine2.addElement(bassNote3, "6")   # I6
         >>> fbLine2.realize()
         >>> fbLine2.timeElapsed.seconds
         7
         >>> fbLine2.getNumSolutions()
         171
+        >>> fbLine2.keyboardStyleOutput = False
+        >>> fbLine2.showRandomRealization()
         >>> fbLine2.showRandomRealizations(10)
         >>> allSolsScore = fbLine2.generateAllRealizations()
-        >>> fbLine2.showRandomRealization()
         '''
         if partList is None:
             part1 = part.Part(1,2)
@@ -169,12 +170,14 @@ class FiguredBass(object):
         self.bassLine.append(copy.deepcopy(self.ks))
         self.maxPitch = MAX_PITCH
         self.fbScale = realizerScale.FiguredBassScale(keyString, modeString)
+        partList.sort()
         self.fbParts = partList
         self.fbRules = rules.Rules()
         self.addNotationAsLyrics = True
         
         #Contains fb solutions
         self.isRealized = False
+        self.keyboardStyleOutput = True
         
     def addElement(self, bassNote, notationString = ''):
         '''
@@ -334,48 +337,92 @@ class FiguredBass(object):
         the Possibility progression for consistency.
         '''
         sol = stream.Score()
-        rightHand = stream.Part()
-        rightHand.append(copy.deepcopy(self.ts))
-        rightHand.append(copy.deepcopy(self.ks))
-
-        v0 = self.fbParts[0]
         
-        for j in range(len(possibilityProgression)):
-            givenPossib = possibilityProgression[j]
-            bassNote = self.bassNotes[j]
-
-            if givenPossib[v0] != bassNote.pitch:
-                raise FiguredBassException("Chord progression possibility doesn't match up with bass line.")
-        
-            rhPitches = []
-            for k in range(1, len(self.fbParts)):
-                v1 = self.fbParts[k]
-                rhPitches.append(copy.copy(givenPossib[v1]))
-                             
-            rhChord = chord.Chord(rhPitches)
-            rhChord.quarterLength = bassNote.quarterLength
-            rightHand.append(rhChord)
+        if self.keyboardStyleOutput:
+            rightHand = stream.Part()
+            rightHand.append(copy.deepcopy(self.ts))
+            rightHand.append(copy.deepcopy(self.ks))
     
-        sol.insert(0, rightHand)
+            v0 = self.fbParts[0]
+            
+            for j in range(len(possibilityProgression)):
+                givenPossib = possibilityProgression[j]
+                bassNote = self.bassNotes[j]
+    
+                if givenPossib[v0] != bassNote.pitch:
+                    raise FiguredBassException("Chord progression possibility doesn't match up with bass line.")
+            
+                rhPitches = []
+                for k in range(1, len(self.fbParts)):
+                    v1 = self.fbParts[k]
+                    rhPitches.append(copy.copy(givenPossib[v1]))
+                                 
+                rhChord = chord.Chord(rhPitches)
+                rhChord.quarterLength = bassNote.quarterLength
+                rightHand.append(rhChord)
+        
+            sol.insert(0, rightHand)
+        else: # Chorale-style output
+            streamParts = []
+            for k in range(len(self.fbParts) - 1):
+                givenPart = stream.Part()
+                givenPart.append(copy.deepcopy(self.ts))
+                givenPart.append(copy.deepcopy(self.ks))
+                streamParts.append(givenPart)
+            
+            p0 = self.fbParts[0]
+            
+            for j in range(len(possibilityProgression)):
+                givenPossib = possibilityProgression[j]
+                bassNote = self.bassNotes[j]
+    
+                if givenPossib[p0] != bassNote.pitch:
+                    raise FiguredBassException("Chord progression possibility doesn't match up with bass line.")
+            
+                for k in range(1, len(self.fbParts)):
+                    p1 = self.fbParts[k]
+                    n1 = note.Note(givenPossib[p1])
+                    n1.quarterLength = bassNote.quarterLength
+                    streamParts[k-1].append(n1)
+            
+            streamParts.reverse()                 
+            for k in range(len(self.fbParts) - 1):
+                sol.insert(0, streamParts[k])
+            
         sol.insert(0, copy.deepcopy(self.bassLine))
         sol.append(bar.Barline('light-heavy'))
 
-        return sol   
+        return sol
 
     def generateAllRealizations(self):
         allSols = stream.Score()
-        part1 = stream.Part()
-        part2 = stream.Part()
-        allSols.insert(0, part1)
-        allSols.insert(0, part2)
-        possibilityProgressions = self.getAllPossibilityProgressions()
-        for possibilityProgression in possibilityProgressions:
-            sol = self.generateRealizationFromPossibilityProgression(possibilityProgression)
-            for m in sol.parts[0]:
-                part1.append(m)
-            for m in sol.parts[1]:
-                part2.append(m)
-        
+        if self.keyboardStyleOutput:
+            part1 = stream.Part()
+            part2 = stream.Part()
+            allSols.insert(0, part1)
+            allSols.insert(0, part2)
+            possibilityProgressions = self.getAllPossibilityProgressions()
+            for possibilityProgression in possibilityProgressions:
+                sol = self.generateRealizationFromPossibilityProgression(possibilityProgression)
+                for m in sol.parts[0]:
+                    part1.append(m)
+                for m in sol.parts[1]:
+                    part2.append(m)
+        else: # Chorale-style output
+            streamParts = []
+            for k in range(len(self.fbParts)):
+                givenPart = stream.Part()
+                allSols.insert(0, givenPart)
+                streamParts.append(givenPart)
+            
+            possibilityProgressions = self.getAllPossibilityProgressions()
+            for possibilityProgression in possibilityProgressions:
+                sol = self.generateRealizationFromPossibilityProgression(possibilityProgression)
+                for k in range(len(self.fbParts)):
+                    streamParts[k].append(sol.getClefs()[0])
+                    for m in sol.parts[k]:
+                        streamParts[k].append(m)
+                
         return allSols
 
     def generateRandomRealization(self):
@@ -388,19 +435,32 @@ class FiguredBass(object):
     def generateRandomRealizations(self, amountToShow = 20):
         if amountToShow > self.lastSegment.getNumSolutions():
             return self.generateAllRealizations()
-        
         allSols = stream.Score()
-        part1 = stream.Part()
-        part2 = stream.Part()
-        allSols.insert(0, part1)
-        allSols.insert(0, part2)
-        for solutionCounter in range(amountToShow):
-            sol = self.generateRandomRealization()
-            for m in sol.parts[0]:
-                part1.append(m)
-            for m in sol.parts[1]:
-                part2.append(m)
-            
+        if self.keyboardStyleOutput:
+            part1 = stream.Part()
+            part2 = stream.Part()
+            allSols.insert(0, part1)
+            allSols.insert(0, part2)
+            for solutionCounter in range(amountToShow):
+                sol = self.generateRandomRealization()
+                for m in sol.parts[0]:
+                    part1.append(m)
+                for m in sol.parts[1]:
+                    part2.append(m)
+        else: # Chorale-style output
+            streamParts = []
+            for k in range(len(self.fbParts)):
+                givenPart = stream.Part()
+                allSols.insert(0, givenPart)
+                streamParts.append(givenPart)
+
+            for solutionCounter in range(amountToShow):
+                sol = self.generateRandomRealization()
+                for k in range(len(self.fbParts)):
+                    streamParts[k].append(sol.parts[k].getClefs()[0])
+                    for m in sol.parts[k]:
+                        streamParts[k].append(m)
+
         return allSols
     
     # METHODS FOR DISPLAY OF MUSIC21.STREAM SCORE GENERATION FROM POSSIBILITY PROGRESSIONS
