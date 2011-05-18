@@ -1067,8 +1067,37 @@ def extractorsById(idOrList, library=['jSymbolic', 'native']):
     return post
 
 
+def extractorById(idOrList, library=['jSymbolic', 'native']):
+    '''Get the first feature matched by extractorsById().
+
+    >>> from music21 import *
+    >>> s = stream.Stream()
+    >>> s.append(pitch.Pitch('a4'))
+    >>> fe = features.extractorById('p20')(s) # call class
+    >>> fe.extract().vector
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+
+    '''
+    ebi = extractorsById(idOrList=idOrList, library=library)
+    if len(ebi) > 0:
+        return ebi[0]
+    return None # no match
 
 
+def vectorById(streamObj, id, library=['jSymbolic', 'native']):
+    '''Utility function to get a vector from an extractor
+
+    >>> from music21 import *
+    >>> s = stream.Stream()
+    >>> s.append(pitch.Pitch('a4'))
+    >>> features.vectorById(s, 'p20')
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+    '''
+    fe = extractorById('p20')(streamObj) # call class
+    if fe is None:
+        return None # could raise exception
+    return fe.extract().vector
+    
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):

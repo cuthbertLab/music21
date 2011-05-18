@@ -890,6 +890,52 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testExpandRepeatH(self):
+        # an algorithmic generation approach
+
+        from music21 import bar, note, stream, meter, pitch
+        from music21 import features
+        
+        dur = [.125, .25, .5, .125]
+        repeatTimesCycle = [0, 1, 3, 5]
+        pitches = [pitch.Pitch(p) for p in ['a2', 'b-3', 'a2', 'a2']]
+
+        s = stream.Stream()
+        repeatHandles = []
+        for i in range(8):
+            m = stream.Measure()
+            m.timeSignature = meter.TimeSignature('1/4')
+            for j, p in enumerate(pitches):
+                m.append(note.Note(p.transpose(i*3), quarterLength=dur[j]))
+
+            m.leftBarline = bar.Repeat(direction='start')
+            rb = bar.Repeat(direction='end')
+            rb.times = repeatTimesCycle[i%len(repeatTimesCycle)]
+            te = rb.getTextExpression()
+            m.rightBarline = rb
+            m.append(te)
+            m.makeBeams(inPlace=True)
+            repeatHandles.append(rb) # store for annoation
+            s.append(m)
+        
+        self.assertEqual(len(s), 8)
+        self.assertEqual(str(s.flat.pitches[0]), 'A2')
+            
+        self.assertEqual(str(features.vectorById(s, 'p20')), '[1.0, 0.33333333333333331, 0.0, 1.0, 0.33333333333333331, 0.0, 1.0, 0.33333333333333331, 0.0, 1.0, 0.33333333333333331, 0.0]')
+
+        #s.show()    
+
+        s1 = s.expandRepeats()
+        self.assertEqual(len(s1), 18)            
+        # first bar is an A, but repeat is zero, will be removed
+        self.assertEqual(str(s1.flat.pitches[0]), 'C3')
+
+        self.assertEqual(str(features.vectorById(s1, 'p20')), '[0.20000000000000001, 0.066666666666666666, 0.0, 0.59999999999999998, 0.20000000000000001, 0.0, 1.0, 0.33333333333333331, 0.0, 0.0, 0.0, 0.0]')
+
+
+        #s1.show()
+
+
     def testRepeatExpressionValidText(self):
         from music21 import repeat
         rm = repeat.Coda()
