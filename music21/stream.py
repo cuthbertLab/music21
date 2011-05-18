@@ -1627,8 +1627,6 @@ class Stream(music21.Music21Object):
         >>> s = corpus.parse('hwv56/movement3-05.md')
         >>> s.vector('p16') # most common pitch class
         [5]
-        >>> str(s.vector('p1')[0]) # most common pitch class prevalence
-        '0.3'
         '''
         from music21 import features
         # pass self as the stream

@@ -55,6 +55,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         self._textExpression = None
         # store a lost of alternative text representations
         self._textAlternatives = []
+        # store a default text justification
+        self._textJustification = 'center'
         # for those that have symbols, declare if the symbol is to be used
         self._useSymbol = False
 
@@ -66,6 +68,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         self._positionRelativeY = None
         # this does not do anything if default y is defined
         self._positionPlacement = None
+
 
 
     def __repr__(self):
@@ -83,15 +86,21 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         return self._textExpression.content
 
     def setText(self, value):
+        '''Set the text of this repeat expression. This is also the primary way that the stored TextExpression object is created.
+        '''
         if self._textExpression is None:
             self._textExpression = expressions.TextExpression(value)
+            self.applyTextFormatting()
         else:
             self._textExpression.content = value
         
-    def getTextExpression(self):
-        '''Convert this to text expression object and return a deepcopy. 
+    def applyTextFormatting(self, te=None):
+        '''Apply the default text formatting to the text expression version of of this repeat
         '''
-        return copy.deepcopy(self._textExpression)
+        if te is None: # use the stored version if possible
+            te = self._textExpression
+        te.justify = self._textJustification
+        return te
 
     def setTextExpression(self, value):
         '''Directly set a TextExpression object. 
@@ -99,13 +108,17 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         if not isinstance(value, expressions.TextExpression):
             raise RepeatExpressionException('must set with a TextExpression object, not: %s' % value)
         self._textExpression = value
+        self.applyTextFormatting()
 
     def getTextExpression(self):
         '''Return a copy of the TextExpression stored in this object.
         '''
+        # whenever getting, set justifation
+        self._textJustification
         if self._textExpression is None:
             return None
         else:
+            # first, apply defaults 
             return copy.deepcopy(self._textExpression)
 
 
@@ -128,7 +141,17 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         return False
 
 
-class Coda(RepeatExpression):
+
+class RepeatExpressionMarker(RepeatExpression):
+    '''Some repeat expressions are markers of positions in the score; these classes model those makers, such as Coda, Segno, and Fine.
+    '''
+    def __init__(self):
+        RepeatExpression.__init__(self)
+        # these are generally centered
+        self._textJustification = 'center'
+
+
+class Coda(RepeatExpressionMarker):
     '''The coda symbol, or the word coda, as placed in a score. 
 
     >>> from music21 import *
@@ -136,14 +159,14 @@ class Coda(RepeatExpression):
     '''
     # note that only Coda and Segno have non-text expression forms
     def __init__(self):
-        RepeatExpression.__init__(self)
+        RepeatExpressionMarker.__init__(self)
 
         # default text expression is coda
         self._textAlternatives = ['Coda', 'to Coda', 'al Coda']
         self.setText(self._textAlternatives[0])
         self._useSymbol = True
 
-class Segno(RepeatExpression):
+class Segno(RepeatExpressionMarker):
     '''The fine word as placed in a score. 
 
     >>> from music21 import *
@@ -151,80 +174,96 @@ class Segno(RepeatExpression):
     '''
     # note that only Coda and Segno have non-text expression forms
     def __init__(self):
-        RepeatExpression.__init__(self)
+        RepeatExpressionMarker.__init__(self)
         # default text expression is coda
         self._textAlternatives = ['Segno']
         self.setText(self._textAlternatives[0])
         self._useSymbol = True
 
-class Fine(RepeatExpression):
+class Fine(RepeatExpressionMarker):
     '''The fine word as placed in a score. 
 
     >>> from music21 import *
     >>> rm = repeat.Fine()
     '''
     def __init__(self):
-        RepeatExpression.__init__(self)
+        RepeatExpressionMarker.__init__(self)
         # default text expression is coda
         self._textAlternatives = ['fine']
         self.setText(self._textAlternatives[0])
 
 
 
-class DaCapo(RepeatExpression):
-    '''The Da Capo statement
+
+
+
+
+class RepeatExpressionCommand(RepeatExpression):
+    '''Some repeat expressions are commands, instructing the reader to go somewhere else. DaCapo and related are examples.
     '''
     def __init__(self):
         RepeatExpression.__init__(self)
+        # whether any internal repeats encountered within a jumped region are also repeated.
+        self.repeatAfterJump = False
+        # generally these should be right aligned, as they are placed 
+        # at the end of the measure they alter
+        self._textJustification = 'right'
+
+
+class DaCapo(RepeatExpressionCommand):
+    '''The Da Capo statement
+    '''
+    def __init__(self):
+        RepeatExpressionCommand.__init__(self)
         # default text expression is coda
         self._textAlternatives = ['Da Capo', 'D.C.']
         self.setText(self._textAlternatives[0])
 
-class DaCapoAlFine(RepeatExpression):
+class DaCapoAlFine(RepeatExpressionCommand):
     '''The coda symbol, or the word coda, as placed in a score. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
     '''
     def __init__(self):
-        RepeatExpression.__init__(self)
+        RepeatExpressionCommand.__init__(self)
         # default text expression is coda
         self._textAlternatives = ['Da Capo al fine', 'D.C. al fine']
         self.setText(self._textAlternatives[0])
 
 
-class DaCapoAlCoda(RepeatExpression):
+class DaCapoAlCoda(RepeatExpressionCommand):
     '''The coda symbol, or the word coda, as placed in a score.
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlCoda() 
     '''
     def __init__(self):
-        RepeatExpression.__init__(self)
+        RepeatExpressionCommand.__init__(self)
 
         self._textAlternatives = ['Da Capo al Coda', 'D.C. al Coda']
         self.setText(self._textAlternatives[0])
 
 
-class DalSegnoAlFine(RepeatExpression):
+class DalSegnoAlFine(RepeatExpressionCommand):
     '''The coda symbol, or the word coda, as placed in a score. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
     '''
     def __init__(self):
-        RepeatExpression.__init__(self)
+        RepeatExpressionCommand.__init__(self)
         self._textAlternatives = ['Dal Segno al fine', 'D.S. al fine']
         self.setText(self._textAlternatives[0])
 
-class DalSegnoAlCoda(RepeatExpression):
+class DalSegnoAlCoda(RepeatExpressionCommand):
     '''The coda symbol, or the word coda, as placed in a score.
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlCoda() 
     '''
     def __init__(self):
-        RepeatExpression.__init__(self)
+        RepeatExpressionCommand.__init__(self)
         self._textAlternatives = ['Dal Segno al Coda', 'D.S. al Coda']
         self.setText(self._textAlternatives[0])
 
@@ -332,7 +371,6 @@ class Expander(object):
         startCount = 0
         endCount = 0
         countBalance = 0
-
         for m in self._srcMeasureStream:
             lb = m.leftBarline
             rb = m.rightBarline
@@ -341,7 +379,6 @@ class Expander(object):
                 if lb.direction == 'start':
                     startCount += 1
                     countBalance += 1
-
                 # ends may be encountered on left of bar
                 elif lb.direction == 'end':
                     if countBalance == 0: # the first repeat found
@@ -349,7 +386,6 @@ class Expander(object):
                         countBalance += 1 # simulate first
                     endCount += 1
                     countBalance -= 1
-
             if rb is not None and 'Repeat' in rb.classes:
                 if rb.direction == 'end':
                     # if this is the first of all repeats found, then we
@@ -359,20 +395,41 @@ class Expander(object):
                         countBalance += 1 # simulate first
                     endCount += 1
                     countBalance -= 1
-
                 else:
                     raise ExpanderException('a right barline is found that cannot be processed: %s, %s' % (m, rb))
-
         if countBalance != 0:
             environLocal.printDebug(['Repeats are not balanced: countBalance: %s' % (countBalance)])
             return False
-
         if startCount != endCount:
             environLocal.printDebug(['start count not the same as end count: %s / %s' % (startCount, endCount)])
             return False
-
-        environLocal.printDebug(['matched start and end repeat barline count of: %s/%s' % (startCount, endCount)])
+        #environLocal.printDebug(['matched start and end repeat barline count of: %s/%s' % (startCount, endCount)])
         return True
+
+
+    def _daCapoIsCoherent(self):
+        '''Check of a DC statement is coherent.
+        '''
+        # get all repeatExpression objects 
+        reStream = self._srcMeasureStream.flat.getElementsByClass(
+                RepeatExpression)
+
+        # note that the offsets of these streams are as found in the flat score
+        # this can be used to determine characteristics
+        dcCount = len(reStream.getElementsByClass(DaCapo))
+        dcafCount = len(reStream.getElementsByClass(DaCapoAlFine))
+        dcacCount = len(reStream.getElementsByClass(DaCapoAlCoda))
+        
+
+        environLocal.printDebug(['_daCapoIsCoherent', 'dcCount', dcCount, 'dcafCount', dcafCount, 'dcacCount', dcacCount])
+        # there can be only one da capo statement for the provided span
+        if (dcCount + dcafCount + dcacCount) > 1:
+            return False
+        if (dcCount + dcafCount + dcacCount) == 1:
+            return True
+        # return false for all other cases
+        return False
+        
 
 
 
@@ -479,10 +536,8 @@ class Expander(object):
         number = streamObj[0].number
         if number is None:
             number = 1
-
         # handling of end repeat as left barline
         stripFirstNextMeasure = False
-
         # use index values instead of an interator
         i = 0
         while i < len(streamObj):
@@ -495,7 +550,6 @@ class Expander(object):
                 for times in range(repeatTimes):
                     environLocal.printDebug(['repeat times:', times])    
                 # copy the range of measures; this will include the first
-                # pass
                     # do indices directly
                     for j in repeatIndices:
                         mSub = copy.deepcopy(streamObj[j])
@@ -510,7 +564,6 @@ class Expander(object):
                 # check if need to clear repeats from next bar
                 if mLast is not mEndBarline:
                     stripFirstNextMeasure = True
-
                 # set i to next measure after mLast
                 i = repeatIndices[-1] + 1
             # if is not in repeat indicies, just add this measure
@@ -1022,12 +1075,22 @@ class Test(unittest.TestCase):
         m2.rightBarline = rb
         m3 = stream.Measure()
         m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m3.append(DaCapo())
         m4 = stream.Measure()
         m4.repeatAppend(note.Note('a4', type='half'), 2)
     
         s = stream.Part()
         s.append([m1, m2, m3, m4])
         #s.show()
+
+        ex = Expander(s)
+        self.assertEqual(ex._daCapoIsCoherent(), True)
+
+        # test incorrect da capo
+        sAlt1 = copy.deepcopy(s)
+        sAlt1[1].append(DaCapoAlFine())
+        ex = Expander(sAlt1)
+        self.assertEqual(ex._daCapoIsCoherent(), False)
 
 
 
