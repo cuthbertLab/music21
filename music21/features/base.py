@@ -1093,7 +1093,7 @@ def vectorById(streamObj, id, library=['jSymbolic', 'native']):
     >>> features.vectorById(s, 'p20')
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
     '''
-    fe = extractorById('p20')(streamObj) # call class
+    fe = extractorById(id)(streamObj) # call class with stream
     if fe is None:
         return None # could raise exception
     return fe.extract().vector

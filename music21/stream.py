@@ -1615,6 +1615,25 @@ class Stream(music21.Music21Object):
         return discrete.analyzeStream(self, *args, **keywords)
 
 
+
+    def vector(self, id, **keywords):
+        '''Given a feature extraction method id, return the analysis vector. For more information on music21 features extractions, se  
+
+        For details on arguments, see :func:`~music21.features.base.vectorById`.
+
+        For feature extractors available from jSymbolic, see :func:`~music21.features.jSymbolic.getExtractorByTypeAndNumber`.
+
+        >>> from music21 import *
+        >>> s = corpus.parse('hwv56/movement3-05.md')
+        >>> s.vector('p16') # most common pitch class
+        [5]
+        >>> str(s.vector('p1')[0]) # most common pitch class prevalence
+        '0.3'
+        '''
+        from music21 import features
+        # pass self as the stream
+        return features.vectorById(self, id=id, **keywords)
+
     #---------------------------------------------------------------------------
     # methods that act on individual elements without requiring 
     # @ _elementsChanged to fire
