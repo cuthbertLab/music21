@@ -28,7 +28,20 @@ from music21.figuredBass import rules
 _MOD = 'segment.py'
 
 class Segment:
+    '''
+    A Segment is intended to correspond to a 1:1 realization of a bassNote and 
+    notationString of a FiguredBass. A Segment provides all possible solutions 
+    for a bassNote, taking into account the restrictions indicated in a provided 
+    Rules object. 
+    '''
     def __init__(self, fbScale, partList, fbRules, bassNote, notationString = ''):
+        '''
+        A Segment instance is created by providing a FiguredBassScale fbScale, 
+        a list of Part instances partList, an instance of Rules fbRules, a 
+        bassNote, and a notationString. Next, getPitches and getPitchNames are 
+        called on fbScale, to retrieve first a list of all allowable pitches, 
+        pitchesAboveBass, and second a list of allowable pitch classes, pitchNamesInChord.
+        '''
         self.bassNote = bassNote
         self.notationString = notationString
         self.fbScale = fbScale
@@ -40,6 +53,9 @@ class Segment:
         self.nextSegment = None
     
     def allSinglePossibilities(self):
+        '''
+        Creates an initial list of Possibility instances, possibilities, using pitchesAboveBass and partList.
+        '''
         possibilities = []
         
         bassPossibility = possibility.Possibility()
@@ -65,7 +81,10 @@ class Segment:
     
     def correctSinglePossibilities(self, verbose = False):
         '''
-        Default rules:
+        Uses the results of allSinglePossibilities to trim down the list in accordance 
+        with stand-alone Possibility restrictions as specified in fbRules.
+         
+        Default values of fbRules:
         (1) No incomplete possibilities
         (2) Top parts within maxSemitoneSeparation
         (3) Pitches in each part within range
@@ -109,10 +128,37 @@ class Segment:
     
     def trimAllMovements(self, eliminated = []):
         '''
-        Trims all movements beginning at the segment it is
-        called upon and moving backwards, stopping at the
-        StartSection. Intended to be called by the last
-        segment to trim the movements of a fbLine.
+        Each Segment which has a nextSegment also defines a list of movements, 
+        nextMovements. Keys for nextMovements are indices in the Segment's list 
+        of possibilities. For a given key, a value is a list of indices in the 
+        nextSegment's list of possibilities, representing acceptable movements 
+        between the two. There may be movements in a string of Segment instances 
+        which directly or indirectly lead nowhere. This method is designed to be 
+        called on the last Segment, and eliminates any dead ends within a string 
+        of Segment instances, important for solution retrieval.   
+        
+        >>> from music21.figuredBass import segment
+        >>> from music21.figuredBass import possibility
+        >>> from music21.figuredBass import part
+        >>> from music21.figuredBass import rules
+        >>> from music21.figuredBass import realizerScale
+        >>> from music21 import note
+        >>> p1 = part.Part(1)
+        >>> p2 = part.Part(2)
+        >>> p3 = part.Part(3)
+        >>> p4 = part.Part(4)
+        >>> partList = [p1, p2, p3, p4]
+        >>> fbScale = realizerScale.FiguredBassScale("D")
+        >>> fbRules = rules.Rules()
+        >>> bassA = note.Note("D3")
+        >>> startSeg = segment.StartSegment(fbScale, partList, fbRules, bassA, "5, 3")
+        >>> bassB = note.Note("E3")
+        >>> midSeg1  = segment.MiddleSegment(fbScale, partList, fbRules,  startSeg, bassB, "6, 3")
+        >>> bassC  = note.Note("F#3")
+        >>> midSeg2 = segment.MiddleSegment(fbScale, partList, fbRules,  startSeg, bassC, "6, 3")
+        >>> midSeg2.trimAllMovements()
+        >>> midSeg2.getNumSolutions()
+        92
         '''
         for possibleIndex in self.nextMovements.keys():
             movements = self.nextMovements[possibleIndex]
@@ -132,11 +178,11 @@ class Segment:
         
     def getNumSolutions(self, pathList = {}):
         '''
-        Obtains the number of solutions up to and including the given segment,
-        by calculating the total number of paths, the sum of paths to each
-        possibility in the given segment. Intended to be called on the last
-        segment to return the total number of solutions to a fbLine, but could
-        conceivably be used in other ways as well.
+        A recursive method which returns the number of solutions for a string 
+        of Segment instances by calculating the total number of paths through 
+        a string of Segment movements. More efficient than compiling a list of 
+        all solutions and then taking its length. Intended to be called on the 
+        last Segment.        
         '''
         newPathList = {}
         if len(pathList.keys()) == 0:
@@ -159,17 +205,95 @@ class Segment:
     
                 
 class StartSegment(Segment):
+    '''
+    StartSegment is intended to correspond to a bassNote which is not preceded by another in a FiguredBass.
+    
+    >>> from music21.figuredBass import segment
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import part
+    >>> from music21.figuredBass import rules
+    >>> from music21.figuredBass import realizerScale
+    >>> from music21 import note
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+    >>> partList = [p1, p2, p3, p4]
+    >>> fbScale = realizerScale.FiguredBassScale("D")
+    >>> fbRules = rules.Rules()
+    >>> bassNote = note.Note("D3")
+    >>> startSeg = segment.StartSegment(fbScale, partList, fbRules, bassNote, "5, 3")
+    >>> len(startSeg.possibilities) # Number of correctly formed possibilities
+    21
+    >>> startSeg.possibilities[0]
+    <music21.figuredBass.possibility Possibility: {1: A3, 2: F#3, 3: D3, 4: D3}>
+    '''
     def __init__(self, fbScale, partList, fbRules, bassNote, notationString = ''):
+        '''
+        Takes in arguments required for creation of a general Segment instance, and then 
+        initializes one. From there, correctSinglePossibilities is called on this Segment 
+        instance, which provides an initial list of correctly formed possibilities.
+        '''
         Segment.__init__(self, fbScale, partList, fbRules, bassNote, notationString)
         self.possibilities = self.correctSinglePossibilities()
     
 class MiddleSegment(Segment):
+    '''
+    MiddleSegment is intended to correspond to a bassNote which is preceded by another in a FiguredBass.
+    
+    >>> from music21.figuredBass import segment
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import part
+    >>> from music21.figuredBass import rules
+    >>> from music21.figuredBass import realizerScale
+    >>> from music21 import note
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+    >>> partList = [p1, p2, p3, p4]
+    >>> fbScale = realizerScale.FiguredBassScale("D")
+    >>> fbRules = rules.Rules()
+    >>> bassA = note.Note("D3")
+    >>> startSeg = segment.StartSegment(fbScale, partList, fbRules, bassA, "5, 3")
+    >>> bassB = note.Note("E3")
+    >>> midSeg  = segment.MiddleSegment(fbScale, partList, fbRules,  startSeg, bassB, "6, 3")
+    >>> len(midSeg.possibilities) # Number of correctly formed self-contained possibilities
+    17
+    >>> midSeg.possibilities[0]
+    <music21.figuredBass.possibility Possibility: {1: C#4, 2: G3, 3: E3, 4: E3}>
+    >>> startSeg.nextMovements[3]
+    [0, 1, 2, 4]
+    >>> startSeg.possibilities[3]
+    <music21.figuredBass.possibility Possibility: {1: D4, 2: A3, 3: F#3, 4: D3}>
+    >>> midSeg.possibilities[0]
+    <music21.figuredBass.possibility Possibility: {1: C#4, 2: G3, 3: E3, 4: E3}>
+    >>> midSeg.possibilities[1]
+    <music21.figuredBass.possibility Possibility: {1: C#4, 2: G3, 3: G3, 4: E3}>
+    >>> midSeg.possibilities[2]
+    <music21.figuredBass.possibility Possibility: {1: C#4, 2: C#4, 3: G3, 4: E3}>
+    >>> midSeg.possibilities[4]
+    <music21.figuredBass.possibility Possibility: {1: G4, 2: C#4, 3: G3, 4: E3}>
+    '''
     def __init__(self, fbScale, partList, fbRules, prevSegment, bassNote, notationString = ''):
+        '''
+        Takes in arguments required for creation of a general Segment instance, but takes 
+        in one more argument: a previous Segment, containing the previous bassNote. It then 
+        creates a general Segment instance, and then calls correctConsecutivePossibilities.
+        '''
         Segment.__init__(self, fbScale, partList, fbRules, bassNote, notationString)
         self.prevSegment = prevSegment
         self.correctConsecutivePossibilities()
     
     def correctConsecutivePossibilities(self):
+        '''
+        Resolves MiddleSegment by calling other methods:
+        1) resolveAllDominantSeventhPossibilities
+        2) resolveAllDiminishedSeventhPossibilities
+        3) resolveAllConsecutivePossibilities
+        
+        
+        '''
         try:
             self.resolveAllDominantSeventhPossibilities()
             return
@@ -186,6 +310,16 @@ class MiddleSegment(Segment):
         return
     
     def resolveAllDominantSeventhPossibilities(self):
+        '''
+        If pitchesAboveBass of the previous Segment spell out a dominant seventh chord, then each 
+        of its possibilities spell out a dominant seventh chord. If fbRules requires proper resolution 
+        of the dominant seventh chord, resolveDominantSeventhPossibility is called on each Possibility. 
+        All the resolutions form MiddleSegment's list of possibilities. A Python dictionary of movements, 
+        nextMovements, is also defined. Keys correspond to indices of possibilities in the previous 
+        Segment's possibilities, while each value corresponds to a list containing only the index of 
+        the appropriate resolution in MiddleSegment's list of possibilities. An UnresolvedSegmentException 
+        is raised if MiddleSegment remains unresolved.
+        '''
         isDominantSeventh = chord.Chord(self.prevSegment.pitchesAboveBass).isDominantSeventh()
         if isDominantSeventh and self.fbRules.resolveDominantSeventhProperly:
             dominantPossibilities = self.prevSegment.possibilities
@@ -209,6 +343,9 @@ class MiddleSegment(Segment):
         raise UnresolvedSegmentException()
     
     def resolveAllDiminishedSeventhPossibilities(self):
+        '''
+        Resolves a fully-diminished seventh Segment. See resolveAllDominantSeventhPossibilities for more details.
+        '''
         isDiminishedSeventh = chord.Chord(self.prevSegment.pitchesAboveBass).isDiminishedSeventh()
         if isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:
             diminishedPossibilities = self.prevSegment.possibilities
@@ -232,6 +369,17 @@ class MiddleSegment(Segment):
         raise UnresolvedSegmentException()
 
     def resolveAllConsecutivePossibilities(self):
+        '''
+        Called when a MiddleSegment requires no special resolution of possibilities from the previous Segment, 
+        which happens if both of the special resolution methods throw an UnresolvedSegmentException. The method 
+        finds a list of correctly formed possibilities for MiddleSegment by calling correctSinglePossibilities. 
+        It then uses this list, nextPossibilities, along with the list of possibilities of the previous Segment, 
+        prevPossibilities. For each element in prevPossibilities, possibA, iterates over each element in 
+        nextPossibilities, possibB. For each combination of possibA and possibB, isCorrectConsecutivePossibility 
+        is called. Every instance where the latter method returns True is recorded in a Python dictionary of movements, 
+        nextMovements. Keys in nextMovements correspond to indices of possibA. Each value corresponds to a list 
+        containing indices of possibB, those for which isCorrectConsecutivePossibility returns True.
+        '''
         prevPossibilities = self.prevSegment.possibilities
         self.prevSegment.nextMovements = {}
         nextPossibilities = self.correctSinglePossibilities()
@@ -250,6 +398,14 @@ class MiddleSegment(Segment):
         return
     
     def resolveDominantSeventhPossibility(self, dominantPossib, verbose = False):
+        '''
+        Takes in a single Possibility which spells out a dominant seventh chord and attempts to return 
+        a Possibility which is resolved properly. An applicable dominant seventh resolution method in 
+        resolution.py is used. The method chosen depends on the bassNote and pitchesAboveBass of 
+        MiddleSegment. A SegmentException is raised if an applicable method cannot be chosen, if the 
+        pitch of bassNote does not match the resolution Possibility, or if the input does not spell 
+        out a dominant seventh. 
+        '''
         environRules = environment.Environment(_MOD)
         if not dominantPossib.isDominantSeventh():
             raise SegmentException("Possibility does not form a correctly spelled dominant seventh chord.")
@@ -310,6 +466,10 @@ class MiddleSegment(Segment):
         return resolutionPossib
 
     def resolveDiminishedSeventhPossibility(self, diminishedPossib, verbose = False):
+        '''
+        Takes in a single Possibility which spells out a fully-diminished seventh chord and attempts to return 
+        a Possibility which is resolved properly. See resolveDominantSeventhPossibility for more details.
+        '''
         environRules = environment.Environment(_MOD)       
         if not diminishedPossib.isDiminishedSeventh():
             raise SegmentException("Possibility does not form a correctly spelled diminished seventh chord.")
@@ -361,6 +521,23 @@ class MiddleSegment(Segment):
         return resolutionPossib
 
     def isCorrectConsecutivePossibility(self, possibA, possibB, verbose = False):
+        '''
+        Performs checks on two consecutive Possibility instances, possibA and possibB. 
+        
+        There are at most six checks performed:
+        (1) hiddenFifth
+        (2) hiddenOctave
+        (3) partMovementsWithinLimits
+        (4) voiceOverlap
+        (5) parallelFifths
+        (6) parallelOctaves
+        
+        If fbRules is set to its default values, then all six checks are performed. 
+        The number of checks can be altered by modifying the corresponding flag(s) 
+        in fbRules. The method returns False as soon as possibA and possibB fail an 
+        applicable check. If possibA and possibB pass all applicable checks, the 
+        method returns True.
+        '''
         isCorrectPossib = True
         
         # No hidden fifth between shared outer parts
