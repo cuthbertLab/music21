@@ -302,6 +302,13 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
 #-------------------------------------------------------------------------------
 # various ways of looking at chordify representation
 
+# percentage of closed-position chords and
+# percentage of closed-position chords above bass  -- which looks at how many
+#2 (or 3 in the second one) note chordify simultaneities are the same after
+# running .closedPosition() on them.  For the latter, we just delete the
+# lowest note of the chord before running that.
+
+
 class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
     '''Number of unique pitch class simultaneities.
 

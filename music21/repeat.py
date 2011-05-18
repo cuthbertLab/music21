@@ -962,6 +962,29 @@ class Test(unittest.TestCase):
 
 
 
+    def testExpandDaCapoA(self):
+        
+        # test one back repeat at end of a measure
+        from music21 import stream, bar, note
+
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m2.leftBarline = bar.Repeat(direction='start')
+        rb = bar.Repeat(direction='end')
+        m2.rightBarline = rb
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+    
+        s = stream.Part()
+        s.append([m1, m2, m3, m4])
+        #s.show()
+
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

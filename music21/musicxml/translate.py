@@ -39,6 +39,90 @@ class TranslateException(Exception):
 
 
 
+def repeatToMx(r):
+    '''
+    >>> from music21 import *
+    >>> b = bar.Repeat('light-heavy')
+    >>> mxBarline = b.mx
+    >>> mxBarline.get('barStyle')
+    'light-heavy'
+    '''
+    mxBarline = musicxmlMod.Barline()
+    if r.style is not None:
+        mxBarline.set('barStyle', r.style)
+
+    if r.location is not None:
+        mxBarline.set('location', r.location)
+
+    mxRepeat = musicxmlMod.Repeat()
+    if r.direction == 'start':
+        mxRepeat.set('direction', 'forward')
+    elif r.direction == 'end':
+        mxRepeat.set('direction', 'backward')
+#         elif self.direction == 'bidirectional':
+#             environLocal.printDebug(['skipping bi-directional repeat'])
+    else:
+        raise BarException('cannot handle direction format:', r.direction)
+
+    if r.times != None:
+        mxRepeat.set('times', r.times)
+
+    mxBarline.set('repeatObj', mxRepeat)
+    return mxBarline
+
+def mxToRepeat(mxBarline, inputM21=None):
+    '''Given an mxBarline, fille the necessary parameters
+
+    >>> from music21 import *
+    >>> mxRepeat = musicxml.Repeat()
+    >>> mxRepeat.set('direction', 'forward')
+    >>> mxRepeat.get('times') == None
+    True
+    >>> mxBarline = musicxml.Barline()
+    >>> mxBarline.set('barStyle', 'light-heavy')
+    >>> mxBarline.set('repeatObj', mxRepeat)
+    >>> b = bar.Repeat()
+    >>> b.mx = mxBarline
+    >>> b.style
+    'light-heavy'
+    >>> b.direction
+    'start'
+    '''
+    from music21 import bar
+    if inputM21 == None:
+        r = bar.Repeat()
+    else:
+        r = inputM21
+
+    r.style = mxBarline.get('barStyle')
+    location = mxBarline.get('location')
+    if location != None:
+        r.location = location
+
+    mxRepeat = mxBarline.get('repeatObj')
+    if mxRepeat == None:
+        raise BarException('attempting to create a Repeat from an MusicXML bar that does not define a repeat')
+
+    mxDirection = mxRepeat.get('direction')
+
+    #environLocal.printDebug(['mxRepeat', mxRepeat, mxRepeat._attr])
+
+    if mxDirection.lower() == 'forward':
+        r.direction = 'start'
+    elif mxDirection.lower() == 'backward':
+        r.direction = 'end'
+    else:
+        raise bar.BarException('cannot handle mx direction format:', mxDirection)
+
+    if mxRepeat.get('times') != None:
+        # make into a number
+        r.times = int(mxRepeat.get('times'))
+
+
+
+
+
+
 #-------------------------------------------------------------------------------
 # Pitch and pitch components
 
@@ -87,7 +171,6 @@ def mxToPitch(mxNote, inputM21=None):
     E-3
     '''
     from music21 import pitch
-
     if inputM21 == None:
         p = pitch.Pitch()
     else:
