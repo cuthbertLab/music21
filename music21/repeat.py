@@ -331,9 +331,10 @@ class Expander(object):
 
         # store counts of all non barline elements.
         reStream = self._srcMeasureStream.flat.getElementsByClass(
-                RepeatExpression)
+                   RepeatExpression)
         self._codaCount = len(reStream.getElementsByClass(Coda))
         self._segnoCount = len(reStream.getElementsByClass(Segno))
+        self._fineCount = len(reStream.getElementsByClass(Fine))
 
         self._dcCount = len(reStream.getElementsByClass(DaCapo))
         self._dcafCount = len(reStream.getElementsByClass(DaCapoAlFine))
@@ -400,6 +401,20 @@ class Expander(object):
         return True
 
 
+    def _daCapoOrSegno(self):
+        '''Return a DaCapo if this is any form of DaCapo; return a Segno if this is any form of Segno. Return None if incoherent.
+        '''
+        sumDc = self._dcCount + self._dcafCount + self._dcacCount
+        # for now, only accepting one segno
+        sumDs = self._dsacCount + self._dsafCount + self._asCount
+        if sumDc == 1 and sumDs == 0:
+            return DaCapo
+        elif sumDs == 1 and sumDc == 0:
+            return Segno
+        else:
+            return None
+        
+
     def _daCapoIsCoherent(self):
         '''Check of a DC statement is coherent.
         '''
@@ -409,13 +424,28 @@ class Expander(object):
 
         # note that the offsets of these streams are as found in the flat score
         # this can be used to determine characteristics
-        environLocal.printDebug(['_daCapoIsCoherent', 'dcCount', self._dcCount, 'dcafCount', self._dcafCount, 'dcacCount', self._dcacCount])
+        environLocal.printDebug(['_daCapoIsCoherent', 'dcCount', self._dcCount, 'dcafCount', self._dcafCount, 'dcacCount', self._dcacCount, 'self._fineCount', self._fineCount])
+
         # there can be only one da capo statement for the provided span
         sumDc = self._dcCount + self._dcafCount + self._dcacCount
         if sumDc > 1:
             return False
-        if sumDc == 1:
+
+        # if dc, there can be no codas
+        if self._dcCount == 1 and self._codaCount == 0:
+            environLocal.printDebug(['returning true on dc'])
             return True
+
+        # if we have a da capo al fine, must have one fine
+        elif self._dcafCount == 1 and self._fineCount == 1:
+            environLocal.printDebug(['returning true on dcaf'])
+            return True
+
+        # if we have a da capo al coda, must have two coda signs
+        elif self._dcacCount == 1 and self._codaCount == 2:
+            environLocal.printDebug(['returning true on dcaf'])
+            return True
+
         # return false for all other cases
         return False
         
@@ -1070,16 +1100,94 @@ class Test(unittest.TestCase):
     
         s = stream.Part()
         s.append([m1, m2, m3, m4])
-        #s.show()
-
         ex = Expander(s)
         self.assertEqual(ex._daCapoIsCoherent(), True)
+        self.assertEqual(ex._daCapoOrSegno(), DaCapo)
 
         # test incorrect da capo
         sAlt1 = copy.deepcopy(s)
         sAlt1[1].append(DaCapoAlFine())
         ex = Expander(sAlt1)
         self.assertEqual(ex._daCapoIsCoherent(), False)
+        # rejected here b/c there is more than one
+        self.assertEqual(ex._daCapoOrSegno(), None)
+
+
+        # a da capo with a coda is not valid
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.append(Coda())
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m3.append(DaCapo())
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+    
+        s = stream.Part()
+        s.append([m1, m2, m3, m4])
+        ex = Expander(s)
+        self.assertEqual(ex._daCapoIsCoherent(), False)
+        self.assertEqual(ex._daCapoOrSegno(), DaCapo)
+
+
+    def testExpandDaCapoB(self):
+        
+        # test one back repeat at end of a measure
+        from music21 import stream, bar, note
+
+        # a da capo al fine without a fine is not valid
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m3.append(DaCapoAlFine())
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+    
+        s = stream.Part()
+        s.append([m1, m2, m3, m4])
+        ex = Expander(s)
+        self.assertEqual(ex._daCapoIsCoherent(), False)
+        self.assertEqual(ex._daCapoOrSegno(), DaCapo)
+
+
+        # has both da capo and da segno
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m1.append(DaCapoAlFine())
+        m2 = stream.Measure()
+        m1.append(DalSegnoAlCoda())
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        s = stream.Part()
+        s.append([m1, m2])
+        ex = Expander(s)
+        self.assertEqual(ex._daCapoIsCoherent(), False)
+        self.assertEqual(ex._daCapoOrSegno(), None)
+
+        # segno alone
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m1.append(DalSegnoAlCoda())
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        s = stream.Part()
+        s.append([m1, m2])
+        ex = Expander(s)
+        self.assertEqual(ex._daCapoIsCoherent(), False)
+        self.assertEqual(ex._daCapoOrSegno(), Segno)
+
+        # if nothing, will return None
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        s = stream.Part()
+        s.append([m1])
+        ex = Expander(s)
+        self.assertEqual(ex._daCapoOrSegno(), None)
+
 
 
 
