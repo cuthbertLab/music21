@@ -17,6 +17,233 @@ from music21 import interval
 
 from music21.figuredBass import possibility
 
+#-------------------------------------------------------------------------------
+# AUGMENTED SIXTH RESOLUTIONS
+
+def isAugmentedSixth(augSixthPossib):
+    '''
+    Returns True if the Possibility is an Italian, French, or German +6 chord.
+    In other words, returns True if the following methods also return True:
+    1) isItalianAugmentedSixth(augSixthPossib)
+    2) isFrenchAugmentedSixth(augSixthPossib)
+    3) isGermanAugmentedSixth(augSixthPossib)
+    
+    >>> from music21 import interval
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import resolution
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+    >>> itAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2'})
+    >>> frAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'D4', p4: 'A-2'})
+    >>> grAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'E-4', p4: 'A-2'})
+    >>> resolution.isAugmentedSixth(itAug6)
+    True
+    >>> resolution.isAugmentedSixth(frAug6)
+    True
+    >>> resolution.isAugmentedSixth(grAug6)
+    True
+    >>> V7 = possibility.Possibility({p1: 'D5', p2: 'F4', p3: 'B3', p4: 'G2'})
+    >>> resolution.isAugmentedSixth(V7)
+    False
+    '''
+
+    if isItalianAugmentedSixth(augSixthPossib):
+        return True
+    elif isFrenchAugmentedSixth(augSixthPossib):
+        return True
+    elif isGermanAugmentedSixth(augSixthPossib):
+        return True
+    
+    return False
+
+def isItalianAugmentedSixth(augSixthPossib):
+    '''
+    >>> from music21 import interval
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import resolution
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+    >>> itAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2'})
+    >>> resolution.isItalianAugmentedSixth(itAug6)
+    True
+    >>> itAug6a = possibility.Possibility({p1: 'C5', p2: 'F4', p3: 'C4', p4: 'A-2'})
+    >>> resolution.isItalianAugmentedSixth(itAug6a)
+    False
+    >>> frAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'D4', p4: 'A-2'})
+    >>> grAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'E-4', p4: 'A-2'})
+    >>> resolution.isItalianAugmentedSixth(frAug6)
+    False
+    >>> resolution.isItalianAugmentedSixth(grAug6)
+    False
+
+    OMIT_FROM_DOCS
+    >>> p5 = part.Part(5)
+    >>> itAug6b = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2', p5: 'F#5'})
+    >>> resolution.isItalianAugmentedSixth(itAug6b)
+    True
+    >>> itAug6c = possibility.Possibility({p2: 'F#4', p3: 'C4', p4: 'A-2', p5: 'F#5'})
+    >>> resolution.isItalianAugmentedSixth(itAug6c)
+    False
+    >>> itAug6d = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2', p5: 'A2'})    
+    >>> resolution.isItalianAugmentedSixth(itAug6d)
+    False
+    '''
+    ### It+6 => Minor sixth scale step in bass, tonic, raised 4th + doubling of tonic note.
+    augSixthChord = augSixthPossib.chordify()
+    augSixthChord.removeRedundantPitchNames()
+    
+    ### Chord must be in first inversion.
+    if not augSixthChord.inversion() == 1:
+        return False
+    
+    ### Augmented sixth interval (simple or compound) must be present between bass and raised 4th (root of chord)
+    bass = augSixthChord.bass()
+    root = augSixthChord.root()
+    augSixthInterval = interval.Interval(bass, root)
+    if not (augSixthInterval.diatonic.specificName == 'Augmented' and augSixthInterval.generic.simpleDirected == 6):
+        return False
+        
+    ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if 
+    ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
+    tonic = augSixthChord.getChordStep(5)
+    majThirdInterval = interval.Interval(bass, tonic)
+    if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
+        return False
+    
+    ### No other pitches may be present that aren't the m6 scale step, raised 4th, or tonic.
+    for samplePitch in augSixthChord.pitches:
+        if not (samplePitch == bass or samplePitch == root or samplePitch == tonic):
+            return False
+    
+    ### Tonic must be doubled.
+    for samplePitch in augSixthPossib.pitches():
+        if (not samplePitch == tonic) and (samplePitch.name == tonic.name):
+            return True
+        
+    return False
+
+def isFrenchAugmentedSixth(augSixthPossib):
+    '''
+    >>> from music21 import interval
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import resolution
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+    >>> itAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2'})
+    >>> frAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'D4', p4: 'A-2'})
+    >>> grAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'E-4', p4: 'A-2'})
+    >>> resolution.isFrenchAugmentedSixth(frAug6)
+    True
+    >>> resolution.isItalianAugmentedSixth(frAug6)
+    False
+    >>> resolution.isGermanAugmentedSixth(frAug6)
+    False
+    '''
+    ### Fr+6 => Minor sixth scale step in bass, tonic, raised 4th + second scale degree.
+    augSixthChord = augSixthPossib.chordify()
+    augSixthChord.removeRedundantPitchNames()
+    
+    ### The findRoot() method of music21.chord Chord determines the root based on the note with
+    ### the most thirds above it. However, under this definition, a french augmented sixth chord
+    ### resembles a second inversion chord, not the first inversion subdominant chord it is based
+    ### upon. We fix this by adjusting the root. First, however, we check to see if the chord is
+    ### in second inversion to begin with, otherwise its not a Fr+6 chord. This is to avoid 
+    ### ChordException errors.
+    if not augSixthChord.inversion() == 2:
+        return False    
+    augSixthChord.root(augSixthChord.getChordStep(3))
+
+    ### Chord must be in first inversion.    
+    if not augSixthChord.inversion() == 1:
+        return False
+        
+    ### Augmented sixth interval (simple or compound) must be present between bass and raised 4th (root of chord)
+    bass = augSixthChord.bass()
+    root = augSixthChord.root()
+    augSixthInterval = interval.Interval(bass, root)
+    if not (augSixthInterval.diatonic.specificName == 'Augmented' and augSixthInterval.generic.simpleDirected == 6):
+        return False
+        
+    ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if 
+    ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
+    tonic = augSixthChord.getChordStep(5)
+    majThirdInterval = interval.Interval(bass, tonic)
+    if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
+        return False
+
+    ### The sixth of the chord must be the supertonic. The sixth of the chord is the supertonic if and only if
+    ### there is a A4 (simple or compound) between the bass (m6 scale step) and the sixth of the chord.
+    supertonic = augSixthChord.getChordStep(6)
+    augFourthInterval = interval.Interval(bass, supertonic)
+    if not (augFourthInterval.diatonic.specificName == 'Augmented' and augFourthInterval.generic.simpleDirected == 4):
+        return False
+    
+    ### No other pitches may be present that aren't the m6 scale step, raised 4th, tonic, or supertonic.
+    for samplePitch in augSixthChord.pitches:
+        if not (samplePitch == bass or samplePitch == root or samplePitch == tonic or samplePitch == supertonic):
+            return False
+
+    return True
+
+def isGermanAugmentedSixth(augSixthPossib):
+    '''
+    >>> from music21 import interval
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import resolution
+    >>> from music21.figuredBass import part
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+    >>> itAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2'})
+    >>> frAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'D4', p4: 'A-2'})
+    >>> grAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'E-4', p4: 'A-2'})
+    >>> resolution.isGermanAugmentedSixth(grAug6)
+    True
+    >>> resolution.isItalianAugmentedSixth(grAug6)
+    False
+    >>> resolution.isFrenchAugmentedSixth(grAug6)
+    False
+    '''
+    augSixthChord = augSixthPossib.chordify()
+    augSixthChord.removeRedundantPitchNames()
+
+    ### Chord must be in first inversion.
+    if not augSixthChord.inversion() == 1:
+        return False
+        
+    ### Augmented sixth interval (simple or compound) must be present between bass and raised 4th (root of chord)
+    bass = augSixthChord.bass()
+    root = augSixthChord.root()
+    augSixthInterval = interval.Interval(bass, root)
+    if not (augSixthInterval.diatonic.specificName == 'Augmented' and augSixthInterval.generic.simpleDirected == 6):
+        return False
+        
+    ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if 
+    ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
+    tonic = augSixthChord.getChordStep(5)
+    majThirdInterval = interval.Interval(bass, tonic)
+    if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
+        return False
+
+    ### The seventh of the chord must be the mediant. The seventh of the chord is the mediant if and only if
+    ### there is a P5 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
+    mediant = augSixthChord.getChordStep(7)
+    perfectFifthInterval = interval.Interval(bass, mediant)
+    if not (perfectFifthInterval.diatonic.specificName == 'Perfect' and perfectFifthInterval.generic.simpleDirected == 5):
+        return False
+
+    return True
+    
 #Used Ex.76 (page 46) from 'The Basis of Harmony' by Frederick J. Horwood
 #-------------------------------------------------------------------------------
 # DOMINANT SEVENTH RESOLUTIONS
