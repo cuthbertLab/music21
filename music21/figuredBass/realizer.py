@@ -38,7 +38,7 @@ from a figured bass are added to an instance of FiguredBass, after which
 resolve is called to find every complete resolution to the provided bass line.
 '''
 
-def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = False):
+def figuredBassFromStream(streamPart, partList = None, takeFromNotation = False):
     '''
     Takes a music21.stream Part (or another music21.stream Stream subclass) 
     and returns a FiguredBass object whose bass notes have Notations taken 
@@ -49,9 +49,9 @@ def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = Fa
     
     >>> from music21 import *
     >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
-    >>> fb = figuredBass.realizer.figuredBassFromStreamPart(s)
+    >>> fb = figuredBass.realizer.figuredBassFromStream(s)
     >>> fb.realize()
-    >>> fb.showRandomRealizations(20)
+    >>> #_DOCS_SHOW fb.showRandomRealizations(20)
     '''
     if partList is None:
         part1 = part.Part(1,2)
@@ -63,11 +63,21 @@ def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = Fa
     
     sf = streamPart.flat
     sfn = sf.notes
-    keyList = sf.getElementsByClass(key.KeySignature)
+    
+    keyList = sf.getElementsByClass(key.Key)
+    myKey = None
     if len(keyList) == 0:
-        mykey = key.Key('C')
+        keyList = sf.getElementsByClass(key.KeySignature)
+        if len(keyList) == 0:
+            myKey = key.Key('C')
+        else:
+            if keyList[0].pitchAndMode[1] is None:
+                mode = 'major'
+            else:
+                mode = keyList[0].pitchAndMode[1]
+            myKey = key.Key(keyList[0].pitchAndMode[0], mode)
     else:
-        mykey = keyList[0]
+        myKey = keyList[0]
 
     tsList = sf.getElementsByClass(meter.TimeSignature)
     if len(tsList) == 0:
@@ -75,16 +85,19 @@ def figuredBassFromStreamPart(streamPart, partList = None, takeFromNotation = Fa
     else:
         ts = tsList[0]
     
-    fb = FiguredBass(partList, str(ts), mykey.tonic, mykey.mode)
+    fb = FiguredBass(partList, str(ts), myKey.tonic, myKey.mode)
     fb.addNotationAsLyrics = False
     
     for n in sfn:
-        if n.lyric != "" and n.lyric is not None:
-            fb.addElement(n, n.lyric)
+        if len(n.lyrics) > 0:
+            annotationString = ", ".join([x.text for x in n.lyrics])
+            fb.addElement(n, annotationString)
         else:
             fb.addElement(n)
     
     return fb
+
+figuredBassFromStreamPart = figuredBassFromStream
 
 def addLyricsToBassNote(bassNote, notationString):
     '''
@@ -137,14 +150,13 @@ class FiguredBass(object):
         >>> fbLine2.addElement(bassNote2, "6")   # viio6
         >>> fbLine2.addElement(bassNote3, "6")   # I6
         >>> fbLine2.realize()
-        >>> fbLine2.timeElapsed.seconds
+        >>> #_DOCS_SHOW fbLine2.timeElapsed.seconds
+        >>> print "7" #_DOCS_HIDE
         7
         >>> fbLine2.getNumSolutions()
         171
-        >>> fbLine2.keyboardStyleOutput = False
-        >>> fbLine2.showRandomRealization()
-        >>> fbLine2.showRandomRealizations(10)
-        >>> allSolsScore = fbLine2.generateAllRealizations()
+        >>> #_DOCS_SHOW fbLine2.showRandomRealizations(10)
+        >>> #_DOCS_SHOW fbLine2.showRandomRealization()
         '''
         if partList is None:
             part1 = part.Part(1,2)
@@ -389,12 +401,14 @@ class FiguredBass(object):
             for k in range(len(self.fbParts) - 1):
                 sol.insert(0, streamParts[k])
             
-        sol.insert(0, copy.deepcopy(self.bassLine))
-        sol.append(bar.Barline('light-heavy'))
+        sol.insert(0, blCopy)
 
         return sol
 
     def generateAllRealizations(self):
+        if self.isRealized is False:
+            self.realize()
+        
         allSols = stream.Score()
         if self.keyboardStyleOutput:
             part1 = stream.Part()
@@ -429,10 +443,16 @@ class FiguredBass(object):
         '''
         Generates a random solution as a stream.Score()
         '''
+        if self.isRealized is False:
+            self.realize()
+        
         possibilityProgression = self.getRandomPossibilityProgression()
         return self.generateRealizationFromPossibilityProgression(possibilityProgression)
       
     def generateRandomRealizations(self, amountToShow = 20):
+        if self.isRealized is False:
+            self.realize()
+
         if amountToShow > self.lastSegment.getNumSolutions():
             return self.generateAllRealizations()
         allSols = stream.Score()

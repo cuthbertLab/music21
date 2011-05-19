@@ -121,7 +121,59 @@ def testChinaEurope():
                     mismatch += 1
             print('%s %s: misclassified %s/%s of %s' % (cStr, cName, mismatch, len(matchData),  matchStr))
 
-prepareChinaEurope()
+def tinyNotationBass():
+    bass1 = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
+    #bass1.show('lily.png')
+    fbLine1 = figuredBass.realizer.figuredBassFromStream(bass1)
+    fbLine1.showAllRealizations()
+
+def figuredBassScale():
+    fbScale1 = figuredBass.realizerScale. \
+        FiguredBassScale("D", "major")
+    print fbScale1.getSamplePitches("E3", "6")
+
+
+def exampleD():
+    eD = figuredBass.examples.exampleD()
+    eD.fbRules.allowVoiceOverlap = True
+    eD.realize()
+    eD.showRandomRealizations(20)
+    
+def featureExtraction():
+    exampleFB = converter.parse('d:/desktop/example1b.xml')
+    fe1 = features.jSymbolic.\
+         PitchClassDistributionFeature(exampleFB)
+    print fe1.extract().vector
+    # [0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.6666666666666666, 0.0, 0.0, 1.0, 0.0, 0.0]
+    n1 = exampleFB.parts[0][1][5]
+    n1.expressions.append(expressions.Turn())
+    x = expressions.realizeOrnaments(n1)
+    n2 = exampleFB.parts[0][2][2]
+    n2.expressions.append(expressions.Mordent())
+    y = expressions.realizeOrnaments(n2)
+    
+    exampleFB.parts[0][1].elements = [exampleFB.parts[0][1][4]]
+    exampleFB.parts[0][1].append(x)
+    exampleFB.parts[0][2].elements = [exampleFB.parts[0][2][0], exampleFB.parts[0][2][1]]
+    exampleFB.parts[0][2].append(y)
+    
+    fb1 = figuredBass.realizer.figuredBassFromStream(exampleFB.parts[1])
+    fb1.realize()
+    sol1 = fb1.generateRandomRealization()
+    
+    exampleFBOut = stream.Score()
+    exampleFBOut.insert(0, exampleFB.parts[0])
+    exampleFBOut.insert(0, sol1.parts[0])
+    exampleFBOut.insert(0, sol1.parts[1])
+
+    fe1.setData(exampleFBOut)
+    print fe1.extract().vector
+    #[0.0, 0.5, 1.0, 0.0, 0.6000000000000001, 0.0, 0.4, 0.2, 0.0, 0.7000000000000001, 0.0, 0.1]
+    # exampleFBOut.show()
+
+#figuredBassScale()
+featureExtraction()
+#prepareChinaEurope()
 #testDataSet()
 #testFictaFeature()
 #example2()

@@ -712,7 +712,7 @@ def realizerExample1():
     >>> from music21.figuredBass import realizer
     >>> from music21 import tinyNotation
     >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
-    >>> fbLine1 = realizer.figuredBassFromStreamPart(s)
+    >>> fbLine1 = realizer.figuredBassFromStream(s)
     >>> fbLine1.realize()
     >>> fbLine1.showAllRealizations()
     '''

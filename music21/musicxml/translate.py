@@ -1772,7 +1772,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
                 if mxNote.get('notationsObj') is not None:
                     for mxObjSub in mxNote.get('notationsObj'):
-                        # deal with ornaments, strill, etc
+                        # deal with ornaments, trill, etc
                         pass
             else: # its a rest
                 n = note.Rest()

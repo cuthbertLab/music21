@@ -668,6 +668,7 @@ class BassClarinet(Clarinet):
         self.instrumentAbbreviation = 'Bs Cl'
 
         self.lowestNote = pitch.Pitch('E-3')
+        self.transposition = interval.Interval('M-9')
 
 class Bassoon(WoodwindInstrument):
     def __init__(self):

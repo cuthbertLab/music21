@@ -6245,6 +6245,10 @@ class Stream(music21.Music21Object):
 #        if self.showTimeSignature is not False and self.timeSignature is not None:
 #            lilyout += self.timeSignature.lily
     
+        foundClefs = self.getElementsByClass(clef.Clef)
+        if len(foundClefs) == 0:
+            lilyout += str(self.bestClef().lily)
+    
         for thisObject in self.elements:
             if hasattr(thisObject, "startTransparency") and thisObject.startTransparency is True:
                 lilyout += lilyModule.TRANSPARENCY_START
