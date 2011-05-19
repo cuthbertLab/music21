@@ -7,7 +7,9 @@
 # Copyright:    (c) 2010 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+import music21
 import copy
+import unittest
 
 from music21 import interval
 from music21 import note
@@ -334,9 +336,11 @@ if __name__ == "__main__":
     #generateTripletBlues(fbRealizer.generateRandomRealizations(5).show()
     #generateBluesVamp(fbRealizer.generateRandomRealizations(5).show()
     '''
+    # Uncomment the following before running:
+    ''' 
     fbRealizer.realize()
     fbRealizer.showRandomRealizations(20)
-
+    '''
 # -----------------------------------------------------------------
 # METHODS FOR GENERATION OF BLUES VAMPS
 def generateBoogieVamp(sampleScore):
@@ -346,15 +350,10 @@ def generateBoogieVamp(sampleScore):
     
     >>> from music21.figuredBass import examples
     >>> bluesLine = examples.twelveBarBlues()
-    >>> bluesLine.solve()
-    Finding starting possibilities for: (B-2, '')
-    Finding all possibilities for: (E-3, '')
-    Finding all possibilities for: (B-2, '')
-    ...
-    Finding all possibilities for: (B-2, '')
-    Solving complete. Number of solutions, as calculated by path counting: 2224978.
-
-    >>> examples.generateBoogieVamp(bluesLine.generateRandomSolutions(10)).show()
+    >>> bluesLine.realize()
+    >>> bluesLine.getNumSolutions()
+    2224978
+    >>> examples.generateBoogieVamp(bluesLine.generateRandomRealizations(10)).show()
     '''
     boogieBassLine = stream.Part()
     boogieBassLine.append(note.Note('B-2'))
@@ -454,4 +453,15 @@ def generateBluesVamp(sampleScore, topLineChordLengths = [1.0, 1.0, 1.0, 1.0]):
     newScore.insert(0, sampleScore[1])
 
     return newScore
-    
+
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+if __name__ == "__main__":
+    music21.mainTest(Test)
+
+#------------------------------------------------------------------------------
+# eof
