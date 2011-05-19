@@ -15,6 +15,11 @@
 
 
 import unittest
+import webbrowser
+import urllib
+import re
+import math
+
 import music21
 
 from music21.features import base as featuresModule
@@ -24,15 +29,11 @@ _MOD = 'features/native.py'
 environLocal = environment.Environment(_MOD)
 
 
-
-
-
-
+#-------------------------------------------------------------------------------
 # ideas for other music21 features extactors
-# and not available in midi
 
-# clef usage
-# enhmaronic usage
+# notation features: clef usage, enharmonic usage
+# chromatic alteration related to beat position
 
 # key signature histogram
 # array of circle of fiths
@@ -40,20 +41,22 @@ environLocal = environment.Environment(_MOD)
 # lyrics
 # luca gloria:
 # searching for numbers of hits
-# is vowel placed on strongest beat
-# wikifonia
+# vowel metrical postiion
+# idea of language/text specific
 
-# idea of language specific
-
-# essen local
-# getting elevation
+# essen locale and elevation
 
 # automatic key analysis
 # as a method of feature extraction
 
+# key detection on windowed segments
+# prevalence m/M over 4 bar windwows
+
+
+
+#-------------------------------------------------------------------------------
 class NativeFeatureException(featuresModule.FeatureException):
     pass
-
 
 
 class QualityFeature(featuresModule.FeatureExtractor):
@@ -136,22 +139,6 @@ class QualityFeature(featuresModule.FeatureExtractor):
         self._feature.vector[0] = keyFeature
     
     
-
-
-
-
-#=======
-# key detection on windowed segments
-# prevalence m/M over 4 bar windwows
-
-# chromatic alteration related to beat position
-
-
-# landini cadence
-# scales steps 7 / 7 / 6 / 1
-# antepenultimate note is half step below final
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -677,13 +664,10 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
 
 
 
-import webbrowser
-import urllib
-from urllib import FancyURLopener
-import re
-import math
+#-------------------------------------------------------------------------------
+# metadata
 
-class URLOpenerUI(FancyURLopener):
+class URLOpenerUI(urllib.FancyURLopener):
     version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
 
 googleResultsRE = re.compile('([\d\,]+) results')
@@ -744,8 +728,66 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
 
 
 
-class NativeFeatureException(featuresModule.FeatureException):
-    pass
+#-------------------------------------------------------------------------------
+# melodic contour
+
+
+class EndsWithLandiniMelodicContour(featuresModule.FeatureExtractor):
+    '''Return a bolean if one or more Parts end with a Landini-like cadential figure.
+
+    >>> from music21 import *
+    '''
+    id = 'MC1'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Ends With Landini Melodic Contour'
+        self.description = 'Boolean that indicates the presence of a Landini-like cadential figure in one or more parts.'
+        self.dimensions = 1
+        self.discrete = False 
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # store plausible ending half step movements
+        # these need to be lists for comparison
+        match = [[-2, 3], [-1, -2, 3]]
+
+        cBundle = []
+        if self.data.partsCount > 0:
+            for i in range(self.data.partsCount):
+                cList = self.data['parts'][i]['contourList']
+                cBundle.append(cList)
+        else:
+            cList = self.data['contourList']
+            cBundle.append(cList)
+
+        # iterate over each contour
+        found = False
+        for cList in cBundle:
+            # remove repeated notes
+            cListClean = []
+            for c in cList:
+                if c != 0:
+                    cListClean.append(c)
+            # find matches
+            for cMatch in match:
+                #environLocal.printDebug(['cList', cList, 'cListClean', cListClean, 'cMatch', cMatch])
+                # compare to last
+                if len(cListClean) >= len(cMatch):
+                    # get the len of the last elements
+                    if cListClean[-len(cMatch):] == cMatch:
+                        found = True
+                        break
+            if found: break
+        if found:
+            self._feature.vector[0] = 1
+
+
+
+#-------------------------------------------------------------------------------
+
+
 
 
 featureExtractors = [
@@ -755,6 +797,7 @@ UniqueNoteQuarterLengths, # ql1
 MostCommonNoteQuarterLength, # ql2
 MostCommonNoteQuarterLengthPrevalence, # ql3
 RangeOfNoteQuarterLengths, # ql4
+
 UniquePitchClassSetSimultaneities, # cs1
 UniqueSetClassSimultaneities, # cs2
 MostCommonPitchClassSetSimultaneityPrevalence, # cs3
@@ -768,6 +811,8 @@ DiminishedSeventhSimultaneityPrevalence, # cs10
 IncorrectlySpelledTriadPrevalence, # cs11
 
 ComposerPopularity, #md1
+
+EndsWithLandiniMelodicContour, #mc1
 ]
 
 
@@ -792,12 +837,23 @@ class Test(unittest.TestCase):
         fe = features.native.IncorrectlySpelledTriadPrevalence(s)
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
 
-        
-        
-#         streamList = corpus.bachChorales[200:220]
-#         feList = ['cs9', 'cs11']
-#         p = graph.PlotFeatures(streamList, feList)
-#         p.process()
+
+
+    def testEndsWithLandiniMelodicContour(self):
+        from music21 import converter, features, corpus, graph
+
+        s = converter.parse(['f#4 f# e g2', '3/4'])
+        fe = features.native.EndsWithLandiniMelodicContour(s)
+        self.assertEqual(fe.extract().vector[0], 1)        
+
+        s = converter.parse(['f#4 f# f# g2', '3/4'])
+        fe = features.native.EndsWithLandiniMelodicContour(s)
+        self.assertEqual(fe.extract().vector[0], 0)        
+
+        s = converter.parse(['f#4 e a g2', '3/4'])
+        fe = features.native.EndsWithLandiniMelodicContour(s)
+        self.assertEqual(fe.extract().vector[0], 0)        
+
 
 #    def testComposer(self):
 #        from music21 import corpus, features

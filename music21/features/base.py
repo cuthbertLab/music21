@@ -409,7 +409,17 @@ class StreamForms(object):
                     if i < (len(post) - 1): # if not last
                         iNext = i + 1
                         nNext = post[iNext]
-                        cList.append(nNext.midi - n.midi)
+
+                        if n.isChord:
+                            ps = n.sortDiatonicAscending().pitches[-1].midi
+                        else: # normal note
+                            ps = n.midi
+                        if nNext.isChord:
+                            psNext = nNext.sortDiatonicAscending().pitches[-1].midi
+                        else: # normal note
+                            psNext = nNext.midi
+
+                        cList.append(psNext - ps)
             #environLocal.printDebug(['contourList', cList])
             self._forms['contourList'] = cList
             return self._forms['contourList']
