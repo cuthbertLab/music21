@@ -68,15 +68,12 @@ from music21 import environment
 _MOD = "scale.py"
 environLocal = environment.Environment(_MOD)
 
-
-
 DIRECTION_BI = intervalNetwork.DIRECTION_BI
 DIRECTION_ASCENDING = intervalNetwork.DIRECTION_ASCENDING
 DIRECTION_DESCENDING = intervalNetwork.DIRECTION_DESCENDING
 
 TERMINUS_LOW = intervalNetwork.TERMINUS_LOW
 TERMINUS_HIGH = intervalNetwork.TERMINUS_HIGH
-
 
 #-------------------------------------------------------------------------------
 class ScaleException(Exception):
@@ -2702,8 +2699,14 @@ class Test(unittest.TestCase):
 
     def testPlot(self):
 
-        amms = AbstractMelodicMinorScale()
-        amms.plot(doneAction=None)
+        try:
+            import networkx
+        except ImportError:
+            networkx = None # use for testing
+
+        if networkx is not None:
+            amms = AbstractMelodicMinorScale()
+            amms.plot(doneAction=None)
 
 
     def testPlagalModes(self):

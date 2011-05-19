@@ -47,7 +47,7 @@ try:
     import networkx
 except ImportError:
     # lacking this does nothing
-    pass
+    networkx = None
     #_missingImport.append('networkx')
 
 

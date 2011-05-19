@@ -71,8 +71,7 @@ except ImportError:
 try:
     import networkx
 except ImportError:
-    # for now, this does nothing
-    pass
+    networkx = None # use for testing
     #_missingImport.append('networkx')
 
 
@@ -534,9 +533,10 @@ class GraphNetworxGraph(Graph):
         if 'title' not in keywords:
             self.setTitle('Network Plot')
 
+        self.networkxGraph = None
         if 'networkxGraph' in keywords.keys():
-            self.networkxGraph = keywords['networkxGraph']
-        else:
+            self.networkxGraph = keywords['networkxGraph']            
+        elif networkx is not None: # if we have this module
             # testing default; temporary
             try:
                 g = networkx.Graph()
@@ -544,10 +544,8 @@ class GraphNetworxGraph(Graph):
 #             g.add_edge('b','c',weight=0.6)
 #             g.add_edge('c','d',weight=0.2)
 #             g.add_edge('d','e',weight=0.6)
-            
                 self.networkxGraph = g
-            except NameError:
-                self.networkxGraph = None
+            except NameError: pass # keep as None
 
     def process(self):
 
@@ -4038,10 +4036,10 @@ class Test(unittest.TestCase):
 
 
     def testGraphNetworxGraph(self):
-        
-        b = GraphNetworxGraph(doneAction=None)
-        #b = GraphNetworxGraph()
-        b.process()
+        if networkx is not None:
+            b = GraphNetworxGraph(doneAction=None)
+            #b = GraphNetworxGraph()
+            b.process()
 
 
     def testPlotChordsA(self):
