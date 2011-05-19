@@ -732,7 +732,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
 # melodic contour
 
 
-class EndsWithLandiniMelodicContour(featuresModule.FeatureExtractor):
+class LandiniCadence(featuresModule.FeatureExtractor):
     '''Return a bolean if one or more Parts end with a Landini-like cadential figure.
 
     >>> from music21 import *
@@ -812,7 +812,7 @@ IncorrectlySpelledTriadPrevalence, # cs11
 
 ComposerPopularity, #md1
 
-EndsWithLandiniMelodicContour, #mc1
+LandiniCadence, #mc1
 ]
 
 
@@ -839,19 +839,19 @@ class Test(unittest.TestCase):
 
 
 
-    def testEndsWithLandiniMelodicContour(self):
+    def testLandiniCadence(self):
         from music21 import converter, features, corpus, graph
 
         s = converter.parse(['f#4 f# e g2', '3/4'])
-        fe = features.native.EndsWithLandiniMelodicContour(s)
+        fe = features.native.LandiniCadence(s)
         self.assertEqual(fe.extract().vector[0], 1)        
         
         s = converter.parse(['f#4 f# f# g2', '3/4'])
-        fe = features.native.EndsWithLandiniMelodicContour(s)
+        fe = features.native.LandiniCadence(s)
         self.assertEqual(fe.extract().vector[0], 0)        
 
         s = converter.parse(['f#4 e a g2', '3/4'])
-        fe = features.native.EndsWithLandiniMelodicContour(s)
+        fe = features.native.LandiniCadence(s)
         self.assertEqual(fe.extract().vector[0], 0)        
 
 
