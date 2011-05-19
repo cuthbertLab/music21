@@ -51,6 +51,9 @@ def augmentedSixthToDominant(augSixthPossib, inPlace = False):
     {1: A4, 2: E4, 3: C#4, 4: A2}
     >>> print(resolution.augmentedSixthToDominant(grAug6))
     {1: A4, 2: E4, 3: C#4, 4: A2}
+    >>> resolution.augmentedSixthToDominant(iv6)
+    Traceback (most recent call last):
+    ResolutionException: Possibility does not form a correctly spelled augmented sixth chord.
     '''
     if not augSixthPossib.isAugmentedSixth():
         raise ResolutionException("Possibility does not form a correctly spelled augmented sixth chord.")
@@ -72,7 +75,6 @@ def augmentedSixthToDominant(augSixthPossib, inPlace = False):
     bass = augSixthChord.bass()
     root = augSixthChord.root()
     tonic = augSixthChord.getChordStep(5)
-    p1 = possibility.Possibility()
     for givenPart in asCopy.parts():
         givenPitch = asCopy[givenPart]
         givenPitchName = givenPitch.name
@@ -95,6 +97,159 @@ def augmentedSixthToDominant(augSixthPossib, inPlace = False):
     
     return asCopy
 
+def augmentedSixthToMajorTonic(augSixthPossib, inPlace = False):
+    '''
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import part
+    >>> from music21.figuredBass import resolution
+    
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+    
+    The following examples were retrieved from Marjorie Merryman's The Music Theory Handbook.
+    >>> iv6 = possibility.Possibility({p1: 'G4', p2: 'D4', p3: 'D4', p4: 'B-2'})
+    >>> itAug6 = possibility.Possibility({p1: 'G#4', p2: 'D4', p3: 'D4', p4: 'B-2'})
+    >>> frAug6 = possibility.Possibility({p1: 'G#4', p2: 'E4', p3: 'D4', p4: 'B-2'})
+    >>> grAug6 = possibility.Possibility({p1: 'G#4', p2: 'F4', p3: 'D4', p4: 'B-2'})
+    >>> iv6.isAugmentedSixth()
+    False
+    >>> itAug6.isItalianAugmentedSixth()
+    True
+    >>> frAug6.isFrenchAugmentedSixth()
+    True
+    >>> grAug6.isGermanAugmentedSixth()
+    True
+    
+    
+    It+6 to V not yet defined, because there are multiple equally valid solutions, not sure what to do.    
+    >>> print(resolution.augmentedSixthToMajorTonic(frAug6))
+    {1: A4, 2: F#4, 3: D4, 4: A2}
+    >>> print(resolution.augmentedSixthToMajorTonic(grAug6))
+    {1: A4, 2: F#4, 3: D4, 4: A2}
+    >>> resolution.augmentedSixthToMajorTonic(iv6)
+    Traceback (most recent call last):
+    ResolutionException: Possibility does not form a correctly spelled augmented sixth chord.
+    '''
+    if not augSixthPossib.isAugmentedSixth():
+        raise ResolutionException("Possibility does not form a correctly spelled augmented sixth chord.")
+
+    isItalian = augSixthPossib.isItalianAugmentedSixth()
+    isFrench = augSixthPossib.isFrenchAugmentedSixth()
+    isGerman = augSixthPossib.isGermanAugmentedSixth()
+    
+    if inPlace:
+        asCopy = augSixthPossib
+    else:
+        asCopy = copy.deepcopy(augSixthPossib)
+
+    augSixthChord = asCopy.chordify()
+    augSixthChord.removeRedundantPitchNames()
+    if augSixthChord.inversion() == 2: # Fr+6
+        augSixthChord.root(augSixthChord.getChordStep(3))
+        
+    bass = augSixthChord.bass()
+    root = augSixthChord.root()
+    tonic = augSixthChord.getChordStep(5)
+    for givenPart in asCopy.parts():
+        givenPitch = asCopy[givenPart]
+        givenPitchName = givenPitch.name
+        if givenPitchName == bass.name:
+            givenPitch.transpose('-m2', True)
+        elif givenPitchName == root.name:
+            givenPitch.transpose('m2', True)
+        elif givenPitchName == tonic.name:
+            givenPitch.transpose('P1', True)
+        else:
+            if isFrench:
+                givenPitch.transpose('M2', True)
+            elif isGerman:
+                givenPitch.transpose('A1', True)
+            elif isItalian:
+                pass
+
+    if inPlace == True:
+        return None
+    
+    return asCopy
+
+def augmentedSixthToMinorTonic(augSixthPossib, inPlace = False):
+    '''
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import part
+    >>> from music21.figuredBass import resolution
+    
+    >>> p1 = part.Part(1)
+    >>> p2 = part.Part(2)
+    >>> p3 = part.Part(3)
+    >>> p4 = part.Part(4)
+    
+    The following examples were retrieved from Marjorie Merryman's The Music Theory Handbook.
+    >>> iv6 = possibility.Possibility({p1: 'G4', p2: 'D4', p3: 'D4', p4: 'B-2'})
+    >>> itAug6 = possibility.Possibility({p1: 'G#4', p2: 'D4', p3: 'D4', p4: 'B-2'})
+    >>> frAug6 = possibility.Possibility({p1: 'G#4', p2: 'E4', p3: 'D4', p4: 'B-2'})
+    >>> grAug6 = possibility.Possibility({p1: 'G#4', p2: 'F4', p3: 'D4', p4: 'B-2'})
+    >>> iv6.isAugmentedSixth()
+    False
+    >>> itAug6.isItalianAugmentedSixth()
+    True
+    >>> frAug6.isFrenchAugmentedSixth()
+    True
+    >>> grAug6.isGermanAugmentedSixth()
+    True
+    
+    
+    It+6 to V not yet defined, because there are multiple equally valid solutions, not sure what to do.   
+    >>> print(resolution.augmentedSixthToMinorTonic(frAug6))
+    {1: A4, 2: F4, 3: D4, 4: A2}
+    >>> print(resolution.augmentedSixthToMinorTonic(grAug6))
+    {1: A4, 2: F4, 3: D4, 4: A2}
+    >>> resolution.augmentedSixthToMajorTonic(iv6)
+    Traceback (most recent call last):
+    ResolutionException: Possibility does not form a correctly spelled augmented sixth chord.
+    '''
+    if not augSixthPossib.isAugmentedSixth():
+        raise ResolutionException("Possibility does not form a correctly spelled augmented sixth chord.")
+
+    isItalian = augSixthPossib.isItalianAugmentedSixth()
+    isFrench = augSixthPossib.isFrenchAugmentedSixth()
+    isGerman = augSixthPossib.isGermanAugmentedSixth()
+    
+    if inPlace:
+        asCopy = augSixthPossib
+    else:
+        asCopy = copy.deepcopy(augSixthPossib)
+
+    augSixthChord = asCopy.chordify()
+    augSixthChord.removeRedundantPitchNames()
+    if augSixthChord.inversion() == 2: # Fr+6
+        augSixthChord.root(augSixthChord.getChordStep(3))
+        
+    bass = augSixthChord.bass()
+    root = augSixthChord.root()
+    tonic = augSixthChord.getChordStep(5)
+    for givenPart in asCopy.parts():
+        givenPitch = asCopy[givenPart]
+        givenPitchName = givenPitch.name
+        if givenPitchName == bass.name:
+            givenPitch.transpose('-m2', True)
+        elif givenPitchName == root.name:
+            givenPitch.transpose('m2', True)
+        elif givenPitchName == tonic.name:
+            givenPitch.transpose('P1', True)
+        else:
+            if isFrench:
+                givenPitch.transpose('m2', True)
+            elif isGerman:
+                givenPitch.transpose('P1', True)
+            elif isItalian:
+                pass
+    
+    if inPlace == True:
+        return None
+    
+    return asCopy
 
 #Used Ex.76 (page 46) from 'The Basis of Harmony' by Frederick J. Horwood
 #-------------------------------------------------------------------------------
