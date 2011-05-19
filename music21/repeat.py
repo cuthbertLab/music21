@@ -211,7 +211,7 @@ class RepeatExpressionCommand(RepeatExpression):
 
 
 class DaCapo(RepeatExpressionCommand):
-    '''The Da Capo statement
+    '''The Da Capo command, indicating a return to the beginning and a continuation to the end. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
     '''
     def __init__(self):
         RepeatExpressionCommand.__init__(self)
@@ -220,7 +220,7 @@ class DaCapo(RepeatExpressionCommand):
         self.setText(self._textAlternatives[0])
 
 class DaCapoAlFine(RepeatExpressionCommand):
-    '''The coda symbol, or the word coda, as placed in a score. 
+    '''The Da Capo al Fine command, indicating a return to the beginning and a continuation to the :class:`~music21.repeat.Fine` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
@@ -233,7 +233,7 @@ class DaCapoAlFine(RepeatExpressionCommand):
 
 
 class DaCapoAlCoda(RepeatExpressionCommand):
-    '''The coda symbol, or the word coda, as placed in a score.
+    '''The Da Capo al Coda command, indicating a return to the beginning and a continuation to the :class:`~music21.repeat.Coda` object. The music resumes at a second :class:`~music21.repeat.Coda` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlCoda() 
@@ -245,8 +245,20 @@ class DaCapoAlCoda(RepeatExpressionCommand):
         self.setText(self._textAlternatives[0])
 
 
+class AlSegno(RepeatExpressionCommand):
+    '''Jump to the sign. 
+
+    >>> from music21 import *
+    >>> rm = repeat.DaCapoAlFine()
+    '''
+    def __init__(self):
+        RepeatExpressionCommand.__init__(self)
+        self._textAlternatives = ['al Segno']
+        self.setText(self._textAlternatives[0])
+
+
 class DalSegnoAlFine(RepeatExpressionCommand):
-    '''The coda symbol, or the word coda, as placed in a score. 
+    '''
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
@@ -257,7 +269,7 @@ class DalSegnoAlFine(RepeatExpressionCommand):
         self.setText(self._textAlternatives[0])
 
 class DalSegnoAlCoda(RepeatExpressionCommand):
-    '''The coda symbol, or the word coda, as placed in a score.
+    '''
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlCoda() 
@@ -275,7 +287,7 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
 # store a list of one each of RepeatExpression objects; these are used for t
 # testing TextExpressions 
 repeatExpressionReference = [Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(), 
-    DaCapoAlCoda(), DalSegnoAlFine(), DalSegnoAlCoda()]
+    DaCapoAlCoda(), AlSegno(), DalSegnoAlFine(), DalSegnoAlCoda()]
 
 
 
@@ -300,40 +312,6 @@ repeatExpressionReference = [Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
 # segno
 # go to measure number
 
-# finale represents fine as a text expression <words> tag:
-#       <direction placement="above">
-#         <direction-type>
-#           <words default-x="255" default-y="16" font-size="12" font-weight="bold" justify="right">Fine</words>
-#         </direction-type>
-#       </direction>
-
-#d.s. indicatinos are also <word> tags
-
-#       <direction placement="above">
-#         <direction-type>
-#           <words default-x="353" default-y="23" font-size="12" font-weight="bold" justify="right">D.C. al Coda</words>
-#         </direction-type>
-#       </direction>
-
-
-# segno is represetned as follows:
-#       <direction placement="above">
-#         <direction-type>
-#           <segno default-x="-2" default-y="18"/>
-#         </direction-type>
-#         <sound divisions="1" segno="2"/>
-#       </direction>
-
-# coda also has a tag
-#       <direction placement="above">
-#         <direction-type>
-#           <coda default-x="-2" default-y="28"/>
-#         </direction-type>
-#         <sound coda="5" divisions="1"/>
-#       </direction>
-# to coda
-
-
 
 
 class ExpanderException(Exception):
@@ -350,6 +328,21 @@ class Expander(object):
         self._srcMeasureCount = len(self._srcMeasureStream)
         if self._srcMeasureCount == 0:
             raise ExpanderException('no measures found in the source stream to be expanded')
+
+        # store counts of all non barline elements.
+        reStream = self._srcMeasureStream.flat.getElementsByClass(
+                RepeatExpression)
+        self._codaCount = len(reStream.getElementsByClass(Coda))
+        self._segnoCount = len(reStream.getElementsByClass(Segno))
+
+        self._dcCount = len(reStream.getElementsByClass(DaCapo))
+        self._dcafCount = len(reStream.getElementsByClass(DaCapoAlFine))
+        self._dcacCount = len(reStream.getElementsByClass(DaCapoAlCoda))
+
+        self._asCount = len(reStream.getElementsByClass(AlSegno))
+        self._dsafCount = len(reStream.getElementsByClass(DalSegnoAlFine))
+        self._dsacCount = len(reStream.getElementsByClass(DalSegnoAlCoda))
+
 
     def _stripRepeatBarlines(self, m, newStyle='light-light'):
         '''Strip barlines if they are repeats, and replace with Barlines that are of the same style. Modify in place.
@@ -416,16 +409,12 @@ class Expander(object):
 
         # note that the offsets of these streams are as found in the flat score
         # this can be used to determine characteristics
-        dcCount = len(reStream.getElementsByClass(DaCapo))
-        dcafCount = len(reStream.getElementsByClass(DaCapoAlFine))
-        dcacCount = len(reStream.getElementsByClass(DaCapoAlCoda))
-        
-
-        environLocal.printDebug(['_daCapoIsCoherent', 'dcCount', dcCount, 'dcafCount', dcafCount, 'dcacCount', dcacCount])
+        environLocal.printDebug(['_daCapoIsCoherent', 'dcCount', self._dcCount, 'dcafCount', self._dcafCount, 'dcacCount', self._dcacCount])
         # there can be only one da capo statement for the provided span
-        if (dcCount + dcafCount + dcacCount) > 1:
+        sumDc = self._dcCount + self._dcafCount + self._dcacCount
+        if sumDc > 1:
             return False
-        if (dcCount + dcafCount + dcacCount) == 1:
+        if sumDc == 1:
             return True
         # return false for all other cases
         return False
