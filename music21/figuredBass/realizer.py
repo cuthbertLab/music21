@@ -433,7 +433,7 @@ class FiguredBass(object):
             for possibilityProgression in possibilityProgressions:
                 sol = self.generateRealizationFromPossibilityProgression(possibilityProgression)
                 for k in range(len(self.fbParts)):
-                    streamParts[k].append(sol.getClefs()[0])
+                    streamParts[k].append(sol.parts[k].bestClef(True))
                     for m in sol.parts[k]:
                         streamParts[k].append(m)
                 
@@ -477,7 +477,7 @@ class FiguredBass(object):
             for solutionCounter in range(amountToShow):
                 sol = self.generateRandomRealization()
                 for k in range(len(self.fbParts)):
-                    streamParts[k].append(sol.parts[k].getClefs()[0])
+                    streamParts[k].append(sol.parts[k].bestClef(True))
                     for m in sol.parts[k]:
                         streamParts[k].append(m)
 
