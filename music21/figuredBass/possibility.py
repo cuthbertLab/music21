@@ -981,6 +981,7 @@ class Possibility(dict):
         >>> p3 = part.Part(3)
         >>> p4 = part.Part(4)
         
+        Some of the following examples were retrieved from Marjorie Merryman's The Music Theory Handbook.
         >>> itAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2'})
         >>> frAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'D4', p4: 'A-2'})
         >>> grAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'E-4', p4: 'A-2'})
@@ -1017,6 +1018,7 @@ class Possibility(dict):
         >>> p3 = part.Part(3)
         >>> p4 = part.Part(4)
         
+        Some of the following examples were retrieved from Marjorie Merryman's The Music Theory Handbook.
         >>> itAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2'})
         >>> itAug6.isItalianAugmentedSixth()
         True
@@ -1062,7 +1064,7 @@ class Possibility(dict):
         ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if 
         ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
-        if tonic == None:
+        if tonic == False:
             return False
         majThirdInterval = interval.Interval(bass, tonic)
         if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
@@ -1075,7 +1077,7 @@ class Possibility(dict):
         
         ### Tonic must be doubled.
         for samplePitch in self.pitches():
-            if (not samplePitch == tonic) and (samplePitch.name == tonic.name):
+            if (not samplePitch is tonic) and (samplePitch.name == tonic.name):
                 return True
             
         return False
@@ -1090,6 +1092,7 @@ class Possibility(dict):
         >>> p3 = part.Part(3)
         >>> p4 = part.Part(4)
         
+        The following examples were retrieved from Marjorie Merryman's The Music Theory Handbook.
         >>> itAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2'})
         >>> frAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'D4', p4: 'A-2'})
         >>> grAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'E-4', p4: 'A-2'})
@@ -1130,7 +1133,7 @@ class Possibility(dict):
         ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if 
         ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
-        if tonic == None:
+        if tonic == False:
             return False
         majThirdInterval = interval.Interval(bass, tonic)
         if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
@@ -1140,7 +1143,7 @@ class Possibility(dict):
         ### there is a A4 (simple or compound) between the bass (m6 scale step) and the sixth of the chord.
         supertonic = augSixthChord.getChordStep(6)
         augFourthInterval = interval.Interval(bass, supertonic)
-        if supertonic == None:
+        if supertonic == False:
             return False
         if not (augFourthInterval.diatonic.specificName == 'Augmented' and augFourthInterval.generic.simpleDirected == 4):
             return False
@@ -1162,6 +1165,7 @@ class Possibility(dict):
         >>> p3 = part.Part(3)
         >>> p4 = part.Part(4)
         
+        The following examples were retrieved from Marjorie Merryman's The Music Theory Handbook.
         >>> itAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'C4', p4: 'A-2'})
         >>> frAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'D4', p4: 'A-2'})
         >>> grAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'E-4', p4: 'A-2'})
@@ -1191,7 +1195,7 @@ class Possibility(dict):
         ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if 
         ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
-        if tonic == None:
+        if tonic == False:
             return False
         majThirdInterval = interval.Interval(bass, tonic)
         if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
@@ -1200,7 +1204,7 @@ class Possibility(dict):
         ### The seventh of the chord must be the mediant. The seventh of the chord is the mediant if and only if
         ### there is a P5 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
         mediant = augSixthChord.getChordStep(7)
-        if mediant == None:
+        if mediant == False:
             return False
         perfectFifthInterval = interval.Interval(bass, mediant)
         if not (perfectFifthInterval.diatonic.specificName == 'Perfect' and perfectFifthInterval.generic.simpleDirected == 5):
