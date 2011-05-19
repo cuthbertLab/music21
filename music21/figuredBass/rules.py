@@ -36,6 +36,7 @@ class Rules:
         #Special Resolution rules
         self.resolveDominantSeventhProperly = True
         self.resolveDiminishedSeventhProperly = True
+        self.resolveAugmentedSixthProperly = True
         self.doubledRootInDim7 = False
         
 class FiguredBassRulesException(music21.Music21Exception):
