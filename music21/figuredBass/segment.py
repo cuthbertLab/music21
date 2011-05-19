@@ -51,6 +51,7 @@ class Segment:
         self.pitchNamesInChord = self.fbScale.getPitchNames(self.bassNote.pitch, self.notationString)
         self.nextMovements = {}
         self.nextSegment = None
+        self.environRules = environment.Environment(_MOD)
     
     def allSinglePossibilities(self):
         '''
@@ -288,85 +289,44 @@ class MiddleSegment(Segment):
     def correctConsecutivePossibilities(self):
         '''
         Resolves MiddleSegment by calling other methods:
-        1) resolveAllDominantSeventhPossibilities
-        2) resolveAllDiminishedSeventhPossibilities
-        3) resolveAllConsecutivePossibilities
-        
-        
+        1) resolveSpecial
+        2) resolveAllConsecutivePossibilities
         '''
         try:
-            self.resolveAllDominantSeventhPossibilities()
-            return
+            self.resolveSpecialSegment(True)
         except UnresolvedSegmentException:
-            pass
+            self.resolveAllConsecutivePossibilities()
         
-        try:
-            self.resolveAllDiminishedSeventhPossibilities()
-            return
-        except UnresolvedSegmentException:
-            pass
-        
-        self.resolveAllConsecutivePossibilities()
-        return
-    
-    def resolveAllDominantSeventhPossibilities(self):
-        '''
-        If pitchesAboveBass of the previous Segment spell out a dominant seventh chord, then each 
-        of its possibilities spell out a dominant seventh chord. If fbRules requires proper resolution 
-        of the dominant seventh chord, resolveDominantSeventhPossibility is called on each Possibility. 
-        All the resolutions form MiddleSegment's list of possibilities. A Python dictionary of movements, 
-        nextMovements, is also defined. Keys correspond to indices of possibilities in the previous 
-        Segment's possibilities, while each value corresponds to a list containing only the index of 
-        the appropriate resolution in MiddleSegment's list of possibilities. An UnresolvedSegmentException 
-        is raised if MiddleSegment remains unresolved.
-        '''
+    def resolveSpecialSegment(self, verbose = False):
         isDominantSeventh = chord.Chord(self.prevSegment.pitchesAboveBass).isDominantSeventh()
-        if isDominantSeventh and self.fbRules.resolveDominantSeventhProperly:
-            dominantPossibilities = self.prevSegment.possibilities
-            self.prevSegment.nextMovements = {}
-            resolutionPossibilities = []
-            dominantPossibIndex = 0
-            for dominantPossib in dominantPossibilities:
-                movements = []
-                resolutionPossib = self.resolveDominantSeventhPossibility(dominantPossib)
-                try:
-                    movements.append(resolutionPossibilities.index(resolutionPossib))
-                except ValueError:
-                    resolutionPossibilities.append(resolutionPossib)
-                    movements.append(len(resolutionPossibilities) - 1)             
-                self.prevSegment.nextMovements[dominantPossibIndex] = movements
-                dominantPossibIndex += 1 
-            self.prevSegment.nextSegment = self
-            self.possibilities = resolutionPossibilities
-            return
-        
-        raise UnresolvedSegmentException()
-    
-    def resolveAllDiminishedSeventhPossibilities(self):
-        '''
-        Resolves a fully-diminished seventh Segment. See resolveAllDominantSeventhPossibilities for more details.
-        '''
         isDiminishedSeventh = chord.Chord(self.prevSegment.pitchesAboveBass).isDiminishedSeventh()
-        if isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:
-            diminishedPossibilities = self.prevSegment.possibilities
-            self.prevSegment.nextMovements = {}
-            resolutionPossibilities = []
-            diminishedPossibIndex = 0
-            for diminishedPossib in diminishedPossibilities:
-                movements = []
-                resolutionPossib = self.resolveDiminishedSeventhPossibility(diminishedPossib)
-                try:
-                    movements.append(resolutionPossibilities.index(resolutionPossib))
-                except ValueError:
-                    resolutionPossibilities.append(resolutionPossib)
-                    movements.append(len(resolutionPossibilities) - 1)             
-                self.prevSegment.nextMovements[diminishedPossibIndex] = movements
-                diminishedPossibIndex += 1
-            self.prevSegment.nextSegment = self
-            self.possibilities = resolutionPossibilities
-            return
-    
-        raise UnresolvedSegmentException()
+        isAugmentedSixth = (self.prevSegment.possibilities[0]).isAugmentedSixth()
+
+        if isDominantSeventh and self.fbRules.resolveDominantSeventhProperly:
+            resolve = self.resolveDominantSeventhPossibility
+        elif isDiminishedSeventh and self.fbRules.resolveDiminishedSeventhProperly:        
+            resolve = self.resolveDiminishedSeventhPossibility
+        elif isAugmentedSixth and self.fbRules.resolveAugmentedSixthProperly:
+            resolve = self.resolveAugmentedSixthPossibility
+        else:
+            raise UnresolvedSegmentException()
+
+        prevPossibilities = self.prevSegment.possibilities
+        self.prevSegment.nextMovements = {}        
+        resolutionPossibilities = []
+        prevPossibIndex = 0
+        for prevPossib in prevPossibilities:
+            movements = []
+            resolutionPossib = resolve(prevPossib, verbose)
+            try:
+                movements.append(resolutionPossibilities.index(resolutionPossib))
+            except ValueError:
+                resolutionPossibilities.append(resolutionPossib)
+                movements.append(len(resolutionPossibilities) - 1)             
+            self.prevSegment.nextMovements[prevPossibIndex] = movements
+            prevPossibIndex += 1 
+        self.prevSegment.nextSegment = self
+        self.possibilities = resolutionPossibilities
 
     def resolveAllConsecutivePossibilities(self):
         '''
@@ -397,6 +357,52 @@ class MiddleSegment(Segment):
         self.possibilities = nextPossibilities
         return
     
+    def resolveAugmentedSixthPossibility(self, augSixthPossib, verbose = False):
+        '''
+        Takes in a single Possibility which spells out an augmented sixth chord and attempts to return a
+        Possibility which is resolved properly.
+        '''
+        if not augSixthPossib.isAugmentedSixth():
+            raise SegmentException("Possibility does not form a correctly spelled augmented sixth chord.")
+        
+        if verbose:
+            augSixthType = None
+            if augSixthPossib.isItalianAugmentedSixth():
+                augSixthType = "It+6"
+            elif augSixthPossib.isFrenchAugmentedSixth():
+                augSixthType = "Fr+6"
+            elif augSixthPossib.isGermanAugmentedSixth():
+                augSixthType = "Gr+6"
+        
+        augSixthChord = augSixthPossib.chordify()
+        tonic = augSixthChord.bass().transpose('M3')
+        majorScale = scale.MajorScale(tonic)
+        minorScale = scale.MinorScale(tonic)
+        
+        resolutionChord = chord.Chord(self.pitchesAboveBass)
+            
+        if resolutionChord.inversion() == 2:
+            if resolutionChord.root().name == tonic.name:
+                if resolutionChord.isMajorTriad():
+                    if verbose:
+                        self.environRules.warn("Augmented sixth resolution: " + augSixthType + " to I64 in " + majorScale.name)
+                    resolutionPossib = resolution.augmentedSixthToMajorTonic(augSixthPossib)
+                elif resolutionChord.isMinorTriad():
+                    if verbose:
+                        self.environRules.warn("Augmented sixth resolution: " + augSixthType + " to i64 in " + minorScale.name)
+                    resolutionPossib = resolution.augmentedSixthToMinorTonic(augSixthPossib)
+        elif resolutionChord.isMajorTriad() and majorScale.pitchFromDegree(5).name == resolutionChord.bass().name:
+            if verbose:
+                        self.environRules.warn("Augmented sixth resolution: " + augSixthType + " to V in " + majorScale.name)
+            resolutionPossib = resolution.augmentedSixthToDominant(augSixthPossib)
+        else:
+            raise SegmentException("Augmented sixth resolution: No standard resolution available.")
+        
+        if not (resolutionPossib.chordify().bass() == self.bassNote.pitch):
+            raise SegmentException("Augmented sixth resolution: Bass note resolved improperly in figured bass.")
+       
+        return resolutionPossib
+        
     def resolveDominantSeventhPossibility(self, dominantPossib, verbose = False):
         '''
         Takes in a single Possibility which spells out a dominant seventh chord and attempts to return 
@@ -406,7 +412,6 @@ class MiddleSegment(Segment):
         pitch of bassNote does not match the resolution Possibility, or if the input does not spell 
         out a dominant seventh. 
         '''
-        environRules = environment.Environment(_MOD)
         if not dominantPossib.isDominantSeventh():
             raise SegmentException("Possibility does not form a correctly spelled dominant seventh chord.")
         
@@ -432,30 +437,30 @@ class MiddleSegment(Segment):
                 resolveV43toI6 = True
             if resolutionChord.isMajorTriad():
                 if verbose:
-                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + dominantScale.name)
+                    self.environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorTonic(dominantPossib, resolveV43toI6)
             elif resolutionChord.isMinorTriad():
                 if verbose:
-                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + minorScale.name)
+                    self.environRules.warn("Dominant seventh resolution: V" + domInversionName + "->I" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorTonic(dominantPossib, resolveV43toI6)
         elif resolutionChord.root().name == majSubmediant.name:
             if sampleChord.isMinorTriad():
                 if verbose:
-                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->vi" + resInversionName + " in " + dominantScale.name)
+                    self.environRules.warn("Dominant seventh resolution: V" + domInversionName + "->vi" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorSubmediant(dominantPossib) #Major scale
         elif resolutionChord.root().name == minSubmediant.name:
             if resolutionChord.isMajorTriad():
                 if verbose:
-                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->VI" + resInversionName + " in " + minorScale.name)
+                    self.environRules.warn("Dominant seventh resolution: V" + domInversionName + "->VI" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorSubmediant(dominantPossib) #Minor scale
         elif resolutionChord.root().name == subdominant.name:
             if resolutionChord.isMajorTriad():
                 if verbose:
-                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->IV" + resInversionName + " in " + dominantScale.name)
+                    self.environRules.warn("Dominant seventh resolution: V" + domInversionName + "->IV" + resInversionName + " in " + dominantScale.name)
                 resolutionPossib = resolution.dominantSeventhToMajorSubdominant(dominantPossib)
             elif resolutionChord.isMinorTriad():
                 if verbose:
-                    environRules.warn("Dominant seventh resolution: V" + domInversionName + "->iv" + resInversionName + " in " + minorScale.name)
+                    self.environRules.warn("Dominant seventh resolution: V" + domInversionName + "->iv" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.dominantSeventhToMinorSubdominant(dominantPossib)
         else:
             raise SegmentException("Dominant seventh resolution: No proper resolution available.")
@@ -470,7 +475,6 @@ class MiddleSegment(Segment):
         Takes in a single Possibility which spells out a fully-diminished seventh chord and attempts to return 
         a Possibility which is resolved properly. See resolveDominantSeventhPossibility for more details.
         '''
-        environRules = environment.Environment(_MOD)       
         if not diminishedPossib.isDiminishedSeventh():
             raise SegmentException("Possibility does not form a correctly spelled diminished seventh chord.")
           
@@ -497,20 +501,20 @@ class MiddleSegment(Segment):
                     doubledRoot = False
             if resolutionChord.isMajorTriad():
                 if verbose:
-                    environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + diminishedScale.name)
+                    self.environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + diminishedScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMajorTonic(diminishedPossib, doubledRoot)
             elif resolutionChord.isMinorTriad():
                 if verbose:
-                    environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + minorScale.name)
+                    self.environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->I" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMinorTonic(diminishedPossib, doubledRoot)
         elif resolutionChord.root().name == subdominant.name:
              if resolutionChord.isMajorTriad():
                 if verbose:
-                     environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + diminishedScale.name)
+                     self.environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + diminishedScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMajorSubdominant(diminishedPossib)
              elif resolutionChord.isMinorTriad():
                 if verbose:
-                     environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + minorScale.name)
+                     self.environRules.warn("Diminished seventh resolution: viio" + dimInversionName + "->IV" + resInversionName + " in " + minorScale.name)
                 resolutionPossib = resolution.diminishedSeventhToMinorSubdominant(diminishedPossib)
         else:
             raise SegmentException("Diminished seventh resolution: No proper resolution available.")
