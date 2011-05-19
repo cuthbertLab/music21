@@ -845,7 +845,7 @@ class Test(unittest.TestCase):
         s = converter.parse(['f#4 f# e g2', '3/4'])
         fe = features.native.EndsWithLandiniMelodicContour(s)
         self.assertEqual(fe.extract().vector[0], 1)        
-
+        
         s = converter.parse(['f#4 f# f# g2', '3/4'])
         fe = features.native.EndsWithLandiniMelodicContour(s)
         self.assertEqual(fe.extract().vector[0], 0)        
