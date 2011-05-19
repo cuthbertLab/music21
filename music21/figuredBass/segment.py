@@ -293,7 +293,7 @@ class MiddleSegment(Segment):
         2) resolveAllConsecutivePossibilities
         '''
         try:
-            self.resolveSpecialSegment(True)
+            self.resolveSpecialSegment()
         except UnresolvedSegmentException:
             self.resolveAllConsecutivePossibilities()
         
