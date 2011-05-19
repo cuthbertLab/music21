@@ -973,7 +973,6 @@ class Possibility(dict):
         2) isFrenchAugmentedSixth(augSixthPossib)
         3) isGermanAugmentedSixth(augSixthPossib)
         
-        >>> from music21 import interval
         >>> from music21.figuredBass import possibility
         >>> from music21.figuredBass import part
         
@@ -1010,7 +1009,6 @@ class Possibility(dict):
     
     def isItalianAugmentedSixth(self):
         '''
-        >>> from music21 import interval
         >>> from music21.figuredBass import possibility
         >>> from music21.figuredBass import part
         
@@ -1084,7 +1082,6 @@ class Possibility(dict):
     
     def isFrenchAugmentedSixth(self):
         '''
-        >>> from music21 import interval
         >>> from music21.figuredBass import possibility
         >>> from music21.figuredBass import part
         
@@ -1157,9 +1154,7 @@ class Possibility(dict):
     
     def isGermanAugmentedSixth(self):
         '''
-        >>> from music21 import interval
         >>> from music21.figuredBass import possibility
-        >>> from music21.figuredBass import resolution
         >>> from music21.figuredBass import part
         
         >>> p1 = part.Part(1)
