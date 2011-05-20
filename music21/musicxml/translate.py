@@ -815,20 +815,24 @@ def codaToMx(rm):
 
     >>> from music21 import *
     '''
-    mxCoda = musicxmlMod.Coda()
-    for src, dst in [(rm._positionDefaultX, 'default-x'), 
-                     (rm._positionDefaultY, 'default-y'), 
-                     (rm._positionRelativeX, 'relative-x'),
-                     (rm._positionRelativeY, 'relative-y')]:
-        if src is not None:
-            mxCoda.set(dst, src)
-    mxDirectionType = musicxmlMod.DirectionType()
-    mxDirectionType.append(mxCoda)
-    mxDirection = musicxmlMod.Direction()
-    mxDirection.append(mxDirectionType)
-    mxDirection.set('placement', rm._positionPlacement)
-    return mxDirection
-
+    if rm.useSymbol:
+        mxCoda = musicxmlMod.Coda()
+        for src, dst in [(rm._positionDefaultX, 'default-x'), 
+                         (rm._positionDefaultY, 'default-y'), 
+                         (rm._positionRelativeX, 'relative-x'),
+                         (rm._positionRelativeY, 'relative-y')]:
+            if src is not None:
+                mxCoda.set(dst, src)
+        mxDirectionType = musicxmlMod.DirectionType()
+        mxDirectionType.append(mxCoda)
+        mxDirection = musicxmlMod.Direction()
+        mxDirection.append(mxDirectionType)
+        mxDirection.set('placement', rm._positionPlacement)
+        return mxDirection
+    else:
+        # simply get the text expression version and convert
+        # returns an mxDirection
+        return textExpressionToMx(rm.getTextExpression()) 
 
 def mxToSegno(mxCoda):
     '''Translate a MusicXML :class:`~music21.musicxml.Coda` object to a music21 :class:`~music21.repeat.Coda` object. 
@@ -863,6 +867,8 @@ def mxToRepeatExpression(mxDirection):
     '''Given an mxDirection that may define a coda, segno, or other repeat expression statement, realize the appropriate music21 object. 
     '''
     pass
+    # note: this may not be needed, as mx text expressions are converted to repeat objects in measure processing
+
 
 #-------------------------------------------------------------------------------
 # Instruments

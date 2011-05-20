@@ -60,7 +60,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         # store a default text justification
         self._textJustification = 'center'
         # for those that have symbols, declare if the symbol is to be used
-        self._useSymbol = False
+        self.useSymbol = False
 
         # for musicxml compatibility
         self._positionDefaultX = None
@@ -157,13 +157,18 @@ class Coda(RepeatExpressionMarker):
     >>> rm = repeat.Coda()
     '''
     # note that only Coda and Segno have non-text expression forms
-    def __init__(self):
+    def __init__(self, text=None):
         RepeatExpressionMarker.__init__(self)
-
         # default text expression is coda
         self._textAlternatives = ['Coda', 'to Coda', 'al Coda']
-        self.setText(self._textAlternatives[0])
-        self._useSymbol = True
+        if text is not None and self.isValidText(text):
+            environLocal.printDebug(['Coda got text', text])
+            self.setText(text)
+            self.useSymbol = False
+        else:
+            self.setText(self._textAlternatives[0])
+            self.useSymbol = True
+
 
 class Segno(RepeatExpressionMarker):
     '''The fine word as placed in a score. 
@@ -177,7 +182,7 @@ class Segno(RepeatExpressionMarker):
         # default text expression is coda
         self._textAlternatives = ['Segno']
         self.setText(self._textAlternatives[0])
-        self._useSymbol = True
+        self.useSymbol = True
 
 class Fine(RepeatExpressionMarker):
     '''The fine word as placed in a score. 
@@ -442,6 +447,25 @@ class Expander(object):
         else:
             return None
         
+    def _getRepeatExpressionCommandType(self):
+        '''Return the class of the repeat expression command. This should only be called if it has been determine that there is one repeat command in this Stream.
+        '''
+        if self._dcCount == 1:
+            return 'DaCapo'
+        elif self._dcacCount == 1:
+            return 'DaCapoAlCoda'
+        elif self._dcafCount == 1:
+            return 'DaCapoAlFine'
+        elif self._asCount == 1:
+            return 'AlSegno'
+        elif self._dsCount == 1:
+            return 'DalSegno'
+        elif self._dsacCount == 1:
+            return 'DalSegnoAlCoda'
+        elif self._dsafCount == 1:
+            return 'DalSegnoAlFine'
+        else:
+            raise ExpanderException('no repeat command found')
 
     def _daCapoIsCoherent(self):
         '''Check of a DC statement is coherent.
@@ -594,7 +618,7 @@ class Expander(object):
             repeatTimes = 2
         return mLast, mEndBarline, repeatTimes
 
-    def _processInnermostRepeat(self, streamObj):
+    def _processInnermostRepeatBars(self, streamObj):
         '''Process and return a new Stream of Measures, likely a Part.
         '''
         # get class from src
@@ -622,8 +646,8 @@ class Expander(object):
                     streamObj, repeatIndices[-1])
                 for times in range(repeatTimes):
                     environLocal.printDebug(['repeat times:', times])    
-                # copy the range of measures; this will include the first
-                    # do indices directly
+                    # copy the range of measures; this will include the first
+                    # always copying from the same source
                     for j in repeatIndices:
                         mSub = copy.deepcopy(streamObj[j])
                         # must do for each pass, b/c not changing source
@@ -632,6 +656,11 @@ class Expander(object):
                         if j in [repeatIndices[0], repeatIndices[-1]]:
                             self._stripRepeatBarlines(mSub)
                         mSub.number = number
+                        # only keep repeat expressions found at the end  
+                        # only remove anything if we have 2 or more repeats
+                        # and this is not the last time 
+                        if repeatTimes >= 2 and times < repeatTimes - 1: 
+                            self._stripRepeatExpressions(mSub)
                         new.append(mSub)
                         number += 1
                 # check if need to clear repeats from next bar
@@ -654,6 +683,68 @@ class Expander(object):
                 i += 1
         return new
 
+
+    def _getRepeatExpressionIndex(self, streamObj, target):
+        '''Return a list of index position of a Measure given a stream of measures. This requires the provided stream to only have measures. 
+        '''
+        post = []
+        for i, m in enumerate(streamObj):
+            for e in m.getElementsByClass('RepeatExpression'):
+                if target in e.classes or (
+                not isinstance(target, str) and isinstance(e, target)):
+                    post.append(i)
+        # if not found
+        if len(post) > 0: 
+            return post            
+        return None
+            
+
+    def _processRepeatExpression(self, streamPreRepeat, streamPostRepeat):
+        '''Process and return a new Stream of Measures, likely a Part.
+        '''
+        srcPreRepeat = streamPreRepeat.getElementsByClass('Measure')
+        srcPostRepeat = streamPostRepeat.getElementsByClass('Measure')
+
+        if len(srcPreRepeat) == len(srcPostRepeat):
+            noRepeats = True
+        else:            
+            noRepeats = False
+        capoOrSegno = self._daCapoOrSegno()
+        recType = self._getRepeatExpressionCommandType() # a string form
+
+        jumpBackPre = self._getRepeatExpressionIndex(srcPreRepeat, recType)[0]
+        jumpBackPost = self._getRepeatExpressionIndex(srcPostRepeat, recType)[0]
+
+        # start position is dependent on capo or segno
+        if capoOrSegno is DaCapo:
+            startPre = 0
+            startPost = 0
+        elif capoOrSegno is Segno:
+            startPre = self._getRepeatExpressionIndex(srcPreRepeat, 'Segno')[0]
+            startPost = self._getRepeatExpressionIndex(srcPostRepeat, 'Segno')[0]
+
+        # this is either fine or the end
+        if recType in ['DaCapoAlFine', 'DalSegnoAlFine']:
+            endPre = self._getRepeatExpressionIndex(srcPreRepeat, 'Fine')[0]
+            endPost = self._getRepeatExpressionIndex(srcPostRepeat, 'Fine')[0]
+        else:
+            endPre = len(srcPreRepeat) - 1
+            endPost = len(srcPostRepeat) - 1
+
+        # coda jump/start
+        if recType in ['DaCapoAlCoda', 'DalSegnoAlCoda']:
+            # there must always be two coda symbols; the jump and start
+            codaJumpPre = self._getRepeatExpressionIndex(srcPreRepeat, 'Coda')[0]
+            codaJumpPost = self._getRepeatExpressionIndex(srcPostRepeat, 'Coda')[0]
+            codaStartPre = self._getRepeatExpressionIndex(srcPreRepeat, 'Coda')[1]
+            codaStartPost = self._getRepeatExpressionIndex(srcPreRepeat, 'Coda')[1]
+        else:
+            codaJumpPre = None
+            codaJumpPost = None
+            codaStartPre = None
+            codaStartPost = None
+
+        environLocal.printDebug(['_processRepeatExpression', 'jumpBackPre', jumpBackPre, 'jumpBackPost', jumpBackPost, 'startPre', startPre, 'startPost', startPost, 'endPre', endPre, 'endPost', endPost, 'codaJumpPre', codaJumpPre, 'codaJumpPost', codaJumpPost, 'codaStartPre', codaStartPre, 'codaStartPost', codaStartPost])
 
 
     def isExpandable(self):
@@ -682,15 +773,17 @@ class Expander(object):
 
     def process(self):
         if not self.isExpandable():
-            raise ExpanderException('cannot expand Stream: badly formed repeats')
+            raise ExpanderException('cannot expand Stream: badly formed repeats or repeat expressions')
 
         post = copy.deepcopy(self._srcMeasureStream)
+
+        match = self._daCapoOrSegno()
 
         # cyclically process inntermost, one at a time
         while True:
             #environLocal.printDebug(['process(): top of loop'])
             #post.show('t')
-            post = self._processInnermostRepeat(post)
+            post = self._processInnermostRepeatBars(post)
             #post.show('t')
             if self._hasRepeat(post):                        
                 environLocal.printDebug([
@@ -815,7 +908,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import stream, bar, repeat, note
 
-        # a nested repeat; acceptable
+        # no repeats
         s = stream.Part()
         m1 = stream.Measure()
         m2 = stream.Measure()
@@ -864,7 +957,6 @@ class Test(unittest.TestCase):
         ex = repeat.Expander(s)
         self.assertEqual(ex.isExpandable(), True)    
 
-
         # dc al fine but missing fine
         s = stream.Part()
         m1 = stream.Measure()
@@ -904,7 +996,7 @@ class Test(unittest.TestCase):
         m1.append(Coda())
         m2 = stream.Measure()
         m3 = stream.Measure()
-        m1.append(Coda())
+        m3.append(Coda())
         m3.append(DaCapoAlCoda())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
@@ -921,7 +1013,7 @@ class Test(unittest.TestCase):
         ex = repeat.Expander(s)
         self.assertEqual(ex.isExpandable(), False)   
 
-        # ds al coda missing one of two codas
+        # ds al coda 
         s = stream.Part()
         m1 = stream.Measure()
         m1.append(Segno())
@@ -933,6 +1025,7 @@ class Test(unittest.TestCase):
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
         self.assertEqual(ex.isExpandable(), True)   
+        #ex._processRepeatExpression(s, s)
 
 
 
@@ -1390,7 +1483,7 @@ class Test(unittest.TestCase):
 
 
     def testRemoveRepeatExpressions(self):
-        from music21 import stream, repeat
+        from music21 import stream, repeat, bar
 
         s = stream.Part()
         m1 = stream.Measure()
@@ -1400,10 +1493,11 @@ class Test(unittest.TestCase):
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
         self.assertEqual(ex.isExpandable(), True)    
+        self.assertEqual(ex._getRepeatExpressionIndex(s, 'DaCapo'), [2])    
+
         ex._stripRepeatExpressions(m3)
         ex = repeat.Expander(s)
         self.assertEqual(ex.isExpandable(), False)    
-
 
         s = stream.Part()
         m1 = stream.Measure()
@@ -1415,11 +1509,34 @@ class Test(unittest.TestCase):
         m3.append(DaCapoAlCoda())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
+        self.assertEqual(ex._getRepeatExpressionIndex(s, Segno), [0])    
+        self.assertEqual(ex._getRepeatExpressionIndex(s, 'Segno'), [0])    
+        self.assertEqual(ex._getRepeatExpressionIndex(s, 'Coda'), [0, 2])    
+        self.assertEqual(ex._getRepeatExpressionIndex(s, 'DaCapoAlCoda'), [2])    
+
         ex._stripRepeatExpressions(s) # entire part works too
         ex = repeat.Expander(s)
         self.assertEqual(ex.isExpandable(), False)   
 
+        # case where a d.c. statement is placed at the end of bar that is repeated
+        m1 = stream.Measure()
+        m1.insert(4, Coda('To Coda'))
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m3.leftBarline = bar.Repeat(direction='start')
+        m3.rightBarline = bar.Repeat(direction='end')
+        m3.insert(4, DaCapoAlCoda())
+        m4 = stream.Measure()
+        m5 = stream.Measure()
+        m5.append(Coda('Coda'))
+        s = stream.Part()
+        s.append([m1, m2, m3, m4, m5])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex._getRepeatExpressionIndex(s, Coda), [0, 4])    
+        self.assertEqual(ex._getRepeatExpressionIndex(s, DaCapoAlCoda), [2])    
 
+        post = ex.process()
+        #post.show()        
 
 if __name__ == "__main__":
     music21.mainTest(Test)
