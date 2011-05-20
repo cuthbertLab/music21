@@ -89,7 +89,7 @@ class FeatureExtractor(object):
 
     '''
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        self._src = None # the original Stream, or None
+        self.stream = None # the original Stream, or None
         self.data = None # a DataInstance object: use to get data
         self.setData(dataOrStream)
 
@@ -118,11 +118,11 @@ class FeatureExtractor(object):
                 # if we are passed a stream, create a DataInstrance to 
                 # manage the
                 # its data; this is less efficient but is good for testing
-                self._src = dataOrStream
-                self.data = DataInstance(self._src)
+                self.stream = dataOrStream
+                self.data = DataInstance(self.stream)
             # if a DataInstance, do nothing
             else:
-                self._src = None
+                self.stream = None
                 self.data = dataOrStream
 
     def getAttributeLabels(self): 
@@ -188,7 +188,7 @@ class FeatureExtractor(object):
         '''Extract the feature and return the result. 
         '''
         if source is not None:
-            self._src = source
+            self.stream = source
         # preparing the feature always sets self._feature to a new instance
         self._prepareFeature()
         self._process() # will set Feature object to _feature
@@ -211,12 +211,12 @@ class StreamForms(object):
     A DataSet object manages one or more StreamForms objects, and exposes them to FeatureExtractors for usage.
     '''
     def __init__(self, streamObj, prepareStream=True):   
-        self._src = streamObj
-        if self._src is not None:
+        self.stream = streamObj
+        if self.stream is not None:
             if prepareStream:
-                self._base = self._prepareStream(self._src)
+                self._base = self._prepareStream(self.stream)
             else: # possibly make a copy?
-                self._base = self._src
+                self._base = self.stream
         else:       
             self._base = None
 
@@ -448,7 +448,7 @@ class DataInstance(object):
     multiple commonly-used stream representations once, providing rapid processing. 
     '''
     def __init__(self, streamObj=None, id=None):
-        self._src = streamObj
+        self.stream = streamObj
 
         # perform basic operations that are performed on all
         # streams
@@ -458,8 +458,8 @@ class DataInstance(object):
         if id is not None:
             self._id = id
         else:
-            if hasattr(self._src, 'metadata'): 
-                self._id = self._src.metadata # may be None
+            if hasattr(self.stream, 'metadata'): 
+                self._id = self.stream.metadata # may be None
 
         # the attribute name in the data set for this label
         self._classLabel = None
@@ -467,13 +467,13 @@ class DataInstance(object):
         self._classValue = None
 
         # store a dictionary of StreamForms
-        self._forms = StreamForms(self._src)
+        self._forms = StreamForms(self.stream)
         
         # if parts exist, store a forms for each
         self._formsByPart = []
-        if hasattr(self._src, 'parts'):
-            self.partsCount = len(self._src.parts)
-            for p in self._src.parts:
+        if hasattr(self.stream, 'parts'):
+            self.partsCount = len(self.stream.parts)
+            for p in self.stream.parts:
                 # note that this will join ties and expand rests again
                 self._formsByPart.append(StreamForms(p))
         else:
@@ -482,8 +482,8 @@ class DataInstance(object):
         # TODO: store a list of voices, extracted from each part, 
         # presently this will only work on a measure stream
         self._formsByVoice = []
-        if hasattr(self._src, 'voices'):
-            for v in self._src.voices:
+        if hasattr(self.stream, 'voices'):
+            for v in self.stream.voices:
                 self._formsByPart.append(StreamForms(v))
 
 
@@ -901,7 +901,7 @@ class DataSet(object):
         s = None
         if isinstance(dataOrStreamOrPath, DataInstance):
             di = dataOrStreamOrPath
-            s = di._src
+            s = di.stream
         elif common.isStr(dataOrStreamOrPath):
             # could be corpus or file path
             if os.path.exists(dataOrStreamOrPath) or dataOrStreamOrPath.startswith('http'):
@@ -1041,7 +1041,7 @@ def extractorsById(idOrList, library=['jSymbolic', 'native']):
     
     >>> y = [x.id for x in features.extractorsById('all')]
     >>> y[0:3], y[-3:-1]
-    (['M1', 'M2', 'M3'], ['CS10', 'CS11'])
+    (['M1', 'M2', 'M3'], ['CS11', 'MD1'])
 
     '''
     from music21.features import jSymbolic

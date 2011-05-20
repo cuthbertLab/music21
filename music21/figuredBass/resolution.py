@@ -46,6 +46,17 @@ def augmentedSixthToDominant(augSixthPossib, inPlace = False):
     True
     
     
+    "Swiss" or "Alsatian" augmented 6ths (that is a German 6th with #2 instead of b3)
+    are not currently supported:
+    >>> swissAug6 = possibility.Possibility({p1: 'G#4', p2: 'E#4', p3: 'D4', p4: 'B-2'})
+    >>> swissAug6.isAugmentedSixth()
+    True
+    >>> swissAug6.isGermanAugmentedSixth()
+    False
+    
+    
+    
+    
     It+6 to V not yet defined, because there are multiple equally valid solutions, not sure what to do.
     >>> print(resolution.augmentedSixthToDominant(frAug6))
     {1: A4, 2: E4, 3: C#4, 4: A2}

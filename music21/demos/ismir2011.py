@@ -1,11 +1,13 @@
 #-------------------------------------------------------------------------------
-# Name:         ismir2010.py
-# Purpose:      Examples for ISMIR 2010 paper
+# Name:         ismir2011.py
+# Purpose:      Examples for ISMIR 2011 papers
 #
 # Authors:      Christopher Ariza
+#               Jose Cabal-Ugaz
 #               Michael Scott Cuthbert
+#               Lisa D. Friedland
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -27,7 +29,7 @@ class MusicaFictaFeature(features.FeatureExtractor):
     dimensions = 1
     
     def _process(self):
-        allPitches = self._src.flat.pitches
+        allPitches = self.data['flat.pitches']
         fictaPitches = 0
         for p in allPitches:
             if p.name == "B-":
@@ -75,7 +77,8 @@ def testDataSet():
     p.process()
 
 def prepareChinaEurope():
-    featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])
+    #featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])
+    featureExtractors = features.extractorsById('all')
 
     oChina1 = corpus.parse('essenFolksong/han1')
     oCEurope1 = corpus.parse('essenFolksong/boehme10')
@@ -93,9 +96,9 @@ def prepareChinaEurope():
         ds.addData(w, classValue='CentralEurope', id=id)
     # process with all feature extractors, store all features
     ds.process()
-    ds.write('d:/desktop/1a.tab')
+    ds.write('d:/desktop/folkTrain.tab')
 
-def testChinaEurope():
+def testChinaEuropeFull():
     import orange, orngTree
     data1 = orange.ExampleTable('d:/desktop/1.tab')
     data2 = orange.ExampleTable('d:/desktop/2.tab')
@@ -120,6 +123,31 @@ def testChinaEurope():
                 if c != matchData[i].getclass():
                     mismatch += 1
             print('%s %s: misclassified %s/%s of %s' % (cStr, cName, mismatch, len(matchData),  matchStr))
+
+def testChinaEuropeSimpler():
+    import orange, orngTree
+
+    trainData = orange.ExampleTable('folkTrain.tab')
+    testData  = orange.ExampleTable('folkTest.tab')
+
+    majClassifier = orange.MajorityLearner(trainData)
+    knnClassifier = orange.kNNLearner(trainData)
+        
+    majWrong = 0
+    knnWrong = 0
+        
+    for testRow in testData:
+      majGuess = majClassifier(testRow)
+      knnGuess = knnClassifier(testRow)
+      realAnswer = testRow.getclass()
+      if majGuess != realAnswer:
+        majWrong += 1
+      if knnGuess != realAnswer:
+        knnWrong += 1
+       
+    total = float(len(testData))
+    print majWrong/total, knnWrong/total
+    
 
 def tinyNotationBass():
     bass1 = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
@@ -172,7 +200,9 @@ def featureExtraction():
     # exampleFBOut.show()
 
 #figuredBassScale()
-featureExtraction()
+#featureExtraction()
+testChinaEuropeSimpler()
+
 #prepareChinaEurope()
 #testDataSet()
 #testFictaFeature()

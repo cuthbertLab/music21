@@ -972,6 +972,11 @@ class Possibility(dict):
         1) isItalianAugmentedSixth(augSixthPossib)
         2) isFrenchAugmentedSixth(augSixthPossib)
         3) isGermanAugmentedSixth(augSixthPossib)
+        4) isSwissAugmentedSixth(augSixthPossib)
+        
+        
+        Note that chords MUST be in first inversion to be true.
+        
         
         >>> from music21.figuredBass import possibility
         >>> from music21.figuredBass import part
@@ -1004,6 +1009,8 @@ class Possibility(dict):
         elif self.isFrenchAugmentedSixth():
             return True
         elif self.isGermanAugmentedSixth():
+            return True
+        elif self.isSwissAugmentedSixth():
             return True
         
         return False
@@ -1211,6 +1218,91 @@ class Possibility(dict):
             return False
     
         return True
+
+    def isSwissAugmentedSixth(self):
+        '''
+        Returns true is it is a respelled German augmented 6th chord with
+        sharp 2 instead of flat 3.  This chord has many names,
+        Swiss Augmented Sixth, Alsatian Chord, English A6, Norwegian, etc.
+        as well as doubly-augmented sixth, which is a bit of a misnomer since
+        it is the 4th that is doubly augmented, not the sixth.
+        
+        
+        >>> from music21.figuredBass import possibility
+        >>> from music21.figuredBass import part
+        
+        >>> p1 = part.Part(1)
+        >>> p2 = part.Part(2)
+        >>> p3 = part.Part(3)
+        >>> p4 = part.Part(4)
+
+        
+        The following examples were retrieved from Marjorie Merryman's The Music Theory Handbook.
+
+
+        >>> swissAug6 = possibility.Possibility({p1: 'C5', p2: 'F#4', p3: 'D#4', p4: 'A-2'})
+        >>> swissAug6.isGermanAugmentedSixth()
+        False
+        >>> swissAug6.isSwissAugmentedSixth()
+        True
+        >>> swissAug6.isFrenchAugmentedSixth()
+        False
+        >>> swissAug6.isAugmentedSixth()
+        True
+        '''
+        ### Sw+6 => Minor sixth scale step in bass, tonic, raised 4th + raised 2nd scale degree.
+        augSixthChord = self.chordify()
+        augSixthChord.removeRedundantPitchNames()
+        
+        ### The findRoot() method of music21.chord Chord determines the root based on the note with
+        ### the most thirds above it. However, under this definition, a Swiss augmented sixth chord
+        ### resembles a second inversion chord, not the first inversion subdominant chord it is based
+        ### upon. We fix this by adjusting the root. First, however, we check to see if the chord is
+        ### in second inversion to begin with, otherwise its not a Sw+6 chord. This is to avoid 
+        ### ChordException errors.
+        if not augSixthChord.inversion() == 2:
+            return False    
+        augSixthChord.root(augSixthChord.getChordStep(3))
+    
+        ### Chord must be in first inversion.    
+        if not augSixthChord.inversion() == 1:
+            return False
+            
+        ### Augmented sixth interval (simple or compound) must be present between bass and raised 4th (root of chord)
+        bass = augSixthChord.bass()
+        root = augSixthChord.root()
+        if bass == None or root == None:
+            return False
+        augSixthInterval = interval.Interval(bass, root)
+        if not (augSixthInterval.diatonic.specificName == 'Augmented' and augSixthInterval.generic.simpleDirected == 6):
+            return False
+            
+        ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if 
+        ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
+        tonic = augSixthChord.getChordStep(5)
+        if tonic == False:
+            return False
+        majThirdInterval = interval.Interval(bass, tonic)
+        if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
+            return False
+    
+        ### The sixth of the chord must be the supertonic. The sixth of the chord is the supertonic if and only if
+        ### there is a A4 (simple or compound) between the bass (m6 scale step) and the sixth of the chord.
+        supertonic = augSixthChord.getChordStep(6)
+        augFourthInterval = interval.Interval(bass, supertonic)
+        if supertonic == False:
+            return False
+        if not (augFourthInterval.diatonic.specificName == 'Doubly-Augmented' and augFourthInterval.generic.simpleDirected == 4):
+            return False
+        
+        ### No other pitches may be present that aren't the m6 scale step, raised 4th, tonic, or supertonic.
+        for samplePitch in augSixthChord.pitches:
+            if not (samplePitch == bass or samplePitch == root or samplePitch == tonic or samplePitch == supertonic):
+                return False
+    
+        return True
+
+
 
     # CONSECUTIVE POSSIBILITY HELPER METHODS
     # --------------
