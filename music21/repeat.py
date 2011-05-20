@@ -246,7 +246,7 @@ class DaCapoAlCoda(RepeatExpressionCommand):
 
 
 class AlSegno(RepeatExpressionCommand):
-    '''Jump to the sign. 
+    '''Jump to the sign. Presumably a forward jump, not a repeat.
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
@@ -257,8 +257,19 @@ class AlSegno(RepeatExpressionCommand):
         self.setText(self._textAlternatives[0])
 
 
-class DalSegnoAlFine(RepeatExpressionCommand):
+class DalSegno(RepeatExpressionCommand):
+    '''The Dal Segno command, indicating a return to the segno and a continuation to the end. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
+
+    >>> from music21 import *
+    >>> rm = repeat.DaCapoAlFine()
     '''
+    def __init__(self):
+        RepeatExpressionCommand.__init__(self)
+        self._textAlternatives = ['Dal Segno', 'D.S.']
+        self.setText(self._textAlternatives[0])
+
+class DalSegnoAlFine(RepeatExpressionCommand):
+    '''The Dal Segno al Fine command, indicating a return to the segno and a continuation to the :class:`~music21.repeat.Fine` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Dal Segno repeat not be repeated. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
@@ -269,7 +280,7 @@ class DalSegnoAlFine(RepeatExpressionCommand):
         self.setText(self._textAlternatives[0])
 
 class DalSegnoAlCoda(RepeatExpressionCommand):
-    '''
+    '''The Dal Segno al Coda command, indicating a return to the beginning and a continuation to the :class:`~music21.repeat.Coda` object. The music resumes at a second :class:`~music21.repeat.Coda` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Segno repeat not be repeated. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlCoda() 
@@ -287,7 +298,7 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
 # store a list of one each of RepeatExpression objects; these are used for t
 # testing TextExpressions 
 repeatExpressionReference = [Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(), 
-    DaCapoAlCoda(), AlSegno(), DalSegnoAlFine(), DalSegnoAlCoda()]
+    DaCapoAlCoda(), AlSegno(), DalSegno(), DalSegnoAlFine(), DalSegnoAlCoda()]
 
 
 
@@ -341,6 +352,7 @@ class Expander(object):
         self._dcacCount = len(reStream.getElementsByClass(DaCapoAlCoda))
 
         self._asCount = len(reStream.getElementsByClass(AlSegno))
+        self._dsCount = len(reStream.getElementsByClass(DalSegno))
         self._dsafCount = len(reStream.getElementsByClass(DalSegnoAlFine))
         self._dsacCount = len(reStream.getElementsByClass(DalSegnoAlCoda))
 
@@ -418,14 +430,6 @@ class Expander(object):
     def _daCapoIsCoherent(self):
         '''Check of a DC statement is coherent.
         '''
-        # get all repeatExpression objects 
-        reStream = self._srcMeasureStream.flat.getElementsByClass(
-                RepeatExpression)
-
-        # note that the offsets of these streams are as found in the flat score
-        # this can be used to determine characteristics
-        environLocal.printDebug(['_daCapoIsCoherent', 'dcCount', self._dcCount, 'dcafCount', self._dcafCount, 'dcacCount', self._dcacCount, 'self._fineCount', self._fineCount])
-
         # there can be only one da capo statement for the provided span
         sumDc = self._dcCount + self._dcafCount + self._dcacCount
         if sumDc > 1:
@@ -443,12 +447,50 @@ class Expander(object):
 
         # if we have a da capo al coda, must have two coda signs
         elif self._dcacCount == 1 and self._codaCount == 2:
-            environLocal.printDebug(['returning true on dcaf'])
+            environLocal.printDebug(['returning true on dcac'])
             return True
 
         # return false for all other cases
         return False
         
+
+    def _daSegnoIsCoherent(self):
+        '''Check of a sa segno statement is coherent.
+        '''
+        # there can be only one da segno statement for the provided span
+        sumDs = (self._asCount + self._dsCount + self._dsacCount + 
+                self._dsafCount)
+        if sumDs > 1:
+            return False
+
+        # if al segno, there can be no codas, and one segno
+        if (self._asCount == 1 and self._segnoCount == 1 and 
+            self._codaCount == 0):
+            environLocal.printDebug(['returning true on as'])
+            return True
+
+        if (self._dsCount == 1 and self._segnoCount == 1 and 
+            self._codaCount == 0):
+            environLocal.printDebug(['returning true on ds'])
+            return True
+
+        # if we have a da capo al fine, must have one fine
+        elif (self._dsafCount == 1 and self._codaCount == 0 and 
+            self._segnoCount == 1 and self._fineCount == 1):
+            environLocal.printDebug(['returning true on dsaf'])
+            return True
+
+        # if we have a da capo al coda, must have two coda signs
+        elif (self._dsacCount == 1 and self._codaCount == 2 and 
+            self._segnoCount == 1 and self._fineCount == 0):
+            environLocal.printDebug(['returning true on dsac'])
+            return True
+
+        # return false for all other cases
+        return False
+        
+
+
 
 
 
