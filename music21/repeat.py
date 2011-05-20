@@ -371,16 +371,19 @@ class Expander(object):
             m.rightBarline = bar.Barline(newStyle)
 
     def _stripRepeatExpressions(self, streamObj):
-        '''Given a Stream of measures, strip all RepeatExpression objects 
+        '''Given a Stream of measures or a Measure, strip all RepeatExpression objects in place.
         '''
-        lb = m.leftBarline
-        rb = m.rightBarline
-        if lb is not None and 'Repeat' in lb.classes:
-            environLocal.printDebug(['inserting new barline: %s' % newStyle])
-            m.leftBarline = bar.Barline(newStyle)
-        if rb is not None and 'Repeat' in rb.classes:
-            m.rightBarline = bar.Barline(newStyle)
-
+        if not streamObj.hasMeasures():
+            # it probably is a measure; place in temporary containers
+            mList = [streamObj]
+        else:
+            mList = streamObj.getElementsByClass('Measure')
+        for m in mList:
+            remove = []
+            for e in m.getElementsByClass('RepeatExpression'):
+                remove.append(e)
+            for e in remove:
+                m.remove(e)
 
     def _repeatBarsAreCoherent(self):
         '''Check that all repeat bars are paired properly.
@@ -1384,6 +1387,38 @@ class Test(unittest.TestCase):
         s.append([m1])
         ex = Expander(s)
         self.assertEqual(ex._daCapoOrSegno(), None)
+
+
+    def testRemoveRepeatExpressions(self):
+        from music21 import stream, repeat
+
+        s = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m3.append(DaCapo())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), True)    
+        ex._stripRepeatExpressions(m3)
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), False)    
+
+
+        s = stream.Part()
+        m1 = stream.Measure()
+        m1.append(Segno())
+        m1.append(Coda())
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m3.append(Coda())
+        m3.append(DaCapoAlCoda())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        ex._stripRepeatExpressions(s) # entire part works too
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), False)   
+
 
 
 if __name__ == "__main__":
