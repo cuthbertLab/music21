@@ -29,9 +29,9 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 class RepeatMark(object):
-    '''Bass class of all repeat objects, including RepeatExpression objects and Repeat(Barline) objects. 
+    '''Base class of all repeat objects, including RepeatExpression objects and Repeat (Barline) objects. 
 
-    This object is used to for multiple-inheritance of such objects. 
+    This object is used to for multiple-inheritance of such objects and to filter by class.
     '''
     def __init__(self):
         pass
@@ -44,7 +44,9 @@ class RepeatExpressionException(music21.Music21Exception):
 
 class RepeatExpression(RepeatMark, expressions.Expression):
     '''
-    This class models any mark added to a Score to mark repeat start and end points that are designated by text expressions. 
+    This class models any mark added to a Score to mark repeat start and end points that are designated by text expressions or symbols.
+
+    Repeat(Barlin) objects are not RepeatExpression objects, but both are RepeatMark subclasses. 
 
     This class stores internally a :class:`~music21.expressions.TextExpression`. This object is used for rendering text output in translation. A properly configured TextExpression object can also be used to create an instance of a RepeatExpressions.
     '''
@@ -68,8 +70,6 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         self._positionRelativeY = None
         # this does not do anything if default y is defined
         self._positionPlacement = None
-
-
 
     def __repr__(self):
         content = self.getText()
@@ -120,7 +120,6 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         else:
             # first, apply defaults 
             return copy.deepcopy(self._textExpression)
-
 
     def isValidText(self, value):
         '''Return True or False if the supplied text could be used for this RepeatExpression.  
@@ -341,27 +340,39 @@ class Expander(object):
             raise ExpanderException('no measures found in the source stream to be expanded')
 
         # store counts of all non barline elements.
+        # doing class matching by string as problems matching in some test cases
         reStream = self._srcMeasureStream.flat.getElementsByClass(
-                   RepeatExpression)
-        self._codaCount = len(reStream.getElementsByClass(Coda))
-        self._segnoCount = len(reStream.getElementsByClass(Segno))
-        self._fineCount = len(reStream.getElementsByClass(Fine))
+                   'RepeatExpression')
+        self._codaCount = len(reStream.getElementsByClass('Coda'))
+        self._segnoCount = len(reStream.getElementsByClass('Segno'))
+        self._fineCount = len(reStream.getElementsByClass('Fine'))
 
-        self._dcCount = len(reStream.getElementsByClass(DaCapo))
-        self._dcafCount = len(reStream.getElementsByClass(DaCapoAlFine))
-        self._dcacCount = len(reStream.getElementsByClass(DaCapoAlCoda))
+        self._dcCount = len(reStream.getElementsByClass('DaCapo'))
+        self._dcafCount = len(reStream.getElementsByClass('DaCapoAlFine'))
+        self._dcacCount = len(reStream.getElementsByClass('DaCapoAlCoda'))
 
-        self._asCount = len(reStream.getElementsByClass(AlSegno))
-        self._dsCount = len(reStream.getElementsByClass(DalSegno))
-        self._dsafCount = len(reStream.getElementsByClass(DalSegnoAlFine))
-        self._dsacCount = len(reStream.getElementsByClass(DalSegnoAlCoda))
+        self._asCount = len(reStream.getElementsByClass('AlSegno'))
+        self._dsCount = len(reStream.getElementsByClass('DalSegno'))
+        self._dsafCount = len(reStream.getElementsByClass('DalSegnoAlFine'))
+        self._dsacCount = len(reStream.getElementsByClass('DalSegnoAlCoda'))
 
 
     def _stripRepeatBarlines(self, m, newStyle='light-light'):
-        '''Strip barlines if they are repeats, and replace with Barlines that are of the same style. Modify in place.
+        '''Given a measure, strip barlines if they are repeats, and replace with Barlines that are of the same style. Modify in place.
         '''
         # bar import repeat to make Repeat inherit from RepeatMark
         from music21 import bar
+        lb = m.leftBarline
+        rb = m.rightBarline
+        if lb is not None and 'Repeat' in lb.classes:
+            environLocal.printDebug(['inserting new barline: %s' % newStyle])
+            m.leftBarline = bar.Barline(newStyle)
+        if rb is not None and 'Repeat' in rb.classes:
+            m.rightBarline = bar.Barline(newStyle)
+
+    def _stripRepeatExpressions(self, streamObj):
+        '''Given a Stream of measures, strip all RepeatExpression objects 
+        '''
         lb = m.leftBarline
         rb = m.rightBarline
         if lb is not None and 'Repeat' in lb.classes:
@@ -418,7 +429,9 @@ class Expander(object):
         '''
         sumDc = self._dcCount + self._dcafCount + self._dcacCount
         # for now, only accepting one segno
-        sumDs = self._dsacCount + self._dsafCount + self._asCount
+        sumDs = (self._dsCount + self._dsacCount + 
+                self._dsafCount + self._asCount)
+        environLocal.printDebug(['_daCapoOrSegno', sumDc, sumDs])
         if sumDc == 1 and sumDs == 0:
             return DaCapo
         elif sumDs == 1 and sumDc == 0:
@@ -454,7 +467,7 @@ class Expander(object):
         return False
         
 
-    def _daSegnoIsCoherent(self):
+    def _dalSegnoIsCoherent(self):
         '''Check of a sa segno statement is coherent.
         '''
         # there can be only one da segno statement for the provided span
@@ -489,10 +502,6 @@ class Expander(object):
         # return false for all other cases
         return False
         
-
-
-
-
 
     def _hasRepeat(self, streamObj):
         '''Return True if this Stream of Measures has a repeat pair left to process.
@@ -553,7 +562,7 @@ class Expander(object):
         return barRepeatIndices
 
 
-    def _getEndObjects(self, streamObj, index):
+    def _getEndRepeatBar(self, streamObj, index):
         '''Get the last measure to be processed in the repeat, as well as the measure that has the end barline. These may not be the same: if an end repeat bar is placed on the left of a measure that is not actually being copied. 
 
         The `index` parameter is the index of the last measure to be copied. The streamObj expects to only have Measures. 
@@ -606,7 +615,7 @@ class Expander(object):
             environLocal.printDebug(['processing measure index:', i, 'repeatIndices', repeatIndices])
             # if this index is the start of the repeat
             if i == repeatIndices[0]:
-                mLast, mEndBarline, repeatTimes = self._getEndObjects(
+                mLast, mEndBarline, repeatTimes = self._getEndRepeatBar(
                     streamObj, repeatIndices[-1])
                 for times in range(repeatTimes):
                     environLocal.printDebug(['repeat times:', times])    
@@ -645,10 +654,26 @@ class Expander(object):
 
 
     def isExpandable(self):
-        '''Return True or False if this Stream is expandable.
+        '''Return True or False if this Stream is expandable, that is, if it has balanced repeats or sensible da copo or dal segno indications. 
         '''
-        if not self._repeatBarsAreCoherent():
+        match = self._daCapoOrSegno()
+        # if neither repeats nor segno/capo, than not expandable
+        if match is None and not self._hasRepeat(self._srcMeasureStream):
+            environLocal.printDebug('no dc/segno, no repeats')
             return False
+
+        if not self._repeatBarsAreCoherent():
+            environLocal.printDebug('repeat bars not coherent')
+            return False
+        if match is not None:
+            if match == DaCapo:
+                if not self._daCapoIsCoherent():
+                    environLocal.printDebug('dc not coherent')
+                    return False
+            elif match == Segno:
+                if not self._dalSegnoIsCoherent():
+                    environLocal.printDebug('ds not coherent')
+                    return False            
         return True
 
 
@@ -709,7 +734,7 @@ class Test(unittest.TestCase):
 
 
 
-    def testRepeatCoherneceA(self):
+    def testRepeatCoherenceB(self):
         from music21 import stream, bar, repeat, note
 
         s = stream.Part()
@@ -735,7 +760,7 @@ class Test(unittest.TestCase):
         self.assertEqual(ex._findInnermostRepeatIndices(s), [0])
 
 
-    def testRepeatCoherneceB(self):
+    def testRepeatCoherenceB(self):
         from music21 import stream, bar, repeat, note
 
         # a nested repeat; acceptable
@@ -779,6 +804,135 @@ class Test(unittest.TestCase):
         self.assertEqual([m.offset for m in post.getElementsByClass('Measure')], [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0])
 
         self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')], ['G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4', 'G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4'])
+
+
+
+    def testRepeatCoherenceC(self):
+        '''Using da capo/dal segno
+        '''
+        from music21 import stream, bar, repeat, note
+
+        # a nested repeat; acceptable
+        s = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), False)    
+
+        s = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m3.append(DaCapo())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), True)    
+
+        # missing segno
+        s = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m3.append(DalSegno())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), False)    
+
+        s = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m2.append(Segno())
+        m3 = stream.Measure()
+        m3.append(DalSegno())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), True)    
+
+        # dc al fine
+        s = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m2.append(Fine())
+        m3 = stream.Measure()
+        m3.append(DaCapoAlFine())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), True)    
+
+
+        # dc al fine but missing fine
+        s = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m3.append(DaCapoAlFine())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), False)    
+
+        # ds al fine
+        s = stream.Part()
+        m1 = stream.Measure()
+        m1.append(Segno())
+        m2 = stream.Measure()
+        m2.append(Fine())
+        m3 = stream.Measure()
+        m3.append(DalSegnoAlFine())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), True)    
+
+        # ds al fine missing fine
+        s = stream.Part()
+        m1 = stream.Measure()
+        m1.append(Segno())
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m3.append(DalSegnoAlFine())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), False)    
+
+        # dc al coda
+        s = stream.Part()
+        m1 = stream.Measure()
+        m1.append(Coda())
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m1.append(Coda())
+        m3.append(DaCapoAlCoda())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), True)    
+
+        # dc al coda missing one of two codas
+        s = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m3.append(Coda())
+        m3.append(DaCapoAlCoda())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), False)   
+
+        # ds al coda missing one of two codas
+        s = stream.Part()
+        m1 = stream.Measure()
+        m1.append(Segno())
+        m1.append(Coda())
+        m2 = stream.Measure()
+        m3 = stream.Measure()
+        m3.append(Coda())
+        m3.append(DaCapoAlCoda())
+        s.append([m1, m2, m3])
+        ex = repeat.Expander(s)
+        self.assertEqual(ex.isExpandable(), True)   
+
+
+
 
     def testExpandRepeatA(self):
         from music21 import stream, bar, repeat, note
@@ -1221,6 +1375,7 @@ class Test(unittest.TestCase):
         ex = Expander(s)
         self.assertEqual(ex._daCapoIsCoherent(), False)
         self.assertEqual(ex._daCapoOrSegno(), Segno)
+        self.assertEqual(ex._dalSegnoIsCoherent(), False)
 
         # if nothing, will return None
         m1 = stream.Measure()
@@ -1229,8 +1384,6 @@ class Test(unittest.TestCase):
         s.append([m1])
         ex = Expander(s)
         self.assertEqual(ex._daCapoOrSegno(), None)
-
-
 
 
 if __name__ == "__main__":

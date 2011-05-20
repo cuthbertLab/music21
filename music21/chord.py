@@ -2509,7 +2509,6 @@ class Chord(note.NotRest):
         # TODO: Check context
         return self.sortDiatonicAscending(inPlace=inPlace)
 
-    
     def sortChromaticAscending(self):
         '''
         Same as sortAscending but notes are sorted by midi number, so F## sorts above G-.
