@@ -401,7 +401,7 @@ class FiguredBass(object):
             for k in range(len(self.fbParts) - 1):
                 sol.insert(0, streamParts[k])
             
-        sol.insert(0, blCopy)
+#        sol.insert(0, blCopy)
 
         return sol
 

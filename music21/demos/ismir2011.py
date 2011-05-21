@@ -76,9 +76,9 @@ def testDataSet():
     p = graph.PlotFeatures(ds.streams, fes[1:], roundDigits = 2)
     p.process()
 
-def prepareChinaEurope():
-    #featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])
-    featureExtractors = features.extractorsById('all')
+def prepareChinaEurope1():
+    featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])
+    #featureExtractors = features.extractorsById('all')
 
     oChina1 = corpus.parse('essenFolksong/han1')
     oCEurope1 = corpus.parse('essenFolksong/boehme10')
@@ -97,6 +97,28 @@ def prepareChinaEurope():
     # process with all feature extractors, store all features
     ds.process()
     ds.write('d:/desktop/folkTrain.tab')
+
+
+def prepareChinaEurope2():
+    featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])
+
+    oChina2 = corpus.parse('essenFolksong/han2')
+    oCEurope2 = corpus.parse('essenFolksong/boehme20')
+
+    ds2 = features.DataSet(classLabel='Region')
+    ds2.addFeatureExtractors(featureExtractors)
+        
+    # add works, defining the class value 
+    for w in oChina2.scores:
+        id = 'essenFolksong/%s-%s' % ('han2', w.metadata.number)
+        ds2.addData(w, classValue='China', id=id)
+
+    for w in oCEurope2.scores:
+        id = 'essenFolksong/%s-%s' % ('europe2', w.metadata.number)
+        ds2.addData(w, classValue='CentralEurope', id=id)
+    # process with all feature extractors, store all features
+    ds2.process()
+    ds2.write('d:/desktop/folkTest.tab')
 
 def testChinaEuropeFull():
     import orange, orngTree
@@ -149,6 +171,103 @@ def testChinaEuropeSimpler():
     print majWrong/total, knnWrong/total
     
 
+def prepareTrecentoCadences():
+    featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 
+                                                 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21',
+                                                 'mc1', # LANDINI CADENCE                                                 
+                                                 ])
+    ds = features.DataSet(classLabel='Composer')
+    ds.addFeatureExtractors(featureExtractors)
+    ds2 = features.DataSet(classLabel='Composer')
+    ds2.addFeatureExtractors(featureExtractors)
+
+    
+    allBallate = trecento.cadencebook.BallataSheet()
+    for i, thisBallata in enumerate(allBallate):
+        if thisBallata.composer not in ['Zacharias', 'A. Zacara', 'Ciconia']:
+            continue
+        if thisBallata.composer != 'Ciconia':
+            thisBallata.composer = 'Zachara'
+        s = stream.Score()
+        md = metadata.Metadata()
+        s.insert(0, md)
+        s.metadata.composer = thisBallata.composer
+        s.metadata.title = thisBallata.title   
+        
+        for j in range(thisBallata.totalVoices):
+            s.insert(0, stream.Part())
+        currentTs = None
+        bs = thisBallata.snippets
+        for thisSnippet in bs:
+            if thisSnippet is None:
+                continue
+            if thisSnippet.tenor is None:
+                continue
+            if thisSnippet.cantus is None:
+                continue
+            ss = thisSnippet.asScore()
+            timeSig = ss.getElementsByClass(meter.TimeSignature)[0]
+            for partNumber, snippetPart in enumerate(ss.getElementsByClass('TrecentoCadenceStream')):
+                if currentTs is None:
+                    ctsNumerator = 0
+                else:
+                    ctsNumerator = currentTs.numerator
+                if timeSig.numerator != ctsNumerator and partNumber == 0:
+                    s.append(timeSig)
+                    currentTs = timeSig
+                try:
+                    currentScorePart = s.parts[partNumber]
+                except IndexError:
+                    continue  # error in coding
+                for thisElement in snippetPart:
+                    if 'TimeSignature' in thisElement.classes:
+                        continue
+                    currentScorePart.append(thisElement) 
+                
+        if len(s.flat.pitches) < 10:
+            continue
+        if i % 2 == 0:
+            ds.addData(s, classValue = thisBallata.composer, id=str(i))
+        else:
+            ds2.addData(s, classValue = thisBallata.composer, id=str(i))
+        print i, thisBallata.title, thisBallata.composer
+    
+    ds.process()
+    ds2.process()
+    ds.write('d:/desktop/trecento1.tab')
+    ds2.write('d:/desktop/trecento2.tab')
+
+
+def testTrecentoSimpler():
+    import orange, orngTree
+
+    trainData = orange.ExampleTable('d:/desktop/trecento2.tab')
+    testData  = orange.ExampleTable('d:/desktop/trecento1.tab')
+
+    majClassifier = orange.MajorityLearner(trainData)
+    knnClassifier = orange.kNNLearner(trainData)
+        
+    majWrong = 0
+    knnWrong = 0
+        
+    for testRow in testData:
+      majGuess = majClassifier(testRow)
+      knnGuess = knnClassifier(testRow)
+      realAnswer = testRow.getclass()
+      if majGuess != realAnswer:
+        majWrong += 1
+      if knnGuess != realAnswer:
+        knnWrong += 1
+       
+    total = float(len(testData))
+    print majWrong/total, knnWrong/total
+
+
+    
+
+
+### FIGURED BASS PAPER ###
+
 def tinyNotationBass():
     bass1 = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
     #bass1.show('lily.png')
@@ -199,11 +318,13 @@ def featureExtraction():
     #[0.0, 0.5, 1.0, 0.0, 0.6000000000000001, 0.0, 0.4, 0.2, 0.0, 0.7000000000000001, 0.0, 0.1]
     # exampleFBOut.show()
 
+testTrecentoSimpler()
+#prepareTrecentoCadences()
 #figuredBassScale()
 #featureExtraction()
-testChinaEuropeSimpler()
+#testChinaEuropeSimpler()
 
-#prepareChinaEurope()
+#prepareChinaEurope2()
 #testDataSet()
 #testFictaFeature()
 #example2()

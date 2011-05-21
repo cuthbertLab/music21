@@ -29,6 +29,29 @@ class PolyphonicSnippet(music21.Music21Object):
             self.cantus = None
             self.streams.pop(0)
 
+    def asScore(self):
+        '''
+        returns a music21.stream.Score from the polyphonic snippet.
+        '''
+        myScore = stream.Score()
+            
+        myScore.insert(0, self.timeSig)
+        if self.cantus is not None:
+            if hasattr(self, 'frontPadLine'):
+                self.frontPadLine(self.cantus)
+            myScore.insert(0, self.cantus)
+        if self.contratenor is not None:
+            if hasattr(self, 'frontPadLine'):
+                self.frontPadLine(self.contratenor)
+            myScore.insert(0, self.contratenor)
+        if self.tenor is not None:
+            if hasattr(self, 'frontPadLine'):
+                self.frontPadLine(self.tenor)
+            myScore.insert(0, self.tenor)
+        return myScore
+
+        
+
     def headerWithPageNums(self):
         '''returns a string that prints an appropriate header for this cadence'''
         if (self.parentPiece is not None):

@@ -714,7 +714,7 @@ def realizerExample1():
     >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
     >>> fbLine1 = realizer.figuredBassFromStream(s)
     >>> fbLine1.realize()
-    >>> fbLine1.showAllRealizations()
+    >>> #_DOCS_SHOW fbLine1.showAllRealizations()
     '''
     pass
 
@@ -759,7 +759,7 @@ def realizerExample3():
     >>> fbLine2.realize()
     >>> fbLine2.showRandomRealizations(20)
     >>> allSolsScore = fbLine2.generateAllRealizations()
-    >>> fbLine2.showRandomRealization()
+    >>> #_DOCS_SHOW fbLine2.showRandomRealization()
     '''
     pass
     

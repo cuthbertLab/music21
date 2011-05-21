@@ -205,6 +205,14 @@ class TrecentoCadenceWork(object):
             self.isAnonymous = True
         else:
             self.isAnonymous = False
+        self.totalVoices = 0
+        try:
+            self.totalVoices = int(self.encodedVoices)
+        except ValueError:
+            try:
+                self.totalVoices = int(self.encodedVoices[0])
+            except (ValueError, IndexError):
+                pass
 
     def getIncipit(self):
         '''the first incipit keeps its time signature
@@ -280,7 +288,8 @@ class TrecentoCadenceWork(object):
 
     def convertBlockToStreams(self, thisBlock):
         '''
-        Takes a block of music information and converts it to a list of Streams and other information
+        Takes a block of music information and converts it to a 
+        list of Streams and other information
         
         >>> block1 = ['e4 f g a', 'g4 a b cc', '', 'no-cadence', '2/4']
         >>> bs = BallataSheet()
@@ -329,7 +338,8 @@ class TrecentoCadenceWork(object):
         return False
 
     def allCadences(self):
-        '''returns a list of all the PolyphonicSnippet 
+        '''
+        returns a list of all the PolyphonicSnippet 
         objects which are actually cadences
         '''
         x = len(self.snippets)
