@@ -401,8 +401,7 @@ class FiguredBass(object):
             for k in range(len(self.fbParts) - 1):
                 sol.insert(0, streamParts[k])
             
-#        sol.insert(0, blCopy)
-
+        sol.insert(0, copy.deepcopy(self.bassLine)) #Need to deepcopy the bass line every time, otherwise things get screwed up in display of solutions.
         return sol
 
     def generateAllRealizations(self):
