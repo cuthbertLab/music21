@@ -18,7 +18,7 @@ def sortMelodicFifths():
     '''
     ballataObj = cadencebook.BallataSheet()
     for pieceObj in ballataObj:
-        if pieceObj.incipitClass() is None:
+        if pieceObj.incipit is None:
             continue
         print(pieceObj.title)
         for polyphonicSnippet in pieceObj.snippets:

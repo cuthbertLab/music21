@@ -149,11 +149,12 @@ def nextLargerType(durType):
     '''
     Given a type (such as 16th or quarter), return the next larger type.
     
-    >>> nextLargerType("16th")
+    >>> from music21 import *
+    >>> duration.nextLargerType("16th")
     'eighth'
-    >>> nextLargerType("whole")
+    >>> duration.nextLargerType("whole")
     'breve'
-    >>> nextLargerType("duplex-maxima")
+    >>> duration.nextLargerType("duplex-maxima")
     'unexpressible'
     '''
     if durType not in ordinalTypeFromNum:
@@ -163,6 +164,29 @@ def nextLargerType(durType):
         return 'unexpressible'
     else:
         return ordinalTypeFromNum[thisOrdinal - 1]
+
+
+def nextSmallerType(durType):
+    '''
+    Given a type (such as 16th or quarter), return the next smaller type.
+    
+    >>> from music21 import *
+    >>> duration.nextSmallerType("16th")
+    '32nd'
+    >>> duration.nextSmallerType("whole")
+    'half'
+    >>> duration.nextSmallerType("1024th")
+    'unexpressible'
+    '''
+    if durType not in ordinalTypeFromNum:
+        raise DurationException("cannot get the next smaller of %s" % durType)
+    thisOrdinal = ordinalTypeFromNum.index(durType)
+    if thisOrdinal == 14: # TODO: should this raise an exception?
+        return 'unexpressible'
+    else:
+        return ordinalTypeFromNum[thisOrdinal + 1]
+
+
     
 def quarterLengthToClosestType(qLen):
     '''
@@ -561,8 +585,9 @@ def partitionQuarterLength(qLen, qLenDiv=4):
 def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     '''
     Given a rhythm type (`dType`), number of dots (`dots`), an optional list of 
-    Tuplet objects (`tuplets`), and a (very) optional list of Medieval dot groups (`dotGroups`), 
-    return the equivalent quarter length.
+    Tuplet objects (`tuplets`), and a (very) optional list of 
+    Medieval dot groups (`dotGroups`), return the equivalent quarter length.
+
     
     >>> convertTypeToQuarterLength('whole')
     4.0
@@ -570,17 +595,24 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     0.25
     >>> convertTypeToQuarterLength('quarter', 2)
     1.75
+
     
     >>> tup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
     >>> convertTypeToQuarterLength('quarter', 0, [tup])
     0.8...
 
+
     >>> tup = Tuplet(numberNotesActual = 3, numberNotesNormal = 4)
     >>> convertTypeToQuarterLength('quarter', 0, [tup])
     1.333333...
 
-    Also can handle those rare medieval dot groups (such as dotted-dotted half notes that take a full measure of 9/8).
-    >>> convertTypeToQuarterLength('half', dotGroups = [1,1])
+
+    Also can handle those rare medieval dot groups 
+    (such as dotted-dotted half notes that take a full measure of 9/8.
+    Conceptually, these are dotted-(dotted-half) notes.  See 
+    trecento.trecentoCadence for more information
+    ).
+    >>> convertTypeToQuarterLength('half', dots = 1, dotGroups = [1,1])
     4.5
     '''
     
@@ -593,11 +625,13 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     qtrLength = durationFromType
 
     # weird medieval notational device; rarely used.
-    if len(dotGroups) > 0:
-        for dot in dotGroups:
-            qtrLength *= common.dotMultiplier(dot)
+    if len(dotGroups) > 1:
+        for dots in dotGroups:
+            if dots > 0:
+                qtrLength *= common.dotMultiplier(dots)
     else:
         qtrLength *= common.dotMultiplier(dots)
+
     for tup in tuplets:
         qtrLength *= tup.tupletMultiplier()
     return qtrLength
@@ -1256,8 +1290,10 @@ class DurationUnit(DurationCommon):
     def __init__(self, prototype='quarter'):
 
         self._type = ""
-        # rarely used: dotted-dotted notes; e.g. dotted-dotted half in 9/8
         # dots can be a float for expressing Crumb dots (1/2 dots)
+        # dots is a list for rarely used: dotted-dotted notes; 
+        #  e.g. dotted-dotted half in 9/8 expressed as 1,1
+
         self._dots = [0] 
         self._tuplets = () # an empty tuple
         
@@ -1347,7 +1383,7 @@ class DurationUnit(DurationCommon):
         '''
         if self.linkStatus is True:
             self._qtrLength = convertTypeToQuarterLength(self.type,
-                            self.dots, self.tuplets) # add self.dotGroups
+                            self.dots, self.tuplets, self.dotGroups) # add self.dotGroups
         self._quarterLengthNeedsUpdating = False
 
     def link(self):
@@ -1581,7 +1617,7 @@ class DurationUnit(DurationCommon):
 
     def _getDots(self):
         '''
-        _dots is a list (so we can do weird things like Crumb half-dots)
+        _dots is a list (so we can do weird things like dot groups)
         Normally we only want the first element. 
         So that's what _getDots returns...
         '''
@@ -1615,6 +1651,42 @@ class DurationUnit(DurationCommon):
             raise DurationException("number of dots must be a number")
 
     dots = property(_getDots, _setDots)
+
+    def _getDotGroups(self):
+        '''
+        _dots is a list (so we can do weird things like dot groups)
+        _getDotGroups lets you do the entire list (as a tuple)
+
+        >>> from music21 import *
+        >>> d1 = duration.DurationUnit()
+        >>> d1.type = 'half'
+        >>> d1.dotGroups = [1, 1]  # dotted dotted half
+        >>> d1.dots
+        1
+        >>> d1.dotGroups
+        (1, 1)
+        >>> d1.quarterLength
+        4.5
+        '''
+        if self._typeNeedsUpdating:
+            self.updateType()
+        return tuple(self._dots)
+
+    def _setDotGroups(self, listValue):
+        '''
+        Sets the number of dots in a dot group
+        '''
+        self._quarterLengthNeedsUpdating = True
+        if common.isListLike(listValue):
+            if not isinstance(listValue, list):
+                self._dots = list(listValue)
+            else:
+                self._dots = listValue
+        else:
+            raise DurationException("number of dots must be a number")
+
+    dotGroups = property(_getDotGroups, _setDotGroups)
+
 
     def _getTuplets(self):
         '''Return a tuple of Tuplet objects '''
@@ -2090,7 +2162,7 @@ class Duration(DurationCommon):
         1.75
         '''
         if not common.isNum(value):
-            raise DurationException('only numeric dot values can be used iwth this method.')
+            raise DurationException('only numeric dot values can be used with this method.')
 
         if len(self.components) > 1:
             raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
@@ -2101,6 +2173,109 @@ class Duration(DurationCommon):
             raise DurationException("zero DurationUnits in components")        
 
     dots = property(_getDots, _setDots)
+
+    def _getDotGroups(self):
+        '''
+        Returns the tuple of dotGroups in the Duration
+        if it is a simple Duration.  Otherwise raises error.
+        '''
+        if self._componentsNeedUpdating == True:
+            self._updateComponents()
+
+        if len(self.components) > 1:
+            return None
+        elif len(self.components) == 1:
+            return self.components[0].dotGroups
+        else: # there must be 1 or more components
+            raise DurationException("unexpected number DurationUnits in components: %s" % len(self.components))
+
+    def _setDotGroups(self, value):
+        '''Set dotGroups if a list, as first element
+
+        Having this as a method permits error checking.
+
+        >>> a = Duration()
+        >>> a.type = 'half'
+        >>> a.dotGroups = [1,1]
+        >>> a.quarterLength
+        4.5
+        '''
+        if not common.isListLike(value):
+            raise DurationException('only list-like dotGroups values can be used with this method.')
+
+        if len(self.components) > 1:
+            raise DurationException("setting dotGroups: Myke and Chris need to decide what that means")
+        elif len(self.components) == 1:
+            self.components[0].dotGroups = value
+            self._quarterLengthNeedsUpdating = True
+        else: # there must be 1 or more components
+            raise DurationException("zero DurationUnits in components")        
+
+    dotGroups = property(_getDotGroups, _setDotGroups)
+
+    def splitDotGroups(self):
+        '''
+        splits a dotGroup-duration (of 1 component) into a new duration of two
+        components.  Returns a new duration
+        
+        Probably does not handle properly tuplets of dot-groups.  Never seen one, so probably okay.
+
+
+        >>> from music21 import *
+        >>> d1 = duration.Duration(type = 'half')
+        >>> d1.dotGroups = [1,1]
+        >>> d1.quarterLength
+        4.5
+        >>> d2 = d1.splitDotGroups()
+        >>> d2.components
+        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
+        >>> d2.quarterLength
+        4.5
+        
+        
+        
+        Here's how a system that does not support dotGroups can still display
+        the notes accurately.  N.B. MusicXML does this automatically, so 
+        no need.
+        
+        
+        >>> n1 = note.Note()
+        >>> n1.duration = d1
+        >>> n1.duration = n1.duration.splitDotGroups()
+        >>> n1.duration.components
+        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
+        >>> s1 = stream.Stream()
+        >>> s1.append(meter.TimeSignature('9/8'))
+        >>> s1.append(n1)
+        >>> #_DOCS_SHOW s1.show('lily.png')
+        .. image:: images/duration_splitDotGroups.*
+
+
+        >>> n2 = note.Note()
+        >>> n2.duration.type = 'quarter'
+        >>> n2.duration.dotGroups = [1,1]
+        >>> n2.quarterLength
+        2.25
+        >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
+        
+        '''
+        dG = self.dotGroups
+        if len(dG) < 2:
+            return copy.deepcopy(self)
+        else:
+            newDuration = copy.deepcopy(self)
+            newDuration.dotGroups = [0]
+            newDuration.components[0].dots = dG[0]
+            for i in range(1, len(dG)):
+                newComponent = copy.deepcopy(newDuration.components[i-1])
+                newComponent.type = nextSmallerType(newDuration.components[i-1].type)
+                newComponent.dots = dG[i]
+                newDuration.components.append(newComponent)
+            return newDuration
+            
+
+
+
 
     def _getTuplets(self):
         '''

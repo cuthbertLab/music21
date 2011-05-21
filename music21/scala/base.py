@@ -19,9 +19,10 @@ To create a :class:`~music21.scale.ScalaScale` instance, simple provide a root p
 
 
 >>> from music21 import *
->>> scala.search('mbira')
-['mbira_mujuru.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_banda.scl', 'mbira_gondo.scl', 'mbira_zimb.scl', 'mbira_mude.scl', 'mbira_banda2.scl']
->>> sc = scale.ScalaScale('a4', scala.search('mbira')[3])
+>>> mbiraScales = scala.search('mbira')
+>>> mbiraScales
+['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
+>>> sc = scale.ScalaScale('a4', mbiraScales[0])
 >>> sc.pitches
 [A4, B4(-15c), C#5(-11c), D#5(-7c), E~5(+6c), F#5(+14c), G~5(+1c), B-5(+2c)]
 
@@ -416,8 +417,9 @@ def search(target):
     '''Search the scala archive for matches based on a string
 
     >>> from music21 import *
-    >>> scala.search('mbira')
-    ['mbira_mujuru.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_banda.scl', 'mbira_gondo.scl', 'mbira_zimb.scl', 'mbira_mude.scl', 'mbira_banda2.scl']
+    >>> mbiraScales = scala.search('mbira')
+    >>> mbiraScales
+    ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
     '''
     match = []
     # try from stored collections
@@ -440,6 +442,7 @@ def search(target):
     names = []
     for fp in match:
         names.append(os.path.basename(fp))
+    names.sort()
     return names
 
 

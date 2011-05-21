@@ -27,8 +27,7 @@ class TrecentoCadenceNote(TinyNotationNote):
     ## for trecento notation: a double dotted half = 9 eighths, not 7;
     def getDots(self, stringRep, noteObj):
         if (self.DBLDOT.search(stringRep)):
-            noteObj.duration.dots = 1
-            noteObj.duration.dotGroups = [1]
+            noteObj.duration.dotGroups = [1,1]
         elif (self.DOT.search(stringRep)):
             noteObj.duration.dots = 1
 
@@ -60,7 +59,7 @@ Step: C
 Octave: 4
 Accidental: sharp
 Duration Type: half
-QuarterLength: 3.0
+QuarterLength: 4.5
 ''')
 
     

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         ismir2011.py
 # Purpose:      Examples for ISMIR 2011 papers
@@ -188,42 +189,7 @@ def prepareTrecentoCadences():
             continue
         if thisBallata.composer != 'Ciconia':
             thisBallata.composer = 'Zachara'
-        s = stream.Score()
-        md = metadata.Metadata()
-        s.insert(0, md)
-        s.metadata.composer = thisBallata.composer
-        s.metadata.title = thisBallata.title   
-        
-        for j in range(thisBallata.totalVoices):
-            s.insert(0, stream.Part())
-        currentTs = None
-        bs = thisBallata.snippets
-        for thisSnippet in bs:
-            if thisSnippet is None:
-                continue
-            if thisSnippet.tenor is None:
-                continue
-            if thisSnippet.cantus is None:
-                continue
-            ss = thisSnippet.asScore()
-            timeSig = ss.getElementsByClass(meter.TimeSignature)[0]
-            for partNumber, snippetPart in enumerate(ss.getElementsByClass('TrecentoCadenceStream')):
-                if currentTs is None:
-                    ctsNumerator = 0
-                else:
-                    ctsNumerator = currentTs.numerator
-                if timeSig.numerator != ctsNumerator and partNumber == 0:
-                    s.append(timeSig)
-                    currentTs = timeSig
-                try:
-                    currentScorePart = s.parts[partNumber]
-                except IndexError:
-                    continue  # error in coding
-                for thisElement in snippetPart:
-                    if 'TimeSignature' in thisElement.classes:
-                        continue
-                    currentScorePart.append(thisElement) 
-                
+        s = thisBallata.asScore()
         if len(s.flat.pitches) < 10:
             continue
         if i % 2 == 0:
@@ -262,7 +228,60 @@ def testTrecentoSimpler():
     total = float(len(testData))
     print majWrong/total, knnWrong/total
 
-
+def wekaCommands():
+    '''
+    These commands were used to do the 10-fold Cross-validation in Weka:
+    (the function does nothing; it's just a placeholder for these docs)
+    
+    
+    # convert from CSV to ARFF (if the ARFF output from music21 wasn't used)
+    java weka.core.converters.CSVLoader chinaMitteleuropa-all.csv > chinaMitteleuropa-all.arff
+    
+    # remove features that are the same for all pieces
+    # -i: input file
+    # -o: output file
+    java weka.filters.unsupervised.attribute.RemoveUseless -i chinaMitteleuropa-all.arff -o chinaMitteleuropa-no-useless.arff
+    
+    # run Naive Bayes
+    # -t: data file. Default: uses the file for both training and testing data, 
+    #    running 10-fold cross validation.
+    # -o: turn off some outputs we don't need
+    # -i: print some additional statistics
+    java weka.classifiers.bayes.NaiveBayes -o -i -t chinaMitteleuropa-no-useless.arff
+    
+    # Naive Bayes with supervised discretization of continuous attributes
+    # -D: (above option)
+    java weka.classifiers.bayes.NaiveBayes -o -i -D -t chinaMitteleuropa-no-useless.arff
+    
+    # run majority classifier (as baseline)
+    java weka.classifiers.rules.ZeroR -i -t chinaMitteleuropa-no-useless.arff
+    
+    # run a decision tree
+    java weka.classifiers.trees.J48 -i -t chinaMitteleuropa-no-useless.arff 
+    
+    # run logistic regression
+    java weka.classifiers.functions.Logistic -i -t chinaMitteleuropa-no-useless.arff
+    
+    # run k-nearest neighbors
+    # -K: how many nearest neighbors to use
+    java weka.classifiers.lazy.IBk -i -K 3 -t chinaMitteleuropa-no-useless.arff
+    
+    # print some information about the feature distributions
+    java weka.core.Instances chinaMitteleuropa-no-useless.arff
+    
+    
+    Results:
+    
+    classifier           % correct
+    =====================
+    majority baseline    63%
+    naïve Bayes          79%
+    naïve Bayes with supervised discretization    91%
+    decision tree        93%
+    logistic regression  95%
+    kNN (k=3)            96%
+    '''
+    pass
     
 
 
@@ -318,7 +337,7 @@ def featureExtraction():
     #[0.0, 0.5, 1.0, 0.0, 0.6000000000000001, 0.0, 0.4, 0.2, 0.0, 0.7000000000000001, 0.0, 0.1]
     # exampleFBOut.show()
 
-testTrecentoSimpler()
+#testTrecentoSimpler()
 #prepareTrecentoCadences()
 #figuredBassScale()
 #featureExtraction()

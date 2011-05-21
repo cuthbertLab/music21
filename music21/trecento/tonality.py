@@ -36,8 +36,10 @@ class TonalityCounter(object):
     is called, stores a set of information about the cadence
     tonalities of the works.
 
+
     streamNumber can be 0 (cantus), 1 (tenor, default), or 2
     (contratenor), or very rarely 3 (fourth voice).
+    
     
     cadenceName can be "A" or "B" (which by default uses the
     second ending of cadence B if there are two endings) or
@@ -46,10 +48,12 @@ class TonalityCounter(object):
     want the Amen no matter how many internal cadences there
     are).
     
+    
     This example takes three ballata and how that all three of
     them cadence on a different note than they began on.  All
     three cadence on D despite beginning on C, A, and B (or B
     flat) repsectively.
+    
     
     >>> from music21.trecento import cadencebook
     >>> threeBallata = cadencebook.BallataSheet()[15:18]
@@ -91,11 +95,11 @@ class TonalityCounter(object):
             incip = thisWork.incipit
             
             if self.cadenceName == "A":
-                cadence = thisWork.cadenceAClass()
+                cadence = thisWork.cadenceA
             elif self.cadenceName == "B":
-                cadence = thisWork.cadenceB2Class()
+                cadence = thisWork.cadenceBclos
                 if (cadence is None or cadence.streams is None or len(cadence.streams) <= self.streamNumber):
-                    cadence = thisWork.cadenceB1Class()
+                    cadence = thisWork.cadenceB
             elif isinstance(self.cadenceName, int):
                 try:
                     cadence = thisWork.snippets[self.cadenceName]
@@ -205,8 +209,10 @@ def sacredTonality(show = True):
     Gives a list of all sacred pieces by incipit tenor note and last cadence tenor note
     and then notices which are the same and which are different.
 
+
     note that we only have a very very few sacred pieces encoded at this point so
     the results are NOT statistically significant.
+
 
     And then generates a PNG of the incipit and cadence of all the ones that are the same.
     '''

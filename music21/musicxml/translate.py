@@ -407,9 +407,13 @@ def mxToDuration(mxNote, inputM21):
 
 
 def durationToMx(d):
-    '''Translate a music21 :class:`~music21.duration.Duration` object to a list of one or more MusicXML :class:`~music21.musicxml.Note` objects. 
+    '''
+    Translate a music21 :class:`~music21.duration.Duration` object to a list 
+    of one or more MusicXML :class:`~music21.musicxml.Note` objects. 
+
 
     All rhythms and ties necessary in the MusicXML Notes are configured. The returned mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.
+
 
     >>> from music21 import *
     >>> a = duration.Duration()
@@ -420,6 +424,7 @@ def durationToMx(d):
     >>> isinstance(b[0], musicxmlMod.Note)
     True
 
+
     >>> a = duration.Duration()
     >>> a.quarterLength = .33333333
     >>> b = musicxml.translate.durationToMx(a)
@@ -427,11 +432,36 @@ def durationToMx(d):
     True
     >>> isinstance(b[0], musicxmlMod.Note)
     True
+
+
+
+    >>> a = duration.Duration()
+    >>> a.quarterLength = .625
+    >>> b = musicxml.translate.durationToMx(a)
+    >>> len(b) == 2
+    True
+    >>> isinstance(b[0], musicxmlMod.Note)
+    True
+
+
+
+    >>> a = duration.Duration()
+    >>> a.type = 'half'
+    >>> a.dotGroups = [1,1]
+    >>> b = musicxml.translate.durationToMx(a)
+    >>> len(b) == 2
+    True
+    >>> isinstance(b[0], musicxmlMod.Note)
+    True
+
     '''
     from music21 import duration
 
     post = [] # rename mxNoteList for consistencuy
     #environLocal.printDebug(['in _getMX', d, d.quarterLength])
+
+    if d.dotGroups is not None and len(d.dotGroups) > 1:
+        d = d.splitDotGroups()
 
     for dur in d.components:
         mxDivisions = int(defaults.divisionsPerQuarter * 

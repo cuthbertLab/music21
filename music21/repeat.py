@@ -1324,7 +1324,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 8)
         self.assertEqual(str(s.flat.pitches[0]), 'A2')
             
-        self.assertEqual(str(features.vectorById(s, 'p20')), '[1.0, 0.33333333333333331, 0.0, 1.0, 0.33333333333333331, 0.0, 1.0, 0.33333333333333331, 0.0, 1.0, 0.33333333333333331, 0.0]')
+        self.assertEqual(features.vectorById(s, 'p20'), [1.0, 0.333333333333333333333, 0.0, 1.0, 0.3333333333333333333, 0.0, 1.0, 0.3333333333333333, 0.0, 1.0, 0.333333333333333333333, 0.0])
         
         #s.show()    
         
@@ -1333,7 +1333,7 @@ class Test(unittest.TestCase):
         # first bar is an A, but repeat is zero, will be removed
         self.assertEqual(str(s1.flat.pitches[0]), 'C3')
         
-        self.assertEqual(str(features.vectorById(s1, 'p20')), '[0.20000000000000001, 0.066666666666666666, 0.0, 0.59999999999999998, 0.20000000000000001, 0.0, 1.0, 0.33333333333333331, 0.0, 0.0, 0.0, 0.0]')
+        self.assertEqual(features.vectorById(s1, 'p20'), [0.2, 0.06666666666666666, 0.0, 0.6, 0.2, 0.0, 1.0, 0.3333333333333333333333, 0.0, 0.0, 0.0, 0.0])
         
         
         #s1.show()
