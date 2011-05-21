@@ -39,10 +39,9 @@ under the module "base":
 '''
 
 #-------------------------------------------------------------------------------
-VERSION_STR = "0.3.5.a9"
-VERSION = (0, 3, 5)  # increment any time picked versions will be obsolete or other significant changes have been made
+VERSION_STR = "0.3.6.a10"
+VERSION = (0, 3, 6)  # increment any time picked versions will be obsolete or other significant changes have been made
 #-------------------------------------------------------------------------------
-
 
 import copy
 import unittest, doctest
