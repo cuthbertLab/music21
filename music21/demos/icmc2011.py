@@ -557,7 +557,7 @@ class Test(unittest.TestCase):
             for group in groups:
                 for n in group['stream'].notes:
                     n.addLyric('%s^%s' % (sc.getTonic().name.lower(), sc.getScaleDegreeFromPitch(n.pitch, group['direction'])))
-        part.show()
+        #part.show()
 
 
 
