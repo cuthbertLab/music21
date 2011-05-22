@@ -9,14 +9,14 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
-Tools for representing data from the Scala scale file format as defined here.
+This module defines classes for representing Scala scale data, including Scala pitch representations, storage, and files. 
 
+The Scala format is defined at the following URL:
 http://www.huygens-fokker.org/scala/scl_format.html
 
-Utility functions are also provided to search and find scales in the Scala scale archive.
+Utility functions are also provided to search and find scales in the Scala scale archive. File names can be found with the :func:`~music21.scala.search` function.
 
-To create a :class:`~music21.scale.ScalaScale` instance, simple provide a root pitch and the name of the scale. Scale names are given as a the scala .scl file name. File names can be found with the :func:`~music21.scala.search` function.
-
+To create a :class:`~music21.scale.ScalaScale` instance, simply provide a root pitch and the name of the scale. Scale names are given as a the scala .scl file name. 
 
 >>> from music21 import *
 >>> mbiraScales = scala.search('mbira')
@@ -25,8 +25,6 @@ To create a :class:`~music21.scale.ScalaScale` instance, simple provide a root p
 >>> sc = scale.ScalaScale('a4', mbiraScales[0])
 >>> sc.pitches
 [A4, B4(-15c), C#5(-11c), D#5(-7c), E~5(+6c), F#5(+14c), G~5(+1c), B-5(+2c)]
-
-
 
 '''
 

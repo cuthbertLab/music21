@@ -5951,7 +5951,7 @@ class Stream(music21.Music21Object):
                     e.duration.quarterLength = qlNew
 
 
-    def expandRepeats(self):
+    def expandRepeats(self, copySpanners=True):
         '''Expand all repeats, as well as all repeat indications given by text expressions such as D.C. al Segno.
 
         This method always returns a new Stream, with deepcopies of all contained elements at all levels.
@@ -5959,8 +5959,29 @@ class Stream(music21.Music21Object):
         NOTE: This preliminary implementation only handles repeats designated with repeat signs.
 
         '''
+        if not self.hasMeasures():
+            raise StreamException('cannot process repeats on Stream that does not contian measures')
+
         ex = repeat.Expander(self)
-        return ex.process()
+        post = ex.process()
+
+        # copy all non-repeats
+        for e in self.getElementsNotOfClass('Measure'):
+            eNew = copy.deepcopy(e) # assume that this is needed
+            post.insert(e.getOffsetBySite(self), eNew)
+
+        # all elements at this level and in measures have been copied; now we 
+        # need to reconnect spanners
+        if copySpanners:
+            environLocal.printDebug(['Stream.expandRepeats', 'copying spanners'])
+            spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+            # iterate over complete semi flat (need containers); find
+            # all new/old pairs
+            for e in post.semiFlat:
+                # update based on last id, new object
+                spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
+
+        return post
         
 
     #---------------------------------------------------------------------------
@@ -8324,8 +8345,7 @@ class Score(Stream):
 
         This method always returns a new Stream, with deepcopies of all contained elements at all level.
     
-        NOTE: preliminary implementation.
-        TODO: overidden method on Score
+        NOTE: This is still a preliminary implementation. 
         '''
         post = Score()
         # this calls on Music21Object, transfers id, groups
@@ -8337,8 +8357,16 @@ class Score(Stream):
             post.insert(e.getOffsetBySite(self), eNew)
 
         for p in self.getElementsByClass('Part'):
-            post.insert(0, p.expandRepeats())
-        #TODO: gather spanners?
+            # get spanners at highest level, not by Part
+            post.insert(0, p.expandRepeats(copySpanners=False))
+
+        spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+        # iterate over complete semi flat (need containers); find
+        # all new/old pairs
+        for e in post.semiFlat:
+            # update based on last id, new object
+            spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
+
         return post
         
 

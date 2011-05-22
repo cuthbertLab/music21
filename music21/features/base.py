@@ -176,7 +176,7 @@ class FeatureExtractor(object):
         self._feature = Feature()
         self._fillFeatureAttributes() # will fill self._feature
         self._feature.prepareVectors() # will vector with necessary zeros
-
+        
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
@@ -198,6 +198,18 @@ class FeatureExtractor(object):
         return self._feature    
 
 
+    def getBlankFeature(self):
+        '''Return a properly configured plain feature as a place holder
+
+        >>> from music21 import features
+        >>> fe = features.jSymbolic.InitialTimeSignatureFeature()
+        >>> fe.getBlankFeature().vector
+        [0, 0]
+        '''
+        f = Feature()
+        self._fillFeatureAttributes(f) 
+        f.prepareVectors() # will vector with necessary zeros
+        return f
 
 
 
@@ -929,7 +941,15 @@ class DataSet(object):
             row = []
             for fe in self._featureExtractors:
                 fe.setData(data)
-                row.append(fe.extract()) # get feature and store
+                # in some cases there might be problem; to not fail 
+                try:
+                    fReturned = fe.extract()
+                except: # for now take any error
+                    environLocal.warn(['failed feature extactor:', fe])
+                    # provide a blank feature extactor
+                    fReturned = fe.getBlankFeature()
+
+                row.append(fReturned) # get feature and store
             # rows will align with data the order of DataInstances
             self._features.append(row)
 
@@ -1200,6 +1220,29 @@ class Test(unittest.TestCase):
         ds.write(format='csv')
         ds.write(format='arff')
 
+
+
+    def testFeatureFail(self):
+
+        from music21 import stream, features
+
+        featureExtractors = ['p10', 'p11', 'p12', 'p13']
+
+    
+        featureExtractors = features.extractorsById(featureExtractors, 
+                            'jSymbolic')
+
+        ds = features.DataSet(classLabel='Composer')
+        ds.addFeatureExtractors(featureExtractors)
+        
+        # create problematic streams
+        s = stream.Stream()
+        s.append(None) # will create a wrapper
+        ds.addData(s, classValue='Monteverdi')
+        ds.addData(s, classValue='Handel')
+        
+        # process with all feature extractors, store all features
+        ds.process()
 
 
 

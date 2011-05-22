@@ -162,7 +162,6 @@ class Coda(RepeatExpressionMarker):
         # default text expression is coda
         self._textAlternatives = ['Coda', 'to Coda', 'al Coda']
         if text is not None and self.isValidText(text):
-            environLocal.printDebug(['Coda got text', text])
             self.setText(text)
             self.useSymbol = False
         else:
@@ -195,6 +194,7 @@ class Fine(RepeatExpressionMarker):
         # default text expression is coda
         self._textAlternatives = ['fine']
         self.setText(self._textAlternatives[0])
+        self._textJustification = 'right'
 
 
 
@@ -217,11 +217,15 @@ class RepeatExpressionCommand(RepeatExpression):
 class DaCapo(RepeatExpressionCommand):
     '''The Da Capo command, indicating a return to the beginning and a continuation to the end. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
     '''
-    def __init__(self):
+    def __init__(self, text=None):
         RepeatExpressionCommand.__init__(self)
         # default text expression is coda
         self._textAlternatives = ['Da Capo', 'D.C.']
-        self.setText(self._textAlternatives[0])
+        if text is not None and self.isValidText(text):
+            self.setText(text)
+        else:
+            self.setText(self._textAlternatives[0])
+
 
 class DaCapoAlFine(RepeatExpressionCommand):
     '''The Da Capo al Fine command, indicating a return to the beginning and a continuation to the :class:`~music21.repeat.Fine` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
@@ -229,11 +233,14 @@ class DaCapoAlFine(RepeatExpressionCommand):
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self):
+    def __init__(self, text=None):
         RepeatExpressionCommand.__init__(self)
         # default text expression is coda
         self._textAlternatives = ['Da Capo al fine', 'D.C. al fine']
-        self.setText(self._textAlternatives[0])
+        if text is not None and self.isValidText(text):
+            self.setText(text)
+        else:
+            self.setText(self._textAlternatives[0])
 
 
 class DaCapoAlCoda(RepeatExpressionCommand):
@@ -242,11 +249,14 @@ class DaCapoAlCoda(RepeatExpressionCommand):
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlCoda() 
     '''
-    def __init__(self):
+    def __init__(self, text=None):
         RepeatExpressionCommand.__init__(self)
 
         self._textAlternatives = ['Da Capo al Coda', 'D.C. al Coda']
-        self.setText(self._textAlternatives[0])
+        if text is not None and self.isValidText(text):
+            self.setText(text)
+        else:
+            self.setText(self._textAlternatives[0])
 
 
 class AlSegno(RepeatExpressionCommand):
@@ -255,10 +265,13 @@ class AlSegno(RepeatExpressionCommand):
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self):
+    def __init__(self, text=None):
         RepeatExpressionCommand.__init__(self)
         self._textAlternatives = ['al Segno']
-        self.setText(self._textAlternatives[0])
+        if text is not None and self.isValidText(text):
+            self.setText(text)
+        else:
+            self.setText(self._textAlternatives[0])
 
 
 class DalSegno(RepeatExpressionCommand):
@@ -267,10 +280,13 @@ class DalSegno(RepeatExpressionCommand):
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self):
+    def __init__(self, text=None):
         RepeatExpressionCommand.__init__(self)
         self._textAlternatives = ['Dal Segno', 'D.S.']
-        self.setText(self._textAlternatives[0])
+        if text is not None and self.isValidText(text):
+            self.setText(text)
+        else:
+            self.setText(self._textAlternatives[0])
 
 class DalSegnoAlFine(RepeatExpressionCommand):
     '''The Dal Segno al Fine command, indicating a return to the segno and a continuation to the :class:`~music21.repeat.Fine` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Dal Segno repeat not be repeated. 
@@ -278,10 +294,13 @@ class DalSegnoAlFine(RepeatExpressionCommand):
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self):
+    def __init__(self, text=None):
         RepeatExpressionCommand.__init__(self)
         self._textAlternatives = ['Dal Segno al fine', 'D.S. al fine']
-        self.setText(self._textAlternatives[0])
+        if text is not None and self.isValidText(text):
+            self.setText(text)
+        else:
+            self.setText(self._textAlternatives[0])
 
 class DalSegnoAlCoda(RepeatExpressionCommand):
     '''The Dal Segno al Coda command, indicating a return to the beginning and a continuation to the :class:`~music21.repeat.Coda` object. The music resumes at a second :class:`~music21.repeat.Coda` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Segno repeat not be repeated. 
@@ -289,10 +308,13 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlCoda() 
     '''
-    def __init__(self):
+    def __init__(self, text=None):
         RepeatExpressionCommand.__init__(self)
         self._textAlternatives = ['Dal Segno al Coda', 'D.S. al Coda']
-        self.setText(self._textAlternatives[0])
+        if text is not None and self.isValidText(text):
+            self.setText(text)
+        else:
+            self.setText(self._textAlternatives[0])
 
 
 
@@ -469,6 +491,11 @@ class Expander(object):
             return 'DalSegnoAlFine'
         else:
             raise ExpanderException('no repeat command found')
+    
+    def _getRepeatExpressionCommand(self, streamObj):
+        '''Get the instance found in this stream; assumes that there is one.
+        '''
+        return streamObj.flat.getElementsByClass('RepeatExpressionCommand')[0]
 
     def _daCapoIsCoherent(self):
         '''Check of a DC statement is coherent.
@@ -755,6 +782,7 @@ class Expander(object):
         # should already be a stream of measures
         capoOrSegno = self._daCapoOrSegno()
         recType = self._getRepeatExpressionCommandType() # a string form
+        recObj = self._getRepeatExpressionCommand(streamObj)
         jumpBack = self._getRepeatExpressionIndex(streamObj, recType)[0]
 
         # start position is dependent on capo or segno
@@ -792,7 +820,7 @@ class Expander(object):
         else: # no coda (fine or normal end), get start to end
             indexSegments.append([start, end])    
 
-
+        # process measures
         new = streamObj.__class__()
         # try to start from first number
         number = streamObj[0].number
@@ -800,19 +828,36 @@ class Expander(object):
             number = 1
 
         environLocal.printDebug(['_processRepeatExpressionAndRepeats', 'index segments', indexSegments])
+        # recType.repeatAfterJump
 
         # build segments form the source, copying as necessary, and 
         # expanding repeats
         for subCount, sub in enumerate(indexSegments):
-            # TODO: expand repeats when subCount is not 1
             # 1 is the second group, and is always pre coda
-
+            subStream = streamObj.__class__()
             # get all values inclusive for each range
             for i in range(sub[0], sub[1]+1):
+                # great a subgroup
                 m = copy.deepcopy(streamObj[i])
                 m.number = number
-                new.append(m)
+                subStream.append(m)
                 number += 1
+            if self._hasRepeat(subStream):
+                # if we are in the jump section, check setting of repeats after 
+                # jump; otherwise, take all repeats
+                if subCount == 1 and not recObj.repeatAfterJump:
+                    pass
+                else:
+                    subStream = self._processRecursiveRepeatBars(subStream)
+                    # update measure number from last option
+                    number = subStream[-1].number + 1 # add for next
+                # no matter what, always strip repeat bars
+                for m in subStream:
+                    self._stripRepeatBarlines(m, newStyle='light-light')
+
+            # add sub to new
+            for m in subStream:
+                new.append(m)
         # can strip all repeat expressions in place
         self._stripRepeatExpressions(new)
         return new
@@ -820,6 +865,8 @@ class Expander(object):
 
 
     def process(self):
+        '''Process all repeats. Note that this processing only happens for Measures contained in the given Stream. Other objects in that Stream are neither processed nor copied. 
+        '''
         if not self.isExpandable():
             raise ExpanderException('cannot expand Stream: badly formed repeats or repeat expressions')
 
@@ -830,7 +877,10 @@ class Expander(object):
             post = self._processRecursiveRepeatBars(self._srcMeasureStream)
         else: # we have a segno or capo
             post = self._processRepeatExpressionAndRepeats(
-                self._srcMeasureStream)
+                self._srcMeasureStream)        
+
+        # TODO: need to copy spanners from each sub-group into their newest conects; must be done here as more than one connection is made
+
         return post
 
 
@@ -1665,7 +1715,256 @@ class Test(unittest.TestCase):
         self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
 
 
+    def testExpandRepeatExpressionD(self):
+        import stream, note, repeat
 
+        # da capo al coda
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m2.append(repeat.Coda('to coda'))
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m3.append(repeat.DaCapoAlCoda())
+        m4 = stream.Measure()
+        m4.append(repeat.Coda())
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+        m5 = stream.Measure()
+        m5.repeatAppend(note.Note('b4', type='half'), 2)
+
+        s = stream.Part()
+        s.append([m1, m2, m3, m4, m5])
+        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        #s.show()
+        ex = Expander(s)
+        post = ex.process()
+        #post.show()
+        # three measure repeat
+        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
+
+
+    def testExpandRepeatExpressionE(self):
+        import stream, note, repeat
+
+        # dal segno simple
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.append(repeat.Segno())
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+        m3.append(repeat.DalSegno())
+
+        s = stream.Part()
+        s.append([m1, m2, m3, m4])
+        #s.show()
+        self.assertEqual(len(s.getElementsByClass('Measure')), 4)
+        #s.show()
+        ex = Expander(s)
+        post = ex.process()
+        #post.show()
+        # three measure repeat
+        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
+
+
+    def testExpandRepeatExpressionF(self):
+        import stream, note, repeat
+        # dal segno al fine
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.append(repeat.Segno())
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m3.append(repeat.Fine())
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+        m4.append(repeat.DalSegnoAlFine())
+        m5 = stream.Measure()
+        m5.repeatAppend(note.Note('b4', type='half'), 2)
+
+        s = stream.Part()
+        s.append([m1, m2, m3, m4, m5])
+        #s.show()
+        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        ex = Expander(s)
+        post = ex.process()
+        #post.show()
+        # three measure repeat
+        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4', 'E4', 'E4', 'G4', 'G4'])
+
+
+    def testExpandRepeatExpressionG(self):
+        import stream, note, repeat
+        # dal segno al coda
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.append(repeat.Segno())
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m2.append(repeat.Coda('to coda'))
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('e4', type='half'), 2)
+
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('g4', type='half'), 2)
+        m4.append(repeat.DalSegnoAlCoda())
+        m5 = stream.Measure()
+        m5.repeatAppend(note.Note('g4', type='half'), 2)
+        m6 = stream.Measure()
+        m6.append(repeat.Coda('CODA'))
+        m6.repeatAppend(note.Note('a4', type='half'), 2)
+        m7 = stream.Measure()
+        m7.repeatAppend(note.Note('b4', type='half'), 2)
+
+        s = stream.Part()
+        s.append([m1, m2, m3, m4, m5, m6, m7])
+        #s.show()
+        self.assertEqual(len(s.getElementsByClass('Measure')), 7)
+        ex = Expander(s)
+        post = ex.process()
+        #post.show()
+        # three measure repeat
+        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'E4', 'E4', 'G4', 'G4', 'E4', 'E4', 'A4', 'A4', 'B4', 'B4'] )
+
+    def testExpandRepeatExpressionH(self):        
+        # test one back repeat at end of a measure
+        from music21 import stream, bar, note
+
+        # simple da capo alone
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+
+        m3 = stream.Measure()
+        m3.leftBarline = bar.Repeat(direction='start')
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m3.rightBarline = bar.Repeat(direction='end')
+
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+        dcHandle = DaCapo('D.C.')
+        m4.append(dcHandle)
+
+        m5 = stream.Measure()
+        m5.repeatAppend(note.Note('b4', type='half'), 2)
+
+        s = stream.Part()
+        s.append([m1, m2, m3, m4, m5])
+        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        #s.show()
+        ex = Expander(s)
+        post = ex.process()
+        #post.show()
+        # three measure repeat
+        self.assertEqual(len(post.getElementsByClass('Measure')), 10)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4', 'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4', 'B4', 'B4'])
+
+        # test changing repeat after jump
+        dcHandle.repeatAfterJump = True
+        ex = Expander(s)
+        post = ex.process()
+        #post.show()
+        # three measure repeat
+        self.assertEqual(len(post.getElementsByClass('Measure')), 11)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4', 'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4', 'A4', 'B4', 'B4'])
+
+
+
+    def testExpandRepeatExpressionI(self):        
+        # test one back repeat at end of a measure
+        from music21 import stream, bar, note, repeat
+
+        # simple da capo alone
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m2.append(repeat.Coda('to coda'))
+
+        m3 = stream.Measure()
+        m3.leftBarline = bar.Repeat(direction='start')
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        dcHandle = repeat.DaCapoAlCoda()
+        m3.append(dcHandle)
+        m3.rightBarline = bar.Repeat(direction='end')
+
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+
+        m5 = stream.Measure()
+        m5.append(repeat.Coda())
+        m5.repeatAppend(note.Note('b4', type='half'), 2)
+
+        s = stream.Part()
+        s.append([m1, m2, m3, m4, m5])
+        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        #s.show()
+        ex = Expander(s)
+        post = ex.process()
+        #post.show()
+        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'B4', 'B4'] )
+
+
+    def testExpandRepeatExpressionJ(self):        
+        # test one back repeat at end of a measure
+        from music21 import stream, bar, note, repeat, instrument, spanner
+
+        # simple da capo alone
+        m1 = stream.Measure()
+        m1.append(repeat.Segno())
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m2.append(repeat.Coda('to coda'))
+
+        m3 = stream.Measure()
+        m3.leftBarline = bar.Repeat(direction='start')
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        dsHandle = repeat.DalSegnoAlCoda()
+        m3.append(dsHandle)
+        m3.rightBarline = bar.Repeat(direction='end')
+
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+
+        m5 = stream.Measure()
+        m5.append(repeat.Coda())
+        m5.repeatAppend(note.Note('b4', type='half'), 2)
+
+        s = stream.Part()
+        s.append([m1, m2, m3, m4, m5])
+        # add an insturment
+        s.insert(0, instrument.Trumpet())
+        s.insert(0, spanner.Slur(m1[1], m2[1]))
+
+        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+
+        #s.show()
+        #ex = Expander(s)
+        #post = ex.process()
+        post = s.expandRepeats()
+        #post.show()
+        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'B4', 'B4'] )
+        
+        # instrument is copied in Stream
+        self.assertEqual(post.getElementsByClass(
+            'Instrument')[0].instrumentName, 'Trumpet')
 
 
 
