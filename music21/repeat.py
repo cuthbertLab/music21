@@ -753,7 +753,6 @@ class Expander(object):
         streamObj 
         '''
         # should already be a stream of measures
-
         capoOrSegno = self._daCapoOrSegno()
         recType = self._getRepeatExpressionCommandType() # a string form
         jumpBack = self._getRepeatExpressionIndex(streamObj, recType)[0]
@@ -769,6 +768,7 @@ class Expander(object):
             end = self._getRepeatExpressionIndex(streamObj, 'Fine')[0]
         else:
             end = len(streamObj) - 1
+        environLocal.printDebug(['got end/fine:', end])
 
         # coda jump/start
         if recType in ['DaCapoAlCoda', 'DalSegnoAlCoda']:
@@ -788,8 +788,8 @@ class Expander(object):
         if recType in ['DaCapoAlCoda', 'DalSegnoAlCoda']:
             # if there is a coda, then start to coda jump, coda to end
             indexSegments.append([start, codaJump])    
-            indexSegments.append([codaStart, 0])    
-        else: # no coda, get start to end
+            indexSegments.append([codaStart, len(streamObj) - 1])    
+        else: # no coda (fine or normal end), get start to end
             indexSegments.append([start, end])    
 
 
@@ -798,6 +798,8 @@ class Expander(object):
         number = streamObj[0].number
         if number is None:
             number = 1
+
+        environLocal.printDebug(['_processRepeatExpressionAndRepeats', 'index segments', indexSegments])
 
         # build segments form the source, copying as necessary, and 
         # expanding repeats
@@ -1586,7 +1588,7 @@ class Test(unittest.TestCase):
         # test one back repeat at end of a measure
         from music21 import stream, bar, note
 
-        # a da capo al fine without a fine is not valid
+        # simple da capo alone
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
         m2 = stream.Measure()
@@ -1596,7 +1598,6 @@ class Test(unittest.TestCase):
         m3.append(DaCapo())
         m4 = stream.Measure()
         m4.repeatAppend(note.Note('a4', type='half'), 2)
-    
         s = stream.Part()
         s.append([m1, m2, m3, m4])
         self.assertEqual(len(s.getElementsByClass('Measure')), 4)
@@ -1605,8 +1606,64 @@ class Test(unittest.TestCase):
         post = ex.process()
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
 
+    def testExpandRepeatExpressionC(self):
+        import stream, note, repeat
+
+        # da capo al fine
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m2.append(repeat.Fine())
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m3.append(repeat.DaCapoAlFine())
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+        s = stream.Part()
+        s.append([m1, m2, m3, m4])
+        self.assertEqual(len(s.getElementsByClass('Measure')), 4)
+        #s.show()
+        ex = Expander(s)
+        post = ex.process()
         #post.show()
+        # three measure repeat
+        self.assertEqual(len(post.getElementsByClass('Measure')), 5)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4'] )
+
+
+
+    def testExpandRepeatExpressionD(self):
+        import stream, note, repeat
+
+        # da capo al coda
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4', type='half'), 2)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('e4', type='half'), 2)
+        m2.append(repeat.Coda('to coda'))
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g4', type='half'), 2)
+        m3.append(repeat.DaCapoAlCoda())
+        m4 = stream.Measure()
+        m4.append(repeat.Coda())
+        m4.repeatAppend(note.Note('a4', type='half'), 2)
+        m5 = stream.Measure()
+        m5.repeatAppend(note.Note('b4', type='half'), 2)
+
+        s = stream.Part()
+        s.append([m1, m2, m3, m4, m5])
+        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        #s.show()
+        ex = Expander(s)
+        post = ex.process()
+        #post.show()
+        # three measure repeat
+        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
+
 
 
 
