@@ -1813,7 +1813,7 @@ class Test(unittest.TestCase):
         m2.append(repeat.Coda('to coda'))
         m3 = stream.Measure()
         m3.repeatAppend(note.Note('e4', type='half'), 2)
-
+        
         m4 = stream.Measure()
         m4.repeatAppend(note.Note('g4', type='half'), 2)
         m4.append(repeat.DalSegnoAlCoda())
@@ -1824,7 +1824,7 @@ class Test(unittest.TestCase):
         m6.repeatAppend(note.Note('a4', type='half'), 2)
         m7 = stream.Measure()
         m7.repeatAppend(note.Note('b4', type='half'), 2)
-
+        
         s = stream.Part()
         s.append([m1, m2, m3, m4, m5, m6, m7])
         #s.show()
@@ -1889,29 +1889,30 @@ class Test(unittest.TestCase):
         # simple da capo alone
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
-
+        
         m2 = stream.Measure()
         m2.repeatAppend(note.Note('e4', type='half'), 2)
         m2.append(repeat.Coda('to coda'))
-
+        
         m3 = stream.Measure()
         m3.leftBarline = bar.Repeat(direction='start')
         m3.repeatAppend(note.Note('g4', type='half'), 2)
         dcHandle = repeat.DaCapoAlCoda()
         m3.append(dcHandle)
         m3.rightBarline = bar.Repeat(direction='end')
-
+        
         m4 = stream.Measure()
         m4.repeatAppend(note.Note('a4', type='half'), 2)
-
+        
         m5 = stream.Measure()
         m5.append(repeat.Coda())
         m5.repeatAppend(note.Note('b4', type='half'), 2)
-
+        
         s = stream.Part()
         s.append([m1, m2, m3, m4, m5])
         self.assertEqual(len(s.getElementsByClass('Measure')), 5)
         #s.show()
+        #s.expandRepeats().show()
         ex = Expander(s)
         post = ex.process()
         #post.show()
