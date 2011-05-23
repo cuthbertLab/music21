@@ -563,6 +563,7 @@ class Expander(object):
     def _hasRepeat(self, streamObj):
         '''Return True if this Stream of Measures has a repeat pair left to process.
         '''
+        #environLocal.printDebug(['hasRepeat', streamObj])
         for i in range(len(streamObj)):
             m = streamObj[i]
             lb = m.leftBarline
@@ -1967,6 +1968,23 @@ class Test(unittest.TestCase):
         self.assertEqual(post.getElementsByClass(
             'Instrument')[0].instrumentName, 'Trumpet')
 
+
+
+    def testExpandRepeatsImportedA(self):
+        from music21 import corpus
+        s = corpus.parse('banjoreel')
+        self.assertEqual(len(s.parts), 1)        
+        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 11)        
+        self.assertEqual(len(s.parts[0].flat.notes), 58)        
+
+        bars = s.parts[0].flat.getElementsByClass('Barline')
+        self.assertEqual(len(bars), 3)        
+
+        s2 = s.expandRepeats()    
+        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 21)        
+
+        self.assertEqual(len(s2.parts[0].flat.notes), 111)        
+    
 
 
 if __name__ == "__main__":
