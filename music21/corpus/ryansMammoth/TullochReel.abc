@@ -1,0 +1,22 @@
+X:1
+T:Tulloch -- Reel
+R:reel
+B:Ryan's Mammoth Collection
+N:249
+N:the key is A mixolydian but the book shows 3 sharps and
+N:puts each G as neutral
+O:SCOTCH.
+Z:Contributed by Ray Davies,  ray:davies99.freeserve.co.uk
+M:C|
+L:1/8
+K:A
+uf"^Segno"|\
+"tr"vTe2 (Ac/d/) "4"ecAa | "tr"Te2 (AB/c/) dB=GB | \
+"tr"Te2 (Ac/d/) "4"eAc"4"e | (BE) (cd/"4"e/) dB=GB |
+"tr"Te2 (Ac/d/) "4"ecAa | "tr"Te2 (AB/c/) dB=GB | \
+"tr"Te2 (Ac/d/) "4"eAc"4"e | (BE) (cd/"4"e/) dB=GB |]
+"tr"(TcA) (cd/"4"e/) "tr"(TcA)(AB) | "tr"(TcA) (cd/"4"e/) dB=GB |\
+"tr"(TcA) (cd/"4"e/) cAcA | (BE) (cd/"4"e/) dB=GB |
+"tr"(TcA) (cd/"4"e/) "tr"(TcA)(AB) | "tr"(TcA) (cd/"4"e/) dB=GB |\
+"tr"(TcA) (cd/"4"e/) "tr"(TcA)"tr"(Tcd/e/) | \
+(BE) (cd/"4"e/) dB=GB "^Segno"|]

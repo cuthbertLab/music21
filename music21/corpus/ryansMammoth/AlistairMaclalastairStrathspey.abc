@@ -1,0 +1,18 @@
+X: 1
+T: ALISTAIR MACLALASTAIR -- STRATHSPEY
+B: Ryan's Mammoth Collection of Fiddle Tunes
+R: strathspey
+M: C
+L: 1/8
+Z: Contributed 20000516201603 by John Chambers jchambers:casc.com
+K: Gm
+ud "S"\
+| (vB<G) (G>.F) (D<G) (G>.A) | "SEGUE"B>AG>A B>cd.c \
+| (B<G) G>F (D<G) G>d | g>d (d/c/B/A/) G2 G>d |
+| (vB<G) G>F (D<G) G>A | B>AG>A B>cd.c \
+| (B<G) G>F (D<G) G>d | g>d (d/c/B/A/) G2 G H|]
+ud \
+| (vd<g)(g>.f)  (d<g)(g>.f) | (d<g)(g>.a) "SEGUE"b>ag>a \
+| b>ga>^f g>ed>c | B>dc>A G2 G>d |
+| (d<g) g>f (d<g)f>f | (d<g)g>a b>ag>a \
+| b>ga>^f g>d=f>d | (c<F)F>A  c2 "D.S."(d>c) "Segno"|]

@@ -1,0 +1,1779 @@
+% Tunes from Bruce and Stokoe, "Northumbrian Minstrelsy", 1882
+% Jack Campin  <http://www.campin.me.uk/>
+% v 1.0, May 2007
+
+% ---- Song tunes ------------------------------------------------------
+
+% I have laid out all the songs so that each line of ABC corresponds
+% to a line of text.  This makes for rather short lines in the staff
+% notation, so I've combined some of them with continuation marks (\)
+% for a more conventionally compact appearance.  This is so that you
+% can add your own "w:" lines for the words without my layout getting
+% in the way - just remove the backslashes.
+% Where lines are very short, I've sometimes used leading whitespace
+% for better visual flow and to align parallel phrases.
+
+X:1
+T:Chevy Chase 1
+T:Flying Fame
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+d|c2B A2D|F2G A2                 \
+                B|c2d e2d|c3- c2
+c|B2A B2c|ded A2                 \
+                B|c2d B2A|G3- G2|]
+
+X:2
+T:Chevy Chase 2
+T:In Peascod Time
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+D|G2A B2 G|B2A G2                    \
+                 B| c2B  A2^G|A3- A2
+A|c2c d2 c|B2A G2                    \
+                 B|(BAG) G2 F|G3- G2|]
+
+X:3
+T:Chevy Chase 3
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+Q:"Slowly and Smoothly"
+K:G
+zA|BA G3 A| BA G3 \
+ B|ce d3 B|(B2 A2)
+zB|ce d3 B| dB G3 \
+ d|eg B3 A| G4 |]
+
+X:4
+T:The Bewick and the Graeme
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:F Mixolydian
+z2|D E  F2   B B |(G```F) (GA) HB>
+ B|D E  F2   B2  |(B/c/d) He2  Hc>
+ c|d f (ed)  c B |(G```F)  G A  B>
+ B|d f (ed) (c`B)| G>  F   F2   |]
+
+
+X:5
+T:The Brave Earl Brand and the King of England's Daughter
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+G2 |A A A A G2 G G| A2   A2  G2
+z2 |G2  B B d2 d d| e4       d2
+z d|e e e e d2 d c|(BA) (AG) E2
+G E|D4      G2 B2 | A4       G2|]
+
+X:6
+T:Hughie the Graeme
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:F# Minor
+z2   | C F  F2  G F |E     F G2 \
+G  B |(A`G) F2 (F`G)|c     B e3
+   e | f d  e3    c |B/ B/ G F2 \
+(G`B)| c f  e3    c |B     G F3|]
+
+X:7
+T:Jock o' the Syde
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:A Minor
+E    |A2  A  G2   E|c c c  B2
+B/ B/|A A A  c c  c|B2  A (Bd)
+d    |d d d  d2   A|c2  c  c2
+B    |A A A (A`G) E|E G G (GA)
+B    |A A A (A`G) E|c c A (BA)|]
+
+X:8
+T:The Death of Parcy Reed
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+ G2  | B2   A2 (GA) B2 |(AB) (AG) E2
+(D>E)| G3    A  G2 (AB)| c2   e2  d3
+   d |(ed) (eg) d2 (AB)|(cB) (AG) E2
+(DB,)| D2   D2  d3   c | B2   A2  G2|]
+
+X:9
+T:The Outlandish Knight
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+Q:3/8=72
+K:Eb
+B|B c B (e`f) e|d B B B2                            \
+                         B    |B c B  e d  c|B3- B2
+B|B c B  e f  e|d B G A2                            \
+                        (G/A/)|B c B (A`F) D|E3- E2|]
+
+X:10
+T:The Fair Flower of Northumberland
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:D
+D    | F2  A    (A`F) A|(d`c) B A3 |\
+       d e f     B2   A| B d  d d2
+A    |(de) f     B B  A|(A`B) d e2  \
+f/ e/| d B A ({c}d) F F| E2   D D2|]
+
+X:11
+T:The Laidley Worm o' Spindleston Heugh
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:A Minor
+E2|({E}A2) A2  A2 E2 |A2 A A A2 E2 |\
+       G2  B c d2 c2 |B6        
+z2|    E2  E E E2 D D|E2 G2 (E2 D2)|\
+       E2  A A B2 G2 |A6          |]
+
+X:12
+T:Binnorie; or, The Cruel Sister
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G Minor
+ D2  |G2  G2   D2  D2 | F2   F G  A3 \
+  A  |G2  F2   D2  F2 | G4        G2
+(G`A)|B2 (A`G) c2  c2 |(de) (f`e) d2 \
+ d c |B2  A G (FG) A B| G4        G2|]
+
+X:13
+T:Lord Beichan
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:G
+  D |G A B2 (AG)|c  B A3 \
+  D |G A B2  c2 |d ^c d3
+  D |B c d2  c2 |A  G F2 \
+(GA)|B c d2  c2 |A  G G3|]
+
+X:14
+T:Derwentwater's Farewell
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:G
+D2|D> E G2 G2|A> B  D3                  \
+                       B|c> B A3  G|E4
+G2|D> E G2 G2|A> B  D3                  \
+                       B|c> B c2 d2|e4
+e2|d> B A2 G2|c> d  e3                  \
+                       e|d> B A3  G|E4
+G2|D> E G2 G2|A> B Hc3                  \
+                       e|d B  A3  G|G4|]
+
+X:15
+T:Derwentwater
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+(GA)|B2 d2 c2 B B|A2 G2 A2                       \
+                          (GA)|B2 d2 e2 A2 |d4 z2
+(GA)|B2 d2 c2 B2 |A2 G2 A2                       \
+                          (GA)|B2 A2 d2 F2 |G6 |]
+
+X:16
+T:Lay the Bent to the Bonny Broom
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+Q:"Slowly"
+K:G Minor
+D B A|G G A B c B|A4\
+                     B c|d2  d> c d f|d3
+d d c|B2  d2  c B|A4\
+                     G A|c B A G  A B|G3|]
+
+X:17
+T:Whittingham Fair
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:E Minor
+   E2   E  G A  B| A B  G   F3 |\
+  (E`F) E (G`A) B| B c  A  HB2
+e| e2   B (B`A) G| A B  d  (FE) \
+D| E2   E  G A  B|(A`F) G   E3|]
+
+X:18
+T:Blow the Winds, I-Ho!
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:D Minor
+ c2 |A2 d2 d2 c2 |(e2 d2)                       \
+                         d2 A2|c2 d2 A2 F2|G6
+(FG)|A2 d2 d2 c c| e2 d2 d2                     \
+                            A2|c2 A2 G2 E2|c6 ||
+(BG)|F2 D2 D2 E2 | G2 A2 B2                     \
+                            G2|F2 D2 D2 E2|G4 z2
+ z2 |A2 d2 d2 c2 | e2 d2 d2                     \
+                            B2|c2 A2 G2 E2|D6 |]
+
+X:19
+T:The Keach i' the Creel
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+K:D
+(D/`E/)|F    d c  d| B  A     A
+ A     |F    d c  d| B3
+ D/ E/ |F/F/ d c  d| B (B/A/) F
+ D/ E/ |F/F/ D B, C|(D>```E)  F>
+ E     |F/F/ D B, C| D3       |]
+
+X:20
+T:O I Hae Seen the Roses Blaw
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+D| G2   G (BA)  B| c2A F2
+D|(G>A) G  B2   c| d2g d2
+c| B2   c  d2   e|=f2d B2
+G|(d>e) d (c>B) A| G3  G2||
+d| g2   d  B2   G| c2A F2
+D| g2   d  B2   c| e2g d2
+c| B2   c  d2   e|=f2d B2
+G|(d>e) d (cB)  A| G3  G2|]
+
+X:21
+T:O the Oak and the Ash and the Bonny Ivy Tree
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G Minor
+ D2  | G2 G A   B2  A G| A2  A B  c2
+(B`A)| G2 G A   B2  A G|^F2  d>^c d2
+(d`e)|=f2 d c   B2  A B| c2  A G  F2
+(G`A)| B2 A G (^FG) A A| G2  d>^c d2
+ d e |=f2 d c   B2  A B| c B A G  F2
+(G`A)| B2 A G (^FG) A A| G2 (G^F) G2|]
+
+X:22
+T:Bonny at Morn
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/4
+L:1/8
+K:G Minor
+A2|(d3    e)  d c  d2 G2 (AB)|(c3  B) A G (F2 G2)
+A2| d3    e  (d`c) d2 G2  A2 | c2 A2  F2   G4
+A2|(d3    e)  d c  d2 G2 (AB)|(c3  B) A G (F2 G2)
+A2|(GF) (GA) (B`c) d2 g2  f2 | d2 f2  A2   G4 ||
+z2| G2   g2   g2  (G4     B2)| A2 f2  f2   F4
+A2| G3    A  (Bc)  d2 g2  f2 | d2 f2  A2   G4 |]
+
+X:23
+T:The Water of Tyne
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:D
+ A    |A F F  A F  E | D D>````D  D2
+(E/F/)|G G F  E F  A |(B`A) B/ B/ B2
+(F/E/)|D d> d d e>  f| d A> ```B  B2
+(c/d/)|A F A  A> F E | D D> ```D  D2|]
+
+X:24
+T:The Willow Tree, or Rue and Thyme
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:A Minor
+(c`B)|A2 (G`E) D2 (EG)| G4       z2 \
+ E2  |c2  c2   d2  e2 | A4       z2
+(c`d)|e2  c e  d2 (AB)|(cB) (AG) E2 \
+ c B |A2 (A`c) D2 (EG)| A4       z2|]
+
+X:25
+T:Sair Fyel'd, Hinny
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+Q:1/4=80
+K:C Minor
+P:Chorus
+E2  (DE)  C C |\
+B2  (BA) (G`e)|\
+E2  (DE)  C C |\
+e f (dB)  c2 ||
+P:Verse
+G d  e  f  d B|\
+G`d  e  f  d2 |\
+G d  e  f  d B|\
+c e (d>=B) c2|]
+
+X:26
+T:I Drew My Ship Into a Harbour
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:Ab
+E2|E E A2 E2 |F D E2 HA \
+ A|d f e2 c A|d c d2
+c2|d f e2 c A|c A F2 HE \
+ G|A A d2 c A|B B A2 |]
+
+X:27
+T:The Miller and his Sons
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:D
+(FE)|D2 D2 d2 (AG)|F F E2 D2
+ c2 |d2 d2 e2  A2 |B2 ^G2 A2
+(de)|f2 e2 d2  D2 |F2  A2 d2
+(dc)|B2 B2 B2 (dB)|A2  B2 F2
+(DE)|F2 A2 d2 (AG)|F2  E2 D2|]
+
+X:28
+T:The Shoemakker
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+K:Bb
+ F    | F B  c  e    |d B  c     \
+ F    | F B  c  d    |B> c B F/
+   F/ | F B  c  e    |d B  c     \
+(d/e/)| f> d e>   c  |B2   A F||
+       _A2   A (G/F/)|G G  G F/  \
+   G/ |_A A  A  G    |B c  B G/
+   G/ |_A A  A (G/F/)|G G  G     \
+(F/G/)| F B  c  e    |B2   A F|]
+
+X:29
+T:My Love is Newly Listed
+T:The Snows They Melt the Soonest
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:E Minor
+E>`F |G>BB^c  d<BBA | GE````E^D E2 z
+ E/F/|G>BB^c  d>de>d|^cA````B^G A2 z
+ F   |GB`B>^c d>de>d|^cA````A`c d2 z
+=c   |BE`GA   B<dc>A| BG/E/ E>E E2|]
+
+X:30
+T:Broom, Green Broom
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+D|G G G (B`A) G| G B c   d2
+B|c c c  A G  A| D2  A   A2
+D|G G G (B`A) B| G B d   d2
+g|f e d  A d ^c| d3-     d2
+d|g f g (d`c) B| e c  A (GF)
+D|G G G (B`A) B|(G`B) d Hg2
+e|d e d (c`B) A| G3-     G2|]
+
+X:31
+T:O the Bonny Fisher Lad
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+Q:1/4=100
+K:B Minor
+P:Chorus
+z|A F d B A  F  G \
+E|A F d B A  F  B2|
+  A F d B A  F  G \
+E|F E D E F ^A HB|]
+P:Verse
+B|c e d f F  A  G \
+E|c e d f F ^A  B
+B|c e d f F  A  G \
+E|A F D E F ^A  B||
+
+X:32
+T:The Hexhamshire Lass
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/4
+L:1/8
+K:D
+P:Verse
+     d2  c d  B2  G F  (E2 D2) |\
+     d2  c d  B2  A d   e2 E2  |
+     d2  c d  B2  A F   E2      \
+(FA)|B2 (A`c) d2 (A`F) (E2 D2)||
+P:Chorus
+     G2  B G  F2 (A`F) (E2 D)   \
+  D |G2  B G  F2  A B (=c2 E2) |
+     F2  B G  F2 (A`F)  E2      \
+(FA)|B2 (A`c) d2 (A`F) (E2 D2)|]
+
+
+X:33
+T:The Mode o' Wooing
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+N:original for the tune of The Blackleg Miner?
+M:C
+L:1/8
+Q:1/4=100
+K:D Minor
+A|c c =B A B c d                      \
+                 d|e d  =B    A G A D>
+D|c c =B A B c d                      \
+                 d|e A (=B/A) G A B c
+E|D D  E G A2  A                      \
+                 G|E2    e2     E2  G
+G|D D  E G A2  d                      \
+                =B|c A   G    E D3 |]
+
+X:34
+T:The Northumberland Bagpipes
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+ d|B2  G2   G2  G2  | D2    D D  A3 \
+ d|B2  G G  G2  G G |(G`A)  B G  c3
+ c|c2  d c  B2  c B | A2    B A  F3 \
+ F|G3    G  E3    F | F3      G  G3||
+ g|g2  G2   g2  G2  |(g`f) (e`d) g2 \
+G2|G2  A G  F2 (G`F)| E E   E2   c3
+ c|c2  d c  B2 (c`B)| A2   (B`G) F3 \
+ F|G3    G  E2  E F | F3      G  G3||
+ g|g2  G2   g2  G G | g f  (e`d) g2 \
+G2|G2 (A`G) F2  G F | E E   E2   c3
+ c|c2  d c  B2 (c`B)| A2   (B`G) F3 \
+ F|G3    G  E2  E F | F3      G  G3|]
+
+X:35
+T:Durham Old Women
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+N:the first half does not make any sense to me at all;
+N:this is possibly one of the book's editing screwups
+M:9/8
+L:1/8
+K:G
+c3  GBG          dGA|d3  GBG          AcA |
+c3  GBG          dGA|c3  GBG          AcA:|
+g2d e/f/g/f/e/d/ gdB|g2d e/f/g/f/e/d/ fcA |
+g2d e/f/g/f/e/d/ dBc|ecd f2c          AcA:|
+
+X:36
+T:Aboot the Bush, Willy
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/4
+L:1/4
+K:Bb
+c|d B c A F c|d B c A2  \
+c|d B c A F f|e c A B2||
+c|d e f A F c|d e f A2  \
+c|d e f A F f|e c A B2|]
+
+X:37
+T:Christmas Day in the Morning
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+  G2 G G2e|d2 c  B3 |                   \
+                     A>Bc B2G|A>Bc  B3 |
+  G2 G G2e|d2 c  B2                     \
+                   d|edc  BAG|A3    G2||
+d|B>AB G2d|B>AB  G2B|                   \
+                     c>Bc A2B|c>Bc  A2c|
+  B>AB G2d|B>AB HG2                     \
+                   d|edc  BAG|A3    G2|]
+
+X:38
+T:Elsie Marley
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:Eb
+P:Chorus
+   G F  G  E2   E| E2   e   e B      \
+A|(G`F) G  E2   E| F2  _d   d A
+F|(G`F) G  E E  E|(e`f) e   e`B      \
+A| A f  A  G e  G| F2  _d  (d`A) HF |]
+P:Verse
+   G2   A  B2   B|(B`c) d  (e`B)     \
+A| G2   A  B2   B|(FG)  F (_d`A)
+F| G2   A  B2   B|(Bc)  d  (e`B)     \
+G|(A`f) A (G`e) G| F2  _d  (d`A``HF)||
+
+X:39
+T:Bobby Shaftoe
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+P:ABBA
+K:Bb
+P:A
+B B B e|d f (dB)|                 \
+                 F F F B|A c (AF)|
+B A B e|d f (dB)|                 \
+                 c e c A|B2   B2||
+P:B
+d f d B|d f  d2 |                 \
+                 c e c A|c e  c2 |
+d f d B|d f  d2 |                 \
+                 c e c A|B2   B2|]
+
+X:40
+T:Up the Raw
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:Eb
+ E2      G  A3     |G2  B F3  |\
+(E`F)    G (A`B) c |B2  G E3  |
+ E E     G  A A2   |G G B F F2|\
+ E F     G  A B  c |B2  G E3 |]
+P:Verse
+_d d     B (c2   e)|F F E F A2|\
+_d d     B  c2   e |G2  B E3  |
+_d d     B  c2   e |F F E F A2|\
+_d d/ d/ B  c2   e |G G B E3 |]
+
+X:41
+T:Dol-Li-A
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+Q:1/4=80
+K:G Minor
+ G G A B  c A G2|                     \
+                 (B`c)  d2  (B`c) d2 |\
+ G2  A B  c A G2|                     \
+                 (B`c)  d2   G4     ||
+ e2  d c  d B G2|                     \
+                  B2    d z  B2   d z|\
+ e2  d c  d B G2|                     \
+                 (B`c) (d^F) G4     |]
+
+X:42
+T:Buy Broom Buzzems
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:G
+G B d e c A|            \
+            G B d e c2 |\
+G B d e c A|            \
+            B G G E c2||
+A2  A2  F D|            \
+            G G G B c2 |\
+A2  A G F D|            \
+            G B c A G2|]
+
+X:43
+T:A U Hinny Burd
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+Q:1/4=100
+K:C
+G| c2   e c|B2  d2|                  \
+                   G2 (B`c)|d g  B
+G| c c  e c|B2  d2|                  \
+                   G2 (A`B)|c3     ||
+c|(f`e) d f|e e c2|                  \
+                   G2 (B`c)|d g (BG)|
+   f e  d f|e e c2|                  \
+                   G2 (A`B)|c3     |]
+
+
+X:44
+T:Ca' Hawkie Through the Water
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+K:G Minor
+P:Chorus
+B2  B d|c2  c e|                              \
+                 B2   B  d|(c/B/) (A/G/) F A |
+B B B d|c2  c                                 \
+              e| d g  g ^f| g      G     G G|]
+P:Verse
+f d d B|c d e2 |                              \
+                 f d  d  B| c      A     A F |
+f d d B|c d e                                 \
+              e|(d`g) g ^f| g      G     G G||
+
+X:45
+T:The Anti-Gallican Privateer
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+N:the printed version has apparently nonsensical segno and repeat
+M:6/8
+L:1/8
+K:G
+B|d2 B G A B|c2 A F2                           \
+                     A    |d2 B G2  E|F2 A d2||
+B|d2 d d2  d|e2 f g2                           \
+                     f/ e/|d2 B c B A|G2 G G3 |
+A2 B c3     |B2 d g2                           \
+                     f/ e/|d2 B c B A|G2 G G2|]
+
+X:46
+T:Adam Buckham, O!
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:D
+G|     F A (A`c) (d`A)                              \
+                       (AF)|     G B  B c  d3
+z|     c e  e f  (g`e) (ed)|                        \
+                                 c A  B c  d3     ||
+z|({de}f2)  e d   c A  (Ac)|                        \
+                            ({Bc}d2)  c B  A F (FA)|
+  ({GA}B2)  A G   F A  (dA)|                        \
+                                 B g (e`c) d2     |]
+
+X:47
+T:Captain Bover
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:G
+   G2    F> G     A2  |                        \
+                       (B>d) (c/B/) (A/G/) F D|
+   G2    F> G     A2  |                        \
+                       (B>d) (d/c/) (A/F/) G2||
+   B> d  d> e     c  A|                        \
+                        B G  (c/B/) (A/G/) F D|
+   B> d  d> e     c  A|                        \
+                        B G  (d/c/) (A/F/) G2 |
+   B> d =f (e/d/) c  A|                        \
+                        B G  (c/B/) (A/G/) F D/
+D/|G> G  F  G     A>                           \
+                     G| B d  (d/c/) (A/F/) G2|]
+
+X:48
+T:Here's the Tender Coming
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G Dorian
+c2 c A2 c  F2 G|                \
+                A2 d  d2 A  c3 |
+c3  (A2`G) F2 G|                \
+                A2 c  d2 A  G3||
+F2 e f2 f  e2 c|                \
+                f2 d (c2`A) c3 |
+F2 A f2 f  e2 c|                \
+                f2 d  c2 A  G3|]
+
+X:49
+T:Liberty for the Sailors
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+N:the words are not printed as an underlay
+N:and the tune doesn't quite fit
+M:6/8
+L:1/8
+K:D
+g|f2e f2e|dcd A2=c|BGB AFA|GEG F2
+D|f2e f2e|dBd A2=c|BAG F2D|E3  D2 |
+F|DFA AFD|DFA B2 A|Ace ecA|Ace f2
+g|afd BdB|ecA AB`c|dBG F2D|E3  D2|]
+
+X:50
+T:The Sailors are All at the Bar
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+N:the words are not printed as an underlay
+N:and the tune doesn't quite fit
+M:9/8
+L:1/8
+K:G
+BGB AFA  G2B|AcA FAF AcA |
+BGB AFA  G2c|def gdc BAG||
+F2f ege Tf3 |cde fcB AGF |
+G2g ege Tg3 |def gdc BAG|]
+
+X:51
+T:The Twelve Days of Christmas (1)
+T:The first day
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+N:last note printed as G6
+M:2/4
+L:1/8
+K:G
+D|G2  G A |(G`F) E D |G G B G|d3
+F|G2 (B`d)| c A (G`F)|G3|]
+
+X:52
+T:The Twelve Days of Christmas (2)
+T:the twelfth day
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+K:G
+  D|G2  G A |(G`F) E D |G G B G|Hd4
+    c2  A c | B G  z2  |         \
+    c c A c | B G  z2  |         \
+    c2  A c | B G  z2  |
+    c2  A c | B G  z2  |         \
+    c2  A c | B G  z2  |         \
+    c2  A c | B G  z2  |
+    c2  A c | d2  Hd2  |         \
+    G2  B2  | E2   z2  |         \
+    F2  A F | D2   z2  |         \
+    G2  B2  | D2   z2  | 
+    F2  A F | D2                 \
+E F|G2 (B`d)| c A (G`F)|G3   |]
+
+X:53
+T:Maw Canny Hinny
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+Q:1/4=80
+K:Eb
+P:Chorus
+     B2      B B (G`E)   |E2  A c B B/ \
+  B/|B2      B B (G`E)   |E2  A c F2 |
+     B B     B B (G`E)   |E2  A c B B| \
+     B B     B B (G`E)   |E E A c F ||
+P:Verse
+E   |E E/ E/ e e  d B    |e2  c c B2 | \
+     E E/ E/ e2   d B/ B/|e c B G F2||
+
+X:54
+T:Robin Spraggon's Old Grey Mare
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:C
+    C|C C c  B2  A|(G2  F) E2 G|F2 E D2 C|c3- c2
+    C|C2  c  B2  A| G2  F  E2 G|F2 E D2 C|c3- c2||
+    G|c2  d  e2  f|(dB) c  A2 G|c2 B A2 G|G3
+G G G|g2  e (cd) e| f2  d HB2 B|c2 E D2 B|c3- c2|]
+
+X:55
+T:The Sword Dancers' Song
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+Q:"Andantino"
+K:G Mixolydian
+d2|e2 c2 d2 B2|G6 G2|B2 d2 f2 f2|c6
+B2|c3 d  e g3 |d6 B2|G2 B2 c2 A2|G6|]
+
+X:56
+T:Kitty Bo-Bo
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+N:sword dance tune, not a song
+M:3/4
+L:1/8
+K:G
+gf`ed g/f/e/d/|B2 G2 B2|gf`ed g/f/e/d/|A2 F2 A2:|
+GB`dB`d```c   |B2 G2 B2|GB`dB`c```A   |A2 F2 A2:|
+B2 Gc`B```A   |B2 G2 B2|B2 Gc`B```G   |A2 F2 A2:|
+
+X:57
+T:The Keel Row
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+K:G
+P:Verse
+c| B2   G> B|c2 A> c| B2    G> B|(AF) D
+c| B2   G> B|c2 A> c| B> G  A> F| G3   ||
+P:Chorus
+z|(B>d) d> g|e2 d> c| B2    G> B|(AF) D2|
+  (B>d) d> g|e2 d> c|(B>`G) A> F| G3   ||
+c| B2   G> B|c2 A> c| B2    G> B|(AF) D2|
+   B2   G> B|c2 A> c|(B>`G) A> F| G3   |]
+
+
+% ---- Pipe tunes ------------------------------------------------------
+
+% I've laid these out somewhat like the songs, putting phrases on
+% single lines.  In some cases I've already put the continuation
+% marks in, or split lines, to get them on A4 paper in portrait
+% format at a size I can read easily myself.
+
+X:58
+T:Chevy Chase
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+Q:"Slowly and Smoothly"
+K:G
+zA|BA G3 A|BA G3 B|ce d3 B|(B2 A2)
+zB|ce d3 B|dB G3 d|eg B3 A| G4 |]
+
+X:59
+T:Coquetside
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+edBG Be      TB2|ed```````BG       Bg TA2 |\
+edBG GB```````gd|eg```````ef       gB TA2:|
+BgBe g/f/e/d/ gd|Bg```````Bg       eg TA2 |\
+BgBe g/f/e/d/ gd|e/f/g/f/ g/f/e/d/ gB TA2:|
+
+X:60
+T:Wylam Away
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+e/f/|gdB    gGB   |gdB    A2e/f/|gdB    gGB   |gdB    G2:|
+e   |dB/c/d dB/c/d|dB/c/d A2e   |dB/c/d dB/c/d|dB/c/d G2:|
+c   |BAG    edB   |gdB    ABc   |BAG    edB   |gdB    G2:|
+
+X:61
+T:Cockle Geordie
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+K:F
+fd`eg   |fd A2|fd`eg   |fd G2 |\
+fd`eg   |fd A2|fd`eg   |fd G2:|
+FG AB/c/|dc A2|FG AB/c/|dc G2 |\
+FG AB/c/|dc A2|FG AB/c/|dc G2:|
+
+X:62
+T:I Saw My Love Come Passing By Me
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/16
+K:G
+ef|g2G2 BcdB g4   d2ef|g2G2 BcdB f4   A2ef |
+   g2G2 BcdB B2G2 BcdB|cdec BcdB ABcA efge:| 
+   g2d2`g2B2 g2d2 efge|g2d2`g2B2 g2A2 efge |
+   g2d2`g2G2 g2G2 BcdB|cdec BcdB ABcA efge:|
+
+X:63
+T:Jockey Lay Up In The Hay Loft
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+GBG    GBG    F2D| GBG    G2B cAF |\
+GBG    GBG    F2D|=FGA   =f2d cAF:| 
+B/c/dB A/B/cA B2G| B/c/dB cAd cAF |\
+B/c/dB A/B/cA B2G|=FGA   =f2d cAF:|
+
+X:64
+T:Felton Lonnin'
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+d|e2c dBG|TB2G  GBd|e2c dBG|Tc2A  Acd|\
+  e2c dBG| B2G  GAB|cec BdB| cAA  Ac:|
+d|efg gfe| d<gB GBd|efg gfe| e<aA Acd|\
+  efg gfe| def  gdB|cac BgB| cAA  Ac:|
+
+X:65
+T:Stay a Wee Bit, Bonnie Lad
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:D
+   DFAF dFE2|DFAF BABd |\
+   GeFd eFEF|DFAd BABd::\
+   adab afdf|
+             adab abaf |\ 
+[1yadab afdf|dABA dABd:|\
+[2ygbaf edef|dABA dABd|]
+
+X:66
+T:The Broken-Legged Chicken
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:G
+(3efg BGTB2|Gg```````ga```````ge|(3efg BGTB2|Ga```````ag```````fd |
+(3efg BGTB2|A/B/c/d/ e/f/g/a/ ge|(3efg BGTB2|A/B/c/d/ e/f/g/e/ fd:|
+(3efg dg`Bg|Gg```````ga```````ge|(3efg dg`Bg|Aa```````ag```````ge |
+(3efg dg`Bg|A/B/c/d/ e/f/g/a/ fd|(3efg dg`Bg|A/B/c/d/ e/f/g/e/ fd:|
+
+X:67
+T:The Bonny Pit Laddie
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+G|cec TB2G|cec dBG|Td3 TB2
+G|cec TB2G|cec dBG| c3  G2:|
+G|cde  fdf|ece dBG| c3  G2
+G|cde  fdf|ece dBG|Tc3  G2:|
+
+X:68
+T:Dorrington Lads
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+e|dGB dB/c/d/B/ gdB         |dGB        dB/c/d/B/ cAe      |\
+  dGB dB/c/d/B/ gdB         |c2A        AB/c/d/B/ cA      :|
+e|d2g feg       fdg         |feg        fdf       ec/d/e/c/|\
+  d2g feg       fdf         |c2A        Ac/d/e/c/ cAe      |
+  dBg fdg       f/e/d/f/g/e/|dBg        fdf       ec/d/e/c/|\
+  dBg fdg       f/e/d/f/g/e/|c/A/B/c/B/ Ac/d/e/d/ cA      :|
+
+X:69
+T:Blackett o' Wylam
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+B/c/|ded d2c|Bgd B2 \
+c   |ded d2c|BgB A2:|
+e/f/|gfe dBG|Bgd B2 \
+e/f/|gfe dBG|BgB A2:|
+
+X:70
+T:The Peacock Followed the Hen
+T:Cuddle Me,Cuddy
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+c>de cAA cAA|c>de cAA TB2G | 
+c>de cAA cAA|c>de dgd TB2G:| 
+c>de gee gee|c>de gee Tf2d | 
+c>de gee gee|B>cd dgd TB2G:|
+
+X:71
+T:Meggy's Foot
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/16
+K:G
+ gf`ed  .B2  z2| Bc`d2  .A2   z2| gf`ed   B2```G2| Bc`d2 .G2z2:|
+.G2.G2 (3Bcd z2|.A2.A2 (3Bcd  z2| G2`G2 (3Bcd  z2| Bc`d2 .G2z2:| 
+ B2`g2```B2``g2| B2`g2  .A2   z2| B2`g2   B2```g2| B2`g2 .G2z2:|
+ gf`ed   cB``AG| Bc`dB   AB```cA| gf`ed   cB```AG| Bc`dB .G2z2:|
+ Bd`gd   Bd``gd| Bd`gd   Ad```gd| Bd`gd   Bd```gd| Bd`gd .G2z2:|
+ g3``d   B2``G2| B2`d2  .A2   z2|.g2.d2  .B2``.G2|.B2.d2 .G2z2:|
+ G2`G2 (3Bcd z2| A2`A2 (3Bc.d z2| G2`G2 (3Bc.d z2| Bc.d2 .G2z2:|
+ B2`g2   B2``g2| B2`g2  .A2   z2| B2`g2   B2```g2| B2`g2 .G2z2:|
+
+X:72
+T:Because He was A Bonny Lad
+C:Cole Richardson
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:G
+d|B>AGg e/f/g d>B|c>edB cAAc|\
+  B>AGg e/f/g d>B|c>edc BGG:|
+d|BGdG  eGdG     |c>edB cAAc|\
+  BGdG  eGdG     |c>edc BGG:|
+
+X:73
+T:The Fair Maid of Whickham
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+g|G2G GAB|cdc TB3|cBc Adc|BGG  G2
+g|G2G GAB|cdc TB3|cBc Adc|BGG  G2:|
+B|cec BdB|A2A F2F|G2G GAB|cdc TB3 |
+  cec BdB|AcA F2f|gfg ABc|BGG  G2:|
+
+X:74
+T:My Dearie Sits Ower Late Up
+T:My Bonnie Bay Mare and I
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+e|dBG BdB       G2e |dBG     dB/c/d/B/ A2
+e|dBG dB/c/d/B/ GAB |c>de/f/ gdB       A2:|
+g|fef gdB       A2g |fef     gdB       A2
+g|fef gdB       GAB |c>de/f/ gdB       A2:|
+
+X:75
+T:Newburn Lads
+T:The Braw Lads o' Jethart
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:G
+B/c/|dBGB dBGB|dBdg f2ed|ecAc ecAc|edef     gage|
+     dBGB dBGB|dBdg f2df|afge fdgB|A/A/A Bd e2e:|
+e   |dgBg dgBg|dgBg fedf|eaca eaca|ecef     gage|
+     dgBg dgBg|dgBg fedf|afge fdgB|A/A/A Bd e2e:|
+
+X:76
+T:Cut and Dry Dolly
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+K:G
+g   |d/B/A/G/ TB2 |d/B/A/G/ g/f/e/f/|gG TB2|Gdd
+g   |d/B/A/G/  B2 |d/B/A/G/ g/f/e/f/|gA Tc2|Aee:|
+f   |g>e```````f>d|e>c``````d>B     |gG TB2|Bdd
+e/f/|g>e```````f>d|e>c``````d>B     |gA Tc2|Aee:|
+
+X:77
+T:I'll Have Her In Spite Of Her Minnie
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+GAB GAG|BAG       BgB      |GAB       GAG      |cAF AfA |
+GAB cAB|BAB       BGG      |cA/B/c/A/ dB/c/d/B/|cAF AfA:|
+g2d f2d|dcB       BgB      |g2d       f2d      |cAF AfA | 
+g2d f2d|GB/c/d/B/ dB/c/d/B/|cA/B/c/A/ dB/c/d/B/|cAF AfA:|
+
+X:78
+T:The Lads of Anwick
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/16
+K:G
+g4   d2ef gfed|B2G2 g2G2 BcdB|g4   d2ef gfed|c2A2e2 A2c2e2:|
+GABc d2B2 d2B2|GABc d2B2 d2g2|GABc d2B2 d2B2|ABcde2 A2c2e2:|
+d2g2 BcdB g2B2|d2g2 BcdB c2e2|d2g2 BcdB g2B2|ABcde2 A2c2e2:|
+GABc dedc BcdB|dedB BcdB d2g2|GABc dedc BcdB|ABcde2 A2c2e2:|
+
+X:79
+T:Sir John Fenwick's The Flower Amang Them All
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:G
+G3  ABc|d2 e2 g2|d2 e2 g2| edcBAG |\
+A3  Bcd|e2 e2 g2|e2 e2 g2|Te4  d2 |
+G3  ABc|d2 e2 g2|d2 e2 g2| edcBAG |\
+c2 dcBA|B2 cB`AG|A2 B2 d2|Te4  d2:|
+g2 G2B2|g2 G2 B2|g2 G2 g2| edcBAG |\
+a2 A2B2|a2 A2 B2|a2 A2 a2|Te4  d2 |
+g2 G2B2|g2 G2 B2|g2 G2 g2| edcBAG |\
+c2 dcBA|B2 cB`AG|A2 B2 d2|Te4  d2:|
+
+X:80
+T:Cuddy Clauder
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/16
+K:G
+G2|B3`cd2 Td2BcdB|d2Tg4  TB4  G2|B3cd2 Td2BcdB|A2 Tf4 TA4
+e2|B3`cd2 Td2BcdB|g2`d2e2 g2d2B2|cBABcA dcBcdB|A2 Td4 TA4:|
+e2|g2d2e2  g2d2B2|d2Tg4  TB4  G2|g2d2e2 g2d2B2|A2 Tf4 TA4
+e2|g2d2e2  g2d2B2|d2efge  g2d2B2|cBABcA dcBcdB|A2 Tf4 TA4:|
+
+X:81
+T:All The Night I Lay Awake
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/16
+K:G
+e3`d B2e2 dBAG|B2g2 g2B2 d2g2|e3`d B2e2 dBAG|A2e2e2A2 c4:|
+B2d2 edcB dBAG|B2d2 edcB d2g2|B2d2 edcB dBAG|A2e2e2A2 c4:| 
+G3`A B2g2 dBAG|B2g2 g2B2 d2g2|G3`A B2g2 dBAG|A2e2e2A2 c4:|
+B2g2 g2B2 efge|BcdB g2B2 d4  |B2g2 g2B2 efge|A2e2e2A2 c4:|
+
+X:82
+T:All Hands Upon Deck
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:D
+ d2fg a2fd| cecA Aeef|defg ^gafd|edcB Add2:|
+TF2ED DddF|TG2FE EeeG|GFED  Dddf|ebag fdd2 |
+TF2ED DddF|TG2FE Eeeg|fagf  gbag|faea fdd2:|
+
+X:83
+T:Noble Squire Dacre
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/16
+K:G
+B3`AG2  G3FG2|G3`AB2 TA4  G2|c3`BA2  A3`BA2|c3`ec2  e2f2g2 |
+B3`AG2  G3AG2|G3`AB2 TA4  G2|c3`ec2  d2e2f2|g4  B2 TA4  G2:|
+B2GABG Td4 G2|B2GABG Td4  G2|c2ABcA Te4  A2|c2ABcA Te2f2g2 |
+B2GABG Td4 G2|B2GABG Td2c2B2|c2e2c2  d2e2f2|g4  B2 TA4  G2:|
+
+X:84
+T:Go to Berwick Johnnie
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/2
+L:1/8
+K:G
+d2G2 G2d2 edcB|d2G2 G2d2 B2g2 |\
+d2G2 G2d2 edcB|d2A2 A2B2 c2e2:|
+g3 a g2G2 BcdB|g3 a g2G2 B2d2 |\
+g3 a g2G2 BcdB|e2a2 a2A2 c2e2 |
+g3 a g2G2 BcdB|g3 a g2G2 B2d2 |\
+g3 a bagf gfed|e2a2 a2A2 c2e2:|
+
+X:85
+T:The Parks o' Yester
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+d| BGG dBB eAA| BGG dBB Tg2d| BGG  dBB eAA|BGG dBB Tg2
+d| BGG dBB ecA| BGG dBd Tg2d| BGG  dcB ecA|BGG dBd Tg2:|
+d|Tg3  dcB ecA|Tg3  dBd Tg2d|Te>fg dcB edA|BGG dBd Tg2:|
+
+X:86
+T:The Wedding o' Blyth
+T:Blue's Gaen Oot o' the Fashion
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+D|GAB c2A Bcd |e2c  dBG F2 \
+D|GAB c2A cd=f|e2c  eBG G2:|
+d|gag fgf ege |dge  dBG A2 \
+d|gag fgf ege |d<ge dBG G2
+d|gag fgf ege |dge  dBG A2 \
+d|GAB c2A Bcd |e2c  dBG G2:|
+
+X:87
+T:The Black Cock o' Whickham
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+K:G
+Bc|d2dc|BGGB|d2dc|B2Bg|dedc|BGGB|cAFA|c2:|
+dg|bgdg|Bgdg|bgfa|g2ga|bgdg|BgdB|cAFA|c2
+dg|bgdg|Bgdg|bgfa|gfga|bgaf|gedB|cAFA|c2:|
+
+X:88
+T:Coffee and Tea
+T:Jamie Allen's Fancy
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:G
+ef|g2d2   BG```````dB      |Gggf Tg2ed|g2d2   BG```````dB      |Aefg Tf2
+ed|g2dc   BG       B/c/d/B/|Gggf Tg2ed|g2dc   BG       B/c/d/B/|Aefg Tf2||
+ed|BgBg (3def      gd      |BgBg Tf2ed|BgBg (3dgf      gd      |Aegf gfed|
+   BgBg   f/g/f/e/ gd      |BgBg Tf2ed|BgBg   f/g/f/e/ gB      |Aefg Tf2|]
+
+X:89
+T:The Keelman Ower Land
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+d(3c/B/A/G d2g   |d(3c/B/A/G d2g   |ecA       gcA      |ecA    efg   |
+dBG        GAB   |Bge        dBG   |A/B/c/B/A B/c/d/c/B|e2d    efg  :|
+ddg        ddg   |ddg        dcB   |eea       eea      |eea    edc   | 
+ddg        ddg   |Gge        dBG   |A/B/c/B/A B/c/d/c/B|e2d    efg  :|
+d/B/GG     G/B/GG|d/B/GG     G/B/GG|e/c/AA    A/c/AA   |e/c/AA A/c/AA|
+dBG        GAB   |Bge        dBG   |AcA       BdB      |e2d    efg  :|
+
+X:90
+T:Small Coals an' Little Money
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:G
+e2cA eA B/c/d|e2cA dG B/c/d |\
+e2cA eA B/c/d|edge dG B/c/d:|
+eAcA eA B/c/d|eAcA dG B/c/d |\
+eAcA eA B/c/d|edge dG B/c/d:|
+
+X:91
+T:Shew's the Way to Wallington
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+B2f    ede    f3 |cAf    cAA ABc|B2d    fef    g3 |dBg    dBG ABc:|
+dBd    cAc    B2G|Acf    cAA ABc|dBd    cAc    B2G|dBg    dBG ABc:|
+B/c/dg B/c/dg B2G|A/B/cf cAc ABc|B/c/dg B/c/dg B2G|B/c/dg dBG ABc:|
+G2g    fed    f3 |cAf    cAc ABc|G2g    fef    g3 |B/c/dg dBG ABc:|
+
+X:92
+T:Jockey Stays Lang at the Fair
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+e3           ce/f/g/e/ gce|d3           GB/c/d/B/ dBG |\
+e3           ce/f/g/e/ gce|dgf          dcB       c2G:|
+e/f/gf       e/f/gf    edc|dgf          dgf       dcB |\
+e/f/gf       e/f/gf    edc|dgf          dcB       c2G:|
+c/B/c/d/e/f/ gce      Tc2e|d/c/B/c/d/B/ GB/c/d/B/ dBG |\
+c/B/c/d/e/f/ gce      Tc2e|dgf          dcB      Tc2G:|
+gce          gce       gce|gBd          gBd       gBd |\ 
+gce          gce       gce|dgf          dcB      Tc2G:|
+
+X:93
+T:Stagshaw Bank Fair
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:G
+d/c/|BG`GB cA`Ac|BG`Gc Bdgd|BGGB cAAc|Bgd^c d3 :|
+e   |dB`dg ec`eg|fd`ef gage|dBdg eceg|fdef  g2fe|
+     dBTB2 ecTc2|dBTB2 AFDd|edef gage|dBcA  G3 :|
+
+X:94
+T:We'll All Away to Sunniside
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+K:C
+f|eccf|ecgc|ecgc|A2 ff|edcf|ecgc|BddB|G2 Bg |
+  eccf|ecgc|ecgc|A2 f2|edcf|ecgc|BddB|G2 B :|
+B|AcBd|cedf|ecgc|A2 c2|AcBd|cedc|BGdB|G2 B2 |
+  AcBd|cedf|ecgc|A2 c2|AcBd|cedc|BGdB|G2 B2:|
+
+X:95
+T:The Miller's Wife of Blaydon
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+P:ABA
+K:C
+P:A
+e|d B G B A2  e c|d B G B d2 (g`e)|d B G B  A A e g|d B G B d2 g||
+P:B
+f|g d B d A A e f|g d B c d2  g f |g d B d  A A e g|d B G B d2 g|]
+
+X:96
+T:The Holey Halfpenny
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+d|:B2G GBG|d2G GBG|B2G GBG|d3 edc |
+   B2G GBG|d2c BAG|A2f fef|c3 edc:|
+   B2g gfg|d2g B2g|B2g gfg|c3 edc |
+   B2g gfg|d2g B2g|A2f fef|c3 edc:|
+
+X:97
+T:Hoop and Gird Her
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+GBG GB/c/d   |GBG d2B|GBG GB/c/d      |AB/A/B c2A      | 
+GAG GB/c/d   |BGB gdB|cec d/c/B/c/d/B/|cAB    c2A     :|
+gdB de/f/g/f/|gdB d2B|gdB de/f/g/e/   |cAB    cd/c/B/A/|
+gdB de/f/g/e/|gde dcB|cec d/c/B/c/d/B/|cAB    c2A     :|
+
+X:98
+T:Fenwick O Bywell
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+g|edc BAB|GBG  B2g|edc     BAG|AfA c2
+g|edc BAB|GBG  B2G|c>de/f/ gdB|AgA c2:|
+e|GGd BBg|GGd TB2g|GGd     BBg|AgA c2
+e|GGd BBg|GGd  B2G|c>de/f/ gdB|AgA c2:|
+
+X:99
+T:Drucken Moll Knox
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+P:ABA
+% printed with a da capo
+K:C
+P:A
+B2 G>A GB (3dcB|c2 A>B cd (3edc|B2    G>A  GB (3dcB|c>BAg (3fef g2:|
+P:B
+g2 eg  f2  dB  |c2 Ac  B2   G2 |(3gfg eg (3fef  dB |ced^c   d2  ef | 
+g2 eg  f2  dB  |c2 Ac  B2   G2 |(3gfg eg (3fef  dB |ced^c   d2 =c2:|
+
+X:100
+T:The Lass and the Money is All My Own
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+e|dBG GAB|c2B A2G|dBG GAB|A2B c2
+e|dBG GAB|c2B A2G|BdB AcA|G2G G2:|
+d|ece dBd|ece dBd|efg dBG|A2B c2
+e|def gfe|dcB A2F|BdB AcA|G2G G2:|
+
+X:101
+T:Cannie Hobbie Elliot
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+c|B2d       c2B       ABc|B2d       e2f       g3 | 
+  B2d       c2B       ABc|BAB       cGE       D2:|
+c|dB/c/d/B/ dB/c/d/B/ ABc|dB/c/d/B/ dB/c/d/B/ g2
+e|dB/c/d/B/ dB/c/d/B/ ABc|BAB       cGE       D2:|
+
+X:102
+T:Peacock's March
+C:John Peacock
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+(de/f/)|g2 d>d d2B>A|B2    G>G   G2 AB|cBAG              edcB|A>GA>G A2
+(de/f/)|g2 d>d d2B>A|B2    G>G   G2 A2|Bd de/c/          B2A2|G2 G>G G2:|
+ d>B   |A2 A>A AGAB |cB    cd/e/ d2 c2|A/G/A/B/ c/d/e/f/ gdBG|A2 A>A A2
+ dB    |BG`Bd  cAce |de/f/ ge    d2 c2|Bdec              BdcA|G2 G>G G2:|
+
+X:103
+T:Peacock's Tune
+C:John Peacock
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+B/c/|d>ed d>cB|gfg  d2B/c/|d>ed dcB|AAA A2
+B/c/|d>ed d>cB|gfg  d2c   |Bcd  BcA|GGG G2:|
+G/A/|BAB  cBc |dcd  ede   |fef  gdB|AAA A2
+d/c/|BAB  cBc |def Hg2f/e/|dec  BcA|GGG G2:|
+
+X:104
+T:Peacock's Fancy
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+D|G3  B2G|c2A B2G|c2A Acd|e3- e2
+f|g2e f2d|B2d g2e|dBG A2G|E3- E2:|
+f|g2f efg|a2f d2f|g2e faf|e3- e2
+f|g2e f2d|B2d g2e|dBG A2G|E3- E2:|
+
+X:105
+T:Pipers Maggot
+T:Pipers Fancy
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+c|d3     GBG dBG|B/c/dB gdB efg|d3     GBG dBG|A/B/cA fAB c2:|
+c|B/c/dB gdB gdB|B/c/dc fdB efg|B/c/dB gdB gdB|A/B/cA fAB c2:|
+
+X:106
+T:The Green Brechans o' Branton
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+g|f2B BdB|e2A AcA|f2B BdB|d3 g3 |
+  f2B BdB|e2A AcA|Bcd ecA|d3 g2:|
+g|fdB fdB|ecA ecA|fdB fdB|d3 g3 |
+  fdB fdB|ecA ecA|Bcd ecA|d3 g3:|
+
+X:107
+T:Jackey Layton
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+G/A/B/c/ dg       dB```````Bg      |dB```````Bg Td2 TB2 |\
+G/A/B/c/ dg       dB```````Bg      |gA```````AB Tc2  BA |
+G/A/B/c/ dg       dB```````Bg      |dB```````Bg Td2 TB2 |\
+G/A/B/c/ d/e/g/e/ d/c/B/d/ B/c/d/f/|gA```````AB Tc2  BA:|
+G/A/B/c/ dB       ec```````dB      |G/A/B/c/ dG Td2  cB |\
+G/A/B/c/ dB       ec```````dB      |eA```````AB Tc2  BA |
+G/A/B/c/ dB       ec```````dB      |G/A/B/c/ dB Tc2  BA |\
+G/A/B/c/ d/c/B/d/ e/d/c/e/ d/c/B/d/|eA```````AB Tc2  BA|]
+
+X:108
+T:Till the Tide Comes In
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+  BA |GBd2 d2cB|Ac e2 e2 dc|BdgB Aedc|B2 G2 G2
+  BA |GBd2 d2cB|Ac e2 e2 dc|BdgB Aedc|B2 G2 G2:|
+(3def|gfgf gdBd|e2 d2 d2 ef|gfgf gdBd|c2 A2 A2
+  BA |GBd2 d2cB|Ac e2 e2 dc|BdgB Aedc|B2 G2 G2:|
+
+X:109
+T:Lamshaw's Fancy
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+D|DGBG dGBG|EAcA        eAcA|DGBG        dGBG|B/c/d Ac BGG:|
+f|gdBd GdBd|g/f/e/d/ ce Aece|g/f/e/d/ Bd GdBd|e/f/g dc BGG:|
+
+X:110
+T:Morpeth Lasses
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:A Minor
+G|ABcB EAAc|BAGd BGGB|ABcB EAAe|dBGB cAA:|
+e|agea gea2|gedg BGdB|agea gea2|gegB A2Ae| 
+  agea gea2|gedg BGdB|AcBd ceda|gegB A2A:|
+
+X:111
+T:The Major
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+dBG g3 |dBG GBd|dBG g3 |cAF ABc |
+dBG g3 |dBG g3 |dBG g3 |cAF ABc:|
+dBG dBG|dBG ABc|dBG dBG|cAF ABc |
+dBG dBG|dBG dBG|edc fed|cAF ABc:|
+
+X:112
+T:Andrew Carr
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+B2d dBd dBG|B2e efg f2d|B2d dBd def|g2G GAB A2G:|
+g2e dBG dBG|g2e ege f2d|gfe dBd def|g2G GAB A2G:|
+
+X:113
+T:Follow Her Over The Border
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+e|d2B BGB BGB|d2B BGB d2g|d2B BGB BGB|c2A ABA c2:|
+e|dBB gBB dBB|dBB gBB d2e|dBB gBB dBB|c2A ABA c2:|
+
+X:114
+T:Little Fishie
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/2
+L:1/4
+K:G
+(DG) .G.G (FA) |(GB) .B.B (ce)|(dB) .B.G (FG)        | AB  cE  F2 |
+(DG) .G.G (FA) |(GB) .B.B (ce)|(dB) .B.G (A/c/)(B/d/)| cE  EF  G2:| 
+.d (gf) (gd) .B|(AB) .c.d  B2 |.d (gf) (gf)    .g    |(eb) a^c d2-|
+ d=f  ed   cB  |(ce)  AG   F2 |(dB) .B.G (A/c/)(B/d/)| cE  EF  G2:|
+
+X:115
+T:Leazes Hopping
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+g2g g2e|dBG GBG|g2g g2e|aba agf|
+g2g g2e|dBG GAB|GAB g2e|dBG G3:|
+ded dBd|cAc GAB|ded dcB|cdc ABc| 
+ded dBd|cec GAB|GAB g2e|dBG G3:|
+
+X:116
+T:The Cooper o' Stannerton Heugh
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+d|gGG BAG|BcB BAG|gGG BAG|ABd e2
+d|gGG BAG|BcB BAG|gfe dcB|ABd e2:| 
+d|gbg bgb|faf afa|gbg bgb|faf e2
+d|gbg bgb|faf afa|gfe dcB|ABd e2:|
+
+X:117
+T:A Mile to Ride
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+dBd g2g f2d|g2B BcB d2e |\
+dBd g2g f2d|ecA ABA c2e:| 
+dBG G2c B2c|dBG GAB c2e |\
+dBB G2c B2d|ecA A2B c2e:|
+
+X:118
+T:Sandhill Corner
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+c|B2d B2d|efg f2d|g2e dBG|A2A A2
+c|B2d B2d|efg f2d|g2e dBG|G2G G2:|
+e|g2g f2d|efg d2f|g2e dBG|A2A A2
+c|g2g f2d|efg d2f|g2e dBG|G2G G2
+d|g2g f2d|efg d2f|g2e dBG|A2A A2
+c|B2d c2e|d2f e2f|g2e dBG|G2G G2|]
+
+X:119
+T:Lang Stayed Away
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:G
+ec```````cg       Te2|eAAc B/c/d/B/|ec```````cg       Te2|dGGc B/c/d/B/:|
+c2       cg       Tc2|eAAc B/c/d/B/|c2       eg       Tc2|dGGc B/c/d/B/:|
+c/d/e/c/ B/c/d/B/ TA2|eAAc B/c/d/B/|c/d/e/c/ B/c/d/B/ TA2|BGGc B/c/d/B/:|
+
+X:120
+T:Blaw the Wind Southerly
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:D
+A|fed AFA|BGB AFA|fed AFA|Bdc  d2:|
+a|f2a e2a|dcd cBA|f2a e2a|ba^g a2
+a|b2b a2a|g2g fed|fed Bgf|eBc  d2:|
+
+X:121
+T:Cuckold Come Out o' the Amrey
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:D
+A/B/c/A/ Tc>d      e>deg      |GG      TB>c d/B/A/G/ B/c/d/B/|\
+A/B/c/A/  c>d      e>deg      |dB/A/    gB TA2      Te2     :|
+g>e```````cg       ec e/f/g/e/|d/c/B/A/ Gd  BG       B/c/d/B/|\
+g/f/e/d/  c/d/e/f/ gc e/f/g/e/|dB/A/    gB TA2      Te2     :|
+
+X:122
+T:Ower the Border
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/8
+L:1/8
+K:G
+TB2G     B/A/B/c/d/e/ gdB      |dgf    dgB        de/f/g|\
+TB2G     B/A/B/c/d/e/ gdB      |c>dc   gec       Te2g  :|
+ fdB     de/f/g/f/    g/f/e/d/f|dgf    dgB        de/f/g|\
+ fdB     de/f/g/f/    g/f/e/d/B|c>dc   g/f/e/d/c Te2g  :|
+ G>AB/c/ dgf          dgB      |dgf    dgB        de/f/g|\
+ G>AB/c/ dgf          dgB      |c>dc   g/f/e/d/c Te2g  :|
+Tf2d     dB/c/d       dB/c/d   |gB/c/d gB/c/d     fdg   |\
+Tf2d     dB/c/d       gdB      |c>dc   g/f/e/d/c Te2g  :|
+
+X:123
+T:Sunderland Lasses
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:3/4
+L:1/8
+K:G
+B2       G/A/B/c/ dB|G/A/B/c/ dBdg|B2       G/A/B/c/ dB|Ae`eA`ce:|
+G/A/B/c/ dB```````gB|G/A/B/c/ dBdg|G/A/B/c/ dB```````gB|Ae`eA`ce:|
+g2       d/e/f/g/ gd|Bd```````dGBd|g2       d/e/f/g/ gd|Ae`eA`ce:|
+
+X:124
+T:New Highland Laddie
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+ G2      GB       A2       AB      | G2       GB       A2    AB |\
+ G2      g2       d2       cB      | AB```````cA       B2    G2 :|
+ d2      de       d2       de      | dg```````fe       d2    cB |\
+ d2      de       d2       de      | dg```````fe       d2    cB |
+ c2      ce       B2       Bd      | A2       AB       c2    BA |\
+ G2      g2       d2       cB      | AB```````cA       B2    G2:|
+P:Variation by Peacock
+(3GBd  (3GBd    (3Gce    (3Gce     |(3GBd   (3GBd    (3Gce (3Gce|\ 
+(3GBd  (3Gce      d2       cB      | AB```````cd       B2    G2:|
+d/c/B/c/ d/c/B/c/ d/c/B/c/ d/c/B/c/| e/d/c/B/ ge       d2    cB |\ 
+d/c/B/A/ G/A/B/c/ d/c/B/A/ G/A/B/c/| e/d/c/B/ ge       d2    cB |
+c/e/g/e/ c/e/g/e/ B/d/g/d/ B/d/g/B/| A/G/A/B/ c/B/c/d/ ec````BA |\
+G/A/B/c/ d/e/d/g/ ed```````cB      | AB       cd/c/    B2    G2:|
+
+X:125
+T:Little Wot ye Wha's Coming
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:C
+L:1/8
+K:G
+ d/d/d fd Tg2       dB| d/d/d    fd       Te2cA |\
+ d/d/d fd  ge```````fd| e/f/g    f/g/a    Te2cA:|
+Tg2    dB  Bg```````ec|Tg2       dB        AecA |\
+Tg2    dB  Bg```````dB| e/f/g    f/g/a    Te2cA:|
+ d/d/d fd  ge```````fB| d/d/d    fB        eAcA |\
+ d/d/d fd  ge```````fd| e/f/g/e/ f/g/a/f/ Te2cA:|
+ g2    Bg  Bg```````dB| g2       Bg        BgcA |\
+ g2    Bg  a/g/f/e/ fd| e/f/g/e/ f/g/a/f/ Te2eA:|
+
+X:126
+T:Fairly Shot of Her
+M:6/8
+L:1/8
+K:G
+B|:c2A c2A|c2e ecA|c2A c2A          |GBd dBG |
+[1 c2A c2A|c2e ece|fdf ece          |dBg dBG:|
+[2 c2A c2A|c2e ece|ceg dBG          |A2B dBG||
+ |:G2g gfg|c2e ece|G2g g/f/e/f/g/e/ |GBd dBG |
+   G2g gfg|gfg d2B|cde dBG          |A2B dBG:|
+
+X:127
+T:The Black and the Grey
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:6/8
+L:1/8
+K:G
+ d|BGd f2d|gaf  g2d |BGd  adc| (B3 G2)
+ B|cAe a2e|ab^g a2e |cAe  aed|(^c3 A2)
+=c|BGd g2d|gaf  g2d |BGd  gdc| (B3 c2)
+ d|ece dBd|cAc  BA^G|Aa^g aed|(^c3 A2):|
+=c|BGG dGG|gGG  dGG |BGG  gdc|   B3 G2
+ B|cAA eAA|gAA  eAA |cAA  aed|(^c3 A2)
+=c|BGG dGG|gGG  dBB |BGd  gdc|  B3 c2
+ d|ece dBd|cAc  BA^G|Aa^g aed| ^c3 A2 :|
+
+X:128
+T:Rantin' Roarin' Willie
+T:The Mitford Galloway
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:9/4
+L:1/8
+K:G
+e2|dcBABG d4  G2 Bcd2e2|=f2gfed  f2c2A2 c4  e2| 
+   dcBABG B4  G2 Bcd2ef| efefge  g2d2B2 d4  ef| 
+   gfefge g2d2B2 d2c2B2| c2B2A2 =f2c2A2 cBcdef|
+   g4  d2 e4  d2 gfefge| dcBcdB  c2A2F2 G4   ||
+e2|G2BcdB d2BcdB G2BcdB| F2ABcA =f2c2A2 c4  e2| 
+   G2BcdB d2BcdB G2BcdB| g2BcdB  d2BcdB d4  ef|
+   g2BcdB d2BcdB g2BcdB| c2ABcA =f2c2A2 cBcdef|
+   g4  d2 e4  d2 gfefge| dcBcdB  c2A2F2 G4   |]
+
+X:129
+T:The Hen's March
+Z:Jack Campin, http://www.campin.me.uk/
+S:Northumbrian Minstrelsy
+M:2/4
+L:1/8
+N:the printed key signature is G
+K:C
+G|c>d``````e>f     |g>f``````e>d|c>d      c/d/e   |G2       G2 | 
+  c>d``````e>f     |g>f``````e>f|g>f``````e>f     |g2       g>g|
+  g>f``````e>g     |f>e``````d>f|e>d      c/d/e   |G2       G2 | 
+  c>B``````c>e     |ef```````gf |ed```````cB      |c3         :|
+G|Gc```````cc      |cc```````cc |cc```````cc      |cc```````eg | 
+  Gc```````cc      |cc```````cc |cc```````cc      |cc```````eg | 
+  cc```````eg      |cc```````eg |c/d/c/d/ c/d/c/d/|c/d/c/d/ eg | 
+  c/d/c/d/ c/d/c/d/|c/d/c/d/ eg |c/d/c/d/ eg      |c/d/c/d/ eg | 
+  g>f``````e>g     |f>e``````d>f|e>d      c/d/e   |G2       G2 | 
+  c>B``````cd      |ef```````gf |ed```````cB      |c3         :|

@@ -1,0 +1,22 @@
+X: 1
+T: WALK AROUND. -- "HEY, DADDY."
+C: Dan Emmett
+B: Ryan's Mammoth Collection of Fiddle Tunes
+R: walkaround
+M: 2/4
+L: 1/16
+Z: Contributed 20071129 by John Chambers jc:jc.tzo.net
+K: Bm
+%%indent 600
+kv[b4B4] k[b4B4] | k[b4B4] k[b4B4] |
+!Segno!\
+|: !mf!"2"b2"3"f2 "2"b4- | b"3"c'ba "3"f4 | b2f2 bc'ba | "3"f2"1"ka4 a2 |\
+b2f2 "2"b4 | !8va(!"1"Bcde f3e | d4 c4 |1 B4- B2z2 :|2 [b4-B4-] [b2B2][A2A,2] |]
+!mf!vd2d2 c2"4"e2 | d4- d2A2 | d2d2 c2"4"e2 | d4- d2A2 |\
+d4- d2e2 | f2d2 A2F2 | E6 GF | E4 z2uE2 |]
+"4"e2e2 ^d2f2 | e6 B2 | e2e2 ^d2f2 | e6 B2 |\
+e4-e2f2 | g2e2c2A2 | ^G2A2B2c2 | d4z2A2 |]
+"dance"\
+vdcde fedc | B^ABc dcdA | dcde fedc | Bdc"4"e d2A2 |
+ dcde fedc | B^ABc dcdA | dcde fedc | Bdc"4"e d2z2 !Segno!|]\
+ !ff!y"break"!8va(!A2AA A2A2 | kB2kc2 k[d4F4] H|]

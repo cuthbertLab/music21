@@ -1,0 +1,14 @@
+X: 1
+T: TEMPERANCE -- REEL
+B: Ryan's Mammoth Collection of Fiddle Tunes
+R: reel
+M: 2/4
+L: 1/16
+Z: Contributed 20000424182903 by John Chambers jchambers:casc.com
+K: G
+((3uDEF) "Segno"\
+|: G2{A}GF GABc | dBge dBAc | BE{F}ED EFGA | BGAF GFED |
+|  G2{A}GF GABc | dBge dBAc | BE{F}ED EFGA | BdAF G2 :|
+: uB2 \
+| Beed e3f | geaf gfed | Bdde d3e | geaf gfed |
+| Beed e3f | geaf gfed | BE{F}ED EFGA |1 BdAF G2 :|2 BGAF GFED "Segno"[|]|]

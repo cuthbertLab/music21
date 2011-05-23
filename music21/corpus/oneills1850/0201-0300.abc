@@ -1,0 +1,1712 @@
+
+X: 201
+T: The Blackbird
+B: O'Neill's 201
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: "Moderate"
+N: "3rd Setting"
+N: "Collected by F.O'Neill"
+M: 2/4
+L: 1/16
+K:D
+((5DEFGA) \
+| (B3d) (c2B2) | (A3G) (AB{d}=cA) | (d2c2) (d=cAF) | (GAGF) D2(DE) |
+| F2(FG) A2(fe) | (d3c) (d=cAF) | (GAGF) D2D2 | D4 :| ((5FGABc) |
+| d3e f2g2 | (a3g) (f2a2) | (g3f) (g2a2) | (g3f) (d2a2) |
+| (d3e) f2g2 | (a3g) f2a2 | (g3f) d2d2 | d4 defg |
+| (a3g) (fgaf) | g3b (agfd) | =c2(AB) c2(de) | (.d.e.f.g) Ha2 (FG) |
+| A3G (FGAB) | =c3e (dcAF) | G3F D2D2 | D4 ||
+
+
+X: 202
+T: The Wheelwright
+B: O'Neill's 202
+N: "Slow"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 2/4
+L: 1/8
+K:A
+(E>G) \
+| ~A>B cf | {def}e>d cA/B/ | {B}c>B (~B/A/F/E/) | (~F>A) A :|
+e \
+| (f>e) (fg) | (a>g) fa | ({fga}g>e) cB | ({B}cf) fe |
+| ({g}f>e) (fg) | (a>g) (fa) | ({fga}g>e) (cB) | (~ce) e E/>G/ |
+| | ~A>B (cf) | ({def}e>d) .c(A/B/) | ({AB}c>B) (~B/A/F/E/) | (~FA) A2 ||
+
+
+X: 203
+T: The Minstrel Boy
+B: O'Neill's 203
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:G
+D \
+| (G3A) (cBAG) | B2d2 g2(fg) | e2d2 (Bcd>B) | A4 G2z :|
+d \
+| g2f2 e2(fg) | f2e2 d3^d | e3B B2^d2 | (e3/2f//e//d//e/f/) Hg3g |
+| (G3A) (cBAG) | B2d2 g2(fg) | e2d2 (Bcd>B) | A4 G2z ||
+
+
+X: 204
+T: The Irish Nation
+B: O'Neill's 204
+N: "Moderate"
+N: "Collected by F.O'Neill"
+N: There is a minor typo in bar 1.
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:A
+(c>d) \
+| e>^de3/2f e2c>e | d>cBA G2AB | c>B ((3cBA) B>edB | A4 A2z :|
+B \
+| A2A2 a3g | e>de>f g3z | A>AA>A a>ag>f | g<ez2 z2(c>d) |
+| e>^de>f e2c>e | d>cBA G2AB | c>B ((3cBA) B>ed>B | A4 Az :|
+
+
+X: 205
+T: Thy Fair Bosom
+B: O'Neill's 205
+N: "With feeling"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+(de/f/) \
+| g>g g2 (ga/b/) | (a>f) (e2 dc) | (B>c) (d2 cA) | B>B B2 d2 |
+| g>g g2 (ga/b/) | a>f e2 (d>c) | (B>c) d2 cA | G>G G2 ||
+|| Bd \
+| c2 zA A>c | e4 (dc) | (B>d g2) (f>g) | (a>f) Hg2 (d>c) |
+| (B>d g2) (ga/b/) | (a>f) e2 (d>c) | (B>c) Hd2 cA | G>G G2 ||
+
+
+X: 206
+T: The Chieftain
+B: O'Neill's 206
+N: "Moderate"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:G
+((3DEF) \
+| (G3A) (GFED) | (d3{f}e) (d2Bd) | e2(dB) G2A2 | E4- Ez ((3DEF) |
+| (G3A) (GFED) | (d3{f}e) (d2Bd) | e2(dB) G2A2 | G4- Gz ||
+|| ((3Bcd) \
+| (e3f) (edBA) | (G3B) (d2gf) | e2(dB) G2A2 | E4- Ez ((3DEF) |
+| (G3A) (GFED) | (d3{f}e) (d2Bd) | e2(dB) G2A2 | G4- Gz ||
+
+
+X: 207
+T: Peggy Bawn
+B: O'Neill's 207
+N: "Slow"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:D
+A2 \
+| d2 (fd) (ec) | d>B AG FE | D2 FA Bc | d4 A2 |
+| d2 fd ec | d>B G2 FE | D>E FA Bc | d4 ||
+|| d>e \
+| f2 f2 ge | fd B2 c>d | eB gf ed | d2 c2 (AB/c/) |
+| d2 fd ec | d>B (AG FE) | HD2 FA Bc | Hd4 ||
+
+
+X: 208
+T: The Lough Carra Fisherman
+B: O'Neill's 208
+N: "Lively"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 2/4
+L: 1/8
+K:A
+E \
+| E.A.A.A | .A.A.A.A | cded | dcBA \
+| GBBB | BBBB | efed | dcBA |
+| cAAA | AAAA | EAAB | cAAc \
+| dfff | aeee | dfed | cA A ||
+|| (c/d/) \
+| eaaa | aeee | fbbb | geeg \
+| agfe | fedc | dfed | cAcd |
+| eaaa | aeee | fbbb | geeg \
+| agfe | (f/g/a) ec | dfed | cA A ||
+
+
+X: 209
+T: Lord Mayo
+B: O'Neill's 209
+N: "Slow"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:GDor
+GF \
+| (D>G) (G/A/c) d2 (cA) | d2 (G>A) (GF) D2 | D>G (G/A/c) d2 (fd) | (d>c) (A>G) G2 ||
+|| d2 \
+| (fd)(fg) a2 (gf) | (d>c) (d/=e/f) (F>G) (FD) | (fd)(fg) a2 (gf) | d2 (ga) g2 (ag) |
+| (fd)(fg) a2 (gf) | d>c (d/=e/f) F>G FD | (D>G) (cA) (GF) (fd) | d>c A>G G2 ||
+
+
+X: 210
+T: the Boys of Carrigallen
+B: O'Neill's 210
+N: "Cheerful"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:Am
+E \
+| A2E A>(Bc/d/) | e>de (A2B/A/) | G2D G>(AB/c/) | d>cd G2B |
+| A2E ABd | e2^f g>fg | edc Bcd | ecA A2 :|
+|| a \
+| a^ga A2a | a^ga A2g | g^fg G2=g | g^fg G2B |
+| c2c d2d | e^fg a3 | edc Bcd | ecA A2 :|
+
+
+X: 211
+T: My Johnny Dear
+B: O'Neill's 211
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 2/4
+L: 1/8
+K:D
+"mf"(D/E/) \
+| FF F(E/D/) | A>F AB | AA .A(F/D/) | E3 (D/E/) |
+| FF .F(E/D/) | (A>F) "p"(AB) | (A/F/)(E/>F/) D"pp"D | D3 ||
+|| A/B//c// \
+| (d>e) dc | (B>A) Bc | BA .A(F/D/) | E3 (D/E/) |
+| FF .F(E/D/) | (A>F) "p"(AB) | (A/F/)(E/>F/) D"pp"D | D3 ||
+
+
+X: 212
+T: New Year's Song
+B: O'Neill's 212
+N: "With spirit"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+D \
+| D2G G2A | B2d d2B | c2A A2A | A3- A2A \
+| B2A G2B | d2G G2A | {A}G2F D2D | D3- D2 ||
+|| (B/c/) \
+| d2d e2d | B2c d2B | c2c d2c | A3- A2(B/c/) \
+| d2c B2G | A2G F2D | C2D G2G | G3- G2 ||
+
+
+X: 213
+T: Good Health to Our Friends Far Away
+B: O'Neill's 213
+N: "Lively"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+(b/a/) \
+| g2d e>dB | d>ef g2(b/a/) | g2d e>fg | a>ba a2 (b/a/) \
+| g2d e>fg | f>ed Hg2d | (BGB) (AFA) | G3- G2 ||
+|| G \
+| B2d (d<e)d | cBA G2(B/c/) | d2d d>ef | g3- g2d \
+| d>ed efg | f>ed Hg2(d/c/) | (BGB) (AFA) | G3- G2 ||
+
+
+X: 214
+T: the Black Lettered List
+B: O'Neill's 214
+N: "Animated"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+D/D/ \
+| GDB B>AG | ADc c>BA | d>BG G>AB | (A>GF/E/) D2D/D/ |
+| GDB B>AG | (A<D)c c>BA | dBG DEF | GDB G2 ||
+|| B \
+| BFd d>cB | ABc cBA | G>AB BAG | (A>GF/E/) D2D |
+| GDB BAG | c>de e>dc | B>dG GAF | GDB G2 ||
+
+
+X: 215
+T: Summer Evening
+B: O'Neill's 215
+N: "Moderate"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:A
+E \
+| A2- A(cBA) | G2-G (Bcd) | e2 fdBA | G4 ((3EFG) \
+| A2- A(cBA) | G3 A (B/c/d) | e2 fdBG | A4 ||
+|| (c>d) \
+| e2- e(fed) |  c2- c(edB) | A2- A(BAG) | E4 ((3EFG) \
+| A2- A(cBA) | G3 A (B/c/d) | e2 fdBG | A4 ||
+
+
+X: 216
+T: The Alewoman
+B: O'Neill's 216
+N: "With feeling"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:ADor
+(ef) \
+| g2 (agfe) | dB e>d BA | B2 B2 cA | B2 B2 ef \
+| g2 (agfe) | dB e>d BG | A2 A2 BG | A2 A2 ||
+|| (B>A) \
+| (GFGABc) | dB e>d BA | B2 B2 cA | B2 B2 ga \
+| (bage ag) | ed e>d BG | A2 A2 BG | A2 A2 ||
+
+
+X: 217
+T: I Love Thee No More
+B: O'Neill's 217
+N: "Moderate"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: Part B is 10 bars.
+M: 3/4
+L: 1/8
+K:G
+d>c \
+| B2 G2 D2 | E2 A2 zG | F3 E D2 | G2 B2 d2 | c3 d c2 | B2 c2 d2 | e2 c2 AG | F2 z2 d>c |
+| B2 G2 D2 | E2 A3 G | F3 E D2 | G2 B2 D2 | EFGABc | d2 B2 cA | G3 A F2 | G2 z2 || d2 \
+| F3 G E2 | D2 z2 GF |
+| ED EC AG | FE FD BA | GF GE cB | AF D2 zD | E3 F GA | d2 B2 cA | G3 A F2 | G2 z2 ||
+
+
+X: 218
+T: When First I Met Thee
+B: O'Neill's 218
+N: "With spirit"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 2/4
+L: 1/8
+K:F
+F \
+| A>G GG | GF FF | G^F GA | cB A z/A/ \
+| G>G G^F GA Bc | d>e fd | cA F ||
+|| c \
+| c>f fe | fe {e}dc | c>f fe | ed c>c \
+| cf fc | dc BA | Gd cB | BA {A}GF |
+| F2 F>F | {A}GF FF | G>^F GA | cB A2 \
+| G2 G>G GA HBc | d>e fd | cA F2 ||
+
+
+X: 219
+T: Of in the Stilly Night
+B: O'Neill's 219
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: The first section ends with a fermata over the double bar.
+M: 2/4
+L: 1/8
+K:D
+A \
+| f2 f>e | d>B Bd | A>A FD | E4 \
+| FA AB | AF Dd | fd ec | d2- d ||
+|| B \
+| A>d dd | B>d dd | f>d dd | {f}ed cB \
+| A>d dd | B>d dd | fd ec | d2- "D.C."d ||
+
+
+X: 220
+T: The Young Black Cow
+B: O'Neill's 220
+N: "Slow"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: The first section has a segno over the first bar.
+N: The first section ends with a fermata over the double bar.
+N: The second section ends with a segno over the double bar.
+M: 3/4
+L: 1/8
+K:Gm
+GF \
+| D2 G2 G^F | G2 A2 c2 | (d=e)(f_e)(dc) | A4 dB \
+| A2 G2 G^F | G3 A B2 | A2 G2 FD | D4 D2 |
+| D2 G2 G^F | G2 A2 c2 | (d=e)(f_e)(dc) | A4 ^fg \
+| {g}a2 g=f (ed/c/) | d3 =e f2 | G2 G2 ({B}AG/F/) | G4 ||
+|| d2 \
+| d2 g2 (g^f) | g3 a b2 | a2 g2 fd | d4 =e2 \
+| f3 g fd | f2 g2 a>g | (fd)(cB)(AG) | F4 (GF) ||
+
+
+X: 221
+T: The Humors of the Joyce Country
+B: O'Neill's 221
+N: "With spirit"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: Both endings have a long trill over the entire note.
+M: 3/4
+L: 1/8
+K:G
+(Bd) \
+| e4 (e/f/g) | d4 (BA) | G2 G2 DE | G2 G2 DE \
+| (GAGEDE) | G2 G2 (DG) | A2 A2 GA | B2 B2 AG |
+| (AGABAG) | E2 D2 (BA) | TG6- | G4 || (Bd) \
+| e4 (e/f/.g) | d4 (de) | (gagede) | (gagede) |
+| (gagede) | g2 g2 (eg) | a2 a2 ga |b2 b2 ag \
+| (agabag) | e2 d2 (g/a/b) | Tg6- | g4 ||
+
+
+X: 222
+T: A Stranger in Cork
+B: O'Neill's 222
+N: "Moderate"
+N: "Collected by J.O'Brien"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+(dc) \
+| (B2 G2 E2) | (D2 B,2 D2) | (E2 G2) .A2 | G4 D2 \
+| (G2 B2 d2) | d2 B2 d2 | (e2 d2) .B2 | A4 D2 |
+| (G2 B2 d2) | d2 B2 d2 | (e2 d2) .B2 | A4 (dc) \
+| (B2 G2 E2) | (D2 B,2 D2) | (E2 G2) .G2 | G4 ||
+
+
+X: 223
+T: My Love is a Lady
+B: O'Neill's 223
+N: "Playful"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+G \
+| d>ed (gab) | {b}agf g2(f/e/) | dcB GFG | BAz z2(B/c/) |
+| d>ed gab | {b}agf g2(f/e/) | dBG FDA | G3- G2 ||
+|| d \
+| g>ag bag | c'ba b/g/zz | afd g>ag | {f}ed^c d2d |
+| b>gd (B/G/) z (a/b/) | c'ag (f/d/) z (e/f/) | gBd FDA | G3- G2 ||
+
+
+X: 224
+T: A Place In Thy Memory
+B: O'Neill's 224
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+(DE) \
+| (G2 A2) .B2 | (d2 g2) .f2 | e2 d2 (Bc) | B4 (AG) \
+| A2 B2 G2 | E4 (DE) | G2 G2 A2 | B2 e2 (d>e) |
+| d2 B2 (c>B) | ({B}A2 G2) G2 | G6- | G4 || \
+ (de) \
+| g2">" f2 e2 | d2"<" B2 ">"^d2 | e2 E2 (GB) | d2 B2 (ef) |
+| (g2 f2) (e^d) | e4 (BA) | G2 E2 (GA) | B2 g2 e2 \
+| d2 B2 (GA) | B2 e2 (dB) |  ({B}A2 G2) G2 | G4 ||
+
+
+X: 225
+T: Young Kate of Kilcummer
+B: O'Neill's 225
+N: "Slow"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:Dm
+zA \
+| A2 A2 =B^c | d2 d2 ((3def) | e2 (^cA) (=Bc) | d4 (fd) \
+| c2 (BA) (GF) | G2 (GB) (AG) | F2 D2 D2 | D4 ||
+|| DE \
+| F2 G2 (AB) | AF D2 ((3def) | e2 (^cA) (=Bc) | dd3 (fd) \
+| c2 (BA) (GF) | G3 (BAG) | F2 D2 D2 | D4 ||
+
+
+X: 226
+T: Shady Groves
+B: O'Neill's 226
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: The first section ends with a fermata over the double bar.
+N: The second section has 10 bars.
+M: C
+L: 1/8
+K:G
+G>A \
+| (Bd)AB GFED | E2A2 A2(GA) | (Bd)AB (GF)ED | E2G2 G2 || AB \
+| cBcd He2 Bc | dBAG HA2 (FG) |
+| (Ad)^cB (AG)FE | F2D2 D2(Fd) | dcBA ^G2ed | c2A2 A2(AB) |
+| (cB)AG F2(dc) | B2G2 G2AB | cBcd He2 Bc | dBAG "D.C."A2 ||
+
+
+X: 227
+T: the Wink of Her Eye
+B: O'Neill's 227
+N: "Cheerful"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+(g/a/) \
+| b2g {a}gfe | d>cB cde | dBd gfe | dBG A2 (g/a/) |
+| b>ag {a}gfe | dcB cde | dge dcB | cBA G2 ||
+|| (f/g/) \
+| a2b {d'}c'ba | gfe d3 | cBA Bcd | age d2(f/g/) |
+| a2b {d'}c'ba | bd'b g2e | dge dcB | cBA G2 ||
+
+
+X: 228
+T: Tossing on the Waves
+B: O'Neill's 228
+N: "Playful"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+  B2B (dcB) | (c2A) (B2G) | (GBd) (GBd) | (FAd) (FAd) \
+| (GAB) (cde) | (f2e) d2c | (c2B) (c2d) | (GBA) G3 ||
+|| (ba).g (fe).^d | (egb) e3 | gfe dcB | ceg c'3 \
+| (Bcd edc) | (BAB) (GAB) | (c2B) (c2d) | (GBA) G3 ||
+
+
+X: 229
+T: Castle Hyde
+B: O'Neill's 229
+N: "Tenderly"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+(B A>G) \
+| G2 (Bdef) | g3 (edB) | (A2 G)(BAG) | E3 (BAG) \
+| G2 (Bde>f) | g3 (edc) | (B2 G>)(BA>G) | G3 :|
+|| d (d>B) \
+| g3 (fed) | (e>d B)B dB | g3 (fed) | e3 (def) \
+| (gagf) (e^d) | e>f Hg>edB | (A2 G>)(BA>G) | G3 ||
+
+
+X: 230
+T: The Joys of Summer
+B: O'Neill's 230
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:Bb
+F2 \
+| B3A G2AB | c3B A2F2 | G4 A4 | B4 z2F2 \
+| B3A G2AB | c3B A2F2 | G4 A4 | B6 ||
+|| d2 \
+| e2d2 e2f2 | g2f2 e2zd | e2d2 c2B2 | d2c2 B2A2 \
+| B3A G2(AB) | c3B A2F2 | G4 A4 | B6 ||
+
+
+X: 231
+T: One Sunday After Mass
+B: O'Neill's 231
+N: "Slow"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: Note the extra 2-bar "phrases".
+M: 3/4
+L: 1/8
+K:D
+(F>E) \
+| D2 D2 (F>G) | A4 (Bc) | d2 f2 (ec) | d4 (dc) \
+| B>c BAFE | (D3E) (FA) | (B3d) (ce) | d4 ef  |
+|| D2 F2 A>B A4 || (AB/c/) \
+| d2 A2 A2 | d4 (cd) | e2 (cA) (B>c) | A4 (cd) |
+| .e.e e2 e2 | e4 a2 | (A3B) (AF) | A4 (fe) \
+|| dB (A/>B/d) ({f}e>d) | Hd4 ||
+
+
+X: 232
+T: The Miller's Maid
+B: O'Neill's 232
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:G
+d>c \
+| B2AG B>cd2 | g3a b2ze | (efgf) (edcB) | B2A2 z2d>c |
+| B2AG Bcd2 | g3(a/b/) d2zg | (e>fg)(e fg)(ab) | g4 ||
+|| g2 \
+| gbag gfed | g2ab d2zd | efgd edcB | B2A2 z2g>a |
+| b>gaf g>fed | egdB A2zd | (e>fg)(e fg)(ab) | g4 ||
+
+
+X: 233
+T: A Lullagy
+B: O'Neill's 233
+N: "Moderate"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:D
+  d2f afd | Bcd A2F | ABc d2e | {g}fed e2z \
+| d2f afd | Bcd A>GF | A>Bc d2(e/g/) | f2e d2(d/e/) ||
+|| (f2e/c/) (A2d/B/) | (G2A/F/) D3 | (ceg) (fdB) | A>Bc d2(d/e/) \
+|  (f2e/c/) (A2d/B/) | (G2A/F/) D3 | ceg fdB | A>Bc d2 ||
+
+
+X: 234
+T: Saturday Night
+B: O'Neill's 234
+N: "With spirit"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+(G/B/) \
+| de=f edB | AGG G2B | def gag | =fdB c2B/c/ |
+| def gag | =fdB c2(B/c/) | de=f edB | AGG G2 ||
+|| B \
+| BGB gag | =fdB c2(B/c/) | de=f edB | BAG A2(B/c/) |
+| def gag | =fdB c2(B/c/) | de=f edB | AGG G2 ||
+
+
+X: 235
+T: Bally Patrick
+B: O'Neill's 235
+N: "With spirit"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: The second part has 15 bars.
+M: 3/4
+L: 1/8
+K:G
+D2 \
+| (D2 G2) .G2 | G3 (FGA) | .B2 .B2 .B2 | B3 z(BA) \
+| .G2 .G2 .G2 | G3 (cBG) | (A2 F2) .D2 | D3 zBc |
+| .d2 .d2 .d2 | g2 d2 B2 | B2 A2 B2 | c3 (def) \
+| d2 B2 G2 | G3 ABG | F2 D2 D2 | D4 ||
+|| DE \
+| G4 GA | B2 B2 (cB) | A2 G2 z(B/c/) | (~d3 e)(=fe) \
+| dc B2 cA | ({AB}A2 G2) G2 | G3 (EDC) | (.B,2 .C2 .D2) |
+| G4 (GA) | B2 B2 cB | A2 G2 Bc | (~d3 e)(=fe) \
+| dc TB2 cA | {AB}A2 G2 G2 | G4 ||
+
+
+X: 236
+T: As I Roved Out One Morning
+B: O'Neill's 236
+N: "With spirit"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 2/4
+L: 1/8
+K:G
+D \
+| GG A(B/c/) | d(d/c/) A(B/c/) | d(B/G/) FG | F3 D \
+| GG A(B/c/) | d(d/c/) A(B/c/) | d(c/A/) GG | G3 ||
+|| (B/c/) \
+| (dg d)(c/B/) | (cd c)(D/E/) | FG (A/B/c/A/) | F3 (d/c/) \
+| (BA/).B/ (cB/).c/ | d(d/c/) A(B/c/) | d(c/A/) GG | G3 ||
+
+
+X: 237
+T: The Young Lady
+B: O'Neill's 237
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+D GA \
+| (B>A G)B de | (=f>e d)B cc | B2 AG BA | A3 D GA |
+| (B>A G)B de | (=f>e d)B cc | B2 G{B}A GG | G3 ||
+|| d dd \
+| =f2 ed d^f | (g2 B)d =fe | (e2 d)B GB | A3 D GA |
+| (B>A G)B de | (=f>e d)B cc | B2 G{B}A GG | G3 ||
+
+
+X: 238
+T: Thou of the Beautiful Hair
+B: O'Neill's 238
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:G
+d>c \
+| .B2.B2 (B>AG)B | .d2.d2 (=f>ed)^f | (g2B2) (B>AG)B | (c4 d2)d>c |
+| .B2.B2 (B>AG)B | .d2.d2 (=f>ed)^f | e>d BG A3G | G4 G2 ||
+|| (de) \
+| =f2d2 f2d>e | =f>e ((3dBA) B2(de) | =f2 ((3edB) (g2B2) | ~c4 {de}d2d>c |
+| .B2.B2 (B>AG)B | .d2.d2 (=f>ed)^f | e>d BG A3G | G4 G2 ||
+
+
+X: 239
+T: Who Are You?
+B: O'Neill's 239
+N: "With spirit"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 2/4
+L: 1/8
+K:G
+G \
+| AA (Bd) | (cB) AG | (ED/)E/ GG | G3 (B/d/) \
+| ee dg | (B>A G)(B/c/) | dd (e/>d/)B/G/ | A3 d |
+| ee dg | (B>A G)(B/d/) | cB (TAB/)G/ | E3 (F/G/) \
+| AA Bd | cB AG | E(D/E/) GG | G3 ||
+
+
+X: 240
+T: O For One and Twenty!
+B: O'Neill's 240
+N: "Gaily"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:Dm
+f \
+| cAF GAc | d2G G2f | cAF GA^c | d2D D2f |
+| cAF GAc | dcB AGF | BAG A=B^c | d2D D2 ||
+|| e \
+| f>gf fed | g>ag gfe | f>ed g>fe | a2d d2e |
+| f>gf fed | gag gfe | f>ed A=B^c | d2D D2 ||
+
+
+X: 241
+T: The Charming Fair Maid
+B: O'Neill's 241
+N: "Slow"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: The second part has 9 bars.
+M: 3/4
+L: 1/8
+K:D
+z2 z2 dc \
+| A2 A2 Bc | d4 de | f4 ed | e2 d4 \
+| f4 gf | e4 a2 | d2 c2 d2 | e2 d4 ||
+|| ed d2  (cB/A/) | AB c2 z2 | ed dc BA | AG F2 ED \
+| C4 DE | F4 AG | E4 GE | D2 C2 D2 | E2 D4 ||
+
+
+X: 242
+T: My Fairhaired Darling
+B: O'Neill's 242
+N: "With feeling"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+G2F \
+| D2G G2F | G3 AGF | G2A c2d | =f3 de^f \
+| g2f d2c | A3 G3 | F3- F2G | A3 G2F |
+| D2G G2F | G3 AGF | G2A c2d | =f3 de^f \
+| g2f d2c | A2G F2A | G3- G3 | G3 z2 ||
+|| c \
+| d2c d2e | =f2 de^f | g2f d2e | =f3 de^f \
+| g2f d2c | A3 G3 | F3- F2G | A3 G2F |
+| D2G G2F | G3 AGF | G2A c2d | =f3 de^f \
+| g2f d2c | A2G F2A | G3- G3 | G3 z2 ||
+
+
+X: 243
+T: The Fairy Boy
+B: O'Neill's 243
+N: "Moderate"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:A
+E2 \
+| (Ac) E2 FG | Ac f2 e2 | fe c3 A | (BA F2) G2 \
+| (Ac) E2 (FG) | (Ac f2) e2 | (fe) c3 A | (c>B) A2 ||
+|| e2 \
+| (ec) (f3 e) | (cA) (B3 A) | cA f3 e | cA B3 (c/B/) \
+| (Ac) (E2 FG) | (Ac f2) e2 | fe (c3 A) | c>B A2 ||
+
+
+X: 244
+T: the Man With the Red Cloak
+B: O'Neill's 244
+N: "With spirit"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:C
+   G2G G2G | GFA G3   | c2c cBc    | (^c3 d2)A \
+|  G2G G2G | GFA G2z  | d2d ded    | c2c GAB ||
+|| c2c cdc | c2B Bc^c | d2d ded    | e2z GAB \
+|  c2c cdc | c2B Bc^c | d2d (de).d | c2z z2 ||
+|| G \
+| f3 def | e3 c2c | BBB BAB | c3 z2G \
+| f3 def | e3 c2c | BBB BAB | c3 z2z ||
+|| G2G G2G | GFA G3   | c2c cBc    | (^c3 d2)z \
+|  G2G G2G | GFA G2G  | d2d ded    | c3 z2z ||
+
+
+X: 245
+T: I'll Be a Good Boy
+B: O'Neill's 245
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:D
+(Ad) \
+| f2 (gf) (ed) | (c2 A2) (A>G) | (F2 D2) D>E | D4 (Ad) \
+| (fg a2) (gf) | (ef g2) (fe) | (dc A2) A2 | A4 (de) |
+|| fg a2 gf | ef g2 fe | d>c de fg | f4 e(f/e/) \
+| (d2 A2) (A>G) | (F2 D2) (FG) | (A2 d2) (d{f}e) | Hd4 ||
+
+
+X: 246
+T: You Never Saw Rosey
+B: O'Neill's 246
+N: "Slow"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+(G/A/).B/.c/ \
+| (d3 f) g2 | (f d3) (B>G) | {GAB}A4 G2 | G6 \
+| .d2 .d2 (ga) | b2 a2 gf | d2 (gf) (d>e) | d4 (G/A/).B/.c/ |
+| .d2 .d2 (g>a)  | b2 a2 gf | d2 gf d>{f}e | d4 (c/d/).e/.f/ \
+| a2 g2 (fe) | c f2 dBG | {GAB}A4 G2 | G4 ||
+
+
+X: 247
+T: the Old Langolee
+B: O'Neill's 247
+N: "Playful"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+  G3 B3 | A>GA BGE | D>EG G2e | d>cB (A2{BA}G) |
+| G3 B2B | A>GA BGE | D>EG G2e | d>cB {B}A2G ||
+|| Bcd d>ef | edc BAG | Bcd def | efd g2G |
+| G>Bd gfe | dcB BAG | G>DG G>DG | G>cB (A2{BA}G) ||
+
+
+X: 248
+T: the New Langolee
+B: O'Neill's 248
+N: "With expression"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+D/D/ \
+| D>EF GAB | c>ed cBA | BGE DEG | B>cA G2D |
+| (DEF) (GAB) | (ced) (cBA) | (BGE) (DEG) | (B{d}cA) G2 ||
+|| c/c/ \
+| BGB dBd | e>dc dBG | G>Bd efg | G>AG GED/D/ |
+| cec BdB | A>GA BGE/E/ | GFE (D<d)c | B>cA G2 ||
+
+
+X: 249
+T: The Bride of Malahide
+B: O'Neill's 249
+N: "Moderate"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+(d/e/f) \
+| g2 (gf)(ed) | d2 (ed)(c{dc}B) | c2 B2 ({B}A>G) | E4 (A/B/d) \
+| e2 (fe)(dB) | (A>B) d2 D2 | E2 {B}A3 G | G2 :|
+|| (D/E/F) \
+| G2 A2 BA | B2 B2 AG | c2 d2 ef | g4 (d/e/g) \
+| a2 b2 (a/g/e) | d2 e2 (e/d/B) | A2 dB AB | A4 {d}cB |
+| c2 d2 ef | g2 g2 (gf/e/) | d2 B2 A>G | E4 (D/E/F) \
+| G2 (FE) (~DC) | B,2 A,>B, G,2 | E2 {B}TA3 G | G4 ||
+
+
+X: 250
+T: the Maid of Selma
+B: O'Neill's 250
+N: "Gaily"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+(G2E) (EDE) | G3 (g2e) | (d2B) (BAG) | .A.B.A (A2B) \
+| (G2E) (EDE) | G3 (g2e) | (d2B) .B.A.G | A3 G3 ||
+|| d3 (gfg) | e3 (dcB) | (d2e) (g2a) | (b2e) e2z \
+| d3 (gfg) | e3 (dcB) | (d2e) (g2b) | a3 (g2a) |
+| (b2e) (efg) | (f2d) d3 | (e2B) (~BAG) | (A2E) E2 \
+| (G2E) (~EDE) | G3 g3 | | .e.d.B .B.A.G | A3 G3 ||
+
+
+X: 251
+T: The Shepherd
+B: O'Neill's 251
+N: "Moderate"
+N: "Collected by J.O'neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:G
+B>A \
+| G3F E2(Bd) | (ed)Bd e2(eg) | (dc)(BA) G2B2 | (cBAG) A2B>A |
+| G3F E2(Bd) | (ed)Bd e2f2 | (g>ag).f (e>fg).c | B2(A>G) G2 ||
+|| d2 \
+| g3a g2G2 | (Bcde) (edcB) | (Bdgb) (bagb) | (agab) a2(g>a) |
+| {ga}b3a g2fd | .B.d.f.a g2e>f | (g>ag).f (e>fg).c | B2(A>G) G2 ||
+
+
+X: 252
+T: the Fairy Cobbler
+B: O'Neill's 252
+N: "With spirit"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:Gm
+(d/c/) \
+| B2G A2F | G2F D2E  | F2E F2G | F3 d2c |
+| BAG AG^F | G2=F DEC | D=E^F G2G | G3- G2 ||
+|| D \
+| G2G B2c | d2c f2d | c2A F2A | c3- c2A |
+| G2G B2c | d2g g2g | {=e}f2d B2c | d3- d2c |
+| B2G AG^F | G2=F DEC | D=E^F G2G | G3- G2 ||
+
+
+X: 253
+T: The Battle Eve
+B: O'Neill's 253
+N: "Animated"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:Gm
+D2 \
+| G3^F G2A2 | G4 B3B | AF3 F3F | F4 ^F3F |
+| D2G2 G2A2 | B4 A2G2 | D4 ">"E4 | ">"D6 f2 |
+| (f3d B2d2) | f4 =e2d2 | (c3A F2A2) | c4 B3c |
+| (d3B) (c3A) | D4 G3^F | G4 A4 | B4 B2c2 |
+| d3d c2B2 | f4 F3F | B4 ||
+
+
+X: 254
+T: The Cruiskeen Lawn
+B: O'Neill's 254
+N: "With expression"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: Bar 2 doesn't add; F3 should probably be F2.
+M: C
+L: 1/8
+K:Gm
+(G/^F/) \
+| (D<G)(GA) B2(AB) | .c.B.A.G F3(DC) | (D<G)(GA) (B>A)(Bc) | d6 zd |
+| (d>B)(B<d) f2(ed) | .c.B.A.B Hc2(Bc) | (d>c)(B<G) ">"d2">"D2 | ">"G2">"A2 ">"B2Bc |
+| (d>c)(B<G) ">"d2D2 | G6 z || (G/A/) | (B>A)(B<d) (f<d)f2 | (c>A)(F<A) (c<A)c2 |
+| (d>c)(B<G) ">"d2">"D2 | ">"G2">"A2 ">"B2Bc | (d<Hg)(d>c) ">"B2A2 | G6 ||
+
+
+X: 255
+T: Brian the Brave
+B: O'Neill's 255
+N: "Tenderly"
+N: "Collected by McFadden"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:A
+(e>d) \
+| c2A>B A2(G(3A/B/c/) | (d>c) (AG/F/) G2 (Ac/d/) | (e>d) (c<A) (d>c) (A<G) | A6 :|
+|| (ef) \
+| (gfga) g2(ef) | (gag)e d2 ((3efg) | (ab)(ag) ed ((3efg) | a6 (ba/g/) |
+| f2 (fe/d/) e2 (ed/c/) | (dcde) (a3g) | (eage) d2(e<d) | c2A>G A2 ||
+
+
+X: 256
+T: When I Crossed the Valley
+B: O'Neill's 256
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:F
+c>B \
+| (BAGF) f3g | {fg}a2g>f (fe)(dc) | d3c A>GA>c | d2e>f f2c>B |
+| (BAGF) f3g | {fg}a2g>f (fe)(dc) | d>efg agfe | ~d3e f2 ||
+|| (g>f) \
+| (fedc) c2a2 | (ge)(d>e) c2A>B | c3d c>dc>A | (c3d/e/ f3)e |
+| d>cd>f ({e}d2c).A | cA (cd/e/) f3g | {g}agfd (cd/e/) fB | A3G F2 ||
+
+
+X: 257
+T: On a Bank of Flowers
+B: O'Neill's 257
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:D
+DE \
+| F2A2 A2Bc | d2A2 A2f2 | (e2d2) fedc | d6 (DE) |
+| F2A2 A2(Bc) | d2A2 A2f2 | (ge)(cA) f2e2 | d6 ||
+|| (fg) \
+| .a2.g2 fgaf | .g2.c2 .c2(de) | (.=f2.d2) (.d.e.^f.g) | a2A2 A2 (FG) |
+| (A^GAB) (A=GFG) | (A^GAB) A2f2 | e2d2 fedc | d6 ||
+
+
+X: 258
+T: Count Not the Hours
+B: O'Neill's 258
+N: "Cheerful"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+  G>AB (Bg>)d | (d2B) (A2B/A/) | G>AB gdB | A3 z2(B/A/) |
+| G>AB (Bg>)d | .d.e.f (Hg2f/e/) | .d.g.B .d.c.A | G3 z2 ||
+|| (g/a/) \
+| (b2g) (ag).e | d2B B2g/a/ | (b2g) (ag).e | d3 g2(g/a/) |
+| .b.a.g .a.g.f | .d.e.f (Hg2f/e/) | .d.g.B .d.c.A | G3 z2 ||
+
+
+X: 259
+T: O'Donnell Aboo
+B: O'Neill's 259
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:D
+A/F/ \
+| D2DF A2FA | f2dB A2GF | E2EF G2FE | D2DF A2A/G/F/E/ |
+| D2DF A2FA | f2dB AGF2 | E2ed cABc | d2de d2z :|
+|| f2ec dcBA | d2dB AFD2 | G2G>G FAGF | E2E>F E2 A/G/F/E/ |
+| D2DF A2FA | f2dB A2GF | E2ed cABc | d2de d2z ||
+
+
+X: 260
+T: The Boyne Water
+B: O'Neill's 260
+N: "Moderate"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:ADor
+AG \
+| E2e2 efge | dcBA G2AB | c2BA edcB | ABAG E3D |
+| E2e2 efge | dcBA G2AB | c2BA edcB | A4 A2 ||
+|| ^cd \
+| e2a2 a2b2 | a^ge^c d2cd | e2a2 ^gabg | a3^g e2f2 |
+| =gfga g2fe | dcBA G2AB | c2BA edcB | A4 A2 ||
+
+
+X: 261
+T: the Boy of My Heart
+B: O'Neill's 261
+N: "Gaily"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+D2 \
+| (DEG) A2A | (ABG) A2E | (GAB) (cBA) | (BGE) E2c |
+| (c>dc) B2G | (A2E) (G2E) | .D(cB) (cBA) | GED D2 ||
+|| (G/E/) \
+| (DG).G (DA).A | (DB).B A2(E/F/) | (GAB) (c>BA) | (B2G) (E2B) |
+| (c>dc) B2B | A2E G2E/E/ | .D(cB) (cBA) | GED D2 ||
+
+
+X: 262
+T: Paddies Evermore
+B: O'Neill's 262
+N: "With spirit"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:D
+(A/G/) \
+| FA2 d2f | e2c A2G | (F2A) d2d | d3 z2g \
+| {g}f2e f2g | a2f d2f | e2d c2B | A3 z2g |
+| {g}f2e f2g | a2f d2f | e2c A2F | G3 z2A \
+| B2B Bcd | e2c A2G | (FA2) d2d | d3 z2g |
+| f2e f2g | a2f d2f | e2c A2F | G3 z2A \
+| B2B Hg2f | e2c A2G | (FA2) d2d | d3 z2g ||
+
+
+X: 263
+T: Kate Kearnel
+B: O'Neill's 263
+N: "Moderate"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+D2 \
+| D2 E2 G2 | G2 A2 B2 | A2 G2 G2 | G4 D2 \
+| G2 B2 d2 | (edcBAG) | B2 A2 A2 | A4 (Bd) |
+| e2 c2 e2 | d2 B2 d2 | c2 A2 c2 | B4 (G/A/) \
+| (TB2 A2) .B2 | (TG2 E2) .D2 | (E2 G2) .G2 | G4 ||
+|| D2 \
+| D2 B,2 D2 | D2 B,2 D2 | G6 | G4 D2 \
+| D2 B,2 D2 | D2 B,2 D2 | A6 A4 (Bd) |
+| e3 c e2 | d2 B2 d2 | c3 A c2 | B2 G2 A2 \
+| (TB2 A2) .B2 | (TG2 E2) .D2 | E6 | G4 ||
+
+
+X: 264
+T: I Leave You To Guess
+B: O'Neill's 264
+N: "Slow"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: The notes don't add up in bar 2.
+M: 5/4
+L: 1/8
+K:D
+D FA \
+| d3e fd A3 (F/A/) | G3E FDz D2FA | d3e fd A3 (F/A/) | G3c edz ||
+M: 6/8
+|| "Lively"D \
+| F2F F2F | EFE E2F | D2D D2F | A3 d3 \
+| F2F F2F | EFE E2F | D2F A2F | D3 D2 ||
+
+
+X: 265
+T: Finnegan's Wake
+B: O'Neill's 265
+N: "Lively"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 2/4
+L: 1/8
+K:C
+G/F/ \
+| EG GA/B/ | cc cd/e/ | fd ed/c/ | AG GG/F/ \
+| EG GA/B/ | cc cd/e/ | fd ed/c/ | AG G ||
+|| (c/d/) \
+| eg ge | dc Ac | eg ge | dc dc/d/ \
+| eg ge | dc cd/e/ | fd ed/c/ | AG G ||
+
+
+X: 266
+T: The Old Blind Bard
+B: O'Neill's 266
+N: "Brilliant"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: Typo: The note values are obviously wrong in bar 6; (b2a2) should be (ba).
+M: 2/4
+L: 1/16
+K:Em
+(BA) \
+| (GABc) .d2(cd) | (edcd) .B2(ba) | {a}g2(fe) B2^d2 | e6 (BA) |
+| (GABc) .d2(cd) | (edcd) .B2(b2a2) | (gfed) B2^d2 | e6 ||
+|| b2 \
+| b3a .g2(fg) | (agfe) .d2(ef) | .g2(fg) (ef)(ga) | b2B2 .B2(BA) |
+| (GABc) .d2(cd) | (edcd) .B2(ba) | (gfed) B2^d2 | e6 ||
+
+
+X: 267
+T: the Old Beggarman
+B: O'Neill's 267
+N: "With spirit"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:D
+d \
+| A>BA A<AB | (=c>d)c c2e | (dc).B (AB).c | d2e f2d |
+| A>BA Adc | BcB Be.d | cBA ABc | ded d2||
+|| (d/e/) \
+| f2f (fga) | (agf) (e2f/g/) | a2a gfe | dcB (A2d/e/) |
+| (fgf) (fga) | agf efg | fed cBc | ded d2 ||
+
+
+X: 268
+T: The New Apron
+B: O'Neill's 268
+N: "With expression"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+(D>E) \
+| (G3 ABA) | MG2 MD2 ME2 | (=F3 AGF) | =F2 E2 (D>E) \
+| G2 dc BA | MG2 MD2 ME2 | {A}G>F G>A B>c | d4 E>F |
+| G2 dc BA | MG2 MD2 ME2 | =F2- F(G/A/) GF | =F2 E2 (G>E) \
+| D3 B, (DE/F/) | D4 Bc | d3c BA | G4 ||
+|| B>c \
+| d2 cB AG | c4 c_B | {B}A2 FG AB | c4 Bc \
+| d2 cB AG | (cd/e/) d2 ze | d2 cB .c(d/e/) | d4 .g(f/e/) |
+| d2 B2 (GA/B/) | c3 d e2 |  E2 AB cA | G2 F2 GE \
+| D2 CB, (CD/E/) | D4 Bc | d3 c BA | G4 ||
+
+
+X: 269
+T: Burn's Farewell
+B: O'Neill's 269
+N: "Moderate"
+N: "Collected by J.Kennedy"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:Am
+ed \
+| c2A2 A2GE | c2e2 d2^cd | e2e2 d2^cd | e2G2 G2ed \
+| c2A2 A2GE | c2e2 d2^cd | e2a2 gede | c2A2 A2 :|
+|| e^f \
+| g2a2 g2^fg | a2g2 g2ag | =f2e2 d2^cd |e2G2 G2ed \
+| c2A2 A2GE | c2e2 d2^cd | e2a2 gede | c2A2 A2 :|
+
+
+X: 270
+T: The Church of Dromore
+B: O'Neill's 270
+N: "Moderate"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:Am
+D \
+| (EA).A ABc | (TBAB) (G2A) | (Be).e dBA | (TBAB) GED \
+| (EA).A ABc | (TBAB) (G2A) | (Be).e dBG | (BA).A A2 ||
+|| d \
+| (g^fg) (edB) | (BA).A A2d | (Tg^fg) edc | (TBAB) GED \
+| (EA).A ABc | (TBAB) (G2A) | (Be).e dBG | BAA A2 ||
+
+
+X: 271
+T: the Fox and His Wife
+B: O'Neill's 271
+N: "With spirit"
+N: "Collected by M.O'Brien"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+(d/c/) \
+| BAB Az B | GFA Gz d | gfg edc | (B2c) dz d |
+| gfg e3 | d^ce d2(B/A/) | GFA GAB | g3 ez e \
+| d^ce d=cA | G3 Gz ||
+
+
+X: 272
+T: O'Reilly's Lamentation
+B: O'Neill's 272
+N: "Slow"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+(d>c) \
+| (BG B)(c/d/) (c>A) | (F>A) "p"G2- G ((3d/e/f/) | ">"g2 (e>g) (f>d) | (ec) d2- d ((3d/e/f/) |
+| ">"g2 e>g fd | Bd "p"e2- e (g>e) | (dB) .G(B/d/) (cA) | (F>A) G2- G ((3d/e/f/) |
+| ">"g2 (e>g) (f>d) | (Bd) .e(e/f/) (g/f/)(g/e/) | (dB) G(B/d/) cA | (F>A) G2- G ||
+
+
+X: 273
+T: Kilkenny Tune
+B: O'Neill's 273
+N: "Lively"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:G
+(d>c) \
+| B2(A>B) (G>A)(G>E) | D2G2 G2(B>c) | (dB)(ge) (dB)(GB) | (dc)(Bc) A2(d>c) |
+| B2(A>B) (G>A)(G>E) | D2G2 G2(B>c) | d2(g>e) (d>c)(B>A) | G4- G2 :|
+|| de \
+| (=f>e)(f>g) f2(d>e) | (=f>e)(f>g) f2(A>B) | (c>B)(c>d) (c>B)(c>d) | (c>B)(c>d) ((3cde) (d>c) |
+| B2(A>B) (G>A)(G>E) | D2G2 G2(B>c) | d2(g>e) (d>c)(B>A) | G4- G2 :|
+
+
+X: 274
+T: Achil Air
+B: O'Neill's 274
+N: "Slow"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:D
+(.A.d.d) \
+| ">"d3 (ded) | ">"c3 .c(cB) | ">"A3 .G(AB) | ">"c3 (.A.d.d) \
+| ">"d3 (ded) | ">"c3 .c(cB) | A3 G (TE>D) | D2- D ||
+|| (.A.A.A) \
+| ">"A3 (ABA) | ">"d3 (.A.A.A) | ">"B3 (.A.B.c) | ">"d3 (.d.d.d) \
+| =f3 "dim".f(fe) | (ed) (dcBG) | "p"A3 G (TE>D) | D2- D ||
+
+
+X: 275
+T: The Forlorn Lover
+B: O'Neill's 275
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+G2 \
+| B2 B2 B2 | B3 A G2 | e2 A2 A2 | A4 (GA) \
+| B2 (dB) (AG) | .E2 D2 (GA) | (B3 c) BA | G4 :|
+|| B2 \
+| d2 d2 d2 | d2 (cB) (AG) | ">"G2 g2 g2 | g4 Bc \
+| d2 d2 d2 | (ed) (cB) (AG) | ">"G2 g2 f2 | g4 (de) |
+| =f3 g f2 | e4 g2 | d2 (cB) (AG) | A4 GA \
+| B2 dB AG | E2 D2 GA | B3 c BA | G4 ||
+
+
+X: 276
+T: The Green Woods of Truigha
+B: O'Neill's 276
+N: "Slow"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:G
+D \
+| G2 Bd  (c/B/)(A/G/) | B2 g>f (e/d/)(c/B/) | A>c BG {B}A>G | G4 z2 |
+| G2 B>d (c/B/)(A/G/) | B2 g>f (e/d/)(c/B/) | A>c BG {B}A>G | G4 z ||
+|| d \
+| g>g fe a>g | f>e d2 g>f | {f}e3 d Bd | ef ga Hb2 |
+| G2 Bd (c/B/)(A/G/) | B2 g>f (e/d/)(c/B/) | A>c BG {B}A>G | G4 z ||
+
+
+X: 277
+T: Little Mary Cullinan
+B: O'Neill's 277
+N: "With spirit"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:D
+(f/e/) \
+| d>BAF A2A>B | d2 ed/e/ feef | dBAF A2AB | d2 {f}ed/e/ fd d ||
+| g \
+| fefg a2gf | ebba be ef/e/ | dBAF A2AB | df ed/e/ fd d ||
+
+
+X: 278
+T: O Arranmore Loved Arranmore
+B: O'Neill's 278
+N: "Moderate"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:Dm
+A \
+| d>efe dAA>F | G>GGA c3A | d>efe dAA>F | G>FDD D3 ||
+| c \
+| c/c/A F>G A>BAF | c>AF>A c3A | d>efe dAA>F | G>FDD D3 ||
+
+
+X: 279
+T: My Heart's Full of Joy
+B: O'Neill's 279
+N: "Playful"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: Typo: Missing dot in first bar.
+M: 6/8
+L: 1/8
+K:G
+(D/>G/) \
+| Bc/A GAB | {AB}c2B {B}A2d | G2{cd}e d<BA | GBc d2(D/>G/) |
+| B>cA GBd | g{ag}fe d2d | dcB ABA | G2(B/A/) G2 ||
+|| d \
+| g{ag}fg agf | gdB G2(B/>d/) | g{ag}fe dBc | d3 d2(B/>d/) |
+| g{ag}fg agf | gBd  g2e | dcB ABA | G2(B/A/) G2 ||
+
+
+X: 280
+T: the Silver Crown
+B: O'Neill's 280
+N: "With spirit"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+(G/A/) \
+| B2A (GBd) | g2e d2(B/d/) | g2e (dBG) | A2E F2(G/A/) |
+| B2A (GBd) | g2e d2e | dBG A2d | G3 G2 ||
+|| ((3d/e/f) \
+| g2f (efg) | (a>gf/e/) d2d | e(dc/B/) c(de/f/) | g2a Hb2a |
+| g(fe/d/) (c/d/e).f | egB A2D | G2A BcA | G3 G2 ||
+
+
+X: 281
+T: O White Maive
+B: O'Neill's 281
+N: "Very slow"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:Gm
+d>c \
+| (B>AG>AB>c) | d4 (c>B) | c4 (B>A) | G4 (d>c) \
+| (B>AG>AB>c) | d4 (b>a) | g3/2 (f/ e>d) | c2 z2 (d>c) |
+| (B>AG>AB>c) | d4 (b>a) | g3/2 (f/ e>d) | c2 z2 (d>c) \
+| (B>AG>AB>c) | d4 (c>B) | c4 (B>A) | (.G2 .G2) ||
+
+
+X: 282
+T: the Gentle Maiden
+B: O'Neill's 282
+N: "Slow"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:G
+F \
+| (G>AG) (F>ED) | d3 (e>fg) | (d>cB) A2G | E3- E2F \
+| (G>AG) (F>ED) | d3 (e>fg) | (d>cB) (A2{BA}G) | G3- G2 ||
+|| d \
+| (d>ef) g2g | g3 (g>fe) | d>cB {B}A2G | E3- E2F \
+| (G>AG) (F>ED) | d3 (e>fg) | (d>cB) (A2{BA}G) | G3- G2 ||
+
+
+X: 283
+T: While Gazing on the Moonlight
+B: O'Neill's 283
+N: "Animated"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:Dm
+F \
+| F2F F2G | F3 E2E | D2D E2F | G2F E2A \
+| A2G F2E | D3 D2^c | d2A A2G | {G}F2E D2^c |
+| d3 A2^c | d3 A2^c | d2f e2d | =c2=B A2B \
+| c3 G2=B | c3 G2=B | c2_e d2c | B2A G2G |
+| d2^c d2A | c2=B c2A | d2f e2d | c2B A2G \
+| F2F F2F | E2E E2^c | d2A A2G | F2E D2 ||
+
+
+X: 284
+T: The Pearl of the Flowing Tresses
+B: O'Neill's 284
+N: "Rather slow"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:Gm
+D2 \
+| G2 G2 (G>A) | G4 fd | c2 A2 A>G | F4 GA \
+| B2 B2 A>G | ^F2 G2 c>A | A2 G2 G2 | G4 ||
+|| d2 | g2 g2 g2 | a4 g2 | (gf) (dc) (d=e) | f4 Hg/f/d/>c/ \
+| | B2 B2 A>G | ^F2 G2 (c>A) | A2 G2 G2 | G4 ||
+
+
+X: 285
+T: I Will Drink No More
+B: O'Neill's 285
+N: "Slow"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:D
+AA(d/e/) \
+| "mf"f2 f2 (e>d) | d2 "p"A2 (AG) | F2 (DF) (E>D) | D3 A/B/ c/d/e \
+| f2 df ed | d>c "dim."A2 (dA/G/) | F2 D"pp"F {F}E>D | D3 ||
+|| ("cresc."D AG) \
+| (F2 E2) DF | E2 E2 (D/F/)A/>B/ | =c2 BA (d^c/A/) | A3 .A/.B/ (c/d/e) \
+| (f3 d) (ed) | d>c "dim."A2 (dA/G/) | F2 D"pp"F {F}E>D | D3 ||
+
+
+X: 286
+T: My Love Is On the River
+B: O'Neill's 286
+N: "Distinctly"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 2/4
+L: 1/8
+K:D
+  A2 AG | (FG) (AB) | =c2 B2 | HA3 (f/>e/) \
+| dc AG | FG Ad | e2 f>e | d3 z |
+| A2 AG | (FG) .A.B | =c2 B2 | HA3 (f/>e/) \
+| dc AG | FG Ac/d/ | e2 f>e | d3 z ||
+|| f>g ag | f2 ed | {d}c2 AG A4 \
+| f>g ag | f2 ed | cd e>f | d4 |
+| .A.A .A.G | .F.G .A.B | .=c.c (BG) | .A.A f>e \
+| dc AG | FG Ac/d/ | e2 f>e | d3 z ||
+
+
+X: 287
+T: Down at the Seaside
+B: O'Neill's 287
+N: "Graceful"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:D
+DE \
+| F>EFA BAFD | A^GAB A2(dc) | B3c dec>B | B4 z2(DE) |
+| F>E F(G/A/) GFED | A>F AB/c/ d3c | B>cde Tf2e>d | d6 ||
+|| (cd) \
+| edef g2(cd) | e(d/c/) dB A2 (Bc) | d>cde dcBA | B4 z2(dB) |
+| (AF)(ED) D2(FG) | (A>F)(ED) d2(fe) | (d>c) ((3Bcd) (A>F) (E>D) | D6 ||
+
+
+X: 288
+T: The Old Cloak
+B: O'Neill's 288
+N: "Very slow"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:Gm
+A \
+| (.B>.c) (.B3 .d) | (c>B) (.A2 z.A) | (G>A) (.G2 z.A) | (^F=E) (.D2 z.A) |
+| (B>c) (.B3 .d) | (c>B) ({B}A2 z{d}c) | (B>A) (.G3 .G) | (^F>A) G2 z :|
+|| A \
+| (B>=F) (.F2 z.E) | (D>F) (.F2 z.F) | (D>G) (.G3 .A) | (B>c) ({c}.d2 z.c) |
+| (.B>.B) (.B3 .B) | cd ">"{g}f2 zd | d^f ">"g2 dc | (BA) G2 z :|
+
+
+X: 289
+T: On the Mountain Side
+B: O'Neill's 289
+N: "Slow"
+N: "Collected by O'Brien"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:D
+A2 \
+| d2 (A2 GE) | c2 (B2 AG) | (E2 D2) .D2 | D4 EF \
+| G2 (A2 Bc) | d2 .e2 (ed) | (BA GA) BG | A4 (EF) |
+| G2 A2  Bc | d2 e2 ed | BA GA BG | A4 A2 \
+| d2 A2 GE | c2 B2 AG | (E2 D2) .D2 | D4 ||
+
+
+X: 290
+T: Green Shady Bowers
+B: O'Neill's 290
+N: "Animated"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: Bars 4 and 12 obviously have typos.
+M: 2/4
+L: 1/8
+K:A
+(c/B/) \
+| A>B (AF) | (FE) .E(B/c/)  | .d.d (cB) | c3 AB \
+| (cf) (fe) | (c>d) .e(c/B/) | A>B c^d | e3 A/B/ |
+| (cf) fe | c>d .e(c/B/) | (BA) (FE) | E3 (cd) \
+| .e.e .f(e/d/) | cA FE | E>F AA | A3 ||
+
+
+X: 291
+T: The Bold Deserter
+B: O'Neill's 291
+N: "Moderate"
+N: "Collected by Mrs.Cantwell"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:D
+(fe) \
+| d2A2 B2(AF) | (AB)(de) (fe)(dB) | (AF)(EF) D2D2 | D6 || (DE) |
+| F2A2 d2(ef) | g2f2 e2(de) | (fe)(dB) (AF)(EF) | A6 (DE) |
+| F2A2 d2(ef) | g2f2 e2(de) | (fe)(dB) (AF)(EF) | A6 (fe) |
+| d2A2 B2(AF) | (AB)(de) (fe)(dB) | (AF)(EF) D2D2 | D6 ||
+
+
+X: 292
+T: I'm Sadly Thinking
+B: O'Neill's 292
+N: "Slow and plaintive"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 3/4
+L: 1/8
+K:F
+(c/B/) AG \
+| F2 FG AA | {c}B2 AB cc | c2 (Bc) (AF) | G3 (c/B/) AG \
+| F2 (FG) AA | {c}B2 (AB) cc | f2 (AB/G/) FE | F3 ||
+|| G AA \
+| _e2 (d=e) fc | c2 (BA) (BA) | G2 (ec) (BA) | G3 (c/B/) AG \
+| F2 (FG) AA | {c}B2 (AB) cc | f2 (AB/G/) FE | F3 ||
+
+
+X: 293
+T: The Jug and It Full
+B: O'Neill's 293
+N: "Slow"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: This tune has 6-bar phrases.
+M: 3/4
+L: 1/8
+K:D
+F>G \
+| (A2 f2) (ef) | d2 (cA) (Bc) | d3 (efd) | (dc) A2 (AG) | {DF}E2 D2 D2 | D4 (F>G) |
+| (A2 f2) (ef) | d2 (cA) (AB/c/) | d3 (efd) | (dc) A>B AG | {DF}E2 D2 D2 | D4 ||
+|| (DE) \
+| F2 G2 (AB) | =c2 (dc) (AG) | F2 D2 DE | (.F.G.A.B) (cA) | dc A2 A2 | A3 (.G.F.G) |
+| (A2 f2) (ef) | d2 (cA) (Bc) | d3 (efd) | dc A2 AG | {DF}E2 D2 D2 | D4 ||
+
+
+X: 294
+T: Nancy My Pride
+B: O'Neill's 294
+N: "Slow"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: This tune has 3-bar phrases.
+M: 3/4
+L: 1/8
+K:G
+d>c \
+| B2 (AG) (ED) | c2 (cd) e2 | d3 z(BA) \
+| G2 A2 GE | D>E G2 B2 | A3 zdc |
+| B2 (AG) (ED) | (cB) (cd) e2 | d3 zBA \
+| G2 A2 (GE) | (D>E) (.G2 .G2) | G3 z ||
+|| (Bc) \
+| d2 (cB) (AG) | e2 ef ge | d3 zgf \
+| e2 (dB) (AB) | G2 G2 (cB) | A3 z(DE) |
+| G2 (AG) (ED) | c2 (cd) e2 | d3 z(BA) \
+| G2 A2 (GE) | (D>E) (.G2 .G2) | G3 z ||
+
+
+X: 295
+T: Down Among the Ditches
+B: O'Neill's 295
+N: "Lively"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:D
+A \
+| A2d def | dcB A2F | A2d def | {a}gfe fdB \
+| A2d def | dcB A2F | F2D GEC | D2D D2 ||
+|| D \
+| (DFA) (ABc) | GFE (E2F) | (DFA) (ABc) | d3 (F2E) \
+| (DFA) (ABc) | GFE EFG | dAF GEC | D2D D2 ||
+
+
+X: 296
+T: the Peeler and the Goat
+B: O'Neill's 296
+N: "Lively"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:Am
+(A/B/) \
+| (c2A) BAG | (A2B) (c2d) | efe (d2c) | (B2G) GAB \
+| (c2A) BAG | (A2B) (c2d) | e^fg =fed | e2A A2 ||
+|| ^f \
+| (g2e) dcd | e^f^g (a2b) | age (d2g) | (B2G) GAB \
+| (c2A) BAG | (A2B) (c2d) | e^fg =fed | e2A A2 ||
+
+
+X: 297
+T: the Smile of Nancy Barlow
+B: O'Neill's 297
+N: "Lively"
+N: "Collected by Ennis"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 6/8
+L: 1/8
+K:Gm
+G/F/ \
+| (D2G) (G2A) | B3 (A2G) | (F2A) (c2A) | (G2F) D2c \
+| (d2f) (c2d) | B3 (A2G) | (F2A) (c2A) | G2G G2 ||
+|| c \
+| d2d (d2B) | c3 (f2A) | (G2A) (B2A) | (GF2) D2C \
+| (D2G) (G2A) | B3 (A2G) | (F2A) (c2A) | G2G G2(G/F/) ||
+|| (D2G) (G2A) | F3 FGA | (B2G) (A2F) | (G2F) D2c \
+| (d2f) (c2d) | B3 (A2G) | (F2A) (c2A) | G2G G2 ||
+
+
+X: 298
+T: St. Patrick's Day
+B: O'Neill's 298
+N: "Lively"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+N: The second part is 14 bars (6+8).
+M: 6/8
+L: 1/8
+K:G
+D \
+| GAG GBd | gfe dBG | AGA BGD | EFE E2D \
+| GAG GBd | gfe dBG |
+| AGA BGD | E2F G2 :| B | def gag | fed edB \
+| def gag | fed e2B | def gag | fed gfe |
+| dBG GBd | gfe dBG | AGA BGD | EFE E2D \
+| GAG GBd | gfe dBG | AGA BGD | E2F G2 ||
+
+
+X: 299
+T: The Rambling Laborer
+B: O'Neill's 299
+N: "Moderate"
+N: "Collected by F.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: 2/4
+L: 1/8
+K:G
+e \
+| dB c/B/A/G/ | AG E(E/F/) | GG G/A/B/c/ | d2 Be \
+| dB c/B/A/G/ | AG E(F/G/) | FA D(E/F/) | G2 G ||
+| d \
+| Bd ef | gd BG | Bd ef | g2 fg \
+| ed BG | B/A/G/F/ E(F/G/) | FA D(E/F/) | G2 G ||
+
+
+X: 300
+T: The Winter is Past
+T: Ta an geimhreadh thart
+B: O'Neill's 300
+N: "Moderate"
+N: "Collected by J.O'Neill"
+Z: 1997 by John Chambers <jc@trillian.mit.edu>
+M: C
+L: 1/8
+K:AMix
+A \
+| AFAB d2g>f | edBA A2cd | (e2f).g (a2g).f | e4- .e2 (ef) |
+| (ge)fg (a2g)f | edBA A2AB | d2.gf edB>A | A4- .A2ef |
+| gefg a2ba | gfed B2AB | d2gf edB>A | A4 A2z ||

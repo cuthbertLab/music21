@@ -109,6 +109,8 @@ from music21.corpus.haydn import opus76no6
 from music21.corpus.haydn import opus77no1
 from music21.corpus.haydn import opus77no2 
 
+from music21.corpus import miscFolk
+
 from music21.corpus import monteverdi
 
 from music21.corpus import mozart
@@ -139,6 +141,10 @@ from music21.corpus.mozart import k546
 from music21.corpus.mozart import k575
 from music21.corpus.mozart import k589
 from music21.corpus.mozart import k590
+
+from music21.corpus import oneills1850
+
+from music21.corpus import ryansMammoth
 
 from music21.corpus import schoenberg
 from music21.corpus.schoenberg import opus19
@@ -277,6 +283,8 @@ MODULES = [
             opus77no1,
             opus77no2,
 
+            miscFolk,
+            
             monteverdi,
 
             mozart,
@@ -307,6 +315,10 @@ MODULES = [
             k575,
             k589,
             k590,
+            
+            oneills1850,
+            
+            ryansMammoth,
             
             schoenberg,
             opus19,

@@ -1,0 +1,23 @@
+X: 1
+T: MISS DALY'S - JIG
+B: Ryan's Mammoth Collection of Fiddle Tunes
+R: jig
+M: C|
+L: 1/8
+Z: Contributed 20020326191234 by John Chambers jmchambers:rcn.com
+K: Am
+(ue>.d) \
+| (vc<A) zvc (uB<D) zuB | (vA>.B)(c>.d) (e<a) ("4"e>.d) \
+| (c<A) zc (B<E) z"4"e | (d>.c)(B>.c) A2 ("4"e>.d) |
+| (c<A)zc (B<E) zB | (A>.B)"SEGUE"c>d (e<a) "4"e>d \
+| (c<A) zc (B<E) z"4"e | d>cB>c A2 z |]
+uG \
+| ("4"vG>.G)(A>.B) (c<"4"e) zvc | (d>.d)(c>.d) (e<c) zA \
+| (G>.G)(A>.B) (c<"4"e) z"4"e | (d>.c)(B>.d) c2 z"SEGUE"G |
+| G>GA>B (c<e) zc | d>dc>d (e<c) zA \
+| G>GA>B (c<e) ze | d>cB>d c2 z!fermat:a!x |]
+K:F
+uc \
+| (vc>.a)(g>.f) (fc) zvc | (uc>.a)(g>.f) (fc) zuc \
+| "SEGUE"c>cd>e {g}f>ef>g | a>"4"c'b>a (gd) zud |
+| vd>ba>g (gd) zvd | ud>ba>g (gd) zud || c>=Bc>d e>fg>a |1f>ag>f e>dc>=B :|2 f2 a2 f2 "D.C."[|]|]

@@ -1,0 +1,19 @@
+X: 1
+T: MRS. ADYE'S -- STRATHSPEY
+B: Ryan's Mammoth Collection of Fiddle Tunes
+R: strathspey
+M: C
+L: 1/16
+Z: Contributed 20080902 by John Chambers jc:jc.tzo.net
+%%slurgraces 1
+K: Bb
+ud2 |\
+(vB3.B)~B4 (c3.A)(F3.A) | vBuB3 ({d}c3.B) ("4"AF3)F4 |\
+(vGuG3) (B3.G) (F3.D)(B,3.D) | uEvE3 ({G}F3.E) (DB,3)(B,3ud) |
+(vB3.B)~B4 "SEGUE"(c3A)F3A | BB3 {d}c3B ("4"AF3)F4 |\
+uGG3 B3G F3DB,3D | vEE3 {G}F3E (DB,3)B,2 |] 
+uB2 |\
+(vd3.B)(f3.B) (b3.B)"SEGUE"f3B | (ABc2) ({d}Tc3B) ("4"AF3)F4 |\
+vGuG3 B3G F3DB,3D | (uE2DE) F3E (DB,3)B,3uB |
+vd3Bf3B b3Bf3B | (ABc2) ({d}Tc3B) ("4"AF3) (F3_A) |\
+G3E (Ee3) F3D (Dd3) | E3C (CF3) (DB,3)B,2 |]

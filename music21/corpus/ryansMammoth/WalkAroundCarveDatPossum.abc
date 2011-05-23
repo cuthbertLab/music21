@@ -1,0 +1,17 @@
+X:1
+T:WALK AROUND. -- "CARVE DAT POSSUM."
+N:I = start crescendo hairpin, L = end crescendo hairpin
+B:Coles pg 26.1
+Z:John B. Walsh, <walsh:mat:h.ubc.ca> 5/17/02
+M:2/4
+L:1/8
+K:G
+k"_f"v[g2B2D2G,2] k[g2B2D2G,2] | k[g2B2D2G,2] k[g2B2D2G,2] |:\
+"_p"(vB3d) | (A3d)|I ^cdef | ga L b2|
+u(B3d) | (A3d) | I ^cdef | g4 L |
+ v(B3d) | (A3d) | I ^cdef | ga b2 L |
+u(B3d) | (A3d) | I ^cdef | g4 L :|
+L:1/16
+"DANCE""_f"ud^cde gfeg | fe^df efga | bagb agfg | fe^df e2"0,4"e'2 |
+e^def gfeg | fe^df efga | bafb agfg | fe^df e4 |]\
+"^BREAK""_ff"gfeg agfg | fe^df e4 |]
