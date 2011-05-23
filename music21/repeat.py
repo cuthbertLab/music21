@@ -1986,6 +1986,23 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s2.parts[0].flat.notes), 111)        
     
 
+    def testExpandRepeatsImportedB(self):
+        from music21 import corpus
+        s = corpus.parse('GlobeHornpipe')
+        self.assertEqual(len(s.parts), 1)        
+        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 18)        
+        self.assertEqual(len(s.parts[0].flat.notes), 125)        
+
+        s2 = s.expandRepeats()    
+        #s2.show()
+        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 36)        
+        self.assertEqual(len(s2.parts[0].flat.notes), 250)        
+        # make sure barlines are stripped
+        bars = s2.parts[0].flat.getElementsByClass('Repeat')
+        self.assertEqual(len(bars), 0)        
+
+#         self.assertEqual(len(s2.parts[0].flat.notes), 111)        
+    
 
 if __name__ == "__main__":
     music21.mainTest(Test)
