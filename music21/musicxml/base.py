@@ -1498,10 +1498,13 @@ class Barline(MusicXMLElement):
 
 
 class Ending(MusicXMLElement):
+    '''Ending tags are stored in Barline tags to indicate the start ane end of a repeat bracket, used to designate an alternate repeat. 
+    '''
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'ending'
         # attributes
+        # note: not sure what difference between stop and discontinue is
         self._attr['type'] = None # can be start, stop, discontinue
         self._attr['number'] = None # this is displayed indication
 
