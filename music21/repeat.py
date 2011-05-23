@@ -2003,6 +2003,15 @@ class Test(unittest.TestCase):
 
 #         self.assertEqual(len(s2.parts[0].flat.notes), 111)        
     
+    def testRepeatsEndingsA(self):
+        from music21 import corpus
+
+
+    def testRepeatsEndingsB(self):
+        from music21 import corpus
+        # last alternate endings in last bars
+        s = corpus.parse('SmugglersReel')
+
 
 if __name__ == "__main__":
     music21.mainTest(Test)

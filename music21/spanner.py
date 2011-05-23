@@ -957,6 +957,8 @@ class SpannerBundle(object):
 #-------------------------------------------------------------------------------
 # connect two or more notes anywhere in the score
 class Slur(Spanner):
+    '''A slur represented as a spanner between two Notes. 
+    '''
 
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
@@ -970,6 +972,88 @@ class Slur(Spanner):
         msg = msg.replace(self._reprHead, '<music21.spanner.Slur ')
         return msg
     
+
+
+
+#-------------------------------------------------------------------------------
+# first/second repeat bracket
+class RepeatBracket(Spanner):
+    '''A grouping of one or more measures, presumably in sequence, that mark an alternate repeat. 
+
+    These gather what are sometimes called first-time bars and second-time bars.
+
+    It is assumed that numbering starts from 1. Numberings above 2 are permitted. The `number` keyword argument can be used to pass in the desired number. 
+
+    >>> from music21 import *
+    >>> m = stream.Measure()
+    >>> sp = spanner.RepeatBracket(m, number=1)
+    >>> sp # can be one or more measures
+    <music21.spanner.RepeatBrack 1 <music21.stream.Measure 0 offset=0.0>>
+    >>> sp.number = 3
+    >>> sp # can be one or more measures
+    <music21.spanner.RepeatBrack 3 <music21.stream.Measure 0 offset=0.0>>
+    >>> sp.getNumberList() # the list of repeat numbers
+    [3]
+    >>> sp.number = '1-3' # range of repeats
+    >>> sp.getNumberList()
+    [1, 2, 3]
+    >>> sp.number = [2,3] # range of repeats
+    >>> sp.getNumberList()
+    [2, 3]
+    '''
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+
+        self._number = None
+        self._numberRange = [] # store a range, inclusive of the single number assignment
+        if 'number' in keywords.keys():
+            self.number = keywords['number']
+
+    # property to enforce numerical numbers
+    def _getNumber(self):
+        return self._number
+
+    def _setNumber(self, value):
+        if common.isListLike(value):
+            self._numberRange = [] # clear
+            for x in value:
+                if common.isNum(x):
+                    self._numberRange.append(x)
+                else:
+                    raise SpannerException('number for RepeatBrack must be a number, not %r' % value)
+            self._number = min(self._numberRange)
+        elif common.isStr(value):
+            # assume defined a range with a dash; assumed inclusive
+            if '-' in value:
+                start, end = value.split('-')
+                self._numberRange = range(int(start), int(end)+1)
+            else:
+                raise SpannerException('number for RepeatBrack must be a number, not %r' % value)
+            self._number = min(self._numberRange)
+        elif common.isNum(value):
+            self._numberRange = [] # clear
+            self._number = value
+            if value not in self._numberRange:
+                self._numberRange.append(value)
+        else:
+            raise SpannerException('number for RepeatBrack must be a number, not %r' % value)
+
+    number = property(_getNumber, _setNumber, doc = '''
+        ''')
+
+    def getNumberList(self):
+        '''Get a contiguous list of repeat numbers that are applicable for this instance.
+        '''
+        return self._numberRange
+
+    def __repr__(self):
+        msg = Spanner.__repr__(self)
+        if self.number is not None:
+            msg = msg.replace(self._reprHead, '<music21.spanner.RepeatBrack %s ' % self.number)
+        else:
+            msg = msg.replace(self._reprHead, '<music21.spanner.RepeatBracket ')
+        return msg
+
 
 
 
@@ -1054,11 +1138,6 @@ class Diminuendo(DynamicWedge):
 # associate two or more notes to be beamed together
 # use a stored time signature to apply beaming values 
 class BeamingGroup(Spanner):
-    pass
-
-
-# first/second repeat bracket
-class RepeatBracket(Spanner):
     pass
 
 
