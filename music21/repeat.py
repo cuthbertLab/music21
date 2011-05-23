@@ -2003,8 +2003,30 @@ class Test(unittest.TestCase):
 
 #         self.assertEqual(len(s2.parts[0].flat.notes), 111)        
     
+
+    def testExpandRepeatsImportedC(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+        s = converter.parse(testPrimitive.repeatExpressionsA)
+        self.assertEqual(len(s.flat.getElementsByClass('RepeatExpression')), 3)
+
+        s = converter.parse(testPrimitive.repeatExpressionsB)
+        self.assertEqual(len(s.flat.getElementsByClass('RepeatExpression')), 3)
+
+        #s.show()
+
     def testRepeatsEndingsA(self):
-        from music21 import corpus
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+        #from music21.musicxml import testPrimitive
+        # this has repeat brackets
+        # these are stored in bar objects as ending tags, 
+        # given at start and end
+        #         <ending number="2" type="discontinue"/>
+
+        s = converter.parse(testPrimitive.repeatBracketsA)
+        #s.show()
+        pass
 
 
     def testRepeatsEndingsB(self):
