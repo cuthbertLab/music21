@@ -1751,11 +1751,32 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             # and end of repeat bracket designations
             mxEndingObj = mxBarline.get('endingObj')
             if mxEndingObj is not None:
-                # need to create spanner for this bracket, or add to e
-                # existing
                 environLocal.printDebug(['found mxEndingObj', mxEndingObj, 'm', m]) 
-                # look for existing spanner double or create new
-                # need to store spanne in SpannerBundle: spannerBundle
+                # get all incomplete spanners of the appropriate class that are
+                # not complete
+                rbSpanners = spannerBundle.getByClassComplete(
+                            'RepeatBracket', False)
+                # if we have no complete bracket objects, must start a new one
+                if len(rbSpanners) == 0:
+                    # create with this measure as the object
+                    rb = spanner.RepeatBracket(m)
+                    # there may just be an ending marker, and no start
+                    # this implies just one measure
+                    if mxEndingObj.get('type') in ['stop', 'discontinue']:
+                        rb.completeStatus = True
+                    spannerBundle.append(rb)
+                # if we have any incomplete, this must be the end
+                else:
+                    environLocal.printDebug(['matching RepeatBracket spanner', 'len(rbSpanners)', len(rbSpanners)])
+                    rb = rbSpanners[0] # get RepeatBracket
+                    # try to add this measure; may be the same
+                    rb.addComponents(m)
+                    # in general, any rb found should be the opening, and thus
+                    # this is the closing; can check
+                    if mxEndingObj.get('type') in ['stop', 'discontinue']:
+                        rb.completeStatus = True
+                    else:
+                        raise TranslateException('found mx Ending object that is not stop message, even though there is still an open start message.')
 
             barline.mx = mxBarline # configure
             if barline.location == 'left':
@@ -2656,6 +2677,13 @@ spirit</words>
         raw = s.musicxml
         self.assertEqual(raw.find('<coda') > 0, True)
         self.assertEqual(raw.find('D.C. al Coda') > 0, True)
+
+    def testImportRepeatBracketA(self):
+        from music21 import corpus
+        # has repeats in it; start with single emasure
+        s = corpus.parse('opus74no1', 3)
+        # there are 2 for each part, totaling 8
+        self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 8)
 
 
 if __name__ == "__main__":

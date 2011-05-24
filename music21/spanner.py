@@ -495,6 +495,9 @@ class Spanner(music21.Music21Object):
         # will return None if weakref is dead
         return self._components.__getitem__(key)
 
+    def __len__(self):
+        return len(self._components)
+
 
     def getComponents(self):
         '''Return all components for this Spanner as objects, without weak-refs.  
@@ -593,6 +596,7 @@ class Spanner(music21.Music21Object):
             if not self._components.hasElement(c): # not already in storage
                 self._components.append(c)
             else:
+                # it makes sense to not have multiple copies
                 environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s' % (c, self)])
 
 
@@ -1395,20 +1399,23 @@ class Test(unittest.TestCase):
         self.assertEqual(sb1[2].getComponents(), [n4a, n5])
 
 
+    def testRepeatBracketA(self):
+        from music21 import note, spanner, stream
+
+        m1 = stream.Measure()
+        rb1 = spanner.RepeatBracket(m1)
+        # if added again; it is not really added, it simply is ignored
+        rb1.addComponents(m1)
+        self.assertEqual(len(rb1), 1)
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
 if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-
-        t.testReplaceComponent()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
 
 
