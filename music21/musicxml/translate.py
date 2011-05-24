@@ -1349,7 +1349,8 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
             # returns a new spanner bundle with just the result of the search
             #environLocal.printDebug(['spanner bundle: getByCompleteStatus(False)', spannerBundle.getByCompleteStatus(False)])
 
-            sb = spannerBundle.getByIdLocal(idFound).getByCompleteStatus(False)
+            #sb = spannerBundle.getByIdLocal(idFound).getByCompleteStatus(False)
+            sb = spannerBundle.getByClassIdLocalComplete('Slur', idFound, False)
             if len(sb) > 0:
                 #environLocal.printDebug(['found a match in SpannerBundle'])
                 su = sb[0] # get the first
@@ -1741,11 +1742,20 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             # repeat is a tag found in the barline object
             mxBarline = mxObj
             mxRepeatObj = mxBarline.get('repeatObj')
-
-            if mxRepeatObj != None:
+            if mxRepeatObj is not None:
                 barline = bar.Repeat()
             else:
                 barline = bar.Barline()
+
+            # barline objects also store ending objects, that mark begin
+            # and end of repeat bracket designations
+            mxEndingObj = mxBarline.get('endingObj')
+            if mxEndingObj is not None:
+                # need to create spanner for this bracket, or add to e
+                # existing
+                environLocal.printDebug(['found mxEndingObj', mxEndingObj, 'm', m]) 
+                # look for existing spanner double or create new
+                # need to store spanne in SpannerBundle: spannerBundle
 
             barline.mx = mxBarline # configure
             if barline.location == 'left':

@@ -1481,6 +1481,8 @@ class Barline(MusicXMLElement):
         self._attr['location'] = None # right-left-middle
         # elements
         self.barStyle = None # varieties include light-heavy
+        # store a single ending object; this is used to tag start and end
+        # of repeat brackets
         self.endingObj = None
         self.repeatObj = None
 

@@ -776,7 +776,7 @@ class Spanner(music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 class SpannerBundle(object):
-    '''A utility object for collecting and processing collections of Spanner objects.
+    '''A utility object for collecting and processing collections of Spanner objects. This is necessary because often processing routines that happen at many different levels need access to the same collection of spanners. 
 
     If a Stream or Stream subclass is provided as an argument, all Spanners on this Stream will be accumulated herein. 
     '''
@@ -951,6 +951,44 @@ class SpannerBundle(object):
         return post
 
 
+    def getByClassIdLocalComplete(self, className, idLocal, completeStatus):
+        '''Get all spanners of a specified class `className`, an id `idLocal`, and a `completeStatus`. This is a convenience routine for multiple filtering when searching for relevant Spanners to pair with. 
+
+        >>> from music21 import *
+        >>> su1 = spanner.Slur()
+        >>> su2 = spanner.StaffGroup()
+        >>> su2.idLocal = 3
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> sb.append(su2)
+        >>> sb.getByClassIdLocalComplete('StaffGroup', 3, False).list == [su2]
+        True
+        >>> su2.completeStatus = True
+        >>> sb.getByClassIdLocalComplete('StaffGroup', 3, False).list == []
+        True
+        '''
+        return self.getByClass(className).getByIdLocal(
+            idLocal).getByCompleteStatus(completeStatus)
+
+    def getByClassComplete(self, className, completeStatus):
+        '''Get all spanner of a specified class `className` and a `completeStatus`. Convenience routine for multiple filtering
+
+        >>> from music21 import *
+        >>> su1 = spanner.Slur()
+        >>> su1.completeStatus = True
+        >>> su2 = spanner.StaffGroup()
+        >>> su3 = spanner.Slur()
+        >>> su3.completeStatus = False
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> sb.append(su2)
+        >>> sb.append(su3)
+        >>> sb.getByClassComplete('Slur', True).list == [su1]
+        True
+        >>> sb.getByClassComplete('Slur', False).list == [su3]
+        True
+        '''
+        return self.getByClass(className).getByCompleteStatus(completeStatus)
 
 
 
@@ -958,8 +996,9 @@ class SpannerBundle(object):
 # connect two or more notes anywhere in the score
 class Slur(Spanner):
     '''A slur represented as a spanner between two Notes. 
-    '''
 
+    The `idLocal` attribute, defined in the Spanner base class, is used to mark start and end tags of potentially overlapping indicators.
+    '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
         self.placement = None # can above or below, after musicxml
