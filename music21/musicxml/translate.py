@@ -1289,7 +1289,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
         n = note.Note()
     else:
         n = inputM21
-
+ 
     # doing this will create an instance, but will not be passed
     # out of this method, and thus is only for testing
     if spannerBundle == None:
@@ -1421,6 +1421,14 @@ def measureToMx(m, spannerBundle=None):
     '''Translate a :class:`~music21.stream.Measure` to a MusicXML :class:`~music21.musicxml.Measure` object.
     '''
     #environLocal.printDebug(['measureToMx(): got spannerBundle:', spannerBundle])
+    if spannerBundle is not None:
+        # get all spanners that have this measure as a component    
+        rbSpanners = spannerBundle.getByComponentAndClass(
+                          m, 'RepeatBracket')
+        environLocal.printDebug(['measureToMx', 'm', m, 'len(rbSpanners)',
+                             len(rbSpanners)])
+    else:
+        rbSpanners = [] # for size comparison
 
     mxMeasure = musicxmlMod.Measure()
     mxMeasure.set('number', m.number)
@@ -1456,11 +1464,24 @@ def measureToMx(m, spannerBundle=None):
     mxMeasure.set('attributes', mxAttributes)
 
     # see if we have barlines
-    if m.leftBarline != None:
-        mxBarline = m.leftBarline.mx # this may be a repeat object
+    if (m.leftBarline != None or 
+        (len(rbSpanners) > 0 and rbSpanners[0].isFirst(m))):
+        if m.leftBarline is None:
+            # create a simple barline for storing ending
+            mxBarline = musicxmlMod.Barline()
+        else:
+            mxBarline = m.leftBarline.mx # this may be a repeat object
         # setting location outside of object based on that this attribute
         # is the leftBarline
         mxBarline.set('location', 'left')
+    
+        # if we have spanners here, we can be sure they are relevant
+        if len(rbSpanners) > 0:
+            mxEnding = musicxmlMod.Ending()
+            mxEnding.set('type', 'start')
+            mxEnding.set('number', rbSpanners[0].number)
+            mxBarline.set('endingObj', mxEnding)
+
         mxMeasure.componentList.append(mxBarline)
     
     # need to handle objects in order when creating musicxml 
@@ -1552,12 +1573,26 @@ def measureToMx(m, spannerBundle=None):
                 pass
                 #environLocal.printDebug(['_getMX of Measure is not processing', obj])
 
+    # TODO: create bar ending positions
     # right barline must follow all notes
-    if m.rightBarline != None:
-        mxBarline = m.rightBarline.mx # this may be a repeat
+    if (m.rightBarline != None or 
+        (len(rbSpanners) > 0 and rbSpanners[0].isLast(m))):
+        if m.rightBarline is None:
+            # create a simple barline for storing ending
+            mxBarline = musicxmlMod.Barline()
+        else:
+            mxBarline = m.rightBarline.mx # this may be a repeat
         # setting location outside of object based on that this attribute
         # is the leftBarline
         mxBarline.set('location', 'right')
+
+        # if we have spanners here, we can be sure they are relevant
+        if len(rbSpanners) > 0:
+            mxEnding = musicxmlMod.Ending()
+            mxEnding.set('type', 'stop')
+            mxEnding.set('number', rbSpanners[0].number)
+            mxBarline.set('endingObj', mxEnding)
+
         mxMeasure.componentList.append(mxBarline)
 
     return mxMeasure
@@ -1591,6 +1626,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     '''Translate an mxMeasure (a MusicXML :class:`~music21.musicxml.Measure` object) into a music21 :class:`~music21.stream.Measure`.
 
     If an `inputM21` object reference is provided, this object will be configured and returned; otherwise, a new :class:`~music21.stream.Measure` object is created.  
+
+    The `spannerBundle` that is passed in is used to accumulate any created Spanners. This Spanners are not inserted into the Stream here. 
     '''
     from music21 import stream
     from music21 import chord
@@ -1764,6 +1801,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     # this implies just one measure
                     if mxEndingObj.get('type') in ['stop', 'discontinue']:
                         rb.completeStatus = True
+                        rb.number = mxEndingObj.get('number')
+                    # set number; '' or None is interpreted as 1
                     spannerBundle.append(rb)
                 # if we have any incomplete, this must be the end
                 else:
@@ -1775,6 +1814,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     # this is the closing; can check
                     if mxEndingObj.get('type') in ['stop', 'discontinue']:
                         rb.completeStatus = True
+                        rb.number = mxEndingObj.get('number')
                     else:
                         raise TranslateException('found mx Ending object that is not stop message, even though there is still an open start message.')
 
@@ -2229,6 +2269,8 @@ def _getStaffExclude(staffReference, targetKey):
 
 def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     '''Load a part into a new Stream or one provided by `inputM21` given an mxScore and a part name.
+
+    The `spannerBundle` reference, when passed in, is used to accumulate Spanners. These are not inserted here. 
     '''
     #environLocal.printDebug(['calling Stream._setMXPart'])
 
@@ -2359,7 +2401,12 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 
 def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     '''Translate an mxScore into a music21 Score object.
+
+    All spannerBundles accumulated at all lower levels are inserted here.
     '''
+    # TODO: may not want to wait to this leve to insert spanners; may want to 
+    # insert in lower positions if it makes sense
+
     from music21 import metadata
     from music21 import spanner
 
@@ -2371,7 +2418,6 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
 
     if spannerBundle == None:
         spannerBundle = spanner.SpannerBundle()
-
 
     partNames = mxScore.getPartNames().keys()
     partNames.sort()
@@ -2684,7 +2730,8 @@ spirit</words>
         s = corpus.parse('opus74no1', 3)
         # there are 2 for each part, totaling 8
         self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 8)
-
+        #for e in s.flat.getElementsByClass('RepeatBracket'):
+        #    print e
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

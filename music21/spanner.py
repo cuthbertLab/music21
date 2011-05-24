@@ -954,6 +954,10 @@ class SpannerBundle(object):
                     post.append(sp)
         return post
 
+    def getByComponentAndClass(self, component, className):
+        '''Get all Spanners that both contain the component and match the provided class. 
+        '''
+        return self.getByComponent(component).getByClass(className)
 
     def getByClassIdLocalComplete(self, className, idLocal, completeStatus):
         '''Get all spanners of a specified class `className`, an id `idLocal`, and a `completeStatus`. This is a convenience routine for multiple filtering when searching for relevant Spanners to pair with. 
@@ -1057,21 +1061,27 @@ class RepeatBracket(Spanner):
         return self._number
 
     def _setNumber(self, value):
-        if common.isListLike(value):
+        if value in ['', None]:
+            # assume this is 1 
+            self._numberRange = [1]
+            self._number = 1
+        elif common.isListLike(value):
             self._numberRange = [] # clear
             for x in value:
                 if common.isNum(x):
                     self._numberRange.append(x)
                 else:
-                    raise SpannerException('number for RepeatBrack must be a number, not %r' % value)
+                    raise SpannerException('number for RepeatBracket must be a number, not %r' % value)
             self._number = min(self._numberRange)
         elif common.isStr(value):
             # assume defined a range with a dash; assumed inclusive
             if '-' in value:
                 start, end = value.split('-')
                 self._numberRange = range(int(start), int(end)+1)
+            elif value.isdigit():
+                self._numberRange.append(int(value))
             else:
-                raise SpannerException('number for RepeatBrack must be a number, not %r' % value)
+                raise SpannerException('number for RepeatBracket must be a number, not %r' % value)
             self._number = min(self._numberRange)
         elif common.isNum(value):
             self._numberRange = [] # clear
@@ -1079,7 +1089,7 @@ class RepeatBracket(Spanner):
             if value not in self._numberRange:
                 self._numberRange.append(value)
         else:
-            raise SpannerException('number for RepeatBrack must be a number, not %r' % value)
+            raise SpannerException('number for RepeatBracket must be a number, not %r' % value)
 
     number = property(_getNumber, _setNumber, doc = '''
         ''')

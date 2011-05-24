@@ -2025,6 +2025,7 @@ class Test(unittest.TestCase):
         #         <ending number="2" type="discontinue"/>
 
         s = converter.parse(testPrimitive.repeatBracketsA)
+        # TODO: add tests
         #s.show()
         pass
 
