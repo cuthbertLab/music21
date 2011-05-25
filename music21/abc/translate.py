@@ -463,7 +463,7 @@ class Test(unittest.TestCase):
         from music21 import abc
 
         # replace w/ ballad80, smaller or erk5
-        fp = corpus.getWork('teste')
+        fp = corpus.getWork('essenFolksong/teste')
         self.assertTrue(fp.endswith('essenFolksong/teste.abc') or fp.endswith(r'essenFolksong\teste.abc'))
 
         af = abc.ABCFile()
@@ -550,21 +550,9 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    import sys
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-
-    elif len(sys.argv) > 1:
-        t = Test()
-        #t.testBasic()
-
-        #t.testAnacrusisPadding()
-
-        #t.testOpusImport()
-
-        t.testMultiWorkImported()
-        t.testLocaleOfCompositionImport()
 
 #------------------------------------------------------------------------------
 # eof

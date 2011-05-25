@@ -575,7 +575,13 @@ def getComposer(composerName, extList=None):
         # composer name may be at any level
         stubs = path.split(os.sep)
         for s in stubs:
+            # need to remove extension if found
             if composerName.lower() == s.lower():
+                post.append(path)
+                break
+            # get all but the last dot group
+            # this is done for file names that function like composer names
+            elif '.' in s and '.'.join(s.split('.')[:-1]).lower() == composerName.lower():
                 post.append(path)
                 break
     post.sort()
@@ -665,6 +671,8 @@ def getWorkList(workName, movementNumber=None, extList=None):
     workSlashes = workName.replace('/', os.path.sep)
 
     # find all matches for the work name
+    # TODO: this should match by path component, not just
+    # substring
     for path in paths:
         if workName.lower() in path.lower():
             post.append(path)
