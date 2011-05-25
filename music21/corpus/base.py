@@ -397,15 +397,20 @@ _ALL_EXTENSIONS = (common.findInputExtension('abc') +
 # store all composers in the corpus (not virtual) 
 # as two element tuples of path name, full name
 COMPOSERS = [
+    ('airdsAirs', 'Aird\'s Airs'),
     ('bach', 'Johann Sebastian Bach'),
     ('beethoven', 'Ludwig van Beethoven'),
     ('ciconia', 'Johannes Ciconia'),
-    ('haydn', 'Joseph Haydn'),
+    ('essenFolksong', 'Essen Folksong Collection'),
     ('handel', 'George Frideric Handel'),
+    ('haydn', 'Joseph Haydn'),
     ('josquin', 'Josquin des Prez'),
     ('luca', 'D. Luca'),
+    ('miscFolk', "Miscellaneous Folk"),
     ('monteverdi', "Claudio Monteverdi"),
     ('mozart', 'Wolfgang Amadeus Mozart'),
+    ('oneills1850', 'Oneill\'s 1850'),
+    ('ryansMammoth', 'Ryan\'s Mammoth Collection'),
     ('schoenberg', 'Arnold Schoenberg'),
     ('schumann', 'Robert Schumann'),
     ]
@@ -566,8 +571,13 @@ def getComposer(composerName, extList=None):
     paths = getPaths(extList)
     post = []
     for path in paths:
-        if composerName.lower() in path.lower():
-            post.append(path)
+        # iterate through path components; cannot match entire string
+        # composer name may be at any level
+        stubs = path.split(os.sep)
+        for s in stubs:
+            if composerName.lower() == s.lower():
+                post.append(path)
+                break
     post.sort()
     return post
 
@@ -764,6 +774,7 @@ def getWorkReferences(sort=True):
         works = getComposer(dirComposer)
         for path in works:
             # split by the composer dir to get relative path
+            #environLocal.printDebug(['dir composer', dirComposer, path])
             junk, fileStub = path.split(dirComposer)
             if fileStub.startswith(os.sep):
                 fileStub = fileStub[len(os.sep):]
@@ -1272,10 +1283,14 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testWorkReferences(self):
+        from music21 import corpus
+        s = corpus.getWorkReferences()
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [parse, parseWork, getWork]
+_DOC_ORDER = [parse, getWork]
 
 
 if __name__ == "__main__":
