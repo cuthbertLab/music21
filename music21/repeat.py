@@ -2025,15 +2025,22 @@ class Test(unittest.TestCase):
         #         <ending number="2" type="discontinue"/>
 
         s = converter.parse(testPrimitive.repeatBracketsA)
-        # TODO: add tests
-        #s.show()
-        pass
+        raw = s.musicxml
+        self.assertEqual(raw.find("<repeat direction=")>1, True)    
+        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
 
 
     def testRepeatsEndingsB(self):
         from music21 import corpus
         # last alternate endings in last bars
+        # need to add import from abc
         s = corpus.parse('SmugglersReel')
+        #s.show()
+
+
 
 
 if __name__ == "__main__":

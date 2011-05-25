@@ -1286,6 +1286,10 @@ class Test(unittest.TestCase):
     def testWorkReferences(self):
         from music21 import corpus
         s = corpus.getWorkReferences()
+        
+        # presenly 19 top level lists
+        self.assertEqual(len(s)>=19, True)
+        self.assertEqual(len(s[0].keys()), 4)
 
 
 #-------------------------------------------------------------------------------

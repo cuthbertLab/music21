@@ -757,7 +757,7 @@ def realizerExample3():
     >>> fbLine2.addElement(bassNote2, "6")    # viio6
     >>> fbLine2.addElement(bassNote3,  "6")    # I6
     >>> fbLine2.realize()
-    >>> fbLine2.showRandomRealizations(20)
+    >>> #_DOCS_SHOW fbLine2.showRandomRealizations(20)
     >>> allSolsScore = fbLine2.generateAllRealizations()
     >>> #_DOCS_SHOW fbLine2.showRandomRealization()
     '''

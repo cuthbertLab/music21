@@ -1425,8 +1425,8 @@ def measureToMx(m, spannerBundle=None):
         # get all spanners that have this measure as a component    
         rbSpanners = spannerBundle.getByComponentAndClass(
                           m, 'RepeatBracket')
-        environLocal.printDebug(['measureToMx', 'm', m, 'len(rbSpanners)',
-                             len(rbSpanners)])
+        #environLocal.printDebug(['measureToMx', 'm', m, 'len(rbSpanners)',
+        #                     len(rbSpanners)])
     else:
         rbSpanners = [] # for size comparison
 
@@ -2392,6 +2392,22 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     else:
         streamPart.addGroupForElements(partId) # set group for components 
         streamPart.groups.append(partId) # set group for stream itself
+
+        # TODO: this does not work with voices; there, Spanners 
+        # will be copied into the Score 
+
+        # copy spanners that are complete into the part, as this is the 
+        # highest level container that needs them
+        # note that this may cause problems when creating staff copies, 
+        # as is down below
+        rm = []
+        for sp in spannerBundle.getByCompleteStatus(True):
+            streamPart.insert(0, sp)
+            rm.append(sp)
+        # remove from original spanner
+        for sp in rm:
+            spannerBundle.remove(sp)
+    
         s.insert(0, streamPart)
 
     # when adding parts to this Score
@@ -2432,10 +2448,16 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     md.mx = mxScore
     s.insert(0, md)
 
-    # for now, just adding spanners to top-most level
-    for sp in spannerBundle:
+    # only insert complete spanners; at each level possible, complete spanners
+    # are inserted into either the Score or the Part
+    # storing complet Part spanners in a Part permits extracting parts with spanners
+    rm = []
+    for sp in spannerBundle.getByCompleteStatus(True):
         s.insert(0, sp)
-    # add spanners to highest level object
+        rm.append(sp)
+    for sp in rm:
+        spannerBundle.remove(sp)
+
     return s
 
 
@@ -2565,15 +2587,14 @@ class Test(unittest.TestCase):
         
         s = converter.parse(testPrimitive.spanners33a)
         # this number will change as more are being imported
-        self.assertEqual(len(s.spanners), 2)
+        self.assertEqual(len(s.flat.spanners) >= 2, True)
 
-        self.assertEqual(len(s.spanners), 2)
 
         environLocal.printDebug(['pre s.measures(2,3)', 's', s])
         ex = s.measures(2, 3) # this needs to get all spanners too
 
         # all spanners are referenced over; even ones that may not be relevant
-        self.assertEqual(len(ex.spanners), 2)
+        self.assertEqual(len(ex.flat.spanners), 2)
         #ex.show()
         
         # slurs are on measures 2, 3
@@ -2724,6 +2745,7 @@ spirit</words>
         self.assertEqual(raw.find('<coda') > 0, True)
         self.assertEqual(raw.find('D.C. al Coda') > 0, True)
 
+
     def testImportRepeatBracketA(self):
         from music21 import corpus
         # has repeats in it; start with single emasure
@@ -2731,7 +2753,24 @@ spirit</words>
         # there are 2 for each part, totaling 8
         self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 8)
         #for e in s.flat.getElementsByClass('RepeatBracket'):
-        #    print e
+        #s.show()
+        raw = s.parts[0].musicxml
+        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
+
+        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
+
+        # can get for each part as spanners are stored in Part now
+        raw = s.parts[1].musicxml
+        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
+
+        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
+
+        
+
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

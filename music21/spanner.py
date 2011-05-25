@@ -373,6 +373,10 @@ class SpannerException(Exception):
     pass
 
 
+class SpannerBundleException(Exception):
+    pass
+
+
 #-------------------------------------------------------------------------------
 class Spanner(music21.Music21Object):
     '''
@@ -597,7 +601,7 @@ class Spanner(music21.Music21Object):
                 self._components.append(c)
             else:
                 # it makes sense to not have multiple copies
-                environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s' % (c, self)])
+                environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an erorr.' % (c, self)])
 
 
     def replaceComponent(self, old, new):
@@ -810,6 +814,29 @@ class SpannerBundle(object):
 
     def __getitem__(self, key):
         return self._storage[key]
+
+    def remove(self, item):
+        '''Remove a stored Spanner from the bundle with an instance. Each reference must have a matching id() value.
+
+        >>> from music21 import *
+        >>> su1 = spanner.Slur()
+        >>> su1.idLocal = 1
+        >>> su2 = spanner.Slur()
+        >>> su2.idLocal = 2
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> sb.append(su2)
+        >>> len(sb)
+        2
+        >>> sb.remove(su2)
+        >>> len(sb)
+        1
+
+        '''
+        if item in self._storage:
+            self._storage.remove(item)
+        else:
+            raise SpannerBundleException('cannot match object for removal: %s' % item)
 
     def __repr__(self):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
