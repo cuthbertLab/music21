@@ -549,6 +549,13 @@ class Test(unittest.TestCase):
         self.assertEqual(s.metadata.localeOfComposition, 'Amerika, Mittelamerika, Mexiko')
 
 
+    def testRepeatBrackets(self):
+        from music21.abc import testFiles
+        from music21 import converter
+        s = converter.parse(testFiles.morrisonsJig)
+        #s.show()
+
+
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)

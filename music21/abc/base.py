@@ -39,11 +39,15 @@ environLocal = environment.Environment(_MOD)
 
 # store symbol and m21 naming/class eq
 ABC_BARS = [
+           (':|1', 'light-heavy-repeat-end-first'),
+           (':|2', 'light-heavy-repeat-end-second'),
            ('|]', 'light-heavy'),
            ('||', 'light-light'),
            ('[|', 'heavy-light'),
-           ('[1', 'regular-first'),
+           ('[1', 'regular-first'), # preferred format
            ('[2', 'regular-second'),
+           ('|1', 'regular-first'), # gets converted
+           ('|2', 'regular-second'),
            (':|', 'light-heavy-repeat-end'),
            ('|:', 'heavy-light-repeat-start'),
            ('::', 'heavy-heavy-repeat-bidirectional'),
@@ -556,11 +560,17 @@ class ABCBar(ABCToken):
         '''
         for abcStr, barTypeString in ABC_BARS:
             if abcStr == self.src.strip():
+                # this gets lists of elements like
+                # light-heavy-repeat-end
                 barTypeComponents = barTypeString.split('-')
                 if 'repeat' in barTypeComponents:
                     self.barType = 'repeat'
                 else:
                     self.barType = 'barline'
+
+                if 'first' in barTypeComponents or 'second' in barTypeComponents:
+                    environLocal.printDebug(['got repeat 1/2:', self.src])
+
 
                 # case of regular, dotted
                 if len(barTypeComponents) == 1:
@@ -1216,6 +1226,34 @@ class ABCHandler(object):
                 return j # will increment to next char on loop
             j += 1
 
+    def _barlineTokenFilter(self, token):
+        '''Some single barline tokens are better replaced with two tokens. This method, given a token, returns a list of tokens. If there is no change necessary, the provided token will be returned in the list.
+        '''
+        post = []
+        if token == '::':
+            # create a start and and an end
+            post.append(ABCBar(':|'))
+            post.append(ABCBar('|:'))
+        elif token == '|1':
+            # create a start and and an end
+            post.append(ABCBar('|'))
+            post.append(ABCBar('[1'))
+        elif token == '|2':
+            # create a start and and an end
+            post.append(ABCBar('|'))
+            post.append(ABCBar('[2'))
+        elif token == ':|1':
+            # create a start and and an end
+            post.append(ABCBar(':|'))
+            post.append(ABCBar('[1'))
+        elif token == ':|2':
+            # create a start and and an end
+            post.append(ABCBar(':|'))
+            post.append(ABCBar('[2'))
+        else: # append unaltered
+            post.append(ABCBar(token))
+        return post
+
 
     #---------------------------------------------------------------------------
     # token processing
@@ -1269,24 +1307,35 @@ class ABCHandler(object):
                 matchBars = False
                 for barIndex in range(len(ABC_BARS)):
                     # first of bars tuple is symbol to match
-                    if c + cNext == ABC_BARS[barIndex][0]:
-                        j = i + 2
-                        matchBars = True 
-                        break
-                    # check for single char bars
-                    elif c == ABC_BARS[barIndex][0]:
-                        j = i + 1
-                        matchBars = True 
-                        break
+                    # three possible sizes of bar indications: 3, 2, 1
+                    barTokenArchetype = ABC_BARS[barIndex][0]
+                    if len(barTokenArchetype) == 3:
+                        if cNextNext is not None and (c + cNext + cNextNext == barTokenArchetype):
+                            j = i + 3
+                            matchBars = True 
+                            break
+                    elif cNext is not None and (len(barTokenArchetype) == 2):
+                        if c + cNext == barTokenArchetype:
+                            j = i + 2
+                            matchBars = True 
+                            break
+                    elif len(barTokenArchetype) == 1:
+                        if c == barTokenArchetype:
+                            j = i + 1
+                            matchBars = True 
+                            break
                 if matchBars:
                     collect = strSrc[i:j]
+                    # filter and replace with 2 tokens if necessary
+                    for tokenSub in self._barlineTokenFilter(collect):
+                        self._tokens.append(tokenSub)
                     #environLocal.printDebug(['got bars:', repr(collect)])  
-                    if collect == '::':
-                        # create a start and and an end
-                        self._tokens.append(ABCBar(':|'))
-                        self._tokens.append(ABCBar('|:'))
-                    else:
-                        self._tokens.append(ABCBar(collect))
+#                     if collect == '::':
+#                         # create a start and and an end
+#                         self._tokens.append(ABCBar(':|'))
+#                         self._tokens.append(ABCBar('|:'))
+#                     else:
+#                         self._tokens.append(ABCBar(collect))
                     i = j
                     continue
                     
@@ -2018,12 +2067,12 @@ class Test(unittest.TestCase):
 
         for (tf, countTokens, noteTokens, chrodTokens) in [
             (testFiles.fyrareprisarn, 239, 152, 0), 
-            (testFiles.mysteryReel, 188, 153, 0), 
+            (testFiles.mysteryReel, 192, 153, 0), 
             (testFiles.aleIsDear, 291, 206, 32),
             (testFiles.testPrimitive, 94, 75, 2),
             (testFiles.kitchGirl, 126, 101, 2),
             (testFiles.williamAndNancy, 127, 93, 0),
-            (testFiles.morrisonsJig, 176, 137, 0),
+            (testFiles.morrisonsJig, 178, 137, 0),
 
                 ]:
 
