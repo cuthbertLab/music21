@@ -1188,6 +1188,7 @@ class Test(unittest.TestCase):
         from music21 import converter, repeat
         
         s = converter.parse(testFiles.draughtOfAle)
+        #s.show()
         self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 18)
         self.assertEqual(s.metadata.title, '"A Draught of Ale"    (jig)     0912')
         self.assertEqual(len(s.flat.notesAndRests), 88)
@@ -1973,6 +1974,7 @@ class Test(unittest.TestCase):
     def testExpandRepeatsImportedA(self):
         from music21 import corpus
         s = corpus.parse('banjoreel')
+        #s.show()
         self.assertEqual(len(s.parts), 1)        
         self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 11)        
         self.assertEqual(len(s.parts[0].flat.notes), 58)        
@@ -1982,7 +1984,7 @@ class Test(unittest.TestCase):
 
         s2 = s.expandRepeats()    
         self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 21)        
-
+        #s2.show()
         self.assertEqual(len(s2.parts[0].flat.notes), 111)        
     
 

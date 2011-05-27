@@ -1437,9 +1437,7 @@ class ABCHandler(object):
                 self._tokens.append(ABCNote(collect))
                 i = j
                 continue
-
             # look for white space: can be used to determine beam groups
-
             # no action: normal continuation of 1 char
             i += 1
 
@@ -1454,7 +1452,7 @@ class ABCHandler(object):
         # metadata, for example, is parsed
         lastTimeSignature = None
         for t in self._tokens:
-            #environLocal.printDebug(['token:', t.src])
+            #environLocal.printDebug(['tokenProcess: calling preParse()', t.src])
             t.preParse()
 
         # context: iterate through tokens, supplying contextual data as necessary to appropriate objects
@@ -1517,8 +1515,7 @@ class ABCHandler(object):
         # parse : call methods to set attributes and parse abc string
         for t in self._tokens:
             t.parse()
-
-            #print o.src
+            #environLocal.printDebug(['tokenProcess: calling parse()', t])
 
     def process(self, strSrc):
         self._tokens = []
@@ -1790,6 +1787,41 @@ class ABCHandler(object):
         return post
 
 
+    def _buildMeasureBoundaryIndices(self, positionList, lastValidIndex):
+        '''Given a list of indices into a list marking the position of each bar, return a list of two-element lists, each indication the start and positions of a measure.
+
+        >>> from music21 import *
+        >>> ah = abc.ABCHandler()
+        >>> ah._buildMeasureBoundaryIndices([8, 12, 16], 20)
+        [[0, 8], [8, 12], [12, 16], [16, 20]]
+
+        >>> # in this case, we need to see that 12 and 13 are the same
+        >>> ah._buildMeasureBoundaryIndices([8, 12, 13, 16], 20)
+        [[0, 8], [8, 12], [13, 16], [16, 20]]
+
+        >>> ah._buildMeasureBoundaryIndices([9, 10, 16, 23, 29, 36, 42, 49, 56, 61, 62, 64, 70, 77, 84, 90, 96, 103, 110, 115], 115)
+        [[0, 9], [10, 16], [16, 23], [23, 29], [29, 36], [36, 42], [42, 49], [49, 56], [56, 61], [62, 64], [64, 70], [70, 77], [77, 84], [84, 90], [90, 96], [96, 103], [103, 110], [110, 115]]
+
+        '''
+        # collect start and end pairs of split
+        pairs = []
+        # first chunk is metadata, as first token is probably not a bar
+        pairs.append([0, positionList[0]])
+        i = positionList[0] # get first bar position stored
+        # iterate through every other bar position (already have first)
+        for x in range(1, len(positionList)):
+            j = positionList[x]
+            if j == i + 1: # a span of one is skipped
+                i = j
+                continue
+            pairs.append([i, j])
+            i = j # the end becomes the new start
+        # add last valid index
+        if i != lastValidIndex:
+            pairs.append([i, lastValidIndex])
+        #environLocal.printDebug(['splitByMeasure(); pairs pre filter', pairs])
+        return pairs
+
 
     def splitByMeasure(self):
         '''Divide a token list by Measures, also defining start and end bars of each Measure. 
@@ -1800,58 +1832,69 @@ class ABCHandler(object):
         '''
         if self._tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
-
         post = []
-#         if not self.definesMeasures():
-#             ah = self.__class__() # just making a copy
-#             ah.tokens = self._tokens
-#             post.append(ah)
-#             return post
-
         pos = []
         barCount = 0
         noteCount = 0
         for i in range(len(self._tokens)):
             t = self._tokens[i]
+            tNext = None
+            if i < len(self._tokens) - 1:
+                tNext = self._tokens[i+1]
+            #environLocal.printDebug(['splitByMeasure(); tokens', t, 'isinstance(t, ABCBar)', isinstance(t, ABCBar)])
+
             if isinstance(t, (ABCNote, ABCChord)):
                 noteCount += 1
-                # do not continue
-            # either we get a bar, or we we have notes and no bar yet
-            if isinstance(t, ABCBar) or (barCount == 0 and noteCount > 0):
+
+            # either we get a bar, or we just complete metadata and we 
+            # encounter a note (a pickup) 
+            if isinstance(t, ABCBar): # or (barCount == 0 and noteCount > 0):
+                #environLocal.printDebug(['splitByMeasure()', 'found bar', t])
                 pos.append(i) # store position 
                 barCount += 1
+            # case of end of metadata and start of notes in a pickup
+            # tag the last metadata as the end
+            elif isinstance(t, ABCMetadata) and tNext is not None and isinstance(tNext, (ABCNote, ABCChord)):
+                pos.append(i) # store position                 
 
-        # collect start and end pairs of split
-        pairs = []
-        pairs.append([0, pos[0]])
-        i = pos[0] # get first bar position stored
-        # iterate through every other bar position
-        for x in range(1, len(pos)):
-            j = pos[x]
-            pairs.append([i, j])
-            # the end becomes the new start
-            i = j
-        # add last
-        pairs.append([i, len(self)])
+        #environLocal.printDebug(['splitByMeasure(); raw bar positions', pos])
+        pairs = self._buildMeasureBoundaryIndices(pos, len(self)-1)
+        #for x, y in pairs:
+            #environLocal.printDebug(['boundary indicies:', x, y])
+            #environLocal.printDebug(['    values at x, y', self._tokens[x], self._tokens[y]])
 
         # iterate through start and end pairs
         for x, y in pairs:
             ah = ABCHandlerBar()
-            # this will get the first to second to last
-            ah.tokens = self._tokens[x:y]
+            # this will get the first to last
+            # shave of tokens if not needed
+            xClip = x
+            yClip = y
 
             # check if first is a bar; if so, assign and remove
             if isinstance(self._tokens[x], ABCBar):
                 lbCandidate = self._tokens[x]
-                # if we get and end repeat, probably already assigned this
+                # if we get an end repeat, probably already assigned this
                 # in the last measure, so skip
+                #environLocal.printDebug(['reading paris, got token:', lbCandidate, 'lbCandidate.barType', lbCandidate.barType, 'lbCandidate.repeatForm', lbCandidate.repeatForm])
+                # skip end repeats assigned (improperly) to the left
                 if (lbCandidate.barType == 'repeat' and 
                     lbCandidate.repeatForm == 'end'):
                     pass
                 else: # assign
                     ah.leftBarToken = lbCandidate
-                ah.tokens = ah._tokens[1:] # remove first, as not done above
-        
+                    #environLocal.printDebug(['splitByMeasure(); assigning left bar token', lbCandidate])
+                # always trim if we have a bar
+                xClip = x + 1
+                #ah.tokens = ah._tokens[1:] # remove first, as not done above
+            # if x boundary is metadata, do not include it
+            elif isinstance(self._tokens[x], ABCMetadata):
+                xClip = x + 1
+            else:
+                # if we find a note in the x-clip position, it is likely a pickup the first note after metadata. this we keep, b/c it 
+                # should be part of this branch
+                pass
+
             if y >= len(self):
                 yTestIndex = y-i
             else:
@@ -1863,14 +1906,36 @@ class ABCHandler(object):
                     rbCandidate.repeatForm == 'start'):
                     pass
                 else:
+                    #environLocal.printDebug(['splitByMeasure(); assigning right bar token', lbCandidate])
                     ah.rightBarToken = self._tokens[yTestIndex]
+                # always trim if we have a bar
+                #ah.tokens = ah._tokens[:-1] # remove last
+                yClip = y - 1
+            # if y boundary is metadata, include it
+            elif isinstance(self._tokens[yTestIndex], ABCMetadata):
+                pass # no change
+            # if y position is a note/chord, and this is the last index,
+            # must included it
+            elif (isinstance(self._tokens[yTestIndex], (ABCNote, ABCChord)) and 
+                yTestIndex == len(self._tokens) - 1):
+                pass # no change
+            else: 
+                # if we find a note in the yClip position, it is likely
+                # a pickup, the first note after metadata. we do not include this
+                yClip = yTestIndex - 1
 
+            #environLocal.printDebug(['clip boundaries: x,y', xClip, yClip])
+            # boundaries are inclusive; need to add one here
+            ah.tokens = self._tokens[xClip:yClip+1]
             # after bar assign, if no bars known, reject
             if len(ah) == 0:
                 continue 
-
             post.append(ah)
 
+#         for sub in post:
+#             environLocal.printDebug(['concluded splitByMeasure:', sub, 'leftBarToken', sub.leftBarToken, 'rightBartoken', sub.rightBarToken, 'len(sub)', len(sub), 'sub.hasNotes()', sub.hasNotes()])
+#             for t in sub.tokens:
+#                 print '    ', t
         return post
 
 
@@ -1891,10 +1956,15 @@ class ABCHandler(object):
         '''
         if self._tokens == []:
             raise ABCHandlerException('must process tokens before calling')
+        count = 0
         for t in self._tokens:
             if isinstance(t, (ABCNote, ABCChord)):
-                return True
-        return False
+                count += 1
+        #environLocal.printDebug(['hasNotes', count])
+        if count > 0:
+            return True
+        else:
+            return False
 
     def getTitle(self):
         '''If tokens are processed, get the first title tag. Used for testing.
@@ -1922,11 +1992,39 @@ class ABCHandlerBar(ABCHandler):
         self.leftBarToken = None
         self.rightBarToken = None
 
+    def __add__(self, other):
+        '''Return a new handler adding the tokens in both. This must also set bar tokens if available.
+        '''
+        ah = self.__class__() # will get the same class type
+        ah.tokens = self._tokens + other._tokens
+        # get defined tokesn
+        for barAttr in ['leftBarToken', 'rightBarToken']:
+            bOld = getattr(self, barAttr)
+            bNew = getattr(other, barAttr)
+            if bNew is None and bOld is None:
+                pass # nothing to do
+            elif bNew is not None and bOld is None: # get new
+                setattr(ah, barAttr, bNew)
+            elif bNew is None and bOld is not None: # get old
+                setattr(ah, barAttr, bOld)
+            else:
+                # if both ar the same, assign one
+                if bOld.src == bNew.src:
+                    setattr(ah, barAttr, bNew)                    
+                else:
+                    # might resolve this by ignoring standard bars and favoring
+                    # repeats or styled bars
+                    environLocal.printDebug(['got bNew, bOld', bNew, bOld])
+                    raise ABCHandlerException('cannot handle two non-None bars yet')
+        return ah
+
 
 
 
 def mergeLeadingMetaData(barHandlers):
-    '''Given a list of ABCHandlerBar, ruturn a list of ABCHandlerBar objects, where leading metadata is merged, if possible, with the bar data preceding. This is often needed for processing measures. 
+    '''Given a list of ABCHandlerBar, ruturn a list of ABCHandlerBar objects, where leading metadata is merged, if possible, with the bar data following. 
+
+    This consolidates all metadata in bar-like entities.
     '''
     mCount = 0
     metadataPos = [] # store indices of handlers that are all metadata
@@ -1935,7 +2033,7 @@ def mergeLeadingMetaData(barHandlers):
             mCount += 1
         else:
             metadataPos.append(i)
-
+    environLocal.printDebug(['mergeLeadingMetaData()', 'metadataPosList', metadataPos, 'mCount', mCount])
     # merge meta data into bars for processing
     mergedHandlers = []
     if mCount <= 1: # if only one true measure, do not create measures
@@ -1951,13 +2049,13 @@ def mergeLeadingMetaData(barHandlers):
         while i < len(barHandlers):
             # if we find metadata and it is not the last valid index
             # merge into a single handler
-            if i in metadataPos and i != len(barHandlers) -1:
-                mergedHandlers.append(barHandlers[i] +
-                                     barHandlers[i+1])
+            if i in metadataPos and i != len(barHandlers)-1:
+                mergedHandlers.append(barHandlers[i] + barHandlers[i+1])
                 i += 2 
             else:
                 mergedHandlers.append(barHandlers[i])
                 i += 1
+    
 
     return mergedHandlers
 

@@ -353,7 +353,7 @@ def generateBoogieVamp(sampleScore):
     >>> bluesLine.realize()
     >>> bluesLine.getNumSolutions()
     2224978
-    >>> examples.generateBoogieVamp(bluesLine.generateRandomRealizations(10)).show()
+    >>> #_DOCS_SHOW examples.generateBoogieVamp(bluesLine.generateRandomRealizations(10)).show()
     '''
     boogieBassLine = stream.Part()
     boogieBassLine.append(note.Note('B-2'))

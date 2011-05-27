@@ -57,8 +57,10 @@ def abcToStreamPart(abcHandler, inputM21=None):
         # first, split into a list of Measures; if there is only metadata and 
         # one measure, that means that no measures are defined
         barHandlers = abcHandler.splitByMeasure()
-        # merge leading meta data with each bar that preceedes it
+        environLocal.printDebug(['barHandlers', len(barHandlers)])
+        # merge loading meta data with each bar that preceedes it
         mergedHandlers = abcModule.mergeLeadingMetaData(barHandlers)
+        environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else: # simply stick in a single list
         mergedHandlers = [abcHandler] 
 
@@ -74,13 +76,17 @@ def abcToStreamPart(abcHandler, inputM21=None):
     # merged handler are ABCHandlerBar objects, defining attributes for barlines
     for mh in mergedHandlers:
         # if use measures and the handler has notes; otherwise add to part
+        #environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken, 'right:', mh.rightBarToken, 'len(mh)', len(mh)])
+
         if useMeasures and mh.hasNotes():
+            #environLocal.printDebug(['abcToStreamPart', 'useMeasures', useMeasures, 'mh.hasNotes()', mh.hasNotes()])
+
             dst = stream.Measure()
 
             # bar tokens are already extracted form token list and are available
             # as attributes on the handler object
             # may return None for a regular barline
-            if mh.leftBarToken != None:
+            if mh.leftBarToken is not None:
                 bLeft = mh.leftBarToken.getBarObject()
                 if bLeft != None:
                     dst.leftBarline = bLeft
@@ -362,7 +368,7 @@ class Test(unittest.TestCase):
         tf = testFiles.aleIsDear
         af = abc.ABCFile()
         s = abcToStreamScore(af.readstr(tf))
-
+        #s.show()
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 111)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 127)
@@ -429,7 +435,7 @@ class Test(unittest.TestCase):
         ah.process(testFiles.hectorTheHero)
         s = abcToStreamScore(ah)
         m1 = s.parts[0].getElementsByClass('Measure')[0]
-
+        #s.show()
         # ts is 3/4
         self.assertEqual(m1.barDuration.quarterLength, 3.0)
         # filled with two quarter notes
@@ -549,12 +555,27 @@ class Test(unittest.TestCase):
         self.assertEqual(s.metadata.localeOfComposition, 'Amerika, Mittelamerika, Mexiko')
 
 
-    def testRepeatBrackets(self):
+    def testRepeatBracketsA(self):
         from music21.abc import testFiles
         from music21 import converter
         s = converter.parse(testFiles.morrisonsJig)
         #s.show()
+        # one start, one end
+        #s.parts[0].show('t')
+        self.assertEqual(len(s.flat.getElementsByClass('Repeat')), 2)
+        #s.show()
 
+        # this has a 1 note pickup
+        # has three repeat bars; first one is implied
+        s = converter.parse(testFiles.draughtOfAle)
+        self.assertEqual(len(s.flat.getElementsByClass('Repeat')), 3)
+        self.assertEqual(s.parts[0].getElementsByClass(
+            'Measure')[0].notes[0].pitch.nameWithOctave, 'D4')
+
+        # new problem case:
+        s = converter.parse(testFiles.hectorTheHero)
+        # first measure has 2 pickup notes
+        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')[0].notes), 2)
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
