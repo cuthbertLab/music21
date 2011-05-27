@@ -563,14 +563,15 @@ class ABCBar(ABCToken):
                 # this gets lists of elements like
                 # light-heavy-repeat-end
                 barTypeComponents = barTypeString.split('-')
+                # this is a list of attrbitues
                 if 'repeat' in barTypeComponents:
                     self.barType = 'repeat'
+                elif ('first' in barTypeComponents or 
+                    'second' in barTypeComponents):
+                    self.barType = 'barline'
+                    #environLocal.printDebug(['got repeat 1/2:', self.src])
                 else:
                     self.barType = 'barline'
-
-                if 'first' in barTypeComponents or 'second' in barTypeComponents:
-                    environLocal.printDebug(['got repeat 1/2:', self.src])
-
 
                 # case of regular, dotted
                 if len(barTypeComponents) == 1:
@@ -589,6 +590,7 @@ class ABCBar(ABCToken):
                     else:
                         self.barStyle = '%s-%s' % (barTypeComponents[0],
                                                barTypeComponents[1])
+                # repeat form is either start/end for normal repeats
                 # get extra repeat information; start, end, first, second
                 if len(barTypeComponents) > 2:
                     self.repeatForm = barTypeComponents[3]
@@ -613,6 +615,23 @@ class ABCBar(ABCToken):
         else:
             return False
 
+    def isRepeatBracket(self):
+        '''Return true if this defines a repeat bracket for an alternat eending
+        >>> from music21 import *
+        >>> ab = abc.ABCBar('[2')
+        >>> ab.parse()
+        >>> ab.isRepeat()
+        False
+        >>> ab.isRepeatBracket()
+        2
+        '''
+        if self.repeatForm in ['first']:
+            return 1 # we need a number
+        elif self.repeatForm in ['second']:
+            return 2
+        else:
+            return False
+
     def getBarObject(self):
         '''Return a music21 bar object
 
@@ -631,7 +650,9 @@ class ABCBar(ABCToken):
                 environLocal.printDebug(['found an unspported repeatForm in ABC: %s' % self.repeatForm])            
         elif self.barStyle == 'regular':
             post = None # do not need an object for regular
-
+        elif self.repeatForm in ['first', 'second']:
+            # do nothing, as this is handled in translation
+            post = None
         else:
             post = bar.Barline(self.barStyle)
         return post

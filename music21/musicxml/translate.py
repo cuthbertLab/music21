@@ -1652,7 +1652,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
     # doing this will create an instance, but will not be passed
     # out of this method, and thus is only for testing
-    if spannerBundle == None:
+    if spannerBundle is None:
         #environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
         spannerBundle = spanner.SpannerBundle()
 
@@ -2404,7 +2404,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         for sp in spannerBundle.getByCompleteStatus(True):
             streamPart.insert(0, sp)
             rm.append(sp)
-        # remove from original spanner
+        # remove from original spanner bundle
         for sp in rm:
             spannerBundle.remove(sp)
     

@@ -34,10 +34,11 @@ environLocal = environment.Environment(_MOD)
 
 
 
-def abcToStreamPart(abcHandler, inputM21=None):
+def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     '''Handler conversion of a single Part of a multi-part score. Results, as a Part, are built into the provided inputM21 object (a Score or similar Stream) or a newly created Stream.
     '''
     from music21 import metadata
+    from music21 import spanner
     from music21 import stream
     from music21 import note
     from music21 import meter
@@ -48,6 +49,10 @@ def abcToStreamPart(abcHandler, inputM21=None):
         s = stream.Score()
     else:
         s = inputM21
+
+    if spannerBundle is None:
+        #environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
+        spannerBundle = spanner.SpannerBundle()
 
     p = stream.Part()
 
@@ -78,24 +83,63 @@ def abcToStreamPart(abcHandler, inputM21=None):
         # if use measures and the handler has notes; otherwise add to part
         #environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken, 'right:', mh.rightBarToken, 'len(mh)', len(mh)])
 
+
         if useMeasures and mh.hasNotes():
             #environLocal.printDebug(['abcToStreamPart', 'useMeasures', useMeasures, 'mh.hasNotes()', mh.hasNotes()])
-
             dst = stream.Measure()
-
             # bar tokens are already extracted form token list and are available
             # as attributes on the handler object
             # may return None for a regular barline
+
             if mh.leftBarToken is not None:
+                # this may be Repeat Bar subclass
                 bLeft = mh.leftBarToken.getBarObject()
                 if bLeft != None:
                     dst.leftBarline = bLeft
+                if mh.leftBarToken.isRepeatBracket():
+                    # get any open spanners of RepeatBracket type
+                    rbSpanners = spannerBundle.getByClassComplete(
+                                'RepeatBracket', False)
+                    # this indication is most likely an opening, as ABC does 
+                    # not encode second ending ending boundaries
+                    # we can still check thought:
+                    if len(rbSpanners) == 0:
+                        # add this measure as a componnt
+                        rb = spanner.RepeatBracket(dst)
+                        # set number, returned here
+                        rb.number = mh.leftBarToken.isRepeatBracket()
+                        # only append if created; otherwise, already stored
+                        spannerBundle.append(rb)
+                    else: # close it here
+                        rb = rbSpanners[0] # get RepeatBracket
+                        rb.addComponents(dst)
+                        rb.completeStatus = True
+                        # this returns 1 or 2 depending on the repeat
+                    # in ABC, second repeats close immediately; that is
+                    # they never span more than one measure
+                    if mh.leftBarToken.isRepeatBracket() == 2:
+                        rb.completeStatus = True                        
+
             if mh.rightBarToken != None:
                 bRight = mh.rightBarToken.getBarObject()
                 if bRight != None:
                     dst.rightBarline = bRight
+                # above returns bars and repeats; we need to look if we just 
+                # have repeats
+                if mh.rightBarToken.isRepeat():
+                    # if we have a right bar repeat, and a spanner repeat
+                    # bracket is open (even if just assigned above) we need
+                    # to close it now.
+                    # presently, now r bar conditions start a repeat bracket
+                    rbSpanners = spannerBundle.getByClassComplete(
+                                'RepeatBracket', False)
+                    if len(rbSpanners) > 0:
+                        rb = rbSpanners[0] # get RepeatBracket
+                        rb.addComponents(dst)
+                        rb.completeStatus = True
+                        # this returns 1 or 2 depending on the repeat
+                        # do not need to append; already in bundle
             barCount += 1
-
         else:
             dst = p # store directly in a part instance
 
@@ -195,6 +239,16 @@ def abcToStreamPart(abcHandler, inputM21=None):
         # call make beams for now; later, import beams
         #environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         p.makeBeams()
+
+    # copy spanners into topmost container; here, a part
+    rm = []
+    for sp in spannerBundle.getByCompleteStatus(True):
+        p.insert(0, sp)
+        rm.append(sp)
+    # remove from original spanner bundle
+    for sp in rm:
+        spannerBundle.remove(sp)
+
 
     s.insert(0, p)
     return s
@@ -576,6 +630,16 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.hectorTheHero)
         # first measure has 2 pickup notes
         self.assertEqual(len(s.parts[0].getElementsByClass('Measure')[0].notes), 2)
+
+
+    def testRepeatBracketsB(self):
+        from music21.abc import testFiles
+        from music21 import converter
+        s = converter.parse(testFiles.morrisonsJig)
+        # TODO: get
+        self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 2)
+        #s.show()
+
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
