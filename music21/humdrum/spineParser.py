@@ -1227,7 +1227,7 @@ class Test(unittest.TestCase):
         
         # humdrum type problem: how many G#s start on beat 2 of a measure?
         GsharpCount = 0
-        notes = masterStream.flat.notesAndRests
+        notes = masterStream.flat.notes
         for n in notes:
             if n.offset != 1:
                 continue

@@ -323,24 +323,6 @@ def twelveBarBlues():
     fb.fbRules.allowVoiceOverlap = True
     return fb
 
-if __name__ == "__main__":
-    fbRealizer = exampleA()
-    #fbRealizer = exampleB()
-    #fbRealizer = exampleC()
-    #fbRealizer = exampleD()
-    #fbRealizer = V43ResolutionExample()
-    #fbRealizer = viio65ResolutionExample()
-    '''
-    #fbRealizer = twelveBarBlues()
-    #generateBoogieVamp(fbRealizer.generateRandomRealizations(5)).show()
-    #generateTripletBlues(fbRealizer.generateRandomRealizations(5).show()
-    #generateBluesVamp(fbRealizer.generateRandomRealizations(5).show()
-    '''
-    # Uncomment the following before running:
-    ''' 
-    fbRealizer.realize()
-    fbRealizer.showRandomRealizations(20)
-    '''
 # -----------------------------------------------------------------
 # METHODS FOR GENERATION OF BLUES VAMPS
 def generateBoogieVamp(sampleScore):
@@ -461,7 +443,26 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+#    import time
+#    startT = time.clock()
+    #fbRealizer = exampleA()
+    #fbRealizer = exampleB()
+    #fbRealizer = exampleC()
+    fbRealizer = exampleD()
+    #fbRealizer = V43ResolutionExample()
+    #fbRealizer = viio65ResolutionExample()
+    '''
+    #fbRealizer = twelveBarBlues()
+    #generateBoogieVamp(fbRealizer.generateRandomRealizations(5)).show()
+    #generateTripletBlues(fbRealizer.generateRandomRealizations(5).show()
+    #generateBluesVamp(fbRealizer.generateRandomRealizations(5).show()
+    '''
+    # Uncomment the following before running:
+#    fbRealizer.realize()
+#    endT = time.clock()
+#    print int(startT - endT)
+#    fbRealizer.showRandomRealizations(20)
+
 
 #------------------------------------------------------------------------------
 # eof

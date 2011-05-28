@@ -1324,7 +1324,7 @@ class Test(unittest.TestCase):
         for p in a.parts:
             post = p.getClefs()[0]
             self.assertEqual(isinstance(post, clef.TenorClef), True)
-            for n in p.flat.notesAndRests:
+            for n in p.flat.notes:
                 if n.tie != None:
                     countTies += 1
                     if n.tie.type == 'start' or n.tie.type =='continue':

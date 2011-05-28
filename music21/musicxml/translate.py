@@ -2668,7 +2668,7 @@ spirit</words>
         s =  corpus.parse('bwv66.6')
         p = s.parts[0]
         for m in p.getElementsByClass('Measure'):
-            for n in m.flat.notesAndRests:
+            for n in m.flat.notes:
                 if n.pitch.name in ['B']:
                     msg = '%s\n%s' % (n.pitch.nameWithOctave, n.duration.quarterLength)
                     te = expressions.TextExpression(msg)

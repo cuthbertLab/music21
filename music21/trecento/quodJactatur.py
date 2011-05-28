@@ -277,7 +277,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
 
     startCounting = False
 
-    for n in qjChords.flat.notesAndRests:
+    for n in qjChords.flat.notes:
         if not 'Chord' in n.classes: continue
         if (startCounting is False or n.offset >= 70) and len(n.pitches) < 2:
             continue

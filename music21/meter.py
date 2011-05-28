@@ -2094,12 +2094,12 @@ class TimeSignature(music21.Music21Object):
 
     >>> m = stream.Measure()
     >>> m.timeSignature = meter.TimeSignature('3/4')
-    >>> n = note.Note(quarterLength=.5)
+    >>> n = note.EighthNote()
     >>> m.repeatAppend(n, 6)
-    >>> [n.beatStr for n in m.notesAndRests]
+    >>> [n.beatStr for n in m.notes]
     ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
     >>> m.timeSignature = meter.TimeSignature('6/8')
-    >>> [n.beatStr for n in m.notesAndRests]
+    >>> [n.beatStr for n in m.notes]
     ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
 
 
@@ -3874,7 +3874,7 @@ class Test(unittest.TestCase):
         m.timeSignature = ts
         n = note.Note(quarterLength=0.5)
         m.repeatAppend(n, 6)
-        match = [n.beatStr for n in m.notesAndRests]
+        match = [n.beatStr for n in m.notes]
         self.assertEqual(match, ['1', '2', '3', '4', '5', '6'])
         m.makeBeams()
         #m.show()

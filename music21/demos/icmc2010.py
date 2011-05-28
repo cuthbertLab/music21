@@ -68,7 +68,7 @@ def bergEx01(show=True):
    
 # TODO: what is the best way to do this now that 
 # this raises a TupletException for being frozen?
-#     for thisNote in score.flat.notesAndRests:
+#     for thisNote in score.flat.notes:
 #         thisNote.duration.tuplets[0].setRatio(12, 8)
 
     for thisMeasure in score.getElementsByClass(stream.Measure):
@@ -98,7 +98,7 @@ def showDots(show=True):
                     ts.beatSequence[h][i][j].subdivide(2)
     
     for m in partBass.getElementsByClass('Measure'):
-        for n in m.notesAndRests:
+        for n in m.notes:
             for i in range(ts.getBeatDepth(n.offset)):
                 n.addLyric('*')
     if show:
@@ -124,7 +124,7 @@ def findRaisedSevenths(show=True):
             music21.clef.Clef)[0])
         for i in range(len(part.getElementsByClass('Measure'))):
             m = part.getElementsByClass('Measure')[i]
-            for n in m.notesAndRests:
+            for n in m.notes:
                 if n.name == 'C#': 
                     n.addLyric('%s, m. %s' % (          
         part.getInstrument().partName[0], 
@@ -151,7 +151,7 @@ def oldAccent(show=True):
     
     for m in partBass.getElementsByClass('Measure'):
         lastBeat = None
-        for n in m.notesAndRests:
+        for n in m.notes:
             beat, progress = ts.getBeatProgress(n.offset)
             if beat != lastBeat and progress == 0:
                 if n.tie != None and n.tie.type == 'stop':

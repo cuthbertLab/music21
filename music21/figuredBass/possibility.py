@@ -587,6 +587,11 @@ class Possibility(dict):
             (lowerPart, lowerPitchA, lowerPitchB) = pairsList[pairIndex1]
             for pairIndex2 in range(pairIndex1 +  1, len(pairsList)):
                 (higherPart, higherPitchA, higherPitchB) = pairsList[pairIndex2]
+#                if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 7:
+#                    continue
+#                if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 7:
+#                    continue
+
                 vlq = voiceLeading.VoiceLeadingQuartet(lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
                 if vlq.parallelFifth():
                     if verbose:
@@ -646,6 +651,11 @@ class Possibility(dict):
             (lowerPart, lowerPitchA, lowerPitchB) = pairsList[pairIndex1]
             for pairIndex2 in range(pairIndex1 +  1, len(pairsList)):
                 (higherPart, higherPitchA, higherPitchB) = pairsList[pairIndex2]
+#                if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 0:
+#                    continue
+#                if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 0:
+#                    continue
+                
                 vlq = voiceLeading.VoiceLeadingQuartet(lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
                 if vlq.parallelOctave():
                     if verbose:

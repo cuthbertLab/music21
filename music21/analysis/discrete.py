@@ -310,17 +310,16 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         '''
         # storage for 12 pitch classes
         pcDist = [0]*12
-        if len(streamObj.notesAndRests) == 0:
+        if len(streamObj.notes) == 0:
             return None
 
-        for n in streamObj.notesAndRests:        
-            if not n.isRest:
-                length = n.quarterLength
-                if n.isChord:
-                    for m in n.pitchClasses:
-                        pcDist[m] = pcDist[m] + (1 * length)
-                else:
-                    pcDist[n.pitchClass] = pcDist[n.pitchClass] + (1 * length)
+        for n in streamObj.notes:        
+            length = n.quarterLength
+            if n.isChord:
+                for m in n.pitchClasses:
+                    pcDist[m] = pcDist[m] + (1 * length)
+            else:
+                pcDist[n.pitchClass] = pcDist[n.pitchClass] + (1 * length)
         return pcDist
 
 
@@ -932,14 +931,14 @@ class Ambitus(DiscreteAnalysis):
         >>> p.getPitchSpan(s)
         (45, 108)
         '''
-        
-        if len(subStream.flat.notesAndRests) == 0:
+        ssfn = subStream.flat.notes
+        if len(ssfn) == 0:
             # need to handle case of no pitches
             return None
 
         # find the min and max pitch space value for all pitches
         psFound = []
-        for n in subStream.flat.notesAndRests:
+        for n in ssfn:
             #environLocal.printDebug([n])
             pitches = []
             if 'Chord' in n.classes:
@@ -972,8 +971,10 @@ class Ambitus(DiscreteAnalysis):
         >>> p.getPitchRanges(s)
         (0, 34)
         '''
+        ssfn = subStream.flat.notes
+        
         psFound = []
-        for n in subStream.flat.notesAndRests:
+        for n in ssfn:
             pitches = []
             if 'Chord' in n.classes:
                 pitches = n.pitches
@@ -1088,8 +1089,6 @@ class Ambitus(DiscreteAnalysis):
         >>> p.process(s)
         (63, '#665288')
         '''
-        sStream = sStream.flat.notesAndRests
-
         post = self.getPitchSpan(sStream)
         if post != None:
             solution = post[1] - post[0] # max-min

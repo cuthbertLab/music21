@@ -76,7 +76,7 @@ class ModalCounterpoint(object):
         
         srcStream.attachIntervalsBetweenStreams(cmpStream)
         numParallelFifths = 0
-        srcNotes = srcStream.notesAndRests
+        srcNotes = srcStream.notes
         
         for note1 in srcStream:
             note2 = srcStream.getElementAfterElement(note1, [Note])
@@ -119,8 +119,8 @@ class ModalCounterpoint(object):
 
         '''
         numHiddenFifths = 0
-        for i in range(len(stream1.notesAndRests)-1):
-            note1 = stream1.notesAndRests[i]
+        for i in range(len(stream1.notes)-1):
+            note1 = stream1.notes[i]
             note2 = stream1.getElementAfterElement(note1, [Note])
             note3 = stream2.playingWhenAttacked(note1)
             note4 = stream2.playingWhenAttacked(note2)
@@ -290,8 +290,8 @@ class ModalCounterpoint(object):
 
         '''
         numHiddenOctaves = 0
-        for i in range(len(stream1.notesAndRests)-1):
-            note1 = stream1.notesAndRests[i]
+        for i in range(len(stream1.notes)-1):
+            note1 = stream1.notes[i]
             note2 = stream1.getElementAfterElement(note1, [Note])
             note3 = stream2.playingWhenAttacked(note1)
             note4 = stream2.playingWhenAttacked(note2)
@@ -549,19 +549,19 @@ class ModalCounterpoint(object):
         '''
         stream1.attachIntervalsBetweenStreams(stream2)
         stream2.attachIntervalsBetweenStreams(stream1)
-        for note1 in stream1.notesAndRests:
+        for note1 in stream1.notes:
             if note1.editorial.harmonicInterval.semiSimpleName not in self.legalHarmonicIntervals:
                 return False
-        for note2 in stream2.notesAndRests:
+        for note2 in stream2.notes:
             if note2.editorial.harmonicInterval.semiSimpleName not in self.legalHarmonicIntervals:
                 return False
-        if stream1.notesAndRests[-1].editorial.harmonicInterval.specificName != "Perfect":
-            environLocal.printDebug([stream1.notesAndRests[-1].editorial.harmonicInterval.specificName + " ending, yuk!"])
+        if stream1.notes[-1].editorial.harmonicInterval.specificName != "Perfect":
+            environLocal.printDebug([stream1.notes[-1].editorial.harmonicInterval.specificName + " ending, yuk!"])
             return False
-        if abs(stream1.notesAndRests[-1].editorial.harmonicInterval.generic.value) == 5:
+        if abs(stream1.notes[-1].editorial.harmonicInterval.generic.value) == 5:
             environLocal.printDebug(["Ends on a fifth, yuk!"])
             return False
-        if stream1.notesAndRests[-1].editorial.harmonicInterval.semiSimpleName == 'P8' and stream1.notesAndRests[-2].editorial.harmonicInterval.simpleName == 'M6':
+        if stream1.notes[-1].editorial.harmonicInterval.semiSimpleName == 'P8' and stream1.notes[-2].editorial.harmonicInterval.simpleName == 'M6':
             return True
         else:
             environLocal.printDebug(['Not ending on M6 to P8'])
@@ -598,14 +598,14 @@ class ModalCounterpoint(object):
         '''
         stream1.attachIntervalsBetweenStreams(stream2)
         stream2.attachIntervalsBetweenStreams(stream1)
-        for note1 in stream1.notesAndRests:
+        for note1 in stream1.notes:
             if note1.editorial.harmonicInterval.semiSimpleName not in self.legalMiddleHarmonicIntervals:
                 return False
-        for note2 in stream2.notesAndRests:
+        for note2 in stream2.notes:
             if note2.editorial.harmonicInterval.semiSimpleName not in self.legalMiddleHarmonicIntervals:
                 return False
-        if stream1.notesAndRests[-1].editorial.harmonicInterval.specificName != "Perfect":
-            environLocal.printDebug([stream1.notesAndRests[-1].editorial.harmonicInterval.specificName + " ending, yuk!"])
+        if stream1.notes[-1].editorial.harmonicInterval.specificName != "Perfect":
+            environLocal.printDebug([stream1.notes[-1].editorial.harmonicInterval.specificName + " ending, yuk!"])
             return False
         return True
 
@@ -637,7 +637,7 @@ class ModalCounterpoint(object):
         '''
         stream1.attachIntervalsBetweenStreams(stream2)
         numBadHarmonies = 0
-        for note1 in stream1.notesAndRests:
+        for note1 in stream1.notes:
             if note1.editorial.harmonicInterval.semiSimpleName not in self.legalHarmonicIntervals:
                 numBadHarmonies += 1
         return numBadHarmonies
@@ -733,7 +733,7 @@ class ModalCounterpoint(object):
     
         '''
         numBadSteps = 0
-        sn = stream1.notesAndRests
+        sn = stream1.notes
         for i in range(len(sn)-1):
             note1 = sn[i]
             note2 = sn[i+1]
@@ -827,7 +827,7 @@ class ModalCounterpoint(object):
         '''
         stream1.attachIntervalsBetweenStreams(stream2)
         iList = []
-        for note1 in stream1.notesAndRests:
+        for note1 in stream1.notes:
             iList.append(note1.editorial.harmonicInterval.name)
         thirds = 0
         for i in range(len(iList)):
@@ -897,7 +897,7 @@ class ModalCounterpoint(object):
         '''
         stream1.attachIntervalsBetweenStreams(stream2)
         iList = []
-        for note1 in stream1.notesAndRests:
+        for note1 in stream1.notes:
             intName = note1.editorial.harmonicInterval.name
             iList.append(intName)
         sixths = 0
@@ -963,19 +963,19 @@ class ModalCounterpoint(object):
         >>> cp = ModalCounterpoint(s1, s2)
         >>> aMinor = scale.MinorScale(n3)
         >>> s2 = cp.raiseLeadingTone(s1, aMinor)
-        >>> s2.notesAndRests[1].name
+        >>> s2.notes[1].name
         'G#'
-        >>> s2.notesAndRests[3].name
+        >>> s2.notes[3].name
         'G'
-        >>> s2.notesAndRests[4].name
+        >>> s2.notes[4].name
         'F#'
-        >>> s2.notesAndRests[5].name
+        >>> s2.notes[5].name
         'G#'
-        >>> s2.notesAndRests[7].name
+        >>> s2.notes[7].name
         'F'
 
         '''
-        s1notes = stream1.notesAndRests
+        s1notes = stream1.notes
         stream2 = stream.Part()
         sixth = minorScale.pitchFromDegree(6).name
         seventh = minorScale.pitchFromDegree(7).name
@@ -1014,19 +1014,19 @@ class ModalCounterpoint(object):
             try:
                 top = self.getValidSecondVoice(cantusFirmus, minorScale, 'random')
                 top = self.raiseLeadingTone(top, minorScale)
-                environLocal.printDebug([note1.name + str(note1.octave) for note1 in top.notesAndRests])
+                environLocal.printDebug([note1.name + str(note1.octave) for note1 in top.notes])
         
                 goodHarmony = self.allValidHarmony(top, cantusFirmus)
                 goodMelody = self.isValidMelody(top)
                 thirdsGood = not self.tooManyThirds(top, cantusFirmus)
                 sixthsGood = not self.tooManySixths(top, cantusFirmus)
     
-##                lastInterval = interval.notesToInterval(hopeThisWorks2.notesAndRests[-2], hopeThisWorks2.notesAndRests[-1])
+##                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
 ##                if lastInterval.generic.undirected != 2:
 ##                    goodMelody = False
 ##                    environLocal.printDebug(["rejected because lastInterval was not a second"])
              
-                environLocal.printDebug([note1.name + str(note1.octave) for note1 in cantusFirmus.notesAndRests])
+                environLocal.printDebug([note1.name + str(note1.octave) for note1 in cantusFirmus.notes])
                 if not goodHarmony: environLocal.printDebug(["bad harmony"])
                 else: environLocal.printDebug(["harmony good"])
                 if not goodMelody: environLocal.printDebug(["bad melody"])
@@ -1050,7 +1050,7 @@ class ModalCounterpoint(object):
         # DOES NOT YET CHECK FOR TOO MANY THIRDS/SIXTHS IN A ROW,
         # DOES NOT YET RAISE LEADING TONES, AND DOES NOT CHECK FOR NOODLING.
         stream2 = stream.Part([])
-        firstNote = stream1.notesAndRests[0]
+        firstNote = stream1.notes[0]
 #        choices = [interval.transposeNote(firstNote, "P1"),\
 #                   interval.transposeNote(firstNote, "P5"),\
 #                   interval.transposeNote(firstNote, "P8")]
@@ -1066,10 +1066,10 @@ class ModalCounterpoint(object):
         note1.duration = firstNote.duration
         stream2.append(note1)
         afterLeap = False
-        for i in range(1, len(stream1.notesAndRests)):
-            prevFirmus = stream1.notesAndRests[i-1]
-            currFirmus = stream1.notesAndRests[i]
-            prevNote = stream2.notesAndRests[i-1]
+        for i in range(1, len(stream1.notes)):
+            prevFirmus = stream1.notes[i-1]
+            currFirmus = stream1.notes[i]
+            prevNote = stream2.notes[i-1]
             choices = self.generateValidNotes(prevFirmus, currFirmus, prevNote, afterLeap, minorScale)
             if len(choices) == 0:
                 raise ModalCounterpointException("Sorry, please try again")
@@ -1239,14 +1239,14 @@ class ModalCounterpoint(object):
         while (goodHarmony2 == False or goodMelody2 == False or thirdsGood2 == False or sixthsGood2 == False):
             try:
                 middle = self.getValidSecondVoice(bottom, minorScale, choice)
-#                environLocal.printDebug([note1.name + str(note1.octave) for note1 in middle.notesAndRests])
+#                environLocal.printDebug([note1.name + str(note1.octave) for note1 in middle.notes])
         
                 goodHarmony2 = self.allValidHarmony(middle, bottom)
                 goodMelody2 = self.isValidMelody(middle)
                 thirdsGood2 = not self.tooManyThirds(middle, bottom)
                 sixthsGood2 = not self.tooManySixths(middle, bottom)
              
-#                environLocal.printDebug([note1.name + str(note1.octave) for note1 in bottom.notesAndRests])
+#                environLocal.printDebug([note1.name + str(note1.octave) for note1 in bottom.notes])
                 if not goodHarmony2: environLocal.printDebug(["bad harmony"])
                 else: environLocal.printDebug(["harmony good"])
                 if not goodMelody2: environLocal.printDebug(["bad melody"])
@@ -1266,7 +1266,7 @@ class ModalCounterpoint(object):
         while (goodHarmony3 == False or goodMelody3 == False or thirdsGood3 == False or sixthsGood3 == False):
             try:
                 top = self.getValidThirdVoice(bottom, middle, minorScale, choice)
-                environLocal.printDebug([note1.name + str(note1.octave) for note1 in top.notesAndRests])
+                environLocal.printDebug([note1.name + str(note1.octave) for note1 in top.notes])
 
                 #goodHarmony3 = self.allValidHarmonyMiddleVoices(top, middle) and self.allValidHarmony(top, bottom)
                 #goodMelody3 = self.isValidMelody(top)
@@ -1275,7 +1275,7 @@ class ModalCounterpoint(object):
 
                 goodHarmony3 = goodMelody3 = thirdsGood3 = sixthsGood3 = True
 
-                lastInterval = interval.notesToInterval(top.notesAndRests[-2], top.notesAndRests[-1])
+                lastInterval = interval.notesToInterval(top.notes[-2], top.notes[-1])
                 if lastInterval.generic.undirected != 2:
                     goodMelody = False
                     environLocal.printDebug(["rejected because lastInterval was not a second"])
@@ -1298,8 +1298,8 @@ class ModalCounterpoint(object):
         '''
         '''
         top = stream.Part([])
-        firstNoteBottom = bottom.notesAndRests[0]
-        firstNoteMiddle = middle.notesAndRests[0]
+        firstNoteBottom = bottom.notes[0]
+        firstNoteMiddle = middle.notes[0]
         firstBottomInterval = interval.Interval(firstNoteBottom, firstNoteMiddle)
         if firstBottomInterval.name == 'P1':
             choices = [firstNoteBottom.transpose('P5'),
@@ -1321,12 +1321,12 @@ class ModalCounterpoint(object):
         note1.duration = firstNoteMiddle.duration
         top.append(note1)
         afterLeap = False
-        for i in range(1, len(bottom.notesAndRests)):
-            prevBottom = bottom.notesAndRests[i-1]
-            currBottom = bottom.notesAndRests[i]
-            prevMiddle = middle.notesAndRests[i-1]
-            currMiddle = middle.notesAndRests[i]
-            prevTop = top.notesAndRests[i-1]
+        for i in range(1, len(bottom.notes)):
+            prevBottom = bottom.notes[i-1]
+            currBottom = bottom.notes[i]
+            prevMiddle = middle.notes[i-1]
+            currMiddle = middle.notes[i]
+            prevTop = top.notes[i-1]
             choices = self.generateValidThirdNotes(prevBottom, currBottom, prevMiddle,
                                               currMiddle, prevTop, afterLeap, minorScale)
             if len(choices) == 0:
@@ -1753,7 +1753,7 @@ class Test(unittest.TestCase):
         stream14 = Stream([n100, n101, n102, n103, n104, n105, n106, n107])
         aMinor = scale.MinorScale(n101)
         stream15 = counterpoint1.raiseLeadingTone(stream14, aMinor)
-        names15 = [note1.name for note1 in stream15.notesAndRests]
+        names15 = [note1.name for note1 in stream15.notes]
         assert names15 == ["G#", "A", "D", "F#", "G#", "A", "G", "F"]
 
 # ADD MORE CANTUS FIRMI HERE; MODIFY LIST CANTUSFIRMI
@@ -1808,7 +1808,7 @@ class TestExternal(unittest.TestCase):
 
         cf = getRandomCF()
         environLocal.printDebug(['Using: ', cf['notes']])
-        cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notesAndRests)
+        cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notes)
 
         baseNote = Note(cf['mode'])
         thisScale = scale.MinorScale(baseNote)
@@ -1834,7 +1834,7 @@ class TestExternal(unittest.TestCase):
         
         cf = cantusFirmi[0]# getRandomCF()
         environLocal.printDebug(['Using: ', cf['notes']])
-        cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notesAndRests)
+        cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notes)
 
         baseNote = Note(cf['mode'])
         thisScale = scale.MinorScale(baseNote)

@@ -162,7 +162,7 @@ def ch1_basic_II_A_1(show=True, *arguments, **keywords):
 '''
     exercise = converter.parseData(humdata)
     #exercise = music21.parseData("ch1_basic_II_A_1.xml")
-    for n in exercise.flat.notesAndRests: # have to use flat here
+    for n in exercise.flat.notes: # have to use flat here
         n.lyric = n.nameWithOctave
     if show: 
         exercise.show()
@@ -192,7 +192,7 @@ def ch1_basic_II_A_2(show=True, *arguments, **keywords):
 *-
 '''
     exercise = converter.parseData(humdata)
-    for n in exercise.flat.notesAndRests: # have to use flat here
+    for n in exercise.flat.notes: # have to use flat here
         n.lyric = n.nameWithOctave
     exercise.insert(0, clef.BassClef())
     exercise = exercise.sorted # need sorted to get clef
@@ -217,7 +217,7 @@ def ch1_basic_II_B_1(show=True, *arguments, **keywords):
 *-
 '''
     exercise = converter.parseData(humdata)
-    for n in exercise.flat.notesAndRests: # have to use flat here
+    for n in exercise.flat.notes: # have to use flat here
         n.lyric = n.nameWithOctave
     exercise.insert(0, clef.AltoClef())
     if show: 
@@ -232,7 +232,7 @@ def ch1_basic_II_B_2(show=True, *arguments, **keywords):
     from music21 import clef, converter
     humdata = '**kern\n1F#1e-\n1B\n1D-\n1c\n*-'
     exercise = converter.parseData(humdata)
-    for n in exercise.flat.notesAndRests: # have to use flat here
+    for n in exercise.flat.notes: # have to use flat here
         n.lyric = n.nameWithOctave
     exercise.insert(0, clef.TenorClef())
     if show: 

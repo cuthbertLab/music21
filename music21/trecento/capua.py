@@ -317,7 +317,7 @@ def clearFicta(srcStream1):
     '''In the given srcStream, moves anything under note.editorial.ficta into
     note.editorial.misc under "saved-ficta".'''
 
-    for n2 in srcStream1.notesAndRests:
+    for n2 in srcStream1.notes:
         if  n2.editorial.ficta is not None:
             n2.editorial.misc["saved-ficta"] = n2.editorial.ficta
         n2.editorial.ficta = None   
@@ -469,7 +469,7 @@ def compareThreeFictas(srcStream1, srcStream2):
 #    twosrcStream1 = TwoStreamComparer(srcStream1, srcStream2)
 #    twosrcStream1.intervalToOtherStreamWhenAttacked()
 
-    for note1 in srcStream1.notesAndRests:
+    for note1 in srcStream1.notes:
         if "pmfc-ficta" in note1.editorial.misc or \
            "capua-ficta" in note1.editorial.misc:
             normalInterval = note1.editorial.harmonicInterval.name
@@ -549,7 +549,7 @@ def compareOnesrcStream(srcStream1, srcStream2, fictaType = "editor"):
 
     ### populates the note.editorial.harmonicInterval object
     twosrcStream1.intervalToOtherStreamWhenAttacked()
-    for note1 in srcStream1.notesAndRests:
+    for note1 in srcStream1.notes:
         hasFicta = False
         interval1 = note1.editorial.harmonicInterval
         if interval1 is None:
@@ -873,7 +873,7 @@ def runPiece(pieceNum = 331, snipNum = 0):  # random default piece...
     cmpStream    = pieceObj.snippets[snipNum].streams[1]  ## ignore 3rd voice for now...
     srcStream.attachIntervalsBetweenStreams(cmpStream)
 
-    for note in srcStream.notesAndRests:
+    for note in srcStream.notes:
         if note.editorial.harmonicInterval is not None:
             print(note.name)
             print(note.editorial.harmonicInterval.semiSimpleName)
@@ -931,7 +931,7 @@ class TestExternal(unittest.TestCase):
         srcStream.attachIntervalsBetweenStreams(cmpStream)
 
         outList = []
-        for note in srcStream.notesAndRests:
+        for note in srcStream.notes:
             if note.editorial.harmonicInterval is not None:
                 note.lyric = note.editorial.harmonicInterval.simpleName
         
@@ -957,7 +957,7 @@ class Test(unittest.TestCase):
         srcStream.attachIntervalsBetweenStreams(cmpStream)
 
         outList = []
-        for note in srcStream.notesAndRests:
+        for note in srcStream.notes:
             if note.editorial.harmonicInterval is not None:
                 outList.append(note.name)
                 outList.append(note.editorial.harmonicInterval.simpleName)

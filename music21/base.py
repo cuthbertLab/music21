@@ -2951,7 +2951,7 @@ class Music21Object(JSONSerializer):
         >>> n.quarterLength = .5
         >>> m = stream.Measure()
         >>> m.repeatAppend(n, 4)
-        >>> [n._getMeasureOffset() for n in m.notesAndRests]
+        >>> [n._getMeasureOffset() for n in m.notes]
         [0.0, 0.5, 1.0, 1.5]
         '''
 
@@ -2985,12 +2985,12 @@ class Music21Object(JSONSerializer):
         True
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> m.repeatAppend(n, 2)
-        >>> m[1].activeSite # here we get the parent, but not in m.notesAndRests
+        >>> m[1].activeSite # here we get the parent, but not in m.notes
         <music21.stream.Measure 0 offset=0.0>
 
-        >>> m.notesAndRests[0]._getBeat()
+        >>> m.notes[0]._getBeat()
         1.0
-        >>> m.notesAndRests[1]._getBeat()
+        >>> m.notes[1]._getBeat()
         3.0
         '''
         ts = self.getContextByClass('TimeSignature')
@@ -3008,11 +3008,11 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notesAndRests[i].beat for i in range(6)]
+        >>> [m.notes[i].beat for i in range(6)]
         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notesAndRests[i].beat for i in range(6)]
+        >>> [m.notes[i].beat for i in range(6)]
         [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
 
         ''')
@@ -3035,10 +3035,10 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notesAndRests[i].beatStr for i in range(6)]
+        >>> [m.notes[i].beatStr for i in range(6)]
         ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notesAndRests[i].beatStr for i in range(6)]
+        >>> [m.notes[i].beatStr for i in range(6)]
         ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
         ''')
 
@@ -3052,9 +3052,9 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> m.repeatAppend(n, 2)
-        >>> m.notesAndRests[0]._getBeatDuration()
+        >>> m.notes[0]._getBeatDuration()
         <music21.duration.Duration 1.0>
-        >>> m.notesAndRests[1]._getBeatDuration()
+        >>> m.notes[1]._getBeatDuration()
         <music21.duration.Duration 1.0>
         '''
         ts = self.getContextByClass('TimeSignature')
@@ -3071,11 +3071,11 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notesAndRests[i].beatDuration.quarterLength for i in range(6)]
+        >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
         [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notesAndRests[i].beatDuration.quarterLength for i in range(6)]
+        >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
         [1.5, 1.5, 1.5, 1.5, 1.5, 1.5]
         ''')
 
@@ -3084,7 +3084,7 @@ class Music21Object(JSONSerializer):
         '''Return an accent weight based on local Measure and TimeSignature. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
 
         >>> from music21 import *
-        >>> n = note.Note()
+        >>> n = note.Note("D#7")
         >>> n.quarterLength = .25
         >>> m = stream.Measure()
         >>> m.isMeasure
@@ -3092,11 +3092,11 @@ class Music21Object(JSONSerializer):
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> m.repeatAppend(n, 16)
 
-        >>> m.notesAndRests[0]._getBeatStrength()
+        >>> m.notes[0]._getBeatStrength()
         1.0
-        >>> m.notesAndRests[4]._getBeatStrength()
+        >>> m.notes[4]._getBeatStrength()
         0.25
-        >>> m.notesAndRests[8]._getBeatStrength()
+        >>> m.notes[8]._getBeatStrength()
         0.5
         '''
         ts = self.getContextByClass('TimeSignature')
@@ -3115,11 +3115,11 @@ class Music21Object(JSONSerializer):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notesAndRests[i].beatStrength for i in range(6)]
+        >>> [m.notes[i].beatStrength for i in range(6)]
         [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notesAndRests[i].beatStrength for i in range(6)]
+        >>> [m.notes[i].beatStrength for i in range(6)]
         [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
 
         ''')
@@ -3760,7 +3760,7 @@ class Test(unittest.TestCase):
         note1.duration.type = "whole"
         stream1 = stream.Stream()
         stream1.append(note1)
-        subStream = stream1.notesAndRests
+        subStream = stream1.notes
 
     def testLocationsRefs(self):
         aMock = TestMock()
@@ -3896,7 +3896,7 @@ class Test(unittest.TestCase):
 
         violin1 = corpus.parse("beethoven/opus18no1", 
                                 3, extList='xml').getElementById("Violin I")
-        lastNote = violin1.flat.notesAndRests[-1]
+        lastNote = violin1.flat.notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(lastNoteClef, clef.TrebleClef), True)
 

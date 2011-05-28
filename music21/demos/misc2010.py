@@ -48,7 +48,7 @@ def annotateWithGerman():
     annotates a score with the German notes for each note
     '''
     bwv295 = corpus.parseWork('bach/bwv295')
-    for thisNote in bwv295.flat.notesAndRests:
+    for thisNote in bwv295.flat.notes:
         thisNote.addLyric(thisNote.pitch.german)
     bwv295.show()
 

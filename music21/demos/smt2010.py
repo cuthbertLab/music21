@@ -155,7 +155,7 @@ def findHighestNotes(show=True, *arguments, **keywords):
         found.append(part.flat.getElementsByClass(music21.clef.Clef)[0])
         highestNoteNum = 0
         for m in part.getElementsByClass('Measure'):
-            for n in m.notesAndRests:
+            for n in m.notes:
                 if n.midi > highestNoteNum:
                     highestNoteNum = n.midi
                     highestNote = copy.deepcopy(n) # optional

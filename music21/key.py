@@ -469,7 +469,7 @@ class KeySignature(music21.Music21Object):
         After:
 
 
-        >>> for n in s1.notesAndRests:
+        >>> for n in s1.notes:
         ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
         >>> #_DOCS_SHOW s1.show()
 
@@ -498,7 +498,7 @@ class KeySignature(music21.Music21Object):
         >>> nB2 = note.WholeNote("B")
         >>> s1.append(nB1)
         >>> s1.append(nB2)
-        >>> for n in s1.notesAndRests:
+        >>> for n in s1.notes:
         ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
         >>> (nB1.accidental, nB2.accidental)
         (<accidental flat>, <accidental flat>)

@@ -3785,7 +3785,7 @@ class Test(unittest.TestCase):
             n.pitch.accidental = pitch.Accidental(alterList[x])
             s.append(n)
 
-        match = [str(n.pitch) for n in s.notesAndRests]
+        match = [str(n.pitch) for n in s.notes]
         self.assertEqual(match, ['C~4', 'D#~4', 'E-`4', 'F`4', 'G~4', 'A#~4', 'B`4', 'C-`4', 'D~4'])
 
         

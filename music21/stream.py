@@ -123,7 +123,7 @@ class Stream(music21.Music21Object):
     >>> s1.append(note.QuarterNote('D5'))
     >>> s1.duration.quarterLength
     3.0
-    >>> for thisNote in s1.notesAndRests:
+    >>> for thisNote in s1.notes:
     ...     print thisNote.octave
     4
     5
@@ -467,7 +467,7 @@ class Stream(music21.Music21Object):
         >>> c = a + b   
         >>> c.pitches # autoSort is True, thus a sorted version results
         [C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G]
-        >>> len(c.notesAndRests)
+        >>> len(c.notes)
         20
 
 
@@ -2419,7 +2419,7 @@ class Stream(music21.Music21Object):
 
     #--------------------------------------------------------------------------
     # routines for obtaining specific types of elements from a Stream
-    # _getNotesAndRests and _getPitches are found with the interval routines
+    # _getNotes and _getPitches are found with the interval routines
 
     def measures(self, numberStart, numberEnd, 
         collect=[clef.Clef, meter.TimeSignature, 
@@ -3092,21 +3092,20 @@ class Stream(music21.Music21Object):
         
         
         inversionDNN = inversionNote.diatonicNoteNum
-        for n in returnStream.flat.notesAndRests:
-            if n.isRest is False:
-                n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
-                if quickSearch is True:
-                    n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
-                else:
-                    n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
-                if n.pitch.accidental is not None:
-                    n.pitch.accidental.displayStatus = None
-    #            if n.step != 'B':
-    #                n.pitch.accidental = None
-    #            else:
-    #                n.pitch.accidental = pitch.Accidental('flat')
-    #                n.pitch.accidental.displayStatus = None
-    ##            n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
+        for n in returnStream.flat.notes:
+            n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
+            if quickSearch is True:
+                n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
+            else:
+                n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
+            if n.pitch.accidental is not None:
+                n.pitch.accidental.displayStatus = None
+#            if n.step != 'B':
+#                n.pitch.accidental = None
+#            else:
+#                n.pitch.accidental = pitch.Accidental('flat')
+#                n.pitch.accidental.displayStatus = None
+##            n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
         return returnStream
 
 
@@ -3773,7 +3772,7 @@ class Stream(music21.Music21Object):
             {0.0} <music21.note.Note D#>
         {6.0} <music21.stream.Measure 3 offset=6.0>
             {0.0} <music21.note.Note D#>
-        >>> allNotes = partWithMeasures.flat.notesAndRests
+        >>> allNotes = partWithMeasures.flat.notes
         >>> [allNotes[0].articulations, allNotes[1].articulations, allNotes[2].articulations]
         [[<music21.articulations.Staccato>], [], []]
         >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
@@ -4428,7 +4427,7 @@ class Stream(music21.Music21Object):
 
         # need to move through notes in order
         # NOTE: this may or may have sub-streams that are not being examined
-        noteStream = returnObj.sorted.notesAndRests
+        noteStream = returnObj.sorted.notes
 
         # get chords, notes, and rests
         for i in range(len(noteStream)):
@@ -4633,10 +4632,10 @@ class Stream(music21.Music21Object):
         >>> a.append(n)
         >>> m = a.makeMeasures()
         >>> m = m.makeTies()
-        >>> len(m.flat.notesAndRests)
+        >>> len(m.flat.notes)
         2
         >>> m = m.stripTies()
-        >>> len(m.flat.notesAndRests)
+        >>> len(m.flat.notes)
         1
         >>> 
         '''
@@ -5065,7 +5064,7 @@ class Stream(music21.Music21Object):
         
         
         >>> bwv66 = corpus.parse('bach/bwv66.6')
-        >>> len(bwv66.notesAndRests)
+        >>> len(bwv66.notes)
         0
         
         
@@ -5073,12 +5072,12 @@ class Stream(music21.Music21Object):
         objects and those measures lie within :class:`music21.stream.Part`
         objects.  It'd be a pain to navigate all the way through all those
         objects just to count notes.  Fortunately we can get a Stream of
-        all the notes in the piece with .flat.notesAndRests and then use the
+        all the notes in the piece with .flat.notes and then use the
         length of that Stream to count notes:
         
         
         >>> bwv66flat = bwv66.flat
-        >>> len(bwv66flat.notesAndRests)
+        >>> len(bwv66flat.notes)
         165
         
 
@@ -6460,11 +6459,19 @@ class Stream(music21.Music21Object):
 
     notesAndRests = property(_getNotesAndRests, doc='''
         The notesAndRests property of a Stream returns a new Stream object
-        that consists only of the notes (including 
+        that consists only of the notes and rests (including 
         :class:`~music21.note.Note`, 
         :class:`~music21.chord.Chord`, 
         :class:`~music21.note.Rest`, etc.) found 
         in the stream.
+        
+        
+        In versions of music21 before alpha 6, the "notes" property
+        also returned rests.  Thus you may find some old programs that
+        use "notes" and expect to find rests.  These programs should
+        be converted to use notesAndRests
+        
+        
 
         >>> from music21 import *
         >>> s1 = stream.Stream()
@@ -6498,6 +6505,13 @@ class Stream(music21.Music21Object):
         :class:`~music21.note.Note`, 
         :class:`~music21.chord.Chord`, etc.) found 
         in the stream. This excludes :class:`~music21.note.Rest` objects.
+
+
+        In versions of music21 before alpha 6, the "notes" property
+        also returned rests.  Thus you may find some old programs that
+        use "notes" and expect to find rests.  These programs should
+        be converted to use notesAndRests
+
 
         >>> from music21 import *
         >>> s1 = stream.Stream()
@@ -7254,33 +7268,27 @@ class Stream(music21.Music21Object):
     
     
         >>> from music21 import *
-        >>> s1 = converter.parse('C4 d8 e f# g A2', '5/4')
-        >>> s2 = converter.parse('g4 e8 d c4   a2', '5/4')
+        >>> s1 = converter.parse('C4 d8 e f# g A2 d2', '7/4')
+        >>> s2 = converter.parse('g4 e8 d c4   a2 r2', '7/4')
         >>> s1.attachIntervalsBetweenStreams(s2)
-        >>> for n in s1.notesAndRests:
-        ...     if "Rest" in n.classes: continue  # safety check
-        ...     if n.editorial.harmonicInterval is None: continue # if other voice had a rest...
-        ...     print n.editorial.harmonicInterval.directedName
+        >>> for n in s1.notes:
+        ...     if n.editorial.harmonicInterval is None: print "None" # if other voice had a rest...
+        ...     else: print n.editorial.harmonicInterval.directedName
         P12
         M2
         M-2
         A-4
         P-5
         P8
-        
+        None
         '''
-    
-        srcNotes = self.notesAndRests
-        for thisNote in srcNotes:
-            if thisNote.isRest is True:
-                continue
+        for thisNote in self.notes:
             simultEls = cmpStream.getElementsByOffset(thisNote.offset, mustBeginInSpan = False, mustFinishInSpan = False)
             if len(simultEls) > 0:
-                for simultNote in simultEls.notesAndRests:
-                    if simultNote.isRest is False:
-                        interval1 = interval.notesToInterval(thisNote, simultNote)
-                        thisNote.editorial.harmonicInterval = interval1
-                        break
+                for simultNote in simultEls.notes:
+                    interval1 = interval.notesToInterval(thisNote, simultNote)
+                    thisNote.editorial.harmonicInterval = interval1
+                    break
 
     def playingWhenAttacked(self, el, elStream = None):
         '''
@@ -9075,7 +9083,7 @@ class TestExternal(unittest.TestCase):
         s.insert(0, meter.TimeSignature("3/4") )
         s.insert(3, meter.TimeSignature("5/4") )
         s.insert(8, meter.TimeSignature("4/4") )
-        self.assertEqual(len(s.flat.notesAndRests), 360)
+        self.assertEqual(len(s.flat.notes), 360)
 
         s.show()
 
@@ -9532,7 +9540,7 @@ class Test(unittest.TestCase):
         s.insert(0, meter.TimeSignature("3/4") )
         s.insert(3, meter.TimeSignature("5/4") )
         s.insert(8, meter.TimeSignature("3/4") )
-        self.assertEqual(len(s.flat.notesAndRests), 80)
+        self.assertEqual(len(s.flat.notes), 80)
 
         from music21 import corpus, converter
         thisWork = corpus.getWork('haydn/opus74no2/movement4.xml')
@@ -9945,19 +9953,19 @@ class Test(unittest.TestCase):
 
     def testStripTiesBuiltA(self):
         s1 = Stream()
-        n1 = note.Note()
+        n1 = note.Note("D#2")
         n1.quarterLength = 6
         s1.append(n1)
-        self.assertEqual(len(s1.notesAndRests), 1)
+        self.assertEqual(len(s1.notes), 1)
 
         s1 = s1.makeMeasures()
         s1 = s1.makeTies() # makes ties but no end tie positions!
         # flat version has 2 notes
-        self.assertEqual(len(s1.flat.notesAndRests), 2)
+        self.assertEqual(len(s1.flat.notes), 2)
 
         sUntied = s1.stripTies()
-        self.assertEqual(len(sUntied.notesAndRests), 1)
-        self.assertEqual(sUntied.notesAndRests[0].quarterLength, 6)
+        self.assertEqual(len(sUntied.notes), 1)
+        self.assertEqual(sUntied.notes[0].quarterLength, 6)
 
         n = note.Note()        
         n.quarterLength = 3
@@ -9976,10 +9984,10 @@ class Test(unittest.TestCase):
         b = b.makeTies()
         
         # we now have 65 notes, as ties have been created
-        self.assertEqual(len(b.flat.notesAndRests), 65)
+        self.assertEqual(len(b.flat.notes), 65)
 
         c = b.stripTies() # gets flat, removes measures
-        self.assertEqual(len(c.notesAndRests), 40)
+        self.assertEqual(len(c.notes), 40)
 
 
     def testStripTiesImportedA(self):
@@ -10137,17 +10145,17 @@ class Test(unittest.TestCase):
         p1 = a.parts[0]
         # get measure by class; this will not manipulate the measure
         mExRaw = p1.getElementsByClass('Measure')[5]
-        self.assertEqual(str([n for n in mExRaw.notesAndRests]), '[<music21.note.Note B>, <music21.note.Note D>]')
+        self.assertEqual(str([n for n in mExRaw.notes]), '[<music21.note.Note B>, <music21.note.Note D>]')
         self.assertEqual(len(mExRaw.flat), 3)
 
         # get measure by using method; this will add elements
         mEx = p1.measure(6)
-        self.assertEqual(str([n for n in mEx.notesAndRests]), '[<music21.note.Note B>, <music21.note.Note D>]')
+        self.assertEqual(str([n for n in mEx.notes]), '[<music21.note.Note B>, <music21.note.Note D>]')
         self.assertEqual(len(mEx.flat), 7)
         
         # make sure source has not chnaged
         mExRaw = p1.getElementsByClass('Measure')[5]
-        self.assertEqual(str([n for n in mExRaw.notesAndRests]), '[<music21.note.Note B>, <music21.note.Note D>]')
+        self.assertEqual(str([n for n in mExRaw.notes]), '[<music21.note.Note B>, <music21.note.Note D>]')
         self.assertEqual(len(mExRaw.flat), 3)
 
 
@@ -11462,11 +11470,11 @@ class Test(unittest.TestCase):
 
         m = stream.Measure()
         m.timeSignature = meter.TimeSignature('3/4')
-        n = note.Note()
+        n = note.Note("B--2")
         n.quarterLength = 1
         m.append(copy.deepcopy(n))
 
-        self.assertEqual(m.notesAndRests[0].offset, 0)
+        self.assertEqual(m.notes[0].offset, 0)
         self.assertAlmostEqual(m.barDurationProportion(), .333333, 4)
         self.assertAlmostEqual(m.barDuration.quarterLength, 3, 4)
 
@@ -12333,8 +12341,8 @@ class Test(unittest.TestCase):
             n.quarterLength = ql
             s.append(n)
         postMake = s.makeNotation()
-        self.assertEqual(collectTupletType(postMake.flat.notesAndRests), ['startStop'])
-        self.assertEqual(collectTupletBracket(postMake.flat.notesAndRests), [False])
+        self.assertEqual(collectTupletType(postMake.flat.notes), ['startStop'])
+        self.assertEqual(collectTupletBracket(postMake.flat.notes), [False])
 
         #s.show()
 
