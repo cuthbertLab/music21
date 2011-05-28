@@ -635,11 +635,18 @@ class Test(unittest.TestCase):
     def testRepeatBracketsB(self):
         from music21.abc import testFiles
         from music21 import converter
+        from music21 import corpus
         s = converter.parse(testFiles.morrisonsJig)
         # TODO: get
         self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 2)
         #s.show()
+        # four repeat brackets here; 2 at beginning, 2 at end
+        s = converter.parse(testFiles.hectorTheHero)
+        self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 4)
 
+        s = corpus.parse('JollyTinkersReel')
+        self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 4)
+        
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

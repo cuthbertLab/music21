@@ -1445,6 +1445,43 @@ class Test(unittest.TestCase):
         rb1.addComponents(m1)
         self.assertEqual(len(rb1), 1)
 
+
+    def testRepeatBracketB(self):
+        from music21 import note, spanner, stream, bar
+
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4'), 4)
+        p.append(m1)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('d#4'), 4)
+        p.append(m2)
+        
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g#4'), 4)
+        m3.rightBarline = bar.Repeat(direction='end')
+        p.append(m3)
+        p.append(spanner.RepeatBracket(m3, number=1))
+        
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4'), 4)
+        m4.rightBarline = bar.Repeat(direction='end')
+        p.append(m4)
+        p.append(spanner.RepeatBracket(m4, number=2))
+        
+        m5 = stream.Measure()
+        m5.repeatAppend(note.Note('b4'), 4)
+        m5.rightBarline = bar.Repeat(direction='end')
+        p.append(m5)
+        p.append(spanner.RepeatBracket(m5, number=3))
+        
+        m6 = stream.Measure()
+        m6.repeatAppend(note.Note('c#5'), 4)
+        p.append(m6)
+        
+        # all spanners should be at the part level
+        self.assertEqual(len(p.spanners), 3)
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []

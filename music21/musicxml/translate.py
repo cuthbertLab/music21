@@ -1589,7 +1589,7 @@ def measureToMx(m, spannerBundle=None):
         # if we have spanners here, we can be sure they are relevant
         if len(rbSpanners) > 0:
             mxEnding = musicxmlMod.Ending()
-            mxEnding.set('type', 'stop')
+            mxEnding.set('type', 'discontinue')
             mxEnding.set('number', rbSpanners[0].number)
             mxBarline.set('endingObj', mxEnding)
 
@@ -2769,6 +2769,7 @@ spirit</words>
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
 
+        # TODO: need to test getting repeat brackets after measure extraction
         
 
 

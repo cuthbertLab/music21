@@ -2475,6 +2475,7 @@ class Stream(music21.Music21Object):
                 #environLocal.printDebug(['copying spanner to returnObj', sp])
                 # store in flat locations? could also be end elements?
                 returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
+                #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
 
         for m in mStream.elements:
             #environLocal.printDebug(['m', m])
@@ -14144,7 +14145,15 @@ class Test(unittest.TestCase):
         b = a.flat
         #b = a.flat.extendDuration(dynamics.Dynamic)    
 
-
+    def testSpannerTransferA(self):
+        from music21 import corpus
+        # test getting spanners after .measures extraction
+        s = corpus.parse('opus74no1', 3)
+        post = s.measures(68,81)
+        # two per part
+        self.assertEqual(len(post.parts[0].getElementsByClass('RepeatBracket')), 2)
+        # TODO: this is not yet showing repeat brackets
+        #post.parts[0].show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
