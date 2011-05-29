@@ -1482,6 +1482,53 @@ class Test(unittest.TestCase):
         # all spanners should be at the part level
         self.assertEqual(len(p.spanners), 3)
 
+
+    def testRepeatBracketC(self):
+        from music21 import note, spanner, stream, bar
+
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4'), 4)
+        p.append(m1)
+
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('d#4'), 4)
+        p.append(m2)
+        
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g#4'), 4)
+        m3.rightBarline = bar.Repeat(direction='end')
+        p.append(m3)
+        rb1 = spanner.RepeatBracket(number=1)
+        rb1.addComponents(m2, m3)
+        self.assertEqual(len(rb1), 2)
+        p.insert(0, rb1)
+        
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4'), 4)
+        m4.rightBarline = bar.Repeat(direction='end')
+        p.append(m4)
+        p.append(spanner.RepeatBracket(m4, number=2))
+        
+        m5 = stream.Measure()
+        m5.repeatAppend(note.Note('b4'), 4)
+        p.append(m5)
+        
+        #p.show()        
+        # all spanners should be at the part level
+        self.assertEqual(len(p.spanners), 2)
+        # have the offsets of the start of each measure
+        self.assertEqual(rb1.getOffsetsBySite(p), [4.0, 8.0])
+        self.assertEqual(rb1.getDurationBySite(p).quarterLength, 8.0)
+
+        raw = p.musicxml
+        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+
+
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []

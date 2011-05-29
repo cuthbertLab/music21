@@ -1589,7 +1589,8 @@ def measureToMx(m, spannerBundle=None):
         # if we have spanners here, we can be sure they are relevant
         if len(rbSpanners) > 0:
             mxEnding = musicxmlMod.Ending()
-            mxEnding.set('type', 'discontinue')
+            # must use stop, not discontinue
+            mxEnding.set('type', 'stop')
             mxEnding.set('number', rbSpanners[0].number)
             mxBarline.set('endingObj', mxEnding)
 
