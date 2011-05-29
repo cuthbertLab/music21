@@ -22,8 +22,6 @@ from music21 import common
 from music21 import roman
 from music21.figuredBass import notation
 
-MAX_PITCH = pitch.Pitch('B5')
-
 scaleModes = {'major' : scale.MajorScale,
               'minor' : scale.MinorScale,
               'dorian' : scale.DorianScale,
@@ -115,7 +113,7 @@ class FiguredBassScale:
         samplePitches = self.getPitches(bassPitch, notationString, maxPitch)
         return samplePitches
         
-    def getPitches(self, bassPitch, notationString = '', maxPitch=MAX_PITCH):
+    def getPitches(self, bassPitch, notationString = '', maxPitch=pitch.Pitch('B5')):
         '''
         Given a bass pitch and a corresponding notation string,
         returns a list of corresponding pitches, located at the
