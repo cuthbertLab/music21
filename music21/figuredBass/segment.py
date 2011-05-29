@@ -21,8 +21,8 @@ from music21 import note
 from music21 import pitch
 from music21 import scale
 from music21.figuredBass import fbPitch
-from music21.figuredBass import possibility2
-from music21.figuredBass import resolution2
+from music21.figuredBass import possibility
+from music21.figuredBass import resolution
 from music21.figuredBass import rules
 
 _MOD = 'segment2.py'
@@ -45,17 +45,17 @@ class Segment:
         self.numParts = fbRules.numParts
 
         singlePossibilityRules = \
-        [(fbRules.forbidIncompletePossibilities, possibility2.isIncomplete, False, [self.pitchNamesInChord]),
-         (True, possibility2.upperPartsWithinLimit, True, [fbRules.upperPartsMaxSemitoneSeparation]),
-         (fbRules.forbidVoiceCrossing, possibility2.voiceCrossing, False)]
+        [(fbRules.forbidIncompletePossibilities, possibility.isIncomplete, False, [self.pitchNamesInChord]),
+         (True, possibility.upperPartsWithinLimit, True, [fbRules.upperPartsMaxSemitoneSeparation]),
+         (fbRules.forbidVoiceCrossing, possibility.voiceCrossing, False)]
 
         consecutivePossibilityRules = \
-        [(fbRules.forbidVoiceOverlap, possibility2.voiceOverlap, False),
-         (True, possibility2.partMovementsWithinLimits, True, [fbRules.partMovementLimits]),
-         (fbRules.forbidParallelFifths, possibility2.parallelFifths, False),
-         (fbRules.forbidParallelOctaves, possibility2.parallelOctaves, False),
-         (fbRules.forbidHiddenFifths, possibility2.hiddenFifth, False),
-         (fbRules.forbidHiddenOctaves, possibility2.hiddenOctave, False)]
+        [(fbRules.forbidVoiceOverlap, possibility.voiceOverlap, False),
+         (True, possibility.partMovementsWithinLimits, True, [fbRules.partMovementLimits]),
+         (fbRules.forbidParallelFifths, possibility.parallelFifths, False),
+         (fbRules.forbidParallelOctaves, possibility.parallelOctaves, False),
+         (fbRules.forbidHiddenFifths, possibility.hiddenFifth, False),
+         (fbRules.forbidHiddenOctaves, possibility.hiddenOctave, False)]
 
         isDominantSeventh = self.segmentChord.isDominantSeventh()
         isDiminishedSeventh = self.segmentChord.isDiminishedSeventh()
@@ -133,12 +133,12 @@ class Segment:
         resolveV43toI6 = domInversion and resInversion == 1
         
         dominantResolutionMethods = \
-        [(resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution2.dominantSeventhToMajorTonic, [resolveV43toI6]),
-         (resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution2.dominantSeventhToMinorTonic, [resolveV43toI6]),
-         (resChord.root().name == majSubmediant.name and resChord.isMinorTriad() and domInversion == 0, resolution2.dominantSeventhToMinorSubmediant),
-         (resChord.root().name == minSubmediant.name and resChord.isMajorTriad() and domInversion == 0, resolution2.dominantSeventhToMajorSubmediant),
-         (resChord.root().name == subdominant.name and resChord.isMajorTriad() and domInversion == 0, resolution2.dominantSeventhToMajorSubdominant),
-         (resChord.root().name == subdominant.name and resChord.isMinorTriad() and domInversion == 0, resolution2.dominantSeventhToMinorSubdominant)]
+        [(resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution.dominantSeventhToMajorTonic, [resolveV43toI6]),
+         (resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution.dominantSeventhToMinorTonic, [resolveV43toI6]),
+         (resChord.root().name == majSubmediant.name and resChord.isMinorTriad() and domInversion == 0, resolution.dominantSeventhToMinorSubmediant),
+         (resChord.root().name == minSubmediant.name and resChord.isMajorTriad() and domInversion == 0, resolution.dominantSeventhToMajorSubmediant),
+         (resChord.root().name == subdominant.name and resChord.isMajorTriad() and domInversion == 0, resolution.dominantSeventhToMajorSubdominant),
+         (resChord.root().name == subdominant.name and resChord.isMinorTriad() and domInversion == 0, resolution.dominantSeventhToMinorSubdominant)]
         
         try:
             return self.resolveSpecialSegment(dominantResolutionMethods)
@@ -162,10 +162,10 @@ class Segment:
                 doubledRoot = False
 
         diminishedResolutionMethods = \
-        [(resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution2.diminishedSeventhToMajorTonic, [doubledRoot]),
-         (resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution2.diminishedSeventhToMinorTonic, [doubledRoot]),
-         (resChord.root().name == subdominant.name and resChord.isMajorTriad(), resolution2.diminishedSeventhToMajorSubdominant),
-         (resChord.root().name == subdominant.name and resChord.isMinorTriad(), resolution2.diminishedSeventhToMinorSubdominant)]
+        [(resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution.diminishedSeventhToMajorTonic, [doubledRoot]),
+         (resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution.diminishedSeventhToMinorTonic, [doubledRoot]),
+         (resChord.root().name == subdominant.name and resChord.isMajorTriad(), resolution.diminishedSeventhToMajorSubdominant),
+         (resChord.root().name == subdominant.name and resChord.isMinorTriad(), resolution.diminishedSeventhToMinorSubdominant)]
         
         try:
             return self.resolveSpecialSegment(diminishedResolutionMethods)
