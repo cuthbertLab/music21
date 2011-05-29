@@ -63,7 +63,8 @@ class Segment:
 
         specialResolutionRules = \
         [(fbRules.resolveDominantSeventhProperly and isDominantSeventh, self.resolveDominantSeventhSegment),
-         (fbRules.resolveDiminishedSeventhProperly and isDiminishedSeventh, self.resolveDiminishedSeventhSegment, [fbRules.doubledRootInDim7])]
+         (fbRules.resolveDiminishedSeventhProperly and isDiminishedSeventh, self.resolveDiminishedSeventhSegment, [fbRules.doubledRootInDim7]),
+         (fbRules.resolveAugmentedSixthProperly and isAugmentedSixth, self.resolveAugmentedSixthSegment)]
         
         self.singlePossibilityRuleChecking = self.compileRules(singlePossibilityRules)
         self.consecutivePossibilityRuleChecking = self.compileRules(consecutivePossibilityRules)
@@ -173,6 +174,38 @@ class Segment:
             self.environRules.warn("Diminished seventh resolution: No proper resolution available. Executing ordinary resolution.")
             return self.resolveOrdinarySegment(segmentB)
 
+    def resolveAugmentedSixthSegment(self, segmentB):
+        augSixthChord = self.segmentChord
+        if augSixthChord.isFrenchAugmentedSixth():
+            augSixthType = 1
+        elif augSixthChord.isGermanAugmentedSixth():
+            augSixthType = 2
+        elif augSixthChord.isItalianAugmentedSixth():
+            self.environRules.warn("Augmented sixth resolution: It+6 resolution not yet supported. Executing ordinary resolution.")
+            return self.resolveOrdinarySegment(segmentB)
+        elif augSixthChord.isSwissAugmentedSixth():
+            self.environRules.warn("Augmented sixth resolution: Sw+6 resolution not yet supported. Executing ordinary resolution.")
+            return self.resolveOrdinarySegment(segmentB)
+        else:
+            self.environRules.warn("Augmented sixth resolution: Augmented sixth type not supported. Executing ordinary resolution.")
+            return self.resolveOrdinarySegment(segmentB)
+
+        tonic = resolution.transpose(augSixthChord.bass(), 'M3')
+        majorScale = scale.MajorScale(tonic)
+        minorScale = scale.MinorScale(tonic)
+        resChord = segmentB.segmentChord
+
+        augmentedSixthResolutionMethods = \
+        [(resChord.inversion() == 2 and resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution.augmentedSixthToMajorTonic, [augSixthType]),
+         (resChord.inversion() == 2 and resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution.augmentedSixthToMinorTonic, [augSixthType]),
+         (majorScale.pitchFromDegree(5).name == resChord.bass().name and resChord.isMajorTriad(), resolution.augmentedSixthToDominant, [augSixthType])]
+        
+        try:
+            return self.resolveSpecialSegment(augmentedSixthResolutionMethods)
+        except SegmentException:
+            self.environRules.warn("Augmented sixth resolution: No proper resolution available. Executing ordinary resolution.")
+            return self.resolveOrdinarySegment(segmentB)
+    
     def resolveSpecialSegment(self, specialResolutionMethods):
         resolutionMethodExecutor = self.compileRules(specialResolutionMethods, 3)
         for (resolutionMethod, args) in resolutionMethodExecutor[True]:
