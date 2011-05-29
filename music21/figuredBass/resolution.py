@@ -7,6 +7,66 @@ from music21 import chord
 from music21 import note
 from music21 import stream
 
+def augmentedSixthToDominant(augSixthPossib, augSixthType):
+    '''
+    '''
+    #Type 0: Italian, type 1: French, type 2: German, type 3: Swiss
+    augSixthChord = chord.Chord(augSixthPossib)
+    augSixthChord.removeRedundantPitchNames()
+    if augSixthType == 1:
+        augSixthChord.root(augSixthChord.getChordStep(3))
+    
+    bass = augSixthChord.bass()
+    root = augSixthChord.root()
+    tonic = augSixthChord.getChordStep(5)
+    
+    howToResolve = \
+    [(lambda p: p.name == bass.name, '-m2'),
+    (lambda p: p.name == root.name, 'm2'),
+    (lambda p: p.name == tonic.name and not augSixthType == 0, '-m2'),
+    (lambda p: augSixthType == 2, '-m2')]
+
+    return resolvePitches(augSixthPossib, howToResolve)
+
+def augmentedSixthToMajorTonic(augSixthPossib, augSixthType):
+    '''
+    '''
+    augSixthChord = chord.Chord(augSixthPossib)
+    augSixthChord.removeRedundantPitchNames()
+    if augSixthType == 1:
+        augSixthChord.root(augSixthChord.getChordStep(3))
+    
+    bass = augSixthChord.bass()
+    root = augSixthChord.root()
+    tonic = augSixthChord.getChordStep(5)
+    
+    howToResolve = \
+    [(lambda p: p.name == bass.name, '-m2'),
+    (lambda p: p.name == root.name, 'm2'),
+    (lambda p: augSixthType == 1, 'M2'),
+    (lambda p: augSixthType == 2, 'A1')]
+
+    return resolvePitches(augSixthPossib, howToResolve)
+
+def augmentedSixthToMinorTonic(augSixthPossib, augSixthType):
+    '''
+    '''
+    augSixthChord = chord.Chord(augSixthPossib)
+    augSixthChord.removeRedundantPitchNames()
+    if augSixthType == 1:
+        augSixthChord.root(augSixthChord.getChordStep(3))
+    
+    bass = augSixthChord.bass()
+    root = augSixthChord.root()
+    tonic = augSixthChord.getChordStep(5)
+    
+    howToResolve = \
+    [(lambda p: p.name == bass.name, '-m2'),
+    (lambda p: p.name == root.name, 'm2'),
+    (lambda p: augSixthType == 1, 'm2')]
+    
+    return resolvePitches(augSixthPossib, howToResolve)
+
 def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
